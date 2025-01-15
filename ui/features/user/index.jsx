@@ -18,7 +18,7 @@
 
 import './jquery/index'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import GeneratePairingCode from '@canvas/generate-pairing-code'
 import ready from '@instructure/ready'
 import ManageTempEnrollButton from '@canvas/temporary-enrollment/react/ManageTempEnrollButton'
@@ -46,9 +46,9 @@ ready(() => {
   const roles = Array.prototype.slice.call(ENV.COURSE_ROLES)
 
   if (pairing_container) {
-    ReactDOM.render(
-      <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
-      pairing_container,
+    const pairingRoot = createRoot(pairing_container)
+    pairingRoot.render(
+      <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />
     )
   }
 
@@ -58,16 +58,16 @@ ready(() => {
     )
 
     if (temp_enrollments_container) {
-      ReactDOM.render(
-        <ManageTempEnrollButton
-          user={{id: ENV.USER_ID, name: ENV.CONTEXT_USER_DISPLAY_NAME}}
-          modifyPermissions={modifyPermissions}
-          roles={roles}
-          rolePermissions={rolePermissions}
-          can_read_sis={permissions.can_read_sis}
-        />,
-        temp_enrollments_container,
-      )
+    const tempEnrollRoot = createRoot(temp_enrollments_container)
+    tempEnrollRoot.render(
+      <ManageTempEnrollButton
+        user={{id: ENV.USER_ID, name: ENV.CONTEXT_USER_DISPLAY_NAME}}
+        modifyPermissions={modifyPermissions}
+        roles={roles}
+        rolePermissions={rolePermissions}
+        can_read_sis={permissions.can_read_sis}
+      />
+    )
     }
   }
 })
