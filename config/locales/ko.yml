@@ -2953,6 +2953,7 @@ ko:
   choose_assignment_group_9e7de13c: "과제 그룹 선택"
   clear_all_e23811b1: "모두 지우기"
   click_to_change_profile_picture_for_display_name_6a4b41db: "%{display_name}의 프로필 사진을 변경하려면 클릭"
+  click_to_edit_drag_to_reorder_ab725681: "편집하려면 클릭, 순서를 다시 매기려면 끌기"
   click_to_report_profile_picture_370f9625: "프로필 사진을 신고하려면 클릭"
   click_to_report_profile_picture_for_display_name_9ffbcc86: "%{display_name}의 프로필 사진을 신고하려면 클릭"
   close_17f50799: 닫기
@@ -10050,6 +10051,7 @@ ko:
   page_comments: 
     errors: 
       create_failed: "의견 생성 실패함"
+  page_name_21defa75: "페이지 이름"
   page_title_d1a22bbf: "페이지 제목"
   page_views: 
     browsers: 
@@ -10154,6 +10156,7 @@ ko:
     statistics: 통계
   please_enter_the_details_for_the_new_course_dc705b8c: "새 과목에 대한 세부 정보를 입력하시기 바랍니다."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "토큰에 의해 표시되는 인증 코드를 입력하시기 바랍니다."
+  please_upload_files_as_a_zip_5a2c799f: "파일을 .zip으로 업로드하십시오."
   plugins: 
     academic_benchmark_importer: 
       description: "이를 사용하면 Academic Benchmark 표준을 Canvas로 가져올 수 있습니다."
