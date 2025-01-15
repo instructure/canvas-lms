@@ -328,7 +328,7 @@ es-ES:
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Capacidad para enviar las actividades con anotaciones del alumno."
   about_70c18bba: "Acerca de"
   about_intro_d50f2d36: "Acerca de (introducción)"
-  about_smart_search_c8e7fcb4: "Smart Search"
+  about_smart_search_c8e7fcb4: "Acerca de la búsqueda inteligente"
   about_this_service_b10bc808: "Acerca de este servicio"
   above_max_rating_64b29915: "Por encima de la puntuación máxima"
   academic_benchmark: 
@@ -8183,7 +8183,7 @@ es-ES:
     registered_services: "Servicios registrados"
     revisions: Revisiones
     rubrics: Rúbricas
-    search: "Smart Search"
+    search: "Búsqueda inteligente"
     settings: Configuraciones
     site_admin: "Administrador del sitio"
     stats: Estadísticas
@@ -18355,7 +18355,7 @@ es-ES:
   please_verify_your_username_or_password_and_try_ag_59ccc355: "Comprueba tu nombre de usuario y/o contraseña y vuelve a intentarlo. Con %{attempts} intentos más, tu cuenta se bloqueará."
   please_verify_your_username_or_password_and_try_ag_8988c9c6: "Comprueba tu nombre de usuario y/o contraseña y vuelve a intentarlo. ¿Tienes problemas para iniciar sesión? *Consulta nuestras preguntas frecuentes de inicio de sesión*."
   please_visit_your_modules_page_for_more_informatio_846c5e32: "Visitar la *página de tus contenidos* para obtener más información."
-  please_wait_a_moment_while_we_get_smart_search_rea_99a77351: "Espere un momento mientras preparamos Smart Search para este curso. Esto solo se hará una vez."
+  please_wait_a_moment_while_we_get_smart_search_rea_99a77351: "Espere un momento mientras preparamos la búsqueda inteligente para este curso. Esto solo se hará una vez."
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: "Espera mientras cargamos y procesamos tu archivo."
   please_wait_e6355980: Espera...
   please_wait_while_we_upload_attachments_59544216: "Espera mientras se cargan los adjuntos."
@@ -23092,12 +23092,12 @@ es-ES:
   smaller_numbers_mean_higher_priority_c69f4d0a: "Cuanto más bajo es el número, mayor es la prioridad"
   smart_alerts_44db622e: "Alertas inteligentes"
   smart_assignment_alerts_abc2224: "Alertas de actividades inteligentes"
-  smart_search_community_c2a115a2: "Comunidad de Smart Search"
-  smart_search_currently_in_development_for_canvas_u_541c3754: "Smart Search, actualmente en desarrollo por Canvas, utiliza algoritmos semánticos y IA para entender el contexto y el significado semántico, no solo keyword matching."
-  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "Smart Search utiliza «incrustaciones» para representar matemáticamente el contenido y consultar comparaciones, entender palabras clave y consultar en general en cualquier lengua, gracias a su modelo IA multilingüe. Escribe consultas de búsqueda utilizando palabras clave, preguntas, frases o lo que sea más natural para que describas lo que estás intentando encontrar."
+  smart_search_community_c2a115a2: "Comunidad de la búsqueda inteligente"
+  smart_search_currently_in_development_for_canvas_u_541c3754: "La búsqueda inteligente, actualmente en desarrollo por Canvas, utiliza algoritmos semánticos y IA para entender el contexto y el significado semántico, no solo keyword matching."
+  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "La búsqueda inteligente utiliza «incrustaciones» para representar matemáticamente el contenido y consultar comparaciones, entender palabras clave y consultar en general en cualquier lengua, gracias a su modelo IA multilingüe. Escribe consultas de búsqueda utilizando palabras clave, preguntas, frases o lo que sea más natural para que describas lo que estás intentando encontrar."
   smart_search_fd7cd4: "Búsqueda inteligente"
   smart_search_is_a_feature_of_canvas_that_is_curren_31f7d35d: "Smart Search es una funcionalidad de Canvas actualmente en desarrollo.  Al utilizar algoritmos semánticos y la IA, la nueva funcionalidad Smart Search entiende el contexto y las preguntas, proporcionando unos resultados más precisos y relevantes sin necesidad de operadores de Boole ni otras herramientas de búsqueda."
-  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "Smart Search es una funcionalidad que se puede previsualizar. A través de los resultados de evaluación y del espacio de Canvas Community se puede conseguir una valoración para Smart Search Beta. El espacio de Canvas Community se puede encontrar aquí: "
+  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "La búsqueda inteligente es una funcionalidad que se puede previsualizar. A través de los resultados de evaluación y del espacio de Canvas Community se puede conseguir una valoración para la búsqueda inteligente Beta. El espacio de Canvas Community se puede encontrar aquí: "
   smileys_emotion_edc2beac: "Sonrisas y emoción"
   sms_f0ddceeb: sms
   sms_is_only_used_for_multi_factor_authentication_i_73a11abc: "El SMS solo se utiliza para la autentificación multifactor (si está habilitada para tu cuenta)."
@@ -24079,7 +24079,7 @@ es-ES:
     quizzes: Pruebas
     rubrics: Rúbricas
     schedule: Planificar
-    search: "Smart Search"
+    search: "Búsqueda inteligente"
     settings: Configuraciones
     syllabus: "Programa de la asignatura"
     tab_location_error: "La ubicación de la pestaña no es correcta"
@@ -26940,7 +26940,7 @@ es-ES:
   using_login_attribute_integration_id_9067ea54: "Utilizando atributo de inicio de sesión: identificación de integración"
   using_login_attribute_sis_user_id_b5ec538f: "Utilizando atributo de inicio de sesión: Identificación de usuario SIS"
   using_login_attribute_unique_user_id_a307a9f: "Utilizando atributo de inicio de sesión: identificación de un solo usuario"
-  using_smart_search_aecf6c76: "Utilizando Smart Search"
+  using_smart_search_aecf6c76: "Utilizando la búsqueda inteligente"
   utc_e44049af: UTC
   uuid_has_been_provisioned_ab0c6c9: "UUID ha sido provisionado."
   val_percent_c2ca6679: "%val porcentaje"

@@ -146,6 +146,7 @@ hy:
     upload: Բեռնել
     uploading: "Բեռնում է..."
   _5a374287: "..."
+  _at_the_bottom__4360f2b4: "-- Ներքևում--"
   _section_not_synced_yet_cd07d0dd: "Բաժինը դեռևս չի սինխրոնացվել"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Հաշվարկվող մեծությունը չի օգտագործվում հաշվարկման սույն մեթոդում"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "%{itemName} անվանմամբ ֆայլը արդեն գոյություն ունի սույն թղթապանակում:"
@@ -3505,6 +3506,7 @@ hy:
   click_here_to_review_the_submission_ae017c01: "Սեղմեք այստեղ ուղարկված նյութը դիտելու համար"
   click_here_to_see_the_file_79e2b366: "Սեղմեք այստեղ ֆայլը տեսնելու համար:"
   click_here_to_view_the_submission_24777a69: "Սեղմեք այստեղ ուղարկվածը դիտելու համար"
+  click_to_edit_drag_to_reorder_ab725681: "Սեղմել այստեղ՝ խմբագրելու համար: Վերադասավորելու համար քաշել աղեղի օգնությամբ "
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Սեղմեք մեկնաբանությունները մուտքագրելու համար, եթե ունկնդիրը ընտրում է այս պատասխանը"
   click_to_modify_89fa26aa: "Սեղմել փոփոխելու համար"
   click_to_report_profile_picture_370f9625: "Սեղմել զեկուցելու պրոֆիլի նկարի մասին"
@@ -6607,7 +6609,7 @@ hy:
       zipping: "Ֆայլի արխիվացումը ընթացքի մեջ է..."
     page_list: 
       buttons: 
-        done_editing: "Խմբագրումը ավարտվել է"
+        done_editing: "Խմբագրումը կատարված  է"
       default_page_name: "Էջի անվանում"
       edit_instructions: "Սեղմել էջի անվանման վրա՝ այն փոխելու, կամ սեղմել և քաշել վերադասավորելու համար:"
       headers: 
@@ -11926,6 +11928,7 @@ hy:
   page_comments: 
     errors: 
       create_failed: "Մեկնաբանության ստեղծումը չհաջողվեց"
+  page_name_21defa75: "Էջի անվանում"
   page_not_found_2b0d05f5: "Էջը չի գտնվել"
   page_title_d1a22bbf: "Էջի անվանում"
   page_views: 
@@ -12073,6 +12076,7 @@ hy:
   please_enter_your_label_name_and_password_5c56be80: "Մուտքագրեք ձեր  %{label_name} և գաղտնաբառը՝"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Տեղեկացրեք նրանց, որ էջն եք դիտում և որ հղումով անցաք այդտեղ:"
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Թույլ տվեք նրանց տեսնել Ձեր կողմից տվյալ պահին դիտվող էջը եւ ձեր սեղմած հղումը"
+  please_upload_files_as_a_zip_5a2c799f: "Ներբեռնել ֆայլերը որպես zip ֆայլեր:"
   please_wait_e6355980: "Խնդրում ենք սպասել..."
   plugins: 
     academic_benchmark_importer: 

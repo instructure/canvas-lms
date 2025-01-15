@@ -359,7 +359,7 @@ es:
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Capacidad para enviar las tareas de comentar del estudiante."
   about_70c18bba: "Acerca de"
   about_intro_d50f2d36: "Acerca de (introducción)"
-  about_smart_search_c8e7fcb4: "Acerca de Smart Search"
+  about_smart_search_c8e7fcb4: "Acerca de la búsqueda inteligente"
   about_this_service_b10bc808: "Acerca de este servicio"
   above_max_rating_64b29915: "Calificación por encima del máximo"
   academic_benchmark: 
@@ -10425,7 +10425,7 @@ es:
     registered_services: "Servicios registrados"
     revisions: Revisiones
     rubrics: Rúbricas
-    search: "Smart Search"
+    search: "Búsqueda inteligente"
     settings: ~
     site_admin: "Administrador del sitio"
     stats: Estadísticas
@@ -29362,12 +29362,12 @@ es:
     threshold_24h: 24h
     threshold_36h: 36h
   smart_assignment_alerts_abc2224: "Alertas de tareas inteligentes"
-  smart_search_community_c2a115a2: "Comunidad de Smart Search"
-  smart_search_currently_in_development_for_canvas_u_541c3754: "Smart Search, actualmente en desarrollo para Canvas, usa algoritmos semánticos e inteligencia artificial para comprender el contexto de la consulta y el significado semántico, no solo una coincidencia de palabras clave."
-  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "Smart Search emplea \"incrustaciones\" para representar matemáticamente contenido y consultas para comparación, comprender palabras clave o consultas generales en cualquier idioma, gracias a su modelo de inteligencia artificial multilingüe. Escriba consultas de búsqueda usando palabras clave, preguntas, oraciones o lo que sea que le resulte más natural para describir lo que está intentando encontrar."
+  smart_search_community_c2a115a2: "Comunidad de la búsqueda inteligente"
+  smart_search_currently_in_development_for_canvas_u_541c3754: "La búsqueda inteligente, actualmente en desarrollo para Canvas, usa algoritmos semánticos e inteligencia artificial para comprender el contexto de la consulta y el significado semántico, no solo una coincidencia de palabras clave."
+  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "La búsqueda inteligente emplea \"incrustaciones\" para representar matemáticamente contenido y consultas para comparación, comprender palabras clave o consultas generales en cualquier idioma, gracias a su modelo de inteligencia artificial multilingüe. Escriba consultas de búsqueda usando palabras clave, preguntas, oraciones o lo que sea que le resulte más natural para describir lo que está intentando encontrar."
   smart_search_fd7cd4: "Búsqueda inteligente"
   smart_search_is_a_feature_of_canvas_that_is_curren_31f7d35d: "La búsqueda inteligente es una funcionalidad de Canvas que está en desarrollo.  Al aprovechar algoritmos semánticos y la IA, la nueva funcionalidad de búsqueda inteligente comprende el contexto de las consultas, lo cual proporciona resultados más precisos y relevantes sin la necesidad de operadores booleanos tradicionales ni otras herramientas de búsqueda."
-  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "Smart Search está en la vista previa de la funcionalidad. Se puede dar una devolución a través de las calificaciones de los resultados y el espacio Comunidad Canvas para Smart Search Beta. El espacio Comunidad Canvas se puede encontrar aquí: "
+  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "La búsqueda inteligente está en la vista previa de la funcionalidad. Se puede dar una devolución a través de las calificaciones de los resultados y el espacio Comunidad Canvas para la búsqueda inteligente Beta. El espacio Comunidad Canvas se puede encontrar aquí: "
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "En Google Play"
@@ -30487,7 +30487,7 @@ es:
     quizzes: Evaluaciones
     rubrics: Rúbricas
     schedule: Planificar
-    search: "Smart Search"
+    search: "Búsqueda inteligente"
     settings: Configuraciones
     syllabus: "Programa del curso"
     tab_location_error: "La ubicación de la pestaña no es válida"
@@ -34079,7 +34079,7 @@ es:
   using_login_attribute_integration_id_9067ea54: "Uso del atributo de inicio de sesión: identificación de integración"
   using_login_attribute_sis_user_id_b5ec538f: "Uso del atributo de inicio de sesión: Identificación de usuario de SIS"
   using_login_attribute_unique_user_id_a307a9f: "Uso del atributo de inicio de sesión: identificación de usuario único"
-  using_smart_search_aecf6c76: "Uso de Smart Search"
+  using_smart_search_aecf6c76: "Uso de la búsqueda inteligente"
   utc_e44049af: UTC
   uuid_has_been_provisioned_ab0c6c9: "Se provisionó un UUID."
   val_percent_c2ca6679: "%val porcentaje"
