@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class FixupTwitterAuthProviders < ActiveRecord::Migration[7.1]
+class FixupTwitterAuthProvidersAndPseudos < ActiveRecord::Migration[7.1]
   tag :postdeploy
 
   def up
-    DataFixup::RemoveTwitterAuthProviders.delay_if_production(priority: Delayed::LOWER_PRIORITY).run
+    DataFixup::RemoveTwitterAuthProviders.delay_if_production(priority: Delayed::LOWER_PRIORITY, n_strand: "long_datafixups").run
   end
 end
