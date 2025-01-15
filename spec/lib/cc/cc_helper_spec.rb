@@ -336,6 +336,17 @@ describe CC::CCHelper do
       expect(urls[1]).to eq "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
 
+    context "exploit assessment_question file links" do
+      it "will ignore links if the exporting user has no access" do
+        teacher_in_course(active_all: true, course: @course)
+        attachment_model(uploaded_data: stub_png_data, context: Course.create!)
+        question_text = "<p><img src=\"/assessment_questions/0/files/#{@attachment.id}\"/></p>"
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @teacher, for_course_copy: false)
+        translated = @exporter.html_content(question_text)
+        expect(translated).to eq "<p><img src=\"http://localhost/assessment_questions/0/files/#{@attachment.id}\"></p>"
+      end
+    end
+
     context "assessment_question file links" do
       before do
         attachment_model(uploaded_data: stub_png_data)
