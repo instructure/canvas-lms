@@ -32,7 +32,9 @@ root.render(<App />);
 ```
 
 ### Notes
-1. The root element must exist in the DOM before calling createRoot
-2. To unmount, use `root.unmount()` instead of `ReactDOM.unmountComponentAtNode`
-3. Error boundaries work the same way with createRoot
-4. Hydration is done using `hydrateRoot` instead of `ReactDOM.hydrate`
+* The root element must exist in the DOM before calling createRoot
+* To unmount, use `root.unmount()` instead of `ReactDOM.unmountComponentAtNode`
+* Error boundaries work the same way with createRoot
+* Hydration is done using `hydrateRoot` instead of `ReactDOM.hydrate`
+* When migrating from ReactDOM.render to createRoot, consider if flushSync
+  is needed for old patterns.
