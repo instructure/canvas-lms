@@ -41,4 +41,14 @@ describe DataFixup::RemoveTwitterAuthProviders do
     DataFixup::RemoveTwitterAuthProviders.run
     expect(Pseudonym.where(authentication_provider_id: @auth_provider.id).active).to eq([])
   end
+
+  it "removes pseudos of deleted auth providers too" do
+    DataFixup::RemoveTwitterAuthProviders.run
+    expect(AuthenticationProvider.where(auth_type: "twitter").active).to eq([])
+    expect(Pseudonym.where(authentication_provider_id: @auth_provider.id).active).to eq([])
+    pseudonym = @auth_provider.pseudonyms.create!(unique_id: "phony.stark@x.com", user: User.create!)
+    expect(Pseudonym.where(authentication_provider_id: @auth_provider.id).active).to eq([pseudonym])
+    DataFixup::RemoveTwitterAuthProviders.run
+    expect(Pseudonym.where(authentication_provider_id: @auth_provider.id).active).to eq([])
+  end
 end
