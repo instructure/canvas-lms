@@ -50,6 +50,10 @@ if settings.present?
     end
 
     config.traces_sampler = lambda do |sampling_context|
+      # if this is the continuation of a trace, just use that decision (rate controlled by the caller)
+      unless sampling_context[:parent_sampled].nil?
+        next sampling_context[:parent_sampled]
+      end
       rack_env = sampling_context[:env]
       return 1 if rack_env && rack_env.try(:[], 'QUERY_STRING')&.include?('sentry')
       return 0.01 if rack_env && rack_env.try(:[], 'PATH_INFO') =~ /grade_passback$/
