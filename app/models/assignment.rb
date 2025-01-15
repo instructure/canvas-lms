@@ -124,12 +124,13 @@ class Assignment < AbstractAssignment
   end
 
   def self.assignment_ids_with_sub_assignment_submissions(assignment_ids)
-    Assignment
-      .where(id: assignment_ids)
-      .joins("LEFT OUTER JOIN #{SubAssignment.quoted_table_name} AS sub_assignments ON assignments.id = sub_assignments.parent_assignment_id")
-      .where(Submission.active.having_submission.where("submissions.assignment_id=sub_assignments.id").arel.exists)
+    Submission
+      .active
+      .having_submission
+      .joins(:assignment)
+      .where(assignment_id: SubAssignment.where(parent_assignment_id: assignment_ids))
       .distinct
-      .pluck("sub_assignments.parent_assignment_id")
+      .pluck(:parent_assignment_id)
   end
 
   # AbstractAssignment method with added support for sub_assignment submisssions
