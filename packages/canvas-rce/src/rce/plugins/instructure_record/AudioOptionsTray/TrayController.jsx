@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 
 import bridge from '../../../../bridge'
 import {asAudioElement, findMediaPlayerIframe} from '../../shared/ContentSelection'
@@ -32,6 +32,7 @@ export default class TrayController {
     this._shouldOpen = false
     this._editor = null
     this._audioContainer = null
+    this._root = null
   }
 
   get container() {
@@ -81,8 +82,14 @@ export default class TrayController {
     this._renderTray(trayProps)
     this._editor = null
     this._audioContainer = null
+    if (this._root) {
+      this._root.unmount()
+      this._root = null
+    }
     const elem = document.getElementById(CONTAINER_ID)
-    return elem.parentNode.removeChild(elem)
+    if (elem) {
+      elem.parentNode.removeChild(elem)
+    }
   }
 
   _applyAudioOptions(audioOptions) {
@@ -104,7 +111,7 @@ export default class TrayController {
       })
       .then(() => container?.contentWindow.location.reload())
       .catch(ex => {
-        // eslint-disable-next-line no-console
+         
         console.error('Failed updating audio captions', ex)
       })
   }
@@ -154,6 +161,9 @@ export default class TrayController {
         requestSubtitlesFromIframe={cb => this.requestSubtitlesFromIframe(cb)}
       />
     )
-    ReactDOM.render(element, this.container)
+    if (!this._root) {
+      this._root = createRoot(this.container)
+    }
+    this._root.render(element)
   }
 }
