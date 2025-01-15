@@ -422,18 +422,15 @@ module AccountReports::ReportHelper
     GuardRail.activate(:primary) { @account_report.write_report_runners }
   end
 
-  def activate_report_db(replica: :report, &block)
+  def activate_report_db(replica: :report, &)
     # if there is no report db configured, use the secondary.
-    # Rails 6.1 - Shard.current.database_server.roles will be set.
-    # It is not set in older versions of Rails.
-    Shard.current.database_server.tap do |ds|
-      if (ds.respond_to?(:roles) && ds.roles.include?(replica)) || ds.config[replica]
-        GuardRail.activate(replica, &block)
-      else
-        GuardRail.activate(:secondary, &block)
-      end
+    if Shard.current.database_server.roles.include?(replica)
+      GuardRail.activate(replica, &)
+    else
+      GuardRail.activate(:secondary, &)
     end
   end
+  module_function :activate_report_db
 
   def run_account_report_runner(report_runner, headers, files: nil)
     return if report_runner.reload.workflow_state == "aborted"

@@ -41,7 +41,7 @@ module Reporting
     end
 
     def process_account(account)
-      GuardRail.activate(:secondary) do
+      AccountReports::ReportHelper.activate_report_db do
         data = {}.with_indifferent_access
         data[:generated_at] = @timestamp
         data[:id] = account.id
