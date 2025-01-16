@@ -17,12 +17,11 @@
  */
 
 import React from 'react'
-import {render, getByRole, getByText} from '@testing-library/react'
+import {render, getByRole, getByText, waitFor} from '@testing-library/react'
 import CoursePacingNotice, {renderCoursePacingNotice} from '../CoursePacingNotice'
 
 describe('CoursePacingNotice', () => {
   it('renders', () => {
-     
     const {getByRole, getByText} = render(<CoursePacingNotice courseId="17" />)
     expect(
       getByText('This course is using Course Pacing. Go to Course Pacing to manage due dates.'),
@@ -32,16 +31,18 @@ describe('CoursePacingNotice', () => {
     expect(link.getAttribute('href')).toEqual('/courses/17/course_pacing')
   })
 
-  describe('renderCoursePacingNoticee', () => {
-    it('renders', () => {
+  describe('renderCoursePacingNotice', () => {
+    it('renders', async () => {
       const div = document.createElement('div')
       renderCoursePacingNotice(div, '17')
-      expect(
-        getByText(
-          div,
-          'This course is using Course Pacing. Go to Course Pacing to manage due dates.',
-        ),
-      ).toBeDefined()
+      await waitFor(() => {
+        expect(
+          getByText(
+            div,
+            'This course is using Course Pacing. Go to Course Pacing to manage due dates.',
+          ),
+        ).toBeDefined()
+      })
       const link = getByRole(div, 'link', {name: 'Course Pacing'})
       expect(link).toBeDefined()
       expect(link.getAttribute('href')).toEqual('/courses/17/course_pacing')
