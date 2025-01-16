@@ -61,6 +61,7 @@ class AbstractAssignment < ActiveRecord::Base
     graders_anonymous_to_graders
     anonymous_instructor_annotations
   ].freeze
+  HORIZON_SUBMISSION_TYPES = %w[online_text_entry online_upload external_tool].freeze
 
   DEFAULT_POINTS_POSSIBLE = 0
 
@@ -210,6 +211,7 @@ class AbstractAssignment < ActiveRecord::Base
   validates :grader_count, numericality: true
   validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
   validates :sis_source_id, uniqueness: { scope: :root_account_id }, allow_nil: true
+  validates_with HorizonValidators::AssignmentValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true

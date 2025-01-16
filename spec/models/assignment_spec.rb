@@ -12156,4 +12156,23 @@ describe Assignment do
       end
     end
   end
+
+  describe "Horizon course limitations" do
+    before :once do
+      Account.site_admin.enable_feature!(:horizon_course_setting)
+      @course.horizon_course = true
+      @course.save!
+    end
+
+    it "does not accept group assignments" do
+      @assignment = assignment_model(submission_types: "online_text_entry", course: @course)
+      group_category = @course.group_categories.create!(name: "Test Group Set")
+      @assignment.group_category = group_category
+      expect { @assignment.save! }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "does not accept invalid submission types" do
+      expect { assignment_model(submission_types: "online_url", course: @course) }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
 end
