@@ -4269,6 +4269,7 @@ uk:
   confirm_delete_6febeafb: "Підтвердити видалення"
   confirm_deletion_b2efe7d4: "Підтвердити видалення"
   confirm_email_address_9072dd3c: "Підтвердити електронну адресу"
+  confirm_new_password_3d3ca4ea: "Підтвердити новий пароль"
   confirm_password_aaf07824: "Підтвердити пароль"
   confirm_removal_a9bb889: "Підтвердження видалення"
   confirm_reservation_removal_e6350e7c: "Підтвердження зарезервованого видалення"
@@ -11836,6 +11837,7 @@ uk:
   new_opportunities_7d349c4d: "Нові можливості"
   new_outcome_7fba8c7d: "Новий результат"
   new_outcome_group_af59f145: "Новий результат групи"
+  new_password_1232cbf2: "Новий пароль"
   new_question_9107c469: "Нове питання"
   new_question_group_d9306280: "Група нових питань"
   new_quiz_34aacba6: "Нова контрольна робота"
@@ -13585,6 +13587,8 @@ uk:
     confirm_change_password: 
       buttons: 
         update_password: "Оновити пароль"
+      confirm_change_password: 
+        loading: Завантаження...
       labels: 
         new_password: "Новий пароль"
         password: Пароль
@@ -18057,6 +18061,7 @@ uk:
   update_grade_b47eb3ff: "Оновити оцінку"
   update_link_b7cab181: "Оновити посилання"
   update_module_b984c2e5: "Оновити модуль"
+  update_password_4bc5cb1f: "Оновити пароль"
   update_rating_6d29c2ef: "Оновити рейтинг"
   update_settings_9b422d0f: "Налаштування оновлення"
   update_tool_7d48ef2a: "Оновити %{tool}"
@@ -18688,6 +18693,7 @@ uk:
   whenever_b943b119: щоразу
   where_would_you_like_to_move_title_fabd6e8f: "Куди б ви хотіли перейти%{title} ?"
   which_course_is_this_question_about_f819a158: "Це питання з якого курсу?"
+  which_login_to_change_4707fbc6: "Який логін змінити"
   who_can_create_new_courses_7a6c1338: "Хто може створювати нові курси?"
   widget: 
     upload_media_track_form: 
