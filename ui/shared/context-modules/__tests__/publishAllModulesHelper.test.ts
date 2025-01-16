@@ -42,7 +42,7 @@ const {renderContextModulesPublishIcon} = {
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('../utils/publishOneModuleHelper')
 
-const mockDoFetchApi = jest.fn() as jest.MockedFunction<typeof doFetchApi>
+const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
 
 describe('publishAllModulesHelper', () => {
   beforeEach(() => {
