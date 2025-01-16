@@ -116,7 +116,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :external_status, default: "active", limit: 255
       t.bigint :storage_quota
       t.bigint :default_storage_quota
-      t.boolean :enable_user_notes, default: false
       t.string :allowed_services, limit: 255
       t.text :turnitin_pledge
       t.text :turnitin_comments
@@ -298,7 +297,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :reminder_time_for_grading, default: 0
       t.bigint :storage_quota
       t.string :visible_inbox_types, limit: 255
-      t.timestamp :last_user_note
       t.boolean :subscribe_to_emails
       t.text :features_used
       t.text :preferences
@@ -1576,7 +1574,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :context, polymorphic: { limit: 255 }, index: false
       t.string :subject, limit: 255
       t.boolean :group
-      t.boolean :generate_user_note
 
       t.index [:user_id, :workflow_state]
     end
@@ -2901,6 +2898,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :disabled_placements, array: true, default: []
       t.string :privacy_level
       t.string :unified_tool_id, limit: 255
+      t.references :lti_registration, foreign_key: true, index: { where: "lti_registration_id IS NOT NULL" }
     end
 
     create_table :lti_tool_consumer_profiles do |t|
@@ -4526,20 +4524,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.index %i[context_id context_type user_merge_data_id previous_user_id],
               name: "index_user_merge_data_records_on_context_id_and_context_type"
-    end
-
-    create_table :user_notes do |t|
-      t.references :user, foreign_key: true, index: false
-      t.text :note
-      t.string :title, limit: 255
-      t.references :created_by, foreign_key: { to_table: :users }
-      t.string :workflow_state, default: "active", null: false, limit: 255
-      t.timestamp :deleted_at
-      t.timestamps precision: nil
-      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
-
-      t.replica_identity_index
-      t.index [:user_id, :workflow_state]
     end
 
     create_table :user_observers do |t|
