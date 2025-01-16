@@ -3263,6 +3263,7 @@ ko:
   confirm_dialog_component: 
     ok: 확인
   confirm_email_address_9072dd3c: "이메일 주소 확인"
+  confirm_new_password_3d3ca4ea: "새 암호 확인"
   confirm_password_aaf07824: "암호 확인"
   confirm_unenrollment_64333263: "등록 취소 확인"
   confirming_2df4b68f: "확인 중..."
@@ -9543,6 +9544,7 @@ ko:
   new_group_8d6ad781: "새 그룹"
   new_outcome_7fba8c7d: "새 성과"
   new_outcome_group_af59f145: "새 성과 그룹"
+  new_password_1232cbf2: "새 암호"
   new_quizzes_dbda7e0a: "새로운 퀴즈"
   next_40e12421: 다음
   next_assignment_c19812a5: "다음 과제"
@@ -10741,6 +10743,8 @@ ko:
     confirm_change_password: 
       buttons: 
         update_password: "암호 업데이트"
+      confirm_change_password: 
+        loading: "로드 중..."
       labels: 
         new_password: "새 암호"
         password: 암호
@@ -14012,6 +14016,7 @@ ko:
   until_date_949017c4: "%{date} 까지"
   update_details_6abfed16: "세부 정보 업데이트"
   update_module_b984c2e5: "모듈 업데이트"
+  update_password_4bc5cb1f: "암호 업데이트"
   update_settings_9b422d0f: "설정 업데이트"
   updating_user_details_b8520b3e: "사용자 세부 정보 업데이트 중..."
   upload_8b403d05: 업로드
@@ -14486,6 +14491,7 @@ ko:
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "나의 과목에 오신 것을 환영합니다! 과목들의 목록을 편집하려면 \"모든 과목\"을 클릭하고 표시할 과목들에 별표 표시를 하십시오."
   what_should_the_csv_file_look_like_985a59ac: "CSV 파일은 어떻게 보입니까?"
   what_would_you_like_to_do_next_2835397e: "다음에 어떤 작업을 하시겠습니까?"
+  which_login_to_change_4707fbc6: "변경하려는 로그인"
   widget: 
     upload_media_track_form: 
       choose_a_language: "--언어 선택--"
