@@ -43,7 +43,6 @@ const renderComponent = resource => {
 describe('AssignmentSubmissionTypeContainer', () => {
   beforeEach(() => {
     window.ENV = {
-      ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED: true,
       UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED: true,
     }
   })
