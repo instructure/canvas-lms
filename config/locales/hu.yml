@@ -6214,6 +6214,7 @@ hu:
   confirm_email_address_9072dd3c: "E-mail cím megerősítése"
   confirm_mastery_calculation_19ad19f9: "Erősítse meg a Jártassági számítást"
   confirm_mastery_scale_9a779252: "Erősítse meg a Jártassági szintet"
+  confirm_new_password_3d3ca4ea: "Új jelszó megerősítése"
   confirm_password_aaf07824: "Jelszó megerősítése"
   confirm_qr_code_display_49664fa3: "Erősítse meg a QR-kód megjelenítését"
   confirm_reactivation_ec0f30c6: "Erősítse meg az újraaktiválást"
@@ -16755,6 +16756,7 @@ hu:
   new_opportunities_7d349c4d: "Új lehetőségek"
   new_outcome_7fba8c7d: "Új tanulási eredmény"
   new_outcome_group_af59f145: "Új tanulási eredménycsoport"
+  new_password_1232cbf2: "Új jelszó"
   new_question_9107c469: "Új kérdés"
   new_question_bank_732bbf83: "Új kérdésbank"
   new_question_group_d9306280: "Új kérdéscsoport"
@@ -19295,6 +19297,8 @@ hu:
     confirm_change_password: 
       buttons: 
         update_password: "Jelszó frissítése"
+      confirm_change_password: 
+        loading: Betöltés...
       labels: 
         new_password: "Új jelszó"
         password: Jelszó
@@ -26140,6 +26144,7 @@ hu:
   update_live_events_subscriptions_e9c618b0: "Élő események előfizetések frissítése"
   update_module_b984c2e5: "Modul frissítése"
   update_pages_c91d7ba: "Oldalak frissítése"
+  update_password_4bc5cb1f: "Jelszó frissítése"
   update_public_jwk_9f25f520: "Frissítés nyilvános JWK"
   update_rating_6d29c2ef: "Értékelés frissítése"
   update_settings_9b422d0f: "Beállítások frissítése"
@@ -27148,6 +27153,7 @@ hu:
   which_account_will_this_course_be_associated_with_80f78fd2: "Melyik fiókhoz fog kapcsolódni ez a kurzus?"
   which_account_will_this_subject_be_associated_with_921d6bac: "Melyik fiókhoz kapcsolódik ez a téma?"
   which_course_is_this_question_about_f819a158: "Melyik kurzussal kapcsolatos ez a kérdés?"
+  which_login_to_change_4707fbc6: "Melyik bejelentkezés legyen megváltoztatva"
   while_the_grades_for_an_assignment_are_set_to_manu_457c38ff: "Amíg egy feladat osztályzatai manuálisra vannak állítva, a hallgatók nem kapnak új értesítéseket, és nem is láthatják azokat:"
   while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: "Amíg a feladat osztályzatai el vannak rejtve, a hallgatók nem kapnak új értesítést, és nem is láthatják:"
   while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: "Amíg ennek a feladatnak az osztályzatai kézi értékelésre vannak beállítva, a hallgatók nem kapnak új értesítéseket, és nem is láthatják:"

@@ -12128,8 +12128,8 @@ cy:
         body1: "Mae adrannau’n cynnwys mwy nag un dudalen. Gallwch weld y rhestr o dudalennau ar gyfer yr adran bresennol ar ochr dde’r ffenestr (%{showme1}). I drefnu neu ychwanegu tudalennau, cliciwch y ddolen \"%{manage_pages}\"(%{showme2})."
         body2: "Gallwch ailenwi unrhyw dudalen drwy glicio’r eicon %{edit_icon} a fydd yn ymddangos, dileu tudalen drwy glicio’r eicon %{delete_icon}, neu newid trefn y tudalennau drwy eu clicio a’u llusgo."
       sections: 
-        body1: "Mae’r adrannau wedi’u rhestru ar hyd ochr chwith y ffenestr (%{showme1}). Mae pob adran yn gallu cynnwys mwy nag un dudalen. I drefnu neu ychwanegu adrannau, cliciwch y ddolen \"%{manage_sections}\"(%{showme2})."
-        body2: "Gallwch ailenwi unrhyw adran drwy glicio’r eicon %{edit_icon} a fydd yn ymddangos, aildrefnu adrannau drwy eu clicio a’u llusgo, neu aildrefnu adrannau drwy glicio’r eicon %{delete_icon}."
+        body1: "Mae’r adrannau wedi’u rhestru ar hyd ochr chwith y ffenestr (%{showme1}). Mae pob adran yn gallu cynnwys mwy nag un dudalen. I drefnu neu olygu adran, cliciwch %{manage_sections}."
+        body2: "Gallwch ailenwi unrhyw adran trwy glicio \"Ailenwi\", aildrefnu adrannau trwy glicio \"Symud i...\", neu ddileu adrannau trwy glicio \"Dileu\" yn y ddewislen naid."
       settings: 
         body: "I newid gosodiadau’ch e-Bortffolio, cliciwch y ddolen \"Gosodiadau e-Bortffolio\" (%{showme}). Gallwch ailenwi’r portffolio, a’i newid i fod yn gyhoeddus neu’n breifat. Dim ond y rheini a fydd yn cael caniatâd gennych chi fydd yn gallu gweld portffolios preifat."
       submissions: 

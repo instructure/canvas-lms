@@ -4693,7 +4693,7 @@ ga:
   calendar_events_api_pagination_enhancements_9107cb6b: "Feabhsuithe Leathanaigh Féilire Imeachtaí API"
   calendar_feed_url_b7b91e7b: "URL Fothaí Féilire"
   calendar_frequency_picker: 
-    annually: "Gach bliain ar %{month} %{date}"
+    annually: "Gach bliain ar an %{date} %{month}"
     custom: Saincheaptha...
     daily: Laethúil
     every_weekday: "Gach lá i rith na seachtaine (Luan go hAoine)"
@@ -4705,7 +4705,7 @@ ga:
     not_repeat: "Ná athdhéan"
     second: dara
     third: tríú
-    weekly_day: "Seachtainiúil ar %{day}"
+    weekly_day: "Seachtainiúil ar an %{day}"
   calendar_removed_1c841af4: "Baineadh an féilire"
   calendar_series_e1b7a4bc: "Sraith Féilire"
   calendars: 

@@ -6001,6 +6001,7 @@ fa:
   confirm_email_address_9072dd3c: "تأیید نشانی پست الکترونیکی"
   confirm_mastery_calculation_19ad19f9: "محاسبه تسلط را تأیید کنید"
   confirm_mastery_scale_9a779252: "تایید مقیاس تسلط"
+  confirm_new_password_3d3ca4ea: "تأیید رمز عبور جدید"
   confirm_password_aaf07824: "تأیید رمز عبور"
   confirm_qr_code_display_49664fa3: "نمایش کد QR را تأیید کنید"
   confirm_reactivation_ec0f30c6: "فعال سازی مجدد را تایید کنید"
@@ -16372,6 +16373,7 @@ fa:
   new_note_5f05cb20: "یادداشت جدید"
   new_outcome_7fba8c7d: "نتیجه جدید"
   new_outcome_group_af59f145: "گروه جدید نتیجه"
+  new_password_1232cbf2: "رمز عبور جدید"
   new_question_9107c469: "پرسش جدید"
   new_question_group_d9306280: "گروه پرسش جدید"
   new_quiz_34aacba6: "آزمون جدید"
@@ -18607,6 +18609,8 @@ fa:
     confirm_change_password: 
       buttons: 
         update_password: "بهنگام سازی رمز عبور"
+      confirm_change_password: 
+        loading: "در حال بارگزاری..."
       labels: 
         new_password: "رمز عبور جدید"
         password: "رمز عبور"
@@ -24759,6 +24763,7 @@ fa:
   update_module_b984c2e5: "بهنگام سازی ماژول"
   update_name_6581781d: "به روز رسانی %{name}"
   update_pages_c91d7ba: "به روز رسانی صفحات"
+  update_password_4bc5cb1f: "بهنگام سازی رمز عبور"
   update_rating_6d29c2ef: "به روزرسانی رتبه بندی"
   update_settings_9b422d0f: "بهنگام سازی تنظیمات"
   update_tool_7d48ef2a: "بهنگام سازی %{tool}"
@@ -25620,6 +25625,7 @@ fa:
   which_account_will_this_subject_be_associated_with_921d6bac: "این موضوع با کدام حساب مرتبط خواهد بود؟"
   which_canvas_account_would_you_like_to_use_to_log__c3718dc6: "از کدام حساب کانواس می خواهید برای ورود استفاده کنید؟"
   which_course_is_this_question_about_f819a158: "این پرسش مربوط به کدام درس است؟"
+  which_login_to_change_4707fbc6: "کدام ورود برای تغییر"
   while_the_grades_for_an_assignment_are_set_to_manu_457c38ff: "تازمانی که که نمرات یک تکلیف به صورت دستی تنظیم شده است ، دانشجویان اطلاعیه‌های جدیدی در مورد آن‌ها دریافت نخواهند کرد یا قادر به دیدن آن‌ها نیستند:"
   while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: "مادامی که نمرات این تکلیف  پنهان است ، دانشجویان  اطلاعیه های جدیدی درباره آن دریافت نمی کنند یا قادر به مشاهده آن نخواهند بود:"
   while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: "تا زمانی که نمرات این تکلیف به صورت دستی تنظیم شده است، دانشجویان اطلاعیه‌های جدیدی در مورد آن‌ها دریافت نخواهند کرد یا قادر به دیدن آنها نیستند:"

@@ -6757,6 +6757,7 @@ nn:
   confirm_email_address_9072dd3c: "Stadfest e-postadresse"
   confirm_mastery_calculation_19ad19f9: "Bekreft ekspertiseberekning"
   confirm_mastery_scale_9a779252: "Stadfest meistringskala"
+  confirm_new_password_3d3ca4ea: "Stadfest nytt passord"
   confirm_password_aaf07824: "Stadfeste passord"
   confirm_qr_code_display_49664fa3: "Bekreft QR-kode visning"
   confirm_reactivation_ec0f30c6: "Stadfest reaktivering"
@@ -18063,6 +18064,7 @@ nn:
   new_opportunities_7d349c4d: "Nye val"
   new_outcome_7fba8c7d: "Nytt læringsmål"
   new_outcome_group_af59f145: "Ny læringsmålgruppe"
+  new_password_1232cbf2: "Nytt passord"
   new_question_9107c469: "Nytt spørsmål"
   new_question_bank_732bbf83: "Ny spørsmålsbank"
   new_question_group_d9306280: "Ny spørsmålsgruppe"
@@ -20683,6 +20685,8 @@ nn:
     confirm_change_password: 
       buttons: 
         update_password: "Oppdater passord"
+      confirm_change_password: 
+        loading: Lastar...
       labels: 
         new_password: "Nytt passord"
         password: Passord
@@ -27981,6 +27985,7 @@ nn:
   update_module_b984c2e5: "Oppdater modul"
   update_name_6581781d: "Oppdater %{name}"
   update_pages_c91d7ba: "Oppdater sider"
+  update_password_4bc5cb1f: "Oppdater passord"
   update_public_jwk_9f25f520: "Oppdater offentlig JWK"
   update_rating_6d29c2ef: "Oppdater vurdering"
   update_settings_9b422d0f: "Oppdater innstillingar"
@@ -28991,6 +28996,7 @@ nn:
   which_account_will_this_subject_be_associated_with_921d6bac: "Hvilken underkonto skal dette emnet være knytta til?"
   which_canvas_account_would_you_like_to_use_to_log__c3718dc6: "Kva for ein Canvas brukar ynskjer du å bruke for å logge inn?"
   which_course_is_this_question_about_f819a158: "Kva emne gjeld spørsmålet?"
+  which_login_to_change_4707fbc6: "Pålogging som skal endrast"
   while_the_grades_for_an_assignment_are_set_to_manu_457c38ff: "Dersom vurderingar for ein oppgåve er sett til manuell, vil studentane ikkje få varsel om eller sjå: "
   while_the_grades_for_this_assignment_are_hidden_st_9fb8de65: |-
       
