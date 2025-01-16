@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { createRoot } from 'react-dom/client'
+import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 
 import {subscribeFlashNotifications} from '@canvas/notifications/redux/actions'
@@ -27,17 +27,16 @@ import createStore from './store'
 export default function createAnnouncementsIndex(root, data = {}) {
   const store = createStore(data)
 
-  const reactRoot = createRoot(root)
-
   function unmount() {
-    reactRoot.unmount()
+    ReactDOM.unmountComponentAtNode(root)
   }
 
   function render() {
-    reactRoot.render(
+    ReactDOM.render(
       <Provider store={store}>
         <ConnectedAnnouncementsIndex />
-      </Provider>
+      </Provider>,
+      root,
     )
   }
 

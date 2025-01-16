@@ -16,39 +16,45 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import {waitFor} from '@testing-library/react'
 import createAnnIndex from '../index'
 
-const ok = value => expect(value).toBeTruthy()
-const notOk = value => expect(value).toBeFalsy()
-
-let app = null
-
-const node = document.createElement('div')
-node.setAttribute('id', 'fixtures')
-document.body.appendChild(node)
-const container = document.getElementById('fixtures')
-
-const defaultData = () => ({})
-
 describe('Announcements app', () => {
+  let container
+  let app
+
+  beforeEach(() => {
+    container = document.createElement('div')
+    document.body.appendChild(container)
+  })
+
   afterEach(() => {
     if (app) {
       app.unmount()
       app = null
     }
-    container.innerHTML = ''
+    container.remove()
   })
 
-  test('mounts Announcements to container component', () => {
-    app = createAnnIndex(container, defaultData())
+  it('renders the Announcements component', async () => {
+    app = createAnnIndex(container, {})
     app.render()
-    ok(container.querySelector('.announcements-v2__wrapper'))
+    
+    await waitFor(() => {
+      expect(container.querySelector('.announcements-v2__wrapper')).toBeInTheDocument()
+    })
   })
 
-  test('unmounts Announcements from container component', () => {
-    app = createAnnIndex(container, defaultData())
+  it('unmounts the Announcements component', async () => {
+    app = createAnnIndex(container, {})
     app.render()
+    
+    await waitFor(() => {
+      expect(container.querySelector('.announcements-v2__wrapper')).toBeInTheDocument()
+    })
+    
     app.unmount()
-    notOk(document.querySelector('.announcements-v2__wrapper'))
+    expect(container.querySelector('.announcements-v2__wrapper')).not.toBeInTheDocument()
   })
 })
