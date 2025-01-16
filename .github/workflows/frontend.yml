@@ -77,3 +77,33 @@ jobs:
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: yarn tsc --noemit -p tsconfig.json
+
+  jest:
+    name: Jest Tests (Shard ${{ matrix.shard }})
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Packages
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn build:packages
+
+      - name: Run Tests (Shard ${{ matrix.shard }})
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn test --shard=${{ matrix.shard }}/10
