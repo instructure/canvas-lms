@@ -176,7 +176,7 @@ export default class KyleMenu {
     // the menu may have flipped above the trigger
     const mbox = this.$menu[0].getBoundingClientRect()
     const tbox = this.$trigger[0].getBoundingClientRect()
-    const caratIsBelow = mbox.top + mbox.height < tbox.top
+    const caratIsBelow = mbox.top + mbox.height < tbox.top || this.$trigger.offset().top > this.$menu.offset().top
     const caratY = mbox.height - 2
 
     // if it is a mouse event, it will have a 'pageX' otherwise use the middle of the trigger
