@@ -61,7 +61,10 @@ describe CC::TopicResources do
     allow(mock_course.root_account).to receive(:feature_enabled?).with(:discussion_checkpoints)
   end
 
-  before { allow(mock_course).to receive_messages(root_account: Account.create!) }
+  before do
+    allow(mock_course).to receive_messages(root_account: Account.create!)
+    allow(mock_course.root_account).to receive(:feature_enabled?).with(:horizon_course_setting)
+  end
 
   describe "#create_canvas_topic" do
     context "reply_to_entry_required_count" do
