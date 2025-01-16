@@ -1,4 +1,4 @@
-name: TypeScript Check
+name: Circular Dependency Check
 
 on:
   pull_request:
@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  typescript:
-    name: TypeScript Type Check
+  depcruise:
+    name: Check Circular Dependencies
     runs-on: ubuntu-22.04
 
     steps:
@@ -39,7 +39,5 @@ jobs:
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: yarn build:packages
 
-      - name: Run TypeScript Check
-        env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
-        run: yarn tsc --noemit -p tsconfig.json
+      - name: Check Circular Dependencies
+        run: yarn depcruise ./ --include-only "^(ui|packages)"
