@@ -4653,6 +4653,7 @@ he:
   confirm_dialog_component: 
     ok: OK
   confirm_email_address_9072dd3c: "אישור כתובת דוא\"ל"
+  confirm_new_password_3d3ca4ea: "אישור סיסמה חדשה"
   confirm_password_aaf07824: "אישור סיסמה"
   confirm_removal_a9bb889: "אישור הסרה"
   confirm_reservation_removal_e6350e7c: "אישור הסרת רישום"
@@ -13303,6 +13304,7 @@ he:
   new_opportunities_7d349c4d: "הזדמנויות חדשות"
   new_outcome_7fba8c7d: "תוצאת למידה חדשה"
   new_outcome_group_af59f145: "קבוצת השגי למידה חדשה"
+  new_password_1232cbf2: "סיסמה חדשה"
   new_question_9107c469: "שאלה חדשה"
   new_question_group_d9306280: "קבוצת שאלות חדשה"
   new_quiz_34aacba6: "בוחן חדש"
@@ -15117,6 +15119,8 @@ he:
     confirm_change_password: 
       buttons: 
         update_password: "עדכון סיסמה"
+      confirm_change_password: 
+        loading: "בטעינה... "
       labels: 
         new_password: "סיסמה חדשה"
         password: סיסמה
@@ -19892,6 +19896,7 @@ he:
   update_grade_b47eb3ff: "עדכון הערכה"
   update_link_b7cab181: "עדכון קישור"
   update_module_b984c2e5: "עדכון מודול"
+  update_password_4bc5cb1f: "עדכון סיסמה"
   update_settings_9b422d0f: "עדכון הגדרות"
   update_tool_7d48ef2a: "עדכון %{tool}"
   update_your_notification_settings_ed9564f3: "עדכון הגדרות ההתראות שלך"
@@ -20563,6 +20568,7 @@ he:
   whenever_b943b119: "כל פעם"
   where_would_you_like_to_move_title_fabd6e8f: "לאן היית רוצה לעבור %{title}?"
   which_course_is_this_question_about_f819a158: "לאיזה קורס מתחיסת שאלה זו?"
+  which_login_to_change_4707fbc6: "איזה לוג-אין לשנות?"
   white_87fa64fd: לבן
   widget: 
     upload_media_track_form: 

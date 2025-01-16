@@ -4882,6 +4882,7 @@ tr:
   confirm_dialog_component: 
     ok: Tamam
   confirm_email_address_9072dd3c: "Eposta Adresini Onayla"
+  confirm_new_password_3d3ca4ea: "Yeni Şifrenizi Onaylayın"
   confirm_password_aaf07824: "Şifreyi Onayla"
   confirm_removal_a9bb889: "Kaldırma İşlemini Onayla"
   confirm_reservation_removal_e6350e7c: "Rezervasyon Silme Onayı"
@@ -13400,6 +13401,7 @@ tr:
   new_module_4e9287e4: "Yeni Modül"
   new_outcome_7fba8c7d: "Yeni Öğrenme Çıktısı"
   new_outcome_group_af59f145: "Yeni Öğrenme Çıktısı Grubu"
+  new_password_1232cbf2: "Yeni Şifre"
   new_question_9107c469: "Yeni Soru"
   new_question_group_d9306280: "Yeni Soru Grubu"
   new_quiz_34aacba6: "Yeni Kısa Sınav"
@@ -15215,6 +15217,8 @@ tr:
     confirm_change_password: 
       buttons: 
         update_password: "Şifremi Güncelle"
+      confirm_change_password: 
+        loading: Yükleniyor...
       labels: 
         new_password: "Yeni Şifre"
         password: Şifre
@@ -19623,6 +19627,7 @@ tr:
   update_grade_b47eb3ff: "Notu Düzenle"
   update_link_b7cab181: "Bağlantı güncelle"
   update_module_b984c2e5: "Modülü Güncelle"
+  update_password_4bc5cb1f: "Şifremi Güncelle"
   update_settings_9b422d0f: "Ayarları Güncelle"
   update_tool_7d48ef2a: "%{tool} güncelle"
   update_your_notification_settings_ed9564f3: "Bildirim ayarlarınızı güncelleyin"
@@ -20243,6 +20248,7 @@ tr:
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Seçildiğinde, derse ders tarihleri ​​dışında erişilemez. Ders tarihleri ​​boşsa, bu başlangıç ​​ve bitiş tarihleri ​​dönem tarihleri ​​için geçerlidir."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Seçildiğinde, ders bölümü bu tarihlerin dışında salt okunur durumdadır."
   where_would_you_like_to_move_title_fabd6e8f: "%{title} ı nereye taşımak istersiniz?"
+  which_login_to_change_4707fbc6: "Hangi oturum açma değişecek"
   while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: "Bu ödevin notları manuel ayarlanırsa, öğrenciler aşağıdakilerle ilgili yeni bildirimler almaz veya göremez:"
   widget: 
     upload_media_track_form: 
