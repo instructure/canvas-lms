@@ -170,7 +170,7 @@ class Login::SamlController < ApplicationController
           # ignore
         end
 
-        if uri&.path &&
+        if uri&.path && !uri.path.starts_with?("/login") &&
            (!uri.scheme || request.scheme == uri.scheme || uri.scheme == "https")
           if uri.host
             # allow relay_state's to other (trusted) domains, by tacking on a session token
