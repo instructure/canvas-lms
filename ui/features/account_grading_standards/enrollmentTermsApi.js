@@ -34,20 +34,19 @@ const deserializeTerms = termGroups =>
           createdAt: term.created_at ? new Date(term.created_at) : null,
           gradingPeriodGroupId: newGroupID,
         }
-      })
-    )
+      }),
+    ),
   )
 
 export default {
   list() {
     return new Promise((resolve, reject) => {
       const dispatch = new NaiveRequestDispatch()
-      /* eslint-disable promise/catch-or-return */
+
       dispatch
         .getDepaginated(listUrl())
         .then(response => resolve(deserializeTerms(response)))
         .fail(error => reject(error))
-      /* eslint-enable promise/catch-or-return */
     })
   },
 }

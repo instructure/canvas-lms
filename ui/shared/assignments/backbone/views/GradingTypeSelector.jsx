@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {includes} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -27,7 +25,7 @@ import template from '../../jst/GradingTypeSelector.handlebars'
 import '../../jquery/toggleAccessibly'
 import '@canvas/util/jquery/fixDialogButtons'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {GradingSchemesSelector} from '@canvas/grading-scheme'
 
 const I18n = createI18nScope('assignment_grading_type')
@@ -43,6 +41,7 @@ function GradingTypeSelector() {
   this.showGradingSchemeDialog = this.showGradingSchemeDialog.bind(this)
   this.showGpaDialog = this.showGpaDialog.bind(this)
   this.handleGradingTypeChange = this.handleGradingTypeChange.bind(this)
+  this.root = null
   return GradingTypeSelector.__super__.constructor.apply(this, arguments)
 }
 
@@ -77,7 +76,7 @@ GradingTypeSelector.optionProperty('canEditGrades')
 GradingTypeSelector.prototype.handleGradingTypeChange = function (_ev) {
   const gradingType = this.$gradingType.val()
   this.$viewGradingLevels.toggleAccessibly(
-    gradingType === 'letter_grade' || gradingType === 'gpa_scale'
+    gradingType === 'letter_grade' || gradingType === 'gpa_scale',
   )
   if (ENV.GRADING_SCHEME_UPDATES_ENABLED) {
     if (gradingType === 'letter_grade' || gradingType === 'gpa_scale') {
@@ -193,13 +192,15 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
     contextType: 'Course',
     archivedGradingSchemesEnabled: ENV.ARCHIVED_GRADING_SCHEMES_ENABLED,
     assignmentId:
-      ENV.ASSIGNMENT?.id ?? ENV.ASSIGNMENT_ID ?? this.parentModel.id
+      (ENV.ASSIGNMENT?.id ?? ENV.ASSIGNMENT_ID ?? this.parentModel.id)
         ? String(this.parentModel.id)
         : undefined,
   }
   const mountPoint = document.querySelector('#grading_scheme_selector-target')
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(React.createElement(GradingSchemesSelector, props), mountPoint)
+  if (!this.root) {
+    this.root = createRoot(mountPoint)
+  }
+  this.root.render(React.createElement(GradingSchemesSelector, props))
 }
 
 export default GradingTypeSelector

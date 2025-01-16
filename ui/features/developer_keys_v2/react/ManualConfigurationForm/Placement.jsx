@@ -162,7 +162,7 @@ export default class Placement extends React.Component {
               {this.isSpecialType(placementName) ? (
                 <Alert variant="warning" margin="small">
                   {I18n.t(
-                    'This placement requires Deep Link support by the vendor. Check with your tool vendor to ensure they support this functionality'
+                    'This placement requires Deep Link support by the vendor. Check with your tool vendor to ensure they support this functionality',
                   )}
                 </Alert>
               ) : null}

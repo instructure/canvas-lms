@@ -52,7 +52,7 @@ describe('SpeedGraderAlerts', () => {
       it('displays a message indicating the selected student was not in the previous group', () => {
         showAlert({selectedStudentGroup, reasonForChange})
         expect(flashStub.mock.calls[0][0]).toMatch(
-          /the student you requested is not in the previously-selected group/i
+          /the student you requested is not in the previously-selected group/i,
         )
       })
 
@@ -75,7 +75,7 @@ describe('SpeedGraderAlerts', () => {
       it('displays a message indicating no students were in the previously-selected group', () => {
         showAlert({selectedStudentGroup, reasonForChange})
         expect(flashStub.mock.calls[0][0]).toMatch(
-          /the previously-selected group contains no students/i
+          /the previously-selected group contains no students/i,
         )
       })
 
@@ -119,7 +119,7 @@ describe('SpeedGraderAlerts', () => {
       it('displays a message indicating the selected student was not in the previous group', () => {
         showAlert({selectedStudentGroup, reasonForChange})
         expect(flashStub.mock.calls[0][0]).toMatch(
-          /the student you requested is not part of any groups/i
+          /the student you requested is not part of any groups/i,
         )
       })
     })

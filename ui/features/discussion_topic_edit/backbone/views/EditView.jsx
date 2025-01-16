@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
@@ -134,7 +132,7 @@ EditView.prototype.messages = {
   group_category_field_label: I18n.t('this_is_a_group_discussion', 'This is a Group Discussion'),
   group_locked_message: I18n.t(
     'group_discussion_locked',
-    'Students have already submitted to this discussion, so group settings cannot be changed.'
+    'Students have already submitted to this discussion, so group settings cannot be changed.',
   ),
 }
 
@@ -184,7 +182,7 @@ EditView.prototype.initialize = function (options) {
                 return {}
               },
               contextId,
-              contextType + 's'
+              contextType + 's',
             ).always(function () {
               _this.unwatchUnload()
               return _this.redirectAfterSave()
@@ -198,7 +196,7 @@ EditView.prototype.initialize = function (options) {
           return _this.redirectAfterSave()
         }
       }
-    })(this)
+    })(this),
   )
   this.attachment_model = new FilesystemObject()
   EditView.__super__.initialize.apply(this, arguments)
@@ -318,7 +316,7 @@ EditView.prototype.handlePointsChange = function (ev) {
   this.assignment.pointsPossible(this.$assignmentPointsPossible.val())
   if (this.assignment.hasSubmittedSubmissions()) {
     return this.$discussionPointPossibleWarning.toggleAccessibly(
-      this.assignment.pointsPossible() !== this.initialPointsPossible
+      this.assignment.pointsPossible() !== this.initialPointsPossible,
     )
   }
 }
@@ -370,7 +368,7 @@ EditView.prototype.render = function () {
         return function () {
           return _this.loadNewEditor(_this.$textarea)
         }
-      })(this)
+      })(this),
     )
   }
   if (this.assignmentGroupCollection) {
@@ -417,7 +415,7 @@ EditView.prototype.afterRender = function () {
       this.$AssignmentExternalTools.get(0),
       'assignment_edit',
       parseInt(context_id, 10),
-      parseInt(this.assignment.id, 10)
+      parseInt(this.assignment.id, 10),
     )
   }
   if (this.shouldRenderUsageRights()) {
@@ -542,7 +540,7 @@ EditView.prototype.loadConditionalRelease = function () {
   return (this.conditionalReleaseEditor = ConditionalRelease.attach(
     this.$conditionalReleaseTarget.get(0),
     I18n.t('discussion topic'),
-    ENV.CONDITIONAL_RELEASE_ENV
+    ENV.CONDITIONAL_RELEASE_ENV,
   ))
 }
 
@@ -563,7 +561,7 @@ EditView.prototype.renderStudentTodoAtDate = function () {
       labelText: I18n.t('Discussion Topic will show on student to-do list for date'),
       labelClasses: 'screenreader-only',
     }),
-    this.$todoDateInput[0]
+    this.$todoDateInput[0],
   )
 }
 
@@ -633,8 +631,8 @@ EditView.prototype.getFormData = function () {
       set_assignment: this.permissions.CAN_CREATE_ASSIGNMENT
         ? '0'
         : this.permissions.CAN_UPDATE_ASSIGNMENT
-        ? '1'
-        : '0',
+          ? '1'
+          : '0',
     })
   }
   // these options get passed to Backbone.sync in ValidatedFormView
@@ -684,10 +682,10 @@ EditView.prototype.saveFormData = function () {
             },
             function (err) {
               return new $.Deferred().reject(xhr, err).promise()
-            }
+            },
           )
         }
-      })(this)
+      })(this),
     )
   } else {
     return EditView.__super__.saveFormData.apply(this, arguments)
@@ -733,7 +731,7 @@ EditView.prototype.fieldSelectors = lodashExtend(
     usage_rights_control: '#usage_rights_control button',
   },
   AssignmentGroupSelector.prototype.fieldSelectors,
-  GroupCategorySelector.prototype.fieldSelectors
+  GroupCategorySelector.prototype.fieldSelectors,
 )
 
 EditView.prototype.saveAndPublish = function (event) {
@@ -804,7 +802,7 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
       'assignment',
       this.model.createAssignment({
         set_assignment: false,
-      })
+      }),
     )
   }
   if (

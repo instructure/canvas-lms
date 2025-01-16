@@ -41,7 +41,7 @@ describe('ContentTypeExternalToolTray', () => {
         open={true}
         extraQueryParams={extraQueryParams}
         {...props}
-      />
+      />,
     )
   }
 
@@ -53,7 +53,7 @@ describe('ContentTypeExternalToolTray', () => {
   it('calls onDismiss when close button is clicked', () => {
     const {getByText} = renderTray()
     fireEvent.click(getByText('Close'))
-    expect(onDismiss.mock.calls.length).toBe(1)
+    expect(onDismiss.mock.calls).toHaveLength(1)
   })
 
   describe('external content message handling', () => {

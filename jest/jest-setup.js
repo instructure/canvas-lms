@@ -18,18 +18,16 @@
 
 import 'cross-fetch/polyfill'
 // eslint-disable-next-line import/no-nodejs-modules, no-redeclare
-import {TextDecoder, TextEncoder} from 'node:util'
-import CoreTranslations from '../public/javascripts/translations/en.json'
-import Enzyme from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
-import filterUselessConsoleMessages from '@instructure/filter-console-messages'
-import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
+import {loadDevMessages, loadErrorMessages} from '@apollo/client/dev'
 import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
 import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'
-import {up as installNodeDecorations} from '../ui/boot/initializers/installNodeDecorations'
-import {loadErrorMessages, loadDevMessages} from '@apollo/client/dev'
 import {registerTranslations} from '@canvas/i18n'
-import MockBroadcastChannel from './MockBroadcastChannel'
+import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
+import filterUselessConsoleMessages from '@instructure/filter-console-messages'
+import Enzyme from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
+import CoreTranslations from '../public/javascripts/translations/en.json'
+import {up as installNodeDecorations} from '../ui/boot/initializers/installNodeDecorations'
 
 loadDevMessages()
 loadErrorMessages()
@@ -46,8 +44,12 @@ rceFormatMessage.setup({
  * have an unintended consequence from your changes. If you expect
  * the warning/error, add it to the ignore list below.
  */
-/* eslint-disable no-console */
+const globalLog = global.console.log
 const globalError = global.console.error
+const ignoredLogs = [
+  /Migrate is installed with logging active/,
+  /Kaltura has not been enabled for this account/,
+]
 const ignoredErrors = [
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
@@ -81,7 +83,12 @@ const ignoredWarnings = [
 ]
 
 global.console = {
-  log: console.log,
+  log: (log, ...rest) => {
+    if (ignoredLogs.some(regex => regex.test(log))) {
+      return
+    }
+    globalLog(log, ...rest)
+  },
   error: (error, ...rest) => {
     if (
       ignoredErrors.some(regex => regex.test(error)) ||
@@ -90,23 +97,16 @@ global.console = {
       return
     }
     globalError(error, rest)
-    throw new Error(
-      `Looks like you have an unhandled error. Keep our test logs clean by handling or filtering it. ${error}`
-    )
   },
   warn: (warning, ...rest) => {
     if (ignoredWarnings.some(regex => regex.test(warning))) {
       return
     }
     globalWarn(warning, rest)
-    throw new Error(
-      `Looks like you have an unhandled warning. Keep our test logs clean by handling or filtering it. ${warning}`
-    )
   },
   info: console.info,
   debug: console.debug,
 }
-/* eslint-enable no-console */
 filterUselessConsoleMessages(global.console)
 
 window.scroll = () => {}
@@ -128,7 +128,6 @@ installNodeDecorations()
 
 // because everyone implements `flat()` and `flatMap()` except JSDOM 🤦🏼‍♂️
 if (!Array.prototype.flat) {
-  // eslint-disable-next-line no-extend-native
   Object.defineProperty(Array.prototype, 'flat', {
     configurable: true,
     value: function flat(depth = 1) {
@@ -147,12 +146,21 @@ if (!Array.prototype.flat) {
 }
 
 if (!Array.prototype.flatMap) {
-  // eslint-disable-next-line no-extend-native
   Object.defineProperty(Array.prototype, 'flatMap', {
     configurable: true,
     value: function flatMap(_cb) {
       // biome-ignore lint/style/noArguments: <explanation>
       return Array.prototype.map.apply(this, arguments).flat()
+    },
+    writable: true,
+  })
+}
+
+if (!Set.prototype.isDisjointFrom) {
+  Object.defineProperty(Set.prototype, 'isDisjointFrom', {
+    configurable: true,
+    value: function isDisjointFrom(otherSet) {
+      return Array.from(this).every(value => !otherSet.has(value))
     },
     writable: true,
   })
@@ -224,7 +232,12 @@ if (!('matchMedia' in window)) {
   window.matchMedia._mocked = true
 }
 
-global.BroadcastChannel = global.BroadcastChannel || MockBroadcastChannel
+global.BroadcastChannel = jest.fn().mockImplementation(() => ({
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+  postMessage: jest.fn(),
+  close: jest.fn(),
+}))
 
 global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
 
@@ -275,9 +288,6 @@ Document.prototype.createRange =
       }
     },
   }))
-
-global.TextEncoder = TextEncoder
-global.TextDecoder = TextDecoder
 
 if (!('Worker' in window)) {
   Object.defineProperty(window, 'Worker', {

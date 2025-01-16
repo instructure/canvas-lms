@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {type RefObject} from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconArrowOpenDownSolid, IconArrowOpenEndSolid} from '@instructure/ui-icons'
@@ -40,6 +40,7 @@ interface Props extends NodeStructure {
   indent: Spacing
   updateCheck: Function
   updateToggle: Function
+  elementRef?: RefObject<Checkbox>
 }
 
 export function translateState(workflow: string) {
@@ -60,7 +61,7 @@ export function translateState(workflow: string) {
 export function constructLabel(
   label: string,
   termName?: string,
-  children?: NodeStructure[]
+  children?: NodeStructure[],
 ): string {
   const labelParts = [label]
   // append section label if it exists and is different
@@ -116,7 +117,7 @@ export function EnrollmentTreeGroup(props: Props) {
                 >
                   {course.children}
                 </EnrollmentTreeGroup>
-              </Flex.Item>
+              </Flex.Item>,
             )
           } else {
             // top-level course
@@ -135,7 +136,7 @@ export function EnrollmentTreeGroup(props: Props) {
                 >
                   {[]}
                 </EnrollmentTreeItem>
-              </Flex.Item>
+              </Flex.Item>,
             )
           }
         }
@@ -156,7 +157,7 @@ export function EnrollmentTreeGroup(props: Props) {
               >
                 {[]}
               </EnrollmentTreeItem>
-            </Flex.Item>
+            </Flex.Item>,
           )
         }
       }
@@ -174,6 +175,7 @@ export function EnrollmentTreeGroup(props: Props) {
 
   const renderRow = () => {
     const {elements, count} = renderChildren()
+    const additionalProps = props.elementRef !== null ? {ref: props.elementRef} : {}
 
     return (
       <Flex key={props.id} gap="xx-small" direction="column">
@@ -198,6 +200,7 @@ export function EnrollmentTreeGroup(props: Props) {
               <Flex alignItems="start" gap="x-small">
                 <Flex.Item shouldShrink={true}>
                   <Checkbox
+                    {...additionalProps}
                     data-testid={'check-' + props.id}
                     label={<Text weight="bold">{props.label}</Text>}
                     checked={props.isCheck}

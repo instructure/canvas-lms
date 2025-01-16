@@ -16,34 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {render} from '@testing-library/react'
-import $ from 'jquery'
-
 import DateLocked from '../DateLocked'
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
-})
+describe('DateLocked', () => {
+  it('renders normally', () => {
+    const container = render(<DateLocked date="TEST" type="assignment" />)
+    const element = container.getByTestId('assignments-2-date-locked')
+    expect(element).toBeInTheDocument()
+  })
 
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
-
-it('renders normally', () => {
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(<DateLocked date="TEST" type="assignment" />, document.getElementById('fixtures'))
-  const element = $('[data-testid="assignments-2-date-locked"]')
-  expect(element).toHaveLength(1)
-})
-
-it('includes date in lock reason text', () => {
-  const {getByText} = render(<DateLocked date="2020-07-04T19:30:00-01:00" type="assignment" />)
-
-  expect(getByText('This assignment is locked until Jul 4, 2020 at 8:30pm.')).toBeInTheDocument()
+  it('includes date in lock reason text', () => {
+    const container = render(<DateLocked date="2020-07-04T19:30:00-01:00" type="assignment" />)
+    expect(
+      container.getByText('This assignment is locked until Jul 4, 2020 at 8:30pm.')
+    ).toBeInTheDocument()
+  })
 })

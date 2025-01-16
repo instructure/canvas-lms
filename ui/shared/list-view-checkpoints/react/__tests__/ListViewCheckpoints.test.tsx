@@ -28,7 +28,7 @@ import {
 describe('ListViewCheckpoints', () => {
   it('renders the ListViewCheckpoints component with the correct checkpoint titles', async () => {
     const {container, getByTestId} = render(
-      <ListViewCheckpoints {...checkpointedAssignmentNoDueDates} />
+      <ListViewCheckpoints {...checkpointedAssignmentNoDueDates} />,
     )
     expect(container.querySelectorAll('li')).toHaveLength(2)
 

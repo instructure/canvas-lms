@@ -35,7 +35,7 @@ const renderBlock = (enabled: boolean, props: Partial<TabsBlockProps> = {}) => {
       <Frame>
         <TabsBlock {...props} />
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 
@@ -46,7 +46,7 @@ describe('TabsBlock', () => {
     expect(getByText('Tab 2')).toBeInTheDocument()
 
     const tabs = container.querySelectorAll('[role="tab"]')
-    expect(tabs.length).toBe(2)
+    expect(tabs).toHaveLength(2)
   })
 
   it('should render with custom tabs', () => {
@@ -68,14 +68,14 @@ describe('TabsBlock', () => {
     const {container} = renderBlock(true)
 
     const tabs = container.querySelectorAll('[role="tab"]')
-    expect(tabs.length).toBe(2)
+    expect(tabs).toHaveLength(2)
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true')
     expect(tabs[1]).not.toHaveAttribute('aria-selected')
 
     await user.click(tabs[1])
 
     const tabs2 = container.querySelectorAll('[role="tab"]')
-    expect(tabs2.length).toBe(2)
+    expect(tabs2).toHaveLength(2)
 
     expect(tabs2[0]).not.toHaveAttribute('aria-selected')
     expect(tabs2[1]).toHaveAttribute('aria-selected', 'true')
@@ -86,7 +86,7 @@ describe('TabsBlock', () => {
     // this may need to be a selenium test
     const {container, getByText} = renderBlock(true)
     let tabs = container.querySelectorAll('[role="tab"]')
-    expect(tabs.length).toBe(2)
+    expect(tabs).toHaveLength(2)
     expect(getByText('Tab 1')).toBeInTheDocument()
     expect(getByText('Tab 2')).toBeInTheDocument()
 
@@ -96,7 +96,7 @@ describe('TabsBlock', () => {
 
     await waitFor(() => {
       tabs = container.querySelectorAll('[role="tab"] [contenteditable]')
-      expect(tabs.length).toBe(2)
+      expect(tabs).toHaveLength(2)
     })
     expect(tabs[0]).toHaveAttribute('contenteditable', 'true')
     expect(tabs[1]).toHaveAttribute('contenteditable', 'true')
@@ -109,7 +109,7 @@ describe('TabsBlock', () => {
     expect(getByText('Tab 2')).toBeInTheDocument()
 
     const deleteButtons = getAllByText('Delete Tab')
-    expect(deleteButtons.length).toBe(2)
+    expect(deleteButtons).toHaveLength(2)
     const b0 = deleteButtons[0].closest('button') as HTMLButtonElement
     await user.click(b0)
     await waitFor(() => {

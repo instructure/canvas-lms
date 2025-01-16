@@ -100,7 +100,6 @@ function renderDatepickerTime($input) {
 
   const containingDiv = document.createElement('div')
 
-   
   ReactDOM.render(
     <div className="ui-datepicker-time ui-corner-bottom">
       {label}{' '}
@@ -112,7 +111,7 @@ function renderDatepickerTime($input) {
         {STRINGS.doneButton}
       </button>
     </div>,
-    containingDiv
+    containingDiv,
   )
   return containingDiv.innerHTML
 }

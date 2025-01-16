@@ -251,6 +251,25 @@ class AuthenticationProvidersController < ApplicationController
     end
   end
 
+  # @API Get authentication provider
+  # Get the specified authentication provider
+  #
+  # @example_request
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns AuthenticationProvider
+  def show
+    aac = @account.authentication_providers.active.find(params[:id])
+    return if aac.auth_type != "canvas" && !require_root_account_management
+
+    render json: aac_json(aac)
+  rescue ActiveRecord::RecordNotFound
+    return unless require_root_account_management
+
+    raise
+  end
+
   # @API Add authentication provider
   #
   # Add external authentication provider(s) for the account.
@@ -714,7 +733,7 @@ class AuthenticationProvidersController < ApplicationController
   #
   # @example_request
   #   # update SAML config
-  #   curl -XPUT 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
+  #   curl -X PUT 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
   #        -F 'idp_entity_id=<new_idp_entity_id>' \
   #        -F 'log_in_url=<new_url>' \
   #        -H 'Authorization: Bearer <token>'
@@ -763,30 +782,11 @@ class AuthenticationProvidersController < ApplicationController
     end
   end
 
-  # @API Get authentication provider
-  # Get the specified authentication provider
-  #
-  # @example_request
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
-  #        -H 'Authorization: Bearer <token>'
-  #
-  # @returns AuthenticationProvider
-  def show
-    aac = @account.authentication_providers.active.find(params[:id])
-    return if aac.auth_type != "canvas" && !require_root_account_management
-
-    render json: aac_json(aac)
-  rescue ActiveRecord::RecordNotFound
-    return unless require_root_account_management
-
-    raise
-  end
-
   # @API Delete authentication provider
   # Delete the config
   #
   # @example_request
-  #   curl -XDELETE 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
+  #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
   #        -H 'Authorization: Bearer <token>'
   def destroy
     aac = @account.authentication_providers.active.find params[:id]
@@ -795,6 +795,26 @@ class AuthenticationProvidersController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(account_authentication_providers_path(@account)) }
       format.json { render json: aac_json(aac) }
+    end
+  end
+
+  # @API Restore a deleted authentication provider
+  #
+  # Restore an authentication provider back to active that was previously deleted. Only
+  # available to admins who can manage_account_settings for given root account.
+  #
+  # @example_request
+  #   curl -X PUT 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>/restore' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns AuthenticationProvider
+  def restore
+    aac = @account.authentication_providers.find params[:id]
+
+    if aac.deleted? && aac.restore
+      render json: aac_json(aac)
+    else
+      render json: { error: "There was an error restoring the authentication provider" }, status: :bad_request
     end
   end
 

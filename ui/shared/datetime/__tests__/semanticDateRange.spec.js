@@ -23,7 +23,7 @@ describe('semanticDateRange', () => {
     const date1 = new Date(0)
     const date2 = new Date(+date1 + 86400000)
     expect(semanticDateRange(date1, date2)).toBe(
-      `<span class=\"date-range\"><time datetime=\"1970-01-01T00:00:00.000Z\">Jan 1, 1970 at 12am</time> - <time datetime=\"1970-01-02T00:00:00.000Z\">Jan 2, 1970 at 12am</time></span>`
+      `<span class=\"date-range\"><time datetime=\"1970-01-01T00:00:00.000Z\">Jan 1, 1970 at 12am</time> - <time datetime=\"1970-01-02T00:00:00.000Z\">Jan 2, 1970 at 12am</time></span>`,
     )
   })
 
@@ -31,27 +31,27 @@ describe('semanticDateRange', () => {
     const date1 = new Date(0)
     const date2 = new Date(+date1 + 3600000)
     expect(semanticDateRange(date1, date2)).toBe(
-      `<span class="date-range"><time datetime="1970-01-01T00:00:00.000Z">Jan 1, 1970, 12am</time> - <time datetime="1970-01-01T01:00:00.000Z">1am</time></span>`
+      `<span class="date-range"><time datetime="1970-01-01T00:00:00.000Z">Jan 1, 1970, 12am</time> - <time datetime="1970-01-01T01:00:00.000Z">1am</time></span>`,
     )
   })
 
   test('same day, same time', () => {
     const date = new Date(0)
     expect(semanticDateRange(date, date)).toBe(
-      `<span class="date-range"><time datetime="1970-01-01T00:00:00.000Z">Jan 1, 1970 at 12am</time></span>`
+      `<span class="date-range"><time datetime="1970-01-01T00:00:00.000Z">Jan 1, 1970 at 12am</time></span>`,
     )
   })
 
   test('no date', () => {
     expect(semanticDateRange(null, null)).toBe(
-      `<span class="date-range date-range-no-date">No Date</span>`
+      `<span class="date-range date-range-no-date">No Date</span>`,
     )
   })
 
   test('can take ISO strings', () => {
     const date = new Date(0).toISOString()
     expect(semanticDateRange(date, date)).toBe(
-      `<span class="date-range"><time datetime="1970-01-01T00:00:00.000Z">Jan 1, 1970 at 12am</time></span>`
+      `<span class="date-range"><time datetime="1970-01-01T00:00:00.000Z">Jan 1, 1970 at 12am</time></span>`,
     )
   })
 })

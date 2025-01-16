@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable object-shorthand */
+ 
 
 import Progress from './Progress'
 
@@ -50,7 +50,7 @@ export default {
             workflow_state: 'queued',
           })
         }
-      })(this)
+      })(this),
     )
     return this.progressModel.on(
       'complete',
@@ -62,7 +62,7 @@ export default {
             },
           })
         }
-      })(this)
+      })(this),
     )
   },
 }

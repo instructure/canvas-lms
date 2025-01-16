@@ -27,56 +27,115 @@ describe "files index page" do
     Account.site_admin.enable_feature! :files_a11y_rewrite
   end
 
-  context("as a teacher") do
-    before(:once) do
-      course_with_teacher(active_all: true)
+  context("for a course") do
+    context("as a teacher") do
+      before(:once) do
+        course_with_teacher(active_all: true)
+      end
+
+      before do
+        user_session @teacher
+      end
+
+      it "All My Files button links to user files" do
+        get "/courses/#{@course.id}/files"
+        all_my_files_button.click
+        expect(heading).to include_text("All My Files")
+      end
+
+      it "Displays files in table" do
+        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf")
+        get "/courses/#{@course.id}/files"
+        expect(f("#content")).to include_text(file_attachment.display_name)
+      end
+
+      it "Can navigate to subfolders" do
+        folder = Folder.create!(name: "folder", context: @course)
+        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "subfile.pdf", folder:)
+        get "/courses/#{@course.id}/files"
+        table_item_by_name(folder.name).click
+        expect(f("#content")).to include_text(file_attachment.display_name)
+      end
+
+      it "Displays the file usage bar if user has permission" do
+        allow(Attachment).to receive(:get_quota).with(@course).and_return({ quota: 50_000_000, quota_used: 25_000_000 })
+        get "/courses/#{@course.id}/files"
+        expect(files_usage_text.text).to include("50% of 50 MB used")
+      end
+
+      it "Can create a new folder" do
+        get "/courses/#{@course.id}/files"
+        create_folder_button.click
+        create_folder_input.send_keys("new folder")
+        create_folder_input.send_keys(:return)
+        expect(content).to include_text("new folder")
+      end
+
+      it "Can paginate through files" do
+        51.times do |i|
+          attachment_model(content_type: "application/pdf", context: @course, display_name: "file#{i}.pdf")
+        end
+        get "/courses/#{@course.id}/files"
+        pagination_button_by_index(1).click
+        # that's just how sorting works
+        expect(content).to include_text("file9.pdf")
+      end
     end
 
-    before do
-      user_session @teacher
-    end
+    context("as a student") do
+      before(:once) do
+        course_with_student(active_all: true)
+      end
 
-    it "All My Files button links to user files" do
-      get "/courses/#{@course.id}/files"
-      all_my_files_button.click
-      expect(heading).to include_text("All My Files")
-    end
+      before do
+        user_session @student
+      end
 
-    it "Displays files in table" do
-      file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf")
-      get "/courses/#{@course.id}/files"
-      expect(f("#content")).to include_text(file_attachment.display_name)
-    end
-
-    it "Can navigate to subfolders" do
-      folder = Folder.create!(name: "folder", context: @course)
-      file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "subfile.pdf", folder:)
-      get "/courses/#{@course.id}/files"
-      folder_link(folder.name).click
-      expect(f("#content")).to include_text(file_attachment.display_name)
-    end
-
-    it "Displays the file usage bar if user has permission" do
-      allow(Attachment).to receive(:get_quota).with(@course).and_return({ quota: 50_000_000, quota_used: 25_000_000 })
-      get "/courses/#{@course.id}/files"
-      expect(files_usage_text.text).to include("50% of 50 MB used")
+      it "Does not display the file usage bar if user does not have permission" do
+        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf")
+        file_attachment.publish!
+        get "/courses/#{@course.id}/files"
+        expect(content).not_to contain_css(files_usage_text_selector)
+      end
     end
   end
 
-  context("as a student") do
-    before(:once) do
-      course_with_student(active_all: true)
-    end
+  context("All My Files") do
+    context("as a teacher") do
+      before(:once) do
+        course_with_teacher(active_all: true)
+      end
 
-    before do
-      user_session @student
-    end
+      before do
+        user_session @teacher
+      end
 
-    it "Does not display the file usage bar if user does not have permission" do
-      file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf")
-      file_attachment.publish!
-      get "/courses/#{@course.id}/files"
-      expect(content).not_to contain_css(files_usage_text_selector)
+      it "Displays related contexts" do
+        get "/files"
+
+        expect(table_rows[0]).to include_text("My Files")
+        expect(table_rows[1]).to include_text(@course.name)
+      end
+
+      it "Can navigate through My Files" do
+        folder = Folder.create!(name: "parent", context: @teacher)
+        file_attachment = attachment_model(content_type: "application/pdf", context: @teacher, display_name: "file1.pdf", folder:)
+        get "/files"
+
+        table_item_by_name("My Files").click
+        table_item_by_name(folder.name).click
+        expect(table_item_by_name(file_attachment.display_name)).to be_displayed
+      end
+
+      it "Can navigate through course files" do
+        folder = Folder.create!(name: "parent", context: @course)
+        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf", folder:)
+        get "/files"
+
+        table_item_by_name(@course.name).click
+        table_item_by_name(folder.name).click
+        expect(table_item_by_name(file_attachment.display_name)).to be_displayed
+      end
     end
   end
 end

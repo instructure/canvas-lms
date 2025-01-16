@@ -24,7 +24,6 @@ require_relative "../helpers/files_common"
 require_relative "../helpers/admin_settings_common"
 require_relative "../rcs/pages/rce_next_page"
 require_relative "../helpers/wiki_and_tiny_common"
-require_relative "../../helpers/selective_release_common"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "page_objects/quizzes_edit_page"
 
@@ -36,7 +35,6 @@ describe "creating a quiz" do
   include AdminSettingsCommon
   include RCENextPage
   include WikiAndTinyCommon
-  include SelectiveReleaseCommon
   include ItemsAssignToTray
   include QuizzesEditPage
 
@@ -44,71 +42,6 @@ describe "creating a quiz" do
     before do
       stub_rcs_config
       course_with_teacher_logged_in(course_name: "Test Course", active_all: true)
-    end
-
-    context "when the course has two sections" do
-      before do
-        differentiated_modules_off
-
-        @section_a = @course.course_sections.first
-        @section_b = @course.course_sections.create!(name: "Section B")
-        course_quiz(active: true)
-        open_quiz_edit_form
-      end
-
-      it "sets availability dates and due dates for each section", priority: 1 do
-        assign_quiz_to_no_one
-
-        # assign to default section
-        now = Time.zone.now
-        due_at_a = default_time_for_due_date(now.advance(days: 3))
-        unlock_at_a = default_time_for_unlock_date(now.advance(days: -3))
-        lock_at_a = default_time_for_lock_date(now.advance(days: 3))
-
-        select_first_override_section(@section_a.name)
-        assign_dates_for_first_override_section(
-          due_at: due_at_a,
-          unlock_at: unlock_at_a,
-          lock_at: lock_at_a
-        )
-
-        # assign to Section B
-        due_at_b = default_time_for_due_date(now.advance(days: 5))
-        unlock_at_b = default_time_for_unlock_date(now.advance(days: -1))
-        lock_at_b = default_time_for_lock_date(now.advance(days: 5))
-
-        add_override
-        select_last_override_section(@section_b.name)
-        assign_dates_for_last_override_section(
-          due_at: due_at_b,
-          unlock_at: unlock_at_b,
-          lock_at: lock_at_b
-        )
-
-        save_settings
-
-        # verify default section due date & availability dates
-        expect(obtain_due_date(@section_a)).to include_text(format_time_for_view(due_at_a).to_s)
-        expect(obtain_availability_start_date(@section_a)).to include_text(format_time_for_view(unlock_at_a).to_s)
-        expect(obtain_availability_end_date(@section_a)).to include_text(format_time_for_view(lock_at_a).to_s)
-
-        # verify Section B due date & availability dates
-        expect(obtain_due_date(@section_b)).to include_text(format_time_for_view(due_at_b).to_s)
-        expect(obtain_availability_start_date(@section_b)).to include_text(format_time_for_view(unlock_at_b).to_s)
-        expect(obtain_availability_end_date(@section_b)).to include_text(format_time_for_view(lock_at_b).to_s)
-      end
-    end
-
-    it "prevents assigning a quiz to no one", priority: 1 do
-      differentiated_modules_off
-
-      course_quiz(active: true)
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-      assign_quiz_to_no_one
-      save_settings
-
-      expect(ffj("div.error_text", "div.error_box.errorBox")[1].text)
-        .to eq "You must have a student or section selected"
     end
 
     it "saves and publishes a new quiz", :xbrowser, custom_timeout: 30, priority: "1" do
@@ -229,163 +162,10 @@ describe "creating a quiz" do
         @account.save!
       end
 
-      it "blocks with only overrides" do
-        differentiated_modules_off
-        @course.course_sections.create!(name: section_to_set)
-        new_quiz
-        assign_quiz_to_no_one
-        select_last_override_section(section_to_set)
-        set_value(due_date_input_fields.first, "")
-        submit_blocked_with_errors
-      end
-
       context "with due dates" do
         it "does not block" do
           new_quiz
           submit_page
-        end
-
-        describe "with selective release flags on" do
-          before(:once) do
-            Account.site_admin.disable_feature!(:selective_release_edit_page)
-          end
-
-          it "does not block with base due date and override", :ignore_js_errors do
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-
-            click_manage_assign_to_button
-
-            wait_for_assign_to_tray_spinner
-            keep_trying_until { expect(item_tray_exists?).to be_truthy }
-
-            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
-            update_due_time(0, "11:59 PM")
-
-            click_add_assign_to_card
-            select_module_item_assignee(1, section_to_set)
-            update_due_date(1, format_date_for_view(due_date, "%-m/%-d/%Y"))
-            update_due_time(1, "11:59 PM")
-            click_save_button("Apply")
-            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
-
-            submit_page
-          end
-
-          it "does not block with base due date and override using embedded cards", :ignore_js_errors do
-            Account.site_admin.enable_feature!(:selective_release_edit_page)
-
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-
-            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
-            update_due_time(0, "11:59 PM")
-
-            click_add_assign_to_card
-            select_module_item_assignee(1, section_to_set)
-            update_due_date(1, format_date_for_view(due_date, "%-m/%-d/%Y"))
-            update_due_time(1, "11:59 PM")
-
-            submit_page
-          end
-        end
-
-        describe "with selective release flags off" do
-          before(:once) do
-            differentiated_modules_off
-          end
-
-          it "does not block with base due date and override" do
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-            add_override
-            last_override(section_to_set)
-            submit_page
-          end
-        end
-      end
-
-      context "without due dates" do
-        describe "with selective release flags on" do
-          before(:once) do
-            Account.site_admin.disable_feature!(:selective_release_edit_page)
-          end
-
-          it "blocks when enabled", :ignore_js_errors do
-            skip("LX-1858: Tray is not using the checkbox value")
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-
-            click_manage_assign_to_button
-
-            wait_for_assign_to_tray_spinner
-            keep_trying_until { expect(item_tray_exists?).to be_truthy }
-
-            expect(assign_to_date_and_time[0].text).to include("Please add a due date")
-
-            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
-            update_due_time(0, "11:59 PM")
-            click_save_button("Apply")
-            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
-
-            click_quiz_save_button
-            expect(driver.current_url).to include("edit")
-          end
-
-          it "does not block when disabled" do
-            new_quiz
-            set_value(sync_sis_button, false)
-
-            submit_page
-          end
-
-          it "blocks with base set with override not", :ignore_js_errors do
-            skip("LX-1858: Tray is not using the checkbox value")
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-
-            click_manage_assign_to_button
-
-            wait_for_assign_to_tray_spinner
-            keep_trying_until { expect(item_tray_exists?).to be_truthy }
-
-            expect(assign_to_date_and_time[0].text).to include("Please add a due date")
-
-            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
-            update_due_time(0, "11:59 PM")
-
-            click_add_assign_to_card
-
-            expect(assign_to_date_and_time[3].text).to include("Please add a due date")
-
-            select_module_item_assignee(1, section_to_set)
-            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
-            update_due_time(0, "11:59 PM")
-            click_save_button("Apply")
-            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
-
-            click_quiz_save_button
-            expect(driver.current_url).to include("edit")
-          end
-
-          it "does not block with base set with override not when disabled", :ignore_js_errors do
-            skip("LX-1858: Tray is not using the checkbox value")
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-            set_value(sync_sis_button, false)
-
-            click_manage_assign_to_button
-
-            wait_for_assign_to_tray_spinner
-            keep_trying_until { expect(item_tray_exists?).to be_truthy }
-            click_add_assign_to_card
-            select_module_item_assignee(1, section_to_set)
-            click_save_button("Apply")
-            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
-
-            click_quiz_save_button
-            expect(driver.current_url).to include("edit")
-          end
         end
 
         describe "with assign to cards embedded in page" do
@@ -443,37 +223,6 @@ describe "creating a quiz" do
 
             click_quiz_save_button
             expect(driver.current_url).to include("edit")
-          end
-        end
-
-        describe "with selective release flags off" do
-          before(:once) do
-            differentiated_modules_off
-          end
-
-          it "blocks when enabled" do
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-            select_last_override_section(section_to_set)
-            set_value(due_date_input_fields.first, "")
-            submit_blocked_with_errors
-          end
-
-          it "does not block when disabled" do
-            new_quiz
-            set_value(sync_sis_button, false)
-            submit_page
-          end
-
-          it "blocks with base set with override not" do
-            @course.course_sections.create!(name: section_to_set)
-            new_quiz
-            Timecop.freeze(7.days.from_now) do
-              set_value(due_date_input_fields.first, Time.zone.now)
-            end
-            add_override
-            select_last_override_section(section_to_set)
-            submit_blocked_with_errors
           end
         end
       end

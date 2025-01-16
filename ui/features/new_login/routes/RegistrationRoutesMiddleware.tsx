@@ -18,16 +18,16 @@
 
 import React, {useMemo} from 'react'
 import {Navigate, Outlet, useLocation} from 'react-router-dom'
-import {ROUTES} from './routes'
+import {useNewLoginData} from '../context'
 import {SelfRegistrationType} from '../types'
-import {useNewLogin} from '../context/NewLoginContext'
+import {ROUTES} from './routes'
 
 interface Rules {
   [key: string]: (type: string) => boolean
 }
 
 const RegistrationRoutesMiddleware = () => {
-  const {selfRegistrationType, isDataLoading} = useNewLogin()
+  const {selfRegistrationType, isDataLoading} = useNewLoginData()
   const location = useLocation()
 
   const fallback = ROUTES.SIGN_IN
@@ -40,7 +40,7 @@ const RegistrationRoutesMiddleware = () => {
       parent: type => type === SelfRegistrationType.ALL || type === SelfRegistrationType.OBSERVER,
       teacher: type => type === SelfRegistrationType.ALL,
     }),
-    []
+    [],
   )
 
   const computeRelativePath = (pathname: string): string =>
@@ -59,7 +59,7 @@ const RegistrationRoutesMiddleware = () => {
   // redirect if the user does not have access
   if (!selfRegistrationType || !canAccess) {
     console.warn(
-      `Unauthorized access attempt: selfRegistrationType=${selfRegistrationType}, route=${relativePath}`
+      `Unauthorized access attempt: selfRegistrationType=${selfRegistrationType}, route=${relativePath}`,
     )
     return <Navigate to={fallback} replace={true} state={{from: location.pathname}} />
   }

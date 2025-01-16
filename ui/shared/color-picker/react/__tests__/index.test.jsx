@@ -34,7 +34,7 @@ describe('ColorPicker', () => {
         positions={{top: 0, left: 0}}
         {...props}
       />,
-      container
+      container,
     )
   }
 
@@ -80,7 +80,7 @@ describe('ColorPicker', () => {
     const {getByText, getByLabelText} = renderColorPicker({currentColor: '#00000'})
     const applyButton = getByText('Apply')
     const textInput = getByLabelText(
-      'Invalid hexcode. Enter a valid hexcode here to use a custom color.'
+      'Invalid hexcode. Enter a valid hexcode here to use a custom color.',
     )
     fireEvent.change(textInput, {target: {value: '#00000c'}})
     expect(applyButton).toBeEnabled()
@@ -92,7 +92,7 @@ describe('ColorPicker', () => {
     fireEvent.change(textInput, {target: {value: '#hi'}})
     fireEvent.blur(textInput)
     expect(
-      getByText("'#hi' is not a valid color. Enter a valid hexcode before saving.")
+      getByText("'#hi' is not a valid color. Enter a valid hexcode before saving."),
     ).toBeInTheDocument()
   })
 })

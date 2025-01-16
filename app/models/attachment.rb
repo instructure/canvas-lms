@@ -803,15 +803,9 @@ class Attachment < ActiveRecord::Base
           quota = context.quota if context.respond_to?(:quota) && context.quota
 
           attachment_scope = context.attachments.active.where(root_attachment_id: nil)
+          excluded_attachment_ids = excluded_ids_for_context(context)
 
-          if context.is_a?(User) || context.is_a?(Group)
-            excluded_attachment_ids = []
-            if context.is_a?(User)
-              excluded_attachment_ids += context.attachments.joins(:attachment_associations).where(attachment_associations: { context_type: "Submission" }).pluck(:id)
-            end
-            excluded_attachment_ids += context.attachments.where(folder_id: context.submissions_folders).pluck(:id)
-            attachment_scope = attachment_scope.where.not(id: excluded_attachment_ids) if excluded_attachment_ids.any?
-          end
+          attachment_scope = attachment_scope.where.not(id: excluded_attachment_ids) if excluded_attachment_ids.present?
 
           min = MINIMUM_SIZE_FOR_QUOTA
           # translated to ruby this is [size, min].max || 0
@@ -820,6 +814,27 @@ class Attachment < ActiveRecord::Base
       end
     end
     { quota:, quota_used: }
+  end
+
+  def self.excluded_ids_for_context(context)
+    excluded_attachment_ids = []
+
+    case context
+    when Account
+      if context.root_account? && (root_folder = Folder.root_folders(context).first)
+        root_attachment_ids = Attachment.where(folder_id: Array(root_folder.id) + root_folder.sub_folders.ids).ids
+        excluded_attachment_ids.concat(root_attachment_ids) if root_attachment_ids
+      end
+    when User
+      excluded_attachment_ids.concat(context.attachments
+                                            .joins(:attachment_associations)
+                                            .where(attachment_associations: { context_type: "Submission" }).ids)
+      excluded_attachment_ids.concat(context.attachments.where(folder_id: context.submissions_folders).ids)
+    when Group
+      excluded_attachment_ids.concat(context.attachments.where(folder_id: context.submissions_folders).ids)
+    end
+
+    excluded_attachment_ids
   end
 
   # Returns a boolean indicating whether the given context is over quota
@@ -1769,7 +1784,7 @@ class Attachment < ActiveRecord::Base
       att.destroy_content
       att.thumbnail&.destroy
 
-      if att.instfs_hosted? && InstFS.enabled?
+      if InstFS.enabled?
         # duplicate the base file_removed file to a unique uuid
         att.instfs_uuid = InstFS.duplicate_file(Attachment.file_removed_base_instfs_uuid)
       else

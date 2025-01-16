@@ -75,6 +75,9 @@ const props: Props = {
     id: '',
     name: '',
   },
+  elementRef: {
+    current: null,
+  },
   enrollmentsByCourse: [
     {
       id: '1',
@@ -249,10 +252,10 @@ describe('EnrollmentTree', () => {
     expect(screen.queryByText('SubTeacherRole')).toBeInTheDocument()
     await user.click(screen.getByTestId('check-r1'))
     // includes default teacher check
-    expect(screen.getAllByRole('checkbox', {checked: true}).length).toBe(2)
+    expect(screen.getAllByRole('checkbox', {checked: true})).toHaveLength(2)
     await user.click(screen.getByText('Toggle group StudentRole'))
     // parent + child + default
-    expect(screen.getAllByRole('checkbox', {checked: true}).length).toBe(3)
+    expect(screen.getAllByRole('checkbox', {checked: true})).toHaveLength(3)
   })
 
   it('calls createEnroll when available', async () => {

@@ -43,7 +43,7 @@ export default function NotificationPreferencesContextSelect(props) {
         props.handleContextChanged({value: data.value, name})
       }
     },
-    [props]
+    [props],
   )
 
   return (

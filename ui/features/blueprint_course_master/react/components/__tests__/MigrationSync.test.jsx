@@ -19,7 +19,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {shallow} from 'enzyme'
-import sinon from 'sinon'
 import userEvent from '@testing-library/user-event'
 import MigrationSync from '../MigrationSync'
 
@@ -57,27 +56,27 @@ describe('MigrationSync component', () => {
 
   test('calls beginMigration when sync button is clicked', async () => {
     const props = defaultProps()
-    props.beginMigration = sinon.spy()
+    props.beginMigration = jest.fn()
     const tree = render(<MigrationSync {...props} />)
     const button = tree.container.querySelector('.bcs__migration-sync button')
     const user = userEvent.setup({delay: null})
     await user.click(button)
-    expect(props.beginMigration.callCount).toEqual(1)
+    expect(props.beginMigration).toHaveBeenCalledTimes(1)
   })
 
   test('calls checkMigration on mount if it has not been checked already', () => {
     const props = defaultProps()
     props.hasCheckedMigration = false
-    props.checkMigration = sinon.spy()
+    props.checkMigration = jest.fn()
     const tree = shallow(<MigrationSync {...props} />)
-    expect(props.checkMigration.callCount).toEqual(1)
+    expect(props.checkMigration).toHaveBeenCalledTimes(1)
   })
 
   test('does not call checkMigration on mount if it has been checked already', () => {
     const props = defaultProps()
     props.hasCheckedMigration = true
-    props.checkMigration = sinon.spy()
+    props.checkMigration = jest.fn()
     const tree = shallow(<MigrationSync {...props} />)
-    expect(props.checkMigration.callCount).toEqual(0)
+    expect(props.checkMigration).not.toHaveBeenCalled()
   })
 })

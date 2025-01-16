@@ -17,12 +17,23 @@
  */
 
 import Actions from '../actions'
-import sinon from 'sinon'
+import {uploadFile as rawUploadFile} from '@canvas/upload-file'
+import Helpers from '../helpers'
 
-const ok = x => expect(x).toBeTruthy()
-const deepEqual = (x, y) => expect(x).toEqual(y)
+jest.mock('@canvas/upload-file', () => ({
+  uploadFile: jest.fn(),
+}))
+
+jest.mock('../helpers', () => ({
+  extractInfoFromEvent: jest.fn(),
+  isValidImageType: jest.fn(),
+}))
 
 describe('Course Settings Actions', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   test('calling setModalVisibility produces the proper object', () => {
     let actual = Actions.setModalVisibility(true)
     let expected = {
@@ -32,7 +43,7 @@ describe('Course Settings Actions', () => {
       },
     }
 
-    deepEqual(actual, expected, 'the objects match')
+    expect(actual).toEqual(expected)
 
     actual = Actions.setModalVisibility(false)
     expected = {
@@ -42,7 +53,7 @@ describe('Course Settings Actions', () => {
       },
     }
 
-    deepEqual(actual, expected)
+    expect(actual).toEqual(expected)
   })
 
   test('calling gotCourseImage produces the proper object', () => {
@@ -54,22 +65,18 @@ describe('Course Settings Actions', () => {
       },
     }
 
-    deepEqual(actual, expected, 'the objects match')
+    expect(actual).toEqual(expected)
   })
 
-  test('getCourseImage', done => {
+  test('getCourseImage', async () => {
     const fakeResponse = {
       data: {
         image: 'http://imageUrl',
       },
     }
 
-    const fakeAjaxLib = {
-      get(url) {
-        return new Promise(resolve => {
-          setTimeout(() => resolve(fakeResponse), 100)
-        })
-      },
+    const mockAjaxLib = {
+      get: jest.fn().mockResolvedValue(fakeResponse),
     }
 
     const expectedAction = {
@@ -79,14 +86,15 @@ describe('Course Settings Actions', () => {
       },
     }
 
-    Actions.getCourseImage(
-      1,
-      'image',
-      fakeAjaxLib
-    )(dispatched => {
-      deepEqual(dispatched, expectedAction, 'the proper action was dispatched')
-      done()
-    })
+    const dispatches = []
+    const dispatch = action => {
+      dispatches.push(action)
+      return action
+    }
+
+    await Actions.getCourseImage(1, 'image', mockAjaxLib)(dispatch)
+
+    expect(dispatches).toEqual([expect.objectContaining(expectedAction)])
   })
 
   test('setCourseImageId creates the proper action', () => {
@@ -99,173 +107,194 @@ describe('Course Settings Actions', () => {
       },
     }
 
-    deepEqual(actual, expected, 'the objects match')
+    expect(actual).toEqual(expected)
   })
 
-  test('prepareSetImage with a imageUrl calls putImageData', () => {
-    sinon.spy(Actions, 'putImageData')
-    Actions.prepareSetImage('http://imageUrl', 12, 0)
-    ok(Actions.putImageData.called, 'putImageData was called')
-    Actions.putImageData.restore()
+  test('prepareSetImage with a imageUrl calls putImageData', async () => {
+    const mockAjaxLib = {
+      put: jest.fn().mockResolvedValue({}),
+    }
+
+    const dispatches = []
+    const dispatch = action => {
+      dispatches.push(action)
+      return action
+    }
+
+    await Actions.prepareSetImage('http://imageUrl', 12, 'image', 1, mockAjaxLib)(dispatch)
+
+    expect(mockAjaxLib.put).toHaveBeenCalledTimes(1)
   })
 
-  test('prepareSetImage without a imageUrl calls the API to get the url', done => {
+  // TODO: fix with msw
+  test('prepareSetImage without a imageUrl calls the API to get the url', async () => {
+    const imageUrl = 'http://imageUrl'
     const fakeResponse = {
       data: {
-        url: 'http://imageUrl',
+        url: imageUrl,
       },
     }
 
-    const fakeAjaxLib = {
-      get(url) {
-        return new Promise(resolve => {
-          setTimeout(() => resolve(fakeResponse), 100)
-        })
-      },
+    const mockAjaxLib = {
+      get: jest.fn().mockResolvedValue(fakeResponse),
+      put: jest.fn().mockResolvedValue({}),
     }
 
-    sinon.spy(Actions, 'putImageData')
-
-    Actions.prepareSetImage(
-      null,
-      1,
-      'image',
-      0,
-      fakeAjaxLib
-    )(dispatched => {
-      ok(
-        Actions.putImageData.called,
-        'image',
-        'putImageData was called indicating successfully hit API'
-      )
-      Actions.putImageData.restore()
-      done()
-    })
-  })
-
-  test('uploadFile returns false when image is not valid', done => {
-    const fakeDragonDropEvent = {
-      dataTransfer: {
-        files: [
-          {
-            name: 'test file',
-            size: 12345,
-            type: 'image/tiff',
-          },
-        ],
-      },
-      preventDefault: () => {},
-    }
-
-    const expectedAction = {
-      type: 'REJECTED_UPLOAD',
-      payload: {
-        rejectedFiletype: 'image/tiff',
-      },
-    }
-
-    Actions.uploadFile(
-      fakeDragonDropEvent,
-      1,
-      'image'
-    )(dispatched => {
-      deepEqual(dispatched, expectedAction, 'the REJECTED_UPLOAD action was fired')
-      done()
-    })
-  })
-
-  test('uploadFile dispatches UPLOADING_IMAGE when file type is valid', done => {
-    const fakeDragonDropEvent = {
-      dataTransfer: {
-        files: [
-          {
-            name: 'test file',
-            size: 12345,
-            type: 'image/jpeg',
-          },
-        ],
-      },
-      preventDefault: () => {},
-    }
-
-    const expectedAction = {
-      type: 'UPLOADING_IMAGE',
-    }
-
-    Actions.uploadFile(
-      fakeDragonDropEvent,
-      1,
-      'image'
-    )(dispatched => {
-      if (dispatched.type === 'UPLOADING_IMAGE') {
-        deepEqual(dispatched, expectedAction, 'the UPLOADING_IMAGE action was fired')
-        done()
+    const dispatches = []
+    const dispatch = action => {
+      if (typeof action === 'function') {
+        return action(dispatch)
       }
-    })
-  })
-
-  test('uploadFile dispatches prepareSetImage when successful', done => {
-    const successUrl = 'http://successUrl'
-    const preflightResponse = new Promise(resolve => {
-      setTimeout(() =>
-        resolve({
-          data: {
-            upload_params: {fakeKey: 'fakeValue', success_url: successUrl},
-            upload_url: 'http://uploadUrl',
-          },
-        })
-      )
-    })
-
-    const successResponse = new Promise(resolve => {
-      setTimeout(() =>
-        resolve({
-          data: {
-            url: 'http://fileDownloadUrl',
-            id: 1,
-          },
-        })
-      )
-    })
-
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.onCall(0).returns(preflightResponse)
-    postStub.onCall(1).returns(Promise.resolve({data: {}}))
-    getStub.returns(successResponse)
-
-    const fakeAjaxLib = {
-      post: postStub,
-      get: getStub,
+      dispatches.push(action)
+      return action
     }
 
+    await Actions.prepareSetImage(null, 1, 'image', 1, mockAjaxLib)(dispatch)
+
+    // Wait for all promises to resolve
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(mockAjaxLib.get).toHaveBeenCalledWith('/api/v1/files/1')
+    expect(mockAjaxLib.put).toHaveBeenCalledTimes(1)
+    expect(dispatches).toEqual([
+      expect.objectContaining({
+        type: 'SET_COURSE_IMAGE_ID',
+        payload: {
+          imageUrl,
+          imageId: 1,
+        },
+      }),
+    ])
+  })
+
+  test('uploadFile returns false when image is not valid', async () => {
     const fakeDragonDropEvent = {
       dataTransfer: {
         files: [
           new File(['fake'], 'fake.jpg', {
             name: 'test file',
             size: 12345,
-            type: 'image/jpeg',
+            type: 'image/tiff',
           }),
         ],
       },
       preventDefault: () => {},
     }
 
-    sinon.spy(Actions, 'prepareSetImage')
-
-    Actions.uploadFile(
-      fakeDragonDropEvent,
-      1,
-      'image',
-      fakeAjaxLib
-    )(dispatched => {
-      if (dispatched.type !== 'UPLOADING_IMAGE') {
-        ok(getStub.calledWith(successUrl), 'made request to success url')
-        ok(Actions.prepareSetImage.called, 'prepareSetImage was called')
-        Actions.prepareSetImage.restore()
-        done()
-      }
+    Helpers.extractInfoFromEvent.mockReturnValue({
+      type: 'image/tiff',
+      file: fakeDragonDropEvent.dataTransfer.files[0],
     })
+    Helpers.isValidImageType.mockReturnValue(false)
+
+    const dispatches = []
+    const dispatch = action => {
+      dispatches.push(action)
+      return action
+    }
+
+    await Actions.uploadFile(fakeDragonDropEvent, 1, 'image')(dispatch)
+
+    expect(dispatches).toEqual([
+      expect.objectContaining({
+        type: 'REJECTED_UPLOAD',
+        payload: {
+          rejectedFiletype: 'image/tiff',
+        },
+      }),
+    ])
+  })
+
+  test('uploadFile dispatches UPLOADING_IMAGE when file type is valid', async () => {
+    const fakeFile = new File(['fake'], 'fake.jpg', {
+      name: 'test file',
+      size: 12345,
+      type: 'image/jpeg',
+    })
+
+    const fakeDragonDropEvent = {
+      dataTransfer: {
+        files: [fakeFile],
+      },
+      preventDefault: () => {},
+    }
+
+    Helpers.extractInfoFromEvent.mockReturnValue({
+      type: 'image/jpeg',
+      file: fakeFile,
+    })
+    Helpers.isValidImageType.mockReturnValue(true)
+    rawUploadFile.mockResolvedValue({})
+
+    const dispatches = []
+    const dispatch = action => {
+      dispatches.push(action)
+      return action
+    }
+
+    await Actions.uploadFile(fakeDragonDropEvent, 1, 'image')(dispatch)
+
+    expect(dispatches[0]).toEqual(expect.objectContaining({type: 'UPLOADING_IMAGE'}))
+  })
+
+  test('uploadFile dispatches prepareSetImage when successful', async () => {
+    const fileDownloadUrl = 'http://fileDownloadUrl'
+    const fakeFile = new File(['fake'], 'fake.jpg', {
+      name: 'test file',
+      size: 12345,
+      type: 'image/jpeg',
+    })
+
+    const mockAjaxLib = {
+      put: jest.fn().mockResolvedValue({}),
+      get: jest.fn().mockResolvedValue({
+        data: {
+          url: fileDownloadUrl,
+        },
+      }),
+    }
+
+    Helpers.extractInfoFromEvent.mockReturnValue({
+      type: 'image/jpeg',
+      file: fakeFile,
+    })
+    Helpers.isValidImageType.mockReturnValue(true)
+
+    rawUploadFile.mockResolvedValue({
+      url: fileDownloadUrl,
+      id: 1,
+    })
+
+    const fakeDragonDropEvent = {
+      dataTransfer: {
+        files: [fakeFile],
+      },
+      preventDefault: () => {},
+    }
+
+    const dispatches = []
+    const dispatch = action => {
+      if (typeof action === 'function') {
+        return action(dispatch)
+      }
+      dispatches.push(action)
+      return action
+    }
+
+    await Actions.uploadFile(fakeDragonDropEvent, 1, 'image', mockAjaxLib)(dispatch)
+
+    // Wait for all promises to resolve
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(dispatches).toEqual([
+      expect.objectContaining({type: 'UPLOADING_IMAGE'}),
+      expect.objectContaining({
+        type: 'SET_COURSE_IMAGE_ID',
+        payload: {
+          imageUrl: fileDownloadUrl,
+          imageId: 1,
+        },
+      }),
+    ])
   })
 })

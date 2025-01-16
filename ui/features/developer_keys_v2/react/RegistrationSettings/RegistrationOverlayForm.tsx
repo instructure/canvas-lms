@@ -120,7 +120,7 @@ export const RegistrationOverlayForm = (props: {
           {placements
             .map(placement => {
               const placementOverlay = state.registration.placements.find(
-                p => p.type === placement.placement
+                p => p.type === placement.placement,
               )
               if (!placementOverlay) {
                 return [placement, {type: placement.placement}] as const
@@ -154,7 +154,7 @@ type PlacementOverlayFormProps = {
   placementDisabled: boolean
   toggleDisabledPlacement: (placementType: LtiPlacement) => void
   updatePlacement: (
-    placement_type: LtiPlacement
+    placement_type: LtiPlacement,
   ) => (fn: (placementOverlay: PlacementOverlay) => PlacementOverlay) => void
   borders: boolean
 }

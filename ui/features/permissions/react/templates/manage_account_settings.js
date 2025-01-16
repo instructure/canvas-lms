@@ -26,13 +26,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Account Settings'),
       description: I18n.t(
-        'Allows user to view and manage the Settings and Notifications tabs in Account Settings.'
+        'Allows user to view and manage the Settings and Notifications tabs in Account Settings.',
       ),
     },
     {
       title: I18n.t('Authentication'),
       description: I18n.t(
-        'Allows user to view and manage authentication options for the whole account.'
+        'Allows user to view and manage authentication options for the whole account.',
       ),
     },
     {
@@ -52,13 +52,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Announcements'),
       description: I18n.t(
-        'The Announcements tab is always visible to admins; however, to manage announcements, Global Announcements - add / edit / delete must also be enabled.'
+        'The Announcements tab is always visible to admins; however, to manage announcements, Global Announcements - add / edit / delete must also be enabled.',
       ),
     },
     {
       title: I18n.t('Feature Options (Account Settings)'),
       description: I18n.t(
-        'To manage the Feature Options tab, Feature Options - enable disable - must also be enabled.'
+        'To manage the Feature Options tab, Feature Options - enable disable - must also be enabled.',
       ),
     },
     {
@@ -68,10 +68,10 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Subaccount Navigation (Account Settings)'),
       description: I18n.t(
-        'Not all settings options are available at the subaccount level, including the Notifications tab.'
+        'Not all settings options are available at the subaccount level, including the Notifications tab.',
       ),
     },
   ],
   [],
-  []
+  [],
 )

@@ -111,7 +111,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       postRequest = postAssignmentGradesForSections(assignment.id, selectedSectionIds, options)
       successMessage = I18n.t(
         'Success! Grades have been posted for the selected sections of %{assignmentName}.',
-        {assignmentName: assignment.name}
+        {assignmentName: assignment.name},
       )
     } else {
       postRequest = postAssignmentGrades(assignment.id, options)
@@ -120,14 +120,14 @@ export default class PostAssignmentGradesTray extends PureComponent {
           'Success! Grades have been posted to everyone graded for %{assignmentName}.',
           {
             assignmentName: assignment.name,
-          }
+          },
         )
       } else {
         successMessage = I18n.t(
           'Success! Grades have been posted to everyone for %{assignmentName}.',
           {
             assignmentName: assignment.name,
-          }
+          },
         )
       }
     }
@@ -163,7 +163,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
     } else {
       this.setState({
         selectedSectionIds: selectedSectionIds.filter(
-          selectedSection => selectedSection !== sectionId
+          selectedSection => selectedSection !== sectionId,
         ),
       })
     }

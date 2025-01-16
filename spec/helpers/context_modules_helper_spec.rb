@@ -125,7 +125,7 @@ describe ContextModulesHelper do
         }
       )
       item = t_module.add_item(type: "assignment", id: assignment.id)
-      expect(module_item_translated_content_type(item, true)).to eq "Quiz"
+      expect(module_item_translated_content_type(item, student: true)).to eq "Quiz"
     end
 
     it "returns a string for a recognized content type" do
@@ -158,7 +158,7 @@ describe ContextModulesHelper do
     it "does not set mastery_paths if cyoe is disabled" do
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
       expect(ConditionalRelease::Service).not_to receive(:rules_for)
-      module_data = process_module_data(t_module, true, @student, @session)
+      module_data = process_module_data(t_module, @student, @session, student: true)
       item_data = module_data[:items_data][item.id]
       expect(item_data[:mastery_paths]).to be_nil
     end
@@ -169,14 +169,14 @@ describe ContextModulesHelper do
       end
 
       it "sets mastery_paths for a cyoe trigger assignment module item" do
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:mastery_paths][:locked]).to be false
         expect(item_data[:mastery_paths][:assignment_sets]).to eq [{}, {}]
       end
 
       it "returns the correct choose_url for a cyoe trigger assignment module item" do
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:choose_url]).to eq context_url(t_course, :context_url) + "/modules/items/" + item.id.to_s + "/choose"
       end
@@ -189,13 +189,13 @@ describe ContextModulesHelper do
                                                                                  assignment_sets: [],
                                                                                }
                                                                              ])
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to be true
       end
 
       it "is true if no set has been selected and sets are available" do
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to be true
       end
@@ -209,7 +209,7 @@ describe ContextModulesHelper do
                                                                                  still_processing: true
                                                                                }
                                                                              ])
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to be false
       end
@@ -222,7 +222,7 @@ describe ContextModulesHelper do
                                                                                  assignment_sets: [],
                                                                                }
                                                                              ])
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to be false
       end
@@ -237,7 +237,7 @@ describe ContextModulesHelper do
                                                                                }
                                                                              ])
 
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to be false
       end
@@ -249,7 +249,7 @@ describe ContextModulesHelper do
       hidden_assignment = course.assignments.create!(workflow_state: "failed_to_duplicate")
       test_module.add_item(type: "assignment", id: hidden_assignment.id)
 
-      module_data = process_module_data(test_module, true, @student, @session)
+      module_data = process_module_data(test_module, @student, @session, student: true)
 
       expect(module_data[:items]).to be_empty
     end
@@ -262,21 +262,21 @@ describe ContextModulesHelper do
 
         it "returns blueprinit item restrictions for a teacher in a child course" do
           @is_child_course = true
-          module_data = process_module_data(t_module, false, @teacher, @session)
+          module_data = process_module_data(t_module, @teacher, @session)
 
           expect(module_data[:items_restrictions]).not_to be_nil
         end
 
         it "does not return blueprinit item restrictions for a student in a child course" do
           @is_child_course = true
-          module_data = process_module_data(t_module, true, @student, @session)
+          module_data = process_module_data(t_module, @student, @session, student: true)
 
           expect(module_data[:items_restrictions]).to be_nil
         end
 
         it "does not return blueprinit item restrictions for a teacher if not a blueprint child" do
           @is_child_course = nil
-          module_data = process_module_data(t_module, false, @teacher, @session)
+          module_data = process_module_data(t_module, @teacher, @session)
 
           expect(module_data[:items_restrictions]).to be_nil
         end
@@ -285,14 +285,14 @@ describe ContextModulesHelper do
       context "is off" do
         it "does not return blueprinit item restrictions for a teacher in a child course" do
           @is_child_course = true
-          module_data = process_module_data(t_module, false, @teacher, @session)
+          module_data = process_module_data(t_module, @teacher, @session)
 
           expect(module_data[:items_restrictions]).to be_nil
         end
 
         it "does not return blueprinit item restrictions for a student in a child course" do
           @is_child_course = true
-          module_data = process_module_data(t_module, true, @student, @session)
+          module_data = process_module_data(t_module, @student, @session, student: true)
 
           expect(module_data[:items_restrictions]).to be_nil
         end

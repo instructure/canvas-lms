@@ -119,7 +119,7 @@ export default class TokenSelectorList extends PaginatedView {
     }
     this.$el.toggleClass(
       'with-toggles',
-      this.selector.options.showToggles && this.$body.find('li.toggleable').length > 0
+      this.selector.options.showToggles && this.$body.find('li.toggleable').length > 0,
     )
     this.selector.select($(this.paginationScrollContainer.children()[activeIndex]))
 
@@ -138,7 +138,7 @@ export default class TokenSelectorList extends PaginatedView {
           ? this.selector.options.messages != null
             ? this.selector.options.messages.noResults
             : undefined
-          : ''
+          : '',
       )
       this.$body.append($message)
     }

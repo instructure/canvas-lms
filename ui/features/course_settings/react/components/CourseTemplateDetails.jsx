@@ -46,7 +46,7 @@ const AssociatedText = ({count, onClick}) => (
               one: 'Associated with one account',
               other: 'Associated with %{count} accounts',
             },
-            {count}
+            {count},
           )}
     </Text>
     {count > 0 && (
@@ -77,7 +77,7 @@ AssociatedAccounts.propTypes = {
     shape({
       id: string,
       name: string,
-    }).isRequired
+    }).isRequired,
   ),
 }
 

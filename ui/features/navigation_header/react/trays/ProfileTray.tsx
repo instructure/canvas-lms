@@ -84,7 +84,7 @@ export default function ProfileTray() {
   })
 
   const countsEnabled = Boolean(
-    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
   )
 
   const {data: unreadContentSharesCount} = useQuery({

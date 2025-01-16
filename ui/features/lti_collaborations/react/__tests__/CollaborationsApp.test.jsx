@@ -17,10 +17,9 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
 import CollaborationsApp from '../CollaborationsApp'
-
-const ok = x => expect(x).toBeTruthy()
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const applicationState = {
   listCollaborations: {
@@ -38,48 +37,63 @@ const applicationState = {
         },
       },
     ],
+    listCollaborationsPending: false,
   },
   ltiCollaborators: {
     ltiCollaboratorsData: [],
+    listLTICollaboratorsPending: false,
   },
 }
 
-function setEnvironment() {
-  ENV.context_asset_string = 'courses_1'
-  ENV.current_user_roles = 'teacher'
-  ENV.CREATE_PERMISSION = true
-}
-
 describe('CollaborationsApp', () => {
-  test('renders the getting started component when there are no collaborations', () => {
-    setEnvironment()
+  let oldEnv
 
+  beforeEach(() => {
+    oldEnv = fakeENV.setup({
+      context_asset_string: 'courses_1',
+      current_user_roles: 'teacher',
+      CREATE_PERMISSION: true,
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown(oldEnv)
+  })
+
+  it('renders the getting started component when there are no collaborations', () => {
     const appState = {
       ...applicationState,
       listCollaborations: {
         list: [],
+        listCollaborationsPending: false,
       },
     }
-    const component = TestUtils.renderIntoDocument(
-      <CollaborationsApp applicationState={appState} actions={{}} />
+    const {getByText, container} = render(
+      <CollaborationsApp applicationState={appState} actions={{}} />,
     )
-    const gettingStarted = TestUtils.findRenderedDOMComponentWithClass(
-      component,
-      'GettingStartedCollaborations'
-    )
-    ok(gettingStarted)
+
+    expect(container.querySelector('.GettingStartedCollaborations')).toBeInTheDocument()
+    expect(getByText('No Collaboration Apps')).toBeInTheDocument()
   })
 
-  test('renders the list of collaborations when there are some', () => {
-    setEnvironment()
+  it('renders the list of collaborations when there are some', () => {
+    const {container} = render(
+      <CollaborationsApp applicationState={applicationState} actions={{}} />,
+    )
 
-    const component = TestUtils.renderIntoDocument(
-      <CollaborationsApp applicationState={applicationState} actions={{}} />
-    )
-    const collaborationsList = TestUtils.findRenderedDOMComponentWithClass(
-      component,
-      'CollaborationsList'
-    )
-    ok(collaborationsList)
+    expect(container.querySelector('.CollaborationsList')).toBeInTheDocument()
+  })
+
+  it('renders a loading spinner when data is pending', () => {
+    const appState = {
+      ...applicationState,
+      listCollaborations: {
+        ...applicationState.listCollaborations,
+        listCollaborationsPending: true,
+      },
+    }
+    const {container} = render(<CollaborationsApp applicationState={appState} actions={{}} />)
+
+    expect(container.querySelector('.LoadingSpinner')).toBeInTheDocument()
   })
 })

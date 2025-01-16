@@ -32,7 +32,7 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 
 const flushAllTimersAndPromises = async () => {
   while (jest.getTimerCount() > 0) {
-    // eslint-disable-next-line no-await-in-loop
+     
     await act(async () => {
       jest.runAllTimers()
     })
@@ -183,7 +183,7 @@ describe('groupDetailHook', () => {
 
     const {result, rerender} = renderHook(
       id => useGroupDetail({id, rhsGroupIdsToRefetch: ['200']}),
-      {wrapper, initialProps: '1'}
+      {wrapper, initialProps: '1'},
     )
     await act(async () => jest.runAllTimers())
     expect(result.current.group.title).toBe('Group 1')
@@ -219,7 +219,7 @@ describe('groupDetailHook', () => {
           loadOutcomesIsImported: false,
           searchString: search,
         }),
-      {wrapper}
+      {wrapper},
     )
     hook.rerender('')
     await act(async () => jest.runAllTimers())
@@ -248,7 +248,7 @@ describe('groupDetailHook', () => {
           loadOutcomesIsImported: false,
           searchString: 'search',
         }),
-      {wrapper}
+      {wrapper},
     )
     await flushAllTimersAndPromises()
     expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 1', 'Outcome 3 - Group 1'])
@@ -271,7 +271,7 @@ describe('groupDetailHook', () => {
 
     await flushAllTimersAndPromises()
     let contentTags = result.current.group.outcomes.edges
-    expect(contentTags.length).toBe(2)
+    expect(contentTags).toHaveLength(2)
     expect(result.current.group.outcomesCount).toBe(2)
 
     act(() => result.current.removeLearningOutcomes(['1']))
@@ -279,7 +279,7 @@ describe('groupDetailHook', () => {
     contentTags = result.current.group.outcomes.edges
 
     expect(result.current.group.outcomesCount).toBe(1)
-    expect(contentTags.length).toBe(1)
+    expect(contentTags).toHaveLength(1)
     expect(contentTags[0]._id).toBe('2')
   })
 
@@ -293,7 +293,7 @@ describe('groupDetailHook', () => {
           loadOutcomesIsImported: false,
           searchString: search,
         }),
-      {wrapper}
+      {wrapper},
     )
 
     // load without search

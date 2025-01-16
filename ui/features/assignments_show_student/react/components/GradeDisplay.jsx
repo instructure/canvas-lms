@@ -45,7 +45,7 @@ export default function PointsDisplay(props) {
           count: props.pointsPossible,
           formattedPoints,
           wrappers: ['<span class="points-value">$1</span>'],
-        }
+        },
       )
     }
 
@@ -67,7 +67,7 @@ export default function PointsDisplay(props) {
         {
           count: props.pointsPossible,
           formattedPoints,
-        }
+        },
       )
     }
 

@@ -23,7 +23,7 @@ import ContextModuleLink from '../ContextModuleLink'
 describe('ContextModuleLink', () => {
   it('renders', async () => {
     render(
-      <ContextModuleLink courseId="1" contextModuleId="2" contextModuleName="My fabulous module" />
+      <ContextModuleLink courseId="1" contextModuleId="2" contextModuleName="My fabulous module" />,
     )
     expect(await screen.findByTestId('context-module-text')).toBeInTheDocument()
     const link = screen.getByRole('link', {name: 'My fabulous module'})
@@ -37,7 +37,7 @@ describe('ContextModuleLink', () => {
         courseId="1"
         contextModuleId="2"
         contextModuleName="My fabulous student & course <b>module's</b> name<script>alert('hi')</script>"
-      />
+      />,
     )
     expect(await screen.findByTestId('context-module-text')).toBeInTheDocument()
     const link = screen.getByRole('link', {

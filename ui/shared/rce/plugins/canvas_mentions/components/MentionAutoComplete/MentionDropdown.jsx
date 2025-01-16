@@ -72,7 +72,10 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
 
   const filteredOptions = useMemo(() => {
     return mentionData?.filter(o => {
-      return o.name.toLowerCase().includes(inputText?.toLowerCase().trim()) || o.shortName.toLowerCase().includes(inputText?.toLowerCase().trim())
+      return (
+        o.name.toLowerCase().includes(inputText?.toLowerCase().trim()) ||
+        o.shortName.toLowerCase().includes(inputText?.toLowerCase().trim())
+      )
     })
   }, [mentionData, inputText])
 
@@ -111,7 +114,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
         setFocusedUser(
           filteredOptionsRef.current[
             selectedUserIndex + 1 >= filteredOptionsRef.current.length ? 0 : selectedUserIndex + 1
-          ]
+          ],
         )
         break
       case 'up':
@@ -120,7 +123,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
             selectedUserIndex - 1 < 0
               ? filteredOptionsRef.current.length - 1
               : selectedUserIndex - 1
-          ]
+          ],
         )
         break
       default:

@@ -25,7 +25,7 @@ const createTestEvents = (
   child_events_count,
   available_slots = 1,
   reserved = false,
-  past_slot = false
+  past_slot = false,
 ) => [
   commonEventFactory(
     {
@@ -50,7 +50,7 @@ const createTestEvents = (
         asset_string: 'course_1',
         id: 1,
       },
-    ]
+    ],
   ),
   commonEventFactory(
     {
@@ -82,7 +82,7 @@ const createTestEvents = (
         id: 1,
         can_create_calendar_events: can_edit,
       },
-    ]
+    ],
   ),
 ]
 

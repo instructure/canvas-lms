@@ -86,7 +86,7 @@ $.fn.datepicker = function (options) {
     const inputdate = new Date(
       picker.selectedYear,
       picker.selectedMonth,
-      parseInt(picker.selectedDay, 10)
+      parseInt(picker.selectedDay, 10),
     )
     const format = {month: 'short', day: 'numeric', year: 'numeric'}
 
@@ -139,7 +139,7 @@ $.fn.datepicker = function (options) {
       const inst = cur
       const sel = $(
         `td.${$.datepicker._dayOverClass}, td.${$.datepicker._currentClass}`,
-        inst.dpDiv
+        inst.dpDiv,
       )
       if (sel[0]) {
         $.datepicker.okClicked = true
@@ -190,7 +190,7 @@ $.fn.datepicker = function (options) {
       '.ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm',
       function () {
         $(this).focus()
-      }
+      },
     )
     $(document).on(
       'change keypress focus blur',
@@ -201,7 +201,7 @@ $.fn.datepicker = function (options) {
           const inst = cur
           const sel = $(
             'td.' + $.datepicker._dayOverClass + ', td.' + $.datepicker._currentClass,
-            inst.dpDiv
+            inst.dpDiv,
           )
           if (sel[0]) {
             $.datepicker.okClicked = true
@@ -213,7 +213,7 @@ $.fn.datepicker = function (options) {
         } else if (event.keyCode && event.keyCode === 27) {
           $.datepicker._hideDatepicker(null, '')
         }
-      }
+      },
     )
     $.fn.datepicker.timepicker_initialized = true
   }

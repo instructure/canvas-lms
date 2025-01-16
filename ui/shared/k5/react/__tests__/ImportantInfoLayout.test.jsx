@@ -62,7 +62,7 @@ describe('ImportantInfoLayout', () => {
       },
     ]
     const {getByText, queryByText, getByRole} = render(
-      <ImportantInfoLayout {...getProps({importantInfos})} />
+      <ImportantInfoLayout {...getProps({importantInfos})} />,
     )
     expect(queryByText('Homeroom 1')).not.toBeInTheDocument()
     expect(getByText('Hello 1!')).toBeInTheDocument()

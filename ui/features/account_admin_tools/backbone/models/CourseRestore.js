@@ -90,8 +90,8 @@ export default class CourseRestore extends Backbone.Model {
       $.flashError(
         I18n.t(
           'restore_error',
-          'There was an error attempting to restore the course. Course was not restored.'
-        )
+          'There was an error attempting to restore the course. Course was not restored.',
+        ),
       )
       return deferred.reject()
     }

@@ -48,7 +48,7 @@ describe('HomeroomPage', () => {
 
   it('shows loading skeletons while loading for announcements and cards', () => {
     const {getAllByText, getByText} = render(
-      <HomeroomPage {...getProps()} loadingAnnouncements={true} loadingCards={true} />
+      <HomeroomPage {...getProps()} loadingAnnouncements={true} loadingCards={true} />,
     )
     const cards = getAllByText('Loading Card')
     expect(cards[0]).toBeInTheDocument()
@@ -58,7 +58,7 @@ describe('HomeroomPage', () => {
   it('shows loading skeletons while loading based off ENV variable', () => {
     const {getAllByText} = render(<HomeroomPage {...getProps()} loadingCards={true} />)
     const cards = getAllByText('Loading Card')
-    expect(cards.length).toBe(3)
+    expect(cards).toHaveLength(3)
     expect(cards[0]).toBeInTheDocument()
   })
 
@@ -80,7 +80,7 @@ describe('HomeroomPage', () => {
       loadingCards: false,
     }
     const {queryAllByText, getByText} = render(<HomeroomPage {...getProps(overrides)} />)
-    expect(queryAllByText('Loading Card').length).toBe(0)
+    expect(queryAllByText('Loading Card')).toHaveLength(0)
     expect(getByText('Computer Science 101')).toBeInTheDocument()
   })
 

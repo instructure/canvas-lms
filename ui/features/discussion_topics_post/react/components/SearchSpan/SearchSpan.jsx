@@ -69,7 +69,7 @@ const highlightText = (text, searchTerm) => {
     .replace(/<[^>]*>/gm, '')
     .replace(
       searchExpression,
-      '<span data-testid="highlighted-search-item" style="font-weight: bold; background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
+      '<span data-testid="highlighted-search-item" style="font-weight: bold; background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>',
     )
 }
 

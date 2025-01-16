@@ -39,7 +39,7 @@ export const validateAvailability = (
   newAvailableFrom,
   newAvailableUntil,
   isGraded,
-  setAvailabilityValidationMessages
+  setAvailabilityValidationMessages,
 ) => {
   if (isGraded) {
     return true
@@ -72,7 +72,7 @@ const validateUsageRights = (
   attachment,
   usageRightsData,
   setUsageRightsErrorState,
-  setOnFailure
+  setOnFailure,
 ) => {
   // if usage rights is not enabled or there are no attachments, there is no need to validate
   if (!ENV?.USAGE_RIGHTS_REQUIRED || !attachment) {
@@ -104,7 +104,7 @@ const validateGradedDiscussionFields = (
   isGraded,
   assignedInfoList,
   postToSis,
-  showPostToSisError
+  showPostToSisError,
 ) => {
   if (!isGraded) {
     return true
@@ -159,7 +159,7 @@ export const validateFormFields = (
   sectionIdsToPostTo,
   assignedInfoList,
   postToSis,
-  showPostToSisError
+  showPostToSisError,
 ) => {
   let isValid = true
 
@@ -176,7 +176,7 @@ export const validateFormFields = (
       validationFunction: validateSelectGroup(
         isGroupDiscussion,
         groupCategoryId,
-        setGroupCategorySelectError
+        setGroupCategorySelectError,
       ),
       ref: groupOptionsRef.current,
     },
@@ -185,7 +185,7 @@ export const validateFormFields = (
         availableFrom,
         availableUntil,
         isGraded,
-        setAvailabilityValidationMessages
+        setAvailabilityValidationMessages,
       ),
       ref: dateInputRef.current,
     },
@@ -196,7 +196,7 @@ export const validateFormFields = (
         isGraded,
         assignedInfoList,
         postToSis,
-        showPostToSisError
+        showPostToSisError,
       ),
       ref: gradedDiscussionRef.current,
     },
@@ -205,7 +205,7 @@ export const validateFormFields = (
         attachment,
         usageRightsData,
         setUsageRightsErrorState,
-        setOnFailure
+        setOnFailure,
       ),
       ref: null,
     },

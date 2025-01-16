@@ -26,8 +26,8 @@ export const DEFAULT_ACTIVE_REQUEST_LIMIT = 12 // overall limit
 export const MAX_ACTIVE_REQUEST_LIMIT = 100
 export const MIN_ACTIVE_REQUEST_LIMIT = process.env.NODE_ENV !== 'production' ? 1 : 10
 
-type Request = {
-  deferred: ReturnType<typeof deferPromise>
+type Request<T = unknown> = {
+  deferred: ReturnType<typeof deferPromise<T>>
   active: boolean
   start: () => void
 }
@@ -44,7 +44,7 @@ export default class RequestDispatch {
     activeRequestLimit: number
   }
 
-  requests: Request[]
+  requests: Array<Request<unknown> | Request<any>>
 
   constructor(options: {activeRequestLimit?: string | number} = {}) {
     this.options = {
@@ -64,14 +64,12 @@ export default class RequestDispatch {
     return this.requests.find(request => !request.active)
   }
 
-  // @ts-expect-error
-  addRequest(request) {
-    this.requests.push(request)
+  addRequest<T>(request: Request<T>) {
+    this.requests.push(request as Request<unknown>)
     this.fillQueue()
   }
 
-  // @ts-expect-error
-  clearRequest(request) {
+  clearRequest<T>(request: Request<T>) {
     this.requests = this.requests.filter(r => r !== request)
     this.fillQueue()
   }
@@ -84,21 +82,19 @@ export default class RequestDispatch {
     }
   }
 
-  getDepaginated<T>(
+  getDepaginated<T, D = T>(
     url: string,
-    // @ts-expect-error
-    params,
-    // @ts-expect-error
-    pageCallback: (data?) => void = () => {},
-    pagesEnqueuedCallback = (_deferreds: ReturnType<typeof deferPromise>[]) => {}
+    params: Record<string, unknown>,
+    pageCallback: (data: D) => void = () => {},
+    pagesEnqueuedCallback: (promises: Promise<D>[]) => void = () => {},
   ): Promise<T> {
-    const request = {
+    const request: Request<T> = {
       deferred: deferPromise<T>(),
       active: false,
       start: () => {},
     }
 
-    const allEnqueued = (deferreds: ReturnType<typeof deferPromise>[]) => {
+    const allEnqueued = (promises: Promise<D>[]) => {
       /*
        * The initial request to get the first page and page link headers has
        * completed, so the corresponding request object in this queue can be
@@ -106,7 +102,7 @@ export default class RequestDispatch {
        * and will be responsible for removing themselves upon completion.
        */
       this.clearRequest(request)
-      return pagesEnqueuedCallback(deferreds)
+      return pagesEnqueuedCallback(promises)
     }
 
     request.start = () => {
@@ -117,7 +113,7 @@ export default class RequestDispatch {
       request.active = true
 
       cheaterDepaginate(url, params, pageCallback, allEnqueued, this)
-        .then(request.deferred.resolve)
+        .then(data => request.deferred.resolve(data as T))
         .catch(request.deferred.reject)
         .finally(() => {
           /*
@@ -134,8 +130,7 @@ export default class RequestDispatch {
     return request.deferred.promise
   }
 
-  // @ts-expect-error
-  getJSON<T>(url: string, params?): Promise<T> {
+  getJSON<T>(url: string, params?: Record<string, unknown>): Promise<T> {
     const request = {
       deferred: deferPromise<T>(),
       start: () => {},
@@ -150,7 +145,6 @@ export default class RequestDispatch {
        */
       request.active = true
 
-      // @ts-expect-error
       $.ajaxJSON(url, 'GET', params)
         .then(request.deferred.resolve)
         .fail(request.deferred.reject)
@@ -167,19 +161,16 @@ export default class RequestDispatch {
 
   // PRIVILEGED
 
-  // @ts-expect-error
-  _getJSON(url, params) {
+  _getJSON(url: string, params: Record<string, unknown>) {
     return new Promise((resolve, reject) => {
-      // @ts-expect-error
       $.ajaxJSON(
         url,
         'GET',
         params,
-        // @ts-expect-error
-        (data, xhr) => {
+        (data: unknown, xhr: unknown) => {
           resolve({data, xhr})
         },
-        reject
+        reject,
       )
     })
   }

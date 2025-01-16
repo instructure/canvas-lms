@@ -1,5 +1,3 @@
- 
- 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -51,7 +49,7 @@ ready(() => {
     },
     function () {
       $(this).removeClass('header_hover')
-    }
+    },
   )
 
   $('.edit_account_link').click(function () {
@@ -107,7 +105,7 @@ ready(() => {
       const url = replaceTags(
         $('#sub_account_urls .sub_account_url').attr('href'),
         'id',
-        account.id
+        account.id,
       )
       $(this).attr({action: url, method: 'PUT'})
       $(this)
@@ -127,8 +125,8 @@ ready(() => {
     alert(
       I18n.t(
         'alerts.subaccount_has_courses',
-        "You can't delete a sub-account that has courses in it"
-      )
+        "You can't delete a sub-account that has courses in it",
+      ),
     )
     return false
   })
@@ -138,8 +136,8 @@ ready(() => {
       alert(
         I18n.t(
           'alerts.subaccount_has_subaccounts',
-          "You can't delete a sub-account that has sub-accounts"
-        )
+          "You can't delete a sub-account that has sub-accounts",
+        ),
       )
     } else {
       $(this)
@@ -148,7 +146,7 @@ ready(() => {
           url: $(this).parents('.header').find('form').attr('action'),
           message: I18n.t(
             'confirms.delete_subaccount',
-            'Are you sure you want to delete this sub-account?'
+            'Are you sure you want to delete this sub-account?',
           ),
           success() {
             const $list_entry = $(this).closest('.sub_account')
@@ -211,12 +209,12 @@ ready(() => {
             sub_account.courses_count = I18n.t(
               'courses_count',
               {one: '1 Course', other: '%{count} Courses'},
-              {count: sub_account.course_count}
+              {count: sub_account.course_count},
             )
             sub_account.sub_accounts_count = I18n.t(
               'sub_accounts_count',
               {one: '1 Sub-Account', other: '%{count} Sub-Accounts'},
-              {count: sub_account.sub_account_count}
+              {count: sub_account.sub_account_count},
             )
             const sub_account_node = $("<li class='sub_account'/>")
             sub_account_node
@@ -226,7 +224,7 @@ ready(() => {
                   .attr('id', 'account_new')
                   .show()
                   .attr('id', 'account_' + sub_account.id)
-                  .fillFormData(sub_account, {object_name: 'account'})
+                  .fillFormData(sub_account, {object_name: 'account'}),
               )
               .fillTemplateData({
                 data: sub_account,
@@ -248,7 +246,7 @@ ready(() => {
                 'data-link': replaceTags(
                   sub_account_node.find('.expand_sub_accounts_link').attr('data-link'),
                   'id',
-                  sub_account.id
+                  sub_account.id,
                 ),
               })
               .end()
@@ -260,7 +258,7 @@ ready(() => {
                 action: replaceTags(
                   $('#sub_account_urls .sub_account_url').attr('href'),
                   'id',
-                  sub_account.id
+                  sub_account.id,
                 ),
                 method: 'PUT',
               })
@@ -268,7 +266,7 @@ ready(() => {
           $header.parent('.account').children('ul').slideDown()
           $header.find('.collapse_sub_accounts_link').focus()
         },
-        _data => {}
+        _data => {},
       )
     }
     return false

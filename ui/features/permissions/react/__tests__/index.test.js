@@ -29,10 +29,13 @@ const defaultData = () => ({
 const indexContainer = document.createElement('div')
 document.body.appendChild(indexContainer)
 
-it('mounts/unmounts permissions to container component', () => {
+it('mounts/unmounts permissions to container component', async () => {
   app = createPermissionsIndex(indexContainer, defaultData())
   app.render()
+  // Allow for React 19 async rendering
+  await new Promise(resolve => setTimeout(resolve, 0))
   expect(document.querySelector('.permissions-v2__wrapper')).not.toBeNull()
   app.unmount()
+  await new Promise(resolve => setTimeout(resolve, 0))
   expect(document.querySelector('.permissions-v2__wrapper')).toBeNull()
 })

@@ -68,7 +68,7 @@ describe('GradeSummary Layout', () => {
     wrapper = render(
       <Provider store={store}>
         <Layout />
-      </Provider>
+      </Provider>,
     )
   }
 

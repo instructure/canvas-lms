@@ -23,7 +23,7 @@ export default function setDefaultToolValues(
   tool: {
     definition_type: string
     definition_id: string
-  }
+  },
 ) {
   $('#assignment_external_tool_tag_attributes_content_type').val(tool.definition_type)
   $('#assignment_external_tool_tag_attributes_content_id').val(tool.definition_id)
@@ -36,6 +36,6 @@ export default function setDefaultToolValues(
       subject: 'defaultToolContentReady',
       content: result,
     },
-    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN,
   )
 }

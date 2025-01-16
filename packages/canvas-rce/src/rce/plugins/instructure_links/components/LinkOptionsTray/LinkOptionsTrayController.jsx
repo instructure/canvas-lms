@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import bridge from '../../../../../bridge'
 import {getLinkContentFromEditor} from '../../../shared/ContentSelection'
 import {getAnchorElement} from '../../../../contentInsertionUtils'
@@ -30,6 +30,7 @@ export default class LinkOptionsTrayController {
     this._isOpen = false
     this._shouldOpen = false
     this._renderId = 0
+    this._root = null
   }
 
   get $container() {
@@ -113,6 +114,9 @@ export default class LinkOptionsTrayController {
         open={this._shouldOpen}
       />
     )
-    ReactDOM.render(element, this.$container)
+    if (!this._root) {
+      this._root = createRoot(this.$container)
+    }
+    this._root.render(element)
   }
 }

@@ -109,14 +109,14 @@ describe('DashboardHeader', () => {
 
   it('renders', () => {
     const {container} = render(
-      <DashboardHeader planner_enabled={true} planner_selected={true} env={window.ENV} />
+      <DashboardHeader planner_enabled={true} planner_selected={true} env={window.ENV} />,
     )
     expect(container).toBeTruthy()
   })
 
   it('switches between dashboard views', async () => {
     const {getByRole} = render(
-      <FakeDashboardHeader planner_enabled={false} dashboard_view="activity" />
+      <FakeDashboardHeader planner_enabled={false} dashboard_view="activity" />,
     )
 
     const dashboardActivity = document.getElementById('dashboard-activity')
@@ -158,7 +158,7 @@ describe('DashboardHeader', () => {
 
   it('shows planner view when enabled', async () => {
     const {getByRole} = render(
-      <FakeDashboardHeader planner_enabled={true} dashboard_view="activity" />
+      <FakeDashboardHeader planner_enabled={true} dashboard_view="activity" />,
     )
 
     const dashboardPlanner = document.getElementById('dashboard-planner')
@@ -212,7 +212,7 @@ describe('DashboardHeader', () => {
           dashboard_view="planner"
           env={window.ENV}
           canAddObservee={false}
-        />
+        />,
       )
 
       const dashboardPlanner = document.getElementById('dashboard-planner')

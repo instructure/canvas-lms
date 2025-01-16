@@ -1,4 +1,3 @@
- 
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -61,7 +60,7 @@ $.each(ENV.LDAP_TESTS, (i, test) => {
       })
       if (success) {
         $('#ldap_' + test.test_type + '_result').html(
-          "<h4 style='color:green'>" + h(I18n.t('test_ldap_result_ok', 'OK')) + '</h4>'
+          "<h4 style='color:green'>" + h(I18n.t('test_ldap_result_ok', 'OK')) + '</h4>',
         )
         if (ENV.LDAP_TESTS[i + 1]) {
           // proceed to the next test
@@ -72,7 +71,7 @@ $.each(ENV.LDAP_TESTS, (i, test) => {
         }
       } else {
         $('#ldap_' + test.test_type + '_result').html(
-          "<h4 style='color:red'>" + h(I18n.t('test_ldap_result_failed', 'Failed')) + '</h4>'
+          "<h4 style='color:red'>" + h(I18n.t('test_ldap_result_failed', 'Failed')) + '</h4>',
         )
         $('#ldap_' + test.test_type + '_help').show()
         const $server_error = $('<p></p>')
@@ -83,11 +82,11 @@ $.each(ENV.LDAP_TESTS, (i, test) => {
 
         $.each(ENV.LDAP_TESTS.slice(i + 1), (i, next_test) => {
           $('#ldap_' + next_test.test_type + '_result').html(
-            "<h4 style='color:red'>" + h(I18n.t('test_ldap_result_canceled', 'Canceled')) + '</h4>'
+            "<h4 style='color:red'>" + h(I18n.t('test_ldap_result_canceled', 'Canceled')) + '</h4>',
           )
         })
         $('#ldap_login_result').html(
-          "<h4 style='color:red'>" + h(I18n.t('test_ldap_result_canceled', 'Canceled')) + '</h4>'
+          "<h4 style='color:red'>" + h(I18n.t('test_ldap_result_canceled', 'Canceled')) + '</h4>',
         )
       }
     })
@@ -119,14 +118,14 @@ function testLDAPLogin() {
       if (success) {
         $('#ldap_login_help_error').hide()
         $('#ldap_login_result').html(
-          "<h4 style='color:green'>" + h(I18n.t('test_ldap_result_ok', 'OK')) + '</h4>'
+          "<h4 style='color:green'>" + h(I18n.t('test_ldap_result_ok', 'OK')) + '</h4>',
         )
         $('#ldap_test_login')
           .prop('disabled', false)
           .prop('value', I18n.t('test_login', 'Test Login'))
       } else {
         $('#ldap_login_result').html(
-          "<h4 style='color:red'>" + h(I18n.t('test_ldap_result_failed', 'Failed')) + '</h4>'
+          "<h4 style='color:red'>" + h(I18n.t('test_ldap_result_failed', 'Failed')) + '</h4>',
         )
         $('#ldap_login_help').show()
         $('#ldap_test_login')
@@ -134,7 +133,7 @@ function testLDAPLogin() {
           .prop('value', I18n.t('retry_login', 'Retry Login'))
         $('#ldap_login_help_error').text(message)
       }
-    }
+    },
   )
 }
 

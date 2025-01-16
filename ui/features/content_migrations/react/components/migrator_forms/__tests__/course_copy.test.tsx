@@ -57,7 +57,7 @@ describe('CourseCopyImporter', () => {
             blueprint: false,
           },
         ],
-      })
+      }),
     )
   })
 
@@ -108,7 +108,7 @@ describe('CourseCopyImporter', () => {
         settings: expect.objectContaining({
           source_course_id: '0',
         }),
-      })
+      }),
     )
   })
 

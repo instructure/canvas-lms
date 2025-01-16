@@ -98,7 +98,7 @@ describe('Assignment Student Content View', () => {
     const {getByTestId} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(getByTestId('assignments-2-student-view')).toBeInTheDocument()
   })
@@ -136,7 +136,7 @@ describe('Assignment Student Content View', () => {
     const {getByTestId} = render(
       <MockedProvider mocks={mocks}>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(getByTestId('assignment-student-header')).toBeInTheDocument()
   })
@@ -146,7 +146,7 @@ describe('Assignment Student Content View', () => {
     const {getByText, queryByText} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(getByText('Details')).toBeInTheDocument()
     expect(queryByText('Availability Dates')).not.toBeInTheDocument()
@@ -158,7 +158,7 @@ describe('Assignment Student Content View', () => {
     const {getByRole} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     const sticker = getByRole('img', {name: 'A sticker with a picture of an apple.'})
@@ -171,7 +171,7 @@ describe('Assignment Student Content View', () => {
     const {queryByRole} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     const sticker = queryByRole('img', {name: 'A sticker with a picture of an apple.'})
@@ -184,7 +184,7 @@ describe('Assignment Student Content View', () => {
     const {queryByRole} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const sticker = queryByRole('button', {name: 'A sticker with a picture of an apple.'})
     expect(sticker).not.toBeInTheDocument()
@@ -210,7 +210,7 @@ describe('Assignment Student Content View', () => {
         <MockedProvider>
           <StudentContent {...props} />
         </MockedProvider>
-      </StudentViewContext.Provider>
+      </StudentViewContext.Provider>,
     )
     expect(container).toHaveTextContent(/Attempt 1 Score:\s*N\/A/)
   })
@@ -242,7 +242,7 @@ describe('Assignment Student Content View', () => {
         <MockedProvider>
           <StudentContent {...props} />
         </MockedProvider>
-      </StudentViewContext.Provider>
+      </StudentViewContext.Provider>,
     )
 
     expect(container).toHaveTextContent(/Attempt 7 Score:\s*131\/150/)
@@ -275,7 +275,7 @@ describe('Assignment Student Content View', () => {
         <MockedProvider>
           <StudentContent {...props} />
         </MockedProvider>
-      </StudentViewContext.Provider>
+      </StudentViewContext.Provider>,
     )
 
     expect(container).toHaveTextContent(/Attempt 7 Score:\s*N\/A/)
@@ -308,7 +308,7 @@ describe('Assignment Student Content View', () => {
         <MockedProvider>
           <StudentContent {...props} />
         </MockedProvider>
-      </StudentViewContext.Provider>
+      </StudentViewContext.Provider>,
     )
 
     expect(container).toHaveTextContent(/Offline Score:\s*131\/150/)
@@ -322,7 +322,7 @@ describe('Assignment Student Content View', () => {
     const {queryByTestId} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(queryByTestId('attemptSelect')).toBeInTheDocument()
   })
@@ -333,7 +333,7 @@ describe('Assignment Student Content View', () => {
     const {queryByTestId} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
   })
@@ -345,7 +345,7 @@ describe('Assignment Student Content View', () => {
     const {queryByTestId} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
   })
@@ -358,7 +358,7 @@ describe('Assignment Student Content View', () => {
     const {queryByTestId} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
   })
@@ -385,7 +385,7 @@ describe('Assignment Student Content View', () => {
     const {queryByTestId} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
   })
@@ -399,7 +399,7 @@ describe('Assignment Student Content View', () => {
     const {queryByTestId} = render(
       <MockedProvider>
         <StudentContent {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(queryByTestId('attemptSelect')).toBeInTheDocument()
   })
@@ -428,7 +428,7 @@ describe('Assignment Student Content View', () => {
       const {getAllByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getAllByText(/this is my assignment/)).not.toHaveLength(0)
     })
@@ -437,7 +437,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('assignment-2-student-content-tabs')).not.toBeInTheDocument()
     })
@@ -448,7 +448,7 @@ describe('Assignment Student Content View', () => {
       const {getByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const lti_external_tool = getByTestId('lti-external-tool')
       expect(lti_external_tool).toBeInTheDocument()
@@ -458,7 +458,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('lti-external-tool')).not.toBeInTheDocument()
     })
@@ -473,7 +473,7 @@ describe('Assignment Student Content View', () => {
       const {getByRole} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByRole('button', {name: 'Mark as done'})).toBeInTheDocument()
     })
@@ -482,7 +482,7 @@ describe('Assignment Student Content View', () => {
       const {queryByRole} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByRole('button', {name: 'Mark as done'})).not.toBeInTheDocument()
     })
@@ -523,7 +523,7 @@ describe('Assignment Student Content View', () => {
       const {findByText} = render(
         <MockedProvider mocks={mocks}>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(await findByText('View Rubric')).toBeInTheDocument()
@@ -546,7 +546,7 @@ describe('Assignment Student Content View', () => {
         const {getByTestId} = render(
           <MockedProvider>
             <StudentContent {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
 
@@ -561,7 +561,7 @@ describe('Assignment Student Content View', () => {
         const {queryByRole} = render(
           <MockedProvider>
             <StudentContent {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
 
@@ -596,7 +596,7 @@ describe('Assignment Student Content View', () => {
       const {findByText} = render(
         <MockedProvider mocks={mocks}>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       fireEvent.click(await findByText(/add comment/i))
       expect(await findByText(/attempt 1 feedback/i)).toBeInTheDocument()
@@ -608,7 +608,7 @@ describe('Assignment Student Content View', () => {
       const {getAllByTitle, getByText} = render(
         <MockedProvider mocks={mocks}>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       fireEvent.click(getByText('Add Comment'))
       expect(getAllByTitle('Loading')[0]).toBeInTheDocument()
@@ -634,7 +634,7 @@ describe('Assignment Student Content View', () => {
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(getByText(concludedMatch)).toBeInTheDocument()
@@ -645,7 +645,7 @@ describe('Assignment Student Content View', () => {
       const {queryByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByText(concludedMatch)).not.toBeInTheDocument()
@@ -659,10 +659,10 @@ describe('Assignment Student Content View', () => {
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(
-        getByText('This assignment is part of an unpublished module and is not available yet.')
+        getByText('This assignment is part of an unpublished module and is not available yet.'),
       ).toBeInTheDocument()
     })
   })
@@ -685,10 +685,10 @@ describe('Assignment Student Content View', () => {
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(
-        getByText('There are no submissions available to review just yet.')
+        getByText('There are no submissions available to review just yet.'),
       ).toBeInTheDocument()
       expect(getByText('Please check back soon.')).toBeInTheDocument()
     })
@@ -700,10 +700,10 @@ describe('Assignment Student Content View', () => {
       const {queryByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(
-        queryByText('There are no submissions available to review just yet.')
+        queryByText('There are no submissions available to review just yet.'),
       ).not.toBeInTheDocument()
       expect(queryByText('Please check back soon.')).not.toBeInTheDocument()
     })
@@ -714,10 +714,10 @@ describe('Assignment Student Content View', () => {
       const {queryByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(
-        queryByText('There are no submissions available to review just yet.')
+        queryByText('There are no submissions available to review just yet.'),
       ).not.toBeInTheDocument()
       expect(queryByText('Please check back soon.')).not.toBeInTheDocument()
     })
@@ -749,7 +749,7 @@ describe('Assignment Student Content View', () => {
       render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       await waitFor(() => {
@@ -770,7 +770,7 @@ describe('Assignment Student Content View', () => {
       render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       await waitFor(() => {
@@ -787,7 +787,7 @@ describe('Assignment Student Content View', () => {
       render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       await new Promise(resolve => setTimeout(resolve, 0))
@@ -801,7 +801,7 @@ describe('Assignment Student Content View', () => {
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByText('Add Comment')).toBeInTheDocument()
     })
@@ -813,7 +813,7 @@ describe('Assignment Student Content View', () => {
       const {getByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByTestId('view_feedback_button')).toHaveTextContent('View Feedback')
       expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
@@ -827,7 +827,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
     })
@@ -837,7 +837,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
     })
@@ -850,7 +850,7 @@ describe('Assignment Student Content View', () => {
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByText('Add Comment')).toBeInTheDocument()
     })
@@ -869,7 +869,7 @@ describe('Assignment Student Content View', () => {
           <MockedProvider>
             <StudentContent {...props} />
           </MockedProvider>
-        </StudentViewContext.Provider>
+        </StudentViewContext.Provider>,
       )
       expect(getByText('View Feedback')).toBeInTheDocument()
     })
@@ -881,7 +881,7 @@ describe('Assignment Student Content View', () => {
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByText('View Feedback')).toBeInTheDocument()
     })
@@ -894,7 +894,7 @@ describe('Assignment Student Content View', () => {
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByText('View Feedback')).toBeInTheDocument()
     })
@@ -911,7 +911,7 @@ describe('Assignment Student Content View', () => {
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByText('Add Comment').closest('button')).toBeDisabled()
     })
@@ -928,10 +928,10 @@ describe('Assignment Student Content View', () => {
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const screenText = getByText(
-        /After the first attempt, you cannot leave comments until you submit the assignment./
+        /After the first attempt, you cannot leave comments until you submit the assignment./,
       )
       expect(screenText).toBeInTheDocument()
     })
@@ -946,12 +946,12 @@ describe('Assignment Student Content View', () => {
       const {queryByRole} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(
         queryByRole('button', {
           name: /After the first attempt, you cannot leave comments until you submit the assignment./,
-        })
+        }),
       ).not.toBeInTheDocument()
     })
 
@@ -965,12 +965,12 @@ describe('Assignment Student Content View', () => {
       const {queryByRole} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(
         queryByRole('button', {
           name: /After the first attempt, you cannot leave comments until you submit the assignment./,
-        })
+        }),
       ).not.toBeInTheDocument()
     })
 
@@ -992,7 +992,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
     })
@@ -1005,7 +1005,7 @@ describe('Assignment Student Content View', () => {
       const {getByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByTestId('view_feedback_button')).toHaveTextContent('View Feedback')
       expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
@@ -1017,7 +1017,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).toBeInTheDocument()
     })
@@ -1028,7 +1028,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
     })
@@ -1039,7 +1039,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
     })
@@ -1050,7 +1050,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
     })
@@ -1061,7 +1061,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
     })
@@ -1072,7 +1072,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).toBeInTheDocument()
     })
@@ -1096,7 +1096,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
     })
@@ -1121,7 +1121,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).toBeInTheDocument()
     })
@@ -1143,7 +1143,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -1170,7 +1170,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -1197,7 +1197,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).toBeInTheDocument()
     })
@@ -1228,7 +1228,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).toBeInTheDocument()
     })
@@ -1276,7 +1276,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -1287,7 +1287,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -1298,7 +1298,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -1309,7 +1309,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -1320,7 +1320,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -1332,7 +1332,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('originality_report')).not.toBeInTheDocument()
     })
@@ -1353,7 +1353,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('assignment-student-anonymous-label')).not.toBeInTheDocument()
     })
@@ -1374,7 +1374,7 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('assignment-student-anonymous-label')).not.toBeInTheDocument()
     })
@@ -1396,10 +1396,10 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('assignment-student-anonymus-label')).toHaveTextContent(
-        'Anonymous Grading:yes'
+        'Anonymous Grading:yes',
       )
     })
 
@@ -1408,10 +1408,10 @@ describe('Assignment Student Content View', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('assignment-student-anonymus-label')).toHaveTextContent(
-        'Anonymous Grading:no'
+        'Anonymous Grading:no',
       )
     })
   })

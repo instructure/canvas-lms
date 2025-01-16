@@ -177,7 +177,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
   function getOptionsMenuTrigger() {
     return (
       [...container.querySelectorAll('button')].find(
-        button => button.textContent === 'Math 1.1 Options'
+        button => button.textContent === 'Math 1.1 Options',
       ) || null
     )
   }
@@ -694,7 +694,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         fireEvent.click(menuItem)
         await loadMessageStudentsWhoDialogPromise
         const [settings] = MessageStudentsWhoDialog.show.lastCall.args
-        expect(settings.students.length).toBe(2)
+        expect(settings.students).toHaveLength(2)
       })
 
       test('excludes test students from the "settings" hash', async () => {
@@ -845,7 +845,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         await waitFor(() => {
           expect(getMenuItem(menuContent, 'All grades posted')).toHaveAttribute(
             'aria-disabled',
-            'true'
+            'true',
           )
         })
       })
@@ -918,7 +918,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         await waitFor(() => {
           expect(getMenuItem(menuContent, 'All grades hidden')).toHaveAttribute(
             'aria-disabled',
-            'true'
+            'true',
           )
         })
       })

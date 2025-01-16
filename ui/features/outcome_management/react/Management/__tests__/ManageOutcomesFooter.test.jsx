@@ -33,7 +33,7 @@ describe('ManageOutcomesFooter', () => {
           canUnlink,
         },
       }),
-      {}
+      {},
     )
   const defaultProps = (numberToGenerate = 2, canUnlink = true) => ({
     selected: generateOutcomes(numberToGenerate, canUnlink),
@@ -54,7 +54,7 @@ describe('ManageOutcomesFooter', () => {
 
   const renderWithContext = children => {
     return render(
-      <OutcomesContext.Provider value={{env: {isMobileView}}}>{children}</OutcomesContext.Provider>
+      <OutcomesContext.Provider value={{env: {isMobileView}}}>{children}</OutcomesContext.Provider>,
     )
   }
 
@@ -69,7 +69,7 @@ describe('ManageOutcomesFooter', () => {
       const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps(0)} />)
       expect(getByText('0 Outcomes Selected').closest('button')).toHaveAttribute(
         'aria-disabled',
-        'true'
+        'true',
       )
     })
 

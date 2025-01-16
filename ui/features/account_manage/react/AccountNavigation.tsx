@@ -43,7 +43,7 @@ export function AccountNavigation(props: Props) {
         }}
       >
         {i}
-      </Page>
+      </Page>,
     )
   }
 

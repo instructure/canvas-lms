@@ -1,5 +1,3 @@
-/* eslint-disable import/no-commonjs */
-/* eslint-disable no-inner-declarations */
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -50,8 +48,6 @@ The quiz taking police has arrived.
      }
 */
 
-/* eslint-disable no-restricted-globals */
-
 if (!window.Worker) {
   // If this browser doesn't support web workers, this module does nothing
   module.exports = null
@@ -74,7 +70,7 @@ if (!window.Worker) {
             break
         }
       },
-      false
+      false,
     )
   }
 

@@ -19,11 +19,8 @@
 #
 
 require_relative "../../views_helper"
-require_relative "../../../helpers/selective_release_common"
 
 describe "quizzes/quizzes/show" do
-  include SelectiveReleaseCommon
-
   it "renders" do
     course_with_student
     view_context
@@ -84,17 +81,6 @@ describe "quizzes/quizzes/show" do
     render "quizzes/quizzes/show"
 
     expect(response).to have_tag ".assign-to-link"
-  end
-
-  it "does not show assign to button if flag is off" do
-    differentiated_modules_off
-    course_with_teacher(active_all: true)
-    assign(:quiz, @course.quizzes.create!)
-
-    view_context
-    render "quizzes/quizzes/show"
-
-    expect(response).not_to have_tag ".assign-to-link"
   end
 
   it "shows unpublished quiz changes to instructors" do

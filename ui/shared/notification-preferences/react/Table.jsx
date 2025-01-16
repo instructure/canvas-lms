@@ -109,7 +109,7 @@ const renderNotificationCategory = (
   updatePreferenceCallback,
   renderChannelHeader,
   sendScoresInEmails,
-  setSendScoresInEmails
+  setSendScoresInEmails,
 ) => (
   <React.Fragment key={notificationCategory}>
     {!(notificationCategory === 'conversations' && ENV.current_user_disabled_inbox) && (
@@ -170,7 +170,7 @@ const renderNotificationCategory = (
             .filter(
               category =>
                 notificationPreferences.channels[0].categories[notificationCategory][category]
-                  .notification
+                  .notification,
             )
             .map(category => (
               <Table.Row key={category} data-testid={formatCategoryKey(category)}>
@@ -217,7 +217,7 @@ const renderNotificationCategory = (
                     renderSendScoresInEmailsToggle(
                       sendScoresInEmails,
                       setSendScoresInEmails,
-                      updatePreferenceCallback
+                      updatePreferenceCallback,
                     )}
                 </Table.RowHeader>
                 {notificationPreferences.channels.map(channel => (
@@ -250,7 +250,7 @@ const renderNotificationCategory = (
 const renderSendScoresInEmailsToggle = (
   sendScoresInEmails,
   setSendScoresInEmails,
-  updatePreferenceCallback
+  updatePreferenceCallback,
 ) => {
   if (ENV.NOTIFICATION_PREFERENCES_OPTIONS.send_scores_in_emails_text !== null) {
     return (
@@ -284,7 +284,7 @@ const formatPreferencesData = preferences => {
     setNotificationPolicy(channel.notificationPolicies, formattedPreferences.channels[i].categories)
     setNotificationPolicy(
       channel.notificationPolicyOverrides,
-      formattedPreferences.channels[i].categories
+      formattedPreferences.channels[i].categories,
     )
     dropEmptyCategories(formattedPreferences.channels[i].categories)
   })
@@ -319,7 +319,7 @@ const dropEmptyCategories = categories => {
 const NotificationPreferencesTable = props => {
   const {sendScoresInEmails} = props.preferences
   const [stageSendScoresInEmails, setStageSendScoresInEmails] = useState(
-    props.preferences.sendScoresInEmails
+    props.preferences.sendScoresInEmails,
   )
 
   useEffect(() => {
@@ -341,8 +341,8 @@ const NotificationPreferencesTable = props => {
             props.updatePreference,
             i === 0,
             stageSendScoresInEmails,
-            setStageSendScoresInEmails
-          )
+            setStageSendScoresInEmails,
+          ),
         )}
       </>
     )

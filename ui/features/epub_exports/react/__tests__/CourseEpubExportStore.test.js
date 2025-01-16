@@ -16,17 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isEmpty, isUndefined} from 'lodash'
 import CourseStore from '../CourseStore'
-import sinon from 'sinon'
+import $ from 'jquery'
 
-const ok = x => expect(x).toBeTruthy()
-const deepEqual = (x, y) => expect(x).toEqual(y)
+describe('CourseEpubExportStore', () => {
+  let courses
 
-let courses
-let server
-
-describe('CourseEpubExportStoreSpec', () => {
   beforeEach(() => {
     CourseStore.clearState()
     courses = {
@@ -42,61 +37,68 @@ describe('CourseEpubExportStoreSpec', () => {
         },
       ],
     }
-    server = sinon.fakeServer.create()
+
+    jest.spyOn($, 'getJSON').mockImplementation((url, callback) => {
+      callback(url.includes('courses/1/epub_exports/1') ? courses.courses[0] : courses)
+      return {fail: () => {}}
+    })
+
+    jest.spyOn($, 'post').mockImplementation((url, data, callback) => {
+      const course_id = url.match(/courses\/(\d+)/)[1]
+      const response = {
+        name: 'Creative Writing',
+        id: parseInt(course_id, 10),
+        epub_export: {
+          permissions: {},
+          workflow_state: 'created',
+        },
+      }
+      callback(response)
+      return {fail: () => {}}
+    })
   })
 
   afterEach(() => {
     CourseStore.clearState()
-    server.restore()
+    jest.restoreAllMocks()
   })
 
-  test('getAll', function () {
-    server.respondWith('GET', '/api/v1/epub_exports', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(courses),
-    ])
-    ok(isEmpty(CourseStore.getState()), 'precondition')
+  it('gets all courses', () => {
+    expect(CourseStore.getState()).toEqual({})
     CourseStore.getAll()
-    server.respond()
     const state = CourseStore.getState()
-    return courses.courses.forEach(course => deepEqual(state[course.id], course))
+    courses.courses.forEach(course => {
+      expect(state[course.id]).toEqual(course)
+    })
+    expect($.getJSON).toHaveBeenCalledWith('/api/v1/epub_exports', expect.any(Function))
   })
 
-  test('get', function () {
-    const url = '/api/v1/courses/1/epub_exports/1'
-    const course = courses.courses[0]
-    server.respondWith('GET', url, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(course),
-    ])
-    ok(isEmpty(CourseStore.getState()), 'precondition')
+  it('gets a specific course', () => {
+    expect(CourseStore.getState()).toEqual({})
     CourseStore.get(1, 1)
-    server.respond()
     const state = CourseStore.getState()
-    deepEqual(state[course.id], course)
+    expect(state[courses.courses[0].id]).toEqual(courses.courses[0])
+    expect($.getJSON).toHaveBeenCalledWith('/api/v1/courses/1/epub_exports/1', expect.any(Function))
   })
 
-  test('create', function () {
+  it('creates a new epub export', () => {
     const course_id = 3
-    const epub_export = {
+    expect(CourseStore.getState()[course_id]).toBeUndefined()
+    CourseStore.create(course_id)
+    const state = CourseStore.getState()
+    expect(state[course_id]).toEqual({
       name: 'Creative Writing',
       id: course_id,
       epub_export: {
         permissions: {},
         workflow_state: 'created',
       },
-    }
-    server.respondWith('POST', `/api/v1/courses/${course_id}/epub_exports`, [
-      200,
-      {'Content-Type': 'application/josn'},
-      JSON.stringify(epub_export),
-    ])
-    ok(isUndefined(CourseStore.getState()[course_id]), 'precondition')
-    CourseStore.create(course_id)
-    server.respond()
-    const state = CourseStore.getState()
-    deepEqual(state[course_id], epub_export, 'should add new object to state')
+    })
+    expect($.post).toHaveBeenCalledWith(
+      `/api/v1/courses/${course_id}/epub_exports`,
+      {},
+      expect.any(Function),
+      'json',
+    )
   })
 })

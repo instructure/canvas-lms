@@ -37,7 +37,7 @@ const reducerMap = {
     return Object.keys(state).reduce((obj, id) => {
       const discussion = state[id]
       const searchMatch = regex.test(
-        `${discussion.title} ${discussion.author ? discussion.author.display_name : 'anonymous'}`
+        `${discussion.title} ${discussion.author ? discussion.author.display_name : 'anonymous'}`,
       )
       const filterMatch =
         filter === 'unread' ? discussion.read_state !== 'read' || discussion.unread_count > 0 : true

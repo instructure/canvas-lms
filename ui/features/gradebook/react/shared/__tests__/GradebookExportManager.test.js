@@ -209,8 +209,8 @@ describe('GradebookExportManager - startExport', () => {
         undefined,
         () => [],
         false,
-        () => []
-      )
+        () => [],
+      ),
     ).rejects.toEqual('No way to export gradebooks provided!')
   })
 
@@ -222,8 +222,8 @@ describe('GradebookExportManager - startExport', () => {
         undefined,
         () => [],
         false,
-        () => []
-      )
+        () => [],
+      ),
     ).rejects.toEqual('An export is already in progress.')
   })
 
@@ -240,7 +240,7 @@ describe('GradebookExportManager - startExport', () => {
       undefined,
       () => [],
       false,
-      () => []
+      () => [],
     )
     expect(subject.export).toEqual(expectedExport)
   })
@@ -253,8 +253,8 @@ describe('GradebookExportManager - startExport', () => {
         undefined,
         () => [],
         false,
-        () => []
-      )
+        () => [],
+      ),
     ).rejects.toEqual('No way to monitor gradebook exports provided!')
 
     expect(subject.export).toBeUndefined()
@@ -278,8 +278,8 @@ describe('GradebookExportManager - startExport', () => {
         undefined,
         () => [],
         false,
-        () => []
-      )
+        () => [],
+      ),
     ).rejects.toEqual('Error exporting gradebook: Arbitrary failure')
   })
 
@@ -301,8 +301,8 @@ describe('GradebookExportManager - startExport', () => {
         undefined,
         () => [],
         false,
-        () => []
-      )
+        () => [],
+      ),
     ).rejects.toEqual('Error exporting gradebook: Pattern buffer degradation')
   })
 
@@ -331,7 +331,7 @@ describe('GradebookExportManager - startExport', () => {
       undefined,
       () => [],
       false,
-      () => {}
+      () => {},
     )
 
     expect(subject.export).toBeUndefined()

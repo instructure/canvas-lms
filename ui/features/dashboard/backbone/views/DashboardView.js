@@ -82,7 +82,7 @@ export default class DashboardView extends View {
             one: 'Expand %{count} announcement',
             other: 'Expand %{count} announcements',
           },
-          {count}
+          {count},
         )
       } else {
         return I18n.t(
@@ -91,7 +91,7 @@ export default class DashboardView extends View {
             one: 'Collapse %{count} announcement',
             other: 'Collapse %{count} announcements',
           },
-          {count}
+          {count},
         )
       }
     } else if (category === 'Conversation') {
@@ -102,7 +102,7 @@ export default class DashboardView extends View {
             one: 'Expand %{count} conversation message',
             other: 'Expand %{count} conversation messages',
           },
-          {count}
+          {count},
         )
       } else {
         return I18n.t(
@@ -111,7 +111,7 @@ export default class DashboardView extends View {
             one: 'Collapse %{count} conversation message',
             other: 'Collapse %{count} conversation messages',
           },
-          {count}
+          {count},
         )
       }
     } else if (category === 'Assignment') {
@@ -122,7 +122,7 @@ export default class DashboardView extends View {
             one: 'Expand %{count} assignment notification',
             other: 'Expand %{count} assignment notifications',
           },
-          {count}
+          {count},
         )
       } else {
         return I18n.t(
@@ -131,7 +131,7 @@ export default class DashboardView extends View {
             one: 'Collapse %{count} assignment notification',
             other: 'Collapse %{count} assignment notifications',
           },
-          {count}
+          {count},
         )
       }
     } else if (category === 'DiscussionTopic') {
@@ -142,7 +142,7 @@ export default class DashboardView extends View {
             one: 'Expand %{count} discussion',
             other: 'Expand %{count} discussions',
           },
-          {count}
+          {count},
         )
       } else {
         return I18n.t(
@@ -151,7 +151,7 @@ export default class DashboardView extends View {
             one: 'Collapse %{count} discussion',
             other: 'Collapse %{count} discussions',
           },
-          {count}
+          {count},
         )
       }
     } else {
@@ -182,7 +182,7 @@ export default class DashboardView extends View {
     setTimeout(
       () =>
         $.screenReaderFlashMessage($(event.target).find('.screenreader_points_possible').text()),
-      6000
+      6000,
     )
   }
 
@@ -192,14 +192,14 @@ export default class DashboardView extends View {
       !window.confirm(
         I18n.t(
           'confirm.close',
-          'Are you sure you want to end this conference?\n\nYou will not be able to reopen it.'
-        )
+          'Are you sure you want to end this conference?\n\nYou will not be able to reopen it.',
+        ),
       )
     )
       return
     const link = $(e.currentTarget)
     return $.ajaxJSON(link.attr('href'), 'POST', {}, _data =>
-      link.parents('.ic-notification.conference').hide()
+      link.parents('.ic-notification.conference').hide(),
     )
   }
 }

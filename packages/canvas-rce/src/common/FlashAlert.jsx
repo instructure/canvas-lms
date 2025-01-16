@@ -42,8 +42,7 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import formatMessage from '../format-message'
 import {Alert} from '@instructure/ui-alerts'
 import {Link} from '@instructure/ui-link'
@@ -73,22 +72,6 @@ function getLiveRegion() {
 // more info about the error when pressed.
 // Is displayed at the top of the document, and will close itself after a while
 export default class FlashAlert extends React.Component {
-  static propTypes = {
-    onClose: PropTypes.func.isRequired,
-    message: PropTypes.string.isRequired,
-    error: PropTypes.instanceOf(Error),
-    variant: PropTypes.oneOf(['info', 'success', 'warning', 'error']),
-    timeout: PropTypes.number,
-    screenReaderOnly: PropTypes.bool,
-  }
-
-  static defaultProps = {
-    error: null,
-    variant: 'info',
-    timeout: TIMEOUT,
-    screenReaderOnly: false,
-  }
-
   constructor(props) {
     super(props)
 
@@ -192,7 +175,7 @@ export default class FlashAlert extends React.Component {
 
 export function showFlashAlert({message, err, type = err ? 'error' : 'info', srOnly = false}) {
   function closeAlert(atNode) {
-    ReactDOM.unmountComponentAtNode(atNode)
+    atNode.root.unmount()
     atNode.remove()
   }
 
@@ -213,7 +196,9 @@ export function showFlashAlert({message, err, type = err ? 'error' : 'info', srO
 
   function renderAlert(parent) {
     const configuredTimeout = RCEGlobals.getConfig()?.flashAlertTimeout
-    ReactDOM.render(
+    const root = createRoot(parent)
+    parent.root = root
+    root.render(
       <FlashAlert
         message={message}
         timeout={Number.isNaN(parseInt(configuredTimeout, 10)) ? TIMEOUT : configuredTimeout}
@@ -222,8 +207,7 @@ export function showFlashAlert({message, err, type = err ? 'error' : 'info', srO
         onClose={closeAlert.bind(null, parent)}
         liveRegion={getLiveRegion}
         screenReaderOnly={srOnly}
-      />,
-      parent
+      />
     )
   }
 

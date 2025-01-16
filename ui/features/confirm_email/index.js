@@ -49,8 +49,8 @@ $(() => {
           resending = false
           $this.text(text)
           $.flashError(I18n.t('failed_resending', 'Request failed. Try again.'))
-        }
+        },
       )
-    })
+    }),
   )
 })

@@ -58,7 +58,7 @@ const speedGraderHelpers = {
       has_originality_report?: boolean
     },
     defaultEl: JQuery,
-    originalityReportEl: JQuery
+    originalityReportEl: JQuery,
   ) {
     if (submission.has_originality_report) {
       return originalityReportEl
@@ -86,7 +86,7 @@ const speedGraderHelpers = {
   determineGradeToSubmit(
     use_existing_score: boolean,
     student: StudentWithSubmission,
-    grade: JQuery
+    grade: JQuery,
   ) {
     if (use_existing_score) {
       return (student.submission.score || 0).toString()
@@ -233,7 +233,7 @@ const speedGraderHelpers = {
 
   randomizedStudentSorter(
     studentWithSubmission: StudentWithSubmission[],
-    sort_function: (student: StudentWithSubmission) => number = () => Math.random()
+    sort_function: (student: StudentWithSubmission) => number = () => Math.random(),
   ) {
     return studentWithSubmission
       .map(student => ({
@@ -248,7 +248,6 @@ const speedGraderHelpers = {
     event.preventDefault()
 
     $(event.target).prop('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'))
-    // @ts-expect-error
     $.ajaxJSON(resubmitUrl, 'POST', {}, () => {
       speedGraderHelpers.reloadPage()
     })
@@ -256,7 +255,7 @@ const speedGraderHelpers = {
 
   plagiarismResubmitUrl(
     submission: HistoricalSubmission,
-    anonymizableUserId: 'anonymous_id' | 'user_id'
+    anonymizableUserId: 'anonymous_id' | 'user_id',
   ) {
     return replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href') || '', {
       [anonymizableUserId]: submission[anonymizableUserId],
@@ -275,7 +274,7 @@ const speedGraderHelpers = {
     return (
       turnitinAsset.error_message ||
       I18n.t(
-        'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
+        'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.',
       )
     )
   },

@@ -32,7 +32,7 @@ describe('ExternalToolPlacementList', () => {
 
   const renderComponent = (overrides = {}) => {
     return render(
-      <ExternalToolPlacementList tool={tool()} onToggleSuccess={() => {}} {...overrides} />
+      <ExternalToolPlacementList tool={tool()} onToggleSuccess={() => {}} {...overrides} />,
     )
   }
 
@@ -281,7 +281,7 @@ describe('ExternalToolPlacementList', () => {
           expect.objectContaining({
             tool: expect.objectContaining({homework_submission: {enabled: true}}),
             placements: ['homework_submission'],
-          })
+          }),
         )
       })
 
@@ -320,7 +320,7 @@ describe('ExternalToolPlacementList', () => {
             expect.objectContaining({
               tool: expect.objectContaining({not_selectable: true}),
               placements: [],
-            })
+            }),
           )
         })
 
@@ -337,7 +337,7 @@ describe('ExternalToolPlacementList', () => {
             expect.objectContaining({
               tool: expect.objectContaining({not_selectable: true}),
               placements: ['assignment_selection'],
-            })
+            }),
           )
         })
       })
@@ -355,7 +355,7 @@ describe('ExternalToolPlacementList', () => {
           expect.objectContaining({
             tool: expect.objectContaining({homework_submission: {enabled: false}}),
             placements: ['homework_submission'],
-          })
+          }),
         )
       })
 
@@ -407,7 +407,7 @@ describe('ExternalToolPlacementList', () => {
         })
         fireEvent.click(getByRole('button', {name: /Placement active/}))
         expect(store.togglePlacements).toHaveBeenCalledWith(
-          expect.objectContaining({placements: ['assignment_selection']})
+          expect.objectContaining({placements: ['assignment_selection']}),
         )
       })
     })

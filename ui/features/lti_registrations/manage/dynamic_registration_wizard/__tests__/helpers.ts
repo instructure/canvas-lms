@@ -27,7 +27,7 @@ import type {DynamicRegistrationWizardService} from '../DynamicRegistrationWizar
 import type {Lti1p3RegistrationWizardService} from '../../lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 
 export const mockDynamicRegistrationWizardService = (
-  mocked?: Partial<DynamicRegistrationWizardService>
+  mocked?: Partial<DynamicRegistrationWizardService>,
 ): DynamicRegistrationWizardService => ({
   fetchRegistrationToken: jest.fn(),
   deleteDeveloperKey: jest.fn(),
@@ -40,7 +40,7 @@ export const mockDynamicRegistrationWizardService = (
 })
 
 export const mockLti1p3RegistrationWizardService = (
-  mocked?: Partial<Lti1p3RegistrationWizardService>
+  mocked?: Partial<Lti1p3RegistrationWizardService>,
 ): Lti1p3RegistrationWizardService => ({
   createLtiRegistration: jest.fn(),
   updateLtiRegistration: jest.fn(),
@@ -61,7 +61,7 @@ export const mockToolConfiguration = (config?: Partial<LtiConfiguration>): LtiCo
 
 export const mockRegistration = (
   reg?: Partial<LtiImsRegistration>,
-  config?: Partial<LtiConfiguration>
+  config?: Partial<LtiConfiguration>,
 ): LtiImsRegistration => ({
   id: ZLtiImsRegistrationId.parse('1'),
   lti_registration_id: ZLtiRegistrationId.parse('1'),

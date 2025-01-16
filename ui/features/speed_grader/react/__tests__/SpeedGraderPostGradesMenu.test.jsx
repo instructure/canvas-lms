@@ -64,7 +64,7 @@ describe('SpeedGraderPostGradesMenu', () => {
       it('enables the menu item', async () => {
         await renderMenu()
         expect(screen.getByRole('menuitem', {name: 'Post Grades'})).not.toHaveAttribute(
-          'aria-disabled'
+          'aria-disabled',
         )
       })
 
@@ -112,7 +112,7 @@ describe('SpeedGraderPostGradesMenu', () => {
       it('enables the menu item', async () => {
         await renderMenu()
         expect(screen.getByRole('menuitem', {name: 'Hide Grades'})).not.toHaveAttribute(
-          'aria-disabled'
+          'aria-disabled',
         )
       })
 

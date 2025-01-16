@@ -129,7 +129,7 @@ it('renders unique text for dismiss button', () => {
 it('calls the handleDismissClick prop when the dismiss X is clicked', () => {
   const handleDismissClick = jest.fn()
   const wrapper = render(
-    <ToDoItem {...getDefaultProps()} handleDismissClick={handleDismissClick} />
+    <ToDoItem {...getDefaultProps()} handleDismissClick={handleDismissClick} />,
   )
   const btn = wrapper.getByTestId('todo-sidebar-item-close-button')
   fireEvent.click(btn)
@@ -138,7 +138,7 @@ it('calls the handleDismissClick prop when the dismiss X is clicked', () => {
       expect.objectContaining({
         type: 'Assignment',
         title: 'Introduction to Board Games',
-      })
+      }),
     )
   })
 })

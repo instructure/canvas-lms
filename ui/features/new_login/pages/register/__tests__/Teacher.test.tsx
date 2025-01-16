@@ -16,20 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import Teacher from '../Teacher'
-import {MemoryRouter} from 'react-router-dom'
-import {NewLoginProvider} from '../../../context/NewLoginContext'
 import {render} from '@testing-library/react'
+import React from 'react'
+import {MemoryRouter} from 'react-router-dom'
+import {NewLoginDataProvider, NewLoginProvider} from '../../../context'
+import Teacher from '../Teacher'
 
 describe('Teacher', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter>
         <NewLoginProvider>
-          <Teacher />
+          <NewLoginDataProvider>
+            <Teacher />
+          </NewLoginDataProvider>
         </NewLoginProvider>
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

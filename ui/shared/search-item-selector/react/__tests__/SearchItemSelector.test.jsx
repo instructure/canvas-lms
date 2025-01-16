@@ -45,12 +45,12 @@ describe('SearchItemSelector', () => {
         itemSearchFunction={testSearchFunction}
         onItemSelected={() => {}}
         renderLabel="Select a course"
-      />
+      />,
     )
     expect(testSearchFunction).toHaveBeenCalledWith(
       expect.objectContaining({
         params: {},
-      })
+      }),
     )
   })
 
@@ -61,7 +61,7 @@ describe('SearchItemSelector', () => {
         itemSearchFunction={testSearchFunction}
         onItemSelected={() => {}}
         renderLabel="Select a course"
-      />
+      />,
     )
     fireEvent.click(getByLabelText(/select a course/i))
     expect(getByText(/loading/i)).toBeInTheDocument()
@@ -73,7 +73,7 @@ describe('SearchItemSelector', () => {
         itemSearchFunction={testSearchFunction}
         onItemSelected={() => {}}
         renderLabel="Select a course"
-      />
+      />,
     )
     const selectInput = getByLabelText(/select a course/i)
     fireEvent.click(selectInput)
@@ -86,7 +86,7 @@ describe('SearchItemSelector', () => {
     expect(testSearchFunction).toHaveBeenCalledWith(
       expect.objectContaining({
         params: {term: 'abc', search_term: 'abc'},
-      })
+      }),
     )
   })
 
@@ -98,7 +98,7 @@ describe('SearchItemSelector', () => {
         itemSearchFunction={testSearchFunction}
         onItemSelected={handleCourseSelected}
         renderLabel="Select a course"
-      />
+      />,
     )
     const selectInput = getByLabelText(/select a course/i)
     fireEvent.click(selectInput)
@@ -115,7 +115,7 @@ describe('SearchItemSelector', () => {
         itemSearchFunction={testSearchFunction}
         onItemSelected={handleCourseSelected}
         renderLabel="Select a course"
-      />
+      />,
     )
     const selectInput = getByLabelText(/select a course/i)
     fireEvent.click(selectInput)
@@ -134,7 +134,7 @@ describe('SearchItemSelector', () => {
         onItemSelected={handleCourseSelected}
         renderLabel="Select a course"
         manualSelection="bar"
-      />
+      />,
     )
     const selectInput = getByLabelText(/select a course/i)
     fireEvent.change(selectInput, {target: {value: 'barn'}})
@@ -148,7 +148,7 @@ describe('SearchItemSelector', () => {
         itemSearchFunction={testSearchFunction}
         onItemSelected={() => {}}
         renderLabel="Select a course"
-      />
+      />,
     )
     const selectInput = getByLabelText(/select a course/i)
     fireEvent.change(selectInput, {target: {value: 'nothing'}})
@@ -163,7 +163,7 @@ describe('SearchItemSelector', () => {
         itemSearchFunction={testSearchFunction}
         onItemSelected={handleCourseSelected}
         renderLabel="Select a course"
-      />
+      />,
     )
     const selectInput = getByLabelText(/select a course/i)
     fireEvent.click(selectInput)
@@ -175,7 +175,7 @@ describe('SearchItemSelector', () => {
         itemSearchFunction={testSearchFunction}
         onItemSelected={handleCourseSelected}
         renderLabel="Select a course"
-      />
+      />,
     )
     expect(selectInput.value).toBe('')
   })
@@ -188,14 +188,14 @@ describe('SearchItemSelector', () => {
         onItemSelected={handleCourseSelected}
         renderLabel="Select a course"
         manualSelection="bar"
-      />
+      />,
     )
     const selectInput = getByLabelText(/select a course/i)
     expect(selectInput.value).toBe('bar')
     expect(testSearchFunction).toHaveBeenLastCalledWith(
       expect.objectContaining({
         params: {},
-      })
+      }),
     )
 
     fireEvent.click(selectInput)
@@ -204,7 +204,7 @@ describe('SearchItemSelector', () => {
     expect(testSearchFunction).toHaveBeenLastCalledWith(
       expect.objectContaining({
         params: {term: 'baz', search_term: 'baz'},
-      })
+      }),
     )
   })
 
@@ -218,8 +218,8 @@ describe('SearchItemSelector', () => {
           itemSearchFunction={testSearchFunction}
           onItemSelected={() => {}}
           renderLabel="Select a course"
-        />
-      )
+        />,
+      ),
     ).toThrow(testError)
   })
 })

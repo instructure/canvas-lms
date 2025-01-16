@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -79,7 +80,7 @@ describe('Gradebook > store > fetchFinalGradeOverrides', () => {
       store.getState().fetchFinalGradeOverrides()
       await network.allRequestsReady()
       const requests = getRequests()
-      expect(requests.length).toStrictEqual(1)
+      expect(requests).toHaveLength(1)
     })
 
     test('saves final grade overrides to the store', async () => {

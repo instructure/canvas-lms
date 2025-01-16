@@ -66,7 +66,7 @@ describe('TimeZoneSelect', () => {
         value="Mountain"
         timezones={timezones}
         priority_zones={priorityZones}
-      />
+      />,
     )
 
     expect(getByDisplayValue('Mountain localized')).toBeInTheDocument()
@@ -80,7 +80,7 @@ describe('TimeZoneSelect', () => {
         value="Mountain"
         timezones={timezones}
         priority_zones={priorityZones}
-      />
+      />,
     )
 
     // open the select dropdown
@@ -88,25 +88,25 @@ describe('TimeZoneSelect', () => {
     label.click()
 
     const priorityOptions = document.querySelectorAll(
-      '[data-testid="Group:Common Timezones"] span[role="option"]'
+      '[data-testid="Group:Common Timezones"] span[role="option"]',
     )
     isEqual(
       Array.from(priorityOptions).map(e => ({
         name: e.getAttribute('value'),
         localized_name: e.textContent,
       })),
-      priorityZones
+      priorityZones,
     )
 
     const allOptions = document.querySelectorAll(
-      '[data-testid="Group:All Timezones"] span[role="option"]'
+      '[data-testid="Group:All Timezones"] span[role="option"]',
     )
     isEqual(
       Array.from(allOptions).map(e => ({
         name: e.getAttribute('value'),
         localized_name: e.textContent,
       })),
-      timezones
+      timezones,
     )
   })
 
@@ -118,7 +118,7 @@ describe('TimeZoneSelect', () => {
         onChange={onChangeTZ}
         timezones={timezones}
         priority_zones={priorityZones}
-      />
+      />,
     )
 
     // open the select dropdown

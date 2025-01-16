@@ -34,6 +34,7 @@ export const ConfiguredDateInput = ({
   onSelectedDateChange,
   disabled = false,
   errorMessage,
+  infoMessage,
   courseTimeZone,
   userTimeZone,
 }: {
@@ -44,6 +45,7 @@ export const ConfiguredDateInput = ({
   onSelectedDateChange: (d: Date | null) => void
   disabled?: boolean
   errorMessage?: string
+  infoMessage?: string
   courseTimeZone?: string
   userTimeZone?: string
 }) => {
@@ -60,10 +62,22 @@ export const ConfiguredDateInput = ({
     ]
   }
 
+  const generateInfoMessage = (message: string): FormMessage[] => {
+    return [
+      {
+        text: <Text>{message}</Text>,
+        type: 'hint',
+      },
+    ]
+  }
+
   const generateMessages = (): FormMessage[] => {
     const messageArray: FormMessage[] = []
     if (errorMessage) {
       messageArray.push(...generateErrorMessage(errorMessage))
+    }
+    if (infoMessage) {
+      messageArray.push(...generateInfoMessage(infoMessage))
     }
     if (courseTimeZone && userTimeZone && selectedDate && courseTimeZone !== userTimeZone) {
       messageArray.push(...timeZonedFormMessages(courseTimeZone, userTimeZone, selectedDate))

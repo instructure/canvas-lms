@@ -49,7 +49,7 @@ describe('Gradebook > Custom Columns', () => {
       gradebook.gotCustomColumns(customColumns)
       const storedColumns = gradebook.gradebookContent.customColumns
       expect(storedColumns.map(customColumn => customColumn.id)).toEqual(
-        customColumns.map(customColumn => customColumn.id)
+        customColumns.map(customColumn => customColumn.id),
       )
     })
 

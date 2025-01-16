@@ -51,6 +51,8 @@ class EportfolioEntriesController < ApplicationController
       session[:permissions_key] = SecureRandom.uuid
     end
     if authorized_action(@portfolio, @current_user, :read)
+      browser_env = rce_js_env
+      browser_env[:eportfolio_id] = @portfolio.id
       if params[:category_name]
         @category = @portfolio.eportfolio_categories.where(slug: params[:category_name]).first
       end
@@ -65,6 +67,9 @@ class EportfolioEntriesController < ApplicationController
         return
       end
       @category = @page.eportfolio_category
+      browser_env[:category_id] = @category.id
+      browser_env[:owner_view] = @portfolio.user == @current_user && params[:view] != "preview"
+      js_env(browser_env)
       eportfolio_page_attributes
       render "eportfolios/show", stream: can_stream_template?
     end

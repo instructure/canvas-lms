@@ -43,11 +43,11 @@ export const sharedMatchingAssessmentCheckboxTests = (InputComponent: React.Comp
         {...props}
         isSubmitting={true}
         fileUploadProgress={10}
-      />
+      />,
     )
 
     expect(
-      getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/})
+      getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/}),
     ).toBeDisabled()
   })
 }
@@ -110,7 +110,7 @@ export const sharedAdjustDateTests = (InputComponent: React.ComponentType<any>) 
         onCancel={onCancel}
         isSubmitting={true}
         fileUploadProgress={10}
-      />
+      />,
     )
 
     await waitFor(() => {
@@ -163,7 +163,7 @@ export const sharedFormTests = (InputComponent: React.ComponentType<any>) => {
           size: 16,
         },
       }),
-      expect.any(Object)
+      expect.any(Object),
     )
   })
 

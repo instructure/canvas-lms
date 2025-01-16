@@ -154,23 +154,11 @@ class SubAssignment < AbstractAssignment
 
   # visibility of sub_assignments is determined by the visibility of their parent assignment
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:).map(&:assignment_id)
-      if visible_assignment_ids.any?
-        where(parent_assignment_id: visible_assignment_ids)
-      else
-        none
-      end
+    visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:).map(&:assignment_id)
+    if visible_assignment_ids.any?
+      where(parent_assignment_id: visible_assignment_ids)
     else
-      joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} AS asv ON asv.assignment_id = assignments.parent_assignment_id")
-        .where("assignments.context_id IN (?)
-          AND assignments.context_type = 'Course'
-          AND asv.course_id IN (?)
-          AND asv.user_id = ANY( '{?}'::INT8[] )
-        ",
-               course_ids,
-               course_ids,
-               user_ids)
+      none
     end
   }
 end

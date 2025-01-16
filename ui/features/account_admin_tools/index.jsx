@@ -36,7 +36,7 @@ import CommMessageItemView from './backbone/views/CommMessageItemView'
 import messagesSearchResultsTemplate from './jst/commMessagesSearchResults.handlebars'
 import usersTemplate from './jst/usersList.handlebars'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import BouncedEmailsView from './react/BouncedEmailsView'
 import ready from '@instructure/ready'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
@@ -101,7 +101,9 @@ ready(() => {
 
   const bouncedEmailsMountPoint = document.getElementById('bouncedEmailsPane')
   if (bouncedEmailsMountPoint) {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(<BouncedEmailsView accountId={ENV.ACCOUNT_ID} />, bouncedEmailsMountPoint)
+    const root = createRoot(bouncedEmailsMountPoint)
+    root.render(<BouncedEmailsView accountId={ENV.ACCOUNT_ID} />)
+    return () => root.unmount()
   }
+  return () => {}
 })

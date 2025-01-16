@@ -35,13 +35,13 @@ export type UnpublishedWarningModalProps = {
 
 const WARNING_MODAL_BODY_TEXT = {
   Course: I18n.t(
-    'You have unpublished changes to your course pace. Continuing will discard these changes.'
+    'You have unpublished changes to your course pace. Continuing will discard these changes.',
   ),
   Section: I18n.t(
-    'You have unpublished changes to your section pace. Continuing will discard these changes.'
+    'You have unpublished changes to your section pace. Continuing will discard these changes.',
   ),
   Enrollment: I18n.t(
-    'You have unpublished changes to your student pace. Continuing will discard these changes.'
+    'You have unpublished changes to your student pace. Continuing will discard these changes.',
   ),
 }
 

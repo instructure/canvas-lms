@@ -96,7 +96,7 @@ export const Module = (props: ComponentProps) => {
   }
 
   const compressionTipText = I18n.t(
-    'Due Dates are being compressed based on your start and end dates'
+    'Due Dates are being compressed based on your start and end dates',
   )
   const timezoneTipText = I18n.t('Dates shown in Course Time Zone')
   const daysTipText = I18n.t('Changing course pacing days may modify due dates')

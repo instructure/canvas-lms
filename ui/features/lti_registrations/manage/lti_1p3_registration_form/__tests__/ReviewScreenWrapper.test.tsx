@@ -25,7 +25,7 @@ import {
   type Lti1p3RegistrationOverlayState,
   createLti1p3RegistrationOverlayStore,
 } from '../Lti1p3RegistrationOverlayState'
-import {type InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
+import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 
@@ -35,7 +35,7 @@ describe('Review Screen Wrapper', () => {
   })
   const renderComponent = (
     internalConfigOverrides: Partial<InternalLtiConfiguration> = {},
-    stateOverrides: Partial<Lti1p3RegistrationOverlayState> = {}
+    stateOverrides: Partial<Lti1p3RegistrationOverlayState> = {},
   ) => {
     const internalConfig = mockInternalConfiguration(internalConfigOverrides)
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
@@ -49,7 +49,7 @@ describe('Review Screen Wrapper', () => {
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         transitionTo={transitionTo}
-      />
+      />,
     )
 
     return {transitionTo}
@@ -152,10 +152,8 @@ describe('Review Screen Wrapper', () => {
           nickname: undefined,
           placements: {},
         },
-      }
+      },
     )
-
-    screen.debug(undefined, 100000)
 
     expect(screen.getByText(/no nickname provided/i)).toBeInTheDocument()
   })
@@ -210,7 +208,7 @@ describe('Review Screen Wrapper', () => {
             global_navigation: 'https://example.com/icon2.png',
           },
         },
-      }
+      },
     )
 
     expect(screen.getByText('Default Icon')).toBeInTheDocument()
@@ -226,11 +224,11 @@ describe('Review Screen Wrapper', () => {
   it('renders scopes correctly', () => {
     renderComponent(
       {},
-      {permissions: {scopes: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem']}}
+      {permissions: {scopes: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem']}},
     )
 
     expect(
-      screen.getByText(i18nLtiScope('https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'))
+      screen.getByText(i18nLtiScope('https://purl.imsglobal.org/spec/lti-ags/scope/lineitem')),
     ).toBeInTheDocument()
   })
 })

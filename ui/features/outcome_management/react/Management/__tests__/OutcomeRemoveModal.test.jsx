@@ -37,7 +37,7 @@ const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, 
         parentGroupTitle: `Outcome Group ${sameGroup ? 1001 : 1001 + idx}`,
       },
     }),
-    {}
+    {},
   )
 
 describe('OutcomeRemoveModal', () => {
@@ -71,14 +71,14 @@ describe('OutcomeRemoveModal', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = accountMocks()} = {}
+    {contextType = 'Account', contextId = '1', mocks = accountMocks()} = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
   describe('With single outcome provided', () => {
@@ -115,7 +115,7 @@ describe('OutcomeRemoveModal', () => {
     it('renders component with proper text for Account context', () => {
       const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
       expect(
-        getByText('Are you sure that you want to remove this outcome from this account?')
+        getByText('Are you sure that you want to remove this outcome from this account?'),
       ).toBeInTheDocument()
     })
 
@@ -124,7 +124,7 @@ describe('OutcomeRemoveModal', () => {
         contextType: 'Course',
       })
       expect(
-        getByText('Are you sure that you want to remove this outcome from this course?')
+        getByText('Are you sure that you want to remove this outcome from this course?'),
       ).toBeInTheDocument()
     })
 
@@ -149,7 +149,7 @@ describe('OutcomeRemoveModal', () => {
           {...defaultProps({
             outcomes: outcomesGenerator(1, 2),
           })}
-        />
+        />,
       )
       expect(getByText('Remove Outcomes?')).toBeInTheDocument()
     })
@@ -161,7 +161,7 @@ describe('OutcomeRemoveModal', () => {
             isOpen: false,
             outcomes: outcomesGenerator(1, 2),
           })}
-        />
+        />,
       )
       expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
     })
@@ -175,7 +175,7 @@ describe('OutcomeRemoveModal', () => {
         />,
         {
           mocks: [deleteOutcomeMock()],
-        }
+        },
       )
       fireEvent.click(getByText('Remove Outcomes'))
       expect(onCleanupHandlerMock).toHaveBeenCalled()
@@ -187,7 +187,7 @@ describe('OutcomeRemoveModal', () => {
           {...defaultProps({
             outcomes: outcomesGenerator(1, 2),
           })}
-        />
+        />,
       )
       fireEvent.click(getByText('Cancel'))
       expect(onCloseHandlerMock).toHaveBeenCalled()
@@ -199,7 +199,7 @@ describe('OutcomeRemoveModal', () => {
           {...defaultProps({
             outcomes: outcomesGenerator(1, 2),
           })}
-        />
+        />,
       )
       const closeBtn = getAllByText('Close')[getAllByText('Close').length - 1]
       fireEvent.click(closeBtn)
@@ -212,10 +212,10 @@ describe('OutcomeRemoveModal', () => {
           {...defaultProps({
             outcomes: outcomesGenerator(1, 2),
           })}
-        />
+        />,
       )
       expect(
-        getByText('Are you sure that you want to remove these 2 outcomes from this account?')
+        getByText('Are you sure that you want to remove these 2 outcomes from this account?'),
       ).toBeInTheDocument()
     })
 
@@ -228,10 +228,10 @@ describe('OutcomeRemoveModal', () => {
         />,
         {
           contextType: 'Course',
-        }
+        },
       )
       expect(
-        getByText('Are you sure that you want to remove these 2 outcomes from this course?')
+        getByText('Are you sure that you want to remove these 2 outcomes from this course?'),
       ).toBeInTheDocument()
     })
 
@@ -244,12 +244,12 @@ describe('OutcomeRemoveModal', () => {
               ...outcomesGenerator(1, 2, false),
             },
           })}
-        />
+        />,
       )
       expect(
         getByText(
-          'Some of the outcomes that you have selected cannot be removed because they are aligned to content in this account. Do you want to proceed with removing the outcomes without alignments?'
-        )
+          'Some of the outcomes that you have selected cannot be removed because they are aligned to content in this account. Do you want to proceed with removing the outcomes without alignments?',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -265,12 +265,12 @@ describe('OutcomeRemoveModal', () => {
         />,
         {
           contextType: 'Course',
-        }
+        },
       )
       expect(
         getByText(
-          'Some of the outcomes that you have selected cannot be removed because they are aligned to content in this course. Do you want to proceed with removing the outcomes without alignments?'
-        )
+          'Some of the outcomes that you have selected cannot be removed because they are aligned to content in this course. Do you want to proceed with removing the outcomes without alignments?',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -280,12 +280,12 @@ describe('OutcomeRemoveModal', () => {
           {...defaultProps({
             outcomes: outcomesGenerator(1, 2, false),
           })}
-        />
+        />,
       )
       expect(
         getByText(
-          'The outcomes that you have selected cannot be removed because they are aligned to content in this account.'
-        )
+          'The outcomes that you have selected cannot be removed because they are aligned to content in this account.',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -298,12 +298,12 @@ describe('OutcomeRemoveModal', () => {
         />,
         {
           contextType: 'Course',
-        }
+        },
       )
       expect(
         getByText(
-          'The outcomes that you have selected cannot be removed because they are aligned to content in this course.'
-        )
+          'The outcomes that you have selected cannot be removed because they are aligned to content in this course.',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -316,7 +316,7 @@ describe('OutcomeRemoveModal', () => {
         7: sortedOutcomes[7],
       }
       const {findAllByText} = render(
-        <OutcomeRemoveModal {...defaultProps({outcomes: unsortedOutcomes})} />
+        <OutcomeRemoveModal {...defaultProps({outcomes: unsortedOutcomes})} />,
       )
       const outcomes = await findAllByText(/Outcome Group/)
       expect(outcomes[0]).toContainHTML('Outcome Group 1003')
@@ -334,7 +334,7 @@ describe('OutcomeRemoveModal', () => {
         7: sortedOutcomes[7],
       }
       const {findAllByText} = render(
-        <OutcomeRemoveModal {...defaultProps({outcomes: unsortedOutcomes})} />
+        <OutcomeRemoveModal {...defaultProps({outcomes: unsortedOutcomes})} />,
       )
       const outcomes = await findAllByText(/Learning Outcome/)
       expect(outcomes[0]).toContainHTML('Learning Outcome 3')
@@ -353,7 +353,7 @@ describe('OutcomeRemoveModal', () => {
           />,
           {
             mocks: [deleteOutcomeMock({ids: ['1', '2']})],
-          }
+          },
         )
         fireEvent.click(getByText('Remove Outcomes'))
 

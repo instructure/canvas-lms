@@ -165,7 +165,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
             sort: columnID,
             order: 'asc',
           }}
-        />
+        />,
       )
 
       expect(wrapper.container.querySelector(`svg[name="IconMiniArrowDown"]`)).toBeNull()
@@ -188,7 +188,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
             sort: columnID,
             order: 'desc',
           }}
-        />
+        />,
       )
 
       expect(wrapper.container.querySelector(`svg[name="IconMiniArrowUp"]`)).toBeNull()
@@ -211,7 +211,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
             ...coursesProps,
             onChangeSort,
           }}
-        />
+        />,
       )
 
       wrapper.getByRole('button', {name: label}).click()

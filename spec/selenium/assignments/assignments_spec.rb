@@ -26,7 +26,6 @@ require_relative "../../helpers/k5_common"
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "page_objects/assignment_create_edit_page"
-require_relative "../../helpers/selective_release_common"
 
 describe "assignments" do
   include_context "in-process server selenium tests"
@@ -38,7 +37,6 @@ describe "assignments" do
   include CustomSeleniumActions
   include K5Common
   include ItemsAssignToTray
-  include SelectiveReleaseCommon
 
   # NOTE: due date testing can be found in assignments_overrides_spec
 
@@ -233,6 +231,73 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
         wait_for_ajaximations
         expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+      end
+    end
+
+    context "re-upload submissions" do
+      def create_text_file(file_path, content)
+        File.write(file_path, content)
+      end
+
+      def create_zip_file(zip_path, files)
+        Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
+          files.each do |file|
+            zipfile.add(File.basename(file), file)
+          end
+        end
+      end
+
+      before do
+        # Create assignment with at least one submission
+        student_in_course(course: @course, active_all: true)
+        @assignment = @course.assignments.create!(
+          name: "Assignment 1",
+          submission_types: "online_text_entry"
+        )
+        submission = @assignment.submit_homework(@student)
+        submission.submission_type = "online_text_entry"
+        submission.save!
+
+        # Go to assignment show page
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        # Download submissions
+        f(".download_submissions_link").click
+        wait_for_ajaximations
+        fj(".ui-dialog-titlebar-close:visible").click
+        wait_for_ajaximations
+        # Click Re-Upload Submissions link
+        f(".upload_submissions_link").click
+        wait_for_ajaximations
+      end
+
+      it "displays correct buttons" do
+        expect(f("#choose_file_button")).to be_displayed
+        Dir.mktmpdir do |tmpdir|
+          # Create text files in the temp directory
+          txt_file_1 = File.join(tmpdir, "file1.txt")
+          txt_file_2 = File.join(tmpdir, "file2.txt")
+
+          create_text_file(txt_file_1, "This is the content of file1.")
+          create_text_file(txt_file_2, "This is the content of file2.")
+
+          # Create the zip file in the temp directory
+          zip_file_path = File.join(tmpdir, "my_files.zip")
+          create_zip_file(zip_file_path, [txt_file_1, txt_file_2])
+
+          f('input[name="submissions_zip"]').send_keys(zip_file_path)
+          expect(f("#reuploaded_submissions_button")).to be_displayed
+        end
+      end
+
+      it "displays error text if incorrect file type" do
+        Dir.mktmpdir do |tmpdir|
+          # Create text files in the temp directory
+          txt_file_1 = File.join(tmpdir, "file1.txt")
+          create_text_file(txt_file_1, "This is the content of file1.")
+
+          f('input[name="submissions_zip"]').send_keys(txt_file_1)
+          expect(f("#file_type_error_text")).to be_displayed
+        end
       end
     end
 
@@ -431,14 +496,7 @@ describe "assignments" do
           expect(f("#assignment_points_possible").attribute(:value)).to include(points)
 
           if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-            unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
-              AssignmentCreateEditPage.click_manage_assign_to_button
-            end
-
             expect(element_value_for_attr(assign_to_due_date, "value") + ", " + element_value_for_attr(assign_to_due_time, "value")).to eq due_at
-            unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
-              click_cancel_button
-            end
           else
             due_at_field = fj(".date_field[data-date-type='due_at']:first")
             expect(due_at_field).to have_value due_at
@@ -478,12 +536,6 @@ describe "assignments" do
         expect(f("#assignment_points_possible").text).to match ""
 
         if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-          unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
-            AssignmentCreateEditPage.click_manage_assign_to_button
-            expect(element_value_for_attr(assign_to_due_date, "value")).to match expected_date
-            expect(element_value_for_attr(assign_to_due_date(1), "value")).to eq("")
-          end
-
           expect(element_value_for_attr(assign_to_due_date(0), "value")).to match expected_date
           expect(element_value_for_attr(assign_to_due_date(1), "value")).to eq("")
         else
@@ -712,29 +764,11 @@ describe "assignments" do
         expect(f("div#assignment_#{@frozen_assign.id}")).to contain_css("a.delete_assignment.disabled")
       end
 
-      it "allows editing the due date even if completely frozen", priority: "2" do
-        differentiated_modules_off
+      it "allows editing the due date even if completely frozen", :ignore_js_errors do
         old_due_at = @frozen_assign.due_at
         run_assignment_edit(@frozen_assign) do
-          replace_and_proceed(f(".datePickerDateField[data-date-type='due_at']"), "Sep 20, 2012")
-        end
-
-        expect(f(".assignment_dates").text).to match(/Sep 20, 2012/)
-        # some sort of time zone issue is occurring with Sep 20, 2012 - it rolls back a day and an hour locally.
-        expect(@frozen_assign.reload.due_at.to_i).not_to eq old_due_at.to_i
-      end
-
-      it "allows editing the due date even if completely frozen with SR on", :ignore_js_errors do
-        old_due_at = @frozen_assign.due_at
-        run_assignment_edit(@frozen_assign) do
-          unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
-            AssignmentCreateEditPage.click_manage_assign_to_button
-          end
           assign_to_due_date.send_keys(:control, "a", :backspace)
           update_due_date(0, "Sep 20, 2012")
-          unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
-            click_save_button("Apply")
-          end
         end
 
         expect(f(".assignment_dates").text).to match(/Sep 20, 2012/)

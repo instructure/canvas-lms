@@ -106,7 +106,7 @@ describe('Gradebook#applyLatePolicy', () => {
       submission1,
       'assignment1value',
       gradingStandard,
-      'latepolicy'
+      'latepolicy',
     )
   })
 
@@ -116,7 +116,7 @@ describe('Gradebook#applyLatePolicy', () => {
       submission2,
       'assignment2value',
       gradingStandard,
-      'latepolicy'
+      'latepolicy',
     )
   })
 
@@ -124,7 +124,7 @@ describe('Gradebook#applyLatePolicy', () => {
     const calculateStudentGrade = jest.spyOn(gradebook, 'calculateStudentGrade')
     gradebook.applyLatePolicy()
     const gradesCalculated = calculateStudentGrade.mock.calls.some(
-      call => call[0] === gradebook.students[12]
+      call => call[0] === gradebook.students[12],
     )
     expect(gradesCalculated).toBe(false)
     calculateStudentGrade.mockRestore()
@@ -136,7 +136,7 @@ describe('Gradebook#applyLatePolicy', () => {
       submission1,
       'assignment1value',
       gradingStandard,
-      'latepolicy'
+      'latepolicy',
     )
   })
 
@@ -146,7 +146,7 @@ describe('Gradebook#applyLatePolicy', () => {
       submission3,
       'assignment2value',
       gradingStandard,
-      'latepolicy'
+      'latepolicy',
     )
   })
 })

@@ -259,7 +259,7 @@ describe('Gradebook > Default Gradebook > Components > LatePoliciesTabPanelPerce
             data: DEFAULT_LATE_POLICY_DATA,
           },
         }}
-      />
+      />,
     )
   }
 

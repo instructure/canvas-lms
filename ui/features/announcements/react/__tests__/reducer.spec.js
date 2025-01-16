@@ -109,7 +109,7 @@ describe('Announcements reducer', () => {
             },
           },
         },
-      }
+      },
     )
     expect(newState.announcements.pages).toEqual({
       1: {

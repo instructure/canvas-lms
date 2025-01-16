@@ -17,7 +17,6 @@
  */
 
 import UploadQueue from '../UploadQueue'
-import sinon from 'sinon'
 
 const mockFileOptions = (name = 'foo', type = 'bar', expandZip = false) => ({
   file: {
@@ -113,23 +112,23 @@ describe('UploadQueue', () => {
     const sentinel = mockFileOptions('sentinel')
     UploadQueue.currentUploader = sentinel
     const all = UploadQueue.getAllUploaders()
-    expect(all.length).toBe(3)
+    expect(all).toHaveLength(3)
     expect(all.indexOf(sentinel)).toBe(0)
     UploadQueue.currentUploader = undefined
     UploadQueue.attemptNextUpload = original
   })
 
   test('calls onChange', () => {
-    const onChangeSpy = sinon.spy(UploadQueue, 'onChange')
-    const callbackSpy = sinon.spy()
+    const onChangeSpy = jest.spyOn(UploadQueue, 'onChange')
+    const callbackSpy = jest.fn()
     UploadQueue.addChangeListener(callbackSpy)
     const foo = mockFileOptions('foo', 'bar', true)
     const uploader = UploadQueue.createUploader(foo)
 
     uploader.onProgress()
-    expect(onChangeSpy.calledOnce).toBe(true)
-    expect(callbackSpy.calledWith(UploadQueue)).toBe(true)
-    expect(callbackSpy.calledOnce).toBe(true)
+    expect(onChangeSpy).toHaveBeenCalledTimes(1)
+    expect(callbackSpy).toHaveBeenCalledWith(UploadQueue)
+    expect(callbackSpy).toHaveBeenCalledTimes(1)
   })
 
   test('can retry a specific uploader', async () => {

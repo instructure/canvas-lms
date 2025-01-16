@@ -107,7 +107,7 @@ const IntegrationRow = ({
                 {enabled
                   ? info?.message || info
                   : I18n.t(
-                      'This integration is not enabled. Please enable it to interact with settings.'
+                      'This integration is not enabled. Please enable it to interact with settings.',
                     )}
               </Text>
             </Alert>

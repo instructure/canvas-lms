@@ -83,13 +83,13 @@ export default class FinalGradeOverrideDatastore {
   removePendingGradeInfo(userId: string, gradingPeriodId: string | null) {
     this._pendingGrades =
       this._pendingGrades.filter(
-        gradeInfo => gradeInfo.userId !== userId || gradeInfo.gradingPeriodId !== gradingPeriodId
+        gradeInfo => gradeInfo.userId !== userId || gradeInfo.gradingPeriodId !== gradingPeriodId,
       ) || null
   }
 
   getPendingGradeInfo(userId: string, gradingPeriodId: string | null) {
     const datum = this._pendingGrades.find(
-      gradeInfo => gradeInfo.userId === userId && gradeInfo.gradingPeriodId === gradingPeriodId
+      gradeInfo => gradeInfo.userId === userId && gradeInfo.gradingPeriodId === gradingPeriodId,
     )
     return datum ? datum.gradeInfo : null
   }

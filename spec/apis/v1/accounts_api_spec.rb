@@ -2328,6 +2328,23 @@ describe "Accounts API", type: :request do
         expect(json["use_classic_font_in_k5"]).to be_nil
       end
     end
+
+    describe "Assign To Differentiation Tags" do
+      it "gets allow_assign_to_differentiation_tags setting" do
+        @a1.settings = { allow_assign_to_differentiation_tags: true }
+        @a1.save
+
+        json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+
+        expect(json["allow_assign_to_differentiation_tags"]).to be_present
+        expect(json["allow_assign_to_differentiation_tags"]).to be true
+      end
+
+      it "does not return allow_assign_to_differentiation_tags setting if it is not set" do
+        json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+        expect(json["allow_assign_to_differentiation_tags"]).to be_nil
+      end
+    end
   end
 
   context "account api extension" do

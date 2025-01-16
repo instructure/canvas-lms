@@ -46,6 +46,6 @@ TenantInput.propTypes = {
     PropTypes.shape({
       text: PropTypes.string,
       type: PropTypes.oneOf(['error', 'hint', 'success', 'screenreader-only']),
-    })
+    }),
   ),
 }

@@ -41,9 +41,9 @@ const renderAccountOptions = (accounts = [], depth = 0) =>
   flatten(
     accounts.map(account =>
       [{id: account.id, name: Array(2 * depth + 1).join(nonBreakingSpace) + account.name}].concat(
-        renderAccountOptions(account.subAccounts || [], depth + 1)
-      )
-    )
+        renderAccountOptions(account.subAccounts || [], depth + 1),
+      ),
+    ),
   )
 
 NewCourseModal.propTypes = {

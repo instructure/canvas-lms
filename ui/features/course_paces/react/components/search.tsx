@@ -83,7 +83,7 @@ export const Search = ({
               one: 'Showing 1 result below',
               other: 'Showing %{count} results below',
             },
-            {count: contexts.length}
+            {count: contexts.length},
           ),
           srOnly: true,
           err: null,

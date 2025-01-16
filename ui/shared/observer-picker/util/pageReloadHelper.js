@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {reloadWindow} from '@canvas/util/globalUtils'
+
 // These are used by assignments2 and courses#show to reload page when the selected
 // observed user changes while persisting focus of the observer picker for a11y.
 export const getHandleChangeObservedUser = () => {
@@ -25,7 +27,7 @@ export const getHandleChangeObservedUser = () => {
       prevObservedUser = newObservedUser
     } else if (newObservedUser !== prevObservedUser) {
       sessionStorage.setItem('autoFocusObserverPicker', true)
-      window.location.reload()
+      reloadWindow()
     }
   }
 }

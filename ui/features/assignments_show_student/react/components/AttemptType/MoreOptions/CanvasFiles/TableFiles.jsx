@@ -87,13 +87,13 @@ class TableFiles extends React.Component {
     description.push(I18n.t('type: file'))
     description.push(I18n.t('name: %{name}', {name: file.display_name}))
     description.push(
-      I18n.t('date created: %{createdAt}', {createdAt: this.formattedDateTime(file.created_at)})
+      I18n.t('date created: %{createdAt}', {createdAt: this.formattedDateTime(file.created_at)}),
     )
     if (file.hasOwnProperty('updated_at')) {
       description.push(
         I18n.t('date modified: %{modifiedAt}', {
           modifiedAt: this.formattedDateTime(file.updated_at),
-        })
+        }),
       )
     }
     if (file.hasOwnProperty('user')) {

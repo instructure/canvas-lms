@@ -27,19 +27,19 @@ export const useGradingSchemeCreate = (): {
   createGradingScheme: (
     contextType: 'Account' | 'Course',
     contextId: string,
-    gradingSchemeTemplate: GradingSchemeTemplate
+    gradingSchemeTemplate: GradingSchemeTemplate,
   ) => Promise<GradingScheme>
   createGradingSchemeStatus: ApiCallStatus
 } => {
   const [createGradingSchemeStatus, setCreateGradingSchemeStatus] = useState<ApiCallStatus>(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const createGradingScheme = useCallback(
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      gradingSchemeTemplate: GradingSchemeTemplate
+      gradingSchemeTemplate: GradingSchemeTemplate,
     ): Promise<GradingScheme> => {
       setCreateGradingSchemeStatus(ApiCallStatus.NOT_STARTED)
 
@@ -63,7 +63,7 @@ export const useGradingSchemeCreate = (): {
         throw err
       }
     },
-    []
+    [],
   )
   return {
     createGradingScheme,

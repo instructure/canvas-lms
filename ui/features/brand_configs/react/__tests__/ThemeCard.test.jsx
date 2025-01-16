@@ -19,7 +19,6 @@
 import React from 'react'
 import ThemeCard from '../ThemeCard'
 import {shallow} from 'enzyme'
-import sinon from 'sinon'
 
 let props
 
@@ -34,12 +33,12 @@ describe('ThemeCard Component', () => {
       isActiveBrandConfig: false,
       isDeleteable: true,
       isBeingDeleted: false,
-      open: sinon.stub(),
-      startDeleting: sinon.stub(),
-      cancelDelete: sinon.stub(),
-      onDelete: sinon.stub(),
-      getVariable: sinon.stub(),
-      cancelDeleting: sinon.stub(),
+      open: jest.fn(),
+      startDeleting: jest.fn(),
+      cancelDelete: jest.fn(),
+      onDelete: jest.fn(),
+      getVariable: jest.fn(),
+      cancelDeleting: jest.fn(),
       showMultipleCurrentThemesMessage: false,
       isDeletable: true,
     }
@@ -49,32 +48,26 @@ describe('ThemeCard Component', () => {
     equal(
       wrapper.find('.ic-ThemeCard-name-button').text(),
       `Edit this theme in Theme Editor${props.name}`,
-      'renders the name'
+      'renders the name',
     )
   })
 
   test('Renders preview of colors', () => {
     shallow(<ThemeCard {...props} />)
     const getVar = props.getVariable
-    ok(getVar.calledWith('ic-brand-primary'), 'prview ic-brand-primary')
-    ok(getVar.calledWith('ic-brand-button--primary-bgd'), 'prview ic-brand-button--primary-bgd')
-    ok(getVar.calledWith('ic-brand-button--secondary-bgd'), 'prview ic-brand-button--secondary-bgd')
-    ok(getVar.calledWith('ic-brand-global-nav-bgd'), 'prview ic-brand-global-nav-bgd')
-    ok(
-      getVar.calledWith('ic-brand-global-nav-ic-icon-svg-fill'),
-      'prview ic-brand-global-nav-ic-icon-svg-fill'
-    )
-    ok(
-      getVar.calledWith('ic-brand-global-nav-menu-item__text-color'),
-      'prview ic-brand-nav-menu-item__text-color'
-    )
+    expect(getVar).toHaveBeenCalledWith('ic-brand-primary')
+    expect(getVar).toHaveBeenCalledWith('ic-brand-button--primary-bgd')
+    expect(getVar).toHaveBeenCalledWith('ic-brand-button--secondary-bgd')
+    expect(getVar).toHaveBeenCalledWith('ic-brand-global-nav-bgd')
+    expect(getVar).toHaveBeenCalledWith('ic-brand-global-nav-ic-icon-svg-fill')
+    expect(getVar).toHaveBeenCalledWith('ic-brand-global-nav-menu-item__text-color')
   })
 
   test('Indicates if it is the current theme', () => {
     let wrapper = shallow(<ThemeCard {...props} />)
     notOk(
       wrapper.find('.ic-ThemeCard-status__text').exists(),
-      'status text elment not found when isActiveBrandConfig is false'
+      'status text elment not found when isActiveBrandConfig is false',
     )
 
     props.isActiveBrandConfig = true
@@ -82,7 +75,7 @@ describe('ThemeCard Component', () => {
     equal(
       wrapper.find('.ic-ThemeCard-status__text').text(),
       'Current theme',
-      '"Current theme" status text found when isActiveBrandConfig is true'
+      '"Current theme" status text found when isActiveBrandConfig is true',
     )
   })
 

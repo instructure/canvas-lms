@@ -31,7 +31,7 @@ it('renders loading when indicated', () => {
 
 it('renders all future items loaded regardless of other props', () => {
   const wrapper = shallow(
-    <LoadingFutureIndicator loadingFuture={true} allFutureItemsLoaded={true} />
+    <LoadingFutureIndicator loadingFuture={true} allFutureItemsLoaded={true} />,
   )
   expect(wrapper).toMatchSnapshot()
 })

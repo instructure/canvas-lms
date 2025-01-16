@@ -16,16 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+import React, {useCallback} from 'react'
 import {useAUPContent} from '../hooks/useAUPContent'
-import {useScope as createI18nScope} from '@canvas/i18n'
 
+import {assignLocation} from '@canvas/util/globalUtils'
 // @ts-expect-error
 import styles from './AcceptableUsePolicy.module.css'
 
@@ -38,14 +39,14 @@ const AcceptableUsePolicy = () => {
     if (window.history.length > 1) {
       window.history.back()
     } else {
-      window.location.assign('/login/canvas')
+      assignLocation('/login/canvas')
     }
   }, [])
 
   const alertTermsUnavailable = () => (
     <Alert variant="error" transition="none" margin="none" hasShadow={false}>
       {I18n.t(
-        'Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.'
+        'Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.',
       )}
     </Alert>
   )
@@ -53,7 +54,7 @@ const AcceptableUsePolicy = () => {
   const alertNoTerms = () => (
     <Alert variant="info" transition="none" margin="none" hasShadow={false}>
       {I18n.t(
-        'The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.'
+        'The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.',
       )}
     </Alert>
   )

@@ -224,7 +224,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
                     trigger={renderTrigger(
                       this.props.assignmentGroup,
                       // @ts-expect-error
-                      ref => (this.optionsMenuTrigger = ref)
+                      ref => (this.optionsMenuTrigger = ref),
                     )}
                     onToggle={this.onToggle}
                     onDismiss={this.props.onMenuDismiss}

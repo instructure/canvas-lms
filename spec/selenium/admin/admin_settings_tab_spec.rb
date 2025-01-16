@@ -464,32 +464,37 @@ describe "admin settings tab" do
     it "adds a custom link" do
       Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
+      wait_for_ajaximations
+
+      # Click the Help Options button first
       help_options = f(".HelpMenuOptions__Container button")
       scroll_into_view(help_options)
       help_options.click
+      wait_for_ajaximations
+
+      # Click "Add Custom Link" in the menu
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
-      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "text"
-      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "subtext"
-      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://url.example.com"
-      fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
-      link = f('#custom_help_link_settings button[type="submit"]')
-      scroll_into_view(link)
-      link.click
-      expect(fj(".ic-Sortable-item:first .ic-Sortable-item__Text")).to include_text("text")
-      form = f("#account_settings")
-      form.submit
-      cl = Account.default.help_links.detect { |hl| hl["url"] == "https://url.example.com" }
-      expect(cl).to include(
-        {
-          "text" => "text",
-          "subtext" => "subtext",
-          "url" => "https://url.example.com",
-          "type" => "custom",
-          "is_featured" => true,
-          "is_new" => false,
-          "available_to" => %w[user student teacher admin observer unenrolled]
-        }
-      )
+      wait_for_ajaximations
+
+      # Fill in the form fields
+      replace_content f("#admin_settings_custom_link_name"), "text"
+      replace_content f("#admin_settings_custom_link_subtext"), "subtext"
+      replace_content f("#admin_settings_custom_link_url"), "http://example.com"
+
+      # Click the label for the user checkbox
+      user_label = f('label[for="admin_settings_custom_link_type_user"]')
+      scroll_into_view(user_label)
+      user_label.click
+
+      # Click submit
+      submit = f('#custom_help_link_settings button[type="submit"]')
+      scroll_into_view(submit)
+      submit.click
+      wait_for_ajaximations
+
+      added_item = ff(".ic-Sortable-item .ic-Sortable-item__Text").find { |item| item.text == "text" }
+      expect(added_item).to be_present
+      expect(added_item.text).to eq "text"
     end
 
     it "adds a custom link with New designation" do
@@ -499,13 +504,16 @@ describe "admin settings tab" do
       scroll_into_view(help_options)
       help_options.click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
-      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "text"
-      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "subtext"
-      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://newurl.example.com"
-      fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
+      replace_content f("#admin_settings_custom_link_name"), "text"
+      replace_content f("#admin_settings_custom_link_subtext"), "subtext"
+      replace_content f("#admin_settings_custom_link_url"), "https://newurl.example.com"
+      new_label = fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible')
+      scroll_into_view(new_label)
+      new_label.click
       link = f('#custom_help_link_settings button[type="submit"]')
       scroll_into_view(link)
       link.click
+      wait_for_ajaximations
       form = f("#account_settings")
       form.submit
       cl = Account.default.help_links.detect { |hl| hl["url"] == "https://newurl.example.com" }
@@ -525,7 +533,7 @@ describe "admin settings tab" do
       link = fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, "..")
       scroll_into_view(link)
       link.click
-      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://whatever.example.com"
+      replace_content f("#admin_settings_custom_link_url"), "https://whatever.example.com"
       f('#custom_help_link_settings button[type="submit"]').click
       expect(fj(".ic-Sortable-item:last .ic-Sortable-item__Text")).to include_text("custom-link-text-frd")
       form = f("#account_settings")
@@ -541,9 +549,11 @@ describe "admin settings tab" do
       link = fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, "..")
       scroll_into_view(link)
       link.click
-      url = fj('#custom_help_link_settings input[name$="[url]"]:visible')
+      url = f("#admin_settings_custom_link_url")
       expect(url).to be_disabled
-      fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible').click
+      teachers_label = fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible')
+      scroll_into_view(teachers_label)
+      teachers_label.click
       f('#custom_help_link_settings button[type="submit"]').click
       expect(f(".ic-Sortable-item:nth-of-type(3) .ic-Sortable-item__Text")).to include_text("Report a Problem")
       form = f("#account_settings")

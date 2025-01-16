@@ -65,7 +65,7 @@ const FindOutcomesView = ({
   const notImportedOutcomesCount = outcomesGroup?.notImportedOutcomesCount || 0
   const importedOutcomesCount = Object.entries(importOutcomesStatus).filter(
     ([outId, importStatus]) =>
-      outcomesIds.includes(outId) && [IMPORT_COMPLETED, IMPORT_PENDING].includes(importStatus)
+      outcomesIds.includes(outId) && [IMPORT_COMPLETED, IMPORT_PENDING].includes(importStatus),
   ).length
   const hasOutcomes = !!outcomesCount && outcomesCount > 0
   const searchEnabled =
@@ -97,10 +97,10 @@ const FindOutcomesView = ({
             isMobileView
               ? 'x-small 0'
               : isRootGroup
-              ? 'x-small 0'
-              : searchString.length === 0
-              ? 'x-small medium x-small 0'
-              : 'x-small 0'
+                ? 'x-small 0'
+                : searchString.length === 0
+                  ? 'x-small medium x-small 0'
+                  : 'x-small 0'
           }
         >
           <Text size="medium">
@@ -111,7 +111,7 @@ const FindOutcomesView = ({
               },
               {
                 count: outcomesCount || 0,
-              }
+              },
             )}
           </Text>
         </Flex.Item>
@@ -249,7 +249,7 @@ const FindOutcomesView = ({
                       isImported,
                     },
                   },
-                  index
+                  index,
                 ) => (
                   <FindOutcomeItem
                     key={linkId}
@@ -269,7 +269,7 @@ const FindOutcomesView = ({
                     sourceContextType={outcomesGroup.contextType}
                     importOutcomeHandler={importOutcomeHandler}
                   />
-                )
+                ),
               )}
             </View>
           </InfiniteScroll>

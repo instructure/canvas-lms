@@ -170,7 +170,7 @@ class InheritedTable extends React.Component {
       developerKeysList: this.sortedDeveloperKeys(),
       developerKeyRef: this.developerKeyRef,
       srMsg: I18n.t(
-        'Loaded more developer keys. Focus moved to the last enabled developer key in the list.'
+        'Loaded more developer keys. Focus moved to the last enabled developer key in the list.',
       ),
       handleRef: ref => (ref ? ref.focusToggleGroup() : this.props.setFocus()),
     })

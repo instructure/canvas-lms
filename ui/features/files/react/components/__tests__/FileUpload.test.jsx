@@ -44,7 +44,7 @@ describe('FileUpload', () => {
         filesDirectoryRef: ref,
         currentFolder: new Folder(),
       },
-      props
+      props,
     )
   }
 

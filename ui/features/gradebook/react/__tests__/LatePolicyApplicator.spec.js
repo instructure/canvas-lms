@@ -48,21 +48,21 @@ describe('LatePolicyApplicator#processSubmission', () => {
 
     test('returns true if the score on the missing submission is changed', () => {
       expect(LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)).toBe(
-        true
+        true,
       )
     })
 
     test('returns false if the score on the missing submission is not null', () => {
       submission.score = 5
       expect(LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)).toBe(
-        false
+        false,
       )
     })
 
     test('returns false if the grade on the missing submission is not null', () => {
       submission.grade = '5'
       expect(LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)).toBe(
-        false
+        false,
       )
     })
 
@@ -118,7 +118,7 @@ describe('LatePolicyApplicator#processSubmission', () => {
           latePolicy.lateSubmissionDeduction = 0
           submission.points_deducted = val
           expect(
-            LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)
+            LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy),
           ).toBe(false)
         })
       })
@@ -128,13 +128,13 @@ describe('LatePolicyApplicator#processSubmission', () => {
         submission.score = 9
         submission.points_deducted = 1
         expect(LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)).toBe(
-          false
+          false,
         )
       })
 
       test('returns true when the hourly late submission penalty changes the score on the submission', () => {
         expect(LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)).toBe(
-          true
+          true,
         )
       })
 
@@ -184,7 +184,7 @@ describe('LatePolicyApplicator#processSubmission', () => {
 
       test('returns true when the daily late submission penalty changes the score on the submission', () => {
         expect(LatePolicyApplicator.processSubmission(submission, assignment, [], latePolicy)).toBe(
-          true
+          true,
         )
       })
 

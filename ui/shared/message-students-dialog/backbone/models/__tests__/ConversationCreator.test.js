@@ -44,7 +44,7 @@ describe('ConversationCreator', () => {
         body: 'body',
         recipients: [{}],
       }),
-      undefined
+      undefined,
     )
   })
 

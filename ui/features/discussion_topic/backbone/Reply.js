@@ -44,7 +44,7 @@ class Reply {
   // @param {view} an EntryView instance
   constructor(view, options = {}) {
     ;['hide', 'hideNotification', 'submit', 'onPostReplySuccess', 'onPostReplyError'].forEach(
-      m => (this[m] = this[m].bind(this))
+      m => (this[m] = this[m].bind(this)),
     )
     this.view = view
     this.options = options
@@ -75,7 +75,7 @@ class Reply {
       this.form.find('ul.discussion-reply-attachments input[type=file]').focus()
       if (e.target.files.length > 0) {
         $.screenReaderFlashMessage(
-          I18n.t('File selected for upload: %{filename}', {filename: e.target.files[0].name})
+          I18n.t('File selected for upload: %{filename}', {filename: e.target.files[0].name}),
         )
       }
     })
@@ -164,7 +164,7 @@ class Reply {
     this.hide()
     this.view.model.set(
       'notification',
-      `<div class='alert alert-info'>${htmlEscape(I18n.t('saving_reply', 'Saving reply...'))}</div>`
+      `<div class='alert alert-info'>${htmlEscape(I18n.t('saving_reply', 'Saving reply...'))}</div>`,
     )
     const entry = new Entry(this.getModelAttributes())
     entry.save(null, {
@@ -232,8 +232,8 @@ class Reply {
         '*An error occurred*, please post your reply again later',
         {
           wrapper: '<strong>$1</strong>',
-        }
-      )}</div>`
+        },
+      )}</div>`,
     )
     this.textArea.val(entry.get('message'))
     return this.edit()

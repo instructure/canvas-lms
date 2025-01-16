@@ -61,18 +61,13 @@ import {BlockToolbar} from './BlockToolbar'
 
 interface RenderNodeComponent extends React.FC<RenderNodeProps> {
   globals: {
-    selectedSectionId: string
     enableResizer: boolean
     templateEditor: TemplateEditor
   }
 }
 
 export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
-  const {actions, query} = useEditor(state => {
-    if (state.events.selected.size === 0) {
-      RenderNode.globals.selectedSectionId = ''
-    }
-  })
+  const {actions, query} = useEditor()
   const {hovered, selected, node, name} = useNode((n: Node) => {
     return {
       node: n,
@@ -118,26 +113,30 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     (includeOffset: boolean = true) => {
       return getToolbarPosUtil(node.dom, mountPoint, currentToolbarOrTagRef, includeOffset)
     },
-    [currentToolbarOrTagRef, node.dom, mountPoint]
+    [currentToolbarOrTagRef, node.dom, mountPoint],
   )
 
   const renderBlockToolbar = () => {
     return ReactDOM.createPortal(
       <BlockToolbar templateEditor={RenderNode.globals.templateEditor} />,
-      mountPoint
+      mountPoint,
     )
   }
 
   const renderHoverTag = () => {
-    if (node.data?.custom?.noToolbar) return null
-
-    const parentSection = findContainingSection(node, query)
-    if (!parentSection) return null
-
-    const isMySectionSelected = RenderNode.globals.selectedSectionId === parentSection.id
-    if (!isMySectionSelected) return null
-
     if (!mountPoint) return null
+
+    let hoverNode: Node | null = node
+    while (hoverNode && hoverNode.id !== 'ROOT' && hoverNode.data?.custom?.noToolbar) {
+      if (hoverNode.data.parent) {
+        hoverNode = query.node(hoverNode.data.parent).get()
+      } else {
+        hoverNode = null
+      }
+    }
+    if (!hoverNode || hoverNode.id === 'ROOT') return null
+
+    const hoverName = hoverNode.data.custom.displayName || hoverNode.data.displayName
 
     const {left, top} = getToolbarPos()
     return ReactDOM.createPortal(
@@ -150,10 +149,10 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
         }}
       >
         <View as="div" background="secondary" padding="0 xx-small" borderRadius="small">
-          <Text size="small">{name}</Text>
+          <Text size="small">{hoverName}</Text>
         </View>
       </div>,
-      mountPoint
+      mountPoint,
     )
   }
 
@@ -162,7 +161,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
 
     return ReactDOM.createPortal(
       <BlockResizer mountPoint={mountPoint} sizeVariant={node.data.props.sizeVariant || 'pixel'} />,
-      mountPoint
+      mountPoint,
     )
   }
 
@@ -197,7 +196,6 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
 }
 
 RenderNode.globals = {
-  selectedSectionId: '',
   enableResizer: true,
   templateEditor: TemplateEditor.NONE,
 }

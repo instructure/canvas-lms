@@ -130,10 +130,10 @@ export default function UserSuspendLink() {
       actionName = I18n.t('Suspend')
       actionText = I18n.t(
         'Suspending %{name} from this account will remove all access to all authorized systems from all their logins.',
-        {name}
+        {name},
       )
       infoText = I18n.t(
-        'You must be authorized to manage SIS in order to suspend logins with an associated SIS ID.'
+        'You must be authorized to manage SIS in order to suspend logins with an associated SIS ID.',
       )
     } else {
       modalLabel = I18n.t('Confirm reactivation')
@@ -142,10 +142,10 @@ export default function UserSuspendLink() {
       actionName = 'Reactivate'
       actionText = I18n.t(
         'Reactivation will allow all logins for %{name} to log in to Canvas and regain access to previously authorized API integrations.',
-        {name}
+        {name},
       )
       infoText = I18n.t(
-        'You must be authorized to manage SIS in order to reactivate logins with an associated SIS ID.'
+        'You must be authorized to manage SIS in order to reactivate logins with an associated SIS ID.',
       )
     }
     return (

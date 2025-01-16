@@ -17,86 +17,85 @@
  */
 
 import Router from '../router'
-import sinon from 'sinon'
 
 describe('Blueprint router', () => {
   test('registerRoutes calls registerRoute for each item', () => {
     const router = new Router()
-    const registerSpy = sinon.stub(router, 'registerRoute')
+    const registerSpy = jest.spyOn(router, 'registerRoute')
     router.registerRoutes([{}, {}])
-    expect(registerSpy.callCount).toEqual(2)
+    expect(registerSpy.mock.calls).toHaveLength(2)
   })
 
   test('registerRoutes registers route onEnter and onExit handlers for each route', () => {
-    const pageSpy = sinon.spy()
-    pageSpy.exit = sinon.spy()
+    const pageSpy = jest.fn()
+    pageSpy.exit = jest.fn()
 
     const router = new Router(pageSpy)
     router.registerRoutes([
       {onEnter: () => {}, onExit: () => {}},
       {onEnter: () => {}, onExit: () => {}},
     ])
-    expect(pageSpy.exit.callCount).toEqual(2)
-    expect(pageSpy.callCount).toEqual(2)
+    expect(pageSpy.exit.mock.calls).toHaveLength(2)
+    expect(pageSpy.mock.calls).toHaveLength(2)
   })
 
   test('registerRoute does not register route onEnter and onExit handlers if not provided', () => {
-    const pageSpy = sinon.spy()
-    pageSpy.exit = sinon.spy()
+    const pageSpy = jest.fn()
+    pageSpy.exit = jest.fn()
 
     const router = new Router(pageSpy)
     router.registerRoute({onEnter: null, onExit: null})
-    expect(pageSpy.callCount).toEqual(0)
-    expect(pageSpy.exit.callCount).toEqual(0)
+    expect(pageSpy.mock.calls).toHaveLength(0)
+    expect(pageSpy.exit.mock.calls).toHaveLength(0)
   })
 
   test('registerRoute registers route onEnter and onExit handlers if provided', () => {
-    const pageSpy = sinon.spy()
-    pageSpy.exit = sinon.spy()
+    const pageSpy = jest.fn()
+    pageSpy.exit = jest.fn()
 
     const router = new Router(pageSpy)
     router.registerRoute({onEnter: () => {}, onExit: () => {}})
-    expect(pageSpy.callCount).toEqual(1)
-    expect(pageSpy.exit.callCount).toEqual(1)
+    expect(pageSpy.mock.calls).toHaveLength(1)
+    expect(pageSpy.exit.mock.calls).toHaveLength(1)
   })
 
   test('start sets base and starts pagejs', () => {
-    const pageSpy = sinon.spy()
-    pageSpy.base = sinon.spy()
+    const pageSpy = jest.fn()
+    pageSpy.base = jest.fn()
 
     const router = new Router(pageSpy)
     router.start()
-    expect(pageSpy.callCount).toEqual(1)
-    expect(pageSpy.base.callCount).toEqual(1)
+    expect(pageSpy.mock.calls).toHaveLength(1)
+    expect(pageSpy.base.mock.calls).toHaveLength(1)
   })
 
   test('handleEnter returns a function that calls enter handler and next', () => {
     const ctx = {params: {id: '5'}}
-    const nextSpy = sinon.spy()
+    const nextSpy = jest.fn()
     const route = {
-      onEnter: sinon.spy(),
+      onEnter: jest.fn(),
     }
 
     const handler = Router.handleEnter(route)
     handler(ctx, nextSpy)
 
-    expect(route.onEnter.callCount).toEqual(1)
-    expect(route.onEnter.firstCall.args).toEqual([ctx])
-    expect(nextSpy.callCount).toEqual(1)
+    expect(route.onEnter.mock.calls).toHaveLength(1)
+    expect(route.onEnter.mock.calls[0]).toEqual([ctx])
+    expect(nextSpy.mock.calls).toHaveLength(1)
   })
 
   test('handleExit returns a function that calls exit handler and next', () => {
     const ctx = {params: {id: '5'}}
-    const nextSpy = sinon.spy()
+    const nextSpy = jest.fn()
     const route = {
-      onExit: sinon.spy(),
+      onExit: jest.fn(),
     }
 
     const handler = Router.handleExit(route)
     handler(ctx, nextSpy)
 
-    expect(route.onExit.callCount).toEqual(1)
-    expect(route.onExit.firstCall.args).toEqual([ctx])
-    expect(nextSpy.callCount).toEqual(1)
+    expect(route.onExit.mock.calls).toHaveLength(1)
+    expect(route.onExit.mock.calls[0]).toEqual([ctx])
+    expect(nextSpy.mock.calls).toHaveLength(1)
   })
 })

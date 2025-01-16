@@ -101,7 +101,7 @@ describe('handleDeepLinking', () => {
       origin: 'http://www.test.com',
       data: {subject: 'LtiDeepLinkingResponse', content_items},
       ...overrides,
-    } as unknown as DeepLinkEvent)
+    }) as unknown as DeepLinkEvent
 
   let env: typeof window.ENV
 

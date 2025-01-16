@@ -34,7 +34,7 @@ export const useSubmissionsQuery = (courseId: string) => {
 
   const submissions = useMemo(
     () => data?.pages.flatMap(page => page.course.submissionsConnection.nodes) ?? [],
-    [data]
+    [data],
   )
 
   return {

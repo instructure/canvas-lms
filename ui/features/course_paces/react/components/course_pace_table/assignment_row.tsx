@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {KeyboardEvent, MouseEvent} from 'react'
 import {connect} from 'react-redux'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {debounce, pick} from 'lodash'
@@ -93,7 +93,7 @@ interface LocalState {
   readonly hovering: boolean
 }
 
-type ComponentProps = PassedProps & StoreProps & DispatchProps
+export type ComponentProps = PassedProps & StoreProps & DispatchProps
 
 export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   state: LocalState = {
@@ -151,7 +151,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       this.props.excludeWeekends,
       this.props.selectedDaysToSkip,
       this.props.blackoutDates,
-      false
+      false,
     )
     return parseInt(this.state.duration, 10) + daysDiff
   }
@@ -180,13 +180,14 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     }
   }
 
-  onDecrementOrIncrement = (_e: React.FormEvent<HTMLInputElement>, direction: number) => {
-    // it's either this error or a typescript typing error using the function version of setState
-     
-    const newValue = (this.parsePositiveNumber(this.state.duration) || 0) + direction
-    if (newValue < 0) return
-    this.setState({duration: newValue.toString()})
-    this.debouncedCommitChanges()
+  onDecrementOrIncrement = (
+    e: KeyboardEvent<HTMLInputElement> | MouseEvent<HTMLButtonElement>,
+    direction: number,
+  ) => {
+    const newDuration = this.parsePositiveNumber(this.state.duration)
+    if (newDuration !== false) {
+      this.onChangeItemDuration(e as any, (newDuration + direction).toString())
+    }
   }
 
   onBlur = (e: React.FormEvent<HTMLInputElement>) => {
@@ -269,7 +270,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     }
     const disabledByBlueprintLock = this.props.blueprintLocked
     const itemChange = this.props.coursePaceItemChanges.find(
-      c => c.newValue.module_item_id === this.props.coursePaceItem.module_item_id
+      c => c.newValue.module_item_id === this.props.coursePaceItem.module_item_id,
     )
     const durationHasChanged = itemChange?.oldValue?.duration !== itemChange?.newValue.duration
 
@@ -319,7 +320,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
               <Text size="x-small">
                 {I18n.t(
                   {one: '1 pt', other: '%{count} pts'},
-                  {count: this.props.coursePaceItem.points_possible}
+                  {count: this.props.coursePaceItem.points_possible},
                 )}
               </Text>
             </div>

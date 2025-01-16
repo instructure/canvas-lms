@@ -37,8 +37,8 @@ export function waitFor(conditionFn, timeout = 200) {
       if (result == null) {
         reject(
           new Error(
-            "waitFor's criteria function returned null or undefined, did you mean for this function to return a boolean?"
-          )
+            "waitFor's criteria function returned null or undefined, did you mean for this function to return a boolean?",
+          ),
         )
       }
       if (result) {

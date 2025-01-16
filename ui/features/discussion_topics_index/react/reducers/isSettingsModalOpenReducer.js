@@ -24,7 +24,7 @@ const isSettingsModalOpenReducer = handleActions(
     [actionTypes.SAVING_SETTINGS_SUCCESS]: () => false,
     [actionTypes.SAVING_SETTINGS_FAIL]: () => true,
   },
-  false
+  false,
 )
 
 export default isSettingsModalOpenReducer

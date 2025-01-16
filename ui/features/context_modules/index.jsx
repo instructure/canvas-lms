@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import ModulesHomePage from './react/ModulesHomePage'
 import modules from '@canvas/context-modules'
 import ready from '@instructure/ready'
@@ -26,11 +25,11 @@ import ready from '@instructure/ready'
 ready(() => {
   const container = document.getElementById('modules_homepage_user_create')
   if (container) {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(<ModulesHomePage onCreateButtonClick={modules.addModule} />, container)
+    const root = createRoot(container)
+    root.render(<ModulesHomePage onCreateButtonClick={modules.addModule} />)
   }
 
   if (ENV.NO_MODULE_PROGRESSIONS) {
-    $('.module_progressions_link').remove()
+    document.querySelectorAll('.module_progressions_link').forEach(el => el.remove())
   }
 })

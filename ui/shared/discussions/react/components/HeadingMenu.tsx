@@ -64,9 +64,9 @@ export const HeadingMenu: React.FC<Props> = ({
       {
         leading: false,
         trailing: true,
-      }
+      },
     ),
-    [onSelectFilter]
+    [onSelectFilter],
   )
 
   const handleFilterSelect = (filter: string | number | undefined) => {

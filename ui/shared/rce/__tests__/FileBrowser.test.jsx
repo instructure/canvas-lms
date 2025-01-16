@@ -571,19 +571,19 @@ describe('FileBrowser', () => {
       ref.current.setState({collections})
 
       expect(
-        wrapper.container.querySelector('button#image-upload__upload[disabled]')
+        wrapper.container.querySelector('button#image-upload__upload[disabled]'),
       ).toBeInTheDocument()
       await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
       expect(
-        wrapper.container.querySelector('button#image-upload__upload[disabled]')
+        wrapper.container.querySelector('button#image-upload__upload[disabled]'),
       ).not.toBeInTheDocument()
       await userEvent.click(getNthOfElementByType(wrapper, 1, 'button'))
       expect(
-        wrapper.container.querySelector('button#image-upload__upload[disabled]')
+        wrapper.container.querySelector('button#image-upload__upload[disabled]'),
       ).toBeInTheDocument()
       await userEvent.click(getNthOfElementByType(wrapper, 2, 'button'))
       expect(
-        wrapper.container.querySelector('button#image-upload__upload[disabled]')
+        wrapper.container.querySelector('button#image-upload__upload[disabled]'),
       ).toBeInTheDocument()
     })
 
@@ -633,7 +633,7 @@ describe('FileBrowser', () => {
       ref.current.setState({collections})
 
       expect(
-        wrapper.container.querySelector('button#image-upload__upload[disabled]')
+        wrapper.container.querySelector('button#image-upload__upload[disabled]'),
       ).not.toBeInTheDocument()
     })
 

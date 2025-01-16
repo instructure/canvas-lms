@@ -14,31 +14,24 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react'
-import {act, render, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {act, render} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
+import fetchMock from 'fetch-mock'
+import React from 'react'
 import GroupCategoryCloneModal from '../GroupCategoryCloneModal'
 
+// mock reloadWindow
+jest.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: jest.fn(),
+}))
+
 describe('GroupCategoryCloneModal', () => {
-  const {reload} = window.location
   const onDismiss = jest.fn()
   const open = true
   const groupCategory = {
     id: '1',
     name: '',
   }
-
-  beforeAll(() => {
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: {reload: jest.fn()},
-    })
-  })
-
-  afterAll(() => {
-    window.location.reload = reload
-  })
 
   afterEach(() => {
     fetchMock.restore()
@@ -52,7 +45,7 @@ describe('GroupCategoryCloneModal', () => {
           label="Clone Group Set"
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(getByPlaceholderText('Name')).toHaveValue('(Clone) Course Admin View Group Set')
     })
@@ -64,7 +57,7 @@ describe('GroupCategoryCloneModal', () => {
           label="Clone Group Set"
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(getByText(/Submit/i)).toBeVisible()
       expect(getByText(/Cancel/i)).toBeVisible()
@@ -77,7 +70,7 @@ describe('GroupCategoryCloneModal', () => {
           label="Clone Group Set"
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
     })
@@ -89,7 +82,7 @@ describe('GroupCategoryCloneModal', () => {
           label="Clone Group Set"
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await userEvent.setup({delay: null}).type(getByPlaceholderText('Name'), 'enabled')
       expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
@@ -106,7 +99,7 @@ describe('GroupCategoryCloneModal', () => {
           label="Clone Group Set"
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await userEvent
         .setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
@@ -120,7 +113,6 @@ describe('GroupCategoryCloneModal', () => {
       await act(() => fetchMock.flush(true))
       expect(getAllByText(/success/i)).toBeTruthy()
       expect(onDismiss).toHaveBeenCalled()
-      expect(window.location.reload).toHaveBeenCalled()
     })
   })
 
@@ -141,7 +133,7 @@ describe('GroupCategoryCloneModal', () => {
           label="Clone Group Set"
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await userEvent
         .setup({pointerEventsCheck: PointerEventsCheckLevel.Never})

@@ -62,8 +62,8 @@ const testTimezone = async (timezone, inputDate, expectedDate, time) => {
         'calendar_event[start_at]': expectedDate,
       }),
       expect.any(Function),
-      expect.any(Function)
-    )
+      expect.any(Function),
+    ),
   )
   await waitFor(() => expect(defaultProps.closeCB).toHaveBeenCalled())
 }
@@ -78,7 +78,7 @@ const testBlackoutDateSuccess = () => {
       'calendar_event[blackout_date]': true,
     }),
     expect.any(Function),
-    expect.any(Function)
+    expect.any(Function),
   )
   defaultProps.event.contextInfo = userContext
   defaultProps.event.blackout_date = false
@@ -96,7 +96,7 @@ describe('CalendarEventDetailsForm', () => {
   beforeEach(() => {
     defaultProps = eventFormProps()
     commonEventFactory.mockImplementation(
-      jest.requireActual('@canvas/calendar/jquery/CommonEvent/index').default
+      jest.requireActual('@canvas/calendar/jquery/CommonEvent/index').default,
     )
     $.ajaxJSON = (_url, _method, _params, onSuccess, _onError) => {
       onSuccess({})
@@ -149,7 +149,7 @@ describe('CalendarEventDetailsForm', () => {
         'calendar_event[blackout_date]': false,
       }),
       expect.any(Function),
-      expect.any(Function)
+      expect.any(Function),
     )
   })
 
@@ -169,8 +169,8 @@ describe('CalendarEventDetailsForm', () => {
       expect(props.event.save).toHaveBeenCalledWith(
         expect.objectContaining({which: 'all'}),
         expect.any(Function),
-        expect.any(Function)
-      )
+        expect.any(Function),
+      ),
     )
   })
 
@@ -223,8 +223,8 @@ describe('CalendarEventDetailsForm', () => {
           'calendar_event[start_at]': '2022-07-23T00:00:00.000Z',
         }),
         expect.any(Function),
-        expect.any(Function)
-      )
+        expect.any(Function),
+      ),
     )
   })
 
@@ -265,8 +265,8 @@ describe('CalendarEventDetailsForm', () => {
           'calendar_event[start_at]': '2022-07-14T00:00:00.000Z',
         }),
         expect.any(Function),
-        expect.any(Function)
-      )
+        expect.any(Function),
+      ),
     )
   })
 
@@ -279,7 +279,7 @@ describe('CalendarEventDetailsForm', () => {
       'America/Denver',
       '2022-07-14T06:00:00.000Z',
       '2022-07-15T05:30:00.000Z',
-      '11:30 PM'
+      '11:30 PM',
     )
   })
 
@@ -292,7 +292,7 @@ describe('CalendarEventDetailsForm', () => {
       'Asia/Shanghai',
       '2022-07-13T16:00:00.000Z',
       '2022-07-14T15:30:00.000Z',
-      '11:30 PM'
+      '11:30 PM',
     )
   })
 
@@ -305,7 +305,7 @@ describe('CalendarEventDetailsForm', () => {
       'Australia/Adelaide',
       '2022-07-13T14:30:00.000Z',
       '2022-07-14T14:00:00.000Z',
-      '11:30 PM'
+      '11:30 PM',
     )
   })
 
@@ -395,7 +395,7 @@ describe('CalendarEventDetailsForm', () => {
     changeValue(component, 'edit-calendar-event-form-date', '')
     fireEvent.blur(component.getByTestId('edit-calendar-event-form-date'))
     expect(component.getByTestId('edit-calendar-event-form-date').value).toMatch(
-      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}, \d{4}$/
+      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}, \d{4}$/,
     )
 
     const errMessage = component.queryByText('This date is invalid.')
@@ -421,7 +421,7 @@ describe('CalendarEventDetailsForm', () => {
     await user.click(component.getByTestId('edit-calendar-event-form-date'))
     await user.click(component.getByTestId('edit-calendar-event-form-title'))
     expect(component.getByTestId('edit-calendar-event-form-date').value).toMatch(
-      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), \d{1,2} (Jan|Feb|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec) \d{4}$/
+      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), \d{1,2} (Jan|Feb|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec) \d{4}$/,
     )
 
     const errMessage = component.queryByText('This date is invalid.')
@@ -441,7 +441,7 @@ describe('CalendarEventDetailsForm', () => {
         'calendar_event[web_conference][name]': 'BigBlueButton',
       }),
       expect.any(Function),
-      expect.any(Function)
+      expect.any(Function),
     )
   })
 
@@ -456,7 +456,7 @@ describe('CalendarEventDetailsForm', () => {
         'calendar_event[web_conference]': '',
       }),
       expect.any(Function),
-      expect.any(Function)
+      expect.any(Function),
     )
   })
 
@@ -472,7 +472,7 @@ describe('CalendarEventDetailsForm', () => {
         'calendar_event[important_dates]': true,
       }),
       expect.any(Function),
-      expect.any(Function)
+      expect.any(Function),
     )
   })
 
@@ -488,7 +488,7 @@ describe('CalendarEventDetailsForm', () => {
         'calendar_event[important_dates]': true,
       }),
       expect.any(Function),
-      expect.any(Function)
+      expect.any(Function),
     )
   })
 
@@ -510,7 +510,7 @@ describe('CalendarEventDetailsForm', () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
     expect(
-      component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})
+      component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'}),
     ).not.toBeInTheDocument()
     defaultProps.event.contextInfo = userContext
   })
@@ -519,7 +519,7 @@ describe('CalendarEventDetailsForm', () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
     expect(
-      component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})
+      component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'}),
     ).not.toBeInTheDocument()
   })
 
@@ -587,7 +587,7 @@ describe('CalendarEventDetailsForm', () => {
           'calendar_event[rrule]': 'FREQ=DAILY;INTERVAL=1;COUNT=365',
         }),
         expect.any(Function),
-        expect.any(Function)
+        expect.any(Function),
       )
     })
 
@@ -600,7 +600,7 @@ describe('CalendarEventDetailsForm', () => {
           'calendar_event[rrule]': expect.anything(),
         }),
         expect.any(Function),
-        expect.any(Function)
+        expect.any(Function),
       )
     })
 
@@ -637,7 +637,7 @@ describe('CalendarEventDetailsForm', () => {
       component.getByText('Frequency').click()
       screen.getByText('Weekly on Monday').click()
       await waitFor(() =>
-        expect(component.queryByDisplayValue('Weekly on Monday')).toBeInTheDocument()
+        expect(component.queryByDisplayValue('Weekly on Monday')).toBeInTheDocument(),
       )
       changeValue(component, 'edit-calendar-event-form-date', nextDate)
       expect(component.queryByDisplayValue('Weekly on Tuesday')).toBeInTheDocument()

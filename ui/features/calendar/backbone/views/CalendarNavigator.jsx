@@ -216,7 +216,6 @@ CalendarNavigator.prototype.afterRender = function () {
     return this._loadDateField()
   }
 
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <CalendarNavigatorComponent
       size={this.options.size || 'large'}
@@ -255,7 +254,7 @@ CalendarNavigator.prototype.afterRender = function () {
         },
       }}
     />,
-    this.$el.find('#calendar_navigator_component')[0]
+    this.$el.find('#calendar_navigator_component')[0],
   )
 }
 

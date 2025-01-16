@@ -20,6 +20,7 @@ import React from 'react'
 
 export const StudentViewContextDefaults = {
   allowChangesToSubmission: true,
+  allowPeerReviewComments: true,
   cancelDraftAction: () => {},
   isLatestAttempt: true,
   isObserver: false,

@@ -76,7 +76,7 @@ const AddConference = ({
         lti_settings: ltiSettings,
       })
     },
-    [selectedType, setConference]
+    [selectedType, setConference],
   )
 
   const onLtiClose = () => {

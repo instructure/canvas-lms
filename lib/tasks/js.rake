@@ -6,6 +6,7 @@ namespace :js do
   desc "Build development webpack js"
   task :webpack_development do
     puts "--> Building DEVELOPMENT webpack bundles"
+    system "yarn run build:packages"
     system "yarn run webpack-development"
     raise "Error running js:webpack_development: \nABORTING" if $?.exitstatus != 0
   end
@@ -13,6 +14,7 @@ namespace :js do
   desc "Build production webpack js"
   task :webpack_production do
     puts "--> Building PRODUCTION webpack bundles"
+    system "yarn run build:packages"
     system "yarn run webpack-production"
     raise "Error running js:webpack_production: \nABORTING" if $?.exitstatus != 0
   end
@@ -20,6 +22,7 @@ namespace :js do
   desc "Ensure up-to-date node environment"
   task :yarn_install do
     puts "node is: #{`node -v`.strip} (#{`which node`.strip})"
+    puts "yarn is: #{`yarn -v`.strip} (#{`which yarn`.strip})"
 
     # --production=false so that it still installs devDependencies as they are
     # needed for post-installation steps (like wsrun)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -18,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Provider} from 'react-redux'
 import ready from '@instructure/ready'
 
@@ -32,6 +31,10 @@ const CoursePage = () => (
 )
 
 ready(() => {
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(<CoursePage />, document.getElementById('course_paces'))
+  const container = document.getElementById('course_paces')
+  if (!container) {
+    throw new Error('Failed to find the root element')
+  }
+  const root = createRoot(container)
+  root.render(<CoursePage />)
 })

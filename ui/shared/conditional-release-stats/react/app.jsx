@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {connect, Provider} from 'react-redux'
 import BreakdownGraphs from './components/breakdown-graphs'
 import BreakdownDetails from './components/breakdown-details'
@@ -42,36 +42,46 @@ export default class CRSApp {
   constructor(store, actions) {
     this.store = store
     this.actions = actions
+    this.graphsRoot = null
+    this.detailsRoot = null
   }
 
   renderGraphs(root) {
+    if (!root) {
+      throw new Error('Failed to find the graphs root element')
+    }
     const actions = {
       openSidebar: this.actions.openSidebar,
       selectRange: this.actions.selectRange,
     }
 
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(
+    if (!this.graphsRoot) {
+      this.graphsRoot = createRoot(root)
+    }
+    this.graphsRoot.render(
       <Provider store={this.store}>
         <Graphs {...actions} />
       </Provider>,
-      root
     )
   }
 
   renderDetails(root) {
+    if (!root) {
+      throw new Error('Failed to find the details root element')
+    }
     const detailActions = {
       selectRange: this.actions.selectRange,
       selectStudent: this.actions.selectStudent,
       closeSidebar: this.actions.closeSidebar,
     }
 
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(
+    if (!this.detailsRoot) {
+      this.detailsRoot = createRoot(root)
+    }
+    this.detailsRoot.render(
       <Provider store={this.store}>
         <Details {...detailActions} />
       </Provider>,
-      root
     )
   }
 }

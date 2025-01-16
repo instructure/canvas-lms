@@ -50,7 +50,7 @@ class EventStream extends React.Component {
           <p>
             {I18n.t(
               'notices.no_events_available',
-              'There were no events logged during the quiz-taking session.'
+              'There were no events logged during the quiz-taking session.',
             )}
           </p>
         )}

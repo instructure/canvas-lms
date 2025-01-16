@@ -43,11 +43,11 @@ type SubmitScoreRequestBody = {
 
 export const useSubmitScore = () => {
   const [submitScoreStatus, setSubmitScoreStatus] = useState<ApiCallStatus>(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
   const [submitScoreError, setSubmitScoreError] = useState<string>('')
   const [savedSubmission, setSavedSubmission] = useState<GradebookUserSubmissionDetails | null>(
-    null
+    null,
   )
 
   const submit = useCallback(
@@ -56,7 +56,7 @@ export const useSubmitScore = () => {
       submission: GradebookUserSubmissionDetails,
       gradeInput: string,
       submitScoreUrl?: string | null,
-      subAssignmentTag?: string | null
+      subAssignmentTag?: string | null,
     ) => {
       if (!submitScoreUrl) {
         setSubmitScoreError(I18n.t('Unable to submit score'))
@@ -120,7 +120,7 @@ export const useSubmitScore = () => {
         setSubmitScoreStatus(ApiCallStatus.FAILED)
       }
     },
-    []
+    [],
   )
 
   const submitExcused = useCallback(
@@ -156,7 +156,7 @@ export const useSubmitScore = () => {
         setSubmitScoreStatus(ApiCallStatus.FAILED)
       }
     },
-    []
+    [],
   )
 
   return {

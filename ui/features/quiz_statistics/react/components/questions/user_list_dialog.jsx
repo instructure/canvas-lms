@@ -33,7 +33,7 @@ const UserListDialog = ({answer_id, user_names}) => {
             one: '1 respondent',
             other: '%{count} respondents',
           },
-          {count: user_names.length}
+          {count: user_names.length},
         )}
       </button>
 

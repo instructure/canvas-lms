@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import sinon from 'sinon'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {shallow} from 'enzyme'
@@ -36,7 +35,7 @@ const defaultProps = (props = {}) =>
       parent: () => {},
       onConfirm: () => {},
     },
-    props
+    props,
   )
 
 it('renders the ConfirmOutcomeEditModal component', () => {
@@ -51,14 +50,14 @@ it('renders the rubrics text if hasUpdateableRubrics', () => {
 
 it('renders the masteryPoints text if mastery points modified', () => {
   const modal = shallow(
-    <ConfirmOutcomeEditModal {...defaultProps({modifiedFields: {masteryPoints: true}})} />
+    <ConfirmOutcomeEditModal {...defaultProps({modifiedFields: {masteryPoints: true}})} />,
   )
   expect(modal.find(Modal.Body).render().text()).toMatch(/scoring criteria/)
 })
 
 it('renders the scoring method text if scoring method modified', () => {
   const modal = shallow(
-    <ConfirmOutcomeEditModal {...defaultProps({modifiedFields: {scoringMethod: true}})} />
+    <ConfirmOutcomeEditModal {...defaultProps({modifiedFields: {scoringMethod: true}})} />,
   )
   expect(modal.find(Modal.Body).render().text()).toMatch(/scoring criteria/)
 })
@@ -66,7 +65,7 @@ it('renders the scoring method text if scoring method modified', () => {
 it('does not call onConfirm when canceled', () => {
   const onConfirm = jest.fn()
   const modal = shallow(
-    <ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true, onConfirm})} />
+    <ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true, onConfirm})} />,
   )
   modal.find(Modal.Footer).find('#cancel-outcome-edit-modal').simulate('click')
   expect(modal.state('show')).toBe(false)
@@ -76,7 +75,7 @@ it('does not call onConfirm when canceled', () => {
 it('calls onConfirm when saved', () => {
   const onConfirm = jest.fn()
   const modal = shallow(
-    <ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true, onConfirm})} />
+    <ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true, onConfirm})} />,
   )
 
   jest.useFakeTimers()
@@ -91,10 +90,10 @@ describe('showConfirmOutcomeEdit', () => {
   afterEach(() => {
     const parent = document.querySelector('.confirm-outcome-edit-modal-container')
     if (parent) {
-      const skipScroll = sinon.stub(window, 'scroll').callsFake(() => {})
+      const skipScroll = jest.spyOn(window, 'scroll').mockImplementation(() => {})
       ReactDOM.unmountComponentAtNode(parent)
       parent.remove()
-      skipScroll.restore()
+      skipScroll.mockRestore()
     }
   })
 

@@ -36,23 +36,23 @@ describe('OutcomeDetailView', () => {
         id: '9',
         score: 1,
         submitted_or_assessed_at: '2015-03-13T16:23:26Z',
-        links: { user: '6', learning_outcome: '2', alignment: 'assignment_1' }
-      }
+        links: {user: '6', learning_outcome: '2', alignment: 'assignment_1'},
+      },
     ],
     linked: {
       alignments: [
         {
           id: 'assignment_1',
           name: 'This is the first assignment.',
-          html_url: 'http://localhost:3000/courses/1/assignments/1'
-        }
-      ]
-    }
+          html_url: 'http://localhost:3000/courses/1/assignments/1',
+        },
+      ],
+    },
   }
 
   beforeEach(() => {
     document.body.innerHTML = '<div id="application"></div>'
-    
+
     // Mock jQuery dialog
     $.fn.dialog = jest.fn(() => $({}))
 
@@ -68,12 +68,12 @@ describe('OutcomeDetailView', () => {
 
     fakeENV.setup()
     ENV.context_asset_string = `course_${courseId}`
-    ENV.current_user = { display_name: 'Student One' }
+    ENV.current_user = {display_name: 'Student One'}
     ENV.student_id = userId
 
     outcomeDetailView = new OutcomeDetailView({
       course_id: courseId,
-      user_id: userId
+      user_id: userId,
     })
   })
 
@@ -92,9 +92,9 @@ describe('OutcomeDetailView', () => {
     const outcome = new Outcome({
       id: outcomeId,
       mastery_points: 3,
-      points_possible: 5
+      points_possible: 5,
     })
-    outcome.group = new Group({ title: 'Outcome Group Title' })
+    outcome.group = new Group({title: 'Outcome Group Title'})
 
     // Listen for the reset event on alignmentsForView
     outcomeDetailView.alignmentsForView.on('reset', () => {

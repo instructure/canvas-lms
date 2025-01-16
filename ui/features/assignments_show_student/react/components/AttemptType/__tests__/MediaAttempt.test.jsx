@@ -98,7 +98,7 @@ describe('MediaAttempt', () => {
       const {getByTestId} = render(
         <StudentViewContext.Provider value={{allowChangesToSubmission: false, isObserver: true}}>
           <MediaAttempt {...props} />
-        </StudentViewContext.Provider>
+        </StudentViewContext.Provider>,
       )
       expect(getByTestId('open-record-media-modal-button')).toBeDisabled()
       expect(getByTestId('open-upload-media-modal-button')).toBeDisabled()
@@ -120,7 +120,7 @@ describe('MediaAttempt', () => {
     it('renders an iframe if iframeURL is given', async () => {
       const props = await makeProps(submissionDraftOverrides)
       const wrapper = render(
-        <MediaAttempt {...props} iframeURL="https://www.youtube.com/embed/U9t-slLl30E" />
+        <MediaAttempt {...props} iframeURL="https://www.youtube.com/embed/U9t-slLl30E" />,
       )
       expect(wrapper.getByTitle('preview')).toBeInTheDocument()
     })
@@ -154,7 +154,7 @@ describe('MediaAttempt', () => {
         },
       })
       const {getByTestId, queryByTestId} = render(
-        <MediaAttempt {...props} uploadingFiles={false} />
+        <MediaAttempt {...props} uploadingFiles={false} />,
       )
       expect(queryByTestId('remove-media-recording')).not.toBeInTheDocument()
       expect(getByTestId('media-recording')).toBeInTheDocument()

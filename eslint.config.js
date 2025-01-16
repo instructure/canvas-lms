@@ -9,19 +9,24 @@ const importPlugin = require('eslint-plugin-import')
 const lodashPlugin = require('eslint-plugin-lodash')
 const notice = require('eslint-plugin-notice')
 const comments = require('@eslint-community/eslint-plugin-eslint-comments/configs')
+const path = require('path')
+
+const projectRoot = __dirname
 
 /** @type {import('eslint').Linter.Config[]} */
 module.exports = [
   {
-    files: ['ui/**/*.{js,mjs,ts,jsx,tsx}', 'ui-build/**/*.{js,mjs,ts,jsx,tsx}'],
     ignores: [
-      '**/doc/*',
-      '**/es/*',
+      '**/doc/**',
+      '**/es/**',
       'Jenkinsfile.js',
-      'ui/shared/jquery/**',
-      '*.config.*',
-      'jest/**',
+      '**/ui/shared/jquery/**',
+      '**/*.config.*',
+      '**/jest/**',
     ],
+  },
+  {
+    files: ['ui/**/*.{js,mjs,ts,jsx,tsx}', 'ui-build/**/*.{js,mjs,ts,jsx,tsx}'],
   },
 
   // Globals
@@ -65,7 +70,14 @@ module.exports = [
   ...tseslint.configs.recommended,
   {
     rules: {
-      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/ban-ts-comment': [
+        'error',
+        {
+          'ts-nocheck': true,
+          'ts-ignore': true,
+          'ts-expect-error': false,
+        },
+      ],
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
@@ -170,6 +182,8 @@ module.exports = [
       },
     },
     rules: {
+      'react/jsx-uses-react': 'off',
+      'react/react-in-jsx-scope': 'off',
       'react/no-deprecated': 'warn',
       'react/prop-types': 'warn',
       'react/display-name': 'off',

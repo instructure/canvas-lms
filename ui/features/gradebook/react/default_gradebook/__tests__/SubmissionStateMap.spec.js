@@ -399,7 +399,7 @@ describe('#setSubmissionCellState', () => {
   test('a moderated and unpublished grades assignment is locked and grades not hidden when published', () => {
     const map = createAndSetupMap(
       moderatedAndGradesUnpublishedAssignment.toJS(),
-      studentWithoutSubmission
+      studentWithoutSubmission,
     )
     const submission = map.getSubmissionState({
       user_id: studentWithoutSubmission.id,

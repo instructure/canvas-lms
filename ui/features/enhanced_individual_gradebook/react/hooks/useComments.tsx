@@ -56,7 +56,7 @@ export const useGetComments = ({courseId, submissionId}: UseCommentsProps) => {
 
 export const usePostComment = () => {
   const [postCommentStatus, setpostCommentStatus] = useState<ApiCallStatus>(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
   const [postCommentError, setpostCommentError] = useState<string>('')
 
@@ -94,7 +94,7 @@ export const usePostComment = () => {
         setpostCommentStatus(ApiCallStatus.FAILED)
       }
     },
-    []
+    [],
   )
 
   return {

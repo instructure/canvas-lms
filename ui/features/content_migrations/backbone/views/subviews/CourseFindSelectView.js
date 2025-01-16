@@ -90,7 +90,7 @@ CourseFindSelectView.prototype.render = function () {
             .value()
           return CourseFindSelectView.__super__.render.apply(_this, arguments)
         }
-      })(this)
+      })(this),
     )
   }
 }
@@ -205,9 +205,9 @@ CourseFindSelectView.prototype.updateSearch = function (event) {
       return function (course) {
         return course.id === value
       }
-    })(this)
+    })(this),
   )
-   
+
   return this.$courseSearchField.val(courseObj != null ? courseObj.value : void 0)
 }
 
@@ -216,7 +216,7 @@ CourseFindSelectView.prototype.updateSearch = function (event) {
 // @api private
 CourseFindSelectView.prototype.setSourceCourseId = function (id) {
   let course, ref
-   
+
   if (id === ((ref = ENV.COURSE_ID) != null ? ref.toString() : void 0)) {
     this.$selectWarning.show()
   } else {
@@ -245,7 +245,7 @@ CourseFindSelectView.prototype.setSourceCourseId = function (id) {
 CourseFindSelectView.prototype.validations = function () {
   const errors = {}
   const settings = this.model.get('settings')
-   
+
   if (!(settings != null ? settings.source_course_id : void 0)) {
     errors.courseSearchField = [
       {

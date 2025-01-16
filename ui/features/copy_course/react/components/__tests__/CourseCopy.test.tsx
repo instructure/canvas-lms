@@ -16,11 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {useMutation, useQuery} from '@canvas/query'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {fireEvent, render} from '@testing-library/react'
-import {useQuery, useMutation} from '@canvas/query'
-import CourseCopy from '../CourseCopy'
+import React from 'react'
 import {useTermsQuery} from '../../queries/termsQuery'
+import CourseCopy from '../CourseCopy'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 jest.mock('@canvas/query')
 jest.mock('../../queries/termsQuery')
@@ -32,7 +37,7 @@ describe('CourseCopy', () => {
     canImportAsNewQuizzes: true,
   }
 
-  const courseData = {id: '1', name: 'Test Course', enrollment_term_id: 1}
+  const courseData = {id: '1', name: 'Test Course', enrollment_term_id: 1, restrict_enrollments_to_course_dates: true, time_zone: 'time_zone'}
   const termsData = [{id: '1', name: 'Test Term'}]
 
   const mockUseQuery = useQuery as jest.Mock
@@ -44,7 +49,7 @@ describe('CourseCopy', () => {
   })
 
   it('renders loading state on course loading', () => {
-    mockUseQuery.mockReturnValue({isLoading: true})
+    mockUseQuery.mockReturnValue({isFetchedAfterMount: false})
     mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, hasNextPage: false})
 
     const {getByText} = render(<CourseCopy {...defaultProps} />)
@@ -53,7 +58,7 @@ describe('CourseCopy', () => {
   })
 
   it('renders loading state on terms loading', () => {
-    mockUseQuery.mockReturnValue({isLoading: false})
+    mockUseQuery.mockReturnValue({isFetchedAfterMount: true})
     mockUseTermsQuery.mockReturnValue({isLoading: true, isError: false, hasNextPage: false})
 
     const {getByText} = render(<CourseCopy {...defaultProps} />)
@@ -62,7 +67,7 @@ describe('CourseCopy', () => {
   })
 
   it('renders loading state on terms has next page', () => {
-    mockUseQuery.mockReturnValue({isLoading: false})
+    mockUseQuery.mockReturnValue({isFetchedAfterMount: true})
     mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, hasNextPage: true})
 
     const {getByText} = render(<CourseCopy {...defaultProps} />)
@@ -71,7 +76,7 @@ describe('CourseCopy', () => {
   })
 
   it('renders success state', () => {
-    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
+    mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: courseData})
     mockUseTermsQuery.mockReturnValue({
       isLoading: false,
       isError: false,
@@ -87,7 +92,7 @@ describe('CourseCopy', () => {
 
   describe('when there is an error', () => {
     it('renders error state on course loading error', () => {
-      mockUseQuery.mockReturnValue({isLoading: false, isError: true, data: null})
+      mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: true, data: null})
       mockUseTermsQuery.mockReturnValue({
         isLoading: false,
         isError: false,
@@ -101,7 +106,7 @@ describe('CourseCopy', () => {
     })
 
     it('renders error state on terms loading error', () => {
-      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: null})
+      mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: null})
       mockUseTermsQuery.mockReturnValue({
         isLoading: false,
         isError: true,
@@ -115,7 +120,7 @@ describe('CourseCopy', () => {
     })
 
     it('renders error state on terms error but has next page', () => {
-      mockUseQuery.mockReturnValue({isLoading: false})
+      mockUseQuery.mockReturnValue({isFetchedAfterMount: true})
       mockUseTermsQuery.mockReturnValue({
         isLoading: false,
         isError: true,
@@ -131,7 +136,7 @@ describe('CourseCopy', () => {
 
   describe('when there is no data returned', () => {
     it('renders error state on missing course data', () => {
-      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: null})
+      mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: null})
       mockUseTermsQuery.mockReturnValue({
         isLoading: false,
         isError: false,
@@ -145,7 +150,7 @@ describe('CourseCopy', () => {
     })
 
     it('renders error state on missing terms data', () => {
-      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: {}})
+      mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: {}})
       mockUseTermsQuery.mockReturnValue({
         isLoading: false,
         isError: false,
@@ -160,10 +165,7 @@ describe('CourseCopy', () => {
   })
 
   it('handleCancel redirects to the course settings page', () => {
-    // @ts-ignore
-    delete window.location
-    window.location = {href: ''} as Location
-    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
+    mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: courseData})
     mockUseTermsQuery.mockReturnValue({
       isLoading: false,
       isError: false,
@@ -175,12 +177,12 @@ describe('CourseCopy', () => {
     const {getByRole} = render(<CourseCopy {...defaultProps} />)
 
     fireEvent.click(getByRole('button', {name: 'Cancel'}))
-    expect(window.location.href).toBe(`/courses/${defaultProps.courseId}/settings`)
+    expect(assignLocation).toHaveBeenCalledWith(`/courses/${defaultProps.courseId}/settings`)
   })
 
   it('handleSubmit calls mutate', () => {
     const mockMutate = jest.fn()
-    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
+    mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: courseData})
     mockUseTermsQuery.mockReturnValue({
       isLoading: false,
       isError: false,
@@ -215,6 +217,8 @@ describe('CourseCopy', () => {
           import_quizzes_next: false,
         },
         errored: false,
+        restrictEnrollmentsToCourseDates: true,
+        courseTimeZone: 'time_zone',
       },
     })
   })

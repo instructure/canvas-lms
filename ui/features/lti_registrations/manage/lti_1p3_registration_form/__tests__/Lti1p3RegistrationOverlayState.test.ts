@@ -53,7 +53,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
           ...prev,
           state: emptyState,
         }),
-        true
+        true,
       )
     })
 
@@ -62,7 +62,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.custom_fields).toEqual({
@@ -78,7 +78,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {config: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.redirect_uris).toEqual([
@@ -92,7 +92,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {config: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.oidc_initiation_url).toBe('https://example.com/oidc')
@@ -104,7 +104,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {config: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.public_jwk_url).toBe('https://example.com/jwk')
@@ -117,21 +117,21 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {config: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.public_jwk).toEqual(JSON.parse(jwk))
     })
 
     it('handles domain properly', () => {
-      state.getState().setDomain('example.com')
+      state.getState().setDomain('example2.com')
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
-      expect(result.domain).toBe('example.com')
+      expect(result.domain).toBe('example2.com')
     })
 
     it('handles privacy level properly', () => {
@@ -139,7 +139,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.privacy_level).toBe('public')
@@ -150,7 +150,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
       // An empty state should result in both placements being disabled.
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.disabled_placements).toEqual(['course_navigation', 'global_navigation'])
@@ -165,7 +165,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.placements).toEqual({
@@ -184,7 +184,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.placements?.course_navigation?.default).toBe('disabled')
@@ -195,19 +195,19 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {config: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.scopes).toEqual(['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'])
     })
 
     it('removes any undefined properties', () => {
-      state.getState().setDefaultTargetLinkURI('https://example.com')
-      state.getState().setPrivacyLevel('anonymous')
+      state.getState().setDefaultTargetLinkURI('https://example.com/edited')
+      state.getState().setPrivacyLevel('email_only')
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       const expectedNonExistentProperties: Omit<keyof LtiConfigurationOverlay, 'title'>[] = [
@@ -223,8 +223,35 @@ describe('Lti1p3RegistrationOverlayState', () => {
         'scopes',
       ] as const
 
-      expect(result.target_link_uri).toBe('https://example.com')
-      expect(result.privacy_level).toBe('anonymous')
+      expect(result.target_link_uri).toBe('https://example.com/edited')
+      expect(result.privacy_level).toBe('email_only')
+
+      expectedNonExistentProperties.forEach(property => {
+        expect(Object.hasOwn(result, property as string)).toBeFalsy()
+      })
+    })
+
+    it('does not include values that are the same as the internal configuration', () => {
+      state.getState().setDefaultTargetLinkURI('https://example.com')
+      state.getState().setDescription('description')
+      state.getState().setDomain('example.com')
+      state.getState().setPrivacyLevel('anonymous')
+      state.getState().setCustomFields('foo=bar')
+      state.getState().setRedirectURIs('https://example.com/redirect')
+
+      const {overlay: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig,
+      )
+
+      const expectedNonExistentProperties: Omit<keyof LtiConfigurationOverlay, 'title'>[] = [
+        'description',
+        'custom_fields',
+        'target_link_uri',
+        'redirect_uris',
+        'domain',
+        'placements',
+      ] as const
 
       expectedNonExistentProperties.forEach(property => {
         expect(Object.hasOwn(result, property as string)).toBeFalsy()

@@ -701,7 +701,7 @@ describe('transformApiToInternalGrade', () => {
             current_period_computed_current_grade: 'D',
           },
         ],
-      })
+      }),
     ).toMatchSnapshot()
   })
 
@@ -718,7 +718,7 @@ describe('transformApiToInternalGrade', () => {
             current_period_computed_current_grade: 'D',
           },
         ],
-      })
+      }),
     ).toMatchSnapshot()
   })
 })
@@ -750,7 +750,7 @@ describe('observedUserContextCodes', () => {
       observedUserContextCodes({
         currentUser: {id: '3'},
         selectedObservee: '3',
-      })
+      }),
     ).toBeUndefined()
   })
 
@@ -760,7 +760,7 @@ describe('observedUserContextCodes', () => {
         currentUser: {id: '3'},
         selectedObservee: '17',
         courses: [{id: '20'}, {id: '4'}],
-      })
+      }),
     ).toStrictEqual(['course_4', 'course_20'])
   })
 })
@@ -779,7 +779,7 @@ describe('buildURL', () => {
       start_date: 'a',
     })
     expect(url).toStrictEqual(
-      '/here/there?start_date=a&end_date=b&include=i&filter=c&order=d&per_page=e&observed_user_id=f&context_codes%5B%5D=g_5&context_codes%5B%5D=g_30&course_ids%5B%5D=7&course_ids%5B%5D=50'
+      '/here/there?start_date=a&end_date=b&include=i&filter=c&order=d&per_page=e&observed_user_id=f&context_codes%5B%5D=g_5&context_codes%5B%5D=g_30&course_ids%5B%5D=7&course_ids%5B%5D=50',
     )
   })
 
@@ -817,7 +817,7 @@ describe('getContextCodesFromState', () => {
     expect(
       getContextCodesFromState({
         courses: [{id: '20'}, {id: '4'}],
-      })
+      }),
     ).toStrictEqual(['course_4', 'course_20'])
   })
 })

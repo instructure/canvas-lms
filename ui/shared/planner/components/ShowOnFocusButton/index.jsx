@@ -49,7 +49,7 @@ export default class ShowOnFocusButton extends Component {
       () => {
         // eslint-disable-next-line react/no-find-dom-node
         findDOMNode(this.btnRef).focus()
-      }
+      },
     )
   }
 

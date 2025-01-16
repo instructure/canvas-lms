@@ -105,7 +105,7 @@ export default class PerformanceControls {
       // @ts-expect-error
       MAXIMUMS[name] || this.apiMaxPerPage,
       // @ts-expect-error
-      DEFAULTS[name] || DEFAULTS.apiMaxPerPage
+      DEFAULTS[name] || DEFAULTS.apiMaxPerPage,
     )
   }
 }

@@ -41,7 +41,7 @@ const MIN_SEARCH_TERM_LENGTH = 2
 const PAGE_LENGTH_SEARCH = 20
 const PAGE_LENGTH_FILTER = 100
 
-type ComponentProps = {
+export type ComponentProps = {
   readonly originAccountId: number
   readonly searchValue: string
   readonly filterValue: FilterType
@@ -89,11 +89,11 @@ export const AccountList = ({
     },
     success: useCallback(
       (accountData: AccountData[]) => setAccounts(castIdsToInt(accountData)),
-      []
+      [],
     ),
     error: useCallback(
       (error: Error) => showFlashError(I18n.t('Unable to load results'))(error),
-      []
+      [],
     ),
     loading: setLoading,
   })

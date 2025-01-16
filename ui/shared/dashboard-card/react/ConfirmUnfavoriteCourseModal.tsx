@@ -36,10 +36,9 @@ export function showConfirmUnfavorite(props: Props) {
     if (modal) modal.show()
   }
 
-   
   ReactDOM.render(
     <ConfirmUnfavoriteCourseModal {...props} ref={showConfirmUnfavoriteRef} />,
-    parent
+    parent,
   )
   return parent
 }
@@ -53,14 +52,13 @@ export function showNoFavoritesAlert() {
   parent.setAttribute('class', 'no-favorites-alert-container')
   document.querySelector('.ic-DashboardCard__box')?.appendChild(parent)
 
-   
   ReactDOM.render(
     <Alert variant="info" renderCloseButtonLabel="Close" margin="small">
       {I18n.t(`You have no courses favorited. Reloading this page will show all
       your active courses. To add favorites, go to `)}{' '}
       <a href="/courses">{I18n.t('All Courses.')}</a>
     </Alert>,
-    parent
+    parent,
   )
   return parent
 }
@@ -131,7 +129,7 @@ export default class ConfirmUnfavoriteCourseModal extends React.Component<Props,
         <Modal.Body>
           {I18n.t(
             `You are about to remove this course from your dashboard. It will still be available
-              by navigating to Courses > All Courses from the main menu.`
+              by navigating to Courses > All Courses from the main menu.`,
           )}
         </Modal.Body>
 

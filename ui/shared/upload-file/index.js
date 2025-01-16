@@ -43,8 +43,8 @@ function fileUploadFailed(err) {
     // fault
     const wrapped = new Error(
       I18n.t(
-        'Unable to transmit file to the storage service. The service may be down or you may need to re-login to Canvas.'
-      )
+        'Unable to transmit file to the storage service. The service may be down or you may need to re-login to Canvas.',
+      ),
     )
     wrapped.originalError = err
     return Promise.reject(wrapped)
@@ -78,7 +78,7 @@ export function uploadFile(
   file,
   ajaxLib = axios,
   onProgress,
-  ignoreResult = false
+  ignoreResult = false,
 ) {
   if (!file && !preflightData.url) {
     throw new Error('expected either a file to upload or a url to clone', {file, preflightData})
@@ -267,7 +267,7 @@ export function uploadFiles(files, uploadUrl, options = {}) {
           name: file.name,
           content_type: file.type,
         },
-        file
+        file,
       )
     }
   })

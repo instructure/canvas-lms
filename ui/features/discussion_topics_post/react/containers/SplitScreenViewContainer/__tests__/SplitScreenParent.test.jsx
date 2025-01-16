@@ -63,7 +63,7 @@ describe('SplitScreenParent', () => {
         >
           <SplitScreenParent {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 
@@ -90,7 +90,7 @@ describe('SplitScreenParent', () => {
     const container = setup(
       defaultProps({
         discussionEntryOverrides: {...quotedEntry},
-      })
+      }),
     )
     expect(container.getByTestId('reply-preview')).toBeInTheDocument()
   })
@@ -155,19 +155,19 @@ describe('SplitScreenParent', () => {
       const {queryAllByText} = setup(
         defaultProps({
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}},
-        })
+        }),
       )
-      expect(queryAllByText('2 Replies, 1 Unread').length).toBe(2)
+      expect(queryAllByText('2 Replies, 1 Unread')).toHaveLength(2)
     })
 
     it('does not display unread count if it is 0', async () => {
       const {queryAllByText} = setup(
         defaultProps({
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}},
-        })
+        }),
       )
-      expect(queryAllByText('2 Replies, 0 Unread').length).toBe(0)
-      expect(queryAllByText('2 Replies').length).toBe(2)
+      expect(queryAllByText('2 Replies, 0 Unread')).toHaveLength(0)
+      expect(queryAllByText('2 Replies')).toHaveLength(2)
     })
   })
 
@@ -182,13 +182,13 @@ describe('SplitScreenParent', () => {
           depth: 4,
         },
         overrides: {RCEOpen: true},
-      })
+      }),
     )
 
     expect(
       queryByText(
-        'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
-      )
+        'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.',
+      ),
     ).toBeTruthy()
   })
 
@@ -203,13 +203,13 @@ describe('SplitScreenParent', () => {
           depth: 3,
         },
         overrides: {RCEOpen: true},
-      })
+      }),
     )
 
     expect(
       queryByText(
-        'Deeply nested replies are no longer supported. Your reply will appear on on the page you are currently on.'
-      )
+        'Deeply nested replies are no longer supported. Your reply will appear on on the page you are currently on.',
+      ),
     ).toBeTruthy()
   })
 
@@ -221,8 +221,8 @@ describe('SplitScreenParent', () => {
 
     expect(
       queryByText(
-        'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
-      )
+        'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.',
+      ),
     ).toBeFalsy()
   })
 
@@ -257,7 +257,7 @@ describe('SplitScreenParent', () => {
               reportType: 'other',
             },
           },
-        })
+        }),
       )
 
       fireEvent.click(getByTestId('thread-actions-menu'))
@@ -270,7 +270,7 @@ describe('SplitScreenParent', () => {
         defaultProps(),
         updateDiscussionEntryParticipantMock({
           reportType: 'other',
-        })
+        }),
       )
 
       fireEvent.click(getByTestId('thread-actions-menu'))
@@ -309,7 +309,7 @@ describe('SplitScreenParent', () => {
       const {queryByTestId} = setup(
         defaultProps({
           overrides: {onToggleRating},
-        })
+        }),
       )
       const likeButton = await queryByTestId('not-liked-icon')
       expect(likeButton).toBeInTheDocument()
@@ -327,7 +327,7 @@ describe('SplitScreenParent', () => {
             },
           },
           overrides: {onToggleRating},
-        })
+        }),
       )
       const likeButton = await queryByTestId('liked-icon')
       expect(likeButton).toBeInTheDocument()

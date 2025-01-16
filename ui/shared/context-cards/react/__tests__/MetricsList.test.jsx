@@ -51,7 +51,7 @@ describe('MetricsList', () => {
             ],
           }}
           allowFinalGradeOverride={true}
-        />
+        />,
       )
       expect(screen.getByText('Grade')).toBeInTheDocument()
       expect(screen.getByText(overrideGrade)).toBeInTheDocument()
@@ -73,7 +73,7 @@ describe('MetricsList', () => {
             ],
           }}
           allowFinalGradeOverride={false}
-        />
+        />,
       )
       expect(screen.getByText('Grade')).toBeInTheDocument()
       expect(screen.getByText(currentGrade)).toBeInTheDocument()
@@ -94,7 +94,7 @@ describe('MetricsList', () => {
             ],
           }}
           allowFinalGradeOverride={true}
-        />
+        />,
       )
       expect(screen.getByText('Grade')).toBeInTheDocument()
       expect(screen.getByText(`${overrideScore}%`)).toBeInTheDocument()
@@ -114,7 +114,7 @@ describe('MetricsList', () => {
               },
             ],
           }}
-        />
+        />,
       )
       expect(screen.getByText('Grade')).toBeInTheDocument()
       expect(screen.getByText(currentGrade)).toBeInTheDocument()
@@ -134,7 +134,7 @@ describe('MetricsList', () => {
               },
             ],
           }}
-        />
+        />,
       )
       expect(screen.getByText('Grade')).toBeInTheDocument()
       expect(screen.getByText(`${currentScore}%`)).toBeInTheDocument()
@@ -147,7 +147,7 @@ describe('MetricsList', () => {
           user={{
             enrollments: undefined,
           }}
-        />
+        />,
       )
       expect(screen.queryByText('Grade')).not.toBeInTheDocument()
     })
@@ -171,7 +171,7 @@ describe('MetricsList', () => {
               },
             ],
           }}
-        />
+        />,
       )
       expect(screen.getByText('Missing')).toBeInTheDocument()
       expect(screen.getByText(missingCount.toString())).toBeInTheDocument()
@@ -196,7 +196,7 @@ describe('MetricsList', () => {
               },
             ],
           }}
-        />
+        />,
       )
       expect(screen.getByText('Late')).toBeInTheDocument()
       expect(screen.getByText(lateCount.toString())).toBeInTheDocument()

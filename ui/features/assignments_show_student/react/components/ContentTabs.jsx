@@ -29,12 +29,13 @@ import PropTypes from 'prop-types'
 
 const I18n = createI18nScope('assignments_2')
 
-const RubricTab = lazy(() =>
-  import(
-    /* webpackChunkName: "RubricTab" */
-    /* webpackPrefetch: true */
-    './RubricTab'
-  )
+const RubricTab = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "RubricTab" */
+      /* webpackPrefetch: true */
+      './RubricTab'
+    ),
 )
 
 ContentTabs.propTypes = {

@@ -54,15 +54,15 @@ const initializeNewUserTutorials = () => {
 
       const renderTray = () => {
         const Tray = trayObj.component
-        // eslint-disable-next-line no-restricted-properties
+
         ReactDOM.render(
           <TutorialTray store={store} returnFocusToFunc={getReturnFocus} label={trayObj.label}>
             <Tray />
           </TutorialTray>,
-          document.querySelector('.NewUserTutorialTray__Container')
+          document.querySelector('.NewUserTutorialTray__Container'),
         )
       }
-      // eslint-disable-next-line no-restricted-properties
+
       ReactDOM.render(
         <NewUserTutorialToggleButton
           ref={(c: NewUserTutorialToggleButton | null) => {
@@ -71,7 +71,7 @@ const initializeNewUserTutorials = () => {
           store={store}
         />,
         document.querySelector('.TutorialToggleHolder'),
-        () => renderTray()
+        () => renderTray(),
       )
     })
   }

@@ -30,7 +30,7 @@ it('calls the onClick prop when clicked', () => {
   const wrapper = shallow(
     <StickyButton id="sb" onClick={fakeOnClick}>
       Click me
-    </StickyButton>
+    </StickyButton>,
   )
 
   wrapper.find('button').simulate('click')
@@ -42,7 +42,7 @@ it('does not call the onClick prop when disabled', () => {
   const wrapper = shallow(
     <StickyButton id="sb" onClick={fakeOnClick} disabled={true}>
       Disabled button
-    </StickyButton>
+    </StickyButton>,
   )
 
   wrapper.find('button').simulate('click', {
@@ -56,7 +56,7 @@ it('renders the correct up icon', () => {
   const wrapper = shallow(
     <StickyButton id="sb" direction="up">
       Click me
-    </StickyButton>
+    </StickyButton>,
   )
   expect(wrapper.find(IconArrowUpSolid)).toHaveLength(1)
 })
@@ -65,7 +65,7 @@ it('renders the correct down icon', () => {
   const wrapper = shallow(
     <StickyButton id="sb" direction="down">
       Click me
-    </StickyButton>
+    </StickyButton>,
   )
   expect(wrapper.find(IconArrowDownLine)).toHaveLength(1)
 })
@@ -74,7 +74,7 @@ it('adds aria-hidden when specified', () => {
   const wrapper = shallow(
     <StickyButton id="sb" hidden={true}>
       Click me
-    </StickyButton>
+    </StickyButton>,
   )
 
   expect(wrapper).toMatchSnapshot()
@@ -84,7 +84,7 @@ it('shows aria-describedby when a description is given', () => {
   const wrapper = shallow(
     <StickyButton id="sb" description="hello world">
       Click me
-    </StickyButton>
+    </StickyButton>,
   )
   expect(wrapper.find('button[aria-describedby="sb_desc"]')).toHaveLength(1)
   expect(wrapper.find('#sb_desc')).toHaveLength(1)

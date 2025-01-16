@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
+import {render} from '@testing-library/react'
 
 import MissingPrereqs from '../MissingPrereqs'
 
@@ -31,12 +30,10 @@ beforeAll(() => {
 })
 
 afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
+  // Removed ReactDOM.unmountComponentAtNode as it's not needed with React Testing Library
 })
 
 it('renders normally', () => {
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(<MissingPrereqs moduleUrl="TEST" />, document.getElementById('fixtures'))
-  const element = $('[data-testid="assignments-2-pre-req-title"]')
-  expect(element).toHaveLength(1)
+  const container = render(<MissingPrereqs moduleUrl="TEST" />, { container: document.getElementById('fixtures') })
+  expect(container.getByTestId('assignments-2-pre-req-title')).toBeInTheDocument()
 })

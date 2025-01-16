@@ -39,7 +39,7 @@ describe('GradebookGrid CustomColumnCellFormatter', () => {
       0, // cell
       columnContent, // value
       null, // column definition
-      null // dataContext
+      null, // dataContext
     )
     return $fixture
   }

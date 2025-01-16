@@ -57,6 +57,7 @@ const IconBlock = ({iconName, size, color}: IconBlockProps) => {
       ref={el => el && connect(drag(el as HTMLElement))}
       style={styl}
       tabIndex={-1}
+      data-testid="icon-block"
     >
       <Icon size={size} />
     </div>

@@ -1278,6 +1278,17 @@ describe CoursesController do
       expect(flash[:notice]).to match(/Course was successfully updated./)
     end
 
+    it "allows horizon student view student to leave student view" do
+      @course.update_attribute :workflow_state, "claimed"
+      user_session(@teacher)
+      @fake_student = @course.student_view_student
+      session[:become_user_id] = @fake_student.id
+
+      get "show", params: { id: @course.id, leave_student_view: "/courses/#{@course.id}/modules" }
+      expect(response).to redirect_to("#{course_url(@course)}/modules")
+      expect(session[:become_user_id]).to be_nil
+    end
+
     it "allows student view student to view unpublished courses" do
       @course.update_attribute :workflow_state, "claimed"
       user_session(@teacher)
@@ -2202,8 +2213,7 @@ describe CoursesController do
         expect(assigns[:js_env][:COURSE][:latest_announcement][:message]).to eq "Welcome to the grind"
       end
 
-      it "is set with most recent visible announcement for observers with selective_release_backend" do
-        Account.site_admin.enable_feature!(:selective_release_backend)
+      it "is set with most recent visible announcement for observers" do
         @observer = course_with_observer(course: @course, active_all: true).user
         user_session(@observer)
 

@@ -211,7 +211,9 @@ describe "courses" do
       # Test that only users in the approved section are displayed.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      expect(ff(".roster .rosterUser").length).to eq 2
+      wait_for(method: nil, timeout: 5) do
+        expect(ff(".roster .rosterUser").length).to eq 2
+      end
     end
 
     it "displays users section name" do

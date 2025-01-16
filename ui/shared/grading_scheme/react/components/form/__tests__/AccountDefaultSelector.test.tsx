@@ -29,7 +29,7 @@ describe('AccountDefaultSelector tests', () => {
         gradingSchemes={AccountGradingSchemes}
         onChange={() => {}}
         {...props}
-      />
+      />,
     )
   }
 

@@ -25,8 +25,8 @@ export const titleValidator = title =>
   !title.trim().length
     ? I18n.t('Cannot be blank')
     : title.length > 255
-    ? I18n.t('Must be 255 characters or less')
-    : ''
+      ? I18n.t('Must be 255 characters or less')
+      : ''
 
 export const displayNameValidator = displayName =>
   displayName.length > 255 ? I18n.t('Must be 255 characters or less') : ''

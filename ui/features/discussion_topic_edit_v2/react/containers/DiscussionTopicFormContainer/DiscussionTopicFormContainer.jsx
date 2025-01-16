@@ -18,24 +18,25 @@
 
 import React, {useCallback, useContext, useEffect, useState} from 'react'
 
-import {useQuery, useMutation} from '@apollo/client'
-import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
-import {CREATE_DISCUSSION_TOPIC, UPDATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {useMutation, useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
-import {setUsageRights} from '../../util/setUsageRights'
-import {getContextQuery} from '../../util/utils'
+import LoadingIndicator from '@canvas/loading-indicator'
+import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
+import {assignLocation} from '@canvas/util/globalUtils'
+import WithBreakpoints from '@canvas/with-breakpoints'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconCompleteSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
-import {SavingDiscussionTopicOverlay} from '../../components/SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
-import WithBreakpoints from '@canvas/with-breakpoints'
 import {flushSync} from 'react-dom'
-import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
+import {CREATE_DISCUSSION_TOPIC, UPDATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
+import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
+import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
+import {SavingDiscussionTopicOverlay} from '../../components/SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
+import {setUsageRights} from '../../util/setUsageRights'
+import {getContextQuery} from '../../util/utils'
 
 const I18n = createI18nScope('discussion_create')
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
@@ -103,9 +104,9 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
 
   function navigateToDiscussionTopic(context_type, discussion_topic_id) {
     if (context_type === 'Course') {
-      window.location.assign(`/courses/${ENV.context_id}/discussion_topics/${discussion_topic_id}`)
+      assignLocation(`/courses/${ENV.context_id}/discussion_topics/${discussion_topic_id}`)
     } else if (context_type === 'Group') {
-      window.location.assign(`/groups/${ENV.context_id}/discussion_topics/${discussion_topic_id}`)
+      assignLocation(`/groups/${ENV.context_id}/discussion_topics/${discussion_topic_id}`)
     } else {
       setOnFailure(I18n.t('Invalid context type'))
     }
@@ -150,7 +151,7 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
           })
 
           window.dispatchEvent(
-            new CustomEvent('triggerMasteryPathsUpdateAssignment', {detail: {assignmentInfo}})
+            new CustomEvent('triggerMasteryPathsUpdateAssignment', {detail: {assignmentInfo}}),
           )
           window.dispatchEvent(new CustomEvent('triggerMasteryPathsSave'))
         }

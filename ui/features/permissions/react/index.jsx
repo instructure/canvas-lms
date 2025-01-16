@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Provider} from 'react-redux'
 
 // TODO: we probably want this one eventually
@@ -29,21 +29,20 @@ import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
 
 export default function createPermissionsIndex(root, data = {}) {
   const store = createStore(data)
+  const rootElement = createRoot(root)
 
   function unmount() {
-    ReactDOM.unmountComponentAtNode(root)
+    rootElement.unmount()
   }
 
   function render() {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(
+    rootElement.render(
       <>
         <TopNavPortal />
         <Provider store={store}>
           <ConnectedPermissionsIndex />
         </Provider>
       </>,
-      root
     )
   }
 

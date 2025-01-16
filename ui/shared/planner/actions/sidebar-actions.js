@@ -36,7 +36,7 @@ export const {
   'SIDEBAR_ITEMS_LOADING',
   'SIDEBAR_ITEMS_LOADED',
   'SIDEBAR_ITEMS_LOADING_FAILED',
-  'SIDEBAR_ENOUGH_ITEMS_LOADED'
+  'SIDEBAR_ENOUGH_ITEMS_LOADED',
 )
 
 export const ENOUGH_ITEMS_TO_SHOW_LIST = 7
@@ -57,7 +57,7 @@ function desiredSidebarItemsAreLoaded(state) {
 function handleSidebarLoadingResponse(response, dispatch, getState) {
   const nextUrl = findNextLink(response)
   const transformedItems = response.data.map(item =>
-    transformApiToInternalItem(item, getState().courses, getState().groups, getState().timeZone)
+    transformApiToInternalItem(item, getState().courses, getState().groups, getState().timeZone),
   )
   dispatch(sidebarItemsLoaded({items: transformedItems, nextUrl}))
   if (!nextUrl || enoughSidebarItemsAreLoaded(getState())) {
@@ -134,5 +134,5 @@ export const maybeUpdateTodoSidebar = identifiableThunk(
       }
       return payload
     })
-  }
+  },
 )

@@ -115,14 +115,12 @@ module AuthenticationMethods
       end
 
       def blocked?
-        return false unless Account.site_admin.feature_enabled?(:site_admin_service_auth)
         return false unless verified_token.try(:jti).present?
 
         RequestThrottle.blocklist.include? verified_token.jti
       end
 
       def tag_identifier
-        return unless Account.site_admin.feature_enabled?(:site_admin_service_auth)
         return unless request.present?
 
         return unless RequestThrottle::SERVICE_HEADER_EXPRESSION.match?(request.user_agent)

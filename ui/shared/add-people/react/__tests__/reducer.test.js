@@ -295,7 +295,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult,
       INITIAL_STATE.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
@@ -310,7 +310,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult,
       INITIAL_STATE.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
@@ -327,7 +327,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult.validUsers,
       goodUsers,
-      'userValidationResult.avalidUsers'
+      'userValidationResult.avalidUsers',
     )
 
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
@@ -343,12 +343,12 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.apiState,
       {pendingCount: 0, error: 'whoops'},
-      'api is no longer in-flight with error'
+      'api is no longer in-flight with error',
     )
     deepEqual(
       newState.userValidationResult,
       INITIAL_STATE.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
@@ -366,7 +366,7 @@ describe('Course Enrollment Add People Reducer', () => {
     equal(
       newState.userValidationResult.duplicates.bob.selectedUserId,
       '2',
-      'duplicate set selectedUserId'
+      'duplicate set selectedUserId',
     )
     equal(newState.userValidationResult.duplicates.bob.skip, false, 'duplicate set skip')
 
@@ -374,7 +374,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult.validUsers,
       goodUsers,
-      'userValidationResult.avalidUsers'
+      'userValidationResult.avalidUsers',
     )
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
@@ -391,7 +391,7 @@ describe('Course Enrollment Add People Reducer', () => {
     equal(
       newState.userValidationResult.duplicates.bob.selectedUserId,
       -1,
-      'duplicate set selectedUserId'
+      'duplicate set selectedUserId',
     )
     equal(newState.userValidationResult.duplicates.bob.skip, true, 'duplicate set skip')
 
@@ -399,7 +399,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult.validUsers,
       goodUsers,
-      'userValidationResult.avalidUsers'
+      'userValidationResult.avalidUsers',
     )
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
@@ -409,7 +409,7 @@ describe('Course Enrollment Add People Reducer', () => {
     // create a new bob
     const newState = reduce(
       actions.enqueueNewForDuplicate({address: 'bob', newUserInfo: USER_BOB}),
-      runningState
+      runningState,
     )
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
@@ -419,20 +419,20 @@ describe('Course Enrollment Add People Reducer', () => {
     equal(
       newState.userValidationResult.duplicates.bob.selectedUserId,
       -1,
-      'duplicate set selectedUserId'
+      'duplicate set selectedUserId',
     )
     equal(newState.userValidationResult.duplicates.bob.skip, false, 'duplicate set skip')
     deepEqual(
       newState.userValidationResult.duplicates.bob.newUserInfo,
       USER_BOB,
-      'duplicate set newUserInfo'
+      'duplicate set newUserInfo',
     )
 
     deepEqual(newState.userValidationResult.missing, missingList, 'userValidationResult.missing')
     deepEqual(
       newState.userValidationResult.validUsers,
       goodUsers,
-      'userValidationResult.avalidUsers'
+      'userValidationResult.avalidUsers',
     )
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
@@ -447,7 +447,7 @@ describe('Course Enrollment Add People Reducer', () => {
     // create a new user for amelia
     const newState = reduce(
       actions.enqueueNewForMissing({address: 'amelia', newUserInfo: USER_AMELIA}),
-      runningState
+      runningState,
     )
 
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
@@ -457,19 +457,19 @@ describe('Course Enrollment Add People Reducer', () => {
     equal(
       newState.userValidationResult.missing.amelia.createNew,
       true,
-      'missing entry set createNew'
+      'missing entry set createNew',
     )
     deepEqual(
       newState.userValidationResult.missing.amelia.newUserInfo,
       USER_AMELIA,
-      'missing entry has newUserInfo'
+      'missing entry has newUserInfo',
     )
 
     deepEqual(newState.userValidationResult.duplicates, dupeList, 'userValidationResult.dupliates')
     deepEqual(
       newState.userValidationResult.validUsers,
       goodUsers,
-      'userValidationResult.avalidUsers'
+      'userValidationResult.avalidUsers',
     )
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
@@ -478,7 +478,7 @@ describe('Course Enrollment Add People Reducer', () => {
   test('ENQUEUE_NEW_FOR_MISSING, unselect user', () => {
     const newState = reduce(
       actions.enqueueNewForMissing({address: 'amelia', newUserInfo: false}),
-      runningState
+      runningState,
     )
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
@@ -487,19 +487,19 @@ describe('Course Enrollment Add People Reducer', () => {
     equal(
       newState.userValidationResult.missing.amelia.createNew,
       false,
-      'missing entry unset createNew'
+      'missing entry unset createNew',
     )
     deepEqual(
       newState.userValidationResult.missing.amelia.newUserInfo,
       USER_AMELIA,
-      'missing entry still has newUserInfo'
+      'missing entry still has newUserInfo',
     )
 
     deepEqual(newState.userValidationResult.duplicates, dupeList, 'userValidationResult.dupliates')
     deepEqual(
       newState.userValidationResult.validUsers,
       goodUsers,
-      'userValidationResult.avalidUsers'
+      'userValidationResult.avalidUsers',
     )
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
@@ -514,7 +514,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult,
       runningState.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, runningState.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
@@ -528,7 +528,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult,
       runningState.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, runningState.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
@@ -543,7 +543,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult,
       runningState.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, runningState.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
@@ -558,12 +558,12 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.apiState,
       {pendingCount: 0, error: 'uh oh'},
-      'api is no longer in-flight and has error'
+      'api is no longer in-flight and has error',
     )
     deepEqual(
       newState.userValidationResult,
       runningState.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, runningState.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
@@ -578,7 +578,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult,
       runningState.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, goodUsers, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
@@ -592,7 +592,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult,
       runningState.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, goodUsers, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
@@ -606,7 +606,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult,
       runningState.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, [], 'usersToBeEnrolled is emptied')
     equal(Boolean(newState.usersEnrolled), true, 'usersEnrolled')
@@ -618,7 +618,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.apiState,
       {pendingCount: 0, error: 'whoops'},
-      'api is no longer in-flight and has error'
+      'api is no longer in-flight and has error',
     )
   })
   test(' ', () => {
@@ -629,7 +629,7 @@ describe('Course Enrollment Add People Reducer', () => {
     deepEqual(
       newState.userValidationResult,
       INITIAL_STATE.userValidationResult,
-      'userValidationResult'
+      'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')

@@ -92,7 +92,7 @@ export default class EditableNumber extends React.Component {
       if (this._inputRef) {
         fontSize = parseInt(
           window.getComputedStyle(this._inputRef).getPropertyValue('font-size'),
-          10
+          10,
         )
       }
     } catch (_ignore) {
@@ -142,7 +142,6 @@ export default class EditableNumber extends React.Component {
   }
 
   renderView = () => {
-    // eslint-disable-next-line react/forbid-foreign-prop-types
     const p = omitProps(this.props, EditableNumber.propTypes, ['mode'])
     const color = this.props.value ? 'primary' : 'secondary'
     return (
@@ -174,7 +173,6 @@ export default class EditableNumber extends React.Component {
   }
 
   renderEditor = ({onBlur, editorRef}) => {
-    // eslint-disable-next-line react/forbid-foreign-prop-types
     const p = omitProps(this.props, EditableNumber.propTypes, ['mode'])
     return (
       <NumberInput

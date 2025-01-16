@@ -20,7 +20,7 @@ import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfi
 import type {JsonUrlWizardService} from '../JsonUrlWizardService'
 
 export const mockJsonUrlWizardService = (
-  mocked?: Partial<JsonUrlWizardService>
+  mocked?: Partial<JsonUrlWizardService>,
 ): JsonUrlWizardService => ({
   fetchThirdPartyToolConfiguration: jest.fn(),
   ...mocked,

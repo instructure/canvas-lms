@@ -17,7 +17,7 @@
 
 import DialogManager from './dialog_manager'
 import CommentUiLoader from './comment_ui_loader'
-import K5Uploader from '@instructure/k5uploader'
+import {K5Uploader} from '@instructure/k5uploader'
 import UploadViewManager from './upload_view_manager'
 import KalturaSessionLoader from './kaltura_session_loader'
 import FileInputManager from './file_input_manager'
@@ -40,7 +40,7 @@ export default class JsUploader {
     return this.kSession.loadSession(
       '/api/v1/services/kaltura_session',
       this.initialize,
-      this.uploadViewManager.showConfigError
+      this.uploadViewManager.showConfigError,
     )
   }
 
@@ -89,7 +89,7 @@ export default class JsUploader {
     return this.uploadViewManager.monitorUpload(
       this.uploader,
       this.fileInputManager.allowedMedia,
-      this.file
+      this.file,
     )
   }
 

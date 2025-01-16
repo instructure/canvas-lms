@@ -16,13 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {assignLocation} from '@canvas/util/globalUtils'
+import {QueryClient} from '@tanstack/react-query'
 import {render, screen, waitFor} from '@testing-library/react'
-import UserObservees, {type Observee} from '../UserObservees'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
-import {QueryClient} from '@tanstack/react-query'
-import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import React from 'react'
+import UserObservees, {type Observee} from '../UserObservees'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 describe('UserObservees', () => {
   const queryClient = new QueryClient({
@@ -61,18 +66,12 @@ describe('UserObservees', () => {
     render(
       <MockedQueryClientProvider client={queryClient}>
         <UserObservees userId={userId} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
 
   beforeAll(() => {
     fetchMock.get(GET_POST_OBSERVEES_URI, [])
     global.window = Object.create(window)
-    Object.defineProperty(window, 'location', {
-      value: {
-        href: '',
-      },
-      writable: true,
-    })
   })
 
   afterEach(() => {
@@ -94,7 +93,7 @@ describe('UserObservees', () => {
       fetchMock.get(
         GET_POST_OBSERVEES_URI,
         {status: 500, body: {error: 'Unknown error'}},
-        {overwriteRoutes: true}
+        {overwriteRoutes: true},
       )
       renderComponent()
 
@@ -141,7 +140,7 @@ describe('UserObservees', () => {
           fetchMock.post(
             GET_POST_OBSERVEES_URI,
             {...newObservee, redirect: redirectUrl},
-            {overwriteRoutes: true}
+            {overwriteRoutes: true},
           )
           renderComponent()
           const pairingCode = screen.getByLabelText('Student Pairing Code *')
@@ -152,7 +151,7 @@ describe('UserObservees', () => {
 
           await waitFor(() => {
             expect(confirmMock).toHaveBeenCalled()
-            expect(window.location.href).toBe(redirectUrl)
+            expect(assignLocation).toHaveBeenCalledWith(redirectUrl)
           })
         })
       })
@@ -205,7 +204,7 @@ describe('UserObservees', () => {
         fetchMock.delete(
           createDeleteObserveeUri(observeeToDelete.id),
           {...observeeToDelete},
-          {overwriteRoutes: true}
+          {overwriteRoutes: true},
         )
         renderComponent()
         const removeButton = await screen.findByLabelText(`Remove ${observeeToDelete.name}`)
@@ -229,7 +228,7 @@ describe('UserObservees', () => {
           {status: 500},
           {
             overwriteRoutes: true,
-          }
+          },
         )
         renderComponent()
         const removeButton = await screen.findByLabelText(`Remove ${observeeToDelete.name}`)

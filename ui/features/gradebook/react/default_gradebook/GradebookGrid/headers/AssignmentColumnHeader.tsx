@@ -65,7 +65,7 @@ function labelForHideGradesAction(hideGradesAction: {
 
 function speedGraderUrl(assignment: {courseId: string; id: string}) {
   return encodeURI(
-    `/courses/${assignment.courseId}/gradebook/speed_grader?assignment_id=${assignment.id}`
+    `/courses/${assignment.courseId}/gradebook/speed_grader?assignment_id=${assignment.id}`,
   )
 }
 
@@ -294,7 +294,9 @@ export default class AssignmentColumnHeader extends ColumnHeader<
   }
 
   rubricAssessmentImportExportDisplayed = () =>
-    this.props.assignment.hasRubric && !this.props.assignment.anonymizeStudents && this.props.rubricAssessmentImportsExportsEnabled
+    this.props.assignment.hasRubric &&
+    !this.props.assignment.anonymizeStudents &&
+    this.props.rubricAssessmentImportsExportsEnabled
 
   renderAssignmentLink() {
     const assignment = this.props.assignment

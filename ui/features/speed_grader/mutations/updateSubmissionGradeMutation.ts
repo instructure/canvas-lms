@@ -77,6 +77,7 @@ function transform(result: any) {
       _id: submission.id,
       grade: submission.grade,
       score: submission.score,
+      gradingStatus: submission.grading_status,
     },
   }
 }

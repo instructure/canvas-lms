@@ -35,7 +35,12 @@ import ProjectedDates from './projected_dates/projected_dates'
 import Settings from './settings/settings'
 import BlueprintLock from './blueprint_lock'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
-import {getBlueprintLocked, getSelectedContextId, getSelectedContextType, getSyncing} from '../../reducers/ui'
+import {
+  getBlueprintLocked,
+  getSelectedContextId,
+  getSelectedContextType,
+  getSyncing,
+} from '../../reducers/ui'
 import {getCoursePace, isNewPace, getIsDraftPace} from '../../reducers/course_paces'
 import type {PaceContext, CoursePace, StoreState, ResponsiveSizes} from '../../types'
 import {actions} from '../../actions/ui'
@@ -75,13 +80,13 @@ export type HeaderProps = PassedProps & StoreProps & DispatchProps
 
 const NEW_PACE_ALERT_MESSAGES = {
   Course: I18n.t(
-    'This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.'
+    'This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.',
   ),
   Section: I18n.t(
-    'This is a new section pace and all changes are unpublished. Publish to save any changes and create the pace.'
+    'This is a new section pace and all changes are unpublished. Publish to save any changes and create the pace.',
   ),
   Enrollment: I18n.t(
-    'This is a new student pace and all changes are unpublished. Publish to save any changes and create the pace.'
+    'This is a new student pace and all changes are unpublished. Publish to save any changes and create the pace.',
   ),
 }
 
@@ -93,7 +98,7 @@ export const Header = (props: HeaderProps) => {
   const fetchDefaultPaceContext = props.fetchDefaultPaceContext
   const updated_at = props.coursePace?.updated_at
   const durationTooltipText = I18n.t(
-    'This duration does not take into account weekends and blackout days.'
+    'This duration does not take into account weekends and blackout days.',
   )
 
   useEffect(() => {
@@ -158,27 +163,29 @@ export const Header = (props: HeaderProps) => {
             ) : null}
             <Text wrap="break-word">
               {I18n.t(
-                "Course Pacing is an automated tool that sets differentiated due dates for assessments and learning activities based on each students' enrollment date, enabling structured, self-paced learning in rolling enrollment courses."
+                "Course Pacing is an automated tool that sets differentiated due dates for assessments and learning activities based on each students' enrollment date, enabling structured, self-paced learning in rolling enrollment courses.",
               )}
             </Text>
             {props.isDraftPace ? (
               <>
-                <br/>
-                <Pill data-testid="draft-pace-status-pill" margin="small 0" statusLabel="Status">Draft</Pill>
+                <br />
+                <Pill data-testid="draft-pace-status-pill" margin="small 0" statusLabel="Status">
+                  Draft
+                </Pill>
               </>
-            ) : null }
+            ) : null}
           </Flex.Item>
           <Flex.Item margin="none none auto none">
             {props.isDraftPace ? (
-              <Button 
+              <Button
                 color="success"
                 data-testid="direct-publish-draft-pace-button"
-                renderIcon={!props.isSyncing ? <IconPublishSolid/> : null}
+                renderIcon={!props.isSyncing ? <IconPublishSolid /> : null}
                 onClick={() => handlePublishClicked()}
               >
                 {getPublishLabel()}
               </Button>
-            ) : null }
+            ) : null}
           </Flex.Item>
         </Flex>
 

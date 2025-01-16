@@ -53,7 +53,7 @@ const I18n = createI18nScope('AssignmentListItemView')
 
 let AssignmentListItemView
 
-export default AssignmentListItemView = (function () {
+export default (AssignmentListItemView = (function () {
   AssignmentListItemView = class AssignmentListItemView extends Backbone.View {
     constructor(...args) {
       super(...args)
@@ -142,7 +142,7 @@ export default AssignmentListItemView = (function () {
           ag_move_label() {
             return I18n.beforeLabel(I18n.t('Assignment Group'))
           },
-        }
+        },
       )
     }
 
@@ -253,7 +253,7 @@ export default AssignmentListItemView = (function () {
             this.model.collection.view != null
               ? this.model.collection.view.parentCollection
               : undefined,
-            col => col.get('assignments')
+            col => col.get('assignments'),
           ),
         },
         onMoveSuccess: res => {
@@ -265,7 +265,7 @@ export default AssignmentListItemView = (function () {
             res.data.order,
             res.groupId,
             this.model,
-            keys
+            keys,
           )
         },
         focusOnExit: () => {
@@ -328,32 +328,30 @@ export default AssignmentListItemView = (function () {
             this.$el.find(`#assignment_student_checkpoints_${this.model.id}`) ?? []
           const mountPoint = checkpointsElem[0]
 
-           
           ReactDOM.render(
             React.createElement(ListViewCheckpoints, {
               assignment: attributes,
             }),
-            mountPoint
+            mountPoint,
           )
         } catch (error) {
           const errorMessage = I18n.t('Checkpoints mount point element not found')
-           
+
           console.error(errorMessage, error)
           captureException(new Error(errorMessage), error)
         }
       } else if (checkpoints && checkpoints.length && this.canManage()) {
         const checkpointsElem = this.$el.find(
-          `#assignment_teacher_checkpoint_info_${this.model.id}`
+          `#assignment_teacher_checkpoint_info_${this.model.id}`,
         )
         const mountPoint = checkpointsElem[0]
         if (mountPoint) {
           try {
-             
             ReactDOM.render(
               React.createElement(TeacherCheckpointsInfo, {
                 assignment: this.model.attributes,
               }),
-              mountPoint
+              mountPoint,
             )
           } catch (error) {
             const errorMessage = I18n.t('Checkpoints mount point element not found')
@@ -368,12 +366,11 @@ export default AssignmentListItemView = (function () {
           this.$el.find(`#assignment_student_peer_review_${this.model.id}`) ?? []
         const mountPoint = peerReviewElem[0]
         if (mountPoint) {
-           
           ReactDOM.render(
             React.createElement(StudentViewPeerReviews, {
               assignment: attributes,
             }),
-            mountPoint
+            mountPoint,
           )
         }
       }
@@ -434,7 +431,6 @@ export default AssignmentListItemView = (function () {
       data.is_locked = this.model.isRestrictedByMasterCourse()
       data.isCheckpoint = this.model.get('checkpoints') && this.model.get('checkpoints').length > 0
       data.showAvailability =
-        !data.isCheckpoint &&
         !(this.model.inPacedCourse() && this.canManage()) &&
         (this.model.multipleDueDates() || !this.model.defaultDates().available())
       data.showDueDate =
@@ -444,7 +440,7 @@ export default AssignmentListItemView = (function () {
 
       data.cyoe = CyoeHelper.getItemData(
         data.id,
-        this.isGraded() && (!this.model.isQuiz() || data.is_quiz_assignment)
+        this.isGraded() && (!this.model.isQuiz() || data.is_quiz_assignment),
       )
       data.return_to = encodeURIComponent(window.location.pathname)
 
@@ -456,8 +452,8 @@ export default AssignmentListItemView = (function () {
       data.item_assignment_type = data.is_quiz_assignment
         ? 'quiz'
         : data.isQuizLTIAssignment
-        ? 'lti-quiz'
-        : 'assignment'
+          ? 'lti-quiz'
+          : 'assignment'
 
       if (data.canManage) {
         data.spanWidth = 'span3'
@@ -495,7 +491,6 @@ export default AssignmentListItemView = (function () {
           return (tool.url = tool.base_url + `&assignments[]=${this.model.get('id')}`)
         })
       }
-
       if ((modules = this.model.get('modules'))) {
         const moduleName = modules[0]
         const has_modules = modules.length > 0
@@ -618,7 +613,7 @@ export default AssignmentListItemView = (function () {
         ReactDOM.unmountComponentAtNode(mountPoint)
         mountPoint.innerHTML = ''
       }
-       
+
       ReactDOM.render(
         <ItemAssignToManager
           open={open}
@@ -635,7 +630,7 @@ export default AssignmentListItemView = (function () {
           isCheckpointed={itemProps.isCheckpoint}
           {...itemProps}
         />,
-        mountPoint
+        mountPoint,
       )
     }
 
@@ -664,7 +659,7 @@ export default AssignmentListItemView = (function () {
       if (!this.canDelete()) {
         return
       }
-       
+
       if (!window.confirm(this.messages.confirm)) {
         return this.$el.find('a[id*=manage_link]').focus()
       }
@@ -685,7 +680,7 @@ export default AssignmentListItemView = (function () {
         if (!mountPoint) {
           return
         }
-         
+
         ReactDOM.render(
           React.createElement(DirectShareUserModal, {
             open,
@@ -694,7 +689,7 @@ export default AssignmentListItemView = (function () {
             shouldReturnFocus: false,
             onDismiss: dismissModal,
           }),
-          mountPoint
+          mountPoint,
         )
       }
 
@@ -714,7 +709,7 @@ export default AssignmentListItemView = (function () {
         if (!mountPoint) {
           return
         }
-         
+
         ReactDOM.render(
           React.createElement(DirectShareCourseTray, {
             open,
@@ -723,7 +718,7 @@ export default AssignmentListItemView = (function () {
             shouldReturnFocus: false,
             onDismiss: dismissTray,
           }),
-          mountPoint
+          mountPoint,
         )
       }
 
@@ -890,7 +885,7 @@ export default AssignmentListItemView = (function () {
               scoreToPercentage(json.submission.score, json.pointsPossible),
               ENV.grading_scheme,
               ENV.points_based,
-              ENV.scaling_factor
+              ENV.scaling_factor,
             )
           }
         }
@@ -1003,7 +998,7 @@ export default AssignmentListItemView = (function () {
   }
   AssignmentListItemView.initClass()
   return AssignmentListItemView
-})()
+})())
 
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null ? transform(value) : undefined

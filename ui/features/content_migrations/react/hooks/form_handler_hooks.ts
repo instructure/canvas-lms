@@ -23,7 +23,7 @@ const submit = (
   formData: any,
   setFileError: React.Dispatch<React.SetStateAction<boolean>>,
   onSubmit: onSubmitMigrationFormCallback,
-  file: File | null
+  file: File | null,
 ) => {
   if (file) {
     setFileError(false)
@@ -42,7 +42,7 @@ const isFormInvalid = (
   formData: any,
   setFileError: Dispatch<SetStateAction<boolean>>,
   questionBankSettings?: QuestionBankSettings | null,
-  setQuestionBankError?: Dispatch<SetStateAction<boolean>>
+  setQuestionBankError?: Dispatch<SetStateAction<boolean>>,
 ): boolean => {
   if (!formData) {
     setFileError(true)
@@ -73,7 +73,7 @@ const useSubmitHandler = (onSubmit: onSubmitMigrationFormCallback) => {
 
       submit(formData, setFileError, onSubmit, file)
     },
-    [onSubmit, file]
+    [onSubmit, file],
   )
 
   return {
@@ -88,7 +88,7 @@ const useSubmitHandlerWithQuestionBank = (onSubmit: onSubmitMigrationFormCallbac
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
   const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>(
-    null
+    null,
   )
   const [questionBankError, setQuestionBankError] = useState<boolean>(false)
 
@@ -105,7 +105,7 @@ const useSubmitHandlerWithQuestionBank = (onSubmit: onSubmitMigrationFormCallbac
 
       submit(formData, setFileError, onSubmit, file)
     },
-    [onSubmit, file, questionBankSettings]
+    [onSubmit, file, questionBankSettings],
   )
 
   return {

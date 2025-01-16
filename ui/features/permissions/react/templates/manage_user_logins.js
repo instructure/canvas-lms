@@ -45,13 +45,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Logging tab)'),
       description: I18n.t(
-        'If Users - manage login details or Statistics - view is enabled, the user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled.'
+        'If Users - manage login details or Statistics - view is enabled, the user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled.',
       ),
     },
     {
       title: I18n.t('People (Account)'),
       description: I18n.t(
-        'To view users and user account details, Users - view list must be enabled.'
+        'To view users and user account details, Users - view list must be enabled.',
       ),
     },
     {
@@ -59,23 +59,23 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To view a user’s SIS ID, SIS Data - manage or SIS Data - read must also be enabled.'
+        'To view a user’s SIS ID, SIS Data - manage or SIS Data - read must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To view a user’s Integration ID, SIS Data - manage must also be enabled.'
+        'To view a user’s Integration ID, SIS Data - manage must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To merge users, the Self Service User Merge feature option must also be enabled.'
+        'To merge users, the Self Service User Merge feature option must also be enabled.',
       ),
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
+        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).',
       ),
     },
     {
@@ -84,5 +84,5 @@ export const template = generateActionTemplates(
     },
   ],
   [],
-  []
+  [],
 )

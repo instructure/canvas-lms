@@ -59,10 +59,10 @@ describe('mediaCommentThumbnail', () => {
     // emulating the call from enhanceUserContent() in instructure.js
     $('.instructure_inline_media_comment', '#fixtures').mediaCommentThumbnail('normal')
     await awhile()
-    expect($('.media_comment_thumbnail', '#fixtures').length).toBe(1)
+    expect($('.media_comment_thumbnail', '#fixtures')).toHaveLength(1)
     const bgImage = $('.media_comment_thumbnail', '#fixtures').first().css('background-image')
     expect(bgImage).toContain(
-      `https://example.com/p/12345/thumbnail/entry_id/23/width/140/height/100/bgcolor/000000/type/2/vid_sec/5`
+      `https://example.com/p/12345/thumbnail/entry_id/23/width/140/height/100/bgcolor/000000/type/2/vid_sec/5`,
     )
   })
 
@@ -70,7 +70,7 @@ describe('mediaCommentThumbnail', () => {
     $('.instructure_inline_media_comment', '#fixtures').mediaCommentThumbnail('normal')
     await awhile()
     const screenreaderText = document.querySelector(
-      '.media_comment_thumbnail .screenreader-only'
+      '.media_comment_thumbnail .screenreader-only',
     ).innerText
     expect(screenreaderText).toBe('Play media comment by Tom from Oct 22 at 7:10pm.')
   })
@@ -86,12 +86,12 @@ describe('mediaCommentThumbnail', () => {
       >
         this is a media comment
       </a>
-    `)
+    `),
     )
     $('.instructure_inline_media_comment', '#fixtures').mediaCommentThumbnail('normal')
     await awhile()
     const screenreaderText = document.querySelector(
-      '.media_comment_thumbnail .screenreader-only'
+      '.media_comment_thumbnail .screenreader-only',
     ).innerText
     expect(screenreaderText).toBe('Play media comment.')
   })

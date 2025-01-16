@@ -32,7 +32,7 @@ describe('AssessmentAuditTray AuditTrail', () => {
       buildEvent({id: '4904', userId: '1104'}),
       buildEvent(
         {id: '4905', eventType: 'submission_updated', userId: '1101'},
-        {grade: [null, 'A']}
+        {grade: [null, 'A']},
       ),
     ]
 

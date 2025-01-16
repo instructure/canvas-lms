@@ -21,6 +21,7 @@ import moment from 'moment'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {captureException} from '@sentry/browser'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import type {Course, NodeStructure, RoleChoice, SelectedEnrollment} from '../types'
 
 declare const ENV: GlobalEnv & EnvCommon
 
@@ -38,7 +39,7 @@ const I18n = createI18nScope('temporary_enrollment')
 export function removeStringAffix(
   inputString: string,
   affix: string,
-  type: 'prefix' | 'suffix' = 'suffix'
+  type: 'prefix' | 'suffix' = 'suffix',
 ): string {
   if (!affix) {
     return inputString
@@ -79,9 +80,15 @@ export function getDayBoundaries(date: Date = new Date()): [Date, Date] {
  * @param {boolean} isInvalid True if the value cannot be parsed
  * @return {FormMessage[]} Array of messages to display in a DateTimeInput
  */
-export function generateDateTimeMessage(value: string | null, isInvalid: boolean): FormMessage[] {
-  if (isInvalid) {
-    return [{type: 'error', text: I18n.t('The chosen date and time is invalid.')}]
+export function generateDateTimeMessage(dateTime: {
+  value: string | null
+  isInvalid: boolean
+  wrongOrder: boolean
+}): FormMessage[] {
+  if (dateTime.isInvalid) {
+    return [{type: 'newError', text: I18n.t('The chosen date and time is invalid.')}]
+  } else if (dateTime.wrongOrder) {
+    return [{type: 'newError', text: I18n.t('The start date must be before the end date')}]
   } else if (
     ENV.CONTEXT_TIMEZONE &&
     ENV.TIMEZONE !== ENV.CONTEXT_TIMEZONE &&
@@ -91,22 +98,71 @@ export function generateDateTimeMessage(value: string | null, isInvalid: boolean
       {
         type: 'success',
         text: I18n.t('Local: %{datetime}', {
-          datetime: moment.tz(value, ENV.TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
+          datetime: moment.tz(dateTime.value, ENV.TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
         }),
       },
       {
         type: 'success',
         text: I18n.t('Account: %{datetime}', {
-          datetime: moment.tz(value, ENV.CONTEXT_TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
+          datetime: moment
+            .tz(dateTime.value, ENV.CONTEXT_TIMEZONE)
+            .format('ddd, MMM D, YYYY, h:mm A'),
         }),
       },
     ]
   } else {
     // default to returning local datetime if local and account are the same timezone
     return [
-      {type: 'success', text: moment.tz(value, ENV.TIMEZONE).format('ddd, MMM D, YYYY, h:mm A')},
+      {
+        type: 'success',
+        text: moment.tz(dateTime.value, ENV.TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
+      },
     ]
   }
+}
+
+export const handleCollectSelectedEnrollments = (
+  tree: NodeStructure[],
+  enrollmentsByCourse: Course[],
+  roleChoice: RoleChoice,
+): SelectedEnrollment[] => {
+  const selectedEnrolls: SelectedEnrollment[] = []
+  for (const role in tree) {
+    for (const course of tree[role].children) {
+      for (const section of course.children) {
+        if (section.isCheck || (course.children.length === 1 && course.isCheck)) {
+          if (enrollmentsByCourse) {
+            enrollmentsByCourse.forEach((c: Course) => {
+              const courseId = course.id.slice(1) // remove leading 'c' prefix from course.id
+              const sectionId = section.id.slice(1) // remove leading 's' prefix from section.id
+              let enrollment
+              if (c.id === courseId) {
+                enrollment = c.enrollments.find(
+                  matchedEnrollment =>
+                    // covers base role types
+                    matchedEnrollment.role_id === roleChoice.id ||
+                    // covers custom role types if existing enrollment with same role type is present
+                    matchedEnrollment.type === roleChoice.name.toLowerCase(),
+                )
+                if (enrollment === undefined) {
+                  // covers custom role types if no matching enrollment role type is present
+                  enrollment = c.enrollments[c.enrollments.length - 1]
+                }
+                if (enrollment) {
+                  selectedEnrolls.push({
+                    section: sectionId,
+                    limit_privileges_to_course_section:
+                      enrollment.limit_privileges_to_course_section,
+                  })
+                }
+              }
+            })
+          }
+        }
+      }
+    }
+  }
+  return selectedEnrolls
 }
 
 /**
@@ -129,12 +185,10 @@ export function getFromLocalStorage<T extends object>(storageKey: string): T | u
     if (typeof parsedValue === 'object' && parsedValue !== null) {
       return parsedValue as T
     } else {
-       
       console.warn(`Stored value for ${storageKey} is not an object.`)
       return
     }
   } catch (error) {
-     
     console.error(`Error fetching/parsing ${storageKey} from localStorage:`, error)
     captureException(error)
   }
@@ -154,7 +208,6 @@ export function setToLocalStorage<T>(storageKey: string, value: T): void {
     const serializedValue = JSON.stringify(value)
     localStorage.setItem(storageKey, serializedValue)
   } catch (error) {
-     
     console.error(`Error serializing/saving ${storageKey} to localStorage:`, error)
     captureException(error)
   }
@@ -172,7 +225,7 @@ export function setToLocalStorage<T>(storageKey: string, value: T): void {
 export function updateLocalStorageObject<T extends object>(
   storageKey: string,
   // using partial to allow partial updates of object
-  newValues: Partial<T>
+  newValues: Partial<T>,
 ): void {
   const existingData = getFromLocalStorage<T>(storageKey) || {}
 
@@ -210,7 +263,7 @@ export function safeDateConversion(date: Date | string | undefined): Date | unde
  */
 export function splitArrayByProperty(
   arr: any[],
-  property: string
+  property: string,
 ): {[propertyValue: string]: any[]} {
   return arr.reduce((result: {[x: string]: any[]}, obj: {[x: string]: any}) => {
     const index = obj[property]

@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {act, render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter, Routes} from 'react-router-dom'
+import {useNewLoginData} from '../../context'
 import {NewLoginRoutes} from '../NewLoginRoutes'
-import {act, render, screen, waitFor} from '@testing-library/react'
-import {useNewLogin} from '../../context/NewLoginContext'
 
 jest.mock('../../assets/images/instructure.svg', () => 'instructure.svg')
 jest.mock('../../pages/SignIn', () => () => <div>Sign In Page</div>)
@@ -40,16 +40,16 @@ jest.mock('react-router-dom', () => {
     ScrollRestoration: () => null,
   }
 })
-jest.mock('../../context/NewLoginContext', () => ({
-  ...jest.requireActual('../../context/NewLoginContext'),
-  useNewLogin: jest.fn(),
+jest.mock('../../context/NewLoginDataContext', () => ({
+  ...jest.requireActual('../../context/NewLoginDataContext'),
+  useNewLoginData: jest.fn(),
 }))
 
-const mockUseNewLogin = useNewLogin as jest.Mock
+const mockUseNewLoginData = useNewLoginData as jest.Mock
 
 describe('NewLoginRoutes', () => {
   beforeEach(() => {
-    mockUseNewLogin.mockReturnValue({
+    mockUseNewLoginData.mockReturnValue({
       selfRegistrationType: 'all',
     })
     jest.clearAllMocks()
@@ -60,7 +60,7 @@ describe('NewLoginRoutes', () => {
       render(
         <MemoryRouter initialEntries={['/login/canvas']}>
           <Routes>{NewLoginRoutes}</Routes>
-        </MemoryRouter>
+        </MemoryRouter>,
       )
     })
     await waitFor(() => expect(screen.getByText('Sign In Page')).toBeInTheDocument())
@@ -71,7 +71,7 @@ describe('NewLoginRoutes', () => {
       render(
         <MemoryRouter initialEntries={['/login/canvas/forgot-password']}>
           <Routes>{NewLoginRoutes}</Routes>
-        </MemoryRouter>
+        </MemoryRouter>,
       )
     })
     await waitFor(() => expect(screen.getByText('Forgot Password Page')).toBeInTheDocument())
@@ -83,7 +83,7 @@ describe('NewLoginRoutes', () => {
         render(
           <MemoryRouter initialEntries={['/login/canvas/register']}>
             <Routes>{NewLoginRoutes}</Routes>
-          </MemoryRouter>
+          </MemoryRouter>,
         )
       })
       await waitFor(() => expect(screen.getByText('Register Landing Page')).toBeInTheDocument())
@@ -94,7 +94,7 @@ describe('NewLoginRoutes', () => {
         render(
           <MemoryRouter initialEntries={['/login/canvas/register/student']}>
             <Routes>{NewLoginRoutes}</Routes>
-          </MemoryRouter>
+          </MemoryRouter>,
         )
       })
       await waitFor(() => expect(screen.getByText('Register Student Page')).toBeInTheDocument())
@@ -105,7 +105,7 @@ describe('NewLoginRoutes', () => {
         render(
           <MemoryRouter initialEntries={['/login/canvas/register/parent']}>
             <Routes>{NewLoginRoutes}</Routes>
-          </MemoryRouter>
+          </MemoryRouter>,
         )
       })
       await waitFor(() => expect(screen.getByText('Register Parent Page')).toBeInTheDocument())
@@ -116,7 +116,7 @@ describe('NewLoginRoutes', () => {
         render(
           <MemoryRouter initialEntries={['/login/canvas/register/teacher']}>
             <Routes>{NewLoginRoutes}</Routes>
-          </MemoryRouter>
+          </MemoryRouter>,
         )
       })
       await waitFor(() => expect(screen.getByText('Register Teacher Page')).toBeInTheDocument())

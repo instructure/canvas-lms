@@ -36,7 +36,7 @@ function renderGradingSchemesSelector(props: Partial<GradingSchemesSelectorProps
       archivedGradingSchemesEnabled={true}
       onChange={onChange}
       {...props}
-    />
+    />,
   )
 
   return {
@@ -77,7 +77,7 @@ describe('GradingSchemesSelector', () => {
             return Promise.resolve({response: {ok: false}})
           }
         }
-      }
+      },
     )
   })
 

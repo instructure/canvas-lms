@@ -16,23 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import RegistrationRoutesMiddleware from '../RegistrationRoutesMiddleware'
-import {MemoryRouter} from 'react-router-dom'
 import {render} from '@testing-library/react'
+import React from 'react'
+import {MemoryRouter} from 'react-router-dom'
+import {NewLoginDataProvider} from '../../context'
+import RegistrationRoutesMiddleware from '../RegistrationRoutesMiddleware'
 
-jest.mock('../../context/NewLoginContext', () => ({
-  useNewLogin: jest.fn(() => ({
-    selfRegistrationType: 'all',
-  })),
-}))
+jest.mock('../../context/NewLoginDataContext', () => {
+  const actualContext = jest.requireActual('../../context/NewLoginDataContext')
+  return {
+    ...actualContext,
+    useNewLoginData: () => ({
+      ...actualContext.useNewLoginData(),
+      // mock the data attribute default values that would normally be provided by the back-end
+      selfRegistrationType: 'all',
+    }),
+  }
+})
 
 describe('RegistrationRoutesMiddleware', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter initialEntries={['/login/canvas/register/landing']}>
-        <RegistrationRoutesMiddleware />
-      </MemoryRouter>
+        <NewLoginDataProvider>
+          <RegistrationRoutesMiddleware />
+        </NewLoginDataProvider>
+      </MemoryRouter>,
     )
   })
 })

@@ -27,7 +27,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('calculator.command')
 
 const calcCmd = {}
-
 ;(function () {
   const methods = {}
   const predefinedVariables = {}
@@ -421,7 +420,7 @@ const calcCmd = {}
       return Math.abs(val)
     },
     I18n.t('abs.description', 'Returns the absolute value of the given value'),
-    'abs(x)'
+    'abs(x)',
   )
   f(
     'asin',
@@ -429,7 +428,7 @@ const calcCmd = {}
       return Math.asin(x)
     },
     I18n.t('asin.description', 'Returns the arcsin of the given value'),
-    'asin(x)'
+    'asin(x)',
   )
   f(
     'acos',
@@ -437,7 +436,7 @@ const calcCmd = {}
       return Math.acos(x)
     },
     I18n.t('acos.description', 'Returns the arccos of the given value'),
-    'acos(x)'
+    'acos(x)',
   )
   f(
     'atan',
@@ -445,7 +444,7 @@ const calcCmd = {}
       return Math.atan(x)
     },
     I18n.t('atan.description', 'Returns the arctan of the given value'),
-    'atan(x)'
+    'atan(x)',
   )
   f(
     'log',
@@ -453,7 +452,7 @@ const calcCmd = {}
       return Math.log(x) / Math.log(base || 10)
     },
     I18n.t('log.description', 'Returns the log of the given value with an optional base'),
-    'log(x, [base])'
+    'log(x, [base])',
   )
   f(
     'ln',
@@ -461,7 +460,7 @@ const calcCmd = {}
       return Math.log(x)
     },
     I18n.t('ln.description', 'Returns the natural log of the given value'),
-    'ln(x)'
+    'ln(x)',
   )
   f(
     'rad_to_deg',
@@ -469,7 +468,7 @@ const calcCmd = {}
       return (x * 180) / Math.PI
     },
     I18n.t('rad_to_deg.description', 'Returns the given value converted from radians to degrees'),
-    'rad_to_deg(radians)'
+    'rad_to_deg(radians)',
   )
   f(
     'deg_to_rad',
@@ -477,7 +476,7 @@ const calcCmd = {}
       return (x * Math.PI) / 180
     },
     I18n.t('deg_to_rad.description', 'Returns the given value converted from degrees to radians'),
-    'deg_to_rad(degrees)'
+    'deg_to_rad(degrees)',
   )
   f(
     'sin',
@@ -485,7 +484,7 @@ const calcCmd = {}
       return Math.sin(x)
     },
     I18n.t('sin.description', 'Returns the sine of the given value'),
-    'sin(radians)'
+    'sin(radians)',
   )
   f(
     'cos',
@@ -493,7 +492,7 @@ const calcCmd = {}
       return Math.cos(x)
     },
     I18n.t('cos.description', 'Returns the cosine of the given value'),
-    'cos(radians)'
+    'cos(radians)',
   )
   f(
     'tan',
@@ -501,7 +500,7 @@ const calcCmd = {}
       return Math.tan(x)
     },
     I18n.t('tan.description', 'Returns the tangent of the given value'),
-    'tan(radians)'
+    'tan(radians)',
   )
 
   f(
@@ -510,7 +509,7 @@ const calcCmd = {}
       return 1 / Math.cos(x)
     },
     I18n.t('sec.description', 'Returns the secant of the given value'),
-    'sec(radians)'
+    'sec(radians)',
   )
   f(
     'cosec',
@@ -518,7 +517,7 @@ const calcCmd = {}
       return 1 / Math.sin(x)
     },
     I18n.t('cosec.description', 'Returns the cosecant of the given value'),
-    'cosec(radians)'
+    'cosec(radians)',
   )
   f(
     'cotan',
@@ -526,7 +525,7 @@ const calcCmd = {}
       return 1 / Math.tan(x)
     },
     I18n.t('cotan.description', 'Returns the cotangent of the given value'),
-    'cotan(radians)'
+    'cotan(radians)',
   )
 
   f(
@@ -535,7 +534,7 @@ const calcCmd = {}
       return Math.PI
     },
     I18n.t('pi.description', 'Returns the computed value of pi'),
-    'pi()'
+    'pi()',
   )
   f(
     'if',
@@ -544,9 +543,9 @@ const calcCmd = {}
     },
     I18n.t(
       'if.description',
-      'Evaluates the first argument, returns the second argument if it evaluates to a non-zero value, otherwise returns the third value'
+      'Evaluates the first argument, returns the second argument if it evaluates to a non-zero value, otherwise returns the third value',
     ),
-    'if(bool,success,fail)'
+    'if(bool,success,fail)',
   )
   const make_list = function (args) {
     if (args.length == 1 && args[0] instanceof Array) {
@@ -567,7 +566,7 @@ const calcCmd = {}
       return max
     },
     I18n.t('max.description', 'Returns the highest value in the list'),
-    ['max(a,b,c...)', 'max(list)']
+    ['max(a,b,c...)', 'max(list)'],
   )
   f(
     'min',
@@ -581,7 +580,7 @@ const calcCmd = {}
       return min
     },
     I18n.t('min.description', 'Returns the lowest value in the list'),
-    ['min(a,b,c...)', 'min(list)']
+    ['min(a,b,c...)', 'min(list)'],
   )
   f(
     'sqrt',
@@ -589,7 +588,7 @@ const calcCmd = {}
       return Math.sqrt(x)
     },
     I18n.t('sqrt.description', 'Returns the square root of the given value'),
-    'sqrt(x)'
+    'sqrt(x)',
   )
   f(
     'sort',
@@ -604,7 +603,7 @@ const calcCmd = {}
       })
     },
     I18n.t('sort.description', 'Returns the list of values, sorted from lowest to highest'),
-    ['sort(a,b,c...)', 'sort(list)']
+    ['sort(a,b,c...)', 'sort(list)'],
   )
   f(
     'reverse',
@@ -617,7 +616,7 @@ const calcCmd = {}
       return list
     },
     I18n.t('reverse.description', 'Reverses the order of the list of values'),
-    ['reverse(a,b,c...)', 'reverse(list)']
+    ['reverse(a,b,c...)', 'reverse(list)'],
   )
   f(
     'first',
@@ -625,7 +624,7 @@ const calcCmd = {}
       return make_list(arguments)[0]
     },
     I18n.t('first.description', 'Returns the first value in the list'),
-    ['first(a,b,c...)', 'first(list)']
+    ['first(a,b,c...)', 'first(list)'],
   )
   f(
     'last',
@@ -634,7 +633,7 @@ const calcCmd = {}
       return args[args.length - 1]
     },
     I18n.t('last.description', 'Returns the last value in the list'),
-    ['last(a,b,c...)', 'last(list)']
+    ['last(a,b,c...)', 'last(list)'],
   )
   f(
     'at',
@@ -642,7 +641,7 @@ const calcCmd = {}
       return list[x]
     },
     I18n.t('at.description', 'Returns the indexed value in the given list'),
-    'at(list,index)'
+    'at(list,index)',
   )
   f(
     'rand',
@@ -651,9 +650,9 @@ const calcCmd = {}
     },
     I18n.t(
       'rand.description',
-      'Returns a random number between zero and the range specified, or one if no number is given'
+      'Returns a random number between zero and the range specified, or one if no number is given',
     ),
-    'rand(x)'
+    'rand(x)',
   )
   f(
     'length',
@@ -661,7 +660,7 @@ const calcCmd = {}
       return make_list(arguments).length
     },
     I18n.t('length.description', 'Returns the number of arguments in the given list'),
-    ['length(a,b,c...)', 'length(list)']
+    ['length(a,b,c...)', 'length(list)'],
   )
   const sum = function (list) {
     let total = 0
@@ -680,7 +679,7 @@ const calcCmd = {}
       return sum(args) / args.length
     },
     I18n.t('mean.description', 'Returns the average mean of the values in the list'),
-    ['mean(a,b,c...)', 'mean(list)']
+    ['mean(a,b,c...)', 'mean(list)'],
   )
   f(
     'median',
@@ -700,7 +699,7 @@ const calcCmd = {}
       }
     },
     I18n.t('median.description', 'Returns the median for the list of values'),
-    ['median(a,b,c...)', 'median(list)']
+    ['median(a,b,c...)', 'median(list)'],
   )
   f(
     'range',
@@ -714,7 +713,7 @@ const calcCmd = {}
       return list[list.length - 1] - list[0]
     },
     I18n.t('range.description', 'Returns the range for the list of values'),
-    ['range(a,b,c...)', 'range(list)']
+    ['range(a,b,c...)', 'range(list)'],
   )
   f(
     'count',
@@ -722,7 +721,7 @@ const calcCmd = {}
       return make_list(arguments).length
     },
     I18n.t('count.description', 'Returns the number of items in the list'),
-    ['count(a,b,c...)', 'count(list)']
+    ['count(a,b,c...)', 'count(list)'],
   )
   f(
     'sum',
@@ -730,7 +729,7 @@ const calcCmd = {}
       return sum(make_list(arguments))
     },
     I18n.t('sum.description', 'Returns the sum of the list of values'),
-    ['sum(a,b,c...)', 'sum(list)']
+    ['sum(a,b,c...)', 'sum(list)'],
   )
   const factorials = {}
   var fact = function (n) {
@@ -751,7 +750,7 @@ const calcCmd = {}
       return fact(n)
     },
     I18n.t('fact.description', 'Returns the factorial of the given number'),
-    'fact(n)'
+    'fact(n)',
   )
   f(
     'perm',
@@ -759,7 +758,7 @@ const calcCmd = {}
       return fact(n) / fact(n - k)
     },
     I18n.t('perm.description', 'Returns the permutation result for the given values'),
-    'perm(n, k)'
+    'perm(n, k)',
   )
   f(
     'comb',
@@ -767,7 +766,7 @@ const calcCmd = {}
       return fact(n) / (fact(k) * fact(n - k))
     },
     I18n.t('comb.description', 'Returns the combination result for the given values'),
-    'comb(n, k)'
+    'comb(n, k)',
   )
   f(
     'ceil',
@@ -775,7 +774,7 @@ const calcCmd = {}
       return Math.ceil(x)
     },
     I18n.t('ceil.description', 'Returns the ceiling for the given value'),
-    'ceil(x)'
+    'ceil(x)',
   )
   f(
     'floor',
@@ -783,7 +782,7 @@ const calcCmd = {}
       return Math.floor(x)
     },
     I18n.t('floor.description', 'Returns the floor for the given value'),
-    'floor(x)'
+    'floor(x)',
   )
   f(
     'round',
@@ -791,7 +790,7 @@ const calcCmd = {}
       return Math.round(x)
     },
     I18n.t('round.description', 'Returns the given value rounded to the nearest whole number'),
-    'round(x)'
+    'round(x)',
   )
   f(
     'e',
@@ -799,7 +798,7 @@ const calcCmd = {}
       return Math.exp(x || 1)
     },
     I18n.t('e.description', 'Returns the value for e'),
-    'e()'
+    'e()',
   )
 })()
 

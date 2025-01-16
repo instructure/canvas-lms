@@ -95,7 +95,7 @@ describe('MessageStudentsDialog', () => {
 
     const noRecipientsErrors = dialog.validateBeforeSave(
       {body: 'take your dang quiz'},
-      {recipients: []}
+      {recipients: []},
     )
     expect(noRecipientsErrors.recipientGroupName[0].message).toBeTruthy()
   })

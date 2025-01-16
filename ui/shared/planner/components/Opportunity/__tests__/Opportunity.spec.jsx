@@ -86,7 +86,7 @@ it('registers itself as animatable', () => {
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
       animatableIndex={42}
-    />
+    />,
   )
   expect(fakeRegister).toHaveBeenCalledWith('opportunity', ref.current, 42, ['1'])
 
@@ -98,7 +98,7 @@ it('registers itself as animatable', () => {
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
       animatableIndex={43}
-    />
+    />,
   )
   expect(fakeDeregister).toHaveBeenCalledWith('opportunity', ref.current, ['1'])
   expect(fakeRegister).toHaveBeenCalledWith('opportunity', ref.current, 43, ['2'])

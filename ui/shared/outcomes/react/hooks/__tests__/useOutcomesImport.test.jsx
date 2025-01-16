@@ -137,7 +137,7 @@ describe('useOutcomesImport', () => {
         },
         {
           interval: 5000,
-        }
+        },
       )
     })
 
@@ -397,7 +397,7 @@ describe('useOutcomesImport', () => {
         },
         {
           interval: 1000,
-        }
+        },
       )
     })
 

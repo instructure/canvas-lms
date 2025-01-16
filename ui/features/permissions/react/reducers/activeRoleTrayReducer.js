@@ -23,7 +23,7 @@ const activeRoleTrayReducer = handleActions(
     [actionTypes.DISPLAY_ROLE_TRAY]: (state, action) => ({roleId: action.payload.role.id}),
     [actionTypes.HIDE_ALL_TRAYS]: () => null,
   },
-  null
+  null,
 )
 
 export default activeRoleTrayReducer

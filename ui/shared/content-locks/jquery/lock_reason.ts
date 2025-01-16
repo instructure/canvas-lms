@@ -29,7 +29,7 @@ export default function lockExplanation(
     unlock_at?: string | null
     context_module?: {name?: string}
   },
-  type: 'quiz' | 'assignment' | 'topic' | 'file' | 'page'
+  type: 'quiz' | 'assignment' | 'topic' | 'file' | 'page',
 ): string | SafeString {
   // Any additions to this function should also be added to similar logic in ApplicationController.rb
   if (data.lock_at) {
@@ -61,7 +61,7 @@ export default function lockExplanation(
         return I18n.t(
           'messages.assignment_locked_until',
           'This assignment is locked until %{date}.',
-          {date: unlock_at}
+          {date: unlock_at},
         )
       case 'topic':
         return I18n.t('messages.topic_locked_until', 'This topic is locked until %{date}.', {
@@ -87,42 +87,42 @@ export default function lockExplanation(
         html += I18n.t(
           'messages.quiz_locked_module',
           "This quiz is part of the module *%{module}* and hasn't been unlocked yet.",
-          {module: data.context_module.name, wrapper: '<b>$1</b>'}
+          {module: data.context_module.name, wrapper: '<b>$1</b>'},
         )
         break
       case 'assignment':
         html += I18n.t(
           'messages.assignment_locked_module',
           "This assignment is part of the module *%{module}* and hasn't been unlocked yet.",
-          {module: data.context_module.name, wrapper: '<b>$1</b>'}
+          {module: data.context_module.name, wrapper: '<b>$1</b>'},
         )
         break
       case 'topic':
         html += I18n.t(
           'messages.topic_locked_module',
           "This topic is part of the module *%{module}* and hasn't been unlocked yet.",
-          {module: data.context_module.name, wrapper: '<b>$1</b>'}
+          {module: data.context_module.name, wrapper: '<b>$1</b>'},
         )
         break
       case 'file':
         html += I18n.t(
           'messages.file_locked_module',
           "This file is part of the module *%{module}* and hasn't been unlocked yet.",
-          {module: data.context_module.name, wrapper: '<b>$1</b>'}
+          {module: data.context_module.name, wrapper: '<b>$1</b>'},
         )
         break
       case 'page':
         html += I18n.t(
           'messages.page_locked_module',
           "This page is part of the module *%{module}* and hasn't been unlocked yet.",
-          {module: data.context_module.name, wrapper: '<b>$1</b>'}
+          {module: data.context_module.name, wrapper: '<b>$1</b>'},
         )
         break
       default:
         html += I18n.t(
           'messages.content_locked_module',
           "This content is part of the module *%{module}* and hasn't been unlocked yet.",
-          {module: data.context_module.name, wrapper: '<b>$1</b>'}
+          {module: data.context_module.name, wrapper: '<b>$1</b>'},
         )
         break
     }
@@ -132,8 +132,8 @@ export default function lockExplanation(
       html += htmlEscape(
         I18n.t(
           'messages.visit_modules_page_for_details',
-          'Visit the modules page for information on how to unlock this content.'
-        )
+          'Visit the modules page for information on how to unlock this content.',
+        ),
       )
       html += '</a>'
     }
@@ -143,32 +143,32 @@ export default function lockExplanation(
       case 'quiz':
         return I18n.t(
           'messages.quiz_locked_no_reason',
-          'This quiz is locked.  No other reason has been provided.'
+          'This quiz is locked.  No other reason has been provided.',
         )
       case 'assignment':
         return I18n.t(
           'messages.assignment_locked_no_reason',
-          'This assignment is locked.  No other reason has been provided.'
+          'This assignment is locked.  No other reason has been provided.',
         )
       case 'topic':
         return I18n.t(
           'messages.topic_locked_no_reason',
-          'This topic is locked.  No other reason has been provided.'
+          'This topic is locked.  No other reason has been provided.',
         )
       case 'file':
         return I18n.t(
           'messages.file_locked_no_reason',
-          'This file is locked.  No other reason has been provided.'
+          'This file is locked.  No other reason has been provided.',
         )
       case 'page':
         return I18n.t(
           'messages.page_locked_no_reason',
-          'This page is locked.  No other reason has been provided.'
+          'This page is locked.  No other reason has been provided.',
         )
       default:
         return I18n.t(
           'messages.content_locked_no_reason',
-          'This content is locked.  No other reason has been provided.'
+          'This content is locked.  No other reason has been provided.',
         )
     }
   }

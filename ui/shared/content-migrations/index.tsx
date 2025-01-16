@@ -17,10 +17,11 @@
  */
 
 import {
-  CollapsableList,
-  type CollapsableListProps,
-  type Item,
-} from './react/CollapsableList/CollapsableList'
+  type ItemType,
+  type CheckboxTreeNode,
+  type CheckboxState,
+  TreeSelector,
+} from './react/TreeSelector/TreeSelector'
 
 import {CommonMigratorControls} from './react/CommonMigratorControls/CommonMigratorControls'
 import {
@@ -33,8 +34,8 @@ import {
   type onSubmitMigrationFormCallback,
 } from './react/CommonMigratorControls/types'
 
-export {CollapsableList}
-export type {CollapsableListProps, Item}
+export {TreeSelector}
+export type {CheckboxTreeNode, CheckboxState, ItemType}
 export {CommonMigratorControls}
 export type {
   AdjustDates,

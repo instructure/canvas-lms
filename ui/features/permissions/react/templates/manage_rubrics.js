@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        'Determines visibility and management of the Rubrics link in Account Navigation.'
+        'Determines visibility and management of the Rubrics link in Account Navigation.',
       ),
     },
     {
@@ -37,7 +37,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        'Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add are enabled.'
+        'Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add are enabled.',
       ),
     },
   ],
@@ -45,7 +45,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        'Determines visibility and management of Rubrics link in Account Navigation.'
+        'Determines visibility and management of Rubrics link in Account Navigation.',
       ),
     },
     {
@@ -59,8 +59,8 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        'Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add is enabled.'
+        'Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add is enabled.',
       ),
     },
-  ]
+  ],
 )

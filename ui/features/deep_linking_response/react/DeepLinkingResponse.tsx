@@ -52,6 +52,17 @@ type ContentItemError = {
   message: string
 }
 
+const noContentBlurb = () => (
+  <View
+    display="inline-block"
+    padding="none small"
+    borderWidth="none none none large"
+    borderColor="danger"
+  >
+    <View display="block">{I18n.t('The external app returned with no content.')}</View>
+  </View>
+)
+
 const header = () => (
   <View
     display="inline-block"
@@ -62,7 +73,7 @@ const header = () => (
     <View display="block">
       {I18n.t(
         'One or more content items sent by this external app failed to process correctly. ' +
-          'These have not been saved by Canvas, and the reasons for failure are listed below.'
+          'These have not been saved by Canvas, and the reasons for failure are listed below.',
       )}
     </View>
     <View display="block" margin="small 0 0 0">
@@ -98,7 +109,7 @@ const buildContentItems = (items: ContentItem[]) =>
           ({
             title: item.title,
             error: {field, message},
-          } as ContentItemDisplay)
+          }) as ContentItemDisplay,
       )
       return [...acc, ...errorItems]
     }
@@ -120,6 +131,7 @@ export const RetrievingContent = ({environment, parentWindow}: RetrievingContent
   const subject = 'LtiDeepLinkingResponse'
   const deepLinkResponse = environment.deep_link_response as DeepLinkResponse
   const [hasErrors, setHasErrors] = useState(false)
+  const [noContent, setNoContent] = useState(false)
   const [contentItems, setContentItems] = useState<ContentItemDisplay[]>([])
 
   const sendMessage = useCallback(() => {
@@ -128,13 +140,16 @@ export const RetrievingContent = ({environment, parentWindow}: RetrievingContent
         subject,
         ...deepLinkResponse,
       },
-      environment.DEEP_LINKING_POST_MESSAGE_ORIGIN
+      environment.DEEP_LINKING_POST_MESSAGE_ORIGIN,
     )
   }, [deepLinkResponse, environment.DEEP_LINKING_POST_MESSAGE_ORIGIN, parentWindow])
 
   useEffect(() => {
+    if (deepLinkResponse.content_items?.length == 0) {
+      setNoContent(true)
+    }
     const anyItemHasError = deepLinkResponse.content_items.some(
-      item => Object.keys(item.errors || {}).length > 0
+      item => Object.keys(item.errors || {}).length > 0,
     )
     setHasErrors(anyItemHasError)
 
@@ -146,6 +161,10 @@ export const RetrievingContent = ({environment, parentWindow}: RetrievingContent
     const items = buildContentItems(deepLinkResponse.content_items)
     setContentItems(items)
   }, [deepLinkResponse.content_items, sendMessage])
+
+  if (noContent) {
+    return noContentBlurb()
+  }
 
   if (hasErrors) {
     return (

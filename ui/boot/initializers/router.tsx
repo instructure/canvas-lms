@@ -44,8 +44,16 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/act_as_modal/react/ActAsModalRoute')}
       />
       <Route
+        path="/accounts/:accountId/users/:userId"
+        lazy={() => import('../../features/page_views/react/PageViewsRoute')}
+      />
+      <Route
         path="/accounts"
         lazy={() => import('../../features/account_manage/react/AccountListRoute')}
+      />
+      <Route
+        path="/users/:userId"
+        lazy={() => import('../../features/page_views/react/PageViewsRoute')}
       />
 
       {accountGradingSettingsRoutes}
@@ -72,7 +80,7 @@ const portalRouter = createBrowserRouter(
 
 export function loadReactRouter() {
   const mountNode = document.querySelector('#react-router-portals')
-   
+
   const I18n = createI18nScope('main')
   if (mountNode) {
     const root = ReactDOM.createRoot(mountNode)

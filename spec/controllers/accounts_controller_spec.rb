@@ -1112,16 +1112,22 @@ describe AccountsController do
       @controller.instance_variable_set(:@domain_root_account, @account)
     end
 
-    it "returns a successful HTML response" do
+    it "returns a successful HTML response and disables custom CSS/JS and headers" do
       get "acceptable_use_policy", format: :html
       expect(response).to be_successful
       expect(response.content_type).to eq "text/html; charset=utf-8"
+      expect(assigns(:exclude_account_css)).to be(true)
+      expect(assigns(:exclude_account_js)).to be(true)
+      expect(assigns(:headers)).to be(false)
     end
 
-    it "returns a successful JSON response" do
+    it "returns a successful JSON response and does not set custom CSS/JS variables or headers" do
       get "acceptable_use_policy", format: :json
       expect(response).to be_successful
       expect(response.content_type).to eq "application/json; charset=utf-8"
+      expect(assigns(:exclude_account_css)).to be_nil
+      expect(assigns(:exclude_account_js)).to be_nil
+      expect(assigns(:headers)).to be_nil
     end
   end
 

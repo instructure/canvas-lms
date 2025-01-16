@@ -24,9 +24,10 @@ const setupFilesEnvWithAllContexts = () => {
     {
       contextType: 'users',
       contextId: '1',
-      root_folder_id: '1',
+      root_folder_id: '2',
       asset_string: 'user_1',
       permissions: {},
+      name: 'My Files',
     },
     {
       contextType: 'courses',
@@ -34,6 +35,7 @@ const setupFilesEnvWithAllContexts = () => {
       root_folder_id: '1',
       asset_string: 'course_1',
       permissions: {},
+      name: 'Course 1',
     },
   ]
   filesEnv.contextsDictionary = {
@@ -51,6 +53,7 @@ const setupFilesEnvWithSingleContext = () => {
       root_folder_id: '1',
       asset_string: 'course_1',
       permissions: {},
+      name: 'Course 1',
     },
   ]
   filesEnv.contextsDictionary = {

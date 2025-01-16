@@ -29,7 +29,7 @@ it('renders the value in view mode', () => {
       onChange={() => {}}
       onChangeMode={() => {}}
       label="The Label"
-    />
+    />,
   )
 
   expect(getByText('I am a paragraph of text')).toBeInTheDocument()
@@ -63,7 +63,7 @@ it('does not render edit button when readOnly', () => {
       onChangeMode={() => {}}
       label="The Label"
       readOnly={true}
-    />
+    />,
   )
   expect(queryByText('The Label')).toBeNull()
 })
@@ -77,7 +77,7 @@ it('shows the placeholder when value is all whitespace', () => {
       onChangeMode={() => {}}
       label="The Label"
       placeholder="the placeholder"
-    />
+    />,
   )
   expect(getByText('the placeholder')).toBeInTheDocument()
 })
@@ -92,10 +92,10 @@ it('shows the content and not the placeholder when value is all whitespace and r
       label="The Label"
       placeholder="the placeholder"
       readOnly={true}
-    />
+    />,
   )
   expect(queryByText('the placeholder')).toBeNull()
   expect(
-    getAllByText((_content, element) => /<p>&nbsp;<\/p>/.test(element.innerHTML))[0]
+    getAllByText((_content, element) => /<p>&nbsp;<\/p>/.test(element.innerHTML))[0],
   ).toBeInTheDocument()
 })

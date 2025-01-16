@@ -19,7 +19,6 @@
 import ChildCourse from '../ChildCourse'
 import select from '@canvas/obj-select'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
-import sinon from 'sinon'
 
 const ok = x => expect(x).toBeTruthy()
 const notOk = x => expect(x).toBeFalsy()
@@ -60,31 +59,31 @@ describe('ChildCourse class', () => {
   test('change log route onEnter calls app showChangeLog with params from URL', () => {
     child = new ChildCourse(container, defaultData())
     child.render()
-    child.app.showChangeLog = sinon.spy()
+    child.app.showChangeLog = jest.fn()
     child.routes[0].onEnter(
       {params: {blueprintType: 'template', templateId: '2', changeId: '3'}},
-      () => {}
+      () => {},
     )
-    equal(child.app.showChangeLog.callCount, 1)
-    deepEqual(child.app.showChangeLog.getCall(0).args[0], {
+    expect(child.app.showChangeLog).toHaveBeenCalledTimes(1)
+    expect(child.app.showChangeLog).toHaveBeenCalledWith({
       blueprintType: 'template',
       templateId: '2',
       changeId: '3',
     })
 
-    child.app.hideChangeLog = sinon.spy()
+    child.app.hideChangeLog = jest.fn()
     child.routes[0].onExit({}, () => {})
-    equal(child.app.hideChangeLog.callCount, 1)
+    expect(child.app.hideChangeLog).toHaveBeenCalledTimes(1)
   })
 
   test.skip('start calls render() and setupRouter()', () => {
     child = new ChildCourse(container, defaultData())
-    const renderStub = sinon.stub(child, 'render')
-    const setupRouterStub = sinon.stub(child, 'setupRouter')
+    const renderSpy = jest.spyOn(child, 'render')
+    const setupRouterSpy = jest.spyOn(child, 'setupRouter')
 
     child.start()
 
-    equal(renderStub.callCount, 1)
-    equal(setupRouterStub.callCount, 1)
+    expect(renderSpy).toHaveBeenCalledTimes(1)
+    expect(setupRouterSpy).toHaveBeenCalledTimes(1)
   })
 })

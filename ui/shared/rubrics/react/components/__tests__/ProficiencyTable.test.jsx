@@ -138,7 +138,7 @@ describe('default proficiency', () => {
     wrapper.instance().handleDescriptionChange(0)('')
     wrapper.find('Button').last().simulate('click')
     expect(findProficiencyRatings(wrapper).first().prop('descriptionError')).toBe(
-      'Missing required description'
+      'Missing required description',
     )
   })
 

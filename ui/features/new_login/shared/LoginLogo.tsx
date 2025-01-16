@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
-import {canvas} from '@instructure/ui-theme-tokens'
 import {Text} from '@instructure/ui-text'
-import {useNewLogin} from '../context/NewLoginContext'
+import {canvas} from '@instructure/ui-theme-tokens'
+import React from 'react'
+import {useNewLoginData} from '../context'
 
 const LoginLogo = () => {
-  const {loginLogoUrl: src, loginLogoText: text} = useNewLogin()
+  const {loginLogoUrl: src, loginLogoText: text} = useNewLoginData()
 
   if (!src) return null
 

@@ -44,7 +44,7 @@ const SectionToolbar = () => {
       setProp((prps: ContainerProps) => (prps.background = color))
       setColorModalOpen(false)
     },
-    [setProp]
+    [setProp],
   )
 
   const handleBackgroundColorButtonClick = useCallback(() => {

@@ -36,7 +36,7 @@ export default class Grid extends Component {
       shape({
         graderName: string,
         graderId: string.isRequired,
-      })
+      }),
     ).isRequired,
     grades: shape({}).isRequired,
     horizontalScrollRef: func.isRequired,
@@ -46,7 +46,7 @@ export default class Grid extends Component {
         speedGraderUrl: string.isRequired,
         studentId: string.isRequired,
         studentName: string.isRequired,
-      }).isRequired
+      }).isRequired,
     ).isRequired,
     selectProvisionalGradeStatuses: shape({}).isRequired,
   }

@@ -120,12 +120,12 @@ const enrollmentsByCourse = [
 ]
 
 const ENROLLMENTS_URI = encodeURI(
-  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections&include[]=term&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCourse[0].account_id}`
+  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections&include[]=term&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCourse[0].account_id}`,
 )
 
 // user_list did not match the encoded url (hence user_list[])
 const userListsData = {
-  'user_list[]': '',
+  'user_list[]': '1',
   v2: true,
   search_type: 'cc_path',
 }
@@ -169,7 +169,7 @@ describe('TempEnrollModal', () => {
     render(
       <TempEnrollModal {...modalProps}>
         <p>child_element</p>
-      </TempEnrollModal>
+      </TempEnrollModal>,
     )
 
     expect(screen.queryByText('Find recipients of Temporary Enrollments')).toBeNull()
@@ -185,14 +185,16 @@ describe('TempEnrollModal', () => {
       fetchMock.post(USER_LIST_URI, userData)
       userDetailsUriMock(recipientUser.user_id, recipientProfile)
       fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
-      render(
+      const {findByTestId} = render(
         <TempEnrollModal {...modalProps}>
           <p>child_element</p>
-        </TempEnrollModal>
+        </TempEnrollModal>,
       )
 
       // trigger the modal to open and display the search screen (page 1)
       await userEvent.click(screen.getByText('child_element'))
+      const searchArea = await findByTestId('search_area')
+      fireEvent.input(searchArea, {target: {value: '1'}})
     })
 
     it('hides the modal upon clicking the cancel button', async () => {
@@ -208,7 +210,7 @@ describe('TempEnrollModal', () => {
       // wait for the modal to close (including animation)
       await waitFor(() => {
         expect(
-          screen.queryByText('Find recipients of Temporary Enrollments')
+          screen.queryByText('Find recipients of Temporary Enrollments'),
         ).not.toBeInTheDocument()
       })
     })
@@ -237,9 +239,9 @@ describe('TempEnrollModal', () => {
       expect(submit).toBeInTheDocument()
       fireEvent.click(submit)
 
-      expect(fetchMock.calls(USER_LIST_URI).length).toBe(1)
-      expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
-      expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
+      expect(fetchMock.calls(USER_LIST_URI)).toHaveLength(1)
+      expect(fetchMock.calls('/api/v1/users/2/profile')).toHaveLength(1)
+      expect(fetchMock.calls(ENROLLMENTS_URI)).toHaveLength(1)
     })
 
     it('starts over when start over button is clicked', async () => {
@@ -261,8 +263,8 @@ describe('TempEnrollModal', () => {
         expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeNull()
       })
 
-      expect(fetchMock.calls(USER_LIST_URI).length).toBe(1)
-      expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
+      expect(fetchMock.calls(USER_LIST_URI)).toHaveLength(1)
+      expect(fetchMock.calls('/api/v1/users/2/profile')).toHaveLength(1)
     })
 
     it('goes back when the assign screen (page 3) back button is clicked', async () => {
@@ -274,7 +276,7 @@ describe('TempEnrollModal', () => {
       // click next to go to the search results screen (page 2)
       await userEvent.click(next)
       expect(
-        await screen.findByText(/One user is ready to be assigned temporary enrollments/)
+        await screen.findByText(/One user is ready to be assigned temporary enrollments/),
       ).toBeInTheDocument()
 
       // click next to go to the assign screen (page 3)
@@ -293,9 +295,9 @@ describe('TempEnrollModal', () => {
         expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeInTheDocument()
       })
 
-      expect(fetchMock.calls(USER_LIST_URI).length).toBe(1)
-      expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
-      expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
+      expect(fetchMock.calls(USER_LIST_URI)).toHaveLength(1)
+      expect(fetchMock.calls('/api/v1/users/2/profile')).toHaveLength(1)
+      expect(fetchMock.calls(ENROLLMENTS_URI)).toHaveLength(1)
     })
 
     it('buttons are enabled', async () => {

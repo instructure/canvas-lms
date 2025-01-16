@@ -1,4 +1,3 @@
- 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -103,7 +102,7 @@ $(document).on('click', '.license_help_link', function (event) {
       $dialog
         .loadingImage('remove')
         .html(html)
-        .triggerHandler('license_change', $select.val() || 'private')
+        .triggerHandler('license_change', $select.val() || 'private'),
     )
   }
 

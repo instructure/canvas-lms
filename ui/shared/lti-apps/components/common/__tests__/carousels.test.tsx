@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
+import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
-import ProductCarousel from '../Carousels/ProductCarousel'
 import ImageCarousel from '../Carousels/ImageCarousel'
-import {product, company} from './data'
+import ProductCarousel from '../Carousels/ProductCarousel'
+import {company, product} from './data'
 
 beforeAll(() => {
   Object.defineProperty(window, 'matchMedia', {
@@ -40,23 +40,7 @@ beforeAll(() => {
 })
 
 describe('Carousels render as expected', () => {
-  const originalLocation = window.location
-
-  afterEach(() => {
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: originalLocation,
-    })
-  })
-
   it('ProductCarousel renders as expected', () => {
-    const testPath = 'ipsum/lorem/12/dolor'
-
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: {...originalLocation, pathname: testPath},
-    })
-
     const {getByText} = render(<ProductCarousel products={product} companyName={company.name} />)
     expect(getByText('Product 1')).toBeInTheDocument()
   })

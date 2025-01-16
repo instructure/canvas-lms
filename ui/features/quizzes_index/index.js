@@ -49,17 +49,17 @@ const QuizzesIndexRouter = Backbone.Router.extend({
       assignment: this.createQuizItemGroupView(
         this.allQuizzes.assignment,
         this.translations.assignmentQuizzes,
-        'assignment'
+        'assignment',
       ),
       open: this.createQuizItemGroupView(
         this.allQuizzes.open,
         this.translations.practiceQuizzes,
-        'open'
+        'open',
       ),
       surveys: this.createQuizItemGroupView(
         this.allQuizzes.surveys,
         this.translations.surveys,
-        'surveys'
+        'surveys',
       ),
       noQuizzes: new NoQuizzesView(),
     }

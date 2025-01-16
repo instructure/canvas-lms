@@ -51,7 +51,7 @@ describe('SourceLink', () => {
       const component = renderComponent()
       expect(component.getByRole('link', {name: 'My Course'})).toHaveAttribute(
         'href',
-        'https://localhost/courses/1'
+        'https://localhost/courses/1',
       )
     })
   })
@@ -61,7 +61,7 @@ describe('SourceLink', () => {
       const component = renderComponent({migration_type: 'canvas_cartridge_importer'})
       expect(component.getByRole('link', {name: 'My Course'})).toHaveAttribute(
         'href',
-        'https://localhost/courses/1'
+        'https://localhost/courses/1',
       )
     })
 
@@ -73,7 +73,7 @@ describe('SourceLink', () => {
       })
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
@@ -85,7 +85,7 @@ describe('SourceLink', () => {
       })
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
@@ -103,7 +103,7 @@ describe('SourceLink', () => {
       const component = renderComponent({migration_type: 'zip_file_importer', attachment})
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
@@ -118,7 +118,7 @@ describe('SourceLink', () => {
       const component = renderComponent({migration_type: 'common_cartridge_importer', attachment})
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
@@ -133,7 +133,7 @@ describe('SourceLink', () => {
       const component = renderComponent({migration_type: 'moodle_converter', attachment})
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
@@ -148,7 +148,7 @@ describe('SourceLink', () => {
       const component = renderComponent({migration_type: 'qti_converter', attachment})
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 

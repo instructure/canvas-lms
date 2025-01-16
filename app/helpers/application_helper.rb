@@ -167,7 +167,7 @@ module ApplicationHelper
     end.any?
   end
 
-  def hidden(include_style = false)
+  def hidden(include_style: false)
     include_style ? "style='display:none;'".html_safe : "display: none;"
   end
 
@@ -268,7 +268,7 @@ module ApplicationHelper
     @rendered_css_bundles += new_css_bundles
 
     unless new_css_bundles.empty?
-      bundles = new_css_bundles.map { |(bundle, plugin)| css_url_for(bundle, plugin) }
+      bundles = new_css_bundles.map { |(bundle, plugin)| css_url_for(bundle, plugin:) }
       bundles << css_url_for("disable_transitions") if disable_css_transitions?
       bundles << { media: "all" }
       tags = bundles.map { |bundle| stylesheet_link_tag(bundle) }
@@ -286,14 +286,14 @@ module ApplicationHelper
     I18n.rtl? ? { "left" => "right", "right" => "left" }[left_or_right] : left_or_right
   end
 
-  def css_variant(opts = {})
+  def css_variant(force_high_contrast: false)
     use_high_contrast =
-      @current_user&.prefers_high_contrast? || opts[:force_high_contrast]
+      @current_user&.prefers_high_contrast? || force_high_contrast
     "new_styles" + + (use_high_contrast ? "_high_contrast" : "_normal_contrast") +
       (I18n.rtl? ? "_rtl" : "")
   end
 
-  def css_url_for(bundle_name, plugin = false, opts = {})
+  def css_url_for(bundle_name, plugin: false, force_high_contrast: false)
     bundle_path =
       if plugin
         "../../gems/plugins/#{plugin}/app/stylesheets/#{bundle_name}"
@@ -301,8 +301,8 @@ module ApplicationHelper
         "bundles/#{bundle_name}"
       end
 
-    cache = BrandableCSS.cache_for(bundle_path, css_variant(opts))
-    base_dir = cache[:includesNoVariables] ? "no_variables" : css_variant(opts)
+    cache = BrandableCSS.cache_for(bundle_path, css_variant(force_high_contrast:))
+    base_dir = cache[:includesNoVariables] ? "no_variables" : css_variant(force_high_contrast:)
     File.join("/dist", "brandable_css", base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
   end
 

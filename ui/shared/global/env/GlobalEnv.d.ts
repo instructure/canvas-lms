@@ -32,6 +32,7 @@ import {EnvWikiPages} from './EnvWikiPages'
 import {EnvContentMigrations} from './ContentMigrations'
 import {EnvDiscussions} from './EnvDiscussions'
 import {EnvProfiles} from './EnvProfiles'
+import {EnvChangePassword} from './EnvChangePassword'
 
 /**
  * Top level ENV variable.
@@ -62,5 +63,6 @@ export type GlobalEnv =
         EnvWikiPages &
         EnvContentMigrations &
         EnvDiscussions &
-        EnvProfiles
+        EnvProfiles &
+        EnvChangePassword
     >

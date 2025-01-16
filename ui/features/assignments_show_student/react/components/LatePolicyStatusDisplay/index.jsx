@@ -61,13 +61,13 @@ export default function LatePolicyStatusDisplay(props) {
               <ScreenReaderContent>
                 {I18n.t(
                   {one: 'Late Policy: minus 1 Point', other: 'Late Policy: minus %{count} Points'},
-                  {count: props.pointsDeducted}
+                  {count: props.pointsDeducted},
                 )}
               </ScreenReaderContent>
               <Text aria-hidden="true" size="medium">
                 {I18n.t(
                   {one: '-1 Point', other: '-%{count} Points'},
-                  {count: props.pointsDeducted}
+                  {count: props.pointsDeducted},
                 )}
               </Text>
             </Link>

@@ -89,7 +89,7 @@ describe('WebcamCapture', () => {
       expect(
         await screen.findByRole('button', {
           name: /take photo/i,
-        })
+        }),
       ).toBeInTheDocument()
     })
 
@@ -189,7 +189,7 @@ describe('WebcamCapture', () => {
         fireEvent.click(saveButton)
 
         expect(onSelectImage).toHaveBeenCalledWith(
-          expect.objectContaining({filename: 'not-a-webcam-picture.png'})
+          expect.objectContaining({filename: 'not-a-webcam-picture.png'}),
         )
       })
 

@@ -82,7 +82,7 @@ describe('ScoreToGradeHelper#scoreToGrade', () => {
         ['B', 0.8],
         ['C', 0.7],
         ['F', 0],
-      ]
+      ],
     )
     expect(grade).toBe('C')
   })

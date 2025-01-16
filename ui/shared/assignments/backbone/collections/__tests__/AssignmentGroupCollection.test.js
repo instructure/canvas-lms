@@ -69,7 +69,7 @@ describe('AssignmentGroupCollection', () => {
     strictEqual(
       collection_.courseSubmissionsURL,
       COURSE_SUBMISSIONS_URL,
-      'assigns courseSubmissionsURL to courseSubmissionsURL'
+      'assigns courseSubmissionsURL to courseSubmissionsURL',
     )
     strictEqual(collection_.course, course, 'assigns course to course')
   })
@@ -91,7 +91,7 @@ describe('AssignmentGroupCollection', () => {
     const lastAssignment = assignments[3]
     lastAssignment.on(
       'change:submission',
-      () => (triggeredChangeForAssignmentWithoutSubmission = true)
+      () => (triggeredChangeForAssignmentWithoutSubmission = true),
     )
     collection.getGrades()
     server.respond()
@@ -100,12 +100,12 @@ describe('AssignmentGroupCollection', () => {
       equal(
         assignment.get('submission').get('grade'),
         assignment.get('id'),
-        'sets submission grade for assignments with a matching submission'
+        'sets submission grade for assignments with a matching submission',
       )
     }
     ok(
       triggeredChangeForAssignmentWithoutSubmission,
-      'triggers change for assignments without a matching submission grade so the UI can update'
+      'triggers change for assignments without a matching submission grade so the UI can update',
     )
   })
 

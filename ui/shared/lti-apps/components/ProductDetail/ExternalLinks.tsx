@@ -78,7 +78,7 @@ const ExternalLinks = (props: ExternalLinksProps) => {
           ) : (
             <Flex.Item>
               {I18n.t(
-                'The terms of service documentation for this provider is not currently available.'
+                'The terms of service documentation for this provider is not currently available.',
               )}
             </Flex.Item>
           )}
@@ -102,7 +102,7 @@ const ExternalLinks = (props: ExternalLinksProps) => {
           ) : (
             <Flex.Item>
               {I18n.t(
-                'The accessibility documentation for this provider is not currently available.'
+                'The accessibility documentation for this provider is not currently available.',
               )}
             </Flex.Item>
           )}

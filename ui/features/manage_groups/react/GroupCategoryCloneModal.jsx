@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {shape, string} from 'prop-types'
+import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {reloadWindow} from '@canvas/util/globalUtils'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {captureException} from '@sentry/react'
+import {shape, string} from 'prop-types'
+import React, {useEffect, useState} from 'react'
 
 const I18n = createI18nScope('groups')
 
@@ -52,9 +53,9 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
     startSendOperation()
       .then(res => notifyDidSave(res))
       .catch(err => {
-        console.error(err)  
+        console.error(err)
         captureException(err)
-        if (err.response) console.error(err.response)  
+        if (err.response) console.error(err.response)
         setStatus('error')
       })
   }
@@ -70,7 +71,7 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
 
   function refreshGroupSet(res) {
     window.location.hash = `#tab-${res.json.group_category.id}`
-    window.location.reload()
+    reloadWindow()
   }
 
   function notifyDidSave(res) {

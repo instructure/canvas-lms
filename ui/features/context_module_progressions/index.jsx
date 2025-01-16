@@ -24,18 +24,30 @@ import PaginatedCollectionView from '@canvas/pagination/backbone/views/Paginated
 import ProgressionStudentView from './backbone/views/ProgressionStudentView'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import ProgressionModuleHeader from './react/components/ProgressionModuleHeader'
 
 class IndexView extends PaginatedCollectionView {
+  constructor(options) {
+    super(options)
+    this.root = null
+  }
+
   // needed to render the react component at the top of the page
   // in the right lifecycle method of backbone
   afterRender() {
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    return ReactDOM.render(
-      <ProgressionModuleHeader bridge={this.collection} />,
-      document.getElementById('progression-module-header-root')
-    )
+    const container = document.getElementById('progression-module-header-root')
+    if (container) {
+      this.root = createRoot(container)
+      this.root.render(<ProgressionModuleHeader bridge={this.collection} />)
+    }
+  }
+
+  remove() {
+    if (this.root) {
+      this.root.unmount()
+    }
+    super.remove()
   }
 }
 
@@ -69,7 +81,7 @@ ready(() => {
       success() {
         if (students.length === 0) return
         indexView.resetScrollContainer(
-          indexView.$el.find('#progression_students .collectionViewItems')
+          indexView.$el.find('#progression_students .collectionViewItems'),
         )
       },
     })

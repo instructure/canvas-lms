@@ -28,6 +28,7 @@ import * as tz from '@instructure/moment-utils'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
+import {assignLocation} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('gradebookActionMenu')
 
@@ -87,9 +88,8 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
     },
   }
 
-  // @ts-expect-error
-  static gotoUrl(url) {
-    window.location.href = url
+  static gotoUrl(url: string) {
+    assignLocation(url)
   }
 
   exportManager?: GradebookExportManager
@@ -113,7 +113,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
       this.props.currentUserId,
       existingExport,
       undefined,
-      this.props.updateExportState
+      this.props.updateExportState,
     )
 
     if (this.props.setExportManager) {
@@ -161,7 +161,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
         this.props.getAssignmentOrder,
         this.props.showStudentFirstLastName,
         this.props.getStudentOrder,
-        currentView
+        currentView,
       )
       .then(resolution => this.handleExportSuccess(resolution))
       .catch(error => this.handleExportError(error))

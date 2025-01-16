@@ -72,7 +72,7 @@ ready(function () {
           closeModal()
         }}
         onClose={() => closeModal()}
-      />
+      />,
     )
   })
   $('.remove_avatar_picture_link').on('click', async function (event) {
@@ -82,7 +82,7 @@ ready(function () {
       label: I18n.t('Confirm Removal'),
       body: I18n.t(
         'confirms.remove_profile_picture',
-        "Are you sure you want to remove this user's profile picture?"
+        "Are you sure you want to remove this user's profile picture?",
       ),
     })
     if (!result) {
@@ -99,9 +99,9 @@ ready(function () {
       },
       _data => {
         $link.text(
-          I18n.t('errors.failed_to_remove_image', 'Failed to remove the image, please try again')
+          I18n.t('errors.failed_to_remove_image', 'Failed to remove the image, please try again'),
         )
-      }
+      },
     )
   })
   $('.report_avatar_picture_link').on('click', function (event) {
@@ -119,9 +119,9 @@ ready(function () {
       },
       _data => {
         $link.text(
-          I18n.t('errors.failed_to_report_image', 'Failed to report the image, please try again')
+          I18n.t('errors.failed_to_report_image', 'Failed to report the image, please try again'),
         )
-      }
+      },
     )
   })
   $('.clear_user_cache_link').on('click', function (event) {
@@ -136,7 +136,7 @@ ready(function () {
       },
       _data => {
         $.flashMessage(I18n.t('Failed to clear cache'))
-      }
+      },
     )
   })
   $('.destroy_user_link').on('click', async function (event) {
@@ -144,7 +144,7 @@ ready(function () {
     const result = await showConfirmationDialog({
       label: I18n.t('Confirm Deletion'),
       body: I18n.t(
-        'Are you sure you want to remove this user from ALL accounts? The user will not only be deleted, but will be marked for PERMANENT deletion.'
+        'Are you sure you want to remove this user from ALL accounts? The user will not only be deleted, but will be marked for PERMANENT deletion.',
       ),
     })
     if (!result) {
@@ -160,7 +160,7 @@ ready(function () {
       },
       _data => {
         $.flashMessage(I18n.t('Failed to remove user'))
-      }
+      },
     )
   })
 })

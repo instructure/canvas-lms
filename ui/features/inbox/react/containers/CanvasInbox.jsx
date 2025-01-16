@@ -171,7 +171,7 @@ const CanvasInbox = ({breakpoints}) => {
     if (
       selectedConversations.length > 0 &&
       !JSON.parse(sessionStorage.getItem('conversationsManuallyMarkedUnread'))?.includes(
-        selectedConversations[0]._id
+        selectedConversations[0]._id,
       )
     ) {
       sessionStorage.removeItem('conversationsManuallyMarkedUnread')
@@ -268,14 +268,14 @@ const CanvasInbox = ({breakpoints}) => {
     }
 
     const conversationsFromCache = JSON.parse(
-      JSON.stringify(cache.readQuery(conversationsQueryOption))
+      JSON.stringify(cache.readQuery(conversationsQueryOption)),
     )
     const conversationParticipantIDsFromResult =
       result.data.updateConversationParticipants.conversationParticipants.map(cp => cp._id)
 
     const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
       conversationParticipant =>
-        !conversationParticipantIDsFromResult.includes(conversationParticipant._id)
+        !conversationParticipantIDsFromResult.includes(conversationParticipant._id),
     )
     conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
     cache.writeQuery({...conversationsQueryOption, data: conversationsFromCache})
@@ -298,10 +298,10 @@ const CanvasInbox = ({breakpoints}) => {
         one: 'Are you sure you want to archive your copy of this conversation?',
         other: 'Are you sure you want to archive your copy of these conversations?',
       },
-      {count: selectedConversations.length}
+      {count: selectedConversations.length},
     )
 
-    const confirmResult = window.confirm(archiveConfirmMsg)  
+    const confirmResult = window.confirm(archiveConfirmMsg)
     if (confirmResult) {
       archiveConversationParticipants({
         variables: {
@@ -321,10 +321,10 @@ const CanvasInbox = ({breakpoints}) => {
         one: 'Are you sure you want to unarchive your copy of this conversation?',
         other: 'Are you sure you want to unarchive your copy of these conversations?',
       },
-      {count: selectedConversations.length}
+      {count: selectedConversations.length},
     )
 
-    const confirmResult = window.confirm(unarchiveConfirmMsg)  
+    const confirmResult = window.confirm(unarchiveConfirmMsg)
     if (confirmResult) {
       unarchiveConversationParticipants({
         variables: {
@@ -345,7 +345,7 @@ const CanvasInbox = ({breakpoints}) => {
         one: 'Message archived!',
         other: 'Messages archived!',
       },
-      {count: selectedConversations.length}
+      {count: selectedConversations.length},
     )
     if (data.updateConversationParticipants.errors) {
       setArchiveDisabled(false)
@@ -366,7 +366,7 @@ const CanvasInbox = ({breakpoints}) => {
         one: 'Message unarchived!',
         other: 'Messages unarchived!',
       },
-      {count: selectedConversations.length}
+      {count: selectedConversations.length},
     )
     if (data.updateConversationParticipants.errors) {
       setArchiveDisabled(true)
@@ -449,9 +449,9 @@ const CanvasInbox = ({breakpoints}) => {
         other:
           'Are you sure you want to delete your copy of these conversations? This action cannot be undone.',
       },
-      {count: conversationsToDeleteByID.length}
+      {count: conversationsToDeleteByID.length},
     )
-    const confirmResult = window.confirm(delMsg)  
+    const confirmResult = window.confirm(delMsg)
     if (confirmResult) {
       deleteConversations({variables: {ids: conversationsToDeleteByID}})
     } else {
@@ -467,7 +467,7 @@ const CanvasInbox = ({breakpoints}) => {
         one: 'Message Deleted!',
         other: 'Messages Deleted!',
       },
-      {count: deletedConversationIDs.length}
+      {count: deletedConversationIDs.length},
     )
 
     if (data.deleteConversations.errors) {
@@ -492,7 +492,7 @@ const CanvasInbox = ({breakpoints}) => {
 
   const removeDeletedConversationsFromCache = (cache, result) => {
     const conversationsFromCache = JSON.parse(
-      JSON.stringify(cache.readQuery(conversationsQueryOption))
+      JSON.stringify(cache.readQuery(conversationsQueryOption)),
     )
 
     const conversationIDsFromResult = result.data.deleteConversations.conversationIds
@@ -500,7 +500,7 @@ const CanvasInbox = ({breakpoints}) => {
     const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
       conversationParticipant => {
         return !conversationIDsFromResult.includes(conversationParticipant.conversation._id)
-      }
+      },
     )
 
     conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
@@ -531,8 +531,8 @@ const CanvasInbox = ({breakpoints}) => {
               one: 'The conversation has been successfully unstarred.',
               other: 'The conversations has been successfully unstarred.',
             },
-            {count}
-          )
+            {count},
+          ),
         )
       } else {
         setOnSuccess(
@@ -541,8 +541,8 @@ const CanvasInbox = ({breakpoints}) => {
               one: 'The conversation has been successfully starred.',
               other: 'The conversations has been successfully starred.',
             },
-            {count}
-          )
+            {count},
+          ),
         )
       }
     },
@@ -586,8 +586,8 @@ const CanvasInbox = ({breakpoints}) => {
               one: 'Read state Changed!',
               other: 'Read states Changed!',
             },
-            {count: '1000'}
-          )
+            {count: '1000'},
+          ),
         )
       }
     },
@@ -607,8 +607,8 @@ const CanvasInbox = ({breakpoints}) => {
               one: 'Read state Changed!',
               other: 'Read states Changed!',
             },
-            {count: '1000'}
-          )
+            {count: '1000'},
+          ),
         )
       }
     },
@@ -676,7 +676,7 @@ const CanvasInbox = ({breakpoints}) => {
       setDisplayUnarchiveButton(false)
     } else {
       setDisplayUnarchiveButton(
-        selectedConversations.some(conversation => conversation.workflowState === 'archived')
+        selectedConversations.some(conversation => conversation.workflowState === 'archived'),
       )
     }
   }, [selectedConversations, userID])

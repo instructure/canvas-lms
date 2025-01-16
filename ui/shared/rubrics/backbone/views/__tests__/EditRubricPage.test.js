@@ -18,7 +18,6 @@
 
 import EditRubricPage from '../EditRubricPage'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
-import sinon from 'sinon'
 
 describe('RubricEdit', () => {
   test('should be accessible', done => {
@@ -27,17 +26,16 @@ describe('RubricEdit', () => {
   })
 
   test('does not immediately create the dialog', () => {
-    const clickSpy = sinon.spy(EditRubricPage.prototype, 'attachInitialEvent')
-    const dialogSpy = sinon.spy(EditRubricPage.prototype, 'createDialog')
+    const clickSpy = jest.spyOn(EditRubricPage.prototype, 'attachInitialEvent')
+    const dialogSpy = jest.spyOn(EditRubricPage.prototype, 'createDialog')
 
     new EditRubricPage()
 
     // 'sets up the initial click event'
-    expect(clickSpy.called).toBeTruthy()
+    expect(clickSpy.mock.calls.length).toBeGreaterThan(0)
 
     // 'does not immediately create the dialog'
-    expect(dialogSpy.notCalled).toBeTruthy()
-    clickSpy.restore()
-    dialogSpy.restore()
+    expect(dialogSpy.mock.calls).toHaveLength(0)
+    jest.restoreAllMocks()
   })
 })

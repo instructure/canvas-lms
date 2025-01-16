@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {ApiResponse, OtpInitiationResponse, OtpVerifyResponse} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import type {ApiResponse, OtpInitiationResponse, OtpVerifyResponse} from '../types'
 
 export const initiateOtpRequest = async (): Promise<ApiResponse<OtpInitiationResponse>> => {
   const {json, response} = await doFetchApi<OtpInitiationResponse>({
@@ -30,7 +30,7 @@ export const initiateOtpRequest = async (): Promise<ApiResponse<OtpInitiationRes
 
 export const verifyOtpRequest = async (
   verificationCode: string,
-  rememberMe: boolean
+  rememberMe: boolean,
 ): Promise<ApiResponse<OtpVerifyResponse>> => {
   const {json, response} = await doFetchApi<OtpVerifyResponse>({
     path: '/login/otp',

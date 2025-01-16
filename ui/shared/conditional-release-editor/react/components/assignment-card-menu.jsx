@@ -60,7 +60,7 @@ export class AssignmentCardMenu extends React.Component {
         name: this.props.assignment.get('name'),
         lower: transformScore(range.get('lower_bound'), this.props.triggerAssignment, false),
         upper: transformScore(range.get('upper_bound'), this.props.triggerAssignment, true),
-      })
+      }),
     )
   }
 
@@ -79,7 +79,7 @@ export class AssignmentCardMenu extends React.Component {
                 lower: transformScore(
                   range.get('lower_bound'),
                   this.props.triggerAssignment,
-                  false
+                  false,
                 ),
                 upper: transformScore(range.get('upper_bound'), this.props.triggerAssignment, true),
               })}
@@ -127,8 +127,8 @@ const ConnectedAssignmentCardMenu = connect(
         moveAssignment: actions.moveAssignment,
         setAriaAlert: actions.setAriaAlert,
       },
-      dispatch
-    )
+      dispatch,
+    ),
 )(AssignmentCardMenu)
 
 export default ConnectedAssignmentCardMenu

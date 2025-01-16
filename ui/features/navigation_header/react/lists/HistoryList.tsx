@@ -86,7 +86,7 @@ export default function HistoryList() {
           root: null,
           rootMargin: '0px',
           threshold: 0.4,
-        }
+        },
       )
       observer.observe(lastItem)
     }

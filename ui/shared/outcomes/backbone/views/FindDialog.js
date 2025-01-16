@@ -160,9 +160,9 @@ export default class FindDialog extends DialogBaseView {
           $.flashError(
             I18n.t(
               'flash.importError',
-              'An error occurred while importing. Please try again later.'
-            )
-          )
+              'An error occurred while importing. Please try again later.',
+            ),
+          ),
         )
     }
   }

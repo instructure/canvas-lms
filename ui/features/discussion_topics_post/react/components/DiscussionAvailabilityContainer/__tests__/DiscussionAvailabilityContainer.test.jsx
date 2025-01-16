@@ -82,7 +82,7 @@ const setup = props => {
       delayedPostAt={mockDelayedPost}
       lockAt={mockLockAt}
       {...props}
-    />
+    />,
   )
 }
 

@@ -86,7 +86,7 @@ KeyboardNavDialog.prototype.bindOpenKeys = function () {
           }
         }
       }
-    })(this)
+    })(this),
   )
 }
 

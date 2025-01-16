@@ -30,7 +30,7 @@ describe('EditableHeading', () => {
         label="Book title"
         value="Another Roadside Attraction"
         level="h3"
-      />
+      />,
     )
 
     expect(getAllByText('Another Roadside Attraction')[0]).toBeInTheDocument()
@@ -46,7 +46,7 @@ describe('EditableHeading', () => {
         label="Book title"
         value="Still Life with Woodpecker"
         level="h3"
-      />
+      />,
     )
 
     expect(getByDisplayValue('Still Life with Woodpecker')).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('EditableHeading', () => {
         value="Even Cowgirls Get the Blues"
         level="h3"
         readOnly={true}
-      />
+      />,
     )
     expect(queryByText('Edit title')).toBeNull()
   })
@@ -77,7 +77,7 @@ describe('EditableHeading', () => {
         label="Book title"
         value="Jitterbug Perfume"
         level="h3"
-      />
+      />,
     )
     const input = getByDisplayValue('Jitterbug Perfume')
     fireEvent.keyDown(input, {key: 'Enter', code: 13})
@@ -95,7 +95,7 @@ describe('EditableHeading', () => {
         label="Book title"
         value="Half Asleep in Frog Pajamas"
         level="h3"
-      />
+      />,
     )
 
     const input = getByDisplayValue('Half Asleep in Frog Pajamas')

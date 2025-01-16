@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -23,7 +24,7 @@ import {
   handleExternalContentMessages,
   postMessageExternalContentReady,
   postMessageExternalContentCancel,
-  Service,
+  type Service,
 } from '../messages'
 
 describe('1.1 content item messages', () => {
@@ -38,7 +39,7 @@ describe('1.1 content item messages', () => {
         new MessageEvent('message', {
           data,
           origin,
-        })
+        }),
       )
     }
 
@@ -158,7 +159,7 @@ describe('1.1 content item messages', () => {
         postMessageExternalContentReady(window, eventData)
         expect(window.postMessage).toHaveBeenCalledWith(
           {subject: 'externalContentReady', ...eventData},
-          'http://canvas.test'
+          'http://canvas.test',
         )
       })
     })
@@ -169,7 +170,7 @@ describe('1.1 content item messages', () => {
         postMessageExternalContentCancel(window)
         expect(window.postMessage).toHaveBeenCalledWith(
           {subject: 'externalContentCancel'},
-          'http://canvas.test'
+          'http://canvas.test',
         )
       })
     })

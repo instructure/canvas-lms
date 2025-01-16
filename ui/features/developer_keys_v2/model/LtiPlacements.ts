@@ -165,7 +165,7 @@ export const i18nLtiPlacement = (placement: LtiPlacement): string =>
     wiki_page_menu: I18n.t('Page Menu'),
     wiki_index_menu: I18n.t('Pages Index Menu'),
     default_placements: I18n.t('Assignment and Link Selection'),
-  }[placement])
+  })[placement]
 
 /**
  * Identifier for an LTI placement.

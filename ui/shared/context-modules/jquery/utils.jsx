@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import {some} from 'lodash'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
@@ -47,7 +47,7 @@ export function scrollTo($thing, time = 500) {
     {
       scrollTop: $thing.offset().top,
     },
-    time
+    time,
   )
 }
 
@@ -145,11 +145,9 @@ export function initPublishButton($el, data) {
     const fileFauxView = {
       render: () => {
         const model = $el.data('view').model
-         
-        ReactDOM.render(
-          <PublishCloud {...props} model={model} disabled={model.get('disabled')} />,
-          $el[0]
-        )
+
+        const root = createRoot($el[0])
+        root.render(<PublishCloud {...props} model={model} disabled={model.get('disabled')} />)
         // to look disable, we need to add the class here
         $el[0].classList[model.get('disabled') ? 'add' : 'remove']('disabled')
       },
@@ -221,7 +219,7 @@ export function setExpandAllButton() {
 
   $('#expand_collapse_all').attr(
     'aria-label',
-    someVisible ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
+    someVisible ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules'),
   )
   $('#expand_collapse_all').data('expand', !someVisible)
   $('#expand_collapse_all').attr('aria-expanded', someVisible ? 'true' : 'false')
@@ -242,7 +240,7 @@ export function setExpandAllButtonHandler() {
 
     $(this).attr(
       'aria-label',
-      shouldExpand ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
+      shouldExpand ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules'),
     )
     $(this).data('expand', !shouldExpand)
     $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
@@ -337,8 +335,8 @@ export function updateProgressionState($module) {
 
     const completed = some(
       reqs_met,
-       
-      req => req.id == mod_id && $mod_item.hasClass(req.type + '_requirement')
+
+      req => req.id == mod_id && $mod_item.hasClass(req.type + '_requirement'),
     )
     if (completed) {
       $mod_item.addClass('completed_item')
@@ -353,7 +351,6 @@ export function updateProgressionState($module) {
     } else {
       let incomplete_req = null
       for (const idx in incomplete_reqs) {
-         
         if (incomplete_reqs[idx].id == mod_id) {
           incomplete_req = incomplete_reqs[idx]
         }
@@ -367,7 +364,7 @@ export function updateProgressionState($module) {
             I18n.t('You scored a %{score}.', {score: incomplete_req.score}) +
               ' ' +
               criterionMessage($mod_item) +
-              '.'
+              '.',
           )
         } else {
           // hasn't been scored yet
@@ -556,8 +553,8 @@ function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', 
     }
   }
 
-   
-  ReactDOM.render(
+  const root = createRoot($('#external-tool-mount-point')[0])
+  root.render(
     <ContentTypeExternalToolTray
       tool={tool}
       placement={placement}
@@ -568,7 +565,6 @@ function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', 
       onDismiss={handleDismiss}
       open={tool !== null}
     />,
-    $('#external-tool-mount-point')[0]
   )
 }
 
@@ -590,8 +586,8 @@ function setExternalToolModal({
     returnFocusTo.focus()
   }
 
-   
-  ReactDOM.render(
+  const root = createRoot($('#external-tool-mount-point')[0])
+  root.render(
     <ExternalToolModalLauncher
       tool={tool}
       launchType={launchType}
@@ -602,7 +598,6 @@ function setExternalToolModal({
       onRequestClose={handleDismiss}
       contextModuleId={contextModuleId}
     />,
-    $('#external-tool-mount-point')[0]
   )
 }
 

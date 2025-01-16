@@ -32,12 +32,13 @@ describe('PlacementsConfirmationWrapper', () => {
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
-      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
+      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />,
     )
 
     expect(screen.queryByLabelText(/default to hidden/i)).not.toBeInTheDocument()
-    expect(screen.getAllByRole('checkbox').length).toBe(
-      AllLtiPlacements.filter(p => !(UNDOCUMENTED_PLACEMENTS as Array<typeof p>).includes(p)).length
+    expect(screen.getAllByRole('checkbox')).toHaveLength(
+      AllLtiPlacements.filter(p => !(UNDOCUMENTED_PLACEMENTS as Array<typeof p>).includes(p))
+        .length,
     )
   })
 
@@ -48,7 +49,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
-      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
+      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />,
     )
 
     expect(screen.getByLabelText(i18nLtiPlacement('course_navigation'))).toBeChecked()
@@ -64,7 +65,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
-      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
+      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />,
     )
 
     const courseNavCheckbox = screen.getByLabelText(i18nLtiPlacement('course_navigation'))
@@ -81,7 +82,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
-      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
+      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />,
     )
 
     const defaultHiddenCheckbox = screen.getByLabelText(/default to hidden/i)
@@ -95,7 +96,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
-      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
+      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />,
     )
 
     expect(screen.queryByLabelText(/default to hidden/i)).not.toBeInTheDocument()
@@ -108,7 +109,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
-      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
+      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />,
     )
 
     const courseNavCheckbox = screen.getByLabelText(i18nLtiPlacement('course_navigation'))
@@ -137,7 +138,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
-      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
+      <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />,
     )
 
     const defaultHiddenCheckbox = screen.getByLabelText(/default to hidden/i)

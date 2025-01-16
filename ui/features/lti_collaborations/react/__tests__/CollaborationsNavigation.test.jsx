@@ -17,23 +17,61 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
 import CollaborationsNavigation from '../CollaborationsNavigation'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const defaultProps = {
-  ltiCollaborators: {ltiCollaboratorsData: [{name: 'A name', id: '1'}]},
+  ltiCollaborators: {
+    ltiCollaboratorsData: [{name: 'A name', id: '1'}],
+  },
 }
 
 describe('CollaborationsNavigation', () => {
-  it('button hidden if create permission is false', () => {
-    ENV.context_asset_string = 'courses_1'
-    ENV.CREATE_PERMISSION = false
+  beforeEach(() => {
+    fakeENV.setup({
+      context_asset_string: 'courses_1',
+    })
+  })
 
-    const component = TestUtils.renderIntoDocument(<CollaborationsNavigation {...defaultProps} />)
-    const num_buttons = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'create-collaborations-dropdown'
-    )
-    expect(num_buttons.length).toEqual(0)
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  it('renders the collaborations title', () => {
+    const {getByTestId} = render(<CollaborationsNavigation {...defaultProps} />)
+    expect(getByTestId('collaborations-title')).toBeInTheDocument()
+  })
+
+  it('shows dropdown when create permission is true and collaborators exist', () => {
+    fakeENV.setup({
+      context_asset_string: 'courses_1',
+      CREATE_PERMISSION: true,
+    })
+    const {container} = render(<CollaborationsNavigation {...defaultProps} />)
+    expect(container.querySelector('.create-collaborations-dropdown')).toBeInTheDocument()
+  })
+
+  it('hides dropdown when create permission is false', () => {
+    fakeENV.setup({
+      context_asset_string: 'courses_1',
+      CREATE_PERMISSION: false,
+    })
+    const {container} = render(<CollaborationsNavigation {...defaultProps} />)
+    expect(container.querySelector('.create-collaborations-dropdown')).not.toBeInTheDocument()
+  })
+
+  it('hides dropdown when no collaborators exist', () => {
+    fakeENV.setup({
+      context_asset_string: 'courses_1',
+      CREATE_PERMISSION: true,
+    })
+    const props = {
+      ltiCollaborators: {
+        ltiCollaboratorsData: [],
+      },
+    }
+    const {container} = render(<CollaborationsNavigation {...props} />)
+    expect(container.querySelector('.create-collaborations-dropdown')).not.toBeInTheDocument()
   })
 })

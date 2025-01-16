@@ -35,7 +35,7 @@ export const ZUpdateSpeedGraderSettingsParams = z.object({gradeByQuestion: z.boo
 type UpdateSpeedGraderSettingsParams = z.infer<typeof ZUpdateSpeedGraderSettingsParams>
 
 export async function updateSpeedGraderSettings(
-  params: UpdateSpeedGraderSettingsParams
+  params: UpdateSpeedGraderSettingsParams,
 ): Promise<any> {
   const result = executeQuery<any>(UPDATE_SPEED_GRADER_SETTINGS, params)
 

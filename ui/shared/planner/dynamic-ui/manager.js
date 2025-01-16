@@ -163,7 +163,7 @@ export class DynamicUiManager {
   triggerFocusOpportunity() {
     const oppToFocus = this.animatableRegistry.getComponent(
       'opportunity',
-      this.animationPlan.focusOpportunity
+      this.animationPlan.focusOpportunity,
     )
     if (oppToFocus == null) return
     this.animator.focusElement(oppToFocus.component.getFocusable(this.animationPlan.trigger))
@@ -224,8 +224,8 @@ export class DynamicUiManager {
         },
         {
           count: newItems.length,
-        }
-      )
+        },
+      ),
     )
   }
 
@@ -249,7 +249,7 @@ export class DynamicUiManager {
   planDeletedComponent(doomedComponentType, doomedComponentId) {
     const sortedComponents = this.sortedComponentsFor(doomedComponentType)
     const doomedComponentIndex = sortedComponents.findIndex(
-      c => c.componentIds[0] === doomedComponentId
+      c => c.componentIds[0] === doomedComponentId,
     )
     const newComponentIndex = this.findFocusIndexAfterDelete(sortedComponents, doomedComponentIndex)
     const animationPlanFocusField = changeCase.camelCase(`focus-${doomedComponentType}`)

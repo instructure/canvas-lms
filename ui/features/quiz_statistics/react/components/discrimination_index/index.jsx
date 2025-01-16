@@ -57,7 +57,7 @@ const DiscriminationIndex = ({discriminationIndex: di = 0}) => {
               className="Button Button--icon-action help-trigger"
               title={I18n.t(
                 'discrimination_index_dialog_trigger',
-                'Learn more about the Discrimination Index.'
+                'Learn more about the Discrimination Index.',
               )}
               tabIndex="0"
               onClick={() => displayHelp(true)}

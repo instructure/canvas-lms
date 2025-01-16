@@ -20,7 +20,7 @@ import {type BlockTemplate} from '../types'
 
 export const mergeTemplates = (
   apiTemplates: BlockTemplate[] | undefined,
-  globalTemplates: BlockTemplate[] | undefined
+  globalTemplates: BlockTemplate[] | undefined,
 ): BlockTemplate[] => {
   const templates = apiTemplates ? apiTemplates.slice() : []
   if (!globalTemplates) {

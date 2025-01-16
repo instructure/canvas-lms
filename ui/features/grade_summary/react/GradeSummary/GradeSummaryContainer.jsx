@@ -79,8 +79,8 @@ const GradeSummaryContainer = () => {
               one: 'Read state Changed!',
               other: 'Read states Changed!',
             },
-            {count: '1000'}
-          )
+            {count: '1000'},
+          ),
         )
         setSubmissionIdsForUpdate([])
       }
@@ -101,8 +101,8 @@ const GradeSummaryContainer = () => {
               one: 'Rubric read state Changed!',
               other: 'Rubric read states Changed!',
             },
-            {count: '1000'}
-          )
+            {count: '1000'},
+          ),
         )
         setSubmissionIdsForRubricUpdate([])
       }
@@ -170,8 +170,8 @@ const GradeSummaryContainer = () => {
     const arr = [...submissionIdsForUpdate, submissionID]
     setSubmissionIdsForUpdate(
       arr.filter(
-        (item, index) => item !== null && item !== undefined && arr.indexOf(item) === index
-      )
+        (item, index) => item !== null && item !== undefined && arr.indexOf(item) === index,
+      ),
     )
   }
 
@@ -180,8 +180,8 @@ const GradeSummaryContainer = () => {
     const arr = [...submissionIdsForRubricUpdate, submissionID]
     setSubmissionIdsForRubricUpdate(
       arr.filter(
-        (item, index) => item !== null && item !== undefined && arr.indexOf(item) === index
-      )
+        (item, index) => item !== null && item !== undefined && arr.indexOf(item) === index,
+      ),
     )
   }
 

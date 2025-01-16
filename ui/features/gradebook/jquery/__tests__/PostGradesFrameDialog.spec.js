@@ -73,9 +73,9 @@ describe('Gradebook > PostGradesFrameDialog', () => {
     test("doesn't show infos or add border to iframe by default", () => {
       expect(
         el.find(
-          '.before_external_content_info_alert > .screenreader-only, .after_external_content_info_alert > .screenreader-only'
-        ).length
-      ).toBe(2)
+          '.before_external_content_info_alert > .screenreader-only, .after_external_content_info_alert > .screenreader-only',
+        ),
+      ).toHaveLength(2)
       expect(iframe.hasClass('info_alert_outline')).toBeFalsy()
     })
 

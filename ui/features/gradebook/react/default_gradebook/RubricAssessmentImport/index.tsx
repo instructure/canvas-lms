@@ -43,7 +43,7 @@ export const RubricAssessmentImport = () => {
         const currentImport = await fetchRubricAssessmentImport(
           importId,
           assignment?.courseId,
-          assignment?.id
+          assignment?.id,
         )
         const workflowState = currentImport.workflowState
 

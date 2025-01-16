@@ -24,18 +24,18 @@ export const template = generateActionTemplates([
   {
     title: I18n.t('Manage Temporary Enrollments'),
     description: I18n.t(
-      'Temporarily enroll a user into a course. This temporary enrollment is paired up with another enrollment within the course.'
+      'Temporarily enroll a user into a course. This temporary enrollment is paired up with another enrollment within the course.',
     ),
   },
   {
     description: I18n.t(
-      'The temporarily enrolled user can only view and participate in a course between the start and end dates that were chosen when making the temporary enrollment.'
+      'The temporarily enrolled user can only view and participate in a course between the start and end dates that were chosen when making the temporary enrollment.',
     ),
   },
   {
     title: I18n.t('Temporary Enrollments - add'),
     description: I18n.t(
-      'Allows users to add a temporary enrollment with a start date, end date, and role'
+      'Allows users to add a temporary enrollment with a start date, end date, and role',
     ),
   },
   {

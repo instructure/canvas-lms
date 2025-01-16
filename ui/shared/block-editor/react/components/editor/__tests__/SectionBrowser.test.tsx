@@ -54,7 +54,7 @@ const renderComponent = (props: Partial<SectionBrowserProps> = {}) => {
       <Frame>
         <BlankSection />
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 

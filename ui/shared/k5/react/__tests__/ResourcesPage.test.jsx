@@ -16,10 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, waitFor, fireEvent} from '@testing-library/react'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {assignLocation} from '@canvas/util/globalUtils'
+import {fireEvent, render, waitFor} from '@testing-library/react'
+import React from 'react'
 import ResourcesPage from '../ResourcesPage'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 jest.mock('@canvas/k5/react/utils')
 const utils = require('../utils') // eslint-disable-line import/no-commonjs
@@ -134,13 +139,8 @@ describe('ResourcesPage', () => {
     it('only fetches apps for non-homeroom courses', async () => {
       const {getByText, queryByText} = render(<ResourcesPage {...getProps()} />)
       await waitFor(() => expect(getByText('Student Applications')).toBeInTheDocument())
-      const assign = window.location.assign
-      Object.defineProperty(window, 'location', {
-        value: {assign: jest.fn()},
-      })
       fireEvent.click(getByText('Google Apps'))
       expect(queryByText('Choose a Course')).not.toBeInTheDocument()
-      window.location.assign = assign
     })
 
     it('does not fetch apps without subject courses', async () => {

@@ -152,7 +152,7 @@ const ZipFileImporter = ({
       formData.settings.folder_id = folder?.id
       onSubmit(formData, file)
     },
-    [file, folder, onSubmit]
+    [file, folder, onSubmit],
   )
 
   useEffect(() => {
@@ -201,7 +201,7 @@ const ZipFileImporter = ({
 
     if (searchValue) {
       filteredFolders = folders.filter((f: Folder) =>
-        f.name.toLowerCase().includes(searchValue.toLowerCase())
+        f.name.toLowerCase().includes(searchValue.toLowerCase()),
       )
     }
     filteredFolders.forEach((f: Folder) => {
@@ -294,7 +294,13 @@ const ZipFileImporter = ({
                 renderBeforeInput={<IconSearchLine inline={false} />}
                 renderAfterInput={renderClearButton()}
               />
-              <View as="div" height="320px" padding="xx-small" overflowY="auto" overflowX="visible">
+              <View
+                as="div"
+                maxHeight="20rem"
+                padding="xx-small"
+                overflowY="auto"
+                overflowX="visible"
+              >
                 <TreeBrowser
                   collections={folderCollection()}
                   items={{}}

@@ -21,14 +21,12 @@ require_relative "../helpers/context_modules_common"
 require_relative "../helpers/public_courses_context"
 require_relative "page_objects/modules_index_page"
 require_relative "page_objects/modules_settings_tray"
-require_relative "../../helpers/selective_release_common"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include ModulesIndexPage
   include ModulesSettingsTray
-  include SelectiveReleaseCommon
 
   context "as a teacher", priority: "1" do
     before(:once) do
@@ -371,7 +369,7 @@ describe "context modules" do
 
     context "specific tests with differentiated modules" do
       before :once do
-        differentiated_modules_on
+        Account.site_admin.enable_feature!(:selective_release_ui_api)
       end
 
       it "shows the added prerequisites when editing a module with enabled differentiated modules" do

@@ -92,7 +92,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
         const key = name.match(/user\[(.*)\]/)[1] // extracts 'short_name' from 'user[short_name]'
         return {...memo, [key]: this.props.user[key]}
       }, {})
-       
+
       this.setState(update(this.state, {data: {user: {$set: userDataFromProps}}}))
     }
   }
@@ -126,7 +126,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
   onSubmit = () => {
     if (!isEmpty(this.state.errors)) return
     const method = {create: 'POST', update: 'PUT'}[this.props.createOrUpdate]
-     
+
     axios({url: this.props.url, method, data: this.state.data}).then(
       response => {
         const getUserObj = o => (o.user ? getUserObj(o.user) : o)
@@ -137,9 +137,9 @@ export default class CreateOrUpdateUserModal extends React.Component {
           response.data.message_sent
             ? I18n.t(
                 '*%{userName}* saved successfully! They should receive an email confirmation shortly.',
-                {userName, wrapper}
+                {userName, wrapper},
               )
-            : I18n.t('*%{userName}* saved successfully!', {userName, wrapper})
+            : I18n.t('*%{userName}* saved successfully!', {userName, wrapper}),
         )
 
         this.setState({...initialState})
@@ -149,7 +149,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
         const errors = registrationErrors(response.data.errors)
         $.flashError('Something went wrong saving user details.')
         this.setState({errors})
-      }
+      },
     )
   }
 
@@ -211,7 +211,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
                 label: I18n.t('Time Zone'),
                 Component: TimeZoneSelect,
               },
-            ]
+            ],
       )
       .filter(Boolean)
   }
@@ -244,7 +244,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
                   onChange={e =>
                     this.onChange(
                       name,
-                      e.target.type === 'checkbox' ? e.target.checked : e.target.value
+                      e.target.type === 'checkbox' ? e.target.checked : e.target.value,
                     )
                   }
                   isRequired={!!required}
@@ -254,7 +254,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
                     .concat(hint && {type: 'hint', text: hint})
                     .filter(Boolean)}
                 />
-              )
+              ),
             )}
           </FormFieldGroup>
         </Modal.Body>
@@ -272,7 +272,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
             if (child.props.onClick) child.props.onClick(...args)
             this.setState({open: true})
           },
-        })
+        }),
       )}
     </span>
   )

@@ -116,7 +116,7 @@ export default function FilterNav({
         applyFilters(filterPreset.filters)
       }
     },
-    [appliedFilters, applyFilters]
+    [appliedFilters, applyFilters],
   )
 
   const {dataMap, filterItems} = useFilterDropdownData({
@@ -150,7 +150,7 @@ export default function FilterNav({
       modules,
       sections,
       studentGroupCategories,
-      customStatuses
+      customStatuses,
     )
 
     const filterKey = getFilterKey(filter)

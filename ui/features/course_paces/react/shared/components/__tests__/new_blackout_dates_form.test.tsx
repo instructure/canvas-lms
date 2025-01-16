@@ -49,7 +49,7 @@ describe('BlackoutDatesModal', () => {
 
   it('shows error message for missing event title', () => {
     const {getByRole, getByText, queryByText} = render(
-      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
     )
     expect(queryByText('Title required')).not.toBeInTheDocument()
 
@@ -66,7 +66,7 @@ describe('BlackoutDatesModal', () => {
 
   it('shows error message for missing start date', () => {
     const {getByRole, getByText, queryByText} = render(
-      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
     )
     expect(queryByText('Date required')).not.toBeInTheDocument()
 
@@ -82,7 +82,7 @@ describe('BlackoutDatesModal', () => {
 
   it('shows error message for missing start date when end date blurs', () => {
     const {getByRole, getByText, queryByText} = render(
-      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
     )
     expect(queryByText('Date required')).not.toBeInTheDocument()
 
@@ -98,7 +98,7 @@ describe('BlackoutDatesModal', () => {
 
   it('shows error message when end date is before start date', () => {
     const {getByRole, getByText, queryByText} = render(
-      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
     )
     expect(queryByText('End date cannot be before start date')).not.toBeInTheDocument()
 
@@ -122,7 +122,7 @@ describe('BlackoutDatesModal', () => {
 
   it('shows title and start date errors when fields are empty and Add button gets focus', () => {
     const {getByRole, getByText, queryByText} = render(
-      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
     )
     expect(queryByText('Title required')).not.toBeInTheDocument()
     expect(queryByText('Date required')).not.toBeInTheDocument()

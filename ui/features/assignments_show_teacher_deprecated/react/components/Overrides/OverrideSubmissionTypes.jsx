@@ -207,7 +207,7 @@ export default class OverrideSubmissionTypes extends React.Component {
         {this.props.override.submissionTypes
           .map(typeSelection => {
             const nonCanvasType = OverrideSubmissionTypes.nonCanvasType.options.find(
-              opt => opt.key === typeSelection
+              opt => opt.key === typeSelection,
             )
             if (nonCanvasType) {
               return nonCanvasType.display
@@ -277,7 +277,7 @@ export default class OverrideSubmissionTypes extends React.Component {
         }
       } else if (type === OverrideSubmissionTypes.nonCanvasType) {
         selectedOptions = OverrideSubmissionTypes.nonCanvasType.options.find(
-          opt => opt.key === this.props.override.submissionTypes[0]
+          opt => opt.key === this.props.override.submissionTypes[0],
         )
         selectedOptions = selectedOptions ? selectedOptions.key : null
       }
@@ -295,7 +295,7 @@ export default class OverrideSubmissionTypes extends React.Component {
             options={type.options}
             initialSelection={selectedOptions}
           />
-        </View>
+        </View>,
       )
     }
     return slots

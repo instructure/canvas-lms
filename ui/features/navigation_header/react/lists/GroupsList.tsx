@@ -62,7 +62,7 @@ export default function CoursesList() {
                 <ActiveText url={`/groups/${group.id}`}>{group.name}</ActiveText>
               </Link>
             </List.Item>
-          ))
+          )),
         )}
     </List>
   )

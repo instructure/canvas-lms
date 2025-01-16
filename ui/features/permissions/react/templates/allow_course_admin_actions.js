@@ -38,7 +38,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People (Account)'),
       description: I18n.t(
-        'To edit user details, modify login details, or change user passwords, Users - manage login details must also be enabled.'
+        'To edit user details, modify login details, or change user passwords, Users - manage login details must also be enabled.',
       ),
     },
     {
@@ -47,7 +47,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
+        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).',
       ),
     },
     {
@@ -55,18 +55,18 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit a user’s section, Conversations - send to individual course members must be enabled.'
+        'To edit a user’s section, Conversations - send to individual course members must be enabled.',
       ),
     },
     {
       title: I18n.t('Observers (Course)'),
       description: I18n.t(
-        'To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.'
+        'To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.'
+        'To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.',
       ),
     },
   ],
@@ -89,7 +89,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
+        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).',
       ),
     },
     {
@@ -97,19 +97,19 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit a user’s section, Conversations - send to individual course members must be enabled.'
+        'To edit a user’s section, Conversations - send to individual course members must be enabled.',
       ),
     },
     {
       title: I18n.t('Observers'),
       description: I18n.t(
-        'To link an observer to a student, Conversations - send to individual course members must be enabled.'
+        'To link an observer to a student, Conversations - send to individual course members must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.'
+        'To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.',
       ),
     },
-  ]
+  ],
 )

@@ -264,7 +264,6 @@ const RatingScaleAccordion = ({
             <RatingScaleAccordionItem
               hidePoints={hidePoints}
               rating={rating}
-               
               key={`rating-scale-item-${rating.id}-${index}`}
               scale={scale}
               spacing={spacing}

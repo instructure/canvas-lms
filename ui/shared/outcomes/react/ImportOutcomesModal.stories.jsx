@@ -24,8 +24,6 @@ export default {
   component: ImportOutcomesModal,
 }
 
-// Similar to showImportOutcomesModal but without ReactDOM.render so we don't have to
-//  handle unmounting ourselves
 const storybookImportOutcomesModal = props => {
   const parent = document.createElement('div')
   parent.setAttribute('class', 'import-outcomes-modal-container')

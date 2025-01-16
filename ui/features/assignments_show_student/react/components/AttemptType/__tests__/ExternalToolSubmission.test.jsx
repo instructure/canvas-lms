@@ -52,7 +52,7 @@ describe('ExternalToolSubmission', () => {
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
       expect(iframe.src).toBe(
-        'http://localhost/courses/100/external_tools/retrieve?assignment_id=200&display=borderless&resource_link_lookup_uuid=some_uuid&url=%2Fsubmitted-lti-launch'
+        'http://localhost/courses/100/external_tools/retrieve?assignment_id=200&display=borderless&resource_link_lookup_uuid=some_uuid&url=%2Fsubmitted-lti-launch',
       )
     })
   })
@@ -61,13 +61,13 @@ describe('ExternalToolSubmission', () => {
     it('shows the URL and content using the values specified in the draft', () => {
       const submission = {...SubmissionMocks.basicLtiLaunchReadyToSubmit}
       const {getByTestId, getByText} = render(
-        <ExternalToolSubmission submission={submission} tool={tool} />
+        <ExternalToolSubmission submission={submission} tool={tool} />,
       )
 
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
       expect(iframe.src).toBe(
-        'http://localhost/courses/100/external_tools/retrieve?assignment_id=200&display=borderless&resource_link_lookup_uuid=some_uuid&url=%2Flti-launch'
+        'http://localhost/courses/100/external_tools/retrieve?assignment_id=200&display=borderless&resource_link_lookup_uuid=some_uuid&url=%2Flti-launch',
       )
 
       expect(getByText(/Website URL:\s*\/lti-launch/)).toBeInTheDocument()
@@ -76,7 +76,7 @@ describe('ExternalToolSubmission', () => {
     it('shows the original resource-selection launch frame if the user clicks the "Change" button', () => {
       const submission = SubmissionMocks.basicLtiLaunchReadyToSubmit
       const {getByRole, getByTestId} = render(
-        <ExternalToolSubmission submission={submission} tool={tool} />
+        <ExternalToolSubmission submission={submission} tool={tool} />,
       )
 
       const changeButton = getByRole('button', {name: /Change/})
@@ -85,7 +85,7 @@ describe('ExternalToolSubmission', () => {
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
       expect(iframe.src).toBe(
-        'http://localhost/courses/100/external_tools/1/resource_selection?launch_type=homework_submission&assignment_id=200'
+        'http://localhost/courses/100/external_tools/1/resource_selection?launch_type=homework_submission&assignment_id=200',
       )
     })
   })
@@ -95,13 +95,13 @@ describe('ExternalToolSubmission', () => {
       const otherTool = {name: 'some other external tool', _id: '2'}
       const submission = SubmissionMocks.basicLtiLaunchReadyToSubmit
       const {getByTestId} = render(
-        <ExternalToolSubmission submission={submission} tool={otherTool} />
+        <ExternalToolSubmission submission={submission} tool={otherTool} />,
       )
 
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
       expect(iframe.src).toBe(
-        'http://localhost/courses/100/external_tools/2/resource_selection?launch_type=homework_submission&assignment_id=200'
+        'http://localhost/courses/100/external_tools/2/resource_selection?launch_type=homework_submission&assignment_id=200',
       )
     })
   })
@@ -114,7 +114,7 @@ describe('ExternalToolSubmission', () => {
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
       expect(iframe.src).toBe(
-        'http://localhost/courses/100/external_tools/1/resource_selection?launch_type=homework_submission&assignment_id=200'
+        'http://localhost/courses/100/external_tools/1/resource_selection?launch_type=homework_submission&assignment_id=200',
       )
     })
   })
@@ -143,7 +143,7 @@ describe('ExternalToolSubmission', () => {
           onFileUploadRequested={onFileUploadRequested}
           submission={submission}
           tool={tool}
-        />
+        />,
       )
 
     it('does nothing if the submission is already submitted', () => {
@@ -202,7 +202,7 @@ describe('ExternalToolSubmission', () => {
             onFileUploadRequested={onFileUploadRequested}
             submission={submission}
             tool={tool}
-          />
+          />,
         )
 
         postMessage('A2ExternalContentReady', {content_items: [contentItem]})

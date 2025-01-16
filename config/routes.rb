@@ -596,7 +596,9 @@ CanvasRails::Application.routes.draw do
   resources :eportfolios, except: :index do
     post :reorder_categories
     post ":eportfolio_category_id/reorder_entries" => "eportfolios#reorder_entries", :as => :reorder_entries
-    resources :categories, controller: :eportfolio_categories
+    resources :categories, controller: :eportfolio_categories do
+      get "pages" => "eportfolio_categories#pages", :as => :pages
+    end
     resources :entries, controller: :eportfolio_entries do
       resources :page_comments, path: :comments, only: [:create, :destroy]
       get "files/:attachment_id" => "eportfolio_entries#attachment", :as => :view_file
@@ -878,7 +880,7 @@ CanvasRails::Application.routes.draw do
   get "login/oauth/callback" => "login/oauth#create", :as => :oauth_login_callback
   # the callback URL for all OAuth2 based SSO
   get "login/oauth2/callback" => "login/oauth2#create", :as => :oauth2_login_callback
-  # the callback URL for Sign in with Apple
+  # the callback URL for Apple
   post "login/oauth2/callback" => "login/oauth2#create"
   # ActionController::TestCase can't deal with aliased controllers when finding
   # routes, so we let this route exist only for tests
@@ -1789,6 +1791,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/authentication_providers", action: :create, as: "account_create_ap"
       put "accounts/:account_id/authentication_providers/:id", action: :update, as: "account_update_ap"
       delete "accounts/:account_id/authentication_providers/:id", action: :destroy, as: "account_delete_ap"
+      put "accounts/:account_id/authentication_providers/:id/restore", action: :restore, as: "account_restore_ap"
     end
 
     get "users/:user_id/page_views", controller: :page_views, action: :index, as: "user_page_views"

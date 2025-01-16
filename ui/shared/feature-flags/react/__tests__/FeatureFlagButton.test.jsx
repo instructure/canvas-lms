@@ -34,7 +34,7 @@ describe('feature_flags::FeatureFlagButton', () => {
 
   it('Renders the correct icons for on state', () => {
     const {container} = render(
-      <FeatureFlagButton featureFlag={sampleData.onFeature.feature_flag} />
+      <FeatureFlagButton featureFlag={sampleData.onFeature.feature_flag} />,
     )
     expect(container.querySelector('svg[name="IconPublish"]')).toBeInTheDocument()
     expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
@@ -42,7 +42,7 @@ describe('feature_flags::FeatureFlagButton', () => {
 
   it('Renders the correct icons for allowed state', () => {
     const {container} = render(
-      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} />
+      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} />,
     )
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
     expect(container.querySelector('svg[name="IconUnlock"]')).toBeInTheDocument()
@@ -50,7 +50,7 @@ describe('feature_flags::FeatureFlagButton', () => {
 
   it('Shows the lock and menu item for allowed without disableDefaults ', async () => {
     const {container, getByText} = render(
-      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} />
+      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} />,
     )
     expect(container.querySelector('svg[name="IconUnlock"]')).toBeInTheDocument()
     await userEvent.click(container.querySelector('button'))
@@ -62,7 +62,7 @@ describe('feature_flags::FeatureFlagButton', () => {
       <FeatureFlagButton
         featureFlag={sampleData.allowedFeature.feature_flag}
         disableDefaults={true}
-      />
+      />,
     )
     expect(container.querySelector('svg[name="IconUnlock"]')).not.toBeInTheDocument()
     await userEvent.click(container.querySelector('button'))
@@ -78,7 +78,7 @@ describe('feature_flags::FeatureFlagButton', () => {
       <FeatureFlagButton
         featureFlag={sampleData.allowedFeature.feature_flag}
         onStateChange={onStateChange}
-      />
+      />,
     )
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
@@ -95,7 +95,7 @@ describe('feature_flags::FeatureFlagButton', () => {
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature1`
     fetchMock.deleteOnce(route, sampleData.allowedFeature.feature_flag)
     const {container, getByText} = render(
-      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} />
+      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} />,
     )
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
@@ -114,13 +114,13 @@ describe('feature_flags::FeatureFlagButton', () => {
     const {container, getByText, getByRole} = render(
       <div id="ff-test-button-enclosing-div">
         <FeatureFlagButton featureFlag={sampleData.offFeature.feature_flag} />
-      </div>
+      </div>,
     )
     container.querySelector('#ff-test-button-enclosing-div').focus()
     await userEvent.click(getByRole('button'))
     await userEvent.click(getByText('Enabled'))
     await waitFor(() =>
-      expect(container.querySelector('svg[name="IconPublish"]')).toBeInTheDocument()
+      expect(container.querySelector('svg[name="IconPublish"]')).toBeInTheDocument(),
     )
     const button = container.querySelector('button')
     const areSameElement = document.activeElement === button

@@ -46,7 +46,7 @@ export const RubircAssessmentImportFailuresModal = ({
 
       return prev
     },
-    {fileNames: [] as string[], messages: [] as string[]}
+    {fileNames: [] as string[], messages: [] as string[]},
   )
 
   return (
@@ -66,7 +66,6 @@ export const RubircAssessmentImportFailuresModal = ({
           {I18n.t('The import failed for the following file(s):')}
         </View>
         {fileNames.map((fileName, i) => (
-           
           <View as="div" margin="x-small 0 0" key={`${fileName}-${i}`}>
             <Text weight="bold">{fileName}</Text>
           </View>

@@ -141,7 +141,7 @@ describe('OverrideStudentStore', () => {
     server.respondWith(
       'GET',
       '/api/v1/courses/1/users?user_ids=2%2C5%2C8&enrollment_type=student&include%5B%5D=enrollments&include%5B%5D=group_ids',
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(response)]
+      [200, {'Content-Type': 'application/json'}, JSON.stringify(response)],
     )
     server.respondWith(
       'GET',
@@ -153,7 +153,7 @@ describe('OverrideStudentStore', () => {
           Link: '<http://page2>; rel="next"',
         },
         JSON.stringify(response),
-      ]
+      ],
     )
     server.respondWith('GET', 'http://page2', [
       200,
@@ -168,7 +168,7 @@ describe('OverrideStudentStore', () => {
     server.respondWith(
       'GET',
       '/api/v1/courses/1/search_users?search_term=publiu&enrollment_type=student&include_inactive=false&include%5B%5D=enrollments&include%5B%5D=group_ids',
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(response)]
+      [200, {'Content-Type': 'application/json'}, JSON.stringify(response)],
     )
     server.respondWith('GET', '/api/v1/courses/1/search_users?search_term=publiu', [
       200,
@@ -185,7 +185,7 @@ describe('OverrideStudentStore', () => {
           Link: '<http://coursepage2>; rel="next"',
         },
         JSON.stringify(response),
-      ]
+      ],
     )
   }
 
@@ -208,7 +208,7 @@ describe('OverrideStudentStore', () => {
   test('does not fetch by ID if no IDs given', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([])
-    expect(server.requests.length).toBe(0)
+    expect(server.requests).toHaveLength(0)
   })
 
   test('fetching by id: includes sections on the students', () => {
@@ -231,11 +231,11 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8, 7, 9])
     server.respond()
-    expect(server.requests.length).toBe(2)
-    expect(server.queue.length).toBe(1)
+    expect(server.requests).toHaveLength(2)
+    expect(server.queue).toHaveLength(1)
     server.respond()
-    expect(server.requests.length).toBe(2)
-    expect(server.queue.length).toBe(0)
+    expect(server.requests).toHaveLength(2)
+    expect(server.queue).toHaveLength(0)
     const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
     expect(results).toEqual(['2', '5', '7', '8', '9'])
   })
@@ -261,14 +261,14 @@ describe('OverrideStudentStore', () => {
     OverrideStudentStore.fetchStudentsByName('publiu')
     server.respond()
     OverrideStudentStore.fetchStudentsByName('publiu')
-    expect(server.requests.length).toBe(1)
+    expect(server.requests).toHaveLength(1)
   })
 
   test('does not fetch if allStudentsFetched is true', () => {
     setupServerResponses()
     OverrideStudentStore.setState({allStudentsFetched: true})
     OverrideStudentStore.fetchStudentsByName('Mike Jones')
-    expect(server.requests.length).toBe(0)
+    expect(server.requests).toHaveLength(0)
   })
 
   test('fetching by name: includes sections on the students', () => {
@@ -290,7 +290,7 @@ describe('OverrideStudentStore', () => {
   test('can properly fetch by course', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsForCourse()
-    expect(server.requests.length).toBe(1)
+    expect(server.requests).toHaveLength(1)
     server.respond()
     expect(server.requests[0].status).toBe(200)
   })
@@ -310,7 +310,7 @@ describe('OverrideStudentStore', () => {
       ])
       server.respond()
     }
-    expect(server.requests.length).toBe(4)
+    expect(server.requests).toHaveLength(4)
     expect(OverrideStudentStore.allStudentsFetched()).toBe(false)
   })
 

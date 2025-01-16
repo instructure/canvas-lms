@@ -70,15 +70,15 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
     return setTimeout(
       () =>
         $.screenReaderFlashMessageExclusive(
-          I18n.t('%{length} results found', {length: this.usersView.collection.length})
+          I18n.t('%{length} results found', {length: this.usersView.collection.length}),
         ),
-      500
+      500,
     )
   }
 
   notificationsFound() {
     return $.screenReaderFlashMessage(
-      I18n.t('%{length} notifications found', {length: this.collection.length})
+      I18n.t('%{length} notifications found', {length: this.collection.length}),
     )
   }
 
@@ -121,7 +121,7 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
             closeModal()
           }}
           onClose={() => closeModal()}
-        />
+        />,
       )
     } else {
       return this.$userIdField.val('')

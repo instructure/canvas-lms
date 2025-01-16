@@ -32,7 +32,7 @@ import {GroupContext, SPLIT} from './context'
 const I18n = createI18nScope('groups')
 
 const tooltipText = I18n.t(
-  'Group leaders can manage members and edit the group name but not the group size.'
+  'Group leaders can manage members and edit the group name but not the group size.',
 )
 
 const HelpText = () => (

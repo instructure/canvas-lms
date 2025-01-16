@@ -34,7 +34,7 @@ describe('assignments 2 teacher view header', () => {
           onValidate={() => true}
           invalidMessage={() => undefined}
         />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(getByTestId('AssignmentType')).toBeInTheDocument()

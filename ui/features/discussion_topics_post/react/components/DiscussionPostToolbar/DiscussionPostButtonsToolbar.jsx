@@ -53,21 +53,17 @@ const I18n = createI18nScope('discussions_posts')
 const DiscussionPostButtonsToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
   const [moreOpened, setMoreOpened] = useState(false)
-  const {translationLanguages, setShowTranslationControl} = useContext(
-    DiscussionManagerUtilityContext
+  const {translationLanguages, showTranslationControl, setShowTranslationControl} = useContext(
+    DiscussionManagerUtilityContext,
   )
-  const [showTranslate, setShowTranslate] = useState(false)
 
   const handleClose = () => setShowAssignToTray(false)
 
   const toggleTranslateText = () => {
-    // Update local state
-    setShowTranslate(!showTranslate)
-    // Update context
-    setShowTranslationControl(!showTranslate)
+    setShowTranslationControl(!showTranslationControl)
   }
 
-  const translationOptionText = showTranslate
+  const translationOptionText = showTranslationControl
     ? I18n.t('Turn off Translation')
     : I18n.t('Translate Discussion')
 
@@ -203,7 +199,7 @@ const DiscussionPostButtonsToolbar = props => {
             <IconGroupLine />
             {I18n.t('Group')}
           </Flex>
-        </Drilldown.Option>
+        </Drilldown.Option>,
       )
     }
     if (props.breakpoints.mobileOnly) {
@@ -223,7 +219,7 @@ const DiscussionPostButtonsToolbar = props => {
             )}
             {I18n.t('Sort')}
           </Flex>
-        </Drilldown.Option>
+        </Drilldown.Option>,
       )
     }
     if (ENV.user_can_summarize && !props.isSummaryEnabled) {
@@ -239,7 +235,7 @@ const DiscussionPostButtonsToolbar = props => {
             <AiIcon />
             {I18n.t('Summarize')}
           </Flex>
-        </Drilldown.Option>
+        </Drilldown.Option>,
       )
     }
     if (translationLanguages.current.length > 0) {
@@ -255,7 +251,7 @@ const DiscussionPostButtonsToolbar = props => {
             <AiIcon />
             {translationOptionText}
           </Flex>
-        </Drilldown.Option>
+        </Drilldown.Option>,
       )
     }
     return options

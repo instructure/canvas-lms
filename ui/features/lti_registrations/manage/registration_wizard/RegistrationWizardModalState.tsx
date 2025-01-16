@@ -154,7 +154,7 @@ export const useRegistrationModalWizardState = create<
 }))
 
 export const openRegistrationWizard = (
-  initialState: Partial<Omit<RegistrationWizardModalState, 'open'>>
+  initialState: Partial<Omit<RegistrationWizardModalState, 'open'>>,
 ) => {
   useRegistrationModalWizardState.setState(prev => {
     return {
@@ -176,7 +176,7 @@ export const openJsonRegistrationWizard = (
   jsonCode: string,
   internalLtiConfig: InternalLtiConfiguration,
   unifiedToolId?: UnifiedToolId,
-  onSuccessfulInstallation?: () => void
+  onSuccessfulInstallation?: () => void,
 ) => {
   useRegistrationModalWizardState.setState(prev => {
     return {
@@ -203,7 +203,7 @@ export const openJsonUrlRegistrationWizard = (
   jsonUrl: string,
   internalLtiConfig: InternalLtiConfiguration,
   unifiedToolId?: UnifiedToolId,
-  onSuccessfulInstallation?: () => void
+  onSuccessfulInstallation?: () => void,
 ) => {
   useRegistrationModalWizardState.setState(prev => {
     return {
@@ -235,7 +235,7 @@ export const openJsonUrlRegistrationWizard = (
 export const openDynamicRegistrationWizard = (
   dynamicRegistrationUrl: string,
   unifiedToolId?: UnifiedToolId,
-  onSuccessfulInstallation?: () => void
+  onSuccessfulInstallation?: () => void,
 ) => {
   openRegistrationWizard({
     dynamicRegistrationUrl,
@@ -256,7 +256,7 @@ export const openDynamicRegistrationWizard = (
  */
 export const openEditDynamicRegistrationWizard = (
   ltiImsRegistrationId: LtiImsRegistrationId,
-  onSuccessfulInstallation?: () => void
+  onSuccessfulInstallation?: () => void,
 ) => {
   openRegistrationWizard({
     ltiImsRegistrationId,
@@ -268,7 +268,7 @@ export const openEditDynamicRegistrationWizard = (
 
 export const openEditManualRegistrationWizard = (
   existingRegistrationId: LtiRegistrationId,
-  onSuccessfulInstallation?: () => void
+  onSuccessfulInstallation?: () => void,
 ) => {
   openRegistrationWizard({
     existingRegistrationId,

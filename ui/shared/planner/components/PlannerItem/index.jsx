@@ -46,7 +46,7 @@ import {
 } from '@instructure/ui-icons'
 import {arrayOf, bool, number, string, func, shape, object} from 'prop-types'
 import {momentObj} from 'react-moment-proptypes'
- 
+
 import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
 import BadgeList from '../BadgeList'
 import CalendarEventModal from '../CalendarEventModal'
@@ -460,7 +460,7 @@ export class PlannerItem_raw extends Component {
   renderItemMetrics = () => {
     const secondaryClasses = classnames(
       this.style.classNames.secondary,
-      !this.hasBadges() ? this.style.classNames.secondary_no_badges : ''
+      !this.hasBadges() ? this.style.classNames.secondary_no_badges : '',
     )
     const metricsClasses = classnames(this.style.classNames.metrics, {
       [this.style.classNames.with_end_time]: this.showEndTime(),
@@ -512,7 +512,7 @@ export class PlannerItem_raw extends Component {
       <div
         className={classnames(
           this.style.classNames.details,
-          !this.hasBadges() ? this.style.classNames.details_no_badges : ''
+          !this.hasBadges() ? this.style.classNames.details_no_badges : '',
         )}
       >
         {!this.props.simplifiedControls && (
@@ -707,7 +707,7 @@ export class PlannerItem_raw extends Component {
             {
               [this.style.classNames.missingItem]: this.props.isMissingItem,
             },
-            this.props.simplifiedControls ? this.style.classNames.k5Layout : ''
+            this.props.simplifiedControls ? this.style.classNames.k5Layout : '',
           )}
           ref={this.registerRootDivRef}
         >

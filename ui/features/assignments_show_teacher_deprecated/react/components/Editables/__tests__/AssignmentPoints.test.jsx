@@ -39,7 +39,7 @@ function renderAssignmentPoints(props) {
       invalidMessage={errorMessage}
       pointsPossible={1432}
       {...props}
-    />
+    />,
   )
 }
 
@@ -88,7 +88,7 @@ describe('AssignmentPoints', () => {
         <span id="focus-me" tabIndex="-1">
           just here to get focus
         </span>
-      </div>
+      </div>,
     )
 
     const input = getByDisplayValue('12')
@@ -122,7 +122,7 @@ describe('AssignmentPoints', () => {
           pointsPossible="1.247"
         />
         <input data-testid="focusme" />
-      </div>
+      </div>,
     )
     const btn = getByTestId('focusme')
     btn.focus()

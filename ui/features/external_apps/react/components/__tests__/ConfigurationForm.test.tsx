@@ -28,7 +28,7 @@ import userEvent from '@testing-library/user-event'
 import ConfigurationForm from '../configuration_forms/ConfigurationForm'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
-const renderForm = (props: Object) => {
+const renderForm = (props: object) => {
   return render(<ConfigurationForm {...props} />)
 }
 
@@ -38,7 +38,7 @@ const getSubmitButton = () => {
 
 const getMembershipServiceCheckbox = () => {
   return screen.getByLabelText(
-    'Allow this tool to access the IMS Names and Role Provisioning Service'
+    'Allow this tool to access the IMS Names and Role Provisioning Service',
   )
 }
 
@@ -102,7 +102,7 @@ describe.skip('when configuration type is manual', () => {
     await userEvent.type(screen.getByRole('textbox', {name: /consumer key/i}), expected.consumerKey)
     await userEvent.type(
       screen.getByRole('textbox', {name: /shared secret/i}),
-      expected.sharedSecret
+      expected.sharedSecret,
     )
     await userEvent.click(screen.getByRole('combobox', {name: /privacy level/i}))
     await userEvent.click(screen.getByText(/anonymous/i))
@@ -110,7 +110,7 @@ describe.skip('when configuration type is manual', () => {
     await userEvent.type(screen.getByRole('textbox', {name: /description/i}), expected.description)
     await userEvent.type(
       screen.getByRole('textbox', {name: /custom fields/i}),
-      expected.customFields
+      expected.customFields,
     )
     await userEvent.click(getSubmitButton())
     expect(handleSubmitMock).toHaveBeenCalledWith('manual', expected, expect.anything())
@@ -248,7 +248,7 @@ describe.skip('when configuration type is url', () => {
         sharedSecret: 'secret',
         verifyUniqueness: 'true',
       },
-      expect.anything()
+      expect.anything(),
     )
   })
 
@@ -352,7 +352,7 @@ describe.skip('when configuration type is xml', () => {
         sharedSecret: 'secret',
         verifyUniqueness: 'true',
       },
-      expect.anything()
+      expect.anything(),
     )
   })
 
@@ -453,7 +453,7 @@ describe('when configuration type is lti2', () => {
       {
         registrationUrl: 'https://example.com',
       },
-      expect.anything()
+      expect.anything(),
     )
   })
 

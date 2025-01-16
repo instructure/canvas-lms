@@ -63,7 +63,7 @@ const assignmentRubricDialog = {
       // since that is the point of why they clicked the link.
       if (assignmentRubricDialog.noRubricExists) {
         $.subscribe('edit_rubric/initted', () =>
-          assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click()
+          assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click(),
         )
       }
 

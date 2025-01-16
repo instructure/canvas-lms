@@ -149,7 +149,7 @@ function formatGradingSchemeGrade(score, grade, options = {}) {
       // @ts-expect-error
       options.pointsBasedGradingScheme,
       // @ts-expect-error
-      options.scalingFactor
+      options.scalingFactor,
     )
     // @ts-expect-error
   } else if (options.pointsPossible) {
@@ -162,7 +162,7 @@ function formatGradingSchemeGrade(score, grade, options = {}) {
       // @ts-expect-error
       options.pointsBasedGradingScheme,
       // @ts-expect-error
-      options.scalingFactor
+      options.scalingFactor,
     )
   } else if (grade != null) {
     formattedGrade = grade
@@ -174,7 +174,7 @@ function formatGradingSchemeGrade(score, grade, options = {}) {
       // @ts-expect-error
       options.pointsBasedGradingScheme,
       // @ts-expect-error
-      options.scalingFactor
+      options.scalingFactor,
     )
   }
 
@@ -361,7 +361,7 @@ const GradeFormatHelper = {
 
   formatSubmissionGrade(
     submission: SubmissionData,
-    options: {version: string; defaultValue?: string; formatType?: string} = {version: 'final'}
+    options: {version: string; defaultValue?: string; formatType?: string} = {version: 'final'},
   ) {
     if (submission.excused) {
       return excused()

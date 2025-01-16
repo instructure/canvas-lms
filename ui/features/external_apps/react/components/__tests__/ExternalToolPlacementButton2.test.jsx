@@ -34,7 +34,7 @@ describe('ExternalToolPlacementButton', () => {
         returnFocus={() => {}}
         onSuccess={() => {}}
         onToggleSuccess={() => {}}
-      />
+      />,
     )
     equal(wrapper.find('a').props().role, 'menuitem')
   })
@@ -50,7 +50,7 @@ describe('ExternalToolPlacementButton', () => {
         returnFocus={() => {}}
         onSuccess={() => {}}
         onToggleSuccess={() => {}}
-      />
+      />,
     )
     equal(wrapper.find('a').props().role, 'button')
   })
@@ -66,7 +66,7 @@ describe('ExternalToolPlacementButton', () => {
         returnFocus={() => {}}
         onSuccess={() => {}}
         onToggleSuccess={() => {}}
-      />
+      />,
     )
 
     wrapper.setState({modalIsOpen: true})

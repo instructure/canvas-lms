@@ -61,7 +61,7 @@ describe('Toolbar', () => {
 
   test('renders multi select action items when there is more than one item selected', () => {
     const toolbar = render(
-      <Toolbar params="foo" query="" selectedItems={[file]} contextId="1" contextType="courses" />
+      <Toolbar params="foo" query="" selectedItems={[file]} contextId="1" contextType="courses" />,
     )
     toolbar.container.querySelector('.ui-buttonset .ui-button')
     expect(toolbar.container.querySelector('.ui-buttonset .ui-button')).toBeInTheDocument()
@@ -80,7 +80,7 @@ describe('Toolbar', () => {
         userCanEditFilesForContext={false}
         userCanDeleteFilesForContext={false}
         userCanRestrictFilesForContext={false}
-      />
+      />,
     )
     const config = {
       '.btn-view': true,
@@ -107,7 +107,7 @@ describe('Toolbar', () => {
         userCanEditFilesForContext={true}
         userCanDeleteFilesForContext={true}
         userCanRestrictFilesForContext={true}
-      />
+      />,
     )
     const config = {
       '.btn-view': true,
@@ -133,7 +133,7 @@ describe('Toolbar', () => {
         userCanEditFilesForContext={true}
         userCanDeleteFilesForContext={true}
         userCanRestrictFilesForContext={true}
-      />
+      />,
     )
     const config = {
       '.btn-view': true,
@@ -158,7 +158,7 @@ describe('Toolbar', () => {
         contextType="courses"
         userCanAddFilesForContext={true}
         userCanDeleteFilesForContext={true}
-      />
+      />,
     )
     const config = {
       '.btn-view': true,
@@ -184,7 +184,7 @@ describe('Toolbar', () => {
         userCanAddFilesForContext={true}
         userCanEditFilesForContext={true}
         userCanRestrictFilesForContext={true}
-      />
+      />,
     )
     const config = {
       '.btn-view': true,
@@ -211,7 +211,7 @@ describe('Toolbar', () => {
         userCanEditFilesForContext={true}
         userCanDeleteFilesForContext={true}
         userCanRestrictFilesForContext={true}
-      />
+      />,
     )
     const config = {
       '.btn-view': false,

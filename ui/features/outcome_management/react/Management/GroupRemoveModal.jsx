@@ -48,14 +48,14 @@ const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSucces
       }
     } catch (err) {
       const message = err?.response?.data?.match(
-        /cannot be deleted because it is aligned to content/
+        /cannot be deleted because it is aligned to content/,
       )
         ? I18n.t(
             'An error occurred while removing this group: "%{groupTitle}" contains one or ' +
               'more Outcomes that are currently aligned to content.',
             {
               groupTitle,
-            }
+            },
           )
         : I18n.t('An error occurred while removing this group. Please try again.')
 
@@ -79,10 +79,10 @@ const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSucces
           <Text size="medium">
             {isAccount
               ? I18n.t(
-                  'Are you sure that you want to remove this group and all of its content from your account?'
+                  'Are you sure that you want to remove this group and all of its content from your account?',
                 )
               : I18n.t(
-                  'Are you sure that you want to remove this group and all of its content from your course?'
+                  'Are you sure that you want to remove this group and all of its content from your course?',
                 )}
           </Text>
         </View>

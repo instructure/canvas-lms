@@ -46,7 +46,7 @@ export const useValidateLaunchSettings = (
     domain: string
     customFields: string
   }>,
-  internalConfig: InternalLtiConfiguration
+  internalConfig: InternalLtiConfiguration,
 ): LaunchSettingsValidationMessages => {
   const redirectUrisMessages: FormMessage[] = useMemo(() => {
     const uris = launchSettings.redirectURIs?.trim().split('\n') ?? []
@@ -118,7 +118,7 @@ export const useValidateLaunchSettings = (
       return [
         {
           text: I18n.t(
-            'Invalid Domain. Please ensure the domain does not start with http:// or https://.'
+            'Invalid Domain. Please ensure the domain does not start with http:// or https://.',
           ),
           type: 'error',
         },

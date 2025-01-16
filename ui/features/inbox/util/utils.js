@@ -60,7 +60,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
         inboxConversation.lastMessageContent = newestSubmissionComment?.comment
         inboxConversation.participantString = getParticipantsString(
           conversation?.commentsConnection.nodes,
-          isSubmissionComments
+          isSubmissionComments,
         )
         inboxConversation.messages = conversation?.commentsConnection.nodes
         inboxConversation.count = conversation?.commentsConnection.nodes.length || 0
@@ -83,7 +83,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
           inboxConversation?.participants,
           isSubmissionComments,
           inboxConversation?.messages[inboxConversation.messages.length - 1]?.author?.shortName ||
-            DEFAULT_USER_PROPERTIES.name
+            DEFAULT_USER_PROPERTIES.name,
         )
         inboxConversation.isPrivate = conversation?.conversation?.isPrivate
       }
@@ -166,7 +166,7 @@ const getConversationParticipantString = (participants, conversationOwnerName) =
 const getParticipantsString = (
   participants,
   isSubmissionComments,
-  conversationOwnerName = null
+  conversationOwnerName = null,
 ) => {
   return isSubmissionComments
     ? getSubmissionCommentsParticipantString(participants)

@@ -107,7 +107,7 @@ function checkHeader(linkHeader: string | undefined): boolean {
   if (linkHeader.length > PARSE_LINK_HEADER_MAXLEN) {
     if (PARSE_LINK_HEADER_THROW_ON_MAXLEN_EXCEEDED) {
       throw new Error(
-        `Input string too long, it should be under ${PARSE_LINK_HEADER_MAXLEN} characters.`
+        `Input string too long, it should be under ${PARSE_LINK_HEADER_MAXLEN} characters.`,
       )
     } else {
       return false

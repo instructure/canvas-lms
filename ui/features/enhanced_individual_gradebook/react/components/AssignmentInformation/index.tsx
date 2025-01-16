@@ -67,7 +67,7 @@ export default function AssignmentInformation({
       gradedSubmissions: submissions.filter(s => s.score !== null && s.score !== undefined),
       scores: submissions.map(s => s.score ?? 0),
     }),
-    [submissions]
+    [submissions],
   )
 
   if (!assignment) {
@@ -90,7 +90,7 @@ export default function AssignmentInformation({
   const {downloadAssignmentSubmissionsUrl, contextUrl, groupWeightingScheme} = gradebookOptions
   const downloadSubmissionsUrl = (downloadAssignmentSubmissionsUrl ?? '').replace(
     ':assignment',
-    assignment.id
+    assignment.id,
   )
   const {hasSubmittedSubmissions, submissionTypes, htmlUrl} = assignment
   const showSubmissionDownloadButton = () => {
@@ -155,7 +155,7 @@ export default function AssignmentInformation({
               >
                 <ScreenReaderContent>{I18n.t('Warning')}</ScreenReaderContent>
                 {I18n.t(
-                  'Assignments in this group have no points possible and cannot be included in grade calculation.'
+                  'Assignments in this group have no points possible and cannot be included in grade calculation.',
                 )}
               </Link>
             </View>
@@ -209,7 +209,7 @@ type AssignmentScoreDetailsProps = {
 function AssignmentScoreDetails({assignment, scores}: AssignmentScoreDetailsProps) {
   const {average, max, min} = useMemo(
     () => computeAssignmentDetailText(assignment, scores),
-    [assignment, scores]
+    [assignment, scores],
   )
   return (
     <View as="div" className="pad-box bottom-only ic-Table-responsive-x-scroll">
@@ -261,7 +261,7 @@ function AssignmentActions({
         handleSetGrades(updatedSubmissions)
       }
     },
-    [handleSetGrades]
+    [handleSetGrades],
   )
 
   return (
@@ -309,7 +309,7 @@ function AssignmentActions({
           <View padding="0 0 0 xx-small">
             <Text data-testid="default-grade-warning">
               {I18n.t(
-                'Unable to set default grade because this assignment is due in a closed grading period for at least one student'
+                'Unable to set default grade because this assignment is due in a closed grading period for at least one student',
               )}
             </Text>
           </View>
@@ -328,7 +328,7 @@ function AssignmentActions({
           <View padding="0 0 0 xx-small">
             <Text data-testid="curve-grade-warning">
               {I18n.t(
-                'Unable to curve grades because this assignment is due in a closed grading period for at least one student'
+                'Unable to curve grades because this assignment is due in a closed grading period for at least one student',
               )}
             </Text>
           </View>

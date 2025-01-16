@@ -30,7 +30,7 @@ import {SpeedGraderCheckpoint} from '../SpeedGraderCheckpoint'
 const generateAssignment = (
   id: string,
   points_possible = 3,
-  grading_type = 'points'
+  grading_type = 'points',
 ): Assignment => ({
   id,
   course_id: '1',
@@ -53,7 +53,7 @@ const generateSubAssignmentSubmission = (
   user_id: string,
   grade_matches_current_submission: boolean = true,
   missing: boolean = false,
-  late: boolean = false
+  late: boolean = false,
 ): SubAssignmentSubmission => ({
   sub_assignment_tag,
   score: 0,
@@ -81,7 +81,7 @@ const getDefaultProps = (
   gradingType: string = 'points',
   grade_matches_current_submission: boolean = true,
   missing: boolean = false,
-  late: boolean = false
+  late: boolean = false,
 ) => ({
   assignment: generateAssignment('1', pointsPossible, gradingType),
   subAssignmentSubmission: generateSubAssignmentSubmission(
@@ -89,7 +89,7 @@ const getDefaultProps = (
     '1',
     grade_matches_current_submission,
     missing,
-    late
+    late,
   ),
   customGradeStatusesEnabled: true,
   customGradeStatuses: [

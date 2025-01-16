@@ -58,7 +58,7 @@ const parseWithZodToParamsParseResult = <A>(options: {
 export const parseSearchParam = <A>(
   schema: SearchParamSchema<A>,
   key: string,
-  params: URLSearchParams
+  params: URLSearchParams,
 ): ParamsParseResult<A> => {
   if (schema._def.typeName === 'ZodArray') {
     return parseWithZodToParamsParseResult({schema, key, value: params.getAll(key)})
@@ -76,7 +76,7 @@ export const parseSearchParam = <A>(
  */
 export const parseSearchParams = <Params extends SearchParameterSchemaMap>(
   schemas: Params,
-  params: URLSearchParams
+  params: URLSearchParams,
 ): ParamsParseResult<ParsedSearchParamsValue<Params>> => {
   return Object.keys(schemas).reduce(
     (acc, key) => {
@@ -91,7 +91,7 @@ export const parseSearchParams = <Params extends SearchParameterSchemaMap>(
         return acc
       }
     },
-    {success: true, value: {}} as ParamsParseResult<ParsedSearchParamsValue<Params>>
+    {success: true, value: {}} as ParamsParseResult<ParsedSearchParamsValue<Params>>,
   )
 }
 
@@ -108,7 +108,7 @@ export type SearchParamsValueStrings<Params extends SearchParameterSchemaMap> = 
 }>
 
 export type SetSearchParamsValueStrings<Params extends SearchParameterSchemaMap> = (
-  params: SearchParamsValueStrings<Params>
+  params: SearchParamsValueStrings<Params>,
 ) => void
 
 /**
@@ -160,7 +160,7 @@ export const useZodSearchParams = <M extends SearchParameterSchemaMap>(paramSche
         return newParams
       })
     },
-    [setParams]
+    [setParams],
   )
   return [parsedParams, setParsedParams] as const
 }

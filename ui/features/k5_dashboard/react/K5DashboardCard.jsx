@@ -262,7 +262,7 @@ const K5DashboardCard = ({
   const loadingOpportunities = k5Context?.loadingOpportunities || false
   const isStudent = k5Context?.isStudent || false
   const latestAnnouncement = k5Context.subjectAnnouncements.find(
-    a => a.context_code === `course_${id}`
+    a => a.context_code === `course_${id}`,
   )
 
   const handleHeaderClick = e => {

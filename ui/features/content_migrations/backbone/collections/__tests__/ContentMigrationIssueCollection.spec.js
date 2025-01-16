@@ -27,7 +27,7 @@ describe('ContentMigrationIssueCollection', () => {
       content_migration_id,
     })
     expect(cmiCollection.url()).toBe(
-      `/api/v1/courses/${course_id}/content_migrations/${content_migration_id}/migration_issues`
+      `/api/v1/courses/${course_id}/content_migrations/${content_migration_id}/migration_issues`,
     )
   })
 })

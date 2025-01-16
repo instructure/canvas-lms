@@ -17,29 +17,50 @@
  */
 
 import React from 'react'
-import {arrayOf, shape, string} from 'prop-types'
-
 import natcompare from '@canvas/util/natcompare'
 import {useScope as createI18nScope} from '@canvas/i18n'
-
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 
+interface StudentGroup {
+  id: string
+  name: string
+}
+
+interface StudentGroupSet {
+  id: string
+  name: string
+  groups: StudentGroup[]
+}
+
+interface NormalizedStudentGroupSet {
+  id: string
+  name: string
+  children: StudentGroup[]
+}
+
+interface StudentGroupFilterProps {
+  studentGroupSets: StudentGroupSet[]
+  selectedStudentGroupId: string | null
+  disabled: boolean
+  onSelect: (id: string | null) => void
+  [key: string]: any // For other ContentFilter props
+}
+
 const I18n = createI18nScope(
-  'gradebook_default_gradebook_components_content_filters_student_group_filter'
+  'gradebook_default_gradebook_components_content_filters_student_group_filter',
 )
 
-// @ts-expect-error
-function normalizeStudentGroupSets(studentGroupSets) {
-  // @ts-expect-error
-  return studentGroupSets.map(category => ({
+function normalizeStudentGroupSets(
+  studentGroupSets: StudentGroupSet[],
+): NormalizedStudentGroupSet[] {
+  return studentGroupSets.map((category: StudentGroupSet) => ({
     children: [...category.groups].sort(natcompare.byKey('name')),
     id: category.id,
     name: category.name,
   }))
 }
 
-// @ts-expect-error
-export default function StudentGroupFilter(props) {
+export default function StudentGroupFilter(props: StudentGroupFilterProps) {
   const {studentGroupSets, selectedStudentGroupId, ...filterProps} = props
 
   return (
@@ -53,27 +74,4 @@ export default function StudentGroupFilter(props) {
       sortAlphabetically={true}
     />
   )
-}
-
-StudentGroupFilter.propTypes = {
-  studentGroupSets: arrayOf(
-    shape({
-      /* groups can only ever be a single level deep */
-      children: arrayOf(
-        shape({
-          id: string.isRequired,
-          name: string.isRequired,
-        })
-      ),
-
-      id: string.isRequired,
-      name: string.isRequired,
-    })
-  ).isRequired,
-
-  selectedStudentGroupId: string,
-}
-
-StudentGroupFilter.defaultProps = {
-  selectedStudentGroupId: null,
 }

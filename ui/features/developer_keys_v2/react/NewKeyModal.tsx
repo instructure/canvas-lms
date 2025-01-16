@@ -152,8 +152,8 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
   alertAboutInvalidRedirectUris() {
     $.flashError(
       I18n.t(
-        "One of the supplied redirect_uris is too long. Please ensure you've entered the correct value(s) for your redirect_uris."
-      )
+        "One of the supplied redirect_uris is too long. Please ensure you've entered the correct value(s) for your redirect_uris.",
+      ),
     )
   }
 
@@ -192,8 +192,8 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       createOrEditDeveloperKey(
         {developer_key: toSubmit},
         this.developerKeyUrl(),
-        method
-      ) as unknown as AnyAction
+        method,
+      ) as unknown as AnyAction,
     )
       .then(() => {
         this.setState({isSaving: false})
@@ -212,7 +212,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       scopes?: any
       custom_fields?: any
     },
-    developerKey: DeveloperKey
+    developerKey: DeveloperKey,
   ) {
     const {
       store: {dispatch},
@@ -309,7 +309,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
             this.props.handleSuccessfulSave(data.warning_message)
             this.closeModal()
           },
-          () => this.setState({isSaving: false})
+          () => this.setState({isSaving: false}),
         )
     }
   }

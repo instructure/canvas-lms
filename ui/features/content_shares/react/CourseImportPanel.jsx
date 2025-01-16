@@ -54,7 +54,7 @@ export default function CourseImportPanel({contentShare, onClose, onImport}) {
             importer_skips: ['all_course_settings', 'folders'],
           },
         },
-      })
+      }),
     )
     onImport(contentShare)
   }

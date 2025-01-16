@@ -32,5 +32,5 @@ export default handleActions(
       return !action.payload || action.payload.includes('inputParams') ? resetState : state
     },
   },
-  defaultState.inputParams
+  defaultState.inputParams,
 )

@@ -128,7 +128,7 @@ const OutcomeDescriptionModal = ({outcome, isOpen, onCloseHandler}) => {
             >
               <Text>
                 {I18n.t(
-                  'To edit the name, description, or friendly description of an outcome, open the'
+                  'To edit the name, description, or friendly description of an outcome, open the',
                 )}
                 &nbsp;
                 <Link href={contextURL + '/outcomes'}>{I18n.t('Outcomes')}</Link>

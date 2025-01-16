@@ -2684,6 +2684,45 @@ describe UsersController do
     end
   end
 
+  describe "#new" do
+    context "when the user is logged in" do
+      before do
+        @user = user_factory(active_all: true)
+        user_session(@user)
+      end
+
+      it "redirects to the root URL" do
+        get :new
+        expect(response).to redirect_to(root_url)
+      end
+    end
+
+    context "when the user is not logged in" do
+      context "and the feature flag login_registration_ui_identity is enabled" do
+        before do
+          Account.default.enable_feature!(:login_registration_ui_identity)
+          allow(Account.default).to receive(:self_registration_allowed_for?).and_return(true)
+        end
+
+        it "redirects to the registration landing page" do
+          get :new
+          expect(response).to redirect_to(register_landing_path)
+        end
+      end
+
+      context "and the feature flag login_registration_ui_identity is disabled" do
+        before do
+          allow(Account.default).to receive(:self_registration_allowed_for?).and_return(true)
+        end
+
+        it "renders the legacy registration page using the bare layout" do
+          get :new
+          expect(response).to render_template(layout: "bare")
+        end
+      end
+    end
+  end
+
   describe "#toggle_hide_dashcard_color_overlays" do
     it "updates user preference based on value provided" do
       course_factory

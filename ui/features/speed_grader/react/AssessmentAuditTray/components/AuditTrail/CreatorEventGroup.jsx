@@ -79,6 +79,7 @@ export default class CreatorEventGroup extends PureComponent {
                       color="primary"
                     >
                       <IconButton
+                        data-testid="warning-icon"
                         renderIcon={<IconWarningLine color="error" />}
                         size="medium"
                         screenReaderLabel={I18n.t('Toggle tooltip')}
@@ -92,7 +93,7 @@ export default class CreatorEventGroup extends PureComponent {
             }
             toggleLabel={I18n.t('Assessment audit events for %{creatorName}', {creatorName})}
           >
-            <div>
+            <div data-testid="date-event-groups">
               {dateEventGroups.map(dateEventGroup => (
                 <DateEventGroup dateEventGroup={dateEventGroup} key={dateEventGroup.startDateKey} />
               ))}

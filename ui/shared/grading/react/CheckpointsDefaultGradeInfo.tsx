@@ -26,7 +26,7 @@ export const CheckpointsDefaultGradeInfo = () => {
   return (
     <Alert variant="info">
       {I18n.t(
-        'Leaving any score field blank will result in overwriting graded submissions to be ungraded or incomplete.'
+        'Leaving any score field blank will result in overwriting graded submissions to be ungraded or incomplete.',
       )}
     </Alert>
   )

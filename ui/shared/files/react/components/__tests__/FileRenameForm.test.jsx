@@ -135,7 +135,7 @@ describe('FileRenameForm', () => {
     expect(onNameConflictResolved).toHaveBeenCalledWith(
       expect.objectContaining({
         expandZip: true,
-      })
+      }),
     )
   })
 
@@ -157,7 +157,7 @@ describe('FileRenameForm', () => {
     expect(onNameConflictResolved).toHaveBeenCalledWith(
       expect.objectContaining({
         expandZip: true,
-      })
+      }),
     )
   })
 
@@ -178,7 +178,7 @@ describe('FileRenameForm', () => {
     expect(onNameConflictResolved).toHaveBeenCalledWith(
       expect.objectContaining({
         expandZip: true,
-      })
+      }),
     )
   })
 

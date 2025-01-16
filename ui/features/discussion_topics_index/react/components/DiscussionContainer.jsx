@@ -69,15 +69,15 @@ export class DiscussionsContainer extends Component {
   static propTypes = {
     cleanDiscussionFocus: func.isRequired,
     // this really is used
-    closedState: bool,  
+    closedState: bool,
     connectDropTarget: func,
     deleteDiscussion: func.isRequired,
     deleteFocusDone: func.isRequired,
     // this really is used
-    deleteFocusPending: bool.isRequired,  
+    deleteFocusPending: bool.isRequired,
     discussions: discussionList.isRequired,
     // this really is used
-    handleDrop: func,  
+    handleDrop: func,
     onMoveDiscussion: func,
     onOpenAssignToTray: func,
     permissions: propTypes.permissions.isRequired,
@@ -195,7 +195,7 @@ export class DiscussionsContainer extends Component {
             draggable={false}
           />
         </div>
-      )
+      ),
     )
   }
 
@@ -238,7 +238,7 @@ export class DiscussionsContainer extends Component {
               : this.renderBackgroundImage()}
           </ToggleDetails>
         </span>
-      </div>
+      </div>,
     )
   }
 }
@@ -270,12 +270,12 @@ export const DroppableDiscussionsContainer = DropTarget(
     connectDropTarget: dragConnect.dropTarget(),
     isOver: monitor.isOver(),
     canDrop: monitor.canDrop(),
-  })
+  }),
 )(DiscussionsContainer)
 
 export const ConnectedDiscussionsContainer = connect(mapState, mapDispatch)(DiscussionsContainer)
 
 export const DroppableConnectedDiscussionsContainer = connect(
   mapState,
-  mapDispatch
+  mapDispatch,
 )(DroppableDiscussionsContainer)

@@ -201,7 +201,7 @@ describe('CollectionView', () => {
     expect(submitHtmlForm).toHaveBeenCalledWith(
       `/accounts/${OUR_ACCOUNT_ID}/brand_configs/save_to_user_session`,
       'POST',
-      undefined
+      undefined,
     )
   })
 
@@ -216,7 +216,7 @@ describe('CollectionView', () => {
     expect(submitHtmlForm).toHaveBeenCalledWith(
       `/accounts/${OUR_ACCOUNT_ID}/brand_configs/save_to_user_session`,
       'POST',
-      DELETABLE_BASIS.md5
+      DELETABLE_BASIS.md5,
     )
   })
 
@@ -262,7 +262,7 @@ describe('CollectionView', () => {
     expect(submitHtmlForm).toHaveBeenCalledWith(
       `/accounts/${OUR_ACCOUNT_ID}/brand_configs/save_to_user_session`,
       'POST',
-      DELETABLE_BASIS.md5
+      DELETABLE_BASIS.md5,
     )
   })
 
@@ -274,7 +274,7 @@ describe('CollectionView', () => {
     expect(submitHtmlForm).toHaveBeenCalledWith(
       `/accounts/${OUR_ACCOUNT_ID}/brand_configs/save_to_user_session`,
       'POST',
-      undefined
+      undefined,
     )
   })
 

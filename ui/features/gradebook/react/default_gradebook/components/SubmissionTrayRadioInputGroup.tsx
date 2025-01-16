@@ -67,7 +67,7 @@ export type SubmissionTrayRadioInputGroupProps = {
   submissionUpdating: boolean
   updateSubmission: (arg0: PendingUpdateData) => void
   latePolicy: {
-    lateSubmissionInterval: string
+    lateSubmissionInterval: 'day' | 'hour'
   }
 }
 
@@ -110,7 +110,7 @@ export default function SubmissionTrayRadioInputGroup({
 
   const handleRadioInputChanged = (
     event: React.ChangeEvent<HTMLInputElement>,
-    isCustom: boolean
+    isCustom: boolean,
   ) => {
     const {
       target: {value},
@@ -187,7 +187,6 @@ export default function SubmissionTrayRadioInputGroup({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleRadioInputChanged(e, status.isCustom)
           }
-          // @ts-expect-error
           updateSubmission={updateSubmission}
           // @ts-expect-error
           submission={submission}

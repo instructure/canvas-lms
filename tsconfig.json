@@ -1,30 +1,27 @@
 {
   "compilerOptions": {
-    "allowJs": true, // allows importing of .js files from .ts files
-    "esModuleInterop": true, // more accurately transpiles to the ES6 module spec (maybe not needed w/ babel transpilation)
-    "isolatedModules": true, // required to adhere to babel's single-file transpilation process
-    "jsx": "react-jsx", // transpiles jsx to React.createElement calls (maybe not needed w/ babel transpilation)
-    "lib": ["DOM", "ES2020", "ESNext"], // include types for DOM APIs and standard JS up to ES2020
-    "incremental": true, // enables incremental compilation for faster builds
-    "module": "es2020", // support the most modern ES6-style module syntax
-    "moduleResolution": "node", // required for non-commonjs imports
-    "noEmit": true, // don't generate transpiled JS files, source-maps, or .d.ts files for Canvas source code
-    "resolveJsonModule": true, // enables importing json files
-    "verbatimModuleSyntax": true, // for better tree-shaking
-    "skipLibCheck": true, // don't do type-checking on dependencies' internal types for improved performance
-    "strict": true, // enables a bunch of strict mode family options. See https://www.typescriptlang.org/tsconfig#strict
-    "target": "es2020", // support the most modern JS features (let babel handle transpilation)
-    "noImplicitAny": true, // temporarily allows un-typed variables (and imports) to be automatically defined as "any"
-    "baseUrl": "./ui", // recommended to be defined when using `paths`
+    "allowJs": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "ES2020", "ESNext"],
+    "incremental": false,
+    "module": "es2020",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es2020",
+    "noImplicitAny": true,
+    "baseUrl": "./ui",
     "paths": {
-      "@canvas/*": ["shared/*"], // lets TS follow an 'import Foo from @canvas/foo' statement
-      "@instructure/*": ["../packages/*"] // lets TS follow an 'import Foo from @instructure/bar' statement"
+      "@canvas/*": ["shared/*"],
+      "@instructure/*": ["./packages/*"]
     }
   },
   "include": ["ui/**/*.ts", "ui/**/*.tsx"],
   "exclude": ["node_modules"],
-  "references": [
-    {"path": "./packages/canvas-rce"}
-  ],
   "types": []
 }

@@ -29,7 +29,7 @@ $(document).ready(() => {
     },
     function () {
       $(this).removeClass('hover')
-    }
+    },
   )
 
   $('.quiz_response_text img').each(function () {
@@ -44,8 +44,8 @@ $(document).ready(() => {
         'title',
         I18n.t(
           'titles.this_is_an_image',
-          'This is an image, not text, and could have changed since the student submitted'
-        )
+          'This is an image, not text, and could have changed since the student submitted',
+        ),
       )
   })
 
@@ -61,8 +61,8 @@ $(document).ready(() => {
         'title',
         I18n.t(
           'titles.this_is_an_external_frame',
-          'This is an external frame, not text, and could have changed since the student submitted'
-        )
+          'This is an external frame, not text, and could have changed since the student submitted',
+        ),
       )
   })
 
@@ -88,8 +88,8 @@ $(document).ready(() => {
         'title',
         I18n.t(
           'titles.this_is_an_external_element',
-          'This is an external element, not text, and could have changed since the student submitted'
-        )
+          'This is an external element, not text, and could have changed since the student submitted',
+        ),
       )
   })
 })

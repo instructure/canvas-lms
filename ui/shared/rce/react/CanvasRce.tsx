@@ -34,7 +34,7 @@ import type {EditorOptionsPropType} from '@instructure/canvas-rce/es/rce/RCEWrap
 // onInit has been called. Until then tinymce is not initialized.
 const CanvasRce = forwardRef(function CanvasRce(
   props: CanvasRcePropTypes,
-  _rceRef: React.ForwardedRef<RCEWrapper>
+  _rceRef: React.ForwardedRef<RCEWrapper>,
 ) {
   const rceRef = _rceRef as MutableRefObject<RCEWrapper>
 
@@ -65,7 +65,7 @@ const CanvasRce = forwardRef(function CanvasRce(
       // @ts-expect-error
       config.init_instance_callback = createChainedFunction(
         config.init_instance_callback,
-        editorOptions?.init_instance_callback
+        editorOptions?.init_instance_callback,
       )
     }
     return config
@@ -88,7 +88,7 @@ const CanvasRce = forwardRef(function CanvasRce(
       }
       setRefCreated(node)
     },
-    [rceRef]
+    [rceRef],
   )
 
   useEffect(() => {

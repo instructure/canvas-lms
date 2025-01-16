@@ -32,7 +32,7 @@ const I18n = createI18nScope('ViewRubrics')
 
 export const Component = () => {
   const [breadcrumbMountPoint] = React.useState(
-    document.querySelector('.ic-app-crumbs-enhanced-rubrics')
+    document.querySelector('.ic-app-crumbs-enhanced-rubrics'),
   )
   const {accountId} = useParams()
 

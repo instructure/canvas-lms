@@ -36,7 +36,7 @@ function formatGrade(
   scalingFactor,
   // @ts-expect-error
   enterGradesAs,
-  pendingGradeInfo: PendingGradeInfo
+  pendingGradeInfo: PendingGradeInfo,
 ) {
   if (pendingGradeInfo) {
     return GradeFormatHelper.formatGradeInfo(pendingGradeInfo, {defaultValue: ''})
@@ -133,7 +133,7 @@ export default class TextGradeInput extends Component<Props, State> {
       pointsBasedGradingScheme,
       scalingFactor,
       enterGradesAs,
-      pendingGradeInfo
+      pendingGradeInfo,
     )
 
     this.state = {
@@ -148,7 +148,7 @@ export default class TextGradeInput extends Component<Props, State> {
               pointsBasedGradingScheme,
               scalingFactor,
               enterGradesAs,
-              pendingGradeInfo
+              pendingGradeInfo,
             ),
     }
   }
@@ -173,7 +173,7 @@ export default class TextGradeInput extends Component<Props, State> {
           pointsBasedGradingScheme,
           scalingFactor,
           enterGradesAs,
-          pendingGradeInfo
+          pendingGradeInfo,
         ),
       })
     }
@@ -218,7 +218,7 @@ export default class TextGradeInput extends Component<Props, State> {
       gradingScheme,
       pointsBasedGradingScheme,
       scalingFactor,
-      enterGradesAs
+      enterGradesAs,
     )
 
     if (formattedGrade === this.state.grade.trim()) {

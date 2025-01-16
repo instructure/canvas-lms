@@ -86,7 +86,7 @@ Breadcrumbs.renderDynamicCrumbs = function () {
     // Formerly, in CoffeeScript [...foldersInMiddle, lastFolder] = this.props.rootTillCurrentFolder
     const foldersInMiddle = this.props.rootTillCurrentFolder.slice(
       0,
-      this.props.rootTillCurrentFolder.length - 1
+      this.props.rootTillCurrentFolder.length - 1,
     )
     const lastFolder = this.props.rootTillCurrentFolder[this.props.rootTillCurrentFolder.length - 1]
 

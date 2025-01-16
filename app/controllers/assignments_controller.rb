@@ -358,7 +358,13 @@ class AssignmentsController < ApplicationController
         env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
 
         if env[:SETTINGS][:filter_speed_grader_by_student_group]
-          eligible_categories = @context.group_categories.active
+          can_view_tags = @context.grants_any_right?(
+            @current_user,
+            session,
+            *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS
+          )
+
+          eligible_categories = can_view_tags ? @context.active_combined_group_and_differentiation_tag_categories : @context.group_categories.active
           eligible_categories = eligible_categories.where(id: @assignment.group_category) if @assignment.group_category.present?
           env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, { include: ["groups"] })
 

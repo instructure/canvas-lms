@@ -25,13 +25,21 @@ const I18n = createI18nScope('appt_calendar_event_dialog')
 export default class EditApptCalendarEventDialog {
   constructor(event) {
     this.event = event
-    this.form = $('<div></div>').html(editApptCalendarEventTemplate(this.event)).appendTo('body')
+    const form = $(`#${event.id}`)
+    if (form.length) {
+      form.find('.error-message').remove()
+      this.form = form
+    } else {
+      this.form = $(`<div id="${event.id}"></div>`)
+        .html(editApptCalendarEventTemplate(this.event))
+        .appendTo('body')
+    }
 
     const $maxParticipantsOption = this.form.find('[type=checkbox][name=max_participants_option]')
     this.$maxParticipants = this.form.find('[name=max_participants]')
 
     $maxParticipantsOption.change(() =>
-      this.$maxParticipants.prop('disabled', !$maxParticipantsOption.prop('checked'))
+      this.$maxParticipants.prop('disabled', !$maxParticipantsOption.prop('checked')),
     )
 
     if (this.event.calendarEvent.participants_per_appointment) {
@@ -59,6 +67,28 @@ export default class EditApptCalendarEventDialog {
     })
   }
 
+  showErrorMessage = (selector, message) => {
+    let errorContainer = $('#error-message')
+    if (errorContainer.length) return
+    errorContainer = $('<div />', {
+      id: 'error-message',
+      class: 'error-message',
+      tabindex: '-1',
+    }).appendTo(selector)
+    $('<i />', {
+      class: 'icon-warning icon-Solid',
+      'aria-hidden': true,
+      tabindex: '-1',
+    }).appendTo(errorContainer)
+    $('<span />', {
+      role: 'alert',
+      'aria-live': 'polite',
+      tabindex: '-1',
+    })
+      .text(message)
+      .appendTo(errorContainer)
+  }
+
   show() {
     this.dialog.dialog('open')
   }
@@ -73,8 +103,9 @@ export default class EditApptCalendarEventDialog {
       if (this.event.calendarEvent.participant_type === 'Group') {
         this.$maxParticipants.errorBox(I18n.t('You must allow at least one group to attend'))
       } else {
-        this.$maxParticipants.errorBox(
-          I18n.t('invalid_participants', 'You must allow at least one user to attend')
+        this.showErrorMessage(
+          $('#max_participants_container'),
+          I18n.t('invalid_participants', 'Please enter a value greater or equal to 1'),
         )
       }
       return false

@@ -134,7 +134,7 @@ class OfficialNotFoundGame extends React.Component {
         x: placedX,
         y: placedY,
         goingLeft: rightOrLeft > 3,
-      })
+      }),
     )
   }
 
@@ -200,7 +200,7 @@ class OfficialNotFoundGame extends React.Component {
         this.mainCharacter.x,
         this.mainCharacter.y,
         MAIN_CHAR_LENGTH,
-        MAIN_CHAR_LENGTH
+        MAIN_CHAR_LENGTH,
       )
     ) {
       this.goalReached()
@@ -219,7 +219,7 @@ class OfficialNotFoundGame extends React.Component {
           this.mainCharacter.x,
           this.mainCharacter.y,
           MAIN_CHAR_LENGTH,
-          MAIN_CHAR_LENGTH
+          MAIN_CHAR_LENGTH,
         )
       ) {
         this.endGame(ctx)

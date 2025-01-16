@@ -20,7 +20,6 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import UsersPane, {SEARCH_DEBOUNCE_TIME} from '../UsersPane'
 import UserActions from '../../actions/UserActions'
-import sinon from 'sinon'
 
 const ok = value => expect(value).toBeTruthy()
 const notOk = value => expect(value).toBeFalsy()
@@ -52,17 +51,18 @@ const wrapper = store =>
       roles={[{id: 'id', label: 'label'}]}
       queryParams={{}}
       onUpdateQueryParams={function () {}}
-    />
+    />,
   )
 
 describe('Account Course User Search UsersPane View', () => {
   test('handleUpdateSearchFilter dispatches applySearchFilter action', done => {
-    const spy = sinon.spy(UserActions, 'applySearchFilter')
+    const spy = jest.spyOn(UserActions, 'applySearchFilter')
     const store = fakeStore()
     const instance = wrapper(store).instance()
     instance.handleUpdateSearchFilter()
     setTimeout(() => {
-      ok(spy.called)
+      expect(spy).toHaveBeenCalled()
+      spy.mockRestore()
       done()
     }, SEARCH_DEBOUNCE_TIME)
   })

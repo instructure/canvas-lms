@@ -7,7 +7,7 @@ exports[`The CommentButton component renders the root component as expected 1`] 
     color="secondary"
     cursor="pointer"
     margin="0 x-small 0 0"
-    onClick={[Function]}
+    onClick={[MockFunction]}
     renderIcon={<IconFeedbackLine />}
     screenReaderLabel="Add Additional Comments"
     shape="rectangle"

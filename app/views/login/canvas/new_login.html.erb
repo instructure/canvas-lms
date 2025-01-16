@@ -1,67 +1,76 @@
 <%
-     # Copyright (C) 2024 - present Instructure, Inc.
-     #
-     # This file is part of Canvas.
-     #
-     # Canvas is free software: you can redistribute it and/or modify it under
-     # the terms of the GNU Affero General Public License as published by the Free
-     # Software Foundation, version 3 of the License.
-     #
-     # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-     # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-     # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-     # details.
-     #
-     # You should have received a copy of the GNU Affero General Public License along
-     # with this program. If not, see <http://www.gnu.org/licenses/>.
+  # Copyright (C) 2024 - present Instructure, Inc.
+  #
+  # This file is part of Canvas.
+  #
+  # Canvas is free software: you can redistribute it and/or modify it under
+  # the terms of the GNU Affero General Public License as published by the Free
+  # Software Foundation, version 3 of the License.
+  #
+  # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+  # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+  # details.
+  #
+  # You should have received a copy of the GNU Affero General Public License along
+  # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
 <%
-     provide :page_title, t("Log in to Canvas")
+  provide :page_title, t("Log in to Canvas")
 
-     # course catalog link boolean
-     enable_course_catalog = @domain_root_account.enable_course_catalog?
+  # course catalog link boolean
+  enable_course_catalog = @domain_root_account.enable_course_catalog?
 
-     # json-encoded array of authentication providers with each object containing id and auth_type
-     auth_providers_json = @auth_providers.to_json
+  # json-encoded array of authentication providers with each object containing id and auth_type
+  auth_providers_json = @auth_providers.to_json
 
-     # sso settings custom “login label”
-     login_handle_name = @domain_root_account.login_handle_name_with_inference
+  # sso settings custom “login label”
+  login_handle_name = @domain_root_account.login_handle_name_with_inference
 
-     # custom logo
-     possibly_customized_login_logo = brand_variable("ic-brand-Login-logo")
-     default_login_logo = BrandableCSS.brand_variable_value("ic-brand-Login-logo")
-     login_logo_url = possibly_customized_login_logo != default_login_logo ? possibly_customized_login_logo : nil
-     login_logo_text = login_logo_url.present? ? @domain_root_account.short_name : nil
+  # custom logo
+  possibly_customized_login_logo = brand_variable("ic-brand-Login-logo")
+  default_login_logo = BrandableCSS.brand_variable_value("ic-brand-Login-logo")
+  login_logo_url = possibly_customized_login_logo != default_login_logo ? possibly_customized_login_logo : nil
+  login_logo_text = login_logo_url.present? ? @domain_root_account.short_name : nil
 
-     # custom background
-     body_bg_color = brand_variable("ic-brand-Login-body-bgd-color")
-     body_bg_image = brand_variable("ic-brand-Login-body-bgd-image")
+  # custom background
+  body_bg_color = brand_variable("ic-brand-Login-body-bgd-color")
+  body_bg_image = brand_variable("ic-brand-Login-body-bgd-image")
 
-     # theme editor preview mode boolean
-     is_preview_mode = params[:previewing_from_themeeditor].to_s.downcase == "true"
+  # theme editor preview mode boolean
+  is_preview_mode = params[:previewing_from_themeeditor].to_s.downcase == "true"
 
-     # self-registration (none, all, observer)
-     allowed_self_registration_type = @domain_root_account.self_registration_type if %w[all observer].include?(@domain_root_account.self_registration_type)
+  # self-registration (none, all, observer)
+  allowed_self_registration_type = @domain_root_account.self_registration_type if %w[all observer].include?(@domain_root_account.self_registration_type)
 
-     # captcha
-     recaptcha_key = @domain_root_account.recaptcha_key
+  # captcha
+  recaptcha_key = @domain_root_account.recaptcha_key
 
-     # terms required
-     terms_required = @domain_root_account.terms_required?
+  # terms required
+  terms_required = @domain_root_account.terms_required?
 
-     # terms and privacy policy URLs
-     tou_url = terms_of_use_url
-     pp_url = privacy_policy_url
+  # terms and privacy policy URLs
+  tou_url = terms_of_use_url
+  pp_url = privacy_policy_url
 
-     # require email
-     require_email = @domain_root_account.require_email_for_registration?
+  # require email
+  require_email = @domain_root_account.require_email_for_registration?
 
-     # json-encoded object of password policy rules
-     password_policy_data = @domain_root_account&.password_policy.to_json
+  # json-encoded object of password policy rules
+  password_policy_data = @domain_root_account&.password_policy.to_json
 
-     # custom forgot password URL
-     forgot_password_url = (params[:canvas_login] != '1' && @domain_root_account.try(:forgot_password_external_url)) || nil
+  # custom forgot password URL
+  forgot_password_url = (params[:canvas_login] != '1' && @domain_root_account.try(:forgot_password_external_url)) || nil
+
+  # invalid login FAQ URL
+  invalid_login_faq_url = Setting.get("invalid_login_faq_url", nil)
+
+  # help link attributes
+  help_link_json = ERB::Util.json_escape({ text: help_link_name,
+                                           trackCategory: help_link_data[:"track-category"],
+                                           trackLabel: help_link_data[:"track-label"]
+                                         }.to_json)
 %>
 
 <div id="new_login_data"
@@ -81,4 +90,6 @@
      <%= "data-require-email='true'".html_safe if require_email %>
      <%= "data-password-policy=#{raw password_policy_data}" if password_policy_data.present? %>
      <%= "data-forgot-password-url='#{forgot_password_url}'".html_safe if forgot_password_url.present? %>
+     <%= "data-invalid-login-faq-url='#{h(invalid_login_faq_url)}'".html_safe if invalid_login_faq_url.present? %>
+     <%= "data-help-link='#{help_link_json}'".html_safe if help_link_json.present? %>
 ></div>

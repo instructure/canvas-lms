@@ -1264,7 +1264,9 @@ class AbstractAssignment < ActiveRecord::Base
     return unless tags.any?
 
     modules = ContextModule.where(id: tags.map(&:context_module_id)).ordered.to_a.select do |mod|
-      mod.completion_requirements&.any? { |req| req[:type] == "min_score" && tags.map(&:id).include?(req[:id]) }
+      mod.completion_requirements&.any? do |req|
+        %w[min_score min_percentage].include?(req[:type]) && tags.map(&:id).include?(req[:id])
+      end
     end
     return unless modules.any?
 
@@ -1596,11 +1598,11 @@ class AbstractAssignment < ActiveRecord::Base
     overridden_users
   end
 
-  def students_with_visibility(scope = nil)
+  def students_with_visibility(scope = nil, user_ids = nil)
     scope ||= context.all_students.where("enrollments.workflow_state NOT IN ('inactive', 'rejected')")
     return scope unless differentiated_assignments_applies?
 
-    scope.able_to_see_assignment_in_course_with_da(id, context.id)
+    scope.able_to_see_assignment_in_course_with_da(id, context.id, user_ids)
   end
 
   def process_if_quiz
@@ -3175,17 +3177,12 @@ class AbstractAssignment < ActiveRecord::Base
   scope :for_group_category, ->(group_category_id) { where(group_category_id:) }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:).map(&:assignment_id)
+    visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:).map(&:assignment_id)
 
-      if visible_assignment_ids.any?
-        where(id: visible_assignment_ids)
-      else
-        none # Return no records if no assignment IDs are visible
-      end
+    if visible_assignment_ids.any?
+      where(id: visible_assignment_ids)
     else
-      joins(:assignment_student_visibilities)
-        .where(assignment_student_visibilities: { user_id: user_ids, course_id: course_ids })
+      none # Return no records if no assignment IDs are visible
     end
   }
 
@@ -3194,7 +3191,7 @@ class AbstractAssignment < ActiveRecord::Base
   scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids_that_have_da_enabled|
     if course_ids_that_have_da_enabled.blank?
       active
-    elsif Account.site_admin.feature_enabled?(:selective_release_backend)
+    else
       user_ids = Array.wrap(user_ids)
       course_ids = Array.wrap(course_ids_that_have_da_enabled)
       visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:, assignment_ids: ids).map(&:assignment_id)
@@ -3203,17 +3200,6 @@ class AbstractAssignment < ActiveRecord::Base
         course_ids,
         visible_assignment_ids
       )
-    else
-      user_ids = Array.wrap(user_ids).join(",")
-      course_ids = Array.wrap(course_ids_that_have_da_enabled).join(",")
-      visibility_table = AssignmentStudentVisibility.table_name
-      scope = joins(sanitize_sql([<<~SQL.squish, course_ids, user_ids]))
-        LEFT OUTER JOIN #{AssignmentStudentVisibility.quoted_table_name} ON (
-         #{visibility_table}.assignment_id = assignments.id
-         AND #{visibility_table}.course_id IN (%s)
-         AND #{visibility_table}.user_id IN (%s))
-      SQL
-      scope.where("(assignments.context_id NOT IN (?) AND assignments.workflow_state<>'deleted') OR (#{visibility_table}.assignment_id IS NOT NULL)", course_ids_that_have_da_enabled)
     end
   }
 

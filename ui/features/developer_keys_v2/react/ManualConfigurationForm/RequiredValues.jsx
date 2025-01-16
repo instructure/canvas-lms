@@ -45,7 +45,7 @@ export default class RequiredValues extends React.Component {
     let isMissing = false
     if (
       ['target_link_uri', 'oidc_initiation_url', 'description', 'title'].some(
-        p => !this.state.toolConfiguration[p]
+        p => !this.state.toolConfiguration[p],
       )
     ) {
       isMissing = true
@@ -83,7 +83,7 @@ export default class RequiredValues extends React.Component {
       } catch (e) {
         if (e instanceof SyntaxError) {
           this.props.flashError(
-            I18n.t('Public JWK json is not valid. Please submit properly formatted json.')
+            I18n.t('Public JWK json is not valid. Please submit properly formatted json.'),
           )
           return false
         }
@@ -93,7 +93,7 @@ export default class RequiredValues extends React.Component {
         [jwk.kty, jwk.e, jwk.n, jwk.kid, jwk.alg, jwk.use].some(f => typeof f !== 'string')
       ) {
         this.props.flashError(
-          I18n.t('Public JWK json must have the following string fields: kty, e, n, kid, alg, use')
+          I18n.t('Public JWK json must have the following string fields: kty, e, n, kid, alg, use'),
         )
         return false
       }

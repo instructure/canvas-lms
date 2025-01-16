@@ -106,7 +106,7 @@ export function handleTranslatedModalBody(
   isPrimary: boolean,
   activeSignature: string,
   bodySetter: React.SetStateAction<string>,
-  newBody?: string
+  newBody?: string,
 ) {
   // @ts-expect-error
   bodySetter(prevBody => {

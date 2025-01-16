@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Loading, RememberMeCheckbox} from '../shared'
-import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
+import {TextInput} from '@instructure/ui-text-input'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {useNewLogin} from '../context'
 import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../services'
+import {Loading, RememberMeCheckbox} from '../shared'
 import {createErrorMessage} from '../shared/helpers'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('new_login')
 
@@ -55,7 +55,7 @@ const OtpForm = () => {
       setIsUiActionPending(false)
       setIsInitiating(false)
     },
-    [setIsUiActionPending, setIsInitiating]
+    [setIsUiActionPending, setIsInitiating],
   )
 
   useEffect(() => {
@@ -91,16 +91,16 @@ const OtpForm = () => {
       } else {
         showErrorAlert(
           I18n.t(
-            'Unable to send the verification code at the moment. Please check your connection or try again later.'
-          )
+            'Unable to send the verification code at the moment. Please check your connection or try again later.',
+          ),
         )
         setOtpRequired(false)
       }
     } catch (_error: unknown) {
       showErrorAlert(
         I18n.t(
-          'Failed to send the code due to a network error. Please check your internet connection and try again.'
-        )
+          'Failed to send the code due to a network error. Please check your internet connection and try again.',
+        ),
       )
       setOtpRequired(false)
     } finally {
@@ -148,14 +148,13 @@ const OtpForm = () => {
     setOtpRequired(false)
 
     cancelOtpRequest().catch(_error => {
-       
       console.error('Failed to cancel OTP process due to a network or server issue')
     })
   }
 
   const handleVerificationCodeChange = (
     _event: React.ChangeEvent<HTMLInputElement>,
-    value: string
+    value: string,
   ) => {
     setVerificationCode(value.trim())
     if (verificationCodeError) setVerificationCodeError('')

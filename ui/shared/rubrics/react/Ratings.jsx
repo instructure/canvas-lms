@@ -79,13 +79,12 @@ export const Rating = props => {
   return (
     // eslint is unhappy here because it's not smart enough to understand that
     // when this is interact-able (via tabIndex), it will always have a role
-     
+
     <div
       className={classes}
       onClick={assessing ? onClick : null}
       onKeyPress={e => (e.key === 'Enter' ? onClick() : null)}
       role={assessing ? 'button' : null}
-       
       tabIndex={assessing ? 0 : null}
     >
       {hidePoints || ENV.restrict_quantitative_data ? null : ratingPoints()}
@@ -133,7 +132,7 @@ Rating.propTypes = {
 Rating.defaultProps = {
   footer: null,
   selected: false,
-  endOfRangePoints: null,  
+  endOfRangePoints: null,
   hidePoints: false,
   shaderClass: null,
 }
@@ -163,7 +162,7 @@ const Ratings = props => {
     if (selectedRatingId) {
       return _.findIndex(
         tiers,
-        tier => tier.id === selectedRatingId && (useRange || tier.points === points)
+        tier => tier.id === selectedRatingId && (useRange || tier.points === points),
       )
     } else {
       return pairs.findIndex(({current, next}) => {

@@ -75,7 +75,7 @@ export async function updateSubmissionGradeStatus({
       latePolicyStatus,
       customGradeStatusId,
       courseId,
-    }
+    },
   )
 
   return result.updateSubmissionGradeStatus.submission

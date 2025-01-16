@@ -58,7 +58,7 @@ describe('AlignmentOutcomeItemList', () => {
 
   it('render icon and message when no outcome alignments', () => {
     const {getByText, getByTestId} = render(
-      <AlignmentOutcomeItemList {...defaultProps({rootGroup: generateRootGroup(0)})} />
+      <AlignmentOutcomeItemList {...defaultProps({rootGroup: generateRootGroup(0)})} />,
     )
     expect(getByTestId('no-outcomes-icon')).toBeInTheDocument()
     expect(getByText('Your search returned no results.')).toBeInTheDocument()
@@ -73,7 +73,7 @@ describe('AlignmentOutcomeItemList', () => {
     render(
       <AlignmentOutcomeItemList
         {...defaultProps({rootGroup: generateRootGroup(5, true), scrollContainer})}
-      />
+      />,
     )
 
     mockContainer(scrollContainer, 'scrollTop', 600)

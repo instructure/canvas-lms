@@ -107,7 +107,7 @@ describe('AddConference', () => {
                 subject: 'LtiDeepLinkingResponse',
                 content_items,
               },
-            })
+            }),
           )
         })
       }
@@ -240,7 +240,7 @@ describe('AddConference', () => {
     it('renders the current conference type as selected if it exists', () => {
       const currentConferenceType = conferenceTypes[1]
       const {getByRole} = render(
-        <AddConference {...getProps({conferenceTypes, currentConferenceType})} />
+        <AddConference {...getProps({conferenceTypes, currentConferenceType})} />,
       )
       const select = getByRole('combobox')
       expect(select.value).toEqual('Foo Conference')
@@ -250,7 +250,7 @@ describe('AddConference', () => {
       const currentConferenceType = conferenceTypes[1]
       const setConference = jest.fn()
       const {getByRole, findByText} = render(
-        <AddConference {...getProps({conferenceTypes, currentConferenceType, setConference})} />
+        <AddConference {...getProps({conferenceTypes, currentConferenceType, setConference})} />,
       )
       const select = getByRole('combobox')
       act(() => {
@@ -267,7 +267,7 @@ describe('AddConference', () => {
       const currentConferenceType = conferenceTypes[1]
       const setConference = jest.fn()
       const {getByRole, findByText} = render(
-        <AddConference {...getProps({conferenceTypes, currentConferenceType, setConference})} />
+        <AddConference {...getProps({conferenceTypes, currentConferenceType, setConference})} />,
       )
       const select = getByRole('combobox')
       act(() => {

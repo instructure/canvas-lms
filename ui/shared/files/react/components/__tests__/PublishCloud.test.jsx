@@ -51,7 +51,7 @@ describe('PublishCloud', () => {
           userCanEditFilesForContext={true}
           usageRightsRequiredForContext={false}
         />,
-        {container}
+        {container},
       )
 
       expect(getByTestId('unpublished-button')).toBeInTheDocument()
@@ -74,14 +74,14 @@ describe('PublishCloud', () => {
           userCanEditFilesForContext={true}
           usageRightsRequiredForContext={false}
         />,
-        {container}
+        {container},
       )
 
       const button = getByTestId('unpublished-button')
       fireEvent.click(button)
 
       await waitFor(() => {
-        expect($('.ui-dialog').length).toBe(1)
+        expect($('.ui-dialog')).toHaveLength(1)
       })
     })
 
@@ -99,7 +99,7 @@ describe('PublishCloud', () => {
           userCanEditFilesForContext={true}
           usageRightsRequiredForContext={false}
         />,
-        {container}
+        {container},
       )
 
       const button = getByTestId('published-button')
@@ -127,13 +127,13 @@ describe('PublishCloud', () => {
           userCanEditFilesForContext={false}
           usageRightsRequiredForContext={false}
         />,
-        {container}
+        {container},
       )
 
       const status = getByTestId('restricted-status')
       expect(status).toHaveAttribute(
         'title',
-        'Available after Jan 1, 2014 at 12am until Feb 1, 2014 at 12am'
+        'Available after Jan 1, 2014 at 12am until Feb 1, 2014 at 12am',
       )
     })
   })
@@ -151,7 +151,7 @@ describe('PublishCloud', () => {
           userCanEditFilesForContext={true}
           usageRightsRequiredForContext={false}
         />,
-        {container}
+        {container},
       )
 
       expect(getByTestId('published-button')).toBeInTheDocument()
@@ -171,7 +171,7 @@ describe('PublishCloud', () => {
           userCanEditFilesForContext={true}
           usageRightsRequiredForContext={false}
         />,
-        {container}
+        {container},
       )
 
       expect(getByTestId('restricted-button')).toBeInTheDocument()
@@ -193,7 +193,7 @@ describe('PublishCloud', () => {
           userCanEditFilesForContext={true}
           usageRightsRequiredForContext={false}
         />,
-        {container}
+        {container},
       )
 
       expect(getByTestId('hidden-button')).toBeInTheDocument()

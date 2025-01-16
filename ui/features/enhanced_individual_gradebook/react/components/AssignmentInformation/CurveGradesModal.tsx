@@ -82,7 +82,7 @@ export function CurveGradesModal({assignment, contextUrl, submissions, handleGra
 
   $.subscribe('submissions_updated', submissions_ => {
     const mappedSubmissions: SubmissionGradeChange[] = submissions_.map((submission: Submission) =>
-      mapToSubmissionGradeChange(submission)
+      mapToSubmissionGradeChange(submission),
     )
     handleGradeChange(mappedSubmissions)
   })

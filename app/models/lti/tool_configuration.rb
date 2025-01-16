@@ -186,7 +186,7 @@ module Lti
     # @return [String | nil] A warning message about any disallowed placements
     def verify_placements
       placements_to_verify = placements.filter_map { |p| p["placement"] if Lti::ResourcePlacement::RESTRICTED_PLACEMENTS.include? p["placement"].to_sym }
-      return unless placements_to_verify.present? && Account.site_admin.feature_enabled?(:lti_placement_restrictions)
+      return unless placements_to_verify.present?
 
       # This is a candidate for a deduplication with the same logic in app/models/context_external_tool.rb#placement_allowed?
       placements_to_verify.each do |placement|

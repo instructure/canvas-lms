@@ -43,7 +43,7 @@ ready(async () => {
       if (value.container) {
         const root = ReactDOM.createRoot(value.container)
         root.render(
-          <StudentViewPeerReviews assignment={value.assignment as AssignmentPeerReview} />
+          <StudentViewPeerReviews assignment={value.assignment as AssignmentPeerReview} />,
         )
       }
     })

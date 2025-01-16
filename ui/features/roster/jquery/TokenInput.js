@@ -161,7 +161,7 @@ export default class TokenInput {
       $close.append($('<i class="icon-x" aria-hidden="true"></i>'))
       $token.append($close)
       $token.append(
-        $('<input />').attr('type', 'hidden').attr('name', `${this.nodeName}[]`).val(val)
+        $('<input />').attr('type', 'hidden').attr('name', `${this.nodeName}[]`).val(val),
       )
       if (this.options.onNewToken) {
         this.options.onNewToken($token)
@@ -195,7 +195,7 @@ export default class TokenInput {
               ? data.value
               : undefined
             : data
-        }`
+        }`,
       ).length > 0
     )
   }

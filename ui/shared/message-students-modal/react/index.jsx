@@ -165,7 +165,7 @@ class MessageStudents extends React.Component {
       },
       () => {
         this.props.onRequestClose()
-      }
+      },
     )
   }
 
@@ -267,17 +267,17 @@ class MessageStudents extends React.Component {
             {this.renderAlert(
               I18n.t('Your message was sent!'),
               'success',
-              () => this.state.success
+              () => this.state.success,
             )}
             {this.renderAlert(
               I18n.t("We're sending your message..."),
               'info',
-              () => this.state.sending
+              () => this.state.sending,
             )}
             {this.renderAlert(
               I18n.t('There was a problem sending your message.'),
               'error',
-              () => Object.keys(this.state.errors).length > 0
+              () => Object.keys(this.state.errors).length > 0,
             )}
             <form onSubmit={this.handleSubmit} className="MessageStudents__Form">
               <div className="MessageStudents__FormField">

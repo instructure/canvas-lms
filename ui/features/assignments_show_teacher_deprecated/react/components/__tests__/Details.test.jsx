@@ -54,7 +54,7 @@ function renderDetails(assignment, props = {}) {
       onValidate={() => true}
       invalidMessage={() => undefined}
       {...props}
-    />
+    />,
   )
 }
 describe('Assignment Details', () => {
@@ -106,21 +106,21 @@ describe('Assignment Details', () => {
 
     // Everyone else
     const everyoneElseOverrideSummary = getByText('Everyone else').closest(
-      `div[data-testid="OverrideSummary"]`
+      `div[data-testid="OverrideSummary"]`,
     )
     expect(getByText('8/2/2019', everyoneElseOverrideSummary)).toBeInTheDocument() // Due Date
     expect(getByText('7/28/2019 to 8/4/2019', everyoneElseOverrideSummary)).toBeInTheDocument() // Available from/to
 
     // Section A
     const sectionAOverrideSummary = getByText('Section A').closest(
-      `div[data-testid="OverrideSummary"]`
+      `div[data-testid="OverrideSummary"]`,
     )
     expect(getByText('9/2/2019', sectionAOverrideSummary)).toBeInTheDocument() // Due Date
     expect(getByText('8/28/2019 to 9/4/2019', sectionAOverrideSummary)).toBeInTheDocument() // Available from/to
 
     // Section B
     const sectionBOverrideSummary = getByText('Section B').closest(
-      `div[data-testid="OverrideSummary"]`
+      `div[data-testid="OverrideSummary"]`,
     )
     expect(getByText('10/2/2019', sectionBOverrideSummary)).toBeInTheDocument() // Due Date
     expect(getByText('9/28/2019 to 10/4/2019', sectionBOverrideSummary)).toBeInTheDocument() // Available from/to
@@ -156,23 +156,23 @@ describe('Assignment Details', () => {
 
     // Dates
     const overrideDetail = getByTestId('OverrideDetail')
-    expect(getAllByTestId('EditableDateTime', overrideDetail).length).toEqual(3)
+    expect(getAllByTestId('EditableDateTime', overrideDetail)).toHaveLength(3)
     // Due Date
     expect(
-      getByText('Due:', overrideDetail).closest(`div[data-testid="AssignmentDate"]`)
+      getByText('Due:', overrideDetail).closest(`div[data-testid="AssignmentDate"]`),
     ).toBeInTheDocument()
     // Available Date
     expect(
-      getByText('Available:', overrideDetail).closest(`div[data-testid="AssignmentDate"]`)
+      getByText('Available:', overrideDetail).closest(`div[data-testid="AssignmentDate"]`),
     ).toBeInTheDocument()
     // Until Date
     expect(
-      getByText('Until:', overrideDetail).closest(`div[data-testid="AssignmentDate"]`)
+      getByText('Until:', overrideDetail).closest(`div[data-testid="AssignmentDate"]`),
     ).toBeInTheDocument()
 
     // 3 Submission Types: Text, URL & File
     const submissionTypeContainer = getAllByTestId('OverrideSubmissionTypes', overrideDetail)
-    expect(submissionTypeContainer.length).toEqual(3)
+    expect(submissionTypeContainer).toHaveLength(3)
     expect(getByText('Item 1', submissionTypeContainer[0])).toBeInTheDocument()
     expect(getByText('Text Entry', submissionTypeContainer[0])).toBeInTheDocument()
     expect(getByText('Item 2', submissionTypeContainer[0])).toBeInTheDocument()

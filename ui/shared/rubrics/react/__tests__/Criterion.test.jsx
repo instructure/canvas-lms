@@ -17,7 +17,6 @@
  */
 import _ from 'lodash'
 import React from 'react'
-import sinon from 'sinon'
 import {shallow} from 'enzyme'
 import Criterion from '../Criterion'
 import {Table} from '@instructure/ui-table'
@@ -109,7 +108,7 @@ describe('Criterion', () => {
         criterion={rubrics.points.criteria[1]}
         freeForm={false}
         hasPointsColumn={false}
-      />
+      />,
     )
 
     expect(el.find(Table.Cell)).toHaveLength(1)
@@ -120,10 +119,10 @@ describe('Criterion', () => {
       shallow(
         <Criterion
           assessment={{...assessments.points.data[1], ...changes}}
-          onAssessmentChange={sinon.spy()}
+          onAssessmentChange={jest.fn()}
           criterion={rubrics.points.criteria[1]}
           freeForm={false}
-        />
+        />,
       )
         .find('Ratings')
         .prop('footer')
@@ -141,7 +140,7 @@ describe('Criterion', () => {
         criterion={rubrics.points.criteria[1]}
         freeForm={false}
         onAssessmentChange={() => {}}
-      />
+      />,
     )
 
     expect(el.find('Points').prop('allowExtraCredit')).toEqual(true)
@@ -150,7 +149,7 @@ describe('Criterion', () => {
   describe('the Points for a criterion', () => {
     const points = props =>
       shallow(
-        <Criterion assessment={assessments.points.data[1]} freeForm={false} {...props} />
+        <Criterion assessment={assessments.points.data[1]} freeForm={false} {...props} />,
       ).find('Points')
 
     const criterion = rubrics.points.criteria[1]
@@ -159,14 +158,14 @@ describe('Criterion', () => {
     })
 
     it('can be changed', () => {
-      const onAssessmentChange = sinon.spy()
+      const onAssessmentChange = jest.fn()
       const el = points({criterion, onAssessmentChange})
       const onPointChange = el.find('Points').prop('onPointChange')
 
       onPointChange({points: '10', description: 'good', id: '1'})
       onPointChange({points: '10.245', description: 'better', id: '2'})
       onPointChange({points: 'blergh', description: 'invalid', id: '3'})
-      expect(onAssessmentChange.args).toEqual([
+      expect(onAssessmentChange.mock.calls).toEqual([
         [{description: 'good', id: '1', points: {text: '10', valid: true, value: 10}}],
         [{description: 'better', id: '2', points: {text: '10.245', valid: true, value: 10.245}}],
         [
@@ -180,14 +179,14 @@ describe('Criterion', () => {
     })
 
     it('can be selected and deselected', () => {
-      const onAssessmentChange = sinon.spy()
+      const onAssessmentChange = jest.fn()
       const el = points({criterion, onAssessmentChange})
       const onPointChange = el.find('Points').prop('onPointChange')
 
       onPointChange({points: '10', description: 'good', id: '1'}, false)
       onPointChange({points: '10', description: 'good', id: '1'}, true)
 
-      expect(onAssessmentChange.args).toEqual([
+      expect(onAssessmentChange.mock.calls).toEqual([
         [{description: 'good', id: '1', points: {text: '10', valid: true, value: 10}}],
         [{points: {text: '', valid: true}}],
       ])
@@ -226,7 +225,7 @@ describe('Criterion', () => {
         hidePoints={false}
         freeForm={false}
         hasPointsColumn={true}
-      />
+      />,
     )
 
     expect(component.find('[data-testid="criterion-points"]').exists()).toBe(true)
@@ -240,7 +239,7 @@ describe('Criterion', () => {
         criterion={rubrics.points.criteria[1]}
         freeForm={true}
         hasPointsColumn={true}
-      />
+      />,
     )
 
     expect(component.find('[data-testid="points"]').exists()).toBe(true)
@@ -265,7 +264,7 @@ describe('Criterion', () => {
           criterion={rubrics.points.criteria[1]}
           freeForm={false}
           hasPointsColumn={false}
-        />
+        />,
       )
 
       expect(component.find('[data-testid="points"]').exists()).toBe(false)

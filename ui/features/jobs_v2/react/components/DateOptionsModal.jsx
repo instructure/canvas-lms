@@ -75,7 +75,7 @@ export default function DateOptionsModal({open, startDate, endDate, timeZone, on
             {renderTimeZoneOption('UTC', I18n.t('UTC'))}
             {renderTimeZoneOption(
               Intl.DateTimeFormat().resolvedOptions().timeZone,
-              I18n.t('Local')
+              I18n.t('Local'),
             )}
             {renderTimeZoneOption(ENV?.TIMEZONE, I18n.t('User'))}
             {renderTimeZoneOption(ENV?.CONTEXT_TIMEZONE, I18n.t('Account'))}

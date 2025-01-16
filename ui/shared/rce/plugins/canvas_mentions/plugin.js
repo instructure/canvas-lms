@@ -44,8 +44,8 @@ function onInputChange(_e, ed = false) {
       'mceInsertContent',
       false,
       `<span role="textbox" id="${MARKER_ID}" aria-label="Mentions Textbox" data-testid="${MARKER_ID}" aria-autocomplete="list" aria-controls="${ARIA_ID_TEMPLATES.ariaControlTemplate(
-        editor.id
-      )}" aria-activedescendant=""></span>`
+        editor.id,
+      )}" aria-activedescendant=""></span>`,
     )
 
     makeMarkerEditable(editor, MARKER_SELECTOR) // Make the mentions marker editable for A11y

@@ -44,7 +44,7 @@ describe('MobileGlobalMenu', () => {
     return render(
       <MockedQueryClientProvider client={queryClient}>
         <MobileGlobalMenu onDismiss={() => {}} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
   }
 
@@ -71,7 +71,7 @@ describe('MobileGlobalMenu', () => {
     expect(screen.getByText('Tool 2').closest('a')).toHaveAttribute('href', 'http://tool2.com')
     expect(screen.getByText('Tool 1').closest('a')?.querySelector('img')).toHaveAttribute(
       'src',
-      'img/tool1.png'
+      'img/tool1.png',
     )
     const svg = screen.getByText('Tool 2').closest('a')?.querySelector('svg')
     expect(svg).toBeInTheDocument()
@@ -130,7 +130,7 @@ describe('MobileGlobalMenu', () => {
     expect(await screen.findByText('Custom URL Tool')).toBeInTheDocument()
     expect(screen.getByText('Custom URL Tool').closest('a')).toHaveAttribute(
       'href',
-      'https://custom.example.com'
+      'https://custom.example.com',
     )
   })
 
@@ -155,7 +155,7 @@ describe('MobileGlobalMenu', () => {
     expect(await screen.findByText('Global URL Tool')).toBeInTheDocument()
     expect(screen.getByText('Global URL Tool').closest('a')).toHaveAttribute(
       'href',
-      'https://global.example.com'
+      'https://global.example.com',
     )
   })
 
@@ -200,12 +200,12 @@ describe('MobileGlobalMenu', () => {
           svgPath: null,
         },
       ] as ProcessedTool[],
-      externalTools
+      externalTools,
     )
     expect(await screen.findByText('Tool with Null Image')).toBeInTheDocument()
     expect(screen.getByText('Tool with Null Image').closest('a')).toHaveAttribute(
       'href',
-      'http://tool-null-image.com'
+      'http://tool-null-image.com',
     )
     const fallbackIcon = screen.getByTestId('IconExternalLinkLine')
     expect(fallbackIcon).toBeInTheDocument()

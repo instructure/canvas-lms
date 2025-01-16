@@ -125,10 +125,10 @@ module.exports = {
   devtool: skipSourcemaps
     ? false
     : isProduction || process.env.COVERAGE === '1'
-    ? // "Recommended choice for production builds"
-      'source-map'
-    : // "Recommended choice for development builds"
-      'eval-source-map',
+      ? // "Recommended choice for production builds"
+        'source-map'
+      : // "Recommended choice for development builds"
+        'eval-source-map',
 
   entry: {main: resolve(canvasDir, 'ui/index.ts')},
 

@@ -26,17 +26,17 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        'Determines visibility and management of the Outcomes link in Account Navigation.'
+        'Determines visibility and management of the Outcomes link in Account Navigation.',
       ),
     },
     {
       description: I18n.t(
-        'Allows user to view the Outcomes Manage tab at the account and course levels.'
+        'Allows user to view the Outcomes Manage tab at the account and course levels.',
       ),
     },
     {
       description: I18n.t(
-        'Allows user to create, edit, and delete outcomes and outcome groups at the account and course levels.'
+        'Allows user to create, edit, and delete outcomes and outcome groups at the account and course levels.',
       ),
     },
   ],
@@ -44,23 +44,23 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Feature Option'),
       description: I18n.t(
-        'If the Account and Course Level Outcome Mastery Scales feature option is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.'
+        'If the Account and Course Level Outcome Mastery Scales feature option is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.',
       ),
     },
     {
       description: I18n.t(
-        'Access to these tabs requires the Outcome Proficiency Calculations - add / edit and Outcome Mastery Scales - add / edit permissions.'
+        'Access to these tabs requires the Outcome Proficiency Calculations - add / edit and Outcome Mastery Scales - add / edit permissions.',
       ),
     },
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        'To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled.'
+        'To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To import learning outcomes, Learning Outcomes - import must also be enabled.'
+        'To import learning outcomes, Learning Outcomes - import must also be enabled.',
       ),
     },
   ],
@@ -68,7 +68,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        'Allows user to create, edit, and delete outcomes and outcome groups at the course level.'
+        'Allows user to create, edit, and delete outcomes and outcome groups at the course level.',
       ),
     },
   ],
@@ -76,24 +76,24 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Feature Option'),
       description: I18n.t(
-        'If the Account and Course Level Outcome Mastery Scales feature option is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.'
+        'If the Account and Course Level Outcome Mastery Scales feature option is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management.',
       ),
     },
     {
       description: I18n.t(
-        'Access to these tabs requires the Outcome Proficiency Calculations - add / edit and Outcome Mastery Scales - add / edit permissions.'
+        'Access to these tabs requires the Outcome Proficiency Calculations - add / edit and Outcome Mastery Scales - add / edit permissions.',
       ),
     },
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        'To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled.'
+        'To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To import learning outcomes, Learning Outcomes - import must also be enabled.'
+        'To import learning outcomes, Learning Outcomes - import must also be enabled.',
       ),
     },
-  ]
+  ],
 )

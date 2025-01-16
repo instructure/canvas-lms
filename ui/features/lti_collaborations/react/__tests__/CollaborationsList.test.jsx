@@ -17,10 +17,9 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render, screen} from '@testing-library/react'
 import CollaborationsList from '../CollaborationsList'
-
-const equal = (value, expected) => expect(value).toEqual(expected)
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const collaborations = [
   {
@@ -56,19 +55,51 @@ const collaborationsState = {
 }
 
 describe('CollaborationsList', () => {
-  test('renders the list of collaborations', () => {
-    ENV.context_asset_string = 'courses_1'
-    const component = TestUtils.renderIntoDocument(
+  beforeEach(() => {
+    fakeENV.setup({
+      context_asset_string: 'courses_1',
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  it('renders the list of collaborations', () => {
+    render(
       <CollaborationsList
         collaborationsState={collaborationsState}
         deleteCollaboration={() => {}}
         getCollaborations={() => {}}
-      />
+      />,
     )
-    const collaborationComponents = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'Collaboration'
+
+    const collaborationTitles = screen.getAllByTestId('collaboration-title')
+    expect(collaborationTitles).toHaveLength(2)
+  })
+
+  it('renders a load more loader when there is a next page', () => {
+    const {container} = render(
+      <CollaborationsList
+        collaborationsState={collaborationsState}
+        deleteCollaboration={() => {}}
+        getCollaborations={() => {}}
+      />,
     )
-    equal(collaborationComponents.length, 2)
+
+    expect(container.querySelector('.LoadMore-loader')).toBeInTheDocument()
+  })
+
+  it('does not render a load more loader when there is no next page', () => {
+    const state = {...collaborationsState, nextPage: null}
+    const {container} = render(
+      <CollaborationsList
+        collaborationsState={state}
+        deleteCollaboration={() => {}}
+        getCollaborations={() => {}}
+      />,
+    )
+
+    expect(container.querySelector('.LoadMore-loader')).not.toBeInTheDocument()
   })
 })

@@ -111,7 +111,7 @@ export class AssignmentPicker extends React.Component {
       },
       {
         count: this.state.resultCount || 0,
-      }
+      },
     )
 
     return (
@@ -157,7 +157,7 @@ const ConnectedAssignmentPicker = connect(
     categoryFilter: state.getIn(['assignment_picker', 'category_filter']),
     triggerAssignmentId: state.getIn(['trigger_assignment', 'id']),
   }), // mapStateToProps
-  actions // mapActionsToProps
+  actions, // mapActionsToProps
 )(AssignmentPicker)
 
 export default ConnectedAssignmentPicker

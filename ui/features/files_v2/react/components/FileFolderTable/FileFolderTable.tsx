@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -24,33 +24,34 @@ import {Text} from '@instructure/ui-text'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {useQuery} from '@tanstack/react-query'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {useQuery} from '@canvas/query'
 
 import {type File, type Folder} from '../../../interfaces/File'
+import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
+import {parseLinkHeader} from '../../../utils/apiUtils'
 import SubTableContent from './SubTableContent'
 import ActionMenuButton from './ActionMenuButton'
 import NameLink from './NameLink'
 import PublishIconButton from './PublishIconButton'
 import RightsIconButton from './RightsIconButton'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import renderTableHead from './RenderTableHead'
+import renderTableBody from './RenderTableBody'
 
 const I18n = createI18nScope('files_v2')
 
-interface ColumnHeader {
-  id: string
-  title: string
-  textAlign: 'start' | 'center' | 'end'
-  width?: string
-}
-
-const fetchFilesAndFolders = async (folderId: string) => {
-  const includeParams = ['user', 'usage_rights', 'enhanced_preview_url', 'context_asset_string']
-  const url = `/api/v1/folders/${folderId}/all?include[]=${includeParams.join('&include[]=')}`
+const fetchFilesAndFolders = async (
+  url: string,
+  onLoadingStatusChange: (arg0: boolean) => void,
+) => {
+  onLoadingStatusChange(true)
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error('Failed to fetch files and folders')
   }
-  return response.json()
+  const links = parseLinkHeader(response.headers.get('Link'))
+  const rows = await response.json()
+  return {rows, links}
 }
 
 const columnHeaders: ColumnHeader[] = [
@@ -68,7 +69,11 @@ const columnRenderers: {
   [key: string]: (
     row: File | Folder,
     isStacked: boolean,
-    userCanEditFilesForContext: boolean
+    userCanEditFilesForContext: boolean,
+    usageRightsRequiredForContext: boolean,
+    size: 'small' | 'medium' | 'large',
+    isSelected: boolean,
+    toggleSelect: () => void,
   ) => React.ReactNode
 } = {
   name: (row, isStacked) => <NameLink isStacked={isStacked} item={row} />,
@@ -82,7 +87,13 @@ const columnRenderers: {
     ) : null,
   size: row =>
     'size' in row ? <Text>{friendlyBytes(row.size)}</Text> : <Text>{I18n.t('--')}</Text>,
-  rights: _row => <RightsIconButton />,
+  rights: (row, _isStacked, userCanEditFilesForContext, usageRightsRequiredForContext) =>
+    row.folder_id && usageRightsRequiredForContext ? (
+      <RightsIconButton
+        usageRights={row.usage_rights}
+        userCanEditFilesForContext={userCanEditFilesForContext}
+      />
+    ) : null,
   published: (row, _isStacked, userCanEditFilesForContext) => (
     <PublishIconButton item={row} userCanEditFilesForContext={userCanEditFilesForContext} />
   ),
@@ -92,22 +103,71 @@ const columnRenderers: {
 interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
   userCanEditFilesForContext: boolean
-  folderId: string
+  usageRightsRequiredForContext: boolean
+  currentUrl: string
+  onPaginationLinkChange: (links: Record<string, string>) => void
+  onLoadingStatusChange: (isLoading: boolean) => void
 }
 
-const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolderTableProps) => {
+const FileFolderTable = ({
+  size,
+  userCanEditFilesForContext,
+  usageRightsRequiredForContext,
+  currentUrl,
+  onPaginationLinkChange,
+  onLoadingStatusChange,
+}: FileFolderTableProps) => {
   const isStacked = size !== 'large'
-  const queryKey = useMemo(() => ['files', folderId], [folderId])
 
-  const {data, error, isLoading, isFetching} = useQuery<(File | Folder)[], unknown>(queryKey, () =>
-    fetchFilesAndFolders(folderId)
-  )
+  const {data, error, isLoading, isFetching} = useQuery({
+    queryKey: ['files', currentUrl],
+    queryFn: () => fetchFilesAndFolders(currentUrl, onLoadingStatusChange),
+    staleTime: 0,
+    onSuccess: ({links}) => {
+      onPaginationLinkChange(links)
+    },
+    onSettled: () => {
+      onLoadingStatusChange(false)
+    },
+  })
 
   if (error) {
     showFlashError(I18n.t('Failed to fetch files and folders'))
   }
 
-  const rows = !isFetching && data && data.length > 0 ? data : []
+  const rows: (File | Folder)[] = !isFetching && data?.rows && data.rows.length > 0 ? data.rows : []
+
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
+
+  const toggleRowSelection = (rowId: string) => {
+    setSelectedRows(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId)
+      } else {
+        newSet.add(rowId)
+      }
+      return newSet
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedRows.size === rows.length) {
+      setSelectedRows(new Set()) // Unselect all
+    } else {
+      setSelectedRows(new Set(rows.map(row => row.id))) // Select all
+    }
+  }
+
+  const allRowsSelected = rows.length != 0 && selectedRows.size === rows.length
+  const someRowsSelected = selectedRows.size > 0 && !allRowsSelected
+  const filteredColumns = columnHeaders.filter(column => {
+    if (column.id === 'rights') {
+      return usageRightsRequiredForContext
+    }
+    return true
+  })
+
   return (
     <>
       <Table
@@ -117,29 +177,28 @@ const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolde
       >
         <Table.Head>
           <Table.Row>
-            {columnHeaders.map(columnHeader => (
-              <Table.ColHeader
-                key={columnHeader.id}
-                id={columnHeader.id}
-                textAlign={isStacked ? undefined : columnHeader.textAlign}
-                width={columnHeader.width}
-                data-testid={columnHeader.id}
-              >
-                {columnHeader.title}
-              </Table.ColHeader>
-            ))}
+            {renderTableHead(
+              size,
+              allRowsSelected,
+              someRowsSelected,
+              toggleSelectAll,
+              isStacked,
+              filteredColumns,
+            )}
           </Table.Row>
         </Table.Head>
         <Table.Body>
-          {rows.map(row => (
-            <Table.Row key={row.id} data-testid="table-row">
-              {columnHeaders.map(column => (
-                <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
-                  {columnRenderers[column.id](row, isStacked, userCanEditFilesForContext)}
-                </Table.Cell>
-              ))}
-            </Table.Row>
-          ))}
+          {renderTableBody(
+            rows,
+            filteredColumns,
+            selectedRows,
+            size,
+            isStacked,
+            columnRenderers,
+            toggleRowSelection,
+            userCanEditFilesForContext,
+            usageRightsRequiredForContext,
+          )}
         </Table.Body>
       </Table>
       <SubTableContent

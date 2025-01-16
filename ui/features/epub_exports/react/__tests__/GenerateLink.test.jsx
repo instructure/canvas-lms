@@ -16,26 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'jquery-migrate'
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
 import GenerateLink from '../GenerateLink'
 import CourseEpubExportStore from '../CourseStore'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import sinon from 'sinon'
 
 const I18n = createI18nScope('epub_exports')
 
-const ok = x => expect(x).toBeTruthy()
-const notOk = x => expect(x).toBeFalsy()
-const equal = (x, y) => expect(x).toEqual(y)
-
-let props
-
 describe('GenerateLink', () => {
+  let props
+
   beforeEach(() => {
     props = {
       course: {
@@ -45,58 +37,46 @@ describe('GenerateLink', () => {
     }
   })
 
-  test('showGenerateLink', function () {
-    const ref = React.createRef()
-    render(<GenerateLink {...props} ref={ref} />)
-    ok(ref.current.showGenerateLink(), 'should be true without epub_export object')
+  it('shows generate link without epub_export object', () => {
+    const {getByRole} = render(<GenerateLink {...props} />)
+    expect(getByRole('button', {name: I18n.t('Generate ePub')})).toBeInTheDocument()
+  })
 
+  it('hides generate link without regenerate permissions', () => {
     props.course.epub_export = {permissions: {regenerate: false}}
-    render(<GenerateLink {...props} ref={ref} />)
-    notOk(ref.current.showGenerateLink(), 'should be false without permissions to regenerate')
+    const {container} = render(<GenerateLink {...props} />)
+    expect(container.firstChild).toBeNull()
+  })
 
+  it('shows generate link with regenerate permissions', () => {
     props.course.epub_export = {permissions: {regenerate: true}}
-    render(<GenerateLink {...props} ref={ref} />)
-    ok(ref.current.showGenerateLink(), 'should be true with permissions to regenerate')
+    const {getByRole} = render(<GenerateLink {...props} />)
+    expect(getByRole('button', {name: I18n.t('Regenerate ePub')})).toBeInTheDocument()
   })
 
-  test('state triggered', function () {
-    const clock = sinon.useFakeTimers()
-    sinon.stub(CourseEpubExportStore, 'create')
-    const GenerateLinkElement = <GenerateLink {...props} />
-    const component = TestUtils.renderIntoDocument(GenerateLinkElement)
-    const node = ReactDOM.findDOMNode(component)
-    TestUtils.Simulate.click(node)
-    ok(component.state.triggered, 'should set state to triggered')
-    clock.tick(1005)
-    ok(!component.state.triggered, 'should toggle back to not triggered after 1000')
-    clock.restore()
-    CourseEpubExportStore.create.restore()
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
-  })
+  it('shows generating state when clicked', async () => {
+    jest.useFakeTimers()
+    const createSpy = jest.spyOn(CourseEpubExportStore, 'create')
+    const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
 
-  test('render', async function () {
-    const user = userEvent.setup({delay: null})
-    const clock = sinon.useFakeTimers()
-    sinon.stub(CourseEpubExportStore, 'create')
-
-    const ref = React.createRef()
-    let wrapper = render(<GenerateLink {...props} ref={ref} />)
-    const button = wrapper.container.querySelector('button')
-    equal(button.type, 'button', 'tag should be a button')
-    ok(wrapper.getAllByText(I18n.t('Generate ePub')), 'should show generate text')
-
+    const {getByRole, getByText} = render(<GenerateLink {...props} />)
+    const button = getByRole('button', {name: I18n.t('Generate ePub')})
     await user.click(button)
-    const text = wrapper.getByText(I18n.t('Generating...'))
-    ok(text, 'should show generating text')
-    equal(text.tagName, 'SPAN', 'tag should be span')
 
+    expect(getByText(I18n.t('Generating...'))).toBeInTheDocument()
+
+    jest.advanceTimersByTime(1005)
+    expect(getByRole('button', {name: I18n.t('Generate ePub')})).toBeInTheDocument()
+
+    jest.useRealTimers()
+    createSpy.mockRestore()
+  })
+
+  it('renders regenerate button when epub_export exists with permissions', () => {
     props.course.epub_export = {permissions: {regenerate: true}}
-    wrapper = render(<GenerateLink {...props} />)
-    clock.tick(2000)
-    equal(wrapper.container.querySelector('button').type, 'button', 'tag should be a button')
-    ok(wrapper.getAllByText(I18n.t('Regenerate ePub')), 'should show regenerate text')
-
-    clock.restore()
-    CourseEpubExportStore.create.restore()
+    const {getByRole} = render(<GenerateLink {...props} />)
+    const button = getByRole('button', {name: I18n.t('Regenerate ePub')})
+    expect(button).toBeInTheDocument()
+    expect(button).toHaveAttribute('type', 'button')
   })
 })

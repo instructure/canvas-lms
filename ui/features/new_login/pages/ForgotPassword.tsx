@@ -16,24 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useState} from 'react'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {ROUTES} from '../routes/routes'
-import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
-import {createErrorMessage, EMAIL_REGEX} from '../shared/helpers'
-import {forgotPassword} from '../services'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {TextInput} from '@instructure/ui-text-input'
+import React, {useRef, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
-import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useNewLogin, useNewLoginData} from '../context'
+import {ROUTES} from '../routes/routes'
+import {forgotPassword} from '../services'
+import {EMAIL_REGEX, createErrorMessage} from '../shared/helpers'
 
 const I18n = createI18nScope('new_login')
 
 const ForgotPassword = () => {
-  const {isUiActionPending, setIsUiActionPending, loginHandleName} = useNewLogin()
+  const {isUiActionPending, setIsUiActionPending} = useNewLogin()
+  const {loginHandleName} = useNewLoginData()
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
@@ -101,7 +102,7 @@ const ForgotPassword = () => {
         <Text>
           {I18n.t(
             'Enter your %{loginHandleName} and we’ll send you a link to change your password.',
-            {loginHandleName}
+            {loginHandleName},
           )}
         </Text>
       </Flex>
@@ -150,7 +151,7 @@ const ForgotPassword = () => {
         <Text>
           {I18n.t(
             'A recovery email has been sent to %{email}. Please check your inbox and follow the instructions to reset your password. This may take up to 10 minutes. If you don’t receive an email, be sure to check your spam folder.',
-            {email: submittedEmail}
+            {email: submittedEmail},
           )}
         </Text>
       </Flex>

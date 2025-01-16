@@ -56,7 +56,7 @@ describe('QuestionToggle', () => {
     fireEvent.click(getByText('Is this true or false?'))
     expect(getByTestId(`question-toggle-${testSupportedQuestion.id}`)).toHaveAttribute(
       'aria-expanded',
-      'true'
+      'true',
     )
     expect(getByText('Is this true or false?')).toBeInTheDocument()
   })

@@ -81,7 +81,7 @@ GranularCheckbox.defaultProps = {
 
 function mapStateToProps(state, ownProps) {
   const apiBusy = state.apiBusy.some(
-    elt => elt.id === ownProps.roleId && elt.name === ownProps.permissionName
+    elt => elt.id === ownProps.roleId && elt.name === ownProps.permissionName,
   )
 
   return {apiBusy, ...ownProps}
@@ -93,5 +93,5 @@ const mapDispatchToProps = {
 
 export const ConnectedGranularCheckbox = connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(GranularCheckbox)

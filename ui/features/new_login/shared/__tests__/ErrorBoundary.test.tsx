@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
+import React from 'react'
 import {ErrorBoundary} from '..'
 
 const ProblematicComponent = () => {
@@ -39,7 +39,7 @@ describe('ErrorBoundary', () => {
         <>
           <div>Child 1</div>
           <div>Child 2</div>
-        </>
+        </>,
       )
       expect(getByText('Child 1')).toBeInTheDocument()
       expect(getByText('Child 2')).toBeInTheDocument()
@@ -70,7 +70,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary fallback={<div>Error occurred</div>} key="updated">
           <div>New child</div>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       )
       expect(queryByText('New child')).toBeInTheDocument()
       expect(queryByText('Error occurred')).not.toBeInTheDocument()
@@ -87,8 +87,8 @@ describe('ErrorBoundary', () => {
               <div>Child 1</div>
             </ErrorBoundary>
             <ProblematicComponent />
-          </>
-        )
+          </>,
+        ),
       ).toThrow('Test error')
     })
   })

@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -123,14 +121,14 @@ AgendaView.prototype.handleEvents = function (events) {
 AgendaView.prototype.appendEvents = function (events) {
   let ref
   this.nextPageDate = events.nextPageDate
-   
+
   this.collection.push.apply(
     this.collection,
     calendarEventFilter(
       this.viewingGroup,
       events,
-      (ref = this.calendar) != null ? ref.schedulerState : void 0
-    )
+      (ref = this.calendar) != null ? ref.schedulerState : void 0,
+    ),
   )
   this.collection = sortBy(this.collection, 'originalStart')
   return this.render()
@@ -191,7 +189,7 @@ AgendaView.prototype.manageEvent = function (e) {
           return (currentIndex = index)
         }
       }
-    })(this)
+    })(this),
   )
   const event = this.dataSource.eventWithId(eventId)
   if (event.can_change_context) {
@@ -246,7 +244,7 @@ AgendaView.prototype.sortedBoxBy = function (list, iterator) {
       }
       return result
     },
-    []
+    [],
   )
 }
 

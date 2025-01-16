@@ -70,7 +70,7 @@ describe('GroupMoveModal', () => {
       contextId = '1',
       rootOutcomeGroup = {id: '100'},
       treeBrowserRootGroupId = '1',
-    } = {}
+    } = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider
@@ -79,7 +79,7 @@ describe('GroupMoveModal', () => {
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 

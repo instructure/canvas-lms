@@ -16,57 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import DueDateAddRowButton from '../DueDateAddRowButton'
 
-describe('DueDateAddRowButton with true display prop', () => {
-  let DueDateAddRowButtonInstance
+describe('DueDateAddRowButton', () => {
+  it('renders the add button when display is true', () => {
+    const {getByRole} = render(<DueDateAddRowButton display={true} />)
 
-  beforeEach(() => {
-    const props = {display: true}
-    const DueDateAddRowButtonElement = <DueDateAddRowButton {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    DueDateAddRowButtonInstance = ReactDOM.render(
-      DueDateAddRowButtonElement,
-      $('<div>').appendTo('body')[0]
-    )
+    const button = getByRole('button', {name: /add new set of due dates/i})
+    expect(button).toBeInTheDocument()
+    expect(button).toHaveClass('Button', 'Button--add-row')
   })
 
-  afterEach(() => {
-    if (ReactDOM.findDOMNode(DueDateAddRowButtonInstance)) {
-      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(DueDateAddRowButtonInstance).parentNode)
-    }
+  it('does not render the button when display is false', () => {
+    const {container} = render(<DueDateAddRowButton display={false} />)
+    expect(container).toBeEmptyDOMElement()
   })
 
-  test('renders a button', () => {
-    expect(DueDateAddRowButtonInstance).toBeTruthy()
-    expect(DueDateAddRowButtonInstance.addButtonRef).toBeTruthy()
-  })
-})
+  it('calls handleAdd when clicked', async () => {
+    const handleAdd = jest.fn()
+    const {getByRole} = render(<DueDateAddRowButton display={true} handleAdd={handleAdd} />)
 
-describe('DueDateAddRowButton with false display prop', () => {
-  let DueDateAddRowButtonInstance
+    const button = getByRole('button', {name: /add new set of due dates/i})
+    await userEvent.click(button)
 
-  beforeEach(() => {
-    const props = {display: false}
-    const DueDateAddRowButtonElement = <DueDateAddRowButton {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    DueDateAddRowButtonInstance = ReactDOM.render(
-      DueDateAddRowButtonElement,
-      $('<div>').appendTo('body')[0]
-    )
+    expect(handleAdd).toHaveBeenCalledTimes(1)
   })
 
-  afterEach(() => {
-    if (ReactDOM.findDOMNode(DueDateAddRowButtonInstance)) {
-      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(DueDateAddRowButtonInstance).parentNode)
-    }
-  })
+  it('has proper accessibility attributes', () => {
+    const {getByRole} = render(<DueDateAddRowButton display={true} />)
 
-  test('does not render a button', () => {
-    expect(DueDateAddRowButtonInstance).toBeTruthy()
-    expect(DueDateAddRowButtonInstance.addButtonRef).toBeFalsy()
+    const button = getByRole('button', {name: /add new set of due dates/i})
+    const icon = button.querySelector('.icon-plus')
+
+    expect(icon).toHaveAttribute('role', 'presentation')
+    expect(button).toHaveTextContent('Add')
   })
 })

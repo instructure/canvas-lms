@@ -95,7 +95,7 @@ export default function BouncedEmailsView({accountId}) {
     body_data => {
       return <Table.Body>{renderTableRows(body_data)}</Table.Body>
     },
-    [renderTableRows]
+    [renderTableRows],
   )
 
   const onFetch = useCallback(
@@ -104,7 +104,7 @@ export default function BouncedEmailsView({accountId}) {
       setFetchError('')
       setLoading(false)
     },
-    [setLoading, setData]
+    [setLoading, setData],
   )
 
   const onError = useCallback(() => {
@@ -127,8 +127,8 @@ export default function BouncedEmailsView({accountId}) {
     setLoading(true)
     setCsvReportPath(
       `/api/v1/accounts/${accountId}/bounced_communication_channels.csv?${encodeQueryString(
-        params
-      )}`
+        params,
+      )}`,
     )
     doFetchApi({path, params}).then(onFetch).catch(onError)
   }, [accountId, searchTerm, onFetch, onError, before, after])
@@ -164,7 +164,7 @@ export default function BouncedEmailsView({accountId}) {
         </>
       )
     },
-    [loading, renderTableHeader, renderTableBody, csvReportPath]
+    [loading, renderTableHeader, renderTableBody, csvReportPath],
   )
 
   return (

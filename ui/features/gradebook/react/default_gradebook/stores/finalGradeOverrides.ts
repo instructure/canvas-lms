@@ -46,7 +46,7 @@ export type FinalGradeOverrideState = {
 
 export default (
   set: StoreApi<GradebookStore>['setState'],
-  get: StoreApi<GradebookStore>['getState']
+  get: StoreApi<GradebookStore>['getState'],
 ): FinalGradeOverrideState => ({
   allowFinalGradeOverride: false,
 

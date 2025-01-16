@@ -30,6 +30,6 @@ it('records and forwards the memo for the fixed element', () => {
   expect(animator.elementPositionMemo).toHaveBeenCalledWith('scroll-past-fixed-element-first')
   expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith(
     'scroll-past-fixed-element-second',
-    'position-memo'
+    'position-memo',
   )
 })

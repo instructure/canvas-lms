@@ -2046,14 +2046,14 @@ if (typeof Slick === 'undefined') {
       var childToRemove = cacheEntry.rowNode
       // Frozen Columns - remove row from frozen and nonFrozen canvas_x
       if (options.numberOfColumnsToFreeze > 0) {
-        if (childToRemove.nonFrozen) {
+        if (childToRemove?.nonFrozen instanceof HTMLElement) {
           $canvas_1[0].removeChild(childToRemove.nonFrozen)
         }
-        if (childToRemove.frozen) {
+        if (childToRemove?.frozen instanceof HTMLElement) {
           $canvas_0[0].removeChild(childToRemove.frozen)
         }
-      } else {
-        $canvas_1[0].removeChild(childToRemove.nonFrozen)
+      } else if (childToRemove?.nonFrozen instanceof HTMLElement) {
+        $canvas_1[0].removeChild(childToRemove?.nonFrozen)
       }
       delete rowsCache[row]
       delete postProcessedRows[row]
@@ -2547,8 +2547,12 @@ if (typeof Slick === 'undefined') {
       for (var i = 0, ii = rows.length; i < ii; i++) {
         currentRowCache = rowsCache[rows[i]]
         currentRowCache.rowNode = {
-          frozen: numberOfColumnsToFreeze > 0 ? parentNode_0.appendChild(frozenDiv.firstChild) : '',
-          nonFrozen: parentNode_1.appendChild(nonFrozenDiv.firstChild),
+          frozen: numberOfColumnsToFreeze > 0 && frozenDiv?.firstChild instanceof HTMLElement
+          ? parentNode_0.appendChild(frozenDiv.firstChild)
+          : '',
+          nonFrozen: nonFrozenDiv?.firstChild instanceof HTMLElement
+          ? parentNode_1.appendChild(nonFrozenDiv.firstChild)
+          : '',
         }
       }
 
@@ -3370,6 +3374,7 @@ if (typeof Slick === 'undefined') {
       // walk up the tree
       var offsetParent = elem.offsetParent
       while ((elem = elem.parentNode) != document.body) {
+        if (!elem) continue
         if (
           box.visible &&
           elem.scrollHeight != elem.offsetHeight &&

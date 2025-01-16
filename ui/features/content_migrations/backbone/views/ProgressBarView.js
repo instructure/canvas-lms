@@ -46,7 +46,7 @@ ProgressBarView.prototype.initialize = function () {
     (function (_this) {
       return function () {
         let ref
-         
+
         const integer = Math.floor((ref = _this.model.changed) != null ? ref.completion : void 0)
         const message = I18n.t('Content migration running, %{percent}% complete', {
           percent: integer,
@@ -54,7 +54,7 @@ ProgressBarView.prototype.initialize = function () {
         $.screenReaderFlashMessageExclusive(message)
         return _this.render()
       }
-    })(this)
+    })(this),
   )
 }
 

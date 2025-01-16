@@ -47,7 +47,6 @@ const featureBundles: {
   available_pronouns_list: () => import('./features/available_pronouns_list/index'),
   blueprint_course_child: () => import('./features/blueprint_course_child/index'),
   blueprint_course_master: () => import('./features/blueprint_course_master/index'),
-  block_editor: () => import('./features/block_editor/index'),
   block_editor_iframe_content: () => import('./features/block_editor_iframe_content/index'),
   brand_configs: () => import('./features/brand_configs/index'),
   calendar_appointment_group_edit: () => import('./features/calendar_appointment_group_edit/index'),
@@ -162,7 +161,6 @@ const featureBundles: {
   outcome_alignment_v2: () => import('./features/outcome_alignment_v2/index'),
   outcome_alignments: () => import('./features/outcome_alignments/index'),
   outcome_management: () => import('./features/outcome_management/index'),
-  page_views: () => import('./features/page_views/index'),
   password_complexity_configuration: () =>
     import('./features/password_complexity_configuration/index'),
   past_global_alert: () => import('./features/past_global_alert/index'),

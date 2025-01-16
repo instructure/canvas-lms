@@ -32,12 +32,12 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Notifications tab)'),
       description: I18n.t(
-        'To search and view notifications for a user, Users - view must also be enabled.'
+        'To search and view notifications for a user, Users - view must also be enabled.',
       ),
     },
     {
       title: I18n.t('Subaccounts'),
       description: I18n.t('Not available at the subaccount level.'),
     },
-  ]
+  ],
 )

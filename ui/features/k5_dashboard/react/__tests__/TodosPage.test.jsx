@@ -47,14 +47,14 @@ describe('TodosPage', () => {
 
   it('renders todo items for each todo once loaded', async () => {
     const {getAllByTestId, getAllByText, getByRole, findByRole, rerender, queryByRole} = render(
-      <TodosPage {...getProps({visible: false})} />
+      <TodosPage {...getProps({visible: false})} />,
     )
     // Displays nothing when not visible
     expect(queryByRole('link')).not.toBeInTheDocument()
 
     rerender(<TodosPage {...getProps()} />)
     // Displays loading skeletons when visible and todos are loading
-    expect(getAllByTestId('todo-loading-skeleton').length).toBe(5)
+    expect(getAllByTestId('todo-loading-skeleton')).toHaveLength(5)
     expect(getAllByText('Loading Todo Title')[0]).toBeInTheDocument()
     expect(getAllByText('Loading Todo Course Name')[0]).toBeInTheDocument()
     expect(getAllByText('Loading Additional Todo Details')[0]).toBeInTheDocument()
@@ -92,7 +92,7 @@ describe('Empty todos', () => {
 
     // Displays the empty state if no todos were found
     expect(
-      await findByText("Relax and take a break. There's nothing to do yet.")
+      await findByText("Relax and take a break. There's nothing to do yet."),
     ).toBeInTheDocument()
     expect(await findByTestId('empty-todos-panda')).toBeInTheDocument()
   })

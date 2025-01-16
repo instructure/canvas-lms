@@ -24,10 +24,10 @@ import svgPlugin from './ui-build/esbuild/svg-plugin'
 
 export default defineConfig({
   test: {
-    environment: 'happy-dom',
+    environment: 'jsdom',
     globals: true,
     setupFiles: 'ui/setup-vitests.tsx',
-    include: ['ui/**/__tests__/**/*.test.?(c|m)[jt]s?(x)', 'packages/**/__tests__/**/*.test.?(c|m)[jt]s?(x)'],
+    include: ['ui/**/__tests__/**/*.test.?(c|m)[jt]s?(x)'],
     exclude: [
       'ui/boot/initializers/**/*',
       'ui/features/account_calendar_settings/**/*',

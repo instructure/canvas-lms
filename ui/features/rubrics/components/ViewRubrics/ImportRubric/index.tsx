@@ -112,7 +112,7 @@ export const ImportRubric = ({
               },
               {
                 count: newRubricCount ?? 0,
-              }
+              },
             )
             showFlashSuccess(successMessage)()
           } else if (workflowState === 'succeeded_with_errors') {

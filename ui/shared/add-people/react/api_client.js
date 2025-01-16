@@ -87,7 +87,7 @@ export default {
         return response
       })
     }
-     
+
     return Promise.reject({
       message: I18n.t('You do not have permission to invite users that do not already exist.'),
     })

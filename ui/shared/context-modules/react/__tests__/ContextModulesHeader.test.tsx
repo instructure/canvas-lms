@@ -99,7 +99,7 @@ describe('ContextModulesHeader', () => {
       // @ts-expect-error
       const {container} = render(<ContextModulesHeader {...defaultProps} />)
       expect(
-        container.querySelector('.context-modules-header-publish-menu-responsive button')
+        container.querySelector('.context-modules-header-publish-menu-responsive button'),
       ).toBeDisabled()
     })
 
@@ -146,7 +146,7 @@ describe('ContextModulesHeader', () => {
       // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(
-        getByText(`${defaultProps.lastExport.label} ${defaultProps.lastExport.date}`)
+        getByText(`${defaultProps.lastExport.label} ${defaultProps.lastExport.date}`),
       ).toBeInTheDocument()
     })
 
@@ -155,7 +155,7 @@ describe('ContextModulesHeader', () => {
       // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(() =>
-        getByText(`${defaultProps.lastExport.label} ${defaultProps.lastExport.date}`)
+        getByText(`${defaultProps.lastExport.label} ${defaultProps.lastExport.date}`),
       ).toThrow(/Unable to find an element/)
     })
 
@@ -185,7 +185,7 @@ describe('ContextModulesHeader', () => {
       fireEvent.click(button)
 
       expect(() => getByText(defaultProps.moreMenu.exportCourseContent.label)).toThrow(
-        /Unable to find an element/
+        /Unable to find an element/,
       )
     })
 
@@ -213,7 +213,7 @@ describe('ContextModulesHeader', () => {
       // @ts-expect-error
       const {getByRole} = render(<ContextModulesHeader {...defaultProps} />)
       expect(() => getByRole('button', {name: 'More'})).toThrow(
-        /Unable to find an accessible element/
+        /Unable to find an accessible element/,
       )
     })
   })

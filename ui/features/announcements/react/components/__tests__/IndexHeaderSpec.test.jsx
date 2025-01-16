@@ -53,7 +53,7 @@ describe('"Add Announcement" button', () => {
     expect(
       screen.getByRole('link', {
         name: /add announcement/i,
-      })
+      }),
     ).toBeInTheDocument()
   })
 
@@ -64,7 +64,7 @@ describe('"Add Announcement" button', () => {
     expect(
       screen.queryByRole('link', {
         name: /add announcement/i,
-      })
+      }),
     ).not.toBeInTheDocument()
   })
 })
@@ -82,7 +82,7 @@ describe('searching announcements', () => {
       expect(spy).toHaveBeenCalledWith(
         expect.objectContaining({
           term: 'foo',
-        })
+        }),
       )
     })
   })
@@ -117,7 +117,7 @@ describe('"Announcement Filter" select', () => {
       expect(spy).toHaveBeenCalledWith(
         expect.objectContaining({
           filter: 'unread',
-        })
+        }),
       )
     })
   })
@@ -211,7 +211,7 @@ describe('"Delete Selected Announcements" button', () => {
     expect(
       screen.getByRole('heading', {
         name: /confirm delete/i,
-      })
+      }),
     ).toBeInTheDocument()
   })
 })

@@ -22,10 +22,10 @@ import CoursePacingNotice, {renderCoursePacingNotice} from '../CoursePacingNotic
 
 describe('CoursePacingNotice', () => {
   it('renders', () => {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
+     
     const {getByRole, getByText} = render(<CoursePacingNotice courseId="17" />)
     expect(
-      getByText('This course is using Course Pacing. Go to Course Pacing to manage due dates.')
+      getByText('This course is using Course Pacing. Go to Course Pacing to manage due dates.'),
     ).toBeInTheDocument()
     const link = getByRole('link', {name: 'Course Pacing'})
     expect(link).toBeInTheDocument()
@@ -39,8 +39,8 @@ describe('CoursePacingNotice', () => {
       expect(
         getByText(
           div,
-          'This course is using Course Pacing. Go to Course Pacing to manage due dates.'
-        )
+          'This course is using Course Pacing. Go to Course Pacing to manage due dates.',
+        ),
       ).toBeDefined()
       const link = getByRole(div, 'link', {name: 'Course Pacing'})
       expect(link).toBeDefined()

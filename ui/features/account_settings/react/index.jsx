@@ -39,6 +39,6 @@ export function start(element, props = {}, state = defaultState) {
     <Provider store={store}>
       <ConnectedSecurityPanel {...config} {...props} />
     </Provider>,
-    element
+    element,
   )
 }

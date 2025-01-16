@@ -40,18 +40,18 @@ describe('UnpublishedChangesIndicator', () => {
   it('pluralizes and formats correctly', () => {
     expect(
       render(<UnpublishedChangesIndicator {...defaultProps} changeCount={0} />).getByText(
-        'All changes published'
-      )
+        'All changes published',
+      ),
     ).toBeInTheDocument()
     expect(
       render(<UnpublishedChangesIndicator {...defaultProps} changeCount={1} />).getByText(
-        '1 unsaved change'
-      )
+        '1 unsaved change',
+      ),
     ).toBeInTheDocument()
     expect(
       render(<UnpublishedChangesIndicator {...defaultProps} changeCount={2500} />).getByText(
-        '2,500 unsaved changes'
-      )
+        '2,500 unsaved changes',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -61,7 +61,7 @@ describe('UnpublishedChangesIndicator', () => {
 
     it('is called when clicked if there are pending changes', async () => {
       const {getByText} = render(
-        <UnpublishedChangesIndicator {...defaultProps} changeCount={3} onClick={onClick} />
+        <UnpublishedChangesIndicator {...defaultProps} changeCount={3} onClick={onClick} />,
       )
 
       await userEvent.click(getByText('3 unsaved changes'))
@@ -70,7 +70,7 @@ describe('UnpublishedChangesIndicator', () => {
 
     it('is not called when clicked if there are no pending changes', async () => {
       const {getByText} = render(
-        <UnpublishedChangesIndicator {...defaultProps} changeCount={0} onClick={onClick} />
+        <UnpublishedChangesIndicator {...defaultProps} changeCount={0} onClick={onClick} />,
       )
 
       await userEvent.click(getByText('All changes published'))
@@ -96,20 +96,20 @@ describe('UnpublishedChangesIndicator', () => {
 
   it('throws when a negative changeCount is specified', () => {
     expect(() =>
-      render(<UnpublishedChangesIndicator {...defaultProps} changeCount={-1} />)
+      render(<UnpublishedChangesIndicator {...defaultProps} changeCount={-1} />),
     ).toThrow()
   })
 
   it('displays a spinner indicating ongoing publishing when isSyncing is true', () => {
     const {getAllByText} = render(
-      <UnpublishedChangesIndicator {...defaultProps} isSyncing={true} />
+      <UnpublishedChangesIndicator {...defaultProps} isSyncing={true} />,
     )
     expect(getAllByText('Publishing...')[0]).toBeInTheDocument()
   })
 
   it('renders new pace message if pace has not yet been published', () => {
     const {getByText} = render(
-      <UnpublishedChangesIndicator {...defaultProps} changeCount={0} newPace={true} />
+      <UnpublishedChangesIndicator {...defaultProps} changeCount={0} newPace={true} />,
     )
     expect(getByText('Pace is new and unpublished')).toBeInTheDocument()
   })

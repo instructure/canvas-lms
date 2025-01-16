@@ -55,7 +55,7 @@ export default class UploadViewManager {
       message = I18n.t(
         'file_size_error',
         'Size of %{file} is greater than the maximum %{max} MB allowed file size.',
-        {file: error.file.name, max: error.maxFileSize}
+        {file: error.file.name, max: error.maxFileSize},
       )
     } else {
       message = I18n.t('file_type_error', '%{file} is not an acceptable %{type} file.', {
@@ -70,7 +70,7 @@ export default class UploadViewManager {
   showConfigError = () => {
     const message = I18n.t(
       'errors.media_comment_installation_broken',
-      'Media comment uploading has not been set up properly. Please contact your administrator.'
+      'Media comment uploading has not been set up properly. Please contact your administrator.',
     )
     this.showErrorMessage(message)
     $('#media_upload_feedback').css('visibility', 'visible')

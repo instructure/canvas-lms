@@ -100,8 +100,8 @@ describe('CurveGradesDialogManager.createCurveGradesAction.isDisabled', () => {
       expect(flashErrorSpy).toHaveBeenCalledWith(
         I18n.t(
           'Unable to curve grades because this assignment is due in a closed ' +
-            'grading period for at least one student'
-        )
+            'grading period for at least one student',
+        ),
       )
     })
 

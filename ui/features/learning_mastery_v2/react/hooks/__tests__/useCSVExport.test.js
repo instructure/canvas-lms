@@ -83,8 +83,8 @@ describe('useCSVExport', () => {
     it('calls the /rollups.csv URL with the right parameters', async () => {
       const {result} = renderHook(() =>
         useCSVExport(
-          defaultProps({gradebookFilters: ['inactive_enrollments', 'missing_user_rollups']})
-        )
+          defaultProps({gradebookFilters: ['inactive_enrollments', 'missing_user_rollups']}),
+        ),
       )
       const params = {
         params: {

@@ -26,7 +26,7 @@ export default function flatten(
   result: {
     [key: string]: any
   } = {},
-  prefix: string = ''
+  prefix: string = '',
 ) {
   for (let key in obj) {
     const value = obj[key]

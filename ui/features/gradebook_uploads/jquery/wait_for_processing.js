@@ -38,10 +38,8 @@ async function sleep(milliseconds) {
 export async function waitForProcessing(progress, sleep_time = 2000) {
   const spinner = $('#spinner').spin()
   while (!['completed', 'failed'].includes(progress.workflow_state)) {
-     
     await sleep(sleep_time)
     progress = await $.ajaxJSON(`/api/v1/progress/${progress.id}`, 'GET').promise()
-     
   }
 
   if (progress.workflow_state === 'completed') {
@@ -54,7 +52,7 @@ export async function waitForProcessing(progress, sleep_time = 2000) {
     throw new Error(I18n.t('The CSV file is empty or invalid.'))
   } else {
     throw new Error(
-      I18n.t('An unknown error has occurred. Verify the CSV file or try again later.')
+      I18n.t('An unknown error has occurred. Verify the CSV file or try again later.'),
     )
   }
 }

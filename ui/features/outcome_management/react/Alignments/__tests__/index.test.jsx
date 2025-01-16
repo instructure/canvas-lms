@@ -47,14 +47,14 @@ describe('AlignmentSummary', () => {
       contextId = '1',
       rootOutcomeGroup = {id: '1'},
       mocks = courseAlignmentStatsMocks(),
-    } = {}
+    } = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId, rootOutcomeGroup}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 

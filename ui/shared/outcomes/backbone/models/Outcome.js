@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {map, find, extend as lodashExtend} from 'lodash'
@@ -61,14 +59,14 @@ Outcome.prototype.setMasteryScales = function () {
         return function (r) {
           return r.mastery
         }
-      })(this)
+      })(this),
     ).points,
-     
+
     points_possible: Math.max.apply(
       Math,
       map(ratings, function (r) {
         return r.points
-      })
+      }),
     ),
   })
 }
@@ -101,7 +99,7 @@ Outcome.prototype.initialize = function () {
           calculation_int: _this.defaultCalculationInt(),
         })
       }
-    })(this)
+    })(this),
   )
   return Outcome.__super__.initialize.apply(this, arguments)
 }

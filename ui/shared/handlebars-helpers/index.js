@@ -141,7 +141,7 @@ const object = {
       const courseDatetime = datetimeString(datetime, {timezone: ENV.CONTEXT_TIMEZONE})
       if (localDatetime !== courseDatetime) {
         titleText = `${htmlEscape(localText)}: ${htmlEscape(localDatetime)}<br>${htmlEscape(
-          courseText
+          courseText,
         )}: ${htmlEscape(courseDatetime)}`
       }
     }
@@ -150,7 +150,7 @@ const object = {
       return new Handlebars.SafeString(titleText)
     } else {
       return new Handlebars.SafeString(
-        `data-tooltip data-html-tooltip-title=\"${htmlEscape(titleText)}\"`
+        `data-tooltip data-html-tooltip-title=\"${htmlEscape(titleText)}\"`,
       )
     }
   },
@@ -287,7 +287,7 @@ const object = {
   // helper for easily creating icon font markup
   addIcon(icontype) {
     return new Handlebars.SafeString(
-      `<i role='presentation' class='icon-${htmlEscape(icontype)}'></i>`
+      `<i role='presentation' class='icon-${htmlEscape(icontype)}'></i>`,
     )
   },
 
@@ -669,7 +669,7 @@ const object = {
             return memo[key_]
           }
         },
-        this
+        this,
       )
       if (value) {
         inputProps.checked = true
@@ -817,7 +817,7 @@ const object = {
   },
   truncate_left(string, max) {
     return Handlebars.Utils.escapeExpression(
-      truncateText(string.split('').reverse().join(''), {max}).split('').reverse().join('')
+      truncateText(string.split('').reverse().join(''), {max}).split('').reverse().join(''),
     )
   },
 
@@ -945,7 +945,7 @@ const object = {
         near: 'plus',
       }[status] || 'x'
     return new Handlebars.SafeString(
-      `<i aria-hidden='true' class='icon-${htmlEscape(iconType)}'></i>`
+      `<i aria-hidden='true' class='icon-${htmlEscape(iconType)}'></i>`,
     )
   },
 

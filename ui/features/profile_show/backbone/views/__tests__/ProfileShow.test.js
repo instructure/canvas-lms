@@ -151,7 +151,7 @@ describe('ProfileShow', () => {
 
       // Assert
       expect(document.querySelector('#profile_alert_holder_success').textContent).toBe(
-        'Profile has been saved successfully'
+        'Profile has been saved successfully',
       )
     })
 
@@ -162,7 +162,7 @@ describe('ProfileShow', () => {
 
       // Assert
       expect(document.querySelector('#profile_alert_holder_failed').textContent).toBe(
-        'Profile save was unsuccessful'
+        'Profile save was unsuccessful',
       )
     })
   })

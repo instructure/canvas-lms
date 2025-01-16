@@ -36,7 +36,7 @@ export function SearchResultsCount({...props}) {
           },
           {
             count: props.resultsFound,
-          }
+          },
         )}
       </Text>
     </View>

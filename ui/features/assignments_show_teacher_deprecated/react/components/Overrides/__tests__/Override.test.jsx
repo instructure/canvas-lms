@@ -30,7 +30,7 @@ function renderOverride(override, props = {}) {
       onValidate={() => true}
       invalidMessage={() => undefined}
       {...props}
-    />
+    />,
   )
 }
 

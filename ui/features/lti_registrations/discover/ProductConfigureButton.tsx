@@ -80,7 +80,6 @@ export const ProductConfigureButton = ({
               url: integration.url,
             }
 
-      // eslint-disable-next-line promise/catch-or-return
       fetchThirdPartyToolConfiguration(body, accountId).then(result => {
         setJsonFetchStatus({
           _tag: 'loaded',
@@ -101,13 +100,13 @@ export const ProductConfigureButton = ({
             openDynamicRegistrationWizard(
               integration.url,
               ZUnifiedToolId.parse(integration.unified_tool_id),
-              redirectToManagePage
+              redirectToManagePage,
             )
             break
           case 'lti_13_global_inherited_key':
             openInheritedKeyWizard(
               ZDeveloperKeyId.parse(integration.global_inherited_key),
-              redirectToManagePage
+              redirectToManagePage,
             )
             break
           case 'lti_13_url':
@@ -116,7 +115,7 @@ export const ProductConfigureButton = ({
                 integration.url,
                 jsonFetchStatus.result.data,
                 ZUnifiedToolId.parse(integration.unified_tool_id),
-                redirectToManagePage
+                redirectToManagePage,
               )
             }
             break
@@ -126,7 +125,7 @@ export const ProductConfigureButton = ({
                 integration.configuration,
                 jsonFetchStatus.result.data,
                 ZUnifiedToolId.parse(integration.unified_tool_id),
-                redirectToManagePage
+                redirectToManagePage,
               )
             }
             break
@@ -140,7 +139,7 @@ export const ProductConfigureButton = ({
 
 const buttonIsEnabled = (
   integration: PreferredLtiIntegration | undefined,
-  jsonFetchStatus: JsonFetchStatus
+  jsonFetchStatus: JsonFetchStatus,
 ) => {
   if (jsonFetchStatus._tag === 'loading') {
     return false

@@ -23,7 +23,7 @@ const userSettingsReducer = handleActions(
     [actionTypes.GET_USER_SETTINGS_SUCCESS]: (state, action) => action.payload,
     [actionTypes.SAVING_SETTINGS_SUCCESS]: (state, action) => action.payload.userSettings,
   },
-  {}
+  {},
 )
 
 export default userSettingsReducer

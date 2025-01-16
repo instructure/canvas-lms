@@ -35,13 +35,13 @@ const changeLogReducer = combineReducers({
       [actionTypes.LOAD_CHANGE_SUCCESS]: () => LoadStates.states.loaded,
       [actionTypes.LOAD_CHANGE_FAILED]: () => LoadStates.states.not_loaded,
     },
-    LoadStates.states.not_loaded
+    LoadStates.states.not_loaded,
   ),
   data: handleActions(
     {
       [actionTypes.LOAD_CHANGE_SUCCESS]: (state, action) => action.payload,
     },
-    null
+    null,
   ),
 })
 
@@ -59,7 +59,7 @@ const notificationReducer = handleActions(
     [actionTypes.CLEAR_NOTIFICATION]: (state, action) =>
       state.slice().filter(not => not.id !== action.payload),
   },
-  []
+  [],
 )
 
 export default combineReducers({
@@ -88,7 +88,7 @@ export default combineReducers({
       [actionTypes.SELECT_CHANGE_LOG]: (state, action) =>
         (action.payload && action.payload.changeId) || null,
     },
-    null
+    null,
   ),
   changeLogs: (state = {}, action) => {
     let newState = state
@@ -106,7 +106,7 @@ export default combineReducers({
       [actionTypes.LOAD_HISTORY_SUCCESS]: () => false,
       [actionTypes.LOAD_HISTORY_FAIL]: () => false,
     },
-    false
+    false,
   ),
   hasLoadedHistory: handleActions(
     {
@@ -114,27 +114,27 @@ export default combineReducers({
       [actionTypes.CHECK_MIGRATION_SUCCESS]: (state, action) =>
         MigrationStates.isEndState(action.payload) ? false : state,
     },
-    false
+    false,
   ),
   migrations: handleActions(
     {
       [actionTypes.LOAD_HISTORY_SUCCESS]: (state, action) => action.payload,
     },
-    []
+    [],
   ),
   migrationStatus: handleActions(
     {
       [actionTypes.CHECK_MIGRATION_SUCCESS]: (state, action) => action.payload,
       [actionTypes.BEGIN_MIGRATION_SUCCESS]: (state, action) => action.payload.workflow_state,
     },
-    MigrationStates.states.unknown
+    MigrationStates.states.unknown,
   ),
   hasCheckedMigration: handleActions(
     {
       [actionTypes.CHECK_MIGRATION_SUCCESS]: () => true,
       [actionTypes.BEGIN_MIGRATION_SUCCESS]: () => true,
     },
-    false
+    false,
   ),
   isCheckingMigration: handleActions(
     {
@@ -142,25 +142,25 @@ export default combineReducers({
       [actionTypes.CHECK_MIGRATION_SUCCESS]: () => false,
       [actionTypes.CHECK_MIGRATION_FAIL]: () => false,
     },
-    false
+    false,
   ),
   hasLoadedCourses: handleActions(
     {
       [actionTypes.LOAD_COURSES_SUCCESS]: () => true,
     },
-    false
+    false,
   ),
   courses: handleActions(
     {
       [actionTypes.LOAD_COURSES_SUCCESS]: (state, action) => action.payload,
     },
-    []
+    [],
   ),
   hasLoadedAssociations: handleActions(
     {
       [actionTypes.LOAD_ASSOCIATIONS_SUCCESS]: () => true,
     },
-    false
+    false,
   ),
   existingAssociations: handleActions(
     {
@@ -171,7 +171,7 @@ export default combineReducers({
         return state.filter(course => !removedIds.includes(course.id)).concat(added)
       },
     },
-    []
+    [],
   ),
   addedAssociations: handleActions(
     {
@@ -181,7 +181,7 @@ export default combineReducers({
       [actionTypes.UNDO_ADD_COURSE_ASSOCIATIONS]: (state, action) =>
         state.filter(course => !action.payload.includes(course.id)),
     },
-    []
+    [],
   ),
   removedAssociations: handleActions(
     {
@@ -191,7 +191,7 @@ export default combineReducers({
       [actionTypes.UNDO_REMOVE_COURSE_ASSOCIATIONS]: (state, action) =>
         state.filter(course => !action.payload.includes(course.id)),
     },
-    []
+    [],
   ),
   isLoadingBeginMigration: handleActions(
     {
@@ -199,7 +199,7 @@ export default combineReducers({
       [actionTypes.BEGIN_MIGRATION_SUCCESS]: () => false,
       [actionTypes.BEGIN_MIGRATION_FAIL]: () => false,
     },
-    false
+    false,
   ),
   isLoadingCourses: handleActions(
     {
@@ -207,7 +207,7 @@ export default combineReducers({
       [actionTypes.LOAD_COURSES_SUCCESS]: () => false,
       [actionTypes.LOAD_COURSES_FAIL]: () => false,
     },
-    false
+    false,
   ),
   isLoadingAssociations: handleActions(
     {
@@ -215,7 +215,7 @@ export default combineReducers({
       [actionTypes.LOAD_ASSOCIATIONS_SUCCESS]: () => false,
       [actionTypes.LOAD_ASSOCIATIONS_FAIL]: () => false,
     },
-    false
+    false,
   ),
   isSavingAssociations: handleActions(
     {
@@ -223,7 +223,7 @@ export default combineReducers({
       [actionTypes.SAVE_ASSOCIATIONS_SUCCESS]: () => false,
       [actionTypes.SAVE_ASSOCIATIONS_FAIL]: () => false,
     },
-    false
+    false,
   ),
   isLoadingUnsyncedChanges: handleActions(
     {
@@ -231,55 +231,55 @@ export default combineReducers({
       [actionTypes.LOAD_UNSYNCED_CHANGES_SUCCESS]: () => false,
       [actionTypes.LOAD_UNSYNCED_CHANGES_FAIL]: () => false,
     },
-    false
+    false,
   ),
   hasLoadedUnsyncedChanges: handleActions(
     {
       [actionTypes.LOAD_UNSYNCED_CHANGES_START]: () => false,
       [actionTypes.LOAD_UNSYNCED_CHANGES_SUCCESS]: () => true,
     },
-    false
+    false,
   ),
   unsyncedChanges: handleActions(
     {
       [actionTypes.LOAD_UNSYNCED_CHANGES_SUCCESS]: (state, action) => action.payload,
     },
-    []
+    [],
   ),
   willSendNotification: handleActions(
     {
       [actionTypes.ENABLE_SEND_NOTIFICATION]: (state, action) => action.payload,
     },
-    false
+    false,
   ),
   willIncludeCustomNotificationMessage: handleActions(
     {
       [actionTypes.INCLUDE_CUSTOM_NOTIFICATION_MESSAGE]: (state, action) => action.payload,
     },
-    false
+    false,
   ),
   notificationMessage: handleActions(
     {
       [actionTypes.SET_NOTIFICATION_MESSAGE]: (state, action) => action.payload,
     },
-    ''
+    '',
   ),
   willIncludeCourseSettings: handleActions(
     {
       [actionTypes.INCLUDE_COURSE_SETTINGS]: (state, action) => action.payload,
     },
-    false
+    false,
   ),
   willPublishCourses: handleActions(
     {
       [actionTypes.ENABLE_PUBLISH_COURSES]: (state, action) => action.payload,
     },
-    false
+    false,
   ),
   willSendItemNotifications: handleActions(
     {
       [actionTypes.ENABLE_ITEM_NOTIFICATIONS]: (state, action) => action.payload,
     },
-    false
+    false,
   ),
 })

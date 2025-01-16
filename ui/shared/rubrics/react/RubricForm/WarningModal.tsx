@@ -34,7 +34,7 @@ type WarningModalProps = {
 export function WarningModal({isOpen, onCancel, onDismiss}: WarningModalProps) {
   const modalHeader = I18n.t('Warning')
   const message = I18n.t(
-    'You are about to exit the rubric editor. Any unsaved changes will be lost.'
+    'You are about to exit the rubric editor. Any unsaved changes will be lost.',
   )
   const exitButtonText = I18n.t('Exit')
   const cancelButtonText = I18n.t('Cancel')

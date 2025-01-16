@@ -86,8 +86,8 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
       {
         leading: false,
         trailing: true,
-      }
-    )
+      },
+    ),
   )
 
   const getCourseOptions = useCallback(
@@ -97,7 +97,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
       setSearchParam(target.value)
       throttledCourseFetch.current(target.value, includeCompletedCourses)
     },
-    [includeCompletedCourses]
+    [includeCompletedCourses],
   )
 
   const selectCourse = useCallback(
@@ -105,12 +105,12 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
       setSelectedCourse(
         courseOptions.filter((c: CourseOption) => {
           return c.id === course_id
-        })[0]
+        })[0],
       )
       setCourseOptions([])
       setSearchParam(selectedCourse.label)
     },
-    [courseOptions, selectedCourse]
+    [courseOptions, selectedCourse],
   )
 
   const handleSubmit: onSubmitMigrationFormCallback = useCallback(
@@ -122,7 +122,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
       }
       onSubmit(formData)
     },
-    [selectedCourse, onSubmit]
+    [selectedCourse, onSubmit],
   )
 
   return (

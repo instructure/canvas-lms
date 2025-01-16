@@ -79,7 +79,7 @@ class ViewManager extends React.Component {
       ...Assignment.shape.propTypes,
       ...AssignmentSubmissionsConnection.shape.propTypes,
     }),
-    // eslint-disable-next-line react/no-unused-prop-types
+
     submissionHistoriesQueryData: shape({
       submissionHistoriesConnection: shape({
         nodes: arrayOf(Submission.shape),
@@ -217,7 +217,7 @@ class ViewManager extends React.Component {
         document
           .querySelector('button[data-testid=assignments-2-assignment-toggle-details]')
           .focus()
-      }
+      },
     )
   }
 
@@ -257,6 +257,8 @@ class ViewManager extends React.Component {
             ENV.enrollment_state === 'active' &&
             !ENV.ISOBSERVER &&
             submission.gradingStatus !== 'excused',
+          // we want to continue allowing peer review commenting for excused assignments
+          allowPeerReviewComments: ENV.enrollment_state === 'active' && !ENV.ISOBSERVER,
           cancelDraftAction: this.onCancelDraft,
           isLatestAttempt: !this.hasNextSubmission(),
           latestSubmission: this.getLatestSubmission(),

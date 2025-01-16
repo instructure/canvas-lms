@@ -135,7 +135,7 @@ describe('platform_storage', () => {
       putData(tool_id, key, value)
       expect(window.localStorage.setItem).toHaveBeenCalledWith(
         `lti|platform_storage|${tool_id}|${key}`,
-        value
+        value,
       )
     })
   })
@@ -149,7 +149,7 @@ describe('platform_storage', () => {
     it('namespaces key with tool id', () => {
       getData(tool_id, key)
       expect(window.localStorage.getItem).toHaveBeenCalledWith(
-        `lti|platform_storage|${tool_id}|${key}`
+        `lti|platform_storage|${tool_id}|${key}`,
       )
     })
   })
@@ -174,7 +174,7 @@ describe('platform_storage', () => {
       it('namespaces key with tool id', () => {
         clearData(tool_id, key)
         expect(window.localStorage.removeItem).toHaveBeenCalledWith(
-          `lti|platform_storage|${tool_id}|${key}`
+          `lti|platform_storage|${tool_id}|${key}`,
         )
       })
     })

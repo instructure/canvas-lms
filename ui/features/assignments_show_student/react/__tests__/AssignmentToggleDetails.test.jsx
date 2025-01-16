@@ -17,50 +17,33 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render} from '@testing-library/react'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
 import $ from 'jquery'
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
-})
+describe('AssignmentToggleDetails', () => {
+  it('renders normally', async () => {
+    const assignment = {
+      name: 'an assignment',
+      pointsPossible: 42,
+      dueAt: 'some time',
+      description: 'an assignment',
+    }
 
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
+    const container = render(<AssignmentToggleDetails description={assignment.description} />)
+    const element = container.getByTestId('assignments-2-assignment-toggle-details-text')
+    expect(element).toHaveTextContent(assignment.description)
+  })
 
-it('renders normally', () => {
-  const assignment = {
-    name: 'an assignment',
-    pointsPossible: 42,
-    dueAt: 'some time',
-    description: 'an assignment',
-  }
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(
-    <AssignmentToggleDetails description={assignment.description} />,
-    document.getElementById('fixtures')
-  )
-  const element = $('[data-testid="assignments-2-assignment-toggle-details-text"]')
-  expect(element.text()).toEqual(assignment.description)
-})
+  it('renders normally an assignment with no content', async () => {
+    const assignment = {
+      name: 'an assignment',
+      pointsPossible: 42,
+      dueAt: 'some time',
+    }
 
-it('renders normally an assignment with no content', () => {
-  const assignment = {
-    name: 'an assignment',
-    pointsPossible: 42,
-    dueAt: 'some time',
-  }
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(
-    <AssignmentToggleDetails description={assignment.description} />,
-    document.getElementById('fixtures')
-  )
-  const element = $('[data-testid="assignments-2-assignment-toggle-details-text"]')
-  expect(element.text()).toEqual('No additional details were added for this assignment.')
+    const container = render(<AssignmentToggleDetails description={assignment.description} />)
+    const element = container.getByTestId('assignments-2-assignment-toggle-details-text')
+    expect(element).toHaveTextContent('No additional details were added for this assignment.')
+  })
 })

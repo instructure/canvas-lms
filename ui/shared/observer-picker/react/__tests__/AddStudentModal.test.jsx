@@ -61,7 +61,7 @@ describe('Add Student Modal', () => {
   it('calls onStudentPaired when a new student is paired successfully', async () => {
     const onStudentPaired = jest.fn()
     const {getByTestId} = render(
-      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />
+      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />,
     )
     const pairingCodeInput = getByTestId('pairing-code-input')
     const addStudentButton = getByTestId('add-student-btn')
@@ -77,11 +77,11 @@ describe('Add Student Modal', () => {
     fetchMock.mock(
       LINK_STUDENT_URL,
       {throws: new Error('422 Unprocessable Entity')},
-      {overwriteRoutes: true}
+      {overwriteRoutes: true},
     )
     const onStudentPaired = jest.fn()
     const {getByTestId, getByText} = render(
-      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />
+      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />,
     )
     const pairingCodeInput = getByTestId('pairing-code-input')
     const addStudentButton = getByTestId('add-student-btn')
@@ -98,11 +98,11 @@ describe('Add Student Modal', () => {
     fetchMock.mock(
       LINK_STUDENT_URL,
       {throws: new Error('422 Unprocessable Entity')},
-      {overwriteRoutes: true}
+      {overwriteRoutes: true},
     )
     const onStudentPaired = jest.fn()
     const {getByTestId, getByText, queryByText} = render(
-      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />
+      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />,
     )
     const pairingCodeInput = getByTestId('pairing-code-input')
     const addStudentButton = getByTestId('add-student-btn')

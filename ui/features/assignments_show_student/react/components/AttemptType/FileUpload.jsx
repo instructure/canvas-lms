@@ -55,7 +55,7 @@ class FileUpload extends Component {
         name: string,
         loaded: number,
         total: number,
-      })
+      }),
     ).isRequired,
     focusOnInit: bool.isRequired,
     onCanvasFileRequested: func.isRequired,
@@ -159,7 +159,7 @@ class FileUpload extends Component {
   handleRemoveFile = async e => {
     const fileId = parseInt(e.currentTarget.id, 10)
     const fileIndex = this.getDraftAttachments().findIndex(
-      file => parseInt(file._id, 10) === fileId
+      file => parseInt(file._id, 10) === fileId,
     )
 
     const updatedFiles = this.getDraftAttachments().filter((_, i) => i !== fileIndex)

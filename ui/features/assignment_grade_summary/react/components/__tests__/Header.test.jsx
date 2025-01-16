@@ -100,7 +100,7 @@ describe('GradeSummary Header', () => {
     wrapper = render(
       <Provider store={store}>
         <Header />
-      </Provider>
+      </Provider>,
     )
   }
 
@@ -132,8 +132,8 @@ describe('GradeSummary Header', () => {
     act(() => {
       store.dispatch(
         AssignmentActions.setReleaseGradesStatus(
-          AssignmentActions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS
-        )
+          AssignmentActions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
+        ),
       )
     })
     expect(screen.getByText('grader with inactive enrollments', {exact: false})).toBeInTheDocument()

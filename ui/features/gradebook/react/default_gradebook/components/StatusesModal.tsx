@@ -29,7 +29,7 @@ import type {StatusColors} from '../constants/colors'
 
 const I18n = createI18nScope('gradebook')
 
-const {Body: ModalBody, Footer: ModalFooter} = Modal as any
+const {Body: ModalBody, Footer: ModalFooter} = Modal
 
 type Props = {
   onClose: () => void
@@ -37,7 +37,7 @@ type Props = {
   afterUpdateStatusColors: (
     colors: StatusColors,
     successFn: () => void,
-    errorFn: any
+    errorFn: any,
   ) => Promise<any>
 }
 
@@ -55,7 +55,7 @@ class StatusesModal extends React.Component<Props, State> {
     [key: string]: HTMLDivElement
   }
 
-  doneButton: HTMLButtonElement | null = null
+  doneButton: InstanceType<typeof Button> | null = null
 
   modalContentRef: HTMLDivElement | null = null
 
@@ -77,7 +77,7 @@ class StatusesModal extends React.Component<Props, State> {
             this.setState({openPopover: null})
           }
           this.props.afterUpdateStatusColors(this.state.colors, successFnAndClosePopover, failureFn)
-        }
+        },
       )
     }
 
@@ -103,24 +103,26 @@ class StatusesModal extends React.Component<Props, State> {
     })
   }
 
-  // @ts-expect-error
-  bindColorPickerButton = (status: string) => button => {
-    this.colorPickerButtons[status] = button
+  bindColorPickerButton = (status: string) => (button: Element | null) => {
+    if (button instanceof HTMLButtonElement) {
+      this.colorPickerButtons[status] = button
+    }
   }
 
-  // @ts-expect-error
-  bindColorPickerContent = (status: string) => content => {
-    this.colorPickerContents[status] = content
+  bindColorPickerContent = (status: string) => (content: Element | null) => {
+    if (content instanceof HTMLDivElement) {
+      this.colorPickerContents[status] = content
+    }
   }
 
-  // @ts-expect-error
-  bindDoneButton = button => {
+  bindDoneButton = (button: InstanceType<typeof Button> | null) => {
     this.doneButton = button
   }
 
-  // @ts-expect-error
-  bindContentRef = content => {
-    this.modalContentRef = content
+  bindContentRef = (content: Element | null) => {
+    if (content instanceof HTMLDivElement) {
+      this.modalContentRef = content
+    }
   }
 
   renderListItems() {

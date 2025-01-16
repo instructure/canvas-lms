@@ -68,7 +68,7 @@ const IconSizePopup = ({width, height, maintainAspectRatio, onChange}: ImageSize
         setHeightValue(h)
       }
     },
-    [aspectRatio, maintainAspectRatio]
+    [aspectRatio, maintainAspectRatio],
   )
 
   const handleChangeHeight = useCallback(
@@ -80,7 +80,7 @@ const IconSizePopup = ({width, height, maintainAspectRatio, onChange}: ImageSize
         setWidthValue(w)
       }
     },
-    [aspectRatio, maintainAspectRatio]
+    [aspectRatio, maintainAspectRatio],
   )
 
   const setImageSize = useCallback(() => {

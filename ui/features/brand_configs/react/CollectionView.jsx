@@ -61,7 +61,7 @@ NewTheme.propTypes = {
     shape({
       md5: string.isRequired,
       label: string.isRequired,
-    })
+    }),
   ),
 }
 
@@ -102,7 +102,7 @@ export default function CollectionView(props) {
     if (sharedBrandConfigToStartEditing) {
       sessionStorage.setItem(
         'sharedBrandConfigBeingEdited',
-        JSON.stringify(sharedBrandConfigToStartEditing)
+        JSON.stringify(sharedBrandConfigToStartEditing),
       )
     } else {
       sessionStorage.removeItem('sharedBrandConfigBeingEdited')
@@ -110,7 +110,7 @@ export default function CollectionView(props) {
     submitHtmlForm(
       `/accounts/${accountID}/brand_configs/save_to_user_session`,
       'POST',
-      md5ToActivate
+      md5ToActivate,
     )
   }
 
@@ -167,7 +167,7 @@ export default function CollectionView(props) {
     // Split the globally shared themes and the ones that people in this account
     // have shared apart
     return groupBy(sortedCards, sbc =>
-      isSystemTheme(sbc) ? 'globalThemes' : 'accountSpecificThemes'
+      isSystemTheme(sbc) ? 'globalThemes' : 'accountSpecificThemes',
     )
   }
 
@@ -218,11 +218,11 @@ export default function CollectionView(props) {
   const cards = thingsToShow()
   const bases = flatten(
     map(['globalThemes', 'accountSpecificThemes'], coll =>
-      map(cards[coll], config => ({md5: config.brand_config.md5, label: config.name}))
-    )
+      map(cards[coll], config => ({md5: config.brand_config.md5, label: config.name})),
+    ),
   )
   const explainerText = I18n.t(
-    'Default templates are used as starting points for new themes and cannot be deleted.'
+    'Default templates are used as starting points for new themes and cannot be deleted.',
   )
 
   return (

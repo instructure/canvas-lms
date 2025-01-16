@@ -153,7 +153,7 @@ const redirectTo = url => {
   window.location.href = url
 }
 
-const launchQuizNew = async (data) => {
+const launchQuizNew = async data => {
   const response = await axios.post(newQuizUrl(), data)
   redirectTo(response.data.url)
 }

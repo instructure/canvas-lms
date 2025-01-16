@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import axios from '@canvas/axios'
 import qs from 'qs'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
@@ -51,6 +51,29 @@ import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 if (!('INST' in window)) window.INST = {}
 
 const I18n = createI18nScope('assignment')
+
+// Keep track of React roots
+const roots = new Map()
+
+function createOrUpdateRoot(elementId, component) {
+  const container = document.getElementById(elementId)
+  if (!container) return
+
+  let root = roots.get(elementId)
+  if (!root) {
+    root = createRoot(container)
+    roots.set(elementId, root)
+  }
+  root.render(component)
+}
+
+function unmountRoot(elementId) {
+  const root = roots.get(elementId)
+  if (root) {
+    root.unmount()
+    roots.delete(elementId)
+  }
+}
 
 ready(() => {
   const comments = document.getElementsByClassName('comment_content')
@@ -87,11 +110,11 @@ function onStudentGroupSelected(selectedStudentGroupId) {
               student_group_id: selectedStudentGroupId,
             },
           },
-        })
+        }),
       )
       .finally(() => {
         studentGroupSelectionRequestTrackers = studentGroupSelectionRequestTrackers.filter(
-          item => item !== tracker
+          item => item !== tracker,
         )
         renderSpeedGraderLink()
       })
@@ -102,36 +125,27 @@ function renderSpeedGraderLink() {
   const disabled =
     ENV.SETTINGS.filter_speed_grader_by_student_group &&
     (!ENV.selected_student_group_id || studentGroupSelectionRequestTrackers.length > 0)
-  const $mountPoint = document.getElementById('speed_grader_link_mount_point')
 
-  if ($mountPoint) {
-     
-    ReactDOM.render(
-      <SpeedGraderLink
-        disabled={disabled}
-        href={ENV.speed_grader_url}
-        disabledTip={I18n.t('Must select a student group first')}
-      />,
-      $mountPoint
-    )
-  }
+  createOrUpdateRoot(
+    'speed_grader_link_mount_point',
+    <SpeedGraderLink
+      disabled={disabled}
+      href={ENV.speed_grader_url}
+      disabledTip={I18n.t('Must select a student group first')}
+    />,
+  )
 }
 
 function renderStudentGroupFilter() {
-  const $mountPoint = document.getElementById('student_group_filter_mount_point')
-
-  if ($mountPoint) {
-     
-    ReactDOM.render(
-      <StudentGroupFilter
-        categories={ENV.group_categories}
-        label={I18n.t('Select Group to Grade')}
-        onChange={onStudentGroupSelected}
-        value={ENV.selected_student_group_id}
-      />,
-      $mountPoint
-    )
-  }
+  createOrUpdateRoot(
+    'student_group_filter_mount_point',
+    <StudentGroupFilter
+      categories={ENV.group_categories}
+      label={I18n.t('Select Group to Grade')}
+      onChange={onStudentGroupSelected}
+      value={ENV.selected_student_group_id}
+    />,
+  )
 }
 
 function renderCoursePacingNotice() {
@@ -144,8 +158,7 @@ function renderCoursePacingNotice() {
         renderNotice($mountPoint, ENV.COURSE_ID)
       })
       .catch(ex => {
-         
-        console.error('Falied loading CoursePacingNotice', ex)
+        console.error('Failed loading CoursePacingNotice', ex)
         captureException(ex)
       })
   }
@@ -155,7 +168,7 @@ ready(() => {
   // Attach the immersive reader button if enabled
   const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
   const immersive_reader_mobile_mount_point = document.getElementById(
-    'immersive_reader_mobile_mount_point'
+    'immersive_reader_mobile_mount_point',
   )
   if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
     import('@canvas/immersive-reader/ImmersiveReader')
@@ -175,7 +188,7 @@ ready(() => {
         }
       })
       .catch(e => {
-        console.log('Error loading immersive readers.', e)  
+        console.log('Error loading immersive readers.', e)
       })
   }
 })
@@ -220,16 +233,16 @@ $(() => {
 })
 
 function renderItemAssignToTray(open, returnFocusTo, itemProps) {
-   
-  ReactDOM.render(
+  createOrUpdateRoot(
+    'assign-to-mount-point',
     <ItemAssignToManager
       open={open}
       onClose={() => {
-        ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
+        unmountRoot('assign-to-mount-point')
       }}
       onDismiss={() => {
         renderItemAssignToTray(false, returnFocusTo, itemProps)
-        returnFocusTo.focus()
+        returnFocusTo?.focus()
       }}
       itemType="assignment"
       iconType="assignment"
@@ -237,7 +250,6 @@ function renderItemAssignToTray(open, returnFocusTo, itemProps) {
       timezone={ENV.TIMEZONE || 'UTC'}
       {...itemProps}
     />,
-    document.getElementById('assign-to-mount-point')
   )
 }
 
@@ -261,40 +273,42 @@ $('.assign-to-link').on('click keyclick', function (event) {
 $(() =>
   $('#content').on('click', '#mark-as-done-checkbox', function () {
     return MarkAsDone.toggle(this)
-  })
+  }),
 )
 
 function openSendTo(event, open = true) {
   if (event) event.preventDefault()
-   
-  ReactDOM.render(
+
+  createOrUpdateRoot(
+    'direct-share-mount-point',
     <DirectShareUserModal
       open={open}
       sourceCourseId={ENV.COURSE_ID}
       contentShare={{content_type: 'assignment', content_id: ENV.ASSIGNMENT_ID}}
       onDismiss={() => {
+        unmountRoot('direct-share-mount-point')
         openSendTo(null, false)
         $('.al-trigger').focus()
       }}
     />,
-    document.getElementById('direct-share-mount-point')
   )
 }
 
 function openCopyTo(event, open = true) {
   if (event) event.preventDefault()
-   
-  ReactDOM.render(
+
+  createOrUpdateRoot(
+    'direct-share-mount-point',
     <DirectShareCourseTray
       open={open}
       sourceCourseId={ENV.COURSE_ID}
       contentSelection={{assignments: [ENV.ASSIGNMENT_ID]}}
       onDismiss={() => {
+        unmountRoot('direct-share-mount-point')
         openCopyTo(null, false)
         $('.al-trigger').focus()
       }}
     />,
-    document.getElementById('direct-share-mount-point')
   )
 }
 
@@ -315,7 +329,7 @@ $(() => {
 })
 
 $(() => {
-  const $mountPoint = document.getElementById('enhanced-rubric-assignment-edit')
+  const $mountPoint = document.getElementById('enhanced-rubric-assignment-edit-mount-point')
 
   if ($mountPoint) {
     const envRubric = ENV.assigned_rubric
@@ -329,8 +343,9 @@ $(() => {
     const assignmentRubricAssociation = envRubricAssociation
       ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association)
       : undefined
-     
-    ReactDOM.render(
+
+    createOrUpdateRoot(
+      'enhanced-rubric-assignment-edit-mount-point',
       <RubricAssignmentContainer
         accountMasterScalesEnabled={ENV.ACCOUNT_LEVEL_MASTERY_SCALES}
         assignmentId={ENV.ASSIGNMENT_ID}
@@ -343,7 +358,6 @@ $(() => {
         rubricSelfAssessmentEnabled={ENV.rubric_self_assessment_enabled}
         rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
       />,
-      $mountPoint
     )
   }
 })
@@ -380,7 +394,7 @@ $(() => {
       document.getElementById('assignment_external_tools'),
       'assignment_view',
       parseInt(ENV.COURSE_ID, 10),
-      parseInt(ENV.ASSIGNMENT_ID, 10)
+      parseInt(ENV.ASSIGNMENT_ID, 10),
     )
   }
 })

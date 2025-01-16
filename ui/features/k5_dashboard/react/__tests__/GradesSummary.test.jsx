@@ -67,7 +67,7 @@ describe('GradesSummary', () => {
 
   it('displays the score as a grade if present and grading schemes are in use', () => {
     const {getByText, queryByText} = render(
-      <GradesSummary courses={[{...defaultCourse, grade: 'Not Bad'}]} />
+      <GradesSummary courses={[{...defaultCourse, grade: 'Not Bad'}]} />,
     )
     expect(getByText('Not Bad')).toBeInTheDocument()
     expect(queryByText('90%')).not.toBeInTheDocument()
@@ -76,18 +76,18 @@ describe('GradesSummary', () => {
   it('displays "Not Graded" if no score is present', () => {
     expect(
       render(<GradesSummary courses={[{...defaultCourse, score: undefined}]} />).getByText(
-        'Not Graded'
-      )
+        'Not Graded',
+      ),
     ).toBeInTheDocument()
     cleanup()
 
     expect(
-      render(<GradesSummary courses={[{...defaultCourse, score: null}]} />).getByText('Not Graded')
+      render(<GradesSummary courses={[{...defaultCourse, score: null}]} />).getByText('Not Graded'),
     ).toBeInTheDocument()
     cleanup()
 
     expect(
-      render(<GradesSummary courses={[{...defaultCourse, score: 0}]} />).getByText('0%')
+      render(<GradesSummary courses={[{...defaultCourse, score: 0}]} />).getByText('0%'),
     ).toBeInTheDocument()
   })
 
@@ -95,7 +95,7 @@ describe('GradesSummary', () => {
     const {getByText} = render(
       <GradesSummary
         courses={[{...defaultCourse, score: undefined, currentGradingPeriodId: undefined}]}
-      />
+      />,
     )
     expect(getByText('--')).toBeInTheDocument()
   })
@@ -106,7 +106,7 @@ describe('GradesSummary', () => {
         courses={[
           {...defaultCourse, restrictQuantitativeData: true, gradingScheme: DEFAULT_GRADING_SCHEME},
         ]}
-      />
+      />,
     )
     const progressBar = queryByLabelText('Grade for Horticulture', {exact: false})
     expect(progressBar).not.toBeInTheDocument()
@@ -123,7 +123,7 @@ describe('GradesSummary', () => {
             gradingScheme: DEFAULT_GRADING_SCHEME,
           },
         ]}
-      />
+      />,
     )
     expect(getByText('B+')).toBeInTheDocument()
   })
@@ -139,21 +139,21 @@ describe('GradesSummary', () => {
             gradingScheme: DEFAULT_GRADING_SCHEME,
           },
         ]}
-      />
+      />,
     )
     expect(getByText('F')).toBeInTheDocument()
   })
 
   it('displays "--" if a course is set to hide final grades', () => {
     const {getByText} = render(
-      <GradesSummary courses={[{...defaultCourse, score: undefined, finalGradesHidden: true}]} />
+      <GradesSummary courses={[{...defaultCourse, score: undefined, finalGradesHidden: true}]} />,
     )
     expect(getByText('--')).toBeInTheDocument()
   })
 
   it('shows the course image if one is given', () => {
     const {getByTestId} = render(
-      <GradesSummary courses={[{...defaultCourse, courseImage: 'http://link/to/image.jpg'}]} />
+      <GradesSummary courses={[{...defaultCourse, courseImage: 'http://link/to/image.jpg'}]} />,
     )
     const image = getByTestId('k5-grades-course-image')
     expect(image.style.getPropertyValue('background-image')).toBe('url(http://link/to/image.jpg)')
@@ -161,7 +161,7 @@ describe('GradesSummary', () => {
 
   it('shows the course color if one is given and an image is not', () => {
     const {getByTestId} = render(
-      <GradesSummary courses={[{...defaultCourse, courseColor: 'red'}]} />
+      <GradesSummary courses={[{...defaultCourse, courseColor: 'red'}]} />,
     )
     const image = getByTestId('k5-grades-course-image')
     expect(image.style.getPropertyValue('background-color')).toBe('red')
@@ -175,7 +175,7 @@ describe('GradesSummary', () => {
 
   it('renders a link to the gradebook if the user is enrolled as a teacher', () => {
     const {getByTestId, getByRole, queryByLabelText} = render(
-      <GradesSummary courses={[{...defaultCourse, enrollmentType: 'teacher'}]} />
+      <GradesSummary courses={[{...defaultCourse, enrollmentType: 'teacher'}]} />,
     )
     expect(getByTestId('k5-grades-course-image')).toBeInTheDocument()
     expect(queryByLabelText('Grade for Horticulture', {exact: false})).not.toBeInTheDocument()

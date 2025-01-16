@@ -456,37 +456,37 @@ const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
 export const setupCanvasQueries = () => {
   queryClient.setQueryData(
     ['individual-gradebook-student', '1', '5'],
-    GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE
+    GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE,
   )
 
   queryClient.setQueryData(
     ['individual-gradebook-student', '1', '1'],
-    GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE
+    GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE,
   )
 
   queryClient.setQueryData(
     ['individual-gradebook-submissions', '1'],
-    GRADEBOOK_SUBMISSIONS_QUERY_MOCK_RESPONSE
+    GRADEBOOK_SUBMISSIONS_QUERY_MOCK_RESPONSE,
   )
   queryClient.setQueryData(
     ['individual-gradebook-enrollments', '1'],
-    GRADEBOOK_ENROLLMENTS_QUERY_MOCK_RESPONSE
+    GRADEBOOK_ENROLLMENTS_QUERY_MOCK_RESPONSE,
   )
   queryClient.setQueryData(
     ['individual-gradebook-assignmentGroups', '1'],
-    GRADEBOOK_ASSIGNMENT_GROUPS_QUERY_MOCK_RESPONSE
+    GRADEBOOK_ASSIGNMENT_GROUPS_QUERY_MOCK_RESPONSE,
   )
   queryClient.setQueryData(
     ['individual-gradebook-assignments', '1'],
-    GRADEBOOK_ASSIGNMENTS_QUERY_MOCK_RESPONSE
+    GRADEBOOK_ASSIGNMENTS_QUERY_MOCK_RESPONSE,
   )
   queryClient.setQueryData(
     ['individual-gradebook-outcomes', '1'],
-    GRADEBOOK_OUTCOMES_QUERY_MOCK_RESPONSE
+    GRADEBOOK_OUTCOMES_QUERY_MOCK_RESPONSE,
   )
   queryClient.setQueryData(
     ['individual-gradebook-sections', '1'],
-    GRADEBOOK_SECTIONS_QUERY_MOCK_RESPONSE
+    GRADEBOOK_SECTIONS_QUERY_MOCK_RESPONSE,
   )
   queryClient.setQueryData(['individual-gradebook-student-comments', '1', '1'], {})
   queryClient.setQueryData(['individual-gradebook-student-comments', '1', '13'], {})

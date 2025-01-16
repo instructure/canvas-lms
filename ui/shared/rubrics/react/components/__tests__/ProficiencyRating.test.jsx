@@ -46,7 +46,7 @@ const renderProficiencyRating = (props = {}) =>
       <tbody>
         <ProficiencyRating {...defaultProps(props)} />
       </tbody>
-    </table>
+    </table>,
   )
 
 describe('ProficiencyRating', () => {

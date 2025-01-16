@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
@@ -19,10 +20,10 @@
 
 import React, {useCallback, useState} from 'react'
 import moment from 'moment-timezone'
-import {Story, Meta} from '@storybook/react'
+import type {Story, Meta} from '@storybook/react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import RecurrenceEndPicker, {OnRecurrenceEndChangeType} from './RecurrenceEndPicker'
+import RecurrenceEndPicker, {type OnRecurrenceEndChangeType} from './RecurrenceEndPicker'
 
 export default {
   title: 'Examples/Calendar/RecurringEvents/RecurrenceEndPicker',

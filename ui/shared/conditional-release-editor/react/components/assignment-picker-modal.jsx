@@ -63,12 +63,12 @@ class AssignmentPickerModal extends React.Component {
       const lowerBound = transformScore(
         target.get('lower_bound'),
         this.props.triggerAssignment,
-        false
+        false,
       )
       const upperBound = transformScore(
         target.get('upper_bound'),
         this.props.triggerAssignment,
-        true
+        true,
       )
       range = I18n.t('%{upper} to %{lower}', {
         upper: upperBound,

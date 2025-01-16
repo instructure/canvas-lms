@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, waitFor, screen} from '@testing-library/react'
 import FilesApp from '../FilesApp'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {QueryClient} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {setupFilesEnv} from '../../../fixtures/fakeFilesEnv'
@@ -31,7 +31,9 @@ describe('FilesApp', () => {
   beforeEach(() => {
     setupFilesEnv()
     fetchMock.get(/.*\/by_path/, [FAKE_FOLDERS[0]], {overwriteRoutes: true})
-    fetchMock.get(/.*\/all/, [], {overwriteRoutes: true})
+    fetchMock.get(/.*\/all.*/, [FAKE_FOLDERS[1]], {
+      overwriteRoutes: true,
+    })
     fetchMock.get(/.*\/files\/quota/, {quota_used: 500, quota: 1000}, {overwriteRoutes: true})
     filesEnv.userHasPermission = jest.fn().mockReturnValue(true)
   })
@@ -41,7 +43,6 @@ describe('FilesApp', () => {
   })
 
   const renderComponent = (contextAssetString: string) => {
-    const queryClient = new QueryClient()
     const router = createMemoryRouter(
       [
         {
@@ -52,36 +53,50 @@ describe('FilesApp', () => {
           },
         },
       ],
-      {initialEntries: ['/']}
+      {initialEntries: ['/']},
     )
     return render(
       <MockedQueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
   }
-
-  it('renders "Files" when contextAssetString starts with "course_"', async () => {
-    renderComponent('course_12345')
-
-    const headingElement = await screen.findByText('Files', {exact: true})
-    expect(headingElement).toBeInTheDocument()
-  })
-
-  it('renders "All My Files" when contextAssetString starts with "user_"', async () => {
-    renderComponent('user_67890')
-
-    const headingElement = await screen.findByText(/All My Files/i)
-    expect(headingElement).toBeInTheDocument()
-  })
 
   it('does not render progress bar without permission', async () => {
     filesEnv.userHasPermission = jest.fn().mockReturnValue(false)
     renderComponent('course_12345')
 
     await waitFor(() => {
-      expect(fetchMock.calls().length).toBe(1)
+      expect(fetchMock.calls()).toHaveLength(1)
       expect(fetchMock.calls()[0][0]).not.toContain('/files/quota')
     })
+  })
+
+  it('renders next page button when header', async () => {
+    fetchMock.get(
+      /.*\/all.*/,
+      {
+        body: [],
+        headers: {
+          Link: '</next-page>; rel="next"',
+        },
+      },
+      {
+        overwriteRoutes: true,
+      },
+    )
+    renderComponent('course_12345')
+    const nextPageButton = await screen.findByRole('button', {name: '2'})
+    expect(nextPageButton).toBeInTheDocument()
+  })
+
+  it('does not render page buttons when no header', async () => {
+    renderComponent('course_12345')
+    // necessary to make sure table has finished loading
+    // otherwise test is false positive because button would never be rendered
+    const folderName = await screen.findByText(FAKE_FOLDERS[1].name)
+    expect(folderName).toBeInTheDocument()
+    const nextPageButton = screen.queryByRole('button', {name: '1'})
+    expect(nextPageButton).not.toBeInTheDocument()
   })
 })

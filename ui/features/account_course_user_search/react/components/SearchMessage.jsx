@@ -106,7 +106,7 @@ export default class SearchMessage extends Component {
   render() {
     const {collection, noneFoundMessage} = this.props
     const errorLoadingMessage = I18n.t(
-      'There was an error with your query; please try a different search'
+      'There was an error with your query; please try a different search',
     )
 
     if (collection.error) {
@@ -157,7 +157,7 @@ export default class SearchMessage extends Component {
               >
                 {LAST_PAGE_UNKNOWN_MARKER}
               </Pagination.Page>
-            )
+            ),
           )}
         </Pagination>
       )

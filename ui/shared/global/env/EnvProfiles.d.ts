@@ -19,6 +19,8 @@
 export interface EnvProfiles {
   register_cc_tabs: Array<'email' | 'sms' | 'slack'>
   is_default_account: boolean
-  is_eligible_for_token_regeneration: boolean
   google_drive_oauth_url: string
+  PERMISSIONS: {
+    can_update_tokens: boolean
+  }
 }

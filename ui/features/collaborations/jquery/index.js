@@ -103,7 +103,7 @@ CollaborationsPage.Events = {
         CollaborationsPage.Util.removeCollaboration($collaboration)
         $.screenReaderFlashMessage(I18n.t('Collaboration was deleted'))
       },
-      $.noop
+      $.noop,
     )
   },
 

@@ -99,7 +99,7 @@ describe('OutcomeEditModal', () => {
         <MockedProvider mocks={mocks}>
           <OutcomeEditModal {...defaultProps()} {...overrides} />
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -107,7 +107,7 @@ describe('OutcomeEditModal', () => {
     return realRender(
       <MockedProvider addTypename={false} mocks={mocks}>
         {children}
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 
@@ -200,7 +200,7 @@ describe('OutcomeEditModal', () => {
     fireEvent.change(name, {target: {value: 'a'.repeat(256)}})
     fireEvent.change(friendlyName, {target: {value: 'b'.repeat(256)}})
     fireEvent.change(friendlyDescription, {target: {value: 'c'.repeat(256)}})
-    expect(queryAllByText('Must be 255 characters or less').length).toBe(3)
+    expect(queryAllByText('Must be 255 characters or less')).toHaveLength(3)
     fireEvent.click(getByText('Save'))
     expect(friendlyDescription).not.toBe(document.activeElement)
     expect(friendlyName).not.toBe(document.activeElement)
@@ -325,7 +325,7 @@ describe('OutcomeEditModal', () => {
       })
       await act(async () => jest.runOnlyPendingTimers())
       expect(
-        queryByLabelText('Friendly description (for parent/student display)')
+        queryByLabelText('Friendly description (for parent/student display)'),
       ).not.toBeInTheDocument()
     })
 

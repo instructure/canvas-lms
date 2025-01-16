@@ -40,7 +40,7 @@ export default class PublishableModuleItem extends Model {
     this.prototype.urls = {
       generic() {
         return `${this.baseUrl()}/modules/${this.get('module_id')}/items/${this.get(
-          'module_item_id'
+          'module_item_id',
         )}`
       },
       module() {

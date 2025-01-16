@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ContentLayout from './ContentLayout'
-import {AppNavBar, FooterLinks, GlobalStyle, InstructureLogo, LoginLogo} from '../shared'
 import {Flex} from '@instructure/ui-flex'
-import {Outlet, ScrollRestoration} from 'react-router-dom'
 import {View} from '@instructure/ui-view'
-import {useNewLogin} from '../context/NewLoginContext'
+import React from 'react'
+import {Outlet, ScrollRestoration} from 'react-router-dom'
+import {useNewLoginData} from '../context'
+import {AppNavBar, FooterLinks, GlobalStyle, InstructureLogo, LoginLogo} from '../shared'
+import ContentLayout from './ContentLayout'
 
 export const LoginLayout = () => {
-  const {loginLogoUrl} = useNewLogin()
+  const {loginLogoUrl} = useNewLoginData()
 
   return (
     <>

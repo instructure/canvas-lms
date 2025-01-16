@@ -50,7 +50,7 @@ const setup = props => {
       likeCount={0}
       authorName="Xerxes"
       {...props}
-    />
+    />,
   )
 }
 
@@ -58,9 +58,9 @@ describe('Like', () => {
   it('calls provided callback when clicked', () => {
     const onClickMock = jest.fn()
     const {getByTestId} = setup({onClick: onClickMock})
-    expect(onClickMock.mock.calls.length).toBe(0)
+    expect(onClickMock.mock.calls).toHaveLength(0)
     fireEvent.click(getByTestId('like-button'))
-    expect(onClickMock.mock.calls.length).toBe(1)
+    expect(onClickMock.mock.calls).toHaveLength(1)
   })
 
   it('displays like count', () => {
@@ -91,7 +91,7 @@ describe('Like', () => {
         authorName="Xerxes"
         delimiterKey="like"
         likeCount={0}
-      />
+      />,
     )
 
     expect(queryByTestId('not-liked-icon')).toBeFalsy()

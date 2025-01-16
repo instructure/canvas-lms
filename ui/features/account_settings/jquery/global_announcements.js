@@ -120,7 +120,7 @@ export default {
       }
 
       const source_start_at_disp_el = $(source_form_id).find(
-        '#account_notification_start_at_' + announcement_id
+        '#account_notification_start_at_' + announcement_id,
       )
       const target_start_at_disp_el = $(target_form_id).find('#account_notification_start_at')
       const target_start_at_value_el = target_start_at_disp_el
@@ -137,7 +137,7 @@ export default {
       }
 
       const source_end_at_disp_el = $(source_form_id).find(
-        '#account_notification_end_at_' + announcement_id
+        '#account_notification_end_at_' + announcement_id,
       )
       const target_end_at_disp_el = $(target_form_id).find('#account_notification_end_at')
       const target_end_at_value_el = target_end_at_disp_el
@@ -193,7 +193,7 @@ export default {
       const $confirmation = $this.find('#confirm_global_announcement:visible:not(:checked)')
       if ($confirmation.length > 0) {
         $confirmation.errorBox(
-          I18n.t('confirms.global_announcement', 'You must confirm the global announcement')
+          I18n.t('confirms.global_announcement', 'You must confirm the global announcement'),
         )
         return false
       }
@@ -235,7 +235,7 @@ export default {
         url: $link.attr('data-url'),
         message: I18n.t(
           'confirms.delete_announcement',
-          'Are you sure you want to delete this announcement?'
+          'Are you sure you want to delete this announcement?',
         ),
         success() {
           $(this).slideUp(function () {

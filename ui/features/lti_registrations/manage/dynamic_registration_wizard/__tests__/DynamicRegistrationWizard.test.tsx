@@ -51,13 +51,13 @@ describe('DynamicRegistrationWizard', () => {
         unifiedToolId={unifiedToolId}
         unregister={() => {}}
         onSuccessfulRegistration={() => {}}
-      />
+      />,
     )
 
     expect(fetchRegistrationToken).toHaveBeenCalledWith(
       accountId,
       'https://example.com',
-      unifiedToolId
+      unifiedToolId,
     )
     // Ignore screenreader title.
     expect(screen.getByText(/Loading/i, {ignore: 'title'})).toBeInTheDocument()
@@ -71,7 +71,7 @@ describe('DynamicRegistrationWizard', () => {
         token: 'reg_token_value',
         oidc_configuration_url: 'oidc_config_url_value',
         uuid: 'uuid_value',
-      })
+      }),
     )
     const getRegistrationByUUID = jest.fn().mockResolvedValue(success(mockRegistration()))
     const service = mockDynamicRegistrationWizardService({
@@ -87,19 +87,19 @@ describe('DynamicRegistrationWizard', () => {
         unifiedToolId={unifiedToolId}
         unregister={() => {}}
         onSuccessfulRegistration={() => {}}
-      />
+      />,
     )
     expect(fetchRegistrationToken).toHaveBeenCalledWith(
       accountId,
       'https://example.com?foo=bar',
-      unifiedToolId
+      unifiedToolId,
     )
     const frame = await waitFor(() => screen.getByTestId('dynamic-reg-wizard-iframe'))
     expect(frame).toBeInTheDocument()
     expect(frame).toBeInstanceOf(HTMLIFrameElement)
     expect(frame as HTMLIFrameElement).toHaveAttribute(
       'src',
-      'https://example.com/?foo=bar&openid_configuration=oidc_config_url_value&registration_token=reg_token_value'
+      'https://example.com/?foo=bar&openid_configuration=oidc_config_url_value&registration_token=reg_token_value',
     )
   })
 
@@ -110,7 +110,7 @@ describe('DynamicRegistrationWizard', () => {
         token: 'reg_token_value',
         oidc_configuration_url: 'oidc_config_url_value',
         uuid: 'uuid_value',
-      })
+      }),
     )
     const getRegistrationByUUID = jest.fn().mockResolvedValue(success(mockRegistration()))
     const service = mockDynamicRegistrationWizardService({
@@ -125,14 +125,14 @@ describe('DynamicRegistrationWizard', () => {
         accountId={accountId}
         unregister={() => {}}
         onSuccessfulRegistration={() => {}}
-      />
+      />,
     )
 
     const iframe = await screen.findByTestId('dynamic-reg-wizard-iframe')
     expect(iframe).toBeInTheDocument()
     expect(iframe).toHaveAttribute(
       'src',
-      'https://example.com/?openid_configuration=oidc_config_url_value&registration_token=reg_token_value'
+      'https://example.com/?openid_configuration=oidc_config_url_value&registration_token=reg_token_value',
     )
 
     fireEvent(
@@ -142,7 +142,7 @@ describe('DynamicRegistrationWizard', () => {
           subject: 'org.imsglobal.lti.close',
         },
         origin: 'https://example.com',
-      })
+      }),
     )
 
     await waitFor(() => {
@@ -161,7 +161,7 @@ describe('DynamicRegistrationWizard', () => {
         token: 'reg_token_value',
         oidc_configuration_url: 'oidc_config_url_value',
         uuid: 'uuid_value',
-      })
+      }),
     )
     let reg = mockRegistration()
     const getRegistrationByUUID = jest.fn().mockImplementation(async () => success(reg))
@@ -180,7 +180,7 @@ describe('DynamicRegistrationWizard', () => {
           accountId={accountId}
           unregister={() => {}}
           onSuccessfulRegistration={() => {}}
-        />
+        />,
       )
 
       await screen.findByTestId('dynamic-reg-wizard-iframe')
@@ -192,7 +192,7 @@ describe('DynamicRegistrationWizard', () => {
             subject: 'org.imsglobal.lti.close',
           },
           origin: 'https://example.com',
-        })
+        }),
       )
       await screen.findByText(/Permissions/i)
     }

@@ -33,7 +33,7 @@ describe('ToolbarAlignment', () => {
         alignment="start"
         verticalAlignment="start"
         onSave={jest.fn()}
-      />
+      />,
     )
     getByText('Alignment Options').closest('button')?.click()
     expect(getByText('Orientation')).toBeInTheDocument()
@@ -53,7 +53,7 @@ describe('ToolbarAlignment', () => {
         alignment="center"
         verticalAlignment="end"
         onSave={jest.fn()}
-      />
+      />,
     )
     getByText('Alignment Options').closest('button')?.click()
     const checkedItems = document.querySelectorAll('[aria-checked="true"]')
@@ -71,7 +71,7 @@ describe('ToolbarAlignment', () => {
 
   it('hides the reset button once it is clicked', () => {
     const {getByText, queryByText} = render(
-      <ToolbarAlignment verticalAlignment="center" onSave={jest.fn()} />
+      <ToolbarAlignment verticalAlignment="center" onSave={jest.fn()} />,
     )
     getByText('Alignment Options').closest('button')?.click()
     expect(getByText('Reset Default Alignment')).toBeInTheDocument()
@@ -86,7 +86,7 @@ describe('ToolbarAlignment', () => {
         alignment="center"
         verticalAlignment="end"
         onSave={jest.fn()}
-      />
+      />,
     )
     getByText('Alignment Options').closest('button')?.click()
 

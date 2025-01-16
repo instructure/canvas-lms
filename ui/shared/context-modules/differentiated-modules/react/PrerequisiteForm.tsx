@@ -59,7 +59,7 @@ export default function PrerequisiteForm({
         }
         return selected
       }, []),
-    [options]
+    [options],
   )
 
   // This avoids re-focusing after re-renders
@@ -89,7 +89,7 @@ export default function PrerequisiteForm({
       {prerequisites.map((module, index) => (
         <PrerequisiteSelector
           // This is needed to keep focus in the component after re-rendering when module changed
-           
+
           key={`module-${index}`}
           selection={module.name}
           options={filterOptions(module)}

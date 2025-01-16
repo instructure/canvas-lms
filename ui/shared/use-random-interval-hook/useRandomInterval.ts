@@ -23,7 +23,7 @@ const useRandomInterval = (
   memoizedCallback: () => void,
   minDelayMs: number,
   maxDelayMs: number,
-  enabled: boolean
+  enabled: boolean,
 ) => {
   const timeoutId = useRef<number | null>(null)
 

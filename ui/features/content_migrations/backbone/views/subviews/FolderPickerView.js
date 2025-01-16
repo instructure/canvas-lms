@@ -48,8 +48,7 @@ FolderPickerView.prototype.setAttributes = function (_event) {
       ? {
           folder_id: this.$migrationUploadTo.val(),
         }
-      :  
-        void 0
+      : void 0,
   )
 }
 
@@ -71,7 +70,7 @@ FolderPickerView.prototype.toJSON = function (json) {
 FolderPickerView.prototype.validations = function () {
   const errors = {}
   const settings = this.model.get('settings')
-   
+
   if (!(settings != null ? settings.folder_id : void 0)) {
     errors.migrationUploadTo = [
       {

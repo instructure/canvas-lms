@@ -17,133 +17,163 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
-import $ from 'jquery'
-import 'jquery-migrate'
+import {render, act} from '@testing-library/react'
 import ConditionalRelease from '../index'
-import sinon from 'sinon'
 
-const ok = x => expect(x).toBeTruthy()
-const equal = (x, y) => expect(x).toEqual(y)
-const deepEqual = (x, y) => expect(x).toEqual(y)
+describe('ConditionalRelease Editor', () => {
+  let editor
+  const assignmentEnv = {assignment: {id: 1}, course_id: 1}
 
-let editor = null
-class ConditionalReleaseEditor {
-  constructor(env) {
-    editor = {
-      attach: sinon.stub(),
-      updateAssignment: sinon.stub(),
-      saveRule: sinon.stub(),
-      getErrors: sinon.stub(),
-      focusOnError: sinon.stub(),
-      env,
-    }
-    return editor
+  const makePromise = () => {
+    const promise = {}
+    promise.then = jest.fn().mockReturnValue(promise)
+    promise.catch = jest.fn().mockReturnValue(promise)
+    return promise
   }
-}
-window.conditional_release_module = {ConditionalReleaseEditor}
 
-let component = null
-const createComponent = () => {
-  component = TestUtils.renderIntoDocument(
-    <ConditionalRelease.Editor env={assignmentEnv} type="foo" />
-  )
-  component.createNativeEditor()
-}
+  class ConditionalReleaseEditor {
+    constructor(env) {
+      editor = {
+        attach: jest.fn(),
+        updateAssignment: jest.fn(),
+        saveRule: jest.fn(),
+        getErrors: jest.fn(),
+        focusOnError: jest.fn(),
+        env,
+      }
+      return editor
+    }
+  }
 
-const makePromise = () => {
-  const promise = {}
-  promise.then = sinon.stub().returns(promise)
-  promise.catch = sinon.stub().returns(promise)
-  return promise
-}
+  const renderComponent = async () => {
+    // Mock DOM elements that the editor needs
+    document.body.innerHTML = `
+      <div id="canvas-conditional-release-editor"></div>
+      <div id="application"></div>
+    `
 
-let ajax = null
-const assignmentEnv = {assignment: {id: 1}, course_id: 1}
+    // Setup the editor module
+    window.conditional_release_module = {ConditionalReleaseEditor}
 
-describe('Conditional Release component', () => {
+    // Create a ref to access component instance
+    const ref = React.createRef()
+
+    // Render the component
+    const component = render(<ConditionalRelease.Editor ref={ref} env={assignmentEnv} type="foo" />)
+
+    // Wait for editor to be created
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
+
+    return {
+      ...component,
+      editor,
+      ref,
+    }
+  }
+
   beforeEach(() => {
-    ajax = sinon.stub($, 'ajax')
-    createComponent()
+    editor = null
   })
 
   afterEach(() => {
-    if (component) {
-      const componentNode = ReactDOM.findDOMNode(component)
-      if (componentNode) {
-        ReactDOM.unmountComponentAtNode(componentNode.parentNode)
-      }
-    }
-    component = null
-    editor = null
-    ajax.restore()
+    delete window.conditional_release_module
+    document.body.innerHTML = ''
   })
 
-  test('it creates a cyoe editor', () => {
-    ok(editor.attach.calledOnce)
+  it('creates and attaches the editor', async () => {
+    const {editor} = await renderComponent()
+    expect(editor.attach).toHaveBeenCalledWith(
+      document.getElementById('canvas-conditional-release-editor'),
+      document.getElementById('application'),
+    )
   })
 
-  test('it forwards focusOnError', () => {
-    component.focusOnError()
-    ok(editor.focusOnError.calledOnce)
-  })
+  it('validates before save and transforms errors', async () => {
+    const {ref} = await renderComponent()
 
-  test('it transforms validations', () => {
-    editor.getErrors.returns([
+    editor.getErrors.mockReturnValue([
       {index: 0, error: 'foo bar'},
       {index: 0, error: 'baz bat'},
       {index: 1, error: 'foo baz'},
     ])
-    const transformed = component.validateBeforeSave()
-    deepEqual(transformed, [{message: 'foo bar'}, {message: 'baz bat'}, {message: 'foo baz'}])
+
+    const errors = ref.current.validateBeforeSave()
+    expect(errors).toEqual([{message: 'foo bar'}, {message: 'baz bat'}, {message: 'foo baz'}])
   })
 
-  test('it returns null if no errors on validation', () => {
-    editor.getErrors.returns([])
-    equal(null, component.validateBeforeSave())
+  it('returns null when validation passes', async () => {
+    const {ref} = await renderComponent()
+
+    editor.getErrors.mockReturnValue([])
+    expect(ref.current.validateBeforeSave()).toBeNull()
   })
 
-  test('it saves successfully when editor saves successfully', resolved => {
+  it('saves successfully', async () => {
+    const {ref} = await renderComponent()
+
     const cyoePromise = makePromise()
+    editor.saveRule.mockReturnValue(cyoePromise)
 
-    editor.saveRule.returns(cyoePromise)
+    const savePromise = ref.current.save()
+    cyoePromise.then.mock.calls[0][0]()
 
-    const promise = component.save()
-    promise.then(() => {
-      ok(true)
-      resolved()
-    })
-    cyoePromise.then.args[0][0]()
+    await expect(savePromise).resolves.toBeUndefined()
   })
 
-  test('it fails when editor fails', resolved => {
+  it('handles save failures', async () => {
+    const {ref} = await renderComponent()
+
     const cyoePromise = makePromise()
-    editor.saveRule.returns(cyoePromise)
+    editor.saveRule.mockReturnValue(cyoePromise)
 
-    const promise = component.save()
-    promise.fail(reason => {
-      equal(reason, 'stuff happened')
-      resolved()
-    })
-    cyoePromise.catch.args[0][0]('stuff happened')
+    const savePromise = ref.current.save()
+    cyoePromise.catch.mock.calls[0][0]('save failed')
+
+    await expect(savePromise).rejects.toBe('save failed')
   })
 
-  test('it times out', resolved => {
+  it('times out after specified duration', async () => {
+    const {ref} = await renderComponent()
+
     const cyoePromise = makePromise()
-    editor.saveRule.returns(cyoePromise)
+    editor.saveRule.mockReturnValue(cyoePromise)
 
-    const promise = component.save(2)
-    promise.fail(reason => {
-      ok(reason.match(/timeout/))
-      resolved()
-    })
+    const savePromise = ref.current.save(1)
+    await expect(savePromise).rejects.toBe('timeout')
   })
 
-  test('it updates assignments', () => {
-    component.updateAssignment({
+  it('updates assignments with new values', async () => {
+    const {ref} = await renderComponent()
+
+    const newAssignment = {
+      grading_standard_id: 1,
+      grading_type: 'points',
+      id: 2,
       points_possible: 100,
+      submission_types: ['online_text_entry'],
+    }
+
+    ref.current.updateAssignment(newAssignment)
+
+    expect(editor.updateAssignment).toHaveBeenCalledWith(newAssignment)
+  })
+
+  it('handles not_graded assignments correctly', async () => {
+    const {ref} = await renderComponent()
+
+    const newAssignment = {
+      grading_type: 'not_graded',
+      id: 2,
+      points_possible: 100,
+    }
+
+    ref.current.updateAssignment(newAssignment)
+
+    expect(editor.updateAssignment).toHaveBeenCalledWith({
+      ...newAssignment,
+      id: null,
     })
-    ok(editor.updateAssignment.calledWithMatch({points_possible: 100}))
   })
 })

@@ -33,7 +33,7 @@ import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 export const updateDeveloperKeyWorkflowState = (
   accountId: AccountId,
   developerKeyId: DeveloperKeyId,
-  workflowState: 'on' | 'off'
+  workflowState: 'on' | 'off',
 ) =>
   parseFetchResult(z.unknown())(
     fetch(
@@ -50,8 +50,8 @@ export const updateDeveloperKeyWorkflowState = (
             workflow_state: workflowState,
           },
         }),
-      }
-    )
+      },
+    ),
   )
 
 /**
@@ -64,13 +64,13 @@ export const deleteDeveloperKey = (developerKeyId: DeveloperKeyId) =>
     fetch(`/api/v1/developer_keys/${developerKeyId}`, {
       ...defaultFetchOptions(),
       method: 'DELETE',
-    })
+    }),
   )
 
 export const updateAdminNickname = (
   accountId: AccountId,
   registrationId: LtiRegistrationId,
-  admin_nickname: string
+  admin_nickname: string,
 ) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
@@ -83,5 +83,5 @@ export const updateAdminNickname = (
       body: JSON.stringify({
         admin_nickname,
       }),
-    })
+    }),
   )

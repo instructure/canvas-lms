@@ -53,7 +53,7 @@ const setup = (props, {searchTerm = ''} = {}) => {
         title="Thoughts"
         {...props}
       />
-    </SearchContext.Provider>
+    </SearchContext.Provider>,
   )
 }
 
@@ -74,7 +74,7 @@ const setupWithTranslationLanguageSelected = (props, {searchTerm = ''} = {}) => 
           {...props}
         />
       </SearchContext.Provider>
-    </DiscussionManagerUtilityContext.Provider>
+    </DiscussionManagerUtilityContext.Provider>,
   )
 }
 
@@ -107,28 +107,28 @@ describe('PostMessage', () => {
   describe('search highlighting', () => {
     it('should not highlight text if no search term is present', () => {
       const {queryAllByTestId} = setup()
-      expect(queryAllByTestId('highlighted-search-item').length).toBe(0)
+      expect(queryAllByTestId('highlighted-search-item')).toHaveLength(0)
     })
 
     it('should highlight search terms in message', () => {
       const {queryAllByTestId} = setup({}, {searchTerm: 'Posts'})
-      expect(queryAllByTestId('highlighted-search-item').length).toBe(1)
+      expect(queryAllByTestId('highlighted-search-item')).toHaveLength(1)
     })
 
     it('should highlight multiple terms in postmessage', () => {
       const {queryAllByTestId} = setup(
         {message: 'a longer message with multiple highlights here and here'},
-        {searchTerm: 'here'}
+        {searchTerm: 'here'},
       )
-      expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
+      expect(queryAllByTestId('highlighted-search-item')).toHaveLength(2)
     })
 
     it('highlighting should be case-insensitive', () => {
       const {queryAllByTestId} = setup(
         {message: 'a longer message with multiple highlights Here and here'},
-        {searchTerm: 'here'}
+        {searchTerm: 'here'},
       )
-      expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
+      expect(queryAllByTestId('highlighted-search-item')).toHaveLength(2)
     })
 
     it('updates the displayed message when the message prop changes', async () => {
@@ -147,7 +147,7 @@ describe('PostMessage', () => {
               message="Updated message"
               title="Thoughts"
             />
-          </SearchContext.Provider>
+          </SearchContext.Provider>,
         )
       })
 

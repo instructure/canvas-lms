@@ -45,10 +45,10 @@ it('generates the toolConfiguration', () => {
   const ref = React.createRef()
   render(<AdditionalSettings {...props()} ref={ref} />)
   const toolConfig = ref.current.generateToolConfigurationPart()
-  expect(toolConfig.extensions.length).toEqual(1)
+  expect(toolConfig.extensions).toHaveLength(1)
   const ext = toolConfig.extensions[0]
   expect(ext.domain).toEqual('www.example.com')
-  expect(Object.keys(ext.settings).length).toEqual(4)
+  expect(Object.keys(ext.settings)).toHaveLength(4)
 })
 
 const checkToolConfigPart = (toolConfig, path, value) => {
@@ -76,7 +76,7 @@ it('changes the output when icon_url changes', () => {
   checkChange(
     ['extensions', '0', 'settings', 'icon_url'],
     'handleIconUrlChange',
-    'http://example.com/new_icon'
+    'http://example.com/new_icon',
   )
 })
 
@@ -88,7 +88,7 @@ it('changes the output when selection_height changes', () => {
   checkChange(
     ['extensions', '0', 'settings', 'selection_height'],
     'handleSelectionHeightChange',
-    250
+    250,
   )
 })
 

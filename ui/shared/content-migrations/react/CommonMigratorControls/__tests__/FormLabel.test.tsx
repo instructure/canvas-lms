@@ -30,7 +30,7 @@ describe('FormLabel', () => {
 describe('RequiredFormLabel', () => {
   it('renders the label text with an asterisk', () => {
     const {getByText} = render(
-      <RequiredFormLabel showErrorState={false}>Test Label</RequiredFormLabel>
+      <RequiredFormLabel showErrorState={false}>Test Label</RequiredFormLabel>,
     )
     expect(getByText('Test Label')).toBeInTheDocument()
     expect(getByText('*')).toBeInTheDocument()
@@ -38,14 +38,14 @@ describe('RequiredFormLabel', () => {
 
   it('displays the asterisk in primary color when showErrorState is false', () => {
     const {getByText} = render(
-      <RequiredFormLabel showErrorState={false}>Test Label</RequiredFormLabel>
+      <RequiredFormLabel showErrorState={false}>Test Label</RequiredFormLabel>,
     )
     expect(getByText('*')).toHaveStyle('color: rgb(45, 59, 69)')
   })
 
   it('displays the asterisk in danger color when showErrorState is true', () => {
     const {getByText} = render(
-      <RequiredFormLabel showErrorState={true}>Test Label</RequiredFormLabel>
+      <RequiredFormLabel showErrorState={true}>Test Label</RequiredFormLabel>,
     )
     expect(getByText('*')).toHaveStyle('color: rgb(224, 6, 31)')
   })

@@ -63,6 +63,26 @@ module ModuleVisibility
           exec_find_module_visibility_query(query_sql:, query_params:)
         end
 
+        # groups overrides and related module group overrides
+        def find_modules_visible_to_groups(course_ids:, user_ids:, context_module_ids:)
+          filter_condition_sql = filter_condition_sql(course_ids:, user_ids:, context_module_ids:)
+          query_sql = <<~SQL.squish
+            #{context_module_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment overrides (assignment or related context module) for Group */
+            #{context_module_assignment_override_group_join_sql}
+
+            /* filtered to course_id, user_id, context_module_id, and additional conditions */
+            #{context_module_assignment_override_non_collaborative_group_filter_sql(filter_condition_sql:)}
+          SQL
+
+          query_params = query_params(course_ids:, user_ids:, context_module_ids:)
+          exec_find_module_visibility_query(query_sql:, query_params:)
+        end
+
         # ADHOC overrides and related module ADHOC overrides
         def find_modules_visible_to_adhoc_overrides(course_ids:, user_ids:, context_module_ids:)
           filter_condition_sql = filter_condition_sql(course_ids:, user_ids:, context_module_ids:)
@@ -164,6 +184,30 @@ module ModuleVisibility
             WHERE #{filter_condition_sql}
               AND o.workflow_state NOT IN ('deleted','unpublished')
               AND ao.unassign_item = FALSE
+          SQL
+        end
+
+        def context_module_assignment_override_group_join_sql
+          <<~SQL.squish
+            INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+              ON ao.set_type = 'Group'
+              AND ao.context_module_id = o.id
+              AND ao.workflow_state = 'active'
+            INNER JOIN #{Group.quoted_table_name} g
+              ON g.id = ao.set_id
+            INNER JOIN #{GroupMembership.quoted_table_name} gm
+              ON gm.group_id = g.id
+              AND gm.user_id = e.user_id
+          SQL
+        end
+
+        def context_module_assignment_override_non_collaborative_group_filter_sql(filter_condition_sql:)
+          <<~SQL.squish
+            WHERE #{filter_condition_sql}
+              AND o.workflow_state NOT IN ('deleted','unpublished')
+              AND g.workflow_state <> 'deleted'
+              AND g.non_collaborative IS TRUE
+              AND gm.workflow_state <> 'deleted'
           SQL
         end
 

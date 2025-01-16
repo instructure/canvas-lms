@@ -174,6 +174,17 @@ class AuthenticationProvider < ActiveRecord::Base
   end
   alias_method :destroy_permanently!, :destroy
 
+  def restore
+    timestamp = updated_at
+    self.workflow_state = "active"
+    if save
+      move_to_bottom
+      fix_position_conflicts
+      delay_if_production.restore_soft_deleted_pseudonyms(timestamp)
+      true
+    end
+  end
+
   def auth_password=(password)
     return if password.blank?
 
@@ -503,7 +514,20 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def soft_delete_pseudonyms
-    pseudonyms.find_each(&:destroy)
+    pseudonyms.find_each do |pseudonym|
+      unless pseudonym.deleted?
+        pseudonym.destroy(custom_deleted_at: updated_at)
+      end
+    end
+  end
+
+  def restore_soft_deleted_pseudonyms(timestamp)
+    provider_updated_at_before_restore_timestamp = timestamp
+    pseudonyms.find_each do |pseudonym|
+      if pseudonym.deleted? && pseudonym.deleted_at == provider_updated_at_before_restore_timestamp
+        pseudonym.restore
+      end
+    end
   end
 
   def enable_canvas_authentication

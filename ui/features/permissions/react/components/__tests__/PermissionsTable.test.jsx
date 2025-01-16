@@ -154,7 +154,7 @@ it('displays granular permissions when the expand button is pressed', () => {
 
   // Rendering the expand button and the permission name here, why it looks wierd
   expect(button1.render().text()).toEqual(
-    'Expand Grouped Granular PermissionGrouped Granular Permission'
+    'Expand Grouped Granular PermissionGrouped Granular Permission',
   )
   expect(button2.render().text()).toEqual('Granular 1')
   expect(button3.render().text()).toEqual('Granular 2')

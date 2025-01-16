@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import $ from 'jquery'
 
 const keyPressOptions = {
@@ -113,7 +111,7 @@ NavigationForTree.prototype.bindKeyboardEvents = function () {
           ? _this[name]()
           : void 0
       }
-    })(this)
+    })(this),
   )
 }
 

@@ -36,6 +36,7 @@ class VideoCaptionService < ApplicationService
     @media_id = handoff_video_for_processing
     return update_status(:failed_handoff) unless @media_id
 
+    @media_object.update_attribute(:auto_caption_media_id, @media_id)
     if @skip_polling
       # tell Notorious to start generating captions -- must be complete with handoff first
       request_caption_response = request_caption

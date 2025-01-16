@@ -76,7 +76,7 @@ export const useShouldShowContent = (
   isEditing,
   isStudent,
   published,
-  isCheckpoints
+  isCheckpoints,
 ) => {
   const shouldShowTodoSettings =
     !isGraded &&

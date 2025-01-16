@@ -69,7 +69,7 @@ function mocks() {
         ],
       },
       {},
-      undefined
+      undefined,
     ),
   ]
 }
@@ -83,7 +83,7 @@ describe('TeacherView', () => {
     const {getAllByText, getByText, getByTestId, getByDisplayValue, findByTestId} = render(
       <MockedProvider mocks={mocks()} addTypename={false}>
         <TeacherView assignment={assignment} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     // open the override detail

@@ -40,7 +40,7 @@ const mockSettingsToProps = mockSettings => ({
 })
 
 const mockUsers = [DESIGNER_1, TEACHER_1, TA_1, STUDENT_1, STUDENT_2, STUDENT_3, OBSERVER_1].map(
-  user => mockUser(user)
+  user => mockUser(user),
 )
 
 const DEFAULT_PROPS = mockSettingsToProps({mockUsers})

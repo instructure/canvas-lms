@@ -47,7 +47,6 @@ if (update_url) {
         if (force || (interactionSeconds > 10 && secondsSinceLastEvent < intervalInSeconds)) {
           data.interaction_seconds = interactionSeconds
           // TODO: use fetch
-          // @ts-expect-error
           $.ajaxJSON(update_url, 'PUT', data, null, (_result: any, xhr: JQuery.jqXHR) => {
             if (xhr.status === 422) {
               clearInterval(updateTrigger)
@@ -78,7 +77,7 @@ if (update_url) {
             navigator.sendBeacon(update_url, formData)
           }
         },
-        false
+        false,
       )
 
       let eventInTime = false

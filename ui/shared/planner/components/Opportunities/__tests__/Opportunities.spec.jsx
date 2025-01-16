@@ -105,7 +105,7 @@ it('registers itself as animatable', () => {
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
       ref={ref}
-    />
+    />,
   )
   expect(fakeRegister).toHaveBeenCalledWith('opportunity', ref.current, -1, [
     OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID,

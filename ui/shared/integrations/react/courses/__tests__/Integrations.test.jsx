@@ -78,7 +78,7 @@ describe('Integrations', () => {
       })
 
       expect(
-        subject.getByText('An error occurred, please try again. Error: error')
+        subject.getByText('An error occurred, please try again. Error: error'),
       ).toBeInTheDocument()
     })
 

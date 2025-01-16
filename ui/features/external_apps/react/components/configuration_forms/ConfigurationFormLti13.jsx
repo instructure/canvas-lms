@@ -74,7 +74,7 @@ class ConfigurationFormLti13 extends React.Component {
           messages={[
             {
               text: I18n.t(
-                'To obtain a client ID, an account admin will need to generate an LTI developer key.'
+                'To obtain a client ID, an account admin will need to generate an LTI developer key.',
               ),
               type: 'hint',
             },

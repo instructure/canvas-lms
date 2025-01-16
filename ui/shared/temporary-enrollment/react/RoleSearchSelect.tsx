@@ -39,14 +39,14 @@ const reEscapeMatcher = /(\^|\$|\|\.|\*|\+|\?|\(|\)|\[|\]|\{|\}|\||\\)/g
 const reEscape = (str: string) => str.replace(reEscapeMatcher, '\\$1')
 
 const SearchableSelectOption = () => <div />
- 
+
 SearchableSelectOption.propTypes = {
   id: string,
   value: string,
   children: string,
   label: string,
 }
- 
+
 SearchableSelectOption.displayName = 'Option'
 
 interface Props {
@@ -59,6 +59,8 @@ interface Props {
   noResultsLabel: string
   noSearchMatchLabel: string
   children: any
+  setRef: Function
+  invalidRole: Function
 }
 
 function flattenOptions(nodes: any) {
@@ -84,7 +86,7 @@ export default function RoleSearchSelect(props: Props) {
   const [matcher, setMatcher] = useState(new RegExp(''))
   const [messages, setMessages] = useState<
     Array<{
-      type: 'error' | 'hint' | 'success' | 'screenreader-only'
+      type: 'newError' | 'hint' | 'success' | 'screenreader-only'
       text: React.ReactNode
     }>
     // @ts-expect-error
@@ -123,12 +125,13 @@ export default function RoleSearchSelect(props: Props) {
     setSelectedOptionId(null)
     handleUpdateSearchStatusMessage(doesAnythingMatch)
     setIsShowingOptions(doesAnythingMatch)
+    props.invalidRole(false)
   }
 
   // messages are not being accidentally set
   const handleUpdateSearchStatusMessage = (matches: any) => {
     if (!matches) {
-      setMessages([{type: 'error', text: noSearchMatchLabel}])
+      setMessages([{type: 'newError', text: noSearchMatchLabel}])
       return
     }
     if (noResults) {
@@ -166,6 +169,7 @@ export default function RoleSearchSelect(props: Props) {
     setIsShowingOptions(false)
     setAnnouncement(I18n.t('%{option} selected. List collapsed.', {option: selectedOption?.name}))
     onChange(event, {id, option: selectedOption})
+    setMessages([])
   }
 
   const handleBlur = (e: any) => {
@@ -174,6 +178,10 @@ export default function RoleSearchSelect(props: Props) {
     if (possibleSelection) {
       handleRequestSelectOption(e, possibleSelection)
       handleUpdateSearchStatusMessage(true)
+      // show an error if the current inputValue is not the same as any of the options
+    } else if (options.every(i => i.name !== inputValue)) {
+      setMessages([{type: 'newError', text: I18n.t('Select a valid role')}])
+      props.invalidRole(true)
     }
   }
 
@@ -245,6 +253,8 @@ export default function RoleSearchSelect(props: Props) {
         onRequestHighlightOption={handleRequestHighlightOption}
         onRequestSelectOption={handleRequestSelectOption}
         {...analyticProps('Role')}
+        isRequired={true}
+        ref={ref => props.setRef(ref)}
       >
         {renderChildren()}
       </Select>

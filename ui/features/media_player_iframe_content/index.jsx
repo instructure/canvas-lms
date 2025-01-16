@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 // TODO: use URL() in browser to parse URL
 // eslint-disable-next-line import/no-nodejs-modules
 import {parse} from 'url'
@@ -31,6 +31,8 @@ const isStandalone = () => {
 }
 
 ready(() => {
+  const container = document.getElementById('player_container')
+  const root = createRoot(container)
   // get the media_id from something like
   //  `http://canvas.example.com/media_objects_iframe/m-48jGWTHdvcV5YPdZ9CKsqbtRzu1jURgu?type=video`
   // or
@@ -91,11 +93,11 @@ ready(() => {
         if (tracks)
           event.source.postMessage(
             {subject: 'media_tracks_response', payload: tracks},
-            event.origin
+            event.origin,
           )
       }
     },
-    false
+    false,
   )
 
   document.body.setAttribute('style', 'margin: 0; padding: 0; border-style: none')
@@ -115,8 +117,7 @@ ready(() => {
 
   const aria_label = !media_object.title ? undefined : media_object.title
   if (window.ENV.FEATURES?.consolidated_media_player_iframe) {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(
+    root.render(
       <StudioMediaPlayer
         media_id={media_id}
         media_sources={href_source || media_object.media_sources}
@@ -126,11 +127,9 @@ ready(() => {
         is_attachment={is_attachment}
         attachment_id={attachment_id}
       />,
-      document.getElementById('player_container')
     )
   } else {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(
+    root.render(
       <CanvasMediaPlayer
         media_id={media_id}
         media_sources={href_source || media_object.media_sources}
@@ -140,7 +139,6 @@ ready(() => {
         is_attachment={is_attachment}
         attachment_id={attachment_id}
       />,
-      document.getElementById('player_container')
     )
   }
 })

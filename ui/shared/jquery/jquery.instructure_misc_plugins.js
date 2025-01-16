@@ -59,7 +59,7 @@ $.fn.ifExists = function (func) {
 // Returns the width of the browser's scroll bars.
 $.fn.scrollbarWidth = function () {
   const $div = $(
-      '<div style="width:50px;height:50px;overflow:hidden;position:absolute;top:-200px;left:-200px;"><div style="height:100px;"></div>'
+      '<div style="width:50px;height:50px;overflow:hidden;position:absolute;top:-200px;left:-200px;"><div style="height:100px;"></div>',
     ).appendTo(this),
     $innerDiv = $div.find('div')
   // Append our div, do our calculation and then remove it
@@ -143,7 +143,7 @@ $.fn.confirmDelete = function (options) {
           } else {
             $.ajaxJSON.unhandledXHRs.push(request)
           }
-        }
+        },
       )
     } else {
       if (!options.success) {
@@ -185,12 +185,11 @@ $.fn.confirmDelete = function (options) {
             ],
             zIndex: 1000,
           },
-          dialog_options
-        )
+          dialog_options,
+        ),
       )
       return
     } else {
-       
       result = window.confirm(options.message)
     }
   }
@@ -393,7 +392,6 @@ $.fn.hasScrollbar = function () {
 }
 
 $.fn.log = function (msg) {
-   
   console.log('%s: %o', msg, this)
   return this
 }
@@ -444,7 +442,7 @@ $.fn.autoGrowInput = function (o) {
       minWidth: 0,
       comfortZone: 70,
     },
-    o
+    o,
   )
 
   this.filter('input:text').each(function () {

@@ -37,8 +37,6 @@ import {
 
 const I18n = createI18nScope('assignment_grade_summary')
 
- 
-
 function enumeratedStatuses(actions) {
   return [
     actions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
@@ -69,7 +67,7 @@ class Header extends Component {
       shape({
         graderName: string,
         graderId: string.isRequired,
-      })
+      }),
     ).isRequired,
     releaseGrades: func.isRequired,
     releaseGradesStatus: oneOf(enumeratedStatuses(AssignmentActions)),
@@ -84,8 +82,8 @@ class Header extends Component {
           score: number,
           selected: bool.isRequired,
           studentId: string.isRequired,
-        })
-      )
+        }),
+      ),
     ).isRequired,
     setReleaseGradesStatus: func.isRequired,
   }
@@ -97,7 +95,7 @@ class Header extends Component {
 
   handleReleaseClick = () => {
     const message = I18n.t(
-      'Are you sure you want to do this? It cannot be undone and will override existing grades in the gradebook.'
+      'Are you sure you want to do this? It cannot be undone and will override existing grades in the gradebook.',
     )
 
     // This is stupid, but Chrome has an issue whereby confirm alerts sometimes just
@@ -147,7 +145,7 @@ class Header extends Component {
           AssignmentActions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS && (
           <Alert margin="0 0 medium 0" variant="error">
             {I18n.t(
-              'One or more grade selected was provided by a grader with inactive enrollments. Please update your selections to those provided by current graders.'
+              'One or more grade selected was provided by a grader with inactive enrollments. Please update your selections to those provided by current graders.',
             )}
           </Alert>
         )}
@@ -219,4 +217,3 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header)
- 

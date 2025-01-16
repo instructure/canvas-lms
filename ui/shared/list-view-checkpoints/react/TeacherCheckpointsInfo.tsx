@@ -21,12 +21,16 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Assignment, Checkpoint} from '../../../api'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {datetimeString} from '@canvas/datetime/date-functions'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('assignment')
 
 const REPLY_TO_TOPIC = 'reply_to_topic'
 
-type AssignmentCheckpoints = Pick<Assignment, 'id' | 'checkpoints' | 'discussion_topic'>
+type AssignmentCheckpoints = Pick<
+  Assignment,
+  'id' | 'checkpoints' | 'discussion_topic' | 'points_possible'
+>
 
 type TeacherCheckpointsInfoProps = {
   assignment: AssignmentCheckpoints
@@ -38,7 +42,7 @@ interface DueDate {
 }
 
 const getCheckpointDueDates = (
-  checkpoint: Checkpoint | undefined
+  checkpoint: Checkpoint | undefined,
 ): {multipleDueDates: boolean; dates: DueDate[]} => {
   if (!checkpoint)
     return {multipleDueDates: false, dates: [{dueFor: I18n.t('Everyone'), dueAt: null}]}
@@ -65,7 +69,7 @@ const getCheckpointDueDates = (
 }
 
 const getAvailabilityInfo = (
-  checkpoint: Checkpoint | undefined
+  checkpoint: Checkpoint | undefined,
 ): {title: string; multipleDueDates: boolean; dates: DueDate[]} => {
   let title = ''
   let availability = null
@@ -115,7 +119,7 @@ const getAvailabilityText = (unlockAt: string | null, lockAt: string | null): Du
 
 const renderRequiredRepliesTitle = (assignment: AssignmentCheckpoints): string => {
   const translatedReplyToEntryRequiredCount = I18n.n(
-    assignment.discussion_topic.reply_to_entry_required_count
+    assignment.discussion_topic.reply_to_entry_required_count,
   )
   return I18n.t('Required Replies (%{requiredReplies})', {
     requiredReplies: translatedReplyToEntryRequiredCount,
@@ -199,6 +203,11 @@ export const TeacherCheckpointsInfo: React.FC<TeacherCheckpointsInfoProps> = ({a
         dueDate={getCheckpointDueDates(requiredRepliesCheckpoint)}
         testId={`${assignment.id}_required_replies`}
       />
+      <Text size="x-small" data-testid={`${assignment.id}_points_possible`}>
+        {I18n.t('%{points_possible} pts', {
+          points_possible: assignment.points_possible,
+        })}
+      </Text>
     </div>
   )
 }

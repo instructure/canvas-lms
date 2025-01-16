@@ -135,7 +135,7 @@ describe('ZipFileImporter', () => {
           size: 16,
         },
       }),
-      expect.any(Object)
+      expect.any(Object),
     )
   })
 

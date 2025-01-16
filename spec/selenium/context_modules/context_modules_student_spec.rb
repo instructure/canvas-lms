@@ -19,12 +19,10 @@
 
 require_relative "../common"
 require_relative "../helpers/context_modules_common"
-require_relative "../../helpers/selective_release_common"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
-  include SelectiveReleaseCommon
 
   before :once do
     @course = course_model.tap(&:offer!)
@@ -721,9 +719,8 @@ describe "context modules" do
       expect(f(".user_content")).to include_text(page.body)
     end
 
-    context "with the selective_release_backend and selective_release_ui_api flags enabled" do
+    context "with selective_release_ui_api flag enabled" do
       before :once do
-        differentiated_modules_on
         @module1 = @course.context_modules.create!(name: "module 1")
         @module2 = @course.context_modules.create!(name: "module 2")
         @module3 = @course.context_modules.create!(name: "module 3")

@@ -86,7 +86,7 @@ describe('useGradingSchemeSummariesHook', () => {
     })
     const loadedGradingSchemes = await result.current.loadGradingSchemeSummaries(
       'Account',
-      accountId
+      accountId,
     )
     // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()

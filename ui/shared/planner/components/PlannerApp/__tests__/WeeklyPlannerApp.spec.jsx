@@ -73,7 +73,7 @@ describe('Weekly PlannerApp', () => {
   it('renders empty days with no assignments this week', () => {
     const opts = getDefaultValues()
     const {queryAllByText} = render(<PlannerApp {...opts} />)
-    expect(queryAllByText('Nothing Planned Yet').length).toEqual(7)
+    expect(queryAllByText('Nothing Planned Yet')).toHaveLength(7)
     const d = opts.thisWeek.weekStart.clone()
     for (let i = 0; i < 7; ++i) {
       const dstr = d.format('MMMM D')
@@ -98,7 +98,7 @@ describe('Weekly PlannerApp', () => {
       },
     })
     const {queryAllByText} = render(<PlannerApp {...opts} />)
-    expect(queryAllByText('Nothing Planned Yet').length).toEqual(7)
+    expect(queryAllByText('Nothing Planned Yet')).toHaveLength(7)
     const d = opts.thisWeek.weekStart.clone()
     for (let i = 0; i < 7; ++i) {
       const dstr = d.format('MMMM D')
@@ -115,7 +115,7 @@ describe('Weekly PlannerApp', () => {
       [{dateBucketMoment: d, uniqueId: '1', title: ''}],
     ])
     const {container, queryAllByText} = render(<PlannerApp {...getDefaultValues({days})} />)
-    expect(container.querySelectorAll('.planner-day').length).toEqual(7)
+    expect(container.querySelectorAll('.planner-day')).toHaveLength(7)
     const d = opts.thisWeek.weekStart.clone()
     for (let i = 0; i < 7; ++i) {
       const dstr = d.format('MMMM D')
@@ -132,10 +132,10 @@ describe('Weekly PlannerApp', () => {
   it('notifies the UI to perform dynamic updates', () => {
     const mockUpdate = jest.fn()
     const {rerender} = render(
-      <PlannerApp {...getDefaultValues({isLoading: true})} triggerDynamicUiUpdates={mockUpdate} />
+      <PlannerApp {...getDefaultValues({isLoading: true})} triggerDynamicUiUpdates={mockUpdate} />,
     )
     rerender(
-      <PlannerApp {...getDefaultValues({isLoading: false})} triggerDynamicUiUpdates={mockUpdate} />
+      <PlannerApp {...getDefaultValues({isLoading: false})} triggerDynamicUiUpdates={mockUpdate} />,
     )
     expect(mockUpdate).toHaveBeenCalledTimes(1)
   })

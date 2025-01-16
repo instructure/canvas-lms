@@ -43,7 +43,7 @@ describe('ImportRubric Tests', () => {
           importFetchInterval={100}
           {...props}
         />
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
   }
 
@@ -69,7 +69,7 @@ describe('ImportRubric Tests', () => {
           errorData: [],
           progress: 0,
           workflowState: 'created',
-        })
+        }),
       )
     })
 
@@ -95,7 +95,7 @@ describe('ImportRubric Tests', () => {
           errorData: [],
           progress: 100,
           workflowState: 'success',
-        })
+        }),
       )
       const {getByTestId} = renderComponent()
       const fileDropZone = getByTestId('rubric-import-file-drop')
@@ -121,7 +121,7 @@ describe('ImportRubric Tests', () => {
           errorData: [{message: 'failed format'}],
           progress: 100,
           workflowState: 'failed',
-        })
+        }),
       )
 
       const {getByTestId} = renderComponent()
@@ -132,7 +132,7 @@ describe('ImportRubric Tests', () => {
       const importFilename = getByTestId('rubric-import-job-filename-1')
       expect(importFilename).toHaveTextContent('file.csv')
       expect(getByTestId('import-rubric-failure-header')).toHaveTextContent(
-        'The import failed for the following file(s):'
+        'The import failed for the following file(s):',
       )
       expect(getByTestId('import-failure-message')).toHaveTextContent('failed format')
     })

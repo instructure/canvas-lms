@@ -46,7 +46,7 @@ export const SplitScreenButton = ({
         setOnSuccess('Splitscreen preference updated!')
         setUserSplitScreenPreference(
           data?.updateUserDiscussionsSplitscreenView?.user?.discussionsSplitscreenView ||
-            !userSplitScreenPreference
+            !userSplitScreenPreference,
         )
         setSplitted(!splitted)
       },
@@ -54,7 +54,7 @@ export const SplitScreenButton = ({
         setOnFailure(I18n.t('Unable to update splitscreen preference.'))
         setUserSplitScreenPreference(!userSplitScreenPreference)
       },
-    }
+    },
   )
 
   const onSplitScreenClick = () => {

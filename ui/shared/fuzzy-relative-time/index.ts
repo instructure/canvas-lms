@@ -62,7 +62,7 @@ function buildTime(msec: number): Units {
 
 function timeDistance(
   times: Units,
-  opts: {locale?: string | string[]; [k: string]: unknown}
+  opts: {locale?: string | string[]; [k: string]: unknown},
 ): string {
   const {locale, ...intlOpts} = opts
   const neg = times.negative ? -1 : 1

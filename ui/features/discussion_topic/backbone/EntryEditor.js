@@ -72,7 +72,7 @@ export default class EntryEditor extends EditorToggle {
         {
           success: this.onSaveSuccess.bind(this),
           error: this.onSaveError.bind(this),
-        }
+        },
       )
     } else {
       return this.getAttachmentElement().show() // may have been hidden if user deleted attachment then cancelled
@@ -80,24 +80,22 @@ export default class EntryEditor extends EditorToggle {
   }
 
   createCancelButton() {
-    return (
-      $('<a/>')
-        .text(I18n.t('Cancel'))
-        .css({marginLeft: '5px'})
-         
-        .attr('href', 'javascript:')
-        .addClass('cancel_button')
-        .click(() => {
-          this.cancel()
-          this.display({cancel: true})
-        })
-    )
+    return $('<a/>')
+      .text(I18n.t('Cancel'))
+      .css({marginLeft: '5px'})
+
+      .attr('href', 'javascript:')
+      .addClass('cancel_button')
+      .click(() => {
+        this.cancel()
+        this.display({cancel: true})
+      })
   }
 
   createDeleteAttachmentButton() {
     return (
       $('<a/>')
-         
+
         .attr('href', 'javascript:')
         .text('x')
         .addClass('cancel_button')

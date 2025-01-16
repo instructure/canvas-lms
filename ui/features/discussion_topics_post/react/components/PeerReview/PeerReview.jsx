@@ -44,7 +44,7 @@ export const PeerReview = props => {
                 dueAtText: DateHelper.formatDateForDisplay(
                   props.dueAtDisplayText,
                   'short',
-                  ENV.TIMEZONE
+                  ENV.TIMEZONE,
                 ),
               })
             : I18n.t('Peer review due', {name: props.revieweeName}),

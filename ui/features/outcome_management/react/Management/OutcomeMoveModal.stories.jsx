@@ -34,7 +34,7 @@ const outcomesGenerator = (startId, count, canUnlink = true, title = '') =>
         canUnlink,
       },
     }),
-    {}
+    {},
   )
 
 export default {

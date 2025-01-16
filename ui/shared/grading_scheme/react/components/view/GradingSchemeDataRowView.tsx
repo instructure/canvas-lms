@@ -41,7 +41,7 @@ const GradingSchemeDataRowView: React.FC<ComponentProps> = ({
   viewAsPercentage,
 }) => {
   const [entryScale /* setEntryScale */] = useState<number>(
-    schemeScaleFactor * (viewAsPercentage ? 100 : 1)
+    schemeScaleFactor * (viewAsPercentage ? 100 : 1),
   )
   function renderHighRange() {
     return String(roundToTwoDecimalPlaces(highRange * entryScale))

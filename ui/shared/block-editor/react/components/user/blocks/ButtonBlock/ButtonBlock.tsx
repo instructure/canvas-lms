@@ -60,7 +60,7 @@ const ButtonBlock = ({
         event.preventDefault()
       }
     },
-    [enabled]
+    [enabled],
   )
 
   const getThemeOverride = () => {

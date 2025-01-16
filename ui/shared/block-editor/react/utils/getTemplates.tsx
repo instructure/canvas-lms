@@ -55,9 +55,9 @@ export const getTemplates = (configs: {
       return mergeTemplates(
         (apiTemplatesResult as PromiseFulfilledResult<BlockTemplate[]>).value,
         (globalTemplatesResult as PromiseFulfilledResult<BlockTemplate[]>).value.filter(
-          template => !configs.type || configs.type.includes(template.template_type)
-        )
+          template => !configs.type || configs.type.includes(template.template_type),
+        ),
       )
-    }
+    },
   )
 }

@@ -44,7 +44,7 @@ const handleClickEvent = event => {
       return focusableItems
     }
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <StudentContextTray
         key={`student_context_card_${courseId}_${studentId}`}
@@ -53,7 +53,7 @@ const handleClickEvent = event => {
         returnFocusTo={returnFocusToHandler}
         externalTools={ENV.student_context_card_tools}
       />,
-      container
+      container,
     )
   }
 }

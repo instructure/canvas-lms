@@ -16,20 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {ActionPrompt} from '..'
-import {MemoryRouter} from 'react-router-dom'
-import {NewLoginProvider} from '../../context/NewLoginContext'
 import {render} from '@testing-library/react'
+import React from 'react'
+import {MemoryRouter} from 'react-router-dom'
+import {ActionPrompt} from '..'
+import {NewLoginDataProvider, NewLoginProvider} from '../../context'
 
 describe('ActionPrompt', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter>
         <NewLoginProvider>
-          <ActionPrompt variant="signIn" />
+          <NewLoginDataProvider>
+            <ActionPrompt variant="signIn" />
+          </NewLoginDataProvider>
         </NewLoginProvider>
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

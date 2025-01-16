@@ -15,9 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import {assignLocation} from '@canvas/util/globalUtils'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import LoginActionPrompt from '../LoginActionPrompt'
-import {render, waitFor, fireEvent} from '@testing-library/react'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 describe('LoginActionPrompt', () => {
   it('renders component locked and feedback text labels correctly', async () => {
@@ -27,12 +33,9 @@ describe('LoginActionPrompt', () => {
   })
 
   it('login button redirects towards login page', async () => {
-    delete window.location
-    window.location = {assign: jest.fn()}
-
     const {getByTestId} = render(<LoginActionPrompt />)
     fireEvent.click(getByTestId('login-action-button'))
-    expect(window.location.assign).toHaveBeenCalledWith('/login')
+    expect(assignLocation).toHaveBeenCalledWith('/login')
   })
 
   it('displays a message if the course has not started', async () => {

@@ -252,7 +252,6 @@ export default class SyllabusView extends Backbone.View {
         events[0].override = null
       } else {
         for (const event of Array.from(events)) {
-           
           overrides_present |= event.override !== null
         }
       }

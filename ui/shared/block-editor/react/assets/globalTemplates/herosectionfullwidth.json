@@ -38,9 +38,7 @@
         },
         "parent": "rlSZnd7v6I",
         "hidden": false,
-        "nodes": [
-          "010IWy3vJA"
-        ],
+        "nodes": ["010IWy3vJA"],
         "linkedNodes": {}
       },
       "010IWy3vJA": {
@@ -87,12 +85,7 @@
         },
         "parent": "010IWy3vJA",
         "hidden": false,
-        "nodes": [
-          "MRyHnqaKwI",
-          "B_eUoQj7m1",
-          "bcAaEuLVEl",
-          "4RjAtD49Jy"
-        ],
+        "nodes": ["MRyHnqaKwI", "B_eUoQj7m1", "bcAaEuLVEl", "4RjAtD49Jy"],
         "linkedNodes": {}
       },
       "MRyHnqaKwI": {

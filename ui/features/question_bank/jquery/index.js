@@ -1,4 +1,3 @@
- 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -98,7 +97,7 @@ export function updateAlignments(alignments) {
       $('.add_outcome_text')
         .text(I18n.t('update_outcomes_fail', 'Updating Outcomes Failed'))
         .prop('disabled', false)
-    }
+    },
   )
 }
 
@@ -108,8 +107,8 @@ export function attachPageEvents(_e) {
     const result = window.confirm(
         I18n.t(
           'remove_outcome_from_bank',
-          'Are you sure you want to remove this outcome from the bank?'
-        )
+          'Are you sure you want to remove this outcome from the bank?',
+        ),
       ),
       $outcome = $(event.target).parents('.outcome'),
       alignments = [],
@@ -143,7 +142,7 @@ export function attachPageEvents(_e) {
           $teaser.data('question', question)
         }
       },
-      _data => {}
+      _data => {},
     )
   }
   $('.more_questions_link').click(function (event) {
@@ -192,7 +191,7 @@ export function attachPageEvents(_e) {
         $link
           .text(I18n.t('loading_more_fail', 'loading more questions fails, please try again'))
           .removeClass('loading')
-      }
+      },
     )
   })
   $('.delete_bank_link').click(function (event) {
@@ -203,7 +202,7 @@ export function attachPageEvents(_e) {
         url: $(this).attr('href'),
         message: I18n.t(
           'delete_are_you_sure',
-          'Are you sure you want to delete this bank of questions?'
+          'Are you sure you want to delete this bank of questions?',
         ),
         success() {
           window.location.href = $('.assessment_question_banks_url').attr('href')
@@ -224,7 +223,7 @@ export function attachPageEvents(_e) {
       },
       () => {
         $link.find('.message').text(I18n.t('bookmark_failed', 'Bookmark Failed'))
-      }
+      },
     )
   })
   $('.edit_bank_link').click(event => {
@@ -309,13 +308,13 @@ export function attachPageEvents(_e) {
       submitText = I18n.t(
         'buttons.submit_moving',
         {one: 'Moving Question...', other: 'Moving Questions...'},
-        {count: multiple_questions ? 2 : 1}
+        {count: multiple_questions ? 2 : 1},
       )
     } else {
       submitText = I18n.t(
         'buttons.submit_copying',
         {one: 'Copying Question...', other: 'Copying Questions...'},
-        {count: multiple_questions ? 2 : 1}
+        {count: multiple_questions ? 2 : 1},
       )
     }
     $dialog.find('button').prop('disabled', true)
@@ -363,7 +362,7 @@ export function attachPageEvents(_e) {
                 one: 'Moving Question Failed, please try again',
                 other: 'Moving Questions Failed, please try again',
               },
-              {count: multiple_questions ? 2 : 1}
+              {count: multiple_questions ? 2 : 1},
             )
           } else {
             failedText = I18n.t(
@@ -372,11 +371,11 @@ export function attachPageEvents(_e) {
                 one: 'Copying Question Failed, please try again',
                 other: 'Copying Questions Failed, please try again',
               },
-              {count: multiple_questions ? 2 : 1}
+              {count: multiple_questions ? 2 : 1},
             )
           }
           $dialog.find('.submit_button').text(failedText)
-        }
+        },
       )
     }
     if (data.assessment_question_bank_id === 'new') {
@@ -397,16 +396,16 @@ export function attachPageEvents(_e) {
           if (move) {
             submitAgainText = I18n.t(
               'buttons.submit_retry_moving',
-              'Moving Question Failed, please try again...'
+              'Moving Question Failed, please try again...',
             )
           } else {
             submitAgainText = I18n.t(
               'buttons.submit_retry_copying',
-              'Copying Question Failed, please try again...'
+              'Copying Question Failed, please try again...',
             )
           }
           $dialog.find('.submit_button').text(submitAgainText)
-        }
+        },
       )
     } else {
       save(data)
@@ -417,7 +416,7 @@ export function attachPageEvents(_e) {
   })
   $('#move_question_dialog :radio').change(function () {
     $('#move_question_dialog .new_question_bank_name').showIf(
-      $(this).prop('checked') && $(this).val() === 'new'
+      $(this).prop('checked') && $(this).val() === 'new',
     )
   })
 }

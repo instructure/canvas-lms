@@ -23,7 +23,6 @@ import {shallow} from 'enzyme'
 import UsersList from '../UsersList'
 import UsersListRow from '../UsersListRow'
 import fetchMock from 'fetch-mock'
-import sinon from 'sinon'
 
 describe('Account Course User Search UsersList View', function () {
   beforeEach(() => {
@@ -32,7 +31,7 @@ describe('Account Course User Search UsersList View', function () {
       {
         status: 200,
         body: {},
-      }
+      },
     )
   })
 
@@ -76,9 +75,9 @@ describe('Account Course User Search UsersList View', function () {
       sort: 'username',
       order: 'asc',
     },
-    onUpdateFilters: sinon.spy(),
-    onApplyFilters: sinon.spy(),
-    sortColumnHeaderRef: sinon.spy(),
+    onUpdateFilters: jest.fn(),
+    onApplyFilters: jest.fn(),
+    sortColumnHeaderRef: jest.fn(),
     roles: [],
   }
 
@@ -121,10 +120,10 @@ describe('Account Course User Search UsersList View', function () {
       it(`sorting by ${columnID} ${sortOrder} puts ${expectedArrow}-arrow on ${label} only`, () => {
         const wrapper = render(<UsersList {...props} />)
         expect(
-          wrapper.container.querySelectorAll(`[name="IconMiniArrow${unexpectedArrow}"]`).length
-        ).toEqual(0)
+          wrapper.container.querySelectorAll(`[name="IconMiniArrow${unexpectedArrow}"]`),
+        ).toHaveLength(0)
         const icons = wrapper.container.querySelectorAll(`[name="IconMiniArrow${expectedArrow}"]`)
-        expect(icons.length).toEqual(1)
+        expect(icons).toHaveLength(1)
         const header = icons[0].closest('[data-testid="UsersListHeader"]')
         header.focus()
         expect(wrapper.queryAllByText(expectedTip)).toBeTruthy()
@@ -132,31 +131,29 @@ describe('Account Course User Search UsersList View', function () {
       })
 
       it(`clicking the ${label} column header calls onChangeSort with ${columnID}`, async () => {
-        const sortSpy = sinon.spy()
+        const sortSpy = jest.fn()
         const wrapper = render(
           <UsersList
             {...{
               ...props,
               onUpdateFilters: sortSpy,
             }}
-          />
+          />,
         )
         const header = Array.from(
-          wrapper.container.querySelectorAll('[data-testid="UsersListHeader"]')
+          wrapper.container.querySelectorAll('[data-testid="UsersListHeader"]'),
         )
           .filter(n => n.textContent.includes(label))[0]
           .querySelector('button')
         const user = userEvent.setup({delay: null})
         await user.click(header)
-        expect(sortSpy.calledOnce).toBeTruthy()
-        expect(
-          sortSpy.calledWith({
-            search_term: 'User',
-            sort: columnID,
-            order: sortOrder === 'asc' ? 'desc' : 'asc',
-            role_filter_id: undefined,
-          })
-        ).toBeTruthy()
+        expect(sortSpy).toHaveBeenCalledTimes(1)
+        expect(sortSpy).toHaveBeenCalledWith({
+          search_term: 'User',
+          sort: columnID,
+          order: sortOrder === 'asc' ? 'desc' : 'asc',
+          role_filter_id: undefined,
+        })
       })
     })
   })

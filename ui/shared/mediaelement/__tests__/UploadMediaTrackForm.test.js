@@ -46,7 +46,7 @@ describe('UploadMediaTrackForm', () => {
       'POST',
       expect.anything(),
       expect.anything(),
-      expect.anything()
+      expect.anything(),
     )
   })
 
@@ -58,7 +58,7 @@ describe('UploadMediaTrackForm', () => {
       'POST',
       expect.anything(),
       expect.anything(),
-      expect.anything()
+      expect.anything(),
     )
   })
 })

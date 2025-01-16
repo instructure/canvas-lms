@@ -102,7 +102,7 @@ SisButtonView.prototype.togglePostToSIS = function (e) {
           _this.setAttributes()
           return _this.setAriaPressed()
         }
-      })(this)
+      })(this),
     )
   }
 }
@@ -122,7 +122,7 @@ SisButtonView.prototype.errorsExist = function (validationHelper) {
       {
         name: this.model.name(),
         base_message,
-      }
+      },
     )
   } else if (validationHelper.dueDateMissing()) {
     errors.has_error = true
@@ -156,7 +156,7 @@ SisButtonView.prototype.sisAttributes = function () {
         name: this.sisName,
       }),
       label: I18n.t(
-        'The grade for this assignment will not sync to the student information system.'
+        'The grade for this assignment will not sync to the student information system.',
       ),
     }
   }

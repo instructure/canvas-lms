@@ -37,7 +37,7 @@ const useDebouncedSearch = (props: {
           updateQueryParams({search: searchValue, page: 1})
         },
     delay,
-    [searchValue]
+    [searchValue],
   )
 
   const handleSearchInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {

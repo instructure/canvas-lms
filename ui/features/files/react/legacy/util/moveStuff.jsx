@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import FileRenameForm from '@canvas/files/react/components/FileRenameForm'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 
 const I18n = createI18nScope('react_files')
 
@@ -33,28 +33,43 @@ function moveItem(item, destinationFolder, options = {}) {
     (jqXHR, _textStatus, _errorThrown) => {
       if (jqXHR.status === 409) {
         // file already exists: prompt and retry
-         
-        ReactDOM.render(
-          React.createFactory(FileRenameForm)({
-            onClose() {},
-            closeWithX() {
+
+        const container = $('<div>').appendTo('body')[0]
+        const root = createRoot(container)
+        root.render(
+          <FileRenameForm
+            onClose={() => {
+              root.unmount()
+              container.remove()
+            }}
+            closeWithX={() => {
+              root.unmount()
+              container.remove()
               return dfd.reject()
-            },
-            closeOnResolve: true,
-            fileOptions: {name: item.attributes.display_name},
-            onNameConflictResolved: opts =>
+            }}
+            closeOnResolve={true}
+            fileOptions={{name: item.attributes.display_name}}
+            onNameConflictResolved={opts =>
               moveItem(item, destinationFolder, opts).then(
-                data => dfd.resolve(data),
-                () => dfd.reject()
-              ),
-          }),
-          $('<div>').appendTo('body')[0]
+                data => {
+                  root.unmount()
+                  container.remove()
+                  dfd.resolve(data)
+                },
+                () => {
+                  root.unmount()
+                  container.remove()
+                  dfd.reject()
+                },
+              )
+            }
+          />,
         )
       } else {
         // some other error: fail
         return dfd.reject()
       }
-    }
+    },
   )
   return dfd
 }
@@ -73,8 +88,8 @@ export default function moveStuff(filesAndFolders, destinationFolder) {
           count: filesAndFolders.length,
           item: filesAndFolders[0] && filesAndFolders[0].displayName(),
           destinationFolder: destinationFolder.displayName(),
-        }
-      )
+        },
+      ),
     )
   })
 }

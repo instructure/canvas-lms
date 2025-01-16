@@ -20,48 +20,57 @@ import React, {useEffect, useState, useRef} from 'react'
 import {func, shape, string} from 'prop-types'
 import {statuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
+import type {StatusColors} from '../constants/colors'
 
-const colorPickerButtons = {}
-const colorPickerContents = {}
+interface ColorPickerRefs {
+  [key: string]: Element | null
+}
 
-// @ts-expect-error
-export default function StatusColorPanel({colors: initialColors, onColorsUpdated}) {
-  const [colors, setColors] = useState({...initialColors})
-  const [openPopover, setOpenPopover] = useState(null)
+const colorPickerButtons: ColorPickerRefs = {}
+const colorPickerContents: ColorPickerRefs = {}
+
+interface StatusColorPanelProps {
+  colors: StatusColors
+  onColorsUpdated: (colors: StatusColors) => void
+}
+
+export default function StatusColorPanel({
+  colors: initialColors,
+  onColorsUpdated,
+}: StatusColorPanelProps) {
+  const [colors, setColors] = useState<StatusColors>({...initialColors})
+  const [openPopover, setOpenPopover] = useState<string | null>(null)
   const lastSelectedStatusRef = useRef<string>()
 
-  // @ts-expect-error
-  const bindColorPickerButton = status => button => {
-    // @ts-expect-error
+  const bindColorPickerButton = (status: string) => (button: Element | null) => {
     colorPickerButtons[status] = button
   }
 
-  // @ts-expect-error
-  const bindColorPickerContent = status => content => {
-    // @ts-expect-error
+  const bindColorPickerContent = (status: string) => (content: Element | null) => {
     colorPickerContents[status] = content
   }
-  // @ts-expect-error
-  const updateStatusColors = status => color => {
+
+  const updateStatusColors = (status: keyof StatusColors) => (color: string) => {
     const newColors = {...colors, [status]: color}
     setColors(newColors)
     setOpenPopover(null)
     onColorsUpdated(newColors)
   }
-  // @ts-expect-error
-  const handleOnToggle = status => toggle => {
+
+  const handleOnToggle = (status: string) => (toggle: boolean) => {
     setOpenPopover(toggle ? status : null)
   }
 
-  // @ts-expect-error
-  const handleColorPickerAfterClose = _status => () => {
+  const handleColorPickerAfterClose = (_status: string) => () => {
     setOpenPopover(null)
   }
 
   useEffect(() => {
     if (openPopover == null) {
-      // @ts-expect-error
-      colorPickerButtons[lastSelectedStatusRef.current || '']?.focus()
+      const button = colorPickerButtons[lastSelectedStatusRef.current || '']
+      if (button instanceof HTMLElement) {
+        button.focus()
+      }
     } else {
       lastSelectedStatusRef.current = openPopover
     }
@@ -73,13 +82,13 @@ export default function StatusColorPanel({colors: initialColors, onColorsUpdated
         <StatusColorListItem
           key={status}
           status={status}
-          color={colors[status]}
+          color={colors[status as keyof StatusColors]}
           isColorPickerShown={openPopover === status}
           colorPickerOnToggle={handleOnToggle(status)}
           colorPickerButtonRef={bindColorPickerButton(status)}
           colorPickerContentRef={bindColorPickerContent(status)}
           colorPickerAfterClose={handleColorPickerAfterClose(status)}
-          afterSetColor={updateStatusColors(status)}
+          afterSetColor={updateStatusColors(status as keyof StatusColors)}
         />
       ))}
     </ul>
@@ -93,6 +102,7 @@ StatusColorPanel.propTypes = {
     resubmitted: string.isRequired,
     dropped: string.isRequired,
     excused: string.isRequired,
+    extended: string.isRequired,
   }).isRequired,
   onColorsUpdated: func.isRequired,
 }

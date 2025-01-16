@@ -88,7 +88,7 @@ const CheckpointItem = React.memo(({checkpoint, assignment}: CheckpointProps) =>
     } else {
       // if it's not reply to topic, it must be reply to entry
       const translatedReplyToEntryRequiredCount = I18n.n(
-        assignment.discussion_topic.reply_to_entry_required_count
+        assignment.discussion_topic.reply_to_entry_required_count,
       )
       return I18n.t('Required Replies (%{requiredReplies})', {
         requiredReplies: translatedReplyToEntryRequiredCount,

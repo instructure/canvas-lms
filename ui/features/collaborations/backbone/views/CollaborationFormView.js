@@ -37,7 +37,7 @@ CollaborationFormView.prototype.translations = {
       'Please use %{maxLength} characters or less for the name. Use the description for additional content.',
       {
         maxLength: ENV.TITLE_MAX_LEN,
-      }
+      },
     ),
   },
 }

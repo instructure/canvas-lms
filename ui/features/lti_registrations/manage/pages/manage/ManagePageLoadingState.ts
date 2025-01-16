@@ -97,7 +97,7 @@ export const mkUseManagePageState =
   (
     apiFetchRegistrations: FetchRegistrations,
     apiDeleteRegistration: DeleteRegistration,
-    apiUnbindGlobalRegistration: typeof unbindGlobalLtiRegistration
+    apiUnbindGlobalRegistration: typeof unbindGlobalLtiRegistration,
   ) =>
   (params: ManageSearchParams & {accountId: AccountId}) => {
     const {accountId, q, sort, dir, page} = params
@@ -209,12 +209,12 @@ export const mkUseManagePageState =
               // TODO: log more info about the error? send to Sentry?
               // we could also consider returning the Error object, which
               // FlashAlert.findDetailMessage() expounds upon
-              I18n.t('Error deleting app “%{appName}”', {appName: registration.name})
-            )
+              I18n.t('Error deleting app “%{appName}”', {appName: registration.name}),
+            ),
           )
           .finally(() => refreshRef.current?.())
       },
-      [setStale]
+      [setStale],
     )
 
     return [state, {setStale, deleteRegistration}] as const

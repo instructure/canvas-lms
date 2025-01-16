@@ -108,7 +108,7 @@ export const Assignment = {
         onlyVisibleToOverrides: bool,
         pointsPossible: number,
         tag: string,
-      })
+      }),
     ),
   }),
 

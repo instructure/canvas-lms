@@ -88,7 +88,7 @@ const InboxSettingsModalContainer = ({
         setAlert(SAVE_SETTINGS_FAIL)
         closeModal()
       },
-    }
+    },
   )
   const timezone = ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone
   const today = moment.tz(timezone).startOf('day')

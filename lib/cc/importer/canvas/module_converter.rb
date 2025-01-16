@@ -62,6 +62,7 @@ module CC::Importer::Canvas
           cr[:type] = cr_node["type"]
           cr[:item_migration_id] = get_node_val(cr_node, "identifierref")
           cr[:min_score] = get_float_val(cr_node, "min_score")
+          cr[:min_percentage] = get_node_val(cr_node, "min_percentage")
 
           mod[:completion_requirements] << cr
         end

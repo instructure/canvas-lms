@@ -34,7 +34,7 @@ export const useEnrollmentsQuery = (courseId: string) => {
 
   const enrollments = useMemo(
     () => data?.pages.flatMap(page => page.course.enrollmentsConnection.nodes) ?? [],
-    [data]
+    [data],
   )
 
   return {

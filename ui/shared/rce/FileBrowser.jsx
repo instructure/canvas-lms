@@ -158,11 +158,9 @@ class FileBrowser extends React.Component {
         }
       })
       .catch(error => {
-         
         console.error('Error fetching data from API')
         console.error(error)
         captureException(error)
-         
       })
   }
 
@@ -182,7 +180,7 @@ class FileBrowser extends React.Component {
           collectionCollections.push(collection.id)
           newCollections[parent_id].collections = this.orderedIdsFromList(
             newCollections,
-            collectionCollections
+            collectionCollections,
           )
         }
       })
@@ -245,7 +243,7 @@ class FileBrowser extends React.Component {
       existingCollections && {
         collections: existingCollections.collections,
         items: existingCollections.items,
-      }
+      },
     )
     return folder
   }
@@ -272,7 +270,6 @@ class FileBrowser extends React.Component {
       const sortedIds = ids.sort((a, b) => natcompare.strings(list[a].name, list[b].name))
       return sortedIds
     } catch (error) {
-       
       console.error(error)
       captureException(error)
       return ids

@@ -18,7 +18,6 @@
 import $ from 'jquery'
 import React, {lazy, Suspense} from 'react'
 import {createRoot} from 'react-dom/client'
-import ReactDOM from 'react-dom'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import template from '../../jst/WikiPageEdit.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
@@ -31,6 +30,7 @@ import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
 import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
+import {LATEST_BLOCK_DATA_VERSION} from '@canvas/block-editor/react/utils'
 
 const I18n = createI18nScope('pages')
 
@@ -153,7 +153,10 @@ export default class WikiPageEditView extends ValidatedFormView {
     json.show_assign_to = this.enableAssignTo
     json.edit_with_block_editor = this.model.get('editor') === 'block_editor'
 
-    if (this.queryParams.get('editor') === 'block_editor' && this.model.get('body') == null) {
+    if (
+      (this.queryParams.get('editor') === 'block_editor' || window.ENV.text_editor_preference === "block_editor")
+      && this.model.get('body') == null
+    ) {
       json.edit_with_block_editor = true
     }
 
@@ -189,8 +192,8 @@ export default class WikiPageEditView extends ValidatedFormView {
   renderStudentTodoAtDate() {
     const elt = this.$studentTodoAtContainer[0]
     if (elt) {
-      // eslint-disable-next-line react/no-render-return-value
-      return ReactDOM.render(
+       
+      return createRoot(elt).render(
         <DueDateCalendarPicker
           dateType="todo_date"
           name="student_todo_at"
@@ -204,7 +207,6 @@ export default class WikiPageEditView extends ValidatedFormView {
           labelText="Student Planner Date"
           labelClasses="screenreader-only"
         />,
-        elt
       )
     }
   }
@@ -239,9 +241,14 @@ export default class WikiPageEditView extends ValidatedFormView {
       }
       renderAssignToTray(mountElement, {pageId, onSync, pageName})
     }
-    if (this.model.get('editor') === 'block_editor' && this.model.get('block_editor_attributes')) {
-      const BlockEditor = lazy(() => import('@canvas/block-editor'))
 
+    let chose_block_editor = window.location.href.split("?").filter((piece) => { return piece.indexOf('editor=block_editor') !== -1 }).length === 1
+    if(!chose_block_editor){
+      chose_block_editor = window.ENV.text_editor_preference === "block_editor" && this.model.get('body') == null
+    }
+
+    if ( (this.model.get('editor') === 'block_editor' && this.model.get('block_editor_attributes')) || chose_block_editor ) {
+      const BlockEditor = lazy(() => import('@canvas/block-editor'))
       const blockEditorData = this.model.get('block_editor_attributes')
 
       const container = document.getElementById('content')
@@ -255,10 +262,10 @@ export default class WikiPageEditView extends ValidatedFormView {
           <BlockEditor
             course_id={ENV.COURSE_ID}
             container={container}
-            content={blockEditorData}
+            content={blockEditorData || {version: LATEST_BLOCK_DATA_VERSION, blocks: undefined}}
             onCancel={this.cancel.bind(this)}
           />
-        </Suspense>
+        </Suspense>,
       )
     } else {
       RichContentEditor.loadNewEditor(this.$wikiPageBody, {
@@ -296,7 +303,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       reloadMessage: I18n.t(
         'reload_editing_page',
         'This page has changed since you started editing it. *Reloading* will lose all of your changes.',
-        {wrapper: '<a class="reload" href="#">$1</a>'}
+        {wrapper: '<a class="reload" href="#">$1</a>'},
       ),
       warning: true,
     })
@@ -315,7 +322,6 @@ export default class WikiPageEditView extends ValidatedFormView {
         RichContentEditor.destroyRCE(this.$wikiPageBody)
       }
     } catch (e) {
-       
       console.warn(e)
     } finally {
       this.$el.remove()
@@ -366,16 +372,14 @@ export default class WikiPageEditView extends ValidatedFormView {
       ]
     }
 
-    if (ENV.FEATURES.selective_release_edit_page) {
-      const sectionViewRef = document.getElementById(
-        'manage-assign-to-container'
-      )?.reactComponentInstance
-      const invalidInput = sectionViewRef?.focusErrors()
-      if (invalidInput) {
-        errors.invalid_card = {$input: null, showError: this.showError}
-      } else {
-        delete errors.invalid_card
-      }
+    const sectionViewRef = document.getElementById(
+      'manage-assign-to-container',
+    )?.reactComponentInstance
+    const invalidInput = sectionViewRef?.focusErrors()
+    if (invalidInput) {
+      errors.invalid_card = {$input: null, showError: this.showError}
+    } else {
+      delete errors.invalid_card
     }
 
     return errors
@@ -393,7 +397,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   unsavedWarning() {
     return I18n.t(
       'warnings.unsaved_changes',
-      'You have unsaved changes. Do you want to continue without saving these changes?'
+      'You have unsaved changes. Do you want to continue without saving these changes?',
     )
   }
 
@@ -401,12 +405,11 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.checkUnsavedOnLeave = false
     if (this.reloadPending) {
       if (
-         
         !window.confirm(
           I18n.t(
             'warnings.overwrite_changes',
-            'You are about to overwrite other changes that have been made since you started editing.\n\nOverwrite these changes?'
-          )
+            'You are about to overwrite other changes that have been made since you started editing.\n\nOverwrite these changes?',
+          ),
         )
       ) {
         if (event != null) {
@@ -469,7 +472,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (event != null) {
       event.preventDefault()
     }
-     
+
     if (!this.hasUnsavedChanges() || window.confirm(this.unsavedWarning())) {
       this.checkUnsavedOnLeave = false
       if (this.model.get('editor') !== 'block_editor') {

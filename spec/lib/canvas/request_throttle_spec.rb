@@ -67,10 +67,6 @@ describe RequestThrottle do
   describe "#client_identifier" do
     specs_require_sharding
 
-    before do
-      Account.site_admin.enable_feature! :site_admin_service_auth
-    end
-
     context "with an inst_access service token" do
       include_context "InstAccess setup"
 

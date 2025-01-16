@@ -163,7 +163,7 @@ describe('ObjectStore', () => {
     ])
     server.respond()
     expect(testStore.getState().items).toEqual(
-      foldersPageOne.concat(foldersPageTwo).concat(foldersPageThree)
+      foldersPageOne.concat(foldersPageTwo).concat(foldersPageThree),
     ) // Use Jest's expect
   })
 
@@ -172,7 +172,7 @@ describe('ObjectStore', () => {
     testStore.fetch()
     server.respond()
     const state = testStore.getState()
-    expect(state.items.length).toBe(0) // Use Jest's expect
+    expect(state.items).toHaveLength(0) // Use Jest's expect
     expect(state.hasMore).toBe(true) // Use Jest's expect
     expect(state.isLoaded).toBe(false) // Use Jest's expect
   })

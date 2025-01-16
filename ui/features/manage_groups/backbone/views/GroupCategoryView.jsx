@@ -149,10 +149,9 @@ export default class GroupCategoryView extends View {
   renderProgress() {
     const container = document.getElementById('group-category-progress')
     if (container != null) {
-       
       ReactDOM.render(
         <GroupCategoryProgress progressPercent={this.model.progressModel.attributes.completion} />,
-        container
+        container,
       )
     }
   }
@@ -172,8 +171,8 @@ export default class GroupCategoryView extends View {
       this.model.get('allows_multiple_memberships')
         ? I18n.t('everyone', 'Everyone (%{count})', {count})
         : ENV.group_user_type === 'student'
-        ? I18n.t('unassigned_students', 'Unassigned Students (%{count})', {count})
-        : I18n.t('unassigned_users', 'Unassigned Users (%{count})', {count})
+          ? I18n.t('unassigned_students', 'Unassigned Students (%{count})', {count})
+          : I18n.t('unassigned_users', 'Unassigned Users (%{count})', {count}),
     )
   }
 

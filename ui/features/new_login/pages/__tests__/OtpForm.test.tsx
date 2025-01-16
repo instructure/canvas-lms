@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import OtpForm from '../OtpForm'
-import {MemoryRouter} from 'react-router-dom'
-import {NewLoginProvider} from '../../context/NewLoginContext'
 import {render} from '@testing-library/react'
+import React from 'react'
+import {MemoryRouter} from 'react-router-dom'
+import {NewLoginProvider} from '../../context'
+import OtpForm from '../OtpForm'
 
 describe('OtpForm', () => {
   it('mounts without crashing', () => {
@@ -29,7 +29,7 @@ describe('OtpForm', () => {
         <NewLoginProvider>
           <OtpForm />
         </NewLoginProvider>
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

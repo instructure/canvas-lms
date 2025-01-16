@@ -31,14 +31,14 @@ export const totalRow = (
   queryData,
   calculateOnlyGradedAssignments = false,
   courseLevelGrades,
-  overrideGrade
+  overrideGrade,
 ) => {
   const applicableAssignments = filteredAssignments(queryData, calculateOnlyGradedAssignments)
   let total = getTotal(
     applicableAssignments,
     queryData?.assignmentGroupsConnection?.nodes,
     queryData?.gradingPeriodsConnection?.nodes,
-    queryData?.applyGroupWeights
+    queryData?.applyGroupWeights,
   )
 
   const courseLevelScore = courseLevelGrades?.score || 0
@@ -67,7 +67,7 @@ export const totalRow = (
   const hasWeightedGradingPeriods = queryData?.gradingPeriodsConnection?.nodes?.some(
     gradingPeriod => {
       return gradingPeriod.weight != null && gradingPeriod.weight > 0
-    }
+    },
   )
 
   return (

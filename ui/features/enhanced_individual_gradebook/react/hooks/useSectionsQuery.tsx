@@ -34,7 +34,7 @@ export const useSectionsQuery = (courseId: string) => {
 
   const sections = useMemo(
     () => data?.pages.flatMap(page => page.course.sectionsConnection.nodes) ?? [],
-    [data]
+    [data],
   )
 
   return {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -45,16 +44,17 @@ interface PassedProps {
   readonly coursePace: CoursePace
   readonly toggleShowSettingsPopover: (show: boolean) => void
   readonly showBlackoutDatesModal: () => void
-  readonly menuPlacement: () => 'bottom start' | 'bottom end' | 'top start' | 'top end'
+  readonly menuPlacement: () => MenuPlacement
   readonly toggleExcludeWeekends: typeof coursePaceActions.toggleExcludeWeekends
   readonly toggleSelectedDaysToSkip: typeof coursePaceActions.toggleSelectedDaysToSkip
 }
 
-type ComponentProps = StoreProps & PassedProps
+export type MenuPlacement = 'bottom start' | 'bottom end' | 'top start' | 'top end'
+export type ComponentProps = StoreProps & PassedProps
 
 export const SettingsMenu = (props: ComponentProps) => {
   return window.ENV.FEATURES.course_paces_skip_selected_days ? (
-    <SkipSelectedDaysMenu {...props} renderManageBlackoutDates={renderManageBlackoutDates} />
+    <SkipSelectedDaysMenu {...props} />
   ) : (
     <MainMenu {...props}>
       <Menu.Item
@@ -70,7 +70,7 @@ export const SettingsMenu = (props: ComponentProps) => {
         props.isSyncing,
         props.showBlackoutDatesModal,
         props.toggleShowSettingsPopover,
-        props.coursePace.context_type
+        props.coursePace.context_type,
       )}
     </MainMenu>
   )

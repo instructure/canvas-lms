@@ -53,7 +53,7 @@ export const getReviewLinkUrl = (courseId, assignmentId, revieweeId) => {
 export const updateDiscussionTopicEntryCounts = (
   cache,
   discussionTopicGraphQLId,
-  entryCountChange
+  entryCountChange,
 ) => {
   const options = {
     id: discussionTopicGraphQLId,
@@ -137,7 +137,7 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
       }
 
       const currentSubentriesQueryData = JSON.parse(
-        JSON.stringify(cache.readQuery(subEntriesOptions))
+        JSON.stringify(cache.readQuery(subEntriesOptions)),
       )
       if (currentSubentriesQueryData) {
         const subentriesLegacyNode = currentSubentriesQueryData.legacyNode
@@ -382,7 +382,7 @@ export const getOptimisticResponse = ({
 export const getCheckpointSubmission = (data, subAssignmentTag) => {
   return (
     data.createDiscussionEntry.mySubAssignmentSubmissions?.find(
-      sub => sub.subAssignmentTag === subAssignmentTag
+      sub => sub.subAssignmentTag === subAssignmentTag,
     ) || {}
   )
 }

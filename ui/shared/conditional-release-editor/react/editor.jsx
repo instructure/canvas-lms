@@ -63,7 +63,7 @@ class ConditionalReleaseEditor {
       <Provider store={this.store}>
         <EditorView appElement={targetRoot} />
       </Provider>,
-      targetDomNode
+      targetDomNode,
     )
   }
 

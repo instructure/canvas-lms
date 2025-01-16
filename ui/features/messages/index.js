@@ -87,9 +87,9 @@ class MessageModal {
       $.flashError(
         I18n.t(
           'messages.failure',
-          'There was an error sending your email. Please reload the page and try again.'
-        )
-      )
+          'There was an error sending your email. Please reload the page and try again.',
+        ),
+      ),
     )
     $.flashMessage(I18n.t('messages.success', 'Your email is being delivered.'))
   }

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import Lti2Edit from '../Lti2Edit'
 
 const wrapper = document.getElementById('fixtures') || document.createElement('div') // Ensure the element exists
@@ -35,12 +35,20 @@ const createElement = data => (
   />
 )
 
-// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
+let root = null
+
+const renderComponent = data => {
+  root = createRoot(wrapper)
+  root.render(createElement(data))
+  return wrapper.firstChild
+}
 
 describe('ExternalApps.Lti2Edit', () => {
   afterEach(() => {
-    ReactDOM.unmountComponentAtNode(wrapper)
+    if (root) {
+      root.unmount()
+      root = null
+    }
   })
 
   test('renders', () => {
@@ -59,6 +67,6 @@ describe('ExternalApps.Lti2Edit', () => {
     }
     const component = renderComponent(data)
     expect(component).toBeTruthy() // Checks if component has rendered
-    expect(ReactDOM.findDOMNode(component)).toBeTruthy() // Check if component is of type Lti2Edit
+    expect(component).toBeInstanceOf(HTMLElement) // Check if component is rendered to DOM
   })
 })

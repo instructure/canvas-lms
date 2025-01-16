@@ -81,7 +81,7 @@ describe('DisallowThreadedFixAlert', () => {
     const {getByText, getByTestId, queryAllByText} = render(<DisallowThreadedFixAlert />)
     const updateAllButton = getByTestId('disallow_threaded_fix_alert_update_all')
     await userEvent.click(updateAllButton)
-    expect(queryAllByText('Make All Discussions Threaded').length).toBe(3) // alert button, modal title, confirm button
+    expect(queryAllByText('Make All Discussions Threaded')).toHaveLength(3) // alert button, modal title, confirm button
     expect(getByText('Cancel')).toBeInTheDocument()
   })
 
@@ -91,7 +91,7 @@ describe('DisallowThreadedFixAlert', () => {
     expect(window.localStorage.getItem('disallow_threaded_fix_alert_dismissed_1')).toBeNull()
     await userEvent.click(dismissButton)
     await waitFor(() =>
-      expect(queryByText(/around disallowing threaded replies/)).not.toBeInTheDocument()
+      expect(queryByText(/around disallowing threaded replies/)).not.toBeInTheDocument(),
     )
     expect(window.localStorage.getItem('disallow_threaded_fix_alert_dismissed_1')).toBe('true')
   })

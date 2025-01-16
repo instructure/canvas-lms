@@ -17,9 +17,8 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import RangeInput from '../RangeInput'
-import sinon from 'sinon'
 
 const ok = value => expect(value).toBeTruthy()
 const equal = (value, expected) => expect(value).toEqual(expected)
@@ -35,42 +34,45 @@ describe('RangeInput Component', () => {
       defaultValue: 5,
       labelText: 'Input Label',
       name: 'input_name',
-      formatValue: sinon.stub(),
-      onChange: sinon.stub(),
+      formatValue: jest.fn(),
+      onChange: jest.fn(),
     }
   })
 
   test('renders range input', () => {
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    const component = ReactDOM.render(<RangeInput {...props} />, elem)
-    const input = component.rangeInput
+    const ref = React.createRef()
+    const root = createRoot(elem)
+    root.render(<RangeInput {...props} ref={ref} />)
+    const input = ref.current.rangeInput
     equal(input.type, 'range', 'renders range input')
     equal(String(input.value), String(props.defaultValue), 'renders default value')
     equal(input.name, props.name, 'renders with name from props')
   })
 
   test('renders formatted output', done => {
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    const component = ReactDOM.render(<RangeInput {...props} />, elem)
+    const ref = React.createRef()
+    const root = createRoot(elem)
+    root.render(<RangeInput {...props} ref={ref} />)
     const expected = 47
     const expectedFormatted = '47%'
-    props.formatValue.returns(expectedFormatted)
-    component.setState({value: 47}, () => {
-      const output = component.outputElement
+    props.formatValue.mockReturnValue(expectedFormatted)
+    ref.current.setState({value: 47}, () => {
+      const output = ref.current.outputElement
       ok(output, 'renders the output element')
-      ok(props.formatValue.calledWith(expected), 'formats the value')
+      expect(props.formatValue).toHaveBeenCalledWith(expected)
       equal(output.textContent, expectedFormatted, 'outputs value')
       done()
     })
   })
 
   test('handleChange', () => {
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    const component = ReactDOM.render(<RangeInput {...props} />, elem)
-    sinon.spy(component, 'setState')
+    const ref = React.createRef()
+    const root = createRoot(elem)
+    root.render(<RangeInput {...props} ref={ref} />)
+    jest.spyOn(ref.current, 'setState')
     const event = {target: {value: 8}}
-    component.handleChange(event)
-    ok(component.setState.calledWithMatch({value: event.target.value}), 'updates value in state')
-    ok(props.onChange.calledWith(event.target.value), 'calls onChange with the new value')
+    ref.current.handleChange(event)
+    expect(ref.current.setState).toHaveBeenCalledWith({value: event.target.value})
+    expect(props.onChange).toHaveBeenCalledWith(event.target.value)
   })
 })

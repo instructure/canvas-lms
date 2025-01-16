@@ -98,12 +98,14 @@ describe "student groups" do
 
       it "is titled what the user types in", priority: "1" do
         create_default_student_group(group_name)
+        f('button[type="submit"]').click
 
         expect(fj(".student-group-title")).to include_text(group_name.to_s)
       end
 
       it "by default, created student group only contains the student creator", priority: "2" do
         create_default_student_group
+        f('button[type="submit"]').click
 
         # expand the group
         fj(".student-group-title").click

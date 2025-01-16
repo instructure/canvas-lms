@@ -45,11 +45,11 @@ export const ReviewScreenWrapper = ({
       placement,
       state.naming.placements[placement] ??
         getDefaultPlacementTextFromConfig(placement, internalConfig),
-    ])
+    ]),
   )
   const iconUrls = state.icons.placements
   const defaultPlacementIconUrls = Object.fromEntries(
-    internalConfig.placements.map(placement => [placement.placement, placement.icon_url])
+    internalConfig.placements.map(placement => [placement.placement, placement.icon_url]),
   )
   const name = state.naming.nickname
 

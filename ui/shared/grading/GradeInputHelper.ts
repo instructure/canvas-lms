@@ -80,7 +80,7 @@ function parseAsGradingScheme(value: number, options): null | GradeInput {
       percentage,
       options.gradingScheme,
       options.pointsBasedGradingScheme,
-      options.scalingFactor
+      options.scalingFactor,
     ),
   }
 }
@@ -111,7 +111,7 @@ function parseAsPercent(value: string, options): null | GradeInput {
       percent,
       options.gradingScheme,
       options.pointsBasedGradingScheme,
-      options.scalingFactor
+      options.scalingFactor,
     ),
   }
 }
@@ -133,7 +133,7 @@ function parseAsPoints(value: string, options): null | GradeInput {
       percent,
       options.gradingScheme,
       options.pointsBasedGradingScheme,
-      options.scalingFactor
+      options.scalingFactor,
     ),
   }
 }

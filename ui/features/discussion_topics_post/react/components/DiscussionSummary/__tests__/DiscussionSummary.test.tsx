@@ -42,7 +42,7 @@ const setup = (props = {}) => {
         {/* @ts-expect-error */}
         <DiscussionSummary {...defaultProps} />
       </AlertManagerContext.Provider>
-    </MockedProvider>
+    </MockedProvider>,
   )
 }
 
@@ -90,7 +90,7 @@ describe('DiscussionSummary', () => {
       })
       await waitFor(() => {
         expect(getByTestId('summary-error')).toHaveTextContent(
-          'An unexpected error occurred while loading the discussion summary.'
+          'An unexpected error occurred while loading the discussion summary.',
         )
       })
     })
@@ -434,7 +434,7 @@ describe('DiscussionSummary', () => {
         ],
       ])
       expect(setOnFailure).toHaveBeenCalledWith(
-        'There was an unexpected error while submitting the discussion summary feedback.'
+        'There was an unexpected error while submitting the discussion summary feedback.',
       )
     })
   })

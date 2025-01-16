@@ -58,7 +58,7 @@ export const getDueDates = (
   excludeWeekends: boolean,
   selectedDaysToSkip: string[],
   blackoutDates: BlackoutDate[],
-  startDate?: string
+  startDate?: string,
 ): CoursePaceItemDueDates => {
   const dueDates: {
     [key: string]: string
@@ -72,7 +72,7 @@ export const getDueDates = (
       item.duration,
       excludeWeekends,
       selectedDaysToSkip,
-      blackoutDates
+      blackoutDates,
     )
     dueDates[item.module_item_id] = currentStart
   }

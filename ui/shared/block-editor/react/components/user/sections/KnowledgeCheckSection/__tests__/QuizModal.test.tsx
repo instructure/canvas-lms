@@ -35,7 +35,7 @@ describe('QuizModal', () => {
           {/* @ts-expect-error */}
           <QuizModal {...props} />
         </Frame>
-      </Editor>
+      </Editor>,
     )
   }
 

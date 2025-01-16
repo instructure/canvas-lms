@@ -24,8 +24,6 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import pageNotFoundPandaUrl from '@canvas/images/PageNotFoundPanda.svg'
 import {IconImageLine} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
-import {Modal} from '@instructure/ui-modal'
 import {isValidHttpUrl} from '../../common/lib/validators/isValidHttpUrl'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {useDebouncedCallback} from 'use-debounce'
@@ -40,6 +38,7 @@ import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBod
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
+import {Footer} from './Footer'
 
 const I18n = createI18nScope('lti_registration.wizard')
 export type IconConfirmationProps = {
@@ -70,16 +69,16 @@ export const IconConfirmation = ({
   const placementsWithIcons = React.useMemo(
     () =>
       allPlacements.filter((p): p is LtiPlacementWithIcon =>
-        LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon)
+        LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon),
       ),
-    [allPlacements]
+    [allPlacements],
   )
 
   const [actualInputValues, setActualInputValues] =
     React.useState<Partial<Record<LtiPlacementWithIcon, string>>>(placementIconOverrides)
   const [debouncedUpdate, _, callPending] = useDebouncedCallback(
     (placement: LtiPlacementWithIcon, value: string) => setPlacementIconUrl(placement, value),
-    500
+    500,
   )
 
   const updateIconUrl = React.useCallback(
@@ -87,7 +86,7 @@ export const IconConfirmation = ({
       setActualInputValues(prev => ({...prev, [placement]: value}))
       debouncedUpdate(placement, value)
     },
-    [setActualInputValues, debouncedUpdate]
+    [setActualInputValues, debouncedUpdate],
   )
 
   React.useEffect(() => {
@@ -130,24 +129,13 @@ export const IconConfirmation = ({
           <Text>{I18n.t("This tool doesn't have any placements with configurable icons.")}</Text>
         )}
       </RegistrationModalBody>
-      <Modal.Footer>
-        <Button margin="small" color="secondary" type="submit" onClick={onPreviousButtonClicked}>
-          {I18n.t('Previous')}
-        </Button>
-        <Button
-          margin="small"
-          color="primary"
-          type="submit"
-          interaction={
-            Object.values(actualInputValues).every(v => !v || isValidHttpUrl(v))
-              ? 'enabled'
-              : 'disabled'
-          }
-          onClick={onNextButtonClicked}
-        >
-          {reviewing ? I18n.t('Back to Review') : I18n.t('Next')}
-        </Button>
-      </Modal.Footer>
+      <Footer
+        reviewing={reviewing}
+        currentScreen="intermediate"
+        onPreviousClicked={onPreviousButtonClicked}
+        onNextClicked={onNextButtonClicked}
+        disableNextButton={Object.values(actualInputValues).some(v => v && !isValidHttpUrl(v))}
+      />
     </>
   )
 }
@@ -189,7 +177,7 @@ const IconOverrideInput = React.memo(
         {
           type: 'hint',
           text: I18n.t(
-            'If left blank, a default icon resembling the one displayed will be provided. Color may vary.'
+            'If left blank, a default icon resembling the one displayed will be provided. Color may vary.',
           ),
         },
       ]
@@ -259,5 +247,5 @@ const IconOverrideInput = React.memo(
         />
       </div>
     )
-  }
+  },
 )

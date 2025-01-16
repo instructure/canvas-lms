@@ -68,7 +68,7 @@ export const GradingSchemeTable = ({
   const [currentPage, setCurrentPage] = useState<number>(0)
   const direction = ascending ? 'ascending' : 'descending'
   const sortedSchemes = gradingSchemeCards.sort((a, b) =>
-    a.gradingScheme.title.localeCompare(b.gradingScheme.title)
+    a.gradingScheme.title.localeCompare(b.gradingScheme.title),
   )
   if (!ascending) {
     sortedSchemes.reverse()
@@ -224,7 +224,7 @@ export const GradingSchemeTable = ({
                           {!canArchive(gradingSchemeCard.gradingScheme) ? (
                             <Tooltip
                               renderTip={I18n.t(
-                                "You can't archive this grading scheme because it is set as a default for a course or account."
+                                "You can't archive this grading scheme because it is set as a default for a course or account.",
                               )}
                             >
                               {archiveGradingSchemeButton(gradingSchemeCard.gradingScheme)}
@@ -244,7 +244,7 @@ export const GradingSchemeTable = ({
                             {!canDelete(gradingSchemeCard.gradingScheme) ? (
                               <Tooltip
                                 renderTip={I18n.t(
-                                  "You can't delete this grading scheme because it is in use."
+                                  "You can't delete this grading scheme because it is in use.",
                                 )}
                               >
                                 <IconTrashLine />

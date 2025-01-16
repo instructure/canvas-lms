@@ -65,6 +65,6 @@ export const COURSE_OUTCOME_PROFICIENCY_QUERY = gql`
 export const saveProficiency = (contextType, contextId, config) => {
   return axios.post(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_proficiency`,
-    config
+    config,
   )
 }

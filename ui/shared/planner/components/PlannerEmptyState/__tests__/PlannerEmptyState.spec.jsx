@@ -37,18 +37,18 @@ it('renders desert when completely empty', () => {
 
 it('renders balloons when not completely empty', () => {
   const wrapper = shallow(<PlannerEmptyState {...defaultProps({isCompletelyEmpty: false})} />)
-  expect(wrapper.find('.balloons').length).toEqual(1)
-  expect(wrapper.find('.desert').length).toEqual(0)
+  expect(wrapper.find('.balloons')).toHaveLength(1)
+  expect(wrapper.find('.desert')).toHaveLength(0)
   expect(wrapper.contains('Nothing More To Do')).toBeTruthy()
   expect(wrapper.contains('Add To-Do')).toBeTruthy()
 })
 
 it('renders balloons and different text when weekly', () => {
   const wrapper = shallow(
-    <PlannerEmptyState {...defaultProps({isCompletelyEmpty: false, isWeekly: true})} />
+    <PlannerEmptyState {...defaultProps({isCompletelyEmpty: false, isWeekly: true})} />,
   )
-  expect(wrapper.find('.balloons').length).toEqual(1)
-  expect(wrapper.find('.desert').length).toEqual(0)
+  expect(wrapper.find('.balloons')).toHaveLength(1)
+  expect(wrapper.find('.desert')).toHaveLength(0)
   expect(wrapper.contains('Nothing Due This Week')).toBeTruthy()
   expect(wrapper.contains('Add To-Do')).toBeFalsy()
 })
@@ -64,7 +64,7 @@ it('calls changeDashboardView on link click', () => {
   const mockDispatch = jest.fn()
   const changeDashboardView = mockDispatch
   const wrapper = render(
-    <PlannerEmptyState {...defaultProps({changeDashboardView, isCompletelyEmpty: true})} />
+    <PlannerEmptyState {...defaultProps({changeDashboardView, isCompletelyEmpty: true})} />,
   )
   const button = wrapper.getByText('Go to Card View Dashboard')
   fireEvent.click(button)

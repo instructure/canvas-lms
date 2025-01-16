@@ -966,7 +966,7 @@ class GradebooksController < ApplicationController
     submissions.map do |submission|
       assignment = assignments[submission[:assignment_id].to_i]
       omitted_field = assignment.anonymize_students? ? :user_id : :anonymous_id
-      json_params = Submission.json_serialization_full_parameters(methods: [:late, :missing]).merge(
+      json_params = Submission.json_serialization_full_parameters(methods: %i[late missing grading_status]).merge(
         include: { submission_history: { methods: %i[late missing word_count], except: omitted_field } },
         except: [omitted_field, :submission_comments]
       )

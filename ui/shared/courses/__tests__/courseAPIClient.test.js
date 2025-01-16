@@ -16,9 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {forceReload} from '@canvas/util/globalUtils'
 import $ from 'jquery'
+import moxios from 'moxios'
 import * as apiClient from '../courseAPIClient'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  forceReload: jest.fn(),
+}))
 
 describe('apiClient', () => {
   const {location: savedLocation} = window
@@ -29,13 +34,10 @@ describe('apiClient', () => {
   })
 
   beforeEach(() => {
-    delete window.location
-    window.location = {search: ''}
     moxios.install()
   })
 
   afterEach(() => {
-    window.location = savedLocation
     moxios.uninstall()
     $.flashWarning.mockClear()
     $.flashError.mockClear()
@@ -54,7 +56,7 @@ describe('apiClient', () => {
       })
       apiClient.publishCourse({courseId: 1})
       moxios.wait(() => {
-        expect(window.location.search).toBe('for_reload=1')
+        expect(forceReload).toHaveBeenCalled()
         done()
       })
     })
@@ -83,7 +85,7 @@ describe('apiClient', () => {
       moxios.wait(() => {
         expect(window.location.search).toBe('')
         expect($.flashWarning).toHaveBeenCalledWith(
-          'Complete registration by clicking the “finish the registration process” link sent to your email.'
+          'Complete registration by clicking the “finish the registration process” link sent to your email.',
         )
         done()
       })
@@ -110,7 +112,7 @@ describe('apiClient', () => {
       })
       apiClient.unpublishCourse({courseId: 1})
       moxios.wait(() => {
-        expect(window.location.search).toBe('for_reload=1')
+        expect(forceReload).toHaveBeenCalled()
         done()
       })
     })

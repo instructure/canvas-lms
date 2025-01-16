@@ -65,7 +65,7 @@ const thunkActions = {
         .then(() => {
           const remainingCalendarEvents = BlackoutDatesApi.calendarEventsSync(
             blackoutDates,
-            course_id
+            course_id,
           )
           dispatch(regularActions.blackoutDatesSynced(remainingCalendarEvents))
         })

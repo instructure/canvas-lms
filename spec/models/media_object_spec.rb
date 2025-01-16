@@ -576,6 +576,19 @@ describe MediaObject do
       expect(att.folder.name).to eq "Uploaded Media"
       expect(att[:media_entry_id]).to eql @media_object[:media_id]
     end
+
+    it "defaults the usage rights if the root account requires it" do
+      @course.update(usage_rights_required: true)
+      @media_object = MediaObject.create!(
+        context: @course,
+        title: "usage_video.mp4",
+        media_id: "m-usage",
+        media_type: "video"
+      )
+      att = @media_object.attachment
+      expect(att.usage_rights).to be_present
+      expect(att.usage_rights.use_justification).to eq "own_copyright"
+    end
   end
 
   describe ".process_retrieved_details" do

@@ -33,3 +33,11 @@
 .calendar_header .recommend_agenda{
   position: relative ;
 }
+
+.error-message{
+  color: $ic-bg-light-danger-text;
+  i {
+    vertical-align: middle;
+    margin-right: 0.25rem;
+  }
+}

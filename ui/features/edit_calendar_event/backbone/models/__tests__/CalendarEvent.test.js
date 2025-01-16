@@ -50,7 +50,7 @@ describe('Calendar', () => {
         await waitFor(
           () =>
             calendarEvent.hideSpinner.mock.calls.length === 1 ||
-            calendarEvent.loadFailure.mock.calls.length === 1
+            calendarEvent.loadFailure.mock.calls.length === 1,
         )
       }
 

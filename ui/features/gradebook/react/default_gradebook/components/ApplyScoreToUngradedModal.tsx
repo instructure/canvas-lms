@@ -68,10 +68,10 @@ const ApplyScoreToUngradedModal = ({assignmentGroup, onApply, onClose, open}: Pr
     assignmentGroup != null
       ? I18n.t(
           'Select the score that you would like to apply to ungraded artifacts in %{groupName}. Once applied, this action cannot be undone.',
-          {groupName: assignmentGroup.name}
+          {groupName: assignmentGroup.name},
         )
       : I18n.t(
-          'Select the score that you would like to apply to ungraded artifacts. Once applied, this action cannot be undone.'
+          'Select the score that you would like to apply to ungraded artifacts. Once applied, this action cannot be undone.',
         )
 
   const handleApply = () => {

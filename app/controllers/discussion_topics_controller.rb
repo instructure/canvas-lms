@@ -795,13 +795,13 @@ class DiscussionTopicsController < ApplicationController
         }
 
         entry = entry.highest_level_parent_or_self
-        participant = @topic.participant(current_user: @current_user)
-        sort_order = participant&.sort_order || @topic.sort_order || DiscussionTopic::SortOrder::DESC
+        sort_order = @topic.sort_order_for_user(@current_user)
         condition = (sort_order == DiscussionTopic::SortOrder::DESC) ? ">=" : "<="
-        count_before = @topic.root_discussion_entries
-                             .where(parent_id: nil)
-                             .where("created_at #{condition}?", entry.created_at).count
-        env_hash[:current_page] = ((1 + count_before) / env_hash[:per_page]).ceil
+        count_before = (sort_order == DiscussionTopic::SortOrder::ASC) ? 1 : 0
+        count_before += @topic.root_discussion_entries
+                              .where(parent_id: nil)
+                              .where("created_at #{condition}?", entry.created_at).count
+        env_hash[:current_page] = (count_before / env_hash[:per_page]).ceil
 
       end
       js_env(env_hash)
@@ -873,7 +873,7 @@ class DiscussionTopicsController < ApplicationController
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
                discussion_translation_available: Translation.available?(@context, :translation), # Is translation enabled on the course.
-               ai_translation_improvements: @domain_root_account.feature_enabled?(:translate_inbox_messages),
+               ai_translation_improvements: Account.site_admin.feature_enabled?(:ai_translation_improvements),
                discussion_translation_languages: Translation.available?(@context, :translation) ? Translation.translated_languages(@current_user) : [],
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),

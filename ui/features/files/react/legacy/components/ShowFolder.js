@@ -91,7 +91,7 @@ export default {
             return this.redirectToCourseFiles()
           }
         }
-      }
+      },
     )
   },
 

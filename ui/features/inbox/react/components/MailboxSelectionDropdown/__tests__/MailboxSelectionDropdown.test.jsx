@@ -22,7 +22,7 @@ import {MailboxSelectionDropdown} from '../MailboxSelectionDropdown'
 describe('MailboxSelectionDropdown', () => {
   it('renders', () => {
     const {getByTitle} = render(
-      <MailboxSelectionDropdown onSelect={Function.prototype} activeMailbox="inbox" />
+      <MailboxSelectionDropdown onSelect={Function.prototype} activeMailbox="inbox" />,
     )
     expect(getByTitle('Inbox')).not.toBeNull()
   })
@@ -31,20 +31,20 @@ describe('MailboxSelectionDropdown', () => {
     global.event = undefined
     const mockCallback = jest.fn()
     const {container, getByText} = render(
-      <MailboxSelectionDropdown onSelect={mockCallback} activeMailbox="inbox" />
+      <MailboxSelectionDropdown onSelect={mockCallback} activeMailbox="inbox" />,
     )
     const input = container.querySelector('input')
     fireEvent.click(input)
     const unread = getByText('Unread')
     fireEvent.click(unread)
-    expect(mockCallback.mock.calls.length).toBe(1)
+    expect(mockCallback.mock.calls).toHaveLength(1)
     expect(mockCallback.mock.calls[0][0]).toBe('unread')
   })
 
   it('should respect activeMailbox prop', () => {
     global.event = undefined
     const {container} = render(
-      <MailboxSelectionDropdown onSelect={() => {}} activeMailbox="unread" />
+      <MailboxSelectionDropdown onSelect={() => {}} activeMailbox="unread" />,
     )
     const input = container.querySelector('input')
     expect(input.value).toBe('Unread')

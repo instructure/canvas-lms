@@ -62,10 +62,13 @@ export default function MessageStudentsWhoModal({
   }
 
   const submissionMap = useMemo(() => {
-    return submissions.reduce((acc, submission) => {
-      acc[submission.userId] = submission
-      return acc
-    }, {} as Record<string, SubmissionConnection>)
+    return submissions.reduce(
+      (acc, submission) => {
+        acc[submission.userId] = submission
+        return acc
+      },
+      {} as Record<string, SubmissionConnection>,
+    )
   }, [submissions])
 
   const studentsWithSubmissionDetails = useMemo(() => {
@@ -97,7 +100,7 @@ export default function MessageStudentsWhoModal({
         messageArgs.body,
         `course_${assignment.courseId}`,
         messageArgs.mediaFile,
-        messageArgs.attachmentIds
+        messageArgs.attachmentIds,
       )
       if (status === 202) {
         showFlashSuccess(I18n.t('Your message was sent!'))()
@@ -107,7 +110,7 @@ export default function MessageStudentsWhoModal({
       }
     } catch (error) {
       showFlashError(I18n.t('There was a problem sending your message.'))(
-        new Error(I18n.t('%{errorMessage}', {errorMessage}))
+        new Error(I18n.t('%{errorMessage}', {errorMessage})),
       )
     }
   }

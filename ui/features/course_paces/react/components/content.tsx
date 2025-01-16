@@ -133,13 +133,22 @@ export const PaceContent = ({
 
   if (isDraftPace) {
     return (
-      <View as="div" textAlign="center" padding="medium" data-testid="draft-pace-confused-panda-div">
+      <View
+        as="div"
+        textAlign="center"
+        padding="medium"
+        data-testid="draft-pace-confused-panda-div"
+      >
         <Img src={ConfusedPanda} />
         <Heading level="h3" margin="small 0 small 0">
-          {I18n.t('No section or student course will be created until the default Course Pace is published')}
+          {I18n.t(
+            'No section or student course will be created until the default Course Pace is published',
+          )}
         </Heading>
         <Text size="small" wrap="break-word">
-          {I18n.t('Once the default course pace is published, all section and student course paces will be created and can be customized.')}
+          {I18n.t(
+            'Once the default course pace is published, all section and student course paces will be created and can be customized.',
+          )}
         </Text>
       </View>
     )

@@ -19,13 +19,17 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
-import {ReplyInfo} from '../ReplyInfo/ReplyInfo'
 import {responsiveQuerySizes} from '../../utils'
+import {ReplyInfo} from '../ReplyInfo/ReplyInfo'
 
+import ReadIcon from '@canvas/read-icon'
+import UnreadIcon from '@canvas/unread-icon'
+import {assignLocation} from '@canvas/util/globalUtils'
+import {IconButton, ToggleButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {
-  IconBookmarkSolid,
   IconBookmarkLine,
+  IconBookmarkSolid,
   IconCompleteSolid,
   IconDuplicateLine,
   IconEditLine,
@@ -39,12 +43,9 @@ import {
   IconUnlockLine,
   IconUserLine,
 } from '@instructure/ui-icons'
-import {IconButton, ToggleButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
-import ReadIcon from '@canvas/read-icon'
-import UnreadIcon from '@canvas/unread-icon'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -60,7 +61,6 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
         : true
     }
     return !props.discussionTopic?.groupSet
-     
   }, [props.discussionTopic?.groupSet]) // disabling to use safe nav in dependencies
 
   const subscriptionDisabled = props.discussionTopic?.subscriptionDisabledForUser
@@ -125,15 +125,15 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
                         props.isSubscribed
                           ? I18n.t('Unsubscribe')
                           : subscriptionDisabled
-                          ? I18n.t('Reply to subscribe')
-                          : I18n.t('Subscribe')
+                            ? I18n.t('Reply to subscribe')
+                            : I18n.t('Subscribe')
                       }
                       screenReaderLabel={
                         props.isSubscribed
                           ? I18n.t('Subscribed')
                           : subscriptionDisabled
-                          ? I18n.t('Reply to subscribe')
-                          : I18n.t('Unsubscribed')
+                            ? I18n.t('Reply to subscribe')
+                            : I18n.t('Unsubscribed')
                       }
                       interaction={subscriptionDisabled ? 'disabled' : 'enabled'}
                       onClick={props.onToggleSubscription}
@@ -271,9 +271,7 @@ const getMenuConfigs = props => {
         icon: <i className={tool.canvas_icon_class} />,
         label: tool.title,
         selectionCallback: () => {
-          window.location.assign(
-            `${tool.base_url}&discussion_topics%5B%5D=${props.discussionTopicId}`
-          )
+          assignLocation(`${tool.base_url}&discussion_topics%5B%5D=${props.discussionTopicId}`)
         },
       })
     })

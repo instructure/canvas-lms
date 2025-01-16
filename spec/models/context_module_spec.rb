@@ -236,7 +236,6 @@ describe ContextModule do
 
   describe "update_assignment_submissions" do
     before :once do
-      Account.site_admin.enable_feature!(:selective_release_backend)
       course_module
       @student1 = student_in_course(active_all: true, name: "Student 1").user
       @assignment = @course.assignments.create!(title: "some assignment")
@@ -1013,6 +1012,40 @@ describe ContextModule do
       expect(@module.evaluate_for(@user)).to be_completed
     end
 
+    it "updates progression status to started if submitted for a min_percentage" do
+      course_module
+      @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_text_entry", points_possible: 180)
+      @tag = @module.add_item({ id: @assignment.id, type: "assignment" })
+      @module.completion_requirements = { @tag.id => { type: "min_percentage", min_percentage: 50 } }
+      @module.save!
+      @teacher = User.create!(name: "some teacher")
+      @course.enroll_teacher(@teacher)
+      @user = User.create!(name: "some name")
+      @course.enroll_student(@user).accept!
+
+      expect(@module.evaluate_for(@user)).to be_unlocked
+      expect(@assignment.locked_for?(@user)).to be(false)
+
+      @assignment.submit_homework @user, submission_type: "online_text_entry", body: "stuff"
+
+      prog = @module.evaluate_for(@user)
+      expect(prog).to be_started
+      incomplete_req = prog.incomplete_requirements.detect { |r| r[:id] == @tag.id }
+      expect(incomplete_req).to be_present
+      expect(incomplete_req[:score]).to be_nil
+
+      @assignment.grade_student(@user, grade: 40.0, grader: @teacher)
+
+      prog = @module.evaluate_for(@user)
+      expect(prog).to be_started
+      incomplete_req = prog.incomplete_requirements.detect { |r| r[:id] == @tag.id }
+      expect(incomplete_req).to be_present
+      expect(incomplete_req[:score]).to eq 40.0
+
+      @assignment.grade_student(@user, grade: 90.0, grader: @teacher)
+      expect(@module.evaluate_for(@user)).to be_completed
+    end
+
     it "updates progression status on grading and view events" do
       course_module
       @assignment = @course.assignments.create!(title: "some assignment")
@@ -1211,6 +1244,32 @@ describe ContextModule do
       expect(p).to be_completed
     end
 
+    it "marks progression completed for min_percentage on discussion topic assignment" do
+      asmnt = assignment_model(submission_types: "discussion_topic", points_possible: 100)
+      asmnt.ensure_post_policy(post_manually: false)
+      topic = asmnt.discussion_topic
+      @course.offer
+      course_with_student(active_all: true, course: @course)
+      mod = @course.context_modules.create!(name: "some module")
+
+      tag = mod.add_item({ id: topic.id, type: "discussion_topic" })
+      mod.completion_requirements = { tag.id => { type: "min_percentage", min_percentage: 50 } }
+      mod.save!
+
+      p = mod.evaluate_for(@student)
+      expect(p.requirements_met).to be_empty
+      expect(p).to be_unlocked
+
+      topic.discussion_entries.create!(message: "hi", user: @student)
+
+      asmnt.reload.submissions.first
+      asmnt.grade_student(@student, grader: @teacher, score: 50)
+
+      p = mod.evaluate_for(@student)
+      expect(p.requirements_met).to eq [{ type: "min_percentage", min_percentage: 50, id: tag.id }]
+      expect(p).to be_completed
+    end
+
     it "does not fulfill 'must_submit' requirement with 'untaken' quiz submission" do
       course_module
       student_in_course course: @course, active_all: true
@@ -1374,6 +1433,31 @@ describe ContextModule do
       @course.enroll_student(@user).accept!
 
       @quiz.assignment.grade_student(@user, grade: 100, grader: @teacher)
+
+      @progression = @module.evaluate_for(@user)
+      expect(@progression).to be_completed
+    end
+
+    it "updates quiz progression status on assignment manual grading - min_percentage" do
+      course_module
+      @module.require_sequential_progress = true
+      @module.save!
+
+      @quiz = @course.quizzes.build(title: "some quiz", quiz_type: "assignment", scoring_policy: "keep_highest")
+
+      @quiz.workflow_state = "available"
+      @quiz.save!
+      @quiz.update points_possible: 100.0
+
+      @tag = @module.add_item({ id: @quiz.id, type: "quiz" })
+      @module.completion_requirements = { @tag.id => { type: "min_percentage", min_percentage: 90 } }
+      @module.save!
+
+      @teacher = User.create!(name: "some teacher")
+      @course.enroll_teacher(@teacher)
+      @user = User.create!(name: "some name")
+      @course.enroll_student(@user).accept!
+      @quiz.assignment.grade_student(@user, grade: 92, grader: @teacher)
 
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_completed
@@ -1876,8 +1960,7 @@ describe ContextModule do
     expect(m.grants_right?(@teacher, :manage_course_content_delete)).to be false
   end
 
-  it "only loads visibility and progression information once when calculating prerequisites with selective_release_backend on" do
-    Account.site_admin.enable_feature!(:selective_release_backend)
+  it "only loads visibility and progression information once when calculating prerequisites" do
     course_factory(active_all: true)
     student_in_course(course: @course)
     m1 = @course.context_modules.create!(name: "m1")
@@ -1891,26 +1974,6 @@ describe ContextModule do
     end
 
     expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
-    expect(ContextModuleProgressions::Finder).to receive(:find_or_create_for_context_and_user).once.and_call_original
-
-    m2.evaluate_for(@student)
-  end
-
-  it "only loads visibility and progression information once when calculating prerequisites" do
-    Account.site_admin.disable_feature!(:selective_release_backend)
-    course_factory(active_all: true)
-    student_in_course(course: @course)
-    m1 = @course.context_modules.create!(name: "m1")
-    m2 = @course.context_modules.create!(name: "m2", prerequisites: [{ id: m1.id, type: "context_module", name: m1.name }])
-
-    [m1, m2].each do |m|
-      assmt = @course.assignments.create!(title: "assmt", submission_types: "online_text_entry")
-      assmt.submit_homework(@student, body: "bloop")
-      tag = m.add_item({ id: assmt.id, type: "assignment" })
-      m.update_attribute(:completion_requirements, { tag.id => { type: "must_submit" } })
-    end
-
-    expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
     expect(ContextModuleProgressions::Finder).to receive(:find_or_create_for_context_and_user).once.and_call_original
 
     m2.evaluate_for(@student)

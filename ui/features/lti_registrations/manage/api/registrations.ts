@@ -73,8 +73,8 @@ export const fetchRegistrations: FetchRegistrations = options =>
           page: options.page.toString(),
           per_page: options.limit.toString(),
         }),
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   )
 
 export type FetchThirdPartyToolConfiguration = (
@@ -85,7 +85,7 @@ export type FetchThirdPartyToolConfiguration = (
     | {
         lti_configuration: unknown
       },
-  accountId: AccountId
+  accountId: AccountId,
 ) => Promise<ApiResult<InternalLtiConfiguration>>
 
 // POST
@@ -95,12 +95,12 @@ export type FetchThirdPartyToolConfiguration = (
 
 export const fetchThirdPartyToolConfiguration: FetchThirdPartyToolConfiguration = (
   config,
-  accountId
+  accountId,
 ) =>
   parseFetchResult(
     z.object({
       configuration: ZInternalLtiConfiguration,
-    })
+    }),
   )(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/configuration/validate`, {
       method: 'POST',
@@ -110,12 +110,12 @@ export const fetchThirdPartyToolConfiguration: FetchThirdPartyToolConfiguration 
         },
       }),
       body: JSON.stringify(config),
-    })
+    }),
   ).then(result => mapApiResult(result, r => r.configuration))
 
 export type DeleteRegistration = (
   accountId: AccountId,
-  id: LtiRegistrationId
+  id: LtiRegistrationId,
 ) => Promise<ApiResult<unknown>>
 
 /**
@@ -129,7 +129,7 @@ export const deleteRegistration: DeleteRegistration = (accountId, registrationId
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
       ...defaultFetchOptions(),
       method: 'DELETE',
-    })
+    }),
   )
 
 export type CreateRegistration = (
@@ -137,7 +137,7 @@ export type CreateRegistration = (
   internalConfig: InternalLtiConfiguration,
   overlay?: LtiConfigurationOverlay,
   unifiedToolId?: string,
-  adminNickname?: string
+  adminNickname?: string,
 ) => Promise<ApiResult<unknown>>
 
 /**
@@ -153,7 +153,7 @@ export const createRegistration: CreateRegistration = (
   internalConfig,
   overlay,
   unifiedToolId,
-  adminNickname
+  adminNickname,
 ) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations`, {
@@ -170,7 +170,7 @@ export const createRegistration: CreateRegistration = (
         unified_tool_id: unifiedToolId,
         workflow_state: 'on',
       }),
-    })
+    }),
   )
 
 export type UpdateRegistration = (
@@ -178,7 +178,7 @@ export type UpdateRegistration = (
   registrationId: LtiRegistrationId,
   internalConfig: InternalLtiConfiguration,
   overlay?: LtiConfigurationOverlay,
-  adminNickname?: string
+  adminNickname?: string,
 ) => Promise<ApiResult<unknown>>
 
 /**
@@ -195,7 +195,7 @@ export const updateRegistration: UpdateRegistration = (
   registrationId,
   internalConfig,
   overlay,
-  adminNickname
+  adminNickname,
 ) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
@@ -210,20 +210,20 @@ export const updateRegistration: UpdateRegistration = (
         overlay,
         admin_nickname: adminNickname,
       }),
-    })
+    }),
   )
 
 export const fetchRegistrationByClientId = (accountId: AccountId, clientId: DeveloperKeyId) =>
   parseFetchResult(ZLtiRegistrationWithConfiguration)(
     fetch(`/api/v1/accounts/${accountId}/lti_registration_by_client_id/${clientId}`, {
       ...defaultFetchOptions(),
-    })
+    }),
   )
 
 export const setGlobalLtiRegistrationWorkflowState = (
   accountId: AccountId,
   ltiRegistrationId: LtiRegistrationId,
-  workflowState: 'on' | 'off'
+  workflowState: 'on' | 'off',
 ) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/bind`, {
@@ -236,22 +236,22 @@ export const setGlobalLtiRegistrationWorkflowState = (
       body: JSON.stringify({
         workflow_state: workflowState,
       }),
-    })
+    }),
   )
 
 export const bindGlobalLtiRegistration = (
   accountId: AccountId,
-  ltiRegistrationId: LtiRegistrationId
+  ltiRegistrationId: LtiRegistrationId,
 ) => setGlobalLtiRegistrationWorkflowState(accountId, ltiRegistrationId, 'on')
 
 export const unbindGlobalLtiRegistration = (
   accountId: AccountId,
-  ltiRegistrationId: LtiRegistrationId
+  ltiRegistrationId: LtiRegistrationId,
 ) => setGlobalLtiRegistrationWorkflowState(accountId, ltiRegistrationId, 'off')
 
 export type FetchLtiRegistration = (
   accountId: AccountId,
-  registrationId: LtiRegistrationId
+  registrationId: LtiRegistrationId,
 ) => Promise<ApiResult<LtiRegistrationWithConfiguration>>
 
 /**
@@ -261,7 +261,7 @@ export type FetchLtiRegistration = (
 export const fetchLtiRegistration: FetchLtiRegistration = (
   accountId,
   ltiRegistrationId,
-  includes: Array<'overlay' | 'overlay_history'> = ['overlay', 'overlay_history']
+  includes: Array<'overlay' | 'overlay_history'> = ['overlay', 'overlay_history'],
 ) =>
   parseFetchResult(ZLtiRegistrationWithConfiguration)(
     fetch(
@@ -270,6 +270,6 @@ export const fetchLtiRegistration: FetchLtiRegistration = (
         .join('&')}`,
       {
         ...defaultFetchOptions(),
-      }
-    )
+      },
+    ),
   )

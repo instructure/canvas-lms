@@ -52,6 +52,9 @@ type CommonMigratorControlsProps = {
   SubmittingLabel: ComponentType
   CancelLabel: ComponentType
 }
+const nqCheckboxId = 'existing_quizzes_as_new_quizzes'
+const overwriteAssesmentCheckboxId = 'overwrite_assessment_content'
+const adjustDatesCheckboxId = 'adjust_dates[enabled]'
 
 const generateNewQuizzesLabel = () => {
   const isConvertQuizzes = ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS
@@ -62,7 +65,7 @@ const generateNewQuizzesLabel = () => {
   const headingText = isConvertQuizzes ? I18n.t('Convert Quizzes') : I18n.t('New Quizzes')
   const bodyText = isConvertQuizzes
     ? I18n.t(
-        'Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.'
+        'Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.',
       )
     : I18n.t('New Quizzes is the new assessment engine for Canvas.')
   const helpText = I18n.t('To learn more, please contact your system administrator or visit ')
@@ -106,7 +109,7 @@ const generateOverwriteLabel = () => (
         body={
           <Text>
             {I18n.t(
-              'Some systems recycle their IDs for each new export. As a result, if you export two separate question banks they will have the same IDs. To prevent losing assessment data we treat these objects as different despite the IDs. Choosing this option will disable this safety feature and allow assessment data to overwrite existing data with the same IDs.'
+              'Some systems recycle their IDs for each new export. As a result, if you export two separate question banks they will have the same IDs. To prevent losing assessment data we treat these objects as different despite the IDs. Choosing this option will disable this safety feature and allow assessment data to overwrite existing data with the same IDs.',
             )}
           </Text>
         }
@@ -137,7 +140,9 @@ export const CommonMigratorControls = ({
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(false)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
-  const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(false)
+  const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(
+    !!ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
+  )
   const [overwriteAssessmentContent, setOverwriteAssessmentContent] = useState<boolean>(false)
   const [showAdjustDates, setShowAdjustDates] = useState<boolean>(false)
   const [dateAdjustmentConfig, setDateAdjustmentConfig] = useState<DateAdjustmentConfig>({
@@ -174,7 +179,7 @@ export const CommonMigratorControls = ({
       setImportAsNewQuizzes(target.checked)
       setIsQuestionBankDisabled?.(target.checked)
     },
-    [setImportAsNewQuizzes, setIsQuestionBankDisabled]
+    [setImportAsNewQuizzes, setIsQuestionBankDisabled],
   )
 
   const handleSubmit = useCallback(() => {
@@ -204,16 +209,23 @@ export const CommonMigratorControls = ({
     onSubmit,
   ])
 
+  const defaultChecks = []
+
+  if (ENV.NEW_QUIZZES_MIGRATION_DEFAULT) {
+    defaultChecks.push('existing_quizzes_as_new_quizzes')
+  }
+
   const options = [
     ...(canImportAsNewQuizzes
       ? [
           <Checkbox
-            key="existing_quizzes_as_new_quizzes"
-            name="existing_quizzes_as_new_quizzes"
-            value="existing_quizzes_as_new_quizzes"
+            key={nqCheckboxId}
+            name={nqCheckboxId}
+            value={nqCheckboxId}
             label={generateNewQuizzesLabel()}
-            disabled={!ENV.QUIZZES_NEXT_ENABLED || isSubmitting}
-            defaultChecked={!!ENV.NEW_QUIZZES_MIGRATION_DEFAULT}
+            disabled={
+              !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED || isSubmitting
+            }
             onChange={onCanImportAsNewQuizzesChange}
           />,
         ]
@@ -221,9 +233,9 @@ export const CommonMigratorControls = ({
     ...(canOverwriteAssessmentContent
       ? [
           <Checkbox
-            key="overwrite_assessment_content"
-            name="overwrite_assessment_content"
-            value="overwrite_assessment_content"
+            key={overwriteAssesmentCheckboxId}
+            name={overwriteAssesmentCheckboxId}
+            value={overwriteAssesmentCheckboxId}
             disabled={isSubmitting}
             label={generateOverwriteLabel()}
             onChange={e => setOverwriteAssessmentContent(e.target.checked)}
@@ -233,9 +245,9 @@ export const CommonMigratorControls = ({
     ...(canAdjustDates
       ? [
           <Checkbox
-            key="adjust_dates[enabled]"
-            name="adjust_dates[enabled]"
-            value="adjust_dates[enabled]"
+            key={adjustDatesCheckboxId}
+            name={adjustDatesCheckboxId}
+            value={adjustDatesCheckboxId}
             disabled={isSubmitting}
             label={I18n.t('Adjust events and due dates')}
             onChange={({target}) => {
@@ -258,7 +270,7 @@ export const CommonMigratorControls = ({
       <View as="div" margin="x-small 0 0 0">
         <Text size="small" color="primary">
           {I18n.t(
-            'Note the following content types will be imported: Course Settings, Syllabus Body, Modules, Assignments, Quizzes, Question Banks, Discussion Topics, Pages, Announcements, Rubrics, Files, and Calendar Events.'
+            'Note the following content types will be imported: Course Settings, Syllabus Body, Modules, Assignments, Quizzes, Question Banks, Discussion Topics, Pages, Announcements, Rubrics, Files, and Calendar Events.',
           )}
         </Text>
       </View>
@@ -332,6 +344,7 @@ export const CommonMigratorControls = ({
             name={I18n.t('Options')}
             layout="stacked"
             description={I18n.t('Options')}
+            defaultValue={defaultChecks}
           >
             {options}
           </CheckboxGroup>

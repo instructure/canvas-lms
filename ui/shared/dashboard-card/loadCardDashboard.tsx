@@ -31,7 +31,7 @@ const I18n = createI18nScope('load_card_dashboard')
 export function createDashboardCards(
   dashboardCards: Card[],
   cardComponent = DashboardCard,
-  extraProps: any
+  extraProps: any,
 ) {
   const Box = getDroppableDashboardCardBox()
 
@@ -59,17 +59,17 @@ export class CardDashboardLoader {
 
   renderIntoDOM = (dashboardCards: Card[]) => {
     const dashboardContainer = document.getElementById('DashboardCard_Container')
-     
+
     ReactDOM.render(
       createDashboardCards(dashboardCards, DashboardCard, {observedUserId: this.observedUserId}),
-      dashboardContainer
+      dashboardContainer,
     )
   }
 
   async loadCardDashboard(
     renderFn = this.renderIntoDOM,
     observedUserId: string,
-    preloadedCards?: Card[] | null
+    preloadedCards?: Card[] | null,
   ) {
     if (observedUserId) {
       this.observedUserId = observedUserId

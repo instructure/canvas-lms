@@ -19,15 +19,14 @@
 import Subject from '../page_focused'
 import K from '../../constants'
 import $ from 'jquery'
-import sinon from 'sinon'
 
-const capture = sinon.spy()
+const capture = jest.fn()
 const tracker = new Subject()
 tracker.install(capture)
 
 describe('Quizzes::LogAuditing::EventTrackers::PageFocused', () => {
   afterEach(() => {
-    sinon.restore()
+    jest.clearAllMocks()
   })
 
   it.skip('#constructor: it sets up the proper context', () => {
@@ -38,7 +37,7 @@ describe('Quizzes::LogAuditing::EventTrackers::PageFocused', () => {
   it.skip('capturing: it works', () => {
     $(window).focus()
     // it captures page focus
-    expect(capture.called).toBeTruthy()
+    expect(capture).toHaveBeenCalled()
   })
 
   it.skip('capturing: it throttles captures', () => {
@@ -48,6 +47,6 @@ describe('Quizzes::LogAuditing::EventTrackers::PageFocused', () => {
     $(window).blur()
     $(window).focus()
     // it ignores rapidly repetitive focuses
-    expect(capture.callCount).toEqual(1)
+    expect(capture).toHaveBeenCalledTimes(1)
   })
 })

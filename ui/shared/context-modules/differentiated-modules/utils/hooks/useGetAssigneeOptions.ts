@@ -97,14 +97,14 @@ export const useGetAssigneeOptions = ({
         }),
         ...defaultOptions,
       ],
-      'id'
+      'id',
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sectionsParsedResult, groupsParsedResult, studentsParsedResult])
 
   const isLoading = useMemo(
     () => isSectionsLoading || isStudentsLoading || isGroupsLoading,
-    [isSectionsLoading, isStudentsLoading, isGroupsLoading]
+    [isSectionsLoading, isStudentsLoading, isGroupsLoading],
   )
 
   return {

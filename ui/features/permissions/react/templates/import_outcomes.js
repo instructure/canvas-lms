@@ -35,5 +35,5 @@ export const template = generateActionTemplates(
       description: I18n.t('Allows user to import course learning outcomes.'),
     },
   ],
-  []
+  [],
 )

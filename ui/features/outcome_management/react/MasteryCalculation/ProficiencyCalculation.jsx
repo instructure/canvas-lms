@@ -206,7 +206,7 @@ const Form = ({
   >
     <ScreenReaderContent>
       {I18n.t(
-        'See example below to see how different calculation parameters affect student mastery calculation.'
+        'See example below to see how different calculation parameters affect student mastery calculation.',
       )}
     </ScreenReaderContent>
     <SimpleSelect
@@ -267,7 +267,7 @@ const getModalText = contextType => {
     return I18n.t('This will update all student mastery results within this course.')
   }
   return I18n.t(
-    'This will update all student mastery results tied to the account level mastery calculation.'
+    'This will update all student mastery results tied to the account level mastery calculation.',
   )
 }
 
@@ -412,8 +412,8 @@ const ProficiencyCalculation = ({
             individualOutcomeDisplay
               ? 'none'
               : individualOutcomeEdit
-              ? 'none medium none none'
-              : 'small'
+                ? 'none medium none none'
+                : 'small'
           }
         >
           {canManage ? (

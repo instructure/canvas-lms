@@ -26,9 +26,9 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Analytics Hub'),
       description: I18n.t(
-        'Allows user to open Analytics Hub, the central library of all things Data, Analytics and Insights.'
+        'Allows user to open Analytics Hub, the central library of all things Data, Analytics and Insights.',
       ),
     },
   ],
-  []
+  [],
 )

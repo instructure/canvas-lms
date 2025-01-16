@@ -49,7 +49,7 @@ export const useAccountDefaultGradingScheme = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

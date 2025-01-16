@@ -50,7 +50,7 @@ class DeveloperKeyActionButtons extends React.Component {
       heading: keyName ? I18n.t('You are about to delete “%{keyName}”.', {keyName}) : undefined,
       message: isLtiKey
         ? I18n.t(
-            'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.'
+            'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.',
           )
         : I18n.t('Are you sure you want to delete this developer key?'),
       confirmButtonLabel: I18n.t('Delete'),

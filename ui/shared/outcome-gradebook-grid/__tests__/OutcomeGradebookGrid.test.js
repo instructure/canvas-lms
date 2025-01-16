@@ -43,7 +43,7 @@ describe('OutcomeGradebookGrid', () => {
       scores: [{score: '3', hide_points: true, links: {outcome: '2'}}],
     }
     expect(
-      isEqual(Grid.Util._toRow([rollup], null).outcome_2, {score: '3', hide_points: true})
+      isEqual(Grid.Util._toRow([rollup], null).outcome_2, {score: '3', hide_points: true}),
     ).toBe(true)
   })
 

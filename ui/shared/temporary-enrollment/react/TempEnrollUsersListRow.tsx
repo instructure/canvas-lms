@@ -121,17 +121,17 @@ export default function TempEnrollUsersListRow(props: Props) {
       success: setEnrollmentState,
       error: useCallback(
         () => showFlashError(I18n.t('Failed to fetch temporary enrollment data')),
-        []
+        [],
       ),
     },
-    [props.user.id]
+    [props.user.id],
   )
 
   function renderTempEnrollModal(
     enrollmentType: EnrollmentType,
     icon: JSX.Element,
     editModeStatus: boolean,
-    toggleOrSetEditModeFunction: () => boolean | void
+    toggleOrSetEditModeFunction: () => boolean | void,
   ): JSX.Element {
     const tooltipText = generateTooltipText(enrollmentType, props.user.name)
     const tooltipJsx = (

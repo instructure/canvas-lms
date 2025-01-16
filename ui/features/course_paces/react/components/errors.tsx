@@ -30,11 +30,11 @@ const I18n = createI18nScope('course_paces_errors')
 
 type StoreProps = {
   errors: CategoryErrors
-  responsiveSize: ResponsiveSizes
+  responsiveSize?: ResponsiveSizes
 }
 
 type DispatchProps = {
-  syncUnpublishedChanges: typeof coursePaceActions.syncUnpublishedChanges
+  syncUnpublishedChanges?: typeof coursePaceActions.syncUnpublishedChanges
 }
 
 export type ErrorsProps = StoreProps & DispatchProps
@@ -76,7 +76,7 @@ export const Errors = ({errors, responsiveSize, syncUnpublishedChanges}: ErrorsP
         break
       case 'resetToLastPublished':
         result.contents = result.summary = I18n.t(
-          'There was an error resetting to the previous pace.'
+          'There was an error resetting to the previous pace.',
         )
         break
       case 'loading':
@@ -90,7 +90,7 @@ export const Errors = ({errors, responsiveSize, syncUnpublishedChanges}: ErrorsP
         break
       case 'checkPublishStatus':
         result.contents = result.summary = I18n.t(
-          'There was an error checking pace publishing status.'
+          'There was an error checking pace publishing status.',
         )
         break
       default:

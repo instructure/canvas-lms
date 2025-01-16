@@ -105,7 +105,7 @@ it('renders Quiz correctly with everything', () => {
         points: 4,
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -119,7 +119,7 @@ it('renders Quiz correctly with just points', () => {
         title: 'I am a Quiz',
         points: 2,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -132,7 +132,7 @@ it('renders Quiz correctly without right side content', () => {
         completed: false,
         title: 'I am a Quiz',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -146,7 +146,7 @@ it('renders Quiz correctly with just date', () => {
         title: 'I am a Quiz',
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -162,7 +162,7 @@ it('renders Assignment correctly with everything', () => {
         html_url: 'http://www.non_default_url.com',
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -176,7 +176,7 @@ it('renders Assignment correctly with just points', () => {
         title: 'I am an Assignment',
         points: 2,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -189,7 +189,7 @@ it('renders Assignment correctly without right side content', () => {
         completed: false,
         title: 'I am an Assignment',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -203,7 +203,7 @@ it('renders Assignment correctly with just date', () => {
         title: 'I am an Assignment',
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -219,7 +219,7 @@ it('renders Discussion Checkpoint correctly with everything', () => {
         html_url: 'http://www.non_default_url.com',
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -233,7 +233,7 @@ it('renders Discussion Checkpoint correctly with just points', () => {
         title: 'I am a Discussion Checkpoint',
         points: 2,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -246,7 +246,7 @@ it('renders Discussion Checkpoint correctly without right side content', () => {
         completed: false,
         title: 'I am a Discussion Checkpoint',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -260,7 +260,7 @@ it('renders Discussion Checkpoint correctly with just date', () => {
         title: 'I am a Discussion Checkpoint',
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -272,7 +272,7 @@ it('renders assignment peer reviews correctly', () => {
         associated_item: 'Peer Review',
         title: 'some reviewable assignment',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -287,7 +287,7 @@ it('renders Discussion correctly with everything', () => {
         points: 4,
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -301,7 +301,7 @@ it('renders Discussion correctly with just points', () => {
         title: 'I am a Discussion',
         points: 2,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -314,7 +314,7 @@ it('renders Discussion correctly without right side content', () => {
         completed: false,
         title: 'I am a Discussion',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -328,7 +328,7 @@ it('renders Discussion correctly with just date', () => {
         title: 'I am a Discussion',
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -343,7 +343,7 @@ it('renders Announcement correctly with everything', () => {
         points: 4,
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -357,7 +357,7 @@ it('renders Announcement correctly with just points', () => {
         title: 'I am an Announcement',
         points: 2,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -370,7 +370,7 @@ it('renders Announcement correctly without right side content', () => {
         completed: false,
         title: 'I am an Announcement',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -384,7 +384,7 @@ it('renders Announcement correctly with just date', () => {
         title: 'I am an Announcement',
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -400,7 +400,7 @@ it('renders Calendar Event correctly with everything', () => {
         date: DEFAULT_DATE,
         dateStyle: 'due',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -414,7 +414,7 @@ it('renders Calendar Event correctly without right side content', () => {
         title: 'I am a Calendar Event',
         dateStyle: 'due',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -429,7 +429,7 @@ it('renders Calendar Event correctly with just date', () => {
         date: DEFAULT_DATE,
         dateStyle: 'due',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -445,7 +445,7 @@ it('renders Calendar Event correctly with start and end time', () => {
         endTime: DEFAULT_DATE.clone().add(2, 'hours'),
         dateStyle: 'due',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -460,7 +460,7 @@ it('renders Calendar Event correctly with an all day date', () => {
         date: DEFAULT_DATE,
         allDay: true,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -475,7 +475,7 @@ it('renders Page correctly with everything', () => {
         points: 4,
         date: DEFAULT_DATE,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -489,7 +489,7 @@ it('renders Page correctly with just points', () => {
         title: 'I am a Page',
         points: 2,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -502,7 +502,7 @@ it('renders Page correctly without right side content', () => {
         completed: false,
         title: 'I am a Page',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -530,7 +530,7 @@ it('renders Note correctly with everything', () => {
         date: DEFAULT_DATE,
         courseName: 'Math 101',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -543,7 +543,7 @@ it('renders Note correctly without Course', () => {
         completed: false,
         title: 'I am a Note',
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -558,7 +558,7 @@ it('renders user-created Todo correctly', () => {
         courseName: 'To Do',
         color: null,
       })}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -575,7 +575,7 @@ it('displays Pills when given them', () => {
       onClick={() => {}}
       itemCount={3}
       badges={[{id: 'new_grades', text: 'Graded'}]}
-    />
+    />,
   )
 
   expect(wrapper.find('Pill')).toHaveLength(1)
@@ -584,7 +584,7 @@ it('displays Pills when given them', () => {
 it('calls toggleCompletion when the checkbox is clicked', () => {
   const mock = jest.fn()
   const wrapper = shallow(
-    <PlannerItem {...defaultProps({points: 35, date: DEFAULT_DATE})} toggleCompletion={mock} />
+    <PlannerItem {...defaultProps({points: 35, date: DEFAULT_DATE})} toggleCompletion={mock} />,
   )
   wrapper.find('Checkbox').simulate('change')
   expect(mock).toHaveBeenCalled()
@@ -597,7 +597,7 @@ it('disables the checkbox when toggleAPIPending is true', () => {
       {...defaultProps({points: 35, date: DEFAULT_DATE})}
       toggleAPIPending={true}
       toggleCompletion={mock}
-    />
+    />,
   )
   wrapper.find('Checkbox').simulate('change')
   expect(wrapper.find('Checkbox').prop('disabled')).toBe(true)
@@ -616,7 +616,7 @@ it('registers itself as animatable', () => {
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
       ref={ref}
-    />
+    />,
   )
   expect(fakeRegister).toHaveBeenCalledWith('item', ref.current, 42, ['first'])
 
@@ -629,7 +629,7 @@ it('registers itself as animatable', () => {
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
       ref={ref}
-    />
+    />,
   )
   expect(fakeDeregister).toHaveBeenCalledWith('item', ref.current, ['first'])
   expect(fakeRegister).toHaveBeenCalledWith('item', ref.current, 42, ['second'])
@@ -668,7 +668,7 @@ it('does not render html tags in feedback', () => {
   })
   const {getByTestId} = render(<PlannerItem {...props} />)
   expect(getByTestId('feedback-comment').textContent).toBe(
-    'Death will not be the end of your suffering.'
+    'Death will not be the end of your suffering.',
   )
 })
 
@@ -751,7 +751,7 @@ describe('with isObserving', () => {
           title: 'I am a to do',
         })}
         isObserving={true}
-      />
+      />,
     )
     expect(wrapper.find('[data-testid="edit-event-button"]').exists()).toBeFalsy()
   })
@@ -769,7 +769,7 @@ it('shows the "Join" button for zoom calendar events', () => {
         dateStyle: 'due',
         onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
       })}
-    />
+    />,
   )
   expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
 })
@@ -786,7 +786,7 @@ describe('with simplifiedControls', () => {
 
   it('does not render the details sub-heading', () => {
     const wrapper = shallow(<PlannerItem {...props} />)
-    expect(wrapper.find('.PlannerItem-styles__type').length).toBe(0)
+    expect(wrapper.find('.PlannerItem-styles__type')).toHaveLength(0)
   })
 
   it('does not render the item type icon in course color', () => {
@@ -809,7 +809,7 @@ describe('with simplifiedControls', () => {
               dateStyle: 'due',
               onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
-          />
+          />,
         )
         expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
       })
@@ -827,7 +827,7 @@ describe('with simplifiedControls', () => {
               dateStyle: 'due',
               onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
-          />
+          />,
         )
         expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
       })
@@ -846,7 +846,7 @@ describe('with simplifiedControls', () => {
               dateStyle: 'due',
               onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
-          />
+          />,
         )
         expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
       })
@@ -878,7 +878,7 @@ describe('with simplifiedControls', () => {
               dateStyle: 'due',
               onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
-          />
+          />,
         )
         expect(wrapper.find('[data-testid="join-button-hot"]').exists()).toBeTruthy()
       })
@@ -897,7 +897,7 @@ describe('with simplifiedControls', () => {
               dateStyle: 'due',
               onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
-          />
+          />,
         )
         expect(wrapper.find('[data-testid="join-button-hot"]').exists()).toBeTruthy()
       })
@@ -916,7 +916,7 @@ describe('with simplifiedControls', () => {
               dateStyle: 'due',
               onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
-          />
+          />,
         )
         expect(wrapper.find('[data-testid="join-button-hot"]').exists()).toBeTruthy()
       })
@@ -950,6 +950,6 @@ describe('with isMissingItem', () => {
   it('still renders even when there is no date', () => {
     const wrapper = shallow(<PlannerItem {...props} date={null} />)
     const dateText = wrapper.find('.PlannerItem-styles__due PresentationContent')
-    expect(dateText.children().length).toEqual(0)
+    expect(dateText.children()).toHaveLength(0)
   })
 })

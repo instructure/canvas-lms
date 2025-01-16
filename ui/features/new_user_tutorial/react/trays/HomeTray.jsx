@@ -39,7 +39,7 @@ const HomeTray = () => (
       },
       {
         label: I18n.t(
-          'What layout options are available in the Course Home Page as an instructor?'
+          'What layout options are available in the Course Home Page as an instructor?',
         ),
         href: I18n.t('#community.instructor_homepage_layout_options'),
       },

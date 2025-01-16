@@ -19,7 +19,6 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import LockCheckList from '../LockCheckList'
-import sinon from 'sinon'
 
 const ok = value => expect(value).toBeTruthy()
 const equal = (value, expected) => expect(value).toEqual(expected)
@@ -53,7 +52,7 @@ describe('LockCheckList component', () => {
 
   test('selecting checkbox calls onChange', done => {
     const props = defaultProps()
-    props.onChange = sinon.spy()
+    props.onChange = jest.fn()
     const tree = enzyme.shallow(<LockCheckList {...props} />)
     const checkbox = tree.find('.bcs_check_box-group Checkbox')
     checkbox.at(0).simulate('change', {
@@ -62,15 +61,13 @@ describe('LockCheckList component', () => {
       },
     })
     setTimeout(() => {
-      equal(props.onChange.callCount, 1)
-      deepEqual(props.onChange.firstCall.args, [
-        {
-          content: true,
-          points: false,
-          due_dates: false,
-          availability_dates: false,
-        },
-      ])
+      expect(props.onChange).toHaveBeenCalledTimes(1)
+      expect(props.onChange).toHaveBeenCalledWith({
+        content: true,
+        points: false,
+        due_dates: false,
+        availability_dates: false,
+      })
       done()
     }, 0)
   })

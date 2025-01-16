@@ -26,12 +26,15 @@ import moment from 'moment-timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
-// @ts-ignore
 import tz from 'timezone'
-// @ts-ignore
 import chicago from 'timezone/America/Chicago'
-// @ts-ignore
 import detroit from 'timezone/America/Detroit'
+
+declare module 'timezone' {
+  interface Timezone {
+    (timezoneData: unknown, ...args: string[]): string
+  }
+}
 
 const dateAdjustments: DateAdjustmentConfig = {
   adjust_dates: {
@@ -71,7 +74,7 @@ describe('DateAdjustment', () => {
       <DateAdjustments
         dateAdjustmentConfig={dateAdjustments}
         setDateAdjustments={setDateAdjustments}
-      />
+      />,
     )
     expect(screen.getByLabelText('Select new beginning date').closest('input')?.value).toBe('')
     expect(screen.getByLabelText('Select new end date').closest('input')?.value).toBe('')
@@ -82,7 +85,7 @@ describe('DateAdjustment', () => {
       <DateAdjustments
         dateAdjustmentConfig={dateAdjustments}
         setDateAdjustments={setDateAdjustments}
-      />
+      />,
     )
     expect(screen.getByRole('radio', {name: 'Shift dates', hidden: false})).toBeInTheDocument()
     expect(screen.getByRole('radio', {name: 'Remove dates', hidden: false})).toBeInTheDocument()
@@ -90,7 +93,7 @@ describe('DateAdjustment', () => {
 
   describe('Date fill in on initial data', () => {
     const dateObject = '2024-08-08T08:00:00+00:00'
-    const expectedDate = 'Aug 8 at 8am'
+    const expectedDate = 'Aug 8, 2024 at 8am'
     const getComponent = (dateShiftOptionVariant: Partial<DateShifts>) => {
       return (
         <DateAdjustments
@@ -136,7 +139,7 @@ describe('DateAdjustment', () => {
       <DateAdjustments
         dateAdjustmentConfig={dateAdjustments}
         setDateAdjustments={setDateAdjustments}
-      />
+      />,
     )
     await userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
     expect(screen.getByLabelText('Select original beginning date')).toBeInTheDocument()
@@ -155,7 +158,7 @@ describe('DateAdjustment', () => {
       <DateAdjustments
         dateAdjustmentConfig={dateAdjustments}
         setDateAdjustments={setDateAdjustments}
-      />
+      />,
     )
     await userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
     await userEvent.click(screen.getByRole('button', {name: 'Add substitution', hidden: false}))
@@ -167,7 +170,7 @@ describe('DateAdjustment', () => {
       <DateAdjustments
         dateAdjustmentConfig={dateAdjustmentsWithSub}
         setDateAdjustments={setDateAdjustments}
-      />
+      />,
     )
     await userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
     const remove_sub_button = screen.getByRole('button', {
@@ -195,7 +198,7 @@ describe('DateAdjustment', () => {
       const messages = timeZonedFormMessages(
         'America/Detroit',
         'America/Chicago',
-        '2024-11-08T08:00:00+00:00'
+        '2024-11-08T08:00:00+00:00',
       )
 
       render(
@@ -205,11 +208,11 @@ describe('DateAdjustment', () => {
           formatDate={jest.fn(date => date.toISOString())}
           interaction="enabled"
           messages={messages}
-        />
+        />,
       )
 
-      expect(screen.queryByText('Local: Nov 8 at 2am')).toBeInTheDocument()
-      expect(screen.queryByText('Course: Nov 8 at 3am')).toBeInTheDocument()
+      expect(screen.queryByText('Local: Nov 8, 2024 at 2am')).toBeInTheDocument()
+      expect(screen.queryByText('Course: Nov 8, 2024 at 3am')).toBeInTheDocument()
     })
   })
 })

@@ -129,7 +129,7 @@ actions.getLTICollaborators = (context, contextId) => {
   return dispatch => {
     dispatch(actions.listLTICollaborationsStart())
     $.getJSON(
-      `/api/v1/${context}/${contextId}/external_tools?placement=collaboration&include_parents=true`
+      `/api/v1/${context}/${contextId}/external_tools?placement=collaboration&include_parents=true`,
     )
       .success(tools => {
         dispatch(actions.listLTICollaborationsSuccessful(tools))
@@ -170,7 +170,7 @@ actions.createCollaboration = (context, contextId, contentItems, tool_id) => {
           headers: {
             Accept: 'application/json',
           },
-        }
+        },
       )
       .then(({data}) => {
         dispatch(actions.createCollaborationSuccessful(data))
@@ -197,7 +197,7 @@ actions.updateCollaboration = (context, contextId, contentItems, tool_id, collab
           headers: {
             Accept: 'application/json',
           },
-        }
+        },
       )
       .then(({collaboration}) => {
         page(`/${context}/${contextId}/lti_collaborations`)

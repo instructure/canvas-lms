@@ -32,7 +32,7 @@ describe('resizeHelpers', () => {
       expect(changeSizeVariant(elem, 'pixel')).toEqual({width: 100, height: 100})
     })
 
-    it('returns the current size of the element as a percentage of the parent if the new size variant is percent', () => {
+    it('returns the current width of the element as a percentage of the parent if the new size variant is percent', () => {
       const parent = {
         clientWidth: 200,
         clientHeight: 200,
@@ -40,23 +40,23 @@ describe('resizeHelpers', () => {
       const elem = {} as HTMLElement
       // @ts-expect-error
       elem.offsetParent = parent
-      elem.getBoundingClientRect = jest.fn().mockReturnValue({width: 100, height: 100})
+      elem.getBoundingClientRect = jest.fn().mockReturnValue({width: 100, height: 120})
 
-      expect(changeSizeVariant(elem, 'percent')).toEqual({width: 50, height: 50})
+      expect(changeSizeVariant(elem, 'percent')).toEqual({width: 50, height: 120})
     })
   })
 
   describe('percentSize', () => {
     it('returns the percentage of the parent width and height that the element occupies', () => {
-      expect(percentSize(200, 200, 100, 100)).toEqual({width: 50, height: 50})
+      expect(percentSize(200, 100)).toEqual(50)
     })
 
     it('returns 100% if the element is within 7px of the parent width', () => {
-      expect(percentSize(200, 200, 193, 100)).toEqual({width: 100, height: 50})
+      expect(percentSize(200, 193)).toEqual(100)
     })
 
     it('returns 100% if the element is within 7px of the parent height', () => {
-      expect(percentSize(200, 200, 100, 193)).toEqual({width: 50, height: 100})
+      expect(percentSize(200, 100)).toEqual(50)
     })
   })
 })

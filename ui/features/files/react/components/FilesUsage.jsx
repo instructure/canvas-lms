@@ -36,22 +36,35 @@ FilesUsage.render = function () {
       bytesAvailable: friendlyBytes(this.state.quota),
     })
     return (
-      <div className="grid-row ef-quota-usage">
+      <div className="grid-row ef-quota-usage" data-testid="files-usage">
         <div className="col-xs-3">
-          <div ref="container" className="progress-bar__bar-container" aria-hidden={true}>
+          <div
+            ref="container"
+            className="progress-bar__bar-container"
+            aria-hidden={true}
+            data-testid="progress-container"
+          >
             <div
               ref="bar"
               className="progress-bar__bar"
               style={{
                 width: Math.min(percentUsed, 100) + '%',
               }}
+              data-testid="progress-bar"
             />
           </div>
         </div>
-        <div className="col-xs-9" style={{paddingLeft: '0px'}} aria-hidden={true}>
+        <div
+          className="col-xs-9"
+          style={{paddingLeft: '0px'}}
+          aria-hidden={true}
+          data-testid="usage-text"
+        >
           {label}
         </div>
-        <div className="screenreader-only">{srLabel}</div>
+        <div className="screenreader-only" data-testid="sr-usage-text">
+          {srLabel}
+        </div>
       </div>
     )
   } else {

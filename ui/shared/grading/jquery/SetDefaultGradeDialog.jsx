@@ -47,7 +47,6 @@ const noop = function () {}
 const slice = [].slice
 
 const alertProxy = function (message) {
-   
   return window.alert(message)
 }
 
@@ -97,7 +96,7 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
         onClose()
         return _this.$dialog.remove()
       }
-    })(this)
+    })(this),
   )
   const $form = this.$dialog
   $('.ui-dialog-titlebar-close').focus()
@@ -112,7 +111,7 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
           return $.flashError(
             I18n.t('Default grade cannot be set to %{ex}', {
               ex: 'EX',
-            })
+            }),
           )
         } else {
           submittingDfd = $.Deferred()
@@ -155,7 +154,6 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
             postDfds = makeRequests(defaultGrade)
           }
 
-           
           return $.when.apply($, postDfds).then(function () {
             let responses = arguments.length >= 1 ? slice.call(arguments, 0) : []
             if (postDfds.length === 1) {
@@ -172,8 +170,8 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
                   },
                   {
                     count: submissions.length,
-                  }
-                )
+                  },
+                ),
               )
             } else {
               _this.alert(
@@ -184,8 +182,8 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
                   },
                   {
                     count: submissions.length,
-                  }
-                )
+                  },
+                ),
               )
             }
             submittingDfd.resolve()
@@ -193,7 +191,7 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
           })
         }
       }
-    })(this)
+    })(this),
   )
   getStudents = (function (_this) {
     return function () {
@@ -249,7 +247,7 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
 
       infoRoot.render(overwriteExitingGrades.checked ? <CheckpointsDefaultGradeInfo /> : <span />)
     },
-    false
+    false,
   )
 
   // # uniq on id is required because for group assignments the api will
@@ -284,7 +282,6 @@ SetDefaultGradeDialog.prototype.gradeIsExcused = function (grade) {
 }
 
 SetDefaultGradeDialog.prototype.gradeIsMissingShortcut = function (grade) {
-   
   return this.missing_shortcut_enabled && (grade != null ? grade.toUpperCase() : void 0) === 'MI'
 }
 

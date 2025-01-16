@@ -35,7 +35,7 @@ const setUp = (propOverrides = {}, mockSuccess = true) => {
     <MockedProvider mocks={mocks} addTypename={false}>
       {/* @ts-expect-error */}
       <AssignmentPublishButton {...props} />
-    </MockedProvider>
+    </MockedProvider>,
   )
 }
 

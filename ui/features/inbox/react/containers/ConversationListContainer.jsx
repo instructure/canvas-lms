@@ -126,7 +126,7 @@ const ConversationListContainer = ({
     const data = isSubmissionCommentsType
       ? submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.nodes
       : conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes?.filter(
-          ({conversation}) => conversation
+          ({conversation}) => conversation,
         )
     const inboxData = inboxConversationsWrapper(data, isSubmissionCommentsType)
 

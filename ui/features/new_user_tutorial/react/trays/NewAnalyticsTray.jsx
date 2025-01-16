@@ -35,7 +35,7 @@ const NewAnalyticsTray = () => (
     links={[
       {
         label: I18n.t(
-          'How do I send a message to all students based on specific course criteria in New Analytics?'
+          'How do I send a message to all students based on specific course criteria in New Analytics?',
         ),
         href: I18n.t('#community.instructor_message_all_criteria_new_analytics'),
       },

@@ -135,7 +135,7 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
           <Text>
             <p>
               {I18n.t(
-                'Shift due dates and assignment availability dates forward by a number of days.'
+                'Shift due dates and assignment availability dates forward by a number of days.',
               )}
             </p>
           </Text>

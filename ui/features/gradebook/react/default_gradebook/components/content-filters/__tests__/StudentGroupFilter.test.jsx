@@ -57,18 +57,18 @@ describe('StudentGroupFilter', () => {
 
   it('labels the filter with "Student Group Filter"', () => {
     renderFilter()
-    expect(screen.getByRole('combobox', { name: 'Student Group Filter' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', {name: 'Student Group Filter'})).toBeInTheDocument()
   })
 
   it('displays the name of the selected student group as the value', () => {
-    renderFilter({ selectedStudentGroupId: '2101' })
-    const combobox = screen.getByRole('combobox', { name: 'Student Group Filter' })
+    renderFilter({selectedStudentGroupId: '2101'})
+    const combobox = screen.getByRole('combobox', {name: 'Student Group Filter'})
     expect(combobox).toHaveValue('Group A2')
   })
 
   it('displays "All Student Groups" as the value when selected', () => {
     renderFilter()
-    const combobox = screen.getByRole('combobox', { name: 'Student Group Filter' })
+    const combobox = screen.getByRole('combobox', {name: 'Student Group Filter'})
     expect(combobox).toHaveValue('All Student Groups')
   })
 
@@ -76,8 +76,8 @@ describe('StudentGroupFilter', () => {
     it('labels each group set option group using the related name in alphabetical order', async () => {
       const user = userEvent.setup()
       renderFilter()
-      await user.click(screen.getByRole('combobox', { name: 'Student Group Filter' }))
-      
+      await user.click(screen.getByRole('combobox', {name: 'Student Group Filter'}))
+
       const groupSetA = screen.getByText('Group Set A')
       const groupSetB = screen.getByText('Group Set B')
       expect(groupSetA).toBeInTheDocument()
@@ -90,17 +90,18 @@ describe('StudentGroupFilter', () => {
     it('labels the "all items" option with "All Student Groups"', async () => {
       const user = userEvent.setup()
       renderFilter()
-      await user.click(screen.getByRole('combobox', { name: 'Student Group Filter' }))
-      
-      expect(screen.getByRole('option', { name: 'All Student Groups' })).toBeInTheDocument()
+      await user.click(screen.getByRole('combobox', {name: 'Student Group Filter'}))
+
+      expect(screen.getByRole('option', {name: 'All Student Groups'})).toBeInTheDocument()
     })
 
     it('labels each option using the related student group name in alphabetical order', async () => {
       const user = userEvent.setup()
       renderFilter()
-      await user.click(screen.getByRole('combobox', { name: 'Student Group Filter' }))
-      
-      const options = screen.getAllByRole('option')
+      await user.click(screen.getByRole('combobox', {name: 'Student Group Filter'}))
+
+      const options = screen
+        .getAllByRole('option')
         .slice(1) // Skip "All Student Groups" option
         .map(option => option.textContent.trim())
       expect(options).toEqual(['Group A1', 'Group A2', 'Group B1', 'Group B2'])
@@ -108,10 +109,10 @@ describe('StudentGroupFilter', () => {
 
     it('disables non-selected options when the filter is disabled', async () => {
       const user = userEvent.setup()
-      renderFilter({ disabled: true })
-      await user.click(screen.getByRole('combobox', { name: 'Student Group Filter' }))
-      
-      const option = screen.getByRole('option', { name: 'Group A2' })
+      renderFilter({disabled: true})
+      await user.click(screen.getByRole('combobox', {name: 'Student Group Filter'}))
+
+      const option = screen.getByRole('option', {name: 'Group A2'})
       expect(option).toHaveAttribute('aria-disabled', 'true')
     })
   })
@@ -120,18 +121,18 @@ describe('StudentGroupFilter', () => {
     it('calls the onSelect callback when selecting a group', async () => {
       const user = userEvent.setup()
       renderFilter()
-      await user.click(screen.getByRole('combobox', { name: 'Student Group Filter' }))
-      await user.click(screen.getByRole('option', { name: 'Group A1' }))
-      
+      await user.click(screen.getByRole('combobox', {name: 'Student Group Filter'}))
+      await user.click(screen.getByRole('option', {name: 'Group A1'}))
+
       expect(defaultProps.onSelect).toHaveBeenCalledWith('2102')
     })
 
     it('calls onSelect with "0" when selecting "All Student Groups"', async () => {
       const user = userEvent.setup()
-      renderFilter({ selectedStudentGroupId: '2101' })
-      await user.click(screen.getByRole('combobox', { name: 'Student Group Filter' }))
-      await user.click(screen.getByRole('option', { name: 'All Student Groups' }))
-      
+      renderFilter({selectedStudentGroupId: '2101'})
+      await user.click(screen.getByRole('combobox', {name: 'Student Group Filter'}))
+      await user.click(screen.getByRole('option', {name: 'All Student Groups'}))
+
       expect(defaultProps.onSelect).toHaveBeenCalledWith('0')
     })
   })

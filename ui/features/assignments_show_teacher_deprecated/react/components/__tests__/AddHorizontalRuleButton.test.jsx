@@ -22,7 +22,7 @@ import AddHorizontalRuleButton from '../AddHorizontalRuleButton'
 
 it('renders', () => {
   const {getByText, getByTestId} = render(
-    <AddHorizontalRuleButton onClick={() => {}} label="click me" />
+    <AddHorizontalRuleButton onClick={() => {}} label="click me" />,
   )
   expect(getByTestId('AddHorizontalRuleButton')).toBeInTheDocument()
   expect(getByText('click me')).toBeInTheDocument()

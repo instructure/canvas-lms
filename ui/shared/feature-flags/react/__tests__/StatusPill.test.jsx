@@ -27,8 +27,8 @@ it('includes tooltips for feature preview', () => {
   const {getByText} = render(<StatusPill feature={sampleData.betaFeature} />)
   expect(
     getByText(
-      'Feature preview — opting in includes ongoing updates outside the regular release schedule'
-    )
+      'Feature preview — opting in includes ongoing updates outside the regular release schedule',
+    ),
   ).toBeInTheDocument()
 })
 
@@ -38,8 +38,8 @@ it('includes tooltips for hidden pills', () => {
     getByText(
       'This feature option is only visible to users with Site Admin access.' +
         ' End users will not see it until enabled by a Site Admin user. Before enabling for an institution,' +
-        ' please be sure you fully understand the functionality and possible impacts to users.'
-    )
+        ' please be sure you fully understand the functionality and possible impacts to users.',
+    ),
   ).toBeInTheDocument()
 })
 
@@ -48,7 +48,7 @@ it('Includes tooltips for shadow features', () => {
   expect(
     getByText(
       'This feature option is only visible to users with Site Admin access. It is similar to "Hidden",' +
-        ' but end users will not see it even if enabled by a Site Admin user.'
-    )
+        ' but end users will not see it even if enabled by a Site Admin user.',
+    ),
   ).toBeInTheDocument()
 })

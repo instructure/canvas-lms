@@ -177,7 +177,7 @@ class ContentMigrationsController < ApplicationController
 
         options = @plugins.map { |p| { label: p.metadata(:select_text), id: p.id } }
 
-        external_tools = Lti::ContextToolFinder.all_tools_for(@context, placements: :migration_selection, root_account: @domain_root_account, current_user: @current_user)
+        external_tools = fetch_external_tools
         options.concat(external_tools.map do |et|
           {
             id: et.asset_string,
@@ -224,6 +224,10 @@ class ContentMigrationsController < ApplicationController
     @content_migration = @context.content_migrations.find(params[:id])
     @content_migration.check_for_pre_processing_timeout
     render json: content_migration_json(@content_migration, @current_user, session, nil, params[:include])
+  end
+
+  def fetch_external_tools
+    Lti::ContextToolFinder.all_tools_for(@context, placements: :migration_selection, root_account: @domain_root_account, current_user: @current_user) || []
   end
 
   def migration_plugin_supported?(plugin)
@@ -462,6 +466,18 @@ class ContentMigrationsController < ApplicationController
         name: p.meta["select_text"].call,
         required_settings: p.settings[:required_settings] || []
       }
+    end
+
+    if Account.site_admin.feature_enabled? :instui_for_import_page
+      external_tool_migrators = fetch_external_tools.map do |tool|
+        {
+          type: tool.asset_string,
+          requires_file_upload: false,
+          name: tool.label_for("migration_selection", I18n.locale),
+          required_settings: []
+        }
+      end
+      json.concat(external_tool_migrators)
     end
 
     render json:

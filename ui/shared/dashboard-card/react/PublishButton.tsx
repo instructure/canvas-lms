@@ -76,7 +76,7 @@ export default class PublishButton extends React.Component<Props> {
           }
         })
         .catch(() =>
-          $.flashError(I18n.t('An error ocurred while fetching course details. Please try again.'))
+          $.flashError(I18n.t('An error ocurred while fetching course details. Please try again.')),
         )
     } else {
       apiClient.publishCourse({courseId, onSuccess})

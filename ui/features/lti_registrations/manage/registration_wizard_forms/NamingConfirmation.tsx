@@ -84,7 +84,7 @@ export const NamingConfirmation = ({
           label={
             <Text weight="normal">
               {I18n.t(
-                'Choose a description for this tool to display in the Link Selection and Assignment Selection placements for all accounts.'
+                'Choose a description for this tool to display in the Link Selection and Assignment Selection placements for all accounts.',
               )}
             </Text>
           }
@@ -140,5 +140,5 @@ const MemoPlacementLabelInput = React.memo(
         onChange={(_, value) => onChange(placement, value)}
       />
     )
-  }
+  },
 )

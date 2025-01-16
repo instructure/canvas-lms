@@ -40,7 +40,7 @@ class ApiError extends React.Component {
             // keys rather than determine a better distinquisher. If you happen upon this
             // and would like to improve this, please do!
             //
-             
+
             <li key={`${timestamp}-${i}`}>{e}</li>
           ))}
         </ul>

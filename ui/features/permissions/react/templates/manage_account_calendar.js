@@ -36,10 +36,10 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Account Calendars'),
       description: I18n.t(
-        'Even with the Account Calendars - add / edit / delete events permission enabled, events can only be created in account calendars that are visible.'
+        'Even with the Account Calendars - add / edit / delete events permission enabled, events can only be created in account calendars that are visible.',
       ),
     },
   ],
   [],
-  []
+  [],
 )

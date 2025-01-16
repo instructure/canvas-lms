@@ -87,7 +87,7 @@ export default class CoursePickerTable extends React.Component {
 
   onSelectAllToggle = e => {
     $.screenReaderFlashMessage(
-      e.target.checked ? I18n.t('Selected all courses') : I18n.t('Unselected all courses')
+      e.target.checked ? I18n.t('Selected all courses') : I18n.t('Unselected all courses'),
     )
 
     const selected = this.props.courses.reduce((selectedMap, course) => {
@@ -106,7 +106,7 @@ export default class CoursePickerTable extends React.Component {
         this.tableRef.current.querySelectorAll('svg[aria-hidden]'),
         el => {
           el.setAttribute('focusable', 'false')
-        }
+        },
       )
     }
   }
@@ -204,7 +204,7 @@ export default class CoursePickerTable extends React.Component {
           {this.renderCellText(
             course.teachers
               ? course.teachers.map(teacher => teacher.display_name).join(', ')
-              : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count})
+              : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count}),
           )}
         </Table.Cell>
       </Table.Row>
@@ -244,7 +244,7 @@ export default class CoursePickerTable extends React.Component {
               <Text size="small">
                 {I18n.t(
                   {one: 'Select (%{count}) Course', other: 'Select All (%{count}) Courses'},
-                  {count: this.props.courses.length}
+                  {count: this.props.courses.length},
                 )}
               </Text>
             }

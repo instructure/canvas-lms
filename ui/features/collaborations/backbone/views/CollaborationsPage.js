@@ -80,7 +80,7 @@ CollaborationsPage.prototype.attachEvents = function () {
       return function (view) {
         return view.on('delete', _this.onCollaborationDelete)
       }
-    })(this)
+    })(this),
   )
 }
 

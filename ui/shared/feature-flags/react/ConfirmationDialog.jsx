@@ -96,7 +96,6 @@ export async function showConfirmationDialog({
   }
 
   function renderDialog(parent) {
-     
     ReactDOM.render(
       <ConfirmationDialog
         open={true}
@@ -109,7 +108,7 @@ export async function showConfirmationDialog({
       >
         {body}
       </ConfirmationDialog>,
-      parent
+      parent,
     )
   }
   renderDialog(getDialogContainer())

@@ -49,7 +49,7 @@ describe('ViewRubrics Tests', () => {
         <BrowserRouter>
           <ViewRubrics canManageRubrics={true} {...props} canImportExportRubrics={true} />
         </BrowserRouter>
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
   }
 
@@ -65,7 +65,7 @@ describe('ViewRubrics Tests', () => {
       expect(getByTestId('create-new-rubric-button')).toBeInTheDocument()
 
       // total rubrics length per workflow state + header row
-      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(3)
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr')).toHaveLength(3)
 
       expect(getByTestId('rubric-title-0')).toHaveTextContent('Rubric 1')
       expect(getByTestId('rubric-points-0')).toHaveTextContent('5')
@@ -85,7 +85,7 @@ describe('ViewRubrics Tests', () => {
       const archivedRubricsTab = getByText('Archived')
       archivedRubricsTab.click()
 
-      expect(getByTestId('archived-rubrics-table').querySelectorAll('tr').length).toEqual(2)
+      expect(getByTestId('archived-rubrics-table').querySelectorAll('tr')).toHaveLength(2)
 
       expect(getByTestId('rubric-title-0')).toHaveTextContent('Rubric 2')
       expect(getByTestId('rubric-points-0')).toHaveTextContent('10')
@@ -265,12 +265,12 @@ describe('ViewRubrics Tests', () => {
         queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, queryByText} = renderComponent()
 
-        expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(3)
+        expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr')).toHaveLength(3)
 
         const searchInput = getByTestId('rubric-search-bar')
         fireEvent.change(searchInput, {target: {value: '1'}})
 
-        expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(2)
+        expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr')).toHaveLength(2)
         expect(queryByText('Rubric 1')).not.toBeNull()
         expect(queryByText('Rubric 2')).toBeNull()
         expect(queryByText('Rubric 3')).toBeNull()
@@ -287,7 +287,7 @@ describe('ViewRubrics Tests', () => {
       const {getByTestId, getByText} = renderComponent()
 
       // total rubrics length per workflow state + header row
-      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(3)
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr')).toHaveLength(3)
 
       expect(getByTestId('rubric-title-0')).toHaveTextContent('Rubric 1')
       expect(getByTestId('rubric-points-0')).toHaveTextContent('5')
@@ -307,7 +307,7 @@ describe('ViewRubrics Tests', () => {
       const archivedRubricsTab = getByText('Archived')
       archivedRubricsTab.click()
 
-      expect(getByTestId('archived-rubrics-table').querySelectorAll('tr').length).toEqual(2)
+      expect(getByTestId('archived-rubrics-table').querySelectorAll('tr')).toHaveLength(2)
 
       expect(getByTestId('rubric-title-0')).toHaveTextContent('Rubric 2')
       expect(getByTestId('rubric-points-0')).toHaveTextContent('10')
@@ -579,12 +579,12 @@ describe('ViewRubrics Tests', () => {
       queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId, queryByText} = renderComponent()
 
-      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(3)
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr')).toHaveLength(3)
 
       const searchInput = getByTestId('rubric-search-bar')
       fireEvent.change(searchInput, {target: {value: '1'}})
 
-      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(2)
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr')).toHaveLength(2)
       expect(queryByText('Rubric 1')).not.toBeNull()
       expect(queryByText('Rubric 2')).toBeNull()
       expect(queryByText('Rubric 3')).toBeNull()
@@ -613,7 +613,7 @@ describe('ViewRubrics Tests', () => {
         Promise.resolve({
           _id: '1',
           workflowState: 'archived',
-        })
+        }),
       )
       queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId, getByText, getAllByText, queryByTestId} = renderComponent()
@@ -625,7 +625,7 @@ describe('ViewRubrics Tests', () => {
       expect(queryByTestId('rubric-row-1')).not.toBeInTheDocument()
       getByText('Archived').click()
       expect(getByTestId('rubric-row-1')).toHaveTextContent('Rubric 1')
-      expect(getByTestId('archived-rubrics-panel').querySelectorAll('tr').length).toEqual(3)
+      expect(getByTestId('archived-rubrics-panel').querySelectorAll('tr')).toHaveLength(3)
     })
 
     it('allows un-archiving an account rubric', async () => {
@@ -634,7 +634,7 @@ describe('ViewRubrics Tests', () => {
         Promise.resolve({
           _id: '2',
           workflowState: 'active',
-        })
+        }),
       )
       queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId, getByText, getAllByText, queryByTestId} = renderComponent()
@@ -650,7 +650,7 @@ describe('ViewRubrics Tests', () => {
 
       getByText('Saved').click()
       expect(getByTestId('rubric-row-2')).toHaveTextContent('Rubric 2')
-      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(4)
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr')).toHaveLength(4)
     })
 
     it('allows archiving a course rubric', async () => {
@@ -659,7 +659,7 @@ describe('ViewRubrics Tests', () => {
         Promise.resolve({
           _id: '1',
           workflowState: 'archived',
-        })
+        }),
       )
       queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId, getByText, getAllByText, queryByTestId} = renderComponent()
@@ -671,7 +671,7 @@ describe('ViewRubrics Tests', () => {
       expect(queryByTestId('rubric-row-1')).not.toBeInTheDocument()
       getByText('Archived').click()
       expect(getByTestId('rubric-row-1')).toHaveTextContent('Rubric 1')
-      expect(getByTestId('archived-rubrics-panel').querySelectorAll('tr').length).toEqual(3)
+      expect(getByTestId('archived-rubrics-panel').querySelectorAll('tr')).toHaveLength(3)
     })
 
     it('allows un-archiving a course rubric', async () => {
@@ -680,7 +680,7 @@ describe('ViewRubrics Tests', () => {
         Promise.resolve({
           _id: '2',
           workflowState: 'active',
-        })
+        }),
       )
       queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId, getByText, getAllByText, queryByTestId} = renderComponent()
@@ -696,7 +696,7 @@ describe('ViewRubrics Tests', () => {
 
       getByText('Saved').click()
       expect(getByTestId('rubric-row-2')).toHaveTextContent('Rubric 2')
-      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(4)
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr')).toHaveLength(4)
     })
   })
 })

@@ -29,7 +29,7 @@ const setup = props => {
 describe('DueDatesForParticipantList', () => {
   it('truncates the student names if there are more than 10', () => {
     const students = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(val =>
-      Student.mock({shortName: `Student${val}`})
+      Student.mock({shortName: `Student${val}`}),
     )
     const {getByText} = setup({
       assignmentOverride: AssignmentOverride.mock({
@@ -43,8 +43,8 @@ describe('DueDatesForParticipantList', () => {
         students
           .slice(0, 5)
           .map(student => student.shortName)
-          .join(', ')
-      )
+          .join(', '),
+      ),
     ).toBeInTheDocument()
     expect(getByText('...')).toBeInTheDocument()
     expect(getByText('6 more')).toBeInTheDocument()
@@ -52,7 +52,7 @@ describe('DueDatesForParticipantList', () => {
 
   it('allows expanding the student names if there are more than 10', () => {
     const students = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(val =>
-      Student.mock({shortName: `Student${val}`})
+      Student.mock({shortName: `Student${val}`}),
     )
     const {getByText} = setup({
       assignmentOverride: AssignmentOverride.mock({

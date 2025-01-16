@@ -90,11 +90,9 @@ export default class TimeBlockList {
     })
 
     if (this.blocksManager.blocks.length === 0) {
-       
       window.alert(I18n.t('no_dates_error', 'You need to specify at least one date and time'))
       valid = false
     } else if (!valid) {
-       
       window.alert(I18n.t('time_block_errors', 'There are errors in your time block selections.'))
     }
     return valid

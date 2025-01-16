@@ -55,7 +55,7 @@ AuthTypePicker.propTypes = {
     PropTypes.shape({
       value: PropTypes.string,
       name: PropTypes.string,
-    })
+    }),
   ).isRequired,
   onChange: PropTypes.func,
 }

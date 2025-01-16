@@ -76,7 +76,7 @@ const setup = (assignmentData = {}) => {
     <AssignmentAvailabilityContainer
       assignment={Assignment.mock({...assignmentData})}
       isAdmin={true}
-    />
+    />,
   )
 }
 
@@ -185,7 +185,7 @@ describe('AssignmentAvailabilityContainer', () => {
           isAdmin={true}
           inPacedCourse={true}
           courseId="17"
-        />
+        />,
       )
       act(() => {
         getByRole('button', {name: 'View Due Dates'}).click()
@@ -204,7 +204,7 @@ describe('AssignmentAvailabilityContainer', () => {
           isAdmin={true}
           inPacedCourse={true}
           courseId="17"
-        />
+        />,
       )
       act(() => {
         getByRole('button', {name: 'View Due Dates'}).click()

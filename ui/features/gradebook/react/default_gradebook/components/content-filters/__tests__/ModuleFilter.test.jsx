@@ -43,18 +43,18 @@ describe('ModuleFilter', () => {
 
   it('labels the filter with "Module Filter"', () => {
     renderModuleFilter()
-    expect(screen.getByRole('combobox', { name: 'Module Filter' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', {name: 'Module Filter'})).toBeInTheDocument()
   })
 
   it('displays the name of the selected module as the value', () => {
-    renderModuleFilter({ selectedModuleId: '2002' })
-    const combobox = screen.getByRole('combobox', { name: 'Module Filter' })
+    renderModuleFilter({selectedModuleId: '2002'})
+    const combobox = screen.getByRole('combobox', {name: 'Module Filter'})
     expect(combobox).toHaveDisplayValue('Module 2')
   })
 
   it('displays "All Modules" as the value when selected', () => {
     renderModuleFilter()
-    const combobox = screen.getByRole('combobox', { name: 'Module Filter' })
+    const combobox = screen.getByRole('combobox', {name: 'Module Filter'})
     expect(combobox).toHaveDisplayValue('All Modules')
   })
 
@@ -62,14 +62,14 @@ describe('ModuleFilter', () => {
     it('labels the "all items" option with "All Modules"', async () => {
       const user = userEvent.setup()
       renderModuleFilter()
-      await user.click(screen.getByRole('combobox', { name: 'Module Filter' }))
-      expect(screen.getByRole('option', { name: 'All Modules' })).toBeInTheDocument()
+      await user.click(screen.getByRole('combobox', {name: 'Module Filter'}))
+      expect(screen.getByRole('option', {name: 'All Modules'})).toBeInTheDocument()
     })
 
     it('labels each option using the related module name in alphabetical order', async () => {
       const user = userEvent.setup()
       renderModuleFilter()
-      await user.click(screen.getByRole('combobox', { name: 'Module Filter' }))
+      await user.click(screen.getByRole('combobox', {name: 'Module Filter'}))
       const options = screen.getAllByRole('option')
       expect(options[1]).toHaveTextContent('Module 1')
       expect(options[2]).toHaveTextContent('Module 2')
@@ -77,9 +77,12 @@ describe('ModuleFilter', () => {
 
     it('disables non-selected options when the filter is disabled', async () => {
       const user = userEvent.setup()
-      renderModuleFilter({ disabled: true })
-      await user.click(screen.getByRole('combobox', { name: 'Module Filter' }))
-      expect(screen.getByRole('option', { name: 'Module 2' })).toHaveAttribute('aria-disabled', 'true')
+      renderModuleFilter({disabled: true})
+      await user.click(screen.getByRole('combobox', {name: 'Module Filter'}))
+      expect(screen.getByRole('option', {name: 'Module 2'})).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      )
     })
   })
 
@@ -87,16 +90,16 @@ describe('ModuleFilter', () => {
     it('calls the onSelect callback with module id when selecting a module', async () => {
       const user = userEvent.setup()
       renderModuleFilter()
-      await user.click(screen.getByRole('combobox', { name: 'Module Filter' }))
-      await user.click(screen.getByRole('option', { name: 'Module 1' }))
+      await user.click(screen.getByRole('combobox', {name: 'Module Filter'}))
+      await user.click(screen.getByRole('option', {name: 'Module 1'}))
       expect(defaultProps.onSelect).toHaveBeenCalledWith('2001')
     })
 
     it('calls onSelect with "0" when selecting "All Modules"', async () => {
       const user = userEvent.setup()
-      renderModuleFilter({ selectedModuleId: '2001' })
-      await user.click(screen.getByRole('combobox', { name: 'Module Filter' }))
-      await user.click(screen.getByRole('option', { name: 'All Modules' }))
+      renderModuleFilter({selectedModuleId: '2001'})
+      await user.click(screen.getByRole('combobox', {name: 'Module Filter'}))
+      await user.click(screen.getByRole('option', {name: 'All Modules'}))
       expect(defaultProps.onSelect).toHaveBeenCalledWith('0')
     })
   })

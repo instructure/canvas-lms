@@ -16,9 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {assignLocation} from '@canvas/util/globalUtils'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
 import QuizEngineModal from '../QuizEngineModal'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 describe('QuizEngineModal', () => {
   beforeAll(() => {
@@ -57,14 +62,10 @@ describe('QuizEngineModal', () => {
 
   it('submits to new quizzes without saving', () => {
     const handleDismiss = jest.fn()
-    const windLoc = global.window.location
-    delete global.window.location
-    global.window.location = {href: 'http://localhost'}
     const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
     fireEvent.click(getByText('New Quizzes'))
     fireEvent.click(getByText('Submit').closest('button'))
-    expect(window.location.href).toBe('http://localhost/assignments?quiz_lti')
-    global.window.location = windLoc
+    expect(assignLocation).toHaveBeenCalledWith('http://localhost/assignments?quiz_lti')
   })
 
   it('submits to classic quizzes without saving', () => {
@@ -80,15 +81,11 @@ describe('QuizEngineModal', () => {
 
   it('redirects to new quizzes after saving engine choice', () => {
     const handleDismiss = jest.fn()
-    const windLoc = global.window.location
-    delete global.window.location
-    global.window.location = {href: 'http://localhost'}
     const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
     fireEvent.click(getByText('New Quizzes'))
     fireEvent.change(getByText('Remember my choice for this course'))
     fireEvent.click(getByText('Submit').closest('button'))
-    expect(window.location.href).toBe('http://localhost/assignments?quiz_lti')
-    global.window.location = windLoc
+    expect(assignLocation).toHaveBeenCalledWith('http://localhost/assignments?quiz_lti')
   })
 
   it('redirects to classic quizzes after saving engine choice', () => {

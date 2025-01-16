@@ -98,7 +98,7 @@ const FilterCalendarsModal = ({
 
   const submitSelectedContexts = () => {
     saveSelectedContexts(pendingSelectedContexts).catch(
-      showFlashError(I18n.t('Failed to save selected calendars'))
+      showFlashError(I18n.t('Failed to save selected calendars')),
     )
     updateSelectedContextCodes([...pendingSelectedContexts])
     closeModal()
@@ -125,7 +125,7 @@ const FilterCalendarsModal = ({
                 one: 'Choose up to 1 subject calendar',
                 other: 'Choose up to %{count} subject calendars',
               },
-              {count: selectedContextsLimit}
+              {count: selectedContextsLimit},
             )}
           </Text>
         </View>
@@ -155,7 +155,7 @@ const FilterCalendarsModal = ({
                     one: 'You have 1 calendar left',
                     other: 'You have %{count} calendars left',
                   },
-                  {count: selectedContextsLimit - pendingSelectedContexts.length}
+                  {count: selectedContextsLimit - pendingSelectedContexts.length},
                 )}
               </Text>
             </Flex.Item>

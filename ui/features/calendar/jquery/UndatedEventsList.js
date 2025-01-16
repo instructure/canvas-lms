@@ -70,7 +70,7 @@ export default class UndatedEventsList {
 
     const loadingTimer = setTimeout(
       () => $.screenReaderFlashMessage(I18n.t('loading_undated_events', 'Loading undated events')),
-      0
+      0,
     )
 
     return this.dataSource.getEvents(null, null, this.visibleContextList, events => {

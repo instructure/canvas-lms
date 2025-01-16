@@ -17,104 +17,120 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render, fireEvent} from '@testing-library/react'
 import BreakdownGraph from '../breakdown-graphs'
 
-const defaultProps = () => ({
-  ranges: [
-    {
-      scoring_range: {
-        id: 1,
-        rule_id: 1,
-        lower_bound: 0.7,
-        upper_bound: 1.0,
-        created_at: null,
-        updated_at: null,
-        position: null,
+describe('BreakdownGraph', () => {
+  const defaultProps = (overrides = {}) => ({
+    ranges: [
+      {
+        scoring_range: {
+          id: 1,
+          rule_id: 1,
+          lower_bound: 0.7,
+          upper_bound: 1.0,
+          created_at: null,
+          updated_at: null,
+          position: null,
+        },
+        size: 0,
+        students: [],
       },
-      size: 0,
-      students: [],
-    },
-    {
-      scoring_range: {
-        id: 3,
-        rule_id: 1,
-        lower_bound: 0.4,
-        upper_bound: 0.7,
-        created_at: null,
-        updated_at: null,
-        position: null,
+      {
+        scoring_range: {
+          id: 3,
+          rule_id: 1,
+          lower_bound: 0.4,
+          upper_bound: 0.7,
+          created_at: null,
+          updated_at: null,
+          position: null,
+        },
+        size: 0,
+        students: [],
       },
-      size: 0,
-      students: [],
-    },
-    {
-      scoring_range: {
-        id: 2,
-        rule_id: 1,
-        lower_bound: 0.0,
-        upper_bound: 0.4,
-        created_at: null,
-        updated_at: null,
-        position: null,
+      {
+        scoring_range: {
+          id: 2,
+          rule_id: 1,
+          lower_bound: 0.0,
+          upper_bound: 0.4,
+          created_at: null,
+          updated_at: null,
+          position: null,
+        },
+        size: 0,
+        students: [],
       },
-      size: 0,
-      students: [],
+    ],
+    enrolled: 10,
+    assignment: {
+      id: 7,
+      title: 'Points',
+      description: '',
+      points_possible: 15,
+      grading_type: 'points',
+      submission_types: 'on_paper',
+      grading_scheme: null,
     },
-  ],
-  enrolled: 10,
-  assignment: {
-    id: 7,
-    title: 'Points',
-    description: '',
-    points_possible: 15,
-    grading_type: 'points',
-    submission_types: 'on_paper',
-    grading_scheme: null,
-  },
-  isLoading: false,
-  selectRange: () => {},
-  openSidebar: () => {},
-})
-
-const renderComponent = props => TestUtils.renderIntoDocument(<BreakdownGraph {...props} />)
-
-describe('Breakdown Graph', () => {
-  test('renders three bar components correctly', () => {
-    const component = renderComponent(defaultProps())
-
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'crs-bar__container'
-    )
-    expect(renderedList.length).toBe(3)
+    isLoading: false,
+    selectRange: jest.fn(),
+    openSidebar: jest.fn(),
+    ...overrides,
   })
 
-  test('renders bar inner-components correctly', () => {
-    const component = renderComponent(defaultProps())
-
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
-    expect(renderedList.length).toBe(3)
+  it('renders the title', () => {
+    const {getByRole} = render(<BreakdownGraph {...defaultProps()} />)
+    expect(getByRole('heading', {name: 'Mastery Paths Breakdown'})).toBeInTheDocument()
   })
 
-  test('renders lower bound correctly', () => {
-    const component = renderComponent(defaultProps())
+  it('renders loading state correctly', () => {
+    const props = defaultProps({isLoading: true})
+    const {getByText, getByTitle} = render(<BreakdownGraph {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__info')
-    expect(renderedList[2].textContent).toBe('0 pts+ to 6 pts')
+    expect(getByTitle('Loading')).toBeInTheDocument()
+    expect(getByText('Loading Data..')).toBeInTheDocument()
   })
 
-  test('renders upper bound correctly', () => {
-    const component = renderComponent(defaultProps())
-
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__info')
-    expect(renderedList[0].textContent).toBe('10.5 pts+ to 15 pts')
+  it('renders three bar components when not loading', () => {
+    const {container} = render(<BreakdownGraph {...defaultProps()} />)
+    const bars = container.getElementsByClassName('crs-bar__container')
+    expect(bars).toHaveLength(3)
   })
 
-  test('renders enrolled correctly', () => {
-    const component = renderComponent(defaultProps())
+  it('renders correct point ranges for each bar', () => {
+    const {getAllByText} = render(<BreakdownGraph {...defaultProps()} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
-    expect(renderedList[0].textContent).toBe('0 out of 10 students')
+    expect(getAllByText('10.5 pts+ to 15 pts')).toHaveLength(1)
+    expect(getAllByText('6 pts+ to 10.5 pts')).toHaveLength(1)
+    expect(getAllByText('0 pts+ to 6 pts')).toHaveLength(1)
+  })
+
+  it('renders student counts correctly', () => {
+    const props = defaultProps({
+      ranges: defaultProps().ranges.map(range => ({...range, size: 2})),
+    })
+    const {getAllByText} = render(<BreakdownGraph {...props} />)
+
+    const studentCountButtons = getAllByText('2 out of 10 students')
+    expect(studentCountButtons).toHaveLength(3)
+  })
+
+  it('calls selectRange when a bar is clicked', () => {
+    const props = defaultProps()
+    const {getAllByText} = render(<BreakdownGraph {...props} />)
+
+    const firstBar = getAllByText('0 out of 10 students')[0]
+    fireEvent.click(firstBar)
+    expect(props.selectRange).toHaveBeenCalledWith(0)
+  })
+
+  it('calls openSidebar when a bar is clicked', () => {
+    const props = defaultProps()
+    const {getAllByText} = render(<BreakdownGraph {...props} />)
+
+    const firstBar = getAllByText('0 out of 10 students')[0]
+    fireEvent.click(firstBar)
+    expect(props.openSidebar).toHaveBeenCalled()
   })
 })

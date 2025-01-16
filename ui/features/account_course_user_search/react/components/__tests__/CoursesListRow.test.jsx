@@ -24,7 +24,7 @@ function renderRow(row) {
   return render(
     <table>
       <tbody>{row}</tbody>
-    </table>
+    </table>,
   )
 }
 
@@ -78,7 +78,7 @@ it('filters addable roles by blueprint and permissions', () => {
         {id: '4', base_role_name: 'ObserverEnrollment', addable_by_user: true},
         {id: '5', base_role_name: 'DesignerEnrollment', addable_by_user: false},
       ]}
-    />
+    />,
   )
   const role_ids = ref.current
     .getAvailableRoles()
@@ -101,7 +101,7 @@ it('shows add-enrollment if it makes sense', () => {
   const tooltip = 'Add Users to A'
 
   const {getAllByText} = renderRow(
-    <CoursesListRow {...props} can_create_enrollments={true} concluded={false} />
+    <CoursesListRow {...props} can_create_enrollments={true} concluded={false} />,
   )
   expect(getAllByText(tooltip).length).toBeGreaterThan(0)
 })
@@ -114,7 +114,7 @@ it('does not show add-enrollment when not allowed', () => {
       can_create_enrollments={false}
       workflow_state="active"
       concluded={false}
-    />
+    />,
   )
   expect(queryByText(tooltip)).toBeNull()
 })
@@ -127,7 +127,7 @@ it('does not show add-enrollment when concluded', () => {
       can_create_enrollments={true}
       workflow_state="completed"
       concluded={true}
-    />
+    />,
   )
   expect(queryByText(tooltip)).toBeNull()
 })
@@ -135,7 +135,7 @@ it('does not show add-enrollment when concluded', () => {
 it('does not show add-enrollment when a template course', () => {
   const tooltip = 'Add Users to A'
   const {queryByText} = renderRow(
-    <CoursesListRow {...props} can_create_enrollments={true} template={true} />
+    <CoursesListRow {...props} can_create_enrollments={true} template={true} />,
   )
   expect(queryByText(tooltip)).toBeNull()
 })

@@ -99,24 +99,24 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
     it('invalidates a blank tenant', () => {
       const errors = getTenantErrorMessages(createState(''))
 
-      expect(errors.length).toBe(1)
+      expect(errors).toHaveLength(1)
       expect(errors[0].text).toBe(
-        'To toggle Microsoft Teams Sync you need to input a tenant domain.'
+        'To toggle Microsoft Teams Sync you need to input a tenant domain.',
       )
     })
 
     it('invalidates a tenant with an invalid domain name', () => {
       const errors = getTenantErrorMessages(createState('purpleoranges.com$!'))
 
-      expect(errors.length).toBe(1)
+      expect(errors).toHaveLength(1)
       expect(errors[0].text).toBe(
-        'Please provide a valid tenant domain. Check your Azure Active Directory settings to find it.'
+        'Please provide a valid tenant domain. Check your Azure Active Directory settings to find it.',
       )
     })
 
     it('validates a valid tenant', () => {
       const errors = getTenantErrorMessages(createState('canvastest2.onmicrosoft.com'))
-      expect(errors.length).toBe(0)
+      expect(errors).toHaveLength(0)
     })
   })
 
@@ -126,7 +126,7 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
 
       const errors = getSuffixErrorMessages({microsoft_sync_login_attribute_suffix: suffix})
 
-      expect(errors.length).toBe(1)
+      expect(errors).toHaveLength(1)
     })
 
     it('invalidates suffixes that have whitespace in them', () => {
@@ -134,7 +134,7 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
 
       const errors = getSuffixErrorMessages({microsoft_sync_login_attribute_suffix: suffix})
 
-      expect(errors.length).toBe(1)
+      expect(errors).toHaveLength(1)
     })
   })
 })

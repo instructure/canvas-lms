@@ -107,9 +107,9 @@ export const SplitScreenThreadsContainer = props => {
         const entries = JSON.parse(
           JSON.stringify(
             extractedSubentryNodes.filter(
-              entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
-            )
-          )
+              entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false,
+            ),
+          ),
         )
 
         entries.forEach(entry => (entry.entryParticipant.read = true))
@@ -249,7 +249,7 @@ const SplitScreenThreadContainer = props => {
           root: null,
           rootMargin: '0px',
           threshold: 0.4,
-        }
+        },
       )
 
       if (threadRefCurrent) observer.observe(threadRefCurrent)
@@ -312,7 +312,7 @@ const SplitScreenThreadContainer = props => {
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() => props.onOpenSplitScreenView(props.discussionEntry._id, true)}
         isSplitScreenView={true}
-      />
+      />,
     )
   }
   if (
@@ -329,7 +329,7 @@ const SplitScreenThreadContainer = props => {
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
         isSplitScreenView={true}
-      />
+      />,
     )
   }
 
@@ -342,7 +342,7 @@ const SplitScreenThreadContainer = props => {
         authorName={getDisplayName(props.discussionEntry)}
         onClick={toggleUnread}
         isSplitScreenView={true}
-      />
+      />,
     )
   }
 
@@ -355,7 +355,7 @@ const SplitScreenThreadContainer = props => {
         expandText={I18n.t('View Replies')}
         isExpanded={false}
         onClick={() => props.onOpenSplitScreenView(props.discussionEntry._id, false)}
-      />
+      />,
     )
   }
 
@@ -409,7 +409,7 @@ const SplitScreenThreadContainer = props => {
                           props.onOpenSplitScreenView(
                             props.discussionEntry.rootEntryId,
                             false,
-                            props.discussionEntry.rootEntryId
+                            props.discussionEntry.rootEntryId,
                           )
                         }}
                         goToTopic={props.goToTopic}
@@ -419,7 +419,7 @@ const SplitScreenThreadContainer = props => {
                                 props.onOpenSplitScreenView(
                                   props.discussionEntry.rootEntryId,
                                   false,
-                                  props.discussionEntry.quotedEntry._id
+                                  props.discussionEntry.quotedEntry._id,
                                 )
                               }
                             : null
@@ -462,18 +462,18 @@ const SplitScreenThreadContainer = props => {
                     createdAt={props.discussionEntry.createdAt}
                     updatedAt={props.discussionEntry.updatedAt}
                     timingDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.createdAt
+                      props.discussionEntry.createdAt,
                     )}
                     editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.updatedAt
+                      props.discussionEntry.updatedAt,
                     )}
                     lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.lastReply?.createdAt
+                      props.discussionEntry.lastReply?.createdAt,
                     )}
                     deleted={props.discussionEntry.deleted}
                     isTopicAuthor={isTopicAuthor(
                       props.discussionTopic.author,
-                      props.discussionEntry.author
+                      props.discussionEntry.author,
                     )}
                     quotedEntry={props.discussionEntry.quotedEntry}
                     attachment={props.discussionEntry.attachment}

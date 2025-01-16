@@ -35,7 +35,6 @@ import type {
   VisibilityChange,
   SubscriptionChange,
   ExpandedAccounts,
-  FetchAccountDataResponse,
 } from '../types'
 
 const I18n = createI18nScope('account_calendar_settings_account_tree')
@@ -78,14 +77,13 @@ export const AccountTree = ({
     (accountId: number, nextLink?: string, accumulatedResults: AccountData[] = []) => {
       loadingCollectionIds.current = [...loadingCollectionIds.current, accountId]
       setLoadingCollectionIdState(loadingCollectionIds.current)
-      doFetchApi({
+      doFetchApi<AccountData[]>({
         path: nextLink || `/api/v1/accounts/${accountId}/account_calendars`,
         params: {
           ...(nextLink == null && {per_page: 100}),
         },
       })
-        // @ts-expect-error
-        .then((response: FetchAccountDataResponse) => {
+        .then(response => {
           const {json, link} = response
           const accountData = accumulatedResults.concat(json || [])
           if (link?.next) {
@@ -93,14 +91,14 @@ export const AccountTree = ({
           } else {
             receivedAccountData(accountData)
             loadingCollectionIds.current = loadingCollectionIds.current.filter(
-              id => id !== accountId
+              id => id !== accountId,
             )
             setLoadingCollectionIdState(loadingCollectionIds.current)
           }
         })
         .catch(showFlashError(I18n.t("Couldn't load account calendar settings")))
     },
-    [receivedAccountData]
+    [receivedAccountData],
   )
 
   useEffect(() => {
@@ -124,7 +122,7 @@ export const AccountTree = ({
       }
       onAccountExpandedToggled(account.id, expanded)
     },
-    [collections, fetchAccountData, fetchInFlight, onAccountExpandedToggled, originAccountId]
+    [collections, fetchAccountData, fetchInFlight, onAccountExpandedToggled, originAccountId],
   )
 
   if (!collections[originAccountId]) {

@@ -24,6 +24,7 @@ import {TeacherCheckpointsInfo} from '../TeacherCheckpointsInfo'
 // Mock assignments
 const assignmentNoDueDates = {
   id: '1',
+  points_possible: 20,
   checkpoints: [
     {
       tag: 'reply_to_topic',
@@ -53,6 +54,7 @@ const assignmentNoDueDates = {
 
 const assignmentWithDueDates = {
   id: '2',
+  points_possible: 20,
   checkpoints: [
     {
       tag: 'reply_to_topic',
@@ -82,6 +84,7 @@ const assignmentWithDueDates = {
 
 const assignmentWithOverrides = {
   id: '3',
+  points_possible: 20,
   checkpoints: [
     {
       tag: 'reply_to_topic',
@@ -197,7 +200,7 @@ describe('TeacherCheckpointsInfo', () => {
     })
     it('shows the availability for the row', () => {
       const {queryByText, queryByTestId} = render(
-        <TeacherCheckpointsInfo assignment={assignmentWithDueDates} />
+        <TeacherCheckpointsInfo assignment={assignmentWithDueDates} />,
       )
 
       expect(queryByTestId('2_cp_availability')).toBeInTheDocument()
@@ -206,7 +209,7 @@ describe('TeacherCheckpointsInfo', () => {
     })
     it('shows multiple availability dates for the row', () => {
       const {queryByText, queryByTestId} = render(
-        <TeacherCheckpointsInfo assignment={assignmentWithOverrides} />
+        <TeacherCheckpointsInfo assignment={assignmentWithOverrides} />,
       )
 
       expect(queryByTestId('3_cp_availability')).toBeInTheDocument()
@@ -236,6 +239,17 @@ describe('TeacherCheckpointsInfo', () => {
       expect(screen.getByText('Jun 5, 2023 at 12pm')).toBeInTheDocument() // Section 1
       expect(screen.getByText('Jun 6, 2023 at 12pm')).toBeInTheDocument() // Section 2
       expect(screen.getByText('Jun 7, 2023 at 12pm')).toBeInTheDocument() // Everyone else
+    })
+  })
+
+  describe('points possible', () => {
+    it('display points possible for checkpoint', () => {
+      const {queryByText, queryByTestId} = render(
+        <TeacherCheckpointsInfo assignment={assignmentNoDueDates} />,
+      )
+
+      expect(queryByText('20 pts')).toBeInTheDocument()
+      expect(queryByTestId('1_points_possible')).toBeInTheDocument()
     })
   })
 })

@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import MissingDateDialogView from '../MissingDateDialogView'
-import sinon from 'sinon'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toEqual(y)
@@ -33,7 +32,7 @@ let dialog
 describe('MissingDateDialogView', () => {
   beforeEach(() => {
     $('#fixtures').append(
-      '<label for="date">Section one</label><input type="text" id="date" name="date" />'
+      '<label for="date">Section one</label><input type="text" id="date" name="date" />',
     )
 
     dialog = new MissingDateDialogView({
@@ -50,7 +49,7 @@ describe('MissingDateDialogView', () => {
           return true
         }
       },
-      success: sinon.spy(),
+      success: jest.fn(),
     })
   })
 
@@ -83,6 +82,6 @@ describe('MissingDateDialogView', () => {
   test('should run the success callback on on primary button press', function () {
     dialog.render()
     dialog.$dialog.find('.btn-primary').click()
-    ok(dialog.options.success.calledOnce)
+    expect(dialog.options.success).toHaveBeenCalledTimes(1)
   })
 })

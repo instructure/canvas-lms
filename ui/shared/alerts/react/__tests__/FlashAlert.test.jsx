@@ -31,7 +31,7 @@ describe('FlashAlert', () => {
         variant="error"
         onClose={() => {}}
         screenReaderOnly={false}
-      />
+      />,
     )
     expect(screen.getAllByText('This is a test error message 123')[0]).toBeInTheDocument()
     expect(screen.getAllByText('This is a test error 321')[0]).toBeInTheDocument()
@@ -46,7 +46,7 @@ describe('FlashAlert', () => {
         variant="error"
         onClose={() => {}}
         screenReaderOnly={false}
-      />
+      />,
     )
     expect(screen.getAllByText('This is a test error message 234')[0]).toBeInTheDocument()
     expect(screen.queryByText('loading chunk', {exact: false})).toBeNull()

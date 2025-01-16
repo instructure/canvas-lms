@@ -32,7 +32,7 @@ class DownloadSubmissionsDialogManager {
     assignment: Assignment,
     // @ts-expect-error
     downloadUrlTemplate,
-    submissionsDownloading: (assignmentId: string) => void
+    submissionsDownloading: (assignmentId: string) => void,
   ) {
     this.assignment = assignment
     this.downloadUrl = replaceTags(downloadUrlTemplate, 'assignment_id', assignment.id)

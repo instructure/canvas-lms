@@ -278,7 +278,7 @@ Implemented for: Canvas LMS)
     mock_migration = ContentMigration.create!(context: @course)
     def mock_migration.export_content
       self.workflow_state = "imported"
-      migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
+      migration_settings[:imported_assets] = { "Quizzes::Quiz" => "xyz", "AssessmentQuestionBank" => "qwe" }
     end
     allow(ContentMigration).to receive(:new).and_return(mock_migration)
     allow(ContentMigration).to receive(:find).with(mock_migration.id).and_return(mock_migration)
@@ -350,7 +350,7 @@ Implemented for: Canvas LMS)
       expect(item_id).to eq "pending"
       expect(@token).to eq context
 
-      @mock_migration.migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
+      @mock_migration.migration_settings[:imported_assets] = { "AssessmentQuestionBank" => "qwe", "Quizzes::Quiz" => "xyz" }
       @mock_migration.workflow_state = "imported"
 
       status, _details, _context, item_id = soap_request(
@@ -369,7 +369,7 @@ Implemented for: Canvas LMS)
     end
 
     it "responds with failures asynchronously as well" do
-      @mock_migration.migration_settings[:imported_assets] = []
+      @mock_migration.migration_settings[:imported_assets] = {}
       @mock_migration.workflow_state = "failed"
 
       status, _details, _context, item_id = soap_request(

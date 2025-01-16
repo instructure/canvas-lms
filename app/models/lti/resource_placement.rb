@@ -141,11 +141,7 @@ module Lti
     end
 
     def self.public_placements(root_account)
-      if root_account.feature_enabled?(:remove_submission_type_selection_from_dev_keys_edit_page)
-        valid_placements(root_account) - NON_PUBLIC_PLACEMENTS
-      else
-        valid_placements(root_account)
-      end
+      valid_placements(root_account) - NON_PUBLIC_PLACEMENTS
     end
 
     def self.update_tabs_and_return_item_banks_tab(tabs, new_label = nil)

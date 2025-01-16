@@ -99,7 +99,7 @@ describe('SplitScreenThreadsContainer', () => {
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <SplitScreenThreadsContainer {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 
@@ -125,28 +125,28 @@ describe('SplitScreenThreadsContainer', () => {
       const container = setup(
         defaultProps({
           overrides: {hasMoreNewerReplies: true, fetchingMoreNewerReplies: true},
-        })
+        }),
       )
       await waitFor(() => expect(container.queryByTestId('new-reply-spinner')).toBeTruthy())
     })
 
     it('hide newer button spinner when fetchingMoreNewerReplies is false', async () => {
       const container = setup(
-        defaultProps({overrides: {hasMoreNewerReplies: true, fetchingMoreNewerReplies: false}})
+        defaultProps({overrides: {hasMoreNewerReplies: true, fetchingMoreNewerReplies: false}}),
       )
       await waitFor(() => expect(container.queryByTestId('new-reply-spinner')).toBeNull())
     })
 
     it('show older button spinner when fetchingMoreOlderReplies is true', async () => {
       const container = setup(
-        defaultProps({overrides: {hasMoreOlderReplies: true, fetchingMoreOlderReplies: true}})
+        defaultProps({overrides: {hasMoreOlderReplies: true, fetchingMoreOlderReplies: true}}),
       )
       await waitFor(() => expect(container.queryByTestId('old-reply-spinner')).toBeTruthy())
     })
 
     it('hide older button spinner when fetchingMoreOlderReplies is false', async () => {
       const container = setup(
-        defaultProps({overrides: {hasMoreOlderReplies: true, fetchingMoreOlderReplies: false}})
+        defaultProps({overrides: {hasMoreOlderReplies: true, fetchingMoreOlderReplies: false}}),
       )
       await waitFor(() => expect(container.queryByTestId('old-reply-spinner')).toBeNull())
     })
@@ -156,7 +156,7 @@ describe('SplitScreenThreadsContainer', () => {
     it('clicking show older replies button calls showOlderReplies()', async () => {
       const showOlderReplies = jest.fn()
       const container = setup(
-        defaultProps({overrides: {hasMoreOlderReplies: true, showOlderReplies}})
+        defaultProps({overrides: {hasMoreOlderReplies: true, showOlderReplies}}),
       )
       const showOlderRepliesButton = await container.findByTestId('show-more-replies-button')
       fireEvent.click(showOlderRepliesButton)
@@ -166,7 +166,7 @@ describe('SplitScreenThreadsContainer', () => {
     it('clicking show newer replies button calls showNewerReplies()', async () => {
       const showNewerReplies = jest.fn()
       const container = setup(
-        defaultProps({overrides: {hasMoreNewerReplies: true, showNewerReplies}})
+        defaultProps({overrides: {hasMoreNewerReplies: true, showNewerReplies}}),
       )
       const showNewerRepliesButton = await container.findByTestId('show-more-replies-button')
       fireEvent.click(showNewerRepliesButton)
@@ -263,7 +263,7 @@ describe('SplitScreenThreadsContainer', () => {
               reportType: 'other',
             },
           },
-        })
+        }),
       )
 
       fireEvent.click(getByTestId('thread-actions-menu'))
@@ -277,7 +277,7 @@ describe('SplitScreenThreadsContainer', () => {
         updateDiscussionEntryParticipantMock({
           discussionEntryId: '50',
           reportType: 'other',
-        })
+        }),
       )
 
       fireEvent.click(getByTestId('thread-actions-menu'))

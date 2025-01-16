@@ -32,7 +32,7 @@ const I18n = createI18nScope('discussions_posts')
 
 export const AnonymousResponseSelector = props => {
   const [selectedOption, setSelectedOption] = useState(
-    props.discussionAnonymousState ? 'Anonymous' : props.username
+    props.discussionAnonymousState ? 'Anonymous' : props.username,
   )
   const [showOptions, setShowOptions] = useState(false)
   const [highlightedOption, setHighlightedOption] = useState(null)

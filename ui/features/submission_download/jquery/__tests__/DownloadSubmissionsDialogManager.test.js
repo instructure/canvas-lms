@@ -28,7 +28,7 @@ describe('DownloadSubmissionsDialogManager#constructor', () => {
       {
         id: 'the_id',
       },
-      'the_{{ assignment_id }}_url'
+      'the_{{ assignment_id }}_url',
     )
 
     expect(manager.downloadUrl).toBe('the_the_id_url')
@@ -42,7 +42,7 @@ describe('DownloadSubmissionsDialogManager#isDialogEnabled', () => {
         submission_types: ['online_upload'],
         has_submitted_submissions: true,
       },
-      'the_url'
+      'the_url',
     )
     expect(manager.isDialogEnabled()).toBe(true)
   })
@@ -53,7 +53,7 @@ describe('DownloadSubmissionsDialogManager#isDialogEnabled', () => {
         submission_types: ['online_text_entry'],
         has_submitted_submissions: true,
       },
-      'the_url'
+      'the_url',
     )
     expect(manager.isDialogEnabled()).toBe(true)
   })
@@ -64,7 +64,7 @@ describe('DownloadSubmissionsDialogManager#isDialogEnabled', () => {
         submission_types: ['online_url'],
         has_submitted_submissions: true,
       },
-      'the_url'
+      'the_url',
     )
     expect(manager.isDialogEnabled()).toBe(true)
   })
@@ -75,7 +75,7 @@ describe('DownloadSubmissionsDialogManager#isDialogEnabled', () => {
         submission_types: ['foo'],
         has_submitted_submissions: true,
       },
-      'the_url'
+      'the_url',
     )
     expect(manager.isDialogEnabled()).toBe(false)
   })
@@ -86,7 +86,7 @@ describe('DownloadSubmissionsDialogManager#isDialogEnabled', () => {
         submission_types: ['online_url'],
         has_submitted_submissions: false,
       },
-      '/foo/bar'
+      '/foo/bar',
     )
     expect(manager.isDialogEnabled()).toBe(false)
   })
@@ -113,7 +113,7 @@ describe('DownloadSubmissionsDialogManager#showDialog', () => {
         has_submitted_submissions: true,
       },
       'the_{{ assignment_id }}_url',
-      submissionsDownloading
+      submissionsDownloading,
     )
     manager.showDialog()
 

@@ -27,7 +27,7 @@ type AbortableArgs<
   S extends AnyFunction,
   E extends AnyFunction,
   L extends AnyFunction,
-  M extends AnyFunction
+  M extends AnyFunction,
 > = {
   success?: S
   error?: E
@@ -40,7 +40,7 @@ function abortable<
   S extends AnyFunction,
   E extends AnyFunction,
   L extends AnyFunction,
-  M extends AnyFunction
+  M extends AnyFunction,
 >({success, error, loading, meta}: AbortableArgs<S, E, L, M>) {
   const aborter = new AbortController()
   let active = true
@@ -126,7 +126,7 @@ export default function useFetchApi<R, T>(
 
     fetchOpts = {}, // other options to pass to fetch
   }: UseFetchApiArgs<R, T>,
-  additionalDependencies: readonly unknown[] = []
+  additionalDependencies: readonly unknown[] = [],
 ) {
   // useImmediate for deep comparisons and may help avoid browser flickering
   useImmediate(
@@ -199,6 +199,6 @@ export default function useFetchApi<R, T>(
       fetchNumPages,
       fetchOpts,
     ],
-    {deep: true}
+    {deep: true},
   )
 }

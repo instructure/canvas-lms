@@ -18,7 +18,6 @@
 
 import * as RceCommandShim from '../RceCommandShim'
 import fixtures from '@canvas/test-utils/fixtures'
-import sinon from 'sinon'
 
 let remoteEditor = null
 
@@ -31,7 +30,7 @@ describe('RceCommandShim - send', () => {
     remoteEditor = {
       hidden: false,
       isHidden: () => remoteEditor.hidden,
-      call: sinon.stub().returns('methodResult'),
+      call: jest.fn().mockReturnValue('methodResult'),
     }
   })
 
@@ -42,7 +41,7 @@ describe('RceCommandShim - send', () => {
   it("just forwards through target's remoteEditor if set", () => {
     $target.data('remoteEditor', remoteEditor)
     expect(RceCommandShim.send($target, 'methodName', 'methodArgument')).toBe('methodResult')
-    expect(remoteEditor.call.calledWith('methodName', 'methodArgument')).toBe(true)
+    expect(remoteEditor.call).toHaveBeenCalledWith('methodName', 'methodArgument')
   })
 
   it('returns false for exists? if neither remoteEditor nor rich_text are set (e.g. load failed)', () => {
@@ -79,13 +78,14 @@ describe('RceCommandShim - send', () => {
       classes,
       dataAttributes: {'preview-alt': previewAlt},
     })
-    expect(
-      remoteEditor.call.calledWithMatch('insertLink', {
-        href: url,
-        class: classes,
-        'data-preview-alt': previewAlt,
-      })
-    ).toBe(true)
+    expect(remoteEditor.call).toHaveBeenCalledWith('insertLink', {
+      url,
+      classes,
+      href: url,
+      class: classes,
+      'data-preview-alt': previewAlt,
+      dataAttributes: {'preview-alt': previewAlt},
+    })
   })
 })
 
@@ -96,7 +96,7 @@ describe('RceCommandShim - focus', () => {
     fixtures.setup()
     $target = fixtures.create('<textarea />')
     const editor = {
-      focus: sinon.spy(),
+      focus: jest.fn(),
     }
     const tinymce = {
       get: () => editor,
@@ -109,10 +109,10 @@ describe('RceCommandShim - focus', () => {
   })
 
   it("just forwards through target's remoteEditor if set", () => {
-    remoteEditor = {focus: sinon.spy()}
+    remoteEditor = {focus: jest.fn()}
     $target.data('remoteEditor', remoteEditor)
     RceCommandShim.focus($target)
-    expect(remoteEditor.focus.called).toBe(true)
+    expect(remoteEditor.focus).toHaveBeenCalled()
   })
 })
 
@@ -129,14 +129,14 @@ describe('RceCommandShim - destroy', () => {
   })
 
   it("forwards through target's remoteEditor if set", () => {
-    remoteEditor = {destroy: sinon.spy()}
+    remoteEditor = {destroy: jest.fn()}
     $target.data('remoteEditor', remoteEditor)
     RceCommandShim.destroy($target)
-    expect(remoteEditor.destroy.called).toBe(true)
+    expect(remoteEditor.destroy).toHaveBeenCalled()
   })
 
   it("clears target's remoteEditor afterwards if set", () => {
-    remoteEditor = {destroy: sinon.spy()}
+    remoteEditor = {destroy: jest.fn()}
     $target.data('remoteEditor', remoteEditor)
     RceCommandShim.destroy($target)
     expect($target.data('remoteEditor')).toBeNull()

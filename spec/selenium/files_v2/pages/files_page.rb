@@ -29,8 +29,8 @@ module FilesPage
     fxpath("//button[descendant::text()[contains(., 'All My Files')]]")
   end
 
-  def folder_link(folder_name)
-    f("[data-testid='#{folder_name}']")
+  def create_folder_button
+    f("[data-testid='create-folder-button']")
   end
 
   def files_usage_text_selector
@@ -39,5 +39,26 @@ module FilesPage
 
   def files_usage_text
     f(files_usage_text_selector)
+  end
+
+  def table_item_by_name(name)
+    f("[data-testid='#{name}']")
+  end
+
+  def table_rows
+    ff("tbody tr")
+  end
+
+  def create_folder_input
+    f("[name='folderName']")
+  end
+
+  def pagination_container
+    f("[data-testid='files-pagination']")
+  end
+
+  # which button is next/current/previous depends on how many are being rendered
+  def pagination_button_by_index(index)
+    pagination_container.find_elements(:css, "button")[index]
   end
 end

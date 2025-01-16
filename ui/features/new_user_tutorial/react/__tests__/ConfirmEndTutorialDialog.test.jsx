@@ -45,7 +45,7 @@ describe('ConfirmEndTutorialDialog Spec', () => {
 
     expect(putSpy).toHaveBeenCalledWith(
       '/api/v1/users/self/features/flags/new_user_tutorial_on_off',
-      {state: 'off'}
+      {state: 'off'},
     )
   })
 

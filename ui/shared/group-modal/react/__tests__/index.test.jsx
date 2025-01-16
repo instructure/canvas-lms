@@ -57,7 +57,7 @@ describe('GroupModal', () => {
           requestMethod="POST"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(getByText(/Joining/i)).toBeVisible()
       expect(queryByText(/Group Membership Limit/i)).toBeNull()
@@ -73,7 +73,7 @@ describe('GroupModal', () => {
           requestMethod="POST"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(getByText(/Group Membership Limit/i)).toBeVisible()
       expect(queryByText(/Joining/i)).toBeNull()
@@ -89,7 +89,7 @@ describe('GroupModal', () => {
           requestMethod="POST"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(getByText(/Save/i)).toBeVisible()
       expect(getByText(/Cancel/i)).toBeVisible()
@@ -106,7 +106,7 @@ describe('GroupModal', () => {
           requestMethod="POST"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.type(getByPlaceholderText('Name'), 'foo')
       expect(getByPlaceholderText('Name')).toHaveValue('foo')
@@ -120,7 +120,7 @@ describe('GroupModal', () => {
           requestMethod="POST"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(getByPlaceholderText('Name')).toHaveValue('')
     })
@@ -135,7 +135,7 @@ describe('GroupModal', () => {
           requestMethod="POST"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(getByText('Save').closest('button').hasAttribute('disabled')).toBeTruthy()
     })
@@ -151,7 +151,7 @@ describe('GroupModal', () => {
           requestMethod="POST"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.type(getByPlaceholderText('Name'), 'foo')
       expect(getByText('Save').closest('button').hasAttribute('disabled')).toBeFalsy()
@@ -169,7 +169,7 @@ describe('GroupModal', () => {
           requestMethod="POST"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.type(getByPlaceholderText('Name'), 'Teacher Organized')
       await user.click(getByText('Save'))
@@ -200,7 +200,7 @@ describe('GroupModal', () => {
           requestMethod="POST"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.type(getByPlaceholderText('Name'), 'Student Organized')
       await user.click(getByText('Save'))
@@ -229,7 +229,7 @@ describe('GroupModal', () => {
           requestMethod="PUT"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(getByPlaceholderText('Name')).toHaveValue('foo')
       expect(getByPlaceholderText('Number')).toHaveValue('3')
@@ -276,7 +276,7 @@ describe('GroupModal', () => {
           requestMethod="PUT"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.clear(getByPlaceholderText('Name'))
       await user.type(getByPlaceholderText('Name'), 'Beetle Juice')
@@ -308,7 +308,7 @@ describe('GroupModal', () => {
           requestMethod="PUT"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.clear(getByPlaceholderText('Name'))
       await user.type(getByPlaceholderText('Name'), 'Sleepy Hollow')
@@ -339,7 +339,7 @@ describe('GroupModal', () => {
           requestMethod="PUT"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.clear(getByPlaceholderText('Name'))
       await user.type(getByPlaceholderText('Name'), 'Name Only')
@@ -368,7 +368,7 @@ describe('GroupModal', () => {
           requestMethod="PUT"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.type(getByPlaceholderText('Number'), '{selectall}{backspace}')
       expect(getByPlaceholderText('Number')).toHaveAttribute('value', '')
@@ -390,7 +390,7 @@ describe('GroupModal', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore() // eslint-disable-line no-console
+      console.error.mockRestore()  
     })
 
     it('reports an error if the fetch fails', async () => {
@@ -405,7 +405,7 @@ describe('GroupModal', () => {
           requestMethod="POST"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.type(getByPlaceholderText('Name'), 'foo')
       await user.click(getByText('Save'))
@@ -423,14 +423,14 @@ describe('GroupModal', () => {
           requestMethod="PUT"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.type(getByPlaceholderText('Name'), 'foo')
       await user.type(getByPlaceholderText('Number'), '{selectall}{backspace}')
       await user.type(getByPlaceholderText('Number'), '3')
       await user.click(getByText('Save'))
       const errors = await findAllByText(
-        'Group membership limit must be equal to or greater than current members count.'
+        'Group membership limit must be equal to or greater than current members count.',
       )
       expect(errors[0]).toBeInTheDocument()
     })
@@ -445,7 +445,7 @@ describe('GroupModal', () => {
           requestMethod="PUT"
           onSave={onSave}
           onDismiss={onDismiss}
-        />
+        />,
       )
       await user.type(getByPlaceholderText('Name'), 'foo')
       const input = getByLabelText(/Group Membership/i)

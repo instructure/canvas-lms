@@ -56,6 +56,7 @@ RestrictedDialogForm.renderRestrictedAccessForm = function (options) {
         ref={e => (this.dialogForm = e)}
         onSubmit={this.handleSubmit}
         className="form-horizontal form-dialog permissions-dialog-form"
+        data-testid="restricted-access-form"
       >
         <RestrictedRadioButtons
           ref={e => (this.restrictedSelection = e)}

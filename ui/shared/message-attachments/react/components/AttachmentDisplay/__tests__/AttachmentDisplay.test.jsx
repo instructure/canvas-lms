@@ -30,7 +30,7 @@ const setup = props => {
       onReplaceItem={Function.prototype}
       onDeleteItem={Function.prototype}
       {...props}
-    />
+    />,
   )
 }
 
@@ -41,7 +41,7 @@ describe('AttachmentDisplay', () => {
 
   it('renders the attachments', () => {
     const {getAllByTestId} = setup()
-    expect(getAllByTestId('attachment').length).toBe(2)
+    expect(getAllByTestId('attachment')).toHaveLength(2)
   })
 
   describe('replacing', () => {
@@ -50,18 +50,18 @@ describe('AttachmentDisplay', () => {
       const {getAllByTestId} = setup({onReplaceItem: onReplaceItemMock})
       const attachments = getAllByTestId('attachment')
       const replacementInputs = getAllByTestId('replacement-input')
-      expect(onReplaceItemMock.mock.calls.length).toBe(0)
+      expect(onReplaceItemMock.mock.calls).toHaveLength(0)
 
       // replace first attachment
       fireEvent.dblClick(attachments[0])
       fireEvent.change(replacementInputs[0])
-      expect(onReplaceItemMock.mock.calls.length).toBe(1)
+      expect(onReplaceItemMock.mock.calls).toHaveLength(1)
       expect(onReplaceItemMock.mock.calls[0][0]).toBe('1')
 
       // replace second attachment
       fireEvent.dblClick(attachments[1])
       fireEvent.change(replacementInputs[1])
-      expect(onReplaceItemMock.mock.calls.length).toBe(2)
+      expect(onReplaceItemMock.mock.calls).toHaveLength(2)
       expect(onReplaceItemMock.mock.calls[1][0]).toBe('2')
     })
   })
@@ -71,12 +71,12 @@ describe('AttachmentDisplay', () => {
       const onDeleteItemMock = jest.fn()
       const {getByTestId, getAllByTestId} = setup({onDeleteItem: onDeleteItemMock})
       const attachments = getAllByTestId('attachment')
-      expect(onDeleteItemMock.mock.calls.length).toBe(0)
+      expect(onDeleteItemMock.mock.calls).toHaveLength(0)
 
       // delete first attachment
       fireEvent.mouseOver(attachments[0])
       fireEvent.click(getByTestId('remove-button'))
-      expect(onDeleteItemMock.mock.calls.length).toBe(1)
+      expect(onDeleteItemMock.mock.calls).toHaveLength(1)
       expect(onDeleteItemMock.mock.calls[0][0]).toBe('1')
       fireEvent.mouseOut(attachments[0])
       act(() => jest.advanceTimersByTime(1))
@@ -84,7 +84,7 @@ describe('AttachmentDisplay', () => {
       // delete second attachment
       fireEvent.mouseOver(attachments[1])
       fireEvent.click(getByTestId('remove-button'))
-      expect(onDeleteItemMock.mock.calls.length).toBe(2)
+      expect(onDeleteItemMock.mock.calls).toHaveLength(2)
       expect(onDeleteItemMock.mock.calls[1][0]).toBe('2')
       fireEvent.mouseOut(attachments[1])
       act(() => jest.advanceTimersByTime(1))

@@ -40,7 +40,7 @@ const AddLtiConferenceDialog = ({context, conferenceType, isOpen, onRequestClose
       }
       onContent(returnedItem)
     },
-    [onContent, onRequestClose]
+    [onContent, onRequestClose],
   )
 
   const handleWindowEvent = useCallback(
@@ -53,7 +53,7 @@ const AddLtiConferenceDialog = ({context, conferenceType, isOpen, onRequestClose
         addContentItems(event.data)
       }
     },
-    [addContentItems]
+    [addContentItems],
   )
 
   useEffect(() => {

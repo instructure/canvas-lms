@@ -64,7 +64,7 @@ describe('DifferentiatedModulesTray', () => {
   it('opens to settings when initialTab is "settings"', async () => {
     const {getByRole} = renderComponent({initialTab: 'settings'})
     await waitFor(() =>
-      expect(getByRole('tab', {name: /Settings/})).toHaveAttribute('aria-selected', 'true')
+      expect(getByRole('tab', {name: /Settings/})).toHaveAttribute('aria-selected', 'true'),
     )
   })
 
@@ -104,7 +104,7 @@ describe('DifferentiatedModulesTray', () => {
 
     it('does not fetch assignment overrides', () => {
       renderComponent()
-      expect(fetchMock.calls(OVERRIDES_URL).length).toBe(0)
+      expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(0)
     })
   })
 })

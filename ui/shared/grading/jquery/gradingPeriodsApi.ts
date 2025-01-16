@@ -56,7 +56,7 @@ export default {
           grading_periods: SerializedGradingPeriod[]
         }>(batchUpdateUrl(setId), serializePeriods(periods))
         .then(response => resolve(this.deserializePeriods(response.data.grading_periods)))
-        .catch(error => reject(error))
+        .catch(error => reject(error)),
     )
   },
 }

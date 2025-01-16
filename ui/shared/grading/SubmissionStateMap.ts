@@ -84,7 +84,7 @@ class SubmissionStateMap {
       student,
       this.hasGradingPeriods,
       this.selectedGradingPeriodID,
-      this.isAdmin
+      this.isAdmin,
     )
   }
 

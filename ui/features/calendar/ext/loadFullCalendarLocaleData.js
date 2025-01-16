@@ -87,7 +87,7 @@ export default function loadFullCalendarLocaleData(locale) {
       return import('../../../ext/custom_moment_locales/ca').then(
         ({default: reconfigureMomentCALocale}) => {
           reconfigureMomentCALocale()
-        }
+        },
       )
     }
   })

@@ -32,10 +32,10 @@ const I18n = createI18nScope('announcements_on_home_page')
 if (ENV.SHOW_ANNOUNCEMENTS) {
   ready(() => {
     const container = document.querySelector('#announcements_on_home_page')
-     
+
     ReactDOM.render(
       <Spinner delay={500} renderTitle={I18n.t('Loading Announcements')} size="small" />,
-      container
+      container,
     )
 
     const url = '/api/v1/announcements'
@@ -54,7 +54,6 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
     axios
       .get(url, {params})
       .then(response => {
-         
         ReactDOM.render(
           <View display="block" margin="0 0 medium">
             <Heading
@@ -67,15 +66,13 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
               <AnnouncementRow key={announcement.id} announcement={announcement} />
             ))}
           </View>,
-          container
+          container,
         )
       })
       .catch(error => {
-         
         console.error('Error retrieving home page announcements')
         console.error(error)
         captureException(error)
-         
       })
   })
 }

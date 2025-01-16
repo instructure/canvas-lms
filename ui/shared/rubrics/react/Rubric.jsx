@@ -176,7 +176,7 @@ const Rubric = props => {
       setNarrowColWidths(
         (width * MIN_WIDTH_PERCENT) / 100 > MIN_WIDTH_PIXELS
           ? `${MIN_WIDTH_PERCENT}%`
-          : `${MIN_WIDTH_PIXELS}px`
+          : `${MIN_WIDTH_PIXELS}px`,
       )
     }
 

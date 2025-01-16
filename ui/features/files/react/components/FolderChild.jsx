@@ -220,7 +220,7 @@ FolderChild.render = function () {
   return (
     <div {...this.getAttributesForRootNode()}>
       <div className="ef-select-col" role="gridcell">
-        { }
+        {}
         <label className={keyboardCheckboxClass}>
           <input
             type="checkbox"

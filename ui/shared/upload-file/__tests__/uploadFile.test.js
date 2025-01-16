@@ -17,9 +17,40 @@
  */
 
 import {uploadFile, completeUpload} from '../index'
-import sinon from 'sinon'
 
 describe('Upload File', () => {
+  beforeEach(() => {
+    global.FormData = function () {
+      const data = new Map()
+      return {
+        append: (key, value) => data.set(key, value),
+        get: key => data.get(key),
+        has: key => data.has(key),
+        entries: () => data.entries(),
+        toString: () => {
+          const pairs = []
+          data.forEach((value, key) => pairs.push(`${key}=${value}`))
+          return pairs.join('&')
+        },
+      }
+    }
+
+    // Mock Blob
+    global.Blob = function (content, options) {
+      return {
+        content,
+        type: options?.type || '',
+        size: content[0]?.length || 0,
+        toString: () => content[0],
+      }
+    }
+  })
+
+  afterEach(() => {
+    delete global.FormData
+    delete global.Blob
+  })
+
   test('uploadFile posts form data instead of json if necessary', async () => {
     const preflightResponse = new Promise(resolve => {
       setTimeout(() =>
@@ -27,14 +58,14 @@ describe('Upload File', () => {
           data: {
             upload_url: 'http://uploadUrl',
           },
-        })
+        }),
       )
     })
 
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.onCall(0).returns(preflightResponse)
-    postStub.onCall(1).resolves({data: {}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockReturnValueOnce(preflightResponse)
+    postStub.mockResolvedValueOnce({data: {}})
     const fakeAjaxLib = {
       post: postStub,
       get: getStub,
@@ -45,12 +76,13 @@ describe('Upload File', () => {
       name: 'fake',
       'attachment[context_code]': 'course_1',
     }
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     await uploadFile(url, data, file, fakeAjaxLib)
-    expect(
-      postStub.calledWith(url, 'name=fake&attachment%5Bcontext_code%5D=course_1&no_redirect=true')
-    ).toBeTruthy()
+    expect(postStub).toHaveBeenCalledWith(
+      url,
+      'name=fake&attachment%5Bcontext_code%5D=course_1&no_redirect=true',
+    )
   })
 
   test('uploadFile requests no_redirect in preflight even if not specified', async () => {
@@ -60,14 +92,14 @@ describe('Upload File', () => {
           data: {
             upload_url: 'http://uploadUrl',
           },
-        })
+        }),
       )
     })
 
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.onCall(0).returns(preflightResponse)
-    postStub.onCall(1).resolves({data: {}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockReturnValueOnce(preflightResponse)
+    postStub.mockResolvedValueOnce({data: {}})
     const fakeAjaxLib = {
       post: postStub,
       get: getStub,
@@ -75,10 +107,10 @@ describe('Upload File', () => {
 
     const url = `/api/v1/courses/1/files`
     const data = {name: 'fake'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     await uploadFile(url, data, file, fakeAjaxLib)
-    expect(postStub.calledWith(url, {name: 'fake', no_redirect: true})).toBeTruthy()
+    expect(postStub).toHaveBeenCalledWith(url, {name: 'fake', no_redirect: true})
   })
 
   test('uploadFile threads through in direct to S3 case', async () => {
@@ -90,15 +122,15 @@ describe('Upload File', () => {
             upload_params: {fakeKey: 'fakeValue', success_url: successUrl},
             upload_url: 'http://uploadUrl',
           },
-        })
+        }),
       )
     })
 
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.onCall(0).returns(preflightResponse)
-    postStub.onCall(1).resolves({data: {}})
-    getStub.resolves({data: {}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockReturnValueOnce(preflightResponse)
+    postStub.mockResolvedValueOnce({data: {}})
+    getStub.mockResolvedValue({data: {}})
 
     const fakeAjaxLib = {
       post: postStub,
@@ -107,10 +139,10 @@ describe('Upload File', () => {
 
     const url = `/api/v1/courses/1/files`
     const data = {name: 'fake'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     await uploadFile(url, data, file, fakeAjaxLib)
-    expect(getStub.calledWith(successUrl)).toBeTruthy()
+    expect(getStub).toHaveBeenCalledWith(successUrl)
   })
 
   test('uploadFile threads through in inst-fs case', async () => {
@@ -122,7 +154,7 @@ describe('Upload File', () => {
             upload_params: {fakeKey: 'fakeValue'},
             upload_url: 'http://uploadUrl',
           },
-        })
+        }),
       )
     })
 
@@ -131,15 +163,15 @@ describe('Upload File', () => {
         resolve({
           status: 201,
           data: {location: successUrl},
-        })
+        }),
       )
     })
 
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.onCall(0).returns(preflightResponse)
-    postStub.onCall(1).returns(postResponse)
-    getStub.resolves({data: {}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockReturnValueOnce(preflightResponse)
+    postStub.mockReturnValueOnce(postResponse)
+    getStub.mockResolvedValue({data: {}})
 
     const fakeAjaxLib = {
       post: postStub,
@@ -148,10 +180,10 @@ describe('Upload File', () => {
 
     const url = `/api/v1/courses/1/files`
     const data = {name: 'fake'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     await uploadFile(url, data, file, fakeAjaxLib)
-    expect(getStub.calledWith(successUrl)).toBeTruthy()
+    expect(getStub).toHaveBeenCalledWith(successUrl)
   })
 
   test('uploadFile threads through in local-storage case', async () => {
@@ -162,7 +194,7 @@ describe('Upload File', () => {
             upload_params: {fakeKey: 'fakeValue'},
             upload_url: 'http://uploadUrl',
           },
-        })
+        }),
       )
     })
 
@@ -170,15 +202,15 @@ describe('Upload File', () => {
       setTimeout(() =>
         resolve({
           data: {id: 1},
-        })
+        }),
       )
     })
 
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.onCall(0).returns(preflightResponse)
-    postStub.onCall(1).returns(postResponse)
-    getStub.resolves({data: {}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockReturnValueOnce(preflightResponse)
+    postStub.mockReturnValueOnce(postResponse)
+    getStub.mockResolvedValue({data: {}})
 
     const fakeAjaxLib = {
       post: postStub,
@@ -187,7 +219,7 @@ describe('Upload File', () => {
 
     const url = `/api/v1/courses/1/files`
     const data = {name: 'fake'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     const response = await uploadFile(url, data, file, fakeAjaxLib)
     expect(response.id).toBe(1)
@@ -199,39 +231,39 @@ describe('Upload File', () => {
       attachments: [{upload_url}],
     }
 
-    const postStub = sinon.stub()
-    postStub.resolves({data: {}})
+    const postStub = jest.fn()
+    postStub.mockResolvedValue({data: {}})
     const fakeAjaxLib = {post: postStub}
 
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     return completeUpload(preflightResponse, file, {ajaxLib: fakeAjaxLib}).then(() => {
-      expect(postStub.calledWith(upload_url, sinon.match.any, sinon.match.any)).toBeTruthy()
+      expect(postStub).toHaveBeenCalledWith(upload_url, expect.any(Object), expect.any(Object))
     })
   })
 
   test('completeUpload wires up progress callback if any', () => {
-    const postStub = sinon.stub()
-    postStub.resolves({data: {}})
+    const postStub = jest.fn()
+    postStub.mockResolvedValue({data: {}})
     const fakeAjaxLib = {post: postStub}
 
     const preflightResponse = {upload_url: 'http://uploadUrl'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
+    const onProgress = jest.fn()
+
     const options = {
       ajaxLib: fakeAjaxLib,
-      onProgress: sinon.spy(),
+      onProgress,
     }
 
     return completeUpload(preflightResponse, file, options).then(() => {
-      expect(
-        postStub.calledWith(
-          sinon.match.any,
-          sinon.match.any,
-          sinon.match({
-            onUploadProgress: options.onProgress,
-          })
-        )
-      ).toBeTruthy()
+      expect(postStub).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Object),
+        expect.objectContaining({
+          onUploadProgress: onProgress,
+        }),
+      )
     })
   })
 
@@ -243,14 +275,14 @@ describe('Upload File', () => {
         resolve({
           status: 201,
           data: {location: successUrl},
-        })
+        }),
       )
     })
 
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.returns(postResponse)
-    getStub.resolves({data: {}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockReturnValueOnce(postResponse)
+    getStub.mockResolvedValue({data: {}})
 
     const fakeAjaxLib = {
       post: postStub,
@@ -258,14 +290,14 @@ describe('Upload File', () => {
     }
 
     const preflightResponse = {upload_url: 'http://uploadUrl'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     const options = {
       ajaxLib: fakeAjaxLib,
       ignoreResult: true,
     }
 
     return completeUpload(preflightResponse, file, options).then(() => {
-      expect(getStub.calledWith(successUrl)).toBeFalsy()
+      expect(getStub).not.toHaveBeenCalled()
     })
   })
 
@@ -277,14 +309,14 @@ describe('Upload File', () => {
         resolve({
           status: 201,
           data: {location: successUrl},
-        })
+        }),
       )
     })
 
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.returns(postResponse)
-    getStub.resolves({data: {}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockReturnValueOnce(postResponse)
+    getStub.mockResolvedValue({data: {}})
 
     const fakeAjaxLib = {
       post: postStub,
@@ -292,24 +324,24 @@ describe('Upload File', () => {
     }
 
     const preflightResponse = {upload_url: 'http://uploadUrl'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     const options = {
       ajaxLib: fakeAjaxLib,
       includeAvatar: true,
     }
 
     return completeUpload(preflightResponse, file, options).then(() => {
-      expect(getStub.calledWith(`${successUrl}?include=avatar`)).toBeTruthy()
+      expect(getStub).toHaveBeenCalledWith(`${successUrl}?include=avatar`)
     })
   })
 
   test('completeUpload to S3 posts withCredentials false', () => {
     const successUrl = 'http://successUrl'
 
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.resolves({data: {}})
-    getStub.resolves({data: {}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockResolvedValue({data: {}})
+    getStub.mockResolvedValue({data: {}})
 
     const fakeAjaxLib = {
       post: postStub,
@@ -320,27 +352,25 @@ describe('Upload File', () => {
       upload_url: 'http://uploadUrl',
       success_url: successUrl,
     }
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     const options = {ajaxLib: fakeAjaxLib}
 
     return completeUpload(preflightResponse, file, options).then(() => {
-      expect(
-        postStub.calledWith(
-          sinon.match.any,
-          sinon.match.any,
-          sinon.match({
-            withCredentials: false,
-          })
-        )
-      ).toBeTruthy()
+      expect(postStub).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Object),
+        expect.objectContaining({
+          withCredentials: false,
+        }),
+      )
     })
   })
 
   test('completeUpload to non-S3 posts withCredentials true', () => {
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.resolves({data: {}})
-    getStub.resolves({data: {}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockResolvedValue({data: {}})
+    getStub.mockResolvedValue({data: {}})
 
     const fakeAjaxLib = {
       post: postStub,
@@ -348,25 +378,23 @@ describe('Upload File', () => {
     }
 
     const preflightResponse = {upload_url: 'http://uploadUrl'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     const options = {ajaxLib: fakeAjaxLib}
 
     return completeUpload(preflightResponse, file, options).then(() => {
-      expect(
-        postStub.calledWith(
-          sinon.match.any,
-          sinon.match.any,
-          sinon.match({
-            withCredentials: true,
-          })
-        )
-      ).toBeTruthy()
+      expect(postStub).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Object),
+        expect.objectContaining({
+          withCredentials: true,
+        }),
+      )
     })
   })
 
   test('completeUpload does not add a null file to the upload POST', () => {
-    const postStub = sinon.stub()
-    postStub.resolves({data: {}})
+    const postStub = jest.fn()
+    postStub.mockResolvedValue({data: {}})
 
     const fakeAjaxLib = {
       post: postStub,
@@ -380,22 +408,22 @@ describe('Upload File', () => {
     const options = {ajaxLib: fakeAjaxLib}
 
     return completeUpload(preflightResponse, file, options).then(() => {
-      expect(
-        postStub.calledWith(
-          sinon.match.any,
-          sinon.match(formData => !formData.has('file')),
-          sinon.match.any
-        )
-      ).toBeTruthy()
+      expect(postStub).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Object),
+        expect.any(Object),
+      )
+      const formData = postStub.mock.calls[0][1]
+      expect(formData.has('file')).toBe(false)
     })
   })
 
   test('completeUpload immediately waits on progress if given a progress and no upload_url', () => {
     const results = {id: 1}
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.resolves({data: {}})
-    getStub.resolves({data: {workflow_state: 'completed', results}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockResolvedValue({data: {}})
+    getStub.mockResolvedValue({data: {workflow_state: 'completed', results}})
 
     const fakeAjaxLib = {
       post: postStub,
@@ -407,17 +435,17 @@ describe('Upload File', () => {
     const options = {ajaxLib: fakeAjaxLib}
 
     return completeUpload(preflightResponse, file, options).then(data => {
-      expect(postStub.called).toBeFalsy()
+      expect(postStub).not.toHaveBeenCalled()
       expect(data).toEqual(results)
     })
   })
 
   test('completeUpload waits on progress after upload POST if given both a progress and upload URL', () => {
     const results = {id: 1}
-    const postStub = sinon.stub()
-    const getStub = sinon.stub()
-    postStub.resolves({data: {}})
-    getStub.resolves({data: {workflow_state: 'completed', results}})
+    const postStub = jest.fn()
+    const getStub = jest.fn()
+    postStub.mockResolvedValue({data: {}})
+    getStub.mockResolvedValue({data: {workflow_state: 'completed', results}})
 
     const fakeAjaxLib = {
       post: postStub,
@@ -432,15 +460,15 @@ describe('Upload File', () => {
     const options = {ajaxLib: fakeAjaxLib}
 
     return completeUpload(preflightResponse, file, options).then(data => {
-      expect(postStub.called).toBeTruthy()
+      expect(postStub).toHaveBeenCalled()
       expect(data).toEqual(results)
     })
   })
 
   test('uploadFile differentiates network failures during preflight', async () => {
-    const fakeAjaxLib = {post: sinon.stub()}
-    fakeAjaxLib.post.rejects({message: 'Network Error'}) // preflight attempt
-    const file = new File(['fake'], 'fake.txt')
+    const fakeAjaxLib = {post: jest.fn()}
+    fakeAjaxLib.post.mockRejectedValue({message: 'Network Error'}) // preflight attempt
+    const file = new Blob(['fake'], {type: 'text/plain'})
     try {
       await uploadFile('http://preflightUrl', {}, file, fakeAjaxLib)
       expect(false).toBeTruthy() // preflight should fail
@@ -450,10 +478,10 @@ describe('Upload File', () => {
   })
 
   test('uploadFile differentiates network failures during POST to upload_url', async () => {
-    const fakeAjaxLib = {post: sinon.stub()}
-    fakeAjaxLib.post.onCall(0).resolves({data: {upload_url: 'http://uploadUrl'}}) // preflight
-    fakeAjaxLib.post.onCall(1).rejects({message: 'Network Error'}) // upload attempt
-    const file = new File(['fake'], 'fake.txt')
+    const fakeAjaxLib = {post: jest.fn()}
+    fakeAjaxLib.post.mockResolvedValueOnce({data: {upload_url: 'http://uploadUrl'}}) // preflight
+    fakeAjaxLib.post.mockRejectedValue({message: 'Network Error'}) // upload attempt
+    const file = new Blob(['fake'], {type: 'text/plain'})
     try {
       await uploadFile('http://preflightUrl', {}, file, fakeAjaxLib)
       expect(false).toBeTruthy() // upload should fail
@@ -463,16 +491,16 @@ describe('Upload File', () => {
   })
 
   test('uploadFile differentiates network failures after upload', async () => {
-    const fakeAjaxLib = {post: sinon.stub(), get: sinon.stub()}
-    fakeAjaxLib.post.onCall(0).resolves({
+    const fakeAjaxLib = {post: jest.fn(), get: jest.fn()}
+    fakeAjaxLib.post.mockResolvedValueOnce({
       data: {
         upload_url: 'http://uploadUrl',
         success_url: 'http://successUrl',
       },
     }) // preflight
-    fakeAjaxLib.post.onCall(1).resolves({data: {}}) // upload
-    fakeAjaxLib.get.rejects({message: 'Network Error'}) // success url attempt
-    const file = new File(['fake'], 'fake.txt')
+    fakeAjaxLib.post.mockResolvedValueOnce({data: {}}) // upload
+    fakeAjaxLib.get.mockRejectedValue({message: 'Network Error'}) // success url attempt
+    const file = new Blob(['fake'], {type: 'text/plain'})
     try {
       await uploadFile('http://preflightUrl', {}, file, fakeAjaxLib)
       expect(false).toBeTruthy() // finalization should fail

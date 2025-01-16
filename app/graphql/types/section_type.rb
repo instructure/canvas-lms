@@ -55,5 +55,8 @@ module Types
 
     field :students, UserType.connection_type, null: true
     delegate :students, to: :object
+
+    field :all_students, UserType.connection_type, null: true
+    delegate :all_students, to: :object
   end
 end

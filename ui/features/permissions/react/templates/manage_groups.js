@@ -48,7 +48,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to move group members to another group in an account or course.'
+        'Allows user to move group members to another group in an account or course.',
       ),
     },
     {
@@ -60,7 +60,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to view the Clone Group Set button for an account or course group.'
+        'Allows user to view the Clone Group Set button for an account or course group.',
       ),
     },
     {
@@ -71,7 +71,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to move group members to another group in an account or course.'
+        'Allows user to move group members to another group in an account or course.',
       ),
     },
     {
@@ -82,13 +82,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Groups - add'),
       description: I18n.t(
-        'To add account level groups via CSV, SIS Data - import must also be enabled.'
+        'To add account level groups via CSV, SIS Data - import must also be enabled.',
       ),
     },
     {
       title: I18n.t('Groups'),
       description: I18n.t(
-        'If this permission is disabled, at the account level, the user cannot view any existing account groups. At the course level, the user can view, but not access, any existing groups, including groups created by students.'
+        'If this permission is disabled, at the account level, the user cannot view any existing account groups. At the course level, the user can view, but not access, any existing groups, including groups created by students.',
       ),
     },
     {
@@ -96,17 +96,17 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To view all student groups in a course, Groups - view all student groups must also be enabled.'
+        'To view all student groups in a course, Groups - view all student groups must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
+        'By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.',
       ),
     },
     {
       description: I18n.t(
-        'To access the People page and view course groups, Users - view list must also be enabled.'
+        'To access the People page and view course groups, Users - view list must also be enabled.',
       ),
     },
   ],
@@ -164,18 +164,18 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Groups'),
       description: I18n.t(
-        'To view all student groups in a course, Groups - view all student groups must also be enabled.'
+        'To view all student groups in a course, Groups - view all student groups must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
+        'By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.',
       ),
     },
     {
       description: I18n.t(
-        'To access the People page and view course groups, Users - view list must also be enabled.'
+        'To access the People page and view course groups, Users - view list must also be enabled.',
       ),
     },
-  ]
+  ],
 )

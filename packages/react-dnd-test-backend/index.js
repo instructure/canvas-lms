@@ -1,25 +1,6 @@
-/* eslint-disable operator-assignment */
-/* eslint-disable no-sparse-arrays */
-/* eslint-disable prefer-spread */
-/* eslint-disable new-cap */
-/* eslint-disable no-sequences */
-/* eslint-disable no-self-compare */
-/* eslint-disable no-labels */
-/* eslint-disable no-new-func */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable @typescript-eslint/no-redeclare */
 /* eslint-disable no-empty */
-/* eslint-disable prefer-object-spread */
-/* eslint-disable no-useless-concat */
-/* eslint-disable no-restricted-globals */
-/* eslint-disable block-scoped-var */
-/* eslint-disable strict */
-/* eslint-disable vars-on-top */
-/* eslint-disable no-var */
-/* eslint-disable dot-notation */
-/* eslint-disable @typescript-eslint/semi */
-/* eslint-disable spaced-comment */
-/* eslint-disable prettier/prettier */
+/* eslint-disable no-constant-condition */
+/* eslint-disable no-sparse-arrays */
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *

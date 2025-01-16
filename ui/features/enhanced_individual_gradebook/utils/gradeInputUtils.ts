@@ -61,7 +61,7 @@ export function submitterPreviewText(submission: GradebookUserSubmissionDetails)
 export function outOfText(
   assignment: AssignmentConnection,
   submission: GradebookUserSubmissionDetails,
-  pointsBasedGradingScheme: boolean
+  pointsBasedGradingScheme: boolean,
 ): string {
   const {gradingType, pointsPossible} = assignment
 
@@ -90,7 +90,7 @@ export function outOfText(
 
 export function disableGrading(
   assignment: AssignmentConnection,
-  submitScoreStatus?: ApiCallStatus
+  submitScoreStatus?: ApiCallStatus,
 ): boolean {
   return (
     submitScoreStatus === ApiCallStatus.PENDING ||
@@ -105,11 +105,11 @@ export function assignmentHasCheckpoints(assignment: AssignmentConnection): bool
 
 export const getCorrectSubmission = (
   submission?: GradebookUserSubmissionDetails,
-  subAssignmentTag?: string | null
+  subAssignmentTag?: string | null,
 ) => {
   if (subAssignmentTag === REPLY_TO_TOPIC || subAssignmentTag === REPLY_TO_ENTRY) {
     return submission?.subAssignmentSubmissions?.find(
-      subSubmission => subSubmission.subAssignmentTag === subAssignmentTag
+      subSubmission => subSubmission.subAssignmentTag === subAssignmentTag,
     )
   }
 

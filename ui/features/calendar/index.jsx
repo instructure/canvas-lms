@@ -65,18 +65,17 @@ const initializeDelayed = header => {
       onLoadAppointmentGroups: agMap => {
         if (ENV.CALENDAR.SHOW_SCHEDULER) {
           const courses = eventDataSource.contexts.filter(context =>
-            agMap.hasOwnProperty(context.asset_string)
+            agMap.hasOwnProperty(context.asset_string),
           )
           if (courses.length > 0) {
-            // eslint-disable-next-line no-restricted-properties
             ReactDOM.render(
               <FindAppointment courses={courses} store={schedulerStore} />,
-              $('#select-course-component')[0]
+              $('#select-course-component')[0],
             )
           }
         }
       },
-    }
+    },
   )
   const onContextsChange = additionalContexts => {
     calendar.syncNewContexts(additionalContexts)
@@ -89,12 +88,11 @@ const initializeDelayed = header => {
     ENV.CALENDAR.CONTEXTS,
     ENV.CALENDAR.SELECTED_CONTEXTS,
     eventDataSource,
-    onContextsChange
+    onContextsChange,
   )
 }
 
 const startAnyway = error => {
-  // eslint-disable-next-line no-console
   console.error('Unable to load FullCalendar locale data for "%s" -- %s', ENV.MOMENT_LOCALE, error)
   start()
 }
@@ -122,13 +120,13 @@ $('.calendar-button').on('focus', e => {
 })
 
 $('.calendar-button').on('focusout', e =>
-  $(e.target).find('.accessibility-warning').addClass('screenreader-only')
+  $(e.target).find('.accessibility-warning').addClass('screenreader-only'),
 )
 
 $('.rs-section .accessibility-warning').on('focus', e =>
-  $(e.target).removeClass('screenreader-only')
+  $(e.target).removeClass('screenreader-only'),
 )
 
 $('.rs-section .accessibility-warning').on('focusout', e =>
-  $(e.target).addClass('screenreader-only')
+  $(e.target).addClass('screenreader-only'),
 )

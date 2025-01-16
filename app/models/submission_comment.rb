@@ -467,7 +467,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def serialization_methods
     methods = []
-    methods << :avatar_path if context.root_account.service_enabled?(:avatars)
+    methods << :avatar_path if root_account&.service_enabled?(:avatars)
     methods
   end
 

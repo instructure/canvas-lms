@@ -49,7 +49,7 @@ describe('AssignToGroupMenu', () => {
           name: 'a group',
         }),
       ],
-      {category: groupCategory}
+      {category: groupCategory},
     )
     view = new AssignToGroupMenu({
       collection: groups,

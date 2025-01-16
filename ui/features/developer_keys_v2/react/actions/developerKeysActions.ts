@@ -43,14 +43,14 @@ export type LtiDeveloperKeyApiResponse = {
 export type ToActionCreatorName<K> = ToActionCreatorNameInner<K, true>
 export type ToActionCreatorNameInner<
   ActionType extends string,
-  IsFirstSegment extends boolean = false
+  IsFirstSegment extends boolean = false,
 > = ActionType extends `${infer SegmentHead}_${infer SegmentTail}`
   ? `${IsFirstSegment extends true
       ? Lowercase<SegmentHead>
       : Capitalize<Lowercase<SegmentHead>>}${ToActionCreatorNameInner<SegmentTail, false>}`
   : IsFirstSegment extends true
-  ? Lowercase<ActionType>
-  : Capitalize<Lowercase<ActionType>>
+    ? Lowercase<ActionType>
+    : Capitalize<Lowercase<ActionType>>
 
 export type DeveloperKeyActionNames =
   | 'LIST_DEVELOPER_KEYS_START'
@@ -352,7 +352,7 @@ export const actions = {
         resource: string
         resource_name: string
       }
-    >
+    >,
   ) => ({
     type: actions.LIST_DEVELOPER_KEY_SCOPES_SUCCESSFUL,
     payload,
@@ -392,7 +392,7 @@ export const actions = {
           developerKeyId: developerKey.id,
           // @ts-expect-error
           newAccountBinding: {...previousAccountBinding, workflow_state: workflowState},
-        })
+        }),
       )
       axios
         .post(url, {
@@ -409,7 +409,7 @@ export const actions = {
               developerKeyId: developerKey.id,
               // @ts-expect-error
               previousAccountBinding,
-            })
+            }),
           )
           $.flashError(error.message)
         })
@@ -463,7 +463,7 @@ export const actions = {
     (
       url: string,
       developerKeysPassedIn: Array<DeveloperKey>,
-      callback: (developerKeys: Array<DeveloperKey>) => void
+      callback: (developerKeys: Array<DeveloperKey>) => void,
     ) =>
     (dispatch: Function) => {
       // @ts-expect-error
@@ -484,7 +484,7 @@ export const actions = {
     (
       url: string,
       developerKeysPassedIn: Array<DeveloperKey>,
-      callback: (developerKeys: Array<DeveloperKey>) => void
+      callback: (developerKeys: Array<DeveloperKey>) => void,
     ) =>
     (dispatch: Function) => {
       // @ts-expect-error
@@ -643,7 +643,7 @@ export const actions = {
     disabled_placements: Array<string>,
     developerKeyId: string,
     toolConfiguration: unknown,
-    customFields: unknown
+    customFields: unknown,
   ) => {
     const url = `/api/lti/developer_keys/${developerKeyId}/tool_configuration`
     return axios

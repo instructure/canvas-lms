@@ -49,7 +49,7 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
         readonly: bool,
         scorer_id: string,
         selected: bool,
-      })
+      }),
     ).isRequired,
   }
 
@@ -73,7 +73,7 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
       this.props.onGradeSelected({isNewGrade: true})
     } else {
       const selectedGrade = this.props.provisionalGrades.find(
-        grade => grade.provisional_grade_id === value
+        grade => grade.provisional_grade_id === value,
       )
       this.props.onGradeSelected({selectedGrade})
     }
@@ -120,7 +120,7 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
     // rendered at the top. It needs some slightly special handling since the
     // moderator might not have actually issued a provisional grade yet.
     const gradeIssuedByModerator = provisionalGrades.find(
-      grade => grade.scorer_id === this.props.finalGraderId
+      grade => grade.scorer_id === this.props.finalGraderId,
     )
 
     const moderatorGradeId = gradeIssuedByModerator
@@ -128,7 +128,7 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
       : NEW_CUSTOM_GRADE
 
     const gradesIssuedByOthers = provisionalGrades.filter(
-      grade => grade.provisional_grade_id !== moderatorGradeId
+      grade => grade.provisional_grade_id !== moderatorGradeId,
     )
 
     let sortKey = 'scorer_id'

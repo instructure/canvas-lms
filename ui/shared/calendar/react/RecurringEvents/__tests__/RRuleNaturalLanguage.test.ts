@@ -48,7 +48,7 @@ describe('RRuleToNaturalLanguage', () => {
         const str = RRuleToNaturalLanguage(
           `FREQ=DAILY;INTERVAL=1;UNTIL=${until.utc().format('YYYYMMDDTHHmmss') + 'Z'}`,
           locale,
-          timezone
+          timezone,
         )
         expect(str).toEqual(`Daily until ${format_date(until.toDate())}`)
       })
@@ -64,7 +64,7 @@ describe('RRuleToNaturalLanguage', () => {
         const str = RRuleToNaturalLanguage(
           `FREQ=DAILY;INTERVAL=2;UNTIL=${until.utc().format('YYYYMMDDTHHmmss') + 'Z'}`,
           locale,
-          timezone
+          timezone,
         )
         expect(str).toEqual(`Every 2 days until ${format_date(until.toDate())}`)
       })
@@ -77,7 +77,7 @@ describe('RRuleToNaturalLanguage', () => {
         const str = RRuleToNaturalLanguage(
           'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR;COUNT=3',
           locale,
-          timezone
+          timezone,
         )
         expect(str).toEqual('Weekly on Mon, Wed, Fri, 3 times')
       })
@@ -89,7 +89,7 @@ describe('RRuleToNaturalLanguage', () => {
             until.utc().format('YYYYMMDDTHHmmss') + 'Z'
           }`,
           locale,
-          timezone
+          timezone,
         )
         expect(str).toEqual(`Weekly on Mon, Wed, Fri until ${format_date(until.toDate())}`)
       })
@@ -100,7 +100,7 @@ describe('RRuleToNaturalLanguage', () => {
         const str = RRuleToNaturalLanguage(
           'FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE,FR;COUNT=3',
           locale,
-          timezone
+          timezone,
         )
         expect(str).toEqual('Every 2 weeks on Mon, Wed, Fri, 3 times')
       })
@@ -112,7 +112,7 @@ describe('RRuleToNaturalLanguage', () => {
             until.utc().format('YYYYMMDDTHHmmss') + 'Z'
           }`,
           locale,
-          timezone
+          timezone,
         )
         expect(str).toEqual(`Every 2 weeks on Mon, Wed, Fri until ${format_date(until.toDate())}`)
       })
@@ -125,7 +125,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=MONTHLY;BYMONTHDAY=15;INTERVAL=1;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Monthly on day 15, 3 times')
           })
@@ -137,7 +137,7 @@ describe('RRuleToNaturalLanguage', () => {
                 until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual(`Monthly on day 15 until ${format_date(until.toDate())}`)
           })
@@ -148,7 +148,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=MONTHLY;BYMONTHDAY=15;INTERVAL=2;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Every 2 months on day 15, 3 times')
           })
@@ -160,7 +160,7 @@ describe('RRuleToNaturalLanguage', () => {
                 until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual(`Every 2 months on day 15 until ${format_date(until.toDate())}`)
           })
@@ -172,7 +172,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=MONTHLY;BYDAY=TU;BYSETPOS=1;INTERVAL=1;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Monthly on the first Tue, 3 times')
           })
@@ -184,7 +184,7 @@ describe('RRuleToNaturalLanguage', () => {
                 until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual(`Monthly on the first Tue until ${format_date(until.toDate())}`)
           })
@@ -195,7 +195,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=MONTHLY;BYDAY=TU;BYSETPOS=1;INTERVAL=2;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Every 2 months on the first Tue, 3 times')
           })
@@ -207,10 +207,10 @@ describe('RRuleToNaturalLanguage', () => {
                 until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual(
-              `Every 2 months on the first Tue until ${format_date(until.toDate())}`
+              `Every 2 months on the first Tue until ${format_date(until.toDate())}`,
             )
           })
         })
@@ -221,7 +221,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=MONTHLY;BYDAY=TU;BYSETPOS=-1;INTERVAL=1;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Monthly on the last Tue, 3 times')
           })
@@ -233,7 +233,7 @@ describe('RRuleToNaturalLanguage', () => {
                 until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual(`Monthly on the last Tue until ${format_date(until.toDate())}`)
           })
@@ -244,7 +244,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=MONTHLY;BYDAY=TU;BYSETPOS=-1;INTERVAL=2;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Every 2 months on the last Tue, 3 times')
           })
@@ -256,10 +256,10 @@ describe('RRuleToNaturalLanguage', () => {
                 until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual(
-              `Every 2 months on the last Tue until ${format_date(until.toDate())}`
+              `Every 2 months on the last Tue until ${format_date(until.toDate())}`,
             )
           })
         })
@@ -273,7 +273,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=YEARLY;BYMONTH=7;BYMONTHDAY=28;INTERVAL=1;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Annually on Jul 28, 3 times')
           })
@@ -285,7 +285,7 @@ describe('RRuleToNaturalLanguage', () => {
                 until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual(`Annually on Jul 28 until ${format_date(until.toDate())}`)
           })
@@ -294,7 +294,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;INTERVAL=1;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Annually on Feb 29, 3 times')
           })
@@ -304,7 +304,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=YEARLY;BYMONTH=7;BYDAY=TU;BYSETPOS=2;INTERVAL=1;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Annually on the second Tue of Jul, 3 times')
           })
@@ -316,10 +316,10 @@ describe('RRuleToNaturalLanguage', () => {
                 until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual(
-              `Annually on the second Tue of Jul until ${format_date(until.toDate())}`
+              `Annually on the second Tue of Jul until ${format_date(until.toDate())}`,
             )
           })
         })
@@ -331,7 +331,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=YEARLY;BYMONTH=7;BYMONTHDAY=28;INTERVAL=2;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Every 2 years on Jul 28, 3 times')
           })
@@ -343,7 +343,7 @@ describe('RRuleToNaturalLanguage', () => {
                 until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual(`Every 2 years on Jul 28 until ${format_date(until.toDate())}`)
           })
@@ -353,7 +353,7 @@ describe('RRuleToNaturalLanguage', () => {
             const str = RRuleToNaturalLanguage(
               'FREQ=YEARLY;BYMONTH=7;BYDAY=TU;BYSETPOS=2;INTERVAL=2;COUNT=3',
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual('Every 2 years on the second Tue of Jul, 3 times')
           })
@@ -365,10 +365,10 @@ describe('RRuleToNaturalLanguage', () => {
                 until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
-              timezone
+              timezone,
             )
             expect(str).toEqual(
-              `Every 2 years on the second Tue of Jul until ${format_date(until.toDate())}`
+              `Every 2 years on the second Tue of Jul until ${format_date(until.toDate())}`,
             )
           })
         })

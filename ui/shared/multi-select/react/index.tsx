@@ -133,7 +133,7 @@ function CanvasMultiSelect(props: Props) {
           tagText: n.props.tagText,
         }
       }) || [],
-    [children]
+    [children],
   )
 
   const [filteredOptionIds, setFilteredOptionIds] = useState<string[] | null>(null)
@@ -148,7 +148,7 @@ function CanvasMultiSelect(props: Props) {
         React.Children.map(children, child => {
           if (!React.isValidElement(child)) return undefined
           return child.props.group
-        })
+        }),
       ),
     ].filter((group: string) => group)
 
@@ -156,7 +156,6 @@ function CanvasMultiSelect(props: Props) {
       key: React.Key
       props: {id: string; children: React.ReactNode; key?: string; group: string; tagText?: string}
     }) {
-       
       const {id, children, ...optionProps} = child.props
       delete optionProps.tagText
       return (
@@ -192,19 +191,19 @@ function CanvasMultiSelect(props: Props) {
           })
         }
         return null
-      })
+      }),
     )
 
     function renderGroups() {
       const grouplessOptions = filteredChildren.filter(o => o.props.group === undefined)
       const groupsToRender = groups.filter(group =>
-        filteredChildren.some(child => child.props.group === group)
+        filteredChildren.some(child => child.props.group === group),
       )
       const optionsToRender = grouplessOptions.map(isolatedOption =>
         renderOption({
           ...isolatedOption,
           key: isolatedOption.key ?? uniqueId('multi-select-option-'),
-        })
+        }),
       )
       return [
         ...optionsToRender,
@@ -217,7 +216,7 @@ function CanvasMultiSelect(props: Props) {
                 renderOption({
                   ...option,
                   key: option.key || uniqueId('multi-select-group-option-'),
-                })
+                }),
               )}
           </Select.Group>
         )),
@@ -256,7 +255,7 @@ function CanvasMultiSelect(props: Props) {
             onClick={(e: React.MouseEvent<ViewProps, MouseEvent>) => dismissTag(e, id, tagText)}
           />
         )
-      })
+      }),
     )
   }
 
@@ -288,11 +287,11 @@ function CanvasMultiSelect(props: Props) {
       option: {
         label: string
       },
-      term: string
+      term: string,
     ) => option.label.match(new RegExp(`^${term}`, 'i'))
     const matcher = customMatcher || defaultMatcher
     const filtered = childProps.filter(
-      child => matcher(child, value.trim()) && !selectedOptionIds.includes(child.id)
+      child => matcher(child, value.trim()) && !selectedOptionIds.includes(child.id),
     )
     let message =
       // if number of options has changed, announce the new total.
@@ -302,7 +301,7 @@ function CanvasMultiSelect(props: Props) {
               one: 'One option available.',
               other: '%{count} options available.',
             },
-            {count: filtered.length}
+            {count: filtered.length},
           )
         : null
     if (message && filtered.length > 0 && highlightedOptionId !== filtered[0].id) {
@@ -330,7 +329,7 @@ function CanvasMultiSelect(props: Props) {
     if (filteredOptionIds?.length === 1) {
       const option = getChildById(filteredOptionIds[0])
       setAnnouncement(
-        I18n.t('%{label} selected. List collapsed.', {label: option ? primaryLabel(option) : ''})
+        I18n.t('%{label} selected. List collapsed.', {label: option ? primaryLabel(option) : ''}),
       )
       onChange([...selectedOptionIds, filteredOptionIds[0]])
     }
@@ -396,7 +395,7 @@ function CanvasMultiSelect(props: Props) {
         onKeyDown={onKeyDown}
         onBlur={onBlur}
         assistiveText={I18n.t(
-          'Type or use arrow keys to navigate. Multiple selections are allowed.'
+          'Type or use arrow keys to navigate. Multiple selections are allowed.',
         )}
         renderBeforeInput={contentBeforeInput()}
         isRequired={isRequired && selectedOptionIds.length === 0}

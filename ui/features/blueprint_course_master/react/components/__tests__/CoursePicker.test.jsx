@@ -19,7 +19,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {shallow} from 'enzyme'
-import sinon from 'sinon'
 import CoursePicker from '../CoursePicker'
 import getSampleData from './getSampleData'
 
@@ -50,7 +49,7 @@ describe('CoursePicker component', () => {
 
   test('calls loadCourses when filters are updated', () => {
     const props = defaultProps()
-    props.loadCourses = sinon.spy()
+    props.loadCourses = jest.fn()
     const ref = React.createRef()
     const tree = render(<CoursePicker {...props} ref={ref} />)
     const picker = ref.current
@@ -61,6 +60,6 @@ describe('CoursePicker component', () => {
       search: 'one',
     })
 
-    expect(props.loadCourses.calledOnce).toBeTruthy()
+    expect(props.loadCourses).toHaveBeenCalledTimes(1)
   })
 })

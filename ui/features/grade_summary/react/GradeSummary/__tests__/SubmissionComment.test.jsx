@@ -31,7 +31,7 @@ describe('SubmissionComment', () => {
   it('renders', () => {
     const {getByText} = render(<SubmissionComment {...defaultProps} />)
     expect(
-      getByText(Submission.mock().commentsConnection.nodes[0]?.author?.shortName)
+      getByText(Submission.mock().commentsConnection.nodes[0]?.author?.shortName),
     ).toBeInTheDocument()
   })
 })

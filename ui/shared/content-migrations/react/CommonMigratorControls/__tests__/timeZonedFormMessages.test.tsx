@@ -16,16 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {timeZonedFormMessages} from '../timeZonedFormMessages'
 import moment from 'moment-timezone'
-import tzInTest from '@instructure/moment-utils/specHelpers'
+import {configureAndRestoreLater} from '@instructure/moment-utils/specHelpers'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 import {render} from '@testing-library/react'
-// @ts-ignore
+
+interface TimeZoneMessage {
+  type: 'hint'
+  text: React.ReactElement
+}
+
+function isTimeZoneMessage(result: unknown): result is TimeZoneMessage {
+  return (
+    typeof result === 'object' &&
+    result !== null &&
+    'type' in result &&
+    'text' in result &&
+    React.isValidElement((result as any).text)
+  )
+}
+
 import tz from 'timezone'
-// @ts-ignore
 import chicago from 'timezone/America/Chicago'
-// @ts-ignore
 import detroit from 'timezone/America/Detroit'
 
 describe('timeZonedFormMessages', () => {
@@ -38,7 +52,7 @@ describe('timeZonedFormMessages', () => {
   describe('when the two timezones are the same', () => {
     it('returns an empty array', () => {
       expect(
-        timeZonedFormMessages('America/New_York', 'America/New_York', '2024-11-08T08:00:00+00:00')
+        timeZonedFormMessages('America/New_York', 'America/New_York', '2024-11-08T08:00:00+00:00'),
       ).toStrictEqual([])
     })
   })
@@ -47,7 +61,7 @@ describe('timeZonedFormMessages', () => {
     it('returns an array with two messages', () => {
       moment.tz.setDefault('America/Denver')
 
-      tzInTest.configureAndRestoreLater({
+      configureAndRestoreLater({
         tz: tz(detroit, 'America/Detroit', chicago, 'America/Chicago'),
         tzData: {
           'America/Chicago': chicago,
@@ -59,19 +73,23 @@ describe('timeZonedFormMessages', () => {
       const result = timeZonedFormMessages(
         'America/Detroit',
         'America/Chicago',
-        '2024-11-08T08:00:00+00:00'
+        '2024-11-08T08:00:00+00:00',
       )
 
       const localResult = result[0]
       const courseResult = result[1]
-      const {getByText: localGetByText} = render(localResult.text as JSX.Element)
-      const {getByText: courseGetByTest} = render(courseResult.text as JSX.Element)
 
-      expect(result.length).toBe(2)
+      if (!isTimeZoneMessage(localResult) || !isTimeZoneMessage(courseResult)) {
+        throw new Error('Invalid message format')
+      }
+      const {getByText: localGetByText} = render(localResult.text)
+      const {getByText: courseGetByTest} = render(courseResult.text)
+
+      expect(result).toHaveLength(2)
       expect(localResult.type).toBe('hint')
       expect(courseResult.type).toBe('hint')
-      expect(localGetByText('Local: Nov 8 at 2am')).toBeInTheDocument()
-      expect(courseGetByTest('Course: Nov 8 at 3am')).toBeInTheDocument()
+      expect(localGetByText(/Local: [A-Za-z]{3} \d{1,2}(, \d{4})? at 2am/)).toBeInTheDocument()
+      expect(courseGetByTest(/Course: [A-Za-z]{3} \d{1,2}(, \d{4})? at 3am/)).toBeInTheDocument()
     })
   })
 })

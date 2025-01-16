@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {PasswordPolicy} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import type {PasswordPolicy} from '../types'
 
 const I18n = createI18nScope('new_login')
 
@@ -29,7 +29,7 @@ export const useServerErrorsMap = (passwordPolicy?: PasswordPolicy): Record<stri
     'user.self_enrollment_code.blank': I18n.t('Please enter an enrollment code.'),
     'user.self_enrollment_code.invalid': I18n.t('The enrollment code is invalid.'),
     'user.self_enrollment_code.already_enrolled': I18n.t(
-      'You are already enrolled in this course.'
+      'You are already enrolled in this course.',
     ),
     'user.self_enrollment_code.concluded': I18n.t('This course has ended.'),
     'user.self_enrollment_code.full': I18n.t('This course is full.'),
@@ -40,7 +40,7 @@ export const useServerErrorsMap = (passwordPolicy?: PasswordPolicy): Record<stri
     }),
     'pseudonym.unique_id.invalid': I18n.t(
       'Username can only include letters, numbers, or the following: %{characters}',
-      {characters: '. + - _ @ ='}
+      {characters: '. + - _ @ ='},
     ),
     'pseudonym.unique_id.taken': I18n.t('This username is already in use.'),
     'pseudonym.unique_id.bad_credentials': I18n.t('Invalid username or password.'),
@@ -69,13 +69,13 @@ export const useServerErrorsMap = (passwordPolicy?: PasswordPolicy): Record<stri
     'pseudonym.password.sequence': passwordPolicy?.maxSequence
       ? I18n.t(
           'Password cannot include a sequence of %{max} or more characters (e.g., “abcdef”).',
-          {max: passwordPolicy.maxSequence}
+          {max: passwordPolicy.maxSequence},
         )
       : I18n.t('Password contains a prohibited sequence of characters.'),
     'pseudonym.password.common': I18n.t('Avoid using common passwords like “password123.”'),
     'pseudonym.password.no_digits': I18n.t('Password must include at least one number.'),
     'pseudonym.password.no_symbols': I18n.t(
-      'Password must include at least one special character.'
+      'Password must include at least one special character.',
     ),
     'pseudonym.password.confirmation': I18n.t('Passwords do not match.'),
     'pseudonym.password_confirmation.confirmation': I18n.t('Passwords do not match.'),

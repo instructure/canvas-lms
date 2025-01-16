@@ -228,10 +228,14 @@ RSpec.shared_examples "DiscussionType" do
     de3 = discussion.discussion_entries.create!(message: "root entry", user: @teacher)
     # adding a discussion entry should NOT impact sort order of root entries
     discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de2.id)
-    expect(discussion_type.resolve("discussionEntriesConnection(sortOrder: asc, rootEntries: true) { nodes { _id } }")).to eq [de.id, de2.id, de3.id].map(&:to_s)
-    expect(discussion_type.resolve("discussionEntriesConnection(sortOrder: desc, rootEntries: true) { nodes { _id } }")).to eq [de3.id, de2.id, de.id].map(&:to_s)
+    discussion.update!(sort_order: "asc", sort_order_locked: true)
+    Account.site_admin.enable_feature!(:discussion_default_sort)
+    expect(discussion_type.resolve("discussionEntriesConnection(rootEntries: true) { nodes { _id } }")).to eq [de.id, de2.id, de3.id].map(&:to_s)
+    discussion.update!(sort_order: "desc")
+    expect(discussion_type.resolve("discussionEntriesConnection(rootEntries: true) { nodes { _id } }")).to eq [de3.id, de2.id, de.id].map(&:to_s)
     discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de3.id)
-    expect(discussion_type.resolve("discussionEntriesConnection(sortOrder: desc,rootEntries: true) { nodes { _id } }")).to eq [de3.id, de2.id, de.id].map(&:to_s)
+    expect(discussion_type.resolve("discussionEntriesConnection(rootEntries: true) { nodes { _id } }")).to eq [de3.id, de2.id, de.id].map(&:to_s)
+    Account.site_admin.disable_feature!(:discussion_default_sort)
   end
 
   it "loads discussion_entry_drafts" do
@@ -937,14 +941,6 @@ describe Types::DiscussionType do
       end
 
       context "visibility" do
-        before do
-          Account.site_admin.enable_feature! :selective_release_backend
-        end
-
-        after do
-          Account.site_admin.disable_feature! :selective_release_backend
-        end
-
         it "is visible only to the assigned student" do
           override = @topic.assignment_overrides.create!
           override.assignment_override_students.create!(user: @student1)

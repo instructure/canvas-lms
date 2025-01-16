@@ -16,19 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bool, string} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
-import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import lockedSVG from '../../images/Locked1.svg'
-import React from 'react'
+import {assignLocation} from '@canvas/util/globalUtils'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {bool, string} from 'prop-types'
+import React from 'react'
+import lockedSVG from '../../images/Locked1.svg'
 
 const I18n = createI18nScope('assignments_2_login_action_prompt')
 
 const navigateToLogin = () => {
-  window.location.assign('/login')
+  assignLocation('/login')
 }
 
 function LoginActionText(props) {

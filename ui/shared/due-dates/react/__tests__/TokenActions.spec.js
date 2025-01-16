@@ -34,7 +34,7 @@ describe('TokenActions', () => {
       tokenToAdd,
       initialOverrides,
       1, // rowKey
-      {due_at: new Date(2012, 1, 1)} // dates
+      {due_at: new Date(2012, 1, 1)}, // dates
     )
     assertTimesEqual(newOverrides[0], {due_at: new Date(2012, 1, 1)})
     assertValuesEqual(newOverrides[0], {course_section_id: 1, rowKey: 1})
@@ -47,7 +47,7 @@ describe('TokenActions', () => {
       tokenToAdd,
       initialOverrides,
       1, // rowKey
-      {due_at: new Date(2012, 1, 1)} // dates
+      {due_at: new Date(2012, 1, 1)}, // dates
     )
     assertTimesEqual(newOverrides[0], {due_at: new Date(2012, 1, 1)})
     assertValuesEqual(newOverrides[0], {group_id: 1, rowKey: 1})
@@ -60,7 +60,7 @@ describe('TokenActions', () => {
       tokenToAdd,
       initialOverrides,
       1, // rowKey
-      {due_at: new Date(2012, 1, 1)}
+      {due_at: new Date(2012, 1, 1)},
     )
     assertTimesEqual(newOverrides[0], {due_at: new Date(2012, 1, 1)})
     assertValuesEqual(newOverrides[0], {student_ids: [1], rowKey: 1})
@@ -78,7 +78,7 @@ describe('TokenActions', () => {
       tokenToAdd,
       initialOverrides,
       1, // rowKey
-      {due_at: new Date(2012, 1, 1)}
+      {due_at: new Date(2012, 1, 1)},
     )
     assertTimesEqual(newOverrides[0], {due_at: new Date(2012, 1, 1)})
     assertValuesEqual(newOverrides[0], {student_ids: [2, 1], rowKey: 1})
@@ -97,7 +97,7 @@ describe('TokenActions', () => {
       tokenToAdd,
       initialOverrides,
       1, // rowKey
-      {due_at: new Date(2012, 1, 1), lock_at: new Date(2012, 1, 5)} // dates
+      {due_at: new Date(2012, 1, 1), lock_at: new Date(2012, 1, 5)}, // dates
     )
     const sectionOverride = newOverrides.find(o => o.get('course_section_id'))
     assertTimesEqual(newOverrides[0], {

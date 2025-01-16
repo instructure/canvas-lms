@@ -18,7 +18,6 @@
 
 import {createGradebook, setFixtureHtml} from '../../../__tests__/GradebookSpecHelper'
 import StudentFirstNameCellFormatter from '../StudentFirstNameCellFormatter'
-import sinon from 'sinon'
 
 describe('GradebookGrid StudentFirstNameCellFormatter', () => {
   let $fixture
@@ -31,7 +30,7 @@ describe('GradebookGrid StudentFirstNameCellFormatter', () => {
     setFixtureHtml($fixture)
 
     gradebook = createGradebook({})
-    sinon.stub(gradebook, 'saveSettings')
+    jest.spyOn(gradebook, 'saveSettings')
     formatter = new StudentFirstNameCellFormatter(gradebook)
 
     gradebook.setSections([
@@ -87,7 +86,7 @@ describe('GradebookGrid StudentFirstNameCellFormatter', () => {
       0, // cell
       null, // value
       null, // column definition
-      student // dataContext
+      student, // dataContext
     )
     return $fixture
   }

@@ -101,7 +101,7 @@ export default class EditExternalToolButton extends React.Component {
       () => {
         this.closeModal()
         $.flashError(I18n.t('We were unable to activate the app.'))
-      }
+      },
     )
   }
 
@@ -115,7 +115,7 @@ export default class EditExternalToolButton extends React.Component {
       () => {
         this.closeModal()
         $.flashError(I18n.t('We were unable to deactivate the app.'))
-      }
+      },
     )
   }
 

@@ -281,7 +281,7 @@ it('registers itself as animatable', () => {
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
       ref={ref}
-    />
+    />,
   )
   expect(fakeRegister).toHaveBeenCalledWith('group', ref.current, 42, ['first', 'second'])
 
@@ -293,7 +293,7 @@ it('registers itself as animatable', () => {
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
       ref={ref}
-    />
+    />,
   )
   expect(fakeDeregister).toHaveBeenCalledWith('group', ref.current, ['first', 'second'])
   expect(fakeRegister).toHaveBeenCalledWith('group', ref.current, 42, ['third', 'fourth'])

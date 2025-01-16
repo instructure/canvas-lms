@@ -33,7 +33,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'Allows user to edit Blueprint lock settings on the Discussions index page in a Blueprint master course.'
+        'Allows user to edit Blueprint lock settings on the Discussions index page in a Blueprint master course.',
       ),
     },
     {
@@ -42,7 +42,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to close for comments, move, pin/unpin, edit, and delete discussion topics in the Discussions page.'
+        'Allows user to close for comments, move, pin/unpin, edit, and delete discussion topics in the Discussions page.',
       ),
     },
     {
@@ -60,18 +60,18 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings on the Discussions index page, Courses - manage and Discussions - view must also be enabled.'
+        'To edit lock settings on the Discussions index page, Courses - manage and Discussions - view must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'If the additional permissions are enabled, but this permission is not enabled, lock settings can be edited on individual discussions.'
+        'If the additional permissions are enabled, but this permission is not enabled, lock settings can be edited on individual discussions.',
       ),
     },
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
-        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page. If this permission is enabled, Discussions - create is not required.'
+        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page. If this permission is enabled, Discussions - create is not required.',
       ),
     },
     {
@@ -95,7 +95,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'Allows user to edit Blueprint lock settings on the Discussions index page in a Blueprint master course.'
+        'Allows user to edit Blueprint lock settings on the Discussions index page in a Blueprint master course.',
       ),
     },
     {
@@ -104,7 +104,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to close for comments, move, pin/unpin, edit, and delete discussion topics in the Discussions page.'
+        'Allows user to close for comments, move, pin/unpin, edit, and delete discussion topics in the Discussions page.',
       ),
     },
     {
@@ -125,18 +125,18 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.'
+        'Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.',
       ),
     },
     {
       description: I18n.t(
-        'If this setting is disabled, and Discussions - view is enabled, the user can still adjust content lock settings on individual discussions in a Blueprint master course.'
+        'If this setting is disabled, and Discussions - view is enabled, the user can still adjust content lock settings on individual discussions in a Blueprint master course.',
       ),
     },
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
-        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page. If this permission is enabled, Discussions - create is not required.'
+        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page. If this permission is enabled, Discussions - create is not required.',
       ),
     },
     {
@@ -148,5 +148,5 @@ export const template = generateActionTemplates(
     {
       description: I18n.t('To edit a discussion, Discussions - moderate must also be enabled.'),
     },
-  ]
+  ],
 )

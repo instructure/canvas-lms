@@ -194,8 +194,8 @@ window.rubricAssessment = {
         I18n.t(
           'Extra credit not permitted on outcomes, ' +
             'score adjusted to maximum possible for %{outcome}',
-          {outcome: criterionDescription}
-        )
+          {outcome: criterionDescription},
+        ),
       )
     }
   },
@@ -230,7 +230,7 @@ window.rubricAssessment = {
           const $ratingsContainers = $ratings.find('.rating .container').css('height', ''),
             maxHeight = Math.max(
               $ratings.height(),
-              $this.find('.criterion_description .container').height()
+              $this.find('.criterion_description .container').height(),
             )
           // the -10 here is the padding on the .container.
           $ratingsContainers.css('height', maxHeight - 10 + 'px')
@@ -268,7 +268,7 @@ window.rubricAssessment = {
         const section = key => `${pre}${key}`
         const points = criteriaAssessment.points.value
         data[section('[rating_id]')] = rubricAssessment.getCriteriaAssessmentId(
-          criteriaAssessment.id
+          criteriaAssessment.id,
         )
         data[section('[points]')] = !Number.isNaN(points) ? points : undefined
         data[section('[description]')] = criteriaAssessment.description
@@ -335,7 +335,7 @@ window.rubricAssessment = {
                 htmlEscape(comments[jdx]) +
                 '">' +
                 htmlEscape(truncateText(comments[jdx], {max: 50})) +
-                '</option>'
+                '</option>',
             )
             $holder.show()
           }
@@ -358,7 +358,6 @@ window.rubricAssessment = {
       rubricAssessment.currentAssociation = association
 
       const render = currentAssessment => {
-         
         ReactDOM.render(
           <Rubric
             allowExtraCredit={ENV.outcome_extra_credit_enabled}
@@ -370,12 +369,12 @@ window.rubricAssessment = {
           >
             {null}
           </Rubric>,
-          container.get(0)
+          container.get(0),
         )
       }
 
       setCurrentAssessment(
-        rubricAssessment.fillAssessment(ENV.rubric, assessment || {}, ENV.RUBRIC_ASSESSMENT)
+        rubricAssessment.fillAssessment(ENV.rubric, assessment || {}, ENV.RUBRIC_ASSESSMENT),
       )
       const header = container.find('th').first()
       header.attr('tabindex', -1).focus()
@@ -501,9 +500,9 @@ window.rubricAssessment = {
         const filled = rubricAssessment.fillAssessment(
           ENV.rubric,
           assessment || {},
-          ENV.RUBRIC_ASSESSMENT
+          ENV.RUBRIC_ASSESSMENT,
         )
-         
+
         ReactDOM.render(
           <Rubric
             customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
@@ -514,7 +513,7 @@ window.rubricAssessment = {
           >
             {null}
           </Rubric>,
-          el
+          el,
         )
       } else {
         el.innerHTML = ''

@@ -39,13 +39,13 @@ const localizeDayCount = (days: number) =>
       one: '1 day',
       other: '%{count} days',
     },
-    {count: days}
+    {count: days},
   )
 
 const localizeChangeDescription = (
   descriptiveName: string,
   formattedNewValue: string,
-  formattedOldValue?: string
+  formattedOldValue?: string,
 ): string =>
   formattedOldValue
     ? I18n.t('%{descriptiveName} was changed from %{formattedOldValue} to %{formattedNewValue}.', {
@@ -60,7 +60,7 @@ const localizeChangeDescription = (
 
 const formatBooleanSettingChange = (
   change: Change<boolean>,
-  descriptiveName: string = change.id
+  descriptiveName: string = change.id,
 ): string =>
   change.newValue
     ? I18n.t('%{descriptiveName} was turned on.', {descriptiveName})
@@ -70,7 +70,7 @@ const formatDateSettingChange = (change: Change<string>, descriptiveName: string
   localizeChangeDescription(
     descriptiveName,
     I18n.l('date.formats.long', change.newValue),
-    change.oldValue && I18n.l('date.formats.long', change.oldValue)
+    change.oldValue && I18n.l('date.formats.long', change.oldValue),
   )
 
 const formatBlackoutDateSettingChange = (change: Change<BlackoutDate>): string => {
@@ -90,7 +90,7 @@ const formatUnknownSettingChange = (change: Change, descriptiveName: string = ch
   localizeChangeDescription(
     descriptiveName,
     JSON.stringify(change.newValue),
-    change.oldValue ? JSON.stringify(change.oldValue) : undefined
+    change.oldValue ? JSON.stringify(change.oldValue) : undefined,
   )
 
 export const summarizeItemChanges = (itemChanges: Change<CoursePaceItem>[]): SummarizedChange[] =>
@@ -99,7 +99,7 @@ export const summarizeItemChanges = (itemChanges: Change<CoursePaceItem>[]): Sum
     summary: localizeChangeDescription(
       c.newValue.assignment_title,
       localizeDayCount(c.newValue.duration),
-      c.oldValue && localizeDayCount(c.oldValue.duration)
+      c.oldValue && localizeDayCount(c.oldValue.duration),
     ),
   }))
 
@@ -130,7 +130,7 @@ export const summarizeSettingChanges = (settingChanges: Change[]): SummarizedCha
         } else {
           summary = formatBooleanSettingChange(
             change as Change<boolean>,
-            I18n.t('Require Completion by End Date')
+            I18n.t('Require Completion by End Date'),
           )
         }
         break
@@ -156,5 +156,5 @@ export const summarizeSettingChanges = (settingChanges: Change[]): SummarizedCha
 
 export const summarizeChanges = (
   settingChanges: Change[],
-  itemChanges: Change<CoursePaceItem>[]
+  itemChanges: Change<CoursePaceItem>[],
 ) => [...summarizeSettingChanges(settingChanges), ...summarizeItemChanges(itemChanges)]

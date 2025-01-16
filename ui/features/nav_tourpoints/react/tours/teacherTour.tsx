@@ -47,7 +47,7 @@ export default [
         </Heading>
         <Text as="p">
           {I18n.t(
-            'We know getting your courses online quickly during this time is priority. This quick tour will show you how to:'
+            'We know getting your courses online quickly during this time is priority. This quick tour will show you how to:',
           )}
         </Text>
         <ol>

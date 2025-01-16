@@ -44,7 +44,7 @@ describe('StudentHeader', () => {
     expect(getByText('Display as')).toBeInTheDocument()
     expect(getByText('Secondary info')).toBeInTheDocument()
     expect(
-      getByText('Students without assessments').closest('[role=menuitemcheckbox]')
+      getByText('Students without assessments').closest('[role=menuitemcheckbox]'),
     ).toBeChecked()
     expect(getByText('Inactive Enrollments').closest('[role=menuitemcheckbox]')).toBeChecked()
     expect(getByText('Concluded Enrollments').closest('[role=menuitemcheckbox]')).toBeChecked()

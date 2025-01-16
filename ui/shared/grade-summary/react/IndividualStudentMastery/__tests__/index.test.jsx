@@ -62,7 +62,7 @@ it('renders outcome groups if they are returned', async () => {
     Promise.resolve({
       outcomeGroups: [{id: 1, title: 'Group'}],
       outcomes: [],
-    })
+    }),
   )
   const {findByText} = render(<IndividualStudentMastery {...props} />)
   expect(await findByText('Group')).not.toBeNull()
@@ -88,7 +88,7 @@ describe('expand and contract', () => {
             ratings: [],
           },
         ],
-      })
+      }),
     )
   })
 
@@ -102,7 +102,7 @@ describe('expand and contract', () => {
           {id: 4, title: 'abba Albums'},
         ],
         outcomes: [],
-      })
+      }),
     )
     const {findAllByRole} = render(<IndividualStudentMastery {...props} />)
     const groups = await findAllByRole('listitem')

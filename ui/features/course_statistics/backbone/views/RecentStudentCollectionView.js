@@ -42,7 +42,7 @@ RecentStudentCollectionView.prototype.render = function () {
       return function (user) {
         return _this.renderUser(user)
       }
-    })(this)
+    })(this),
   )
   return ret
 }
@@ -54,7 +54,7 @@ RecentStudentCollectionView.prototype.renderUser = function (user) {
   return this.$el.append(
     new RecentStudentView({
       model: user,
-    }).render().el
+    }).render().el,
   )
 }
 

@@ -52,7 +52,7 @@ export default function useImmediate(fn, newDeps, opts = {}) {
     () => () => {
       if (cleanupFn.current) cleanupFn.current()
     },
-    []
+    [],
   )
 
   // Like useEffect, we want to run the fn and its cleanup every time if deps are not specified

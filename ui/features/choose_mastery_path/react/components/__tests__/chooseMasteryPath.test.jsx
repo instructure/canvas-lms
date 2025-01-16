@@ -17,10 +17,8 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
 import ChooseMasterPath from '../choose-mastery-path'
-
-const equal = (x, y) => expect(x).toEqual(y)
 
 const defaultProps = () => ({
   options: [
@@ -83,22 +81,15 @@ const defaultProps = () => ({
   selectOption: () => {},
 })
 
-const renderComponent = props => TestUtils.renderIntoDocument(<ChooseMasterPath {...props} />)
-
 describe('Choose Mastery Path', () => {
-  test('renders component', () => {
-    const props = defaultProps()
-    const component = renderComponent(props)
-
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-wrapper')
-    equal(renderedList.length, 1, 'renders component')
+  it('renders component', () => {
+    const {container} = render(<ChooseMasterPath {...defaultProps()} />)
+    expect(container.querySelector('.cmp-wrapper')).toBeInTheDocument()
   })
 
-  test('renders all options', () => {
-    const props = defaultProps()
-    const component = renderComponent(props)
-
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-option')
-    equal(renderedList.length, 2, 'renders assignments')
+  it('renders all options', () => {
+    const {container} = render(<ChooseMasterPath {...defaultProps()} />)
+    const options = container.querySelectorAll('.cmp-option')
+    expect(options).toHaveLength(2)
   })
 })

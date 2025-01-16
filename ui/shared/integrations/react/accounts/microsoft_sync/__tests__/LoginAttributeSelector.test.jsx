@@ -47,7 +47,7 @@ describe('LoginAttributeSelector', () => {
     expect(
       container.getByRole('combobox', {
         name: /login attribute selector/i,
-      }).value
+      }).value,
     ).toMatch(/Unique User ID/i)
   })
 })

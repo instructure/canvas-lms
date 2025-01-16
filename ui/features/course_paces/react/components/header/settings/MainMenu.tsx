@@ -28,11 +28,11 @@ import type {ButtonProps} from '@instructure/ui-buttons'
 const I18n = createI18nScope('course_paces_settings')
 
 interface MainMenuProps {
-  readonly children: any
+  readonly children: (JSX.Element | undefined)[] | JSX.Element
   readonly margin?: ButtonProps['margin']
   readonly responsiveSize: ResponsiveSizes
   readonly showSettingsPopover: boolean
-  readonly isBlueprintLocked: boolean | undefined
+  readonly isBlueprintLocked?: boolean | undefined
   readonly menuPlacement: () => 'bottom start' | 'bottom end' | 'top start' | 'top end'
   readonly toggleShowSettingsPopover: (show: boolean) => void
 }

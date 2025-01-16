@@ -30,7 +30,7 @@ export function handleContentItem(result, contentView, callback) {
 
 export function handleDeepLinkingError(e, contentView, reloadTool) {
   $.flashError(I18n.t('Error retrieving content'))
-   
+
   console.error(e)
   captureException(e)
   reloadTool(contentView.model.id)

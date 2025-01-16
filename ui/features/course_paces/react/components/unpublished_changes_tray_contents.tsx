@@ -127,7 +127,7 @@ export const UnpublishedChangesTrayContents = ({
               <li key={c.id} style={{overflowWrap: 'break-word'}}>
                 {c.summary}
               </li>
-            )
+            ),
         )}
       </ol>
       {window.ENV.FEATURES.course_paces_redesign && (

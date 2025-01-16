@@ -368,7 +368,7 @@ const GradebookUploader = {
 
           $.each(uploadedGradebook.missing_objects[`${thing}s`], function () {
             $(
-              `<option value="${this.id}" >${htmlEscape(this.name || this.title)}</option>`
+              `<option value="${this.id}" >${htmlEscape(this.name || this.title)}</option>`,
             ).appendTo($select)
           })
 
@@ -393,7 +393,7 @@ const GradebookUploader = {
               })
           })
           $(
-            `#gradebook_importer_resolution_section, #gradebook_importer_resolution_section .${thing}_section`
+            `#gradebook_importer_resolution_section, #gradebook_importer_resolution_section .${thing}_section`,
           ).show()
         }
       })
@@ -450,7 +450,7 @@ const GradebookUploader = {
                       submission.assignment_id = val
                       const original_submission = find(
                         uploadedGradebook.original_submissions,
-                        sub => sub.user_id == student.id && sub.assignment_id == val
+                        sub => sub.user_id == student.id && sub.assignment_id == val,
                       )
                       if (original_submission) {
                         submission.original_grade =
@@ -464,7 +464,7 @@ const GradebookUploader = {
                       const original_submission = find(
                         uploadedGradebook.original_submissions,
                         sub =>
-                          sub.user_id == obj.id && sub.assignment_id == submission.assignment_id
+                          sub.user_id == obj.id && sub.assignment_id == submission.assignment_id,
                       )
                       if (original_submission) {
                         submission.original_grade =

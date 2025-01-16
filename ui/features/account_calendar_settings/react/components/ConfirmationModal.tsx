@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -59,7 +58,7 @@ const ConfirmationModal: React.FC<ComponentProps> = ({isOpen, onCancel, onConfir
         <View as="div">
           <Text as="p">
             {I18n.t(
-              'All new and existing users in the sub-account will be auto-subscribed to selected calendars.'
+              'All new and existing users in the sub-account will be auto-subscribed to selected calendars.',
             )}
           </Text>
         </View>

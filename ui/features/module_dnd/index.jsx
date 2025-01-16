@@ -17,24 +17,27 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import ModuleFileDrop from '@canvas/context-module-file-drop'
 import ready from '@instructure/ready'
 
 ready(() => {
   const contextModules = document.getElementById('context_modules')
-  const zones = document.querySelectorAll(
-    '.editable_context_module:not(#context_module_blank) .module_dnd'
-  )
+  const zones = document.querySelectorAll('.editable_context_module:not(#context_module_blank)')
   zones.forEach(zone => {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(
-      <ModuleFileDrop
-        courseId={ENV.course_id}
-        moduleId={zone.getAttribute('data-context-module-id')}
-        contextModules={contextModules}
-      />,
-      zone
-    )
+    const moduleDnd = zone.querySelector('.module_dnd')
+    if (moduleDnd) {
+      const moduleName = zone.querySelector('.ig-header-title .name')?.textContent || null
+
+      const root = createRoot(moduleDnd)
+      root.render(
+        <ModuleFileDrop
+          courseId={ENV.course_id}
+          moduleId={moduleDnd.getAttribute('data-context-module-id')}
+          contextModules={contextModules}
+          moduleName={moduleName}
+        />,
+      )
+    }
   })
 })

@@ -30,7 +30,7 @@ const renderComponent = (props = {}) => {
   return render(
     <BrowserRouter>
       <NameLink {...defaultProps} {...props} />
-    </BrowserRouter>
+    </BrowserRouter>,
   )
 }
 
@@ -76,7 +76,7 @@ describe('NameLink', () => {
 
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',
-      `/folder/${encodeURIComponent(folder.name)}`
+      `/folder/${encodeURIComponent(folder.name)}`,
     )
   })
 })

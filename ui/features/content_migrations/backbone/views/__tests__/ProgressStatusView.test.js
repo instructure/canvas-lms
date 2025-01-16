@@ -60,7 +60,7 @@ describe('ProgressStatusViewSpec', () => {
     equal(
       psv.$el.find('.label').text(),
       'Some not running state',
-      'Displays correct workflow state'
+      'Displays correct workflow state',
     )
   })
 

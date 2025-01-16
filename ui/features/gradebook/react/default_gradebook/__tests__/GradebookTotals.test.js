@@ -105,7 +105,7 @@ describe('Gradebook Totals', () => {
         gradebook.courseSettings.setAllowFinalGradeOverride(true)
         gradebook.switchTotalDisplay({dontWarnAgain: false})
         expect(
-          gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders
+          gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders,
         ).toHaveBeenCalledWith(['total_grade', 'total_grade_override'])
       })
 
@@ -113,7 +113,7 @@ describe('Gradebook Totals', () => {
         gradebook.courseSettings.setAllowFinalGradeOverride(false)
         gradebook.switchTotalDisplay({dontWarnAgain: false})
         expect(
-          gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders
+          gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders,
         ).toHaveBeenCalledWith(['total_grade'])
       })
     })

@@ -173,7 +173,7 @@ export default class ToolConfigurationForm extends React.Component {
         {configurationMethod === 'url' && this.urlConfigurationInput()}
         {
           this.manualConfigurationInput(
-            configurationMethod === 'manual'
+            configurationMethod === 'manual',
           ) /* show invisible to preserve state */
         }
       </View>

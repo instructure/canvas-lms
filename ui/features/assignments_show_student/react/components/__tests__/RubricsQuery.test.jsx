@@ -67,7 +67,7 @@ describe('RubricsQuery', () => {
     const {findByTestId} = render(
       <MockedProvider mocks={mocks}>
         <RubricsQuery {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(await findByTestId('rubric-tab')).toBeInTheDocument()
   })
@@ -79,7 +79,7 @@ describe('RubricsQuery', () => {
     const {findByText} = render(
       <MockedProvider mocks={mocks}>
         <RubricsQuery {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(await findByText('Sorry, Something Broke')).toBeInTheDocument()
   })
@@ -90,7 +90,7 @@ describe('RubricsQuery', () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
         <RubricsQuery {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(getByText('Loading')).toBeInTheDocument()
   })

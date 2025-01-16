@@ -18,17 +18,20 @@
 
 import {gql} from '@apollo/client'
 
+const MAX_CUSTOM_GRADE_STATUSES_PER_ACCOUNT = 3
+const MAX_STANDARD_GRADE_STATUSES_PER_ACCOUNT = 6
+
 export const ACCOUNT_GRADING_STATUS_QUERY = gql`
   query AccountGradingStatusQuery($accountId: ID!) {
     account(id: $accountId) {
-      customGradeStatusesConnection {
+      customGradeStatusesConnection(first: ${MAX_CUSTOM_GRADE_STATUSES_PER_ACCOUNT}) {
         nodes {
           color
           id: _id
           name
         }
       }
-      standardGradeStatusesConnection {
+      standardGradeStatusesConnection(first: ${MAX_STANDARD_GRADE_STATUSES_PER_ACCOUNT}) {
         nodes {
           color
           id: _id

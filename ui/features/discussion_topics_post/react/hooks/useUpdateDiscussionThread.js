@@ -61,12 +61,12 @@ export const useUpdateDiscussionThread = ({
           updateDiscussionEntryRootEntryCounts(
             cache,
             result.data.updateDiscussionEntryParticipant.discussionEntry,
-            discussionUnreadCountChange
+            discussionUnreadCountChange,
           )
         }
       }
     },
-    [discussionEntry, discussionTopic]
+    [discussionEntry, discussionTopic],
   )
 
   const updateLoadedSubentry = updatedEntry => {
@@ -74,7 +74,7 @@ export const useUpdateDiscussionThread = ({
     if (setLoadedSubentries) {
       setLoadedSubentries(loadedSubentries => {
         return loadedSubentries.map(entry =>
-          !!updatedEntry.rootEntryId && entry.id === updatedEntry.id ? updatedEntry : entry
+          !!updatedEntry.rootEntryId && entry.id === updatedEntry.id ? updatedEntry : entry,
         )
       })
     }
@@ -103,7 +103,7 @@ export const useUpdateDiscussionThread = ({
           forcedReadState: true,
         },
       }),
-    [discussionEntry, updateDiscussionEntryParticipant]
+    [discussionEntry, updateDiscussionEntryParticipant],
   )
 
   return {

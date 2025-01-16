@@ -47,7 +47,7 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
   ignoreErrors = () => {
     // TODO: fix this as Array<AssignmentWithOverride> cast
     const assignments = assignmentUtils.withErrors(
-      this.props.store.getAssignments() as Array<AssignmentWithOverride>
+      this.props.store.getAssignments() as Array<AssignmentWithOverride>,
     )
     each(assignments, a => this.props.store.updateAssignment(a.id, {please_ignore: true}))
   }
@@ -87,7 +87,7 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
         // @ts-expect-error
         (typeof a.selectedSectionForEveryone === 'undefined' &&
           // @ts-expect-error
-          a.currentlySelected.type === 'course')
+          a.currentlySelected.type === 'course'),
     )
     // @ts-expect-error
     const errorCount = Object.keys(assignmentUtils.withErrors(assignments)).length
@@ -123,7 +123,7 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
                   one: '1 Assignment with Errors',
                   other: '%{count} Assignments with Errors',
                 },
-                {count: errorCount}
+                {count: errorCount},
               )}
             </legend>
             <div className="row title-row">

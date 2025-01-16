@@ -31,7 +31,7 @@ if (deleted_page_title) {
   $.flashMessage(
     I18n.t('notices.page_deleted', 'The page "%{title}" has been deleted.', {
       title: deleted_page_title,
-    })
+    }),
   )
 }
 

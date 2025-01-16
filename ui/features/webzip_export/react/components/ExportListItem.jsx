@@ -24,7 +24,6 @@ import {datetimeString} from '@canvas/datetime/date-functions'
 
 const I18n = createI18nScope('webzip_exports')
 
- 
 class ExportListItem extends React.Component {
   static propTypes = {
     date: PropTypes.string.isRequired,

@@ -150,7 +150,7 @@ export default class OverrideAttempts extends React.Component {
           ? I18n.t('Unlimited Attempts')
           : I18n.t(
               {one: '1 Attempt', other: '%{count} Attempts'},
-              {count: this.props.allowedAttempts}
+              {count: this.props.allowedAttempts},
             )}
       </Text>
     )

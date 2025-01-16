@@ -1,4 +1,4 @@
-/* eslint-disable no-alert */
+ 
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -29,7 +29,7 @@ export default function (ed) {
   const cancel_url = $('#equella_cancel_url').attr('href')
   if (!url || !callback_url || !cancel_url) {
     alert(
-      'Equella is not properly configured for this account, please notify your system administrator.'
+      'Equella is not properly configured for this account, please notify your system administrator.',
     )
     return
   }
@@ -39,7 +39,7 @@ export default function (ed) {
     const teaserAndIframeHtml =
       raw("<div class='teaser' style='width: 800px; margin-bottom: 10px; display: none;'></div>") +
       raw(
-        "<iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: "
+        "<iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: ",
       ) +
       raw(frameHeight) +
       raw("px; border: 0;' src='about:blank' borderstyle='0'/>")

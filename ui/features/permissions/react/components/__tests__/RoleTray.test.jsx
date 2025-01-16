@@ -202,7 +202,7 @@ it('renders the delete confirmation alert if deleteAlertVisible state is true', 
   const tree = shallow(<RoleTray {...props} />)
   tree.setState({deleteAlertVisible: true})
   const node = tree.findWhere(
-    n => n.name() === 'Dialog' && n.children('.role-tray-delete-alert-confirm')
+    n => n.name() === 'Dialog' && n.children('.role-tray-delete-alert-confirm'),
   )
   expect(node.at(0).props().open).toBe(true)
 })
@@ -211,7 +211,7 @@ it('does not render the delete confirmation alert if deleteAlertVisible state is
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.findWhere(
-    n => n.name() === 'Dialog' && n.children('.role-tray-delete-alert-confirm')
+    n => n.name() === 'Dialog' && n.children('.role-tray-delete-alert-confirm'),
   )
   expect(node.at(0).props().open).toBe(false)
 })
@@ -221,7 +221,7 @@ it('renders the edit confirmation alert if editBaseRoleAlertVisible state is tru
   const tree = shallow(<RoleTray {...props} />)
   tree.setState({editBaseRoleAlertVisible: true})
   const node = tree.findWhere(
-    n => n.name() === 'Dialog' && n.children('.role-tray-edit-base-role-confirm')
+    n => n.name() === 'Dialog' && n.children('.role-tray-edit-base-role-confirm'),
   )
   expect(node.at(0).props().open).toBe(false)
 })
@@ -230,7 +230,7 @@ it('does not render the edit confirmation alert if editBaseRoleAlertVisible stat
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.findWhere(
-    n => n.name() === 'Dialog' && n.children('.role-tray-edit-base-role-confirm')
+    n => n.name() === 'Dialog' && n.children('.role-tray-edit-base-role-confirm'),
   )
   expect(node.at(0).props().open).toBe(false)
 })
@@ -255,7 +255,7 @@ it('onChangeRoleLabel sets error if role is used', () => {
   expect(tree.state().editRoleLabelInput).toEqual(' teacher   ')
   expect(tree.state().editRoleLabelErrorMessages).toHaveLength(1)
   expect(tree.state().editRoleLabelErrorMessages[0].text).toEqual(
-    'Cannot change role name to teacher: already in use'
+    'Cannot change role name to teacher: already in use',
   )
   expect(tree.state().editRoleLabelErrorMessages[0].type).toEqual('newError')
 })

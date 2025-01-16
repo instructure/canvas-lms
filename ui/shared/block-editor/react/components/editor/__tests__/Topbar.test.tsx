@@ -62,7 +62,7 @@ const renderComponent = (props: Partial<TopbarProps> = {}) => {
   return render(
     <Editor enabled={true}>
       <Topbar {...defaultProps} {...props} />
-    </Editor>
+    </Editor>,
   )
 }
 

@@ -31,7 +31,7 @@ jest.mock(
         codePayload: `<a href="${contentItem.url}" title="${contentItem.title}" target="${contentItem.linkTarget}">${contentItem.title}</a>`,
       }),
     },
-  })
+  }),
 )
 
 async function makeProps(opts = {}) {
@@ -110,7 +110,7 @@ describe('TextEntry', () => {
               value={{isObserver: true, allowChangesToSubmission: false}}
             >
               <TextEntry {...props} />
-            </StudentViewContext.Provider>
+            </StudentViewContext.Provider>,
           )
           await waitFor(() => {
             expect(tinymce.editors[0]).toBeDefined()

@@ -214,7 +214,7 @@ class ApplicationController < ActionController::Base
 
         editor_hc_css = [
           active_brand_config_url("css", { force_high_contrast: true }),
-          view_context.stylesheet_path(css_url_for("what_gets_loaded_inside_the_tinymce_editor", false, { force_high_contrast: true }))
+          view_context.stylesheet_path(css_url_for("what_gets_loaded_inside_the_tinymce_editor", plugin: false, force_high_contrast: true))
         ]
 
         editor_css << view_context.stylesheet_path(css_url_for("fonts"))
@@ -367,9 +367,7 @@ class ApplicationController < ActionController::Base
     explicit_latex_typesetting
     media_links_use_attachment_id
     permanent_page_links
-    selective_release_backend
     selective_release_ui_api
-    selective_release_edit_page
     assign_to_improved_search
     enhanced_course_creation_account_fetching
     instui_for_import_page
@@ -384,6 +382,7 @@ class ApplicationController < ActionController::Base
     disallow_threaded_replies_fix_alert
     horizon_course_setting
     new_quizzes_media_type
+    differentiation_tags
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -566,10 +565,7 @@ class ApplicationController < ActionController::Base
         tool.feature_flag_enabled?(context)
     end
 
-    if Account.site_admin.feature_enabled?(:lti_placement_restrictions)
-      tools.select! { |tool| tool.placement_allowed?(type) }
-    end
-
+    tools.select! { |tool| tool.placement_allowed?(type) }
     tools.map do |tool|
       external_tool_display_hash(tool, type, {}, context, custom_settings)
     end

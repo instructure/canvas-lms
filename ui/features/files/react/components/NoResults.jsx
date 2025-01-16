@@ -29,7 +29,7 @@ export default function NoResults({search_term}) {
         {I18n.t(
           'errors.no_match.your_search',
           'Your search - "%{search_term}" - did not match any files.',
-          {search_term}
+          {search_term},
         )}
       </p>
       <p>{I18n.t('errors.no_match.suggestions', 'Suggestions:')}</p>

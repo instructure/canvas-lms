@@ -17,7 +17,6 @@
  */
 
 import moxios from 'moxios'
-import sinon from 'sinon'
 import {uploadFile} from '../apiFileUtils'
 
 describe('apiFileUtils', () => {
@@ -30,9 +29,9 @@ describe('apiFileUtils', () => {
   })
 
   describe('uploadFile', () => {
-    it('runs the onSuccess method after upload', done => {
-      const onSuccess = sinon.spy()
-      const onFail = sinon.spy()
+    it('runs the onSuccess method after upload', async () => {
+      const onSuccess = jest.fn()
+      const onFail = jest.fn()
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 200,
         response: {
@@ -51,19 +50,19 @@ describe('apiFileUtils', () => {
       })
       const file = {name: 'file1', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
-      moxios.wait(() => {
-        moxios.wait(() => {
-          expect(onSuccess.calledOnce).toBeTruthy()
-          expect(onSuccess.calledWith('yo')).toBeTruthy()
-          expect(onFail.notCalled).toBeTruthy()
-          done()
+
+      await moxios.wait(() => {
+        return moxios.wait(() => {
+          expect(onSuccess).toHaveBeenCalledTimes(1)
+          expect(onSuccess).toHaveBeenCalledWith('yo')
+          expect(onFail).not.toHaveBeenCalled()
         })
       })
     })
 
-    it('runs the onFailure method on upload failure', done => {
-      const onSuccess = sinon.spy()
-      const onFail = sinon.spy()
+    it('runs the onFailure method on upload failure', async () => {
+      const onSuccess = jest.fn()
+      const onFail = jest.fn()
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 200,
         response: {
@@ -82,30 +81,30 @@ describe('apiFileUtils', () => {
       })
       const file = {name: 'file2', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
-      moxios.wait(() => {
-        moxios.wait(() => {
-          expect(onFail.calledOnce).toBeTruthy()
-          expect(onSuccess.notCalled).toBeTruthy()
-          done()
+
+      await moxios.wait(() => {
+        return moxios.wait(() => {
+          expect(onFail).toHaveBeenCalledTimes(1)
+          expect(onSuccess).not.toHaveBeenCalled()
         })
       })
     })
   })
 
   describe('onFileUploadInfoReceived', () => {
-    it('runs the onFailure on file prep failure', done => {
-      const onSuccess = sinon.spy()
-      const onFail = sinon.spy()
+    it('runs the onFailure on file prep failure', async () => {
+      const onSuccess = jest.fn()
+      const onFail = jest.fn()
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 400,
         response: {data: {formData: 'form', uploadUrl: 'new_url'}},
       })
       const file = {name: 'file2', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
-      moxios.wait(() => {
-        expect(onFail.calledOnce).toBeTruthy()
-        expect(onSuccess.notCalled).toBeTruthy()
-        done()
+
+      await moxios.wait(() => {
+        expect(onFail).toHaveBeenCalledTimes(1)
+        expect(onSuccess).not.toHaveBeenCalled()
       })
     })
   })

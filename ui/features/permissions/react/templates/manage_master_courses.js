@@ -35,7 +35,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to edit lock settings on individual assignments, pages, or discussions.'
+        'Allows user to edit lock settings on individual assignments, pages, or discussions.',
       ),
     },
   ],
@@ -43,30 +43,30 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'Course roles can only manage Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.'
+        'Course roles can only manage Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.',
       ),
     },
     {
       description: I18n.t(
-        'To manage associated courses, Courses - view list and Courses - manage / update must also be enabled.'
+        'To manage associated courses, Courses - view list and Courses - manage / update must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To edit lock settings on files, Courses - manage and Course Files - edit must also be enabled.'
+        'To edit lock settings on files, Courses - manage and Course Files - edit must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To edit lock settings on quizzes, Courses - manage and Assignments and Quizzes - manage / edit must also be enabled.'
+        'To edit lock settings on quizzes, Courses - manage and Assignments and Quizzes - manage / edit must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To manage lock settings for object types, Courses - manage must also be enabled.'
+        'To manage lock settings for object types, Courses - manage must also be enabled.',
       ),
     },
   ],
   [],
-  []
+  [],
 )

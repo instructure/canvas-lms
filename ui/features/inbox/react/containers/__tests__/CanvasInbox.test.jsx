@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from '@apollo/client'
-import CanvasInbox from '../CanvasInbox'
-import {handlers, inboxSettingsHandlers} from '../../../graphql/mswHandlers'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {fireEvent, render} from '@testing-library/react'
+import React from 'react'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
-import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {handlers, inboxSettingsHandlers} from '../../../graphql/mswHandlers'
 import {responsiveQuerySizes} from '../../../util/utils'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
+import CanvasInbox from '../CanvasInbox'
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -82,7 +82,7 @@ describe('CanvasInbox App Container', () => {
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <CanvasInbox breakpoints={{desktopOnly: true}} />
         </AlertManagerContext.Provider>
-      </ApolloProvider>
+      </ApolloProvider>,
     )
   }
 
@@ -209,20 +209,16 @@ describe('CanvasInbox App Container', () => {
         expect(mailboxDropdown.getAttribute('value')).toBe('')
       })
       it('should set course select in compose modal to course name when the context id param is in the url', async () => {
-        const originalLocation = window.location
-        delete window.location
-        window.location = {
-          search: '',
-          hash: '',
-        }
-        window.location.hash = '#filter=type=inbox'
-        window.location.search = '?context_id=course_195&user_id=9&user_name=Ally'
+        const url = new URL(window.location.href)
+        url.hash = '#filter=type=inbox'
+        url.search = '?context_id=course_195&user_id=9&user_name=Ally'
+        window.history.pushState({}, '', url.toString())
+
         const container = setup()
         await waitForApolloLoading()
 
         const courseSelectModal = await container.findByTestId('course-select-modal')
         expect(courseSelectModal.getAttribute('value')).toBe('XavierSchool')
-        window.location = originalLocation
       })
     })
   })

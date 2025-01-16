@@ -52,7 +52,7 @@ export const ManagePage = () => {
       name: I18n.t('Manage'),
       url: `/accounts/${accountId}/apps/manage`,
     },
-    !!window.ENV.FEATURES.lti_registrations_next
+    !!window.ENV.FEATURES.lti_registrations_next,
   )
   const [searchParams] = useManageSearchParams()
 
@@ -79,14 +79,14 @@ const confirmDeletion = (registration: LtiRegistration): Promise<boolean> =>
     confirmButtonLabel: I18n.t('Delete'),
     heading: I18n.t('You are about to delete “%{appName}”.', {appName: registration.name}),
     message: I18n.t(
-      'You are removing the app from the entire account. It will be removed from its placements and any resource links to it will stop working. To reestablish placements and links, you will need to reinstall the app.'
+      'You are removing the app from the entire account. It will be removed from its placements and any resource links to it will stop working. To reestablish placements and links, you will need to reinstall the app.',
     ),
   })
 
 const useManagePageState = mkUseManagePageState(
   apiFetchRegistrations,
   apiDeleteRegistration,
-  apiUnbindGlobalRegistration
+  apiUnbindGlobalRegistration,
 )
 
 export const ManagePageInner = (props: ManagePageInnerProps) => {
@@ -113,7 +113,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
       setStale()
       setManageSearchParams(params)
     },
-    [setStale, setManageSearchParams]
+    [setStale, setManageSearchParams],
   )
 
   const deleteApp = React.useCallback(
@@ -130,7 +130,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
         })
       }
     },
-    [deleteRegistration, props.accountId]
+    [deleteRegistration, props.accountId],
   )
 
   /**
@@ -140,7 +140,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
     debounce((q: string) => {
       updateSearchParams({q: q === '' ? undefined : q, page: undefined})
     }, SEARCH_DEBOUNCE_MS),
-    [updateSearchParams]
+    [updateSearchParams],
   )
 
   const handleChange = React.useCallback(
@@ -150,7 +150,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
       setQuery(value)
       updateQueryParamDebounced(value)
     },
-    [setStale, updateQueryParamDebounced]
+    [setStale, updateQueryParamDebounced],
   )
 
   const handleClear = React.useCallback(() => {

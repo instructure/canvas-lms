@@ -48,7 +48,7 @@ describe('inlineMediaComment', () => {
       $link
         .next()
         .html()
-        .match(/Loading media/)
+        .match(/Loading media/),
     )
   })
 

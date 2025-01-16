@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -90,7 +88,7 @@ QuotasView.prototype.submitFail = function (errors) {
   }
   if (unknownFailure) {
     return $.flashError(
-      I18n.t('default_account_quotas_not_updated', 'Default account quotas were not updated')
+      I18n.t('default_account_quotas_not_updated', 'Default account quotas were not updated'),
     )
   }
 }

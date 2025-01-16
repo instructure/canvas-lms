@@ -44,7 +44,7 @@ export default function AdminSplit({user, splitUrl, splitUsers}) {
       _data => {
         setLoading(false)
         setFailed(true)
-      }
+      },
     )
   }, [splitUrl, setLoading, setResults, setFailed])
 
@@ -100,7 +100,7 @@ export default function AdminSplit({user, splitUrl, splitUsers}) {
       </ul>
       <p>
         {I18n.t(
-          'NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.'
+          'NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.',
         )}
       </p>
       <Button disabled={loading} margin="xx-small" color="primary" onClick={performSplit}>

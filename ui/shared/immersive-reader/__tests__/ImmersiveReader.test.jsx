@@ -68,7 +68,7 @@ describe('#initializeReaderButton', () => {
           launchAsync: fakeLaunchAsync,
         })
         const {findByText} = render(
-          <ImmersiveReaderButton content={fakeContent} readerSDK={fakeReaderLib} />
+          <ImmersiveReaderButton content={fakeContent} readerSDK={fakeReaderLib} />,
         )
         const button = await findByText(/Immersive Reader/)
         await user.click(button)
@@ -122,7 +122,7 @@ describe('#initializeReaderButton', () => {
           })
 
           const {findByText} = render(
-            <ImmersiveReaderButton content={fakeContentWithMath} readerSDK={fakeReaderLib} />
+            <ImmersiveReaderButton content={fakeContentWithMath} readerSDK={fakeReaderLib} />,
           )
 
           const button = await findByText(/^Immersive Reader$/)

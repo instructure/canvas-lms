@@ -126,7 +126,7 @@ describe('DiscussionEntryContainer', () => {
 
     it('should render the reply info', () => {
       const container = setup(defaultProps())
-      expect(container.getAllByText('24 Replies, 4 Unread').length).toBe(2)
+      expect(container.getAllByText('24 Replies, 4 Unread')).toHaveLength(2)
     })
 
     it('should render the created timestamp', () => {
@@ -155,7 +155,7 @@ describe('DiscussionEntryContainer', () => {
             },
             deleted: false,
           },
-        })
+        }),
       )
       expect(container.getByTestId('reply-preview')).toBeInTheDocument()
     })

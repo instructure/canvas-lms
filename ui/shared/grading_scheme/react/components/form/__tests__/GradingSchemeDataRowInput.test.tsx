@@ -59,7 +59,7 @@ describe('GradingSchemeDataRowInput', () => {
         <tbody>
           <GradingSchemeDataRowInput {...testProps} />
         </tbody>
-      </table>
+      </table>,
     )
     const letterGradeInput = screen.getByRole<HTMLInputElement>('textbox', {
       name: /Letter Grade/,
@@ -78,7 +78,7 @@ describe('GradingSchemeDataRowInput', () => {
         <tbody>
           <GradingSchemeDataRowInput {...testProps} />
         </tbody>
-      </table>
+      </table>,
     )
     const letterGradeInput = screen.getByRole<HTMLInputElement>('textbox', {
       name: /Letter Grade/,
@@ -93,7 +93,7 @@ describe('GradingSchemeDataRowInput', () => {
         <tbody>
           <GradingSchemeDataRowInput {...testProps} />
         </tbody>
-      </table>
+      </table>,
     )
     const rangeInput = screen.getByRole<HTMLInputElement>('textbox', {
       name: /Lower limit of range/,
@@ -112,7 +112,7 @@ describe('GradingSchemeDataRowInput', () => {
         <tbody>
           <GradingSchemeDataRowInput {...testProps} />
         </tbody>
-      </table>
+      </table>,
     )
     const rangeInput = screen.getByRole<HTMLInputElement>('textbox', {
       name: /Lower limit of range/,
@@ -129,7 +129,7 @@ describe('GradingSchemeDataRowInput', () => {
         <tbody>
           <GradingSchemeDataRowInput {...testProps} />
         </tbody>
-      </table>
+      </table>,
     )
     const rangeInput = screen.getByRole<HTMLInputElement>('textbox', {
       name: /Lower limit of range/,
@@ -147,7 +147,7 @@ describe('GradingSchemeDataRowInput', () => {
         <tbody>
           <GradingSchemeDataRowInput {...testProps} />
         </tbody>
-      </table>
+      </table>,
     )
     const rangeInput = screen.getByRole<HTMLInputElement>('textbox', {
       name: /Lower limit of range/,
@@ -164,7 +164,7 @@ describe('GradingSchemeDataRowInput', () => {
         <tbody>
           <GradingSchemeDataRowInput {...testProps} />
         </tbody>
-      </table>
+      </table>,
     )
     const deleteRowButton = screen.getByRole<HTMLInputElement>('button', {
       name: /Remove letter grade row/,
@@ -179,7 +179,7 @@ describe('GradingSchemeDataRowInput', () => {
         <tbody>
           <GradingSchemeDataRowInput {...testProps} />
         </tbody>
-      </table>
+      </table>,
     )
     const addRowButton = screen.getByRole<HTMLInputElement>('button', {
       name: /Add new row for a letter grade to grading scheme after this row/,
@@ -194,7 +194,7 @@ describe('GradingSchemeDataRowInput', () => {
         <tbody>
           <GradingSchemeDataRowInput {...testProps} isFirstRow={true} isLastRow={true} />
         </tbody>
-      </table>
+      </table>,
     )
     const deleteRowButton = screen.getByRole<HTMLInputElement>('button', {
       name: /Remove letter grade row/,
@@ -227,7 +227,7 @@ describe('GradingSchemeDataRowInput', () => {
         <tbody>
           <GradingSchemeDataRowInput {...gradeByPointsComponentProps} />
         </tbody>
-      </table>
+      </table>,
     )
 
     const letterGradeInput = screen.getByRole<HTMLInputElement>('textbox', {

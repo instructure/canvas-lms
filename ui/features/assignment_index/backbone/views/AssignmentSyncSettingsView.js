@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {extend as lodashExtend} from 'lodash'
 import $ from 'jquery'
@@ -50,7 +48,7 @@ AssignmentSyncSettingsView.prototype.events = lodashExtend(
   AssignmentSyncSettingsView.prototype.events,
   {
     'click .dialog_closer': 'cancel',
-  }
+  },
 )
 
 AssignmentSyncSettingsView.optionProperty('viewToggle')
@@ -99,7 +97,7 @@ AssignmentSyncSettingsView.prototype.submit = function (event) {
     },
     function () {
       return $.flashError(error_message)
-    }
+    },
   )
 }
 

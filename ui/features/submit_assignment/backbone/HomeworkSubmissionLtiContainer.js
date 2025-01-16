@@ -130,10 +130,10 @@ export default class HomeworkSubmissionLtiContainer {
           }
 
           return $('input.turnitin_pledge').click(e =>
-            recordEulaAgreement('#eula_agreement_timestamp', e.target.checked)
+            recordEulaAgreement('#eula_agreement_timestamp', e.target.checked),
           )
         }
-      })(this)
+      })(this),
     )
 
     returnView.on('cancel', () => {})

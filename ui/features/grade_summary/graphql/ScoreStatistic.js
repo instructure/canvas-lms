@@ -47,7 +47,7 @@ export const ScoreStatistic = {
     mean = 10,
     median = 10,
     minimum = 5,
-    upperQ = 15
+    upperQ = 15,
   ) => ({
     count,
     lowerQ,

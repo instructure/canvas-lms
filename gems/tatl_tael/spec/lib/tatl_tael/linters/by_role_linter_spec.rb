@@ -20,7 +20,7 @@ require "spec_helper"
 
 BYROLE_FIXTURE_BASE = File.expand_path("fixtures/by_role_linter/__tests__/", __dir__)
 VALID_FILES = %w[valid.js valid.ts valid.tsx valid.jsx].map { |f| BYROLE_FIXTURE_BASE + "/" + f }
-CHANGE_LINE_NUMBERS = [25, 29, 33, 37, 41, 45].freeze
+CHANGE_LINE_NUMBERS = [26, 30, 34, 38, 42, 46].freeze
 
 describe TatlTael::Linters::ByRoleLinter do
   let(:config) do

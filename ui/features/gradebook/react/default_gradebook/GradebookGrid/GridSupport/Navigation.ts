@@ -332,7 +332,7 @@ export default class Navigation {
     if (gridEvent) {
       return gridEvent.trigger(
         event.originalEvent || event,
-        this.gridSupport.state.getActiveLocation()
+        this.gridSupport.state.getActiveLocation(),
       )
     }
 

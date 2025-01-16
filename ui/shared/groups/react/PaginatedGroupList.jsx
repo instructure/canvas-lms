@@ -25,7 +25,6 @@ import Group from './Group'
 
 const I18n = createI18nScope('student_groups')
 
- 
 const PaginatedGroupList = createReactClass({
   displayName: 'PaginatedGroupList',
 

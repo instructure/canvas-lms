@@ -102,7 +102,7 @@ const PublishIconButton = ({item, userCanEditFilesForContext}: PublishIconButton
           '%{fileName} is only available to students with the link - Click to modify',
           {
             fileName,
-          }
+          },
         ),
       })
     } else if (published) {

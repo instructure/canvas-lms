@@ -58,7 +58,7 @@ describe('GradeChangeActivityForm', () => {
           [fieldName]: inputValue,
         })
       })
-    }
+    },
   )
 
   it.each([
@@ -105,7 +105,7 @@ describe('GradeChangeActivityForm', () => {
           [fieldName]: inputValue,
         })
       })
-    }
+    },
   )
 
   it('should show an error if the form is empty', async () => {
@@ -133,7 +133,7 @@ describe('GradeChangeActivityForm', () => {
 
     const errorText = await screen.findAllByText('Invalid date and time.')
     const visualAndScreenReaderErrorMessagesCount = 4
-    expect(errorText.length).toBe(visualAndScreenReaderErrorMessagesCount)
+    expect(errorText).toHaveLength(visualAndScreenReaderErrorMessagesCount)
     expect(props.onSubmit).not.toHaveBeenCalled()
   })
 

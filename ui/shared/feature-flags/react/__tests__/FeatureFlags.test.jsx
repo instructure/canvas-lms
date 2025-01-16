@@ -179,7 +179,7 @@ describe('feature_flags::FeatureFlags', () => {
 
   it('filters when search and state filter are used', async () => {
     const {getByText, getAllByTestId, getByLabelText, findByPlaceholderText} = render(
-      <FeatureFlags />
+      <FeatureFlags />,
     )
     await waitFor(() => {
       expect(getByLabelText('Filter by')).toBeInTheDocument()
@@ -200,7 +200,7 @@ describe('feature_flags::FeatureFlags', () => {
   describe('clear', () => {
     it('clears search input & resets state filter to all', async () => {
       const {getByLabelText, getByText, findByPlaceholderText, getAllByTestId} = render(
-        <FeatureFlags />
+        <FeatureFlags />,
       )
       await waitFor(() => {
         expect(getByLabelText('Filter by')).toBeInTheDocument()

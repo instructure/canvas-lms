@@ -107,7 +107,7 @@ describe('OutcomeManagement', () => {
     const {findByText, findByTestId, getByTestId} = render(
       <MockedProvider cache={cache} mocks={mocks}>
         <OutcomeManagement breakpoints={{tablet: true}} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     await act(async () => jest.runAllTimers())
 
@@ -152,7 +152,7 @@ describe('OutcomeManagement', () => {
       const {getByText, getByTestId} = render(
         <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
           <OutcomeManagement />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByText(/^Loading$/)).toBeInTheDocument() // spinner
       await act(async () => jest.runAllTimers())
@@ -166,7 +166,7 @@ describe('OutcomeManagement', () => {
       const {getByText, getByLabelText} = render(
         <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
           <OutcomeManagement />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByText(/^Loading$/)).toBeInTheDocument() // spinner
       await act(async () => jest.runAllTimers())
@@ -185,7 +185,7 @@ describe('OutcomeManagement', () => {
       const {getByText, getByTestId} = render(
         <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks, ...outcomeGroupsMocks]}>
           <OutcomeManagement />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByText(/^Loading$/)).toBeInTheDocument() // spinner
       await act(async () => jest.runAllTimers())
@@ -199,7 +199,7 @@ describe('OutcomeManagement', () => {
           learningOutcomeGroupId: null,
           onSuccessfulCreateOutcome: expect.any(Function),
         },
-        '1'
+        '1',
       )
       fireEvent.click(getByText('Calculation'))
       fireEvent.click(getByText('Manage'))
@@ -218,7 +218,7 @@ describe('OutcomeManagement', () => {
       const {getByText} = render(
         <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
           <OutcomeManagement />
-        </MockedProvider>
+        </MockedProvider>,
       )
       await act(async () => jest.runAllTimers())
       expect(getByText('Manage')).toBeInTheDocument()
@@ -231,7 +231,7 @@ describe('OutcomeManagement', () => {
       const {getByText, queryByText} = render(
         <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
           <OutcomeManagement />
-        </MockedProvider>
+        </MockedProvider>,
       )
       await act(async () => jest.runAllTimers())
       expect(getByText('Manage')).toBeInTheDocument()
@@ -266,7 +266,7 @@ describe('OutcomeManagement', () => {
             mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
           >
             <OutcomeManagement />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         fireEvent.click(getByText('Mastery'))
@@ -282,7 +282,7 @@ describe('OutcomeManagement', () => {
             mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
           >
             <OutcomeManagement />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         fireEvent.click(getByText('Calculation'))
@@ -304,7 +304,7 @@ describe('OutcomeManagement', () => {
             mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
           >
             <OutcomeManagement />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         fireEvent.click(getByText('Calculation'))
@@ -321,7 +321,7 @@ describe('OutcomeManagement', () => {
             mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
           >
             <OutcomeManagement />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const calculationButton = getByText('Calculation')
@@ -342,7 +342,7 @@ describe('OutcomeManagement', () => {
             mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
           >
             <OutcomeManagement />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const calculationButton = getByText('Calculation')
@@ -373,7 +373,7 @@ describe('OutcomeManagement', () => {
           const {getByText} = render(
             <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
               <OutcomeManagement />
-            </MockedProvider>
+            </MockedProvider>,
           )
           await act(async () => jest.runAllTimers())
           expect(getByText('Alignments')).toBeInTheDocument()
@@ -384,7 +384,7 @@ describe('OutcomeManagement', () => {
           const {queryByText} = render(
             <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
               <OutcomeManagement />
-            </MockedProvider>
+            </MockedProvider>,
           )
           await act(async () => jest.runAllTimers())
           expect(queryByText('Alignments')).not.toBeInTheDocument()
@@ -395,7 +395,7 @@ describe('OutcomeManagement', () => {
           const {queryByText} = render(
             <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
               <OutcomeManagement />
-            </MockedProvider>
+            </MockedProvider>,
           )
           await act(async () => jest.runAllTimers())
           expect(queryByText('Alignments')).not.toBeInTheDocument()
@@ -408,7 +408,7 @@ describe('OutcomeManagement', () => {
           const {queryByText} = render(
             <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
               <OutcomeManagement />
-            </MockedProvider>
+            </MockedProvider>,
           )
           await act(async () => jest.runAllTimers())
           expect(queryByText('Alignments')).not.toBeInTheDocument()
@@ -425,7 +425,7 @@ describe('OutcomeManagement', () => {
         const {queryByText} = render(
           <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
             <OutcomeManagement />
-          </MockedProvider>
+          </MockedProvider>,
         )
         await act(async () => jest.runAllTimers())
         expect(queryByText('Alignments')).not.toBeInTheDocument()

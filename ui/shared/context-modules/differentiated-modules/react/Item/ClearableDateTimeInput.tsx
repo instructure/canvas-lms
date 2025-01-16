@@ -30,10 +30,10 @@ import type {FormMessage} from '@instructure/ui-form-field'
 const I18n = createI18nScope('differentiated_modules')
 
 function useElementResize(
-  onResize: (element: Element) => void
+  onResize: (element: Element) => void,
 ): [(element: Element | null) => void] {
   const observer = useRef(
-    new ResizeObserver(entries => entries.forEach(entry => onResize(entry.target)))
+    new ResizeObserver(entries => entries.forEach(entry => onResize(entry.target))),
   )
 
   const listenElement = (element: Element | null) => {

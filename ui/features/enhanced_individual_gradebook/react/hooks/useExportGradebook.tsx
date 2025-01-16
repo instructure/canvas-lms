@@ -76,8 +76,8 @@ export const useExportGradebook = () => {
             new Error(
               message
                 ? I18n.t('%{message}', {message})
-                : I18n.t('There was an error exporting the gradebook')
-            )
+                : I18n.t('There was an error exporting the gradebook'),
+            ),
           )
           setAttachmentStatus(ApiCallStatus.FAILED)
         }

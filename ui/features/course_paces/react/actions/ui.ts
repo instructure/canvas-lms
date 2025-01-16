@@ -63,7 +63,7 @@ export const regularActions = {
   setSelectedPaceContext: (
     contextType: PaceContextTypes,
     contextId: string,
-    newSelectedPace: CoursePace
+    newSelectedPace: CoursePace,
   ) => createAction(Constants.SET_SELECTED_PACE_CONTEXT, {contextType, contextId, newSelectedPace}),
   setResponsiveSize: (responsiveSize: ResponsiveSizes) =>
     createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize),
@@ -80,7 +80,7 @@ export const regularActions = {
 export const thunkActions = {
   setSelectedPaceContext: (
     contextType: PaceContextTypes,
-    contextId: string
+    contextId: string,
   ): ThunkAction<void, StoreState, void, Action> => {
     // Switch to the other pace type, and load the exact pace we should switch to
     return dispatch => {
@@ -91,7 +91,7 @@ export const thunkActions = {
         }
       }
       dispatch(
-        coursePaceActions.loadLatestPaceByContext(contextType, contextId, afterLoadActionCreator)
+        coursePaceActions.loadLatestPaceByContext(contextType, contextId, afterLoadActionCreator),
       )
     }
   },

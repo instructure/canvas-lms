@@ -57,14 +57,14 @@ export const UsageRights = ({
     useJustification => {
       return usageRightsOptions.find(opt => opt.value === useJustification) || null
     },
-    [usageRightsOptions]
+    [usageRightsOptions],
   )
 
   const findCreativeLicenseOption = useCallback(
     license => {
       return creativeCommonsOptions.find(opt => opt.id === license) || null
     },
-    [creativeCommonsOptions]
+    [creativeCommonsOptions],
   )
 
   // Set Initial values
@@ -77,10 +77,10 @@ export const UsageRights = ({
   const revertToInitialValues = () => {
     setCopyrightHolder(initialUsageRights?.legalCopyright || '')
     setSelectedUsageRightsOption(
-      usageRightsOptions.find(opt => opt.value === initialUsageRights?.useJustification) || null
+      usageRightsOptions.find(opt => opt.value === initialUsageRights?.useJustification) || null,
     )
     setSelectedCreativeLicense(
-      creativeCommonsOptions.find(opt => opt.id === initialUsageRights?.license) || null
+      creativeCommonsOptions.find(opt => opt.id === initialUsageRights?.license) || null,
     )
   }
 
@@ -264,13 +264,13 @@ UsageRights.propTypes = {
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
-    })
+    }),
   ), // Array of objects with id and name for creative commons options
   usageRightsOptions: PropTypes.arrayOf(
     PropTypes.shape({
       display: PropTypes.string.isRequired,
       value: PropTypes.string.isRequired,
-    })
+    }),
   ),
 }
 

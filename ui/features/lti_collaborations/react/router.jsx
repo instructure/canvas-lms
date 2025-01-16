@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import $ from 'jquery'
 import page from 'page'
 import qs from 'qs'
@@ -39,12 +39,15 @@ const attachListeners = () => {
 
     try {
       const item = processSingleContentItem(event)
+      if (!item) {
+        return
+      }
       store.dispatch(
         actions.externalContentReady({
           service_id: event.data?.service_id,
           contentItems: [item],
           tool_id: event.data?.tool_id,
-        })
+        }),
       )
     } catch {
       store.dispatch(actions.externalContentRetrievalFailed)
@@ -60,6 +63,7 @@ const attachListeners = () => {
 }
 
 let unsubscribe
+let root
 /**
  * Route Handlers
  */
@@ -68,17 +72,16 @@ function renderShowCollaborations(ctx) {
   store.dispatch(
     actions.getCollaborations(
       `/api/v1/${ctx.params.context}/${ctx.params.contextId}/collaborations`,
-      true
-    )
+      true,
+    ),
   )
 
   const view = () => {
     const state = store.getState()
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(
-      <CollaborationsApp applicationState={state} actions={actions} />,
-      document.getElementById('content')
-    )
+    if (!root) {
+      root = createRoot(document.getElementById('content'))
+    }
+    root.render(<CollaborationsApp applicationState={state} actions={actions} />)
   }
   unsubscribe = store.subscribe(view)
   view()
@@ -86,10 +89,11 @@ function renderShowCollaborations(ctx) {
 
 function renderLaunchTool(ctx) {
   const view = () => {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(
+    if (!root) {
+      root = createRoot(document.getElementById('content'))
+    }
+    root.render(
       <CollaborationsToolLaunch launchUrl={ctx.path.replace('/lti_collaborations', '')} />,
-      document.getElementById('content')
     )
   }
   view()

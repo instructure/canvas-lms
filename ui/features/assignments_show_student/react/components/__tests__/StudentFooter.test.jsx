@@ -39,7 +39,7 @@ describe('StudentFooter', () => {
     return render(
       <AlertManagerContext.Provider value={{setOnFailure}}>
         <StudentFooter {...defaultProps} {...customProps} />
-      </AlertManagerContext.Provider>
+      </AlertManagerContext.Provider>,
     )
   }
 
@@ -51,7 +51,7 @@ describe('StudentFooter', () => {
 
     api.getContextModuleData.mockClear()
     api.getContextModuleData.mockImplementation(() =>
-      Promise.resolve({next: nextModule, previous: previousModule})
+      Promise.resolve({next: nextModule, previous: previousModule}),
     )
   })
 
@@ -156,7 +156,9 @@ describe('StudentFooter', () => {
 
       renderComponent()
       await waitFor(() =>
-        expect(setOnFailure).toHaveBeenCalledWith('There was a problem loading module information.')
+        expect(setOnFailure).toHaveBeenCalledWith(
+          'There was a problem loading module information.',
+        ),
       )
     })
   })

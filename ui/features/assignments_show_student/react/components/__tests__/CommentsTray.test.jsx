@@ -48,7 +48,7 @@ describe('CommentsTray', () => {
     render(
       <MockedProvider mocks={mocks}>
         <CommentsTray {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
   beforeEach(async () => {
@@ -73,7 +73,7 @@ describe('CommentsTray', () => {
     rerender(
       <MockedProvider mocks={mocks}>
         <CommentsTray {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(getByRole('heading', {type: 'h2'})).toHaveTextContent('Attempt 1 Feedback')
   })
@@ -99,7 +99,7 @@ describe('CommentsTray', () => {
     rerender(
       <MockedProvider mocks={mocks}>
         <CommentsTray {...props} isPeerReviewEnabled={true} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(getByRole('heading', {type: 'h2'})).toHaveTextContent('Peer Review Comments')
   })

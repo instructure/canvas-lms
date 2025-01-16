@@ -50,7 +50,7 @@ ready(() => {
 
         return acc
       },
-      [[], {}]
+      [[], {}],
     )
 
     Object.entries(groups).forEach(([group_name, group_permissions]) => {
@@ -96,7 +96,7 @@ ready(() => {
     contextId: ENV.ACCOUNT_ID, // This is at present always an account, I think?
     permissions: markAndCombineArrays(
       groupGranularPermissions(permissions),
-      groupGranularPermissions(flattenPermissions(ENV.ACCOUNT_PERMISSIONS))
+      groupGranularPermissions(flattenPermissions(ENV.ACCOUNT_PERMISSIONS)),
     ),
     roles: getSortedRoles(roles, accountAdmin),
     selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}],

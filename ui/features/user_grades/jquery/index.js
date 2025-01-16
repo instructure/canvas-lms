@@ -54,7 +54,7 @@ $(document).ready(function () {
                 totals.grade,
                 totals.grading_scheme,
                 totals.points_based_grading_scheme,
-                totals.scaling_factor
+                totals.scaling_factor,
               )
             : totals.grade + '%'
         } else {
@@ -62,7 +62,7 @@ $(document).ready(function () {
         }
 
         $percentDisplay.text(gradeToShow)
-      }
+      },
     )
   })
 })

@@ -87,8 +87,8 @@ export const RubricTable = ({
           ? -1
           : 1
         : a.hasRubricAssociations
-        ? 1
-        : -1
+          ? 1
+          : -1
     } else {
       // Default sorting by ID if no specific column is selected
       return a.id.localeCompare(b.id)

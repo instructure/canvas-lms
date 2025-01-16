@@ -40,6 +40,6 @@ export default function renderEditAssignmentsApp(elt: HTMLElement | null) {
           <TeacherCreateQuery courseId={ENV.COURSE_ID} />
         )}
       </ApolloProvider>
-    </QueryProvider>
+    </QueryProvider>,
   )
 }

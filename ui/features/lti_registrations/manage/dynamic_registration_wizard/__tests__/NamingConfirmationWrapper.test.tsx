@@ -66,7 +66,7 @@ describe('NamingConfirmation', () => {
       },
       {
         description: 'Foo',
-      }
+      },
     )
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
@@ -94,7 +94,7 @@ describe('NamingConfirmation', () => {
       {
         client_name: 'A Great Little Name',
       },
-      config
+      config,
     )
 
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
@@ -104,7 +104,7 @@ describe('NamingConfirmation', () => {
     render(<NamingConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     expect(
-      screen.queryByLabelText(i18nLtiPlacement(LtiPlacements.CourseAssignmentsMenu))
+      screen.queryByLabelText(i18nLtiPlacement(LtiPlacements.CourseAssignmentsMenu)),
     ).not.toBeInTheDocument()
   })
 
@@ -119,7 +119,7 @@ describe('NamingConfirmation', () => {
       {
         client_name: 'A Great Little Name',
       },
-      config
+      config,
     )
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
@@ -129,9 +129,9 @@ describe('NamingConfirmation', () => {
       const el = screen.getByLabelText(i18nLtiPlacement(placement))
       expect(el).toBeInTheDocument()
       expect(el).toHaveValue('')
-      // eslint-disable-next-line no-await-in-loop
+
       await userEvent.clear(el)
-      // eslint-disable-next-line no-await-in-loop
+
       await userEvent.type(el, 'New Name')
 
       expect(el).toHaveValue('New Name')

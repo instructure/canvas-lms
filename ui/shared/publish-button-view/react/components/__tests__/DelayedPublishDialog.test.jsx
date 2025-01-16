@@ -46,7 +46,7 @@ function renderDialog(props) {
       onPublish={props.onPublish || jest.fn()}
       onUpdatePublishAt={props.onUpdatePublishAt || jest.fn()}
       onClose={props.onClose || jest.fn()}
-    />
+    />,
   )
 }
 

@@ -207,7 +207,7 @@ describe('RandomlyAssignMembersView', () => {
     queueResponse(
       'GET',
       '/api/v1/group_categories/20/users?per_page=50&include[]=sections&exclude[]=pseudonym&unassigned=true&include[]=group_submissions',
-      unassignedUsersResponse
+      unassignedUsersResponse,
     )
 
     view.render()
@@ -231,7 +231,7 @@ describe('RandomlyAssignMembersView', () => {
     // Initial state verification
     expect(document.querySelector('.progress-container')).toBeFalsy()
     expect(document.querySelector('[data-view=groups]')).toBeTruthy()
-    expect(model.unassignedUsers().length).toBe(3)
+    expect(model.unassignedUsers()).toHaveLength(3)
 
     // Open options menu
     $('.icon-mini-arrow-down').simulate('click')
@@ -249,7 +249,7 @@ describe('RandomlyAssignMembersView', () => {
     queueResponse(
       'POST',
       '/api/v1/group_categories/20/assign_unassigned_members',
-      assignUnassignedMembersResponse
+      assignUnassignedMembersResponse,
     )
     queueResponse('GET', /progress/, partialProgressResponse)
     server.respond()
@@ -272,7 +272,7 @@ describe('RandomlyAssignMembersView', () => {
         ...groupCategoryResponse,
         groups_count: 1,
         unassigned_users_count: 0,
-      }
+      },
     )
     server.respond()
     clock.tick(1)
@@ -284,7 +284,7 @@ describe('RandomlyAssignMembersView', () => {
     queueResponse(
       'GET',
       '/api/v1/group_categories/20/users?per_page=50&include[]=sections&exclude[]=pseudonym&unassigned=true&include[]=group_submissions',
-      []
+      [],
     )
     server.respond()
     clock.tick(1)
@@ -292,6 +292,6 @@ describe('RandomlyAssignMembersView', () => {
     // Final state verification
     expect(document.querySelector('.progress-container')).toBeFalsy()
     expect(document.querySelector('[data-view=groups]')).toBeTruthy()
-    expect(model.unassignedUsers().length).toBe(0)
+    expect(model.unassignedUsers()).toHaveLength(0)
   })
 })

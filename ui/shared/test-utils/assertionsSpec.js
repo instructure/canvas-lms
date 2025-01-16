@@ -59,7 +59,7 @@ export default {
       const violations = reject(result.violations, violation => ignores.indexOf(violation.id) >= 0)
 
       const err = violations.map(violation =>
-        [`[${violation.id}] ${violation.help}`, `${violation.helpUrl}\n`].join('\n')
+        [`[${violation.id}] ${violation.help}`, `${violation.helpUrl}\n`].join('\n'),
       )
 
       ok(violations.length === 0, err)
@@ -73,7 +73,7 @@ export default {
       string.indexOf(substring) > -1,
       string,
       substring,
-      'expected string not found in actual'
+      'expected string not found in actual',
     )
   },
 }

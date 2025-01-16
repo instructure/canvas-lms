@@ -87,9 +87,9 @@ export default function CoursesToolbar({
                 </SearchableSelect.Option>
               ))}
             </SearchableSelect.Group>
-          )
-      )
-    )
+          ),
+      ),
+    ),
   )
 
   return (
@@ -205,7 +205,7 @@ CoursesToolbar.propTypes = {
   isLoading: bool.isRequired,
   draftFilters: shape({
     enrollment_type: arrayOf(
-      oneOf(['teacher', 'student', 'ta', 'observer', 'designer']).isRequired
+      oneOf(['teacher', 'student', 'ta', 'observer', 'designer']).isRequired,
     ),
     search_by: oneOf(['course', 'teacher']).isRequired,
     search_term: string.isRequired,

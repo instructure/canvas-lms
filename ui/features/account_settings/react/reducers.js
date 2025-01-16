@@ -77,7 +77,7 @@ function getInheritedList(toolsWhiteList, effectiveWhitelist) {
 
 export function whitelistedDomains(
   state = {account: [], effective: [], inherited: [], tools: {}},
-  action
+  action,
 ) {
   switch (action.type) {
     case ADD_DOMAIN:

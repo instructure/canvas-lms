@@ -38,7 +38,6 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('pages')
 
@@ -121,7 +120,7 @@ export default class WikiPageView extends Backbone.View {
     // Attach the immersive reader button if enabled
     const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
     const immersive_reader_mobile_mount_point = document.getElementById(
-      'immersive_reader_mobile_mount_point'
+      'immersive_reader_mobile_mount_point',
     )
     if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
       import(
@@ -144,7 +143,7 @@ export default class WikiPageView extends Backbone.View {
           }
         })
         .catch(e => {
-          console.log('Error loading immersive readers.', e)  
+          console.log('Error loading immersive readers.', e)
         })
     }
 
@@ -191,20 +190,10 @@ export default class WikiPageView extends Backbone.View {
     ) {
       if (window.ENV.text_editor_preference == null) {
         renderChooseEditorModal(e, async editor => {
-          if (editor === 'block_editor') {
-            await doFetchApi({
-              path: `/courses/${this.course_id}/pages/${this.model.get('url')}/create_block_editor`,
-              method: 'PUT',
-            })
-          }
           window.location.href = `${window.location.href.split('?')[0]}/edit?editor=${editor}`
         })
       } else if (window.ENV.text_editor_preference === 'block_editor') {
         e.preventDefault()
-        await doFetchApi({
-          path: `/courses/${this.course_id}/pages/${this.model.get('url')}/create_block_editor`,
-          method: 'PUT',
-        })
         window.location.href = `${window.location.href.split('?')[0]}/edit${
           window.location.href.split('?')[1] ? `?${window.location.href.split('?')[1]}` : ''
         }`
@@ -238,7 +227,6 @@ export default class WikiPageView extends Backbone.View {
           renderBlockEditorView(content, container)
         })
         .catch(() => {
-           
           window.alert('Error loading block editor content')
         })
     }
@@ -254,7 +242,7 @@ export default class WikiPageView extends Backbone.View {
       reloadMessage: I18n.t(
         'reload_viewing_page',
         'This page has changed since you started viewing it. *Reload*',
-        {wrapper: '<a class="reload" href="#">$1</a>'}
+        {wrapper: '<a class="reload" href="#">$1</a>'},
       ),
     })
     this.reloadView.on('changed', () => this.$headerBarOuterContainer.addClass('page-changed'))
@@ -288,7 +276,7 @@ export default class WikiPageView extends Backbone.View {
     }
 
     return this.model.unsetFrontPage(() =>
-      $('#wiki_page_show .page-toolbar .buttons .al-trigger').focus()
+      $('#wiki_page_show .page-toolbar .buttons .al-trigger').focus(),
     )
   }
 
@@ -299,13 +287,13 @@ export default class WikiPageView extends Backbone.View {
     if (!this.model.get('published')) return
 
     return this.model.setFrontPage(() =>
-      $('#wiki_page_show .page-toolbar .buttons .al-trigger').focus()
+      $('#wiki_page_show .page-toolbar .buttons .al-trigger').focus(),
     )
   }
 
   openSendTo(ev, open = true) {
     if (ev) ev.preventDefault()
-     
+
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -316,13 +304,13 @@ export default class WikiPageView extends Backbone.View {
           this.$gearMenu.focus()
         }}
       />,
-      document.getElementById('direct-share-mount-point')
+      document.getElementById('direct-share-mount-point'),
     )
   }
 
   openCopyTo(ev, open = true) {
     if (ev) ev.preventDefault()
-     
+
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -333,7 +321,7 @@ export default class WikiPageView extends Backbone.View {
           this.$gearMenu.focus()
         }}
       />,
-      document.getElementById('direct-share-mount-point')
+      document.getElementById('direct-share-mount-point'),
     )
   }
 
@@ -355,7 +343,6 @@ export default class WikiPageView extends Backbone.View {
     }
     const onTrayExited = () => ReactDOM.unmountComponentAtNode(mountPoint)
 
-     
     ReactDOM.render(
       <ItemAssignToManager
         open={open}
@@ -371,7 +358,7 @@ export default class WikiPageView extends Backbone.View {
         itemContentId={this.model.get('page_id')}
         removeDueDateInput={true}
       />,
-      mountPoint
+      mountPoint,
     )
   }
 

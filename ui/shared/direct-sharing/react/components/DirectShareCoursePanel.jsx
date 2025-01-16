@@ -73,7 +73,7 @@ export default function DirectShareCoursePanel({
             insert_into_module_position: selectedPosition,
           },
         },
-      })
+      }),
     )
   }
 
@@ -105,7 +105,7 @@ export default function DirectShareCoursePanel({
       />
       <Alert variant="warning" hasShadow={false}>
         {I18n.t(
-          'Importing the same course content more than once will overwrite any existing content in the course.'
+          'Importing the same course content more than once will overwrite any existing content in the course.',
         )}
       </Alert>
       <ConfirmActionButtonBar

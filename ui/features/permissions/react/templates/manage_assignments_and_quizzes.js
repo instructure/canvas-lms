@@ -41,7 +41,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to add new questions to new or existing question banks in a course or account.'
+        'Allows user to add new questions to new or existing question banks in a course or account.',
       ),
     },
     {
@@ -62,7 +62,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to edit lock settings on the Assignments and Quizzes index pages.'
+        'Allows user to edit lock settings on the Assignments and Quizzes index pages.',
       ),
     },
     {
@@ -73,7 +73,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Determines visibility and management of the Question Banks link in Account Navigation.'
+        'Determines visibility and management of the Question Banks link in Account Navigation.',
       ),
     },
     {
@@ -100,57 +100,57 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        'To access the Assignments Index Page, Course Content - view must be enabled.'
+        'To access the Assignments Index Page, Course Content - view must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To differentiate assignments to individual students, Users - view list must also be enabled.'
+        'To differentiate assignments to individual students, Users - view list must also be enabled.',
       ),
     },
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.'
+        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'If Blueprint Courses - add / edit / associate / delete and Courses - manage are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.'
+        'If Blueprint Courses - add / edit / associate / delete and Courses - manage are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.',
       ),
     },
     {
       description: I18n.t(
-        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.'
+        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.',
       ),
     },
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'To import assignments and quizzes using the Course Import Tool, Course Content - add / edit / delete must be enabled.'
+        'To import assignments and quizzes using the Course Import Tool, Course Content - add / edit / delete must be enabled.',
       ),
     },
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
-        'These permissions do not manage Discussions. Discussions are managed via individual Discussion permissions.'
+        'These permissions do not manage Discussions. Discussions are managed via individual Discussion permissions.',
       ),
     },
     {
       description: I18n.t(
-        'To edit assignment details on individual discussions, Discussions - manage must also be enabled.'
+        'To edit assignment details on individual discussions, Discussions - manage must also be enabled.',
       ),
     },
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        'To manage moderated grading, Grades - Select final grade for moderation must also be enabled.'
+        'To manage moderated grading, Grades - Select final grade for moderation must also be enabled.',
       ),
     },
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'To access the Quizzes Index Page, Course Content - view must be enabled.'
+        'To access the Quizzes Index Page, Course Content - view must be enabled.',
       ),
     },
     {
@@ -158,23 +158,23 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To access item banks for a course or account, Item Banks - manage account must also be enabled.'
+        'To access item banks for a course or account, Item Banks - manage account must also be enabled.',
       ),
     },
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        'Disabling the Assignments and Quizzes - add permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating rubrics for an individual assignment.'
+        'Disabling the Assignments and Quizzes - add permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating rubrics for an individual assignment.',
       ),
     },
     {
       description: I18n.t(
-        'Disabling the Assignments and Quizzes - edit permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing users from editing rubrics from an individual assignment.'
+        'Disabling the Assignments and Quizzes - edit permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing users from editing rubrics from an individual assignment.',
       ),
     },
     {
       description: I18n.t(
-        'Disabling the Assignments and Quizzes - delete permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from deleting rubrics for an individual assignment.'
+        'Disabling the Assignments and Quizzes - delete permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from deleting rubrics for an individual assignment.',
       ),
     },
   ],
@@ -197,7 +197,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to add new questions to new or existing question banks in a course.'
+        'Allows user to add new questions to new or existing question banks in a course.',
       ),
     },
     {
@@ -218,7 +218,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to edit lock settings on the Assignments and Quizzes index pages.'
+        'Allows user to edit lock settings on the Assignments and Quizzes index pages.',
       ),
     },
     {
@@ -245,67 +245,67 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        'To access the Assignments Index Page, Course Content - view must be enabled.'
+        'To access the Assignments Index Page, Course Content - view must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To differentiate assignments to individual students, Users - view list must also be enabled.'
+        'To differentiate assignments to individual students, Users - view list must also be enabled.',
       ),
     },
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.'
+        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'If Blueprint Courses - add / edit / associate / delete and Courses - manage are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.'
+        'If Blueprint Courses - add / edit / associate / delete and Courses - manage are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.',
       ),
     },
     {
       description: I18n.t(
-        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.'
+        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.',
       ),
     },
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'To import assignments and quizzes using the Course Import Tool, Course Content - add / edit / delete must be enabled.'
+        'To import assignments and quizzes using the Course Import Tool, Course Content - add / edit / delete must be enabled.',
       ),
     },
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
-        'These permissions do not manage Discussions. Discussions are managed via individual Discussion permissions.'
+        'These permissions do not manage Discussions. Discussions are managed via individual Discussion permissions.',
       ),
     },
     {
       description: I18n.t(
-        'To edit assignment details on individual discussions, Discussions - manage must also be enabled.'
+        'To edit assignment details on individual discussions, Discussions - manage must also be enabled.',
       ),
     },
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        'To manage moderated grading, Grades - Select final grade for moderation must also be enabled.'
+        'To manage moderated grading, Grades - Select final grade for moderation must also be enabled.',
       ),
     },
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'To access the Quizzes Index Page, Course Content - view must be enabled.'
+        'To access the Quizzes Index Page, Course Content - view must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To edit quizzes, Assignments and Quizzes - manage / edit must also be enabled.'
+        'To edit quizzes, Assignments and Quizzes - manage / edit must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To access item banks for a course, Item Banks - manage account must also be enabled.'
+        'To access item banks for a course, Item Banks - manage account must also be enabled.',
       ),
     },
     {
@@ -314,18 +314,18 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        'Disabling the Assignments and Quizzes - add permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating rubrics for an individual assignment.'
+        'Disabling the Assignments and Quizzes - add permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating rubrics for an individual assignment.',
       ),
     },
     {
       description: I18n.t(
-        'Disabling the Assignments and Quizzes - edit permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing users from editing rubrics from an individual assignment.'
+        'Disabling the Assignments and Quizzes - edit permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing users from editing rubrics from an individual assignment.',
       ),
     },
     {
       description: I18n.t(
-        'Disabling the Assignments and Quizzes - delete permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from deleting rubrics for an individual assignment.'
+        'Disabling the Assignments and Quizzes - delete permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from deleting rubrics for an individual assignment.',
       ),
     },
-  ]
+  ],
 )

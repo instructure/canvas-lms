@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Pill} from '@instructure/ui-pill'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -36,39 +36,41 @@ export default {
         statusMap[status.id] = status
         return statusMap
       }, {}) ?? {}
+
     const missMountPoints = document.querySelectorAll('.submission-missing-pill')
     const lateMountPoints = document.querySelectorAll('.submission-late-pill')
     const excusedMountPoints = document.querySelectorAll('.submission-excused-pill')
     const extendedMountPoints = document.querySelectorAll('.submission-extended-pill')
     const customGradeStatusMountPoints = document.querySelectorAll(
-      '[class^="submission-custom-grade-status-pill-"]'
+      '[class^="submission-custom-grade-status-pill-"]',
     )
+
     forEachNode(missMountPoints, mountPoint => {
-       
-      ReactDOM.render(<Pill color="danger">{I18n.t('missing')}</Pill>, mountPoint)
+      const root = createRoot(mountPoint)
+      root.render(<Pill color="danger">{I18n.t('missing')}</Pill>)
     })
 
     forEachNode(lateMountPoints, mountPoint => {
-       
-      ReactDOM.render(<Pill color="info">{I18n.t('late')}</Pill>, mountPoint)
+      const root = createRoot(mountPoint)
+      root.render(<Pill color="info">{I18n.t('late')}</Pill>)
     })
 
     forEachNode(excusedMountPoints, mountPoint => {
-       
-      ReactDOM.render(<Pill color="danger">{I18n.t('excused')}</Pill>, mountPoint)
+      const root = createRoot(mountPoint)
+      root.render(<Pill color="danger">{I18n.t('excused')}</Pill>)
     })
 
     forEachNode(extendedMountPoints, mountPoint => {
-       
-      ReactDOM.render(<Pill color="alert">{I18n.t('extended')}</Pill>, mountPoint)
+      const root = createRoot(mountPoint)
+      root.render(<Pill color="alert">{I18n.t('extended')}</Pill>)
     })
 
     forEachNode(customGradeStatusMountPoints, mountPoint => {
       const status =
         statusMap[mountPoint.classList[0].substring('submission-custom-grade-status-pill-'.length)]
       if (status) {
-         
-        ReactDOM.render(<Pill>{status.name}</Pill>, mountPoint)
+        const root = createRoot(mountPoint)
+        root.render(<Pill>{status.name}</Pill>)
       }
     })
   },

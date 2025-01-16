@@ -85,7 +85,7 @@ export type ItemAssignToCardProps = {
   onCardAssignmentChange?: (
     cardId: string,
     assignees: AssigneeOption[],
-    deletedAssignees: string[]
+    deletedAssignees: string[],
   ) => void
   onCardDatesChange?: (cardId: string, dateAttribute: string, dateValue: string | null) => void
   selectedAssigneeIds: string[]
@@ -117,7 +117,7 @@ export type ItemAssignToCardRef = {
 
 export default forwardRef(function ItemAssignToCard(
   props: ItemAssignToCardProps,
-  ref: ForwardedRef<ItemAssignToCardRef>
+  ref: ForwardedRef<ItemAssignToCardRef>,
 ) {
   const {
     courseId,
@@ -179,7 +179,7 @@ export default forwardRef(function ItemAssignToCard(
         userIsAdmin: ENV.current_user_is_admin,
         postToSIS,
       }),
-    [postToSIS]
+    [postToSIS],
   )
 
   const cardActionLabels = useMemo(
@@ -187,9 +187,9 @@ export default forwardRef(function ItemAssignToCard(
       generateCardActionLabels(
         customAllOptions
           ?.filter(option => selectedAssigneeIds.includes(option.id))
-          .map(({value}) => value) ?? []
+          .map(({value}) => value) ?? [],
       ),
-    [customAllOptions, selectedAssigneeIds]
+    [customAllOptions, selectedAssigneeIds],
   )
 
   const commonDateTimeInputProps = useMemo(
@@ -199,7 +199,7 @@ export default forwardRef(function ItemAssignToCard(
       locale: ENV?.LOCALE || 'en',
       timezone: ENV?.TIMEZONE || 'UTC',
     }),
-    []
+    [],
   )
 
   const dueAtHasChanged = useCallback(() => {
@@ -248,7 +248,7 @@ export default forwardRef(function ItemAssignToCard(
       cardId,
       error.length === 0 &&
         Object.keys(validationErrors).length === 0 &&
-        unparsedFieldKeys.size === 0
+        unparsedFieldKeys.size === 0,
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error.length, Object.keys(validationErrors).length, unparsedFieldKeys.size])
@@ -326,7 +326,7 @@ export default forwardRef(function ItemAssignToCard(
       const dateTimeErrors = dateValidator.validateDatetimes(dateValidatorInputArgs)
       const parserErrors = Array.from(unparsedFieldKeys).reduce(
         (result, key) => ({...result, [key]: true}),
-        {}
+        {},
       )
       // Restores custom date validator attributes
       if (dueDateRequired !== undefined) {
@@ -339,11 +339,11 @@ export default forwardRef(function ItemAssignToCard(
   const handleSelect = useCallback(
     (newSelectedAssignees: AssigneeOption[]) => {
       const deletedAssigneeIds = selectedAssigneeIds.filter(
-        assigneeId => newSelectedAssignees.find(({id}) => id === assigneeId) === undefined
+        assigneeId => newSelectedAssignees.find(({id}) => id === assigneeId) === undefined,
       )
       onCardAssignmentChange?.(cardId, newSelectedAssignees, deletedAssigneeIds)
     },
-    [cardId, selectedAssigneeIds, onCardAssignmentChange]
+    [cardId, selectedAssigneeIds, onCardAssignmentChange],
   )
 
   const handleBlur = useCallback(
@@ -361,7 +361,7 @@ export default forwardRef(function ItemAssignToCard(
         const isDateInputValid = moment(
           dateInputRef.value,
           'll',
-          commonDateTimeInputProps.locale
+          commonDateTimeInputProps.locale,
         ).isValid()
         if ((isDateInputEmpty || isDateInputValid) && unparsedFieldExists) {
           // If date is empty or valid and had an error, it should be marked as solved
@@ -381,7 +381,7 @@ export default forwardRef(function ItemAssignToCard(
       if (!setEquals(newUnparsedFieldKeys, unparsedFieldKeys))
         setUnparsedFieldKeys(newUnparsedFieldKeys)
     },
-    [commonDateTimeInputProps.locale, unparsedFieldKeys]
+    [commonDateTimeInputProps.locale, unparsedFieldKeys],
   )
 
   const handleDelete = useCallback(() => onDelete?.(cardId), [cardId, onDelete])
@@ -482,7 +482,7 @@ export default forwardRef(function ItemAssignToCard(
             }}
             {...commonDateTimeInputProps}
             handleReplyToTopicDueDateChange={handleReplyToTopicDueDateChange(
-              timeInputRefs.current.reply_to_topic_due_at?.value || ''
+              timeInputRefs.current.reply_to_topic_due_at?.value || '',
             )}
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
@@ -503,7 +503,7 @@ export default forwardRef(function ItemAssignToCard(
             }}
             {...commonDateTimeInputProps}
             handleRequiredRepliesDueDateChange={handleRequiredRepliesDueDateChange(
-              timeInputRefs.current.required_replies_due_at?.value || ''
+              timeInputRefs.current.required_replies_due_at?.value || '',
             )}
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
@@ -522,7 +522,7 @@ export default forwardRef(function ItemAssignToCard(
           }}
           {...commonDateTimeInputProps}
           handleAvailableFromDateChange={handleAvailableFromDateChange(
-            timeInputRefs.current.unlock_at?.value || ''
+            timeInputRefs.current.unlock_at?.value || '',
           )}
           disabledWithGradingPeriod={isInClosedGradingPeriod}
         />
@@ -540,7 +540,7 @@ export default forwardRef(function ItemAssignToCard(
           }}
           {...commonDateTimeInputProps}
           handleAvailableToDateChange={handleAvailableToDateChange(
-            timeInputRefs.current.lock_at?.value || ''
+            timeInputRefs.current.lock_at?.value || '',
           )}
           disabledWithGradingPeriod={isInClosedGradingPeriod}
         />

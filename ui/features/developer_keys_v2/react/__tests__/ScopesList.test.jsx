@@ -201,7 +201,7 @@ describe('DeveloperKeyScopesList', () => {
       ref.current.handleReadOnlySelected(fakeEvent)
 
       expect(ref.current.state.selectedScopes).toEqual(
-        expect.arrayContaining(['/auth/userinfo', 'url:GET|/api/v1/accounts/search'])
+        expect.arrayContaining(['/auth/userinfo', 'url:GET|/api/v1/accounts/search']),
       )
     })
 

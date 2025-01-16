@@ -22,7 +22,6 @@ import CoursesPane from '../CoursesPane'
 import CoursesStore from '../../store/CoursesStore'
 import TermsStore from '../../store/TermsStore'
 import AccountsTreeStore from '../../store/AccountsTreeStore'
-import sinon from 'sinon'
 
 const stores = [CoursesStore, TermsStore, AccountsTreeStore]
 
@@ -36,7 +35,7 @@ describe('Account Course User Search CoursesPane View', () => {
         roles={[{id: '1'}]}
         queryParams={{}}
         onUpdateQueryParams={function () {}}
-      />
+      />,
     )
   })
 
@@ -46,13 +45,18 @@ describe('Account Course User Search CoursesPane View', () => {
 
   test('onUpdateFilters calls debouncedApplyFilters after updating state', () => {
     const instance = wrapper.instance()
-    const spy = sinon.spy(instance, 'debouncedApplyFilters')
+    const spy = jest.spyOn(instance, 'debouncedApplyFilters')
     instance.onUpdateFilters()
-    expect(spy.called).toBeTruthy()
+    expect(spy).toHaveBeenCalled()
+  })
+
+  test('it loads mores terms at once', () => {
+    const termsStore = stores.find(s => s.jsonKey === 'enrollment_terms')
+    expect(termsStore.lastParams).toHaveProperty('per_page', 100)
   })
 
   test('have an h1 on the page', () => {
     //  'There is one H1 on the page'
-    expect(wrapper.find('h1').length).toBe(1)
+    expect(wrapper.find('h1')).toHaveLength(1)
   })
 })

@@ -47,7 +47,7 @@ export default function useCreateDiscussionEntry(onCompleteCallback, updateCache
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
 
       captureException(
-        new Error(`Error received when creating the discussion entry: ${errorData.message}`)
+        new Error(`Error received when creating the discussion entry: ${errorData.message}`),
       )
 
       if (onCompleteCallback) {

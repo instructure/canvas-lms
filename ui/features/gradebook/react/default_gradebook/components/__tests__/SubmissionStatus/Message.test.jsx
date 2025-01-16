@@ -37,8 +37,8 @@ describe('Message', () => {
         wrapper.contains(
           <Text color="danger" size="small">
             {message}
-          </Text>
-        )
+          </Text>,
+        ),
       ).toBe(true)
     })
   })
@@ -57,8 +57,8 @@ describe('Message', () => {
         wrapper.contains(
           <Text color="primary" size="small">
             {message}
-          </Text>
-        )
+          </Text>,
+        ),
       ).toBe(true)
     })
   })

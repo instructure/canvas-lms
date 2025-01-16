@@ -74,7 +74,7 @@ it('renders the item to update if provided', () => {
         {id: '1', longName: 'a course', enrollmentType: 'StudentEnrollment'},
         {id: '2', longName: 'a course I teach', enrollmentType: 'TeacherEnrollment'},
       ]}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -83,7 +83,7 @@ it("doesn't re-render unless new item is provided", () => {
   const wrapper = shallow(<UpdateItemTray {...defaultProps} />)
   const newProps = {...defaultProps, locale: 'fr'}
   wrapper.setProps(newProps)
-  expect(wrapper.find('DateTimeInput').props().messages.length).toBe(0)
+  expect(wrapper.find('DateTimeInput').props().messages).toHaveLength(0)
 })
 
 it('renders Add To Do header when creating a new to do', async () => {
@@ -127,7 +127,7 @@ it('correctly updates id to null when courseid is none', () => {
   const item = simpleItem()
   const mockCallback = jest.fn()
   const wrapper = shallow(
-    <UpdateItemTray {...defaultProps} onSavePlannerItem={mockCallback} noteItem={item} />
+    <UpdateItemTray {...defaultProps} onSavePlannerItem={mockCallback} noteItem={item} />,
   )
   wrapper.instance().handleCourseIdChange({}, {value: 'none'})
   wrapper.instance().handleSave()
@@ -164,7 +164,7 @@ it('does not set an initial error message on title', () => {
 
 it('sets error message on title field when title is set to blank', () => {
   const wrapper = shallow(
-    <UpdateItemTray {...defaultProps} noteItem={{uniqueId: '1', title: 'an item'}} />
+    <UpdateItemTray {...defaultProps} noteItem={{uniqueId: '1', title: 'an item'}} />,
   )
   wrapper.instance().handleTitleChange({target: {value: ''}})
   const titleInput = wrapper.find('TextInput').first()
@@ -175,7 +175,7 @@ it('sets error message on title field when title is set to blank', () => {
 
 it('clears the error message when a title is typed in', () => {
   const wrapper = shallow(
-    <UpdateItemTray {...defaultProps} noteItem={{uniqueId: '1', title: 'an item'}} />
+    <UpdateItemTray {...defaultProps} noteItem={{uniqueId: '1', title: 'an item'}} />,
   )
   wrapper.instance().handleTitleChange({target: {value: ''}})
   wrapper.instance().handleTitleChange({target: {value: 't'}})
@@ -223,7 +223,7 @@ it.skip('changes state when new date is typed in', async () => {
   const noteItem = simpleItem({title: 'Planner Item'})
   const mockCallback = jest.fn()
   const wrapper = render(
-    <UpdateItemTray {...defaultProps} onSavePlannerItem={mockCallback} noteItem={noteItem} />
+    <UpdateItemTray {...defaultProps} onSavePlannerItem={mockCallback} noteItem={noteItem} />,
   )
   const newDate = moment('2017-10-16T13:30:00')
 
@@ -258,7 +258,7 @@ it('updates state when new note is passed in', () => {
         {id: '1', longName: 'first course', enrollmentType: 'StudentEnrollment'},
         {id: '2', longName: 'second course', enrollmentType: 'StudentEnrollment'},
       ]}
-    />
+    />,
   )
   expect(wrapper).toMatchSnapshot()
 
@@ -297,7 +297,7 @@ it('does not render the delete button if an item is not specified', () => {
 
 it('does render the delete button if an item is specified', () => {
   const wrapper = shallow(
-    <UpdateItemTray {...defaultProps} noteItem={{uniqueId: '1', title: 'some note'}} />
+    <UpdateItemTray {...defaultProps} noteItem={{uniqueId: '1', title: 'some note'}} />,
   )
   const deleteButton = wrapper.find('Button[color="primary-inverse"]')
   expect(deleteButton).toHaveLength(1)
@@ -323,7 +323,7 @@ it('renders course options plus an optional option when provided with courses', 
         {id: '1', longName: 'first course', enrollmentType: 'StudentEnrollment'},
         {id: '2', longName: 'second course', enrollmentType: 'StudentEnrollment'},
       ]}
-    />
+    />,
   )
   const option = getByTitle('Optional: Add Course')
   await user.click(option)
@@ -350,7 +350,7 @@ it('invokes save callback with updated data', () => {
         {id: '43', longName: 'second', enrollmentType: 'StudentEnrollment'},
       ]}
       onSavePlannerItem={saveMock}
-    />
+    />,
   )
   wrapper.instance().handleTitleChange({target: {value: 'new title'}})
   wrapper.instance().handleDateChange({}, '2017-05-01T14:00:00Z')
@@ -370,7 +370,7 @@ it('invokes the delete callback', () => {
   const item = simpleItem({title: 'a title'})
   const mockDelete = jest.fn()
   const wrapper = shallow(
-    <UpdateItemTray {...defaultProps} noteItem={item} onDeletePlannerItem={mockDelete} />
+    <UpdateItemTray {...defaultProps} noteItem={item} onDeletePlannerItem={mockDelete} />,
   )
   const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true)
   wrapper.instance().handleDeleteClick()

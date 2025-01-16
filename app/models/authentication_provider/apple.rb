@@ -27,10 +27,6 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   SENSITIVE_PARAMS = [:client_secret].freeze
 
   class << self
-    def display_name
-      "Sign in with Apple"
-    end
-
     def login_message
       display_name
     end

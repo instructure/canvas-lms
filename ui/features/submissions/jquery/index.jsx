@@ -123,7 +123,7 @@ function showGrade(submission) {
     $('.grading_box').val(submission.entered_grade)
   } else {
     $('.grading_box').val(
-      callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade, formatGradeOptions())
+      callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade, formatGradeOptions()),
     )
   }
   $('.late_penalty').text(callIfSet(-submission.points_deducted, roundAndFormat))
@@ -136,7 +136,7 @@ function showGrade(submission) {
     const formattedGrade = callIfSet(
       submission.entered_grade,
       GradeFormatHelper.formatGrade,
-      formatGradeOptions()
+      formatGradeOptions(),
     )
     $('.entered_grade').text(formattedGrade)
   }
@@ -246,15 +246,14 @@ function insertEmoji(emoji) {
 export function setup() {
   $(document).ready(function () {
     if (ENV.EMOJIS_ENABLED) {
-       
       ReactDOM.render(
         <EmojiPicker insertEmoji={insertEmoji} />,
-        document.getElementById('emoji-picker-container')
+        document.getElementById('emoji-picker-container'),
       )
-       
+
       ReactDOM.render(
         <EmojiQuickPicker insertEmoji={insertEmoji} />,
-        document.getElementById('emoji-quick-picker-container')
+        document.getElementById('emoji-quick-picker-container'),
       )
     }
     const comments = document.getElementsByClassName('comment_content')
@@ -307,7 +306,7 @@ export function setup() {
         ) {
           formData['submission[comment]'] = I18n.t(
             'see_attached_files',
-            'Please see attached files'
+            'Please see attached files',
           )
         }
       }
@@ -322,7 +321,7 @@ export function setup() {
           method,
           formData,
           $("#add_comment_form input[type='file']"),
-          submissionLoaded
+          submissionLoaded,
         )
       } else {
         $.ajaxJSON(url, method, formData, submissionLoaded)
@@ -495,7 +494,7 @@ export function setup() {
         () => {
           $('#add_comment_form').show()
           $('#media_media_recording').hide()
-        }
+        },
       )
     })
     $(document).on('click', '#media_recorder_container a', _event => {
@@ -567,6 +566,6 @@ $(document).ready(() => {
         INST.refreshGrades()
       }
     },
-    false
+    false,
   )
 })

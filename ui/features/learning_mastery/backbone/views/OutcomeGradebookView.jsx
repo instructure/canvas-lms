@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -220,8 +218,8 @@ OutcomeGradebookView.prototype._toggleOutcomesWithNoResults = function (enabled)
           return function (c) {
             return c.hasResults
           }
-        })(this)
-      )
+        })(this),
+      ),
     )
     this.grid.setColumns(columns)
   } else {
@@ -255,7 +253,7 @@ OutcomeGradebookView.prototype._rerender = function () {
   this.grid.setData([])
   this.grid.invalidate()
   this.hasOutcomes = $.Deferred()
-   
+
   $.when(this.hasOutcomes).then(this.renderGrid)
   return this._loadOutcomes()
 }
@@ -295,14 +293,14 @@ OutcomeGradebookView.prototype.toJSON = function () {
     {},
     {
       checkboxes: this.checkboxes,
-    }
+    },
   )
 }
 
 OutcomeGradebookView.prototype._loadFilterSettings = function () {
   return this.$('#no_results_outcomes').prop(
     'checked',
-    this._getFilterSetting('outcomes_no_results')
+    this._getFilterSetting('outcomes_no_results'),
   )
 }
 
@@ -312,7 +310,7 @@ OutcomeGradebookView.prototype._loadFilterSettings = function () {
 OutcomeGradebookView.prototype.render = function () {
   OutcomeGradebookView.__super__.render.call(this)
   this.renderSectionMenu()
-   
+
   $.when(this.hasOutcomes).then(this.renderGrid)
   return this
 }
@@ -341,7 +339,7 @@ OutcomeGradebookView.prototype.renderGrid = function (response) {
       return function (i) {
         return _this.checkboxes[i].checked
       }
-    })(this)
+    })(this),
   ).map(function (i) {
     return 'rating_' + i
   })
@@ -366,8 +364,8 @@ OutcomeGradebookView.prototype.renderGrid = function (response) {
           return function (c) {
             return c.hasResults
           }
-        })(this)
-      )
+        })(this),
+      ),
     )
   }
   if (this.grid) {
@@ -413,7 +411,7 @@ OutcomeGradebookView.prototype.onShow = function () {
 // Returns nothing.
 OutcomeGradebookView.prototype.loadPage = function (page) {
   this.hasOutcomes = $.Deferred()
-   
+
   $.when(this.hasOutcomes).then(this.renderGrid)
   return this._loadOutcomes(page)
 }
@@ -548,7 +546,7 @@ OutcomeGradebookView.prototype._getOutcomeFiltersParams = function () {
         return function (value) {
           return '&exclude[]=' + value
         }
-      })(this)
+      })(this),
     )
     .join('')
 }
@@ -570,10 +568,10 @@ OutcomeGradebookView.prototype._loadPage = function (url, outcomes) {
         _this.hasOutcomes.resolve(outcomes)
         return _this.learningMastery.renderPagination(
           response.meta.pagination.page,
-          response.meta.pagination.page_count
+          response.meta.pagination.page_count,
         )
       }
-    })(this)
+    })(this),
   )
 }
 

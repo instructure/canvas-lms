@@ -168,7 +168,7 @@ ScopesGroup.propTypes = {
     PropTypes.shape({
       scope: PropTypes.string,
       verb: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
   name: PropTypes.string.isRequired,

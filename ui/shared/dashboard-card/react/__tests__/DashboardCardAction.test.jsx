@@ -16,78 +16,51 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
 import DashboardCardAction from '../DashboardCardAction'
 
-const equal = (x, y) => expect(x).toBe(y)
-
-const container = document.createElement('div')
-container.setAttribute('id', 'fixtures')
-document.body.appendChild(container)
-
-let props
-let component
-
 describe('DashboardCardAction', () => {
-  beforeAll(() => {
+  let props
+
+  beforeEach(() => {
     props = {
       iconClass: 'icon-assignment',
       path: '/courses/1/assignments/',
     }
   })
 
-  test('should render link & icon', function () {
-    component = TestUtils.renderIntoDocument(<DashboardCardAction {...props} />)
-    const $html = $(ReactDOM.findDOMNode(component))
-    equal($html.prop('tagName'), 'A', 'parent tag should be link')
-    equal(
-      $html.find('svg').attr('name'),
-      'IconAssignment',
-      'should have provided corresponding icon'
-    )
-    equal($html.find('span.screenreader-only').length, 0, 'should not have screenreader span')
+  it('renders link with icon', () => {
+    const {getByRole, container} = render(<DashboardCardAction {...props} />)
+    const link = getByRole('link')
+    expect(link).toBeInTheDocument()
+    expect(container.querySelector('svg[name="IconAssignment"]')).toBeInTheDocument()
+    expect(container.querySelector('.screenreader-only')).not.toBeInTheDocument()
   })
 
-  test('should render fallback icon for unrecognized iconClass', function () {
+  it('renders fallback icon for unrecognized iconClass', () => {
     props.iconClass = 'icon-something-else'
-    component = TestUtils.renderIntoDocument(<DashboardCardAction {...props} />)
-    const $html = $(ReactDOM.findDOMNode(component))
-    equal($html.prop('tagName'), 'A', 'parent tag should be link')
-    equal($html.find('i').attr('class'), props.iconClass, 'i tag should have given prop as class')
-    equal($html.find('span.screenreader-only').length, 0, 'should not have screenreader span')
+    const {getByRole, container} = render(<DashboardCardAction {...props} />)
+    const link = getByRole('link')
+    expect(link).toBeInTheDocument()
+    const icon = container.querySelector('i')
+    expect(icon).toBeInTheDocument()
+    expect(icon).toHaveClass(props.iconClass)
+    expect(container.querySelector('.screenreader-only')).not.toBeInTheDocument()
   })
 
-  test('should render actionType as screenreader text if provided', function () {
-    const screen_reader_label = 'Dashboard Action'
-    const component = TestUtils.renderIntoDocument(
-      <DashboardCardAction {...props} screenReaderLabel={screen_reader_label} />
+  it('renders screenreader text when provided', () => {
+    const screenReaderLabel = 'Dashboard Action'
+    const {getByText} = render(
+      <DashboardCardAction {...props} screenReaderLabel={screenReaderLabel} />,
     )
-    const $html = $(ReactDOM.findDOMNode(component))
-    equal($html.find('span.screenreader-only').text(), screen_reader_label)
+    expect(getByText(screenReaderLabel)).toHaveClass('screenreader-only')
   })
 
-  test('should display unread count when it is greater than zero', function () {
-    const unread_count = 2
-    component = TestUtils.renderIntoDocument(
-      <DashboardCardAction {...props} unreadCount={unread_count} />
-    )
-    const $html = $(ReactDOM.findDOMNode(component))
-    equal(
-      $html.find('span.unread_count').text(),
-      String(unread_count),
-      'should display unread count'
-    )
-    equal(
-      $html.find('span.screenreader-only').text(),
-      'Unread',
-      'should display Unread as screenreader only text'
-    )
+  it('displays unread count when greater than zero', () => {
+    const unreadCount = 2
+    const {getByText} = render(<DashboardCardAction {...props} unreadCount={unreadCount} />)
+    expect(getByText(String(unreadCount))).toHaveClass('unread_count')
+    expect(getByText('Unread')).toHaveClass('screenreader-only')
   })
-
-  if (component) {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
-  }
 })

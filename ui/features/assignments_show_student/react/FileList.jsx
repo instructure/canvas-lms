@@ -109,7 +109,7 @@ FileList.propTypes = {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   removeFileHandler: PropTypes.func,
 }

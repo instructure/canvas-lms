@@ -46,7 +46,7 @@ export const daysBetween = (
   excludeWeekends: boolean,
   selectedDaysToSkip: string[],
   blackoutDates: BlackoutDate[] = [],
-  inclusiveEnd = true
+  inclusiveEnd = true,
 ): number => {
   const startDate = moment(start).endOf('day')
   const endDate = moment(end).endOf('day')
@@ -85,7 +85,7 @@ export const addDays = (
   numberOfDays: number,
   excludeWeekends: boolean,
   selectedDaysToSkip: string[] = [],
-  blackoutDates: BlackoutDate[] = []
+  blackoutDates: BlackoutDate[] = [],
 ): string => {
   const date = moment(start)
 
@@ -107,7 +107,7 @@ export const addDays = (
 const msInADay = 1000 * 60 * 60 * 24
 export const rawDaysBetweenInclusive = (
   start_date: moment.Moment,
-  end_date: moment.Moment
+  end_date: moment.Moment,
 ): number => Math.round(end_date.diff(start_date) / msInADay) + 1
 
 export const stripTimezone = (date: string): string => {
@@ -116,7 +116,7 @@ export const stripTimezone = (date: string): string => {
 
 export const inBlackoutDate = (
   date: moment.Moment | string,
-  blackoutDates: BlackoutDate[]
+  blackoutDates: BlackoutDate[],
 ): boolean => {
   date = moment(date)
 
@@ -133,7 +133,7 @@ const dayIsDisabled = (
   date: moment.Moment,
   excludeWeekends: boolean,
   selectedDaysToSkip: string[],
-  blackoutDates: BlackoutDate[]
+  blackoutDates: BlackoutDate[],
 ) => {
   if (window.ENV.FEATURES.course_paces_skip_selected_days) {
     return (

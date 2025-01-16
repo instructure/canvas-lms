@@ -35,7 +35,7 @@ describe.skip('choosing filter options', () => {
 
   it('sends override ID when chosen in assignTo filter', () => {
     const {getByText, getByTestId} = render(
-      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />
+      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
     fireEvent.click(getByTestId('assignToFilter'))
     fireEvent.click(getByText(override.title))
@@ -44,7 +44,7 @@ describe.skip('choosing filter options', () => {
 
   it('sends null when everyone is chosen in assignTo filter', () => {
     const {getByText, getByTestId} = render(
-      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />
+      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
     fireEvent.click(getByTestId('assignToFilter'))
     fireEvent.click(getByText('Everyone'))
@@ -53,7 +53,7 @@ describe.skip('choosing filter options', () => {
 
   it('sends attempt number when specific attempt is chosen in attempt filter', () => {
     const {getByText, getByTestId} = render(
-      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />
+      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
     fireEvent.click(getByTestId('attemptFilter'))
     fireEvent.click(getByText('Attempt 1'))
@@ -62,7 +62,7 @@ describe.skip('choosing filter options', () => {
 
   it('sends null when all is chosen in attempt filter', () => {
     const {getByText, getByTestId} = render(
-      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />
+      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
     fireEvent.click(getByTestId('attemptFilter'))
     fireEvent.click(getByText('All'))
@@ -71,7 +71,7 @@ describe.skip('choosing filter options', () => {
 
   it('sends correct status when chosen in status filter', () => {
     const {getByText, getByTestId} = render(
-      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />
+      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
     fireEvent.click(getByTestId('statusFilter'))
     fireEvent.click(getByText('Excused'))
@@ -80,7 +80,7 @@ describe.skip('choosing filter options', () => {
 
   it('sends null when all is chosen in status filter', () => {
     const {getByText, getByTestId} = render(
-      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />
+      <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
     fireEvent.click(getByTestId('statusFilter'))
     fireEvent.click(getByText('All'))

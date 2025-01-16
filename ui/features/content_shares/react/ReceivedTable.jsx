@@ -58,18 +58,18 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
       items.push(
         <Menu.Item key="prv" data-testid="preview-menu-action" onSelect={() => onPreview(share)}>
           <IconEyeLine /> <View margin="0 0 0 x-small">{I18n.t('Preview')}</View>
-        </Menu.Item>
+        </Menu.Item>,
       )
       items.push(
         <Menu.Item key="imp" data-testid="import-menu-action" onSelect={() => onImport(share)}>
           <IconImportLine /> <View margin="0 0 0 x-small">{I18n.t('Import')}</View>
-        </Menu.Item>
+        </Menu.Item>,
       )
     }
     items.push(
       <Menu.Item key="rmv" data-testid="remove-menu-action" onSelect={() => onRemove(share)}>
         <IconTrashLine /> <View margin="0 0 0 x-small">{I18n.t('Remove')}</View>
-      </Menu.Item>
+      </Menu.Item>,
     )
     return (
       <Menu

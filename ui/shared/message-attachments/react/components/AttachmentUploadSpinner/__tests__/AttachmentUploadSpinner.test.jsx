@@ -28,7 +28,7 @@ const setup = props => {
       isMessageSending={true}
       pendingUploads={['fake upload']}
       {...props}
-    />
+    />,
   )
 }
 

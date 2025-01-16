@@ -48,7 +48,7 @@ class Editor extends React.Component {
           I18n.t('%{error} in mastery paths range %{index}', {
             error: errorRecord.error,
             index: errorRecord.index + 1,
-          })
+          }),
         )
         errors.push({message: errorRecord.error})
       })
@@ -115,7 +115,7 @@ class Editor extends React.Component {
     if (window.conditional_release_module) {
       // spec hook
       return new Promise(resolve =>
-        resolve({default: window.conditional_release_module.ConditionalReleaseEditor})
+        resolve({default: window.conditional_release_module.ConditionalReleaseEditor}),
       )
     } else {
       return import('./editor')
@@ -131,7 +131,7 @@ class Editor extends React.Component {
       })
       editor.attach(
         document.getElementById('canvas-conditional-release-editor'),
-        document.getElementById('application')
+        document.getElementById('application'),
       )
       this.setState({editor})
     })

@@ -249,8 +249,8 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
           // Redux types are really bad, hence the cast here...
           actions.getDeveloperKeys(
             `/api/v1/accounts/${props.contextId}/developer_keys`,
-            true
-          ) as unknown as AnyAction
+            true,
+          ) as unknown as AnyAction,
         )
         close()
       }
@@ -262,7 +262,6 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             margin="0 x-small"
             disabled={buttonsDisabled}
             onClick={() => {
-               
               deleteKey(state.registration).then(onFinish)
             }}
           >
@@ -273,11 +272,10 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             margin="0 x-small"
             disabled={buttonsDisabled}
             onClick={() => {
-               
               closeAndSaveOverlay(
                 props.contextId,
                 state.registration,
-                state.overlayStore.getState().state.registration
+                state.overlayStore.getState().state.registration,
               ).then(onFinish)
             }}
           >
@@ -289,11 +287,10 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             disabled={buttonsDisabled}
             data-testid="dynamic-reg-modal-enable-and-close-button"
             onClick={() => {
-               
               enableAndClose(
                 props.contextId,
                 state.registration,
-                state.overlayStore.getState().state.registration
+                state.overlayStore.getState().state.registration,
               ).then(onFinish)
             }}
           >

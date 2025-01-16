@@ -16,20 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {AppNavBar} from '..'
-import {MemoryRouter} from 'react-router-dom'
-import {NewLoginProvider} from '../../context/NewLoginContext'
 import {render} from '@testing-library/react'
+import React from 'react'
+import {MemoryRouter} from 'react-router-dom'
+import {AppNavBar} from '..'
+import {HelpTrayProvider, NewLoginDataProvider, NewLoginProvider} from '../../context'
 
 describe('AppNavBar', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter>
         <NewLoginProvider>
-          <AppNavBar />
+          <NewLoginDataProvider>
+            <HelpTrayProvider>
+              <AppNavBar />
+            </HelpTrayProvider>
+          </NewLoginDataProvider>
         </NewLoginProvider>
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

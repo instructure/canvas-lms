@@ -55,7 +55,7 @@ export type FiltersState = {
     initialRowFilterSettings: InitialRowFilterSettings,
     initialColumnFilterSettings: InitialColumnFilterSettings,
     customGradeStatuses: GradeStatus[],
-    multiselectGradebookFiltersEnabled: boolean
+    multiselectGradebookFiltersEnabled: boolean,
   ) => void
   initializeStagedFilters: () => void
   fetchFilters: () => Promise<void>
@@ -65,7 +65,7 @@ export type FiltersState = {
   validateFilterPreset: (
     name: string,
     filters: Filter[],
-    otherFilterPresets: FilterPreset[]
+    otherFilterPresets: FilterPreset[],
   ) => boolean
 }
 
@@ -90,7 +90,7 @@ export type InitialRowFilterSettings = {
 
 export default (
   set: StoreApi<GradebookStore>['setState'],
-  get: StoreApi<GradebookStore>['getState']
+  get: StoreApi<GradebookStore>['getState'],
 ): FiltersState => ({
   appliedFilters: [],
 
@@ -109,25 +109,25 @@ export default (
   addFilters: (filters: Filter[]) => {
     const types = filters.map(c => c.type)
     const newFilters = [...get().appliedFilters.filter(c => !types.includes(c.type))].concat(
-      filters
+      filters,
     )
     get().applyFilters(newFilters)
   },
 
   toggleFilter: (filter: Filter) => {
     const existingFilter = get().appliedFilters.find(
-      f => f.type === filter.type && f.value === filter.value
+      f => f.type === filter.type && f.value === filter.value,
     )
     set({
       appliedFilters: [...get().appliedFilters.filter(f => f.type !== filter.type)].concat(
-        existingFilter ? [] : [filter]
+        existingFilter ? [] : [filter],
       ),
     })
   },
 
   toggleFilterMultiSelect: (filter: Filter) => {
     const existingFilter = get().appliedFilters.find(
-      f => f.type === filter.type && f.value === filter.value
+      f => f.type === filter.type && f.value === filter.value,
     )
 
     let appliedFilters = [...get().appliedFilters]
@@ -146,7 +146,7 @@ export default (
     initialRowFilterSettings: InitialRowFilterSettings,
     initialColumnFilterSettings: InitialColumnFilterSettings,
     customStatuses: GradeStatus[],
-    multiselectGradebookFiltersEnabled: boolean
+    multiselectGradebookFiltersEnabled: boolean,
   ) => {
     const appliedFilters: Filter[] = []
 
@@ -324,7 +324,7 @@ export default (
     const appliedFilters = get().appliedFilters
 
     const savedFiltersAlreadyMatch = get().filterPresets.some(filterPreset =>
-      doFiltersMatch(filterPreset.filters, appliedFilters)
+      doFiltersMatch(filterPreset.filters, appliedFilters),
     )
 
     set({
@@ -364,7 +364,7 @@ export default (
   validateFilterPreset: (
     name: string,
     filters: Filter[],
-    otherFilterPresets: FilterPreset[]
+    otherFilterPresets: FilterPreset[],
   ): boolean => {
     const filtersNotEmpty = filters.filter(isFilterNotEmpty)
 

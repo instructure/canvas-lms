@@ -107,7 +107,7 @@ function nodeInterfaceProperlyMocked(queryAST, mocks) {
   // flatMap
   const selections = queryAST.definitions.reduce(
     (acc, d) => acc.concat(d.selectionSet.selections),
-    []
+    [],
   )
   const selectionNames = new Set(selections.map(s => s.name.value))
   if (selectionNames.has('node') || selectionNames.has('legacyNode')) {
@@ -121,7 +121,7 @@ export default async function mockGraphqlQuery(
   query,
   overrides = [],
   variables = {},
-  resolvers = undefined
+  resolvers = undefined,
 ) {
   const queryAST = typeof query === 'string' ? gql(query) : query
   const mocks = await createMocks(overrides)

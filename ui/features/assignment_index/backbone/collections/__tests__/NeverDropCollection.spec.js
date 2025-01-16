@@ -47,7 +47,7 @@ describe('NeverDropCollection', () => {
         id: val,
         position: list.length - i,
         name: `Assignment ${val}`,
-      }))
+      })),
     )
     neverDrops = new NeverDropCollection([], {
       assignments,
@@ -74,7 +74,7 @@ describe('NeverDropCollection', () => {
     neverDrops.add({})
     expect(neverDrops.findNextAvailable()).toEqual(
       neverDrops.availableValues.get(assignments.at(1).id),
-      'finds the available item that has the id of the second assignment'
+      'finds the available item that has the id of the second assignment',
     )
   })
 })

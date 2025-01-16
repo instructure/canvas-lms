@@ -206,6 +206,23 @@ describe "calendar2" do
         expect(event.reload.context).to eq @course
         expect(f(".fc-event")).to have_class "group_course_#{@course.id}"
       end
+
+      it "does not allow saving events without participants" do
+        create_appointment_group
+        ag = AppointmentGroup.first
+        student_in_course(course: @course, active_all: true)
+        ag.appointments.first.reserve_for(@user, @user)
+
+        get "/calendar2"
+
+        open_edit_event_dialog
+        f("[type=checkbox][name=max_participants_option]").click
+        replace_content f("[name=max_participants]"), 0
+        fj(".ui-button:contains(Update)").click
+        wait_for_ajaximations
+
+        expect(f(".error-message").text).to include "Please enter a value greater or equal to 1"
+      end
     end
 
     context "time zone" do

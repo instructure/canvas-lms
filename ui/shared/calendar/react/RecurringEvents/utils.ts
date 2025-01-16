@@ -47,10 +47,10 @@ export const cardinalDayInMonth = (m: moment.Moment): CardinalDayInMonth => {
 export const getWeekdayName = (
   datetime: moment.Moment,
   locale: string,
-  timezone: string
+  timezone: string,
 ): string => {
   return new Intl.DateTimeFormat(locale, {weekday: 'long', timeZone: timezone}).format(
-    datetime.toDate()
+    datetime.toDate(),
   )
 }
 
@@ -97,7 +97,7 @@ export const getSelectTextWidth = (strings: string[]) => {
 export const getMonthlyMode = (
   freq: FrequencyValue,
   weekdays?: SelectedDaysArray,
-  pos?: number
+  pos?: number,
 ): MonthlyModeValue => {
   if (freq === 'MONTHLY' && Array.isArray(weekdays) && typeof pos === 'number') {
     if (pos >= 0) {

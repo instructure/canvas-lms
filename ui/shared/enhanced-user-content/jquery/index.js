@@ -66,7 +66,7 @@ export function formatTimeAgoDate(date) {
         return I18n.t(
           '#time.count_minutes_ago',
           {one: '1 minute ago', other: '%{count} minutes ago'},
-          {count: minutes}
+          {count: minutes},
         )
       }
     } else {
@@ -74,7 +74,7 @@ export function formatTimeAgoDate(date) {
       return I18n.t(
         '#time.count_hours_ago',
         {one: '1 hour ago', other: '%{count} hours ago'},
-        {count: hours}
+        {count: hours},
       )
     }
   } else {
@@ -100,7 +100,7 @@ function enhanceUserJQueryWidgetContent() {
         'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
         "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
         'you should use your own custom JS file to do any such customizations.'
-      console.error(msg, $elements)  
+      console.error(msg, $elements)
       captureException(new Error(msg))
     })
     .end()
@@ -182,37 +182,37 @@ function warnAboutRolesBeingSwitched() {
       case 'TeacherEnrollment':
         switched_roles_message = I18n.t(
           'switched_roles_message.teacher',
-          'You have switched roles temporarily for this course, and are now viewing the course as a teacher.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as a teacher.  You can restore your role and permissions from the course home page.',
         )
         break
       case 'StudentEnrollment':
         switched_roles_message = I18n.t(
           'switched_roles_message.student',
-          'You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.',
         )
         break
       case 'TaEnrollment':
         switched_roles_message = I18n.t(
           'switched_roles_message.ta',
-          'You have switched roles temporarily for this course, and are now viewing the course as a TA.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as a TA.  You can restore your role and permissions from the course home page.',
         )
         break
       case 'ObserverEnrollment':
         switched_roles_message = I18n.t(
           'switched_roles_message.observer',
-          'You have switched roles temporarily for this course, and are now viewing the course as an observer.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as an observer.  You can restore your role and permissions from the course home page.',
         )
         break
       case 'DesignerEnrollment':
         switched_roles_message = I18n.t(
           'switched_roles_message.designer',
-          'You have switched roles temporarily for this course, and are now viewing the course as a designer.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as a designer.  You can restore your role and permissions from the course home page.',
         )
         break
       default:
         switched_roles_message = I18n.t(
           'switched_roles_message.student',
-          'You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.',
         )
     }
     $img.attr('src', '/images/warning.png').attr('title', switched_roles_message).css({
@@ -247,16 +247,16 @@ function previewEquellaContentWhenClicked() {
       $dialog.html(
         "<h2/><iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: 350px; border: 0;' src='about:blank' borderstyle='0'/><div style='text-align: right;'><a href='#' class='original_link external external_link' target='_blank'>" +
           htmlEscape(
-            I18n.t('links.view_equella_content_in_new_window', 'view the content in a new window')
+            I18n.t('links.view_equella_content_in_new_window', 'view the content in a new window'),
           ) +
-          '</a>'
+          '</a>',
       )
       $dialog
         .find('h2')
         .text(
           $(this).attr('title') ||
             $(this).text() ||
-            I18n.t('titles.equella_content_preview', 'Equella Content Preview')
+            I18n.t('titles.equella_content_preview', 'Equella Content Preview'),
         )
       const $iframe = $dialog.find('iframe')
       setTimeout(() => {
@@ -308,8 +308,8 @@ function openDialogsWhenClicked() {
               modal: true,
               zIndex: 1000,
             },
-            $(link).data('dialogOpts')
-          )
+            $(link).data('dialogOpts'),
+          ),
         )
         $dialog.fixDialogButtons()
       }
@@ -336,7 +336,7 @@ function enhanceUserContentWhenAsked() {
         explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
         locale: ENV?.LOCALE ?? 'en',
       }),
-    50
+    50,
   )
 }
 
@@ -426,7 +426,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
         let submission = null
         for (const idx in data) {
           const s = data[idx].submission
-           
+
           if (s.user_id == user_id) {
             submission = s
           }
@@ -537,7 +537,6 @@ function doThingsToModuleSequenceFooter() {
         })
       })
       .catch(ex => {
-         
         console.error(ex)
         captureException(ex)
       })
@@ -609,7 +608,7 @@ function showFilePreviewInOverlayHandler({file_id, verifier, access_token, instf
         message: I18n.t('Something went wrong loading the file previewer.'),
         type: 'error',
       })
-       
+
       console.log(err)
     })
 }

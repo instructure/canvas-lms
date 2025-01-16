@@ -24,7 +24,7 @@ import type {
 } from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 
 export const useOverlayStore = (
-  overlayStore: RegistrationOverlayStore
+  overlayStore: RegistrationOverlayStore,
 ): [RegistrationOverlayState, RegistrationOverlayActions] => {
   const [{state, ...actions}, setState] = React.useState(overlayStore.getState())
 

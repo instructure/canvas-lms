@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Students in Need of Attention'),
       description: I18n.t(
-        'Allows an account administrator to access the Students in Need of Attention feature of Intelligent Insights.'
+        'Allows an account administrator to access the Students in Need of Attention feature of Intelligent Insights.',
       ),
     },
   ],
@@ -34,8 +34,8 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Intelligent Insights'),
       description: I18n.t(
-        'Students in Need of Attention is part of the Intelligent Insights upgrade in Canvas.'
+        'Students in Need of Attention is part of the Intelligent Insights upgrade in Canvas.',
       ),
     },
-  ]
+  ],
 )

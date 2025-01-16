@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -20,7 +22,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import ready from '@instructure/ready'
 import App from './react/app'
-// @ts-ignore
 import extensions from '@canvas/bundles/extensions'
 
 ready(() => {
@@ -33,19 +34,16 @@ ready(() => {
     root.render(<App />)
   }
 
-  // @ts-ignore
   const loadExtension = extensions['ui/features/content_migrations/instui_setup.tsx']?.()
   if (loadExtension) {
     loadExtension
-      // @ts-expect-error
       .then(module => {
         module.default()
       })
-      // @ts-expect-error
       .catch(err => {
         throw new Error(
           'Error loading extension for ui/features/content_migrations/instui_setup.tsx',
-          err
+          err,
         )
       })
   }

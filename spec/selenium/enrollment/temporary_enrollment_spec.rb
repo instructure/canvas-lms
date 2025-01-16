@@ -70,7 +70,7 @@ describe "temporary enrollment" do
     f("textarea").send_keys("tempTeacher,tempTeacher2")
     f("button[data-analytics='TempEnrollNext']").click
 
-    # successfully got user
+    # successfully got users
     expect(f("body")).not_to contain_css("svg[role='img'] circle")
     expect(f("svg[name='IconCheckMark']")).to be_displayed
     expect(f("span[alt='Avatar for #{@temp_teacher.name}']")).to be_displayed
@@ -87,6 +87,25 @@ describe "temporary enrollment" do
     expect(ff("button[data-analytics='TempEnrollIconCalendarReservedSolid']").length).to eq(2)
     # displayed in the recipient's row since temp enrolls can chain
     expect(can_provide).to be_displayed
+  end
+
+  # since TempEnrollSearch checks internal state before making API call
+  # can only be tested via selenium
+  it "fails search" do
+    # open modal
+    load_people_page
+    wait_for_ajax_requests
+    can_provide.click
+
+    # search for user
+    f("[for='peoplesearch_radio_unique_id']").click
+    f("textarea").send_keys("no_one")
+    f("button[data-analytics='TempEnrollNext']").click
+
+    # page stays same and error message
+    expect(f("body")).not_to contain_css("svg[role='img'] circle")
+    expect(f("svg[name='IconNo']")).to be_displayed
+    expect(f("textarea")).to be_displayed
   end
 
   context "modify" do

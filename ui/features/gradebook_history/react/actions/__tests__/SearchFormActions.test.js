@@ -100,7 +100,7 @@ describe('SearchFormActions', () => {
       }
 
       expect(SearchFormActions.fetchRecordsNextPageSuccess(response, recordType)).toEqual(
-        expectedValue
+        expectedValue,
       )
     })
 
@@ -154,7 +154,7 @@ describe('SearchFormActions', () => {
       await thunk(dispatchMock)
       expect(HistoryActions.fetchHistorySuccess).toHaveBeenCalledWith(
         response.data,
-        response.headers
+        response.headers,
       )
       expect(dispatchMock).toHaveBeenCalledWith({type: 'fetchHistorySuccess'})
     })

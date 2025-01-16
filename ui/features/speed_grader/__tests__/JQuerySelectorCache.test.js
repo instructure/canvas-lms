@@ -17,7 +17,6 @@
  */
 import $ from 'jquery'
 import JQuerySelectorCache from '../JQuerySelectorCache'
-import sinon from 'sinon'
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
@@ -65,11 +64,11 @@ describe('JQuerySelectorCache', () => {
   describe('#set', () => {
     test('caches the value that subsequent `get` calls will use', () => {
       selectorCache.set('#foo')
-      sinon.stub(selectorCache, 'set')
+      jest.spyOn(selectorCache, 'set')
       selectorCache.get('#foo')
       // we verify the `get` call uses the cached value
       // by asserting that `set` is not called
-      strictEqual(selectorCache.set.callCount, 0)
+      expect(selectorCache.set).not.toHaveBeenCalled()
     })
 
     test('stores the appropriate selector for the given value', () => {

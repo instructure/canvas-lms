@@ -90,7 +90,7 @@ const CyoeApi = {
   getAssignments: state => {
     const perPage = 100
     return CyoeApi._depaginate(
-      `/api/v1/courses/${state.get('course_id')}/assignments?per_page=${perPage}`
+      `/api/v1/courses/${state.get('course_id')}/assignments?per_page=${perPage}`,
     ).then(res => {
       res.data.forEach(CyoeApi._assignCategory)
       return res

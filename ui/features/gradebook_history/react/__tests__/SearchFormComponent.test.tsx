@@ -87,7 +87,7 @@ describe('SearchForm', () => {
 
   test('has date pickers for from date and to date', function () {
     const inputs = wrapper.find(CanvasDateInput)
-    expect(inputs.length).toBe(2)
+    expect(inputs).toHaveLength(2)
     expect(inputs.every(CanvasDateInput)).toBeTruthy()
   })
 
@@ -106,7 +106,7 @@ describe('SearchForm', () => {
       () => {
         const button = wrapper.find(Button)
         expect(button.props().disabled).toBeTruthy()
-      }
+      },
     )
   })
 
@@ -121,7 +121,7 @@ describe('SearchForm', () => {
       () => {
         const button = wrapper.find(Button)
         expect(button.props().disabled).toBeFalsy()
-      }
+      },
     )
   })
 
@@ -144,7 +144,7 @@ describe('SearchForm', () => {
       () => {
         const button = wrapper.find(Button)
         expect(button.props().disabled).toBeFalsy()
-      }
+      },
     )
   })
 
@@ -159,7 +159,7 @@ describe('SearchForm', () => {
       () => {
         const button = wrapper.find(Button)
         expect(button.props().disabled).toBeFalsy()
-      }
+      },
     )
   })
 
@@ -191,7 +191,7 @@ describe('SearchForm', () => {
         () => {
           wrapper.find(Button).simulate('click')
           expect(props.getGradebookHistory).toHaveBeenCalledWith(selected)
-        }
+        },
       )
     })
 
@@ -361,7 +361,7 @@ describe('SearchForm', () => {
         describe('when the OVERRIDE_GRADES_ENABLED environment variable is set to true', () => {
           const clickOverrideGradeCheckbox = (_wrapper: any) => {
             const overrides = _wrapper.container.querySelectorAll(
-              '#show_final_grade_overrides_only'
+              '#show_final_grade_overrides_only',
             )
             overrides[overrides.length - 1].click()
           }
@@ -394,7 +394,7 @@ describe('SearchForm', () => {
           test('is shown', () => {
             const _wrapper = fullMount()
             expect(
-              _wrapper.container.querySelector('#show_final_grade_overrides_only')
+              _wrapper.container.querySelector('#show_final_grade_overrides_only'),
             ).toBeTruthy()
           })
 

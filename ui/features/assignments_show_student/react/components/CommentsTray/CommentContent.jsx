@@ -65,7 +65,7 @@ export default function CommentContent(props) {
         }
 
         const {submissionComments} = JSON.parse(
-          JSON.stringify(cache.readQuery(commentQueryVariables))
+          JSON.stringify(cache.readQuery(commentQueryVariables)),
         )
         submissionComments.commentsConnection.nodes.forEach(comment => {
           if (updatedCommentIDs.has(comment._id)) {
@@ -120,7 +120,7 @@ export default function CommentContent(props) {
           })
         }
       },
-    }
+    },
   )
 
   // Mark unread comments as read when the tray is opened
@@ -132,7 +132,7 @@ export default function CommentContent(props) {
         .map(comment => comment._id)
       const timer = setTimeout(() => {
         markCommentsRead({variables: {commentIds, submissionId: props.submission.id}}).catch(
-          captureException
+          captureException,
         )
       }, 1000)
 
@@ -149,10 +149,10 @@ export default function CommentContent(props) {
   }, [data, mutationCalled, mutationError, setOnFailure, setOnSuccess])
 
   const defaultText = I18n.t(
-    "This is where you can leave a comment and view your instructor's feedback."
+    "This is where you can leave a comment and view your instructor's feedback.",
   )
   const peerReviewText = I18n.t(
-    'Add a comment to complete your peer review. You will only see comments written by you.'
+    'Add a comment to complete your peer review. You will only see comments written by you.',
   )
   const rubricPeerReviewText = I18n.t('You will only see comments written by you.')
 

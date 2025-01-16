@@ -26,7 +26,7 @@ const deleteFocusReducer = handleActions(
     [actionTypes.DELETE_FOCUS_PENDING]: () => true,
     [actionTypes.DELETE_FOCUS_CLEANUP]: () => false,
   },
-  false
+  false,
 )
 
 export default deleteFocusReducer

@@ -46,7 +46,7 @@ class SetDefaultGradeDialogManager {
     missingShortcutEnabled: boolean,
     selectedSection: string | null,
     isAdmin = false,
-    submissionsLoaded = false
+    submissionsLoaded = false,
   ) {
     this.assignment = assignment
     this.getStudents = getStudents
@@ -80,8 +80,8 @@ class SetDefaultGradeDialogManager {
       $.flashError(
         I18n.t(
           'Unable to set default grade because this ' +
-            'assignment is due in a closed grading period for at least one student'
-        )
+            'assignment is due in a closed grading period for at least one student',
+        ),
       )
     }
   }

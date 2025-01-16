@@ -43,13 +43,12 @@ const AssignmentModulesPropTypes = {
 }
 
 // eslint doesn't deal with the prop types being defined this way
- 
+
 const AssignmentModulesDefaultProps = {
   moduleList: [],
   selectedModules: [],
   readOnly: true,
 }
- 
 
 class AssignmentModulesUI extends React.Component {
   static propTypes = {
@@ -211,7 +210,7 @@ function mergeThePage(previousResult, {fetchMoreResult}) {
     r = set(
       r,
       'course.modulesConnection.nodes',
-      previousResult.course.modulesConnection.nodes.concat(newModules)
+      previousResult.course.modulesConnection.nodes.concat(newModules),
     )
     return r
   })

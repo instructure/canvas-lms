@@ -32,7 +32,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
-        'If this permission is disabled, users cannot share item banks to subaccounts. When a user with an admin role is granted this permission, the user can share item banks to subaccounts they administer.'
+        'If this permission is disabled, users cannot share item banks to subaccounts. When a user with an admin role is granted this permission, the user can share item banks to subaccounts they administer.',
       ),
     },
   ],
@@ -46,8 +46,8 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
-        'If this permission is disabled, users cannot share item banks to subaccounts. When a user with a course role is granted this permission, the user can share item banks to subaccounts they are associated with.'
+        'If this permission is disabled, users cannot share item banks to subaccounts. When a user with a course role is granted this permission, the user can share item banks to subaccounts they are associated with.',
       ),
     },
-  ]
+  ],
 )

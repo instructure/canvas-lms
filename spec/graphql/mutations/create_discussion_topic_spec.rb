@@ -19,9 +19,7 @@
 #
 require "spec_helper"
 require_relative "../graphql_spec_helper"
-require_relative "../../helpers/selective_release_common"
 describe Mutations::CreateDiscussionTopic do
-  include SelectiveReleaseCommon
   before(:once) do
     course_with_teacher(active_all: true)
   end
@@ -795,75 +793,6 @@ describe Mutations::CreateDiscussionTopic do
       expect(created_discussion_topic["title"]).to eq title
       expect(created_discussion_topic["isSectionSpecific"]).to be false
       expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
-    end
-
-    it "successfully creates the discussion topic is_section_specific true" do
-      differentiated_modules_off
-      context_type = "Course"
-      title = "Test Title"
-      message = "A message"
-      published = false
-      require_initial_post = true
-
-      section = add_section("Dope Section")
-      section2 = add_section("Dope Section 2")
-
-      query = <<~GQL
-        contextId: "#{@course.id}"
-        contextType: #{context_type}
-        title: "#{title}"
-        message: "#{message}"
-        published: #{published}
-        requireInitialPost: #{require_initial_post}
-        anonymousState: off
-        specificSections: "#{section.id},#{section2.id}"
-      GQL
-
-      result = execute_with_input(query)
-      created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
-
-      expect(result["errors"]).to be_nil
-      expect(result.dig("data", "discussionTopic", "errors")).to be_nil
-      expect(created_discussion_topic["contextType"]).to eq context_type
-      expect(created_discussion_topic["title"]).to eq title
-      expect(created_discussion_topic["isSectionSpecific"]).to be true
-      expect(created_discussion_topic["courseSections"][0]["name"]).to eq("Dope Section")
-      expect(created_discussion_topic["courseSections"][1]["name"]).to eq("Dope Section 2")
-      expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
-    end
-
-    it "does not allow creation of disuccions to sections that are not visible to the user" do
-      differentiated_modules_off
-      # This teacher does not have permission for section 2
-      course2 =  course_factory(active_course: true)
-      section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = course2.course_sections.create!(name: "Section 2")
-
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
-      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
-
-      sections = [section1.id, section2.id].join(",")
-      context_type = "Course"
-      title = "Test Title"
-      message = "A message"
-      published = false
-      require_initial_post = true
-
-      query = <<~GQL
-        contextId: "#{@course.id}"
-        contextType: #{context_type}
-        title: "#{title}"
-        message: "#{message}"
-        published: #{published}
-        requireInitialPost: #{require_initial_post}
-        anonymousState: off
-        specificSections: "#{sections}"
-      GQL
-
-      result = execute_with_input(query)
-
-      expect(result.dig("data", "createDiscussionTopic", "discussionTopic")).to be_nil
-      expect(result.dig("data", "createDiscussionTopic", "errors")[0]["message"]).to eq("You do not have permissions to modify discussion for section(s) #{section2.id}")
     end
   end
 

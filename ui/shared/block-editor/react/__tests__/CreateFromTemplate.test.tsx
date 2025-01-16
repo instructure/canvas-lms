@@ -55,10 +55,10 @@ jest.mock('@craftjs/core', () => {
 })
 
 const renderComponent = async () => {
-  const rendered = render(<CreateFromTemplate course_id="1" />)
+  const rendered = render(<CreateFromTemplate course_id="1" noBlocks={true}/>)
 
   await waitFor(() => {
-    expect(document.querySelectorAll('.block-template-preview-card').length).toBe(totalPages)
+    expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(totalPages)
   })
   return rendered
 }
@@ -107,7 +107,7 @@ describe('CreateFromTemplate', () => {
 
         return cards.length === 2 && blankPage !== null && yellowTemplate !== null
       },
-      {timeout: 4000} // Increase timeout but keep it reasonable
+      {timeout: 4000}, // Increase timeout but keep it reasonable
     )
   })
 
@@ -116,16 +116,16 @@ describe('CreateFromTemplate', () => {
     user.click(getByTagText('General Content').closest('button') as HTMLButtonElement)
 
     await waitFor(() => {
-      expect(document.querySelectorAll('.block-template-preview-card').length).toBe(
-        totalPages - generalContentPages
+      expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(
+        totalPages - generalContentPages,
       )
     })
 
     user.click(getByTagText('Home').closest('button') as HTMLButtonElement)
 
     await waitFor(() => {
-      expect(document.querySelectorAll('.block-template-preview-card').length).toBe(
-        totalPages - generalContentPages - homePages
+      expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(
+        totalPages - generalContentPages - homePages,
       )
     })
   })
@@ -133,16 +133,16 @@ describe('CreateFromTemplate', () => {
   it('filters on the menu of tags', async () => {
     await renderComponent()
 
-    expect(document.querySelectorAll('[role="menuitemcheckbox"][aria-checked="true"]').length).toBe(
-      0
+    expect(document.querySelectorAll('[role="menuitemcheckbox"][aria-checked="true"]')).toHaveLength(
+      0,
     )
 
     user.click(screen.getByText('Apply Filters').closest('button') as HTMLButtonElement)
 
     await waitFor(() => {
       expect(
-        document.querySelectorAll('[role="menuitemcheckbox"][aria-checked="true"]').length
-      ).toBe(5)
+        document.querySelectorAll('[role="menuitemcheckbox"][aria-checked="true"]'),
+      ).toHaveLength(5)
     })
 
     // I don't understand why getByText doesn't work when Home is displayed
@@ -150,7 +150,7 @@ describe('CreateFromTemplate', () => {
     await user.click(document.querySelectorAll('[role="menuitemcheckbox"]')[1])
 
     await waitFor(() => {
-      expect(document.querySelectorAll('.block-template-preview-card').length).toBe(15)
+      expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(15)
     })
   })
 })

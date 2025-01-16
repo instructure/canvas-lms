@@ -51,16 +51,16 @@ const isAccessible = async (element, options = {}) => {
   const violations = reject(result.violations, violation => ignores.includes(violation.id))
 
   // if there are violations, fail the test and log the errors
-  expect(violations.length).toBe(0)
+  expect(violations).toHaveLength(0)
 
   if (violations.length > 0) {
     const err = violations
       .map(violation =>
-        [`[${violation.id}] ${violation.help}`, `${violation.helpUrl}\n`].join('\n')
+        [`[${violation.id}] ${violation.help}`, `${violation.helpUrl}\n`].join('\n'),
       )
       .join('\n')
 
-    // eslint-disable-next-line no-console
+     
     console.error('Accessibility violations:', err)
   }
 

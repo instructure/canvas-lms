@@ -161,7 +161,7 @@ export default class AnnouncementsIndex extends Component {
 
   renderPagination() {
     const pages = Array.from(Array(this.props.announcementsLastPage)).map((_, i) =>
-      this.renderPageButton(i + 1)
+      this.renderPageButton(i + 1),
     )
     if (pages.length > 1 && !this.props.isLoadingAnnouncements) {
       return (
@@ -218,7 +218,7 @@ const connectActions = dispatch =>
       'deleteAnnouncements',
       'toggleAnnouncementsLock',
     ]),
-    dispatch
+    dispatch,
   )
 
 export const ConnectedAnnouncementsIndex = connect(connectState, connectActions)(AnnouncementsIndex)

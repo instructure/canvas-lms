@@ -33,7 +33,7 @@ export const handleAssignmentIndexDeepLinking = (event: {
       alertUserModuleCreatedKey,
       (
         !!event?.data?.moduleCreated && event?.data?.placement === 'course_assignments_menu'
-      ).toString()
+      ).toString(),
     )
     // MDN says to always catch exceptions from setItem, just in case storage is full.
     // The only thing that happens is the user doesn't get alerted, so we can just swallow this
@@ -46,7 +46,7 @@ export const alertIfDeepLinkingCreatedModule = () => {
   if (sessionStorage.getItem(alertUserModuleCreatedKey) === 'true') {
     showFlashAlert({
       message: I18n.t(
-        'A new module has been created with the content returned from the tool. If you would like to see it, please visit the Modules page.'
+        'A new module has been created with the content returned from the tool. If you would like to see it, please visit the Modules page.',
       ),
       err: null,
     })

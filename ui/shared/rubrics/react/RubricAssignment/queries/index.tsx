@@ -46,7 +46,7 @@ export const addRubricToAssignment = async (
   courseId: string,
   assignmentId: string,
   rubricId: string,
-  updatedAssociation: RubricAssociation
+  updatedAssociation: RubricAssociation,
 ) => {
   const {hidePoints, hideOutcomeResults, hideScoreTotal, useForGrading} = updatedAssociation
 

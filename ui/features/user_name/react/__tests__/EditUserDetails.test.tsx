@@ -92,7 +92,7 @@ describe('EditUserDetails', () => {
       fireEvent.click(submit)
 
       const errorAlerts = await screen.findAllByText(
-        'Updating user details failed, please try again.'
+        'Updating user details failed, please try again.',
       )
       expect(errorAlerts.length).toBeTruthy()
     })
@@ -117,7 +117,7 @@ describe('EditUserDetails', () => {
 
       await waitFor(() => {
         expect(
-          fetchMock.called(EDIT_USER_DETAILS_URI, {method: 'PATCH', body: {user: newUserDetails}})
+          fetchMock.called(EDIT_USER_DETAILS_URI, {method: 'PATCH', body: {user: newUserDetails}}),
         ).toBe(true)
         expect(props.onSubmit).toHaveBeenCalledWith(newUserDetails)
       })
@@ -196,7 +196,7 @@ describe('EditUserDetails', () => {
 
       await waitFor(() => {
         expect(
-          fetchMock.called(EDIT_USER_DETAILS_URI, {method: 'PATCH', body: {user: newUserDetails}})
+          fetchMock.called(EDIT_USER_DETAILS_URI, {method: 'PATCH', body: {user: newUserDetails}}),
         ).toBe(true)
         expect(props.onSubmit).toHaveBeenCalledWith(newUserDetails)
       })

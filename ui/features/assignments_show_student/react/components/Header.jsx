@@ -131,7 +131,7 @@ class Header extends React.Component {
               <PeerReviewNavigationLink
                 assignedAssessments={this.props.peerReviewLinkData?.assignedAssessments}
                 currentAssessmentIndex={this.currentAssessmentIndex(
-                  this.props.peerReviewLinkData?.assignedAssessments
+                  this.props.peerReviewLinkData?.assignedAssessments,
                 )}
               />
             </Flex.Item>
@@ -142,7 +142,7 @@ class Header extends React.Component {
                 <Flex.Item margin="0 small 0 0">
                   <PeerReviewsCounter
                     current={this.currentAssessmentIndex(
-                      this.props.reviewerSubmission?.assignedAssessments
+                      this.props.reviewerSubmission?.assignedAssessments,
                     )}
                     total={this.props.reviewerSubmission?.assignedAssessments?.length || 0}
                   />
@@ -152,7 +152,7 @@ class Header extends React.Component {
                 <PeerReviewNavigationLink
                   assignedAssessments={this.props.reviewerSubmission?.assignedAssessments}
                   currentAssessmentIndex={this.currentAssessmentIndex(
-                    this.props.reviewerSubmission?.assignedAssessments
+                    this.props.reviewerSubmission?.assignedAssessments,
                   )}
                 />
               </Flex.Item>

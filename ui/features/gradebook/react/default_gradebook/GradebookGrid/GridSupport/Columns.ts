@@ -104,7 +104,7 @@ export default class Columns {
         this.gridSupport.options.columnHeaderRenderer.renderColumnHeader(
           column,
           $node,
-          this.gridSupport
+          this.gridSupport,
         )
       })
     }

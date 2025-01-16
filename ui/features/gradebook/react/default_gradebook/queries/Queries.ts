@@ -89,7 +89,7 @@ export type RubricAssessmentImportResponse = {
 export const importRubricAssessment = async (
   file?: File,
   courseId?: string,
-  assignmentId?: string
+  assignmentId?: string,
 ): Promise<RubricAssessmentImportResponse> => {
   if (!file || !courseId || !assignmentId) {
     throw new Error('No file to import')
@@ -118,7 +118,7 @@ export const importRubricAssessment = async (
 export const fetchRubricAssessmentImport = async (
   importId?: string,
   courseId?: string,
-  assignmentId?: string
+  assignmentId?: string,
 ): Promise<RubricAssessmentImportResponse> => {
   const url = `/courses/${courseId}/assignments/${assignmentId}/rubric/assessments/imports/${importId}`
 

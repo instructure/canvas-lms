@@ -103,7 +103,7 @@ export default function JobsTable({
         </Table.Row>
       )
     },
-    [bucket, onClickFilter, onClickJob, timeZone]
+    [bucket, onClickFilter, onClickJob, timeZone],
   )
 
   const renderColHeader = useCallback(
@@ -128,7 +128,7 @@ export default function JobsTable({
         )
       }
     },
-    [bucket, sortColumn, onClickHeader]
+    [bucket, sortColumn, onClickHeader],
   )
 
   return (

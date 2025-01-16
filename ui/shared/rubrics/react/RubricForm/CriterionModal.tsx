@@ -125,8 +125,8 @@ export const CriterionModal = ({
     const points = isFirstIndex
       ? ratings[0].points + 1
       : isLastIndex
-      ? Math.max(ratings[index - 1].points - 1, 0)
-      : Math.round((ratings[index].points + ratings[index - 1].points) / 2)
+        ? Math.max(ratings[index - 1].points - 1, 0)
+        : Math.round((ratings[index].points + ratings[index - 1].points) / 2)
 
     const newRating = {
       id: Date.now().toString(),
@@ -331,7 +331,7 @@ export const CriterionModal = ({
               <Flex.Item shouldGrow={true}>
                 {unassessed && criterionUseRangeEnabled && !hidePoints && (
                   <Checkbox
-                    label="Enable Range"
+                    label={I18n.t('Enable Range')}
                     checked={criterionUseRange}
                     onChange={e => setCriterionUseRange(e.target.checked)}
                     data-testid="enable-range-checkbox"
@@ -391,7 +391,6 @@ export const CriterionModal = ({
                         const rangeStart = rangingFrom(ratings, index)
 
                         return (
-                           
                           <View as="div" key={`rating-row-${rating.id}-${index}`}>
                             <AddRatingRow
                               onClick={() => addRating(index)}
@@ -525,7 +524,7 @@ const RatingRow = ({
                   {criterionUseRange && (
                     <Flex.Item width="3.438rem" textAlign="end" margin="0 0 x-small 0">
                       <View as="span" margin="0 small 0 0">
-                        {rangeStart ? `${rangeStart} to ` : `--`}
+                      {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
                       </View>
                     </Flex.Item>
                   )}

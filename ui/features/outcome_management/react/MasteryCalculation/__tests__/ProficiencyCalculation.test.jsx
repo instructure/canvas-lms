@@ -44,14 +44,14 @@ describe('ProficiencyCalculation', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', outcomeAllowAverageCalculationFF = false} = {}
+    {contextType = 'Account', contextId = '1', outcomeAllowAverageCalculationFF = false} = {},
   ) => {
     return rtlRender(
       <OutcomesContext.Provider
         value={{env: {contextType, contextId, outcomeAllowAverageCalculationFF}}}
       >
         {children}
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -81,7 +81,7 @@ describe('ProficiencyCalculation', () => {
             canManage: false,
             method: {calculationMethod: 'latest', calculationInt: null},
           })}
-        />
+        />,
       )
       expect(getByText('Most Recent Score')).not.toBeNull()
       expect(queryByText('Parameter')).toBeNull()
@@ -93,7 +93,7 @@ describe('ProficiencyCalculation', () => {
           {...makeProps({
             canManage: false,
           })}
-        />
+        />,
       )
       expect(getByText('Example')).not.toBeNull()
       expect(getByText(/Most recent result counts as/)).not.toBeNull()
@@ -108,7 +108,7 @@ describe('ProficiencyCalculation', () => {
             canManage: false,
             method: {calculationMethod: 'latest', calculationInt: null},
           })}
-        />
+        />,
       )
       expect(getByText('Example')).not.toBeNull()
       expect(getByText(/most recent graded/)).not.toBeNull()
@@ -135,7 +135,7 @@ describe('ProficiencyCalculation', () => {
           {...makeProps({
             method: {calculationMethod: 'latest', calculationInt: null},
           })}
-        />
+        />,
       )
       expect(getByDisplayValue('Most Recent Score')).not.toBeNull()
       expect(queryByText('Parameter')).toBeNull()
@@ -143,7 +143,7 @@ describe('ProficiencyCalculation', () => {
 
     it('removes int when method changed', async () => {
       const {getByDisplayValue, getByText, queryByText} = render(
-        <ProficiencyCalculation {...makeProps()} />
+        <ProficiencyCalculation {...makeProps()} />,
       )
       const method = getByDisplayValue('Decaying Average')
       fireEvent.click(method)
@@ -165,7 +165,7 @@ describe('ProficiencyCalculation', () => {
     it('calls save when the button is clicked', () => {
       const update = jest.fn()
       const {getByText, getByLabelText} = render(
-        <ProficiencyCalculation {...makeProps({update})} />
+        <ProficiencyCalculation {...makeProps({update})} />,
       )
       const parameter = getByLabelText('Parameter')
       fireEvent.input(parameter, {target: {value: '22'}})
@@ -183,7 +183,7 @@ describe('ProficiencyCalculation', () => {
       const {getByText, getByLabelText} = render(
         <ProficiencyCalculation
           {...makeProps({onNotifyPendingChanges: onNotifyPendingChangesSpy})}
-        />
+        />,
       )
       const parameter = getByLabelText('Parameter')
       fireEvent.input(parameter, {target: {value: '22'}})
@@ -212,7 +212,7 @@ describe('ProficiencyCalculation', () => {
       it('calls update with the correct arguments', () => {
         const update = jest.fn()
         const {getByDisplayValue, getByText} = render(
-          <ProficiencyCalculation {...makeProps({update})} />
+          <ProficiencyCalculation {...makeProps({update})} />,
         )
         const method = getByDisplayValue('Decaying Average')
         fireEvent.click(method)
@@ -228,7 +228,7 @@ describe('ProficiencyCalculation', () => {
       it('calls update with the correct arguments', () => {
         const update = jest.fn()
         const {getByDisplayValue, getByText} = render(
-          <ProficiencyCalculation {...makeProps({update})} />
+          <ProficiencyCalculation {...makeProps({update})} />,
         )
         const method = getByDisplayValue('Decaying Average')
         fireEvent.click(method)
@@ -248,7 +248,7 @@ describe('ProficiencyCalculation', () => {
           <ProficiencyCalculation {...makeProps({update})} />,
           {
             outcomeAllowAverageCalculationFF: true,
-          }
+          },
         )
         const method = getByDisplayValue('Decaying Average')
         fireEvent.click(method)
@@ -285,7 +285,7 @@ describe('ProficiencyCalculation', () => {
       it('renders the confirmation modal only when int is valid', async () => {
         const update = jest.fn()
         const {getByText, queryByText, getByLabelText} = render(
-          <ProficiencyCalculation {...makeProps({update})} />
+          <ProficiencyCalculation {...makeProps({update})} />,
         )
         const parameter = getByLabelText('Parameter')
         fireEvent.input(parameter, {target: {value: '0'}})
@@ -306,7 +306,7 @@ describe('ProficiencyCalculation', () => {
         const {getByLabelText, getByText} = render(
           <ProficiencyCalculation
             {...makeProps({method: {calculationMethod: 'n_mastery', calculationInt: 5}})}
-          />
+          />,
         )
         const parameter = getByLabelText('Parameter')
         fireEvent.input(parameter, {target: {value: ''}})
@@ -317,7 +317,7 @@ describe('ProficiencyCalculation', () => {
         const {getByLabelText, getByText} = render(
           <ProficiencyCalculation
             {...makeProps({method: {calculationMethod: 'n_mastery', calculationInt: 5}})}
-          />
+          />,
         )
         const parameter = getByLabelText('Parameter')
         fireEvent.input(parameter, {target: {value: '13'}})
@@ -328,7 +328,7 @@ describe('ProficiencyCalculation', () => {
         const {getByLabelText, getByText} = render(
           <ProficiencyCalculation
             {...makeProps({method: {calculationMethod: 'n_mastery', calculationInt: 5}})}
-          />
+          />,
         )
         const parameter = getByLabelText('Parameter')
         fireEvent.input(parameter, {target: {value: '0'}})
@@ -340,7 +340,7 @@ describe('ProficiencyCalculation', () => {
         const {getByText, queryByText, getByLabelText} = render(
           <ProficiencyCalculation
             {...makeProps({update, method: {calculationMethod: 'n_mastery', calculationInt: 5}})}
-          />
+          />,
         )
         const parameter = getByLabelText('Parameter')
         fireEvent.input(parameter, {target: {value: '11'}})
@@ -368,7 +368,7 @@ describe('ProficiencyCalculation', () => {
       fireEvent.click(getByText('Save Mastery Calculation'))
       expect(getByText(/Confirm Mastery Calculation/)).not.toBeNull()
       expect(
-        getByText(/all student mastery results tied to the account level mastery calculation/)
+        getByText(/all student mastery results tied to the account level mastery calculation/),
       ).not.toBeNull()
     })
 
@@ -389,7 +389,7 @@ describe('ProficiencyCalculation', () => {
   describe('when individualOutcome is "display" and canManage is false', () => {
     it('renders method and int', () => {
       const {getByText} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'display', canManage: false})} />
+        <ProficiencyCalculation {...makeProps({individualOutcome: 'display', canManage: false})} />,
       )
       expect(getByText('Proficiency Calculation:')).toBeInTheDocument()
       expect(getByText('Decaying Average - 75%/25%')).toBeInTheDocument()
@@ -403,7 +403,7 @@ describe('ProficiencyCalculation', () => {
             canManage: false,
             method: {calculationMethod: 'latest', calculationInt: null},
           })}
-        />
+        />,
       )
       expect(getByText('Most Recent Score')).toBeInTheDocument()
       expect(queryByTestId('calculation-int-input')).not.toBeInTheDocument()
@@ -411,7 +411,7 @@ describe('ProficiencyCalculation', () => {
 
     it('does not render example', () => {
       const {queryByText} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'display', canManage: false})} />
+        <ProficiencyCalculation {...makeProps({individualOutcome: 'display', canManage: false})} />,
       )
       expect(queryByText('Example')).not.toBeInTheDocument()
       expect(queryByText(/Most recent result counts as/)).not.toBeInTheDocument()
@@ -419,7 +419,7 @@ describe('ProficiencyCalculation', () => {
 
     it('does not render the save button', () => {
       const {queryByText} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'display', canManage: false})} />
+        <ProficiencyCalculation {...makeProps({individualOutcome: 'display', canManage: false})} />,
       )
       expect(queryByText(/Save Mastery Calculation/)).not.toBeInTheDocument()
     })
@@ -428,7 +428,7 @@ describe('ProficiencyCalculation', () => {
   describe('when individualOutcome is "edit"', () => {
     it('renders method and int', () => {
       const {getByDisplayValue, queryByTestId, getByText} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />
+        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />,
       )
 
       expect(getByDisplayValue('Decaying Average')).toBeInTheDocument()
@@ -444,7 +444,7 @@ describe('ProficiencyCalculation', () => {
             individualOutcome: 'edit',
             method: {calculationMethod: 'latest', calculationInt: null},
           })}
-        />
+        />,
       )
       expect(getByDisplayValue('Most Recent Score')).toBeInTheDocument()
       expect(queryByTestId('calculation-int-input')).not.toBeInTheDocument()
@@ -454,7 +454,7 @@ describe('ProficiencyCalculation', () => {
       const update = jest.fn()
       const setError = jest.fn()
       const {getByText, getByDisplayValue} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit', update, setError})} />
+        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit', update, setError})} />,
       )
       fireEvent.click(getByDisplayValue('Decaying Average'))
       fireEvent.click(getByText('Most Recent Score'))
@@ -464,7 +464,7 @@ describe('ProficiencyCalculation', () => {
     describe('example', () => {
       it('renders example', () => {
         const {getByText, queryByText} = render(
-          <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />
+          <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />,
         )
         expect(queryByText('Example')).toBeInTheDocument()
         expect(getByText('Item Scores:')).toBeInTheDocument()
@@ -483,7 +483,7 @@ describe('ProficiencyCalculation', () => {
                 calculationInt: 5,
               },
             })}
-          />
+          />,
         )
         const exampleFinalScore = getByTestId('proficiency-calculation-example-final-score')
         expect(exampleFinalScore).toBeInTheDocument()
@@ -500,7 +500,7 @@ describe('ProficiencyCalculation', () => {
                 calculationInt: 5,
               },
             })}
-          />
+          />,
         )
         const exampleFinalScore = getByTestId('proficiency-calculation-example-final-score')
         expect(exampleFinalScore).toBeInTheDocument()
@@ -514,7 +514,7 @@ describe('ProficiencyCalculation', () => {
           <ProficiencyCalculation {...makeProps({update})} />,
           {
             outcomeAllowAverageCalculationFF: true,
-          }
+          },
         )
         const method = getByDisplayValue('Decaying Average')
         fireEvent.click(method)
@@ -526,14 +526,14 @@ describe('ProficiencyCalculation', () => {
 
     it('does not render the save button', () => {
       const {queryByText} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />
+        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />,
       )
       expect(queryByText(/Save Mastery Calculation/)).not.toBeInTheDocument()
     })
 
     it('changes label of calculation method field', () => {
       const {getByText} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />
+        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit'})} />,
       )
       expect(getByText('Calculation Method')).toBeInTheDocument()
     })
@@ -542,7 +542,7 @@ describe('ProficiencyCalculation', () => {
       const update = jest.fn()
       const setError = jest.fn()
       const {getByText, getByDisplayValue, queryByTestId} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit', update, setError})} />
+        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit', update, setError})} />,
       )
       fireEvent.click(getByDisplayValue('Decaying Average'))
       fireEvent.click(getByText('n Number of Times'))
@@ -556,7 +556,7 @@ describe('ProficiencyCalculation', () => {
       const update = jest.fn()
       const setError = jest.fn()
       const {queryByTestId} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit', update, setError})} />
+        <ProficiencyCalculation {...makeProps({individualOutcome: 'edit', update, setError})} />,
       )
       fireEvent.input(queryByTestId('calculation-int-input'), {target: {value: '0'}})
       expect(setError).toHaveBeenCalledWith(true)

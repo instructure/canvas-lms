@@ -52,7 +52,7 @@ export const CustomStatusItem = ({
   const confirmStatusDelete = async () => {
     const confirmed = await showConfirmationDialog({
       body: I18n.t(
-        'Are you sure you want to delete this custom status? This action cannot be undone. All submissions and scores currently marked with this custom status will have their status removed.'
+        'Are you sure you want to delete this custom status? This action cannot be undone. All submissions and scores currently marked with this custom status will have their status removed.',
       ),
       confirmColor: 'danger',
       confirmText: I18n.t('Delete'),

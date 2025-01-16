@@ -109,7 +109,7 @@ export default class FilePreview extends React.PureComponent {
   getItemsToView = (props, cb) => {
     if (typeof cb !== 'function')
       throw new Error(
-        'getItemsToView(props: obj, callback: fn) requires `callback` to be a function'
+        'getItemsToView(props: obj, callback: fn) requires `callback` to be a function',
       )
     // Sets up our collection that we will be using.
     let initialItem = null
@@ -167,22 +167,24 @@ export default class FilePreview extends React.PureComponent {
     if (event.keyCode === $.ui.keyCode.LEFT) {
       nextItem = CollectionHandler.getPreviousInRelationTo(
         this.state.otherItems,
-        this.state.displayedItem
+        this.state.displayedItem,
       )
     }
     if (event.keyCode === $.ui.keyCode.RIGHT) {
       nextItem = CollectionHandler.getNextInRelationTo(
         this.state.otherItems,
-        this.state.displayedItem
+        this.state.displayedItem,
       )
     }
 
-    page(`${this.getRouteIdentifier()}?${$.param(this.getNavigationParams({id: nextItem.id}))}`)
+    if (nextItem) {
+      page(`${this.getRouteIdentifier()}?${$.param(this.getNavigationParams({id: nextItem.id}))}`)
+    }
   }
 
   closeModal = () => {
     this.props.closePreview(
-      `${this.getRouteIdentifier()}?${$.param(this.getNavigationParams({except: 'only_preview'}))}`
+      `${this.getRouteIdentifier()}?${$.param(this.getNavigationParams({except: 'only_preview'}))}`,
     )
   }
 
@@ -207,7 +209,7 @@ export default class FilePreview extends React.PureComponent {
       <div className="col-xs-1 ef-file-arrow_container">
         <a
           href={`${baseUrl}${this.getRouteIdentifier()}?${$.param(
-            this.getNavigationParams({id: nextItem.id})
+            this.getNavigationParams({id: nextItem.id}),
           )}`}
           className="ef-file-preview-container-arrow-link"
           onClick={e => page.clickHandler(e.nativeEvent)}

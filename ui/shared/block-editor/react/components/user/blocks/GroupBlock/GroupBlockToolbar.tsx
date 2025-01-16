@@ -47,14 +47,14 @@ export const GroupBlockToolbar = () => {
         prps.borderColor = bordercolor
       })
     },
-    [setProp]
+    [setProp],
   )
 
   const handleSaveAlignment = useCallback(
     (
       layout: GroupLayout,
       alignment: GroupHorizontalAlignment,
-      verticalAlignment: GroupAlignment
+      verticalAlignment: GroupAlignment,
     ) => {
       setProp((prps: GroupBlockProps) => {
         prps.layout = layout
@@ -62,7 +62,7 @@ export const GroupBlockToolbar = () => {
         prps.verticalAlignment = verticalAlignment
       })
     },
-    [setProp]
+    [setProp],
   )
 
   const handleSaveCorners = useCallback(
@@ -71,7 +71,7 @@ export const GroupBlockToolbar = () => {
         prps.roundedCorners = rounded
       })
     },
-    [setProp]
+    [setProp],
   )
 
   const getCurrentBorderColor = () => {

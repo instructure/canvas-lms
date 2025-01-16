@@ -41,7 +41,7 @@ describe('I18n', () => {
 
   test('html safety: should not html-escape translations or interpolations by default', () => {
     expect(t('bar', 'these are some tags: <input> and %{another}', {another: '<img>'})).toEqual(
-      'these are some tags: <input> and <img>'
+      'these are some tags: <input> and <img>',
     )
   })
 
@@ -53,7 +53,7 @@ describe('I18n', () => {
     })
 
     expect(result.string).toEqual(
-      'only one of these won&#39;t get escaped: &lt;input&gt;, &lt;img&gt;, <br> &amp; &lt;hr&gt;'
+      'only one of these won&#39;t get escaped: &lt;input&gt;, &lt;img&gt;, <br> &amp; &lt;hr&gt;',
     )
   })
 
@@ -147,13 +147,13 @@ describe('I18n localize number', () => {
 
   test('allows stripping of 0s to be explicitly toggled along with precision', () => {
     expect(I18n.localizeNumber(1.12, {precision: 4, strip_insignificant_zeros: true})).toEqual(
-      `1${separator}12`
+      `1${separator}12`,
     )
   })
 
   test('does not have precision errors with large numbers', () => {
     expect(I18n.localizeNumber(50000000.12)).toEqual(
-      `50${delimiter}000${delimiter}000${separator}12`
+      `50${delimiter}000${delimiter}000${separator}12`,
     )
   })
 })

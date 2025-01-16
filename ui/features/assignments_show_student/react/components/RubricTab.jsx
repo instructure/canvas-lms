@@ -77,7 +77,7 @@ export default function RubricTab(props) {
   }
 
   const hasSubmittedAssessment = rubricAssessments.some(
-    assessment => assessment.assessor?._id === ENV.current_user.id
+    assessment => assessment.assessor?._id === ENV.current_user.id,
   )
 
   const rubricAssessmentData = (displayedAssessment?.data ?? []).map(data => {
@@ -154,7 +154,7 @@ export default function RubricTab(props) {
         {props.peerReviewModeEnabled && !hasSubmittedAssessment && (
           <Alert variant="info" hasShadow={false} data-testid="peer-review-rubric-alert">
             {I18n.t(
-              'Fill out the rubric below after reviewing the student submission to complete this review.'
+              'Fill out the rubric below after reviewing the student submission to complete this review.',
             )}
           </Alert>
         )}

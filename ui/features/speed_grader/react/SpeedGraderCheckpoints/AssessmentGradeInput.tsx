@@ -59,7 +59,6 @@ const isScientific = (inputString: string) => {
   return inputString.match(scientificPattern)
 }
 
- 
 const getLocaleSeparators = (numberFormatter: Intl.NumberFormat) => {
   // Generate a localized number to find out the thousand and decimal separators
   const parts = numberFormatter.formatToParts(1234567.89)
@@ -69,7 +68,6 @@ const getLocaleSeparators = (numberFormatter: Intl.NumberFormat) => {
   return {thousands: thousands || ',', decimal: decimal || '.'}
 }
 
- 
 const parseFormattedNumber = (input: number | string, numberFormatter: Intl.NumberFormat) => {
   if (input === null) {
     return Number.NaN
@@ -128,7 +126,7 @@ export const AssessmentGradeInput = ({
     (gradeToUseSubmission: SubAssignmentSubmission) => {
       return (isDisabled ? gradeToUseSubmission?.grade : gradeToUseSubmission?.entered_grade) || ''
     },
-    [isDisabled]
+    [isDisabled],
   )
 
   // @ts-expect-error
@@ -154,7 +152,7 @@ export const AssessmentGradeInput = ({
       }
       return formattedGrade
     },
-    [assignment.grading_type]
+    [assignment.grading_type],
   )
 
   useEffect(() => {
@@ -185,8 +183,8 @@ export const AssessmentGradeInput = ({
         formatGradeForSubmission(
           // @ts-expect-error
           gradeToUse(submission),
-          submission?.excused || false
-        )
+          submission?.excused || false,
+        ),
       )
       showAlert(I18n.t('Invalid grade value'), 'error')
       return

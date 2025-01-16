@@ -36,7 +36,7 @@ const today = moment().tz(defaultTZ)
 type messageSpy = jest.SpyInstance<InstuiMessage[], []>
 
 const defaultProps = (
-  overrides: UnknownSubset<RecurrenceEndPickerProps> = {}
+  overrides: UnknownSubset<RecurrenceEndPickerProps> = {},
 ): RecurrenceEndPickerProps => ({
   locale: 'en',
   timezone: defaultTZ,
@@ -75,7 +75,7 @@ describe('RecurrenceEndPicker', () => {
     const onChange = jest.fn()
     const enddate = today.clone().add(5, 'days').format('YYYY-MM-DD')
     const {getByDisplayValue} = render(
-      <RecurrenceEndPicker {...defaultProps({onChange, until: enddate})} />
+      <RecurrenceEndPicker {...defaultProps({onChange, until: enddate})} />,
     )
 
     act(() => {
@@ -234,7 +234,7 @@ describe('RecurrenceEndPicker', () => {
         mode: ModeValues,
         freq: FrequencyValue,
         interval: number,
-        courseEndAt: string | undefined
+        courseEndAt: string | undefined,
       ]
       const defaultGetUntilMessageProps = (overrides = {}): getUntilMessageArgs => {
         const propObj = {
@@ -275,7 +275,7 @@ describe('RecurrenceEndPicker', () => {
           defaultGetUntilMessageProps({
             eventStart: '2023-07-13T13:00:00-04:00',
             until: '2023-07-12T13:00:00-04:00',
-          })
+          }),
         )
         expect(tooSoonSpy).toHaveBeenCalled()
       })
@@ -287,7 +287,7 @@ describe('RecurrenceEndPicker', () => {
           defaultGetUntilMessageProps({
             eventStart: '2023-07-13T13:00:00-04:00',
             until: '2025-07-13T13:00:00-04:00',
-          })
+          }),
         )
         expect(tooManySpy).toHaveBeenCalled()
       })

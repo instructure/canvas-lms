@@ -53,8 +53,10 @@ describe('UploadResult', () => {
   })
 
   it('reports token correctly', () => {
+    // https://github.com/jsdom/jsdom/issues/2615
+    // <?xml version="1.0" encoding="ISO-8859-1"?>
     const xml = `
-      <?xml version="1.0" encoding="ISO-8859-1"?><xml>
+      <xml>
         <result>
           <result_ok>
             <token>1011389726328.4103</token>

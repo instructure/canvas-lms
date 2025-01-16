@@ -26,12 +26,12 @@ import {buildContextPath} from './buildContextPath'
 export const useDefaultGradingScheme = (): {
   loadDefaultGradingScheme: (
     contextType: 'Account' | 'Course',
-    contextId: string
+    contextId: string,
   ) => Promise<GradingScheme>
   loadDefaultGradingSchemeStatus: ApiCallStatus
 } => {
   const [loadDefaultGradingSchemeStatus, setLoadDefaultGradingSchemeStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const loadDefaultGradingScheme = useCallback(
@@ -57,7 +57,7 @@ export const useDefaultGradingScheme = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {loadDefaultGradingScheme, loadDefaultGradingSchemeStatus}

@@ -34,7 +34,7 @@ export const UserGroups = {
       shape({
         _id: string,
         name: string,
-      })
+      }),
     ),
   }),
 }

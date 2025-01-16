@@ -17,8 +17,8 @@
  */
 
 import React, {Component} from 'react'
-import ReactDOM from 'react-dom'
-import {array, func, instanceOf} from 'prop-types'
+import {createRoot} from 'react-dom/client'
+import PropTypes, {array, func, instanceOf} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {FileDrop} from '@instructure/ui-file-drop'
@@ -35,29 +35,30 @@ export function showImportOutcomesModal(props) {
   const parent = document.createElement('div')
   parent.setAttribute('class', 'import-outcomes-modal-container')
   document.body.appendChild(parent)
+  const root = createRoot(parent)
 
   function showImportOutcomesRef(modal) {
     if (modal) modal.show()
   }
 
-   
-  ReactDOM.render(
-    <ImportOutcomesModal {...props} parent={parent} ref={showImportOutcomesRef} />,
-    parent
+  root.render(
+    <ImportOutcomesModal {...props} parent={parent} root={root} ref={showImportOutcomesRef} />,
   )
 }
 
 export default class ImportOutcomesModal extends Component {
   static propTypes = {
-    parent: instanceOf(Element),
-    toolbar: instanceOf(Element),
-    onFileDrop: func,
-    learningOutcomeGroup: instanceOf(Object),
-    learningOutcomeGroupAncestorIds: array,
+    parent: PropTypes.instanceOf(Element),
+    toolbar: PropTypes.instanceOf(Element),
+    onFileDrop: PropTypes.func,
+    learningOutcomeGroup: PropTypes.instanceOf(Object),
+    learningOutcomeGroupAncestorIds: PropTypes.arrayOf(PropTypes.any),
+    root: PropTypes.object,
   }
 
   static defaultProps = {
     parent: null,
+    root: null,
   }
 
   state = {
@@ -92,7 +93,10 @@ export default class ImportOutcomesModal extends Component {
 
   hide() {
     this.setState({show: false}, () => {
-      if (this.props.parent) ReactDOM.unmountComponentAtNode(this.props.parent)
+      if (this.props.root) {
+        this.props.root.unmount()
+        this.props.parent?.remove()
+      }
     })
   }
 

@@ -127,11 +127,11 @@ function Body({
   const footerHeight = '63'
   const panelHeight = useMemo(
     (): string => calculatePanelHeight(moduleId !== undefined),
-    [moduleId]
+    [moduleId],
   )
   const bodyHeight = useMemo(
     (): string => `calc(${panelHeight} - ${footerHeight}px)`,
-    [panelHeight]
+    [panelHeight],
   )
 
   const handleSubmitMissingTabs = () => {
@@ -141,7 +141,6 @@ function Body({
       assignToData.current &&
       moduleId
     ) {
-       
       updateModuleAssignees({
         courseId,
         moduleId,
@@ -154,7 +153,7 @@ function Body({
       settingsData.current
     ) {
       const performRequest = moduleId === undefined ? createModule : updateModule
-       
+
       performRequest({
         moduleId,
         moduleElement,
@@ -200,7 +199,7 @@ function Body({
               mountNodeRef={trayRef}
               updateParentData={(newSettingsData, changed) => {
                 settingsData.current = newSettingsData
-                changed && changes.current.add(SETTINGS_ID)
+                if (changed) changes.current.add(SETTINGS_ID)
               }}
               onDidSubmit={handleSubmitMissingTabs}
               {...settingsProps}
@@ -229,7 +228,7 @@ function Body({
                 onDismiss={onDismiss}
                 updateParentData={(newAssignToData, changed) => {
                   assignToData.current = newAssignToData
-                  changed && changes.current.add(ASSIGN_TO_ID)
+                  if (changed) changes.current.add(ASSIGN_TO_ID)
                 }}
                 defaultOption={assignToData.current?.selectedOption}
                 defaultAssignees={assignToData.current?.selectedAssignees}

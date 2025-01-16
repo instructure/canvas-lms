@@ -37,7 +37,7 @@ export interface RegistrationOverlayActions {
   updateRegistrationLaunchHeight: (s: string) => void
   updateRegistrationLaunchWidth: (s: string) => void
   updatePlacement: (
-    placement_type: LtiPlacement
+    placement_type: LtiPlacement,
   ) => (fn: (placementOverlay: LtiPlacementOverlay) => LtiPlacementOverlay) => void
   /**
    * Restore all values to their default values
@@ -64,7 +64,7 @@ const updatePlacement =
       registration: {
         ...state.registration,
         placements: (state.registration.placements || []).map(p =>
-          p.type === placement_type ? fn(p) : p
+          p.type === placement_type ? fn(p) : p,
         ),
       },
     }))
@@ -126,7 +126,7 @@ const updateAdminNickname = (nickname: string) =>
 // const updateRegistrationPlacements = (s: string) => updateRegistrationKey('placements')(() => s)
 const resetOverlays = (configuration: LtiConfiguration) =>
   updateState(state =>
-    initialOverlayStateFromLtiRegistration(configuration, null, state.developerKeyName)
+    initialOverlayStateFromLtiRegistration(configuration, null, state.developerKeyName),
   )
 
 export type RegistrationOverlayStore = StoreApi<
@@ -137,7 +137,7 @@ export type RegistrationOverlayStore = StoreApi<
 
 export const createRegistrationOverlayStore = (
   developerKeyName: string | null,
-  ltiRegistration: LtiImsRegistration
+  ltiRegistration: LtiImsRegistration,
 ): StoreApi<
   {
     state: RegistrationOverlayState
@@ -148,7 +148,7 @@ export const createRegistrationOverlayStore = (
       state: initialOverlayStateFromLtiRegistration(
         ltiRegistration.tool_configuration,
         ltiRegistration.overlay,
-        developerKeyName
+        developerKeyName,
       ),
       updateDevKeyName: (name: string) =>
         set(state => {
@@ -178,15 +178,15 @@ export const createRegistrationOverlayStore = (
           updatePlacement(placement)(placementOverlay => ({
             ...placementOverlay,
             icon_url: iconUrl,
-          }))(state)
+          }))(state),
         ),
-    }))
+    })),
   )
 
 const initialOverlayStateFromLtiRegistration = (
   configuration: LtiConfiguration,
   overlay?: RegistrationOverlay | null,
-  developerKeyName?: string | null
+  developerKeyName?: string | null,
 ): RegistrationOverlayState => {
   return {
     developerKeyName: developerKeyName || '',
@@ -215,10 +215,10 @@ export const canvasPlatformSettings = (configuration: LtiConfiguration): Extensi
 
 const placementsWithOverlay = (
   configuration: LtiConfiguration,
-  overlay?: RegistrationOverlay | null
+  overlay?: RegistrationOverlay | null,
 ) =>
   canvasPlatformSettings(configuration)?.settings.placements.flatMap(
-    initialPlacementOverlayStateFromPlacementConfig(overlay?.placements || [])
+    initialPlacementOverlayStateFromPlacementConfig(overlay?.placements || []),
   ) || []
 
 const initialPlacementOverlayStateFromPlacementConfig =

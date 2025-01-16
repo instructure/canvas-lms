@@ -89,7 +89,7 @@ describe('LongTextEditor', () => {
     })
 
     it('navigates to previous cell when Shift+Tab is pressed on textarea', async () => {
-      const event = $.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey: true })
+      const event = $.Event('keydown', {which: $.ui.keyCode.TAB, shiftKey: true})
       $(screen.getByRole('textbox')).trigger(event)
       expect(args.grid.navigatePrev).toHaveBeenCalled()
     })
@@ -124,7 +124,7 @@ describe('LongTextEditor', () => {
     })
 
     it('navigates to next cell when Tab is pressed on Cancel button', async () => {
-      const event = $.Event('keydown', { which: $.ui.keyCode.TAB, shiftKey: false })
+      const event = $.Event('keydown', {which: $.ui.keyCode.TAB, shiftKey: false})
       $(screen.getByRole('button', {name: 'Cancel'})).trigger(event)
       expect(args.grid.navigateNext).toHaveBeenCalled()
     })

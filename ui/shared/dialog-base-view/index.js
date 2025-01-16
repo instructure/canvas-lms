@@ -111,7 +111,6 @@ DialogBaseView.prototype.close = function () {
 }
 
 DialogBaseView.prototype.update = function (_e) {
-   
   throw 'Not yet implemented'
 }
 

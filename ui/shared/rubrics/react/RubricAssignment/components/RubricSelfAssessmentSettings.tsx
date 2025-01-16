@@ -37,7 +37,7 @@ export const RubricSelfAssessmentSettings = ({
   rubricSelfAssessmentEnabled,
 }: RubricSelfAssessmentSettingsProps) => {
   const [selfAssessmentEnabled, setSelfAssessmentEnabled] = React.useState(
-    rubricSelfAssessmentEnabled
+    rubricSelfAssessmentEnabled,
   )
 
   const {isLoading: mutationLoading, mutateAsync} = useMutation({

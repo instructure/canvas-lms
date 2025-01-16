@@ -75,7 +75,7 @@ describe('MicrosoftSyncButton', () => {
 
   describe('when the sync request is loading', () => {
     beforeEach(() =>
-      doFetchApi.mockImplementationOnce(() => Promise.resolve({json: props().group}))
+      doFetchApi.mockImplementationOnce(() => Promise.resolve({json: props().group})),
     )
 
     it('shows a "scheduling sync" spinner', () => {
@@ -93,9 +93,9 @@ describe('MicrosoftSyncButton', () => {
   describe('when the sync request fails', () => {
     beforeEach(() =>
       doFetchApi.mockImplementationOnce(() =>
-        // eslint-disable-next-line prefer-promise-reject-errors
-        Promise.reject({message: 'test error'})
-      )
+         
+        Promise.reject({message: 'test error'}),
+      ),
     )
 
     it('calls the error handler, but allows trying to sync again', async () => {
@@ -111,7 +111,7 @@ describe('MicrosoftSyncButton', () => {
       const component = subject()
       fireEvent.click(component.getByText('Sync Now'))
       await waitFor(() =>
-        expect(component.getByText('Sync Now').closest('button').disabled).toBeFalsy()
+        expect(component.getByText('Sync Now').closest('button').disabled).toBeFalsy(),
       )
     })
 
@@ -168,7 +168,7 @@ describe('MicrosoftSyncButton', () => {
       const component = subject()
       fireEvent.click(component.getByText('Sync Now'))
       await waitFor(() =>
-        expect(component.getByText('Sync Now').closest('button').disabled).toBeTruthy()
+        expect(component.getByText('Sync Now').closest('button').disabled).toBeTruthy(),
       )
     })
   })
@@ -198,16 +198,16 @@ describe('MicrosoftSyncButton', () => {
       await waitFor(() =>
         expect(onInfo).toHaveBeenLastCalledWith(
           expect.stringMatching(
-            /Manual syncs are available every 90 minutes. Please wait 90 minutes to sync again./
-          )
-        )
+            /Manual syncs are available every 90 minutes. Please wait 90 minutes to sync again./,
+          ),
+        ),
       )
     })
 
     it('disables the sync button', async () => {
       const component = subject(overrides)
       await waitFor(() =>
-        expect(component.getByText('Sync Now').closest('button').disabled).toBeTruthy()
+        expect(component.getByText('Sync Now').closest('button').disabled).toBeTruthy(),
       )
     })
 
@@ -242,7 +242,7 @@ describe('MicrosoftSyncButton', () => {
         })
 
         await waitFor(() =>
-          expect(component.getByText('Sync Now').closest('button').disabled).toBeFalsy()
+          expect(component.getByText('Sync Now').closest('button').disabled).toBeFalsy(),
         )
       })
     })

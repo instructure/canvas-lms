@@ -90,14 +90,14 @@ export const {
   'GOT_WAY_FUTURE_ITEM_DATE',
   'GOT_WAY_PAST_ITEM_DATE',
   'GOT_COURSE_LIST',
-  'CLEAR_LOADING'
+  'CLEAR_LOADING',
 )
 
 export const gettingPastItems = createAction(
   'GETTING_PAST_ITEMS',
   (opts = {seekingNewActivity: false}) => {
     return opts
-  }
+  },
 )
 
 export const gotDaysSuccess = createAction('GOT_DAYS_SUCCESS', (newDays, response) => {
@@ -148,7 +148,7 @@ export function getFirstNewActivityDate(fromMoment) {
             response.data[0],
             getState().courses,
             getState().groups,
-            getState().timeZone
+            getState().timeZone,
           )
           dispatch(foundFirstNewActivityDate(first.dateBucketMoment))
         }
@@ -226,7 +226,7 @@ function loadPastItems(byScrolling) {
     dispatch(
       gettingPastItems({
         seekingNewActivity: false,
-      })
+      }),
     )
     dispatch(startLoadingPastSaga())
   }
@@ -244,7 +244,7 @@ export const loadPastUntilNewActivity = () => dispatch => {
   dispatch(
     gettingPastItems({
       seekingNewActivity: true,
-    })
+    }),
   )
   dispatch(startLoadingPastUntilNewActivitySaga())
   return 'loadPastUntilNewActivity' // for testing
@@ -254,7 +254,7 @@ export const loadPastUntilToday = () => dispatch => {
   dispatch(
     gettingPastItems({
       seekingNewActivity: false,
-    })
+    }),
   )
   dispatch(startLoadingPastUntilTodaySaga())
   return 'loadPastUntilToday' // for testing
@@ -497,7 +497,7 @@ function transformItems(loadingOptions, items) {
       item,
       loadingOptions.getState().courses,
       loadingOptions.getState().groups,
-      loadingOptions.getState().timeZone
-    )
+      loadingOptions.getState().timeZone,
+    ),
   )
 }

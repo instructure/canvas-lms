@@ -18,7 +18,6 @@
 
 import {createGradebook, setFixtureHtml} from '../../../__tests__/GradebookSpecHelper'
 import TotalGradeCellFormatter from '../TotalGradeCellFormatter'
-import sinon from 'sinon'
 
 describe('GradebookGrid TotalGradeCellFormatter', () => {
   let fixture
@@ -43,19 +42,17 @@ describe('GradebookGrid TotalGradeCellFormatter', () => {
       show_total_grade_as_points: true,
     })
 
-    sinon.stub(gradebook, 'getTotalPointsPossible').returns(10)
-    sinon.stub(gradebook, 'listInvalidAssignmentGroups').returns([])
-    sinon.stub(gradebook, 'listHiddenAssignments').returns([])
-    sinon.stub(gradebook, 'saveSettings')
+    jest.spyOn(gradebook, 'getTotalPointsPossible').mockReturnValue(10)
+    jest.spyOn(gradebook, 'listInvalidAssignmentGroups').mockReturnValue([])
+    jest.spyOn(gradebook, 'listHiddenAssignments').mockReturnValue([])
+    jest.spyOn(gradebook, 'saveSettings')
     formatter = new TotalGradeCellFormatter(gradebook)
 
     grade = {score: 8, possible: 10}
   })
 
   afterEach(() => {
-    gradebook.getTotalPointsPossible.restore()
-    gradebook.listInvalidAssignmentGroups.restore()
-    gradebook.listHiddenAssignments.restore()
+    jest.restoreAllMocks()
     fixture.remove()
   })
 
@@ -65,7 +62,7 @@ describe('GradebookGrid TotalGradeCellFormatter', () => {
       0, // cell
       grade, // value
       null, // column definition
-      {id: '1001'} // student/dataContext
+      {id: '1001'}, // student/dataContext
     )
     return fixture
   }
@@ -149,45 +146,45 @@ describe('GradebookGrid TotalGradeCellFormatter', () => {
   })
 
   test('renders a warning when there are hidden assignments', () => {
-    gradebook.listHiddenAssignments.returns([{id: '2301'}])
+    gradebook.listHiddenAssignments.mockReturnValue([{id: '2301'}])
     const expectedTooltip =
       "This grade may differ from the student's view of the grade because some assignment grades are not yet posted"
     expect(getTooltip()).toBe(expectedTooltip)
   })
 
   test('renders a warning icon when there are hidden assignments', () => {
-    gradebook.listHiddenAssignments.returns([{id: '2301'}])
-    expect(renderCell().querySelectorAll('i.icon-off').length).toBe(1)
+    gradebook.listHiddenAssignments.mockReturnValue([{id: '2301'}])
+    expect(renderCell().querySelectorAll('i.icon-off')).toHaveLength(1)
   })
 
   test('renders a warning when there is an invalid assignment group', () => {
-    gradebook.listInvalidAssignmentGroups.returns([{id: '2401', name: '<Math>'}])
+    gradebook.listInvalidAssignmentGroups.mockReturnValue([{id: '2401', name: '<Math>'}])
     expect(getTooltip()).toBe('Score does not include <Math> because it has no points possible')
   })
 
   test('renders a warning icon when there is an invalid assignment group', () => {
-    gradebook.listInvalidAssignmentGroups.returns([{id: '2401', name: 'Math'}])
-    expect(renderCell().querySelectorAll('i.icon-warning').length).toBe(1)
+    gradebook.listInvalidAssignmentGroups.mockReturnValue([{id: '2401', name: 'Math'}])
+    expect(renderCell().querySelectorAll('i.icon-warning')).toHaveLength(1)
   })
 
   test('renders a warning when there are multiple invalid assignment groups', () => {
-    gradebook.listInvalidAssignmentGroups.returns([
+    gradebook.listInvalidAssignmentGroups.mockReturnValue([
       {id: '2401', name: 'Math'},
       {id: '2402', name: '<English>'},
     ])
     expect(getTooltip()).toBe(
-      'Score does not include Math and <English> because they have no points possible'
+      'Score does not include Math and <English> because they have no points possible',
     )
   })
 
   test('renders a warning when total points possible is zero', () => {
-    gradebook.getTotalPointsPossible.returns(0)
+    gradebook.getTotalPointsPossible.mockReturnValue(0)
     expect(getTooltip()).toBe("Can't compute score until an assignment has points possible")
   })
 
   test('renders a warning icon when total points possible is zero', () => {
-    gradebook.getTotalPointsPossible.returns(0)
-    expect(renderCell().querySelectorAll('i.icon-warning').length).toBe(1)
+    gradebook.getTotalPointsPossible.mockReturnValue(0)
+    expect(renderCell().querySelectorAll('i.icon-warning')).toHaveLength(1)
   })
 
   test('renders a letter grade (with trailing en-dashes replaced with minus) when using a grading standard', () => {
@@ -200,9 +197,9 @@ describe('GradebookGrid TotalGradeCellFormatter', () => {
   })
 
   test('does not render a letter grade when not using a grading standard', () => {
-    sinon.stub(gradebook, 'getCourseGradingScheme').returns(null)
+    jest.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
     expect(renderCell().querySelector('.letter-grade-points')).toBeNull()
-    gradebook.getCourseGradingScheme.restore()
+    gradebook.getCourseGradingScheme.mockRestore()
   })
 
   test('does not render a letter grade when the grade has zero points possible', () => {
