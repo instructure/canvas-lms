@@ -251,19 +251,6 @@ lti_resource_link_id_speedgrader_launches_reference_assignment:
     title. With the feature flag off, in SpeedGrader launches, resource_link_id
     and resource_link_title reference the tool (not the assignment) for
     non-NewQuizzes LTI 1.1 tools.
-lti_resource_links_api:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Allow LTI 1.3 Resource Links API
-  description: |-
-    When enabled, the Canvas API for LTI Resource Links is usable. Admins can
-    use this API for visibility into content returned from tools.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_toggle_placements:
   state: hidden
   applies_to: RootAccount
