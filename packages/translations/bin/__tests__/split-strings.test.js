@@ -19,6 +19,7 @@
 jest.mock('fs')
 jest.mock('path')
 
+// biome-ignore lint/style/useNodejsImportProtocol
 const fs = require('fs')
 
 const splitStrings = require('../split-strings')
