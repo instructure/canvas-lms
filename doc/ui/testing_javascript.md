@@ -25,6 +25,7 @@ Run `npm test -- --coverage` for a coverage report.
 * @instructure/foo module (generally) lives in packages/foo
 * @canvas/foo module lives in ui/shared/foo
 * Follow the Arrange-Act-Assert pattern.
+* Use testing-library, not React Testing Library or react-dom/test-utils
 * Tests should be resilient to change of year, month, and day.
 * Keep tests independent. One test should not depend on the result of another.
 * testing-library docs say: “getByRole performance can be improved by setting the option hidden to true and thereby avoid expensive visibility checks. Note that in doing so inaccessible elements will now be included in the result. Another option may be to substitute getByRole for simpler getByLabelText and getByText queries which can be significantly faster though less robust alternatives.”
