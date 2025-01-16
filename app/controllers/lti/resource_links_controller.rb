@@ -134,7 +134,6 @@
 #     }
 class Lti::ResourceLinksController < ApplicationController
   before_action :require_context_instrumented
-  before_action :require_feature_flag
   before_action :require_permissions
   before_action :validate_custom, only: [:create, :update]
   before_action :validate_url, only: [:create, :update]
@@ -489,15 +488,6 @@ class Lti::ResourceLinksController < ApplicationController
   rescue ActiveRecord::RecordNotFound => e
     report_error(e)
     raise e
-  end
-
-  def require_feature_flag
-    unless @context.root_account.feature_enabled?(:lti_resource_links_api)
-      respond_to do |format|
-        format.html { render "shared/errors/404_message", status: :not_found }
-        format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
-      end
-    end
   end
 
   def require_permissions

@@ -32,7 +32,6 @@ describe Lti::ResourceLinksController, type: :request do
 
   before do
     user_session(admin)
-    account.enable_feature!(:lti_resource_links_api)
   end
 
   describe "GET #index" do
@@ -86,15 +85,6 @@ describe Lti::ResourceLinksController, type: :request do
       it "returns 403" do
         subject
         expect(response).to be_forbidden
-      end
-    end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_resource_links_api) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
       end
     end
 
@@ -184,15 +174,6 @@ describe Lti::ResourceLinksController, type: :request do
       end
     end
 
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_resource_links_api) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
-      end
-    end
-
     it "is successful" do
       subject
       expect(response).to be_successful
@@ -277,15 +258,6 @@ describe Lti::ResourceLinksController, type: :request do
       it "returns 403" do
         subject
         expect(response).to be_forbidden
-      end
-    end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_resource_links_api) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
       end
     end
 
@@ -382,15 +354,6 @@ describe Lti::ResourceLinksController, type: :request do
       end
     end
 
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_resource_links_api) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
-      end
-    end
-
     it "is successful" do
       subject
       expect(response).to be_successful
@@ -458,15 +421,6 @@ describe Lti::ResourceLinksController, type: :request do
       it "returns 403" do
         subject
         expect(response).to be_forbidden
-      end
-    end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_resource_links_api) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
       end
     end
 
@@ -566,15 +520,6 @@ describe Lti::ResourceLinksController, type: :request do
       it "returns 403" do
         subject
         expect(response).to be_forbidden
-      end
-    end
-
-    context "with flag disabled" do
-      before { account.disable_feature!(:lti_resource_links_api) }
-
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
       end
     end
 
