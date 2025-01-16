@@ -3803,6 +3803,7 @@ hy:
   confirm_dialog_component: 
     ok: OK
   confirm_email_address_9072dd3c: "Հաստատել էլեկտրոնային փոստի հասցեն"
+  confirm_new_password_3d3ca4ea: "Հաստատել նոր գաղտնաբառը "
   confirm_password_aaf07824: "Հաստատել գաղտնաբառը"
   confirm_unenrollment_64333263: "Հաստատել գրանցման չեղյալացումը"
   confirmation_code_required_22984955: "Հաստատման ծածկագիր (պարտադիր է)"
@@ -11299,6 +11300,7 @@ hy:
   new_module_4e9287e4: "Նոր Մոդուլ"
   new_outcome_7fba8c7d: "Նոր արդյունք"
   new_outcome_group_af59f145: "Արդյունքների նոր խումբ"
+  new_password_1232cbf2: "Նոր գաղտնաբառ"
   new_quiz_statistics_desc: "Միացնել դասընթացի նոր թեստի վիճակագրության էջը:"
   new_ui_487a624e: "Նոր UI"
   next_40e12421: Հաջորդը
@@ -12854,6 +12856,8 @@ hy:
     confirm_change_password: 
       buttons: 
         update_password: "Թարմացնել գաղտնաբառը"
+      confirm_change_password: 
+        loading: "Բեռնում է..."
       labels: 
         new_password: "Նոր գաղտնաբառ"
         password: Գաղտնաբառ
@@ -17047,6 +17051,7 @@ hy:
   update_details_6abfed16: "Թարմացնել Տվյալները"
   update_grade_b47eb3ff: "Թարմացնել գնահատականը"
   update_module_b984c2e5: "Թարմացնել մոդուլը"
+  update_password_4bc5cb1f: "Թարմացնել գաղտնաբառը"
   update_settings_9b422d0f: "Թարմացնել կարգաբերումները"
   update_tool_7d48ef2a: "Թարմացնել %{tool}"
   update_your_notification_settings_ed9564f3: "Թարմացնել ծանուցման ձեր կարգաբերումները"
@@ -17618,6 +17623,7 @@ hy:
   what_would_you_like_to_do_next_2835397e: "Ինչ կցանկանայիք անել հաջորդ քայլում"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Երբ մարդիկ այցելում են դասընթացը, նրանք տեսնում են հենց այս էջը: Դուք կարող եք կարգաբերել այն այնպես, որ ցույց տա գործողությունների հոսքը, մոդուլների, ուսումնական ծրագրերի ցուցակը կամ դնել Ձեր կողմից ստեղծված  օգտատիրոջ էջը: Լռելյայն ընդունված տարբերակը ցուցադրում է դասընթացի գործողությունների հոսքը: "
   where_would_you_like_to_move_title_fabd6e8f: "Ու՞ր կցանկանայիք տեղափոխել %{title}:"
+  which_login_to_change_4707fbc6: "Որ մուտքի տվյալները պետք է փոխել"
   widget: 
     upload_media_track_form: 
       choose_a_language: "--Ընտրել լեզուն--"
