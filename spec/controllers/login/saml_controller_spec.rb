@@ -435,6 +435,18 @@ describe Login::SamlController do
       expect(response.location).to eql "http://test.host/courses/2"
     end
 
+    it "ignores it if it's going to cause a login loop" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, "http://test.host/login/saml"]
+      )
+
+      expect(Account).not_to receive(:find_by_domain)
+
+      post :create, params: { SAMLResponse: "foo", RelayState: "http://test.host/login/saml" }
+      expect(response).to be_redirect
+      expect(response.location).to eql "http://test.host/courses/1"
+    end
+
     it "appends a session token if we're redirecting to a different domain for the same account" do
       allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
         [saml_response, "https://sameaccount/courses/2"]
