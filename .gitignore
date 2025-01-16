@@ -98,8 +98,5 @@ docker-compose/api-gateway.override.yml
 coverage-jest
 coverage-karma
 
-# generated graphql schema
-schema.graphql
-
 # Ignore master key for decrypting credentials and more.
 /config/master.key
