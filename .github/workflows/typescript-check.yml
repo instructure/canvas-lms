@@ -1,0 +1,43 @@
+name: TypeScript Check
+
+on:
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  typescript:
+    name: TypeScript Type Check
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install Dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Build Packages
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn build:packages
+
+      - name: Run TypeScript Check
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn tsc --noemit -p tsconfig.json
