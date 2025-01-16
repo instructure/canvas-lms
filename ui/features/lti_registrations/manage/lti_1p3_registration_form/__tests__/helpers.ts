@@ -31,7 +31,7 @@ export const mockInternalConfiguration = (
     launch_settings: {
       text: 'Default Title',
     },
-    redirect_uris: [],
+    redirect_uris: ['https://example.com/redirect1'],
     oidc_initiation_urls: {},
     privacy_level: 'anonymous',
     tool_id: 'tool_id',
