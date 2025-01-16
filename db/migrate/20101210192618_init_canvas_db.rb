@@ -1896,6 +1896,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :include_reply_preview, default: false, null: false
       t.boolean :is_anonymous_author, default: false, null: false
       t.references :quoted_entry, foreign_key: { to_table: :discussion_entries }
+      t.datetime :edited_at, precision: 6
 
       t.replica_identity_index
       t.index %i[root_entry_id workflow_state created_at], name: "index_discussion_entries_root_entry"
@@ -2000,6 +2001,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :unlock_at, precision: 6
       t.boolean :only_visible_to_overrides, null: false, default: false
       t.boolean :summary_enabled, default: false, null: false
+      t.timestamp :edited_at, precision: 6
 
       t.replica_identity_index
       t.index [:context_id, :position]
@@ -2721,6 +2723,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                    null: true
       t.string :workflow_state, limit: 255, default: "active"
       t.string :unified_tool_id, limit: 255
+      t.string :registration_url, limit: 255
 
       t.replica_identity_index
     end
@@ -3941,6 +3944,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :hide_points, default: false, null: false
       t.string :rating_order, default: "descending", null: false
       t.string :button_display, default: "numeric", null: false
+      t.references :rubric_imports, foreign_key: true
 
       t.check_constraint "rating_order IN ('descending', 'ascending')", name: "check_rating_order"
       t.check_constraint "button_display IN ('numeric', 'emoji', 'letter')", name: "check_button_display"
@@ -4005,6 +4009,27 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :created_by, null: false, foreign_key: { to_table: :users }
       t.references :deleted_by, foreign_key: { to_table: :users }
       t.timestamps
+
+      t.replica_identity_index
+    end
+
+    create_table :rubric_imports do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.string :workflow_state, null: false
+      t.references :user, foreign_key: true
+      t.references :attachment, foreign_key: true
+      t.integer :progress, default: 0, null: false
+      t.integer :error_count, default: 0, null: false
+      t.json :error_data
+      t.timestamps
+      t.references :account, foreign_key: true, index: { where: "account_id IS NOT NULL" }
+      t.references :course, foreign_key: true, index: { where: "course_id IS NOT NULL" }
+
+      t.check_constraint <<~SQL.squish, name: "require_context"
+        (account_id IS NOT NULL OR
+        course_id IS NOT NULL) AND NOT
+        (account_id IS NOT NULL AND course_id IS NOT NULL)
+      SQL
 
       t.replica_identity_index
     end
@@ -4614,7 +4639,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :context_type, null: false, limit: 255
       t.string :user_ids, limit: 255
       t.string :added_user_ids, limit: 255
-      t.references :user, null: false, foreign_key: true
+      t.references :user, foreign_key: true
       t.timestamp :started_at
       t.text :description
       t.float :duration
