@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
 import SubmissionStatusPill from '../SubmissionStatusPill'
-
-let root
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -32,16 +31,12 @@ beforeAll(() => {
   }
 })
 
-beforeEach(() => {
-  root = createRoot(document.getElementById('fixtures'))
-})
-
 afterEach(() => {
-  root.unmount()
+  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
 
 it('does not render with null status', () => {
-  root.render(<SubmissionStatusPill />)
+  ReactDOM.render(<SubmissionStatusPill />, document.getElementById('fixtures'))
   const excusedPill = $('[data-testid="excused-pill"]')
   const missingPill = $('[data-testid="missing-pill"]')
   const latePill = $('[data-testid="late-pill"]')
@@ -51,13 +46,16 @@ it('does not render with null status', () => {
 })
 
 it('renders excused when given excused only', () => {
-  root.render(<SubmissionStatusPill excused={true} />)
+  ReactDOM.render(<SubmissionStatusPill excused={true} />, document.getElementById('fixtures'))
   const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill.text()).toEqual('Excused')
 })
 
 it('renders only excused even when submission is also missing', () => {
-  root.render(<SubmissionStatusPill excused={true} submissionStatus="missing" />)
+  ReactDOM.render(
+    <SubmissionStatusPill excused={true} submissionStatus="missing" />,
+    document.getElementById('fixtures'),
+  )
   const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill.text()).toEqual('Excused')
   const missingPill = $('[data-testid="missing-pill"]')
@@ -65,7 +63,10 @@ it('renders only excused even when submission is also missing', () => {
 })
 
 it('renders only excused even when submission is also late', () => {
-  root.render(<SubmissionStatusPill excused={true} submissionStatus="late" />)
+  ReactDOM.render(
+    <SubmissionStatusPill excused={true} submissionStatus="late" />,
+    document.getElementById('fixtures'),
+  )
   const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill.text()).toEqual('Excused')
   const latePill = $('[data-testid="late-pill"]')
@@ -73,7 +74,10 @@ it('renders only excused even when submission is also late', () => {
 })
 
 it('renders late when given late', () => {
-  root.render(<SubmissionStatusPill submissionStatus="late" />)
+  ReactDOM.render(
+    <SubmissionStatusPill submissionStatus="late" />,
+    document.getElementById('fixtures'),
+  )
   const latePill = $('[data-testid="late-pill"]')
   expect(latePill.text()).toEqual('Late')
   const excusedPill = $('[data-testid="excused-pill"]')
@@ -81,7 +85,10 @@ it('renders late when given late', () => {
 })
 
 it('renders missing when given missing', () => {
-  root.render(<SubmissionStatusPill submissionStatus="missing" />)
+  ReactDOM.render(
+    <SubmissionStatusPill submissionStatus="missing" />,
+    document.getElementById('fixtures'),
+  )
   const missingPill = $('[data-testid="missing-pill"]')
   expect(missingPill.text()).toEqual('Missing')
   const excusedPill = $('[data-testid="excused-pill"]')
