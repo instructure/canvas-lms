@@ -3655,6 +3655,7 @@ el:
   confirm_contact_method_29d6fe4b: "Επιβεβαίωση τρόπου επικοινωνίας"
   confirm_delete_6febeafb: "Επικύρωση Αφαίρεσης"
   confirm_email_address_9072dd3c: "Επικύρωση Ηλεκτρονικής Διεύθυνσης"
+  confirm_new_password_3d3ca4ea: "Επιβεβαίωση Νέου Κωδικού Πρόσβασης"
   confirm_password_aaf07824: "Επικύρωση Συνθηματικού"
   confirm_unenrollment_64333263: "Επιβεβαίωση απεγγραφής"
   confirmation_code_required_22984955: "Κωδικός επιβεβαίωσης (απαιτείται)"
@@ -10050,6 +10051,7 @@ el:
   new_module_4e9287e4: "Νέα Ενότητα"
   new_outcome_7fba8c7d: "Νέο Αποτέλεσμα"
   new_outcome_group_af59f145: "Νέα Ομάδα Αποτελεσμάτων"
+  new_password_1232cbf2: "Καινούργιο Συνθηματικό"
   new_question_9107c469: "Νέα Ερώτηση"
   new_quiz_34aacba6: "Νέο Κουίζ"
   next_40e12421: Επόμενη
@@ -11555,6 +11557,8 @@ el:
     confirm_change_password: 
       buttons: 
         update_password: "Ενημέρωση Κωδικού Πρόσβασης"
+      confirm_change_password: 
+        loading: Φόρτωση...
       labels: 
         new_password: "Καινούργιο Συνθηματικό"
         password: "Κωδικός πρόσβασης"
@@ -15256,6 +15260,7 @@ el:
   update_details_6abfed16: "Ενημέρωση Λεπτομερειών"
   update_grade_b47eb3ff: "Ενημέρωση Βαθμού"
   update_module_b984c2e5: "Ενημέρωση Αρθρώματος"
+  update_password_4bc5cb1f: "Ενημέρωση Κωδικού Πρόσβασης"
   update_settings_9b422d0f: "Ενημέρωση Ρυθμίσεων"
   update_tool_7d48ef2a: "Ενημέρωση %{tool}"
   update_your_notification_settings_ed9564f3: "Ενημέρωση των ρυθμίσεων ειδοποιήσεών σας"
@@ -15769,6 +15774,7 @@ el:
   what_would_you_like_to_do_next_2835397e: "Τι θα θέλατε να κάνετε έπειτα;"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "<mrk mid=\"4369\" mtype=\"seg\">Όταν επισκέπτεται κάποιος το μάθημα, αυτή είναι η σελίδα που θα βλέπει.</mrk>  <mrk mid=\"4370\" mtype=\"seg\">Μπορείτε να ρυθμίσετε να εμφανίζεται η ροή δραστηριοτήτων, η λίστα των ενοτήτων του μαθήματος, το αναλυτικό πρόγραμμα ή κάποια προσαρμοσμένη σελίδα που θα δημιουργήσετε εσείς.</mrk>  <mrk mid=\"4371\" mtype=\"seg\">Η προεπιλεγμένη ρύθμιση είναι η ροή δραστηριοτήτων.</mrk>"
   where_would_you_like_to_move_title_fabd6e8f: "Πού θα θέλατε να μετακινήσετε το %{title};"
+  which_login_to_change_4707fbc6: "Ποια σύνδεση να αλλάξει"
   white_87fa64fd: Λευκό
   widget: 
     upload_media_track_form: 
