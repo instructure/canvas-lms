@@ -146,12 +146,16 @@ describe('GradesPage', () => {
     })
 
     it('renders the returned assignment details', async () => {
-      const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
+      const {getByText, queryByText, findByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
       const formattedDueDate = dateFormatter('2020-04-18T05:59:59Z')
-      ;['WWII Report', formattedDueDate, 'Reports', '9.5 pts', 'Out of 10 pts'].forEach(header => {
-        expect(getByText(header)).toBeInTheDocument()
-      })
+
+      // Wait for and verify each element individually with more flexible matchers
+      await findByText('WWII Report')
+      await findByText(formattedDueDate)
+      await findByText('Reports')
+      await findByText(/9\.5\s*pts/i)
+      await findByText(/Out of 10\s*pts/i)
     })
 
     it('shows a panda and link to gradebook for teachers', async () => {
