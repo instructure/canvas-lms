@@ -97,33 +97,6 @@ describe('MessageDetailContainer', () => {
 
   describe('conversation messages', () => {
     const mockConversation = Conversation.mock()
-    describe('rendering', () => {
-      it('should not render the reply or reply_all option in header if student lacks permission', async () => {
-        const container = setup({
-          conversation: {...Conversation.mock({_id: CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE})},
-        })
-        await waitForElementToBeRemoved(() => container.queryByTestId('conversation-loader'))
-
-        expect(container.queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
-        expect(container.queryByTestId('message-reply')).not.toBeInTheDocument()
-      })
-
-      it('should render conversation information correctly', async () => {
-        const container = setup()
-        expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
-        await waitForApolloLoading()
-
-        expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
-        expect(
-          await container.findByText(mockConversation.conversationMessagesConnection.nodes[1].body),
-        ).toBeInTheDocument()
-      })
-
-      it('should render (No subject) when subject is empty', () => {
-        const container = setup({conversation: Conversation.mock({subject: ''})})
-        expect(container.getByText('(No subject)')).toBeInTheDocument()
-      })
-    })
 
     describe('function inputs', () => {
       it('should delete with correct conversation ID', async () => {
@@ -182,73 +155,6 @@ describe('MessageDetailContainer', () => {
             ...Conversation.mock(),
             workflowState: 'unread',
           },
-          onReadStateChange: mockReadStateChange,
-        })
-        // wait for query to load
-        await container.findAllByTestId('message-more-options')
-
-        await waitForApolloLoading()
-        expect(mockReadStateChange).toHaveBeenCalled()
-      })
-    })
-  })
-
-  describe('submission comments', () => {
-    const mockSubmissionComment = {subject: 'mySubject', _id: '1', workflowState: 'unread'}
-    describe('rendering', () => {
-      it('should render conversation information correctly', async () => {
-        const container = setup({
-          isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment,
-        })
-        expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
-        await waitForApolloLoading()
-
-        expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
-        expect(await container.findByText('my student comment')).toBeInTheDocument()
-      })
-
-      it('should not render the reply or reply_all option in header if student lacks permission', async () => {
-        const container = setup({
-          isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment,
-        })
-        expect(container.queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
-      })
-
-      it('should render with link in title', async () => {
-        const container = setup({
-          isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment,
-        })
-        expect(container).toBeTruthy()
-        await waitFor(() =>
-          expect(container.getByTestId('submission-comment-header-line')).toBeTruthy(),
-        )
-      })
-
-      it('should not render reply option', async () => {
-        const container = setup({
-          isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment,
-        })
-        await waitForApolloLoading()
-        expect(container.queryByTestId('message-reply')).not.toBeInTheDocument()
-      })
-
-      it('should not render more options', async () => {
-        const container = setup({
-          isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment,
-        })
-        await waitForApolloLoading()
-        expect(container.queryByTestId('message-more-options')).not.toBeInTheDocument()
-      })
-
-      it('should mark loaded submission comments as read', async () => {
-        const mockReadStateChange = jest.fn()
-        const container = setup({
-          conversation: mockSubmissionComment,
           onReadStateChange: mockReadStateChange,
         })
         // wait for query to load
