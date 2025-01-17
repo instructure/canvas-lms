@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
@@ -122,9 +122,10 @@ describe('CreateAssignmentViewAdapter', () => {
 
     // Wait for the save operation to complete
     await savePromise
-    await new Promise(resolve => setTimeout(resolve, 0)) // Wait for next tick
 
-    expect(ag.get('assignments')).toHaveLength(1)
+    await waitFor(() => {
+      expect(ag.get('assignments')).toHaveLength(1)
+    })
   })
 
   it('shows a flash alert when the assignment fails to save', async () => {
