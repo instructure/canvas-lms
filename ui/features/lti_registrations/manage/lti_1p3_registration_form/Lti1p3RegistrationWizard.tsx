@@ -121,6 +121,20 @@ export const Lti1p3RegistrationWizard = ({
         </>
       )
     case 'DataSharing':
+      return (
+        <>
+          <PrivacyConfirmationWrapper
+            internalConfig={internalConfiguration}
+            overlayStore={store.state.overlayStore}
+          />
+          <Footer
+            currentScreen="intermediate"
+            reviewing={store.state.reviewing}
+            onPreviousClicked={handlePreviousClicked('Permissions')}
+            onNextClicked={handleNextClicked('Placements')}
+          />
+        </>
+      )
     case 'Placements':
       return (
         <>

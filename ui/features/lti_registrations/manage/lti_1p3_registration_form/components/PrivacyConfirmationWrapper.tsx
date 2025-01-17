@@ -26,13 +26,11 @@ import type {InternalLtiConfiguration} from '../../model/internal_lti_configurat
 export type PrivacyConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   internalConfig: InternalLtiConfiguration
-  appName: string
 }
 
 export const PrivacyConfirmationWrapper = ({
   overlayStore,
   internalConfig,
-  appName,
 }: PrivacyConfirmationWrapperProps) => {
   const {state, ...actions} = overlayStore()
 
@@ -42,7 +40,7 @@ export const PrivacyConfirmationWrapper = ({
   return (
     <RegistrationModalBody>
       <PrivacyConfirmation
-        appName={appName}
+        appName={internalConfig.title}
         privacyLevelOnChange={actions.setPrivacyLevel}
         selectedPrivacyLevel={value}
       />
