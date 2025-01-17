@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { createRoot } from 'react-dom/client'
+import ReactDOM from 'react-dom'
 import Bridge from '../../../bridge'
 
 export default function (ed, document) {
@@ -29,10 +29,8 @@ export default function (ed, document) {
       document.body.appendChild(container)
     }
 
-    const root = createRoot(container)
-
     const handleDismiss = () => {
-      root.unmount()
+      ReactDOM.unmountComponentAtNode(container)
       ed.focus(false)
     }
 
@@ -40,6 +38,6 @@ export default function (ed, document) {
       Bridge.insertEmbedCode(embedCode)
     }
 
-    root.render(<Embed onSubmit={handleEmbedCode} onDismiss={handleDismiss} />)
+    ReactDOM.render(<Embed onSubmit={handleEmbedCode} onDismiss={handleDismiss} />, container)
   })
 }

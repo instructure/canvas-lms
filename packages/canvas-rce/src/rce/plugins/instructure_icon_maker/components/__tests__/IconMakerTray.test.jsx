@@ -33,11 +33,12 @@ jest.mock('../../svg/font')
 jest.mock('../../../../../rcs/api')
 jest.mock('../../../shared/StoreContext')
 jest.mock('../../utils/useDebouncedValue', () =>
-  jest.requireActual('../../utils/__tests__/useMockedDebouncedValue')
+  jest.requireActual('../../utils/__tests__/useMockedDebouncedValue'),
 )
-const startIconMakerUpload = jest
-  .fn()
-  .mockResolvedValue({url: 'https://uploaded.url', display_name: 'untitled.svg'})
+const startIconMakerUpload = jest.fn().mockResolvedValue({
+  url: 'https://uploaded.url',
+  display_name: 'untitled.svg',
+})
 
 useStoreProps.mockReturnValue({startIconMakerUpload})
 
@@ -95,7 +96,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       <>
         <button type="button">Outside button</button>
         <IconMakerTray {...defaults} />
-      </>
+      </>,
     )
 
     const addImageButton = getByText('Add Image')
@@ -214,7 +215,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       })
 
       expect(firstCall).toMatchInlineSnapshot(`
-        Object {
+        {
           "domElement": <svg
             fill="none"
             height="122px"
@@ -303,12 +304,14 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       it('with alt text when it is present', async () => {
         render(<IconMakerTray {...defaults} />)
 
-        fireEvent.change(document.querySelector('#icon-alt-text'), {target: {value: 'banana'}})
+        fireEvent.change(document.querySelector('#icon-alt-text'), {
+          target: {value: 'banana'},
+        })
         setIconColor('#000000')
         await fireEvent.click(screen.getByTestId('create-icon-button'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "STYLE": null,
             "alt_text": "banana",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
@@ -331,7 +334,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await fireEvent.click(screen.getByTestId('create-icon-button'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "STYLE": null,
             "alt_text": "",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
@@ -354,7 +357,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await fireEvent.click(screen.getByTestId('create-icon-button'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "STYLE": null,
             "alt_text": "",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
@@ -431,7 +434,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
           onClose={jest.fn()}
           editor={ed}
           canvasOrigin="https://canvas.instructor.com"
-        />
+        />,
       )
 
     it('loads the standard SVG metadata', async () => {
@@ -454,7 +457,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       ed = new FakeEditor()
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" src="https://canvas.instructure.com/svg" data-inst-icon-maker-icon="true" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
+        '<img id="test-image" src="https://canvas.instructure.com/svg" data-inst-icon-maker-icon="true" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />',
       )
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
     })
@@ -466,7 +469,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
           editing={true}
           editor={ed}
           canvasOrigin="https://canvas.instructure.com"
-        />
+        />,
       )
 
     beforeEach(() => {
@@ -548,7 +551,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       beforeEach(() => {
         // Add an image to the editor and select it
         ed.setContent(
-          '<img style="display:block; margin-left:auto; margin-right:auto;" width="156" height="134" id="test-image" src="https://canvas.instructure.com/svg" data-inst-icon-maker-icon="true" data-download-url="https://canvas.instructure.com/files/1/download" alt="one blue pine" />'
+          '<img style="display:block; margin-left:auto; margin-right:auto;" width="156" height="134" id="test-image" src="https://canvas.instructure.com/svg" data-inst-icon-maker-icon="true" data-download-url="https://canvas.instructure.com/files/1/download" alt="one blue pine" />',
         )
         ed.setSelectedNode(ed.dom.select('#test-image')[0])
       })
@@ -561,7 +564,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await fireEvent.click(getByTestId('icon-maker-save'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "STYLE": "display:block; margin-left:auto; margin-right:auto;",
             "alt_text": "one blue pine",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
