@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {waitFor} from '@testing-library/react'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import Lti2Edit from '../Lti2Edit'
@@ -51,7 +52,7 @@ describe('ExternalApps.Lti2Edit', () => {
     }
   })
 
-  test('renders', () => {
+  test('renders', async () => {
     const data = {
       tool: {
         app_id: 3,
@@ -65,8 +66,10 @@ describe('ExternalApps.Lti2Edit', () => {
       handleDeactivateLti2() {},
       handleCancel() {},
     }
-    const component = renderComponent(data)
-    expect(component).toBeTruthy() // Checks if component has rendered
-    expect(component).toBeInstanceOf(HTMLElement) // Check if component is rendered to DOM
+    renderComponent(data)
+    await waitFor(() => {
+      expect(document.getElementById('fixtures')).toBeTruthy() // Checks if component has rendered
+      expect(document.getElementById('fixtures')).toBeInstanceOf(HTMLElement) // Check if component is rendered to DOM
+    })
   })
 })

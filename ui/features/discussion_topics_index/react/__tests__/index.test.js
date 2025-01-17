@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {waitFor} from '@testing-library/react'
 import createAnnIndex from '../index'
 
 let app = null
@@ -41,16 +42,20 @@ describe('Discussions app', () => {
     container.innerHTML = ''
   })
 
-  test('mounts Discussions to container component', () => {
+  test('mounts Discussions to container component', async () => {
     app = createAnnIndex(container, defaultData())
     app.render()
-    ok(container.querySelector('.discussions-v2__wrapper'))
+    await waitFor(() => {
+      ok(container.querySelector('.discussions-v2__wrapper'))
+    })
   })
 
-  test('unmounts Discussions from container component', () => {
+  test('unmounts Discussions from container component', async () => {
     app = createAnnIndex(container, defaultData())
     app.render()
     app.unmount()
-    notOk(document.querySelector('.discussions-v2__wrapper'))
+    await waitFor(() => {
+      notOk(document.querySelector('.discussions-v2__wrapper'))
+    })
   })
 })
