@@ -114,7 +114,7 @@ describe('CreateFromTemplate', () => {
   // fickle; passes individually
   it.skip('filters on the tags', async () => {
     await renderComponent()
-    user.click(getByTagText('General Content').closest('button') as HTMLButtonElement)
+    await user.click(getByTagText('General Content').closest('button') as HTMLButtonElement)
 
     await waitFor(() => {
       expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(
@@ -122,7 +122,7 @@ describe('CreateFromTemplate', () => {
       )
     })
 
-    user.click(getByTagText('Home').closest('button') as HTMLButtonElement)
+    await user.click(getByTagText('Home').closest('button') as HTMLButtonElement)
 
     await waitFor(() => {
       expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(
