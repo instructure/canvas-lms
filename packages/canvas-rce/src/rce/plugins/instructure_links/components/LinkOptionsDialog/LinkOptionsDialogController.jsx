@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import ReactDOM from 'react-dom'
 import bridge from '../../../../../bridge'
 import {isOnlyTextSelected, getAnchorElement} from '../../../../contentInsertionUtils'
 import LinkOptionsDialog from './index'
@@ -30,7 +30,6 @@ export default class LinkOptionsDialogController {
     this._isOpen = false
     this._shouldOpen = false
     this._renderId = 0
-    this._root = null
   }
 
   get $container() {
@@ -69,10 +68,6 @@ export default class LinkOptionsDialogController {
   }
 
   _hasClosed = () => {
-    if (this._root) {
-      this._root.unmount()
-      this._root = null
-    }
     bridge.focusActiveEditor(false)
     this._isOpen = false
     this._editor.focus(false)
@@ -116,9 +111,6 @@ export default class LinkOptionsDialogController {
         open={this._shouldOpen}
       />
     )
-    if (!this._root) {
-      this._root = createRoot(this.$container)
-    }
-    this._root.render(element)
+    ReactDOM.render(element, this.$container)
   }
 }

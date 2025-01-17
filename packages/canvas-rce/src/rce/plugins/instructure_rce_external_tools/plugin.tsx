@@ -19,7 +19,7 @@
 import tinymce from 'tinymce'
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import ReactDOM from 'react-dom'
 import {
   RceToolWrapper,
   buildToolMenuItems,
@@ -77,8 +77,8 @@ function registerFavoriteAppsToolbarButtons(editor: ExternalToolsEditor) {
   externalToolsForToolbar(allTools).forEach(toolInfo =>
     editor.ui.registry.addButton(
       `instructure_external_button_${toolInfo.id}`,
-      toolInfo.asToolbarButton(),
-    ),
+      toolInfo.asToolbarButton()
+    )
   )
 }
 
@@ -105,14 +105,16 @@ function openToolSelectionDialog(editor: ExternalToolsEditor) {
   const availableTools = RceToolWrapper.forEditorEnv(externalToolsEnvFor(editor))
 
   const container = ensureToolDialogContainerElem()
-  const root = createRoot(container)
 
   const handleDismiss = () => {
-    root.unmount()
+    ReactDOM.unmountComponentAtNode(container)
     editor.focus()
   }
 
-  root.render(<ExternalToolSelectionDialog onDismiss={handleDismiss} ltiButtons={availableTools} />)
+  ReactDOM.render(
+    <ExternalToolSelectionDialog onDismiss={handleDismiss} ltiButtons={availableTools} />,
+    ensureToolDialogContainerElem()
+  )
 }
 
 function makeViewAllItem(editor: ExternalToolsEditor): ExternalToolMenuItem {

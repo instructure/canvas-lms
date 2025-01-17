@@ -100,6 +100,6 @@ export default function (editor: Editor) {
       positionTarget={target}
       onCancel={handleDismiss}
       onChange={handleChange}
-    />
+    />,
   )
 }

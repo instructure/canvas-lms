@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
-import {waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import FakeEditor from './FakeEditor'
 import Bridge from '../../bridge'
 import * as indicateModule from '../../common/indicate'
@@ -56,8 +55,7 @@ function createBasicElement(opts) {
 function createMountedElement(additionalProps = {}) {
   const rceRef = React.createRef()
   const container = document.getElementById('container')
-  const root = createRoot(container)
-  root.render(
+  const retval = render(
     <RCEWrapper
       ref={rceRef}
       defaultContent="an example string"
@@ -69,12 +67,9 @@ function createMountedElement(additionalProps = {}) {
       canvasOrigin={canvasOrigin}
       {...trayProps()}
       {...additionalProps}
-    />
+    />,
+    {container}
   )
-  const retval = {
-    container,
-    unmount: () => root.unmount()
-  }
   rce = rceRef.current
   editor = rce.mceInstance()
   jest.spyOn(rce, 'indicateEditor').mockReturnValue(undefined)
@@ -453,7 +448,7 @@ describe('RCEWrapper', () => {
           }
 
           rce.checkImageLoadError(fakeElement)
-          expect(Object.keys(fakeElement.style)).toHaveLength(0)
+          expect(Object.keys(fakeElement.style).length).toEqual(0)
           fakeElement.complete = true
           fakeElement.onload()
           await waitFor(() => {
@@ -689,7 +684,7 @@ describe('RCEWrapper', () => {
         text: alertmsg1,
         variant: 'error',
       })
-      expect(getAllByText(alertmsg1)).toHaveLength(1)
+      expect(getAllByText(alertmsg1).length).toEqual(1)
     })
 
     it('removes an alert when removeAlert is called', () => {
@@ -1101,7 +1096,7 @@ describe('RCEWrapper', () => {
 
     it('renders them all if no max is set', done => {
       renderAnotherRCE(() => {
-        expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(3)
+        expect(document.querySelectorAll('.rce-wrapper').length).toEqual(3)
         done()
       })
     })
@@ -1109,7 +1104,7 @@ describe('RCEWrapper', () => {
     it('renders them all if maxInitRenderedRCEs is <0', done => {
       renderAnotherRCE(
         () => {
-          expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(3)
+          expect(document.querySelectorAll('.rce-wrapper').length).toEqual(3)
           done()
         },
         {maxInitRenderedRCEs: -1}
@@ -1119,7 +1114,7 @@ describe('RCEWrapper', () => {
     it('limits them to maxInitRenderedRCEs value', done => {
       renderAnotherRCE(
         () => {
-          expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(2)
+          expect(document.querySelectorAll('.rce-wrapper').length).toEqual(2)
           done()
         },
         {maxInitRenderedRCEs: 2}
@@ -1131,7 +1126,7 @@ describe('RCEWrapper', () => {
 
       renderAnotherRCE(
         () => {
-          expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(3)
+          expect(document.querySelectorAll('.rce-wrapper').length).toEqual(3)
           done()
         },
         {maxInitRenderedRCEs: 2}
