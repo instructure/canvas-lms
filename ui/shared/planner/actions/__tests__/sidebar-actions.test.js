@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import moxios from 'moxios'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
@@ -94,20 +92,16 @@ describe('load items', () => {
   })
 
   it('dispatches SIDEBAR_ITEMS_LOADED with the proper payload on success', async () => {
-    const today = moment.tz('2018-01-01', 'UTC')
-    const thunk = Actions.sidebarLoadInitialItems(today)
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     const promise = thunk(fakeDispatch, mockGetState())
 
-    const response = {
+    await moxiosRespond([{uniqueId: 1}, {uniqueId: 2}], promise, {
       status: 200,
       headers: {
         link: '</>; rel="current"',
       },
-      response: [{uniqueId: 1}, {uniqueId: 2}],
-    }
-
-    await moxiosRespond(response.response, promise, response)
+    })
 
     const expected = {
       type: 'SIDEBAR_ITEMS_LOADED',
@@ -117,20 +111,16 @@ describe('load items', () => {
   })
 
   it('dispatches SIDEBAR_ITEMS_LOADED with the proper url on success', async () => {
-    const today = moment.tz('2018-01-01', 'UTC')
-    const thunk = Actions.sidebarLoadInitialItems(today)
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     const promise = thunk(fakeDispatch, mockGetState())
 
-    const response = {
+    await moxiosRespond([{uniqueId: 1}, {uniqueId: 2}], promise, {
       status: 200,
       headers: {
         link: '</>; rel="next"',
       },
-      response: [{uniqueId: 1}, {uniqueId: 2}],
-    }
-
-    await moxiosRespond(response.response, promise, response)
+    })
 
     const expected = {
       type: 'SIDEBAR_ITEMS_LOADED',
@@ -140,18 +130,14 @@ describe('load items', () => {
   })
 
   it('dispatches SIDEBAR_ENOUGH_ITEMS_LOADED when initial load gets them all', async () => {
-    const today = moment.tz('2018-01-01', 'UTC')
-    const thunk = Actions.sidebarLoadInitialItems(today)
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     const promise = thunk(fakeDispatch, mockGetState({nextUrl: null}))
 
-    const response = {
+    await moxiosRespond([{uniqueId: 1}, {uniqueId: 2}], promise, {
       status: 200,
-      headers: {}, // no link header means we got them all
-      response: [{uniqueId: 1}, {uniqueId: 2}],
-    }
-
-    await moxiosRespond(response.response, promise, response)
+      headers: {},
+    })
 
     const expected = {
       type: 'SIDEBAR_ITEMS_LOADED',
@@ -162,8 +148,7 @@ describe('load items', () => {
   })
 
   it('continues to load if there are less than 14 incomplete items loaded', async () => {
-    const today = moment.tz('2018-01-01', 'UTC')
-    const thunk = Actions.sidebarLoadInitialItems(today)
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     const fetchPromise = thunk(
       fakeDispatch,
@@ -216,14 +201,10 @@ describe('load items', () => {
       }),
     )
     await moxiosRespond([], secondFetchPromise)
-
-    // make sure we got here because another load happened.
-    // test times out if we don't get here.
   })
 
   it('stops loading when it gets 14 incomplete items', async () => {
-    const today = moment.tz('2018-01-01', 'UTC')
-    const thunk = Actions.sidebarLoadInitialItems(today)
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     const fetchPromise = thunk(
       fakeDispatch,
@@ -252,8 +233,7 @@ describe('load items', () => {
   })
 
   it('finishes loading even when there are less then 5 incomplete items', async () => {
-    const today = moment.tz('2018-01-01', 'UTC')
-    const thunk = Actions.sidebarLoadInitialItems(today)
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     const fetchPromise = thunk(
       fakeDispatch,
@@ -278,17 +258,13 @@ describe('load items', () => {
   })
 
   it('dispatches SIDEBAR_ITEMS_LOADING_FAILED on failure', async () => {
-    const today = moment.tz('2018-01-01', 'UTC')
-    const thunk = Actions.sidebarLoadInitialItems(today)
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
     const promise = thunk(fakeDispatch, mockGetState())
 
-    const response = {
+    await moxiosRespond({error: 'Something terrible'}, promise, {
       status: 500,
-      response: {error: 'Something terrible'},
-    }
-
-    await moxiosRespond(response.response, promise, response)
+    })
 
     expect(fakeDispatch).toHaveBeenCalledWith(
       expect.objectContaining({type: 'SIDEBAR_ITEMS_LOADING_FAILED', error: true}),
@@ -302,7 +278,6 @@ describe('fetch more items', () => {
     const mockGs = mockGetState({nextUrl: '/', items: generateItems(13)})
     const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
     await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, mockGs)
-
     expect(mockDispatch).toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
   })
 
@@ -311,7 +286,6 @@ describe('fetch more items', () => {
     const gs = mockGetState({nextUrl: '/', items: generateItems(14)})
     const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
     await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs)
-
     expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
   })
 
@@ -320,7 +294,6 @@ describe('fetch more items', () => {
     const gs = mockGetState({nextUrl: null})
     const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
     await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs)
-
     expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
   })
 })
