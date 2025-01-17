@@ -408,6 +408,18 @@ describe "people" do
       wait_for_ajaximations
       expect(f(".conclude_enrollment_link")).to be_displayed
     end
+
+    it "does not show selection checkboxes for teachers when differentiation_tags feature flag is OFF" do
+      Account.site_admin.disable_feature!(:differentiation_tags)
+      get "/courses/#{@course.id}/users/"
+      expect(f("body")).not_to contain_jqcss("input[id^='select-user-']")
+    end
+
+    it "shows selection checkboxes for teachers when differentiation_tags feature flag is ON" do
+      Account.site_admin.enable_feature!(:differentiation_tags)
+      get "/courses/#{@course.id}/users/"
+      expect(f("body")).to contain_jqcss("input[id^='select-user-']")
+    end
   end
 
   context "people as a TA" do
@@ -417,6 +429,12 @@ describe "people" do
 
     before do
       user_session @ta
+    end
+
+    it "does not show selection checkboxes for tas even when differentiation_tags feature flag is ON (they do not have differentiation tag permission by default)" do
+      Account.site_admin.enable_feature!(:differentiation_tags)
+      get "/courses/#{@course.id}/users/"
+      expect(f("body")).not_to contain_jqcss("input[id^='select-user-']")
     end
 
     it "validates that the TA cannot delete or reset course" do

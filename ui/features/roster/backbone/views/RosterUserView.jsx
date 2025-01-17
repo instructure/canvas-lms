@@ -50,6 +50,7 @@ export default class RosterUserView extends Backbone.View {
       'click .admin-links [data-event]': 'handleMenuEvent',
       'focus *': 'focus',
       'blur *': 'blur',
+      'change .select-user-checkbox': 'handleCheckboxChange',
     }
   }
 
@@ -108,6 +109,7 @@ export default class RosterUserView extends Backbone.View {
     json.canLinkStudents = json.isObserver && !ENV.course.concluded
     json.canViewLoginIdColumn = ENV.permissions.view_user_logins
     json.canViewSisIdColumn = ENV.permissions.read_sis
+    json.canManageDifferentiationTags = ENV.permissions.can_manage_differentiation_tags
 
     const candoAdminActions = ENV.permissions.can_allow_course_admin_actions
 
@@ -296,6 +298,26 @@ export default class RosterUserView extends Backbone.View {
     e.preventDefault()
     const method = $(e.currentTarget).data('event')
     return this[method].call(this, e)
+  }
+
+  // you can access the selected users through RosterUserView.selectedUsers
+  static selectedUsers = []
+
+  handleCheckboxChange(e) {
+    const isChecked = $(e.currentTarget).is(':checked')
+    const userId = this.model.id
+
+    if (isChecked) {
+      RosterUserView.selectedUsers.push(userId)
+    } else {
+      RosterUserView.selectedUsers = RosterUserView.selectedUsers.filter(id => id !== userId)
+    }
+
+    this.trigger('userSelectionChanged', {
+      model: this.model,
+      selected: isChecked,
+      selectedUsers: RosterUserView.selectedUsers,
+    })
   }
 
   focus() {

@@ -92,7 +92,8 @@ class ContextController < ApplicationController
         active_granular_enrollment_permissions: get_active_granular_enrollment_permissions(@context),
         read_reports: @context.grants_right?(@current_user, session, :read_reports),
         can_add_groups: can_do(@context.groups.temp_record, @current_user, :create),
-        can_allow_course_admin_actions: @context.grants_right?(@current_user, session, :allow_course_admin_actions)
+        can_allow_course_admin_actions: @context.grants_right?(@current_user, session, :allow_course_admin_actions),
+        can_manage_differentiation_tags: @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
       }
 
       js_env({
