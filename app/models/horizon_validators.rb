@@ -27,6 +27,9 @@ module HorizonValidators
       unless invalid_types.empty?
         record.errors.add(:submission_types, "Invalid submission type for Horizon course: #{invalid_types}")
       end
+      if record.peer_reviews
+        record.errors.add(:peer_reviews, "Peer reviews are disabled")
+      end
     end
   end
 end

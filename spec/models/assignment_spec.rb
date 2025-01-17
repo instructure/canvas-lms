@@ -12174,5 +12174,9 @@ describe Assignment do
     it "does not accept invalid submission types" do
       expect { assignment_model(submission_types: "online_url", course: @course) }.to raise_error(ActiveRecord::RecordInvalid)
     end
+
+    it "does not accept peer reviews" do
+      expect { assignment_model(peer_reviews: true, course: @course) }.to raise_error(ActiveRecord::RecordInvalid)
+    end
   end
 end

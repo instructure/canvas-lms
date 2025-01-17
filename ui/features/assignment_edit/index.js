@@ -92,7 +92,7 @@ ready(() => {
       assignmentGroupSelector,
       gradingTypeSelector,
       ...(!ENV.horizon_course && {groupCategorySelector}),
-      peerReviewsSelector,
+      ...(!ENV.horizon_course && {peerReviewsSelector}),
       views: {
         'js-assignment-overrides': new DueDateOverride({
           model: dueDateList,
