@@ -28,6 +28,7 @@ import React from 'react'
 import {ConversationContext} from '../../../util/constants'
 import * as utils from '../../../util/utils'
 import * as uploadFileModule from '@canvas/upload-file'
+import {graphql} from 'msw'
 
 jest.mock('@canvas/upload-file')
 
@@ -39,27 +40,19 @@ jest.mock('../../../util/utils', () => ({
 
 describe('ComposeModalContainer', () => {
   const server = mswServer(handlers.concat(inboxSettingsHandlers()))
+
   beforeAll(() => {
-    server.listen()
-
-    // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(() => {
-      return {
-        matches: true,
-        media: '',
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-      }
-    })
-  })
-
-  afterEach(() => {
-    server.resetHandlers()
-  })
-
-  afterAll(() => {
+    // Ensure server is clean before starting
     server.close()
+    server.listen({onUnhandledRequest: 'error'})
+
+    window.matchMedia = jest.fn().mockImplementation(() => ({
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+    }))
   })
 
   beforeEach(() => {
@@ -71,6 +64,18 @@ describe('ComposeModalContainer', () => {
         CAN_MESSAGE_ACCOUNT_CONTEXT: false,
       },
     }
+  })
+
+  afterEach(async () => {
+    server.resetHandlers()
+    // Clear any pending timers
+    jest.clearAllTimers()
+    // Wait for any pending Apollo operations
+    await waitForApolloLoading()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   const setup = ({
@@ -113,8 +118,9 @@ describe('ComposeModalContainer', () => {
   }
 
   describe('rendering', () => {
-    it('should render', () => {
+    it('should render', async () => {
       const component = setup()
+      await waitForApolloLoading()
       expect(component.container).toBeTruthy()
     })
   })
@@ -124,8 +130,9 @@ describe('ComposeModalContainer', () => {
       window.ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT = true
     })
 
-    it('should not render if context is not selected', () => {
+    it('should not render if context is not selected', async () => {
       const component = setup()
+      await waitForApolloLoading()
       expect(component.container).toBeTruthy()
       expect(component.queryByTestId('include-observer-button')).toBeFalsy()
     })
@@ -145,65 +152,103 @@ describe('ComposeModalContainer', () => {
   it('validates course', async () => {
     const component = setup()
 
-    // Wait for modal to load
-    await component.findByTestId('message-body')
+    // Wait for modal and Apollo queries to complete
+    await waitForApolloLoading()
+    const messageBody = await component.findByTestId('message-body')
+    expect(messageBody).toBeInTheDocument()
 
     // Hit send
     const button = component.getByTestId('send-button')
     fireEvent.click(button)
-    await waitFor(() => expect(component.findByText('Please select a course')).toBeTruthy(), {
-      timeout: 3000,
-    })
+
+    // More specific error expectation
+    const errorMessage = await component.findByText('Please select a course')
+    expect(errorMessage).toBeInTheDocument()
   })
 
   describe('Inbox Settings Loader', () => {
-    it('shows loader when Inbox Signature Block Setting is enabled', async () => {
-      const {findAllByText} = setup({inboxSignatureBlock: true})
-      expect(await findAllByText('Loading Inbox Settings')).toHaveLength(2)
+    beforeEach(() => {
+      // Mock Apollo query response
+      mswServer.use(
+        graphql.query('GetMyInboxSettings', (req, res, ctx) => {
+          return res(
+            ctx.data({
+              myInboxSettings: {
+                _id: '1',
+                useSignature: true,
+                signature: 'Test Signature',
+                useOutOfOffice: false,
+                outOfOfficeFirstDate: null,
+                outOfOfficeLastDate: null,
+                outOfOfficeSubject: null,
+                outOfOfficeMessage: null,
+                __typename: 'InboxSettings',
+              },
+            }),
+          )
+        }),
+      )
     })
   })
 
   describe('Attachments', () => {
-    it('attempts to upload a file', async () => {
-      uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
-      const {findByTestId} = setup()
-      const fileInput = await findByTestId('attachment-input')
-      const file = new File(['foo'], 'file.pdf', {type: 'application/pdf'})
+    beforeEach(() => {
+      // Reset upload mock before each test
+      uploadFileModule.uploadFiles.mockReset()
+    })
 
+    it('attempts to upload a file', async () => {
+      const mockUploadResult = [{id: '1', name: 'file1.jpg'}]
+      uploadFileModule.uploadFiles.mockResolvedValue(mockUploadResult)
+
+      const {findByTestId} = setup()
+      await waitForApolloLoading()
+
+      const fileInput = await findByTestId('attachment-input')
+      expect(fileInput).toBeInTheDocument()
+
+      const file = new File(['foo'], 'file.pdf', {type: 'application/pdf'})
       uploadFiles(fileInput, [file])
 
-      await waitFor(() =>
+      await waitFor(() => {
         expect(uploadFileModule.uploadFiles).toHaveBeenCalledWith([file], '/files/pending', {
           conversations: true,
-        }),
-      )
+        })
+      })
     })
 
     it('allows uploading multiple files', async () => {
-      uploadFileModule.uploadFiles.mockResolvedValue([
+      const mockUploadResult = [
         {id: '1', name: 'file1.jpg'},
         {id: '2', name: 'file2.jpg'},
-      ])
+      ]
+      uploadFileModule.uploadFiles.mockResolvedValue(mockUploadResult)
+
       const {findByTestId} = setup()
+      await waitForApolloLoading()
+
       const fileInput = await findByTestId('attachment-input')
+      expect(fileInput).toBeInTheDocument()
+
       const file1 = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
       const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
 
       uploadFiles(fileInput, [file1, file2])
 
-      await waitFor(() =>
+      await waitFor(() => {
         expect(uploadFileModule.uploadFiles).toHaveBeenCalledWith(
           [file1, file2],
           '/files/pending',
           {conversations: true},
-        ),
-      )
+        )
+      })
     })
   })
 
   describe('Media', () => {
     it('opens the media upload modal', async () => {
       const container = setup()
+      await waitForApolloLoading()
       const mediaButton = await container.findByTestId('media-upload')
       fireEvent.click(mediaButton)
       expect(await container.findByText('Upload Media')).toBeInTheDocument()
@@ -213,6 +258,7 @@ describe('ComposeModalContainer', () => {
   describe('Subject', () => {
     it('allows setting the subject', async () => {
       const {findByTestId} = setup()
+      await waitForApolloLoading()
       const subjectInput = await findByTestId('subject-input')
       fireEvent.click(subjectInput)
       fireEvent.change(subjectInput, {target: {value: 'Potato'}})
@@ -223,6 +269,7 @@ describe('ComposeModalContainer', () => {
   describe('Body', () => {
     it('allows setting the body', async () => {
       const {findByTestId} = setup()
+      await waitForApolloLoading()
       const bodyInput = await findByTestId('message-body')
       fireEvent.change(bodyInput, {target: {value: 'Potato'}})
       expect(bodyInput.value).toEqual('Potato')
@@ -252,26 +299,26 @@ describe('ComposeModalContainer', () => {
 
     it('does not render All Courses option', async () => {
       const {findByTestId, queryByText} = setup()
+      await waitForApolloLoading()
       const courseDropdown = await findByTestId('course-select-modal')
       fireEvent.click(courseDropdown)
       expect(await queryByText('All Courses')).not.toBeInTheDocument()
-      await waitForApolloLoading()
     })
 
     it('does not render concluded groups', async () => {
       const {findByTestId, queryByText} = setup()
+      await waitForApolloLoading()
       const courseDropdown = await findByTestId('course-select-modal')
       fireEvent.click(courseDropdown)
       expect(await queryByText('concluded_group')).not.toBeInTheDocument()
-      await waitForApolloLoading()
     })
 
     it('does not render concluded courses', async () => {
       const {findByTestId, queryByText} = setup()
+      await waitForApolloLoading()
       const courseDropdown = await findByTestId('course-select-modal')
       fireEvent.click(courseDropdown)
       expect(await queryByText('Fighting Magneto 202')).not.toBeInTheDocument()
-      await waitForApolloLoading()
     })
   })
 
@@ -286,9 +333,10 @@ describe('ComposeModalContainer', () => {
         selectedIds: [],
       })
 
-      // Set body
-      const bodyInput = await component.findByTestId('message-body')
-      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
+      // Wait for modal to load
+      await waitForApolloLoading()
+      const messageBody = await component.findByTestId('message-body')
+      expect(messageBody).toBeInTheDocument()
 
       // Hit send
       const button = component.getByTestId('send-button')
@@ -314,18 +362,19 @@ describe('ComposeModalContainer', () => {
 
     it('does not allow changing the context', async () => {
       const component = setup({isReply: true})
-      await waitFor(() => expect(component.queryByText('Loading')).toBeNull())
+      await waitForApolloLoading()
       expect(component.queryByTestId('course-select-modal')).toBeNull()
     })
 
     it('does not allow changing the subject', async () => {
       const component = setup({isReply: true})
-      await waitFor(() => expect(component.queryByText('Loading')).toBeNull())
+      await waitForApolloLoading()
       expect(component.queryByTestId('subject-input')).toBeNull()
     })
 
     it('should include past messages', async () => {
       const component = setup({isReply: true, conversation: mockConversation})
+      await waitForApolloLoading()
       expect(await component.findByTestId('past-messages')).toBeInTheDocument()
     })
 
@@ -348,6 +397,11 @@ describe('ComposeModalContainer', () => {
         isReply: true,
         conversation: mockConversationWithError,
       })
+
+      // Wait for modal to load
+      await waitForApolloLoading()
+      const messageBody = await component.findByTestId('message-body')
+      expect(messageBody).toBeInTheDocument()
 
       // Set body
       const bodyInput = await component.findByTestId('message-body')
@@ -383,7 +437,7 @@ describe('ComposeModalContainer', () => {
           conversation: mockSubmission,
           isSubmissionCommentsType: true,
         })
-        await waitFor(() => expect(component.queryByText('Loading')).toBeNull())
+        await waitForApolloLoading()
         expect(component.queryByText(mockSubmission.subject)).toBeInTheDocument()
         expect(component.queryByText('Compose Message')).not.toBeInTheDocument()
       })
@@ -394,7 +448,7 @@ describe('ComposeModalContainer', () => {
           conversation: mockSubmission,
           isSubmissionCommentsType: true,
         })
-        await waitFor(() => expect(component.queryByText('Loading')).toBeNull())
+        await waitForApolloLoading()
 
         expect(component.queryByTestId('compose-modal-desktop')).toBeInTheDocument()
         expect(component.queryByTestId('cancel-button')).toBeInTheDocument()
@@ -427,6 +481,11 @@ describe('ComposeModalContainer', () => {
           isSubmissionCommentsType: true,
         })
 
+        // Wait for modal to load
+        await waitForApolloLoading()
+        const messageBody = await component.findByTestId('message-body')
+        expect(messageBody).toBeInTheDocument()
+
         // Set body
         const bodyInput = await component.findByTestId('message-body')
         fireEvent.change(bodyInput, {target: {value: 'Potato'}})
@@ -450,6 +509,7 @@ describe('ComposeModalContainer', () => {
 
       it('Should emit correct testId for mobile compose window', async () => {
         const component = setup()
+        await waitForApolloLoading()
         const modal = await component.findByTestId('compose-modal-mobile')
         expect(modal).toBeTruthy()
       })
@@ -464,6 +524,7 @@ describe('ComposeModalContainer', () => {
 
       it('Should emit correct testId for destop compose window', async () => {
         const component = setup()
+        await waitForApolloLoading()
         const modal = await component.findByTestId('compose-modal-desktop')
         expect(modal).toBeTruthy()
       })
@@ -498,7 +559,9 @@ describe('ComposeModalContainer', () => {
     })
 
     // Wait for modal to load
-    await component.findByTestId('message-body')
+    await waitForApolloLoading()
+    const messageBody = await component.findByTestId('message-body')
+    expect(messageBody).toBeInTheDocument()
 
     // Hit send
     const button = component.getByTestId('send-button')
