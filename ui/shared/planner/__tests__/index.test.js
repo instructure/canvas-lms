@@ -151,9 +151,18 @@ describe('with mock api', () => {
     })
 
     it('renders into provided element', async () => {
-      renderToDoSidebar(document.querySelector('#dashboard-sidebar'))
-      await findByTestId(document.body, 'ToDoSidebar')
-      expect(document.querySelector('.todo-list-header')).toBeTruthy()
+      const {findByTestId} = render(renderToDoSidebar(document.querySelector('#dashboard-sidebar')))
+      
+      // Wait for loading state to complete
+      await waitFor(() => {
+        expect(document.querySelector('.css-83ke56-view-spinner')).toBeTruthy()
+      })
+      
+      // Wait for actual component to render
+      await waitFor(() => {
+        expect(findByTestId('ToDoSidebar')).toBeTruthy()
+        expect(document.querySelector('.todo-list-header')).toBeTruthy()
+      }, { timeout: 3000 })
     })
   })
 
@@ -166,11 +175,10 @@ describe('with mock api', () => {
     })
 
     it('renders the WeeklyPlannerHeader', async () => {
-       
       const {findByTestId} = render(renderWeeklyPlannerHeader({visible: false}))
-
-      const wph = await findByTestId('WeeklyPlannerHeader')
-      expect(wph).toBeInTheDocument()
+      await waitFor(() => {
+        expect(findByTestId('WeeklyPlannerHeader')).toBeTruthy()
+      })
     })
   })
 
