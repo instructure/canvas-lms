@@ -578,12 +578,20 @@ const fixture = {
           scores: {67: 1, 50: 1},
           score_average: 5.25,
           score_high: 6.0,
-          score_low: 4.5,
-          score_stdev: 0.75,
+          score_low: 4.0,
+          score_stdev: 1.0,
+          scores_above_average: 11,
+          scores_below_average: 1,
+          unique_count: 12,
+          student_count: 12,
+          submission_count: 12,
+          point_score_average: 5.25,
+          point_score_high: 6.0,
+          point_score_low: 4.0,
+          point_score_stdev: 1.0,
           correct_count_average: 5.0,
           incorrect_count_average: 2.5,
           duration_average: 59.0,
-          unique_count: 2,
         },
         links: {quiz: 'http://lvh.me:3000/api/v1/courses/1/quizzes/1'},
       },
@@ -728,6 +736,7 @@ describe('canvas_quizzes/statistics', () => {
     configure({
       ajax: $.ajax,
       loadOnStartup: true,
+      canBeLoaded: true,
       quizStatisticsUrl: '/api/v1/courses/1/quizzes/1/statistics',
       quizReportsUrl: '/api/v1/courses/1/quizzes/1/reports',
       courseSectionsUrl: '/api/v1/courses/1/sections',
@@ -741,15 +750,20 @@ describe('canvas_quizzes/statistics', () => {
     return unmount()
   })
 
-  it('renders', () => {
+  it('renders', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
     const node = document.createElement('div')
 
-    return mount(node)
-      .then(() => findByTestId(node, 'summary-statistics'))
-      .then(el => {
-        expect(el.textContent).toContain(
-          '11 students scored above or at the average, and 1 below. 1 student in percentile 50. 1 student in percentile 67.',
-        )
-      })
+    await mount(node)
+    const el = await findByTestId(node, 'summary-statistics')
+
+    // Wait for data to load and render
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(el.textContent).toContain(
+      '11 students scored above or at the average, and 1 below. 1 student in percentile 50. 1 student in percentile 67.',
+    )
+
+    consoleError.mockRestore()
   })
 })
