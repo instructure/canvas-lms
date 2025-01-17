@@ -1,4 +1,4 @@
-## Instructions
+# Modernize React code
 
 Prepare a file for React 19. In version 19 the following were removed:
 

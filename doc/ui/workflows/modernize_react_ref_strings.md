@@ -1,4 +1,4 @@
-## Instructions
+# Migrate from React string refs
 
 Identify any string refs in the component, e.g., `ref="someRef"`.
 
