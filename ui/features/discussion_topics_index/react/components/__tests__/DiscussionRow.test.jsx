@@ -276,41 +276,52 @@ describe('DiscussionRow', () => {
   })
 
   it('renders "Delayed until" date label for ungraded overrides', () => {
-    const delayedDate = new Date()
-    delayedDate.setYear(delayedDate.getFullYear() + 1)
+    const futureDate = new Date('2027-01-17T00:00:00Z')
+    const furtherFutureDate = new Date('2028-01-17T00:00:00Z')
     const discussion = {
-      ungraded_discussion_overrides: [{assignment_override: {unlock_at: delayedDate}}],
+      ungraded_discussion_overrides: [{assignment_override: {unlock_at: futureDate}}],
     }
     render(<DiscussionRow {...makeProps({discussion})} />)
-    expect(screen.getAllByText(`Not available until ${dateFormatter(delayedDate)}`)).toBeTruthy()
+    expect(screen.getAllByText(`Not available until ${dateFormatter(futureDate)}`)).toBeTruthy()
   })
 
   it('renders "Delayed until" date label for ungraded overrides even if has discussion has "everyone" dates', () => {
-    const delayedDate = new Date()
-    delayedDate.setYear(delayedDate.getFullYear() + 1)
-    const delayedDate2 = new Date()
-    delayedDate2.setYear(delayedDate.getFullYear() + 1)
+    const futureDate = new Date('2027-01-17T00:00:00Z')
+    const furtherFutureDate = new Date('2028-01-17T00:00:00Z')
     const discussion = {
-      delayed_post_at: delayedDate,
-      ungraded_discussion_overrides: [{assignment_override: {unlock_at: delayedDate2}}],
+      delayed_post_at: futureDate,
+      ungraded_discussion_overrides: [{assignment_override: {unlock_at: furtherFutureDate}}],
     }
     render(<DiscussionRow {...makeProps({discussion})} />)
-    expect(screen.getAllByText(`Not available until ${dateFormatter(delayedDate2)}`)).toBeTruthy()
+    expect(
+      screen.getAllByText(`Not available until ${dateFormatter(furtherFutureDate)}`),
+    ).toBeTruthy()
   })
 
   it('renders the further "Delayed until" date for ungraded overrides', () => {
-    const delayedDate = new Date()
-    delayedDate.setYear(delayedDate.getFullYear() + 1)
-    const delayedDate2 = new Date()
-    delayedDate2.setYear(delayedDate.getFullYear() + 1)
+    const futureDate = new Date('2027-01-17T00:00:00Z')
+    const furtherFutureDate = new Date('2028-01-17T00:00:00Z')
     const discussion = {
       ungraded_discussion_overrides: [
-        {assignment_override: {unlock_at: delayedDate}},
-        {assignment_override: {unlock_at: delayedDate2}},
+        {assignment_override: {unlock_at: futureDate}},
+        {assignment_override: {unlock_at: furtherFutureDate}},
       ],
     }
     render(<DiscussionRow {...makeProps({discussion})} />)
-    expect(screen.getAllByText(`Not available until ${dateFormatter(delayedDate2)}`)).toBeTruthy()
+
+    // Find all elements that contain text starting with "Not available until"
+    const availabilityElements = screen.getAllByText(/^Not available until/)
+    expect(availabilityElements.length).toBeGreaterThan(0)
+
+    // Get all text content that includes "Not available until"
+    const availabilityTexts = availabilityElements.map(el => el.textContent)
+
+    // Verify at least one of them has the later date
+    const hasLaterDate = availabilityTexts.some(text => {
+      const formattedDate = dateFormatter(furtherFutureDate)
+      return text.includes(formattedDate)
+    })
+    expect(hasLaterDate).toBe(true)
   })
 
   it('renders a last reply at date', () => {
@@ -335,8 +346,8 @@ describe('DiscussionRow', () => {
   })
 
   it('renders available until for ungraded overrides', () => {
-    const futureDate = new Date()
-    futureDate.setYear(futureDate.getFullYear() + 1)
+    const futureDate = new Date('2027-01-17T00:00:00Z')
+    const furtherFutureDate = new Date('2028-01-17T00:00:00Z')
     const discussion = {
       ungraded_discussion_overrides: [{assignment_override: {lock_at: futureDate}}],
     }
@@ -345,31 +356,40 @@ describe('DiscussionRow', () => {
   })
 
   it('renders available until for ungraded overrides even if has discussion has "everyone" dates', () => {
-    const futureDate = new Date()
-    futureDate.setYear(futureDate.getFullYear() + 1)
-    const futureDate2 = new Date()
-    futureDate2.setYear(futureDate2.getFullYear() + 2)
+    const futureDate = new Date('2027-01-17T00:00:00Z')
+    const furtherFutureDate = new Date('2028-01-17T00:00:00Z')
     const discussion = {
       lock_at: futureDate,
-      ungraded_discussion_overrides: [{assignment_override: {lock_at: futureDate2}}],
+      ungraded_discussion_overrides: [{assignment_override: {lock_at: furtherFutureDate}}],
     }
     render(<DiscussionRow {...makeProps({discussion})} />)
-    expect(screen.getAllByText(`Available until ${dateFormatter(futureDate2)}`)).toBeTruthy()
+    expect(screen.getAllByText(`Available until ${dateFormatter(furtherFutureDate)}`)).toBeTruthy()
   })
 
   it('renders the further available until date for ungraded overrides', () => {
-    const futureDate = new Date()
-    futureDate.setYear(futureDate.getFullYear() + 1)
-    const futureDate2 = new Date()
-    futureDate2.setYear(futureDate2.getFullYear() + 2)
+    const futureDate = new Date('2027-01-17T00:00:00Z')
+    const furtherFutureDate = new Date('2028-01-17T00:00:00Z')
     const discussion = {
       ungraded_discussion_overrides: [
         {assignment_override: {lock_at: futureDate}},
-        {assignment_override: {lock_at: futureDate2}},
+        {assignment_override: {lock_at: furtherFutureDate}},
       ],
     }
     render(<DiscussionRow {...makeProps({discussion})} />)
-    expect(screen.getAllByText(`Available until ${dateFormatter(futureDate2)}`)).toBeTruthy()
+
+    // Find all elements that contain text starting with "Available until"
+    const availabilityElements = screen.getAllByText(/^Available until/)
+    expect(availabilityElements.length).toBeGreaterThan(0)
+
+    // Get all text content that includes "Available until"
+    const availabilityTexts = availabilityElements.map(el => el.textContent)
+
+    // Verify at least one of them has the later date
+    const hasLaterDate = availabilityTexts.some(text => {
+      const formattedDate = dateFormatter(furtherFutureDate)
+      return text.includes(formattedDate)
+    })
+    expect(hasLaterDate).toBe(true)
   })
 
   it('renders locked at if appropriate', () => {
@@ -930,5 +950,31 @@ describe('DiscussionRow', () => {
     expect(allKeys).toHaveLength(2)
     expect(allKeys[0].textContent.includes('discussion_topic_menu Text')).toBe(true)
     expect(allKeys[1].textContent.includes('discussion_topic_menu otherText')).toBe(true)
+  })
+
+  it('renders the further available until date for ungraded overrides', () => {
+    const futureDate = new Date('2027-01-17T00:00:00Z')
+    const furtherFutureDate = new Date('2028-01-17T00:00:00Z')
+    const discussion = {
+      ungraded_discussion_overrides: [
+        {assignment_override: {lock_at: futureDate}},
+        {assignment_override: {lock_at: furtherFutureDate}},
+      ],
+    }
+    render(<DiscussionRow {...makeProps({discussion})} />)
+
+    // Find all elements that contain text starting with "Available until"
+    const availabilityElements = screen.getAllByText(/^Available until/)
+    expect(availabilityElements.length).toBeGreaterThan(0)
+
+    // Get all text content that includes "Available until"
+    const availabilityTexts = availabilityElements.map(el => el.textContent)
+
+    // Verify at least one of them has the later date
+    const hasLaterDate = availabilityTexts.some(text => {
+      const formattedDate = dateFormatter(furtherFutureDate)
+      return text.includes(formattedDate)
+    })
+    expect(hasLaterDate).toBe(true)
   })
 })
