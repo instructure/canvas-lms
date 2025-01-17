@@ -242,7 +242,7 @@ export function resetPlanner() {
 }
 
 function loading() {
-  return <Spinner renderTitle="Loading..." size="small" />
+  return <Spinner renderTitle="Loading..." size="small" data-testid="todo-sidebar-spinner" />
 }
 
 export function createPlannerApp() {
