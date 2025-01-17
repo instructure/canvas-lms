@@ -1,3 +1,5 @@
+# Improve TypeScript files
+
 ## Find a test file to work on
 
 git ls-files "ui/" | grep -E "\\.test\\.(ts|tsx)$" | xargs wc -l | awk '$1 <= 400 {print $2}' | xargs grep -El "@ts-ignore|@ts-nocheck|@ts-expect-error" | shuf -n 1
