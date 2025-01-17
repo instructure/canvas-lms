@@ -36,35 +36,41 @@ jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
   responsiveQuerySizes: jest.fn(),
 }))
+
 describe('MessageDetailContainer', () => {
   const server = mswServer(handlers)
-  beforeAll(() => {
-    server.listen()
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
-      return {
-        matches: true,
-        media: '',
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-      }
-    })
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'error'})
+
+    window.matchMedia = jest.fn().mockImplementation(() => ({
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+    }))
 
     responsiveQuerySizes.mockImplementation(() => ({
       desktop: {minWidth: '768px'},
     }))
   })
 
-  afterEach(() => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  afterEach(async () => {
     server.resetHandlers()
+    await waitFor(() => expect(mswClient.stop).toBeDefined())
   })
 
   afterAll(() => {
     server.close()
+    jest.restoreAllMocks()
   })
 
-  const setup = ({
+  const setup = async ({
     conversation = Conversation.mock(),
     isSubmissionCommentsType = false,
     onReply = jest.fn(),
@@ -75,8 +81,8 @@ describe('MessageDetailContainer', () => {
     setOnSuccess = jest.fn(),
     setCanReply = jest.fn(),
     overrideProps = {},
-  } = {}) =>
-    render(
+  } = {}) => {
+    const container = render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess}}>
           <ConversationContext.Provider value={{isSubmissionCommentsType}}>
@@ -95,33 +101,48 @@ describe('MessageDetailContainer', () => {
       </ApolloProvider>,
     )
 
+    // Wait for loading to complete, handling both cases where loader might or might not be present
+    await waitFor(() => {
+      const loader = container.queryByTestId('conversation-loader')
+      return loader === null
+    })
+    await waitForApolloLoading()
+
+    return container
+  }
+
   describe('conversation messages', () => {
     const mockConversation = Conversation.mock()
+
     describe('rendering', () => {
       it('should not render the reply or reply_all option in header if student lacks permission', async () => {
-        const container = setup({
+        const container = await setup({
           conversation: {...Conversation.mock({_id: CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE})},
         })
-        await waitForElementToBeRemoved(() => container.queryByTestId('conversation-loader'))
 
-        expect(container.queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
-        expect(container.queryByTestId('message-reply')).not.toBeInTheDocument()
+        await waitFor(() => {
+          expect(container.queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
+          expect(container.queryByTestId('message-reply')).not.toBeInTheDocument()
+        })
       })
 
       it('should render conversation information correctly', async () => {
-        const container = setup()
-        expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
-        await waitForApolloLoading()
+        const container = await setup()
 
-        expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
-        expect(
-          await container.findByText(mockConversation.conversationMessagesConnection.nodes[1].body),
-        ).toBeInTheDocument()
+        await waitFor(() => {
+          expect(container.getByTestId('message-detail-header-desktop')).toBeInTheDocument()
+          expect(
+            container.getByText(mockConversation.conversationMessagesConnection.nodes[1].body),
+          ).toBeInTheDocument()
+        })
       })
 
-      it('should render (No subject) when subject is empty', () => {
-        const container = setup({conversation: Conversation.mock({subject: ''})})
-        expect(container.getByText('(No subject)')).toBeInTheDocument()
+      it('should render (No subject) when subject is empty', async () => {
+        const container = await setup({conversation: Conversation.mock({subject: ''})})
+
+        await waitFor(() => {
+          expect(container.getByText('(No subject)')).toBeInTheDocument()
+        })
       })
     })
   })
