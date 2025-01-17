@@ -20,9 +20,7 @@ import CourseRestoreModel from './backbone/models/CourseRestore'
 import UserRestoreModel from './backbone/models/UserRestore'
 import AdminToolsView from './backbone/views/AdminToolsView'
 import RestoreContentPaneView from './backbone/views/RestoreContentPaneView'
-import CourseSearchFormView from './backbone/views/CourseSearchFormView'
 import CourseSearchResultsView from './backbone/views/CourseSearchResultsView'
-import UserSearchFormView from './backbone/views/UserSearchFormView'
 import UserSearchResultsView from './backbone/views/UserSearchResultsView'
 import LoggingContentPaneView from './backbone/views/LoggingContentPaneView'
 import InputFilterView from '@canvas/backbone-input-filter-view'
@@ -85,9 +83,7 @@ ready(() => {
     },
     restoreContentPaneView: new RestoreContentPaneView({
       permissions: ENV.PERMISSIONS,
-      courseSearchFormView: new CourseSearchFormView({model: courseRestoreModel}),
       courseSearchResultsView: new CourseSearchResultsView({model: courseRestoreModel}),
-      userSearchFormView: new UserSearchFormView({model: userRestoreModel}),
       userSearchResultsView: new UserSearchResultsView({model: userRestoreModel}),
     }),
     messageContentPaneView: messagesContentView,
