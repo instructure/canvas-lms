@@ -118,20 +118,15 @@ describe('CyoeStats', () => {
   it('renders components in the correct places when mastery paths enabled', async () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
     const {graphsRoot} = initCyoeStats()
-
-    // Wait for the component to render
     await waitFor(() => {
       expect(graphsRoot.getElementsByClassName('crs-breakdown-graph')).toHaveLength(1)
     })
-
     consoleError.mockRestore()
   })
 
   it('does not render components when mastery paths not enabled', async () => {
     window.ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
     const {graphsRoot} = initCyoeStats()
-
-    // Wait for any potential rendering
     await waitFor(() => {
       expect(graphsRoot.getElementsByClassName('crs-breakdown-graph')).toHaveLength(0)
     })
@@ -140,8 +135,6 @@ describe('CyoeStats', () => {
   it('does not render if there is no rule defined', async () => {
     window.ENV.CONDITIONAL_RELEASE_ENV.rule = null
     const {graphsRoot} = initCyoeStats()
-
-    // Wait for any potential rendering
     await waitFor(() => {
       expect(graphsRoot.getElementsByClassName('crs-breakdown-graph')).toHaveLength(0)
     })

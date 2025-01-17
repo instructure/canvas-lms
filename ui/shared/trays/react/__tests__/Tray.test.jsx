@@ -43,7 +43,7 @@ describe('CanvasTray', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore()  
+      console.error.mockRestore()
     })
 
     it('has an error boundary in case the children throw', () => {

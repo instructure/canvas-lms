@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import { act } from 'react-dom/test-utils'
+import {waitFor} from '@testing-library/dom'
 import SpeedGraderLink from '../index'
 
 const container = document.createElement('div')
@@ -34,9 +34,13 @@ describe('SpeedGraderLink', () => {
   let root
 
   async function mountComponent() {
-    await act(async () => {
-      root = createRoot($container)
-      root.render(<SpeedGraderLink {...context} />)
+    root = createRoot($container)
+    root.render(<SpeedGraderLink {...context} />)
+    // Using React.act causes some very strange test failures due to some kind of
+    // leakage. Be warned if you try to change over to using it and make sure this
+    // file still passes even when run with all other tests.
+    await waitFor(() => {
+      expect(getLink()).toBeInTheDocument()
     })
   }
 
