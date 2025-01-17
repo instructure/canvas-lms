@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import CyoeStats from '../index'
 
 const defaultEnv = {
@@ -115,22 +115,35 @@ describe('CyoeStats', () => {
     return {graphsRoot}
   }
 
-  it('renders components in the correct places when mastery paths enabled', () => {
+  it('renders components in the correct places when mastery paths enabled', async () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
     const {graphsRoot} = initCyoeStats()
-    expect(graphsRoot.getElementsByClassName('crs-breakdown-graph')).toHaveLength(1)
+
+    // Wait for the component to render
+    await waitFor(() => {
+      expect(graphsRoot.getElementsByClassName('crs-breakdown-graph')).toHaveLength(1)
+    })
+
     consoleError.mockRestore()
   })
 
-  it('does not render components when mastery paths not enabled', () => {
+  it('does not render components when mastery paths not enabled', async () => {
     window.ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
     const {graphsRoot} = initCyoeStats()
-    expect(graphsRoot.getElementsByClassName('crs-breakdown-graph')).toHaveLength(0)
+
+    // Wait for any potential rendering
+    await waitFor(() => {
+      expect(graphsRoot.getElementsByClassName('crs-breakdown-graph')).toHaveLength(0)
+    })
   })
 
-  it('does not render if there is no rule defined', () => {
+  it('does not render if there is no rule defined', async () => {
     window.ENV.CONDITIONAL_RELEASE_ENV.rule = null
     const {graphsRoot} = initCyoeStats()
-    expect(graphsRoot.getElementsByClassName('crs-breakdown-graph')).toHaveLength(0)
+
+    // Wait for any potential rendering
+    await waitFor(() => {
+      expect(graphsRoot.getElementsByClassName('crs-breakdown-graph')).toHaveLength(0)
+    })
   })
 })
