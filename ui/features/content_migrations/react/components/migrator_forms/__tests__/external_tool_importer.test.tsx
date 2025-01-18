@@ -114,7 +114,11 @@ describe('ExternalToolImporter', () => {
     await userEvent.click(getByRole('button', {name: 'Find a Course'}))
     sendPostMessage(externalContentReady())
 
-    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    await waitFor(() => {
+      expect(getByRole('button', {name: 'Add to Import Queue', hidden: true})).toBeInTheDocument()
+    })
+
+    await userEvent.click(getByRole('button', {name: 'Add to Import Queue', hidden: true}))
 
     expect(onSubmit).toHaveBeenCalledWith({
       settings: {file_url: exampleUrl},
@@ -129,7 +133,7 @@ describe('ExternalToolImporter', () => {
       await userEvent.click(getByRole('button', {name: 'Find a Course'}))
       sendPostMessage(externalContentReady({contentItems: [{url: null, text: 'example'}]}))
 
-      await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+      await userEvent.click(getByRole('button', {name: 'Add to Import Queue', hidden: true}))
 
       expect(onSubmit).not.toHaveBeenCalled()
     })
