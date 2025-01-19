@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -37,6 +38,7 @@ import PublishIconButton from './PublishIconButton'
 import RightsIconButton from './RightsIconButton'
 import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
+import BulkActionButtons from './BulkActionButtons'
 
 const I18n = createI18nScope('files_v2')
 
@@ -193,8 +195,27 @@ const FileFolderTable = ({
     return true
   })
 
+  const renderTableActionsHead = () => {
+    return (
+      <Flex gap="small" margin="0 0 medium" height={38}>
+        <Flex.Item shouldGrow={true}>
+          {/* // TODO: this is a placeholder for the breadcrumbs */}
+          <Text>English 101 Files</Text>
+        </Flex.Item>
+
+        <Flex.Item>
+          <BulkActionButtons selectedRows={selectedRows}
+                             totalRows={rows.length}
+                             userCanEditFilesForContext={userCanEditFilesForContext}
+                             userCanDeleteFilesForContext={userCanDeleteFilesForContext} />
+        </Flex.Item>
+      </Flex>
+    )
+  }
+
   return (
     <>
+      {renderTableActionsHead()}
       <Table
         caption={I18n.t('Files and Folders')}
         hover={true}

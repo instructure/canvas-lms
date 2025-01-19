@@ -220,4 +220,26 @@ describe('FileFolderTable', () => {
       ).toBeInTheDocument()
     })
   })
+
+  describe('FileFolderTable - bulk actions behavior', () => {
+    it('disabled buttons when elements are not selected', async () => {
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], {overwriteRoutes: true, delay: 0})
+      renderComponent()
+
+      expect(screen.queryByText('0 selected')).toBeInTheDocument()
+    })
+
+    it('display enabled buttons when one or more elements are selected', async () => {
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true, delay: 0})
+      renderComponent()
+
+      const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
+      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+
+      fireEvent.click(selectAllCheckbox)
+      rowCheckboxes.forEach(checkbox => expect(checkbox).toBeChecked())
+
+      expect(await screen.getByText('1 of 1 selected')).toBeInTheDocument()
+    })
+  })
 })
