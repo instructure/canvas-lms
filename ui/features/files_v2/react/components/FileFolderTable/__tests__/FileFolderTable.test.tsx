@@ -29,11 +29,12 @@ import {FileManagementContext} from '../../Contexts'
 const defaultProps = {
   size: 'large' as 'large' | 'small' | 'medium',
   userCanEditFilesForContext: true,
+  userCanDeleteFilesForContext: true,
   usageRightsRequiredForContext: false,
   paginationLinks: {},
   onLoadingStatusChange: jest.fn(),
   currentUrl:
-    '/api/v1/folders/1/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string',
+    '/api/v1/folders/1/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status',
   onPaginationLinkChange: jest.fn(),
 }
 

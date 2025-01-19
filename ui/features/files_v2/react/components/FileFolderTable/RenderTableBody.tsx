@@ -32,6 +32,7 @@ const renderTableBody = (
   columnRenderers: Record<string, Function>,
   toggleRowSelection: (id: string) => void,
   userCanEditFilesForContext: boolean,
+  userCanDeleteFilesForContext: boolean,
   usageRightsRequiredForContext: boolean,
 ) => {
   return rows.map(row => {
@@ -48,15 +49,16 @@ const renderTableBody = (
       </Table.RowHeader>,
       ...columnHeaders.map(column => (
         <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
-          {columnRenderers[column.id](
-            row,
-            isStacked,
-            userCanEditFilesForContext,
-            usageRightsRequiredForContext,
-            size,
-            isSelected,
-            () => toggleRowSelection(row.id),
-          )}
+          {columnRenderers[column.id]({
+            row: row,
+            isStacked: isStacked,
+            userCanEditFilesForContext: userCanEditFilesForContext,
+            userCanDeleteFilesForContext: userCanDeleteFilesForContext,
+            usageRightsRequiredForContext: usageRightsRequiredForContext,
+            size: size,
+            isSelected: isSelected,
+            toggleSelect: () => toggleRowSelection(row.id),
+          })}
         </Table.Cell>
       )),
     ]

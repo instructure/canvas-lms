@@ -53,7 +53,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
 
     const currentFolder = folders[folders.length - 1]
     const folderId = currentFolder.id
-    const initialUrl = `/api/v1/folders/${folderId}/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string`
+    const initialUrl = `/api/v1/folders/${folderId}/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
 
     setCurrentUrl(initialUrl)
     setDiscoveredPages({1: initialUrl})
@@ -103,6 +103,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
           <FileFolderTable
             size={size}
             userCanEditFilesForContext={userCanEditFilesForContext}
+            userCanDeleteFilesForContext={userCanDeleteFilesForContext}
             usageRightsRequiredForContext={usageRightsRequiredForContext}
             currentUrl={currentUrl}
             onPaginationLinkChange={handlePaginationLinkChange}

@@ -66,43 +66,67 @@ const columnHeaders: ColumnHeader[] = [
 ]
 
 const columnRenderers: {
-  [key: string]: (
-    row: File | Folder,
-    isStacked: boolean,
-    userCanEditFilesForContext: boolean,
-    usageRightsRequiredForContext: boolean,
-    size: 'small' | 'medium' | 'large',
-    isSelected: boolean,
-    toggleSelect: () => void,
-  ) => React.ReactNode
+  [key: string]: ({
+    row,
+    isStacked,
+    userCanEditFilesForContext,
+    userCanDeleteFilesForContext,
+    usageRightsRequiredForContext,
+    size,
+    isSelected,
+    toggleSelect,
+  }: {
+    row: File | Folder
+    isStacked: boolean
+    userCanEditFilesForContext: boolean
+    userCanDeleteFilesForContext: boolean
+    usageRightsRequiredForContext: boolean
+    size: 'small' | 'medium' | 'large'
+    isSelected: boolean
+    toggleSelect: () => void
+  }) => React.ReactNode
 } = {
-  name: (row, isStacked) => <NameLink isStacked={isStacked} item={row} />,
-  created: row => <FriendlyDatetime dateTime={row.created_at} />,
-  lastModified: row => <FriendlyDatetime dateTime={row.updated_at} />,
-  modifiedBy: row =>
+  name: ({row, isStacked}) => <NameLink isStacked={isStacked} item={row} />,
+  created: ({row}) => <FriendlyDatetime dateTime={row.created_at} />,
+  lastModified: ({row}) => <FriendlyDatetime dateTime={row.updated_at} />,
+  modifiedBy: ({row}) =>
     'user' in row && row.user?.display_name ? (
       <Link isWithinText={false} href={row.user.html_url}>
         <TruncateText>{row.user.display_name}</TruncateText>
       </Link>
     ) : null,
-  size: row =>
+  size: ({row}) =>
     'size' in row ? <Text>{friendlyBytes(row.size)}</Text> : <Text>{I18n.t('--')}</Text>,
-  rights: (row, _isStacked, userCanEditFilesForContext, usageRightsRequiredForContext) =>
+  rights: ({row, userCanEditFilesForContext, usageRightsRequiredForContext}) =>
     row.folder_id && usageRightsRequiredForContext ? (
       <RightsIconButton
         usageRights={row.usage_rights}
         userCanEditFilesForContext={userCanEditFilesForContext}
       />
     ) : null,
-  published: (row, _isStacked, userCanEditFilesForContext) => (
+  published: ({row, userCanEditFilesForContext}) => (
     <PublishIconButton item={row} userCanEditFilesForContext={userCanEditFilesForContext} />
   ),
-  actions: (_row, isStacked) => <ActionMenuButton isStacked={isStacked} />,
+  actions: ({
+    row,
+    size,
+    userCanEditFilesForContext,
+    userCanDeleteFilesForContext,
+    usageRightsRequiredForContext
+  }) => 
+    <ActionMenuButton 
+      size={size}
+      userCanEditFilesForContext={userCanEditFilesForContext}
+      userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+      usageRightsRequiredForContext={usageRightsRequiredForContext}
+      row={row}
+      />,
 }
 
 interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
   userCanEditFilesForContext: boolean
+  userCanDeleteFilesForContext: boolean
   usageRightsRequiredForContext: boolean
   currentUrl: string
   onPaginationLinkChange: (links: Record<string, string>) => void
@@ -112,6 +136,7 @@ interface FileFolderTableProps {
 const FileFolderTable = ({
   size,
   userCanEditFilesForContext,
+  userCanDeleteFilesForContext,
   usageRightsRequiredForContext,
   currentUrl,
   onPaginationLinkChange,
@@ -197,6 +222,7 @@ const FileFolderTable = ({
             columnRenderers,
             toggleRowSelection,
             userCanEditFilesForContext,
+            userCanDeleteFilesForContext,
             usageRightsRequiredForContext,
           )}
         </Table.Body>
