@@ -32,15 +32,21 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 const I18n = createI18nScope('react_developer_keys')
 
 export default class AdditionalSettings extends React.Component {
+
   constructor(props) {
     super(props)
-
     this.state = {
       additionalSettings: {
         ...omit(props.additionalSettings, ['settings']),
         ...props.additionalSettings.settings,
       },
       custom_fields: this.customFieldsToString(props.custom_fields),
+    }
+    if(!this.state.additionalSettings.domain){
+      this.state.additionalSettings.domain = ''
+    }
+    if(!this.state.additionalSettings.tool_id){
+      this.state.additionalSettings.tool_id = ''
     }
   }
 
@@ -60,21 +66,16 @@ export default class AdditionalSettings extends React.Component {
 
   generateToolConfigurationPart = () => {
     const {custom_fields, additionalSettings} = this.state
-    const extension = {
-      platform: 'canvas.instructure.com',
-      settings: {
-        ...omitBy(omit(additionalSettings, ['domain', 'tool_id', 'privacy_level']), s => !s),
-      },
-    }
-    if (additionalSettings.domain) {
-      extension.domain = additionalSettings.domain
-    }
-    if (additionalSettings.tool_id) {
-      extension.tool_id = additionalSettings.tool_id
-    }
-    extension.privacy_level = additionalSettings.privacy_level || 'anonymous'
     return {
-      extensions: [extension],
+      extensions: [{
+        platform: 'canvas.instructure.com',
+        settings: {
+          ...omitBy(omit(additionalSettings, ['domain', 'tool_id', 'privacy_level']), s => !s),
+        },
+        privacy_level: additionalSettings.privacy_level || 'anonymous',
+        domain: additionalSettings.domain,
+        tool_id: additionalSettings.tool_id,
+      }],
       custom_fields: this.customFieldsToObject(custom_fields),
     }
   }
