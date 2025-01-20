@@ -32,4 +32,10 @@ module HorizonValidators
       end
     end
   end
+
+  class GroupValidator < ActiveModel::Validator
+    def validate(record)
+      record.errors.add(:groups, "Can not add groups to Horizon course")
+    end
+  end
 end
