@@ -19,7 +19,6 @@
 import React, {type ChangeEvent} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {ErrorFormMessage} from '@canvas/content-migrations'
 
 export const ConfiguredTextInput = ({
   label,
@@ -37,8 +36,8 @@ export const ConfiguredTextInput = ({
   const generateErrorMessage = (message: string): FormMessage[] => {
     return [
       {
-        text: <ErrorFormMessage>{message}</ErrorFormMessage>,
-        type: 'error',
+        text: message,
+        type: 'newError',
       },
     ]
   }
