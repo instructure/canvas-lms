@@ -22,7 +22,6 @@ import {Text} from '@instructure/ui-text'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {ErrorFormMessage} from '@canvas/content-migrations'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {timeZonedFormMessages} from '@canvas/content-migrations/react/CommonMigratorControls/timeZonedFormMessages'
 
@@ -56,8 +55,8 @@ export const ConfiguredDateInput = ({
   const generateErrorMessage = (message: string): FormMessage[] => {
     return [
       {
-        text: <ErrorFormMessage>{message}</ErrorFormMessage>,
-        type: 'error',
+        text: message,
+        type: 'newError',
       },
     ]
   }
