@@ -21,7 +21,7 @@ import CanvasMultiSelect from '@canvas/multi-select/react'
 import {View} from '@instructure/ui-view'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PropTypes from '@canvas/permissions/react/propTypes'
+import PropTypes from 'prop-types'
 
 const I18n = createI18nScope('discussion_posts')
 
