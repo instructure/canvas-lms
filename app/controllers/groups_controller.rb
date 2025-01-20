@@ -325,6 +325,10 @@ class GroupsController < ApplicationController
     end
 
     unless api_request?
+      if @context.is_a?(Course) && @context.horizon_course?
+        redirect_to named_context_url(@context, :course_users_path)
+        return
+      end
       # The Groups end-point relies on the People's tab configuration since it's a subsection of it.
       return unless tab_enabled?(Course::TAB_PEOPLE)
 
