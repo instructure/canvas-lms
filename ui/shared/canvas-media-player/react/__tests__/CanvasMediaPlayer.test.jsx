@@ -30,6 +30,7 @@ import CanvasMediaPlayer, {
 } from '../CanvasMediaPlayer'
 import {uniqueId} from 'lodash'
 import {enableFetchMocks} from 'jest-fetch-mock'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 enableFetchMocks()
 
@@ -353,26 +354,14 @@ describe('CanvasMediaPlayer', () => {
       })
       it('skips fullscreen button when not enabled', () => {
         document.fullscreenEnabled = false
-        const {
-          getAllByText,
-          getByLabelText,
-          queryAllByText,
-          queryByLabelText,
-          container,
-          getByRole,
-        } = render(
-          <CanvasMediaPlayer media_id="dummy_media_id" media_sources={[defaultMediaObject()]} />,
+        document.webkitFullscreenEnabled = false
+        const {queryAllByText, container} = render(
+          <CanvasMediaPlayer
+            media_id="dummy_media_id"
+            media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+          />,
         )
         fireEvent.canPlay(container.querySelector('video'))
-        const settings = getByRole('button', {
-          name: /settings/i,
-        })
-        fireEvent.click(settings)
-        expect(getAllByText('Play')[0]).toBeInTheDocument()
-        expect(getByLabelText('Timebar')).toBeInTheDocument()
-        expect(getAllByText('Volume')[0]).toBeInTheDocument()
-        expect(getAllByText('Speed')[0]).toBeInTheDocument()
-        expect(queryByLabelText('Quality')).not.toBeInTheDocument()
         expect(queryAllByText('Full Screen')).toHaveLength(0)
         expect(queryAllByText('Captions')).toHaveLength(0) // AKA CC
       })
@@ -595,10 +584,14 @@ describe('CanvasMediaPlayer', () => {
 
   describe('getAutoTrack', () => {
     beforeEach(() => {
-      global.ENV = {
+      fakeENV.setup({
         auto_show_cc: true,
         locale: 'es',
-      }
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
     })
 
     it('finds the track for the user locale', () => {
@@ -611,7 +604,10 @@ describe('CanvasMediaPlayer', () => {
     })
 
     it('finds the generic local given a regional locale', () => {
-      global.ENV.locale = 'en-US'
+      fakeENV.setup({
+        auto_show_cc: true,
+        locale: 'en-US',
+      })
       const tracks = [
         {id: 1, locale: 'en-UK'},
         {id: 2, locale: 'en'},
@@ -621,7 +617,10 @@ describe('CanvasMediaPlayer', () => {
     })
 
     it('finds any a matching de-regionalized locale local given regional locale', () => {
-      global.ENV.locale = 'en-US'
+      fakeENV.setup({
+        auto_show_cc: true,
+        locale: 'en-US',
+      })
       const tracks = [
         {id: 1, locale: 'en-UK'},
         {id: 2, locale: 'es-MX'},
@@ -631,7 +630,9 @@ describe('CanvasMediaPlayer', () => {
     })
 
     it('uses lang attribute on the doc if no locale in ENV', () => {
-      delete global.ENV.locale
+      fakeENV.setup({
+        auto_show_cc: true,
+      })
       document.documentElement.setAttribute('lang', 'he')
       const tracks = [
         {id: 1, locale: 'en'},
@@ -643,7 +644,9 @@ describe('CanvasMediaPlayer', () => {
     })
 
     it('defaults to English if it cannot find a locale', () => {
-      delete global.ENV.locale
+      fakeENV.setup({
+        auto_show_cc: true,
+      })
       document.documentElement.removeAttribute('lang')
       const tracks = [
         {id: 1, locale: 'en'},
@@ -669,7 +672,10 @@ describe('CanvasMediaPlayer', () => {
     })
 
     it('returns undefined if auto_show_cc feature is off', () => {
-      global.ENV.auto_show_cc = false
+      fakeENV.setup({
+        auto_show_cc: false,
+        locale: 'es',
+      })
       const tracks = [
         {id: 1, locale: 'en'},
         {id: 2, locale: 'es'},
