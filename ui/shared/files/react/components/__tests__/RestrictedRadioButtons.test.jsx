@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import RestrictedRadioButtons from '../RestrictedRadioButtons'
 import Folder from '../../../backbone/models/Folder'
@@ -91,9 +91,12 @@ describe('RestrictedRadioButtons', () => {
     const user = userEvent.setup()
     renderComponent({radioStateChange})
 
-    await user.click(screen.getByLabelText('Publish'))
-
-    expect(radioStateChange).toHaveBeenCalled()
+    const unpublishOption = screen.getByLabelText('Unpublish')
+    await user.click(unpublishOption)
+    await waitFor(() => {
+      expect(unpublishOption).toBeChecked()
+      expect(radioStateChange).toHaveBeenCalled()
+    })
   })
 
   it('shows date fields when schedule availability is selected', async () => {
