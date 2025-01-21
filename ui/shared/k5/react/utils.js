@@ -188,7 +188,7 @@ export const getAssignmentGroupTotals = (
     )
   }
   return data.map(group => {
-    const assignments = group.assignments.map(a => ({
+    const assignments = (group.assignments || []).map(a => ({
       ...a,
       submission: getSubmission(a, observedUserId),
     }))
@@ -249,7 +249,7 @@ const formatGradeToRQD = (assignment, submission) => {
 export const getAssignmentGrades = (data, observedUserId) => {
   return data
     .map(group =>
-      group.assignments.reduce((assignments, a) => {
+      (group.assignments || []).reduce((assignments, a) => {
         if (a.hide_in_gradebook) return assignments
 
         const submission = getSubmission(a, observedUserId)
