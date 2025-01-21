@@ -178,6 +178,7 @@ lti_migration_info:
       state: allowed_on
 lti_oidc_missing_cookie_retry:
   state: hidden
+  shadow: true
   applies_to: RootAccount
   display_name: Retry LTI OIDC launches that fail due to missing cookies
   description: |-
