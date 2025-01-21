@@ -112,4 +112,15 @@ describe('SectionList', () => {
     moveOption.click()
     expect(await findByTestId('move-section-modal')).toBeInTheDocument()
   })
+
+  it('does not render profile button if no link if provided', async () => {
+    const {findByText, queryByText} = render(
+      <MockedQueryClientProvider client={queryClient}>
+        <SectionList portfolio={{...portfolio, profile_url: null}} isOwner={true} />
+      </MockedQueryClientProvider>,
+    )
+    expect(await findByText('First Section')).toBeInTheDocument()
+    const userProfileBtn = queryByText('User Profile')
+    expect(userProfileBtn).toBeNull()
+  })
 })
