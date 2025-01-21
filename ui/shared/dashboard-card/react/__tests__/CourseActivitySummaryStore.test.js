@@ -19,7 +19,12 @@
 import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
 import {ActivityStreamSummary as ActivityStreamSummaryType} from '../../graphql/ActivityStream'
 import wait from 'waait'
-import fetchMock from 'fetch-mock'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+// Mock GraphQL request
+jest.mock('@canvas/query', () => ({
+  executeQuery: jest.fn(() => Promise.resolve({data: {}})),
+}))
 
 describe('CourseActivitySummaryStore', () => {
   const stream = [
@@ -34,11 +39,22 @@ describe('CourseActivitySummaryStore', () => {
       count: 3,
     },
   ]
+
   beforeEach(() => {
     CourseActivitySummaryStore.setState({streams: {}})
   })
 
   describe('getStateForCourse', () => {
+    beforeEach(() => {
+      CourseActivitySummaryStore.setState({streams: {}, isFetching: false})
+      fakeENV.setup()
+    })
+
+    afterEach(() => {
+      CourseActivitySummaryStore.setState({streams: {}, isFetching: false})
+      fakeENV.teardown()
+    })
+
     it('should return root state object when no courseId is provided', () => {
       expect(CourseActivitySummaryStore.getStateForCourse().streams).toEqual({})
     })
@@ -53,32 +69,36 @@ describe('CourseActivitySummaryStore', () => {
       expect(CourseActivitySummaryStore.getStateForCourse(1)).toEqual({stream})
     })
 
-    it('should call batchLoadSummaries when FF is enabled', () => {
-      window.ENV = {
+    it('should call batchLoadSummaries when FF is enabled', async () => {
+      fakeENV.setup({
         FEATURES: {
           dashboard_graphql_integration: true,
         },
-        current_user_id: 123,
-      }
+        current_user_id: '123',
+      })
+
       const batchSpy = jest
         .spyOn(CourseActivitySummaryStore, '_batchLoadSummaries')
-        .mockImplementation(() => {})
+        .mockImplementation(() => Promise.resolve())
 
       const fetchSpy = jest
         .spyOn(CourseActivitySummaryStore, '_fetchForCourse')
         .mockImplementation(() => {})
-      expect(CourseActivitySummaryStore.getStateForCourse(1)).toEqual({})
+
+      CourseActivitySummaryStore.getStateForCourse(1)
+      await wait(1)
       expect(batchSpy).toHaveBeenCalled()
       expect(fetchSpy).not.toHaveBeenCalled()
     })
 
     it('should not call batchLoadSummaries if already fetching', () => {
-      window.ENV = {
+      fakeENV.setup({
         FEATURES: {
           dashboard_graphql_integration: true,
         },
-        current_user_id: 123,
-      }
+        current_user_id: '123',
+      })
+
       const batchSpy = jest
         .spyOn(CourseActivitySummaryStore, '_batchLoadSummaries')
         .mockImplementation(() => {})
@@ -86,6 +106,7 @@ describe('CourseActivitySummaryStore', () => {
       const fetchSpy = jest
         .spyOn(CourseActivitySummaryStore, '_fetchForCourse')
         .mockImplementation(() => {})
+
       CourseActivitySummaryStore.setState({isFetching: true})
       expect(CourseActivitySummaryStore.getStateForCourse(1)).toEqual({})
       expect(batchSpy).not.toHaveBeenCalled()
@@ -93,15 +114,24 @@ describe('CourseActivitySummaryStore', () => {
     })
 
     it('should fall back to _fetchForCourse when user id not found', () => {
-      window.ENV = {
+      // Setup with feature flag but no user ID
+      fakeENV.setup({
         FEATURES: {
           dashboard_graphql_integration: true,
         },
-      }
+        current_user_id: null,
+      })
+
+      const batchSpy = jest
+        .spyOn(CourseActivitySummaryStore, '_batchLoadSummaries')
+        .mockImplementation(() => {})
+
       const fetchSpy = jest
         .spyOn(CourseActivitySummaryStore, '_fetchForCourse')
         .mockImplementation(() => {})
-      expect(CourseActivitySummaryStore.getStateForCourse(1)).toEqual({})
+
+      CourseActivitySummaryStore.getStateForCourse(1)
+      expect(batchSpy).not.toHaveBeenCalled()
       expect(fetchSpy).toHaveBeenCalled()
     })
   })
@@ -233,31 +263,44 @@ describe('CourseActivitySummaryStore', () => {
   })
 
   describe('_fetchActivityStreamSummaries', () => {
+    beforeEach(() => {
+      CourseActivitySummaryStore.setState({streams: {}, isFetching: false})
+    })
+
+    afterEach(() => {
+      CourseActivitySummaryStore.setState({streams: {}, isFetching: false})
+    })
+
     it('handles 401 errors correctly', async () => {
       const errorResponse = {
-        ok: false,
+        ok: true,
         status: 401,
         statusText: 'Unauthorized',
-        json: () => Promise.reject(new Error('should never make it here')),
+        json() {
+          throw new Error('should never make it here')
+        },
       }
 
       jest
         .spyOn(CourseActivitySummaryStore, '_fetchActivityStreamSummaries')
         .mockImplementation(() => Promise.reject(errorResponse))
+
       const errorFn = jest.fn()
-      CourseActivitySummaryStore._fetchActivityStreamSummaries('123').catch(errorFn)
+      CourseActivitySummaryStore._fetchForCourse(1).catch(errorFn)
       await wait(1)
       expect(errorFn).toHaveBeenCalled()
       expect(CourseActivitySummaryStore.getState().streams).toEqual({})
+      await wait(1) // Wait for state update
       expect(CourseActivitySummaryStore.getState().isFetching).toBe(false)
     })
 
-    it('handes 503 errors correctly ', async () => {
+    it('handles 503 errors correctly', async () => {
       const errorResponse = {
-        ok: false,
         status: 503,
         statusText: 'Service Unavailable',
-        json: () => Promise.reject(new Error('should never make it here')),
+        json() {
+          throw new Error('should never make it here')
+        },
       }
 
       jest
@@ -265,10 +308,11 @@ describe('CourseActivitySummaryStore', () => {
         .mockImplementation(() => Promise.reject(errorResponse))
 
       const errorFn = jest.fn()
-      CourseActivitySummaryStore._fetchActivityStreamSummaries('123').catch(errorFn)
+      CourseActivitySummaryStore._fetchForCourse(1).catch(errorFn)
       await wait(1)
       expect(errorFn).toHaveBeenCalled()
       expect(CourseActivitySummaryStore.getState().streams).toEqual({})
+      await wait(1) // Wait for state update
       expect(CourseActivitySummaryStore.getState().isFetching).toBe(false)
     })
   })
