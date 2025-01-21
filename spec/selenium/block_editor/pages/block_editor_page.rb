@@ -178,6 +178,10 @@ module BlockEditorPage
     ".block-toolbar button:contains('Delete')"
   end
 
+  def block_toolbar_button
+    fj("#{group_block_inner_selector}:contains('Click me')")
+  end
+
   def block_toolbar_delete_button
     fj(block_toolbar_delete_button_selector)
   end
@@ -385,6 +389,22 @@ module BlockEditorPage
 
   def text_block_popup
     f("#rce-text-block-popup")
+  end
+
+  def editor_area
+    f("#editor-area")
+  end
+
+  def top_bar_action(action)
+    f("[data-testid='topbar-button-#{action}']")
+  end
+
+  def preview_modal_background_image
+    f(".block-editor-previewview")
+  end
+
+  def preview_modal_close_button
+    f("[data-testid='preview-modal-close-button']")
   end
 
   # Toolbox
