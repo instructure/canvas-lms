@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {waitFor} from '@testing-library/dom'
 import createPermissionsIndex from '../index'
 
 let app = null
@@ -27,15 +28,40 @@ const defaultData = () => ({
 })
 
 const indexContainer = document.createElement('div')
-document.body.appendChild(indexContainer)
+
+beforeEach(() => {
+  document.body.appendChild(indexContainer)
+})
+
+afterEach(() => {
+  if (app) {
+    app.unmount()
+    app = null
+  }
+  indexContainer.remove()
+})
+
+const waitForElement = async (selector, {timeout = 1000, interval = 50} = {}) => {
+  const startTime = Date.now()
+  while (Date.now() - startTime < timeout) {
+    const element = document.querySelector(selector)
+    if (element) return element
+    await new Promise(resolve => setTimeout(resolve, interval))
+  }
+  throw new Error(`Element ${selector} not found after ${timeout}ms`)
+}
 
 it('mounts/unmounts permissions to container component', async () => {
   app = createPermissionsIndex(indexContainer, defaultData())
   app.render()
-  // Allow for React 19 async rendering
-  await new Promise(resolve => setTimeout(resolve, 0))
-  expect(document.querySelector('.permissions-v2__wrapper')).not.toBeNull()
+
+  await waitFor(() =>
+    expect(document.querySelector('.permissions-v2__wrapper')).toBeInTheDocument(),
+  )
+
   app.unmount()
-  await new Promise(resolve => setTimeout(resolve, 0))
-  expect(document.querySelector('.permissions-v2__wrapper')).toBeNull()
+
+  await waitFor(() =>
+    expect(document.querySelector('.permissions-v2__wrapper')).not.toBeInTheDocument(),
+  )
 })
