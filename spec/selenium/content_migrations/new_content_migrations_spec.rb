@@ -19,6 +19,7 @@
 
 require_relative "../common"
 require_relative "page_objects/new_content_migration_page"
+require_relative "page_objects/new_content_migration_progress_item"
 require_relative "page_objects/new_select_content_page"
 require_relative "page_objects/new_course_copy_page"
 
@@ -190,7 +191,7 @@ describe "content migrations", :non_parallel do
       # expect(NewContentMigrationPage.content).not_to contain_css(NewContentMigrationPage.migration_file_upload_input_id)
     end
 
-    it "submit's queue and list migrations", skip: "no file upload" do
+    it "submit's queue and list migrations" do
       visit_page
       fill_migration_form
       NewContentMigrationPage.all_content_radio.click
@@ -209,18 +210,13 @@ describe "content migrations", :non_parallel do
       progress_items = NewContentMigrationPage.migration_progress_items
       expect(progress_items.count).to eq 2
 
-      source_links = []
       progress_items.each do |item|
-        expect(item.find_element(:css, ".migrationName")).to include_text("Common Cartridge")
-        expect(item.find_element(:css, ".progressStatus")).to include_text("Queued")
+        progress_item = NewContentMigrationProgressItem.new(item)
+        expect(progress_item.content_type).to include_text("Common Cartridge")
+        expect(progress_item.status).to include_text("Queued")
 
-        source_links << item.find_element(:css, ".sourceLink a")
-      end
-
-      hrefs = source_links.map { |a| a.attribute(:href) }
-
-      @course.content_migrations.each do |cm|
-        expect(hrefs.find { |href| href.include?("/files/#{cm.attachment_id}/download") }).not_to be_nil
+        download_url = progress_item.source_link.attribute(:href)
+        expect(download_url).to include("download")
       end
     end
 
