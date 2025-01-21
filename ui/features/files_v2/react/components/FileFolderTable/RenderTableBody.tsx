@@ -42,6 +42,7 @@ const renderTableBody = (
       <Table.RowHeader key="select">
         <Checkbox
           label=""
+          scope="row"
           size={size}
           checked={isSelected}
           onChange={() => toggleRowSelection(getUniqueId(row))}
@@ -49,7 +50,11 @@ const renderTableBody = (
         />
       </Table.RowHeader>,
       ...columnHeaders.map(column => (
-        <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
+        <Table.Cell
+          scope="row"
+          key={column.id}
+          textAlign={isStacked ? undefined : column.textAlign}
+        >
           {columnRenderers[column.id]({
             row: row,
             isStacked: isStacked,

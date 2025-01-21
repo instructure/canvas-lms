@@ -44,7 +44,10 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const showingAllContexts = filesEnv.showingAllContexts
   const [isTableLoading, setIsTableLoading] = useState(true)
   const [currentPageNumber, setCurrentPageNumber] = useState(1)
-  const [currentUrl, setCurrentUrl] = useState<string | null>(null)
+  const [baseUrl, setBaseUrl] = useState<string | null>(null)
+  const [sortBy, setSortBy] = useState<string>('name')
+  const [sortDirection, setSortDirection] = useState<string>('asc')
+  const [currentUrl, setCurrentUrl] = useState<string>('')
   const [discoveredPages, setDiscoveredPages] = useState<{[key: number]: string}>({})
   const folders = useLoaderData() as Folder[] | null
   const currentFolderWrapper = useRef<MainFolderWrapper | null>(null)
@@ -55,13 +58,14 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
 
     const currentFolder = folders[folders.length - 1]
     const folderId = currentFolder.id
-    const initialUrl = `/api/v1/folders/${folderId}/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
+    const baseUrl = `/api/v1/folders/${folderId}/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
 
-    setCurrentUrl(initialUrl)
-    setDiscoveredPages({1: initialUrl})
+    setBaseUrl(baseUrl)
+    setCurrentUrl(`${baseUrl}&sort=${sortBy}&order=${sortDirection}`)
+    setDiscoveredPages({1: baseUrl})
 
     currentFolderWrapper.current = new MainFolderWrapper(currentFolder)
-  }, [folders])
+  }, [folders, sortBy, sortDirection])
 
   if (!folders || folders.length === 0) {
     showFlashError(I18n.t('Failed to retrieve folder information'))
@@ -99,6 +103,15 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
     setCurrentUrl(discoveredPages[pageNumber])
   }
 
+  const handlePageReset = (newSortBy: string, newSortDirection: string) => {
+    setSortBy(newSortBy)
+    setSortDirection(newSortDirection)
+    const newInitialUrl = `${baseUrl}&sort=${newSortBy}&order=${newSortDirection}`
+    setCurrentUrl(newInitialUrl)
+    setCurrentPageNumber(1)
+    setDiscoveredPages({1: newInitialUrl})
+  }
+
   return (
     <FileManagementContext.Provider
       value={{
@@ -121,6 +134,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
             currentUrl={currentUrl}
             onPaginationLinkChange={handlePaginationLinkChange}
             onLoadingStatusChange={handleTableLoadingStatusChange}
+            onPageReset={handlePageReset}
           />
         )}
         <Flex padding="small none none none" justifyItems="space-between">

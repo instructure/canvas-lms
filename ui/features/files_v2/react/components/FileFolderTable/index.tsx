@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FileFolderTable from './FileFolderTable'
+import FileFolderTable, {type FileFolderTableProps} from './FileFolderTable'
 
 export default FileFolderTable
+export type {FileFolderTableProps}
