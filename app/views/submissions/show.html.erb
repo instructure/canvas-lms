@@ -22,6 +22,23 @@
     assessment_request: @assessment_request,
     current_host: request.host
   )
+
+  # Create additional presenters if this is a checkpointed parent
+  if @assignment.checkpoints_parent?
+    @reply_to_topic_presenter = Submission::ShowPresenter.new(
+      submission: @reply_to_topic_submission,
+      current_user: @current_user,
+      assessment_request: @assessment_request,
+      current_host: request.host
+    )
+    @reply_to_entry_presenter = Submission::ShowPresenter.new(
+      submission: @reply_to_entry_submission,
+      current_user: @current_user,
+      assessment_request: @assessment_request,
+      current_host: request.host
+    )
+  end
+
   submission_comments = @submission.visible_submission_comments_for(@current_user)
 
   if presenter.anonymize_submission_owner?
@@ -40,7 +57,7 @@
 
   show_updated_plagiarism_icons = @assignment.context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
 
-  js_env({
+  js_env_hash = {
     GRADING_TYPE: @assignment.grading_type,
     RUBRIC_ASSESSMENT: {
       assessment_type: assessment_type,
@@ -61,9 +78,38 @@
       end,
       **submission_owner_param
     },
+    CURRENT_USER_CAN_GRADE_SUBMISSION: can_do(@assignment, @current_user, :grade),
 
     :CUSTOM_GRADE_STATUSES => @assignment.course.custom_grade_statuses.as_json(include_root: false)
-  })
+  }
+
+  # Add checkpoint submission information if necessary
+  if @assignment.checkpoints_parent?
+    js_env_hash[:CHECKPOINT_SUBMISSIONS] = {
+      reply_to_topic: if @reply_to_topic_submission.user_can_read_grade?(@current_user, session)
+        @reply_to_topic_assignment.attributes.merge(
+          entered_grade: @reply_to_topic_presenter.entered_grade,
+          entered_score: @reply_to_topic_submission.entered_score,
+          points_possible: @reply_to_topic_assignment.points_possible,
+          submission_id: @reply_to_topic_submission.id
+        )
+      else
+        {}
+      end,
+      reply_to_entry: if @reply_to_entry_submission.user_can_read_grade?(@current_user, session)
+        @reply_to_entry_assignment.attributes.merge(
+          entered_grade: @reply_to_entry_presenter.entered_grade,
+          entered_score: @reply_to_entry_submission.entered_score,
+          points_possible: @reply_to_entry_assignment.points_possible,
+          submission_id: @reply_to_entry_submission.id
+        )
+      else
+        {}
+      end
+    }
+  end
+
+  js_env(js_env_hash)
   provide :page_title, join_title(@assignment.title, submission_author_name_for(@assessment_request))
   provide_blank :right_side
 %>
@@ -88,25 +134,29 @@
         <% if @submission.user_can_read_grade?(@current_user, session) %>
         <table class="grade-values">
           <tbody>
-            <tr>
-              <th><label for="student_grading_<%= @assignment.id %>"><%= I18n.t('Grade:') %></label></th>
-              <td class="bold">
-                <% if can_do(@assignment, @current_user, :grade) %>
-                  <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
-                <% else %>
-                  <span class="entered_grade">
-                    <% if @submission.excused? %>
-                      <%= t "Excused" %>
-                    <% else %>
-                      <%= i18n_grade(round_if_whole(presenter.entered_grade), @submission.grading_type) %>
-                    <% end %>
-                  </span>
-                <% end %>
-                <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible && !@assignment.restrict_quantitative_data?(@current_user) %>
-                  <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
-                <% end %>
-              </td>
-            </tr>
+            <% if @assignment.checkpoints_parent? %>
+              <div id="checkpoints-grade-inputs-mount-point">
+            <% else %>
+              <tr>
+                <th><label for="student_grading_<%= @assignment.id %>"><%= I18n.t('Grade:') %></label></th>
+                <td class="bold">
+                  <% if can_do(@assignment, @current_user, :grade) %>
+                    <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
+                  <% else %>
+                    <span class="entered_grade">
+                      <% if @submission.excused? %>
+                        <%= t "Excused" %>
+                      <% else %>
+                        <%= i18n_grade(round_if_whole(presenter.entered_grade), @submission.grading_type) %>
+                      <% end %>
+                    </span>
+                  <% end %>
+                  <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible && !@assignment.restrict_quantitative_data?(@current_user) %>
+                    <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
             <% if can_do(@assignment, @current_user, :grade) || @submission.user_can_read_grade?(@current_user, session)
                 points_deducted = I18n.n(-@submission.points_deducted) if @submission.points_deducted&.> 0
                 points_possible = I18n.n(round_if_whole(@assignment.points_possible))
