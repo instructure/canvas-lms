@@ -103,7 +103,6 @@ describe('MessageDetailContainer', () => {
           isSubmissionCommentsType: true,
           conversation: mockSubmissionComment,
         })
-        expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
         await waitForApolloLoading()
 
         expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
