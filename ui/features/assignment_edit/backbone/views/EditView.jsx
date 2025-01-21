@@ -57,6 +57,7 @@ import '@canvas/common/activateTooltips'
 import {AnnotatedDocumentSelector} from '../../react/EditAssignment'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('assignment_editview')
 
@@ -1809,6 +1810,16 @@ EditView.prototype.locationAfterSave = function (params) {
   if (useCancelLocation) {
     return this.locationAfterCancel(deparam())
   }
+
+  try {
+    queryClient.invalidateQueries({
+      queryKey: ['assignment-self-assessment-settings', this.assignment.id],
+      exact: false,
+    });
+  } catch (error) {
+    console.error('Error invalidating query, error:', error)
+  }
+
   const htmlUrl = this.model.get('html_url')
   if (this.assignment.showBuildButton()) {
     return htmlUrl + '?display=full_width'
