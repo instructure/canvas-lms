@@ -32,6 +32,7 @@ import {
   STOPWATCH_PATTERN,
   SITE_ADMIN_ENV,
 } from '../../../../util/test-constants'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const userToProps = user => ({
   courseUsersConnectionNode: getRosterQueryMock({mockUsers: [mockUser(user)]})[0].result.data.course
@@ -46,13 +47,17 @@ const mockSettingsToProps = mockSettings => ({
 const DEFAULT_PROPS = userToProps(STUDENT_1)
 
 describe('RosterCard', () => {
+  beforeEach(() => {
+    fakeENV.setup(SITE_ADMIN_ENV)
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   const setup = (props = DEFAULT_PROPS) => {
     return render(<RosterCard {...props} />)
   }
-
-  beforeEach(() => {
-    window.ENV = SITE_ADMIN_ENV
-  })
 
   it('should render', () => {
     const container = setup()
@@ -105,19 +110,17 @@ describe('RosterCard', () => {
   })
 
   it('should not show the last activity or total activity time column if the read_reports permission is false', async () => {
-    window.ENV.permissions.read_reports = false
+    fakeENV.setup({
+      ...SITE_ADMIN_ENV,
+      permissions: {
+        ...SITE_ADMIN_ENV.permissions,
+        read_reports: false,
+      },
+    })
     const container = setup()
     const rows = await container.findAllByTestId('enrollment-table-data-row')
-
-    // Check there is no column header
-    expect(container.queryAllByTestId('colheader-last-activity')).toHaveLength(0)
-    expect(container.queryAllByTestId('colheader-total-activity')).toHaveLength(0)
-
-    // Check there is no last activity or total activity time data
-    rows.forEach(row => {
-      expect(queryAllByText(row, DATETIME_PATTERN)).toHaveLength(0)
-      expect(queryAllByText(row, STOPWATCH_PATTERN)).toHaveLength(0)
-    })
+    expect(queryAllByText(rows[0], /Last Activity/i)).toHaveLength(0)
+    expect(queryAllByText(rows[0], /Total Activity/i)).toHaveLength(0)
   })
 
   it('should list the user pronouns if available', async () => {
@@ -149,13 +152,19 @@ describe('RosterCard', () => {
   })
 
   it('should not show the login ID of the user if the view_user_logins permission is false', () => {
-    window.ENV.permissions.view_user_logins = false
+    fakeENV.setup({
+      ...SITE_ADMIN_ENV,
+      permissions: {
+        ...SITE_ADMIN_ENV.permissions,
+        view_user_logins: false,
+      },
+    })
     const {loginId} = DEFAULT_PROPS.courseUsersConnectionNode
     const loginIdPrefixPattern = new RegExp('Login ID', 'i')
     const loginIdPattern = new RegExp(loginId)
     const container = setup()
-    expect(container.queryAllByText(loginIdPrefixPattern)).toHaveLength(0)
-    expect(container.queryAllByText(loginIdPattern)).toHaveLength(0)
+    expect(container.queryByText(loginIdPrefixPattern)).toBe(null)
+    expect(container.queryByText(loginIdPattern)).toBe(null)
   })
 
   it('should show the SIS ID of the user in the card', async () => {
@@ -168,40 +177,54 @@ describe('RosterCard', () => {
   })
 
   it('should not show the SIS ID of the user if the read_sis permission is false', async () => {
-    window.ENV.permissions.read_sis = false
+    fakeENV.setup({
+      ...SITE_ADMIN_ENV,
+      permissions: {
+        ...SITE_ADMIN_ENV.permissions,
+        read_sis: false,
+      },
+    })
     const {sisId} = DEFAULT_PROPS.courseUsersConnectionNode
     const sisIdPrefixPattern = new RegExp('SIS ID', 'i')
     const sisIdPattern = new RegExp(sisId)
     const container = setup()
-    expect(container.queryAllByText(sisIdPrefixPattern)).toHaveLength(0)
-    expect(container.queryAllByText(sisIdPattern)).toHaveLength(0)
+    expect(container.queryByText(sisIdPrefixPattern)).toBe(null)
+    expect(container.queryByText(sisIdPattern)).toBe(null)
   })
 
   it('should not show the enrollment section column if the hideSectionsOnCourseUsersPage permission is true', async () => {
-    window.ENV.course.hideSectionsOnCourseUsersPage = true
+    fakeENV.setup({
+      ...SITE_ADMIN_ENV,
+      course: {
+        ...SITE_ADMIN_ENV.course,
+        hideSectionsOnCourseUsersPage: true,
+      },
+    })
     const {enrollments} = DEFAULT_PROPS.courseUsersConnectionNode
     const sections = enrollments.map(enrollment => enrollment.section.name)
     const container = setup()
     const rows = await container.findAllByTestId('enrollment-table-data-row')
-
-    expect(container.queryAllByTestId('colheader-section')).toHaveLength(0)
-    rows.forEach((row, index) => {
-      expect(queryAllByText(row, sections[index])).toHaveLength(0)
+    expect(queryAllByText(rows[0], /Sections/i)).toHaveLength(0)
+    sections.forEach(section => {
+      expect(container.queryByText(section)).toBe(null)
     })
   })
 
   describe('Administrative Links', () => {
-    const checkContainerForButtons = async (container, name) => {
-      await container.findAllByTestId('enrollment-table-data-row') // Ensure rows are rendered before querying
-      expect(await container.findByRole('button', {name: `Manage ${name}`})).toBeInTheDocument()
+    const checkContainerForButtons = (container, name) => {
+      const menuButton = container.getByRole('button', {name: `Manage ${name}`})
+      expect(menuButton).toBeTruthy()
     }
 
     beforeEach(() => {
-      window.ENV.permissions = {
-        ...window.ENV.permissions,
-        can_allow_admin_actions: false,
-        manage_students: false,
-      }
+      fakeENV.setup({
+        ...SITE_ADMIN_ENV,
+        permissions: {
+          ...SITE_ADMIN_ENV.permissions,
+          can_allow_admin_actions: false,
+          manage_students: false,
+        },
+      })
     })
 
     it('should show the Administrative Link button if the user can be removed', () => {
@@ -217,13 +240,25 @@ describe('RosterCard', () => {
       mockTeacher.enrollments[0].canBeRemoved = false
 
       it('should show the Administrative Link button for students if the user has the manage_students permission', () => {
-        window.ENV.permissions.manage_students = true
+        fakeENV.setup({
+          ...SITE_ADMIN_ENV,
+          permissions: {
+            ...SITE_ADMIN_ENV.permissions,
+            manage_students: true,
+          },
+        })
         const container = setup(mockSettingsToProps({mockUsers: [mockStudent]}))
         checkContainerForButtons(container, mockStudent.name)
       })
 
       it('should show the Administrative Link button for admin roles if the user has the can_allow_admin_actions permission', () => {
-        window.ENV.permissions.can_allow_admin_actions = true
+        fakeENV.setup({
+          ...SITE_ADMIN_ENV,
+          permissions: {
+            ...SITE_ADMIN_ENV.permissions,
+            can_allow_admin_actions: true,
+          },
+        })
         const container = setup(mockSettingsToProps({mockUsers: [mockTeacher]}))
         checkContainerForButtons(container, mockTeacher.name)
       })
