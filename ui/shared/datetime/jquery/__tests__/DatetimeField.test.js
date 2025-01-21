@@ -17,9 +17,7 @@
  */
 
 import DatetimeField, {
-  DATE_FORMAT_OPTIONS,
   DATETIME_FORMAT_OPTIONS,
-  TIME_FORMAT_OPTIONS,
   PARSE_RESULTS,
 } from '../DatetimeField'
 import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
@@ -31,6 +29,7 @@ import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 import moment from 'moment'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const challenger = new Date('1986-01-28T16:39:00Z')
 const columbia = new Date('2003-02-01T13:59:00Z')
@@ -39,15 +38,20 @@ describe('DatetimeField', () => {
   let $field
   let field
 
+  beforeEach(() => {
+    fakeENV.setup()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    $field?.remove()
+  })
+
   const createField = (options = {}) => {
     $field = $('<input type="text" name="due_at">')
     field = new DatetimeField($field, options)
     return field
   }
-
-  afterEach(() => {
-    $field?.remove()
-  })
 
   describe('processTimeOptions', () => {
     beforeEach(() => {
@@ -132,7 +136,7 @@ describe('DatetimeField', () => {
     it('uses first day of week for moment locale', () => {
       const momentLocale = 'MOMENT_LOCALE'
       const firstDayOfWeek = 1
-      window.ENV = {MOMENT_LOCALE: momentLocale}
+      ENV.MOMENT_LOCALE = momentLocale
       jest.spyOn(moment, 'localeData').mockReturnValue({firstDayOfWeek: () => firstDayOfWeek})
       const datepickerSpy = jest.spyOn($field, 'datepicker')
       field.addDatePicker({})
@@ -163,7 +167,8 @@ describe('DatetimeField', () => {
     })
 
     it('adds course suggest field if ENV.CONTEXT_TIMEZONE differs', () => {
-      window.ENV = {TIMEZONE: 'America/Detroit', CONTEXT_TIMEZONE: 'America/Juneau'}
+      ENV.TIMEZONE = 'America/Detroit'
+      ENV.CONTEXT_TIMEZONE = 'America/Juneau'
       field.addSuggests($field)
       expect(field.$contextSuggest).toBeTruthy()
       expect(field.$suggest.next()[0]).toBe(field.$contextSuggest[0])
@@ -178,7 +183,7 @@ describe('DatetimeField', () => {
           'America/Detroit': detroit,
         },
       })
-      window.ENV = {TIMEZONE: 'America/Detroit'}
+      ENV.TIMEZONE = 'America/Detroit'
       $field = $('<input type="text" name="due_at">')
     })
 
@@ -241,7 +246,7 @@ describe('DatetimeField', () => {
           'America/Detroit': detroit,
         },
       })
-      window.ENV = {TIMEZONE: 'America/Detroit'}
+      ENV.TIMEZONE = 'America/Detroit'
       createField()
     })
 
@@ -352,7 +357,7 @@ describe('DatetimeField', () => {
           'America/Detroit': detroit,
         },
       })
-      window.ENV = {TIMEZONE: 'America/Detroit'}
+      ENV.TIMEZONE = 'America/Detroit'
       createField()
       field.datetime = challenger
       field.fudged = fudgeDateForProfileTimezone(challenger)
@@ -381,10 +386,8 @@ describe('DatetimeField', () => {
           'America/Juneau': juneau,
         },
       })
-      window.ENV = {
-        TIMEZONE: 'America/Detroit',
-        CONTEXT_TIMEZONE: 'America/Juneau',
-      }
+      ENV.TIMEZONE = 'America/Detroit'
+      ENV.CONTEXT_TIMEZONE = 'America/Juneau'
       createField()
       field.datetime = challenger
       field.fudged = fudgeDateForProfileTimezone(challenger)
@@ -424,7 +427,7 @@ describe('DatetimeField', () => {
           'America/Detroit': detroit,
         },
       })
-      window.ENV = {TIMEZONE: 'America/Detroit'}
+      ENV.TIMEZONE = 'America/Detroit'
       createField()
     })
 
@@ -446,7 +449,7 @@ describe('DatetimeField', () => {
           'America/Detroit': detroit,
         },
       })
-      window.ENV = {TIMEZONE: 'America/Detroit'}
+      ENV.TIMEZONE = 'America/Detroit'
       createField()
     })
 
