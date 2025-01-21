@@ -24,8 +24,9 @@ import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
 
 const defaultProps = {
   isStacked: false,
-  item: FAKE_FILES[0],
+  item: {...FAKE_FILES[0]},
 }
+
 const renderComponent = (props = {}) => {
   return render(
     <BrowserRouter>
@@ -36,7 +37,7 @@ const renderComponent = (props = {}) => {
 
 describe('NameLink', () => {
   it('renders folder with folder icon', () => {
-    const folder = FAKE_FOLDERS[0]
+    const folder = {...FAKE_FOLDERS[0]}
     renderComponent({item: folder})
 
     expect(screen.getByText(folder.name)).toBeInTheDocument()
@@ -44,8 +45,7 @@ describe('NameLink', () => {
   })
 
   it('renders locked folder with locked folder icon', () => {
-    const folder = FAKE_FOLDERS[0]
-    folder.for_submissions = true
+    const folder = {...FAKE_FOLDERS[0], for_submissions: true}
     renderComponent({item: folder})
 
     expect(screen.getByText(folder.name)).toBeInTheDocument()
@@ -53,8 +53,7 @@ describe('NameLink', () => {
   })
 
   it('renders file with thumbnail if url is present', () => {
-    const file = FAKE_FILES[0]
-    file.thumbnail_url = 'https://example.com/image.jpg'
+    const file = {...FAKE_FILES[0], thumbnail_url: 'https://example.com/image.jpg'}
     renderComponent({item: file})
 
     expect(screen.getByText(file.display_name)).toBeInTheDocument()
@@ -62,8 +61,7 @@ describe('NameLink', () => {
   })
 
   it('renders file with mime icon if thumbnail url is not present', () => {
-    const file = FAKE_FILES[0]
-    file.thumbnail_url = null
+    const file = {...FAKE_FILES[0], thumbnail_url: null}
     renderComponent({item: file})
 
     expect(screen.getByText(file.display_name)).toBeInTheDocument()
@@ -71,7 +69,7 @@ describe('NameLink', () => {
   })
 
   it('renders folder with url', () => {
-    const folder = FAKE_FOLDERS[1]
+    const folder = {...FAKE_FOLDERS[1]}
     renderComponent({item: folder})
 
     expect(screen.getByRole('link')).toHaveAttribute(
