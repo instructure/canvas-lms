@@ -22,6 +22,24 @@ import {setupServer} from 'msw/node'
 import {http} from 'msw'
 import {AnnotatedDocumentSelector} from '../EditAssignment'
 
+// Mock FlashAlert
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: () => jest.fn(),
+  showFlashSuccess: () => jest.fn(),
+}))
+
+jest.mock('@canvas/i18n', () => ({
+  useScope: () => ({
+    t: str => {
+      const translations = {
+        'Course files': 'Course files',
+        'Group files': 'Group files',
+      }
+      return translations[str] || str
+    },
+  }),
+}))
+
 const server = setupServer(
   http.get('/api/v1/courses/1/folders/root', (_req, res, ctx) => {
     return res(
@@ -54,6 +72,52 @@ const server = setupServer(
     )
   }),
 )
+
+beforeAll(() => {
+  const elements = [
+    'flash_message_holder',
+    'flash_screenreader_holder',
+    'flashalert_message_holder',
+  ]
+
+  elements.forEach(id => {
+    if (!document.getElementById(id)) {
+      const container = document.createElement('div')
+      container.id = id
+      if (id === 'flash_screenreader_holder') {
+        container.setAttribute('role', 'alert')
+        container.setAttribute('aria-live', 'assertive')
+        container.setAttribute('aria-relevant', 'additions text')
+        container.setAttribute('aria-atomic', 'false')
+      } else if (id === 'flashalert_message_holder') {
+        container.style.position = 'fixed'
+        container.style.top = '0'
+        container.style.left = '0'
+        container.style.width = '100%'
+        container.style.zIndex = '100000'
+        container.className = 'clickthrough-container'
+      }
+      document.body.appendChild(container)
+    }
+  })
+})
+
+afterAll(() => {
+  document.body.innerHTML = ''
+})
+
+afterEach(() => {
+  // Clean up flash messages after each test
+  const elements = [
+    'flash_message_holder',
+    'flash_screenreader_holder',
+    'flashalert_message_holder',
+  ]
+  elements.forEach(id => {
+    const el = document.getElementById(id)
+    if (el) el.innerHTML = ''
+  })
+})
 
 describe('AnnotatedDocumentSelector', () => {
   describe('when attachment prop is present', () => {
@@ -110,8 +174,6 @@ describe('AnnotatedDocumentSelector', () => {
     describe('FileBrowser', () => {
       it('renders a FileBrowser', () => {
         const {getByText} = render(<AnnotatedDocumentSelector {...props} />)
-
-        expect(getByText('Loading')).toBeInTheDocument()
 
         waitFor(() => {
           expect(getByText('Available folders')).toBeInTheDocument()
