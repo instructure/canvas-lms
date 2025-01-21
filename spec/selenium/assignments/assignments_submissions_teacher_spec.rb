@@ -54,6 +54,100 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
       expect(f(".grading_value")[:value]).to eq "2"
     end
+
+    describe "checkpoints" do
+      before do
+        @student = student_in_course(active_all: true).user
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion Topic", user: @teacher)
+        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 5, reply_to_entry_required_count: 2)
+
+        # Create submission for the student
+        entry_by_teacher = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic by teacher")
+        @topic.discussion_entries.create!(user: @student, message: "reply to topic by student")
+        2.times do
+          @topic.discussion_entries.create!(user: @student, message: "reply to entry by student", root_entry_id: entry_by_teacher.id, parent_id: entry_by_teacher.id)
+        end
+      end
+
+      it "Displays grade in grade field, priority: 1" do
+        # Grade the student
+        @topic.reply_to_topic_checkpoint.grade_student(@student, grade: 8, grader: @teacher)
+        @topic.reply_to_entry_checkpoint.grade_student(@student, grade: 4, grader: @teacher)
+
+        assignment = @topic.assignment
+
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+        wait_for_ajaximations
+
+        expect(ff("[data-testid='default-grade-input']")[0][:value]).to eq "8"
+        expect(ff("[data-testid='default-grade-input']")[1][:value]).to eq "4"
+      end
+
+      it "Total score is updated when checkpoints are changed, priority: 1" do
+        assignment = @topic.assignment
+
+        # Grade the student
+        @topic.reply_to_topic_checkpoint.grade_student(@student, grade: 8, grader: @teacher)
+        @topic.reply_to_entry_checkpoint.grade_student(@student, grade: 4, grader: @teacher)
+
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+        wait_for_ajaximations
+
+        expect(f("[data-testid='total-score-display']")[:value]).to eq "12"
+
+        # Change the grade of the checkpoints
+        inputs = ff("[data-testid='default-grade-input']")
+
+        # Reply to Topic
+        inputs[0].send_keys [:backspace, "9", :tab] # Tab causes "blur" event so submission updates
+
+        # Reply to Entry
+        inputs[1].send_keys [:backspace, "5", :tab]
+
+        wait_for_ajaximations
+        expect(f("[data-testid='total-score-display']")[:value]).to eq "14"
+      end
+
+      context "pass_fail_grading_type" do
+        before do
+          @student = student_in_course(active_all: true).user
+          @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion Topic", user: @teacher)
+          @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 5, reply_to_entry_required_count: 2)
+
+          @topic.assignment.update!(grading_type: "pass_fail", points_possible: 15)
+          @topic.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC).update!(grading_type: "pass_fail")
+          @topic.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY).update!(grading_type: "pass_fail")
+
+          # Create submission for the student
+          entry_by_teacher = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic by teacher")
+          @topic.discussion_entries.create!(user: @student, message: "reply to topic by student")
+          2.times do
+            @topic.discussion_entries.create!(user: @student, message: "reply to entry by student", root_entry_id: entry_by_teacher.id, parent_id: entry_by_teacher.id)
+          end
+        end
+
+        it "Total score is updated when checkpoints are changed, priority: 1" do
+          assignment = @topic.assignment
+
+          # Grade the student
+          @topic.reply_to_topic_checkpoint.grade_student(@student, grade: "complete", grader: @teacher)
+          @topic.reply_to_entry_checkpoint.grade_student(@student, grade: "incomplete", grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+          wait_for_ajaximations
+
+          expect(f("[data-testid='total-score-display']")[:value]).to eq "Incomplete"
+
+          # Select the "reply to entry" dropdown and select "Complete"
+          ff("[data-testid='select-dropdown']")[1].click
+          f("[data-testid='complete-dropdown-option']").click
+          wait_for_ajaximations
+
+          expect(f("[data-testid='total-score-display']")[:value]).to eq "Complete"
+        end
+      end
+    end
   end
 
   context "student view" do

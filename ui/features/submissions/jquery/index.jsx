@@ -36,6 +36,8 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rubrics/jquery/rubric_assessment'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
+import CheckpointGradeRoot from '../react/CheckpointGradeRoot'
+import {createRoot} from 'react-dom/client'
 
 const I18n = createI18nScope('submissions')
 /* global rubricAssessment */
@@ -245,6 +247,35 @@ function insertEmoji(emoji) {
 // while submissionsSpec.jsx triggers it after setup is complete.
 export function setup() {
   $(document).ready(function () {
+    // Render Checkpoint Score Boxes if applicable
+    // The mount point is only available if checkpoints are enabled and the assignment has checkpoints
+    // For reference the mount point is located in the "views/submissions/show.html.erb" file
+    const mountPoint = document.getElementById('checkpoints-grade-inputs-mount-point')
+    if (mountPoint) {
+      const root = createRoot(mountPoint)
+      const props = {
+        assignment: {
+          grading_type: ENV.GRADING_TYPE,
+          total_score: ENV.SUBMISSION.submission.grade || '',
+          checkpoint_submissions: [
+            {
+              tag: 'reply_to_topic',
+              points_possible: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.points_possible,
+              submission_score: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.entered_score,
+              submission_id: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.submission_id,
+            },
+            {
+              tag: 'reply_to_entry',
+              points_possible: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.points_possible,
+              submission_score: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.entered_score,
+              submission_id: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.submission_id,
+            },
+          ],
+        },
+      }
+      root.render(<CheckpointGradeRoot {...props} />)
+    }
+
     if (ENV.EMOJIS_ENABLED) {
       ReactDOM.render(
         <EmojiPicker insertEmoji={insertEmoji} />,

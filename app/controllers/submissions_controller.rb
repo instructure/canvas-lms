@@ -119,6 +119,16 @@ class SubmissionsController < SubmissionsBaseController
     begin
       @assignment = @submission_for_show.assignment
       @submission = @submission_for_show.submission
+
+      # If the assignment has checkpoints
+      # We need to find reply_to_topic sub assignment and reply_to_entry sub assignment and their submissions
+      if @assignment.checkpoints_parent?
+        @reply_to_topic_assignment = @assignment.find_checkpoint(CheckpointLabels::REPLY_TO_TOPIC)
+        @reply_to_entry_assignment = @assignment.find_checkpoint(CheckpointLabels::REPLY_TO_ENTRY)
+
+        @reply_to_topic_submission = @reply_to_topic_assignment.submissions.find_by(user_id: @submission.user)
+        @reply_to_entry_submission = @reply_to_entry_assignment.submissions.find_by(user_id: @submission.user)
+      end
     rescue ActiveRecord::RecordNotFound
       return render_user_not_found
     end
