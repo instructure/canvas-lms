@@ -26,8 +26,8 @@ import {
   IconOffLine,
 } from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {datetimeString} from '@canvas/datetime/date-functions'
 import {type File, type Folder} from '../../../interfaces/File'
+import {getRestrictedText, isPublished, isRestricted, isHidden} from '../../../utils/fileUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -44,26 +44,9 @@ interface RenderButtonProps {
 
 const PublishIconButton = ({item, userCanEditFilesForContext}: PublishIconButtonProps) => {
   const fileName = 'name' in item ? item.name : item.display_name
-  const published = !item.locked
-  const restricted = !!item.lock_at || !!item.unlock_at
-  const hidden = !!item.hidden
-
-  const getRestrictedText = () => {
-    if (item.unlock_at && item.lock_at) {
-      return I18n.t('Available from %{from_date} until %{until_date}', {
-        from_date: datetimeString(item.unlock_at),
-        until_date: datetimeString(item.lock_at),
-      })
-    } else if (item.unlock_at) {
-      return I18n.t('Available from %{from_date}', {
-        from_date: datetimeString(item.unlock_at),
-      })
-    } else if (item.lock_at) {
-      return I18n.t('Available until %{until_date}', {
-        until_date: datetimeString(item.lock_at),
-      })
-    }
-  }
+  const published = isPublished(item)
+  const restricted = isRestricted(item)
+  const hidden = isHidden(item)
 
   const renderButton = ({icon, srLabel, tooltip}: RenderButtonProps) => (
     <Tooltip
@@ -88,10 +71,10 @@ const PublishIconButton = ({item, userCanEditFilesForContext}: PublishIconButton
     if (published && restricted) {
       return renderButton({
         icon: <IconCalendarMonthLine />,
-        tooltip: getRestrictedText(),
+        tooltip: getRestrictedText(item),
         srLabel: I18n.t('%{fileName} is %{restricted} - Click to modify', {
           fileName,
-          restricted: getRestrictedText(),
+          restricted: getRestrictedText(item),
         }),
       })
     } else if (published && hidden) {
@@ -121,10 +104,10 @@ const PublishIconButton = ({item, userCanEditFilesForContext}: PublishIconButton
   } else if (published && restricted) {
     return renderButton({
       icon: <IconCalendarMonthLine color="warning" />,
-      tooltip: getRestrictedText(),
+      tooltip: getRestrictedText(item),
       srLabel: I18n.t('%{fileName} is %{restricted}', {
         fileName,
-        restricted: getRestrictedText(),
+        restricted: getRestrictedText(item),
       }),
     })
   }
