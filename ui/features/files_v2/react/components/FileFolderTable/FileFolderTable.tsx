@@ -22,6 +22,7 @@ import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -63,9 +64,9 @@ const fetchFilesAndFolders = async (
 
 const columnHeaders: ColumnHeader[] = [
   {id: 'name', title: I18n.t('Name'), textAlign: 'start', width: '12.5em'},
-  {id: 'created', title: I18n.t('Created'), textAlign: 'start', width: '6em'},
-  {id: 'lastModified', title: I18n.t('Last Modified'), textAlign: 'start', width: '6em'},
-  {id: 'modifiedBy', title: I18n.t('Modified By'), textAlign: 'start', width: '6em'},
+  {id: 'created_at', title: I18n.t('Created'), textAlign: 'start', width: '6em'},
+  {id: 'updated_at', title: I18n.t('Last Modified'), textAlign: 'start', width: '6em'},
+  {id: 'modified_by', title: I18n.t('Modified By'), textAlign: 'start', width: '6em'},
   {id: 'size', title: I18n.t('Size'), textAlign: 'start', width: '4em'},
   {id: 'rights', title: I18n.t('Rights'), textAlign: 'center', width: '3.5em'},
   {id: 'published', title: I18n.t('Published'), textAlign: 'center', width: '4em'},
@@ -94,9 +95,9 @@ const columnRenderers: {
   }) => React.ReactNode
 } = {
   name: ({row, isStacked}) => <NameLink isStacked={isStacked} item={row} />,
-  created: ({row}) => <FriendlyDatetime dateTime={row.created_at} />,
-  lastModified: ({row}) => <FriendlyDatetime dateTime={row.updated_at} />,
-  modifiedBy: ({row}) =>
+  created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} />,
+  updated_at: ({row}) => <FriendlyDatetime dateTime={row.updated_at} />,
+  modified_by: ({row}) =>
     'user' in row && row.user?.display_name ? (
       <Link isWithinText={false} href={row.user.html_url}>
         <TruncateText>{row.user.display_name}</TruncateText>
@@ -131,15 +132,16 @@ const columnRenderers: {
   ),
 }
 
-interface FileFolderTableProps {
+export interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
   usageRightsRequiredForContext: boolean
   currentUrl: string
+  folderBreadcrumbs: Folder[]
   onPaginationLinkChange: (links: Record<string, string>) => void
   onLoadingStatusChange: (isLoading: boolean) => void
-  folderBreadcrumbs: Folder[]
+  onPageReset: (sortBy: string, sortDir: 'asc' | 'desc') => void
 }
 
 const FileFolderTable = ({
@@ -148,13 +150,17 @@ const FileFolderTable = ({
   userCanDeleteFilesForContext,
   usageRightsRequiredForContext,
   currentUrl,
+  folderBreadcrumbs,
   onPaginationLinkChange,
   onLoadingStatusChange,
-  folderBreadcrumbs,
+  onPageReset,
 }: FileFolderTableProps) => {
   const {currentFolder} = useContext(FileManagementContext)
   const isStacked = size !== 'large'
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
+
+  const [sortColumn, setSortColumn] = useState<string>('name')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('asc')
 
   const {data, error, isLoading, isFetching} = useQuery({
     queryKey: ['files', currentUrl],
@@ -210,6 +216,17 @@ const FileFolderTable = ({
     }
   }
 
+  const handleColumnHeaderClick = useCallback(
+    (columnId: string) => {
+      const newDir = columnId === sortColumn ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc'
+      const newCol = columnId
+      setSortColumn(newCol)
+      setSortDirection(newDir)
+      onPageReset(newCol, newDir)
+    },
+    [onPageReset, sortColumn, sortDirection],
+  )
+
   const allRowsSelected = rows.length != 0 && selectedRows.size === rows.length
   const someRowsSelected = selectedRows.size > 0 && !allRowsSelected
   const filteredColumns = columnHeaders.filter(column => {
@@ -247,18 +264,21 @@ const FileFolderTable = ({
     userCanEditFilesForContext,
   ])
 
+  const tableCaption = I18n.t(
+    'Files and Folders: sorted by %{sortColumn} in %{sortDirection} order',
+    {sortColumn, sortDirection},
+  )
+
   return (
     <>
       {renderTableActionsHead()}
       <View display="block" margin="0 0 medium">
         <CurrentUploads />
       </View>
-      <Table
-        caption={I18n.t('Files and Folders')}
-        hover={true}
-        layout={isStacked ? 'stacked' : 'fixed'}
-      >
-        <Table.Head>
+      <Table caption={tableCaption} hover={true} layout={isStacked ? 'stacked' : 'fixed'}>
+        <Table.Head
+          renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+        >
           <Table.Row>
             {renderTableHead(
               size,
@@ -267,6 +287,9 @@ const FileFolderTable = ({
               toggleSelectAll,
               isStacked,
               filteredColumns,
+              sortColumn,
+              sortDirection,
+              handleColumnHeaderClick,
             )}
           </Table.Row>
         </Table.Head>

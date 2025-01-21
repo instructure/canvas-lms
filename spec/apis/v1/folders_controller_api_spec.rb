@@ -1253,24 +1253,31 @@ describe "Folders API", type: :request do
       @folders_files_path = "/api/v1/folders/#{@root.id}/all"
       @folders_files_path_options = { controller: "folders", action: "list_folders_and_files", format: "json", id: @root.id.to_param }
 
-      @folder1 = @root.sub_folders.create!(name: "folder1", context: @course, position: 1)
-      @folder2 = @root.sub_folders.create!(name: "folder2", context: @course, position: 2, hidden: true)
-      @file1 = Attachment.create!(
-        filename: "file1.txt",
-        display_name: "file1.txt",
-        uploaded_data: StringIO.new("existing"),
-        folder: @root,
-        context: @course,
-        user: @user
-      )
-      @file2 = Attachment.create!(
-        filename: "file2.txt",
-        display_name: "file2.txt",
-        uploaded_data: StringIO.new("existing"),
-        folder: @root,
-        context: @course,
-        hidden: true
-      )
+      now = Time.now.utc
+      now -= 10.minutes
+      Timecop.freeze(now) do
+        @folder1 = @root.sub_folders.create!(name: "folder1", context: @course, position: 1)
+        Timecop.travel(now + 1.minute)
+        @folder2 = @root.sub_folders.create!(name: "folder2", context: @course, position: 2, hidden: true)
+        Timecop.travel(now + 2.minutes)
+        @file1 = Attachment.create!(
+          filename: "file1.txt",
+          display_name: "file1.txt",
+          uploaded_data: StringIO.new("existing file with more content"),
+          folder: @root,
+          context: @course,
+          user: @user
+        )
+        Timecop.travel(now + 3.minutes)
+        @file2 = Attachment.create!(
+          filename: "file2.txt",
+          display_name: "file2.txt",
+          uploaded_data: StringIO.new("existing file"),
+          folder: @root,
+          context: @course,
+          hidden: true
+        )
+      end
     end
 
     it "returns unauthorized if feature is disabled" do
@@ -1346,6 +1353,57 @@ describe "Folders API", type: :request do
         item.dig("user", "display_name")
       end
       expect(result_names).to include(@user.name)
+    end
+
+    describe "sorting" do
+      it "sorts folders and files by name, ascending by default" do
+        json = api_call(:get, @folders_files_path, @folders_files_path_options)
+        result_names = json.map do |item|
+          item["name"] || item["display_name"]
+        end
+        expect(result_names).to eq %w[folder1 folder2 file1.txt file2.txt]
+      end
+
+      it "sorts folders by name and files by size if sorting on size" do
+        json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(sort: "size", order: "asc"))
+        result_names = json.map do |item|
+          item["name"] || item["display_name"] || item["filename"]
+        end
+        expect(result_names).to eq %w[folder1 folder2 file2.txt file1.txt]
+      end
+
+      it "sorts folders and files by created_at if sorting on created_at" do
+        json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(sort: "created_at", order: "desc"))
+        result_names = json.map do |item|
+          item["name"] || item["display_name"] || item["filename"]
+        end
+        expect(result_names).to eq %w[folder2 folder1 file2.txt file1.txt]
+      end
+
+      it "sorts folders and files by updated_at if sorting on updated_at" do
+        json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(sort: "updated_at", order: "desc"))
+        result_names = json.map do |item|
+          item["name"] || item["display_name"] || item["filename"]
+        end
+        expect(result_names).to eq %w[folder2 folder1 file2.txt file1.txt]
+      end
+
+      it "paginates the results" do
+        json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(per_page: 3, sort: "size", order: "sc"))
+        expect(json.size).to eq 3
+
+        result_names = json.map do |item|
+          item["name"] || item["display_name"] || item["filename"]
+        end
+        expect(result_names).to eq ["folder1", "folder2", "file2.txt"]
+
+        next_page = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }
+        next_page_json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(per_page: 3, sort: next_page["sort"], order: next_page["order"], page: next_page["page"]))
+        result_names = next_page_json.map do |item|
+          item["name"] || item["display_name"] || item["filename"]
+        end
+        expect(result_names).to eq ["file1.txt"]
+      end
     end
   end
 end
