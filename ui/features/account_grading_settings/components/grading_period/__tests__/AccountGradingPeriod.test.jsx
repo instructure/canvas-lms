@@ -22,12 +22,17 @@ import {render, fireEvent, screen} from '@testing-library/react'
 import axios from '@canvas/axios'
 import GradingPeriod from '../AccountGradingPeriod'
 import DateHelper from '@canvas/datetime/dateHelper'
+import {windowConfirm} from '@canvas/util/globalUtils'
 
 jest.mock('@canvas/datetime/dateHelper', () => ({
   formatDateForDisplay: jest.fn(date => {
     const options = {year: 'numeric', month: '2-digit', day: '2-digit'}
     return date.toLocaleDateString('en-US', options)
   }),
+}))
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  windowConfirm: jest.fn(),
 }))
 
 const allPermissions = {read: true, create: true, update: true, delete: true}
@@ -54,6 +59,17 @@ describe('AccountGradingPeriod', () => {
   const renderComponent = (props = {}) => {
     return render(<GradingPeriod {...defaultProps} {...props} />)
   }
+
+  beforeEach(() => {
+    windowConfirm.mockReset()
+    jest.spyOn(axios, 'delete').mockReset()
+    defaultProps.onDelete.mockReset()
+    defaultProps.onEdit.mockReset()
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
 
   it('shows the "edit grading period" button when "update" is permitted', () => {
     renderComponent()
@@ -130,14 +146,16 @@ describe('AccountGradingPeriod', () => {
   })
 
   it('does not delete the period if the user cancels the delete confirmation', () => {
-    window.confirm = jest.fn(() => false)
+    windowConfirm.mockReturnValue(false)
+    const axiosDeleteMock = jest.spyOn(axios, 'delete')
     renderComponent()
     fireEvent.click(screen.getByTitle(/Delete/))
     expect(defaultProps.onDelete).not.toHaveBeenCalled()
+    expect(axiosDeleteMock).not.toHaveBeenCalled()
   })
 
   it('calls onDelete if the user confirms deletion and the axios call succeeds', async () => {
-    window.confirm = jest.fn(() => true)
+    windowConfirm.mockReturnValue(true)
     const flashMessageMock = jest.fn()
     $.flashMessage = flashMessageMock
     const axiosDeleteMock = jest.spyOn(axios, 'delete').mockResolvedValue({})
@@ -151,7 +169,5 @@ describe('AccountGradingPeriod', () => {
     expect(axiosDeleteMock).toHaveBeenCalled()
     expect(defaultProps.onDelete).toHaveBeenCalledWith(defaultProps.period.id)
     expect(flashMessageMock).toHaveBeenCalled()
-
-    axiosDeleteMock.mockRestore()
   })
 })
