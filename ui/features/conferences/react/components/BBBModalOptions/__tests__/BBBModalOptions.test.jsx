@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import BBBModalOptions from '../BBBModalOptions'
 import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../../util/constants'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('BBBModalOptions', () => {
   const setName = jest.fn()
@@ -80,14 +81,18 @@ describe('BBBModalOptions', () => {
   }
 
   beforeEach(() => {
+    fakeENV.setup()
+    ENV.bbb_recording_enabled = true
     setName.mockClear()
     setDuration.mockClear()
     setOptions.mockClear()
     setDescription.mockClear()
     setInvitationOptions.mockClear()
     setAttendeesOptions.mockClear()
+  })
 
-    window.ENV.bbb_recording_enabled = true
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   it('should render', () => {
@@ -134,7 +139,7 @@ describe('BBBModalOptions', () => {
   })
 
   it('should disable recording if setting is disabled', () => {
-    window.ENV.bbb_recording_enabled = false
+    ENV.bbb_recording_enabled = false
     const container = setup(defaultProps)
     expect(container.getByLabelText('Enable recording for this conference').disabled).toBeTruthy()
   })
@@ -153,15 +158,15 @@ describe('BBBModalOptions', () => {
   })
 
   it('should lock Remove Observers if Invite All is not checked', () => {
-    const customProps = defaultProps
-    customProps.invitationOption = []
+    const customProps = {...defaultProps}
+    customProps.invitationOptions = []
 
     const container = setup({...customProps, tab: ATTENDEES_TAB})
     expect(container.getByLabelText('Remove all course observer members').disabled).toBeTruthy()
   })
 
   it('does not show add to calendar when context is group', () => {
-    window.ENV.context_asset_string = 'group_1'
+    ENV.context_asset_string = 'group_1'
     const customProps = defaultProps
     const container = setup({...customProps})
 
@@ -169,8 +174,8 @@ describe('BBBModalOptions', () => {
   })
 
   it('shows add to calendar when context and can_manage_calendar', () => {
-    window.ENV.context_asset_string = 'course_1'
-    window.ENV.can_manage_calendar = true
+    ENV.context_asset_string = 'course_1'
+    ENV.can_manage_calendar = true
     const customProps = defaultProps
     const container = setup({...customProps})
     expect(container.queryByText('Add to Calendar')).toBeInTheDocument()
