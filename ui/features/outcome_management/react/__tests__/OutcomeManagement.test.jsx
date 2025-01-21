@@ -34,10 +34,16 @@ import {
   showOutcomesImporterIfInProgress,
 } from '@canvas/outcomes/react/OutcomesImporter'
 import {courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/Management'
+import {windowConfirm} from '@canvas/util/globalUtils'
 
 jest.mock('@canvas/outcomes/react/OutcomesImporter', () => ({
   showOutcomesImporter: jest.fn(() => jest.fn(() => {})),
   showOutcomesImporterIfInProgress: jest.fn(() => jest.fn(() => {})),
+}))
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  ...jest.requireActual('@canvas/util/globalUtils'),
+  windowConfirm: jest.fn(() => true),
 }))
 
 describe('OutcomeManagement', () => {
@@ -240,12 +246,10 @@ describe('OutcomeManagement', () => {
     })
 
     describe('Changes confirmation', () => {
-      let originalConfirm, originalAddEventListener, unloadEventListener
+      let originalAddEventListener, unloadEventListener
 
       beforeAll(() => {
-        originalConfirm = window.confirm
         originalAddEventListener = window.addEventListener
-        window.confirm = jest.fn(() => true)
         window.addEventListener = (eventName, callback) => {
           if (eventName === 'beforeunload') {
             unloadEventListener = callback
@@ -253,8 +257,11 @@ describe('OutcomeManagement', () => {
         }
       })
 
+      beforeEach(() => {
+        jest.clearAllMocks()
+      })
+
       afterAll(() => {
-        window.confirm = originalConfirm
         window.addEventListener = originalAddEventListener
         unloadEventListener = null
       })
@@ -272,7 +279,7 @@ describe('OutcomeManagement', () => {
         fireEvent.click(getByText('Mastery'))
         fireEvent.click(getByText('Calculation'))
 
-        expect(window.confirm).not.toHaveBeenCalled()
+        expect(windowConfirm).not.toHaveBeenCalled()
       })
 
       it('Asks to confirm tab change when there is changes', async () => {
@@ -290,13 +297,15 @@ describe('OutcomeManagement', () => {
         fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
         fireEvent.click(getByText('Mastery'))
         await act(async () => jest.runAllTimers())
-        expect(window.confirm).toHaveBeenCalled()
+        expect(windowConfirm).toHaveBeenCalledWith(
+          'Are you sure you want to proceed? Changes you made will not be saved.',
+        )
         expect(getByTestId('masteryScales')).toBeInTheDocument()
       })
 
       it("Doesn't change tabs when doesn't confirm", async () => {
         // mock decline from user
-        window.confirm = () => false
+        windowConfirm.mockImplementationOnce(() => false)
 
         const {getByText, getByLabelText, queryByTestId} = render(
           <MockedProvider

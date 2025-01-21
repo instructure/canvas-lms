@@ -33,6 +33,7 @@ import {
   showOutcomesImporterIfInProgress,
 } from '@canvas/outcomes/react/OutcomesImporter'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {windowConfirm} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -88,7 +89,9 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const handleTabChange = (_, {index}) => {
     if (hasUnsavedChangesRef.current) {
       if (
-        confirm(I18n.t('Are you sure you want to proceed? Changes you made will not be saved.'))
+        windowConfirm(
+          I18n.t('Are you sure you want to proceed? Changes you made will not be saved.'),
+        )
       ) {
         setHasUnsavedChanges(false)
         setSelectedIndex(index)
