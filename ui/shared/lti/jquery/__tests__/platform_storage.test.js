@@ -33,6 +33,7 @@ describe('platform_storage', () => {
 
   beforeEach(() => {
     clearLimit(tool_id)
+    jest.clearAllMocks()
   })
 
   describe('getLimit', () => {
@@ -160,14 +161,19 @@ describe('platform_storage', () => {
     })
 
     describe('when key does not exist', () => {
+      beforeEach(() => {
+        jest.spyOn(window.localStorage, 'getItem').mockReturnValue(null)
+      })
+
       it('does nothing', () => {
+        clearData(tool_id, key)
         expect(window.localStorage.removeItem).not.toHaveBeenCalled()
       })
     })
 
     describe('when key is already stored', () => {
       beforeEach(() => {
-        jest.spyOn(window.localStorage, 'getItem').mockImplementation(() => value)
+        jest.spyOn(window.localStorage, 'getItem').mockReturnValue(value)
         putData(tool_id, key, value)
       })
 
