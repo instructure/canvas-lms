@@ -107,6 +107,7 @@ describe('lti.put_data handler', () => {
     const code = 'code'
 
     beforeEach(() => {
+      message = {key: 'hello', value: 'world', message_id: 'any'}
       platformStorage.putData.mockRestore()
       platformStorage.putData.mockImplementation(() => {
         const e = new Error(errorMessage)
