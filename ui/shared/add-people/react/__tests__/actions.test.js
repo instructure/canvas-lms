@@ -153,6 +153,30 @@ describe('Add People Actions', () => {
 
     test('dispatches CREATE_USERS_START when called', () => {
       mockAxiosSuccess()
+      const testState = {
+        ...INITIAL_STATE,
+        userValidationResult: {
+          duplicates: {
+            'test@example.com': {
+              selectedUserId: 1,
+              userList: [
+                {
+                  user_id: 1,
+                  name: 'Test User',
+                  email: 'test@example.com'
+                }
+              ]
+            }
+          },
+          missing: {},
+          validUsers: []
+        },
+        courseParams: {
+          courseId: '1',
+          inviteUsersURL: '/courses/1/invite_users'
+        }
+      }
+      mockStore(testState)
       store.dispatch(actions.resolveValidationIssues())
       expect(storeSpy.calledWith({type: actionTypes.CREATE_USERS_START})).toBe(true)
     })
