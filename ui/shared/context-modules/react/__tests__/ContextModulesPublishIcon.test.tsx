@@ -27,11 +27,13 @@ import {initBody, makeModuleWithItems} from '../../__tests__/testHelpers'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
-  default: jest.fn(() => Promise.resolve({
-    response: new Response('', {status: 200}),
-    json: {published: true},
-    text: '',
-  })),
+  default: jest.fn(() =>
+    Promise.resolve({
+      response: new Response('', {status: 200}),
+      json: {published: true},
+      text: '',
+    } as DoFetchApiResults<{published: boolean}>),
+  ),
 }))
 
 jest.mock('@canvas/context-modules/jquery/utils', () => {
@@ -43,7 +45,8 @@ jest.mock('@canvas/context-modules/jquery/utils', () => {
   }
 })
 
-const mockDoFetchApi = jest.requireMock('@canvas/do-fetch-api-effect').default as jest.MockedFunction<typeof doFetchApi>
+const mockDoFetchApi = jest.requireMock('@canvas/do-fetch-api-effect')
+  .default as jest.MockedFunction<typeof doFetchApi>
 
 const defaultProps = {
   courseId: '1',
@@ -55,13 +58,16 @@ const defaultProps = {
 
 const PUBLISH_URL = '/api/v1/courses/1/modules/1'
 
+const mockResponse = new Response('', {status: 200})
+mockResponse.json = () => Promise.resolve({published: true})
+
 beforeEach(() => {
   mockDoFetchApi.mockImplementation(() =>
     Promise.resolve({
-      response: new Response('', {status: 200}),
+      response: mockResponse,
       json: {published: true},
       text: '',
-    })
+    } as DoFetchApiResults<{published: boolean}>),
   )
   initBody()
   makeModuleWithItems(1, [117, 119])
