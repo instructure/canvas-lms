@@ -232,6 +232,10 @@ module CustomSeleniumActions
     fj("table:contains('#{caption}')", scope)
   end
 
+  def find_table_rows(caption = "", scope = nil)
+    ffxpath("//table[caption='#{caption}']/tbody/tr", scope)
+  end
+
   def fxpath_table_cell(caption, row_index, col_index)
     fxpath("//table[caption= '#{caption}']/tbody/tr[#{row_index}]/td[#{col_index}]")
   end

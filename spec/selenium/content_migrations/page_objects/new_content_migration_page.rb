@@ -52,7 +52,7 @@ class NewContentMigrationPage
     end
 
     def all_content_radio
-      f('[for="RadioInput_0"]')
+      fxpath('//*[text()="All content"]')
     end
 
     def specific_content_radio
@@ -116,7 +116,7 @@ class NewContentMigrationPage
     end
 
     def migration_progress_items
-      ff(".migrationProgressItem")
+      find_table_rows("Content Migrations")
     end
 
     def course_select_warning
