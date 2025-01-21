@@ -25,7 +25,7 @@ export type ePortfolio = {
   id: number
   name: string
   public: boolean
-  profile_url: string
+  profile_url: string | null
 }
 export type ePortfolioSection = {
   id: number
