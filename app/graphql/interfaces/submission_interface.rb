@@ -493,7 +493,9 @@ module Interfaces::SubmissionInterface
           submission.course_id,
           assignment.discussion_topic.id,
           host: context[:request].host_with_port,
-          embed: true
+          embed: true,
+          persist: 1,
+          student_id: submission.user_id
         )
       else
         GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
