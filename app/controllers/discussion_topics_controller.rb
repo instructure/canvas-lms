@@ -1149,6 +1149,9 @@ class DiscussionTopicsController < ApplicationController
   #   "all".  Can only be present only on announcements and only those that are
   #   for a course (as opposed to a group).
   #
+  # @argument lock_comment [Boolean]
+  #   If is_announcement and lock_comment are true, ‘Allow Participants to Comment’ setting is disabled.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
   #         -F title='my topic' \
@@ -1243,6 +1246,9 @@ class DiscussionTopicsController < ApplicationController
   #   topic specific to sections, then this parameter may be omitted or set to
   #   "all".  Can only be present only on announcements and only those that are
   #   for a course (as opposed to a group).
+  #
+  # @argument lock_comment [Boolean]
+  #   If is_announcement and lock_comment are true, ‘Allow Participants to Comment’ setting is disabled.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
@@ -1510,6 +1516,22 @@ class DiscussionTopicsController < ApplicationController
     allowed_fields = @context.is_a?(Group) ? API_ALLOWED_TOPIC_FIELDS_FOR_GROUP : API_ALLOWED_TOPIC_FIELDS
     discussion_topic_hash = params.permit(*allowed_fields)
     only_pinning = discussion_topic_hash.except(*%w[pinned]).blank?
+
+    # Handle the locked parameter
+    if @topic.is_announcement
+      params[:locked] = if params[:lock_comment].present?
+                          value_to_boolean(params[:lock_comment])
+                        elsif params[:locked].present?
+                          value_to_boolean(params[:locked])
+                        else
+                          false
+                        end
+    end
+
+    if @topic.is_announcement && params[:locked]
+      discussion_topic_hash.delete(:discussion_type)
+      discussion_topic_hash.delete(:require_initial_post)
+    end
 
     # allow pinning/unpinning if a subtopic and we can update the root
     topic_to_check = (only_pinning && @topic.root_topic) ? @topic.root_topic : @topic

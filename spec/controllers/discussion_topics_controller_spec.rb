@@ -2226,6 +2226,34 @@ describe DiscussionTopicsController do
       end
     end
 
+    describe "handle locked parameter" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "removes discussion_type and require_initial_post when is_announcement is true and lock_comment is true" do
+        post_params = topic_params(@course, { is_announcement: true, lock_comment: true, discussion_type: "threaded", require_initial_post: true })
+        post "create", params: post_params, format: :json
+        topic = assigns[:topic]
+
+        expect(topic.is_announcement).to be_truthy
+        expect(topic.locked).to be_truthy
+        expect(topic.discussion_type).to eq "not_threaded"
+        expect(topic.require_initial_post).to be_falsey
+      end
+
+      it "does not remove discussion_type and require_initial_post when is_announcement is true and lock_comment is false" do
+        post_params = topic_params(@course, { is_announcement: true, lock_comment: false, discussion_type: "threaded", require_initial_post: true })
+        post "create", params: post_params, format: :json
+        topic = assigns[:topic]
+
+        expect(topic.is_announcement).to be_truthy
+        expect(topic.locked).to be_falsey
+        expect(topic.discussion_type).to eq "threaded"
+        expect(topic.require_initial_post).to be_truthy
+      end
+    end
+
     describe "the new topic" do
       let(:topic) { assigns[:topic] }
 
@@ -2461,13 +2489,13 @@ describe DiscussionTopicsController do
       expect(accessed_asset[:level]).to eq "participate"
     end
 
-    it "creates an announcement that is locked by default" do
+    it "creates an announcement that is not locked by default" do
       user_session(@teacher)
       params = topic_params(@course, { is_announcement: true })
       params.delete(:locked)
       post("create", params:, format: :json)
       expect(response).to be_successful
-      expect(DiscussionTopic.last.locked).to be_truthy
+      expect(DiscussionTopic.last.locked).to be_falsy
     end
 
     it "creates a discussion topic that is not locked by default" do
