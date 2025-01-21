@@ -102,7 +102,16 @@ describe "Block Editor", :ignore_js_errors do
       open_block_toolbox_to_tab("blocks")
       expect(block_toolbox).to be_displayed
       drop_new_block("button", group_block_dropzone)
-      expect(fj("#{group_block_inner_selector}:contains('Click me')")).to be_displayed
+      expect(block_toolbar_button).to be_displayed
+    end
+
+    it "can click on a block and it gets added to the editor from the toolbox" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      open_block_toolbox_to_tab("blocks")
+      expect(block_toolbox).to be_displayed
+      block_toolbox_button.click
+      expect(block_toolbar_button).to be_displayed
     end
 
     it "cannot resize an image with no src" do

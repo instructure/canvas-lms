@@ -326,9 +326,11 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
         <Flex justifyItems="space-between">
           <Heading level="h2">{I18n.t('Preview')}</Heading>
           <Flex gap="large" direction="row-reverse">
-            <CloseButton offset="small" onClick={onDismiss} screenReaderLabel={I18n.t('Close')} />
+            <CloseButton data-testid="preview-modal-close-button"
+                         offset="small" onClick={onDismiss} screenReaderLabel={I18n.t('Close')} />
             <Flex as="div" gap="small">
               <IconButton
+                data-testid="preview-modal-icon-button-desktop"
                 size="small"
                 onClick={handleDesktopSize}
                 screenReaderLabel={I18n.t('Desktop')}
@@ -341,6 +343,7 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
                 <IconDesktop size="x-small" />
               </IconButton>
               <IconButton
+                data-testid="preview-modal-icon-button-tablet"
                 size="small"
                 onClick={handleTabletSize}
                 screenReaderLabel={I18n.t('Tablet')}
@@ -353,6 +356,7 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
                 <IconTablet size="x-small" />
               </IconButton>
               <IconButton
+                data-testid="preview-modal-icon-button-mobile"
                 size="small"
                 onClick={handleMobileSize}
                 screenReaderLabel={I18n.t('Mobile')}
