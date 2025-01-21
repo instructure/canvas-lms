@@ -29,6 +29,7 @@ import {
 import ConnectedHeader, {Header, type HeaderProps} from '../header'
 import type {CoursePace} from '../../../types'
 import {enableFetchMocks} from 'jest-fetch-mock'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 enableFetchMocks()
 
@@ -49,6 +50,14 @@ const defaultProps: HeaderProps = {
 }
 
 describe('Course paces header', () => {
+  beforeEach(() => {
+    fakeENV.setup()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   it('renders', () => {
     const {getByRole, getByText} = renderConnected(<Header {...defaultProps} />)
     expect(getByRole('button', {name: 'Course Pacing'})).toBeInTheDocument()
@@ -101,9 +110,12 @@ describe('Course paces header', () => {
   // the other messsages are tested with UnpublishedChangesIndicator
 
   describe('with course paces for students', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_for_students = true
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          course_paces_for_students: true,
+        },
+      })
     })
 
     it('does render publishing changes for student paces', () => {
@@ -113,9 +125,13 @@ describe('Course paces header', () => {
   })
 
   describe('with course paces redesign ON', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_redesign = true
+    beforeEach(() => {
+      fakeENV.setup({
+        COURSE_ID: '30',
+        FEATURES: {
+          course_paces_redesign: true,
+        },
+      })
     })
 
     afterEach(() => {
@@ -123,8 +139,6 @@ describe('Course paces header', () => {
     })
 
     it('renders metrics as table', async () => {
-      window.ENV.COURSE_ID = '30'
-      type Foo = Parameters<typeof ConnectedHeader>[0]
       const {getByRole, getByTestId} = renderConnected(<ConnectedHeader {...defaultProps} />)
       await waitFor(() => {
         expect(getByRole('columnheader', {name: 'Students'})).toBeInTheDocument()
@@ -134,7 +148,6 @@ describe('Course paces header', () => {
     })
 
     it('renders the data pulled from the context api', async () => {
-      window.ENV.COURSE_ID = '30'
       fetchMock.mock('/api/v1/courses/30/pace_contexts?type=course', HEADING_STATS_API_RESPONSE)
       const {getByRole, getByTestId} = renderConnected(<ConnectedHeader {...defaultProps} />)
 
