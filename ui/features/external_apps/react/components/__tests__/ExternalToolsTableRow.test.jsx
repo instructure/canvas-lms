@@ -21,6 +21,7 @@ import {act, render, fireEvent, waitFor} from '@testing-library/react'
 import $ from 'jquery'
 import store from '../../lib/ExternalAppsStore'
 import ExternalToolsTableRow from '../ExternalToolsTableRow'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const tools = [
   {
@@ -69,6 +70,11 @@ const tools = [
 
 const ajax = $.ajax
 beforeEach(() => {
+  fakeENV.setup({
+    FEATURES: {
+      top_navigation_placement: true,
+    },
+  })
   store.setState({
     externalTools: tools,
     hasMore: false,
@@ -78,6 +84,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  fakeENV.teardown()
   $.ajax = ajax
 })
 
@@ -86,7 +93,6 @@ function renderRow(props) {
   const tbody = document.createElement('tbody')
   table.appendChild(tbody)
   document.body.appendChild(table)
-  window.ENV.FEATURES = {top_navigation_placement: true}
   return render(
     <ExternalToolsTableRow
       tool={tools[0]}
