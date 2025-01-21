@@ -268,14 +268,14 @@ RSpec.describe ApplicationController do
 
       it "sets the contextual timezone from the context" do
         Time.use_zone("Mountain Time (US & Canada)") do
-          controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil, grants_right?: false))
+          controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil, grants_any_right?: false))
           controller.js_env({})
           expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/Denver"
         end
       end
 
       context "session_timezone url param is given" do
-        let(:context_double) { double(asset_string: "", class_name: nil, grants_right?: false) }
+        let(:context_double) { double(asset_string: "", class_name: nil, grants_any_right?: false) }
 
         before do
           allow(controller).to receive(:params).and_return({ session_timezone: "America/New_York" })
@@ -3271,23 +3271,38 @@ end
 
 RSpec.describe ApplicationController, "#set_js_env" do
   context "when a context is set" do
+    let(:account) { Account.default }
     let(:context) { course_model }
 
     before do
+      controller.instance_variable_set(:@domain_root_account, account)
       controller.instance_variable_set(:@context, context)
       allow(controller).to receive(:request).and_return(request)
     end
 
-    it "does not set current_context" do
+    it "does not set current_context when the user does not have :read or :read_as_admin rights" do
+      student = student_in_course(course: context).user
+      controller.instance_variable_set(:@current_user, student)
       expect(controller.js_env[:current_context]).to be_nil
     end
 
     context "when user has access to the context" do
-      before do
-        allow(context).to receive(:grants_right?).and_return(true)
+      it "sets current_context when the user has :read rights" do
+        teacher = teacher_in_course(course: context, active_all: true).user
+        controller.instance_variable_set(:@current_user, teacher)
+        expect(controller.js_env[:current_context]).to eq(
+          {
+            id: context.id,
+            url: "http://test.host/courses/#{context.id}",
+            name: context.name,
+            type: "Course"
+          }
+        )
       end
 
-      it "sets current_context" do
+      it "sets current_context when the user has :read_as_admin rights" do
+        admin = account_admin_user(account:)
+        controller.instance_variable_set(:@current_user, admin)
         expect(controller.js_env[:current_context]).to eq(
           {
             id: context.id,
