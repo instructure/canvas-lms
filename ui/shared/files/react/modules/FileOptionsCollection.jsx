@@ -66,7 +66,10 @@ class FileOptionsCollection {
     // Some uploaded files require a certain category be applied to them.
     // We use "applyCategory" and CategoryProcessor to add those categories
     // according to file type and content.
-    this.applyCategory(this.state.resolvedNames)
+
+    this.setState({newOptions: false})
+
+    return this.applyCategory(this.state.resolvedNames)
       .then(resolvedNamesWithCategories => {
         resolvedNamesWithCategories.forEach(f => {
           UploadQueue.enqueue(f, this.folder, contextId, contextType)
@@ -75,8 +78,6 @@ class FileOptionsCollection {
       .catch(error => {
         throw error
       })
-
-    this.setState({newOptions: false})
   }
 
   toFilesOptionArray(fList) {
