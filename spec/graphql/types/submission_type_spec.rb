@@ -1002,7 +1002,7 @@ describe Types::SubmissionType do
       end
     end
 
-    context "whent the assignment is a discussion topic" do
+    context "when the assignment is a discussion topic" do
       before do
         @assignment.update!(submission_types: "discussion_topic")
         @discussion_topic = @assignment.discussion_topic
@@ -1010,7 +1010,7 @@ describe Types::SubmissionType do
 
       it "returns the preview URL for the discussion topic" do
         @discussion_topic.discussion_entries.create!(user: @student, message: "I have a lot to say about this topic")
-        expect(preview_url).to eq "http://test.host/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}?embed=true"
+        expect(preview_url).to eq "http://test.host/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}?embed=true&persist=1&student_id=#{@student.id}"
       end
     end
   end
