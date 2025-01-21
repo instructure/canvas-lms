@@ -16,17 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import MutexManager from '@canvas/mutex-manager/MutexManager'
-
 describe('initMutexes drawer_layout_mutex', () => {
   const oldEnv = window.ENV
   const oldBody = document.body
   const drawer_layout_mutex = 'drawer-layout-mutex'
 
+  beforeEach(() => {
+    window.ENV = {}
+    document.body = document.createElement('body')
+    jest.resetModules()
+  })
+
   afterEach(() => {
     window.ENV = oldEnv
     document.body = oldBody
-    MutexManager.mutexes = {}
+    jest.resetModules()
   })
 
   it('should create a drawer layout mutex if all conditions are met', () => {
@@ -40,8 +44,12 @@ describe('initMutexes drawer_layout_mutex', () => {
     drawerLayout.id = 'drawer-layout-mount-point'
     document.body.appendChild(drawerLayout)
 
-    require('../initMutexes')
-    expect(MutexManager.mutexes[drawer_layout_mutex]).not.toBeUndefined()
+    jest.isolateModules(() => {
+      const MutexManager = require('@canvas/mutex-manager/MutexManager').default
+      require('../initMutexes')
+      expect(Object.keys(MutexManager.mutexes)).toHaveLength(1)
+      expect(MutexManager.mutexes[drawer_layout_mutex]).toBeDefined()
+    })
   })
 
   it('should not create a mutex if the ENV variable is not set', () => {
@@ -53,8 +61,11 @@ describe('initMutexes drawer_layout_mutex', () => {
     drawerLayout.id = 'drawer-layout-mount-point'
     document.body.appendChild(drawerLayout)
 
-    require('../initMutexes')
-    expect(MutexManager.mutexes[drawer_layout_mutex]).toBeUndefined()
+    jest.isolateModules(() => {
+      const MutexManager = require('@canvas/mutex-manager/MutexManager').default
+      require('../initMutexes')
+      expect(MutexManager.mutexes[drawer_layout_mutex]).toBeUndefined()
+    })
   })
 
   it('should not create a mutex if the topNav element is not present', () => {
@@ -64,8 +75,11 @@ describe('initMutexes drawer_layout_mutex', () => {
     drawerLayout.id = 'drawer-layout-mount-point'
     document.body.appendChild(drawerLayout)
 
-    require('../initMutexes')
-    expect(MutexManager.mutexes[drawer_layout_mutex]).toBeUndefined()
+    jest.isolateModules(() => {
+      const MutexManager = require('@canvas/mutex-manager/MutexManager').default
+      require('../initMutexes')
+      expect(MutexManager.mutexes[drawer_layout_mutex]).toBeUndefined()
+    })
   })
 
   it('should not create a mutex if the drawerLayout element is not present', () => {
@@ -75,7 +89,10 @@ describe('initMutexes drawer_layout_mutex', () => {
     topNav.id = 'top-nav-tools-mount-point'
     document.body.appendChild(topNav)
 
-    require('../initMutexes')
-    expect(MutexManager.mutexes[drawer_layout_mutex]).toBeUndefined()
+    jest.isolateModules(() => {
+      const MutexManager = require('@canvas/mutex-manager/MutexManager').default
+      require('../initMutexes')
+      expect(MutexManager.mutexes[drawer_layout_mutex]).toBeUndefined()
+    })
   })
 })
