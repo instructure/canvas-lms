@@ -76,7 +76,7 @@ describe "settings tabs" do
       course_with_admin_logged_in
     end
 
-    it "adds and delete an announcement" do
+    it "adds and deletes an announcement" do
       get "/accounts/#{Account.default.id}/settings"
       add_announcement
       f(".delete_notification_link").click
