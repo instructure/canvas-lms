@@ -16,17 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState, useEffect} from 'react'
+import {useLocation, Link} from 'react-router-dom'
 import {Flex} from '@instructure/ui-flex'
 import {IconFolderLockedSolid, IconFolderSolid} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Text} from '@instructure/ui-text'
-import {Link} from 'react-router-dom'
 import {View} from '@instructure/ui-view'
+import FilePreviewModal from './FilePreviewModal'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {type File, type Folder} from '../../../interfaces/File'
 import {generateUrlPath} from '../../../utils/folderUtils'
+import {generatePreviewUrlPath} from '../../../utils/fileUtils'
 
 interface NameLinkProps {
   item: File | Folder
@@ -34,6 +36,30 @@ interface NameLinkProps {
 }
 
 const NameLink = ({item, isStacked}: NameLinkProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const location = useLocation()
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search)
+    const previewId = searchParams.get('preview')
+    if (previewId == item.id) {
+      setIsModalOpen(true)
+    }
+  }, [location.search, item.id])
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (isFile) {
+      e.preventDefault()
+      setIsModalOpen(true)
+      const searchParams = new URLSearchParams(location.search)
+      searchParams.set('preview', item.id)
+      window.history.pushState({}, '', urlPath())
+    }
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
   const isFile = 'display_name' in item
   const name = isFile ? item.display_name : item.name
   const iconUrl = isFile ? item.thumbnail_url : undefined
@@ -59,31 +85,39 @@ const NameLink = ({item, isStacked}: NameLinkProps) => {
     )
   }
 
+  const renderFilePreviewModal = () => {
+    if (!isFile) return null
+
+    return <FilePreviewModal isOpen={isModalOpen} onClose={handleCloseModal} item={item as File} />
+  }
+
   const urlPath = () => {
     if (isFile) {
-      // TODO: file preview
-      return '/'
+      return generatePreviewUrlPath(item as File)
     } else {
       return generateUrlPath(item)
     }
   }
 
   return (
-    <Link to={urlPath()} data-testid={name}>
-      {isStacked ? (
-        <>
-          {renderIconComponent()}
-          {renderTextComponent()}
-        </>
-      ) : (
-        <Flex>
-          <Flex.Item margin="0 0 x-small 0">{renderIconComponent()}</Flex.Item>
-          <Flex.Item margin="0 0 0 small" shouldShrink={true}>
+    <>
+      <Link to={urlPath()} data-testid={name} onClick={handleLinkClick}>
+        {isStacked ? (
+          <>
+            {renderIconComponent()}
             {renderTextComponent()}
-          </Flex.Item>
-        </Flex>
-      )}
-    </Link>
+          </>
+        ) : (
+          <Flex>
+            <Flex.Item margin="0 0 x-small 0">{renderIconComponent()}</Flex.Item>
+            <Flex.Item margin="0 0 0 small" shouldShrink={true}>
+              {renderTextComponent()}
+            </Flex.Item>
+          </Flex>
+        )}
+      </Link>
+      {renderFilePreviewModal()}
+    </>
   )
 }
 
