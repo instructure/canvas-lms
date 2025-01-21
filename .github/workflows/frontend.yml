@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
 
     steps:
       - uses: actions/checkout@v4
@@ -106,4 +106,4 @@ jobs:
       - name: Run Tests (Shard ${{ matrix.shard }})
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
-        run: yarn test --shard=${{ matrix.shard }}/10
+        run: yarn test --shard=${{ matrix.shard }}/16
