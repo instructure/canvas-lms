@@ -20,12 +20,20 @@ import React from 'react'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import SpeedGraderProvisionalGradeSelector from '../SpeedGraderProvisionalGradeSelector'
 import {render, waitFor} from '@testing-library/react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('SpeedGraderProvisionalGradeSelector', () => {
-  let $container
   let props
 
   beforeEach(() => {
+    fakeENV.setup({
+      instructor_selectable_states: {
+        1: false,
+        2: true,
+        3: true,
+      },
+    })
+
     props = {
       detailsInitiallyVisible: true,
       finalGraderId: '2',
@@ -64,8 +72,12 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
     }
 
     document.documentElement.setAttribute('dir', 'ltr')
-    $container = document.createElement('div')
+    const $container = document.createElement('div')
     document.body.appendChild($container)
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   test('has "Show Details" text if detailsVisible is false', () => {
@@ -83,13 +95,6 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
   test('has "Hide Details" text if detailsVisible is true', async () => {
     const ref = React.createRef()
     const wrapper = render(<SpeedGraderProvisionalGradeSelector {...props} ref={ref} />)
-    window.ENV = {
-      instructor_selectable_states: {
-        1: false,
-        2: true,
-        3: true,
-      },
-    }
     ref.current.setState({detailsVisible: true})
     await waitFor(() => {
       expect(wrapper.getByText('Hide Details')).toBeInTheDocument()
