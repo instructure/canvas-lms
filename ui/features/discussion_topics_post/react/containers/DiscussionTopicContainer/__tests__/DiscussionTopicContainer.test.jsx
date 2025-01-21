@@ -783,6 +783,12 @@ describe('DiscussionTopicContainer', () => {
     })
 
     describe('PodcastFeed Button', () => {
+      afterEach(() => {
+        // Clean up any podcast feed links added to document head
+        const podcastLinks = document.querySelectorAll('link[type="application/rss+xml"]')
+        podcastLinks.forEach(link => link.remove())
+      })
+
       it('does not render when Discussion Podcast Feed is not present', () => {
         const {queryByTestId} = setup({discussionTopic: Discussion.mock()})
         expect(queryByTestId('post-rssfeed')).toBeNull()
