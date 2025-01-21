@@ -22,81 +22,98 @@ import {EnrollmentTreeGroup, constructLabel} from '../EnrollmentTreeGroup'
 import type {NodeStructure} from '../types'
 import type {Spacing} from '@instructure/emotion'
 
-const checkCallback = jest.fn()
-const toggleCallback = jest.fn()
-
-interface TestableNodeStructure extends NodeStructure {
-  parent?: NodeStructure
-}
-
-const emptyNode = {
+const createEmptyNode = () => ({
   id: '',
   label: '',
   children: [],
   isMixed: false,
   isCheck: false,
-}
+})
 
-const section2Node: TestableNodeStructure = {
+const createSection2Node = (parent: NodeStructure): NodeStructure => ({
   id: 's2',
   label: 'Section 2',
   children: [],
-  parent: emptyNode,
+  parent,
   isCheck: false,
   isMixed: false,
-}
+})
 
-const section1Node: TestableNodeStructure = {
+const createSection1Node = (parent: NodeStructure): NodeStructure => ({
   id: 's1',
   label: 'Section 1',
   children: [],
-  parent: emptyNode,
+  parent,
   isCheck: false,
   isMixed: false,
-}
+})
 
-const courseNode: TestableNodeStructure = {
+const createCourseNode = (parent: NodeStructure): NodeStructure => ({
   id: 'c1',
   label: 'Course 1',
-  children: [section1Node],
-  termName: 'Fall 2021',
-  parent: emptyNode,
+  children: [],
+  parent,
   isCheck: false,
-  isToggle: true,
   isMixed: false,
-}
+  isToggle: true,
+  termName: 'Fall 2021',
+})
 
-const roleNode: TestableNodeStructure = {
-  enrollId: '1',
+const createRoleNode = (): NodeStructure => ({
   id: 'r1',
   label: 'Role 1',
-  children: [courseNode],
+  children: [],
   isCheck: false,
-  isToggle: true,
   isMixed: false,
-}
-
-courseNode.parent = roleNode
-section1Node.parent = courseNode
-section2Node.parent = courseNode
-
-const rProps = {
-  id: roleNode.id,
-  label: roleNode.label,
-  isCheck: roleNode.isCheck,
-  isMixed: roleNode.isMixed,
-  isToggle: roleNode.isToggle,
-  children: roleNode.children,
-  indent: '0 0 0 0' as Spacing,
-  updateCheck: checkCallback,
-  updateToggle: toggleCallback,
-}
+  isToggle: true,
+})
 
 describe('EnrollmentTreeGroup', () => {
+  let emptyNode: NodeStructure
+  let section2Node: NodeStructure
+  let section1Node: NodeStructure
+  let courseNode: NodeStructure
+  let roleNode: NodeStructure
+  let checkCallback: jest.Mock
+  let toggleCallback: jest.Mock
+  let rProps: any
+
+  beforeEach(() => {
+    emptyNode = createEmptyNode()
+    roleNode = createRoleNode()
+    courseNode = createCourseNode(roleNode)
+    section1Node = createSection1Node(courseNode)
+    section2Node = createSection2Node(courseNode)
+
+    courseNode.children = [section1Node]
+    roleNode.children = [courseNode]
+
+    checkCallback = jest.fn()
+    toggleCallback = jest.fn()
+
+    rProps = {
+      id: roleNode.id,
+      label: roleNode.label,
+      children: roleNode.children,
+      isCheck: roleNode.isCheck,
+      isMixed: roleNode.isMixed,
+      isToggle: roleNode.isToggle,
+      indent: '0 0 0 0' as Spacing,
+      updateCheck: checkCallback,
+      updateToggle: toggleCallback,
+    }
+
+    jest.clearAllMocks()
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   it('renders role with one course item when toggled', () => {
     const {getByText} = render(<EnrollmentTreeGroup {...rProps} />)
     expect(getByText('Role 1')).toBeInTheDocument()
-    // course and section labels will be shown because they are different
+    // The course name, section name and term are shown together
     expect(getByText('Course 1 - Section 1 - Fall 2021')).toBeInTheDocument()
   })
 
@@ -113,7 +130,7 @@ describe('EnrollmentTreeGroup', () => {
     // only the course label will be displayed
     expect(getByText('Course 1 - Fall 2021')).toBeInTheDocument()
     // default section labels that match course labels will not be shown to reduce UI clutter
-    expect(queryByText('Course 1 - Course 1 - Fall 2021')).not.toBeInTheDocument()
+    expect(queryByText('Course 1')).not.toBeInTheDocument()
   })
 
   it('renders role with one course group when toggled', () => {
