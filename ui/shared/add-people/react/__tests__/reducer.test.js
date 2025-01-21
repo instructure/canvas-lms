@@ -276,16 +276,24 @@ const API_ENROLL_RESPONSE = [{}, {}]
 
 // the tests ---------------------
 describe('Course Enrollment Add People Reducer', () => {
-  const reduce = (action, state = INITIAL_STATE) => reducer(state, action)
+  let runningState
 
-  let runningState = cloneDeep(INITIAL_STATE)
+  beforeEach(() => {
+    runningState = cloneDeep(INITIAL_STATE)
+  })
+
+  afterEach(() => {
+    runningState = null
+  })
+
+  const reduce = (action, state = runningState) => reducer(state, action)
 
   test('set input paramaters', () => {
     const newSearchParams = {
       fieldType: 'unique_id',
       nameList: 'foo, bar, baz',
       role: '2',
-      secion: '2',
+      section: '2',
       limitPrivilege: true,
     }
     const newState = reduce(actions.setInputParams(newSearchParams))
@@ -303,10 +311,10 @@ describe('Course Enrollment Add People Reducer', () => {
 
   // validating users
   test('VALIDATE_USERS_START', () => {
-    const newState = reduce(actions.validateUsersStart(runningState))
+    const newState = reduce(actions.validateUsersStart())
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
-    deepEqual(newState.apiState, {pendingCount: 1, error: undefined}, 'apiState')
+    deepEqual(newState.apiState, {pendingCount: 1, error: undefined}, 'api is in-flight')
     deepEqual(
       newState.userValidationResult,
       INITIAL_STATE.userValidationResult,
@@ -314,14 +322,13 @@ describe('Course Enrollment Add People Reducer', () => {
     )
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
-    runningState = newState
   })
   test('VALIDATE_USERS_SUCCESS', () => {
-    const newState = reduce(actions.validateUsersSuccess(API_VALIDATION_RESPONSE1), runningState)
+    runningState.apiState.pendingCount = 1 // Set initial pending count
+    const newState = reduce(actions.validateUsersSuccess(API_VALIDATION_RESPONSE1))
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
-    deepEqual(newState.apiState, INITIAL_STATE.apiState, 'apiState')
-
+    deepEqual(newState.apiState, {pendingCount: 0, error: undefined}, 'api is no longer in-flight')
     deepEqual(newState.userValidationResult.duplicates, dupeList, 'userValidationResult.duplicates')
     deepEqual(newState.userValidationResult.missing, missingList, 'userValidationResult.missing')
     deepEqual(
@@ -329,15 +336,12 @@ describe('Course Enrollment Add People Reducer', () => {
       goodUsers,
       'userValidationResult.avalidUsers',
     )
-
     deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
     equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
-    runningState = newState
   })
   test('VALIDATE_USERS_ERROR', () => {
-    const state = cloneDeep(INITIAL_STATE)
-    state.apiState.pendingCount = 1
-    const newState = reduce(actions.validateUsersError('whoops'), state)
+    runningState.apiState.pendingCount = 1 // Set initial pending count
+    const newState = reduce(actions.validateUsersError('whoops'))
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
     deepEqual(
@@ -356,205 +360,130 @@ describe('Course Enrollment Add People Reducer', () => {
 
   // manipulating duplicates
   test('CHOOSE_DUPLICATE', () => {
-    // choose bob weir
-    const newState = reduce(actions.chooseDuplicate({address: 'bob', user_id: '2'}), runningState)
+    // First set up the duplicates state
+    runningState = reduce(actions.validateUsersSuccess(API_VALIDATION_RESPONSE1))
+    const newState = reduce(actions.chooseDuplicate({address: 'bob', user_id: 2}))
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
-    deepEqual(newState.apiState, INITIAL_STATE.apiState, 'apiState')
-
-    equal(newState.userValidationResult.duplicates.bob.createNew, false, 'duplicate set createNew')
-    equal(
-      newState.userValidationResult.duplicates.bob.selectedUserId,
-      '2',
-      'duplicate set selectedUserId',
-    )
-    equal(newState.userValidationResult.duplicates.bob.skip, false, 'duplicate set skip')
-
-    deepEqual(newState.userValidationResult.missing, missingList, 'userValidationResult.missing')
-    deepEqual(
-      newState.userValidationResult.validUsers,
-      goodUsers,
-      'userValidationResult.avalidUsers',
-    )
-    deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
-    runningState = newState
+    equal(newState.userValidationResult.duplicates.bob.selectedUserId, 2)
+    equal(newState.userValidationResult.duplicates.bob.skip, false)
+    equal(newState.userValidationResult.duplicates.bob.createNew, false)
   })
   test('SKIP_DUPLICATE', () => {
-    // skip the bobs
-    const newState = reduce(actions.skipDuplicate('bob'), runningState)
+    // First set up the duplicates state
+    runningState = reduce(actions.validateUsersSuccess(API_VALIDATION_RESPONSE1))
+    const newState = reduce(actions.skipDuplicate('bob'))
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
-    deepEqual(newState.apiState, INITIAL_STATE.apiState, 'apiState')
-
-    equal(newState.userValidationResult.duplicates.bob.createNew, false, 'duplicate set createNew')
-    equal(
-      newState.userValidationResult.duplicates.bob.selectedUserId,
-      -1,
-      'duplicate set selectedUserId',
-    )
-    equal(newState.userValidationResult.duplicates.bob.skip, true, 'duplicate set skip')
-
-    deepEqual(newState.userValidationResult.missing, missingList, 'userValidationResult.missing')
-    deepEqual(
-      newState.userValidationResult.validUsers,
-      goodUsers,
-      'userValidationResult.avalidUsers',
-    )
-    deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
-    runningState = newState
+    equal(newState.userValidationResult.duplicates.bob.selectedUserId, -1)
+    equal(newState.userValidationResult.duplicates.bob.skip, true)
+    equal(newState.userValidationResult.duplicates.bob.createNew, false)
   })
   test('ENQUEUE_NEW_FOR_DUPLICATE', () => {
-    // create a new bob
+    // First set up the duplicates state
+    runningState = reduce(actions.validateUsersSuccess(API_VALIDATION_RESPONSE1))
     const newState = reduce(
-      actions.enqueueNewForDuplicate({address: 'bob', newUserInfo: USER_BOB}),
-      runningState,
+      actions.enqueueNewForDuplicate({
+        address: 'bob',
+        newUserInfo: USER_BOB,
+      })
     )
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
-    deepEqual(newState.apiState, INITIAL_STATE.apiState, 'apiState')
-
-    equal(newState.userValidationResult.duplicates.bob.createNew, true, 'duplicate set createNew')
-    equal(
-      newState.userValidationResult.duplicates.bob.selectedUserId,
-      -1,
-      'duplicate set selectedUserId',
-    )
-    equal(newState.userValidationResult.duplicates.bob.skip, false, 'duplicate set skip')
-    deepEqual(
-      newState.userValidationResult.duplicates.bob.newUserInfo,
-      USER_BOB,
-      'duplicate set newUserInfo',
-    )
-
-    deepEqual(newState.userValidationResult.missing, missingList, 'userValidationResult.missing')
-    deepEqual(
-      newState.userValidationResult.validUsers,
-      goodUsers,
-      'userValidationResult.avalidUsers',
-    )
-    deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
-    runningState = newState
+    equal(newState.userValidationResult.duplicates.bob.selectedUserId, -1)
+    equal(newState.userValidationResult.duplicates.bob.skip, false)
+    equal(newState.userValidationResult.duplicates.bob.createNew, true)
+    deepEqual(newState.userValidationResult.duplicates.bob.newUserInfo, USER_BOB)
   })
 
   // manipulating missing users
   test('ENQUEUE_NEW_FOR_MISSING', () => {
-    // reset state to just after validation
-    runningState.userValidationResult.duplicates = cloneDeep(dupeList)
-
-    // create a new user for amelia
+    // First set up the missing users state
+    runningState = reduce(actions.validateUsersSuccess(API_VALIDATION_RESPONSE1))
     const newState = reduce(
-      actions.enqueueNewForMissing({address: 'amelia', newUserInfo: USER_AMELIA}),
-      runningState,
+      actions.enqueueNewForMissing({
+        address: 'amelia',
+        newUserInfo: USER_AMELIA,
+      })
     )
-
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
-    deepEqual(newState.apiState, INITIAL_STATE.apiState, 'apiState')
-
-    equal(
-      newState.userValidationResult.missing.amelia.createNew,
-      true,
-      'missing entry set createNew',
-    )
-    deepEqual(
-      newState.userValidationResult.missing.amelia.newUserInfo,
-      USER_AMELIA,
-      'missing entry has newUserInfo',
-    )
-
-    deepEqual(newState.userValidationResult.duplicates, dupeList, 'userValidationResult.dupliates')
-    deepEqual(
-      newState.userValidationResult.validUsers,
-      goodUsers,
-      'userValidationResult.avalidUsers',
-    )
-    deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
-    runningState = newState
+    deepEqual(newState.userValidationResult.missing.amelia.newUserInfo, USER_AMELIA)
+    equal(newState.userValidationResult.missing.amelia.createNew, true)
   })
   test('ENQUEUE_NEW_FOR_MISSING, unselect user', () => {
+    // First set up the missing users state
+    runningState = reduce(actions.validateUsersSuccess(API_VALIDATION_RESPONSE1))
+    // Then enqueue a new user
+    runningState = reduce(
+      actions.enqueueNewForMissing({
+        address: 'amelia',
+        newUserInfo: USER_AMELIA,
+      }),
+      runningState
+    )
+    // Then unselect the user
     const newState = reduce(
-      actions.enqueueNewForMissing({address: 'amelia', newUserInfo: false}),
-      runningState,
+      actions.enqueueNewForMissing({
+        address: 'amelia',
+        newUserInfo: false,
+      }),
+      runningState
     )
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
-    deepEqual(newState.apiState, INITIAL_STATE.apiState, 'apiState')
-
-    equal(
-      newState.userValidationResult.missing.amelia.createNew,
-      false,
-      'missing entry unset createNew',
-    )
-    deepEqual(
-      newState.userValidationResult.missing.amelia.newUserInfo,
-      USER_AMELIA,
-      'missing entry still has newUserInfo',
-    )
-
-    deepEqual(newState.userValidationResult.duplicates, dupeList, 'userValidationResult.dupliates')
-    deepEqual(
-      newState.userValidationResult.validUsers,
-      goodUsers,
-      'userValidationResult.avalidUsers',
-    )
-    deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
-    runningState = newState
+    deepEqual(newState.userValidationResult.missing.amelia.newUserInfo, USER_AMELIA, 'newUserInfo should be preserved')
+    equal(newState.userValidationResult.missing.amelia.createNew, false, 'createNew should be false')
   })
+
   // creating users
   test('CREATE_USERS_START', () => {
-    const newState = reduce(actions.createUsersStart(), runningState)
-    deepEqual(newState.courseParams, runningState.courseParams, 'courseParams')
-    deepEqual(newState.inputParams, runningState.inputParams, 'inputParams')
+    const newState = reduce(actions.createUsersStart())
+    deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
+    deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
     deepEqual(newState.apiState, {pendingCount: 1, error: undefined}, 'api is in-flight')
     deepEqual(
       newState.userValidationResult,
-      runningState.userValidationResult,
+      INITIAL_STATE.userValidationResult,
       'userValidationResult',
     )
-    deepEqual(newState.usersToBeEnrolled, runningState.usersToBeEnrolled, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
-    runningState = newState
+    deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
+    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
   })
   test('CREATE_USERS_SUCCESS', () => {
-    const newState = reduce(actions.createUsersSuccess(API_CREATE_RESPONSE1), runningState)
-    deepEqual(newState.courseParams, runningState.courseParams, 'courseParams')
-    deepEqual(newState.inputParams, runningState.inputParams, 'inputParams')
+    runningState.apiState.pendingCount = 1 // Set initial pending count
+    const newState = reduce(actions.createUsersSuccess(API_CREATE_RESPONSE1))
+    deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
+    deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
     deepEqual(newState.apiState, {pendingCount: 0, error: undefined}, 'api is no longer in-flight')
     deepEqual(
       newState.userValidationResult,
-      runningState.userValidationResult,
+      INITIAL_STATE.userValidationResult,
       'userValidationResult',
     )
-    deepEqual(newState.usersToBeEnrolled, runningState.usersToBeEnrolled, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
-    runningState = newState
+    deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
+    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
   })
   test('CREATE_USERS_SUCCESS, with error', () => {
-    runningState.apiState.pendingCount = 1
-    const newState = reduce(actions.createUsersSuccess(API_CREATE_RESPONSE2), runningState)
-    deepEqual(newState.courseParams, runningState.courseParams, 'courseParams')
-    deepEqual(newState.inputParams, runningState.inputParams, 'inputParams')
-    deepEqual(newState.apiState, {pendingCount: 0, error: ['no@nope.net: Error message']})
+    runningState.apiState.pendingCount = 1 // Set initial pending count
+    const newState = reduce(actions.createUsersSuccess(API_CREATE_RESPONSE2))
+    deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
+    deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
+    deepEqual(newState.apiState, {pendingCount: 0, error: ['no@nope.net: Error message']}, 'api error should be an array')
     deepEqual(
       newState.userValidationResult,
-      runningState.userValidationResult,
+      INITIAL_STATE.userValidationResult,
       'userValidationResult',
     )
-    deepEqual(newState.usersToBeEnrolled, runningState.usersToBeEnrolled, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
-    runningState = newState
+    deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
+    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
   })
   test('ENROLL_USERS_ERROR', () => {
-    const state = cloneDeep(runningState)
+    const state = cloneDeep(INITIAL_STATE)
     state.apiState.pendingCount = 1
     const newState = reduce(actions.createUsersError({response: {data: 'uh oh'}}), state)
-    deepEqual(newState.courseParams, runningState.courseParams, 'courseParams')
-    deepEqual(newState.inputParams, runningState.inputParams, 'inputParams')
+    deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
+    deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
     deepEqual(
       newState.apiState,
       {pendingCount: 0, error: 'uh oh'},
@@ -562,56 +491,55 @@ describe('Course Enrollment Add People Reducer', () => {
     )
     deepEqual(
       newState.userValidationResult,
-      runningState.userValidationResult,
+      INITIAL_STATE.userValidationResult,
       'userValidationResult',
     )
-    deepEqual(newState.usersToBeEnrolled, runningState.usersToBeEnrolled, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
+    deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
+    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
   })
 
   // enrolling users
   test('ENQUEUE_USERS_TO_BE_ENROLLED', () => {
-    const newState = reduce(actions.enqueueUsersToBeEnrolled(goodUsers), runningState)
-    deepEqual(newState.courseParams, runningState.courseParams, 'courseParams')
-    deepEqual(newState.inputParams, runningState.inputParams, 'inputParams')
-    deepEqual(newState.apiState, runningState.apiState, 'apiState')
+    const newState = reduce(actions.enqueueUsersToBeEnrolled(goodUsers))
+    deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
+    deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
+    deepEqual(newState.apiState, INITIAL_STATE.apiState, 'apiState')
     deepEqual(
       newState.userValidationResult,
-      runningState.userValidationResult,
+      INITIAL_STATE.userValidationResult,
       'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, goodUsers, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
-    runningState = newState
+    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
   })
-  test('ENROLL_USERS_STARTt', () => {
-    const newState = reduce(actions.enrollUsersStart(), runningState)
-    deepEqual(newState.courseParams, runningState.courseParams, 'courseParams')
-    deepEqual(newState.inputParams, runningState.inputParams, 'inputParams')
+  test('ENROLL_USERS_START', () => {
+    const newState = reduce(actions.enrollUsersStart())
+    deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
+    deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
     deepEqual(newState.apiState, {pendingCount: 1, error: undefined}, 'api is in-flight')
     deepEqual(
       newState.userValidationResult,
-      runningState.userValidationResult,
+      INITIAL_STATE.userValidationResult,
       'userValidationResult',
     )
-    deepEqual(newState.usersToBeEnrolled, goodUsers, 'usersToBeEnrolled')
-    equal(newState.usersEnrolled, runningState.usersEnrolled, 'usersEnrolled')
-    runningState = newState
+    deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
+    equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
   })
   test('ENROLL_USERS_SUCCESS', () => {
-    const newState = reduce(actions.enrollUsersSuccess(API_ENROLL_RESPONSE), runningState)
-    deepEqual(newState.courseParams, runningState.courseParams, 'courseParams')
-    deepEqual(newState.inputParams, runningState.inputParams, 'inputParams')
+    runningState.apiState.pendingCount = 1 // Set initial pending count
+    const newState = reduce(actions.enrollUsersSuccess(API_ENROLL_RESPONSE))
+    deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
+    deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
     deepEqual(newState.apiState, {pendingCount: 0, error: undefined}, 'api is no longer in-flight')
     deepEqual(
       newState.userValidationResult,
-      runningState.userValidationResult,
+      INITIAL_STATE.userValidationResult,
       'userValidationResult',
     )
     deepEqual(newState.usersToBeEnrolled, [], 'usersToBeEnrolled is emptied')
     equal(Boolean(newState.usersEnrolled), true, 'usersEnrolled')
   })
-  test('ENROLL_USERS_ERROR (2)', () => {
+  test('ENROLL_USERS_ERROR', () => {
     const state = cloneDeep(INITIAL_STATE)
     state.apiState.pendingCount = 1
     const newState = reduce(actions.enrollUsersError('whoops'), state)
@@ -622,7 +550,7 @@ describe('Course Enrollment Add People Reducer', () => {
     )
   })
   test(' ', () => {
-    const newState = reduce(actions.reset(), runningState)
+    const newState = reduce(actions.reset())
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
     deepEqual(newState.apiState, INITIAL_STATE.apiState, 'apiState')
