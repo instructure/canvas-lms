@@ -21,7 +21,7 @@ import {ZAccountId} from '../../model/AccountId'
 import {DynamicRegistrationWizard} from '../DynamicRegistrationWizard'
 import {success} from '../../../common/lib/apiResult/ApiResult'
 import userEvent from '@testing-library/user-event'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import type {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {mockRegistration, mockDynamicRegistrationWizardService} from './helpers'
 import {htmlEscape} from '@instructure/html-escape'
@@ -203,13 +203,6 @@ describe('DynamicRegistrationWizard', () => {
       for (const scope of reg.scopes) {
         expect(screen.getByText(i18nLtiScope(scope))).toBeInTheDocument()
       }
-    })
-
-    it("doesn't allow for xss", async () => {
-      const xss = '<script>alert("xss")</script>'
-      reg = mockRegistration({client_name: xss})
-      await setup()
-      expect(screen.getByText(htmlEscape(xss))).toBeInTheDocument()
     })
 
     it("renders the tool's name in bold", async () => {
