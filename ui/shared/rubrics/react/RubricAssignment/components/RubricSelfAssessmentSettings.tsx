@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import {useMutation, useQuery, queryClient} from '@canvas/query'
 import {getRubricSelfAssessmentSettings, setRubricSelfAssessment} from '../queries'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('enhanced-rubrics-self-assessments')
 
@@ -35,6 +36,7 @@ export const RubricSelfAssessmentSettings = ({
   rubricId,
 }: RubricSelfAssessmentSettingsProps) => {
   const queryKey = ['assignment-self-assessment-settings', assignmentId, rubricId ?? '']
+  const [showTooltip, setShowTooltip] = React.useState(false)
 
   const {isLoading: mutationLoading, mutateAsync} = useMutation({
     mutationFn: setRubricSelfAssessment,
@@ -67,16 +69,31 @@ export const RubricSelfAssessmentSettings = ({
   const { canUpdateRubricSelfAssessment, rubricSelfAssessmentEnabled } = selfAssessmentSettings
 
   return (
-    <View>
+    <View as="div">
       <View as="div" margin="small 0">
-        <Checkbox
-          data-testid="rubric-self-assessment-checkbox"
-          label={I18n.t('Enable self assessment')}
-          checked={rubricSelfAssessmentEnabled}
-          disabled={mutationLoading || !canUpdateRubricSelfAssessment}
-          name="self-assessment-settings"
-          onChange={e => handleSettingChange(e.target.checked)}
-        />
+        <Tooltip
+          renderTip={
+            <View width='336px' as='div'>
+              {
+                I18n.t('This toggle will be disabled if the due date has passed OR there have already been self-assessments made on this assignment.')
+              }
+            </View>
+          }
+          isShowingContent={!canUpdateRubricSelfAssessment && showTooltip}
+          placement="top start"
+          offsetX="10px"
+        >
+          <Checkbox
+            data-testid="rubric-self-assessment-checkbox"
+            label={I18n.t('Enable self assessment')}
+            checked={rubricSelfAssessmentEnabled}
+            disabled={mutationLoading || !canUpdateRubricSelfAssessment}
+            name="self-assessment-settings"
+            onChange={e => handleSettingChange(e.target.checked)}
+            onMouseOver={() => setShowTooltip(true)}
+            onMouseOut={() => setShowTooltip(false)}
+          />
+        </Tooltip>
       </View>
     </View>
   )
