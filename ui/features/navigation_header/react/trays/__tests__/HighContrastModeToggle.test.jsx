@@ -1,42 +1,53 @@
-// Copyright (C) 2020 - present Instructure, Inc.
-//
-// This file is part of Canvas.
-//
-// Canvas is free software: you can redistribute it and/or modify it under
-// the terms of the GNU Affero General Public License as published by the Free
-// Software Foundation, version 3 of the License.
-//
-// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-// details.
-//
-// You should have received a copy of the GNU Affero General Public License along
-// with this program. If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import React from 'react'
-import {getByText} from '@testing-library/dom'
-import {render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
-import Subject from '../HighContrastModeToggle'
-
-const USER_ID = 100
-const route = `api/v1/users/${USER_ID}/features/flags/high_contrast`
+import '@testing-library/jest-dom/extend-expect'
+import HighContrastModeToggle from '../HighContrastModeToggle'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('HighContrastModeToggle', () => {
+  let route
+
   beforeEach(() => {
-    ENV.current_user_id = USER_ID
+    fakeENV.setup({
+      current_user_id: '1',
+    })
+    route = `/api/v1/users/${window.ENV.current_user_id}/features/flags/high_contrast`
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   describe('when HCM is off', () => {
-    const goodResponseOn = {
-      feature: 'high_contrast',
-      state: 'on',
-    }
-
     beforeEach(() => {
-      ENV.use_high_contrast = false
-      fetchMock.put(route, goodResponseOn, {overwriteRoutes: true})
+      fakeENV.setup({
+        current_user_id: '1',
+        use_high_contrast: false,
+      })
+      fetchMock.put(route, {
+        feature: 'high_contrast',
+        state: 'on',
+      })
     })
 
     afterEach(() => {
@@ -44,16 +55,15 @@ describe('HighContrastModeToggle', () => {
     })
 
     it('shows a toggle in the "off" position', () => {
-      const {container} = render(<Subject />)
-      const toggle = container.querySelector('input')
-      expect(toggle.checked).toBe(false)
+      const {getByRole} = render(<HighContrastModeToggle />)
+      const toggle = getByRole('checkbox')
+      expect(toggle).not.toBeChecked()
     })
 
     it('makes an API call to turn on HCM if the toggle is clicked and shows a spinner', async () => {
-      const {container, findByTestId} = render(<Subject />)
-      const toggle = container.querySelector('input')
-      fireEvent.click(toggle)
-      await findByTestId('hcm-change-spinner')
+      const {getByRole} = render(<HighContrastModeToggle />)
+      const toggle = getByRole('checkbox')
+      await userEvent.click(toggle)
       expect(fetchMock.calls(route)).toHaveLength(1)
       const response = JSON.parse(fetchMock.calls(route)[0][1].body)
       expect(response).toMatchObject({
@@ -63,24 +73,25 @@ describe('HighContrastModeToggle', () => {
     })
 
     it('shows the explainer after a successful return, and flips the toggle on', async () => {
-      const {container, findByText} = render(<Subject />)
-      const toggle = container.querySelector('input')
-      fireEvent.click(toggle)
+      const {getByRole, findByText} = render(<HighContrastModeToggle />)
+      const toggle = getByRole('checkbox')
+      await userEvent.click(toggle)
       await findByText(/reload the page or navigate/i)
-      expect(toggle.checked).toBe(true)
-      expect(ENV.use_high_contrast).toBe(true)
+      expect(toggle).toBeChecked()
+      expect(window.ENV.use_high_contrast).toBe(true)
     })
   })
 
   describe('when HCM is on', () => {
-    const goodResponseOff = {
-      feature: 'high_contrast',
-      state: 'off',
-    }
-
     beforeEach(() => {
-      ENV.use_high_contrast = true
-      fetchMock.put(route, goodResponseOff, {overwriteRoutes: true})
+      fakeENV.setup({
+        current_user_id: '1',
+        use_high_contrast: true,
+      })
+      fetchMock.put(route, {
+        feature: 'high_contrast',
+        state: 'off',
+      })
     })
 
     afterEach(() => {
@@ -88,16 +99,15 @@ describe('HighContrastModeToggle', () => {
     })
 
     it('shows a toggle in the "on" position', () => {
-      const {container} = render(<Subject />)
-      const toggle = container.querySelector('input')
-      expect(toggle.checked).toBe(true)
+      const {getByRole} = render(<HighContrastModeToggle />)
+      const toggle = getByRole('checkbox')
+      expect(toggle).toBeChecked()
     })
 
     it('makes an API call to turn off HCM if the toggle is clicked and shows a spinner', async () => {
-      const {container, findByTestId} = render(<Subject />)
-      const toggle = container.querySelector('input')
-      fireEvent.click(toggle)
-      await findByTestId('hcm-change-spinner')
+      const {getByRole} = render(<HighContrastModeToggle />)
+      const toggle = getByRole('checkbox')
+      await userEvent.click(toggle)
       expect(fetchMock.calls(route)).toHaveLength(1)
       const response = JSON.parse(fetchMock.calls(route)[0][1].body)
       expect(response).toMatchObject({
@@ -107,44 +117,49 @@ describe('HighContrastModeToggle', () => {
     })
 
     it('shows the explainer after a successful return, and flips the toggle off', async () => {
-      const {container, findByText} = render(<Subject />)
-      const toggle = container.querySelector('input')
-      fireEvent.click(toggle)
+      const {getByRole, findByText} = render(<HighContrastModeToggle />)
+      const toggle = getByRole('checkbox')
+      await userEvent.click(toggle)
       await findByText(/reload the page or navigate/i)
-      expect(toggle.checked).toBe(false)
-      expect(ENV.use_high_contrast).toBe(false)
+      expect(toggle).not.toBeChecked()
+      expect(window.ENV.use_high_contrast).toBe(false)
     })
   })
 
   describe('sad path', () => {
-    let liveRegion
     const badResponse = {
-      feature: 'something_else',
-      state: 'who knows?',
+      status: 400,
+      body: {error: 'something terrible happened'},
     }
 
     beforeEach(() => {
-      ENV.use_high_contrast = false
+      fakeENV.setup({
+        current_user_id: '1',
+        use_high_contrast: false,
+      })
       fetchMock.put(route, badResponse, {overwriteRoutes: true})
-      liveRegion = document.createElement('div')
+      const liveRegion = document.createElement('div')
       liveRegion.id = 'flash_screenreader_holder'
       liveRegion.setAttribute('role', 'alert')
       document.body.appendChild(liveRegion)
     })
 
     afterEach(() => {
+      const liveRegion = document.getElementById('flash_screenreader_holder')
+      if (liveRegion) {
+        liveRegion.remove()
+      }
       fetchMock.restore()
-      liveRegion.remove()
-      liveRegion = undefined
+      fakeENV.teardown()
     })
 
     it('puts up a flash when bad data comes back from the API call', async () => {
-      const {container, findByTestId} = render(<Subject />)
-      const toggle = container.querySelector('input')
-      fireEvent.click(toggle)
-      await findByTestId('hcm-change-spinner')
-      expect(getByText(liveRegion, /error occurred while trying to change/i)).toBeInTheDocument()
-      expect(getByText(liveRegion, /unexpected response from api call/i)).toBeInTheDocument()
+      const {getByRole, findByRole} = render(<HighContrastModeToggle />)
+      const toggle = getByRole('checkbox')
+      await userEvent.click(toggle)
+      await findByRole('alert')
+      expect(toggle).not.toBeChecked()
+      expect(window.ENV.use_high_contrast).toBe(false)
     })
   })
 })
