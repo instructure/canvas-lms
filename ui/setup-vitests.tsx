@@ -33,7 +33,9 @@ vi.stubGlobal(
     observe() {}
 
     unobserve() {}
-  }
+
+    disconnect() {}
+  },
 )
 
 vi.stubGlobal(
@@ -44,8 +46,10 @@ vi.stubGlobal(
     unobserve() {}
 
     disconnect() {}
-  }
+  },
 )
+
+vi.stubGlobal('DataTransferItem', class DataTransferItem {})
 
 vi.stubGlobal('matchMedia', () => ({
   matches: false,
