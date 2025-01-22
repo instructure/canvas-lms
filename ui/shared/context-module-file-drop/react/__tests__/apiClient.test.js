@@ -28,19 +28,15 @@ afterEach(() => {
   jest.clearAllMocks()
 })
 
-it('fetches course root folder', done => {
+it('fetches course root folder', async () => {
   moxios.stubRequest('/api/v1/courses/1/folders/root', {
     response: {files: []},
   })
-  getCourseRootFolder('1')
-    .then(rootFolder => {
-      expect(rootFolder).toEqual({files: []})
-      done() // eslint-disable-line promise/no-callback-in-promise
-    })
-    .catch(() => done.fail())
+  const rootFolder = await getCourseRootFolder('1')
+  expect(rootFolder).toEqual({files: []})
 })
 
-it('fetches folder files across pages', done => {
+it('fetches folder files across pages', async () => {
   moxios.stubRequest('/api/v1/folders/1/files?only[]=names', {
     response: [{display_name: 'a.txt'}],
     headers: {
@@ -50,10 +46,6 @@ it('fetches folder files across pages', done => {
   moxios.stubRequest('http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2', {
     response: [{display_name: 'b.txt'}],
   })
-  getFolderFiles('1')
-    .then(files => {
-      expect(files.map(f => f.get('display_name'))).toEqual(['a.txt', 'b.txt'])
-      done() // eslint-disable-line promise/no-callback-in-promise
-    })
-    .catch(() => done.fail())
+  const files = await getFolderFiles('1')
+  expect(files.map(f => f.get('display_name'))).toEqual(['a.txt', 'b.txt'])
 })
