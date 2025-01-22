@@ -26,11 +26,8 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import waitForApolloLoading from '../../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../../util/utils'
-import {render, fireEvent, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
-import {
-  ConversationContext,
-  CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE,
-} from '../../../../util/constants'
+import {render, waitFor} from '@testing-library/react'
+import {ConversationContext} from '../../../../util/constants'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
@@ -99,14 +96,18 @@ describe('MessageDetailContainer', () => {
     const mockSubmissionComment = {subject: 'mySubject', _id: '1', workflowState: 'unread'}
     describe('rendering', () => {
       it('should render conversation information correctly', async () => {
-        const container = setup({
+        const {findByTestId, findByText} = setup({
           isSubmissionCommentsType: true,
           conversation: mockSubmissionComment,
         })
+
         await waitForApolloLoading()
 
-        expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
-        expect(await container.findByText('my student comment')).toBeInTheDocument()
+        const header = await findByTestId('message-detail-header-desktop')
+        expect(header).toBeInTheDocument()
+
+        const commentText = await findByText('my student comment')
+        expect(commentText).toBeInTheDocument()
       })
 
       it('should not render the reply or reply_all option in header if student lacks permission', async () => {
@@ -152,7 +153,6 @@ describe('MessageDetailContainer', () => {
           conversation: mockSubmissionComment,
           onReadStateChange: mockReadStateChange,
         })
-        // wait for query to load
         await container.findAllByTestId('message-more-options')
 
         await waitForApolloLoading()
