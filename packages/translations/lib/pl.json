@@ -512,6 +512,9 @@
     "deep_purple_bb3e2907": {
         "message": "Głęboki fiolet"
     },
+    "default_9db103d": {
+        "message": "Domyślna"
+    },
     "default_bulleted_unordered_list_47079da8": {
         "message": "domyślna nieuporządkowana lista wypunktowana"
     },
@@ -1675,6 +1678,9 @@
     },
     "outline_size_a6059a21": {
         "message": "Rozmiar konturu"
+    },
+    "p_is_not_a_valid_protocol_b1c4efaa": {
+        "message": "{ p } nie jest prawidłowym protokołem."
     },
     "page_50c4823d": {
         "message": "Strona"

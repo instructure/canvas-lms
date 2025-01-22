@@ -512,6 +512,9 @@
     "deep_purple_bb3e2907": {
         "message": "गहरा बैंगनी"
     },
+    "default_9db103d": {
+        "message": "डिफ़ॉल्ट"
+    },
     "default_bulleted_unordered_list_47079da8": {
         "message": "डिफ़ॉल्ट बुलेटेड अक्रमित सूची"
     },
@@ -1675,6 +1678,9 @@
     },
     "outline_size_a6059a21": {
         "message": "रूपरेखा साइज़"
+    },
+    "p_is_not_a_valid_protocol_b1c4efaa": {
+        "message": "{ p } मान्य प्रोटोकॉल नहीं है।"
     },
     "page_50c4823d": {
         "message": "पेज"
