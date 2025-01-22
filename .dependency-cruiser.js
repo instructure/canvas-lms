@@ -202,7 +202,7 @@ module.exports = {
       severity: 'error',
       from: {},
       to: {
-        path: '[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx|ls|coffee|litcoffee|coffee[.]md)$',
+        path: '[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx[.]md)$',
       },
     },
     {
@@ -216,8 +216,7 @@ module.exports = {
         'from.pathNot re of the not-to-dev-dep rule in the dependency-cruiser configuration',
       from: {
         path: '^(packages)',
-        pathNot:
-          '[.](?:|config|spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx|ls|coffee|litcoffee|coffee[.]md)$',
+        pathNot: '[.](?:|config|spec|setup|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx[.]md)$',
       },
       to: {
         dependencyTypes: ['npm-dev'],
