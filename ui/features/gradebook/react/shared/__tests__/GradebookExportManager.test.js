@@ -267,25 +267,24 @@ describe('GradebookExportManager - startExport', () => {
 
   test('starts polling for progress and returns a rejected promise on progress failure', async () => {
     const expectedMonitoringUrl = `${monitoringBase}/newProgressId`
-
     subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
 
     // First stub the export request
     moxios.stubRequest(exportingUrl, {
       status: 200,
-      response: {
+      responseText: JSON.stringify({
         attachmentId: 'attachmentId',
         progressId: 'newProgressId'
-      }
+      })
     })
 
     // Then stub the monitoring request
     moxios.stubRequest(expectedMonitoringUrl, {
       status: 200,
-      response: {
+      responseText: JSON.stringify({
         workflow_state: 'failed',
         message: 'Arbitrary failure'
-      }
+      })
     })
 
     await expect(
