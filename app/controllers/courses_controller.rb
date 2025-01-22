@@ -2302,6 +2302,7 @@ class CoursesController < ApplicationController
         @course_home_view = "k5_dashboard" if @context.elementary_subject_course?
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
         @course_home_view = "syllabus" if @context.elementary_homeroom_course? && !@context.grants_right?(@current_user, session, :read_announcements)
+        @course_home_view = "modules" if @context.horizon_course?
 
         course_env_variables = {}
         # env.COURSE variables that apply to both classic and k5 courses
