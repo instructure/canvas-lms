@@ -308,14 +308,19 @@ class MessageStudents extends React.Component {
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button disabled={this.state.sending || this.state.success} onClick={this.handleClose}>
+            <Button
+              data-testid="message-students-cancel"
+              disabled={this.state.sending || this.state.success}
+              onClick={this.handleClose}
+            >
               {I18n.t('Close')}
             </Button>
             &nbsp;
             <Button
-              disabled={this.state.sending || this.state.success}
-              onClick={this.handleSubmit}
+              data-testid="message-students-submit"
               color="primary"
+              onClick={this.handleSubmit}
+              disabled={this.state.sending || this.state.success}
             >
               {I18n.t('Send Message')}
             </Button>
