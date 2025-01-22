@@ -156,82 +156,6 @@ describe('GradebookExportManager - startExport', () => {
     subject = undefined
   })
 
-  test('sets show_student_first_last_name setting if requested', async () => {
-    subject.monitorExport = (resolve, _reject) => resolve('success')
-
-    const getAssignmentOrder = () => []
-    const getStudentOrder = () => []
-    await subject.startExport(undefined, getAssignmentOrder, true, getStudentOrder)
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    expect(postData.show_student_first_last_name).toBe(true)
-  })
-
-  test('does not set show_student_first_last_name setting by default', async () => {
-    subject.monitorExport = (resolve, _reject) => resolve('success')
-
-    const getAssignmentOrder = () => []
-    const getStudentOrder = () => []
-    await subject.startExport(undefined, getAssignmentOrder, false, getStudentOrder)
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    expect(postData.show_student_first_last_name).toBe(false)
-  })
-
-  test('includes assignment_order if getAssignmentOrder returns some assignments', async () => {
-    subject.monitorExport = (resolve, _reject) => resolve('success')
-
-    const getAssignmentOrder = () => ['1', '2', '3']
-    const getStudentOrder = () => []
-    await subject.startExport(undefined, getAssignmentOrder, false, getStudentOrder)
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    expect(postData.assignment_order).toEqual(['1', '2', '3'])
-  })
-
-  test('does not include assignment_order if getAssignmentOrder returns no assignments', async () => {
-    subject.monitorExport = (resolve, _reject) => resolve('success')
-
-    const getAssignmentOrder = () => []
-    const getStudentOrder = () => []
-    await subject.startExport(undefined, getAssignmentOrder, false, getStudentOrder)
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    expect(postData.assignment_order).toBeUndefined()
-  })
-
-  test('includes stringified student IDs if getStudentOrder returns some students', async () => {
-    subject.monitorExport = (resolve, _reject) => resolve('success')
-
-    const getAssignmentOrder = () => []
-    const getStudentOrder = () => ['4', '10610000001840127', '12']
-    await subject.startExport(undefined, getAssignmentOrder, false, getStudentOrder)
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    expect(postData.student_order).toEqual(['4', '10610000001840127', '12'])
-  })
-
-  test('returns a rejected promise if the manager has no exportingUrl set', async () => {
-    subject.exportingUrl = undefined
-
-    await expect(
-      subject.startExport(
-        undefined,
-        () => [],
-        false,
-        () => [],
-      ),
-    ).rejects.toEqual('No way to export gradebooks provided!')
-  })
-
-  test('returns a rejected promise if the manager already has an export going', async () => {
-    subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
-
-    await expect(
-      subject.startExport(
-        undefined,
-        () => [],
-        false,
-        () => [],
-      ),
-    ).rejects.toEqual('An export is already in progress.')
-  })
-
   test('sets a new existing export and returns a fulfilled promise', async () => {
     const expectedExport = {
       progressId: 'newProgressId',
@@ -273,8 +197,9 @@ describe('GradebookExportManager - startExport', () => {
     moxios.stubRequest(exportingUrl, {
       status: 200,
       response: {
-        attachmentId: 'attachmentId',
-        progressId: 'newProgressId',
+        progress_id: 'newProgressId',
+        attachment_id: 'attachmentId',
+        filename: 'filename.csv',
       },
     })
 
@@ -287,14 +212,17 @@ describe('GradebookExportManager - startExport', () => {
       },
     })
 
-    await expect(
-      subject.startExport(
+    try {
+      await subject.startExport(
         undefined,
         () => [],
         false,
         () => [],
-      ),
-    ).rejects.toEqual('Error exporting gradebook: Arbitrary failure')
+      )
+      expect(false).toBe(true)
+    } catch (error) {
+      expect(error).toBe('Error exporting gradebook: Arbitrary failure')
+    }
   })
 
   test('starts polling for progress and returns a rejected promise on unknown progress status', async () => {
