@@ -175,8 +175,6 @@ class User < ActiveRecord::Base
   has_many :discussion_entry_drafts, inverse_of: :user
   has_many :discussion_entry_versions, inverse_of: :user
   has_many :all_attachments, as: "context", class_name: "Attachment"
-  has_many :assignment_student_visibilities
-  has_many :quiz_student_visibilities, class_name: "Quizzes::QuizStudentVisibility"
   has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context
   has_many :submissions_folders, -> { where.not(folders: { submission_context_code: nil }) }, as: :context, inverse_of: :context, class_name: "Folder"
   has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order(:name) }, class_name: "Folder", as: :context, inverse_of: :context

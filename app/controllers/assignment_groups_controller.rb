@@ -351,7 +351,7 @@ class AssignmentGroupsController < ApplicationController
       AssignmentVisibility::AssignmentVisibilityService.assignments_with_user_visibilities(course, assignments)
     else
       params.fetch(:include, []).delete("assignment_visibility")
-      AssignmentStudentVisibility.none
+      {}
     end
   end
 

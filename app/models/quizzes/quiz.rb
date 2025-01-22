@@ -45,7 +45,6 @@ class Quizzes::Quiz < ActiveRecord::Base
   has_many :quiz_statistics, -> { order(:created_at) }, class_name: "Quizzes::QuizStatistics"
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_many :quiz_regrades, class_name: "Quizzes::QuizRegrade"
-  has_many :quiz_student_visibilities
   belongs_to :context, polymorphic: [:course]
   belongs_to :assignment, inverse_of: :quiz, class_name: "AbstractAssignment"
   belongs_to :assignment_group
