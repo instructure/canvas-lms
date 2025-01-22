@@ -40,6 +40,7 @@ Run `npm test -- --coverage` for a coverage report.
 * Prefer native DOM API over jQuery for construction of HTML
 * Use msw for mocking network requests
 * jest-axe isn’t available. use axe-core if needed
+* Avoid using mockResolvedValue and mockImplementation; better to mock directly in the mock definition at the top of the file.
 * Try to keep test files under 300 lines
 * Use `import fakeENV from '@canvas/test-utils/fakeENV'` to test window.ENV
 
