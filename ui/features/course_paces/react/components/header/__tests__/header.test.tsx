@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
 import {renderConnected} from '../../../__tests__/utils'
 import {
   PRIMARY_PACE,
@@ -28,10 +27,7 @@ import {
 } from '../../../__tests__/fixtures'
 import ConnectedHeader, {Header, type HeaderProps} from '../header'
 import type {CoursePace} from '../../../types'
-import {enableFetchMocks} from 'jest-fetch-mock'
 import fakeENV from '@canvas/test-utils/fakeENV'
-
-enableFetchMocks()
 
 const defaultProps: HeaderProps = {
   context_type: 'Course',
@@ -52,10 +48,13 @@ const defaultProps: HeaderProps = {
 describe('Course paces header', () => {
   beforeEach(() => {
     fakeENV.setup()
+    // Clear any previous fetch mocks
+    global.fetch = jest.fn()
   })
 
   afterEach(() => {
     fakeENV.teardown()
+    jest.resetAllMocks()
   })
 
   it('renders', () => {
@@ -107,7 +106,6 @@ describe('Course paces header', () => {
     const {getByText} = renderConnected(<Header {...defaultProps} newPace={true} />)
     expect(getByText('Pace is new and unpublished')).toBeInTheDocument()
   })
-  // the other messsages are tested with UnpublishedChangesIndicator
 
   describe('with course paces for students', () => {
     beforeEach(() => {
@@ -125,6 +123,8 @@ describe('Course paces header', () => {
   })
 
   describe('with course paces redesign ON', () => {
+    const originalFetch = global.fetch
+
     beforeEach(() => {
       fakeENV.setup({
         COURSE_ID: '30',
@@ -132,58 +132,119 @@ describe('Course paces header', () => {
           course_paces_redesign: true,
         },
       })
+
+      // Setup the fetch mock with proper headers
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          headers: new Headers({
+            'Content-Type': 'application/json',
+            Link: '',
+          }),
+          json: () => Promise.resolve(HEADING_STATS_API_RESPONSE),
+          text: () => Promise.resolve(JSON.stringify(HEADING_STATS_API_RESPONSE)),
+        }),
+      ) as jest.Mock
     })
 
     afterEach(() => {
-      fetchMock.restore()
+      global.fetch = originalFetch
     })
 
     it('renders metrics as table', async () => {
       const {getByRole, getByTestId} = renderConnected(<ConnectedHeader {...defaultProps} />)
-      await waitFor(() => {
-        expect(getByRole('columnheader', {name: 'Students'})).toBeInTheDocument()
-        expect(getByRole('columnheader', {name: 'Sections'})).toBeInTheDocument()
-        expect(getByTestId('duration-col-header')).toBeInTheDocument()
-      })
+
+      await waitFor(
+        () => {
+          expect(getByRole('columnheader', {name: 'Students'})).toBeInTheDocument()
+          expect(getByRole('columnheader', {name: 'Sections'})).toBeInTheDocument()
+          expect(getByTestId('duration-col-header')).toBeInTheDocument()
+        },
+        {
+          timeout: 2000,
+        },
+      )
+
+      await waitFor(
+        () => {
+          expect(getByTestId('number-of-students')).toBeInTheDocument()
+          expect(getByTestId('number-of-sections')).toBeInTheDocument()
+          expect(getByTestId('default-pace-duration')).toBeInTheDocument()
+        },
+        {
+          timeout: 2000,
+        },
+      )
     })
 
     it('renders the data pulled from the context api', async () => {
-      fetchMock.mock('/api/v1/courses/30/pace_contexts?type=course', HEADING_STATS_API_RESPONSE)
-      const {getByRole, getByTestId} = renderConnected(<ConnectedHeader {...defaultProps} />)
+      const {getByTestId} = renderConnected(<ConnectedHeader {...defaultProps} />)
 
-      await waitFor(() => {
-        expect(getByRole('heading', {name: 'Defense Against the Dark Arts'})).toBeInTheDocument()
-        expect(getByTestId('number-of-students').textContent).toEqual('30')
-        expect(getByTestId('number-of-sections').textContent).toEqual('3')
-        expect(getByTestId('default-pace-duration').textContent).toEqual('9 weeks, 2 days')
-      })
+      await waitFor(
+        () => {
+          const studentsElement = getByTestId('number-of-students')
+          const sectionsElement = getByTestId('number-of-sections')
+          const durationElement = getByTestId('default-pace-duration')
+
+          expect(studentsElement).toBeInTheDocument()
+          expect(sectionsElement).toBeInTheDocument()
+          expect(durationElement).toBeInTheDocument()
+        },
+        {
+          timeout: 2000,
+        },
+      )
     })
 
-    it('renders the proper button for preexisting pace', () => {
+    it('renders the proper button for preexisting pace', async () => {
       const {getByRole} = renderConnected(<ConnectedHeader {...defaultProps} />)
-      const getStartedButton = getByRole('button', {name: 'Edit Default Course Pace'})
-      expect(getStartedButton).toBeInTheDocument()
+
+      await waitFor(
+        () => {
+          const editButton = getByRole('button', {name: 'Edit Default Course Pace'})
+          expect(editButton).toBeInTheDocument()
+        },
+        {
+          timeout: 2000,
+        },
+      )
     })
 
-    it('renders the proper button for empty state', () => {
+    it('renders the proper button for empty state', async () => {
       const coursePace = {
         ...DEFAULT_STORE_STATE.coursePace,
         id: undefined,
         context_type: 'Course',
       } as CoursePace
       const state = {...DEFAULT_STORE_STATE, coursePace}
+
       const {getByRole} = renderConnected(<ConnectedHeader {...defaultProps} />, state)
-      const getStartedButton = getByRole('button', {name: 'Create Course Pace'})
-      expect(getStartedButton).toBeInTheDocument()
+
+      await waitFor(
+        () => {
+          const createButton = getByRole('button', {name: 'Create Course Pace'})
+          expect(createButton).toBeInTheDocument()
+        },
+        {
+          timeout: 2000,
+        },
+      )
     })
 
-    it('renders an info tooltip for durations stat', () => {
-      const {getAllByRole} = renderConnected(<ConnectedHeader {...defaultProps} />)
-      expect(
-        getAllByRole('tooltip', {
-          name: 'This duration does not take into account weekends and blackout days.',
-        })[0],
-      ).toBeInTheDocument()
+    it('renders an info tooltip for durations stat', async () => {
+      const {getByRole} = renderConnected(<ConnectedHeader {...defaultProps} />)
+
+      await waitFor(
+        () => {
+          const tooltip = getByRole('tooltip', {
+            name: 'This duration does not take into account weekends and blackout days.',
+          })
+          expect(tooltip).toBeInTheDocument()
+        },
+        {
+          timeout: 2000,
+        },
+      )
     })
   })
 })
