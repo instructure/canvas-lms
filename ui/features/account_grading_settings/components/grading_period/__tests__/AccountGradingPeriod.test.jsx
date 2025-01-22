@@ -158,15 +158,15 @@ describe('AccountGradingPeriod', () => {
     windowConfirm.mockReturnValue(true)
     const flashMessageMock = jest.fn()
     $.flashMessage = flashMessageMock
-    const axiosDeleteMock = jest.spyOn(axios, 'delete').mockResolvedValue({
-      status: 200,
-      data: {},
-    })
+    const axiosDeleteMock = jest.spyOn(axios, 'delete').mockImplementation(() => 
+      Promise.resolve({ status: 200, data: {} })
+    )
 
     renderComponent()
     fireEvent.click(screen.getByTitle(/Delete/))
 
-    await new Promise(resolve => setTimeout(resolve, 0))
+    // Wait for all pending promises to resolve
+    await Promise.resolve()
 
     expect(axiosDeleteMock).toHaveBeenCalledWith('api/v1/accounts/1/grading_periods/1')
     expect(defaultProps.onDelete).toHaveBeenCalledWith(defaultProps.period.id)
