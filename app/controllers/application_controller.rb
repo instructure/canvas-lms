@@ -409,6 +409,7 @@ class ApplicationController < ActionController::Base
     course_paces_skip_selected_days
     course_pace_download_document
     course_pace_draft_state
+    course_pace_time_selection
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes,

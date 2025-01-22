@@ -79,4 +79,33 @@ describe('PaceModalHeading', () => {
     expect(getByTestId('section-name').textContent).toBe(SECTION_1.name)
     expect(getByTestId('pace-info').textContent).toBe(studentPaceContext.name)
   })
+
+  describe('course_pace_time_selection is enabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_pace_time_selection = true
+    })
+
+    it('pace info component is not rendered', () => {
+      const {queryByTestId} = renderConnected(
+        <PaceModalHeading
+          {...defaultProps}
+          coursePace={STUDENT_PACE}
+          paceContext={studentPaceContext}
+        />,
+      )
+      expect(queryByTestId('pace-info')).not.toBeInTheDocument()
+    })
+
+    it('course stats info component is rendered', () => {
+      const {getByTestId} = renderConnected(
+        <PaceModalHeading
+          {...defaultProps}
+          coursePace={STUDENT_PACE}
+          paceContext={studentPaceContext}
+        />,
+      )
+      expect(getByTestId('course-stats-info')).toBeInTheDocument()
+    })
+  })
 })
