@@ -879,6 +879,7 @@ class SisBatch < ActiveRecord::Base
               ids = type.constantize.connection.select_values(restore_sql(type, data.map(&:to_restore_array)))
               capture_ids_for_post_processing(type, ids)
               finalize_enrollments(ids) if type == "Enrollment"
+              restore_assignment_overrides(ids) if type == "AssignmentOverrideStudent"
               count += update_restore_progress(restore_progress, data, count, total)
             else
               # try to restore each row one at a time
@@ -897,6 +898,7 @@ class SisBatch < ActiveRecord::Base
 
               capture_ids_for_post_processing(type, successful_ids)
               finalize_enrollments(successful_ids) if type == "Enrollment"
+              restore_assignment_overrides(ids) if type == "AssignmentOverrideStudent"
               count += update_restore_progress(restore_progress, data - failed_data, count, total)
               roll_back_data.active.where(id: failed_data).update_all(workflow_state: "failed", updated_at: Time.zone.now)
             end
@@ -918,6 +920,12 @@ class SisBatch < ActiveRecord::Base
     Enrollment.where(id: ids, type: "StudentEnrollment").order(:course_id).preload(:course).find_in_batches do |batch|
       StudentEnrollment.restore_submissions_and_scores_for_enrollments(batch)
     end
+  end
+
+  def restore_assignment_overrides(assignment_override_student_ids)
+    # restore assignment overrides that were deleted when the last AssignmentOverrideStudent was deleted but is now being restored
+    ao_ids = AssignmentOverrideStudent.where(id: assignment_override_student_ids).distinct.pluck(:assignment_override_id)
+    AssignmentOverride.where(workflow_state: "deleted", id: ao_ids).update_all(workflow_state: "active", updated_at: Time.now.utc)
   end
 
   def restore_states_later(batch_mode: nil, undelete_only: false, unconclude_only: false)

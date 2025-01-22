@@ -68,7 +68,8 @@ class Enrollment::BatchStateUpdater
       disassociate_cross_shard_users(@user_ids)
     end
     update_linked_enrollments(@students)
-    update_assignment_overrides(batch, @courses, @user_ids)
+    assignment_override_student_rollback_data = update_assignment_overrides(batch, @courses, @user_ids, sis_batch:, batch_mode:)
+    @data&.concat(assignment_override_student_rollback_data)
     touch_and_update_associations(@user_ids)
     clear_email_caches(@invited_user_ids) unless @invited_user_ids.empty?
     needs_grading_count_updated(@courses)
@@ -194,19 +195,27 @@ class Enrollment::BatchStateUpdater
     end
   end
 
-  def self.update_assignment_overrides(batch, courses, user_ids)
+  def self.update_assignment_overrides(batch, courses, user_ids, sis_batch: nil, batch_mode: false)
+    rollback_data = []
     courses.each do |c|
       assignment_ids = Assignment.where(context_id: c, context_type: "Course").pluck(:id)
       next unless assignment_ids
 
       # this is handled in :update_cached_due_dates
       AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates) do
-        AssignmentOverrideStudent
-          .where(user_id: user_ids, assignment_id: assignment_ids)
-          .where.not(user_id: c.enrollments.where(user_id: user_ids)
-          .where.not(id: batch).select(:user_id)).each(&:destroy)
+        assignment_override_students = AssignmentOverrideStudent
+                                       .where(user_id: user_ids, assignment_id: assignment_ids)
+                                       .where.not(user_id: c.enrollments.where(user_id: user_ids)
+                                                            .where.not(id: batch).select(:user_id)).to_a
+        next if assignment_override_students.empty?
+
+        if sis_batch
+          rollback_data.concat(SisBatchRollBackData.build_dependent_data(contexts: assignment_override_students, updated_state: "deleted", sis_batch:, batch_mode_delete: batch_mode))
+        end
+        assignment_override_students.each(&:destroy)
       end
     end
+    rollback_data
   end
 
   def self.needs_grading_count_updated(courses)
