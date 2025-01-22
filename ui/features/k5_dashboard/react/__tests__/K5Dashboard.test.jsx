@@ -38,6 +38,7 @@ import {
 
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import K5Dashboard from '../K5Dashboard'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
@@ -163,13 +164,13 @@ beforeEach(() => {
     body: {status: 'ok'},
   })
   fetchMock.put(/\/api\/v1\/users\/\d+\/colors\.*/, {status: 200, body: []})
-  global.ENV = defaultEnv
+  fakeENV.setup(defaultEnv)
 })
 
 afterEach(() => {
   moxios.uninstall()
   fetchMock.restore()
-  global.ENV = {}
+  fakeENV.teardown()
   resetPlanner()
   resetCardCache()
   sessionStorage.clear()
@@ -265,8 +266,8 @@ describe('K-5 Dashboard', () => {
     })
 
     it('shows loading skeletons for course cards while they load', () => {
-      const {getAllByText} = render(<K5Dashboard {...defaultProps} />)
-      expect(getAllByText('Loading Card')[0]).toBeInTheDocument()
+      const {container} = render(<K5Dashboard {...defaultProps} />)
+      expect(container.querySelector('[data-testid="skeleton-wrapper"]')).toBeInTheDocument()
     })
 
     // FOO-3830
@@ -303,7 +304,7 @@ describe('K-5 Dashboard', () => {
             })
             .then(() => {
               // Expect just one announcement request for all cards
-              expect(fetchMock.calls(/\/api\/v1\/announcements.*latest_only=true.*/).length).toBe(1)
+              expect(fetchMock.calls(/\/api\/v1\/announcements.*latest_only=true.*/)).toHaveLength(1)
               done()
             }),
         )
@@ -322,10 +323,10 @@ describe('K-5 Dashboard', () => {
               response: [],
             })
             .then(() => {
-              expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(0)
+              expect(fetchMock.calls(/\/api\/v1\/announcements.*/)).toHaveLength(0)
               expect(
-                fetchMock.calls(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/).length,
-              ).toBe(0)
+                fetchMock.calls(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/),
+              ).toHaveLength(0)
               done()
             }),
         )
@@ -429,7 +430,6 @@ describe('K-5 Dashboard', () => {
 
     it('filters important dates to those selected', async () => {
       moxios.stubs.reset()
-      // Overriding mocked cards to make all cards active so we have 2 subjects to choose from
       moxios.stubRequest(window.location.origin + '/api/v1/dashboard/dashboard_cards', {
         status: 200,
         response: MOCK_CARDS.map(c => ({...c, enrollmentState: 'active'})),
@@ -504,13 +504,13 @@ describe('K-5 Dashboard with dashboard_graphql_integration on', () => {
   ]
 
   beforeEach(() => {
-    global.ENV = {
+    fakeENV.setup({
       ...defaultEnv,
       FEATURES: {
         ...defaultEnv?.FEATURES,
         dashboard_graphql_integration: true,
       },
-    }
+    })
     queryClient.setQueryData(queryKey, MOCK_QUERY_CARDS_RESPONSE)
   })
   describe('Homeroom Section', () => {
@@ -528,23 +528,23 @@ describe('K-5 Dashboard with dashboard_graphql_integration on', () => {
       jest
         .spyOn(ReactQuery, 'useQuery')
         .mockImplementation(jest.fn().mockReturnValue({isLoading: true}))
-      const {getAllByText} = render(<K5Dashboard {...defaultProps} />)
-      expect(getAllByText('Loading Card')[0]).toBeInTheDocument()
+      const {container} = render(<K5Dashboard {...defaultProps} />)
+      expect(container.querySelector('[data-testid="skeleton-wrapper"]')).toBeInTheDocument()
     })
     it('only fetches announcements based on cards once per page load', async () => {
       render(<K5Dashboard {...defaultProps} />)
       await waitFor(() => {
-        expect(fetchMock.calls(/\/api\/v1\/announcements.*latest_only=true.*/).length).toBe(1)
+        expect(fetchMock.calls(/\/api\/v1\/announcements.*latest_only=true.*/)).toHaveLength(1)
       })
     })
 
     it('only fetches announcements and apps if there are any cards', async () => {
       queryClient.setQueryData(queryKey, [])
       await waitFor(() => {
-        expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(0)
+        expect(fetchMock.calls(/\/api\/v1\/announcements.*/)).toHaveLength(0)
         expect(
-          fetchMock.calls(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/).length,
-        ).toBe(0)
+          fetchMock.calls(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/),
+        ).toHaveLength(0)
       })
     })
   })
