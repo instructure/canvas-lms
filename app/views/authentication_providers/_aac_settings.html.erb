@@ -42,6 +42,8 @@
         <%= render partial: "#{aac.auth_type}_fields",
                  locals: {aac: aac, presenter: presenter, f: f}%>
 
+        <%= render partial: "additional_settings", locals: { f:, presenter:, provider: aac } %>
+
         <% if aac.class.recognized_federated_attributes != [] %>
           <%= render partial: "federated_attributes", locals: { aac: aac, presenter: presenter, f: f } %>
         <% end %>
