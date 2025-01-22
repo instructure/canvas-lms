@@ -72,7 +72,7 @@ describe "UngradedDiscussionVisibility" do
       expect(ids_visible_to_user(@student1, "discussion_topic")).to contain_exactly(@discussion1.id, @discussion2.id)
     end
 
-    it "assignment_student_visibilities shows correct visibilities for graded discussion topic's assignment" do
+    it "assignment_ids_visible_to_user shows correct visibilities for graded discussion topic's assignment" do
       @discussion1_assignment.only_visible_to_overrides = true
       @discussion1_assignment.save!
 

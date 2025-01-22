@@ -45,15 +45,6 @@ module DifferentiableAssignment
     end
   end
 
-  def visibility_view
-    case differentiable.class_name
-    when "Assignment"
-      AssignmentStudentVisibility
-    else
-      Quizzes::QuizStudentVisibility
-    end
-  end
-
   def visible(conditions)
     case differentiable.class_name
     when "Assignment"

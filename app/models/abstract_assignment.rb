@@ -106,7 +106,6 @@ class AbstractAssignment < ActiveRecord::Base
   has_many :provisional_grades, through: :submissions
   belongs_to :annotatable_attachment, class_name: "Attachment"
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :assignment_student_visibilities, inverse_of: :assignment, foreign_key: :assignment_id
   has_one :quiz, class_name: "Quizzes::Quiz", inverse_of: :assignment, foreign_key: :assignment_id
   belongs_to :assignment_group
   has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }, inverse_of: :assignment, foreign_key: :assignment_id
