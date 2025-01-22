@@ -31,6 +31,7 @@ import {useQuery} from '@canvas/query'
 import {type File, type Folder} from '../../../interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {parseLinkHeader} from '../../../utils/apiUtils'
+import {getUniqueId} from '../../../utils/fileFolderUtils'
 import SubTableContent from './SubTableContent'
 import ActionMenuButton from './ActionMenuButton'
 import NameLink from './NameLink'
@@ -145,10 +146,14 @@ const FileFolderTable = ({
   onLoadingStatusChange,
 }: FileFolderTableProps) => {
   const isStacked = size !== 'large'
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
 
   const {data, error, isLoading, isFetching} = useQuery({
     queryKey: ['files', currentUrl],
-    queryFn: () => fetchFilesAndFolders(currentUrl, onLoadingStatusChange),
+    queryFn: () => {
+      setSelectedRows(new Set())
+      return fetchFilesAndFolders(currentUrl, onLoadingStatusChange)
+    },
     staleTime: 0,
     onSuccess: ({links}) => {
       onPaginationLinkChange(links)
@@ -163,8 +168,6 @@ const FileFolderTable = ({
   }
 
   const rows: (File | Folder)[] = !isFetching && data?.rows && data.rows.length > 0 ? data.rows : []
-
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
 
   const toggleRowSelection = (rowId: string) => {
     setSelectedRows(prev => {
@@ -182,7 +185,7 @@ const FileFolderTable = ({
     if (selectedRows.size === rows.length) {
       setSelectedRows(new Set()) // Unselect all
     } else {
-      setSelectedRows(new Set(rows.map(row => row.id))) // Select all
+      setSelectedRows(new Set(rows.map(row => getUniqueId(row)))) // Select all
     }
   }
 

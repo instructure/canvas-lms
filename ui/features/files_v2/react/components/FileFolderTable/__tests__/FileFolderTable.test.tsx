@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import FileFolderTable from '..'
 import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
@@ -119,18 +120,20 @@ describe('FileFolderTable', () => {
 
   describe('FileFolderTable - selection behavior', () => {
     it('allows row selection and highlights selected rows', async () => {
+      const user = userEvent.setup()
       fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true, delay: 0})
       renderComponent()
 
       const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
       // Select first row
-      fireEvent.click(rowCheckboxes[0])
+      await user.click(rowCheckboxes[0])
 
       const firstRow = screen.getAllByTestId('table-row')[0]
       expect(firstRow).toHaveStyle({borderColor: 'brand'})
     })
 
     it('allows "Select All" functionality', async () => {
+      const user = userEvent.setup()
       fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], {
         overwriteRoutes: true,
         delay: 0,
@@ -141,15 +144,16 @@ describe('FileFolderTable', () => {
       const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
 
       // Select all rows
-      fireEvent.click(selectAllCheckbox)
+      await user.click(selectAllCheckbox)
       rowCheckboxes.forEach(checkbox => expect(checkbox).toBeChecked())
 
       // Unselect all rows
-      fireEvent.click(selectAllCheckbox)
+      await user.click(selectAllCheckbox)
       rowCheckboxes.forEach(checkbox => expect(checkbox).not.toBeChecked())
     })
 
     it('sets "Select All" checkbox to indeterminate when some rows are selected', async () => {
+      const user = userEvent.setup()
       fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], {
         overwriteRoutes: true,
         delay: 0,
@@ -160,7 +164,7 @@ describe('FileFolderTable', () => {
       const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
 
       // Select the first row only
-      fireEvent.click(rowCheckboxes[0])
+      await user.click(rowCheckboxes[0])
 
       await waitFor(() => {
         expect(selectAllCheckbox).toBeDefined()
@@ -169,6 +173,7 @@ describe('FileFolderTable', () => {
     })
 
     it('updates "Select All" checkbox correctly when all rows are selected', async () => {
+      const user = userEvent.setup()
       fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], {
         overwriteRoutes: true,
         delay: 0,
@@ -180,11 +185,11 @@ describe('FileFolderTable', () => {
 
       expect(selectAllCheckbox).toBeDefined()
       // Select all rows
-      fireEvent.click(selectAllCheckbox)
+      await user.click(selectAllCheckbox)
       expect(selectAllCheckbox).toBeChecked()
 
       // Unselect one row
-      fireEvent.click(rowCheckboxes[0])
+      await user.click(rowCheckboxes[0])
       await waitFor(() => {
         expect(selectAllCheckbox).not.toBeChecked()
         expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(true)
@@ -223,23 +228,27 @@ describe('FileFolderTable', () => {
 
   describe('FileFolderTable - bulk actions behavior', () => {
     it('disabled buttons when elements are not selected', async () => {
-      fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], {overwriteRoutes: true, delay: 0})
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], {
+        overwriteRoutes: true,
+        delay: 0,
+      })
       renderComponent()
 
       expect(screen.queryByText('0 selected')).toBeInTheDocument()
     })
 
     it('display enabled buttons when one or more elements are selected', async () => {
+      const user = userEvent.setup()
       fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true, delay: 0})
       renderComponent()
 
       const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
       const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
 
-      fireEvent.click(selectAllCheckbox)
+      await user.click(selectAllCheckbox)
       rowCheckboxes.forEach(checkbox => expect(checkbox).toBeChecked())
 
-      expect(await screen.getByText('1 of 1 selected')).toBeInTheDocument()
+      expect(screen.getByText('1 of 1 selected')).toBeInTheDocument()
     })
   })
 })
