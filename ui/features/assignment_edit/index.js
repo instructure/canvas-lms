@@ -33,6 +33,16 @@ import LockManager from '@canvas/blueprint-courses/react/components/LockManager/
 import renderEditAssignmentsApp from './react/index'
 
 ready(() => {
+  window.addEventListener('load', () => {
+    const params = new URLSearchParams(window.location.search)
+    const targetId = params.get('scrollTo')
+    const target = document.getElementById(targetId)
+
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' })
+    }
+  })
+
   if (ENV.ASSIGNMENT_EDIT_ENHANCEMENTS_TEACHER_VIEW) {
     const div = document.createElement('div')
     renderEditAssignmentsApp(document.getElementById('content').appendChild(div))

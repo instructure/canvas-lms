@@ -571,9 +571,10 @@ class AssignmentsController < ApplicationController
       cnt = params[:peer_review_count].to_i
       @assignment.peer_review_count = cnt if cnt > 0
       @assignment.intra_group_peer_reviews = params[:intra_group_peer_reviews].present?
-      @assignment.assign_peer_reviews
+      request = @assignment.assign_peer_reviews
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url, @assignment.id) }
+        format.json { render json: request }
       end
     end
   end

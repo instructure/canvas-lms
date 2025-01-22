@@ -195,6 +195,61 @@ describe "assignments" do
     end
   end
 
+  describe "auto assign" do
+    before do
+      course_with_teacher_logged_in
+      @assignment = assignment_model({
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: false,
+                                     })
+    end
+
+    it "displays auto assign section if the assignment is assigned to at least one user" do
+      student_in_course(active_all: true)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+      expect(f("#automatically_assign_reviews")).to be_displayed
+    end
+
+    it "displays auto assign input if there are submissions" do
+      student1 = student_in_course(active_all: true).user
+      student_in_course(active_all: true).user
+      submission = @assignment.submit_homework(student1)
+      submission.submission_type = "online_text_entry"
+      submission.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+      expect(f("#reviews_per_user_container")).to be_displayed
+    end
+
+    it "displays redirect to edit assignment button if there are no submissions" do
+      student_in_course(active_all: true).user
+      student_in_course(active_all: true).user
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+      expect(f("#redirect_to_edit_button")).to be_displayed
+    end
+
+    it "automatically assigns peer reviews if both students have submissions" do
+      student1 = student_in_course(active_all: true).user
+      student2 = student_in_course(active_all: true).user
+      submission1 = @assignment.submit_homework(student1)
+      submission2 = @assignment.submit_homework(student2)
+      [submission1, submission2].each do |s|
+        s.submission_type = "online_text_entry"
+        s.save!
+      end
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+      f("#reviews_per_user_input").send_keys("1")
+      f("#submit_assign_peer_reviews").click
+
+      wait_for_ajaximations
+      expect(submission1.assigned_assessments.size).to eq(1)
+      expect(submission2.assigned_assessments.size).to eq(1)
+    end
+  end
+
   describe "with anonymous peer reviews" do
     let!(:review_course) { course_factory(active_all: true) }
     let!(:teacher) { review_course.teachers.first }
