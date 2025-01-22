@@ -1452,10 +1452,7 @@ class AccountsController < ApplicationController
         delete_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_delete)
       }
 
-      can_set_token = true
-      if @account.root_account.feature_enabled?(:require_permission_for_app_center_token)
-        can_set_token = %i[add_tool_manually edit_tool_manually delete_tool_manually].any? { |perm| js_permissions[perm] }
-      end
+      can_set_token = %i[add_tool_manually edit_tool_manually delete_tool_manually].any? { |perm| js_permissions[perm] }
 
       js_env({
                APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled?, can_set_token: },
@@ -1924,8 +1921,6 @@ class AccountsController < ApplicationController
 
   def set_app_center_access_token
     # not touching params will allow it to be set as usual
-    return :ok unless @account.root_account.feature_enabled?(:require_permission_for_app_center_token)
-
     token = params.dig(:account, :settings)&.delete(:app_center_access_token)
     return if token.nil?
 

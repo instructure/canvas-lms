@@ -317,24 +317,6 @@ describe AccountsController do
         @account.reload
         expect(@account.settings[:app_center_access_token]).to be_nil
       end
-
-      context "with flag disabled" do
-        before do
-          @account.disable_feature!(:require_permission_for_app_center_token)
-        end
-
-        it "updates 'app_center_access_token'" do
-          access_token = SecureRandom.uuid
-          post "update", params: { id: @account.id,
-                                   account: {
-                                     settings: {
-                                       app_center_access_token: access_token
-                                     }
-                                   } }
-          @account.reload
-          expect(@account.settings[:app_center_access_token]).to eq access_token
-        end
-      end
     end
 
     it "updates 'emoji_deny_list'" do

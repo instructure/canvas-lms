@@ -317,20 +317,6 @@ remove_unwanted_lti_validation_claims:
       state: allowed_on
     ci:
       state: allowed_on
-require_permission_for_app_center_token:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Require Manage LTI permissions to set External App Center token
-  description: |-
-    When enabled, requires any of the manage_lti_* permissions to see the
-    Manage App List button on the External Apps page and to update the token
-    from Eduappcenter, to prevent accidental changes to the app list.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 top_navigation_placement:
   state: hidden
   applies_to: RootAccount
