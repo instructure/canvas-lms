@@ -22,6 +22,9 @@ import customTypes from '@canvas/theme-editor/react/PropTypes'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import rgb2hex from '@canvas/util/rgb2hex'
 import classnames from 'classnames'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
+import {IconWarningSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('theme_editor')
 
@@ -48,22 +51,17 @@ export default class ThemeEditorColorRow extends Component {
   warningLabel = () => {
     if (this.showWarning()) {
       return (
-        <span role="alert">
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-          <div className="ic-Form-message ic-Form-message--error" tabIndex="0">
-            <div className="ic-Form-message__Layout">
-              <i className="icon-warning" role="presentation" />
-              {I18n.t("'%{chosenColor}' is not a valid color.", {
-                chosenColor: this.props.userInput.val,
-              })}
-            </div>
-          </div>
-        </span>
+        <Flex gap="xx-small" alignItems="end">
+          <Text size="small">
+            <IconWarningSolid color="error" />
+          </Text>
+          <Text size="x-small" id="warning-message" data-testid="warning-message">
+            {I18n.t("'%{chosenColor}' is not a valid color.", {
+              chosenColor: this.props.userInput.val,
+            })}
+          </Text>
+        </Flex>
       )
-    } else {
-      // must return empty alert span so screenreaders
-      // read the error when it is inserted
-      return <span role="alert" />
     }
   }
 
@@ -123,6 +121,7 @@ export default class ThemeEditorColorRow extends Component {
         placeholder={this.props.placeholder}
         value={this.props.themeState[this.props.varDef.variable_name]}
         aria-invalid={this.showWarning()}
+        aria-describedby="warning-message"
         onChange={event => this.inputChange(event.target.value)}
         onBlur={this.updateIfMounted}
       />
@@ -142,7 +141,6 @@ export default class ThemeEditorColorRow extends Component {
           </label>
           <div className="Theme__editor-color-block">
             {this.textColorInput()}
-            {this.warningLabel()}
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label
               className="Theme__editor-color-label Theme__editor-color-block_label-sample"
@@ -161,6 +159,7 @@ export default class ThemeEditorColorRow extends Component {
             </label>
           </div>
         </div>
+        {this.warningLabel()}
       </section>
     )
   }
