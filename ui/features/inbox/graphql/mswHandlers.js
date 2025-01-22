@@ -152,7 +152,7 @@ export const handlers = [
           {
             ...ConversationParticipant.mock(
               {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
-              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'},
+              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU8', workflowState: 'unread'},
             ),
             conversation: Conversation.mock({
               _id: '197',
@@ -163,7 +163,7 @@ export const handlers = [
           {
             ...ConversationParticipant.mock(
               {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
-              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'},
+              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU8', workflowState: 'unread'},
             ),
             conversation: Conversation.mock({
               _id: '905',
@@ -174,7 +174,7 @@ export const handlers = [
           {
             ...ConversationParticipant.mock(
               {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
-              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'},
+              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU8', workflowState: 'unread'},
             ),
             conversation: Conversation.mock({
               _id: '906',
@@ -234,7 +234,7 @@ export const handlers = [
           }),
           ConversationParticipant.mock({
             _id: '257',
-            id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4',
+            id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU8',
             user: User.mock({_id: '1', name: 'Charles Xavier', shortName: 'Charles Xavier'}),
             workflowState: 'unread',
           }),
@@ -269,6 +269,29 @@ export const handlers = [
     return HttpResponse.json({
       data: {legacyNode: Conversation.mock()},
     })
+  }),
+
+  graphql.query('GetSubmissionCommentsQuery', ({variables}) => {
+    const data = {
+      legacyNode: {
+        _id: variables.submissionId || '1',
+        submissionCommentsConnection: {
+          nodes: [
+            SubmissionComment.mock({
+              _id: '1',
+              comment: 'my student comment',
+              htmlComment: '<p>my student comment</p>',
+              author: User.mock({_id: '1', name: 'Student One'}),
+              read: false
+            })
+          ],
+          pageInfo: PageInfo.mock({hasNextPage: false}),
+          __typename: 'SubmissionCommentConnection'
+        },
+        __typename: 'Submission'
+      }
+    }
+    return HttpResponse.json({data})
   }),
 
   graphql.query('GetSubmissionComments', () => {
