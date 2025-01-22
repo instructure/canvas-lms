@@ -48,6 +48,7 @@ import {getSections} from './sections'
 import {getInitialCoursePace, getOriginalBlackoutDates, getOriginalPace} from './original'
 import {getBlackoutDates} from '../shared/reducers/blackout_dates'
 import {type Change, summarizeChanges} from '../utils/change_tracking'
+import { calculatePaceDuration } from '../utils/utils'
 
 const initialProgress = window.ENV.COURSE_PACE_PROGRESS
 
@@ -411,14 +412,12 @@ export const getPaceDuration = createSelector(
   getCoursePace,
   getProjectedEndDate,
   (coursePace: CoursePace, projectedEndDate?: string): PaceDuration => {
-    if (!coursePace.start_date) return {weeks: 0, days: 0}
-
     const paceStart = moment(coursePace.start_date).endOf('day')
     const paceEnd = moment(coursePace.end_date).endOf('day')
     const projectedEnd = moment(projectedEndDate).endOf('day')
     const endDate = projectedEnd.isAfter(paceEnd) ? paceEnd : projectedEnd
-    const planDays = DateHelpers.rawDaysBetweenInclusive(paceStart, endDate)
-    return {weeks: Math.floor(planDays / 7), days: planDays % 7}
+
+    return calculatePaceDuration(paceStart, endDate)
   },
 )
 

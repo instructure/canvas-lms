@@ -282,6 +282,7 @@ export type RootAccountFeatureId =
   | 'course_paces_skip_selected_days'
   | 'course_pace_download_document'
   | 'course_pace_draft_state'
+  | 'course_pace_time_selection'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

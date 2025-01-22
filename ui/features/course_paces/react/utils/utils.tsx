@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {APIPaceContextTypes, PaceContext, PaceContextTypes} from '../types'
+import type {APIPaceContextTypes, PaceContext, PaceContextTypes, PaceDuration} from '../types'
+import * as DateHelpers from '../utils/date_stuff/date_helpers'
+import {type Moment} from 'moment-timezone'
 
 export const generateModalLauncherId = (paceContext: PaceContext) =>
   `pace-modal-launcher-${paceContext.type}-${paceContext.item_id}`
@@ -31,4 +33,9 @@ export const CONTEXT_TYPE_MAP: {[k: string]: PaceContextTypes} = {
   Course: 'Course',
   CourseSection: 'Section',
   StudentEnrollment: 'Enrollment',
+}
+
+export const calculatePaceDuration = (startDate: Moment, endDate: Moment): PaceDuration => {
+  const planDays = DateHelpers.rawDaysBetweenInclusive(startDate, endDate)
+  return { weeks: Math.floor(planDays / 7), days: planDays % 7 }
 }
