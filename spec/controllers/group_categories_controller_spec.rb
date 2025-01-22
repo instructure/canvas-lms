@@ -398,6 +398,252 @@ describe GroupCategoriesController do
     end
   end
 
+  describe "POST bulk_manage_groups" do
+    before :once do
+      @collaborative_category = @course.group_categories.create!(name: "Collaborative Category", non_collaborative: false)
+      @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+    end
+
+    context "authorization checks" do
+      it "requires add permission to create groups" do
+        user_session(@teacher)
+        # Revoke add permission
+        @course.account.role_overrides.create!(
+          permission: :manage_groups_add,
+          role: teacher_role,
+          enabled: false
+        )
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 create: [{ name: "New Group" }]
+               }
+             }
+        assert_unauthorized
+      end
+
+      it "requires manage permission to update groups" do
+        user_session(@teacher)
+        # Revoke manage permission
+        @course.account.role_overrides.create!(
+          permission: :manage_groups_manage,
+          role: teacher_role,
+          enabled: false
+        )
+
+        # Create a group for testing
+        test_group = @collaborative_category.groups.create!(name: "Old Group", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 update: [{ id: test_group.id, name: "Updated Group" }]
+               }
+             }
+        assert_unauthorized
+      end
+
+      it "requires delete permission to delete groups" do
+        user_session(@teacher)
+        # Revoke delete permission
+        @course.account.role_overrides.create!(
+          permission: :manage_groups_delete,
+          role: teacher_role,
+          enabled: false
+        )
+
+        # Create a group for testing
+        test_group = @collaborative_category.groups.create!(name: "To Be Deleted", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 delete: [{ id: test_group.id }]
+               }
+             }
+        assert_unauthorized
+      end
+    end
+
+    context "with proper permissions" do
+      before do
+        user_session(@teacher)
+        # Ensure teacher has all relevant group permissions
+        # (manage_tags_add, manage_tags_manage, manage_tags_delete) = true
+      end
+
+      it "creates multiple groups" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 create: [
+                   { name: "Group A" },
+                   { name: "Group B" },
+                   { name: "Group C" },
+                   { name: "Group D" },
+                   { name: "Group E" }
+                 ]
+               }
+             }
+        expect(response).to be_successful
+        body = response.parsed_body
+        expect(body["created"].size).to eq 5
+      end
+
+      it "updates groups" do
+        group = @collaborative_category.groups.create!(name: "Original Name", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 update: [{ id: group.id, name: "Updated Name" }]
+               }
+             }
+
+        expect(response).to be_successful
+        body = response.parsed_body
+        expect(body["updated"].size).to eq 1
+        expect(group.reload.name).to eq "Updated Name"
+      end
+
+      it "deletes groups" do
+        group = @collaborative_category.groups.create!(name: "Delete Me", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 delete: [{ id: group.id }]
+               }
+             }
+
+        expect(response).to be_successful
+        body = response.parsed_body
+        expect(body["deleted"].size).to eq 1
+        expect(@collaborative_category.groups.active.map(&:name)).not_to include("Delete Me")
+      end
+
+      it "handles create, update, and delete in one request" do
+        group1 = @collaborative_category.groups.create!(name: "Group1", context: @course)
+        group2 = @collaborative_category.groups.create!(name: "Group2", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 create: [{ name: "New Group" }],
+                 update: [{ id: group1.id, name: "Updated Group1" }],
+                 delete: [{ id: group2.id }]
+               }
+             }
+
+        expect(response).to be_successful
+        body = response.parsed_body
+        expect(body["created"].size).to eq 1
+        expect(body["updated"].size).to eq 1
+        expect(body["deleted"].size).to eq 1
+        expect(@collaborative_category.groups.active.map(&:name)).to include("Updated Group1", "New Group")
+        expect(@collaborative_category.groups.active.map(&:name)).not_to include("Group2")
+      end
+
+      it "fails if a group to update doesn't exist" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 update: [{ id: 9999, name: "Nonexistent" }]
+               }
+             }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "fails if a group to delete doesn't exist" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 delete: [{ id: 9999 }]
+               }
+             }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "fails if create params are invalid" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 create: [{ name: "" }] # invalid name
+               }
+             }
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["errors"]).to be_present
+      end
+
+      it "handles ActiveRecord validation errors gracefully" do
+        group = @collaborative_category.groups.create!(name: "Valid Name", context: @course)
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 update: [{ id: group.id, name: "" }] # invalid
+               }
+             }
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["errors"]).to match(/Validation failed/i)
+      end
+
+      it "fails when the maximum number of operations is exceeded" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 create: [
+                   { name: "Group A" },
+                   { name: "Group B" },
+                   { name: "Group C" },
+                   { name: "Group D" },
+                   { name: "Group E" }
+                 ] * 11
+               }
+             }
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["errors"]).to match(/You can only perform a maximum of 50 operations at a time./i)
+      end
+
+      it "fails when an invalid group category id is provided" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: 999_999,
+               operations: {
+                 create: [{ name: "New Group" }]
+               }
+             }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "fails when trying to edit a group that belongs to a different category" do
+        other_category = @course.group_categories.create!(name: "Other Category")
+        other_group = other_category.groups.create!(name: "Other Group", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 update: [{ id: other_group.id, name: "Updated Name" }]
+               }
+             }
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
   describe "DELETE delete" do
     it "requires authorization" do
       group_category = @course.group_categories.create(name: "Study Groups")

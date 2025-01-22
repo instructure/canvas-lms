@@ -94,7 +94,7 @@
 #
 class GroupCategoriesController < ApplicationController
   before_action :require_context, only: [:create, :index]
-  before_action :get_category_context, only: %i[show update destroy groups users assign_unassigned_members import export]
+  before_action :get_category_context, only: %i[show update destroy groups users assign_unassigned_members import export bulk_manage_groups]
 
   include Api::V1::Attachment
   include Api::V1::GroupCategory
@@ -103,6 +103,7 @@ class GroupCategoriesController < ApplicationController
   include GroupPermissionHelper
 
   SETTABLE_GROUP_ATTRIBUTES = %w[name description join_level is_public group_category avatar_attachment].freeze
+  MAX_BULK_ACTIONS = 50
 
   include TextHelper
 
@@ -265,6 +266,106 @@ class GroupCategoriesController < ApplicationController
         end
       end
     end
+  end
+
+  # @API Bulk manage groups in category
+  #
+  # Perform bulk operations on groups within a category
+  #
+  # @argument operations [Required, Hash]
+  #   A hash containing arrays of create/update/delete operations:
+  #   {
+  #     "create": [
+  #       { "name": "New Group A" },
+  #       { "name": "New Group B" }
+  #     ],
+  #     "update": [
+  #       { "id": 123, "name": "Updated Group Name A" },
+  #       { "id": 456, "name": "Updated Group Name B" }
+  #     ],
+  #     "delete": [
+  #       { "id": 789 },
+  #       { "id": 101 }
+  #     ]
+  #   }
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/group_categories/<group_category_id>/bulk_manage_groups \
+  #          -X POST \
+  #          -H 'Authorization: Bearer <token>' \
+  #          -H 'Content-Type: application/json' \
+  #          -d '{
+  #                "operations": {
+  #                  "create": [{"name": "New Group"}],
+  #                  "update": [{"id": 123, "name": "Updated Group"}],
+  #                  "delete": [{"id": 456}]
+  #                }
+  #              }'
+  #
+  # @returns GroupCategory
+  def bulk_manage_groups
+    operations = params.require(:operations)
+    create_ops = operations[:create] || []
+    update_ops = operations[:update] || []
+    delete_ops = operations[:delete] || []
+
+    if (create_ops.count + update_ops.count + delete_ops.count) > MAX_BULK_ACTIONS
+      return render json: { errors: "You can only perform a maximum of #{MAX_BULK_ACTIONS} operations at a time." }, status: :bad_request
+    end
+
+    if create_ops.any?
+      return unless check_group_authorization(
+        context: @context,
+        current_user: @current_user,
+        action_category: :add,
+        non_collaborative: @group_category.non_collaborative?
+      )
+    end
+    if update_ops.any?
+      return unless check_group_authorization(
+        context: @context,
+        current_user: @current_user,
+        action_category: :manage,
+        non_collaborative: @group_category.non_collaborative?
+      )
+    end
+    if delete_ops.any?
+      return unless check_group_authorization(
+        context: @context,
+        current_user: @current_user,
+        action_category: :delete,
+        non_collaborative: @group_category.non_collaborative?
+      )
+    end
+    results = { created: [], updated: [], deleted: [] }
+
+    ActiveRecord::Base.transaction do
+      create_ops.each do |group_params|
+        permitted_attrs = group_params.permit(:name)
+        group = @group_category.groups.create!(permitted_attrs.merge(context: @group_category.context))
+        results[:created] << group
+      end
+      update_ops.each do |group_params|
+        permitted_attrs = group_params.permit(:name, :id)
+
+        group = @group_category.groups.find(permitted_attrs[:id])
+        group.name = group_params[:name]
+        group.save!
+        results[:updated] << group
+      end
+      delete_ops.each do |group_params|
+        permitted_attrs = group_params.permit(:id)
+        group = @group_category.groups.find(permitted_attrs[:id])
+        group.destroy!
+        results[:deleted] << group
+      end
+    end
+
+    render json: results
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.message }, status: :bad_request
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { error: e.message }, status: :not_found
   end
 
   # @API Import category groups

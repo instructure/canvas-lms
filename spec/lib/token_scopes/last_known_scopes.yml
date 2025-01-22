@@ -1523,6 +1523,8 @@
   path: '/api/v1/group_categories/:group_category_id'
 - verb: POST
   path: '/api/v1/group_categories/:group_category_id/assign_unassigned_members'
+- verb: POST
+  path: '/api/v1/group_categories/:group_category_id/bulk_manage_groups'
 - verb: GET
   path: '/api/v1/group_categories/:group_category_id/export'
 - verb: GET
