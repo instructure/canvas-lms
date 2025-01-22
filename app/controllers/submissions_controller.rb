@@ -143,8 +143,8 @@ class SubmissionsController < SubmissionsBaseController
 
   # @API Submit an assignment
   #
-  # Make a submission for an assignment. You must be enrolled as a student in
-  # the course/section to do this.
+  # Make a submission for an assignment. You must be actively enrolled as a student in
+  # the course/section to do this. Concluded and pending enrollments are not permitted.
   #
   # All online turn-in submission types are supported in this API. However,
   # there are a few things that are not yet supported:
