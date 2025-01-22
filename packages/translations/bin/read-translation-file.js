@@ -1,3 +1,4 @@
+/* eslint-disable import/no-nodejs-modules */
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -22,7 +23,7 @@ const path = require('path')
 /**
  * This returns the contents of the translations for the given package and locale
  */
-function readTRanslationFile(packageName, locale) {
+exports.readTranslationFile = function (packageName, locale) {
   const filePath = path.resolve(__dirname, `../lib/${packageName}/${locale}.json`)
   const jsonData = fs.readFileSync(filePath, {encoding: 'utf8'})
   // sanity check
@@ -34,5 +35,3 @@ function readTRanslationFile(packageName, locale) {
   }
   return jsonData
 }
-
-module.exports = readTRanslationFile

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,20 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from 'format-message'
-
-const generateId = require('format-message-generate-id/underscored_crc32.js')
-
-const ns = formatMessage.namespace()
-
-ns.addLocale = translations => {
-  const locale = Object.keys(translations)[0]
-  ns.setup({
-    translations: {...ns.setup().translations, ...translations},
-    locale,
-    generateId,
-    missingTranslation: 'ignore',
-  })
-}
-
-export default ns
+const {getTranslationList} = require('./bin/get-translation-list.js')
+const {readTranslationFile} = require('./bin/read-translation-file.js')
+module.exports = {getTranslationList, readTranslationFile}
