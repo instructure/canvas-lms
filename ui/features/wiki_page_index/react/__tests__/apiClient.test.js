@@ -28,15 +28,11 @@ afterEach(() => {
   jest.clearAllMocks()
 })
 
-it('deletes pages', done => {
+it('deletes pages', async () => {
   moxios.stubRequest('/api/v1/courses/1/pages/my_page', {
     response: {},
   })
-  deletePages('courses', '1', ['my_page'])
-    .then(response => {
-      expect(response.failures).toEqual([])
-      expect(response.successes[0].data).toEqual('my_page')
-      done() // eslint-disable-line promise/no-callback-in-promise
-    })
-    .catch(_err => done.fail())
+  const response = await deletePages('courses', '1', ['my_page'])
+  expect(response.failures).toEqual([])
+  expect(response.successes[0].data).toEqual('my_page')
 })

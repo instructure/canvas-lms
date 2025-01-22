@@ -48,26 +48,21 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
-it('fetchRootFolder sets folderState ', done => {
+it('fetchRootFolder sets folderState', async () => {
   const ref = React.createRef()
   component = render(<ModuleFileDrop {...props} ref={ref} />)
   jest.restoreAllMocks()
 
-  ref.current
-    .fetchRootFolder()
-    .then(() => {
-      expect(ModuleFileDrop.folderState).toEqual({
-        contextId: '1',
-        contextType: 'Course',
-        folder: {
-          context_id: '1',
-          context_type: 'Course',
-          files: ['a.txt'],
-        },
-      })
-      done() // eslint-disable-line promise/no-callback-in-promise
-    })
-    .catch(() => done.fail())
+  await ref.current.fetchRootFolder()
+  expect(ModuleFileDrop.folderState).toEqual({
+    contextId: '1',
+    contextType: 'Course',
+    folder: {
+      context_id: '1',
+      context_type: 'Course',
+      files: ['a.txt'],
+    },
+  })
 })
 
 it('registers and deregisters drop components', () => {
