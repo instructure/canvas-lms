@@ -128,6 +128,8 @@ class ContextModulesController < ApplicationController
       @allow_menu_tools = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add) &&
                           (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?)
 
+      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+
       hash = {
         course_id: @context.id,
         CONTEXT_URL_ROOT: polymorphic_path([@context]),
@@ -137,6 +139,7 @@ class ContextModulesController < ApplicationController
           usage_rights_required: @context.usage_rights_required?,
           manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
         },
+        ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
         MODULE_TOOLS: module_tool_definitions,
         DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
         PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?
