@@ -1,6 +1,8 @@
 {
   "name": "@instructure/translations",
   "version": "1.0.0",
+  "type": "commonjs",
+  "main": "index.js",
   "engines": {
     "node": ">= 10.10"
   },

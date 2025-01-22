@@ -21,7 +21,7 @@ import formatMessage from '../format-message'
 import RCEWrapper from './RCEWrapper'
 import {EditorOptionsPropType, type ExternalToolsConfig, LtiToolsPropType} from './RCEWrapperProps'
 import {RCEVariant} from './RCEVariants'
-import editorLanguage from './editorLanguage'
+import {editorLanguage} from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
 import wrapInitCb from './wrapInitCb'
 import tinyRCE from './tinyRCE'
@@ -76,7 +76,7 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
         setTranslations(true)
       })
       .catch(err => {
-        // eslint-disable-next-line no-console
+         
         console.error('Failed loading the language file for', locale, '\n Cause:', err)
         setTranslations(false)
       })
