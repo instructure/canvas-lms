@@ -361,6 +361,34 @@ describe AssignmentsController do
         expect(assignment_permissions[@assignment.id][:update]).to be(false)
       end
     end
+
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+      end
+
+      it "is true if account setting is on" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "is false if account setting is off" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = false
+          a.save!
+        end
+
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be false
+      end
+    end
   end
 
   describe "GET 'show_moderate'" do
@@ -1832,6 +1860,34 @@ describe AssignmentsController do
         end
       end
     end
+
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+      end
+
+      it "is true if account setting is on" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+
+        user_session(@teacher)
+        get "show", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "is false if account setting is off" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = false
+          a.save!
+        end
+
+        user_session(@teacher)
+        get "show", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be false
+      end
+    end
   end
 
   describe "GET 'tool_launch'" do
@@ -2768,6 +2824,34 @@ describe AssignmentsController do
 
       get :edit, params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
+    end
+
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+      end
+
+      it "is true if account setting is on" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+
+        user_session(@teacher)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "is false if account setting is off" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = false
+          a.save!
+        end
+
+        user_session(@teacher)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be false
+      end
     end
   end
 

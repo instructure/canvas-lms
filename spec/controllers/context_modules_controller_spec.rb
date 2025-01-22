@@ -151,6 +151,34 @@ describe ContextModulesController do
       end
     end
 
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+      end
+
+      it "is true if account setting is on" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(controller.js_env[:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "is false if account setting is off" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = false
+          a.save!
+        end
+
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(controller.js_env[:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be false
+      end
+    end
+
     context "tool definitions for placements" do
       subject { get "index", params: { course_id: @course.id } }
 
