@@ -40,9 +40,12 @@ module Lti
       @session_id = session_id
     end
 
+    def log_lti_launches?
+      Setting.get("log_lti_launches", "true") == "true"
+    end
+
     def call
-      return unless @context.root_account.feature_enabled?(:lti_log_launches)
-      return unless Account.site_admin.feature_enabled?(:lti_log_launches_site_admin)
+      return unless log_lti_launches?
 
       PandataEvents.send_event(:lti_launch, log_data, for_user_id: @user&.global_id)
     end
