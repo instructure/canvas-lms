@@ -19,6 +19,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {datetimeString} from '@canvas/datetime/date-functions'
@@ -29,10 +30,41 @@ import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
 import FilterPeerReview from './react/FilterPeerReview'
+import ReviewsPerUserInput from './react/ReviewsPerUserInput'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('assignments.peer_reviews')
 
 $(document).ready(() => {
+  const peerReviewCountContainer = document.getElementById('reviews_per_user_container')
+  const redirectToEditContainer = document.getElementById('redirect_to_edit_button')
+  if (peerReviewCountContainer) {
+    const root = createRoot(peerReviewCountContainer)
+    const initialCount = peerReviewCountContainer.dataset.count ?? '0'
+    const setValue = value => {
+      const peerReviewCount = document.getElementById('peer_review_count')
+      peerReviewCount.value = value
+    }
+    root.render(
+      <View as="div" margin="medium 0 large 0">
+        <ReviewsPerUserInput initialCount={initialCount} onChange={setValue} />
+      </View>
+    )
+  }
+
+  if (redirectToEditContainer) {
+    const courseId = redirectToEditContainer.dataset.courseid
+    const assignmentId = redirectToEditContainer.dataset.assignmentid
+    const root = createRoot(redirectToEditContainer)
+    const editLink = `/courses/${courseId}/assignments/${assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`
+    root.render(
+      <Button href={editLink}>
+        {I18n.t('Edit Assignment')}
+      </Button>
+    )
+  }
+
   $('.peer_review').hover(
     function () {
       $('.peer_review.submission-hover').removeClass('submission-hover')
@@ -148,6 +180,26 @@ $(document).ready(() => {
       $(this).loadingImage('remove')
       $(this).formErrors(data)
     },
+  })
+
+  $('#assign_peer_reviews_form').formSubmit({
+    beforeSubmit(data) {
+      const textInput = document.getElementById('reviews_per_user_input')
+      if (!data.peer_review_count) {
+        textInput.focus()
+        return false
+      } else {
+        const input = Number(data.peer_review_count)
+        if (!Number.isInteger(input) || input <= 0) {
+          textInput.focus()
+          return false
+        }
+        return true
+      }
+    },
+    success(_data) {
+      location.reload()
+    }
   })
 
   $('.remind_peer_review_link').click(function (event) {

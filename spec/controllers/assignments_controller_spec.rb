@@ -2951,4 +2951,32 @@ describe AssignmentsController do
       end
     end
   end
+
+  describe "POST #assign_peer_reviews" do
+    before do
+      course_with_teacher(active_all: true)
+      @assignment = @course.assignments.create(title: "Peer Review Assignment", workflow_state: "published")
+      @assignment.update!(peer_reviews: true, submission_types: "text_entry")
+      student1 = student_in_course(active_all: true).user
+      student2 = student_in_course(active_all: true).user
+      [student1, student2].each do |student|
+        submission = @assignment.submit_homework(student)
+        submission.submission_type = "online_text_entry"
+        submission.save!
+      end
+      user_session(@teacher)
+    end
+
+    it "returns a JSON response" do
+      post :assign_peer_reviews, params: {
+        course_id: @course.id,
+        assignment_id: @assignment.id,
+        peer_review_count: 1,
+        format: :json
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.size).to eq(2)
+    end
+  end
 end

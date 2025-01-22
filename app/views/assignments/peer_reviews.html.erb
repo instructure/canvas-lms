@@ -27,20 +27,28 @@
   <p><%= t :details, "To the left you can see the list of students for this assignment, and also
   which student submissions (if any) they have been assigned to review." %></p>
   <% unless @submissions.empty? %>
-    <%= form_tag context_url(@context, :context_assignment_assign_peer_reviews_url, @assignment.id), {} do %>
-      <h3 style="margin-bottom: 0;"><%= t 'titles.automatically_assign_reviews', "Automatically Assign Reviews" %></h3>
-      <p><%= t 'descriptions.automatically_assign_reviews', "You can assign peer reviews to those users who have submitted but don't already have
-      reviews assigned by clicking the button below." %></p>
-      <% if @assignment.group_category %>
-        <div>
-          <%= check_box_tag "intra_group_peer_reviews", "1", @assignment.intra_group_peer_reviews %>
-          <label for="intra_group_peer_reviews"><%= t("Allow intra-group peer reviews") %></label>
+    <% unless @assignment.current_submissions_and_assessors[:submissions]&.count&.zero? %>
+      <%= form_tag context_url(@context, :context_assignment_assign_peer_reviews_url, @assignment.id), {:id => "assign_peer_reviews_form" } do %>
+        <h3 style="margin-bottom: 0;" id="automatically_assign_reviews"><%= t 'titles.automatically_assign_reviews', "Automatically Assign Reviews" %></h3>
+        <p><%= t 'descriptions.automatically_assign_reviews', "You can assign peer reviews to those users who have submitted but don't already have
+        reviews assigned by clicking the button below." %></p>
+        <% if @assignment.group_category %>
+          <div>
+            <%= check_box_tag "intra_group_peer_reviews", "1", @assignment.intra_group_peer_reviews %>
+            <label for="intra_group_peer_reviews"><%= t("Allow intra-group peer reviews") %></label>
+          </div>
+        <% end %>
+        <%= hidden_field_tag :peer_review_count, @assignment.peer_review_count %>
+        <div id="reviews_per_user_container" data-count="<%= @assignment.peer_review_count %>" ></div>
+        <div class='button-container button-container-right-aligned'>
+          <button id="submit_assign_peer_reviews" type="submit" class="btn btn-large"><%= t 'buttons.assign_peer_reviews', "Assign Peer Reviews" %></button>
         </div>
       <% end %>
-      <%= t :reviews_per_user, "%{count} reviews per user", :count => %{<input type="text" name="peer_review_count" value="#{@assignment.peer_review_count || 1}" style="width: 25px;"/>}.html_safe %>
-      <div class='button-container button-container-right-aligned'>
-        <button type="submit" class="btn btn-large" <%= "disabled" if @assignment.current_submissions_and_assessors[:submissions]&.count&.zero? %>><%= t 'buttons.assign_peer_reviews', "Assign Peer Reviews" %></button>
-      </div>
+    <% else %>
+      <h3 style="margin-bottom: 0;" id="automatically_assign_reviews"><%= t 'titles.automatically_assign_reviews', "Automatically Assign Reviews" %></h3>
+      <p><%= t 'descriptions.automatically_assign_reviews_redirect', "Peer reviews can be assigned to users who have submitted but don't already have
+      reviews assigned. To enable and configure automatically assigning peer reviews, click the button below." %></p>
+      <div id="redirect_to_edit_button" class="redirect_to_edit_button" data-courseid="<%= @context.id %>" data-assignmentid="<%= @assignment.id %>"></div>
     <% end %>
   <% end %>
 <% end %>
