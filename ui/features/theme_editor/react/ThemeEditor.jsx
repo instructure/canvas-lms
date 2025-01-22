@@ -29,6 +29,7 @@ import SaveThemeButton from './SaveThemeButton'
 import ThemeEditorModal from './ThemeEditorModal'
 import ThemeEditorSidebar from './ThemeEditorSidebar'
 import getCookie from '@instructure/get-cookie'
+import {Button} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('theme_editor')
 
@@ -433,14 +434,14 @@ export default class ThemeEditor extends React.Component {
             {/* IF CHANGES ARE MADE, THIS BUTTON IS DISABLED UNTIL THEY ARE SAVED */}
             {this.props.hasUnsavedChanges ? (
               <span data-tooltip="right" title={tooltipForWhyApplyIsDisabled}>
-                <button
+                <Button
                   type="button"
-                  className="Button Button--success"
+                  color="success"
                   disabled={!!tooltipForWhyApplyIsDisabled}
                   onClick={this.handleApplyClicked}
                 >
                   {I18n.t('Apply theme')}
-                </button>
+                </Button>
               </span>
             ) : null}
 
@@ -464,9 +465,9 @@ export default class ThemeEditor extends React.Component {
               onSave={this.updateSharedBrandConfigBeingEdited}
             />
             &nbsp;
-            <button type="button" className="Button" onClick={this.handleCancelClicked}>
+            <Button type="button" onClick={this.handleCancelClicked}>
               {I18n.t('Exit')}
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -563,8 +564,8 @@ export default class ThemeEditor extends React.Component {
               />
             </div>
           </div>
-          {this.renderHeader(tooltipForWhyApplyIsDisabled)}
         </form>
+        {this.renderHeader(tooltipForWhyApplyIsDisabled)}
 
         <ThemeEditorModal
           showProgressModal={this.state.showProgressModal}
