@@ -145,16 +145,16 @@ describe('Conference', () => {
       url: 'invalid://foo',
       lti_settings: {
         type: 'html',
-        html: '<div><a href="/foo">This is some text</a></div>',
+        html: '<div><a href="invalid://foo">This is some text</a></div>',
       },
     }
 
     it('shows lti html conferences as html', () => {
-      const {getByText} = render(
+      const {getByRole} = render(
         <Conference conference={htmlConference} conferenceType={msTeamsConferenceType} />,
       )
-      const link = getByText('This is some text')
-      expect(link.href).toMatch(/foo$/)
+      const link = getByRole('link', {name: 'This is some text'})
+      expect(link.href).toBe('invalid://foo')
     })
 
     it('sanitizes html text', () => {
