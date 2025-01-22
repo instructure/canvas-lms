@@ -270,12 +270,22 @@ describe('GradebookExportManager - startExport', () => {
 
     subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
 
+    // First stub the export request
+    moxios.stubRequest(exportingUrl, {
+      status: 200,
+      response: {
+        attachmentId: 'attachmentId',
+        progressId: 'newProgressId'
+      }
+    })
+
+    // Then stub the monitoring request
     moxios.stubRequest(expectedMonitoringUrl, {
       status: 200,
-      responseText: {
+      response: {
         workflow_state: 'failed',
-        message: 'Arbitrary failure',
-      },
+        message: 'Arbitrary failure'
+      }
     })
 
     await expect(
@@ -283,8 +293,8 @@ describe('GradebookExportManager - startExport', () => {
         undefined,
         () => [],
         false,
-        () => [],
-      ),
+        () => []
+      )
     ).rejects.toEqual('Error exporting gradebook: Arbitrary failure')
   })
 
