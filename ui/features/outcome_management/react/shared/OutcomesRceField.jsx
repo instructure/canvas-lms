@@ -37,7 +37,7 @@ const OutcomesRceField = ({onChangeHandler, defaultContent}) => {
   const [isLoadingRce, setIsLoadingRce] = useState(true)
   const rceRef = useRef(null)
   const spinner = (
-    <View display="block" textAlign="center">
+    <View display="block" textAlign="center" data-testid="rce-loading-spinner">
       <Spinner size="large" margin="large auto" renderTitle={() => I18n.t('Loading...')} />
     </View>
   )
