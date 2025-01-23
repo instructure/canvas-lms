@@ -151,6 +151,17 @@ describe ContextController do
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
       end
     end
+
+    it "displays modernized course people page when FF enabled" do
+      @course.root_account.enable_feature!(:people_page_modernization)
+      user_session(@teacher)
+      get :roster, params: { course_id: @course.id }
+      expect(response.status).to eq(200)
+      expect(response).to render_template "layouts/application"
+      expect(response.body).to eq("")
+      expect(assigns).to have_key(:js_bundles)
+      expect(assigns[:js_bundles]).to include [:course_people_new, nil, false]
+    end
   end
 
   describe "GET 'roster_user'" do
