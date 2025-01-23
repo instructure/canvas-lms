@@ -158,5 +158,38 @@ class NewContentMigrationPage
     def lti_select_content
       fxpath('//*[text()="Content"]')
     end
+
+    def date_adjust_checkbox
+      fxpath('//*[text()="Adjust events and due dates"]')
+    end
+
+    def add_day_substitution_button
+      fxpath('//*[@aria-hidden="true" and text()="Substitution"]/ancestor::button')
+    end
+
+    def add_day_containers
+      ff("#daySubstitution ul > div")
+    end
+
+    def old_start_date_input
+      find_by_test_id("old_start_date")
+    end
+
+    def old_end_date_input
+      find_by_test_id("old_end_date")
+    end
+
+    def new_start_date_input
+      find_by_test_id("new_start_date")
+    end
+
+    def new_end_date_input
+      find_by_test_id("new_end_date")
+    end
+
+    def select_day_substition_range(index, from_weekday, to_weekday)
+      click_option("#day-substition-from-#{index}", from_weekday)
+      click_option("#day-substition-to-#{index}", to_weekday)
+    end
   end
 end
