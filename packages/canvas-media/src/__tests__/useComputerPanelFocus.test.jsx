@@ -20,6 +20,7 @@ import React, {useRef} from 'react'
 import {object, func, bool} from 'prop-types'
 import {render} from '@testing-library/react'
 import useComputerPanelFocus from '../useComputerPanelFocus'
+import {vi} from 'vitest'
 
 function TestComponent(props) {
   const panelRef = useRef(null)
@@ -40,18 +41,18 @@ TestComponent.propTypes = {
   theFile: object,
   onButtonFocus: func,
   onInputFocus: func,
-  hasClearButton: bool
+  hasClearButton: bool,
 }
 TestComponent.defaultProps = {
-  hasClearButton: true
+  hasClearButton: true,
 }
 
 describe('useComputerPanelFocus hook', () => {
   it('does nothing until we have a file', () => {
-    const onButtonFocus = jest.fn()
-    const onInputFocus = jest.fn()
+    const onButtonFocus = vi.fn()
+    const onInputFocus = vi.fn()
     render(
-      <TestComponent theFile={null} onButtonFocus={onButtonFocus} onInputFocus={onInputFocus} />
+      <TestComponent theFile={null} onButtonFocus={onButtonFocus} onInputFocus={onInputFocus} />,
     )
 
     expect(onButtonFocus).not.toHaveBeenCalled()
@@ -59,11 +60,11 @@ describe('useComputerPanelFocus hook', () => {
   })
 
   it('focuses the button once we have a file', () => {
-    const onButtonFocus = jest.fn()
-    const onInputFocus = jest.fn()
+    const onButtonFocus = vi.fn()
+    const onInputFocus = vi.fn()
     const theFile = {}
     render(
-      <TestComponent theFile={theFile} onButtonFocus={onButtonFocus} onInputFocus={onInputFocus} />
+      <TestComponent theFile={theFile} onButtonFocus={onButtonFocus} onInputFocus={onInputFocus} />,
     )
 
     expect(onButtonFocus).toHaveBeenCalled()
@@ -71,8 +72,8 @@ describe('useComputerPanelFocus hook', () => {
   })
 
   it('focuses the input once we have a file, but no button', () => {
-    const onButtonFocus = jest.fn()
-    const onInputFocus = jest.fn()
+    const onButtonFocus = vi.fn()
+    const onInputFocus = vi.fn()
     const theFile = {}
     render(
       <TestComponent
@@ -80,7 +81,7 @@ describe('useComputerPanelFocus hook', () => {
         onButtonFocus={onButtonFocus}
         onInputFocus={onInputFocus}
         hasClearButton={false}
-      />
+      />,
     )
 
     expect(onButtonFocus).not.toHaveBeenCalled()

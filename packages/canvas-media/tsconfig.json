@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "lib": [
+      "ES2021",
+      "DOM"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "useDefineForClassFields": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "outDir": "es",
+    "declaration": true,
+    "esModuleInterop": true,
+  },
+  "include": [
+    "src"
+  ]
+}

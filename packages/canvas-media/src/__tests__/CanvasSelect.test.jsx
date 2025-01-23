@@ -25,6 +25,7 @@ import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import '@instructure/canvas-theme'
 import CanvasSelect from '../shared/CanvasSelect'
+import {vi} from 'vitest'
 
 function selectProps(override = {}) {
   return {
@@ -89,7 +90,7 @@ describe('CanvasSelect component', () => {
   })
 
   it('calls onChange when selection changes', async () => {
-    const handleChange = jest.fn()
+    const handleChange = vi.fn()
     const {getByText} = renderSelect({onChange: handleChange})
 
     const label = getByText('Choose one')
@@ -103,7 +104,7 @@ describe('CanvasSelect component', () => {
   })
 
   it('forwards the isDisabled prop', async () => {
-    const handleChange = jest.fn()
+    const handleChange = vi.fn()
     const {getByText} = render(
       <CanvasSelect {...selectProps({onChange: handleChange})}>
         <CanvasSelect.Option key="1" id="1" value="one">
@@ -115,7 +116,7 @@ describe('CanvasSelect component', () => {
         <CanvasSelect.Option key="3" id="3" value="three" isDisabled={true}>
           Three
         </CanvasSelect.Option>
-      </CanvasSelect>
+      </CanvasSelect>,
     )
 
     const label = getByText('Choose one')
@@ -137,7 +138,7 @@ describe('CanvasSelect component', () => {
         <CanvasSelect.Option key="3" id="3" value="three" isDisabled={true}>
           Three
         </CanvasSelect.Option>
-      </CanvasSelect>
+      </CanvasSelect>,
     )
     const label = getByText('Choose one')
     await fireEvent.click(label)
@@ -156,7 +157,7 @@ describe('CanvasSelect component', () => {
 
   it('handles no options', async () => {
     const {getByText} = render(
-      <CanvasSelect {...selectProps({noOptionsLabel: 'No Options'})}>what is this?</CanvasSelect>
+      <CanvasSelect {...selectProps({noOptionsLabel: 'No Options'})}>what is this?</CanvasSelect>,
     )
     const label = getByText('Choose one')
     await fireEvent.click(label)
@@ -190,7 +191,7 @@ describe('CanvasSelect component', () => {
               Six
             </CanvasSelect.Option>
           </CanvasSelect.Group>
-        </CanvasSelect>
+        </CanvasSelect>,
       )
       expect(getByText('Choose one')).toBeInTheDocument()
       const label = getByText('Choose one')
@@ -210,7 +211,7 @@ describe('CanvasSelect component', () => {
               One
             </CanvasSelect.Option>
           </CanvasSelect.Group>
-        </CanvasSelect>
+        </CanvasSelect>,
       )
       expect(getByText('Choose one')).toBeInTheDocument()
       const label = getByText('Choose one')
@@ -256,7 +257,7 @@ describe('CanvasSelect component', () => {
             ))}
           </CanvasSelect.Group>
         ))}
-      </CanvasSelect>
+      </CanvasSelect>,
     )
 
     expect(getByText('Choose one')).toBeInTheDocument()

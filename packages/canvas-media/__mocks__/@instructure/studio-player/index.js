@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,16 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// this target is intended for Jest / JSDOM Node.js environments and is not
-// suitable for the browser or production
-module.exports = {
-  presets: [
-    ['@babel/preset-env', {
-      modules: 'commonjs',
-    }],
-    ['@babel/preset-react', { useBuiltIns: true }],
-  ],
-  targets: {
-    node: 'current'
-  },
-}
+import React from 'react'
+
+export const StudioPlayer = () => <div data-testid="studio-player" />

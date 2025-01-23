@@ -179,6 +179,8 @@
     "@testing-library/react-hooks": "^5",
     "@testing-library/react": "^12",
     "@testing-library/user-event": "^14",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "@types/testing-library__jest-dom": "^5.0.0",
     "axe-testcafe": "^3",
     "babel-loader": "^9.1.3",

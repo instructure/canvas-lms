@@ -162,16 +162,19 @@ export class UploadMediaModal extends React.Component {
 
   handleSubmit = () => {
     switch (this.state.selectedPanel) {
-      case PANELS.COMPUTER:
+      case PANELS.COMPUTER: {
         this.uploadFile(this.state.computerFile)
         break
-      case PANELS.RECORD:
+      }
+      case PANELS.RECORD: {
         const button = document.getElementById('media_capture_save_button')
         if (button) button.disabled = true
         this.uploadFile(this.state.recordedFile)
         break
-      default:
+      }
+      default: {
         throw new Error('Selected Panel is invalid') // Should never get here
+      }
     }
   }
 
@@ -191,13 +194,15 @@ export class UploadMediaModal extends React.Component {
       file.userEnteredTitle ||= file.name
       if (!fileExtensionRegex.test(file.userEnteredTitle)) {
         const extension = mediaExtension(file.type) || DEFAULT_EXTENSION
-        file.userEnteredTitle +=  file.userEnteredTitle.endsWith('.') ? `${extension}` : `.${extension}`
+        file.userEnteredTitle += file.userEnteredTitle.endsWith('.')
+          ? `${extension}`
+          : `.${extension}`
       }
       saveMediaRecording(
         file,
         this.props.rcsConfig,
         this.saveMediaCallback,
-        this.onSaveMediaProgress
+        this.onSaveMediaProgress,
       )
     })
   }
@@ -221,13 +226,13 @@ export class UploadMediaModal extends React.Component {
                 media_object.attachment_id,
                 subtitles,
                 rcsConfig,
-                CC_FILE_MAX_BYTES
+                CC_FILE_MAX_BYTES,
               )
             : await saveClosedCaptions(
                 media_object.media_id,
                 subtitles,
                 rcsConfig,
-                CC_FILE_MAX_BYTES
+                CC_FILE_MAX_BYTES,
               )
         }
         onUploadComplete?.(null, data, captions?.data)
@@ -235,9 +240,9 @@ export class UploadMediaModal extends React.Component {
         onUploadComplete?.(ex, null)
       }
     }
-      onDismiss?.()
-      const button = document.getElementById('media_capture_save_button')
-      if (button) button.disabled = false
+    onDismiss?.()
+    const button = document.getElementById('media_capture_save_button')
+    if (button) button.disabled = false
   }
 
   componentDidMount() {

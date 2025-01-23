@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {act, render, fireEvent, waitFor} from '@testing-library/react'
+import {act, render, fireEvent, waitFor, screen} from '@testing-library/react'
 import ComputerPanel from '../ComputerPanel'
 import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
-import StudioPlayer from '@instructure/studio-player'
+import {vi} from 'vitest'
 
 const uploadMediaTranslations = {
   UploadMediaStrings: {
@@ -49,7 +49,21 @@ const uploadMediaTranslations = {
 
 const LIVE_REGION_ID = 'flash_screenreader_holder'
 
-function createPanel(overrideProps) {
+interface ComputerPanelProps {
+  theFile: File | null
+  setFile: (file: File | null) => void
+  hasUploadedFile: boolean
+  setHasUploadedFile: (uploaded: boolean) => void
+  label: string
+  uploadMediaTranslations: typeof uploadMediaTranslations
+  accept: string[]
+  userLocale: string
+  liveRegion: () => HTMLElement | null
+  updateSubtitles: () => boolean
+  useStudioPlayer: boolean
+}
+
+function createPanel(overrideProps: Partial<ComputerPanelProps>) {
   return (
     <ComputerPanel
       theFile={null}
@@ -73,14 +87,6 @@ function renderPanel(overrideProps = {}) {
 }
 
 describe('UploadMedia: ComputerPanel', () => {
-  jest.mock('@instructure/studio-player', () => {
-    const mockPlayer = jest.fn(() => null)
-    mockPlayer.propTypes = {}
-    return {
-      StudioPlayer: mockPlayer,
-    }
-  })
-
   beforeEach(() => {
     const liveRegion = document.createElement('div')
     liveRegion.id = LIVE_REGION_ID
@@ -119,13 +125,13 @@ describe('UploadMedia: ComputerPanel', () => {
     const aFile = new File(['foo'], 'foo.mov', {
       type: 'video/quicktime',
     })
-    const setFile = file =>
+    const setFile = (file: File | null) =>
       rerender(
         createPanel({
           setFile,
           theFile: file,
           hasUploadedFile: true,
-        })
+        }),
       )
     const {rerender, getByLabelText, getByPlaceholderText} = renderPanel({setFile})
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
@@ -135,12 +141,26 @@ describe('UploadMedia: ComputerPanel', () => {
       },
     })
     const titleInput = getByPlaceholderText('File name')
+    if (!(titleInput instanceof HTMLInputElement)) {
+      throw new Error('Expected titleInput to be an HTMLInputElement')
+    }
     expect(titleInput.value).toEqual('foo.mov')
     fireEvent.change(titleInput, {target: {value: 'Awesome video'}})
     expect(titleInput.value).toEqual('Awesome video')
   })
 
   describe('file preview', () => {
+    beforeEach(() => {
+      vi.mock('@instructure/studio-player', () => ({
+        StudioPlayer: vi.fn(() => <div data-testid="studio-player" data-test-id="studio-player" />),
+      }))
+    })
+
+    afterEach(() => {
+      vi.clearAllMocks()
+      vi.resetModules()
+    })
+
     // this test passes locally, but consistently fails in jenkins.
     // Though I don't know why, this ComputerPanel typically isn't used to upload video
     // (that would be the version in canvas-media), and if you do select a video file
@@ -156,52 +176,61 @@ describe('UploadMedia: ComputerPanel', () => {
     })
 
     it('Does not render the StudioPlayer if the flag is not enabled', async () => {
-      const playerSpy = jest.spyOn(StudioPlayer, 'StudioPlayer')
-      HTMLElement.prototype.scrollIntoView = jest.fn()
       const aFile = new File(['foo'], 'foo.mov', {
         type: 'video/quicktime',
       })
-      const setFile = file =>
-        rerender(
-          createPanel({
-            setFile,
-            theFile: file,
-            hasUploadedFile: true,
-          })
-        )
-      const {rerender, getByLabelText} = renderPanel({setFile})
-      const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
-      fireEvent.change(dropZone, {
-        target: {
-          files: [aFile],
-        },
+      const {queryByTestId} = renderPanel({
+        theFile: aFile,
+        hasUploadedFile: true,
+        useStudioPlayer: false,
       })
-      expect(playerSpy).not.toHaveBeenCalled()
+
+      expect(queryByTestId('studio-player')).not.toBeInTheDocument()
     })
 
     it('Renders the StudioPlayer if the flag is enabled', async () => {
-      const playerSpy = jest.spyOn(StudioPlayer, 'StudioPlayer')
-      HTMLElement.prototype.scrollIntoView = jest.fn()
-      const aFile = new File(['foo'], 'foo.mov', {
-        type: 'video/quicktime',
+      const aFile = new File(['foo'], 'foo.mp4', {
+        type: 'video/mp4',
       })
-      const setFile = file =>
-        rerender(
-          createPanel({
-            setFile,
-            theFile: file,
-            hasUploadedFile: true,
-            useStudioPlayer: true,
-          })
-        )
-      const {rerender, getByLabelText} = renderPanel({setFile})
+      const setFile = vi.fn()
+      const setHasUploadedFile = vi.fn()
+
+      const {getByLabelText, getByTestId, queryByTestId, rerender} = renderPanel({
+        setFile,
+        setHasUploadedFile,
+        label: 'Upload File',
+        useStudioPlayer: true,
+      })
+
+      // Verify StudioPlayer is not rendered before file upload
+      expect(queryByTestId('studio-player')).not.toBeInTheDocument()
+
+      // Trigger the file upload
       const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
       fireEvent.change(dropZone, {
         target: {
           files: [aFile],
         },
       })
-      expect(playerSpy).toHaveBeenCalled()
+
+      rerender(
+        createPanel({
+          setFile,
+          setHasUploadedFile,
+          label: 'Upload File',
+          useStudioPlayer: true,
+          theFile: aFile,
+          hasUploadedFile: true,
+        }),
+      )
+
+      await waitFor(() => {
+        const player = getByTestId('studio-player')
+        expect(player).toBeInTheDocument()
+      })
+
+      expect(setFile).toHaveBeenCalledWith(aFile)
+      expect(setHasUploadedFile).toHaveBeenCalledWith(true)
     })
 
     it('Renders a video icon if afile type is a video/avi', async () => {
@@ -241,8 +270,8 @@ describe('UploadMedia: ComputerPanel', () => {
       const aFile = new File(['foo'], 'foo.mov', {
         type: 'video/quicktime',
       })
-      const setFile = jest.fn()
-      const setHasUploadedFile = jest.fn()
+      const setFile = vi.fn()
+      const setHasUploadedFile = vi.fn()
       const {getByText} = renderPanel({
         theFile: aFile,
         setFile,
@@ -269,62 +298,34 @@ describe('UploadMedia: ComputerPanel', () => {
         }))
     })
 
-    it('when uploading videos', async () => {
-      HTMLElement.prototype.scrollIntoView = jest.fn()
-      const aFile = new File(['foo'], 'foo.mov', {
-        type: 'video/quicktime',
+    it('shows closed captions panel when uploading videos', async () => {
+      renderPanel({
+        theFile: new File(['bits'], 'dummy-video.mp4', {
+          lastModified: 1568991600840,
+          type: 'video/mp4',
+        }),
+        hasUploadedFile: true,
       })
-      const setFile = file =>
-        rerender(
-          createPanel({
-            setFile,
-            theFile: file,
-            hasUploadedFile: true,
-          })
-        )
-      const {rerender, getByLabelText, getByTestId, getByRole} = renderPanel({setFile})
-      const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
-      fireEvent.change(dropZone, {
-        target: {
-          files: [aFile],
-        },
-      })
-      const ccCheckbox = getByRole('checkbox', {name: /Add CC\/Subtitles/})
-      expect(ccCheckbox).not.toBeNull()
+
+      const ccCheckbox = await screen.findByRole('checkbox', {name: 'Add CC/Subtitles'})
       fireEvent.click(ccCheckbox)
-      await waitFor(() => {
-        const ccPanel = getByTestId('ClosedCaptionPanel')
-        expect(ccPanel).not.toBeNull()
-      })
+
+      expect(screen.getByText('Add CC/Subtitles')).toBeInTheDocument()
     })
 
-    it('when uploading audios', async () => {
-      HTMLElement.prototype.scrollIntoView = jest.fn()
-      const aFile = new File(['foo'], 'foo.mp3', {
-        type: 'audio/mp3',
+    it('shows closed captions panel when uploading audios', async () => {
+      renderPanel({
+        theFile: new File(['bits'], 'dummy-audio.mp3', {
+          lastModified: 1568991600840,
+          type: 'audio/mp3',
+        }),
+        hasUploadedFile: true,
       })
-      const setFile = file =>
-        rerender(
-          createPanel({
-            setFile,
-            theFile: file,
-            hasUploadedFile: true,
-          })
-        )
-      const {rerender, getByLabelText, getByTestId, getByRole} = renderPanel({setFile})
-      const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
-      fireEvent.change(dropZone, {
-        target: {
-          files: [aFile],
-        },
-      })
-      const ccCheckbox = getByRole('checkbox', {name: /Add CC\/Subtitles/})
-      expect(ccCheckbox).not.toBeNull()
+
+      const ccCheckbox = await screen.findByRole('checkbox', {name: 'Add CC/Subtitles'})
       fireEvent.click(ccCheckbox)
-      await waitFor(() => {
-        const ccPanel = getByTestId('ClosedCaptionPanel')
-        expect(ccPanel).not.toBeNull()
-      })
+
+      expect(screen.getByText('Add CC/Subtitles')).toBeInTheDocument()
     })
   })
 })

@@ -64,15 +64,15 @@ function CanvasSelectOption() {
   return <div />
 }
 CanvasSelectOption.propTypes = {
-  id: string.isRequired, // eslint-disable-line react/no-unused-prop-types
-  value: string.isRequired, // eslint-disable-line react/no-unused-prop-types
+  id: string.isRequired,
+  value: string.isRequired,
 }
 
 function CanvasSelectGroup() {
   return <div />
 }
 CanvasSelectGroup.propTypes = {
-  label: string.isRequired, // eslint-disable-line react/no-unused-prop-types
+  label: string.isRequired,
 }
 
 export default class CanvasSelect extends React.Component {
@@ -125,7 +125,7 @@ export default class CanvasSelect extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.value !== prevProps.value || !isEqual(this.props.children, prevProps.children)) {
       const option = this.getOptionByFieldValue('value', this.props.value)
-      // eslint-disable-next-line react/no-did-update-set-state
+
       this.setState({
         inputValue: option ? option.props.children : '',
         selectedOptionId: option ? option.props.id : '',
@@ -258,7 +258,6 @@ export default class CanvasSelect extends React.Component {
     })
   }
 
-  /* eslint-disable react/no-access-state-in-setstate */
   // Because handleShowOptions sets state.isShowingOptions:true
   // it's already in the value of state passed to the setState(updater)
   // by the time handleHighlightOption is called we miss the transition,
@@ -276,7 +275,6 @@ export default class CanvasSelect extends React.Component {
       announcement: `${text} ${nowOpen}`,
     })
   }
-  /* eslint-enable react/no-access-state-in-setstate */
 
   handleSelectOption = (event, {id}) => {
     if (id === noOptionsOptionId) {
