@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UiConfig from '../ui_config'
-import FileFilter from '../file_filter'
+import UiConfig from '../ui_config.js'
+import FileFilter from '../file_filter.js'
 
 let uiConf
 

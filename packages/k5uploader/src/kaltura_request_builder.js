@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import signatureBuilder from './signature_builder'
-import urlParams from './url_params'
-import k5Options from './k5_options'
+import signatureBuilder from './signature_builder.js'
+import urlParams from './url_params.js'
+import k5Options from './k5_options.js'
 
 function KalturaRequestBuilder() {
   this.settings, this.file

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import MD5 from './md5'
+import {encrypt} from './md5.js'
 
 export default function (params) {
   let names = []
@@ -29,5 +29,5 @@ export default function (params) {
     s += element
     s += params[element]
   })
-  return MD5.encrypt(s)
+  return encrypt(s)
 }

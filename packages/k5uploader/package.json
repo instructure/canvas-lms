@@ -2,32 +2,31 @@
   "name": "@instructure/k5uploader",
   "version": "1.1.1",
   "description": "html 5 kaltura uploader",
+  "type": "module",
   "scripts": {
-    "build": "rslib build",
+    "build": "tsc",
     "check": "biome check --write",
-    "dev": "rslib build --watch",
+    "dev": "tsc --watch",
     "format": "biome format --write",
     "test": "vitest run"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "default": "./dist/index.mjs"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
   "author": "Instructure",
   "license": "MIT",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
   "devDependencies": {
     "@biomejs/biome": "*",
-    "@rslib/core": "^0.3.1",
     "@types/node": "^22.8.1",
     "typescript": "*",
     "vitest": "*"

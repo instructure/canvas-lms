@@ -1,16 +1,18 @@
 {
   "compilerOptions": {
+    "target": "ES2021",
     "lib": ["ES2021"],
-    "module": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "allowJs": true,
-    "noEmit": true,
+    "declaration": true,
+    "outDir": "./dist",
     "strict": true,
     "skipLibCheck": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "moduleResolution": "bundler",
     "useDefineForClassFields": true,
-    "allowImportingTsExtensions": true
+    "esModuleInterop": true
   },
   "include": ["src"]
 }

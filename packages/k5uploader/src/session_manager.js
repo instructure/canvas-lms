@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import messageBus from './message_bus'
-import k5Options from './k5_options'
-import KalturaSession from './kaltura_session'
+import messageBus from './message_bus.js'
+import k5Options from './k5_options.js'
+import KalturaSession from './kaltura_session.js'
 
 function SessionManager() {
   this.sessionData = new KalturaSession()
