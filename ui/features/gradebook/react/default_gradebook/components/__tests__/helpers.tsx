@@ -39,13 +39,13 @@ export const getAutomaticallyApplyDeductionToLateSubmissionsCheckbox = (
 export const getGradePercentageForMissingSubmissionsInput = (
   screen: typeof _screen,
 ): HTMLInputElement => {
-  return screen.getByRole('textbox', {name: 'Grade for missing submissions', hidden: true})
+  return screen.getByTestId('missing-submission-grade')
 }
 
 export const getLateSubmissionDeductionPercentInput = (
   screen: typeof _screen,
 ): HTMLInputElement => {
-  return screen.getByRole('textbox', {name: 'Late submission deduction', hidden: true})
+  return screen.getByTestId('late-submission-deduction')
 }
 
 export const getLateSubmissionDeductionIntervalInput = (
@@ -55,7 +55,7 @@ export const getLateSubmissionDeductionIntervalInput = (
 }
 
 export const getLowestPossibleGradePercentInput = (screen: typeof _screen): HTMLInputElement => {
-  return screen.getByRole('textbox', {name: 'Lowest possible grade', hidden: true})
+  return screen.getByTestId('late-submission-minimum-percent')
 }
 
 export const getLatePoliciesTabPanelProps = () => {

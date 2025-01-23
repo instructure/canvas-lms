@@ -279,30 +279,6 @@ describe('Gradebook > Default Gradebook > Components > LatePoliciesTabPanelPerce
     return screen.getByLabelText('Automatically apply deduction to late submissions')
   }
 
-  /**
-   * Retrieves the "Grade for missing submissions" input.
-   * @returns {HTMLElement} - The input element.
-   */
-  function getGradePercentageForMissingSubmissionsInput() {
-    return screen.getByLabelText('Grade for missing submissions')
-  }
-
-  /**
-   * Retrieves the "Late submission deduction" input.
-   * @returns {HTMLElement} - The input element.
-   */
-  function getLateSubmissionDeductionPercentInput() {
-    return screen.getByLabelText('Late submission deduction')
-  }
-
-  /**
-   * Retrieves the "Lowest possible grade" input.
-   * @returns {HTMLElement} - The input element.
-   */
-  function getLowestPossibleGradePercentInput() {
-    return screen.getByLabelText('Lowest possible grade')
-  }
-
   // Begin Testing
   describe('Late Policies:', () => {
     beforeEach(() => {
@@ -316,7 +292,7 @@ describe('Gradebook > Default Gradebook > Components > LatePoliciesTabPanelPerce
           fireEvent.click(checkbox)
         })
 
-        percentInputValidations({label: 'Grade for missing submissions'})
+        percentInputValidations({label: 'Grade for missing submissions %'})
       })
     })
 
@@ -327,7 +303,7 @@ describe('Gradebook > Default Gradebook > Components > LatePoliciesTabPanelPerce
           fireEvent.click(checkbox)
         })
 
-        percentInputValidations({label: 'Late submission deduction'})
+        percentInputValidations({label: 'Late submission deduction %'})
       })
 
       describe('when the "Automatically apply deduction to late submissions" checkbox is toggled on and the "Lowest possible grade percent" is changed', () => {
@@ -336,7 +312,7 @@ describe('Gradebook > Default Gradebook > Components > LatePoliciesTabPanelPerce
           fireEvent.click(checkbox)
         })
 
-        percentInputValidations({label: 'Lowest possible grade'})
+        percentInputValidations({label: 'Lowest possible grade %'})
       })
     })
   })
