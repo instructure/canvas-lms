@@ -43,6 +43,7 @@ gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false
 gem "aws-sdk-sqs", "~> 1.53", require: false
 gem "aws-sdk-sagemakerruntime", "~> 1.61", require: false
+gem "aws-sdk-translate", "~> 1.77", require: false
 gem "rqrcode", "~> 2.2", require: false
 gem "bcrypt", "~> 3.1"
 gem "bigdecimal", "~> 3.1"
