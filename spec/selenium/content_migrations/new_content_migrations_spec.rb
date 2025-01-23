@@ -571,7 +571,7 @@ describe "content migrations", :non_parallel do
     end
   end
 
-  context "importing LTI content", skip: "LTI not implemented" do
+  context "importing LTI content" do
     let(:import_course) do
       account = account_model
       course_with_teacher_logged_in(account:).course
@@ -611,7 +611,7 @@ describe "content migrations", :non_parallel do
       tool
     end
 
-    it "shows LTI tools with migration_selection in the select control" do
+    it "shows LTI tools with migration_selection in the select control", skip: "LTI not implemented" do
       import_tool
       other_tool
       visit_page
@@ -632,7 +632,7 @@ describe "content migrations", :non_parallel do
       expect(NewContentMigrationPage.lti_select_content).to be_displayed
     end
 
-    it "launches LTI tool on browse and get content link" do
+    it "launches LTI tool on browse and get content link", skip: "LTI not implemented" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
@@ -647,7 +647,7 @@ describe "content migrations", :non_parallel do
       expect(NewContentMigrationPage.file_name_label).to include_text "lti embedded link"
     end
 
-    it "has content selection option" do
+    it "has content selection option", skip: "LTI not implemented" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)

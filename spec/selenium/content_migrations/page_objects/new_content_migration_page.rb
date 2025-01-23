@@ -56,7 +56,7 @@ class NewContentMigrationPage
     end
 
     def specific_content_radio
-      f('[for="RadioInput_1"]')
+      fxpath('//*[text()="Select specific content"]')
     end
 
     def progress_status_label
@@ -152,11 +152,11 @@ class NewContentMigrationPage
     end
 
     def external_tool_launch
-      f("#converter .externalToolLaunch")
+      fxpath('//*[text()="Find a Course"]')
     end
 
     def lti_select_content
-      f("#converter .selectContent")
+      fxpath('//*[text()="Content"]')
     end
   end
 end
