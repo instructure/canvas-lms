@@ -134,6 +134,10 @@ module CustomSeleniumActions
     reloadable_collection { (scope || driver).find_elements(:xpath, xpath) }
   end
 
+  def find_by_test_id(test_id, scope = nil)
+    f("[data-testid='#{test_id}']", scope)
+  end
+
   def find_with_jquery(selector, scope = nil)
     driver.execute_script(
       "return $(arguments[0], arguments[1] && $(arguments[1]))[0];",

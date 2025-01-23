@@ -220,23 +220,21 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "shifts dates", skip: "not implemented" do
+    it "shifts dates" do
       visit_page
       fill_migration_form
-      CourseCopyPage.date_adjust_checkbox.click
+      NewContentMigrationPage.date_adjust_checkbox.click
       NewContentMigrationPage.all_content_radio.click
-      replace_and_proceed(CourseCopyPage.old_start_date_input, "7/1/2014")
-      replace_and_proceed(CourseCopyPage.old_end_date_input, "Jul 11, 2014")
-      replace_and_proceed(CourseCopyPage.new_start_date_input, "8-5-2014")
-      replace_and_proceed(CourseCopyPage.new_end_date_input, "Aug 15, 2014")
-      2.times { CourseCopyPage.add_day_substitution_button.click }
-      click_option("#daySubstitution ul > div:nth-child(1) .currentDay", "1", :value)
-      click_option("#daySubstitution ul > div:nth-child(1) .subDay", "2", :value)
-      click_option("#daySubstitution ul > div:nth-child(2) .currentDay", "5", :value)
-      click_option("#daySubstitution ul > div:nth-child(2) .subDay", "4", :value)
+      replace_and_proceed(NewContentMigrationPage.old_start_date_input, "7/1/2014")
+      replace_and_proceed(NewContentMigrationPage.old_end_date_input, "Jul 11, 2014")
+      replace_and_proceed(NewContentMigrationPage.new_start_date_input, "8-5-2014")
+      replace_and_proceed(NewContentMigrationPage.new_end_date_input, "Aug 15, 2014")
+      2.times { NewContentMigrationPage.add_day_substitution_button.click }
+      NewContentMigrationPage.select_day_substition_range(1, "Monday", "Tuesday")
+      NewContentMigrationPage.select_day_substition_range(2, "Friday", "Thursday")
       submit
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      expect(opts["shift_dates"]).to eq "1"
+      expect(opts["shift_dates"]).to be true
       expect(opts["day_substitutions"]).to eq({ "1" => "2", "5" => "4" })
       expect(Date.parse(opts["old_start_date"])).to eq Date.new(2014, 7, 1)
       expect(Date.parse(opts["old_end_date"])).to eq Date.new(2014, 7, 11)
