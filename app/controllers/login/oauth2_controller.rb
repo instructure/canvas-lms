@@ -66,6 +66,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
       begin
         unique_id = @aac.unique_id(token)
         provider_attributes = @aac.provider_attributes(token)
+        @aac = @aac.try(:alternate_provider_for_token, token) || @aac
       rescue OAuthValidationError => e
         @aac.debug_set(:validation_error, e.message) if debugging
         return redirect_to_unknown_user_url(e.message)
