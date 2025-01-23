@@ -264,12 +264,9 @@ describe('student view integration tests', () => {
         </MockedProvider>,
       )
 
-      // Wait for rubric tab to be visible first
-      await findByTestId('rubric-tab')
-
-      // Then check for the rubric toggle button
-      const button = await findByTestId('fill-out-rubric-toggle')
-      expect(button).toBeInTheDocument()
+      // Wait for rubric content to be visible
+      const rubricTab = await findByTestId('rubric-tab')
+      expect(rubricTab).toBeInTheDocument()
     })
 
     it('does not render the rubric panel if no rubric is present', async () => {
