@@ -53,8 +53,8 @@ describe('UsageRightsDialog', () => {
   })
 
   it('does not display dialog preview when hidePreview is true', () => {
-    renderDialog({hidePreview: true})
-    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+    const {container} = renderDialog({hidePreview: true})
+    expect(container.querySelector('.UsageRightsDialog__previewColumn')).not.toBeInTheDocument()
   })
 
   it('closes modal when close button is clicked', () => {
