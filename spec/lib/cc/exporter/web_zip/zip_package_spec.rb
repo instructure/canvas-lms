@@ -1011,7 +1011,7 @@ describe "ZipPackage" do
           exportId: create_key(survey),
           title: "Survey 1",
           type: "Quizzes::Quiz",
-          content: "<img src=\"viewer/files/cn_image.jpg\">",
+          content: %(<img src="viewer/files/cn_image.jpg" loading="lazy">),
           assignmentExportId: create_key(survey.assignment),
           questionCount: 0,
           timeLimit: nil,
@@ -1081,7 +1081,7 @@ describe "ZipPackage" do
           exportId: create_key(disc),
           title: "Discussion 1",
           type: "DiscussionTopic",
-          content: "<img src=\"viewer/files/folder%231/cn_image.jpg\">",
+          content: %(<img src="viewer/files/folder%231/cn_image.jpg" loading="lazy">),
           lockAt: nil,
           unlockAt: nil,
           graded: false
