@@ -72,11 +72,16 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
                       type="text"
                       size="medium"
                       validate={titleValidator}
+                      data-testid="group-name-input"
                     />
                   </Flex.Item>
                 </Flex>
                 <View as="div" padding="medium 0">
-                  <LabeledRceField name="description" label={I18n.t('Group Description')} />
+                  <LabeledRceField 
+                    name="description" 
+                    label={I18n.t('Group Description')} 
+                    data-testid="group-description-input"
+                  />
                 </View>
               </Modal.Body>
               <Modal.Footer>
@@ -85,6 +90,7 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
                   color="secondary"
                   margin="0 x-small 0 0"
                   onClick={onCloseHandler}
+                  data-testid="group-edit-cancel-button"
                 >
                   {I18n.t('Cancel')}
                 </Button>
@@ -95,6 +101,7 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
                   color="primary"
                   margin="0 x-small 0 0"
                   interaction={valid && dirty ? 'enabled' : 'disabled'}
+                  data-testid="group-edit-submit-button"
                 >
                   {I18n.t('Save')}
                 </Button>
