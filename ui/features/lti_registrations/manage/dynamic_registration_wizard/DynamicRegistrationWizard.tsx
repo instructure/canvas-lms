@@ -43,6 +43,8 @@ import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrappe
 import {ReviewScreenWrapper} from './components/ReviewScreenWrapper'
 import {isUnsuccessful} from '../../common/lib/apiResult/ApiResult'
 import {Footer} from '../registration_wizard_forms/Footer'
+import {isLtiPlacementWithIcon} from '../model/LtiPlacement'
+import {getPlacements} from './hooks/usePlacements'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -302,10 +304,19 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                   'Reviewing',
                 )
               } else {
-                dynamicRegistrationWizardState.transitionToConfirmationState(
-                  state._type,
-                  'IconConfirmation',
-                )
+                const placements = getPlacements(state.registration) ?? []
+                const disabledPlacements =
+                  state.overlayStore.getState().state.registration.disabledPlacements ?? []
+                const enabledPlacements = placements.filter(p => !disabledPlacements.includes(p))
+
+                if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
+                  dynamicRegistrationWizardState.transitionToConfirmationState(
+                    state._type,
+                    'IconConfirmation',
+                  )
+                } else {
+                  dynamicRegistrationWizardState.transitionToReviewingState(state._type)
+                }
               }
             }}
           />
@@ -341,11 +352,24 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
             currentScreen="last"
             reviewing={state.reviewing}
             onPreviousClicked={() => {
-              dynamicRegistrationWizardState.transitionToConfirmationState(
-                state._type,
-                'IconConfirmation',
-                false,
-              )
+              const placements = getPlacements(state.registration) ?? []
+              const disabledPlacements =
+                state.overlayStore.getState().state.registration.disabledPlacements ?? []
+              const enabledPlacements = placements.filter(p => !disabledPlacements.includes(p))
+
+              if (enabledPlacements.some(p => isLtiPlacementWithIcon(p))) {
+                dynamicRegistrationWizardState.transitionToConfirmationState(
+                  state._type,
+                  'IconConfirmation',
+                  false,
+                )
+              } else {
+                dynamicRegistrationWizardState.transitionToConfirmationState(
+                  state._type,
+                  'NamingConfirmation',
+                  false,
+                )
+              }
             }}
             onNextClicked={() => {
               if (registrationId) {

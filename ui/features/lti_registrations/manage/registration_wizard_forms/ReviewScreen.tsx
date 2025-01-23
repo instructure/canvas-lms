@@ -368,56 +368,48 @@ export const IconUrlsReviewSection = React.memo(
       LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon),
     )
 
-    const body = (() => {
-      if (placementsWithIcons.length === 0) {
-        return (
-          <Text size="small" fontStyle="italic">
-            {I18n.t('No placements with icons')}
-          </Text>
-        )
-      } else {
-        return placementsWithIcons.map(placement => {
-          let status: string
-          const iconUrl = iconUrls[placement]
-          const defaultPlacementIconUrl = defaultPlacementIconUrls[placement]
-          const usingDefaultIcon = // We're using the placement's default URL
-            (!iconUrl && !!defaultPlacementIconUrl) ||
-            // We're using the top-level default Icon URL
-            (!iconUrl && !!defaultIconUrl) ||
-            // Our configured URL matches the placement's default URL, and
-            // both URL's are actually present
-            (iconUrl === defaultPlacementIconUrl && !!iconUrl && !!defaultPlacementIconUrl) ||
-            // Our configured URL matches the top-level default URL, and both
-            // URL's are actually present
-            (iconUrl === defaultIconUrl && !!iconUrl && !!defaultIconUrl)
-          if (usingDefaultIcon) {
-            status = I18n.t('Default Icon')
-          } else if (iconUrl) {
-            status = I18n.t('Custom Icon')
-          } else if (!iconUrl && placement === 'editor_button') {
-            status = I18n.t('Generated Icon')
-          } else {
-            status = I18n.t('No Icon')
-          }
-
-          return (
-            <div key={placement}>
-              <Text size="small" weight="bold">
-                {i18nLtiPlacement(placement)}:{' '}
-              </Text>
-              <Text size="small">{status}</Text>
-            </div>
-          )
-        })
-      }
-    })()
+    if (placementsWithIcons.length === 0) {
+      return null
+    }
 
     return (
       <ReviewSection>
         <View>
           <Heading level="h4">{I18n.t('Icon URLs')}</Heading>
           <Flex direction="column" gap="x-small" margin="small 0 0 0">
-            {body}
+            {placementsWithIcons.map(placement => {
+              let status: string
+              const iconUrl = iconUrls[placement]
+              const defaultPlacementIconUrl = defaultPlacementIconUrls[placement]
+              const usingDefaultIcon = // We're using the placement's default URL
+                (!iconUrl && !!defaultPlacementIconUrl) ||
+                // We're using the top-level default Icon URL
+                (!iconUrl && !!defaultIconUrl) ||
+                // Our configured URL matches the placement's default URL, and
+                // both URL's are actually present
+                (iconUrl === defaultPlacementIconUrl && !!iconUrl && !!defaultPlacementIconUrl) ||
+                // Our configured URL matches the top-level default URL, and both
+                // URL's are actually present
+                (iconUrl === defaultIconUrl && !!iconUrl && !!defaultIconUrl)
+              if (usingDefaultIcon) {
+                status = I18n.t('Default Icon')
+              } else if (iconUrl) {
+                status = I18n.t('Custom Icon')
+              } else if (!iconUrl && placement === 'editor_button') {
+                status = I18n.t('Generated Icon')
+              } else {
+                status = I18n.t('No Icon')
+              }
+
+              return (
+                <div key={placement}>
+                  <Text size="small" weight="bold">
+                    {i18nLtiPlacement(placement)}:{' '}
+                  </Text>
+                  <Text size="small">{status}</Text>
+                </div>
+              )
+            })}
           </Flex>
         </View>
         <IconButton
