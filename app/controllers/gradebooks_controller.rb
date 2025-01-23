@@ -1456,6 +1456,8 @@ class GradebooksController < ApplicationController
       return false if @assignment.anonymous_grading
     end
 
+    return false if Services::PlatformServiceSpeedgrader.launch_url.blank?
+
     params[:platform_sg].nil? || value_to_boolean(params[:platform_sg])
   end
 
