@@ -9507,6 +9507,7 @@ ko:
     where_to_move: "*%{name}*을(를) 어디로 이동하시겠습니까?"
   move_dialog_select: 
     move_to_end: "-- 아래에 --"
+  move_from_ef79aa53: "다음 요일에서"
   move_name_to_a_new_group_acabed4e: "%{name}을(를) 새 그룹으로 이동"
   move_to_1c208ae5: "다음으로 이동..."
   multi_factor_authentication_1a6b3b3d: "다단계 인증"

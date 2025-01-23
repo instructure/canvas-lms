@@ -9963,6 +9963,7 @@ el:
   move_abf00365: Μετακίνησε
   move_dialog_select: 
     move_to_end: "-- Στο κάτω μέρος --"
+  move_from_ef79aa53: "Μετακίνηση από"
   move_module_item_77754119: "Μετακίνηση Ενότητας/Στοιχείου"
   move_name_to_a_new_group_acabed4e: "Μετακίνηση του/της %{name} σε νέα ομάδα"
   move_outcome_ce497e6c: "Μετακίνηση Αποτελέσματος"

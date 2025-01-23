@@ -11227,6 +11227,7 @@ hy:
     where_to_move: "Կցանկանայի՞ք տեղափոխել  *%{name}*:"
   move_dialog_select: 
     move_to_end: "-- Ներքևում--"
+  move_from_ef79aa53: Տեղափոխել
   move_module_item_77754119: "Տեղափոխել Մոդուլ/Տարր"
   move_name_to_a_new_group_acabed4e: " %{name} տեղափոխել նոր խումբ"
   move_outcome_ce497e6c: "Տեղափոխել արդյունքը"
