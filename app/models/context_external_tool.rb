@@ -1720,8 +1720,6 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def update_unified_tool_id
-    return unless context.root_account.feature_enabled?(:update_unified_tool_id)
-
     unified_tool_id = if use_1_3? && (utid = developer_key.tool_configuration.unified_tool_id)
                         utid
                       else

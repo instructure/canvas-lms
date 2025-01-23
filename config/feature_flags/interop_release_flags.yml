@@ -353,16 +353,3 @@ tune_lti_context_id_history_query:
     improve performance. Caution: for some accounts where this query
     doesn't already time out, enabling this may cause the query to take
     much longer and even time out.
-update_unified_tool_id:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Fetch Unified Tool ID from LP and update it
-  shadow: true
-  description: |-
-    When enabled, it fetches the unified_tool_id from LearnPlatform and updates the
-    unified_tool_id field every time the ContextExternalTool is saved.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
