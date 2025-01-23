@@ -63,7 +63,9 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
          verify_tls_cert_opt_in].freeze
   end
 
-  SENSITIVE_PARAMS = [:auth_password].freeze
+  def self.sensitive_params
+    [*super, :auth_password].freeze
+  end
 
   def clear_last_timeout_failure
     unless last_timeout_failure_changed?

@@ -24,7 +24,11 @@ class OAuthValidationError < RuntimeError
 end
 
 class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
-  SENSITIVE_PARAMS = [:client_secret].freeze
+  class << self
+    def sensitive_params
+      [*super, :client_secret].freeze
+    end
+  end
 
   # rename DB fields to something that makes sense for OAuth2
   alias_method :client_secret=, :auth_password=

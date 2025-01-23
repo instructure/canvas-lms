@@ -29,9 +29,7 @@ module Api::V1::AuthenticationProvider
 
   def aac_json(aac)
     result = api_json(aac, nil, nil, only: %i[auth_type id position])
-    allowed_params = aac.class.recognized_params
-    sensitive_params = aac.class.const_get(:SENSITIVE_PARAMS)
-    (allowed_params - sensitive_params).each do |param|
+    (aac.class.recognized_params - aac.class.sensitive_params).each do |param|
       result[param] = aac.public_send(param)
     end
 
