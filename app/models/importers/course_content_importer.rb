@@ -245,6 +245,12 @@ module Importers
 
       migration.trigger_live_events!
       Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
+      if course.root_account.feature_enabled?(:lti_context_copy_notice)
+        copied_at = (migration.started_at || Time.zone.now).iso8601
+        notice = Lti::Pns::LtiContextCopyNoticeBuilder.new(course:, copied_at:, source_course: migration.source_course)
+        Lti::PlatformNotificationService.notify_tools_in_course(course, notice)
+      end
+
       InstStatsd::Statsd.increment("content_migrations.import_success")
       duration = Time.zone.now - migration.created_at
       InstStatsd::Statsd.timing("content_migrations.import_duration", duration, tags: { migration_type: migration.migration_type })
