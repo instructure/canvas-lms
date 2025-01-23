@@ -17774,6 +17774,7 @@ nn:
   move_discussion_9ff5b2d1: "Flytt diskusjon"
   move_discussion_title_93ea7be1: "Flytt diskusjon %{title}"
   move_down_4a9c9b18: "Flytt ned"
+  move_from_ef79aa53: "Flytt frå"
   move_group_3dd7f76e: "Flytt gruppe"
   move_group_77ae285d: "Flytt gruppe"
   move_grouptitle_20927676: "Flytt \"%{groupTitle}\""
