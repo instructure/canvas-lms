@@ -220,7 +220,7 @@ describe Types::QueryType do
           "{ submission(id: #{submission.id}, assignmentId: #{@assignment.id}) { _id } }",
           context: { current_user: @teacher }
         ).dig("errors", 0, "message")
-      ).to eq "Must specify an id or an assignment_id and user_id"
+      ).to eq "Must specify an id or an assignment_id and user_id or an assignment_id and an anonymous_id"
     end
 
     it "returns an error when fetching the submission via ID in combination with the user ID" do
@@ -229,7 +229,16 @@ describe Types::QueryType do
           "{ submission(id: #{submission.id}, userId: #{@student1.id}) { _id } }",
           context: { current_user: @teacher }
         ).dig("errors", 0, "message")
-      ).to eq "Must specify an id or an assignment_id and user_id"
+      ).to eq "Must specify an id or an assignment_id and user_id or an assignment_id and an anonymous_id"
+    end
+
+    it "returns an error when fetching the submission via ID in combination with the anonymous ID" do
+      expect(
+        CanvasSchema.execute(
+          "{ submission(id: #{submission.id}, anonymousId: #{@student1.id}) { _id } }",
+          context: { current_user: @teacher }
+        ).dig("errors", 0, "message")
+      ).to eq "Must specify an id or an assignment_id and user_id or an assignment_id and an anonymous_id"
     end
 
     it "returns an error when not providing an id or assignment_id and user_id" do
@@ -238,7 +247,7 @@ describe Types::QueryType do
           "{ submission { _id } }",
           context: { current_user: @teacher }
         ).dig("errors", 0, "message")
-      ).to eq "Must specify an id or an assignment_id and user_id"
+      ).to eq "Must specify an id or an assignment_id and user_id or an assignment_id and an anonymous_id"
     end
   end
 
