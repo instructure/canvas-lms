@@ -267,7 +267,7 @@ export default class ExternalToolsTableRow extends React.Component {
         >
           <div style={{display: 'flex', alignItems: 'center'}}>
             {tool.name} {this.disabledFlag()}
-            {ENV.FEATURES.lti_migration_info && tool.migration_running ? (
+            {tool.migration_running ? (
               <ExternalToolMigrationInfo tool={tool} />
             ) : null}
           </div>
