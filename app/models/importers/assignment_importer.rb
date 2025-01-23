@@ -646,7 +646,7 @@ module Importers
       item.lock_at = CourseContentImporter.shift_date(item.lock_at, shift_options) if item.lock_at
       item.unlock_at = CourseContentImporter.shift_date(item.unlock_at, shift_options) if item.unlock_at
       item.peer_reviews_due_at = CourseContentImporter.shift_date(item.peer_reviews_due_at, shift_options) if item.peer_reviews_due_at
-      item.needs_update_cached_due_dates = item.update_cached_due_dates?
+      item.needs_update_cached_due_dates ||= item.update_cached_due_dates?
 
       if item.invalid? && CourseContentImporter.error_on_dates?(item, ATTRIBUTES_FOR_DATE_SHIFT)
         migration.add_warning(t("Couldn't adjust dates on assignment %{name} (ID %{id})", name: item.title, id: item.id&.to_s))
