@@ -28,27 +28,33 @@ class TranslationController < ApplicationController
 
   def translate
     # Don't allow users that can't access, or if translation is not available
-    return render_unauthorized_action unless Translation.available?(@context, :translation) && @context.grants_right?(@current_user, session, :read)
+    return render_unauthorized_action unless Translation.available?(@context, :translation) && user_can_read?
 
     # This action is used for dicussions
     InstStatsd::Statsd.distributed_increment("translation.discussions")
-
-    render json: { translated_text: Translation.translate_html(html_string: required_params[:text],
-                                                               src_lang: required_params[:src_lang],
-                                                               tgt_lang: required_params[:tgt_lang]) }
+    if Account.site_admin.feature_enabled?(:ai_translation_improvements)
+      render json: { translated_text: Translation.translate_html(html_string: required_params[:text],
+                                                                 src_lang: required_params[:src_lang],
+                                                                 tgt_lang: required_params[:tgt_lang]) }
+    else
+      render json: { translated_text: Translation.translate_html_sagemaker(html_string: required_params[:text],
+                                                                           src_lang: required_params[:src_lang],
+                                                                           tgt_lang: required_params[:tgt_lang]) }
+    end
   end
 
-  ##
-  # Translate the paragraph given to us, split the paragraph into sentences and build up the response
-  # incrementally
-  #
   def translate_paragraph
     # This action is used for inbox_compose
     InstStatsd::Statsd.distributed_increment("translation.inbox_compose")
-
-    render json: translate_large_passage(original_text: required_params[:text],
-                                         src_lang: required_params[:src_lang],
-                                         tgt_lang: required_params[:tgt_lang])
+    if Account.site_admin.feature_enabled?(:ai_translation_improvements)
+      render json: { translated_text: Translation.translate_text(text: required_params[:text],
+                                                                 src_lang: required_params[:src_lang],
+                                                                 tgt_lang: required_params[:tgt_lang]) }
+    else
+      render json: translate_large_passage(original_text: required_params[:text],
+                                           src_lang: required_params[:src_lang],
+                                           tgt_lang: required_params[:tgt_lang])
+    end
   end
 
   def translate_message
@@ -61,18 +67,14 @@ class TranslationController < ApplicationController
     InstStatsd::Statsd.distributed_increment("translation.inbox")
 
     # Translate the message
-    render json: { translated_text: Translation.translate_message(text: required_params[:text], user: @current_user) }
+    if Account.site_admin.feature_enabled?(:ai_translation_improvements)
+      render json: { translated_text: Translation.translate_message(text: required_params[:text], user: @current_user) }
+    else
+      render json: { translated_text: Translation.translate_message_sagemaker(text: required_params[:text], user: @current_user) }
+    end
   end
 
   private
-
-  def required_params
-    params.require(:inputs).permit(:src_lang, :tgt_lang, :text)
-  end
-
-  def require_inbox_translation
-    render_unauthorized_action unless Translation.available?(@domain_root_account, :translate_inbox_messages)
-  end
 
   def translate_large_passage(original_text:, src_lang:, tgt_lang:)
     # Split into paragraphs.
@@ -88,7 +90,18 @@ class TranslationController < ApplicationController
       end
       text.append(passage.join)
     end
-
     { translated_text: text.join("\n") }
+  end
+
+  def required_params
+    params.require(:inputs).permit(:src_lang, :tgt_lang, :text)
+  end
+
+  def user_can_read?
+    @context.grants_right?(@current_user, session, :read)
+  end
+
+  def require_inbox_translation
+    render_unauthorized_action unless Translation.available?(@domain_root_account, :translate_inbox_messages)
   end
 end
