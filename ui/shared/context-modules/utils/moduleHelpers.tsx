@@ -61,6 +61,9 @@ export function addModuleElement(
       .addClass('publish-module-link')
       .removeClass('unpublish-module-link')
     $module.addClass('unpublished_module')
+    $module
+      .find('h2')
+      .html(data.context_module.name)
   }
 
   $('#no_context_modules_message').slideUp()
