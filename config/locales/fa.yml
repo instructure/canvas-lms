@@ -16150,6 +16150,7 @@ fa:
   move_discussion_9ff5b2d1: "انتقال بحث"
   move_discussion_title_93ea7be1: "انتقال گفتگوی %{title}"
   move_down_4a9c9b18: "انتقال به پایین"
+  move_from_ef79aa53: "انتقال از"
   move_group_3dd7f76e: "انتقال گروه"
   move_group_77ae285d: "انتقال گروه ..."
   move_grouptitle_20927676: "انتقال \"%{groupTitle}\""
