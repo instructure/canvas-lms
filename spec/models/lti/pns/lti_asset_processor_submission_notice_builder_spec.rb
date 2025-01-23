@@ -132,14 +132,6 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model 
             "timestamp" => iso_timestamp,
             "type" => "LtiAssetProcessorSubmissionNotice"
           },
-          "https://purl.imsglobal.org/spec/lti/claim/platformnotificationservice" =>
-          {
-            "notice_types_supported" =>
-              Lti::Pns::NoticeTypes::ALL,
-            "platform_notification_service_url" => "https://example.com/notice_handler",
-            "scope" => ["https://purl.imsglobal.org/spec/lti/scope/noticehandlers"],
-            "service_versions" => ["1.0"]
-          },
           "https://purl.imsglobal.org/spec/lti/claim/version" => "1.3.0",
           "iat" => now.to_i,
           "iss" => "https://canvas.instructure.com",

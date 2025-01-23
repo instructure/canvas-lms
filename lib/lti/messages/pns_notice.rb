@@ -19,22 +19,16 @@
 
 module Lti::Messages
   # A "factory" class that builds an ID Token (JWT) to be used in LTI Advantage
-  # LTI Deep Linking Requests. These requests indicate to the launched
-  # tool that Canvas expects it to return data via deep linking.
+  # Platform Notices. These messages are sent to tools separately from the launch
+  # process to inform tools about events in the platform
   #
-  # This class relies on a another class (LtiAdvantage::Messages::DeepLinkingRequest)
+  # This class relies on a another class (LtiAdvantage::Messages::PnsNotice)
   # to model the data in the JWT body and produce a signature.
-  #
-  # For details on the data included in the ID token please refer
-  # to http://www.imsglobal.org/spec/lti-dl/v2p0.
-  #
-  # For implementation details on LTI Advantage launches in
-  # Canvas, please see the inline documentation of
-  # app/models/lti/lti_advantage_adapter.rb.
   class PnsNotice < JwtMessage
     def initialize(tool:, context:, notice:, user: nil, opts: nil, expander: nil)
+      extra_claims = opts&.delete(:extra_claims) || []
       opts = {
-        claim_group_whitelist: %i[security platform_notification_service roles target_link_uri context custom_params],
+        claim_group_whitelist: %i[security context custom_params] + extra_claims,
         extension_blacklist: [:placement]
       }.merge(opts || {})
       opts[:claim_group_whitelist]&.delete(:custom_params) if expander.nil?
