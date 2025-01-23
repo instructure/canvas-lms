@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UploadResult from '../upload_result'
+import UploadResult from '../upload_result.js'
 
 describe('UploadResult', () => {
   beforeEach(() => {

@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import signatureBuilder from './signature_builder'
-import urlParams from './url_params'
-import mBus from './message_bus'
-import objectMerge from './object_merge'
-import k5Options from './k5_options'
+import signatureBuilder from './signature_builder.js'
+import urlParams from './url_params.js'
+import mBus from './message_bus.js'
+import objectMerge from './object_merge.js'
+import k5Options from './k5_options.js'
 
 function EntryService() {}
 

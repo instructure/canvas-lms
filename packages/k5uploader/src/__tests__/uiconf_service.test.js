@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UiconfService from '../uiconf_service'
+import UiconfService from '../uiconf_service.js'
 
 describe('UiconfService', () => {
   it('parses XML ui config', () => {
