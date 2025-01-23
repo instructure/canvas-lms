@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Lti1p3RegistrationWizard} from '../Lti1p3RegistrationWizard'
@@ -125,5 +124,27 @@ describe('Lti1p3RegistrationWizard', () => {
     await userEvent.click(screen.getByText('Update App').closest('button')!)
 
     expect(screen.getByText(/sorry, something broke/i)).toBeInTheDocument()
+  })
+
+  it('skips the icon confirmation screen if the tool has no placements with icons', async () => {
+    render(
+      <Lti1p3RegistrationWizard
+        {...defaultProps}
+        internalConfiguration={mockInternalConfiguration({
+          placements: [{placement: 'course_navigation'}],
+        })}
+      />,
+    )
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    await userEvent.click(findNextButton())
+    expect(screen.getByText(/^Review$/i)).toBeInTheDocument()
+    expect(screen.queryByText(/Icon URLs/i)).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByText(/^Previous$/i).closest('button')!)
+    expect(screen.getByText(/^Nickname$/i)).toBeInTheDocument()
   })
 })

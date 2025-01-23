@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {ZAccountId} from '../../model/AccountId'
 import {DynamicRegistrationWizard} from '../DynamicRegistrationWizard'
@@ -23,8 +22,11 @@ import {success} from '../../../common/lib/apiResult/ApiResult'
 import userEvent from '@testing-library/user-event'
 import type {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
-import {mockRegistration, mockDynamicRegistrationWizardService} from './helpers'
-import {htmlEscape} from '@instructure/html-escape'
+import {
+  mockRegistration,
+  mockDynamicRegistrationWizardService,
+  mockToolConfiguration,
+} from './helpers'
 import {ZUnifiedToolId} from '../../model/UnifiedToolId'
 
 const mockAlert = jest.fn() as jest.Mock<typeof showFlashAlert>
@@ -227,6 +229,89 @@ describe('DynamicRegistrationWizard', () => {
         expect(service.deleteDeveloperKey).toHaveBeenCalledWith(reg.developer_key_id)
         expect(mockAlert).not.toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('IconConfirmation', () => {
+    const accountId = ZAccountId.parse('123')
+    const fetchRegistrationToken = jest.fn().mockResolvedValue(
+      success({
+        token: 'reg_token_value',
+        oidc_configuration_url: 'oidc_config_url_value',
+        uuid: 'uuid_value',
+      }),
+    )
+    let reg = mockRegistration()
+    const getRegistrationByUUID = jest.fn().mockImplementation(async () => success(reg))
+    const deleteDeveloperKey = jest.fn().mockImplementation(async () => success(reg))
+    const service = mockDynamicRegistrationWizardService({
+      fetchRegistrationToken,
+      getRegistrationByUUID,
+      deleteDeveloperKey,
+    })
+
+    const setup = async () => {
+      render(
+        <DynamicRegistrationWizard
+          service={service}
+          dynamicRegistrationUrl="https://example.com/"
+          accountId={accountId}
+          unregister={() => {}}
+          onSuccessfulRegistration={() => {}}
+        />,
+      )
+
+      await screen.findByTestId('dynamic-reg-wizard-iframe')
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            subject: 'org.imsglobal.lti.close',
+          },
+          origin: 'https://example.com',
+        }),
+      )
+      await screen.findByText(/Permissions/i)
+      await userEvent.click(screen.getByText(/Next/i).closest('button')!)
+      await screen.findByText(/Data Sharing/i)
+      await userEvent.click(screen.getByText(/Next/i).closest('button')!)
+      await screen.findByText(/Placements/i, {selector: 'h3'})
+      await userEvent.click(screen.getByText(/Next/i).closest('button')!)
+      await screen.findByText(/^Nickname$/i)
+    }
+
+    it('renders the icon confirmation screen if the tool has a placement with an icon', async () => {
+      reg = mockRegistration({
+        default_configuration: mockToolConfiguration({
+          extensions: [
+            {
+              platform: 'canvas.instructure.com',
+              settings: {
+                placements: [
+                  {placement: 'global_navigation', message_type: 'LtiDeepLinkingRequest'},
+                ],
+              },
+            },
+          ],
+        }),
+      })
+      await setup()
+      await userEvent.click(screen.getByText(/^Next$/i).closest('button')!)
+      expect(await screen.findByText(/Icon URLs/i)).toBeInTheDocument()
+    })
+
+    it('skips the icon confirmation screen if the tool has no placements with icons', async () => {
+      reg = mockRegistration({
+        default_configuration: mockToolConfiguration(),
+      })
+      await setup()
+      await userEvent.click(screen.getByText(/^Next$/i).closest('button')!)
+      expect(screen.getByText(/Review/i, {selector: 'h3'})).toBeInTheDocument()
+
+      expect(screen.queryByText(/Icon URLs/i)).not.toBeInTheDocument()
+      await userEvent.click(screen.getByText(/^Previous$/i).closest('button')!)
+      expect(screen.getByText(/^Nickname$/i)).toBeInTheDocument()
     })
   })
 })
