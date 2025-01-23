@@ -876,7 +876,7 @@ describe ContentMigration do
 
         translated_body = <<~HTML.strip
           with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
-          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
         HTML
         expect(@copy_to.wiki_pages.take.body).to eq translated_body
       end
@@ -898,7 +898,7 @@ describe ContentMigration do
 
         translated_body = <<~HTML.strip
           with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
-          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
         HTML
         expect(@copy_to.wiki_pages.take.body).to eq translated_body
       end
@@ -920,7 +920,7 @@ describe ContentMigration do
 
         translated_body = <<~HTML.strip
           with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
-          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video"></iframe>
         HTML
         expect(@copy_to.wiki_pages.take.body).to eq translated_body
       end
@@ -942,7 +942,7 @@ describe ContentMigration do
 
         translated_body = <<~HTML.strip
           with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
-          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video"></iframe>
         HTML
         expect(@copy_to.wiki_pages.take.body).to eq translated_body
       end
@@ -963,8 +963,8 @@ describe ContentMigration do
         file1 = @copy_to.attachments.find_by(media_entry_id: "m-index1")
 
         translated_body = <<~HTML.strip
-          undefined data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video"></iframe>
-          no data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video" data-media-id="m-index1"></iframe>
+          undefined data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video"></iframe>
+          no data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video" data-media-id="m-index1"></iframe>
         HTML
         expect(@copy_to.wiki_pages.take.body).to eq translated_body
       end
@@ -988,7 +988,7 @@ describe ContentMigration do
 
         translated_body = <<~HTML.strip
           with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
-          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
         HTML
         expect(@copy_to.syllabus_body).to eq translated_body
       end
@@ -1009,7 +1009,7 @@ describe ContentMigration do
         course_with_teacher(course_name: "from course", active_all: true)
         @course.media_objects.create!(media_id:)
         att = @course.attachments.find_by(media_entry_id: media_id)
-        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video&"></iframe></p>)
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{att.id}?type=video&"></iframe></p>)
         run_course_copy
         expect(@copy_to.attachments.count).to eq 0
         expect(@copy_to.media_objects.count).to eq 0
@@ -1019,7 +1019,7 @@ describe ContentMigration do
       it "does not update media attachment links from user media" do
         media_id = "0_deadbeef"
         att = attachment_model(display_name: "lolcats.mp4", context: @user, media_entry_id: media_id)
-        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video&amp;embedded=true"></iframe></p>)
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{att.id}?type=video&amp;embedded=true"></iframe></p>)
         run_course_copy
         expect(@copy_to.attachments.count).to eq 0
         expect(@copy_to.media_objects.count).to eq 0
@@ -1073,8 +1073,8 @@ describe ContentMigration do
 
         translated_body = <<~HTML.strip
           with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
-          with media objects iframe url 0: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video"></iframe>
-          with media objects iframe url 1: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url 0: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url 1: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
         HTML
         expect(@copy_to.wiki_pages.take.body).to eq translated_body
       end

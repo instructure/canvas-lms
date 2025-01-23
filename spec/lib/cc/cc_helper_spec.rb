@@ -95,8 +95,8 @@ describe CC::CCHelper do
         )
 
         exported_html = @exporter.html_content(html).split("\n").map(&:strip).compact_blank
-        expect(exported_html[0]).to eq(%(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allow="fullscreen" data-media-id="abcde"><source src="$IMS-CC-FILEBASE$/Uploaded%20Media/some_media.mp4?canvas_=1&amp;canvas_qs_type=video&amp;canvas_qs_embedded=true" data-media-id="abcde" data-media-type="video"></video>))
-        expect(exported_html[1]).to eq(%(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allow="fullscreen" data-media-id="abcde"><source src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media-id="abcde" data-media-type="video"></video>))
+        expect(exported_html[0]).to eq(%(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allow="fullscreen" data-media-id="abcde" loading="lazy"><source src="$IMS-CC-FILEBASE$/Uploaded%20Media/some_media.mp4?canvas_=1&amp;canvas_qs_type=video&amp;canvas_qs_embedded=true" data-media-id="abcde" data-media-type="video"></video>))
+        expect(exported_html[1]).to eq(%(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allow="fullscreen" data-media-id="abcde" loading="lazy"><source src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media-id="abcde" data-media-type="video"></video>))
         expect(exported_html[2]).to eq(%(<a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media_comment_type="video" data-alt=""></a>))
       end
 
@@ -343,7 +343,7 @@ describe CC::CCHelper do
         question_text = "<p><img src=\"/assessment_questions/0/files/#{@attachment.id}\"/></p>"
         @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @teacher, for_course_copy: false)
         translated = @exporter.html_content(question_text)
-        expect(translated).to eq "<p><img src=\"http://localhost/assessment_questions/0/files/#{@attachment.id}\"></p>"
+        expect(translated).to eq "<p><img src=\"http://localhost/assessment_questions/0/files/#{@attachment.id}\" loading=\"lazy\"></p>"
       end
     end
 

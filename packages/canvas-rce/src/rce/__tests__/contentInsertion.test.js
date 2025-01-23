@@ -338,7 +338,9 @@ describe('contentInsertion', () => {
       image.href = 'https://mycanvas.com:3000/some/path'
       image.url = 'https://mycanvas.com:3000/some/path'
       contentInsertion.insertImage(editor, image, canvasOrigin)
-      expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path/preview"/>')
+      expect(editor.content).toEqual(
+        '<img alt="Here Be Images" src="/some/path/preview" loading="lazy"/>',
+      )
     })
 
     it('leaves non-Canvas URLs as absolute', () => {
@@ -346,7 +348,7 @@ describe('contentInsertion', () => {
       image.url = 'https://yodawg.com:3001/some/path'
       contentInsertion.insertImage(editor, image, canvasOrigin)
       expect(editor.content).toEqual(
-        '<img alt="Here Be Images" src="https://yodawg.com:3001/some/path"/>',
+        '<img alt="Here Be Images" src="https://yodawg.com:3001/some/path" loading="lazy"/>',
       )
     })
 
@@ -369,19 +371,21 @@ describe('contentInsertion', () => {
       }
       contentInsertion.insertImage(editor, image)
       expect(editor.content).toEqual(
-        '<img alt="Here Be Images" src="/some/path/preview" width="100px" style="float:left"/>',
+        '<img alt="Here Be Images" src="/some/path/preview" width="100px" loading="lazy" style="float:left"/>',
       )
     })
 
     it('builds image html from image data', () => {
       contentInsertion.insertImage(editor, image)
-      expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path/preview"/>')
+      expect(editor.content).toEqual(
+        '<img alt="Here Be Images" src="/some/path/preview" loading="lazy"/>',
+      )
     })
 
     it('uses url if no href', () => {
       image.href = undefined
       contentInsertion.insertImage(editor, image)
-      expect(editor.content).toEqual('<img alt="Here Be Images" src="/other/path"/>')
+      expect(editor.content).toEqual('<img alt="Here Be Images" src="/other/path" loading="lazy"/>')
     })
 
     it('builds linked image html from linked image data', () => {
@@ -400,7 +404,7 @@ describe('contentInsertion', () => {
       })
       contentInsertion.insertImage(editor, image)
       expect(editor.content).toEqual(
-        '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path/preview"/></a>',
+        '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path/preview" loading="lazy"/></a>',
       )
     })
   })
@@ -510,7 +514,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" loading="lazy" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
         {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
@@ -523,7 +527,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_objects_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
         {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
@@ -559,7 +563,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        '<iframe data-media-id="m-media-id" data-media-type="audio" loading="lazy" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
         {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
@@ -571,7 +575,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=/url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        '<iframe data-media-id="29" data-media-type="audio" loading="lazy" src="/media_objects_iframe?mediahref=/url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
         {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
@@ -598,7 +602,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_attachments_iframe/17?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_attachments_iframe/17?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
         {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
@@ -611,7 +615,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="/media_attachments_iframe/maybe?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" loading="lazy" src="/media_attachments_iframe/maybe?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
         {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
@@ -636,7 +640,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/media_attachments_iframe/maybe?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        '<iframe data-media-id="m-media-id" data-media-type="audio" loading="lazy" src="/media_attachments_iframe/maybe?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
         {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
@@ -648,7 +652,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_attachments_iframe/29?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        '<iframe data-media-id="29" data-media-type="audio" loading="lazy" src="/media_attachments_iframe/29?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
         {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
