@@ -356,8 +356,6 @@ module Lti
     end
 
     def update_unified_tool_id
-      return unless developer_key.root_account.feature_enabled?(:update_unified_tool_id)
-
       unified_tool_id = LearnPlatform::GlobalApi.get_unified_tool_id(**params_for_unified_tool_id)
       update_column(:unified_tool_id, unified_tool_id) if unified_tool_id
     end
