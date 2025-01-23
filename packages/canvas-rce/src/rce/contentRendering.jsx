@@ -88,6 +88,7 @@ export function constructJSXImageElement(image, canvasOrigin, opts = {}) {
       src={imageSrc}
       width={image.width}
       height={image.height}
+      loading="lazy"
       {...otherAttributes}
     />
   )
@@ -114,6 +115,7 @@ export function renderVideo(video, canvasOrigin) {
       allowfullscreen
       data-media-id="${getMediaId(video)}"
       data-media-type="video"
+      loading="lazy"
       src="${src}"
       style="width:${VIDEO_SIZE_DEFAULT.width};height:${
         VIDEO_SIZE_DEFAULT.height
@@ -132,6 +134,7 @@ export function renderAudio(audio, canvasOrigin) {
   <iframe
       data-media-id="${getMediaId(audio)}"
       data-media-type="audio"
+      loading="lazy"
       src="${src}"
       style="width:${AUDIO_PLAYER_SIZE.width};height:${
         AUDIO_PLAYER_SIZE.height
