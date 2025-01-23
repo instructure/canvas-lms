@@ -24,8 +24,6 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   self.plugin = :apple
   plugin_settings :client_id, client_secret: :client_secret_dec
 
-  SENSITIVE_PARAMS = [:client_secret].freeze
-
   class << self
     def login_message
       display_name
@@ -45,6 +43,10 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
 
     def recognized_params
       [*(super - open_id_connect_params), :login_attribute, :jit_provisioning].freeze
+    end
+
+    def sensitive_params
+      [*super, :client_secret].freeze
     end
 
     def recognized_federated_attributes

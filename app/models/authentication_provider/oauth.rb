@@ -21,7 +21,11 @@
 require "oauth2"
 
 class AuthenticationProvider::OAuth < AuthenticationProvider::Delegated
-  SENSITIVE_PARAMS = [:consumer_secret].freeze
+  class << self
+    def sensitive_params
+      [*super, :consumer_secret].freeze
+    end
+  end
 
   # rename DB fields to something that makes sense for OAuth2
   def consumer_key=(val)

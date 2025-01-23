@@ -140,7 +140,9 @@ class AuthenticationProvider < ActiveRecord::Base
     [].freeze
   end
 
-  SENSITIVE_PARAMS = [].freeze
+  def self.sensitive_params
+    [].freeze
+  end
 
   def self.login_button?
     Rails.root.join("app/views/shared/svg/_svg_icon_#{sti_name}.svg").exist?
