@@ -24,6 +24,65 @@ describe ContentMigration do
   context "course copy assignments" do
     include_context "course copy"
 
+    context "pre_date_shift_for_assignment_importing" do
+      before do
+        @copy_to.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active")
+        @copy_to.update!(workflow_state: "available")
+        @cm.migration_settings["date_shift_options"] = { "remove_dates" => "1" }
+        @cm.save!
+      end
+
+      context "when FF is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:pre_date_shift_for_assignment_importing)
+        end
+
+        it "generates submissions for assignment with date shift options" do
+          @copy_from.assignments.create!(title: "title")
+
+          run_course_copy
+
+          to_assign = @copy_to.assignments.first
+          expect(to_assign.submissions.length).to eq(1)
+        end
+
+        it "generates submissions for quiz with date shift options" do
+          quiz = @copy_from.quizzes.create!(title: "quiz")
+          quiz.publish!
+
+          run_course_copy
+
+          to_assign = @copy_to.assignments.first
+          expect(to_assign.submissions.length).to eq(1)
+        end
+      end
+
+      context "when FF is disabled" do
+        before do
+          Account.site_admin.disable_feature!(:pre_date_shift_for_assignment_importing)
+        end
+
+        it "generates submissions for assignment with date shift options" do
+          @copy_from.assignments.create!(title: "title")
+
+          run_course_copy
+
+          to_assign = @copy_to.assignments.first
+          expect(to_assign.submissions.length).to eq(1)
+        end
+
+        it "generates submissions for quiz with date shift options" do
+          quiz = @copy_from.quizzes.create!(title: "quiz")
+          quiz.publish!
+
+          run_course_copy
+
+          to_assign = @copy_to.assignments.first
+          expect(to_assign.submissions.length).to eq(1)
+        end
+      end
+    end
+
     it "links assignments to account rubrics and outcomes" do
       account = @copy_from.account
       lo = create_outcome(account)
