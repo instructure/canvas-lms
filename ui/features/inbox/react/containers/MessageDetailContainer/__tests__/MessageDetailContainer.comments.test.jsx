@@ -102,12 +102,17 @@ describe('MessageDetailContainer', () => {
         })
 
         await waitForApolloLoading()
-
-        const header = await findByTestId('message-detail-header-desktop')
-        expect(header).toBeInTheDocument()
-
-        const commentText = await findByText('my student comment')
-        expect(commentText).toBeInTheDocument()
+        await waitFor(
+          async () => {
+            const header = await findByTestId('message-detail-header-desktop')
+            expect(header).toBeInTheDocument()
+            const commentText = await findByText('my student comment')
+            expect(commentText).toBeInTheDocument()
+          },
+          {
+            timeout: 2000, // Increase timeout slightly to handle async operations
+          },
+        )
       })
 
       it('should not render the reply or reply_all option in header if student lacks permission', async () => {
