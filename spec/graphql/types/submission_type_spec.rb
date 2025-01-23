@@ -1022,4 +1022,19 @@ describe Types::SubmissionType do
       expect(submission_type.resolve("wordCount")).to eq 100
     end
   end
+
+  describe "anonymous grading" do
+    before do
+      @assignment.update!(anonymous_grading: true)
+      @submission.update!(posted_at: nil)
+    end
+
+    it "returns the anonymous id" do
+      expect(submission_type.resolve("anonymousId")).to eq @submission.anonymous_id
+    end
+
+    it "does not show the user to a grader when an assignment is actively anonymous" do
+      expect(submission_type.resolve("userId")).to be_nil
+    end
+  end
 end

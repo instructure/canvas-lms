@@ -60,7 +60,19 @@ module Types
 
     field :redo_request, Boolean, null: true
 
-    field :user_id, ID, null: false
+    field :user_id, ID, null: true
+    def user_id
+      load_association(:course).then do
+        load_association(:assignment).then do
+          if !Account.site_admin.feature_enabled?(:graphql_honor_anonymous_grading) ||
+             !(object.course.grants_right?(current_user, :manage_grades) && object.assignment.anonymize_students?)
+            object.user_id
+          end
+        end
+      end
+    end
+
+    field :anonymous_id, ID, null: true
 
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}

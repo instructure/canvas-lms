@@ -173,6 +173,9 @@ module GraphQLNodeLoader
     when "SubmissionByAssignmentAndUser"
       submission = Submission.active.find_by(assignment_id: id.fetch(:assignment_id), user_id: id.fetch(:user_id))
       check_read_permission.call(submission)
+    when "SubmissionByAssignmentAndAnonymousId"
+      submission = Submission.active.find_by(assignment_id: id.fetch(:assignment_id), anonymous_id: id.fetch(:anonymous_id))
+      check_read_permission.call(submission)
     when "Progress"
       Loaders::IDLoader.for(Progress).load(id).then do |progress|
         Loaders::AssociationLoader.for(Progress, :context).load(progress).then do
