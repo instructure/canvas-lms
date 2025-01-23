@@ -26,6 +26,7 @@ module AccountReports
       ORDER_SQL = { "users" => "u.id, learning_outcomes.id, c.id",
                     "courses" => "c.id, u.id, learning_outcomes.id",
                     "outcomes" => "learning_outcomes.id, u.id, c.id" }.freeze
+      DEFAULT_ORDER = "u.id, learning_outcomes.id, c.id"
 
       include ReportHelper
 
@@ -44,14 +45,8 @@ module AccountReports
         select.first if select.length == 1
       end
 
-      # TODO: simplify this method by
-      # - defining a DEFAULT_ORDER variable
-      # - creating a one-liner
       def outcome_order
-        order_key = determine_order_key
-        order = "u.id, learning_outcomes.id, c.id"
-        order = ORDER_SQL[order_key] if order_key
-        order
+        ORDER_SQL[determine_order_key] || DEFAULT_ORDER
       end
 
       def map_order_to_columns(outcome_order)
