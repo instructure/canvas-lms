@@ -32,6 +32,7 @@ import {IconEndLine, IconFolderLine, IconSearchLine, IconTroubleLine} from '@ins
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import type {FetchLinkHeader} from '@canvas/do-fetch-api-effect/types'
 import type {onSubmitMigrationFormCallback} from '../types'
@@ -97,13 +98,13 @@ const SelectedFolderName = ({folderName, clearFolderName}: SelectedFolderNamePro
   }
 
   return (
-    <Flex alignItems="center" gap="x-small" justifyItems="space-between">
+    <Flex alignItems="center" gap="x-small">
       <IconFolderLine />
-      <View as="div" width="100%">
-        <Text weight="bold" size="small">
-          {folderName}
+      <Flex.Item shouldShrink shouldGrow>
+        <Text weight="bold" size="small" >
+          <TruncateText>{folderName}</TruncateText>
         </Text>
-      </View>
+      </Flex.Item>
       <IconButton
         withBackground={false}
         withBorder={false}
