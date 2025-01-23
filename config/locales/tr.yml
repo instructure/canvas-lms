@@ -13283,6 +13283,7 @@ tr:
     where_to_move: "*%{name}*'ı taşımak istediğinize emin misiniz?"
   move_dialog_select: 
     move_to_end: "-- Alt kısımda --"
+  move_from_ef79aa53: "Şuraya taşı"
   move_group_3dd7f76e: "Grubu Taşı"
   move_group_77ae285d: "Grubu Taşı"
   move_module_346b8112: "Modülü Taşı"
