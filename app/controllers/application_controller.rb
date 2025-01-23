@@ -403,7 +403,6 @@ class ApplicationController < ActionController::Base
     non_scoring_rubrics
     top_navigation_placement
     rubric_criterion_range
-    lti_migration_info
     rce_lite_enabled_speedgrader_comments
     lti_toggle_placements
     login_registration_ui_identity

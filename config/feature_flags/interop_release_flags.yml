@@ -143,17 +143,6 @@ lti_find_external_tool_prefer_original_client_id:
     When possible, the LTI tool finding logic will prefer tools installed from the same
     developer key as the original tool. This prevents the edge case where multiple developer
     keys share the same domain, and a tool from the wrong developer key would be matched first.
-lti_migration_info:
-  state: hidden
-  display_name: LTI 1.1 to 1.3 Migration Info
-  shadow: true
-  description: When enabled, allows users to view LTI 1.1 to 1.3 migration info on the External Apps page.
-  applies_to: RootAccount
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_oidc_missing_cookie_retry:
   state: hidden
   shadow: true
