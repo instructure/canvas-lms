@@ -216,14 +216,19 @@ module.exports = {
         'from.pathNot re of the not-to-dev-dep rule in the dependency-cruiser configuration',
       from: {
         path: '^(packages)',
-        pathNot: '[.](?:|config|spec|setup|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx[.]md)$',
+        pathNot:
+          '[.](?:|config|spec|setup|test|jest-setup)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx[.]md)$',
       },
       to: {
         dependencyTypes: ['npm-dev'],
         // type only dependencies are not a problem as they don't end up in the
         // production code or are ignored by the runtime.
         dependencyTypesNot: ['type-only'],
-        pathNot: ['node_modules/@types/', 'node_modules/sinon/'],
+        pathNot: [
+          'node_modules/@types/',
+          'node_modules/sinon/',
+          'node_modules/@testing-library/jest-dom/',
+        ],
       },
     },
     {

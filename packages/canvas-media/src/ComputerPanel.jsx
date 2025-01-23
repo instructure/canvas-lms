@@ -42,6 +42,7 @@ import {px} from '@instructure/ui-utils'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {StudioPlayer} from '@instructure/studio-player'
 import {TextInput} from '@instructure/ui-text-input'
+import {Spinner} from '@instructure/ui-spinner'
 import formatMessage from './format-message'
 
 import LoadingIndicator from './shared/LoadingIndicator'
@@ -110,14 +111,14 @@ export default function ComputerPanel({
       // audio player's poster image. We can give it a background image though
       player.classList.add(isAudio(theFile.type) ? 'audio-player' : 'video-player')
     },
-    [theFile, width, height]
+    [theFile, width, height],
   )
 
   const handleLoadedMetadata = useCallback(
     _event => {
       handlePlayerSize()
     },
-    [handlePlayerSize]
+    [handlePlayerSize],
   )
 
   useEffect(() => {
@@ -149,7 +150,13 @@ export default function ComputerPanel({
             </Button>
           </Flex.Item>
         </Flex>
-        <View as="div" textAlign="center" margin="0 auto" width={useStudioPlayer ? width : undefined} height={useStudioPlayer ? height : undefined}>
+        <View
+          as="div"
+          textAlign="center"
+          margin="0 auto"
+          width={useStudioPlayer ? width : undefined}
+          height={useStudioPlayer ? height : undefined}
+        >
           {/* avi, wma, and wmv files won't load from a blob URL */}
           {!(isPreviewable(theFile.type) && previewURL) ? (
             <>
@@ -185,16 +192,19 @@ export default function ComputerPanel({
         {(isVideo(theFile.type) || isAudio(theFile.type)) && (
           <>
             <View display="block" padding="medium medium medium 0">
-              <Checkbox
-                onChange={event => setMediaTracksCheckbox(event.target.checked)}
-                checked={mediaTracksCheckbox}
-                label={ADD_CLOSED_CAPTIONS_OR_SUBTITLES}
-                value="mediaTracks"
-              />
+              <div data-testid="mediaTracks-checkbox">
+                <Checkbox
+                  onChange={event => setMediaTracksCheckbox(event.target.checked)}
+                  checked={mediaTracksCheckbox}
+                  label={ADD_CLOSED_CAPTIONS_OR_SUBTITLES}
+                  value="mediaTracks"
+                />
+              </div>
             </View>
             {mediaTracksCheckbox && (
-              <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
+              <Suspense fallback={<View as="div" margin="small 0 0"><Spinner data-testid="loading-spinner" renderTitle="" /></View>}>
                 <ClosedCaptionPanel
+                  data-testid="ClosedCaptionPanel"
                   userLocale={userLocale}
                   liveRegion={liveRegion}
                   uploadMediaTranslations={uploadMediaTranslations}
@@ -227,7 +237,7 @@ export default function ComputerPanel({
             msgs.concat({
               text: uploadMediaTranslations.UploadMediaStrings.INVALID_FILE_TEXT,
               type: 'error',
-            })
+            }),
           )
         }}
         messages={messages}
