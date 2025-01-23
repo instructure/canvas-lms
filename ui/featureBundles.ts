@@ -80,6 +80,7 @@ const featureBundles: {
   course_notification_settings: () => import('./features/course_notification_settings/index'),
   course_paces: () => import('./features/course_paces/index'),
   course_people: () => import('./features/course_people/index'),
+  course_people_new: () => import('./features/course_people_new/index'),
   course_show_secondary: () => import('./features/course_show_secondary/index'),
   course_settings: () => import('./features/course_settings/index'),
   course_show: () => import('./features/course_show/index'),
