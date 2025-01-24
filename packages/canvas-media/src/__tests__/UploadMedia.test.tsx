@@ -300,12 +300,13 @@ describe('UploadMedia: ComputerPanel', () => {
     })
   })
   describe('shows closed captions panel', () => {
+    // @ts-expect-error
     let user
 
     beforeEach(() => {
       user = userEvent.setup()
       vi.mock('../ClosedCaptionCreator', () => ({
-        default: () => <div data-testid="ClosedCaptionPanel" />
+        default: () => <div data-testid="ClosedCaptionPanel" />,
       }))
     })
 
@@ -317,7 +318,8 @@ describe('UploadMedia: ComputerPanel', () => {
     it('shows closed captions panel when uploading videos', async () => {
       const aFile = new File(['foo'], 'foo.mov', {
         type: 'video/quicktime',
-        title: 'foo.mov'
+        // @ts-expect-error
+        title: 'foo.mov',
       })
 
       const {getByTestId, findByTestId} = renderPanel({
@@ -327,6 +329,7 @@ describe('UploadMedia: ComputerPanel', () => {
 
       const ccCheckbox = getByTestId('mediaTracks-checkbox').querySelector('input[type="checkbox"]')
       if (!ccCheckbox) throw new Error('Checkbox input not found')
+      // @ts-expect-error
       await user.click(ccCheckbox)
 
       // Wait for panel to appear
@@ -337,7 +340,8 @@ describe('UploadMedia: ComputerPanel', () => {
     it('shows closed captions panel when uploading audios', async () => {
       const aFile = new File(['foo'], 'foo.mp3', {
         type: 'audio/mp3',
-        title: 'foo.mp3'
+        // @ts-expect-error
+        title: 'foo.mp3',
       })
       const {getByTestId, findByTestId} = renderPanel({
         theFile: aFile,
@@ -346,6 +350,7 @@ describe('UploadMedia: ComputerPanel', () => {
 
       const ccCheckbox = getByTestId('mediaTracks-checkbox').querySelector('input[type="checkbox"]')
       if (!ccCheckbox) throw new Error('Checkbox input not found')
+      // @ts-expect-error
       await user.click(ccCheckbox)
 
       // Wait for panel to appear
