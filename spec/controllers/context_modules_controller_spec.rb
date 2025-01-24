@@ -731,6 +731,23 @@ describe ContextModulesController do
       expect(@external_url_item.reload.indent).to eq 2
     end
 
+    describe "with horizon course" do
+      before do
+        Account.site_admin.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: true)
+      end
+
+      after do
+        Account.site_admin.disable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: false)
+      end
+
+      it "does not update indent" do
+        put "update_item", params: { course_id: @course.id, id: @external_url_item.id, content_tag: { indent: 2 } }
+        expect(@external_url_item.reload.indent).to eq 0
+      end
+    end
+
     it "updates the url for an external url item" do
       new_url = "http://example.org/new_url"
       put "update_item", params: { course_id: @course.id, id: @external_url_item.id, content_tag: { url: new_url } }

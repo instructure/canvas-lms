@@ -239,6 +239,7 @@ context_modules_header_props = {
           <td><%= f.blabel :url, :en => "URL" %></td>
           <td><%= f.text_field :url, :style => "width: 200px;" %></td>
         </tr>
+        <% unless @context.horizon_course? %>
         <tr>
           <td><label for="content_tag_indent_select"><%= before_label('indent', %{Indent}) %></label></td>
           <td>
@@ -249,6 +250,7 @@ context_modules_header_props = {
             </select>
           </td>
         </tr>
+        <% end %>
         <tr class="external">
           <td colspan="2">
             <%= f.check_box :new_tab %>

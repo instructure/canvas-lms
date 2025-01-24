@@ -65,7 +65,7 @@
     <% end %>
     <%= module_item.content_type_class(@is_student) if module_item %>
     <%= 'also_assignment' if module_item && module_item.graded? %>
-    indent_<%= module_item.try_rescue(:indent) || '0' %>
+    indent_<%= @context.horizon_course? ? '0' : (module_item.try_rescue(:indent) || '0') %>
     <%= 'progression_requirement' if criterion %>
     <%= criterion[:type] if criterion %>_requirement
     <%= module_item.item_class if module_item %>
@@ -312,8 +312,10 @@
                     title="<%= t('Move this item') %>"
                   ><%= @module_item_image_tags["move_to"]%> <%= t("Move to...") %></a>
                 </li>
+                <% unless @context.horizon_course? %>
                 <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('Decrease indent') %>"><%= @module_item_image_tags['outdent'] %> <%= t('Decrease indent') %></a></li>
                 <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('Increase indent') %>"><%= @module_item_image_tags['indent'] %> <%= t('Increase indent') %></a></li>
+                <% end %>
               <%end%>
               <% if can_direct_share && (!module_item || module_item.direct_shareable?) %>
                 <li role="presentation">
