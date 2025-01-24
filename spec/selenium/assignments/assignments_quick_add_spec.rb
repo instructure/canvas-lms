@@ -51,6 +51,15 @@ describe "assignments" do
       expect(f("[data-testid='modal-title']")).to include_text("Create Assignment")
     end
 
+    it "creating basic assignment defaults to 'online_text_entry' submission type", priority: "1" do
+      get "/courses/#{@course.id}/assignments"
+
+      build_assignment_with_type("Assignment", name: "pink panther", points: "3", due_at: "2015-07-31", submit: true)
+
+      a = Assignment.last
+      expect(a.submission_types).to eq("online_text_entry")
+    end
+
     context "more options button" do
       it "works for assignments and transfer values", priority: "1" do
         fill_out_quick_add_modal("Assignment")
