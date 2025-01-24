@@ -104,6 +104,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :user
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :discussion_topic
   has_many :summaries, class_name: "DiscussionTopicSummary"
+  has_one :estimated_duration, dependent: :destroy, inverse_of: :discussion_topic
 
   validates_associated :discussion_topic_section_visibilities
   validates :context_id, :context_type, presence: true

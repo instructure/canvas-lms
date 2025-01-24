@@ -62,6 +62,7 @@ class ContentTag < ActiveRecord::Base
   belongs_to :learning_outcome_content, class_name: "LearningOutcome", foreign_key: :content_id, inverse_of: false
   has_many :learning_outcome_results
   belongs_to :root_account, class_name: "Account"
+  has_one :estimated_duration, dependent: :destroy, inverse_of: :content_tag
 
   after_create :clear_stream_items_if_module_is_unpublished
 
