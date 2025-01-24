@@ -93,7 +93,61 @@ describe('MessageDetailContainer', () => {
     )
 
   describe('submission comments', () => {
-    const mockSubmissionComment = {subject: 'mySubject', _id: '1', workflowState: 'unread'}
+    const mockSubmissionComment = {
+      _id: '1',
+      id: 'Submission-1',
+      subject: 'Assignment: Test Assignment',
+      workflowState: 'unread',
+      canReply: false,
+      commentsConnection: {
+        nodes: [
+          {
+            _id: '1',
+            id: 'SubmissionComment-1',
+            submissionId: '1',
+            createdAt: '2024-01-24T11:35:35-07:00',
+            attempt: 1,
+            canReply: false,
+            author: {
+              _id: '1',
+              id: 'VXNlci0x',
+              name: 'Student Name',
+              shortName: 'Student',
+              pronouns: null,
+              avatarUrl: null,
+              __typename: 'User',
+            },
+            assignment: {
+              _id: '1',
+              id: 'QXNzaWdubWVudC0x',
+              name: 'Test Assignment',
+              htmlUrl: '/courses/1/assignments/1',
+              __typename: 'Assignment',
+            },
+            comment: 'my student comment',
+            htmlComment: '<p>my student comment</p>',
+            course: {
+              _id: '1',
+              id: 'Q291cnNlLTE=',
+              name: 'Test Course',
+              courseNickname: null,
+              contextName: 'Test Course',
+              assetString: 'course_1',
+              __typename: 'Course',
+            },
+            read: false,
+            __typename: 'SubmissionComment',
+          },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          endCursor: null,
+          __typename: 'PageInfo',
+        },
+        __typename: 'SubmissionCommentConnection',
+      },
+    }
+
     describe('rendering', () => {
       it('should render conversation information correctly', async () => {
         const {findByTestId, findByText} = setup({
@@ -101,7 +155,6 @@ describe('MessageDetailContainer', () => {
           conversation: mockSubmissionComment,
         })
 
-        await waitForApolloLoading()
         await waitFor(
           async () => {
             const header = await findByTestId('message-detail-header-desktop')
@@ -110,17 +163,29 @@ describe('MessageDetailContainer', () => {
             expect(commentText).toBeInTheDocument()
           },
           {
-            timeout: 2000, // Increase timeout slightly to handle async operations
+            timeout: 1000,
           },
         )
       })
 
       it('should not render the reply or reply_all option in header if student lacks permission', async () => {
-        const container = setup({
+        const noReplyMock = {
+          ...mockSubmissionComment,
+          commentsConnection: {
+            ...mockSubmissionComment.commentsConnection,
+            nodes: [
+              {
+                ...mockSubmissionComment.commentsConnection.nodes[0],
+                canReply: false,
+              },
+            ],
+          },
+        }
+        const {queryByTestId} = setup({
           isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment,
+          conversation: noReplyMock,
         })
-        expect(container.queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
+        expect(queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
       })
 
       it('should render with link in title', async () => {
