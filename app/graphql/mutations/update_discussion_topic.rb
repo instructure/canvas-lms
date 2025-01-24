@@ -146,6 +146,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       # Assignment must be present to set checkpoints
       if discussion_topic.assignment && input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
         return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
+        return validation_error(I18n.t("If there are submissions, checkpoints cannot be enabled.")) if input.dig(:assignment, :for_checkpoints) && discussion_topic.assignment.has_submitted_submissions?
 
         # on the case of changing an ungraded discussion to a graded, checkpointed discussion, at this stage
         # has_sub_assignments? returns true, but sub_assignments is empty. We will want the creator service when this happens

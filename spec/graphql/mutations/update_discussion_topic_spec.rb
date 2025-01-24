@@ -1094,6 +1094,22 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
       expect_error(result, "Group discussions cannot have checkpoints.")
     end
+
+    it "returns an error when attempting to add checkpoins to a discussion with student submissions" do
+      discussion_assignment = @course.assignments.create!(
+        title: "Topic 1",
+        submission_types: "discussion_topic"
+      )
+      student = student_in_course.user
+      topic = discussion_assignment.discussion_topic
+      topic.ensure_particular_submission(discussion_assignment, student, Time.zone.now)
+      result = run_mutation(id: topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+
+      expect_error(result, "If there are submissions, checkpoints cannot be enabled.")
+    end
   end
 
   context "with selective release" do
