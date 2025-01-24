@@ -34,7 +34,7 @@ class Publishable extends Backbone.Model {
   publish() {
     this.set('published', true)
     const dfrd = $.Deferred()
-    dfrd.reject({status: 0}) 
+    dfrd.reject({status: 0})
     return dfrd
   }
 
@@ -85,8 +85,8 @@ describe('PublishButtonView', () => {
 
     it('publish button renders loading spinner only while publishing', async () => {
       jest.spyOn($, 'flashError')
-      const renderSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'renderLoadingSpinner')
-      const hideSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'hideLoadingSpinner')
+      const renderSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'renderOverlayLoadingSpinner')
+      const hideSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'hideOverlayLoadingSpinner')
       const btnView = new PublishButtonView({model: publish}).render()
       btnView.$el.trigger('click')
 
@@ -98,8 +98,8 @@ describe('PublishButtonView', () => {
 
     it('unpublish button renders loading spinner only while unpublishing', async () => {
       jest.spyOn($, 'flashError')
-      const renderSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'renderLoadingSpinner')
-      const hideSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'hideLoadingSpinner')
+      const renderSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'renderOverlayLoadingSpinner')
+      const hideSpinnerSpy = jest.spyOn(PublishButtonView.prototype, 'hideOverlayLoadingSpinner')
       const btnView = new PublishButtonView({model: published}).render()
       btnView.$el.trigger('click')
 
