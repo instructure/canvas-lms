@@ -140,8 +140,8 @@ describe CollaborationsController do
       let(:course) { @course }
       let(:url) { "http://www.example.com/launch" }
       let(:domain) { "example.com" }
-      let(:developer_key_1) { dev_key_model_1_3(account: @course.account) }
-      let(:developer_key_2) { dev_key_model_1_3(account: @course.account) }
+      let(:developer_key_1) { lti_developer_key_model(account: @course.account) }
+      let(:developer_key_2) { lti_developer_key_model(account: @course.account) }
       let(:tool_1) { external_tool_1_3_model(context: @course, developer_key: developer_key_1, opts: { url:, name: "1.3 tool 1" }) }
       let(:tool_2) { external_tool_1_3_model(context: @course, developer_key: developer_key_2, opts: { url:, name: "1.3 tool 2" }) }
       let(:content_item_1) do
@@ -266,7 +266,7 @@ describe CollaborationsController do
 
     let(:url) { "http://www.example.com/launch" }
     let(:domain) { "example.com" }
-    let(:developer_key) { dev_key_model_1_3(account: @course.account) }
+    let(:developer_key) { lti_developer_key_model(account: @course.account) }
     let(:new_tool) { external_tool_1_3_model(context: @course, developer_key:, opts: { url:, name: "1.3 tool" }) }
     let(:old_tool) { external_tool_model(context: @course, opts: { url:, domain: }) }
 

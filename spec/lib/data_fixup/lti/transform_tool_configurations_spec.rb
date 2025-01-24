@@ -26,21 +26,14 @@ RSpec.describe DataFixup::Lti::TransformToolConfigurations do
   include_context "lti_1_3_tool_configuration_spec_helper"
 
   let(:account) { Account.default }
-  let(:developer_key) { dev_key_model_1_3(account:) }
+  let(:developer_key) { lti_developer_key_model(account:) }
   let(:tool_configuration) do
-    developer_key.tool_configuration.delete
     # needs to be not transformed yet
-    Lti::ToolConfiguration.create!(
-      developer_key:,
-      settings: settings.merge(public_jwk: tool_config_public_jwk),
-      privacy_level: "public"
-    )
+    lti_tool_configuration_model(developer_key:, privacy_level: "public").tap(&:untransform!)
   end
   let(:second_tool_configuration) do
     tool_configuration.dup.tap do |tc|
-      dk = dev_key_model_1_3(account:)
-      dk.tool_configuration.delete
-      tc.developer_key = dk
+      tc.developer_key = lti_developer_key_model(account:)
       tc.save!
     end
   end

@@ -31,6 +31,7 @@ describe AccountReports::DeveloperKeyReports do
     read_report(report_type, report_opts)
   end
 
+  let_once(:scopes) { ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"] }
   let_once(:account) { Account.default }
   let_once(:first_key) do
     dk = dev_key_model({ scopes: [
@@ -49,14 +50,17 @@ describe AccountReports::DeveloperKeyReports do
   let_once(:second_key) do
     dk = dev_key_model_1_3({ name: "Second Key",
                              public_jwk_url: "http://test.com/jwks",
-                             account: })
+                             account:,
+                             scopes: })
+    lti_tool_configuration_model(developer_key: dk, scopes:)
     disable_developer_key_account_binding! dk
     dk
   end
   let_once(:third_key) do
     dk = dev_key_model_dyn_reg({ name: "Third Key",
                                  public_jwk_url: "http://test.com/jwks",
-                                 account: })
+                                 account:,
+                                 scopes: })
     enable_developer_key_account_binding! dk
     dk
   end
@@ -178,7 +182,7 @@ describe AccountReports::DeveloperKeyReports do
 
     let(:expected_result) do
       super().tap do |er|
-        er[1][5] = %w[course_navigation module_index_menu_modal].to_s
+        er[1][5] = %w[course_navigation account_navigation module_index_menu_modal].to_s
       end
     end
 

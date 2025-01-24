@@ -31,7 +31,9 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
   end
 
   let(:developer_key) do
-    dev_key_model_1_3(account:, settings: settings.merge(public_jwk: tool_config_public_jwk))
+    lti_developer_key_model(account:).tap do |developer_key|
+      lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration, settings: settings.merge(public_jwk: tool_config_public_jwk))
+    end
   end
 
   before do

@@ -461,6 +461,7 @@ describe Schemas::InternalLtiConfiguration do
         "target_link_uri" => "http://lti13testtool.docker/blti_launch",
         "custom_fields" => { "has_expansion" => "$Canvas.user.id", "no_expansion" => "foo" },
         "public_jwk" => internal_configuration[:public_jwk].deep_stringify_keys,
+        "public_jwk_url" => "http://example.com/jwks",
         "oidc_initiation_url" => "http://lti13testtool.docker/blti_launch",
         "scopes" => [],
         "oidc_initiation_urls" => { "us-east-1" => "http://example.com" },

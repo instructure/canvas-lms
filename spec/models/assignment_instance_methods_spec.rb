@@ -268,7 +268,7 @@ describe Assignment do
     let(:url) { "http://www.example.com" }
     let(:account) { account_model }
     let(:course) { course_model(account:) }
-    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:developer_key) { lti_developer_key_model(account:) }
     let(:old_tool) { external_tool_model(context: course, opts: { url: }) }
     let(:new_tool) { external_tool_1_3_model(context: course, developer_key:, opts: { url:, name: "1.3 tool" }) }
     let(:direct_assignment) do

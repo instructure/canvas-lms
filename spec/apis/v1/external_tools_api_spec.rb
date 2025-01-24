@@ -454,7 +454,7 @@ describe ExternalToolsController, type: :request do
       ContextExternalTool.create!(
         context: account,
         consumer_key: "key",
-        developer_key: dev_key_model_1_3,
+        developer_key: lti_developer_key_model,
         shared_secret: "secret",
         name: "test tool",
         url: "http://www.tool.com/launch",

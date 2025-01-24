@@ -503,10 +503,6 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       end
     end
 
-    it_behaves_like "an endpoint that validates public_jwk and public_jwk_url" do
-      let(:make_request) { put :update, params: }
-    end
-
     it_behaves_like "an action that requires manage developer keys"
 
     it_behaves_like "an endpoint that accepts developer key parameters" do

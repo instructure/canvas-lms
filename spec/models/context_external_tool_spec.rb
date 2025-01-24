@@ -4314,7 +4314,10 @@ describe ContextExternalTool do
       let(:tool_version) { "1.3" }
       let(:account) { account_model }
 
-      let_once(:developer_key) { dev_key_model_1_3(account:) }
+      let_once(:developer_key) { lti_developer_key_model(account:) }
+      let_once(:tool_configuration) do
+        lti_tool_configuration_model(developer_key:, unified_tool_id:)
+      end
       let_once(:tool) do
         ContextExternalTool.new(
           context: @course,
@@ -4331,8 +4334,6 @@ describe ContextExternalTool do
       end
 
       before do
-        tc = tool.developer_key.tool_configuration
-        tc.update_column(:unified_tool_id, unified_tool_id)
         run_jobs # to empty the job queue
       end
 

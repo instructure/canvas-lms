@@ -208,7 +208,7 @@ RSpec.describe Lti::RegistrationsController do
         # introduces `tool_configuration`
         include_context "lti_1_3_tool_configuration_spec_helper"
 
-        let(:developer_key) { dev_key_model_1_3(account:) }
+        let(:developer_key) { lti_developer_key_model(account:) }
         let(:registration) { developer_key.lti_registration }
 
         before do
@@ -701,7 +701,7 @@ RSpec.describe Lti::RegistrationsController do
   describe "GET show_by_client_id", type: :request do
     subject { get "/api/v1/accounts/#{account.id}/lti_registration_by_client_id/#{developer_key.id}" }
 
-    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:developer_key) { lti_developer_key_model(account:) }
     let(:registration) { developer_key.lti_registration }
 
     context "without user session" do
@@ -781,6 +781,8 @@ RSpec.describe Lti::RegistrationsController do
 
     let(:other_admin) { account_admin_user(account:) }
     let(:registration) { developer_key.lti_registration }
+    let(:developer_key) { lti_developer_key_model(account:) }
+    let(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: registration) }
     let(:admin_nickname) { "New Name" }
     let(:name) { "foo" }
     let(:vendor) { "vendor" }
@@ -829,7 +831,7 @@ RSpec.describe Lti::RegistrationsController do
     it "updates the associated tool configuration" do
       expect(subject).to be_successful
 
-      expect(tool_configuration.reload.internal_lti_configuration.except(:public_jwk_url).with_indifferent_access)
+      expect(tool_configuration.reload.internal_lti_configuration.with_indifferent_access)
         .to eq(internal_configuration.with_indifferent_access)
     end
 
@@ -842,7 +844,7 @@ RSpec.describe Lti::RegistrationsController do
     it "returns the appropriate info" do
       expect(subject).to be_successful
 
-      expect(response_json[:configuration].with_indifferent_access.except(:public_jwk_url))
+      expect(response_json[:configuration].with_indifferent_access)
         .to eq(internal_configuration.with_indifferent_access)
       expect(response_json[:account_binding]).to include({ workflow_state: "on" })
     end
@@ -1012,7 +1014,7 @@ RSpec.describe Lti::RegistrationsController do
       it "is successful" do
         expect(subject).to be_successful
 
-        expect(tool_configuration.reload.internal_lti_configuration.with_indifferent_access.except(:public_jwk_url))
+        expect(tool_configuration.reload.internal_lti_configuration.with_indifferent_access)
           .to eq(params[:configuration].with_indifferent_access)
       end
     end
@@ -1593,7 +1595,7 @@ RSpec.describe Lti::RegistrationsController do
       expect { subject }.to change { Lti::ToolConfiguration.count }.by(1)
 
       expect(Lti::ToolConfiguration.last.internal_lti_configuration.with_indifferent_access)
-        .to eq(internal_configuration.merge({ "public_jwk_url" => nil }).with_indifferent_access)
+        .to eq(internal_configuration.with_indifferent_access)
     end
 
     it "defaults to a nil unified_tool_id" do
@@ -1607,7 +1609,7 @@ RSpec.describe Lti::RegistrationsController do
       expect(response).to be_successful
       expect(response_json[:name]).to eq("Test Tool")
       expect(response_json[:admin_nickname]).to eq("Test Nickname")
-      expect(response_json[:configuration].with_indifferent_access.except(:public_jwk_url))
+      expect(response_json[:configuration].with_indifferent_access)
         .to eq(internal_configuration.with_indifferent_access)
       expect(response_json[:account_binding]).to be_present
     end
@@ -1789,7 +1791,7 @@ RSpec.describe Lti::RegistrationsController do
         expect { subject }.to change { Lti::ToolConfiguration.count }.by(1)
 
         expect(Lti::ToolConfiguration.last.internal_lti_configuration.with_indifferent_access)
-          .to eq(internal_configuration.with_indifferent_access.merge(public_jwk_url: nil))
+          .to eq(internal_configuration.with_indifferent_access)
       end
 
       it "returns the created registration" do
