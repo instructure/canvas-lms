@@ -1477,12 +1477,34 @@ describe "Importing assignments" do
 
     context "when setting needs_update_cached_due_dates field" do
       context "when field is given" do
+        let(:item) { Assignment.new }
+
         before do
-          item.update!(needs_update_cached_due_dates: true)
+          allow(item).to receive(:save_without_broadcasting!)
         end
 
         it "should shift the date" do
           expect(subject.needs_update_cached_due_dates).to be_truthy
+        end
+
+        context "when the update_cached_due_dates? is false" do
+          before do
+            allow(item).to receive_messages(update_cached_due_dates?: false)
+          end
+
+          it "sets needs_update_cached_due_dates false" do
+            expect(subject.needs_update_cached_due_dates).to be_falsey
+          end
+        end
+
+        context "when the update_cached_due_dates? is true" do
+          before do
+            allow(item).to receive_messages(update_cached_due_dates?: true)
+          end
+
+          it "sets needs_update_cached_due_dates to true" do
+            expect(subject.needs_update_cached_due_dates).to be true
+          end
         end
       end
 
