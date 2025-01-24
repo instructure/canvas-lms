@@ -22,7 +22,7 @@ RSpec.describe DataFixup::Lti::SetLtiRegistrationAccountBindingsWorkflowState do
   let(:account) { account_model }
 
   let(:dkab) do
-    dev_key = dev_key_model_1_3(account:)
+    dev_key = lti_developer_key_model(account:)
     dev_key.developer_key_account_bindings.first
   end
 
@@ -57,7 +57,7 @@ RSpec.describe DataFixup::Lti::SetLtiRegistrationAccountBindingsWorkflowState do
 
       before do
         5.times do
-          dev_key = dev_key_model_1_3(account:)
+          dev_key = lti_developer_key_model(account:)
           dkab = dev_key.developer_key_account_bindings.first
           dkab.update_column(:workflow_state, "off")
           dkab.lti_registration_account_binding.update_column(:workflow_state, "on")

@@ -161,11 +161,10 @@ RSpec.describe Lti::Registration do
     end
 
     context "when tool_configuration is present" do
-      let!(:tool_configuration) do
-        dk = dev_key_model_1_3
-        dk.tool_configuration.update!(lti_registration: registration)
-        dk.tool_configuration
-      end
+      let(:developer_key) { lti_developer_key_model(account: account) }
+      let(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: registration) }
+
+      before { tool_configuration }
 
       it "returns the manual_configuration" do
         expect(subject).to eq(tool_configuration.internal_lti_configuration.with_indifferent_access)
@@ -322,9 +321,8 @@ RSpec.describe Lti::Registration do
 
     context "when a tool configuration is present" do
       let!(:tool_configuration) do
-        dk = dev_key_model_1_3
-        dk.tool_configuration.update!(lti_registration: registration)
-        dk.tool_configuration
+        dk = lti_developer_key_model
+        lti_tool_configuration_model(developer_key: dk, lti_registration: registration)
       end
 
       it "returns the logo_uri" do

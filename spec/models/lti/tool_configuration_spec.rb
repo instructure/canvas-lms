@@ -1257,7 +1257,7 @@ module Lti
       let(:tool_configuration) { untransformed_tool_configuration }
 
       it "remains equivalent after multiple transforms" do
-        settings = tool_configuration.settings.merge("public_jwk_url" => nil)
+        settings = tool_configuration.settings
         tool_configuration.transform!
         new_settings = tool_configuration.settings
         expect(new_settings).to eq settings
