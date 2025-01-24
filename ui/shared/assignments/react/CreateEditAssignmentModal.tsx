@@ -71,7 +71,7 @@ export type CreateEditAssignmentModalProps = {
   assignment: ModalAssignment | undefined
   userIsAdmin: boolean
   onCloseHandler: () => void
-  onSaveHandler: (data: SaveProps) => Promise<void>
+  onSaveHandler: (data: SaveProps, isNewAssignment: boolean) => Promise<void>
   onMoreOptionsHandler: (data: MoreOptionsProps, isNewAssignment: boolean) => void
   timezone: string
   validDueAtRange: any | undefined
@@ -275,7 +275,7 @@ const CreateEditAssignmentModal = ({
       setFieldWithError(null)
     }
   }, [fieldWithError, inputElRefs])
-
+  
   const validForm = () => {
     const validType = isEditMode ? true : validateAssignmentType(assignmentType)
     const validName = validateAssignmentName(name)
@@ -363,7 +363,7 @@ const CreateEditAssignmentModal = ({
       points,
       syncToSIS,
       publish: false,
-    })
+    }, !isEditMode)
 
     onCloseHandler()
   }
@@ -382,7 +382,7 @@ const CreateEditAssignmentModal = ({
       points,
       syncToSIS,
       publish: true,
-    })
+    }, !isEditMode)
 
     onCloseHandler()
   }
