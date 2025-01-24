@@ -78,12 +78,14 @@ describe('MasteryCalculation', () => {
   })
 
   it('loads calculation data for Course', async () => {
-    const {getByDisplayValue} = render(<MasteryCalculation />, {
+    const {findByDisplayValue} = render(<MasteryCalculation />, {
       contextType: 'Course',
       contextId: '12',
     })
     await act(async () => jest.runAllTimers())
-    expect(getByDisplayValue(/65/)).not.toEqual(null)
+    await waitFor(async () => {
+      expect(await findByDisplayValue(/65/)).not.toBeNull()
+    })
   })
 
   it('loads role list', async () => {
