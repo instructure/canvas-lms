@@ -1289,6 +1289,15 @@ describe CoursesController do
       expect(session[:become_user_id]).to be_nil
     end
 
+    it "redirects to the modules page for horizon courses" do
+      user_session(@teacher)
+      Account.site_admin.enable_feature!(:horizon_course_setting)
+      @course.update!(horizon_course: true)
+
+      get "show", params: { id: @course.id }
+      expect(response).to redirect_to("#{course_url(@course)}/modules")
+    end
+
     it "allows student view student to view unpublished courses" do
       @course.update_attribute :workflow_state, "claimed"
       user_session(@teacher)

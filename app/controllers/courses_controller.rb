@@ -2227,6 +2227,11 @@ class CoursesController < ApplicationController
 
       @context = api_find(Course.active, params[:id])
 
+      if @context.horizon_course? && !request.path.include?("/modules")
+        redirect_to course_context_modules_path(@context.id)
+        return
+      end
+
       assign_localizer
       if request.xhr?
         if authorized_action(@context, @current_user, [:read, :read_as_admin])
@@ -2302,7 +2307,6 @@ class CoursesController < ApplicationController
         @course_home_view = "k5_dashboard" if @context.elementary_subject_course?
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
         @course_home_view = "syllabus" if @context.elementary_homeroom_course? && !@context.grants_right?(@current_user, session, :read_announcements)
-        @course_home_view = "modules" if @context.horizon_course?
 
         course_env_variables = {}
         # env.COURSE variables that apply to both classic and k5 courses
