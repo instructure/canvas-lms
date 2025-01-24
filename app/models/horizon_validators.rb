@@ -38,4 +38,10 @@ module HorizonValidators
       record.errors.add(:groups, "Can not add groups to Horizon course")
     end
   end
+
+  class QuizzesValidator < ActiveModel::Validator
+    def validate(record)
+      record.errors.add("Classic Quizzes is not supported on Horizon courses")
+    end
+  end
 end

@@ -122,6 +122,15 @@ describe "shared/_select_content_dialog" do
         expect(page.css("#quizs_select .new tr").first["style"]).to eq "display: none;"
         expect(page.at_css('#quizs_select .new input[type="radio"][checked]')).to be_nil
       end
+
+      it "hides radios and selects New Quizzes when Horizon course" do
+        allow(@course).to receive(:horizon_course?).and_return(true)
+        assign(:combined_active_quizzes, [])
+        render partial: "shared/select_content_dialog"
+        page = Nokogiri(response.body)
+        expect(page.css("#quizs_select .new tr").first["style"]).to eq "display: none;"
+        expect(page.at_css('#quizs_select .new input[type="radio"][checked]')).not_to be_nil
+      end
     end
 
     context "with quiz engine never selected" do

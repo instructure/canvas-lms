@@ -26,6 +26,7 @@
   new_quizzes_by_default = new_quizzes_enabled && @context.feature_enabled?(:new_quizzes_by_default)
   newquizzes_engine_selected = @context.settings.dig(:engine_selected, :user_id, :newquizzes_engine_selected)
   newquizzes_engine_selected = ['true', 'false'].include?(newquizzes_engine_selected) ? newquizzes_engine_selected : nil
+  newquizzes_engine_selected = @context.horizon_course? ? 'true' : newquizzes_engine_selected
   add_assignment_permission = @context.root_account.feature_enabled?(:granular_permissions_manage_assignments) ? :manage_assignments_add : :manage_assignments
   module_links_default_new_tab = @current_user&.get_preference(:module_links_default_new_tab)
 %>
