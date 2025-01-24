@@ -142,8 +142,11 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
     const saveButtonState = name.length === 0 || status === 'info' ? 'disabled' : 'enabled'
     return (
       <>
-        <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
+        <Button data-testid="group-modal-cancel-button" onClick={modalProps.onDismiss}>
+          {I18n.t('Cancel')}
+        </Button>
         <Button
+          data-testid="group-modal-save-button"
           type="submit"
           interaction={saveButtonState}
           color="primary"
