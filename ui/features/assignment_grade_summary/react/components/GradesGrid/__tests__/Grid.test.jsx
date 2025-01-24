@@ -19,20 +19,18 @@
 import React from 'react'
 import {render, screen, within} from '@testing-library/react'
 
-import {speedGraderUrl} from '../../../assignment/AssignmentApi'
 import Grid from '../Grid'
-import GridRow from '../GridRow'
+import {speedGraderUrl} from '../../../assignment/AssignmentApi'
 import {STARTED, SUCCESS} from '../../../grades/GradeActions'
 
-const ActualGridRow = jest.requireActual('../GridRow').default
-jest.mock('../GridRow', props => {
-  return jest.fn(properties => {
-    return <ActualGridRow {...properties} />
-  })
+jest.mock('../GridRow', () => {
+  const ActualGridRow = jest.requireActual('../GridRow').default
+  return jest.fn(props => <ActualGridRow {...props} />)
 })
 
 describe('GradeSummary Grid', () => {
   let props
+  let MockGridRow
 
   function speedGraderUrlFor(studentId) {
     return speedGraderUrl('1201', '2301', {anonymousStudents: false, studentId})
@@ -43,6 +41,7 @@ describe('GradeSummary Grid', () => {
   })
 
   beforeEach(() => {
+    MockGridRow = jest.requireMock('../GridRow')
     props = {
       horizontalScrollRef: () => {},
       disabledCustomGrade: false,
@@ -143,48 +142,48 @@ describe('GradeSummary Grid', () => {
 
   test('sends disabledCustomGrade to each GridRow', () => {
     render(<Grid {...props} />)
-    const rowCalls = GridRow.mock.calls.filter(call => !call[0].disabledCustomGrade)
+    const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
+    const rowCalls = calls.filter(call => !call[0].disabledCustomGrade)
     expect(rowCalls).toHaveLength(4)
   })
 
   test('sends finalGrader to each GridRow', () => {
     render(<Grid {...props} />)
-    const rowCalls = GridRow.mock.calls.filter(call => !!call[0].finalGrader)
+    const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
+    const rowCalls = calls.filter(call => !!call[0].finalGrader)
     expect(rowCalls).toHaveLength(4)
   })
 
   test('sends graders to each GridRow', () => {
     render(<Grid {...props} />)
-    const rowCalls = GridRow.mock.calls
-    expect(
-      rowCalls.map(row => row[0].graders.map(grader => grader.graderName)).flat(),
-    ).toStrictEqual([
-      'Miss Frizzle',
-      'Mr. Keating',
-      'Miss Frizzle',
-      'Mr. Keating',
-      'Miss Frizzle',
-      'Mr. Keating',
-      'Miss Frizzle',
-      'Mr. Keating',
-    ])
+    const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
+    expect(calls).toHaveLength(4)
+    calls.forEach(call => {
+      expect(call[0].graders).toEqual([
+        {graderId: '1101', graderName: 'Miss Frizzle'},
+        {graderId: '1102', graderName: 'Mr. Keating'},
+      ])
+    })
   })
 
   test('sends onGradeSelect to each GridRow', () => {
     render(<Grid {...props} />)
-    const rowCalls = GridRow.mock.calls.filter(call => !!call[0].onGradeSelect)
+    const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
+    const rowCalls = calls.filter(call => !!call[0].onGradeSelect)
     expect(rowCalls).toHaveLength(4)
   })
 
   test('sends student-specific grades to each GridRow', () => {
     render(<Grid {...props} />)
-    const firstStudentGrade = GridRow.mock.calls[0][0].grades
+    const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
+    const firstStudentGrade = calls[0][0].grades
     expect(Object.keys(firstStudentGrade)).toStrictEqual(['1101', '1102'])
   })
 
   test('sends student-specific select provisional grade statuses to each GridRow', () => {
     render(<Grid {...props} />)
-    const rowCalls = GridRow.mock.calls.filter(
+    const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
+    const rowCalls = calls.filter(
       call => call[0].selectProvisionalGradeStatus == STARTED,
     )
     expect(rowCalls).toHaveLength(1)
@@ -192,7 +191,8 @@ describe('GradeSummary Grid', () => {
 
   test('sends the related row to each GridRow', () => {
     render(<Grid {...props} />)
-    const rowCalls = GridRow.mock.calls.filter(call => !!call[0].row)
+    const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
+    const rowCalls = calls.filter(call => !!call[0].row)
     expect(rowCalls).toHaveLength(4)
   })
 })
