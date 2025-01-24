@@ -335,7 +335,7 @@
         </div>
       </div>
       <% end %>
-      <% if !only || only.include?(:indentation) %>
+      <% if (!only || only.include?(:indentation)) && !@context.horizon_course? %>
       <div class="context_module_content">
         <%= before_label :indentation, "Indentation" %>
         <select name="content_tag[indent]" id="content_tag_indent" aria-label="<%= before_label :indentation, "Indentation" %>">

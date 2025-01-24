@@ -757,7 +757,7 @@ class ContextModulesController < ApplicationController
         @tag.url = params[:content_tag][:url]
         @tag.reassociate_external_tool = true
       end
-      @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent]
+      @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent] && !@context.horizon_course?
       @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
 
       unless @tag.save
