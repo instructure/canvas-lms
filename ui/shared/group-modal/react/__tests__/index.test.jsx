@@ -80,7 +80,7 @@ describe('GroupModal', () => {
     })
 
     it('renders modular footer', () => {
-      const {getByText} = render(
+      const {getByTestId} = render(
         <GroupModal
           groupCategory={groupCategory}
           group={group}
@@ -91,8 +91,8 @@ describe('GroupModal', () => {
           onDismiss={onDismiss}
         />,
       )
-      expect(getByText(/Save/i)).toBeVisible()
-      expect(getByText(/Cancel/i)).toBeVisible()
+      expect(getByTestId('group-modal-save-button')).toBeVisible()
+      expect(getByTestId('group-modal-cancel-button')).toBeVisible()
     })
 
     it('clears prior state if modal is closed', async () => {
@@ -126,7 +126,7 @@ describe('GroupModal', () => {
     })
 
     it('disables the save button if group name is empty', () => {
-      const {getByText} = render(
+      const {getByTestId} = render(
         <GroupModal
           groupCategory={groupCategory}
           group={group}
@@ -137,12 +137,12 @@ describe('GroupModal', () => {
           onDismiss={onDismiss}
         />,
       )
-      expect(getByText('Save').closest('button').hasAttribute('disabled')).toBeTruthy()
+      expect(getByTestId('group-modal-save-button')).toHaveAttribute('disabled')
     })
 
     it('enables the save button if group name is provided', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
-      const {getByText, getByPlaceholderText} = render(
+      const {getByTestId, getByPlaceholderText} = render(
         <GroupModal
           groupCategory={groupCategory}
           group={group}
@@ -154,13 +154,13 @@ describe('GroupModal', () => {
         />,
       )
       await user.type(getByPlaceholderText('Name'), 'foo')
-      expect(getByText('Save').closest('button').hasAttribute('disabled')).toBeFalsy()
+      expect(getByTestId('group-modal-save-button')).not.toHaveAttribute('disabled')
     })
 
     it('creates a non student organized group and reports status', async () => {
       fetchMock.postOnce(`path:/api/v1/group_categories/${groupCategory.id}/groups`, 200)
       const user = userEvent.setup(USER_EVENT_OPTIONS)
-      const {getByText, getAllByText, getByPlaceholderText} = render(
+      const {getByTestId, getAllByText, getByPlaceholderText} = render(
         <GroupModal
           groupCategory={groupCategory}
           group={group}
@@ -172,7 +172,7 @@ describe('GroupModal', () => {
         />,
       )
       await user.type(getByPlaceholderText('Name'), 'Teacher Organized')
-      await user.click(getByText('Save'))
+      await user.click(getByTestId('group-modal-save-button'))
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.method).toBe('POST')
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
@@ -191,7 +191,7 @@ describe('GroupModal', () => {
     it('creates a student organized group and reports status', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       fetchMock.postOnce(`path:/api/v1/group_categories/${groupCategory.id}/groups`, 200)
-      const {getByText, getAllByText, getByPlaceholderText} = render(
+      const {getByTestId, getAllByText, getByPlaceholderText} = render(
         <GroupModal
           groupCategory={groupCategory}
           group={{...group, role: 'student_organized'}}
@@ -203,7 +203,7 @@ describe('GroupModal', () => {
         />,
       )
       await user.type(getByPlaceholderText('Name'), 'Student Organized')
-      await user.click(getByText('Save'))
+      await user.click(getByTestId('group-modal-save-button'))
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.method).toBe('POST')
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
@@ -268,7 +268,7 @@ describe('GroupModal', () => {
     it('allows updating a non student organized group', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       fetchMock.putOnce(`path:/api/v1/groups/${group.id}`, 200)
-      const {getByText, getAllByText, getByPlaceholderText} = render(
+      const {getByTestId, getAllByText, getByPlaceholderText} = render(
         <GroupModal
           group={{...group, name: 'Teacher Organized'}}
           label="Edit Group"
@@ -281,7 +281,7 @@ describe('GroupModal', () => {
       await user.clear(getByPlaceholderText('Name'))
       await user.type(getByPlaceholderText('Name'), 'Beetle Juice')
       await user.type(getByPlaceholderText('Number'), '{selectall}{backspace}3')
-      await user.click(getByText('Save'))
+      await user.click(getByTestId('group-modal-save-button'))
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.method).toBe('PUT')
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
@@ -300,7 +300,7 @@ describe('GroupModal', () => {
     it('allows updating a student organized group', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       fetchMock.putOnce(`path:/api/v1/groups/${group.id}`, 200)
-      const {getByText, getAllByText, getByPlaceholderText} = render(
+      const {getByTestId, getAllByText, getByPlaceholderText} = render(
         <GroupModal
           group={{...group, name: 'Student Organized', role: 'student_organized'}}
           label="Edit Group"
@@ -312,7 +312,7 @@ describe('GroupModal', () => {
       )
       await user.clear(getByPlaceholderText('Name'))
       await user.type(getByPlaceholderText('Name'), 'Sleepy Hollow')
-      await user.click(getByText('Save'))
+      await user.click(getByTestId('group-modal-save-button'))
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.method).toBe('PUT')
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
@@ -330,7 +330,7 @@ describe('GroupModal', () => {
     it("allows updating a 'name only' group", async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       fetchMock.putOnce(`path:/api/v1/groups/${group.id}`, 200)
-      const {getByText, getAllByText, getByPlaceholderText} = render(
+      const {getByTestId, getAllByText, getByPlaceholderText} = render(
         <GroupModal
           group={{...group, name: 'nameOnly'}}
           label="Edit Group"
@@ -343,7 +343,7 @@ describe('GroupModal', () => {
       )
       await user.clear(getByPlaceholderText('Name'))
       await user.type(getByPlaceholderText('Name'), 'Name Only')
-      await user.click(getByText('Save'))
+      await user.click(getByTestId('group-modal-save-button'))
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.method).toBe('PUT')
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
@@ -360,7 +360,7 @@ describe('GroupModal', () => {
     it('resets group membership limit', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       fetchMock.putOnce(`path:/api/v1/groups/${group.id}`, 200)
-      const {getByText, getByPlaceholderText} = render(
+      const {getByTestId, getByPlaceholderText} = render(
         <GroupModal
           group={{...group, name: 'Empty Group Limit', group_limit: 2}}
           label="Edit Group"
@@ -372,7 +372,7 @@ describe('GroupModal', () => {
       )
       await user.type(getByPlaceholderText('Number'), '{selectall}{backspace}')
       expect(getByPlaceholderText('Number')).toHaveAttribute('value', '')
-      await user.click(getByText('Save'))
+      await user.click(getByTestId('group-modal-save-button'))
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.method).toBe('PUT')
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
