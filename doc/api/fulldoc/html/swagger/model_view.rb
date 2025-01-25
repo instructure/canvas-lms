@@ -33,6 +33,17 @@ class ModelView < HashView
     @deprecation_description = deprecation_description
   end
 
+  def self.new_from_schema(name, schema)
+    new(
+      name,
+      schema[:properties].deep_stringify_keys,
+      schema[:description] || "",
+      schema[:required] || [],
+      deprecated: schema[:deprecated],
+      deprecation_description: ""
+    )
+  end
+
   def self.new_from_model(model)
     lines = model.text.lines.to_a
     json = JSON.parse(lines[1..].join)
