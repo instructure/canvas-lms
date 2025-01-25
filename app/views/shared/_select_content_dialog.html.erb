@@ -48,7 +48,7 @@
         <% if !only || only.include?(:wiki_pages) %>
         <option value="wiki_page"><%= t :content_page_item, "Page" %></option>
         <% end %>
-        <% if !only || only.include?(:discussion_topics) %>
+        <% if (!only || only.include?(:discussion_topics)) && !@context.horizon_course? %>
         <option value="discussion_topic"><%= t :discussion_item, "Discussion" %></option>
         <% end %>
         <% if !only || only.include?(:sub_headers) %>
@@ -96,12 +96,14 @@
             <td><label for="content_tag_create_title"><%= before_label :page_name, "Page Name" %></label></td>
             <td><input type="text" name="title" id="content_tag_create_title" style="width: 120px;"/></td>
           </tr>
+          <% unless @context.horizon_course? %>
           <tr>
             <td colspan="2">
               <input type="checkbox" name="new_tab" id="external_url_create_new_tab" <%= "checked" if module_links_default_new_tab %> />
               <label for="external_url_create_new_tab"><%= t :new_tab, "Load in a new tab" %></label>
             </td>
           </tr>
+          <% end %>
         </table>
       </div>
       <% end %>
@@ -146,12 +148,14 @@
             <td><label for="external_tool_create_title"><%= before_label :page_name, "Page Name" %></label></td>
             <td><input type="text" name="title" id="external_tool_create_title" style="width: 120px;"/></td>
           </tr>
+          <% unless @context.horizon_course? %>
           <tr>
               <td colspan="2">
               <input type="checkbox" name="new_tab" id="external_tool_create_new_tab" <%= "checked" if module_links_default_new_tab %> />
               <label for="external_tool_create_new_tab"><%= t :new_tab, "Load in a new tab" %></label>
             </td>
           </tr>
+          <% end %>
         </table>
       </div>
       <% end %>
@@ -200,11 +204,14 @@
                 <div id="module_attachment_upload_form"></div>
                 <div id="module_attachment_upload_progress" style="display: none"></div>
               </td>
-            </tr><tr>
+            </tr>
+            <% unless @context.horizon_course? %>
+            <tr>
               <td>
                 <a href="<%= context_url(@context, :context_files_url, :format => :text) %>" style="display: none;" class="add_item_url">&nbsp;</a>
                 <%= before_label :folder, "Folder" %>
-              </td><td>
+              </td>
+              <td>
                 <% Folder.root_folders(@context) %>
                 <% folders = @context.active_folders.select([:id, :name, :parent_folder_id]).to_a %>
                 <% root_folders = folders.select{|f| f.parent_folder_id == nil} %>
@@ -213,6 +220,7 @@
                 </select>
               </td>
             </tr>
+            <% end %>
           </table>
         </div>
       </div>
