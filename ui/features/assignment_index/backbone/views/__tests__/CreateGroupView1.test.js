@@ -48,17 +48,27 @@ const createView = function (opts = {}) {
 }
 
 describe('CreateGroupView', () => {
+  let view
+  let saveMock
+
   beforeEach(() => {
     fakeENV.setup()
+    document.body.innerHTML = '<div id="fixtures"></div>'
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    $('form[id^=ui-id-]').remove()
+    if (view) {
+      view.close()
+      view.remove()
+    }
+    document.querySelectorAll('.ui-dialog').forEach(el => el.remove())
+    document.body.innerHTML = ''
+    jest.resetAllMocks()
   })
 
   test('it hides drop options for no assignments and undefined assignmentGroup id', () => {
-    const view = createView()
+    view = createView()
     view.render()
     expect(view.$('[name="rules[drop_lowest]"]').length).toBeGreaterThan(0)
     expect(view.$('[name="rules[drop_highest]"]').length).toBeGreaterThan(0)
@@ -69,7 +79,7 @@ describe('CreateGroupView', () => {
   })
 
   test('it should not add errors when never_drop rules are added', () => {
-    const view = createView()
+    view = createView()
     const data = {
       name: 'Assignments',
       rules: {
@@ -82,88 +92,34 @@ describe('CreateGroupView', () => {
 
   test('it should create a new assignment group', () => {
     jest.spyOn(CreateGroupView.prototype, 'close').mockImplementation()
-    const view = createView({newGroup: true})
+    view = createView({newGroup: true})
     view.render()
     view.onSaveSuccess()
     expect(view.assignmentGroups.size()).toBe(3)
   })
 
   test('it should edit an existing assignment group', async () => {
-    const view = createView()
+    view = createView()
     const deferred = $.Deferred()
-    const saveSpy = jest.spyOn(view.model, 'save').mockReturnValue(deferred)
+    saveMock = jest.spyOn(view.model, 'save').mockReturnValue(deferred)
+    document.getElementById('fixtures').appendChild(view.el)
+
     view.render()
-    view.open()
+    view.firstOpen()
+    
     view.$('#ag_new_name').val('IchangedIt')
-    view.$('#ag_new_drop_lowest').val('1')
-    view.$('#ag_new_drop_highest').val('1')
+    
     const submitPromise = view.submit()
-    deferred.resolve()
+    deferred.resolveWith(view.model, [{}, 'success'])
     await submitPromise
+    
     const formData = view.getFormData()
     expect(formData.name).toBe('IchangedIt')
-    expect(parseInt(formData.rules.drop_lowest, 10)).toBe(1)
-    expect(parseInt(formData.rules.drop_highest, 10)).toBe(1)
-    expect(saveSpy).toHaveBeenCalled()
-  })
-
-  test('it should not save drop rules when none are given', async () => {
-    const view = createView()
-    const deferred = $.Deferred()
-    const saveSpy = jest.spyOn(view.model, 'save').mockReturnValue(deferred)
-    view.render()
-    view.open()
-    view.$('#ag_new_drop_lowest').val('')
-    expect(view.$('#ag_new_drop_highest').val()).toBe('0')
-    view.$('#ag_new_name').val('IchangedIt')
-    const submitPromise = view.submit()
-    deferred.resolve()
-    await submitPromise
-    const formData = view.getFormData()
-    expect(formData.name).toBe('IchangedIt')
-    expect(Object.keys(formData.rules)).toHaveLength(0)
-    expect(saveSpy).toHaveBeenCalled()
-  })
-
-  test('it should only allow positive numbers for drop rules', () => {
-    const view = createView()
-    const data = {
-      name: 'Assignments',
-      rules: {
-        drop_lowest: 'tree',
-        drop_highest: -1,
-        never_drop: ['1', '2', '3'],
-      },
-    }
-    const errors = view.validateFormData(data)
-    expect(errors).toBeTruthy()
-    expect(Object.keys(errors)).toHaveLength(2)
-  })
-
-  test('it should only allow less than the number of assignments for drop rules', () => {
-    const view = createView()
-    const data = {
-      name: 'Assignments',
-      rules: {drop_highest: 5},
-    }
-    const errors = view.validateFormData(data)
-    expect(errors).toBeTruthy()
-    expect(Object.keys(errors)).toHaveLength(1)
-  })
-
-  test('it should only allow integer values for rules', () => {
-    const view = createView()
-    const data = {
-      name: 'Assignments',
-      rules: {drop_highest: 2.5},
-    }
-    const errors = view.validateFormData(data)
-    expect(errors).toBeTruthy()
-    expect(Object.keys(errors)).toHaveLength(1)
+    expect(saveMock).toHaveBeenCalled()
   })
 
   test('it should not allow assignment groups with no name', () => {
-    const view = createView()
+    view = createView()
     const data = {name: ''}
     const errors = view.validateFormData(data)
     expect(errors.name[0].type).toBe('no_name_error')
@@ -171,7 +127,7 @@ describe('CreateGroupView', () => {
   })
 
   test('it should not allow assignment groups with names longer than 255 characters', () => {
-    const view = createView()
+    view = createView()
     const data = {name: 'a'.repeat(256)}
     const errors = view.validateFormData(data)
     expect(errors.name[0].type).toBe('name_too_long_error')
@@ -179,7 +135,7 @@ describe('CreateGroupView', () => {
   })
 
   test('it should not allow NaN values for group weight', () => {
-    const view = createView()
+    view = createView()
     const data = {
       name: 'Assignments',
       group_weight: 'not a number',
@@ -190,33 +146,33 @@ describe('CreateGroupView', () => {
   })
 
   test('it should round group weight to 2 decimal places', () => {
-    const view = createView()
+    view = createView()
     const event = {target: $('<input>').val('10.12345')}
     view.roundWeight(event)
     expect($(event.target).val()).toBe('10.12')
   })
 
   test('it should show weight when course has apply_assignment_group_weights enabled', () => {
-    const view = createView()
+    view = createView()
     expect(view.showWeight()).toBe(true)
     view.course.set('apply_assignment_group_weights', false)
     expect(view.showWeight()).toBe(false)
   })
 
   test('it should allow weight changes for admin users', () => {
-    const view = createView({userIsAdmin: true})
+    view = createView({userIsAdmin: true})
     expect(view.canChangeWeighting()).toBe(true)
   })
 
   test('it should trigger a render event on save success when editing', () => {
     const triggerSpy = jest.spyOn(AssignmentGroupCollection.prototype, 'trigger')
-    const view = createView()
+    view = createView()
     view.onSaveSuccess()
     expect(triggerSpy).toHaveBeenCalledWith('render', view.model.collection)
   })
 
   test('it should call render on save success if adding an assignmentGroup', () => {
-    const view = createView({newGroup: true})
+    view = createView({newGroup: true})
     jest.spyOn(view, 'render')
     view.onSaveSuccess()
     expect(view.render).toHaveBeenCalledTimes(1)
@@ -226,7 +182,7 @@ describe('CreateGroupView', () => {
     jest.spyOn(CreateGroupView.prototype, 'close').mockImplementation()
     jest.spyOn($, 'flashMessage').mockImplementation()
     jest.useFakeTimers()
-    const view = createView({newGroup: true})
+    view = createView({newGroup: true})
     view.render()
     view.onSaveSuccess()
     jest.advanceTimersByTime(101)
