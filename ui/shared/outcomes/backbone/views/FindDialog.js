@@ -38,8 +38,9 @@ export default class FindDialog extends DialogBaseView {
       title: this.title,
       width: 1000,
       resizable: true,
-      close() {
+      close: () => {
         $('.find_outcome').focus()
+        this?.content?.innerView?.render()
       },
       buttons: [
         {
@@ -105,7 +106,9 @@ export default class FindDialog extends DialogBaseView {
     const model = this.sidebar.selectedModel()
     // add optional attributes for use in logic elsewhere
     if (this.content.setQuizMastery) {
-      model.quizMasteryLevel = parseFloat(this.$el.find('#outcome_mastery_at').val()) || 0
+      const quizMasteryLevel = this.content.innerView.validateOutcomeMasteryAtInput()
+      if (quizMasteryLevel == null) return
+      model.quizMasteryLevel = quizMasteryLevel
     }
     if (this.content.useForScoring) {
       model.useForScoring = this.$el.find('#outcome_use_for_scoring').prop('checked')

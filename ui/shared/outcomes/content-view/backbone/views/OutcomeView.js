@@ -31,6 +31,11 @@ import {addCriterionInfoButton} from '../../react/CriterionInfo'
 import 'jqueryui/dialog'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 import {raw} from '@instructure/html-escape'
+import {createRoot} from 'react-dom/client'
+import {createElement} from 'react';
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {TextInput} from '@instructure/ui-text-input'
 
 const I18n = createI18nScope('OutcomeView')
 
@@ -339,7 +344,54 @@ export default class OutcomeView extends OutcomeContentBase {
     this.$('input:first').focus()
     this.screenreaderTitleFocus()
     this._afterRender()
+
+    this._outcomeMasteryAtContainer = (() => {
+      const container = this.$('#outcome_mastery_at_container')[0]
+      if(!container) return
+      return createRoot(container)
+    })()
+
+    this._renderOutcomeMasteryAtInput()
+
     return this
+  }
+
+  _renderOutcomeMasteryAtInput(errorType) {
+    const errorMessage = {
+      'NaNError': {type: 'newError', text: I18n.t('mastery_at_nan_error', 'Must be a number')},
+      'rangeError': {type: 'newError', text: I18n.t('mastery_at_range_error', 'Must be between 1 and 99')},
+    }[errorType]
+    this._outcomeMasteryAtContainer?.render(createElement(View, { as:'div', margin: 'small' },
+      createElement(TextInput, {
+        name: 'mastery_at',
+        id: 'outcome_mastery_at',
+        renderLabel: ()=> createElement(Text, { weight: 'normal' }, 'Set mastery for any score at or above'),
+        defaultValue: '60',
+        width: '36ch',
+        renderAfterInput: ()=> createElement('div', {}, '%'),
+        messages: [
+          {type: 'hint', text: I18n.t('mastery_at_hint', 'Must be between 1 and 99')},
+          ...(errorMessage ? [errorMessage] : [])
+        ]
+      })
+    ))
+  }
+
+  validateOutcomeMasteryAtInput(){
+    const input = this.$('#outcome_mastery_at')[0]
+    if (!input) return null
+    const value = parseFloat(input.value)
+    if (isNaN(value)) {
+      this._renderOutcomeMasteryAtInput('NaNError')
+      input.focus()
+      return null
+    }
+    if(value < 1 || value > 99) {
+      this._renderOutcomeMasteryAtInput('rangeError')
+      input.focus()
+      return null
+    }
+    return input.value
   }
 }
 OutcomeView.initClass()
