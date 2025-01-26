@@ -28,6 +28,7 @@ import 'jquery-tinypubsub'
 import '@canvas/util/jquery/fixDialogButtons'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
+import {windowAlert} from '@canvas/util/globalUtils'
 
 // # this is a partial needed by the 'SetDefaultGradeDialog' template
 // # since you cant declare a dependency in a handlebars file, we need to do it here
@@ -46,10 +47,6 @@ const DEFAULT_GRADE_WITH_CHECKPOINTS_INFO_MOUNT_POINT =
 const noop = function () {}
 const slice = [].slice
 
-const alertProxy = function (message) {
-  return window.alert(message)
-}
-
 function SetDefaultGradeDialog(arg) {
   let ref, ref1, ref2
   this.assignment = arg.assignment
@@ -59,7 +56,7 @@ function SetDefaultGradeDialog(arg) {
   this.selected_section = arg.selected_section
   this.onClose = (ref = arg.onClose) != null ? ref : noop
   this.page_size = (ref1 = arg.page_size) != null ? ref1 : 50
-  this.alert = (ref2 = arg.alert) != null ? ref2 : alertProxy
+  this.alert = (ref2 = arg.alert) != null ? ref2 : windowAlert
   this.show = this.show.bind(this)
 }
 
