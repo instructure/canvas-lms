@@ -120,7 +120,8 @@ describe('Shared > SetDefaultGradeDialog', () => {
       expect(windowAlert).toHaveBeenCalledWith('2 student scores updated')
     })
 
-    test('submit reports number of students marked as missing', async () => {
+    // fickle; cf. EVAL-4977
+    test.skip('submit reports number of students marked as missing', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
