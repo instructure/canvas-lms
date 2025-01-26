@@ -280,14 +280,13 @@ export const CommonMigratorControls = ({
       {canSelectContent && (
         <View as="div" margin="medium none none none" width="100%" maxWidth="28.75rem">
           <RadioInputGroup
-            name={I18n.t('Selective import')}
+            name="selective_import"
             description={I18n.t('Content')}
             defaultValue="non_selective"
             isRequired
             messages={contentError ? [{text: I18n.t('You must choose a content option'), type: 'newError'}] : []}
           >
             <RadioInput
-              name="selective_import"
               value="non_selective"
               label={allContentText}
               onChange={(e: React.SyntheticEvent<Element, Event>) => {
@@ -313,7 +312,6 @@ export const CommonMigratorControls = ({
               ) : null}
             </>
             <RadioInput
-              name="selective_import"
               value="selective"
               label={I18n.t('Select specific content')}
               onChange={(e: React.SyntheticEvent<Element, Event>) => {
