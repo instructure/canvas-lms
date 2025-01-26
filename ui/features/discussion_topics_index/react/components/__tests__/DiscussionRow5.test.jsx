@@ -259,7 +259,7 @@ describe('DiscussionRow', () => {
     expect(allKeys[1].textContent.includes('discussion_topic_menu otherText')).toBe(true)
   })
 
-  it('renders the further available until date for ungraded overrides', () => {
+  it('renders the latest available until date for ungraded overrides', () => {
     const futureDate = new Date('2027-01-17T00:00:00Z')
     const furtherFutureDate = new Date('2028-01-17T00:00:00Z')
     const discussion = {
@@ -270,18 +270,12 @@ describe('DiscussionRow', () => {
     }
     render(<DiscussionRow {...makeProps({discussion})} />)
 
-    // Find all elements that contain text starting with "Available until"
-    const availabilityElements = screen.getAllByText(/^Available until/)
-    expect(availabilityElements.length).toBeGreaterThan(0)
+    // Find element that contains text starting with "Available until"
+    const availabilityElement = screen.getByText(/^Available until/)
+    expect(availabilityElement).toBeInTheDocument()
 
-    // Get all text content that includes "Available until"
-    const availabilityTexts = availabilityElements.map(el => el.textContent)
-
-    // Verify at least one of them has the later date
-    const hasLaterDate = availabilityTexts.some(text => {
-      const formattedDate = dateFormatter(furtherFutureDate)
-      return text.includes(formattedDate)
-    })
-    expect(hasLaterDate).toBe(true)
+    // Verify it has the latest date
+    const formattedDate = dateFormatter(furtherFutureDate)
+    expect(availabilityElement.textContent).toContain(formattedDate)
   })
 })
