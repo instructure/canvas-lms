@@ -21,6 +21,11 @@ import 'jquery-migrate'
 import {http} from 'msw'
 import {setupServer} from 'msw/node'
 import SetDefaultGradeDialog from '../SetDefaultGradeDialog'
+import {windowAlert} from '@canvas/util/globalUtils'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  windowAlert: jest.fn(),
+}))
 
 const server = setupServer()
 
@@ -45,6 +50,7 @@ describe('Shared > SetDefaultGradeDialog', () => {
       name: 'an Assignment',
       points_possible: 10,
     }
+    windowAlert.mockClear()
   })
 
   afterEach(() => {
@@ -57,6 +63,7 @@ describe('Shared > SetDefaultGradeDialog', () => {
       }
     }
     server.resetHandlers()
+    jest.clearAllMocks()
   })
 
   function getDialog() {
@@ -65,7 +72,6 @@ describe('Shared > SetDefaultGradeDialog', () => {
 
   describe('submit behaviors', () => {
     const context_id = '1'
-    let alert
 
     function clickSetDefaultGrade() {
       const buttons = Array.from(getDialog().querySelectorAll('button[role="button"]'))
@@ -75,8 +81,7 @@ describe('Shared > SetDefaultGradeDialog', () => {
 
     function setupSubmissionHandler(payload) {
       server.use(
-        http.post(`/courses/${context_id}/gradebook/update_submission`, async ({request}) => {
-          const formData = await request.formData()
+        http.post(`/courses/${context_id}/gradebook/update_submission`, () => {
           return new Response(JSON.stringify(payload), {
             headers: {'Content-Type': 'application/json'},
           })
@@ -85,7 +90,6 @@ describe('Shared > SetDefaultGradeDialog', () => {
     }
 
     beforeEach(() => {
-      alert = jest.fn()
       jest.spyOn($, 'publish').mockImplementation(jest.fn())
     })
 
@@ -103,7 +107,6 @@ describe('Shared > SetDefaultGradeDialog', () => {
         assignment,
         students,
         context_id,
-        alert,
       })
 
       dialog.show()
@@ -114,7 +117,7 @@ describe('Shared > SetDefaultGradeDialog', () => {
 
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      expect(alert).toHaveBeenCalledWith('2 student scores updated')
+      expect(windowAlert).toHaveBeenCalledWith('2 student scores updated')
     })
 
     test('submit reports number of students marked as missing', async () => {
@@ -131,7 +134,6 @@ describe('Shared > SetDefaultGradeDialog', () => {
         assignment,
         students,
         context_id,
-        alert,
       })
 
       dialog.show()
@@ -144,7 +146,7 @@ describe('Shared > SetDefaultGradeDialog', () => {
       // Wait for the alert to be called
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      expect(alert).toHaveBeenCalledWith('2 students marked as missing')
+      expect(windowAlert).toHaveBeenCalledWith('2 students marked as missing')
     })
 
     test('submit ignores the missing shortcut when the shortcut feature flag is disabled', async () => {
@@ -161,7 +163,6 @@ describe('Shared > SetDefaultGradeDialog', () => {
         assignment,
         students,
         context_id,
-        alert,
       })
 
       dialog.show()
@@ -172,7 +173,7 @@ describe('Shared > SetDefaultGradeDialog', () => {
 
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      expect(alert).toHaveBeenCalledWith('2 student scores updated')
+      expect(windowAlert).toHaveBeenCalledWith('2 student scores updated')
     })
 
     test('submit reports number of students when api includes duplicates due to group assignments', async () => {
@@ -192,7 +193,6 @@ describe('Shared > SetDefaultGradeDialog', () => {
         students,
         context_id,
         page_size: 2,
-        alert,
       })
 
       dialog.show()
@@ -203,7 +203,7 @@ describe('Shared > SetDefaultGradeDialog', () => {
 
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      expect(alert).toHaveBeenCalledWith('4 student scores updated')
+      expect(windowAlert).toHaveBeenCalledWith('4 student scores updated')
     })
   })
 })
