@@ -48,11 +48,7 @@
 {{/unless}}
 
 {{#if setQuizMastery}}
-  <label for="outcome_mastery_at">
-    {{#t "mastery_at_label"}}Set mastery for any score at or above:{{/t}}
-    <input type="text" name="mastery_at" id="outcome_mastery_at" value="60" />
-    %
-  </label>
+  <span id="outcome_mastery_at_container"></span>
 {{else}}
   {{#if useForScoring}}
     <label for="outcome_use_for_scoring">
