@@ -609,11 +609,11 @@ describe "content migrations", :non_parallel do
       tool
     end
 
-    it "shows LTI tools with migration_selection in the select control", skip: "LTI not implemented" do
+    it "shows LTI tools with migration_selection in the select control" do
       import_tool
       other_tool
       visit_page
-      migration_type_options = CourseCopyPage.migration_type_options
+      migration_type_options = NewContentMigrationPage.migration_type_options
       migration_type_values = migration_type_options.pluck("value")
       migration_type_texts = migration_type_options.map(&:text)
       expect(migration_type_values).to include(import_tool.asset_string)
