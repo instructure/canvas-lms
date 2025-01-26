@@ -645,7 +645,7 @@ describe "content migrations", :non_parallel do
       expect(NewContentMigrationPage.file_name_label).to include_text "lti embedded link"
     end
 
-    it "has content selection option", skip: "LTI not implemented" do
+    it "has content selection option" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
