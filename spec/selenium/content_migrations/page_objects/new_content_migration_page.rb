@@ -30,6 +30,10 @@ class NewContentMigrationPage
       '[data-cid="BaseButton Button"]'
     end
 
+    def migration_type_options
+      INSTUI_Select_options('[data-testid="select-content-type-dropdown"]')
+    end
+
     # Selectors
     def migration_type_dropdown
       f("#Select_0")
