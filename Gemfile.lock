@@ -481,7 +481,7 @@ GEM
     db-query-matchers (0.14.0)
       activesupport (>= 4.0, < 8.1)
       rspec (>= 3.0)
-    debug (1.9.2)
+    debug (1.10.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
@@ -1266,7 +1266,7 @@ DEPENDENCIES
   database_cleaner (~> 2.0)
   datadog (~> 2.1)
   db-query-matchers (~> 0.12)
-  debug (~> 1.8)
+  debug (~> 1.10)
   diigo!
   diplomat (~> 2.6)
   docx (~> 0.8)
