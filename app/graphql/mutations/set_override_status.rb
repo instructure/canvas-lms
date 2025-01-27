@@ -32,14 +32,17 @@ module Mutations
         raise GraphQL::ExecutionError, I18n.t("Insufficient permissions")
       end
 
-      if score.update(custom_grade_status: custom_grade_status(input:))
-        InstStatsd::Statsd.distributed_increment("custom_grade_status.applied_to.final_grade")
-        { grades: score }
-      else
-        errors_for(score)
-      end
+      enrollment = Enrollment.find_by(id: input[:enrollment_id])
+      custom_grade_status = get_custom_grade_status(input:)
+      grading_period_id = input[:grading_period_id]
+
+      updated_score = enrollment.update_override_status(custom_grade_status:, grading_period_id:)
+      InstStatsd::Statsd.distributed_increment("custom_grade_status.applied_to.final_grade")
+      { grades: updated_score }
     rescue ActiveRecord::RecordNotFound => e
       raise GraphQL::ExecutionError, "#{e.model} not found"
+    rescue ActiveRecord::RecordInvalid => e
+      errors_for(e.record)
     end
 
     private
@@ -54,7 +57,7 @@ module Mutations
       )
     end
 
-    def custom_grade_status(input:)
+    def get_custom_grade_status(input:)
       id = input[:custom_grade_status_id]
 
       return nil if id.blank?
