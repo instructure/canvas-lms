@@ -62,6 +62,21 @@ module VisibilitySqlHelper
       SQL
     end
 
+    def assignment_override_non_collaborative_group_join_sql(id_column_name:)
+      <<~SQL.squish
+        INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+          ON (ao.#{id_column_name} = o.id OR m.id = ao.context_module_id)
+          AND ao.set_type = 'Group'
+          AND ao.workflow_state = 'active'
+        INNER JOIN #{Group.quoted_table_name} g
+          ON g.id = ao.set_id
+          AND g.non_collaborative = TRUE
+        INNER JOIN #{GroupMembership.quoted_table_name} gm
+          ON gm.group_id = g.id
+          AND gm.user_id = e.user_id
+      SQL
+    end
+
     def section_override_filter_sql(filter_condition_sql:)
       <<~SQL.squish
         WHERE #{filter_condition_sql}
@@ -99,11 +114,35 @@ module VisibilitySqlHelper
       SQL
     end
 
-    def assignment_override_unassign_section_filter_sql(filter_condition_sql:)
+    def assignment_override_unassign_non_collaborative_group_join_sql(id_column_name:)
+      <<~SQL.squish
+        INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+          ON o.id = ao.#{id_column_name}
+          AND ao.set_type = 'Group'
+          AND ao.workflow_state = 'active'
+        INNER JOIN #{Group.quoted_table_name} g
+          ON g.id = ao.set_id
+          AND g.non_collaborative = TRUE
+        INNER JOIN #{GroupMembership.quoted_table_name} gm
+          ON gm.group_id = g.id
+          AND gm.user_id = e.user_id
+      SQL
+    end
+
+    def assignment_override_non_collaborative_group_filter_sql(filter_condition_sql:)
       <<~SQL.squish
         WHERE #{filter_condition_sql}
         AND o.workflow_state NOT IN ('deleted','unpublished')
-        AND ao.unassign_item = TRUE
+        AND (m.id IS NOT NULL OR o.only_visible_to_overrides = 'true')
+        AND ao.unassign_item = FALSE
+      SQL
+    end
+
+    def assignment_override_unassign_filter_sql(filter_condition_sql:)
+      <<~SQL.squish
+        WHERE #{filter_condition_sql}
+          AND o.workflow_state NOT IN ('deleted','unpublished')
+          AND ao.unassign_item = TRUE
       SQL
     end
 
@@ -170,6 +209,15 @@ module VisibilitySqlHelper
           AND o.workflow_state NOT IN ('deleted','unpublished')
           AND ao.workflow_state = 'active'
       SQL
+    end
+
+    def assign_to_differentiation_tags_enabled?(course_ids)
+      return false if course_ids.blank?
+
+      account_ids = Course.where(id: course_ids).distinct.pluck(:account_id).uniq
+      accounts = Account.where(id: account_ids).to_a
+
+      accounts.any? { |account| account.feature_enabled?(:assign_to_differentiation_tags) }
     end
 
     def full_section_with_left_joins_sql(filter_condition_sql:, id_column_name:, content_tag_type:)
