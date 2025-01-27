@@ -908,4 +908,55 @@ describe "people" do
 
     expect(f("#courses")).to_not contain_css(".unenroll_link")
   end
+
+  context "Differentiation Tags" do
+    context "Differentiation tags Tray" do
+      before :once do
+        course_with_teacher active_user: true, active_course: true, active_enrollment: true, name: "Mrs. Commanderson"
+        @student = create_user("student@test.com")
+        enroll_student(@student)
+        Account.default.enable_feature!(:differentiation_tags)
+      end
+
+      before do
+        user_session @teacher
+      end
+
+      it "renders the Manage Tags Button if the FF is on" do
+        get "/courses/#{@course.id}/users"
+        expect(fj("button:contains('Manage Tags')")).to be_displayed
+      end
+
+      it "does not render the Manage Tags Button if the FF is off" do
+        Account.default.disable_feature!(:differentiation_tags)
+        get "/courses/#{@course.id}/users"
+        expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
+      end
+
+      it "does not render the Manage Tags Button if the user does not have permissions (as a TA)" do
+        course_with_ta(active_all: true)
+        user_session @ta
+        get "/courses/#{@course.id}/users"
+        expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
+      end
+
+      it "opens the Tray when the Manage Tags Button is clicked" do
+        get "/courses/#{@course.id}/users"
+        fj("button:contains('Manage Tags')").click
+        expect(fj("h2:contains('Manage Tags')")).to be_displayed
+      end
+
+      it "closes the Tray when the close button is clicked" do
+        get "/courses/#{@course.id}/users"
+        fj("button:contains('Manage Tags')").click
+        wait_for_ajaximations
+        expect(fj("h2:contains('Manage Tags')")).to be_displayed
+        fj("button:contains('Close Differentiation Tag Tray')").click
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss("h2:contains('Manage Tags')")
+        # Verify that focus returns to the element that opened the Tray
+        check_element_has_focus(fj("button:contains('Manage Tags')"))
+      end
+    end
+  end
 end
