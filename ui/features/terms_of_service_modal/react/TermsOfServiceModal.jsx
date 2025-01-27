@@ -98,7 +98,7 @@ export default class TermsOfServiceModal extends React.Component {
   }
 
   render() {
-    const linkThemeOverrides = this.props.footerLink ? {
+    const linkThemeOverrides = this.props.footerLink && window.CANVAS_ACTIVE_BRAND_VARIABLES ? {
       color: window.CANVAS_ACTIVE_BRAND_VARIABLES['ic-brand-font-color-dark-lightened-15']
     } : {}
 
