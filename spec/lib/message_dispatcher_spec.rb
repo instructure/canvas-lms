@@ -21,7 +21,7 @@
 describe "MessageDispatcher" do
   describe ".dispatch" do
     before do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       message_model(dispatch_at: Time.zone.now, workflow_state: "staged", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email")
     end
 
@@ -51,7 +51,7 @@ describe "MessageDispatcher" do
       worker = MessageDispatcher::DeliverWorker.new(message)
       expect { worker.perform }.to raise_error(Delayed::RetriableError)
 
-      expect(InstStatsd::Statsd).to have_received(:increment).with("MessageDispatcher.dispatch.failed")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("MessageDispatcher.dispatch.failed")
     end
   end
 

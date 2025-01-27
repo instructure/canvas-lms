@@ -32,9 +32,9 @@ describe "CanvasCache::Redis", if: Canvas.redis_enabled? do
   end
 
   it "logs to statsd on error" do
-    expect(InstStatsd::Statsd).to receive(:increment).with("redis.errors.all")
-    expect(InstStatsd::Statsd).to receive(:increment).with("redis.errors.redis://doesntexist:9873/1", anything)
-    expect(InstStatsd::Statsd).to receive(:increment).with("errors.warn", anything).at_least(:once)
+    expect(InstStatsd::Statsd).to receive(:distributed_increment).with("redis.errors.all")
+    expect(InstStatsd::Statsd).to receive(:distributed_increment).with("redis.errors.redis://doesntexist:9873/1", anything)
+    expect(InstStatsd::Statsd).to receive(:distributed_increment).with("errors.warn", anything).at_least(:once)
     store.read("foo")
   end
 end

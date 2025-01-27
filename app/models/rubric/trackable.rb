@@ -31,14 +31,14 @@ class Rubric
 
       if new_record?
         if is_duplicate
-          InstStatsd::Statsd.increment("#{context.class.to_s.downcase}.rubrics.duplicated_#{version}")
+          InstStatsd::Statsd.distributed_increment("#{context.class.to_s.downcase}.rubrics.duplicated_#{version}")
         elsif rubric_imports_id.present?
-          InstStatsd::Statsd.increment("#{context.class.to_s.downcase}.rubrics.csv_imported")
+          InstStatsd::Statsd.distributed_increment("#{context.class.to_s.downcase}.rubrics.csv_imported")
         else
-          InstStatsd::Statsd.increment("#{context.class.to_s.downcase}.rubrics.created_#{version}")
+          InstStatsd::Statsd.distributed_increment("#{context.class.to_s.downcase}.rubrics.created_#{version}")
         end
       elsif is_manually_update
-        InstStatsd::Statsd.increment("#{context.class.to_s.downcase}.rubrics.updated_#{version}")
+        InstStatsd::Statsd.distributed_increment("#{context.class.to_s.downcase}.rubrics.updated_#{version}")
       end
     end
   end

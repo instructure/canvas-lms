@@ -209,12 +209,12 @@ describe DeveloperKeysController do
 
         context "when request fails" do
           before do
-            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(InstStatsd::Statsd).to receive(:distributed_increment)
           end
 
           it "reports error metric" do
             get :index, params: { account_id: Account.last.id + 2, format: "json" }
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "index", code: 404 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "index", code: 404 })
             expect(response).to be_not_found
           end
         end
@@ -251,7 +251,7 @@ describe DeveloperKeysController do
 
       context "when request errors" do
         before do
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
         end
 
         context "when request fails" do
@@ -262,7 +262,7 @@ describe DeveloperKeysController do
 
           it "reports error metric with code 500" do
             post :create, params: create_params
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "create", code: 500 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "create", code: 500 })
           end
         end
 
@@ -279,7 +279,7 @@ describe DeveloperKeysController do
 
           it "reports error metric with code 400" do
             post :create, params: create_params
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "create", code: 400 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "create", code: 400 })
           end
         end
       end
@@ -337,14 +337,14 @@ describe DeveloperKeysController do
 
       context "when request errors" do
         before do
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
         end
 
         context "when key is not found" do
           it "reports error metric with code 404" do
             put :update, params: { id: dk.id + 1, developer_key: { name: "update key" }, account_id: Account.site_admin.id }
             expect(response).to be_not_found
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "update", code: 404 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "update", code: 404 })
           end
         end
 
@@ -356,14 +356,14 @@ describe DeveloperKeysController do
 
           it "reports error metric with code 500" do
             put :update, params: { id: dk.id, developer_key: { name: "update key" }, account_id: Account.site_admin.id }
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "update", code: 500 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "update", code: 500 })
           end
         end
 
         context "when key validation fails" do
           it "reports error metric with code 400" do
             put :update, params: { id: dk.id, developer_key: { scopes: ["bad_scope"] }, account_id: Account.site_admin.id }
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "update", code: 400 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "update", code: 400 })
           end
         end
       end
@@ -429,14 +429,14 @@ describe DeveloperKeysController do
 
       context "when request errors" do
         before do
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
         end
 
         context "when key is not found" do
           it "reports error metric with code 404" do
             delete :destroy, params: { id: dk.id + 1, account_id: Account.site_admin.id }
             expect(response).to be_not_found
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "destroy", code: 404 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "destroy", code: 404 })
           end
         end
 
@@ -448,7 +448,7 @@ describe DeveloperKeysController do
 
           it "reports error metric with code 500" do
             delete :destroy, params: { id: dk.id, account_id: Account.site_admin.id }
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "destroy", code: 500 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "destroy", code: 500 })
           end
         end
       end

@@ -120,12 +120,12 @@ class RequestThrottle
     elsif blocked?(request)
       # blocking is useful even if throttling is disabled, this is left in intentionally
       Rails.logger.info("blocking request due to blocklist, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
-      InstStatsd::Statsd.increment("request_throttling.blocked")
+      InstStatsd::Statsd.distributed_increment("request_throttling.blocked")
       false
     else
       if bucket.full?
         if RequestThrottle.enabled?
-          InstStatsd::Statsd.increment("request_throttling.throttled")
+          InstStatsd::Statsd.distributed_increment("request_throttling.throttled")
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
           return false
         else

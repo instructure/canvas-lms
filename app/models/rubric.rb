@@ -134,7 +134,7 @@ class Rubric < ActiveRecord::Base
     # remove this and 'unarchive' method when feature flag is removed
     return unless enhanced_rubrics_enabled?
 
-    InstStatsd::Statsd.increment("#{context.class.to_s.downcase}.rubrics.archived")
+    InstStatsd::Statsd.distributed_increment("#{context.class.to_s.downcase}.rubrics.archived")
     super
   end
 

@@ -1192,10 +1192,10 @@ describe CoursePacesController do
       end
 
       it "does not increment when the course pace delete api endpoint is called" do
-        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
 
         delete :destroy, params: { course_id: @course.id, id: @course_pace.id }
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course_pacing.deleted_course_pace")
+        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course_pacing.deleted_course_pace")
       end
 
       context "with fallback paces" do

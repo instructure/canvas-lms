@@ -501,6 +501,6 @@ class Lti::ResourceLinksController < ApplicationController
 
   def report_error(exception, code = nil)
     code ||= response_code_for_rescue(exception) if exception
-    InstStatsd::Statsd.increment("canvas.lti_resource_links_controller.request_error", tags: { action: action_name, code: })
+    InstStatsd::Statsd.distributed_increment("canvas.lti_resource_links_controller.request_error", tags: { action: action_name, code: })
   end
 end

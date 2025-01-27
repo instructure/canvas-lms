@@ -111,12 +111,12 @@ describe "CommunicationChannels API", type: :request do
     end
 
     it "registers user if skip_confirmation is truthy" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       json = api_call(:post, @path, @path_options, @post_params)
       channel = CommunicationChannel.find(json["id"])
       channel.update(workflow_state: "retired")
       api_call(:post, @path, @path_options, @post_params.merge({ skip_confirmation: 1 }))
-      expect(InstStatsd::Statsd).to have_received(:increment).once.with("communication_channels.create.skip_confirmation")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("communication_channels.create.skip_confirmation")
 
       expect(channel.reload.workflow_state).to eq "active"
       expect(@someone.reload.registered?).to be_truthy

@@ -110,7 +110,7 @@ module IncomingMail
       ndr_subject = I18n.t("Undelivered message")
       ndr_body = case error
                  when IncomingMail::Errors::ReplyToDeletedDiscussion
-                   InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.reply_to_deleted_discussion")
+                   InstStatsd::Statsd.distributed_increment("incoming_mail_processor.message_processing_error.reply_to_deleted_discussion")
                    I18n.t(<<~TEXT, subject:).gsub(/^ +/, "")
                      The message titled "%{subject}" could not be delivered because the discussion topic has been deleted. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
@@ -118,7 +118,7 @@ module IncomingMail
                      Canvas Support
                    TEXT
                  when IncomingMail::Errors::ReplyToLockedTopic
-                   InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.reply_to_locked_topic")
+                   InstStatsd::Statsd.distributed_increment("incoming_mail_processor.message_processing_error.reply_to_locked_topic")
                    I18n.t("lib.incoming_message_processor.locked_topic.body", <<~TEXT, subject:).gsub(/^ +/, "")
                      The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
@@ -126,7 +126,7 @@ module IncomingMail
                      Canvas Support
                    TEXT
                  when IncomingMail::Errors::UnknownSender
-                   InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.unknown_sender")
+                   InstStatsd::Statsd.distributed_increment("incoming_mail_processor.message_processing_error.unknown_sender")
                    I18n.t(<<~TEXT, subject:, link: I18n.t(:"community.guides_home")).gsub(/^ +/, "")
                      The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address. You may also contact this person via the Canvas Inbox. For help, please see the Inbox chapter for your user role in the Canvas Guides. [See %{link}].
 
@@ -134,7 +134,7 @@ module IncomingMail
                      Canvas Support
                    TEXT
                  when IncomingMail::Errors::UserSuspended
-                   InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.user_suspended")
+                   InstStatsd::Statsd.distributed_increment("incoming_mail_processor.message_processing_error.user_suspended")
                    I18n.t(<<~TEXT, subject:).gsub(/^ +/, "")
                      The message you sent with the subject line "%{subject}" was not delivered because your account has been suspended.
 
@@ -142,7 +142,7 @@ module IncomingMail
                      Canvas Support
                    TEXT
                  when IncomingMail::Errors::InvalidParticipant
-                   InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.invalid_participant")
+                   InstStatsd::Statsd.distributed_increment("incoming_mail_processor.message_processing_error.invalid_participant")
                    I18n.t(<<~TEXT, subject:).gsub(/^ +/, "")
                      The message you sent with the subject line "%{subject}" was not delivered because you are not a valid participant in the conversation.
 
@@ -150,7 +150,7 @@ module IncomingMail
                      Canvas Support
                    TEXT
                  else # including IncomingMessageProcessor::UnknownAddressError
-                   InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.catch_all")
+                   InstStatsd::Statsd.distributed_increment("incoming_mail_processor.message_processing_error.catch_all")
                    error_info = { tags: { type: :message_processing_error_catch_all }, extra: { ref: get_ref_uuid } }
                    Canvas::Errors.capture(error, error_info, :error)
                    I18n.t("lib.incoming_message_processor.failure_message.body", <<~TEXT, subject:, ref: error_info.dig(:extra, :ref)).to_s.gsub(/^ +/, "")
