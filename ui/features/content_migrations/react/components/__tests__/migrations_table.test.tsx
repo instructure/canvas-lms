@@ -82,8 +82,8 @@ describe('ContentMigrationTable', () => {
     it('renders the table', () => {
       renderComponent({})
 
-      const headers = Array.from(document.querySelectorAll('span[as="th"]')).map(e => e.textContent)
-      const data = Array.from(document.querySelectorAll('span[as="td"]')).map(e => e.textContent)
+      const headers = Array.from(document.querySelectorAll('[role="cell"] strong')).map(e => e.textContent)
+      const data = Array.from(document.querySelectorAll('[role="cell"]')).map(e => e.textContent)
 
       expect(headers).toEqual([
         'Content Type',
@@ -94,12 +94,12 @@ describe('ContentMigrationTable', () => {
         'Action',
       ])
       expect(data).toEqual([
-        'Copy a Canvas Course',
-        'Other course',
-        'Apr 15 at 9:11pm',
-        'Waiting for selection',
-        'Select content',
-        '',
+        'Content Type: Copy a Canvas Course',
+        'Source Link: Other course',
+        'Date Imported: Apr 15 at 9:11pm',
+        'Status: Waiting for selection',
+        'Progress: Select content',
+        'Action: ',
       ])
     })
 

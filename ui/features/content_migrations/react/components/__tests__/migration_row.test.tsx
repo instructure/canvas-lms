@@ -20,6 +20,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import MigrationRow from '../migration_row'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {Table} from '@instructure/ui-table'
 
 jest.mock('../utils', () => ({
   timeout: (_delay: number) => {
@@ -76,27 +77,20 @@ jest.mock('@canvas/do-fetch-api-effect')
 
 const updateMigrationItem = jest.fn()
 
-const renderComponent = (overrideProps?: any) =>
+const renderComponent = (overrideProps?: any) => {
+  const layout = overrideProps?.layout || 'auto'
   render(
-    <table>
-      <tbody>
+    <Table layout={layout}>
+      <Table.Body>
         <MigrationRow
           migration={migration}
           updateMigrationItem={updateMigrationItem}
           {...overrideProps}
         />
-      </tbody>
-    </table>,
+      </Table.Body>
+    </Table>
   )
-
-const renderCondensedComponent = (overrideProps?: any) =>
-  render(
-    <MigrationRow
-      migration={migration}
-      updateMigrationItem={updateMigrationItem}
-      {...overrideProps}
-    />,
-  )
+}
 
 describe('MigrationRow', () => {
   afterEach(() => {
@@ -104,13 +98,13 @@ describe('MigrationRow', () => {
   })
 
   it('renders the proper view if extended', async () => {
-    renderComponent({view: 'extended'})
+    renderComponent()
     await waitFor(() => expect(screen.getByText('Copy a Canvas Course').tagName).toEqual('TD'))
   })
 
   it('renders the proper view if condensed', async () => {
-    renderCondensedComponent({view: 'condensed'})
-    await waitFor(() => expect(screen.getByText('Copy a Canvas Course').tagName).toEqual('SPAN'))
+    renderComponent({layout: 'stacked'})
+    await waitFor(() => expect(screen.getByText('Copy a Canvas Course').tagName).toEqual('DIV'))
   })
 
   it('polls for progress when appropriate', async () => {
