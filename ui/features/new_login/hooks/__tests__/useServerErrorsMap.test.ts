@@ -23,11 +23,11 @@ describe('useServerErrorsMap', () => {
   it('returns default error messages without a password policy', () => {
     const {result} = renderHook(() => useServerErrorsMap())
 
-    expect(result.current['user.name.blank']).toBe('Please enter your name.')
-    expect(result.current['pseudonym.password.too_short']).toBe(
+    expect(result.current['user.name.blank']?.()).toBe('Please enter your name.')
+    expect(result.current['pseudonym.password.too_short']?.()).toBe(
       'Password does not meet the length requirement.',
     )
-    expect(result.current['pseudonym.password.too_long']).toBe(
+    expect(result.current['pseudonym.password.too_long']?.()).toBe(
       'Password exceeds the allowed length.',
     )
   })
@@ -41,16 +41,16 @@ describe('useServerErrorsMap', () => {
     }
     const {result} = renderHook(() => useServerErrorsMap(passwordPolicy))
 
-    expect(result.current['pseudonym.password.too_short']).toBe(
+    expect(result.current['pseudonym.password.too_short']?.()).toBe(
       'Password must be at least 8 characters.',
     )
-    expect(result.current['pseudonym.password.too_long']).toBe(
+    expect(result.current['pseudonym.password.too_long']?.()).toBe(
       'Password cannot exceed 50 characters.',
     )
-    expect(result.current['pseudonym.password.repeated']).toBe(
+    expect(result.current['pseudonym.password.repeated']?.()).toBe(
       'Password cannot have the same character more than 3 times in a row.',
     )
-    expect(result.current['pseudonym.password.sequence']).toBe(
+    expect(result.current['pseudonym.password.sequence']?.()).toBe(
       'Password cannot include a sequence of 4 or more characters (e.g., “abcdef”).',
     )
   })
@@ -58,10 +58,10 @@ describe('useServerErrorsMap', () => {
   it('handles missing or undefined password policy gracefully', () => {
     const {result} = renderHook(() => useServerErrorsMap(undefined))
 
-    expect(result.current['pseudonym.password.too_short']).toBe(
+    expect(result.current['pseudonym.password.too_short']?.()).toBe(
       'Password does not meet the length requirement.',
     )
-    expect(result.current['pseudonym.password.too_long']).toBe(
+    expect(result.current['pseudonym.password.too_long']?.()).toBe(
       'Password exceeds the allowed length.',
     )
   })
@@ -69,16 +69,16 @@ describe('useServerErrorsMap', () => {
   it('returns all error keys with expected messages', () => {
     const {result} = renderHook(() => useServerErrorsMap())
 
-    expect(result.current['user.name.blank']).toBe('Please enter your name.')
-    expect(result.current['user.self_enrollment_code.blank']).toBe(
+    expect(result.current['user.name.blank']?.()).toBe('Please enter your name.')
+    expect(result.current['user.self_enrollment_code.blank']?.()).toBe(
       'Please enter an enrollment code.',
     )
-    expect(result.current['user.terms_of_use.accepted']).toBe(
+    expect(result.current['user.terms_of_use.accepted']?.()).toBe(
       'You must accept the terms to proceed.',
     )
-    expect(result.current['pseudonym.unique_id.too_long']).toBe(
+    expect(result.current['pseudonym.unique_id.too_long']?.()).toBe(
       'Username must be 100 characters or fewer.',
     )
-    expect(result.current['pairing_code.code.invalid']).toBe('The pairing code is invalid.')
+    expect(result.current['pairing_code.code.invalid']?.()).toBe('The pairing code is invalid.')
   })
 })
