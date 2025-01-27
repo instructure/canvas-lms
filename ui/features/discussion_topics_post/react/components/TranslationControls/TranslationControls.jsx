@@ -30,7 +30,7 @@ export const TranslationControls = props => {
   const {translationLanguages, setTranslateTargetLanguage} = useContext(
     DiscussionManagerUtilityContext,
   )
-  const [input, setInput] = useState(translationLanguages.current?.[0]?.name || '')
+  const [input, setInput] = useState('')
   const [selected, setSelected] = useState(null)
 
   const handleSelect = selectedArray => {
@@ -69,6 +69,7 @@ export const TranslationControls = props => {
         inputValue={input}
         onInputChange={e => setInput(e.target.value)}
         width="360px"
+        placeholder={I18n.t('Language')}
       >
         {filteredLanguages.map(({id, name}) => (
           <CanvasMultiSelect.Option key={id} id={id} value={id} isSelected={id === selected}>
