@@ -36,7 +36,7 @@ describe "UngradedDiscussionVisibility" do
     @discussion2 = DiscussionTopic.create!(context: @course, title: "Page 2")
   end
 
-  context "discussion topic visibility" do
+  context "ungraded discussion topic visibility" do
     let(:learning_object1) { @discussion1 }
     let(:learning_object2) { @discussion2 }
     let(:learning_object_type) { "discussion_topic" }

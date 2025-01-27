@@ -55,9 +55,72 @@ module StudentVisibilityCommon
       expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
     end
 
+    # run for all visibility queries
     context "with only_visible_to_overrides set to true" do
       before :once do
         learning_object1.update!(only_visible_to_overrides: true)
+      end
+
+      context "non-collaborative group" do
+        before do
+          @course.account.enable_feature!(:differentiation_tags)
+          @course.account.enable_feature!(:assign_to_differentiation_tags)
+          @course.account.settings[:allow_assign_to_differentiation_tags] = true
+          @course.account.save!
+
+          # additional student for testing differentiation tags
+          @student3 = student_in_course(active_all: true, course: @course, name: "Student 3").user
+
+          @group_category = @course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)
+          @group_category.create_groups(2)
+          @differentiation_tag_group_1 = @group_category.groups[0]
+          @differentiation_tag_group_2 = @group_category.groups[1]
+        end
+
+        it "does not include objects with a non collaborative override unless the user is in the group" do
+          @differentiation_tag_group_1.add_user(@student1)
+          @differentiation_tag_group_1.add_user(@student3)
+          learning_object1.assignment_overrides.create!(set: @differentiation_tag_group_1)
+          expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
+          expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
+        end
+
+        it "does not include object with a non collaborative group if feature flag is disabled" do
+          @differentiation_tag_group_1.add_user(@student1)
+          learning_object1.assignment_overrides.create!(set: @differentiation_tag_group_1)
+          @course.account.disable_feature!(:assign_to_differentiation_tags)
+          expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object2.id)
+        end
+
+        it "does include object with a non collaborative group if account setting is disabled" do
+          # Once a learning object is assigned to a non-collaborative group, it should be visible
+          # to all students in that group.  If the account setting is disabled, these learning objects should still be visible
+          # to all students in the non collaborative group until the instructor has indicated that the learning object should
+          # no longer be assigned to a non collaborative group.  This can be done by manually removing the learning object from the
+          # group or by selecting to bulk remove all non collaborative groups assigned to learning objects.
+          # Please refer to rollback plan for more information
+          # https://instructure.atlassian.net/wiki/spaces/EGGWIKI/pages/86942646273/Tech+Plan+Assign+To+Hidden+Groups#Rollback-Plan
+          @differentiation_tag_group_1.add_user(@student1)
+          learning_object1.assignment_overrides.create!(set: @differentiation_tag_group_1)
+          @course.account.settings[:allow_assign_to_differentiation_tags] = false
+          @course.account.save!
+          expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
+          expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object2.id)
+        end
+
+        it "ignores deleted overrides" do
+          @differentiation_tag_group_1.add_user(@student3)
+          @differentiation_tag_group_2.add_user(@student1)
+          learning_object1.assignment_overrides.create!(set: @differentiation_tag_group_1)
+          learning_object1.assignment_overrides.create!(set: @differentiation_tag_group_2, workflow_state: "deleted")
+          expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
+        end
       end
 
       it "does not include objects with a section override unless the user is in the section" do
@@ -120,6 +183,69 @@ module StudentVisibilityCommon
         @module1.assignment_overrides.create!(set: @section2, workflow_state: "deleted")
         expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
         expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
+      end
+
+      context "non-collaborative group" do
+        before do
+          @course.account.enable_feature!(:differentiation_tags)
+          @course.account.enable_feature!(:assign_to_differentiation_tags)
+          @course.account.settings[:allow_assign_to_differentiation_tags] = true
+          @course.account.save!
+
+          # additional student for testing differentiation tags
+          @student3 = student_in_course(active_all: true, course: @course, name: "Student 3").user
+
+          @group_category = @course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)
+          @group_category.create_groups(2)
+          @differentiation_tag_group_1 = @group_category.groups[0]
+          @differentiation_tag_group_2 = @group_category.groups[1]
+        end
+
+        it "does not include module with a non collaborative override unless the user is in the group" do
+          # learning_object1 is in the module1
+          # learning_object2 is not in a module
+          @differentiation_tag_group_1.add_user(@student3)
+          @module1.assignment_overrides.create!(set: @differentiation_tag_group_1)
+          expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
+          expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object2.id)
+        end
+
+        it "does not include module with a non collaborative group if feature flag is disabled" do
+          @differentiation_tag_group_1.add_user(@student1)
+          @module1.assignment_overrides.create!(set: @differentiation_tag_group_1)
+          @course.account.disable_feature!(:assign_to_differentiation_tags)
+          expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object2.id)
+        end
+
+        it "does include module with a non collaborative group if account setting is disabled" do
+          # Once a learning object is assigned to a non-collaborative group, it should be visible
+          # to all students in that group.  If the account setting is disabled, these learning objects should still be visible
+          # to all students in the non collaborative group until the instructor has indicated that the learning object should
+          # no longer be assigned to a non collaborative group.  This can be done by manually removing the learning object from the
+          # group or by selecting to bulk remove all non collaborative groups assigned to learning objects.
+          # Please refer to rollback plan for more information
+          # https://instructure.atlassian.net/wiki/spaces/EGGWIKI/pages/86942646273/Tech+Plan+Assign+To+Hidden+Groups#Rollback-Plan
+          @differentiation_tag_group_1.add_user(@student1)
+          @module1.assignment_overrides.create!(set: @differentiation_tag_group_1)
+          @course.account.settings[:allow_assign_to_differentiation_tags] = false
+          @course.account.save!
+
+          expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
+          expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object2.id)
+        end
+
+        it "ignores deleted overrides" do
+          @differentiation_tag_group_1.add_user(@student1)
+          @differentiation_tag_group_2.add_user(@student3)
+          @module1.assignment_overrides.create!(set: @differentiation_tag_group_1)
+          @module1.assignment_overrides.create!(set: @differentiation_tag_group_2, workflow_state: "deleted")
+          expect(ids_visible_to_user(@student1, learning_object_type)).to contain_exactly(learning_object1.id, learning_object2.id)
+          expect(ids_visible_to_user(@student2, learning_object_type)).to contain_exactly(learning_object2.id)
+          expect(ids_visible_to_user(@student3, learning_object_type)).to contain_exactly(learning_object2.id)
+        end
       end
     end
   end

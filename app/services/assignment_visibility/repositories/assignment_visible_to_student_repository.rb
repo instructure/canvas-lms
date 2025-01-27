@@ -50,7 +50,7 @@ module AssignmentVisibility
             #{VisibilitySqlHelper.enrollment_join_sql}
 
             /* join assignment group overrides */
-            #{assignment_group_override_join_sql}
+            #{VisibilitySqlHelper.assign_to_differentiation_tags_enabled?(course_ids) ? assignment_group_override_join_sql : assignment_group_override_join_sql(collaborative_group_filter: "AND g.non_collaborative = FALSE")}
 
             /* filtered to course_id, user_id, assignment_id, and additional conditions */
             #{assignment_group_override_filter_sql(filter_condition_sql:)}
@@ -81,7 +81,7 @@ module AssignmentVisibility
             #{VisibilitySqlHelper.assignment_override_unassign_section_join_sql(id_column_name: "assignment_id")}
 
             /* filtered to course_id, user_id, assignment_id, and additional conditions */
-            #{VisibilitySqlHelper.assignment_override_unassign_section_filter_sql(filter_condition_sql:)}
+            #{VisibilitySqlHelper.assignment_override_unassign_filter_sql(filter_condition_sql:)}
 
             UNION
 
@@ -110,7 +110,7 @@ module AssignmentVisibility
             #{VisibilitySqlHelper.assignment_override_unassign_adhoc_join_sql(id_column_name: "assignment_id")}
 
             /* filtered to course_id, user_id, assignment_id, and additional conditions */
-            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_filter_sql(filter_condition_sql:)}
+            #{VisibilitySqlHelper.assignment_override_unassign_filter_sql(filter_condition_sql:)}
 
             UNION
 
@@ -253,13 +253,14 @@ module AssignmentVisibility
           SQL
         end
 
-        def assignment_group_override_join_sql
+        def assignment_group_override_join_sql(collaborative_group_filter: nil)
           <<~SQL.squish
             INNER JOIN #{AssignmentOverride.quoted_table_name} ao
               ON o.id = ao.assignment_id
               AND ao.set_type = 'Group'
             INNER JOIN #{Group.quoted_table_name} g
               ON g.id = ao.set_id
+              #{collaborative_group_filter unless collaborative_group_filter.nil?}
             INNER JOIN #{GroupMembership.quoted_table_name} gm
               ON gm.group_id = g.id
               AND gm.user_id = e.user_id
