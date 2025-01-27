@@ -323,7 +323,7 @@ describe('DatetimeField', () => {
     it('alerts screenreader on an invalid parse no matter what', () => {
       $field.val('invalid')
       $field.change()
-      expect(field.debouncedSRFME).toHaveBeenCalledWith("That's not a date!")
+      expect(field.debouncedSRFME).toHaveBeenCalledWith("Please enter a valid format for a date")
     })
 
     it('flashes combined suggest text to screenreader when there is course suggest text', () => {
