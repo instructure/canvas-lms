@@ -236,6 +236,225 @@ describe "assignments" do
       end
     end
 
+    context "submission methods" do
+      it "preserves submission methods when saving from index page", priority: "1" do
+        # Create assignment with multiple submission methods
+        assignment = @course.assignments.create!(
+          name: "Test Assignment",
+          submission_types: "online_text_entry,online_url,online_upload",
+          assignment_group: @course.assignment_groups.first
+        )
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        edit_assignment(assignment.id, submit: true)
+        assignment.reload
+        expect(assignment.submission_types).to eq "online_text_entry,online_url,online_upload"
+      end
+
+      it "preserves all assignment attributes when opening and submitting without changes using more options", :ignore_js_errors do
+        original_assignment = @course.assignments.create!(
+          title: "Unchanged Assignment",
+          description: "Original description",
+          due_at: Time.zone.parse("2025-01-31 17:09:36 UTC"),
+          unlock_at: Time.zone.parse("2025-01-25 17:09:36 UTC"),
+          lock_at: Time.zone.parse("2025-02-07 17:09:36 UTC"),
+          points_possible: 20.0,
+          grading_type: "points",
+          submission_types: "online_text_entry,online_url,online_upload",
+          workflow_state: "published",
+          peer_reviews: false,
+          automatic_peer_reviews: false,
+          anonymous_peer_reviews: false,
+          moderated_grading: false,
+          grader_count: 0,
+          grader_comments_visible_to_graders: true,
+          grader_names_visible_to_final_grader: true,
+          allowed_attempts: nil,
+          muted: true
+        )
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        edit_assignment(original_assignment.id, more_options: true)
+        f(".btn-primary[type='submit']").click
+        wait_for_ajaximations
+
+        assignment = original_assignment.reload
+        expect(assignment.title).to eq "Unchanged Assignment"
+        expect(assignment.type).to eq "Assignment"
+        expect(assignment.due_at).to eq Time.zone.parse("2025-01-31 17:09:36 UTC")
+        expect(assignment.unlock_at).to eq Time.zone.parse("2025-01-25 17:09:36 UTC")
+        expect(assignment.lock_at).to eq Time.zone.parse("2025-02-07 17:09:36 UTC")
+        expect(assignment.points_possible).to eq 20.0
+        expect(assignment.grading_type).to eq "points"
+        expect(assignment.submission_types).to eq "online_text_entry,online_url,online_upload"
+        expect(assignment.workflow_state).to eq "published"
+        expect(assignment.peer_reviews).to be false
+        expect(assignment.automatic_peer_reviews).to be false
+        expect(assignment.anonymous_peer_reviews).to be false
+        expect(assignment.moderated_grading).to be false
+        expect(assignment.grader_count).to eq 0
+        expect(assignment.grader_comments_visible_to_graders).to be true
+        expect(assignment.grader_names_visible_to_final_grader).to be true
+        expect(assignment.allowed_attempts).to be_nil
+        expect(assignment.muted).to be true
+      end
+
+      it "preserves all assignment attributes for checkpointed discussion when opening and submitting without changes using more options", :ignore_js_errors do
+        Account.site_admin.enable_feature!(:discussion_checkpoints)
+        @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 6
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 7,
+          replies_required: 2
+        )
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        edit_assignment(@checkpointed_discussion.assignment.id, more_options: true)
+        f(".btn-primary[type='submit']").click
+        wait_for_ajaximations
+
+        assignment = @checkpointed_discussion.assignment.reload
+        expect(assignment.title).to eq "checkpointed discussion"
+        expect(assignment.submission_types).to eq "discussion_topic"
+        expect(assignment.workflow_state).to eq "published"
+        expect(assignment.type).to eq "Assignment"
+        expect(assignment.sub_assignments.first.type).to eq "SubAssignment"
+      end
+
+      it "preserves online_upload submission type when editing an assignment" do
+        @assignment = @course.assignments.create!(
+          title: "Test Assignment",
+          points_possible: 10,
+          submission_types: "online_upload"
+        )
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        edit_assignment(@assignment.id, submit: true)
+
+        expect(@assignment.reload.submission_types).to eq "online_upload"
+      end
+
+      it "preserves online_url submission type when editing an assignment" do
+        @assignment = @course.assignments.create!(
+          title: "Test Assignment",
+          points_possible: 10,
+          submission_types: "online_url"
+        )
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        edit_assignment(@assignment.id, submit: true)
+
+        expect(@assignment.reload.submission_types).to eq "online_url"
+      end
+
+      it "preserves none submission type when editing an assignment" do
+        @assignment = @course.assignments.create!(
+          title: "Test Assignment",
+          points_possible: 10,
+          submission_types: "none"
+        )
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        edit_assignment(@assignment.id, submit: true)
+
+        expect(@assignment.reload.submission_types).to eq "none"
+      end
+
+      it "preserves all assignment attributes when opening and submitting without changes" do
+        original_assignment = @course.assignments.create!(
+          title: "Unchanged Assignment",
+          description: "Original description",
+          due_at: Time.zone.parse("2025-01-31 17:09:36 UTC"),
+          unlock_at: Time.zone.parse("2025-01-25 17:09:36 UTC"),
+          lock_at: Time.zone.parse("2025-02-07 17:09:36 UTC"),
+          points_possible: 20.0,
+          grading_type: "points",
+          submission_types: "online_text_entry",
+          workflow_state: "published",
+          peer_reviews: false,
+          automatic_peer_reviews: false,
+          anonymous_peer_reviews: false,
+          moderated_grading: false,
+          grader_count: 0,
+          grader_comments_visible_to_graders: true,
+          grader_names_visible_to_final_grader: true,
+          allowed_attempts: nil,
+          muted: true
+        )
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        edit_assignment(original_assignment.id, submit: true)
+
+        assignment = original_assignment.reload
+        expect(assignment.title).to eq "Unchanged Assignment"
+        expect(assignment.type).to eq "Assignment"
+        expect(assignment.description).to eq "Original description"
+        expect(assignment.due_at).to eq Time.zone.parse("2025-01-31 17:09:36 UTC")
+        expect(assignment.unlock_at).to eq Time.zone.parse("2025-01-25 17:09:36 UTC")
+        expect(assignment.lock_at).to eq Time.zone.parse("2025-02-07 17:09:36 UTC")
+        expect(assignment.points_possible).to eq 20.0
+        expect(assignment.grading_type).to eq "points"
+        expect(assignment.submission_types).to eq "online_text_entry"
+        expect(assignment.workflow_state).to eq "published"
+        expect(assignment.peer_reviews).to be false
+        expect(assignment.automatic_peer_reviews).to be false
+        expect(assignment.anonymous_peer_reviews).to be false
+        expect(assignment.moderated_grading).to be false
+        expect(assignment.grader_count).to eq 0
+        expect(assignment.grader_comments_visible_to_graders).to be true
+        expect(assignment.grader_names_visible_to_final_grader).to be true
+        expect(assignment.allowed_attempts).to be_nil
+        expect(assignment.muted).to be true
+      end
+
+      it "preserves all assignment attributes for checkpointed discussion when opening and submitting without changes" do
+        Account.site_admin.enable_feature!(:discussion_checkpoints)
+        @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 6
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 7,
+          replies_required: 2
+        )
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+        edit_assignment(@checkpointed_discussion.assignment.id, submit: true)
+
+        assignment = @checkpointed_discussion.assignment.reload
+        expect(assignment.title).to eq "checkpointed discussion"
+        expect(assignment.submission_types).to eq "discussion_topic"
+        expect(assignment.workflow_state).to eq "published"
+        expect(assignment.type).to eq "Assignment"
+        expect(assignment.sub_assignments.first.type).to eq "SubAssignment"
+      end
+    end
+
     it "edits an assignment", priority: "1" do
       assignment_name = "first test assignment"
       due_date = Time.now.utc + 2.days

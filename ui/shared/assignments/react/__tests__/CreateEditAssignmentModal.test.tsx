@@ -44,7 +44,7 @@ describe('CreateEditAssignmentModal', () => {
     frozenFields: [],
   }
 
-  const defaultProps = (overrides: Object = {}): CreateEditAssignmentModalProps => ({
+  const defaultProps = (overrides: object = {}): CreateEditAssignmentModalProps => ({
     assignment: undefined,
     userIsAdmin: true,
     onCloseHandler: onCloseHandlerMock,
@@ -205,7 +205,7 @@ describe('CreateEditAssignmentModal', () => {
         points: 100,
         publish: false,
         syncToSIS: false,
-      })
+      }, true)
     })
 
     it('calls onSaveHandler with correct data when save and publish button is clicked', () => {
@@ -222,7 +222,7 @@ describe('CreateEditAssignmentModal', () => {
         points: 100,
         publish: true,
         syncToSIS: false,
-      })
+      }, true)
     })
 
     it('sets time to 11:59 PM when date is selected (and no time is present)', () => {
@@ -246,7 +246,7 @@ describe('CreateEditAssignmentModal', () => {
         points: 100,
         publish: false,
         syncToSIS: false,
-      })
+      }, true)
     })
 
     it('set time to DEFAULT_DUE_TIME if provided by props', () => {
@@ -270,7 +270,7 @@ describe('CreateEditAssignmentModal', () => {
         points: 100,
         publish: false,
         syncToSIS: false,
-      })
+      }, true)
     })
   })
 
@@ -334,7 +334,7 @@ describe('CreateEditAssignmentModal', () => {
         points: 100,
         publish: false,
         syncToSIS: false,
-      })
+      }, false)
     })
 
     it('Default due time Does not overwrite due date time if time is already present', () => {
@@ -352,7 +352,7 @@ describe('CreateEditAssignmentModal', () => {
         points: 100,
         publish: false,
         syncToSIS: false,
-      })
+      }, false)
     })
 
     it('preserves submission type when editing an assignment', () => {
@@ -370,7 +370,7 @@ describe('CreateEditAssignmentModal', () => {
         points: 100,
         publish: false,
         syncToSIS: false,
-      })
+      }, false)
     })
 
     describe('Due Date Validation', () => {
