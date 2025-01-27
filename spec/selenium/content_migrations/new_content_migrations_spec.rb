@@ -620,13 +620,13 @@ describe "content migrations", :non_parallel do
       expect(NewContentMigrationPage.lti_select_content).to be_displayed
     end
 
-    it "launches LTI tool on browse and get content link", skip: "LTI not implemented" do
+    it "launches LTI tool on browse and get content link" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
       NewContentMigrationPage.external_tool_launch_button.click
-      tool_iframe = NewContentMigrationPage.lti_iframe
       expect(NewContentMigrationPage.lti_title.text).to eq import_tool.label_for(:migration_selection)
+      tool_iframe = NewContentMigrationPage.lti_iframe
 
       in_frame(tool_iframe, "#basic_lti_link") do
         NewContentMigrationPage.basic_lti_link.click
