@@ -35,8 +35,8 @@ class AnnouncementsController < ApplicationController
 
     def load_announcements
       can_create = @context.announcements.temp_record.grants_right?(@current_user, session, :create)
-      can_edit = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit)
-      can_delete = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_delete)
+      can_edit = @context.grants_right?(@current_user, session, :manage_course_content_edit)
+      can_delete = @context.grants_right?(@current_user, session, :manage_course_content_delete)
 
       js_env permissions: {
         create: can_create,

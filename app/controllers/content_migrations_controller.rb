@@ -128,10 +128,8 @@ class ContentMigrationsController < ApplicationController
   include Api::V1::ExternalTools
   include NewQuizzesFeaturesHelper
   include K5Mode
-  include GranularPermissionEnforcement
 
   before_action :require_context
-  before_action :authorize_action
 
   # @API List content migrations
   #
@@ -144,6 +142,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns [ContentMigration]
   def index
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     Folder.root_folders(@context) # ensure course root folder exists so file imports can run
 
     if Account.site_admin.feature_enabled?(:instui_for_import_page) && !api_request?
@@ -221,6 +221,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns ContentMigration
   def show
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     @content_migration = @context.content_migrations.find(params[:id])
     @content_migration.check_for_pre_processing_timeout
     render json: content_migration_json(@content_migration, @current_user, session, nil, params[:include])
@@ -390,6 +392,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns ContentMigration
   def create
+    return unless authorized_action(@context, @current_user, :manage_course_content_add)
+
     @plugin = find_migration_plugin params[:migration_type]
 
     unless @plugin
@@ -436,6 +440,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns ContentMigration
   def update
+    return unless authorized_action(@context, @current_user, :manage_course_content_edit)
+
     @content_migration = @context.content_migrations.find(params[:id])
     @content_migration.check_for_pre_processing_timeout
     @plugin = find_migration_plugin @content_migration.migration_type
@@ -458,6 +464,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns [Migrator]
   def available_migrators
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     systems = ContentMigration.migration_plugins(true).select { |sys| migration_plugin_supported?(sys) }
     json = systems.map do |p|
       {
@@ -544,6 +552,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns list of content items
   def content_list
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     @content_migration = @context.content_migrations.find(params[:id])
     base_url = api_v1_course_content_migration_selective_data_url(@context, @content_migration)
     formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@content_migration,
@@ -580,6 +590,8 @@ class ContentMigrationsController < ApplicationController
   #    }
   #
   def asset_id_mapping
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     content_migration = @context.content_migrations.find(params[:id])
     return render json: { message: "Migration is incomplete" }, status: :bad_request unless content_migration.imported?
     return render json: { message: "Migration is not course copy or blueprint" }, status: :bad_request unless content_migration.source_course_id.present?
@@ -588,22 +600,6 @@ class ContentMigrationsController < ApplicationController
   end
 
   protected
-
-  def authorize_action
-    enforce_granular_permissions(
-      @context,
-      overrides: [:manage_content],
-      actions: {
-        index: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        show: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        available_migrators: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        content_list: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        create: [:manage_course_content_add],
-        update: [:manage_course_content_edit],
-        asset_id_mapping: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
-      }
-    )
-  end
 
   def find_migration_plugin(name)
     if name.include?("context_external_tool")

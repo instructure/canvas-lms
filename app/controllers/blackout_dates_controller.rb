@@ -62,9 +62,7 @@
 class BlackoutDatesController < ApplicationController
   before_action :require_context
   before_action :require_feature_flag
-  before_action :authorize_action
   before_action :load_blackout_date, only: %i[show edit update destroy]
-  include GranularPermissionEnforcement
 
   # @API List blackout dates
   # Returns the list of blackout dates for the current context.
@@ -72,6 +70,8 @@ class BlackoutDatesController < ApplicationController
   # @returns [BlackoutDate]
   #
   def index
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     @blackout_dates = @context.blackout_dates.order(:start_date)
     respond_to do |format|
       format.html
@@ -85,6 +85,8 @@ class BlackoutDatesController < ApplicationController
   # @returns BlackoutDate
   #
   def show
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     render json: @blackout_date.as_json
   end
 
@@ -94,6 +96,8 @@ class BlackoutDatesController < ApplicationController
   # @returns BlackoutDate
   #
   def new
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     @blackout_date = @context.blackout_dates.new
     render json: @blackout_date.as_json
   end
@@ -111,6 +115,8 @@ class BlackoutDatesController < ApplicationController
   # @returns BlackoutDate
   #
   def create
+    return unless authorized_action(@context, @current_user, :manage_course_content_add)
+
     @blackout_date = @context.blackout_dates.build(blackout_date_params)
     if @blackout_date.save
       render json: @blackout_date.as_json, status: :created
@@ -132,6 +138,8 @@ class BlackoutDatesController < ApplicationController
   # @returns BlackoutDate
   #
   def update
+    return unless authorized_action(@context, @current_user, :manage_course_content_edit)
+
     if @blackout_date.update(blackout_date_params)
       render json: @blackout_date.as_json
     else
@@ -145,6 +153,8 @@ class BlackoutDatesController < ApplicationController
   # @returns BlackoutDate
   #
   def destroy
+    return unless authorized_action(@context, @current_user, :manage_course_content_delete)
+
     @blackout_date.destroy
     head :no_content
   end
@@ -161,6 +171,8 @@ class BlackoutDatesController < ApplicationController
   #   The result (which should match the input with maybe some different IDs).
   #
   def bulk_update
+    return unless authorized_action(@context, @current_user, :manage_course_content_edit)
+
     incoming_blackout_dates = params.permit(blackout_dates: %i[id start_date end_date event_title])[:blackout_dates]
     @blackout_dates = @context.blackout_dates
 
@@ -184,22 +196,6 @@ class BlackoutDatesController < ApplicationController
   end
 
   private
-
-  def authorize_action
-    enforce_granular_permissions(
-      @context,
-      overrides: [:manage_content],
-      actions: {
-        index: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        show: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        new: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        create: [:manage_course_content_add],
-        update: [:manage_course_content_edit],
-        bulk_update: [:manage_course_content_edit],
-        destroy: [:manage_course_content_delete]
-      }
-    )
-  end
 
   def require_feature_flag
     account = @context.is_a?(Account) ? @context : @context.account

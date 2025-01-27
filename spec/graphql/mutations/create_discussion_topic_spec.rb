@@ -672,7 +672,7 @@ describe Mutations::CreateDiscussionTopic do
     end
 
     context "todo_date" do
-      it "returns an error when user has neither manage_content nor manage_course_content_add permissions" do
+      it "returns an error when user has no manage_course_content_add permissions" do
         todo_date = 5.days.from_now.iso8601
         query = <<~GQL
           contextId: "#{@course.id}"

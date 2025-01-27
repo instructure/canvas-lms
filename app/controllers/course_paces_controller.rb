@@ -290,17 +290,17 @@ class CoursePacesController < ApplicationController
   before_action :load_blackout_dates, only: %i[index]
   before_action :load_calendar_event_blackout_dates, only: %i[index]
   before_action :require_feature_flag
-  before_action :authorize_action
   before_action :load_course_pace, only: %i[api_show publish update destroy]
 
   include Api::V1::Course
   include Api::V1::Progress
   include K5Mode
-  include GranularPermissionEnforcement
 
   COURSE_PACES_PUBLISHING_LIMIT = 50
 
   def index
+    return unless authorized_action(@course, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     add_crumb(t("Course Pacing"))
     @course_pace = @context.course_paces.primary.first
 
@@ -393,6 +393,8 @@ class CoursePacesController < ApplicationController
   #     -H 'Authorization: Bearer <token>'
 
   def api_show
+    return unless authorized_action(@course, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     load_and_run_progress
     render json: {
       course_pace: CoursePacePresenter.new(@course_pace).as_json,
@@ -401,6 +403,8 @@ class CoursePacesController < ApplicationController
   end
 
   def new
+    return unless authorized_action(@course, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     @course_pace = case @context
                    when Course
                      @context.course_paces.primary.published.take ||
@@ -444,6 +448,8 @@ class CoursePacesController < ApplicationController
   end
 
   def publish
+    return unless authorized_action(@course, @current_user, :manage_course_content_edit)
+
     publish_course_pace
     log_course_paces_publishing
     render json: progress_json(@progress, @current_user, session)
@@ -495,6 +501,8 @@ class CoursePacesController < ApplicationController
   #     -H 'Authorization: Bearer <token>'
 
   def create
+    return unless authorized_action(@course, @current_user, :manage_course_content_add)
+
     @course_pace = @context.course_paces.new(create_params)
 
     if @course_pace.save
@@ -517,6 +525,8 @@ class CoursePacesController < ApplicationController
   end
 
   def bulk_create_enrollment_paces
+    return unless authorized_action(@course, @current_user, :manage_course_content_edit)
+
     @course.run_bulk_assign_enrollment_paces_delayed_job(params[:enrollment_ids], bulk_create_params)
   end
 
@@ -555,6 +565,8 @@ class CoursePacesController < ApplicationController
   #     -H 'Authorization: Bearer <token>'
 
   def update
+    return unless authorized_action(@course, @current_user, :manage_course_content_edit)
+
     should_publish = false
 
     if @context.root_account.feature_enabled?(:course_pace_draft_state) &&
@@ -582,6 +594,8 @@ class CoursePacesController < ApplicationController
   end
 
   def compress_dates
+    return unless authorized_action(@course, @current_user, :manage_course_content_edit)
+
     @course_pace = @course.course_paces.new(create_params)
     if params[:blackout_dates]
       # keep the param.permit values in sync with BlackoutDatesController#blackout_date_params
@@ -629,6 +643,8 @@ class CoursePacesController < ApplicationController
   #     -H 'Authorization: Bearer <token>'
 
   def destroy
+    return unless authorized_action(@course, @current_user, :manage_course_content_delete)
+
     return not_found unless Account.site_admin.feature_enabled?(:course_paces_redesign)
 
     if @course_pace.primary? && @course_pace.published?
@@ -642,25 +658,6 @@ class CoursePacesController < ApplicationController
   end
 
   private
-
-  def authorize_action
-    enforce_granular_permissions(
-      @course,
-      overrides: [:manage_content],
-      actions: {
-        index: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        api_show: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        new: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        publish: [:manage_course_content_edit],
-        create: [:manage_course_content_add],
-        update: [:manage_course_content_edit],
-        compress_dates: [:manage_course_content_edit],
-        bulk_create_enrollment_paces: [:manage_course_content_edit],
-        master_course_info: [:manage_course_content_edit],
-        destroy: [:manage_course_content_delete]
-      }
-    )
-  end
 
   def latest_progress
     progress = Progress.order(created_at: :desc).find_by(context: @course_pace, tag: "course_pace_publish")

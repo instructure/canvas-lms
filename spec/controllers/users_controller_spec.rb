@@ -404,7 +404,7 @@ describe UsersController do
 
     it "does not include courses for which the user doesnt have the appropriate rights" do
       @role1 = custom_account_role("subadmin", account: Account.default)
-      account_admin_user_with_role_changes(role: @role1, role_changes: { manage_content: false, read_course_content: false })
+      account_admin_user_with_role_changes(role: @role1, role_changes: { read_course_content: false })
       course_with_user("TeacherEnrollment", course_name: "A", active_all: true, user: @admin)
       course_with_user("StudentEnrollment", course_name: "B", active_all: true, user: @admin)
 

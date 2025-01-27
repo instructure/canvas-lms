@@ -3261,7 +3261,6 @@ type DiscussionPermissions {
   delete: Boolean
   duplicate: Boolean
   manageAssignTo: Boolean
-  manageContent: Boolean
   manageCourseContentAdd: Boolean
   manageCourseContentDelete: Boolean
   manageCourseContentEdit: Boolean

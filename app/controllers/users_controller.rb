@@ -888,7 +888,6 @@ class UsersController < ApplicationController
       @courses.select! do |c|
         c.grants_any_right?(
           @current_user,
-          :manage_content,
           *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
         )
       end

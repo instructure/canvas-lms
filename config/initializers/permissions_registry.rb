@@ -848,26 +848,6 @@ Rails.application.config.to_prepare do
           AccountAdmin
         ]
       },
-      # legacy role override
-      manage_content: {
-        label: -> { I18n.t("Manage all other course content") },
-        label_v2: -> { I18n.t("Course Content - add / edit / delete") },
-        available_to: %w[
-          TaEnrollment
-          TeacherEnrollment
-          DesignerEnrollment
-          ObserverEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: %w[
-          TaEnrollment
-          TeacherEnrollment
-          DesignerEnrollment
-          AccountAdmin
-        ],
-        account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_course_content) }
-      },
       manage_course_content_add: {
         label: -> { I18n.t("Add all other course content") },
         label_v2: -> { I18n.t("Course Content - add") },
@@ -886,8 +866,7 @@ Rails.application.config.to_prepare do
           TeacherEnrollment
           DesignerEnrollment
           AccountAdmin
-        ],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_course_content) }
+        ]
       },
       manage_course_content_edit: {
         label: -> { I18n.t("Edit all other course content") },
@@ -907,8 +886,7 @@ Rails.application.config.to_prepare do
           TeacherEnrollment
           DesignerEnrollment
           AccountAdmin
-        ],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_course_content) }
+        ]
       },
       manage_course_content_delete: {
         label: -> { I18n.t("Delete all other course content") },
@@ -928,8 +906,7 @@ Rails.application.config.to_prepare do
           TeacherEnrollment
           DesignerEnrollment
           AccountAdmin
-        ],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_course_content) }
+        ]
       },
       # Course Template account permissions
       add_course_template: {

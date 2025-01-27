@@ -952,27 +952,7 @@ describe "security" do
         expect(@course.reload).to be_deleted
       end
 
-      it "manage_content" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
-        get "/courses/#{@course.id}/details"
-        expect(response).to be_successful
-        expect(response.body).not_to match(/Import Course Content/)
-
-        get "/courses/#{@course.id}/content_migrations"
-        assert_status(401)
-
-        add_permission :manage_content
-
-        get "/courses/#{@course.id}/details"
-        expect(response).to be_successful
-        expect(response.body).to match(/Import Course Content/)
-
-        get "/courses/#{@course.id}/content_migrations"
-        expect(response).to be_successful
-      end
-
-      it "manage_course_content (granular permissions)" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
+      it "manage_course_content" do
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
         expect(response.body).not_to match(/Import Course Content/)

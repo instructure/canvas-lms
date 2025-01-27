@@ -50,7 +50,7 @@ context_modules_header_props = {
     courseId: @context.id,
     runningProgressId: @progress&.id,
     disabled: @modules.empty?,
-    visible: @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
+    visible: @context.grants_right?(@current_user, session, :manage_course_content_edit),
   },
   expandCollapseAll: {
     label: t('Collapse All'),
@@ -111,7 +111,7 @@ context_modules_header_props = {
           </button>
         <% end %>
       <% end %>
-      <% if @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit) %>
+      <% if @context.grants_right?(@current_user, session, :manage_course_content_edit) %>
         <div id="context-modules-publish-menu" data-course-id="<%= @context.id %>" data-progress-id="<%= @progress&.id %>" style="display: inline-block;" data-disabled="<%= @modules.empty? %>"></div>
       <% end %>
       <% if @can_add %>
@@ -121,7 +121,7 @@ context_modules_header_props = {
           <%= t('Module') %>
         </button>
       <% end %>
-      <% if @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add) && (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?) %>
+      <% if @context.grants_right?(@current_user, session, :manage_course_content_add) && (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?) %>
         <div class="inline-block module_index_tools">
           <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#" data-popup-collision="flip">
             <i class="icon-more" aria-hidden="true"></i>

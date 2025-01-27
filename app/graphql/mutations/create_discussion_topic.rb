@@ -69,7 +69,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
     # TODO: return an error when user tries to create a graded anonymous discussion
 
-    if input[:todo_date] && !discussion_topic_context.grants_any_right?(current_user, session, :manage_content, :manage_course_content_add)
+    if input[:todo_date] && !discussion_topic_context.grants_right?(current_user, session, :manage_course_content_add)
       return validation_error(I18n.t("You do not have permission to add this topic to the student to-do list."))
     end
 

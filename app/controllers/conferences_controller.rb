@@ -191,7 +191,7 @@ class ConferencesController < ApplicationController
 
     page_has_instui_topnav
     log_api_asset_access(["conferences", @context], "conferences", "other")
-    conferences = if @context.grants_any_right?(@current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    conferences = if @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
                     @context.web_conferences.active
                   else
                     @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)

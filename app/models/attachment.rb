@@ -1516,27 +1516,13 @@ class Attachment < ActiveRecord::Base
     end
     can :manage_assign_to
 
-    #################### Begin legacy permission block #########################
     given do |user|
-      !root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-        ((self.user && self.user == user) || context&.grants_right?(user, :manage_content))
-    end
-    can :add_captions and can :delete_captions
-
-    given do |user|
-      !root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-        Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && grants_right?(user, :update)
-    end
-    can :add_captions and can :delete_captions
-    ##################### End legacy permission block ##########################
-
-    given do |user|
-      root_account.feature_enabled?(:granular_permissions_manage_course_content) && grants_right?(user, :update)
+      grants_right?(user, :update)
     end
     can :add_captions
 
     given do |user|
-      root_account.feature_enabled?(:granular_permissions_manage_course_content) && grants_right?(user, :update)
+      grants_right?(user, :update)
     end
     can :delete_captions
   end

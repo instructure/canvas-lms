@@ -710,7 +710,7 @@ class AssignmentsController < ApplicationController
       end
     )
     can_see_admin_tools = @context.grants_any_right?(
-      @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+      @current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
     )
     @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
       @context,

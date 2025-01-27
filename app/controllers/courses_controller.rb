@@ -1308,8 +1308,8 @@ class CoursesController < ApplicationController
                     teacher_scope(email_scope(users_scope), @context.root_account_id),
                     admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.full_account_admin),
                     admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.full_account_admin),
-                    admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission("manage_content")),
-                    admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission("manage_content"))
+                    admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission("manage_course_content_add")),
+                    admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission("manage_course_content_add"))
                   )
                   .order(:name)
                   .distinct
@@ -1759,7 +1759,7 @@ class CoursesController < ApplicationController
     return unless api_request?
 
     @course = api_find(Course, params[:course_id])
-    return unless authorized_action(@course, @current_user, %i[manage_content manage_course_content_edit])
+    return unless authorized_action(@course, @current_user, :manage_course_content_edit)
 
     old_settings = @course.settings
 
@@ -2401,7 +2401,7 @@ class CoursesController < ApplicationController
         flash.now[:notice] = t("notices.updated", "Course was successfully updated.") if params[:for_reload]
 
         can_see_admin_tools = @context.grants_any_right?(
-          @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+          @current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
         )
         @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
           @context,
@@ -2443,7 +2443,7 @@ class CoursesController < ApplicationController
             end_date = start_date + 28.days
             scope = Announcement.where(context_type: "Course", context_id: @context.id, workflow_state: "active")
                                 .ordered_between(start_date, end_date)
-            unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) || User.observing_full_course(@context).where(id: @current_user).any?
+            unless @context.grants_any_right?(@current_user, session, :read_as_admin, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) || User.observing_full_course(@context).where(id: @current_user).any?
               scope = scope.visible_to_ungraded_discussion_student_visibilities(@current_user, @context)
             end
             latest_announcement = scope.limit(1).first
@@ -3104,7 +3104,7 @@ class CoursesController < ApplicationController
       return
     end
 
-    if authorized_action(@course, @current_user, %i[manage_content manage_course_content_edit])
+    if authorized_action(@course, @current_user, :manage_course_content_edit)
       return render_update_success if params[:for_reload]
 
       unless @course.grants_right?(@current_user, :update)
@@ -3908,7 +3908,7 @@ class CoursesController < ApplicationController
 
   def link_validation
     get_context
-    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
     if (progress = CourseLinkValidator.current_progress(@context))
       render json: progress_json(progress, @current_user, session)
@@ -3939,14 +3939,14 @@ class CoursesController < ApplicationController
 
   def start_link_validation
     get_context
-    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
     CourseLinkValidator.queue_course(@context)
     render json: { success: true }
   end
 
   def link_validator
-    authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
     # render view
   end
 

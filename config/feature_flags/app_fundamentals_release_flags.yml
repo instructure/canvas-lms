@@ -5,11 +5,6 @@ default_recaptcha_registration_enable:
   display_name: Enable Recaptcha by default for self-registration
   description: Requires Recaptcha for self-registration by default
   applies_to: SiteAdmin
-granular_permissions_manage_course_content:
-  state: allowed_on
-  applies_to: RootAccount
-  display_name: Granular permissions for managing course content
-  description: Add granularity to permissions around managing all other course content
 course_templates:
   state: hidden
   applies_to: RootAccount

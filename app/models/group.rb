@@ -522,7 +522,6 @@ class Group < ActiveRecord::Base
     given { |user| !non_collaborative? && user && can_participate?(user) && has_member?(user) }
     can :participate,
         :manage_calendar,
-        :manage_content,
         :manage_course_content_add,
         :manage_course_content_edit,
         :manage_course_content_delete,
@@ -608,7 +607,6 @@ class Group < ActiveRecord::Base
         manage
         allow_course_admin_actions
         manage_calendar
-        manage_content
         manage_course_content_add
         manage_course_content_edit
         manage_course_content_delete
@@ -652,19 +650,9 @@ class Group < ActiveRecord::Base
       given { |user| user && (self.group_category.try(:allows_multiple_memberships?) || allow_self_signup?(user)) }
       can :leave
 
-      #################### Begin legacy permission block #########################
       given do |user, session|
-        !context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-          grants_right?(user, session, :manage_content) && context &&
-          context.grants_right?(user, session, :create_conferences)
-      end
-      can :create_conferences
-      ##################### End legacy permission block ##########################
-
-      given do |user, session|
-        context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-          grants_right?(user, session, :manage_course_content_add) && context &&
-          context.grants_right?(user, session, :create_conferences)
+        grants_right?(user, session, :manage_course_content_add) &&
+          context&.grants_right?(user, session, :create_conferences)
       end
       can :create_conferences
 
@@ -755,7 +743,6 @@ class Group < ActiveRecord::Base
       # be used as a context that owns content. So no user should ever be able to manage content in a non_collaborative group.
       # %i[
       #   manage_calendar
-      #   manage_content
       #   manage_course_content_add
       #   manage_course_content_edit
       #   manage_course_content_delete
