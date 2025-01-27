@@ -1416,7 +1416,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| !root_topic_id && context.grants_all_rights?(user, session, :read_forum, :moderate_forum) && available_for?(user) }
     can :update and can :read_as_admin and can :delete and can :create and can :read and can :attach
 
-    # Moderators can still modify content even in unavailable topics (*especially* unlocking them), but can't create new content
+    # Moderators can still modify content even in unavailable topics (*especially* unlocking them)
     given { |user, session| !root_topic_id && context.grants_all_rights?(user, session, :read_forum, :moderate_forum) }
     can :update and can :read_as_admin and can :delete and can :read and can :attach
 
@@ -1474,7 +1474,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def user_can_create(user, session)
     !is_announcement &&
-      context.grants_right?(user, session, :create_forum) &&
+      context.grants_any_right?(user, session, :create_forum, :moderate_forum) &&
       context_allows_user_to_create?(user)
   end
 
