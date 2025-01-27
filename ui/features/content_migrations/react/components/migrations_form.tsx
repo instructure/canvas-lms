@@ -200,7 +200,7 @@ export const ContentMigrationsForm = ({
 
   return (
     <View as="div" margin="small none xx-large none">
-      <Heading level="h2" as="h2" margin="0 0 small">
+      <Heading level="h1" as="h1" margin="0 0 small">
         {I18n.t('Import Content')}
       </Heading>
       <Text>
