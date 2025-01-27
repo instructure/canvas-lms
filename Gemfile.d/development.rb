@@ -24,5 +24,5 @@ group :development do
   gem "spring-commands-rubocop", "~> 0.4"
   gem "active_record_query_trace", "~> 1.8", require: false
 
-  gem "debug", "~> 1.8", platform: :mri, require: false
+  gem "debug", "~> 1.10", platform: :mri, require: false
 end
