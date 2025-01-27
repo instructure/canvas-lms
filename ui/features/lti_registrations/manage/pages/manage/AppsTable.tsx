@@ -107,7 +107,7 @@ const Columns: ReadonlyArray<Column> = [
   {
     id: 'name',
     header: I18n.t('App Name'),
-    width: '182px',
+    width: '150px',
     sortable: true,
     render: r => (
       <Flex>
@@ -139,7 +139,7 @@ const Columns: ReadonlyArray<Column> = [
   {
     id: 'nickname',
     header: I18n.t('Nickname'),
-    width: '220px',
+    width: '160px',
     sortable: true,
     render: r =>
       r.admin_nickname ? (
@@ -152,15 +152,8 @@ const Columns: ReadonlyArray<Column> = [
     id: 'lti_version',
     sortable: true,
     header: I18n.t('Version'),
-    width: '90px',
+    width: '80px',
     render: r => <div>{'legacy_configuration_id' in r ? '1.1' : '1.3'}</div>,
-  },
-  {
-    id: 'installed',
-    header: I18n.t('Installed On'),
-    width: '132px',
-    sortable: true,
-    render: r => <div>{tz.format(r.created_at, 'date.formats.medium')}</div>,
   },
   {
     id: 'installed_by',
@@ -184,6 +177,13 @@ const Columns: ReadonlyArray<Column> = [
     },
   },
   {
+    id: 'installed',
+    header: I18n.t('Installed On'),
+    width: '130px',
+    sortable: true,
+    render: r => <div>{tz.format(r.created_at, 'date.formats.medium')}</div>,
+  },
+  {
     id: 'updated_by',
     header: I18n.t('Updated By'),
     width: '132px',
@@ -205,9 +205,16 @@ const Columns: ReadonlyArray<Column> = [
     },
   },
   {
+    id: 'updated',
+    header: I18n.t('Updated On'),
+    width: '130px',
+    sortable: true,
+    render: r => <div>{tz.format(r.updated_at, 'date.formats.medium')}</div>,
+  },
+  {
     id: 'on',
     header: I18n.t('On/Off'),
-    width: '96px',
+    width: '80px',
     sortable: true,
     render: r => (
       <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
@@ -215,7 +222,7 @@ const Columns: ReadonlyArray<Column> = [
   },
   {
     id: 'actions',
-    width: '80px',
+    width: '60px',
     render: (r, {deleteApp}) => {
       const developerKeyId = r.developer_key_id
 
