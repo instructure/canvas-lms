@@ -243,7 +243,7 @@ describe "content migrations", :non_parallel do
     end
   end
 
-  context "course copy", skip: "issues with cc search" do
+  context "course copy" do
     before do
       # the "true" param is important, it forces the cache clear
       #  without it this spec group fails if
@@ -279,7 +279,7 @@ describe "content migrations", :non_parallel do
       @copy_from.enroll_teacher(@user).accept
     end
 
-    it "only shows courses the user is authorized to see", priority: "1" do
+    it "only shows courses the user is authorized to see", priority: "1", skip: "issues with cc search" do
       new_course = Course.create!(name: "please don't see me")
       visit_page
       select_migration_type
@@ -305,7 +305,7 @@ describe "content migrations", :non_parallel do
       expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
     end
 
-    it "includes completed courses when checked", priority: "1" do
+    it "includes completed courses when checked", priority: "1", skip: "issues with cc search" do
       new_course = Course.create!(name: "completed course")
       new_course.enroll_teacher(@user).accept
       new_course.complete!
@@ -323,7 +323,7 @@ describe "content migrations", :non_parallel do
       expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
     end
 
-    it "finds courses in other accounts", priority: "1" do
+    it "finds courses in other accounts", priority: "1", skip: "issues with cc search" do
       new_account1 = account_model
       enrolled_course = Course.create!(name: "faraway course", account: new_account1)
       enrolled_course.enroll_teacher(@user).accept
@@ -368,7 +368,7 @@ describe "content migrations", :non_parallel do
         worker_class.new(cm.id).perform
       end
 
-      it "copies all content from a course", priority: "1" do
+      it "copies all content from a course", priority: "1", skip: "issues with cc search" do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -389,7 +389,7 @@ describe "content migrations", :non_parallel do
         expect(@course.quizzes.first.quiz_questions.count).to eq 11
       end
 
-      it "selectively copies content", priority: "1" do
+      it "selectively copies content", priority: "1", skip: "issues with cc search" do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -404,7 +404,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    context "with selectable_outcomes_in_course_copy enabled" do
+    context "with selectable_outcomes_in_course_copy enabled", skip: "issues with cc search" do
       before do
         root = @copy_from.root_outcome_group(true)
         outcome_model(context: @copy_from, title: "root1")
@@ -430,7 +430,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "sets day substitution and date adjustment settings", priority: "1" do
+    it "sets day substitution and date adjustment settings", priority: "1", skip: "issues with cc search" do
       # TODO: fix click_option
       new_course = Course.create!(name: "day sub")
       new_course.enroll_teacher(@user).accept
@@ -478,7 +478,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "sets pre-populate date adjustment settings" do
+    it "sets pre-populate date adjustment settings", skip: "issues with cc search" do
       new_course = Course.create!(name: "date adjust", start_at: "Jul 1, 2012", conclude_at: "Jul 11, 2012")
       new_course.enroll_teacher(@user).accept
 
@@ -510,7 +510,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "removes dates", priority: "1" do
+    it "removes dates", priority: "1", skip: "issues with cc search" do
       new_course = Course.create!(name: "date remove", start_at: "Jul 1, 2014", conclude_at: "Jul 11, 2014")
       new_course.enroll_teacher(@user).accept
 
@@ -537,7 +537,7 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type
       wait_for_ajaximations
-      click_option("#courseSelect", @copy_from.id.to_s, :value)
+      search_for_option("#course-copy-select-course", @copy_from.name, @copy_from.id.to_s)
       NewContentMigrationPage.all_content_radio.click
       submit
       run_jobs
@@ -548,7 +548,7 @@ describe "content migrations", :non_parallel do
       expect(@course.lock_all_announcements).to be_truthy
     end
 
-    it "persists topic 'allow liking' settings across course copy", priority: "2" do
+    it "persists topic 'allow liking' settings across course copy", priority: "2", skip: "issues with cc search" do
       @copy_from.discussion_topics.create!(
         title: "Liking Allowed Here",
         message: "Like I said, liking is allowed",
