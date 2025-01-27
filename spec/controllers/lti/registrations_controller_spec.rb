@@ -273,6 +273,70 @@ RSpec.describe Lti::RegistrationsController do
         end
       end
 
+      context "when sorting by installed" do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed" }
+
+        let(:first_registration) { lti_registration_model(account:, name: "AAA registration", created_at: 1.day.ago, updated_at: 1.day.ago) }
+        let(:second_registration) { lti_registration_model(account:, name: "ZZZ registration", created_at: 2.days.ago, updated_at: 2.days.ago) }
+
+        before do
+          first_registration
+          second_registration
+        end
+
+        it "sorts by created_at" do
+          subject
+          expect(response).to be_successful
+          first_index = response_data.find_index { |r| r["id"] == first_registration.id }
+          second_index = response_data.find_index { |r| r["id"] == second_registration.id }
+          expect(first_index).to be < second_index
+        end
+
+        context "with the dir=asc parameter" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed&dir=asc" }
+
+          it "puts the results in ascending order" do
+            subject
+            expect(response).to be_successful
+            first_index = response_data.find_index { |r| r["id"] == first_registration.id }
+            second_index = response_data.find_index { |r| r["id"] == second_registration.id }
+            expect(second_index).to be < first_index
+          end
+        end
+      end
+
+      context "when sorting by updated" do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=updated" }
+
+        let(:first_registration) { lti_registration_model(account:, name: "AAA registration", created_at: 1.day.ago, updated_at: 1.day.ago) }
+        let(:second_registration) { lti_registration_model(account:, name: "ZZZ registration", created_at: 2.days.ago, updated_at: 2.days.ago) }
+
+        before do
+          first_registration
+          second_registration
+        end
+
+        it "sorts by updated_at" do
+          subject
+          expect(response).to be_successful
+          first_index = response_data.find_index { |r| r["id"] == first_registration.id }
+          second_index = response_data.find_index { |r| r["id"] == second_registration.id }
+          expect(first_index).to be < second_index
+        end
+
+        context "with the dir=asc parameter" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=updated&dir=asc" }
+
+          it "puts the results in ascending order" do
+            subject
+            expect(response).to be_successful
+            first_index = response_data.find_index { |r| r["id"] == first_registration.id }
+            second_index = response_data.find_index { |r| r["id"] == second_registration.id }
+            expect(second_index).to be < first_index
+          end
+        end
+      end
+
       context "when sorting by a nil attribute" do
         subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=nickname" }
 

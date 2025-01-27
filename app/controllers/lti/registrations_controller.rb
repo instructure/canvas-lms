@@ -919,7 +919,7 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @argument sort [String]
   #   The field to sort by. Choices are: name, nickname, lti_version, installed,
-  #   installed_by, updated_by, and on. Defaults to installed.
+  #   installed_by, updated_by, updated, and on. Defaults to installed.
   #
   # @argument dir [String, "asc"|"desc"]
   #   The order to sort the given column by. Defaults to desc.
@@ -1012,6 +1012,8 @@ class Lti::RegistrationsController < ApplicationController
           reg.created_by&.name&.downcase || ""
         when :updated_by
           reg.updated_by&.name&.downcase || ""
+        when :updated
+          reg.updated_at
         when :on
           reg.account_binding_for(@account)&.workflow_state || ""
         end
@@ -1516,7 +1518,7 @@ class Lti::RegistrationsController < ApplicationController
     render_error("invalid_page", "page param should be an integer") unless params[:page].nil? || params[:page].to_i > 0
     render_error("invalid_dir", "dir param should be asc, desc, or empty") unless ["asc", "desc", nil].include?(params[:dir])
 
-    valid_sort_fields = %w[name nickname lti_version installed installed_by updated_by on]
+    valid_sort_fields = %w[name nickname lti_version installed installed_by updated_by updated on]
     render_error("invalid_sort", "#{params[:sort]} is not a valid field for sorting") unless [*valid_sort_fields, nil].include?(params[:sort])
   end
 
