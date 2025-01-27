@@ -144,7 +144,7 @@ class NewContentMigrationPage
     end
 
     def external_tool_launch_button
-      f("button#externalToolLaunch")
+      external_tool_launch.find_element(:xpath, "../parent::button")
     end
 
     def lti_iframe
@@ -152,7 +152,7 @@ class NewContentMigrationPage
     end
 
     def lti_title
-      f(".ui-dialog-title")
+      fxpath('//*[@aria-label="Launch External Tool"]//h2')
     end
 
     def basic_lti_link
@@ -160,7 +160,7 @@ class NewContentMigrationPage
     end
 
     def file_name_label
-      f("#converter .file_name")
+      fxpath('//*[text()="lti embedded link"]')
     end
 
     def external_tool_launch
