@@ -52,6 +52,7 @@ class ApplicationController < ActionController::Base
   include Canvas::RequestForgeryProtection
   protect_from_forgery with: :exception
 
+  before_action :register_request_id_in_thread
   # load_user checks masquerading permissions, so this needs to be cleared first
   before_action :clear_cached_contexts
   prepend_before_action :load_user, :load_account
@@ -90,6 +91,9 @@ class ApplicationController < ActionController::Base
     crumb.html_safe
   }, :root_path, class: 'home')
 
+  def register_request_id_in_thread
+    Thread.current.thread_variable_set('request_id', request.uuid)
+  end
   ##
   # Sends data from rails to JavaScript
   #
