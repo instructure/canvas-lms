@@ -72,7 +72,13 @@ class StudentEnrollment < Enrollment
     score_params = { grading_period_id: } if grading_period_id.present?
     score = find_score(score_params)
 
+    old_status = CustomGradeStatus.find(score[:custom_grade_status_id]) if score.custom_grade_status_id.present?
+
     score.update!(custom_grade_status:)
+
+    Canvas::LiveEvents.final_grade_custom_status(score, old_status, self, course)
+
+    score
   end
 
   class << self
