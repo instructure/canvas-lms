@@ -104,7 +104,7 @@ const Teacher = () => {
     // email address
     if (errors.pseudonym?.unique_id?.length) {
       const errorKey = `pseudonym.unique_id.${errors.pseudonym.unique_id[0]?.type}`
-      setEmailError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+      setEmailError(serverErrorsMap[errorKey]?.() || I18n.t('An unknown error occurred.'))
 
       if (!hasFocusedError) {
         emailInputRef.current?.focus()
@@ -115,7 +115,7 @@ const Teacher = () => {
     // full name
     if (errors.user?.name?.length) {
       const errorKey = `user.name.${errors.user.name[0]?.type}`
-      setNameError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+      setNameError(serverErrorsMap[errorKey]?.() || I18n.t('An unknown error occurred.'))
 
       if (!hasFocusedError) {
         nameInputRef.current?.focus()
@@ -126,7 +126,7 @@ const Teacher = () => {
     // terms of use
     if (errors.user?.terms_of_use?.length) {
       const errorKey = `user.terms_of_use.${errors.user.terms_of_use[0]?.type}`
-      setTermsError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+      setTermsError(serverErrorsMap[errorKey]?.() || I18n.t('An unknown error occurred.'))
 
       if (!hasFocusedError) {
         const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
