@@ -219,14 +219,16 @@ function SectionList(props: Props) {
             {renderModal()}
           </>
         ) : null}
-        <Button
-          data-testid="user-profile"
-          textAlign="start"
-          renderIcon={<IconUserLine />}
-          href={props.portfolio.profile_url}
-        >
-          {I18n.t('User Profile')}
-        </Button>
+        {props.portfolio.profile_url !== null ? (
+          <Button
+            data-testid="user-profile"
+            textAlign="start"
+            renderIcon={<IconUserLine />}
+            href={props.portfolio.profile_url}
+          >
+            {I18n.t('User Profile')}
+          </Button>
+        ) : null}
         {isEditPortfolio ? (
           <PortfolioSettingsModal
             portfolio={{...props.portfolio, name: portfolioName, public: portfolioPublic}}
