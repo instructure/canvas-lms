@@ -94,7 +94,11 @@ module DifferentiableAssignment
   def self.scope_filter(scope, user, context, opts = {})
     context.shard.activate do
       filter(scope, user, context, opts) do |filtered_scope, user_ids|
-        filtered_scope.visible_to_students_in_course_with_da(user_ids, [context.id])
+        if filtered_scope&.model&.name == "Assignment"
+          filtered_scope.visible_to_students_in_course_with_da(user_ids, [context.id], filtered_scope)
+        else
+          filtered_scope.visible_to_students_in_course_with_da(user_ids, [context.id])
+        end
       end
     end
   end

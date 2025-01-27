@@ -36,6 +36,42 @@ describe AssignmentGroupsController do
       json_response.first["assignments"].pluck("id")
     end
 
+    context "with cache" do
+      specs_require_cache(:redis_cache_store)
+      it "returns assignments for students" do
+        course_with_teacher(active_all: true)
+        @student = student_in_course(course: @course, active_enrollment: true, name: "Pedro").user
+        user_session(@student)
+        assignment1 = @course.assignments.create!(title: "assignment 1", assignment_group: @group, workflow_state: "published")
+        assignment2 = @course.assignments.create!(title: "assignment 2", assignment_group: @group, workflow_state: "published")
+        assignment3 = @course.assignments.create!(title: "assignment 3", assignment_group: @group, workflow_state: "published")
+        get :index,
+            params: {
+              course_id: @course.id,
+              include: ["assignments"],
+              format: "json"
+            }
+
+        group = json_parse(response.body).first
+        assignments = group["assignments"]
+        expect(assignments.pluck("id")).to match_array([assignment1.id, assignment2.id, assignment3.id])
+
+        assignment4 = @course.assignments.create!(title: "assignment 4", assignment_group: @group, workflow_state: "published")
+        assignment5 = @course.assignments.create!(title: "assignment 5", assignment_group: @group, workflow_state: "published")
+        assignment6 = @course.assignments.create!(title: "assignment 6", assignment_group: @group, workflow_state: "published")
+        get :index,
+            params: {
+              course_id: @course.id,
+              include: ["assignments"],
+              format: "json"
+            }
+
+        group = json_parse(response.body).first
+        assignments = group["assignments"]
+        expect(assignments.pluck("id")).to match_array([assignment1.id, assignment2.id, assignment3.id, assignment4.id, assignment5.id, assignment6.id])
+      end
+    end
+
     describe "filtering by grading period and overrides" do
       let!(:assignment) { course.assignments.create!(name: "Assignment without overrides", due_at: Date.new(2015, 1, 15)) }
       let!(:assignment_with_override) do
