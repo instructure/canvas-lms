@@ -346,6 +346,22 @@ describe DiscussionTopic do
       @relevant_permissions = %i[read reply update delete]
     end
 
+    it "does grant create permission with create_forum but no moderate_forum" do
+      @course.account.role_overrides.create!(role: teacher_role, permission: "moderate_forum", enabled: false)
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply create duplicate attach student_reporting create_assign_to]
+    end
+
+    it "does grant create permission with moderate_forum but no create_forum" do
+      @course.account.role_overrides.create!(role: teacher_role, permission: "create_forum", enabled: false)
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply update delete create duplicate attach student_reporting read_as_admin moderate_forum manage_assign_to]
+    end
+
+    it "does not grant create permission without moderate_forum and create_forum" do
+      @course.account.role_overrides.create!(role: teacher_role, permission: "create_forum", enabled: false)
+      @course.account.role_overrides.create!(role: teacher_role, permission: "moderate_forum", enabled: false)
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply attach student_reporting]
+    end
+
     it "does not grant moderate permissions without read permissions" do
       @course.account.role_overrides.create!(role: teacher_role, permission: "read_forum", enabled: false)
       expect(@topic.reload.check_policy(@teacher2)).to eql %i[create duplicate attach student_reporting manage_assign_to create_assign_to]
