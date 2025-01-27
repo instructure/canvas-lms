@@ -27,32 +27,8 @@ import {ROUTES} from '../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
-type Prompt = {
-  text: string
-  linkText: string
-  linkHref: string
-}
-
 type ActionPromptProps = {
   variant: 'createAccount' | 'signIn' | 'createParentAccount'
-}
-
-const prompts: Record<ActionPromptProps['variant'], Prompt> = {
-  createAccount: {
-    text: I18n.t('Sign in or'),
-    linkText: I18n.t('create an account.'),
-    linkHref: ROUTES.REGISTER,
-  },
-  signIn: {
-    text: I18n.t('Already have an account?'),
-    linkText: I18n.t('Sign in'),
-    linkHref: ROUTES.SIGN_IN,
-  },
-  createParentAccount: {
-    text: I18n.t('Have a pairing code?'),
-    linkText: I18n.t('Create a parent account'),
-    linkHref: ROUTES.REGISTER_PARENT,
-  },
 }
 
 const ActionPrompt = ({variant}: ActionPromptProps) => {
@@ -60,24 +36,46 @@ const ActionPrompt = ({variant}: ActionPromptProps) => {
   const {isUiActionPending} = useNewLogin()
   const {isPreviewMode} = useNewLoginData()
 
-  const {text, linkText, linkHref} = prompts[variant]
   const isDisabled = isPreviewMode || isUiActionPending
 
-  const handleNavigate = (event: React.MouseEvent<ViewOwnProps>) => {
+  const handleNavigate = (path: string) => (event: React.MouseEvent<ViewOwnProps>) => {
     event.preventDefault()
     if (!isDisabled) {
-      navigate(linkHref)
+      navigate(path)
     }
   }
 
-  return (
-    <Text>
-      {text}{' '}
-      <Link href={linkHref} onClick={handleNavigate}>
-        {linkText}
-      </Link>
-    </Text>
-  )
+  switch (variant) {
+    case 'createAccount':
+      return (
+        <Text>
+          {I18n.t('Sign in or')}{' '}
+          <Link href={ROUTES.REGISTER} onClick={handleNavigate(ROUTES.REGISTER)}>
+            {I18n.t('create an account.')}
+          </Link>
+        </Text>
+      )
+    case 'signIn':
+      return (
+        <Text>
+          {I18n.t('Already have an account?')}{' '}
+          <Link href={ROUTES.SIGN_IN} onClick={handleNavigate(ROUTES.SIGN_IN)}>
+            {I18n.t('Sign in')}
+          </Link>
+        </Text>
+      )
+    case 'createParentAccount':
+      return (
+        <Text>
+          {I18n.t('Have a pairing code?')}{' '}
+          <Link href={ROUTES.REGISTER_PARENT} onClick={handleNavigate(ROUTES.REGISTER_PARENT)}>
+            {I18n.t('Create a parent account')}
+          </Link>
+        </Text>
+      )
+    default:
+      return null
+  }
 }
 
 export default ActionPrompt
