@@ -137,7 +137,7 @@ class NotificationMessageCreator
       fallback_policy ||= channel.notification_policies.create!(frequency: "daily")
     end
 
-    InstStatsd::Statsd.increment("message.fall_back_used", short_stat: "message.fall_back_used")
+    InstStatsd::Statsd.distributed_increment("message.fall_back_used")
     build_summary_for(user, fallback_policy)
   end
 
@@ -398,7 +398,7 @@ class NotificationMessageCreator
 
   def too_many_messages_for?(user)
     if @user_counts[user.id] >= user.max_messages_per_day
-      InstStatsd::Statsd.increment("message.too_many_messages_for_was_true", short_stat: "message.too_many_messages_for_was_true")
+      InstStatsd::Statsd.distributed_increment("message.too_many_messages_for_was_true")
       true
     end
   end

@@ -46,7 +46,7 @@ module DataFixup
         sleep(sleep_duration(elapsed))
       end
       reenqueue_job(queue) unless queue.empty?
-      InstStatsd::Statsd.increment("import_instfs_attachments.job_runs.count")
+      InstStatsd::Statsd.distributed_increment("import_instfs_attachments.job_runs.count")
     end
 
     def run_expired?
@@ -64,7 +64,7 @@ module DataFixup
             end
           end
         end
-        InstStatsd::Statsd.increment("import_instfs_attachments.import_batch.count")
+        InstStatsd::Statsd.distributed_increment("import_instfs_attachments.import_batch.count")
         Time.zone.now - started
       end
     end
@@ -110,7 +110,7 @@ module DataFixup
       InstStatsd::Statsd.time("import_instfs_attachments.import_line.time") do
         Attachment.connection.execute(sql)
       end
-      InstStatsd::Statsd.increment("import_instfs_attachments.import_line.count")
+      InstStatsd::Statsd.distributed_increment("import_instfs_attachments.import_line.count")
     end
 
     def sleep_duration(elapsed)

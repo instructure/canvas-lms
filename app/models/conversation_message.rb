@@ -227,7 +227,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def log_conversation_message_metrics
     stat = "inbox.message.created.react"
-    InstStatsd::Statsd.increment(stat)
+    InstStatsd::Statsd.distributed_increment(stat)
   end
 
   def check_for_out_of_office_participants

@@ -452,9 +452,9 @@ describe CoursePace do
 
     it "logs if the assignment being updated has been completed" do
       @assignment.submit_homework(@student, body: "Test")
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       expect(@course_pace.publish).to be(true)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.submitted_assignment_date_change")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.submitted_assignment_date_change")
     end
 
     it "compresses to hard end dates" do
@@ -631,22 +631,22 @@ describe CoursePace do
     end
 
     it "writes the number of course-type course paces to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       @course_pace = @course.course_paces.create! workflow_state: "active"
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.course_paces.count").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.course_paces.count").once
     end
 
     it "writes the number of section-type course paces to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       @new_section = @course.course_sections.create! name: "new_section"
       @section_plan = @course.course_paces.create! course_section: @new_section
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.section_paces.count").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.section_paces.count").once
     end
 
     it "writes the number of user-type course paces to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       @course.course_paces.create!(user: @student, workflow_state: "active")
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.user_paces.count").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.user_paces.count").once
     end
   end
 
@@ -665,25 +665,25 @@ describe CoursePace do
     it "increments the course pace deletion to statsd" do
       # This destroy does work and we log it here, but in general, the code doesn't allow for the default
       # course pace to be deleted for now.
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       course_pace = @course.course_paces.create! workflow_state: "active"
       course_pace.destroy!
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_course_pace").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.deleted_course_pace").once
     end
 
     it "increments the section-type course pace deletion to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       new_section = @course.course_sections.create! name: "new_section"
       section_plan = @course.course_paces.create! course_section: new_section
       section_plan.destroy!
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_section_pace").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.deleted_section_pace").once
     end
 
     it "increments the student-type course pace deletion to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       user_plan = @course.course_paces.create!(user: @student, workflow_state: "active")
       user_plan.destroy!
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_user_pace").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.deleted_user_pace").once
     end
   end
 
@@ -706,14 +706,14 @@ describe CoursePace do
       end
 
       it "increments on initial publish when weekend days selected to be skipped" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
         @course_pace = @course.course_paces.create!(
           workflow_state: "active",
           selected_days_to_skip: SKIP_WEEKEND_DAYS
         )
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
       end
 
       it "does not decrement on initial publish when no days selected to skipped" do
@@ -728,7 +728,7 @@ describe CoursePace do
       end
 
       it "increments on subsequent publish when no days selected then weekend days selected to be skipped" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
         @course_pace = @course.course_paces.create!(
@@ -739,11 +739,11 @@ describe CoursePace do
         @course_pace.publish
 
         expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
       end
 
       it "decrements on subsequent publish when weekend days initially selected then de selected to be skipped" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
         @course_pace = @course.course_paces.create!(
@@ -753,7 +753,7 @@ describe CoursePace do
         @course_pace.update!(selected_days_to_skip: NOT_SKIP_WEEKEND_DAYS)
         @course_pace.publish
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
         expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
       end
     end
@@ -764,14 +764,14 @@ describe CoursePace do
       end
 
       it "increments on initial publish when exclude_weekends set to true" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
         @course_pace = @course.course_paces.create!(
           workflow_state: "active",
           exclude_weekends: true
         )
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
       end
 
       it "does not decrement on initial publish when exclude_weekends set to false" do
@@ -786,7 +786,7 @@ describe CoursePace do
       end
 
       it "increments on subsequent publish when exclude_weekends initially false then set to true" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
         @course_pace = @course.course_paces.create!(
@@ -797,11 +797,11 @@ describe CoursePace do
         @course_pace.publish
 
         expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
       end
 
       it "increments on subsequent publish when exclude_weekends initially true then set to false" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
         @course_pace = @course.course_paces.create!(
@@ -811,7 +811,7 @@ describe CoursePace do
         @course_pace.update!(exclude_weekends: false)
         @course_pace.publish
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
         expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
       end
     end

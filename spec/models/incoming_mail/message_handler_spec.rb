@@ -174,7 +174,7 @@ describe IncomingMail::MessageHandler do
           @pseudonym.update!(workflow_state: "suspended")
           @pseudonym.reload
           user.reload
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
           # by not receiving reply_from we make sure that it is not processed as a reply
           expect(original_message.context).not_to receive(:reply_from)
@@ -202,7 +202,7 @@ describe IncomingMail::MessageHandler do
           expect(expected_bounce_message).to receive(:deliver)
 
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
-          expect(InstStatsd::Statsd).to have_received(:increment).with("incoming_mail_processor.message_processing_error.user_suspended")
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("incoming_mail_processor.message_processing_error.user_suspended")
         end
 
         it "bounces if user is missing" do
@@ -265,7 +265,7 @@ describe IncomingMail::MessageHandler do
 
         context "with a locked discussion topic generic_error" do
           it "constructs the message correctly" do
-            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(InstStatsd::Statsd).to receive(:distributed_increment)
             allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::ReplyToLockedTopic.new)
 
@@ -292,13 +292,13 @@ describe IncomingMail::MessageHandler do
             expect(expected_bounce_message).to receive(:deliver)
 
             subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
-            expect(InstStatsd::Statsd).to have_received(:increment).with("incoming_mail_processor.message_processing_error.reply_to_locked_topic")
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("incoming_mail_processor.message_processing_error.reply_to_locked_topic")
           end
         end
 
         context "with an IncomingMail::Errors::InvalidParticipant error" do
           it "sends the appropriate message" do
-            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(InstStatsd::Statsd).to receive(:distributed_increment)
             allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::InvalidParticipant.new)
 
@@ -326,13 +326,13 @@ describe IncomingMail::MessageHandler do
             expect(expected_bounce_message).to receive(:deliver)
 
             subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
-            expect(InstStatsd::Statsd).to have_received(:increment).with("incoming_mail_processor.message_processing_error.invalid_participant")
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("incoming_mail_processor.message_processing_error.invalid_participant")
           end
         end
 
         context "with a generic reply to error" do
           it "constructs the message correctly" do
-            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(InstStatsd::Statsd).to receive(:distributed_increment)
             allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
             allow(subject).to receive(:get_ref_uuid).and_return("TestRef")
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::UnknownAddress.new)
@@ -362,7 +362,7 @@ describe IncomingMail::MessageHandler do
             expect(expected_bounce_message).to receive(:deliver)
 
             subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
-            expect(InstStatsd::Statsd).to have_received(:increment).with("incoming_mail_processor.message_processing_error.catch_all")
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("incoming_mail_processor.message_processing_error.catch_all")
           end
         end
 

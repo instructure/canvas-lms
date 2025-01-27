@@ -89,7 +89,7 @@ class RedisClient
             dbcluster: defined?(Switchman) ? Switchman::Shard.current.database_server.id : "unknown",
           }
 
-          InstStatsd::Statsd.increment("canvas.redis.by_dbcluster", tags: by_dbcluster_tags)
+          InstStatsd::Statsd.distributed_increment("canvas.redis.by_dbcluster", tags: by_dbcluster_tags)
 
           by_controller_tags = {
             ring: config.ring_tag,
@@ -97,7 +97,7 @@ class RedisClient
             command: DATADOG_COMMANDS.include?(message[:command]) ? message[:command] : "other",
           }
 
-          InstStatsd::Statsd.increment("canvas.redis.by_controller", tags: by_controller_tags)
+          InstStatsd::Statsd.distributed_increment("canvas.redis.by_controller", tags: by_controller_tags)
         end
 
         logline = format_log_message(message, log_style)

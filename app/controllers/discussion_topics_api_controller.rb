@@ -905,7 +905,7 @@ class DiscussionTopicsApiController < ApplicationController
 
     tags = { institution: @domain_root_account&.name || "unknown" }
 
-    InstStatsd::Statsd.increment("discussion_topic.migrate_disallow.count", tags:)
+    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow.count", tags:)
     InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow.discussions_updated", update_count, tags:)
 
     render json: { update_count: }

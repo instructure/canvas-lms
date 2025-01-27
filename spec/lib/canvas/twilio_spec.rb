@@ -127,25 +127,25 @@ describe "Canvas::Twilio" do
     end
 
     it "pings StatsD about outgoing messages" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       stub_twilio(["+18015550100", "+18015550102"], "+18015550102" => "CA", "+18015550103" => "CA", "+18015550104" => "GB")
       expect(Canvas::Twilio.client.api.account.messages).to receive(:create).exactly(3).times
       Canvas::Twilio.deliver("+18015550101", "message text")
       Canvas::Twilio.deliver("+18015550103", "message text")
       Canvas::Twilio.deliver("+18015550104", "message text")
-      expect(InstStatsd::Statsd).to have_received(:increment)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment)
         .with(
           "notifications.twilio.message_sent_from_number.US.+18015550100",
           short_stat: "notifications.twilio.message_sent",
           tags: { country: "US", number: "+18015550100" }
         ).twice
-      expect(InstStatsd::Statsd).to have_received(:increment)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment)
         .with(
           "notifications.twilio.message_sent_from_number.CA.+18015550102",
           short_stat: "notifications.twilio.message_sent",
           tags: { country: "CA", number: "+18015550102" }
         )
-      expect(InstStatsd::Statsd).to have_received(:increment)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment)
         .with("notifications.twilio.no_outbound_numbers_for.GB",
               short_stat: "notifications.twilio.no_outbound_numbers",
               tags: { country: "GB" })

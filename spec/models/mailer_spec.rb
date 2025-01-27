@@ -69,15 +69,14 @@ describe Mailer do
     end
 
     it "sends stat to stat service" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       message = message_model(to: "someemail@example.com")
       mail = Mailer.create_message(message)
       expect(mail).to receive(:deliver_now)
       Mailer.deliver(mail)
-      expect(InstStatsd::Statsd).to have_received(:increment).with(
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
         "message.deliver",
-        { short_stat: "message.deliver",
-          tags: { path_type: "mailer_emails", notification_name: "mailer_delivery" } }
+        { tags: { path_type: "mailer_emails", notification_name: "mailer_delivery" } }
       )
     end
 

@@ -81,7 +81,7 @@ module MicrosoftSync
         raise
       ensure
         statsd_tags = { status_code: response&.code&.to_s || "error" }
-        InstStatsd::Statsd.increment(STATSD_NAME, tags: statsd_tags)
+        InstStatsd::Statsd.distributed_increment(STATSD_NAME, tags: statsd_tags)
       end
 
       # Returns a string token. Cached per-tenant for the time given in the login response.

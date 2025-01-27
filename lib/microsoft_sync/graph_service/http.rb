@@ -325,7 +325,7 @@ module MicrosoftSync
         Rails.logger.info(
           "MicrosoftSync::GraphService::Http: #{request_method} #{request_path} -- #{status_code}, #{outcome}"
         )
-        InstStatsd::Statsd.increment(
+        InstStatsd::Statsd.distributed_increment(
           "#{STATSD_PREFIX}.#{outcome}", tags: statsd_tags.merge(status_code: status_code.to_s)
         )
       end
