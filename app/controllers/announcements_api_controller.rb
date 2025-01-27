@@ -127,7 +127,6 @@ class AnnouncementsApiController < ApplicationController
           :read_as_admin,
           :manage_grades,
           *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS,
-          :manage_content,
           *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
         ) || User.observing_full_course(course).where(id: @current_user).any?
       end

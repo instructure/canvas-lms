@@ -3010,22 +3010,6 @@ describe CoursesController do
     end
 
     it "lets admins without course edit rights update only the syllabus body" do
-      @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
-      role = custom_account_role("grade viewer", account: Account.default)
-      account_admin_user_with_role_changes(role:, role_changes: { manage_content: true })
-      user_session(@user)
-
-      name = "some name"
-      body = "some body"
-      put "update", params: { id: @course.id, course: { name:, syllabus_body: body } }
-
-      @course.reload
-      expect(@course.name).to_not eq name
-      expect(@course.syllabus_body).to eq body
-    end
-
-    it "lets admins without course edit rights update only the syllabus body (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
       role = custom_account_role("grade viewer", account: Account.default)
       account_admin_user_with_role_changes(
         role:,
@@ -4498,17 +4482,17 @@ describe CoursesController do
       expect(json.pluck("name")).to match_array(["course teacher", "search teacher"])
     end
 
-    it 'does not return admin roles that do not have the "manage_content" permission' do
+    it 'does not return admin roles that do not have the "manage_course_content_add" permission' do
       user_session(@teacher)
       account_admin = user_factory(name: "less privileged account admin")
-      role = custom_account_role("manage_content", account: @course.root_account)
+      role = custom_account_role("manage_course_content_add", account: @course.root_account)
       account_admin_user(account: @course.root_account, user: account_admin, role:)
 
       get "content_share_users", params: { course_id: @course.id, search_term: "less privileged" }
       json = json_parse(response.body)
       expect(json.pluck("name")).not_to include("less privileged account admin")
 
-      role.role_overrides.create!(enabled: true, permission: "manage_content", context: @course.root_account)
+      role.role_overrides.create!(enabled: true, permission: "manage_course_content_add", context: @course.root_account)
       get "content_share_users", params: { course_id: @course.id, search_term: "less privileged" }
       json = json_parse(response.body)
       expect(json.pluck("name")).to include("less privileged account admin")

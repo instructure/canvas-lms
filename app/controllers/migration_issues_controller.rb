@@ -94,11 +94,9 @@
 #
 class MigrationIssuesController < ApplicationController
   include Api::V1::ContentMigration
-  include GranularPermissionEnforcement
 
   before_action :require_context
   before_action :require_content_migration
-  before_action :authorize_action
 
   # @API List migration issues
   #
@@ -111,6 +109,8 @@ class MigrationIssuesController < ApplicationController
   #
   # @returns [MigrationIssue]
   def index
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     @issues = Api.paginate(@content_migration.migration_issues.by_created_at, self, api_v1_course_content_migration_migration_issue_list_url(@context, @content_migration))
     render json: migration_issues_json(@issues, @content_migration, @current_user, session)
   end
@@ -126,6 +126,8 @@ class MigrationIssuesController < ApplicationController
   #
   # @returns MigrationIssue
   def show
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     issue = @content_migration.migration_issues.find(params[:id])
     render json: migration_issue_json(issue, @content_migration, @current_user, session)
   end
@@ -144,6 +146,8 @@ class MigrationIssuesController < ApplicationController
   #
   # @returns MigrationIssue
   def update
+    return unless authorized_action(@context, @current_user, :manage_course_content_edit)
+
     issue = @content_migration.migration_issues.find(params[:id])
 
     if ["active", "resolved"].member? params[:workflow_state]
@@ -159,18 +163,6 @@ class MigrationIssuesController < ApplicationController
   end
 
   protected
-
-  def authorize_action
-    enforce_granular_permissions(
-      @context,
-      overrides: [:manage_content],
-      actions: {
-        index: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        show: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        update: [:manage_course_content_edit]
-      }
-    )
-  end
 
   def require_content_migration
     @content_migration = @context.content_migrations.find(params[:content_migration_id])

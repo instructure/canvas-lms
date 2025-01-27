@@ -57,7 +57,6 @@ class ContentImportsController < ApplicationController
       @current_user,
       [
         *RoleOverride::GRANULAR_FILE_PERMISSIONS,
-        :manage_content,
         *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
       ]
     )
@@ -86,7 +85,7 @@ class ContentImportsController < ApplicationController
     if api_request?
       @context = api_find(Course, params[:course_id])
     end
-    if authorized_action(@context, @current_user, [:manage_content, :manage_course_content_add])
+    if authorized_action(@context, @current_user, :manage_course_content_add)
       cm = ContentMigration.where(context_id: @context, id: params[:id]).first
       raise ActiveRecord::RecordNotFound unless cm
 
@@ -122,7 +121,7 @@ class ContentImportsController < ApplicationController
       @context = api_find(Course, params[:course_id])
     end
 
-    if authorized_action(@context, @current_user, [:manage_content, :manage_course_content_add])
+    if authorized_action(@context, @current_user, :manage_course_content_add)
       if api_request?
         @source_course = api_find(Course, params[:source_course])
         copy_params = { everything: false }

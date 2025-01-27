@@ -818,7 +818,7 @@ module Lti
                     account_admin_user_with_role_changes(
                       account:,
                       role: department_admin_role,
-                      role_changes: { manage_content: false, manage_course_content_add: false }
+                      role_changes: { manage_course_content_add: false }
                     )
                     user_session(@user)
                     subject
@@ -830,7 +830,7 @@ module Lti
                     account_admin_user_with_role_changes(
                       account:,
                       role: department_admin_role,
-                      role_changes: { manage_content: false, manage_course_content_add: true }
+                      role_changes: { manage_course_content_add: true }
                     )
                     user_session(@user)
                     subject

@@ -1665,13 +1665,6 @@ describe ContextModule do
       end
 
       it "properly returns differentiated assignments for teacher even without update rights" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
-        @course.account.role_overrides.create!(role: teacher_role, enabled: false, permission: :manage_content)
-        expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
-      end
-
-      it "properly returns differentiated assignments for teacher even without update rights (granular permissions)" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
         @course.account.role_overrides.create!(role: teacher_role, enabled: false, permission: :manage_course_content_add)
         @course.account.role_overrides.create!(role: teacher_role, enabled: false, permission: :manage_course_content_edit)
         @course.account.role_overrides.create!(role: teacher_role, enabled: false, permission: :manage_course_content_delete)
@@ -1938,18 +1931,6 @@ describe ContextModule do
 
   it "allows teachers with concluded enrollments to :read unpublished modules" do
     course_with_teacher.complete!
-    @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
-    m = @course.context_modules.create!
-    m.workflow_state = "unpublished"
-    m.save!
-    expect(m.grants_right?(@teacher, :read)).to be true
-    expect(m.grants_right?(@teacher, :read_as_admin)).to be true
-    expect(m.grants_right?(@teacher, :manage_content)).to be false
-  end
-
-  it "allows teachers with concluded enrollments to :read unpublished modules (granular permissions)" do
-    course_with_teacher.complete!
-    @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
     m = @course.context_modules.create!
     m.workflow_state = "unpublished"
     m.save!

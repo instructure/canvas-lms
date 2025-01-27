@@ -1357,7 +1357,6 @@ class User < ActiveRecord::Base
       read_files
       read_as_admin
       manage
-      manage_content
       manage_course_content_add
       manage_course_content_edit
       manage_course_content_delete

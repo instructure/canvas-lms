@@ -94,17 +94,8 @@ class ContentTag < ActiveRecord::Base
   acts_as_list scope: :context_module
 
   set_policy do
-    #################### Begin legacy permission block #########################
     given do |user, session|
-      user && !root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-        context&.grants_right?(user, session, :manage_content)
-    end
-    can :delete
-    ##################### End legacy permission block ##########################
-
-    given do |user, session|
-      user && root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-        context&.grants_right?(user, session, :manage_course_content_delete)
+      user && context&.grants_right?(user, session, :manage_course_content_delete)
     end
     can :delete
   end

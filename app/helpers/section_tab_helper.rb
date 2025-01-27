@@ -26,7 +26,6 @@ module SectionTabHelper
     :manage_assignments_add,
     :manage_assignments_edit,
     :manage_assignments_delete,
-    :manage_content,
     :manage_files_add,
     :manage_files_edit,
     :manage_files_delete,

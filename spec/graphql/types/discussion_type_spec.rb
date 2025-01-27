@@ -143,20 +143,8 @@ RSpec.shared_context "DiscussionTypeContext" do
       }
     ]
   end
-  let(:manage_content_permission) do
-    [
-      {
-        value: "manageContent",
-        allowed: ->(user) { discussion.context.grants_right?(user, :manage_content) }
-      }
-    ]
-  end
   let(:permissions) do
-    if Account.default.feature_enabled?(:granular_permissions_manage_course_content)
-      default_permissions.concat(manage_course_content_permissions)
-    else
-      default_permissions.concat(manage_content_permission)
-    end
+    default_permissions.concat(manage_course_content_permissions)
   end
 end
 
@@ -588,19 +576,6 @@ RSpec.shared_examples "DiscussionType" do
   end
 
   it "returns the current user permissions" do
-    Account.default.disable_feature!(:granular_permissions_manage_course_content)
-    student_in_course(active_all: true)
-    type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
-
-    permissions.each do |permission|
-      expect(discussion_type.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@teacher)
-
-      expect(type_with_student.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@student)
-    end
-  end
-
-  it "returns the current user permissions (granular permissions)" do
-    Account.default.enable_feature!(:granular_permissions_manage_course_content)
     student_in_course(active_all: true)
     type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
 

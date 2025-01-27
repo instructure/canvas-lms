@@ -76,10 +76,10 @@ class ContextModulesController < ApplicationController
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 
-      @can_view = @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
-      @can_add = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add)
-      @can_edit = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit)
-      @can_delete = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_delete)
+      @can_view = @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+      @can_add = @context.grants_right?(@current_user, session, :manage_course_content_add)
+      @can_edit = @context.grants_right?(@current_user, session, :manage_course_content_edit)
+      @can_delete = @context.grants_right?(@current_user, session, :manage_course_content_delete)
       @can_view_grades = can_do(@context, @current_user, :view_all_grades)
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
@@ -121,11 +121,11 @@ class ContextModulesController < ApplicationController
         @menu_tools[p] = tools.select { |t| t.has_placement? p }
       end
 
-      if @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+      if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
         module_file_details = load_module_file_details
       end
 
-      @allow_menu_tools = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add) &&
+      @allow_menu_tools = @context.grants_right?(@current_user, session, :manage_course_content_add) &&
                           (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?)
 
       assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
@@ -712,7 +712,7 @@ class ContextModulesController < ApplicationController
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
 
-    if authorized_action(@context, @current_user, %i[manage_content manage_course_content_add manage_course_content_edit])
+    if authorized_action(@context, @current_user, %i[manage_course_content_add manage_course_content_edit])
       params[:item][:link_settings] = launch_dimensions
       @tag = @module.add_item(params[:item])
       unless @tag&.valid?

@@ -180,7 +180,7 @@ describe "context modules" do
     end
 
     it "shows progressions link if user has grading permission but not content management" do
-      RoleOverride.create!(context: Account.default, permission: "manage_content", role: teacher_role, enabled: false)
+      RoleOverride.create!(context: Account.default, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
       get "/courses/#{@course.id}/modules"
       expect(f("#content")).to contain_css(".module_progressions_link")
     end
