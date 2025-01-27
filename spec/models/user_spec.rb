@@ -4580,6 +4580,56 @@ describe User do
         end
       end
     end
+
+    context "with teachers_can_create_courses_anywhere" do
+      before :once do
+        @account.settings[:teachers_can_create_courses_anywhere] = true
+        @account.settings[:teachers_can_create_courses] = true
+        @account.save!
+        @other_account = @account.sub_accounts.create!
+      end
+
+      it "is :teacher for account if user has teacher enrollments" do
+        course_with_teacher(user: @user, active_all: true)
+        expect(@user.create_courses_right(@account)).to be(:teacher)
+      end
+
+      it "is not :teacher for an account if the teacher does not have enrollments" do
+        expect(@user.create_courses_right(@account)).to be_nil
+        expect(@user.create_courses_right(@other_account)).to be_nil
+      end
+
+      it "is does not leak permissions to other sub-accounts when user has teacher enrollments elsewhere" do
+        course_with_teacher(user: @user, active_all: true)
+        expect(@user.create_courses_right(@account)).to be(:teacher)
+        expect(@user.create_courses_right(@other_account)).to be_nil
+      end
+    end
+
+    context "with students_can_create_courses_anywhere" do
+      before :once do
+        @account.settings[:students_can_create_courses_anywhere] = true
+        @account.settings[:students_can_create_courses] = true
+        @account.save!
+        @other_account = @account.sub_accounts.create!
+      end
+
+      it "is :student for account if user has student enrollments" do
+        course_with_student(user: @user, active_all: true)
+        expect(@user.create_courses_right(@account)).to be(:student)
+      end
+
+      it "is not :student for an account if the student does not have enrollments" do
+        expect(@user.create_courses_right(@account)).to be_nil
+        expect(@user.create_courses_right(@other_account)).to be_nil
+      end
+
+      it "is does not leak permissions to other sub-accounts when user has student enrollments elsewhere" do
+        course_with_student(user: @user, active_all: true)
+        expect(@user.create_courses_right(@account)).to be(:student)
+        expect(@user.create_courses_right(@other_account)).to be_nil
+      end
+    end
   end
 
   it "destroys associated gradebook filters when the user is soft-deleted" do

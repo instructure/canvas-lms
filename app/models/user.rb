@@ -3514,14 +3514,18 @@ class User < ActiveRecord::Base
     return nil if fake_student? || account.root_account.site_admin?
 
     scope = account.root_account.enrollments.active.where(user_id: self)
-    teacher_right = account.root_account.teachers_can_create_courses? && scope.where(type: %w[TeacherEnrollment DesignerEnrollment]).exists?
-    # k5 users can still create courses anywhere, even if the setting restricts them to the manually created courses account
-    return :teacher if teacher_right && (account.root_account.teachers_can_create_courses_anywhere? || active_k5_enrollments?)
-    return :teacher if teacher_right && account == account.root_account.manually_created_courses_account
+    course_scope = Enrollment.joins(:course).merge(Course.where(account:))
 
-    student_right = account.root_account.students_can_create_courses? && scope.where(type: %w[StudentEnrollment ObserverEnrollment]).exists?
-    return :student if student_right && (account.root_account.students_can_create_courses_anywhere? || active_k5_enrollments?)
-    return :student if student_right && account == account.root_account.manually_created_courses_account
+    teacher_right = account.root_account.teachers_can_create_courses?
+    teacher_scope = scope.where(type: %w[TeacherEnrollment DesignerEnrollment])
+    # k5 users can still create courses anywhere, even if the setting restricts them to the manually created courses account
+    return :teacher if teacher_right && teacher_scope.merge(course_scope).exists? && (account.root_account.teachers_can_create_courses_anywhere? || active_k5_enrollments?)
+    return :teacher if teacher_right && teacher_scope.exists? && account == account.root_account.manually_created_courses_account
+
+    student_right = account.root_account.students_can_create_courses?
+    student_scope = scope.where(type: %w[StudentEnrollment ObserverEnrollment])
+    return :student if student_right && student_scope.merge(course_scope).exists? && (account.root_account.students_can_create_courses_anywhere? || active_k5_enrollments?)
+    return :student if student_right && student_scope.exists? && account == account.root_account.manually_created_courses_account
     return :no_enrollments if account.root_account.no_enrollments_can_create_courses? && !scope.exists? && account == account.root_account.manually_created_courses_account
 
     nil
