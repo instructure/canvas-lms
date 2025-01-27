@@ -450,6 +450,16 @@ module CustomSeleniumActions
     end
   end
 
+  def search_for_option(select_css, option_text, option_value)
+    element = fj(select_css)
+    # for search select inputs required to type some text before selecting an option
+    element.send_keys(option_text.split.first)
+    Selenium::WebDriver::Wait.new(timeout: 5).until do
+      element.attribute("aria-expanded") == "true"
+    end
+    click_INSTUI_Select_option(element, option_value, :value)
+  end
+
   def click_option(select_css, option_text, select_by = :text)
     element = fj(select_css)
     if element.tag_name == "input"
