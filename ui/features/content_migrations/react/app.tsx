@@ -31,6 +31,7 @@ type MigrationsResponse = {json: ContentMigrationItem[]}
 export const App = () => {
   const [migrations, setMigrations] = useState<ContentMigrationItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
+
   useEffect(() => {
     setIsLoading(true)
     doFetchApi({

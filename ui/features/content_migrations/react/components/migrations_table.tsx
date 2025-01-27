@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {canvas} from '@instructure/ui-theme-tokens'
-import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -31,70 +30,29 @@ import {View} from '@instructure/ui-view'
 const I18n = createI18nScope('content_migrations_redesign')
 
 const LoadingSpinner = () => (
-  <View as="div" margin="medium none" textAlign="center">
-    <Spinner size="small" renderTitle={I18n.t('Loading')} />
-  </View>
+  <Table.Row>
+    <Table.Cell colSpan={headerData.length} textAlign="center">
+      <View as="div" margin="medium none" textAlign="center">
+        <Spinner size="small" renderTitle={I18n.t('Loading')} />
+      </View>
+    </Table.Cell>
+  </Table.Row>
 )
 
-
-type ContentMigrationsTableViewProps = {
-  migrations: ContentMigrationItem[]
-  isLoading: boolean
-  updateMigrationItem: (
-    migrationId: string,
-    data: any,
-    noXHR: boolean | undefined,
-  ) => Promise<ContentMigrationItem | undefined>
+type HeaderData = {
+  id: string
+  label: React.ReactNode
+  textAlign?: 'start' | 'center' | 'end'
 }
 
-const ContentMigrationsTableCondensedView = ({
-  migrations,
-  isLoading,
-  updateMigrationItem,
-}: ContentMigrationsTableViewProps) => {
-  return (
-    <Flex justifyItems="center" direction="column" gap="small">
-      {migrations.map((cm: ContentMigrationItem) => (
-        <MigrationRow
-          key={cm.id}
-          migration={cm}
-          view="condensed"
-          updateMigrationItem={updateMigrationItem}
-        />
-      ))}
-      {isLoading && (<LoadingSpinner />)}
-    </Flex>
-  )
-}
-
-const ContentMigrationsTableExpandedView = ({
-  migrations,
-  isLoading,
-  updateMigrationItem,
-}: ContentMigrationsTableViewProps) => {
-  return (
-    <Table caption={I18n.t('Content Migrations')}>
-      {renderTableHeader()}
-      <Table.Body>
-        {migrations.map((cm: ContentMigrationItem) => (
-          <MigrationRow
-            key={cm.id}
-            migration={cm}
-            view="expanded"
-            updateMigrationItem={updateMigrationItem}
-          />
-        ))}
-        {isLoading && 
-          <Table.Row>
-            <Table.Cell colSpan={6} textAlign="center">
-              <LoadingSpinner />
-            </Table.Cell>
-          </Table.Row>
-        }
-      </Table.Body>
-    </Table>
-  )
-}
+const headerData: HeaderData[] = [
+  {id: 'content_type', label: <strong>{I18n.t('Content Type')}</strong>},
+  {id: 'source_link', label: <strong>{I18n.t('Source Link')}</strong>},
+  {id: 'date_imported', label: <strong>{I18n.t('Date Imported')}</strong>},
+  {id: 'status', label: <strong>{I18n.t('Status')}</strong>, textAlign: 'center'},
+  {id: 'progress', label: <strong>{I18n.t('Progress')}</strong>, textAlign: 'center'},
+  {id: 'action', label: <strong>{I18n.t('Action')}</strong>, textAlign: 'center'},
+]
 
 export type ContentMigrationsTableProps = {
   migrations: ContentMigrationItem[]
@@ -107,66 +65,52 @@ export const ContentMigrationsTable = ({
   isLoading,
   updateMigrationItem,
 }: ContentMigrationsTableProps) => {
-
   return (
-    <>
-      <Heading level="h2" as="h2" margin="small 0">
-        {I18n.t('Import Activity')}
+    <View as="div" borderWidth='small 0 0 0' padding='small 0 0 0'>
+      <Heading level="h3" as="h3" margin="small 0">
+        {I18n.t('Content imports')}
       </Heading>
-      <hr role="presentation" aria-hidden="true" />
+      <View as="div" margin="small 0 medium 0">
+        {I18n.t(
+          'Content import files cannot be downloaded after 30 days.',
+        )}
+      </View>
       <Responsive
         match="media"
         query={{
           expanded: {minWidth: canvas.breakpoints.medium},
         }}
         render={(_, matches) => {
-          if (matches?.includes('expanded')) {
-            return (
-              <ContentMigrationsTableExpandedView
-                migrations={migrations}
-                isLoading={isLoading}
-                updateMigrationItem={updateMigrationItem}
-              />
-            )
-          } else {
-            return (
-              <ContentMigrationsTableCondensedView
-                migrations={migrations}
-                isLoading={isLoading}
-                updateMigrationItem={updateMigrationItem}
-              />
-            )
-          }
+          const layout = matches?.includes('expanded') ? 'auto' : 'stacked'
+          return (
+            <Table caption={I18n.t('Content Migrations')} layout={layout}>
+              <Table.Head>
+                <Table.Row>
+                  {headerData.map((header) => (
+                    <Table.ColHeader key={header.id} id={header.id} themeOverride={{padding: '0.6rem 0'}} textAlign={header.textAlign || 'start'}>
+                      {header.label}
+                    </Table.ColHeader>
+                  ))}
+                </Table.Row>
+              </Table.Head>
+              <Table.Body>
+                {isLoading ? (
+                  <LoadingSpinner />
+                ) : (
+                  migrations.map((cm: ContentMigrationItem) => (
+                  <MigrationRow
+                    key={cm.id}
+                    migration={cm}
+                    layout={layout}
+                    updateMigrationItem={updateMigrationItem}
+                  />
+                )))}
+              </Table.Body>
+            </Table>
+          )
         }}
       />
-    </>
-  )
-}
-
-const renderTableHeader = () => {
-  return (
-    <Table.Head>
-      <Table.Row>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="content_type">
-          {I18n.t('Content Type')}
-        </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="source_link">
-          {I18n.t('Source Link')}
-        </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="date_imported">
-          {I18n.t('Date Imported')}
-        </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} textAlign="center" id="status">
-          {I18n.t('Status')}
-        </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} textAlign="center" id="progress">
-          {I18n.t('Progress')}
-        </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} textAlign="center" id="action">
-          {I18n.t('Action')}
-        </Table.ColHeader>
-      </Table.Row>
-    </Table.Head>
+    </View>
   )
 }
 

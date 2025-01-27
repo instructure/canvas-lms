@@ -62,18 +62,18 @@ const obtainLink = ({
   return attachment ? attachment.url : null
 }
 
-export const SourceLink = ({item}: {item: ContentMigrationItem}) => {
+export const SourceLink = ({item, ellipsis = false}: {item: ContentMigrationItem, ellipsis?: boolean}) => {
   const text = obtainText(item)
   const link = obtainLink(item)
-  const ellipsisStyle = {
+  const ellipsisStyle = ellipsis ? {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    display: 'block',
+    display: 'inline-block',
     maxWidth: '40vw',
-  }
+  } : {}
 
   return link ? (
-    <Link href={link} display="block">
+    <Link href={link} display="auto">
       <span style={ellipsisStyle}>{text}</span>
     </Link>
   ) : (
