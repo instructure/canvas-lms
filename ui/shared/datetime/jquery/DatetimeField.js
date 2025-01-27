@@ -142,6 +142,7 @@ export default class DatetimeField {
     this.$field = $field
     this.$field.data({instance: this})
     this.$options = options
+    this.$options.newSuggestionDesign = true
 
     this.processTimeOptions(options)
     if (this.showDate) $wrapper = this.addDatePicker(options)
@@ -272,11 +273,11 @@ export default class DatetimeField {
 
   // private API
   setFromValue(e) {
-    const inputdate = this.$field.data('inputdate')
-    if (typeof e !== 'undefined' && ['focus', 'blur'].includes(e.type) && !inputdate) return
-    this.parseValue()
-    this.update()
-    this.updateSuggest(e?.type === 'keyup') // only show suggestions when typing
+    const inputdate = this.$field.data('inputdate');
+    if (['focus', 'blur'].includes(e?.type) && !inputdate) return
+    this.parseValue();
+    this.update();
+    this.updateSuggest(e?.type === 'keyup');
   }
 
   normalizeValue(value) {
@@ -432,13 +433,21 @@ export default class DatetimeField {
 
     if ((show || this.$contextSuggest || this.invalid()) && localText.length > 0) {
       const errorContainer = document.createElement('span')
-      errorContainer.className = 'error-message'
+      errorContainer.className = ''
       errorContainer.setAttribute('tabindex', '-1')
 
       const icon = document.createElement('i')
-      icon.className = 'icon-warning icon-Solid'
+      icon.className = ''
       icon.setAttribute('tabindex', '-1')
       icon.setAttribute('aria-hidden', 'true')
+
+      if (this.invalid()) {
+        errorContainer.className = 'error-message'
+        icon.className = 'icon-warning icon-Solid'
+        this.$field.addClass('error')
+      } else {
+        this.$field.removeClass('error')
+      }
 
       const text = document.createElement('span')
       text.setAttribute('role', 'alert')
@@ -452,7 +461,6 @@ export default class DatetimeField {
       this.$suggest[0].innerHTML = ''
       this.$suggest[0].appendChild(errorContainer)
 
-      this.$field.addClass('error')
       this.$suggest.show()
       return
     }
@@ -515,6 +523,6 @@ export default class DatetimeField {
       if (this.$options.timeOnly) return I18n.t('Not a valid time format')
     }
     if (this.valid === PARSE_RESULTS.BAD_YEAR) return I18n.t('Year is too far in the past.')
-    return I18n.t('errors.not_a_date', "That's not a date!")
+    return I18n.t('errors.not_a_date', 'Please enter a valid format for a date')
   }
 }
