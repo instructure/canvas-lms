@@ -160,11 +160,6 @@ class PageViewsController < ApplicationController
 
   include Api::V1::PageView
 
-  def update
-    render json: { ok: true }
-    # page view update happens in log_page_view after_action
-  end
-
   # @API List user page views
   # Return a paginated list of the user's page view history in json format,
   # similar to the available CSV download. Page views are returned in
@@ -228,5 +223,16 @@ class PageViewsController < ApplicationController
         send_data(csv, options)
       end
     end
+  rescue PageView::Pv4Client::Pv4EmptyResponse => e
+    Canvas::Errors.capture_exception(:pv4, e, :warn)
+    render json: { error: t("Page view data is not available at this time") }, status: :service_unavailable
+  rescue PageView::Pv4Client::Pv4Timeout => e
+    Canvas::Errors.capture_exception(:pv4, e, :warn)
+    render json: { error: t("Page Views service is temporarily unavailable") }, status: :bad_gateway
+  end
+
+  def update
+    render json: { ok: true }
+    # page view update happens in log_page_view after_action
   end
 end
