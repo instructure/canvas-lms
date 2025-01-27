@@ -257,25 +257,27 @@ export const getAssignmentGrades = (data, observedUserId) => {
           ? 'letter_grade'
           : a.grading_type
         const rqdFormattedGrade = formatGradeToRQD(a, submission)
-        assignments.push({
-          id: a.id,
-          assignmentName: a.name,
-          url: a.html_url,
-          dueDate: a.due_at,
-          assignmentGroupName: group.name,
-          assignmentGroupId: group.id,
-          pointsPossible: a.points_possible,
-          gradingType: ENV.RESTRICT_QUANTITATIVE_DATA ? rqd_grading_type : a.grading_type,
-          restrictQuantitativeData: ENV.RESTRICT_QUANTITATIVE_DATA,
-          score: submission?.score,
-          grade: ENV.RESTRICT_QUANTITATIVE_DATA ? rqdFormattedGrade : submission?.grade,
-          submissionDate: submission?.submitted_at,
-          unread: submission?.read_state === 'unread',
-          late: submission?.late,
-          excused: submission?.excused,
-          missing: submission?.missing,
-          hasComments: !!submission?.submission_comments?.length,
-        })
+        if (a.grading_type != "not_graded") {
+          assignments.push({
+            id: a.id,
+            assignmentName: a.name,
+            url: a.html_url,
+            dueDate: a.due_at,
+            assignmentGroupName: group.name,
+            assignmentGroupId: group.id,
+            pointsPossible: a.points_possible,
+            gradingType: ENV.RESTRICT_QUANTITATIVE_DATA ? rqd_grading_type : a.grading_type,
+            restrictQuantitativeData: ENV.RESTRICT_QUANTITATIVE_DATA,
+            score: submission?.score,
+            grade: ENV.RESTRICT_QUANTITATIVE_DATA ? rqdFormattedGrade : submission?.grade,
+            submissionDate: submission?.submitted_at,
+            unread: submission?.read_state === 'unread',
+            late: submission?.late,
+            excused: submission?.excused,
+            missing: submission?.missing,
+            hasComments: !!submission?.submission_comments?.length,
+          })
+        }
         return assignments
       }, []),
     )
