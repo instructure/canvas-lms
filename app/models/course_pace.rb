@@ -170,6 +170,8 @@ class CoursePace < ActiveRecord::Base
               content_tag = course_pace_module_item.module_item
               assignment = content_tag.assignment
               next unless assignment
+              next if assignment.only_visible_to_overrides
+              next if assignment.assignment_overrides.active.find_by(set_type: AssignmentOverride::SET_TYPE_NOOP, set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
 
               due_at = CanvasTime.fancy_midnight(dates[course_pace_module_item.id].in_time_zone).utc
               user_id = enrollment.user_id

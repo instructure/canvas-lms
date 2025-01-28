@@ -144,6 +144,33 @@ module ConditionalRelease
         expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).to_not include(@set3a_assmt)
         expect(DifferentiableAssignment.scope_filter(@course.assignments, old_student, @course).to_a).to include(@set3a_assmt)
       end
+
+      context "with course pace" do
+        before :once do
+          @course.update start_at: "2021-06-30", restrict_enrollments_to_course_dates: true, time_zone: "UTC"
+          @course.root_account.enable_feature!(:course_paces)
+          @course.enable_course_paces = true
+          @course.save!
+          @module = @course.context_modules.create!
+          @tags = [@trigger_assmt, @set1_assmt1, @set2_assmt1, @set3a_assmt, @set3b_assmt].map do |assignment|
+            assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+          end
+          @course_pace = @course.course_paces.create! workflow_state: "active", published_at: Time.zone.now
+          @course_pace_module_items = @tags.map do |tag|
+            @course_pace.course_pace_module_items.create! module_item: tag
+          end
+
+          @course_pace.publish
+        end
+
+        it "creates the assignment override with the due date from the course pace" do
+          ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
+
+          override = @set3a_assmt.assignment_overrides.last
+
+          expect(override.due_at).to eq Time.zone.now.end_of_day
+        end
+      end
     end
   end
 end
