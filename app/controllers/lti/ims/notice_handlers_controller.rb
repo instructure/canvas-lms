@@ -175,7 +175,7 @@ module Lti::IMS
     end
 
     def tool
-      @tool ||= ContextExternalTool.find(params.require(:context_external_tool_id))
+      @tool ||= ContextExternalTool.active.find(params.require(:context_external_tool_id))
     rescue ActiveRecord::RecordNotFound
       render_error("not found", :not_found)
     end
