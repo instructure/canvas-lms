@@ -45,6 +45,7 @@ import CurrentUploads from '../FilesHeader/CurrentUploads'
 import {View} from '@instructure/ui-view'
 import {FileManagementContext} from '../Contexts'
 import {FileFolderWrapper, FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
+import BlueprintIconButton from './BlueprintIconButton'
 
 const I18n = createI18nScope('files_v2')
 
@@ -69,6 +70,7 @@ const columnHeaders: ColumnHeader[] = [
   {id: 'modified_by', title: I18n.t('Modified By'), textAlign: 'start', width: '6em'},
   {id: 'size', title: I18n.t('Size'), textAlign: 'start', width: '4em'},
   {id: 'rights', title: I18n.t('Rights'), textAlign: 'center', width: '3.5em'},
+  {id: 'blueprint', title: I18n.t('Blueprint'), textAlign: 'center', width: '3.5em'},
   {id: 'published', title: I18n.t('Published'), textAlign: 'center', width: '4em'},
   {id: 'actions', title: '', textAlign: 'center', width: '3em'},
 ]
@@ -112,6 +114,7 @@ const columnRenderers: {
         userCanEditFilesForContext={userCanEditFilesForContext}
       />
     ) : null,
+  blueprint: ({row}) => <BlueprintIconButton item={row} />,
   published: ({row, userCanEditFilesForContext}) => (
     <PublishIconButton item={row} userCanEditFilesForContext={userCanEditFilesForContext} />
   ),
@@ -230,10 +233,14 @@ const FileFolderTable = ({
   const allRowsSelected = rows.length != 0 && selectedRows.size === rows.length
   const someRowsSelected = selectedRows.size > 0 && !allRowsSelected
   const filteredColumns = columnHeaders.filter(column => {
-    if (column.id === 'rights') {
-      return usageRightsRequiredForContext
+    switch (column.id) {
+      case 'rights':
+        return usageRightsRequiredForContext
+      case 'blueprint':
+        return !!ENV.BLUEPRINT_COURSES_DATA
+      default:
+        return true
     }
-    return true
   })
 
   const renderTableActionsHead = useCallback(() => {
