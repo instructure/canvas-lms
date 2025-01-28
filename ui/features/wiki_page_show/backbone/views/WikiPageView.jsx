@@ -170,8 +170,8 @@ export default class WikiPageView extends Backbone.View {
         assetType: 'Page',
         assetID: this.model.get('url'),
         onFetchSuccess: () => {
-          $('.module-sequence-footer-content').append($('#mark-as-done-container'))
-          $('#mark-as-done-container').css({float: 'right', 'margin-right': '4px'})
+          $('.module-sequence-footer-right').prepend($('#mark-as-done-container'))
+          $('#mark-as-done-container').css({'margin-right': '4px'})
         },
       })
     } else if (this.$sequenceFooter != null) {

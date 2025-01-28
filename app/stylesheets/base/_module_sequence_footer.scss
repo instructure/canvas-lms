@@ -36,6 +36,8 @@ $bar-height: 64px;
   border-top: 1px solid $ic-border-light;
   box-sizing: border-box;
   padding-top: $ic-sp;
+  display: flex;
+  justify-content: space-between;
 }
 
 .module-sequence-footer .module-sequence-footer-content a {
