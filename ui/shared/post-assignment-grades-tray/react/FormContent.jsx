@@ -47,6 +47,7 @@ export default function FormContent({
   sections,
   selectedSectionIds,
   unpostedCount,
+  showSectionValidation,
 }) {
   if (postingGrades) {
     return (
@@ -100,6 +101,7 @@ export default function FormContent({
           sections={sections}
           sectionSelectionChanged={sectionSelectionChanged}
           selectedSectionIds={selectedSectionIds}
+          showSectionValidation={showSectionValidation}
         />
       )}
 

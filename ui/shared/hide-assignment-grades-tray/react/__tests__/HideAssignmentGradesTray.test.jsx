@@ -136,6 +136,13 @@ describe('HideAssignmentGradesTray', () => {
       expect(Api.hideAssignmentGradesForSections).toHaveBeenCalledWith('2301', ['2001'])
     })
 
+    it('shows an error when no sections are selected with "Specific Sections" checked', async () => {
+      await showTray()
+      await userEvent.click(screen.getByLabelText('Specific Sections'))
+      await userEvent.click(screen.getByTestId('hide-grades-button'))
+      expect(screen.getByText('Please select at least one option')).toBeInTheDocument()
+    })
+
     it('shows success message when hiding grades succeeds', async () => {
       await showTray()
       await userEvent.click(screen.getByRole('button', {name: 'Hide'}))
