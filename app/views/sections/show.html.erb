@@ -271,17 +271,19 @@ h3 .tally {
     </p>
     <table class="formtable">
       <tr>
-        <td><label for="course_autocomplete_id_lookup"><%= before_label('search_for_course', "Search for Course") %> </label></td>
         <td>
           <a href="<%= context_url(@current_user, :context_manageable_courses_url, :format => :json) %>" id="course_autocomplete_url" style="display: none;">&nbsp;</a>
           <a href="<%= context_url(@context, :context_section_confirm_crosslist_url, @section.id, "{{ id }}") %>" id="course_confirm_crosslist_url" style="display: none;">&nbsp;</a>
           <input type="hidden" name="new_course_id" id="course_autocomplete_id"/>
-          <input type="text" id="course_autocomplete_id_lookup" style="width: 250px;"/>
+          <label for="course_autocomplete_id_lookup"><strong><%= before_label('search_for_course', "Search for Course") %></strong></label>
+          <input type="text" id="course_autocomplete_id_lookup" style="width: 80%;"/>
+          <div id="course_autocomplete_id_lookup_errors"></div>
         </td>
       </tr><tr>
-        <td><label for="course_id"><%= before_label('enter_course_id', "Or Enter the Course's ID") %></label></td>
         <td>
-          <input type="text" id="course_id" style="width: 75px;"/>
+          <label for="course_id"><strong><%= before_label('enter_course_id', "Or Enter the Course's ID") %></strong></label>
+          <input type="text" id="course_id" style="width: 80%;"/>
+          <div id="course_id_errors"></div>
         </td>
       </tr><tr>
         <td colspan="2">
