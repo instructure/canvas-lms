@@ -218,4 +218,26 @@ describe('FileFolderTable', () => {
       expect(screen.getByText('1 of 1 selected')).toBeInTheDocument()
     })
   })
+
+  describe('FileFolderTable - blueprint behavior', () => {
+    it('renders the BP column', async () => {
+      ENV.BLUEPRINT_COURSES_DATA = {
+        isMasterCourse: true,
+        isChildCourse: false,
+        accountId: '1',
+        course: {id: '1', name: "course", enrollment_term_id: '1'},
+        masterCourse: {id: '1', name: "course", enrollment_term_id: '1'},
+      }
+      renderComponent()
+
+      expect(screen.queryByText('Blueprint')).toBeInTheDocument()
+    })
+
+    it('does not render the BP column', async () => {
+      ENV.BLUEPRINT_COURSES_DATA = undefined
+      renderComponent()
+
+      expect(screen.queryByText('Blueprint')).not.toBeInTheDocument()
+    })
+  })
 })

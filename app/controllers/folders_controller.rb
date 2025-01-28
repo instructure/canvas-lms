@@ -194,6 +194,11 @@ class FoldersController < ApplicationController
     ]
     per_page = Api.per_page_for(self, default: 50)
     combined = Api.paginate(BookmarkedCollection.concat(*collections), self, api_v1_list_folders_and_files_url, { per_page: })
+
+    if opts[:can_view_hidden_files] && opts[:context]
+      opts[:master_course_status] = setup_master_course_restrictions(combined, opts[:context])
+    end
+
     render json: folders_or_files_json(combined, @current_user, session, opts)
   end
 
