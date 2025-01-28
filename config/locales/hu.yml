@@ -9693,6 +9693,7 @@ hu:
   edit_new_internal_setting_value_f618a7f4: "Új belső beállítási érték szerkesztése"
   edit_outcome_867a0381: "Tanulási eredmény szerkesztése"
   edit_outcome_group_f82e0210: "Tanulási eredménycsoport szerkesztése"
+  edit_page_5df5916a: "Oldal szerkesztése"
   edit_pagetitle_cd8abab9: "%{pageTitle} szerkesztése"
   edit_permissions_for_count_items_d65e3855: 
     one: "Engedélyek kezelése %{itemName} elemhez"
