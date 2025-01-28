@@ -37,6 +37,23 @@ describe "Discussion Topic Search" do
       )
     end
 
+    it "doesn't render error page when searching", :ignore_js_errors do
+      @topic.discussion_entries.create!(
+        user: @teacher, message: "bar"
+      )
+      (1..5).each do |number|
+        @topic.discussion_entries.create!(
+          user: @teacher,
+          message: "foo #{number}"
+        )
+      end
+      student = student_in_course(course: @course, name: "Jeff", active_all: true).user
+      user_session(student)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      f("input[placeholder='Search entries or author...']").send_keys("bar")
+      expect(f("body")).not_to contain_jqcss("h1:contains('Sorry, Something Broke')")
+    end
+
     it "search only replies that matches parameter" do
       @topic.discussion_entries.create!(
         user: @teacher, message: "bar"

@@ -349,16 +349,7 @@ const DiscussionTopicManager = props => {
     updateCache,
   )
 
-  // why || waitForUnreadFilter: when waitForUnreadFilter, discussionTopicQuery is skipped, but this does not set loading.
-  // why && !searchTerm: this is for the search if you type it triggers useQuery and you lose the search.
-  // why not just discussionTopicQuery.loading, it doesnt play nice with search term.
-  if (
-    (discussionTopicQuery.loading && !searchTerm) ||
-    waitForUnreadFilter ||
-    (discussionTopicQuery.loading &&
-      discussionTopicQuery?.data &&
-      Object.keys(discussionTopicQuery.data).length === 0)
-  ) {
+  if (discussionTopicQuery.loading || waitForUnreadFilter) {
     return <LoadingSpinner />
   }
 
