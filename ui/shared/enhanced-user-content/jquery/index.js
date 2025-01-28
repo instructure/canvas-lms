@@ -534,6 +534,10 @@ function doThingsToModuleSequenceFooter() {
           courseID: el.attr('data-course-id'),
           assetType: el.attr('data-asset-type'),
           assetID: el.attr('data-asset-id'),
+          onFetchSuccess: () => {
+            $('.module-sequence-footer-right').prepend($('#mark-as-done-container'))
+            $('#mark-as-done-container').css({'margin-right': '4px'})
+          },
         })
       })
       .catch(ex => {
