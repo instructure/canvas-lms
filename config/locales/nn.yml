@@ -10525,6 +10525,7 @@ nn:
   edit_new_internal_setting_name_ce308469: "Rediger nytt namn for intern innstilling"
   edit_outcome_867a0381: "Rediger læringsmål"
   edit_outcome_group_f82e0210: "Rediger læringsmålgruppe"
+  edit_page_5df5916a: "Rediger side"
   edit_pagetitle_cd8abab9: "Rediger %{pageTitle}"
   edit_permissions_for_count_items_d65e3855: 
     one: "Rediger løyve for: %{itemName}"
