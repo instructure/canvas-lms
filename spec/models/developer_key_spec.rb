@@ -581,7 +581,7 @@ describe DeveloperKey do
           ContextExternalTool
             .where(id: tool.id)
             .update_all(context_id: Course.last&.id.to_i + 1, context_type: "Course")
-          developer_key.tool_configuration.configuration["oidc_initiation_url"] = "example.com"
+          developer_key.tool_configuration.oidc_initiation_url = "example.com"
           developer_key.tool_configuration.save!
           update_external_tools
           run_jobs
@@ -689,10 +689,7 @@ describe DeveloperKey do
       let(:lti_site_admin_key) do
         Account.site_admin.shard.activate do
           k = DeveloperKey.create!(skip_lti_sync: true)
-          Lti::ToolConfiguration.create!(
-            developer_key: k,
-            settings: settings.merge(public_jwk: tool_config_public_jwk)
-          )
+          lti_tool_configuration_model(developer_key: k)
           k
         end
       end

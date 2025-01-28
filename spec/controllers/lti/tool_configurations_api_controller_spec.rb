@@ -127,7 +127,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
       it "uses the tool configuration JSON from the settings_url" do
         subject
-        expect(config_from_response.settings["target_link_uri"]).to eq settings["target_link_uri"]
+        expect(config_from_response.target_link_uri).to eq settings["target_link_uri"]
       end
 
       context "when developer_key.redirect_uris is a blank string" do
@@ -149,7 +149,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
       it 'sets the "custom_fields"' do
         subject
-        expect(config_from_response.settings["custom_fields"]).to eq(
+        expect(config_from_response.custom_fields).to eq(
           "foo" => "bar",
           "key" => "value",
           "has_expansion" => "$Canvas.user.id",
@@ -323,6 +323,10 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       s
     end
 
+    before do
+      tool_configuration.update!(public_jwk: tool_config_public_jwk)
+    end
+
     context "when the public jwk is missing" do
       let(:public_jwk) { nil }
 
@@ -449,8 +453,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
       it "updates the tool configuration" do
         subject
-        new_settings = config_from_response.settings
-        expect(new_settings["target_link_uri"]).to eq new_url
+        expect(config_from_response.target_link_uri).to eq new_url
       end
 
       it "sets the privacy level" do
@@ -549,11 +552,20 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       end
     end
 
-    context "when the tool configuration exists and key is enabled" do
-      it "renders the tool configuration" do
-        subject
-        expect(config_from_response).to eq tool_configuration
-      end
+    it "returns the right tool configuration" do
+      subject
+      expect(config_from_response).to eq tool_configuration
+    end
+
+    it "includes the config in canvas LtiConfiguration format" do
+      subject
+      canvas_config = tool_configuration.lti_registration.canvas_configuration(context: account).with_indifferent_access
+      expect(json_parse.dig("tool_configuration", "settings").with_indifferent_access).to eq canvas_config
+    end
+
+    it "includes the developer key JSON" do
+      subject
+      expect(json_parse["developer_key"]).to include "id" => developer_key.global_id
     end
 
     context "when the tool configuration is an Lti::IMS::Registration" do

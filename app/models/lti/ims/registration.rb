@@ -100,8 +100,6 @@ class Lti::IMS::Registration < ApplicationRecord
       }]
     }.with_indifferent_access
   end
-  alias_method :settings, :canvas_configuration
-  alias_method :configuration, :canvas_configuration
 
   def self.to_internal_lti_configuration(registration)
     config = registration.lti_tool_configuration

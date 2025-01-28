@@ -1226,7 +1226,6 @@ class Lti::RegistrationsController < ApplicationController
       Lti::ToolConfiguration.create!(
         developer_key: dk,
         lti_registration: registration,
-        settings: {},
         unified_tool_id: params[:unified_tool_id],
         **configuration_params
       )
