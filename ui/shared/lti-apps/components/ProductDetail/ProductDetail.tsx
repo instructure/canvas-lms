@@ -43,7 +43,7 @@ import ProductCarousel from '../common/Carousels/ProductCarousel'
 import ImageCarousel from '../common/Carousels/ImageCarousel'
 import Disclaimer from '../common/Disclaimer'
 import type {Lti, Product} from '../../models/Product'
-import {instructorAppsRoute} from '@canvas/lti-apps/utils/route'
+import {instructorAppsRoute} from '@canvas/lti-apps/utils/routes'
 
 const I18n = createI18nScope('lti_registrations')
 

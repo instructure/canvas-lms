@@ -27,7 +27,7 @@ import {IconEndSolid, IconFilterLine, IconSearchLine} from '@instructure/ui-icon
 import useDebouncedSearch from '../../hooks/useDebouncedSearch'
 import useDiscoverQueryParams from '../../hooks/useDiscoverQueryParams'
 import useBreakpoints from '../../hooks/useBreakpoints'
-import {instructorAppsHash, instructorAppsRoute} from '../../utils/route'
+import {instructorAppsHash, instructorAppsRoute} from '../../utils/routes'
 
 const I18n = createI18nScope('lti_registrations')
 
