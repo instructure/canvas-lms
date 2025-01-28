@@ -240,5 +240,62 @@ describe "Block Editor", :ignore_js_errors do
       end
     end
   end
+
+  describe("block behavior") do
+    describe("hover tag") do
+      it "hovered over Icon block a small tag with the block’s name is displayed" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        page_block.click
+        hover(icon_block)
+        expect(block_tag).to be_displayed
+        expect(block_tag.attribute("textContent")).to eq("Icon")
+      end
+
+      it "hovered over Button block a small tag with the block’s name is displayed" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        open_block_toolbox_to_tab("blocks")
+        drop_new_block("button", group_block_dropzone)
+        page_block.click
+        hover(button_block)
+        expect(block_tag).to be_displayed
+        expect(block_tag.attribute("textContent")).to eq("Button")
+      end
+
+      it "hovered over Image block a small tag with the block’s name is displayed" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        open_block_toolbox_to_tab("blocks")
+        drop_new_block("image", group_block_dropzone)
+        page_block.click
+        hover(image_block)
+        expect(block_tag).to be_displayed
+        expect(block_tag.attribute("textContent")).to eq("Image")
+      end
+
+      it "hovered over Text block a small tag with the block’s name is displayed" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        open_block_toolbox_to_tab("blocks")
+        drop_new_block("text", group_block_dropzone)
+        page_block.click
+        hover(text_block)
+        expect(block_tag).to be_displayed
+        expect(block_tag.attribute("textContent")).to eq("Text")
+      end
+
+      it "tag is not displayed when mouse cursor is no longer over the block" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        page_block.click
+        hover(icon_block)
+        expect(block_tag).to be_displayed
+        expect(block_tag.attribute("textContent")).to eq("Icon")
+        page_block.click
+        expect(element_exists?(block_tag_selector)).to be_falsey
+      end
+    end
+  end
 end
 # rubocop:enable Specs/NoNoSuchElementError, Specs/NoExecuteScript

@@ -216,7 +216,7 @@ module BlockEditorPage
   end
 
   def text_block
-    f(".text-block")
+    f(".rce-text-block")
   end
 
   # Sections
@@ -273,6 +273,18 @@ module BlockEditorPage
   # blocks
   def page_block
     f(".page-block")
+  end
+
+  def block_tag_selector
+    ".block-tag"
+  end
+
+  def block_tag
+    f(block_tag_selector)
+  end
+
+  def button_block
+    f(".button-block")
   end
 
   def group_block_child
