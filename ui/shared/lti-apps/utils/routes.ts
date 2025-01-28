@@ -19,4 +19,15 @@
 export const instructorAppsRoute = window.location.pathname.includes('configurations')
   ? 'configurations'
   : 'settings'
+
 export const instructorAppsHash = '#tab-apps'
+
+export const productRoute = (globalProductId: string) => {
+  const accountId = ENV.ACCOUNT_ID
+  const pathname = window.location.pathname.includes(instructorAppsRoute)
+    ? `/courses/${accountId}/settings`
+    : `/accounts/${accountId}/apps`
+  return `${window.location.origin}${pathname}/product_detail/${globalProductId}${
+    window.location.pathname.includes(instructorAppsRoute) ? instructorAppsHash : ''
+  }`
+}

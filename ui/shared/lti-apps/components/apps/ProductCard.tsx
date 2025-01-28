@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import {Tag} from '@instructure/ui-tag'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import TruncateWithTooltip from '../common/TruncateWithTooltip'
-import {instructorAppsHash, instructorAppsRoute} from '../../utils/route'
+import {productRoute} from '../../utils/routes'
 
 type ProductCardProps = {
   product: Product | OrganizationProduct
@@ -34,11 +34,6 @@ type ProductCardProps = {
 
 const ProductCard = (props: ProductCardProps) => {
   const {product} = props
-  const accountId = ENV.ACCOUNT_ID
-  const pathname = window.location.pathname.includes(instructorAppsRoute) ? `/courses/${accountId}/settings` : `/accounts/${accountId}/apps`
-  const productUrl = `${window.location.origin}${pathname}/product_detail/${
-    product.global_product_id
-  }${window.location.pathname.includes(instructorAppsRoute) ? instructorAppsHash : ''}`
 
   return (
     <Flex.Item>
@@ -52,7 +47,7 @@ const ProductCard = (props: ProductCardProps) => {
         borderWidth="small"
         padding="mediumSmall"
         onClick={() => {
-          window.location.href = productUrl
+          window.location.href = productRoute(product.global_product_id)
         }}
         cursor="pointer"
       >
@@ -71,7 +66,7 @@ const ProductCard = (props: ProductCardProps) => {
                   <Link
                     isWithinText={false}
                     themeOverride={{fontWeight: 700, color: 'black'}}
-                    href={productUrl}
+                    href={productRoute(product.global_product_id)}
                   >
                     {product?.name}
                   </Link>
