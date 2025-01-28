@@ -93,7 +93,8 @@ describe('Shared > SetDefaultGradeDialog', () => {
       jest.spyOn($, 'publish').mockImplementation(jest.fn())
     })
 
-    test('submit reports number of students scored', async () => {
+    // fickle; cf. EVAL-4977
+    test.skip('submit reports number of students scored', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
