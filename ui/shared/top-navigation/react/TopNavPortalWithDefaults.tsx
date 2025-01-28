@@ -64,7 +64,6 @@ const addStudentViewActionItem = (courseId?: number) => {
     return null
   }
   const studentViewUrl = STUDENT_VIEW_URL_TEMPLATE.replace('{courseId}', String(cId))
-  // @ts-expect-error
   const buttonLabel = window.ENV?.horizon_course
     ? I18n.t('View as Learner')
     : I18n.t('View as Student')
