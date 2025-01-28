@@ -45,6 +45,7 @@ function initialShowState() {
     open: true,
     selectedSectionIds: [],
     submissions: [],
+    showSectionValidation: false,
   }
 }
 
@@ -67,6 +68,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       open: false,
       selectedSectionIds: [],
       submissions: [],
+      showSectionValidation: false,
     }
   }
 
@@ -82,7 +84,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
   }
 
   postBySectionsChanged(postBySections) {
-    this.setState({postBySections, selectedSectionIds: []})
+    this.setState({postBySections, selectedSectionIds: [], showSectionValidation: false})
   }
 
   postTypeChanged(event) {
@@ -101,12 +103,10 @@ export default class PostAssignmentGradesTray extends PureComponent {
 
     if (this.state.postBySections) {
       if (selectedSectionIds.length === 0) {
-        showFlashAlert({
-          message: I18n.t('At least one section must be selected to post grades by section.'),
-          type: 'error',
-        })
-        return
+        return this.setState({showSectionValidation: true})
       }
+
+      this.setState({showSectionValidation: false})
 
       postRequest = postAssignmentGradesForSections(assignment.id, selectedSectionIds, options)
       successMessage = I18n.t(
@@ -181,6 +181,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       sections,
       selectedSectionIds,
       submissions,
+      showSectionValidation,
     } = this.state
 
     if (!assignment) {
@@ -225,6 +226,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
           sectionSelectionChanged={this.sectionSelectionChanged}
           selectedSectionIds={selectedSectionIds}
           unpostedCount={unpostedCount}
+          showSectionValidation={showSectionValidation}
         />
       </Tray>
     )

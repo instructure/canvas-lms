@@ -44,6 +44,7 @@ export default function Layout({
   sections,
   selectedSectionIds,
   unpostedCount,
+  showSectionValidation,
 }) {
   return (
     <>
@@ -93,6 +94,7 @@ export default function Layout({
           sections={sections}
           selectedSectionIds={selectedSectionIds}
           unpostedCount={unpostedCount}
+          showSectionValidation={showSectionValidation}
         />
       </FormFieldGroup>
     </>
