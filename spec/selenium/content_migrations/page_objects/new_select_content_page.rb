@@ -23,22 +23,19 @@ class SelectContentPage
 
     # Selectors
     def outcome_parent
-      f('[data-testid="checkbox-copy[all_learning_outcomes]"]')
+      fxpath("//*[contains(text(), 'Learning Outcomes')]/ancestor::button")
     end
 
-    def outcome_options(index)
-      ff('li[data-type="learning_outcomes"] a')[index].click
-      wait_for_ajax_requests
+    def outcome_option_caret_by_name(name)
+      fxpath("//*[contains(text(), '#{name}')]/ancestor::button")
     end
 
-    def outcome_checkboxes(index)
-      ff('li[data-type="learning_outcomes"] input')[index].click
-      wait_for_ajax_requests
+    def outcome_option_checkbox_by_name(name)
+      fxpath("//*[contains(text(), '#{name}')]/ancestor::label//span[@aria-hidden='true']")
     end
 
     def submit_button
-      f(".selectContentDialog input[type=submit]").click
-      wait_for_ajax_requests
+      fxpath("//*[@data-cid='ModalFooter']//button[2]")
     end
   end
 end

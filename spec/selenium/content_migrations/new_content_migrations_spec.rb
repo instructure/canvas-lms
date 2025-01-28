@@ -114,13 +114,14 @@ describe "content migrations", :non_parallel do
     SelectContentPage.outcome_parent.click
 
     # Expand first group
-    SelectContentPage.outcome_options(1)
+    SelectContentPage.outcome_option_caret_by_name("group1").click
 
     # Select subgroup
-    SelectContentPage.outcome_checkboxes(2)
+    SelectContentPage.outcome_option_checkbox_by_name("subgroup1").click
 
     # Submit selection
-    SelectContentPage.submit_button
+    SelectContentPage.submit_button.click
+    wait_for_ajax_requests
 
     source_course ? run_migration : import
 
@@ -147,7 +148,7 @@ describe "content migrations", :non_parallel do
       @filename = "cc_outcomes.imscc"
     end
 
-    it "selectively copies outcomes", skip: "learning outcomes not working" do
+    it "selectively copies outcomes", skip: "selective content migration bug CLAB-975" do
       visit_page
 
       fill_migration_form
