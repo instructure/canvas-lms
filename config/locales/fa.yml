@@ -9468,6 +9468,7 @@ fa:
   edit_name_cbdef0c2: "ویرایش %{name}"
   edit_outcome_867a0381: "ویرایش نتیجه"
   edit_outcome_group_f82e0210: "ویرایش گروه نتیجه"
+  edit_page_5df5916a: "ویرایش صفحه"
   edit_pagetitle_cd8abab9: "ویرایش %{pageTitle}"
   edit_permissions_for_count_items_d65e3855: 
     one: "ویرایش مجوزها برای %{count} مورد"
