@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconUploadLine} from '@instructure/ui-icons'
 import CreateFolderButton from './CreateFolderButton'
+import UploadButton from './UploadButton'
 
 const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
@@ -40,7 +41,7 @@ const TopLevelButtons = ({
 
   const uploadButton = () => {
     return (
-      <Button
+      <UploadButton
         color="primary"
         margin="none none small none"
         renderIcon={<IconUploadLine />}
@@ -48,7 +49,7 @@ const TopLevelButtons = ({
         disabled={isDisabled}
       >
         {I18n.t('Upload')}
-      </Button>
+      </UploadButton>
     )
   }
 

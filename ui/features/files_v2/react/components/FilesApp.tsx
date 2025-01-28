@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
@@ -31,6 +31,7 @@ import {useLoaderData} from 'react-router-dom'
 import {type Folder} from '../../interfaces/File'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {FileManagementContext} from './Contexts'
+import {MainFolderWrapper} from '../../utils/fileFolderWrappers'
 
 const I18n = createI18nScope('files_v2')
 
@@ -46,6 +47,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const [currentUrl, setCurrentUrl] = useState<string | null>(null)
   const [discoveredPages, setDiscoveredPages] = useState<{[key: number]: string}>({})
   const folders = useLoaderData() as Folder[] | null
+  const currentFolderWrapper = useRef<MainFolderWrapper | null>(null)
 
   // the useEffect is necessary to protect against folders being empty
   useEffect(() => {
@@ -57,6 +59,8 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
 
     setCurrentUrl(initialUrl)
     setDiscoveredPages({1: initialUrl})
+
+    currentFolderWrapper.current = new MainFolderWrapper(currentFolder)
   }, [folders])
 
   if (!folders || folders.length === 0) {
@@ -96,7 +100,15 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   }
 
   return (
-    <FileManagementContext.Provider value={{folderId, contextType, contextId, showingAllContexts}}>
+    <FileManagementContext.Provider
+      value={{
+        folderId,
+        contextType,
+        contextId,
+        showingAllContexts,
+        currentFolder: currentFolderWrapper.current,
+      }}
+    >
       <View as="div">
         <FilesHeader size={size} isUserContext={isUserContext} />
         {currentUrl && (

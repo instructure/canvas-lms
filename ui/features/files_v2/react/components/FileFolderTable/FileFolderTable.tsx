@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -26,7 +26,7 @@ import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useQuery} from '@canvas/query'
+import {useQuery, queryClient} from '@canvas/query'
 import {type File, type Folder} from '../../../interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {parseLinkHeader} from '../../../utils/apiUtils'
@@ -40,6 +40,10 @@ import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
 import BulkActionButtons from './BulkActionButtons'
 import Breadcrumbs from './Breadcrumbs'
+import CurrentUploads from '../FilesHeader/CurrentUploads'
+import {View} from '@instructure/ui-view'
+import {FileManagementContext} from '../Contexts'
+import {FileFolderWrapper, FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
 
 const I18n = createI18nScope('files_v2')
 
@@ -148,6 +152,7 @@ const FileFolderTable = ({
   onLoadingStatusChange,
   folderBreadcrumbs,
 }: FileFolderTableProps) => {
+  const {currentFolder} = useContext(FileManagementContext)
   const isStacked = size !== 'large'
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
 
@@ -161,10 +166,23 @@ const FileFolderTable = ({
     onSuccess: ({links}) => {
       onPaginationLinkChange(links)
     },
-    onSettled: () => {
+    onSettled: result => {
+      if (result) {
+        const foldersAndFiles = result.rows.map((row: File | Folder) => new FileFolderWrapper(row))
+        currentFolder?.files.set(foldersAndFiles)
+      }
       onLoadingStatusChange(false)
     },
   })
+
+  useEffect(() => {
+    const listener = (event: FilesCollectionEvent) => {
+      if (event === 'add') queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+    }
+    currentFolder?.addListener(listener)
+
+    return () => currentFolder?.removeListener(listener)
+  }, [currentFolder])
 
   if (error) {
     showFlashError(I18n.t('Failed to fetch files and folders'))
@@ -232,6 +250,9 @@ const FileFolderTable = ({
   return (
     <>
       {renderTableActionsHead()}
+      <View display="block" margin="0 0 medium">
+        <CurrentUploads />
+      </View>
       <Table
         caption={I18n.t('Files and Folders')}
         hover={true}
