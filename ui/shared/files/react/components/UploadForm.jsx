@@ -38,6 +38,8 @@ export const UploadFormPropTypes = {
   onEmptyOrClose: func,
   onRenameFileMessage: func,
   onLockFileMessage: func,
+  onZipFileUpload: func,
+  onFileRename: func,
 }
 
 class UploadForm extends React.Component {
@@ -53,6 +55,8 @@ class UploadForm extends React.Component {
     onEmptyOrClose: () => {},
     onRenameFileMessage: () => {},
     onLockFileMessage: () => {},
+    onZipFileUpload: null,
+    onFileRename: null,
   }
 
   constructor(props) {
@@ -119,7 +123,7 @@ class UploadForm extends React.Component {
     }
   }
 
-  addFiles = () => {
+  addFiles() {
     return this.addFileInputRef.current.click()
   }
 
@@ -199,27 +203,39 @@ class UploadForm extends React.Component {
     this.setState(FileOptionsCollection.getState(), callback)
   }
 
+  renderZipFileOptionsForm() {
+    if (this.props.onZipFileUpload) return null
+
+    return (
+      <ZipFileOptionsForm
+        fileOptions={this.state.zipOptions[0]}
+        onZipOptionsResolved={this.onZipOptionsResolved}
+        onClose={this.onClose}
+      />
+    )
+  }
+
+  renderFileRenameForm() {
+    if (this.props.onFileRename) return null
+
+    return (
+      <FileRenameForm
+        data-testid="rename-dialog"
+        fileOptions={this.state.nameCollisions[0]}
+        onNameConflictResolved={this.onNameConflictResolved}
+        onClose={this.onClose}
+        allowSkip={this.props.allowSkip}
+        onRenameFileMessage={this.props.onRenameFileMessage}
+        onLockFileMessage={this.props.onLockFileMessage}
+      />
+    )
+  }
+
   buildPotentialModal = () => {
     if (this.state.zipOptions.length && !this.props.alwaysUploadZips) {
-      return (
-        <ZipFileOptionsForm
-          fileOptions={this.state.zipOptions[0]}
-          onZipOptionsResolved={this.onZipOptionsResolved}
-          onClose={this.onClose}
-        />
-      )
+      return this.renderZipFileOptionsForm()
     } else if (this.state.nameCollisions.length && !this.props.alwaysRename) {
-      return (
-        <FileRenameForm
-          data-testid="rename-dialog"
-          fileOptions={this.state.nameCollisions[0]}
-          onNameConflictResolved={this.onNameConflictResolved}
-          onClose={this.onClose}
-          allowSkip={this.props.allowSkip}
-          onRenameFileMessage={this.props.onRenameFileMessage}
-          onLockFileMessage={this.props.onLockFileMessage}
-        />
-      )
+      return this.renderFileRenameForm()
     }
   }
 

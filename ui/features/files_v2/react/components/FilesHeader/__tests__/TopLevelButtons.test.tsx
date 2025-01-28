@@ -19,16 +19,26 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import TopLevelButtons from '../TopLevelButtons'
+import {FileManagementContext} from '../../Contexts'
 
 describe('TopLevelButtons', () => {
   it('renders "All My Files" button when isUserContext is false', () => {
     render(
-      <TopLevelButtons
-        isUserContext={false}
-        size="small"
-        isDisabled={false}
-        onCreateFolderButtonClick={() => {}}
-      />,
+      <FileManagementContext.Provider
+        value={{
+          contextType: 'course',
+          contextId: '1',
+          folderId: '1',
+          showingAllContexts: false,
+        }}
+      >
+        <TopLevelButtons
+          isUserContext={false}
+          size="small"
+          isDisabled={false}
+          onCreateFolderButtonClick={() => {}}
+        />
+      </FileManagementContext.Provider>,
     )
 
     const allMyFilesButton = screen.getByText(/All My Files/i)
@@ -37,12 +47,21 @@ describe('TopLevelButtons', () => {
 
   it('does not render "All My Files" button when isUserContext is true', () => {
     render(
-      <TopLevelButtons
-        isUserContext={true}
-        size="small"
-        isDisabled={false}
-        onCreateFolderButtonClick={() => {}}
-      />,
+      <FileManagementContext.Provider
+        value={{
+          contextType: 'course',
+          contextId: '1',
+          folderId: '1',
+          showingAllContexts: false,
+        }}
+      >
+        <TopLevelButtons
+          isUserContext={true}
+          size="small"
+          isDisabled={false}
+          onCreateFolderButtonClick={() => {}}
+        />
+      </FileManagementContext.Provider>,
     )
 
     const allMyFilesButton = screen.queryByText(/All My Files/i)
@@ -51,12 +70,21 @@ describe('TopLevelButtons', () => {
 
   it('renders upload button last when size is not small', () => {
     render(
-      <TopLevelButtons
-        isUserContext={false}
-        size="medium"
-        isDisabled={false}
-        onCreateFolderButtonClick={() => {}}
-      />,
+      <FileManagementContext.Provider
+        value={{
+          contextType: 'course',
+          contextId: '1',
+          folderId: '1',
+          showingAllContexts: false,
+        }}
+      >
+        <TopLevelButtons
+          isUserContext={false}
+          size="medium"
+          isDisabled={false}
+          onCreateFolderButtonClick={() => {}}
+        />
+      </FileManagementContext.Provider>,
     )
 
     const buttons = screen.getAllByRole('button')
@@ -67,12 +95,21 @@ describe('TopLevelButtons', () => {
 
   it('renders upload button first when size is small', () => {
     render(
-      <TopLevelButtons
-        isUserContext={false}
-        size="small"
-        isDisabled={false}
-        onCreateFolderButtonClick={() => {}}
-      />,
+      <FileManagementContext.Provider
+        value={{
+          contextType: 'course',
+          contextId: '1',
+          folderId: '1',
+          showingAllContexts: false,
+        }}
+      >
+        <TopLevelButtons
+          isUserContext={false}
+          size="small"
+          isDisabled={false}
+          onCreateFolderButtonClick={() => {}}
+        />
+      </FileManagementContext.Provider>,
     )
 
     const buttons = screen.getAllByRole('button')
