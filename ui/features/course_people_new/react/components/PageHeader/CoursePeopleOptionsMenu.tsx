@@ -29,7 +29,9 @@ import {
   IconExportLine,
 } from '@instructure/ui-icons'
 import useCoursePeopleContext from '../../hooks/useCoursePeopleContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('course_people')
 
 type MenuItemProps = {
   href: string
@@ -39,7 +41,6 @@ type MenuItemProps = {
 }
 
 const CoursePeopleOptionsMenu: FC = () => {
-  const I18n = useI18nScope('course_people')
   const {
     canAllowCourseAdminActions,
     canGenerateObserverPairingCode,

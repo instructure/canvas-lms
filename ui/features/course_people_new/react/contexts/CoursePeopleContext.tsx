@@ -22,7 +22,7 @@ import type {CoursePeopleEnv, CoursePeopleContextType} from '../types.d'
 
 declare const ENV: GlobalEnv & CoursePeopleEnv
 
-const defaultCoursePeoplePermissions = {
+const defaultEnvPermissions = {
   can_read_roster: false,
   can_allow_course_admin_actions: false,
   can_read_prior_roster: false,
@@ -32,24 +32,32 @@ const defaultCoursePeoplePermissions = {
   user_is_instructor: false,
   self_registration: false,
   can_generate_observer_pairing_code: false,
+  view_user_logins: false,
+  read_sis: false,
+  can_manage_differentiation_tags: false,
+  allow_assign_to_differentiation_tags: false,
 }
 
-const defaultCoursePeopleUrls = {
+const defaultEnvCourse = {
   groups_url: '',
   prior_enrollments_url: '',
   interactions_report_url: '',
   user_services_url: '',
-  observer_pairing_codes_url: ''
+  observer_pairing_codes_url: '',
+  hideSectionsOnCourseUsersPage: false,
+  hideCheckboxesOnCourseUsersPage: false
 }
 
 export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeopleContextType => {
   const permissions = defaultContext
-    ? defaultCoursePeoplePermissions
-    : {...defaultCoursePeoplePermissions, ...ENV.permissions}
+    ? defaultEnvPermissions
+    : {...defaultEnvPermissions, ...ENV.permissions}
 
   const course = defaultContext
-    ? defaultCoursePeopleUrls
-    : {...defaultCoursePeopleUrls, ...ENV.course}
+    ? defaultEnvCourse
+    : {...defaultEnvCourse, ...ENV.course}
+
+  const courseRootUrl = ENV.COURSE_ROOT_URL
 
   const {
     can_read_roster: canReadRoster,
@@ -60,7 +68,11 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     read_reports: canReadReports,
     user_is_instructor: userIsInstructor,
     self_registration: selfRegistration,
-    can_generate_observer_pairing_code: canGenerateObserverPairingCode
+    can_generate_observer_pairing_code: canGenerateObserverPairingCode,
+    view_user_logins: canViewLoginIdColumn,
+    read_sis: canViewSisIdColumn,
+    can_manage_differentiation_tags: canManageDifferentiationTags,
+    allow_assign_to_differentiation_tags: allowAssignToDifferentiationTags
   } = permissions
 
   const {
@@ -68,24 +80,31 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     prior_enrollments_url: priorEnrollmentsUrl,
     interactions_report_url: interactionsReportUrl,
     user_services_url: userServicesUrl,
-    observer_pairing_codes_url: observerPairingCodesUrl
+    observer_pairing_codes_url: observerPairingCodesUrl,
+    hideSectionsOnCourseUsersPage: hideSectionsOnCourseUsersPage
   } = course
 
   return {
+    allowAssignToDifferentiationTags,
     canReadRoster,
     canAllowCourseAdminActions,
-    canReadPriorRoster,
+    canGenerateObserverPairingCode,
     canManageStudents,
-    canViewAllGrades,
+    canManageDifferentiationTags,
     canReadReports,
+    canReadPriorRoster,
+    canViewAllGrades,
+    canViewLoginIdColumn,
+    canViewSisIdColumn,
+    hideSectionsOnCourseUsersPage,
     userIsInstructor,
     selfRegistration,
-    canGenerateObserverPairingCode,
-    groupsUrl,
-    priorEnrollmentsUrl,
-    interactionsReportUrl,
-    userServicesUrl,
+    courseRootUrl,
     observerPairingCodesUrl,
+    groupsUrl,
+    interactionsReportUrl,
+    priorEnrollmentsUrl,
+    userServicesUrl,
   }
 }
 
