@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require_relative "../spec_helper"
+require_relative "../conditional_release_spec_helper"
 
 describe CoursePace do
   before :once do
@@ -464,6 +465,18 @@ describe CoursePace do
       expect(AssignmentOverride.count).to eq(2)
       expect(AssignmentOverride.last.due_at).to eq(fancy_midnight_rounded_to_last_second(@course_pace.end_date.to_s))
       expect(@course_pace.course_pace_module_items.reload.pluck(:duration)).to eq([900, 900])
+    end
+
+    context "with mastery paths" do
+      before :once do
+        setup_course_with_native_conditional_release(course: @course)
+      end
+
+      it "does not create an override for unreleased assignments" do
+        @course_pace.publish
+
+        expect(AssignmentOverride.where.not(set_type: AssignmentOverride::SET_TYPE_NOOP, set_id: AssignmentOverride::NOOP_MASTERY_PATHS).count).to eq(2)
+      end
     end
   end
 
