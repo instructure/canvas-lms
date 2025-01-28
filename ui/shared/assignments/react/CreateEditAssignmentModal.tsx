@@ -89,6 +89,10 @@ type AssignmentTypeIndex = {
   [type: string]: string
 }
 
+const assignmentTypeOptions = ENV.horizon_course
+  ? ['none', 'external_tool', 'not_graded']
+  : ['none', 'discussion_topic', 'online_quiz', 'external_tool', 'not_graded']
+
 const CreateEditAssignmentModal = ({
   assignment,
   userIsAdmin,
@@ -131,13 +135,6 @@ const CreateEditAssignmentModal = ({
   const [nameInputMessage, setNameInputMessage] = useState<FormMessage[]>([])
   const [dueDateInputMessage, setDueDateInputMessage] = useState<FormMessage[]>([])
 
-  const assignmentTypeOptions = [
-    'none',
-    'discussion_topic',
-    'online_quiz',
-    'external_tool',
-    'not_graded',
-  ]
   const assignmentTypeLabels: AssignmentTypeIndex = {
     none: I18n.t('Assignment'),
     discussion_topic: I18n.t('Discussion'),

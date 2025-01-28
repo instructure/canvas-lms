@@ -39,6 +39,14 @@ module HorizonValidators
     end
   end
 
+  class DiscussionsValidator < ActiveModel::Validator
+    def validate(record)
+      unless record.is_announcement
+        record.errors.add(:discussion_type, "Cannot create discussions in Horizon courses")
+      end
+    end
+  end
+
   class QuizzesValidator < ActiveModel::Validator
     def validate(record)
       record.errors.add("Classic Quizzes is not supported on Horizon courses")

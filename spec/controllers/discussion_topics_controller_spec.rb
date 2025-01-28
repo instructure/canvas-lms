@@ -3064,6 +3064,25 @@ describe DiscussionTopicsController do
     end
   end
 
+  describe "Horizon course" do
+    before do
+      allow(@course).to receive(:horizon_course?).and_return(true)
+    end
+
+    it "does not let create/edit discussions" do
+      user_session @teacher
+      expect do
+        @course.discussion_topics.create!(title: "some topic")
+      end.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "lets create/edit announcements" do
+      user_session @teacher
+      @course.announcements.create!(message: "some topic123")
+      expect(@course.announcements.last.message).to eq "some topic123"
+    end
+  end
+
   describe "Metrics" do
     before do
       allow(InstStatsd::Statsd).to receive(:distributed_increment)

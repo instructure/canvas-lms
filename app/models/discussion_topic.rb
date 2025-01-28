@@ -106,6 +106,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :summaries, class_name: "DiscussionTopicSummary"
   has_one :estimated_duration, dependent: :destroy, inverse_of: :discussion_topic
 
+  validates_with HorizonValidators::DiscussionsValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
   validates_associated :discussion_topic_section_visibilities
   validates :context_id, :context_type, presence: true
   validates :discussion_type, inclusion: { in: DiscussionTypes::TYPES }
