@@ -397,7 +397,7 @@
     "test:jest:watch": "jest --color --watch",
     "test:jest:build": "if [ \"$COVERAGE\" = \"1\" ]; then yarn test:jest:coverage --maxWorkers=5 --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL; else yarn test:jest --maxWorkers=5 --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL; fi",
     "test:packages": "wsrun --report -m -l -s -c test",
-    "build": "yarn run build:css && yarn run build:js",
+    "build": "yarn run build:css && yarn run build:packages && yarn run build:js",
     "build:watch": "concurrently --raw \"yarn build:css:watch\" \"yarn build:js:watch\"",
     "build:css": "brandable_css",
     "build:css:compressed": "SASS_STYLE=compressed brandable_css",
