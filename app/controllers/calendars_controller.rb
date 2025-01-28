@@ -58,7 +58,7 @@ class CalendarsController < ApplicationController
     end
     @contexts_json = @contexts.map do |context|
       ag_permission = false
-      if context.respond_to?(:appointment_groups) && context.grants_right?(@current_user, session, :manage_calendar)
+      if context.respond_to?(:appointment_groups) && context.grants_right?(@current_user, session, :manage_calendar) && !context&.horizon_course?
         ag = AppointmentGroup.new(contexts: [context])
         ag.update_contexts_and_sub_contexts
         if ag.grants_right? @current_user, session, :create

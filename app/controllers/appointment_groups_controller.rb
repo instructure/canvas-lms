@@ -360,6 +360,11 @@ class AppointmentGroupsController < ApplicationController
                     status: :bad_request
     end
 
+    if contexts.any?(&:horizon_course?)
+      return render json: { error: t("cannot create an appointment group for a horizon course") },
+                    status: :bad_request
+    end
+
     if value_to_boolean(params[:appointment_group][:allow_observer_signup]) && contexts.any? { |c| !c.is_a?(Course) || !c.account.allow_observers_in_appointment_groups? }
       return render json: { error: "cannot allow observers to sign up for appointment groups in this course" },
                     status: :forbidden
