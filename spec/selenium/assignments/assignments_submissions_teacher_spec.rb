@@ -31,20 +31,40 @@ describe "submissions" do
       course_with_teacher_logged_in
     end
 
-    it "allows media comments", priority: "1" do
-      stub_kaltura
+    describe "submission comments" do
+      it "allows media comments", priority: "1" do
+        stub_kaltura
 
-      student_in_course
-      assignment = create_assignment
-      get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+        student_in_course
+        assignment = create_assignment
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
 
-      # make sure the JS didn't burn any bridges, and submit two
-      submit_media_comment_1
-      submit_media_comment_2
+        # make sure the JS didn't burn any bridges, and submit two
+        submit_media_comment_1
+        submit_media_comment_2
 
-      # check that the thumbnails show up on the right sidebar
-      number_of_comments = driver.execute_script("return $('.comment_list').children().length")
-      expect(number_of_comments).to eq 2
+        # check that the thumbnails show up on the right sidebar
+        comment_list = driver.find_element(css: ".comment_list")
+        number_of_comments = comment_list.find_elements(css: ":scope > *").size
+        expect(number_of_comments).to eq 2
+      end
+
+      it "allows file comments" do
+        student_in_course
+        assignment = create_assignment
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+
+        upload_submission_comment_file
+      end
+
+      it "displays error if user tries to submit empty comment" do
+        student_in_course
+        assignment = create_assignment
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+
+        comment_save_button.click
+        expect(f("#error_text")).to be_displayed
+      end
     end
 
     it "displays the grade in grade field", priority: "1" do

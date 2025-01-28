@@ -74,6 +74,7 @@ describe('submissions', () => {
               </div>
             </div>
             <textarea class='grading_comment'>Hello again.</textarea>
+            <div id="textarea-error-container"></div>
             <input type='checkbox' id='submission_group_comment' checked>
             <div class='save_comment_button'>
             </div>
