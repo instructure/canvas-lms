@@ -16,25 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {FC} from 'react'
-import {Heading} from '@instructure/ui-heading'
-import {Flex} from '@instructure/ui-flex'
-import CoursePeopleOptionsMenu from './CoursePeopleOptionsMenu'
+import React from 'react'
+import {Pill} from '@instructure/ui-pill'
+import {PENDING_ENROLLMENT, INACTIVE_ENROLLMENT} from '../../../util/constants'
+import type {EnrollmentState} from '../../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')
 
-const CoursePeopleHeader: FC = () => (
-  <Flex justifyItems="space-between" width="100%">
-    <Flex.Item as="div">
-      <Heading data-testid="course-people-header" level="h1">
-        {I18n.t('People')}
-      </Heading>
-    </Flex.Item>
-    <Flex.Item as="div">
-      <CoursePeopleOptionsMenu />
-    </Flex.Item>
-  </Flex>
-)
+type PillColor = "primary" | "info" | "alert" | "success" | "danger" | "warning" | undefined
 
-export default CoursePeopleHeader
+const StatusPill = ({state}: {state: EnrollmentState}) => {
+  const renderPill = (text: string, color: PillColor) => <Pill color={color}>{text}</Pill>
+
+  if (state === PENDING_ENROLLMENT) return renderPill(I18n.t('Pending'), 'info')
+  if (state === INACTIVE_ENROLLMENT) return renderPill(I18n.t('Inactive'), 'primary')
+
+  return null
+}
+
+export default StatusPill

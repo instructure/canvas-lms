@@ -16,25 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {FC} from 'react'
-import {Heading} from '@instructure/ui-heading'
-import {Flex} from '@instructure/ui-flex'
-import CoursePeopleOptionsMenu from './CoursePeopleOptionsMenu'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import React from 'react'
+import {View} from '@instructure/ui-view'
+import {timeEventToString} from '../../../util/utils'
+import {OBSERVER_ENROLLMENT} from '../../../util/constants'
+import {Enrollment} from '../../types'
 
-const I18n = createI18nScope('course_people')
+const UserLastActivity: React.FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
+  (enrollments || []).map(enrollment => {
+    if (enrollment.type === OBSERVER_ENROLLMENT) return null
+    if (!enrollment.last_activity) return null
 
-const CoursePeopleHeader: FC = () => (
-  <Flex justifyItems="space-between" width="100%">
-    <Flex.Item as="div">
-      <Heading data-testid="course-people-header" level="h1">
-        {I18n.t('People')}
-      </Heading>
-    </Flex.Item>
-    <Flex.Item as="div">
-      <CoursePeopleOptionsMenu />
-    </Flex.Item>
-  </Flex>
+    return (
+      <View as="div" key={`last-activity-${enrollment.id}`} data-testid={`last-activity-${enrollment.id}`}>
+        {timeEventToString(enrollment.last_activity)}
+      </View>
+    )
+  })
 )
 
-export default CoursePeopleHeader
+export default UserLastActivity

@@ -16,25 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {FC} from 'react'
-import {Heading} from '@instructure/ui-heading'
-import {Flex} from '@instructure/ui-flex'
-import CoursePeopleOptionsMenu from './CoursePeopleOptionsMenu'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import React from 'react'
+import {render} from '@testing-library/react'
+import StatusPill from '../StatusPill'
 
-const I18n = createI18nScope('course_people')
+describe('StatusPill', () => {
+  it('renders nothing when neither isPending nor isInactive', () => {
+    const {container} = render(<StatusPill state={'active'}/>)
+    expect(container).toBeEmptyDOMElement()
+  })
 
-const CoursePeopleHeader: FC = () => (
-  <Flex justifyItems="space-between" width="100%">
-    <Flex.Item as="div">
-      <Heading data-testid="course-people-header" level="h1">
-        {I18n.t('People')}
-      </Heading>
-    </Flex.Item>
-    <Flex.Item as="div">
-      <CoursePeopleOptionsMenu />
-    </Flex.Item>
-  </Flex>
-)
+  it('shows inactive status when isInactive is true', () => {
+    const {getByText} = render(<StatusPill state={'inactive'} />)
+    expect(getByText('Inactive')).toBeInTheDocument()
+  })
 
-export default CoursePeopleHeader
+  it('shows pending status when isPending is true', () => {
+    const {getByText} = render(<StatusPill state={'invited'} />)
+    expect(getByText('Pending')).toBeInTheDocument()
+  })
+})

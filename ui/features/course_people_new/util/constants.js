@@ -16,25 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {FC} from 'react'
-import {Heading} from '@instructure/ui-heading'
-import {Flex} from '@instructure/ui-flex'
-import CoursePeopleOptionsMenu from './CoursePeopleOptionsMenu'
-import {useScope as createI18nScope} from '@canvas/i18n'
+export const TEACHER_ENROLLMENT = 'TeacherEnrollment'
+export const STUDENT_ENROLLMENT = 'StudentEnrollment'
+export const OBSERVER_ENROLLMENT = 'ObserverEnrollment'
 
-const I18n = createI18nScope('course_people')
-
-const CoursePeopleHeader: FC = () => (
-  <Flex justifyItems="space-between" width="100%">
-    <Flex.Item as="div">
-      <Heading data-testid="course-people-header" level="h1">
-        {I18n.t('People')}
-      </Heading>
-    </Flex.Item>
-    <Flex.Item as="div">
-      <CoursePeopleOptionsMenu />
-    </Flex.Item>
-  </Flex>
-)
-
-export default CoursePeopleHeader
+export const ACTIVE_ENROLLMENT = 'active'
+export const INACTIVE_ENROLLMENT = 'inactive'
+export const PENDING_ENROLLMENT = 'invited'
