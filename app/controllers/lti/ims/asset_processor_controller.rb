@@ -24,7 +24,6 @@ module Lti::IMS
   #
   # 1EdTech Asset Processor services: Asset Service and Asset Report Service.
   #
-  # TODO full @model doc
   class AssetProcessorController < ApplicationController
     include Concerns::AdvantageServices
     before_action(
@@ -56,6 +55,109 @@ module Lti::IMS
       type
     ].freeze
 
+    # @API Create an Asset Report
+    #
+    # Creates a report for a given Canvas-managed asset (such as a submission
+    # attachment).
+    #
+    # @argument assetId [String]
+    #   The UUID of the asset to which the report applies. Canvas will supply
+    #   this to the tool in the the `LtiAssetProcessorSubmissionNotice`.
+    #
+    # @argument errorCode [Optional, String]
+    #   A machine-readable code indicating the cause of the failure, for reports
+    #   with a processingProgress value of `Failed`. The following standard error
+    #   codes are available, but tools may use their own (in which case the tool
+    #   may provide human-readable information in the `comment` field):
+    #   UNSUPPORTED_ASSET_TYPE, ASSET_TOO_LARGE, ASSET_TOO_SMALL,
+    #   EULA_NOT_ACCEPTED, DOWNLOAD_FAILED
+    #
+    # @argument indicationAlt [Optional, String]
+    #   Alternate text representing the meaning of the indicationColor for screen
+    #   readers or as a tooltip over the indication color.
+    #
+    # @argument indicationColor [Optional, String]
+    #   A hex (#RRGGBB) color code the tool wishes to use indicating the outcome
+    #   of an asset's report.
+    #
+    # @argument priority [Integer]
+    #   A number from 0 (meaning "good" or "success") to 5 (meaning urgent or
+    #   time-critical notable features) indicating the tool's perceived priority
+    #   of the report. If a priority is not known or applicable, the tool should
+    #   use the value 0.
+    #
+    # @argument processingProgress [String]
+    #   Indicates the status of the report. Must be one of the following:
+    #   Processed, Processing, PendingManual, Failed, NotProcessed, NotReady.
+    #   If an unrecognized value is given, Canvas will assume `NotReady`.
+    #
+    # @argument scoreGiven [Optional, Float]
+    #   The report's score. Must be greater or equal to zero. Required
+    #   if scoreMaximum is provided. scoreGiven may be greater than scoreMaximum.
+    #
+    # @argument scoreMaximum [Optional, Float]
+    #   The denominator in a score value (e.g. total calculated score is
+    #   scoreGiven / scoreMaximum). Must be positive. Required if scoreGiven is
+    #   provided.
+    #
+    # @argument timestamp [String]
+    #   An ISO8601 date time value with microsecond precision. Reports with newer
+    #   timetamps for the same asset and report type supersede
+    #   previously submitted reports with older (or equal) timestamps. Likewise,
+    #   if the timestamp provided is older than the latest timestamp for an
+    #   existing report (of same asset and type), the new report will be
+    #   ignored and the endpoint will return an HTTP 409 (Conflict).
+    #
+    # @argument title [Optional, String]
+    #   A human-readable title for the report, to be displayed to the user.
+    #
+    # @argument type [String]
+    #   An opaque value representing the type of report. If the Asset Processor
+    #   tool has previously declared a `supportedTypes` list, the type value here
+    #   must be one of those types.
+    #
+    # @returns the input arguments, as accepted and stored in the database.
+    # Returns an HTTP 201 (Created) on success.
+    #
+    # @example_request
+    #   {
+    #     "assetId" : "57d463ea-6e5d-45c8-a86f-64f3dd9ef81e",
+    #     "type": "originality",
+    #     "timestamp": "2025-01-24T17:56:53.221+00:00",
+    #     "title": "Originality Report",
+    #     "scoreGiven" : 75,
+    #     "scoreMaximum" : 100,
+    #     "indicationColor" : "#EC0000",
+    #     "indicationAlt" : "High percentage of matched text.",
+    #     "priority": 5,
+    #     "processingProgress": "Processed"
+    #   }
+    #
+    # @example_request
+    #   {
+    #     "assetId" : "57d463ea-6e5d-45c8-a86f-64f3dd9ef81e",
+    #     "type": "originality",
+    #     "timestamp": "2025-01-24T17:56:53.221+00:00",
+    #     "title": "Originality Report",
+    #     "priority": 0,
+    #     "errorCode": "UNSUPPORTED_ASSET_TYPE",
+    #     "processingProgress": "Failed"
+    #   }
+    #
+    # @example_response
+    #   {
+    #     "assetId" : "57d463ea-6e5d-45c8-a86f-64f3dd9ef81e",
+    #     "type": "originality",
+    #     "timestamp": "2025-01-24T17:56:53.221+00:00",
+    #     "title": "Originality Report",
+    #     "scoreGiven" : 75,
+    #     "scoreMaximum" : 100,
+    #     "indicationColor" : "#EC0000",
+    #     "indicationAlt" : "High percentage of matched text.",
+    #     "priority": 5,
+    #     "processingProgress": "Processed"
+    #   }
+    #
     def create_report
       timestamp = report_timestamp
       extensions = request.request_parameters.except(*ASSET_REPORT_RECOGNIZED_PARAMS)
