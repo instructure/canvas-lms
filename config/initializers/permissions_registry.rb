@@ -156,7 +156,33 @@ Rails.application.config.to_prepare do
       },
       manage_courses_delete: {
         label: -> { I18n.t("Delete courses") },
-        label_v2: -> { I18n.t("Courses - delete") },
+        label_v2: -> { I18n.t("Courses - delete/archive") },
+        group: "manage_courses",
+        group_label: -> { I18n.t("Manage Courses") },
+        available_to: %w[
+          AccountAdmin
+          AccountMembership
+          TeacherEnrollment
+          DesignerEnrollment
+        ],
+        true_for: %w[AccountAdmin]
+      },
+      undelete_courses: {
+        label: -> { I18n.t("permissions.undelete_courses", "Undelete courses") },
+        label_v2: -> { I18n.t("Courses - undelete/unarchive") },
+        group: "manage_courses",
+        group_label: -> { I18n.t("Manage Courses") },
+        admin_tool: true,
+        account_only: true,
+        available_to: %w[
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: %w[AccountAdmin]
+      },
+      view_archived_courses: {
+        label: -> { I18n.t("View archived courses") },
+        label_v2: -> { I18n.t("Courses - view archived") },
         group: "manage_courses",
         group_label: -> { I18n.t("Manage Courses") },
         available_to: %w[
@@ -403,17 +429,6 @@ Rails.application.config.to_prepare do
         account_only: true,
         true_for: %w[AccountAdmin],
         available_to: %w[AccountAdmin AccountMembership]
-      },
-      undelete_courses: {
-        label: -> { I18n.t("permissions.undelete_courses", "Undelete courses") },
-        label_v2: -> { I18n.t("Courses - undelete") },
-        admin_tool: true,
-        account_only: true,
-        available_to: [
-          "AccountAdmin",
-          "AccountMembership"
-        ],
-        true_for: ["AccountAdmin"]
       },
       create_collaborations: {
         label: -> { I18n.t("permissions.create_collaborations", "Create student collaborations") },
