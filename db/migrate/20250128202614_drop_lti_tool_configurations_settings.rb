@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright (C) 2024 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class FixToolConfigurationPrivacyLevel < ActiveRecord::Migration[7.1]
+class DropLtiToolConfigurationsSettings < ActiveRecord::Migration[7.1]
   tag :postdeploy
-  def up
-    DataFixup::Lti::FixToolConfigurationPrivacyLevel.delay_if_production(priority: Delayed::LOWER_PRIORITY).run
+
+  def change
+    remove_column :lti_tool_configurations, :settings, :jsonb, null: false, default: {}
   end
 end

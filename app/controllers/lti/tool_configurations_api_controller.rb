@@ -128,10 +128,11 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   # @returns ToolConfiguration
   def update
     tool_config = developer_key.tool_configuration
+    settings = tool_configuration_params[:settings]&.to_unsafe_hash&.deep_merge(manual_custom_fields)
     update_params = {
-      settings: tool_configuration_params[:settings]&.to_unsafe_hash&.deep_merge(manual_custom_fields),
       disabled_placements: tool_configuration_params[:disabled_placements],
       redirect_uris: tool_configuration_redirect_uris,
+      **Schemas::InternalLtiConfiguration.from_lti_configuration(settings)
     }
     update_params[:privacy_level] = tool_configuration_params[:privacy_level] unless tool_configuration_params[:privacy_level].nil?
     tool_config.update!(update_params)
@@ -182,9 +183,9 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   def update_developer_key!(tool_config, redirect_uris)
     developer_key = tool_config.developer_key
     developer_key.redirect_uris = redirect_uris unless redirect_uris.nil?
-    developer_key.public_jwk = tool_config.settings["public_jwk"]
-    developer_key.public_jwk_url = tool_config.settings["public_jwk_url"]
-    developer_key.oidc_initiation_url = tool_config.settings["oidc_initiation_url"]
+    developer_key.public_jwk = tool_config.public_jwk
+    developer_key.public_jwk_url = tool_config.public_jwk_url
+    developer_key.oidc_initiation_url = tool_config.oidc_initiation_url
     developer_key.is_lti_key = true
     developer_key.current_user = @current_user
     developer_key.update!(developer_key_params)

@@ -1019,7 +1019,7 @@ RSpec.describe Lti::RegistrationsController do
     context "with a legacy configuration" do
       let(:params) do
         super().tap do |p|
-          p[:configuration] = registration.manual_configuration.settings.except(:public_jwk_url)
+          p[:configuration] = registration.canvas_configuration.except(:public_jwk_url)
         end
       end
 

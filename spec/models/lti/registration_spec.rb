@@ -326,7 +326,7 @@ RSpec.describe Lti::Registration do
       end
 
       it "returns the logo_uri" do
-        expect(subject).to eq(tool_configuration.settings["extensions"].first["settings"]["icon_url"])
+        expect(subject).to eq(tool_configuration.launch_settings["icon_url"])
       end
     end
 

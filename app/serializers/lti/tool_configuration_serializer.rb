@@ -28,15 +28,10 @@ module Lti
 
     def as_json
       key = @tool_configuration.developer_key
-      json = @tool_configuration.as_json.merge({
-                                                 developer_key: developer_key_json(
-                                                   key,
-                                                   nil,
-                                                   nil,
-                                                   key.owner_account
-                                                 ),
-                                               })
+      json = @tool_configuration.as_json
 
+      json[:developer_key] = developer_key_json(key, nil, nil, key.owner_account)
+      json[:tool_configuration][:settings] = @tool_configuration.lti_registration.canvas_configuration(context: key.owner_account)
       json[:warning_message] = @tool_configuration.placement_warnings if @include_warnings
       json
     end

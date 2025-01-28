@@ -206,7 +206,7 @@ class Lti::Registration < ActiveRecord::Base
 
   # TODO: this will eventually need to account for 1.1 registrations
   def icon_url
-    ims_registration&.logo_uri || manual_configuration&.settings&.dig("extensions", 0, "settings", "icon_url")
+    ims_registration&.logo_uri || manual_configuration&.launch_settings&.dig("icon_url")
   end
 
   # Returns an LtiConfiguration-conforming Hash with the overlay appropriate
