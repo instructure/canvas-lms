@@ -145,6 +145,7 @@ nn:
     length_error: "Må vere 255 teikn eller mindre"
   OutcomeView: 
     length_error: "Må vere 255 teikn eller mindre"
+    mastery_at_nan_error: "Må være eit tal"
     mastery_error: "Må vere større enn eller lik 0"
   OutcomesDirectoryView: 
     flash: 
@@ -2462,6 +2463,7 @@ nn:
   advanced_analytics_ask_questions: "Slå på \"Intelligent Insights - Ask Your Data\" og tilhøyrande rettar. "
   advanced_analytics_ask_questions_26553cd2: "Avansert analyse - Still spørsmål"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "Avansert analyse - Emnetilgjengelegheit og studentar som krev merksemd"
+  advanced_turnitin_settings_9ee84a38: "Avanserte Turnitin-innstillingar"
   affects_viewing_the_delete_this_course_and_conclud_1ac257e: "Påverkar visning av knappane “Slett dette emnet” og “Avslutt emne”."
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Har innverknad på vising av knappar for publiser emne, avslutt emne og slett emnet for godt.
@@ -13388,6 +13390,7 @@ nn:
         randomly_assign_students_dialog: "Dette fordeler automatisk alle studentar utan gruppe så jamt som mogleg i alle dei gjeldande studentgruppene"
       self_signup_help: 
         about_self_signup_groups: "Om sjølvregistreringsgrupper"
+        self_signup_deadline_description: "Du kan opprette sett med grupper der studentar registrerer seg sjølve. Studentane kan framleis ta del i berre ei gruppe i settet, men på denne måten kan dei sjølve organisere seg i grupper i staden for at faglæraren gjer det. Merk deg at så lenge dette alternativet er aktivert, kan studentane flytte mellom gruppene."
         self_signup_description: "Du kan opprette sett med grupper der studentar registrerer seg sjølve. Studentane kan framleis ta del i berre ei gruppe i settet, men på denne måten kan dei sjølve organisere seg i grupper i staden for at faglæraren gjer det. Merk deg at så lenge dette alternativet er aktivert, kan studentane flytte mellom gruppene."
     max_membership_number: "Maksimal deltaking må vere eit tal"
     member: 
@@ -28776,6 +28779,7 @@ nn:
   view_prior_enrollments_9b519b25: "Vis tidlegare påmeldingar"
   view_question_banks_188a9e0f: "Vis spørsmålsbankar"
   view_range_student_details_8116d68a: "Sjå studentdetaljar innan området"
+  view_registered_services_6c8cd301: "Vis registrerte tenester"
   view_replies_8565a729: "Sjå svara"
   view_rubric_d71cce10: "Vis vurderingsskjema"
   view_rubric_evaluation_b1b0db2a: "Vis evalueringa for vurderingsskjemaet"
