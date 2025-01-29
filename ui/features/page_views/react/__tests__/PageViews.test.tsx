@@ -74,4 +74,10 @@ describe('PageViews', () => {
     expect(startDate?.toISOString()).toBe(expectedStartDate?.toISOString())
     expect(endDate?.toISOString()).toBe(expectedEndDate?.toISOString())
   })
+
+  it('renders the correct label for the date input', () => {
+    const {getByLabelText} = render(<Subject userId="1" />)
+    const input = getByLabelText('Filter by date') as HTMLInputElement
+    expect(input).toBeInTheDocument()
+  })
 })
