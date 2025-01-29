@@ -2905,6 +2905,7 @@ CanvasRails::Application.routes.draw do
     # Asset Service & Asset Report Service (LTI Asset Processor Specs)
     scope(controller: "lti/ims/asset_processor") do
       post "asset_processor/:asset_processor_id/report", action: :create_report, as: :lti_asset_processor_create_report
+      get "asset_processor/:asset_processor_id/asset/:asset_id", action: :lti_asset_show, as: :lti_asset_processor_asset_show
     end
 
     # Dynamic Registration Service

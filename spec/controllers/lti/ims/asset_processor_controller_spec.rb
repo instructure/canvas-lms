@@ -198,4 +198,57 @@ describe Lti::IMS::AssetProcessorController do
       end
     end
   end
+
+  describe "#lti_asset_show" do
+    let(:action) { :lti_asset_show }
+    let(:request_method) { :get }
+    let(:assignment) { assignment_model(course:) }
+    let(:asset) { lti_asset_model(submission: submission_model(assignment:)) }
+    let(:asset_processor) { lti_asset_processor_model(tool:, assignment:) }
+    let(:params_overrides) { { asset_processor_id: asset_processor.id, asset_id: asset.uuid } }
+    let(:expected_mime_type) { "text/html" }
+
+    it_behaves_like "advantage services", skip_mime_type_checks_on_error: true, route_includes_context: false do
+      let(:http_success_status) { :found }
+      let(:context) { asset_processor.assignment.context }
+    end
+    it_behaves_like "lti services", skip_mime_type_checks_on_error: true do
+      let(:http_success_status) { :found }
+      let(:scope_to_remove) { TokenScopes::LTI_ASSET_READ_ONLY_SCOPE }
+    end
+
+    def expect_not_found
+      send_request
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "redirects to the asset's public download URL" do
+      allow(controller).to receive(:render_or_redirect_to_stored_file).and_call_original
+      expect(controller).to receive(:render_or_redirect_to_stored_file)
+      send_request
+      expect(response).to have_http_status(:found)
+    end
+
+    context "when the asset is not found" do
+      let(:params_overrides) { { asset_processor_id: asset_processor.id, asset_id: "non-existent-id" } }
+
+      it { expect_not_found }
+    end
+
+    context "when the asset is not compatible with the asset processor" do
+      let(:asset_processor) { lti_asset_processor_model(tool:) }
+
+      it "returns a 400 Bad Request" do
+        send_request
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to match(/Invalid asset/)
+      end
+    end
+
+    context "when the feature flag lti_asset_processor is disabled" do
+      before { tool.root_account.disable_feature!(:lti_asset_processor) }
+
+      it { expect_not_found }
+    end
+  end
 end
