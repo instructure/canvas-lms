@@ -142,6 +142,8 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
         "when the tool is used to upload a file as an assignment submission"
       when "INTERNAL_TOOL_GUARD"
         "internal LTI tools"
+      when "INSTRUCTURE_IDENTITY_GUARD"
+        "Instructure Identity is enabled"
       end
     end
     "**Availability**: *#{all_availabilities.join(" and ")}*  " if all_availabilities.size
