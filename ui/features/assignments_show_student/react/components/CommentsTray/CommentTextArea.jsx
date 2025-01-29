@@ -52,12 +52,22 @@ export default class CommentTextArea extends Component {
   state = {
     commentText: '',
     currentFiles: [],
+    commentTextErrors:[],
     hasError: false,
     mediaModalOpen: false,
     mediaObject: null,
     uploadingComments: false,
+    bottomValue: '0px',
   }
 
+  componentDidUpdate(){
+    if(this.state.commentTextErrors.length > 0 && this.state.bottomValue === '0px') {
+      this.setState({bottomValue: this._commentTextBox.ref.children[0].lastChild.getBoundingClientRect().height + 'px'})
+    }
+    else if(this.state.commentTextErrors.length === 0 && this.state.bottomValue !== '0px') {
+      this.setState({bottomValue: '0px'})
+    }
+  }
   queryVariables() {
     return {
       query: SUBMISSION_COMMENT_QUERY,
@@ -117,7 +127,7 @@ export default class CommentTextArea extends Component {
     selectedFiles.forEach(file => {
       file.id = ++currIndex
     })
-    this.setState(prevState => ({currentFiles: [...prevState.currentFiles, ...selectedFiles]}))
+    this.setState(prevState => ({currentFiles: [...prevState.currentFiles, ...selectedFiles], commentTextErrors: []}))
   }
 
   onMediaModalDismiss = (err, mediaObject) => {
@@ -196,13 +206,13 @@ export default class CommentTextArea extends Component {
   }
 
   onTextChange = e => {
-    this.setState({commentText: e.target.value})
+    this.setState({commentText: e.target.value, commentTextErrors: []})
   }
 
   insertEmoji = emoji => {
     this.setState(
       state => {
-        return {commentText: state.commentText + emoji.native}
+        return {commentText: state.commentText + emoji.native, commentTextErrors: []}
       },
       () => {
         if (this._commentTextBox) {
@@ -277,8 +287,14 @@ export default class CommentTextArea extends Component {
                 }}
                 value={this.state.commentText}
                 data-testid="comment-text-input"
+                messages={this.state.commentTextErrors}
               />
-              <span className="emoji-picker-container">
+              <span
+                className="emoji-picker-container"
+                style={{
+                  bottom: this.state.bottomValue,
+                }}
+              >
                 {!this.state.uploadingComments && !!ENV.EMOJIS_ENABLED && (
                   <EmojiPicker insertEmoji={this.insertEmoji} />
                 )}
@@ -360,10 +376,21 @@ export default class CommentTextArea extends Component {
                     disableSubmitWhileUploading={true}
                   />
                   <Button
-                    disabled={
-                      this.state.commentText.length === 0 && this.state.currentFiles.length === 0
-                    }
-                    onClick={() => this.onSendComment(createSubmissionComment)}
+                    onClick={() => {
+                      if (this.state.commentText.trim().length > 0 || this.state.currentFiles.length > 0) {
+                        this.onSendComment(createSubmissionComment)
+                      } else {
+                        const errorMessage = I18n.t('Comment or file required to save')
+                        this._commentTextBox.focus()
+                        this.setState({
+                          commentTextErrors: [
+                            { text: errorMessage, type: 'newError' },
+                            { text: errorMessage, type: 'screenreader-only' },
+                          ]
+                        })
+                      }
+
+                    }}
                     data-testid="send-button"
                   >
                     {I18n.t('Send Comment')}
