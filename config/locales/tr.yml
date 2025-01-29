@@ -2144,6 +2144,7 @@ tr:
   admin_user_name_29dd115a: admin_user_name
   admins_3e1dce15: Yöneticiler
   admins_add_remove_26811ce5: "Yöneticiler - ekle / sil"
+  advanced_turnitin_settings_9ee84a38: "Gelişmiş Turnitin Ayarları"
   afghanistan_93_ab06805: "Afganistan (+93)"
   after_48b9d69: "..den sonra"
   after_4c71e718: Sonra
@@ -10046,6 +10047,7 @@ tr:
         randomly_assign_students_dialog: "Bu işlem tüm atanmamış öğrencileri mevcut gruplara olabildiğince eşit bir şekilde otomatik dağıtacaktır."
       self_signup_help: 
         about_self_signup_groups: "Gruplara Hızlı Üye Olma Hakkında"
+        self_signup_deadline_description: "Öğrencilerin kendilerini kaydedebildikleri grup setleri oluşturabilirsiniz. Öğrenciler hala yalnızca bir grubun içinde olabilirler fakat bu şekilde öğretmenin yapmasına gerek kalmadan öğrenciler kendilerini gruplar içinde organize edebilirler. Unutmayın, bu seçenek etkinken öğrenciler kendilerini bir gruptan diğerine taşıyabilirler."
         self_signup_description: "Öğrencilerin kendilerini kaydedebildikleri grup setleri oluşturabilirsiniz. Öğrenciler hala yalnızca bir grubun içinde olabilirler fakat bu şekilde öğretmenin yapmasına gerek kalmadan öğrenciler kendilerini gruplar içinde organize edebilirler. Unutmayın, bu seçenek etkinken öğrenciler kendilerini bir gruptan diğerine taşıyabilirler."
     max_membership_number: "Maksimum üyelik alanına bir sayı girilmelidir"
     member: 
@@ -20175,6 +20177,7 @@ tr:
   view_previous_file_b846db4f: "Önceki dosyayı gör"
   view_prior_enrollments_9b519b25: "Öncei Ders Kayıtlarını Göster"
   view_question_banks_188a9e0f: "Soru Bankalarını Göster"
+  view_registered_services_6c8cd301: "Kayıt Olunan Servisleri Göster"
   view_rubric_d71cce10: "Değerlendirme Listesini Göster"
   view_rubric_evaluation_b1b0db2a: "Değerlendirme Listesini Göster"
   view_student_analytics_6b8ccd42: "Öğrenci Analitiklerini Göster"
