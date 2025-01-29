@@ -24,6 +24,13 @@ class GradebookUploadsController < ApplicationController
 
   before_action :require_context
 
+  def index
+    send(:new)
+    return if performed?
+
+    render :new
+  end
+
   def new
     if authorized_action(@context, @current_user, :manage_grades)
       # GradebookUpload is a singleton.  If there is
@@ -61,9 +68,8 @@ class GradebookUploadsController < ApplicationController
         js_env gradebook_env(@progress)
         render :show
       else
-        flash[:error] = t(:no_file_attached, "We did not detect a CSV to " \
-                                             "upload. Please select a CSV to upload and submit again.")
-        redirect_to action: :new
+        @no_file_message = t("Please select a CSV file to upload")
+        render :new
       end
     end
   end
@@ -90,7 +96,7 @@ class GradebookUploadsController < ApplicationController
       bulk_update_custom_columns_path: api_v1_course_custom_gradebook_column_bulk_data_path(@context),
       bulk_update_override_scores_path: "/api/v1/courses/#{@context.id}/update_final_grade_overrides",
       create_assignment_path: api_v1_course_assignments_path(@context),
-      new_gradebook_upload_path: new_course_gradebook_upload_path(@context),
+      new_gradebook_upload_path: course_gradebook_uploads_path(@context),
       custom_grade_statuses: Account.site_admin.feature_enabled?(:custom_gradebook_statuses) ? @context.custom_grade_statuses.as_json(include_root: false) : []
     }
   end
