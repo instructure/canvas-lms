@@ -270,7 +270,10 @@ const ZipFileImporter = ({
         <View as="div" margin="medium none none none" maxWidth="22.5rem">
           {folders.length > 0 ? (
             <>
-              <RequiredFormLabel showErrorState={folderError}>
+              <RequiredFormLabel
+                showErrorState={folderError}
+                htmlFor="folder-search"
+              >
                 {I18n.t('Upload to')}
               </RequiredFormLabel>
               <View as="div" margin="x-small 0 medium" data-testid="fileName">
@@ -285,6 +288,7 @@ const ZipFileImporter = ({
                 />
               </View>
               <TextInput
+                id="folder-search"
                 renderLabel=""
                 placeholder={I18n.t('Search folders')}
                 value={searchValue}
