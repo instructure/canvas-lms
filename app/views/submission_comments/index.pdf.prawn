@@ -27,8 +27,8 @@ prawn_document(page_layout: :portrait, page_size:) do |pdf|
   pdf.font("Helvetica")
 
   # initialize and set non-Latin fallback fonts using only the “Regular” style
-  fallback_fonts = %w[NotoSansJP NotoSansKR NotoSansSC NotoSansTC NotoSansThai NotoSansArabic NotoSansHebrew NotoSansArmenian]
-  fallback_fonts.each do |font_name|
+  non_latin_fallback_fonts = %w[NotoSansJP NotoSansKR NotoSansSC NotoSansTC NotoSansThai NotoSansArabic NotoSansHebrew NotoSansArmenian]
+  non_latin_fallback_fonts.each do |font_name|
     font_path = "#{File.dirname(__FILE__)}/fonts/noto_sans/#{font_name}-Regular.ttf"
     pdf.font_families.update(font_name => {
                                normal: { file: font_path, subset: true },
@@ -36,16 +36,20 @@ prawn_document(page_layout: :portrait, page_size:) do |pdf|
                                italic: { file: font_path, subset: true }
                              })
   end
-  pdf.fallback_fonts(fallback_fonts)
 
-  # Add DejaVuSans font for Unicode support
   pdf.font_families.update(
+    # add DejaVuSans font for general Unicode support
     "DejaVuSans" => {
       normal: "#{File.dirname(__FILE__)}/fonts/DejaVuSans.ttf"
+    },
+    # add NotoEmoji font for emoji support
+    "NotoEmoji" => {
+      normal: "#{File.dirname(__FILE__)}/fonts/NotoEmoji-Regular.ttf"
     }
   )
 
-  pdf.fallback_fonts(fallback_fonts + ["DejaVuSans"])
+  # set the fallback fonts
+  pdf.fallback_fonts(non_latin_fallback_fonts + %w[NotoEmoji DejaVuSans])
 
   pdf.font_size 8
   pdf.text assignment_title, size: pdf.font_size * 2.375
