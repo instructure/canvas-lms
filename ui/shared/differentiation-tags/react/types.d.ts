@@ -20,3 +20,16 @@ export interface DifferentiationTagCategory {
   id: number
   name: string
 }
+
+export interface DifferentiationTagGroup {
+  id: number
+  name: string
+}
+
+export interface DifferentiationTagSet {
+  id: number
+  name: string
+  groups?: DifferentiationTagGroup[]
+}
+
+export type ModalMode = 'create' | 'edit'
