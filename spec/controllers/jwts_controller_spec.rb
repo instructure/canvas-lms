@@ -60,6 +60,16 @@ describe JwtsController do
         decrypted_token_body = translate_token.call(response)
         expect(decrypted_token_body[:domain]).to eq("test.host")
       end
+
+      it "generates a token that includes the root account uuid" do
+        root_account_uuid = LoadAccount.default_domain_root_account.uuid
+        pseudonym(admin_user)
+        access_token = admin_user.access_tokens.create!.full_token
+        request.headers["Authorization"] = "Bearer #{access_token}"
+        post "create", format: "json"
+        jwt = translate_token.call(response)
+        expect(jwt[:root_account_uuid]).to eq(root_account_uuid)
+      end
     end
 
     context "asymmetric tokens" do
