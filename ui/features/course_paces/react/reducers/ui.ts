@@ -39,6 +39,7 @@ export const initialState: UIState = {
   responsiveSize: 'large',
   showProjections: true,
   blueprintLocked: window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course,
+  showWeightedAssignmentsTray: false,
 }
 
 /* Selectors */
@@ -73,6 +74,7 @@ export const getShowPaceModal = (state: StoreState) => state.ui.showPaceModal
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
 export const getIsSyncing = (state: StoreState) => state.ui.syncing
 export const getBlueprintLocked = (state: StoreState) => state.ui.blueprintLocked
+export const getShowWeightedAssignmentsTray = (state: StoreState) => state.ui.showWeightedAssignmentsTray
 
 export const getShowProjections = createSelector(
   state => state.ui.showProjections,
@@ -129,6 +131,10 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, blueprintLocked: action.payload}
     case UIConstants.SAVING_DRAFT:
       return {...state, savingDraft: !state.savingDraft}
+    case UIConstants.SHOW_WEIGHTING_ASSIGNMENTS_MODAL:
+      return {...state, showWeightedAssignmentsTray: true}
+    case UIConstants.HIDE_WEIGHTING_ASSIGNMENTS_MODAL:
+      return {...state, showWeightedAssignmentsTray: false}
     default:
       return state
   }

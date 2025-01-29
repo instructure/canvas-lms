@@ -28,10 +28,10 @@ import {coursePaceActions} from '../../../actions/course_paces'
 import {getSelectedDaysToSkip} from '../../../reducers/course_paces'
 import {Pill} from '@instructure/ui-pill'
 import type {CoursePace, ResponsiveSizes, StoreState} from 'features/course_paces/react/types'
-import {renderManageBlackoutDates} from './helpers'
 import {WORK_WEEK_DAYS_MENU_OPTIONS, WEEK_DAYS_VALUES} from '../../../../constants'
 import MainMenu from './MainMenu'
 import type {MenuPlacement} from './SettingsMenu'
+import {ButtonProps} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('course_paces_settings')
 
@@ -40,6 +40,7 @@ interface StoreProps {
 }
 
 interface SkipSelectedDaysMenuProps {
+  readonly margin?: ButtonProps['margin']
   readonly isSyncing: boolean
   readonly responsiveSize: ResponsiveSizes
   readonly showSettingsPopover: boolean
@@ -62,7 +63,9 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
   const [skipWeekends, setSkipWeekends] = useState(skipWeekendsSelected)
 
   const toggleSkipWeekends = () => {
-    const newSelectedDaysToSkip = props.selectedDaysToSkip.filter((value) => WEEK_DAYS_VALUES.includes(value))
+    const newSelectedDaysToSkip = props.selectedDaysToSkip.filter(value =>
+      WEEK_DAYS_VALUES.includes(value),
+    )
 
     if (!skipWeekends) {
       newSelectedDaysToSkip.push('sat', 'sun')
@@ -85,7 +88,7 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
   }, [props.selectedDaysToSkip.length])
 
   const disableWeekends = useMemo(() => {
-    return props.selectedDaysToSkip.filter((day) => WEEK_DAYS_VALUES.includes(day)).length === 5
+    return props.selectedDaysToSkip.filter(day => WEEK_DAYS_VALUES.includes(day)).length === 5
   }, [props.selectedDaysToSkip])
 
   const backButton = (
@@ -122,7 +125,8 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
     const pillComponent =
       selectedItemsCount > 0 ? (
         <Pill
-          themeOverride={{height: '0.75rem', maxWidth: '0.75rem'}}
+          themeOverride={{height: '1.563rem', maxWidth: '1.95rem'}}
+          margin="xxx-small"
           data-testid="selected_days_counter"
         >
           {selectedItemsCount}
@@ -147,19 +151,35 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
   return (
     <>
       {currentItemId === 'mainMenu' && (
-        <MainMenu {...props}>
+        <MainMenu
+          margin={props.margin}
+          responsiveSize={props.responsiveSize}
+          showSettingsPopover={props.showSettingsPopover}
+          isBlueprintLocked={props.isBlueprintLocked}
+          isSyncing={props.isSyncing}
+          showBlackoutDatesModal={props.showBlackoutDatesModal}
+          toggleShowSettingsPopover={props.toggleShowSettingsPopover}
+          menuPlacement={props.menuPlacement}
+          isPrincipal={true}
+          contextType={props.coursePace.context_type}
+        >
           {renderRootItemSkipSelectedDays()}
-          {renderManageBlackoutDates(
-            props.isSyncing,
-            props.showBlackoutDatesModal,
-            props.toggleShowSettingsPopover,
-            props.coursePace.context_type,
-          )}
         </MainMenu>
       )}
 
       {currentItemId === 'skipSelectedDays' && (
-        <MainMenu {...props}>
+        <MainMenu
+          margin={props.margin}
+          responsiveSize={props.responsiveSize}
+          showSettingsPopover={props.showSettingsPopover}
+          isBlueprintLocked={props.isBlueprintLocked}
+          isSyncing={props.isSyncing}
+          showBlackoutDatesModal={props.showBlackoutDatesModal}
+          toggleShowSettingsPopover={props.toggleShowSettingsPopover}
+          menuPlacement={props.menuPlacement}
+          isPrincipal={false}
+          contextType={props.coursePace.context_type}
+        >
           {backButton}
           <Menu.Group label={skipSelectedDaysMenuHeader} allowMultiple={false}>
             <Menu.Separator
@@ -193,7 +213,12 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
           >
             {WORK_WEEK_DAYS_MENU_OPTIONS.map(({value, label}, _) => {
               return (
-                <Menu.Item key={value} type="checkbox" value={value} disabled={!props.selectedDaysToSkip.includes(value) && disableLastDay}>
+                <Menu.Item
+                  key={value}
+                  type="checkbox"
+                  value={value}
+                  disabled={!props.selectedDaysToSkip.includes(value) && disableLastDay}
+                >
                   {label}
                 </Menu.Item>
               )

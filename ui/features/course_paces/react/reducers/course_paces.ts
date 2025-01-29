@@ -48,7 +48,7 @@ import {getSections} from './sections'
 import {getInitialCoursePace, getOriginalBlackoutDates, getOriginalPace} from './original'
 import {getBlackoutDates} from '../shared/reducers/blackout_dates'
 import {type Change, summarizeChanges} from '../utils/change_tracking'
-import { calculatePaceDuration } from '../utils/utils'
+import { calculatePaceDuration, calendarDaysToPaceDuration, isTimeToCompleteCalendarDaysValid } from '../utils/utils'
 
 const initialProgress = window.ENV.COURSE_PACE_PROGRESS
 
@@ -105,6 +105,8 @@ export const getPaceCompressedDates = (state: StoreState): CoursePaceItemDueDate
   state.coursePace.compressed_due_dates
 export const getSearchTerm = (state: StoreState): string => state.paceContexts.searchTerm
 export const getCoursePaceItems = createSelector(getCoursePaceModules, getModuleItems)
+export const getWeightedAssignments = (state: StoreState) => state.coursePace.assignments_weighting
+export const getTimeToCompleteCalendarDays = (state: StoreState) => state.coursePace.time_to_complete_calendar_days
 
 export const getPaceName = (state: StoreState): string => {
   switch (state.coursePace.context_type) {
@@ -128,7 +130,8 @@ export const getSettingChanges = createDeepEqualSelector(
   getOriginalPace,
   getOriginalBlackoutDates,
   getBlackoutDates,
-  (excludeWeekends, selectedDaysToSkip, originalPace, originalBlackoutDates, blackoutDates) => {
+  getTimeToCompleteCalendarDays,
+  (excludeWeekends, selectedDaysToSkip, originalPace, originalBlackoutDates, blackoutDates, timeToCompleteCalendarDays) => {
     const changes: Change[] = []
 
     if (window.ENV.FEATURES.course_paces_skip_selected_days) {
@@ -148,6 +151,17 @@ export const getSettingChanges = createDeepEqualSelector(
         oldValue: originalPace.exclude_weekends,
         newValue: excludeWeekends,
       })
+
+      if (window.ENV.FEATURES.course_pace_weighted_assignments) {
+
+      if (timeToCompleteCalendarDays !== originalPace.time_to_complete_calendar_days) {
+        changes.push({
+          id: 'time_to_complete_calendar_days',
+          oldValue: calendarDaysToPaceDuration(originalPace.time_to_complete_calendar_days),
+          newValue: calendarDaysToPaceDuration(timeToCompleteCalendarDays),
+        })
+      }
+    }
 
     const blackoutChanges = getBlackoutDateChanges(originalBlackoutDates, blackoutDates)
     if (blackoutChanges.length) {
@@ -421,6 +435,16 @@ export const getPaceDuration = createSelector(
   },
 )
 
+export const isPaceDueDateRight = createSelector(
+  getCoursePace,
+  getCoursePaceItems,
+  getBlackoutDates,
+  (coursePace: CoursePace, coursePaceItem: CoursePaceItem[], blackoutDates: BlackoutDate[]): boolean => {
+
+    return isTimeToCompleteCalendarDaysValid(coursePace, coursePaceItem, blackoutDates)
+  },
+)
+
 export const getActivePaceContext = createSelector(
   getCoursePace,
   getCourse,
@@ -629,6 +653,10 @@ export default (
     }
     case CoursePaceConstants.UNCOMPRESS_DATES:
       return {...state, compressed_due_dates: undefined}
+    case CoursePaceConstants.SET_WEIGHTED_ASSIGNMENTS:
+      return {...state, assignments_weighting: action.payload}
+    case CoursePaceConstants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS:
+      return {...state, time_to_complete_calendar_days: action.payload}
     default:
       return {
         ...state,

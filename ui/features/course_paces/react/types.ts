@@ -96,6 +96,13 @@ export interface PaceDuration {
   days: number
 }
 
+export type AssignmentWeightening = {
+  assignment: number | undefined,
+  quiz: number | undefined,
+  discussion: number | undefined,
+  page: number | undefined,
+}
+
 export interface CoursePace {
   readonly id?: string
   readonly start_date?: string
@@ -116,6 +123,8 @@ export interface CoursePace {
   readonly compressed_due_dates: CoursePaceItemDueDates | undefined
   readonly updated_at: string
   readonly name?: string
+  readonly assignments_weighting: AssignmentWeightening
+  readonly time_to_complete_calendar_days: number
 }
 
 export interface Progress {
@@ -175,6 +184,7 @@ export interface UIState {
   readonly showProjections: boolean
   readonly editingBlackoutDates: boolean
   readonly blueprintLocked?: boolean
+  readonly showWeightedAssignmentsTray: boolean
 }
 
 export type SortableColumn = 'name' | null

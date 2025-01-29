@@ -57,6 +57,8 @@ class CoursePace < ActiveRecord::Base
   scope :section_paces, -> { where.not(course_section_id: nil) }
   scope :student_enrollment_paces, -> { where.not(user_id: nil) }
 
+  serialize :assignments_weighting
+
   workflow do
     state :unpublished
     state :active

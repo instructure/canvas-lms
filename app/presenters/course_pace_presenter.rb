@@ -45,6 +45,8 @@ class CoursePacePresenter
       root_account_id: course_pace.root_account_id,
       modules: modules_json,
       context_id:,
+      assignments_weighting: assignments_weighting,
+      time_to_complete_calendar_days: course_pace.time_to_complete_calendar_days,
       context_type:
     }.merge(course_pace.start_date(with_context: true)).merge(course_pace.effective_end_date(with_context: true))
   end
@@ -312,6 +314,14 @@ class CoursePacePresenter
       p.each_text_run do |tr|
         tr.substitute(matcher, replace_with)
       end
+    end
+  end
+
+  def assignments_weighting
+    return {} unless course_pace.assignments_weighting.present?
+
+    course_pace.assignments_weighting.to_h do |weighting|
+      [weighting["resource_type"].to_sym, weighting["duration"]]
     end
   end
 end

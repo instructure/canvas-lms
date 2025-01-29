@@ -66,6 +66,7 @@ import { getEnrolledSection } from '../../reducers/enrollments'
 import PaceModalStats from './stats'
 import { generateModalLauncherId } from '../../utils/utils'
 import TimeSelection from './TimeSelection'
+import WeightedAssignmentsTray from '../header/settings/WeightedAssignmentsTray'
 
 const I18n = createI18nScope('course_paces_modal')
 
@@ -163,9 +164,8 @@ export const PaceModal = ({
   const headerSection = window.ENV.FEATURES.course_pace_time_selection ? (
     <TimeSelection
       coursePace={props.coursePace}
-      plannedEndDate={props.plannedEndDate}
-      paceDuration={props.paceDuration}
       appliedPace={props.selectedPaceContext?.applied_pace as Pace}
+      responsiveSize={props.responsiveSize}
     />
   ) : (
     <PaceModalStats
@@ -261,6 +261,7 @@ export const PaceModal = ({
           }}
           contextType={props.coursePace.context_type}
         />
+      { window.ENV.FEATURES.course_pace_weighted_assignments && <WeightedAssignmentsTray />}
       </Modal.Body>
       <Modal.Footer themeOverride={{ padding: '0' }}>
         <Footer
