@@ -78,19 +78,20 @@ const portalRouter = createBrowserRouter(
   )
 )
 
+// ensure lazy evaluation at render time, preventing `I18n.t()` eager lookup violations
+export function FallbackSpinner() {
+  const I18n = createI18nScope('main')
+  return <Spinner renderTitle={I18n.t('Loading page')} data-testid="fallback-spinner" />
+}
+
 export function loadReactRouter() {
   const mountNode = document.querySelector('#react-router-portals')
-
-  const I18n = createI18nScope('main')
   if (mountNode) {
     const root = ReactDOM.createRoot(mountNode)
     root.render(
       <QueryProvider>
-        <RouterProvider
-          router={portalRouter}
-          fallbackElement={<Spinner renderTitle={I18n.t('Loading page')} />}
-        />
-      </QueryProvider>
+        <RouterProvider router={portalRouter} fallbackElement={<FallbackSpinner />} />
+      </QueryProvider>,
     )
   }
 }
