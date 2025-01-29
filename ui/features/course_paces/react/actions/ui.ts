@@ -46,6 +46,8 @@ export enum Constants {
   SYNCING_COMPLETED = 'UI/SYNCING_COMPLETED',
   SET_SELECTED_PACE_CONTEXT_TYPE = 'UI/SET_SELECTED_PACE_CONTEXT_TYPE',
   SET_BLUEPRINT_LOCK = 'COURSE_PACE/SET_BLUEPRINT_LOCK',
+  SHOW_WEIGHTING_ASSIGNMENTS_MODAL = 'UI/SHOW_WEIGHTING_ASSIGNMENTS_MODAL',
+  HIDE_WEIGHTING_ASSIGNMENTS_MODAL = 'UI/HIDE_WEIGHTING_ASSIGNMENTS_MODAL',
 }
 
 /* Action creators */
@@ -75,6 +77,8 @@ export const regularActions = {
   setSelectedContextType: (selectedContextType: PaceContextTypes) =>
     createAction(Constants.SET_SELECTED_PACE_CONTEXT_TYPE, selectedContextType),
   setBlueprintLocked: (locked?: boolean) => createAction(Constants.SET_BLUEPRINT_LOCK, locked),
+  showWeightedAssignmentsTray: () => createAction(Constants.SHOW_WEIGHTING_ASSIGNMENTS_MODAL),
+  hideWeightedAssignmentsTray: () => createAction(Constants.HIDE_WEIGHTING_ASSIGNMENTS_MODAL),
 }
 
 export const thunkActions = {

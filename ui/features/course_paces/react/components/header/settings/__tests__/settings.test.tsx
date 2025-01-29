@@ -254,4 +254,31 @@ describe('Settings', () => {
       expect(screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})).toBeInTheDocument()
     })
   })
+
+  describe('course_pace_weighted_assignments is enabled', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          course_pace_weighted_assignments: true,
+        },
+      })
+    })
+
+    it('renders set weighted assignment duration menu option', () => {
+      renderConnected(<Settings {...defaultProps} />)
+      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+      act(() => settingsButton.click())
+
+      const weightedAssignmentsOption = screen.getByTestId('weighted-assignment-duration-option')
+      expect(weightedAssignmentsOption).toBeInTheDocument()
+    })
+  })
+
+  it('set weighted assignment duration menu option is not displayed', () => {
+    renderConnected(<Settings {...defaultProps} />)
+    const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+    act(() => settingsButton.click())
+
+    expect(screen.queryByTestId('weighted-assignment-duration-option')).not.toBeInTheDocument()
+  })
 })

@@ -17,15 +17,15 @@
  */
 
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
+import {renderConnected} from '../../../__tests__/utils'
 import '@testing-library/jest-dom'
 import TimeSelection from '../TimeSelection'
 import { PRIMARY_PACE, STUDENT_PACE } from '../../../__tests__/fixtures'
 import { Pace } from 'features/course_paces/react/types'
 import keycode from 'keycode'
 
-const plannedEndDate = '2023-12-31T00:00:00Z'
-const defaultPaceDuration = { weeks: 15, days: 1 }
+const responsiveSize = 'small'
 
 const appliedPace: Pace = {
   name: 'LS3432',
@@ -36,36 +36,33 @@ const appliedPace: Pace = {
 
 describe('Pace Modal TimeSelection', () => {
   it('displays the correct start date', () => {
-    render(
+    renderConnected(
       <TimeSelection
         coursePace={PRIMARY_PACE}
-        plannedEndDate={plannedEndDate}
         appliedPace={appliedPace}
-        paceDuration={defaultPaceDuration}
+        responsiveSize={responsiveSize}
       />
     )
     expect(screen.getByLabelText('Start Date')).toHaveValue('September 1, 2021')
   })
 
   it('displays the correct end date from PRIMARY_PACE.end_date', () => {
-    render(
+    renderConnected(
       <TimeSelection
         coursePace={PRIMARY_PACE}
-        plannedEndDate={plannedEndDate}
         appliedPace={appliedPace}
-        paceDuration={defaultPaceDuration}
+        responsiveSize={responsiveSize}
       />
     )
     expect(screen.getByLabelText('End Date')).toHaveValue('December 15, 2021')
   })
 
   it('updates the end date when incrementing weeks', () => {
-    const { getByTestId } = render(
+    const { getByTestId } = renderConnected(
       <TimeSelection
         coursePace={PRIMARY_PACE}
-        plannedEndDate={plannedEndDate}
         appliedPace={appliedPace}
-        paceDuration={defaultPaceDuration}
+        responsiveSize={responsiveSize}
       />
     )
     const weeksInput = getByTestId('weeks-number-input')
@@ -75,12 +72,11 @@ describe('Pace Modal TimeSelection', () => {
   })
 
   it('updates the end date when decrementing weeks', () => {
-    const { getByTestId } = render(
+    const { getByTestId } = renderConnected(
       <TimeSelection
         coursePace={PRIMARY_PACE}
-        plannedEndDate={plannedEndDate}
         appliedPace={appliedPace}
-        paceDuration={defaultPaceDuration}
+        responsiveSize={responsiveSize}
       />
     )
     const weeksInput = getByTestId('weeks-number-input')
@@ -90,12 +86,11 @@ describe('Pace Modal TimeSelection', () => {
   })
 
   it('updates the end date when incrementing days', () => {
-    const { getByTestId } = render(
+    const { getByTestId } = renderConnected(
       <TimeSelection
         coursePace={PRIMARY_PACE}
-        plannedEndDate={plannedEndDate}
         appliedPace={appliedPace}
-        paceDuration={defaultPaceDuration}
+        responsiveSize={responsiveSize}
       />
     )
     const weeksInput = getByTestId('days-number-input')
@@ -105,12 +100,11 @@ describe('Pace Modal TimeSelection', () => {
   })
 
   it('updates the end date when decrementing days', () => {
-    const { getByTestId } = render(
+    const { getByTestId } = renderConnected(
       <TimeSelection
         coursePace={PRIMARY_PACE}
-        plannedEndDate={plannedEndDate}
         appliedPace={appliedPace}
-        paceDuration={defaultPaceDuration}
+        responsiveSize={responsiveSize}
       />
     )
     const weeksInput = getByTestId('days-number-input')
@@ -120,12 +114,11 @@ describe('Pace Modal TimeSelection', () => {
   })
 
   it('updates time to complete when start date is changed', () => {
-    const { getByTestId } = render(
+    const { getByTestId } = renderConnected(
       <TimeSelection
         coursePace={PRIMARY_PACE}
-        plannedEndDate={plannedEndDate}
         appliedPace={appliedPace}
-        paceDuration={defaultPaceDuration}
+        responsiveSize={responsiveSize}
       />
     )
     const dateText = '2021-09-16'
@@ -140,12 +133,11 @@ describe('Pace Modal TimeSelection', () => {
   })
 
   it('updates time to complete when end date is changed', () => {
-    const { getByTestId } = render(
+    const { getByTestId } = renderConnected(
       <TimeSelection
         coursePace={PRIMARY_PACE}
-        plannedEndDate={plannedEndDate}
         appliedPace={appliedPace}
-        paceDuration={defaultPaceDuration}
+        responsiveSize={responsiveSize}
       />
     )
     const dateText = '2021-12-23'
@@ -160,13 +152,11 @@ describe('Pace Modal TimeSelection', () => {
   })
 
   it('Start date input is not available for Student Pace', () => {
-
-    const { queryByTestId } = render(
+    const { queryByTestId } = renderConnected(
       <TimeSelection
         coursePace={STUDENT_PACE}
-        plannedEndDate={plannedEndDate}
         appliedPace={appliedPace}
-        paceDuration={defaultPaceDuration}
+        responsiveSize={responsiveSize}
       />
     )
 
@@ -176,13 +166,11 @@ describe('Pace Modal TimeSelection', () => {
   })
 
   it('Start date Label is shown for Student Pace', () => {
-
-    const { queryByTestId } = render(
+    const { queryByTestId } = renderConnected(
       <TimeSelection
         coursePace={STUDENT_PACE}
-        plannedEndDate={plannedEndDate}
         appliedPace={appliedPace}
-        paceDuration={defaultPaceDuration}
+        responsiveSize={responsiveSize}
       />
     )
 

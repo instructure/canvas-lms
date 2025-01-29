@@ -39,6 +39,13 @@ window.ENV.TIMEZONE = 'America/Denver'
 window.ENV.CONTEXT_TIMEZONE = 'America/Denver'
 moment.tz.setDefault('America/Denver')
 
+export const ASSIGNMENT_WEIGHTING = {
+  assignment: 1,
+  discussion: 2,
+  quiz: 3,
+  page: 4,
+}
+
 export const COURSE: Course = {
   id: '30',
   name: 'Neuromancy 300',
@@ -188,6 +195,7 @@ export const PRIMARY_PACE: CoursePace = {
   course: undefined,
   compressed_due_dates: undefined,
   updated_at: '',
+  assignments_weighting: ASSIGNMENT_WEIGHTING
 }
 
 export const PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED: CoursePace = {
@@ -386,6 +394,7 @@ export const SECTION_PACE: CoursePace = {
   course: undefined,
   compressed_due_dates: undefined,
   updated_at: '',
+  assignments_weighting: ASSIGNMENT_WEIGHTING,
 }
 
 export const STUDENT_PACE: CoursePace = {
@@ -406,6 +415,7 @@ export const STUDENT_PACE: CoursePace = {
   course: undefined,
   compressed_due_dates: undefined,
   updated_at: '',
+  assignments_weighting: ASSIGNMENT_WEIGHTING,
 }
 
 export const PACE_CONTEXTS_DEFAULT_STATE: PaceContextsState = {
@@ -456,6 +466,7 @@ export const DEFAULT_UI_STATE: UIState = {
   syncing: 0,
   outerResponsiveSize: 'large',
   savingDraft: false,
+  showWeightedAssignmentsTray: false,
 }
 
 export const DEFAULT_STORE_STATE: StoreState = {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {CoursePace, OptionalDate, PaceContextTypes, Progress, WorkflowStates} from '../types'
+import type {AssignmentWeightening, CoursePace, OptionalDate, PaceContextTypes, Progress, WorkflowStates} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 enum ApiMode {
@@ -164,6 +164,8 @@ interface PublishApiFormattedCoursePace extends CompressApiFormattedCoursePace {
   readonly workflow_state: WorkflowStates
   readonly context_type: PaceContextTypes
   readonly context_id: string
+  readonly assignments_weighting: Array<{ resource_type: string; duration: number }>
+  readonly time_to_complete_calendar_days: number
 }
 
 const transformCoursePaceForApi = (
@@ -191,6 +193,15 @@ const transformCoursePaceForApi = (
     selected_days_to_skip: selectedDaysToSkipValue,
     exclude_weekends: coursePace.exclude_weekends,
   }
+  const weightedAssignment: Array<{ resource_type: string; duration: number }> =
+    window.ENV.FEATURES.course_pace_weighted_assignments && coursePace.assignments_weighting
+      ? Object.entries(coursePace.assignments_weighting)
+          .filter(([_, value]) => value !== undefined)
+          .map(([key, value]) => ({
+            resource_type: key,
+            duration: value as number,
+          }))
+      : []
 
   return mode === ApiMode.COMPRESS
     ? compressedCoursePace
@@ -199,5 +210,7 @@ const transformCoursePaceForApi = (
         workflow_state: coursePace.workflow_state,
         context_type: coursePace.context_type,
         context_id: coursePace.context_id,
+        assignments_weighting: weightedAssignment,
+        time_to_complete_calendar_days: coursePace.time_to_complete_calendar_days,
       }
 }

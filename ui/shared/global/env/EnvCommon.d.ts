@@ -320,6 +320,7 @@ export type RootAccountFeatureId =
   | 'modules_requirements_allow_percentage'
   | 'lti_asset_processor'
   | 'discussion_checkpoints'
+  | 'course_pace_weighted_assignments'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

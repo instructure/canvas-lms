@@ -17,9 +17,11 @@
  */
 
 import {createAction, type ActionsUnion} from '../shared/types'
+import {AssignmentWeightening} from '../types'
 
 export enum Constants {
   SET_PACE_ITEM_DURATION = 'COURSE_PACE_ITEMS/SET_PACE_ITEM_DURATION',
+  SET_PACE_ITEM_WEIGHTED_DURATION = 'COURSE_PACE_ITEMS/SET_PACE_ITEM_WEIGHTED_DURATION'
 }
 
 /* Action creators */
@@ -27,6 +29,8 @@ export enum Constants {
 export const actions = {
   setPaceItemDuration: (paceItemId: string, duration: number) =>
     createAction(Constants.SET_PACE_ITEM_DURATION, {paceItemId, duration}),
+  setPaceItemWeightedDuration: (assignmentWeightedDuration: AssignmentWeightening) =>
+    createAction(Constants.SET_PACE_ITEM_WEIGHTED_DURATION, {assignmentWeightedDuration})
 }
 
 export type CoursePaceItemAction = ActionsUnion<typeof actions>

@@ -29,6 +29,7 @@ import type {
   APIPaceContextTypes,
   Progress,
   StoreState,
+  AssignmentWeightening,
 } from '../types'
 import {createAction, type ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
@@ -58,6 +59,8 @@ export enum Constants {
   SET_PROGRESS = 'COURSE_PACE/SET_PROGRESS',
   SET_COMPRESSED_ITEM_DATES = 'COURSE_PACE/SET_COMPRESSED_ITEM_DATES',
   UNCOMPRESS_DATES = 'COURSE_PACE/UNCOMPRESS_ITEM_DATES',
+  SET_WEIGHTED_ASSIGNMENTS = 'COURSE_PACE/SET_WEIGHTED_ASSIGNMENTS',
+  SET_TIME_TO_COMPLETE_CALENDAR_DAYS = 'COURSE_PACE/SET_TIME_TO_COMPLETE_CALENDAR_DAYS',
 }
 
 /* Action creators */
@@ -78,6 +81,8 @@ const regularActions = {
   setProgress: (progress?: Progress) => createAction(Constants.SET_PROGRESS, progress),
   coursePaceSaved: (coursePace: CoursePace) =>
     createAction(Constants.COURSE_PACE_SAVED, coursePace),
+  setWeightedAssignments: (assignmentsWeighting: AssignmentWeightening) => createAction(Constants.SET_WEIGHTED_ASSIGNMENTS, assignmentsWeighting),
+  setTimeToCompleteCalendarDays: (days: number) => createAction(Constants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS, days),
 }
 
 // @ts-expect-error

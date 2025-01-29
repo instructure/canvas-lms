@@ -28,3 +28,10 @@ course_pace_pacing_with_mastery_paths:
   applies_to: RootAccount
   display_name: Course Paces with Mastery Paths
   description: Supplemental logic and UX for supporting Course Paces with Mastery Paths
+
+
+course_pace_weighted_assignments:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Pace Weighted Assignments
+  description: Allows for setting the weight of assignments in the course pace

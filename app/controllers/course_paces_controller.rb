@@ -748,8 +748,10 @@ class CoursePacesController < ApplicationController
         :exclude_weekends,
         :hard_end_dates,
         :workflow_state,
+        :time_to_complete_calendar_days,
         course_pace_module_items_attributes: %i[id duration module_item_id root_account_id],
-        selected_days_to_skip: []
+        selected_days_to_skip: [],
+        assignments_weighting: strong_anything
       )
       set_context_ids_in(permitted_params)
     end
@@ -767,8 +769,10 @@ class CoursePacesController < ApplicationController
         :exclude_weekends,
         :hard_end_dates,
         :workflow_state,
+        :time_to_complete_calendar_days,
         course_pace_module_items_attributes: %i[duration module_item_id root_account_id],
-        selected_days_to_skip: []
+        selected_days_to_skip: [],
+        assignments_weighting: strong_anything
       )
       set_context_ids_in(permitted_params)
     end
@@ -783,8 +787,10 @@ class CoursePacesController < ApplicationController
       :exclude_weekends,
       :hard_end_dates,
       :workflow_state,
+      :time_to_complete_calendar_days,
       course_pace_module_items_attributes: %i[duration module_item_id root_account_id],
-      selected_days_to_skip: []
+      selected_days_to_skip: [],
+      assignments_weighting: strong_anything
     )
   end
 

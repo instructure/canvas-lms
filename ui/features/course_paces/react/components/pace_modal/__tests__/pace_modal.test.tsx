@@ -91,4 +91,23 @@ describe('PaceModal', () => {
       expect(getByTestId('time-selection-section')).toBeInTheDocument()
     })
   })
+
+  describe('course_pace_weighted_assignments is enabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_pace_weighted_assignments = true
+    })
+
+    it('set weighted assignment duration tray is shown', () => {
+      const {getByTestId, getByRole} = renderConnected(<PaceModal {...defaultProps} coursePace={STUDENT_PACE} />)
+
+      const settingsButton = getByRole('button', {name: 'Modify Settings'})
+      act(() => settingsButton.click())
+
+      const weightedAssignmentsOpgion = getByTestId('weighted-assignment-duration-option')
+      act(() => weightedAssignmentsOpgion.click())
+
+      expect(getByTestId('weighted-assignments-tray')).toBeInTheDocument()
+    })
+  })
 })

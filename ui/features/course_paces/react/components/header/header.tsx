@@ -50,6 +50,7 @@ import {generateModalLauncherId} from '../../utils/utils'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
+import WeightedAssignmentsTray from './settings/WeightedAssignmentsTray'
 
 const I18n = createI18nScope('course_paces_header')
 

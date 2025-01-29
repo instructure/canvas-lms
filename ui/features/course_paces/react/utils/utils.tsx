@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {APIPaceContextTypes, PaceContext, PaceContextTypes, PaceDuration} from '../types'
+import type {APIPaceContextTypes, AssignmentWeightening, CoursePace, CoursePaceItem, PaceContext, PaceContextTypes, PaceDuration} from '../types'
 import * as DateHelpers from '../utils/date_stuff/date_helpers'
-import {type Moment} from 'moment-timezone'
+import moment, {type Moment} from 'moment-timezone'
+import * as PaceDueDatesCalculator from './date_stuff/pace_due_dates_calculator'
+import { BlackoutDate } from '../shared/types'
 
 export const generateModalLauncherId = (paceContext: PaceContext) =>
   `pace-modal-launcher-${paceContext.type}-${paceContext.item_id}`
@@ -37,5 +39,54 @@ export const CONTEXT_TYPE_MAP: {[k: string]: PaceContextTypes} = {
 
 export const calculatePaceDuration = (startDate: Moment, endDate: Moment): PaceDuration => {
   const planDays = DateHelpers.rawDaysBetweenInclusive(startDate, endDate)
-  return { weeks: Math.floor(planDays / 7), days: planDays % 7 }
+  return calendarDaysToPaceDuration(planDays)
+}
+
+export const calendarDaysToPaceDuration = (calendarDays: number): PaceDuration => {
+  return { weeks: Math.floor(calendarDays / 7), days: calendarDays % 7 }
+}
+
+export const calculatePaceItemDuration = (
+  coursePaceItem: CoursePaceItem[],
+  assignmentWeightedDuration: AssignmentWeightening
+): CoursePaceItem[] => {
+  const getDuration = (itemType: string): number | undefined => {
+    switch (itemType) {
+      case 'Assignment':
+        return assignmentWeightedDuration.assignment
+      case 'DiscussionTopic':
+        return assignmentWeightedDuration.discussion
+      case 'Quizzes::Quiz':
+        return assignmentWeightedDuration.quiz
+      case 'Page':
+        return assignmentWeightedDuration.page
+      default:
+        return undefined
+    }
+  }
+
+  return coursePaceItem.map(item => {
+    const duration = getDuration(item.module_item_type) || item.duration
+    return { ...item, duration }
+  })
+}
+
+export const isTimeToCompleteCalendarDaysValid = (
+  coursePace: CoursePace,
+  coursePaceItem: CoursePaceItem[],
+  blackoutDates: BlackoutDate[]
+): boolean => {
+  const paceDueDates = PaceDueDatesCalculator.getDueDates(
+    coursePaceItem,
+    coursePace.exclude_weekends,
+    coursePace.selected_days_to_skip,
+    blackoutDates,
+    coursePace.start_date
+  )
+
+  const endDateValue = moment.max(Object.values(paceDueDates).map((x) => moment(x)))
+  const startDateMoment = moment(coursePace.start_date).startOf('day')
+  const calendarDays = DateHelpers.rawDaysBetweenInclusive(startDateMoment, endDateValue)
+
+  return calendarDays <= coursePace.time_to_complete_calendar_days
 }
