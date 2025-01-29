@@ -143,7 +143,7 @@ class OutcomesController < ApplicationController
     @outcomes = if @user == @context
                   LearningOutcome.has_result_for(@user).active
                 else
-                  @context.available_outcomes
+                  @context.is_a?(Course) ? @context.associated_outcomes : @context.available_outcomes
                 end
     @results = LearningOutcomeResult.active.for_user(@user).for_outcome_ids(@outcomes.map(&:id)).order(assessed_at: :asc) # .for_context_codes(@codes)
 
@@ -162,7 +162,7 @@ class OutcomesController < ApplicationController
 
     @account_contexts = @context.associated_accounts
     @current_outcomes = @context.linked_learning_outcomes
-    @outcomes = Canvas::ICU.collate_by(@context.available_outcomes, &:title)
+    @outcomes = Canvas::ICU.collate_by(@context.is_a?(Course) ? @context.associated_outcomes : @context.available_outcomes, &:title)
     if params[:unused]
       @outcomes -= @current_outcomes
     end
