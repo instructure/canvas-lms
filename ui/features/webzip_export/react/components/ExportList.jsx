@@ -31,14 +31,13 @@ class ExportList extends React.Component {
         link: PropTypes.string,
         workflowState: PropTypes.string.isRequired,
         newExport: PropTypes.bool.isRequired,
-      })
+      }),
     ).isRequired,
   }
 
   renderExportListItems() {
     return this.props.exports.map((webzip, key) => (
       <ExportListItem
-         
         key={key}
         link={webzip.link}
         date={webzip.date}

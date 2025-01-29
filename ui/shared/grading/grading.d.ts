@@ -210,7 +210,7 @@ export type SubmissionOriginalityData = z.infer<typeof ZSubmissionOriginalityDat
 export const ZVericiteOriginalityData = ZSubmissionOriginalityData.extend(
   z.object({
     provider: z.literal('vericite'),
-  }).shape
+  }).shape,
 )
 
 export type VericiteOriginalityData = z.infer<typeof ZVericiteOriginalityData>
@@ -384,7 +384,17 @@ export type RubricAssessment = {
   assessor_id: string
   anonymous_assessor_id: string
   assessment_type: string
-  assessor_name: string
+  assessor_name: string | null
+  data: {
+    id: string
+    points: number
+    criterion_id: string
+    learning_outcome_id: string
+    comments: string
+    comments_enabled: boolean
+    description: string
+  }[]
+  updated_at: string
 }
 
 export type SubmissionState =

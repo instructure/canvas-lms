@@ -137,7 +137,6 @@ function shouldApplySelectedStyle(color) {
   return this.state.currentColor === color.hexcode
 }
 
- 
 const ColorPicker = createReactClass({
   // ===============
   //     CONFIG
@@ -151,7 +150,7 @@ const ColorPicker = createReactClass({
       PropTypes.shape({
         hexcode: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
-      }).isRequired
+      }).isRequired,
     ),
     isOpen: PropTypes.bool,
     afterUpdateColor: PropTypes.func,
@@ -161,7 +160,7 @@ const ColorPicker = createReactClass({
         return new Error(
           `Invalid prop '${propName}' supplied to '${componentName}'. ` +
             `Prop '${propName}' must be present when 'parentComponent' ` +
-            "is 'DashboardCardMenu'. Vaidation failed."
+            "is 'DashboardCardMenu'. Vaidation failed.",
         )
       }
       return undefined
@@ -248,7 +247,7 @@ const ColorPicker = createReactClass({
         if (this.state.isOpen) {
           this.setFocus()
         }
-      }
+      },
     )
   },
 
@@ -326,7 +325,7 @@ const ColorPicker = createReactClass({
           "'%{chosenColor}' is not a valid color. Enter a valid hexcode before saving.",
           {
             chosenColor: this.state.currentColor,
-          }
+          },
         ),
         type: 'warning',
         srOnly: true,
@@ -610,7 +609,7 @@ ColorPicker.getColorName = colorHex => {
   const colorWithoutHash = colorHex.replace('#', '')
 
   const definedColor = PREDEFINED_COLORS.find(
-    color => color.hexcode.replace('#', '') === colorWithoutHash
+    color => color.hexcode.replace('#', '') === colorWithoutHash,
   )
 
   if (definedColor) {

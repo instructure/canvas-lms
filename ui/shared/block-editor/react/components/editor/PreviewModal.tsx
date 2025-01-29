@@ -265,7 +265,7 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
         onDismiss()
       }
     },
-    [onDismiss, open]
+    [onDismiss, open],
   )
 
   const handleRendered = useCallback(() => {

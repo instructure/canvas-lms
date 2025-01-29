@@ -123,7 +123,9 @@ export default class BlueprintModal extends Component {
                 </Flex.Item>
               )}
               <Flex.Item margin="0 x-small 0 0">
-                <Button data-testid="cancel-button" onClick={this.props.onCancel}>{I18n.t('Cancel')}</Button>
+                <Button data-testid="cancel-button" onClick={this.props.onCancel}>
+                  {I18n.t('Cancel')}
+                </Button>
               </Flex.Item>
               {this.props.saveButton ? (
                 this.props.saveButton
@@ -136,7 +138,12 @@ export default class BlueprintModal extends Component {
               )}
             </Flex>
           ) : (
-            <Button data-testid="done-button" ref={c => (this.doneBtn = c)} onClick={this.props.onCancel} color="primary">
+            <Button
+              data-testid="done-button"
+              ref={c => (this.doneBtn = c)}
+              onClick={this.props.onCancel}
+              color="primary"
+            >
               {I18n.t('Done')}
             </Button>
           )}

@@ -176,7 +176,7 @@ function mapStateToProps(state, ownProps) {
   function findPermission(name) {
     // First try the primary permissions (might be a group)
     const perm = state.permissions.find(
-      p => p.permission_name === name && p.contextType === ownProps.tab
+      p => p.permission_name === name && p.contextType === ownProps.tab,
     )
     if (perm) return perm
 
@@ -185,7 +185,7 @@ function mapStateToProps(state, ownProps) {
       state.permissions
         .filter(p => p.contextType === ownProps.tab)
         .map(p => p.granular_permissions)
-        .filter(p => typeof p !== 'undefined')
+        .filter(p => typeof p !== 'undefined'),
     )
     return groupPerms.find(p => p.permission_name === name)
   }

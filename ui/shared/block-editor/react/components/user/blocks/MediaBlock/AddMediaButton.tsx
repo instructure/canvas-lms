@@ -43,7 +43,7 @@ export const AddMediaButton = ({setProp}: {setProp: (args: any) => void}) => {
       })
       setShowAllMediaUploadModal(false)
     },
-    [setProp]
+    [setProp],
   )
 
   const closeAllMediaModal = () => {

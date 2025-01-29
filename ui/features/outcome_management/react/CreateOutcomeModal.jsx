@@ -103,7 +103,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [selectedGroupAncestorIds, setSelectedGroupAncestorIds] = useState([])
   const [proficiencyCalculation, setProficiencyCalculation] = useState(
-    defaultProficiencyCalculation
+    defaultProficiencyCalculation,
   )
   const [proficiencyCalculationError, setProficiencyCalculationError] = useState(false)
 

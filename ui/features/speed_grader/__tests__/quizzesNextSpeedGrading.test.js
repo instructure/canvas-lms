@@ -68,7 +68,7 @@ describe('QuizzesNextSpeedGrading', () => {
         fakeIframeHolder,
         registerCallback,
         refreshGradesCallback,
-        speedGraderWindow
+        speedGraderWindow,
       )
       expect(addEventListenerMock).toHaveBeenCalledWith('message', expect.any(Function))
     })
@@ -79,7 +79,7 @@ describe('QuizzesNextSpeedGrading', () => {
         fakeIframeHolder,
         registerCallback,
         refreshGradesCallback,
-        speedGraderWindow
+        speedGraderWindow,
       )
       fns.onMessage({data: {subject: 'quizzesNext.register'}})
       expect(fakeEG.setGradeReadOnly).toHaveBeenCalledWith(true)
@@ -91,7 +91,7 @@ describe('QuizzesNextSpeedGrading', () => {
         fakeIframeHolder,
         registerCallback,
         refreshGradesCallback,
-        speedGraderWindow
+        speedGraderWindow,
       )
       fns.onMessage({data: {subject: 'quizzesNext.register'}})
       expect(registerCallback).toHaveBeenCalledWith(fns.postChangeSubmissionMessage, {
@@ -105,13 +105,13 @@ describe('QuizzesNextSpeedGrading', () => {
         fakeIframeHolder,
         registerCallback,
         refreshGradesCallback,
-        speedGraderWindow
+        speedGraderWindow,
       )
       fns.onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
       expect(refreshGradesCallback).toHaveBeenCalledWith(
         fns.quizzesNextChange,
         expect.any(Function),
-        1000
+        1000,
       )
     })
 
@@ -121,7 +121,7 @@ describe('QuizzesNextSpeedGrading', () => {
         fakeIframeHolder,
         registerCallback,
         refreshGradesCallback,
-        speedGraderWindow
+        speedGraderWindow,
       )
       fns.onMessage({data: {subject: 'quizzesNext.previousStudent'}})
       expect(fakeEG.prev).toHaveBeenCalled()
@@ -133,7 +133,7 @@ describe('QuizzesNextSpeedGrading', () => {
         fakeIframeHolder,
         registerCallback,
         refreshGradesCallback,
-        speedGraderWindow
+        speedGraderWindow,
       )
       fns.onMessage({data: {subject: 'quizzesNext.nextStudent'}})
       expect(fakeEG.next).toHaveBeenCalled()
@@ -145,7 +145,7 @@ describe('QuizzesNextSpeedGrading', () => {
         fakeIframeHolder,
         registerCallback,
         refreshGradesCallback,
-        speedGraderWindow
+        speedGraderWindow,
       )
       const fakeSubmissionData = {}
       fns.quizzesNextChange(fakeSubmissionData)
@@ -165,7 +165,7 @@ describe('QuizzesNextSpeedGrading', () => {
         fakeIframeHolder,
         registerCallback,
         refreshGradesCallback,
-        speedGraderWindow
+        speedGraderWindow,
       )
       const arbitrarySubmissionData = {}
       fns.postChangeSubmissionMessage(arbitrarySubmissionData)
@@ -175,7 +175,7 @@ describe('QuizzesNextSpeedGrading', () => {
           subject: 'canvas.speedGraderSubmissionChange',
           submission: arbitrarySubmissionData,
         },
-        '*'
+        '*',
       )
     })
   })

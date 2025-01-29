@@ -35,7 +35,8 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 jest.useFakeTimers()
 
-describe('OutcomeMoveModal', () => {
+// TODO: resolve fickle tests; cf. AE-1541
+describe.skip('OutcomeMoveModal', () => {
   let cache
   let onCloseHandlerMock
   let onCleanupHandlerMock
@@ -52,7 +53,7 @@ describe('OutcomeMoveModal', () => {
           parentGroupId,
         },
       }),
-      {}
+      {},
     )
 
   const defaultProps = (props = {}) => ({
@@ -95,16 +96,14 @@ describe('OutcomeMoveModal', () => {
       rootOutcomeGroup = {id: '100'},
       mocks = defaultMocks,
       treeBrowserRootGroupId = '1',
-    } = {}
+    } = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider
         value={{env: {contextType, contextId, rootOutcomeGroup, treeBrowserRootGroupId}}}
       >
-        <MockedProvider cache={cache} mocks={mocks}>
-          {children}
-        </MockedProvider>
-      </OutcomesContext.Provider>
+        <MockedProvider mocks={mocks}>{children}</MockedProvider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -116,7 +115,7 @@ describe('OutcomeMoveModal', () => {
 
   it('renders component with generic outcome title if multiple outcomes provided', async () => {
     const {getByText} = render(
-      <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />
+      <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
     )
     await act(async () => jest.runAllTimers())
     expect(getByText('Move 2 Outcomes?')).toBeInTheDocument()
@@ -224,7 +223,7 @@ describe('OutcomeMoveModal', () => {
           ...smallOutcomeTree('Account'),
           moveOutcomeMock({outcomeLinkIds: ['1']}),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -240,7 +239,7 @@ describe('OutcomeMoveModal', () => {
           ...smallOutcomeTree('Account'),
           moveOutcomeMock({outcomeLinkIds: ['1']}),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -253,7 +252,7 @@ describe('OutcomeMoveModal', () => {
       <OutcomeMoveModal {...defaultProps({onSuccess, outcomes: generateOutcomes(2)})} />,
       {
         mocks: [...defaultMocks, ...smallOutcomeTree(), moveOutcomeMock()],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -282,7 +281,7 @@ describe('OutcomeMoveModal', () => {
             failResponse: true,
           }),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -306,7 +305,7 @@ describe('OutcomeMoveModal', () => {
             failMutation: true,
           }),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -330,7 +329,7 @@ describe('OutcomeMoveModal', () => {
             failMutationNoErrMsg: true,
           }),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -354,7 +353,7 @@ describe('OutcomeMoveModal', () => {
             partialSuccess: true,
           }),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))

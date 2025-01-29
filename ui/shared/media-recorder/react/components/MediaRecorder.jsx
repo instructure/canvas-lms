@@ -16,44 +16,99 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import React from 'react'
-import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
 import {ScreenCapture, canUseScreenCapture} from '@instructure/media-capture-new'
+import $ from 'jquery'
 import {func, string} from 'prop-types'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import {mediaExtension} from '../../mimetypes'
 
 import {IconRecordSolid, IconStopLine} from '@instructure/ui-icons'
 
-import {View} from '@instructure/ui-view'
-import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-heading'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('media_recorder')
 const DEFAULT_EXTENSION = 'webm'
 const fileExtensionRegex = /\.\S/
 
 const translations = {
+  ARIA_TIMEBAR_LABEL: I18n.t('Timebar'),
   ARIA_VIDEO_LABEL: I18n.t('Video Player'),
   ARIA_VOLUME: I18n.t('Current Volume Level'),
-  ARIA_RECORDING: I18n.t('Recording'),
-  DEFAULT_ERROR: I18n.t('Something went wrong accessing your mic or webcam.'),
-  DEVICE_AUDIO: I18n.t('Mic'),
-  DEVICE_VIDEO: I18n.t('Webcam'),
+  CAPTIONS_OFF: I18n.t('Captions Off'),
   FILE_PLACEHOLDER: I18n.t('Untitled'),
   FINISH: I18n.t('Finish'),
-  NO_WEBCAM: I18n.t('No Video'),
-  NOT_ALLOWED_ERROR: I18n.t('Please allow Canvas to access your microphone and webcam.'),
-  NOT_READABLE_ERROR: I18n.t('Your webcam may already be in use.'),
+  FULL_SCREEN: I18n.t('Full Screen'),
+  MICROPHONE_DISABLED: I18n.t('Microphone Disabled'),
   PLAYBACK_PAUSE: I18n.t('Pause'),
   PLAYBACK_PLAY: I18n.t('Play'),
-  PREVIEW: I18n.t('PREVIEW'),
-  SAVE: I18n.t('Save'),
-  SR_FILE_INPUT: I18n.t('File name'),
+  PLAYBACK_SPEED: I18n.t('Playback Speed'),
+  SAVE_MEDIA: I18n.t('Save Media'),
+  DEFAULT_ERROR: I18n.t('Something went wrong. Please try again.'),
+  SOURCE_CHOOSER: I18n.t('Media Quality'),
+  SR_FILE_INPUT: I18n.t('Title'),
   START: I18n.t('Start Recording'),
   START_OVER: I18n.t('Start Over'),
+  VIDEO_TRACK: I18n.t('Closed Captioning'),
+  VOLUME_MUTED: I18n.t('Muted'),
+  VOLUME_UNMUTED: I18n.t('Volume'),
+  WEBCAM_DISABLED: I18n.t('Webcam Disabled'),
+  WINDOWED_SCREEN: I18n.t('Windowed Screen'),
+  BACK: I18n.t('Back'),
+  STANDARD: I18n.t('Standard'),
+  OFF: I18n.t('Off'),
+  CAPTIONS: I18n.t('Captions'),
+  SPEED: I18n.t('Speed'),
+  QUALITY: I18n.t('Quality'),
+  PLAYER_SETTINGS: I18n.t('Player Settings'),
+  SETTINGS: I18n.t('Settings'),
+  TOGGLE_CAPTIONS_ON: I18n.t('Toggle Captions On'),
+  TOGGLE_CAPTIONS_OFF: I18n.t('Toggle Captions Off'),
+  ON_TOP: I18n.t('On Top'),
+  PLACE_CAPTION_TO_BOTTOM: I18n.t('Place caption to bottom'),
+  PLACE_CAPTION_TO_TOP: I18n.t('Place caption to top'),
+  INVERT_COLORS: I18n.t('Invert Colors'),
+  CHANGE_CAPTION_COLOR_TO_LIGHT_THEME: I18n.t('Change caption color to light theme'),
+  CHANGE_CAPTION_COLOR_TO_DARK_THEME: I18n.t('Change caption color to dark theme'),
+  SIZE: I18n.t('Size'),
+  NORMAL: I18n.t('Normal'),
+  LARGE: I18n.t('Large'),
+  X_LARGE: I18n.t('Extra Large'),
+  WEBCAM_VIDEO_SELECTION_LABEL: I18n.t('Select video source'),
+  WEBCAM_AUDIO_SELECTION_LABEL: I18n.t('Select audio source'),
+  COMMENTS: I18n.t('Comments'),
+  LANGUAGE: I18n.t('Language'),
+  SCREEN_SHARING_CONTROL: I18n.t('Screen Capture'),
+  SCREEN_SHARING_CONTROL_LABEL_ACTIVATE: I18n.t('Screen sharing enabled'),
+  SCREEN_SHARING_CONTROL_LABEL_DEACTIVATE: I18n.t('Screen sharing disabled'),
+  SCREEN_SHARING_CONTROL_ACTIVATE: I18n.t('Enabled'),
+  SCREEN_SHARING_CONTROL_DEACTIVATE: I18n.t('Disabled'),
+  PAUSE: I18n.t('Pause'),
+  CONTINUE: I18n.t('Continue'),
+  PAUSED_VIDEO: I18n.t('Recording is paused'),
+  PICTURE_IN_PICTURE: I18n.t('Picture-in-Picture'),
+  PICTURE_IN_PICTURE_TOOLTIP: I18n.t('To enable your webcam, share your entire screen.'),
+  PICTURE_IN_PICTURE_MODAL_HEADING: I18n.t('Enable camera'),
+  PICTURE_IN_PICTURE_MODAL_BODY: I18n.t(
+    'Would you like to enable your camera during full screen recording?',
+  ),
+  PICTURE_IN_PICTURE_MODAL_CANCEL: I18n.t('No'),
+  PICTURE_IN_PICTURE_MODAL_CONFIRM: I18n.t('Yes'),
+  PICTURE_IN_PICTURE_MODAL_CLOSE: I18n.t('Close'),
+  ERROR_SCREEN_SHARING_SYSTEM_PERMISSION: I18n.t(
+    'Unable to share your screen. Please review your system permissions and try again.',
+  ),
+  NO_SYSTEM_PERMISSION_OVERLAY_HEADING: I18n.t('Give your browser permission to record'),
+  NO_SYSTEM_PERMISSION_OVERLAY_TEXT: I18n.t(
+    'Grant your browser permission to record by allowing access to your camera and microphone.',
+  ),
+  NO_SYSTEM_PERMISSION_OVERLAY_LINK: I18n.t('Learn more ...'),
+  NO_SYSTEM_VIDEO_PERMISSION_TOOLTIP: I18n.t("Please check your system's camera settings."),
+  NO_SYSTEM_AUDIO_PERMISSION_TOOLTIP: I18n.t("Please check your system's microphone settings."),
 }
 
 export function fileWithExtension(file) {
@@ -103,13 +158,12 @@ export default class CanvasMediaRecorder extends React.Component {
     if (!indicatorBarMountPointId) return
     const mountPoint = document.getElementById(indicatorBarMountPointId)
     if (mountPoint) {
-       
       ReactDOM.render(
         <ScreenCaptureIndicatorBar
           onFinishClick={this.handleFinishClick}
           onCancelClick={this.handleCancelClick}
         />,
-        mountPoint
+        mountPoint,
       )
     }
   }

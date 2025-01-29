@@ -171,7 +171,7 @@ class ItemCog extends React.Component {
           >
             {I18n.t('Download')}
           </a>
-        </li>
+        </li>,
       )
     } else {
       menuItems.push(
@@ -185,7 +185,7 @@ class ItemCog extends React.Component {
           >
             {I18n.t('Download')}
           </a>
-        </li>
+        </li>,
       )
 
       if (this.props.userCanEditFilesForContext) {
@@ -215,7 +215,7 @@ class ItemCog extends React.Component {
               >
                 {I18n.t('Copy To...')}
               </a>
-            </li>
+            </li>,
           )
         }
       }
@@ -235,7 +235,7 @@ class ItemCog extends React.Component {
             >
               {I18n.t('Rename')}
             </a>
-          </li>
+          </li>,
         )
         // Move Link
         menuItems.push(
@@ -252,7 +252,7 @@ class ItemCog extends React.Component {
             >
               {I18n.t('Move To...')}
             </a>
-          </li>
+          </li>,
         )
         // Manage Usage Rights Link
         if (this.props.usageRightsRequiredForContext) {
@@ -267,7 +267,7 @@ class ItemCog extends React.Component {
               >
                 {I18n.t('Manage Usage Rights')}
               </a>
-            </li>
+            </li>,
           )
         }
       }
@@ -285,7 +285,7 @@ class ItemCog extends React.Component {
             >
               {I18n.t('Delete')}
             </a>
-          </li>
+          </li>,
         )
       }
     }

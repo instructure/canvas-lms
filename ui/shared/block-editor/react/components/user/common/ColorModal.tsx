@@ -60,7 +60,7 @@ const ColorModal = ({open, color, variant, onClose, onSubmit}: ColorModalProps) 
     (event: React.ChangeEvent<HTMLInputElement>) => {
       handleColorChange(event.target.value)
     },
-    [handleColorChange]
+    [handleColorChange],
   )
 
   const handleSubmit = useCallback(() => {

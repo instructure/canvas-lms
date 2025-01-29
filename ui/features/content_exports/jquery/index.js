@@ -37,7 +37,7 @@ $(document).ready(function (_event) {
         htmlEscape(I18n.t('messages.processing', 'Processing')) +
           "<div style='font-size: 0.8em;'>" +
           htmlEscape(I18n.t('messages.this_may_take_a_bit', 'this may take a bit...')) +
-          '</div>'
+          '</div>',
       )
       .prop('disabled', true)
     $('.instruction').hide()
@@ -73,7 +73,7 @@ $(document).ready(function (_event) {
           if (content_export) {
             progress = Math.max(
               $('.export_progress').progressbar('option', 'value') || 0,
-              content_export.progress
+              content_export.progress,
             )
             $('.export_progress').progressbar('option', 'value', progress)
           }
@@ -86,7 +86,7 @@ $(document).ready(function (_event) {
                 htmlEscape(content_export.download_url) +
                 '">' +
                 htmlEscape(I18n.t('New Export')) +
-                '</a></p>'
+                '</a></p>',
             )
           } else if (content_export.workflow_state === 'failed') {
             const code = 'content_export_' + content_export.id
@@ -95,7 +95,7 @@ $(document).ready(function (_event) {
             const message = I18n.t(
               'errors.error',
               'There was an error exporting your content.  Please notify your system administrator and give them the following export identifier: "%{code}"',
-              {code}
+              {code},
             )
             $('.export_messages .error_message').text(message)
             $('.export_messages').show()
@@ -111,7 +111,7 @@ $(document).ready(function (_event) {
         },
         () => {
           setTimeout(checkup, 3000)
-        }
+        },
       )
     }
     setTimeout(checkup, 2000)

@@ -20,7 +20,6 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import SectionMenuView from '../SectionMenuView'
 import 'jquery-tinypubsub'
-import sinon from 'sinon'
 
 const sections = [
   {
@@ -65,14 +64,14 @@ describe('gradebook/SectionMenuView', () => {
 
   // FOO-4485
   test.skip('it displays given sections', () => {
-    const clock = sinon.useFakeTimers()
+    jest.useFakeTimers()
     view.$el.find('button').click()
-    clock.tick(101)
+    jest.advanceTimersByTime(101)
     const html = $('.section-select-menu:visible').html()
     expect(html).toMatch(/All Sections/)
     expect(html).toMatch(/Section One/)
     expect(html).toMatch(/Section Two/)
-    clock.restore()
+    jest.useRealTimers()
   })
 
   // FOO-4485

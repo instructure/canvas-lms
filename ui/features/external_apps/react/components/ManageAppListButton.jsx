@@ -81,7 +81,7 @@ export default class ManageAppListButton extends React.Component {
           ENV.CONTEXT_BASE_URL,
           this.state.accessToken,
           this.successHandler,
-          this.errorHandler
+          this.errorHandler,
         )
       }
     })
@@ -119,7 +119,7 @@ export default class ManageAppListButton extends React.Component {
                       '<a href="https://www.eduappcenter.com">$1</a>',
                       '<a href="' + allowListLink + '">$1</a>',
                     ],
-                  }
+                  },
                 ),
               }}
             />

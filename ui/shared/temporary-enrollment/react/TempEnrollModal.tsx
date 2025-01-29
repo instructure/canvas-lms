@@ -61,7 +61,7 @@ export const generateModalTitle = (
   enrollmentType: EnrollmentType,
   isEditMode: boolean,
   page: number,
-  enrollments: User[]
+  enrollments: User[],
 ): string => {
   const userName = user.name
   const enrollmentName = enrollments[0]?.name
@@ -78,7 +78,7 @@ export const generateModalTitle = (
           one: `Assign temporary enrollments to %{recipient}`,
           other: `Assign temporary enrollments to %{count} users`,
         },
-        {count: enrollments.length, recipient}
+        {count: enrollments.length, recipient},
       )
     } else {
       return I18n.t('Assign temporary enrollments')
@@ -103,6 +103,7 @@ export function TempEnrollModal(props: Props) {
   const [isModalOpenAnimationComplete, setIsModalOpenAnimationComplete] = useState(false)
   const [tempEnrollmentsPairing, setTempEnrollmentsPairing] = useState<Enrollment[] | null>(null)
   const [title, setTitle] = useState(' ')
+  const [duplicateReq, setDuplicateReq] = useState(false)
 
   useEffect(() => {
     if (isModalOpenAnimationComplete) {
@@ -116,7 +117,7 @@ export function TempEnrollModal(props: Props) {
       props.enrollmentType,
       props.isEditMode,
       page,
-      enrollments
+      enrollments,
     )
     setTitle(newTitle)
   }, [props.user, props.enrollmentType, props.isEditMode, page, enrollments])
@@ -139,7 +140,7 @@ export function TempEnrollModal(props: Props) {
 
   const handleGoToAssignPageWithEnrollments = (
     enrollmentUser: User,
-    tempEnrollments: Enrollment[]
+    tempEnrollments: Enrollment[],
   ) => {
     setEnrollments([enrollmentUser])
     setTempEnrollmentsPairing(tempEnrollments)
@@ -151,7 +152,7 @@ export function TempEnrollModal(props: Props) {
   const handleEnrollmentSubmission = (
     isSuccess: boolean,
     isUpdate: boolean,
-    isMultiple: boolean
+    isMultiple: boolean,
   ) => {
     if (isSuccess) {
       setOpen(false)
@@ -182,10 +183,16 @@ export function TempEnrollModal(props: Props) {
 
   const handleSetEnrollmentsFromSearch = (enrollmentUsers: User[]) => {
     setEnrollments(enrollmentUsers)
+    setDuplicateReq(false)
   }
 
   const handlePageChange = (change: number) => {
-    setPage((currentPage: number) => currentPage + change)
+    // don't change page if duplicates are not selected
+    if (page !== 1 || enrollments.length !== 0) {
+      setPage((currentPage: number) => currentPage + change)
+    } else {
+      setDuplicateReq(true)
+    }
   }
 
   const isSubmissionPage = () => {
@@ -267,6 +274,7 @@ export function TempEnrollModal(props: Props) {
           searchSuccess={handleSetEnrollmentsFromSearch}
           foundUsers={enrollments}
           wasReset={wasReset}
+          duplicateReq={duplicateReq}
         />
       )
     }
@@ -308,7 +316,7 @@ export function TempEnrollModal(props: Props) {
         !props.isEditMode && (
           <Flex.Item key="nextOrSubmit">
             <Button
-              disabled={buttonsDisabled || (enrollments.length === 0 && page === 1)}
+              disabled={buttonsDisabled}
               color="primary"
               onClick={() => handlePageChange(1)}
               {...analyticProps(page === 2 ? 'Submit' : 'Next')}

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
@@ -34,7 +35,7 @@ describe('StatusColorPanel', () => {
 
   it('renders a list item for each color in .colors', () => {
     const {getAllByRole} = render(
-      <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />
+      <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />,
     )
 
     const colorListItems = getAllByRole('listitem')
@@ -47,7 +48,7 @@ describe('StatusColorPanel', () => {
 
   it('shows a popover when the "More" button is clicked for an item', () => {
     const {getByRole} = render(
-      <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />
+      <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />,
     )
 
     const excusedPickerButton = getByRole('button', {name: /Excused Color Picker/i})
@@ -59,7 +60,7 @@ describe('StatusColorPanel', () => {
 
   it('only shows a single popover at a time', () => {
     const {getAllByRole, getByRole} = render(
-      <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />
+      <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />,
     )
 
     const excusedPickerButton = getByRole('button', {name: /Excused Color Picker/i})
@@ -74,7 +75,7 @@ describe('StatusColorPanel', () => {
 
   it('returns focus to the "More" button when the popover is closed', () => {
     const {getByRole} = render(
-      <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />
+      <StatusColorPanel colors={colors} onColorsUpdated={onColorsUpdated} />,
     )
 
     const excusedPickerButton = getByRole('button', {name: /Excused Color Picker/i})
@@ -88,7 +89,7 @@ describe('StatusColorPanel', () => {
   it('calls the .onColorsUpdated prop when the user saves a change to a color', () => {
     const customColors = {...colors, excused: defaultColors.lavender}
     const {getByRole} = render(
-      <StatusColorPanel colors={customColors} onColorsUpdated={onColorsUpdated} />
+      <StatusColorPanel colors={customColors} onColorsUpdated={onColorsUpdated} />,
     )
 
     fireEvent.click(getByRole('button', {name: /Excused Color Picker/i}))
@@ -96,14 +97,14 @@ describe('StatusColorPanel', () => {
     fireEvent.click(getByRole('button', {name: /Apply/}))
 
     expect(onColorsUpdated).toHaveBeenCalledWith(
-      expect.objectContaining({excused: defaultColors.salmon})
+      expect.objectContaining({excused: defaultColors.salmon}),
     )
   })
 
   it('does not call the .onColorsUpdated prop when the user cancels a change', () => {
     const customColors = {...colors, excused: defaultColors.lavender}
     const {getByRole} = render(
-      <StatusColorPanel colors={customColors} onColorsUpdated={onColorsUpdated} />
+      <StatusColorPanel colors={customColors} onColorsUpdated={onColorsUpdated} />,
     )
 
     fireEvent.click(getByRole('button', {name: /Excused Color Picker/i}))

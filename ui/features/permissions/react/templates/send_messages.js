@@ -32,13 +32,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Conversations'),
       description: I18n.t(
-        'When disabled, students can still send individual messages to course teachers, course TAs, and students who belong to the same account-level groups.'
+        'When disabled, students can still send individual messages to course teachers, course TAs, and students who belong to the same account-level groups.',
       ),
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        'To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.'
+        'To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.',
       ),
     },
   ],
@@ -52,14 +52,14 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Conversations'),
       description: I18n.t(
-        'When disabled, students can still send individual messages to course teachers, course TAs, and students that belong to the same account-level groups.'
+        'When disabled, students can still send individual messages to course teachers, course TAs, and students that belong to the same account-level groups.',
       ),
     },
     {
       title: I18n.t('People'),
       description: I18n.t(
-        'To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled. '
+        'To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled. ',
       ),
     },
-  ]
+  ],
 )

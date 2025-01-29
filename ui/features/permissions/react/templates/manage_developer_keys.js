@@ -32,7 +32,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Developer Keys'),
       description: I18n.t(
-        'Required fields include key name, owner email, tool ID, redirect URL, and icon URL.'
+        'Required fields include key name, owner email, tool ID, redirect URL, and icon URL.',
       ),
     },
     {
@@ -41,5 +41,5 @@ export const template = generateActionTemplates(
     },
   ],
   [],
-  []
+  [],
 )

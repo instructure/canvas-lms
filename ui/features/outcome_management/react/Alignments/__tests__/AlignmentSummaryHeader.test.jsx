@@ -72,7 +72,7 @@ describe('AlignmentSummaryHeader', () => {
 
   it('displays total outcomes', () => {
     const {getAllByTestId} = render(
-      <AlignmentSummaryHeader {...defaultProps({totalOutcomes: 979})} />
+      <AlignmentSummaryHeader {...defaultProps({totalOutcomes: 979})} />,
     )
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[0])
     expect(getByText(/979 OUTCOMES/)).toBeInTheDocument()
@@ -80,7 +80,7 @@ describe('AlignmentSummaryHeader', () => {
 
   it('displays total assessable artifacts', () => {
     const {getAllByTestId} = render(
-      <AlignmentSummaryHeader {...defaultProps({totalArtifacts: 878})} />
+      <AlignmentSummaryHeader {...defaultProps({totalArtifacts: 878})} />,
     )
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[1])
     expect(getByText(/878 ASSESSABLE ARTIFACTS/)).toBeInTheDocument()
@@ -88,7 +88,7 @@ describe('AlignmentSummaryHeader', () => {
 
   it('calculates properly outcome coverage', () => {
     const {getAllByTestId} = render(
-      <AlignmentSummaryHeader {...defaultProps({totalOutcomes: 100, alignedOutcomes: 67})} />
+      <AlignmentSummaryHeader {...defaultProps({totalOutcomes: 100, alignedOutcomes: 67})} />,
     )
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[0])
     expect(getByText(/67%/)).toBeInTheDocument()
@@ -96,7 +96,7 @@ describe('AlignmentSummaryHeader', () => {
 
   it('calculates properly outcome coverage if no outcomes', () => {
     const {getAllByTestId} = render(
-      <AlignmentSummaryHeader {...defaultProps({totalOutcomes: 0, alignedOutcomes: 80})} />
+      <AlignmentSummaryHeader {...defaultProps({totalOutcomes: 0, alignedOutcomes: 80})} />,
     )
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[0])
     expect(getByText(/0%/)).toBeInTheDocument()
@@ -104,7 +104,7 @@ describe('AlignmentSummaryHeader', () => {
 
   it('calculates properly average alignments per outcome', () => {
     const {getAllByTestId} = render(
-      <AlignmentSummaryHeader {...defaultProps({totalOutcomes: 100, totalAlignments: 150})} />
+      <AlignmentSummaryHeader {...defaultProps({totalOutcomes: 100, totalAlignments: 150})} />,
     )
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[0])
     expect(getByText(/1.5/)).toBeInTheDocument()
@@ -112,7 +112,7 @@ describe('AlignmentSummaryHeader', () => {
 
   it('calculates properly average alignments per outcome if no outcomes', () => {
     const {getAllByTestId} = render(
-      <AlignmentSummaryHeader {...defaultProps({totalOutcomes: 0, totalAlignments: 150})} />
+      <AlignmentSummaryHeader {...defaultProps({totalOutcomes: 0, totalAlignments: 150})} />,
     )
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[0])
     expect(getByText(/0.0/)).toBeInTheDocument()
@@ -120,7 +120,7 @@ describe('AlignmentSummaryHeader', () => {
 
   it('calculates properly percent of artifacts with alignments', () => {
     const {getAllByTestId} = render(
-      <AlignmentSummaryHeader {...defaultProps({totalArtifacts: 100, alignedArtifacts: 25})} />
+      <AlignmentSummaryHeader {...defaultProps({totalArtifacts: 100, alignedArtifacts: 25})} />,
     )
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[1])
     expect(getByText(/25%/)).toBeInTheDocument()
@@ -128,7 +128,7 @@ describe('AlignmentSummaryHeader', () => {
 
   it('calculates properly percent of artifacts with alignments if no artifacts', () => {
     const {getAllByTestId} = render(
-      <AlignmentSummaryHeader {...defaultProps({totalArtifacts: 0, alignedArtifacts: 25})} />
+      <AlignmentSummaryHeader {...defaultProps({totalArtifacts: 0, alignedArtifacts: 25})} />,
     )
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[1])
     expect(getByText(/0%/)).toBeInTheDocument()
@@ -142,7 +142,7 @@ describe('AlignmentSummaryHeader', () => {
 
   it('calculates properly average alignments per artifact if no artifacts', () => {
     const {getAllByTestId} = render(
-      <AlignmentSummaryHeader {...defaultProps({totalArtifacts: 0, totalAlignments: 150})} />
+      <AlignmentSummaryHeader {...defaultProps({totalArtifacts: 0, totalAlignments: 150})} />,
     )
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[1])
     expect(getByText(/0.0/)).toBeInTheDocument()

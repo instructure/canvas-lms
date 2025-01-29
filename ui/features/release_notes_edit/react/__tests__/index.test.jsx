@@ -46,7 +46,7 @@ describe('release notes editing parent', () => {
     const notes = [exampleNote]
     fetchMock.getOnce('/api/v1/release_notes?includes%5B%5D=langs&per_page=20&page=null', notes)
     const {getByText, queryByText} = render(
-      <ReleaseNotesEdit envs={['test']} langs={['en', 'es']} />
+      <ReleaseNotesEdit envs={['test']} langs={['en', 'es']} />,
     )
     waitFor(() => {
       expect(getByText(notes[0].langs.en.title)).toBeInTheDocument()

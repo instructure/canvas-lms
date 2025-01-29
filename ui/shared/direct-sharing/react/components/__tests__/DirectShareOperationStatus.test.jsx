@@ -29,7 +29,7 @@ describe('DirectShareOperationStatus', () => {
         startingMsg="starting"
         successMsg="success"
         errorMsg="error"
-      />
+      />,
     )
     expect(queryByText(/starting|success|error/)).toBeNull()
   })
@@ -42,7 +42,7 @@ describe('DirectShareOperationStatus', () => {
         startingMsg="starting"
         successMsg="success"
         errorMsg="error"
-      />
+      />,
     )
     expect(getAllByText('starting')).not.toHaveLength(0)
     expect(queryByText(/success|error/)).toBeNull()
@@ -56,7 +56,7 @@ describe('DirectShareOperationStatus', () => {
         startingMsg="starting"
         successMsg="success"
         errorMsg="error"
-      />
+      />,
     )
     expect(document.querySelector('[role="alert"]')).toBeInTheDocument()
   })
@@ -69,7 +69,7 @@ describe('DirectShareOperationStatus', () => {
         startingMsg="starting"
         successMsg="success"
         errorMsg="error"
-      />
+      />,
     )
     expect(await findByText('success')).toBeInTheDocument()
     expect(queryByText(/starting|error/)).toBeNull()
@@ -77,7 +77,7 @@ describe('DirectShareOperationStatus', () => {
 
   describe('errors', () => {
     beforeEach(() => jest.spyOn(console, 'error').mockImplementation(() => {}))
-    afterEach(() => console.error.mockRestore()) // eslint-disable-line no-console
+    afterEach(() => console.error.mockRestore())  
 
     it('shows error when promise is rejected', async () => {
       const promise = Promise.reject()
@@ -87,11 +87,11 @@ describe('DirectShareOperationStatus', () => {
           startingMsg="starting"
           successMsg="success"
           errorMsg="error"
-        />
+        />,
       )
       expect(await findByText('error')).toBeInTheDocument()
       expect(queryByText(/starting|success/)).toBeNull()
-      expect(console.error).toHaveBeenCalled() // eslint-disable-line no-console
+      expect(console.error).toHaveBeenCalled()  
     })
   })
 
@@ -103,7 +103,7 @@ describe('DirectShareOperationStatus', () => {
         startingMsg="starting"
         successMsg="success"
         errorMsg="error"
-      />
+      />,
     )
     expect(await findByText('success')).toBeInTheDocument()
     const newPromise = new Promise(() => {})
@@ -113,7 +113,7 @@ describe('DirectShareOperationStatus', () => {
         startingMsg="starting"
         successMsg="success"
         errorMsg="error"
-      />
+      />,
     )
     expect(getAllByText('starting')).not.toHaveLength(0)
   })

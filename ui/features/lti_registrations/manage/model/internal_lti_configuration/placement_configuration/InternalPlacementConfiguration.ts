@@ -24,7 +24,7 @@ export const ZInternalPlacementConfiguration = ZInternalBaseLaunchSettings.merge
   z.object({
     placement: ZLtiPlacement,
     enabled: z.boolean().optional(),
-  })
+  }),
 )
 
 export interface InternalPlacementConfiguration

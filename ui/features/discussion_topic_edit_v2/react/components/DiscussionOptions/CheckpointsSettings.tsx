@@ -39,7 +39,7 @@ const replyToEntryRequiredCountToolTip = I18n.t(
   {
     minimumReplies: minimumReplyToEntryRequiredCount,
     maximumReplies: maximumReplyToEntryRequiredCount,
-  }
+  },
 )
 
 export const CheckpointsSettings = () => {

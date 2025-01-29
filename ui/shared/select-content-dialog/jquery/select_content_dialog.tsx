@@ -99,7 +99,6 @@ export const externalContentReadyHandler = (event: MessageEvent, tool: LtiLaunch
   if (item['@type'] === 'LtiLinkItem' && item.url) {
     handleContentItemResult(item, tool)
   } else {
-     
     window.alert(SelectContent.errorForUrlItem(item))
 
     resetExternalToolFields()
@@ -125,13 +124,15 @@ const numberOrZero = (num: number | undefined) => (typeof num === 'undefined' ? 
 
 const isEqualOrIsArrayWithEqualValue = (
   value: string | number | string[] | undefined,
-  toCompare: string
+  toCompare: string,
 ) => value === toCompare || (Array.isArray(value) && value[0] === toCompare)
 
 export const deepLinkingResponseHandler = (event: MessageEvent<DeepLinkResponse>) => {
+  // Handles lti_msg / lti_errormsg
+  contentItemProcessorPrechecks(event.data)
+
   if (event.data.content_items.length > 1) {
     try {
-      contentItemProcessorPrechecks(event.data)
       const result = event.data.content_items
 
       const $dialog = $('#resource_selection_dialog')
@@ -148,7 +149,7 @@ export const deepLinkingResponseHandler = (event: MessageEvent<DeepLinkResponse>
       }
     } catch (e) {
       $.flashError(I18n.t('Error retrieving content'))
-       
+
       console.error(e)
     } finally {
       const $dialog = $('#resource_selection_dialog')
@@ -156,7 +157,6 @@ export const deepLinkingResponseHandler = (event: MessageEvent<DeepLinkResponse>
     }
   } else if (event.data.content_items.length === 1) {
     try {
-      contentItemProcessorPrechecks(event.data)
       const result = event.data.content_items[0]
       const $dialog = $('#resource_selection_dialog')
       $dialog.off('dialogbeforeclose', dialogCancelHandler)
@@ -173,12 +173,12 @@ export const deepLinkingResponseHandler = (event: MessageEvent<DeepLinkResponse>
       }
 
       const tool: LtiLaunchDefinition = $(
-        '#context_external_tools_select .tools .tool.selected'
+        '#context_external_tools_select .tools .tool.selected',
       ).data('tool')
       handleContentItemResult(result, tool)
     } catch (e) {
       $.flashError(I18n.t('Error retrieving content'))
-       
+
       console.error(e)
     } finally {
       const $dialog = $('#resource_selection_dialog')
@@ -218,13 +218,9 @@ export function closeAll() {
   $selectContextContentDialog.dialog('close')
 }
 
-export function dialogCancelHandler(
-   
-  event: JQuery.TriggeredEvent<HTMLElement, any, any, any>
-) {
-   
+export function dialogCancelHandler(event: JQuery.TriggeredEvent<HTMLElement, any, any, any>) {
   const response = window.confirm(
-    I18n.t('Are you sure you want to cancel? Changes you made may not be saved.')
+    I18n.t('Are you sure you want to cancel? Changes you made may not be saved.'),
   )
   if (!response) {
     event.preventDefault()
@@ -232,11 +228,10 @@ export function dialogCancelHandler(
 }
 
 export function beforeUnloadHandler(
-   
-  e: JQuery.TriggeredEvent<Window & typeof globalThis, any, any, any>
+  e: JQuery.TriggeredEvent<Window & typeof globalThis, any, any, any>,
 ) {
   return ((e as typeof e & {returnValue: string}).returnValue = I18n.t(
-    'Changes you made may not be saved.'
+    'Changes you made may not be saved.',
   ))
 }
 
@@ -253,7 +248,7 @@ const setJsonValueIfDefined = (id: string, value: unknown): void => {
 
 export function handleContentItemResult(
   result: ResourceLinkContentItem,
-  tool: LtiLaunchDefinition
+  tool: LtiLaunchDefinition,
 ) {
   if (ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && ENV.DEFAULT_ASSIGNMENT_TOOL_URL) {
     setDefaultToolValues(result, tool)
@@ -285,7 +280,7 @@ export function handleContentItemResult(
   setJsonValueIfDefined('#external_tool_create_available', result.available)
   setJsonValueIfDefined(
     '#external_tool_create_preserve_existing_assignment_name',
-    result['https://canvas.instructure.com/lti/preserveExistingAssignmentName']
+    result['https://canvas.instructure.com/lti/preserveExistingAssignmentName'],
   )
   if ('text' in result && typeof result.text === 'string') {
     $('#external_tool_create_description').val(result.text)
@@ -302,15 +297,13 @@ export const Events = {
     $('#context_external_tools_select .tools').on(
       'click',
       '.tool',
-      this.onContextExternalToolSelect
+      this.onContextExternalToolSelect,
     )
   },
 
   onContextExternalToolSelect(
-     
-    e: JQuery.ClickEvent<HTMLElement, undefined, any, any>,
-     
-    existingTool: JQuery<HTMLElement>
+    e: Pick<JQuery.ClickEvent<HTMLElement, undefined, any, any>, 'preventDefault'>,
+    existingTool: JQuery<HTMLElement>,
   ) {
     e.preventDefault()
     const $tool = existingTool || $(this)
@@ -362,7 +355,7 @@ export const Events = {
             tabindex: '0',
             allow: iframeAllowances(),
             'data-lti-launch': 'true',
-          })
+          }),
         )
         $dialog.append(`<div class="after_external_content_info_alert screenreader-only" tabindex="0">
             <div class="ic-flash-info">
@@ -374,7 +367,7 @@ export const Events = {
           </div>`)
 
         const $external_content_info_alerts = $dialog.find(
-          '.before_external_content_info_alert, .after_external_content_info_alert'
+          '.before_external_content_info_alert, .after_external_content_info_alert',
         )
 
         const $iframe = $dialog.find('#resource_selection_iframe')
@@ -477,7 +470,7 @@ export const Events = {
       let url = replaceTags(
         $('#select_content_resource_selection_url').attr('href') as string,
         'id',
-        tool.definition_id
+        tool.definition_id,
       )
       url = url + '?placement=' + placement_type + '&secure_params=' + $('#secure_params').val()
       if ($('#select_context_content_dialog').data('context_module_id')) {
@@ -504,7 +497,7 @@ export const Events = {
 
 export function extractContextExternalToolItemData() {
   const tool: LtiLaunchDefinition = $('#context_external_tools_select .tools .tool.selected').data(
-    'tool'
+    'tool',
   )
   let tool_type = 'context_external_tool'
   let tool_id: string | number = 0
@@ -532,7 +525,7 @@ export function extractContextExternalToolItemData() {
     'item[submission]': $('#external_tool_create_submission').val(),
     'item[available]': $('#external_tool_create_available').val(),
     'item[preserveExistingAssignmentName]': $(
-      '#external_tool_create_preserve_existing_assignment_name'
+      '#external_tool_create_preserve_existing_assignment_name',
     ).val(),
   } as const
 }
@@ -591,7 +584,7 @@ export const selectContentDialog = function (options?: SelectContentDialogOption
           'title',
           I18n.t('titles.find_links_using_service', 'Find links using %{service}', {
             service: service.service,
-          })
+          }),
         )
         const $img = $('<img/>')
         $img.attr('src', '/images/' + service.service + '_small_icon.png')
@@ -647,7 +640,7 @@ $(document).ready(function () {
     $dialog.dialog('close')
   })
   $(
-    '#select_context_content_dialog select, #select_context_content_dialog input[type=text], .module_item_select'
+    '#select_context_content_dialog select, #select_context_content_dialog input[type=text], .module_item_select',
   ).keycodes('return', function (event) {
     if (!$('.add_item_button').hasClass('disabled')) {
       // button is enabled
@@ -658,7 +651,7 @@ $(document).ready(function () {
   $('#select_context_content_dialog .add_item_button').click(function () {
     const submit = function (
       item_data: Record<string, string | number | string[] | undefined | boolean>,
-      close_dialog = true
+      close_dialog = true,
     ) {
       const submitted = $dialog.data('submitted_function')
       if (submitted && $.isFunction(submitted)) {
@@ -679,7 +672,7 @@ $(document).ready(function () {
       item_data = {
         'item[type]': $('#add_module_item_select').val(),
         'item[id]': $(
-          '#select_context_content_dialog .module_item_option:visible:first .module_item_select'
+          '#select_context_content_dialog .module_item_option:visible:first .module_item_select',
         ).val(),
         'item[new_tab]': $('#external_url_create_new_tab').prop('checked') ? '1' : '0',
         'item[indent]': $('#content_tag_indent').val(),
@@ -712,7 +705,7 @@ $(document).ready(function () {
           marginTop: 8,
         })
         $errorBox.text(
-          I18n.t('errors.external_tool_url', "An external tool can't be saved without a URL.")
+          I18n.t('errors.external_tool_url', "An external tool can't be saved without a URL."),
         )
         $dialog.prepend($errorBox)
       } else if (item_data['item[title]'] === '' && !no_name_input) {
@@ -724,7 +717,7 @@ $(document).ready(function () {
       item_data = {
         'item[type]': $('#add_module_item_select').val(),
         'item[id]': $(
-          '#select_context_content_dialog .module_item_option:visible:first .module_item_select'
+          '#select_context_content_dialog .module_item_option:visible:first .module_item_select',
         ).val(),
         'item[indent]': $('#content_tag_indent').val(),
       }
@@ -732,7 +725,7 @@ $(document).ready(function () {
       submit(item_data)
     } else {
       const $options = $(
-        '#select_context_content_dialog .module_item_option:visible:first .module_item_select option:selected'
+        '#select_context_content_dialog .module_item_option:visible:first .module_item_select option:selected',
       )
       $options.each(function () {
         const $option = $(this)
@@ -757,11 +750,11 @@ $(document).ready(function () {
         }
         if (item_data['item[id]'] === 'new') {
           const $urls = $(
-            '#select_context_content_dialog .module_item_option:visible:first .new .add_item_url'
+            '#select_context_content_dialog .module_item_option:visible:first .new .add_item_url',
           )
           const url = quiz_lti ? $urls.last().attr('href') : $urls.attr('href')
           let data = $(
-            '#select_context_content_dialog .module_item_option:visible:first'
+            '#select_context_content_dialog .module_item_option:visible:first',
           ).getFormData<{
             'quiz[title]'?: string
             'quiz[assignment_group_id]'?: string
@@ -802,7 +795,7 @@ $(document).ready(function () {
               item_data['item[title]'] = obj.display_name
             } else {
               item_data['item[title]'] = $(
-                '#select_context_content_dialog .module_item_option:visible:first .item_title'
+                '#select_context_content_dialog .module_item_option:visible:first .item_title',
               ).val()
               item_data['item[title]'] = item_data['item[title]'] || obj.display_name
             }
@@ -830,9 +823,8 @@ $(document).ready(function () {
               if (
                 !Object.keys(ENV.MODULE_FILE_DETAILS).find(fdkey => {
                   file_matches =
-                     
                     ENV.MODULE_FILE_DETAILS[fdkey].content_id == attachment.replacingFileId &&
-                    ENV.MODULE_FILE_DETAILS[fdkey].module_id == adding_to_module_id  
+                    ENV.MODULE_FILE_DETAILS[fdkey].module_id == adding_to_module_id
                   if (file_matches) ENV.MODULE_FILE_DETAILS[fdkey].content_id = attachment.id
                   return file_matches
                 })
@@ -849,7 +841,7 @@ $(document).ready(function () {
             ;(BaseUploader as any).prototype.onUploadFailed = (_err: any) => {
               $('#select_context_content_dialog').loadingImage('remove')
               $('#select_context_content_dialog').errorBox(
-                I18n.t('errors.failed_to_create_item', 'Failed to Create new Item')
+                I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'),
               )
               renderFileUploadForm()
             }
@@ -860,7 +852,6 @@ $(document).ready(function () {
             fileSelectBox?.setDirty()
             renderCurrentUploads()
           } else if (typeof url !== 'undefined') {
-            // @ts-expect-error
             $.ajaxJSON(
               url,
               'POST',
@@ -868,19 +859,20 @@ $(document).ready(function () {
               (data_: unknown) => {
                 process_upload(data_)
               },
-              (data_: {errors?: {title?: {message?: string}[]}}) => {
+              (data_: unknown) => {
                 $('#select_context_content_dialog').loadingImage('remove')
+                // @ts-expect-error
                 if (data_?.errors?.title?.[0]?.message === 'blank') {
                   $('#select_context_content_dialog').errorBox(
-                    I18n.t('errors.assignment_name_blank', 'Assignment name cannot be blank.')
+                    I18n.t('errors.assignment_name_blank', 'Assignment name cannot be blank.'),
                   )
                   $('.item_title').focus()
                 } else {
                   $('#select_context_content_dialog').errorBox(
-                    I18n.t('errors.failed_to_create_item', 'Failed to Create new Item')
+                    I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'),
                   )
                 }
-              }
+              },
             )
           }
         } else {
@@ -897,7 +889,7 @@ $(document).ready(function () {
     const doNotDisable =
       typeof selectedOption === 'string' &&
       ['external_url', 'context_external_tool', 'context_module_sub_header'].includes(
-        selectedOption
+        selectedOption,
       )
     if (doNotDisable) {
       $('.add_item_button').removeClass('disabled').attr('aria-disabled', 'false')
@@ -912,7 +904,7 @@ $(document).ready(function () {
         React.createFactory(FileSelectBox)({
           contextString: ENV.context_asset_string,
         }),
-        $('#module_item_select_file')[0]
+        $('#module_item_select_file')[0],
       )
       fileSelectBox.refresh()
       $('#attachment_folder_id').on('change', update_foc)
@@ -938,7 +930,6 @@ $(document).ready(function () {
         $select.find('.message').text('Loading...')
         const url = $('#select_context_content_dialog .external_tools_url').attr('href')
         if (typeof url !== 'undefined') {
-          // @ts-expect-error
           $.ajaxJSON(
             url,
             'GET',
@@ -954,7 +945,7 @@ $(document).ready(function () {
                   tool.placements.assignment_selection || tool.placements.link_selection
                 $tool.toggleClass(
                   'resource_selection',
-                  SelectContent.isContentMessage(placement, tool.placements)
+                  SelectContent.isContentMessage(placement, tool.placements),
                 )
                 $tool.fillTemplateData({
                   data: tool,
@@ -973,7 +964,7 @@ $(document).ready(function () {
             },
             () => {
               $select.find('.message').text(I18n.t('errors.loading_failed', 'Loading Failed'))
-            }
+            },
           )
         }
       }
@@ -993,7 +984,7 @@ $(document).ready(function () {
       }
     } else {
       enable_disable_submit_button(
-        $(currentSelectItem).is(':hidden') || currentSelectItem.selectedIndex > -1
+        $(currentSelectItem).is(':hidden') || currentSelectItem.selectedIndex > -1,
       )
     }
 
@@ -1060,14 +1051,14 @@ function getFileUploadFolder() {
 const renameFileMessage = (nameToUse: string) => {
   return I18n.t(
     'A file named "%{name}" already exists in this folder. Do you want to replace the existing file?',
-    {name: nameToUse}
+    {name: nameToUse},
   )
 }
 
 const lockFileMessage = (nameToUse: string) => {
   return I18n.t(
     'A locked file named "%{name}" already exists in this folder. Please enter a new name.',
-    {name: nameToUse}
+    {name: nameToUse},
   )
 }
 
@@ -1102,19 +1093,18 @@ function renderFileUploadForm() {
     // toggle from current uploads to the choose files button
     $('#module_attachment_upload_form').show()
     $('#module_attachment_upload_progress').hide()
-     
+
     upload_form = ReactDOM.render(
       <UploadForm {...folderProps} />,
-      $('#module_attachment_upload_form')[0]
+      $('#module_attachment_upload_form')[0],
     ) as unknown as UploadForm
   }
 }
 
 function renderCurrentUploads() {
-   
   ReactDOM.render(
     <CurrentUploads onUploadChange={handleUploadOnChange} />,
-    $('#module_attachment_upload_progress')[0]
+    $('#module_attachment_upload_progress')[0],
   )
 }
 

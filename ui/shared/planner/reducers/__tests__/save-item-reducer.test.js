@@ -142,7 +142,7 @@ it('adds a new item to partial past days when the new date matches the near past
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('new past partial', -1)})
+    savedPlannerItem({item: itemIdAt('new past partial', -1)}),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })
@@ -155,7 +155,7 @@ it('adds a new item to partial past days when the new date is after the near pas
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('new past partial', -2)})
+    savedPlannerItem({item: itemIdAt('new past partial', -2)}),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })
@@ -171,7 +171,7 @@ it('adds a new item to partial past days when the new date is within the partial
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('new past partial', -2)})
+    savedPlannerItem({item: itemIdAt('new past partial', -2)}),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })
@@ -184,7 +184,7 @@ it('adds a new item to partial future days when the new date matches the near fu
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('new future partial', 1)})
+    savedPlannerItem({item: itemIdAt('new future partial', 1)}),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })
@@ -197,7 +197,7 @@ it('adds a new item to partial future days when the new date is before the near 
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('new future partial', 2)})
+    savedPlannerItem({item: itemIdAt('new future partial', 2)}),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })
@@ -213,7 +213,7 @@ it('adds a new item to partial future days when the new date is within the parti
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('new future partial', 2)})
+    savedPlannerItem({item: itemIdAt('new future partial', 2)}),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })
@@ -226,7 +226,7 @@ it('does nothing when the date falls in the distant past', () => {
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('should be ignored', -2)})
+    savedPlannerItem({item: itemIdAt('should be ignored', -2)}),
   )
   expect(nextState).toMatchSnapshotAndBe(initialState)
 })
@@ -239,7 +239,7 @@ it('does nothing when the date falls in the distant future', () => {
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('should be ignored', 2)})
+    savedPlannerItem({item: itemIdAt('should be ignored', 2)}),
   )
   expect(nextState).toMatchSnapshotAndBe(initialState)
 })
@@ -248,7 +248,7 @@ it('does nothing when date falls in distant past and there is no near past range
   const initialState = makeState()
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('should be ignored', -1)})
+    savedPlannerItem({item: itemIdAt('should be ignored', -1)}),
   )
   expect(nextState).toMatchSnapshotAndBe(initialState)
 })
@@ -257,7 +257,7 @@ it('does nothing when date falls in distant future and there is no near future r
   const initialState = makeState()
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('should be ignored', 1)})
+    savedPlannerItem({item: itemIdAt('should be ignored', 1)}),
   )
   expect(nextState).toMatchSnapshotAndBe(initialState)
 })
@@ -271,7 +271,7 @@ it('removes item from days and adds it to partial past days when the date has ch
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('should be in partial past', -2)})
+    savedPlannerItem({item: itemIdAt('should be in partial past', -2)}),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })
@@ -285,7 +285,7 @@ it('removes item from days and adds it to partial future days when the date has 
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('should be in partial future', 2)})
+    savedPlannerItem({item: itemIdAt('should be in partial future', 2)}),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })
@@ -299,7 +299,7 @@ it('removes item from days when the date has changed to a distant past date', ()
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('should be removed', -3)})
+    savedPlannerItem({item: itemIdAt('should be removed', -3)}),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })
@@ -313,7 +313,7 @@ it('removes item from days when the date has changed to a distant future date', 
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: itemIdAt('should be removed', 3)})
+    savedPlannerItem({item: itemIdAt('should be removed', 3)}),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })
@@ -342,7 +342,7 @@ it('updates the item when its date does not change', () => {
     initialState,
     savedPlannerItem({
       item: itemIdAt('to update', 0, {title: 'updated title'}),
-    })
+    }),
   )
   expect(nextState).toMatchSnapshotAndNotBe(initialState)
 })

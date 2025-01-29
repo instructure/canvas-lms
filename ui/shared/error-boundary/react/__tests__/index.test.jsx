@@ -46,7 +46,7 @@ describe('ErrorBoundary', () => {
     const {getByText} = render(
       <ErrorBoundary {...defaultProps()}>
         <div>Making sure this works</div>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
     expect(getByText('Making sure this works')).toBeInTheDocument()
   })
@@ -59,7 +59,7 @@ describe('ErrorBoundary', () => {
           <div>Making sure this works</div>
           <ThrowsErrorComponent />
         </div>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
     expect(getByText('Making sure this does not work')).toBeInTheDocument()
   })

@@ -163,10 +163,6 @@ describe "announcements" do
       end
 
       context "selective release assignment embedded in discussions edit page" do
-        before :once do
-          Account.site_admin.enable_feature!(:selective_release_edit_page)
-        end
-
         it "allows create", :ignore_js_errors do
           title = "Announcement"
           message = "this is an announcement"

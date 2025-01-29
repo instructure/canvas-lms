@@ -45,7 +45,7 @@ export function renderTeacherQuery(assignment, additionalApolloMocks = []) {
   const fns = render(
     <MockedProvider mocks={mocks} addTypename={false}>
       <TeacherQuery assignmentLid={assignment.lid} />
-    </MockedProvider>
+    </MockedProvider>,
   )
   return fns
 }
@@ -60,13 +60,13 @@ export function renderTeacherView(
   assignment = mockAssignment(),
   additionalApolloMocks = [],
   teacherViewProps = {},
-  activeTabName = null
+  activeTabName = null,
 ) {
   const mocks = [...initialTeacherViewGQLMocks(assignment.course.lid), ...additionalApolloMocks]
   const fns = render(
     <MockedProvider mocks={mocks} addTypename={false}>
       <TeacherView assignment={assignment} {...teacherViewProps} />
-    </MockedProvider>
+    </MockedProvider>,
   )
   if (activeTabName) {
     fireEvent.click(fns.getAllByText(new RegExp(activeTabName, 'i'))[0])

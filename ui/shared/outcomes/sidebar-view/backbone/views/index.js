@@ -258,7 +258,7 @@ export default class SidebarView extends Backbone.View {
         I18n.t('%{model} is already located in %{newGroup}', {
           model: model.get('title'),
           newGroup: newGroup.get('title'),
-        })
+        }),
       )
       return
     }
@@ -289,9 +289,9 @@ export default class SidebarView extends Backbone.View {
             I18n.t('Successfully moved %{model} to %{newGroup}', {
               model: model.get('title'),
               newGroup: newGroup.get('title'),
-            })
+            }),
           ),
-        1500
+        1500,
       )
     })
   }
@@ -303,7 +303,7 @@ export default class SidebarView extends Backbone.View {
       (this.entryHeight + 1) *
       indexOf(
         this.directories[dirIndex].views(),
-        find(this.directories[dirIndex].views(), v => v.model === model)
+        find(this.directories[dirIndex].views(), v => v.model === model),
       )
     return this.directories[dirIndex].$el.animate({scrollTop}, {duration: 200})
   }

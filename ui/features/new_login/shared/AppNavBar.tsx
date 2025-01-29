@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
-import {TopNavBar} from '@instructure/ui-top-nav-bar'
 import {canvas} from '@instructure/ui-theme-tokens'
-import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {TopNavBar} from '@instructure/ui-top-nav-bar'
+import React from 'react'
+import {useNewLoginData} from '../context'
 
 import CanvasLmsLogoIcon from '../assets/images/canvas-small.svg'
 import CanvasLmsLogo from '../assets/images/canvas.svg'
@@ -30,7 +30,7 @@ import CanvasLmsLogo from '../assets/images/canvas.svg'
 const I18n = createI18nScope('new_login')
 
 const AppNavBar = () => {
-  const {enableCourseCatalog} = useNewLogin()
+  const {enableCourseCatalog} = useNewLoginData()
 
   return (
     <TopNavBar breakpoint={10} inverseColor={true}>

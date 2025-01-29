@@ -116,7 +116,7 @@ describe('PostAssignmentGradesTray FormContent', () => {
     it('hides "Post types" inputs', () => {
       const {container} = renderComponent({postingGrades: true})
       const inputs = container.querySelectorAll('input[type="radio"]')
-      expect(inputs.length).toBe(0)
+      expect(inputs).toHaveLength(0)
     })
   })
 
@@ -191,7 +191,7 @@ describe('PostAssignmentGradesTray FormContent', () => {
     it('checks "Everyone" by default', () => {
       const {container} = renderComponent()
       const everyoneInput = Array.from(container.querySelectorAll('input[type="radio"]')).find(
-        input => input.value === EVERYONE
+        input => input.value === EVERYONE,
       )
       expect(everyoneInput).toBeChecked()
     })
@@ -199,7 +199,7 @@ describe('PostAssignmentGradesTray FormContent', () => {
     it('calls postTypeChanged when clicking another post type', () => {
       const {container} = renderComponent()
       const gradedInput = Array.from(container.querySelectorAll('input[type="radio"]')).find(
-        input => input.value !== EVERYONE
+        input => input.value !== EVERYONE,
       )
       fireEvent.click(gradedInput)
       expect(defaultProps.postTypeChanged).toHaveBeenCalledTimes(1)
@@ -218,12 +218,12 @@ describe('PostAssignmentGradesTray FormContent', () => {
       const {getByText, container, debug} = renderComponent()
 
       const specificSectionsToggle = container.querySelector(
-        'input[id^="Checkbox_"][type="checkbox"]'
+        'input[id^="Checkbox_"][type="checkbox"]',
       )
       fireEvent.click(specificSectionsToggle)
 
       const freshmenCheckbox = container.querySelectorAll(
-        'input[id^="Checkbox_"][type="checkbox"]'
+        'input[id^="Checkbox_"][type="checkbox"]',
       )[1]
       fireEvent.click(freshmenCheckbox)
 

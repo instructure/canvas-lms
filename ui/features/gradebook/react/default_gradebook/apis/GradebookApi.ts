@@ -55,7 +55,7 @@ function updateSubmission(
   // @ts-expect-error
   submission,
   enterGradesAs?: string,
-  subAssignmentTag?: string
+  subAssignmentTag?: string,
 ) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}`
   return axios.put(url, {

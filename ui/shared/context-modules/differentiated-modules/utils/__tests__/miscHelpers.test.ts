@@ -91,8 +91,28 @@ describe('convertModuleSettingsForApi', () => {
     publishFinalGrade: true,
   }
 
-  it('converts the module settings to the format expected by the API', () => {
+  it('produces correct API parm when name was not modified', () => {
     expect(convertModuleSettingsForApi(moduleSettings)).toEqual({
+      context_module: {
+        unlock_at: '2023-08-02T06:00:00.000Z',
+        prerequisites: 'module_1,module_2',
+        completion_requirements: {
+          1: {min_score: '', type: 'must_view'},
+          2: {min_score: '', type: 'must_mark_done'},
+          3: {min_score: '', type: 'must_submit'},
+          4: {min_score: '50', type: 'min_score'},
+          5: {min_score: '', type: 'must_contribute'},
+        },
+        requirement_count: '',
+        require_sequential_progress: false,
+        publish_final_grade: true,
+      },
+    })
+  })
+
+  it('includes the module name when it was modified', () => {
+    const settings = {...moduleSettings, moduleNameDirty: true}
+    expect(convertModuleSettingsForApi(settings)).toEqual({
       context_module: {
         name: 'Module 1',
         unlock_at: '2023-08-02T06:00:00.000Z',
@@ -110,6 +130,7 @@ describe('convertModuleSettingsForApi', () => {
       },
     })
   })
+
 
   it('excludes unlockAt if lockUntilChecked is false', () => {
     const formattedSettings = convertModuleSettingsForApi({

@@ -43,7 +43,7 @@ $(document).ready(function () {
         url: $(this).attr('href'),
         message: I18n.t(
           'delete_question_bank_prompt',
-          'Are you sure you want to delete this bank of questions?'
+          'Are you sure you want to delete this bank of questions?',
         ),
         success() {
           $(this).slideUp(function () {

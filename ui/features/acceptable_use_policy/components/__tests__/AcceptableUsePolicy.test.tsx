@@ -45,7 +45,7 @@ describe('AcceptableUsePolicy', () => {
     render(<AcceptableUsePolicy />)
     expect(screen.getByText('Loading page')).toBeInTheDocument()
     await waitFor(() =>
-      expect(screen.getByText('Test Acceptable Use Policy Content')).toBeInTheDocument()
+      expect(screen.getByText('Test Acceptable Use Policy Content')).toBeInTheDocument(),
     )
     expect(screen.queryByText('Loading page')).not.toBeInTheDocument()
   })
@@ -60,9 +60,9 @@ describe('AcceptableUsePolicy', () => {
     await waitFor(() =>
       expect(
         screen.getByText(
-          'Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.'
-        )
-      ).toBeInTheDocument()
+          'Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.',
+        ),
+      ).toBeInTheDocument(),
     )
     expect(screen.queryByText('Loading page')).not.toBeInTheDocument()
   })
@@ -77,9 +77,9 @@ describe('AcceptableUsePolicy', () => {
     await waitFor(() =>
       expect(
         screen.getByText(
-          'The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.'
-        )
-      ).toBeInTheDocument()
+          'The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.',
+        ),
+      ).toBeInTheDocument(),
     )
     expect(screen.queryByText('Loading page')).not.toBeInTheDocument()
   })

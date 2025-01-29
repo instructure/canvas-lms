@@ -62,7 +62,7 @@ const ScorePercentileChart = createChartComponent({
       .attr('height', height + MARGIN_T + MARGIN_B)
       .attr(
         'viewBox',
-        '0 0 ' + (width + MARGIN_L + MARGIN_R) + ' ' + (height + MARGIN_T + MARGIN_B)
+        '0 0 ' + (width + MARGIN_L + MARGIN_R) + ' ' + (height + MARGIN_T + MARGIN_B),
       )
       .attr('preserveAspectRatio', 'xMidYMax')
       .append('g')
@@ -106,7 +106,7 @@ const ScorePercentileChart = createChartComponent({
       {
         above_average: labelOptions.aboveAverage,
         below_average: labelOptions.belowAverage,
-      }
+      },
     )
 
     data.forEach(function (datum, i) {
@@ -119,7 +119,7 @@ const ScorePercentileChart = createChartComponent({
           {
             count: datum,
             percentile: i + '',
-          }
+          },
         )
       }
     })
@@ -225,7 +225,7 @@ const ScorePercentileChart = createChartComponent({
     const highest = max(
       Object.keys(scores).map(function (score) {
         return parseInt(score, 10)
-      })
+      }),
     )
 
     const upperBound = max([101, highest])

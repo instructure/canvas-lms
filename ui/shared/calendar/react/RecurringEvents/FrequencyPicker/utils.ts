@@ -38,7 +38,7 @@ export const generateFrequencyOptions = (
   eventStart: Moment,
   locale: string = 'en',
   timezone: string,
-  rrule: string | null
+  rrule: string | null,
 ): FrequencyOption[] => {
   const day = I18n.lookup('date.day_names').at(eventStart.day())
   const month = I18n.lookup('date.month_names').at(eventStart.month() + 1)
@@ -117,7 +117,7 @@ export const generateFrequencyOptions = (
 // The calling code needs to differenciate between 1 and 2.
 export const generateFrequencyRRULE = (
   id: FrequencyOptionValue,
-  eventStart: Moment
+  eventStart: Moment,
 ): string | null => {
   /*
   We are using UTC time instead of local time or local time + zone reference.
@@ -141,7 +141,7 @@ export const generateFrequencyRRULE = (
       }`
     case 'monthly-nth-day':
       return `FREQ=MONTHLY;BYSETPOS=${weekdayIndex};BYDAY=${AllRRULEDayValues.at(
-        eventStart.day()
+        eventStart.day(),
       )};INTERVAL=1;COUNT=${FrequencyCounts['monthly-nth-day']}`
     case 'annually': {
       const month = eventStart.format('MM')
@@ -159,7 +159,7 @@ export const generateFrequencyRRULE = (
 
 export const RRULEToFrequencyOptionValue = (
   eventStart: Moment,
-  rrule: string | null | undefined
+  rrule: string | null | undefined,
 ): FrequencyOptionValue => {
   if (rrule === null || rrule === undefined) return 'not-repeat'
   if (rrule.length === 0) return 'custom'
@@ -214,7 +214,7 @@ export const RRULEToFrequencyOptionValue = (
 
 export const updateRRuleForNewDate = (
   newEventStart: Moment,
-  rrule: string | null
+  rrule: string | null,
 ): string | null => {
   if (rrule === null || rrule === undefined) return null
 

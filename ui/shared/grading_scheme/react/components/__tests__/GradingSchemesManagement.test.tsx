@@ -49,7 +49,7 @@ describe('Grading Schemes Management Tests', () => {
         defaultAccountGradingSchemeEnabled={false}
         onGradingSchemesChanged={() => {}}
         {...props}
-      />
+      />,
     )
   }
 
@@ -104,7 +104,7 @@ describe('Grading Schemes Management Tests', () => {
 
   describe('archived grading schemes', () => {
     const renderArchivedGradingSchemesManagement = (
-      props: Partial<GradingSchemesManagementProps> = {}
+      props: Partial<GradingSchemesManagementProps> = {},
     ) => {
       return renderGradingSchemesManagement({archivedGradingSchemesEnabled: true, ...props})
     }

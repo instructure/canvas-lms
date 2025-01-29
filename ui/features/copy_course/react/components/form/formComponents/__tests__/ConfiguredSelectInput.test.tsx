@@ -76,4 +76,10 @@ describe('ConfiguredSelectInput', () => {
     const {getByDisplayValue} = renderConfiguredSelectInput({disabled: true})
     expect(getByDisplayValue(defaultInputValue)).toBeDisabled()
   })
+
+  it('renders with messages', () => {
+    const messages = [{text: 'Error message', type: 'error'}]
+    const {getByText} = renderConfiguredSelectInput({messages})
+    expect(getByText('Error message')).toBeInTheDocument()
+  })
 })

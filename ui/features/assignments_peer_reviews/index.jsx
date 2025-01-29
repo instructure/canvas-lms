@@ -40,7 +40,7 @@ $(document).ready(() => {
     },
     function () {
       $(this).removeClass('submission-hover')
-    }
+    },
   )
 
   $('.peer_review').focusin(function () {
@@ -138,7 +138,7 @@ $(document).ready(() => {
         I18n.t('titles.reminder', 'Remind %{assessor} about Assessment, last notified %{time}', {
           assessor: assessor_name,
           time,
-        })
+        }),
       )
       $(this).slideUp(function () {
         $(this).remove()
@@ -163,7 +163,7 @@ $(document).ready(() => {
         I18n.t('titles.remind', 'Remind %{assessor} about Assessment, last notified %{time}', {
           assessor: assessor_name,
           time,
-        })
+        }),
       )
     })
   })
@@ -173,6 +173,5 @@ $(document).ready(() => {
     $('.peer_review.assigned .remind_peer_review_link').click()
   })
 
-   
   ReactDOM.render(<FilterPeerReview />, document.getElementById('filter_peer_review'))
 })

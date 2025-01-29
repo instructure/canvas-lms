@@ -103,7 +103,7 @@ describe('Discussions reducer', () => {
       {
         allDiscussions: {1: {id: 1, pinned: false, locked: false}},
         pinnedDiscussionIds: [1],
-      }
+      },
     )
     expect(newState.closedForCommentsDiscussionIds).toEqual([])
     expect(newState.unpinnedDiscussionIds).toEqual([])
@@ -116,7 +116,7 @@ describe('Discussions reducer', () => {
       {
         allDiscussions: {1: {id: 1, pinned: true, locked: false}},
         pinnedDiscussionIds: [1],
-      }
+      },
     )
     expect(newState.closedForCommentsDiscussionIds).toEqual([])
     expect(newState.unpinnedDiscussionIds).toEqual([1])
@@ -129,7 +129,7 @@ describe('Discussions reducer', () => {
       {
         allDiscussions: {1: {id: 1, pinned: true, locked: false}},
         pinnedDiscussionIds: [1],
-      }
+      },
     )
     expect(newState.closedForCommentsDiscussionIds).toEqual([1])
     expect(newState.unpinnedDiscussionIds).toEqual([])
@@ -199,7 +199,7 @@ describe('Discussions reducer', () => {
 
   test('SAVING_SETTINGS_SUCCESS should return payload if returned', () => {
     const newState = reduce(
-      actions.savingSettingsSuccess({courseSettings: 'blah', userSettings: 'blee'})
+      actions.savingSettingsSuccess({courseSettings: 'blah', userSettings: 'blee'}),
     )
     expect(newState.courseSettings).toEqual('blah')
   })
@@ -218,7 +218,7 @@ describe('Discussions reducer', () => {
 
   test('SAVING_SETTINGS_SUCCESS should return payload for user settings', () => {
     const newState = reduce(
-      actions.savingSettingsSuccess({courseSettings: 'blah', userSettings: 'blee'})
+      actions.savingSettingsSuccess({courseSettings: 'blah', userSettings: 'blee'}),
     )
     expect(newState.userSettings).toEqual('blee')
   })
@@ -346,7 +346,7 @@ describe('Discussions reducer', () => {
 
     const newState = reduce(actions.updateDiscussionsSearch(dispatchData), initialState)
     const searchedDiscussions = Object.values(newState.allDiscussions).filter(
-      disc => !disc.filtered
+      disc => !disc.filtered,
     )
     expect(searchedDiscussions).toEqual([
       {
@@ -436,7 +436,7 @@ describe('Discussions reducer', () => {
 
     const newState = reduce(actions.updateDiscussionsSearch(dispatchData), initialState)
     const searchedDiscussions = Object.values(newState.allDiscussions).filter(
-      disc => !disc.filtered
+      disc => !disc.filtered,
     )
 
     expect(searchedDiscussions).toEqual([

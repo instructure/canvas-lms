@@ -40,7 +40,7 @@ describe('sanitizeData()', () => {
 
   describe('when partial sanitization is needed', () => {
     beforeEach(
-      () => (data = {text: "<div>Don't remove me <script>console.log('remove me')</script></div>"})
+      () => (data = {text: "<div>Don't remove me <script>console.log('remove me')</script></div>"}),
     )
 
     it('only removes the unsafe elements', () => {

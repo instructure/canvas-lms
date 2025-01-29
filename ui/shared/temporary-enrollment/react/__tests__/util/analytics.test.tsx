@@ -58,7 +58,7 @@ describe('analytics.ts', () => {
       // assert that the attribute was set correctly
       expect(divElement).toHaveAttribute(
         DATA_ANALYTICS_ATTRIBUTE,
-        `${ANALYTICS_PREFIX}${ANALYTICS_TEST_VALUE}`
+        `${ANALYTICS_PREFIX}${ANALYTICS_TEST_VALUE}`,
       )
     })
 
@@ -66,14 +66,14 @@ describe('analytics.ts', () => {
       const customDelimiter = '_'
       const analyticProps = createAnalyticPropsGenerator(
         ANALYTICS_PREFIX,
-        customDelimiter
+        customDelimiter,
       )(ANALYTICS_TEST_VALUE)
 
       simulateSpread(divElement, analyticProps)
 
       expect(divElement).toHaveAttribute(
         DATA_ANALYTICS_ATTRIBUTE,
-        `${ANALYTICS_PREFIX}${customDelimiter}${ANALYTICS_TEST_VALUE}`
+        `${ANALYTICS_PREFIX}${customDelimiter}${ANALYTICS_TEST_VALUE}`,
       )
     })
 
@@ -107,7 +107,7 @@ describe('analytics.ts', () => {
 
       expect(divElement).toHaveAttribute(
         DATA_ANALYTICS_ATTRIBUTE,
-        `${ANALYTICS_PREFIX}${ANALYTICS_TEST_VALUE}`
+        `${ANALYTICS_PREFIX}${ANALYTICS_TEST_VALUE}`,
       )
     })
 
@@ -124,7 +124,7 @@ describe('analytics.ts', () => {
 
       expect(spanElement).toHaveAttribute(
         DATA_ANALYTICS_ATTRIBUTE,
-        `${ANALYTICS_PREFIX}${ANALYTICS_TEST_VALUE}`
+        `${ANALYTICS_PREFIX}${ANALYTICS_TEST_VALUE}`,
       )
     })
 
@@ -135,7 +135,7 @@ describe('analytics.ts', () => {
 
       expect(divElement).toHaveAttribute(
         DATA_ANALYTICS_ATTRIBUTE,
-        `${ANALYTICS_PREFIX}${ANALYTICS_TEST_VALUE}`
+        `${ANALYTICS_PREFIX}${ANALYTICS_TEST_VALUE}`,
       )
     })
 
@@ -161,7 +161,7 @@ describe('analytics.ts', () => {
 
         expect(element).toHaveAttribute(
           DATA_ANALYTICS_ATTRIBUTE,
-          `${ANALYTICS_PREFIX}${ANALYTICS_TEST_VALUE}`
+          `${ANALYTICS_PREFIX}${ANALYTICS_TEST_VALUE}`,
         )
       })
     })

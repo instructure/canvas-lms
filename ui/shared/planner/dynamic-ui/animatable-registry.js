@@ -96,7 +96,7 @@ export class AnimatableRegistry {
     const sortedDays = this.getSortedComponents('day')
     // get sorted groups for each sorted day, then flatten into one list of interface sorted groups.
     const sortedGroups = _.flatMap(sortedDays, day =>
-      this.getUniqSortedComponents('group', day.componentIds)
+      this.getUniqSortedComponents('group', day.componentIds),
     )
     return sortedGroups
   }
@@ -106,7 +106,7 @@ export class AnimatableRegistry {
     const sortedGroups = this.getAllGroupsSorted()
     // get sorted items for each group, then flatten into one list of interface sorted items
     const sortedItems = _.flatMap(sortedGroups, group =>
-      this.getUniqSortedComponents('item', group.componentIds)
+      this.getUniqSortedComponents('item', group.componentIds),
     )
     return sortedItems
   }

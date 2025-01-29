@@ -48,7 +48,7 @@ export default class GradesDisplay extends Component {
 
   scoreString = (score, useThisCoercedLetterGradeInstead = null) => {
     const fixedScore = parseFloat(score)
-     
+
     if (isNaN(fixedScore)) return I18n.t('No Grade')
     return useThisCoercedLetterGradeInstead || `${fixedScore.toFixed(2)}%`
   }

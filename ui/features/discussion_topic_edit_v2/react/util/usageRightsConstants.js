@@ -39,7 +39,7 @@ export const defaultUsageRights = [
   },
   {
     display: I18n.t(
-      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'
+      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws',
     ),
     value: 'fair_use',
   },

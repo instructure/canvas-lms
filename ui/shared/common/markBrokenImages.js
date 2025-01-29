@@ -25,7 +25,6 @@ export function attachErrorHandler(imgEl) {
     const img = e.currentTarget
     const broken = () => img.classList.add('broken-image')
     if (img.src) {
-       
       fetch(img.src).then(res => {
         if (res.status === 403) {
           // if 403 Forbidden, replace the image with a lock image

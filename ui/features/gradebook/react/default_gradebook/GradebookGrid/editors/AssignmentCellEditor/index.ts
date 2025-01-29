@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
@@ -48,7 +49,7 @@ export default class AssignmentCellEditor {
 
     const Component = props.gradeIsEditable ? AssignmentRowCell : ReadOnlyCell
     const element = React.createElement(Component, props, null)
-    // eslint-disable-next-line no-restricted-properties
+
     ReactDOM.render(element, this.container)
   }
 

@@ -69,14 +69,14 @@ export default function useSaveAssignments(courseId) {
         setStartingSaveError(
           await extractFetchErrorMessage(
             err,
-            I18n.t('There was an error starting the save assignment dates job')
-          )
+            I18n.t('There was an error starting the save assignment dates job'),
+          ),
         )
       } finally {
         setStartingSave(false)
       }
     },
-    [courseId]
+    [courseId],
   )
 
   return {

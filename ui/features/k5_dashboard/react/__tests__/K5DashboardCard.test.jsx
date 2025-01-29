@@ -48,10 +48,10 @@ describe('DashboardCardHeaderHero', () => {
   }
   it("doesn't add instFS query params if it doesnt use an inst-fs url", () => {
     const {getByTestId} = render(
-      <DashboardCardHeaderHero {...heroProps} image="https://example.com/path/to/image.png" />
+      <DashboardCardHeaderHero {...heroProps} image="https://example.com/path/to/image.png" />,
     )
     expect(getByTestId('k5-dashboard-card-hero').style.getPropertyValue('background-image')).toBe(
-      'url(https://example.com/path/to/image.png)'
+      'url(https://example.com/path/to/image.png)',
     )
   })
 
@@ -60,17 +60,17 @@ describe('DashboardCardHeaderHero', () => {
       <DashboardCardHeaderHero
         {...heroProps}
         image="https://inst-fs-iad-beta.inscloudgate.net/files/blah/foo?download=1&token=abcxyz"
-      />
+      />,
     )
     expect(getByTestId('k5-dashboard-card-hero').style.getPropertyValue('background-image')).toBe(
-      'url(https://inst-fs-iad-beta.inscloudgate.net/files/blah/foo?download=1&token=abcxyz&geometry=300x150)'
+      'url(https://inst-fs-iad-beta.inscloudgate.net/files/blah/foo?download=1&token=abcxyz&geometry=300x150)',
     )
   })
 
   it('shows the background color if no image is provided', () => {
     const {getByTestId} = render(<DashboardCardHeaderHero {...heroProps} />)
     expect(getByTestId('k5-dashboard-card-hero').style.getPropertyValue('background-color')).toBe(
-      'rgb(255, 255, 255)'
+      'rgb(255, 255, 255)',
     )
   })
 })
@@ -93,7 +93,7 @@ describe('K-5 Dashboard Card', () => {
     const {findByText} = render(
       <K5DashboardContext.Provider value={{...defaultContext, subjectAnnouncements}}>
         <K5DashboardCard {...defaultProps} />
-      </K5DashboardContext.Provider>
+      </K5DashboardContext.Provider>,
     )
     const linkText = await findByText('How do you do, fellow kids?')
     const link = linkText.closest('a')
@@ -104,7 +104,7 @@ describe('K-5 Dashboard Card', () => {
     const {findByText} = render(
       <K5DashboardContext.Provider value={defaultContext}>
         <K5DashboardCard {...defaultProps} />
-      </K5DashboardContext.Provider>
+      </K5DashboardContext.Provider>,
     )
     const message = await findByText('Nothing due today')
     expect(message).toBeInTheDocument()
@@ -114,7 +114,7 @@ describe('K-5 Dashboard Card', () => {
     const {findByRole} = render(
       <K5DashboardContext.Provider value={{...defaultContext, assignmentsDueToday: {test: 3}}}>
         <K5DashboardCard {...defaultProps} />
-      </K5DashboardContext.Provider>
+      </K5DashboardContext.Provider>,
     )
     const link = await findByRole('link', {name: 'View 3 items due today for course test course'})
     expect(link).toBeInTheDocument()
@@ -127,7 +127,7 @@ describe('K-5 Dashboard Card', () => {
         value={{...defaultContext, assignmentsCompletedForToday: {test: 2}}}
       >
         <K5DashboardCard {...defaultProps} />
-      </K5DashboardContext.Provider>
+      </K5DashboardContext.Provider>,
     )
     expect(await findByText('Nothing else due')).toBeInTheDocument()
     expect(queryByText('Nothing due today')).not.toBeInTheDocument()
@@ -137,7 +137,7 @@ describe('K-5 Dashboard Card', () => {
     const {findByRole} = render(
       <K5DashboardContext.Provider value={{...defaultContext, assignmentsMissing: {test: 2}}}>
         <K5DashboardCard {...defaultProps} />
-      </K5DashboardContext.Provider>
+      </K5DashboardContext.Provider>,
     )
     const link = await findByRole('link', {name: 'View 2 missing items for course test course'})
     expect(link).toBeInTheDocument()
@@ -149,7 +149,7 @@ describe('K-5 Dashboard Card', () => {
     const {queryByText} = render(
       <K5DashboardContext.Provider value={{...defaultContext, isStudent: false}}>
         <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />
-      </K5DashboardContext.Provider>
+      </K5DashboardContext.Provider>,
     )
     expect(queryByText('Nothing due today')).not.toBeInTheDocument()
   })
@@ -157,7 +157,7 @@ describe('K-5 Dashboard Card', () => {
   it('defaults color if no course color or image are provided', () => {
     const {getByTestId} = render(<K5DashboardCard {...defaultProps} />)
     expect(getByTestId('k5-dashboard-card-hero').style.getPropertyValue('background-color')).toBe(
-      'rgb(57, 75, 88)'
+      'rgb(57, 75, 88)',
     )
   })
 })
@@ -165,7 +165,7 @@ describe('K-5 Dashboard Card', () => {
 describe('LatestAnnouncementLink', () => {
   it('renders loading skeleton while loading', () => {
     const {getByText, queryByText} = render(
-      <LatestAnnouncementLink courseId="1" loading={true} color="red" />
+      <LatestAnnouncementLink courseId="1" loading={true} color="red" />,
     )
     expect(getByText('Loading latest announcement link')).toBeInTheDocument()
     expect(queryByText('New announcement', {exact: false})).not.toBeInTheDocument()
@@ -175,7 +175,7 @@ describe('LatestAnnouncementLink', () => {
 describe('AssignmentLinks', () => {
   it('renders loading skeleton while loading', () => {
     const {getByText, queryByText} = render(
-      <AssignmentLinks id="1" loading={true} color="red" courseName="test" numMissing={2} />
+      <AssignmentLinks id="1" loading={true} color="red" courseName="test" numMissing={2} />,
     )
     expect(getByText('Loading missing assignments link')).toBeInTheDocument()
     expect(queryByText('2 missing')).not.toBeInTheDocument()

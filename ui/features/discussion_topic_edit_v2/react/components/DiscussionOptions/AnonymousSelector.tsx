@@ -68,7 +68,7 @@ export const AnonymousSelector = ({
           key="off"
           value="off"
           label={I18n.t(
-            'Off: student names and profile pictures will be visible to other members of this course'
+            'Off: student names and profile pictures will be visible to other members of this course',
           )}
         />
         <RadioInput

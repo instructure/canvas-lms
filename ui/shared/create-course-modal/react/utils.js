@@ -23,7 +23,7 @@ export const createNewCourse = (
   accountId,
   courseName,
   syncHomeroomEnrollments = null,
-  homeroomCourseId = null
+  homeroomCourseId = null,
 ) =>
   doFetchApi({
     path: `/api/v1/accounts/${accountId}/courses`,

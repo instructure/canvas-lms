@@ -30,11 +30,7 @@ module DifferentiableAssignment
       visible_instances = DifferentiableAssignment.filter([differentiable], user, context) do |_, user_ids|
         conditions = { user_id: user_ids }
         conditions[column_name] = differentiable.id
-        if Account.site_admin.feature_enabled?(:selective_release_backend)
-          visible(conditions)
-        else
-          visibility_view.where(conditions)
-        end
+        visible(conditions)
       end
       is_visible = true if visible_instances.any?
     end

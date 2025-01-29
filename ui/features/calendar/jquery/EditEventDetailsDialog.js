@@ -70,7 +70,7 @@ export default class EditEventDetailsDialog {
     tabs
       .tabs()
       .bind('tabsselect', (event, ui) =>
-        $(ui.panel).closest('.tab_holder').data('form-widget')?.activate()
+        $(ui.panel).closest('.tab_holder').data('form-widget')?.activate(),
       )
 
     // note: tabs should be removed in descending order, so numbers don't shift
@@ -127,7 +127,7 @@ export default class EditEventDetailsDialog {
       // permission to create them
       const can_create_assignments = some(
         this.event.allPossibleContexts,
-        c => c.can_create_assignments
+        c => c.can_create_assignments,
       )
       if (!can_create_assignments) tabs.tabs('remove', 1)
     }
@@ -190,7 +190,7 @@ export default class EditEventDetailsDialog {
           formHolder,
           this.event,
           this.contextChange.bind(this),
-          this.closeCB
+          this.closeCB,
         )
       }
 
@@ -199,7 +199,7 @@ export default class EditEventDetailsDialog {
           $('#edit_assignment_form_holder'),
           this.event,
           this.contextChange.bind(this),
-          this.closeCB
+          this.closeCB,
         )
         dialog.find('#edit_assignment_form_holder').data('form-widget', this.assignmentDetailsForm)
       }
@@ -210,7 +210,7 @@ export default class EditEventDetailsDialog {
           formHolder,
           this.event,
           this.contextChange.bind(this),
-          this.closeCB
+          this.closeCB,
         )
         formHolder.data('form-widget', this.plannerNoteDetailsForm)
       }
@@ -221,7 +221,7 @@ export default class EditEventDetailsDialog {
           formHolder,
           this.event,
           this.contextChange.bind(this),
-          this.closeCB
+          this.closeCB,
         )
         formHolder.data('form-widget', this.toDoItemDetailsForm)
       }
@@ -237,7 +237,7 @@ export default class EditEventDetailsDialog {
           filter(this.event.allPossibleContexts, c => c.can_create_appointment_groups),
           this.closeCB,
           this.event,
-          this.useScheduler
+          this.useScheduler,
         )
         dialog
           .find('#edit_appointment_group_form_holder')

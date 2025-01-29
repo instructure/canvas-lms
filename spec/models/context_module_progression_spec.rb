@@ -168,31 +168,6 @@ describe ContextModuleProgression do
     context "when post policies enabled" do
       let(:assignment) { @course.assignments.create! }
       let(:tag) { @module.add_item({ id: assignment.id, type: "assignment" }) }
-      let(:min_score) { 90 }
-
-      before do
-        @module.update!(completion_requirements: { tag.id => { type: "min_score", min_score: } })
-        @submission = assignment.submit_homework(@user, body: "my homework")
-      end
-
-      context "when the score is close enough" do
-        let(:min_score) { 1 }
-        let(:score) { 0.9999999999999999 } # eg 0.3 + 0.3 + 0.3 + 0.1
-
-        it "evaluates requirement as complete" do
-          @submission.update!(score:, posted_at: 1.second.ago)
-          progression = @module.context_module_progressions.find_by(user: @user)
-          requirement = { id: tag.id, type: "min_score", min_score: }
-          expect(progression.requirements_met).to include requirement
-        end
-
-        it "works if score is nil" do
-          @submission.update!(score: nil, posted_at: 1.second.ago)
-          progression = @module.context_module_progressions.find_by(user: @user)
-          requirement = { id: tag.id, type: "min_score", min_score: }
-          expect(progression.requirements_met).not_to include requirement
-        end
-      end
 
       it "doesn't mark students that haven't submitted as in-progress" do
         other_student = student_in_course(course: @course, active_all: true).user
@@ -204,18 +179,78 @@ describe ContextModuleProgression do
         expect(progression.incomplete_requirements).to be_empty
       end
 
-      it "does not evaluate requirements when grade has not posted" do
-        @submission.update!(score: 100, posted_at: nil)
-        progression = @module.context_module_progressions.find_by(user: @user)
-        requirement = { id: tag.id, type: "min_score", min_score: 90.0, score: nil }
-        expect(progression.incomplete_requirements).to include requirement
+      context "evaluate min_score requirement type" do
+        let(:min_score) { 90 }
+
+        before do
+          @module.update!(completion_requirements: { tag.id => { type: "min_score", min_score: } })
+          @submission = assignment.submit_homework(@user, body: "my homework")
+        end
+
+        context "when the score is close enough" do
+          let(:min_score) { 1 }
+          let(:score) { 0.9999999999999999 } # eg 0.3 + 0.3 + 0.3 + 0.1
+
+          it "evaluates requirement as complete" do
+            @submission.update!(score:, posted_at: 1.second.ago)
+            progression = @module.context_module_progressions.find_by(user: @user)
+            requirement = { id: tag.id, type: "min_score", min_score: }
+            expect(progression.requirements_met).to include requirement
+          end
+
+          it "works if score is nil" do
+            @submission.update!(score: nil, posted_at: 1.second.ago)
+            progression = @module.context_module_progressions.find_by(user: @user)
+            requirement = { id: tag.id, type: "min_score", min_score: }
+            expect(progression.requirements_met).not_to include requirement
+          end
+        end
+
+        it "does not evaluate requirements when grade has not posted" do
+          @submission.update!(score: 100, posted_at: nil)
+          progression = @module.context_module_progressions.find_by(user: @user)
+          requirement = { id: tag.id, type: "min_score", min_score: 90.0, score: nil }
+          expect(progression.incomplete_requirements).to include requirement
+        end
+
+        it "evaluates requirements when grade has posted" do
+          @submission.update!(score: 100, posted_at: 1.second.ago)
+          progression = @module.context_module_progressions.find_by(user: @user)
+          requirement = { id: tag.id, type: "min_score", min_score: 90.0 }
+          expect(progression.requirements_met).to include requirement
+        end
       end
 
-      it "evaluates requirements when grade has posted" do
-        @submission.update!(score: 100, posted_at: 1.second.ago)
-        progression = @module.context_module_progressions.find_by(user: @user)
-        requirement = { id: tag.id, type: "min_score", min_score: 90.0 }
-        expect(progression.requirements_met).to include requirement
+      context "evaluate min_percentage requirement type" do
+        let(:min_percentage) { 75 }
+
+        before do
+          assignment.update!(points_possible: 200)
+          @module.update!(completion_requirements: { tag.id => { type: "min_percentage", min_percentage: } })
+          @submission = assignment.submit_homework(@user, body: "my homework")
+        end
+
+        it "does not evaluate requirements when grade has not posted" do
+          @submission.update!(score: 100, posted_at: nil)
+          progression = @module.context_module_progressions.find_by(user: @user)
+          requirement = { id: tag.id, type: "min_percentage", min_percentage: 75.0, score: nil }
+          expect(progression.incomplete_requirements).to include requirement
+        end
+
+        it "evaluates requirements when grade has posted" do
+          @submission.update!(score: 160, posted_at: 1.second.ago)
+          progression = @module.context_module_progressions.find_by(user: @user)
+          requirement = { id: tag.id, type: "min_percentage", min_percentage: 75.0 }
+          expect(progression.requirements_met).to include requirement
+        end
+
+        it "assignment points_possible not present" do
+          assignment.update!(points_possible: nil)
+          @submission.update!(score: 160, posted_at: 1.second.ago)
+          progression = @module.context_module_progressions.find_by(user: @user)
+          requirement = { id: tag.id, type: "min_percentage", min_percentage: 75.0, score: 160 }
+          expect(progression.incomplete_requirements).to include requirement
+        end
       end
     end
   end

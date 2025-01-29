@@ -33,7 +33,7 @@ describe('UserApi', () => {
     getStub = sandbox.stub(axios, 'get').returns(
       Promise.resolve({
         response: {},
-      })
+      }),
     )
   })
 

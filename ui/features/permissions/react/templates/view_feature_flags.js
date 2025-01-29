@@ -32,10 +32,10 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Feature Options (Account Settings)'),
       description: I18n.t(
-        'To manage Feature Options for an account, Feature Options - enable / disable must also be enabled.'
+        'To manage Feature Options for an account, Feature Options - enable / disable must also be enabled.',
       ),
     },
   ],
   [],
-  []
+  [],
 )

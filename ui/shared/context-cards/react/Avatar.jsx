@@ -25,7 +25,6 @@ import {Avatar as InstUIAvatar} from '@instructure/ui-avatar'
 
 const I18n = createI18nScope('student_context_trayAvatar')
 
- 
 class Avatar extends React.Component {
   static propTypes = {
     user: PropTypes.shape({

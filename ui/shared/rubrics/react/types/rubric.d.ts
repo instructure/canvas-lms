@@ -83,6 +83,7 @@ export type RubricAssessmentData = {
   ignoreForScoring?: boolean
   rubricSavedComments?: string[]
   saveCommentsForLater?: boolean
+  updatedAt?: string
 }
 
 export type UpdateAssessmentData = {
@@ -117,4 +118,9 @@ export type RubricImport = {
   }[]
   progress: number
   workflowState: string
+}
+
+export type RubricSubmissionUser = {
+  name?: string
+  avatarUrl?: string
 }

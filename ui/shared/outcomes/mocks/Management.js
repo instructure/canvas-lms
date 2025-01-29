@@ -195,7 +195,7 @@ export const treeGroupMocks = ({
     flattenDeep([
       Object.keys(groupsStruct).map(toString),
       Object.values(groupsStruct).flat().map(toString),
-    ])
+    ]),
   )
   const parents = groupIds.reduce((acc, gid) => {
     ;(groupsStruct[gid] || []).forEach(cid => (acc[cid] = gid))
@@ -349,7 +349,7 @@ export const outcomeGroup = {
   title: 'Grade.2.Math.3A.Elementary.CCSS.Calculus.1',
   description:
     '<p>This is a <strong><em>description</em></strong>. And because it’s so <strong>long</strong>, it will run out of space and hence be truncated. </p>'.repeat(
-      2
+      2,
     ),
   outcomesCount: 15,
   outcomes: {
@@ -366,7 +366,7 @@ export const outcomeGroup = {
           title: 'CCSS.Math.Content.2.MD.A.1 - Outcome with regular length title and description',
           description:
             '<p>Partition <strong>circles</strong> and <strong><em>rectangle</em></strong> into two, three, or four equal share. </p>'.repeat(
-              2
+              2,
             ),
           contextType: null,
           contextId: null,
@@ -387,7 +387,7 @@ export const outcomeGroup = {
             'CCSS.Math.Content.2.MD.A.1.CCSS.Math.Content.2.MD.A.1.CCSS.Math.Content.Outcome.with.long.title.and.description',
           description:
             '<p>Measure the <strong><em>length</em></strong> of an <strong>object</strong> by selecting and using appropriate measurements. </p>'.repeat(
-              2
+              2,
             ),
           contextType: null,
           contextId: null,
@@ -425,7 +425,7 @@ export const outcomeGroup = {
             'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math',
           description:
             '<p><em>Partition circles and rectangle into two, three, or four equal share. </em></p>'.repeat(
-              2
+              2,
             ),
           contextType: null,
           contextId: null,
@@ -446,7 +446,7 @@ export const outcomeGroup = {
             'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math',
           description:
             '<p><strong>Partition circles and rectangle into two, three, or four equal share. </strong></p>'.repeat(
-              2
+              2,
             ),
           contextType: null,
           contextId: null,
@@ -466,7 +466,7 @@ export const outcomeGroup = {
           title: 'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3',
           description:
             '<p>Partition circles and rectangle into two, three, or four equal share. </p>'.repeat(
-              2
+              2,
             ),
           contextType: null,
           contextId: null,
@@ -489,7 +489,7 @@ const createSearchGroupOutcomesOutcomeMocks = (
   contextId,
   contextType,
   title,
-  outcomeCount
+  outcomeCount,
 ) => {
   const calculationMethod = 'decaying_average'
   const calculationInt = 65
@@ -886,7 +886,7 @@ export const groupDetailMocks = ({
                     contextId,
                     contextType,
                     title,
-                    numOfOutcomes
+                    numOfOutcomes,
                   ),
                   __typename: 'ContentTagConnection',
                 },
@@ -2588,7 +2588,7 @@ export const courseAlignmentMocks = ({
 
   const generateAlignments = (num = 2) =>
     [...Array(num).keys()].map(el =>
-      generateAlignment({id: `${el + 1}`, title: `Alignment ${el + 1}`})
+      generateAlignment({id: `${el + 1}`, title: `Alignment ${el + 1}`}),
     )
 
   const generateOutcomeNode = (outcomeId, withAlignments = true, isRefetch = false) => ({

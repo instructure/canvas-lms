@@ -43,7 +43,7 @@ function renderEditor(props = {}) {
       }}
       {...props}
     />,
-    {container}
+    {container},
   )
 }
 
@@ -72,38 +72,22 @@ describe('BlockEditor', () => {
     expect(getBlockTag()).not.toBeInTheDocument()
   })
 
-  it.skip('shows the section menu and toolbar on first click', async () => {
+  it('shows the block toolbar on click', async () => {
     renderEditor()
-    expect(getBlockToolbar()).toBeInTheDocument()
-    expect(domGetByText(getBlockToolbar(), 'Blank Section')).toBeInTheDocument()
 
     const buttonBlock = getButton()
-    await user.click(buttonBlock)
-    await waitFor(() => {
-      expect(domGetByText(getBlockToolbar(), 'Blank Section')).toBeInTheDocument()
-    })
-  })
-
-  it.skip('shows the block toolbar on second click', async () => {
-    renderEditor()
-    expect(getBlockToolbar()).toBeInTheDocument()
-    expect(domGetByText(getBlockToolbar(), 'Blank Section')).toBeInTheDocument()
-
-    const buttonBlock = getButton()
-    await user.click(buttonBlock)
     await user.click(buttonBlock)
     await waitFor(() => {
       expect(domGetByText(getBlockToolbar(), 'Button')).toBeInTheDocument()
     })
     const toolbar = getBlockToolbar()
-    expect(domGetByText(toolbar, 'Drag to move')).toBeInTheDocument()
-    expect(domGetByText(toolbar, 'Go up')).toBeInTheDocument()
-    expect(domGetByText(toolbar, 'Delete')).toBeInTheDocument()
-    expect(domGetByText(toolbar, 'Link')).toBeInTheDocument()
-    expect(domGetByText(toolbar, 'Size')).toBeInTheDocument()
-    expect(domGetByText(toolbar, 'Style')).toBeInTheDocument()
-    expect(domGetByText(toolbar, 'Color')).toBeInTheDocument()
-    expect(domGetByText(toolbar, 'Select Icon')).toBeInTheDocument()
+    expect(toolbar).toBeInTheDocument()
+    expect(screen.getByText('Filled')).toBeInTheDocument()
+    expect(screen.getByText('Button Text/Link*')).toBeInTheDocument()
+    expect(screen.getByText('Color')).toBeInTheDocument()
+    expect(screen.getByText('Size')).toBeInTheDocument()
+    expect(screen.getByTitle('Style')).toBeInTheDocument()
+    expect(screen.getByText('Select Icon')).toBeInTheDocument()
   })
 
   it('switches to the new block on cick once section has been selected', async () => {
@@ -162,7 +146,7 @@ describe('BlockEditor', () => {
     })
 
     const deleteButton = domGetByText(getBlockToolbar(), 'Delete').closest(
-      'button'
+      'button',
     ) as HTMLButtonElement
     await user.click(deleteButton)
     await waitFor(() => {
@@ -183,7 +167,7 @@ describe('BlockEditor', () => {
       expect(domGetByText(getBlockToolbar(), 'Heading')).toBeInTheDocument()
     })
     const levelButton = domGetByText(getBlockToolbar(), 'Level').closest(
-      'button'
+      'button',
     ) as HTMLButtonElement
     await user.click(levelButton)
     await waitFor(() => {

@@ -18,16 +18,18 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {updateDiscussionEntryMock} from '../../graphql/Mocks'
-
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
 import {responsiveQuerySizes} from '../utils'
-
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {DiscussionThreadContainer} from '../containers/DiscussionThreadContainer/DiscussionThreadContainer'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  openWindow: jest.fn(),
+}))
 
 injectGlobalAlertContainers()
 
@@ -39,11 +41,9 @@ jest.mock('../utils', () => ({
 describe('DiscussionsAttachment', () => {
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
-  const openMock = jest.fn()
   beforeAll(() => {
     delete window.location
     window.location = {search: ''}
-    window.open = openMock
     window.ENV = {
       course_id: '1',
       SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
@@ -78,7 +78,7 @@ describe('DiscussionsAttachment', () => {
         >
           <DiscussionThreadContainer {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 
@@ -106,7 +106,7 @@ describe('DiscussionsAttachment', () => {
           quotedEntryId: '1337',
           // Since we set up the mock with the quotedEntryId, the test will only pass if the mutation variables
           // match the id, else we'd get an error
-        })
+        }),
       )
 
       expect(await container.findByText('This is the parent reply')).toBeInTheDocument()
@@ -129,7 +129,7 @@ describe('DiscussionsAttachment', () => {
       fireEvent.click(submitButton)
 
       await waitFor(() =>
-        expect(container.queryByText('This is the parent reply')).not.toBeInTheDocument()
+        expect(container.queryByText('This is the parent reply')).not.toBeInTheDocument(),
       )
 
       await waitFor(() => {

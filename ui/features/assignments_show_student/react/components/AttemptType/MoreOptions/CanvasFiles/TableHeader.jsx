@@ -52,7 +52,7 @@ const TableHeader = props => {
     <div style={headerStyle}>
       <Flex aria-hidden={true}>
         {tableHeadings.map((header, index) =>
-          renderTableHeader(header.name, header.size, index, header.grow)
+          renderTableHeader(header.name, header.size, index, header.grow),
         )}
       </Flex>
     </div>

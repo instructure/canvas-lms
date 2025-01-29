@@ -26,18 +26,12 @@ import {LtiPrivacyLevels} from '../../model/LtiPrivacyLevel'
 import {i18nLtiPrivacyLevel} from '../../model/i18nLtiPrivacyLevel'
 
 describe('PrivacyConfirmationWrapper', () => {
-  const appName = 'Test App'
-
   it('renders the PrivacyConfirmation component with the correct props', () => {
-    const internalConfig = mockInternalConfiguration()
+    const internalConfig = mockInternalConfiguration({title: 'Test App'})
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
-      <PrivacyConfirmationWrapper
-        overlayStore={overlayStore}
-        appName={appName}
-        internalConfig={internalConfig}
-      />
+      <PrivacyConfirmationWrapper overlayStore={overlayStore} internalConfig={internalConfig} />,
     )
 
     expect(screen.getByText(/Data Sharing/i)).toBeInTheDocument()
@@ -50,11 +44,7 @@ describe('PrivacyConfirmationWrapper', () => {
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
-      <PrivacyConfirmationWrapper
-        overlayStore={overlayStore}
-        appName={appName}
-        internalConfig={internalConfig}
-      />
+      <PrivacyConfirmationWrapper overlayStore={overlayStore} internalConfig={internalConfig} />,
     )
 
     const select = screen.getByLabelText(/User Data Shared With This App/i)
@@ -66,11 +56,7 @@ describe('PrivacyConfirmationWrapper', () => {
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
-      <PrivacyConfirmationWrapper
-        overlayStore={overlayStore}
-        appName={appName}
-        internalConfig={internalConfig}
-      />
+      <PrivacyConfirmationWrapper overlayStore={overlayStore} internalConfig={internalConfig} />,
     )
 
     const select = screen.getByLabelText(/User Data Shared With This App/i)

@@ -58,10 +58,10 @@ export default class CommMessagesContentPaneView extends Backbone.View {
         user: this.searchForm.model.get('name'),
         start_date: this.getDisplayDateText(
           dates.start_time,
-          I18n.t('from_beginning', 'the beginning')
+          I18n.t('from_beginning', 'the beginning'),
         ),
         end_date: this.getDisplayDateText(dates.end_time, I18n.t('to_now', 'now')),
-      })
+      }),
     )
     return this.$overview.show()
   }

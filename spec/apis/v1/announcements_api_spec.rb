@@ -297,7 +297,6 @@ describe "Announcements API", type: :request do
     before :once do
       @observer = observer_in_course(name: "bob's mom", course: @course, active_all: true).user
       observer_in_course(user: @observer, associated_user_id: @student, course: @course1, active_all: true)
-      Account.site_admin.enable_feature!(:selective_release_backend)
     end
 
     it "orders by reverse chronological order" do

@@ -34,7 +34,7 @@ describe('InternalSettingActionButtons', () => {
         onClearPendingChange={onClearChanges}
         onDelete={onDelete}
         pendingChange={true}
-      />
+      />,
     )
 
     expect(queryByText('Delete "my_setting"')).not.toBeInTheDocument()
@@ -49,7 +49,7 @@ describe('InternalSettingActionButtons', () => {
         onSubmitPendingChange={onSubmitChanges}
         onClearPendingChange={onClearChanges}
         onDelete={onDelete}
-      />
+      />,
     )
 
     expect(queryByText('Save "my_setting"')).not.toBeInTheDocument()
@@ -65,7 +65,7 @@ describe('InternalSettingActionButtons', () => {
         onSubmitPendingChange={onSubmitChanges}
         onClearPendingChange={onClearChanges}
         onDelete={onDelete}
-      />
+      />,
     )
 
     await user.click(getByText('Delete "my_setting"').closest('button') as HTMLElement)
@@ -78,7 +78,7 @@ describe('InternalSettingActionButtons', () => {
         onClearPendingChange={onClearChanges}
         onDelete={onDelete}
         pendingChange={true}
-      />
+      />,
     )
 
     await user.click(getByText('Save "my_setting"').closest('button') as HTMLElement)
@@ -96,7 +96,7 @@ describe('InternalSettingActionButtons', () => {
         onClearPendingChange={onClearChanges}
         onDelete={onDelete}
         secret={true}
-      />
+      />,
     )
 
     expect(queryByText('Delete "my_setting"')).not.toBeInTheDocument()
@@ -104,7 +104,7 @@ describe('InternalSettingActionButtons', () => {
     await userEvent.hover(container)
 
     expect(
-      getByText('This is a secret setting, and may only be modified from the console')
+      getByText('This is a secret setting, and may only be modified from the console'),
     ).toBeInTheDocument()
   })
 })

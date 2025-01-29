@@ -19,7 +19,6 @@
 import {createGradebook} from '../../../__tests__/GradebookSpecHelper'
 import TotalGradeOverrideCellFormatter from '../TotalGradeOverrideCellFormatter'
 import useStore from '../../../stores'
-import sinon from 'sinon'
 
 describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
   let $fixture
@@ -51,7 +50,7 @@ describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
         },
       },
     }
-    sinon.stub(gradebook, 'isFilteringColumnsByGradingPeriod').returns(false)
+    jest.spyOn(gradebook, 'isFilteringColumnsByGradingPeriod').mockReturnValue(false)
     gradebook.gradingPeriodId = '1501'
   })
 
@@ -67,7 +66,7 @@ describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
       0, // cell
       null, // value
       null, // column definition
-      {id: '1101'} // student (dataContext)
+      {id: '1101'}, // student (dataContext)
     )
     return $fixture
   }
@@ -102,7 +101,7 @@ describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
 
     describe('when not using a grading scheme', () => {
       beforeEach(() => {
-        sinon.stub(gradebook, 'getCourseGradingScheme').returns(null)
+        jest.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
       })
 
       test('renders the percentage of the grade', () => {
@@ -129,7 +128,7 @@ describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
 
   describe('when displaying grading period grade overrides', () => {
     beforeEach(() => {
-      gradebook.isFilteringColumnsByGradingPeriod.returns(true)
+      gradebook.isFilteringColumnsByGradingPeriod.mockReturnValue(true)
     })
 
     describe('when using a grading scheme', () => {
@@ -160,7 +159,7 @@ describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
 
     describe('when not using a grading scheme', () => {
       beforeEach(() => {
-        sinon.stub(gradebook, 'getCourseGradingScheme').returns(null)
+        jest.spyOn(gradebook, 'getCourseGradingScheme').mockReturnValue(null)
       })
 
       test('renders the percentage of the grade', () => {
@@ -199,7 +198,7 @@ describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
           0, // cell
           null, // value
           null, // column definition
-          {id: '1101'} // student (dataContext)
+          {id: '1101'}, // student (dataContext)
         )
         return $fixture
       }
@@ -224,28 +223,28 @@ describe('GradebookGrid TotalGradeOverrideCellFormatter', () => {
       test('does not render cell color change when custom status FF is OFF', () => {
         renderCustomStatusCell('0', false)
         expect(
-          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-1')
+          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-1'),
         ).toBe(false)
       })
 
       test('renders the custom grade status cell color', () => {
         renderCustomStatusCell()
         expect(
-          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-1')
+          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-1'),
         ).toBe(true)
       })
 
       test('renders the custom grade status cell color for correct grading period', () => {
         renderCustomStatusCell('11')
         expect(
-          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-2')
+          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-2'),
         ).toBe(true)
       })
 
       test('renders no color class when non existent grading period is passed', () => {
         renderCustomStatusCell('12')
         expect(
-          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-2')
+          $fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-2'),
         ).toBe(false)
       })
     })

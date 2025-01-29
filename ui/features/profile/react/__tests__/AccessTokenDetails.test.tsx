@@ -33,11 +33,12 @@ describe('AccessTokenDetails', () => {
     expires_at: '2022-02-02T00:00:00Z',
     purpose: 'Mock purpose',
     visible_token,
+    can_manually_regenerate: true,
   }
   const props: AccessTokenDetailsProps = {
     loadedToken,
     url: '/url',
-    isEligibleForTokenRegeneration: true,
+    userCanUpdateTokens: true,
     onClose: jest.fn(),
     onTokenLoad: jest.fn(),
   }
@@ -75,7 +76,7 @@ describe('AccessTokenDetails', () => {
     render(<AccessTokenDetails {...props} loadedToken={undefined} />)
 
     const error = await screen.findByText(
-      'Failed to load access token details. Please try again later.'
+      'Failed to load access token details. Please try again later.',
     )
     expect(error).toBeInTheDocument()
   })
@@ -98,34 +99,46 @@ describe('AccessTokenDetails', () => {
       <AccessTokenDetails
         {...props}
         loadedToken={{...loadedToken, visible_token: fully_visible_token}}
-      />
+      />,
     )
 
     const warning = screen.getByText(
-      /once you leave this page you won't be able to retrieve the full token anymore, you'll have to regenerate it to get a new value./i
+      /once you leave this page you won't be able to retrieve the full token anymore, you'll have to regenerate it to get a new value./i,
     )
     expect(warning).toBeInTheDocument()
   })
 
   it('should NOT be able to regenerate the token if the user is NOT eligible', () => {
-    render(<AccessTokenDetails {...props} isEligibleForTokenRegeneration={false} />)
+    render(<AccessTokenDetails {...props} userCanUpdateTokens={false} />)
 
     const regenerateButton = screen.queryByText('Regenerate Token')
     expect(regenerateButton).not.toBeInTheDocument()
   })
 
   it('should be able to regenerate the token if the user is eligible', async () => {
-    render(<AccessTokenDetails {...props} isEligibleForTokenRegeneration={true} />)
+    render(<AccessTokenDetails {...props} userCanUpdateTokens={true} />)
 
     const regenerateButton = await screen.findByText('Regenerate Token')
     expect(regenerateButton).toBeInTheDocument()
+  })
+
+  it('should disable the regenerate button if the token is not eligible', async () => {
+    render(
+      <AccessTokenDetails
+        {...props}
+        loadedToken={{...loadedToken, can_manually_regenerate: false}}
+      />,
+    )
+
+    const regenerateButton = (await screen.findByText('Regenerate Token')).closest('button')
+    expect(regenerateButton).toBeDisabled()
   })
 
   it('should update the token if the regeneration request succeed', async () => {
     fetchMock.put(
       props.url,
       {...loadedToken, visible_token: fully_visible_token},
-      {overwriteRoutes: true}
+      {overwriteRoutes: true},
     )
     jest.spyOn(window, 'confirm').mockImplementationOnce(() => true)
     render(<AccessTokenDetails {...props} />)

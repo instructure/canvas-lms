@@ -30,7 +30,7 @@ export default class QuestionFlagged extends EventTracker {
       const questionId = parseQuestionId($question[0])
 
       debugConsole.log(
-        `Question ${questionId} ${isFlagged ? 'is now flagged' : 'is no longer flagged'}.`
+        `Question ${questionId} ${isFlagged ? 'is now flagged' : 'is no longer flagged'}.`,
       )
 
       return deliver({

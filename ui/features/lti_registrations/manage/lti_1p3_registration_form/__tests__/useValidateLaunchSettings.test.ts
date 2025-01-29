@@ -37,7 +37,7 @@ describe('useValidateLaunchSettings', () => {
   const internalConfig = mockInternalConfiguration()
 
   const createLaunchSettings = (
-    overrides: Partial<Lti1p3RegistrationOverlayState['launchSettings']> = {}
+    overrides: Partial<Lti1p3RegistrationOverlayState['launchSettings']> = {},
   ): Lti1p3RegistrationOverlayState['launchSettings'] => ({
     redirectURIs: `${validUrl}\n${validUrl}`,
     targetLinkURI: `${validUrl}/launch`,

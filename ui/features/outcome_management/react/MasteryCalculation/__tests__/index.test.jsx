@@ -60,14 +60,14 @@ describe('MasteryCalculation', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '11', mocks = masteryCalculationGraphqlMocks} = {}
+    {contextType = 'Account', contextId = '11', mocks = masteryCalculationGraphqlMocks} = {},
   ) => {
     return rtlRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         <MockedProvider addTypename={false} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -90,18 +90,20 @@ describe('MasteryCalculation', () => {
     const {getByText, getAllByText} = render(<MasteryCalculation />)
     await act(async () => jest.runAllTimers())
     expect(
-      getByText(/Permission to change this mastery calculation at the account level is enabled for/)
+      getByText(
+        /Permission to change this mastery calculation at the account level is enabled for/,
+      ),
     ).not.toEqual(null)
     expect(
-      getByText(/Permission to change this mastery calculation at the course level is enabled for/)
+      getByText(/Permission to change this mastery calculation at the course level is enabled for/),
     ).not.toEqual(null)
-    expect(getAllByText(/Account Admin/).length).not.toBe(0)
+    expect(getAllByText(/Account Admin/)).not.toHaveLength(0)
     expect(getByText(/Teacher/)).not.toEqual(null)
   })
 
   it('displays an error on failed request', async () => {
     const mocks = [...masteryCalculationGraphqlMocks]
-    mocks[0] = { ...mocks[0], result: { errors: new Error('aw shucks') } }
+    mocks[0] = {...mocks[0], result: {errors: new Error('aw shucks')}}
 
     const {getByText} = render(<MasteryCalculation />, {mocks: mocks})
     await act(async () => jest.runAllTimers())

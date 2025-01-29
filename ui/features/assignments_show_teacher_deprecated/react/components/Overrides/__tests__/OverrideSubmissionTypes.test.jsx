@@ -33,7 +33,7 @@ it('renders an OverrideSubmissionType summary', () => {
     ],
   })
   const {getByText} = render(
-    <OverrideSubmissionTypes variant="summary" override={override} onChangeOverride={() => {}} />
+    <OverrideSubmissionTypes variant="summary" override={override} onChangeOverride={() => {}} />,
   )
   const submission_types = 'No Submission & App & File & On Paper & Text Entry & URL'
   const elem = getByText(/^No Submission/)
@@ -53,7 +53,7 @@ it.skip('renders details of a file submission type', () => {
     submissionTypes: ['online_upload'],
   })
   const {getByText} = render(
-    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />,
   )
   expect(getByText('Item 1')).toBeInTheDocument()
   expect(getByText('File')).toBeInTheDocument()
@@ -66,7 +66,7 @@ it.skip('renders details of a restricted-type file submission type', () => {
     allowedExtensions: ['doc', 'xls'],
   })
   const {getByText} = render(
-    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />,
   )
   expect(getByText('Item 1')).toBeInTheDocument()
   expect(getByText('File')).toBeInTheDocument()
@@ -79,7 +79,7 @@ it('renders details of an external tool submission type', () => {
     submissionTypes: ['external_tool'],
   })
   const {getByText} = render(
-    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />,
   )
   expect(getByText('Item 1')).toBeInTheDocument()
   expect(getByText('App')).toBeInTheDocument()
@@ -90,7 +90,7 @@ it('renders details of a text submission type', () => {
     submissionTypes: ['online_text_entry'],
   })
   const {getByText} = render(
-    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />,
   )
   expect(getByText('Item 1')).toBeInTheDocument()
   expect(getByText('Text Entry')).toBeInTheDocument()
@@ -101,7 +101,7 @@ it('renders details of a url submission type', () => {
     submissionTypes: ['online_url'],
   })
   const {getByText} = render(
-    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />,
   )
   expect(getByText('Item 1')).toBeInTheDocument()
   expect(getByText('URL')).toBeInTheDocument()
@@ -112,7 +112,7 @@ it.skip('renders details of multiple submission types', () => {
     submissionTypes: ['online_text_entry', 'online_url', 'online_upload'],
   })
   const {getByText} = render(
-    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />,
   )
   expect(getByText('Item 1')).toBeInTheDocument()
   expect(getByText('Text Entry')).toBeInTheDocument()

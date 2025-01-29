@@ -25,7 +25,7 @@ import {ApiCallStatus} from './ApiCallStatus'
 export const useAccountDefaultGradingSchemeUpdate = (): {
   updateAccountDefaultGradingScheme: (
     contextId: string,
-    id: string | null
+    id: string | null,
   ) => Promise<GradingScheme | null>
   updateAccountDefaultGradingSchemeStatus: string
 } => {
@@ -54,7 +54,7 @@ export const useAccountDefaultGradingSchemeUpdate = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

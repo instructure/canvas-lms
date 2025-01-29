@@ -76,7 +76,7 @@ export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
         <Flex.Item>
           <Table
             caption={I18n.t(
-              'A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.'
+              'A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.',
             )}
             layout="fixed"
             data-testid="default_canvas_grading_scheme_data_table"

@@ -67,18 +67,18 @@ interface DynamicRegistrationActions {
   loadingRegistrationToken: () => void
   loadingRegistration: (
     registrationToken: RegistrationToken,
-    dynamicRegistrationUrl: string
+    dynamicRegistrationUrl: string,
   ) => void
   confirm: (registration: LtiRegistration, overlayStore: StoreApi<RegistrationOverlayStore>) => void
   enableAndClose: (
     contextId: string,
     registration: LtiRegistration,
-    overlay: RegistrationOverlay
+    overlay: RegistrationOverlay,
   ) => Promise<unknown>
   closeAndSaveOverlay: (
     accountId: string,
     registration: LtiRegistration,
-    overlay: RegistrationOverlay
+    overlay: RegistrationOverlay,
   ) => Promise<unknown>
   deleteKey: (registration: LtiRegistration) => Promise<unknown>
   error: (error?: Error) => void
@@ -189,7 +189,7 @@ const loadingRegistrationToken = (dynamicRegistrationUrl: string): DynamicRegist
  */
 const registering = (
   dynamicRegistrationUrl: string,
-  registrationToken: RegistrationToken
+  registrationToken: RegistrationToken,
 ): DynamicRegistrationState => ({
   tag: 'registering',
   dynamicRegistrationUrl,
@@ -198,7 +198,7 @@ const registering = (
 
 const loadingRegistration = (
   registrationToken: RegistrationToken,
-  dynamicRegistrationUrl: string
+  dynamicRegistrationUrl: string,
 ): DynamicRegistrationState => ({
   tag: 'loading_registration',
   dynamicRegistrationUrl,
@@ -217,7 +217,7 @@ const confirmationState =
       tag,
       registration,
       overlayStore,
-    } as const)
+    }) as const
 
 const confirming = confirmationState('confirming')
 const enablingAndClosing = confirmationState('enabling_and_closing')
@@ -236,8 +236,8 @@ const stateFrom =
   (
     mkNewState: (
       oldState: Extract<DynamicRegistrationState, {tag: T}>,
-      actions: DynamicRegistrationActions
-    ) => DynamicRegistrationState
+      actions: DynamicRegistrationActions,
+    ) => DynamicRegistrationState,
   ) =>
   (oldState: {state: DynamicRegistrationState} & DynamicRegistrationActions) => {
     if (oldState.state.tag === tag) {
@@ -284,7 +284,7 @@ export const useDynamicRegistrationState = create<
         }
         window.addEventListener('message', onMessage)
         return registering(state.dynamicRegistrationUrl, registrationToken)
-      })
+      }),
     ),
   loadingRegistration: (registrationToken: RegistrationToken, dynamicRegistrationUrl: string) =>
     set(stateFor(loadingRegistration(registrationToken, dynamicRegistrationUrl))),
@@ -293,10 +293,10 @@ export const useDynamicRegistrationState = create<
   enableAndClose: (
     accountId: string,
     registration: LtiRegistration,
-    overlay: RegistrationOverlay
+    overlay: RegistrationOverlay,
   ) => {
     set(
-      stateFrom('confirming')(state => enablingAndClosing(state.registration, state.overlayStore))
+      stateFrom('confirming')(state => enablingAndClosing(state.registration, state.overlayStore)),
     )
     return Promise.all([
       updateRegistrationOverlay(accountId, registration.id, overlay),
@@ -306,17 +306,17 @@ export const useDynamicRegistrationState = create<
   closeAndSaveOverlay: (
     accountId: string,
     registration: LtiRegistration,
-    overlay: RegistrationOverlay
+    overlay: RegistrationOverlay,
   ) => {
     set(stateFrom('confirming')(state => closingAndSaving(state.registration, state.overlayStore)))
     return updateRegistrationOverlay(accountId, registration.id, overlay).catch(err =>
-      set(stateFor(errorState(err)))
+      set(stateFor(errorState(err))),
     )
   },
   deleteKey: (registration: LtiRegistration) => {
     set(stateFrom('confirming')(state => deleting(state.registration, state.overlayStore)))
     return deleteDeveloperKey(registration.developer_key_id).catch(err =>
-      set(stateFor(errorState(err)))
+      set(stateFor(errorState(err))),
     )
   },
   error: (error?: Error) => set(stateFor(errorState(error))),

@@ -145,7 +145,7 @@ export default class GradebookKeyboardNav {
 
   preprocessKeydown(
     handler: (e: KeyboardEvent) => void,
-    usePrevActiveLocation: boolean = false
+    usePrevActiveLocation: boolean = false,
   ): (e: KeyboardEvent) => void {
     return e => {
       if (!this.shouldHandleEvent(e) || !this.haveLocation(usePrevActiveLocation)) {
@@ -174,7 +174,7 @@ export default class GradebookKeyboardNav {
     if (this.prevActiveLocation.region === 'header') {
       this.gridSupport.state.setActiveLocation(
         this.prevActiveLocation.region,
-        this.prevActiveLocation
+        this.prevActiveLocation,
       )
       if (this.prevActiveElement instanceof HTMLElement) {
         this.prevActiveElement.focus()
@@ -182,7 +182,7 @@ export default class GradebookKeyboardNav {
     } else {
       this.gridSupport.state.setActiveLocation(
         this.prevActiveLocation.region,
-        this.prevActiveLocation
+        this.prevActiveLocation,
       )
       if (this.currentColumnType() === 'assignment') {
         // return to the cell, but do not engage the editor

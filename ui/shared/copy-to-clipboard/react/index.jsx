@@ -32,7 +32,7 @@ const CopyToClipboard = props => {
 
   // Object containing props intended for the TextInput component
   const textInputProps = Object.fromEntries(
-    Object.entries(props).filter(([k]) => !copyToClipboardProps.includes(k))
+    Object.entries(props).filter(([k]) => !copyToClipboardProps.includes(k)),
   )
 
   const copyToClipboard = () => {

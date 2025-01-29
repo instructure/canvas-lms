@@ -24,6 +24,7 @@ import {
   type DateAdjustmentConfig,
   type MigrationCreateRequestBody,
   type onSubmitMigrationFormCallback,
+  type ItemType,
 } from '@canvas/content-migrations'
 
 export type ContentMigrationItemSettings = {
@@ -81,12 +82,31 @@ export type AttachmentProgressResponse = ContentMigrationItem & {
 export type UpdateMigrationItemType = (
   contentMigrationItemId: string,
   data?: object,
-  noXHR?: boolean
+  noXHR?: boolean,
 ) => Promise<ContentMigrationItem | undefined>
 
 export type QuestionBankSettings = {
   question_bank_id?: string | number
   question_bank_name?: string
+}
+
+export type GenericItemResponse = {
+  property: string
+  title: string
+  type: ItemType
+  sub_items?: GenericItemResponse[]
+  linked_resource?: {
+    migration_id: string
+    type: ItemType
+  }
+  migration_id?: string
+}
+
+export type SelectiveDataRequest = {
+  id: string
+  user_id: string
+  copy: {[key: string]: string | {[key: string]: string}}
+  workflow_state: ContentMigrationWorkflowState
 }
 
 export type {

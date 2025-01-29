@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -37,6 +36,7 @@ import {
 import {SyncState} from '../../shared/types'
 import {paceContextsActions} from '../pace_contexts'
 import {enableFetchMocks} from 'jest-fetch-mock'
+import type {CoursePace, CoursePacesState, StoreState} from '../../types'
 
 enableFetchMocks()
 
@@ -50,12 +50,12 @@ const dispatch = jest.fn()
 
 const mockGetState =
   (
-    pace,
-    originalPace,
+    pace: CoursePacesState,
+    originalPace: CoursePace,
     blackoutDates = DEFAULT_BLACKOUT_DATE_STATE,
-    originalBlackoutDates = BLACKOUT_DATES
+    originalBlackoutDates = BLACKOUT_DATES,
   ) =>
-  () => ({
+  (): StoreState => ({
     ...DEFAULT_STORE_STATE,
     coursePace: {...pace},
     blackoutDates,
@@ -94,7 +94,7 @@ describe('Course paces actions', () => {
       expect(dispatch.mock.calls[3]).toEqual([coursePaceActions.setProgress(PROGRESS_RUNNING)])
       // Compare dispatched functions by name since they won't be directly equal
       expect(JSON.stringify(dispatch.mock.calls[4])).toEqual(
-        JSON.stringify([coursePaceActions.pollForPublishStatus()])
+        JSON.stringify([coursePaceActions.pollForPublishStatus()]),
       )
       expect(dispatch.mock.calls[5]).toEqual([
         paceContextsActions.addPublishingPace({
@@ -190,14 +190,14 @@ describe('Course paces actions', () => {
       jest.advanceTimersByTime(PUBLISH_STATUS_POLLING_MS)
 
       await waitFor(() => {
-        expect(dispatch.mock.calls.length).toBe(6)
+        expect(dispatch.mock.calls).toHaveLength(6)
         expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('checkPublishStatus')])
         expect(dispatch.mock.calls[2]).toEqual([coursePaceActions.setProgress(undefined)])
         expect(dispatch.mock.calls[4]).toEqual([
           coursePaceActions.coursePaceSaved(getState().coursePace),
         ])
         expect(
-          screen.getAllByText(`${contextsPublishing[0].pace_context?.name} Pace updated`)[0]
+          screen.getAllByText(`${contextsPublishing[0].pace_context?.name} Pace updated`)[0],
         ).toBeInTheDocument()
       })
     })
@@ -262,10 +262,10 @@ describe('Course paces actions', () => {
                   id: item.id,
                   duration: item.duration,
                   module_item_id: item.module_item_id,
-                }))
+                })),
               )
             },
-            []
+            [],
           ),
           selected_days_to_skip: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.selected_days_to_skip,
           exclude_weekends: PRIMARY_PACE.exclude_weekends,
@@ -293,10 +293,10 @@ describe('Course paces actions', () => {
                     id: item.id,
                     duration: item.duration,
                     module_item_id: item.module_item_id,
-                  }))
+                  })),
                 )
               },
-              []
+              [],
             ),
           selected_days_to_skip: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.selected_days_to_skip,
           exclude_weekends: true,
@@ -326,7 +326,7 @@ describe('Course paces actions', () => {
 
   describe('syncUnpublishedChanges', () => {
     it('saves blackout dates and publishes the pace', async () => {
-      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const asyncDispatch = jest.fn((..._args) => Promise.resolve())
       const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}
       const getState = mockGetState(updatedPace, PRIMARY_PACE, {
         syncing: SyncState.UNSYNCED,
@@ -336,7 +336,7 @@ describe('Course paces actions', () => {
       const thunkedAction = coursePaceActions.syncUnpublishedChanges()
       await thunkedAction(asyncDispatch, getState)
 
-      expect(asyncDispatch.mock.calls.length).toBe(5)
+      expect(asyncDispatch.mock.calls).toHaveLength(5)
       expect(asyncDispatch.mock.calls[0]).toEqual([uiActions.clearCategoryError('publish')])
       expect(asyncDispatch.mock.calls[1]).toEqual([uiActions.startSyncing()])
       expect(typeof asyncDispatch.mock.calls[2][0]).toBe('function') // dispatch syncBlackoutDates
@@ -352,7 +352,7 @@ describe('Course paces actions', () => {
       const thunkedAction = coursePaceActions.syncUnpublishedChanges()
       await thunkedAction(asyncDispatch, getState)
 
-      expect(asyncDispatch.mock.calls.length).toBe(2)
+      expect(asyncDispatch.mock.calls).toHaveLength(2)
     })
   })
 
@@ -365,7 +365,7 @@ describe('Course paces actions', () => {
       const thunkedAction = coursePaceActions.removePace()
       await thunkedAction(asyncDispatch, getState)
 
-      expect(asyncDispatch.mock.calls.length).toBe(5)
+      expect(asyncDispatch.mock.calls).toHaveLength(5)
       expect(asyncDispatch.mock.calls[0]).toEqual([
         uiActions.showLoadingOverlay('Removing pace...'),
       ])
@@ -429,7 +429,7 @@ describe('Course paces actions', () => {
       const thunkedAction = coursePaceActions.removePace()
       await thunkedAction(asyncDispatch, getState)
 
-      expect(asyncDispatch.mock.calls.length).toBe(4)
+      expect(asyncDispatch.mock.calls).toHaveLength(4)
       expect(asyncDispatch.mock.calls[0]).toEqual([
         uiActions.showLoadingOverlay('Removing pace...'),
       ])

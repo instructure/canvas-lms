@@ -27,7 +27,7 @@ export const addAttachmentsFn =
     setPendingUploads,
     messageAttachmentUploadFolderId,
     setOnFailure,
-    setOnSuccess
+    setOnSuccess,
   ) =>
   async e => {
     const fileUploadUrl = `/api/v1/folders/${messageAttachmentUploadFolderId}/files`
@@ -53,7 +53,7 @@ export const addAttachmentsFn =
     } finally {
       setPendingUploads(prev => {
         const attachmentsStillUploading = prev.filter(
-          file => !newAttachmentsToUpload.includes(file)
+          file => !newAttachmentsToUpload.includes(file),
         )
         return attachmentsStillUploading
       })

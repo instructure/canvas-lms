@@ -164,7 +164,7 @@ export const PaceModalStats = ({
             ? getColoredText(
                 '#66189D',
                 dateFormatter(moment.tz(dateValue, coursePaceTimezone).toDate()),
-                {weight: 'bold'}
+                {weight: 'bold'},
               )
             : getColoredText('#66189D', `${DASH} ${I18n.t('Not Specified')} ${DASH}`, {
                 weight: 'bold',
@@ -214,7 +214,7 @@ export const PaceModalStats = ({
             I18n.t('Start Date'),
             startDateValue,
             captions.startDate,
-            'coursepace-start-date'
+            'coursepace-start-date',
           )}
         </Flex.Item>
         <Flex.Item margin="0 medium medium 0" shouldGrow={true}>
@@ -229,7 +229,7 @@ export const PaceModalStats = ({
             I18n.t('End Date'),
             endDateValue,
             captions.endDate,
-            'coursepace-end-date'
+            'coursepace-end-date',
           )}
         </Flex.Item>
       </View>
@@ -278,14 +278,14 @@ export const PaceModalStats = ({
         one: '1 week',
         other: '%{count} weeks',
       },
-      {count: paceDuration.weeks}
+      {count: paceDuration.weeks},
     )
     const days = I18n.t(
       {
         one: '1 day',
         other: '%{count} days',
       },
-      {count: paceDuration.days}
+      {count: paceDuration.days},
     )
 
     const duration = `${weeks}, ${days}`

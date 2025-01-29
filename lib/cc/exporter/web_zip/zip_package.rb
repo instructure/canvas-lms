@@ -347,7 +347,13 @@ module CC::Exporter::WebZip
       reqs_for_item = completion_reqs.find { |req| req[:id] == item.id }
       return unless reqs_for_item
 
-      [reqs_for_item[:type], reqs_for_item[:min_score]]
+      min_score = if reqs_for_item[:type] == "min_percentage"
+                    (item.assignment.points_possible * reqs_for_item[:min_percentage]) / 100
+                  else
+                    reqs_for_item[:min_score]
+                  end
+
+      [reqs_for_item[:type], min_score]
     end
 
     def parse_content(item_content)

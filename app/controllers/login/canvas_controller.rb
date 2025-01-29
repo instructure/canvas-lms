@@ -212,6 +212,8 @@ class Login::CanvasController < ApplicationController
         display_name: provider.class.display_name
       }
     end
+    # disable custom js/css if flag enabled
+    @exclude_account_css = @exclude_account_js = @domain_root_account.feature_enabled?(:login_registration_ui_identity)
     render "login/canvas/new_login", layout: "bare", status: status || :ok
   end
 

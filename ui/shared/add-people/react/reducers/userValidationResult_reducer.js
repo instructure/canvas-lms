@@ -145,5 +145,5 @@ export default handleActions(
         : state
     },
   },
-  defaultState.userValidationResult
+  defaultState.userValidationResult,
 )

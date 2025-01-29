@@ -22,7 +22,8 @@ import 'jqueryui/dialog'
 
 describe('Dialog Widget', () => {
   beforeEach(() => {
-    document.body.innerHTML = '<div id="fixtures"><div id="test-dialog" title="Test Dialog">Test Content</div></div>'
+    document.body.innerHTML =
+      '<div id="fixtures"><div id="test-dialog" title="Test Dialog">Test Content</div></div>'
   })
 
   afterEach(() => {

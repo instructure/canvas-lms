@@ -51,7 +51,7 @@ describe('ContentTypeExternalToolDrawer', () => {
         onExternalContentReady={onExternalContentReady}
         open={true}
         {...props}
-      />
+      />,
     )
   }
 
@@ -68,7 +68,7 @@ describe('ContentTypeExternalToolDrawer', () => {
   it('calls onDismiss when close button is clicked', () => {
     const {getByText} = renderTray()
     fireEvent.click(getByText('Close'))
-    expect(onDismiss.mock.calls.length).toBe(1)
+    expect(onDismiss.mock.calls).toHaveLength(1)
   })
 
   it('includes page content', () => {
@@ -127,7 +127,7 @@ describe('ContentTypeExternalToolDrawer', () => {
         onDismiss={onDismiss}
         onExternalContentReady={onExternalContentReady}
         open={true}
-      />
+      />,
     )
     expect(queryByTestId('ltiIframe')).toBeNull()
   })

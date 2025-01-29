@@ -25,7 +25,7 @@ const I18n = createI18nScope('user_restore')
 export default class UserRestore extends CourseRestore {
   searchUrl() {
     return `/accounts/${this.get('account_id')}/users/${this.get(
-      'id'
+      'id',
     )}.json?include_deleted_users=true`
   }
 
@@ -47,7 +47,7 @@ export default class UserRestore extends CourseRestore {
 
     restoreError = (_response = {}) => {
       $.flashError(
-        I18n.t('There was an error attempting to restore the user. User was not restored.')
+        I18n.t('There was an error attempting to restore the user. User was not restored.'),
       )
       return deferred.reject()
     }

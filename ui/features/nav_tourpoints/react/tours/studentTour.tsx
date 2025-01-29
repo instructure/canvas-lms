@@ -96,7 +96,7 @@ export default [
         </Heading>
         <Text as="p">
           {I18n.t(
-            'Access your courses and groups using any iOS or Android mobile device and find more information in the Help menu.'
+            'Access your courses and groups using any iOS or Android mobile device and find more information in the Help menu.',
           )}
         </Text>
         <ul>

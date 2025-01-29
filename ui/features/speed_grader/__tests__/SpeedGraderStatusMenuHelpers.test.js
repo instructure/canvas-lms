@@ -101,7 +101,7 @@ describe('makeSubmissionUpdateRequest', () => {
     moxios.wait(() => {
       const request = moxios.requests.mostRecent()
       expect(request.url).toEqual(
-        `/api/v1/courses/1/assignments/2/anonymous_submissions/${submission.anonymous_id}`
+        `/api/v1/courses/1/assignments/2/anonymous_submissions/${submission.anonymous_id}`,
       )
       done()
     })

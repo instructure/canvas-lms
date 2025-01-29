@@ -35,7 +35,7 @@ function schemeKeyForPercentage(percentage, gradingScheme: DeprecatedGradingSche
       percentage,
       gradingScheme.data,
       gradingScheme.pointsBased,
-      gradingScheme.scalingFactor
+      gradingScheme.scalingFactor,
     )
     return GradeFormatHelper.replaceDashWithMinus(grade)
   }
@@ -106,7 +106,7 @@ export default class GradeOverrideEntry extends GradeEntry {
     assignedGradeInfo,
     // @ts-expect-error
     currentGradeInfo,
-    previousGradeInfo: null | GradeOverrideInfo = null
+    previousGradeInfo: null | GradeOverrideInfo = null,
   ) {
     const effectiveGradeInfo = previousGradeInfo || assignedGradeInfo
 

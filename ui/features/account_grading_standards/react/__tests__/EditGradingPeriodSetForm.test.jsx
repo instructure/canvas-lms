@@ -153,7 +153,7 @@ describe('EditGradingPeriodSetForm', () => {
         weighted: true,
         displayTotalsForAllGradingPeriods: false,
         enrollmentTermIDs: ['1', '3'],
-      })
+      }),
     )
   })
 

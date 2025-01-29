@@ -57,7 +57,7 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
       data = {message: text}
       try {
         data = JSON.parse(xhr.responseText)
-      } catch (e) {
+      } catch (_e) {
         // no-op
       }
     }
@@ -74,7 +74,7 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
     url,
     dataType: 'json',
     type: submit_type,
-    success(data, textStatus, xhr) {
+    success(data, _textStatus, xhr) {
       data = data || {}
       let page_view_update_url = null
       if (
@@ -94,7 +94,7 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
             null,
             data,
             '0',
-            data.errors
+            data.errors,
           )
         } else {
           $.ajaxJSON.ignoredXHRs.push(xhr)
@@ -120,6 +120,7 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
   $.ajaxJSON.storeRequest(xhr, url, submit_type, data)
   return xhr
 }
+export const ajaxJSON = $.ajaxJSON
 $.ajaxJSON.unhandledXHRs = []
 $.ajaxJSON.ignoredXHRs = []
 $.ajaxJSON.passedRequests = []

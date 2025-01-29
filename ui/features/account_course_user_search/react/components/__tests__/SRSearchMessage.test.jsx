@@ -52,7 +52,7 @@ it('returns the error message when collection has an error', () => {
   props.collection.error = new Error('failure')
   const wrapper = render(<SRSearchMessage {...props} />)
   expect(
-    wrapper.getByText('There was an error with your query; please try a different search')
+    wrapper.getByText('There was an error with your query; please try a different search'),
   ).toBeInTheDocument()
 })
 it('returns the empty course message when the collection is empty and the dataType is Course', () => {

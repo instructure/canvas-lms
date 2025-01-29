@@ -131,10 +131,9 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                   value="add_to_calendar"
                   onChange={event => {
                     const confirmMessage = I18n.t(
-                      'Checking Add to Calendar will invite all course members.'
+                      'Checking Add to Calendar will invite all course members.',
                     )
                     if (event.target.checked) {
-                       
                       if (window.confirm(confirmMessage)) {
                         setAddToCalendar(event.target.checked)
                         // due to calendar api, it sends invite to full course, thus invite_all must be checked
@@ -167,13 +166,13 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
             <Flex.Item padding="small" data-testid="plain-text-dates">
               <div>
                 <span>{`${I18n.t('Start at: ')} ${DateHelper.formatDatetimeForDisplay(
-                  props.startDate
+                  props.startDate,
                 )}`}</span>
               </div>
               {props.endDate && (
                 <div>
                   <span>{`${I18n.t('End at: ')} ${DateHelper.formatDatetimeForDisplay(
-                    props.endDate
+                    props.endDate,
                   )}`}</span>
                 </div>
               )}

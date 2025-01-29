@@ -29,6 +29,25 @@ import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mut
 import {mockQuery, mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 
+global.Blob = class MockBlob {
+  constructor(content, options = {}) {
+    this.content = content
+    this.type = options.type || ''
+    this.size = content[0]?.length || 0
+  }
+}
+
+global.File = class MockFile extends global.Blob {
+  constructor(parts, filename, properties = {}) {
+    super(parts, properties)
+    this.name = filename
+    this.lastModified = properties.lastModified || Date.now()
+  }
+}
+
+global.URL.createObjectURL = jest.fn(file => `mock-url-for-${file.name}`)
+global.URL.revokeObjectURL = jest.fn()
+
 async function mockSubmissionCommentQuery() {
   const variables = {submissionAttempt: 0, submissionId: '1'}
   const overrides = {
@@ -111,8 +130,8 @@ describe('CommentTextArea', () => {
         mockContext(
           <MockedProvider>
             <CommentTextArea {...props} ref={ref} />
-          </MockedProvider>
-        )
+          </MockedProvider>,
+        ),
       )
       return ref.current
     }
@@ -130,7 +149,7 @@ describe('CommentTextArea', () => {
       const error = {file: {size: 100}, maxFileSize: 250}
       componentRef.handleMediaUpload(error, mediaObject, createSubmissionComment)
       await waitFor(() =>
-        expect(mockedSetOnFailure).toHaveBeenCalledWith('Error uploading video/audio recording')
+        expect(mockedSetOnFailure).toHaveBeenCalledWith('Error uploading video/audio recording'),
       )
     })
 
@@ -140,7 +159,7 @@ describe('CommentTextArea', () => {
       const error = {file: {size: 262144010}, maxFileSize: 250}
       componentRef.handleMediaUpload(error, mediaObject, createSubmissionComment)
       await waitFor(() =>
-        expect(mockedSetOnFailure).toHaveBeenCalledWith('File size exceeds the maximum of 250 MB')
+        expect(mockedSetOnFailure).toHaveBeenCalledWith('File size exceeds the maximum of 250 MB'),
       )
     })
   })
@@ -150,7 +169,7 @@ describe('CommentTextArea', () => {
     const {getByText} = render(
       <MockedProvider>
         <CommentTextArea {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(getByText('Attach a File')).toBeInTheDocument()
   })
@@ -160,7 +179,7 @@ describe('CommentTextArea', () => {
     const {container} = render(
       <MockedProvider>
         <CommentTextArea {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(container.querySelector('input[id="attachmentFile"]')).toBeInTheDocument()
   })
@@ -170,7 +189,7 @@ describe('CommentTextArea', () => {
     const {container, getByText} = render(
       <MockedProvider>
         <CommentTextArea {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const files = [
@@ -189,7 +208,7 @@ describe('CommentTextArea', () => {
     const {container, getByText} = render(
       <MockedProvider>
         <CommentTextArea {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const files = [
@@ -216,7 +235,7 @@ describe('CommentTextArea', () => {
     const {container, getByText, queryByText} = render(
       <MockedProvider>
         <CommentTextArea {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const files = [
@@ -244,7 +263,7 @@ describe('CommentTextArea', () => {
     const {container, getByText} = render(
       <MockedProvider>
         <CommentTextArea {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const file = new File(['foo'], 'awesome-test-image.png', {type: 'image/png'})
@@ -266,7 +285,7 @@ describe('CommentTextArea', () => {
     const {container, getByText} = render(
       <MockedProvider>
         <CommentTextArea {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const files = [
@@ -292,7 +311,7 @@ describe('CommentTextArea', () => {
     const {container, getByText} = render(
       <MockedProvider>
         <CommentTextArea {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
     const files = [
@@ -341,8 +360,8 @@ describe('CommentTextArea', () => {
       mockContext(
         <MockedProvider mocks={mocks}>
           <CommentsTray {...props} />
-        </MockedProvider>
-      )
+        </MockedProvider>,
+      ),
     )
     const textArea = await findByPlaceholderText('Submit a Comment')
     const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))
@@ -381,7 +400,7 @@ describe('CommentTextArea', () => {
     const {getByPlaceholderText, getByText, queryAllByText} = render(
       <MockedProvider mocks={mocks}>
         <CommentsTray {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: ''}})
@@ -411,8 +430,8 @@ describe('CommentTextArea', () => {
       mockContext(
         <MockedProvider mocks={mocks}>
           <CommentsTray {...props} />
-        </MockedProvider>
-      )
+        </MockedProvider>,
+      ),
     )
     const textArea = await waitFor(() => getByPlaceholderText('Submit a Comment'))
     const fileInput = await waitFor(() => container.querySelector('input[id="attachmentFile"]'))

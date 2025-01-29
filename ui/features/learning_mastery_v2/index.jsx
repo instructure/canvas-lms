@@ -17,14 +17,11 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import ready from '@instructure/ready'
 import LearningMastery from './react'
 
 ready(() => {
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(
-    <LearningMastery courseId={ENV.GRADEBOOK_OPTIONS.context_id} />,
-    document.getElementById('learning_mastery_gradebook')
-  )
+  const root = createRoot(document.getElementById('learning_mastery_gradebook'))
+  root.render(<LearningMastery courseId={ENV.GRADEBOOK_OPTIONS.context_id} />)
 })

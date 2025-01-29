@@ -53,7 +53,7 @@ const SectionsPanel = ({
         actions.addNodeTree(node_tree, 'ROOT')
       }
     },
-    [actions, query, templates]
+    [actions, query, templates],
   )
 
   const handleAddSectionKey = useCallback(
@@ -62,7 +62,7 @@ const SectionsPanel = ({
         handleAddSection(id)
       }
     },
-    [handleAddSection]
+    [handleAddSection],
   )
 
   const renderSection = (section_template: BlockTemplate) => {

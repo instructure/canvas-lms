@@ -64,7 +64,7 @@ export const RCEBlock = ({id, text, onContentChange}: RCEBlockProps) => {
       })
       onContentChange?.(content)
     },
-    [onContentChange, setProp]
+    [onContentChange, setProp],
   )
 
   const handleKey = useCallback(
@@ -82,7 +82,7 @@ export const RCEBlock = ({id, text, onContentChange}: RCEBlockProps) => {
         setEditable(true)
       }
     },
-    [editable]
+    [editable],
   )
 
   if (enabled && selected) {

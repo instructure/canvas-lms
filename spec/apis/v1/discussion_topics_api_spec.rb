@@ -1217,10 +1217,6 @@ describe DiscussionTopicsController, type: :request do
       end
 
       describe "differentiated modules" do
-        before do
-          Account.site_admin.enable_feature! :selective_release_backend
-        end
-
         context "ungraded discussions" do
           before do
             course_factory(active_all: true)

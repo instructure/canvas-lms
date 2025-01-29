@@ -29,7 +29,7 @@ const I18n = createI18nScope('content_share')
 
 ready(() => {
   const container = document.getElementById('content')
-   
+
   ReactDOM.render(
     <ErrorBoundary
       errorComponent={
@@ -41,6 +41,6 @@ ready(() => {
     >
       <ReceivedContentView />
     </ErrorBoundary>,
-    container
+    container,
   )
 })

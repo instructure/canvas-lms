@@ -24,7 +24,7 @@ import {useNavigate, useParams} from 'react-router-dom'
 
 export const Component = () => {
   const [breadcrumbMountPoint] = React.useState(
-    document.querySelector('.ic-app-crumbs-enhanced-rubrics')
+    document.querySelector('.ic-app-crumbs-enhanced-rubrics'),
   )
 
   const navigate = useNavigate()

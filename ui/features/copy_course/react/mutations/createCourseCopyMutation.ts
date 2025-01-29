@@ -69,7 +69,7 @@ export const createCourseCopyMutation = async ({
       settings: formData.settings,
     },
     courseId,
-    'course_copy_importer'
+    'course_copy_importer',
   )
 
   copyMigrationParams.settings.source_course_id = courseId

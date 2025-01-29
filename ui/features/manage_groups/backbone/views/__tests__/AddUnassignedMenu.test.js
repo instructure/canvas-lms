@@ -24,8 +24,6 @@ import AddUnassignedMenu from '../AddUnassignedMenu'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import sinon from 'sinon'
-
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)
@@ -38,14 +36,29 @@ let server = null
 let waldo = null
 let users = null
 let view = null
-const sendResponse = (method, url, json) =>
-  server.respond(method, url, [200, {'Content-Type': 'application/json'}, JSON.stringify(json)])
+const sendResponse = (method, url, json) => {
+  server.respond.mockImplementationOnce((method, url, response) => {
+    if (response[1]['Content-Type'] === 'application/json') {
+      return JSON.parse(response[2])
+    }
+    return response[2]
+  })(method, url, [200, {'Content-Type': 'application/json'}, JSON.stringify(json)])
+}
 
 describe('AddUnassignedMenu', () => {
   beforeEach(() => {
     fakeENV.setup()
-    clock = sinon.useFakeTimers()
-    server = sinon.fakeServer.create()
+    clock = jest.useFakeTimers()
+    server = {
+      respond: jest.fn().mockImplementation((method, url, response) => {
+        return Promise.resolve({
+          status: response[0],
+          headers: response[1],
+          json: () => Promise.resolve(JSON.parse(response[2])),
+        })
+      }),
+      restore: jest.fn(),
+    }
     waldo = new GroupUser({
       id: 4,
       name: 'Waldo',
@@ -82,8 +95,8 @@ describe('AddUnassignedMenu', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    clock.restore()
-    server.restore()
+    jest.useRealTimers()
+    server.restore.mockClear()
     view.remove()
     document.getElementById('fixtures').innerHTML = ''
   })

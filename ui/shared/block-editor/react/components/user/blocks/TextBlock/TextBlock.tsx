@@ -58,7 +58,7 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
         prps.text = html
       })
     },
-    [setProp]
+    [setProp],
   )
 
   const handleKey = useCallback(
@@ -76,7 +76,7 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
         setEditable(true)
       }
     },
-    [editable]
+    [editable],
   )
 
   const styl: React.CSSProperties = {fontSize, textAlign, color}

@@ -56,7 +56,7 @@ const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export function mapAssignmentGroupQueryResults(
   assignmentGroup: AssignmentGroupConnection[],
-  assignmentGradingPeriodMap: AssignmentGradingPeriodMap
+  assignmentGradingPeriodMap: AssignmentGradingPeriodMap,
 ): {
   mappedAssignments: SortableAssignment[]
   mappedAssignmentGroupMap: AssignmentGroupCriteriaMap
@@ -68,8 +68,8 @@ export function mapAssignmentGroupQueryResults(
         mapToSortableAssignment(
           assignment,
           curr.position,
-          assignmentGradingPeriodMap[assignment.id]
-        )
+          assignmentGradingPeriodMap[assignment.id],
+        ),
       )
       prev.mappedAssignments.push(...mappedAssignments)
 
@@ -113,7 +113,7 @@ export function mapAssignmentGroupQueryResults(
     {
       mappedAssignments: [] as SortableAssignment[],
       mappedAssignmentGroupMap: {} as AssignmentGroupCriteriaMap,
-    }
+    },
   )
 }
 
@@ -136,36 +136,39 @@ export function mapAssignmentSubmissions(submissions: SubmissionConnection[]): {
 }
 
 export function mapEnrollmentsToSortableStudents(
-  enrollments: EnrollmentConnection[]
+  enrollments: EnrollmentConnection[],
 ): SortableStudent[] {
-  const mappedEnrollments = enrollments.reduce((prev, enrollment) => {
-    const {user, courseSectionId, state} = enrollment
-    if (!prev[user.id]) {
-      prev[user.id] = {
-        ...user,
-        sections: [courseSectionId],
-        state,
+  const mappedEnrollments = enrollments.reduce(
+    (prev, enrollment) => {
+      const {user, courseSectionId, state} = enrollment
+      if (!prev[user.id]) {
+        prev[user.id] = {
+          ...user,
+          sections: [courseSectionId],
+          state,
+        }
+      } else {
+        prev[user.id].sections.push(courseSectionId)
       }
-    } else {
-      prev[user.id].sections.push(courseSectionId)
-    }
 
-    return prev
-  }, {} as {[key: string]: SortableStudent})
+      return prev
+    },
+    {} as {[key: string]: SortableStudent},
+  )
 
   return Object.values(mappedEnrollments)
 }
 
 export function studentDisplayName(
   student: SortableStudent | GradebookStudentDetails,
-  hideStudentNames: boolean
+  hideStudentNames: boolean,
 ): string {
-  return hideStudentNames ? student.hiddenName ?? I18n.t('Student') : student.sortableName
+  return hideStudentNames ? (student.hiddenName ?? I18n.t('Student')) : student.sortableName
 }
 
 export function sortAssignments(
   assignments: SortableAssignment[],
-  sortOrder: GradebookSortOrder
+  sortOrder: GradebookSortOrder,
 ): SortableAssignment[] {
   switch (sortOrder) {
     case GradebookSortOrder.Alphabetical:
@@ -181,19 +184,22 @@ export function sortAssignments(
 
 export function filterAssignmentsByStudent(
   assignments: SortableAssignment[],
-  submissions: GradebookUserSubmissionDetails[]
+  submissions: GradebookUserSubmissionDetails[],
 ) {
-  const assignmentIdMap = submissions.reduce((prev, curr) => {
-    prev[curr.assignmentId] = true
-    return prev
-  }, {} as {[key: string]: boolean})
+  const assignmentIdMap = submissions.reduce(
+    (prev, curr) => {
+      prev[curr.assignmentId] = true
+      return prev
+    },
+    {} as {[key: string]: boolean},
+  )
   return assignments.filter(assignment => assignmentIdMap[assignment.id])
 }
 
 // This logic was taken directly from ui/features/screenreader_gradebook/jquery/AssignmentDetailsDialog.js
 export function computeAssignmentDetailText(
   assignment: AssignmentConnection,
-  scores: number[]
+  scores: number[],
 ): AssignmentDetailCalculationText {
   return {
     max: nonNumericGuard(Math.max(...scores)),
@@ -327,7 +333,7 @@ export function gradebookOptionsSetup(env: GlobalEnv) {
 }
 
 export function mapToCamelizedGradingPeriodSet(
-  gradingPeriodSet?: GradingPeriodSet | null
+  gradingPeriodSet?: GradingPeriodSet | null,
 ): CamelizedGradingPeriodSet | null {
   if (!gradingPeriodSet) {
     return null
@@ -373,7 +379,7 @@ export function getLetterGrade(
   score?: number,
   gradingStandards?: GradingStandard[] | null,
   pointsBased?: boolean,
-  gradingStandardScalingFactor?: number
+  gradingStandardScalingFactor?: number,
 ) {
   if (!gradingStandards || !gradingStandards.length || !possible || !score) {
     return '-'
@@ -423,7 +429,7 @@ export function calculateGradesForStudent({
       cached_due_date: submission.cachedDueDate,
       user_id: submission.userId,
     })),
-    camelizedGradingPeriodSet?.gradingPeriods
+    camelizedGradingPeriodSet?.gradingPeriods,
   )
 
   const hasGradingPeriods = gradingPeriodSet && effectiveDueDates
@@ -434,13 +440,13 @@ export function calculateGradesForStudent({
     groupWeightingScheme ?? 'points',
     gradeCalcIgnoreUnpostedAnonymousEnabled ?? false,
     hasGradingPeriods ? camelizedGradingPeriodSet : undefined,
-    hasGradingPeriods ? scopeToUser(effectiveDueDates, studentId) : undefined
+    hasGradingPeriods ? scopeToUser(effectiveDueDates, studentId) : undefined,
   )
 }
 
 export function showInvalidGroupWarning(
   invalidAssignmentGroupsCount: number,
-  groupWeightingScheme?: string | null
+  groupWeightingScheme?: string | null,
 ) {
   return invalidAssignmentGroupsCount > 0 && groupWeightingScheme === 'percent'
 }
@@ -459,7 +465,7 @@ function percentile(values: number[], percentileValue: number): number {
 function mapToSortableAssignment(
   assignment: AssignmentConnection,
   assignmentGroupPosition: number,
-  gradingPeriodId?: string | null
+  gradingPeriodId?: string | null,
 ): SortableAssignment {
   // Used sort date logic from screenreader_gradebook_controller.js
   // @ts-expect-error

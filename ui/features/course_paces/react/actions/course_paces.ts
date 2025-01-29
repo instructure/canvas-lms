@@ -89,7 +89,9 @@ const thunkActions = {
       return dispatch(regularActions.resetPace(originalPace))
     }
   },
-  publishPace: (saveAsDraft: boolean | undefined): ThunkAction<Promise<void>, StoreState, void, Action> => {
+  publishPace: (
+    saveAsDraft: boolean | undefined,
+  ): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return (dispatch, getState) => {
       dispatch(uiActions.clearCategoryError('publish'))
 
@@ -119,7 +121,7 @@ const thunkActions = {
                 progress_context_id: progress.context_id,
                 pace_context: getState().paceContexts.selectedContext!,
                 polling: true,
-              })
+              }),
             )
             dispatch(uiActions.syncingCompleted())
           }
@@ -132,7 +134,9 @@ const thunkActions = {
   },
   // TODO: when blackout dates are changed we have to possibly publish changes
   // to the pace in the UI + save all existing paces
-  publishPaceAndSaveAll: (saveAsDraft: boolean | undefined): ThunkAction<Promise<void>, StoreState, void, Action> => {
+  publishPaceAndSaveAll: (
+    saveAsDraft: boolean | undefined,
+  ): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return (dispatch, _getState) => {
       return dispatch(coursePaceActions.publishPace(saveAsDraft))
     }
@@ -173,13 +177,13 @@ const thunkActions = {
           .then(updatedProgress => {
             if (!updatedProgress) throw new Error(I18n.t('Response body was empty'))
             const paceContext = getState().paceContexts.contextsPublishing.find(
-              ({progress_context_id}: any) => updatedProgress.context_id === progress_context_id
+              ({progress_context_id}: any) => updatedProgress.context_id === progress_context_id,
             )?.pace_context
             const paceName = paceContext?.name || ''
             dispatch(
               coursePaceActions.setProgress(
-                updatedProgress.workflow_state !== 'completed' ? updatedProgress : undefined
-              )
+                updatedProgress.workflow_state !== 'completed' ? updatedProgress : undefined,
+              ),
             )
             if (uiActions.clearCategoryError instanceof Function)
               dispatch(uiActions.clearCategoryError('checkPublishStatus'))
@@ -201,21 +205,21 @@ const thunkActions = {
               })
               dispatch(uiActions.setCategoryError('publish'))
               dispatch(paceContextsActions.refreshPublishedContext(updatedProgress.context_id))
-              console.log(`Error publishing pace: ${updatedProgress.message}`)  
+              console.log(`Error publishing pace: ${updatedProgress.message}`)
             } else {
               setTimeout(pollingLoop, PUBLISH_STATUS_POLLING_MS)
             }
           })
           .catch(error => {
             dispatch(uiActions.setCategoryError('checkPublishStatus', error?.toString()))
-            console.log(error)  
+            console.log(error)
           })
       return pollingLoop()
     }
   },
   resetToLastPublished: (
     contextType: PaceContextTypes,
-    contextId: string
+    contextId: string,
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay(I18n.t('Loading...')))
@@ -232,7 +236,7 @@ const thunkActions = {
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('resetToLastPublished', error?.toString()))
-          console.error(error)  
+          console.error(error)
           captureException(error)
         })
     }
@@ -241,7 +245,7 @@ const thunkActions = {
     contextType: PaceContextTypes,
     contextId: string,
     afterAction: LoadingAfterAction = coursePaceActions.saveCoursePace,
-    openModal: boolean = true
+    openModal: boolean = true,
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       if (openModal) {
@@ -269,7 +273,7 @@ const thunkActions = {
           .catch(error => {
             dispatch(uiActions.hideLoadingOverlay())
             dispatch(uiActions.setCategoryError('loading', error?.toString()))
-            console.error(error)  
+            console.error(error)
             captureException(error)
           })
       )
@@ -294,7 +298,7 @@ const thunkActions = {
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('relinkToParent', error?.toString()))
-          console.error(error)  
+          console.error(error)
           captureException(error)
         })
     }
@@ -317,7 +321,7 @@ const thunkActions = {
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('compress', error?.toString()))
-          console.log(error)  
+          console.log(error)
         })
     }
   },
@@ -345,7 +349,7 @@ const thunkActions = {
               searchTerm,
               sortBy,
               orderType: order,
-            })
+            }),
           )
           showFlashSuccess(I18n.t('%{paceName} Pace removed', {paceName}))()
         })

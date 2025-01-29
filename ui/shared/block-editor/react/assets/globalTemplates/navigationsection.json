@@ -39,9 +39,7 @@
         },
         "parent": "yue4mpUChN",
         "hidden": false,
-        "nodes": [
-          "13kQFSc-L3"
-        ],
+        "nodes": ["13kQFSc-L3"],
         "linkedNodes": {}
       },
       "13kQFSc-L3": {
@@ -88,12 +86,7 @@
         },
         "parent": "13kQFSc-L3",
         "hidden": false,
-        "nodes": [
-          "lDKe-fJfGy",
-          "JwS1ab5Ylg",
-          "CV9ftqN8l9",
-          "u3ntJFci_x"
-        ],
+        "nodes": ["lDKe-fJfGy", "JwS1ab5Ylg", "CV9ftqN8l9", "u3ntJFci_x"],
         "linkedNodes": {}
       },
       "lDKe-fJfGy": {

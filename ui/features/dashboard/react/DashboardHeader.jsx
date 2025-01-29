@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 import classnames from 'classnames'
@@ -185,7 +185,7 @@ class DashboardHeader extends React.Component {
           $dashboardActivity.html(axiosResponse.data)
           this.streamItemDashboard = new DashboardView()
         })
-        .catch(showFlashError(I18n.t('Failed to load recent activity')))
+        .catch(showFlashError(I18n.t('Failed to load recent activity'))),
     )
   }
 
@@ -477,7 +477,7 @@ class DashboardHeader extends React.Component {
 export {DashboardHeader}
 export default responsiviser()(
   DashboardHeader,
-  ENV.FEATURES?.instui_header ? {small: '(max-width: 62em)', medium: '(max-width: 86em)'} : null
+  ENV.FEATURES?.instui_header ? {small: '(max-width: 62em)', medium: '(max-width: 86em)'} : null,
 )
 
 // extract this out to a property so tests can override it and not have to mock
@@ -507,7 +507,7 @@ function loadDashboardSidebar(observedUserId) {
       if (container) renderToDoSidebar(container)
 
       loadStartNewCourseHandler()
-    })
+    }),
   )
 }
 
@@ -520,19 +520,24 @@ function loadStartNewCourseHandler() {
 
   const modalContainer = document.getElementById('create_course_modal_container')
   if (startButton && modalContainer && ENV.FEATURES?.create_course_subaccount_picker) {
+    let root = null
     startButton.addEventListener('click', () => {
-       
-      ReactDOM.render(
+      if (!root) {
+        root = createRoot(modalContainer)
+      }
+      root.render(
         <CreateCourseModal
           isModalOpen={true}
           setModalOpen={isOpen => {
-            if (!isOpen) ReactDOM.unmountComponentAtNode(modalContainer)
+            if (!isOpen) {
+              root.unmount()
+              root = null
+            }
           }}
           permissions={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
           restrictToMCCAccount={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
           isK5User={false} // can't be k5 user if classic dashboard is showing
         />,
-        modalContainer
       )
     })
   }

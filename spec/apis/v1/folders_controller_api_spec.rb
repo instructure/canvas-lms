@@ -1312,6 +1312,26 @@ describe "Folders API", type: :request do
       expect(result_names).to eq %w[extra_file_0.txt extra_file_1.txt extra_file_2.txt file1.txt file2.txt]
     end
 
+    it "respects default 50 per_page when listing folders and files correctly" do
+      50.times { |i| @root.sub_folders.create!(name: "extra_folder_#{i}", context: @course) }
+      50.times do |i|
+        Attachment.create!(
+          filename: "extra_file_#{i}.txt",
+          display_name: "extra_file_#{i}.txt",
+          uploaded_data: StringIO.new("existing"),
+          folder: @root,
+          context: @course
+        )
+      end
+
+      json = api_call(:get, @folders_files_path, @folders_files_path_options, {})
+      expect(json.size).to eq 50
+
+      next_page = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }
+      next_page_json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(page: next_page["page"]), {})
+      expect(next_page_json.size).to eq 50
+    end
+
     it "excludes hidden folders and files if the user lacks permission" do
       course_with_student(course: @course)
       json = api_call(:get, @folders_files_path, @folders_files_path_options)

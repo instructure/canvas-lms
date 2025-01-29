@@ -138,7 +138,7 @@ describe('DatetimeField', () => {
       field.addDatePicker({})
       expect(moment.localeData).toHaveBeenCalledWith(momentLocale)
       expect(datepickerSpy).toHaveBeenCalledWith(
-        expect.objectContaining({firstDay: firstDayOfWeek})
+        expect.objectContaining({firstDay: firstDayOfWeek}),
       )
     })
   })
@@ -188,12 +188,12 @@ describe('DatetimeField', () => {
 
     it('adds datepicker by default', () => {
       new DatetimeField($field, {})
-      expect($field.parent().length).toBe(1)
+      expect($field.parent()).toHaveLength(1)
     })
 
     it('does not add datepicker when timeOnly', () => {
       new DatetimeField($field, {timeOnly: true})
-      expect($field.parent().length).toBe(0)
+      expect($field.parent()).toHaveLength(0)
     })
 
     it('places suggest outside wrapper when adding datepicker', () => {

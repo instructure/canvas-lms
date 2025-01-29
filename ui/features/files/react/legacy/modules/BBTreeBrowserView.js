@@ -35,7 +35,7 @@ export default class BBTreeBrowserView {
       if (options.element == null) {
         const errorMessage =
           "`element` option missing error: An element to attach the TreeBrowserView to must be specified when setting the render option to 'true' for BBTreeBrowserView"
-        // eslint-disable-next-line no-console
+
         console.error(errorMessage)
         captureException(errorMessage)
       }
@@ -94,7 +94,7 @@ export default class BBTreeBrowserView {
         this.render(
           refreshed.index,
           refreshed.renderOptions.element,
-          refreshed.renderOptions.callback
+          refreshed.renderOptions.callback,
         )
       }
       return refreshed

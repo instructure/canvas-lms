@@ -41,7 +41,7 @@ export default function ExternalToolOptions({
   // better option, we just check the names directly, ignoring I18n.
   const isFavorite = tool =>
     ['Arc', 'Canvas Studio', 'Studio', 'Google Drive', 'Office 365'].some(
-      name => name.toLowerCase() === tool.name.toLowerCase()
+      name => name.toLowerCase() === tool.name.toLowerCase(),
     )
   const favoriteTools = externalTools.filter(isFavorite)
   const otherTools = externalTools.filter(tool => !isFavorite(tool))

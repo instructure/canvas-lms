@@ -34,7 +34,7 @@ const getDiscussionOpts = {
 const discussionActions = createPaginationActions(
   'discussions',
   apiClient.getDiscussions,
-  getDiscussionOpts
+  getDiscussionOpts,
 )
 
 const types = [
@@ -96,7 +96,7 @@ actions.updateDiscussion = function (
   discussion,
   updatedFields,
   {successMessage, failMessage},
-  focusOn
+  focusOn,
 ) {
   return (dispatch, getState) => {
     dispatch(actions.updateDiscussionStart())
@@ -130,7 +130,7 @@ actions.updateDiscussion = function (
           actions.updateDiscussionFail({
             message: failMessage || I18n.t('Updating discussion failed'),
             err,
-          })
+          }),
         )
       })
   }
@@ -175,7 +175,7 @@ actions.handleDrop = function (discussion, updatedFields, order) {
                 discussion: discussionCopy,
                 order: originalOrder,
                 err,
-              })
+              }),
             )
           })
       })
@@ -187,7 +187,7 @@ actions.handleDrop = function (discussion, updatedFields, order) {
             discussion,
             order: originalOrder,
             err,
-          })
+          }),
         )
       })
   }
@@ -203,7 +203,7 @@ actions.searchDiscussions = function searchDiscussions({searchTerm, filter}) {
     })
     const numDisplayed = unfiltered.length
     $.screenReaderFlashMessageExclusive(
-      I18n.t('%{count} discussions found.', {count: numDisplayed})
+      I18n.t('%{count} discussions found.', {count: numDisplayed}),
     )
   }
 }
@@ -272,19 +272,19 @@ actions.deleteDiscussion = function (discussion) {
         dispatch(actions.deleteFocusPending())
         dispatch(actions.deleteDiscussionSuccess({discussion, nextFocusDiscussion}))
         $.screenReaderFlashMessage(
-          I18n.t('Successfully deleted discussion %{title}', {title: discussion.title})
+          I18n.t('Successfully deleted discussion %{title}', {title: discussion.title}),
         )
       })
       .catch(err => {
         $.screenReaderFlashMessage(
-          I18n.t('Failed to delete discussion %{title}', {title: discussion.title})
+          I18n.t('Failed to delete discussion %{title}', {title: discussion.title}),
         )
         dispatch(
           actions.deleteDiscussionFail({
             message: I18n.t('Failed to delete discussion %{title}', {title: discussion.title}),
             discussion,
             err,
-          })
+          }),
         )
       })
   }
@@ -374,7 +374,7 @@ actions.duplicateDiscussion = function (discussionId) {
           actions.duplicateDiscussionSuccess({
             newDiscussion,
             originalId: discussionId,
-          })
+          }),
         )
       })
       .catch(err => {
@@ -384,7 +384,7 @@ actions.duplicateDiscussion = function (discussionId) {
           actions.duplicateDiscussionFail({
             message: failMessage,
             err,
-          })
+          }),
         )
       })
   }
@@ -414,7 +414,7 @@ actions.toggleSubscriptionState = function (discussion) {
             actions.toggleSubscribeFail({
               message: failMessage,
               err,
-            })
+            }),
           )
         })
     }
@@ -423,7 +423,7 @@ actions.toggleSubscriptionState = function (discussion) {
 
 const actionTypes = types.reduce(
   (typesMap, actionType) => Object.assign(typesMap, {[actionType]: actionType}),
-  {}
+  {},
 )
 
 export {actionTypes, actions as default}

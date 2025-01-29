@@ -73,7 +73,7 @@ const memoizedGetTheme = memoize(getTheme)
 export function render(
   element: React.ReactElement,
   container: Element | null,
-  options: Options = {}
+  options: Options = {},
 ) {
   if (!(container instanceof HTMLElement)) {
     throw new Error('Container must be an HTMLElement')

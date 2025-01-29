@@ -54,7 +54,7 @@ export function getFinalGradeOverrides(courseId: string): Promise<void | FinalGr
 
           for (const gradingPeriodId in responseOverrides.grading_period_grades) {
             studentOverrides.gradingPeriodGrades[gradingPeriodId] = camelizeProperties(
-              responseOverrides.grading_period_grades[gradingPeriodId]
+              responseOverrides.grading_period_grades[gradingPeriodId],
             )
           }
         }
@@ -74,7 +74,7 @@ export function getFinalGradeOverrides(courseId: string): Promise<void | FinalGr
 export function updateFinalGradeOverride(
   enrollmentId: string,
   gradingPeriodId?: string,
-  grade?: {percentage: number}
+  grade?: {percentage: number},
 ): any {
   const gradingPeriodQuery = gradingPeriodId ? `gradingPeriodId: ${gradingPeriodId}` : ''
 

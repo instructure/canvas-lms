@@ -63,7 +63,7 @@ export function saveUserSettings({currentUserId}, settings) {
 
 export function duplicateDiscussion({contextType, contextId}, discussionId) {
   return axios.post(
-    `/api/v1/${contextType}s/${contextId}/discussion_topics/${discussionId}/duplicate`
+    `/api/v1/${contextType}s/${contextId}/discussion_topics/${discussionId}/duplicate`,
   )
 }
 

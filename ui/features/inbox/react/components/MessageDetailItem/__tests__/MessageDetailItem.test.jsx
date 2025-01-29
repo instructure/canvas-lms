@@ -254,7 +254,7 @@ describe('MessageDetailItem', () => {
 
     const moreOptionsButton = getByRole(
       (role, element) =>
-        role === 'button' && element.textContent === 'More options for message from Tom Thompson'
+        role === 'button' && element.textContent === 'More options for message from Tom Thompson',
     )
 
     fireEvent.click(moreOptionsButton)

@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {func, instanceOf, array} from 'prop-types'
 
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -36,10 +36,9 @@ export function showConfirmDelete(props) {
     if (modal) modal.show()
   }
 
-   
-  ReactDOM.render(
-    <ConfirmDeleteModal {...props} parent={parent} ref={showConfirmDeleteRef} />,
-    parent
+  const root = createRoot(parent)
+  root.render(
+    <ConfirmDeleteModal {...props} parent={parent} root={root} ref={showConfirmDeleteRef} />,
   )
 }
 
@@ -50,6 +49,7 @@ export default class ConfirmDeleteModal extends Component {
     onCancel: func,
     onHide: func,
     parent: instanceOf(Element),
+    root: instanceOf(Object),
   }
 
   static defaultProps = {
@@ -88,7 +88,7 @@ export default class ConfirmDeleteModal extends Component {
   hide(confirmed, error = false) {
     this.setState({show: false, inProgress: false}, () => {
       if (this.props.onHide) setTimeout(() => this.props.onHide(confirmed, error))
-      if (this.props.parent) ReactDOM.unmountComponentAtNode(this.props.parent)
+      if (this.props.parent && this.props.root) this.props.root.unmount()
     })
   }
 
@@ -110,13 +110,12 @@ export default class ConfirmDeleteModal extends Component {
       },
       {
         count: this.props.pageTitles.length,
-      }
+      },
     )
     return (
       <>
         <div className="delete-wiki-pages-header">{message}</div>
         {this.props.pageTitles.map((title, index) => (
-           
           <div className="wiki-page-title" key={index}>
             {title}
           </div>

@@ -88,7 +88,7 @@ describe('AlignmentStatItem', () => {
     fireEvent.click(getByTestId('outcome-alignment-stat-info-icon'))
 
     getAllByText(
-      /Assessable artifacts include assignments, quizzes, and graded discussions/
+      /Assessable artifacts include assignments, quizzes, and graded discussions/,
     ).forEach(text => expect(text).toBeInTheDocument())
   })
 
@@ -96,7 +96,7 @@ describe('AlignmentStatItem', () => {
     const {getAllByText} = renderAlignmentStatItem({type: 'artifact'})
 
     getAllByText(
-      'Assessable artifacts include assignments, quizzes, and graded discussions'
+      'Assessable artifacts include assignments, quizzes, and graded discussions',
     ).forEach(text => expect(text).toBeInTheDocument())
   })
 

@@ -42,7 +42,7 @@ const findRating = (ratings, score) => {
     (r, i) =>
       r.points === score ||
       (i === 0 && score > r.points) ||
-      (score > r.points && ratings[i - 1].points > score)
+      (score > r.points && ratings[i - 1].points > score),
   )
   return rating || ratings[ratings.length - 1]
 }

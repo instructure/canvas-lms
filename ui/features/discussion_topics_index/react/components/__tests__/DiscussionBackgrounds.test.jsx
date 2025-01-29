@@ -48,7 +48,7 @@ describe('DiscussionBackgrounds', () => {
     render(pinnedDiscussionBackground(props))
     expect(screen.getByText('You currently have no pinned discussions')).toBeInTheDocument()
     expect(
-      screen.queryByText('To pin a discussion to the top', {exact: false})
+      screen.queryByText('To pin a discussion to the top', {exact: false}),
     ).not.toBeInTheDocument()
   })
 
@@ -71,10 +71,10 @@ describe('DiscussionBackgrounds', () => {
   it('renders correct student view for the closedDiscussionBackground decorative component with manage_content true', () => {
     render(closedDiscussionBackground(defaultProps))
     expect(
-      screen.getByText('You currently have no discussions with closed comments')
+      screen.getByText('You currently have no discussions with closed comments'),
     ).toBeInTheDocument()
     expect(
-      screen.getByText('To close comments on a discussion', {exact: false})
+      screen.getByText('To close comments on a discussion', {exact: false}),
     ).toBeInTheDocument()
   })
 
@@ -86,10 +86,10 @@ describe('DiscussionBackgrounds', () => {
 
     render(closedDiscussionBackground(props))
     expect(
-      screen.getByText('You currently have no discussions with closed comments')
+      screen.getByText('You currently have no discussions with closed comments'),
     ).toBeInTheDocument()
     expect(
-      screen.queryByText('To close comments on a discussion', {exact: false})
+      screen.queryByText('To close comments on a discussion', {exact: false}),
     ).not.toBeInTheDocument()
   })
 })

@@ -44,14 +44,14 @@ const UploadButton = function (props) {
   const renameFileMessage = nameToUse => {
     return I18n.t(
       'A file named "%{name}" already exists in this folder. Do you want to replace the existing file?',
-      {name: nameToUse}
+      {name: nameToUse},
     )
   }
 
   const lockFileMessage = nameToUse => {
     return I18n.t(
       'A locked file named "%{name}" already exists in this folder. Please enter a new name.',
-      {name: nameToUse}
+      {name: nameToUse},
     )
   }
 

@@ -35,17 +35,17 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to still create access tokens for themself when the Limit Personal Access Token Creation setting is on.'
+        'Allows user to still create access tokens for themself when the Limit Personal Access Token Creation setting is on.',
       ),
     },
     {
       description: I18n.t(
-        'Allows user to still update their access tokens when the Limit Personal Access Token Creation setting is on.'
+        'Allows user to still update their access tokens when the Limit Personal Access Token Creation setting is on.',
       ),
     },
     {
       description: I18n.t(
-        'Allows user to still regenerate their access tokens when the Limit Personal Access Token Creation setting is on.'
+        'Allows user to still regenerate their access tokens when the Limit Personal Access Token Creation setting is on.',
       ),
     },
     {
@@ -55,5 +55,5 @@ export const template = generateActionTemplates(
   ],
   [],
   [],
-  []
+  [],
 )

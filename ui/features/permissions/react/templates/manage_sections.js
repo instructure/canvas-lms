@@ -49,7 +49,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Cross-Listing'),
       description: I18n.t(
-        'To cross-list sections, Course Sections - edit and Courses - manage must also be enabled.'
+        'To cross-list sections, Course Sections - edit and Courses - manage must also be enabled.',
       ),
     },
   ],
@@ -61,7 +61,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Course Sections - edit'),
       description: I18n.t(
-        'Allows user to rename course sections. Allows user to change start and end dates for course sections. Allows user to cross-list sections.'
+        'Allows user to rename course sections. Allows user to change start and end dates for course sections. Allows user to cross-list sections.',
       ),
     },
     {
@@ -76,8 +76,8 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Cross-Listing'),
       description: I18n.t(
-        'To cross-list sections, Course Sections - edit must be enabled. The user must also be enrolled as an instructor in the courses being cross-listed.'
+        'To cross-list sections, Course Sections - edit must be enabled. The user must also be enrolled as an instructor in the courses being cross-listed.',
       ),
     },
-  ]
+  ],
 )

@@ -43,7 +43,7 @@ const setup = ({
       }}
     >
       <CheckpointsSettings />
-    </DiscussionDueDatesContext.Provider>
+    </DiscussionDueDatesContext.Provider>,
   )
 }
 

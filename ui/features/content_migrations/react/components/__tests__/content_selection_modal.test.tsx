@@ -178,7 +178,7 @@ describe('ContentSelectionModal', () => {
       await user.click(xButton)
 
       expect(
-        screen.queryByRole('heading', {name: 'Select Content for Import'})
+        screen.queryByRole('heading', {name: 'Select Content for Import'}),
       ).not.toBeInTheDocument()
     })
 
@@ -191,7 +191,7 @@ describe('ContentSelectionModal', () => {
       await user.click(cancelButton)
 
       expect(
-        screen.queryByRole('heading', {name: 'Select Content for Import'})
+        screen.queryByRole('heading', {name: 'Select Content for Import'}),
       ).not.toBeInTheDocument()
     })
 
@@ -208,8 +208,8 @@ describe('ContentSelectionModal', () => {
         await waitFor(() => {
           expect(
             screen.getByText(
-              'This file appears to be empty. Do you still want to proceed with content selection?'
-            )
+              'This file appears to be empty. Do you still want to proceed with content selection?',
+            ),
           ).toBeInTheDocument()
         })
       })

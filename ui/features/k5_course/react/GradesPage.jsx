@@ -80,7 +80,7 @@ export const GradesPage = ({
   useEffect(() => {
     if (error) {
       showFlashError(I18n.t('Failed to load grading periods for %{courseName}', {courseName}))(
-        error
+        error,
       )
       setError(null)
     }
@@ -89,7 +89,7 @@ export const GradesPage = ({
   useEffect(() => {
     if (enrollments.length > 0 && observedUserId && observedUserRef.current !== observedUserId) {
       const enrollment = enrollments.find(
-        e => e.user_id === observedUserId && e.type !== 'observer'
+        e => e.user_id === observedUserId && e.type !== 'observer',
       )
       setCurrentGradingPeriodId(enrollment?.current_grading_period_id)
       setAllowTotalsForAllPeriods(enrollment?.totals_for_all_grading_periods_option)

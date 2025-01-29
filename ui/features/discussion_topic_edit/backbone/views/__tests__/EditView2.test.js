@@ -47,11 +47,11 @@ describe('EditView', () => {
   beforeEach(() => {
     $container = $('<div>').appendTo(document.body)
     fakeENV.setup()
-    
+
     // Mock API endpoints
     fetchMock
       .get('path:/api/v1/courses/1/lti_apps/launch_definitions', {
-        tools: []
+        tools: [],
       })
       .get('*', 200) // Catch any other requests
   })
@@ -68,11 +68,11 @@ describe('EditView', () => {
       ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {is_announcement: false}}
       const view = editView({withAssignment: true})
       $container.append(view.$el)
-      
+
       const title = 'a'.repeat(10)
       const {assignment} = view
       assignment.attributes.post_to_sis = '1'
-      
+
       const errors = view.validateBeforeSave(
         {
           title,
@@ -80,9 +80,9 @@ describe('EditView', () => {
           assignment,
           specific_sections: null,
         },
-        []
+        [],
       )
-      
+
       expect(Object.keys(errors)).toHaveLength(0)
     })
 
@@ -91,19 +91,19 @@ describe('EditView', () => {
       ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {is_announcement: true}}
       const view = editView({withAssignment: false})
       $container.append(view.$el)
-      
+
       const title = 'a'.repeat(10)
       const {assignment} = view
       assignment.attributes.post_to_sis = '1'
-      
+
       const errors = view.validateBeforeSave(
         {
           title,
           specific_sections: ['fake_section'],
         },
-        []
+        [],
       )
-      
+
       expect(Object.keys(errors)).toHaveLength(0)
     })
 
@@ -114,19 +114,19 @@ describe('EditView', () => {
       ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {is_announcement: true}}
       const view = editView({withAssignment: false})
       $container.append(view.$el)
-      
+
       const title = 'a'.repeat(10)
       const {assignment} = view
       assignment.attributes.post_to_sis = '1'
-      
+
       const errors = view.validateBeforeSave(
         {
           title,
           specific_sections: null,
         },
-        []
+        [],
       )
-      
+
       expect(Object.keys(errors)).toHaveLength(0)
     })
 
@@ -138,19 +138,19 @@ describe('EditView', () => {
       ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {is_announcement: true}}
       const view = editView({withAssignment: false})
       $container.append(view.$el)
-      
+
       const title = 'a'.repeat(10)
       const {assignment} = view
       assignment.attributes.post_to_sis = '1'
-      
+
       const errors = view.validateBeforeSave(
         {
           title,
           specific_sections: null,
         },
-        []
+        [],
       )
-      
+
       expect(Object.keys(errors)).toHaveLength(1)
       expect(Object.keys(errors)[0]).toBe('specific_sections')
     })

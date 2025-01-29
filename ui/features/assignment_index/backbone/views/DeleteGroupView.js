@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {extend as lodashExtend} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -48,7 +46,7 @@ DeleteGroupView.prototype.defaults = shimGetterShorthand(
     title: function () {
       return I18n.t('Delete Assignment Group')
     },
-  }
+  },
 )
 
 DeleteGroupView.prototype.els = {
@@ -79,7 +77,7 @@ DeleteGroupView.prototype.toJSON = function () {
       return function (model) {
         return model.get('id') === _this.model.get('id')
       }
-    })(this)
+    })(this),
   )
   const groups_json = groups.map(function (model) {
     return model.toJSON()
@@ -140,7 +138,7 @@ DeleteGroupView.prototype.destroyModel = function (moveTo) {
     data: data,
     wait: true,
   })
-   
+
   destroyDfd.then(
     (function (_this) {
       return function () {
@@ -150,7 +148,7 @@ DeleteGroupView.prototype.destroyModel = function (moveTo) {
           })
         }
       }
-    })(this)
+    })(this),
   )
   this.$el.disableWhileLoading(destroyDfd)
   return destroyDfd
@@ -167,17 +165,15 @@ DeleteGroupView.prototype.openAgain = function () {
     if (this.model.get('assignments').length > 0) {
       return DeleteGroupView.__super__.openAgain.apply(this, arguments)
     } else if (
-       
       window.confirm(
-        I18n.t('confirm_delete_group', 'Are you sure you want to delete this Assignment Group?')
+        I18n.t('confirm_delete_group', 'Are you sure you want to delete this Assignment Group?'),
       )
     ) {
       return this.destroyModel()
     }
   } else {
-     
     return window.alert(
-      I18n.t('cannot_delete_group', 'You must have at least one Assignment Group')
+      I18n.t('cannot_delete_group', 'You must have at least one Assignment Group'),
     )
   }
 }

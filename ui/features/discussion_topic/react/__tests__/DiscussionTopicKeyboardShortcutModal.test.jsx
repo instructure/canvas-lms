@@ -77,8 +77,8 @@ describe('DiscussionTopicKeyboardShortcutModal#render', () => {
           const keycode = $(li).find('.keycode').text()
           const description = $(li).find('.description').text()
           return sc.keycode === keycode && sc.description === description
-        })
-      )
+        }),
+      ),
     )
     wrapper.unmount()
   })

@@ -67,7 +67,6 @@ export default class PathOption extends React.Component {
           </div>
           <ul className="ig-list">
             {this.props.assignments.map((assg, i) => (
-               
               <Assignment key={i} assignment={assg} isSelected={selected} />
             ))}
           </ul>

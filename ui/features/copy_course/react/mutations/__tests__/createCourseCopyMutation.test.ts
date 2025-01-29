@@ -63,7 +63,7 @@ describe('createCourseCopyMutation', () => {
     mockDoFetchApi.mockResolvedValueOnce({json: null})
 
     await expect(createCourseCopyMutation({accountId, courseId, formData})).rejects.toThrow(
-      'Failed to create course'
+      'Failed to create course',
     )
   })
 
@@ -73,7 +73,7 @@ describe('createCourseCopyMutation', () => {
     mockConvertFormDataToMigrationCreateRequest.mockReturnValueOnce(mockReturnValue)
 
     await expect(createCourseCopyMutation({accountId, courseId, formData})).rejects.toThrow(
-      'Failed to create course'
+      'Failed to create course',
     )
   })
 

@@ -20,14 +20,12 @@ require_relative "../helpers/context_modules_common"
 require_relative "../helpers/public_courses_context"
 require_relative "page_objects/modules_index_page"
 require_relative "page_objects/modules_settings_tray"
-require_relative "../../helpers/selective_release_common"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include ModulesIndexPage
   include ModulesSettingsTray
-  include SelectiveReleaseCommon
 
   context "as a teacher through course home page (set to modules)", priority: "1" do
     before(:once) do
@@ -198,7 +196,6 @@ describe "context modules" do
 
     context "when adding new module with differentiated modules" do
       before :once do
-        differentiated_modules_on
         @new_module = @course.context_modules.create! name: "New Module"
       end
 
@@ -208,14 +205,12 @@ describe "context modules" do
       end
 
       it "adds a new module with differentiated modules", priority: "1" do
-        differentiated_modules_on
         add_module_with_tray("New Module2")
         mod = @course.context_modules.last
         expect(mod.name).to eq "New Module2"
       end
 
       it "publishes an unpublished module with differentiated modules", priority: "1" do
-        differentiated_modules_on
         add_module_with_tray("New Module2")
         expect(ff(".context_module")[1]).to have_class("unpublished_module")
         expect(@course.context_modules.count).to eq 2

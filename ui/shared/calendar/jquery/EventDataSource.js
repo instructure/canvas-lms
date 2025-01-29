@@ -144,7 +144,7 @@ export default class EventDataSource {
     if (cached_ag) {
       cached_ag.reserved_times = reject(
         cached_ag.reserved_times,
-        reservation => reservation.id === event.id
+        reservation => reservation.id === event.id,
       )
       if (cached_ag.reserved_times.length === 0) {
         cached_ag.requiring_action = true
@@ -372,7 +372,7 @@ export default class EventDataSource {
       include: ['reserved_times', 'participant_count', 'appointments', 'child_events'],
     }
     return this.startFetch([[group.url, params]], dataCB, () =>
-      cb(this.cache.appointmentGroups[group.id].appointmentEvents)
+      cb(this.cache.appointmentGroups[group.id].appointmentEvents),
     )
   }
 
@@ -531,7 +531,7 @@ export default class EventDataSource {
     }
     const eventDataSources = [['/api/v1/calendar_events', this.indexParams(params)]]
     params.context_codes = params.context_codes.filter(
-      context => !context.match(/^appointment_group_/)
+      context => !context.match(/^appointment_group_/),
     )
     eventDataSources.push(['/api/v1/calendar_events', this.assignmentParams(params)])
     if (ENV.CALENDAR?.SHOW_CHECKPOINTS) {
@@ -542,7 +542,7 @@ export default class EventDataSource {
     }
     const [admin_contexts, student_contexts] = partition(
       params.context_codes,
-      cc => ENV.CALENDAR?.MANAGE_CONTEXTS?.indexOf(cc) >= 0
+      cc => ENV.CALENDAR?.MANAGE_CONTEXTS?.indexOf(cc) >= 0,
     )
     if (student_contexts.length) {
       const pparams = {filter: 'ungraded_todo_items', ...params, context_codes: student_contexts}
@@ -588,7 +588,7 @@ export default class EventDataSource {
       params.context_codes = ENV.CALENDAR.CONTEXTS.filter(
         context =>
           params.context_codes.includes(context.asset_string) &&
-          (!context.course_pacing_enabled || context.user_is_student)
+          (!context.course_pacing_enabled || context.user_is_student),
       ).map(context => context.asset_string)
     }
     const type = subAssignment ? 'sub_assignment' : 'assignment'
@@ -624,7 +624,7 @@ export default class EventDataSource {
         ],
       ],
       dataCB,
-      doneCB
+      doneCB,
     )
   }
 
@@ -656,8 +656,8 @@ export default class EventDataSource {
             urlAndParameters[0],
             urlAndParameters[1],
             (data, isDone) => wrapperCB(data, isDone, urlAndParameters[0], urlAndParameters[1]),
-            options
-          ))(urlAndParams)
+            options,
+          ))(urlAndParams),
       )
     }
     return results

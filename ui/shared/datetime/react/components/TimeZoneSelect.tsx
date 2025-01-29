@@ -84,7 +84,6 @@ import(
     }
   })
   .catch(error => {
-     
     console.error('Error loading localized timezone list', error)
     captureException(error)
   })

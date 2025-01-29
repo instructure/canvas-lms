@@ -48,7 +48,7 @@ export default function TodoEditorModal({
     savePlannerItem(plannerItem)
       .then(onClose)
       .catch(() =>
-        alert(I18n.t('Failed saving changes on %{name}.', {name: todoItem?.title}), true)
+        alert(I18n.t('Failed saving changes on %{name}.', {name: todoItem?.title}), true),
       )
   }
 

@@ -39,7 +39,7 @@ it('renders the given assignment type in view mode', () => {
       onChange={() => {}}
       onChangeMode={() => {}}
       selectedAssignmentType="group"
-    />
+    />,
   )
   expect(getByTestId('SelectableText')).toBeInTheDocument()
   expect(getByText('Group Assignment')).toBeInTheDocument()
@@ -52,7 +52,7 @@ it.skip('renders the given assignment type in edit mode', () => {
       onChange={() => {}}
       onChangeMode={() => {}}
       selectedAssignmentType="group"
-    />
+    />,
   )
   expect(getByTestId('SelectableText')).toBeInTheDocument()
   expect(document.querySelector('input').value).toBe('Group Assignment')
@@ -60,7 +60,7 @@ it.skip('renders the given assignment type in edit mode', () => {
 
 it('renders the placeholder when not given a value', () => {
   const {getAllByText, getByTestId} = render(
-    <AssignmentType mode="view" onChange={() => {}} onChangeMode={() => {}} />
+    <AssignmentType mode="view" onChange={() => {}} onChangeMode={() => {}} />,
   )
   expect(getByTestId('SelectableText')).toBeInTheDocument()
   expect(getAllByText('Assignment Type')[0]).toBeInTheDocument()
@@ -73,7 +73,7 @@ it.skip('has 3 options if quiz.next is not enabled', () => {
       onChange={() => {}}
       onChangeMode={() => {}}
       selectedAssignmentType="assignment"
-    />
+    />,
   )
   const input = container.querySelector('input')
   input.click()
@@ -88,7 +88,7 @@ it.skip('has 4 options if quiz.next is enabled', () => {
       onChange={() => {}}
       onChangeMode={() => {}}
       selectedAssignmentType="assignment"
-    />
+    />,
   )
   const input = container.querySelector('input')
   input.click()
@@ -109,7 +109,7 @@ it.skip('calls onChange when the selection changes', () => {
       <span id="focus-me" tabIndex="-1">
         just here to get focus
       </span>
-    </div>
+    </div>,
   )
   const input = container.querySelector('input')
   input.click()
@@ -132,7 +132,7 @@ it.skip('calls onChange when the selection changes', () => {
         just here to get focus
       </span>
     </div>,
-    {container}
+    {container},
   )
   expect(onchange).toHaveBeenCalledWith('peer-review')
 })

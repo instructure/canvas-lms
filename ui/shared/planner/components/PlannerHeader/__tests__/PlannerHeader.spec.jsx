@@ -20,7 +20,6 @@ import {shallow} from 'enzyme'
 import {fireEvent, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import moment from 'moment-timezone'
-import sinon from 'sinon'
 import {PlannerHeader} from '../index'
 
 const TZ = 'America/Denver'
@@ -126,7 +125,7 @@ it('does not render the Add To Do option when isObserving', () => {
 it('toggles the new item tray', async () => {
   const mockCancel = jest.fn()
   const {getByTestId} = render(
-    <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />
+    <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />,
   )
   const button = getByTestId('add-to-do-button')
   await userEvent.click(button)
@@ -188,7 +187,7 @@ it('toggles aria-hidden on the ariaHideElement when opening the add to do item t
 
 it('renders the tray with the name of an existing item when provided', () => {
   const wrapper = shallow(
-    <PlannerHeader {...defaultProps({todo: {updateTodoItem: {title: 'abc'}}})} />
+    <PlannerHeader {...defaultProps({todo: {updateTodoItem: {title: 'abc'}}})} />,
   )
   expect(findEditTray(wrapper).prop('label')).toBe('Edit abc')
 })
@@ -249,41 +248,6 @@ it('does not call getNextOpportunities when component has loaded all opportuniti
       id: '7',
       course_id: '1',
       due_at: '2017-09-09T20:40:35Z',
-      html_url: 'http://www.non_default_url.com',
-      name: 'learning object title',
-    },
-    {
-      id: '8',
-      course_id: '2',
-      due_at: '2017-10-09T20:40:35Z',
-      html_url: 'http://www.non_default_url.com',
-      name: 'learning object title',
-    },
-    {
-      id: '9',
-      course_id: '1',
-      due_at: '2017-15-09T20:40:35Z',
-      html_url: 'http://www.non_default_url.com',
-      name: 'learning object title',
-    },
-    {
-      id: '11',
-      course_id: '2',
-      due_at: '2017-16-09T20:40:35Z',
-      html_url: 'http://www.non_default_url.com',
-      name: 'learning object title',
-    },
-    {
-      id: '12',
-      course_id: '1',
-      due_at: '2017-12-09T20:40:35Z',
-      html_url: 'http://www.non_default_url.com',
-      name: 'learning object title',
-    },
-    {
-      id: '10',
-      course_id: '2',
-      due_at: '2017-17-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
       name: 'learning object title',
     },
@@ -626,7 +590,7 @@ it('edits new item in open tray', () => {
   // Because Tray renders its contents (UpdateItemTray) somewhere else in the DOM,
   // if we mount(), we won't be able to find it to check its properties
   const wrapper = shallow(
-    <PlannerHeader {...defaultProps()} openEditingPlannerItem={openEditingPlannerItem} />
+    <PlannerHeader {...defaultProps()} openEditingPlannerItem={openEditingPlannerItem} />,
   )
 
   // edit a PlannerItem
@@ -676,6 +640,9 @@ it('toggles the grades tray', async () => {
 
   await userEvent.click(button)
 
+  // Wait for animation to complete
+  await new Promise(resolve => setTimeout(resolve, 500))
+
   const heading2 = screen.queryByRole('heading', {name: /My Grades/i})
   expect(heading2).not.toBeInTheDocument()
 })
@@ -717,26 +684,26 @@ describe('new activity button', () => {
   let spy
 
   beforeEach(() => {
-    spy = sinon.stub(PlannerHeader.prototype, 'newActivityAboveView')
+    spy = jest.spyOn(PlannerHeader.prototype, 'newActivityAboveView')
   })
 
   afterEach(() => {
-    spy.reset()
-    spy.restore()
+    spy.mockReset()
+    spy.mockRestore()
   })
 
   it('does not show when there is no new activity', () => {
-    spy.returns(false)
+    spy.mockReturnValue(false)
     const wrapper = shallow(<PlannerHeader {...defaultProps()} />)
     expect(wrapper).toMatchSnapshot()
-    expect(spy.calledOnce).toEqual(true)
+    expect(spy.mock.calls).toHaveLength(1)
   })
 
   it('shows when there is new activity', () => {
-    spy.returns(true)
+    spy.mockReturnValue(true)
     const wrapper = shallow(<PlannerHeader {...defaultProps()} />)
     expect(wrapper).toMatchSnapshot()
-    expect(spy.calledOnce).toEqual(true)
+    expect(spy.mock.calls).toHaveLength(1)
   })
 })
 
@@ -808,7 +775,7 @@ describe('today button', () => {
     const props = defaultProps()
     const wrapper = shallow(<PlannerHeader {...props} />)
     const todaybtn = wrapper.find('#planner-today-btn')
-    expect(todaybtn.length).toEqual(1)
+    expect(todaybtn).toHaveLength(1)
   })
 
   it('is not displayed when the planner has no items to display', () => {
@@ -816,6 +783,6 @@ describe('today button', () => {
     props.days = []
     const wrapper = shallow(<PlannerHeader {...props} />)
     const todaybtn = wrapper.find('#planner-today-btn')
-    expect(todaybtn.length).toEqual(0)
+    expect(todaybtn).toHaveLength(0)
   })
 })

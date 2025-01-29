@@ -46,7 +46,7 @@ describe('SelectableText, single', () => {
         label="Pick one"
         value={options[1]}
         options={options}
-      />
+      />,
     )
 
     expect(getByText('Mongo Santamaria')).toBeInTheDocument()
@@ -63,7 +63,7 @@ describe('SelectableText, single', () => {
         label="Pick one"
         value={options[1]}
         options={options}
-      />
+      />,
     )
     // Depends on the implementation of SelectMultiple, but
     // getByText doesn't return anything when the text is in
@@ -83,7 +83,7 @@ describe('SelectableText, single', () => {
         value={options[1]}
         options={options}
         readOnly={true}
-      />
+      />,
     )
     expect(queryByText('Pick one')).toBeNull()
   })
@@ -103,7 +103,7 @@ describe('SelectableText, multiple', () => {
         value={[options[1], options[0]]}
         options={options}
         multiple={true}
-      />
+      />,
     )
     expect(getByText('Mongo Santamaria|Pancho Sanchez')).toBeInTheDocument()
   })
@@ -124,7 +124,7 @@ describe('SelectableText, multiple', () => {
         value={[options[1], options[2]]}
         options={options}
         multiple={true}
-      />
+      />,
     )
 
     // I can't simply look for the strings for the selected values

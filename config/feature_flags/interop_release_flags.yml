@@ -1,15 +1,14 @@
 ---
-ags_scores_multiple_files:
+ags_improved_course_concluded_response_codes:
   state: hidden
-  display_name: Allow multiple file AGS submissions to count as only one submission
+  display_name: Better LTI AGS Response Codes for Concluded Courses
   description: |-
-    This feature makes it so that when multiple files are submitted together by
-    a third party tool via the Assignments and Grade Service API they will be
-    grouped as one submission, rather than creating multiple separate submissions.
+    If enabled, the AGS API will return a more helpful response code whenever an LTI
+    tool attempts to access or modify data in a course that has already concluded.
+    Rather than returning a generic 404 Not Found, the API will instead return a 422
+    along with a helpful message indicating that the tool cannot access concluded
+    courses.
   applies_to: RootAccount
-  environments:
-    development:
-      state: on
 assignment_edit_placement_not_on_announcements:
   state: hidden
   applies_to: SiteAdmin
@@ -71,21 +70,6 @@ import_numeric_lti_custom_params_as_string:
   applies_to: SiteAdmin
   display_name: Copy numeric lti custom params as strings on imports.
   description: Prevent ResourceLink custom parameters from being converted to numbers during course copy.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
-lti_ags_remove_top_submitted_at:
-  state: hidden
-  applies_to: RootAccount
-  shadow: true
-  display_name: Remove top-level submittedAt from LTI AGS Score API
-  description: |-
-    When enabled, removes support for passing submittedAt as a top-level parameter in an
-    LTI AGS Score request, to better conform to LTI AGS spec.
   environments:
     development:
       state: allowed_on
@@ -195,20 +179,6 @@ lti_log_launches_site_admin:
       state: allowed_on
     ci:
       state: allowed_on
-lti_login_required_error_page:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Friendly Error Page for LTI Login Required
-  description: |-
-    When enabled, a friendly error page will be shown to users when they attempt to launch an LTI tool but encounter the
-    dreaded Heisenbug caused by missing cookies. See INTEROP-8200 for more background info.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_migration_info:
   state: hidden
   display_name: LTI 1.1 to 1.3 Migration Info
@@ -229,21 +199,6 @@ lti_oidc_missing_cookie_retry:
     If enabled, Canvas will retry LTI OIDC launches that fail due to missing cookies.
     Safari tracking protection sometimes blocks cookies from being set to authorize the endpoint.
     To fix this, we resubmit the request with a form.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
-lti_placement_restrictions:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Limit certain LTI placements to authorized tools
-  description: |-
-    When enabled, Submission_type_selection placement usage will be
-    limited with an allow list.
-  shadow: true
   environments:
     development:
       state: allowed_on
@@ -392,24 +347,6 @@ refactor_custom_variables:
     Some of the custom variables used a controller instance for substitution.
     That is not available in background jobs, so in PNS notices and content migration.
     This feature flag will refactor the custom variables to make most if the variable substitutions controllerless.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
-remove_submission_type_selection_from_dev_keys_edit_page:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Remove submission_type_selection from Dev Keys edit page UI
-  description: |-
-    When enabled, the submission_type_selection placement will not show up in
-    the UI for Dev Keys which do not already have it. Tools can still have the
-    placement by editing the JSON, and it will still show up for Dev Keys which
-    already have it. This flag is to be removed when after it is completely
-    turned on in roughly April-May 2024.
   environments:
     development:
       state: allowed_on

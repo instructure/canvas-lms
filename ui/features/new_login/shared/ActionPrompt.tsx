@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import type {ViewOwnProps} from '@instructure/ui-view'
-import {Link} from '@instructure/ui-link'
-import {ROUTES} from '../routes/routes'
-import {Text} from '@instructure/ui-text'
-import {useNavigate} from 'react-router-dom'
-import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
+import type {ViewOwnProps} from '@instructure/ui-view'
+import React from 'react'
+import {useNavigate} from 'react-router-dom'
+import {useNewLogin, useNewLoginData} from '../context'
+import {ROUTES} from '../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
@@ -33,7 +33,8 @@ type ActionPromptProps = {
 
 const ActionPrompt = ({variant}: ActionPromptProps) => {
   const navigate = useNavigate()
-  const {isPreviewMode, isUiActionPending} = useNewLogin()
+  const {isUiActionPending} = useNewLogin()
+  const {isPreviewMode} = useNewLoginData()
 
   const isDisabled = isPreviewMode || isUiActionPending
 

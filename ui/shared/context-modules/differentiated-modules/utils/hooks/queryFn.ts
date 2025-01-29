@@ -33,7 +33,7 @@ export const processResult = async (
     link?: {next: {url: string}}
   }> | null,
   key: string,
-  groupKey: string
+  groupKey: string,
 ) => {
   // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
   if (result && !result?.response?.ok)
@@ -66,7 +66,7 @@ export const processResult = async (
           groupCategoryId,
           group: I18n.t('%{groupKey}', {groupKey}),
         }
-      }
+      },
     ) ?? []
 
   return resultParsedResult
@@ -74,7 +74,7 @@ export const processResult = async (
 
 export const fetchNextPages = async (
   next: {url: string},
-  results: {id: string; name: string; group_category_id: string}[]
+  results: {id: string; name: string; group_category_id: string}[],
 ): Promise<{id: string; name: string; group_category_id: string}[]> => {
   let mergedResults = results
   const {json, link} = await doFetchApi({
@@ -125,7 +125,7 @@ export const getGroups = async ({queryKey}: {queryKey: any}) => {
     // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
     result,
     'group',
-    'Groups'
+    'Groups',
   )
   return parsedResult || []
 }

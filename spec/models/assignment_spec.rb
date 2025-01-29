@@ -2505,6 +2505,21 @@ describe Assignment do
     end
   end
 
+  describe "show_in_search_for_user?" do
+    let(:user) { User.create }
+    let(:assignment) { Assignment.create }
+
+    it "returns true if the user can see the description" do
+      expect(assignment).to receive(:include_description?).with(user).and_return(true)
+      expect(assignment.show_in_search_for_user?(user)).to be true
+    end
+
+    it "returns false if the user cannot see the description" do
+      expect(assignment).to receive(:include_description?).with(user).and_return(false)
+      expect(assignment.show_in_search_for_user?(user)).to be false
+    end
+  end
+
   describe "#grade_to_score" do
     before(:once) { setup_assignment_without_submission }
 
@@ -10079,37 +10094,75 @@ describe Assignment do
         let(:student2) { @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
         let(:tag) { context_module.add_item({ id: assignment.id, type: "assignment" }) }
 
-        before do
-          context_module.update!(completion_requirements: { tag.id => { type: "min_score", min_score: 90 } })
-          # Have a manual post policy to stop the evaluation of the requirement
-          # until post_submissions is called.
-          assignment.ensure_post_policy(post_manually: true)
+        context "min_score requirement" do
+          before do
+            context_module.update!(completion_requirements: { tag.id => { type: "min_score", min_score: 90 } })
+            # Have a manual post policy to stop the evaluation of the requirement
+            # until post_submissions is called.
+            assignment.ensure_post_policy(post_manually: true)
+          end
+
+          it "updates the met requirements" do
+            assignment.grade_student(student1, grader: teacher, score: 100)
+            assignment.post_submissions
+            progression = context_module.context_module_progressions.find_by(user: student1)
+            requirement = { id: tag.id, type: "min_score", min_score: 90.0 }
+            expect(progression.requirements_met).to include requirement
+          end
+
+          it "does not update the met requirements for students that did not meet requirement" do
+            assignment.grade_student(student1, grader: teacher, score: 20)
+            assignment.post_submissions
+            progression = context_module.context_module_progressions.find_by(user: student1)
+            requirement = { id: tag.id, type: "min_score", min_score: 90.0, score: 20.0 }
+            expect(progression.incomplete_requirements).to include requirement
+          end
+
+          it "does not update the met requirements for students not included" do
+            assignment.grade_student(student1, grader: teacher, score: 100)
+            assignment.grade_student(student2, grader: teacher, score: 100)
+            student1_sub = assignment.submissions.find_by(user: student1)
+            assignment.post_submissions(submission_ids: [student1_sub])
+            progression = context_module.context_module_progressions.find_by(user: student2)
+            requirement = { id: tag.id, type: "min_score", min_score: 90.0, score: nil }
+            expect(progression.incomplete_requirements).to include requirement
+          end
         end
 
-        it "updates the met requirements" do
-          assignment.grade_student(student1, grader: teacher, score: 100)
-          assignment.post_submissions
-          progression = context_module.context_module_progressions.find_by(user: student1)
-          requirement = { id: tag.id, type: "min_score", min_score: 90.0 }
-          expect(progression.requirements_met).to include requirement
-        end
+        context "min_percentage requirement" do
+          before do
+            assignment.update points_possible: 150
+            context_module.update!(completion_requirements: { tag.id => { type: "min_percentage", min_percentage: 60 } })
+            # Have a manual post policy to stop the evaluation of the requirement
+            # until post_submissions is called.
+            assignment.ensure_post_policy(post_manually: true)
+          end
 
-        it "does not update the met requirements for students that did not meet requirement" do
-          assignment.grade_student(student1, grader: teacher, score: 20)
-          assignment.post_submissions
-          progression = context_module.context_module_progressions.find_by(user: student1)
-          requirement = { id: tag.id, type: "min_score", min_score: 90.0, score: 20.0 }
-          expect(progression.incomplete_requirements).to include requirement
-        end
+          it "updates the met requirements" do
+            assignment.grade_student(student1, grader: teacher, score: 110)
+            assignment.post_submissions
+            progression = context_module.context_module_progressions.find_by(user: student1)
+            requirement = { id: tag.id, type: "min_percentage", min_percentage: 60 }
+            expect(progression.requirements_met).to include requirement
+          end
 
-        it "does not update the met requirements for students not included" do
-          assignment.grade_student(student1, grader: teacher, score: 100)
-          assignment.grade_student(student2, grader: teacher, score: 100)
-          student1_sub = assignment.submissions.find_by(user: student1)
-          assignment.post_submissions(submission_ids: [student1_sub])
-          progression = context_module.context_module_progressions.find_by(user: student2)
-          requirement = { id: tag.id, type: "min_score", min_score: 90.0, score: nil }
-          expect(progression.incomplete_requirements).to include requirement
+          it "does not update the met requirements for students that did not meet requirement" do
+            assignment.grade_student(student1, grader: teacher, score: 20)
+            assignment.post_submissions
+            progression = context_module.context_module_progressions.find_by(user: student1)
+            requirement = { id: tag.id, type: "min_percentage", min_percentage: 60, score: 20.0 }
+            expect(progression.incomplete_requirements).to include requirement
+          end
+
+          it "does not update the met requirements for students not included" do
+            assignment.grade_student(student1, grader: teacher, score: 100)
+            assignment.grade_student(student2, grader: teacher, score: 100)
+            student1_sub = assignment.submissions.find_by(user: student1)
+            assignment.post_submissions(submission_ids: [student1_sub])
+            progression = context_module.context_module_progressions.find_by(user: student2)
+            requirement = { id: tag.id, type: "min_percentage", min_percentage: 60, score: nil }
+            expect(progression.incomplete_requirements).to include requirement
+          end
         end
       end
     end
@@ -11626,7 +11679,7 @@ describe Assignment do
   describe "checkpointed assignments" do
     before do
       @course.root_account.enable_feature!(:discussion_checkpoints)
-      @parent = @course.assignments.create!(has_sub_assignments: true, workflow_state: "published")
+      @parent = @course.assignments.create!(has_sub_assignments: true, workflow_state: "published", grading_type: "points")
       @first_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
       @second_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
     end
@@ -11663,6 +11716,14 @@ describe Assignment do
       @parent.update!(workflow_state: "unpublished")
       expect(@first_checkpoint.reload.workflow_state).to eq "unpublished"
       expect(@second_checkpoint.reload.workflow_state).to eq "unpublished"
+    end
+
+    it "will update the sub_assignment grading_type when parent updates" do
+      expect(@first_checkpoint.reload.grading_type).to eq "points"
+      expect(@second_checkpoint.reload.grading_type).to eq "points"
+      @parent.update!(grading_type: "pass_fail")
+      expect(@first_checkpoint.reload.grading_type).to eq "pass_fail"
+      expect(@second_checkpoint.reload.grading_type).to eq "pass_fail"
     end
 
     it "will update the sub_assignment lock_at and unlock_at when parent updates" do

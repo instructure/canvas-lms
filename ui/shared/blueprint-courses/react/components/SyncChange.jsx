@@ -90,7 +90,7 @@ class SyncChange extends Component {
     return (
       <ul className="bcs__history-item__change-exceps">
         {Object.keys(exGroups).map(groupType =>
-          this.renderExceptionGroup(groupType, exGroups[groupType])
+          this.renderExceptionGroup(groupType, exGroups[groupType]),
         )}
       </ul>
     )
@@ -127,7 +127,7 @@ class SyncChange extends Component {
               <Grid.Row>
                 <Grid.Col width={5}>
                   {this.renderText(
-                    locale ? `${asset_name} (${captionLanguageForLocale(locale)})` : asset_name
+                    locale ? `${asset_name} (${captionLanguageForLocale(locale)})` : asset_name,
                   )}
                 </Grid.Col>
                 <Grid.Col width={2}>{this.renderText(itemTypeLabels[asset_type])}</Grid.Col>
@@ -137,7 +137,7 @@ class SyncChange extends Component {
                     <Pill id="exceptionPill">
                       {I18n.t(
                         {one: '%{count} exception', other: '%{count} exceptions'},
-                        {count: exceptions.length}
+                        {count: exceptions.length},
                       )}
                     </Pill>
                   ) : (

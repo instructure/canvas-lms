@@ -269,7 +269,7 @@ export default class CourseSidebar extends Component {
           <Link
             aria-label={I18n.t(
               {one: 'There is 1 Unsynced Change', other: 'There are %{count} Unsynced Changes'},
-              {count: this.props.unsyncedChanges.length}
+              {count: this.props.unsyncedChanges.length},
             )}
             id="mcUnsyncedChangesBtn"
             ref={c => {
@@ -305,7 +305,7 @@ export default class CourseSidebar extends Component {
         <Link
           aria-label={I18n.t(
             {one: 'There is 1 Association', other: 'There are %{count} Associations'},
-            {count: length}
+            {count: length},
           )}
           disabled={isSyncing}
           id="mcSidebarAsscBtn"
@@ -409,7 +409,7 @@ const connectState = state =>
     {
       hasAssociationChanges: state.addedAssociations.length + state.removedAssociations.length > 0,
       willAddAssociations: state.addedAssociations.length > 0,
-    }
+    },
   )
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedCourseSidebar = connect(connectState, connectActions)(CourseSidebar)

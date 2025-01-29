@@ -44,7 +44,7 @@ export type CustomColumnsState = {
 
 export default (
   set: StoreApi<GradebookStore>['setState'],
-  get: StoreApi<GradebookStore>['getState']
+  get: StoreApi<GradebookStore>['getState'],
 ): CustomColumnsState => ({
   reorderCustomColumnsUrl: '',
 
@@ -73,7 +73,7 @@ export default (
           .loadCustomColumnsData(customColumns.map(column => column.id))
           .catch(() => {
             FlashAlert.showFlashError(
-              I18n.t('There was an error fetching custom column data for Gradebook')
+              I18n.t('There was an error fetching custom column data for Gradebook'),
             )
           })
       })
@@ -93,14 +93,13 @@ export default (
   },
 
   reorderCustomColumns: (columnIds: string[]) =>
-    // @ts-expect-error
     $.ajaxJSON(get().reorderCustomColumnsUrl, 'POST', {
       order: columnIds,
     }),
 
   loadCustomColumnsData: (columnIds: string[] = []): Promise<CustomColumnData[][]> => {
     const customColumnsDataLoadingPromises = columnIds.map(columnId =>
-      get().loadDataForCustomColumn(columnId)
+      get().loadDataForCustomColumn(columnId),
     )
 
     return Promise.all(customColumnsDataLoadingPromises)

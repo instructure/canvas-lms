@@ -12,7 +12,8 @@ limit_section_visibility_in_lmgb:
   state: hidden
   applies_to: RootAccount
   display_name: Restricted view for teachers in LMGB
-  description: Hides certain students and sections in the LMGB if the teacher only
+  description:
+    Hides certain students and sections in the LMGB if the teacher only
     has access to a particular section
 outcome_alignments_course_migration:
   state: hidden
@@ -23,7 +24,8 @@ outcome_alignments_course_migration:
 account_level_mastery_scales:
   state: hidden
   display_name: Account and Course Level Outcome Mastery Scales
-  description: Allows setting Account & Course Level mastery scales and calculation methods,
+  description:
+    Allows setting Account & Course Level mastery scales and calculation methods,
     replacing per-outcome criterion ratings & calculation methods
   after_state_change_proc: mastery_scales_after_change_hook
   applies_to: RootAccount
@@ -31,7 +33,8 @@ improved_outcomes_management:
   state: hidden
   applies_to: RootAccount
   display_name: Improved Outcomes Management
-  description: Helps administrators and teachers make more meaningful decisions as they import,
+  description:
+    Helps administrators and teachers make more meaningful decisions as they import,
     organize, and edit outcomes in their account and courses.
 assignment_comment_library:
   type: setting
@@ -61,7 +64,8 @@ outcomes_friendly_description:
   state: hidden
   applies_to: SiteAdmin
   display_name: Outcomes Friendly Description
-  description: Allows users to add a friendly description to outcomes for student and parent view
+  description:
+    Allows users to add a friendly description to outcomes for student and parent view
     in the Student Learning Mastery Gradebook.
 outcome_service_results_to_canvas:
   state: hidden
@@ -99,9 +103,9 @@ prevent_deletion_outcomes_with_os_alignments:
   applies_to: SiteAdmin
   display_name: Prevent deletion of outcomes with alignments in OS
   description: This FF is for development purposes only and should not be adjusted without first consulting product and engineering. This flag will prevent deletion of outcomes that have alignments within the outcomes service, which is used for New Quizzes.
-improved_outcomes_report_generation:
+improved_outcome_report_generation:
   state: hidden
-  display_name: Improved Outcomes Report Generation
-  description: Reduces execution time of Student Competency Report generation by reducing query complexity.
+  display_name: Improved Outcome Report Generation
+  description: Enables postprocessing records after SQL execution to reduce query complexity in Outcome reports.
   applies_to: SiteAdmin
   shadow: true

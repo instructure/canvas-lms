@@ -52,7 +52,7 @@ export type ConfirmProps = {
 }
 
 export function confirmDanger(
-  confirmProps: Omit<ConfirmProps, 'confirmButtonColor'>
+  confirmProps: Omit<ConfirmProps, 'confirmButtonColor'>,
 ): Promise<boolean> {
   return confirm({
     ...confirmProps,
@@ -77,10 +77,10 @@ export function confirm(confirmProps: ConfirmProps): Promise<boolean> {
       alertContainer.removeChild(container)
       resolve(false)
     }
-     
+
     ReactDOM.render(
       <ConfirmationModal {...confirmProps} onConfirm={handleConfirm} onCancel={handleCancel} />,
-      container
+      container,
     )
   })
 }
@@ -139,7 +139,7 @@ function getConfirmContainer() {
     confirmContainer.id = messageHolderId
     confirmContainer.setAttribute(
       'style',
-      'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;'
+      'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;',
     )
     document.body.appendChild(confirmContainer)
   }

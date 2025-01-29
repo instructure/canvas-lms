@@ -162,7 +162,7 @@ class ManualQuotasView extends ValidatedFormView {
             message: I18n.t(
               'find_not_authorized',
               'You are not authorized to access that %{type}',
-              {type: model.type}
+              {type: model.type},
             ),
           },
         ],

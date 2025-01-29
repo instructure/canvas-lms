@@ -46,7 +46,7 @@ export default [
         </Heading>
         <p>
           {I18n.t(
-            "We know it's a priority to transition your institution for online learning during this time. This quick tour will show you how to:"
+            "We know it's a priority to transition your institution for online learning during this time. This quick tour will show you how to:",
           )}
         </p>
         <ol>
@@ -141,7 +141,7 @@ export default [
             rel="noopener noreferrer"
           >
             {I18n.t(
-              'Video conferencing tools enable face-to-face connection between teachers and students.'
+              'Video conferencing tools enable face-to-face connection between teachers and students.',
             )}
           </Link>
         </Text>

@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
 import CanvasModal from '../Modal'
 
 describe('CanvasModal', () => {
-  it('renders a header, close button, and children', () => {
+  it('renders a header, close button, and children', async () => {
     const handleDismiss = jest.fn()
-    const {getByText} = render(
+    render(
       <CanvasModal
         open={true}
         label="Do the thing"
@@ -31,41 +32,44 @@ describe('CanvasModal', () => {
         footer={<span>The Footer</span>}
       >
         Dialog Content
-      </CanvasModal>
+      </CanvasModal>,
     )
-    expect(getByText('Do the thing').tagName).toBe('H2')
-    expect(getByText('Dialog Content')).toBeInTheDocument()
-    expect(getByText('The Footer')).toBeInTheDocument()
-    const closeButton = getByText('Close').closest('button')
+
+    const heading = screen.getByRole('heading', {name: 'Do the thing'})
+    expect(heading.tagName).toBe('H2')
+    expect(screen.getByText('Dialog Content')).toBeInTheDocument()
+    expect(screen.getByText('The Footer')).toBeInTheDocument()
+
+    const closeButton = screen.getByRole('button', {name: 'Close'})
     expect(closeButton).toBeInTheDocument()
-    fireEvent.click(closeButton)
+    await userEvent.click(closeButton)
     expect(handleDismiss).toHaveBeenCalled()
   })
 
-  describe('Errors', () => {
-    // Don't want to log the expected errors to the console
-    beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation(() => {})
+  describe('Error Boundary', () => {
+    const originalError = console.error
+    beforeAll(() => {
+      console.error = jest.fn()
     })
 
-    afterEach(() => {
-      console.error.mockRestore() // eslint-disable-line no-console
+    afterAll(() => {
+      console.error = originalError
     })
 
-    it('has an error boundary in case the children throw', () => {
-      function ThrowError() {
+    it('catches errors in children and displays fallback UI', () => {
+      const ThrowError = () => {
         throw new Error('something bad happened')
       }
 
-      const {getByText} = render(
+      render(
         <CanvasModal open={true} label="Do the thing">
           <ThrowError />
-        </CanvasModal>
+        </CanvasModal>,
       )
-      expect(getByText(/something broke/i)).toBeInTheDocument()
-      // Header and close button should still be there
-      expect(getByText('Do the thing').tagName).toBe('H2')
-      expect(getByText('Close').closest('button')).toBeInTheDocument()
+
+      expect(screen.getByText(/something broke/i)).toBeInTheDocument()
+      expect(screen.getByRole('heading', {name: 'Do the thing'})).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument()
     })
   })
 })

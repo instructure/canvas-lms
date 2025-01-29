@@ -25,7 +25,7 @@ describe('ErrorBoundary', () => {
     const {getByText} = render(
       <ErrorBoundary>
         <div>hello</div>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
     expect(getByText('hello')).toBeInTheDocument()
   })

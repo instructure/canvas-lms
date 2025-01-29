@@ -234,5 +234,5 @@ export default new Store(
       }
     },
   },
-  Dispatcher
+  Dispatcher,
 )

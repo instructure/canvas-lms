@@ -52,7 +52,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     // assignment is of type no-submission
     it('does not show the not submitted yet filter when the assignment is of type no submissions', () => {
       const {queryByText, getByTestId} = renderMessageStudentsWhoDialog(
-        mockAssignment({submissionTypes: ['none']})
+        mockAssignment({submissionTypes: ['none']}),
       )
       fireEvent.click(getByTestId('filter-students'))
       expect(queryByText(`Haven't submitted yet`)).toBeNull()
@@ -60,7 +60,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     // 'First Student' has not submitted, 'Second Student' has submitted
     it('populates the students list when the not submitted filter is selected', () => {
       const {getByText, getByTestId, queryByText} = renderMessageStudentsWhoDialog(
-        partialSubAssignment()
+        partialSubAssignment(),
       )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText(`Haven't submitted yet`))
@@ -70,7 +70,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     // 'Second Student' has submitted and has been graded
     it('populates the students list when the ungraded filter is selected', () => {
       const {getByText, getByTestId, queryByText} = renderMessageStudentsWhoDialog(
-        partialSubAssignment()
+        partialSubAssignment(),
       )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText(`Haven't been graded`))
@@ -85,7 +85,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
             submissions: {
               nodes: variedSubmissionTypes(),
             },
-          })
+          }),
         )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored less than'))
@@ -102,7 +102,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
             submissions: {
               nodes: variedSubmissionTypes(),
             },
-          })
+          }),
         )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored more than'))
@@ -119,7 +119,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
             submissions: {
               nodes: variedSubmissionTypes(),
             },
-          })
+          }),
         )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored less than'))
@@ -166,7 +166,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
           submissions: {
             nodes: variedSubmissionTypes(),
           },
-        })
+        }),
       )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored more than'))
@@ -183,7 +183,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
             submissions: {
               nodes: variedSubmissionTypes(),
             },
-          })
+          }),
         )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored more than'))
@@ -211,7 +211,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
             submissions: {
               nodes: variedSubmissionTypes(),
             },
-          })
+          }),
         )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored more than'))
@@ -241,7 +241,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
             submissions: {
               nodes: variedSubmissionTypes(),
             },
-          })
+          }),
         )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored more than'))
@@ -267,7 +267,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
           submissions: {
             nodes: variedSubmissionTypes(),
           },
-        })
+        }),
       )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored more than'))
@@ -288,7 +288,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
     it('does not allow negative points', () => {
       const {getByText, getByTestId, getByPlaceholderText} = renderMessageStudentsWhoDialog(
-        partialSubAssignment()
+        partialSubAssignment(),
       )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored more than'))
@@ -315,7 +315,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
           submissions: {
             nodes: variedSubmissionTypes(),
           },
-        })
+        }),
       )
       fireEvent.click(getByTestId('filter-students'))
       // Both students have not submitted, Student6 has a grade
@@ -336,7 +336,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
           submissions: {
             nodes: variedSubmissionTypes(),
           },
-        })
+        }),
       )
       // Default is unsubmitted and both students have not submitted
       expect(getByText('Fifth Student')).toBeInTheDocument()
@@ -392,7 +392,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
                 }),
               ],
             },
-          })
+          }),
         )
       // Default is unsubmitted, both students have submitted and have a grade
       expect(queryByText('Second Student')).toBeNull()
@@ -412,7 +412,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
             submissions: {
               nodes: variedSubmissionTypes(),
             },
-          })
+          }),
         )
       // Default is unsubmitted, both students have submitted and have a grade
       expect(queryByText('Second Student')).toBeFalsy()
@@ -432,7 +432,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
             submissions: {
               nodes: variedSubmissionTypes(),
             },
-          })
+          }),
         )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored less than'))
@@ -455,7 +455,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
     it('can add students', () => {
       const {getByText, getByTestId, queryByText} = renderMessageStudentsWhoDialog(
-        partialSubAssignment()
+        partialSubAssignment(),
       )
       expect(queryByText('Second Student')).toBeNull()
       fireEvent.click(getByTestId('student-recipients'))
@@ -465,7 +465,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
     it('resets the student list when the filter changes, even when the students list has changed', () => {
       const {getByText, queryByText, getByTestId} = renderMessageStudentsWhoDialog(
-        partialSubAssignment()
+        partialSubAssignment(),
       )
       // default filter is unsubmitted
       expect(getByText('First Student')).toBeInTheDocument()
@@ -487,7 +487,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
           submissions: {
             nodes: variedSubmissionTypes(),
           },
-        })
+        }),
       )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored less than'))
@@ -518,7 +518,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
     it('autofills the subject field when the points change', () => {
       const {getByText, getByTestId, getByPlaceholderText} = renderMessageStudentsWhoDialog(
-        partialSubAssignment()
+        partialSubAssignment(),
       )
       fireEvent.click(getByTestId('filter-students'))
       fireEvent.click(getByText('Scored less than'))
@@ -625,7 +625,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
 
     it('handles error', async () => {
       const {getByTestId, findAllByText, getByText} = renderMessageStudentsWhoDialog(
-        partialSubAssignment()
+        partialSubAssignment(),
       )
       const bodyInput = getByTestId('body-input')
       fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})

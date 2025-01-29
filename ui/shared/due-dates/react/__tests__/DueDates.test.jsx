@@ -145,7 +145,7 @@ describe('DueDates', () => {
     expect(tokenTexts).toContain('Reading Group Two')
 
     const nullDueDateTokens = tokens.filter(t =>
-      ['Plebs', 'Reading Group One'].includes(t.textContent)
+      ['Plebs', 'Reading Group One'].includes(t.textContent),
     )
     const dueDateTokens = tokens.filter(t => ['Patricians'].includes(t.textContent))
     const lateDueDateTokens = tokens.filter(t => ['Reading Group Two'].includes(t.textContent))

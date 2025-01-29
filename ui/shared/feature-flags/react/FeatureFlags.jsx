@@ -55,7 +55,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     }
     const transitions = flagUtils.buildTransitions(
       flag,
-      flagUtils.doesAllowDefaults(flag, disableDefaults)
+      flagUtils.doesAllowDefaults(flag, disableDefaults),
     )
     if (stateFilter === 'enabled') {
       return [transitions.enabled, 'allowed_on'].includes(filterableStateOf(flag))
@@ -72,9 +72,9 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   useEffect(() => {
     const groupings = groupBy(
       features.filter(
-        feat => (!hiddenFlags || !hiddenFlags.includes(feat.feature)) && matchesFilters(feat)
+        feat => (!hiddenFlags || !hiddenFlags.includes(feat.feature)) && matchesFilters(feat),
       ),
-      'applies_to'
+      'applies_to',
     )
 
     if (groupings.Account || groupings.RootAccount) {

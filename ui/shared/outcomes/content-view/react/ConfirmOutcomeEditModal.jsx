@@ -44,10 +44,9 @@ export function showConfirmOutcomeEdit(props) {
     if (modal) modal.show()
   }
 
-   
   ReactDOM.render(
     <ConfirmOutcomeEditModal {...props} parent={() => parent} ref={showConfirmOutcomeEditRef} />,
-    parent
+    parent,
   )
 }
 
@@ -103,7 +102,7 @@ export default class ConfirmOutcomeEditModal extends Component {
               {willUpdateRubrics({changed, hasUpdateableRubrics}) && (
                 <li>
                   {I18n.t(
-                    'This will update all rubrics using this outcome that have not yet been assessed'
+                    'This will update all rubrics using this outcome that have not yet been assessed',
                   )}
                 </li>
               )}
@@ -111,7 +110,7 @@ export default class ConfirmOutcomeEditModal extends Component {
                 <li>
                   {I18n.t(
                     'You’ve updated the scoring criteria; this will affect all students ' +
-                      'previously assessed using this outcome'
+                      'previously assessed using this outcome',
                   )}
                 </li>
               )}

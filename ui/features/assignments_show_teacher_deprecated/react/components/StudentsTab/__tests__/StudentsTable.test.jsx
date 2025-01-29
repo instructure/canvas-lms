@@ -40,7 +40,7 @@ it('renders basic information', () => {
   const assignment = mockAssignment()
 
   const {getByText, getAllByText} = render(
-    <StudentsTable assignment={assignment} submissions={[submission]} />
+    <StudentsTable assignment={assignment} submissions={[submission]} />,
   )
   expect(getByText('Name')).toBeInTheDocument()
   expect(getByText(user.shortName)).toBeInTheDocument()
@@ -56,7 +56,7 @@ it('renders basic information', () => {
   const viewSubmissionLink = closest(getByText('Attempt 1'), 'a')
   expect(viewSubmissionLink).toBeTruthy()
   expect(viewSubmissionLink.getAttribute('href')).toMatch(
-    /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid&student_id=user_1&attempt=1/
+    /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid&student_id=user_1&attempt=1/,
   )
 })
 
@@ -66,7 +66,7 @@ it('displays no attempts, scores, or submission dates with zero attempts', () =>
   const assignment = mockAssignment()
 
   const {getByText, queryByText} = render(
-    <StudentsTable assignment={assignment} submissions={[submission]} />
+    <StudentsTable assignment={assignment} submissions={[submission]} />,
   )
   expect(getByText('Name')).toBeInTheDocument()
   expect(getByText(user.shortName)).toBeInTheDocument()
@@ -90,7 +90,7 @@ it('displays multiple attempts', () => {
   const assignment = mockAssignment()
 
   const {getByText, getAllByText} = render(
-    <StudentsTable assignment={assignment} submissions={[submission]} />
+    <StudentsTable assignment={assignment} submissions={[submission]} />,
   )
   expect(getAllByText('Attempt 1')[0]).toBeInTheDocument()
   expect(getAllByText('Attempt 2')[0]).toBeInTheDocument()
@@ -104,7 +104,7 @@ it('displays multiple attempts', () => {
 
   const viewSubmissionLink = closest(getByText('Attempt 1'), 'a')
   expect(viewSubmissionLink.getAttribute('href')).toMatch(
-    /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid&student_id=user_1&attempt=1/
+    /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid&student_id=user_1&attempt=1/,
   )
 })
 
@@ -130,7 +130,7 @@ it('renders submission status pill', () => {
   const submittedAt = `${tz.format(submission.submittedAt, I18n.t('#date.formats.full'))}`
 
   const {queryByText, getByText} = render(
-    <StudentsTable assignment={assignment} submissions={[submission]} />
+    <StudentsTable assignment={assignment} submissions={[submission]} />,
   )
   expect(queryByText('View Submission', {exact: false})).toBeNull()
   expect(queryByText(submittedAt)).toBeNull()
@@ -147,7 +147,7 @@ it('renders excused status pill', () => {
   const submittedAt = `${tz.format(submission.submittedAt, I18n.t('#date.formats.full'))}`
 
   const {queryByText, getByText} = render(
-    <StudentsTable assignment={assignment} submissions={[submission]} />
+    <StudentsTable assignment={assignment} submissions={[submission]} />,
   )
   expect(queryByText('View Submission', {exact: false})).toBeNull()
   expect(queryByText(submittedAt)).toBeNull()
@@ -163,7 +163,7 @@ it('renders the specified sort direction', () => {
       sortableColumns={['username']}
       sortId="username"
       sortDirection="descending"
-    />
+    />,
   )
   const nameButton = closest(getByText('Name'), 'button')
   expect(nameButton.querySelector('[name="IconMiniArrowDown"]')).not.toBe(null)

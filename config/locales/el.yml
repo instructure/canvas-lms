@@ -1669,6 +1669,7 @@ el:
   admin_4d3ba42f: Διαχειριστής
   admin_tools_9e2c9268: "Εργαλεία Διαχειριστή"
   admins_3e1dce15: Διαχειριστές
+  advanced_turnitin_settings_9ee84a38: "Προχωρημένες Ρυθμίσεις Turnitin"
   after_48b9d69: Έπειτα...
   after_4c71e718: Έπειτα
   after_date_981cd41b: "έπειτα απο τις %{date}"
@@ -3655,6 +3656,7 @@ el:
   confirm_contact_method_29d6fe4b: "Επιβεβαίωση τρόπου επικοινωνίας"
   confirm_delete_6febeafb: "Επικύρωση Αφαίρεσης"
   confirm_email_address_9072dd3c: "Επικύρωση Ηλεκτρονικής Διεύθυνσης"
+  confirm_new_password_3d3ca4ea: "Επιβεβαίωση Νέου Κωδικού Πρόσβασης"
   confirm_password_aaf07824: "Επικύρωση Συνθηματικού"
   confirm_unenrollment_64333263: "Επιβεβαίωση απεγγραφής"
   confirmation_code_required_22984955: "Κωδικός επιβεβαίωσης (απαιτείται)"
@@ -7289,6 +7291,7 @@ el:
         randomly_assign_students_dialog: "Κάτι τέτοιο θα κατατάξει αυτόματα τους μη εγγεγραμμένους σπουδαστές όσο το δυνατό πιο ομοιόμορφα σε ήδη υπάρχουσες ομάδες σπουδαστών."
       self_signup_help: 
         about_self_signup_groups: "Σχετικά με τις Ομάδες Αυτο-εγγραφής"
+        self_signup_deadline_description: "<mrk mid=\"6526\" mtype=\"seg\">Μπορείτε να δημιουργήσετε σετ ομάδων όπου οι σπουδαστές θα μπορούν να εγγράφονται μόνοι τους.</mrk> <mrk mid=\"6527\" mtype=\"seg\">Οι σπουδαστές μπορούν να εγγράφονται ακόμη σε μία μόνο ομάδα του σετ, αλλά έτσι οι σπουδαστές μπορούν να οργανώνονται οι ίδιοι σε ομάδες αντί να χρειάζεται να το κάνει αυτό ο καθηγητής.</mrk> <mrk mid=\"6528\" mtype=\"seg\">Σημειώνεται ότι όσο αυτή η επιλογή είναι ενεργοποιημένη, οι σπουδαστές μπορούν να μετακινούνται από μια ομάδα σε άλλη.</mrk>"
         self_signup_description: "<mrk mid=\"6526\" mtype=\"seg\">Μπορείτε να δημιουργήσετε σετ ομάδων όπου οι σπουδαστές θα μπορούν να εγγράφονται μόνοι τους.</mrk> <mrk mid=\"6527\" mtype=\"seg\">Οι σπουδαστές μπορούν να εγγράφονται ακόμη σε μία μόνο ομάδα του σετ, αλλά έτσι οι σπουδαστές μπορούν να οργανώνονται οι ίδιοι σε ομάδες αντί να χρειάζεται να το κάνει αυτό ο καθηγητής.</mrk> <mrk mid=\"6528\" mtype=\"seg\">Σημειώνεται ότι όσο αυτή η επιλογή είναι ενεργοποιημένη, οι σπουδαστές μπορούν να μετακινούνται από μια ομάδα σε άλλη.</mrk>"
     max_membership_number: "Το μέγιστο όριο των μελών ομάδας πρέπει να είναι αριθμός"
     membership_pending: 
@@ -9962,6 +9965,7 @@ el:
   move_abf00365: Μετακίνησε
   move_dialog_select: 
     move_to_end: "-- Στο κάτω μέρος --"
+  move_from_ef79aa53: "Μετακίνηση από"
   move_module_item_77754119: "Μετακίνηση Ενότητας/Στοιχείου"
   move_name_to_a_new_group_acabed4e: "Μετακίνηση του/της %{name} σε νέα ομάδα"
   move_outcome_ce497e6c: "Μετακίνηση Αποτελέσματος"
@@ -10050,6 +10054,7 @@ el:
   new_module_4e9287e4: "Νέα Ενότητα"
   new_outcome_7fba8c7d: "Νέο Αποτέλεσμα"
   new_outcome_group_af59f145: "Νέα Ομάδα Αποτελεσμάτων"
+  new_password_1232cbf2: "Καινούργιο Συνθηματικό"
   new_question_9107c469: "Νέα Ερώτηση"
   new_quiz_34aacba6: "Νέο Κουίζ"
   next_40e12421: Επόμενη
@@ -11555,6 +11560,8 @@ el:
     confirm_change_password: 
       buttons: 
         update_password: "Ενημέρωση Κωδικού Πρόσβασης"
+      confirm_change_password: 
+        loading: Φόρτωση...
       labels: 
         new_password: "Καινούργιο Συνθηματικό"
         password: "Κωδικός πρόσβασης"
@@ -15256,6 +15263,7 @@ el:
   update_details_6abfed16: "Ενημέρωση Λεπτομερειών"
   update_grade_b47eb3ff: "Ενημέρωση Βαθμού"
   update_module_b984c2e5: "Ενημέρωση Αρθρώματος"
+  update_password_4bc5cb1f: "Ενημέρωση Κωδικού Πρόσβασης"
   update_settings_9b422d0f: "Ενημέρωση Ρυθμίσεων"
   update_tool_7d48ef2a: "Ενημέρωση %{tool}"
   update_your_notification_settings_ed9564f3: "Ενημέρωση των ρυθμίσεων ειδοποιήσεών σας"
@@ -15708,6 +15716,7 @@ el:
   view_notifications_6aea09a2: "Προβολή Ειδοποιήσεων"
   view_previous_file_b846db4f: "Προβολή προηγούμενου αρχείου"
   view_question_banks_188a9e0f: "Προβολή Τραπεζών Ερωτήσεων"
+  view_registered_services_6c8cd301: "Προβολή Υπηρεσιών στις οποίες έχετε Εγγραφεί"
   view_rubric_d71cce10: "Εμφάνιση Ρουμπρίκας Αξιολόγισης"
   view_the_assignment_e61ca4fc: "Δείτε την εργασία"
   view_this_message_in_conversations_5a16bc9f: "Προβολή αυτού του μηνύματος στις Συνομιλίες"
@@ -15769,6 +15778,7 @@ el:
   what_would_you_like_to_do_next_2835397e: "Τι θα θέλατε να κάνετε έπειτα;"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "<mrk mid=\"4369\" mtype=\"seg\">Όταν επισκέπτεται κάποιος το μάθημα, αυτή είναι η σελίδα που θα βλέπει.</mrk>  <mrk mid=\"4370\" mtype=\"seg\">Μπορείτε να ρυθμίσετε να εμφανίζεται η ροή δραστηριοτήτων, η λίστα των ενοτήτων του μαθήματος, το αναλυτικό πρόγραμμα ή κάποια προσαρμοσμένη σελίδα που θα δημιουργήσετε εσείς.</mrk>  <mrk mid=\"4371\" mtype=\"seg\">Η προεπιλεγμένη ρύθμιση είναι η ροή δραστηριοτήτων.</mrk>"
   where_would_you_like_to_move_title_fabd6e8f: "Πού θα θέλατε να μετακινήσετε το %{title};"
+  which_login_to_change_4707fbc6: "Ποια σύνδεση να αλλάξει"
   white_87fa64fd: Λευκό
   widget: 
     upload_media_track_form: 

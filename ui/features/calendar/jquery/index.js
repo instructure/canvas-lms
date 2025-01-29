@@ -153,7 +153,7 @@ export default class Calendar {
     this.connectHeaderEvents()
     this.connectAgendaEvents()
     $('#flash_message_holder').on('click', '.gotoDate_link', event =>
-      this.gotoDate(fcUtil.wrap($(event.target).data('date')))
+      this.gotoDate(fcUtil.wrap($(event.target).data('date'))),
     )
 
     this.header.selectView(this.getCurrentView())
@@ -161,7 +161,7 @@ export default class Calendar {
     // enter find-appointment mode via sign-up-for-things notification URL
     if (data.find_appointment && this.schedulerStore) {
       const course = ENV.CALENDAR.CONTEXTS.filter(
-        context => context.asset_string === data.find_appointment
+        context => context.asset_string === data.find_appointment,
       )
       if (course.length) {
         this.schedulerStore.dispatch(schedulerActions.actions.setCourse(course[0]))
@@ -248,7 +248,7 @@ export default class Calendar {
         dragCursorAt: {month: {top: -5, left: -5}},
       },
 
-      calendarDefaults
+      calendarDefaults,
     )
   }
 
@@ -284,10 +284,10 @@ export default class Calendar {
               calendarEventFilter(
                 this.displayAppointmentEvents,
                 events.concat(aEvents),
-                this.schedulerState
-              )
+                this.schedulerState,
+              ),
             )
-          }
+          },
         )
       } else {
         this.gettingEvents = false
@@ -371,8 +371,8 @@ export default class Calendar {
     const screenReaderTitleHint = event.eventType.match(/assignment/)
       ? I18n.t('Assignment Title:')
       : event.eventType === 'planner_note'
-      ? I18n.t('To Do:')
-      : I18n.t('Event Title:')
+        ? I18n.t('To Do:')
+        : I18n.t('Event Title:')
 
     let reservedText = ''
     if (event.isAppointmentGroupEvent()) {
@@ -390,8 +390,8 @@ export default class Calendar {
         ? $.trim(htmlEscape(element.find('.fc-title').text()))
         : $.trim(
             `${timeString}\n${$element.find('.fc-title').text()}\n\n${I18n.t(
-              'Calendar:'
-            )} ${htmlEscape(event.contextInfo.name)} ${htmlEscape(reservedText)}`
+              'Calendar:',
+            )} ${htmlEscape(event.contextInfo.name)} ${htmlEscape(reservedText)}`,
           )
 
     $element.attr('title', newTitle)
@@ -400,9 +400,9 @@ export default class Calendar {
       .prepend(
         $(
           `<span class='screenreader-only'>${htmlEscape(
-            I18n.t('calendar_title', 'Calendar:')
-          )} ${htmlEscape(event.contextInfo.name)}</span>`
-        )
+            I18n.t('calendar_title', 'Calendar:'),
+          )} ${htmlEscape(event.contextInfo.name)}</span>`,
+        ),
       )
     $element
       .find('.fc-title')
@@ -451,7 +451,7 @@ export default class Calendar {
           currentTarget: element,
           pageX: element.offset().left + parseInt(element.width() / 2, 10),
         },
-        view
+        view,
       )
     }
 
@@ -502,7 +502,7 @@ export default class Calendar {
       revertFunc()
       showFlashAlert({
         message: I18n.t(
-          'Discussion checkpoints are not draggable. You can update their due dates by editing the parent discussion topic.'
+          'Discussion checkpoints are not draggable. You can update their due dates by editing the parent discussion topic.',
         ),
         err: null,
         type: 'error',
@@ -525,7 +525,7 @@ export default class Calendar {
         revertFunc()
         showFlashAlert({
           message: I18n.t(
-            'Assignment has a locked date. Due date cannot be set outside of locked date range.'
+            'Assignment has a locked date. Due date cannot be set outside of locked date range.',
           ),
           err: null,
           type: 'error',
@@ -716,7 +716,7 @@ export default class Calendar {
     }
     event.start = date
     event.addClass('event_pending')
-    const revertFunc = () => console.log('could not save date on undated event')  
+    const revertFunc = () => console.log('could not save date on undated event')
 
     if (!this._eventDrop(event, 0, false, revertFunc)) {
       return
@@ -743,7 +743,7 @@ export default class Calendar {
         event.start = originalStart
         event.end = originalEnd
         return this.updateEvent(event)
-      }
+      },
     )
   }
 
@@ -864,14 +864,14 @@ export default class Calendar {
   // when an appointment event was deleted, clear the reserved flag and increment the available slot count on the parent
   handleUnreserve = event => {
     const parentEvent = this.dataSource.eventWithId(
-      `calendar_event_${event.calendarEvent.parent_event_id}`
+      `calendar_event_${event.calendarEvent.parent_event_id}`,
     )
     if (parentEvent) {
       parentEvent.calendarEvent.reserved = false
       parentEvent.calendarEvent.available_slots += 1
       // remove the unreserved event from the parent's children.
       parentEvent.calendarEvent.child_events = parentEvent.calendarEvent.child_events.filter(
-        obj => obj.id !== event.calendarEvent.id
+        obj => obj.id !== event.calendarEvent.id,
       )
       // need to update the appointmentGroupEventStatus to make sure it
       // correctly displays the new status in the calendar.
@@ -1161,7 +1161,7 @@ export default class Calendar {
   agendaViewFetch(start) {
     this.setDateTitle(this.formatDate(start, 'date.formats.medium'))
     return $.when(this.hasAppointmentGroups).then(() =>
-      this.agenda.fetch(this.visibleContextList.concat(this.findAppointmentModeGroups()), start)
+      this.agenda.fetch(this.visibleContextList.concat(this.findAppointmentModeGroups()), start),
     )
   }
 
@@ -1171,8 +1171,8 @@ export default class Calendar {
     this.setDateTitle(
       `${this.formatDate(start, 'date.formats.medium')} – ${this.formatDate(
         end,
-        'date.formats.medium'
-      )}`
+        'date.formats.medium',
+      )}`,
     )
     // for "load more" with voiceover, we want the alert to happen later so
     // the focus change doesn't interrupt it.
@@ -1181,7 +1181,7 @@ export default class Calendar {
         I18n.t('agenda_view_displaying_start_end', 'Now displaying %{start} through %{end}', {
           start: this.formatDate(start, 'date.formats.long'),
           end: this.formatDate(end, 'date.formats.long'),
-        })
+        }),
       )
     }, 500)
   }
@@ -1308,7 +1308,7 @@ export default class Calendar {
 
     // find the next reservable appointment and report its date
     const group_ids = map(this.findAppointmentModeGroups(), asset_string =>
-      last(asset_string.split('_'))
+      last(asset_string.split('_')),
     )
     if (!(group_ids.length > 0)) return
 
@@ -1328,13 +1328,13 @@ export default class Calendar {
                 ],
                 date: tz.format(nextDate, 'date.formats.long'),
               }),
-              30000
+              30000,
             )
           }
         } else {
           $.flashWarning(I18n.t('There are no available signups for this course.'))
         }
-      }
+      },
     )
   }
 }

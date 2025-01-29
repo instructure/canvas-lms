@@ -99,7 +99,7 @@ export class ExternalToolsTable extends React.Component {
     const rceFavCount = countFavorites(externalTools)
     const topNavFavCount = externalTools.reduce(
       (accum, current) => accum + (current.is_top_nav_favorite ? 1 : 0),
-      0
+      0,
     )
     return externalTools.map(tool => (
       <ExternalToolsTableRow
@@ -137,6 +137,7 @@ export class ExternalToolsTable extends React.Component {
           <table
             className="ic-Table ic-Table--striped ic-Table--condensed"
             id="external-tools-table"
+            data-testid="dev-key-admin-table"
           >
             <caption className="screenreader-only">{I18n.t('External Apps')}</caption>
             <thead>
@@ -150,7 +151,7 @@ export class ExternalToolsTable extends React.Component {
                     {I18n.t('Pin to Top Navigation')}
                     <Tooltip
                       renderTip={I18n.t(
-                        'There is a 2 app limit for pinned tools in Top Navigation.'
+                        'There is a 2 app limit for pinned tools in Top Navigation.',
                       )}
                       placement="top"
                       on={['hover', 'focus']}
@@ -171,7 +172,7 @@ export class ExternalToolsTable extends React.Component {
                     {I18n.t('Add to RCE toolbar')}
                     <Tooltip
                       renderTip={I18n.t(
-                        'There is a 2 app limit on the RCE toolbar. Apps which Instructure defaults to on are not included in the limit.'
+                        'There is a 2 app limit on the RCE toolbar. Apps which Instructure defaults to on are not included in the limit.',
                       )}
                       placement="top"
                       on={['hover', 'focus']}
@@ -209,6 +210,6 @@ export function countFavorites(tools) {
       !INST.editorButtons?.find(b => b.id === current.app_id)?.on_by_default
         ? 1
         : 0),
-    0
+    0,
   )
 }

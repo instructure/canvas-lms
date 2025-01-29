@@ -15,15 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render, fireEvent} from '@testing-library/react'
 import DeleteConfirmation from '../DeleteConfirmation'
 
-const ok = x => expect(x).toBeTruthy()
-const equal = (x, y) => expect(x).toBe(y)
-
-const props = {
+const defaultProps = {
   collaboration: {
     title: 'Hello there',
     description: 'Im here to describe stuff',
@@ -31,57 +28,36 @@ const props = {
     user_name: 'Say my name',
     updated_at: new Date(0).toString(),
   },
-  onDelete: () => {},
-  onCancel: () => {},
+  onDelete: jest.fn(),
+  onCancel: jest.fn(),
 }
 
 describe('DeleteConfirmation', () => {
-  // passes in QUnit, fails in Jest
-  test.skip('renders the message and action buttons', () => {
-    const component = TestUtils.renderIntoDocument(<DeleteConfirmation {...props} />)
-    const message = TestUtils.findRenderedDOMComponentWithClass(
-      component,
-      'DeleteConfirmation-message'
-    )
-    const buttons = TestUtils.scryRenderedDOMComponentsWithClass(component, 'Button')
+  it('renders the message and action buttons', () => {
+    const {getByTestId} = render(<DeleteConfirmation {...defaultProps} />)
 
-    equal(ReactDOM.findDOMNode(message).innerText, 'Remove "Hello there"?')
-    equal(buttons.length, 2)
-    equal(ReactDOM.findDOMNode(buttons[0]).innerText, 'Yes, remove')
-    equal(ReactDOM.findDOMNode(buttons[1]).innerText, 'Cancel')
+    expect(getByTestId('delete-message')).toHaveTextContent('Remove "Hello there"?')
+    expect(getByTestId('confirm-delete-button')).toHaveTextContent('Yes, remove')
+    expect(getByTestId('cancel-delete-button')).toHaveTextContent('Cancel')
   })
 
-  test('Clicking on the confirmation button calls onDelete', () => {
-    let onDeleteCalled = false
-    const newProps = {
-      ...props,
-      onDelete: () => {
-        onDeleteCalled = true
-      },
-    }
+  it('calls onDelete when clicking confirm button', () => {
+    const {getByTestId} = render(<DeleteConfirmation {...defaultProps} />)
 
-    const component = TestUtils.renderIntoDocument(<DeleteConfirmation {...newProps} />)
-    const confirmButton = ReactDOM.findDOMNode(
-      TestUtils.scryRenderedDOMComponentsWithClass(component, 'Button')[0]
-    )
-    TestUtils.Simulate.click(confirmButton)
-    ok(onDeleteCalled)
+    fireEvent.click(getByTestId('confirm-delete-button'))
+    expect(defaultProps.onDelete).toHaveBeenCalled()
   })
 
-  test('Clicking on the cancel button calls onCancel', () => {
-    let onCancelCalled = false
-    const newProps = {
-      ...props,
-      onCancel: () => {
-        onCancelCalled = true
-      },
-    }
+  it('calls onCancel when clicking cancel button', () => {
+    const {getByTestId} = render(<DeleteConfirmation {...defaultProps} />)
 
-    const component = TestUtils.renderIntoDocument(<DeleteConfirmation {...newProps} />)
-    const cancelButton = ReactDOM.findDOMNode(
-      TestUtils.scryRenderedDOMComponentsWithClass(component, 'Button')[1]
-    )
-    TestUtils.Simulate.click(cancelButton)
-    ok(onCancelCalled)
+    fireEvent.click(getByTestId('cancel-delete-button'))
+    expect(defaultProps.onCancel).toHaveBeenCalled()
+  })
+
+  it('focuses the dialog on mount', () => {
+    const {getByTestId} = render(<DeleteConfirmation {...defaultProps} />)
+
+    expect(getByTestId('delete-confirmation')).toHaveFocus()
   })
 })

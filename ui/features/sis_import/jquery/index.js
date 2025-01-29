@@ -94,13 +94,15 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.accounts', 'Accounts: %{account_count}', {
           account_count: batch.data.counts.accounts,
-        })
+        }),
       ) +
       '</li>'
     output +=
       '<li>' +
       htmlEscape(
-        I18n.t('import_counts.terms', 'Terms: %{term_count}', {term_count: batch.data.counts.terms})
+        I18n.t('import_counts.terms', 'Terms: %{term_count}', {
+          term_count: batch.data.counts.terms,
+        }),
       ) +
       '</li>'
     output +=
@@ -108,7 +110,7 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.courses', 'Courses: %{course_count}', {
           course_count: batch.data.counts.courses,
-        })
+        }),
       ) +
       '</li>'
     output +=
@@ -116,13 +118,15 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.sections', 'Sections: %{section_count}', {
           section_count: batch.data.counts.sections,
-        })
+        }),
       ) +
       '</li>'
     output +=
       '<li>' +
       htmlEscape(
-        I18n.t('import_counts.users', 'Users: %{user_count}', {user_count: batch.data.counts.users})
+        I18n.t('import_counts.users', 'Users: %{user_count}', {
+          user_count: batch.data.counts.users,
+        }),
       ) +
       '</li>'
     output +=
@@ -130,7 +134,7 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.logins', 'Logins: %{login_count}', {
           login_count: batch.data.counts.logins,
-        })
+        }),
       ) +
       '</li>'
     output +=
@@ -138,7 +142,7 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.enrollments', 'Enrollments: %{enrollment_count}', {
           enrollment_count: batch.data.counts.enrollments,
-        })
+        }),
       ) +
       '</li>'
     output +=
@@ -146,7 +150,7 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.crosslists', 'Crosslists: %{crosslist_count}', {
           crosslist_count: batch.data.counts.xlists,
-        })
+        }),
       ) +
       '</li>'
     output +=
@@ -154,7 +158,7 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.admins', 'Admins: %{admin_count}', {
           admin_count: batch.data.counts.admins,
-        })
+        }),
       ) +
       '</li>'
     output +=
@@ -162,7 +166,7 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.group_categories', 'Group Categories: %{group_categories_count}', {
           group_categories_count: batch.data.counts.group_categories,
-        })
+        }),
       ) +
       '</li>'
     output +=
@@ -170,7 +174,7 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.groups', 'Groups: %{group_count}', {
           group_count: batch.data.counts.groups,
-        })
+        }),
       ) +
       '</li>'
     output +=
@@ -178,7 +182,7 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.group_enrollments', 'Group Enrollments: %{group_enrollments_count}', {
           group_enrollments_count: batch.data.counts.group_memberships,
-        })
+        }),
       ) +
       '</li>'
     output +=
@@ -186,7 +190,7 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.user_observers', 'User Observers: %{user_observers_count}', {
           user_observers_count: batch.data.counts.user_observers,
-        })
+        }),
       ) +
       '</li>'
     output +=
@@ -194,7 +198,7 @@ $(document).ready(function (_event) {
       htmlEscape(
         I18n.t('import_counts.change_sis_ids', 'Change SIS IDs: %{change_sis_ids_count}', {
           change_sis_ids_count: batch.data.counts.change_sis_ids,
-        })
+        }),
       ) +
       '</li>'
     output += '</ul></li></ul>'
@@ -208,7 +212,7 @@ $(document).ready(function (_event) {
         htmlEscape(I18n.t('status.processing', 'Processing')) +
           " <div style='font-size: 0.6em;'>" +
           htmlEscape(I18n.t('notices.processing_takes_awhile', 'this may take a bit...')) +
-          '</div>'
+          '</div>',
       )
       .prop('disabled', true)
     $('.instruction').hide()
@@ -244,7 +248,7 @@ $(document).ready(function (_event) {
           if (sis_batch) {
             progress = Math.max(
               $('.copy_progress').progressbar('option', 'value') || 0,
-              sis_batch.progress
+              sis_batch.progress,
             )
             $('.copy_progress').progressbar('option', 'value', progress)
             $('#import_log').empty()
@@ -257,10 +261,10 @@ $(document).ready(function (_event) {
                 htmlEscape(
                   I18n.t(
                     'messages.import_complete_success',
-                    'The import is complete and all records were successfully imported.'
-                  )
-                ) + createCountsHtml(sis_batch)
-              )
+                    'The import is complete and all records were successfully imported.',
+                  ),
+                ) + createCountsHtml(sis_batch),
+              ),
             )
           } else if (sis_batch.workflow_state === 'failed') {
             const code = 'sis_batch_' + sis_batch.id
@@ -270,7 +274,7 @@ $(document).ready(function (_event) {
               const message = I18n.t(
                 'errors.import_failed_code',
                 'There was an error importing your SIS data. Please notify your system administrator and give them the following code: "%{code}"',
-                {code}
+                {code},
               )
               $('.sis_messages .sis_error_message').text(message)
             }
@@ -280,7 +284,7 @@ $(document).ready(function (_event) {
             $('#sis_importer').hide()
             {
               let message = htmlEscape(
-                I18n.t('errors.import_failed_messages', 'The import failed with these messages:')
+                I18n.t('errors.import_failed_messages', 'The import failed with these messages:'),
               )
               message += createMessageHtml(sis_batch)
               $('.sis_messages .sis_error_message').html(raw(message))
@@ -293,8 +297,8 @@ $(document).ready(function (_event) {
               let message = htmlEscape(
                 I18n.t(
                   'messages.import_complete_warnings',
-                  'The SIS data was imported but with these messages:'
-                )
+                  'The SIS data was imported but with these messages:',
+                ),
               )
               message += createMessageHtml(sis_batch)
               message += createCountsHtml(sis_batch)
@@ -312,7 +316,7 @@ $(document).ready(function (_event) {
         },
         () => {
           setTimeout(checkup, 3000)
-        }
+        },
       )
     }
     setTimeout(checkup, 2000)

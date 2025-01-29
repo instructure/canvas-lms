@@ -223,7 +223,7 @@ export default function GradeSelect(props) {
             score,
             studentId: props.studentId,
           },
-          numFormatter
+          numFormatter,
         )
       }
     }
@@ -308,7 +308,7 @@ GradeSelect.propTypes = {
     shape({
       graderName: string,
       graderId: string.isRequired,
-    })
+    }),
   ).isRequired,
   grades: object.isRequired,
   onClose: func,

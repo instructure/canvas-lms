@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -54,7 +52,7 @@ GradeSummaryOutcome.prototype.parse = function (response) {
             ? ref1.includes('assessment_question_bank')
             : void 0
           : void 0,
-    })
+    }),
   )
 }
 

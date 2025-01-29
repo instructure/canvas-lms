@@ -34,7 +34,7 @@ module1.itemsWithDates = module1.items.map(
       ...item,
       type: 'assignment' as const,
       date: moment(dueDates[index]),
-    } as CoursePaceItemWithDate)
+    }) as CoursePaceItemWithDate,
 )
 
 const defaultProps = {
@@ -66,7 +66,7 @@ describe('Module', () => {
 
   it('does not show due date column header when hiding projections', () => {
     const {queryByRole, queryByTestId} = renderConnected(
-      <Module {...defaultProps} showProjections={false} />
+      <Module {...defaultProps} showProjections={false} />,
     )
     expect(queryByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
     expect(queryByTestId('pp-duration-columnheader')).toBeInTheDocument()
@@ -76,16 +76,16 @@ describe('Module', () => {
 
   it('displays headers and values in stacked format when at small screen sizes', () => {
     const {queryByRole, queryAllByTestId} = renderConnected(
-      <Module {...defaultProps} responsiveSize="small" showProjections={true} />
+      <Module {...defaultProps} responsiveSize="small" showProjections={true} />,
     )
     expect(queryByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
     expect(queryByRole('columnheader')).not.toBeInTheDocument()
     expect(queryAllByTestId('pp-title-cell')[0].textContent).toEqual(
-      'Item: Basic encryption/decryption100 pts'
+      'Item: Basic encryption/decryption100 pts',
     )
     expect(queryAllByTestId('pp-duration-cell')[0]).toBeInTheDocument()
     expect(queryAllByTestId('pp-due-date-cell')[1].textContent).toEqual(
-      'Due DateToggle tooltip: Tue, Mar 22, 2022'
+      'Due DateToggle tooltip: Tue, Mar 22, 2022',
     )
     expect(queryAllByTestId('pp-status-cell')[0].textContent).toEqual('Status: Published')
   })
@@ -95,7 +95,7 @@ describe('Module', () => {
     expect(
       getByRole('tooltip', {
         name: 'Due Dates are being compressed based on your start and end dates',
-      })
+      }),
     ).toBeInTheDocument()
   })
 
@@ -104,7 +104,7 @@ describe('Module', () => {
     expect(
       getByRole('tooltip', {
         name: 'Changing course pacing days may modify due dates',
-      })
+      }),
     ).toBeInTheDocument()
   })
 
@@ -113,7 +113,7 @@ describe('Module', () => {
     expect(
       getByRole('tooltip', {
         name: 'Dates shown in Course Time Zone',
-      })
+      }),
     ).toBeInTheDocument()
   })
 
@@ -132,9 +132,9 @@ describe('Module', () => {
     })
 
     const {queryAllByRole, queryAllByTestId} = renderConnected(
-      <Module {...defaultProps} module={module2} responsiveSize="small" showProjections={true} />
+      <Module {...defaultProps} module={module2} responsiveSize="small" showProjections={true} />,
     )
-    expect(queryAllByRole('row').length).toEqual(3)
-    expect(queryAllByTestId('pp-status-cell').length).toEqual(2)
+    expect(queryAllByRole('row')).toHaveLength(3)
+    expect(queryAllByTestId('pp-status-cell')).toHaveLength(2)
   })
 })

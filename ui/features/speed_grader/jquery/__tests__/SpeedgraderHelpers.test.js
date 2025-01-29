@@ -117,7 +117,7 @@ describe('SpeedGrader', () => {
     const container_ = SpeedgraderHelpers.urlContainer(
       submission,
       defaultContainer,
-      reportContainer
+      reportContainer,
     )
     expect(container_).toBe(reportContainer)
   })
@@ -425,7 +425,7 @@ describe('SpeedgraderHelpers#plagiarismResubmitHandler', () => {
       'http://www.test.com',
       'POST',
       {},
-      expect.any(Function)
+      expect.any(Function),
     )
   })
 
@@ -450,7 +450,7 @@ describe('SpeedGraderHelpers.resourceLinkLookupUuidParam', () => {
   test('returns resource_link_lookup_uuid param when submission resource_link_lookup_uuid exists', () => {
     const submission = {resource_link_lookup_uuid: 'test-uuid'}
     expect(SpeedgraderHelpers.resourceLinkLookupUuidParam(submission)).toBe(
-      '&resource_link_lookup_uuid=test-uuid'
+      '&resource_link_lookup_uuid=test-uuid',
     )
   })
 })

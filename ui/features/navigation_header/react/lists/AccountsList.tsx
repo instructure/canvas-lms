@@ -59,7 +59,7 @@ export default function AccountsList() {
                 <ActiveText url={`/accounts/${account.id}`}>{account.name}</ActiveText>
               </Link>
             </List.Item>
-          ))
+          )),
         )}
     </List>
   )

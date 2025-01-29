@@ -81,7 +81,7 @@ const Environment = {
     window.history.pushState(
       '',
       '',
-      [window.location.pathname, decodeURIComponent(encodeQueryString(this.query))].join('?')
+      [window.location.pathname, decodeURIComponent(encodeQueryString(this.query))].join('?'),
     )
   },
 

@@ -16,20 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import type {ViewOwnProps} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
-import {ROUTES} from '../routes/routes'
+import type {ViewOwnProps} from '@instructure/ui-view'
+import React from 'react'
 import {useMatch, useNavigate} from 'react-router-dom'
-import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useNewLogin, useNewLoginData} from '../context'
+import {ROUTES} from '../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
 const SignInLinks = () => {
   const navigate = useNavigate()
-  const {isPreviewMode, isUiActionPending, forgotPasswordUrl} = useNewLogin()
+  const {isUiActionPending} = useNewLogin()
+  const {isPreviewMode, forgotPasswordUrl} = useNewLoginData()
   const isSignIn = useMatch(ROUTES.SIGN_IN)
   const isForgotPassword = useMatch(ROUTES.FORGOT_PASSWORD)
 

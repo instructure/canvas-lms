@@ -22,7 +22,6 @@ import userEvent from '@testing-library/user-event'
 import {shallow} from 'enzyme'
 import {Provider} from 'react-redux'
 import _ from 'lodash'
-import sinon from 'sinon'
 
 import AnnouncementsIndex from '../AnnouncementsIndex'
 
@@ -74,7 +73,7 @@ const makeProps = (props = {}) =>
       toggleAnnouncementsLock: jest.fn(),
       announcementsLocked: false,
     },
-    props
+    props,
   )
 
 // necessary to mock this because we have a child Container/"Smart" component
@@ -105,7 +104,7 @@ describe('AnnouncementsIndex component', function () {
     render(
       <Provider store={store}>
         <AnnouncementsIndex {...makeProps()} ref={ref} />
-      </Provider>
+      </Provider>,
     )
     expect(ref.current).toBeTruthy()
   })
@@ -117,13 +116,13 @@ describe('AnnouncementsIndex component', function () {
   })
 
   test('calls getAnnouncements if hasLoadedAnnouncements is false', () => {
-    const getAnnouncements = sinon.spy()
+    const getAnnouncements = jest.fn()
     render(
       <Provider store={store}>
         <AnnouncementsIndex {...makeProps({getAnnouncements})} />
-      </Provider>
+      </Provider>,
     )
-    expect(getAnnouncements.callCount).toEqual(1)
+    expect(getAnnouncements).toHaveBeenCalledTimes(1)
   })
 
   test('should render IndexHeader if we have manage_course_content_edit/delete permissions', () => {
@@ -134,7 +133,7 @@ describe('AnnouncementsIndex component', function () {
             permissions: {manage_course_content_delete: true, manage_course_content_edit: true},
           })}
         />
-      </Provider>
+      </Provider>,
     )
     expect(tree.queryAllByText('Announcement Filter')).toBeTruthy()
   })
@@ -147,13 +146,13 @@ describe('AnnouncementsIndex component', function () {
             permissions: {manage_course_content_delete: true, manage_course_content_edit: true},
           })}
         />
-      </Provider>
+      </Provider>,
     )
     expect(tree.queryAllByText('Announcement Filter')).toBeTruthy()
   })
 
   test('clicking announcement checkbox triggers setAnnouncementSelection with correct data', async () => {
-    const selectSpy = sinon.spy()
+    const selectSpy = jest.fn()
     const props = {
       announcements,
       announcementSelectionChangeStart: selectSpy,
@@ -163,19 +162,19 @@ describe('AnnouncementsIndex component', function () {
     const tree = render(
       <Provider store={store}>
         <AnnouncementsIndex {...makeProps(props)} />
-      </Provider>
+      </Provider>,
     )
 
     const checkbox = tree.container.querySelector('input[type="checkbox"]')
     await userEvent.click(checkbox)
     setTimeout(() => {
-      expect(selectSpy.callCount).toEqual(1)
-      expect(selectSpy.firstCall.args).toEqual([{selected: true, id: announcements[0].id}])
+      expect(selectSpy).toHaveBeenCalledTimes(1)
+      expect(selectSpy).toHaveBeenCalledWith({selected: true, id: announcements[0].id})
     })
   })
 
   test('does not show checkbox if manage_course_content_edit/delete is false', () => {
-    const selectSpy = sinon.spy()
+    const selectSpy = jest.fn()
     const props = {
       announcements,
       announcementSelectionChangeStart: selectSpy,
@@ -189,7 +188,7 @@ describe('AnnouncementsIndex component', function () {
     const tree = render(
       <Provider store={store}>
         <AnnouncementsIndex {...makeProps(props)} />
-      </Provider>
+      </Provider>,
     )
 
     expect(tree.container.querySelector('input[type="checkbox"]')).toBeFalsy()
@@ -219,12 +218,12 @@ describe('AnnouncementsIndex component', function () {
     render(
       <Provider store={store}>
         <AnnouncementsIndex {...makeProps(props)} ref={indexRef} />
-      </Provider>
+      </Provider>,
     )
   })
 
   test('onManageAnnouncement calls toggleAnnouncementsLock when called with lock action', done => {
-    const lockSpy = sinon.spy()
+    const lockSpy = jest.fn()
     const props = {
       announcements,
       hasLoadedAnnouncements: true,
@@ -237,7 +236,7 @@ describe('AnnouncementsIndex component', function () {
       if (c) {
         c.onManageAnnouncement(null, {action: 'lock'})
         setTimeout(() => {
-          expect(lockSpy.callCount).toEqual(1)
+          expect(lockSpy).toHaveBeenCalledTimes(1)
           done()
         })
       }
@@ -245,7 +244,7 @@ describe('AnnouncementsIndex component', function () {
     render(
       <Provider store={store}>
         <AnnouncementsIndex {...makeProps(props)} ref={indexRef} />
-      </Provider>
+      </Provider>,
     )
   })
 })

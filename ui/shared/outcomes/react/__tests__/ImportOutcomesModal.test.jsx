@@ -18,10 +18,13 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import sinon from 'sinon'
 import ImportOutcomesModal from '../ImportOutcomesModal'
 
-const element = () => sinon.createStubInstance(Element)
+const element = () => {
+  const el = document.createElement('div')
+  el.trigger = jest.fn()
+  return el
+}
 
 it('renders the ConfirmOutcomeEditModal component', () => {
   const modal = shallow(<ImportOutcomesModal toolbar={element()} />)

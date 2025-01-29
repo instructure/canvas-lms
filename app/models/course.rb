@@ -522,11 +522,7 @@ class Course < ActiveRecord::Base
 
   def modules_visible_to(user)
     scope = grants_right?(user, :view_unpublished_items) ? context_modules.not_deleted : context_modules.active
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      DifferentiableAssignment.scope_filter(scope, user, self)
-    else
-      scope
-    end
+    DifferentiableAssignment.scope_filter(scope, user, self)
   end
 
   def module_items_visible_to(user)

@@ -75,14 +75,14 @@ export default ({
         !peerReviewModeEnabled &&
         submission.attempt != null &&
         submission.attempt > 1 &&
-        submission.state === 'unsubmitted'
+        submission.state === 'unsubmitted',
     )
 
   const unsubmittedDraftMessage = I18n.t(
-    'After the first attempt, you cannot leave comments until you submit the assignment.'
+    'After the first attempt, you cannot leave comments until you submit the assignment.',
   )
   const unavailablePeerReviewMessage = I18n.t(
-    'You cannot leave comments until reviewer and reviewee submits the assignment.'
+    'You cannot leave comments until reviewer and reviewee submits the assignment.',
   )
   const popoverMessage = shouldDisplayPeerReviewEmptyState
     ? unavailablePeerReviewMessage
@@ -251,7 +251,7 @@ export default ({
                 isOriginalityReportVisible(
                   assignment.originalityReportVisibility,
                   assignment.dueAt,
-                  submission.gradingStatus
+                  submission.gradingStatus,
                 ) &&
                 getOriginalityData(submission, 0) && (
                   <Flex.Item>

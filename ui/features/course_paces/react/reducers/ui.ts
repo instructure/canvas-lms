@@ -38,7 +38,6 @@ export const initialState: UIState = {
   showPaceModal: false,
   responsiveSize: 'large',
   showProjections: true,
-  // @ts-expect-error
   blueprintLocked: window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course,
 }
 
@@ -78,7 +77,7 @@ export const getBlueprintLocked = (state: StoreState) => state.ui.blueprintLocke
 export const getShowProjections = createSelector(
   state => state.ui.showProjections,
   getCoursePaceType,
-  (showProjections, coursePaceType) => showProjections || coursePaceType === 'Enrollment'
+  (showProjections, coursePaceType) => showProjections || coursePaceType === 'Enrollment',
 )
 
 /* Reducers */

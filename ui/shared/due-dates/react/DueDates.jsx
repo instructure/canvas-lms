@@ -93,7 +93,7 @@ export default class DueDates extends React.Component {
         selectedGroupSetId: this.props.selectedGroupSetId,
         importantDates: this.props.importantDates,
       },
-      this.fetchAdhocStudents
+      this.fetchAdhocStudents,
     )
 
     OverrideStudentStore.addChangeListener(this.handleStudentStoreChange)
@@ -233,7 +233,7 @@ export default class DueDates extends React.Component {
       changedToken,
       row.overrides,
       rowKey,
-      row.dates
+      row.dates,
     )
 
     this.replaceRow(rowKey, newOverridesForRow, row.dates)
@@ -309,13 +309,13 @@ export default class DueDates extends React.Component {
     const effectiveDueDates = AssignmentOverrideHelper.effectiveDueDatesForAssignment(
       assignment,
       overrides,
-      allStudents
+      allStudents,
     )
     const gradingPeriodsHelper = new GradingPeriodsHelper(this.props.gradingPeriods)
     return reduce(
       effectiveDueDates,
       this.addStudentIfInClosedPeriod.bind(this, gradingPeriodsHelper),
-      []
+      [],
     )
   }
 
@@ -347,7 +347,7 @@ export default class DueDates extends React.Component {
         this.filterDropdownOptionsForMultipleGradingPeriods(
           validStudents,
           validGroups,
-          validSections
+          validSections,
         ))
     }
 
@@ -370,7 +370,7 @@ export default class DueDates extends React.Component {
     const omitted = reduce(
       studentsToOmit,
       this.extractGroupsAndSectionsFromStudent.bind(this, groups),
-      {groupsToOmit: {}, sectionsToOmit: {}}
+      {groupsToOmit: {}, sectionsToOmit: {}},
     )
 
     return {

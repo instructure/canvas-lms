@@ -61,7 +61,7 @@ export const getSelectedPaceContext = (state: StoreState): PaceContext | null =>
 export const paceContextsReducer = (
   state = paceContextsInitialState,
   // @ts-expect-error
-  action
+  action,
 ): PaceContextsState => {
   switch (action.type) {
     case PaceContextsConstants.SET_PACE_CONTEXTS: {
@@ -142,7 +142,7 @@ export const paceContextsReducer = (
         const newPublishingContext = action.payload.find(
           // @ts-expect-error
           updatedContextPublishing =>
-            contextPublishing.progress_context_id === updatedContextPublishing.progress_context_id
+            contextPublishing.progress_context_id === updatedContextPublishing.progress_context_id,
         )
         return newPublishingContext || contextPublishing
       })
@@ -155,14 +155,14 @@ export const paceContextsReducer = (
       return {
         ...state,
         contextsPublishing: state.contextsPublishing.filter(
-          ({progress_context_id}) => action.payload.progress_context_id !== progress_context_id
+          ({progress_context_id}) => action.payload.progress_context_id !== progress_context_id,
         ),
       }
     case PaceContextsConstants.REPLACE_PACE_CONTEXTS: {
       const newPaceContexts = state.entries.map(paceContext => {
         const newPaceContext = action.payload.find(
           // @ts-expect-error
-          updatedPaceContext => paceContext.item_id === updatedPaceContext.item_id
+          updatedPaceContext => paceContext.item_id === updatedPaceContext.item_id,
         )
         return newPaceContext || paceContext
       })

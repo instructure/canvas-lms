@@ -29,7 +29,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to view the previous SIS import dates, errors, and imported items.'
+        'Allows user to view the previous SIS import dates, errors, and imported items.',
       ),
     },
     {
@@ -39,7 +39,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People (Account)'),
       description: I18n.t(
-        'Allows user to view and edit the SIS ID and Integration ID in a user’s Login Details.'
+        'Allows user to view and edit the SIS ID and Integration ID in a user’s Login Details.',
       ),
     },
     {
@@ -59,23 +59,23 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People (Account)'),
       description: I18n.t(
-        'To view or edit a user’s SIS ID or Integration ID, Users - view list and Users - manage login details must also both be enabled.'
+        'To view or edit a user’s SIS ID or Integration ID, Users - view list and Users - manage login details must also both be enabled.',
       ),
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        'If this permission is enabled, users do not need the SIS Data - read permission enabled. The account permission overrides the course permission.'
+        'If this permission is enabled, users do not need the SIS Data - read permission enabled. The account permission overrides the course permission.',
       ),
     },
     {
       description: I18n.t(
-        'To disallow users from managing SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled.'
+        'To disallow users from managing SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled.',
       ),
     },
     {
       description: I18n.t(
-        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
+        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).',
       ),
     },
     {
@@ -88,5 +88,5 @@ export const template = generateActionTemplates(
     },
   ],
   [],
-  []
+  [],
 )

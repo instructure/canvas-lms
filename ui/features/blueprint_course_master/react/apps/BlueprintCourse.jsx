@@ -51,7 +51,7 @@ export default class BlueprintCourse {
 
   render() {
     const routeTo = isBlueprintShabang() ? this.router.page : noop
-    // eslint-disable-next-line no-restricted-properties
+
     ReactDOM.render(
       <Provider store={this.store}>
         <ConnectedCourseSidebar
@@ -61,7 +61,7 @@ export default class BlueprintCourse {
           }}
         />
       </Provider>,
-      this.root
+      this.root,
     )
   }
 

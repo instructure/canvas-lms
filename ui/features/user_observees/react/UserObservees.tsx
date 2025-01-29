@@ -16,26 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
-import * as z from 'zod'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-text'
-import {Flex} from '@instructure/ui-flex'
-import {TextInput} from '@instructure/ui-text-input'
-import {zodResolver} from '@hookform/resolvers/zod'
-import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {IconAddLine} from '@instructure/ui-icons'
-import {View} from '@instructure/ui-view'
-import {Link} from '@instructure/ui-link'
-import {useQuery, useMutation} from '@canvas/query'
-import {Spinner} from '@instructure/ui-spinner'
-import {Alert} from '@instructure/ui-alerts'
-import {Mask, Overlay} from '@instructure/ui-overlays'
+import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {clearObservedId, savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
+import {useMutation, useQuery} from '@canvas/query'
+import {assignLocation} from '@canvas/util/globalUtils'
+import {zodResolver} from '@hookform/resolvers/zod'
+import {Alert} from '@instructure/ui-alerts'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {IconAddLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
+import {Mask, Overlay} from '@instructure/ui-overlays'
+import {Spinner} from '@instructure/ui-spinner'
+import {Text} from '@instructure/ui-text'
+import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-view'
+import React from 'react'
+import {Controller, type SubmitHandler, useForm} from 'react-hook-form'
+import * as z from 'zod'
 
 const I18n = createI18nScope('pairing_code_user_observees')
 
@@ -94,15 +95,14 @@ function UserObservees({userId}: UserObserveesProps) {
     },
     onSuccess: observee => {
       if (observee?.redirect) {
-         
         const isConfirmed = window.confirm(
           I18n.t(
-            "In order to complete the process you will be redirected to a login page where you will need to log in with your child's credentials."
-          )
+            "In order to complete the process you will be redirected to a login page where you will need to log in with your child's credentials.",
+          ),
         )
 
         if (isConfirmed) {
-          window.location.href = observee.redirect
+          assignLocation(observee.redirect)
         }
       } else {
         showFlashSuccess(I18n.t('Now observing %{name}.', {name: observee?.name}))()
@@ -139,11 +139,10 @@ function UserObservees({userId}: UserObserveesProps) {
   const buttonText = I18n.t('Student')
 
   const handleRemoveObservee = ({observeeId, name}: {observeeId: string; name: string}) => {
-     
     const isConfirmed = window.confirm(
       I18n.t('Are you sure you want to stop observing %{name}?', {
         name,
-      })
+      }),
     )
 
     if (!isConfirmed) {

@@ -73,7 +73,7 @@ describe('CourseAndModulePicker', () => {
     })
     const setModule = jest.fn()
     const {getByText} = render(
-      <CourseAndModulePicker selectedCourseId="abc" setSelectedModule={setModule} />
+      <CourseAndModulePicker selectedCourseId="abc" setSelectedModule={setModule} />,
     )
     const selector = getByText(/select a module/i)
     fireEvent.click(selector)
@@ -106,7 +106,7 @@ describe('CourseAndModulePicker', () => {
         selectedCourseId="abc"
         selectedModuleId="1"
         setModuleItemPosition={setPosition}
-      />
+      />,
     )
     const selector = getByTestId('select-position')
     fireEvent.change(selector, {target: {value: 'top'}})
@@ -132,7 +132,7 @@ describe('CourseAndModulePicker', () => {
         selectedCourseId="abc"
         setSelectedModule={setModule}
         disableModuleInsertion={true}
-      />
+      />,
     )
     const selector = queryByText(/select a module/i)
     expect(selector).not.toBeInTheDocument()
@@ -147,7 +147,7 @@ describe('CourseAndModulePicker', () => {
     })
     const setModule = jest.fn()
     const {queryByText} = render(
-      <CourseAndModulePicker selectedCourseId="abc" setSelectedModule={setModule} />
+      <CourseAndModulePicker selectedCourseId="abc" setSelectedModule={setModule} />,
     )
     const selector = queryByText(/select an assignment/i)
     expect(selector).not.toBeInTheDocument()
@@ -188,7 +188,7 @@ describe('CourseAndModulePicker', () => {
             ],
           },
         },
-      })
+      }),
     )
 
     const setModule = jest.fn()
@@ -197,7 +197,7 @@ describe('CourseAndModulePicker', () => {
         selectedCourseId="abc"
         setSelectedModule={setModule}
         showAssignments={true}
-      />
+      />,
     )
     const selector = queryByText(/select an assignment/i)
     expect(selector).toBeInTheDocument()

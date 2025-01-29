@@ -70,7 +70,7 @@ describe('AccountTree', () => {
   it('calls onAccountToggled when a checkbox is toggled', async () => {
     const onAccountToggled = jest.fn()
     const {findByRole, getByRole} = render(
-      <AccountTree {...defaultProps} onAccountToggled={onAccountToggled} />
+      <AccountTree {...defaultProps} onAccountToggled={onAccountToggled} />,
     )
     expect(await findByRole('button', {name: 'University, 5 accounts'})).toBeInTheDocument()
     const universityCheckbox = getByRole('checkbox', {name: 'Show account calendar for University'})
@@ -87,7 +87,7 @@ describe('AccountTree', () => {
   it('asks to expand tree when a parent account is selected', async () => {
     const onAccountExpandedToggled = jest.fn()
     const {findByRole} = render(
-      <AccountTree {...defaultProps} onAccountExpandedToggled={onAccountExpandedToggled} />
+      <AccountTree {...defaultProps} onAccountExpandedToggled={onAccountExpandedToggled} />,
     )
     const cpmsButton = await findByRole('button', {name: 'CPMS, 2 accounts'})
     act(() => cpmsButton.click())
@@ -97,7 +97,7 @@ describe('AccountTree', () => {
   it('expands expanded nodes of the tree', async () => {
     const {getByText} = render(<AccountTree {...defaultProps} expandedAccounts={[1, 4]} />)
     await waitFor(() => {
-      expect(fetchMock.calls().length).toBe(2)
+      expect(fetchMock.calls()).toHaveLength(2)
     })
     await waitFor(() => {
       expect(getByText('University (5)')).toBeInTheDocument() // this is the parent account
@@ -117,7 +117,7 @@ describe('AccountTree', () => {
     })
     fetchMock.getOnce(
       '/api/v1/accounts/1/account_calendars?page=2&per_page=100',
-      RESPONSE_ACCOUNT_1.slice(3, 5)
+      RESPONSE_ACCOUNT_1.slice(3, 5),
     )
     const {findByRole, getByRole} = render(<AccountTree {...defaultProps} />)
     expect(await findByRole('button', {name: 'University, 5 accounts'})).toBeInTheDocument()

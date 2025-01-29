@@ -40,12 +40,12 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('External Apps (Account, Course Settings)'),
       description: I18n.t(
-        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution).'
+        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution).',
       ),
     },
     {
       description: I18n.t(
-        'Additionally, if this permission is disabled, users cannot delete manually added external apps.'
+        'Additionally, if this permission is disabled, users cannot delete manually added external apps.',
       ),
     },
   ],
@@ -63,13 +63,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('External Apps (Course Settings)'),
       description: I18n.t(
-        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution).'
+        'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution).',
       ),
     },
     {
       description: I18n.t(
-        'Additionally, if this permission is disabled, users cannot delete manually added external apps.'
+        'Additionally, if this permission is disabled, users cannot delete manually added external apps.',
       ),
     },
-  ]
+  ],
 )

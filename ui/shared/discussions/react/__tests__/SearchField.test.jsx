@@ -53,7 +53,7 @@ describe('SearchField Component', () => {
   it('calls onSearchEvent with the correct value after debounce', async () => {
     const onSearchEventMock = jest.fn()
     const {getByPlaceholderText} = render(
-      <SearchField onSearchEvent={onSearchEventMock} searchInputRef={jest.fn()} />
+      <SearchField onSearchEvent={onSearchEventMock} searchInputRef={jest.fn()} />,
     )
     const inputElement = getByPlaceholderText('Search...')
 
@@ -63,7 +63,7 @@ describe('SearchField Component', () => {
       () => {
         expect(onSearchEventMock).toHaveBeenCalledWith({searchTerm: 'test'})
       },
-      {timeout: DEFAULT_SEARCH_DELAY}
+      {timeout: DEFAULT_SEARCH_DELAY},
     )
   })
 })

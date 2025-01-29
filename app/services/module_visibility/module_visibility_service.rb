@@ -43,11 +43,27 @@ module ModuleVisibility
                                         .find_modules_visible_to_sections(course_ids:, user_ids:, context_module_ids:)
           visible_modules |= modules_visible_to_sections
 
+          if assign_to_differentiation_tags_enabled?(course_ids)
+            # add modules visible to groups (and related module group overrides)
+            modules_visible_to_groups = ModuleVisibility::Repositories::ModuleVisibleToStudentRepository
+                                        .find_modules_visible_to_groups(course_ids:, user_ids:, context_module_ids:)
+            visible_modules |= modules_visible_to_groups
+          end
+
           # add modules visible due to ADHOC overrides (and related module ADHOC overrides)
           modules_visible_to_adhoc_overrides = ModuleVisibility::Repositories::ModuleVisibleToStudentRepository
                                                .find_modules_visible_to_adhoc_overrides(course_ids:, user_ids:, context_module_ids:)
           visible_modules | modules_visible_to_adhoc_overrides
         end
+      end
+
+      def assign_to_differentiation_tags_enabled?(course_ids)
+        return false if course_ids.blank?
+
+        account_ids = Course.where(id: course_ids).distinct.pluck(:account_id).uniq
+        accounts = Account.where(id: account_ids).to_a
+
+        accounts.any? { |account| account.feature_enabled?(:assign_to_differentiation_tags) }
       end
     end
   end

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -36,7 +37,7 @@ describe('ScoreToUngradedManager', () => {
 
       const anotherManager = new ScoreToUngradedManager(workingProcess)
       expect(anotherManager.pollingInterval).toStrictEqual(
-        ScoreToUngradedManager.DEFAULT_POLLING_INTERVAL
+        ScoreToUngradedManager.DEFAULT_POLLING_INTERVAL,
       )
     })
 
@@ -135,7 +136,7 @@ describe('ScoreToUngradedManager', () => {
         await manager.startProcess(undefined, () => [])
       } catch (reason) {
         expect(reason).toStrictEqual(
-          'Score to ungraded process failed: No way to monitor score to ungraded provided!'
+          'Score to ungraded process failed: No way to monitor score to ungraded provided!',
         )
       }
     })

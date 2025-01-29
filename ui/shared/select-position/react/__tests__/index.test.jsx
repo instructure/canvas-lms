@@ -29,7 +29,7 @@ describe('SelectPosition', () => {
           {id: '2', title: 'Item 2', groupId: '1'},
           {id: '3', title: 'Item 3', groupId: '1'},
         ]}
-      />
+      />,
     )
     expect(getByText(/Place "Item 1"/)).toBeInTheDocument()
   })
@@ -45,7 +45,7 @@ describe('SelectPosition', () => {
           {id: '2', title: 'Assignments 2', groupId: '2'},
           {id: '3', title: 'Assignments 3', groupId: '3'},
         ]}
-      />
+      />,
     )
     expect(queryByText(/Place "Item 1"/)).not.toBeInTheDocument()
   })
@@ -59,7 +59,7 @@ describe('SelectPosition', () => {
           {id: '3', title: 'Item 3', groupId: '1'},
         ]}
         selectedPosition={{type: 'relative'}}
-      />
+      />,
     )
     expect(getByText(/Item Select/)).toBeInTheDocument()
     expect(getByText(/Item 2/)).toBeInTheDocument()
@@ -74,7 +74,7 @@ describe('SelectPosition', () => {
           {id: '3', title: 'Item 3', groupId: '1'},
         ]}
         selectedPosition={{type: 'absolute'}}
-      />
+      />,
     )
     expect(queryByText(/Item Select/)).not.toBeInTheDocument()
     expect(queryByText(/Item 2/)).not.toBeInTheDocument()
@@ -91,7 +91,7 @@ describe('SelectPosition', () => {
         ]}
         selectedPosition={{type: 'absolute'}}
         selectPosition={selectPosition}
-      />
+      />,
     )
     fireEvent.change(getByTestId('select-position'), {target: {value: 'after'}})
     expect(selectPosition).toHaveBeenCalled()
@@ -108,7 +108,7 @@ describe('SelectPosition', () => {
         ]}
         selectedPosition={{type: 'relative'}}
         selectSibling={selectSibling}
-      />
+      />,
     )
     fireEvent.change(getByTestId('select-sibling'), {target: {value: 'Item 3'}})
     expect(selectSibling).toHaveBeenCalled()

@@ -16,20 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
-import {SSOButtons} from '..'
+import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
-import {NewLoginProvider} from '../../context/NewLoginContext'
+import {SSOButtons} from '..'
+import {NewLoginDataProvider, NewLoginProvider} from '../../context'
 
 describe('SSOButtons', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter>
         <NewLoginProvider>
-          <SSOButtons />
+          <NewLoginDataProvider>
+            <SSOButtons />
+          </NewLoginDataProvider>
         </NewLoginProvider>
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

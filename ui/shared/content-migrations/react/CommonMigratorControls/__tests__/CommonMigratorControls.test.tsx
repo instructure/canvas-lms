@@ -35,7 +35,7 @@ const renderComponent = (overrideProps?: any) =>
       SubmitLabel={TextLabel}
       CancelLabel={TextCancelLabel}
       SubmittingLabel={TextSubmittingLabel}
-    />
+    />,
   )
 
 const TextLabel = () => <Text>Add to Import Queue</Text>
@@ -53,18 +53,19 @@ describe('CommonMigratorControls', () => {
 
   afterEach(() => jest.clearAllMocks())
 
+  const expectNqCheckbox = (getByRole: (role: string, options?: object) => HTMLElement) => {
+    return getByRole('checkbox', {name: /Import existing quizzes as New Quizzes/})
+  }
   it('calls onSubmit with import_quizzes_next', async () => {
-    renderComponent({canImportAsNewQuizzes: true})
+    const {getByRole} = renderComponent({canImportAsNewQuizzes: true})
 
-    await userEvent.click(
-      screen.getByRole('checkbox', {name: /Import existing quizzes as New Quizzes/})
-    )
+    await userEvent.click(expectNqCheckbox(getByRole))
     await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         settings: expect.objectContaining({import_quizzes_next: true}),
-      })
+      }),
     )
   })
 
@@ -72,14 +73,14 @@ describe('CommonMigratorControls', () => {
     renderComponent({canOverwriteAssessmentContent: true})
 
     await userEvent.click(
-      screen.getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/})
+      screen.getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/}),
     )
     await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         settings: expect.objectContaining({overwrite_quizzes: true}),
-      })
+      }),
     )
   })
 
@@ -98,7 +99,7 @@ describe('CommonMigratorControls', () => {
           old_end_date: '',
           old_start_date: '',
         },
-      })
+      }),
     )
   })
 
@@ -114,14 +115,14 @@ describe('CommonMigratorControls', () => {
   it('calls onSubmit with import_blueprint_settings', async () => {
     renderComponent({canSelectContent: true, canImportBPSettings: true})
     await userEvent.click(
-      await screen.getByRole('checkbox', {name: 'Import Blueprint Course settings'})
+      await screen.getByRole('checkbox', {name: 'Import Blueprint Course settings'}),
     )
     await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         settings: expect.objectContaining({import_blueprint_settings: true}),
-      })
+      }),
     )
   })
 
@@ -193,7 +194,7 @@ describe('CommonMigratorControls', () => {
         SubmitLabel={TextLabel}
         SubmittingLabel={TextSubmittingLabel}
         CancelLabel={TextCancelLabel}
-      />
+      />,
     )
     expect(getByRole('radio', {name: 'Shift dates'})).toBeInTheDocument()
     expect(getByRole('radio', {name: 'Shift dates'})).toBeDisabled()
@@ -229,37 +230,33 @@ describe('CommonMigratorControls', () => {
         SubmitLabel={TextLabel}
         SubmittingLabel={TextSubmittingLabel}
         CancelLabel={TextCancelLabel}
-      />
+      />,
     )
     expect(getByRole('checkbox', {name: 'Import Blueprint Course settings'})).toBeDisabled()
-    expect(getByRole('checkbox', {name: /Import existing quizzes as New Quizzes/})).toBeDisabled()
+    expect(expectNqCheckbox(getByRole)).toBeDisabled()
     expect(
-      getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/})
+      getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/}),
     ).toBeDisabled()
   })
 
   it('call setIsQuestionBankDisabled after "Import existing quizzes as New Quizzes" checked', async () => {
-    renderComponent({canImportAsNewQuizzes: true, setIsQuestionBankDisabled})
+    const {getByRole} = renderComponent({canImportAsNewQuizzes: true, setIsQuestionBankDisabled})
 
-    await userEvent.click(
-      screen.getByRole('checkbox', {name: /Import existing quizzes as New Quizzes/})
-    )
+    await userEvent.click(expectNqCheckbox(getByRole))
     expect(setIsQuestionBankDisabled).toHaveBeenCalledWith(true)
-    await userEvent.click(
-      screen.getByRole('checkbox', {name: /Import existing quizzes as New Quizzes/})
-    )
+    await userEvent.click(expectNqCheckbox(getByRole))
     expect(setIsQuestionBankDisabled).toHaveBeenCalledWith(false)
   })
 
   describe('Date fill in', () => {
     const oldStartDateInputSting = '2024-08-08T08:00:00+00:00'
-    const oldStartDateExpectedDate = 'Aug 8 at 8am'
+    const oldStartDateExpectedDate = 'Aug 8, 2024 at 8am'
     const oldEndDateInputSting = '2024-08-09T08:00:00+00:00'
-    const oldEndDateExpectedDate = 'Aug 9 at 8am'
+    const oldEndDateExpectedDate = 'Aug 9, 2024 at 8am'
     const newStartDateInputSting = '2024-08-10T08:00:00+00:00'
-    const newStartDateExpectedDate = 'Aug 10 at 8am'
+    const newStartDateExpectedDate = 'Aug 10, 2024 at 8am'
     const newEndDateInputSting = '2024-08-11T08:00:00+00:00'
-    const newEndDateExpectedDate = 'Aug 11 at 8am'
+    const newEndDateExpectedDate = 'Aug 11, 2024 at 8am'
 
     const expectDateField = (dataCid: string, value: string) => {
       expect((screen.getByTestId(dataCid) as HTMLInputElement).value).toBe(value)
@@ -328,54 +325,122 @@ describe('CommonMigratorControls', () => {
     })
   })
 
-  describe('New Quizzes Label', () => {
-    const testNewQuizzesLabel = async (
-      featureFlag: boolean,
-      labelText: string,
-      headerText: string,
-      bodyText: string
-    ) => {
-      window.ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS = featureFlag
-      renderComponent({canImportAsNewQuizzes: true})
+  describe('New Quizzes Option', () => {
+    describe('Availability', () => {
+      afterEach(() => {
+        window.ENV.QUIZZES_NEXT_ENABLED = true
+        window.ENV.NEW_QUIZZES_MIGRATION_REQUIRED = false
+      })
 
-      expect(screen.getByText(labelText)).toBeInTheDocument()
+      it('enabled New Quizzes option when QUIZZES_NEXT_ENABLED is enabled', () => {
+        const {getByRole} = renderComponent({canImportAsNewQuizzes: true})
+        expect(expectNqCheckbox(getByRole)).toBeEnabled()
+      })
 
-      const infoButton = screen
-        .getByText('Import assessment as New Quizzes Help Icon')
-        .closest('button')
+      it('disables New Quizzes option when QUIZZES_NEXT_ENABLED is disabled', () => {
+        window.ENV.QUIZZES_NEXT_ENABLED = false
+        const {getByRole} = renderComponent({canImportAsNewQuizzes: true})
+        expect(expectNqCheckbox(getByRole)).toBeDisabled()
+      })
 
-      if (!infoButton) {
-        throw new Error('New Quizzes Help button not found')
-      }
-
-      await userEvent.click(infoButton)
-
-      within(screen.getByLabelText('Import assessment as New Quizzes Help Modal')).getByText(
-        headerText
-      )
-      expect(screen.getByText(bodyText)).toBeInTheDocument()
-      expect(
-        screen.getByText('To learn more, please contact your system administrator or visit')
-      ).toBeInTheDocument()
-      expect(screen.getByText('Canvas Instructor Guide')).toBeInTheDocument()
-    }
-
-    it('renders convert new quizzes text when feature flag is enabled', async () => {
-      await testNewQuizzesLabel(
-        true,
-        'Convert content to New Quizzes',
-        'Convert Quizzes',
-        'Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.'
-      )
+      it('disables New Quizzes option when NEW_QUIZZES_MIGRATION_REQUIRED is enabled', () => {
+        window.ENV.NEW_QUIZZES_MIGRATION_REQUIRED = true
+        const {getByRole} = renderComponent({canImportAsNewQuizzes: true})
+        expect(expectNqCheckbox(getByRole)).toBeDisabled()
+      })
     })
 
-    it('renders import new quizzes text when feature flag is disabled', async () => {
-      await testNewQuizzesLabel(
-        false,
-        'Import existing quizzes as New Quizzes',
-        'New Quizzes',
-        'New Quizzes is the new assessment engine for Canvas.'
-      )
+    describe('Default check', () => {
+      afterEach(() => {
+        window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = false
+      })
+
+      describe('when NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS is disabled', () => {
+        it('unchecks New Quizzes option', () => {
+          window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = false
+          const {getByRole} = renderComponent({canImportAsNewQuizzes: true})
+          expect(expectNqCheckbox(getByRole)).not.toBeChecked()
+        })
+
+        it('calls onSubmit with import_quizzes_next false', async () => {
+          window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = false
+          renderComponent({canImportAsNewQuizzes: true})
+          await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+          expect(onSubmit).toHaveBeenCalledWith({
+            errored: false,
+            settings: {import_quizzes_next: false},
+          })
+        })
+      })
+
+      describe('when NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS is enabled', () => {
+        it('checks New Quizzes option', () => {
+          window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = true
+          const {getByRole} = renderComponent({canImportAsNewQuizzes: true})
+          expect(expectNqCheckbox(getByRole)).toBeChecked()
+        })
+
+        it('calls onSubmit with import_quizzes_next true', async () => {
+          window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = true
+          renderComponent({canImportAsNewQuizzes: true})
+          await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+          expect(onSubmit).toHaveBeenCalledWith({
+            errored: false,
+            settings: {import_quizzes_next: true},
+          })
+        })
+      })
+    })
+
+    describe('Label', () => {
+      const testNewQuizzesLabel = async (
+        featureFlag: boolean,
+        labelText: string,
+        headerText: string,
+        bodyText: string,
+      ) => {
+        window.ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS = featureFlag
+        renderComponent({canImportAsNewQuizzes: true})
+
+        expect(screen.getByText(labelText)).toBeInTheDocument()
+
+        const infoButton = screen
+          .getByText('Import assessment as New Quizzes Help Icon')
+          .closest('button')
+
+        if (!infoButton) {
+          throw new Error('New Quizzes Help button not found')
+        }
+
+        await userEvent.click(infoButton)
+
+        within(screen.getByLabelText('Import assessment as New Quizzes Help Modal')).getByText(
+          headerText,
+        )
+        expect(screen.getByText(bodyText)).toBeInTheDocument()
+        expect(
+          screen.getByText('To learn more, please contact your system administrator or visit'),
+        ).toBeInTheDocument()
+        expect(screen.getByText('Canvas Instructor Guide')).toBeInTheDocument()
+      }
+
+      it('renders convert new quizzes text when feature flag is enabled', async () => {
+        await testNewQuizzesLabel(
+          true,
+          'Convert content to New Quizzes',
+          'Convert Quizzes',
+          'Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.',
+        )
+      })
+
+      it('renders import new quizzes text when feature flag is disabled', async () => {
+        await testNewQuizzesLabel(
+          false,
+          'Import existing quizzes as New Quizzes',
+          'New Quizzes',
+          'New Quizzes is the new assessment engine for Canvas.',
+        )
+      })
     })
   })
 })

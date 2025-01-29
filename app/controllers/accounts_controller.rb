@@ -493,7 +493,8 @@ class AccountsController < ApplicationController
                       microsoft_sync_login_attribute_suffix
                       microsoft_sync_remote_attribute
                       enable_as_k5_account
-                      use_classic_font_in_k5]
+                      use_classic_font_in_k5
+                      allow_assign_to_differentiation_tags]
     settings_hash = public_attrs.index_with { |key| @account.settings[key] }.compact
 
     if @account.password_complexity_enabled? && !@account.site_admin?
@@ -1400,9 +1401,13 @@ class AccountsController < ApplicationController
 
   def acceptable_use_policy
     TermsOfService.ensure_terms_for_account(@domain_root_account)
-    # disable navigation_header JavaScript bundle to prevent console errors
-    # caused by missing DOM elements in this bare layout
-    @headers = false
+    if request.format.html?
+      # disable navigation_header JavaScript bundle (in _head.html.erb) to
+      # prevent console errors caused by missing DOM elements in this bare layout
+      @headers = false
+      # disable custom js/css
+      @exclude_account_css = @exclude_account_js = true
+    end
     respond_to do |format|
       format.html { render html: "", layout: "bare" }
       format.json { render json: { content: @domain_root_account.terms_of_service.terms_of_service_content&.content }, status: :ok }

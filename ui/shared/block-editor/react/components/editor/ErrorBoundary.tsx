@@ -50,7 +50,6 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-     
     console.error(error, '\n', info.componentStack)
   }
 

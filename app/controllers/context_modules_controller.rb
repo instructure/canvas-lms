@@ -85,9 +85,7 @@ class ContextModulesController < ApplicationController
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
       @viewable_module_ids = @modules.pluck(:id)
 
-      if Account.site_admin.feature_enabled?(:selective_release_backend)
-        @module_ids_with_overrides = AssignmentOverride.where(context_module_id: @modules).active.distinct.pluck(:context_module_id)
-      end
+      @module_ids_with_overrides = AssignmentOverride.where(context_module_id: @modules).active.distinct.pluck(:context_module_id)
 
       modules_cache_key
 

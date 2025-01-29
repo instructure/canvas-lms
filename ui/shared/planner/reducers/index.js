@@ -36,7 +36,7 @@ const locale = handleAction(
   (state, action) => {
     return action.payload.env.MOMENT_LOCALE
   },
-  'en'
+  'en',
 )
 
 const timeZone = handleAction(
@@ -44,7 +44,7 @@ const timeZone = handleAction(
   (state, action) => {
     return action.payload.env.TIMEZONE
   },
-  'UTC'
+  'UTC',
 )
 
 const today = handleAction(
@@ -52,7 +52,7 @@ const today = handleAction(
   (state, action) => {
     return moment.tz(action.payload.env.TIMEZONE).startOf('day')
   },
-  moment().startOf('day')
+  moment().startOf('day'),
 )
 
 const currentUser = handleAction(
@@ -71,13 +71,13 @@ const currentUser = handleAction(
       color: userColor,
     }
   },
-  {}
+  {},
 )
 
 const singleCourse = handleAction(
   'INITIAL_OPTIONS',
   (state, action) => action.payload.singleCourse || false,
-  false
+  false,
 )
 
 const firstNewActivityDate = handleAction(
@@ -85,7 +85,7 @@ const firstNewActivityDate = handleAction(
   (state, action) => {
     return action.payload.clone()
   },
-  null
+  null,
 )
 
 const combinedReducers = combineReducers({

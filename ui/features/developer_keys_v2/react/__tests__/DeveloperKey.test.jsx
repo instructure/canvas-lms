@@ -68,7 +68,7 @@ describe('DeveloperKey', () => {
         <tbody>
           <DeveloperKey {...props} />
         </tbody>
-      </table>
+      </table>,
     )
   }
 

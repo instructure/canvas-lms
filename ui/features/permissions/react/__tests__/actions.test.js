@@ -32,7 +32,7 @@ it('searchPermissions dispatches updatePermissionsSearch', done => {
   const dispatchMock = jest.fn()
   actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
     dispatchMock,
-    () => state
+    () => state,
   )
 
   const expectedDispatch = {
@@ -54,7 +54,7 @@ it('searchPermissions announces when search is complete', () => {
   const flashMock = jest.spyOn($, 'screenReaderFlashMessageExclusive')
   actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
     dispatchMock,
-    () => state
+    () => state,
   )
 
   expect(flashMock).toHaveBeenCalledTimes(1)
@@ -176,7 +176,6 @@ it('tabChanged dispatches permissionsTabChanged', () => {
   expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
 })
 
-/* eslint-disable promise/catch-or-return */
 /* eslint-disable promise/no-callback-in-promise */
 describe('api actions', () => {
   beforeEach(() => {
@@ -426,5 +425,5 @@ describe('api actions', () => {
     })
   })
 })
-/* eslint-enable promise/catch-or-return */
+
 /* eslint-enable promise/no-callback-in-promise */

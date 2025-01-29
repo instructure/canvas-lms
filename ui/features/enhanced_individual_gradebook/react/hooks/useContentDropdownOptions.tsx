@@ -91,7 +91,7 @@ export const useUserDropdownOptions = ({
     const filteredStudents = students.filter(
       student =>
         filteredStates.includes(student.state) &&
-        (selectedSection ? student.sections.includes(selectedSection) : true)
+        (selectedSection ? student.sections.includes(selectedSection) : true),
     )
     const studentOptions: StudentDropdownOption = [
       defaultStudentDropdownOptions,
@@ -143,7 +143,7 @@ export const useAssignmentDropdownOptions = ({
 
     if (selectedGradingPeriodId) {
       filteredAssignments = filteredAssignments.filter(
-        assignment => assignment.gradingPeriodId === selectedGradingPeriodId
+        assignment => assignment.gradingPeriodId === selectedGradingPeriodId,
       )
     }
 

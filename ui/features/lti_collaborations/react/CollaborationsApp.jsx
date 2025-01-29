@@ -23,7 +23,6 @@ import CollaborationsNavigation from './CollaborationsNavigation'
 import CollaborationsList from './CollaborationsList'
 import LoadingSpinner from './LoadingSpinner'
 
-// eslint-disable-next-line react/prefer-stateless-function
 class CollaborationsApp extends React.Component {
   static propTypes = {
     applicationState: PropTypes.object,
@@ -47,12 +46,14 @@ class CollaborationsApp extends React.Component {
             />
             {list.length ? (
               <CollaborationsList
+                data-testid="collaborations-list"
                 collaborationsState={this.props.applicationState.listCollaborations}
                 getCollaborations={this.props.actions.getCollaborations}
                 deleteCollaboration={this.props.actions.deleteCollaboration}
               />
             ) : (
               <GettingStartedCollaborations
+                data-testid="getting-started-collaborations"
                 ltiCollaborators={this.props.applicationState.ltiCollaborators}
               />
             )}

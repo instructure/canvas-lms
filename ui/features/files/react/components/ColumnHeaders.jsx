@@ -57,7 +57,7 @@ ColumnHeaders.renderColumns = function (sort, order) {
       .map(part => window.encodeURIComponent(part))
       .join('/')
     const href = `${encoded_path}?${$.param(
-      this.queryParamsFor(this.props.query, column.property)
+      this.queryParamsFor(this.props.query, column.property),
     )}`
     const linkProps = {
       className: 'ef-plain-link',

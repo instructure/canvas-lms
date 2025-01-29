@@ -60,14 +60,14 @@ describe('GradingPeriodSelect', () => {
       <GradingPeriodSelect
         {...defaultProps}
         handleSelectGradingPeriod={handleSelectGradingPeriod}
-      />
+      />,
     )
     act(() => getByRole('combobox', {name: 'Select Grading Period'}).click())
     act(() => getByText('Fall 2020').click())
 
     expect(handleSelectGradingPeriod).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({value: '2'})
+      expect.objectContaining({value: '2'}),
     )
   })
 })

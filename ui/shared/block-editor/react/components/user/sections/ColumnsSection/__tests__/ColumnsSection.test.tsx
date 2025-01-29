@@ -51,7 +51,7 @@ const renderSection = (props: Partial<ColumnsSectionProps> = {}) => {
       <Frame>
         <ColumnsSection columns={2} {...props} />
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 

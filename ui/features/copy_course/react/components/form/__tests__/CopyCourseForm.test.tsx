@@ -22,20 +22,22 @@ import type {Course} from '../../../../../../api'
 import moment from 'moment-timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
-// @ts-ignore
-import tz from 'timezone'
-// @ts-ignore
-import chicago from 'timezone/America/Chicago'
-// @ts-ignore
-import detroit from 'timezone/America/Detroit'
+import type {default as Timezone} from 'timezone'
+import type {default as ChicagoTz} from 'timezone/America/Chicago'
+import type {default as DetroitTz} from 'timezone/America/Detroit'
+
+const tz = require('timezone') as typeof Timezone
+const chicago = require('timezone/America/Chicago') as typeof ChicagoTz
+const detroit = require('timezone/America/Detroit') as typeof DetroitTz
 
 describe('CourseCopyForm', () => {
+  const currentYear = new Date().getFullYear()
   const courseName = 'Course name'
   const courseCode = 'Course code'
-  const startAt = '2024-01-01'
-  const termStartAt = '2024-02-01'
-  const endAt = '2024-01-02'
-  const termEndAt = '2024-02-02'
+  const startAt = `${currentYear}-01-01`
+  const termStartAt = `${currentYear}-02-01`
+  const endAt = `${currentYear}-01-02`
+  const termEndAt = `${currentYear}-02-02`
 
   const course: Course = {
     blueprint: false,
@@ -71,6 +73,43 @@ describe('CourseCopyForm', () => {
     canImportAsNewQuizzes: true,
   }
 
+  const defaultExpectedOnSubmitCall = {
+    courseName: course.name,
+    courseCode: course.course_code,
+    newCourseStartDate: new Date(startAt),
+    newCourseEndDate: new Date(endAt),
+    selectedTerm: {id: '1', name: 'Option 1'},
+    settings: {import_quizzes_next: false},
+    selective_import: false,
+    adjust_dates: {enabled: 1, operation: 'shift_dates'},
+    errored: false,
+    date_shift_options: {
+      old_start_date: new Date(startAt).toISOString(),
+      new_start_date: new Date(startAt).toISOString(),
+      old_end_date: new Date(endAt).toISOString(),
+      new_end_date: new Date(endAt).toISOString(),
+      day_substitutions: [],
+    },
+    restrictEnrollmentsToCourseDates: course.restrict_enrollments_to_course_dates,
+    courseTimeZone: course.time_zone,
+  }
+
+  beforeEach(() => {
+    // Set timezone and mock current date
+    const timezone = 'America/Denver'
+    moment.tz.setDefault(timezone)
+    window.ENV = window.ENV || {}
+    window.ENV.TIMEZONE = timezone
+
+    // Mock the current date to be January 1st of the current year at noon
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date(`${currentYear}-01-01T12:00:00.000Z`))
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
   const renderCopyCourseForm = (props = {}) =>
     render(<CopyCourseForm {...defaultProps} {...props} />)
 
@@ -90,33 +129,14 @@ describe('CourseCopyForm', () => {
 
   it('calls onSubmit with the correct arguments when the form is submitted', () => {
     const onSubmit = jest.fn()
-    const {getByRole, getByLabelText, getByText} = renderCopyCourseForm({onSubmit})
+    const {getByRole, getByText} = renderCopyCourseForm({onSubmit})
 
-    fireEvent.click(getByLabelText('Term'))
-    fireEvent.click(getByText('Option 1'))
+    fireEvent.click(getByText('Term'))
+    fireEvent.click(getByRole('option', {name: 'Option 1'}))
     fireEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
     fireEvent.click(getByRole('button', {name: 'Create course'}))
 
-    expect(onSubmit).toHaveBeenCalledWith({
-      courseName: course.name,
-      courseCode: course.course_code,
-      newCourseStartDate: new Date(startAt),
-      newCourseEndDate: new Date(endAt),
-      selectedTerm: {id: '1', name: 'Option 1'},
-      settings: {import_quizzes_next: false},
-      selective_import: false,
-      adjust_dates: {enabled: 1, operation: 'shift_dates'},
-      errored: false,
-      date_shift_options: {
-        old_start_date: new Date(startAt).toISOString(),
-        new_start_date: new Date(startAt).toISOString(),
-        old_end_date: new Date(endAt).toISOString(),
-        new_end_date: new Date(endAt).toISOString(),
-        day_substitutions: [],
-      },
-      restrictEnrollmentsToCourseDates: course.restrict_enrollments_to_course_dates,
-      courseTimeZone: course.time_zone,
-    })
+    expect(onSubmit).toHaveBeenCalledWith(defaultExpectedOnSubmitCall)
   })
 
   describe('validation', () => {
@@ -210,12 +230,14 @@ describe('CourseCopyForm', () => {
     })
 
     it('renders the terms', () => {
-      const {getByText, getByLabelText} = renderCopyCourseForm()
+      const {getByText, getAllByRole} = renderCopyCourseForm()
 
-      fireEvent.click(getByLabelText('Term'))
-      terms.forEach(option => {
-        expect(getByText(option.name)).toBeInTheDocument()
-      })
+      fireEvent.click(getByText('Term'))
+      const options = getAllByRole('option')
+      const optionTexts = options.map(option => option.textContent)
+      expect(optionTexts).toContain('Option 1')
+      expect(optionTexts).toContain('Option 2')
+      expect(optionTexts).toContain('Option 3')
     })
   })
 
@@ -237,6 +259,15 @@ describe('CourseCopyForm', () => {
 
           expect(getByDisplayValue('Feb 2 at 12am')).toBeDisabled()
         })
+
+        it('should render disable state explanation', () => {
+          const {getAllByText} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: false},
+          })
+
+          expect(getAllByText('Term start and end dates cannot be modified here, only on the Term Details page under Admin.'))
+            .toHaveLength(2)
+        })
       })
 
       describe('when restrictEnrollmentsToCourseDates is true', () => {
@@ -254,6 +285,15 @@ describe('CourseCopyForm', () => {
           })
 
           expect(getByDisplayValue('Jan 2 at 12am')).toBeEnabled()
+        })
+
+        it('should not render disable state explanation', () => {
+          const {queryByText} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: true},
+          })
+
+          expect(queryByText('Term start and end dates cannot be modified here, only on the Term Details page under Admin.'))
+          .not.toBeInTheDocument()
         })
       })
     })
@@ -312,10 +352,10 @@ describe('CourseCopyForm', () => {
 
       const courseTimeZone = 'America/Detroit'
       const userTimeZone = 'America/Chicago'
-      const startDate = '2024-02-03T00:00:00.000Z'
+      const startDate = `${currentYear}-02-03T00:00:00.000Z`
       const expectedStartDateCourseDateString = 'Local: Feb 2 at 6pm'
       const expectedStartDateUserDateString = 'Course: Feb 2 at 7pm'
-      const endDate = '2024-03-03T00:00:00.000Z'
+      const endDate = `${currentYear}-03-03T00:00:00.000Z`
       const expectedEndDateCourseDateString = 'Local: Mar 2 at 6pm'
       const expectedEndDateUserDateString = 'Course: Mar 2 at 7pm'
 

@@ -129,13 +129,13 @@ window.modules = (function () {
                 $moduleElement,
                 updatePublishMenuDisabledState,
                 new RelockModulesDialog(),
-                {}
+                {},
               )
             }
             $moduleElement.css('display', 'block')
           },
         }
-         
+
         renderDifferentiatedModulesTray(event.target, $module, settings, options)
       } else {
         modules.editModule($module)
@@ -162,7 +162,7 @@ window.modules = (function () {
         },
         _data => {
           $('#context_modules').loadingImage('remove')
-        }
+        },
       )
     },
 
@@ -196,8 +196,8 @@ window.modules = (function () {
             $module
               .find('.content')
               .errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'))
-          }
-        )
+          },
+        ),
       )
       $('.context_module').each(function () {
         refreshDuplicateLinkStatus($(this))
@@ -244,10 +244,10 @@ window.modules = (function () {
               return
             }
             const progression = data.context_module_progression
-             
+
             if (progression.user_id == window.ENV.current_user_id) {
               let $user_progression = $user_progression_list.find(
-                '.progression_' + progression.context_module_id
+                '.progression_' + progression.context_module_id,
               )
 
               if ($user_progression.length === 0 && $user_progression_list.length > 0) {
@@ -261,7 +261,7 @@ window.modules = (function () {
                 $user_progression.data('requirements_met', progression.requirements_met)
                 $user_progression.data(
                   'incomplete_requirements',
-                  progression.incomplete_requirements
+                  progression.incomplete_requirements,
                 )
                 $user_progression.fillTemplateData({data: progression})
               }
@@ -280,7 +280,7 @@ window.modules = (function () {
           if (callback) {
             callback()
           }
-        }
+        },
       )
     },
 
@@ -356,7 +356,7 @@ window.modules = (function () {
           if (callback) {
             $(callback)
           }
-        }
+        },
       )
     },
 
@@ -367,7 +367,7 @@ window.modules = (function () {
           if (data.tag_restrictions) {
             Object.entries(data.tag_restrictions).forEach(([id, restriction]) => {
               const item = document.querySelector(
-                `#context_module_item_${id}:not(.master_course_content)`
+                `#context_module_item_${id}:not(.master_course_content)`,
               )
               if (item) {
                 item.classList.add('master_course_content')
@@ -434,7 +434,7 @@ window.modules = (function () {
         .find('#require_sequential_progress')
         .prop(
           'checked',
-          data.require_sequential_progress === 'true' || data.require_sequential_progress === '1'
+          data.require_sequential_progress === 'true' || data.require_sequential_progress === '1',
         )
       $form
         .find('#publish_final_grade')
@@ -637,7 +637,7 @@ window.modules = (function () {
           $a.attr('data-item-name', data.title)
           $a.attr(
             'data-item-type',
-            data.quiz_lti ? 'lti-quiz' : data.content_type == 'Quizzes::Quiz' ? 'quiz' : data.type
+            data.quiz_lti ? 'lti-quiz' : data.content_type == 'Quizzes::Quiz' ? 'quiz' : data.type,
           )
           $a.attr('data-item-context-id', data.context_id)
           $a.attr('data-item-context-type', data.context_type)
@@ -655,7 +655,7 @@ window.modules = (function () {
         .each(function () {
           const position = parseInt(
             $(this).getTemplateData({textValues: ['position']}).position,
-            10
+            10,
           )
           if ((data.position || data.position === 0) && (position || position === 0)) {
             if ($before == null && position - data.position >= 0) {
@@ -692,7 +692,7 @@ window.modules = (function () {
       if (cyoe.isReleased) {
         const fullText = I18n.t('Released by Mastery Path: %{path}', {path: cyoe.releasedLabel})
         const $pathIcon = $(
-          '<span class="pill mastery-path-icon" aria-hidden="true" data-tooltip><i class="icon-mastery-paths" /></span>'
+          '<span class="pill mastery-path-icon" aria-hidden="true" data-tooltip><i class="icon-mastery-paths" /></span>',
         )
           .attr('title', fullText)
           .append(htmlEscape(cyoe.releasedLabel))
@@ -709,7 +709,7 @@ window.modules = (function () {
               '/modules/items/' +
               data.id +
               '/edit_mastery_paths?return_to=' +
-              encodeURIComponent(window.location.pathname)
+              encodeURIComponent(window.location.pathname),
           )
           .attr('title', I18n.t('Edit Mastery Paths for %{title}', {title: data.title}))
           .text(I18n.t('Mastery Paths'))
@@ -723,8 +723,8 @@ window.modules = (function () {
           .parent()
           .before(
             $('<li role="presentation" />').append(
-              $mpLink.prepend('<i class="icon-mastery-path" /> ')
-            )
+              $mpLink.prepend('<i class="icon-mastery-path" /> '),
+            ),
           )
       }
     },
@@ -737,7 +737,7 @@ window.modules = (function () {
         .each(function () {
           const position = parseInt(
             $(this).getTemplateData({textValues: ['position']}).position,
-            10
+            10,
           )
           if (position > maxPosition) maxPosition = position
         })
@@ -860,7 +860,7 @@ const renderDifferentiatedModulesTray = (
   returnFocusTo,
   moduleElement,
   settingsProps,
-  options = {initialTab: 'settings'}
+  options = {initialTab: 'settings'},
 ) => {
   const container = document.getElementById('differentiated-modules-mount-point')
   if (container.reactRoot) container.reactRoot.unmount()
@@ -875,7 +875,7 @@ const renderDifferentiatedModulesTray = (
       moduleElement={moduleElement}
       courseId={ENV.COURSE_ID ?? ''}
       {...settingsProps}
-    />
+    />,
   )
 }
 
@@ -948,7 +948,7 @@ const updateOtherPrerequisites = function (id, name) {
   $('div.context_module .prerequisite_criterion .id').each(function (_, idNode) {
     const $id = $(idNode)
     const prereq_id = $id.text()
-     
+
     if (prereq_id == id) {
       const $crit = $id.closest('.prerequisite_criterion')
       $crit.find('.name').text(name)
@@ -979,7 +979,7 @@ const updatePublishMenuDisabledState = function (disabled) {
   if (ENV.FEATURES.instui_header) {
     // Send event to ContextModulesHeader component to update the publish menu
     window.dispatchEvent(
-      new CustomEvent('update-publish-menu-disabled-state', {detail: {disabled}})
+      new CustomEvent('update-publish-menu-disabled-state', {detail: {disabled}}),
     )
   } else {
     // Update the top level publish menu to reflect the new module
@@ -987,14 +987,14 @@ const updatePublishMenuDisabledState = function (disabled) {
     if (publishMenu) {
       const $publishMenu = $(publishMenu)
       $publishMenu.data('disabled', disabled)
-       
+
       ReactDOM.render(
         <ContextModulesPublishMenu
           courseId={$publishMenu.data('courseId')}
           runningProgressId={$publishMenu.data('progressId')}
           disabled={disabled}
         />,
-        publishMenu
+        publishMenu,
       )
     }
   }
@@ -1137,7 +1137,7 @@ modules.initModuleManagement = async function (duplicate) {
         $module,
         updatePublishMenuDisabledState,
         relock_modules_dialog,
-        moduleItems
+        moduleItems,
       ),
     error(data, $module) {
       $module.loadingImage('remove')
@@ -1274,7 +1274,7 @@ modules.initModuleManagement = async function (duplicate) {
     const points_possible = $.trim(
       $('#context_module_item_' + id + ' .points_possible_display')
         .text()
-        .split(' ')[0]
+        .split(' ')[0],
     )
     if (points_possible.length > 0 && $(this).val() === 'min_score') {
       $option.find('.points_possible').text(points_possible)
@@ -1290,7 +1290,7 @@ modules.initModuleManagement = async function (duplicate) {
       .find('.delete_criterion_link')
       .attr(
         'aria-label',
-        I18n.t('Delete requirement %{item} (%{type})', {item: itemName, type: reqType})
+        I18n.t('Delete requirement %{item} (%{type})', {item: itemName, type: reqType}),
       )
   })
 
@@ -1329,7 +1329,7 @@ modules.initModuleManagement = async function (duplicate) {
     const spinner = <ModuleDuplicationSpinner />
     const $tempElement = $('<div id="temporary-spinner" class="item-group-condensed"></div>')
     $tempElement.insertAfter(duplicatedModuleElement)
-     
+
     ReactDOM.render(spinner, $('#temporary-spinner')[0])
     $.screenReaderFlashMessage(I18n.t('Duplicating Module, this may take some time'))
     const renderDuplicatedModule = function (response) {
@@ -1339,6 +1339,7 @@ modules.initModuleManagement = async function (duplicate) {
       const newModuleId = response.data.context_module.id
       // This is terrible but then so is the whole file so it fits in
       const contextId = response.data.context_module.context_id
+      const moduleName = response.data.context_module.name
       const modulesPage = `/courses/${contextId}/modules`
       axios
         .get(modulesPage)
@@ -1350,14 +1351,15 @@ modules.initModuleManagement = async function (duplicate) {
           const module_dnd = $newModule.find('.module_dnd')[0]
           if (module_dnd) {
             const contextModules = document.getElementById('context_modules')
-             
+
             ReactDOM.render(
               <ModuleFileDrop
                 courseId={ENV.course_id}
                 moduleId={newModuleId}
                 contextModules={contextModules}
+                moduleName={moduleName}
               />,
-              module_dnd
+              module_dnd,
             )
           }
           $newModule.find('.collapse_module_link').focus()
@@ -1432,7 +1434,7 @@ modules.initModuleManagement = async function (duplicate) {
           $.flashMessage(
             I18n.t('Module %{module_name} was successfully deleted.', {
               module_name: data.context_module.name,
-            })
+            }),
           )
         },
       })
@@ -1463,7 +1465,7 @@ modules.initModuleManagement = async function (duplicate) {
           $module.find('.context_module_items.ui-sortable').sortable('refresh')
           modules.updateAssignmentData()
         },
-        _data => {}
+        _data => {},
       ).done(() => {
         if (elemID) {
           setTimeout(() => {
@@ -1474,7 +1476,7 @@ modules.initModuleManagement = async function (duplicate) {
           $cogLink.focus()
         }
       })
-    }
+    },
   )
 
   $(document).on('click', '.edit_item_link', function (event) {
@@ -1575,7 +1577,7 @@ modules.initModuleManagement = async function (duplicate) {
         url: $(this).attr('href'),
         message: I18n.t(
           'confirm.delete_item',
-          'Are you sure you want to remove this item from the module?'
+          'Are you sure you want to remove this item from the module?',
         ),
         success(data) {
           delete ENV.MODULE_FILE_DETAILS[data.content_tag.id]
@@ -1588,7 +1590,7 @@ modules.initModuleManagement = async function (duplicate) {
           $.flashMessage(
             I18n.t('Module item %{module_item_name} was successfully removed.', {
               module_item_name: data.content_tag.title,
-            })
+            }),
           )
         },
         cancelled() {
@@ -1670,7 +1672,7 @@ modules.initModuleManagement = async function (duplicate) {
         reorderElements(
           res.data.map(item => item.context_module.id),
           container,
-          id => `#context_module_${id}`
+          id => `#context_module_${id}`,
         )
         $(container).sortable('refresh')
       },
@@ -1750,7 +1752,7 @@ modules.initModuleManagement = async function (duplicate) {
         $moduleElement,
         updatePublishMenuDisabledState,
         relock_modules_dialog,
-        moduleItems
+        moduleItems,
       )
     modules.addModule(addModuleCallback)
   }
@@ -1849,7 +1851,7 @@ modules.initModuleManagement = async function (duplicate) {
               $module.find('.add_module_item_link').focus()
             }
           },
-        }
+        },
       )
     }
   }
@@ -1926,7 +1928,7 @@ modules.initModuleManagement = async function (duplicate) {
     const $module = $(
       '#context_module_' +
         $('#add_module_prerequisite_dialog').getTemplateData({textValues: ['context_module_id']})
-          .context_module_id
+          .context_module_id,
     )
     $module.find('.prerequisites .criterion').each(function () {
       prereqs.push('module_' + $(this).getTemplateData({textValues: ['id', 'name', 'type']}).id)
@@ -1945,7 +1947,7 @@ modules.initModuleManagement = async function (duplicate) {
       data => {
         $('#add_module_prerequisite_dialog').loadingImage('remove')
         $('#add_module_prerequisite_dialog').formErrors(data)
-      }
+      },
     )
   })
   $(document).on('click', '.context_module .add_prerequisite_link', function (event) {
@@ -2076,7 +2078,7 @@ modules.initModuleManagement = async function (duplicate) {
     const $el = $(element)
     const model = new Publishable(
       {published: $el.hasClass('published'), id: $el.attr('data-id')},
-      {url: $el.attr('data-url'), root: 'module'}
+      {url: $el.attr('data-url'), root: 'module'},
     )
     const view = new PublishButtonView({model, el: $el})
     view.render()
@@ -2149,7 +2151,7 @@ function toggleModuleCollapse(event) {
     },
     _data => {
       $module.loadingImage('remove')
-    }
+    },
   )
   if (collapse === '1' || !reload_entries) {
     toggle()
@@ -2468,7 +2470,6 @@ $(document).ready(function () {
   }
 
   function renderCopyToTray(open, contentSelection, returnFocusTo) {
-     
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -2479,12 +2480,11 @@ $(document).ready(function () {
           returnFocusTo.focus()
         }}
       />,
-      document.getElementById('direct-share-mount-point')
+      document.getElementById('direct-share-mount-point'),
     )
   }
 
   function renderSendToTray(open, contentSelection, returnFocusTo) {
-     
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -2495,14 +2495,13 @@ $(document).ready(function () {
           returnFocusTo.focus()
         }}
       />,
-      document.getElementById('direct-share-mount-point')
+      document.getElementById('direct-share-mount-point'),
     )
   }
 
   function renderHeaderComponent() {
     const root = $('#context-modules-header-root')
     if (root[0]) {
-       
       ReactDOM.render(<ContextModulesHeader {...root.data('props')} />, root[0])
     }
   }
@@ -2632,7 +2631,7 @@ $(document).ready(function () {
         timezone={ENV.TIMEZONE || 'UTC'}
         removeDueDateInput={handleRemoveDueDateInput(itemProps)}
         isCheckpointed={itemProps.moduleItemHasCheckpoint === 'true'}
-      />
+      />,
     )
   }
 
@@ -2641,7 +2640,7 @@ $(document).ready(function () {
   function parseModuleItemElement(element) {
     const pointsPossibleElem = element?.querySelector('.points_possible_display')
     const points = parseFloat(pointsPossibleElem?.textContent)
-     
+
     return {pointsPossible: isNaN(points) ? undefined : points}
   }
 
@@ -2657,7 +2656,7 @@ $(document).ready(function () {
     const moduleItemHasCheckpoint = event.target.getAttribute('data-item-has-assignment-checkpoint')
 
     const itemProps = parseModuleItemElement(
-      document.getElementById(`context_module_item_${moduleItemId}`)
+      document.getElementById(`context_module_item_${moduleItemId}`),
     )
     renderItemAssignToTray(true, returnFocusTo, {
       courseId,

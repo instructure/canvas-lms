@@ -47,20 +47,22 @@ import {arrayOf, func, bool} from 'prop-types'
 
 const I18n = createI18nScope('assignments_2_student_content')
 
-const LoggedOutTabs = lazy(() =>
-  import(
-    /* webpackChunkName: "LoggedOutTabs" */
-    /* webpackPrefetch: true */
-    './LoggedOutTabs'
-  )
+const LoggedOutTabs = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "LoggedOutTabs" */
+      /* webpackPrefetch: true */
+      './LoggedOutTabs'
+    ),
 )
 
-const RubricsQuery = lazy(() =>
-  import(
-    /* webpackChunkName: "RubricsQuery" */
-    /* webpackPrefetch: true */
-    './RubricsQuery'
-  )
+const RubricsQuery = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "RubricsQuery" */
+      /* webpackPrefetch: true */
+      './RubricsQuery'
+    ),
 )
 
 function EnrollmentConcludedNotice() {
@@ -68,7 +70,7 @@ function EnrollmentConcludedNotice() {
     <View as="div" textAlign="center" margin="auto" padding="small">
       <Text fontStyle="italic" size="large">
         {I18n.t(
-          'You are unable to submit to this assignment as your enrollment in this course has been concluded.'
+          'You are unable to submit to this assignment as your enrollment in this course has been concluded.',
         )}
       </Text>
     </View>
@@ -114,7 +116,7 @@ function renderAttemptsAndAvailability(assignment) {
                   one: '1 Attempt Allowed',
                   other: '%{count} Attempts Allowed',
                 },
-                {count: totalAllowedAttempts(assignment, context.latestSubmission) || 0}
+                {count: totalAllowedAttempts(assignment, context.latestSubmission) || 0},
               )}
             </Text>
           )}
@@ -130,7 +132,7 @@ function renderAttemptsAndAvailability(assignment) {
 function renderContentBaseOnAvailability(
   {assignment, submission, reviewerSubmission, rubricExpanded, toggleRubricExpanded},
   alertContext,
-  onSuccessfulPeerReview
+  onSuccessfulPeerReview,
 ) {
   if (assignment.env.modulePrereq) {
     return <MissingPrereqs moduleUrl={assignment.env.moduleUrl} />
@@ -173,7 +175,7 @@ function renderContentBaseOnAvailability(
             {assignment.submissionTypes.includes('student_annotation') && (
               <VisualOnFocusMessage
                 message={I18n.t(
-                  'Warning: For improved accessibility with Annotated Assignments, please use File Upload or Text Entry to leave comments.'
+                  'Warning: For improved accessibility with Annotated Assignments, please use File Upload or Text Entry to leave comments.',
                 )}
               />
             )}
@@ -259,7 +261,7 @@ function StudentContent(props) {
           })
         })
         .catch(e => {
-          console.log('Error loading immersive readers.', e)  
+          console.log('Error loading immersive readers.', e)
         })
     }
 

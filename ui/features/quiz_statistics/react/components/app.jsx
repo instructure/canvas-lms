@@ -68,7 +68,7 @@ class Statistics extends React.Component {
             <p>
               {I18n.t(
                 'quiz-stats-noshow-warning',
-                "Even awesomeness has limits. We can't render statistics for this quiz, but you can download the reports."
+                "Even awesomeness has limits. We can't render statistics for this quiz, but you can download the reports.",
               )}
             </p>
             <div className="links">{this.renderQuizReports(this.props.quizReports)}</div>
@@ -120,7 +120,7 @@ class Statistics extends React.Component {
         <p>
           {I18n.t(
             'loading_questions',
-            'Question statistics are being loaded. Please wait a while.'
+            'Question statistics are being loaded. Please wait a while.',
           )}
         </p>
       )

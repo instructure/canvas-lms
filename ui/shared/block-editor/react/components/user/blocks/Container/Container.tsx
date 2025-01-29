@@ -43,7 +43,7 @@ interface ForwardRefContainerComponent
 const Container = forwardRef<HTMLElement, ContainerProps>(
   (
     {id, className, background, style, onKeyDown, children, ...rest}: ContainerProps,
-    ref: React.Ref<HTMLElement | null>
+    ref: React.Ref<HTMLElement | null>,
   ) => {
     const {
       connectors: {connect, drag},
@@ -61,6 +61,7 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
         aria-expanded={!!node.data.custom?.isExpanded}
         id={id || `container-${node.id}`}
         className={`container-block ${className}`}
+        data-testid="container-block"
         data-placeholder={rest['data-placeholder'] || 'Drop blocks here'}
         ref={el => {
           if (el) connect(drag(el))
@@ -77,7 +78,7 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
         {children}
       </div>
     )
-  }
+  },
 ) as ForwardRefContainerComponent
 
 Container.craft = {

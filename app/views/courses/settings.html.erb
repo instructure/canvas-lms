@@ -851,6 +851,11 @@
               :start_date => format_course_section_date(section.start_at),
               :end_date => format_course_section_date(section.end_at) }) %>
           </div>
+          <% if section.nonxlist_course %>
+            <div class="course_section_crosslist">
+              <span><%= t('Section Crosslisted From: ') %> <a href="<%= course_url(section.nonxlist_course_id) %>"> <%= section.nonxlist_course.name %> </a></span>
+            </div>
+          <% end %>
           <div class="clear"></div>
         </li>
       <% end %>

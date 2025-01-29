@@ -54,7 +54,7 @@ const Comment = ({
     // This uses window.confirm due to poor focus
     // behavior caused by using a Tray with a
     // Modal.
-     
+
     const confirmed = window.confirm(I18n.t('Are you sure you want to delete this comment?'))
     if (confirmed) {
       onDelete()

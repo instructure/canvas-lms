@@ -52,7 +52,7 @@ describe('HideAssignmentGradesTray Layout', () => {
         <Layout
           {...defaultProps}
           assignment={{...defaultProps.assignment, gradesPublished: false}}
-        />
+        />,
       )
       expect(screen.getByText(unreleasedMessage)).toBeInTheDocument()
     })

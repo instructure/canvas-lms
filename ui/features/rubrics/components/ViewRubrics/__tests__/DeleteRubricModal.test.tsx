@@ -55,7 +55,7 @@ describe('RubricForm Tests', () => {
             setPopoverIsOpen={setPopoverIsOpen}
           />
         </BrowserRouter>
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
   }
 

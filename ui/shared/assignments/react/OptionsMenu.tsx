@@ -16,32 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import {useMutation} from '@apollo/client'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {SET_WORKFLOW} from '@canvas/assignments/graphql/teacher/Mutations'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
+import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
+import DownloadSubmissionsModal from '@canvas/download-submissions-modal'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
-import {IconButton, Button} from '@instructure/ui-buttons'
+import {assignLocation} from '@canvas/util/globalUtils'
+import {BREAKPOINTS, type Breakpoints} from '@canvas/with-breakpoints'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {
+  IconCommonsLine,
   IconDownloadLine,
+  IconDuplicateLine,
+  IconEditLine,
+  IconMoreLine,
+  IconSpeedGraderLine,
+  IconTrashLine,
   IconUploadLine,
   IconUserLine,
-  IconDuplicateLine,
-  IconCommonsLine,
-  IconEditLine,
-  IconSpeedGraderLine,
-  IconMoreLine,
-  IconTrashLine,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {BREAKPOINTS, type Breakpoints} from '@canvas/with-breakpoints'
-import type {TeacherAssignmentType} from '../graphql/teacher/AssignmentTeacherTypes'
 import {View} from '@instructure/ui-view'
-import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
-import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
-import DownloadSubmissionsModal from '@canvas/download-submissions-modal'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
-import {useMutation} from '@apollo/client'
-import {SET_WORKFLOW} from '@canvas/assignments/graphql/teacher/Mutations'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import React, {useState, useEffect, useRef} from 'react'
+import type {TeacherAssignmentType} from '../graphql/teacher/AssignmentTeacherTypes'
 import {ASSIGNMENT_VIEW_TYPES} from './AssignmentTypes'
 
 const I18n = createI18nScope('assignment_more_button')
@@ -96,14 +97,12 @@ const OptionsMenu = ({
           if (result.errors?.length || !result.data || result.data.errors) {
             showFlashError(I18n.t('This assignment has failed to delete.'))()
           } else {
-            window.location.assign(
-              `/courses/${assignment.course?.lid}/assignments/${assignment?.lid}`
-            )
+            assignLocation(`/courses/${assignment.course?.lid}/assignments/${assignment?.lid}`)
           }
         })
         .catch(() => showFlashError(I18n.t('This assignment has failed to delete.'))())
     } else {
-      window.location.assign(`/courses/${assignment.course?.lid}/assignments`)
+      assignLocation(`/courses/${assignment.course?.lid}/assignments`)
     }
   }
 

@@ -164,11 +164,7 @@ module BroadcastPolicies
     end
 
     def user_has_visibility?
-      if Account.site_admin.feature_enabled?(:selective_release_backend)
-        AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: submission.user_id, assignment_ids: submission.assignment_id).any?
-      else
-        AssignmentStudentVisibility.where(assignment_id: submission.assignment_id, user_id: submission.user_id).any?
-      end
+      AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: submission.user_id, assignment_ids: submission.assignment_id).any?
     end
 
     def user_active_or_invited?

@@ -17,14 +17,13 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import CreateAssignmentViewAdapter from '../CreateAssignmentViewAdapter'
 import Backbone from '@canvas/backbone'
-import {act} from 'react-dom/test-utils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: jest.fn(() => jest.fn(() => {})),
@@ -50,7 +49,7 @@ const buildAssignmentOne = () =>
   buildAssignment({
     id: 1,
     name: 'Math Assignment',
-    due_at: new Date('April 13, 2024').toISOString(),
+    due_at: new Date('2024-04-13').toISOString(),
     points_possible: 10,
     position: 1,
   })
@@ -71,61 +70,74 @@ const buildAssignmentGroup = assignments => {
 describe('CreateAssignmentViewAdapter', () => {
   let closeHandlerMock
 
-  const getProps = overrides => ({
-    assignment: new Assignment(buildAssignmentOne()),
-    assignmentGroup: buildAssignmentGroup([]),
-    closeHandler: closeHandlerMock,
-    ...overrides,
-  })
+  const renderComponent = (overrides = {}) => {
+    const defaultProps = {
+      assignment: new Assignment(buildAssignmentOne()),
+      assignmentGroup: buildAssignmentGroup([]),
+      closeHandler: closeHandlerMock,
+      ...overrides,
+    }
+    return render(<CreateAssignmentViewAdapter {...defaultProps} />)
+  }
 
   beforeEach(() => {
     closeHandlerMock = jest.fn()
   })
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('renders the CreateEditAssignmentModal', () => {
-    const {getByTestId} = render(<CreateAssignmentViewAdapter {...getProps()} />)
+    const {getByTestId} = renderComponent()
     expect(getByTestId('create-edit-assignment-modal')).toBeInTheDocument()
   })
 
-  it('calls the closeHandler when the modal is closed', () => {
-    const {getByTestId} = render(<CreateAssignmentViewAdapter {...getProps()} />)
+  it('calls the closeHandler when the modal is closed', async () => {
+    const {getByTestId} = renderComponent()
+    const user = userEvent.setup()
 
-    fireEvent.click(getByTestId('close-button'))
+    await user.click(getByTestId('close-button'))
     expect(closeHandlerMock).toHaveBeenCalled()
   })
 
   it('adds assignment to assignment group when save is clicked (Create Mode)', async () => {
     const ag = buildAssignmentGroup([])
+    const savePromise = Promise.resolve({})
+    const saveSpy = jest
+      .spyOn(Backbone.Model.prototype, 'save')
+      .mockImplementation(() => savePromise)
 
-    // Mock out the save method so we can test the assignment group
-    jest.spyOn(Backbone.Model.prototype, 'save').mockImplementation(() => Promise.resolve())
-
-    const {getByTestId} = render(
-      <CreateAssignmentViewAdapter {...getProps({assignment: null, assignmentGroup: ag})} />
-    )
-
-    expect(ag.get('assignments').length).toBe(0)
-
-    await act(async () => {
-      fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
-      fireEvent.change(getByTestId('points-input'), {target: {value: '100'}})
-      fireEvent.click(getByTestId('save-button'))
+    const {getByTestId} = renderComponent({
+      assignment: null,
+      assignmentGroup: ag,
     })
+    const user = userEvent.setup()
 
-    expect(ag.get('assignments').length).toBe(1)
+    expect(ag.get('assignments')).toHaveLength(0)
+
+    await user.type(getByTestId('assignment-name-input'), 'Test Assignment')
+    await user.type(getByTestId('points-input'), '100')
+    await user.click(getByTestId('save-button'))
+
+    // Wait for the save operation to complete
+    await savePromise
+    await new Promise(resolve => setTimeout(resolve, 0)) // Wait for next tick
+
+    expect(ag.get('assignments')).toHaveLength(1)
   })
 
-  it('renders a FlashAlert when the assignment fails to save', async () => {
-    const {getByTestId} = render(<CreateAssignmentViewAdapter {...getProps()} />)
+  it('shows a flash alert when the assignment fails to save', async () => {
+    const {getByTestId} = renderComponent()
+    const user = userEvent.setup()
 
-    jest
-      .spyOn(Backbone.Model.prototype, 'save')
-      .mockImplementation(() => Promise.reject(new Error('Failed to save')))
+    jest.spyOn(Backbone.Model.prototype, 'save').mockRejectedValue(new Error('Failed to save'))
 
-    await act(async () => {
-      fireEvent.click(getByTestId('save-button'))
+    await user.click(getByTestId('save-button'))
+
+    expect(showFlashAlert).toHaveBeenCalledWith({
+      message: expect.any(String),
+      type: 'error',
     })
-
-    expect(showFlashAlert).toHaveBeenCalled()
   })
 })

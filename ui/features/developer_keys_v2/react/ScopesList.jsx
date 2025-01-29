@@ -164,7 +164,7 @@ export default class ScopesList extends React.Component {
                           selectedScopes={this.state.selectedScopes}
                           setSelectedScopes={this.setSelectedScopes}
                         />
-                      </LazyLoad>
+                      </LazyLoad>,
                     )
                   }
                   return result
@@ -186,8 +186,8 @@ ScopesList.propTypes = {
       PropTypes.shape({
         resource: PropTypes.string,
         scope: PropTypes.string,
-      })
-    )
+      }),
+    ),
   ).isRequired,
   filter: PropTypes.string.isRequired,
   selectedScopes: PropTypes.arrayOf(PropTypes.string),

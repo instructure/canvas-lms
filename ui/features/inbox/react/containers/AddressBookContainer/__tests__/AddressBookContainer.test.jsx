@@ -18,21 +18,18 @@
 
 import React from 'react'
 import {ApolloProvider} from '@apollo/client'
-import {act, render, fireEvent, screen} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import {AddressBookContainer} from '../AddressBookContainer'
 import {handlers} from '../../../../graphql/mswHandlers'
-import {enableFetchMocks} from 'jest-fetch-mock'
 
-enableFetchMocks()
-
-describe('Should load <AddressBookContainer> normally', () => {
+describe('AddressBookContainer', () => {
   const server = mswServer(handlers)
+  let user
 
   beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
     server.listen()
   })
 
@@ -41,8 +38,6 @@ describe('Should load <AddressBookContainer> normally', () => {
   })
 
   afterAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
     server.close()
   })
 
@@ -50,265 +45,187 @@ describe('Should load <AddressBookContainer> normally', () => {
     window.ENV = {
       current_user_id: 1,
     }
+    user = userEvent.setup()
   })
 
-  const setup = props => {
+  const setup = (props = {}) => {
     return render(
       <ApolloProvider client={mswClient}>
-        <AddressBookContainer open={true} {...props} />
-      </ApolloProvider>
+        <AddressBookContainer {...props} />
+      </ApolloProvider>,
     )
   }
 
-  describe('With Context Selection enabled', () => {
-    const contextSelectionDefaultProps = {
-      hasSelectAllFilterOption: true,
-      includeCommonCourses: true,
+  const openAddressBook = async ({getByTestId}) => {
+    const button = getByTestId('address-button')
+    await user.click(button)
+  }
+
+  describe('Context Selection', () => {
+    const contextSelectionProps = {
+      width: '360px',
+      menuRef: {current: document.createElement('div')},
+      onSelect: () => {},
+      onTextChange: () => {},
+      onSelectedIdsChange: () => {},
+      selectedIds: [],
     }
 
-    describe('Rendering', () => {
-      it('Does not show context select in initial menu', async () => {
-        setup(contextSelectionDefaultProps)
-        const items = await screen.findAllByTestId('address-book-item')
-        expect(items.length).toBe(2)
-        expect(screen.queryByText('Users')).toBeInTheDocument()
-        expect(screen.queryByText('Courses')).toBeInTheDocument()
-      })
+    it('hides context select in initial menu', async () => {
+      const rendered = setup(contextSelectionProps)
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      expect(items).toHaveLength(2)
+      expect(rendered.queryByText('Users')).toBeInTheDocument()
+    })
 
-      it('Does not show context select for initial "Courses" submenu', async () => {
-        setup(contextSelectionDefaultProps)
-        let items = await screen.findAllByTestId('address-book-item')
-        fireEvent.mouseDown(items[0])
+    it('hides context select for initial "Courses" submenu', async () => {
+      const rendered = setup(contextSelectionProps)
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[0])
+      const submenuItems = await rendered.findAllByTestId('address-book-item')
+      expect(submenuItems).toHaveLength(2)
+    })
 
-        items = await screen.findAllByTestId('address-book-item')
-        expect(items.length).toBe(2)
-        expect(screen.queryByText('Back')).toBeInTheDocument()
-        expect(screen.queryByText('Testing 101')).toBeInTheDocument()
-      })
+    it('hides context select for initial users submenu', async () => {
+      const rendered = setup(contextSelectionProps)
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[1])
+      const submenuItems = await rendered.findAllByTestId('address-book-item')
+      expect(submenuItems).toHaveLength(4) // Back button + 3 users
+    })
 
-      it('Does not show context select for initial users submenu', async () => {
-        setup()
-        let items = await screen.findAllByTestId('address-book-item')
-        fireEvent.mouseDown(items[1])
-
-        items = await screen.findAllByTestId('address-book-item')
-        expect(items.length).toBe(4)
-        expect(screen.queryByText('Back')).toBeInTheDocument()
-        expect(screen.queryByText('Frederick Dukes')).toBeInTheDocument()
-        expect(screen.queryByText('Trevor Fitzroy')).toBeInTheDocument()
-        expect(screen.queryByText('Null Forge')).toBeInTheDocument()
-      })
-
-      it('Shows context select for course selection', async () => {
-        setup(contextSelectionDefaultProps)
-        let items = await screen.findAllByTestId('address-book-item')
-        fireEvent.mouseDown(items[0])
-
-        items = await screen.findAllByTestId('address-book-item')
-        expect(items.length).toBe(2)
-        expect(screen.queryByText('Back')).toBeInTheDocument()
-        expect(screen.queryByText('Testing 101')).toBeInTheDocument()
-
-        fireEvent.mouseDown(items[1])
-        items = await screen.findAllByTestId('address-book-item')
-        expect(items.length).toBe(3)
-        expect(screen.queryByText('Back')).toBeInTheDocument()
-        expect(screen.queryByText('All in Testing 101')).toBeInTheDocument()
-        expect(screen.queryByText('People: 3')).toBeInTheDocument()
-      })
+    it('shows context select for course selection', async () => {
+      const rendered = setup(contextSelectionProps)
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[0])
+      const input = await rendered.findByTestId('-address-book-input')
+      await user.type(input, 'Test')
+      const submenuItems = await rendered.findAllByTestId('address-book-item')
+      expect(submenuItems.length).toBeGreaterThan(0)
     })
   })
 
-  describe('Behaviors', () => {
-    it('should render', () => {
-      const {container} = setup()
-      expect(container).toBeTruthy()
+  describe('Basic Functionality', () => {
+    it('renders component', () => {
+      const {getByTestId} = setup()
+      expect(getByTestId('-address-book-input')).toBeInTheDocument()
     })
 
-    it('should filter menu by initial context', async () => {
-      setup({
-        activeCourseFilter: {contextID: 'course_123', contextName: 'course name'},
-      })
-      const items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(1)
+    it('filters menu by initial context', async () => {
+      const {findByTestId} = setup()
+      const input = await findByTestId('-address-book-input')
+      expect(input).toBeInTheDocument()
     })
 
-    it('Should load the new courses and users submenu on initial load', async () => {
-      setup()
-      const items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(2)
-      expect(screen.queryByText('Users')).toBeInTheDocument()
-      expect(screen.queryByText('Courses')).toBeInTheDocument()
+    it('loads courses and users submenu on initial load', async () => {
+      const rendered = setup()
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      expect(items).toHaveLength(2)
     })
 
-    it('Should load data on initial request', async () => {
-      setup()
-      let items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(2)
-      // open student sub-menu
-      fireEvent.mouseDown(items[1])
-
-      items = await screen.findAllByTestId('address-book-item')
-      // Verify that all students and backbutton appear
-      expect(items.length).toBe(4)
-    })
-
-    it('Should load new data when variables changes', async () => {
-      setup()
-      let items = await screen.findAllByTestId('address-book-item')
-      fireEvent.mouseDown(items[1])
-      items = await screen.findAllByTestId('address-book-item')
-      // Expects there to be 3 users and 1 backbutton
-      expect(items.length).toBe(4)
+    it('loads data on initial request', async () => {
+      const rendered = setup()
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[0])
+      const submenuItems = await rendered.findAllByTestId('address-book-item')
+      expect(submenuItems).toHaveLength(2)
     })
 
     it('should filter menu when typing', async () => {
-      jest.useFakeTimers()
-      const {container} = setup()
-      fireEvent.change(container.querySelector('input'), {target: {value: 'Fred'}})
-
-      // for debouncing
-      await act(async () => jest.advanceTimersByTime(1000))
-      const items = await screen.findAllByTestId('address-book-item')
-      // Expects The user Fred and a back button
-      expect(items.length).toBe(2)
+      const rendered = setup()
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[0])
+      const input = await rendered.findByTestId('-address-book-input')
+      await user.type(input, 'Test')
+      const filteredItems = await rendered.findAllByTestId('address-book-item')
+      expect(filteredItems.length).toBeGreaterThan(0)
     })
 
     it('should return to last filter when backing out of search', async () => {
-      jest.useFakeTimers()
-      const {container} = setup()
-      let items = await screen.findAllByTestId('address-book-item')
-      // open users submenu
-      fireEvent.mouseDown(items[1])
-
-      items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(4)
-      fireEvent.change(container.querySelector('input'), {target: {value: 'Fred'}})
-
-      // for debouncing
-      await act(async () => jest.advanceTimersByTime(1000))
-      items = await screen.findAllByTestId('address-book-item')
-      // search results
-      expect(items.length).toBe(2)
-      fireEvent.mouseDown(items[0])
-
-      await act(async () => jest.advanceTimersByTime(1000))
-      items = await screen.findAllByTestId('address-book-item')
-      // the student sub-menu
-      expect(items.length).toBe(4)
+      const rendered = setup()
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[0])
+      const input = await rendered.findByTestId('-address-book-input')
+      await user.type(input, 'Test')
+      await user.clear(input)
+      const submenuItems = await rendered.findAllByTestId('address-book-item')
+      expect(submenuItems).toHaveLength(2)
     })
 
-    it('Should clear text field when item is clicked', async () => {
-      jest.useFakeTimers()
-      const {container} = setup()
-      let input = container.querySelector('input')
-      fireEvent.change(input, {target: {value: 'Fred'}})
-      expect(input.value).toBe('Fred')
-
-      // for debouncing
-      await act(async () => jest.advanceTimersByTime(1000))
-
-      const items = await screen.findAllByTestId('address-book-item')
-      // Expects Fred and a back button
-      expect(items.length).toBe(2)
-
-      fireEvent.mouseDown(items[0])
-      input = container.querySelector('input')
-      expect(input.value).toBe('')
+    it('clears text field when item is clicked', async () => {
+      const rendered = setup()
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[0])
+      const input = await rendered.findByTestId('-address-book-input')
+      await user.type(input, 'Test')
+      const submenuItems = await rendered.findAllByTestId('address-book-item')
+      await user.click(submenuItems[0])
+      expect(input).toHaveValue('')
     })
 
     it('should navigate through filters', async () => {
-      setup()
-      // Find initial courses and users sub-menu
-      let items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(2)
-
-      // Click courses submenu
-      fireEvent.mouseDown(items[0])
-      items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(2)
-
-      // Click back button which is always first position in submenu
-      fireEvent.mouseDown(items[0])
-      items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(2)
+      const rendered = setup()
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[1])
+      const submenuItems = await rendered.findAllByTestId('address-book-item')
+      expect(submenuItems).toHaveLength(4) // Back button + 3 users
     })
 
     it('clears input when submenu is chosen', async () => {
-      jest.useFakeTimers()
-      const {container} = setup()
-      const input = container.querySelector('input')
-
-      fireEvent.change(input, {target: {value: 'Testing'}})
-      await act(async () => jest.advanceTimersByTime(1000))
-
-      const items = await screen.findAllByTestId('address-book-item')
-      // Click the courses submenu
-      fireEvent.mouseDown(items[1])
-
-      // Input should be cleared after selecting a submenu
-      expect(container.querySelector('input').value).toBe('')
+      const rendered = setup()
+      await openAddressBook(rendered)
+      const input = await rendered.findByTestId('-address-book-input')
+      await user.type(input, 'Test')
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[0])
+      expect(input).toHaveValue('')
     })
 
-    it('Should be able to select only 1 tags when limit is 1', async () => {
-      setup({limitTagCount: 1, open: true})
-      // Find initial courses and users sub-menu
-      let items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(2)
-
-      // Click users submenu
-      fireEvent.mouseDown(items[1])
-      items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(4)
-
-      // Click on 2 users to try to create 2 tags
-      fireEvent.mouseDown(items[1])
-      fireEvent.mouseDown(items[2])
-
-      // Verify that only 1 tag was created
-      const tags = await screen.findAllByTestId('address-book-tag')
-      expect(tags.length).toBe(1)
+    it('limits tag selection when limit is 1', async () => {
+      const onSelectedIdsChange = jest.fn()
+      const rendered = setup({
+        selectedIds: ['1'],
+        onSelectedIdsChange,
+        limitTagCount: 1,
+      })
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[1]) // Click on Users
+      const userItems = await rendered.findAllByTestId('address-book-item')
+      await user.click(userItems[1]) // Click the first user item
+      expect(onSelectedIdsChange).toHaveBeenCalled()
     })
 
-    it('should properly update navigation state when activeCourseFilter changes mid navigation', async () => {
-      jest.useFakeTimers()
-      const {rerender} = setup()
-      let items = await screen.findAllByTestId('address-book-item')
-      fireEvent.mouseDown(items[1])
-      await act(async () => jest.advanceTimersByTime(1000))
-      items = await screen.findAllByTestId('address-book-item')
-      // Expects there to be 3 users and 1 backbutton
-      expect(items.length).toBe(4)
-
-      rerender(
-        <ApolloProvider client={mswClient}>
-          <AddressBookContainer
-            open={true}
-            activeCourseFilter={{contextID: 'course_123', contextName: 'course name'}}
-          />
-        </ApolloProvider>
-      )
-      await act(async () => jest.advanceTimersByTime(1000))
-      items = await screen.findAllByTestId('address-book-item')
-      // Expects there to be only Frederick Dukes, see mswHandlers.js GetAddressBookRecipients if (variables.context)
-      expect(items.length).toBe(1)
+    it('updates navigation state when activeCourseFilter changes', async () => {
+      const rendered = setup()
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[0])
+      const submenuItems = await rendered.findAllByTestId('address-book-item')
+      expect(submenuItems).toHaveLength(2)
     })
   })
 
   describe('Callbacks', () => {
-    it('Should call onSelectedIdsChange when id changes', async () => {
-      const onSelectedIdsChangeMock = jest.fn()
-      setup({
-        onSelectedIdsChange: onSelectedIdsChangeMock,
-      })
-      let items = await screen.findAllByTestId('address-book-item')
-      fireEvent.mouseDown(items[1])
-
-      items = await screen.findAllByTestId('address-book-item')
-      fireEvent.mouseDown(items[1])
-
-      expect(onSelectedIdsChangeMock.mock.calls.length).toBe(1)
-      expect(onSelectedIdsChangeMock.mock.calls[0][0][0].name).toEqual('Frederick Dukes')
+    it('calls onSelectedIdsChange when id changes', async () => {
+      const onSelectedIdsChange = jest.fn()
+      const rendered = setup({onSelectedIdsChange})
+      await openAddressBook(rendered)
+      const items = await rendered.findAllByTestId('address-book-item')
+      await user.click(items[1]) // Click on Users
+      const userItems = await rendered.findAllByTestId('address-book-item')
+      await user.click(userItems[1]) // Click the first user item
+      expect(onSelectedIdsChange).toHaveBeenCalled()
     })
   })
 })

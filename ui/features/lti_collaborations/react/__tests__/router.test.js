@@ -83,7 +83,7 @@ describe('router', () => {
             service_id: 123,
             tool_id: 1234,
           },
-          ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+          ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN,
         )
         await sleep(100)
 

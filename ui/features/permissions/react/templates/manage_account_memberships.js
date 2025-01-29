@@ -33,7 +33,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to create and manage Groups. Allows user to manage shared resources in the account.'
+        'Allows user to create and manage Groups. Allows user to manage shared resources in the account.',
       ),
     },
     {
@@ -42,5 +42,5 @@ export const template = generateActionTemplates(
   ],
   [],
   [],
-  []
+  [],
 )

@@ -118,7 +118,7 @@ describe('AssignmentGroup', () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <AssignmentGroup courseId="55" mode="edit" onChange={() => {}} onChangeMode={() => {}} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     // The groups are loaded when Select removes its spinner
     await waitForNoElement(() => getByText('Loading...'))

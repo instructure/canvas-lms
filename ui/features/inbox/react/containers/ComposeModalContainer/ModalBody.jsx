@@ -94,7 +94,7 @@ ModalBody.propTypes = {
     PropTypes.shape({
       text: PropTypes.string,
       type: PropTypes.string,
-    })
+    }),
   ),
   children: PropTypes.element,
   onBodyChange: PropTypes.func,

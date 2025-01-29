@@ -38,7 +38,7 @@ it('registers itself as animatable', () => {
       deregisterAnimatable={fakeDeregister}
       animatableIndex={42}
       ref={ref}
-    />
+    />,
   )
   expect(fakeRegister).toHaveBeenCalledWith('new-activity-indicator', ref.current, 42, [
     'first',
@@ -53,7 +53,7 @@ it('registers itself as animatable', () => {
       deregisterAnimatable={fakeDeregister}
       animatableIndex={84}
       ref={ref}
-    />
+    />,
   )
   expect(fakeDeregister).toHaveBeenCalledWith('new-activity-indicator', ref.current, [
     'first',

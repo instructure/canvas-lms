@@ -50,7 +50,7 @@ const CONTENT_OPTIONS = [
   },
   {
     display: I18n.t(
-      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'
+      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws',
     ),
     value: 'fair_use',
   },
@@ -130,7 +130,7 @@ export default class UsageRightsSelectBox extends React.Component {
         {
           usageRightSelectionValue: event.target.value,
         },
-        this.handleChange(event)
+        this.handleChange(event),
       )
     }
   }
@@ -180,7 +180,7 @@ export default class UsageRightsSelectBox extends React.Component {
           <i className="icon-warning" />
           <span style={{paddingLeft: '10px'}}>
             {I18n.t(
-              "If you do not select usage rights now, this file will be unpublished after it's uploaded."
+              "If you do not select usage rights now, this file will be unpublished after it's uploaded.",
             )}
           </span>
         </span>

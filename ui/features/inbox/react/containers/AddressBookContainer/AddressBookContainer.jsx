@@ -95,7 +95,7 @@ export const AddressBookContainer = props => {
         courseContextCode: props.courseContextCode,
       },
       notifyOnNetworkStatusChange: true,
-    }
+    },
   )
   const {loading, data} = addressBookRecipientsQuery
 
@@ -119,7 +119,7 @@ export const AddressBookContainer = props => {
           one: '1 Address book result loaded',
           other: '%{count} Address book results loaded',
         },
-        {count: searchResults.length}
+        {count: searchResults.length},
       )
       setOnSuccess(loadedMessage)
     }
@@ -187,14 +187,14 @@ export const AddressBookContainer = props => {
 
   const getCommonCoursesInformation = commonCourses => {
     const activeEnrollments = commonCourses?.nodes.filter(
-      courseEnrollment => courseEnrollment.state === 'active'
+      courseEnrollment => courseEnrollment.state === 'active',
     )
     return activeEnrollments.map(
       courseEnrollment =>
         (courseEnrollment = {
           courseID: courseEnrollment.course._id,
           courseRole: courseEnrollment.type,
-        })
+        }),
     )
   }
 

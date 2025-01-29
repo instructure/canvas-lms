@@ -56,7 +56,7 @@ export default {
       $(this.usageSelection.usageRightSelection).errorBox(
         I18n.t('You must specify a usage right.'),
         null,
-        'fixed'
+        'fixed',
       )
       return false
     }
@@ -100,7 +100,7 @@ export default {
       this.props.itemsToManage.every(
         item =>
           (item.get('usage_rights') && item.get('usage_rights').use_justification) ===
-          useJustification
+          useJustification,
       )
     ) {
       return useJustification
@@ -118,7 +118,7 @@ export default {
       this.props.itemsToManage.every(
         item =>
           (item.get('usage_rights') && item.get('usage_rights').legal_copyright) === copyright ||
-          (item.get('usage_rights') && item.get('usage_rights').license) === copyright
+          (item.get('usage_rights') && item.get('usage_rights').license) === copyright,
       )
     ) {
       return copyright

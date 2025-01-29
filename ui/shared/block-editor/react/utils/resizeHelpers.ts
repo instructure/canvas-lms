@@ -19,29 +19,23 @@
 import {type SizeVariant, type Sz} from '../components/editor/types'
 
 const changeSizeVariant = (elem: HTMLElement, to: SizeVariant): Sz => {
-  const {width, height} = elem.getBoundingClientRect()
+  let {width, height} = elem.getBoundingClientRect()
   if (to === 'percent') {
     const parent = elem.offsetParent
     if (parent) {
-      return percentSize(parent.clientWidth, parent.clientHeight, width, height)
+      width = percentSize(parent.clientWidth, width)
     }
   }
   return {width, height}
 }
 
-const percentSize = (parentWidth: number, parentHeight: number, width: number, height: number) => {
-  let w = width,
-    h = height
+const percentSize = (parentWidth: number, width: number) => {
+  let w = width
+
   if (parentWidth - width <= 7) {
     w = parentWidth
   }
-  if (parentHeight - height <= 7) {
-    h = parentHeight
-  }
-  return {
-    width: (w / parentWidth) * 100,
-    height: (h / parentHeight) * 100,
-  }
+  return (w / parentWidth) * 100
 }
 
 export {changeSizeVariant, percentSize}

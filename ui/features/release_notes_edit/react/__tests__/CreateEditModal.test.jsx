@@ -31,7 +31,7 @@ describe('create modal', () => {
         currentNote={undefined}
         envs={['test']}
         langs={['en', 'es']}
-      />
+      />,
     )
     expect(getByText('Everyone')).toBeInTheDocument()
   })
@@ -47,7 +47,7 @@ describe('create modal', () => {
         currentNote={undefined}
         envs={['test']}
         langs={['en', 'es']}
-      />
+      />,
     )
     expect(getByText('Save').closest('button')).toBeDisabled()
     await userEvent.type(getByLabelText('Title'), 'A great english title')
@@ -68,7 +68,7 @@ describe('create modal', () => {
         currentNote={undefined}
         envs={['test']}
         langs={['en', 'es']}
-      />
+      />,
     )
     await userEvent.type(getByLabelText('Title'), 'A great english title')
     await userEvent.type(getByLabelText('Description'), 'A great english description')

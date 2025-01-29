@@ -112,7 +112,7 @@ export const onSetContent = e => {
           onExited={onMentionsExit}
           editor={editor}
         />,
-        elm
+        elm,
       )
     }
   }

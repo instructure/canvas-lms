@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React, {Suspense} from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import NavigationView from './backbone/views/NavigationView'
 import ErrorBoundary from '@canvas/error-boundary'
 import {Spinner} from '@instructure/ui-spinner'
@@ -39,8 +39,8 @@ const I18n = createI18nScope('course_settings')
 
 const BlueprintLockOptions = React.lazy(() => import('./react/components/BlueprintLockOptions'))
 const CourseTemplateDetails = React.lazy(() => import('./react/components/CourseTemplateDetails'))
-const CourseAvailabilityOptions = React.lazy(() =>
-  import('./react/components/CourseAvailabilityOptions')
+const CourseAvailabilityOptions = React.lazy(
+  () => import('./react/components/CourseAvailabilityOptions'),
 )
 const Integrations = React.lazy(() => import('@canvas/integrations/react/courses/Integrations'))
 const CourseApps = React.lazy(() => import('./react/components/CourseApps'))
@@ -55,8 +55,8 @@ const Error = () => (
 ready(() => {
   const blueprint = document.getElementById('blueprint_menu')
   if (blueprint) {
-     
-    ReactDOM.render(
+    const blueprintRoot = createRoot(blueprint)
+    blueprintRoot.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
           <BlueprintLockOptions
@@ -68,64 +68,58 @@ ready(() => {
           />
         </ErrorBoundary>
       </Suspense>,
-      blueprint
     )
   }
 
   const courseTemplate = document.getElementById('course_template_details')
   if (courseTemplate) {
     const isEditable = courseTemplate.getAttribute('data-is-editable') === 'true'
-     
-    ReactDOM.render(
+
+    const courseTemplateRoot = createRoot(courseTemplate)
+    courseTemplateRoot.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
           <CourseTemplateDetails isEditable={isEditable} />
         </ErrorBoundary>
       </Suspense>,
-      courseTemplate
     )
   }
 
   const navView = new NavigationView({el: $('#tab-navigation')})
 
   if (document.getElementById('tab-features')) {
-     
-    ReactDOM.render(
-      <FeatureFlags disableDefaults={true} />,
-      document.getElementById('tab-features')
-    )
+    const featuresRoot = createRoot(document.getElementById('tab-features'))
+    featuresRoot.render(<FeatureFlags disableDefaults={true} />)
   }
 
   $(() => navView.render())
 
-   
-  ReactDOM.render(
+  const imageSelectorRoot = createRoot($('.CourseImageSelector__Container')[0])
+  imageSelectorRoot.render(
     <CourseImageSelector
       store={configureStore(initialState)}
       courseId={ENV.COURSE_ID}
       setting="image"
     />,
-    $('.CourseImageSelector__Container')[0]
   )
 
   const bannerImageContainer = document.getElementById('course_banner_image_selector_container')
   if (bannerImageContainer) {
-     
-    ReactDOM.render(
+    const bannerImageRoot = createRoot(bannerImageContainer)
+    bannerImageRoot.render(
       <CourseImageSelector
         store={configureStore(initialState)}
         courseId={ENV.COURSE_ID}
         setting="banner_image"
         wide={true}
       />,
-      bannerImageContainer
     )
   }
 
   const availabilityOptionsContainer = document.getElementById('availability_options_container')
   if (availabilityOptionsContainer) {
-     
-    ReactDOM.render(
+    const availabilityOptionsRoot = createRoot(availabilityOptionsContainer)
+    availabilityOptionsRoot.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
           <CourseAvailabilityOptions
@@ -135,68 +129,60 @@ ready(() => {
           />
         </ErrorBoundary>
       </Suspense>,
-      availabilityOptionsContainer
     )
   }
 
   const restrictQuantitativeDataContainer = document.getElementById(
-    'restrict_quantitative_data_options_container'
+    'restrict_quantitative_data_options_container',
   )
   if (restrictQuantitativeDataContainer) {
-     
-    ReactDOM.render(
+    const quantitativeDataRoot = createRoot(restrictQuantitativeDataContainer)
+    quantitativeDataRoot.render(
       <Suspense fallback={<Loading />}>
         <QuantitativeDataOptions canManage={ENV.CAN_EDIT_RESTRICT_QUANTITATIVE_DATA} />
       </Suspense>,
-      restrictQuantitativeDataContainer
     )
   }
 
   const defaultDueTimeContainer = document.getElementById('default_due_time_container')
   if (defaultDueTimeContainer) {
-     
-    ReactDOM.render(
+    const defaultDueTimeRoot = createRoot(defaultDueTimeContainer)
+    defaultDueTimeRoot.render(
       <Suspense fallback={<Loading />}>
         <CourseDefaultDueTime />
       </Suspense>,
-      defaultDueTimeContainer
     )
   }
 
   if (ENV.COURSE_COLORS_ENABLED) {
     const courseColorPickerContainer = document.getElementById('course_color_picker_container')
     if (courseColorPickerContainer) {
-       
-      ReactDOM.render(
-        <CourseColorSelector courseColor={ENV.COURSE_COLOR} />,
-        courseColorPickerContainer
-      )
+      const courseColorRoot = createRoot(courseColorPickerContainer)
+      courseColorRoot.render(<CourseColorSelector courseColor={ENV.COURSE_COLOR} />)
     }
   }
 
   const integrationsContainer = document.getElementById('tab-integrations')
   if (integrationsContainer) {
-     
-    ReactDOM.render(
+    const integrationsRoot = createRoot(integrationsContainer)
+    integrationsRoot.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
           <Integrations />
         </ErrorBoundary>
       </Suspense>,
-      integrationsContainer
     )
   }
 
   const appsMountpoint = document.getElementById('tab-apps')
   if (appsMountpoint) {
-     
-    ReactDOM.render(
+    const appsRoot = createRoot(appsMountpoint)
+    appsRoot.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
           <CourseApps />
         </ErrorBoundary>
       </Suspense>,
-      appsMountpoint
     )
   }
 })

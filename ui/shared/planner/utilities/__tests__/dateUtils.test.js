@@ -103,21 +103,21 @@ describe('getDynamicFullDateAndTime', () => {
   it('returns the format month day time if in the current year', () => {
     const date = moment().tz(TZ)
     expect(getDynamicFullDateAndTime(date, TZ)).toEqual(
-      `${date.format('MMM D')} at ${date.format('LT')}`
+      `${date.format('MMM D')} at ${date.format('LT')}`,
     )
   })
 
   it('returns the format month day year time if in a past year', () => {
     const date = moment().tz(TZ).subtract(1, 'years')
     expect(getDynamicFullDateAndTime(date, TZ)).toEqual(
-      `${date.format('MMM D, YYYY')} at ${date.format('LT')}`
+      `${date.format('MMM D, YYYY')} at ${date.format('LT')}`,
     )
   })
 
   it('returns the format month day year time if in a future year', () => {
     const date = moment().tz(TZ).add(1, 'years')
     expect(getDynamicFullDateAndTime(date, TZ)).toEqual(
-      `${date.format('MMM D, YYYY')} at ${date.format('LT')}`
+      `${date.format('MMM D, YYYY')} at ${date.format('LT')}`,
     )
   })
 })
@@ -228,12 +228,12 @@ describe('dateRangeString', () => {
 
 describe('isThisWeek', () => {
   it('returns true when given day is during this week', () => {
-    // eslint-disable-next-line new-cap
+     
     const wednesday = new moment().startOf('week').add(3, 'days')
     expect(isThisWeek(wednesday)).toEqual(true)
   })
   it('return false when given day is not during this week', () => {
-    // eslint-disable-next-line new-cap
+     
     const lastFriday = new moment().startOf('week').add(-2, 'days')
     expect(isThisWeek(lastFriday)).toEqual(false)
   })

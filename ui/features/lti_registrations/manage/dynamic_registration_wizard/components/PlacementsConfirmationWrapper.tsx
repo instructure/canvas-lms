@@ -40,7 +40,7 @@ export const PlacementsConfirmationWrapper = ({
       appName={registration.client_name}
       availablePlacements={placements}
       enabledPlacements={placements.filter(
-        p => !overlayState.registration.disabledPlacements?.includes(p)
+        p => !overlayState.registration.disabledPlacements?.includes(p),
       )}
       courseNavigationDefaultHidden={
         // @ts-expect-error

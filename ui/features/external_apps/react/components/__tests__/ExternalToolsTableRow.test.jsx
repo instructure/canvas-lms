@@ -101,7 +101,7 @@ function renderRow(props) {
     />,
     {
       container: tbody,
-    }
+    },
   )
 }
 

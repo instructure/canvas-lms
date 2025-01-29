@@ -310,7 +310,7 @@ To logout, simply send a [DELETE request to login/oauth2/token](file.oauth_endpo
 <h4>Example JWK</h4>
 
   <pre class="example code prettyprint">
-   "public_jwk":{  
+   "public_jwk":{
       "kty":"RSA",
       "alg":"RS256",
       "e":"AQAB",

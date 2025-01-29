@@ -59,7 +59,7 @@ const UL = (INST.UserLists = {
         $('#user_lists_path').attr('href'),
         'POST',
         UL.$form.getFormData(),
-        UL.showResults
+        UL.showResults,
       )
     })
     UL.$form.submit(function (event) {
@@ -74,14 +74,14 @@ const UL = (INST.UserLists = {
         'POST',
         UL.$form.getFormData(),
         UL.success,
-        UL.failure
+        UL.failure,
       )
     })
     UL.$form
       .find('#enrollment_type')
       .change(function () {
         return $('#limit_privileges_to_course_section_holder').showIf(
-          $(this).find(':selected').data('isAdmin') != null
+          $(this).find(':selected').data('isAdmin') != null,
         )
       })
       .change()
@@ -93,8 +93,8 @@ const UL = (INST.UserLists = {
         return alert(
           I18n.t(
             'cant_unenroll',
-            "This user was automatically enrolled using the campus enrollment system, so they can't be manually removed.  Please contact your system administrator if you have questions."
-          )
+            "This user was automatically enrolled using the campus enrollment system, so they can't be manually removed.  Please contact your system administrator if you have questions.",
+          ),
         )
       } else {
         $user = $(this).parents('.user')
@@ -135,7 +135,7 @@ const UL = (INST.UserLists = {
       },
       {
         count: enrollments.length - already_existed,
-      }
+      },
     )
     if (already_existed > 0) {
       addedMsg +=
@@ -148,7 +148,7 @@ const UL = (INST.UserLists = {
           },
           {
             count: already_existed,
-          }
+          },
         )
     }
     return $.flashMessage(addedMsg)
@@ -198,8 +198,8 @@ const UL = (INST.UserLists = {
           },
           {
             count: userList.users.length,
-          }
-        )
+          },
+        ),
       )
     UL.$form.find('.verify_syntax_button, .cancel_button, #user_list_textarea_container').hide()
     UL.$form.find('.user_list').removeAttr('disabled').loadingImage('remove')
@@ -221,12 +221,12 @@ const UL = (INST.UserLists = {
               },
               {
                 count: userList.errored_users.length,
-              }
+              },
             ) +
               ' ' +
               I18n.t(
                 'invalid_users_notice',
-                'There may be some that were invalid, and you might need to go back and fix any errors.'
+                'There may be some that were invalid, and you might need to go back and fix any errors.',
               ) +
               ' ' +
               I18n.t(
@@ -237,8 +237,8 @@ const UL = (INST.UserLists = {
                 },
                 {
                   count: userList.users.length,
-                }
-              )
+                },
+              ),
           )
       }
       if (userList.duplicates && userList.duplicates.length) {
@@ -254,8 +254,8 @@ const UL = (INST.UserLists = {
               },
               {
                 count: userList.duplicates.length,
-              }
-            )
+              },
+            ),
           )
       }
       return $.each(userList.users, function () {
@@ -279,7 +279,7 @@ const UL = (INST.UserLists = {
       ['student', 'teacher', 'ta', 'teacher_and_ta', 'student_and_observer', 'observer'],
       function () {
         return $('.' + this + '_count').text($('.' + this + '_enrollments .user:visible').length)
-      }
+      },
     )
   },
   addUserToList(enrollment) {
@@ -327,13 +327,13 @@ const UL = (INST.UserLists = {
           {
             backgroundColor: '#FFEE88',
           },
-          1000
+          1000,
         )
         .animate(
           {
             display: 'block',
           },
-          2000
+          2000,
         )
         .animate(
           {
@@ -342,7 +342,7 @@ const UL = (INST.UserLists = {
           2000,
           function () {
             return $(this).css('backgroundColor', '')
-          }
+          },
         )
       $enrollment
         .find('.enrollment_link')

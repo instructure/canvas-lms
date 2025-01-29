@@ -20,13 +20,34 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import LatePolicyGrade from '../LatePolicyGrade'
 
+interface TestProps {
+  assignment: {
+    pointsPossible: number
+  }
+  submission: {
+    score: number
+    grade: string
+    pointsDeducted: number
+    excused: boolean
+    extended: boolean
+    late: boolean
+    missing: boolean
+    resubmitted: boolean
+    dropped: boolean
+  }
+  enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme'
+  gradingScheme: [string, number][]
+  pointsBasedGradingScheme: boolean
+  scalingFactor: number
+}
+
 describe('LatePolicyGrade', () => {
   const subject = (
     enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme' = 'percent',
     score = 7.345,
-    grade = '7.345'
+    grade = '7.345',
   ) => {
-    const defaultProps = {
+    const defaultProps: TestProps = {
       assignment: {
         pointsPossible: 100,
       },
@@ -48,8 +69,8 @@ describe('LatePolicyGrade', () => {
         ['C', 70],
       ],
       pointsBasedGradingScheme: false,
+      scalingFactor: 1.0,
     }
-    // @ts-expect-error
     return render(<LatePolicyGrade {...defaultProps} />)
   }
 
@@ -72,14 +93,14 @@ describe('LatePolicyGrade', () => {
   test('formats the final grade as "Complete" when enterGradesAs is set to passFail and score > 0', () => {
     const wrapper = subject('passFail')
     expect(wrapper.container.querySelector('#final-grade-value > span')!.innerHTML).toEqual(
-      'Complete'
+      'Complete',
     )
   })
 
   test('formats the final grade as "Incomplete" when enterGradesAs is set to passFail and score == 0', () => {
     const wrapper = subject('passFail', 0, '0')
     expect(wrapper.container.querySelector('#final-grade-value > span')!.innerHTML).toEqual(
-      'Incomplete'
+      'Incomplete',
     )
   })
 })

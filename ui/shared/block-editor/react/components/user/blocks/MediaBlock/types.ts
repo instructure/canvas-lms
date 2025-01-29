@@ -15,15 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export type MediaConstraint = 'cover' | 'contain'
-export type MediaVariant = 'default' | 'hero'
 export type MediaBlockProps = {
   src?: string
-  width?: string
-  height?: string
-  constraint?: MediaConstraint
-  maintainAspectRatio?: boolean
-  sizeVariant?: MediaVariant
   title?: string
+  height?: string
+  width?: string
   attachmentId?: string
 }

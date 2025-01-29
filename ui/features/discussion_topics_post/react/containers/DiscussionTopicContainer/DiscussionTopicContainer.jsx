@@ -16,46 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DiscussionDetails} from '../../components/DiscussionDetails/DiscussionDetails'
+import {useApolloClient, useMutation} from '@apollo/client'
 import DateHelper from '@canvas/datetime/dateHelper'
-import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
-import {Discussion} from '../../../graphql/Discussion'
-import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
-import {DiscussionSummary} from '../../components/DiscussionSummary/DiscussionSummary'
-import {getReviewLinkUrl, getSpeedGraderUrl, responsiveQuerySizes} from '../../utils'
-import {Highlight} from '../../components/Highlight/Highlight'
+import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {PeerReview} from '../../components/PeerReview/PeerReview'
-import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
+import PropTypes from 'prop-types'
+import React, {useContext, useState} from 'react'
+import {Discussion} from '../../../graphql/Discussion'
 import {
   DELETE_DISCUSSION_TOPIC,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_READ_STATE,
   UPDATE_DISCUSSION_TOPIC,
 } from '../../../graphql/Mutations'
+import {DiscussionDetails} from '../../components/DiscussionDetails/DiscussionDetails'
+import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
+import {DiscussionSummary} from '../../components/DiscussionSummary/DiscussionSummary'
+import {Highlight} from '../../components/Highlight/Highlight'
 import {LockedDiscussion} from '../../components/LockedDiscussion/LockedDiscussion'
+import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {PodcastFeed} from '../../components/PodcastFeed/PodcastFeed'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
-import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import {getReviewLinkUrl, getSpeedGraderUrl, responsiveQuerySizes} from '../../utils'
 import {SearchContext} from '../../utils/constants'
-import {useApolloClient, useMutation} from '@apollo/client'
+import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {DiscussionTopicAlertManager} from '../../components/DiscussionTopicAlertManager/DiscussionTopicAlertManager'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {DiscussionTopicAlertManager} from '../../components/DiscussionTopicAlertManager/DiscussionTopicAlertManager'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 
 import assignmentRubricDialog from '@canvas/discussions/jquery/assignmentRubricDialog'
-import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
 import TopNavPortalWithDefaults, {
   addCrumbs,
 } from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
+import {assignLocation, openWindow} from '@canvas/util/globalUtils'
+import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -84,8 +85,8 @@ export const DiscussionTopicContainer = ({
   const [deleteDiscussionTopic] = useMutation(DELETE_DISCUSSION_TOPIC, {
     onCompleted: () => {
       setOnSuccess(I18n.t('The discussion topic was successfully deleted.'))
-      window.location.assign(
-        `/courses/${ENV.course_id}/${isAnnouncement ? 'announcements' : 'discussion_topics'}`
+      assignLocation(
+        `/courses/${ENV.course_id}/${isAnnouncement ? 'announcements' : 'discussion_topics'}`,
       )
     },
     onError: () => {
@@ -136,7 +137,7 @@ export const DiscussionTopicContainer = ({
         setOnSuccess(
           data.subscribeToDiscussionTopic.discussionTopic.subscribed
             ? I18n.t('You have successfully subscribed to the discussion topic.')
-            : I18n.t('You have successfully unsubscribed from the discussion topic.')
+            : I18n.t('You have successfully unsubscribed from the discussion topic.'),
         )
       } else {
         setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
@@ -151,7 +152,7 @@ export const DiscussionTopicContainer = ({
     const message = isAnnouncement
       ? I18n.t('Are you sure you want to delete this announcement?')
       : I18n.t('Are you sure you want to delete this topic?')
-     
+
     if (window.confirm(message)) {
       deleteDiscussionTopic({
         variables: {
@@ -222,7 +223,7 @@ export const DiscussionTopicContainer = ({
       addCrumbs([
         {name: discussionOrAnnouncement, url: `${crumbs[0].url}/${discussionOrAnnouncementUrl}`},
         {name: props.discussionTopic.title || '', url: ''},
-      ])
+      ]),
     )
   }
 
@@ -333,11 +334,11 @@ export const DiscussionTopicContainer = ({
                                 reviewLinkUrl={getReviewLinkUrl(
                                   ENV.course_id,
                                   props.discussionTopic.assignment._id,
-                                  assessmentRequest.user._id
+                                  assessmentRequest.user._id,
                                 )}
                                 workflowState={assessmentRequest.workflowState}
                               />
-                            )
+                            ),
                           )}
                         </Flex.Item>
                         <Flex.Item shouldShrink={true} shouldGrow={true} overflowY="visible">
@@ -372,7 +373,7 @@ export const DiscussionTopicContainer = ({
                                 }
                                 onEdit={
                                   props.discussionTopic.permissions?.update
-                                    ? () => window.location.assign(ENV.EDIT_URL)
+                                    ? () => assignLocation(ENV.EDIT_URL)
                                     : null
                                 }
                                 onTogglePublish={
@@ -383,12 +384,12 @@ export const DiscussionTopicContainer = ({
                                 onToggleSubscription={onSubscribe}
                                 onOpenSpeedgrader={
                                   props.discussionTopic.permissions?.speedGrader
-                                    ? () => window.open(getSpeedGraderUrl(), '_blank')
+                                    ? () => openWindow(getSpeedGraderUrl(), '_blank')
                                     : null
                                 }
                                 onPeerReviews={
                                   props.discussionTopic.permissions?.peerReview
-                                    ? () => window.location.assign(ENV.PEER_REVIEWS_URL)
+                                    ? () => assignLocation(ENV.PEER_REVIEWS_URL)
                                     : null
                                 }
                                 showRubric={props.discussionTopic.permissions?.showRubric}
@@ -437,10 +438,10 @@ export const DiscussionTopicContainer = ({
                             editedAt={props.discussionTopic.editedAt}
                             delayedPostAt={props.discussionTopic.delayedPostAt}
                             timingDisplay={DateHelper.formatDatetimeForDiscussions(
-                              props.discussionTopic.createdAt
+                              props.discussionTopic.createdAt,
                             )}
                             editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
-                              props.discussionTopic.editedAt
+                              props.discussionTopic.editedAt,
                             )}
                             isTopicAuthor={true}
                             attachment={props.discussionTopic.attachment}

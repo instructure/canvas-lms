@@ -85,7 +85,7 @@ const getClearButton = buttonProperties => {
 export const DiscussionPostToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
   const {translationLanguages, setShowTranslationControl} = useContext(
-    DiscussionManagerUtilityContext
+    DiscussionManagerUtilityContext,
   )
   const [showTranslate, setShowTranslate] = useState(false)
 
@@ -256,7 +256,7 @@ export const DiscussionPostToolbar = props => {
                             >
                               {viewOptionLabel.call()}
                             </SimpleSelect.Option>
-                          )
+                          ),
                         )}
                       </SimpleSelect.Group>
                     </SimpleSelect>

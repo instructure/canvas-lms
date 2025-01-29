@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {extend} from '@canvas/backbone/utils'
@@ -59,7 +57,7 @@ AssignmentSettingsView.prototype.events = lodashExtend(
     'click .dialog_closer': 'cancel',
     'click #apply_assignment_group_weights': 'toggleTableByClick',
     'keyup .group_weight_value': 'updateTotalWeight',
-  }
+  },
 )
 
 AssignmentSettingsView.optionProperty('assignmentGroups')
@@ -82,7 +80,7 @@ AssignmentSettingsView.prototype.validateFormData = function () {
       return function (weight) {
         const weight_value = $(weight).val()
         const field_selector = weight.getAttribute('groupId')
-         
+
         if (weight_value && isNaN(numberHelper.parse(weight_value))) {
           return (errors[field_selector] = [
             {
@@ -92,7 +90,7 @@ AssignmentSettingsView.prototype.validateFormData = function () {
           ])
         }
       }
-    })(this)
+    })(this),
   )
   return errors
 }
@@ -122,7 +120,7 @@ AssignmentSettingsView.prototype.showErrors = function (errors) {
             <Text size="small" color="danger">
               {errors[0].message}
             </Text>
-          </Flex>
+          </Flex>,
         )
         this.errorRoots[groupId] = root
       }
@@ -223,7 +221,7 @@ AssignmentSettingsView.prototype.addAssignmentGroups = function () {
   const ref = this.assignmentGroups.models
   for (let i = 0, len = ref.length; i < len; i++) {
     const model = ref[i]
-     
+
     const v = new this.weightsView({
       model,
       canChangeWeights,
@@ -237,7 +235,7 @@ AssignmentSettingsView.prototype.addAssignmentGroups = function () {
   return this.$el.find('#percent_total').text(
     I18n.n(total_weight, {
       percentage: true,
-    })
+    }),
   )
 }
 
@@ -262,7 +260,7 @@ AssignmentSettingsView.prototype.updateTotalWeight = function (event) {
   return this.$el.find('#percent_total').text(
     I18n.n(total_weight, {
       percentage: true,
-    })
+    }),
   )
 }
 

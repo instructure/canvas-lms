@@ -207,7 +207,7 @@ export type FetchRubricVariables = AccountRubricsQueryVariables | CourseRubricsQ
 export const fetchCourseRubrics = async (queryVariables: FetchRubricVariables) => {
   const {course} = await executeQuery<CourseRubricQueryResponse>(
     COURSE_RUBRICS_QUERY,
-    queryVariables
+    queryVariables,
   )
   return course
 }
@@ -215,7 +215,7 @@ export const fetchCourseRubrics = async (queryVariables: FetchRubricVariables) =
 export const fetchAccountRubrics = async (queryVariables: FetchRubricVariables) => {
   const {account} = await executeQuery<AccountRubricQueryResponse>(
     ACCOUNT_RUBRICS_QUERY,
-    queryVariables
+    queryVariables,
   )
   return account
 }
@@ -392,7 +392,7 @@ export const unarchiveRubric = async (rubricId: string): Promise<archiveRubricRe
 export const importRubric = async (
   file?: File,
   accountId?: string,
-  courseId?: string
+  courseId?: string,
 ): Promise<RubricImport> => {
   if (!file) {
     throw new Error('No file to import')
@@ -422,7 +422,7 @@ export const importRubric = async (
 export const fetchRubricImport = async (
   importId?: string,
   accountId?: string,
-  courseId?: string
+  courseId?: string,
 ): Promise<RubricImport> => {
   const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
   const url = `/api/v1/${urlPrefix}/rubrics/upload/${importId ?? 'latest'}`
@@ -444,7 +444,7 @@ export const fetchRubricImport = async (
 export const downloadRubrics = async (
   courseId: string | undefined,
   accountId: string | undefined,
-  selectedRubricIds: string[]
+  selectedRubricIds: string[],
 ) => {
   let postUrl = ''
 
@@ -485,7 +485,7 @@ export const downloadRubrics = async (
 export const getImportedRubrics = async (
   importId: string,
   accountId?: string,
-  courseId?: string
+  courseId?: string,
 ): Promise<Rubric[]> => {
   const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
   const url = `/api/v1/${urlPrefix}/rubrics/upload/${importId}/rubrics`

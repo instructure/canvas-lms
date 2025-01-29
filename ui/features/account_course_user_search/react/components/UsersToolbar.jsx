@@ -153,7 +153,6 @@ export default function UsersToolbar(props) {
                       size="small"
                       checked={props.include_deleted_users}
                       onChange={e =>
-                         
                         props.onUpdateFilters({include_deleted_users: event.target.checked})
                       }
                       label={I18n.t('Include deleted users in search results')}
@@ -211,7 +210,7 @@ UsersToolbar.propTypes = {
     shape({
       id: string.isRequired,
       label: string.isRequired,
-    })
+    }),
   ).isRequired,
 }
 

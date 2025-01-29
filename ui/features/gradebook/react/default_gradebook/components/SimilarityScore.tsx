@@ -19,20 +19,19 @@
 import React, {PureComponent} from 'react'
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
-
 import SimilarityIcon from './SimilarityIcon'
-
 import {useScope as createI18nScope} from '@canvas/i18n'
-
 import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('gradebook')
+
+type Status = 'error' | 'pending' | 'scored'
 
 type Props = {
   hasAdditionalData?: boolean
   reportUrl?: string
   similarityScore?: number
-  status: string
+  status: Status
 }
 
 export default class SimilarityScore extends PureComponent<Props> {
@@ -42,7 +41,7 @@ export default class SimilarityScore extends PureComponent<Props> {
     let statusMessage
     if (status === 'error') {
       statusMessage = I18n.t(
-        'Error submitting to plagiarism service. You may resubmit from SpeedGrader.'
+        'Error submitting to plagiarism service. You may resubmit from SpeedGrader.',
       )
     } else if (status === 'pending') {
       statusMessage = I18n.t('Submission is being processed by plagiarism service.')
@@ -60,17 +59,8 @@ export default class SimilarityScore extends PureComponent<Props> {
         ) : (
           <Grid.Row>
             <Grid.Col>
-              <Link
-                renderIcon={statusIcon}
-                href={reportUrl}
-                isWithinText={false}
-                // @ts-expect-error
-                theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
-              >
-                {/* @ts-expect-error */}
-                <Text margin="auto auto auto small">
-                  {I18n.t('%{score}% similarity score', {score: displayScore})}
-                </Text>
+              <Link renderIcon={statusIcon} href={reportUrl} isWithinText={false}>
+                <Text>{I18n.t('%{score}% similarity score', {score: displayScore})}</Text>
               </Link>
             </Grid.Col>
           </Grid.Row>
@@ -79,10 +69,9 @@ export default class SimilarityScore extends PureComponent<Props> {
         {hasAdditionalData && (
           <Grid.Row>
             <Grid.Col>
-              {/* @ts-expect-error */}
-              <Text as="p" size="x-small" lineHeight="condensed" margin="small auto auto auto">
+              <Text as="p" size="x-small" lineHeight="condensed">
                 {I18n.t(
-                  'This submission has plagiarism data for multiple attachments. To see all reports, open SpeedGrader.'
+                  'This submission has plagiarism data for multiple attachments. To see all reports, open SpeedGrader.',
                 )}
               </Text>
             </Grid.Col>

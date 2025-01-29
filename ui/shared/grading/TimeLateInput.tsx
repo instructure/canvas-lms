@@ -60,7 +60,7 @@ export default function TimeLateInput({
   visible,
 }: Props) {
   const [numberInputValue, setNumberInputValue] = useState(
-    defaultDurationLate(lateSubmissionInterval, secondsLate)
+    defaultDurationLate(lateSubmissionInterval, secondsLate),
   )
   const [numberInputValueSinceBlur, setNumberInputValueSinceBlur] = useState(numberInputValue)
 

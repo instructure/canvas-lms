@@ -62,7 +62,7 @@ export type InheritedKeyWizardState = {
 export const stateFrom =
   <K extends InheritedKeyWizardState['_type']>(key: K) =>
   (
-    modifier: (state: Extract<InheritedKeyWizardState, {_type: K}>) => InheritedKeyWizardState
+    modifier: (state: Extract<InheritedKeyWizardState, {_type: K}>) => InheritedKeyWizardState,
   ): ((state: InheritedKeyWizardState) => InheritedKeyWizardState) => {
     return state => {
       if (state._type === key) {
@@ -81,14 +81,14 @@ export const stateFrom =
 const stateForTag =
   <K extends InheritedKeyWizardState['_type']>(
     _type: K,
-    value: Omit<Extract<InheritedKeyWizardState, {_type: K}>, '_type'>
+    value: Omit<Extract<InheritedKeyWizardState, {_type: K}>, '_type'>,
   ) =>
   () => ({state: {_type, ...value}})
 
 type StateUpdater = (
   updater: (s: {state: InheritedKeyWizardState} & InheritedKeyActions) => {
     state: InheritedKeyWizardState
-  }
+  },
 ) => void
 
 /**
@@ -108,7 +108,7 @@ export const useInheritedKeyWizardState = create<
           open: true,
           developerKeyId,
           onSuccessfulInstallation,
-        })
+        }),
       )
     },
     close: () => {
@@ -120,7 +120,7 @@ export const useInheritedKeyWizardState = create<
           ...state,
           _type: 'RegistrationLoaded' as const,
           result,
-        }))
+        })),
       )
     },
     install: () => {
@@ -128,7 +128,7 @@ export const useInheritedKeyWizardState = create<
         stateFrom('RegistrationLoaded')(state => ({
           ...state,
           _type: 'InstallingRegistration',
-        }))
+        })),
       )
     },
   }
@@ -138,7 +138,7 @@ const inheritedKeyState = useInheritedKeyWizardState.getState()
 
 export const openInheritedKeyWizard = (
   developerKeyId: DeveloperKeyId,
-  onSuccessfulInstallation?: () => void
+  onSuccessfulInstallation?: () => void,
 ) => {
   inheritedKeyState.open(developerKeyId, onSuccessfulInstallation)
 }

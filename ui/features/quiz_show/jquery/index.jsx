@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import MessageStudentsDialog from '@canvas/message-students-dialog'
 import QuizArrowApplicator from '@canvas/quizzes/jquery/quiz_arrows'
 import inputMethods from '@canvas/quizzes/jquery/quiz_inputs'
@@ -90,7 +90,7 @@ $(document).ready(function () {
     event.preventDefault()
     let deleteConfirmMessage = I18n.t(
       'confirms.delete_quiz',
-      'Are you sure you want to delete this quiz?'
+      'Are you sure you want to delete this quiz?',
     )
     const submittedCount = parseInt($('#quiz_details_wrapper').data('submitted-count'), 10)
     if (submittedCount > 0) {
@@ -103,7 +103,7 @@ $(document).ready(function () {
             other:
               'Warning: %{count} students have already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.',
           },
-          {count: submittedCount}
+          {count: submittedCount},
         )
     }
     $('nothing').confirmDelete({
@@ -125,24 +125,24 @@ $(document).ready(function () {
         if (hasOpenedQuizDetails) {
           if (ENV.IS_SURVEY) {
             $quizResultsText.text(
-              I18n.t('links.show_student_survey_results', 'Show Student Survey Results')
+              I18n.t('links.show_student_survey_results', 'Show Student Survey Results'),
             )
           } else {
             $quizResultsText.text(
-              I18n.t('links.show_student_quiz_results', 'Show Student Quiz Results')
+              I18n.t('links.show_student_quiz_results', 'Show Student Quiz Results'),
             )
           }
         } else if (ENV.IS_SURVEY) {
           $quizResultsText.text(
-            I18n.t('links.hide_student_survey_results', 'Hide Student Survey Results')
+            I18n.t('links.hide_student_survey_results', 'Hide Student Survey Results'),
           )
         } else {
           $quizResultsText.text(
-            I18n.t('links.hide_student_quiz_results', 'Hide Student Quiz Results')
+            I18n.t('links.hide_student_quiz_results', 'Hide Student Quiz Results'),
           )
         }
         hasOpenedQuizDetails = !hasOpenedQuizDetails
-      })
+      }),
     )
   })
 
@@ -160,11 +160,11 @@ $(document).ready(function () {
       }))
       const haveTakenQuiz = I18n.t(
         'students_who_have_taken_the_quiz',
-        'Students who have taken the quiz'
+        'Students who have taken the quiz',
       )
       const haveNotTakenQuiz = I18n.t(
         'students_who_have_not_taken_the_quiz',
-        'Students who have NOT taken the quiz'
+        'Students who have NOT taken the quiz',
       )
       const dialog = new MessageStudentsDialog({
         context: ENV.QUIZ.title,
@@ -179,18 +179,20 @@ $(document).ready(function () {
 
   function openSendTo(event, open = true) {
     if (event) event.preventDefault()
-     
-    ReactDOM.render(
+
+    const container = document.getElementById('direct-share-mount-point')
+    const root = createRoot(container)
+    root.render(
       <DirectShareUserModal
         open={open}
         sourceCourseId={ENV.COURSE_ID}
         contentShare={{content_type: 'quiz', content_id: ENV.QUIZ.id}}
         onDismiss={() => {
+          root.unmount()
           openSendTo(null, false)
           $('.al-trigger').focus()
         }}
       />,
-      document.getElementById('direct-share-mount-point')
     )
   }
 
@@ -198,18 +200,20 @@ $(document).ready(function () {
 
   function openCopyTo(event, open = true) {
     if (event) event.preventDefault()
-     
-    ReactDOM.render(
+
+    const container = document.getElementById('direct-share-mount-point')
+    const root = createRoot(container)
+    root.render(
       <DirectShareCourseTray
         open={open}
         sourceCourseId={ENV.COURSE_ID}
         contentSelection={{quizzes: [ENV.QUIZ.id]}}
         onDismiss={() => {
+          root.unmount()
           openCopyTo(null, false)
           $('.al-trigger').focus()
         }}
       />,
-      document.getElementById('direct-share-mount-point')
     )
   }
 
@@ -272,12 +276,13 @@ $(document).ready(function () {
   })
 
   function renderItemAssignToTray(open, returnFocusTo, itemProps) {
-     
-    ReactDOM.render(
+    const container = document.getElementById('assign-to-mount-point')
+    const root = createRoot(container)
+    root.render(
       <ItemAssignToManager
         open={open}
         onClose={() => {
-          ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
+          root.unmount()
         }}
         onDismiss={() => {
           renderItemAssignToTray(false, returnFocusTo, itemProps)
@@ -289,7 +294,6 @@ $(document).ready(function () {
         timezone={ENV.TIMEZONE || 'UTC'}
         {...itemProps}
       />,
-      document.getElementById('assign-to-mount-point')
     )
   }
 
@@ -330,7 +334,7 @@ $(document).ready(function () {
       $('#assignment_external_tools')[0],
       'assignment_view',
       parseInt(ENV.COURSE_ID, 10),
-      parseInt(ENV.QUIZ.assignment_id, 10)
+      parseInt(ENV.QUIZ.assignment_id, 10),
     )
   }
 })

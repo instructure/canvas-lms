@@ -32,7 +32,7 @@ let AssignmentOverride
 
 const I18n = createI18nScope('assignmentOverride')
 
-export default AssignmentOverride = (function () {
+export default (AssignmentOverride = (function () {
   AssignmentOverride = class AssignmentOverride extends Backbone.Model {
     constructor(...args) {
       super(...args)
@@ -62,7 +62,7 @@ export default AssignmentOverride = (function () {
           name() {
             return I18n.t('Mastery Paths')
           },
-        }
+        },
       )
     }
 
@@ -120,4 +120,4 @@ export default AssignmentOverride = (function () {
   }
   AssignmentOverride.initClass()
   return AssignmentOverride
-})()
+})())

@@ -78,7 +78,7 @@ export default handleActions(
             `${errUsr.email}: ${
               (errUsr.errors && errUsr.errors.length && errUsr.errors[0].message) ||
               I18n.t('Failed creating user')
-            }`
+            }`,
         )
       }
       return newstate
@@ -94,5 +94,5 @@ export default handleActions(
       return {pendingCount: 0, error: undefined}
     },
   },
-  defaultState.apiState
+  defaultState.apiState,
 )

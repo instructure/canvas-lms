@@ -27,7 +27,7 @@ const migrationStates = {
       Object.assign(map, {
         [state]: state,
       }),
-    {}
+    {},
   ),
 }
 

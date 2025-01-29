@@ -61,14 +61,14 @@ describe('TargetGroupSelector', () => {
       contextId = '1',
       mocks = accountMocks({childGroupsCount: 0}),
       treeBrowserRootGroupId = '1',
-    } = {}
+    } = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId, treeBrowserRootGroupId}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -167,7 +167,7 @@ describe('TargetGroupSelector', () => {
               groupId: '12',
             }),
           ],
-        }
+        },
       )
       await act(async () => jest.runAllTimers())
       // We're in group 123
@@ -219,7 +219,7 @@ describe('TargetGroupSelector', () => {
               title: 'new group name',
             }),
           ],
-        }
+        },
       )
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Create New Group'))

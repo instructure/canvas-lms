@@ -21,13 +21,14 @@ import CanvasMultiSelect from '@canvas/multi-select/react'
 import {View} from '@instructure/ui-view'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import PropTypes from '@canvas/permissions/react/propTypes'
 
 const I18n = createI18nScope('discussion_posts')
 
 // TODO: Translate the language co> ntrols into the canvas target locale.
-export const TranslationControls = () => {
+export const TranslationControls = props => {
   const {translationLanguages, setTranslateTargetLanguage} = useContext(
-    DiscussionManagerUtilityContext
+    DiscussionManagerUtilityContext,
   )
   const [input, setInput] = useState(translationLanguages.current?.[0]?.name || '')
   const [selected, setSelected] = useState(null)
@@ -42,7 +43,12 @@ export const TranslationControls = () => {
 
     setInput(result.name)
     setSelected(result.id)
-    setTranslateTargetLanguage(result.id)
+
+    if (props.setTranslationLanguage) {
+      props.setTranslationLanguage(result.id)
+    } else {
+      setTranslateTargetLanguage(result.id)
+    }
   }
 
   const filteredLanguages = useMemo(() => {
@@ -51,14 +57,14 @@ export const TranslationControls = () => {
     }
 
     return translationLanguages.current.filter(({name}) =>
-      name.toLowerCase().startsWith(input.toLowerCase())
+      name.toLowerCase().startsWith(input.toLowerCase()),
     )
   }, [translationLanguages, input])
 
   return (
     <View as="div" margin="x-small 0 0">
       <CanvasMultiSelect
-        label={I18n.t('Translate Discussion')}
+        label={I18n.t('Translate to')}
         onChange={handleSelect}
         inputValue={input}
         onInputChange={e => setInput(e.target.value)}
@@ -72,4 +78,8 @@ export const TranslationControls = () => {
       </CanvasMultiSelect>
     </View>
   )
+}
+
+TranslationControls.propTypes = {
+  setTranslationLanguage: PropTypes.func,
 }

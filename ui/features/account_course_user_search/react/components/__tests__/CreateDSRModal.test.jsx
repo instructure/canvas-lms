@@ -49,9 +49,9 @@ describe('CreateDSRModal', () => {
   const renderComponent = (props = {}) =>
     render(
       <CreateDSRModal accountId={mockAccountId} user={mockUser} afterSave={afterSave} {...props}>
-        {/* eslint-disable-next-line react/button-has-type, jsx-a11y/control-has-associated-label */}
+        {}
         <button title="Create DSR Request for John Doe" />
-      </CreateDSRModal>
+      </CreateDSRModal>,
     )
 
   it("uses the user's name in the default report name", () => {
@@ -108,7 +108,7 @@ describe('CreateDSRModal', () => {
 
     await waitFor(() => {
       expect(
-        getByText((_, element) => element.textContent === 'Latest DSR: In progress')
+        getByText((_, element) => element.textContent === 'Latest DSR: In progress'),
       ).toBeInTheDocument()
       expect(queryByText('Download:')).not.toBeInTheDocument()
     })
@@ -128,7 +128,7 @@ describe('CreateDSRModal', () => {
 
     await waitFor(() => {
       expect(
-        getByText((_, element) => element.textContent === 'Latest DSR: Failed')
+        getByText((_, element) => element.textContent === 'Latest DSR: Failed'),
       ).toBeInTheDocument()
       expect(queryByText('Download:')).not.toBeInTheDocument()
     })

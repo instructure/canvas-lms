@@ -303,7 +303,7 @@ describe('FilterNav', () => {
     })
     const {getByTestId} = render(<FilterNav {...defaultProps} />)
     expect(await getByTestId(`applied-filter-${defaultProps.modules[0].name}`)).toHaveTextContent(
-      defaultProps.modules[0].name
+      defaultProps.modules[0].name,
     )
   })
 
@@ -320,7 +320,7 @@ describe('FilterNav', () => {
     })
     const {getByTestId} = render(<FilterNav {...defaultProps} />)
     expect(getByTestId(`applied-filter-${defaultProps.customStatuses[0].name}`)).toHaveTextContent(
-      defaultProps.customStatuses[0].name
+      defaultProps.customStatuses[0].name,
     )
   })
 
@@ -337,7 +337,7 @@ describe('FilterNav', () => {
     })
     const {getByTestId} = render(<FilterNav {...defaultProps} />)
     expect(getByTestId('applied-filter-All Grading Periods')).toHaveTextContent(
-      'All Grading Periods'
+      'All Grading Periods',
     )
   })
 
@@ -383,7 +383,7 @@ describe('FilterNav', () => {
     it('applies filter popover trigger tag when filter is applied', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       const {getByText, getByTestId, queryByTestId, getByRole} = render(
-        <FilterNav {...filterProps} />
+        <FilterNav {...filterProps} />,
       )
       expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
       await user.click(getByText('Apply Filters'))
@@ -395,7 +395,7 @@ describe('FilterNav', () => {
     it('opens popover when filter nav tag is clicked', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       const {getByText, getByTestId, queryByTestId, getByRole} = render(
-        <FilterNav {...filterProps} />
+        <FilterNav {...filterProps} />,
       )
       expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
       await user.click(getByText('Apply Filters'))
@@ -409,7 +409,7 @@ describe('FilterNav', () => {
     it('clicking remove filter removes filter', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       const {getByText, getByTestId, queryByTestId, getByRole} = render(
-        <FilterNav {...filterProps} />
+        <FilterNav {...filterProps} />,
       )
       await user.click(getByText('Apply Filters'))
       await user.click(getByRole('menuitemradio', {name: 'Sections'}))
@@ -424,7 +424,7 @@ describe('FilterNav', () => {
     it('clicking on the same section in the popover will close the popover', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       const {getByText, getByTestId, queryByTestId, getByRole} = render(
-        <FilterNav {...filterProps} />
+        <FilterNav {...filterProps} />,
       )
       await user.click(getByText('Apply Filters'))
       await user.click(getByRole('menuitemradio', {name: 'Sections'}))
@@ -450,7 +450,7 @@ describe('FilterNav', () => {
     it.skip('clicking on another popover trigger will close the current popover', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       const {getByText, getByTestId, queryByTestId, getByRole} = render(
-        <FilterNav {...filterProps} />
+        <FilterNav {...filterProps} />,
       )
       await user.click(getByText('Apply Filters'))
       await user.click(getByRole('menuitemradio', {name: 'Sections'}))
@@ -586,7 +586,7 @@ describe('Filter dropdown', () => {
   it('Clicking filter activates condition', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {getByText, getByTestId, queryByTestId, getByRole} = render(
-      <FilterNav {...defaultProps} />
+      <FilterNav {...defaultProps} />,
     )
     expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
     await user.click(getByText('Apply Filters'))
@@ -598,7 +598,7 @@ describe('Filter dropdown', () => {
   it('Clicking "Clear All Filters" removes all applied filters', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {getByText, getByTestId, queryByTestId, getByRole} = render(
-      <FilterNav {...defaultProps} />
+      <FilterNav {...defaultProps} />,
     )
     expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
     await user.click(getByText('Apply Filters'))
@@ -626,7 +626,7 @@ describe('Filter dropdown', () => {
     await user.click(getByRole('menuitemradio', {name: 'Sections'}))
     await user.click(getByRole('menuitemradio', {name: 'Section 7'}))
     expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toHaveTextContent(
-      'Remove Section 7 Filter'
+      'Remove Section 7 Filter',
     )
   })
 
@@ -688,14 +688,14 @@ describe('FilterNav (save)', () => {
   it.skip('clicking Save saves new filter', async () => {
     const user = userEvent.setup({...USER_EVENT_OPTIONS, delay: null})
     const {getByText, getByPlaceholderText, getByTestId, queryByTestId} = render(
-      <FilterNav {...defaultProps} />
+      <FilterNav {...defaultProps} />,
     )
     await user.click(getByText('Apply Filters'))
     await user.click(getByText('Create & Manage Filter Presets'))
     await user.click(getByText('Toggle Create Filter Preset'))
     await user.type(
       getByPlaceholderText('Give your filter preset a name'),
-      'Sample filter preset name'
+      'Sample filter preset name',
     )
     expect(getByTestId('delete-filter-preset-button')).toBeVisible()
     await user.click(getByTestId('save-filter-button'))

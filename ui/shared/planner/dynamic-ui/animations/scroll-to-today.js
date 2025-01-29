@@ -54,7 +54,7 @@ export function scrollAndFocusTodayItem(manager, todayElem, isWeekly, focusTarge
   if (todayElem) {
     const {component, when} = findTodayOrNearest(
       manager.getRegistry(),
-      manager.getStore().getState().timeZone
+      manager.getStore().getState().timeZone,
     )
     if (component) {
       if (isToday(component.props.date) || !isWeekly) {

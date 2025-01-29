@@ -61,7 +61,7 @@ const validationSchema = z
     {
       message: 'Please enter at least one field.',
       path: ['grader_id'],
-    }
+    },
   )
   .refine(
     ({start_time, end_time}) => {
@@ -74,7 +74,7 @@ const validationSchema = z
     {
       message: 'To Date cannot come before From Date.',
       path: ['end_time'],
-    }
+    },
   )
 
 type FormValues = z.infer<typeof validationSchema>

@@ -36,7 +36,7 @@ export const PermissionConfirmationWrapper = ({
     <PermissionConfirmation
       appName={registration.client_name}
       scopesSelected={registration.scopes.filter(
-        s => !state.registration.disabledScopes?.includes(s)
+        s => !state.registration.disabledScopes?.includes(s),
       )}
       scopesSupported={registration.scopes}
       onScopeToggled={actions.toggleDisabledScope}

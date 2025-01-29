@@ -51,12 +51,12 @@ const useSelectedOutcomes = (initialValue = new Set()) => {
   const selectedOutcomesCount = selectedOutcomeIds.size
   const toggleSelectedOutcomes = useCallback(
     outcome => dispatchSelectedOutcomeIds({type: 'toggle', payload: {linkId: outcome.linkId}}),
-    []
+    [],
   )
   const clearSelectedOutcomes = useCallback(() => dispatchSelectedOutcomeIds({type: 'clear'}), [])
   const removeSelectedOutcome = useCallback(
     outcome => dispatchSelectedOutcomeIds({type: 'remove', payload: {linkId: outcome.linkId}}),
-    []
+    [],
   )
   return {
     selectedOutcomeIds,

@@ -75,7 +75,7 @@ const AccountCalendarsModal = ({
       debounce(v => {
         setSearchTerm(v)
       }, TYPING_DEBOUNCE),
-    []
+    [],
   )
 
   if (searchTerm.length < MIN_SEARCH_LENGTH) {

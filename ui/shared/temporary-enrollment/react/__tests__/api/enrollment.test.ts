@@ -74,14 +74,14 @@ describe('enrollment api', () => {
     })
 
     beforeAll(() => {
-      // eslint-disable-next-line no-console
+       
       originalConsoleError = console.error
-      // eslint-disable-next-line no-console
+       
       console.error = mockConsoleError
     })
 
     afterAll(() => {
-      // eslint-disable-next-line no-console
+       
       console.error = originalConsoleError
     })
 
@@ -107,7 +107,6 @@ describe('enrollment api', () => {
           ...mockEnrollment,
           user: mockRecipientUser,
         }
-
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 200, ok: true},
           json: mockJson,
@@ -132,7 +131,7 @@ describe('enrollment api', () => {
       it('should throw an error when doFetchApi fails', async () => {
         ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('An error occurred'))
         await expect(fetchTemporaryEnrollments('1', true, 'first')).rejects.toThrow(
-          'An error occurred'
+          'An error occurred',
         )
       })
 
@@ -148,7 +147,7 @@ describe('enrollment api', () => {
           json: Promise.resolve({error: statusText}),
         })
         await expect(fetchTemporaryEnrollments('1', true, 'first')).rejects.toThrow(
-          new Error(`Failed to get temporary enrollments for recipient`)
+          new Error(`Failed to get temporary enrollments for recipient`),
         )
       })
 
@@ -167,7 +166,7 @@ describe('enrollment api', () => {
               per_page: ITEMS_PER_PAGE,
               temporary_enrollment_recipients_for_provider: true,
             }),
-          })
+          }),
         )
       })
 
@@ -187,7 +186,7 @@ describe('enrollment api', () => {
               temporary_enrollments_for_recipient: true,
               include: ['avatar_url', 'temporary_enrollment_providers'],
             }),
-          })
+          }),
         )
       })
     })
@@ -323,7 +322,7 @@ describe('enrollment api', () => {
           await getTemporaryEnrollmentPairing(accountId, pairingId)
         } catch (error: any) {
           expect(error.message).toBe(
-            'Failed to retrieve temporary enrollment pairing due to an unknown error'
+            'Failed to retrieve temporary enrollment pairing due to an unknown error',
           )
         }
       })

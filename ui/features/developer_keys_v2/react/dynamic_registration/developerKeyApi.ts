@@ -26,7 +26,7 @@ import axios from '@canvas/axios'
 export const updateDeveloperKeyWorkflowState = (
   contextId: string,
   developerKeyId: string | number,
-  workflowState: 'on' | 'off'
+  workflowState: 'on' | 'off',
 ) =>
   axios.post(
     `/api/v1/accounts/${contextId}/developer_keys/${developerKeyId}/developer_key_account_bindings`,
@@ -34,7 +34,7 @@ export const updateDeveloperKeyWorkflowState = (
       developer_key_account_binding: {
         workflow_state: workflowState,
       },
-    }
+    },
   )
 
 /**

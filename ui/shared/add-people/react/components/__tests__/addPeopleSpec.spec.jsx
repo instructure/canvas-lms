@@ -42,7 +42,7 @@ describe('AddPeople', function () {
 
     const wrapper = render(
       <AddPeople validateUsers={() => {}} enrollUsers={() => {}} reset={() => {}} {...props} />,
-      {attachTo: document.getElementById('fixtures')}
+      {attachTo: document.getElementById('fixtures')},
     )
 
     expect(document.getElementById('add_people_modal')).toBeTruthy()

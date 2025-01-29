@@ -94,7 +94,7 @@ describe('Enhanced Individual Gradebook', () => {
             }
           />
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter>,
     )
   }
 
@@ -140,28 +140,28 @@ describe('Enhanced Individual Gradebook', () => {
       expect(within(contentSelectionStudent).getByText('No Student Selected')).toBeInTheDocument()
       const contentSelectionAssignment = getByTestId('content-selection-assignment')
       expect(
-        within(contentSelectionAssignment).getByText('No Assignment Selected')
+        within(contentSelectionAssignment).getByText('No Assignment Selected'),
       ).toBeInTheDocument()
 
       const gradingResults = getByTestId('grading-results-empty')
       expect(
         within(gradingResults).getByText(
-          'Select a student and an assignment to view and edit grades.'
-        )
+          'Select a student and an assignment to view and edit grades.',
+        ),
       ).toBeInTheDocument()
 
       const studentInformation = getByTestId('student-information-empty')
       expect(
         within(studentInformation).getByText(
-          'Select a student to view additional information here.'
-        )
+          'Select a student to view additional information here.',
+        ),
       ).toBeInTheDocument()
 
       const assignmentInformation = getByTestId('assignment-information-empty')
       expect(
         within(assignmentInformation).getByText(
-          'Select an assignment to view additional information here.'
-        )
+          'Select an assignment to view additional information here.',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -238,7 +238,7 @@ describe('Enhanced Individual Gradebook', () => {
       expect(gradebookExportLink).toBeInTheDocument()
       expect(gradebookExportLink).toHaveAttribute(
         'href',
-        'https://www.testattachment.com/attachment'
+        'https://www.testattachment.com/attachment',
       )
       expect(gradebookExportLink).toHaveTextContent('Download Scores Generated on')
 
@@ -251,7 +251,7 @@ describe('Enhanced Individual Gradebook', () => {
       const contentSelectionAssignment = getByTestId('content-selection-assignment')
       expect(contentSelectionAssignment).toBeInTheDocument()
       expect(
-        within(contentSelectionAssignment).getByText('Missing Assignment 1')
+        within(contentSelectionAssignment).getByText('Missing Assignment 1'),
       ).toBeInTheDocument()
 
       // grading results
@@ -259,7 +259,7 @@ describe('Enhanced Individual Gradebook', () => {
       const gradingResults = getByTestId('grading-results')
       expect(gradingResults).toBeInTheDocument()
       expect(
-        within(gradingResults).getByText('Grade for Student 1 - Missing Assignment 1')
+        within(gradingResults).getByText('Grade for Student 1 - Missing Assignment 1'),
       ).toBeInTheDocument()
 
       // student information
@@ -271,7 +271,7 @@ describe('Enhanced Individual Gradebook', () => {
       const assignmentInformationName = getByTestId('assignment-information-name')
       expect(assignmentInformationName).toBeInTheDocument()
       expect(
-        within(assignmentInformationName).getByText('Missing Assignment 1')
+        within(assignmentInformationName).getByText('Missing Assignment 1'),
       ).toBeInTheDocument()
     })
 
@@ -285,10 +285,10 @@ describe('Enhanced Individual Gradebook', () => {
 
       const gradingResults = getByTestId('grading-results')
       expect(
-        within(gradingResults).getByText('Grade for Student 1 - Missing Assignment 1')
+        within(gradingResults).getByText('Grade for Student 1 - Missing Assignment 1'),
       ).toBeInTheDocument()
       expect(
-        within(gradingResults).queryByText('This grade is currently dropped for this student.')
+        within(gradingResults).queryByText('This grade is currently dropped for this student.'),
       ).not.toBeInTheDocument()
 
       fireEvent.change(getByTestId('content-selection-assignment-select'), {target: {value: '2'}})
@@ -296,10 +296,10 @@ describe('Enhanced Individual Gradebook', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
 
       expect(
-        within(gradingResults).getByText('Grade for Student 1 - Missing Assignment 2')
+        within(gradingResults).getByText('Grade for Student 1 - Missing Assignment 2'),
       ).toBeInTheDocument()
       expect(
-        within(gradingResults).getByText('This grade is currently dropped for this student.')
+        within(gradingResults).getByText('This grade is currently dropped for this student.'),
       ).toBeInTheDocument()
     })
 

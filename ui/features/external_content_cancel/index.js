@@ -26,7 +26,7 @@ postMessageExternalContentCancel(parentWindow)
 setTimeout(
   () =>
     $('#dialog_message').text(
-      I18n.t('popup_success', 'Canceled. This popup should close on its own...')
+      I18n.t('popup_success', 'Canceled. This popup should close on its own...'),
     ),
-  1000
+  1000,
 )

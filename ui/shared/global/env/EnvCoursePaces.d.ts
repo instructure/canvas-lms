@@ -20,6 +20,12 @@ import {Course} from '../../../features/course_paces/react/shared/types'
 import {CoursePace, PaceContextProgress, Progress} from '../../../features/course_paces/react/types'
 import {EnvDateRange} from '../DateRange'
 
+export type MasterCourseData = {
+  is_master_course_child_content?: boolean
+  is_master_course_master_content?: boolean
+  master_course_restrictions: unknown
+  restricted_by_master_course: boolean
+}
 /**
  * Course Paces environment variables
  *
@@ -41,7 +47,7 @@ export interface EnvCoursePaces {
   COURSE_PACE: CoursePace
   COURSE_PACE_PROGRESS: Progress
   VALID_DATE_RANGE: EnvDateRange
-  MASTER_COURSE_DATA: unknown
+  MASTER_COURSE_DATA: MasterCourseData
   IS_MASQUERADING: boolean
   PACES_PUBLISHING: PaceContextProgress[]
 }

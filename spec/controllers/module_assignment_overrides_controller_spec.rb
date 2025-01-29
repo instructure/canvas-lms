@@ -20,7 +20,6 @@
 
 describe ModuleAssignmentOverridesController do
   before :once do
-    Account.site_admin.enable_feature!(:selective_release_backend)
     Account.site_admin.enable_feature!(:selective_release_ui_api)
     course_with_teacher(active_all: true, course_name: "Awesome Course")
     @student1 = student_in_course(active_all: true, name: "Student 1").user

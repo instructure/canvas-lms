@@ -59,7 +59,7 @@ describe('UnpublishedChangesTrayContents', () => {
 
   it('renders successfully with no changes', () => {
     const {getByText} = render(
-      <UnpublishedChangesTrayContents {...defaultProps} unpublishedChanges={[]} />
+      <UnpublishedChangesTrayContents {...defaultProps} unpublishedChanges={[]} />,
     )
     expect(getByText('Unsaved Changes')).toBeInTheDocument()
   })
@@ -74,7 +74,7 @@ describe('UnpublishedChangesTrayContents', () => {
 
   it('disables the reset button if loading', () => {
     const {getByRole} = render(
-      <UnpublishedChangesTrayContents {...defaultProps} isSyncing={true} />
+      <UnpublishedChangesTrayContents {...defaultProps} isSyncing={true} />,
     )
     const resetButton = getByRole('button', {name: 'Reset all'})
     expect(resetButton).toBeInTheDocument()
@@ -83,7 +83,7 @@ describe('UnpublishedChangesTrayContents', () => {
 
   it('disables the reset button if there are no changes', () => {
     const {getByRole} = render(
-      <UnpublishedChangesTrayContents {...defaultProps} unpublishedChanges={[]} />
+      <UnpublishedChangesTrayContents {...defaultProps} unpublishedChanges={[]} />,
     )
     const resetButton = getByRole('button', {name: 'Reset all'})
     expect(resetButton).toBeInTheDocument()
@@ -96,7 +96,7 @@ describe('UnpublishedChangesTrayContents', () => {
     act(() => resetButton.click())
     expect(getByText('Reset all unpublished changes?')).toBeInTheDocument()
     expect(
-      getByText('Your unpublished changes will be reverted to their previously saved state.')
+      getByText('Your unpublished changes will be reverted to their previously saved state.'),
     ).toBeInTheDocument()
     const cancelButton = getByRole('button', {name: 'Cancel'})
     act(() => cancelButton.click())

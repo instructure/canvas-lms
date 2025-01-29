@@ -87,7 +87,7 @@ export default class ProficiencyRating extends React.Component {
     if (this.props.focusField === 'trash') {
       setTimeout(
         () => (this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()),
-        700
+        700,
       )
     } else if (this.props.focusField === 'description') {
       this.descriptionInput.focus()

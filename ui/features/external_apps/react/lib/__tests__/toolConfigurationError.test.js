@@ -43,7 +43,7 @@ describe('toolConfigurationError', () => {
 
     it('shows the "not found" error message', () => {
       expect($.flashError).toHaveBeenCalledWith(
-        `Could not find an LTI configuration for client ID ${clientId}`
+        `Could not find an LTI configuration for client ID ${clientId}`,
       )
     })
   })
@@ -65,7 +65,7 @@ describe('toolConfigurationError', () => {
 
     it('shows the generic error message', () => {
       expect($.flashError).toHaveBeenCalledWith(
-        'An error occured while trying to find the LTI configuration'
+        'An error occured while trying to find the LTI configuration',
       )
     })
   })

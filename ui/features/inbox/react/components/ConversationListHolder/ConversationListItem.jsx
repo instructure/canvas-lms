@@ -172,7 +172,7 @@ export const ConversationListItem = ({...props}) => {
                             one: '1 message',
                             other: '%{count} messages',
                           },
-                          {count: props.conversation.count}
+                          {count: props.conversation.count},
                         )}
                       >
                         {formattedCount}

@@ -202,7 +202,7 @@ export default class Quiz extends Backbone.Model {
   disabledMessage() {
     return I18n.t(
       'cant_unpublish_when_students_submit',
-      "Can't unpublish if there are student submissions"
+      "Can't unpublish if there are student submissions",
     )
   }
 
@@ -281,7 +281,7 @@ export default class Quiz extends Backbone.Model {
       `/api/v1/courses/${course_id}/assignments/${assignment_id}/duplicate`,
       'POST',
       {quizzes: [assignment_id], result_type: 'Quiz'},
-      callback
+      callback,
     )
   }
 
@@ -300,7 +300,7 @@ export default class Quiz extends Backbone.Model {
       `/api/v1/courses/${original_course_id}/assignments/${original_assignment_id}/duplicate${query_string}`,
       'POST',
       {},
-      callback
+      callback,
     )
   }
 
@@ -318,7 +318,7 @@ export default class Quiz extends Backbone.Model {
       `/api/v1/courses/${original_course_id}/assignments/${original_assignment_id}/retry_alignment_clone${query_string}`,
       'POST',
       {},
-      callback
+      callback,
     )
   }
 
@@ -330,7 +330,7 @@ export default class Quiz extends Backbone.Model {
       `/api/v1/courses/${course_id}/content_exports?export_type=quizzes2&quiz_id=${original_quiz_id}&include[]=migrated_quiz`,
       'POST',
       {},
-      callback
+      callback,
     )
   }
 

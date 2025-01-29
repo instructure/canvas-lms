@@ -30,7 +30,7 @@ export const messages = arrayOf(
   shape({
     text: string.isRequired,
     type: string.isRequired,
-  })
+  }),
 )
 
 export const grade = instanceOf(GradeOverride)

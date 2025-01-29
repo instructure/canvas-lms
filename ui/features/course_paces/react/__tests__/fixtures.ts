@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,8 +19,8 @@
 import moment from 'moment-timezone'
 import {keyBy} from 'lodash'
 
-import {BlackoutDate, SyncState, Course} from '../shared/types'
-import {
+import {type BlackoutDate, SyncState, type Course} from '../shared/types'
+import type {
   Enrollment,
   Enrollments,
   Module,
@@ -440,6 +439,8 @@ export const DEFAULT_UI_STATE: UIState = {
   showPaceModal: false,
   showProjections: true,
   syncing: 0,
+  outerResponsiveSize: 'large',
+  savingDraft: false,
 }
 
 export const DEFAULT_STORE_STATE: StoreState = {

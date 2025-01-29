@@ -26,12 +26,12 @@ const Matching = ({answer, question}) => (
       {question.answers.map(questionAnswer => {
         let match
         const answerRecord = answer.find(
-          record => String(record.answer_id) === String(questionAnswer.id)
+          record => String(record.answer_id) === String(questionAnswer.id),
         )
 
         if (answerRecord) {
           match = question.matches.find(
-            match => String(match.match_id) === String(answerRecord.match_id)
+            match => String(match.match_id) === String(answerRecord.match_id),
           )
         }
 

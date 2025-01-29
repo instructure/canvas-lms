@@ -33,7 +33,7 @@ const I18n = createI18nScope('grade_summary')
 export const scoreDistributionRow = (
   assignment,
   setOpenAssignmentDetailIds,
-  openAssignmentDetailIds
+  openAssignmentDetailIds,
 ) => {
   const wholeNumberOrDecimal = value => {
     if (value % 1 === 0) {

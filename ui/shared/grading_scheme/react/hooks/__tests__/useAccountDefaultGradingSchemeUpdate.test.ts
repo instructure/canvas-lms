@@ -56,7 +56,7 @@ describe('useAccountDefaultGradingSchemeUpdateHook', () => {
     })
     const loadedGradingScheme = await result.current.updateAccountDefaultGradingScheme(
       accountId,
-      '99'
+      '99',
     )
     // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()

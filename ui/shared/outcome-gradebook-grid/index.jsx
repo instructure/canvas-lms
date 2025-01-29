@@ -117,7 +117,7 @@ const Grid = {
       response,
       options = {
         column: {},
-      }
+      },
     ) {
       Grid.dataSource = response
       return [
@@ -149,7 +149,7 @@ const Grid = {
             }),
             outcome,
           },
-          options
+          options,
         )
       })
       return [Grid.Util._studentColumn()].concat(columns)
@@ -171,7 +171,7 @@ const Grid = {
           headerCssClass: 'outcome-student-header-cell',
           formatter: Grid.View.studentCell,
         },
-        lodashExtend({}, Grid.Util.COLUMN_OPTIONS, studentOptions)
+        lodashExtend({}, Grid.Util.COLUMN_OPTIONS, studentOptions),
       )
     },
     // Public: Translate an array of rollup data to rows that can be passed to SlickGrid.
@@ -183,7 +183,7 @@ const Grid = {
       const user_ids = uniq(
         map(rollups, function (r) {
           return r.links.user
-        })
+        }),
       )
       const filtered_rollups = groupBy(rollups, function (rollup) {
         return rollup.links.user
@@ -195,7 +195,7 @@ const Grid = {
         map(ordered_rollups, function (rollup) {
           return Grid.Util._toRow(rollup)
         }),
-        isNull
+        isNull,
       )
     },
     // Internal: Translate an outcome result to a SlickGrid row.
@@ -213,8 +213,8 @@ const Grid = {
         return enrollment_status.every(e => e === 'completed')
           ? I18n.t('concluded')
           : enrollment_status.every(e => e === 'inactive')
-          ? I18n.t('inactive')
-          : ''
+            ? I18n.t('inactive')
+            : ''
       }
       if (isEmpty(section_list)) {
         return null
@@ -224,7 +224,7 @@ const Grid = {
       const section_name = listFormatter.format(
         map(sections, 'name')
           .filter(x => x)
-          .sort()
+          .sort(),
       )
       const courseID = ENV.context_asset_string.split('_')[1]
       const row = {
@@ -234,7 +234,7 @@ const Grid = {
             section_name: keys(Grid.sections).length > 1 ? section_name : null,
             enrollment_status: section_enrollment_status(),
           },
-          student
+          student,
         ),
       }
       each(rollup[0].scores, function (score) {
@@ -257,7 +257,7 @@ const Grid = {
           result[`outcome_${outcome.id}`] = outcome
           return result
         },
-        {}
+        {},
       ))
     },
     saveOutcomePaths(outcomePaths) {
@@ -286,7 +286,7 @@ const Grid = {
           result[student.id] = student
           return result
         },
-        {}
+        {},
       ))
     },
     // Public: Look up a student in the current student list.
@@ -309,7 +309,7 @@ const Grid = {
           result[section.id] = section
           return result
         },
-        {}
+        {},
       ))
     },
     // Public: Look up a section in the current section list.
@@ -328,7 +328,7 @@ const Grid = {
         function (a, b) {
           return a + b
         },
-        0
+        0,
       )
       if (round) {
         return Math.round(total / values.length)
@@ -399,7 +399,7 @@ const Grid = {
       return studentCellTemplate(
         lodashExtend(value, {
           course_id: ENV.GRADEBOOK_OPTIONS.context_id,
-        })
+        }),
       )
     },
     masteryDetails(score, outcome) {
@@ -480,7 +480,7 @@ const Grid = {
               column: col,
               grid,
             },
-            score
+            score,
           )
         })
       })
@@ -497,9 +497,9 @@ const Grid = {
           toggleConcludedEnrollments: Grid.gridRef._toggleStudentsWithConcludedEnrollments,
           toggleUnassessedStudents: Grid.gridRef._toggleStudentsWithNoResults,
         },
-        null
+        null,
       )
-       
+
       ReactDOM.render(menu, node)
     },
     studentHeaderRowCell(node, _column, grid) {
@@ -510,9 +510,9 @@ const Grid = {
           averageFn: Grid.averageFn,
           redrawFn: Grid.View.redrawHeader,
         },
-        null
+        null,
       )
-       
+
       ReactDOM.render(menu, node)
     },
     headerCell({node, column, grid}, _fn = Grid.averageFn) {

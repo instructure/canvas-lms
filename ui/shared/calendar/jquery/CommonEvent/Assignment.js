@@ -28,7 +28,7 @@ const I18n = createI18nScope('calendar')
 
 const deleteConfirmation = I18n.t(
   'prompts.delete_assignment',
-  'Are you sure you want to delete this assignment?'
+  'Are you sure you want to delete this assignment?',
 )
 
 extend(Assignment, CommonEvent)
@@ -83,7 +83,7 @@ Object.assign(Assignment.prototype, {
     return this.save(
       {'assignment[due_at]': this.start ? fcUtil.unwrap(this.start).toISOString() : ''},
       success,
-      error
+      error,
     )
   },
 

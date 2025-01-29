@@ -28,7 +28,7 @@ describe('ConfirmEmailAddress', () => {
     render(
       <ConfirmEmailAddress email={email} onClose={onClose}>
         <div />
-      </ConfirmEmailAddress>
+      </ConfirmEmailAddress>,
     )
     const embeddedEmail = screen.getByText(email)
 

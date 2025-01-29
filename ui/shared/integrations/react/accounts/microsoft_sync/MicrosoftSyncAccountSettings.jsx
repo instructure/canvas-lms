@@ -124,7 +124,7 @@ export default function MicrosoftSyncAccountSettings() {
                 <span>{I18n.t('Login Attribute')}</span>
                 <Tooltip
                   renderTip={I18n.t(
-                    'The attribute to use when associating a Canvas User with a Microsoft User'
+                    'The attribute to use when associating a Canvas User with a Microsoft User',
                   )}
                   placement="top"
                   on={['hover', 'focus']}
@@ -155,7 +155,7 @@ export default function MicrosoftSyncAccountSettings() {
                 <span>{I18n.t('Suffix')}</span>
                 <Tooltip
                   renderTip={I18n.t(
-                    'Not Required. If this is populated the entered text will be appended to the Login Attribute'
+                    'Not Required. If this is populated the entered text will be appended to the Login Attribute',
                   )}
                   on={['hover', 'focus']}
                 >
@@ -185,7 +185,7 @@ export default function MicrosoftSyncAccountSettings() {
                 <span>{I18n.t('Active Directory Lookup Attribute')}</span>
                 <Tooltip
                   renderTip={I18n.t(
-                    'The Active Directory attribute that will be used to match a Canvas user to a Microsoft user'
+                    'The Active Directory attribute that will be used to match a Canvas user to a Microsoft user',
                   )}
                   on={['hover', 'focus']}
                 >

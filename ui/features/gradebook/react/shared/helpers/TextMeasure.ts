@@ -22,7 +22,7 @@ export default function getTextWidth(text: string) {
   let $textMeasure = $('#text-measure')
   if (!$textMeasure.length) {
     $textMeasure = $('<span id="text-measure" style="padding: 10px; display: none;" />').appendTo(
-      '#content'
+      '#content',
     )
   }
   // convert to integer to maintain backwards compatibility

@@ -36,7 +36,7 @@ const captureElementThumbnail = async (element: HTMLElement, templateType: Templ
     const imgData = canvas.toDataURL('image/png')
     return imgData
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error('Error capturing element thumbnail:', error)
   }
   return Promise.resolve('')
@@ -55,7 +55,7 @@ function resample_single(
   canvas: HTMLCanvasElement,
   width: number,
   height: number,
-  resize_canvas: boolean
+  resize_canvas: boolean,
 ) {
   const width_source = canvas.width
   const height_source = canvas.height

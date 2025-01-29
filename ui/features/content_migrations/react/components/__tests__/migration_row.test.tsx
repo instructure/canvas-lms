@@ -86,7 +86,7 @@ const renderComponent = (overrideProps?: any) =>
           {...overrideProps}
         />
       </tbody>
-    </table>
+    </table>,
   )
 
 const renderCondensedComponent = (overrideProps?: any) =>
@@ -95,7 +95,7 @@ const renderCondensedComponent = (overrideProps?: any) =>
       migration={migration}
       updateMigrationItem={updateMigrationItem}
       {...overrideProps}
-    />
+    />,
   )
 
 describe('MigrationRow', () => {
@@ -116,7 +116,7 @@ describe('MigrationRow', () => {
   it('polls for progress when appropriate', async () => {
     // @ts-expect-error
     doFetchApi.mockReturnValueOnce(
-      Promise.resolve({json: {completion: 100, workflow_state: 'completed'}})
+      Promise.resolve({json: {completion: 100, workflow_state: 'completed'}}),
     )
     renderComponent({migration: runningMigration})
     // @ts-expect-error
@@ -126,11 +126,11 @@ describe('MigrationRow', () => {
   it('stops polling on fail', async () => {
     // @ts-expect-error
     doFetchApi.mockReturnValueOnce(
-      Promise.resolve({json: {completion: 60, workflow_state: 'running'}})
+      Promise.resolve({json: {completion: 60, workflow_state: 'running'}}),
     )
     // @ts-expect-error
     doFetchApi.mockReturnValueOnce(
-      Promise.resolve({json: {completion: 60, workflow_state: 'failed'}})
+      Promise.resolve({json: {completion: 60, workflow_state: 'failed'}}),
     )
     renderComponent({migration: runningMigration})
     // @ts-expect-error
@@ -140,7 +140,7 @@ describe('MigrationRow', () => {
   it('stops polling on complete', async () => {
     // @ts-expect-error
     doFetchApi.mockReturnValueOnce(
-      Promise.resolve({json: {completion: 100, workflow_state: 'completed'}})
+      Promise.resolve({json: {completion: 100, workflow_state: 'completed'}}),
     )
     renderComponent({migration: runningMigration})
     // @ts-expect-error
@@ -151,11 +151,11 @@ describe('MigrationRow', () => {
     const mockCallback = jest.fn()
     // @ts-expect-error
     doFetchApi.mockReturnValueOnce(
-      Promise.resolve({json: {completion: 50, workflow_state: 'running'}})
+      Promise.resolve({json: {completion: 50, workflow_state: 'running'}}),
     )
     // @ts-expect-error
     doFetchApi.mockReturnValueOnce(
-      Promise.resolve({json: {completion: 100, workflow_state: 'completed'}})
+      Promise.resolve({json: {completion: 100, workflow_state: 'completed'}}),
     )
     renderComponent({migration: queuedMigration, updateMigrationItem: mockCallback})
     // @ts-expect-error
@@ -164,7 +164,7 @@ describe('MigrationRow', () => {
       expect(mockCallback.mock.calls).toEqual([
         [expect.anything(), {completion: 50}, true],
         [expect.anything(), {completion: 100}],
-      ])
+      ]),
     )
   })
 
@@ -173,7 +173,7 @@ describe('MigrationRow', () => {
     const mockFetchProgressPolling = () => {
       // @ts-expect-error
       doFetchApi.mockReturnValueOnce(
-        Promise.resolve({json: {completion: 100, workflow_state: 'completed'}})
+        Promise.resolve({json: {completion: 100, workflow_state: 'completed'}}),
       )
     }
 
@@ -262,7 +262,7 @@ describe('MigrationRow', () => {
           // Progress returns fails
           // @ts-expect-error
           doFetchApi.mockReturnValueOnce(
-            Promise.resolve({json: {completion: 100, workflow_state: 'failed'}})
+            Promise.resolve({json: {completion: 100, workflow_state: 'failed'}}),
           )
           renderComponent({migration: queuedMigration, updateMigrationItem: mockCallback})
           await waitFor(() => {
@@ -282,7 +282,7 @@ describe('MigrationRow', () => {
           // Progress returns completed
           // @ts-expect-error
           doFetchApi.mockReturnValueOnce(
-            Promise.resolve({json: {completion: 100, workflow_state: 'completed'}})
+            Promise.resolve({json: {completion: 100, workflow_state: 'completed'}}),
           )
           // The initial status
           renderComponent({migration: queuedMigration, updateMigrationItem: mockCallback})

@@ -56,8 +56,8 @@ describe('IntegrationRow', () => {
     it('shows a info box saying it is not enabled', () => {
       expect(
         subject(propOverrides).getByText(
-          'This integration is not enabled. Please enable it to interact with settings.'
-        )
+          'This integration is not enabled. Please enable it to interact with settings.',
+        ),
       ).toBeInTheDocument()
     })
   })
@@ -68,8 +68,8 @@ describe('IntegrationRow', () => {
     it('does not show the info bax saying it is not enabled', () => {
       expect(
         subject(propOverrides).queryByText(
-          'This integration is not enabled. Please enable it to interact with settings.'
-        )
+          'This integration is not enabled. Please enable it to interact with settings.',
+        ),
       ).not.toBeInTheDocument()
     })
   })

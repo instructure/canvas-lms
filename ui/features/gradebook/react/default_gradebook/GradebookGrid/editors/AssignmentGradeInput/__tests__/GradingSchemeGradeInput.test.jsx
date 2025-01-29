@@ -85,13 +85,13 @@ describe('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput', () 
   test('adds the GradingSchemeInput-suffix class to the container', () => {
     mountComponent()
     expect(
-      wrapper.container.querySelector('.Grid__GradeCell__GradingSchemeInput')
+      wrapper.container.querySelector('.Grid__GradeCell__GradingSchemeInput'),
     ).toBeInTheDocument()
   })
 
   test('renders a text input', () => {
     mountComponent()
-    expect(wrapper.container.querySelectorAll('input[type="text"]').length).toBe(1)
+    expect(wrapper.container.querySelectorAll('input[type="text"]')).toHaveLength(1)
   })
 
   test('optionally disables the input', () => {
@@ -905,13 +905,13 @@ describe('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput', () 
       mountComponent()
       await wrapper.getByRole('button', {name: 'Open Grading Scheme menu'}).click()
       await waitFor(() => {
-        expect(wrapper.getAllByRole('menuitem').length).toBe(14)
+        expect(wrapper.getAllByRole('menuitem')).toHaveLength(14)
       })
     })
 
     test('uses the grading scheme key (with trailing dashes replaced with minus) for each grading scheme option', async () => {
       const expectedLabels = props.gradingScheme.map(([key]) =>
-        GradeFormatHelper.replaceDashWithMinus(key)
+        GradeFormatHelper.replaceDashWithMinus(key),
       ) // ['A+', 'A', …, 'F']
       mountComponent()
       wrapper.getByRole('button').click()

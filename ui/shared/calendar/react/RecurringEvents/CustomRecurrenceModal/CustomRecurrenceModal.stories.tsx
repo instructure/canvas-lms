@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
@@ -19,11 +20,11 @@
 
 import React, {useCallback, useState} from 'react'
 import moment from 'moment-timezone'
-import {Story, Meta} from '@storybook/react'
+import type {Story, Meta} from '@storybook/react'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import CustomRecurrenceModal, {CustomRecurrenceModalProps} from './CustomRecurrenceModal'
+import CustomRecurrenceModal, {type CustomRecurrenceModalProps} from './CustomRecurrenceModal'
 import {ISODateToIcalDate} from '../RRuleHelper'
 import RRuleToNaturalLanguage from '../RRuleNaturalLanguage'
 
@@ -112,6 +113,6 @@ YearlyJuly4.args = {
   // RRULE: 'FREQ=MONTHLY;BYSETPOS=1;BYDAY=MO;INTERVAL=1;UNTIL=20240501T000000Z', // monthly on the first Monday
   // RRULE: 'FREQ=MONTHLY;BYMONTHDAY=2;INTERVAL=1;UNTIL=20240501T000000Z', // monthly on the 2nd of the month
   RRULE: `FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=4;UNTIL=${ISODateToIcalDate(
-    defaultEventStart.clone().add(5, 'years').toISOString(true)
+    defaultEventStart.clone().add(5, 'years').toISOString(true),
   )}`,
 }

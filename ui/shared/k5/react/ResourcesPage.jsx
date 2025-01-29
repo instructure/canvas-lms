@@ -49,7 +49,7 @@ const fetchStaff = cards =>
           })
         }
         return acc
-      }, [])
+      }, []),
     )
 
 const fetchApps = cards => {
@@ -73,7 +73,7 @@ const fetchApps = cards => {
         })
       }
       return acc
-    }, [])
+    }, []),
   )
 }
 
@@ -117,7 +117,7 @@ export default function ResourcesPage({cards, cardsSettled, visible, showStaff, 
       }
     },
     [cards, cardsSettled, visible],
-    {deep: true}
+    {deep: true},
   )
 
   return (

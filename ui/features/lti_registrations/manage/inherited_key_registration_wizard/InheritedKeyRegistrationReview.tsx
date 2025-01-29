@@ -52,18 +52,24 @@ export const InheritedKeyRegistrationReview = (props: InheritedKeyRegistrationRe
     const placements = toolConfiguration.placements ?? []
 
     const labels =
-      placements.reduce((acc, p) => {
-        acc[p.placement] = p.text !== null ? p.text : undefined
-        return acc
-      }, {} as Partial<Record<LtiPlacement, string>>) ?? {}
+      placements.reduce(
+        (acc, p) => {
+          acc[p.placement] = p.text !== null ? p.text : undefined
+          return acc
+        },
+        {} as Partial<Record<LtiPlacement, string>>,
+      ) ?? {}
 
     const iconUrls =
-      placements.reduce((acc, p) => {
-        if (p.icon_url) {
-          acc[p.placement] = p.icon_url
-        }
-        return acc
-      }, {} as Partial<Record<LtiPlacement, string>>) ?? {}
+      placements.reduce(
+        (acc, p) => {
+          if (p.icon_url) {
+            acc[p.placement] = p.icon_url
+          }
+          return acc
+        },
+        {} as Partial<Record<LtiPlacement, string>>,
+      ) ?? {}
 
     const customFields = toolConfiguration.custom_fields ?? {}
 
@@ -75,7 +81,7 @@ export const InheritedKeyRegistrationReview = (props: InheritedKeyRegistrationRe
       <>
         <Alert variant="info" margin="0 0 medium 0">
           {I18n.t(
-            "This app's configuration is managed by Instructure, so you cannot make changes."
+            "This app's configuration is managed by Instructure, so you cannot make changes.",
           )}
         </Alert>
         <View margin="medium 0 medium 0">
@@ -182,7 +188,7 @@ export const InheritedKeyRegistrationReview = (props: InheritedKeyRegistrationRe
               {placements
                 .map(p => p.placement)
                 .filter((p): p is LtiPlacementWithIcon =>
-                  LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon)
+                  LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon),
                 )
                 .map(p => {
                   let status: string

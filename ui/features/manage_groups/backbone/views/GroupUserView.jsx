@@ -69,10 +69,9 @@ export default class GroupUserView extends View {
     // I want to remove this setTimeout, it is ugly. If I don't do this, it can't find the selector.
     setTimeout(() => {
       const groupUserMenuSelector = document.getElementById(
-        `group_${groupId}_user_${userId}_menu_selector`
+        `group_${groupId}_user_${userId}_menu_selector`,
       )
       if (this.canEditGroupAssignment && groupUserMenuSelector) {
-         
         ReactDOM.render(
           <GroupUserMenu
             userId={userId}
@@ -83,7 +82,7 @@ export default class GroupUserView extends View {
             onRemoveAsLeader={this.removeAsLeader.bind(this)}
             onMoveTo={this.moveTo.bind(this)}
           />,
-          groupUserMenuSelector
+          groupUserMenuSelector,
         )
       }
     }, 0)
@@ -101,14 +100,14 @@ export default class GroupUserView extends View {
       {
         success: () => {
           $.screenReaderFlashMessage(
-            I18n.t('%{user} is now group leader', {user: this.model.get('name')})
+            I18n.t('%{user} is now group leader', {user: this.model.get('name')}),
           )
 
           setTimeout(() => {
             $(`[data-userid='${userId}']`).focus()
           }, 0)
         },
-      }
+      },
     )
   }
 
@@ -120,14 +119,14 @@ export default class GroupUserView extends View {
       {
         success: () => {
           $.screenReaderFlashMessage(
-            I18n.t('Removed %{user} as group leader', {user: this.model.get('name')})
+            I18n.t('Removed %{user} as group leader', {user: this.model.get('name')}),
           )
 
           setTimeout(() => {
             $(`[data-userid='${userId}']`).focus()
           }, 0)
         },
-      }
+      },
     )
   }
 

@@ -126,7 +126,7 @@ export default function GradingResults({
         const index = passFailStatusOptions.findIndex(
           passFailStatusOption =>
             passFailStatusOption.value === correctSubmission.grade ||
-            (passFailStatusOption.value === 'EX' && correctSubmission.excused)
+            (passFailStatusOption.value === 'EX' && correctSubmission.excused),
         )
 
         const passFailStatusIndexSetter = getPassFailStatusIndexSetter(subAssignmentTag)
@@ -154,7 +154,7 @@ export default function GradingResults({
         gradeInputSetter(correctSubmission.enteredGrade)
       }
     },
-    [assignment, submission]
+    [assignment, submission],
   )
 
   useEffect(() => {
@@ -188,7 +188,7 @@ export default function GradingResults({
           break
       }
     },
-    [onSubmissionSaved]
+    [onSubmissionSaved],
   )
 
   const handlePostComment = useCallback(() => {
@@ -283,7 +283,7 @@ export default function GradingResults({
       correctSubmission,
       getGradeFromState(subAssignmentTag),
       submitScoreUrl,
-      subAssignmentTag
+      subAssignmentTag,
     )
   }
 
@@ -302,7 +302,7 @@ export default function GradingResults({
   const handleChangePassFailStatusWrapper = (
     value: string | number | undefined,
     setterForGradeInput: (value: ((prevState: string) => string) | string) => void,
-    setterForPassFailStatusIndex: (value: ((prevState: number) => number) | number) => void
+    setterForPassFailStatusIndex: (value: ((prevState: number) => number) | number) => void,
   ) => {
     if (typeof value === 'string') {
       setterForGradeInput(value)
@@ -312,30 +312,30 @@ export default function GradingResults({
 
   const handleChangePassFailStatus = (
     event: React.SyntheticEvent,
-    data: {value?: string | number | undefined}
+    data: {value?: string | number | undefined},
   ) => {
     handleChangePassFailStatusWrapper(data.value, setGradeInput, setPassFailStatusIndex)
   }
 
   const handleChangeReplyToTopicPassFailStatus = (
     event: React.SyntheticEvent,
-    data: {value?: string | number | undefined}
+    data: {value?: string | number | undefined},
   ) => {
     handleChangePassFailStatusWrapper(
       data.value,
       setReplyToTopicGradeInput,
-      setReplyToTopicPassFailStatusIndex
+      setReplyToTopicPassFailStatusIndex,
     )
   }
 
   const handleChangeReplyToEntryPassFailStatus = (
     event: React.SyntheticEvent,
-    data: {value?: string | number | undefined}
+    data: {value?: string | number | undefined},
   ) => {
     handleChangePassFailStatusWrapper(
       data.value,
       setReplyToEntryGradeInput,
-      setReplyToEntryPassFailStatusIndex
+      setReplyToEntryPassFailStatusIndex,
     )
   }
 
@@ -353,7 +353,7 @@ export default function GradingResults({
       assignmentEnhancementsEnabled: assignmentEnhancementsEnabled ?? false,
       stickersEnabled: stickersEnabled ?? false,
     },
-    assignment
+    assignment,
   )
 
   return (

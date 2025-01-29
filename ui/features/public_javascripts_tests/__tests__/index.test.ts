@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -25,7 +26,7 @@ describe('lti_post_message_forwarding', () => {
     let origin: string
     let parentDomain: string
     let windowReferences: Array<Window | undefined>
-    // eslint-disable-next-line no-undef
+
     let source: MessageEventSource
     let parentWindow: Window
     let includeRCESignal: boolean
@@ -35,7 +36,7 @@ describe('lti_post_message_forwarding', () => {
         parentDomain,
         windowReferences,
         parentWindow,
-        includeRCESignal
+        includeRCESignal,
       )({data: message, origin, source} as MessageEvent)
 
     describe('when message is not JSON string or JS object', () => {
@@ -72,13 +73,13 @@ describe('lti_post_message_forwarding', () => {
         subject()
         expect(parentWindow.postMessage).toHaveBeenCalledWith(
           {...(message as object), sourceToolInfo: {origin, windowId: 0}},
-          expect.anything()
+          expect.anything(),
         )
       })
 
       it('stores source window in an array', () => {
         subject()
-        expect(windowReferences.length).toBe(1)
+        expect(windowReferences).toHaveLength(1)
         expect(windowReferences[0]).toBe(source)
       })
 
@@ -88,13 +89,13 @@ describe('lti_post_message_forwarding', () => {
         handler(
           parentDomain,
           windowReferences,
-          parentWindow
+          parentWindow,
         )({data: message, origin, source: source2} as MessageEvent)
         subject()
         expect(parentWindow.postMessage.mock.calls[0][0].sourceToolInfo.windowId).toBe(0)
         expect(parentWindow.postMessage.mock.calls[1][0].sourceToolInfo.windowId).toBe(1)
         expect(parentWindow.postMessage.mock.calls[2][0].sourceToolInfo.windowId).toBe(0)
-        expect(windowReferences.length).toBe(2)
+        expect(windowReferences).toHaveLength(2)
         expect(windowReferences[0]).toBe(source)
         expect(windowReferences[1]).toBe(source2)
       })
@@ -156,7 +157,7 @@ describe('lti_post_message_forwarding', () => {
         subject()
         expect(source.postMessage).toHaveBeenCalledWith(
           {subject: 'hello_world', key: 'value'},
-          expect.anything()
+          expect.anything(),
         )
       })
     })

@@ -59,7 +59,7 @@ export const MessageDetailContainer = props => {
     data.legacyNode.conversationMessagesConnection.nodes =
       data.legacyNode.conversationMessagesConnection.nodes.filter(
         message =>
-          !result.data.deleteConversationMessages.conversationMessageIds.includes(message._id)
+          !result.data.deleteConversationMessages.conversationMessageIds.includes(message._id),
       )
 
     cache.writeQuery({...options, data})
@@ -67,7 +67,7 @@ export const MessageDetailContainer = props => {
     let legacyNode
     try {
       const queryResult = JSON.parse(
-        JSON.stringify(cache.readQuery(props.conversationsQueryOption))
+        JSON.stringify(cache.readQuery(props.conversationsQueryOption)),
       )
       legacyNode = queryResult.legacyNode
     } catch (e) {
@@ -80,7 +80,9 @@ export const MessageDetailContainer = props => {
     // but the mutation is run with only one.
     const conversationMessageId = result.data.deleteConversationMessages.conversationMessageIds[0]
     const matchingConversation = legacyNode.conversationsConnection.nodes.find(c =>
-      c.conversation.conversationMessagesConnection.nodes.find(m => m._id === conversationMessageId)
+      c.conversation.conversationMessagesConnection.nodes.find(
+        m => m._id === conversationMessageId,
+      ),
     )
 
     if (matchingConversation) {
@@ -95,7 +97,7 @@ export const MessageDetailContainer = props => {
 
   const handleDeleteConversationMessage = conversationMessageId => {
     const delMsg = I18n.t(
-      'Are you sure you want to delete your copy of this message? This action cannot be undone.'
+      'Are you sure you want to delete your copy of this message? This action cannot be undone.',
     )
 
     const confirmResult = window.confirm(delMsg)
@@ -136,7 +138,7 @@ export const MessageDetailContainer = props => {
   // Set Conversation to read when the conversationMessages are loaded
   useEffect(() => {
     const idIsStoredInSessionStorage = JSON.parse(
-      sessionStorage.getItem('conversationsManuallyMarkedUnread')
+      sessionStorage.getItem('conversationsManuallyMarkedUnread'),
     )?.includes(props.conversation._id)
 
     if (
@@ -277,7 +279,7 @@ export const MessageDetailContainer = props => {
           root: null,
           rootMargin: '0px',
           threshold: 0.4,
-        }
+        },
       )
 
       if (lastMessageItem) {

@@ -31,12 +31,12 @@ type FormMessageProps = {
 
 export const ErrorFormMessage = ({children}: FormMessageProps) => {
   return (
-    <Flex gap="xx-small" alignItems="center">
-      <IconWarningSolid color="error" />
-      <Text color="danger" size="small">
+    <Text color="danger" size="small">
+      <Flex gap="xx-small" alignItems="center">
+        <IconWarningSolid color="error" />
         {children}
-      </Text>
-    </Flex>
+      </Flex>
+    </Text>
   )
 }
 

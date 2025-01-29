@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import Subject from '../question_flagged'
 import K from '../../constants'
-import sinon from 'sinon'
 
 const ok = value => expect(value).toBeTruthy()
 const equal = (value, expected) => expect(value).toEqual(expected)
@@ -59,7 +58,7 @@ describe('Quizzes::LogAuditing::EventTrackers::QuestionFlagged', () => {
   })
 
   test('capturing: it works', () => {
-    const capture = sinon.stub()
+    const capture = jest.fn()
     const tracker = new Subject({
       questionSelector: '.question',
       questionMarkedClass: 'marked',
@@ -68,18 +67,14 @@ describe('Quizzes::LogAuditing::EventTrackers::QuestionFlagged', () => {
     tracker.install(capture)
     const $fakeQuestion = createQuestion('123')
     $fakeQuestion.find('a.flag_question').click()
-    ok(
-      capture.calledWith({
-        questionId: '123',
-        flagged: true,
-      })
-    )
+    expect(capture).toHaveBeenCalledWith({
+      questionId: '123',
+      flagged: true,
+    })
     $fakeQuestion.find('a.flag_question').click()
-    ok(
-      capture.calledWith({
-        questionId: '123',
-        flagged: false,
-      })
-    )
+    expect(capture).toHaveBeenCalledWith({
+      questionId: '123',
+      flagged: false,
+    })
   })
 })

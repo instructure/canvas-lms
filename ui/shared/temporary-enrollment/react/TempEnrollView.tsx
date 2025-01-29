@@ -57,14 +57,17 @@ export function getRelevantUserFromEnrollment(enrollment: Enrollment) {
 }
 
 export function groupEnrollmentsByPairingId(enrollments: Enrollment[]) {
-  return enrollments.reduce((groupedById, enrollment) => {
-    const groupId = enrollment.temporary_enrollment_pairing_id
-    if (!groupedById[groupId]) {
-      groupedById[groupId] = []
-    }
-    groupedById[groupId].push(enrollment)
-    return groupedById
-  }, {} as Record<number, Enrollment[]>)
+  return enrollments.reduce(
+    (groupedById, enrollment) => {
+      const groupId = enrollment.temporary_enrollment_pairing_id
+      if (!groupedById[groupId]) {
+        groupedById[groupId] = []
+      }
+      groupedById[groupId].push(enrollment)
+      return groupedById
+    },
+    {} as Record<number, Enrollment[]>,
+  )
 }
 
 /**
@@ -77,15 +80,15 @@ export function groupEnrollmentsByPairingId(enrollments: Enrollment[]) {
  */
 async function handleConfirmAndDeleteEnrollment(tempEnrollments: Enrollment[]): Promise<void> {
   // TODO is there a good inst ui component for confirmation dialog?
-   
+
   const userConfirmed = window.confirm(I18n.t('Are you sure you want to delete this enrollment?'))
   if (userConfirmed) {
     const results = await Promise.allSettled(
       tempEnrollments.map(enrollment =>
         deleteEnrollment(enrollment.course_id, enrollment.id)
           .then(() => ({status: 'success', id: enrollment.id}))
-          .catch(() => ({status: 'error', id: enrollment.id}))
-      )
+          .catch(() => ({status: 'error', id: enrollment.id})),
+      ),
     )
     const successfulDeletions = results
       .filter(result => result.status === 'fulfilled')
@@ -122,7 +125,7 @@ export function TempEnrollView(props: Props) {
   const fetchAndUpdateBookmarks = async (
     userId: string,
     isRecipient: boolean,
-    pageRequest: string
+    pageRequest: string,
   ) => {
     const results = await fetchTemporaryEnrollments(userId, isRecipient, pageRequest)
 
@@ -162,7 +165,6 @@ export function TempEnrollView(props: Props) {
     if (canEdit) {
       props.onEdit?.(getRelevantUserFromEnrollment(enrollments[0]), enrollments)
     } else {
-       
       console.error('User does not have permission to edit enrollment')
     }
   }
@@ -171,7 +173,6 @@ export function TempEnrollView(props: Props) {
     if (canDelete) {
       mutate(enrollments)
     } else {
-       
       console.error('User does not have permission to delete enrollment')
     }
   }
@@ -180,7 +181,6 @@ export function TempEnrollView(props: Props) {
     if (canAdd) {
       props.onAddNew?.()
     } else {
-       
       console.error('User does not have permission to add enrollment')
     }
   }
@@ -253,13 +253,13 @@ export function TempEnrollView(props: Props) {
             </Table.RowHeader>
             <Table.Cell>
               {`${formatDateTime(firstEnrollment.start_at)} - ${formatDateTime(
-                firstEnrollment.end_at
+                firstEnrollment.end_at,
               )}`}
             </Table.Cell>
             <Table.Cell>{firstEnrollment.type}</Table.Cell>
             <Table.Cell>{renderEnrollmentPairingStatus(group)}</Table.Cell>
             {canEditOrDelete ? <Table.Cell>{renderActionIcons(group)}</Table.Cell> : <></>}
-          </Table.Row>
+          </Table.Row>,
         )
         usedKeys.push(pairingId)
       }
@@ -270,7 +270,7 @@ export function TempEnrollView(props: Props) {
   if (error) {
     // @ts-expect-error
     const errorMsg = error.message
-     
+
     console.error(`Failed to fetch enrollments for user ${props.user.id}:`, errorMsg)
     captureException(errorMsg)
     return (

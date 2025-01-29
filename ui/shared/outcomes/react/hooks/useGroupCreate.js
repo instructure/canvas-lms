@@ -58,7 +58,7 @@ const useGroupCreate = () => {
         })
       }
     },
-    [addOutcomeGroup]
+    [addOutcomeGroup],
   )
 
   const clearCreatedGroups = () => setCreatedGroups([])

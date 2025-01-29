@@ -74,10 +74,10 @@ export default class TotalGradeOverrideCellPropFactory {
     const selectedCustomStatusId = gradeOverrideCustomStatus(
       finalGradeOverrideMap,
       userId,
-      this._gradebook.gradingPeriodId
+      this._gradebook.gradingPeriodId,
     )
     const selectedCustomGradeStatus = this._gradebook.options.custom_grade_statuses?.find(
-      status => status.id === selectedCustomStatusId
+      status => status.id === selectedCustomStatusId,
     )
 
     return {

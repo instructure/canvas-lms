@@ -124,7 +124,7 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
         <Flex.Item>
           <Table
             caption={I18n.t(
-              'A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.'
+              'A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.',
             )}
             layout="fixed"
             data-testid={`grading_scheme_${gradingScheme.id}_data_table`}

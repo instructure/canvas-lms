@@ -52,7 +52,7 @@ export const pinnedDiscussionBackground = props => (
     {props.permissions.manage_content && (
       <Text as="div" margin="x-small auto">
         {I18n.t(
-          'To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu.'
+          'To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu.',
         )}
       </Text>
     )}
@@ -95,7 +95,7 @@ export const closedDiscussionBackground = props => (
     {props.permissions.manage_content && (
       <Text as="div" margin="x-small auto">
         {I18n.t(
-          'To close comments on a discussion, drag a discussion here, or select Close for Comments from the discussion settings menu.'
+          'To close comments on a discussion, drag a discussion here, or select Close for Comments from the discussion settings menu.',
         )}
       </Text>
     )}

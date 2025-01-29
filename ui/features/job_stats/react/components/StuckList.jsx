@@ -41,7 +41,7 @@ export default function StuckList({shard, type}) {
       error: setError,
       fetchAllPages: true,
     },
-    []
+    [],
   )
 
   const StuckTable = ({caption}) => {
@@ -67,7 +67,7 @@ export default function StuckList({shard, type}) {
                     href={`//${
                       shard.domain
                     }/jobs_v2?group_type=${type}&group_text=${encodeURIComponent(
-                      row.name
+                      row.name,
                     )}&bucket=queued`}
                   >
                     {row.name}

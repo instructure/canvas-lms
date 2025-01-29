@@ -32,21 +32,18 @@ describe('DynamicRegistrationModal', () => {
     // instui logs an error when we render a component
     // immediately under Modal
 
-    // eslint-disable-next-line no-console
     error = console.error
-    // eslint-disable-next-line no-console
+
     warn = console.warn
 
-    // eslint-disable-next-line no-console
     console.error = jest.fn()
-    // eslint-disable-next-line no-console
+
     console.warn = jest.fn()
   })
 
   afterAll(() => {
-    // eslint-disable-next-line no-console
     console.error = error
-    // eslint-disable-next-line no-console
+
     console.warn = warn
   })
 
@@ -74,7 +71,7 @@ describe('DynamicRegistrationModal', () => {
       expect(iframe).toBeInTheDocument()
       expect(iframe).toHaveAttribute(
         'src',
-        '/api/lti/accounts/1/dr_iframe?url=http%3A%2F%2Flocalhost%2F%3Ffoo%3Dbar%26openid_configuration%3Dhttp%253A%252F%252Fcanvas.instructure.com%26registration_token%3Dabc'
+        '/api/lti/accounts/1/dr_iframe?url=http%3A%2F%2Flocalhost%2F%3Ffoo%3Dbar%26openid_configuration%3Dhttp%253A%252F%252Fcanvas.instructure.com%26registration_token%3Dabc',
       )
     })
 
@@ -156,7 +153,7 @@ describe('DynamicRegistrationModal', () => {
       const component = render(<DynamicRegistrationModal contextId="1" store={store as any} />)
 
       const enableAndCloseButton = await component.findByTestId(
-        'dynamic-reg-modal-enable-and-close-button'
+        'dynamic-reg-modal-enable-and-close-button',
       )
       expect(enableAndCloseButton).toBeInTheDocument()
 

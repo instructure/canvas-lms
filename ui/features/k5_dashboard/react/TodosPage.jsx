@@ -60,7 +60,7 @@ export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
         per_page: '100',
       },
     },
-    [visible]
+    [visible],
   )
 
   const todoSkeleton = props => (

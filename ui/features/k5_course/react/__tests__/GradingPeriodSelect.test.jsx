@@ -33,7 +33,7 @@ describe('GradingPeriodSelect', () => {
 
   it('renders a select with provided active grading periods and all periods as options', () => {
     const {getByText, queryByText} = render(
-      <GradingPeriodSelect {...getProps({currentGradingPeriodId: undefined})} />
+      <GradingPeriodSelect {...getProps({currentGradingPeriodId: undefined})} />,
     )
     act(() => getByText('Select Grading Period').click())
     expect(getByText('Spring 2020')).toBeInTheDocument()

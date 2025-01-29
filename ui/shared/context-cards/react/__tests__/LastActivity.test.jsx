@@ -17,79 +17,56 @@
  */
 
 import React from 'react'
-
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
 import LastActivity from '../LastActivity'
-import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 
-const container = document.createElement('div')
-container.setAttribute('id', 'fixtures')
-document.body.appendChild(container)
-
-const notOk = x => expect(x).toBeFalsy()
-const equal = (x, y) => expect(x).toEqual(y)
-
-describe('StudentContextTray/LastActivity', () => {
-  let subject
-  afterEach(() => {
-    if (subject) {
-      const componentNode = ReactDOM.findDOMNode(subject)
-      if (componentNode) {
-        ReactDOM.unmountComponentAtNode(componentNode.parentNode)
-      }
-    }
-    subject = null
+describe('LastActivity', () => {
+  const lastActivity = '2016-11-16T00:29:34Z'
+  const createUser = (enrollments = []) => ({
+    enrollments,
   })
 
-  const lastActivity = 'Wed, 16 Nov 2016 00:29:34 UTC +00:00'
-
-  describe('lastActivity', () => {
-    test('returns null by default', () => {
-      subject = TestUtils.renderIntoDocument(<LastActivity user={{}} />)
-      notOk(subject.lastActivity)
-    })
-
-    test('returns last activity from collection of enrollment last_activity_at', () => {
-      const firstActivity = 'Mon, 14 Nov 2016 00:29:34 UTC +00:00'
-      const middleActivity = 'Tue, 15 Nov 2016 00:29:34 UTC +00:00'
-
-      subject = TestUtils.renderIntoDocument(
-        <LastActivity
-          user={{
-            enrollments: [
-              {
-                last_activity_at: lastActivity,
-              },
-              {
-                last_activity_at: firstActivity,
-              },
-              {
-                last_activity_at: middleActivity,
-              },
-            ],
-          }}
-        />
-      )
-
-      equal(subject.lastActivity, lastActivity)
-    })
+  it('renders nothing when user has no enrollments', () => {
+    const {container} = render(<LastActivity user={createUser()} />)
+    expect(container).toBeEmptyDOMElement()
   })
 
-  test('renders friendy date time field when user is present', () => {
-    subject = TestUtils.renderIntoDocument(
-      <LastActivity
-        user={{
-          enrollments: [
-            {
-              last_activity_at: lastActivity,
-            },
-          ],
-        }}
-      />
+  it('renders nothing when user has enrollments but no last activity', () => {
+    const user = createUser([{last_activity_at: null}])
+    const {container} = render(<LastActivity user={user} />)
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('displays the most recent activity from multiple enrollments', () => {
+    const firstActivity = '2016-11-14T00:29:34Z'
+    const middleActivity = '2016-11-15T00:29:34Z'
+    const user = createUser([
+      {last_activity_at: lastActivity},
+      {last_activity_at: firstActivity},
+      {last_activity_at: middleActivity},
+    ])
+
+    const {getByText, getByTestId} = render(<LastActivity user={user} />)
+
+    expect(getByText('Last login:')).toBeInTheDocument()
+    const friendlyDateTime = getByTestId('friendly-date-time')
+    expect(friendlyDateTime).toBeInTheDocument()
+    expect(friendlyDateTime.querySelector('time')).toHaveAttribute(
+      'datetime',
+      expect.stringContaining('2016-11-16'),
     )
+  })
 
-    const friendlyDatetime = TestUtils.findRenderedComponentWithType(subject, FriendlyDatetime)
-    equal(friendlyDatetime.props.dateTime, lastActivity)
+  it('displays a single enrollment activity', () => {
+    const user = createUser([{last_activity_at: lastActivity}])
+    const {getByText, getByTestId} = render(<LastActivity user={user} />)
+
+    expect(getByText('Last login:')).toBeInTheDocument()
+    const friendlyDateTime = getByTestId('friendly-date-time')
+    expect(friendlyDateTime).toBeInTheDocument()
+    expect(friendlyDateTime.querySelector('time')).toHaveAttribute(
+      'datetime',
+      expect.stringContaining('2016-11-16'),
+    )
   })
 })

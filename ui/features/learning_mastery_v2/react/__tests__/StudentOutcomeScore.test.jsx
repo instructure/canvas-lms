@@ -75,7 +75,7 @@ describe('StudentOutcomeScore', () => {
             rating: {points: 3, color: 'FFFFF', description: '', mastery: false},
           },
         })}
-      />
+      />,
     )
     expect(getByText('Unassessed')).toBeInTheDocument()
   })
@@ -86,7 +86,7 @@ describe('StudentOutcomeScore', () => {
         {...defaultProps({
           visibleRatings: [true, true, true, true, false, true],
         })}
-      />
+      />,
     )
     expect(queryByText('great!')).toBeNull()
   })

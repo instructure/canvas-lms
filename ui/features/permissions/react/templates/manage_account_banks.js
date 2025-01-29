@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
-        'Allows a user to view and manage all item banks in an account directly from within a course and account.'
+        'Allows a user to view and manage all item banks in an account directly from within a course and account.',
       ),
     },
   ],
@@ -34,7 +34,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
-        'This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor.'
+        'This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor.',
       ),
     },
   ],
@@ -42,7 +42,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
-        'Allows a user to view and manage all item banks in an account from directly within a course.'
+        'Allows a user to view and manage all item banks in an account from directly within a course.',
       ),
     },
   ],
@@ -50,8 +50,8 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
-        'This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor.'
+        'This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor.',
       ),
     },
-  ]
+  ],
 )

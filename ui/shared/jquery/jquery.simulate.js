@@ -88,7 +88,7 @@ $.extend($.simulate.prototype, {
         button: 0,
         relatedTarget: undefined,
       },
-      options
+      options,
     )
 
     var relatedTarget = $(e.relatedTarget)[0]
@@ -110,7 +110,7 @@ $.extend($.simulate.prototype, {
         e.shiftKey,
         e.metaKey,
         e.button,
-        e.relatedTarget || document.body.parentNode
+        e.relatedTarget || document.body.parentNode,
       )
     } else if (document.createEventObject) {
       evt = document.createEventObject()
@@ -134,7 +134,7 @@ $.extend($.simulate.prototype, {
         keyCode: 0,
         charCode: undefined,
       },
-      options
+      options,
     )
 
     if ($.isFunction(document.createEvent)) {
@@ -150,7 +150,7 @@ $.extend($.simulate.prototype, {
           e.shiftKey,
           e.metaKey,
           e.keyCode,
-          e.charCode
+          e.charCode,
         )
       } catch (err) {
         evt = document.createEvent('Events')

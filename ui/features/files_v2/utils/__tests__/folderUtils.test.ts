@@ -17,26 +17,42 @@
  */
 
 import {generateUrlPath} from '../folderUtils'
-import {FAKE_FOLDERS} from '../../fixtures/fakeData'
+import {setupFilesEnv} from '../../fixtures/fakeFilesEnv'
+import {FAKE_COURSE_FOLDER, FAKE_USER_FOLDER} from '../../fixtures/fakeData'
 import {type Folder} from '../../interfaces/File'
 
 describe('generateUrlPath', () => {
-  let folder: Folder
+  let courseFolder: Folder, userFolder: Folder
+
   beforeEach(() => {
-    folder = FAKE_FOLDERS[0]
+    courseFolder = FAKE_COURSE_FOLDER
+    userFolder = FAKE_USER_FOLDER
+  })
+
+  describe('when showing all contexts', () => {
+    beforeAll(() => {
+      setupFilesEnv(true)
+    })
+
+    it('returns the correct path for a course folder', () => {
+      const path = generateUrlPath(courseFolder)
+      expect(path).toBe('/folder/courses_1/2nd%20Folder/A%20Fake%20Course%20Folder')
+    })
+
+    it('returns the correct path fo ra user folder', () => {
+      const path = generateUrlPath(userFolder)
+      expect(path).toBe('/folder/users_1/2nd%20Folder/A%20Fake%20Course%20Folder')
+    })
   })
 
   describe('when not showing all contexts', () => {
-    it('returns the correct path for a course folder', () => {
-      folder.full_name = 'course files/asdf/asdf2'
-      const path = generateUrlPath(folder)
-      expect(path).toBe('/folder/asdf/asdf2')
+    beforeAll(() => {
+      setupFilesEnv()
     })
 
-    it('returns the correct path for a course folder with spaces', () => {
-      folder.full_name = 'course files/Uploaded Media'
-      const path = generateUrlPath(folder)
-      expect(path).toBe('/folder/Uploaded%20Media')
+    it('returns the correct path for a course folder', () => {
+      const path = generateUrlPath(courseFolder)
+      expect(path).toBe('/folder/2nd%20Folder/A%20Fake%20Course%20Folder')
     })
   })
 })

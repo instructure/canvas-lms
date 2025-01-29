@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 
 import ready from '@instructure/ready'
 
@@ -29,9 +29,9 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 declare const ENV: GlobalEnv & EnvAccountsAdminTools
 
 ready(() => {
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(
-    <AccountCalendarSettings accountId={parseInt(ENV.ACCOUNT_ID, 10)} />,
-    document.getElementById('account-calendar-settings-container')
-  )
+  const container = document.getElementById('account-calendar-settings-container')
+  if (container) {
+    const root = createRoot(container)
+    root.render(<AccountCalendarSettings accountId={parseInt(ENV.ACCOUNT_ID, 10)} />)
+  }
 })

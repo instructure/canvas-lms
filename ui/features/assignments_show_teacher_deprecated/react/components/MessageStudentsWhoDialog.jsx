@@ -82,7 +82,7 @@ export default class MessageStudentsWhoDialog extends React.Component {
     else if (selectedFilter === 'more-than') this.handleMoreThan()
     else {
       const errorMessage = 'MessageStudentsWhoDialog error: unrecognized filter'
-       
+
       console.error(errorMessage, selectedFilter)
       captureException(new Error(errorMessage))
     }
@@ -119,7 +119,7 @@ export default class MessageStudentsWhoDialog extends React.Component {
         assignmentTitle: this.props.assignment.name,
       }),
       selectedStudents: this.findStudentsWith(
-        submission => submission.score != null && submission.score < state.pointsThreshold
+        submission => submission.score != null && submission.score < state.pointsThreshold,
       ),
     }))
   }
@@ -131,7 +131,7 @@ export default class MessageStudentsWhoDialog extends React.Component {
         assignmentTitle: this.props.assignment.name,
       }),
       selectedStudents: this.findStudentsWith(
-        submission => submission.score != null && submission.score > state.pointsThreshold
+        submission => submission.score != null && submission.score > state.pointsThreshold,
       ),
     }))
   }

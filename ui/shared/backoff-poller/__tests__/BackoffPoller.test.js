@@ -79,7 +79,7 @@ describe('BackoffPoller', () => {
       {
         backoffFactor: 1,
         baseInterval: 10,
-      }
+      },
     )
     poller.start().then(callback)
     // let the four 'continue' intervals expire, responding after each

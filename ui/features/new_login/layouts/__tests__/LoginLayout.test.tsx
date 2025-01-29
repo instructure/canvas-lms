@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
+import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {LoginLayout} from '../LoginLayout'
 import '@testing-library/jest-dom'
-import {NewLoginProvider} from '../../context/NewLoginContext'
+import {HelpTrayProvider, NewLoginDataProvider, NewLoginProvider} from '../../context'
 
 jest.mock('react-router-dom', () => {
   const originalModule = jest.requireActual('react-router-dom')
@@ -38,9 +38,13 @@ describe('LoginLayout', () => {
     render(
       <MemoryRouter>
         <NewLoginProvider>
-          <LoginLayout />
+          <NewLoginDataProvider>
+            <HelpTrayProvider>
+              <LoginLayout />
+            </HelpTrayProvider>
+          </NewLoginDataProvider>
         </NewLoginProvider>
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

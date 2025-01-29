@@ -24,7 +24,7 @@ class Assignment < AbstractAssignment
 
   before_save :before_soft_delete, if: -> { will_save_change_to_workflow_state?(to: "deleted") }
 
-  SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[workflow_state unlock_at lock_at].freeze
+  SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[workflow_state unlock_at lock_at grading_type].freeze
   after_commit :update_sub_assignments, if: :sync_attributes_changed?
 
   set_broadcast_policy do |p|
@@ -94,6 +94,10 @@ class Assignment < AbstractAssignment
                    body_column: :description,
                    index_scope: ->(course) { course.assignments.active },
                    search_scope: ->(course, user) { Assignments::ScopedToUser.new(course, user, course.assignments.active).scope }
+
+  def show_in_search_for_user?(user)
+    include_description?(user)
+  end
 
   def checkpoints_parent?
     has_sub_assignments? && root_account&.feature_enabled?(:discussion_checkpoints)

@@ -80,7 +80,7 @@ describe('ImportConfirmBox', () => {
     it('renders ImportConfirmBox when showImportConfirmBox is called', async () => {
       showImportConfirmBox({...defaultProps()})
       expect(
-        screen.getByText(/You are about to add 100 outcomes to this course./)
+        screen.getByText(/You are about to add 100 outcomes to this course./),
       ).toBeInTheDocument()
     })
 

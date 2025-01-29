@@ -32,21 +32,6 @@ export const SET_COURSE_POST_POLICY_MUTATION = gql`
   }
 `
 
-export const COURSE_ASSIGNMENT_POST_POLICIES_QUERY = gql`
-  query CourseAssignmentPostPolicies($courseId: ID!) {
-    course(id: $courseId) {
-      assignmentsConnection(filter: {gradingPeriodId: null}) {
-        nodes {
-          _id
-          postPolicy {
-            postManually
-          }
-        }
-      }
-    }
-  }
-`
-
 export function setCoursePostPolicy({
   courseId,
   postManually,
@@ -65,50 +50,20 @@ export function setCoursePostPolicy({
       })
       // @ts-expect-error
       .then(response => {
-        const queryResponse = response && response.data && response.data.setCoursePostPolicy
+        const queryResponse = response?.data?.setCoursePostPolicy
         if (queryResponse) {
           if (queryResponse.postPolicy) {
             return {
               postManually: queryResponse.postPolicy.postManually,
             }
-          } else if (queryResponse.errors && queryResponse.errors.length > 0) {
+          }
+
+          if (queryResponse.errors && queryResponse.errors.length > 0) {
             throw new Error(queryResponse.errors[0].message)
           }
         }
 
         throw new Error('no postPolicy or error provided in response')
-      })
-  )
-}
-
-export function getAssignmentPostPolicies({courseId}: {courseId: string}) {
-  return (
-    createClient()
-      .query({
-        query: COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
-        variables: {courseId},
-      })
-      // @ts-expect-error
-      .then(response => {
-        const queryResponse = response && response.data && response.data.course
-        if (queryResponse) {
-          const assignments = queryResponse.assignmentsConnection.nodes
-          if (assignments != null) {
-            const assignmentPostPoliciesById = {}
-            // @ts-expect-error
-            assignments.forEach(assignment => {
-              if (assignment.postPolicy) {
-                const {postManually} = assignment.postPolicy
-                // @ts-expect-error
-                assignmentPostPoliciesById[assignment._id] = {postManually}
-              }
-            })
-
-            return {assignmentPostPoliciesById}
-          }
-        }
-
-        throw new Error('no course provided in response')
       })
   )
 }

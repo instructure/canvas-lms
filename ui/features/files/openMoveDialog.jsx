@@ -18,14 +18,14 @@
 
 import {find} from 'lodash'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import MoveDialog from './react/components/MoveDialog'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 import $ from 'jquery'
 
 function openMoveDialog(
   thingsToMove,
-  {contextType, contextId, returnFocusTo, clearSelectedItems, onMove}
+  {contextType, contextId, returnFocusTo, clearSelectedItems, onMove},
 ) {
   const rootFolderToShow = find(filesEnv.rootFolders, folder => {
     return (
@@ -35,9 +35,10 @@ function openMoveDialog(
   })
 
   const $moveDialog = $('<div>').appendTo(document.body)
+  const root = createRoot($moveDialog[0])
 
   const handleClose = () => {
-    ReactDOM.unmountComponentAtNode($moveDialog[0])
+    root.unmount()
     $moveDialog.remove()
     $(returnFocusTo).focus()
   }
@@ -46,15 +47,13 @@ function openMoveDialog(
     onMove(models) && clearSelectedItems()
   }
 
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(
+  root.render(
     <MoveDialog
       thingsToMove={thingsToMove}
       rootFoldersToShow={filesEnv.showingAllContexts ? filesEnv.rootFolders : [rootFolderToShow]}
       onClose={handleClose}
       onMove={handleMove}
     />,
-    $moveDialog[0]
   )
 }
 

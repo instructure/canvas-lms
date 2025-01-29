@@ -38,7 +38,7 @@ describe('GradingSchemeDeleteModal', () => {
         handleGradingSchemeDelete={handleGradingSchemeDelete}
         handleCloseDeleteModal={handleCloseDeleteModal}
         {...props}
-      />
+      />,
     )
     return {...funcs, handleGradingSchemeDelete, handleCloseDeleteModal}
   }
@@ -57,7 +57,7 @@ describe('GradingSchemeDeleteModal', () => {
   it('should render the title of the grading scheme in the modal', () => {
     const {getByTestId} = renderGradingSchemeDeleteModal()
     expect(getByTestId('grading-scheme-delete-modal-title')).toHaveTextContent(
-      `Delete ${DefaultGradingScheme.title}`
+      `Delete ${DefaultGradingScheme.title}`,
     )
   })
 

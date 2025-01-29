@@ -44,7 +44,7 @@ class ReuploadSubmissionsDialogManager {
     userAssetString: string,
     downloadedSubmissionsMap: {
       [assignmentId: string]: boolean
-    }
+    },
   ) {
     this.assignment = assignment
     this.downloadedSubmissionsMap = downloadedSubmissionsMap
@@ -64,7 +64,7 @@ class ReuploadSubmissionsDialogManager {
     }
 
     this.reuploadForm = $(
-      re_upload_submissions_form({authenticityToken: authenticity_token()})
+      re_upload_submissions_form({authenticityToken: authenticity_token()}),
     ).dialog({
       width: 400,
       modal: true,

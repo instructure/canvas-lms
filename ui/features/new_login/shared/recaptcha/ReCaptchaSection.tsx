@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Text} from '@instructure/ui-text'
 import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react'
+import {ErrorBoundary} from '..'
 import ReCaptcha from './ReCaptcha'
 import ReCaptchaWrapper, {type ReCaptchaWrapperRef} from './ReCaptchaWrapper'
-import {ErrorBoundary} from '..'
-import {Text} from '@instructure/ui-text'
-import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('new_login')
 
@@ -64,7 +64,6 @@ const ReCaptchaSection = forwardRef<ReCaptchaSectionRef, Props>(({recaptchaKey, 
     if (onVerify) {
       onVerify(token)
     } else {
-       
       console.warn('No onVerify callback provided for ReCaptchaSection.')
     }
   }

@@ -45,7 +45,7 @@ class GradingPeriodTemplate extends React.Component {
     title: PropTypes.string.isRequired,
     disabled: PropTypes.bool.isRequired,
     weight: PropTypes.number,
-    weighted: PropTypes.bool.isRequired,
+    weighted: PropTypes.bool,
     startDate: PropTypes.instanceOf(Date).isRequired,
     endDate: PropTypes.instanceOf(Date).isRequired,
     closeDate: PropTypes.instanceOf(Date).isRequired,
@@ -67,7 +67,6 @@ class GradingPeriodTemplate extends React.Component {
 
       const invalidProps = []
       each(requiredProps, (propType, propName) => {
-         
         const invalidProp = isUndefined(props[propName]) || typeof props[propName] !== propType
         if (invalidProp) invalidProps.push(propName)
       })
@@ -113,6 +112,7 @@ class GradingPeriodTemplate extends React.Component {
           value={this.props.title}
           disabled={this.props.disabled}
           ref="title"
+          data-testid="period-title-input"
         />
       )
     } else {
@@ -152,6 +152,7 @@ class GradingPeriodTemplate extends React.Component {
           className="GradingPeriod__Detail ic-Input input-grading-period-date date_field"
           defaultValue={DateHelper.formatDateForDisplay(this.props.startDate)}
           disabled={this.props.disabled}
+          data-testid="period-start-date-input"
         />
       )
     } else {
@@ -175,6 +176,7 @@ class GradingPeriodTemplate extends React.Component {
           name="endDate"
           defaultValue={DateHelper.formatDateForDisplay(this.props.endDate)}
           disabled={this.props.disabled}
+          data-testid="period-end-date-input"
         />
       )
     } else {
@@ -209,6 +211,7 @@ class GradingPeriodTemplate extends React.Component {
             className={cssClasses}
             aria-disabled={this.props.disabled}
             onClick={this.onDeleteGradingPeriod}
+            data-testid="delete-grading-period-button"
           >
             <i className="icon-x icon-delete-grading-period" />
             <span className="screenreader-only">{I18n.t('Delete grading period')}</span>
@@ -245,7 +248,7 @@ class GradingPeriodTemplate extends React.Component {
               {this.renderEndDate()}
             </div>
             <div className="col-xs-12 col-md-8 col-lg-2">
-              { }
+              {}
               <label className="ic-Label" id={postfixId('period_close_date_', this)}>
                 {I18n.t('Close Date')}
               </label>

@@ -128,7 +128,7 @@ export default function CanvasStudioPlayer({
       setContainerHeight(height)
       setContainerWidth(width)
     },
-    [type, boundingBox]
+    [type, boundingBox],
   )
 
   const fetchSources = useCallback(
@@ -141,7 +141,6 @@ export default function CanvasStudioPlayer({
         setMediaObjNetworkErr(null)
         resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e: any) {
-         
         console.warn(`Error getting ${url}`, e.message)
         setMediaObjNetworkErr(e)
         return
@@ -152,7 +151,7 @@ export default function CanvasStudioPlayer({
         setRetryAttempt(retryAttempt + 1)
       }
     },
-    [attachment_id, media_id, retryAttempt]
+    [attachment_id, media_id, retryAttempt],
   )
 
   useEffect(() => {
@@ -160,9 +159,12 @@ export default function CanvasStudioPlayer({
     // and we don't have its media_sources yet
     let retryTimerId = 0
     if (!mediaSources.length && retryAttempt <= retryAttempts) {
-      retryTimerId = window.setTimeout(() => {
-        fetchSources()
-      }, 2 ** retryAttempt * 1000)
+      retryTimerId = window.setTimeout(
+        () => {
+          fetchSources()
+        },
+        2 ** retryAttempt * 1000,
+      )
     }
 
     return () => {
@@ -208,7 +210,7 @@ export default function CanvasStudioPlayer({
         // @ts-expect-error
         <Alert key="giveupalert" variant="info" margin="x-small" liveRegion={liveRegion}>
           {I18n.t(
-            'Giving up on retrieving media sources. This issue will probably resolve itself eventually.'
+            'Giving up on retrieving media sources. This issue will probably resolve itself eventually.',
           )}
         </Alert>
       )

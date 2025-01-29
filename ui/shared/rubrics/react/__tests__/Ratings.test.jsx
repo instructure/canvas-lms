@@ -18,7 +18,6 @@
 import React from 'react'
 import $ from 'jquery'
 import {shallow} from 'enzyme'
-import sinon from 'sinon'
 import Ratings, {Rating} from '../Ratings'
 
 // This is needed for $.screenReaderFlashMessageExclusive to work.
@@ -85,12 +84,15 @@ describe('The Ratings component', () => {
   })
 
   it('calls onPointChange and flashes VO message when a rating is clicked', () => {
-    const onPointChange = sinon.spy()
+    const onPointChange = jest.fn()
     const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
     const el = component({onPointChange})
 
     el.find('Rating').first().prop('onClick').call()
-    expect(onPointChange.args[0]).toEqual([{id: '1', description: 'Superb', points: 10}, false])
+    expect(onPointChange.mock.calls[0]).toEqual([
+      {id: '1', description: 'Superb', points: 10},
+      false,
+    ])
     expect(flashMock).toHaveBeenCalledTimes(1)
     flashMock.mockRestore()
   })
@@ -161,22 +163,22 @@ describe('The Ratings component', () => {
   )
 
   it('is navigable and clickable when assessing', () => {
-    const onClick = sinon.spy()
+    const onClick = jest.fn()
     const wrapper = shallow(ratingComponent({onClick}))
     const div = wrapper.find('div').at(0)
     expect(div.prop('tabIndex')).toEqual(0)
     div.simulate('click')
-    expect(onClick.called).toBe(true)
+    expect(onClick).toHaveBeenCalled()
   })
 
   it('is not navigable or clickable when not assessing', () => {
-    const onClick = sinon.spy()
+    const onClick = jest.fn()
     const wrapper = shallow(ratingComponent({assessing: false, onClick}))
     const div = wrapper.find('div').at(0)
     expect(div.prop('tabIndex')).toBeNull()
     expect(div.prop('role')).toBeNull()
     div.simulate('click')
-    expect(onClick.called).toBe(false)
+    expect(onClick).not.toHaveBeenCalled()
   })
 
   it('only renders the single selected Rating with a footer in summary mode', () => {
@@ -212,7 +214,7 @@ describe('The Ratings component', () => {
 
   it('renders rating-points when restrictive quantitative data and hidePoints is false', () => {
     const component = shallow(
-      <Rating {...props.tiers[0]} isSummary={false} assessing={true} hidePoints={false} />
+      <Rating {...props.tiers[0]} isSummary={false} assessing={true} hidePoints={false} />,
     )
 
     expect(component.find('[data-testid="rating-points"]').exists()).toBe(true)
@@ -233,7 +235,7 @@ describe('The Ratings component', () => {
     it('does not renders rating-points when restrictive quantitative data is true and hidePoints is false', () => {
       ENV.restrict_quantitative_data = true
       const component = shallow(
-        <Rating {...props.tiers[0]} isSummary={false} assessing={true} hidePoints={false} />
+        <Rating {...props.tiers[0]} isSummary={false} assessing={true} hidePoints={false} />,
       )
 
       expect(component.find('[data-testid="rating-points"]').exists()).toBe(false)
@@ -242,7 +244,7 @@ describe('The Ratings component', () => {
     it('does not renders rubric-total when restrictive quantitative data is false and hidePoints if true', () => {
       ENV.restrict_quantitative_data = false
       const component = shallow(
-        <Rating {...props.tiers[0]} isSummary={false} assessing={true} hidePoints={true} />
+        <Rating {...props.tiers[0]} isSummary={false} assessing={true} hidePoints={true} />,
       )
 
       expect(component.find('[data-testid="rating-points"]').exists()).toBe(false)

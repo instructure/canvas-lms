@@ -16,31 +16,78 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, act} from '@testing-library/react'
 import React from 'react'
 import {Highlight} from '../Highlight'
+import {DiscussionManagerUtilityContext} from '../../../utils/constants'
+
+jest.useFakeTimers()
 
 const setup = props => {
-  return render(<Highlight {...props} />)
+  return render(
+    <DiscussionManagerUtilityContext.Provider
+      value={{focusSelector: '', setFocusSelector: jest.fn()}}
+    >
+      <Highlight {...props}>
+        <button>Test Button</button>
+      </Highlight>
+    </DiscussionManagerUtilityContext.Provider>,
+  )
 }
 
 describe('Highlight', () => {
-  it('displays the highlight', () => {
-    const {queryByTestId, container} = setup({isHighlighted: true})
-    expect(queryByTestId('isHighlighted')).toBeTruthy()
-    expect(container.querySelector('.highlight-fadeout')).toBeInTheDocument()
+  let originalWindowLocation
+
+  beforeEach(() => {
+    originalWindowLocation = window.location
+    // Create a new URL without params
+    const newUrl = new URL(window.location.href)
+    newUrl.search = ''
+    window.history.pushState({}, '', newUrl.toString())
+
+    // Mock scrollIntoView since it's not implemented in JSDOM
+    Element.prototype.scrollIntoView = jest.fn()
   })
 
-  it('displays the highlight with persist', () => {
-    delete window.location
-    window.location = {search: '?persist=1'}
-    const {container} = setup({isHighlighted: true})
+  afterEach(() => {
+    // Restore original URL
+    window.history.pushState({}, '', originalWindowLocation.href)
+    jest.clearAllMocks()
+  })
 
-    expect(container.querySelector('.highlight-discussion')).toBeInTheDocument()
+  it('displays the highlight', async () => {
+    const {getByTestId} = setup({isHighlighted: true})
+
+    await act(async () => {
+      // Allow layout effects to complete
+      await Promise.resolve()
+      // Allow setTimeout to complete
+      jest.runAllTimers()
+    })
+
+    expect(getByTestId('isHighlighted')).toBeInTheDocument()
+    expect(getByTestId('isHighlighted')).toHaveClass('highlight-fadeout')
+  })
+
+  it('displays the highlight with persist', async () => {
+    await act(async () => {
+      window.history.pushState({}, '', '?persist=1')
+    })
+
+    const {getByTestId} = setup({isHighlighted: true})
+
+    await act(async () => {
+      // Allow layout effects to complete
+      await Promise.resolve()
+      // Allow setTimeout to complete
+      jest.runAllTimers()
+    })
+
+    expect(getByTestId('isHighlighted')).toHaveClass('highlight-discussion')
   })
 
   it('does not display the highlight', () => {
     const {queryByTestId} = setup({isHighlighted: false})
-    expect(queryByTestId('isHighlighted')).toBeFalsy()
+    expect(queryByTestId('isHighlighted')).not.toBeInTheDocument()
   })
 })

@@ -127,7 +127,7 @@ const ManageOutcomesView = ({
                   },
                   {
                     count: outcomesCount || 0,
-                  }
+                  },
                 )}
               </Text>
             </Flex.Item>
@@ -191,7 +191,7 @@ const ManageOutcomesView = ({
                 isEnhanced={isEnhanced}
                 canArchive={canArchive}
               />
-            )
+            ),
           )}
         </View>
       </InfiniteScroll>
@@ -227,7 +227,7 @@ ManageOutcomesView.propTypes = {
             contextId: PropTypes.string,
             canArchive: PropTypes.bool,
           }),
-        })
+        }),
       ),
       pageInfo: PropTypes.shape({
         endCursor: PropTypes.string,

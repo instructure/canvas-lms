@@ -199,6 +199,18 @@ describe TokensController do
         expect(response.body).not_to match(/#{assigns[:token].token_hint}/)
       end
 
+      it "does not allow regenerating an expired token without a new expiration date" do
+        token = @user.access_tokens.create!(permanent_expires_at: 1.day.ago)
+        put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+        assert_status(400)
+      end
+
+      it "allows regenerating an expired token with a new expiration date" do
+        token = @user.access_tokens.create!(permanent_expires_at: 1.day.ago)
+        put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1", expires_at: 1.day.from_now } }
+        assert_status(200)
+      end
+
       it "does not allow updating someone else's token" do
         user2 = User.create!
         token = user2.access_tokens.create!

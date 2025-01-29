@@ -56,7 +56,7 @@ const TYPE_INFO = {
 
 const REASON_DESCRIPTION = {
   course_mismatch: I18n.t(
-    'Links to other courses in this resource may not be accessible by the students in this course:'
+    'Links to other courses in this resource may not be accessible by the students in this course:',
   ),
   unpublished_item: I18n.t('Unpublished content referenced in this resource:'),
   missing_item: I18n.t('Non-existent content referenced in this resource:'),
@@ -117,7 +117,7 @@ export default function ValidatorResultsRow(props) {
         <List isUnstyled={true} margin="none x-small small small">
           {links}
         </List>
-      </List.Item>
+      </List.Item>,
     )
   })
 

@@ -80,7 +80,7 @@ export function patch(Backbone) {
         action='${htmlEscape(options.url || model.url())}'
         method='POST'
       >
-      </form>`
+      </form>`,
     ).hide()
 
     // pass proxyAttachment if the upload is being proxied through canvas (deprecated)
@@ -88,8 +88,8 @@ export function patch(Backbone) {
       $form.prepend(
         `<input type='hidden' name='_method' value='${httpMethod}' />
         <input type='hidden' name='authenticity_token' value='${htmlEscape(
-          authenticity_token()
-        )}' />`
+          authenticity_token(),
+        )}' />`,
       )
     }
 

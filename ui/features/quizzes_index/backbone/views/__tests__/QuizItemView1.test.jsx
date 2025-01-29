@@ -16,12 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import Quiz from '@canvas/quizzes/backbone/models/Quiz'
-import QuizItemView from '../QuizItemView'
-import PublishIconView from '@canvas/publish-icon-view'
-import fakeENV from '@canvas/test-utils/fakeENV'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
+import PublishIconView from '@canvas/publish-icon-view'
+import Quiz from '@canvas/quizzes/backbone/models/Quiz'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {assignLocation} from '@canvas/util/globalUtils'
+import $ from 'jquery'
+import QuizItemView from '../QuizItemView'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 // Mock jQuery methods
 $.fn.tooltip = jest.fn()
@@ -85,7 +90,7 @@ const createView = (quiz, options = {}) => {
     const assignToLink = $(`
       <div class="assign-to-link">
         <a href="#" data-quiz-context-id="1" data-quiz-name="${quiz.get(
-          'title'
+          'title',
         )}" data-quiz-id="${quiz.get('id')}">
           Assign To...
         </a>
@@ -117,13 +122,6 @@ describe('QuizItemView', () => {
       },
     })
     CyoeHelper.reloadEnv()
-
-    // Mock window.location
-    delete window.location
-    window.location = {
-      href: '',
-      assign: jest.fn(),
-    }
   })
 
   afterEach(() => {
@@ -165,7 +163,7 @@ describe('QuizItemView', () => {
     const quiz = createQuiz({id: 1, title: 'Waffle', assignment_id: '80'})
     const view = createView(quiz, {canManage: true})
     expect(view.$('.speed-grader-link')[0].href).toContain(
-      '/courses/1/gradebook/speed_grader?assignment_id=80'
+      '/courses/1/gradebook/speed_grader?assignment_id=80',
     )
   })
 
@@ -178,7 +176,7 @@ describe('QuizItemView', () => {
     })
     const view = createView(quiz, {canManage: true})
     expect(view.$('.speed-grader-link')[0].href).toContain(
-      '/courses/1/gradebook/speed_grader?assignment_id=32'
+      '/courses/1/gradebook/speed_grader?assignment_id=32',
     )
   })
 
@@ -278,7 +276,7 @@ describe('QuizItemView', () => {
       expect(redirected).toBe(false)
     })
 
-    it.skip('redirects when clicking details area', () => {
+    it('redirects when clicking details area', () => {
       const quiz = createQuiz({id: 1, title: 'Foo'})
       const view = createView(quiz, {canManage: true})
 
@@ -288,7 +286,7 @@ describe('QuizItemView', () => {
       const detailsArea = view.$('.ig-details')[0]
       $(detailsArea).trigger('click')
 
-      expect(window.location.assign).toHaveBeenCalledWith('/courses/1/quizzes/1')
+      expect(assignLocation).toHaveBeenCalledWith('/courses/1/quizzes/1')
     })
   })
 })

@@ -40,7 +40,7 @@ interface RegistrationOverlayActions {
   updateRegistrationLaunchHeight: (s: string) => void
   updateRegistrationLaunchWidth: (s: string) => void
   updatePlacement: (
-    placement_type: LtiPlacement
+    placement_type: LtiPlacement,
   ) => (fn: (placementOverlay: PlacementOverlay) => PlacementOverlay) => void
   /**
    * Restore all values to their default values
@@ -167,14 +167,14 @@ const resetOverlays = (configuration: Configuration) =>
 
 export const createRegistrationOverlayStore = (
   developerKeyName: string | null,
-  ltiRegistration: LtiRegistration
+  ltiRegistration: LtiRegistration,
 ) =>
   createStore<{state: RegistrationOverlayState} & RegistrationOverlayActions>()(
     subscribeWithSelector(set => ({
       state: initialOverlayStateFromLtiRegistration(
         ltiRegistration.tool_configuration,
         ltiRegistration.overlay,
-        developerKeyName
+        developerKeyName,
       ),
       updateDevKeyName: (name: string) =>
         set(state => {
@@ -197,13 +197,13 @@ export const createRegistrationOverlayStore = (
         (fn: (placementOverlay: PlacementOverlay) => PlacementOverlay) =>
           set(updatePlacement(placement_type)(fn)),
       updatePrivacyLevel: (privacyLevel: LtiPrivacyLevel) => set(updatePrivacyLevel(privacyLevel)),
-    }))
+    })),
   )
 
 const initialOverlayStateFromLtiRegistration = (
   configuration: Configuration,
   overlay?: RegistrationOverlay | null,
-  developerKeyName?: string | null
+  developerKeyName?: string | null,
 ): RegistrationOverlayState => {
   return {
     nickname: developerKeyName || '',
@@ -232,13 +232,13 @@ export const canvasPlatformSettings = (configuration: Configuration) =>
 
 const placementsWithOverlay = (
   configuration: Configuration,
-  overlay?: RegistrationOverlay | null
+  overlay?: RegistrationOverlay | null,
 ) =>
   canvasPlatformSettings(configuration)?.settings.placements.flatMap(
     initialPlacementOverlayStateFromPlacementConfig(
       overlay?.placements || [],
-      overlay?.disabledPlacements || []
-    )
+      overlay?.disabledPlacements || [],
+    ),
   ) || []
 
 const initialPlacementOverlayStateFromPlacementConfig =

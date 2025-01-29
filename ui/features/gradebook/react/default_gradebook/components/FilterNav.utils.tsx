@@ -68,7 +68,7 @@ function useFilterDropdownData({
   const assignments = assignmentGroups.flatMap(ag => ag.assignments)
   const modulesWithGradeableAssignments = useMemo(() => {
     return modules.filter(m =>
-      assignments.some(a => a.grading_type !== 'not_graded' && (a.module_ids || []).includes(m.id))
+      assignments.some(a => a.grading_type !== 'not_graded' && (a.module_ids || []).includes(m.id)),
     )
   }, [modules, assignments])
   const {toggleFilter, toggleFilterMultiSelect} = useStore.getState()
@@ -233,7 +233,7 @@ function useFilterDropdownData({
                 id: group.id,
                 name: group.name,
                 isSelected: appliedFilters.some(
-                  c => c.type === 'student-group' && c.value === group.id
+                  c => c.type === 'student-group' && c.value === group.id,
                 ),
                 onToggle: () => {
                   const filter: Filter = {
@@ -265,7 +265,7 @@ function useFilterDropdownData({
             'excused',
             'extended',
             ...customStatusIdStrings,
-          ].includes(c.value || '')
+          ].includes(c.value || ''),
       ),
       items: [
         {
@@ -300,7 +300,7 @@ function useFilterDropdownData({
           id: '3',
           name: I18n.t('Resubmitted'),
           isSelected: appliedFilters.some(
-            c => c.type === 'submissions' && c.value === 'resubmitted'
+            c => c.type === 'submissions' && c.value === 'resubmitted',
           ),
           onToggle: () => {
             const filter: Filter = {
@@ -363,7 +363,7 @@ function useFilterDropdownData({
         id: mapCustomStatusToIdString(status),
         name: status.name,
         isSelected: appliedFilters.some(
-          c => c.type === 'submissions' && c.value === mapCustomStatusToIdString(status)
+          c => c.type === 'submissions' && c.value === mapCustomStatusToIdString(status),
         ),
         onToggle: () => {
           const filter: Filter = {
@@ -390,14 +390,14 @@ function useFilterDropdownData({
             'has-submissions',
             'has-no-submissions',
             'has-unposted-grades',
-          ].includes(c.value || '')
+          ].includes(c.value || ''),
       ),
       items: [
         {
           id: '1',
           name: I18n.t('Has Ungraded Submissions'),
           isSelected: appliedFilters.some(
-            c => c.type === 'submissions' && c.value === 'has-ungraded-submissions'
+            c => c.type === 'submissions' && c.value === 'has-ungraded-submissions',
           ),
           onToggle: () => {
             const filter: Filter = {
@@ -413,7 +413,7 @@ function useFilterDropdownData({
           id: '2',
           name: I18n.t('Has Submissions'),
           isSelected: appliedFilters.some(
-            c => c.type === 'submissions' && c.value === 'has-submissions'
+            c => c.type === 'submissions' && c.value === 'has-submissions',
           ),
           onToggle: () => {
             const filter: Filter = {
@@ -429,7 +429,7 @@ function useFilterDropdownData({
           id: '3',
           name: I18n.t('Has No Submissions'),
           isSelected: appliedFilters.some(
-            c => c.type === 'submissions' && c.value === 'has-no-submissions'
+            c => c.type === 'submissions' && c.value === 'has-no-submissions',
           ),
           onToggle: () => {
             const filter: Filter = {
@@ -445,7 +445,7 @@ function useFilterDropdownData({
           id: '4',
           name: I18n.t('Has Unposted Grades'),
           isSelected: appliedFilters.some(
-            c => c.type === 'submissions' && c.value === 'has-unposted-grades'
+            c => c.type === 'submissions' && c.value === 'has-unposted-grades',
           ),
           onToggle: () => {
             const filter: Filter = {
@@ -466,7 +466,7 @@ function useFilterDropdownData({
       name: I18n.t('Start & End Date'),
       parentId: 'savedFilterPresets',
       isSelected: appliedFilters.some(
-        f => (f.type === 'start-date' || f.type === 'end-date') && isFilterNotEmpty(f)
+        f => (f.type === 'start-date' || f.type === 'end-date') && isFilterNotEmpty(f),
       ),
       onToggle: onToggleDateModal,
     }

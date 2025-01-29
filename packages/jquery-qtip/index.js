@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable dot-notation */
 /* eslint-disable object-shorthand */
 /* eslint-disable no-extra-boolean-cast */

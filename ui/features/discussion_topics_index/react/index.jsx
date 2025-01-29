@@ -17,27 +17,26 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Provider} from 'react-redux'
 
 import {subscribeFlashNotifications} from '@canvas/notifications/redux/actions'
 import {ConnectedDiscussionsIndex} from './components/DiscussionsIndex'
 import createStore from './store'
 
-export default function createDiscussionsIndex(root, data = {}) {
+export default function createDiscussionsIndex(rootElement, data = {}) {
   const store = createStore(data)
+  const root = createRoot(rootElement)
 
   function unmount() {
-    ReactDOM.unmountComponentAtNode(root)
+    root.unmount()
   }
 
   function render() {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(
+    root.render(
       <Provider store={store}>
         <ConnectedDiscussionsIndex />
       </Provider>,
-      root
     )
   }
 

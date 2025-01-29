@@ -91,7 +91,7 @@ describe('AssignToContent', () => {
     render(
       <MockedQueryProvider>
         <AssignToContent {...props} {...propOverrides} />
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
 
   it('renders', () => {
@@ -147,7 +147,7 @@ describe('AssignToContent', () => {
 
     it('does not fetch assignee options', () => {
       setUp()
-      expect(fetchMock.calls(SECTIONS_URL).length).toBe(0)
+      expect(fetchMock.calls(SECTIONS_URL)).toHaveLength(0)
     })
   })
 

@@ -28,12 +28,12 @@ jest.mock('../GridHelper', () => {
       commitCurrentEdit: jest.fn().mockReturnValue(true),
       focus: jest.fn(),
       getBeforeGridNode: jest.fn().mockReturnValue({
-        focus: jest.fn()
+        focus: jest.fn(),
       }),
       getAfterGridNode: jest.fn().mockReturnValue({
-        focus: jest.fn()
-      })
-    }))
+        focus: jest.fn(),
+      }),
+    })),
   }
 })
 
@@ -85,17 +85,17 @@ jest.mock('../../../GradebookGrid', () => {
 jest.mock('slickgrid', () => {
   const mockEvent = {
     subscribe: jest.fn(),
-    unsubscribe: jest.fn()
+    unsubscribe: jest.fn(),
   }
 
   const mockEditors = {
-    Text: jest.fn()
+    Text: jest.fn(),
   }
 
   const GlobalEditorLock = {
     commitCurrentEdit: jest.fn().mockReturnValue(true),
     cancelCurrentEdit: jest.fn(),
-    isActive: jest.fn()
+    isActive: jest.fn(),
   }
 
   const mockGrid = jest.fn().mockImplementation(() => {
@@ -107,19 +107,11 @@ jest.mock('slickgrid', () => {
       getEditorLock: jest.fn().mockReturnValue(GlobalEditorLock),
       getCellEditor: jest.fn(),
       focus: jest.fn(),
-      getColumns: jest.fn().mockReturnValue([
-        {id: 'column1'},
-        {id: 'column2'},
-        {id: 'column3'},
-        {id: 'column4'}
-      ]),
-      getOptions: jest.fn().mockReturnValue({ numberOfColumnsToFreeze: 2 }),
-      getData: jest.fn().mockReturnValue([
-        {id: 'row1'},
-        {id: 'row2'},
-        {id: 'row3'},
-        {id: 'row4'}
-      ]),
+      getColumns: jest
+        .fn()
+        .mockReturnValue([{id: 'column1'}, {id: 'column2'}, {id: 'column3'}, {id: 'column4'}]),
+      getOptions: jest.fn().mockReturnValue({numberOfColumnsToFreeze: 2}),
+      getData: jest.fn().mockReturnValue([{id: 'row1'}, {id: 'row2'}, {id: 'row3'}, {id: 'row4'}]),
       getContainerNode: jest.fn().mockReturnValue(document.createElement('div')),
       getUID: jest.fn().mockReturnValue('test-grid-1'),
       onHeaderCellRendered: mockEvent,
@@ -130,7 +122,7 @@ jest.mock('slickgrid', () => {
       onClick: mockEvent,
       onKeyDown: mockEvent,
       gotoCell: jest.fn(),
-      editActiveCell: jest.fn()
+      editActiveCell: jest.fn(),
     }
 
     // Set up editActiveCell to be called when setting active location
@@ -148,8 +140,8 @@ jest.mock('slickgrid', () => {
     default: {
       Editors: mockEditors,
       Grid: mockGrid,
-      GlobalEditorLock
-    }
+      GlobalEditorLock,
+    },
   }
 })
 

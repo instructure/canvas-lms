@@ -36,14 +36,14 @@ describe('ApplyScoreToUngradedModal', () => {
 
   function renderComponent(overrides = {}) {
     return render(
-      <ApplyScoreToUngradedModal onApply={onApply} onClose={onClose} open={true} {...overrides} />
+      <ApplyScoreToUngradedModal onApply={onApply} onClose={onClose} open={true} {...overrides} />,
     )
   }
 
   it('includes the assignment group name when assignmentGroup is non-null', () => {
     const {getByRole} = renderComponent({assignmentGroup})
     expect(getByRole('dialog')).toHaveTextContent(
-      /Select the score that you would like to apply to ungraded artifacts in My Assignment Group/
+      /Select the score that you would like to apply to ungraded artifacts in My Assignment Group/,
     )
   })
 

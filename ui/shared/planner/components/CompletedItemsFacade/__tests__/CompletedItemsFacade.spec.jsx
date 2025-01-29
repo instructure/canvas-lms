@@ -41,7 +41,7 @@ it('displays Pills when given them', () => {
       onClick={() => {}}
       itemCount={3}
       badges={[{id: 'new_graded', text: 'Graded'}]}
-    />
+    />,
   )
   expect(wrapper.getAllByTestId('badgepill')).toHaveLength(1)
 })
@@ -59,7 +59,7 @@ it('registers itself as animatable', () => {
       animatableIndex={42}
       animatableItemIds={['1', '2', '3']}
       itemCount={3}
-    />
+    />,
   )
   expect(fakeRegister).toHaveBeenCalledWith('item', ref.current, 42, ['1', '2', '3'])
 
@@ -72,7 +72,7 @@ it('registers itself as animatable', () => {
       animatableIndex={42}
       animatableItemIds={['2', '3', '4']}
       itemCount={3}
-    />
+    />,
   )
 
   const instance = ref.current
@@ -90,7 +90,7 @@ it('renders its own NotificationBadge when asked to', () => {
       notificationBadge="newActivity"
       itemCount={3}
       animatableItemIds={['1', '2', '3']}
-    />
+    />,
   )
   expect(wrapper.getAllByText('New activity for', {exact: false})).toHaveLength(1)
 })

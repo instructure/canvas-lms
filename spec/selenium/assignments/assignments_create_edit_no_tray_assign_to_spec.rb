@@ -23,13 +23,11 @@ require_relative "page_objects/assignment_page"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/groups_common"
-require_relative "../../helpers/selective_release_common"
 
 shared_examples_for "item assign to on page during assignment creation/update" do
   include AssignmentsIndexPage
   include ItemsAssignToTray
   include ContextModulesCommon
-  include SelectiveReleaseCommon
 
   it "assigns student and saves assignment" do
     AssignmentCreateEditPage.replace_assignment_name("new test assignment")
@@ -157,11 +155,9 @@ describe "override assignees" do
   include ItemsAssignToTray
   include ContextModulesCommon
   include GroupsCommon
-  include SelectiveReleaseCommon
 
   context "basic assignee overrides" do
     before :once do
-      Account.site_admin.enable_feature!(:selective_release_edit_page)
       course_with_teacher(active_all: true)
       @assignment = Assignment.create!(context: @course, title: "Test Assignment", only_visible_to_overrides: true)
       @assignment.assignment_overrides.create!(set_type: "ADHOC")
@@ -188,7 +184,6 @@ describe "override assignees" do
 
   context "group assignments", :ignore_js_errors do
     before :once do
-      Account.site_admin.enable_feature!(:selective_release_edit_page)
       course_with_teacher(active_all: true)
       group_test_setup(3, 3, 1, true)
       @normal_assignment = Assignment.create!(context: @course, title: "Normal Assignment")
@@ -258,8 +253,6 @@ describe "override assignees" do
 
   context "assignments show page assign to", :ignore_js_errors do
     before :once do
-      Account.site_admin.enable_feature!(:selective_release_edit_page)
-
       course_with_teacher(active_all: true)
       @assignment1 = @course.assignments.create(name: "test assignment", submission_types: "online_url")
       @section1 = @course.course_sections.create!(name: "section1")

@@ -46,7 +46,7 @@ describe('File Preview Rendering', () => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
-      {preflightUrl: ''}
+      {preflightUrl: ''},
     )
     file2 = new File(
       {
@@ -58,7 +58,7 @@ describe('File Preview Rendering', () => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
-      {preflightUrl: ''}
+      {preflightUrl: ''},
     )
     file3 = new File(
       {
@@ -71,7 +71,7 @@ describe('File Preview Rendering', () => {
         updated_at: new Date().toISOString(),
         url: 'test/test/test.png',
       },
-      {preflightUrl: ''}
+      {preflightUrl: ''},
     )
     file4 = new File(
       {
@@ -84,7 +84,7 @@ describe('File Preview Rendering', () => {
         updated_at: new Date().toISOString(),
         preview_url: 'http://example.com',
       },
-      {preflightUrl: ''}
+      {preflightUrl: ''},
     )
     file5 = new File(
       {
@@ -97,7 +97,7 @@ describe('File Preview Rendering', () => {
         updated_at: new Date().toISOString(),
         preview_url: 'http://example.com',
       },
-      {preflightUrl: ''}
+      {preflightUrl: ''},
     )
     filesCollection.add(file1)
     filesCollection.add(file2)
@@ -116,7 +116,7 @@ describe('File Preview Rendering', () => {
           preview: '1',
         }}
         currentFolder={currentFolder}
-      />
+      />,
     )
     const infoButton = $('.ef-file-preview-header-info')
     expect(infoButton.attr('aria-expanded')).toBe('false')
@@ -125,7 +125,7 @@ describe('File Preview Rendering', () => {
     expect(infoButton.attr('aria-expanded')).toBe('true')
     // click it again to hide it
     infoButton.click()
-    expect($('tr:contains("Name")').length).toBe(0)
+    expect($('tr:contains("Name")')).toHaveLength(0)
     expect(infoButton.attr('aria-expanded')).toBe('false')
   })
 
@@ -137,10 +137,10 @@ describe('File Preview Rendering', () => {
           preview: '2',
         }}
         currentFolder={currentFolder}
-      />
+      />,
     )
     const arrows = $('.ef-file-preview-container-arrow-link')
-    expect(arrows.length).toBe(2)
+    expect(arrows).toHaveLength(2)
     expect((arrows[0] as HTMLAnchorElement).href).toContain('preview=1')
     expect((arrows[1] as HTMLAnchorElement).href).toContain('preview=3')
   })
@@ -153,7 +153,7 @@ describe('File Preview Rendering', () => {
           preview: '3',
         }}
         currentFolder={currentFolder}
-      />
+      />,
     )
     const downloadBtn = $('.ef-file-preview-header-download')[0]
     expect(downloadBtn).toBeInTheDocument()
@@ -178,7 +178,7 @@ describe('File Preview Rendering', () => {
           expect(url).toContain('sort=size')
           expect(url).toContain('order=desc')
         }}
-      />
+      />,
     )
 
     const closeButton = $('.ef-file-preview-header-close')[0]
@@ -195,7 +195,7 @@ describe('File Preview Rendering', () => {
           preview: '4',
         }}
         currentFolder={currentFolder}
-      />
+      />,
     )
     const iframe = $('.ef-file-preview-frame')[0]
     expect(iframe).toBeInTheDocument()
@@ -210,7 +210,7 @@ describe('File Preview Rendering', () => {
           preview: '5',
         }}
         currentFolder={currentFolder}
-      />
+      />,
     )
     const iframe = $('.ef-file-preview-frame')[0]
     expect(iframe).toBeInTheDocument()

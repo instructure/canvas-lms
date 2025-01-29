@@ -85,7 +85,7 @@ describe('HeaderInputs', () => {
     return render(
       <ApolloProvider client={mswClient}>
         <HeaderInputs {...props} />
-      </ApolloProvider>
+      </ApolloProvider>,
     )
   }
 

@@ -77,7 +77,7 @@ const Library = ({
     if (searchResults.length > 0) {
       showFlashAlert({
         message: I18n.t(
-          'There are new comment suggestions available. Press Tab to access the suggestions menu.'
+          'There are new comment suggestions available. Press Tab to access the suggestions menu.',
         ),
         srOnly: true,
       })
@@ -97,7 +97,7 @@ const Library = ({
       setShowResults(false)
       setComment(comment)
     },
-    [setComment]
+    [setComment],
   )
 
   const closeSuggestions = useCallback(() => {
@@ -157,7 +157,7 @@ Library.propTypes = {
     PropTypes.shape({
       comment: PropTypes.string.isRequired,
       _id: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   setComment: PropTypes.func.isRequired,
   isAddingComment: PropTypes.bool.isRequired,

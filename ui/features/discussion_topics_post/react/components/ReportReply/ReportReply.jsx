@@ -75,7 +75,7 @@ export const ReportReply = props => {
             <View as="div" margin="0 0 medium 0">
               <Text>
                 {I18n.t(
-                  'Reported replies will be sent to your teacher for review. You will not be able to undo this action.'
+                  'Reported replies will be sent to your teacher for review. You will not be able to undo this action.',
                 )}
               </Text>
             </View>

@@ -219,7 +219,7 @@ ContentMigration.prototype.onProgress = function (event) {
           formatScreenReaderValue: this.progressValue,
           tabindex: 0,
         }),
-        mountPoint
+        mountPoint,
       )
     }
   }

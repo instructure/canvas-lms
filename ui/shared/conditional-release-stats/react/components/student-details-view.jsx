@@ -45,7 +45,7 @@ export default class StudentDetailsView extends React.Component {
         score: number,
         trend: number,
         assignment: assignmentShape.isRequired,
-      })
+      }),
     ),
 
     selectNextStudent: func.isRequired,
@@ -177,7 +177,6 @@ export default class StudentDetailsView extends React.Component {
       <section>
         {followOnAssignments.map((item, i) => (
           <StudentAssignmentItem
-             
             key={i}
             assignment={item.assignment}
             score={item.score}

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
@@ -94,7 +94,7 @@ PaginatedCollection.prototype.fetch = function (opts) {
           _this.trigger('fetch:' + options.page, _this, response, options)
         }
         if (!((ref1 = _this.urls) != null ? ref1.next : void 0)) {
-          // eslint-disable-next-line prefer-spread
+           
           _this.trigger.apply(_this, ['fetched:last'].concat(slice.call(arguments)))
         }
         if (_this.loadAll && _this.urls.next != null) {
@@ -108,7 +108,7 @@ PaginatedCollection.prototype.fetch = function (opts) {
           return dfd.resolve(response, text, xhr)
         }
       }
-    })(this)
+    })(this),
   )
   dfd.abort = xhr.abort
   dfd.success = dfd.done
@@ -155,8 +155,7 @@ PaginatedCollection.prototype._setStateAfterFetch = function (xhr, options) {
     perPage = parseInt(url.match(this.perPageRegex)[1], 10)
     ;((base = this.options != null ? this.options : (this.options = {})).params != null
       ? base.params
-      : (base.params = {})
-    ).per_page = perPage
+      : (base.params = {})).per_page = perPage
   }
   if (this.urls.last && (match = this.urls.last.match(this.pageRegex))) {
     this.totalPages = parseInt(match[1], 10)

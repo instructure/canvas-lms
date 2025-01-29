@@ -151,7 +151,7 @@ export default function K5Announcement({
         setLoadingMore(false)
       }
     },
-    [courseId, firstAnnouncement, homeroomAnnouncements, moreHomeroomAnnouncementsURL]
+    [courseId, firstAnnouncement, homeroomAnnouncements, moreHomeroomAnnouncementsURL],
   )
 
   const currentAnnouncementIndex = useCallback(() => {
@@ -310,7 +310,7 @@ export default function K5Announcement({
           ) : (
             courseName
           )}
-        </Heading>
+        </Heading>,
       )
     }
   }

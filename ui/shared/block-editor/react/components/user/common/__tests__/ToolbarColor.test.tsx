@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
@@ -45,7 +46,7 @@ const renderComponent = (props = {}) => {
   return render(
     <Editor enabled={false}>
       <ToolbarColor tabs={baseTabs} onChange={() => {}} {...props} />
-    </Editor>
+    </Editor>,
   )
 }
 
@@ -84,7 +85,7 @@ describe('ToolbarColor', () => {
     button.click()
 
     const tabelems = screen.getAllByRole('tab')
-    expect(tabelems.length).toBe(1)
+    expect(tabelems).toHaveLength(1)
     expect(tabelems[0]).toHaveTextContent('Background')
   })
 
@@ -96,7 +97,7 @@ describe('ToolbarColor', () => {
     button.click()
 
     const tabelems = screen.getAllByRole('tab')
-    expect(tabelems.length).toBe(2)
+    expect(tabelems).toHaveLength(2)
     expect(tabelems[0]).toHaveTextContent('Background')
     expect(tabelems[1]).toHaveTextContent('Border')
   })
@@ -119,7 +120,7 @@ describe('ToolbarColor', () => {
     button.click()
 
     const tabs = getAllByRole('tab')
-    expect(tabs.length).toBe(2)
+    expect(tabs).toHaveLength(2)
     expect(tabs[0]).toHaveTextContent('Color')
     expect(tabs[1]).toHaveTextContent('Background')
   })
@@ -142,7 +143,7 @@ describe('ToolbarColor', () => {
       document
         .getElementById('foreground')
         ?.querySelectorAll('button')[0]
-        ?.getAttribute('aria-describedby')
+        ?.getAttribute('aria-describedby'),
     )
     expect(c1).toHaveTextContent(DEFAULT_FONT_COLOR)
   })

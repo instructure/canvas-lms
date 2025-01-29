@@ -16,23 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback} from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import PropTypes from 'prop-types'
+import React, {useState, useCallback} from 'react'
 
-import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
+import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
-import useFetchApi from '@canvas/use-fetch-api-hook'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
+import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import useFetchApi from '@canvas/use-fetch-api-hook'
 import {createNewCourse, getAccountsFromEnrollments} from './utils'
 
 const I18n = createI18nScope('create_course_modal')
@@ -105,8 +105,12 @@ export const CreateCourseModal = ({
   const adminFetchOpts = {
     path: '/api/v1/manageable_accounts',
     success: useCallback(accounts => {
+      // Filter out any undefined/null accounts and ensure they have names before sorting
+      const validAccounts = accounts.filter(account => account && account.name)
       setAllAccounts(
-        accounts.sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}))
+        validAccounts.sort((a, b) =>
+          a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}),
+        ),
       )
     }, []),
     params: {
@@ -132,7 +136,7 @@ export const CreateCourseModal = ({
       // eslint-disable-next-line react-hooks/rules-of-hooks
       success: useCallback(accounts => {
         setAllAccounts(
-          accounts.sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}))
+          accounts.sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'})),
         )
       }, []),
       params: {

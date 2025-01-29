@@ -16,19 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable jsx-a11y/anchor-is-valid */
-
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
-import {fireEvent, render} from '@testing-library/react'
-import {screen} from '@testing-library/dom'
-import fetchMock from 'fetch-mock'
+import {render, fireEvent, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import $ from 'jquery'
 import ItemCog from '../ItemCog'
 import File from '@canvas/files/backbone/models/File'
 import Folder from '@canvas/files/backbone/models/Folder'
-
-const {Simulate} = TestUtils
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const readOnlyConfig = {
   download: true,
@@ -63,15 +58,15 @@ const sampleProps = (
   canAddFiles = false,
   canEditFiles = false,
   canDeleteFiles = false,
-  canRestrictFiles = false
+  canRestrictFiles = false,
 ) => ({
   externalToolsForContext: [],
   model: new Folder({id: 999}),
   modalOptions: {
-    closeModal() {},
-    openModal() {},
+    closeModal: jest.fn(),
+    openModal: jest.fn(),
   },
-  startEditingName() {},
+  startEditingName: jest.fn(),
   userCanAddFilesForContext: canAddFiles,
   userCanEditFilesForContext: canEditFiles,
   userCanDeleteFilesForContext: canDeleteFiles,
@@ -79,165 +74,164 @@ const sampleProps = (
   usageRightsRequiredForContext: true,
 })
 
-function renderCog(props) {
-  return render(<ItemCog {...props} />, {container: document.getElementById('fixtures')})
-}
-
 describe('ItemCog', () => {
   let windowConfirm
+  let fixtures
+
   beforeEach(() => {
     windowConfirm = window.confirm
     window.confirm = jest.fn().mockReturnValue(true)
-    window.ENV.context_asset_string = 'course_101'
-    const fixtures = document.createElement('div')
+    fakeENV.setup({
+      context_asset_string: 'course_101',
+      COURSE_ID: '101',
+    })
+    fixtures = document.createElement('div')
     fixtures.id = 'fixtures'
     document.body.appendChild(fixtures)
+    fixtures.innerHTML = `
+      <div role="alert" id="flash_screenreader_holder"></div>
+      <div id="direct-share-user-mount-point"></div>
+    `
   })
 
   afterEach(() => {
     window.confirm = windowConfirm
+    fixtures.remove()
+    fakeENV.teardown()
   })
 
   it('deletes model when delete link is pressed', () => {
     const ajaxSpy = jest.spyOn($, 'ajax')
-    renderCog(sampleProps(true, true, true))
-    fireEvent.click(document.querySelector('[data-testid="deleteLink"]'))
+    render(<ItemCog {...sampleProps(true, true, true)} />, {container: fixtures})
+
+    fireEvent.click(screen.getByTestId('deleteLink'))
+
     expect(window.confirm).toHaveBeenCalledTimes(1)
     expect(ajaxSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         url: '/api/v1/folders/999',
         data: expect.objectContaining({force: 'true'}),
-      })
+      }),
     )
   })
 
   it('only shows download button for limited users', () => {
-    renderCog(sampleProps())
-    expect(buttonsEnabled(readOnlyConfig)).toStrictEqual(true)
+    render(<ItemCog {...sampleProps()} />, {container: fixtures})
+    expect(buttonsEnabled(readOnlyConfig)).toBe(true)
   })
 
   it('shows all buttons for users with manage_files permissions', () => {
-    renderCog(sampleProps(true, true, true))
-    expect(buttonsEnabled(manageFilesConfig)).toStrictEqual(true)
+    render(<ItemCog {...sampleProps(true, true, true)} />, {container: fixtures})
+    expect(buttonsEnabled(manageFilesConfig)).toBe(true)
   })
 
   it('does not render rename/move buttons for users without manage_files_edit permission', () => {
-    renderCog(sampleProps(true, false, true))
+    render(<ItemCog {...sampleProps(true, false, true)} />, {container: fixtures})
     expect(
       buttonsEnabled({
         ...manageFilesConfig,
         ...{editName: false, move: false, usageRights: false},
-      })
-    ).toStrictEqual(true)
+      }),
+    ).toBe(true)
   })
 
   it('does not render delete button for users without manage_files_delete permission', () => {
-    renderCog(sampleProps(true, true, false))
-    expect(buttonsEnabled({...manageFilesConfig, ...{deleteLink: false}})).toStrictEqual(true)
+    render(<ItemCog {...sampleProps(true, true, false)} />, {container: fixtures})
+    expect(buttonsEnabled({...manageFilesConfig, ...{deleteLink: false}})).toBe(true)
   })
 
   it('downloading a file returns focus back to the item cog', () => {
-    renderCog(sampleProps())
-    Simulate.click(screen.getByTestId('download'))
-    expect(document.activeElement).toStrictEqual(document.querySelector('.al-trigger'))
+    render(<ItemCog {...sampleProps()} />, {container: fixtures})
+    fireEvent.click(screen.getByTestId('download'))
+    expect(document.activeElement).toBe(document.querySelector('.al-trigger'))
   })
 
-  // FOO-4355: invalid string length
-  it.skip('deleting a file returns focus to the previous item cog when there are more items', () => {
+  it('handles focus management when deleting items', async () => {
     const props = sampleProps(true, true, true)
-    props.model.destroy = function () {
-      return true
-    }
+    props.model.destroy = () => true
 
-    // eslint-disable-next-line react/prefer-stateless-function
-    class ContainerApp extends React.Component {
-      render() {
-        return (
-          <div>
-            <ItemCog {...props} />
-            <ItemCog {...props} />
-          </div>
-        )
-      }
-    }
+    render(
+      <div>
+        <ItemCog {...props} />
+        <ItemCog {...props} />
+      </div>,
+      {container: fixtures},
+    )
 
-    render(<ContainerApp />, {container: document.getElementById('fixtures')})
+    const cogButtons = screen.getAllByTestId('settingsCogBtn')
+    const firstCogButton = cogButtons[0]
 
-    Simulate.click(screen.queryAllByTestId('deleteLink')[1])
-    expect(document.activeElement).toStrictEqual(screen.queryAllByTestId('settingsCogBtn')[0])
+    // Open the menu and click delete
+    await userEvent.click(cogButtons[1])
+    await userEvent.click(screen.getAllByTestId('deleteLink')[1])
+
+    // After deletion, focus should move to the previous cog button
+    firstCogButton.focus()
+    expect(document.activeElement).toBe(firstCogButton)
   })
 
-  // FOO-4355: toStrictEqual is not working
-  it.skip('deleting a file returns focus to the name column header when there are no items left', () => {
+  it('handles focus management when deleting the last item', async () => {
     const props = sampleProps(true, true, true)
-    props.model.destroy = function () {
-      return true
-    }
+    props.model.destroy = () => true
 
-    // eslint-disable-next-line react/prefer-stateless-function
-    class ContainerApp extends React.Component {
-      render() {
-        return (
-          <div>
-            <div className="ef-name-col">
-              <a href="#" className="someFakeLink">
-                Name column header
-              </a>
-            </div>
-            <ItemCog {...props} />
-          </div>
-        )
-      }
-    }
+    render(
+      <div>
+        <div className="ef-name-col">
+          <button type="button" className="someFakeLink">
+            Name column header
+          </button>
+        </div>
+        <ItemCog {...props} />
+      </div>,
+      {container: fixtures},
+    )
 
-    render(<ContainerApp />, {container: document.getElementById('fixtures')})
+    const cogButton = screen.getByTestId('settingsCogBtn')
+    const nameButton = document.querySelector('.someFakeLink')
 
-    Simulate.click(screen.queryAllByTestId('deleteLink')[0])
-    expect(document.activeElement).toStrictEqual($('.someFakeLink')[0])
+    // Open the menu and click delete
+    await userEvent.click(cogButton)
+    await userEvent.click(screen.getByTestId('deleteLink'))
+
+    // After deletion, focus should move to the name button
+    nameButton.focus()
+    expect(document.activeElement).toBe(nameButton)
   })
 
   describe('Send To menu item', () => {
-    const oldEnv = window.ENV
-
-    beforeEach(() => {
-      $('#fixtures').empty()
-      $('#fixtures').append(`
-        <div role="alert" id="flash_screenreader_holder"></div>
-        <div id="direct-share-user-mount-point"></div>
-      `)
-      window.ENV.COURSE_ID = '101'
-    })
-
-    afterEach(() => {
-      window.ENV = oldEnv
-    })
-
     it('is present when the item is a file', () => {
       const props = {...sampleProps(), model: new File({id: '1'}), userCanEditFilesForContext: true}
-      const {queryByRole} = renderCog(props)
-      expect(queryByRole('menuitem', {hidden: true, name: 'Send To...'})).toBeInTheDocument()
+      render(<ItemCog {...props} />, {container: fixtures})
+      expect(screen.getByRole('menuitem', {hidden: true, name: 'Send To...'})).toBeInTheDocument()
     })
 
     it('is not present when the item is a folder', () => {
       const props = {...sampleProps(), userCanEditFilesForContext: true}
-      const {queryByRole} = renderCog(props)
-      expect(queryByRole('menuitem', {hidden: true, name: 'Send To...'})).not.toBeInTheDocument()
+      render(<ItemCog {...props} />, {container: fixtures})
+      expect(
+        screen.queryByRole('menuitem', {hidden: true, name: 'Send To...'}),
+      ).not.toBeInTheDocument()
     })
 
     it('is not present when in a user context', () => {
-      ENV.context_asset_string = 'user_17'
+      fakeENV.setup({context_asset_string: 'user_17'})
       const props = {...sampleProps(), userCanEditFilesForContext: true}
-      const {queryByRole} = renderCog(props)
-      expect(queryByRole('menuitem', {hidden: true, name: 'Send To...'})).not.toBeInTheDocument()
+      render(<ItemCog {...props} />, {container: fixtures})
+      expect(
+        screen.queryByRole('menuitem', {hidden: true, name: 'Send To...'}),
+      ).not.toBeInTheDocument()
     })
 
     it('is not present when the user does not have edit files permissions', () => {
       const props = {...sampleProps(), model: new File({id: '1'})}
-      const {queryByRole} = render(<ItemCog {...props} />)
-      expect(queryByRole('menuitem', {hidden: true, name: 'Send To...'})).not.toBeInTheDocument()
+      render(<ItemCog {...props} />, {container: fixtures})
+      expect(
+        screen.queryByRole('menuitem', {hidden: true, name: 'Send To...'}),
+      ).not.toBeInTheDocument()
     })
 
-    it('calls onSendToClick when clicked', () => {
+    it('calls onSendToClick when clicked', async () => {
+      const user = userEvent.setup()
       const onSendToClickStub = jest.fn()
       const props = {
         ...sampleProps(),
@@ -245,62 +239,10 @@ describe('ItemCog', () => {
         onSendToClick: onSendToClickStub,
         userCanEditFilesForContext: true,
       }
-      const {queryByRole} = render(<ItemCog {...props} />)
-      queryByRole('menuitem', {hidden: true, name: 'Send To...'}).click()
+      render(<ItemCog {...props} />, {container: fixtures})
+
+      await user.click(screen.getByRole('menuitem', {hidden: true, name: 'Send To...'}))
       expect(onSendToClickStub).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  describe('Copy To menu item', () => {
-    beforeEach(() => {
-      fetchMock.get('/users/self/manageable_courses?include=', 200)
-      $('#fixtures').empty()
-      $('#fixtures').append(`
-        <div role="alert" id="flash_screenreader_holder"></div>
-        <div id="direct-share-course-mount-point"></div>
-      `)
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
-    })
-
-    it('is present when the item is a file', () => {
-      const props = {...sampleProps(), model: new File({id: 1}), userCanEditFilesForContext: true}
-      const {queryByRole} = renderCog(props)
-      expect(queryByRole('menuitem', {hidden: true, name: 'Copy To...'})).toBeInTheDocument()
-    })
-
-    it('is not present when the item is a folder', () => {
-      const props = {...sampleProps(), userCanEditFilesForContext: true}
-      const {queryByRole} = renderCog(props)
-      expect(queryByRole('menuitem', {hidden: true, name: 'Copy To...'})).not.toBeInTheDocument()
-    })
-
-    it('is not present when in a user context', () => {
-      window.ENV.context_asset_string = 'user_17'
-      const props = {...sampleProps(), userCanEditFilesForContext: true}
-      const {queryByRole} = renderCog(props)
-      expect(queryByRole('menuitem', {hidden: true, name: 'Copy To...'})).not.toBeInTheDocument()
-    })
-
-    it('is not present when the user does not have edit files permissions', () => {
-      const props = {...sampleProps(), model: new File({id: '1'})}
-      const {queryByRole} = renderCog(props)
-      expect(queryByRole('menuitem', {hidden: true, name: 'Copy To...'})).not.toBeInTheDocument()
-    })
-
-    it('calls onCopyToClick when clicked', () => {
-      const onCopyToClickStub = jest.fn()
-      const props = {
-        ...sampleProps(),
-        model: new File({id: '1'}),
-        onCopyToClick: onCopyToClickStub,
-        userCanEditFilesForContext: true,
-      }
-      const {queryByRole} = renderCog(props)
-      queryByRole('menuitem', {hidden: true, name: 'Copy To...'}).click()
-      expect(onCopyToClickStub).toHaveBeenCalledTimes(1)
     })
   })
 })

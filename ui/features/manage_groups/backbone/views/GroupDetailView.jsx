@@ -74,7 +74,7 @@ export default class GroupDetailView extends View {
 
   editGroup(e, open = true) {
     if (e) e.preventDefault()
-     
+
     ReactDOM.render(
       <GroupModal
         group={{
@@ -95,13 +95,13 @@ export default class GroupDetailView extends View {
           this.$editGroupLink.focus()
         }}
       />,
-      document.getElementById('group-mount-point')
+      document.getElementById('group-mount-point'),
     )
   }
 
   deleteGroup(e) {
     e.preventDefault()
-     
+
     if (confirm(I18n.t('delete_confirm', 'Are you sure you want to remove this group?'))) {
       if (groupHasSubmissions(this.model)) {
         this.cloneCategoryView = new GroupCategoryCloneView({
@@ -133,7 +133,7 @@ export default class GroupDetailView extends View {
       },
       error() {
         return $.flashError(
-          I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')
+          I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.'),
         )
       },
     })

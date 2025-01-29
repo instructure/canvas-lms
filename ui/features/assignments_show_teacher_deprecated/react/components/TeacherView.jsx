@@ -239,7 +239,7 @@ export default class TeacherView extends React.Component {
               })),
             },
           })
-        }
+        },
       )
     } else {
       showFlashAlert({
@@ -274,7 +274,7 @@ export default class TeacherView extends React.Component {
       if (state.isTogglingWorkstate) {
         workingAssignment = this.updateWorkingAssignment(
           'state',
-          workingAssignment.state === 'published' ? 'unpublished' : 'published'
+          workingAssignment.state === 'published' ? 'unpublished' : 'published',
         )
       }
       return {
@@ -344,7 +344,7 @@ export default class TeacherView extends React.Component {
             // save everything
             this.handleSave(saveAssignment)
           }
-        }
+        },
       )
     } else {
       showFlashAlert({

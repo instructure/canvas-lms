@@ -37,6 +37,7 @@ module Api::V1::Token
                              workflow_state],
                     methods: %w[app_name visible_token])
     hash[:expires_at] = hash.delete(:permanent_expires_at)
+    hash[:can_manually_regenerate] = token.can_manually_regenerate?
     hash
   end
 end

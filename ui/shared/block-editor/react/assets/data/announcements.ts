@@ -128,7 +128,7 @@ export const announcements: Announcement[] = JSON.parse(
       "summary_enabled": false
   }
 ]
-  `
+  `,
 )
 
 export const users = JSON.parse(`[

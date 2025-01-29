@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -29,7 +28,7 @@ import {
 } from '../../../../__tests__/fixtures'
 import {renderConnected} from '../../../../__tests__/utils'
 
-import {Settings} from '../settings'
+import {Settings, type ComponentProps} from '../settings'
 import type {CoursePace} from 'features/course_paces/react/types'
 
 const loadLatestPaceByContext = jest.fn()
@@ -38,18 +37,15 @@ const toggleExcludeWeekends = jest.fn()
 const toggleSelectedDaysToSkip = jest.fn()
 const updateBlackoutDates = jest.fn()
 
-const defaultProps = {
+const defaultProps: ComponentProps = {
   blackoutDates: BLACKOUT_DATES,
-  course: COURSE,
-  courseId: COURSE.id,
-  excludeWeekends: PRIMARY_PACE.exclude_weekends,
   coursePace: PRIMARY_PACE,
   isSyncing: false,
-  loadLatestPaceByContext,
-  showLoadingOverlay,
   toggleExcludeWeekends,
   toggleSelectedDaysToSkip,
   updateBlackoutDates,
+  isBlueprintLocked: false,
+  responsiveSize: 'large',
 }
 
 beforeAll(() => {
@@ -124,14 +120,14 @@ describe('Settings', () => {
 
     it('toggles the associated setting when the checkboxes are clicked', () => {
       renderConnected(<Settings {...defaultProps} />)
-      const settingsButton = screen.queryByRole('button', {name: 'Modify Settings'})
+      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
       act(() => settingsButton.click())
 
-      const skipSelectedDaysOption = screen.queryByRole('menuitem', {name: 'Skip Selected Days'})
+      const skipSelectedDaysOption = screen.getByRole('menuitem', {name: 'Skip Selected Days'})
       act(() => skipSelectedDaysOption.click())
 
-      const mondaysOption = screen.queryByRole('menuitemcheckbox', {name: 'Mondays'})
-      const fridaysOption = screen.queryByRole('menuitemcheckbox', {name: 'Fridays'})
+      const mondaysOption = screen.getByRole('menuitemcheckbox', {name: 'Mondays'})
+      const fridaysOption = screen.getByRole('menuitemcheckbox', {name: 'Fridays'})
 
       expect(mondaysOption).not.toBeDisabled()
       expect(fridaysOption).not.toBeDisabled()
@@ -151,7 +147,7 @@ describe('Settings', () => {
       const state = {...DEFAULT_STORE_STATE, coursePace}
 
       renderConnected(<Settings {...defaultProps} />, state)
-      const settingsButton = screen.queryByRole('button', {name: 'Modify Settings'})
+      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
       act(() => settingsButton.click())
 
       const selectedDaysCounterPill = screen.getByTestId('selected_days_counter')
@@ -166,10 +162,10 @@ describe('Settings', () => {
     })
     it('toggles the associated setting when the checkboxes are clicked', () => {
       renderConnected(<Settings {...defaultProps} />)
-      const settingsButton = screen.queryByRole('button', {name: 'Modify Settings'})
+      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
       act(() => settingsButton.click())
 
-      const skipWeekendsToggle = screen.queryByRole('menuitemcheckbox', {name: 'Skip Weekends'})
+      const skipWeekendsToggle = screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})
       expect(skipWeekendsToggle).not.toBeDisabled()
       act(() => skipWeekendsToggle.click())
       expect(toggleExcludeWeekends).toHaveBeenCalled()
@@ -202,7 +198,7 @@ describe('Settings', () => {
       act(() => settingsButton.click())
 
       expect(
-        screen.queryByRole('menuitem', {name: 'Manage Blackout Dates'})
+        screen.queryByRole('menuitem', {name: 'Manage Blackout Dates'}),
       ).not.toBeInTheDocument()
       expect(screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})).toBeInTheDocument()
     })

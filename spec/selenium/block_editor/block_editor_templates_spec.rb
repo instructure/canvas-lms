@@ -66,7 +66,6 @@ describe "Block Editor templates", :ignore_js_errors do
     end
 
     it "can save a section template" do
-      skip("RCX-2772")
       block_toolbar_action("go-up").click
       block_toolbar_action("save-template").click
       expect(edit_template_modal_text_input_template_name).to be_displayed
@@ -135,7 +134,6 @@ describe "Block Editor templates", :ignore_js_errors do
     end
 
     it "can create a global section template" do
-      skip("RCX-2772")
       block_toolbar_action("save-template").click
       edit_template_modal_text_input_template_name.send_keys("global section")
       edit_template_modal_text_area_template_description.send_keys("create a global section template")
@@ -147,7 +145,6 @@ describe "Block Editor templates", :ignore_js_errors do
     end
 
     it "can create a global page template" do
-      skip("RCX-2772")
       block_toolbar_action("go-up").click
       block_toolbar_action("save-template").click
       edit_template_modal_text_input_template_name.send_keys("global page template")

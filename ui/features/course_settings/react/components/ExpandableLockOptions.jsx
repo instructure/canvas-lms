@@ -136,7 +136,7 @@ export default class ExpandableLockOptions extends React.Component {
   renderLockIcon() {
     const hasLocks = Object.keys(this.state.locks).reduce(
       (isLocked, lockProp) => isLocked || this.state.locks[lockProp],
-      false
+      false,
     )
     const Icon = hasLocks ? (
       <IconLock data-testid="lock-icon" />

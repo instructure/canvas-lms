@@ -91,7 +91,7 @@ export const extractDataTurnitin = function (submission: SubmissionWithOriginali
 export const extractDataForTurnitin = function (
   submission: SubmissionWithOriginalityReport,
   key: string,
-  urlPrefix: string
+  urlPrefix: string,
 ) {
   let data, type
   data = submission?.turnitin_data

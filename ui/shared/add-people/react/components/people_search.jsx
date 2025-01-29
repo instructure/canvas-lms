@@ -112,14 +112,14 @@ class PeopleSearch extends React.Component {
       case 'sis_user_id':
         exampleText = 'student_2708, student_3693'
         description = I18n.t(
-          'Enter the SIS IDs of the users you would like to add, separated by commas or line breaks'
+          'Enter the SIS IDs of the users you would like to add, separated by commas or line breaks',
         )
         inputLabel = I18n.t('SIS IDs (required)')
         break
       case 'unique_id':
         exampleText = 'lsmith, mfoster'
         description = I18n.t(
-          'Enter the login IDs of the users you would like to add, separated by commas or line breaks'
+          'Enter the login IDs of the users you would like to add, separated by commas or line breaks',
         )
         inputLabel = I18n.t('Login IDs (required)')
         break
@@ -127,7 +127,7 @@ class PeopleSearch extends React.Component {
       default:
         exampleText = 'lsmith@myschool.edu, mfoster@myschool.edu'
         description = I18n.t(
-          'Enter the email addresses of the users you would like to add, separated by commas or line breaks'
+          'Enter the email addresses of the users you would like to add, separated by commas or line breaks',
         )
         inputLabel = I18n.t('Email Addresses (required)')
     }

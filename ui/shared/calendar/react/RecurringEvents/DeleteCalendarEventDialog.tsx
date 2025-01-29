@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -31,7 +32,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Event, Which} from './types'
+import type {Event, Which} from './types'
 import {subAssignmentOrOverride} from '@canvas/calendar/jquery/CommonEvent/SubAssignment'
 
 const I18n = createI18nScope('calendar_event')
@@ -69,7 +70,7 @@ const DeleteCalendarEventDialog = ({
       }
       onCancel()
     },
-    [onCancel]
+    [onCancel],
   )
 
   const handleDelete = useCallback(() => {
@@ -161,13 +162,13 @@ const DeleteCalendarEventDialog = ({
       <Text>
         {eventType === 'assignment'
           ? I18n.t(
-              'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.'
+              'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.',
             )
           : subAssignmentOrOverride(eventType)
-          ? I18n.t(
-              'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment and other checkpoints associated with the assignment.'
-            )
-          : I18n.t('Are you sure you want to delete this event?')}
+            ? I18n.t(
+                'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment and other checkpoints associated with the assignment.',
+              )
+            : I18n.t('Are you sure you want to delete this event?')}
       </Text>
     )
   }
@@ -189,7 +190,6 @@ const DeleteCalendarEventDialog = ({
 }
 
 function renderDeleteCalendarEventDialog(element: Element, props: Props): void {
-   
   ReactDOM.render(<DeleteCalendarEventDialog {...props} />, element)
 }
 

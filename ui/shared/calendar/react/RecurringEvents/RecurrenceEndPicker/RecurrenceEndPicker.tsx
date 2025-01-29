@@ -158,7 +158,7 @@ export const UntilValidator = {
     start: moment.Moment,
     until: moment.Moment,
     freq: FrequencyValue,
-    interval: number
+    interval: number,
   ): number {
     const days = until.diff(start, UntilValidator.freq2Diff(freq))
     return Math.floor(days / interval) + 1
@@ -171,7 +171,7 @@ export const UntilValidator = {
     mode: ModeValues,
     freq: FrequencyValue,
     interval: number,
-    courseEndAt: string | undefined
+    courseEndAt: string | undefined,
   ): InstuiMessage[] | undefined => {
     if (mode === 'AFTER') {
       return UntilValidator.hint(courseEndAt)
@@ -216,11 +216,11 @@ export default function RecurrenceEndPicker({
     return start.add(1, 'year').format('YYYY-MM-DDTHH:mm:ssZ')
   })
   const [countNumber, setCountNumber] = useState<number | undefined>(
-    CountValidator.makeDefaultCount(count)
+    CountValidator.makeDefaultCount(count),
   )
   const [countValue, setCountValue] = useState<string>(countNumber?.toString() || '')
   const [countMessage, setCountMessage] = useState<InstuiMessage[] | undefined>(
-    CountValidator.hint()
+    CountValidator.hint(),
   )
 
   const dateFormatter = new Intl.DateTimeFormat(locale, {
@@ -267,7 +267,7 @@ export default function RecurrenceEndPicker({
         onChange({until: undefined, count: undefined})
       }
     },
-    [onChange]
+    [onChange],
   )
 
   const handleModeChange = useCallback(
@@ -281,7 +281,7 @@ export default function RecurrenceEndPicker({
       setMode(newMode)
       fireOnChange(newMode, untilDate, countNumber)
     },
-    [fireOnChange, untilDate, countNumber]
+    [fireOnChange, untilDate, countNumber],
   )
 
   const handleCountChange = useCallback(
@@ -298,7 +298,7 @@ export default function RecurrenceEndPicker({
         fireOnChange(mode, untilDate, undefined)
       }
     },
-    [fireOnChange, mode, untilDate]
+    [fireOnChange, mode, untilDate],
   )
 
   const handleDateChange = useCallback(
@@ -316,7 +316,7 @@ export default function RecurrenceEndPicker({
       setUntilDate(newISODate)
       fireOnChange(mode, newISODate, countNumber)
     },
-    [timezone, untilDate, fireOnChange, mode, countNumber]
+    [timezone, untilDate, fireOnChange, mode, countNumber],
   )
 
   const gridStyle = {
@@ -361,7 +361,7 @@ export default function RecurrenceEndPicker({
             mode,
             freq,
             interval,
-            formatCourseEndDate(courseEndAt)
+            formatCourseEndDate(courseEndAt),
           )}
         />
         <div style={alignMe}>

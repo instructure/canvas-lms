@@ -64,7 +64,7 @@ describe('BlueprintCourse app', () => {
     blueprint.app.showChangeLog = jest.fn()
     blueprint.routes[0].onEnter(
       {params: {blueprintType: 'template', templateId: '2', changeId: '3'}},
-      () => {}
+      () => {},
     )
     expect(blueprint.app.showChangeLog).toHaveBeenCalledTimes(1)
     expect(blueprint.app.showChangeLog).toHaveBeenCalledWith({

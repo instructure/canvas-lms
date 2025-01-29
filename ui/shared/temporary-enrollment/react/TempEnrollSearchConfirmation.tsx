@@ -28,15 +28,17 @@ import type {User, DuplicateUser} from './types'
 import {Alert} from '@instructure/ui-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
+import {IconWarningSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('temporary_enrollment')
 
 interface Props {
   foundUsers: User[]
   duplicateUsers: Record<string, DuplicateUser[]>
-  searchFailure: Function
-  readySubmit: Function
+  searchFailure: () => void
+  readySubmit: (enrollments: User[]) => void
   canReadSIS: boolean
+  duplicateReq: boolean
 }
 
 export function TempEnrollSearchConfirmation(props: Props) {
@@ -44,6 +46,7 @@ export function TempEnrollSearchConfirmation(props: Props) {
   const [loading, setLoading] = useState<boolean>(false)
   // @ts-expect-error
   const [selectedDupes, setSelectedDupes] = useState<Record<string, DuplicateUser | null>>([])
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false)
 
   useEffect(() => {
     const processFoundUsers = async (users: User[]) => {
@@ -80,7 +83,6 @@ export function TempEnrollSearchConfirmation(props: Props) {
 
     const templateSelectedUsers = () => {
       const emptyMap: Record<string, DuplicateUser | null> = {}
-
       for (const duplicatePair in props.duplicateUsers) {
         emptyMap[duplicatePair] = null
       }
@@ -96,6 +98,12 @@ export function TempEnrollSearchConfirmation(props: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.duplicateUsers, props.foundUsers])
+
+  useEffect(() => {
+    if (props.duplicateReq) {
+      setAttemptedSubmit(true)
+    }
+  }, [props.duplicateReq])
 
   // user_lists.json does not always return email, sis id, and login
   const fetchUserDetails = async (user: User) => {
@@ -157,9 +165,17 @@ export function TempEnrollSearchConfirmation(props: Props) {
   }
 
   const renderDupeTables = (key: string, dupePair: DuplicateUser[]) => {
+    const isError = selectedDupes[key] === null && attemptedSubmit
+    const color = isError ? 'danger' : 'primary'
     return (
       <Flex.Item key={`dupepair_${key}`}>
-        <Text>{I18n.t('Possible matches for "%{key}". Select the desired one below.', {key})}</Text>
+        <Flex gap="x-small">
+          {isError ? <IconWarningSolid color="error" /> : null}
+          <Text color={color}>
+            {I18n.t('Possible matches for "%{key}". Select the desired one below.', {key})}
+            <Text color={color}> *</Text>
+          </Text>
+        </Flex>
         <Table
           caption={
             <Text>
@@ -231,7 +247,7 @@ export function TempEnrollSearchConfirmation(props: Props) {
             one: 'One user is ready to be assigned temporary enrollments.',
             other: '%{count} users are ready to be assigned temporary enrollments',
           },
-          {count: userCount}
+          {count: userCount},
         )}
       </Alert>
     )

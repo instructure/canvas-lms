@@ -33,7 +33,7 @@ export function handleConstraintChange(setProp: SetPropFn) {
     _e: React.MouseEvent<ViewOwnProps, MouseEvent>,
     value: MenuItemProps['value'] | MenuItemProps['value'][],
     _selected: MenuItemProps['selected'],
-    _args: MenuItem
+    _args: MenuItem,
   ) => {
     const constraint = value as ImageConstraint | 'aspect-ratio'
     if (constraint === 'aspect-ratio') {
@@ -55,7 +55,7 @@ export function handleChangeSzVariant(setProp: SetPropFn, node: {dom: HTMLElemen
     _e: React.MouseEvent<ViewOwnProps, MouseEvent>,
     value: MenuItemProps['value'] | MenuItemProps['value'][],
     _selected: MenuItemProps['selected'],
-    _args: MenuItem
+    _args: MenuItem,
   ) => {
     setProp((prps: ImageBlockProps) => {
       prps.sizeVariant = value as SizeVariant

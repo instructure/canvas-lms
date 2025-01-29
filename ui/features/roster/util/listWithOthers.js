@@ -44,7 +44,7 @@ export default function listWithOthers(strings, cutoff = 2) {
               ${raw(strOrArray.map(str => `<li>${h(str)}</li>`).join(''))}
             </ul>
           </span>
-        </span>`
-    )
+        </span>`,
+    ),
   )
 }

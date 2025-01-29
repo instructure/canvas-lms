@@ -29,20 +29,18 @@ $(document).ready(function () {
     event.preventDefault()
     const $link = $(this)
     if ($link.attr('data-state') === 'none') {
-       
       const result = window.confirm(
-        I18n.t('prompts.delete_avatar', "Are you sure you want to delete this user's profile pic?")
+        I18n.t('prompts.delete_avatar', "Are you sure you want to delete this user's profile pic?"),
       )
       if (!result) {
         return
       }
     } else if ($link.attr('data-state') === 'locked') {
-       
       const result = window.confirm(
         I18n.t(
           'prompts.lock_avatar',
-          'Locking this picture will approve it and prevent the user from updating it.  Continue?'
-        )
+          'Locking this picture will approve it and prevent the user from updating it.  Continue?',
+        ),
       )
       if (!result) {
         return
@@ -82,7 +80,7 @@ $(document).ready(function () {
           .find('.progress')
           .text(I18n.t('errors.update_failed', 'Update failed, please try again'))
           .css('visibility', 'visible')
-      }
+      },
     )
   })
 })

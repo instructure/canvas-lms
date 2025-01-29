@@ -47,7 +47,7 @@ export const anchorTag = (
     url: string
     title?: string
   },
-  innerHTML?: string
+  innerHTML?: string,
 ) => {
   const anchorTagEl = document.createElement('a')
   anchorTagEl.setAttribute('href', safeUrl(item.url))
@@ -61,7 +61,7 @@ export const imageTag = (
   url: string,
   text?: string,
   width?: string | number,
-  height?: string | number
+  height?: string | number,
 ) => {
   const imgTag = document.createElement('img')
   imgTag.setAttribute('src', url)

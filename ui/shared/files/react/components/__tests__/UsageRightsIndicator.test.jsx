@@ -40,7 +40,7 @@ describe('UsageRightsIndicator', () => {
 
   it('renders nothing for folders', () => {
     const {container} = render(
-      <UsageRightsIndicator {...defaultProps} model={new Folder({id: 3})} />
+      <UsageRightsIndicator {...defaultProps} model={new Folder({id: 3})} />,
     )
     expect(container).toBeEmptyDOMElement()
   })
@@ -51,7 +51,7 @@ describe('UsageRightsIndicator', () => {
         {...defaultProps}
         usageRightsRequiredForContext={false}
         model={new File({id: 4})}
-      />
+      />,
     )
     expect(container).toBeEmptyDOMElement()
   })
@@ -62,7 +62,7 @@ describe('UsageRightsIndicator', () => {
         {...defaultProps}
         model={new File({id: 4})}
         userCanEditFilesForContext={true}
-      />
+      />,
     )
     const button = screen.getByRole('button')
     expect(button).toBeInTheDocument()
@@ -78,7 +78,7 @@ describe('UsageRightsIndicator', () => {
         model={new File({id: 4})}
         userCanEditFilesForContext={true}
         modalOptions={{openModal}}
-      />
+      />,
     )
 
     await userEvent.click(screen.getByRole('button'))
@@ -92,12 +92,12 @@ describe('UsageRightsIndicator', () => {
         model={new File({id: 4})}
         userCanEditFilesForContext={true}
         suppressWarning={false}
-      />
+      />,
     )
 
     expect(screen.getByRole('button')).toHaveAttribute(
       'title',
-      'Before publishing this file, you must specify usage rights.'
+      'Before publishing this file, you must specify usage rights.',
     )
   })
 
@@ -108,7 +108,7 @@ describe('UsageRightsIndicator', () => {
         model={new File({id: 4})}
         userCanEditFilesForContext={true}
         suppressWarning={true}
-      />
+      />,
     )
 
     expect(screen.getByRole('button')).toHaveAttribute('title', 'Manage usage rights')
@@ -126,7 +126,7 @@ describe('UsageRightsIndicator', () => {
           {...defaultProps}
           model={new File({id: 4, usage_rights})}
           userCanEditFilesForContext={true}
-        />
+        />,
       )
 
       const indicator = screen.getByRole('button')
@@ -146,7 +146,7 @@ describe('UsageRightsIndicator', () => {
           {...defaultProps}
           model={new File({id: 4, usage_rights})}
           userCanEditFilesForContext={true}
-        />
+        />,
       )
 
       const indicator = screen.getByRole('button')

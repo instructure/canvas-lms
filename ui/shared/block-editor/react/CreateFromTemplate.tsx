@@ -31,7 +31,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {getGlobalPageTemplates} from '@canvas/block-editor/react/assets/globalTemplates'
 import TemplateCardSkeleton from './components/create_from_templates/TemplateCardSekeleton'
 import QuickLook from './components/create_from_templates/QuickLook'
@@ -42,11 +41,9 @@ import {TagSelect, AvailableTags} from './components/create_from_templates/TagSe
 
 const I18n = createI18nScope('block-editor')
 
-declare const ENV: GlobalEnv & {WIKI_PAGE: object}
-
-export default function CreateFromTemplate(props: {course_id: string}) {
+export default function CreateFromTemplate(props: {course_id: string, noBlocks: boolean }) {
   const {actions} = useEditor()
-  const [isOpen, setIsOpen] = useState<boolean>(!ENV.WIKI_PAGE)
+  const [isOpen, setIsOpen] = useState<boolean>(props.noBlocks)
   const [displayType, setDisplayType] = useState<DisplayType>('grid')
   const [quickLookTemplate, setQuickLookTemplate] = useState<BlockTemplate | undefined>(undefined)
   const [blockTemplates, setBlockTemplates] = useState<BlockTemplate[]>([])
@@ -91,9 +88,9 @@ export default function CreateFromTemplate(props: {course_id: string}) {
             template =>
               lcval.length < 3 ||
               template.name.toLowerCase().includes(lcval) ||
-              template.description?.toLowerCase().includes(lcval)
+              template.description?.toLowerCase().includes(lcval),
           )
-          .map(template => template.id)
+          .map(template => template.id),
       )
       const tagIds = new Set(
         blockTemplates
@@ -102,7 +99,7 @@ export default function CreateFromTemplate(props: {course_id: string}) {
               return template.tags?.includes(tag)
             })
           })
-          .map(template => template.id)
+          .map(template => template.id),
       )
       const foundIds =
         typeof Set.prototype.intersection === 'function'
@@ -111,7 +108,7 @@ export default function CreateFromTemplate(props: {course_id: string}) {
 
       setFoundTemplateIds(foundIds)
     },
-    [blockTemplates]
+    [blockTemplates],
   )
 
   useEffect(() => {
@@ -122,7 +119,7 @@ export default function CreateFromTemplate(props: {course_id: string}) {
     (_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
       setSearchString(value)
     },
-    []
+    [],
   )
 
   const handleClearAllFilters = useCallback(() => {
@@ -137,7 +134,7 @@ export default function CreateFromTemplate(props: {course_id: string}) {
     (tag: string) => {
       setSelectedTags(selectedTags.filter(t => t !== tag))
     },
-    [selectedTags]
+    [selectedTags],
   )
 
   const renderClearSearch = () => {
@@ -165,7 +162,7 @@ export default function CreateFromTemplate(props: {course_id: string}) {
         <Text lineHeight="condensed">
           <div>
             {I18n.t(
-              'Start from a blank page or select a pre-designed layout ready to be filled with your content.'
+              'Start from a blank page or select a pre-designed layout ready to be filled with your content.',
             )}
           </div>
           <div
@@ -243,7 +240,7 @@ export default function CreateFromTemplate(props: {course_id: string}) {
           />
           {blockTemplates
             .filter(
-              template => foundTemplateIds.length > 0 && foundTemplateIds.includes(template.id)
+              template => foundTemplateIds.length > 0 && foundTemplateIds.includes(template.id),
             )
             .sort((a, b) => {
               return a.name.localeCompare(b.name)

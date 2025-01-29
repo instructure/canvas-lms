@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -26,7 +24,7 @@ import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.instructure_forms'
 import * as tz from '@instructure/moment-utils'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import DelayedPublishDialog from '../../react/components/DelayedPublishDialog'
 
 const I18n = createI18nScope('publish_btn_module')
@@ -76,6 +74,8 @@ export default (function (superClass) {
     '.dpd-mount': '$dpd_mount',
   }
 
+  PublishButton.prototype.dpdRoot = null
+
   PublishButton.prototype.initialize = function () {
     let ref
     PublishButton.__super__.initialize.apply(this, arguments)
@@ -88,7 +88,7 @@ export default (function (superClass) {
                 return _this.disable()
               }
             }
-          })(this)
+          })(this),
         )
       : void 0
   }
@@ -165,7 +165,7 @@ export default (function (superClass) {
           _this.setFocusToElement()
           if (
             !['discussion_topic', 'quiz', 'assignment'].includes(
-              _this.model.attributes.module_type
+              _this.model.attributes.module_type,
             ) ||
             (_this.model.attributes.module_type === 'discussion_topic' &&
               !((ref = _this.$el[0]) != null
@@ -180,11 +180,11 @@ export default (function (superClass) {
             '#speed-grader-container-' +
               _this.model.attributes.module_type +
               '-' +
-              _this.model.attributes.content_id
+              _this.model.attributes.content_id,
           )
           return $sgLink.removeClass('hidden')
         }
-      })(this)
+      })(this),
     )
   }
 
@@ -203,11 +203,11 @@ export default (function (superClass) {
               '#speed-grader-container-' +
                 _this.model.attributes.module_type +
                 '-' +
-                _this.model.attributes.content_id
+                _this.model.attributes.content_id,
             )
             return $sgLink.addClass('hidden')
           }
-        })(this)
+        })(this),
       )
       .fail(
         (function (_this) {
@@ -219,7 +219,7 @@ export default (function (superClass) {
             _this.renderPublished()
             return _this.setFocusToElement()
           }
-        })(this)
+        })(this),
       )
   }
 
@@ -269,7 +269,7 @@ export default (function (superClass) {
         this.publishedClass +
         ' ' +
         this.unpublishClass +
-        ' published-status restricted'
+        ' published-status restricted',
     )
     this.$icon.removeClass('icon-publish icon-unpublish icon-unpublished')
     return this.$el.removeAttr('title aria-label')
@@ -395,7 +395,7 @@ export default (function (superClass) {
     // Grade permission.
     if (this.model.get('disabledForModeration')) {
       return this.disableWithMessage(
-        'You do not have permissions to edit this moderated assignment'
+        'You do not have permissions to edit this moderated assignment',
       )
       // unpublishable (i.e., able to be unpublished)
     } else if (this.model.get('unpublishable') == null || this.model.get('unpublishable')) {
@@ -439,12 +439,18 @@ export default (function (superClass) {
       })(this),
       onClose: (function (_this) {
         return function () {
-          return ReactDOM.unmountComponentAtNode(_this.$dpd_mount[0])
+          if (_this.dpdRoot) {
+            _this.dpdRoot.unmount()
+            _this.dpdRoot = null
+          }
         }
       })(this),
     }
-    // eslint-disable-next-line react/no-render-return-value
-    return ReactDOM.render(React.createElement(DelayedPublishDialog, props), this.$dpd_mount[0])
+    if (this.dpdRoot) {
+      this.dpdRoot.unmount()
+    }
+    this.dpdRoot = createRoot(this.$dpd_mount[0])
+    return this.dpdRoot.render(React.createElement(DelayedPublishDialog, props))
   }
 
   return PublishButton

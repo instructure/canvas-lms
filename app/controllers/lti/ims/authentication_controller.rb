@@ -89,7 +89,7 @@ module Lti
           # overall experience, rather than just getting an obscure "login_required" error message.
           # Unless you have tracked down the root cause of the issue and are sure that it is fixed,
           # do not remove this error screen.
-          if @current_user.blank? && !public_course? && decoded_jwt.present? && Account.site_admin.feature_enabled?(:lti_login_required_error_page)
+          if @current_user.blank? && !public_course? && decoded_jwt.present?
             if context.is_a?(Account)
               account = context
             elsif context.respond_to?(:account)

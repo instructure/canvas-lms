@@ -16,9 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/ProgressStatus.handlebars'

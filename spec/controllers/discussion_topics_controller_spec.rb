@@ -455,10 +455,6 @@ describe DiscussionTopicsController do
     end
 
     describe "differentiated modules" do
-      before do
-        Account.site_admin.enable_feature!(:selective_release_backend)
-      end
-
       context "ungraded discussions" do
         before do
           setup_course_and_users
@@ -764,7 +760,7 @@ describe DiscussionTopicsController do
         41.times do |i|
           @topic.discussion_entries.create!(user: @teacher, message: (i + 1).to_s)
         end
-        participant = @topic.participant(current_user: @student)
+        participant = @topic.participant(@student)
         participant.sort_order = DiscussionTopic::SortOrder::ASC
         participant.save!
       end
@@ -777,7 +773,7 @@ describe DiscussionTopicsController do
       end
 
       it "top level entry are paginated when desc" do
-        participant = @topic.participant(current_user: @student)
+        participant = @topic.participant(@student)
         participant.sort_order = DiscussionTopic::SortOrder::DESC
         participant.save!
         get "show", params: { course_id: @course.id, id: @topic.id, entry_id: @topic.discussion_entries.last.id }

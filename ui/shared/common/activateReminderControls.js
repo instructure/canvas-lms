@@ -53,7 +53,7 @@ $(document).ready(function () {
         $floater.css('visibility', 'visible')
         $floater.find('a:not(.hide_reminders_link):visible:first').focus()
         $('#reminders_icon').hide()
-      }
+      },
     )
   })
   $('.hide_reminders_link').click(function (event) {
@@ -75,7 +75,7 @@ $(document).ready(function () {
       'slow',
       function () {
         $(this).remove()
-      }
+      },
     )
   })
   $('.drop_held_context_link').click(function (event) {

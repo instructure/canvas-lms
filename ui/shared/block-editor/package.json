@@ -3,17 +3,5 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./react/index.tsx",
-  "dependencies": {
-    "@craftjs/core": "^0.2.10",
-    "@instructure/ui-color-picker": "9.10.0",
-    "html2canvas": "^1.4.1",
-    "react-moveable": "0.56.0",
-    "styled-components": ">= 4",
-    "react-contenteditable": "^3.3.7",
-    "re-resizable": "6.9.16",
-    "tinycolor2": "^1.6.0",
-    "@ns0m/hermite-resize": "^2.2.10",
-    "@types/tinycolor2": "^1.4.6"
-  }
+  "main": "./react/index.tsx"
 }

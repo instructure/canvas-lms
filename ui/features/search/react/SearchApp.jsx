@@ -125,8 +125,8 @@ export default function SearchApp() {
       `/api/v1/courses/${ENV.COURSE_ID}/smartsearch/log?q=${encodeURIComponent(previousSearch)}&a=${
         feedback.action
       }&oid=${feedback.objectId}&ot=${feedback.objectType}&c=${encodeURIComponent(
-        feedback.comment
-      )}`
+        feedback.comment,
+      )}`,
     )
     setFeedback({action: null, comment: '', objectId: null, objectType: null})
     setFeedbackOpen(false)
@@ -301,29 +301,30 @@ export default function SearchApp() {
               <h3>{I18n.t('About Smart Search')}</h3>
               <p>
                 {I18n.t(
-                  'Smart Search, currently in development for Canvas, uses semantic algorithms and AI to understand query context and semantic meaning, not just keyword matching.'
+                  'Smart Search, currently in development for Canvas, uses semantic algorithms and AI to understand query context and semantic meaning, not just keyword matching.',
                 )}
               </p>
               <h3>{I18n.t('Using Smart Search')}</h3>
               <p>
                 {I18n.t(
-                  'Smart Search employs "embeddings" to mathematically represent content and queries for comparison, understanding keywords or general queries in any language, thanks to its multilingual AI model. Write search queries using keywords, questions, sentences, or whatever is most natural for you to describe what you are trying to find.'
+                  'Smart Search employs "embeddings" to mathematically represent content and queries for comparison, understanding keywords or general queries in any language, thanks to its multilingual AI model. Write search queries using keywords, questions, sentences, or whatever is most natural for you to describe what you are trying to find.',
                 )}
               </p>
               <h3>{I18n.t('Searchable Content')}</h3>
               <p>
                 {I18n.t(
-                  'As of June 1, 2024, searchable items include content pages, announcements, discussion prompts, and assignment descriptions, with plans to expand.'
+                  'As of June 1, 2024, searchable items include content pages, announcements, discussion prompts, and assignment descriptions, with plans to expand.',
                 )}
               </p>
               <h3>{I18n.t('Contributing to Development')}</h3>
               <p>
                 {I18n.t(
-                  'Smart Search is in feature preview. Feedback can be provided through result ratings and the Canvas Community space for Smart Search Beta. Canvas community space can be found here: '
+                  'Smart Search is in feature preview. Feedback can be provided through result ratings and the Canvas Community space for Smart Search Beta. Canvas community space can be found here: ',
                 )}
                 <a
                   href="https://community.canvaslms.com/t5/Smart-Search/gh-p/smart_search"
-                  target="_blank" rel="noreferrer"
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   {I18n.t('Smart Search Community')}
                 </a>

@@ -129,7 +129,7 @@ describe('GradeSummary StudentsApi', () => {
       await loadStudents()
       const request = server.receivedRequests[0]
       expect(pathFromRequest(request)).toBe(
-        '/api/v1/courses/1201/assignments/2301/gradeable_students'
+        '/api/v1/courses/1201/assignments/2301/gradeable_students',
       )
     })
 
@@ -153,12 +153,12 @@ describe('GradeSummary StudentsApi', () => {
 
     test('sends additional requests while additional pages are available', async () => {
       await loadStudents()
-      expect(server.receivedRequests.length).toBe(3)
+      expect(server.receivedRequests).toHaveLength(3)
     })
 
     test('calls onPageLoaded for each successful request', async () => {
       await loadStudents()
-      expect(loadedStudents.length).toBe(3)
+      expect(loadedStudents).toHaveLength(3)
     })
 
     test('includes students when calling onPageLoaded', async () => {
@@ -284,7 +284,7 @@ describe('GradeSummary StudentsApi', () => {
       try {
         await loadStudents()
       } catch (e) {
-        expect(server.receivedRequests.length).toBe(2)
+        expect(server.receivedRequests).toHaveLength(2)
       }
     })
   })

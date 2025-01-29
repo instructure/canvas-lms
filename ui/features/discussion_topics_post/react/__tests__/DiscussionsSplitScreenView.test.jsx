@@ -86,7 +86,7 @@ describe('DiscussionsSplitScreenView', () => {
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <DiscussionTopicManager discussionTopicId="Discussion-default-mock" />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 
@@ -137,7 +137,7 @@ describe('DiscussionsSplitScreenView', () => {
     fireEvent.click(saveButton)
 
     await waitFor(() =>
-      expect(setOnSuccess).toHaveBeenCalledWith('The reply was successfully updated.')
+      expect(setOnSuccess).toHaveBeenCalledWith('The reply was successfully updated.'),
     )
   }, 10000)
 

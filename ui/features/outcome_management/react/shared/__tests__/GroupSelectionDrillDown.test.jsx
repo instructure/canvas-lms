@@ -106,7 +106,7 @@ describe('GroupSelectionDrillDown', () => {
       expect.anything(),
       expect.objectContaining({
         id: '999',
-      })
+      }),
     )
   })
 

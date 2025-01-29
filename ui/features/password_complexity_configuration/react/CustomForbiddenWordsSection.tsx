@@ -48,13 +48,13 @@ interface ForbiddenWordsResponse {
 }
 
 export const fetchLatestForbiddenWords = async (
-  attachmentId: number
+  attachmentId: number,
 ): Promise<ForbiddenWordsResponse | null> => {
   const {status, data} = await executeApiRequest<ForbiddenWordsResponse>({
     path: `/api/v1/files/${attachmentId}`,
     method: 'GET',
   })
-  return status === 200 ? data ?? null : null
+  return status === 200 ? (data ?? null) : null
 }
 
 const CustomForbiddenWordsSection = ({
@@ -71,7 +71,7 @@ const CustomForbiddenWordsSection = ({
   const [fileModalOpen, setFileModalOpen] = useState(false)
   const [customForbiddenWordsEnabled, setCustomForbiddenWordsEnabled] = useState(false)
   const [commonPasswordsAttachmentId, setCommonPasswordsAttachmentId] = useState<number | null>(
-    null
+    null,
   )
   const [forbiddenWordsFileEnabled, setForbiddenWordsEnabled] = useState(false)
 
@@ -195,7 +195,7 @@ const CustomForbiddenWordsSection = ({
         >
           <Text size="small">
             {I18n.t(
-              'Upload a list of forbidden words/terms in addition to the default list. The file should be text file (.txt) with a single word or term per line.'
+              'Upload a list of forbidden words/terms in addition to the default list. The file should be text file (.txt) with a single word or term per line.',
             )}
           </Text>
           {(!forbiddenWordsUrl || !forbiddenWordsName || !customForbiddenWordsEnabled) && (

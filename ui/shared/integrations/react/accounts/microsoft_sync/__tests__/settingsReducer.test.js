@@ -83,7 +83,7 @@ describe('settingsReducer', () => {
       })
 
       expect(result.microsoft_sync_login_attribute).toBe(
-        expectedState.microsoft_sync_login_attribute
+        expectedState.microsoft_sync_login_attribute,
       )
     })
 
@@ -106,7 +106,7 @@ describe('settingsReducer', () => {
       })
 
       expect(actualState.microsoft_sync_login_attribute_suffix).toEqual(
-        expectedState.microsoft_sync_login_attribute_suffix
+        expectedState.microsoft_sync_login_attribute_suffix,
       )
     })
 
@@ -119,7 +119,7 @@ describe('settingsReducer', () => {
       })
 
       expect(actualState.microsoft_sync_remote_attribute).toEqual(
-        expectedState.microsoft_sync_remote_attribute
+        expectedState.microsoft_sync_remote_attribute,
       )
     })
 
@@ -136,7 +136,7 @@ describe('settingsReducer', () => {
           payload: {microsoft_sync_tenant: 'saved_value'},
         })
 
-        expect(result.tenantInfoMessages.length).toBe(0)
+        expect(result.tenantInfoMessages).toHaveLength(0)
       })
 
       it('sets an info message if the tenant is changed', () => {
@@ -145,7 +145,7 @@ describe('settingsReducer', () => {
           payload: {microsoft_sync_tenant: 'new_value'},
         })
 
-        expect(result.tenantInfoMessages.length).toBe(1)
+        expect(result.tenantInfoMessages).toHaveLength(1)
       })
 
       it('updates the last saved tenant value on save', () => {
@@ -156,7 +156,7 @@ describe('settingsReducer', () => {
           },
           {
             type: reducerActions.updateSuccess,
-          }
+          },
         )
 
         expect(result.last_saved_microsoft_sync_tenant).toBe('new_value')
@@ -170,7 +170,7 @@ describe('settingsReducer', () => {
           },
           {
             type: reducerActions.updateError,
-          }
+          },
         )
 
         expect(result.last_saved_microsoft_sync_tenant).not.toBe('new_value')
@@ -258,7 +258,7 @@ describe('settingsReducer', () => {
         {
           type: reducerActions.updateSettings,
           dispatch: dispatchMock,
-        }
+        },
       )
       await flushPromises()
 

@@ -126,7 +126,7 @@ describe('from handler hooks', () => {
               no_redirect: true,
             },
           },
-          file
+          file,
         )
       })
 
@@ -212,7 +212,7 @@ describe('from handler hooks', () => {
               no_redirect: true,
             },
           },
-          file
+          file,
         )
       })
 

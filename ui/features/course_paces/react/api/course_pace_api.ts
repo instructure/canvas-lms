@@ -42,7 +42,7 @@ export const waitForActionCompletion = (actionInProgress: () => boolean, waitTim
       // @ts-expect-error
       innerResolve,
       // @ts-expect-error
-      innerReject
+      innerReject,
     ) => {
       if (actionInProgress()) {
         setTimeout(() => staller(actionInProgress, waitTime, innerResolve, innerReject), waitTime)
@@ -102,7 +102,7 @@ export const load = (coursePaceId: string) =>
 export const getNewCoursePaceFor = (
   courseId: string,
   context: PaceContextTypes,
-  contextId: string
+  contextId: string,
 ) => {
   let url = `/api/v1/courses/${courseId}/course_pacing/new`
   if (context === 'Section') {
@@ -168,23 +168,23 @@ interface PublishApiFormattedCoursePace extends CompressApiFormattedCoursePace {
 
 const transformCoursePaceForApi = (
   coursePace: CoursePace,
-  mode: ApiMode = ApiMode.PUBLISH
+  mode: ApiMode = ApiMode.PUBLISH,
 ): PublishApiFormattedCoursePace | CompressApiFormattedCoursePace => {
   const coursePaceItems: ApiCoursePaceModuleItemsAttributes[] = coursePace.modules.flatMap(module =>
     module.items.map(item => ({
       id: item.id,
       duration: item.duration,
       module_item_id: item.module_item_id,
-    }))
+    })),
   )
 
   const selectedDaysToSkipValue = window.ENV.FEATURES.course_paces_skip_selected_days
     ? coursePace.selected_days_to_skip
     : coursePace.exclude_weekends
-    ? ['sat', 'sun']
-    : []
+      ? ['sat', 'sun']
+      : []
 
-  const compressedCoursePace = {
+  const compressedCoursePace: CompressApiFormattedCoursePace = {
     start_date: coursePace.start_date,
     end_date: coursePace.end_date,
     course_pace_module_items_attributes: coursePaceItems,

@@ -92,7 +92,7 @@ describe('PostPolicyApi', () => {
         PostPolicyApi.setCoursePostPolicy({
           courseId: ERROR_COURSE_ID,
           postManually: true,
-        })
+        }),
       ).rejects.toThrow('oh no')
     })
 
@@ -101,7 +101,7 @@ describe('PostPolicyApi', () => {
         PostPolicyApi.setCoursePostPolicy({
           courseId: BAD_RESPONSE_COURSE_ID,
           postManually: true,
-        })
+        }),
       ).rejects.toThrow('no postPolicy or error provided in response')
     })
   })

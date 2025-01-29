@@ -20,7 +20,6 @@
 
 describe LearningObjectDatesController do
   before :once do
-    Account.site_admin.enable_feature! :selective_release_backend
     Account.site_admin.enable_feature! :selective_release_ui_api
     Account.site_admin.enable_feature! :differentiated_files
     course_with_teacher(active_all: true)
@@ -695,6 +694,77 @@ describe LearningObjectDatesController do
       expect(response).to be_bad_request
     end
 
+    context "with non-collaborative groups overrides" do
+      before do
+        @course.account.enable_feature!(:differentiation_tags)
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings = { allow_assign_to_differentiation_tags: true }
+        @course.account.save
+
+        @group_category = @course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)
+        @group_category.create_groups(2)
+        @group = @group_category.groups.first
+        @group.add_user(@student, "accepted")
+      end
+
+      def returns_non_collaborative_field_for_group_overrides
+        due_at = 7.days.from_now
+        override2 = @assignment.assignment_overrides.create!(set: @group, due_at:)
+
+        get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+
+        expect(response).to be_successful
+        expect(json_parse).to eq({
+                                   "id" => @assignment.id,
+                                   "due_at" => "2022-01-02T00:00:00Z",
+                                   "unlock_at" => "2022-01-01T00:00:00Z",
+                                   "lock_at" => "2022-01-03T01:00:00Z",
+                                   "only_visible_to_overrides" => true,
+                                   "group_category_id" => nil,
+                                   "graded" => true,
+                                   "visible_to_everyone" => false,
+                                   "overrides" => [
+                                     {
+                                       "id" => @override.id,
+                                       "assignment_id" => @assignment.id,
+                                       "title" => "Unnamed Course",
+                                       "course_section_id" => @course.default_section.id,
+                                       "due_at" => "2022-02-01T01:00:00Z",
+                                       "all_day" => false,
+                                       "all_day_date" => "2022-02-01",
+                                       "unassign_item" => false
+                                     },
+                                     {
+                                       "id" => override2.id,
+                                       "assignment_id" => @assignment.id,
+                                       "title" => "Non-Collaborative Group 1",
+                                       "unassign_item" => false,
+                                       "group_id" => @group.id,
+                                       "non_collaborative" => true,
+                                       "group_category_id" => nil
+                                     }
+                                   ]
+                                 })
+      end
+
+      it "returns the non_collaborative field for group overrides" do
+        returns_non_collaborative_field_for_group_overrides
+      end
+
+      context "works with TAs" do
+        before do
+          @ta = user_factory(active_all: true)
+          @course.enroll_user(@ta, "TaEnrollment", enrollment_state: "active")
+
+          user_session(@ta)
+        end
+
+        it "returns the non_collaborative field for group overrides" do
+          returns_non_collaborative_field_for_group_overrides
+        end
+      end
+    end
+
     context "on blueprint child courses" do
       before :once do
         @child_course = @course
@@ -1008,6 +1078,58 @@ describe LearningObjectDatesController do
         RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
         put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
         expect(response).to be_unauthorized
+      end
+
+      context "with non-collaborative groups overrides" do
+        before do
+          @course.account.enable_feature!(:differentiation_tags)
+          @course.account.enable_feature!(:assign_to_differentiation_tags)
+          @course.account.settings = { allow_assign_to_differentiation_tags: true }
+          @course.account.save
+
+          @group_category = @course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)
+          @group_category.create_groups(2)
+          @group = @group_category.groups.first
+          @group.add_user(@student, "accepted")
+        end
+
+        def adds_an_override_for_a_group
+          put :update, params: { **default_params, assignment_overrides: [{ group_id: @group.id, due_at: 7.days.from_now.to_json }] }
+
+          expect(response).to be_no_content
+          expect(differentiable.assignment_overrides.active.count).to eq 1
+
+          assignment_override = differentiable.assignment_overrides.active.first
+
+          expect(assignment_override.set_id).to eq @group.id
+          expect(assignment_override.set.non_collaborative?).to be true
+        end
+
+        it "adds an override for a group" do
+          adds_an_override_for_a_group
+        end
+
+        it "errors out if setting is disabled" do
+          @course.account.settings = { allow_assign_to_differentiation_tags: false }
+          @course.account.save
+
+          put :update, params: { **default_params, assignment_overrides: [{ group_id: @group.id, due_at: 7.days.from_now.to_json }] }
+
+          expect(response).to be_bad_request
+        end
+
+        context "works with TAs" do
+          before do
+            @ta = user_factory(active_all: true)
+            @course.enroll_user(@ta, "TaEnrollment", enrollment_state: "active")
+
+            user_session(@ta)
+          end
+
+          it "adds an override for a group" do
+            adds_an_override_for_a_group
+          end
+        end
       end
     end
 

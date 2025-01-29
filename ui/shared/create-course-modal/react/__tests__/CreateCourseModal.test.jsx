@@ -77,10 +77,10 @@ const MCC_ACCOUNT = {
 const COURSE_CREATION_COURSES_URL = '/api/v1/course_creation_accounts?per_page=100'
 const MANAGEABLE_COURSES_URL = '/api/v1/manageable_accounts?per_page=100'
 const TEACHER_ENROLLMENTS_URL = encodeURI(
-  '/api/v1/users/self/courses?per_page=100&include[]=account&enrollment_type=teacher'
+  '/api/v1/users/self/courses?per_page=100&include[]=account&enrollment_type=teacher',
 )
 const STUDENT_ENROLLMENTS_URL = encodeURI(
-  '/api/v1/users/self/courses?per_page=100&include[]=account'
+  '/api/v1/users/self/courses?per_page=100&include[]=account',
 )
 const MCC_ACCOUNT_URL = 'api/v1/manually_created_courses_account'
 
@@ -126,11 +126,11 @@ describe('CreateCourseModal (1)', () => {
     const {getByLabelText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => {
       expect(
-        getByLabelText('Which account will this subject be associated with?')
+        getByLabelText('Which account will this subject be associated with?'),
       ).toBeInTheDocument()
       expect(getByLabelText('Subject Name')).toBeInTheDocument()
       expect(
-        getByLabelText('Sync enrollments and subject start/end dates from homeroom')
+        getByLabelText('Sync enrollments and subject start/end dates from homeroom'),
       ).toBeInTheDocument()
     })
   })
@@ -216,7 +216,7 @@ describe('CreateCourseModal (1)', () => {
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     fetchMock.post(encodeURI('/api/v1/accounts/5/courses?course[name]=Math&enroll_me=true'), 500)
     const {getByText, getByLabelText, getAllByText, getByRole} = render(
-      <CreateCourseModal {...getProps()} />
+      <CreateCourseModal {...getProps()} />,
     )
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     await user.click(getByLabelText('Which account will this subject be associated with?'))
@@ -232,7 +232,7 @@ describe('CreateCourseModal (1)', () => {
     it('fetches accounts from enrollments api', async () => {
       fetchMock.get(TEACHER_ENROLLMENTS_URL, ENROLLMENTS)
       const {getByText, getByLabelText} = render(
-        <CreateCourseModal {...getProps({permissions: 'teacher'})} />
+        <CreateCourseModal {...getProps({permissions: 'teacher'})} />,
       )
       await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
       act(() => getByLabelText('Which account will this subject be associated with?').click())
@@ -243,11 +243,11 @@ describe('CreateCourseModal (1)', () => {
     it('hides the account select if there is only one enrollment', async () => {
       fetchMock.get(TEACHER_ENROLLMENTS_URL, [ENROLLMENTS[0]])
       const {queryByText, getByLabelText} = render(
-        <CreateCourseModal {...getProps({permissions: 'teacher'})} />
+        <CreateCourseModal {...getProps({permissions: 'teacher'})} />,
       )
       await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
       expect(
-        queryByText('Which account will this subject be associated with?')
+        queryByText('Which account will this subject be associated with?'),
       ).not.toBeInTheDocument()
     })
 
@@ -260,7 +260,7 @@ describe('CreateCourseModal (1)', () => {
         },
       ])
       const {getByLabelText, queryByText, getByText} = render(
-        <CreateCourseModal {...getProps({permissions: 'teacher'})} />
+        <CreateCourseModal {...getProps({permissions: 'teacher'})} />,
       )
       await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
       expect(queryByText('Unable to get accounts')).not.toBeInTheDocument()
@@ -272,11 +272,11 @@ describe('CreateCourseModal (1)', () => {
     it('fetches accounts from the manually_created_courses_account api if restrictToMCCAccount is true', async () => {
       fetchMock.get(MCC_ACCOUNT_URL, MCC_ACCOUNT)
       const {getByLabelText, queryByText} = render(
-        <CreateCourseModal {...getProps({permissions: 'teacher', restrictToMCCAccount: true})} />
+        <CreateCourseModal {...getProps({permissions: 'teacher', restrictToMCCAccount: true})} />,
       )
       await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
       expect(
-        queryByText('Which account will this subject be associated with?')
+        queryByText('Which account will this subject be associated with?'),
       ).not.toBeInTheDocument()
     })
   })
@@ -288,7 +288,7 @@ describe('CreateCourseModal (1)', () => {
 
     it('fetches accounts from enrollments api', async () => {
       const {findByLabelText, getByLabelText, getByText} = render(
-        <CreateCourseModal {...getProps({permissions: 'student'})} />
+        <CreateCourseModal {...getProps({permissions: 'student'})} />,
       )
       expect(await findByLabelText('Subject Name')).toBeInTheDocument()
       act(() => getByLabelText('Which account will this subject be associated with?').click())
@@ -297,11 +297,11 @@ describe('CreateCourseModal (1)', () => {
 
     it("doesn't show the homeroom sync options", async () => {
       const {findByLabelText, queryByText} = render(
-        <CreateCourseModal {...getProps({permissions: 'student'})} />
+        <CreateCourseModal {...getProps({permissions: 'student'})} />,
       )
       expect(await findByLabelText('Subject Name')).toBeInTheDocument()
       expect(
-        queryByText('Sync enrollments and subject start/end dates from homeroom')
+        queryByText('Sync enrollments and subject start/end dates from homeroom'),
       ).not.toBeInTheDocument()
       expect(queryByText('Select a homeroom')).not.toBeInTheDocument()
     })
@@ -309,11 +309,11 @@ describe('CreateCourseModal (1)', () => {
     it('fetches accounts from the manually_created_courses_account api if restrictToMCCAccount is true', async () => {
       fetchMock.get(MCC_ACCOUNT_URL, MCC_ACCOUNT)
       const {getByLabelText, queryByText} = render(
-        <CreateCourseModal {...getProps({permissions: 'student', restrictToMCCAccount: true})} />
+        <CreateCourseModal {...getProps({permissions: 'student', restrictToMCCAccount: true})} />,
       )
       await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
       expect(
-        queryByText('Which account will this subject be associated with?')
+        queryByText('Which account will this subject be associated with?'),
       ).not.toBeInTheDocument()
     })
   })
@@ -325,21 +325,21 @@ describe('CreateCourseModal (1)', () => {
 
     it('uses the manually_created_courses_account api to get the right account', async () => {
       const {findByLabelText} = render(
-        <CreateCourseModal {...getProps({permissions: 'no_enrollments'})} />
+        <CreateCourseModal {...getProps({permissions: 'no_enrollments'})} />,
       )
       expect(await findByLabelText('Subject Name')).toBeInTheDocument()
     })
 
     it("doesn't show the homeroom sync options or account dropdown", async () => {
       const {findByLabelText, queryByText} = render(
-        <CreateCourseModal {...getProps({permissions: 'no_enrollments'})} />
+        <CreateCourseModal {...getProps({permissions: 'no_enrollments'})} />,
       )
       expect(await findByLabelText('Subject Name')).toBeInTheDocument()
       expect(
-        queryByText('Sync enrollments and subject start/end dates from homeroom')
+        queryByText('Sync enrollments and subject start/end dates from homeroom'),
       ).not.toBeInTheDocument()
       expect(
-        queryByText('Which account will this subject be associated with?')
+        queryByText('Which account will this subject be associated with?'),
       ).not.toBeInTheDocument()
     })
   })
@@ -351,23 +351,23 @@ describe('CreateCourseModal (1)', () => {
 
     it('does not show the homeroom sync options', async () => {
       const {findByLabelText, queryByText} = render(
-        <CreateCourseModal {...getProps({isK5User: false})} />
+        <CreateCourseModal {...getProps({isK5User: false})} />,
       )
       expect(await findByLabelText('Course Name')).toBeInTheDocument()
       expect(
-        queryByText('Sync enrollments and subject start/end dates from homeroom')
+        queryByText('Sync enrollments and subject start/end dates from homeroom'),
       ).not.toBeInTheDocument()
       expect(queryByText('Select a homeroom')).not.toBeInTheDocument()
     })
 
     it('uses classic canvas vocabulary', async () => {
       const {findByLabelText, getByLabelText, getByText} = render(
-        <CreateCourseModal {...getProps({isK5User: false})} />
+        <CreateCourseModal {...getProps({isK5User: false})} />,
       )
       expect(await findByLabelText('Course Name')).toBeInTheDocument()
       expect(getByLabelText('Create Course')).toBeInTheDocument()
       expect(
-        getByLabelText('Which account will this course be associated with?')
+        getByLabelText('Which account will this course be associated with?'),
       ).toBeInTheDocument()
       expect(getByText('Course Details')).toBeInTheDocument()
     })

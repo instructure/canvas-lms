@@ -82,7 +82,7 @@ export const ConferenceAddressBook = ({menuItemList, onChange, selectedItems, is
     selectedGroups = selectedGroups?.map(u => `group-${u}`)
     selectedSections = selectedSections?.map(u => `section-${u}`)
     const initialSelectedMenuItems = menuItemList.filter(u =>
-      selectedGroups.concat(selectedSections, selectedUserAssetCode)?.includes(u.assetCode)
+      selectedGroups.concat(selectedSections, selectedUserAssetCode)?.includes(u.assetCode),
     )
     setSavedAttendees(initialSelectedMenuItems.map(u => u.assetCode))
     setSelectedMenuItems([...selectedMenuItems.concat(initialSelectedMenuItems)])
@@ -211,10 +211,10 @@ export const ConferenceAddressBook = ({menuItemList, onChange, selectedItems, is
     // Remove users that have already been selected so duplicates do not occur
     const selectedMenuItemsAssetCode = selectedMenuItems?.map(u => u.assetCode)
     const unselectedUsers = additionalUsersToAdd.filter(
-      x => !selectedMenuItemsAssetCode.includes(x)
+      x => !selectedMenuItemsAssetCode.includes(x),
     )
     const additionalUsersToAddMenuItem = menuItemList.filter(u =>
-      unselectedUsers?.includes(u.assetCode)
+      unselectedUsers?.includes(u.assetCode),
     )
     additionalUsersToAddMenuItem.push(menuItem)
 
@@ -241,7 +241,7 @@ export const ConferenceAddressBook = ({menuItemList, onChange, selectedItems, is
         data-testid="address-input"
         renderLabel={I18n.t('Course Members')}
         assistiveText={I18n.t(
-          'Type or use arrow keys to navigate options. Multiple selections allowed.'
+          'Type or use arrow keys to navigate options. Multiple selections allowed.',
         )}
         inputValue={inputValue}
         isShowingOptions={isOpen}

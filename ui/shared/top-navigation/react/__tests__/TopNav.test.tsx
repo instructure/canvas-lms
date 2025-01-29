@@ -47,8 +47,8 @@ describe('TopNav', () => {
       render(
         <MockedQueryClientProvider client={queryClient}>
           <TopNav />
-        </MockedQueryClientProvider>
-      )
+        </MockedQueryClientProvider>,
+      ),
     ).not.toThrow()
   })
 
@@ -56,7 +56,7 @@ describe('TopNav', () => {
     const {getByText} = render(
       <MockedQueryClientProvider client={queryClient}>
         <TopNav />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
 
     expect(getByText('crumb')).toBeInTheDocument()
@@ -69,7 +69,7 @@ describe('TopNav', () => {
       render(
         <MockedQueryClientProvider client={queryClient}>
           <TopNav getBreadCrumbSetter={callback} />
-        </MockedQueryClientProvider>
+        </MockedQueryClientProvider>,
       )
 
       expect(callback).toHaveBeenCalledWith({
@@ -82,7 +82,7 @@ describe('TopNav', () => {
       render(
         <MockedQueryClientProvider client={queryClient}>
           <TopNav getBreadCrumbSetter={callback} />
-        </MockedQueryClientProvider>
+        </MockedQueryClientProvider>,
       )
 
       const {getCrumbs} = callback.mock.calls[0][0]
@@ -97,7 +97,7 @@ describe('TopNav', () => {
       const {findByText} = render(
         <MockedQueryClientProvider client={queryClient}>
           <TopNav getBreadCrumbSetter={callback} />
-        </MockedQueryClientProvider>
+        </MockedQueryClientProvider>,
       )
 
       const {setCrumbs} = callback.mock.calls[0][0]
@@ -122,7 +122,7 @@ describe('TopNav', () => {
             </TopNavBar.Item>,
           ]}
         />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
 
     expect(getByText('button1')).toBeInTheDocument()
@@ -134,7 +134,7 @@ describe('TopNav', () => {
     const {queryByText} = render(
       <MockedQueryClientProvider client={queryClient}>
         <TopNav />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
 
     expect(queryByText('crumb')).not.toBeInTheDocument()

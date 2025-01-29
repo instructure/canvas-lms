@@ -97,12 +97,12 @@
   }
   .start-time-column {
     width: $time_column_width;
-    text-align: center;
+    text-align: left;
   }
   .separator-column {
-    width: 6px;
     text-align: center;
     line-height: 28px;
+    margin: 0 2px 0 2px;
   }
   .end-time-column {
     width: $time_column_width;
@@ -113,19 +113,36 @@
   }
   .time_field {
     text-align: direction(right);
-    width: $time_column_width - 30;
+    width: $time_column_width - 20;
   }
   .error {
     border: 1px solid #EE5F5B;
-    padding: 2px;
     box-shadow: 0 0 4px #f8b9b7;
   }
+
+  .datetime_suggest i {
+    display: none;
+  }
+
+  .datetime_suggest.invalid_datetime i {
+    display: inline;
+  }
+
   .invalid_datetime, .error {
     color: #B94A48;
   }
   .datetime_suggest {
     display: none;
+    padding-left: 0;
+
+    .error-message {
+      display: flex;
+      gap: 0.3em;
+      padding-top: 0.2rem;
+      text-align: left;
+    }
   }
+  
   .ui-datepicker-trigger {
     display: inline;
   }

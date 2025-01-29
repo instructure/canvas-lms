@@ -33,11 +33,11 @@ $('#coenrollment_link').click(function (event) {
   const template = $(this).data('template')
   const path = $(this).data('path')
   loadSignupDialog
-    // @ts-ignore
+    // @ts-expect-error
     .then(signupDialog => {
       signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
     })
-    // @ts-ignore
+    // @ts-expect-error
     .catch(error => {
       throw new Error('Failed to load signup dialog', error)
     })
@@ -59,10 +59,10 @@ $('#forgot_password_form').formSubmit({
           {
             wrappers: ['<b>$1</b>'],
             email_address: $(this).find('.email_address').val(),
-          }
-        )
+          },
+        ),
       ),
-      15 * 60 * 1000 // fifteen minutes isn't forever but should be plenty
+      15 * 60 * 1000, // fifteen minutes isn't forever but should be plenty
     )
     // Focus on the close button of the alert we just put up, per a11y
     $('#flash_message_holder button.close_link').focus()

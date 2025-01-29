@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
@@ -77,7 +77,7 @@ PeerReviewsSelector.prototype.handlePeerReviewsChange = function () {
 
 PeerReviewsSelector.prototype.handleAutomaticPeerReviewsChange = function () {
   return this.$autoPeerReviewsOptions.toggleAccessibly(
-    this.$autoPeerReviews.filter(':checked').val() === '1'
+    this.$autoPeerReviews.filter(':checked').val() === '1',
   )
 }
 

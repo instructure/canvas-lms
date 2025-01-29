@@ -20,12 +20,10 @@
 
 require_relative "../api_spec_helper"
 require_relative "../locked_examples"
-require_relative "../../helpers/selective_release_common"
 
 describe "Pages API", type: :request do
   include Api::V1::User
   include AvatarHelper
-  include SelectiveReleaseCommon
 
   let(:block_page_data) do
     {

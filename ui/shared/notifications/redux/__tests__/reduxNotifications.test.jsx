@@ -114,7 +114,7 @@ describe('reduceNotifications', () => {
   test('adds new info notification on NOTIFY_INFO', () => {
     const newState = reduceNotifications(
       [],
-      notificationActions.notifyInfo({message: 'hello world'})
+      notificationActions.notifyInfo({message: 'hello world'}),
     )
     expect(newState).toMatchObject([{type: 'info', message: 'hello world'}])
   })
@@ -122,7 +122,7 @@ describe('reduceNotifications', () => {
   test('adds new error notification on NOTIFY_ERROR', () => {
     const newState = reduceNotifications(
       [],
-      notificationActions.notifyError({message: 'hello world', err: 'bad things happened'})
+      notificationActions.notifyError({message: 'hello world', err: 'bad things happened'}),
     )
     expect(newState).toMatchObject([
       {type: 'error', message: 'hello world', err: 'bad things happened'},
@@ -132,7 +132,7 @@ describe('reduceNotifications', () => {
   test('removes notification on CLEAR_NOTIFICATION', () => {
     const newState = reduceNotifications(
       [{id: '1', message: 'hello world', type: 'info'}],
-      notificationActions.clearNotification('1')
+      notificationActions.clearNotification('1'),
     )
     expect(newState).toEqual([])
   })

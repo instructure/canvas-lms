@@ -33,7 +33,7 @@ const ImportantDateSection = ({date, items, timeZone}) => {
       <Heading as="h3" level="h5">
         {tz.format(
           date,
-          `date.formats.${isSameYear ? 'long_with_weekday' : 'medium_with_weekday'}`
+          `date.formats.${isSameYear ? 'long_with_weekday' : 'medium_with_weekday'}`,
         )}
       </Heading>
       {items.map(item => (

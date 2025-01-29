@@ -38,11 +38,11 @@ const reduceItems = handleActions(
     [actionTypes.LOCK_ANNOUNCEMENTS_SUCCESS]: (state, action) => {
       const successIds = action.payload.res.successes.map(success => success.data)
       return state.map(item =>
-        successIds.includes(item.id) ? {...item, locked: action.payload.locked} : item
+        successIds.includes(item.id) ? {...item, locked: action.payload.locked} : item,
       )
     },
   },
-  []
+  [],
 )
 
 function reducePage(page = {}, action) {
@@ -81,7 +81,7 @@ export default combineReducers({
     {
       [actionTypes.SET_ANNOUNCEMENTS_IS_LOCKING]: (state, action) => action.payload,
     },
-    false
+    false,
   ),
   announcements: (state, action) => {
     const paginatedState = reduceAnnouncementsPagination(state, action)
@@ -102,7 +102,7 @@ export default combineReducers({
           }
         },
       },
-      ''
+      '',
     ),
     filter: handleActions(
       {
@@ -115,7 +115,7 @@ export default combineReducers({
           }
         },
       },
-      'all'
+      'all',
     ),
   }),
   selectedAnnouncements: handleActions(
@@ -130,7 +130,7 @@ export default combineReducers({
       [actionTypes.CLEAR_ANNOUNCEMENT_SELECTIONS]: () => [],
       [actionTypes.DELETE_ANNOUNCEMENTS_SUCCESS]: () => [],
     },
-    []
+    [],
   ),
   isLockingAnnouncements: handleActions(
     {
@@ -138,7 +138,7 @@ export default combineReducers({
       [actionTypes.LOCK_ANNOUNCEMENTS_SUCCESS]: () => false,
       [actionTypes.LOCK_ANNOUNCEMENTS_FAIL]: () => false,
     },
-    false
+    false,
   ),
   isDeletingAnnouncements: handleActions(
     {
@@ -146,7 +146,7 @@ export default combineReducers({
       [actionTypes.DELETE_ANNOUNCEMENTS_SUCCESS]: () => false,
       [actionTypes.DELETE_ANNOUNCEMENTS_FAIL]: () => false,
     },
-    false
+    false,
   ),
   isMarkingAllRead: handleActions(
     {
@@ -154,7 +154,7 @@ export default combineReducers({
       [actionTypes.MARK_ALL_ANNOUNCEMENTS_READ_SUCCESS]: () => false,
       [actionTypes.MARK_ALL_ANNOUNCEMENTS_READ_FAIL]: () => false,
     },
-    false
+    false,
   ),
   externalRssFeed: combineReducers({
     isSaving: handleActions(
@@ -163,7 +163,7 @@ export default combineReducers({
         [actionTypes.ADD_EXTERNAL_FEED_FAIL]: () => false,
         [actionTypes.ADD_EXTERNAL_FEED_SUCCESS]: () => false,
       },
-      false
+      false,
     ),
     isDeleting: handleActions(
       {
@@ -171,7 +171,7 @@ export default combineReducers({
         [actionTypes.DELETE_EXTERNAL_FEED_FAIL]: () => false,
         [actionTypes.DELETE_EXTERNAL_FEED_SUCCESS]: () => false,
       },
-      false
+      false,
     ),
     feeds: handleActions(
       {
@@ -206,7 +206,7 @@ export default combineReducers({
           return removedState
         },
       },
-      []
+      [],
     ),
     hasLoadedFeed: handleActions(
       {
@@ -214,7 +214,7 @@ export default combineReducers({
         [actionTypes.LOADING_EXTERNAL_FEED_SUCCESS]: () => true,
         [actionTypes.LOADING_EXTERNAL_FEED_FAIL]: () => true,
       },
-      false
+      false,
     ),
   }),
   notifications: reduceNotifications,

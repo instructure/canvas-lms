@@ -36,22 +36,22 @@ export const LtiScopeTranslations: Record<LtiScope, string> = {
   [LtiScopes.DataServicesListEventTypes]: I18n.t('Can list categorized event types'),
   [LtiScopes.FeatureFlagsShow]: I18n.t('Can view feature flags'),
   [LtiScopes.AgsLineItem]: I18n.t(
-    'Can create and view assignment data in the gradebook associated with the tool'
+    'Can create and view assignment data in the gradebook associated with the tool',
   ),
   [LtiScopes.AgsLineItemReadonly]: I18n.t(
-    'Can view assignment data in the gradebook associated with the tool'
+    'Can view assignment data in the gradebook associated with the tool',
   ),
   [LtiScopes.AgsResultReadonly]: I18n.t(
-    'Can view submission data for assignments associated with the tool'
+    'Can view submission data for assignments associated with the tool',
   ),
   [LtiScopes.AgsScore]: I18n.t(
-    'Can create and update submission results for assignments associated with the tool'
+    'Can create and update submission results for assignments associated with the tool',
   ),
   [LtiScopes.NrpsContextMembershipReadonly]: I18n.t(
-    'Can retrieve user data associated with the context the tool is installed in'
+    'Can retrieve user data associated with the context the tool is installed in',
   ),
   [LtiScopes.PnsNoticeHandlers]: I18n.t(
-    'Can register event notice handlers using the Platform Notification Service'
+    'Can register event notice handlers using the Platform Notification Service',
   ),
   [LtiScopes.AssetReadonly]: I18n.t('Can fetch assets from the platform using the Asset Service'),
   [LtiScopes.AssetReport]: I18n.t('Can create reports using the Asset Report Service'),
@@ -59,7 +59,7 @@ export const LtiScopeTranslations: Record<LtiScope, string> = {
   [LtiScopes.PublicJwkUpdate]: I18n.t('Can update public jwk for LTI services'),
   [LtiScopes.AccountLookupShow]: I18n.t('Can lookup Account information'),
   [LtiScopes.AgsProgressShow]: I18n.t(
-    'Can view Progress records associated with the context the tool is installed in'
+    'Can view Progress records associated with the context the tool is installed in',
   ),
   [LtiScopes.AccessPageContent]: I18n.t('Can view the content of a page the tool is launched from'),
   [LtiScopes.ReplaceEditorContent]: I18n.t('Can replace the entire contents of the RCE'),

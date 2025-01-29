@@ -138,6 +138,7 @@ hu:
     length_error: "Maximum 255 karakter hosszú lehet"
   OutcomeView: 
     length_error: "Maximum 255 karakter hosszú lehet"
+    mastery_at_nan_error: "Számnak kell lennie"
     mastery_error: "0-nál nagyobb vagy egyenlő lehet"
   OutcomesDirectoryView: 
     flash: 
@@ -2302,6 +2303,7 @@ hu:
   advanced_36b35b8: Haladó
   advanced_analytics_ask_questions: "Engedélyezi az Intelligent Insights – Ask Your Data funkciót és a hozzá tartozó engedélyt."
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "Haladó analitika - Kurzuskészültség és figyelemre szoruló hallgatók"
+  advanced_turnitin_settings_9ee84a38: "Haladó Turnitinbeállítások"
   afghanistan_93_ab06805: "Afganisztán (+93)"
   afrikaans_da0fe6ee: Afrikaans
   after_48b9d69: Után...
@@ -9693,6 +9695,7 @@ hu:
   edit_new_internal_setting_value_f618a7f4: "Új belső beállítási érték szerkesztése"
   edit_outcome_867a0381: "Tanulási eredmény szerkesztése"
   edit_outcome_group_f82e0210: "Tanulási eredménycsoport szerkesztése"
+  edit_page_5df5916a: "Oldal szerkesztése"
   edit_pagetitle_cd8abab9: "%{pageTitle} szerkesztése"
   edit_permissions_for_count_items_d65e3855: 
     one: "Engedélyek kezelése %{itemName} elemhez"
@@ -12169,6 +12172,7 @@ hu:
         randomly_assign_students_dialog: "Ez automatikusan egyenlően el fogja osztani a csoporthoz hozzá nem rendelt hallgatókat a létező hallgatói csoportokba."
       self_signup_help: 
         about_self_signup_groups: "Az önálló feliratkozású csoportokról"
+        self_signup_deadline_description: "Létre tud hozni csoporthalmazokat ahová a hallgatók maguktól jelentkezhetnek fel. A hallgatók így is csak egy csoportban lehetnek minden halmazban, de így a hallgatók csoportokba szervezhetik magukat ahelyett, hogy az oktatók tennék ezt. Azt is megkövetelheti, hogy a csoport tagjai mindannyian ugyanabban a kurzusszekcióban legyenek. Tartsa észben, hogy amíg ez az opció engedélyezett, addig a hallgatók áttehetik magukat az egyik csoportból a másikba."
         self_signup_description: "Létre tud hozni csoporthalmazokat ahová a hallgatók maguktól jelentkezhetnek fel. A hallgatók így is csak egy csoportban lehetnek minden halmazban, de így a hallgatók csoportokba szervezhetik magukat ahelyett, hogy az oktatók tennék ezt. Azt is megkövetelheti, hogy a csoport tagjai mindannyian ugyanabban a kurzusszekcióban legyenek. Tartsa észben, hogy amíg ez az opció engedélyezett, addig a hallgatók áttehetik magukat az egyik csoportból a másikba."
     max_membership_number: "A tagság maximuma csak szám lehet"
     membership_pending: 
@@ -16468,6 +16472,7 @@ hu:
   move_discussion_9ff5b2d1: "Fórum áthelyezése"
   move_discussion_title_93ea7be1: "%{title} Fórum áthelyezése"
   move_down_4a9c9b18: Lejjebb
+  move_from_ef79aa53: "Mozgatás innen "
   move_group_3dd7f76e: "Csoport áthelyezése"
   move_group_77ae285d: "Csoport áthelyezése..."
   move_grouptitle_20927676: "\"%{groupTitle} áthelyezése\""
@@ -26887,6 +26892,7 @@ hu:
   view_prior_enrollments_9b519b25: "Előzetes jelentkezések megtekintése"
   view_question_banks_188a9e0f: "Kérdésbankok megtekintése"
   view_range_student_details_8116d68a: "A Hallgatói adatok megtekintése"
+  view_registered_services_6c8cd301: "Regisztrált szolgáltatások megtekintése"
   view_replies_8565a729: "Válaszok megtekintése"
   view_rubric_assessment_in_speedgrader_984576d: "Értékelőtábla értékelés megtekintése a Gyorsértékelőben"
   view_rubric_d71cce10: "Értékelőtábla megtekintése"

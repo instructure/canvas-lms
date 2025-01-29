@@ -32,7 +32,7 @@ export const assignmentGroupRow = (
   assignmentGroup,
   queryData,
   calculateOnlyGradedAssignments = false,
-  courseLevelGrades = {}
+  courseLevelGrades = {},
 ) => {
   const groupAssignments = queryData?.assignmentsConnection?.nodes?.filter(assignment => {
     return assignment?.assignmentGroup?._id === assignmentGroup?._id
@@ -40,7 +40,7 @@ export const assignmentGroupRow = (
 
   const applicableAssignments = filteredAssignments(
     queryData,
-    calculateOnlyGradedAssignments
+    calculateOnlyGradedAssignments,
   ).filter(assignment => {
     return assignment?.assignmentGroup?._id === assignmentGroup?._id
   })
@@ -50,7 +50,7 @@ export const assignmentGroupRow = (
   const assignmentGroupPercentage = getAssignmentGroupPercentage(
     assignmentGroup,
     applicableAssignments,
-    false
+    false,
   )
 
   const courseLevelScore = courseLevelGrades?.score || 0

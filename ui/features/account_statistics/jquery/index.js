@@ -51,7 +51,7 @@ function populateDialog(data_points, axis, $link) {
     date.setTime(this[0])
     rows.push(
       // this ends up being [(a date), (the number of pageViews on that date), "an annotation tile, (if any)", ""]
-      [date, this[1], undefined, undefined]
+      [date, this[1], undefined, undefined],
     )
   })
 
@@ -80,7 +80,7 @@ $(document).ready(() => {
       },
       () => {
         $link.text(I18n.t('error'))
-      }
+      },
     )
   })
 })

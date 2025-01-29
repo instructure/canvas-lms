@@ -37,7 +37,7 @@ export function addModuleElement(
   $module: JQuery,
   updatePublishMenuDisabledState: (disabled: boolean) => void,
   relockModulesDialog: RelockModulesDialog,
-  moduleItems: any
+  moduleItems: any,
 ) {
   $module.loadingImage('remove')
   $module.attr('id', 'context_module_' + data.context_module.id)
@@ -51,7 +51,7 @@ export function addModuleElement(
       data.context_module.context_id +
       '/modules/' +
       data.context_module.id +
-      'items?include[]=content_details'
+      'items?include[]=content_details',
   )
   $module.data('workflow-state', data.context_module.workflow_state)
   if (data.context_module.workflow_state === 'unpublished') {
@@ -93,28 +93,29 @@ export function addModuleElement(
   }
   const isPublishing =
     document.querySelector<Element & {dataset: Record<string, string>}>(
-      '#context-modules-publish-menu'
+      '#context-modules-publish-menu',
     )?.dataset['data-progress-id'] !== undefined
   updatePublishMenuDisabledState(isPublishing)
   renderContextModulesPublishIcon(
     data.context_module.context_id,
     data.context_module.id,
     published,
-    isPublishing
+    isPublishing,
   )
   relockModulesDialog.renderIfNeeded(data.context_module)
   $module.triggerHandler('update', data)
   const module_dnd = $module.find('.module_dnd')[0]
   if (module_dnd) {
     const contextModules = document.getElementById('context_modules')
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ModuleFileDrop
         courseId={ENV.course_id}
         moduleId={data.context_module.id}
         contextModules={contextModules}
+        moduleName={data.context_module.name}
       />,
-      module_dnd
+      module_dnd,
     )
   }
 
@@ -123,7 +124,7 @@ export function addModuleElement(
       new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
       explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
     },
-    {locale: ENV?.LOCALE || 'en'}
+    {locale: ENV?.LOCALE || 'en'},
   )
   if (mathml.isMathMLOnPage()) {
     if (mathml.isMathJaxLoaded()) {

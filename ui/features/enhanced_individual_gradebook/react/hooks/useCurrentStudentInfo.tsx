@@ -72,7 +72,7 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
         return [...submissions]
       })
     },
-    [setStudentSubmissions]
+    [setStudentSubmissions],
   )
 
   return {

@@ -31,7 +31,7 @@ export function BatchImportAlert({margin}) {
       <p>
         {I18n.t(
           `If selected, this will delete everything for this term, which includes all courses and enrollments
-                that are not in the selected import file above. See the documentation for details.`
+                that are not in the selected import file above. See the documentation for details.`,
         )}
       </p>
     </Alert>
@@ -74,17 +74,15 @@ export function ConfirmationModal({isOpen, onSubmit, onRequestClose}) {
 }
 
 export function renderBatchImportAlert(margin) {
-   
   ReactDOM.render(
     <BatchImportAlert margin={margin} />,
-    document.getElementById('batch_import_instructions')
+    document.getElementById('batch_import_instructions'),
   )
 }
 
 export function openModal(onSubmit, onRequestClose) {
-   
   ReactDOM.render(
     <ConfirmationModal isOpen={true} onSubmit={onSubmit} onRequestClose={onRequestClose} />,
-    document.getElementById('confirmation_modal_root')
+    document.getElementById('confirmation_modal_root'),
   )
 }

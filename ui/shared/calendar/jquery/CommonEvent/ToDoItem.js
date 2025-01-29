@@ -128,7 +128,7 @@ Object.assign(ToDoItem.prototype, {
         return `pages/${encodeURIComponent(this.object.plannable.url)}`
       default:
         return `${encodeURIComponent(this.object.plannable_type)}s/${encodeURIComponent(
-          this.object.plannable_id
+          this.object.plannable_id,
         )}`
     }
   },

@@ -27,18 +27,18 @@ import {getSetting} from '@canvas/settings-query/react/settingsQuery'
 const I18n = createI18nScope('Navigation')
 
 const unreadReleaseNotesCountElement = document.querySelector(
-  '#global_nav_help_link .menu-item__badge'
+  '#global_nav_help_link .menu-item__badge',
 )
 const unreadInboxCountElement = document.querySelector(
-  '#global_nav_conversations_link .menu-item__badge'
+  '#global_nav_conversations_link .menu-item__badge',
 )
 const unreadSharesCountElement = document.querySelector(
-  '#global_nav_profile_link .menu-item__badge'
+  '#global_nav_profile_link .menu-item__badge',
 )
 
 export default function NavigationBadges() {
   const countsEnabled = Boolean(
-    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
   )
 
   const {data: releaseNotesBadgeDisabled} = useQuery({
@@ -89,7 +89,7 @@ export default function NavigationBadges() {
                 one: 'One unread share.',
                 other: '%{count} unread shares.',
               },
-              {count: unreadContentSharesCount}
+              {count: unreadContentSharesCount},
             )}
           </>
         </ScreenReaderContent>
@@ -107,7 +107,7 @@ export default function NavigationBadges() {
                 one: 'One unread message.',
                 other: '%{count} unread messages.',
               },
-              {count: unreadConversationsCount}
+              {count: unreadConversationsCount},
             )}
           </>
         </ScreenReaderContent>
@@ -125,7 +125,7 @@ export default function NavigationBadges() {
                 one: 'One unread release note.',
                 other: '%{count} unread release notes.',
               },
-              {count: unreadReleaseNotesCount}
+              {count: unreadReleaseNotesCount},
             )}
           </>
         </ScreenReaderContent>

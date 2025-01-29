@@ -80,7 +80,7 @@ function addEntry(entry, isAudioFile) {
       data => {
         pubsub.publish('media_object_created', data)
       },
-      $.noop
+      $.noop,
     )
   }
   pubsub.publish('media_comment_created', {id: entry.entryId, mediaType, title: entry.userTitle})
@@ -142,7 +142,7 @@ $.mediaComment.video_delegate = {
     }
     $.mediaComment.video_delegate.readyWatcher = setTimeout(
       $.mediaComment.upload_delegate.setupErrorHandler,
-      2000
+      2000,
     )
   },
   readyHandler() {
@@ -223,8 +223,8 @@ $.mediaComment.upload_delegate = {
         I18n.t(
           'errors.file_too_large',
           '*This file is too large.* The maximum size is %{size}MB.',
-          {size: INST.kalturaSettings.max_file_size_bytes / 1048576, wrapper: '<b>$1</b>'}
-        )
+          {size: INST.kalturaSettings.max_file_size_bytes / 1048576, wrapper: '<b>$1</b>'},
+        ),
       )
       $('#media_upload_feedback').css('visibility', 'visible')
       $('#media_upload_submit').hide()
@@ -268,7 +268,7 @@ $.mediaComment.upload_delegate = {
   uploadErrorHandler(type) {
     const error = $('#' + type + '_upload')[0].getError()
     $('#media_upload_errors').text(
-      I18n.t('errors.upload_failed', 'Upload failed with error:') + ' ' + error
+      I18n.t('errors.upload_failed', 'Upload failed with error:') + ' ' + error,
     )
     $('#media_upload_progress').hide()
   },
@@ -276,8 +276,8 @@ $.mediaComment.upload_delegate = {
     $('#media_upload_feedback_text').text(
       I18n.t(
         'errors.media_comment_installation_broken',
-        'Media comment uploading has not been set up properly. Please contact your administrator.'
-      )
+        'Media comment uploading has not been set up properly. Please contact your administrator.',
+      ),
     )
     $('#media_upload_feedback').css('visibility', 'visible')
     $('#audio_upload_holder').css('visibility', 'hidden')
@@ -391,7 +391,7 @@ $.mediaComment.init = function (mediaType, opts) {
             wmode: 'opaque',
           }
           $('#audio_record').text(
-            I18n.t('messages.flash_required_record_audio', 'Flash required for recording audio.')
+            I18n.t('messages.flash_required_record_audio', 'Flash required for recording audio.'),
           )
           swfobject.embedSWF(
             '/media_record/KRecord.swf',
@@ -401,7 +401,7 @@ $.mediaComment.init = function (mediaType, opts) {
             '9.0.0',
             false,
             recordVars,
-            params
+            params,
           )
 
           params = $.extend({}, params, {name: 'KRecordVideo'})
@@ -415,7 +415,7 @@ $.mediaComment.init = function (mediaType, opts) {
             '9.0.0',
             false,
             recordVars,
-            params
+            params,
           )
 
           // give the dialog time to initialize or the recorder will
@@ -453,7 +453,7 @@ $.mediaComment.init = function (mediaType, opts) {
           wmode: 'transparent',
         }
         $('#audio_upload').text(
-          I18n.t('messages.flash_required_upload_audio', 'Flash required for uploading audio.')
+          I18n.t('messages.flash_required_upload_audio', 'Flash required for uploading audio.'),
         )
         width = '180'
         height = '50'
@@ -468,12 +468,12 @@ $.mediaComment.init = function (mediaType, opts) {
           '9.0.0',
           false,
           flashVars,
-          params
+          params,
         )
 
         flashVars = $.extend({}, flashVars, {jsDelegate: '$.mediaComment.video_delegate'})
         $('#video_upload').text(
-          I18n.t('messages.flash_required_upload_video', 'Flash required for uploading video.')
+          I18n.t('messages.flash_required_upload_video', 'Flash required for uploading video.'),
         )
         width = '180'
         height = '50'
@@ -488,7 +488,7 @@ $.mediaComment.init = function (mediaType, opts) {
           '9.0.0',
           false,
           flashVars,
-          params
+          params,
         )
 
         // **********************************************************************
@@ -636,18 +636,18 @@ $.mediaComment.init = function (mediaType, opts) {
             if (!data.logged_in) {
               $div.data(
                 'ks-error',
-                I18n.t('errors.must_be_logged_in', 'You must be logged in to record media.')
+                I18n.t('errors.must_be_logged_in', 'You must be logged in to record media.'),
               )
             } else {
               $div.data(
                 'ks-error',
                 I18n.t(
                   'errors.load_failed',
-                  'Media Comment Application failed to load.  Please try again.'
-                )
+                  'Media Comment Application failed to load.  Please try again.',
+                ),
               )
             }
-          }
+          },
         )
         // **********************************************************************
         // Load dialog html
@@ -655,7 +655,7 @@ $.mediaComment.init = function (mediaType, opts) {
         const checkForKS = function () {
           if ($div.data('ks')) {
             const mediaCommentsTemplate = getDefaultExport(
-              require('../jst/MediaComments.handlebars')
+              require('../jst/MediaComments.handlebars'),
             )
             $div.html(mediaCommentsTemplate())
             require('jqueryui/tabs')
@@ -751,17 +751,17 @@ $(document).bind('media_recording_error', () => {
       htmlEscape(
         I18n.t(
           'errors.save_failed',
-          'Saving appears to have failed.  Please close this popup to try again.'
-        )
+          'Saving appears to have failed.  Please close this popup to try again.',
+        ),
       ) +
         "<div style='font-size: 0.8em; margin-top: 20px;'>" +
         htmlEscape(
           I18n.t(
             'errors.persistent_problem',
-            'If this problem keeps happening, you may want to try recording your media locally and then uploading the saved file instead.'
-          )
+            'If this problem keeps happening, you may want to try recording your media locally and then uploading the saved file instead.',
+          ),
         ) +
-        '</div>'
+        '</div>',
     )
 })
 
@@ -774,7 +774,6 @@ window.beforeAddEntry = function () {
   const attemptId = Math.random()
   $.mediaComment.lastAddAttemptId = attemptId
   setTimeout(() => {
-     
     if ($.mediaComment.lastAddAttemptId == attemptId) {
       $(document).triggerHandler('media_recording_error')
     }
@@ -797,10 +796,9 @@ window.addEntryComplete = function (entries) {
     }
     for (let idx = 0; idx < entries.length; idx++) {
       const entry = entries[idx]
-       
+
       if ($('#media_record_tabs').tabs('option', 'selected') == 0) {
         userTitle = $('#video_record_title,#audio_record_title').filter(':visible:first').val()
-         
       } else if ($('#media_record_tabs').tabs('option', 'selected') == 1) {
         // no-op
       }
@@ -811,9 +809,8 @@ window.addEntryComplete = function (entries) {
       $('#media_comment_dialog').dialog('close')
     }
   } catch (e) {
-     
     console.log(e)
-     
+
     window.alert(I18n.t('errors.save_failed_try_again', 'Entry failed to save.  Please try again.'))
   }
 }

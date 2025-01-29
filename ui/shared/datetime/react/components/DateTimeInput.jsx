@@ -108,7 +108,7 @@ function DateTimeInput(props) {
       })
       return formatter.format(jsDate)
     },
-    [locale, timezone]
+    [locale, timezone],
   )
 
   const formatDateTime = useCallback(
@@ -125,7 +125,7 @@ function DateTimeInput(props) {
       })
       return formatter.format(jsDate)
     },
-    [locale, timezone]
+    [locale, timezone],
   )
 
   function onDateUpdate(newDate) {

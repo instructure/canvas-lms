@@ -32,7 +32,7 @@ const setup = props => {
       setAttachmentToUpload={() => {}}
       responsiveQuerySizes={responsiveQuerySizes}
       {...props}
-    />
+    />,
   )
 }
 

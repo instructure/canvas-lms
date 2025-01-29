@@ -35,7 +35,7 @@ const renderBlock = (enabled: boolean, props: Partial<ResourceCardProps> = {}) =
       <Frame>
         <ResourceCard {...props} />
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 

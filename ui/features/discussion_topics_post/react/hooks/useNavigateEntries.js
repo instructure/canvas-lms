@@ -28,7 +28,6 @@ export default function useNavigateEntries({
   expandedThreads,
   setExpandedThreads = () => {},
   setFocusSelector = () => {},
-  sort = 'desc',
   discussionID = '',
   perPage = 20,
 } = {}) {
@@ -49,13 +48,12 @@ export default function useNavigateEntries({
     discussionID,
     userSearchId: currentStudentId,
     perPage,
-    sort,
   }
 
   const studentTopicQuery = useQuery(STUDENT_DISCUSSION_QUERY, {
     variables: studentTopicVariables,
     fetchPolicy: 'cache-and-network',
-    skip: !(isInSpeedGrader && currentStudentId && studentTopicVariables.discussionID),
+    skip: !(isInSpeedGrader && currentStudentId && studentTopicVariables.discussionID)
   })
 
   const getStudentEntries = useCallback(() => {
@@ -81,7 +79,7 @@ export default function useNavigateEntries({
         setExpandedThreads([...expandedThreads, newEntry.rootEntryId])
       }
     },
-    [expandedThreads, highlightEntryId, setExpandedThreads, setHighlightEntryId, setPageNumber]
+    [expandedThreads, highlightEntryId, setExpandedThreads, setHighlightEntryId, setPageNumber],
   )
 
   const getStudentPreviousEntry = useCallback(() => {
@@ -134,7 +132,7 @@ export default function useNavigateEntries({
         }
       }
     },
-    [highlightEntryId, getStudentPreviousEntry, getStudentNextEntry, setFocusSelector]
+    [highlightEntryId, getStudentPreviousEntry, getStudentNextEntry, setFocusSelector],
   )
 
   useEffect(() => {

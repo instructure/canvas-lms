@@ -104,7 +104,7 @@ export default class ProficiencyTable extends React.Component {
           $.flashError(
             I18n.t('An error occurred while loading account proficiency ratings: %{m}', {
               m: e.response.statusText,
-            })
+            }),
           )
         }
         this.setState({billboard: true, loading: false})
@@ -113,7 +113,9 @@ export default class ProficiencyTable extends React.Component {
 
   configToState = data => {
     const rows = List(
-      data.ratings.map(rating => this.createRating(rating.description, rating.points, rating.color))
+      data.ratings.map(rating =>
+        this.createRating(rating.description, rating.points, rating.color),
+      ),
     )
     const masteryIndex = data.ratings.findIndex(rating => rating.mastery)
     this.setState({
@@ -201,7 +203,7 @@ export default class ProficiencyTable extends React.Component {
       row =>
         this.invalidPoints(row.get('points')) ||
         row.get('points') < 0 ||
-        this.invalidDescription(row.get('description'))
+        this.invalidDescription(row.get('description')),
     )
 
   stateToConfig = () => ({
@@ -217,7 +219,6 @@ export default class ProficiencyTable extends React.Component {
 
   handleSubmit = () => {
     if (!this.checkForErrors()) {
-       
       saveProficiency(this.props.accountId, this.stateToConfig()).then(response => {
         if (response.status === 200) {
           $.flashMessage(I18n.t('Account proficiency ratings saved'))
@@ -316,7 +317,7 @@ export default class ProficiencyTable extends React.Component {
             `
             Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook.
             Adjust number of ratings, mastery level, points, and colors.
-          `
+          `,
           ).trim()}
         />
         <Button color="primary" onClick={this.removeBillboard}>

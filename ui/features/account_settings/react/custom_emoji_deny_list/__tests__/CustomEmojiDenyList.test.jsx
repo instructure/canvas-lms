@@ -37,7 +37,7 @@ describe('CustomEmojiDenyList', () => {
     window.ENV.EMOJI_DENY_LIST = 'middle_finger,eggplant'
     const {getByRole} = render(<CustomEmojiDenyList />)
     expect(
-      getByRole('button', {name: /Remove emoji "Reversed Hand with Middle Finger Extended"/})
+      getByRole('button', {name: /Remove emoji "Reversed Hand with Middle Finger Extended"/}),
     ).toBeInTheDocument()
     expect(getByRole('button', {name: /Remove emoji "Aubergine"/})).toBeInTheDocument()
   })

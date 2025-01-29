@@ -146,7 +146,7 @@ const useGroupDetail = ({
           // then reverse again to keep the order
           const edges = uniqBy(
             [...prevData.group.outcomes.edges, ...fetchMoreResult.group.outcomes.edges].reverse(),
-            '_id'
+            '_id',
           ).reverse()
 
           return {
@@ -265,7 +265,7 @@ const useGroupDetail = ({
           {
             count: group.outcomesCount,
             groupTitle: group.title,
-          }
+          },
         ),
         srOnly: true,
       })

@@ -150,7 +150,7 @@ describe('FileSelectBox', () => {
       () => {
         expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
       },
-      {timeout: 2000}
+      {timeout: 2000},
     )
 
     for (const folderName of expectedFolders) {
@@ -175,7 +175,7 @@ describe('FileSelectBox', () => {
       () => {
         expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
       },
-      {timeout: 2000}
+      {timeout: 2000},
     )
 
     expect(select).toHaveAttribute('aria-busy', 'false')

@@ -90,7 +90,7 @@ describe('RegisterCommunication', () => {
       render(<RegisterCommunication availableTabs={[Tab.EMAIL]} isDefaultAccount={false} />)
       const input = screen.getByLabelText('Email')
       const checkbox = screen.queryByLabelText(
-        'I want to log in to Canvas using this email address'
+        'I want to log in to Canvas using this email address',
       )
 
       expect(input).toBeInTheDocument()
@@ -123,7 +123,7 @@ describe('RegisterCommunication', () => {
           availableTabs={[Tab.EMAIL]}
           isDefaultAccount={true}
           onSubmit={onSubmit}
-        />
+        />,
       )
       const inputValue = 'test@test.com'
       const input = screen.getByLabelText('Email Address')
@@ -143,7 +143,7 @@ describe('RegisterCommunication', () => {
           availableTabs={[Tab.EMAIL]}
           isDefaultAccount={true}
           onSubmit={onSubmit}
-        />
+        />,
       )
       const inputValue = 'test@test.com'
       const input = screen.getByLabelText('Email Address')
@@ -192,7 +192,7 @@ describe('RegisterCommunication', () => {
           availableTabs={[Tab.SMS]}
           initiallySelectedTab={Tab.SMS}
           onSubmit={onSubmit}
-        />
+        />,
       )
       const inputValue = '5555555555'
       const input = screen.getByLabelText('Mobile Number')
@@ -232,7 +232,7 @@ describe('RegisterCommunication', () => {
           availableTabs={[Tab.SLACK]}
           initiallySelectedTab={Tab.SLACK}
           onSubmit={onSubmit}
-        />
+        />,
       )
       const inputValue = 'test@test.com'
       const input = screen.getByTestId('slack-email')

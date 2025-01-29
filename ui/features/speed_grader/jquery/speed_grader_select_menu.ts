@@ -201,7 +201,7 @@ export default class SpeedgraderSelectMenu {
     this.student_id_map = buildStudentIdMap(this.options_array)
 
     $(
-      '<label class="screenreader-only" for="students_selectmenu">Select a student</label>'
+      '<label class="screenreader-only" for="students_selectmenu">Select a student</label>',
     ).appendTo(selector)
 
     this.$el = $(buildHtml(this.options_array))

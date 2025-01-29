@@ -138,7 +138,7 @@ MessageStudentsDialog.prototype.updateListOfRecipients = function () {
   return this.$messageRecipients.html(
     recipientListTemplate({
       recipients,
-    })
+    }),
   )
 }
 

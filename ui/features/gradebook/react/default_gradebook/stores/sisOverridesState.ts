@@ -28,7 +28,7 @@ export type SisOverrideState = {
 
 export default (
   set: StoreApi<GradebookStore>['setState'],
-  get: StoreApi<GradebookStore>['getState']
+  get: StoreApi<GradebookStore>['getState'],
 ): SisOverrideState => ({
   sisOverrides: [],
 

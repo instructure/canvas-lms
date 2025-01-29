@@ -33,7 +33,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('temporary_enrollment')
 
-interface Props {
+export interface ManageTempEnrollButtonProps {
   user: {
     id: string
     name: string
@@ -44,7 +44,7 @@ interface Props {
   rolePermissions: RolePermissions
 }
 
-function ManageTempEnrollButton(props: Props) {
+function ManageTempEnrollButton(props: ManageTempEnrollButtonProps) {
   const [isProvider, setIsProvider] = useState(false)
   const [editMode, setEditMode] = useState(false)
 
@@ -59,10 +59,10 @@ function ManageTempEnrollButton(props: Props) {
       success: setProvider,
       error: useCallback(
         () => showFlashError(I18n.t('Failed to fetch temporary enrollment data')),
-        []
+        [],
       ),
     },
-    [props.user.id]
+    [props.user.id],
   )
 
   function toggleEditMode() {

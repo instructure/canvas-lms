@@ -68,7 +68,7 @@ export default function CoursesList() {
                 </ActiveText>
               </Link>
             </List.Item>
-          ))
+          )),
         )}
     </List>
   )

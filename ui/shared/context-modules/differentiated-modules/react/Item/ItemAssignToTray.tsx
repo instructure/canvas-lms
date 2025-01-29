@@ -133,14 +133,14 @@ export interface ItemAssignToTrayProps {
     overrides: ItemAssignToCardSpec[],
     hasModuleOverrides: boolean,
     deletedModuleAssignees: string[],
-    disabledOptionIds?: string[]
+    disabledOptionIds?: string[],
   ) => void
   onChange?: (
     overrides: ItemAssignToCardSpec[],
     hasModuleOverrides: boolean,
     deletedModuleAssignees: string[],
     disabledOptionIds?: string[],
-    moduleOverrides?: ItemAssignToCardSpec[]
+    moduleOverrides?: ItemAssignToCardSpec[],
   ) => ItemAssignToCardSpec[]
   onClose: () => void
   onDismiss: () => void
@@ -165,7 +165,7 @@ export interface ItemAssignToTrayProps {
   onAssigneesChange?: (
     cardId: string,
     newAssignee: Record<string, any>,
-    deletedAssignee: Record<string, any>[]
+    deletedAssignee: Record<string, any>[],
   ) => void
   onDatesChange?: (cardId: string, dateType: string, newDate: string) => void
   onCardRemove?: (cardId: string) => void
@@ -212,7 +212,7 @@ export default function ItemAssignToTray({
   const [initialCardsState, setInitialCardsState] = useState<ItemAssignToCardSpec[]>([])
 
   const [assignToCards, setAssignToCardsInner] = useState<ItemAssignToCardSpec[]>(
-    defaultCards ?? []
+    defaultCards ?? [],
   )
   const setAssignToCards = (cards: ItemAssignToCardSpec[]) => {
     assignToCardsRef.current = cards
@@ -223,21 +223,18 @@ export default function ItemAssignToTray({
   const [moduleAssignees, setModuleAssignees] = useState<string[]>([])
   const [groupCategoryId, setGroupCategoryId] = useState<string | null>(defaultGroupCategoryId)
   const [overridesFetched, setOverridesFetched] = useState(
-    defaultCards !== undefined && defaultCards.length > 0
+    defaultCards !== undefined && defaultCards.length > 0,
   )
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     // On the edit pages, the ENV will contain this data, so we can initialize the lock info here. We'll fall back to
     // fetching it via the date details API in other cases.
-    // @ts-expect-error
     ENV.MASTER_COURSE_DATA?.is_master_course_child_content &&
-      // @ts-expect-error
       ENV.MASTER_COURSE_DATA?.restricted_by_master_course
-      ? // @ts-expect-error
-        (Object.entries(ENV.MASTER_COURSE_DATA?.master_course_restrictions ?? {})
+      ? (Object.entries(ENV.MASTER_COURSE_DATA?.master_course_restrictions ?? {})
           .filter(([_lockType, locked]) => locked)
           .filter(([lockType]) => ['due_dates', 'availability_dates'].includes(lockType))
           .map(([lockType]) => lockType) as DateLockTypes[])
-      : undefined
+      : undefined,
   )
   const assignToCardsRef = useRef(assignToCards)
   const disabledOptionIdsRef = useRef(defaultDisabledOptionIds)
@@ -265,9 +262,9 @@ export default function ItemAssignToTray({
   }, [defaultCards, initialCardsState.length])
 
   useEffect(() => {
-    if (!ENV.FEATURES?.selective_release_edit_page || onChange === undefined) return
+    if (onChange === undefined) return
     const deletedModuleAssignees = moduleAssignees.filter(
-      override => !disabledOptionIdsRef.current.includes(override)
+      override => !disabledOptionIdsRef.current.includes(override),
     )
     const moduleOverrides = hasModuleOverrides ? defaultCards?.filter(o => o.contextModuleId) : []
     const newCards = onChange(
@@ -275,7 +272,7 @@ export default function ItemAssignToTray({
       hasModuleOverrides,
       deletedModuleAssignees,
       disabledOptionIdsRef.current,
-      moduleOverrides
+      moduleOverrides,
     )
     setAssignToCards(newCards)
   }, [assignToCards, defaultCards, hasModuleOverrides, moduleAssignees, onChange])
@@ -343,7 +340,7 @@ export default function ItemAssignToTray({
     }
     // compare original module assignees to see if they were removed for unassign_item overrides
     const deletedModuleAssignees = moduleAssignees.filter(
-      override => !disabledOptionIdsRef.current.includes(override)
+      override => !disabledOptionIdsRef.current.includes(override),
     )
 
     if (onSave !== undefined) {
@@ -351,19 +348,19 @@ export default function ItemAssignToTray({
         assignToCardsRef.current,
         hasModuleOverrides,
         deletedModuleAssignees,
-        disabledOptionIdsRef.current
+        disabledOptionIdsRef.current,
       )
       return
     }
     const filteredCards = assignToCardsRef.current.filter(
       card =>
         [null, undefined, ''].includes(card.contextModuleId) ||
-        (card.contextModuleId !== null && card.isEdited)
+        (card.contextModuleId !== null && card.isEdited),
     )
     const payload = generateDateDetailsPayload(
       filteredCards,
       hasModuleOverrides,
-      deletedModuleAssignees
+      deletedModuleAssignees,
     )
     if (itemContentId !== undefined) {
       updateModuleItem({
@@ -411,7 +408,7 @@ export default function ItemAssignToTray({
         // Runs custom card validations with current data and returns true if all cards are valid
         allCardsValidCustom: (params: ItemAssignToCardCustomValidationArgs) =>
           !Object.values(cardsRefs.current).some(
-            c => c.current && Object.keys(c.current.runCustomValidations(params)).length !== 0
+            c => c.current && Object.keys(c.current.runCustomValidations(params)).length !== 0,
           ),
       }
     }
@@ -441,7 +438,7 @@ export default function ItemAssignToTray({
           <Alert liveRegion={getLiveRegion} variant="info" margin="small 0 0">
             <Text size="small">
               {I18n.t(
-                'Select who should be assigned and use the drop-down menus or manually enter your date and time.'
+                'Select who should be assigned and use the drop-down menus or manually enter your date and time.',
               )}
             </Text>
           </Alert>

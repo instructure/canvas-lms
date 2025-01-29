@@ -49,7 +49,7 @@ const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, 
         parentGroupTitle: `Outcome Group ${sameGroup ? 1001 : 1001 + idx}`,
       },
     }),
-    {}
+    {},
   )
 
 describe('useOutcomesRemove', () => {

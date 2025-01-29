@@ -39,24 +39,20 @@ module EportfoliosCommon
   end
 
   def add_eportfolio_section(name)
-    organize_sections
-    f("#section_list_manage .add_section_link").click
-    f("#section_list input").send_keys(name, :return)
     wait_for_ajaximations
-    f("#section_list_manage .done_editing_button").click
+    f("button[data-testid='add-section-button']").click
+    f("input[data-testid='add-field']").send_keys(name, :return)
   end
 
   def sections
-    ffj("#section_list li:visible")
+    ff("#section_list_mount tr")
   end
 
-  def delete_eportfolio_section(page)
-    organize_sections
-    page.find_element(:css, ".section_settings_menu").click
-    page.find_element(:css, ".remove_section_link").click
-    driver.switch_to.alert.accept
-    wait_for_animations
-    f("#section_list_manage .done_editing_button").click
+  def delete_eportfolio_section(section)
+    wait_for_ajaximations
+    section.find("button").click
+    f("[data-testid='delete-menu-option']").click
+    fj("span[role='dialog'] button:contains('Delete')").click
   end
 
   def move_section_to_bottom(section)
@@ -67,21 +63,17 @@ module EportfoliosCommon
     move_to_modal.find_element(:css, "#MoveToDialog__move").click
   end
 
-  def add_eportfolio_page(page_title)
-    organize_pages
-    f(".add_page_link").click
-    f("#page_name").send_keys(page_title, :return)
+  def add_eportfolio_page(name)
     wait_for_ajaximations
-    f("#section_pages .done_editing_button").click
+    f("button[data-testid='add-page-button']").click
+    f("input[data-testid='add-field']").send_keys(name, :return)
   end
 
-  def delete_eportfolio_page(page_title)
-    organize_pages
-    page_title.find_element(:css, ".page_settings_menu").click
-    page_title.find_element(:css, ".remove_page_link").click
-    driver.switch_to.alert.accept
-    wait_for_animations
-    f("#section_pages .done_editing_button").click
+  def delete_eportfolio_page(page)
+    wait_for_ajaximations
+    page.find("button").click
+    f("[data-testid='delete-menu-option']").click
+    fj("span[role='dialog'] button:contains('Delete')").click
   end
 
   def move_page_to_bottom(page)
@@ -93,7 +85,7 @@ module EportfoliosCommon
   end
 
   def pages
-    ffj("#page_list li:visible")
+    ff("#page_list_mount tr")
   end
 
   def organize_pages

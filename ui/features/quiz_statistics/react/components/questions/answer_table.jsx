@@ -63,7 +63,7 @@ class AnswerRow extends React.Component {
               one: '1 respondent',
               other: '%{count} respondents',
             },
-            {count: answer.responses}
+            {count: answer.responses},
           )}
         </div>
       )

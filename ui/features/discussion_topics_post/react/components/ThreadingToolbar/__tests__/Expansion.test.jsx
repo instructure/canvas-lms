@@ -49,7 +49,7 @@ const setup = props => {
       delimiterKey="expansion"
       expandText=""
       {...props}
-    />
+    />,
   )
 }
 
@@ -60,9 +60,9 @@ describe('Expansion', () => {
       onClick: onClickMock,
       expandText: '4 replies',
     })
-    expect(onClickMock.mock.calls.length).toBe(0)
+    expect(onClickMock.mock.calls).toHaveLength(0)
     fireEvent.click(getByText('4 replies'))
-    expect(onClickMock.mock.calls.length).toBe(1)
+    expect(onClickMock.mock.calls).toHaveLength(1)
   })
 
   it('indicates expansion status', () => {
@@ -76,7 +76,7 @@ describe('Expansion', () => {
         isExpanded={true}
         delimiterKey="expansion"
         expandText=""
-      />
+      />,
     )
 
     expect(queryByTestId('reply-expansion-btn-expand')).toBeFalsy()

@@ -29,7 +29,7 @@ const assignmentPickerReducer = combineReducers({
       [actions.OPEN_ASSIGNMENT_PICKER]: (_state, _actions) => true,
       [actions.CLOSE_ASSIGNMENT_PICKER]: (_state, _actions) => false,
     },
-    false
+    false,
   ),
 
   target: handleActions(
@@ -37,7 +37,7 @@ const assignmentPickerReducer = combineReducers({
       [actions.SET_ASSIGNMENT_PICKER_TARGET]: (state, action) => action.payload,
       [actions.CLOSE_ASSIGNMENT_PICKER]: () => null,
     },
-    null
+    null,
   ),
 
   disabled_assignments: handleActions(
@@ -49,7 +49,7 @@ const assignmentPickerReducer = combineReducers({
           .toSet(),
       [actions.CLOSE_ASSIGNMENT_PICKER]: () => Set(),
     },
-    Set()
+    Set(),
   ),
 
   selected_assignments: handleActions(
@@ -59,7 +59,7 @@ const assignmentPickerReducer = combineReducers({
         state.toSet().delete(action.payload),
       [actions.CLOSE_ASSIGNMENT_PICKER]: () => Set(),
     },
-    Set()
+    Set(),
   ),
 
   name_filter: handleActions(
@@ -67,7 +67,7 @@ const assignmentPickerReducer = combineReducers({
       [actions.FILTER_ASSIGNMENTS_BY_NAME]: (state, action) => action.payload,
       [actions.CLOSE_ASSIGNMENT_PICKER]: () => '',
     },
-    ''
+    '',
   ),
 
   category_filter: handleActions(
@@ -75,7 +75,7 @@ const assignmentPickerReducer = combineReducers({
       [actions.FILTER_ASSIGNMENTS_BY_CATEGORY]: (state, action) => action.payload,
       [actions.CLOSE_ASSIGNMENT_PICKER]: () => ALL_ID,
     },
-    ALL_ID
+    ALL_ID,
   ),
 })
 

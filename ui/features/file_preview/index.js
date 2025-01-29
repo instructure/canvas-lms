@@ -29,7 +29,7 @@ ready(() => {
     data.type,
     data.download_url,
     data.attachment_id,
-    data.bp_locked_attachment
+    data.bp_locked_attachment,
   )
   if (ENV.NEW_FILES_PREVIEW) {
     $('#media_preview').css({

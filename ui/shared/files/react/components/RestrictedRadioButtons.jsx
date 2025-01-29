@@ -36,8 +36,8 @@ const allAreEqual = (models, fields) =>
     fields.every(
       attribute =>
         models[0].get(attribute) === model.get(attribute) ||
-        (!models[0].get(attribute) && !model.get(attribute))
-    )
+        (!models[0].get(attribute) && !model.get(attribute)),
+    ),
   )
 
 class RestrictedRadioButtons extends React.Component {
@@ -175,9 +175,8 @@ class RestrictedRadioButtons extends React.Component {
       </label>
       <div>
         {this.permissionOptions.map((option, index) => (
-           
           <div className="radio" key={index}>
-            { }
+            {}
             <label>
               <input
                 ref={e => (this[option.ref] = e)}
@@ -270,7 +269,7 @@ class RestrictedRadioButtons extends React.Component {
   renderVisibilityOptions = () => {
     const equal = allAreEqual(
       this.props.models.filter(model => model instanceof File),
-      ['visibility_level']
+      ['visibility_level'],
     )
 
     return (

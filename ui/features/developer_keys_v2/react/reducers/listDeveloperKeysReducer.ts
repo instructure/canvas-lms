@@ -105,7 +105,7 @@ export default makeReducer(initialState, {
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE]: (state, action) => ({
     ...state,
     list: state.list.map(developerKey =>
-      action.payload.id === developerKey.id ? action.payload : developerKey
+      action.payload.id === developerKey.id ? action.payload : developerKey,
     ),
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE]: (state, action) => {
@@ -188,7 +188,7 @@ export default makeReducer(initialState, {
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_DELETE]: (state, action) => ({
     ...state,
     list: state.list.filter(
-      developerKey => action.payload.id.toString() !== developerKey.id.toString()
+      developerKey => action.payload.id.toString() !== developerKey.id.toString(),
     ),
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_PREPEND]: (state, action) => {

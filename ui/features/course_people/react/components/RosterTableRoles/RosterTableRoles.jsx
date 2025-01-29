@@ -64,7 +64,7 @@ RosterTableRoles.propTypes = {
         id: string.isRequired,
         name: string.isRequired,
       }),
-    })
+    }),
   ).isRequired,
 }
 

@@ -20,18 +20,26 @@ import React from 'react'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import FilesApp from './react/components/FilesApp'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {QueryProvider} from '@canvas/query'
 import {createRoot} from 'react-dom/client'
 import {generateFolderByPathUrl} from './utils/apiUtils'
+import AllMyFilesTable from './react/components/AllMyFilesTable'
 
 const contextAssetString = window.ENV.context_asset_string
+const showingAllContexts = filesEnv.showingAllContexts
 
 const router = createBrowserRouter(
   [
     {
       path: '/',
-      element: <FilesApp contextAssetString={contextAssetString} />,
+      element: showingAllContexts ? (
+        <AllMyFilesTable />
+      ) : (
+        <FilesApp contextAssetString={contextAssetString} />
+      ),
       loader: async () => {
+        if (showingAllContexts) return null
+
         const url = generateFolderByPathUrl('')
         return fetch(url)
       },
@@ -47,15 +55,13 @@ const router = createBrowserRouter(
   ],
   {
     basename: filesEnv.baseUrl,
-  }
+  },
 )
-
-const queryClient = new QueryClient()
 
 const root = createRoot(document.getElementById('content')!)
 
 root.render(
-  <QueryClientProvider client={queryClient}>
+  <QueryProvider>
     <RouterProvider router={router} />
-  </QueryClientProvider>
+  </QueryProvider>,
 )

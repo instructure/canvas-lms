@@ -273,7 +273,7 @@ const assignmentUtils = {
       if (assignment.overrideForThisSection.due_at) {
         fd.append(
           'assignment_override[due_at]',
-          assignment.overrideForThisSection.due_at.toISOString()
+          assignment.overrideForThisSection.due_at.toISOString(),
         )
       }
 
@@ -342,7 +342,7 @@ const assignmentUtils = {
       id: string
       type: string
     },
-    assignments: AssignmentWithOverride[]
+    assignments: AssignmentWithOverride[],
   ) {
     const url = '/api/v1/' + selected.type + 's/' + selected.id + '/post_grades/'
     const data = {

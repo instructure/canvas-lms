@@ -31,7 +31,7 @@ const outcomesGenerator = (startId, count, canUnlink = true, title = '') =>
         canUnlink,
       },
     }),
-    {}
+    {},
   )
 
 export default {
@@ -90,6 +90,6 @@ withLongOutcomeTitles.args = {
     1,
     5,
     true,
-    'This is a very long outcome title that needs to be truncated to fit the modal width'
+    'This is a very long outcome title that needs to be truncated to fit the modal width',
   ),
 }

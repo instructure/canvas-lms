@@ -80,10 +80,10 @@ const TextBlockToolbar = () => {
   const [isBold, setIsBold] = useState(isCaretAtBoldText())
   const [isItalic, setIsItalic] = useState(isCaretAtStyledText('font-style', 'italic'))
   const [isUnderline, setIsUnderline] = useState(
-    isCaretAtStyledText('text-decoration-line', 'underline')
+    isCaretAtStyledText('text-decoration-line', 'underline'),
   )
   const [isStrikeThrough, setIsStrikeThrough] = useState(
-    isCaretAtStyledText('text-decoration-line', 'line-through')
+    isCaretAtStyledText('text-decoration-line', 'line-through'),
   )
 
   useEffect(() => {
@@ -133,11 +133,11 @@ const TextBlockToolbar = () => {
       _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
-      _args: MenuItem
+      _args: MenuItem,
     ) => {
       setProp((prps: TextBlockProps) => (prps.fontSize = value as string))
     },
-    [setProp]
+    [setProp],
   )
 
   const handleColorChange = useCallback(
@@ -145,7 +145,7 @@ const TextBlockToolbar = () => {
       setProp((prps: TextBlockProps) => (prps.color = color))
       setColorModalOpen(false)
     },
-    [setProp]
+    [setProp],
   )
 
   const handleColorButtonClick = useCallback(() => {

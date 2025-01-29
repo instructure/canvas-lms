@@ -80,15 +80,15 @@ export default function GroupCategoryMessageAllUnassignedModal({
           method: 'POST',
           path: `/api/v1/conversations`,
           body: chunkData,
-        })
+        }),
       )
     })
     Promise.all(promiseArray)
       .then(notifyDidSave)
       .catch(err => {
-        console.error(err)  
+        console.error(err)
         captureException(err)
-        if (err.response) console.error(err.response)  
+        if (err.response) console.error(err.response)
         setStatus('error')
       })
   }

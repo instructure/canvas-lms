@@ -70,15 +70,17 @@ describe('HideAssignmentGradesTray', () => {
         ref={ref => {
           trayRef = ref
         }}
-      />
+      />,
     )
   }
 
   const showTray = async (context = defaultContext) => {
     renderTray()
     trayRef.show(context)
+    // Wait for both heading and hide button to ensure tray is fully rendered
     await waitFor(() => {
       expect(screen.getByRole('heading', {name: 'Math 1.1'})).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Hide'})).toBeInTheDocument()
     })
   }
 
@@ -90,6 +92,10 @@ describe('HideAssignmentGradesTray', () => {
   describe('sections functionality', () => {
     it('does not display sections by default', async () => {
       await showTray()
+      // Wait for any potential async updates
+      await waitFor(() => {
+        expect(screen.getByRole('button', {name: 'Hide'})).toBeInTheDocument()
+      })
       expect(screen.queryByRole('checkbox', {name: 'Freshmen'})).not.toBeInTheDocument()
     })
 
@@ -156,7 +162,7 @@ describe('HideAssignmentGradesTray', () => {
 
     it('disables hide button while processing', async () => {
       const hideAssignmentGradesMock = jest.fn(
-        () => new Promise(resolve => setTimeout(resolve, 100))
+        () => new Promise(resolve => setTimeout(resolve, 100)),
       )
       Api.hideAssignmentGrades.mockImplementation(hideAssignmentGradesMock)
       await showTray()

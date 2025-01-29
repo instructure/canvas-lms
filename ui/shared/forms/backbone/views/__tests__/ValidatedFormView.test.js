@@ -98,11 +98,11 @@ describe('ValidatedFormView', () => {
   })
 
   it('disables inputs while loading', () => {
-    expect(form.$(':disabled').length).toBe(0)
+    expect(form.$(':disabled')).toHaveLength(0)
 
     form.on('submit', () => {
       jest.advanceTimersByTime(20) // disableWhileLoading does its thing in a setTimeout
-      expect(form.$(':disabled').length).toBe(3)
+      expect(form.$(':disabled')).toHaveLength(3)
     })
 
     form.submit()
@@ -205,7 +205,7 @@ describe('ValidatedFormView', () => {
       expect(fakeSendFunc).toHaveBeenCalledWith(
         expect.objectContaining({0: textArea[0]}),
         'checkReadyToGetCode',
-        window.confirm
+        window.confirm,
       )
     })
 

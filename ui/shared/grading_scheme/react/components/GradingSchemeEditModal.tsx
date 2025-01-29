@@ -38,7 +38,7 @@ export type GradingSchemeEditModalProps = {
   openDeleteModal: (gradingScheme: GradingScheme) => void
   handleUpdateScheme: (
     gradingSchemeFormInput: GradingSchemeEditableData,
-    gradingSchemeId: string
+    gradingSchemeId: string,
   ) => void
   defaultGradingSchemeTemplate: GradingScheme
   defaultPointsGradingScheme: GradingSchemeTemplate
@@ -94,15 +94,15 @@ const GradingSchemeEditModal = ({
           >
             {!viewingFromAccountManagementPage && gradingScheme.context_type === 'Account'
               ? I18n.t(
-                  "Percentages and points can't be edited because it is an account level grading scheme."
+                  "Percentages and points can't be edited because it is an account level grading scheme.",
                 )
               : isCourseDefault
-              ? I18n.t(
-                  "Percentages and points can't be edited because it is being used as the default grading scheme."
-                )
-              : I18n.t(
-                  "Percentages and points can't be edited because it is currently being used."
-                )}
+                ? I18n.t(
+                    "Percentages and points can't be edited because it is being used as the default grading scheme.",
+                  )
+                : I18n.t(
+                    "Percentages and points can't be edited because it is currently being used.",
+                  )}
           </Alert>
         )}
         <GradingSchemeInput

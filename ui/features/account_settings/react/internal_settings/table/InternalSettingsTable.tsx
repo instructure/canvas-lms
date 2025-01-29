@@ -92,13 +92,13 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
 
         return 0
       }),
-    [sort.sortBy, sort.ascending, props.internalSettings]
+    [sort.sortBy, sort.ascending, props.internalSettings],
   )
 
   // Don't export secret settings
   const exportableSettings = useMemo(
     () => props.internalSettings.filter(internalSetting => !internalSetting.secret),
-    [props.internalSettings]
+    [props.internalSettings],
   )
   const exportParams = {data: exportableSettings, fileName: 'internal-settings'}
 

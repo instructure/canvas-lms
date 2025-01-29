@@ -38,7 +38,7 @@ const BLACKOUT_DATES = [
 describe('summarizeSettingChanges', () => {
   it('formats known setting changes correctly', () => {
     expect(
-      summarizeSettingChanges([EXCLUDE_WEEKENDS, END_DATE, REQUIRE_COMPLETION]).map(c => c.summary)
+      summarizeSettingChanges([EXCLUDE_WEEKENDS, END_DATE, REQUIRE_COMPLETION]).map(c => c.summary),
     ).toEqual([
       'Skip Weekends was turned on.',
       'Require Completion by End Date was turned on and set to November 1, 2021.',
@@ -54,8 +54,8 @@ describe('summarizeSettingChanges', () => {
   it('includes unknown settings (and formats them as strings)', () => {
     expect(
       summarizeSettingChanges([{id: 'unknown_setting', oldValue: 50, newValue: 500}]).map(
-        c => c.summary
-      )
+        c => c.summary,
+      ),
     ).toEqual(['unknown_setting was changed from 50 to 500.'])
   })
 
@@ -82,7 +82,7 @@ describe('summarizeItemChanges', () => {
           newValue: {...PACE_ITEM_1, duration: 1},
         },
         {id: PACE_ITEM_2.id, oldValue: PACE_ITEM_2, newValue: {...PACE_ITEM_2, duration: 2000}},
-      ]).map(c => c.summary)
+      ]).map(c => c.summary),
     ).toEqual([
       `${PACE_ITEM_1.assignment_title} was changed from 2 days to 1 day.`,
       `${PACE_ITEM_2.assignment_title} was changed from 5 days to 2,000 days.`,

@@ -99,7 +99,7 @@ class DuplicateSection extends React.Component {
     for (let i = 0; i < this.props.duplicates.userList.length; ++i) {
       const user = this.props.duplicates.userList[i]
       // match as string or number
-       
+
       if (user.user_id == userId) {
         retval = user
         break
@@ -185,7 +185,7 @@ class DuplicateSection extends React.Component {
               />
             </Table.Cell>
             <Table.Cell colSpan="3" />
-          </Table.Row>
+          </Table.Row>,
         )
       } else {
         // render the row as a hint to the user
@@ -218,7 +218,7 @@ class DuplicateSection extends React.Component {
                 </Text>
               </Link>
             </Table.Cell>
-          </Table.Row>
+          </Table.Row>,
         )
       }
     }
@@ -248,7 +248,7 @@ class DuplicateSection extends React.Component {
             <Text>{I18n.t('Don’t add this user for now.')}</Text>
           </Link>
         </Table.Cell>
-      </Table.Row>
+      </Table.Row>,
     )
     return rows
   }
@@ -261,7 +261,7 @@ class DuplicateSection extends React.Component {
             <Text>
               {I18n.t(
                 'Possible matches for "%{address}". Select the correct one below or create a new user.',
-                {address: this.props.duplicates.address}
+                {address: this.props.duplicates.address},
               )}
             </Text>
           }

@@ -23,7 +23,7 @@ import slickgrid from 'slickgrid'
 jest.mock('slickgrid', () => ({
   Grid: jest.fn().mockImplementation(() => ({
     getColumns: jest.fn().mockReturnValue([]),
-    getOptions: jest.fn().mockReturnValue({ numberOfColumnsToFreeze: 2 }),
+    getOptions: jest.fn().mockReturnValue({numberOfColumnsToFreeze: 2}),
     destroy: jest.fn(),
     invalidate: jest.fn(),
     updateCell: jest.fn(),

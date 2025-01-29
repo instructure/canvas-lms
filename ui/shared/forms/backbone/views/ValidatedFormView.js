@@ -104,14 +104,14 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
           return function (rce) {
             return sendFunc($(rce), 'checkReadyToGetCode', window.confirm)
           }
-        })(this)
+        })(this),
       )
       .every(
         (function (_this) {
           return function (value) {
             return value
           }
-        })(this)
+        })(this),
       )
   }
   if (!okayToContinue) {
@@ -122,7 +122,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
   if (keys(errors).length === 0) {
     disablingDfd = this.disablingDfd ?? new $.Deferred()
     saveDfd = this.saveFormData(data)
-     
+
     saveDfd.then(this.onSaveSuccess.bind(this), this.onSaveFail.bind(this))
     saveDfd.fail(
       (function (_this) {
@@ -132,7 +132,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
             return _this.setFocusAfterError()
           }
         }
-      })(this)
+      })(this),
     )
     if (!this.dontRenableAfterSaveSuccess) {
       saveDfd.done(function () {
@@ -146,7 +146,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
           return function (rce) {
             return sendFunc($(rce), 'RCEClosed')
           }
-        })(this)
+        })(this),
       )
     }
     this.trigger('submit')
@@ -159,7 +159,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
         return function (element) {
           return $(element).attr('data-error-type')
         }
-      })(this)
+      })(this),
     )
     assignmentFieldErrors = chain(keys(errors))
       .reject(function (err) {
@@ -176,7 +176,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
           return null
         }
       })(this),
-      50
+      50,
     )
   }
 }
@@ -188,7 +188,7 @@ ValidatedFormView.prototype.cancel = function () {
       return function (rce) {
         return send($(rce), 'RCEClosed')
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -254,7 +254,6 @@ ValidatedFormView.prototype.hideErrors = function () {
 }
 
 ValidatedFormView.prototype.onSaveSuccess = function (xhr) {
-   
   return this.trigger.apply(this, ['success', xhr].concat(slice.call(arguments)))
 }
 
@@ -263,7 +262,7 @@ ValidatedFormView.prototype.onSaveFail = function (xhr) {
   errors = this.parseErrorResponse(xhr)
   errors || (errors = {})
   this.showErrors(errors)
-   
+
   return this.trigger.apply(this, ['fail', errors].concat(slice.call(arguments)))
 }
 
@@ -316,7 +315,7 @@ ValidatedFormView.prototype.translations = shimGetterShorthand(
     unsaved() {
       return I18n.t('unsaved_changes', 'You have unsaved changes.')
     },
-  }
+  },
 )
 
 // Errors are displayed relative to the field to which they belong. If
@@ -340,7 +339,6 @@ ValidatedFormView.prototype.fieldSelectors = null
 ValidatedFormView.prototype.findField = function (field) {
   let $el, ref
   const selector =
-     
     ((ref = this.fieldSelectors) != null ? ref[field] : void 0) || "[name='" + field + "']"
   $el = this.$(selector)
   if ($el.length === 0) {
@@ -371,7 +369,7 @@ ValidatedFormView.prototype.castJSON = function (obj) {
       return function (val, key) {
         return (clone_[key] = _this.castJSON(val))
       }
-    })(this)
+    })(this),
   )
   return clone_
 }

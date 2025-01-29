@@ -64,10 +64,10 @@ describe('GroupCategoriesView', () => {
 
   it('renders tab and panel elements', () => {
     // find the tabs
-    expect(view.$el.find('.collectionViewItems > li').length).toBe(2)
+    expect(view.$el.find('.collectionViewItems > li')).toHaveLength(2)
     // find the panels
-    expect(view.$el.find('#tab-1').length).toBe(1)
-    expect(view.$el.find('#tab-2').length).toBe(1)
+    expect(view.$el.find('#tab-1')).toHaveLength(1)
+    expect(view.$el.find('#tab-2')).toHaveLength(1)
   })
 
   it('adds new GroupCategory and displays new tab and panel', () => {
@@ -75,24 +75,24 @@ describe('GroupCategoriesView', () => {
       new GroupCategory({
         id: 3,
         name: 'Newly Added',
-      })
+      }),
     )
-    expect(view.$el.find('.collectionViewItems > li').length).toBe(3)
-    expect(view.$el.find('#tab-3').length).toBe(1)
+    expect(view.$el.find('.collectionViewItems > li')).toHaveLength(3)
+    expect(view.$el.find('#tab-3')).toHaveLength(1)
   })
 
   it('removes GroupCategory and removes tab and panel', () => {
     categories.remove(categories.models[0])
-    expect(view.$el.find('.collectionViewItems > li').length).toBe(1)
-    expect(view.$el.find('#tab-1').length).toBe(0)
+    expect(view.$el.find('.collectionViewItems > li')).toHaveLength(1)
+    expect(view.$el.find('#tab-1')).toHaveLength(0)
     categories.remove(categories.models[0])
-    expect(view.$el.find('.collectionViewItems > li').length).toBe(0)
-    expect(view.$el.find('#tab-2').length).toBe(0)
+    expect(view.$el.find('.collectionViewItems > li')).toHaveLength(0)
+    expect(view.$el.find('#tab-2')).toHaveLength(0)
   })
 
   it('loads tab panel content when tab is activated', () => {
     // verify the content is not present before being activated
-    expect($('#tab-2').children().length).toBe(0)
+    expect($('#tab-2').children()).toHaveLength(0)
     // activate
     view.$el.find('.group-category-tab-link:last').click()
     expect($('#tab-2').children().length).toBeGreaterThan(0)

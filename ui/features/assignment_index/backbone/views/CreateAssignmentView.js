@@ -150,7 +150,7 @@ CreateAssignmentView.prototype.moreOptions = function (data) {
           return function (response) {
             return _this.redirectTo(response.url)
           }
-        })(this)
+        })(this),
       )
       .always(function () {
         return button.prop('disabled', false)
@@ -310,7 +310,7 @@ CreateAssignmentView.prototype._validatePointsPossible = function (data, errors)
   if (includes(this.model.frozenAttributes(), 'points_possible')) {
     return errors
   }
-   
+
   if (data.points_possible && isNaN(data.points_possible)) {
     errors.points_possible = [
       {
@@ -383,7 +383,7 @@ CreateAssignmentView.prototype._validateDueDate = function (data, errors) {
 CreateAssignmentView.prototype.roundPointsPossible = function (e) {
   const value = $(e.target).val()
   const rounded_value = round(numberHelper.parse(value), 2)
-   
+
   if (isNaN(rounded_value)) {
     // do nothing
   } else {

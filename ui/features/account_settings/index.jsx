@@ -37,11 +37,9 @@ const I18n = createI18nScope('account_settings_jsx_bundle')
 ready(() => {
   initializeTopNavPortal()
 
-   
   ReactDOM.render(<FeatureFlags />, document.getElementById('tab-features'))
 
   if (document.getElementById('custom_help_link_settings')) {
-     
     ReactDOM.render(
       <CustomHelpLinkSettings
         {...{
@@ -51,43 +49,38 @@ ready(() => {
           defaultLinks: window.ENV.DEFAULT_HELP_LINKS,
         }}
       />,
-      document.getElementById('custom_help_link_settings')
+      document.getElementById('custom_help_link_settings'),
     )
   }
 
   const emojiDenyListContainer = document.getElementById('emoji-deny-list')
   if (emojiDenyListContainer) {
-     
     ReactDOM.render(<CustomEmojiDenyList />, emojiDenyListContainer)
   }
 
   if (document.getElementById('tab-security')) {
-     
     ReactDOM.render(
       <View as="div" margin="large" padding="large" textAlign="center">
         <Spinner size="large" renderTitle={I18n.t('Loading')} />
       </View>,
-      document.getElementById('tab-security')
+      document.getElementById('tab-security'),
     )
   }
 
   const internalSettingsMountpoint = document.getElementById('tab-internal-settings')
   if (internalSettingsMountpoint) {
-     
     ReactDOM.render(<InternalSettings />, internalSettingsMountpoint)
   }
 
   if (document.getElementById('tab-integrations')) {
-     
     ReactDOM.render(<MicrosoftSyncAccountSettings />, document.getElementById('tab-integrations'))
   }
 
   const courseCreationSettingsContainer = document.getElementById('course_creation_settings')
   if (courseCreationSettingsContainer) {
-     
     ReactDOM.render(
       <CourseCreationSettings currentValues={ENV.COURSE_CREATION_SETTINGS} />,
-      courseCreationSettingsContainer
+      courseCreationSettingsContainer,
     )
   }
 })

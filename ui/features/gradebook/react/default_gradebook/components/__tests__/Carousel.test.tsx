@@ -100,7 +100,7 @@ describe('Carousel', () => {
 
   test('focuses left arrow when transitioning from displaying both arrows to only the left arrow', function () {
     const {rerender} = render(
-      <Carousel {...props} displayLeftArrow={true} displayRightArrow={true} />
+      <Carousel {...props} displayLeftArrow={true} displayRightArrow={true} />,
     )
     const leftButton = screen.getByRole('button', {name: 'Previous'})
     rerender(<Carousel {...props} displayLeftArrow={true} displayRightArrow={false} />)
@@ -109,7 +109,7 @@ describe('Carousel', () => {
 
   test('focuses right arrow when transitioning from displaying both arrows to only the right arrow', function () {
     const {rerender} = render(
-      <Carousel {...props} displayLeftArrow={true} displayRightArrow={true} />
+      <Carousel {...props} displayLeftArrow={true} displayRightArrow={true} />,
     )
     const rightButton = screen.getByRole('button', {name: 'Next'})
     rerender(<Carousel {...props} displayLeftArrow={false} displayRightArrow={true} />)

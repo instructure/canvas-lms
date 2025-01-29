@@ -88,10 +88,10 @@ export default function CoursesTray() {
       <Text as="div">
         {k5User
           ? I18n.t(
-              'Welcome to your subjects! To customize the list of subjects, click on the "All Subjects" link and star the subjects to display.'
+              'Welcome to your subjects! To customize the list of subjects, click on the "All Subjects" link and star the subjects to display.',
             )
           : I18n.t(
-              'Welcome to your courses! To customize the list of courses, click on the "All Courses" link and star the courses to display.'
+              'Welcome to your courses! To customize the list of courses, click on the "All Courses" link and star the courses to display.',
             )}
       </Text>
     </View>

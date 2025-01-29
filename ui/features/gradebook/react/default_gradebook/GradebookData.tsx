@@ -46,17 +46,17 @@ type Props = {
 
 export default function GradebookData(props: Props) {
   const performanceControls = useRef(
-    new PerformanceControls(camelizeProperties(props.gradebookEnv.performance_controls))
+    new PerformanceControls(camelizeProperties(props.gradebookEnv.performance_controls)),
   )
   const dispatch = useRef(
     new RequestDispatch({
       activeRequestLimit: performanceControls.current.activeRequestLimit,
-    })
+    }),
   )
   const postGradesStore = useRef(
     PostGradesStore({
       course: {id: props.gradebookEnv.context_id, sis_id: props.gradebookEnv.context_sis_id},
-    })
+    }),
   )
   const courseId = props.gradebookEnv.context_id
   const flashMessages = useStore(state => state.flashMessages)
@@ -120,7 +120,7 @@ export default function GradebookData(props: Props) {
       props.gradebookEnv.custom_grade_statuses_enabled
         ? props.gradebookEnv.custom_grade_statuses
         : [],
-      props.gradebookEnv.multiselect_gradebook_filters_enabled
+      props.gradebookEnv.multiselect_gradebook_filters_enabled,
     )
   }, [
     courseId,
@@ -170,7 +170,7 @@ export default function GradebookData(props: Props) {
 
   useEffect(() => {
     if (gradingPeriodSet) {
-      // eslint-disable-next-line promise/catch-or-return
+       
       fetchGradingPeriodAssignments().then(() => {
         loadAssignmentGroups(props.gradebookEnv.hide_zero_point_quizzes, currentGradingPeriodId)
       })

@@ -42,7 +42,7 @@ describe('FilesystemObjectThumbnail', () => {
 
     it('displays the thumbnail image', () => {
       const {container} = render(
-        <FilesystemObjectThumbnail model={file} className="customClassname" />
+        <FilesystemObjectThumbnail model={file} className="customClassname" />,
       )
       expect(container.firstChild).toHaveStyle({
         backgroundImage: `url('sweet_thumbnail_url')`,
@@ -51,7 +51,7 @@ describe('FilesystemObjectThumbnail', () => {
 
     it('adds class name from props to the span', () => {
       const {container} = render(
-        <FilesystemObjectThumbnail model={file} className="customClassname" />
+        <FilesystemObjectThumbnail model={file} className="customClassname" />,
       )
       expect(container.firstChild).toHaveClass('customClassname')
     })
@@ -72,14 +72,14 @@ describe('FilesystemObjectThumbnail', () => {
 
     it('adds mimeClass-folder if its a folder', () => {
       const {container} = render(
-        <FilesystemObjectThumbnail model={folder} className="customClassname" />
+        <FilesystemObjectThumbnail model={folder} className="customClassname" />,
       )
       expect(container.firstChild).toHaveClass('mimeClass-folder')
     })
 
     it('adds className to i tag if set in props', () => {
       const {container} = render(
-        <FilesystemObjectThumbnail model={folder} className="customClassname" />
+        <FilesystemObjectThumbnail model={folder} className="customClassname" />,
       )
       expect(container.firstChild).toHaveClass('customClassname')
     })
@@ -92,7 +92,7 @@ describe('FilesystemObjectThumbnail', () => {
       jest.useFakeTimers()
 
       const {container} = render(
-        <FilesystemObjectThumbnail model={fso} className="customClassname" />
+        <FilesystemObjectThumbnail model={fso} className="customClassname" />,
       )
       jest.advanceTimersByTime(20000)
 

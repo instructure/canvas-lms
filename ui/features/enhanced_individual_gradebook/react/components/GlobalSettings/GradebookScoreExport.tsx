@@ -43,7 +43,7 @@ export default function GradebookScoreExport({
   exportGradebookCsvUrl,
 }: Props) {
   const [lastGeneratedCsvLink, setLastGeneratedCsvLink] = useState<string | null | undefined>(
-    lastGeneratedCsvAttachmentUrl
+    lastGeneratedCsvAttachmentUrl,
   )
   const [lastGeneratedCsvLinkText, setLastGeneratedCsvLinkText] = useState<
     string | null | undefined

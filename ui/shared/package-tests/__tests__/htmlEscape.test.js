@@ -69,7 +69,7 @@ describe('htmlEscape', () => {
       strictEqual(
         result,
         $regradeInfoSpan,
-        `Passing a jQuery object should return ${$regradeInfoSpan}`
+        `Passing a jQuery object should return ${$regradeInfoSpan}`,
       )
     })
   })

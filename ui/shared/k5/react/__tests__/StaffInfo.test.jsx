@@ -96,7 +96,7 @@ describe('StaffInfo', () => {
       const cancel = wrapper.getByText('Cancel')
       fireEvent.click(cancel)
       await waitFor(() =>
-        expect(wrapper.queryByText('Message Mrs. Thompson')).not.toBeInTheDocument()
+        expect(wrapper.queryByText('Message Mrs. Thompson')).not.toBeInTheDocument(),
       )
     })
 
@@ -119,7 +119,7 @@ describe('StaffInfo', () => {
       it('shows spinner and disables buttons while sending', async () => {
         fetchMock.post(
           CONVERSATIONS_URL,
-          () => new Promise(resolve => setTimeout(() => resolve(200), 1000))
+          () => new Promise(resolve => setTimeout(() => resolve(200), 1000)),
         )
         const wrapper = await openModal()
         fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
@@ -137,7 +137,7 @@ describe('StaffInfo', () => {
         fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
         fireEvent.click(wrapper.getByText('Send'))
         await waitFor(() =>
-          expect(wrapper.getAllByText('Message to Mrs. Thompson sent.')[0]).toBeInTheDocument()
+          expect(wrapper.getAllByText('Message to Mrs. Thompson sent.')[0]).toBeInTheDocument(),
         )
       })
 
@@ -147,7 +147,7 @@ describe('StaffInfo', () => {
         fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
         fireEvent.click(wrapper.getByText('Send'))
         await waitFor(() =>
-          expect(wrapper.getAllByText('Failed sending message.')[0]).toBeInTheDocument()
+          expect(wrapper.getAllByText('Failed sending message.')[0]).toBeInTheDocument(),
         )
       })
 

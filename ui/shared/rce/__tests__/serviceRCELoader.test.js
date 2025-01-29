@@ -124,7 +124,7 @@ describe('loadOnTarget', () => {
     expect(rce.renderIntoDiv).toHaveBeenCalledWith(
       'someCustomTarget',
       expect.any(Object),
-      expect.any(Function)
+      expect.any(Function),
     )
   })
 

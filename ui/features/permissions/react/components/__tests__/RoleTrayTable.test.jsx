@@ -36,7 +36,7 @@ it('renders the component with only one child', () => {
   const tree = shallow(
     <RoleTrayTable title="fruit">
       <RoleTrayTableRow {...createRowProps('banana', '1')} />
-    </RoleTrayTable>
+    </RoleTrayTable>,
   )
   const childrenNodes = tree.find('RoleTrayTableRow')
   expect(childrenNodes).toHaveLength(1)
@@ -48,7 +48,7 @@ it('renders the component with multiple children', () => {
       <RoleTrayTableRow {...createRowProps('banana', '1')} />
       <RoleTrayTableRow {...createRowProps('apple', '2')} />
       <RoleTrayTableRow {...createRowProps('mango', '3')} />
-    </RoleTrayTable>
+    </RoleTrayTable>,
   )
   const childrenNodes = tree.find('RoleTrayTableRow')
   expect(childrenNodes).toHaveLength(3)
@@ -58,7 +58,7 @@ it('renders the title', () => {
   const tree = shallow(
     <RoleTrayTable title="fruit">
       <RoleTrayTableRow {...createRowProps('banana', '1')} />
-    </RoleTrayTable>
+    </RoleTrayTable>,
   )
   const node = tree.find('Text')
   expect(node.at(0).children().text()).toEqual('fruit')
@@ -70,7 +70,7 @@ it('sorts the children by title', () => {
       <RoleTrayTableRow {...createRowProps('banana', '1')} />
       <RoleTrayTableRow {...createRowProps('apple', '2')} />
       <RoleTrayTableRow {...createRowProps('mango', '3')} />
-    </RoleTrayTable>
+    </RoleTrayTable>,
   )
   const nodes = tree.find('RoleTrayTableRow')
   expect(nodes.at(0).props().title).toEqual('apple')

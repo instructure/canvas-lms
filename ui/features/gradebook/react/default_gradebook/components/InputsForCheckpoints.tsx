@@ -36,10 +36,8 @@ import {
 // @ts-expect-error
 import type {GradingStandard, PendingGradeInfo} from '../gradebook.d'
 import {
-  // @ts-expect-error
   CamelizedAssignment,
   type GradeEntryMode,
-  // @ts-expect-error
   GradeResult,
   type SubmissionData,
 } from '@canvas/grading/grading.d'
@@ -75,7 +73,7 @@ export const InputsForCheckpoints = (props: Props) => {
   const standardStatuses: string[] = [NONE, LATE, MISSING, EXCUSED, EXTENDED]
 
   const checkpointState = props.checkpointStates.find(
-    checkpoint => checkpoint.label === props.subAssignmentTag
+    checkpoint => checkpoint.label === props.subAssignmentTag,
   )
 
   const [localTimeLate, setLocalTimeLate] = useState(checkpointState?.timeLate || '')
@@ -91,7 +89,7 @@ export const InputsForCheckpoints = (props: Props) => {
   const getSubAssignment = (
     hasCheckpoints: boolean,
     assignment: CamelizedAssignment,
-    subAssignmentTag: string
+    subAssignmentTag: string,
   ) => {
     if (!hasCheckpoints) {
       return assignment
@@ -124,7 +122,7 @@ export const InputsForCheckpoints = (props: Props) => {
             assignment={getSubAssignment(
               props.hasCheckpoints,
               props.assignment,
-              props.subAssignmentTag
+              props.subAssignmentTag,
             )}
             disabled={props.gradingDisabled}
             enterGradesAs={props.enterGradesAs}
@@ -160,7 +158,7 @@ export const InputsForCheckpoints = (props: Props) => {
                 props.updateCheckpointStates(
                   props.subAssignmentTag,
                   'status',
-                  value?.toString() || NONE
+                  value?.toString() || NONE,
                 )
               } else {
                 // @ts-expect-error

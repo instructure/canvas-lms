@@ -64,5 +64,5 @@ export default handleActions(
       return newState
     },
   },
-  null
+  null,
 )

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map} from 'lodash'
@@ -56,10 +56,10 @@ if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student) && showCourseSummary)
   // Don't show appointment groups for non-logged in users
   if (ENV.current_user_id) {
     collections.push(
-      new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'reservable')
+      new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'reservable'),
     )
     collections.push(
-      new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable')
+      new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable'),
     )
   }
 
@@ -137,13 +137,17 @@ ready(() => {
   // Add the loading indicator now that the collections are fetching
   const node = document.querySelector('#loading_indicator')
   if (node instanceof HTMLElement) {
-     
-    ReactDOM.render(
+    const root = createRoot(node)
+    root.render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
       </View>,
-      node
     )
+
+    // Cleanup on unmount
+    $(window).on('beforeunload', () => {
+      root.unmount()
+    })
   }
 
   // Binding to the mini calendar must take place after sidebar initializes,
@@ -164,7 +168,6 @@ function renderCoursePacingNotice() {
         renderNotice($mountPoint, courseId)
       })
       .catch(ex => {
-         
         console.error('Falied loading CoursePacingNotice', ex)
       })
   }

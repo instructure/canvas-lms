@@ -42,7 +42,7 @@ const ColorPicker = ({label, disabled, value, onChange}: ColorPickerProps) => {
       setMessages([])
       onChange(newcolor)
     },
-    [onChange]
+    [onChange],
   )
 
   const handleTextChange = useCallback(
@@ -55,7 +55,7 @@ const ColorPicker = ({label, disabled, value, onChange}: ColorPickerProps) => {
         setMessages([{text: 'Not a valid color', type: 'error'}])
       }
     },
-    []
+    [],
   )
 
   const handleHexKey = useCallback(
@@ -68,14 +68,14 @@ const ColorPicker = ({label, disabled, value, onChange}: ColorPickerProps) => {
         }
       }
     },
-    [setValidColor, typedColor]
+    [setValidColor, typedColor],
   )
 
   const handleColorChange = useCallback(
     (newcolor: string) => {
       setValidColor(newcolor)
     },
-    [setValidColor]
+    [setValidColor],
   )
 
   return (

@@ -46,7 +46,7 @@ ModuleFilter.propTypes = {
     shape({
       id: string.isRequired,
       name: string.isRequired,
-    })
+    }),
   ).isRequired,
 
   selectedModuleId: string,

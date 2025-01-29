@@ -56,7 +56,7 @@ export default (function () {
             let cnt, errorBox, idx, percent, pre
             if (!_this.assignment.points_possible || _this.assignment.points_possible === '0') {
               errorBox = _this.$dialog.errorBox(
-                I18n.t('errors.no_points_possible', 'Cannot curve without points possible')
+                I18n.t('errors.no_points_possible', 'Cannot curve without points possible'),
               )
               setTimeout(function () {
                 return errorBox.fadeOut(function () {
@@ -112,7 +112,7 @@ export default (function () {
               return results
             })()
             $.publish('submissions_updated', [submissions])
-             
+
             window.alert(
               I18n.t(
                 {
@@ -122,8 +122,8 @@ export default (function () {
                 {
                   count: data.length,
                   studentCount: I18n.n(data.length),
-                }
-              )
+                },
+              ),
             )
             return $('#set_default_grade').focus()
           }
@@ -173,7 +173,7 @@ export default (function () {
     let middleScore = numberHelper.parse($('#middle_score').val())
     middleScore /= this.assignment.points_possible
     const should_assign_blanks = $('#assign_blanks').prop('checked')
-     
+
     if (isNaN(middleScore)) {
       return
     }
@@ -181,7 +181,7 @@ export default (function () {
     for (idx in ref) {
       student = ref[idx]
       sub = student['assignment_' + this.assignment.id]
-       
+
       score = sub != null ? sub.score : void 0
       if (score > this.assignment.points_possible) {
         score = this.assignment.points_possible
@@ -263,7 +263,7 @@ export default (function () {
             count: cnt,
             num: I18n.n(idx),
             studentCount: I18n.n(cnt),
-          }
+          },
         )
         $('#results_list').prepend(
           "<td style='padding: 1px;'><div title='" +
@@ -276,10 +276,10 @@ export default (function () {
             htmlEscape(100 * pct) +
             'px; margin-top: ' +
             htmlEscape(100 * (1 - pct)) +
-            "px;'>&nbsp;</div></td>"
+            "px;'>&nbsp;</div></td>",
         )
         $('#results_values').prepend(
-          "<td style='text-align: center;'>" + htmlEscape(I18n.n(idx)) + '</td>'
+          "<td style='text-align: center;'>" + htmlEscape(I18n.n(idx)) + '</td>',
         )
         skipCount = 0
       } else {
@@ -295,7 +295,7 @@ export default (function () {
         htmlEscape(I18n.n(maxCount)) +
         "</div><div style='position: absolute; bottom: 0; right: 3px;'>" +
         htmlEscape(I18n.n(0)) +
-        '</div></div></td>'
+        '</div></div></td>',
     )
     $('#results_values').prepend('<td>&nbsp;</td>')
     return finalScores

@@ -41,7 +41,7 @@ export default function ReleaseNotesList() {
   const dateFormatter = useDateTimeFormat('date.formats.short')
 
   const countsEnabled = Boolean(
-    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
   )
 
   const {data: releaseNotesBadgeDisabled} = useQuery({
@@ -58,7 +58,7 @@ export default function ReleaseNotesList() {
     onSuccess: () =>
       queryClient.setQueryData(
         ['settings', 'release_notes_badge_disabled'],
-        !releaseNotesBadgeDisabled
+        !releaseNotesBadgeDisabled,
       ),
   })
 

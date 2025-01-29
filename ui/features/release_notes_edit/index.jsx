@@ -17,17 +17,16 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import ReleaseNotesEdit from './react'
 import ready from '@instructure/ready'
 
 ready(() => {
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(
+  const root = createRoot(document.getElementById('content'))
+  root.render(
     <ReleaseNotesEdit
       envs={window.ENV.release_notes_envs}
       langs={window.ENV.release_notes_langs}
     />,
-    document.getElementById('content')
   )
 })

@@ -17,23 +17,30 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {assignLocation, openWindow} from '@canvas/util/globalUtils'
+import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
+import {waitFor} from '@testing-library/dom'
+import {fireEvent, render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import React from 'react'
+import useManagedCourseSearchApi from '../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi'
 import {Assignment} from '../../../../graphql/Assignment'
+import {Discussion} from '../../../../graphql/Discussion'
+import {DiscussionPermissions} from '../../../../graphql/DiscussionPermissions'
 import {
   deleteDiscussionTopicMock,
   updateDiscussionReadStateMock,
   updateDiscussionTopicMock,
 } from '../../../../graphql/Mocks'
-import {Discussion} from '../../../../graphql/Discussion'
-import {DiscussionPermissions} from '../../../../graphql/DiscussionPermissions'
-import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
-import {fireEvent, render} from '@testing-library/react'
-import {getSpeedGraderUrl, responsiveQuerySizes} from '../../../utils'
-import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
 import {PeerReviews} from '../../../../graphql/PeerReviews'
-import React from 'react'
-import useManagedCourseSearchApi from '../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi'
-import {waitFor} from '@testing-library/dom'
-import userEvent from '@testing-library/user-event'
+import {getSpeedGraderUrl, responsiveQuerySizes} from '../../../utils'
+import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
+
+// mock assignLocation
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+  openWindow: jest.fn(),
+}))
 
 jest.mock('../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi')
 jest.mock('@canvas/rce/RichContentEditor')
@@ -45,14 +52,9 @@ jest.mock('../../../utils', () => ({
 describe('DiscussionTopicContainer', () => {
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
-  const assignMock = jest.fn()
-  const openMock = jest.fn()
   let liveRegion = null
 
   beforeAll(() => {
-    delete window.location
-    window.location = {assign: assignMock}
-    window.open = openMock
     window.ENV = {
       EDIT_URL: 'this_is_the_edit_url',
       PEER_REVIEWS_URL: 'this_is_the_peer_reviews_url',
@@ -102,8 +104,7 @@ describe('DiscussionTopicContainer', () => {
   afterEach(() => {
     setOnFailure.mockClear()
     setOnSuccess.mockClear()
-    assignMock.mockClear()
-    openMock.mockClear()
+    jest.clearAllMocks()
   })
 
   afterAll(() => {
@@ -118,7 +119,7 @@ describe('DiscussionTopicContainer', () => {
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <DiscussionTopicContainer {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
   it('publish button is readonly if canUnpublish is false', async () => {
@@ -135,8 +136,8 @@ describe('DiscussionTopicContainer', () => {
     })
     expect(
       container.getByText(
-        'Note: for differentiated group topics, some threads may not have any students assigned.'
-      )
+        'Note: for differentiated group topics, some threads may not have any students assigned.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -194,7 +195,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Edit'))
 
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith(window.ENV.EDIT_URL)
+      expect(assignLocation).toHaveBeenCalledWith(window.ENV.EDIT_URL)
     })
   })
 
@@ -204,7 +205,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Peer Reviews'))
 
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith(window.ENV.PEER_REVIEWS_URL)
+      expect(assignLocation).toHaveBeenCalledWith(window.ENV.PEER_REVIEWS_URL)
     })
   })
 
@@ -212,16 +213,16 @@ describe('DiscussionTopicContainer', () => {
     window.confirm = jest.fn(() => true)
     const {getByTestId, getByText} = setup(
       {discussionTopic: Discussion.mock()},
-      deleteDiscussionTopicMock()
+      deleteDiscussionTopicMock(),
     )
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     fireEvent.click(getByText('Delete'))
 
     await waitFor(() =>
-      expect(setOnSuccess).toHaveBeenCalledWith('The discussion topic was successfully deleted.')
+      expect(setOnSuccess).toHaveBeenCalledWith('The discussion topic was successfully deleted.'),
     )
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith('/courses/1/discussion_topics')
+      expect(assignLocation).toHaveBeenCalledWith('/courses/1/discussion_topics')
     })
   })
 
@@ -229,16 +230,16 @@ describe('DiscussionTopicContainer', () => {
     window.confirm = jest.fn(() => true)
     const {getByTestId, getByText} = setup(
       {discussionTopic: Discussion.mock({isAnnouncement: true})},
-      deleteDiscussionTopicMock()
+      deleteDiscussionTopicMock(),
     )
     await userEvent.click(getByTestId('discussion-post-menu-trigger'))
     await userEvent.click(getByText('Delete'))
 
     await waitFor(() =>
-      expect(setOnSuccess).toHaveBeenCalledWith('The discussion topic was successfully deleted.')
+      expect(setOnSuccess).toHaveBeenCalledWith('The discussion topic was successfully deleted.'),
     )
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith('/courses/1/announcements')
+      expect(assignLocation).toHaveBeenCalledWith('/courses/1/announcements')
     })
   })
 
@@ -256,7 +257,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Open in SpeedGrader'))
 
     await waitFor(() => {
-      expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl(), '_blank')
+      expect(openWindow).toHaveBeenCalledWith(getSpeedGraderUrl(), '_blank')
     })
   })
 
@@ -315,26 +316,26 @@ describe('DiscussionTopicContainer', () => {
   it('Should be able to click Mark All as Read and call mutation', async () => {
     const {getByTestId, getByText} = setup(
       {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: false})},
-      updateDiscussionReadStateMock()
+      updateDiscussionReadStateMock(),
     )
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     fireEvent.click(getByText('Mark All as Read'))
 
     await waitFor(() =>
-      expect(setOnSuccess).toHaveBeenCalledWith('You have successfully marked all as read.')
+      expect(setOnSuccess).toHaveBeenCalledWith('You have successfully marked all as read.'),
     )
   })
 
   it('Should be able to click Mark All as Unread and call mutation', async () => {
     const {getByTestId, getByText} = setup(
       {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: false})},
-      updateDiscussionReadStateMock({read: false})
+      updateDiscussionReadStateMock({read: false}),
     )
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     fireEvent.click(getByText('Mark All as Unread'))
 
     await waitFor(() =>
-      expect(setOnSuccess).toHaveBeenCalledWith('You have successfully marked all as unread.')
+      expect(setOnSuccess).toHaveBeenCalledWith('You have successfully marked all as unread.'),
     )
   })
 
@@ -400,8 +401,8 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Share to Commons'))
 
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith(
-        `example.com&discussion_topics%5B%5D=${discussionTopic._id}`
+      expect(assignLocation).toHaveBeenCalledWith(
+        `example.com&discussion_topics%5B%5D=${discussionTopic._id}`,
       )
     })
   })
@@ -455,30 +456,30 @@ describe('DiscussionTopicContainer', () => {
           permissions: DiscussionPermissions.mock({closeForComments: true}),
         }),
       },
-      updateDiscussionTopicMock({locked: true})
+      updateDiscussionTopicMock({locked: true}),
     )
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     fireEvent.click(getByText('Close for Comments'))
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith(
-        'You have successfully updated the discussion topic.'
-      )
+        'You have successfully updated the discussion topic.',
+      ),
     )
   })
 
   it('Should be able to open for comments', async () => {
     const {getByText, getByTestId} = setup(
       {discussionTopic: Discussion.mock()},
-      updateDiscussionTopicMock({locked: false})
+      updateDiscussionTopicMock({locked: false}),
     )
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     fireEvent.click(getByText('Open for Comments'))
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith(
-        'You have successfully updated the discussion topic.'
-      )
+        'You have successfully updated the discussion topic.',
+      ),
     )
   })
 
@@ -650,9 +651,9 @@ describe('DiscussionTopicContainer', () => {
     waitFor(() =>
       expect(
         container.queryByText(
-          'You must post before seeing replies. Edit history will be available to instructors.'
-        )
-      ).toBeInTheDocument()
+          'You must post before seeing replies. Edit history will be available to instructors.',
+        ),
+      ).toBeInTheDocument(),
     )
   })
 
@@ -665,7 +666,7 @@ describe('DiscussionTopicContainer', () => {
     }
     const container = setup(props)
     expect(
-      container.getByText('This announcement will not be visible until Jan 1, 3000 7:40pm.')
+      container.getByText('This announcement will not be visible until Jan 1, 3000 7:40pm.'),
     ).toBeTruthy()
   })
 
@@ -706,7 +707,7 @@ describe('DiscussionTopicContainer', () => {
     }
     const container = setup(props)
     expect(
-      container.getByText('Last edited Apr 22, 2021 6:41pm', {exact: false})
+      container.getByText('Last edited Apr 22, 2021 6:41pm', {exact: false}),
     ).toBeInTheDocument()
     expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })

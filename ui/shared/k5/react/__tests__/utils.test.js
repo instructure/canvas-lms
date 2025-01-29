@@ -76,7 +76,7 @@ describe('fetchLatestAnnouncement', () => {
         {
           title: 'I am not',
         },
-      ])
+      ]),
     )
     const announcement = await fetchLatestAnnouncement('test')
     expect(announcement).toEqual({title: 'I am first'})
@@ -106,10 +106,10 @@ describe('fetchCourseInstructors', () => {
         {
           id: 15,
         },
-      ])
+      ]),
     )
     const instructors = await fetchCourseInstructors('test')
-    expect(instructors.length).toBe(2)
+    expect(instructors).toHaveLength(2)
     expect(instructors[0].id).toBe(14)
     expect(instructors[1].id).toBe(15)
   })
@@ -356,10 +356,10 @@ describe('fetchCourseApps', () => {
         {
           id: 2,
         },
-      ])
+      ]),
     )
     const apps = await fetchCourseApps(['test'])
-    expect(apps.length).toBe(2)
+    expect(apps).toHaveLength(2)
     expect(apps[0].id).toBe(1)
     expect(apps[1].id).toBe(2)
   })
@@ -412,7 +412,7 @@ describe('getAssignmentGroupTotals', () => {
       },
     ]
     const totals = getAssignmentGroupTotals(data)
-    expect(totals.length).toBe(1)
+    expect(totals).toHaveLength(1)
     expect(totals[0].id).toBe('49')
     expect(totals[0].name).toBe('Assignments')
     expect(totals[0].score).toBe('80.00%')
@@ -456,7 +456,7 @@ describe('getAssignmentGroupTotals', () => {
       },
     ]
     const totals = getAssignmentGroupTotals(data, null, null, true, DEFAULT_GRADING_SCHEME)
-    expect(totals.length).toBe(1)
+    expect(totals).toHaveLength(1)
     expect(totals[0].id).toBe('49')
     expect(totals[0].name).toBe('Assignments')
     expect(totals[0].score).toBe('B-')
@@ -518,7 +518,7 @@ describe('getAssignmentGroupTotals', () => {
       },
     ]
     const totals = getAssignmentGroupTotals(data, 1)
-    expect(totals.length).toBe(1)
+    expect(totals).toHaveLength(1)
     expect(totals[0].name).toBe('Assignments')
   })
 })
@@ -556,7 +556,7 @@ describe('getAssignmentGrades', () => {
       },
     ]
     const totals = getAssignmentGrades(data)
-    expect(totals.length).toBe(2)
+    expect(totals).toHaveLength(2)
     expect(totals[0].assignmentName).toBe('2')
     expect(totals[1].assignmentName).toBe('1')
   })
@@ -642,7 +642,7 @@ describe('getTotalGradeStringFromEnrollments', () => {
       },
     ]
     expect(
-      getTotalGradeStringFromEnrollments(enrollments, '2', false, true, DEFAULT_GRADING_SCHEME)
+      getTotalGradeStringFromEnrollments(enrollments, '2', false, true, DEFAULT_GRADING_SCHEME),
     ).toBe('B')
   })
 
@@ -658,7 +658,7 @@ describe('getTotalGradeStringFromEnrollments', () => {
     ]
 
     expect(
-      getTotalGradeStringFromEnrollments(enrollments, '2', false, true, DEFAULT_GRADING_SCHEME)
+      getTotalGradeStringFromEnrollments(enrollments, '2', false, true, DEFAULT_GRADING_SCHEME),
     ).toBe('F')
   })
 
@@ -751,7 +751,7 @@ describe('fetchImportantInfos', () => {
         canManage: true,
       },
     ])
-    expect(response.length).toBe(0)
+    expect(response).toHaveLength(0)
   })
 })
 
@@ -794,15 +794,15 @@ describe('parseAnnouncementDetails', () => {
     expect(announcementDetails.announcement.title).toBe('Hello class')
     expect(announcementDetails.announcement.message).toBe('<p>Some details</p>')
     expect(announcementDetails.announcement.url).toBe(
-      'http://localhost:3000/courses/78/discussion_topics/72'
+      'http://localhost:3000/courses/78/discussion_topics/72',
     )
     expect(announcementDetails.announcement.attachment.display_name).toBe('File.pdf')
     expect(announcementDetails.announcement.attachment.url).toBe(
-      'http://localhost:3000/files/longpath'
+      'http://localhost:3000/files/longpath',
     )
     expect(announcementDetails.announcement.attachment.filename).toBe('file12.pdf')
     expect(new Date(announcementDetails.announcement.postedDate)).toEqual(
-      new Date('2021-05-14T17:06:21-06:00')
+      new Date('2021-05-14T17:06:21-06:00'),
     )
   })
 
@@ -814,7 +814,7 @@ describe('parseAnnouncementDetails', () => {
   it('handles a missing posted_at date', () => {
     const announcementDetails = parseAnnouncementDetails(
       {...announcement, posted_at: undefined},
-      course
+      course,
     )
     expect(announcementDetails.announcement.postedDate).toBeUndefined()
   })
@@ -887,7 +887,7 @@ describe('groupImportantDates', () => {
 
   it('combines assignments and events into sorted array with items grouped by date bucket', () => {
     const items = groupImportantDates(MOCK_ASSIGNMENTS, MOCK_EVENTS, mountainTime)
-    expect(items.length).toBe(3)
+    expect(items).toHaveLength(3)
     expect(items[0].date).toBe('2021-06-30T06:00:00.000Z')
     expect(items[1].date).toBe('2021-07-02T06:00:00.000Z')
     expect(items[2].date).toBe('2021-07-04T06:00:00.000Z')
@@ -899,7 +899,7 @@ describe('groupImportantDates', () => {
 
   it('groups items into date buckets correctly for different timezones', () => {
     const items = groupImportantDates(MOCK_ASSIGNMENTS, MOCK_EVENTS, kathmanduTime)
-    expect(items.length).toBe(4)
+    expect(items).toHaveLength(4)
     expect(items[0].date).toBe('2021-06-29T18:15:00.000Z')
     expect(items[1].date).toBe('2021-07-01T18:15:00.000Z')
     expect(items[2].date).toBe('2021-07-03T18:15:00.000Z')
@@ -917,13 +917,13 @@ describe('groupImportantDates', () => {
 
   it('still works if only assignments are passed', () => {
     const items = groupImportantDates(MOCK_ASSIGNMENTS, [], mountainTime)
-    expect(items.length).toBe(2)
+    expect(items).toHaveLength(2)
     expect(items[0].items[0].id).toBe('assignment_175')
   })
 
   it('still works if only events are passed', () => {
     const items = groupImportantDates([], MOCK_EVENTS, kathmanduTime)
-    expect(items.length).toBe(1)
+    expect(items).toHaveLength(1)
     expect(items[0].items[0].id).toBe('99')
   })
 

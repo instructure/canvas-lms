@@ -121,7 +121,7 @@ export default class PaginatedList {
     return (this.currentRequest = $.getJSON(
       this.options.url,
       this.options.requestParams,
-      this.onResponse.bind(this)
+      this.onResponse.bind(this),
     ))
   }
 

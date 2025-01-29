@@ -331,7 +331,7 @@ class GradingStandard extends React.Component {
       this.props.standard.context_code !== ENV.context_asset_string
     ) {
       const url = `/${splitAssetString(this.props.standard.context_code).join(
-        '/'
+        '/',
       )}/grading_standards`
       const titleText = I18n.t('Manage grading schemes in %{context_name}', {
         context_name:
@@ -425,7 +425,7 @@ class GradingStandard extends React.Component {
             <table className="grading_standard_data">
               <caption className="screenreader-only">
                 {I18n.t(
-                  'A table that contains the grading scheme data. First is a name of the grading scheme and buttons for editing and deleting the scheme. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.'
+                  'A table that contains the grading scheme data. First is a name of the grading scheme and buttons for editing and deleting the scheme. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.',
                 )}
               </caption>
               <thead>

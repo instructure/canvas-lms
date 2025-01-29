@@ -1345,8 +1345,8 @@ class Account < ActiveRecord::Base
                    else
                      role_scope.where(account_id: account_chain.map(&:id))
                    end
-
-      role_scope.first
+      # not_deleted scope could return both active and inactive roles, prefer the active one
+      role_scope.min_by { |r| (r.workflow_state == "active") ? 0 : 1 }
     end
   end
 

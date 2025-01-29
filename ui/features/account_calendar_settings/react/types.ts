@@ -54,12 +54,3 @@ export type SubscriptionChange = {
 }
 
 export type ExpandedAccounts = number[]
-
-export type FetchAccountDataResponse = {
-  json: AccountData[]
-  link: FetchLinkHeader
-}
-
-export type UpdateAccountDataResponse = {
-  json: {message: string}
-}

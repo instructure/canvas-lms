@@ -109,7 +109,7 @@ describe('RubricForm Tests', () => {
             ratingOrder="ascending"
           />
         </BrowserRouter>
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
   }
 

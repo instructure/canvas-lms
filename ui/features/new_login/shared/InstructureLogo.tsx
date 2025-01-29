@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
 import {type ViewOwnProps} from '@instructure/ui-view'
-import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import React from 'react'
+import {useNewLogin, useNewLoginData} from '../context'
 
 const I18n = createI18nScope('new_login')
 
 const InstructureLogo = () => {
-  const {isPreviewMode, isUiActionPending} = useNewLogin()
+  const {isUiActionPending} = useNewLogin()
+  const {isPreviewMode} = useNewLoginData()
 
   const isDisabled = isPreviewMode || isUiActionPending
 

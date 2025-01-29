@@ -63,7 +63,7 @@ export default function ReceivedContentView() {
           one: '1 shared item loaded.',
           other: '%{count} shared items loaded.',
         },
-        {count: shares.length}
+        {count: shares.length},
       )
       showFlashAlert({message, srOnly: true, type: 'info'})
     }
@@ -103,13 +103,12 @@ export default function ReceivedContentView() {
   }
 
   function onRemove(share) {
-     
     const shouldRemove = window.confirm(I18n.t('Are you sure you want to remove this item?'))
     if (shouldRemove) {
       doFetchApi({path: `${sharesUrl}/${share.id}`, method: 'DELETE'})
         .then(() => removeShareFromList(share))
         .catch(err =>
-          showFlashAlert({message: I18n.t('There was an error removing the item'), err})
+          showFlashAlert({message: I18n.t('There was an error removing the item'), err}),
         )
     }
   }
@@ -163,7 +162,7 @@ export default function ReceivedContentView() {
         heading={I18n.t('Received Content')}
         description={I18n.t(
           'The list below is content that has been shared with you. You can preview the ' +
-            'content, import it into your course, or remove it from the list.'
+            'content, import it into your course, or remove it from the list.',
         )}
       />
       {renderBody()}

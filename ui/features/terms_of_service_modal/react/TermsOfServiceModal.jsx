@@ -43,13 +43,11 @@ class TermsOfServiceCustomContents extends React.Component {
       if (response.ok) {
         this.setState({TERMS_OF_SERVICE_CUSTOM_CONTENT: json?.content || ''})
       } else {
-         
         console.error(
-          `Failed to load Terms of Service content: ${response.status} ${response.statusText}`
+          `Failed to load Terms of Service content: ${response.status} ${response.statusText}`,
         )
       }
     } catch (error) {
-       
       console.error('An error occurred while fetching the Terms of Service content:', error)
     }
   }

@@ -36,7 +36,7 @@ export const ActivityStreamSummary = {
         notificationCategory: string,
         type: string,
         unreadCount: number,
-      })
+      }),
     ),
   }),
   mock: ({

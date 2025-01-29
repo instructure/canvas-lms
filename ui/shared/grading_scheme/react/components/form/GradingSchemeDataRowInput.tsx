@@ -87,7 +87,7 @@ export const GradingSchemeDataRowInput = ({
         setLowRangeValid(true)
       }
     },
-    [displayScalingFactor]
+    [displayScalingFactor],
   )
 
   const validateHighRange = useCallback((highRange: number) => {
@@ -231,8 +231,8 @@ export const GradingSchemeDataRowInput = ({
                     !isFirstRow && pointsBased
                       ? '46px'
                       : isFirstRow && pointsBased
-                      ? '0.5rem'
-                      : 'none',
+                        ? '0.5rem'
+                        : 'none',
                 }}
               >
                 {I18n.t('to')}
@@ -285,7 +285,7 @@ export const GradingSchemeDataRowInput = ({
               <Tooltip renderTip={I18n.t('add a letter grade')}>
                 <IconButton
                   screenReaderLabel={I18n.t(
-                    'Add new row for a letter grade to grading scheme after this row'
+                    'Add new row for a letter grade to grading scheme after this row',
                   )}
                   onClick={onRowAddRequested}
                   elementRef={buttonRef => {

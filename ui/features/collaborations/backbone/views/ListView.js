@@ -80,7 +80,7 @@ ListView.prototype.attachEvents = function () {
         return function (model) {
           return _this.trigger('collection:remove', model)
         }
-      })(this)
+      })(this),
     )
     .on(
       'reset',
@@ -88,7 +88,7 @@ ListView.prototype.attachEvents = function () {
         return function () {
           return _this.trigger('collection:reset')
         }
-      })(this)
+      })(this),
     )
 }
 
@@ -162,7 +162,7 @@ ListView.prototype.updateFilter = function (models) {
         }
       }
     })(this),
-    0
+    0,
   )
 }
 

@@ -103,7 +103,7 @@ export default class AddExternalToolButton extends React.Component {
     if (toolData.status === 'failure') {
       this.setState({modalIsOpen: false}, () => {
         $.flashErrorSafe(
-          toolData.message || I18n.t('There was an unknown error registering the tool')
+          toolData.message || I18n.t('There was an unknown error registering the tool'),
         )
       })
     } else {
@@ -127,7 +127,7 @@ export default class AddExternalToolButton extends React.Component {
         $.flashMessage(I18n.t('The app was added'))
         store.reset()
         store.fetch()
-      }
+      },
     )
   }
 
@@ -186,7 +186,7 @@ export default class AddExternalToolButton extends React.Component {
       return fetchToolConfiguration(
         data.client_id,
         ENV.TOOL_CONFIGURATION_SHOW_URL,
-        toolConfigurationError
+        toolConfigurationError,
       ).then(toolConfiguration => {
         this.setState({
           type: 'byClientId',
@@ -204,7 +204,7 @@ export default class AddExternalToolButton extends React.Component {
         configurationType,
         data,
         this._successHandler.bind(this),
-        this._errorHandler.bind(this)
+        this._errorHandler.bind(this),
       )
       this.throttleCreation = true
     }
@@ -220,7 +220,7 @@ export default class AddExternalToolButton extends React.Component {
         response => {
           const errors = response.response.data.errors
           this._duplicate_check_error(errors)
-        }
+        },
       )
       .catch(() => {
         $.flashError(I18n.t('We were unable to add the app.'))
@@ -261,7 +261,7 @@ export default class AddExternalToolButton extends React.Component {
           onConfirm={() => this.create13Tool()}
           message={I18n.t(
             'Tool "%{toolName}" found for client ID %{clientId}. Would you like to install it?',
-            {toolName, clientId}
+            {toolName, clientId},
           )}
           confirmLabel={I18n.t('Install')}
         />

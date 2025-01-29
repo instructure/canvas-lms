@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM  from 'react-dom'
 import GradebookData from './react/default_gradebook/GradebookData'
 import type {GradebookOptions} from './react/default_gradebook/gradebook.d'
 import ready from '@instructure/ready'
@@ -52,6 +52,7 @@ ready(() => {
   const anonymousSpeedGraderAlertNode = document.querySelector(
     '[data-component="AnonymousSpeedGraderAlert"]',
   ) as HTMLSpanElement
+
 
   ReactDOM.render(
     <GradebookData

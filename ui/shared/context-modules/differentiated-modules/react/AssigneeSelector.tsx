@@ -112,7 +112,7 @@ const AssigneeSelector = ({
         ? loadedOptions
         : [...new Map([...allOptions, ...defaultValues].map(item => [item.id, item])).values()]
     return unfilteredOptions.filter(
-      option => selectedOptionIds.includes(option.id) || !disabledOptions.includes(option.id)
+      option => selectedOptionIds.includes(option.id) || !disabledOptions.includes(option.id),
     )
   }, [allOptions, defaultValues, disabledOptions, isLoading, loadedOptions, selectedOptionIds])
 
@@ -182,7 +182,7 @@ const AssigneeSelector = ({
     option: {
       id: string
     },
-    term: string
+    term: string,
   ): boolean => {
     const unfilteredOptions = isLoading && loadedOptions.length > 0 ? loadedOptions : allOptions
     const selectedOption = unfilteredOptions.find(o => o.id === option.id)
@@ -265,7 +265,7 @@ const AssigneeSelector = ({
         {(!isLoading || searchLoading
           ? options
           : options.filter(
-              option => option.group !== 'Students' || selectedOptionIds.includes(option.id)
+              option => option.group !== 'Students' || selectedOptionIds.includes(option.id),
             )
         ).map(option => {
           return (

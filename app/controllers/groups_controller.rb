@@ -177,8 +177,13 @@ class GroupsController < ApplicationController
   end
 
   def unassigned_members
-    category = @context.group_categories.where(id: params[:category_id]).first
+    category = @context.active_combined_group_and_differentiation_tag_categories.where(id: params[:category_id]).first
     return render json: {}, status: :not_found unless category
+
+    if category.non_collaborative? && !@context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+      return render json: { message: "Not authorized to manage differentiation tag." },
+                    status: :unauthorized
+    end
 
     page = (params[:page] || 1).to_i
     per_page = Api.per_page_for(self, default: 15, max: 100)
@@ -405,6 +410,8 @@ class GroupsController < ApplicationController
     find_group
     respond_to do |format|
       format.html do
+        head :unauthorized and return if @group.non_collaborative?
+
         if @group&.context
           add_crumb @group.context.short_name, named_context_url(@group.context, :context_url)
           add_crumb @group.short_name, named_context_url(@group, :context_url)
@@ -769,6 +776,10 @@ class GroupsController < ApplicationController
 
   def accept_invitation
     find_group
+    if @group.non_collaborative?
+      return render json: { message: "Not authorized to manage differentiation tag." }, status: :unauthorized
+    end
+
     @membership = @group.group_memberships.where(uuid: params[:uuid]).first if @group
     @membership.accept! if @membership.try(:invited?)
     if @membership.try(:active?)
@@ -871,6 +882,10 @@ class GroupsController < ApplicationController
   def public_feed
     return unless get_feed_context(only: [:group])
 
+    if @context.non_collaborative?
+      return render json: { message: "Not authorized to manage differentiation tag." }, status: :unauthorized unless @context.context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+    end
+
     title = t(:feed_title, "%{course_or_account_name} Feed", course_or_account_name: @context.full_name)
     link = group_url(@context)
 
@@ -900,6 +915,15 @@ class GroupsController < ApplicationController
   # group, or any admin over the group.
   def create_file
     @attachment = Attachment.new(context: @context)
+
+    if params[:group_id].present?
+      group = Group.find_by(id: params[:group_id])
+      return render json: { message: "Group not found" }, status: :not_found unless group
+      return render json: { message: "Not authorized to upload file to Differentiation Tag" }, status: :unauthorized if group.non_collaborative?
+    elsif @context.is_a?(Group) || @context.is_a?(GroupCategory)
+      return render json: { message: "Not authorized to upload file to Differentiation Tag" }, status: :unauthorized if @context.non_collaborative?
+    end
+
     if authorized_action(@attachment, @current_user, :create)
       submit_assignment = value_to_boolean(params[:submit_assignment])
       opts = { check_quota: true, submit_assignment: }
@@ -943,6 +967,9 @@ class GroupsController < ApplicationController
   # stream, in the user api.
   def activity_stream
     get_context
+    if @context.non_collaborative?
+      return render json: { message: "Not authorized to manage differentiation tag." }, status: :unauthorized unless @context.context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+    end
     if authorized_action(@context, @current_user, :read)
       api_render_stream(contexts: [@context], paginate_url: :api_v1_group_activity_stream_url)
     end
@@ -955,6 +982,9 @@ class GroupsController < ApplicationController
   # stream summary, in the user api.
   def activity_stream_summary
     get_context
+    if @context.non_collaborative?
+      return render json: { message: "Not authorized to manage differentiation tag." }, status: :unauthorized unless @context.context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+    end
     if authorized_action(@context, @current_user, :read)
       api_render_stream_summary(contexts: [@context])
     end

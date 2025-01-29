@@ -35,11 +35,11 @@ export const useAssignmentsQuery = (courseId: string) => {
 
   const flatAssignments = useMemo(
     () => data?.pages.flatMap(page => page.course.assignmentsConnection.nodes) ?? [],
-    [data]
+    [data],
   )
   const assignments = useMemo(
     () => _.groupBy(flatAssignments, 'assignmentGroupId'),
-    [flatAssignments]
+    [flatAssignments],
   )
 
   return {

@@ -49,7 +49,6 @@ const BlockEditorView = ({content, onRendered}: BlockEditorViewProps) => {
 
   useEffect(() => {
     if (data.version !== LATEST_BLOCK_DATA_VERSION) {
-       
       alert(I18n.t('Unknown block data version "%{v}", mayhem may ensue', {v: data.version}))
     }
   }, [data.version])

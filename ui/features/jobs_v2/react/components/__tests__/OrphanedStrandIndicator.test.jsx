@@ -66,7 +66,7 @@ describe('OrphanedStrandIndicator', () => {
   it("doesn't render button if the user lacks :manage_jobs", async () => {
     ENV.manage_jobs = false
     const {queryByText} = render(
-      <OrphanedStrandIndicator name="strandy" type="strand" onComplete={jest.fn()} />
+      <OrphanedStrandIndicator name="strandy" type="strand" onComplete={jest.fn()} />,
     )
     expect(queryByText('Unblock strand "strandy"')).not.toBeInTheDocument()
   })
@@ -75,7 +75,7 @@ describe('OrphanedStrandIndicator', () => {
     ENV.manage_jobs = true
     const onComplete = jest.fn()
     const {getByText} = render(
-      <OrphanedStrandIndicator name="strandy" type="strand" onComplete={onComplete} />
+      <OrphanedStrandIndicator name="strandy" type="strand" onComplete={onComplete} />,
     )
     fireEvent.click(getByText('Unblock strand "strandy"'))
     fireEvent.click(getByText('Unblock'))
@@ -87,7 +87,7 @@ describe('OrphanedStrandIndicator', () => {
     ENV.manage_jobs = true
     const onComplete = jest.fn()
     const {getByText} = render(
-      <OrphanedStrandIndicator name="tony" type="singleton" onComplete={onComplete} />
+      <OrphanedStrandIndicator name="tony" type="singleton" onComplete={onComplete} />,
     )
     fireEvent.click(getByText('Unblock singleton "tony"'))
     fireEvent.click(getByText('Unblock'))

@@ -73,12 +73,15 @@ export type RubricAssessmentDataUnderscore = {
 }
 export const mapRubricUnderscoredKeysToCamelCase = (
   rubric: RubricUnderscoreType,
-  rubricOutcomeData: RubricOutcomeUnderscore[] = []
+  rubricOutcomeData: RubricOutcomeUnderscore[] = [],
 ): Rubric => {
-  const rubricOutcomeMap = rubricOutcomeData.reduce((prev, curr) => {
-    prev[curr.id] = curr.display_name
-    return prev
-  }, {} as Record<string, string>)
+  const rubricOutcomeMap = rubricOutcomeData.reduce(
+    (prev, curr) => {
+      prev[curr.id] = curr.display_name
+      return prev
+    },
+    {} as Record<string, string>,
+  )
 
   const criteria = rubric.criteria ?? rubric.data ?? []
 
@@ -124,7 +127,7 @@ export const mapRubricUnderscoredKeysToCamelCase = (
 }
 
 export const mapRubricAssessmentDataUnderscoredKeysToCamelCase = (
-  data: RubricAssessmentDataUnderscore[]
+  data: RubricAssessmentDataUnderscore[],
 ): RubricAssessmentData[] => {
   return data.map(assessment => {
     return {
@@ -148,7 +151,7 @@ type RubricAssociationUnderscore = {
   hide_outcome_results: boolean
 }
 export const mapRubricAssociationUnderscoredKeysToCamelCase = (
-  underscoreAssociation: RubricAssociationUnderscore
+  underscoreAssociation: RubricAssociationUnderscore,
 ): RubricAssociation => {
   return {
     id: underscoreAssociation.id,

@@ -347,6 +347,31 @@ describe OutcomeResultsController do
       expect(links[0]["outcome"]["id"]).to eq @outcome.id
     end
 
+    describe "retrieving outcome rollups with outcome_ids" do
+      before do
+        @student1 = @student
+        @student2 = student_in_course(active_all: true, course: outcome_course, name: "Amy Mammoth").user
+        @student3 = student_in_course(active_all: true, course: outcome_course, name: "Barney Youth").user
+
+        create_result(@student2.id, @outcome, outcome_assignment, 1)
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "returns correct filtered results when providing outcome_ids" do
+        get "rollups",
+            params: { course_id: @course.id,
+                      outcome_ids: @outcome.id },
+            format: "json"
+        expect(response).to be_successful
+        hash = parse_response(response)
+        expect(hash["rollups"][0]["scores"][0]["links"]["outcome"].to_i).to eq @outcome.id
+        expect(hash["rollups"][1]["scores"][0]["links"]["outcome"].to_i).to eq @outcome.id
+      end
+    end
+
     it "validates aggregate_stat parameter" do
       user_session(@teacher)
       get "rollups",
@@ -996,6 +1021,27 @@ describe OutcomeResultsController do
                 expect(teacher2_json["rollups"]).to eq teacher1_json["rollups"]
                 # validating that there are 2 keys for lmgb
                 expect(Rails.cache.instance_variable_get(:@data).keys.grep(/lmgb/i).count).to eq 2
+              end
+            end
+
+            it "caches the outcome_ids in the cache key" do
+              outcome_ids = [@outcome.id]
+              cache_key = ["lmgb", "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid, Digest::MD5.hexdigest(outcome_ids.join("|"))]
+
+              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).once.and_return(nil)
+
+              enable_cache do
+                expect(Rails.cache.exist?(cache_key)).to be_falsey
+
+                get "rollups",
+                    params: {
+                      course_id: @course.id,
+                      outcome_ids: @outcome.id,
+                    },
+                    format: "json"
+                expect(response).to be_successful
+
+                expect(Rails.cache.exist?(cache_key)).to be_truthy
               end
             end
 

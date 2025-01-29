@@ -52,7 +52,7 @@ export class CompletedItemsFacade extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     notificationBadge: oneOf(['none', 'newActivity', 'missing']),
-     
+
     date: momentObj, // the scroll-to-today animation requires a date on each component in the planner
     responsiveSize: sizeShape,
     simplifiedControls: bool,
@@ -71,7 +71,7 @@ export class CompletedItemsFacade extends Component {
       'item',
       this,
       this.props.animatableIndex,
-      this.props.animatableItemIds
+      this.props.animatableItemIds,
     )
   }
 
@@ -81,7 +81,7 @@ export class CompletedItemsFacade extends Component {
       'item',
       this,
       newProps.animatableIndex,
-      newProps.animatableItemIds
+      newProps.animatableItemIds,
     )
   }
 
@@ -123,7 +123,7 @@ export class CompletedItemsFacade extends Component {
         one: '1 completed item',
         other: '%{count} completed items',
       },
-      {count: this.props.itemCount}
+      {count: this.props.itemCount},
     )
     return (
       <NotificationBadge responsiveSize={this.props.responsiveSize}>
@@ -147,7 +147,7 @@ export class CompletedItemsFacade extends Component {
           this.style.classNames.root,
           this.style.classNames[this.props.responsiveSize],
           'planner-completed-items',
-          this.props.simplifiedControls ? this.style.classNames.k5Layout : ''
+          this.props.simplifiedControls ? this.style.classNames.k5Layout : '',
         )}
         ref={elt => (this.rootDiv = elt)}
       >
@@ -162,7 +162,7 @@ export class CompletedItemsFacade extends Component {
                 one: 'Show 1 completed item',
                 other: 'Show %{count} completed items',
               },
-              {count: this.props.itemCount}
+              {count: this.props.itemCount},
             )}
             themeOverride={this.conditionalTheme}
           >

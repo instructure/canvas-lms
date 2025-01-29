@@ -47,13 +47,13 @@ export default function CopyToClipboardButton({
       setFeedback(success)
       setTimeout(() => setFeedback(null), 1000)
     },
-    [setFeedback]
+    [setFeedback],
   )
 
   const copyToClipboardAction = useCallback(() => {
     return navigator.clipboard.writeText(value).then(
       () => temporarilySetFeedback(true),
-      () => temporarilySetFeedback(false)
+      () => temporarilySetFeedback(false),
     )
   }, [temporarilySetFeedback, value])
 

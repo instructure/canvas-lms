@@ -97,7 +97,7 @@ export const GradingSchemesManagement = ({
   const {updateAccountDefaultGradingScheme} = useAccountDefaultGradingSchemeUpdate()
 
   const [gradingSchemeCards, setGradingSchemeCards] = useState<GradingSchemeCardData[] | undefined>(
-    undefined
+    undefined,
   )
 
   const [gradingSchemeSearch, setGradingSchemeSearch] = useState<string>('')
@@ -113,12 +113,12 @@ export const GradingSchemesManagement = ({
   const [creatingGradingScheme, setCreatingGradingScheme] = useState<boolean>(false)
   const [deletingGradingScheme, setDeletingGradingScheme] = useState<boolean>(false)
   const [selectedGradingScheme, setSelectedGradingScheme] = useState<GradingScheme | undefined>(
-    undefined
+    undefined,
   )
   const {loadGradingSchemes} = useGradingSchemes()
   const {loadDefaultGradingScheme} = useDefaultGradingScheme()
   const [defaultGradingScheme, setDefaultGradingScheme] = useState<GradingScheme | undefined>(
-    undefined
+    undefined,
   )
 
   const [accountDefaultGradingScheme, setAccountDefaultGradingScheme] =
@@ -139,7 +139,7 @@ export const GradingSchemesManagement = ({
                 editing: false,
                 creating: false,
               } as GradingSchemeCardData
-            })
+            }),
         )
       })
       .catch(error => {
@@ -157,7 +157,7 @@ export const GradingSchemesManagement = ({
         .then(accountDefault => setAccountDefaultGradingScheme(accountDefault))
         .catch(error => {
           showFlashError(I18n.t('There was an error while loading the default grading scheme'))(
-            error
+            error,
           )
         })
     }
@@ -180,23 +180,22 @@ export const GradingSchemesManagement = ({
     setDeletingGradingScheme(true)
     if (
       !archivedGradingSchemesEnabled &&
-       
       !window.confirm(
-        I18n.t('confirm.delete', 'Are you sure you want to delete this grading scheme?')
+        I18n.t('confirm.delete', 'Are you sure you want to delete this grading scheme?'),
       )
     ) {
       return
     }
 
     const gradingSchemeToDelete = gradingSchemeCards.filter(
-      gradingSchemeCard => gradingSchemeId === gradingSchemeCard.gradingScheme.id
+      gradingSchemeCard => gradingSchemeId === gradingSchemeCard.gradingScheme.id,
     )[0].gradingScheme
 
     try {
       await deleteGradingScheme(
         gradingSchemeToDelete.context_type,
         gradingSchemeToDelete.context_id,
-        gradingSchemeId
+        gradingSchemeId,
       )
       showFlashSuccess(I18n.t('Grading scheme was successfully removed.'))()
       if (onGradingSchemesChanged) {
@@ -205,8 +204,8 @@ export const GradingSchemesManagement = ({
       }
       setGradingSchemeCards(
         gradingSchemeCards.filter(
-          gradingSchemeCard => gradingSchemeId !== gradingSchemeCard.gradingScheme.id
-        )
+          gradingSchemeCard => gradingSchemeId !== gradingSchemeCard.gradingScheme.id,
+        ),
       )
       setSelectedGradingScheme(undefined)
       setDeleteModalOpen(false)
@@ -226,7 +225,7 @@ export const GradingSchemesManagement = ({
         pointsBased: gradingScheme.points_based,
       },
       gradingScheme.context_type,
-      gradingScheme.context_id
+      gradingScheme.context_id,
     )
     setCreatingGradingScheme(false)
     handleCloseDuplicateModal()
@@ -235,7 +234,7 @@ export const GradingSchemesManagement = ({
   const handleCreateScheme = async (
     gradingSchemeFormInput: GradingSchemeEditableData,
     schemeContextType = contextType,
-    schemeContextId = contextId
+    schemeContextId = contextId,
   ) => {
     if (!gradingSchemeCards) {
       return
@@ -262,7 +261,7 @@ export const GradingSchemesManagement = ({
 
   const handleUpdateScheme = async (
     gradingSchemeFormInput: GradingSchemeEditableData,
-    gradingSchemeId: string
+    gradingSchemeId: string,
   ) => {
     if (!gradingSchemeCards) {
       return
@@ -307,7 +306,7 @@ export const GradingSchemesManagement = ({
       await archiveGradingScheme(
         gradingScheme.context_type,
         gradingScheme.context_id,
-        gradingScheme.id
+        gradingScheme.id,
       )
       showFlashSuccess(I18n.t('Grading scheme was successfully archived.'))()
       if (onGradingSchemesChanged) {
@@ -323,7 +322,7 @@ export const GradingSchemesManagement = ({
       setGradingSchemeCards(updatedGradingSchemeCards)
     } catch (error) {
       showFlashError(I18n.t('There was an error while archiving the grading scheme'))(
-        error as Error
+        error as Error,
       )
     }
   }
@@ -337,7 +336,7 @@ export const GradingSchemesManagement = ({
       await unarchiveGradingScheme(
         gradingScheme.context_type,
         gradingScheme.context_id,
-        gradingScheme.id
+        gradingScheme.id,
       )
       showFlashSuccess(I18n.t('Grading scheme was successfully unarchived.'))()
       if (onGradingSchemesChanged) {
@@ -353,7 +352,7 @@ export const GradingSchemesManagement = ({
       setGradingSchemeCards(updatedGradingSchemeCards)
     } catch (error) {
       showFlashError(I18n.t('There was an error while unarchiving the grading scheme'))(
-        error as Error
+        error as Error,
       )
     }
   }
@@ -363,7 +362,7 @@ export const GradingSchemesManagement = ({
       const gradingSchemes = await loadGradingSchemes(
         contextType,
         contextId,
-        archivedGradingSchemesEnabled
+        archivedGradingSchemesEnabled,
       )
       setGradingSchemeCards(
         gradingSchemes
@@ -374,7 +373,7 @@ export const GradingSchemesManagement = ({
               editing: false,
               creating: false,
             } as GradingSchemeCardData
-          })
+          }),
       )
     } catch (e) {
       // @ts-expect-error
@@ -418,7 +417,7 @@ export const GradingSchemesManagement = ({
           gradingSchemeCard.editing = true
         }
         return gradingSchemeCard
-      })
+      }),
     )
   }
 
@@ -471,7 +470,7 @@ export const GradingSchemesManagement = ({
           gradingSchemeCard.editing = false
         }
         return gradingSchemeCard
-      })
+      }),
     )
   }
 
@@ -629,7 +628,7 @@ export const GradingSchemesManagement = ({
                     card.gradingScheme.workflow_state === 'active' &&
                     card.gradingScheme.title
                       .toLowerCase()
-                      .includes(gradingSchemeSearch.toLowerCase())
+                      .includes(gradingSchemeSearch.toLowerCase()),
                 )}
                 caption={I18n.t('Active Grading Schemes')}
                 editGradingScheme={editGradingScheme}
@@ -650,7 +649,7 @@ export const GradingSchemesManagement = ({
                 {I18n.t('Archived')}
                 <Tooltip
                   renderTip={I18n.t(
-                    'Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.'
+                    'Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.',
                   )}
                 >
                   <IconButton
@@ -667,7 +666,7 @@ export const GradingSchemesManagement = ({
                     card.gradingScheme.workflow_state === 'archived' &&
                     card.gradingScheme.title
                       .toLowerCase()
-                      .includes(gradingSchemeSearch.toLowerCase())
+                      .includes(gradingSchemeSearch.toLowerCase()),
                 )}
                 caption={I18n.t('Archived Grading Schemes')}
                 editGradingScheme={editGradingScheme}
@@ -779,7 +778,7 @@ export const GradingSchemesManagement = ({
                         onSave={modifiedGradingScheme =>
                           handleUpdateScheme(
                             modifiedGradingScheme,
-                            gradingSchemeCard.gradingScheme.id
+                            gradingSchemeCard.gradingScheme.id,
                           )
                         }
                       />

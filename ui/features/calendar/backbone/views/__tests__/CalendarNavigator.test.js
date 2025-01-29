@@ -21,7 +21,6 @@ import 'jquery-migrate'
 import CalendarNavigator from '../CalendarNavigator'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
-import sinon from 'sinon'
 
 const equal = (x, y) => expect(x).toEqual(y)
 
@@ -52,7 +51,7 @@ describe('CalendarNavigator', () => {
   // TODO: LF-626 started failing only in Jenkins when unrelated code was removed
   test.skip('clicking a day in picker navigates to that date', function () {
     // instrument the callback
-    const handler = sinon.spy()
+    const handler = jest.fn()
     navigator.on('navigateDate', handler)
 
     // navigate to a known month
@@ -73,12 +72,12 @@ describe('CalendarNavigator', () => {
     const expectedDate = unfudgeDateForProfileTimezone(new Date(year, month, day))
 
     // check that we got the expected value to the callback
-    equal(+handler.getCall(0).args[0], +expectedDate)
+    expect(handler.mock.calls[0][0]).toEqual(expectedDate)
   })
 
   test.skip('hitting enter in date field navigates to date', function () {
     // instrument the callback
-    const handler = sinon.spy()
+    const handler = jest.fn()
     navigator.on('navigateDate', handler)
 
     // type and "enter" a date
@@ -89,6 +88,6 @@ describe('CalendarNavigator', () => {
 
     // check that we got the expected value to the callback
     const expectedDate = unfudgeDateForProfileTimezone(new Date(2015, 6, 4))
-    equal(+handler.getCall(0).args[0], +expectedDate)
+    expect(handler.mock.calls[0][0]).toEqual(expectedDate)
   })
 })

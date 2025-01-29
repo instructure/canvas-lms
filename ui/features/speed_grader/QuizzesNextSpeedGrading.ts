@@ -62,7 +62,7 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
   function retryRefreshGrades(
     submission: Submission,
     originalSubmission: Submission,
-    numRequests: number
+    numRequests: number,
   ) {
     const maxRequests = 20
     if (numRequests >= maxRequests) return false

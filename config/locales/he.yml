@@ -2041,6 +2041,7 @@ he:
   administrator_f325c186: "מנהל המערכת"
   admins_3e1dce15: "מנהלי מערכת"
   admins_add_remove_26811ce5: "מנהלי מערכת - הוסף / הסר"
+  advanced_turnitin_settings_9ee84a38: "הגדרות מתקדמות של Turnitin"
   afghanistan_93_ab06805: "אפגניסטן (+93)"
   after_48b9d69: לאחר...
   after_4c71e718: לאחר
@@ -9912,6 +9913,7 @@ he:
         randomly_assign_students_dialog: "הפעולה תקצה אוטומטית את כל התלמידים שטרם צוותו בצורה שוויונית ככל האפשר בין קבוצות תלמידים קיימות"
       self_signup_help: 
         about_self_signup_groups: "אודות קבוצות רישום עצמי"
+        self_signup_deadline_description: "ניתן להגדיר אוספי קבוצות כדי שתלמידים יוכלו להרשם באופן עצמאי. בכל מקרה התלמידים יוכלו להשתתף רק בקבוצה אחת באוסף , אך בדרך זו יוכלו לארגן לעצמם קבוצות במקום להיות תלויים במורה לבצע זאת עבורם. יש לשים לב שכל עוד אפשרות זו מופעלת, תלמידים יכולים לעבור מקבוצה לקבוצה."
         self_signup_description: "ניתן להגדיר אוספי קבוצות כדי שתלמידים יוכלו להרשם באופן עצמאי. בכל מקרה התלמידים יוכלו להשתתף רק בקבוצה אחת באוסף , אך בדרך זו יוכלו לארגן לעצמם קבוצות במקום להיות תלויים במורה לבצע זאת עבורם. יש לשים לב שכל עוד אפשרות זו מופעלת, תלמידים יכולים לעבור מקבוצה לקבוצה."
     max_membership_number: "מספר חברים מרבי חייב להיות ערך מספרי"
     member: 
@@ -13140,6 +13142,7 @@ he:
   move_dialog_select: 
     move_to_end: "-- בתחתית --"
   move_discussion_9ff5b2d1: "העברת דיון"
+  move_from_ef79aa53: "העברה מ"
   move_group_3dd7f76e: "העברת קבוצה"
   move_group_77ae285d: "העברת קבוצה..."
   move_item_e94a8103: "העברת פריט"
@@ -20480,6 +20483,7 @@ he:
   view_prior_enrollments_9b519b25: "הצגת הרשמות קודמות"
   view_question_banks_188a9e0f: "הצגת בנקי שאלות"
   view_range_student_details_8116d68a: "הצגת פרטי קבוצת תלמידים"
+  view_registered_services_6c8cd301: "הצגת שרותים רשומים"
   view_rubric_d71cce10: "הצגת רובריקה"
   view_rubric_evaluation_b1b0db2a: "עיון בהערכת רובריקה"
   view_scoring_details_9fb7a0a5: "הצגת פרטי ציונים"

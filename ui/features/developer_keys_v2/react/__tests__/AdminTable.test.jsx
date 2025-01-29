@@ -67,7 +67,7 @@ describe('AdminTable', () => {
           },
         }}
         {...props}
-      />
+      />,
     )
   }
 

@@ -218,8 +218,8 @@ describe('RubricTab', () => {
 
       expect(
         await findByText(
-          'Fill out the rubric below after reviewing the student submission to complete this review.'
-        )
+          'Fill out the rubric below after reviewing the student submission to complete this review.',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -233,8 +233,8 @@ describe('RubricTab', () => {
 
       expect(
         await queryByText(
-          'Fill out the rubric below after reviewing the student submission to complete this review.'
-        )
+          'Fill out the rubric below after reviewing the student submission to complete this review.',
+        ),
       ).not.toBeInTheDocument()
     })
 

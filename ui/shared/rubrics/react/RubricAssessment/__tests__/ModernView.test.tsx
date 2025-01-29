@@ -196,12 +196,12 @@ describe('ModernView', () => {
   it('switches between horizontal and vertical views', () => {
     const {rerender} = render(<ModernView {...defaultProps} selectedViewMode="horizontal" />)
     expect(screen.getAllByTestId('rubric-assessment-horizontal-display')).toHaveLength(
-      mockCriteria.length
+      mockCriteria.length,
     )
 
     rerender(<ModernView {...defaultProps} selectedViewMode="vertical" />)
     expect(screen.getAllByTestId('rubric-assessment-vertical-display')).toHaveLength(
-      mockCriteria.length
+      mockCriteria.length,
     )
   })
 

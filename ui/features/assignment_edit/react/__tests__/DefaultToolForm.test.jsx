@@ -86,8 +86,8 @@ describe('DefaultToolForm', () => {
 
       await waitFor(() =>
         expect(
-          wrapper.getByText('The tool is not installed in the course or account')
-        ).toBeInTheDocument()
+          wrapper.getByText('The tool is not installed in the course or account'),
+        ).toBeInTheDocument(),
       )
     })
   })

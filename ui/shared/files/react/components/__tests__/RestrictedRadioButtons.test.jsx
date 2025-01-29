@@ -104,7 +104,7 @@ describe('RestrictedRadioButtons', () => {
 
     // The date fields should be visible in the document
     expect(document.querySelector('.RestrictedRadioButtons__dates_wrapper')).not.toHaveClass(
-      'RestrictedRadioButtons__dates_wrapper_hidden'
+      'RestrictedRadioButtons__dates_wrapper_hidden',
     )
   })
 })

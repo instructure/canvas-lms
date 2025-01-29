@@ -39,8 +39,12 @@ interface ComponentProps {
   readonly value: string | number
   readonly onChange: (e: React.FormEvent<HTMLInputElement>, value: string) => void
   readonly onBlur?: (e: React.FormEvent<HTMLInputElement>) => void
-  readonly onDecrement: (_e: React.FormEvent<HTMLInputElement>, direction: number) => void
-  readonly onIncrement: (_e: React.FormEvent<HTMLInputElement>, direction: number) => void
+  readonly onDecrement: (
+    event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>,
+  ) => void
+  readonly onIncrement: (
+    event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>,
+  ) => void
   readonly showTooltipOn?: 'click' | 'hover' | 'focus' | ('click' | 'hover' | 'focus')[]
   readonly showFlag?: boolean
 }
@@ -80,7 +84,6 @@ export const FlaggableNumberInput = ({
           renderTip={I18n.t('You cannot edit a locked pace')}
           on={showTooltipOn}
         >
-          {/* @ts-expect-error */}
           <NumberInput
             allowStringValue={true}
             renderLabel={label}

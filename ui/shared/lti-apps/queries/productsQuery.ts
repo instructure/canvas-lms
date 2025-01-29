@@ -72,14 +72,14 @@ export const fetchProducts = async (params: DiscoverParams): Promise<ProductResp
   return products || {}
 }
 
-export const fetchProductDetails = async (global_product_id: String): Promise<Product | null> => {
+export const fetchProductDetails = async (global_product_id: string): Promise<Product | null> => {
   if (!global_product_id) return null
   const url = `/api/v1/accounts/${accountId}/learn_platform/products/${global_product_id}`
 
   const product = await fetchResponse(
     'get',
     url,
-    `Failed to fetch product with id ${global_product_id}`
+    `Failed to fetch product with id ${global_product_id}`,
   )
 
   return product || {}
@@ -106,7 +106,7 @@ export const fetchCustomFilters = async (salesforceId: number): Promise<Organiza
     {salesforce_id: salesforceId},
     {
       arrayFormat: 'brackets',
-    }
+    },
   )}`
 
   const filters = await fetchResponse('get', url, 'Failed to fetch custom filters')
@@ -116,7 +116,7 @@ export const fetchCustomFilters = async (salesforceId: number): Promise<Organiza
 
 export const fetchProductsByOrganization = async (
   params: DiscoverParams,
-  organizationSalesforceId: string
+  organizationSalesforceId: string,
 ): Promise<OrganizationProductResponse> => {
   const {page, search} = params
   const {tags, companies, audience, versions} = params.filters
@@ -143,13 +143,13 @@ export const fetchProductsByOrganization = async (
     apiParams,
     {
       arrayFormat: 'brackets',
-    }
+    },
   )}`
 
   const products: OrganizationProductResponse = await fetchResponse(
     'get',
     url,
-    'Failed to fetch products by organization'
+    'Failed to fetch products by organization',
   )
 
   return products

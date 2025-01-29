@@ -32,7 +32,14 @@ describe('setupSubmitHandler', () => {
     sandbox.stub($.fn, 'formSubmit')
     fixture = document.createElement('div')
     document.body.appendChild(fixture)
-    fixture.innerHTML = `<form id="${formId}" enctype="multipart/form-data"><input type="file" name="submissions_zip"><button type="submit">Upload Files</button></form>`
+    fixture.innerHTML = `<form id="${formId}" enctype="multipart/form-data">
+    <button id="choose_file_button" class="btn"><%= t 'buttons.choose_file', "Choose File" %></button>
+    <div id="uploaded_file_tag"></div>
+    <div class="button-container">
+      <button id="reuploaded_submissions_button" type="submit" class="btn btn-primary" style="display: none;"><%= t 'buttons.upload_files', "Re-Upload Files" %></button>
+    </div>
+    <input type="file" name="submissions_zip" style="height:0;width:0;overflow:hidden;"/>
+    </form>`
 
     const dummySubmit = event => {
       event.preventDefault()
@@ -132,10 +139,13 @@ describe('setupSubmitHandler', () => {
   describe('success', () => {
     let attachment
     let success
+    let formElement
 
     beforeEach(() => {
       attachment = {id: '729'}
       success = setupSubmitHandler(formId, 'user_1').success
+      formElement = document.getElementById(formId)
+      formElement.submit = sandbox.stub()
     })
 
     it('adds the attachment ID to the form', () => {
@@ -146,13 +156,13 @@ describe('setupSubmitHandler', () => {
 
     it('submits the form', () => {
       success(attachment)
-      expect(formSubmit.callCount).toEqual(1)
+      expect(formElement.submit.callCount).toEqual(1)
     })
 
     it('removes the file input', () => {
       success(attachment)
       const input = document.querySelectorAll('input[name="submissions_zip"]')
-      expect(input.length).toEqual(0)
+      expect(input).toHaveLength(0)
     })
 
     it('removes the multipart enctype', () => {

@@ -82,6 +82,11 @@ module Api::V1::SubmissionComment
     comment_methods = display_avatars ? [:avatar_path] : []
 
     submission_comments.map do |comment|
+      # workaround to avoid N+1 query problem in SubmissionComment#serialization_methods
+      if !comment.association(:root_account).loaded? && course.association(:root_account).loaded? && course.root_account.present?
+        comment.root_account = course.root_account
+      end
+
       json = comment.as_json(include_root: false, methods: comment_methods, only: ANONYMOUS_MODERATED_JSON_ATTRIBUTES)
       json[:publishable] = comment.publishable_for?(current_user)
       author_id = comment.author_id.to_s

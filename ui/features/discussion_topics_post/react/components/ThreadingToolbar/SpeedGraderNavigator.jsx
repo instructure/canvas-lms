@@ -87,13 +87,13 @@ export const SpeedGraderNavigator = () => {
         {renderButton(
           handlePreviousStudentReply,
           'previous-in-speedgrader',
-          I18n.t('Previous in SpeedGrader')
+          I18n.t('Previous in SpeedGrader'),
         )}
         {renderButton(handleNextStudentReply, 'next-in-speedgrader', I18n.t('Next in SpeedGrader'))}
         {renderButton(
           handleJumpFocusToSpeedGrader,
           'jump-to-speedgrader-navigation',
-          I18n.t('Jump to SpeedGrader Navigation')
+          I18n.t('Jump to SpeedGrader Navigation'),
         )}
       </Flex>
     </div>

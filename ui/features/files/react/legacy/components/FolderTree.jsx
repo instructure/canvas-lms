@@ -57,7 +57,7 @@ export default {
       {
         render: true,
         element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder),
-      }
+      },
     ).index
 
     this.expandTillCurrentFolder(this.props)

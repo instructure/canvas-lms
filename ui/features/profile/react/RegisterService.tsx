@@ -47,7 +47,7 @@ const validationSchema = z.object({
       USERNAME_MAX_LENGTH,
       I18n.t('Exceeded the maximum length (%{usernameMaxLength} characters).', {
         usernameMaxLength: USERNAME_MAX_LENGTH,
-      })
+      }),
     ),
   password: z.string().optional(),
 })
@@ -67,7 +67,7 @@ export const serviceConfigByName: Record<
   skype: {
     title: I18n.t('Register Skype'),
     description: I18n.t(
-      'Skype offers free online voice and video calls. Lots of students use Skype as a free, easy way to communicate. If you register your Skype Name and enable visibility, then other students can easily find your contact and call or add you using Skype.'
+      'Skype offers free online voice and video calls. Lots of students use Skype as a free, easy way to communicate. If you register your Skype Name and enable visibility, then other students can easily find your contact and call or add you using Skype.',
     ),
     image: {path: '/images/skype.png', alt: I18n.t('Skype logo')},
     fields: control => (
@@ -96,7 +96,7 @@ export const serviceConfigByName: Record<
   google_drive: {
     title: I18n.t('Authorize Google Drive'),
     description: I18n.t(
-      "Once you authorize us to see your Google Drive you'll be able to submit your assignments directly from Google Drive, and create and share documents with members of your classes."
+      "Once you authorize us to see your Google Drive you'll be able to submit your assignments directly from Google Drive, and create and share documents with members of your classes.",
     ),
     image: {path: '/images/google_docs.png', alt: I18n.t('Google drive logo')},
     button: () => {
@@ -117,7 +117,7 @@ export const serviceConfigByName: Record<
   diigo: {
     title: I18n.t('Diigo login'),
     description: I18n.t(
-      "Diigo is a social bookmarking tool tailored specifically to research and education. Canvas's rich content editor will let you search your Diigo tags to easily link from within Canvas to other resources you find useful."
+      "Diigo is a social bookmarking tool tailored specifically to research and education. Canvas's rich content editor will let you search your Diigo tags to easily link from within Canvas to other resources you find useful.",
     ),
     image: {path: '/images/diigo.png', alt: I18n.t('Diigo logo')},
     fields: control => (
@@ -190,7 +190,7 @@ const RegisterService = ({serviceName, onSubmit, onClose}: RegisterServiceProps)
       onSubmit()
     } catch {
       showFlashError(
-        I18n.t('Registration failed. Check the username and/or password, and try again.')
+        I18n.t('Registration failed. Check the username and/or password, and try again.'),
       )()
     }
   }

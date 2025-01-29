@@ -88,10 +88,10 @@ export default class LinkToStudentsView extends DialogBaseView {
     $link.attr('href', '#')
     $link.attr(
       'title',
-      I18n.t('Remove linked student %{name}', {name: $token.find('div').attr('title')})
+      I18n.t('Remove linked student %{name}', {name: $token.find('div').attr('title')}),
     )
     const $screenreader_span = $('<span class="screenreader-only"></span>').text(
-      I18n.t('Remove linked student %{name}', {name: $token.find('div').attr('title')})
+      I18n.t('Remove linked student %{name}', {name: $token.find('div').attr('title')}),
     )
     return $link.append($screenreader_span)
   }
@@ -121,7 +121,6 @@ export default class LinkToStudentsView extends DialogBaseView {
 
     // create new links
     for (const id of newLinks) {
-       
       this.getUserData(id).done(user => {
         const udfds = []
         const sections = map(user.enrollments, en => en.course_section_id)
@@ -147,7 +146,7 @@ export default class LinkToStudentsView extends DialogBaseView {
                 newEnrollment.observed_user = user
                 return newEnrollments.push(newEnrollment)
               },
-               
+
               response => {
                 const messages = Object.keys(response.errors)
 
@@ -157,8 +156,8 @@ export default class LinkToStudentsView extends DialogBaseView {
                     observerObservingObserver = true
                   }
                 }
-              }
-            )
+              },
+            ),
           )
         }
 
@@ -179,7 +178,7 @@ export default class LinkToStudentsView extends DialogBaseView {
 
     // delete old links
     const enrollmentsToRemove = filter(enrollments, en =>
-      includes(removeLinks, en.associated_user_id)
+      includes(removeLinks, en.associated_user_id),
     )
     for (const en of enrollmentsToRemove) {
       const url = `${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`
@@ -197,19 +196,19 @@ export default class LinkToStudentsView extends DialogBaseView {
             $.flashError(
               I18n.t(
                 'flash.observerObservingObserverError',
-                'Cannot observe user with another user that is being observed by the current user.'
-              )
+                'Cannot observe user with another user that is being observed by the current user.',
+              ),
             )
           } else {
             $.flashError(
               I18n.t(
                 'flash.linkError',
-                "Something went wrong updating the user's student links. Please try again later."
-              )
+                "Something went wrong updating the user's student links. Please try again later.",
+              ),
             )
           }
         })
-        .always(() => this.close())
+        .always(() => this.close()),
     )
   }
 }

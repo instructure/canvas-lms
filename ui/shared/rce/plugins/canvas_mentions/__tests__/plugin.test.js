@@ -68,7 +68,7 @@ describe('plugin', () => {
   it('creates the plugin', () => {
     expect(tinymce.create).toHaveBeenCalledWith(
       'tinymce.plugins.CanvasMentionsPlugin',
-      expect.anything()
+      expect.anything(),
     )
   })
 
@@ -104,7 +104,7 @@ describe('pluginDefinition', () => {
       it('makes the marker contenteditable', () => {
         editor.fire('input', {}, editor)
         expect(screen.getByTestId('mentions-marker').getAttribute('contenteditable')).toEqual(
-          'true'
+          'true',
         )
       })
 
@@ -117,7 +117,7 @@ describe('pluginDefinition', () => {
     describe('when an "inline" mention is triggered', () => {
       beforeEach(() => {
         editor.setContent(
-          '<div data-testid="fake-body" contenteditable="true"><span id="test"> @</span></div>'
+          '<div data-testid="fake-body" contenteditable="true"><span id="test"> @</span></div>',
         )
         editor.selection.select(editor.dom.select('#test')[0])
         editor.selection.setAnchorOffset(2)
@@ -129,7 +129,7 @@ describe('pluginDefinition', () => {
     describe('when a "starting" mention is triggered', () => {
       beforeEach(() => {
         editor.setContent(
-          '<div data-testid="fake-body" contenteditable="true"><span id="test">@</span></div>'
+          '<div data-testid="fake-body" contenteditable="true"><span id="test">@</span></div>',
         )
         editor.selection.select(editor.dom.select('#test')[0])
         editor.selection.setAnchorOffset(1)
@@ -170,7 +170,7 @@ describe('pluginDefinition', () => {
           <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
           </span>
           <span id="mention-menu"></span>
-        </div>`
+        </div>`,
       )
       editor.selection.select(editor.dom.select('#test')[0])
     })
@@ -199,7 +199,7 @@ describe('pluginDefinition', () => {
         `<div data-testid="fake-body" contenteditable="false">
           <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
           </span>
-        </div>`
+        </div>`,
       )
 
       editor.selection.select(editor.dom.select('#mentions-marker')[0])
@@ -249,7 +249,7 @@ describe('pluginDefinition', () => {
           <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
             <span id="mention-menu"></span>
           </span>
-        </div>`
+        </div>`,
       )
       editor.selection.select(editor.dom.select('#test')[0])
     })
@@ -325,7 +325,7 @@ describe('pluginDefinition', () => {
               <span id="test"> @<span id="mentions-marker" contenteditable="true" aria-activedescendant="test" data-userid="123" data-displayname="Test">wes</span>
                 <span id="mention-menu"></span>
               </span>
-            </div>`
+            </div>`,
           )
         })
 
@@ -346,7 +346,7 @@ describe('pluginDefinition', () => {
           <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
             <span id="mention-menu"></span>
           </span>
-        </div>`
+        </div>`,
       )
       editor.selection.select(editor.dom.select('#test')[0])
     })
@@ -379,7 +379,7 @@ describe('pluginDefinition', () => {
           <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
             <span id="mention-menu"></span>
           </span>
-        </div>`
+        </div>`,
       )
       editor.selection.select(editor.dom.select('#test')[0])
     })
@@ -402,7 +402,7 @@ describe('pluginDefinition', () => {
           <span id="test"> @<span id="mentions-marker" contenteditable="true">wes</span>
             <span id="mention-menu"></span>
           </span>
-        </div>`
+        </div>`,
       )
       editor.selection.select(editor.dom.select('#test')[0])
     })

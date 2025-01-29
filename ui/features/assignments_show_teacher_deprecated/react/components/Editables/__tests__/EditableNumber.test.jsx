@@ -29,7 +29,7 @@ describe('EditableNumber', () => {
         onChangeMode={() => {}}
         label="Pick a number"
         value="17"
-      />
+      />,
     )
     expect(getAllByText('17')[0]).toBeInTheDocument()
     expect(getByText('Pick a number')).toBeInTheDocument()
@@ -43,7 +43,7 @@ describe('EditableNumber', () => {
         onChangeMode={() => {}}
         label="Pick a number"
         value="17"
-      />
+      />,
     )
     expect(getByDisplayValue('17')).toBeInTheDocument()
   })
@@ -57,7 +57,7 @@ describe('EditableNumber', () => {
         label="Pick a number"
         value="17"
         readOnly={true}
-      />
+      />,
     )
     expect(queryByText('Pick a number')).toBeNull()
   })
@@ -71,7 +71,7 @@ describe('EditableNumber', () => {
         onChangeMode={onChangeMode}
         label="Pick a number"
         value="17"
-      />
+      />,
     )
     const input = getByDisplayValue('17')
     fireEvent.keyDown(input, {key: 'Enter', code: 13})
@@ -90,7 +90,7 @@ describe('EditableNumber', () => {
         onInputChange={onInputChange}
         label="Pick a number"
         value="17"
-      />
+      />,
     )
 
     const input = getByDisplayValue('17')

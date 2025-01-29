@@ -91,7 +91,6 @@ function computeDatepickerDefaults() {
       try {
         return I18n.lookup('date.formats.medium_month').slice(0, 2) === '%Y'
       } catch {
-         
         console.warn('WARNING Missing required datepicker keys in locale file')
         return false // Assume English
       }
@@ -109,9 +108,8 @@ function computeDatepickerDefaults() {
     datepickerDefaults.dayNamesShort = I18n.lookup('date.abbr_day_names') // title text for column headings
     datepickerDefaults.dayNamesMin = I18n.lookup('date.datepicker.column_headings') // column headings for days (Sunday = 0)
   } catch {
-     
     console.warn(
-      'WARNING Missing required datepicker keys in locale file, using US English datepicker'
+      'WARNING Missing required datepicker keys in locale file, using US English datepicker',
     )
     datepickerDefaults.dateFormat = datePickerFormat(fallbacks['date.formats.medium'])
     datepickerDefaults.monthNames = fallbacks['date.month_names'].slice(1)
@@ -138,7 +136,7 @@ export function renderDatetimeField($fields, options) {
 export default class DatetimeField {
   constructor($field, options = {}) {
     ;['alertScreenreader', 'setFromValue', 'setDatetime', 'setTime', 'setDate'].forEach(
-      m => (this[m] = this[m].bind(this))
+      m => (this[m] = this[m].bind(this)),
     )
     let $wrapper
     this.$field = $field
@@ -186,13 +184,12 @@ export default class DatetimeField {
     // showDate || showTime will always be true; i.e. not showDate implies
     // showTime, and vice versa. that's a nice property, so let's enforce it
     // (treating the provision as both as the provision of neither)
-     
+
     if (timeOnly && dateOnly) {
       console.warn('DatetimeField instantiated with both timeOnly and dateOnly true.')
       console.warn('Treating both as false instead.')
       timeOnly = dateOnly = false
     }
-     
 
     this.showDate = !timeOnly
     this.allowTime = !dateOnly
@@ -218,7 +215,7 @@ export default class DatetimeField {
           onClose: () => this.$field.trigger('reattachTooltip'),
           firstDay: moment.localeData(ENV.MOMENT_LOCALE).firstDayOfWeek(),
         },
-        options.datepicker
+        options.datepicker,
       )
       this.$field.datepicker(datepickerOptions)
 
@@ -406,17 +403,16 @@ export default class DatetimeField {
 
     let localText = this.formatSuggest()
     this.screenreaderAlert = localText
-    if (this.$contextSuggest) {
+    if (this.$contextSuggest && !this.invalid()) {
       let contextText = this.formatSuggestContext()
+      this.clearSuggestion()
       if (contextText) {
         localText = `${this.localLabel}: ${localText}`
         contextText = `${this.contextLabel}: ${contextText}`
         this.screenreaderAlert = `${localText}\n${contextText}`
       }
       this.$contextSuggest.text(contextText).show()
-    }
-
-    if (this.$options.newSuggestionDesign) return this.newSuggestion(show, localText)
+    } else if (this.$options.newSuggestionDesign) return this.newSuggestion(show, localText)
     this.defaultSuggestion(show, localText)
   }
 
@@ -460,6 +456,10 @@ export default class DatetimeField {
       this.$suggest.show()
       return
     }
+    this.clearSuggestion()
+  }
+
+  clearSuggestion() {
     this.$field.removeClass('error')
     this.$suggest.hide()
     if (this.$contextSuggest) this.$contextSuggest.hide()
@@ -510,11 +510,11 @@ export default class DatetimeField {
   }
 
   get parseError() {
-    if (this.valid === PARSE_RESULTS.BAD_YEAR) return I18n.t('Year is too far in the past.')
     if (this.$options.newSuggestionDesign) {
       if (this.$options.dateOnly) return I18n.t('Not a valid date format')
       if (this.$options.timeOnly) return I18n.t('Not a valid time format')
     }
+    if (this.valid === PARSE_RESULTS.BAD_YEAR) return I18n.t('Year is too far in the past.')
     return I18n.t('errors.not_a_date', "That's not a date!")
   }
 }

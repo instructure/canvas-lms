@@ -51,7 +51,7 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     const gradingCategory = getByTestId('grading')
@@ -64,7 +64,7 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     const gradingCategory = getByTestId('grading')
@@ -77,14 +77,14 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     const dueDateCategory = getByTestId('due_date')
     expect(dueDateCategory).not.toBeNull()
     expect(dueDateCategory.children[category].children[0].textContent).toEqual('Due Date')
     expect(
-      dueDateCategory.children[commsChannel2].querySelector('svg[name="IconNo"]')
+      dueDateCategory.children[commsChannel2].querySelector('svg[name="IconNo"]'),
     ).toBeInTheDocument()
   })
 
@@ -93,14 +93,14 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     const dueDateCategory = getByTestId('due_date')
     expect(dueDateCategory).not.toBeNull()
     expect(dueDateCategory.children[category].children[0].textContent).toEqual('Due Date')
     expect(
-      dueDateCategory.children[commsChannel3].querySelector('svg[name="IconNo"]')
+      dueDateCategory.children[commsChannel3].querySelector('svg[name="IconNo"]'),
     ).toBeInTheDocument()
   })
 
@@ -109,14 +109,14 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     const dueDateCategory = getByTestId('due_date')
     expect(dueDateCategory).not.toBeNull()
     expect(dueDateCategory.children[category].children[0].textContent).toEqual('Due Date')
     expect(
-      dueDateCategory.children[commsChannel1].querySelector('svg[name="IconMuted"]')
+      dueDateCategory.children[commsChannel1].querySelector('svg[name="IconMuted"]'),
     ).toBeInTheDocument()
   })
 
@@ -125,7 +125,7 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     expect(getByText('Push Notification')).toBeInTheDocument()
@@ -137,7 +137,7 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     expect(queryByTestId('courseActivities')).not.toBeNull()
@@ -149,7 +149,7 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     const dueDateTooltip = getByTestId('due_date_description')
@@ -164,7 +164,7 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     const dueDateScreenReader = getByTestId('due_date_screenReader')
@@ -179,7 +179,7 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     const sendScoresToggle = getByTestId('grading-send-score-in-email')
@@ -191,7 +191,7 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences({sendScoresInEmails: false})}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     const sendScoresToggle = getByTestId('grading-send-score-in-email')
@@ -203,7 +203,7 @@ describe('Notification Preferences Table', () => {
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
         updatePreference={jest.fn()}
-      />
+      />,
     )
 
     const dueDate = container.getByTestId('due_date_header')
@@ -216,7 +216,7 @@ describe('Notification Preferences Table', () => {
         <NotificationPreferencesTable
           preferences={mockedNotificationPreferences()}
           updatePreference={jest.fn()}
-        />
+        />,
       )
 
       const test = container.queryByTestId('reported_reply_header')
@@ -242,7 +242,7 @@ describe('Notification Preferences Table', () => {
             <NotificationPreferencesTable
               preferences={mockedNotificationPreferences()}
               updatePreference={jest.fn()}
-            />
+            />,
           )
 
           const test = container.queryByTestId('reported_reply_header')
@@ -260,7 +260,7 @@ describe('Notification Preferences Table', () => {
             <NotificationPreferencesTable
               preferences={mockedNotificationPreferences()}
               updatePreference={jest.fn()}
-            />
+            />,
           )
 
           const test = container.getByTestId('reported_reply_header')

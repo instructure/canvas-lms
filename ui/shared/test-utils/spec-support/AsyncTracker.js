@@ -73,7 +73,7 @@ export default class AsyncTracker {
           message: `${trackersOfType.length} ${type}(s) have not yet resolved`,
         }))
       },
-      SLOW_SPEC_LIMIT
+      SLOW_SPEC_LIMIT,
     )
 
     this._currentContextTimer.clear = () => {
@@ -114,7 +114,7 @@ export default class AsyncTracker {
           if (unmanagedBehaviorStrategy === 'wait' || unmanagedBehaviorStrategy === 'hurry') {
             tracker.currentContext.addCriticalFailure(
               'Unmanaged error in setTimeout callback',
-              tracker
+              tracker,
             )
           }
           throw e
@@ -166,7 +166,7 @@ export default class AsyncTracker {
       const [tracker] = this._trackers
       tracker.currentContext.addFailure(
         'Async behavior must resolve before tests complete',
-        tracker
+        tracker,
       )
       this.clearUnmanagedBehavior()
     }

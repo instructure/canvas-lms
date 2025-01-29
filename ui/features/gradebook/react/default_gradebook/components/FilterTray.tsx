@@ -121,7 +121,7 @@ export default function FilterTray({
                 shadow="resting"
               >
                 {I18n.t(
-                  'Did you know you can now create filter presets and save them for future use?'
+                  'Did you know you can now create filter presets and save them for future use?',
                 )}
               </ContextView>
             </Flex.Item>
@@ -177,7 +177,7 @@ export default function FilterTray({
                 onDelete={() => deleteFilterPreset(filterPreset)}
                 onToggle={() =>
                   setExpandedFilterPresetId(
-                    expandedFilterPresetId === filterPreset.id ? null : filterPreset.id
+                    expandedFilterPresetId === filterPreset.id ? null : filterPreset.id,
                   )
                 }
                 onUpdate={updatedFilterPreset => {

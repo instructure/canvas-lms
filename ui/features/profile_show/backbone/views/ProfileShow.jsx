@@ -50,7 +50,6 @@ export default class ProfileShow extends Backbone.View {
   }
 
   renderAlert(message, container, variant) {
-     
     ReactDOM.render(
       <Alert
         variant={variant}
@@ -61,7 +60,7 @@ export default class ProfileShow extends Backbone.View {
       >
         {message}
       </Alert>,
-      this.$el.find(container)[0]
+      this.$el.find(container)[0],
     )
   }
 
@@ -75,7 +74,7 @@ export default class ProfileShow extends Backbone.View {
       this.renderAlert(
         I18n.t('Profile has been saved successfully'),
         saveSuccessContainer,
-        'success'
+        'success',
       )
     } else if (saveFailedDiv.length > 0) {
       this.renderAlert(I18n.t('Profile save was unsuccessful'), saveFailedContainer, 'error')
@@ -101,7 +100,7 @@ export default class ProfileShow extends Backbone.View {
         $('.avatar').css('background-image', 'url()')
         link.remove()
       },
-      _data => $.flashError(I18n.t('Failed to remove the image, please try again.'))
+      _data => $.flashError(I18n.t('Failed to remove the image, please try again.')),
     )
   }
 
@@ -111,7 +110,7 @@ export default class ProfileShow extends Backbone.View {
     const result = await showConfirmationDialog({
       label: I18n.t('Report Profile Picture'),
       body: I18n.t(
-        'Reported profile pictures will be sent to administrators for review. You will not be able to undo this action.'
+        'Reported profile pictures will be sent to administrators for review. You will not be able to undo this action.',
       ),
     })
     if (!result) {
@@ -125,7 +124,7 @@ export default class ProfileShow extends Backbone.View {
         $.flashMessage(I18n.t('The profile picture has been reported.'))
         link.remove()
       },
-      _data => $.flashError(I18n.t('Failed to report the image, please try again.'))
+      _data => $.flashError(I18n.t('Failed to report the image, please try again.')),
     )
   }
 

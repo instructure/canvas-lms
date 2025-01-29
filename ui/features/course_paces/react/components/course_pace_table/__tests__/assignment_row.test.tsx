@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -31,11 +30,11 @@ import {
 } from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
 
-import {AssignmentRow} from '../assignment_row'
+import {AssignmentRow, type ComponentProps} from '../assignment_row'
 
 const setPaceItemDuration = jest.fn()
 
-const defaultProps = {
+const defaultProps: ComponentProps = {
   coursePace: PRIMARY_PACE,
   dueDate: '2020-01-01T02:00:00-05:00',
   excludeWeekends: false,
@@ -43,8 +42,6 @@ const defaultProps = {
   coursePaceItemPosition: 0,
   isSyncing: false,
   blackoutDates: BLACKOUT_DATES,
-  autosaving: false,
-  disabledDaysOfWeek: [],
   showProjections: true,
   setPaceItemDuration,
   datesVisible: true,
@@ -52,6 +49,9 @@ const defaultProps = {
   isStacked: false,
   isStudentPace: false,
   coursePaceItemChanges: [],
+  blueprintLocked: false,
+  selectedDaysToSkip: [],
+  context_type: 'Course',
 }
 
 beforeAll(() => {
@@ -96,14 +96,14 @@ describe('AssignmentRow', () => {
 
   it('does not show the projected due date if projections are being hidden', async () => {
     const {queryByText} = renderConnected(
-      renderRow(<AssignmentRow {...defaultProps} datesVisible={false} showProjections={false} />)
+      renderRow(<AssignmentRow {...defaultProps} datesVisible={false} showProjections={false} />),
     )
     await waitFor(() => expect(queryByText('Wed, Jan 1, 2020')).not.toBeInTheDocument())
   })
 
   it('renders an icon showing whether or not the module item is published', () => {
     const publishedIcon = renderConnected(renderRow(<AssignmentRow {...defaultProps} />)).getByText(
-      'Published'
+      'Published',
     )
     expect(publishedIcon).toBeInTheDocument()
 
@@ -112,14 +112,14 @@ describe('AssignmentRow', () => {
       coursePaceItem: {...defaultProps.coursePaceItem, published: false},
     }
     const unpublishedIcon = renderConnected(
-      renderRow(<AssignmentRow {...unpublishedProps} />)
+      renderRow(<AssignmentRow {...unpublishedProps} />),
     ).getByText('Unpublished')
     expect(unpublishedIcon).toBeInTheDocument()
   })
 
   it('disables duration inputs while publishing', () => {
     const {getByRole} = renderConnected(
-      renderRow(<AssignmentRow {...defaultProps} isSyncing={true} />)
+      renderRow(<AssignmentRow {...defaultProps} isSyncing={true} />),
     )
     const daysInput = getByRole('textbox', {
       name: 'Duration for assignment Basic encryption/decryption',
@@ -142,16 +142,19 @@ describe('AssignmentRow', () => {
         <AssignmentRow
           {...defaultProps}
           coursePaceItem={{...PACE_ITEM_1, points_possible: undefined}}
-        />
-      )
+        />,
+      ),
     )
 
     expect(getByText(PACE_ITEM_1.assignment_title)).toBeInTheDocument()
 
     rerender(
       renderRow(
-        <AssignmentRow {...defaultProps} coursePaceItem={{...PACE_ITEM_1, points_possible: null}} />
-      )
+        <AssignmentRow
+          {...defaultProps}
+          coursePaceItem={{...PACE_ITEM_1, points_possible: null}}
+        />,
+      ),
     )
 
     expect(getByText(PACE_ITEM_1.assignment_title)).toBeInTheDocument()
@@ -159,12 +162,12 @@ describe('AssignmentRow', () => {
 
   it('shows durations as read-only text when on student paces', () => {
     const {queryByRole, getByText} = renderConnected(
-      renderRow(<AssignmentRow {...defaultProps} coursePace={STUDENT_PACE} isStudentPace={true} />)
+      renderRow(<AssignmentRow {...defaultProps} coursePace={STUDENT_PACE} isStudentPace={true} />),
     )
     expect(
       queryByRole('textbox', {
         name: 'Duration for assignment Basic encryption/decryption',
-      })
+      }),
     ).not.toBeInTheDocument()
     expect(getByText('2')).toBeInTheDocument()
   })
@@ -178,8 +181,8 @@ describe('AssignmentRow', () => {
     it('renders an input for student paces that updates the duration for that module item', async () => {
       const {getByRole} = renderConnected(
         renderRow(
-          <AssignmentRow {...defaultProps} coursePace={STUDENT_PACE} isStudentPace={true} />
-        )
+          <AssignmentRow {...defaultProps} coursePace={STUDENT_PACE} isStudentPace={true} />,
+        ),
       )
       const daysInput = getByRole('textbox', {
         name: 'Duration for assignment Basic encryption/decryption',
@@ -198,10 +201,10 @@ describe('AssignmentRow', () => {
   it("renders an indicator next to duration picker when there's unsaved changes", () => {
     const unsavedChangeText = 'Unsaved change'
     const {queryByText, getByText, rerender} = renderConnected(
-      renderRow(<AssignmentRow {...defaultProps} />)
+      renderRow(<AssignmentRow {...defaultProps} />),
     )
     const daysInput = getByText(
-      'Duration for assignment Basic encryption/decryption'
+      'Duration for assignment Basic encryption/decryption',
     ) as HTMLInputElement
     expect(daysInput).toBeInTheDocument()
     expect(queryByText(unsavedChangeText)).not.toBeInTheDocument()
@@ -210,7 +213,7 @@ describe('AssignmentRow', () => {
       {id: PACE_ITEM_1.id, oldValue: PACE_ITEM_1, newValue: {...PACE_ITEM_1, duration: 3}},
     ]
     rerender(
-      renderRow(<AssignmentRow {...defaultProps} coursePaceItemChanges={coursePaceItemChanges} />)
+      renderRow(<AssignmentRow {...defaultProps} coursePaceItemChanges={coursePaceItemChanges} />),
     )
     expect(getByText(unsavedChangeText)).toBeInTheDocument()
   })

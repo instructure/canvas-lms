@@ -45,7 +45,7 @@ export default class NotificationBadge extends React.Component {
     const activityIndicatorClasses = classnames(
       this.style.classNames.activityIndicator,
       indicator != null && this.style.classNames.hasBadge,
-      this.style.classNames[this.props.responsiveSize]
+      this.style.classNames[this.props.responsiveSize],
     )
 
     return (

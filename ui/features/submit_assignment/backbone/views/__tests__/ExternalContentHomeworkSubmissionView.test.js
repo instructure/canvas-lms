@@ -18,10 +18,11 @@
 
 import Backbone from '@canvas/backbone'
 import ExternalContentHomeworkSubmissionView from '../ExternalContentHomeworkSubmissionView'
-import sinon from 'sinon'
 
-const ok = x => expect(x).toBeTruthy()
-const notOk = x => expect(x).toBeFalsy()
+// mock windowAlert
+jest.mock('@canvas/util/globalUtils', () => ({
+  windowAlert: jest.fn(),
+}))
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
@@ -41,7 +42,7 @@ describe('ExternalContentHomeworkSubmissionView#uploadFileFromUrl', () => {
 
   test('Does submit the assignment if the EULA checkbox is not checked', () => {
     const view = newView()
-    const submitSpy = sinon.spy()
+    const submitSpy = jest.fn()
 
     const input = document.createElement('input')
     input.type = 'checkbox'
@@ -52,12 +53,12 @@ describe('ExternalContentHomeworkSubmissionView#uploadFileFromUrl', () => {
     view.submitHomework = submitSpy
     view._triggerSubmit({preventDefault: () => {}, stopPropagation: () => {}})
 
-    notOk(submitSpy.called)
+    expect(submitSpy).not.toHaveBeenCalled()
   })
 
   test('Does submit the assignment if the EULA checkbox is checked', () => {
     const view = newView()
-    const submitSpy = sinon.spy()
+    const submitSpy = jest.fn()
 
     const input = document.createElement('input')
     input.type = 'checkbox'
@@ -68,16 +69,16 @@ describe('ExternalContentHomeworkSubmissionView#uploadFileFromUrl', () => {
     view.submitHomework = submitSpy
     view._triggerSubmit({preventDefault: () => {}, stopPropagation: () => {}})
 
-    ok(submitSpy.called)
+    expect(submitSpy).toHaveBeenCalled()
   })
 
   test('Does submit the assignment if the EULA checkbox does not exist', () => {
     const view = newView()
-    const submitSpy = sinon.spy()
+    const submitSpy = jest.fn()
 
     view.submitHomework = submitSpy
     view._triggerSubmit({preventDefault: () => {}, stopPropagation: () => {}})
 
-    ok(submitSpy.called)
+    expect(submitSpy).toHaveBeenCalled()
   })
 })

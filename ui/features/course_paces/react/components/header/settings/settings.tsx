@@ -65,7 +65,7 @@ interface PassedProps {
   readonly isBlueprintLocked: boolean | undefined
 }
 
-type ComponentProps = StoreProps & DispatchProps & PassedProps
+export type ComponentProps = StoreProps & DispatchProps & PassedProps
 
 interface LocalState {
   readonly showBlackoutDatesModal: boolean

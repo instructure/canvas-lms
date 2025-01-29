@@ -31,7 +31,7 @@ const setFocusReducer = handleActions(
       targetArea: null,
     }),
   },
-  {permissionName: null, roleId: null, targetArea: null}
+  {permissionName: null, roleId: null, targetArea: null},
 )
 
 export default setFocusReducer

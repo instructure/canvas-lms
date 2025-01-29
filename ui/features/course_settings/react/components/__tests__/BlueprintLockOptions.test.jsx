@@ -67,14 +67,14 @@ describe('BlueprintLockOptions', () => {
 
     expect(screen.getByLabelText(/General Locked Objects/i)).toBeInTheDocument()
     expect(
-      screen.getByText(/Define general settings for locked objects in this course/i)
+      screen.getByText(/Define general settings for locked objects in this course/i),
     ).toBeInTheDocument()
   })
 
   it('shows the granular menu when master course is enabled and using restrictions by type', async () => {
     const user = userEvent.setup()
     render(
-      <BlueprintLockOptions {...defaultProps} isMasterCourse={true} useRestrictionsbyType={true} />
+      <BlueprintLockOptions {...defaultProps} isMasterCourse={true} useRestrictionsbyType={true} />,
     )
 
     const checkbox = screen.getByLabelText(/Enable course as a Blueprint Course/i)
@@ -82,7 +82,7 @@ describe('BlueprintLockOptions', () => {
 
     expect(screen.getByLabelText(/Locked Objects by Type/i)).toBeInTheDocument()
     expect(
-      screen.getByText(/Define settings by type for locked objects in this course/i)
+      screen.getByText(/Define settings by type for locked objects in this course/i),
     ).toBeInTheDocument()
   })
 

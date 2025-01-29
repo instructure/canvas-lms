@@ -25,7 +25,6 @@ import EnhancedIndividualGradebookWrapper from './react/components/EnhancedIndiv
 const matches = window.location.pathname.match(/(.*\/gradebook)/)
 const baseUrl = (matches && matches[0]) || ''
 
-// eslint-disable-next-line no-restricted-properties
 ReactDOM.render(
   <QueryProvider>
     <BrowserRouter basename={baseUrl}>
@@ -34,5 +33,5 @@ ReactDOM.render(
       </Routes>
     </BrowserRouter>
   </QueryProvider>,
-  document.getElementById('content')
+  document.getElementById('content'),
 )

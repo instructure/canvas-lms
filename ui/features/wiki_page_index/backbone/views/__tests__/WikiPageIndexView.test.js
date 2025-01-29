@@ -99,7 +99,7 @@ describe('WikiPageIndexView', () => {
       expect(ConfirmDeleteModal.showConfirmDelete).toHaveBeenCalledWith(
         expect.objectContaining({
           pageTitles: ['page 42'],
-        })
+        }),
       )
     })
   })
@@ -141,14 +141,14 @@ describe('WikiPageIndexView', () => {
           sourceCourseId: 'a course',
           contentSelection: {pages: ['42']},
         }),
-        {}
+        {},
       )
       trayComponent.mock.calls[0][0].onDismiss()
       expect(trayComponent).toHaveBeenLastCalledWith(
         expect.objectContaining({
           open: false,
         }),
-        {}
+        {},
       )
     })
 
@@ -165,14 +165,14 @@ describe('WikiPageIndexView', () => {
             content_type: 'page',
           },
         }),
-        {}
+        {},
       )
       userModal.mock.calls[0][0].onDismiss()
       expect(userModal).toHaveBeenLastCalledWith(
         expect.objectContaining({
           open: false,
         }),
-        {}
+        {},
       )
     })
   })
@@ -220,14 +220,14 @@ describe('WikiPageIndexView', () => {
           selectableItems: [],
           open: true,
         }),
-        {}
+        {},
       )
       trayComponent.mock.calls[0][0].onDismiss()
       expect(trayComponent).toHaveBeenLastCalledWith(
         expect.objectContaining({
           open: false,
         }),
-        {}
+        {},
       )
     })
 
@@ -246,7 +246,7 @@ describe('WikiPageIndexView', () => {
           selectableItems: [],
           open: true,
         }),
-        {}
+        {},
       )
     })
   })

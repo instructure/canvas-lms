@@ -107,8 +107,7 @@ class WikiPagesController < ApplicationController
         return
       end
 
-      if authorized_action(@page, @current_user, :read) &&
-         ((!@context.conditional_release? && !Account.site_admin.feature_enabled?(:selective_release_backend)) || enforce_assignment_visible(@page))
+      if authorized_action(@page, @current_user, :read) && enforce_assignment_visible(@page)
         if params[:id] != @page.url
           InstStatsd::Statsd.increment("wikipage.show.page_url_resolved")
           redirect_to polymorphic_url([@context, :wiki_page], id: @page, titleize: params[:titleize])
@@ -120,6 +119,7 @@ class WikiPagesController < ApplicationController
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
       end
+
       js_bundle :wiki_page_show
       css_bundle :wiki_page
     end
@@ -130,8 +130,7 @@ class WikiPagesController < ApplicationController
       set_master_course_js_env_data(@page, @context)
       js_env(ConditionalRelease::Service.env_for(@context))
       wiki_pages_js_env(@context)
-      if (!ConditionalRelease::Service.enabled_in_context?(@context) && !Account.site_admin.feature_enabled?(:selective_release_backend)) ||
-         enforce_assignment_visible(@page)
+      if enforce_assignment_visible(@page)
         add_crumb(@page.title)
         @padless = true
       end
@@ -141,13 +140,9 @@ class WikiPagesController < ApplicationController
     end
   end
 
-  def create_block_editor
-    BlockEditor.create! root_account_id: @page.root_account_id, context: @page, editor_version: BlockEditor::LATEST_VERSION, blocks: BlockEditor.blank_page
-  end
-
   def revisions
     if @page.grants_right?(@current_user, session, :read_revisions)
-      if (!@context.conditional_release? && !Account.site_admin.feature_enabled?(:selective_release_backend)) || enforce_assignment_visible(@page)
+      if enforce_assignment_visible(@page)
         add_crumb(@page.title, polymorphic_url([@context, @page]))
         add_crumb(t("#crumbs.revisions", "Revisions"))
 

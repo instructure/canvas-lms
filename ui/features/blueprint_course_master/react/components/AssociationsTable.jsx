@@ -65,7 +65,7 @@ export default class AssociationsTable extends React.Component {
     const removedIds = nextProps.removedAssociations.map(course => course.id)
     this.setState({
       visibleExisting: nextProps.existingAssociations.filter(
-        assoc => !removedIds.includes(assoc.id)
+        assoc => !removedIds.includes(assoc.id),
       ),
     })
 
@@ -96,11 +96,11 @@ export default class AssociationsTable extends React.Component {
         document
           .querySelector(`.bca-associations-table button[data-course-id="${courseId}"]`)
           .focus(),
-      400
+      400,
     )
 
     $.screenReaderFlashMessage(
-      I18n.t('Restored course association %{course}', {course: courseName})
+      I18n.t('Restored course association %{course}', {course: courseName}),
     )
     this.props.onRestoreAssociations([courseId])
   }
@@ -165,7 +165,7 @@ export default class AssociationsTable extends React.Component {
             {this.renderCellText(
               course.teachers
                 ? course.teachers.map(teacher => teacher.display_name).join(', ')
-                : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count})
+                : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count}),
             )}
           </Table.Cell>
           <Table.Cell>
@@ -201,7 +201,7 @@ export default class AssociationsTable extends React.Component {
             {this.renderCellText(
               course.teachers
                 ? course.teachers.map(teacher => teacher.display_name).join(', ')
-                : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count})
+                : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count}),
             )}
           </Table.Cell>
           <Table.Cell>

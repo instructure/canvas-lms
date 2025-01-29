@@ -23,14 +23,13 @@ import DiscussionFilterState from '../../models/DiscussionFilterState'
 import ReactDOM from 'react-dom'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
-import sinon from 'sinon'
 
 const equal = (x, y) => expect(x).toEqual(y)
 const deepEqual = (x, y) => expect(x).toEqual(y)
 
 describe('TopicView', () => {
   beforeEach(() => {
-    sinon.stub(ReactDOM, 'render')
+    jest.spyOn(ReactDOM, 'render').mockImplementation()
     fakeENV.setup()
     ENV.DISCUSSION = {
       TOPIC: {
@@ -53,8 +52,7 @@ describe('TopicView', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render.restore()
+    ReactDOM.render.mockRestore()
   })
 
   // These tests cheat a bit by calling methods on the view directly. For now this was easier than
@@ -68,18 +66,15 @@ describe('TopicView', () => {
       view.$announcementCog = {focus() {}}
 
       view.openSendTo()
-      // eslint-disable-next-line no-restricted-properties
-      equal(ReactDOM.render.firstCall.args[0].type, DirectShareUserModal)
-      // eslint-disable-next-line no-restricted-properties
-      const {onDismiss, ...props} = ReactDOM.render.firstCall.args[0].props
+      equal(ReactDOM.render.mock.calls[0][0].type, DirectShareUserModal)
+      const {onDismiss, ...props} = ReactDOM.render.mock.calls[0][0].props
       deepEqual(props, {
         open: true,
         sourceCourseId: '1',
         contentShare: {content_type: 'discussion_topic', content_id: '42'},
       })
       onDismiss()
-      // eslint-disable-next-line no-restricted-properties
-      equal(ReactDOM.render.secondCall.args[0].props.open, false)
+      equal(ReactDOM.render.mock.calls[1][0].props.open, false)
     })
 
     test('opens direct share copy modal', () => {
@@ -90,18 +85,15 @@ describe('TopicView', () => {
       view.$announcementCog = {focus() {}}
 
       view.openCopyTo()
-      // eslint-disable-next-line no-restricted-properties
-      equal(ReactDOM.render.firstCall.args[0].type, DirectShareCourseTray)
-      // eslint-disable-next-line no-restricted-properties
-      const {onDismiss, ...props} = ReactDOM.render.firstCall.args[0].props
+      equal(ReactDOM.render.mock.calls[0][0].type, DirectShareCourseTray)
+      const {onDismiss, ...props} = ReactDOM.render.mock.calls[0][0].props
       deepEqual(props, {
         open: true,
         sourceCourseId: '1',
         contentSelection: {discussion_topics: ['42']},
       })
       onDismiss()
-      // eslint-disable-next-line no-restricted-properties
-      equal(ReactDOM.render.secondCall.args[0].props.open, false)
+      equal(ReactDOM.render.mock.calls[1][0].props.open, false)
     })
   })
 })

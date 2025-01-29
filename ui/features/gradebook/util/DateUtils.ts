@@ -21,7 +21,7 @@ import type {MomentInput} from 'moment-timezone'
 export function isoDateFromInput(
   dateType: 'start-date' | 'end-date',
   input: MomentInput,
-  timezone?: string
+  timezone?: string,
 ) {
   if (!input) return undefined
 

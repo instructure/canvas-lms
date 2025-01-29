@@ -70,7 +70,7 @@ export default {
       // They didn't choose a use justification
       if (values.use_justification === 'choose') {
         $(this.usageSelection.usageRightSelection).errorBox(
-          I18n.t('You must specify a usage right.')
+          I18n.t('You must specify a usage right.'),
         )
         return false
       }
@@ -100,7 +100,7 @@ export default {
     const attributes = this.restrictedSelection.extractFormValues()
     if (attributes.unlock_at && attributes.lock_at && attributes.unlock_at > attributes.lock_at) {
       $(this.restrictedSelection.unlock_at).errorBox(
-        I18n.t('"Available From" date must precede "Available Until"')
+        I18n.t('"Available From" date must precede "Available Until"'),
       )
       return false
     }
@@ -112,7 +112,7 @@ export default {
       // We do this so if some other user changes the name while we are looking at the page,
       // when we submit this form, we don't blow away their change and change the name back
       // to what it was. we just update the things we intended.
-      item.save({}, {attrs: attributes})
+      item.save({}, {attrs: attributes}),
     )
 
     const dfd = $.when(...Array.from(promises || []))

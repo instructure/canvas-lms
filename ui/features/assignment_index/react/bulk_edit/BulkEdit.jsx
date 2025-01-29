@@ -60,7 +60,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
         gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods || []),
         userIsAdmin: ENV.current_user_is_admin,
       }),
-    []
+    [],
   )
   const [assignments, setAssignments] = useState([])
   const [loadingError, setLoadingError] = useState(null)
@@ -71,7 +71,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   const {jobCompletion, jobRunning, jobSuccess, jobErrors, setJobSuccess} = useMonitorJobCompletion(
     {
       progressUrl,
-    }
+    },
   )
 
   const filterAssignments = useCallback(assignments => {
@@ -109,7 +109,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
             delete draftOverride[originalDateField('unlock_at')]
             delete draftOverride[originalDateField('lock_at')]
           })
-        })
+        }),
       )
     }
 
@@ -125,10 +125,10 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
               let error
               if (draftOverride.base) {
                 error = errors.find(
-                  e => e.assignment_id == draftAssignment.id && !e.assignment_override_id  
+                  e => e.assignment_id == draftAssignment.id && !e.assignment_override_id,
                 )
               } else {
-                error = errors.find(e => e.assignment_override_id == draftOverride.id)  
+                error = errors.find(e => e.assignment_override_id == draftOverride.id)
               }
               if (error && error.errors) {
                 draftOverride.errors = {}
@@ -140,7 +140,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
               }
             })
           })
-        })
+        }),
       )
     }
     if (jobErrors && !jobErrors.hasOwnProperty('message')) recordJobErrors(jobErrors)
@@ -160,7 +160,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
       override.persisted = false
       override.errors = dateValidator.validateDatetimes(override)
     },
-    [dateValidator]
+    [dateValidator],
   )
 
   const shiftDateOnOverride = useCallback(
@@ -171,7 +171,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
         setDateOnOverride(override, dateFieldName, newDate)
       }
     },
-    [setDateOnOverride]
+    [setDateOnOverride],
   )
 
   const clearPreviousSave = useCallback(() => {
@@ -195,10 +195,10 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
         produce(currentAssignments, draftAssignments => {
           const override = findOverride(draftAssignments, assignmentId, overrideId)
           setDateOnOverride(override, dateKey, newDate)
-        })
+        }),
       )
     },
-    [clearPreviousSave, findOverride, setDateOnOverride]
+    [clearPreviousSave, findOverride, setDateOnOverride],
   )
 
   const clearOverrideEdits = useCallback(
@@ -215,10 +215,10 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
           })
           delete override.errors
           delete override.persisted
-        })
+        }),
       )
     },
-    [findOverride]
+    [findOverride],
   )
 
   const setAssignmentSelected = useCallback((assignmentId, selected) => {
@@ -226,7 +226,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
       produce(currentAssignments, draftAssignments => {
         const assignment = draftAssignments.find(a => a.id === assignmentId)
         assignment.selected = selected
-      })
+      }),
     )
   }, [])
 
@@ -236,7 +236,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
         draftAssignments.forEach(a => {
           if (canEditAll(a)) a.selected = selected
         })
-      })
+      }),
     )
   }, [])
 
@@ -249,12 +249,12 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
         draftAssignments.forEach(draftAssignment => {
           const shouldSelect = draftAssignment.all_dates.some(draftOverride =>
             ['due_at', 'lock_at', 'unlock_at'].some(dateField =>
-              moment(draftOverride[dateField]).isBetween(startMoment, endMoment, null, '[]')
-            )
+              moment(draftOverride[dateField]).isBetween(startMoment, endMoment, null, '[]'),
+            ),
           )
           draftAssignment.selected = shouldSelect
         })
-      })
+      }),
     )
   }, [])
 
@@ -280,11 +280,11 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
               })
             }
           })
-        })
+        }),
       )
       setMoveDatesModalOpen(false)
     },
-    [shiftDateOnOverride]
+    [shiftDateOnOverride],
   )
   const handleBatchEditRemove = useCallback(
     datesToRemove => {
@@ -302,11 +302,11 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
               })
             }
           })
-        })
+        }),
       )
       setMoveDatesModalOpen(false)
     },
-    [setDateOnOverride]
+    [setDateOnOverride],
   )
 
   function renderHeader() {

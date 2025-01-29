@@ -84,7 +84,7 @@ const renderSRContents = folder => {
   description.push(I18n.t('name: %{name}', {name: folder.name}))
   if (folder.hasOwnProperty('created_at')) {
     description.push(
-      I18n.t('date created: %{createdAt}', {createdAt: formattedDateTime(folder.created_at)})
+      I18n.t('date created: %{createdAt}', {createdAt: formattedDateTime(folder.created_at)}),
     )
   }
   if (folder.hasOwnProperty('locked')) {
@@ -138,7 +138,7 @@ const TableFolders = props => {
       {renderParentFolder(
         props.folders[props.selectedFolderID],
         props.handleFolderSelect,
-        props.columnWidths
+        props.columnWidths,
       )}
       {props.folders[props.selectedFolderID].subFolderIDs.map(id => {
         const folder = props.folders[id]

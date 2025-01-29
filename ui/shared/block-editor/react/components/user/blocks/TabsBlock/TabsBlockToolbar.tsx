@@ -56,7 +56,7 @@ const TabsBlockToolbar = () => {
         prps.variant = value
       })
     },
-    [setProp]
+    [setProp],
   )
 
   return (

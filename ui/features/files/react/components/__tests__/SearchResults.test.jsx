@@ -57,7 +57,7 @@ const defaultProps = (props = {}) => {
       clearSelectedItems: () => {},
       onMove: () => {},
     },
-    props
+    props,
   )
 }
 

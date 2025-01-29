@@ -94,7 +94,7 @@ const saveTemplateImages = async (templateRootNode: HTMLElement): Promise<Images
       }
       return acc
     },
-    {}
+    {},
   )
 
   return imagesMap

@@ -53,7 +53,7 @@ function renderStudentsSearcher(usersAndVariables, useAssignment) {
   const fns = render(
     <MockedProvider mocks={requests} addTypename={false}>
       <StudentsSearcher assignment={assignment} />
-    </MockedProvider>
+    </MockedProvider>,
   )
   return fns
 }
@@ -90,7 +90,7 @@ describe('StudentsSearcher', () => {
     const {getByText} = renderStudentsSearcher()
     const sgLink = closest(getByText('SpeedGrader'), 'a')
     expect(sgLink.getAttribute('href')).toMatch(
-      /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid/
+      /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid/,
     )
     expect(sgLink.getAttribute('target')).toEqual('_blank')
   })

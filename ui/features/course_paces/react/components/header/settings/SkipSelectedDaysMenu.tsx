@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import {connect} from 'react-redux'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
@@ -28,21 +27,26 @@ import {Text} from '@instructure/ui-text'
 import {coursePaceActions} from '../../../actions/course_paces'
 import {getSelectedDaysToSkip} from '../../../reducers/course_paces'
 import {Pill} from '@instructure/ui-pill'
-import type {CoursePace, StoreState} from 'features/course_paces/react/types'
+import type {CoursePace, ResponsiveSizes, StoreState} from 'features/course_paces/react/types'
 import {renderManageBlackoutDates} from './helpers'
 import {WORK_WEEK_DAYS_MENU_OPTIONS} from '../../../../constants'
 import MainMenu from './MainMenu'
+import type {MenuPlacement} from './SettingsMenu'
 
 const I18n = createI18nScope('course_paces_settings')
 
 interface StoreProps {
-  readonly excludeWeekends: boolean
+  readonly selectedDaysToSkip: string[]
 }
 
 interface SkipSelectedDaysMenuProps {
   readonly isSyncing: boolean
+  readonly responsiveSize: ResponsiveSizes
+  readonly showSettingsPopover: boolean
+  readonly isBlueprintLocked?: boolean
+  readonly menuPlacement: () => MenuPlacement
   readonly selectedDaysToSkip: string[]
-  readonly showBlackoutDatesModal: boolean
+  readonly showBlackoutDatesModal: () => void
   readonly coursePace: CoursePace
   readonly toggleSelectedDaysToSkip: typeof coursePaceActions.toggleSelectedDaysToSkip
   readonly toggleShowSettingsPopover: (show: boolean) => void
@@ -50,20 +54,12 @@ interface SkipSelectedDaysMenuProps {
 
 const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => {
   const [currentItemId, setCurrentItemId] = useState('mainMenu')
-  const skipWeedendsSelected =
+  const skipWeekendsSelected =
     props.selectedDaysToSkip.length === 2 &&
     props.selectedDaysToSkip.includes('sat') &&
     props.selectedDaysToSkip.includes('sun')
 
-  const [skipWeekends, setSkipWeekends] = useState(skipWeedendsSelected)
-
-  useEffect(() => {
-    const skipWeekendsValue =
-      props.selectedDaysToSkip.length === 2 &&
-      props.selectedDaysToSkip.includes('sat') &&
-      props.selectedDaysToSkip.includes('sun')
-    setSkipWeekends(skipWeekendsValue)
-  }, [props.selectedDaysToSkip])
+  const [skipWeekends, setSkipWeekends] = useState(skipWeekendsSelected)
 
   const toggleSkipWeekends = () => {
     const newskipWeekends = !skipWeekends
@@ -106,7 +102,7 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
     const pillComponent =
       selectedItemsCount > 0 ? (
         <Pill
-          themeOverride={{width: '0.75rem', heigth: '0.75rem'}}
+          themeOverride={{height: '0.75rem', maxWidth: '0.75rem'}}
           data-testid="selected_days_counter"
         >
           {selectedItemsCount}
@@ -137,7 +133,7 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
             props.isSyncing,
             props.showBlackoutDatesModal,
             props.toggleShowSettingsPopover,
-            props.coursePace.context_type
+            props.coursePace.context_type,
           )}
         </MainMenu>
       )}

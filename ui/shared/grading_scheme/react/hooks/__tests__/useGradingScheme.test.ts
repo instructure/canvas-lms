@@ -62,7 +62,7 @@ describe('useGradingSchemeHook', () => {
     const loadedGradingScheme = await result.current.loadGradingScheme(
       'Course',
       courseId,
-      'some-id'
+      'some-id',
     )
     // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()
@@ -90,7 +90,7 @@ describe('useGradingSchemeHook', () => {
     const loadedGradingScheme = await result.current.loadGradingScheme(
       'Account',
       accountId,
-      'some-id'
+      'some-id',
     )
     // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()

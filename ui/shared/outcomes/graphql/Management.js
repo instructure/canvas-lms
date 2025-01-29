@@ -415,5 +415,5 @@ export const SEARCH_OUTCOME_ALIGNMENTS = gql`
 
 export const removeOutcomeGroup = (contextType, contextId, groupId) =>
   axios.delete(
-    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`
+    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
   )

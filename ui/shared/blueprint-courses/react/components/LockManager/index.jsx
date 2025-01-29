@@ -126,7 +126,7 @@ export default class LockManager {
         node => {
           this.toggleNode = node
           cb()
-        }
+        },
       )
     } else {
       cb()
@@ -136,24 +136,23 @@ export default class LockManager {
   renderLockToggle() {
     if (!this.props.toggleWrapperSelector) return
     this.setupToggle(() => {
-       
       ReactDOM.render(
         <LockToggle
           isLocked={this.state.isLocked}
           isToggleable={this.props.page === 'show' && this.state.isMasterContent}
           onClick={this.toggleLocked}
         />,
-        this.toggleNode
+        this.toggleNode,
       )
     })
   }
 
   renderBanner() {
     if (!this.bannerNode) this.bannerNode = LockBanner.setupRootNode(this.props?.bannerSelector)
-     
+
     ReactDOM.render(
       <LockBanner isLocked={this.state.isLocked} itemLocks={this.state.itemLocks} />,
-      this.bannerNode
+      this.bannerNode,
     )
   }
 

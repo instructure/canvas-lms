@@ -52,7 +52,7 @@ const validationSchema = z
     {
       message: 'To Date cannot come before From Date.',
       path: ['end_time'],
-    }
+    },
   )
 
 type FormValues = z.infer<typeof validationSchema>

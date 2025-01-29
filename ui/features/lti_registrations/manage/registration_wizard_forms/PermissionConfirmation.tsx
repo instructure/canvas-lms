@@ -78,7 +78,7 @@ export const PermissionConfirmation = ({
             dangerouslySetInnerHTML={{
               __html: I18n.t(
                 "*%{toolName}* is requesting permission to perform the following actions. We have chosen the app's recommended default settings. Please note that altering these defaults might impact the app's performance.",
-                {toolName: htmlEscape(appName), wrapper: '<strong>$1</strong>'}
+                {toolName: htmlEscape(appName), wrapper: '<strong>$1</strong>'},
               ),
             }}
           />

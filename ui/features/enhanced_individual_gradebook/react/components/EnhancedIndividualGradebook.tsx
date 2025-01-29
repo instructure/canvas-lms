@@ -68,7 +68,7 @@ export default function EnhancedIndividualGradebook() {
   const [searchParams, setSearchParams] = useSearchParams()
   const studentIdQueryParam = searchParams.get(STUDENT_SEARCH_PARAM)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
-    studentIdQueryParam
+    studentIdQueryParam,
   )
   const {currentStudent, studentSubmissions, updateSubmissionDetails, loadingStudent} =
     useCurrentStudentInfo(courseId, selectedStudentId)
@@ -76,7 +76,7 @@ export default function EnhancedIndividualGradebook() {
   const [assignmentGroupMap, setAssignmentGroupMap] = useState<AssignmentGroupCriteriaMap>({})
   const assignmentIdQueryParam = searchParams.get(ASSIGNMENT_SEARCH_PARAM)
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null | undefined>(
-    assignmentIdQueryParam
+    assignmentIdQueryParam,
   )
 
   const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
@@ -84,7 +84,7 @@ export default function EnhancedIndividualGradebook() {
   const submissionsForSelectedAssignment = Object.values(submissionsMap ?? {})
 
   const [gradebookOptions, setGradebookOptions] = useState<GradebookOptions>(
-    gradebookOptionsSetup(ENV)
+    gradebookOptionsSetup(ENV),
   )
 
   const {courseData, isLoading, isSuccess} = useGradebookQuery(courseId)
@@ -93,7 +93,7 @@ export default function EnhancedIndividualGradebook() {
 
   const {customColumns} = useCustomColumns(customColumnsUrl)
   const studentNotesColumnId = customColumns?.find(
-    (column: CustomColumn) => column.teacher_notes
+    (column: CustomColumn) => column.teacher_notes,
   )?.id
 
   const [currentStudentHiddenName, setCurrentStudentHiddenName] = useState<string>('')
@@ -121,7 +121,7 @@ export default function EnhancedIndividualGradebook() {
 
       const {mappedAssignmentGroupMap, mappedAssignments} = mapAssignmentGroupQueryResults(
         assignmentGroupsConnection.nodes,
-        assignmentGradingPeriodMap
+        assignmentGradingPeriodMap,
       )
 
       setAssignmentGroupMap(mappedAssignmentGroupMap)
@@ -133,7 +133,7 @@ export default function EnhancedIndividualGradebook() {
         return a.sortableName.localeCompare(b.sortableName)
       })
       sortedStudents.forEach(
-        (student, index) => (student.hiddenName = I18n.t('Student %{id}', {id: index + 1}))
+        (student, index) => (student.hiddenName = I18n.t('Student %{id}', {id: index + 1})),
       )
       setStudents(sortedStudents)
     }
@@ -181,18 +181,21 @@ export default function EnhancedIndividualGradebook() {
     setAssignmentDropped(droppedAssignmentIds.includes(selectedAssignment.id))
   }, [selectedAssignment, assignments, studentSubmissions, assignmentGroupMap])
 
-  const invalidAssignmentGroups = Object.keys(assignmentGroupMap).reduce((invalidKeys, groupId) => {
-    const {invalid, name, gradingPeriodsIds} = assignmentGroupMap[groupId]
-    const {selectedGradingPeriodId} = gradebookOptions
-    if (
-      invalid ||
-      (selectedGradingPeriodId && !gradingPeriodsIds?.includes(selectedGradingPeriodId))
-    ) {
-      invalidKeys[groupId] = name
-    }
+  const invalidAssignmentGroups = Object.keys(assignmentGroupMap).reduce(
+    (invalidKeys, groupId) => {
+      const {invalid, name, gradingPeriodsIds} = assignmentGroupMap[groupId]
+      const {selectedGradingPeriodId} = gradebookOptions
+      if (
+        invalid ||
+        (selectedGradingPeriodId && !gradingPeriodsIds?.includes(selectedGradingPeriodId))
+      ) {
+        invalidKeys[groupId] = name
+      }
 
-    return invalidKeys
-  }, {} as Record<string, string>)
+      return invalidKeys
+    },
+    {} as Record<string, string>,
+  )
 
   const selectedAssignmentGroupInvalid = selectedAssignment?.assignmentGroupId
     ? !!invalidAssignmentGroups[selectedAssignment?.assignmentGroupId]
@@ -229,7 +232,7 @@ export default function EnhancedIndividualGradebook() {
 
       updateSubmissionDetails(newSubmission)
     },
-    [updateSubmissionDetails, setAssignmentSubmissionsMap]
+    [updateSubmissionDetails, setAssignmentSubmissionsMap],
   )
 
   const handleSetGrades = useCallback(
@@ -254,7 +257,7 @@ export default function EnhancedIndividualGradebook() {
         updateSubmissionDetails(submissionForUser)
       }
     },
-    [selectedStudentId, updateSubmissionDetails]
+    [selectedStudentId, updateSubmissionDetails],
   )
 
   return (

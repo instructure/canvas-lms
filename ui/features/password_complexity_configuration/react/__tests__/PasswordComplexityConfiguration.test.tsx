@@ -115,7 +115,7 @@ describe('PasswordComplexityConfiguration Component', () => {
         await userEvent.click(checkbox)
         const input = await screen.findByTestId('customMaxLoginAttemptsInput')
         const allowLoginSuspensionCheckbox = await screen.findByTestId(
-          'allowLoginSuspensionCheckbox'
+          'allowLoginSuspensionCheckbox',
         )
         expect(input).toBeDisabled()
         expect(allowLoginSuspensionCheckbox).toBeDisabled()
@@ -127,7 +127,7 @@ describe('PasswordComplexityConfiguration Component', () => {
         await userEvent.click(checkbox)
         const input = await screen.findByTestId('customMaxLoginAttemptsInput')
         const allowLoginSuspensionCheckbox = await screen.findByTestId(
-          'allowLoginSuspensionCheckbox'
+          'allowLoginSuspensionCheckbox',
         )
         expect(input).toBeEnabled()
         expect(allowLoginSuspensionCheckbox).toBeEnabled()
@@ -141,7 +141,7 @@ describe('PasswordComplexityConfiguration Component', () => {
       await userEvent.click(await getViewOptionsButton())
       await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
       expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(
-        MOCK_MINIMUM_CHARACTER_LENGTH
+        MOCK_MINIMUM_CHARACTER_LENGTH,
       )
       expect(screen.getByTestId('customMaxLoginAttemptsCheckbox')).toBeChecked()
       expect(screen.getByTestId('requireNumbersCheckbox')).not.toBeChecked()
@@ -157,10 +157,10 @@ describe('PasswordComplexityConfiguration Component', () => {
       await userEvent.click(await getViewOptionsButton())
       await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
       expect(
-        screen.queryByText('An error occurred fetching password policy settings.')
+        screen.queryByText('An error occurred fetching password policy settings.'),
       ).not.toBeInTheDocument()
       expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(
-        MOCK_MINIMUM_CHARACTER_LENGTH
+        MOCK_MINIMUM_CHARACTER_LENGTH,
       )
       expect(screen.getByTestId('requireNumbersCheckbox')).not.toBeChecked()
       expect(screen.getByTestId('requireSymbolsCheckbox')).not.toBeChecked()
@@ -177,10 +177,10 @@ describe('PasswordComplexityConfiguration Component', () => {
       await userEvent.click(await getViewOptionsButton())
       await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
       expect(
-        screen.queryByText('An error occurred fetching password policy settings.')
+        screen.queryByText('An error occurred fetching password policy settings.'),
       ).not.toBeInTheDocument()
       expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(
-        MOCK_MINIMUM_CHARACTER_LENGTH
+        MOCK_MINIMUM_CHARACTER_LENGTH,
       )
       expect(screen.getByTestId('requireNumbersCheckbox')).not.toBeChecked()
       expect(screen.getByTestId('requireSymbolsCheckbox')).not.toBeChecked()
@@ -197,10 +197,10 @@ describe('PasswordComplexityConfiguration Component', () => {
       await userEvent.click(await getViewOptionsButton())
       await waitFor(() => expect(screen.getByTestId('cancelButton')).toBeEnabled())
       expect(
-        screen.queryByText('An error occurred fetching password policy settings.')
+        screen.queryByText('An error occurred fetching password policy settings.'),
       ).not.toBeInTheDocument()
       expect(screen.getByTestId('minimumCharacterLengthInput')).toHaveValue(
-        MOCK_MINIMUM_CHARACTER_LENGTH
+        MOCK_MINIMUM_CHARACTER_LENGTH,
       )
       expect(screen.getByTestId('requireNumbersCheckbox')).not.toBeChecked()
       expect(screen.getByTestId('requireSymbolsCheckbox')).not.toBeChecked()

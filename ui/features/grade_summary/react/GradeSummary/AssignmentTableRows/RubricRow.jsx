@@ -138,7 +138,7 @@ export const rubricRow = (assignment, setOpenRubricDetailIds, openRubricDetailId
               customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
               rubric={transformToRubricShape(assignment.rubric)}
               rubricAssessment={transformToRubricAssessmentShape(
-                assignment.submissionsConnection.nodes[0].rubricAssessmentsConnection.nodes[0]
+                assignment.submissionsConnection.nodes[0].rubricAssessmentsConnection.nodes[0],
               )}
               rubricAssociation={transformToRubricAssociationShape(assignment.rubricAssociation)}
               isSummary={false}

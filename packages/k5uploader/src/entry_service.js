@@ -1,6 +1,3 @@
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
-
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -45,14 +42,15 @@ EntryService.prototype.createEntryRequest = function () {
 
 EntryService.prototype.parseRequest = function (xml) {
   const parser = new DOMParser()
-  const parsedXml = parser.parseFromString(xml, "application/xml")
-  const ent = parsedXml.querySelector("result > entries > entry1_")
+  const parsedXml = parser.parseFromString(xml, 'application/xml')
+  const ent = parsedXml.querySelector('result > entries > entry1_')
   if (ent) {
     var entry = {
       id: ent.querySelector('id') && ent.querySelector('id').textContent,
       type: ent.querySelector('type') && ent.querySelector('type').textContent,
       title: ent.querySelector('name') && ent.querySelector('name').textContent,
-      context_code: ent.querySelector('partnerData') && ent.querySelector('partnerData').textContent,
+      context_code:
+        ent.querySelector('partnerData') && ent.querySelector('partnerData').textContent,
       mediaType: ent.querySelector('mediatype') && ent.querySelector('mediatype').textContent,
       entryId: ent.querySelector('id') && ent.querySelector('id').textContent,
       userTitle: undefined,

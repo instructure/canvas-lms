@@ -73,7 +73,7 @@ const initialize = () => {
       : () => {
           toggleCourseNav()
           saveCourseNavCollapseState()
-        }
+        },
   )
 }
 

@@ -27,7 +27,7 @@ export const useGradingSchemeAccountUsedLocations = (): {
   getGradingSchemeAccountUsedLocations: (
     contextType: 'Account' | 'Course',
     contextId: string,
-    gradingSchemeId: string
+    gradingSchemeId: string,
   ) => Promise<{accountUsedLocations: AccountUsedLocation[]}>
   gradingSchemeAccountUsedLocationsStatus: string
 } => {
@@ -38,7 +38,7 @@ export const useGradingSchemeAccountUsedLocations = (): {
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      gradingSchemeId: string
+      gradingSchemeId: string,
     ): Promise<{accountUsedLocations: AccountUsedLocation[]}> => {
       setGradingSchemeAccountUsedLocationsStatus(ApiCallStatus.PENDING)
       try {
@@ -63,7 +63,7 @@ export const useGradingSchemeAccountUsedLocations = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

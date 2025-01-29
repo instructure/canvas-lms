@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
@@ -17,7 +18,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
 import {waitFor} from '@testing-library/react'
 
 import GradeOverride from '@canvas/grading/GradeOverride'
@@ -49,10 +49,10 @@ describe('Gradebook FinalGradeOverrides', () => {
       gradingPeriodId: '1501',
 
       gradebookGrid: {
-        updateRowCell: sinon.stub(),
+        updateRowCell: jest.fn(),
       },
 
-      isFilteringColumnsByGradingPeriod: sinon.stub().returns(false),
+      isFilteringColumnsByGradingPeriod: jest.fn().mockReturnValue(false),
 
       student(id) {
         return students[id]
@@ -88,10 +88,10 @@ describe('Gradebook FinalGradeOverrides', () => {
     })
 
     it('returns the related grading period grade when Gradebook is filtering to a grading period', () => {
-      gradebook.isFilteringColumnsByGradingPeriod.returns(true)
+      gradebook.isFilteringColumnsByGradingPeriod.mockReturnValue(true)
       finalGradeOverrides.setGrades(grades)
       expect(finalGradeOverrides.getGradeForUser('1101')).toEqual(
-        grades[1101].gradingPeriodGrades[1501]
+        grades[1101].gradingPeriodGrades[1501],
       )
     })
   })
@@ -104,7 +104,7 @@ describe('Gradebook FinalGradeOverrides', () => {
     })
 
     it('returns the related grading period override info when Gradebook is filtering to a grading period', () => {
-      gradebook.isFilteringColumnsByGradingPeriod.returns(true)
+      gradebook.isFilteringColumnsByGradingPeriod.mockReturnValue(true)
       const gradeInfo = new GradeOverrideInfo()
       finalGradeOverrides._datastore.addPendingGradeInfo('1101', '1501', gradeInfo)
       expect(finalGradeOverrides.getPendingGradeInfoForUser('1101')).toBe(gradeInfo)
@@ -134,25 +134,27 @@ describe('Gradebook FinalGradeOverrides', () => {
 
     it('updates row cells for each related student', () => {
       finalGradeOverrides.setGrades(grades)
-      expect(gradebook.gradebookGrid.updateRowCell.callCount).toEqual(2)
+      expect(gradebook.gradebookGrid.updateRowCell.mock.calls).toHaveLength(2)
     })
 
     it('includes the user id when updating column cells', () => {
       finalGradeOverrides.setGrades(grades)
-      const calls = [0, 1].map(index => gradebook.gradebookGrid.updateRowCell.getCall(index))
-      const studentIds = calls.map(call => call.args[0])
+      const studentIds = [0, 1].map(
+        index => gradebook.gradebookGrid.updateRowCell.mock.calls[index][0],
+      )
       expect(studentIds).toEqual(['1101', '1102'])
     })
 
     it('includes the column id when updating column cells', () => {
       finalGradeOverrides.setGrades(grades)
-      const calls = [0, 1].map(index => gradebook.gradebookGrid.updateRowCell.getCall(index))
-      const columnIds = calls.map(call => call.args[1])
+      const columnIds = [0, 1].map(
+        index => gradebook.gradebookGrid.updateRowCell.mock.calls[index][1],
+      )
       expect(columnIds).toEqual(['total_grade_override', 'total_grade_override'])
     })
 
     it('updates row cells after storing final grade overrides', () => {
-      gradebook.gradebookGrid.updateRowCell.callsFake(() => {
+      gradebook.gradebookGrid.updateRowCell.mockImplementation(() => {
         // final grade overrides will have already been updated by this time
         expect(finalGradeOverrides.getGradeForUser('1101')).toEqual(grades[1101].courseGrade)
       })
@@ -163,26 +165,25 @@ describe('Gradebook FinalGradeOverrides', () => {
   // EVAL-3907 - remove or rewrite to remove spies on imports
   describe.skip('#updateGrade()', () => {
     beforeEach(() => {
-      sinon
-        .stub(FinalGradeOverrideApi, 'updateFinalGradeOverride')
-        .returns(Promise.resolve({percentage: 90.0}))
-      sinon.stub(FlashAlert, 'showFlashAlert')
+      jest
+        .spyOn(FinalGradeOverrideApi, 'updateFinalGradeOverride')
+        .mockResolvedValue({percentage: 90.0})
+      jest.spyOn(FlashAlert, 'showFlashAlert')
     })
 
     afterEach(() => {
-      FinalGradeOverrideApi.updateFinalGradeOverride.restore()
-      FlashAlert.showFlashAlert.restore()
+      jest.restoreAllMocks()
     })
 
     async function finished() {
-      await waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
+      await waitFor(() => FlashAlert.showFlashAlert.mock.calls.length > 0)
     }
 
     it('updates the grade info via the api when the grade info is valid', async () => {
       const gradeInfo = new GradeOverrideInfo({valid: true})
       finalGradeOverrides.updateGrade('1101', gradeInfo)
       await finished()
-      expect(FinalGradeOverrideApi.updateFinalGradeOverride.callCount).toEqual(1)
+      expect(FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls).toHaveLength(1)
     })
 
     describe('before updating via the api', () => {
@@ -190,7 +191,9 @@ describe('Gradebook FinalGradeOverrides', () => {
 
       beforeEach(() => {
         gradeInfo = new GradeOverrideInfo({valid: true})
-        FinalGradeOverrideApi.updateFinalGradeOverride.returns(new Promise(() => {}))
+        jest
+          .spyOn(FinalGradeOverrideApi, 'updateFinalGradeOverride')
+          .mockReturnValue(new Promise(() => {}))
       })
 
       it('adds the grade info as pending grade info', () => {
@@ -206,7 +209,7 @@ describe('Gradebook FinalGradeOverrides', () => {
       })
 
       it('adds the pending grade info for the grading period grade when filtering to a grading period', () => {
-        gradebook.isFilteringColumnsByGradingPeriod.returns(true)
+        gradebook.isFilteringColumnsByGradingPeriod.mockReturnValue(true)
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         const pendingGradeInfo = finalGradeOverrides._datastore.getPendingGradeInfo('1101', '1501')
         expect(pendingGradeInfo).toBe(gradeInfo)
@@ -214,11 +217,11 @@ describe('Gradebook FinalGradeOverrides', () => {
 
       it('updates the row cell', () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
-        expect(gradebook.gradebookGrid.updateRowCell.callCount).toEqual(1)
+        expect(gradebook.gradebookGrid.updateRowCell.mock.calls).toHaveLength(1)
       })
 
       it('updates the row cell after adding the pending grade', () => {
-        gradebook.gradebookGrid.updateRowCell.callsFake(() => {
+        gradebook.gradebookGrid.updateRowCell.mockImplementation(() => {
           const pendingGradeInfo = finalGradeOverrides.getPendingGradeInfoForUser('1101')
           expect(pendingGradeInfo).toBe(gradeInfo)
         })
@@ -227,13 +230,19 @@ describe('Gradebook FinalGradeOverrides', () => {
 
       it('includes the user id when updating the row cell', () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
-        const [userId] = gradebook.gradebookGrid.updateRowCell.lastCall.args
+        const [userId] =
+          gradebook.gradebookGrid.updateRowCell.mock.calls[
+            gradebook.gradebookGrid.updateRowCell.mock.calls.length - 1
+          ]
         expect(userId).toEqual('1101')
       })
 
       it('includes the column id when updating the row cell', () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
-        const [, columnId] = gradebook.gradebookGrid.updateRowCell.lastCall.args
+        const [, columnId] =
+          gradebook.gradebookGrid.updateRowCell.mock.calls[
+            gradebook.gradebookGrid.updateRowCell.mock.calls.length - 1
+          ]
         expect(columnId).toEqual('total_grade_override')
       })
     })
@@ -251,29 +260,41 @@ describe('Gradebook FinalGradeOverrides', () => {
       it('includes the enrollment id for the current user', async () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         await finished()
-        const [enrollmentId] = FinalGradeOverrideApi.updateFinalGradeOverride.lastCall.args
+        const [enrollmentId] =
+          FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls[
+            FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls.length - 1
+          ]
         expect(enrollmentId).toEqual('2901')
       })
 
       it('includes the grading period id when filtering to a grading period', async () => {
-        gradebook.isFilteringColumnsByGradingPeriod.returns(true)
+        gradebook.isFilteringColumnsByGradingPeriod.mockReturnValue(true)
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         await finished()
-        const [, gradingPeriodId] = FinalGradeOverrideApi.updateFinalGradeOverride.lastCall.args
+        const [, gradingPeriodId] =
+          FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls[
+            FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls.length - 1
+          ]
         expect(gradingPeriodId).toEqual('1501')
       })
 
       it('includes a null grading period id when not filtering to a grading period', async () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         await finished()
-        const gradingPeriodId = FinalGradeOverrideApi.updateFinalGradeOverride.lastCall.args[1]
+        const gradingPeriodId =
+          FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls[
+            FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls.length - 1
+          ][1]
         expect(gradingPeriodId).toBe(null)
       })
 
       it('includes the grade from the given grade info', async () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         await finished()
-        const gradeParam = FinalGradeOverrideApi.updateFinalGradeOverride.lastCall.args[2]
+        const gradeParam =
+          FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls[
+            FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls.length - 1
+          ][2]
         expect(gradeParam).toBe(gradeInfo.grade)
       })
     })
@@ -291,11 +312,9 @@ describe('Gradebook FinalGradeOverrides', () => {
         // Use a separate instance to mimic a new instance from the API call.
         gradeFromApi = new GradeOverride({percentage: 90.0})
 
-        FinalGradeOverrideApi.updateFinalGradeOverride.returns(
-          new Promise(resolve => {
-            resolvePromise = resolve
-          })
-        )
+        FinalGradeOverrideApi.updateFinalGradeOverride.mockImplementation(resolve => {
+          resolvePromise = resolve
+        })
       })
 
       async function requestAndResolve() {
@@ -317,7 +336,7 @@ describe('Gradebook FinalGradeOverrides', () => {
       })
 
       it('associates the grade with the grading period when filtering to a grading period', async () => {
-        gradebook.isFilteringColumnsByGradingPeriod.returns(true)
+        gradebook.isFilteringColumnsByGradingPeriod.mockReturnValue(true)
         await requestAndResolve()
         const updatedGrade = finalGradeOverrides._datastore.getGrade('1101', '1501')
         expect(updatedGrade).toBe(gradeFromApi)
@@ -326,12 +345,12 @@ describe('Gradebook FinalGradeOverrides', () => {
       it('updates the row cell', async () => {
         await requestAndResolve()
         // The second call happens when the request returns successfully.
-        expect(gradebook.gradebookGrid.updateRowCell.callCount).toEqual(2)
+        expect(gradebook.gradebookGrid.updateRowCell.mock.calls).toHaveLength(2)
       })
 
       it('updates the row cell after removing the pending grade', async () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
-        gradebook.gradebookGrid.updateRowCell.callsFake(() => {
+        gradebook.gradebookGrid.updateRowCell.mockImplementation(() => {
           const pendingGradeInfo = finalGradeOverrides.getPendingGradeInfoForUser('1101')
           expect(pendingGradeInfo).toBe(null)
         })
@@ -341,7 +360,7 @@ describe('Gradebook FinalGradeOverrides', () => {
 
       it('updates the row cell after updating the user grade', async () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
-        gradebook.gradebookGrid.updateRowCell.callsFake(() => {
+        gradebook.gradebookGrid.updateRowCell.mockImplementation(() => {
           const updatedGrade = finalGradeOverrides._datastore.getGrade('1101', null)
           expect(updatedGrade).toBe(gradeFromApi)
         })
@@ -351,24 +370,31 @@ describe('Gradebook FinalGradeOverrides', () => {
 
       it('includes the user id when updating the row cell', async () => {
         await requestAndResolve()
-        const [userId] = gradebook.gradebookGrid.updateRowCell.lastCall.args
+        const [userId] =
+          gradebook.gradebookGrid.updateRowCell.mock.calls[
+            gradebook.gradebookGrid.updateRowCell.mock.calls.length - 1
+          ]
         expect(userId).toEqual('1101')
       })
 
       it('includes the column id when updating the row cell', async () => {
         await requestAndResolve()
-        const [, columnId] = gradebook.gradebookGrid.updateRowCell.lastCall.args
+        const [, columnId] =
+          gradebook.gradebookGrid.updateRowCell.mock.calls[
+            gradebook.gradebookGrid.updateRowCell.mock.calls.length - 1
+          ]
         expect(columnId).toEqual('total_grade_override')
       })
 
       it('shows a flash alert', async () => {
         await requestAndResolve()
-        expect(FlashAlert.showFlashAlert.callCount).toEqual(1)
+        expect(FlashAlert.showFlashAlert.mock.calls).toHaveLength(1)
       })
 
       it('uses the "success" type for the flash alert', async () => {
         await requestAndResolve()
-        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        const [{type}] =
+          FlashAlert.showFlashAlert.mock.calls[FlashAlert.showFlashAlert.mock.calls.length - 1]
         expect(type).toEqual('success')
       })
     })
@@ -383,11 +409,9 @@ describe('Gradebook FinalGradeOverrides', () => {
           valid: true,
         })
 
-        FinalGradeOverrideApi.updateFinalGradeOverride.returns(
-          new Promise((resolve, reject) => {
-            rejectPromise = reject
-          })
-        )
+        FinalGradeOverrideApi.updateFinalGradeOverride.mockImplementation((resolve, reject) => {
+          rejectPromise = reject
+        })
 
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         rejectPromise()
@@ -395,11 +419,12 @@ describe('Gradebook FinalGradeOverrides', () => {
       })
 
       it('shows a flash alert', () => {
-        expect(FlashAlert.showFlashAlert.callCount).toEqual(1)
+        expect(FlashAlert.showFlashAlert.mock.calls).toHaveLength(1)
       })
 
       it('uses the "error" type for the flash alert', () => {
-        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        const [{type}] =
+          FlashAlert.showFlashAlert.mock.calls[FlashAlert.showFlashAlert.mock.calls.length - 1]
         expect(type).toEqual('error')
       })
     })
@@ -417,15 +442,16 @@ describe('Gradebook FinalGradeOverrides', () => {
       })
 
       it('does not update the grade via the api', () => {
-        expect(FinalGradeOverrideApi.updateFinalGradeOverride.callCount).toEqual(0)
+        expect(FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls).toHaveLength(0)
       })
 
       it('shows a flash alert', () => {
-        expect(FlashAlert.showFlashAlert.callCount).toEqual(1)
+        expect(FlashAlert.showFlashAlert.mock.calls).toHaveLength(1)
       })
 
       it('uses the "error" type for the flash alert', () => {
-        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        const [{type}] =
+          FlashAlert.showFlashAlert.mock.calls[FlashAlert.showFlashAlert.mock.calls.length - 1]
         expect(type).toEqual('error')
       })
     })

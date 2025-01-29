@@ -39,7 +39,7 @@ export const getRegistrationByUUID = (accountId: string, registrationUuid: strin
 export const updateRegistrationOverlay = (
   accountId: string,
   registrationId: number | string,
-  overlay: RegistrationOverlay
+  overlay: RegistrationOverlay,
 ) =>
   axios
     .put(`/api/lti/accounts/${accountId}/registrations/${registrationId}/overlay`, overlay)

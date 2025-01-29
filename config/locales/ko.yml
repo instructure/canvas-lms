@@ -1400,6 +1400,7 @@ ko:
   adding_rss_feed_f1202567: "RSS 피드 추가하기"
   adjust_events_and_due_dates_879744fc: "행사와 기한 조정"
   admin_tools_9e2c9268: "관리 도구"
+  advanced_turnitin_settings_9ee84a38: "고급 Turnitin 설정"
   after_date_981cd41b: "%{date} 이후"
   after_last_attempt_c9168da2: "마지막 시도 이후"
   agenda_b010136d: 안건
@@ -6928,6 +6929,7 @@ ko:
         randomly_assign_students_dialog: "이는 할당되지 않은 학생을 기존 학생 그룹에 가능한 한 고르게 임의로 할당합니다."
       self_signup_help: 
         about_self_signup_groups: "직접 등록 그룹에 대한 정보"
+        self_signup_deadline_description: "학생이 직접 등록할 수 있는 그룹의 집합을 만들 수 있습니다. 학생은 집합에 있는 하나의 그룹에만 속할 수 있지만, 이러한 방식으로 교사 대신 학생들이 스스로 그룹을 구성할 수 있습니다. 이 옵션을 사용하면 학생이 하나의 그룹에서 다른 그룹으로 직접 이동할 수 있습니다."
         self_signup_description: "학생이 직접 등록할 수 있는 그룹의 집합을 만들 수 있습니다. 학생은 집합에 있는 하나의 그룹에만 속할 수 있지만, 이러한 방식으로 교사 대신 학생들이 스스로 그룹을 구성할 수 있습니다. 이 옵션을 사용하면 학생이 하나의 그룹에서 다른 그룹으로 직접 이동할 수 있습니다."
     member: 
       one: "멤버 %{count}명"
@@ -9507,6 +9509,7 @@ ko:
     where_to_move: "*%{name}*을(를) 어디로 이동하시겠습니까?"
   move_dialog_select: 
     move_to_end: "-- 아래에 --"
+  move_from_ef79aa53: "다음 요일에서"
   move_name_to_a_new_group_acabed4e: "%{name}을(를) 새 그룹으로 이동"
   move_to_1c208ae5: "다음으로 이동..."
   multi_factor_authentication_1a6b3b3d: "다단계 인증"
@@ -14456,6 +14459,7 @@ ko:
   view_grades_8d3bae6c: "평점 보기"
   view_grades_for_name_45aeb2f2: "%{name} 평점 보기"
   view_notifications_6aea09a2: "알림 보기"
+  view_registered_services_6c8cd301: "등록된 서비스 보기"
   view_rubric_d71cce10: "루브릭 보기"
   viewsContextModules: 
     context_module: 

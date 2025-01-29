@@ -28,11 +28,11 @@ const LegacyBackboneDateComponent = ({size}: {size: string}) => {
   return (
     <>
       <h2 className="navigation_title" tabIndex={-1}>
-        { }
+        {}
         <span role="button" className="navigation_title_text blue" tabIndex={0} />
       </h2>
       <span className="date_field_wrapper">
-        { }
+        {}
         <label className="screenreader-only" id="calendar_navigation_date_accessible_label">
           {I18n.t('Enter the date you would like to navigate to.')}
           {I18n.t('#helpers.accessible_date_only_format', 'YYYY-MM-DD')}
@@ -121,7 +121,7 @@ type CalendarNavigatorComponentProps = {
     navigateNext: () => void
     onLoadReady: () => void
   }
-   
+
   size?: string
 }
 
@@ -133,10 +133,8 @@ const CalendarNavigatorComponent = (props: CalendarNavigatorComponentProps) => {
   }
 
   useEffect(() => {
-     
     document.addEventListener('calendar:header:resized', handleResize as EventListener)
     return () =>
-       
       document.removeEventListener('calendar:header:resized', handleResize as EventListener)
   }, [])
 

@@ -68,7 +68,7 @@ describe('GradeSummary GridRow', () => {
         <tbody>
           <GridRow {...props} />
         </tbody>
-      </table>
+      </table>,
     )
 
   test('displays the student name in the row header', () => {
@@ -87,7 +87,7 @@ describe('GradeSummary GridRow', () => {
     const cells = screen
       .getAllByRole('cell')
       .filter(cell => cell.className.match(/GradesGrid__ProvisionalGradeCell/))
-    expect(cells.length).toBe(props.graders.length)
+    expect(cells).toHaveLength(props.graders.length)
   })
 
   test('displays the score of a provisional grade in the matching cell', () => {
@@ -116,6 +116,6 @@ describe('GradeSummary GridRow', () => {
   test('displays "–" (en dash) when the student has no provisional grades', () => {
     props.grades = {}
     renderComponent()
-    expect(screen.getAllByText('–').length).toBe(2)
+    expect(screen.getAllByText('–')).toHaveLength(2)
   })
 })

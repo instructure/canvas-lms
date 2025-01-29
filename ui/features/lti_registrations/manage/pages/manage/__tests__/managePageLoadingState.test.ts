@@ -40,7 +40,7 @@ const mockFetchRegistrations = (
 }
 
 const mockPromise = <T>(
-  apiResultData: T
+  apiResultData: T,
 ): {
   resolve: () => void
   reject: () => void
@@ -77,11 +77,11 @@ const awaitState = async <K extends ManagePageLoadingState['_type']>(
       ManagePageLoadingState,
       {
         readonly setStale: () => void
-      }
+      },
     ]
   >,
   type: K,
-  f: (s: Extract<ManagePageLoadingState, {_type: K}>) => void
+  f: (s: Extract<ManagePageLoadingState, {_type: K}>) => void,
 ) => {
   await waitFor(() => {
     expect(state.current[0]._type).toEqual(type)
@@ -103,7 +103,7 @@ const setup = () => {
   const useManagePageState = mkUseManagePageState(
     mockFetchRegistrations(req1.promise, req2.promise),
     () => deleteReq.promise,
-    jest.fn()
+    jest.fn(),
   )
 
   const {result, rerender} = renderHook<
@@ -142,7 +142,7 @@ test('it should load results', async () => {
   })
 
   await awaitState(result, 'loaded', state => {
-    expect(state.items.data.length).toBe(3)
+    expect(state.items.data).toHaveLength(3)
   })
 })
 
@@ -206,7 +206,7 @@ test('it should handle race conditions when an in-flight request is made stale',
 
   // The second request should be the one that populates the items
   await awaitState(result, 'loaded', state => {
-    expect(state.items.data.length).toBe(2)
+    expect(state.items.data).toHaveLength(2)
   })
   // #endregion
 })
@@ -253,7 +253,7 @@ test('it should handle race conditions when a later request is resolved quicker'
     req2.resolve()
   })
   await awaitState(result, 'loaded', state => {
-    expect(state.items.data.length).toBe(2)
+    expect(state.items.data).toHaveLength(2)
   })
   // #endregion
 
@@ -264,7 +264,7 @@ test('it should handle race conditions when a later request is resolved quicker'
 
   await awaitState(result, 'loaded', state => {
     // the initial request should be ignored
-    expect(state.items.data.length).toBe(2)
+    expect(state.items.data).toHaveLength(2)
   })
   // #endregion
 })
@@ -281,7 +281,7 @@ test('it should reload results when the query is changed', async () => {
   })
 
   await awaitState(result, 'loaded', state => {
-    expect(state.items.data.length).toBe(3)
+    expect(state.items.data).toHaveLength(3)
   })
 
   act(() => {
@@ -309,7 +309,7 @@ test('it should reload results when the query is changed', async () => {
   })
 
   await awaitState(result, 'loaded', state => {
-    expect(state.items.data.length).toBe(2)
+    expect(state.items.data).toHaveLength(2)
   })
 })
 // TOOD flatten if you can to adhere to paul's style
@@ -321,12 +321,12 @@ describe('deleteRegistration', () => {
     req1.resolve()
 
     await awaitState(result, 'loaded', state => {
-      expect(state.items.data.length).toBe(3)
+      expect(state.items.data).toHaveLength(3)
     })
 
     const deletionPromise = result.current[1].deleteRegistration(
       mockRegistration('Foo', 0),
-      ZAccountId.parse('0')
+      ZAccountId.parse('0'),
     )
     deleteReq.resolve()
 
@@ -349,12 +349,12 @@ describe('deleteRegistration', () => {
     })
 
     await awaitState(result, 'loaded', state => {
-      expect(state.items.data.length).toBe(3)
+      expect(state.items.data).toHaveLength(3)
     })
 
     const deletionPromise = result.current[1].deleteRegistration(
       mockRegistration('Foo', 0),
-      ZAccountId.parse('0')
+      ZAccountId.parse('0'),
     )
 
     deleteReq.reject()

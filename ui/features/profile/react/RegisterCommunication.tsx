@@ -88,7 +88,7 @@ const RegisterCommunication = ({
   onSubmit,
 }: RegisterCommunicationProps) => {
   const [selectedTab, setSelectedTab] = useState<Tab>(
-    availableTabs.includes(initiallySelectedTab) ? initiallySelectedTab : availableTabs[0]
+    availableTabs.includes(initiallySelectedTab) ? initiallySelectedTab : availableTabs[0],
   )
   const currentConfig = configByTab[selectedTab]
   const {
@@ -115,7 +115,7 @@ const RegisterCommunication = ({
       await onSubmit?.(
         address,
         selectedTab,
-        selectedTab === Tab.EMAIL ? values.enableEmailLogin : undefined
+        selectedTab === Tab.EMAIL ? values.enableEmailLogin : undefined,
       )
     } catch {
       setFocus(selectedTab)
@@ -175,7 +175,7 @@ const RegisterCommunication = ({
                         {...field}
                         label={I18n.t(
                           'labels.enable_login_for_email',
-                          'I want to log in to Canvas using this email address'
+                          'I want to log in to Canvas using this email address',
                         )}
                         value="medium"
                       />
@@ -211,7 +211,7 @@ const RegisterCommunication = ({
                 />
                 <Text>
                   {I18n.t(
-                    'SMS is only used for Multi-Factor Authentication (if enabled for your account).'
+                    'SMS is only used for Multi-Factor Authentication (if enabled for your account).',
                   )}
                 </Text>
               </Flex>

@@ -42,7 +42,7 @@ export const SyncToSisCheckbox = ({postToSis, setPostToSis}: Props) => {
     >
       <Checkbox
         label={I18n.t(
-          "Include this assignment's grades when syncing to your school's Student Information System"
+          "Include this assignment's grades when syncing to your school's Student Information System",
         )}
         value="post_to_sis"
         checked={postToSis}

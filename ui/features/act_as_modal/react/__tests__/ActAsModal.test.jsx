@@ -63,7 +63,7 @@ describe('ActAsModal', () => {
   it('renders avatar with user image url', async () => {
     const wrapper = render(<ActAsModal {...props} />)
     expect(
-      wrapper.getByLabelText('Act as User').querySelector("span[data-fs-exclude='true'] img").src
+      wrapper.getByLabelText('Act as User').querySelector("span[data-fs-exclude='true'] img").src,
     ).toContain('testImageUrl')
   })
 

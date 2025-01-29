@@ -44,7 +44,7 @@ describe('ReviewScreen', () => {
         registration={reg}
         overlayStore={overlayStore}
         transitionToConfirmationState={jest.fn()}
-      />
+      />,
     )
 
     expect(screen.getByText('Review')).toBeInTheDocument()
@@ -63,7 +63,7 @@ describe('ReviewScreen', () => {
         registration={reg}
         overlayStore={overlayStore}
         transitionToConfirmationState={jest.fn()}
-      />
+      />,
     )
 
     expect(screen.getByText('Permissions')).toBeInTheDocument()
@@ -87,16 +87,16 @@ describe('ReviewScreen', () => {
         registration={reg}
         overlayStore={overlayStore}
         transitionToConfirmationState={jest.fn()}
-      />
+      />,
     )
 
     expect(screen.getByText('Data Sharing')).toBeInTheDocument()
     expect(
       screen.getByText(
         i18nLtiPrivacyLevelDescription(
-          canvasPlatformSettings(reg.tool_configuration)?.privacy_level!
-        )
-      )
+          canvasPlatformSettings(reg.tool_configuration)?.privacy_level!,
+        ),
+      ),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', {name: 'Edit Data Sharing'})).toBeInTheDocument()
   })
@@ -117,7 +117,7 @@ describe('ReviewScreen', () => {
         registration={reg}
         overlayStore={overlayStore}
         transitionToConfirmationState={jest.fn()}
-      />
+      />,
     )
 
     expect(screen.getByText('Placements')).toBeInTheDocument()
@@ -162,14 +162,14 @@ describe('ReviewScreen', () => {
         registration={reg}
         overlayStore={overlayStore}
         transitionToConfirmationState={jest.fn()}
-      />
+      />,
     )
 
     expect(screen.getByText('Naming')).toBeInTheDocument()
     expect(screen.getByText(nickname)).toBeInTheDocument()
     expect(screen.getByText(description)).toBeInTheDocument()
-    expect(screen.getAllByText(placementLabel).length).toBe(
-      canvasPlatformSettings(reg.tool_configuration)!.settings.placements.length
+    expect(screen.getAllByText(placementLabel)).toHaveLength(
+      canvasPlatformSettings(reg.tool_configuration)!.settings.placements.length,
     )
     expect(screen.getByText('Edit Naming')).toBeInTheDocument()
   })
@@ -193,7 +193,7 @@ describe('ReviewScreen', () => {
           registration={reg}
           overlayStore={overlayStore}
           transitionToConfirmationState={jest.fn()}
-        />
+        />,
       )
 
       expect(screen.getByText('Icon URLs')).toBeInTheDocument()
@@ -223,11 +223,11 @@ describe('ReviewScreen', () => {
           registration={reg}
           overlayStore={overlayStore}
           transitionToConfirmationState={jest.fn()}
-        />
+        />,
       )
 
       expect(screen.getByText('Icon URLs')).toBeInTheDocument()
-      expect(screen.getAllByText('Default Icon').length).toBe(placements.length)
+      expect(screen.getAllByText('Default Icon')).toHaveLength(placements.length)
     })
 
     it("says a 'Custom Icon' is being used if the user added their own custom icon url", () => {
@@ -267,11 +267,11 @@ describe('ReviewScreen', () => {
           registration={reg}
           overlayStore={overlayStore}
           transitionToConfirmationState={jest.fn()}
-        />
+        />,
       )
 
       expect(screen.getByText('Icon URLs')).toBeInTheDocument()
-      expect(screen.getAllByText('Custom Icon').length).toBe(placements.length)
+      expect(screen.getAllByText('Custom Icon')).toHaveLength(placements.length)
     })
 
     it("says that a 'Generated Icon' is being used if the configured icon is blank, the tool doesn't have a top-level icon, and the placement is the editor button", () => {
@@ -295,7 +295,7 @@ describe('ReviewScreen', () => {
           registration={reg}
           overlayStore={overlayStore}
           transitionToConfirmationState={jest.fn()}
-        />
+        />,
       )
 
       expect(screen.getByText('Icon URLs')).toBeInTheDocument()
@@ -322,11 +322,11 @@ describe('ReviewScreen', () => {
           registration={reg}
           overlayStore={overlayStore}
           transitionToConfirmationState={jest.fn()}
-        />
+        />,
       )
 
       expect(screen.getByText('Icon URLs')).toBeInTheDocument()
-      expect(screen.getAllByText('No Icon').length).toBe(placements.length)
+      expect(screen.getAllByText('No Icon')).toHaveLength(placements.length)
     })
   })
 })

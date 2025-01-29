@@ -67,8 +67,8 @@ class CanvadocSessionsController < ApplicationController
         @current_user,
         annotation_context,
         submission,
-        true,
-        enable_annotations
+        disable_annotation_notifications: true,
+        enable_annotations:
       )
     }
   end

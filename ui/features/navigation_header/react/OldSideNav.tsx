@@ -139,7 +139,7 @@ const Navigation = () => {
         openTray(type_)
       }
     },
-    [activeItem, closeTray, isTrayOpen, openTray]
+    [activeItem, closeTray, isTrayOpen, openTray],
   )
 
   useEffect(() => {
@@ -175,7 +175,7 @@ const Navigation = () => {
 
     const overrideDismissUnsubscribe = tourPubSub.subscribe(
       'navigation-tray-override-dismiss',
-      tf => setOverrideDismiss(Boolean(tf))
+      tf => setOverrideDismiss(Boolean(tf)),
     )
 
     return () => {

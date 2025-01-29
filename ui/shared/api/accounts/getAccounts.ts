@@ -44,7 +44,7 @@ export default async function getAccounts({queryKey, signal}: QueryFunctionConte
       method: 'GET',
       signal,
     },
-    ZAccounts
+    ZAccounts,
   )
 
   return {json, link}

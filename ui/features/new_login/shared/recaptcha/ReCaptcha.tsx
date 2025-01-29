@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef} from 'react'
-import {View} from '@instructure/ui-view'
 import {canvas} from '@instructure/ui-theme-tokens'
+import {View} from '@instructure/ui-view'
+import React, {useEffect, useRef} from 'react'
 
 declare global {
   interface Window {

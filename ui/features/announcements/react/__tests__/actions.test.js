@@ -145,7 +145,7 @@ test(`toggleSelectedAnnouncementsLock calls apiClient.lockAnnouncements with sel
       selectedAnnouncements: [1, 2, 3],
     },
     [1, 2, 3],
-    true
+    true,
   )
 })
 
@@ -183,7 +183,7 @@ test('toggleAnnouncementsLock calls apiClient.lockAnnouncements with passed in a
       },
     },
     ['2', '3'],
-    true
+    true,
   )
 })
 
@@ -223,7 +223,7 @@ test(`toggleSelectedAnnouncementsLock calls apiClient.lockAnnouncements with sel
       selectedAnnouncements: [1, 2, 3],
     },
     [1, 2, 3],
-    true
+    true,
   )
 })
 
@@ -297,7 +297,7 @@ test('deleteSelectedAnnouncements calls apiClient.deleteAnnouncements with state
     {
       selectedAnnouncements: state.selectedAnnouncements,
     },
-    state.selectedAnnouncements
+    state.selectedAnnouncements,
   )
 })
 

@@ -36,7 +36,7 @@ const renderComponent = resource => {
       resource={resource}
       onLaunchButtonClick={onLaunchButtonFn}
       onRemoveResource={onRemoveResourceFn}
-    />
+    />,
   )
 }
 
@@ -52,7 +52,7 @@ describe('AssignmentSubmissionTypeContainer', () => {
     renderComponent(undefined)
     expect(screen.getByTestId('assignment_submission_type_selection_launch_button')).toBeTruthy()
     expect(
-      screen.queryByTestId('assignment-submission-type-selection-resource-link-card')
+      screen.queryByTestId('assignment-submission-type-selection-resource-link-card'),
     ).toBeFalsy()
   })
 
@@ -79,7 +79,7 @@ describe('AssignmentSubmissionTypeContainer', () => {
     const resource = {title: 'Resource Title'}
     renderComponent(resource)
     expect(
-      screen.getByTestId('assignment-submission-type-selection-resource-link-card')
+      screen.getByTestId('assignment-submission-type-selection-resource-link-card'),
     ).toBeTruthy()
     expect(screen.queryByTestId('assignment_submission_type_selection_launch_button')).toBeFalsy()
 

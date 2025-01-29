@@ -92,7 +92,7 @@ DraggableCollectionView.prototype.initSort = function (opts) {
     .sortable(
       lodashExtend({}, this.sortOptions, opts, {
         scope: this.cid,
-      })
+      }),
     )
     .on('sortstart', this.modifyPlaceholder)
     .on('sortreceive', this._onReceive)
@@ -148,7 +148,7 @@ DraggableCollectionView.prototype.searchItem = function (itemId) {
         }
         return undefined
       }
-    })(this)
+    })(this),
   )
   return chosen
 }
@@ -245,17 +245,17 @@ DraggableCollectionView.prototype.updateModels = function (model, new_index, inV
       // after it
       (model.unset('position'), [old_index])
     : !old_pos
-    ? // model is new so we need to update everything after it
-      [new_index]
-    : movedDown
-    ? // model is new so we need to update everything after it
-      // we want to include the one at new index
-      // so we add 1
-      [old_index, new_index + 1]
-    : // moved up so slice from new to old
-      [new_index, old_index + 1]
+      ? // model is new so we need to update everything after it
+        [new_index]
+      : movedDown
+        ? // model is new so we need to update everything after it
+          // we want to include the one at new index
+          // so we add 1
+          [old_index, new_index + 1]
+        : // moved up so slice from new to old
+          [new_index, old_index + 1]
   // carve out just the models that need updating
-  // eslint-disable-next-line prefer-spread
+
   const models_to_update = this.collection.slice.apply(this.collection, slice_args)
   // update the position on just these models
   each(models_to_update, function (m) {

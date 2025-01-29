@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import K5Uploader from '@instructure/k5uploader'
+import {K5Uploader} from '@instructure/k5uploader'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import KalturaSessionLoader from '@canvas/media-comments/jquery/kaltura_session_loader'
 import $ from 'jquery'
@@ -48,7 +48,7 @@ export default class SGUploader {
     groupComment,
     attempt,
     mutationCallback,
-    allowedMedia = ['video', 'audio', 'webm', 'video/webm', 'audio/webm']
+    allowedMedia = ['video', 'audio', 'webm', 'video/webm', 'audio/webm'],
   ) => {
     this.file = inputFile
     if (this.uploader) this.resetUploader()
@@ -56,7 +56,7 @@ export default class SGUploader {
     this.uploader = new K5Uploader(session)
     this.uploader.addEventListener('K5.fileError', this.onFileError)
     this.uploader.addEventListener('K5.complete', e =>
-      this.onUploadComplete(e, submissionId, groupComment, attempt, mutationCallback)
+      this.onUploadComplete(e, submissionId, groupComment, attempt, mutationCallback),
     )
     return this.uploader.addEventListener('K5.ready', this.onUploaderReady)
   }
@@ -69,8 +69,8 @@ export default class SGUploader {
     alert(
       I18n.t(
         'File type %{fileType} not compatible with selected media type: %{allowedMediaTypes}.',
-        {fileType, allowedMediaTypes}
-      )
+        {fileType, allowedMediaTypes},
+      ),
     )
   }
 
@@ -119,7 +119,7 @@ export default class SGUploader {
           if (typeof callback === 'function') {
             callback(resp)
           }
-        }
+        },
       )
     }
   }

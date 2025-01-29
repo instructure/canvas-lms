@@ -46,7 +46,7 @@ class PostGradesDialogNeedsGradingPage extends React.Component<Props> {
               'NOTE: Students have submitted work for these assignments' +
                 'that has not been graded. If you post these grades now, you' +
                 'will need to re-post their scores after grading their' +
-                'latest submissions.'
+                'latest submissions.',
             )}
           </em>
         </small>

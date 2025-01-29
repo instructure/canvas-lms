@@ -70,7 +70,7 @@ describe('GenericErrorPage component', () => {
   test('show the submitted text when comment is submitted', async () => {
     const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
     const {getByText, getByPlaceholderText, findByText} = render(
-      <GenericErrorPage {...defaultProps()} />
+      <GenericErrorPage {...defaultProps()} />,
     )
     moxios.stubRequest('/error_reports', {
       status: 200,
@@ -88,7 +88,7 @@ describe('GenericErrorPage component', () => {
   test('show the loading indicator when comment is submitted', async () => {
     const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
     const {getByText, getByTitle, getByPlaceholderText} = render(
-      <GenericErrorPage {...defaultProps()} />
+      <GenericErrorPage {...defaultProps()} />,
     )
     await user.click(getByText('Report Issue'))
     await user.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
@@ -109,7 +109,7 @@ describe('GenericErrorPage component', () => {
     modifiedProps.errorSubject = 'Testing Stuff'
     modifiedProps.errorMessage = 'Test Message'
     const {getByText, getByPlaceholderText, findByText} = render(
-      <GenericErrorPage {...modifiedProps} />
+      <GenericErrorPage {...modifiedProps} />,
     )
     await user.click(getByText('Report Issue'))
     await user.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
@@ -134,7 +134,7 @@ describe('GenericErrorPage component', () => {
     modifiedProps.errorSubject = 'Testing Stuff'
     modifiedProps.errorMessage = 'Test Message'
     const {getByText, getByPlaceholderText, findByText} = render(
-      <GenericErrorPage {...modifiedProps} />
+      <GenericErrorPage {...modifiedProps} />,
     )
     await user.click(getByText('Report Issue'))
     await user.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')

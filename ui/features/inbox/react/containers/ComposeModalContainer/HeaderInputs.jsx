@@ -40,12 +40,12 @@ const HeaderInputs = props => {
   if (!props.isReply && !props.isForward) {
     moreCourses = reduceDuplicateCourses(
       props.courses.enrollments,
-      props.courses.favoriteCoursesConnection.nodes
+      props.courses.favoriteCoursesConnection.nodes,
     )
   }
 
   const [modalContextCourseFilter, setModalContextCourseFilter] = React.useState(
-    props.activeCourseFilter
+    props.activeCourseFilter,
   )
 
   const canIncludeObservers = useMemo(() => {
@@ -61,7 +61,7 @@ const HeaderInputs = props => {
     return props?.courses?.enrollments.some(
       enrollment =>
         enrollment?.course.assetString === currentCourseAssetId &&
-        enrollmentsThatCanIncludeObservers.includes(enrollment.type)
+        enrollmentsThatCanIncludeObservers.includes(enrollment.type),
     )
   }, [props.activeCourseFilter, props.courses])
 

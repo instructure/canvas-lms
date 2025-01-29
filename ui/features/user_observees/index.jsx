@@ -29,6 +29,6 @@ ready(() => {
   root.render(
     <QueryProvider>
       <UserObservees userId={ENV.current_user_id} />
-    </QueryProvider>
+    </QueryProvider>,
   )
 })

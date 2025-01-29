@@ -44,7 +44,6 @@ PublishCloud.openRestrictedDialog = function () {
   })
 
   import('./RestrictedDialogForm').then(({default: RestrictedDialogForm}) => {
-     
     ReactDOM.render(
       <RestrictedDialogForm
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
@@ -53,7 +52,7 @@ PublishCloud.openRestrictedDialog = function () {
           $dialog.dialog('close')
         }}
       />,
-      $dialog[0]
+      $dialog[0],
     )
   })
 }
@@ -94,7 +93,7 @@ PublishCloud.render = function () {
             '%{fileName} is only available to students with the link - Click to modify',
             {
               fileName,
-            }
+            },
           )}
           disabled={this.props.disabled}
         >

@@ -61,6 +61,11 @@ RSpec.describe VideoCaptionService, type: :service do
         service.call
         expect(media_object.auto_caption_status).to eq("complete")
       end
+
+      it "sets auto_caption_media_id" do
+        service.call
+        expect(media_object.auto_caption_media_id).to eq("1234")
+      end
     end
 
     context "when media type is not video" do

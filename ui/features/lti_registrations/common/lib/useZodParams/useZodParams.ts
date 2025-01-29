@@ -43,7 +43,7 @@ export type ParsedUrlParamsValue<Params extends UrlParamSchemaMap> = {
 const parseUrlParam = <A>(
   schema: UrlParamSchema<A>,
   key: string,
-  params: Params<string>
+  params: Params<string>,
 ): ParamsParseResult<A> => {
   const value = params[key]
   if (typeof value === 'undefined') {
@@ -76,7 +76,7 @@ const parseUrlParam = <A>(
  */
 export const parseUrlParams = <ParamSchemas extends UrlParamSchemaMap>(
   schemas: ParamSchemas,
-  params: Params<string>
+  params: Params<string>,
 ): ParamsParseResult<ParsedUrlParamsValue<ParamSchemas>> => {
   return Object.entries(schemas).reduce(
     (acc, [key, schema]) => {
@@ -91,7 +91,7 @@ export const parseUrlParams = <ParamSchemas extends UrlParamSchemaMap>(
         return acc
       }
     },
-    {success: true, value: {}} as ParamsParseResult<ParsedUrlParamsValue<ParamSchemas>>
+    {success: true, value: {}} as ParamsParseResult<ParsedUrlParamsValue<ParamSchemas>>,
   )
 }
 

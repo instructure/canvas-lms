@@ -148,7 +148,7 @@ Tray.propTypes = {
     PropTypes.shape({
       comment: PropTypes.string.isRequired,
       _id: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   isOpen: PropTypes.bool.isRequired,
   onItemClick: PropTypes.func.isRequired,

@@ -35,7 +35,7 @@ const RosterDialogMixin = {
     enrollments = reject(enrollments, en => includes(removeIds, en.id))
     const sectionIds = map(enrollments, 'course_section_id')
     const sections = filter(ENV.SECTIONS, s => includes(sectionIds, s.id)).sort((a, b) =>
-      a.name.localeCompare(b.name)
+      a.name.localeCompare(b.name),
     )
     return this.model.set({enrollments, sections})
   },

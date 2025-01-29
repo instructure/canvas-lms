@@ -66,7 +66,7 @@ describe('CreateOutcomeModal', () => {
       isMobileView = false,
       renderer = rtlRender,
       treeBrowserRootGroupId = '1',
-    } = {}
+    } = {},
   ) => {
     return renderer(
       <OutcomesContext.Provider
@@ -84,7 +84,7 @@ describe('CreateOutcomeModal', () => {
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -433,18 +433,18 @@ describe('CreateOutcomeModal', () => {
       it('sets focus on first field with error if multiple errors in form and click on Create button', async () => {
         const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText, queryAllByText} = render(
-          <CreateOutcomeModal {...defaultProps()} />
+          <CreateOutcomeModal {...defaultProps()} />,
         )
         await act(async () => jest.runOnlyPendingTimers())
         const name = getByLabelText('Name')
         const friendlyName = getByLabelText('Friendly Name')
         const friendlyDescription = getByLabelText(
-          'Friendly description (for parent/student display)'
+          'Friendly description (for parent/student display)',
         )
         fireEvent.change(name, {target: {value: 'a'.repeat(256)}})
         fireEvent.change(friendlyName, {target: {value: 'b'.repeat(256)}})
         fireEvent.change(friendlyDescription, {target: {value: 'c'.repeat(256)}})
-        expect(queryAllByText('Must be 255 characters or less').length).toBe(3)
+        expect(queryAllByText('Must be 255 characters or less')).toHaveLength(3)
         await user.click(getByText('Create'))
         expect(friendlyDescription).not.toBe(document.activeElement)
         expect(friendlyName).not.toBe(document.activeElement)
@@ -464,7 +464,7 @@ describe('CreateOutcomeModal', () => {
                 title: 'test',
               }),
             ],
-          }
+          },
         )
         await act(async () => jest.runOnlyPendingTimers())
         await user.click(getByText('Create New Group'))
@@ -481,7 +481,7 @@ describe('CreateOutcomeModal', () => {
           })
           await act(async () => jest.runOnlyPendingTimers())
           expect(
-            queryByLabelText('Friendly description (for parent/student display)')
+            queryByLabelText('Friendly description (for parent/student display)'),
           ).not.toBeInTheDocument()
         })
 
@@ -555,7 +555,7 @@ describe('CreateOutcomeModal', () => {
                     individualRatings: true,
                   }),
                 ],
-              }
+              },
             )
             await act(async () => jest.runOnlyPendingTimers())
             fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})

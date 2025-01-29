@@ -37,6 +37,7 @@ import {
   sectionList,
   getLabelForFilter,
   formatGradingPeriodTitleForDisplay,
+  postPolicyChangeable,
 } from '../Gradebook.utils'
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
@@ -124,6 +125,24 @@ const gradedPostedSubmission: Submission = {
   ...gradedSubmission,
   posted_at: new Date(),
 }
+
+describe('postPolicyChangeable', () => {
+  it('returns false if the assignment is null', () => {
+    expect(postPolicyChangeable(null)).toStrictEqual(false)
+  })
+
+  it('returns false if the assignment is undefined', () => {
+    expect(postPolicyChangeable(undefined)).toStrictEqual(false)
+  })
+
+  it('returns false if the assignment is anonymizing students', () => {
+    expect(postPolicyChangeable({anonymize_students: true})).toStrictEqual(false)
+  })
+
+  it('returns true if the assignment is not anonymizing students', () => {
+    expect(postPolicyChangeable({anonymize_students: false})).toStrictEqual(true)
+  })
+})
 
 describe('getGradeAsPercent', () => {
   it('returns a percent for a grade with points possible', () => {
@@ -243,7 +262,7 @@ describe('confirmViewUngradedAsZero', () => {
     it('shows a confirmation dialog', () => {
       confirm(false)
       expect(
-        screen.getByText(/This setting only affects your view of student grades/)
+        screen.getByText(/This setting only affects your view of student grades/),
       ).toBeInTheDocument()
     })
 
@@ -514,8 +533,8 @@ describe('maxAssignmentCount', () => {
           per_page: 10,
           assignment_ids: '1,2,3',
         },
-        'courses/1/long/1/url'
-      )
+        'courses/1/long/1/url',
+      ),
     ).toStrictEqual(698)
   })
 })
@@ -532,8 +551,8 @@ describe('otherGradingPeriodAssignmentIds', () => {
       otherGradingPeriodAssignmentIds(
         gradingPeriodAssignments,
         selectedAssignmentIds,
-        selectedPeriodId
-      )
+        selectedPeriodId,
+      ),
     ).toStrictEqual({
       otherGradingPeriodIds: ['2'],
       otherAssignmentIds: ['3', '4', '5', '6', '7', '8', '9', '10'],
@@ -587,12 +606,12 @@ describe('filterStudentBySectionFn', () => {
     it('students appear in the correct sections when switching between filters', () => {
       appliedFilterTest[0].value = 'section1'
       const filteredStudentsSection1 = modifiedStudents.filter(
-        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest),
       )
-      expect(filteredStudentsSection1.length).toBe(2)
+      expect(filteredStudentsSection1).toHaveLength(2)
       appliedFilterTest[0].value = 'section2'
       const filteredStudentsSection2 = modifiedStudents.filter(
-        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest),
       )
       expect(filteredStudentsSection2[0].name).toBe('Bob Jim')
     })
@@ -621,9 +640,9 @@ describe('filterStudentBySectionFn', () => {
       enrollmentFilterTest.concluded = true
       appliedFilterTest[0].value = 'section1'
       const filteredStudentsSection1 = modifiedStudents.filter(
-        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest),
       )
-      expect(filteredStudentsSection1.length).toBe(1)
+      expect(filteredStudentsSection1).toHaveLength(1)
       expect(filteredStudentsSection1[0].name).toBe('Jim Doe')
     })
     it('student appears in section 1 with a inactive enrollment when the inactive enrollment filter is on ', () => {
@@ -631,9 +650,9 @@ describe('filterStudentBySectionFn', () => {
       enrollmentFilterTest.concluded = false
       appliedFilterTest[0].value = 'section1'
       const filteredStudentsSection1 = modifiedStudents.filter(
-        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest),
       )
-      expect(filteredStudentsSection1.length).toBe(1)
+      expect(filteredStudentsSection1).toHaveLength(1)
       expect(filteredStudentsSection1[0].name).toBe('Bob Jim')
     })
     it('both students appear in section 1 when concluded and inactive enrollment filters are both on ', () => {
@@ -641,9 +660,9 @@ describe('filterStudentBySectionFn', () => {
       enrollmentFilterTest.concluded = true
       appliedFilterTest[0].value = 'section1'
       const filteredStudentsSection1 = modifiedStudents.filter(
-        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest),
       )
-      expect(filteredStudentsSection1.length).toBe(2)
+      expect(filteredStudentsSection1).toHaveLength(2)
     })
   })
 
@@ -674,7 +693,7 @@ describe('filterStudentBySectionFn', () => {
     it('dual enrollment student appears in section 1 with an active enrollment ', () => {
       appliedFilterTest[0].value = 'section1'
       const filteredStudentsSection1 = modifiedStudents.filter(
-        filterStudentBySectionFn(appliedFilterTest, enrollmentFilterTest)
+        filterStudentBySectionFn(appliedFilterTest, enrollmentFilterTest),
       )
       expect(filteredStudentsSection1[0].name).toBe('Jim Doe')
     })
@@ -682,16 +701,16 @@ describe('filterStudentBySectionFn', () => {
     it('dual enrollment student does not appear section 2 with a concluded enrollment ', () => {
       appliedFilterTest[0].value = 'section2'
       const filteredStudentsSection2 = modifiedStudents.filter(
-        filterStudentBySectionFn(appliedFilterTest, enrollmentFilterTest)
+        filterStudentBySectionFn(appliedFilterTest, enrollmentFilterTest),
       )
-      expect(filteredStudentsSection2.length).toBe(0)
+      expect(filteredStudentsSection2).toHaveLength(0)
     })
 
     it('dual enrollment student appears in section 2 with a concluded enrollment when the concluded enrollment filter is on ', () => {
       enrollmentFilterTest.concluded = true
       appliedFilterTest[0].value = 'section2'
       const filteredStudentsSection2 = modifiedStudents.filter(
-        filterStudentBySectionFn(appliedFilterTest, enrollmentFilterTest)
+        filterStudentBySectionFn(appliedFilterTest, enrollmentFilterTest),
       )
       expect(filteredStudentsSection2[0].name).toBe('Jim Doe')
     })
@@ -714,9 +733,9 @@ describe('filterStudentBySectionFn', () => {
         },
       ]
       const filteredStudents = modifiedStudents.filter(
-        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest),
       )
-      expect(filteredStudents.length).toBe(2)
+      expect(filteredStudents).toHaveLength(2)
     })
 
     it('filteredStudents does not include all students when appliedFilters includes multiple sections when multiselect_gradebook_filters_enabled is false', () => {
@@ -737,9 +756,9 @@ describe('filterStudentBySectionFn', () => {
         },
       ]
       const filteredStudents = modifiedStudents.filter(
-        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest),
       )
-      expect(filteredStudents.length).toBe(1)
+      expect(filteredStudents).toHaveLength(1)
     })
   })
 

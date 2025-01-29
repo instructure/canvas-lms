@@ -26,19 +26,19 @@ export const useGradingSchemeDelete = (): {
   deleteGradingScheme: (
     contextType: 'Account' | 'Course',
     contextId: string,
-    gradingSchemeId: string
+    gradingSchemeId: string,
   ) => Promise<void>
   deleteGradingSchemeStatus: string
 } => {
   const [deleteGradingSchemeStatus, setDeleteGradingSchemeStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const deleteGradingScheme = useCallback(
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      gradingSchemeId: string
+      gradingSchemeId: string,
     ): Promise<void> => {
       setDeleteGradingSchemeStatus(ApiCallStatus.NOT_STARTED)
       try {
@@ -59,7 +59,7 @@ export const useGradingSchemeDelete = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

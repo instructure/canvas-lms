@@ -36,7 +36,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Logging tab)'),
       description: I18n.t(
-        'If Statistics - view or Users - manage login details is enabled, the user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled.'
+        'If Statistics - view or Users - manage login details is enabled, the user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled.',
       ),
     },
     {
@@ -49,5 +49,5 @@ export const template = generateActionTemplates(
     },
   ],
   [],
-  []
+  [],
 )

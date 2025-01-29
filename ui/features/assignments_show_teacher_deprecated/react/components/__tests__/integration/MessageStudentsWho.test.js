@@ -32,7 +32,7 @@ describe('MessageStudentsWho integration', () => {
 
   it('shows the message students who dialog when the message students who button is clicked', async () => {
     const {getByText, getAllByText} = await renderTeacherView(
-      mockAssignment({submissionTypes: ['none']})
+      mockAssignment({submissionTypes: ['none']}),
     )
     fireEvent.click(getAllByText(/students/i)[0])
     fireEvent.click(closest(getByText(/message students/i), 'button'))

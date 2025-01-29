@@ -20,14 +20,12 @@
 require_relative "../helpers/context_modules_common"
 require_relative "page_objects/modules_index_page"
 require_relative "page_objects/modules_settings_tray"
-require_relative "../../helpers/selective_release_common"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include ModulesIndexPage
   include ModulesSettingsTray
-  include SelectiveReleaseCommon
 
   context "module index tool placement" do
     before do
@@ -228,8 +226,6 @@ describe "context modules" do
     end
 
     it "adds links to newly created modules with differentiated modules tray" do
-      differentiated_modules_on
-
       go_to_modules
       click_new_module_link
       update_module_name("new module")

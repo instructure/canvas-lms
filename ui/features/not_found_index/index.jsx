@@ -17,15 +17,19 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 
 import {renderGameIntoDom} from './react/gameEntry'
 import NotFoundArtwork from './react/NotFoundArtwork'
 
 export const renderNotFoundApp = domElementId => {
   const AppRootElement = document.getElementById(domElementId)
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(<NotFoundArtwork />, AppRootElement)
+  if (AppRootElement) {
+    const root = createRoot(AppRootElement)
+    root.render(<NotFoundArtwork />)
+    return root
+  }
+  return null
 }
 
 export const handleGameStartClick = event => {

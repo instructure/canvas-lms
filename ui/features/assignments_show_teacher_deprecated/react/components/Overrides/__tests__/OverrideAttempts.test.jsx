@@ -27,7 +27,7 @@ describe('OverrideAttempts', () => {
     const override = mockOverride()
 
     const {getByText, getByTestId} = render(
-      <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />
+      <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />,
     )
     expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
 
@@ -39,7 +39,7 @@ describe('OverrideAttempts', () => {
     const override = mockOverride({allowedAttempts: 2})
 
     const {getByText, getByTestId} = render(
-      <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />
+      <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />,
     )
     expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
 
@@ -64,7 +64,7 @@ describe('OverrideAttempts', () => {
         onChange={() => {}}
         variant="detail"
         readOnly={true}
-      />
+      />,
     )
     expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
 
@@ -81,7 +81,7 @@ describe('OverrideAttempts', () => {
         onChange={() => {}}
         variant="detail"
         readOnly={true}
-      />
+      />,
     )
     expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
 
@@ -99,7 +99,7 @@ describe('OverrideAttempts', () => {
         onChange={() => {}}
         variant="detail"
         readOnly={true}
-      />
+      />,
     )
     expect(queryByTestId('OverrideAttempts-Attempts')).toBeNull()
 
@@ -111,7 +111,7 @@ describe('OverrideAttempts', () => {
         variant="detail"
         readOnly={true}
       />,
-      {container}
+      {container},
     )
     expect(getByTestId('OverrideAttempts-Attempts')).toBeInTheDocument()
   })
@@ -126,7 +126,7 @@ describe('OverrideAttempts', () => {
         onChange={onChange}
         variant="detail"
         readOnly={true}
-      />
+      />,
     )
 
     const numberInput = getByLabelText('Attempts')
@@ -144,7 +144,7 @@ describe('OverrideAttempts', () => {
         onChange={onChange}
         variant="detail"
         readOnly={true}
-      />
+      />,
     )
 
     const numberInput = getByLabelText('Attempts')
@@ -162,7 +162,7 @@ describe('OverrideAttempts', () => {
         onChange={onChange}
         variant="detail"
         readOnly={true}
-      />
+      />,
     )
 
     const numberInput = getByLabelText('Attempts')

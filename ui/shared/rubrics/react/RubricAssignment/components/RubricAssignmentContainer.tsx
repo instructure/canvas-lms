@@ -78,6 +78,7 @@ export const RubricAssignmentContainer = ({
   const handleSaveRubric = (savedRubricResponse: SaveRubricResponse) => {
     setRubric(savedRubricResponse.rubric)
     setRubricAssociation(savedRubricResponse.rubricAssociation)
+    setCanUpdateRubric(savedRubricResponse.rubric.canUpdate)
     setRubricCreateModalOpen(false)
   }
 
@@ -95,7 +96,7 @@ export const RubricAssignmentContainer = ({
         courseId,
         assignmentId,
         rubricId,
-        updatedAssociation
+        updatedAssociation,
       )
       setRubric(response.rubric)
       setCanUpdateRubric(response.rubric.can_update)

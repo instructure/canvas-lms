@@ -133,7 +133,7 @@ class AssignmentConfigurationTools extends React.Component {
         selectedToolValue: event.target.value,
         visibilityEnabled: event.target.value.toLowerCase().indexOf('none') === -1,
       },
-      () => this.setToolLaunchUrl()
+      () => this.setToolLaunchUrl(),
     )
   }
 
@@ -270,7 +270,7 @@ const attach = function (
   secureParams,
   selectedTool,
   selectedToolType,
-  visibilitySetting
+  visibilitySetting,
 ) {
   const configTools = (
     <AssignmentConfigurationTools

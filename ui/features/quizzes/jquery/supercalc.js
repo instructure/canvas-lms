@@ -71,8 +71,8 @@ $.fn.superCalc = function (options, more_options) {
         htmlEscape(
           I18n.t(
             'last_formula_row',
-            'the last formula row will be used to compute the final answer'
-          )
+            'the last formula row will be used to compute the final answer',
+          ),
         ) +
         '</td></tr>' +
         "<tr><td></td><td class='decimal_places'>" +
@@ -83,7 +83,7 @@ $.fn.superCalc = function (options, more_options) {
         '</td></tr>' +
         '</tfoot>' +
         '<tbody></tbody>' +
-        '</table>'
+        '</table>',
     )
 
     $entryBox.attr('aria-labelledby', 'headings.formula')
@@ -96,7 +96,7 @@ $.fn.superCalc = function (options, more_options) {
     const $enter = $(
       "<button type='button' class='btn save_formula_button'>" +
         htmlEscape(I18n.t('buttons.save', 'Save')) +
-        '</button>'
+        '</button>',
     )
     $table.find('tfoot tr:last td:first').append($enter)
     $entryBox.hide()
@@ -185,8 +185,8 @@ $.fn.superCalc = function (options, more_options) {
             'title',
             I18n.t(
               'sample_final_answer',
-              'This value is an example final answer for this question type'
-            )
+              'This value is an example final answer for this question type',
+            ),
           )
         $entryBox.val('')
       }
@@ -201,7 +201,7 @@ $.fn.superCalc = function (options, more_options) {
             htmlEscape(I18n.t('drag_to_reorder', 'Drag to reorder')) +
             "'></td><td class='status' aria-labelledby='headings.result'></td><td><a href='#' class='delete_formula_row_link no-hover'><img src='/images/delete_circle.png' alt='" +
             htmlEscape(I18n.t('delete_formula', 'Delete Formula')) +
-            "'/></a></td></tr>"
+            "'/></a></td></tr>",
         )
         $tr.find('td:first').text($entryBox.val())
         $entryBox.val('')

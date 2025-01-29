@@ -53,7 +53,7 @@ const find_outcome = (function () {
               if (options.for_rubric) {
                 message = I18n.t(
                   'messages.no_rubric_outcomes_found',
-                  'No Rubric-Configured Outcomes found'
+                  'No Rubric-Configured Outcomes found',
                 )
               } else {
                 message = I18n.t('messages.no_outcomes_found', 'No Outcomes found')
@@ -119,10 +119,10 @@ const find_outcome = (function () {
               .text(
                 I18n.t(
                   'errors.outcome_retrieval_failed',
-                  'Outcomes Retrieval failed unexpected.  Please try again.'
-                )
+                  'Outcomes Retrieval failed unexpected.  Please try again.',
+                ),
               )
-          }
+          },
         )
       }
       $dialog.dialog({
@@ -140,7 +140,7 @@ $(document).ready(function () {
   $('#find_outcome_criterion_dialog .outcomes_select').click(function (event) {
     event.preventDefault()
     $('#find_outcome_criterion_dialog .outcomes_select.selected_side_tab').removeClass(
-      'selected_side_tab'
+      'selected_side_tab',
     )
     $(this).addClass('selected_side_tab')
     const id = $(this).getTemplateData({textValues: ['id']}).id

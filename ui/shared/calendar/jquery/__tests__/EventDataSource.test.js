@@ -107,7 +107,7 @@ describe('EventDataSource', () => {
       // Filter assignments based on course pacing settings
       const filteredAssignments = server.assignments.filter(assignment => {
         const context = ENV.CALENDAR?.CONTEXTS?.find(
-          ctx => ctx.asset_string === assignment.context_code
+          ctx => ctx.asset_string === assignment.context_code,
         )
         return !context?.course_pacing_enabled || context?.user_is_student
       })
@@ -204,7 +204,7 @@ describe('EventDataSource', () => {
     it('filters out course pacing assignments for teachers', () => {
       server.addAssignment('course_1', '1', date1.toISOString())
       source.getEvents(date1, date2, ['course_1'], list => {
-        expect(list.length).toBe(0)
+        expect(list).toHaveLength(0)
       })
     })
   })

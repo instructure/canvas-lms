@@ -37,7 +37,7 @@ $.fn.fixDialogButtons = function () {
           $button.off('.fixdialogbuttons')
           $button.on(
             'click.fixdialogbuttons',
-            preventDefault(() => $dialog.dialog('close'))
+            preventDefault(() => $dialog.dialog('close')),
           )
         }
 

@@ -82,7 +82,7 @@ class GradebookExportManager {
     // @ts-expect-error
     existingExport,
     pollingInterval = GradebookExportManager.DEFAULT_POLLING_INTERVAL,
-    updateExportState?: (name?: string, val?: number) => void
+    updateExportState?: (name?: string, val?: number) => void,
   ) {
     this.pollingInterval = pollingInterval
 
@@ -203,7 +203,7 @@ class GradebookExportManager {
     showStudentFirstLastName = false,
     // @ts-expect-error
     getStudentOrder,
-    currentView = false
+    currentView = false,
   ) {
     if (!this.exportingUrl) {
       return Promise.reject(I18n.t('No way to export gradebooks provided!'))

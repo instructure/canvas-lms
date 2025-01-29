@@ -128,7 +128,7 @@ describe('SearchableSelect', () => {
     fireEvent.click(opt)
     expect(subjectProps.onChange).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({id: '3'})
+      expect.objectContaining({id: '3'}),
     )
   })
 
@@ -157,7 +157,7 @@ describe('SearchableSelect', () => {
     expect(getByDisplayValue('two for real')).toBeInTheDocument()
     expect(subjectProps.onChange).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({id: '2'})
+      expect.objectContaining({id: '2'}),
     )
   })
 
@@ -214,7 +214,7 @@ describe('SearchableSelect::Groups', () => {
     const results = render(
       <Subject {...subjectProps} {...otherProps}>
         {groupOptions}
-      </Subject>
+      </Subject>,
     )
     const input = results.getByLabelText(LABEL)
     return {subjectProps, input, ...results}

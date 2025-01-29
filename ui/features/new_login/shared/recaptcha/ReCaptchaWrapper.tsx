@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {forwardRef, useImperativeHandle, useRef} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import React, {forwardRef, useImperativeHandle, useRef} from 'react'
 
 const I18n = createI18nScope('new_login')
 

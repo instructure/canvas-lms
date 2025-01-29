@@ -60,16 +60,16 @@ export default function RowScore({gradingScheme, name, possible, score, weight}:
   const letterGradeScore = isPercentInvalid
     ? '-'
     : gradingScheme
-    ? GradeFormatHelper.replaceDashWithMinus(
-        getLetterGrade(
-          possible,
-          score,
-          gradingScheme.data,
-          gradingScheme.pointsBased,
-          gradingScheme.scalingFactor
+      ? GradeFormatHelper.replaceDashWithMinus(
+          getLetterGrade(
+            possible,
+            score,
+            gradingScheme.data,
+            gradingScheme.pointsBased,
+            gradingScheme.scalingFactor,
+          ),
         )
-      )
-    : '-'
+      : '-'
 
   const weightText = weight ? I18n.n(weight, {percentage: true}) : '-'
 

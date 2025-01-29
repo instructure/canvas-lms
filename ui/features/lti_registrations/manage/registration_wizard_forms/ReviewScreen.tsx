@@ -345,7 +345,7 @@ export const LaunchSettingsSection = React.memo(
         />
       </ReviewSection>
     )
-  }
+  },
 )
 
 export type IconUrlsReviewSectionProps = {
@@ -365,7 +365,7 @@ export const IconUrlsReviewSection = React.memo(
     onEditIconUrls,
   }: IconUrlsReviewSectionProps) => {
     const placementsWithIcons = placements.filter((p): p is LtiPlacementWithIcon =>
-      LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon)
+      LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon),
     )
 
     const body = (() => {
@@ -427,5 +427,5 @@ export const IconUrlsReviewSection = React.memo(
         />
       </ReviewSection>
     )
-  }
+  },
 )

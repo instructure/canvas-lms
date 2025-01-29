@@ -25,7 +25,7 @@ import EditRolesView from './EditRolesView'
 import InvitationsView from './InvitationsView'
 import LinkToStudentsView from './LinkToStudentsView'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Avatar} from '@instructure/ui-avatar'
 import {nanoid} from 'nanoid'
 import 'jquery-kyle-menu'
@@ -94,13 +94,13 @@ export default class RosterUserView extends Backbone.View {
     json.canResendInvitation =
       !json.isInactive &&
       some(this.model.get('enrollments'), en =>
-        ENV.permissions.active_granular_enrollment_permissions.includes(en.type)
+        ENV.permissions.active_granular_enrollment_permissions.includes(en.type),
       )
 
     if (json.canRemoveUsers && !ENV.course.concluded) {
       json.canEditRoles = !some(
         this.model.get('enrollments'),
-        e => e.type === 'ObserverEnrollment' && e.associated_user_id
+        e => e.type === 'ObserverEnrollment' && e.associated_user_id,
       )
     }
 
@@ -112,12 +112,12 @@ export default class RosterUserView extends Backbone.View {
     const candoAdminActions = ENV.permissions.can_allow_course_admin_actions
 
     json.canManage = some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
-      this.model.hasEnrollmentType(et)
+      this.model.hasEnrollmentType(et),
     )
       ? candoAdminActions
       : this.model.hasEnrollmentType('ObserverEnrollment')
-      ? candoAdminActions || ENV.permissions.manage_students
-      : ENV.permissions.manage_students
+        ? candoAdminActions || ENV.permissions.manage_students
+        : ENV.permissions.manage_students
     json.customLinks = this.model.get('custom_links')
 
     if (json.canViewLoginIdColumn) {
@@ -206,11 +206,10 @@ export default class RosterUserView extends Backbone.View {
 
   deactivateUser() {
     if (
-       
       !window.confirm(
         I18n.t(
-          'Are you sure you want to deactivate this user? They will be unable to participate in the course while inactive.'
-        )
+          'Are you sure you want to deactivate this user? They will be unable to participate in the course while inactive.',
+        ),
       )
     ) {
       return
@@ -232,9 +231,9 @@ export default class RosterUserView extends Backbone.View {
         })
         .fail(() =>
           $.flashError(
-            I18n.t('Something went wrong while deactivating the user. Please try again later.')
-          )
-        )
+            I18n.t('Something went wrong while deactivating the user. Please try again later.'),
+          ),
+        ),
     )
   }
 
@@ -254,14 +253,13 @@ export default class RosterUserView extends Backbone.View {
         })
         .fail(() =>
           $.flashError(
-            I18n.t('Something went wrong re-activating the user. Please try again later.')
-          )
-        )
+            I18n.t('Something went wrong re-activating the user. Please try again later.'),
+          ),
+        ),
     )
   }
 
   removeFromCourse(_e) {
-     
     if (!window.confirm(I18n.t('Are you sure you want to remove this user?'))) {
       return
     }
@@ -284,11 +282,11 @@ export default class RosterUserView extends Backbone.View {
     const failure = () => {
       this.$el.show()
       return $.flashError(
-        I18n.t('flash.removeError', 'Unable to remove the user. Please try again later.')
+        I18n.t('flash.removeError', 'Unable to remove the user. Please try again later.'),
       )
     }
     const deferreds = map(this.model.get('enrollments'), e =>
-      $.ajaxJSON(`${ENV.COURSE_ROOT_URL}/unenroll/${e.id}`, 'DELETE')
+      $.ajaxJSON(`${ENV.COURSE_ROOT_URL}/unenroll/${e.id}`, 'DELETE'),
     )
     return $.when(...Array.from(deferreds || [])).then(success, failure)
   }
@@ -309,19 +307,29 @@ export default class RosterUserView extends Backbone.View {
   }
 
   afterRender() {
-     
-    ReactDOM.render(
-      <a href={`users/${this.model.id}`}>
-        <Avatar
-          name={this.model.attributes.name}
-          src={this.model.attributes.avatar_url}
-          size="small"
-          alt={this.model.attributes.name}
-        />
-        <span className="screenreader-only">{this.model.attributes.name}</span>
-      </a>,
-      this.$el.find(`#${this.model.attributes.avatarId}`)[0]
-    )
+    const container = this.$el.find(`#${this.model.attributes.avatarId}`)[0]
+    if (container) {
+      const root = createRoot(container)
+      root.render(
+        <a href={`users/${this.model.id}`}>
+          <Avatar
+            name={this.model.attributes.name}
+            src={this.model.attributes.avatar_url}
+            size="small"
+            alt={this.model.attributes.name}
+          />
+          <span className="screenreader-only">{this.model.attributes.name}</span>
+        </a>,
+      )
+      this._reactRoot = root
+    }
+  }
+
+  remove() {
+    if (this._reactRoot) {
+      this._reactRoot.unmount()
+    }
+    return super.remove(...arguments)
   }
 }
 RosterUserView.initClass()

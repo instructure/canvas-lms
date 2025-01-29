@@ -126,7 +126,7 @@ export const getPlannerTheme = () => {
 export const registerK5Theme = (
   options: {
     fontOnly?: boolean
-  } = {}
+  } = {},
 ) => {
   const {baseTheme, base, baseFont} = getBaseThemeVars()
   const fontOnly = options?.fontOnly || false

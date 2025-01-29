@@ -17,36 +17,22 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Modal from '@canvas/react-modal'
 import AddApp from '../AddApp'
 
-const ok = x => expect(x).toBeTruthy()
-const deepEqual = (x, y) => expect(x).toEqual(y)
-const equal = (x, y) => expect(x).toEqual(y)
-
-// const wrapper = document.getElementById('fixtures')
-const wrapper = document.createElement('div')
-document.body.appendChild(wrapper)
-Modal.setAppElement(wrapper)
-const handleToolInstalled = () => ok(true, 'handleToolInstalled called successfully')
-const createElement = data => (
-  <AddApp handleToolInstalled={data.handleToolInstalled} app={data.app} />
-)
-// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
-const getDOMNodes = function (data) {
-  const component = renderComponent(data)
-  const addToolButtonNode = component.refs.addTool
-  const modalNode = component.refs.modal
-  return [component, addToolButtonNode, modalNode]
-}
-
-let app
-
 describe('ExternalApps.AddApp', () => {
+  let container
+  let app
+  const handleToolInstalled = jest.fn()
+
   beforeEach(() => {
+    container = document.createElement('div')
+    container.setAttribute('id', 'fixtures')
+    document.body.appendChild(container)
+    Modal.setAppElement(container)
+
     app = {
       config_options: [],
       config_xml_url: 'https://www.eduappcenter.com/configurations/g7lthtepu68qhchz.xml',
@@ -61,60 +47,54 @@ describe('ExternalApps.AddApp', () => {
   })
 
   afterEach(() => {
-    ReactDOM.unmountComponentAtNode(wrapper)
+    container.remove()
+    handleToolInstalled.mockReset()
   })
 
-  it('renders', function () {
-    const data = {
-      handleToolInstalled,
-      app,
-    }
-    const [component] = Array.from(getDOMNodes(data))
-    ok(component)
-    ok(TestUtils.isCompositeComponentWithType(component, AddApp))
+  it('renders the add app component', () => {
+    render(<AddApp handleToolInstalled={handleToolInstalled} app={app} />, {container})
+    expect(screen.getByRole('link', {name: /add app/i})).toBeInTheDocument()
   })
 
-  it('configOptions', function () {
-    const data = {
-      handleToolInstalled,
-      app,
-    }
-    const [component] = Array.from(getDOMNodes(data))
-    const options = component.configOptions()
-    equal(options[0].props.name, 'name')
-    equal(options[1].props.name, 'consumer_key')
-    equal(options[2].props.name, 'shared_secret')
+  it('renders config options with correct field names', async () => {
+    const {container: componentContainer} = render(
+      <AddApp handleToolInstalled={handleToolInstalled} app={app} />,
+      {container},
+    )
+    const addLink = screen.getByRole('link', {name: /add app/i})
+    await userEvent.click(addLink)
+
+    expect(screen.getByLabelText(/name/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/consumer key/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/shared secret/i)).toBeInTheDocument()
   })
 
-  it('configSettings', function () {
+  it('initializes with correct config settings', async () => {
     app.config_options = [{name: 'param1', param_type: 'text', default_value: 'val1'}]
-    const data = {
-      handleToolInstalled,
-      app,
-    }
-    const [component] = Array.from(getDOMNodes(data))
-    const correctSettings = {
-      param1: 'val1',
-      name: 'Acclaim',
-    }
-    deepEqual(component.configSettings(), correctSettings)
+    const {container: componentContainer} = render(
+      <AddApp handleToolInstalled={handleToolInstalled} app={app} />,
+      {container},
+    )
+    const addLink = screen.getByRole('link', {name: /add app/i})
+    await userEvent.click(addLink)
+
+    const param1Input = screen.getByRole('textbox', {name: ''})
+    expect(param1Input).toHaveValue('val1')
+    expect(screen.getByLabelText(/name/i)).toHaveValue('Acclaim')
   })
 
-  it('mounting sets fields onto state', function () {
-    const data = {
-      handleToolInstalled,
-      app,
-    }
-    const component = renderComponent(data)
-    deepEqual(component.state, {
-      errorMessage: null,
-      fields: {
-        consumer_key: {description: 'Consumer Key', required: true, type: 'text', value: ''},
-        name: {description: 'Name', required: true, type: 'text', value: 'Acclaim'},
-        shared_secret: {description: 'Shared Secret', required: true, type: 'text', value: ''},
-      },
-      invalidFields: ['consumer_key', 'shared_secret'],
-      modalIsOpen: false,
-    })
+  it('initializes with correct field state', async () => {
+    const {container: componentContainer} = render(
+      <AddApp handleToolInstalled={handleToolInstalled} app={app} />,
+      {container},
+    )
+    const addLink = screen.getByRole('link', {name: /add app/i})
+    await userEvent.click(addLink)
+
+    // Check required fields are empty initially
+    expect(screen.getByLabelText(/consumer key/i)).toHaveValue('')
+    expect(screen.getByLabelText(/shared secret/i)).toHaveValue('')
+    // Name should be pre-filled
+    expect(screen.getByLabelText(/name/i)).toHaveValue('Acclaim')
   })
 })

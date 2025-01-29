@@ -80,7 +80,7 @@ const setup = (props = {}) => {
       singleOverrideWithNoDefault={false}
       onSetDueDateTrayOpen={jest.fn()}
       {...props}
-    />
+    />,
   )
 }
 
@@ -91,7 +91,7 @@ describe('AssignmentSingleAvailabilityWindow', () => {
       expect(container.getByText('Everyone')).toBeInTheDocument()
       expect(container.getByText('Due Mar 31, 2021 5:59am')).toBeInTheDocument()
       expect(
-        container.getByText('Available from Mar 24, 2021 until Apr 4, 2021')
+        container.getByText('Available from Mar 24, 2021 until Apr 4, 2021'),
       ).toBeInTheDocument()
     })
 

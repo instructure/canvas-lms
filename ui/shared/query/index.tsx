@@ -107,7 +107,7 @@ export function useQuery<
   TQueryFnData = unknown,
   TError = unknown,
   TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
+  TQueryKey extends QueryKey = QueryKey,
 >(options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>) {
   const ensureFetch = options.meta?.fetchAtLeastOnce || wasPageReloaded
   const hashedKey = hashQueryKey(options.queryKey || [])
@@ -152,7 +152,7 @@ export function useAllPages<
   TQueryFnData = unknown,
   TError = unknown,
   TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
+  TQueryKey extends QueryKey = QueryKey,
 >(options: UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey>) {
   const queryResult = useInfiniteQuery<TQueryFnData, TError, TData, TQueryKey>(options)
 
@@ -173,7 +173,7 @@ export function useMutation<
   TData = unknown,
   TError = unknown,
   TVariables = void,
-  TContext = unknown
+  TContext = unknown,
 >(options: UseMutationOptions<TData, TError, TVariables, TContext>) {
   return baseUseMutation<TData, TError, TVariables, TContext>(options)
 }

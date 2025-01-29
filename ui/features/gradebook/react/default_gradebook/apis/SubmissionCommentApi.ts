@@ -60,7 +60,7 @@ function createSubmissionComment(
   courseId: string,
   assignmentId: string,
   studentId: string,
-  commentData: SubmissionCommentData
+  commentData: SubmissionCommentData,
 ) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`
   const data = {comment: commentData}

@@ -105,7 +105,7 @@ export default class MigrationSync extends Component {
             {this.props.willSendNotification && (
               <Text as="p" size="small">
                 {I18n.t(
-                  'You can leave the page and you will get a notification when the sync process is complete.'
+                  'You can leave the page and you will get a notification when the sync process is complete.',
                 )}
               </Text>
             )}

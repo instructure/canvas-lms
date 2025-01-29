@@ -40,14 +40,14 @@ export const Discover = () => {
         url: `/accounts/${accountId}/apps`,
       },
     ],
-    !!window.ENV.FEATURES.lti_registrations_next
+    !!window.ENV.FEATURES.lti_registrations_next,
   )
 
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const {queryParams, setQueryParams, updateQueryParams} = useDiscoverQueryParams()
   const isFilterApplied = useMemo(
     () => Object.values(queryParams.filters).flat().length > 0 || queryParams.search.length > 0,
-    [queryParams]
+    [queryParams],
   )
 
   const {

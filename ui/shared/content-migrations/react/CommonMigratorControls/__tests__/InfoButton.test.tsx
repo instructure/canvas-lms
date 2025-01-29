@@ -30,7 +30,7 @@ const renderComponent = (overrideProps?: any) =>
       buttonLabel="info button"
       modalLabel="modal label"
       {...overrideProps}
-    />
+    />,
   )
 
 describe('InfoButton', () => {
@@ -54,7 +54,7 @@ describe('InfoButton', () => {
     await user.click(xButton)
 
     await waitFor(() =>
-      expect(screen.queryByRole('heading', {name: 'Info heading'})).not.toBeInTheDocument()
+      expect(screen.queryByRole('heading', {name: 'Info heading'})).not.toBeInTheDocument(),
     )
   })
 
@@ -66,7 +66,7 @@ describe('InfoButton', () => {
     await user.click(closeButton)
 
     await waitFor(() =>
-      expect(screen.queryByRole('heading', {name: 'Info heading'})).not.toBeInTheDocument()
+      expect(screen.queryByRole('heading', {name: 'Info heading'})).not.toBeInTheDocument(),
     )
   })
 })

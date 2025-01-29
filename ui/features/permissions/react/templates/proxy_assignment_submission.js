@@ -35,7 +35,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        "Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt."
+        "Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt.",
       ),
     },
   ],
@@ -52,8 +52,8 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        "Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt."
+        "Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt.",
       ),
     },
-  ]
+  ],
 )

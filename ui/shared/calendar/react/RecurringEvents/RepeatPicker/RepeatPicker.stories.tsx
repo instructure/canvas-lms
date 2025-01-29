@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
@@ -19,11 +20,11 @@
 
 import React, {useCallback, useState} from 'react'
 import moment from 'moment-timezone'
-import {Story, Meta} from '@storybook/react'
+import type {Story, Meta} from '@storybook/react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import RepeatPicker, {OnRepeatPickerChangeType} from './RepeatPicker'
-import {SelectedDaysArray} from '../WeekdayPicker/WeekdayPicker'
+import RepeatPicker, {type OnRepeatPickerChangeType} from './RepeatPicker'
+import type {SelectedDaysArray} from '../WeekdayPicker/WeekdayPicker'
 
 export default {
   title: 'Examples/Calendar/RecurringEvents/RepeatPicker',
@@ -31,10 +32,10 @@ export default {
 } as Meta
 
 const Template: Story<RepeatPicker> = args => {
-  const [interval, setInterval] = useState<Number>(args.interval)
+  const [interval, setInterval] = useState<number>(args.interval)
   const [freq, setFreq] = useState(args.freq)
   const [weekdays, setWeekdays] = useState<SelectedDaysArray | undefined>(args.weekdays)
-  const [monthdate, setMonthdate] = useState<Number | undefined>(args.monthdate)
+  const [monthdate, setMonthdate] = useState<number | undefined>(args.monthdate)
   const [pos, setPos] = useState<number | undefined>(null)
 
   const handleChange = useCallback((newVal: OnRepeatPickerChangeType): void => {

@@ -32,10 +32,9 @@ export const generateUrlPath = (folder: Folder) => {
   }
 
   let relativePath = getRelativePath(folder.full_name)
-
   if (filesEnv.showingAllContexts) {
-    const pluralAssetString = folder.contextType
-      ? `${folder.contextType.toLowerCase()}s_${folder.contextId}`
+    const pluralAssetString = folder.context_type
+      ? `${folder.context_type.toLowerCase()}s_${folder.context_id}`
       : ''
     relativePath = pluralAssetString ? `${pluralAssetString}/${relativePath}` : relativePath
   }

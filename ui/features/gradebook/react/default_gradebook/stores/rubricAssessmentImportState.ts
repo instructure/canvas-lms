@@ -34,7 +34,7 @@ export type RubricAssessmentImportState = {
 
 export default (
   set: StoreApi<GradebookStore>['setState'],
-  get: StoreApi<GradebookStore>['getState']
+  get: StoreApi<GradebookStore>['getState'],
 ): RubricAssessmentImportState => ({
   rubricAssessmentImportTrayProps: {
     isOpen: false,

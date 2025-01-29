@@ -92,11 +92,11 @@ export const handleExternalContentMessages = ({
 
 export function postMessageExternalContentReady(
   window: Window,
-  eventData: ExternalContentReadyInnerData
+  eventData: ExternalContentReadyInnerData,
 ) {
   window.postMessage(
     {subject: EXTERNAL_CONTENT_READY, ...eventData},
-    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN,
   )
 }
 

@@ -133,7 +133,7 @@ describe('Calendar', () => {
   it('renders events', () => {
     const cal = makeCal()
     const $eventDiv = $(
-      '<div class="event"><div class="fc-title"></div><div class="fc-content"></div></div>'
+      '<div class="event"><div class="fc-title"></div><div class="fc-content"></div></div>',
     ).appendTo('#fixtures')
     const now = moment()
     const event = {
@@ -203,7 +203,7 @@ describe('Calendar', () => {
     fakeENV.setup({CALENDAR: {SHOW_SCHEDULER: true}})
     const cal = makeCal()
     const $eventDiv = $(
-      '<div class="event"><div class="fc-title"></div><div class="fc-content"></div></div>'
+      '<div class="event"><div class="fc-title"></div><div class="fc-content"></div></div>',
     ).appendTo('#fixtures')
     const now = moment()
     const data = {

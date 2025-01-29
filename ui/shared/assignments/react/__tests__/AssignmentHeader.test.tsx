@@ -34,7 +34,7 @@ const setUp = (propOverrides = {}) => {
   return render(
     <MockedQueryClientProvider client={new QueryClient()}>
       <AssignmentHeader {...props} />
-    </MockedQueryClientProvider>
+    </MockedQueryClientProvider>,
   )
 }
 

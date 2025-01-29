@@ -53,7 +53,7 @@ it('will render collapsed label if steps is collapsed', async () => {
 it('will not render collapsed label if steps is not collapsed', async () => {
   const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
   const {getByText, queryByTestId} = render(
-    <StepContainer {...props} isCollapsed={false} collapsedLabel="TEST" />
+    <StepContainer {...props} isCollapsed={false} collapsedLabel="TEST" />,
   )
   expect(queryByTestId('collapsed-step-container')).not.toBeInTheDocument()
   expect(getByText('Uploaded')).toBeInTheDocument()
@@ -79,7 +79,7 @@ describe('the assignment is unavailable', () => {
     verifySteps(
       getByTestId('uploaded-step-container'),
       ['Uploaded', 'Submit', 'Not Graded Yet'],
-      getByText
+      getByText,
     )
     expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
   })

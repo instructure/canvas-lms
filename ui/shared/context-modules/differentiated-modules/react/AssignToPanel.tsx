@@ -44,7 +44,7 @@ export type AssignToPanelProps = {
   mountNodeRef: React.RefObject<HTMLElement>
   updateParentData?: (
     data: {selectedOption: OptionValue; selectedAssignees: AssigneeOption[]},
-    changed: boolean
+    changed: boolean,
   ) => void
   defaultOption?: OptionValue
   defaultAssignees?: AssigneeOption[]
@@ -127,10 +127,10 @@ export default function AssignToPanel({
   onDidSubmit,
 }: AssignToPanelProps) {
   const [selectedOption, setSelectedOption] = useState<OptionValue>(
-    defaultOption || EVERYONE_OPTION.value
+    defaultOption || EVERYONE_OPTION.value,
   )
   const [selectedAssignees, setSelectedAssignees] = useState<AssigneeOption[]>(
-    defaultAssignees || []
+    defaultAssignees || [],
   )
   const [isLoading, setIsLoading] = useState(false)
   const changed = useRef(false)
@@ -148,13 +148,11 @@ export default function AssignToPanel({
     const fetchAllOverrides = async () => {
       setIsLoading(true)
       const allResponses = []
-      let url:
-        | string
-        | null = `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`
+      let url: string | null =
+        `/api/v1/courses/${courseId}/modules/${moduleId}/assignment_overrides`
 
       try {
         while (url) {
-           
           const response: any = await doFetchApi({
             path: url,
             params: {per_page: 100},
@@ -217,7 +215,7 @@ export default function AssignToPanel({
       return
     }
     setIsLoading(true)
-     
+
     updateModuleAssignees({courseId, moduleId, moduleElement, selectedAssignees})
       .finally(() => setIsLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
@@ -235,7 +233,7 @@ export default function AssignToPanel({
   // Sends data to parent when unmounting
   useEffect(
     () => () => updateParentData?.({selectedOption, selectedAssignees}, changed.current),
-    [selectedOption, selectedAssignees, updateParentData]
+    [selectedOption, selectedAssignees, updateParentData],
   )
 
   // cannot handle in onSelect because of infinite rerenders due to messages prop

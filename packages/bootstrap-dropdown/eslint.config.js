@@ -1,4 +1,6 @@
 /** @type {import('eslint').Linter.Config[]} */
-module.exports = {
-  ignores: ['**/*'],
-}
+module.exports = [
+  {
+    ignores: ['**/*'],
+  },
+]

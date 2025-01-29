@@ -51,7 +51,7 @@ const IconPopup = ({iconName}: IconPopupProps) => {
       setProp((prps: {iconName: string}) => (prps.iconName = newIconName))
       handleHideContent()
     },
-    [handleHideContent, setProp]
+    [handleHideContent, setProp],
   )
 
   return (

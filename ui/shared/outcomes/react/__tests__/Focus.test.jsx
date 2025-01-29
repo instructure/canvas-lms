@@ -28,7 +28,7 @@ describe('Focus', () => {
     const {getByText} = render(
       <Focus>
         <button type="button">focus me</button>
-      </Focus>
+      </Focus>,
     )
     jest.runOnlyPendingTimers()
     expect(getByText('focus me')).toHaveFocus()
@@ -38,7 +38,7 @@ describe('Focus', () => {
     const {getByText} = render(
       <Focus timeout={100}>
         <button type="button">focus me</button>
-      </Focus>
+      </Focus>,
     )
     jest.advanceTimersByTime(99)
     expect(getByText('focus me')).not.toHaveFocus()

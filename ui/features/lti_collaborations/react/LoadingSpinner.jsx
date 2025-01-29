@@ -21,7 +21,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('react_collaborations')
 
- 
 class Spinner extends React.Component {
   render() {
     return (

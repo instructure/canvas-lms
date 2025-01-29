@@ -92,7 +92,7 @@ describe('PeerReviewNavigationLink', () => {
       fireEvent.click(getByTestId('header-peer-review-link'))
       expect(getByTestId('peer-review-completed-1')).toHaveAttribute(
         'href',
-        '/courses/1/assignments/1?reviewee_id=1'
+        '/courses/1/assignments/1?reviewee_id=1',
       )
     })
   })
@@ -150,7 +150,7 @@ describe('PeerReviewNavigationLink', () => {
       fireEvent.click(getByTestId('header-peer-review-link'))
       expect(getByTestId('peer-review-completed-1')).toHaveAttribute(
         'href',
-        '/courses/1/assignments/1?anonymous_asset_id=anon_1'
+        '/courses/1/assignments/1?anonymous_asset_id=anon_1',
       )
     })
   })

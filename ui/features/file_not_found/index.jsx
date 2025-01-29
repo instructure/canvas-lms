@@ -23,9 +23,8 @@ import FileNotFound from './react/FileNotFound'
 import ready from '@instructure/ready'
 
 ready(() => {
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <FileNotFound contextCode={window.ENV.context_asset_string} />,
-    $('#sendMessageForm')[0]
+    $('#sendMessageForm')[0],
   )
 })

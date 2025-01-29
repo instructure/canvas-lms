@@ -327,7 +327,7 @@ describe('Blueprint Courses reducer', () => {
       type: '_NOT_A_REAL_ACTION_',
       payload: {message: 'hello world', err: 'bad things happened'},
     })
-    expect(newState.notifications.length).toBe(1)
+    expect(newState.notifications).toHaveLength(1)
     expect(newState.notifications[0].type).toBe('error')
     expect(newState.notifications[0].message).toBe('hello world')
     expect(newState.notifications[0].err).toBe('bad things happened')
@@ -335,16 +335,16 @@ describe('Blueprint Courses reducer', () => {
 
   it('adds new info notification on NOTIFY_INFO', () => {
     const newState = reduce(actions.notifyInfo({message: 'hello world'}))
-    expect(newState.notifications.length).toBe(1)
+    expect(newState.notifications).toHaveLength(1)
     expect(newState.notifications[0].type).toBe('info')
     expect(newState.notifications[0].message).toBe('hello world')
   })
 
   it('adds new error notification on NOTIFY_ERROR', () => {
     const newState = reduce(
-      actions.notifyError({message: 'hello world', err: 'bad things happened'})
+      actions.notifyError({message: 'hello world', err: 'bad things happened'}),
     )
-    expect(newState.notifications.length).toBe(1)
+    expect(newState.notifications).toHaveLength(1)
     expect(newState.notifications[0].type).toBe('error')
     expect(newState.notifications[0].message).toBe('hello world')
     expect(newState.notifications[0].err).toBe('bad things happened')
@@ -354,6 +354,6 @@ describe('Blueprint Courses reducer', () => {
     const newState = reduce(actions.clearNotification('1'), {
       notifications: [{id: '1', message: 'hello world', type: 'info'}],
     })
-    expect(newState.notifications.length).toBe(0)
+    expect(newState.notifications).toHaveLength(0)
   })
 })

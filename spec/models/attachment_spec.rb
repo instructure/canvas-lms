@@ -2506,9 +2506,12 @@ describe Attachment do
   end
 
   context "quota" do
+    before(:once) do
+      @file_counter = 0
+    end
+
     def stub_text_data
-      $stub_file_counter ||= 0
-      stub_file_data("file.txt", "some data#{$stub_file_counter += 1}", "text/plain")
+      stub_file_data("file.txt", "some data#{@file_counter += 1}", "text/plain")
     end
 
     it "gives small files a minimum quota size" do
@@ -2557,6 +2560,15 @@ describe Attachment do
       expect(quota[:quota_used]).to eq 1.megabyte
     end
 
+    it "excludes attachments in the root account's root folder from the quota calculation" do
+      account_model
+      root_folder = Folder.root_folders(@account).first
+      attachment_model(context: @account, uploaded_data: stub_text_data, filename: "whatever.txt", folder: root_folder)
+      @attachment.update_attribute(:size, 1.megabyte)
+      quota = Attachment.get_quota(@account)
+      expect(quota[:quota_used]).to eq 0
+    end
+
     it "does not count attachments in submissions folders toward the quota" do
       user_model
       attachment_model(context: @user, uploaded_data: stub_text_data, filename: "whatever.txt", folder: @user.submissions_folder)
@@ -2583,6 +2595,72 @@ describe Attachment do
       # ensure it doesn't go negative
       @attachment.update_attribute :size, 10.megabytes
       expect(Attachment.quota_available(@course)).to eq 0
+    end
+  end
+
+  describe ".excluded_ids_for_context" do
+    let_once(:root_account) { Account.default }
+    let_once(:sub_account) { root_account.sub_accounts.create! }
+    let_once(:user) { user_model }
+    let_once(:group) { group_model }
+    let(:stub_text_data) { stub_file_data("file.txt", "some data", "text/plain") }
+    let(:file_size) { 1.decimal_megabytes }
+
+    context "when context is a Account" do
+      it "returns excluded attachment ids for root folder" do
+        folder = Folder.root_folders(root_account).first
+        attachment = attachment_model(context: root_account,
+                                      uploaded_data: stub_text_data,
+                                      filename: "account.txt",
+                                      folder:,
+                                      size: file_size)
+        expect(Attachment.excluded_ids_for_context(root_account)).to match_array(attachment.id)
+      end
+
+      it "returns excluded attachment ids for root sub-folders" do
+        root_folder = Folder.root_folders(root_account).first
+        sub_folder = root_folder.sub_folders.create!(name: "sub-folder", context: root_account)
+        attachment = attachment_model(context: root_account,
+                                      uploaded_data: stub_text_data,
+                                      filename: "account.txt",
+                                      folder: sub_folder,
+                                      size: file_size)
+        expect(Attachment.excluded_ids_for_context(root_account)).to match_array(attachment.id)
+      end
+
+      it "does not return excluded attachment ids for root folder of a non root account" do
+        folder = Folder.root_folders(sub_account).first
+        attachment_model(context: sub_account,
+                         uploaded_data: stub_text_data,
+                         filename: "account.txt",
+                         folder:,
+                         size: file_size)
+        expect(Attachment.excluded_ids_for_context(sub_account)).to be_empty
+      end
+    end
+
+    context "when context is a User" do
+      it "returns excluded attachment ids for submissions" do
+        folder = user.submissions_folder
+        attachment = attachment_model(context: user,
+                                      uploaded_data: stub_text_data,
+                                      filename: "user.txt",
+                                      folder:,
+                                      size: file_size)
+        expect(Attachment.excluded_ids_for_context(user)).to match_array(attachment.id)
+      end
+    end
+
+    context "when context is a Group" do
+      it "returns excluded attachment ids for group submissions" do
+        folder = group.submissions_folder
+        attachment = attachment_model(context: group,
+                                      uploaded_data: stub_text_data,
+                                      filename: "group.txt",
+                                      folder:,
+                                      size: file_size)
+        expect(Attachment.excluded_ids_for_context(group)).to match_array(attachment.id)
+      end
     end
   end
 

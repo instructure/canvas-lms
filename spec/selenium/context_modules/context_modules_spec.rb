@@ -21,14 +21,12 @@ require_relative "../helpers/context_modules_common"
 require_relative "../helpers/public_courses_context"
 require_relative "page_objects/modules_index_page"
 require_relative "page_objects/modules_settings_tray"
-require_relative "../../helpers/selective_release_common"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include ModulesIndexPage
   include ModulesSettingsTray
-  include SelectiveReleaseCommon
 
   context "adds existing items to modules" do
     before(:once) do
@@ -597,7 +595,6 @@ describe "context modules" do
       end
 
       it "creating a new module should display a drag and drop area with differentiated modules" do
-        differentiated_modules_on
         get "/courses/#{@course.id}/modules"
 
         click_new_module_link
@@ -616,8 +613,6 @@ describe "context modules" do
     end
 
     it "adds a file item to a module when differentiated modules is enabled", priority: "1" do
-      differentiated_modules_on
-
       get "/courses/#{@course.id}/modules"
       manually_add_module_item("#attachments_select", "File", file_name)
       expect(f(".context_module_item")).to include_text(file_name)

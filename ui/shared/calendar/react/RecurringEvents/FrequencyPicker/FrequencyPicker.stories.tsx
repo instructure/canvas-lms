@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
@@ -18,13 +19,13 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {Story, Meta} from '@storybook/react'
-import FrequencyPicker, {FrequencyPickerProps} from './FrequencyPicker'
+import type {Story, Meta} from '@storybook/react'
+import FrequencyPicker, {type FrequencyPickerProps} from './FrequencyPicker'
 import I18n from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import moment from 'moment'
-import {FrequencyOptionValue} from '../utils'
+import type {FrequencyOptionValue} from '../utils'
 
 I18n.translations.en = {
   'date.day_names': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -115,7 +116,7 @@ const Template: Story<FrequencyPickerProps> = args => {
       setFrequency(newFrequency)
       setRRule(newRRule)
     },
-    []
+    [],
   )
 
   return (

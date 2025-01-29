@@ -100,7 +100,7 @@ describe('PeopleValidationIssues', () => {
         inviteUsersURL={inviteUsersURL}
         onChangeDuplicate={noop}
         onChangeMissing={noop}
-      />
+      />,
     )
 
     // Check if the main panel rendered

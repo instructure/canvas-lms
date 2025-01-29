@@ -54,7 +54,7 @@ describe('CourseImageSelector', () => {
     const wrapper = shallow(<CourseImageSelector {...defaultProps} store={store} />)
 
     expect(wrapper.find('.CourseImageSelector').prop('style').backgroundImage).toBe(
-      'url(http://coolUrl)'
+      'url(http://coolUrl)',
     )
   })
 

@@ -49,7 +49,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to edit Blueprint Course lock settings in the Pages index page and for an individual page in a Blueprint master course.'
+        'Allows user to edit Blueprint Course lock settings in the Pages index page and for an individual page in a Blueprint master course.',
       ),
     },
   ],
@@ -60,18 +60,18 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Courses - manage.'
+        'To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Courses - manage.',
       ),
     },
     {
       description: I18n.t(
-        'However, if these additional permissions are enabled, but the Pages - update permission is not enabled, the user can still adjust content lock settings on individual pages in a Blueprint Master Course.'
+        'However, if these additional permissions are enabled, but the Pages - update permission is not enabled, the user can still adjust content lock settings on individual pages in a Blueprint Master Course.',
       ),
     },
     {
       title: I18n.t('Student Page History'),
       description: I18n.t(
-        'Students can edit and view page history if allowed in the options for an individual page.'
+        'Students can edit and view page history if allowed in the options for an individual page.',
       ),
     },
   ],
@@ -82,7 +82,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to edit Blueprint lock settings for individual pages in a Blueprint Master Course.'
+        'Allows user to edit Blueprint lock settings for individual pages in a Blueprint Master Course.',
       ),
     },
     {
@@ -91,7 +91,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to edit Blueprint lock settings for individual pages in a Blueprint Master Course.'
+        'Allows user to edit Blueprint lock settings for individual pages in a Blueprint Master Course.',
       ),
     },
     {
@@ -112,7 +112,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to edit Blueprint lock settings in the Pages index page and for an individual page in a Blueprint master course.'
+        'Allows user to edit Blueprint lock settings in the Pages index page and for an individual page in a Blueprint master course.',
       ),
     },
   ],
@@ -123,19 +123,19 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.'
+        'Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.',
       ),
     },
     {
       description: I18n.t(
-        'If the Pages - Update permission is disabled, the user can still adjust content lock settings on individual pages in a Blueprint Master Course.'
+        'If the Pages - Update permission is disabled, the user can still adjust content lock settings on individual pages in a Blueprint Master Course.',
       ),
     },
     {
       title: I18n.t('Student Page History'),
       description: I18n.t(
-        'Students can edit and view page history if allowed in the options for an individual page.'
+        'Students can edit and view page history if allowed in the options for an individual page.',
       ),
     },
-  ]
+  ],
 )

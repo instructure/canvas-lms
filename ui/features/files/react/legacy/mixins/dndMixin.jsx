@@ -32,10 +32,10 @@ export default {
       this.dragHolder = $('<div>').appendTo(document.body)
     }
     // This should be in JSX, but /o\
-    // eslint-disable-next-line no-restricted-properties
+
     ReactDOM.render(
       <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={this.itemsToDrag()} />,
-      this.dragHolder[0]
+      this.dragHolder[0],
     )
   },
 
@@ -56,7 +56,7 @@ export default {
       if (itemsToDrag.length && isArray(itemsToDrag)) {
         event.dataTransfer.setData(
           'text/uri-list',
-          itemsToDrag.map(item => item.get('url')).join('\n')
+          itemsToDrag.map(item => item.get('url')).join('\n'),
         )
       }
 
@@ -111,7 +111,7 @@ export default {
           if (callback) {
             return callback({success: false, event})
           }
-        }
+        },
       )
       .done(this.clearSelectedItems)
   },

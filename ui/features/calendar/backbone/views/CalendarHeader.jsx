@@ -154,7 +154,7 @@ CalendarHeader.prototype._selectAgenda = function (_event) {
 CalendarHeader.prototype._triggerWeek = function (_event) {
   if (ENV.FEATURES?.instui_header) {
     document.dispatchEvent(
-      new CustomEvent('calendar:header:select_view', {detail: {viewName: 'week'}})
+      new CustomEvent('calendar:header:select_view', {detail: {viewName: 'week'}}),
     )
   }
 
@@ -164,7 +164,7 @@ CalendarHeader.prototype._triggerWeek = function (_event) {
 CalendarHeader.prototype._triggerMonth = function (_event) {
   if (ENV.FEATURES?.instui_header) {
     document.dispatchEvent(
-      new CustomEvent('calendar:header:select_view', {detail: {viewName: 'month'}})
+      new CustomEvent('calendar:header:select_view', {detail: {viewName: 'month'}}),
     )
   }
 
@@ -174,7 +174,7 @@ CalendarHeader.prototype._triggerMonth = function (_event) {
 CalendarHeader.prototype._triggerAgenda = function (_event) {
   if (ENV.FEATURES?.instui_header) {
     document.dispatchEvent(
-      new CustomEvent('calendar:header:select_view', {detail: {viewName: 'agenda'}})
+      new CustomEvent('calendar:header:select_view', {detail: {viewName: 'agenda'}}),
     )
   }
 
@@ -222,7 +222,6 @@ CalendarHeader.prototype.afterRender = function () {
     return this._loadObjects()
   }
 
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <CalendarHeaderComponent
       bridge={{
@@ -240,7 +239,7 @@ CalendarHeader.prototype.afterRender = function () {
         onChangeSelectViewMode: viewName => this.selectView(viewName),
       }}
     />,
-    this.$el.find('#calendar_header_component')[0]
+    this.$el.find('#calendar_header_component')[0],
   )
 }
 

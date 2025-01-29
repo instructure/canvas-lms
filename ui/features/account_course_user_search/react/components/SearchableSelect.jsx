@@ -33,7 +33,6 @@ const liveRegion = () => document.getElementById('flash_screenreader_holder')
 const reEscapeMatcher = /(\^|\$|\|\.|\*|\+|\?|\(|\)|\[|\]|\{|\}|\||\\)/g
 const reEscape = str => str.replace(reEscapeMatcher, '\\$1')
 
- 
 const SearchableSelectOption = () => <div />
 SearchableSelectOption.propTypes = {
   id: string.isRequired,
@@ -46,7 +45,6 @@ SearchableSelectGroup.propTypes = {
   label: string.isRequired,
 }
 SearchableSelectGroup.displayName = 'Group'
- 
 
 function flattenOptions(nodes) {
   const options = []

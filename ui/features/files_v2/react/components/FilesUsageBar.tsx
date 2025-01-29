@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
-import {useQuery} from '@tanstack/react-query'
+import React, {useContext} from 'react'
+import {useQuery} from '@canvas/query'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
@@ -25,6 +25,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import formatMessage from '../../../../../packages/canvas-media/src/format-message'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {generateFilesQuotaUrl} from '../../utils/apiUtils'
+import {FileManagementContext} from './Contexts'
 
 const I18n = createI18nScope('files_v2')
 
@@ -36,14 +37,13 @@ const fetchQuota = async (contextType: string, contextId: string) => {
   return response.json()
 }
 
-interface FilesUsageBarProps {
-  contextType: string
-  contextId: string
-}
-
-const FilesUsageBar = ({contextType, contextId}: FilesUsageBarProps) => {
-  const queryKey = useMemo(() => ['quota', contextType, contextId], [contextType, contextId])
-  const {data, error, isLoading} = useQuery(queryKey, () => fetchQuota(contextType, contextId))
+const FilesUsageBar = () => {
+  const {contextType, contextId} = useContext(FileManagementContext)
+  const {data, error, isLoading} = useQuery({
+    queryKey: ['quota'],
+    queryFn: () => fetchQuota(contextType, contextId),
+    staleTime: 0,
+  })
 
   if (error) {
     showFlashError(I18n.t('An error occurred while loading files usage data'))(error as Error)

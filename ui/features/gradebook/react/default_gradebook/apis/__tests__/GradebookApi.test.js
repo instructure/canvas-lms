@@ -172,7 +172,7 @@ describe('GradebookApi', () => {
         assignmentId,
         userId,
         {latePolicyStatus: 'none'},
-        'points'
+        'points',
       )
       const bodyData = JSON.parse(getRequest().requestBody)
       expect(bodyData.prefer_points_over_scheme).toBe(true)
@@ -184,7 +184,7 @@ describe('GradebookApi', () => {
         assignmentId,
         userId,
         {latePolicyStatus: 'none'},
-        'percent'
+        'percent',
       )
       const bodyData = JSON.parse(getRequest().requestBody)
       expect(bodyData.prefer_points_over_scheme).toBe(false)

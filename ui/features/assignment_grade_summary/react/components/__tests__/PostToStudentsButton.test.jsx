@@ -73,7 +73,7 @@ describe('GradeSummary PostToStudentsButton', () => {
 
     test('is not read-only', () => {
       expect(
-        screen.getByRole('button', {name: 'Post to Students'}).getAttribute('aria-readonly')
+        screen.getByRole('button', {name: 'Post to Students'}).getAttribute('aria-readonly'),
       ).not.toBe('true')
     })
 
@@ -96,7 +96,7 @@ describe('GradeSummary PostToStudentsButton', () => {
 
     test('is read-only', () => {
       expect(
-        screen.getByRole('button', {name: 'Posting to Students'}).getAttribute('aria-readonly')
+        screen.getByRole('button', {name: 'Posting to Students'}).getAttribute('aria-readonly'),
       ).toBe('true')
     })
 
@@ -121,7 +121,7 @@ describe('GradeSummary PostToStudentsButton', () => {
       expect(
         screen
           .getByRole('button', {name: 'Grades Posted to Students'})
-          .getAttribute('aria-readonly')
+          .getAttribute('aria-readonly'),
       ).toBe('true')
     })
 
@@ -144,7 +144,7 @@ describe('GradeSummary PostToStudentsButton', () => {
 
     test('is not read-only', () => {
       expect(
-        screen.getByRole('button', {name: 'Post to Students'}).getAttribute('aria-readonly')
+        screen.getByRole('button', {name: 'Post to Students'}).getAttribute('aria-readonly'),
       ).toBe('false')
     })
 

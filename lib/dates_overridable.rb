@@ -83,31 +83,22 @@ module DatesOverridable
   end
 
   def all_assignment_overrides
-    if Account.site_admin.feature_enabled? :selective_release_backend
-      assignment_overrides.or(AssignmentOverride.active.where(context_module_id: module_ids))
-    else
-      assignment_overrides.where.not(set_type: "Course")
-    end
+    assignment_overrides.or(AssignmentOverride.active.where(context_module_id: module_ids))
   end
 
   def preloaded_all_overrides
     return nil if @preloaded_overrides.nil? || @preloaded_module_overrides.nil?
-    return @preloaded_overrides.reject { |ao| ao.set_type == "Course" } unless Account.site_admin.feature_enabled? :selective_release_backend
 
     @preloaded_overrides + @preloaded_module_overrides
   end
 
   def visible_to_everyone
-    if Account.site_admin.feature_enabled? :selective_release_backend
-      if is_a?(DiscussionTopic)
-        # need to check if is_section_specific for ungraded discussions
-        # this column will eventually be deprecated and then this can be removed
-        course_overrides? || ((!only_visible_to_overrides && !is_section_specific) && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
-      else
-        course_overrides? || (!only_visible_to_overrides && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
-      end
+    if is_a?(DiscussionTopic)
+      # need to check if is_section_specific for ungraded discussions
+      # this column will eventually be deprecated and then this can be removed
+      course_overrides? || ((!only_visible_to_overrides && !is_section_specific) && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
     else
-      !only_visible_to_overrides
+      course_overrides? || (!only_visible_to_overrides && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
     end
   end
 
@@ -131,7 +122,6 @@ module DatesOverridable
   end
 
   def self.preload_override_data_for_objects(learning_objects)
-    return unless Account.site_admin.feature_enabled? :selective_release_backend
     return if learning_objects.empty?
 
     preload_overrides(learning_objects)

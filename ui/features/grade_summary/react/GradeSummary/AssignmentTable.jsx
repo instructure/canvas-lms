@@ -53,7 +53,7 @@ const getCurrentOrFinalGrade = (
   allGradingPeriods,
   calculateOnlyGradedAssignments,
   current,
-  final
+  final,
 ) => {
   if (allGradingPeriods) {
     return calculateOnlyGradedAssignments ? current : final
@@ -83,8 +83,8 @@ const AssignmentTable = ({
       filteredAssignments(queryData, calculateOnlyGradedAssignments, activeWhatIfScores),
       calculateOnlyGradedAssignments,
       queryData?.applyGroupWeights,
-      activeWhatIfScores
-    )
+      activeWhatIfScores,
+    ),
   )
   const overrideGrade =
     queryData?.usersConnection?.nodes[0]?.enrollments[0]?.grades?.overrideGrade || null
@@ -96,13 +96,13 @@ const AssignmentTable = ({
       filteredAssignments(queryData, calculateOnlyGradedAssignments, activeWhatIfScores),
       calculateOnlyGradedAssignments,
       queryData?.applyGroupWeights,
-      activeWhatIfScores
+      activeWhatIfScores,
     )
     setCourseGrades(grades)
   }, [activeWhatIfScores, calculateOnlyGradedAssignments, queryData])
 
   const [droppedAssignments, setDroppedAssignments] = useState(
-    listDroppedAssignments(queryData, getGradingPeriodID() === '0', true)
+    listDroppedAssignments(queryData, getGradingPeriodID() === '0', true),
   )
 
   const handleCalculateOnlyGradedAssignmentsChange = useCallback(() => {
@@ -172,14 +172,14 @@ const AssignmentTable = ({
                 setOpenRubricDetailIds,
                 openRubricDetailIds,
                 setActiveWhatIfScores,
-                activeWhatIfScores
+                activeWhatIfScores,
               ),
               openAssignmentDetailIds.includes(modifiedAssignment._id) &&
               modifiedAssignment?.scoreStatistic
                 ? scoreDistributionRow(
                     modifiedAssignment,
                     setOpenAssignmentDetailIds,
-                    openAssignmentDetailIds
+                    openAssignmentDetailIds,
                   )
                 : null,
               openRubricDetailIds.includes(modifiedAssignment._id) && modifiedAssignment.rubric
@@ -196,7 +196,7 @@ const AssignmentTable = ({
                 calculateOnlyGradedAssignments,
                 calculateOnlyGradedAssignments
                   ? courseGrades?.assignmentGroups[assignmentGroup._id]?.current
-                  : courseGrades?.assignmentGroups[assignmentGroup._id]?.current
+                  : courseGrades?.assignmentGroups[assignmentGroup._id]?.current,
               )
             })
           : queryData?.gradingPeriodsConnection?.nodes?.map(gradingPeriod => {
@@ -207,7 +207,7 @@ const AssignmentTable = ({
                     calculateOnlyGradedAssignments,
                     calculateOnlyGradedAssignments
                       ? courseGrades?.gradingPeriods[gradingPeriod._id].current
-                      : courseGrades?.gradingPeriods[gradingPeriod._id].current
+                      : courseGrades?.gradingPeriods[gradingPeriod._id].current,
                   )
                 : null
             })}
@@ -220,9 +220,9 @@ const AssignmentTable = ({
               calculateOnlyGradedAssignments,
               courseGrades?.current,
               courseGrades?.final,
-              activeWhatIfScores
+              activeWhatIfScores,
             ),
-            overrideGrade
+            overrideGrade,
           )}
       </Table.Body>
     </Table>

@@ -37,7 +37,7 @@ export default function Filter(props) {
         onChange={props.onChange}
         renderBeforeInput={<IconSearchLine />}
         aria-label={I18n.t(
-          'As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input.'
+          'As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input.',
         )}
         data-testid="group-search-input"
       />

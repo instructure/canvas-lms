@@ -17,14 +17,8 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
 import PathOption from '../path-option'
-
-const equal = (x, y) => expect(x).toEqual(y)
-
-const container = document.createElement('div')
-container.setAttribute('id', 'fixtures')
-document.body.appendChild(container)
 
 const defaultProps = () => ({
   assignments: [
@@ -56,49 +50,79 @@ const defaultProps = () => ({
   setId: 1,
   optionIndex: 0,
   selectedOption: null,
-  selectOption: () => {},
+  selectOption: jest.fn(),
 })
 
-const renderComponent = props => TestUtils.renderIntoDocument(<PathOption {...props} />)
-
-describe('Path Option', () => {
-  test('renders component', () => {
+describe('PathOption', () => {
+  it('renders the component with basic structure', () => {
     const props = defaultProps()
-    const component = renderComponent(props)
+    const {container} = render(<PathOption {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-option')
-    equal(renderedList.length, 1, 'renders component')
+    const option = container.querySelector('.cmp-option')
+    expect(option).toBeInTheDocument()
   })
 
-  test('renders all assignments', () => {
+  it('displays all assignments in the option', () => {
     const props = defaultProps()
-    const component = renderComponent(props)
+    const {container} = render(<PathOption {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-assignment')
-    equal(renderedList.length, 2, 'renders assignments')
+    const assignments = container.querySelectorAll('.cmp-assignment')
+    expect(assignments).toHaveLength(2)
   })
 
-  test('renders selected when selected', () => {
+  it('shows assignment details correctly', () => {
+    const props = defaultProps()
+    const {getByText} = render(<PathOption {...props} />)
+
+    expect(getByText('Ch 2 Quiz')).toBeInTheDocument()
+    expect(getByText('Ch 2 Review')).toBeInTheDocument()
+  })
+
+  it('applies selected styling when option is selected', () => {
     const props = defaultProps()
     props.selectedOption = 1
-    const component = renderComponent(props)
+    const {container} = render(<PathOption {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'cmp-option__selected'
-    )
-    equal(renderedList.length, 1, 'renders selected')
+    const selectedOption = container.querySelector('.cmp-option__selected')
+    expect(selectedOption).toBeInTheDocument()
   })
 
-  test('renders disabled when another path is selected', () => {
+  it('applies disabled styling when another option is selected', () => {
     const props = defaultProps()
     props.selectedOption = 2
-    const component = renderComponent(props)
+    const {container} = render(<PathOption {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'cmp-option__disabled'
-    )
-    equal(renderedList.length, 1, 'renders disabled')
+    const disabledOption = container.querySelector('.cmp-option__disabled')
+    expect(disabledOption).toBeInTheDocument()
+  })
+
+  it('shows points for each assignment', () => {
+    const props = defaultProps()
+    const {getAllByText} = render(<PathOption {...props} />)
+
+    const pointsElements = getAllByText('10 pts')
+    expect(pointsElements).toHaveLength(2)
+  })
+
+  it('shows assignment titles correctly', () => {
+    const props = defaultProps()
+    const {getByText} = render(<PathOption {...props} />)
+
+    expect(getByText('Ch 2 Quiz')).toBeInTheDocument()
+    expect(getByText('Ch 2 Review')).toBeInTheDocument()
+  })
+
+  it('shows option number correctly', () => {
+    const props = defaultProps()
+    const {getByText} = render(<PathOption {...props} />)
+
+    expect(getByText('Option 1')).toBeInTheDocument()
+  })
+
+  it('has a select button', () => {
+    const props = defaultProps()
+    const {getByRole} = render(<PathOption {...props} />)
+
+    expect(getByRole('button', {name: 'Select'})).toBeInTheDocument()
   })
 })

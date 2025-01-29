@@ -156,9 +156,9 @@ export default function FilterTrayPreset({
   // make the order of filters consistent
   const filtersWithItemsChunks = chunk(
     [sectionFilter, moduleFilter, assignmentGroupFilter, studentGroupFilter].filter(
-      x => x
+      x => x,
     ) as Filter[],
-    2
+    2,
   )
 
   const gradingPeriodFilter = ensureFilter(stagedFilters, 'grading-period')
@@ -205,7 +205,7 @@ export default function FilterTrayPreset({
                     },
                     {
                       count: stagedFilters.filter(isFilterNotEmpty).length,
-                    }
+                    },
                   )}
                 </Text>
               </View>
@@ -236,7 +236,6 @@ export default function FilterTrayPreset({
           </Flex>
 
           {filtersWithItemsChunks.map((filters, index) => (
-             
             <Flex key={`chunk-${index}`} margin="small 0">
               {filters.map(filter => (
                 <Flex.Item key={filter.id} size="50%" padding="0 xx-small 0 0">
@@ -255,7 +254,6 @@ export default function FilterTrayPreset({
           ))}
 
           {filtersAlwaysShownChunks.map((filters, index) => (
-             
             <Flex key={`always-shown-${index}`} margin="small 0">
               {filters.map(filter => (
                 <Flex.Item key={filter.id} size="50%" padding="0 xx-small 0 0">

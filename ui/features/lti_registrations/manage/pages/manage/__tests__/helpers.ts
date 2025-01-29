@@ -45,7 +45,7 @@ export const mockRegistration = (
   n: string,
   i: number,
   configuration: Partial<InternalLtiConfiguration> = {},
-  registration: Partial<LtiRegistration> = {}
+  registration: Partial<LtiRegistration> = {},
 ): LtiRegistrationWithConfiguration => {
   const id = i.toString()
   const date = new Date()

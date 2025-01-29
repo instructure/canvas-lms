@@ -77,7 +77,7 @@ interface QueryResult {
 const fetchAllPages = async (
   courseId: string,
   cursor: string | null = null,
-  combinedResults: any[] = []
+  combinedResults: any[] = [],
 ): Promise<any[]> => {
   const result: QueryResult = await executeQuery(QUERY, {courseId, cursor})
 

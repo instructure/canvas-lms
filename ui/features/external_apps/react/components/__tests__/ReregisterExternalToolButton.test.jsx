@@ -17,69 +17,58 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {Simulate} from 'react-dom/test-utils'
+import {render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Modal from '@canvas/react-modal'
 import ReregisterExternalToolButton from '../ReregisterExternalToolButton'
 import store from '../../lib/ExternalAppsStore'
 
-const container = document.createElement('div')
-container.setAttribute('id', 'fixtures')
-document.body.appendChild(container)
-
-const wrapper = document.getElementById('fixtures')
-Modal.setAppElement(wrapper)
-
-const ok = value => expect(value).toBeTruthy()
-
-let tools
-
-const createElement = data => (
-  <ReregisterExternalToolButton
-    tool={data.tool}
-    canAdd={true}
-    returnFocus={() => {}}
-  />
-)
-
-// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
-
-const getDOMNodes = function (data) {
-  const component = renderComponent(data)
-  const btnTriggerReregister = component.refs.reregisterExternalToolButton
-  return [component, btnTriggerReregister]
-}
+const tools = [
+  {
+    app_id: 2,
+    app_type: 'Lti::ToolProxy',
+    description: null,
+    enabled: true,
+    installed_locally: true,
+    name: 'SomeTool',
+    reregistration_url: 'http://some.lti/reregister',
+  },
+]
 
 describe('ExternalApps.ReregisterExternalToolButton', () => {
+  let container
+
   beforeEach(() => {
-    tools = [
-      {
-        app_id: 2,
-        app_type: 'Lti::ToolProxy',
-        description: null,
-        enabled: true,
-        installed_locally: true,
-        name: 'SomeTool',
-        reregistration_url: 'http://some.lti/reregister',
-      },
-    ]
+    container = document.createElement('div')
+    container.setAttribute('id', 'fixtures')
+    document.body.appendChild(container)
+    Modal.setAppElement(container)
     store.reset()
     store.setState({externalTools: tools})
   })
 
   afterEach(() => {
     store.reset()
-    ReactDOM.unmountComponentAtNode(wrapper)
+    container.remove()
   })
 
-  test('open and close modal', function () {
-    const data = {tool: tools[0]}
-    const [component, btnTriggerReregister] = Array.from(getDOMNodes(data))
-    Simulate.click(btnTriggerReregister)
-    ok(component.state.modalIsOpen, 'modal is open')
+  it('opens and closes modal', async () => {
+    render(<ReregisterExternalToolButton tool={tools[0]} canAdd={true} returnFocus={() => {}} />, {
+      container,
+    })
 
-    component.closeModal()
-    ok(!component.state.modalIsOpen, 'modal is not open')
+    const reregisterLink = screen.getByRole('menuitem', {name: /reregister sometool/i})
+    userEvent.click(reregisterLink)
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    const closeButton = screen.getByRole('button', {name: /close/i})
+    userEvent.click(closeButton)
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    })
   })
 })

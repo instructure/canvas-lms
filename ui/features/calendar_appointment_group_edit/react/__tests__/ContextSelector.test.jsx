@@ -97,7 +97,7 @@ describe('Other Calendars modal ', () => {
   it('calls setSelectedContexts when a course is selected', () => {
     const setSelectedContexts = jest.fn()
     const {getByText, getByRole, rerender} = render(
-      <ContextSelector {...DEFAULT_PROPS} setSelectedContexts={setSelectedContexts} />
+      <ContextSelector {...DEFAULT_PROPS} setSelectedContexts={setSelectedContexts} />,
     )
     act(() => getByRole('button', {name: 'Select Calendars'}).click())
     act(() => getByText('testcourse').click())
@@ -107,7 +107,7 @@ describe('Other Calendars modal ', () => {
         {...DEFAULT_PROPS}
         setSelectedContexts={setSelectedContexts}
         selectedContexts={new Set(['course_1'])}
-      />
+      />,
     )
     act(() => getByText('testcourse2').click())
     expect(setSelectedContexts).toHaveBeenCalledWith(new Set(['course_1', 'course_2']))
@@ -121,7 +121,7 @@ describe('Other Calendars modal ', () => {
         {...DEFAULT_PROPS}
         setSelectedContexts={setSelectedContexts}
         setSelectedSubContexts={setSelectedSubContexts}
-      />
+      />,
     )
     act(() => getByRole('button', {name: 'Select Calendars'}).click())
     act(() => getByText('testsection').click())
@@ -135,7 +135,7 @@ describe('Other Calendars modal ', () => {
         {...DEFAULT_PROPS}
         selectedContexts={new Set(['course_1', 'course_2'])}
         selectedSubContexts={new Set(['course_section_1'])}
-      />
+      />,
     )
     expect(getByLabelText('testcourse')).toBeChecked()
     expect(getByLabelText('testcourse2')).toBeChecked()
@@ -146,11 +146,11 @@ describe('Other Calendars modal ', () => {
 
   it('renders the button label according to the number of selected contexts', () => {
     const {getByRole, rerender} = render(
-      <ContextSelector {...DEFAULT_PROPS} selectedContexts={new Set(['course_1'])} />
+      <ContextSelector {...DEFAULT_PROPS} selectedContexts={new Set(['course_1'])} />,
     )
     expect(getByRole('button', {name: 'testcourse'})).toBeInTheDocument()
     rerender(
-      <ContextSelector {...DEFAULT_PROPS} selectedContexts={new Set(['course_1', 'course_2'])} />
+      <ContextSelector {...DEFAULT_PROPS} selectedContexts={new Set(['course_1', 'course_2'])} />,
     )
     expect(getByRole('button', {name: 'testcourse and 1 other'})).toBeInTheDocument()
   })

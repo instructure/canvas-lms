@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
+import { act } from 'react-dom/test-utils'
 import SpeedGraderLink from '../index'
 
 const container = document.createElement('div')
@@ -30,10 +31,13 @@ const strictEqual = (x, y) => expect(x).toStrictEqual(y)
 describe('SpeedGraderLink', () => {
   let $container
   let context
+  let root
 
-  function mountComponent() {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(<SpeedGraderLink {...context} />, $container)
+  async function mountComponent() {
+    await act(async () => {
+      root = createRoot($container)
+      root.render(<SpeedGraderLink {...context} />)
+    })
   }
 
   function getLink() {
@@ -50,25 +54,25 @@ describe('SpeedGraderLink', () => {
   })
 
   afterEach(() => {
-    ReactDOM.unmountComponentAtNode($container)
+    root.unmount()
     $container.remove()
   })
 
-  test('renders a link with the href', () => {
-    mountComponent()
+  test('renders a link with the href', async () => {
+    await mountComponent()
     ok(getLink())
   })
 
-  test('renders a disabled link when disabled', () => {
+  test('renders a disabled link when disabled', async () => {
     context.disabled = true
-    mountComponent()
+    await mountComponent()
     strictEqual(getLink().getAttribute('aria-disabled'), 'true')
   })
 
-  test('the disabled link prevents default on clicks', () => {
+  test('the disabled link prevents default on clicks', async () => {
     context.disabled = true
     const event = new MouseEvent('click', {bubbles: true, cancelable: true})
-    mountComponent()
+    await mountComponent()
     getLink().dispatchEvent(event)
     strictEqual(event.defaultPrevented, true)
   })
@@ -82,14 +86,14 @@ describe('SpeedGraderLink', () => {
     strictEqual(tooltip.innerText, 'tooltip text')
   })
 
-  test('has a class of "icon-speed-grader"', () => {
-    mountComponent()
+  test('has a class of "icon-speed-grader"', async () => {
+    await mountComponent()
     strictEqual(getLink().className, 'icon-speed-grader')
   })
 
-  test('takes optional classes', () => {
+  test('takes optional classes', async () => {
     context.className = 'classA classB'
-    mountComponent()
+    await mountComponent()
     strictEqual(getLink().className, 'icon-speed-grader classA classB')
   })
 })

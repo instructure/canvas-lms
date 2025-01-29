@@ -32,15 +32,15 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Restore Courses tab)'),
       description: I18n.t(
-        'To search for a course in the Restore Courses tab, Course Content - view must also be enabled.'
+        'To search for a course in the Restore Courses tab, Course Content - view must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To restore a deleted course in an account, Manage Courses - delete and Course Content - view must also be enabled.'
+        'To restore a deleted course in an account, Manage Courses - delete and Course Content - view must also be enabled.',
       ),
     },
   ],
   [],
-  []
+  [],
 )

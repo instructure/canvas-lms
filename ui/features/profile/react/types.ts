@@ -23,4 +23,5 @@ export interface Token {
   created_at: string
   expires_at: string
   last_used_at: string
+  can_manually_regenerate: boolean
 }

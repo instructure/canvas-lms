@@ -63,7 +63,7 @@ describe('GradeSummary FlashMessageHolder', () => {
     wrapper = render(
       <Provider store={store}>
         <FlashMessageHolder />
-      </Provider>
+      </Provider>,
     )
   }
 
@@ -156,7 +156,7 @@ describe('GradeSummary FlashMessageHolder', () => {
     beforeEach(() => {
       mountComponent()
       store.dispatch(
-        GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.SUCCESS)
+        GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.SUCCESS),
       )
     })
 
@@ -179,7 +179,7 @@ describe('GradeSummary FlashMessageHolder', () => {
     beforeEach(() => {
       mountComponent()
       store.dispatch(
-        GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.FAILURE)
+        GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.FAILURE),
       )
     })
 
@@ -368,7 +368,7 @@ describe('GradeSummary FlashMessageHolder', () => {
     beforeEach(() => {
       mountComponent()
       store.dispatch(
-        AssignmentActions.setReleaseGradesStatus(AssignmentActions.GRADES_ALREADY_RELEASED)
+        AssignmentActions.setReleaseGradesStatus(AssignmentActions.GRADES_ALREADY_RELEASED),
       )
     })
 
@@ -392,8 +392,8 @@ describe('GradeSummary FlashMessageHolder', () => {
       mountComponent()
       store.dispatch(
         AssignmentActions.setReleaseGradesStatus(
-          AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE
-        )
+          AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
+        ),
       )
     })
 

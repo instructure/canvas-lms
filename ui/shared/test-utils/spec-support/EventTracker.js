@@ -102,7 +102,7 @@ export default class EventTracker {
       const [tracker] = this._trackers.eventListeners
       tracker.currentContext.addFailure(
         'Event handlers must be removed before tests complete',
-        tracker
+        tracker,
       )
       this.removeUnmanagedListeners()
     }
@@ -135,7 +135,7 @@ export default class EventTracker {
         } catch (error) {
           tracker.currentContext.addCriticalFailure(
             `Unmanaged error in '${eventName}' event listener`,
-            tracker
+            tracker,
           )
         }
       }
@@ -147,7 +147,7 @@ export default class EventTracker {
           window,
           eventName,
           tracker.listener,
-          optionsOrUseCapture
+          optionsOrUseCapture,
         )
       }
 
@@ -156,7 +156,7 @@ export default class EventTracker {
         window,
         eventName,
         tracker.listener,
-        optionsOrUseCapture
+        optionsOrUseCapture,
       )
     }
   }
@@ -169,7 +169,7 @@ export default class EventTracker {
         eventListener =>
           eventListener.originalListener === listener &&
           eventListener.eventName === eventName &&
-          matchOptionsOrUseCapture(eventListener.optionsOrUseCapture, optionsOrUseCapture)
+          matchOptionsOrUseCapture(eventListener.optionsOrUseCapture, optionsOrUseCapture),
       )
 
       if (tracker) {

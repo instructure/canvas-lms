@@ -44,7 +44,7 @@ export default function RequeueButton({id, onRequeue}) {
       },
       _error => {
         setLoading(false)
-      }
+      },
     )
   }
 

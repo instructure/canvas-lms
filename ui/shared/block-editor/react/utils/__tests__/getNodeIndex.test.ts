@@ -16,71 +16,68 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type Node} from '@craftjs/core'
 import {getNodeIndex, getSectionLocation} from '../getNodeIndex'
+import {type NodeQuery} from '../types'
 
 describe('getNodeIndex', () => {
   let currDescendants: string[] = []
 
   describe('getNodeIndex', () => {
     it('returns the index of the node in the list of descendants', () => {
-      const node = {id: '1', data: {parent: 'ROOT'}}
+      const node = {id: '1', data: {parent: 'ROOT'}} as Node
       currDescendants = ['2', '1', '3']
-      const query = {
+      const query: NodeQuery = {
         node: (_id: string) => ({
           descendants: () => currDescendants,
         }),
       }
-      // @ts-expect-error
       expect(getNodeIndex(node, query)).toEqual(1)
     })
   })
 
   describe('getSectionLocation', () => {
     it('should return "alone" if node is the only section', () => {
-      const node = {id: '1', data: {parent: 'ROOT'}}
+      const node = {id: '1', data: {parent: 'ROOT'}} as Node
       currDescendants = ['1']
-      const query = {
+      const query: NodeQuery = {
         node: (_id: string) => ({
           descendants: () => currDescendants,
         }),
       }
-      // @ts-expect-error
       expect(getSectionLocation(node, query)).toEqual('alone')
     })
 
     it('should return "top" if node is the first section', () => {
-      const node = {id: '1', data: {parent: 'ROOT'}}
+      const node = {id: '1', data: {parent: 'ROOT'}} as Node
       currDescendants = ['1', '2']
-      const query = {
+      const query: NodeQuery = {
         node: (_id: string) => ({
           descendants: () => currDescendants,
         }),
       }
-      // @ts-expect-error
       expect(getSectionLocation(node, query)).toEqual('top')
     })
 
     it('should return "bottom" if node is the last section', () => {
-      const node = {id: '1', data: {parent: 'ROOT'}}
+      const node = {id: '1', data: {parent: 'ROOT'}} as Node
       currDescendants = ['2', '1']
-      const query = {
+      const query: NodeQuery = {
         node: (_id: string) => ({
           descendants: () => currDescendants,
         }),
       }
-      // @ts-expect-error
       expect(getSectionLocation(node, query)).toEqual('bottom')
     })
 
     it('should return "middle" if node is in the middle of sections', () => {
-      const node = {id: '1', data: {parent: 'ROOT'}}
+      const node = {id: '1', data: {parent: 'ROOT'}} as Node
       currDescendants = ['2', '1', '3']
-      const query = {
+      const query: NodeQuery = {
         node: (_id: string) => ({
           descendants: () => currDescendants,
         }),
       }
-      // @ts-expect-error
       expect(getSectionLocation(node, query)).toEqual('middle')
     })
   })

@@ -38,7 +38,7 @@ export function GradingPeriodScores({
   includeUngradedAssignments,
 }: Props) {
   const matchingGradingPeriod = gradingPeriodSet.grading_periods.find(
-    ({id}) => id === gradingPeriodId
+    ({id}) => id === gradingPeriodId,
   )
 
   if (!matchingGradingPeriod) {

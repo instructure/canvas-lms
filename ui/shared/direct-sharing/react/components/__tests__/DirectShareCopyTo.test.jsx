@@ -69,7 +69,7 @@ describe('DirectShareCopyToTray', () => {
 
     it('handles error when user managed course fetch fails', async () => {
       useManagedCourseSearchApi.mockImplementationOnce(({error}) =>
-        error([{status: 400, body: 'Error fetching data'}])
+        error([{status: 400, body: 'Error fetching data'}]),
       )
       const {getByText} = render(<DirectShareCourseTray open={true} />)
 
@@ -81,7 +81,7 @@ describe('DirectShareCopyToTray', () => {
         success(userManagedCoursesList)
       })
       useModuleCourseSearchApi.mockImplementationOnce(({error}) =>
-        error([{status: 400, body: 'Error fetching data'}])
+        error([{status: 400, body: 'Error fetching data'}]),
       )
       const {getByText} = render(<DirectShareCourseTray open={true} />)
       fireEvent.click(getByText(/select a course/i))

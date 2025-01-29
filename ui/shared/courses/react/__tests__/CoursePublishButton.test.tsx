@@ -21,7 +21,7 @@ import CoursePublishButton from '../CoursePublishButton'
 import {render} from '@testing-library/react'
 
 describe('CoursePublishButton', () => {
-  const getProps = (props: Object) => {
+  const getProps = (props: object) => {
     return {
       isPublished: false,
       courseId: '1',
@@ -56,7 +56,7 @@ describe('CoursePublishButton', () => {
 
   it('publish option is disabled if course is published', () => {
     const {getByText, getByLabelText} = render(
-      <CoursePublishButton {...getProps({isPublished: true})} />
+      <CoursePublishButton {...getProps({isPublished: true})} />,
     )
     getByText('Published').click()
     expect(getByLabelText('Publish').getAttribute('aria-disabled')).toBeTruthy()

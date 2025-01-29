@@ -46,7 +46,7 @@ export const loadDefaultRule = createAction(LOAD_DEFAULT_RULE)
 
 export const LOAD_RULE_FOR_ASSIGNMENT = 'LOAD_RULE_FOR_ASSIGNMENT'
 export const loadRuleForAssignment = createAction(LOAD_RULE_FOR_ASSIGNMENT, state =>
-  CyoeApi.getRuleForAssignment(state)
+  CyoeApi.getRuleForAssignment(state),
 )
 
 export const SET_SCORE_AT_INDEX = 'SET_SCORE_AT_INDEX'
@@ -174,7 +174,7 @@ export const moveAssignment = (oldPath, newPath, assignment) => {
         insertAssignment({
           path: newPath,
           assignment,
-        })
+        }),
       )
 
       dispatch(removeAssignment({path: oldPath}))

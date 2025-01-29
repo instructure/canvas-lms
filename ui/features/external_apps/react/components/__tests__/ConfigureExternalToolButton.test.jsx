@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ConfigureExternalToolButton from '../ConfigureExternalToolButton'
 
@@ -42,7 +42,7 @@ beforeEach(() => {
 test('uses the tool configuration "url" when present', () => {
   render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
   expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
-    'url=https%3A%2F%2Fadvantage.tool.com'
+    'url=https%3A%2F%2Fadvantage.tool.com',
   )
 })
 
@@ -52,21 +52,26 @@ test('uses the tool configuration "target_link_uri" when "url" is not present', 
   }
   render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
   expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
-    'url=https%3A%2F%2Fadvantage.tool.com'
+    'url=https%3A%2F%2Fadvantage.tool.com',
   )
 })
 
 test('includes the tool_configuration placement', () => {
   render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
   expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
-    'placement=tool_configuration'
+    'placement=tool_configuration',
   )
 })
 
 test('shows beginning info alert and adds styles to iframe', () => {
   const ref = React.createRef()
   render(
-    <ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} ref={ref} />
+    <ConfigureExternalToolButton
+      tool={tool}
+      modalIsOpen={true}
+      returnFocus={jest.fn()}
+      ref={ref}
+    />,
   )
   ref.current.handleAlertFocus({target: {className: 'before'}})
   expect(ref.current.state.beforeExternalContentAlertClass).toEqual('')
@@ -78,7 +83,12 @@ test('shows beginning info alert and adds styles to iframe', () => {
 test('shows ending info alert and adds styles to iframe', () => {
   const ref = React.createRef()
   render(
-    <ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} ref={ref} />
+    <ConfigureExternalToolButton
+      tool={tool}
+      modalIsOpen={true}
+      returnFocus={jest.fn()}
+      ref={ref}
+    />,
   )
 
   ref.current.handleAlertFocus({target: {className: 'after'}})
@@ -119,7 +129,12 @@ test("doesn't show alerts or add border to iframe by default", () => {
 test('sets the iframe allowances', () => {
   const ref = React.createRef()
   render(
-    <ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} ref={ref} />
+    <ConfigureExternalToolButton
+      tool={tool}
+      modalIsOpen={true}
+      returnFocus={jest.fn()}
+      ref={ref}
+    />,
   )
   ref.current.handleAlertFocus({target: {className: 'before'}})
   const iframe = screen.getByTitle(/Tool Configuration/i)
@@ -143,6 +158,8 @@ test('opens and closes the modal', async () => {
 
   await userEvent.click(screen.getByTestId('close-modal-button'))
 
-  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  await waitFor(() => {
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
   expect(returnFocus).toHaveBeenCalled()
 })

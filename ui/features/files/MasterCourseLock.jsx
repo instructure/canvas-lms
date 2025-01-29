@@ -90,8 +90,8 @@ class MasterCourseLock extends React.Component {
       })
       .catch(
         showFlashError(
-          I18n.t('An error occurred changing the lock state for "%{fileName}"', {fileName})
-        )
+          I18n.t('An error occurred changing the lock state for "%{fileName}"', {fileName}),
+        ),
       )
   }
 

@@ -82,7 +82,7 @@ const Todo = ({
                 one: '1 submission needs grading',
                 other: '%{count} submissions need grading',
               },
-              {count: needs_grading_count}
+              {count: needs_grading_count},
             )}
           >
             {formattedCount}
@@ -146,7 +146,7 @@ Todo.propTypes = {
       PropTypes.shape({
         base: PropTypes.bool,
         due_at: PropTypes.string,
-      })
+      }),
     ).isRequired,
     due_at: PropTypes.string,
     name: PropTypes.string.isRequired,

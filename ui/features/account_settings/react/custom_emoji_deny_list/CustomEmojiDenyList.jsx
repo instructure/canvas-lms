@@ -30,7 +30,7 @@ export default function CustomEmojiDenyList() {
   const [blockedEmojis, setBlockedEmojis] = useState(
     ENV.EMOJI_DENY_LIST
       ? ENV.EMOJI_DENY_LIST.split(',').map(id => ({name: data.emojis[id].name, id}))
-      : []
+      : [],
   )
 
   const removeEmoji = id => setBlockedEmojis(blockedEmojis.filter(emoji => emoji.id !== id))
@@ -40,7 +40,7 @@ export default function CustomEmojiDenyList() {
       <legend id="blocked-emojis">{I18n.t('Blocked Emojis')}</legend>
       <p>
         {I18n.t(
-          'Selected emojis will not be available in the "Emoji Picker" for students or instructors.'
+          'Selected emojis will not be available in the "Emoji Picker" for students or instructors.',
         )}
       </p>
       <View

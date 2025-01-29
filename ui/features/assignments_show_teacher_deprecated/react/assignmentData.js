@@ -464,7 +464,7 @@ export const StudentSearchQueryShape = shape({
     shape({
       field: string,
       direction: oneOf(['ascending', 'descending']),
-    })
+    }),
   ),
 })
 
@@ -474,7 +474,7 @@ export const StudentSearchQueryShape = shape({
 export function requiredIfDetail(props, propName, componentName) {
   if (!props[propName] && props.variant === 'detail') {
     return new Error(
-      `The prop ${propName} is required on ${componentName} if the variant is 'detail'`
+      `The prop ${propName} is required on ${componentName} if the variant is 'detail'`,
     )
   }
 }

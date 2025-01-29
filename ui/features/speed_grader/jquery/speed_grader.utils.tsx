@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -17,26 +18,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
+import type {RubricAssessment} from '@canvas/grading/grading.d'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import htmlEscape from '@instructure/html-escape'
+import * as Alerts from '@instructure/ui-alerts'
+import {Pill} from '@instructure/ui-pill'
 import type JQuery from 'jquery'
+import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import $ from 'jquery'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import JQuerySelectorCache from '../JQuerySelectorCache'
+import SpeedGraderPostGradesMenu from '../react/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from '../react/SpeedGraderSettingsMenu'
-import htmlEscape from '@instructure/html-escape'
-import {Pill} from '@instructure/ui-pill'
-import * as Alerts from '@instructure/ui-alerts'
-import type {RubricAssessment} from '@canvas/grading/grading.d'
 import type {
   Enrollment,
   GradingError,
   SpeedGrader,
-  Submission,
   StudentWithSubmission,
+  Submission,
 } from './speed_grader.d'
-import SpeedGraderPostGradesMenu from '../react/SpeedGraderPostGradesMenu'
-import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
-import JQuerySelectorCache from '../JQuerySelectorCache'
 import '@canvas/jquery-keycodes'
 
 const selectors = new JQuerySelectorCache()
@@ -119,7 +120,7 @@ export const configureRecognition = (
     recording_expired: string
     mic_blocked: string
     no_speech: string
-  }
+  },
 ) => {
   recognition.continuous = true
   recognition.interimResults = true
@@ -129,14 +130,14 @@ export const configureRecognition = (
   }
   let final_transcript = ''
 
-  recognition.onstart = function () {
+  recognition.onstart = () => {
     $('#dialog_message').text(messages.recording)
     $('#record_button')
       .attr('recording', 'true')
       .attr('aria-label', I18n.t('dialog_button.aria_stop', 'Hit "Stop" to end recording.'))
   }
 
-  recognition.onresult = function (event) {
+  recognition.onresult = event => {
     let interim_transcript = ''
     for (let i = event.resultIndex; i < event.results.length; i++) {
       if (event.results[i].isFinal) {
@@ -149,21 +150,21 @@ export const configureRecognition = (
     }
   }
 
-  recognition.onaudiostart = function (_event) {
+  recognition.onaudiostart = _event => {
     // this call is required for onaudioend event to trigger
   }
 
-  recognition.onaudioend = function (_event) {
+  recognition.onaudioend = _event => {
     if ($('#final_results').text() !== '' || $('#interim_results').text() !== '') {
       $('#dialog_message').text(messages.recording_expired)
     }
   }
 
-  recognition.onend = function (_event) {
+  recognition.onend = _event => {
     final_transcript = ''
   }
 
-  recognition.onerror = function (event) {
+  recognition.onerror = event => {
     if (event.error === 'not-allowed') {
       $('#dialog_message').text(messages.mic_blocked)
     } else if (event.error === 'no-speech') {
@@ -188,7 +189,7 @@ export function buildAlertMessage() {
   ) {
     alertMessage = I18n.t(
       'Something went wrong. Please try refreshing the page. If the problem persists, you can try loading a single student group in SpeedGrader by using the *Large Course setting*.',
-      {wrappers: [`<a href="/courses/${ENV.course_id}/settings#course_large_course">$1</a>`]}
+      {wrappers: [`<a href="/courses/${ENV.course_id}/settings#course_large_course">$1</a>`]},
     ).string
   } else {
     alertMessage = I18n.t('Something went wrong. Please try refreshing the page.')
@@ -200,7 +201,7 @@ export function initKeyCodes(
   $window: JQuery,
   $grade: JQuery,
   $add_a_comment_textarea: JQuery,
-  EG: SpeedGrader
+  EG: SpeedGrader,
 ) {
   if (ENV.disable_keyboard_shortcuts) {
     return
@@ -234,9 +235,8 @@ export function renderStatusMenu(component: React.ReactElement | null, mountPoin
       ? SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT
       : SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
 
-   
   ReactDOM.render(<></>, document.getElementById(unmountPoint))
-   
+
   ReactDOM.render(component || <></>, mountPoint)
 }
 
@@ -282,18 +282,18 @@ export function unexcuseSubmission(grade: string, submission: Submission, assign
 export function renderPostGradesMenu(EG: SpeedGrader) {
   const {submissionsMap} = window.jsonData
   const submissions = window.jsonData.studentsWithSubmissions.map(
-    (student: StudentWithSubmission) => student.submission
+    (student: StudentWithSubmission) => student.submission,
   )
 
   const hasGradesOrPostableComments = submissions.some(
     (submission: Submission) =>
-      submission && (isGraded(submission) || submission.has_postable_comments)
+      submission && (isGraded(submission) || submission.has_postable_comments),
   )
   const allowHidingGradesOrComments = submissions.some(
-    (submission: Submission) => submission && submission.posted_at != null
+    (submission: Submission) => submission && submission.posted_at != null,
   )
   const allowPostingGradesOrComments = submissions.some(
-    (submission: Submission) => submission && isPostable(submission)
+    (submission: Submission) => submission && isPostable(submission),
   )
 
   function onHideGrades() {
@@ -312,10 +312,9 @@ export function renderPostGradesMenu(EG: SpeedGrader) {
     onPostGrades,
   }
 
-   
   ReactDOM.render(
     <SpeedGraderPostGradesMenu {...props} />,
-    document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT)
+    document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT),
   )
 }
 
@@ -328,12 +327,11 @@ export function renderHiddenSubmissionPill(submission: Submission) {
   if (!mountPoint) throw new Error('hidden submission pill mount point not found')
 
   if (isPostable(submission)) {
-     
     ReactDOM.render(
       <Pill color="warning" margin="0 0 small">
         {I18n.t('Hidden')}
       </Pill>,
-      mountPoint
+      mountPoint,
     )
   } else {
     ReactDOM.unmountComponentAtNode(mountPoint)
@@ -368,7 +366,7 @@ export function renderDeleteAttachmentLink(
   $submission_file: JQuery,
   attachment: {
     display_name: string
-  }
+  },
 ) {
   const $full_width_container = $('#full_width_container')
 
@@ -379,12 +377,11 @@ export function renderDeleteAttachmentLink(
       const url = $(this).attr('href')
       if (!url) throw new Error('submission-file-delete href not found')
       if (
-         
         window.confirm(
           I18n.t(
             'Deleting a submission file is typically done only when a student posts inappropriate or private material.\n\nThis action is irreversible. Are you sure you wish to delete %{file}?',
-            {file: attachment.display_name}
-          )
+            {file: attachment.display_name},
+          ),
         )
       ) {
         $full_width_container.disableWhileLoading(
@@ -401,14 +398,14 @@ export function renderDeleteAttachmentLink(
                 $.flashError(
                   I18n.t(
                     'You do not have permission to delete %{file}. Please contact your account administrator.',
-                    {file: attachment.display_name}
-                  )
+                    {file: attachment.display_name},
+                  ),
                 )
               } else {
                 $.flashError(I18n.t('Error deleting %{file}', {file: attachment.display_name}))
               }
-            }
-          )
+            },
+          ),
         )
       }
     })
@@ -459,7 +456,7 @@ export function renderSettingsMenu(header) {
   }
 
   const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
-   
+
   ReactDOM.render(<SpeedGraderSettingsMenu {...props} />, mountPoint)
 }
 
@@ -467,7 +464,7 @@ export function speedGraderJSONErrorFn(
   _data: GradingError,
   xhr: XMLHttpRequest,
   _textStatus: string,
-  _errorThrown: Error
+  _errorThrown: Error,
 ) {
   if (xhr.status === 504) {
     const alertProps = {
@@ -475,12 +472,11 @@ export function speedGraderJSONErrorFn(
       dismissible: false,
     }
 
-     
     ReactDOM.render(
       <Alert {...alertProps}>
         <span dangerouslySetInnerHTML={buildAlertMessage()} />
       </Alert>,
-      document.getElementById('speed_grader_timeout_alert')
+      document.getElementById('speed_grader_timeout_alert'),
     )
   }
 }
@@ -490,7 +486,7 @@ export function getSelectedAssessment(EG) {
 
   return $.grep(
     EG.currentStudent.rubric_assessments,
-    (n: RubricAssessment) => n.id === selectMenu.val()
+    (n: RubricAssessment) => n.id === selectMenu.val(),
   )[0]
 }
 
@@ -516,11 +512,11 @@ export function isStudentConcluded(studentMap: any, student: string, sectionId: 
   if (sectionId) {
     return studentMap[student].enrollments.some(
       (enrollment: Enrollment) =>
-        enrollment.workflow_state === 'completed' && enrollment.course_section_id === sectionId
+        enrollment.workflow_state === 'completed' && enrollment.course_section_id === sectionId,
     )
   } else {
     return studentMap[student].enrollments.every(
-      (enrollment: Enrollment) => enrollment.workflow_state === 'completed'
+      (enrollment: Enrollment) => enrollment.workflow_state === 'completed',
     )
   }
 }

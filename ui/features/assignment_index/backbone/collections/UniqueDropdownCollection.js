@@ -132,7 +132,7 @@ UniqueDropdownCollection.prototype.calculateTakenValues = function (records) {
         return function (m) {
           return m.get(_this.propertyName)
         }
-      })(this)
+      })(this),
     )
   } else {
     takenValues = function () {
@@ -156,7 +156,7 @@ UniqueDropdownCollection.prototype.calculateTakenValues = function (records) {
       new Backbone.Model({
         id: takenValue,
         value: takenValue,
-      })
+      }),
     )
   }
   const ref = difference(this.possibleValues, takenValues)
@@ -168,8 +168,8 @@ UniqueDropdownCollection.prototype.calculateTakenValues = function (records) {
         new Backbone.Model({
           id: value,
           value,
-        })
-      )
+        }),
+      ),
     )
   }
   return results

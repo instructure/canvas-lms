@@ -38,11 +38,11 @@ export const ReplyInfo = props => {
             count: props.replyCount,
             replyCount: props.replyCount,
             unreadCount: props.unreadCount,
-          }
+          },
         )
       : I18n.t(
           {one: '%{replyCount} Reply', other: '%{replyCount} Replies'},
-          {count: props.replyCount, replyCount: props.replyCount}
+          {count: props.replyCount, replyCount: props.replyCount},
         )
   }
 
@@ -57,11 +57,11 @@ export const ReplyInfo = props => {
             count: props.replyCount,
             replyCount: props.replyCount,
             unreadCount: props.unreadCount,
-          }
+          },
         )
       : I18n.t(
           {one: '%{replyCount} Reply', other: '%{replyCount} Replies'},
-          {count: props.replyCount, replyCount: props.replyCount}
+          {count: props.replyCount, replyCount: props.replyCount},
         )
   }
 

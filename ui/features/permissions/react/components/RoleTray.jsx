@@ -142,7 +142,7 @@ export default class RoleTray extends Component {
         editRoleLabelInput: this.props.role.label,
         editRoleLabelErrorMessages: [],
       },
-      () => this.closeButton.focus()
+      () => this.closeButton.focus(),
     )
   }
 
@@ -156,7 +156,7 @@ export default class RoleTray extends Component {
         editRoleLabelInput: '',
         editRoleLabelErrorMessages: [],
       },
-      callback
+      callback,
     )
   }
 
@@ -253,7 +253,7 @@ export default class RoleTray extends Component {
           {I18n.t(
             'Warning: If there are any users with this role, they will keep ' +
               'the current permissions but you will not be able to create new ' +
-              'users with this role.'
+              'users with this role.',
           )}
         </Text>
         <Text as="p">{I18n.t('Click "ok" to continue deleting this role.')}</Text>
@@ -263,7 +263,7 @@ export default class RoleTray extends Component {
       text,
       this.state.deleteAlertVisible,
       this.deleteRole,
-      this.hideDeleteAlert
+      this.hideDeleteAlert,
     )
   }
 
@@ -279,7 +279,7 @@ export default class RoleTray extends Component {
       text,
       this.state.editBaseRoleAlertVisible,
       this.handleBaseRoleChange,
-      this.hideEditBaseRoleAlert
+      this.hideEditBaseRoleAlert,
     )
   }
 

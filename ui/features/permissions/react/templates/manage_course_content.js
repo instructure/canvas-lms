@@ -41,7 +41,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to add events to Calendar List View Dashboard via the Add to Student To-Do checkbox. '
+        'Allows user to add events to Calendar List View Dashboard via the Add to Student To-Do checkbox. ',
       ),
     },
     {
@@ -55,7 +55,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox.'
+        'Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox.',
       ),
     },
     {
@@ -63,13 +63,13 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox.'
+        'Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox.',
       ),
     },
     {
       title: I18n.t('Course Content - edit'),
       description: I18n.t(
-        'Allows user to lock / unlock selected announcements individually or in bulk.'
+        'Allows user to lock / unlock selected announcements individually or in bulk.',
       ),
     },
     {
@@ -77,7 +77,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to share assignments to Commons or edit previously shared content.'
+        'Allows user to share assignments to Commons or edit previously shared content.',
       ),
     },
     {
@@ -91,7 +91,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to update modules (edit module settings, publish, unpublish, batch edit, assign modules).'
+        'Allows user to update modules (edit module settings, publish, unpublish, batch edit, assign modules).',
       ),
     },
     {
@@ -119,7 +119,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Course Content - add / edit / or delete'),
       description: I18n.t(
-        'Allows user to have full section visibility when viewing announcements.'
+        'Allows user to have full section visibility when viewing announcements.',
       ),
     },
     {
@@ -127,7 +127,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to view Course Status, Choose Home Page, and Course Setup Checklist buttons in the Home page.'
+        'Allows user to view Course Status, Choose Home Page, and Course Setup Checklist buttons in the Home page.',
       ),
     },
     {
@@ -144,7 +144,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user access to LTI sub navigation tool selection for assignment syllabus configuration.'
+        'Allows user access to LTI sub navigation tool selection for assignment syllabus configuration.',
       ),
     },
     {
@@ -152,7 +152,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to view a content migration notice to an "import in progress".'
+        'Allows user to view a content migration notice to an "import in progress".',
       ),
     },
     {
@@ -177,19 +177,19 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Commons'),
       description: I18n.t(
-        'To share a Discussion to Commons, Discussions - view must also be enabled.'
+        'To share a Discussion to Commons, Discussions - view must also be enabled.',
       ),
     },
     {
       title: I18n.t('Course Home Page'),
       description: I18n.t(
-        'Teachers, designers, and TAs can select a course home page without the Course content - add / edit / delete permission.'
+        'Teachers, designers, and TAs can select a course home page without the Course content - add / edit / delete permission.',
       ),
     },
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.'
+        'The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.',
       ),
     },
     {
@@ -220,7 +220,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to add events to Calendar List View Dashboard via the Add to Student To-Do checkbox. '
+        'Allows user to add events to Calendar List View Dashboard via the Add to Student To-Do checkbox. ',
       ),
     },
     {
@@ -234,7 +234,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox.'
+        'Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox.',
       ),
     },
     {
@@ -242,13 +242,13 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox.'
+        'Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox.',
       ),
     },
     {
       title: I18n.t('Course Content - edit'),
       description: I18n.t(
-        'Allows user to lock / unlock selected announcements individually or in bulk.'
+        'Allows user to lock / unlock selected announcements individually or in bulk.',
       ),
     },
     {
@@ -256,7 +256,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to share assignments to Commons or edit previously shared content.'
+        'Allows user to share assignments to Commons or edit previously shared content.',
       ),
     },
     {
@@ -270,7 +270,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to update modules (edit module settings, publish, unpublish, batch edit, assign modules).'
+        'Allows user to update modules (edit module settings, publish, unpublish, batch edit, assign modules).',
       ),
     },
     {
@@ -298,7 +298,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Course Content - add / edit / or delete'),
       description: I18n.t(
-        'Allows user to have full section visibility when viewing announcements.'
+        'Allows user to have full section visibility when viewing announcements.',
       ),
     },
     {
@@ -306,7 +306,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to view Course Status, Choose Home Page, and Course Setup Checklist buttons in the Home page.'
+        'Allows user to view Course Status, Choose Home Page, and Course Setup Checklist buttons in the Home page.',
       ),
     },
     {
@@ -323,7 +323,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user access to LTI sub navigation tool selection for assignment syllabus configuration.'
+        'Allows user access to LTI sub navigation tool selection for assignment syllabus configuration.',
       ),
     },
     {
@@ -331,7 +331,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to view a content migration notice to an "import in progress".'
+        'Allows user to view a content migration notice to an "import in progress".',
       ),
     },
     {
@@ -356,19 +356,19 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Commons'),
       description: I18n.t(
-        'To share a Discussion to Commons, Discussions - view must also be enabled.'
+        'To share a Discussion to Commons, Discussions - view must also be enabled.',
       ),
     },
     {
       title: I18n.t('Course Home Page'),
       description: I18n.t(
-        'Teachers, designers, and TAs can select a course home page without the Course content - add / edit / delete permission.'
+        'Teachers, designers, and TAs can select a course home page without the Course content - add / edit / delete permission.',
       ),
     },
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.'
+        'The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.',
       ),
     },
     {
@@ -379,5 +379,5 @@ export const template = generateActionTemplates(
       title: I18n.t('Course Pacing'),
       description: I18n.t('Course Pacing feature preview must be enabled in your institution.'),
     },
-  ]
+  ],
 )

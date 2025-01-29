@@ -39,7 +39,7 @@ ready(() => {
       canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
       canImportOutcomes: ENV.PERMISSIONS.import_outcomes,
       contextUrlRoot: ENV.CONTEXT_URL_ROOT,
-    })
+    }),
   )
 
   const renderInstructions = ENV.PERMISSIONS.manage_outcomes
@@ -85,7 +85,7 @@ ready(() => {
       resetOutcomeViews,
       mount: content.$el[0],
       contextUrlRoot: ENV.CONTEXT_URL_ROOT,
-    })
+    }),
   )
 
   if (!ENV.IMPROVED_OUTCOMES_MANAGEMENT) {
@@ -96,7 +96,7 @@ ready(() => {
         mount: content.$el[0],
         contextUrlRoot: ENV.CONTEXT_URL_ROOT,
       },
-      ENV.current_user.id
+      ENV.current_user.id,
     )
   }
 

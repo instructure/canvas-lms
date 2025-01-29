@@ -44,7 +44,7 @@ const renderModal = (props = {}) => {
       onDismiss={() => {}}
       onSave={() => {}}
       {...props}
-    />
+    />,
   )
 }
 
@@ -109,7 +109,7 @@ describe('EditTemplateModal', () => {
 
     expect(onSave).toHaveBeenCalledWith(
       {name: template1.name, description: template1.description, workflow_state: 'active'},
-      false
+      false,
     )
   })
 

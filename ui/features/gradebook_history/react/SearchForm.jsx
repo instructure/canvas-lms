@@ -45,7 +45,7 @@ const recordShape = shape({
     shape({
       id: string.isRequired,
       name: string.isRequired,
-    })
+    }),
   ),
   nextPage: string.isRequired,
 })
@@ -195,7 +195,7 @@ class SearchFormComponent extends Component {
     return (
       moment(this.state.selected.from.value).diff(
         moment(this.state.selected.to.value),
-        'seconds'
+        'seconds',
       ) >= 0
     )
   }

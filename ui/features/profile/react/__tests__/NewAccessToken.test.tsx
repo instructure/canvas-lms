@@ -56,7 +56,7 @@ describe('NewAccessToken', () => {
     await user.click(submit)
 
     const errorText = await screen.findByText(
-      `Exceeded the maximum length (${PURPOSE_MAX_LENGTH} characters).`
+      `Exceeded the maximum length (${PURPOSE_MAX_LENGTH} characters).`,
     )
     expect(errorText).toBeInTheDocument()
   })
@@ -108,7 +108,7 @@ describe('NewAccessToken', () => {
         expect(onSubmit).toHaveBeenCalledWith({token})
         return true
       },
-      {timeout: 20000}
+      {timeout: 20000},
     )
   }, 30000)
 
@@ -154,7 +154,7 @@ describe('NewAccessToken', () => {
         expect(onSubmit).toHaveBeenCalledWith({token})
         return true
       },
-      {timeout: 20000} // Increase timeout for CI
+      {timeout: 20000}, // Increase timeout for CI
     )
   }, 30000) // Add test timeout
 })

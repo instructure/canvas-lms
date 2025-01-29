@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -76,7 +74,7 @@ CollectionView.prototype.defaults = shimGetterShorthand(
     emptyMessage() {
       return I18n.t('no_items', 'No items.')
     },
-  }
+  },
 )
 
 // When using a different template ensure it contains an element with a
@@ -229,11 +227,10 @@ CollectionView.prototype.renderItem = function (model) {
 // Creates the item view instance, extend this when you need to do things
 // like instantiate with child views, etc.
 CollectionView.prototype.createItemView = function (model) {
-   
   const view = new this.itemView(
     $.extend({}, this.itemViewOptions || {}, {
       model,
-    })
+    }),
   )
   model.itemView = view
   return view

@@ -47,7 +47,7 @@ export default class EditSectionsView extends DialogBaseView {
     this.$el.html(
       editSectionsViewTemplate({
         sectionsUrl: ENV.SEARCH_URL,
-      })
+      }),
     )
     super.render()
     return this
@@ -67,12 +67,11 @@ export default class EditSectionsView extends DialogBaseView {
       }
     })
 
-     
     ReactDOM.render(
       <QueryClientProvider client={new QueryClient()}>
         <SectionSelector courseId={ENV.current_context.id} initialSections={excludeSections} />
       </QueryClientProvider>,
-      document.getElementById('react_section_input')
+      document.getElementById('react_section_input'),
     )
   }
 
@@ -106,14 +105,14 @@ export default class EditSectionsView extends DialogBaseView {
         $.ajaxJSON(url, 'POST', data, newEnrollment => {
           lodashExtend(newEnrollment, {can_be_removed: true})
           return newEnrollments.push(newEnrollment)
-        })
+        }),
       )
     }
 
     // delete old section enrollments
     const sectionsToRemove = difference(currentIds, sectionIds)
     const enrollmentsToRemove = filter(this.model.sectionEditableEnrollments(), en =>
-      includes(sectionsToRemove, en.course_section_id)
+      includes(sectionsToRemove, en.course_section_id),
     )
     for (const en of Array.from(enrollmentsToRemove)) {
       url = `${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`
@@ -125,18 +124,18 @@ export default class EditSectionsView extends DialogBaseView {
         .done(() => {
           this.updateEnrollments(newEnrollments, enrollmentsToRemove)
           return $.flashMessage(
-            I18n.t('flash.sections', 'Section enrollments successfully updated')
+            I18n.t('flash.sections', 'Section enrollments successfully updated'),
           )
         })
         .fail(() =>
           $.flashError(
             I18n.t(
               'flash.sectionError',
-              "Something went wrong updating the user's sections. Please try again later."
-            )
-          )
+              "Something went wrong updating the user's sections. Please try again later.",
+            ),
+          ),
         )
-        .always(() => this.close())
+        .always(() => this.close()),
     )
   }
 }

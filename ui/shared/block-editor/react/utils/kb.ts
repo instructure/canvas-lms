@@ -82,7 +82,7 @@ const addNewNodeAsNextSibling = (
   newNode: React.ReactElement,
   currentComponentId: string,
   actions: any,
-  query: any
+  query: any,
 ) => {
   const currentNode = query.node(currentComponentId).get()
   const parentId = currentNode.data.parent

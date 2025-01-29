@@ -79,12 +79,12 @@ const ImportConfirmBox = ({count, onImportHandler, onCloseHandler}) => {
             },
             {
               count,
-            }
+            },
           )}
         </Text>
         <Text as="div">
           {I18n.t(
-            'To make outcome alignment easier, only add outcomes that are pertinent to this course.'
+            'To make outcome alignment easier, only add outcomes that are pertinent to this course.',
           )}
         </Text>
         <View as="div" padding="small 0 0">
@@ -130,7 +130,7 @@ export const showImportConfirmBox = ({count, onImportHandler, onCloseHandler}) =
       boxContainer.id = messageHolderId
       boxContainer.setAttribute(
         'style',
-        'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;'
+        'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;',
       )
       document.body.appendChild(boxContainer)
     }
@@ -141,7 +141,7 @@ export const showImportConfirmBox = ({count, onImportHandler, onCloseHandler}) =
   parent.setAttribute('style', 'max-width:45em;margin:1rem auto;')
   parent.setAttribute('class', 'flashalert-message')
   getBoxContainer().appendChild(parent)
-   
+
   ReactDOM.render(
     <ImportConfirmBox
       count={count}
@@ -152,6 +152,6 @@ export const showImportConfirmBox = ({count, onImportHandler, onCloseHandler}) =
         parent.remove()
       }}
     />,
-    parent
+    parent,
   )
 }

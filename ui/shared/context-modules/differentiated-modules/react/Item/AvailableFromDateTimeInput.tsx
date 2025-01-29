@@ -52,13 +52,13 @@ export function AvailableFromDateTimeInput({
     // @ts-expect-error
     el => (dateInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
   const timeInputRef = useCallback(
     // @ts-expect-error
     el => (timeInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
   const onBlur = useMemo(() => handleBlur(key), [handleBlur])
   const messages = useMemo(
@@ -66,9 +66,9 @@ export function AvailableFromDateTimeInput({
       generateMessages(
         availableFromDate,
         validationErrors[key] ?? null,
-        unparsedFieldKeys.has(key)
+        unparsedFieldKeys.has(key),
       ),
-    [availableFromDate, validationErrors, unparsedFieldKeys]
+    [availableFromDate, validationErrors, unparsedFieldKeys],
   )
 
   const availableFromDateProps = {

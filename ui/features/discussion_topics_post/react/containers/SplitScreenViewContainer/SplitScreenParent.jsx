@@ -48,7 +48,7 @@ const I18n = createI18nScope('discussion_posts')
 
 export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
   const [updateSplitScreenViewDeeplyNestedAlert] = useMutation(
-    UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT
+    UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT,
   )
   const {toggleUnread, updateDiscussionThreadReadState} = useUpdateDiscussionThread({
     discussionEntry: props.discussionEntry,
@@ -90,7 +90,7 @@ export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
         isReadOnly={props.RCEOpen}
         replyButtonRef={props.replyButtonRef}
         isSplitScreenView={true}
-      />
+      />,
     )
   }
 
@@ -112,7 +112,7 @@ export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
         isSplitScreenView={true}
-      />
+      />,
     )
   }
 
@@ -125,7 +125,7 @@ export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
         authorName={getDisplayName(props.discussionEntry)}
         onClick={toggleUnread}
         isSplitScreenView={true}
-      />
+      />,
     )
   }
 
@@ -144,7 +144,7 @@ export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
         isExpanded={false}
         onClick={() => props.setRCEOpen(false)}
         authorName={getDisplayName(props.discussionEntry)}
-      />
+      />,
     )
   }
 
@@ -191,10 +191,10 @@ export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
                 <Text size={responsiveProps.textSize}>
                   {props.discussionEntry.depth > 3
                     ? I18n.t(
-                        'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
+                        'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.',
                       )
                     : I18n.t(
-                        'Deeply nested replies are no longer supported. Your reply will appear on on the page you are currently on.'
+                        'Deeply nested replies are no longer supported. Your reply will appear on on the page you are currently on.',
                       )}
                 </Text>
               </Alert>
@@ -281,18 +281,18 @@ export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
                     createdAt={props.discussionEntry.createdAt}
                     editedAt={props.discussionEntry.editedAt}
                     timingDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.createdAt
+                      props.discussionEntry.createdAt,
                     )}
                     editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.editedAt
+                      props.discussionEntry.editedAt,
                     )}
                     lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.lastReply?.createdAt
+                      props.discussionEntry.lastReply?.createdAt,
                     )}
                     deleted={props.discussionEntry.deleted}
                     isTopicAuthor={isTopicAuthor(
                       props.discussionTopic.author,
-                      props.discussionEntry.author
+                      props.discussionEntry.author,
                     )}
                     quotedEntry={props.discussionEntry.quotedEntry}
                     attachment={props.discussionEntry.attachment}

@@ -54,7 +54,7 @@ describe('ConnectedFriendlyDatetimes', () => {
 
   it('renders a mobile prefix', () => {
     const {getAllByText} = render(
-      <ConnectedFriendlyDatetimes prefixMobile="mobile: " {...defaultProps} />
+      <ConnectedFriendlyDatetimes prefixMobile="mobile: " {...defaultProps} />,
     )
 
     expect(getAllByText('mobile: 7/10/2022 7/22/2022')).toHaveLength(1)
@@ -68,7 +68,7 @@ describe('ConnectedFriendlyDatetimes', () => {
 
   it('renders a mobile connector', () => {
     const {getAllByText} = render(
-      <ConnectedFriendlyDatetimes connectorMobile="mobile" {...defaultProps} />
+      <ConnectedFriendlyDatetimes connectorMobile="mobile" {...defaultProps} />,
     )
 
     expect(getAllByText('7/10/2022 mobile 7/22/2022')).toHaveLength(1)
@@ -83,7 +83,7 @@ describe('ConnectedFriendlyDatetimes', () => {
 
   it('it uses a specified format', () => {
     const {getAllByText} = render(
-      <ConnectedFriendlyDatetimes format={I18n.t('#date.formats.full')} {...defaultProps} />
+      <ConnectedFriendlyDatetimes format={I18n.t('#date.formats.full')} {...defaultProps} />,
     )
 
     expect(getAllByText('Jul 10, 2022 11:00pm Jul 22, 2022 11:00pm')).toHaveLength(2)

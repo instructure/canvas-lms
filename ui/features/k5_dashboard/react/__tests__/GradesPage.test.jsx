@@ -24,7 +24,7 @@ import {GradesPage, getGradingPeriodsFromCourses, overrideCourseGradingPeriods} 
 import fetchMock from 'fetch-mock'
 
 jest.mock('@canvas/k5/react/utils')
-const utils = require('@canvas/k5/react/utils') // eslint-disable-line import/no-commonjs
+const utils = require('@canvas/k5/react/utils')
 
 const defaultCourses = [
   {
@@ -256,7 +256,7 @@ describe('GradesPage', () => {
       () => {
         throw new Error('oh no!')
       },
-      {overwriteRoutes: true}
+      {overwriteRoutes: true},
     )
     const {getAllByText} = render(<GradesPage {...defaultProps} />)
     // showFlashError appears to create both a regular and a screen-reader only alert on the page
@@ -303,7 +303,7 @@ describe('GradesPage', () => {
           ],
         },
       ],
-      {overwriteRoutes: true}
+      {overwriteRoutes: true},
     )
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
     await waitFor(() => getByText('For Teachers Only'))
@@ -312,7 +312,7 @@ describe('GradesPage', () => {
 
   it('updates shown courses and grades to match currently selected grading periods', async () => {
     utils.fetchGradesForGradingPeriod.mockReturnValueOnce(
-      Promise.resolve(defaultSpecificPeriodGrades)
+      Promise.resolve(defaultSpecificPeriodGrades),
     )
 
     const {getByRole, getByText, queryByText} = render(<GradesPage {...defaultProps} />)
@@ -382,7 +382,7 @@ describe('GradesPage', () => {
           currentUserRoles={['observer', 'user']}
           observedUserId="4"
           currentUser={{id: '1'}}
-        />
+        />,
       )
       await waitFor(() => {
         expect(getByText('Mastering Canvas')).toBeInTheDocument()
@@ -402,7 +402,7 @@ describe('GradesPage', () => {
           currentUserRoles={['observer', 'teacher', 'user']}
           observedUserId="1"
           currentUser={{id: '1'}}
-        />
+        />,
       )
       await waitFor(() => {
         expect(getByText('Testing 4 Dummies')).toBeInTheDocument()

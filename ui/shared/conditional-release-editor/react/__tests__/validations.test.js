@@ -64,7 +64,7 @@ describe('validateScores', () => {
   it('allows scores within bounds', () => {
     const errors = validateScores(
       List(['1.0', '.9', '.8', '.2', '.111', '0.100', '0']),
-      defaultScoringInfo()
+      defaultScoringInfo(),
     )
     expect(errors.toJS()).toEqual([null, null, null, null, null, null, null])
   })
@@ -72,7 +72,7 @@ describe('validateScores', () => {
   it('allows scores with similar ranges', () => {
     const errors = validateScores(
       List(['1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0']),
-      defaultScoringInfo()
+      defaultScoringInfo(),
     )
     expect(errors.toJS()).toEqual([null, null, null, null, null, null, null])
   })
@@ -80,7 +80,7 @@ describe('validateScores', () => {
   it('allows scores with similar ranges and shows correct errors', () => {
     const errors = validateScores(
       List(['1.0', '1.0', '1.0', '1.0', '1.0', '2.0', '1.0']),
-      defaultScoringInfo()
+      defaultScoringInfo(),
     )
     expect(errors.toJS()).toEqual([
       null,
@@ -101,7 +101,7 @@ describe('validateScores', () => {
   it('allows scores within bounds for letters', () => {
     const errors = validateScores(
       List(['1.0', '.9', '.8', '.2', '.111', '0.100', '0']),
-      defaultScoringInfoLetter()
+      defaultScoringInfoLetter(),
     )
     expect(errors.toJS()).toEqual([null, null, null, null, null, null, null])
   })
@@ -121,7 +121,7 @@ describe('validateScores', () => {
       const errors = validateScores(List(['1.00', val, '.20']))
       expect(errors.get(1)).toMatch(
         errorExpression,
-        'value ' + val + ' should have error matching ' + errorExpression
+        'value ' + val + ' should have error matching ' + errorExpression,
       )
     })
   }
@@ -131,7 +131,7 @@ describe('validateScores', () => {
       const errors = validateScores(List(['1.0', val, '.2']), defaultScoringInfoLetter())
       expect(errors.get(1)).toMatch(
         errorExpression,
-        'value ' + val + ' should have error matching ' + errorExpression
+        'value ' + val + ' should have error matching ' + errorExpression,
       )
     })
   }

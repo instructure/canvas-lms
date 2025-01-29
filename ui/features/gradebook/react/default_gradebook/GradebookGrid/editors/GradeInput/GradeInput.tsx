@@ -101,7 +101,7 @@ export default class GradeInput extends PureComponent {
       // @ts-expect-error
       this.gradeInput.gradeInfo,
       // @ts-expect-error
-      this.props.pendingGradeInfo
+      this.props.pendingGradeInfo,
     )
   }
 

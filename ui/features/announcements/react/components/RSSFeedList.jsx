@@ -78,7 +78,7 @@ export default class RSSFeedList extends React.Component {
         one: '%{count} post added',
         other: '%{count} posts added',
       },
-      {count: numberOfPosts}
+      {count: numberOfPosts},
     )
   }
 
@@ -162,6 +162,6 @@ const connectState = state => ({
 const connectActions = dispatch =>
   bindActionCreators(
     Object.assign(select(actions, ['getExternalFeeds', 'deleteExternalFeed'])),
-    dispatch
+    dispatch,
   )
 export const ConnectedRSSFeedList = connect(connectState, connectActions)(RSSFeedList)

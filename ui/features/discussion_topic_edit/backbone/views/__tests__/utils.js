@@ -45,7 +45,7 @@ export const editView = function (opts = {}, discussOpts = {}) {
   const dueDateList = new DueDateList(
     assignment.get('assignment_overrides'),
     sectionList,
-    assignment
+    assignment,
   )
   const app = new EditView({
     model: discussion,

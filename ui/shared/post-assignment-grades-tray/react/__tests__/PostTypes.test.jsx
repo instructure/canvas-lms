@@ -36,7 +36,7 @@ describe('PostTypes', () => {
     const {getByText} = render(<PostTypes {...context} />)
     expect(getByText('Everyone')).toBeInTheDocument()
     expect(
-      getByText('All students will be able to see their grade and/or submission comments.')
+      getByText('All students will be able to see their grade and/or submission comments.'),
     ).toBeInTheDocument()
   })
 
@@ -45,8 +45,8 @@ describe('PostTypes', () => {
     expect(getByText('Graded')).toBeInTheDocument()
     expect(
       getByText(
-        'Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.'
-      )
+        'Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.',
+      ),
     ).toBeInTheDocument()
   })
 

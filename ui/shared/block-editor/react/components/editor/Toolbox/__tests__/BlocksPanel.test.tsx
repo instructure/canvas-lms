@@ -121,11 +121,11 @@ describe('Toolbox', () => {
 
       expect(getByText('A block template')).toBeInTheDocument()
       expect(getByText('A block template').closest('.toolbox-item')).toHaveStyle(
-        `border-color: ${borderColorPrimary}`
+        `border-color: ${borderColorPrimary}`,
       )
       expect(getByText('block template 2')).toBeInTheDocument()
       expect(getByText('block template 2').closest('.toolbox-item')).toHaveStyle(
-        `border-color: ${borderColorWarning}`
+        `border-color: ${borderColorWarning}`,
       )
     })
 

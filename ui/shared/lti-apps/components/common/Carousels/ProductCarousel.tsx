@@ -49,7 +49,7 @@ function ProductCarousel(props: ProductCarouselProps) {
     products,
     isDesktop,
     isTablet,
-    isMobile
+    isMobile,
   )
 
   const [currentSlideNumber, setCurrentSlideNumber] = useState(0)
@@ -75,13 +75,17 @@ function ProductCarousel(props: ProductCarouselProps) {
             <PreviousArrow
               currentSlideNumber={currentSlideNumber}
               slider={slider}
-              screenReaderLabel={I18n.t('More Tools by %{companyName} previous button', {companyName: companyName})}
+              screenReaderLabel={I18n.t('More Tools by %{companyName} previous button', {
+                companyName: companyName,
+              })}
             />
             <NextArrow
               currentSlideNumber={currentSlideNumber}
               slider={slider}
               updatedArrowDisableIndex={updatedArrowDisableIndex.type}
-              screenReaderLabel={I18n.t('More Tools by %{companyName} next button', {companyName: companyName})}
+              screenReaderLabel={I18n.t('More Tools by %{companyName} next button', {
+                companyName: companyName,
+              })}
             />
           </Flex>
         )}

@@ -228,9 +228,9 @@ class ProfileController < ApplicationController
     register_cc_tabs.push("sms") if current_mfa_settings != :disabled && otp_via_sms_in_us_region?
     register_cc_tabs.push("slack") if @user.account.feature_enabled?(:slack_notifications)
     is_default_account = @domain_root_account == Account.default
-    is_eligible_for_token_regeneration = @current_user.access_tokens.temp_record.grants_right?(logged_in_user, :update)
+    can_update_tokens = @current_user.access_tokens.temp_record.grants_right?(logged_in_user, :update)
     google_drive_oauth_url = oauth_url(service: "google_drive", return_to: settings_profile_url)
-    js_env({ enable_gravatar: @domain_root_account&.enable_gravatar?, register_cc_tabs:, is_default_account:, is_eligible_for_token_regeneration:, google_drive_oauth_url: })
+    js_env({ enable_gravatar: @domain_root_account&.enable_gravatar?, register_cc_tabs:, is_default_account:, google_drive_oauth_url:, PERMISSIONS: { can_update_tokens: } })
     respond_to do |format|
       format.html do
         @user_data = profile_data(@user.profile, @current_user, session, [])
@@ -411,47 +411,10 @@ class ProfileController < ApplicationController
         user_params.delete(:pronouns)
       end
 
-      if @user.update(user_params)
-        pseudonymed = false
-        if params[:default_email_id].present?
-          @email_channel = @user.communication_channels.email.active.where(id: params[:default_email_id]).first
-          if @email_channel
-            @email_channel.move_to_top
-            @user.clear_email_cache!
-          end
-        end
-        if params[:pseudonym]
-          pseudonym_params = params[:pseudonym].permit(:password, :password_confirmation, :unique_id)
-
-          change_password = params[:pseudonym].delete :change_password
-          old_password = params[:pseudonym].delete :old_password
-          if params[:pseudonym][:password_id] && change_password
-            pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id])
-          end
-          if change_password == "1" && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
-            error_msg = t("errors.invalid_old_passowrd", "Invalid old password for the login %{pseudonym}", pseudonym: pseudonym_to_update.unique_id)
-            pseudonymed = true
-            format.html do
-              flash[:error] = error_msg
-              redirect_to user_profile_url(@current_user)
-            end
-            format.json { render json: { errors: { old_password: error_msg } }, status: :bad_request }
-          end
-          if change_password != "1" || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
-            pseudonym_params.delete :password
-            pseudonym_params.delete :password_confirmation
-          end
-          params[:pseudonym].delete :password_id
-          pseudonym_to_update.require_password = true if pseudonym_to_update
-          if !pseudonym_params.empty? && pseudonym_to_update && !pseudonym_to_update.update(pseudonym_params)
-            pseudonymed = true
-            flash[:error] = t("errors.profile_update_failed", "Login failed to update")
-            format.html { redirect_to user_profile_url(@current_user) }
-            format.json { render json: pseudonym_to_update.errors, status: :bad_request }
-          end
-        end
+      user_saved, pseudonymed = handle_profile_update(format, user_params)
+      if user_saved
         unless pseudonymed
-          flash[:notice] = t("notices.updated_profile", "Settings successfully updated")
+          flash[:notice] = t("notices.updated_profile", "Settings successfully updated") # rubocop:disable Rails/ActionControllerFlashBeforeRender
           format.html { redirect_to user_profile_url(@current_user) }
           format.json { render json: @user.as_json(methods: :avatar_url, include: { communication_channel: { only: [:id, :path], include_root: false }, pseudonym: { only: [:id, :unique_id], include_root: false } }) }
         end
@@ -460,6 +423,51 @@ class ProfileController < ApplicationController
         format.json { render json: @user.errors }
       end
     end
+  end
+
+  def handle_profile_update(format, user_params)
+    pseudonymed = false
+    user_updated = @user.update(user_params)
+    if user_updated
+      if params[:default_email_id].present?
+        @email_channel = @user.communication_channels.email.active.where(id: params[:default_email_id]).first
+        if @email_channel
+          @email_channel.move_to_top
+          @user.clear_email_cache!
+        end
+      end
+      if params[:pseudonym]
+        pseudonym_params = params[:pseudonym].permit(:password, :password_confirmation, :unique_id)
+
+        change_password = params[:pseudonym].delete :change_password
+        old_password = params[:pseudonym].delete :old_password
+        if params[:pseudonym][:password_id] && change_password
+          pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id])
+        end
+        if change_password == "1" && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
+          error_msg = t("errors.invalid_old_passowrd", "Invalid old password for the login %{pseudonym}", pseudonym: pseudonym_to_update.unique_id)
+          pseudonymed = true
+          format.html do
+            flash[:error] = error_msg
+            redirect_to user_profile_url(@current_user)
+          end
+          format.json { render json: { errors: { old_password: error_msg } }, status: :bad_request }
+        end
+        if change_password != "1" || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
+          pseudonym_params.delete :password
+          pseudonym_params.delete :password_confirmation
+        end
+        params[:pseudonym].delete :password_id
+        pseudonym_to_update.require_password = true if pseudonym_to_update
+        if !pseudonym_params.empty? && pseudonym_to_update && !pseudonym_to_update.update(pseudonym_params)
+          pseudonymed = true
+          flash[:error] = t("errors.profile_update_failed", "Login failed to update")
+          format.html { redirect_to user_profile_url(@current_user) }
+          format.json { render json: pseudonym_to_update.errors, status: :bad_request }
+        end
+      end
+    end
+    [user_updated, pseudonymed]
   end
 
   # TODO: the current update method needs to get moved to the UsersController

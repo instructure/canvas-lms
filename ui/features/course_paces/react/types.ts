@@ -95,9 +95,9 @@ export interface PaceDuration {
 
 export interface CoursePace {
   readonly id?: string
-  readonly start_date: string
+  readonly start_date?: string
   readonly start_date_context: ContextTypes
-  readonly end_date: OptionalDate
+  readonly end_date?: OptionalDate
   readonly end_date_context: ContextTypes
   workflow_state: WorkflowStates
   readonly modules: Module[]

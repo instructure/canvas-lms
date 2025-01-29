@@ -595,18 +595,6 @@ pipeline {
                   parallel(nestedStages)
                 }
 
-                extendedStage('Javascript (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
-                  def nestedStages = [:]
-
-                  extendedStage('Javascript')
-                    .hooks(buildSummaryReportHooks.withRunManifest(true))
-                    .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
-                      string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                    ])
-
-                  parallel(nestedStages)
-                }
-
                 extendedStage('Linters (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(LINTERS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
                   extendedStage('Linters - Dependency Check')
                     .nodeRequirements(label: nodeLabel(), podTemplate: dependencyCheckStage.nodeRequirementsTemplate(), container: 'dependency-check')
@@ -669,6 +657,7 @@ pipeline {
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                       string(name: 'SKIP_CRYSTALBALL', value: "${env.SKIP_CRYSTALBALL || setupStage.hasGemOverrides()}"),
+                      string(name: 'RSPECQ_UPDATE_TIMINGS', value: "${env.RSPECQ_UPDATE_TIMINGS || 0}"),
                       string(name: 'UPSTREAM_TAG', value: "${env.BUILD_TAG}"),
                       string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),
                     ])

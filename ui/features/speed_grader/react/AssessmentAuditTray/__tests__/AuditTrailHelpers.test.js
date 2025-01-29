@@ -388,7 +388,7 @@ describe('AuditTrailHelpers', () => {
         const payload = {grader_names_visible_to_final_grader: true}
         const event = buildEventOfType('grader_to_final_grader_anonymity_updated', {}, payload)
         expect(AuditTrailHelpers.labelFor(event)).toEqual(
-          'Grader names visible to final grader turned on'
+          'Grader names visible to final grader turned on',
         )
       })
 
@@ -396,7 +396,7 @@ describe('AuditTrailHelpers', () => {
         const payload = {grader_names_visible_to_final_grader: false}
         const event = buildEventOfType('grader_to_final_grader_anonymity_updated', {}, payload)
         expect(AuditTrailHelpers.labelFor(event)).toEqual(
-          'Grader names visible to final grader turned off'
+          'Grader names visible to final grader turned off',
         )
       })
     })
@@ -420,7 +420,7 @@ describe('AuditTrailHelpers', () => {
         const payload = {grader_comments_visible_to_graders: true}
         const event = buildEventOfType('grader_to_grader_comment_visibility_updated', {}, payload)
         expect(AuditTrailHelpers.labelFor(event)).toEqual(
-          'Grader comments visible to graders turned on'
+          'Grader comments visible to graders turned on',
         )
       })
 
@@ -428,7 +428,7 @@ describe('AuditTrailHelpers', () => {
         const payload = {grader_comments_visible_to_graders: false}
         const event = buildEventOfType('grader_to_grader_comment_visibility_updated', {}, payload)
         expect(AuditTrailHelpers.labelFor(event)).toEqual(
-          'Grader comments visible to graders turned off'
+          'Grader comments visible to graders turned off',
         )
       })
     })

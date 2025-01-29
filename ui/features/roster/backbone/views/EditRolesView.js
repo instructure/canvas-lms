@@ -69,7 +69,7 @@ export default class EditRolesView extends DialogBaseView {
 
     // section ids that already have the new role
     const existing_section_ids = filter(enrollments, en => en.role_id === new_role_id).map(
-      en => en.course_section_id
+      en => en.course_section_id,
     )
 
     const new_enrollments = []
@@ -106,8 +106,8 @@ export default class EditRolesView extends DialogBaseView {
               new_enrollment => {
                 lodashExtend(new_enrollment, {can_be_removed: true})
                 return new_enrollments.push(new_enrollment)
-              }
-            )
+              },
+            ),
           )
         }
       }
@@ -121,10 +121,10 @@ export default class EditRolesView extends DialogBaseView {
         })
         .fail(() =>
           $.flashError(
-            I18n.t("Something went wrong updating the user's role. Please try again later.")
-          )
+            I18n.t("Something went wrong updating the user's role. Please try again later."),
+          ),
         )
-        .always(() => this.close())
+        .always(() => this.close()),
     )
   }
 }

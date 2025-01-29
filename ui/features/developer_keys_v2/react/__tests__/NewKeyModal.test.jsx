@@ -343,7 +343,7 @@ describe('NewKeyModal', () => {
       expect(
         wrapper.getByRole('img', {
           name: /creating key/i,
-        })
+        }),
       ).toBeInTheDocument()
       expect(document.querySelector('div[aria-live="polite"]')).toBeInTheDocument()
     })
@@ -386,7 +386,7 @@ describe('NewKeyModal', () => {
           })
           const {ref} = createWrapper(
             {isLtiKey: true},
-            {saveLtiToolConfiguration: saveLtiToolConfigurationStub}
+            {saveLtiToolConfiguration: saveLtiToolConfigurationStub},
           )
 
           await ref.current.saveLtiToolConfiguration()
@@ -401,7 +401,7 @@ describe('NewKeyModal', () => {
             .mockImplementation(() => () => Promise.reject(new Error('testing')))
           const {ref} = createWrapper(
             {isLtiKey: true},
-            {saveLtiToolConfiguration: saveLtiToolConfigurationStub}
+            {saveLtiToolConfiguration: saveLtiToolConfigurationStub},
           )
 
           await ref.current.saveLtiToolConfiguration()
@@ -418,11 +418,11 @@ describe('NewKeyModal', () => {
                 developer_key: developerKey,
                 tool_configuration: validToolConfig,
                 warning_message,
-              })
+              }),
           )
           const {ref} = createWrapper(
             {isLtiKey: true},
-            {saveLtiToolConfiguration: saveLtiToolConfigurationStub}
+            {saveLtiToolConfiguration: saveLtiToolConfigurationStub},
           )
 
           await ref.current.saveLtiToolConfiguration()
@@ -491,7 +491,7 @@ describe('NewKeyModal', () => {
               developerKeyCreateOrEditPending: false,
               developerKeyCreateOrEditFailed: false,
             },
-            {createOrEditDeveloperKey: createOrEditStub}
+            {createOrEditDeveloperKey: createOrEditStub},
           )
 
           await ref.current.submitForm()
@@ -514,7 +514,7 @@ describe('NewKeyModal', () => {
               developerKeyCreateOrEditPending: false,
               developerKeyCreateOrEditFailed: true,
             },
-            {createOrEditDeveloperKey: createOrEditStub}
+            {createOrEditDeveloperKey: createOrEditStub},
           )
 
           await ref.current.submitForm()
@@ -673,7 +673,7 @@ describe('NewKeyModal', () => {
         })
 
         expect(flashStub).toHaveBeenCalledWith(
-          'Tool configuration must have public jwk or public jwk url'
+          'Tool configuration must have public jwk or public jwk url',
         )
         expect(closeModal).not.toHaveBeenCalled()
 
@@ -709,7 +709,7 @@ describe('NewKeyModal', () => {
     ref.current.saveLtiToolConfiguration()
 
     expect(ref.current.state.toolConfiguration.oidc_initiation_url).toEqual(
-      validToolConfig.oidc_initiation_url
+      validToolConfig.oidc_initiation_url,
     )
     expect(ltiStub).toHaveBeenCalledTimes(1)
   })
@@ -796,7 +796,7 @@ describe('NewKeyModal', () => {
       await userEvent.paste(JSON.stringify(validToolConfig))
 
       expect(redirectUris).toHaveValue(
-        'http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com'
+        'http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com',
       )
     })
 
@@ -812,7 +812,7 @@ describe('NewKeyModal', () => {
       await userEvent.click(screen.getByRole('button', {name: /sync uris/i}))
 
       expect(screen.getByLabelText(/\* Redirect URIs:/i)).toHaveValue(
-        validToolConfig.target_link_uri
+        validToolConfig.target_link_uri,
       )
     })
   })

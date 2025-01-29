@@ -68,7 +68,7 @@ const doRequest = (
   data: any,
   onSuccess: (res: Record<string, any>) => void,
   successMessage: string,
-  errorMessage: string
+  errorMessage: string,
 ) =>
   doFetchApi({
     path,
@@ -92,7 +92,7 @@ const doRequest = (
       showFlashAlert({
         err: e,
         message: errorMessage,
-      })
+      }),
     )
 
 export const updateModule = ({moduleId, moduleElement, data}: any) => {
@@ -102,18 +102,19 @@ export const updateModule = ({moduleId, moduleElement, data}: any) => {
     `/courses/${ENV.COURSE_ID}/modules/${moduleId}`,
     'PUT',
     data,
-    responseData => {
+    responseJSON => {
+      const {context_module: responseData} = responseJSON
       updateModuleUI(moduleElement, data)
       const dialog = new RelockModulesDialog()
       dialog.renderIfNeeded({
-        relock_warning: responseData?.context_module?.relock_warning ?? false,
+        relock_warning: responseData?.relock_warning ?? false,
         id: moduleId,
       })
     },
     I18n.t('%{moduleName} settings updated successfully.', {
       moduleName: data.moduleName,
     }),
-    I18n.t('Error updating %{moduleName} settings.', {moduleName: data.moduleName})
+    I18n.t('Error updating %{moduleName} settings.', {moduleName: data.moduleName}),
   )
 }
 
@@ -126,7 +127,7 @@ export const createModule = ({moduleElement, addModuleUI, data}: any) =>
     I18n.t('%{moduleName} created successfully.', {
       moduleName: data.moduleName,
     }),
-    I18n.t('Error creating %{moduleName}.', {moduleName: data.moduleName})
+    I18n.t('Error creating %{moduleName}.', {moduleName: data.moduleName}),
   )
 
 export default function SettingsPanel({
@@ -221,7 +222,7 @@ export default function SettingsPanel({
     const handleRequest = moduleId ? updateModule : createModule
 
     setLoading(true)
-     
+
     handleRequest({moduleId, moduleElement, addModuleUI, data: state})
       .finally(() => setLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
@@ -238,7 +239,7 @@ export default function SettingsPanel({
   // Sends data to parent when unmounting
   useEffect(
     () => () => updateParentData?.(state, !_.isEqual(initialState.current, state)),
-    [state, updateParentData]
+    [state, updateParentData],
   )
 
   return (
@@ -293,7 +294,7 @@ export default function SettingsPanel({
               prevMonthLabel={I18n.t('Previous month')}
               nextMonthLabel={I18n.t('Next month')}
               allowNonStepInput={true}
-              onChange={(e, dateTimeString) => {
+              onChange={(_e, dateTimeString) => {
                 dispatch({type: actions.SET_UNLOCK_AT, payload: dateTimeString})
                 if (dateTimeString) {
                   setValidDate(true)

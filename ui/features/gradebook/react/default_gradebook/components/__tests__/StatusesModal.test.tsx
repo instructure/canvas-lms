@@ -45,7 +45,7 @@ describe('Statuses Modal', () => {
         onClose={onClose}
         colors={statusColors({})}
         afterUpdateStatusColors={afterUpdateStatusColors}
-      />
+      />,
     )
 
     const {getByRole} = within(document.body)
@@ -61,11 +61,11 @@ describe('Statuses Modal', () => {
         onClose={onClose}
         colors={statusColors({})}
         afterUpdateStatusColors={afterUpdateStatusColors}
-      />
+      />,
     )
 
     const {getAllByRole} = within(document.body)
-    expect(getAllByRole('listitem').length).toBe(6)
+    expect(getAllByRole('listitem')).toHaveLength(6)
   })
 
   it('onClose is called when closed', async () => {
@@ -77,7 +77,7 @@ describe('Statuses Modal', () => {
         onClose={onClose}
         colors={statusColors({})}
         afterUpdateStatusColors={afterUpdateStatusColors}
-      />
+      />,
     )
 
     const {getByRole} = within(document.body)

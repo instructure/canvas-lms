@@ -139,7 +139,7 @@ describe('HistoryReducer', () => {
       nextPage: payload.link,
     }
     expect(reducer(initialState, {type: FETCH_HISTORY_NEXT_PAGE_SUCCESS, payload})).toEqual(
-      newState
+      newState,
     )
   })
 
