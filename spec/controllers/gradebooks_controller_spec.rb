@@ -1656,7 +1656,7 @@ describe GradebooksController do
 
       it "includes the gradebook_import_url key in ENV" do
         actual_value = @gradebook_env[:gradebook_import_url]
-        expected_value = new_course_gradebook_upload_path(@course)
+        expected_value = course_gradebook_uploads_path(@course)
 
         expect(actual_value).to eq(expected_value)
       end
