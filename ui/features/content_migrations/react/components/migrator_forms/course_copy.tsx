@@ -24,10 +24,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {
-  CommonMigratorControls,
-  RequiredFormLabel,
-} from '@canvas/content-migrations'
+import {CommonMigratorControls} from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {parseDateToISOString} from '../utils'
@@ -138,11 +135,8 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
           }}
           placeholder={I18n.t('Search...')}
           isShowingOptions={courseOptions.length > 0}
-          renderLabel={
-            <RequiredFormLabel showErrorState={selectedCourseError}>
-              {I18n.t('Search for a course')}
-            </RequiredFormLabel>
-          }
+          renderLabel={I18n.t('Search for a course')}
+          isRequired={true}
           renderBeforeInput={<IconSearchLine inline={false} />}
           renderAfterInput={<span />}
           onBlur={() => {
