@@ -327,5 +327,9 @@ class StudentAssignmentPageV2
     def peer_review_unavailible_reminder
       f("h4[data-testid='assignments-2-unavailable-pr-label-1']")
     end
+
+    def textarea_div_container
+      f("#textarea-emoji-container")
+    end
   end
 end
