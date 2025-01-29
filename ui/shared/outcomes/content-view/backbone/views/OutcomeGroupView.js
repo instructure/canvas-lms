@@ -19,6 +19,14 @@ import {extend} from 'lodash'
 import OutcomeContentBase from './OutcomeContentBase'
 import outcomeGroupTemplate from '../../jst/outcomeGroup.handlebars'
 import outcomeGroupFormTemplate from '../../jst/outcomeGroupForm.handlebars'
+import {createRoot} from 'react-dom/client'
+import {createElement} from 'react';
+import {Text} from '@instructure/ui-text'
+import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('OutcomeContentBase')
 
 // For outcome groups
 export default class OutcomeGroupView extends OutcomeContentBase {
@@ -39,7 +47,49 @@ export default class OutcomeGroupView extends OutcomeContentBase {
         this.$el.html(outcomeGroupTemplate(extend(data, {canManage})))
       }
     }
+
+    this.instUIInputs = {
+      title: {
+        root: (() => {
+          const el = this.$('#outcome_group_title_container')[0]
+          if(!el) return null
+          return {rootElement: createRoot(el), initialValue: el.dataset.initialValue}
+        })(),
+        render: (errorMessages) => {
+          this.instUIInputs.title.root?.rootElement.render(
+            createElement(View, {as: 'div', margin: 'none none small none'},
+              createElement(TextInput, {
+                name: 'title',
+                id: 'outcome_group_title',
+                defaultValue: this.instUIInputs.title.root?.initialValue,
+                width: '30ch',
+                placeholder: I18n.t('New Outcome Group'),
+                renderLabel: ()=> createElement(Text, { weight: 'normal', size: 'small' }, I18n.t('title', 'Name this group')),
+                messages: errorMessages?.map((m) => ({ text: m.message, type: 'newError' })),
+              })
+            )
+          )
+        },
+        inputElement: () => this.$('#outcome_group_title')[0],
+      }
+    }
+
+    this.instUIInputs.title.render()
+
     this.$('input:first').focus()
     return this
+  }
+
+  showErrors(errors) {
+    Object.keys(errors).forEach(key => {
+      this.instUIInputs[key]?.render(errors[key])
+    })
+
+    for (const key in this.instUIInputs) {
+      if (errors[key]) {
+        this.instUIInputs[key]?.inputElement()?.focus()
+        break
+      }
+    }
   }
 }

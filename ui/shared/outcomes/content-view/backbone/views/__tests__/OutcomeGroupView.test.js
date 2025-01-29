@@ -60,11 +60,12 @@ describe('OutcomeGroupView', () => {
       })
     })
 
-    it('renders placeholder text properly for new outcome groups', () => {
+    it('renders placeholder text properly for new outcome groups', async () => {
       const view = createView({
         state: 'add',
         model: outcomeGroup,
       })
+      await new Promise(resolve => requestAnimationFrame(resolve))
       const titleInput = view.$('input[name="title"]')[0]
       expect(titleInput.getAttribute('placeholder')).toBe('New Outcome Group')
       view.remove()
