@@ -27,7 +27,6 @@ import {Button} from '@instructure/ui-buttons'
 import {IconMsExcelLine} from '@instructure/ui-icons'
 
 const I18n = i18nScope('page_views')
-const filterLabel = I18n.t('Filter by date')
 const icon = <IconMsExcelLine />
 
 export interface PageViewsProps {
@@ -69,7 +68,7 @@ export default function PageViews({userId}: PageViewsProps): React.JSX.Element {
           placeholder={I18n.t('Limit to a specific date')}
           selectedDate={filterDate.date?.toISOString()}
           formatDate={formatDateForDisplay}
-          renderLabel={filterLabel}
+          renderLabel={I18n.t('Filter by date')}
           onSelectedDateChange={handleDateChange}
           withRunningValue={true}
           interaction="enabled"
