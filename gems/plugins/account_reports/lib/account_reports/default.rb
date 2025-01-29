@@ -32,7 +32,11 @@ module AccountReports
     end
 
     def self.outcome_results_csv(account_report)
-      OutcomeReports.new(account_report).outcome_results
+      if Account.site_admin.feature_enabled?(:improved_outcome_report_generation)
+        ImprovedOutcomeReports::OutcomeResultsReport.new(account_report).generate
+      else
+        OutcomeReports.new(account_report).outcome_results
+      end
     end
 
     def self.outcome_export_csv(account_report)
