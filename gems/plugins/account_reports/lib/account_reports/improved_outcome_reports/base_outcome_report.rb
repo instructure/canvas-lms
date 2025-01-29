@@ -21,14 +21,14 @@
 module AccountReports
   module ImprovedOutcomeReports
     class BaseOutcomeReport
+      include ReportHelper
+
       COURSE_CACHE_SIZE = 32
       ORDER_OPTIONS = %w[users courses outcomes].freeze
       ORDER_SQL = { "users" => "u.id, learning_outcomes.id, c.id",
                     "courses" => "c.id, u.id, learning_outcomes.id",
                     "outcomes" => "learning_outcomes.id, u.id, c.id" }.freeze
       DEFAULT_ORDER = "u.id, learning_outcomes.id, c.id"
-
-      include ReportHelper
 
       def initialize(account_report)
         @account_report = account_report
