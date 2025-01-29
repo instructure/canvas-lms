@@ -375,6 +375,9 @@ class ApplicationController < ActionController::Base
     rce_find_replace
     courses_popout_sisid
     dashboard_graphql_integration
+    discussion_checkpoints
+    discussion_default_sort
+    discussion_default_expand
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
     horizon_course_setting

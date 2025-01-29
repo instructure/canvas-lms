@@ -39,7 +39,8 @@ import {breakpointsShape} from '@canvas/with-breakpoints'
 import {DiscussionTranslationModuleContainer} from '../DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer'
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
-
+const discDefaultSortEnabled = () => window.ENV?.FEATURES?.discussion_default_sort
+const discDefaultExpandEnabled = () => window.ENV?.FEATURES?.discussion_default_expand
 const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
   const {showTranslationControl} = useContext(DiscussionManagerUtilityContext)
@@ -155,6 +156,10 @@ const DiscussionTopicToolbarContainer = props => {
                 manageAssignTo={props.discussionTopic.permissions.manageAssignTo}
                 isCheckpointed={props?.discussionTopic?.assignment?.checkpoints?.length > 0}
                 breakpoints={props.breakpoints}
+                isSortOrderLocked={props.discussionTopic.sortOrderLocked}
+                isExpandedLocked={props.discussionTopic.expandedLocked}
+                discDefaultSortEnabled={discDefaultSortEnabled()}
+                discDefaultExpandEnabled={discDefaultExpandEnabled()}
                 showAssignTo={
                   !props.discussionTopic.isAnnouncement &&
                   props.discussionTopic.contextType === 'Course' &&
@@ -200,6 +205,10 @@ const DiscussionTopicToolbarContainer = props => {
           isGraded={props.discussionTopic.assignment !== null}
           manageAssignTo={props.discussionTopic.permissions.manageAssignTo}
           isCheckpointed={props?.discussionTopic?.assignment?.checkpoints?.length > 0}
+          isSortOrderLocked={props.discussionTopic.sortOrderLocked}
+          isExpandedLocked={props.discussionTopic.expandedLocked}
+          discDefaultSortEnabled={discDefaultSortEnabled()}
+          discDefaultExpandEnabled={discDefaultExpandEnabled()}
           showAssignTo={
             !props.discussionTopic.isAnnouncement &&
             props.discussionTopic.contextType === 'Course' &&

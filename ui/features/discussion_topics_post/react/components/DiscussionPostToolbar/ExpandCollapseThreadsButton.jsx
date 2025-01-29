@@ -29,7 +29,7 @@ const I18n = createI18nScope('discussions_posts')
 export const ExpandCollapseThreadsButton = props => {
   const {setAllThreadsStatus, expandedThreads, setExpandedThreads} = useContext(SearchContext)
   const displayExpanded = expandedThreads.length > 0
-  const buttonText = displayExpanded > 0 ? I18n.t('Collapse Threads') : I18n.t('Expand Threads')
+  const buttonText = props.expandedLocked || !displayExpanded ? I18n.t('Expand Threads') : I18n.t('Collapse Threads')
 
   useEffect(() => {
     if (props.isExpanded) {
@@ -83,4 +83,5 @@ ExpandCollapseThreadsButton.propTypes = {
   onCollapseRepliesToggle: PropTypes.func,
   tooltipEnabled: PropTypes.bool,
   disabled: PropTypes.bool,
+  expandedLocked: PropTypes.bool,
 }
