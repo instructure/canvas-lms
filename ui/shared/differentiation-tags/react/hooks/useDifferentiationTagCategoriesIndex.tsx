@@ -23,7 +23,7 @@ import {DifferentiationTagCategory} from '../types'
 
 export const useDifferentiationTagCategoriesIndex = (
   courseId: number,
-  includeGroups: boolean = false,
+  includeDifferentiationTags: boolean = false,
 ) => {
   const fetchDifTagCategories = async () => {
     const response = await doFetchApi<Array<{id: number; name: string}>>({
@@ -34,7 +34,7 @@ export const useDifferentiationTagCategoriesIndex = (
       },
       params: {
         collaboration_state: 'non_collaborative',
-        ...(includeGroups && {'includes[]': 'groups'}),
+        ...(includeDifferentiationTags && {'includes[]': 'groups'}),
       },
     })
 
@@ -51,7 +51,7 @@ export const useDifferentiationTagCategoriesIndex = (
   }
 
   return useQuery<DifferentiationTagCategory[], Error>({
-    queryKey: ['differentiationTagCategories', courseId, includeGroups],
+    queryKey: ['differentiationTagCategories', courseId, includeDifferentiationTags],
     queryFn: fetchDifTagCategories,
     enabled: !!courseId,
     staleTime: QUERY_STALE_TIME,

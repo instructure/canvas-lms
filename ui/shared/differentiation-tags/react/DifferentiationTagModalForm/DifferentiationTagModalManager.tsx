@@ -18,42 +18,35 @@
 
 import React from 'react'
 import {QueryProvider} from '@canvas/query'
-import DifferentiationTagTray from './DifferentiationTagTray'
-import {useDifferentiationTagCategoriesIndex} from '../hooks/useDifferentiationTagCategoriesIndex'
+import DifferentiationTagModalForm from './DifferentiationTagModalForm'
+import {useDifferentiationTagSet} from '../hooks/useDifferentiationTagSet'
 
-interface DifferentiationTagTrayManagerProps {
+export interface DifferentiationTagModalManagerProps {
   isOpen: boolean
   onClose: () => void
-  courseID: number
+  mode: 'create' | 'edit'
+  differentiationTagCategoryId?: number
 }
 
-function DifferentiationTagTrayContainer(props: DifferentiationTagTrayManagerProps) {
-  const {isOpen, onClose, courseID} = props
-  const {
-    data: differentiationTagCategories,
-    isLoading,
-    error,
-  } = useDifferentiationTagCategoriesIndex(courseID, true)
+function DifferentiationTagModalContainer(props: DifferentiationTagModalManagerProps) {
+  const {isOpen, onClose, mode, differentiationTagCategoryId} = props
+
+  const {data: tagSet} = useDifferentiationTagSet(differentiationTagCategoryId, true)
 
   return (
-    <DifferentiationTagTray
+    <DifferentiationTagModalForm
       isOpen={isOpen}
       onClose={onClose}
-      differentiationTagCategories={differentiationTagCategories || []}
-      isLoading={isLoading}
-      error={error}
+      mode={mode}
+      differentiationTagSet={tagSet}
     />
   )
 }
 
-export default function DifferentiationTagTrayManager({
-  isOpen,
-  onClose,
-  courseID,
-}: DifferentiationTagTrayManagerProps) {
+export default function DifferentiationTagModalManager(props: DifferentiationTagModalManagerProps) {
   return (
     <QueryProvider>
-      <DifferentiationTagTrayContainer isOpen={isOpen} onClose={onClose} courseID={courseID} />
+      <DifferentiationTagModalContainer {...props} />
     </QueryProvider>
   )
 }

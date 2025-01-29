@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import pandasBalloonUrl from '../images/pandasBalloon.svg'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -28,6 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
+import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -68,7 +69,7 @@ const DifferentiationTagCategories = ({
   </List>
 )
 
-const EmptyState = ({onClose}: {onClose: () => void}) => (
+const EmptyState = ({handleCreateNewTag}: {handleCreateNewTag: () => void}) => (
   <Flex
     direction="column"
     alignItems="center"
@@ -96,19 +97,32 @@ const EmptyState = ({onClose}: {onClose: () => void}) => (
         {I18n.t('Learn more about how we used your input to create differentiation tags.')}
       </Link>
     </Text>
-    <Button onClick={onClose} margin="large 0 0 0" color="primary" size="medium">
+    <Button onClick={handleCreateNewTag} margin="large 0 0 0" color="primary" size="medium">
       {I18n.t('Get Started')}
     </Button>
   </Flex>
 )
+export default function DifferentiationTagTray(props: DifferentiationTagTrayProps) {
+  const {isOpen, onClose, differentiationTagCategories, isLoading, error} = props
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined)
 
-export default function DifferentiationTagTray({
-  isOpen,
-  onClose,
-  differentiationTagCategories,
-  isLoading,
-  error,
-}: DifferentiationTagTrayProps) {
+  const handleCreateNewTag = () => {
+    setModalMode('create')
+    setSelectedCategoryId(undefined)
+    setIsModalOpen(true)
+  }
+
+  const handleEditFirstTag = () => {
+    if (differentiationTagCategories.length > 0) {
+      setModalMode('edit')
+      // TEMPORARY, WILL BE ADJUSTED TO HANDLE MULTIPLE TAG CATEGORIES
+      setSelectedCategoryId(differentiationTagCategories[0].id)
+      setIsModalOpen(true)
+    }
+  }
+
   return (
     <View id="manage-differentiation-tag-container" width="100%" display="block">
       <Tray
@@ -131,16 +145,35 @@ export default function DifferentiationTagTray({
               </Text>
             </Flex.Item>
           ) : differentiationTagCategories.length === 0 ? (
-            <EmptyState onClose={onClose} />
+            <EmptyState handleCreateNewTag={handleCreateNewTag} />
           ) : (
             <Flex.Item shouldGrow shouldShrink margin="medium">
-              <DifferentiationTagCategories
-                differentiationTagCategories={differentiationTagCategories}
-              />
+              <Flex direction="column" height="100%">
+                <Flex.Item shouldGrow>
+                  <DifferentiationTagCategories
+                    differentiationTagCategories={differentiationTagCategories}
+                  />
+                </Flex.Item>
+                <Flex.Item>
+                  <Button onClick={handleCreateNewTag} color="primary" margin="small 0 0 0">
+                    {I18n.t('Create New Tag')}
+                  </Button>
+                  <Button onClick={handleEditFirstTag} color="secondary" margin="small 0 0 0">
+                    {I18n.t('Edit First Tag')}
+                  </Button>
+                </Flex.Item>
+              </Flex>
             </Flex.Item>
           )}
         </Flex>
       </Tray>
+
+      <DifferentiationTagModalManager
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        mode={modalMode}
+        differentiationTagCategoryId={selectedCategoryId}
+      />
     </View>
   )
 }
