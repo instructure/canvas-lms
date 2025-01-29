@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {ChildTopic} from '../../../graphql/ChildTopic'
 import {Flex} from '@instructure/ui-flex'
@@ -50,6 +49,7 @@ import {SummarizeButton} from './SummarizeButton'
 import MoreMenuButton from './MoreMenuButton'
 import AiIcon from '@canvas/ai-icon'
 import {TranslationTriggerModal} from "../TranslationTriggerModal/TranslationTriggerModal";
+import SortOrderDropDown from './SortOrderDropDown'
 
 const I18n = createI18nScope('discussions_posts')
 
@@ -156,6 +156,46 @@ export const DiscussionPostToolbar = props => {
     setModalOpen(false)
     setShowTranslationControl(false)
     setTranslateTargetLanguage(null)
+  }
+
+  const renderSort = () => {
+    if (props.discDefaultSortEnabled) {
+      return (
+        <SortOrderDropDown
+          isLocked={props.isSortOrderLocked}
+          selectedSortType={props.sortDirection}
+          onSortClick={props.onSortClick}
+        />
+      )
+    }
+    return (
+      <Tooltip
+        renderTip={props.sortDirection === 'desc' ? I18n.t('Newest First') : I18n.t('Oldest First')}
+        width="78px"
+        data-testid="sortButtonTooltip"
+      >
+        <span className="discussions-sort-button">
+          <Button
+            onClick={props.onSortClick}
+            renderIcon={
+              props.sortDirection === 'desc' ? (
+                <IconArrowDownLine data-testid="DownArrow" />
+              ) : (
+                <IconArrowUpLine data-testid="UpArrow" />
+              )
+            }
+            data-testid="sortButton"
+          >
+            {I18n.t('Sort')}
+            <ScreenReaderContent>
+              {props.sortDirection === 'asc'
+                ? I18n.t('Sorted by Ascending')
+                : I18n.t('Sorted by Descending')}
+            </ScreenReaderContent>
+          </Button>
+        </span>
+      </Tooltip>
+    )
   }
 
   return (
@@ -294,40 +334,11 @@ export const DiscussionPostToolbar = props => {
                       </SimpleSelect.Group>
                     </SimpleSelect>
                   </span>
-                  </Flex.Item>
-                  {/* Sort */}
-                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                    <Tooltip
-                      renderTip={
-                        props.sortDirection === 'desc'
-                          ? I18n.t('Newest First')
-                          : I18n.t('Oldest First')
-                      }
-                      width="78px"
-                      data-testid="sortButtonTooltip"
-                    >
-                    <span className="discussions-sort-button">
-                      <Button
-                        onClick={props.onSortClick}
-                        renderIcon={
-                          props.sortDirection === 'desc' ? (
-                            <IconArrowDownLine data-testid="DownArrow" />
-                          ) : (
-                            <IconArrowUpLine data-testid="UpArrow" />
-                          )
-                        }
-                        data-testid="sortButton"
-                      >
-                        {I18n.t('Sort')}
-                        <ScreenReaderContent>
-                          {props.sortDirection === 'asc'
-                            ? I18n.t('Sorted by Ascending')
-                            : I18n.t('Sorted by Descending')}
-                        </ScreenReaderContent>
-                      </Button>
-                    </span>
-                    </Tooltip>
-                  </Flex.Item>
+                </Flex.Item>
+                {/* Sort */}
+                <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                  {renderSort()}
+                </Flex.Item>
                   {!isSpeedGraderInTopUrl && (
                     <Flex.Item
                       margin={responsiveProps?.viewSplitScreen?.margin}
@@ -346,8 +357,10 @@ export const DiscussionPostToolbar = props => {
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                       <ExpandCollapseThreadsButton
                         showText={!matches.includes('mobile')}
-                        isExpanded={props.isExpanded}
+                        isExpanded={props.isExpanded || (props.discDefaultExpandEnabled && props.isExpandedLocked)}
                         onCollapseRepliesToggle={props.onCollapseRepliesToggle}
+                        disabled={props.userSplitScreenPreference || (props.discDefaultExpandEnabled && props.isExpandedLocked)}
+                        expandedLocked={props.isExpandedLocked}
                       />
                     </Flex.Item>
                   )}
@@ -445,4 +458,8 @@ DiscussionPostToolbar.propTypes = {
   isCheckpointed: PropTypes.bool,
   isExpanded: PropTypes.bool,
   showAssignTo: PropTypes.bool,
+  isSortOrderLocked: PropTypes.bool,
+  isExpandedLocked: PropTypes.bool,
+  discDefaultSortEnabled: PropTypes.bool,
+  discDefaultExpandEnabled: PropTypes.bool,
 }

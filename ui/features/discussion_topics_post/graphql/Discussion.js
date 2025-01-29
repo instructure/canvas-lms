@@ -61,6 +61,8 @@ export const Discussion = {
       contextType
       lockInformation
       subscriptionDisabledForUser
+      sortOrderLocked
+      expandedLocked
       editor {
         ...User
       }
@@ -141,6 +143,8 @@ export const Discussion = {
       unreadCount: number,
       repliesCount: number,
     }),
+    sortOrderLocked: bool,
+    expandedLocked: bool,
     author: User.shape,
     anonymousAuthor: AnonymousUser.shape,
     editor: User.shape,
@@ -217,6 +221,8 @@ export const Discussion = {
       expanded: false,
       __typename: 'DiscussionParticipant',
     },
+    sortOrderLocked = false,
+    expandedLocked = false,
     subscriptionDisabledForUser = false,
   } = {}) => ({
     id,
@@ -262,6 +268,8 @@ export const Discussion = {
     discussionEntriesConnection,
     subscriptionDisabledForUser,
     participant,
+    sortOrderLocked,
+    expandedLocked,
     __typename: 'Discussion',
   }),
 }
