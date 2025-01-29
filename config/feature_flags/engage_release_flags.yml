@@ -30,3 +30,8 @@ people_page_modernization:
   applies_to: Account
   display_name: People Page Modernization
   description: People page modernization
+discussions_speedgrader_revisit:
+  state: hidden
+  applies_to: Account
+  display_name: Discussions SpeedGrader Revisit
+  description: Contains improvements to Discussions in Speedgrader. i.e. Toggling, Traversal, Overall experience. Requires react_discussions_post and discussion_checkpoints feature flags to completely work.
