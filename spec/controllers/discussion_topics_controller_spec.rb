@@ -252,6 +252,12 @@ describe DiscussionTopicsController do
         end
       end
 
+      it "works with short global id format" do
+        @topic = @course.discussion_topics.create!(title: "student topic", message: "Hello", user: @student)
+        get "show", params: { course_id: @course.id, id: "#{@topic.shard.id}~#{@topic.id}" }
+        expect(response).to have_http_status :found
+      end
+
       it "returns the topic across shards" do
         @topic = @course.discussion_topics.create!(title: "student topic", message: "Hello", user: @student)
         user_session(@student)
