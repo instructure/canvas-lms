@@ -26,6 +26,8 @@ module Lti::IMS
   #
   class AssetProcessorController < ApplicationController
     include Concerns::AdvantageServices
+    include AttachmentHelper
+
     before_action(
       :require_feature_enabled,
       :verify_developer_key_owns_asset_processor
@@ -38,6 +40,16 @@ module Lti::IMS
       :verify_no_newer_report,
       only: :create_report
     )
+
+    before_action(
+      :verify_processor_compatible_with_asset,
+      only: :lti_asset_show
+    )
+
+    ACTION_SCOPE_MATCHERS = {
+      create_report: all_of(TokenScopes::LTI_ASSET_REPORT_SCOPE),
+      lti_asset_show: all_of(TokenScopes::LTI_ASSET_READ_ONLY_SCOPE)
+    }.with_indifferent_access.freeze
 
     # Recognized params for the asset report create endpoint
     ASSET_REPORT_RECOGNIZED_PARAMS = %i[
@@ -178,10 +190,21 @@ module Lti::IMS
       render json: report_to_api_json(report), status: :created
     end
 
+    def lti_asset_show
+      render_error("not found", :not_found) unless download_asset&.attachment
+      render_or_redirect_to_stored_file(
+        attachment: download_asset.attachment
+      )
+    end
+
     private
 
     def report_asset
       @report_asset ||= Lti::Asset.find_by(uuid: params.require(:assetId))
+    end
+
+    def download_asset
+      @download_asset ||= Lti::Asset.find_by(uuid: params.require(:asset_id))
     end
 
     def report_type
@@ -237,6 +260,13 @@ module Lti::IMS
       end
     end
 
+    def verify_processor_compatible_with_asset
+      render_error("not found", :not_found) unless download_asset
+      unless download_asset&.compatible_with_processor?(asset_processor)
+        render_error "Invalid asset", :bad_request
+      end
+    end
+
     def verify_no_newer_report
       if reports_scope.where("timestamp > ?", report_timestamp).exists?
         render_error "An existing report has a newer timestamp", :conflict
@@ -277,11 +307,7 @@ module Lti::IMS
     end
 
     def scopes_matcher
-      # TODO: use LTI_ASSET_READ_ONLY_SCOPE if action_name is 'lti_asset_show',
-      # when we implement lti_asset_show
-      # (or remove this comment if we've implemented it outside of this controller)
-      # (see line_items_controller#scopes_matcher)
-      self.class.all_of(TokenScopes::LTI_ASSET_REPORT_SCOPE)
+      ACTION_SCOPE_MATCHERS.fetch(action_name, self.class.none)
     end
   end
 end
