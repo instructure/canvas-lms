@@ -1888,6 +1888,12 @@ describe AssignmentsController do
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be false
       end
     end
+
+    it "shows assignment was submitted successfully alert if submitted in url" do
+      user_session(@student)
+      get :show, params: { course_id: @course.id, id: @assignment.id, submitted: 0 }
+      expect(flash[:notice]).to match(/Assignment successfully submitted./)
+    end
   end
 
   describe "GET 'tool_launch'" do

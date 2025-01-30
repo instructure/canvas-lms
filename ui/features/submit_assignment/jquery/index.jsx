@@ -36,6 +36,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/tabs'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import FileBrowser from '@canvas/rce/FileBrowser'
 import {ProgressCircle} from '@instructure/ui-progress'
 import {Alert} from '@instructure/ui-alerts'
@@ -43,6 +44,8 @@ import Attachment from '../react/Attachment'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import {captureException} from '@sentry/react'
 import ready from '@instructure/ready'
+import {Flex} from '@instructure/ui-flex'
+import OnlineUrlSubmission from '../react/OnlineUrlSubmission'
 
 const I18n = createI18nScope('submit_assignment')
 
@@ -58,6 +61,7 @@ function insertEmoji(emoji) {
 
 ready(function () {
   let submitting = false
+  let shouldShowUrlError = false
   const submissionForm = $('.submit_assignment_form')
 
   const homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer()
@@ -74,6 +78,36 @@ ready(function () {
         {accessibilityAlert}
       </Alert>,
       alertMount(),
+    )
+  }
+
+  const getShouldShowUrlError = () => shouldShowUrlError
+  const setShouldShowUrlError = value => (shouldShowUrlError = value)
+
+  const handleOnlineUrlSubmissionError = () => {
+    shouldShowUrlError = true
+    const input = document.getElementById('online-url-input')
+    input.focus()
+  }
+
+  // Add InstUI TextInput for online_url_submission
+  const urlInput = document.getElementById('online_url_submission_input')
+  if (urlInput) {
+    const setOnlineUrlValue = url => {
+      const onlineUrlHiddenInput = document.getElementById('submission_url')
+      onlineUrlHiddenInput.value = url
+    }
+    const root = createRoot(urlInput)
+    root.render(
+      <Flex as="div" margin="small 0">
+        <Flex.Item width="100%">
+          <OnlineUrlSubmission
+            setValue={setOnlineUrlValue}
+            getShouldShowUrlError={getShouldShowUrlError}
+            setShouldShowUrlError={setShouldShowUrlError}
+          />
+        </Flex.Item>
+      </Flex>
     )
   }
 
@@ -104,191 +138,234 @@ ready(function () {
     }
   })
 
-  submissionForm.submit(function (event) {
-    const self = this
-    const $turnitin = $(this).find('.turnitin_pledge')
-    const $vericite = $(this).find('.vericite_pledge')
-
-    if (!verifyPledgeIsChecked($turnitin)) {
-      event.preventDefault()
-      event.stopPropagation()
-      return false
-    }
-
-    if (!verifyPledgeIsChecked($vericite)) {
-      event.preventDefault()
-      event.stopPropagation()
-      return false
-    }
-
-    const valid =
-      !$(this).is('#submit_online_text_entry_form') ||
-      $(this).validateForm({
-        object_name: 'submission',
-        required: ['body'],
-        property_validations: {
-          body(value) {
-            const bodyHtml = document.createElement('div')
-            bodyHtml.insertAdjacentHTML('beforeend', value)
-            if (bodyHtml.querySelector(`[data-placeholder-for]`)) {
-              return I18n.t('File has not finished uploading')
-            }
-          },
-        },
-      })
-    if (!valid) return false
-
-    RichContentEditor.closeRCE($('#submit_online_text_entry_form textarea:first'))
-
-    $(this)
-      .find("button[type='submit']")
-      .text(I18n.t('messages.submitting', 'Submitting...'))
-      .prop('disabled', true)
-
-    if ($(this).attr('id') === 'submit_online_upload_form') {
-      event.preventDefault() && event.stopPropagation()
-      const fileElements = $(this)
-        .find('input[type=file]:visible')
-        .filter(function () {
-          return $(this).val() !== ''
-        })
-
-      Object.values(webcamBlobs)
-        .filter(blob => blob)
-        .forEach(blob => {
-          fileElements.push({
-            name: 'webcam-picture.png',
-            size: blob.size,
-            type: blob.type,
-            files: [blob],
-          })
-        })
-
-      const emptyFiles = $(this)
-        .find('input[type=file]:visible')
-        .filter(function () {
-          return this.files[0] && this.files[0].size === 0
-        })
-
-      const uploadedAttachmentIds = $(this).find('#submission_attachment_ids').val()
-
-      const reenableSubmitButton = function () {
-        $(self)
-          .find('button[type=submit]')
-          .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
-          .prop('disabled', false)
-      }
-
-      const progressIndicator = function (event) {
-        if (event.lengthComputable) {
-          const mountPoint = document.getElementById('progress_indicator')
-
-          if (mountPoint) {
-            ReactDOM.render(
-              <ProgressCircle
-                screenReaderLabel={I18n.t('Uploading Progress')}
-                size="x-small"
-                valueMax={event.total}
-                valueNow={event.loaded}
-                meterColor="info"
-                formatScreenReaderValue={({valueNow, valueMax}) =>
-                  I18n.t('%{percent}% complete', {percent: Math.round((valueNow * 100) / valueMax)})
-                }
-              />,
-              mountPoint,
-            )
-          }
+  if (submissionForm.attr('id') === 'submit_online_url_form') {
+    submissionForm.formSubmit({
+      formErrors: false,
+      processData(data) {
+        return {...data, should_redirect_to_assignment: true}
+      },
+      beforeSubmit(data) {
+        if (data['submission[url]']) {
+          submitting = true
+          $(this)
+            .find("button[type='submit']")
+            .text(I18n.t('messages.submitting', 'Submitting...'))
+            .prop('disabled', true)
+        } else {
+          handleOnlineUrlSubmissionError()
+          return false
         }
+      },
+      success(data) {
+        const location = data['redirect_url']
+        if (location) {
+          window.location.href = location
+        }
+      },
+      error(_data) {
+        submissionForm
+          .find("button[type='submit']")
+          .text(I18n.t('Submit Assignment'))
+        submissionForm.find('button').prop('disabled', false)
+        handleOnlineUrlSubmissionError()
       }
-
-      // warn user if they haven't uploaded any files
-      if (fileElements.length === 0 && uploadedAttachmentIds === '') {
-        $.flashError(
-          I18n.t(
-            '#errors.no_attached_file',
-            'You must attach at least one file to this assignment',
-          ),
-        )
-        reenableSubmitButton()
-        return false
-      }
-
-      // throw error if the user tries to upload an empty file
-      // to prevent S3 from erroring
-      if (emptyFiles.length) {
-        $.flashError(I18n.t('Attached files must be greater than 0 bytes'))
-        reenableSubmitButton()
-        return false
-      }
-
-      // If there are restrictions on file type, don't accept submission if the file extension is not allowed
-      if (ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length > 0) {
-        const subButton = $(this).find('button[type=submit]')
-        let badExt = false
-        $.each(uploadedAttachmentIds.split(','), (index, id) => {
-          if (id.length > 0) {
-            const ext = $('#submission_attachment_ids')
-              .data(String(id))
-              .split('.')
-              .pop()
-              .toLowerCase()
-            if ($.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0) {
-              badExt = true
-              $.flashError(
-                I18n.t(
-                  '#errors.wrong_file_extension',
-                  'The file you selected with extension "%{extension}", is not authorized for submission',
-                  {extension: ext},
-                ),
-              )
-            }
-          }
-        })
-        if (badExt) {
-          subButton
-            .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
-            .prop('disabled', false)
+    })
+  } else {
+    submissionForm.submit(function (event) {
+      const self = this
+      const $turnitin = $(this).find('.turnitin_pledge')
+      const $vericite = $(this).find('.vericite_pledge')
+      // warn users if they entered an invalid URL
+      const urlSubmission = document.getElementById('online_url_submission_input')
+      if (urlSubmission) {
+        const input = document.getElementById('submission_url').value
+        if (!input) {
+          handleOnlineUrlSubmissionError()
           return false
         }
       }
-
-      $.ajaxJSONPreparedFiles.call(this, {
-        handle_files(attachments, data) {
-          const ids = (data['submission[attachment_ids]'] || '').split(',').filter(id => id !== '')
-          for (const idx in attachments) {
-            ids.push(attachments[idx].id)
+  
+      if (!verifyPledgeIsChecked($turnitin)) {
+        event.preventDefault()
+        event.stopPropagation()
+        return false
+      }
+  
+      if (!verifyPledgeIsChecked($vericite)) {
+        event.preventDefault()
+        event.stopPropagation()
+        return false
+      }
+  
+      const valid =
+        !$(this).is('#submit_online_text_entry_form') ||
+        $(this).validateForm({
+          object_name: 'submission',
+          required: ['body'],
+          property_validations: {
+            body(value) {
+              const bodyHtml = document.createElement('div')
+              bodyHtml.insertAdjacentHTML('beforeend', value)
+              if (bodyHtml.querySelector(`[data-placeholder-for]`)) {
+                return I18n.t('File has not finished uploading')
+              }
+            },
+          },
+        })
+      if (!valid) return false
+  
+      RichContentEditor.closeRCE($('#submit_online_text_entry_form textarea:first'))
+  
+      $(this)
+        .find("button[type='submit']")
+        .text(I18n.t('messages.submitting', 'Submitting...'))
+        .prop('disabled', true)
+  
+      if ($(this).attr('id') === 'submit_online_upload_form') {
+        event.preventDefault() && event.stopPropagation()
+        const fileElements = $(this)
+          .find('input[type=file]:visible')
+          .filter(function () {
+            return $(this).val() !== ''
+          })
+  
+        Object.values(webcamBlobs)
+          .filter(blob => blob)
+          .forEach(blob => {
+            fileElements.push({
+              name: 'webcam-picture.png',
+              size: blob.size,
+              type: blob.type,
+              files: [blob],
+            })
+          })
+  
+        const emptyFiles = $(this)
+          .find('input[type=file]:visible')
+          .filter(function () {
+            return this.files[0] && this.files[0].size === 0
+          })
+  
+        const uploadedAttachmentIds = $(this).find('#submission_attachment_ids').val()
+  
+        const reenableSubmitButton = function () {
+          $(self)
+            .find('button[type=submit]')
+            .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
+            .prop('disabled', false)
+        }
+  
+        const progressIndicator = function (event) {
+          if (event.lengthComputable) {
+            const mountPoint = document.getElementById('progress_indicator')
+  
+            if (mountPoint) {
+              ReactDOM.render(
+                <ProgressCircle
+                  screenReaderLabel={I18n.t('Uploading Progress')}
+                  size="x-small"
+                  valueMax={event.total}
+                  valueNow={event.loaded}
+                  meterColor="info"
+                  formatScreenReaderValue={({valueNow, valueMax}) =>
+                    I18n.t('%{percent}% complete', {percent: Math.round((valueNow * 100) / valueMax)})
+                  }
+                />,
+                mountPoint,
+              )
+            }
           }
-          data['submission[attachment_ids]'] = ids.join(',')
-          return data
-        },
-        context_code: $('#submit_assignment').data('context_code'),
-        asset_string: $('#submit_assignment').data('asset_string'),
-        intent: 'submit',
-        file_elements: fileElements,
-        formData: $(this).getFormData(),
-        formDataTarget: 'url',
-        url: $(this).attr('action'),
-        onProgress: progressIndicator,
-        success(data) {
-          submitting = true
-          const url = new URL(window.location.href)
-          url.hash = ''
-          if (window.ENV.CONFETTI_ENABLED && !data?.submission?.late) {
-            url.searchParams.set('confetti', 'true')
+        }
+  
+        // warn user if they haven't uploaded any files
+        if (fileElements.length === 0 && uploadedAttachmentIds === '') {
+          $.flashError(
+            I18n.t(
+              '#errors.no_attached_file',
+              'You must attach at least one file to this assignment',
+            ),
+          )
+          reenableSubmitButton()
+          return false
+        }
+  
+        // throw error if the user tries to upload an empty file
+        // to prevent S3 from erroring
+        if (emptyFiles.length) {
+          $.flashError(I18n.t('Attached files must be greater than 0 bytes'))
+          reenableSubmitButton()
+          return false
+        }
+  
+        // If there are restrictions on file type, don't accept submission if the file extension is not allowed
+        if (ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length > 0) {
+          const subButton = $(this).find('button[type=submit]')
+          let badExt = false
+          $.each(uploadedAttachmentIds.split(','), (index, id) => {
+            if (id.length > 0) {
+              const ext = $('#submission_attachment_ids')
+                .data(String(id))
+                .split('.')
+                .pop()
+                .toLowerCase()
+              if ($.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0) {
+                badExt = true
+                $.flashError(
+                  I18n.t(
+                    '#errors.wrong_file_extension',
+                    'The file you selected with extension "%{extension}", is not authorized for submission',
+                    {extension: ext},
+                  ),
+                )
+              }
+            }
+          })
+          if (badExt) {
+            subButton
+              .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
+              .prop('disabled', false)
+            return false
           }
-          window.location = url.toString()
-        },
-        error(_data) {
-          submissionForm
-            .find("button[type='submit']")
-            .text(I18n.t('messages.submit_failed', 'Submit Failed, please try again'))
-          submissionForm.find('button').prop('disabled', false)
-        },
-      })
-    } else {
-      submitting = true
-    }
-  })
+        }
+  
+        $.ajaxJSONPreparedFiles.call(this, {
+          handle_files(attachments, data) {
+            const ids = (data['submission[attachment_ids]'] || '').split(',').filter(id => id !== '')
+            for (const idx in attachments) {
+              ids.push(attachments[idx].id)
+            }
+            data['submission[attachment_ids]'] = ids.join(',')
+            return data
+          },
+          context_code: $('#submit_assignment').data('context_code'),
+          asset_string: $('#submit_assignment').data('asset_string'),
+          intent: 'submit',
+          file_elements: fileElements,
+          formData: $(this).getFormData(),
+          formDataTarget: 'url',
+          url: $(this).attr('action'),
+          onProgress: progressIndicator,
+          success(data) {
+            submitting = true
+            const url = new URL(window.location.href)
+            url.hash = ''
+            if (window.ENV.CONFETTI_ENABLED && !data?.submission?.late) {
+              url.searchParams.set('confetti', 'true')
+            }
+            window.location = url.toString()
+          },
+          error(_data) {
+            submissionForm
+              .find("button[type='submit']")
+              .text(I18n.t('messages.submit_failed', 'Submit Failed, please try again'))
+            submissionForm.find('button').prop('disabled', false)
+          },
+        })
+      } else {
+        submitting = true
+      }
+    })
+  }
 
   $(window).on('beforeunload', e => {
     if ($('#submit_assignment:visible').length > 0 && !submitting) {
@@ -320,6 +397,14 @@ ready(function () {
 
   $('.submit_assignment_link').click(function (event, skipConfirmation) {
     event.preventDefault()
+    // Since we are starting a new attempt, if it is in the url remove the submitted url param
+    const currentUrl = new URL(window.location.href)
+    if (currentUrl.searchParams.has('submitted')) {
+      currentUrl.searchParams.delete('submitted')
+
+      // Update the URL without reloading the page
+      window.history.replaceState({}, document.title, currentUrl.toString())
+    }
     const late = $(this).hasClass('late')
     if (late && !skipConfirmation) {
       let result
