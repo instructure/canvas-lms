@@ -39,6 +39,7 @@ import PortfolioSettingsModal from './PortfolioSettingsModal'
 import {Menu} from '@instructure/ui-menu'
 import SectionEditModal from './SectionEditModal'
 import type {ePortfolio, ePortfolioSection} from './types'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('eportfolio')
 interface Props {
@@ -182,19 +183,21 @@ function SectionList(props: Props) {
           {portfolioName}
         </Text>
         <Text>{I18n.t('Sections')}</Text>
-        <div id="section_list">
-          <Table
-            caption={I18n.t('List of sections for %{eportfolio}', {
-              eportfolio: props.portfolio.name,
-            })}
-          >
-            <Table.Body>
-              {(data ?? []).map((section: ePortfolioSection) => {
-                return renderSectionRow(section)
+        <View display="block" overflowY="auto" maxHeight="600px">
+          <div id="section_list">
+            <Table
+              caption={I18n.t('List of sections for %{eportfolio}', {
+                eportfolio: props.portfolio.name,
               })}
-            </Table.Body>
-          </Table>
-        </div>
+              >
+              <Table.Body>
+                {(data ?? []).map((section: ePortfolioSection) => {
+                  return renderSectionRow(section)
+                })}
+              </Table.Body>
+            </Table>
+          </div>
+        </View>
         {props.isOwner ? (
           <>
             <Button
