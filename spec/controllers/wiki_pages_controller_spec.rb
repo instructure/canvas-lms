@@ -39,6 +39,16 @@ describe WikiPagesController do
       expect(assigns[:js_env][:DISPLAY_SHOW_ALL_LINK]).to be(true)
     end
 
+    it "suppresses text editor preferences with block editor FF off" do
+      @user.set_preference(:text_editor_preference, "block_editor")
+      @course.account.enable_feature!(:block_editor)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:text_editor_preference]).to eq "block_editor"
+      @course.account.disable_feature!(:block_editor)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env].keys).not_to include(:text_editor_preference)
+    end
+
     it "sets up js_env for the block editor" do
       @course.account.enable_feature!(:block_editor)
       get "index", params: { course_id: @course.id }
