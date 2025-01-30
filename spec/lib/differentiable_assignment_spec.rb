@@ -141,6 +141,10 @@ shared_examples_for "a differentiable_object" do
         expect(differentiable.visible_to_user?(@user)).to be_truthy
       end
     end
+
+    it "returns false if user is nil" do
+      expect(differentiable.visible_to_user?(nil)).to be_falsey
+    end
   end
 
   describe "filter" do
