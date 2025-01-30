@@ -1,4 +1,4 @@
-version: '3.2'
+name: canvas-lms
 
 x-environment: &BASE-ENV
   CANVAS_DATABASE_HOST: canvas-postgres
@@ -13,34 +13,35 @@ x-base-service: &BASE-SERVICE
   build:
     context: .
   volumes:
-      - .:/usr/src/app
-      # needed to prevent local .bundle/plugin/index file from being copied into the container
-      - /usr/src/app/.bundle/plugin
-      - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
-      - bundler:/home/docker/.bundle/
-      - canvas-docker-gems:/home/docker/.gem/
-      - js-utils_es:/usr/src/app/packages/js-utils/es
-      - js-utils_lib:/usr/src/app/packages/js-utils/lib
-      - js-utils_node_modules:/usr/src/app/packages/js-utils/node_modules
-      - locales:/usr/src/app/config/locales/generated
-      - log:/usr/src/app/log
-      - node_modules:/usr/src/app/node_modules
-      - pacts:/usr/src/app/pacts
-      - public_dist:/usr/src/app/public/dist
-      - reports:/usr/src/app/reports
-      - styleguide:/usr/src/app/app/views/info
-      - tmp:/usr/src/app/tmp
-      - translations:/usr/src/app/public/javascripts/translations
-      - yardoc:/usr/src/app/.yardoc
-      - yarn-cache:/home/docker/.cache/yarn
+    - .:/usr/src/app
+    # needed to prevent local .bundle/plugin/index file from being copied into the container
+    - /usr/src/app/.bundle/plugin
+    - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
+    - bundler:/home/docker/.bundle/
+    - canvas-docker-gems:/home/docker/.gem/
+    - js-utils_es:/usr/src/app/packages/js-utils/es
+    - js-utils_lib:/usr/src/app/packages/js-utils/lib
+    - js-utils_node_modules:/usr/src/app/packages/js-utils/node_modules
+    - locales:/usr/src/app/config/locales/generated
+    - log:/usr/src/app/log
+    - node_modules:/usr/src/app/node_modules
+    - pacts:/usr/src/app/pacts
+    - public_dist:/usr/src/app/public/dist
+    - reports:/usr/src/app/reports
+    - styleguide:/usr/src/app/app/views/info
+    - tmp:/usr/src/app/tmp
+    - translations:/usr/src/app/public/javascripts/translations
+    - yardoc:/usr/src/app/.yardoc
+    - yarn-cache:/home/docker/.cache/yarn
   env_file: .env
   environment:
     <<: *BASE-ENV
   labels:
-      - "traefik.enable=true"
+    - traefik.enable=true
 
 services:
   web:
+    container_name: canvas-web
     <<: *BASE-SERVICE
     environment:
       <<: *BASE-ENV
@@ -55,7 +56,7 @@ services:
       - postgres
       - redis
     ports:
-    - "12345-12354:12345-12354"
+      - 12345-12354:12345-12354
     networks:
       default:
         aliases:
@@ -63,14 +64,16 @@ services:
           - canvas-web.$INST_DOMAIN
 
   web-dev-logs:
+    container_name: canvas-web-dev-logs
     <<: *BASE-SERVICE
     command: tail -f log/development.log
     volumes:
       - log:/usr/src/app/log:ro
     labels:
-      - "traefik.enable=false"
+      - traefik.enable=false
 
   jobs:
+    container_name: canvas-jobs
     <<: *BASE-SERVICE
     command: bundle exec script/delayed_job run
     networks:
@@ -79,6 +82,7 @@ services:
           - canvas-jobs
 
   webpack:
+    container_name: canvas-webpack
     <<: *BASE-SERVICE
     command: yarn run webpack
     networks:
@@ -87,12 +91,13 @@ services:
           - canvas-webpack
 
   postgres:
+    container_name: canvas-postgres
     build: ./docker-compose/postgres
     env_file: .env
     environment:
       POSTGRES_PASSWORD: sekret
     labels:
-        - "traefik.enable=true"
+      - traefik.enable=true
     volumes:
       - pg_data:/var/lib/postgresql/data
     networks:
@@ -101,19 +106,21 @@ services:
           - canvas-postgres
 
   redis:
+    container_name: canvas-redis
     image: redis:alpine
     env_file: .env
     labels:
-        - "traefik.enable=true"
+      - traefik.enable=true
     networks:
       default:
         aliases:
           - canvas-redis
 
   githook-installer:
+    container_name: canvas-githook-installer
     build:
       context: .
-      dockerfile: 'Dockerfile.githook'
+      dockerfile: Dockerfile.githook
     env_file: .env
     volumes:
       - ./.git:/tmp/.git
