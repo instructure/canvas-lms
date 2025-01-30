@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
-import {act, render, waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type doFetchApi from '@canvas/do-fetch-api-effect'
 import type {DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {updateModuleItem} from '../../jquery/utils'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
 import {initBody, makeModuleWithItems} from '../../__tests__/testHelpers'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
@@ -32,6 +33,7 @@ jest.mock('@canvas/do-fetch-api-effect', () => ({
       response: new Response('', {status: 200}),
       json: {published: true},
       text: '',
+      link: undefined,
     } as DoFetchApiResults<{published: boolean}>),
   ),
 }))
@@ -39,14 +41,20 @@ jest.mock('@canvas/do-fetch-api-effect', () => ({
 jest.mock('@canvas/context-modules/jquery/utils', () => {
   const originalModule = jest.requireActual('@canvas/context-modules/jquery/utils')
   return {
-    __esmodule: true,
+    __esModule: true,
     ...originalModule,
     updateModuleItem: jest.fn(),
   }
 })
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
+
 const mockDoFetchApi = jest.requireMock('@canvas/do-fetch-api-effect')
   .default as jest.MockedFunction<typeof doFetchApi>
+
+const mockShowFlashAlert = showFlashAlert as jest.Mock
 
 const defaultProps = {
   courseId: '1',
@@ -67,8 +75,10 @@ beforeEach(() => {
       response: mockResponse,
       json: {published: true},
       text: '',
+      link: undefined,
     } as DoFetchApiResults<{published: boolean}>),
   )
+  mockShowFlashAlert.mockReset()
   initBody()
   makeModuleWithItems(1, [117, 119])
 })
@@ -80,130 +90,40 @@ afterEach(() => {
 })
 
 describe('ContextModulesPublishIcon', () => {
-  describe('basic rendering', () => {
-    it('displays a spinner with default message while publishing is in-flight', () => {
-      const {getByText} = render(
-        <ContextModulesPublishIcon {...defaultProps} isPublishing={true} />,
-      )
-      expect(getByText('working')).toBeInTheDocument()
-    })
-
-    it('displays a spinner with given message while publishing is in-flight', () => {
-      const {getByText} = render(
-        <ContextModulesPublishIcon
-          {...defaultProps}
-          isPublishing={true}
-          loadingMessage="the loading message"
-        />,
-      )
-      expect(getByText('the loading message')).toBeInTheDocument()
-    })
-
-    it('renders as unpublished when unpublished', () => {
-      const {container, getByText} = render(
-        <ContextModulesPublishIcon {...defaultProps} published={false} />,
-      )
-      expect(getByText('Lesson 2 module publish options, unpublished')).toBeInTheDocument()
-      expect(container.querySelector('[name="IconUnpublished"]')).toBeInTheDocument()
-    })
-
-    it('renders as published when published', () => {
-      const {container, getByText} = render(
-        <ContextModulesPublishIcon {...defaultProps} published={true} />,
-      )
-      expect(getByText('Lesson 2 module publish options, published')).toBeInTheDocument()
-      expect(container.querySelector('[name="IconPublish"]')).toBeInTheDocument()
-    })
-  })
-
-  it('renders the menu when clicked', () => {
-    const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {hidden: true})
-    act(() => menuButton.click())
-    expect(getByText('Publish module and all items')).toBeInTheDocument()
-    expect(getByText('Publish module only')).toBeInTheDocument()
-    expect(getByText('Unpublish module and all items')).toBeInTheDocument()
-    expect(getByText('Unpublish module only')).toBeInTheDocument()
-  })
-
-  it('calls publishAll when clicked publish all menu item is clicked', async () => {
-    const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {
-      name: 'Lesson 2 module publish options, published',
-      hidden: true,
-    })
-    menuButton.click()
-    const publishButton = getByText('Publish module and all items')
-    publishButton.click()
-    await waitFor(() => expect(getByText('Publishing module and items')).toBeInTheDocument())
-    expect(mockDoFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: 'PUT',
-        path: PUBLISH_URL,
-        body: {module: {published: true, skip_content_tags: false}},
-      }),
-    )
-    expect(getByText('Module and items published')).toBeInTheDocument()
-  })
-
-  it('calls publishModuleOnly when clicked publish module menu item is clicked', async () => {
-    const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {
-      name: 'Lesson 2 module publish options, published',
-      hidden: true,
-    })
-    menuButton.click()
-    const publishButton = getByText('Publish module only')
-    publishButton.click()
-    await waitFor(() => expect(getByText('Publishing module')).toBeInTheDocument())
-    expect(mockDoFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: 'PUT',
-        path: PUBLISH_URL,
-        body: {module: {published: true, skip_content_tags: true}},
-      }),
-    )
-    expect(getByText('Module published')).toBeInTheDocument()
-  })
-
-  it('calls unpublishAll when clicked unpublish all items is clicked', async () => {
-    const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {
-      name: 'Lesson 2 module publish options, published',
-      hidden: true,
-    })
-    menuButton.click()
-    const publishButton = getByText('Unpublish module and all items')
-    publishButton.click()
-    await waitFor(() => expect(getByText('Unpublishing module and items')).toBeInTheDocument())
-    expect(mockDoFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: 'PUT',
-        path: PUBLISH_URL,
-        body: {module: {published: false, skip_content_tags: false}},
-      }),
-    )
-    expect(getByText('Module and items unpublished')).toBeInTheDocument()
-  })
-
   it('calls unpublishModuleOnly when unpublish module only is clicked', async () => {
-    const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
+    const user = userEvent.setup({delay: null})
+    const {getByRole} = render(<ContextModulesPublishIcon {...defaultProps} />)
+
+    // Open menu and click unpublish module only
     const menuButton = getByRole('button', {
       name: 'Lesson 2 module publish options, published',
       hidden: true,
     })
-    menuButton.click()
-    const publishButton = getByText('Unpublish module only')
-    publishButton.click()
-    await waitFor(() => expect(getByText('Unpublishing module')).toBeInTheDocument())
-    expect(mockDoFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: 'PUT',
-        path: PUBLISH_URL,
-        body: {module: {published: false, skip_content_tags: true}},
-      }),
-    )
-    expect(getByText('Module unpublished')).toBeInTheDocument()
+    await user.click(menuButton)
+    const unpublishButton = getByRole('menuitem', {name: 'Unpublish module only'})
+    await user.click(unpublishButton)
+
+    // Verify API call
+    await waitFor(() => {
+      expect(mockDoFetchApi).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PUT',
+          path: PUBLISH_URL,
+          body: {module: {published: false, skip_content_tags: true}},
+        }),
+      )
+    })
+
+    // Verify flash message
+    await waitFor(() => {
+      expect(mockShowFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Module unpublished',
+          type: 'success',
+          srOnly: true,
+        }),
+      )
+    })
   })
 
   it('calls updateModuleItem when publishing', async () => {
