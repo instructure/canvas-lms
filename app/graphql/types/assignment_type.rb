@@ -168,6 +168,14 @@ module Types
             null: true
     end
 
+    class AnonymousStudentIdentityType < ApplicationObjectType
+      description "An anonymous student identity"
+
+      field :anonymous_id, ID, null: false
+      field :name, String, null: false
+      field :position, Int, null: false
+    end
+
     global_id_field :id
 
     field :name, String, null: true
@@ -643,6 +651,13 @@ module Types
 
         scope
       end
+    end
+
+    field :anonymous_student_identities, [AnonymousStudentIdentityType], null: true
+    def anonymous_student_identities
+      return nil unless assignment.context.grants_right?(current_user, :manage_grades)
+
+      assignment.anonymous_student_identities.values
     end
   end
 end
