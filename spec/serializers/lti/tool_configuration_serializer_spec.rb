@@ -17,13 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../lti_1_3_spec_helper"
-
 RSpec.describe Lti::ToolConfigurationSerializer do
   subject { Lti::ToolConfigurationSerializer.new(tool_configuration).as_json }
 
-  include_context "lti_1_3_spec_helper"
-
+  let_once(:developer_key) { lti_developer_key_model(account:) }
+  let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration) }
   let_once(:account) { Account.default }
 
   it { is_expected.to have_key "tool_configuration" }

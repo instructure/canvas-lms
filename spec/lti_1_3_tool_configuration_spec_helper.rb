@@ -18,10 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :metadata do
-  let(:tool_configuration) do
-    developer_key.tool_configuration || lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration, privacy_level: "public")
-  end
-
   let_once(:canvas_lti_configuration) do
     {
       title: "LTI 1.3 Tool",

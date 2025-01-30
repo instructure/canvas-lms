@@ -23,10 +23,10 @@ shared_context "advantage access token context" do
   end
   let_once(:developer_key) do
     dk = lti_developer_key_model(account: root_account)
-    lti_tool_configuration_model(developer_key: dk)
     dk.developer_key_account_bindings.first.update! workflow_state: "on"
     dk
   end
+  let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:) }
   let(:access_token_scopes) do
     %w[
       https://purl.imsglobal.org/spec/lti-ags/scope/lineitem

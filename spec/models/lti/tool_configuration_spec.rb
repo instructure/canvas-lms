@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../lti_1_3_spec_helper"
+require_relative "../../lti_1_3_tool_configuration_spec_helper"
 
 module Lti
   describe ToolConfiguration do
-    include_context "lti_1_3_spec_helper"
+    include_context "lti_1_3_tool_configuration_spec_helper"
 
     let(:tool_configuration) do
       described_class.new(

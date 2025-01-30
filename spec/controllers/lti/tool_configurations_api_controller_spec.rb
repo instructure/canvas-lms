@@ -18,13 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../lti_1_3_spec_helper"
+require_relative "../../lti_1_3_tool_configuration_spec_helper"
 
 RSpec.describe Lti::ToolConfigurationsApiController do
   subject { response }
 
-  include_context "lti_1_3_spec_helper"
+  include_context "lti_1_3_tool_configuration_spec_helper"
 
+  let_once(:developer_key) { lti_developer_key_model(account:) }
+  let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration) }
   let_once(:sub_account) { account_model(root_account: account) }
   let_once(:admin) { account_admin_user(account:) }
   let_once(:student) do
@@ -626,7 +628,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
         before do
           overlay
-          tool_configuration.update!(registration_overlay: nil)
+          ims_registration.update!(registration_overlay: nil)
         end
 
         it "still returns the registration with its overlay applied" do
