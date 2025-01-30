@@ -48,6 +48,7 @@ export interface ModuleItem extends Module {
 export interface AssignmentOverride {
   context_module_id: string
   id: string
+  title: string
   students: {
     id: string
     name: string
@@ -55,6 +56,11 @@ export interface AssignmentOverride {
   course_section: {
     id: string
     name: string
+  }
+  group: {
+    id: string
+    group_category_id: string
+    non_collaborative: boolean
   }
 }
 
@@ -66,6 +72,11 @@ interface SectionOverride {
 interface StudentsOverride {
   id?: string
   student_ids: string[]
+}
+
+interface DifferentiationTagOverride {
+  id?: string
+  group_id: string | undefined
 }
 
 export type ItemType =
@@ -87,7 +98,10 @@ export type IconType =
   | 'wiki_page'
   | null
 
-export type AssignmentOverridePayload = SectionOverride | StudentsOverride
+export type AssignmentOverridePayload =
+  | SectionOverride 
+  | StudentsOverride
+  | DifferentiationTagOverride
 
 export type AssignmentOverridesPayload = {
   overrides: AssignmentOverridePayload[]

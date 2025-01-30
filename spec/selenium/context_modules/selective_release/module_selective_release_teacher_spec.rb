@@ -380,6 +380,94 @@ describe "selective_release module set up" do
       expect(f("body")).not_to contain_jqcss(module_index_menu_tool_link_selector("Assign To..."))
       expect(f("body")).not_to contain_jqcss(view_assign_to_link_selector)
     end
+
+    it "displays correct error message if assignee list is empty" do
+      go_to_modules
+      manage_module_button(@module).click
+      module_index_menu_tool_link("Assign To...").click
+      click_custom_access_radio
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+
+      click_clear_all
+
+      error_message = f("#TextInput-messages_0")
+      expect(error_message.text).to eq("A student or section must be selected")
+    end
+
+    context "differentiation tags" do
+      before :once do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.enable_feature!(:differentiation_tags)
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+
+        @differentiation_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+        @diff_tag1 = @course.groups.create!(name: "Differentiation Tag 1", group_category: @differentiation_tag_category, non_collaborative: true)
+        @diff_tag2 = @course.groups.create!(name: "Differentiation Tag 2", group_category: @differentiation_tag_category, non_collaborative: true)
+      end
+
+      it "can add differentiation tags as assignees to module overrides" do
+        go_to_modules
+        manage_module_button(@module).click
+        module_index_menu_tool_link("Assign To...").click
+        click_custom_access_radio
+
+        assignee_selection.send_keys("Differentiation")
+        click_option(assignee_selection, "Differentiation Tag 1")
+        expect(assignee_selection_item[0].text).to eq("Differentiation Tag 1")
+      end
+
+      it "differentiation tags will persist after saving" do
+        go_to_modules
+        manage_module_button(@module).click
+        module_index_menu_tool_link("Assign To...").click
+        click_custom_access_radio
+
+        assignee_selection.send_keys("Differentiation")
+        click_option(assignee_selection, "Differentiation Tag 1")
+
+        click_settings_tray_update_module_button
+
+        manage_module_button(@module).click
+        module_index_menu_tool_link("Assign To...").click
+        expect(assignee_selection_item[0].text).to eq("Differentiation Tag 1")
+      end
+
+      it "differentiation tags will not show as assignee option if the account setting is disabled" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = false
+          a.save!
+        end
+
+        go_to_modules
+        manage_module_button(@module).click
+        module_index_menu_tool_link("Assign To...").click
+        click_custom_access_radio
+
+        assignee_selection.click
+        options = ff("[data-testid='assignee_selector_option']").map(&:text)
+        expect(options).not_to include("Differentiation")
+      end
+
+      it "displays correct error message if assignee list is empty" do
+        go_to_modules
+        manage_module_button(@module).click
+        module_index_menu_tool_link("Assign To...").click
+        click_custom_access_radio
+
+        assignee_selection.send_keys("Differentiation")
+        click_option(assignee_selection, "Differentiation Tag 1")
+
+        click_clear_all
+
+        error_message = f("#TextInput-messages_0")
+        expect(error_message.text).to eq("A student, section, or tag must be selected")
+      end
+    end
   end
 
   context "uses tray to create modules" do

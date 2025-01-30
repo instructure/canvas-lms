@@ -72,7 +72,9 @@ const CUSTOM_OPTION: Option = {
 }
 
 const EMPTY_ASSIGNEE_ERROR_MESSAGE: FormMessage = {
-  text: I18n.t('A student or section must be selected'),
+  text: ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS
+      ? I18n.t('A student, section, or tag must be selected')
+      : I18n.t('A student or section must be selected'),
   type: 'error',
 }
 
@@ -178,6 +180,15 @@ export default function AssignToPanel({
               overrideId: override.id,
               value: override.course_section.name,
               group: I18n.t('Sections'),
+            })
+          }
+          if (override.group !== undefined && override.group.non_collaborative === true) {
+            const groupId = `tag-${override.group.id}`
+            overrideOptions.push({
+              id: groupId,
+              overrideId: override.id,
+              value: override.title,
+              group: I18n.t('Tags'),
             })
           }
           return [...acc, ...overrideOptions]

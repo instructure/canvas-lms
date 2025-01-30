@@ -52,18 +52,19 @@ export const processResult = async (
       ({
         id,
         name,
-        group_category_id: groupCategoryId,
+        group_category,
       }: {
         id: string
         name: string
-        group_category_id: string
+        group_category: {id: string, name: string}
       }) => {
         const parsedId = `${key.toLowerCase()}-${id}`
         // if an existing override exists for this asignee, use it so we have its overrideId
         return {
           id: parsedId,
           value: name,
-          groupCategoryId,
+          groupCategoryId: group_category?.id,
+          groupCategoryName: group_category?.name,
           group: I18n.t('%{groupKey}', {groupKey}),
         }
       },
@@ -127,5 +128,29 @@ export const getGroups = async ({queryKey}: {queryKey: any}) => {
     'group',
     'Groups',
   )
+  return parsedResult || []
+}
+
+export const getDifferentiationTags = async ({queryKey}: {queryKey: any}) => {
+  // return early if user cannot view/manage differentiation tags
+  if (!ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS || !ENV.CAN_MANAGE_DIFFERENTIATION_TAGS) {
+    return []
+  }
+
+  const [, , currentCourseId, currentParams] = queryKey
+  currentParams.collaboration_state = 'non_collaborative'
+  currentParams.include = 'group_category'
+
+  const result = await doFetchApi({
+    path: `/api/v1/courses/${currentCourseId}/groups`,
+    params: currentParams,
+  })
+  const parsedResult: AssigneeOption[] = await processResult(
+    // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
+    result,
+    'tag',
+    'Tags',
+  )
+
   return parsedResult || []
 }
