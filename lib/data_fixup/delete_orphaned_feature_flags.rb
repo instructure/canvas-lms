@@ -22,17 +22,17 @@ module DataFixup
   class DeleteOrphanedFeatureFlags
     def self.run
       FeatureFlag.joins("LEFT JOIN #{User.quoted_table_name} ON users.id = feature_flags.context_id AND feature_flags.context_type = 'User'")
-                 .where(users: { id: nil })
+                 .where(context_type: "User", users: { id: nil })
                  .in_batches
                  .delete_all
 
       FeatureFlag.joins("LEFT JOIN #{Course.quoted_table_name} ON courses.id = feature_flags.context_id AND feature_flags.context_type = 'Course'")
-                 .where(courses: { id: nil })
+                 .where(context_type: "Course", courses: { id: nil })
                  .in_batches
                  .delete_all
 
       FeatureFlag.joins("LEFT JOIN #{Account.quoted_table_name} ON accounts.id = feature_flags.context_id AND feature_flags.context_type = 'Account'")
-                 .where(accounts: { id: nil })
+                 .where(context_type: "Account", accounts: { id: nil })
                  .in_batches
                  .delete_all
     end
