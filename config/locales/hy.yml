@@ -117,6 +117,7 @@ hy:
       unexpectedDeleteError: "Ինչ-որ բան սխալ է ստացվել: Հնարավոր չէ ջնջել այս պահին:"
       updateSuccess: "Հաջողությամբ թարմացվել է"
     length_error: "Պետք է լինի մինչև 255 նիշ"
+    title: "Նշել այս խումբը"
   OutcomeView: 
     length_error: "Պետք է լինի մինչև 255 նիշ"
     mastery_error: "Պետք է 0-ին հավասար կամ մեծ լինի"
