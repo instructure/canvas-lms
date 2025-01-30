@@ -17,10 +17,18 @@
  */
 import {gql} from '@apollo/client'
 
+const MAX_ENROLLMENTS_PER_PAGE = 100
+
+type PageInfo = {
+  hasNextPage: boolean
+  endCursor: string | null
+}
+
 export type ObserverEnrollmentQueryResult = {
   course: {
     enrollmentsConnection: {
       nodes: ObserverEnrollmentConnectionNode[]
+      pageInfo: PageInfo
     }
   }
 }
@@ -46,9 +54,9 @@ export type ObserverEnrollmentQueryVariables = {
 }
 
 export const OBSERVER_ENROLLMENTS_QUERY = gql`
-  query ObserversForStudents($courseId: ID!, $studentIds: [ID!]) {
+  query ObserversForStudents($courseId: ID!, $studentIds: [ID!], $cursor: String) {
     course(id: $courseId) {
-      enrollmentsConnection(filter: {associatedUserIds: $studentIds, types: ObserverEnrollment}) {
+      enrollmentsConnection(first: ${MAX_ENROLLMENTS_PER_PAGE}, after: $cursor, filter: {associatedUserIds: $studentIds, types: ObserverEnrollment}) {
         nodes {
           _id
           type
@@ -60,6 +68,10 @@ export const OBSERVER_ENROLLMENTS_QUERY = gql`
           associatedUser {
             _id
           }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
         }
       }
     }
