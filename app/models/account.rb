@@ -53,6 +53,7 @@ class Account < ActiveRecord::Base
   has_many :all_differentiation_tags, -> { non_collaborative }, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :all_differentiation_tag_memberships, source: "group_memberships", through: :all_differentiation_tags
   has_many :combined_groups_and_differentiation_tags, class_name: "Group", as: :context, inverse_of: :context
+  has_many :combined_group_and_differentiation_tag_categories, -> { active }, class_name: "GroupCategory", as: :context, inverse_of: :context
   has_many :active_combined_group_and_differentiation_tag_categories, -> { active }, class_name: "GroupCategory", as: :context, inverse_of: :context
   has_many :enrollment_terms, foreign_key: "root_account_id", inverse_of: :root_account
   has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: "EnrollmentTerm", foreign_key: "root_account_id", inverse_of: false
@@ -2520,9 +2521,9 @@ class Account < ActiveRecord::Base
 
     # If an account's RQD setting hasn't been changed before, old_rqd_setting will be nil
     if (old_rqd_setting == false || old_rqd_setting.nil?) && new_rqd_setting == true
-      InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.enabled")
+      InstStatsd::Statsd.distributed_increment("account.settings.restrict_quantitative_data.enabled")
     elsif old_rqd_setting == true && new_rqd_setting == false
-      InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.disabled")
+      InstStatsd::Statsd.distributed_increment("account.settings.restrict_quantitative_data.disabled")
     end
   end
 

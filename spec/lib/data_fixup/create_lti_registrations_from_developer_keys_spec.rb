@@ -24,21 +24,23 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
     let(:second_account) { account_model }
     let(:number_of_keys_without_registrations) { 2 }
     let!(:second_account_key) do
-      key = dev_key_model_1_3(account: second_account)
+      key = lti_developer_key_model(account: second_account)
+      tool_configuration = lti_tool_configuration_model(developer_key: key)
       reg = key.lti_registration
       key.update(lti_registration: nil, skip_lti_sync: true)
-      key.tool_configuration.update(lti_registration: nil)
+      tool_configuration.update(lti_registration: nil)
       reg.delete
       key
     end
 
     before do
       number_of_keys_without_registrations.times do
-        key = dev_key_model_1_3(account: first_account)
+        key = lti_developer_key_model(account: first_account)
+        tool_configuration = lti_tool_configuration_model(developer_key: key)
         # dev_key_model factory creates reg automatically and ignores the skip_lti_sync param
         reg = key.lti_registration
         key.update(lti_registration: nil, skip_lti_sync: true)
-        key.tool_configuration.update(lti_registration: nil)
+        tool_configuration.update(lti_registration: nil)
         reg.delete
       end
     end
@@ -68,7 +70,7 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
 
     context "and with a developer key that already has a registration" do
       # registration will be created for this key automatically
-      before { dev_key_model_1_3(account: first_account) }
+      before { lti_developer_key_model(account: first_account) }
 
       it "only creates registrations for the keys without registrations" do
         expect { described_class.run }
@@ -112,11 +114,12 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
 
     context "and with a site admin developer key" do
       before do
-        key = dev_key_model_1_3(account: Account.site_admin)
+        key = lti_developer_key_model(account: Account.site_admin)
+        tool_configuration = lti_tool_configuration_model(developer_key: key)
         # dev_key_model factory creates reg automatically and ignores the skip_lti_sync param
         reg = key.lti_registration
         key.update(lti_registration: nil, skip_lti_sync: true)
-        key.tool_configuration.update(lti_registration: nil)
+        tool_configuration.update(lti_registration: nil)
         reg.delete
       end
 
@@ -181,7 +184,7 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
     end
 
     let(:developer_key) do
-      key = dev_key_model_1_3
+      key = lti_developer_key_model
       reg = key.lti_registration
       key.update(lti_registration: nil, skip_lti_sync: true)
       reg.destroy_permanently!

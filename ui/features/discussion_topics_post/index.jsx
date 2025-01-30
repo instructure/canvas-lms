@@ -21,6 +21,27 @@ import ready from '@instructure/ready'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import DiscussionTopicKeyboardShortcutModal from './react/KeyboardShortcuts/DiscussionTopicKeyboardShortcutModal'
+import {Portal} from '@instructure/ui-portal'
+
+function DiscussionPageLayout() {
+  return (
+    <>
+      {!window.ENV.disable_keyboard_shortcuts && (
+        <Portal open={true} mountNode={document.getElementById('content')}>
+          <div id="keyboard-shortcut-modal">
+            <DiscussionTopicKeyboardShortcutModal />
+          </div>
+        </Portal>
+      )}
+      <Portal open={true} mountNode={document.getElementById('content')}>
+        <div id="discussion-redesign-layout" className="discussion-redesign-layout">
+          <DiscussionTopicsPost discussionTopicId={ENV.discussion_topic_id} />
+        </div>
+      </Portal>
+    </>
+  )
+}
 
 const renderFooter = () => {
   import('@canvas/module-sequence-footer').then(() => {
@@ -52,10 +73,7 @@ export const adjustFooterWidth = () => {
 
 ready(() => {
   setTimeout(() => {
-    ReactDOM.render(
-      <DiscussionTopicsPost discussionTopicId={ENV.discussion_topic_id} />,
-      $('<div class="discussion-redesign-layout"/>').appendTo('#content')[0],
-    )
+    ReactDOM.render(<DiscussionPageLayout />, document.getElementById('content'))
   })
 
   document.querySelector('body')?.classList.add('full-width')

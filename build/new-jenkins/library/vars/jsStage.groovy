@@ -18,8 +18,7 @@
 
 import groovy.transform.Field
 
-@Field static final JEST_NODE_COUNT = 12
-@Field static final RCE_NODE_COUNT = 5
+@Field static final JEST_NODE_COUNT = 16
 
 def jestNodeRequirementsTemplate(index) {
   def baseTestContainer = [
@@ -128,19 +127,9 @@ def queueJestDistribution(index) {
   }
 }
 
-def queueRceDistribution(index) {
-  { stages ->
-    def jsgEnvVars = [
-        "CI_NODE_INDEX=${index.toInteger() + 1}",
-        "CI_NODE_TOTAL=${RCE_NODE_COUNT}",
-      ]
-    callableWithDelegate(queueTestStage())(stages, "rce-${index}", jsgEnvVars, 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:canvas-rce')
-  }
-}
-
 def queuePackagesDistribution() {
   { stages ->
-    callableWithDelegate(queueTestStage())(stages, 'packages', [], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages:parallel')
+    callableWithDelegate(queueTestStage())(stages, 'packages', [], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages')
   }
 }
 

@@ -398,6 +398,252 @@ describe GroupCategoriesController do
     end
   end
 
+  describe "POST bulk_manage_groups" do
+    before :once do
+      @collaborative_category = @course.group_categories.create!(name: "Collaborative Category", non_collaborative: false)
+      @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+    end
+
+    context "authorization checks" do
+      it "requires add permission to create groups" do
+        user_session(@teacher)
+        # Revoke add permission
+        @course.account.role_overrides.create!(
+          permission: :manage_groups_add,
+          role: teacher_role,
+          enabled: false
+        )
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 create: [{ name: "New Group" }]
+               }
+             }
+        assert_unauthorized
+      end
+
+      it "requires manage permission to update groups" do
+        user_session(@teacher)
+        # Revoke manage permission
+        @course.account.role_overrides.create!(
+          permission: :manage_groups_manage,
+          role: teacher_role,
+          enabled: false
+        )
+
+        # Create a group for testing
+        test_group = @collaborative_category.groups.create!(name: "Old Group", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 update: [{ id: test_group.id, name: "Updated Group" }]
+               }
+             }
+        assert_unauthorized
+      end
+
+      it "requires delete permission to delete groups" do
+        user_session(@teacher)
+        # Revoke delete permission
+        @course.account.role_overrides.create!(
+          permission: :manage_groups_delete,
+          role: teacher_role,
+          enabled: false
+        )
+
+        # Create a group for testing
+        test_group = @collaborative_category.groups.create!(name: "To Be Deleted", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 delete: [{ id: test_group.id }]
+               }
+             }
+        assert_unauthorized
+      end
+    end
+
+    context "with proper permissions" do
+      before do
+        user_session(@teacher)
+        # Ensure teacher has all relevant group permissions
+        # (manage_tags_add, manage_tags_manage, manage_tags_delete) = true
+      end
+
+      it "creates multiple groups" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 create: [
+                   { name: "Group A" },
+                   { name: "Group B" },
+                   { name: "Group C" },
+                   { name: "Group D" },
+                   { name: "Group E" }
+                 ]
+               }
+             }
+        expect(response).to be_successful
+        body = response.parsed_body
+        expect(body["created"].size).to eq 5
+      end
+
+      it "updates groups" do
+        group = @collaborative_category.groups.create!(name: "Original Name", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 update: [{ id: group.id, name: "Updated Name" }]
+               }
+             }
+
+        expect(response).to be_successful
+        body = response.parsed_body
+        expect(body["updated"].size).to eq 1
+        expect(group.reload.name).to eq "Updated Name"
+      end
+
+      it "deletes groups" do
+        group = @collaborative_category.groups.create!(name: "Delete Me", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 delete: [{ id: group.id }]
+               }
+             }
+
+        expect(response).to be_successful
+        body = response.parsed_body
+        expect(body["deleted"].size).to eq 1
+        expect(@collaborative_category.groups.active.map(&:name)).not_to include("Delete Me")
+      end
+
+      it "handles create, update, and delete in one request" do
+        group1 = @collaborative_category.groups.create!(name: "Group1", context: @course)
+        group2 = @collaborative_category.groups.create!(name: "Group2", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 create: [{ name: "New Group" }],
+                 update: [{ id: group1.id, name: "Updated Group1" }],
+                 delete: [{ id: group2.id }]
+               }
+             }
+
+        expect(response).to be_successful
+        body = response.parsed_body
+        expect(body["created"].size).to eq 1
+        expect(body["updated"].size).to eq 1
+        expect(body["deleted"].size).to eq 1
+        expect(@collaborative_category.groups.active.map(&:name)).to include("Updated Group1", "New Group")
+        expect(@collaborative_category.groups.active.map(&:name)).not_to include("Group2")
+      end
+
+      it "fails if a group to update doesn't exist" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 update: [{ id: 9999, name: "Nonexistent" }]
+               }
+             }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "fails if a group to delete doesn't exist" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 delete: [{ id: 9999 }]
+               }
+             }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "fails if create params are invalid" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 create: [{ name: "" }] # invalid name
+               }
+             }
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["errors"]).to be_present
+      end
+
+      it "handles ActiveRecord validation errors gracefully" do
+        group = @collaborative_category.groups.create!(name: "Valid Name", context: @course)
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 update: [{ id: group.id, name: "" }] # invalid
+               }
+             }
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["errors"]).to match(/Validation failed/i)
+      end
+
+      it "fails when the maximum number of operations is exceeded" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 create: [
+                   { name: "Group A" },
+                   { name: "Group B" },
+                   { name: "Group C" },
+                   { name: "Group D" },
+                   { name: "Group E" }
+                 ] * 11
+               }
+             }
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["errors"]).to match(/You can only perform a maximum of 50 operations at a time./i)
+      end
+
+      it "fails when an invalid group category id is provided" do
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: 999_999,
+               operations: {
+                 create: [{ name: "New Group" }]
+               }
+             }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "fails when trying to edit a group that belongs to a different category" do
+        other_category = @course.group_categories.create!(name: "Other Category")
+        other_group = other_category.groups.create!(name: "Other Group", context: @course)
+
+        post "bulk_manage_groups",
+             params: {
+               group_category_id: @collaborative_category.id,
+               operations: {
+                 update: [{ id: other_group.id, name: "Updated Name" }]
+               }
+             }
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
   describe "DELETE delete" do
     it "requires authorization" do
       group_category = @course.group_categories.create(name: "Study Groups")
@@ -759,104 +1005,199 @@ describe GroupCategoriesController do
   context "Differentiation Tags" do
     before do
       Account.default.enable_feature!(:differentiation_tags)
+      # Assuming @course, @teacher_role, @teacher, @non_collaborative_category, etc., are already set up
     end
 
-    it "returns both collaborative and non-collaborative group categories when user has both group and tag management permissions" do
-      user_session(@teacher)
+    describe "GET #index with collaboration_state" do
+      context "when user has both group and tag management permissions" do
+        before do
+          user_session(@teacher)
+        end
 
-      get "index", params: { course_id: @course.id }, format: :json
-      json = response.parsed_body
+        it "fails when invalid Collaborative state is sent" do
+          get "index", params: { course_id: @course.id, collaboration_state: "gibberish" }, format: :json
+          json = response.parsed_body
+          expect(response).to have_http_status(:bad_request)
+          expect(json["error"]).to include("Invalid collaboration_state")
+        end
 
-      expect(response).to be_successful
-      expect(json.count).to eq 2
-      expect(json.pluck("name")).to include("Collaborative Groups", "Non-Collaborative Groups")
-    end
+        it "defaults to collaborative collaboration_state when send empty string" do
+          get "index", params: { course_id: @course.id, collaboration_state: "" }, format: :json
+          json = response.parsed_body
 
-    it "returns only collaborative group categories if tag management permissions are revoked" do
-      RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
-        @course.account.role_overrides.create!(
-          permission:,
-          role: teacher_role,
-          enabled: false
-        )
-      end
-      user_session(@teacher)
+          expect(response).to be_successful
+          expect(json.count).to eq 1
+          expect(json.pluck("name")).to include("Collaborative Groups")
+        end
 
-      get "index", params: { course_id: @course.id }, format: :json
-      json = response.parsed_body
+        it "returns both collaborative and non-collaborative group categories when collaboration_state is 'all'" do
+          get "index", params: { course_id: @course.id, collaboration_state: "all" }, format: :json
+          json = response.parsed_body
 
-      expect(response).to be_successful
-      expect(json.count).to eq 1
-      expect(json[0]["name"]).to eq "Collaborative Groups"
-    end
+          expect(response).to be_successful
+          expect(json.count).to eq 2
+          expect(json.pluck("name")).to include("Collaborative Groups", "Non-Collaborative Groups")
+        end
 
-    it "returns only non-collaborative group categories if group management permissions are revoked" do
-      RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS.each do |permission|
-        @course.account.role_overrides.create!(
-          permission:,
-          role: teacher_role,
-          enabled: false
-        )
-      end
-      user_session(@teacher)
+        it "returns only collaborative group categories when collaboration_state is 'collaborative'" do
+          get "index", params: { course_id: @course.id, collaboration_state: "collaborative" }, format: :json
+          json = response.parsed_body
 
-      get "index", params: { course_id: @course.id }, format: :json
-      json = response.parsed_body
+          expect(response).to be_successful
+          expect(json.count).to eq 1
+          expect(json.first["name"]).to eq "Collaborative Groups"
+        end
 
-      expect(response).to be_successful
-      expect(json.count).to eq 1
-      expect(json[0]["name"]).to eq "Non-Collaborative Groups"
-    end
+        it "returns only non-collaborative group categories when collaboration_state is 'non_collaborative'" do
+          get "index", params: { course_id: @course.id, collaboration_state: "non_collaborative" }, format: :json
+          json = response.parsed_body
 
-    context "with differentiation tags disabled with existing hidden groups" do
-      before do
-        Account.default.disable_feature!(:differentiation_tags)
-      end
+          expect(response).to be_successful
+          expect(json.count).to eq 1
+          expect(json.first["name"]).to eq "Non-Collaborative Groups"
+        end
 
-      it "prevents teachers from creating non_collaborative groups if differentiation_tags is disabled" do
-        @course.account.role_overrides.create!({
-                                                 role: teacher_role,
-                                                 permission: :manage_tags_add,
-                                                 enabled: true
-                                               })
-        user_session(@teacher)
+        it "returns only collaborative group categories by default when collaboration_state is not provided" do
+          get "index", params: { course_id: @course.id }, format: :json
+          json = response.parsed_body
 
-        post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
-
-        expect(response).to be_unauthorized
+          expect(response).to be_successful
+          expect(json.count).to eq 1
+          expect(json.first["name"]).to eq "Collaborative Groups"
+        end
       end
 
-      it "does not allow viewing non-collaborative group category" do
-        user_session(@teacher)
-        get "users", params: {
-          course_id: @course.id,
-          group_category_id: @non_collaborative_category.id
-        }
-        assert_unauthorized
+      context "when tag management permissions are revoked" do
+        before do
+          # Revoke all tag management permissions
+          RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+            @course.account.role_overrides.create!(
+              permission: permission,
+              role: teacher_role,
+              enabled: false
+            )
+          end
+
+          user_session(@teacher)
+        end
+
+        it "returns only collaborative group categories when collaboration_state is 'all' but lacks tag permissions" do
+          get "index", params: { course_id: @course.id, collaboration_state: "all" }, format: :json
+          json = response.parsed_body
+
+          expect(response).to be_successful
+          expect(json.count).to eq 1
+          expect(json.first["name"]).to eq "Collaborative Groups"
+        end
+
+        it "returns only collaborative group categories when collaboration_state is 'collaborative'" do
+          get "index", params: { course_id: @course.id, collaboration_state: "collaborative" }, format: :json
+          json = response.parsed_body
+
+          expect(response).to be_successful
+          expect(json.count).to eq 1
+          expect(json.first["name"]).to eq "Collaborative Groups"
+        end
+
+        it "returns forbidden when trying to access non-collaborative group categories without permissions" do
+          get "index", params: { course_id: @course.id, collaboration_state: "non_collaborative" }, format: :json
+          response.parsed_body
+          expect(response).to be_forbidden
+        end
       end
 
-      it "does not allow adding non-collaborative group category" do
-        user_session(@teacher)
-        post "create", params: {
-          course_id: @course.id,
-          category: {
-            name: "New Non-Collaborative Group",
-            non_collaborative: "1"
+      context "when group management permissions are revoked" do
+        before do
+          # Revoke all group management permissions
+          RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS.each do |permission|
+            @course.account.role_overrides.create!(
+              permission: permission,
+              role: teacher_role,
+              enabled: false
+            )
+          end
+
+          user_session(@teacher)
+        end
+
+        it "returns only non-collaborative group categories when collaboration_state is 'all' but lacks group permissions" do
+          get "index", params: { course_id: @course.id, collaboration_state: "all" }, format: :json
+          json = response.parsed_body
+
+          # Since the user lacks group permissions, 'all' should only return non-collaborative categories
+          expect(response).to be_successful
+          expect(json.count).to eq 1
+          expect(json.first["name"]).to eq "Non-Collaborative Groups"
+        end
+
+        it "returns only non-collaborative group categories when collaboration_state is 'non_collaborative'" do
+          get "index", params: { course_id: @course.id, collaboration_state: "non_collaborative" }, format: :json
+          json = response.parsed_body
+
+          expect(response).to be_successful
+          expect(json.count).to eq 1
+          expect(json.first["name"]).to eq "Non-Collaborative Groups"
+        end
+
+        it "returns forbidden when trying to access collaborative group categories without permissions" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id, collaboration_state: "collaborative" }, format: :json
+          response.parsed_body
+
+          expect(response).to be_forbidden
+        end
+      end
+
+      context "with differentiation tags disabled with existing hidden groups" do
+        before do
+          Account.default.disable_feature!(:differentiation_tags)
+        end
+
+        it "prevents teachers from creating non_collaborative groups if differentiation_tags is disabled" do
+          @course.account.role_overrides.create!({
+                                                   role: teacher_role,
+                                                   permission: :manage_tags_add,
+                                                   enabled: true
+                                                 })
+          user_session(@teacher)
+
+          post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
+
+          expect(response).to be_unauthorized
+        end
+
+        it "does not allow viewing non-collaborative group category" do
+          user_session(@teacher)
+          get "users", params: {
+            course_id: @course.id,
+            group_category_id: @non_collaborative_category.id
           }
-        }
-        assert_unauthorized
-      end
+          assert_unauthorized
+        end
 
-      it "does not allow updating non-collaborative group category" do
-        user_session(@teacher)
-        put "update", params: { course_id: @course.id, id: @non_collaborative_category.id, category: { name: "Updated Non-Collaborative Group" } }
-        assert_unauthorized
-      end
+        it "does not allow adding non-collaborative group category" do
+          user_session(@teacher)
+          post "create", params: {
+            course_id: @course.id,
+            category: {
+              name: "New Non-Collaborative Group",
+              non_collaborative: "1"
+            }
+          }
+          assert_unauthorized
+        end
 
-      it "does not allow deleting non-collaborative group category" do
-        user_session(@teacher)
-        delete "destroy", params: { course_id: @course.id, id: @non_collaborative_category.id }
-        assert_unauthorized
+        it "does not allow updating non-collaborative group category" do
+          user_session(@teacher)
+          put "update", params: { course_id: @course.id, id: @non_collaborative_category.id, category: { name: "Updated Non-Collaborative Group" } }
+          assert_unauthorized
+        end
+
+        it "does not allow deleting non-collaborative group category" do
+          user_session(@teacher)
+          delete "destroy", params: { course_id: @course.id, id: @non_collaborative_category.id }
+          assert_unauthorized
+        end
       end
     end
   end

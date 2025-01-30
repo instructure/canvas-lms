@@ -19,6 +19,8 @@
 import React from 'react'
 import {act, render as rtlRender, waitFor, fireEvent} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
+import {http} from 'msw'
+import {setupServer} from 'msw/node'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
   ACCOUNT_OUTCOME_CALCULATION_QUERY,
@@ -29,7 +31,19 @@ import {masteryCalculationGraphqlMocks} from '@canvas/outcomes/mocks/Outcomes'
 
 jest.useFakeTimers()
 
+const server = setupServer()
+
 describe('MasteryCalculation', () => {
+  beforeAll(() => {
+    server.listen({
+      onUnhandledRequest: 'error',
+    })
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     window.ENV = {
       PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: [
@@ -56,6 +70,7 @@ describe('MasteryCalculation', () => {
 
   afterEach(() => {
     window.ENV = null
+    server.resetHandlers()
   })
 
   const render = (
@@ -71,6 +86,17 @@ describe('MasteryCalculation', () => {
     )
   }
 
+  function setupSubmissionHandler(contextType, contextId, payload) {
+    server.use(
+      http.post(`/${contextType.toLowerCase()}s/${contextId}/outcome_calculation_method`, async ({request}) => {
+        const formData = await request.formData()
+        return new Response(JSON.stringify(payload), {
+          headers: {'Content-Type': 'application/json'},
+        })
+      })
+    )
+  }
+
   it('loads proficiency data for Account', async () => {
     const {getByDisplayValue} = render(<MasteryCalculation />)
     await act(async () => jest.runAllTimers())
@@ -78,12 +104,19 @@ describe('MasteryCalculation', () => {
   })
 
   it('loads calculation data for Course', async () => {
-    const {getByDisplayValue} = render(<MasteryCalculation />, {
+    setupSubmissionHandler('Course', '12', {
+      calculation_method: 'decaying_average',
+      calculation_int: 65,
+    })
+
+    const {findByDisplayValue} = render(<MasteryCalculation />, {
       contextType: 'Course',
       contextId: '12',
     })
     await act(async () => jest.runAllTimers())
-    expect(getByDisplayValue(/65/)).not.toEqual(null)
+    await waitFor(async () => {
+      expect(await findByDisplayValue(/65/)).not.toBeNull()
+    })
   })
 
   it('loads role list', async () => {
@@ -163,6 +196,14 @@ describe('MasteryCalculation', () => {
         result: updateCall,
       },
     ]
+
+    beforeEach(() => {
+      setupSubmissionHandler('Account', '11', {
+        calculation_method: variables.calculationMethod,
+        calculation_int: variables.calculationInt,
+      })
+    })
+
     it('submits a request when calculation method is saved', async () => {
       const {getByText, findByLabelText} = render(<MasteryCalculation />, {mocks: updateMocks})
       await act(async () => jest.runAllTimers())

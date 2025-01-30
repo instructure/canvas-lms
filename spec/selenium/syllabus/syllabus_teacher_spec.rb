@@ -106,6 +106,19 @@ describe "course syllabus" do
       expect(page_main_content).to contain_css(mini_calendar_css)
     end
 
+    it "hides course summary and misc. elements for horizon courses", :ignore_js_errors do
+      @course1.account.enable_feature!(:horizon_course_setting)
+      @course1.horizon_course = true
+      @course1.save!
+      visit_syllabus_page(@course1.id)
+      expect(element_exists?(syllabus_container_css)).to be_falsey
+      expect(element_exists?(mini_calendar_css)).to be_falsey
+
+      edit_syllabus_button.click
+      wait_for_dom_ready
+      expect(element_exists?(show_summary_chkbox_css)).to be_falsey
+    end
+
     context "in a paced course" do
       before do
         @course1.enable_course_paces = true

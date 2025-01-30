@@ -32,8 +32,10 @@ import {View} from '@instructure/ui-view'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 import theme from '@instructure/canvas-theme'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
+  const I18n = useI18nScope('discussion_topics_post')
   const {searchTerm} = useContext(SearchContext)
 
   const getDeletedDisplayName = discussionEntry => {
@@ -73,6 +75,21 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
   }
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
+  const displayedAuthor = props.anonymousAuthor
+    ? props.anonymousAuthor.shortName
+    : props.author
+    ? props.author.displayName
+    : 'Unknown Author'
+
+  const description = props.isTopic
+    ? I18n.t('Post by %{displayedAuthor} from %{date}', {
+        displayedAuthor,
+        date: props.createdAt.split('T')[0],
+      })
+    : I18n.t('Reply to Post by %{displayedAuthor} from %{date}', {
+        displayedAuthor,
+        date: props.createdAt.split('T')[0],
+      })
 
   const depth = props.discussionEntry?.depth || 0
   const threadMode = (depth > 1 && !searchTerm) || props.threadParent
@@ -99,93 +116,105 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
   }
 
   return (
-    <Flex direction="column" data-authorid={props.author?._id}>
-      <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="visible">
-        <Flex direction={props.isTopic ? direction : 'row'}>
-          {hasAuthor && (
-            <Flex.Item
-              overflowY="visible"
-              shouldGrow={true}
-              shouldShrink={true}
-              padding={authorInfoPadding}
-            >
-              <AuthorInfo
-                author={props.author}
-                threadParent={props.threadParent}
-                anonymousAuthor={props.anonymousAuthor}
-                editor={props.editor}
-                isUnread={props.isUnread}
-                isForcedRead={props.isForcedRead}
-                isSplitView={props.isSplitView}
-                createdAt={props.timingDisplay}
-                delayedPostAt={props.delayedPostAt}
-                editedTimingDisplay={props.editedTimingDisplay}
-                lastReplyAtDisplay={props.lastReplyAtDisplay}
-                isTopic={props.isTopic}
-                isTopicAuthor={props.isTopicAuthor}
-                discussionEntryVersions={props.discussionEntry?.discussionEntryVersions || []}
-                reportTypeCounts={props.discussionEntry?.reportTypeCounts}
-                threadMode={threadMode}
-                toggleUnread={props.toggleUnread}
-                breakpoints={breakpoints}
-                published={props.discussionTopic?.published}
-                isAnnouncement={props.discussionTopic?.isAnnouncement}
-              />
-            </Flex.Item>
-          )}
-          <Flex.Item
-            align={postUtilitiesAlign}
-            margin={hasAuthor ? postUtilitiesMargin : '0'}
-            overflowX="visible"
-            overflowY="visible"
-            padding="xxx-small 0 0 0"
-            shouldGrow={!hasAuthor}
-          >
-            {props.postUtilities}
-          </Flex.Item>
-        </Flex>
-      </Flex.Item>
-      <Flex.Item
-        padding={hasAuthor ? postMessagePadding : postMessagePaddingNoAuthor}
-        overflowY="visible"
-        overflowX="visible"
+    <>
+      <Flex
+        direction="column"
+        data-authorid={props.author?._id}
+        data-entry-wrapper-id={props.discussionEntry?._id}
+        aria-label={description} // Add aria-label for screen readers
+        elementRef={el => {
+          if (el?.parentElement) {
+            el.parentElement.tabIndex = 0
+          }
+        }}
       >
-        {props.quotedEntry && <ReplyPreview {...props.quotedEntry} />}
-        <PostMessage
-          isTopic={props.isTopic}
-          threadMode={threadMode && !props.isTopic}
-          discussionEntry={props.discussionEntry}
-          discussionAnonymousState={props.discussionTopic?.anonymousState}
-          canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
-          title={props.title}
-          message={props.message}
-          attachment={props.attachment}
-          isEditing={props.isEditing}
-          onSave={props.onSave}
-          onCancel={props.onCancel}
-          isSplitView={props.isSplitView}
-          discussionTopic={props.discussionTopic}
+        <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="visible">
+          <Flex direction={props.isTopic ? direction : 'row'}>
+            {hasAuthor && (
+              <Flex.Item
+                overflowY="visible"
+                shouldGrow={true}
+                shouldShrink={true}
+                padding={authorInfoPadding}
+              >
+                <AuthorInfo
+                  author={props.author}
+                  threadParent={props.threadParent}
+                  anonymousAuthor={props.anonymousAuthor}
+                  editor={props.editor}
+                  isUnread={props.isUnread}
+                  isForcedRead={props.isForcedRead}
+                  isSplitView={props.isSplitView}
+                  createdAt={props.timingDisplay}
+                  delayedPostAt={props.delayedPostAt}
+                  editedTimingDisplay={props.editedTimingDisplay}
+                  lastReplyAtDisplay={props.lastReplyAtDisplay}
+                  isTopic={props.isTopic}
+                  isTopicAuthor={props.isTopicAuthor}
+                  discussionEntryVersions={props.discussionEntry?.discussionEntryVersions || []}
+                  reportTypeCounts={props.discussionEntry?.reportTypeCounts}
+                  threadMode={threadMode}
+                  toggleUnread={props.toggleUnread}
+                  breakpoints={breakpoints}
+                  published={props.discussionTopic?.published}
+                  isAnnouncement={props.discussionTopic?.isAnnouncement}
+                />
+              </Flex.Item>
+            )}
+            <Flex.Item
+              align={postUtilitiesAlign}
+              margin={hasAuthor ? postUtilitiesMargin : '0'}
+              overflowX="visible"
+              overflowY="visible"
+              padding="xxx-small 0 0 0"
+              shouldGrow={!hasAuthor}
+            >
+              {props.postUtilities}
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+        <Flex.Item
+          padding={hasAuthor ? postMessagePadding : postMessagePaddingNoAuthor}
+          overflowY="visible"
+          overflowX="visible"
         >
-          {props.attachment && (
-            <View as="div" padding="small none none">
-              <Link href={props.attachment.url}>{props.attachment.displayName}</Link>
-            </View>
-          )}
-          {props.children}
-          {!props.isTopic && (
-            <hr
-              data-testid="post-separator"
-              style={{
-                height: theme.borders.widthSmall,
-                borderColor: '#E8EAEC',
-                margin: `${theme.spacing.medium} 0`,
-                ...additionalSeparatorStyles,
-              }}
-            />
-          )}
-        </PostMessage>
-      </Flex.Item>
-    </Flex>
+          {props.quotedEntry && <ReplyPreview {...props.quotedEntry} />}
+          <PostMessage
+            isTopic={props.isTopic}
+            threadMode={threadMode && !props.isTopic}
+            discussionEntry={props.discussionEntry}
+            discussionAnonymousState={props.discussionTopic?.anonymousState}
+            canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
+            title={props.title}
+            message={props.message}
+            attachment={props.attachment}
+            isEditing={props.isEditing}
+            onSave={props.onSave}
+            onCancel={props.onCancel}
+            isSplitView={props.isSplitView}
+            discussionTopic={props.discussionTopic}
+          >
+            {props.attachment && (
+              <View as="div" padding="small none none">
+                <Link href={props.attachment.url}>{props.attachment.displayName}</Link>
+              </View>
+            )}
+            {props.children}
+          </PostMessage>
+        </Flex.Item>
+      </Flex>
+      {!props.isTopic && (
+        <hr
+          data-testid="post-separator"
+          style={{
+            height: theme.borders.widthSmall,
+            borderColor: '#E8EAEC',
+            margin: `${theme.spacing.medium} 0`,
+            ...additionalSeparatorStyles,
+          }}
+        />
+      )}
+    </>
   )
 }
 

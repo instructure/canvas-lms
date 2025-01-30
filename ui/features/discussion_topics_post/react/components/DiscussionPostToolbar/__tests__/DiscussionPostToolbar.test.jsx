@@ -118,7 +118,7 @@ describe('DiscussionPostToolbar', () => {
       fireEvent.click(splitscreenButton)
 
       await waitFor(() => {
-        expect(onSuccessStub.mock.calls.length).toBe(1)
+        expect(onSuccessStub.mock.calls).toHaveLength(1)
       })
     })
   })
@@ -129,9 +129,9 @@ describe('DiscussionPostToolbar', () => {
       const {getByLabelText} = setup({onSearchChange: onSearchChangeMock})
       const searchInput = getByLabelText('Search entries or author...')
       fireEvent.change(searchInput, {target: {value: 'A'}})
-      window.setTimeout(() => expect(onSearchChangeMock.mock.calls.length).toBe(1), 1500)
+      window.setTimeout(() => expect(onSearchChangeMock.mock.calls).toHaveLength(1), 1500)
       fireEvent.change(searchInput, {target: {value: 'B'}})
-      window.setTimeout(() => expect(onSearchChangeMock.mock.calls.length).toBe(2), 1500)
+      window.setTimeout(() => expect(onSearchChangeMock.mock.calls).toHaveLength(2), 1500)
     })
   })
 
@@ -143,7 +143,7 @@ describe('DiscussionPostToolbar', () => {
       fireEvent.click(simpleSelect)
       const unread = getByText('Unread')
       fireEvent.click(unread)
-      expect(onViewFilterMock.mock.calls.length).toBe(1)
+      expect(onViewFilterMock.mock.calls).toHaveLength(1)
       expect(onViewFilterMock.mock.calls[0][1].id).toBe('unread')
     })
   })
@@ -172,7 +172,7 @@ describe('DiscussionPostToolbar', () => {
       })
       const button = getByTestId('sortButton')
       button.click()
-      expect(onSortClickMock.mock.calls.length).toBe(1)
+      expect(onSortClickMock.mock.calls).toHaveLength(1)
     })
   })
 
@@ -225,12 +225,6 @@ describe('DiscussionPostToolbar', () => {
   })
 
   describe('Assign To', () => {
-    beforeEach(() => {
-      ENV.FEATURES = {
-        selective_release_ui_api: true,
-      }
-    })
-
     it('renders the Assign To button if user can manageAssignTo and in a course discussion', () => {
       const {getByRole} = setup({
         manageAssignTo: true,

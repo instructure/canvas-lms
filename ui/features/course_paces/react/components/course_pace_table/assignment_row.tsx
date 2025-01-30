@@ -31,6 +31,7 @@ import {
   IconPublishSolid,
   IconQuizLine,
   IconUnpublishedLine,
+  IconWarningLine
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
@@ -330,6 +331,33 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     )
   }
 
+  renderSubmissionStatus = () => {
+    const { submittable, submitted_at } = this.props.coursePaceItem
+    const dueDate = moment(this.props.dueDate)
+    const now = moment()
+    const isFeatureEnabled = window.ENV.FEATURES.course_pace_pacing_status_labels
+
+    // Not submittable or not due yet, no label needed
+    if (!submittable || dueDate.isAfter(now) || !isFeatureEnabled) {
+      return null
+    }
+
+    const submittedAt = submitted_at ? moment(submitted_at) : null
+    const status = !submittedAt
+      ? I18n.t("No Submission")
+      : submittedAt.isAfter(dueDate)
+      ? I18n.t("Late Submission")
+      : null
+
+    return status ? (
+      <span style={{whiteSpace: "nowrap"}}>
+        <Text color="danger">
+          <IconWarningLine size="x-small" /> {status}
+        </Text>
+      </span>
+    ) : null
+  }
+
   render() {
     const labelMargin = this.props.isStacked ? '0 0 0 small' : undefined
 
@@ -338,7 +366,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
         background: this.state.hovering ? '#eef7ff' : '#fff',
       },
     }
-
+    const contextType = this.props.context_type
     return (
       <InstUISettingsProvider theme={{componentOverrides}}>
         {/* @ts-expect-error */}
@@ -362,6 +390,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
                 <span style={{whiteSpace: this.props.isStacked ? 'normal' : 'nowrap'}}>
                   {this.renderDate()}
                 </span>
+                {contextType === 'Enrollment' && this.renderSubmissionStatus()}
               </View>
             </Table.Cell>
           ) : (

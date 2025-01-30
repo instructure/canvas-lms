@@ -49,7 +49,7 @@ describe('FilesApp', () => {
           path: '/',
           element: <FilesApp contextAssetString={contextAssetString} />,
           loader: async () => {
-            return [{id: 1, context_id: 1, context_type: 'course'}]
+            return [FAKE_FOLDERS[0]]
           },
         },
       ],

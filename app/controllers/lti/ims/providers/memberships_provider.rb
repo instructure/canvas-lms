@@ -187,7 +187,7 @@ module Lti::IMS::Providers
     end
 
     def course_rlid
-      Lti::Asset.opaque_identifier_for(course)
+      Lti::V1p1::Asset.opaque_identifier_for(course)
     end
 
     def find_memberships

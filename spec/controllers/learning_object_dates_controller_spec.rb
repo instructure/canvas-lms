@@ -20,7 +20,6 @@
 
 describe LearningObjectDatesController do
   before :once do
-    Account.site_admin.enable_feature! :selective_release_ui_api
     Account.site_admin.enable_feature! :differentiated_files
     course_with_teacher(active_all: true)
   end
@@ -681,12 +680,6 @@ describe LearningObjectDatesController do
       expect(response).to be_not_found
     end
 
-    it "returns not_found if selective_release_ui_api is disabled" do
-      Account.site_admin.disable_feature! :selective_release_ui_api
-      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
-      expect(response).to be_not_found
-    end
-
     it "returns bad_request if attempting to get a file's details and differentiated_files is disabled" do
       Account.site_admin.disable_feature! :differentiated_files
       attachment = @course.attachments.create!(filename: "coolpdf.pdf", uploaded_data: StringIO.new("test"))
@@ -709,10 +702,10 @@ describe LearningObjectDatesController do
 
       def returns_non_collaborative_field_for_group_overrides
         due_at = 7.days.from_now
-        override2 = @assignment.assignment_overrides.create!(set: @group, due_at:)
+        # to properly override a due date, due_at_overridden needs to be true
+        override2 = @assignment.assignment_overrides.create!(set: @group, due_at_overridden: true, due_at:)
 
         get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
-
         expect(response).to be_successful
         expect(json_parse).to eq({
                                    "id" => @assignment.id,
@@ -738,10 +731,13 @@ describe LearningObjectDatesController do
                                        "id" => override2.id,
                                        "assignment_id" => @assignment.id,
                                        "title" => "Non-Collaborative Group 1",
+                                       "due_at" => due_at.iso8601,
+                                       "all_day" => false,
+                                       "all_day_date" => due_at.to_date.to_s,
                                        "unassign_item" => false,
                                        "group_id" => @group.id,
                                        "non_collaborative" => true,
-                                       "group_category_id" => nil
+                                       "group_category_id" => nil,
                                      }
                                    ]
                                  })
@@ -751,7 +747,7 @@ describe LearningObjectDatesController do
         returns_non_collaborative_field_for_group_overrides
       end
 
-      context "works with TAs" do
+      context "as a TA" do
         before do
           @ta = user_factory(active_all: true)
           @course.enroll_user(@ta, "TaEnrollment", enrollment_state: "active")
@@ -1005,12 +1001,6 @@ describe LearningObjectDatesController do
         expect(response).to be_not_found
       end
 
-      it "returns not_found if selective_release_ui_api is disabled" do
-        Account.site_admin.disable_feature! :selective_release_ui_api
-        put :update, params: { **default_params, due_at: "2020-03-02T05:59:00Z" }
-        expect(response).to be_not_found
-      end
-
       it "returns unauthorized for students" do
         course_with_student_logged_in(course: @course)
         put :update, params: { **default_params, unlock_at: "2020-03-02T05:59:00Z" }
@@ -1109,11 +1099,32 @@ describe LearningObjectDatesController do
           adds_an_override_for_a_group
         end
 
-        it "errors out if setting is disabled" do
+        it "throws error if setting is disabled" do
           @course.account.settings = { allow_assign_to_differentiation_tags: false }
           @course.account.save
 
           put :update, params: { **default_params, assignment_overrides: [{ group_id: @group.id, due_at: 7.days.from_now.to_json }] }
+
+          expect(response).to be_bad_request
+        end
+
+        it "throws error if group assignment" do
+          collab_group_cat = @course.group_categories.create!(name: "Collaborative Group", non_collaborative: false)
+          collab_group_cat.create_groups(1)
+          collab_group = collab_group_cat.groups.first
+          collab_group.add_user(@student, "accepted")
+
+          group_assignment = @course.assignments.create!(
+            title: "Group Assignment",
+            **default_availability_dates,
+            **default_due_date,
+            group_category_id: collab_group_cat.id
+          )
+
+          params = { course_id: @course.id,
+                     assignment_id: group_assignment.id }
+
+          put :update, params: { **params, assignment_overrides: [{ group_id: @group.id, due_at: 7.days.from_now.to_json }] }
 
           expect(response).to be_bad_request
         end

@@ -59,7 +59,7 @@ describe Lti::FeatureFlagsController do
       it_behaves_like "course or account lti service" do
         let(:params) do
           {
-            account_id: Lti::Asset.opaque_identifier_for(account),
+            account_id: Lti::V1p1::Asset.opaque_identifier_for(account),
             feature: "account_feature"
           }
         end
@@ -81,7 +81,7 @@ describe Lti::FeatureFlagsController do
       it_behaves_like "course or account lti service" do
         let(:params) do
           {
-            course_id: Lti::Asset.opaque_identifier_for(course),
+            course_id: Lti::V1p1::Asset.opaque_identifier_for(course),
             feature: "course_feature"
           }
         end

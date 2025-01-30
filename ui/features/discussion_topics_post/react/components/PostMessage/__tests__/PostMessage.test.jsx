@@ -18,23 +18,31 @@
 
 import {PostMessage} from '../PostMessage'
 import React from 'react'
-import {render, screen, act, waitFor} from '@testing-library/react'
+import {render, screen, act, waitFor, cleanup} from '@testing-library/react'
 import {DiscussionManagerUtilityContext, SearchContext} from '../../../utils/constants'
 import {User} from '../../../../graphql/User'
 import {getTranslation, responsiveQuerySizes} from '../../../utils'
 
 jest.mock('../../../utils')
 
+const mediaQueryMock = {
+  matches: true,
+  media: '',
+  onchange: null,
+  addListener: jest.fn(),
+  removeListener: jest.fn(),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+  dispatchEvent: jest.fn(),
+}
+
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
-    return {
-      matches: true,
-      media: '',
-      onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
-    }
-  })
+  window.matchMedia = jest.fn().mockImplementation(query => ({...mediaQueryMock, media: query}))
+})
+
+afterEach(() => {
+  cleanup()
+  jest.clearAllMocks()
 })
 
 beforeEach(() => {
@@ -80,28 +88,28 @@ const setupWithTranslationLanguageSelected = (props, {searchTerm = ''} = {}) => 
 
 describe('PostMessage', () => {
   it('displays the title', () => {
-    const {queryByText} = setup()
-    expect(queryByText('Thoughts')).toBeTruthy()
+    const {getByText} = setup()
+    expect(getByText('Thoughts')).toBeInTheDocument()
   })
 
-  it('displays the title (2)', () => {
-    const {queryByText} = setup()
-    const screenReaderText = queryByText('Discussion Topic: Thoughts')
+  it('displays the title with screen reader text', () => {
+    const {getByText} = setup()
+    const screenReaderText = getByText('Discussion Topic: Thoughts')
 
-    expect(screenReaderText).toBeTruthy()
+    expect(screenReaderText).toBeInTheDocument()
     expect(screenReaderText.parentElement.parentElement.parentElement.tagName).toBe('SPAN')
   })
 
   it('displays the message', () => {
-    const {queryByText} = setup()
-    expect(queryByText('Posts are fun')).toBeTruthy()
+    const {getByText} = setup()
+    expect(getByText('Posts are fun')).toBeInTheDocument()
   })
 
   it('displays the children', () => {
-    const {queryByText} = setup({
+    const {getByText} = setup({
       children: <span>Smol children</span>,
     })
-    expect(queryByText('Smol children')).toBeTruthy()
+    expect(getByText('Smol children')).toBeInTheDocument()
   })
 
   describe('search highlighting', () => {
@@ -159,33 +167,31 @@ describe('PostMessage', () => {
 
   describe('AI translation', () => {
     it('should display the translated message when translation is complete', async () => {
-      getTranslation.mockImplementation(() => '<p>Translated message</p>')
+      getTranslation.mockImplementation(() => Promise.resolve('<p>Translated message</p>'))
 
-      const {findAllByTestId} = setupWithTranslationLanguageSelected({
+      const {findByTestId} = setupWithTranslationLanguageSelected({
         message: '<p>Leforditando uzenet<p/>',
         title: 'Gondolatok',
       })
 
       expect(getTranslation).toHaveBeenCalled()
-      const translatedMessages = await findAllByTestId('post-message-translated')
-      expect(translatedMessages).toHaveLength(1)
-      const translatedMessage = translatedMessages[0]
+      const translatedMessage = await findByTestId('post-message-translated')
       expect(translatedMessage.children[0]).toHaveTextContent('Translated message')
     })
 
     it('should not display the translated message if there is no translation', async () => {
-      getTranslation.mockImplementation(() => '')
+      getTranslation.mockImplementation(() => Promise.resolve(''))
 
       const {queryByTestId} = setupWithTranslationLanguageSelected({
         message: '<p>Leforditando uzenet<p/>',
         title: 'Gondolatok',
       })
 
-      expect(getTranslation).toHaveBeenCalled()
-      expect(queryByTestId('post-message-translated')).toBeNull()
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
     })
 
-    it('should not display the translated message if the translation ran into an error', async () => {
+    it('should not display the translated message if the translation fails', async () => {
       getTranslation.mockImplementation(() => Promise.reject(new Error('Translation error')))
 
       const {queryByTestId} = setupWithTranslationLanguageSelected({
@@ -194,7 +200,7 @@ describe('PostMessage', () => {
       })
 
       await waitFor(() => expect(getTranslation).toHaveBeenCalled())
-      expect(queryByTestId('post-message-translated')).toBeNull()
+      expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
     })
   })
 })

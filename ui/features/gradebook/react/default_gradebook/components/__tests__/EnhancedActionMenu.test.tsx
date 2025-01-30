@@ -25,6 +25,7 @@ import React from 'react'
 import PostGradesApp from '../../../SISGradePassback/PostGradesApp'
 import GradebookExportManager from '../../../shared/GradebookExportManager'
 import EnhancedActionMenu from '../EnhancedActionMenu'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -95,6 +96,22 @@ describe('EnhancedActionMenu', () => {
   let component
   let props
 
+  beforeEach(() => {
+    fakeENV.setup({
+      FEATURES: {
+        instui_nav: true,
+      },
+    })
+    props = {
+      ...workingMenuProps(),
+    }
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    jest.clearAllMocks()
+  })
+
   const renderComponent = props_ => {
     return render(<EnhancedActionMenu {...props_} />)
   }
@@ -111,16 +128,6 @@ describe('EnhancedActionMenu', () => {
     clickElement('menuitem', name)
   }
 
-  beforeEach(() => {
-    props = {
-      ...workingMenuProps(),
-    }
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   describe('Basic Rendering', () => {
     beforeEach(() => {
       props = {
@@ -130,16 +137,22 @@ describe('EnhancedActionMenu', () => {
     })
 
     it('renders the keyboard shortcut button when the disable keyboard shortcut setting is turned off', async () => {
-      // EVAL-3711 Remove ICE Evaluate feature flag
-      window.ENV.FEATURES.instui_nav = true
+      fakeENV.setup({
+        FEATURES: {
+          instui_nav: true,
+        },
+      })
       const {getByTestId} = renderComponent(props)
       expect(getByTestId('keyboard-shortcuts')).toBeInTheDocument()
     })
 
     it('does not render the keyboard shortcut button when the disable keyboard shortcut setting is turned on', async () => {
-      // EVAL-3711 Remove ICE Evaluate feature flag
-      window.ENV.FEATURES.instui_nav = true
-      ENV.disable_keyboard_shortcuts = true
+      fakeENV.setup({
+        FEATURES: {
+          instui_nav: true,
+        },
+        disable_keyboard_shortcuts: true,
+      })
       const {queryByTestId} = renderComponent(props)
       expect(queryByTestId('keyboard-shortcuts')).not.toBeInTheDocument()
     })

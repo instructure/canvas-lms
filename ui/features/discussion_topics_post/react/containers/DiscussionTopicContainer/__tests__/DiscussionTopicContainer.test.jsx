@@ -141,23 +141,9 @@ describe('DiscussionTopicContainer', () => {
     ).toBeInTheDocument()
   })
 
-  it('non-readAsAdmin does not see Diff. Group Assignments alert', async () => {
-    const container = setup({
-      discussionTopic: Discussion.mock({
-        assignment: Assignment.mock({onlyVisibleToOverrides: true}),
-        permissions: DiscussionPermissions.mock({readAsAdmin: false}),
-      }),
-    })
-    expect(await container.findByTestId('graded-discussion-info')).toBeTruthy()
-    expect(container.queryByTestId('differentiated-alert')).toBeFalsy()
-  })
-
   it('renders without optional props', async () => {
     const container = setup({discussionTopic: Discussion.mock({assignment: {}})})
     expect(container.getByTestId('replies-counter')).toBeInTheDocument()
-    expect(container.getByText('Everyone')).toBeInTheDocument()
-    expect(container.getByText('No Due Date')).toBeInTheDocument()
-    expect(container.getByText('0 points possible')).toBeInTheDocument()
   })
 
   it('renders infoText only when there are replies', async () => {
@@ -177,16 +163,6 @@ describe('DiscussionTopicContainer', () => {
     })
     const infoText = await container.findByTestId('replies-counter')
     expect(infoText).toHaveTextContent('24 Replies')
-  })
-
-  it('renders Graded info when assignment info exists', async () => {
-    const container = setup({
-      discussionTopic: Discussion.mock({
-        assignment: Assignment.mock({pointsPossible: 5, assignmentOverrides: null}),
-      }),
-    })
-    const gradedDiscussionInfo = await container.findByTestId('graded-discussion-info')
-    expect(gradedDiscussionInfo).toHaveTextContent('5 points possible')
   })
 
   it('should be able to send to edit page when canUpdate', async () => {
@@ -259,16 +235,6 @@ describe('DiscussionTopicContainer', () => {
     await waitFor(() => {
       expect(openWindow).toHaveBeenCalledWith(getSpeedGraderUrl(), '_blank')
     })
-  })
-
-  it('Should find due date text for assignment', async () => {
-    const container = setup({
-      discussionTopic: Discussion.mock({
-        permissions: DiscussionPermissions.mock({readAsAdmin: false}),
-      }),
-    })
-    expect(await container.findByText('Due Mar 31, 2021 5:59am')).toBeTruthy()
-    expect(await container.findByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeTruthy()
   })
 
   it('Should not be able to see post menu if no permissions and initialPostRequiredForCurrentUser', () => {
@@ -483,139 +449,6 @@ describe('DiscussionTopicContainer', () => {
     )
   })
 
-  it('Should find due date text', async () => {
-    const container = setup({
-      discussionTopic: Discussion.mock({assignment: Assignment.mock({assignmentOverrides: null})}),
-    })
-    expect(await container.findByText('Everyone')).toBeTruthy()
-    expect(await container.findByText('Due Mar 31, 2021 5:59am')).toBeTruthy()
-    expect(await container.findByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeTruthy()
-  })
-
-  it('Should find "Show Due Dates" link button', async () => {
-    const props = {discussionTopic: Discussion.mock({})}
-    const container = setup(props)
-    expect(await container.findByText('View Due Dates')).toBeTruthy()
-  })
-
-  it('Should find due date text for "assignment override 3"', async () => {
-    const overrides = [
-      {
-        id: 'BXMzaWdebTVubC0x',
-        _id: '3',
-        dueAt: '2021-04-05T13:40:50Z',
-        lockAt: '2021-09-03T23:59:59-06:00',
-        unlockAt: '2021-03-21T00:00:00-06:00',
-        title: 'assignment override 3',
-      },
-    ]
-
-    const props = {discussionTopic: Discussion.mock({})}
-    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
-    props.discussionTopic.assignment.dueAt = null
-    props.discussionTopic.assignment.unlockAt = null
-    props.discussionTopic.assignment.lockAt = null
-    const container = setup(props)
-    expect(await container.findByText('assignment override 3')).toBeTruthy()
-    expect(await container.findByText('Due Apr 5, 2021 1:40pm')).toBeTruthy()
-    expect(await container.findByText('Available from Mar 21, 2021 until Sep 4, 2021')).toBeTruthy()
-  })
-
-  it('Should find no due date text for "assignment override 3"', async () => {
-    const overrides = [
-      {
-        id: 'BXMzaWdebTVubC0x',
-        _id: '3',
-        dueAt: '',
-        lockAt: '2021-09-03T23:59:59-06:00',
-        unlockAt: '2021-03-21T00:00:00-06:00',
-        title: 'assignment override 3',
-      },
-    ]
-
-    const props = {discussionTopic: Discussion.mock({})}
-    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
-    props.discussionTopic.assignment.dueAt = null
-    props.discussionTopic.assignment.unlockAt = null
-    props.discussionTopic.assignment.lockAt = null
-    const container = setup(props)
-
-    expect(container.getByText('assignment override 3')).toBeTruthy()
-    expect(container.getByText('No Due Date')).toBeTruthy()
-    expect(container.getByText('Available from Mar 21, 2021 until Sep 4, 2021')).toBeTruthy()
-  })
-
-  it('Should find no available date text for "assignment override 3"', async () => {
-    const overrides = [
-      {
-        id: 'BXMzaWdebTVubC0x',
-        _id: '3',
-        dueAt: '2021-04-05T13:40:50Z',
-        lockAt: '2021-09-03T23:59:59-06:00',
-        unlockAt: '',
-        title: 'assignment override 3',
-      },
-    ]
-
-    const props = {discussionTopic: Discussion.mock({})}
-    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
-    props.discussionTopic.assignment.dueAt = null
-    props.discussionTopic.assignment.unlockAt = null
-    props.discussionTopic.assignment.lockAt = null
-    const container = setup(props)
-
-    expect(container.getByText('assignment override 3')).toBeTruthy()
-    expect(container.getByText('Due Apr 5, 2021 1:40pm')).toBeTruthy()
-    expect(container.getByText('Available until Sep 4, 2021')).toBeTruthy()
-  })
-
-  it('Should find no until date text for "assignment override 3"', async () => {
-    const overrides = [
-      {
-        id: 'BXMzaWdebTVubC0x',
-        _id: '3',
-        dueAt: '2021-04-05T13:40:50Z',
-        lockAt: '',
-        unlockAt: '2021-03-21T00:00:00-06:00',
-        title: 'assignment override 3',
-      },
-    ]
-
-    const props = {discussionTopic: Discussion.mock({})}
-    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
-    props.discussionTopic.assignment.dueAt = null
-    props.discussionTopic.assignment.unlockAt = null
-    props.discussionTopic.assignment.lockAt = null
-    const container = setup(props)
-
-    expect(container.getByText('assignment override 3')).toBeTruthy()
-    expect(container.getByText('Due Apr 5, 2021 1:40pm')).toBeTruthy()
-    expect(container.getByText('Available from Mar 21, 2021')).toBeTruthy()
-  })
-
-  it('Should find no text after due date text for "assignment override 3"', async () => {
-    const overrides = [
-      {
-        id: 'BXMzaWdebTVubC0x',
-        _id: '3',
-        dueAt: '2021-04-05T13:40:50Z',
-        lockAt: '',
-        unlockAt: '',
-        title: 'assignment override 3',
-      },
-    ]
-
-    const props = {discussionTopic: Discussion.mock({})}
-    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
-    props.discussionTopic.assignment.dueAt = null
-    props.discussionTopic.assignment.unlockAt = null
-    props.discussionTopic.assignment.lockAt = null
-    const container = setup(props)
-
-    expect(container.getByText('assignment override 3')).toBeTruthy()
-    expect(container.getByText('Due Apr 5, 2021 1:40pm')).toBeTruthy()
-  })
-
   it('should show discussion availability container for ungraded discussions', () => {
     const mockSections = [
       {
@@ -783,6 +616,12 @@ describe('DiscussionTopicContainer', () => {
     })
 
     describe('PodcastFeed Button', () => {
+      afterEach(() => {
+        // Clean up any podcast feed links added to document head
+        const podcastLinks = document.querySelectorAll('link[type="application/rss+xml"]')
+        podcastLinks.forEach(link => link.remove())
+      })
+
       it('does not render when Discussion Podcast Feed is not present', () => {
         const {queryByTestId} = setup({discussionTopic: Discussion.mock()})
         expect(queryByTestId('post-rssfeed')).toBeNull()

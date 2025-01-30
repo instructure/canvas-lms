@@ -79,4 +79,16 @@ describe('PaceModal', () => {
     const {getByText} = renderConnected(<PaceModal {...defaultProps} coursePace={STUDENT_PACE} />)
     expect(getByText('Student Pace: Custom Pace')).toBeInTheDocument()
   })
+
+  describe('course_pace_time_selection is enabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_pace_time_selection = true
+    })
+
+    it('Time selection section is shown', () => {
+      const {getByTestId} = renderConnected(<PaceModal {...defaultProps} coursePace={STUDENT_PACE} />)
+      expect(getByTestId('time-selection-section')).toBeInTheDocument()
+    })
+  })
 })

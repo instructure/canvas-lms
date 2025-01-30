@@ -65,7 +65,6 @@ export function reducer(
 ): SettingsPanelState {
   switch (action.type) {
     case actions.SET_MODULE_NAME:
-      console.info(`Setting module name to ${action.payload}`)
       return {...state, moduleName: action.payload, moduleNameDirty: true}
     case actions.SET_UNLOCK_AT:
       return {...state, unlockAt: action.payload}

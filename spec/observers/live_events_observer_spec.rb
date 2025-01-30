@@ -301,6 +301,14 @@ describe LiveEventsObserver do
       s.excused = true
       s.save!
     end
+
+    it "posts submission_custom_grade_status event" do
+      expect(Canvas::LiveEvents).to receive(:submission_custom_grade_status).once
+      s = submission_model
+      custom_status = CustomGradeStatus.create!(name: "custom", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
+      s.custom_grade_status = custom_status
+      s.save!
+    end
   end
 
   describe "user" do

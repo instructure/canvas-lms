@@ -11792,7 +11792,7 @@ describe Assignment do
     let(:url) { "http://www.example.com" }
     let(:account) { account_model }
     let(:course) { course_model(account:) }
-    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:developer_key) { lti_developer_key_model(account:) }
     let(:old_tool) { external_tool_model(context: course, opts: { url: }) }
     let(:new_tool) { external_tool_1_3_model(context: course, developer_key:, opts: { url:, name: "1.3 tool" }) }
     let(:direct_assignment) do
@@ -12154,6 +12154,29 @@ describe Assignment do
         expect(subject.ready_to_migrate_to_quiz_next?).to be_falsey
         expect(subject.settings).to eq({ "another" => 123 })
       end
+    end
+  end
+
+  describe "Horizon course limitations" do
+    before :once do
+      Account.site_admin.enable_feature!(:horizon_course_setting)
+      @course.horizon_course = true
+      @course.save!
+    end
+
+    it "does not accept group assignments" do
+      @assignment = assignment_model(submission_types: "online_text_entry", course: @course)
+      group_category = @course.group_categories.create!(name: "Test Group Set")
+      @assignment.group_category = group_category
+      expect { @assignment.save! }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "does not accept invalid submission types" do
+      expect { assignment_model(submission_types: "online_url", course: @course) }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "does not accept peer reviews" do
+      expect { assignment_model(peer_reviews: true, course: @course) }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 end

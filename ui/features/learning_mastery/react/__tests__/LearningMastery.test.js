@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import LearningMastery from '../LearningMastery'
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
@@ -93,7 +93,7 @@ describe('Learning Mastery > LearningMastery', () => {
     })
 
     it('returns the sections from the options', () => {
-      expect(learningMastery.getSections().length).toBe(3)
+      expect(learningMastery.getSections()).toHaveLength(3)
     })
 
     it('sorts sections by id', () => {
@@ -328,18 +328,23 @@ describe('Learning Mastery > LearningMastery', () => {
       })
     })
 
-    it('renders the gradebook menu', () => {
+    it('renders the gradebook menu', async () => {
       learningMastery = new LearningMastery(options)
       learningMastery.start()
       const menuContainer = container.querySelector('[data-component="GradebookMenu"]')
-      expect(menuContainer.children.length).toBeGreaterThan(0)
+
+      await waitFor(() => {
+        expect(menuContainer.children.length).toBeGreaterThan(0)
+      })
     })
 
-    it('renders the outcome gradebook paginator', () => {
+    it('renders the outcome gradebook paginator', async () => {
       learningMastery = new LearningMastery(options)
       learningMastery.start()
       const paginatorContainer = container.querySelector('#outcome-gradebook-paginator')
-      expect(paginatorContainer.children.length).toBeGreaterThan(0)
+      await waitFor(() => {
+        expect(paginatorContainer.children.length).toBeGreaterThan(0)
+      })
     })
   })
 
@@ -364,12 +369,12 @@ describe('Learning Mastery > LearningMastery', () => {
 
     it('unmounts the gradebook menu', () => {
       const menuContainer = container.querySelector('[data-component="GradebookMenu"]')
-      expect(menuContainer.children.length).toBe(0)
+      expect(menuContainer.children).toHaveLength(0)
     })
 
     it('unmounts the outcome gradebook paginator', () => {
       const paginatorContainer = container.querySelector('#outcome-gradebook-paginator')
-      expect(paginatorContainer.children.length).toBe(0)
+      expect(paginatorContainer.children).toHaveLength(0)
     })
   })
 })

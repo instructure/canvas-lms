@@ -323,7 +323,7 @@ class Quizzes::QuizzesController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
 
       if params[:fixup_quiz_math_questions] == "1"
-        InstStatsd::Statsd.increment("fixingup_quiz_math_question")
+        InstStatsd::Statsd.distributed_increment("fixingup_quiz_math_question")
         @quiz = fixup_quiz_questions_with_bad_math(@quiz)
       end
 
@@ -973,7 +973,7 @@ class Quizzes::QuizzesController < ApplicationController
     end
 
     if params[:fixup_quiz_math_questions] == "1"
-      InstStatsd::Statsd.increment("fixingup_quiz_math_submission")
+      InstStatsd::Statsd.distributed_increment("fixingup_quiz_math_submission")
       fixup_submission_questions_with_bad_math(@submission)
     end
 

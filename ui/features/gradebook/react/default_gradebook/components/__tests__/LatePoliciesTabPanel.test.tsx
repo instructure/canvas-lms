@@ -407,7 +407,7 @@ describe('LatePoliciesTabPanel', () => {
     describe('missing submission deduction input', () => {
       test('missing submission input has label describing it', async () => {
         subject()
-        expect(screen.getByText('Grade for missing submissions')).toBeInTheDocument()
+        expect(screen.getByText('Grade for missing submissions %')).toBeInTheDocument()
       })
 
       test('enables the missing deduction input if the missing deduction checkbox is checked', async () => {

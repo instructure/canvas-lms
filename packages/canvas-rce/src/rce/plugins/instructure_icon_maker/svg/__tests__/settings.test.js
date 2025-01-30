@@ -25,7 +25,7 @@ jest.mock('../../../shared/ImageCropper/imageCropUtils', () => ({
   createCroppedImageSvg: jest.fn().mockReturnValue(
     Promise.resolve({
       outerHTML: null,
-    })
+    }),
   ),
 }))
 
@@ -57,7 +57,7 @@ describe('useSvgSettings()', () => {
       const [settings, ,] = subject().current
 
       expect(settings).toMatchInlineSnapshot(`
-        Object {
+        {
           "alt": "",
           "color": null,
           "embedImage": null,
@@ -113,7 +113,7 @@ describe('useSvgSettings()', () => {
         const result = subject()
         act(() => result.current[2](settingsUpdate))
         expect(result.current[0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "alt": "",
             "color": null,
             "embedImage": null,
@@ -156,7 +156,7 @@ describe('useSvgSettings()', () => {
 
       // Add an image to the editor and select it
       ed.setContent(
-        '<img id="test-image" data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
+        '<img id="test-image" data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />',
       )
 
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
@@ -207,14 +207,14 @@ describe('useSvgSettings()', () => {
 
       expect(mock.called('icon_metadata')).toBe(true)
       expect(mock.calls('icon_metadata')[0][0]).toMatch(
-        /https:\/\/domain.from.env\/api\/v1\/files\/1\/icon_metadata/
+        /https:\/\/domain.from.env\/api\/v1\/files\/1\/icon_metadata/,
       )
     })
 
     describe('when the download URL contains a course ID', () => {
       beforeEach(() => {
         ed.setContent(
-          '<img id="test-image" data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="courses/2/files/1/download" alt="a red circle" />'
+          '<img id="test-image" data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="courses/2/files/1/download" alt="a red circle" />',
         )
         ed.setSelectedNode(ed.dom.select('#test-image')[0])
       })
@@ -224,7 +224,7 @@ describe('useSvgSettings()', () => {
 
         expect(mock.called('icon_metadata')).toBe(true)
         expect(mock.calls('icon_metadata')[0][0]).toMatch(
-          /https:\/\/domain.from.env\/api\/v1\/files\/1\/icon_metadata/
+          /https:\/\/domain.from.env\/api\/v1\/files\/1\/icon_metadata/,
         )
       })
     })
@@ -232,7 +232,7 @@ describe('useSvgSettings()', () => {
     describe('with a relative download URL', () => {
       beforeEach(() => {
         ed.setContent(
-          '<img id="test-image" data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" />'
+          '<img id="test-image" data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" />',
         )
         ed.setSelectedNode(ed.dom.select('#test-image')[0])
       })
@@ -247,7 +247,7 @@ describe('useSvgSettings()', () => {
     describe('with a containing element selected', () => {
       beforeEach(() => {
         ed.setContent(
-          '<p id="containing"><img data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" /></p>'
+          '<p id="containing"><img data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" /></p>',
         )
         ed.setSelectedNode(ed.dom.select('#containing')[0])
       })
@@ -261,7 +261,7 @@ describe('useSvgSettings()', () => {
 
     it('parses the SVG settings from the icon metadata', async () => {
       const {result, waitForValueToChange} = renderHook(() =>
-        useSvgSettings(ed, editing, canvasOrigin)
+        useSvgSettings(ed, editing, canvasOrigin),
       )
 
       await waitForValueToChange(() => {
@@ -269,7 +269,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toMatchInlineSnapshot(`
-        Object {
+        {
           "alt": "a red circle",
           "color": "#FF2717",
           "embedImage": null,
@@ -339,7 +339,7 @@ describe('useSvgSettings()', () => {
 
       it('replaces icon type from object to string for single-color images', async () => {
         const {result, waitForValueToChange} = renderHook(() =>
-          useSvgSettings(ed, editing, canvasOrigin)
+          useSvgSettings(ed, editing, canvasOrigin),
         )
 
         await waitForValueToChange(() => {
@@ -347,7 +347,7 @@ describe('useSvgSettings()', () => {
         })
 
         expect(result.current[0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "alt": "a red circle",
             "color": "#FF2717",
             "embedImage": "Art Icon",
@@ -356,7 +356,7 @@ describe('useSvgSettings()', () => {
             "externalStyle": null,
             "externalWidth": null,
             "height": 0,
-            "imageSettings": Object {
+            "imageSettings": {
               "cropperSettings": null,
               "icon": "art",
               "iconFillColor": "#FFFFFF",
@@ -402,7 +402,7 @@ describe('useSvgSettings()', () => {
         overwriteUrl()
 
         const {result, waitForValueToChange} = renderHook(() =>
-          useSvgSettings(ed, editing, canvasOrigin)
+          useSvgSettings(ed, editing, canvasOrigin),
         )
 
         await waitForValueToChange(() => {
@@ -410,7 +410,7 @@ describe('useSvgSettings()', () => {
         })
 
         expect(result.current[0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "alt": "a red circle",
             "color": "#FF2717",
             "embedImage": "Art Icon",
@@ -419,7 +419,7 @@ describe('useSvgSettings()', () => {
             "externalStyle": null,
             "externalWidth": null,
             "height": 0,
-            "imageSettings": Object {
+            "imageSettings": {
               "cropperSettings": null,
               "icon": "art",
               "iconFillColor": "#FFFFFF",
@@ -465,7 +465,7 @@ describe('useSvgSettings()', () => {
         overwriteUrl()
 
         const {result, waitForValueToChange} = renderHook(() =>
-          useSvgSettings(ed, editing, canvasOrigin)
+          useSvgSettings(ed, editing, canvasOrigin),
         )
 
         await waitForValueToChange(() => {
@@ -473,7 +473,7 @@ describe('useSvgSettings()', () => {
         })
 
         expect(result.current[0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "alt": "a red circle",
             "color": "#FF2717",
             "embedImage": null,
@@ -520,7 +520,7 @@ describe('useSvgSettings()', () => {
         overwriteUrl()
 
         const {result, waitForValueToChange} = renderHook(() =>
-          useSvgSettings(ed, editing, canvasOrigin)
+          useSvgSettings(ed, editing, canvasOrigin),
         )
 
         await waitForValueToChange(() => {
@@ -528,7 +528,7 @@ describe('useSvgSettings()', () => {
         })
 
         expect(result.current[0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "alt": "a red circle",
             "color": "#FF2717",
             "embedImage": "data:image/svg+xml;base64,CROPPED",
@@ -537,8 +537,8 @@ describe('useSvgSettings()', () => {
             "externalStyle": null,
             "externalWidth": null,
             "height": 0,
-            "imageSettings": Object {
-              "cropperSettings": Object {
+            "imageSettings": {
+              "cropperSettings": {
                 "shape": "triangle",
               },
               "image": "data:image/svg+xml;base64,aaa",
@@ -583,7 +583,7 @@ describe('useSvgSettings()', () => {
         overwriteUrl()
 
         const {result, waitForValueToChange} = renderHook(() =>
-          useSvgSettings(ed, editing, canvasOrigin)
+          useSvgSettings(ed, editing, canvasOrigin),
         )
 
         await waitForValueToChange(() => {
@@ -591,7 +591,7 @@ describe('useSvgSettings()', () => {
         })
 
         expect(result.current[0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "alt": "a red circle",
             "color": "#FF2717",
             "embedImage": "data:image/svg+xml;base64,CROPPED",
@@ -600,8 +600,8 @@ describe('useSvgSettings()', () => {
             "externalStyle": null,
             "externalWidth": null,
             "height": 0,
-            "imageSettings": Object {
-              "cropperSettings": Object {
+            "imageSettings": {
+              "cropperSettings": {
                 "shape": "triangle",
               },
               "image": "data:image/svg+xml;base64,bbb",
@@ -638,7 +638,7 @@ describe('useSvgSettings()', () => {
 
     it('returns the status to "idle"', async () => {
       const {result, waitForValueToChange} = renderHook(() =>
-        useSvgSettings(ed, editing, canvasOrigin)
+        useSvgSettings(ed, editing, canvasOrigin),
       )
 
       await waitForValueToChange(() => {
@@ -658,7 +658,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', () => {
         const result = subject()
         expect(result.current[0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "alt": "",
             "color": null,
             "embedImage": null,
@@ -696,7 +696,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', async () => {
         const result = subject()
         expect(result.current[0]).toMatchInlineSnapshot(`
-          Object {
+          {
             "alt": "",
             "color": null,
             "embedImage": null,
@@ -753,7 +753,7 @@ describe('useSvgSettings()', () => {
       overwriteUrl()
 
       const {result, waitForValueToChange} = renderHook(() =>
-        useSvgSettings(ed, editing, canvasOrigin)
+        useSvgSettings(ed, editing, canvasOrigin),
       )
 
       await waitForValueToChange(() => {
@@ -761,7 +761,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toMatchInlineSnapshot(`
-        Object {
+        {
           "alt": "a red circle",
           "color": "#FF2717",
           "embedImage": "data:image/svg+xml;base64,CROPPED",
@@ -770,8 +770,8 @@ describe('useSvgSettings()', () => {
           "externalStyle": null,
           "externalWidth": null,
           "height": 0,
-          "imageSettings": Object {
-            "cropperSettings": Object {
+          "imageSettings": {
+            "cropperSettings": {
               "shape": "triangle",
             },
             "image": "data:image/svg+xml;base64,ORIGINAL",
@@ -821,7 +821,7 @@ describe('useSvgSettings()', () => {
       overwriteUrl()
 
       const {result, waitForValueToChange} = renderHook(() =>
-        useSvgSettings(ed, editing, canvasOrigin)
+        useSvgSettings(ed, editing, canvasOrigin),
       )
 
       await waitForValueToChange(() => {
@@ -829,7 +829,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toMatchInlineSnapshot(`
-        Object {
+        {
           "alt": "a red circle",
           "color": "#FF2717",
           "embedImage": "data:image/svg+xml;base64,ORIGINAL",
@@ -838,7 +838,7 @@ describe('useSvgSettings()', () => {
           "externalStyle": null,
           "externalWidth": null,
           "height": 0,
-          "imageSettings": Object {
+          "imageSettings": {
             "image": "data:image/svg+xml;base64,ORIGINAL",
           },
           "isDecorative": false,
@@ -893,7 +893,7 @@ describe('useSvgSettings()', () => {
       overwriteUrl()
 
       const {result, waitForValueToChange} = renderHook(() =>
-        useSvgSettings(ed, editing, canvasOrigin)
+        useSvgSettings(ed, editing, canvasOrigin),
       )
 
       await waitForValueToChange(() => {
@@ -901,7 +901,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toMatchInlineSnapshot(`
-        Object {
+        {
           "alt": "a red circle",
           "color": "#FF2717",
           "embedImage": null,
@@ -963,7 +963,7 @@ describe('useSvgSettings()', () => {
       overwriteUrl()
 
       const {result, waitForValueToChange} = renderHook(() =>
-        useSvgSettings(ed, editing, canvasOrigin)
+        useSvgSettings(ed, editing, canvasOrigin),
       )
 
       await waitForValueToChange(() => {
@@ -971,7 +971,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toMatchInlineSnapshot(`
-        Object {
+        {
           "alt": "a red circle",
           "color": "#FF2717",
           "embedImage": "data:image/svg+xml;base64,CROPPED",
@@ -980,8 +980,8 @@ describe('useSvgSettings()', () => {
           "externalStyle": null,
           "externalWidth": null,
           "height": 0,
-          "imageSettings": Object {
-            "cropperSettings": Object {
+          "imageSettings": {
+            "cropperSettings": {
               "shape": "triangle",
             },
             "icon": "",
@@ -1069,7 +1069,7 @@ describe('useSvgSettings()', () => {
 
     it('loads the correct metadata', async () => {
       const {result, rerender, waitForValueToChange} = renderHook(() =>
-        useSvgSettings(ed, editing, canvasOrigin)
+        useSvgSettings(ed, editing, canvasOrigin),
       )
 
       ed.setSelectedNode(ed.dom.select('#test-image-1')[0])

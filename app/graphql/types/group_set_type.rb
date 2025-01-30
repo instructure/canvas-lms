@@ -65,6 +65,8 @@ module Types
 
     field :groups_connection, GroupType.connection_type, null: true
 
+    field :non_collaborative, Boolean, null: true
+
     def groups_connection
       Loaders::AssociationLoader.for(GroupCategory, :context).load(set).then do
         # this permission matches the REST api, but is probably too strict.

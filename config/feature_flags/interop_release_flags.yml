@@ -14,16 +14,6 @@ assignment_edit_placement_not_on_announcements:
   applies_to: SiteAdmin
   display_name: Prevents LTI tools with assignment_edit placement from being launched on Announcements page
   description: When enabled, an LTI tool with the assignment_edit placement will not be launched on the Announcement page.
-assignment_submission_type_card:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Allow submission type resource card to be shown in the assignment edit page
-  description: When enabled, the new submission type resource card will be shown in the assignment edit page.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 disable_graphql_authentication:
   state: hidden
   display_name: Disable authentication for GraphQL
@@ -153,43 +143,6 @@ lti_find_external_tool_prefer_original_client_id:
     When possible, the LTI tool finding logic will prefer tools installed from the same
     developer key as the original tool. This prevents the edge case where multiple developer
     keys share the same domain, and a tool from the wrong developer key would be matched first.
-lti_log_launches:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Log LTI launches
-  shadow: true
-  description: |-
-    When enabled for an account, sends data for all LTI launches to the PandataEvents system
-    for querying and visualization. Requires Log LTI launches (Site Admin) to also be enabled.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
-lti_log_launches_site_admin:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Log LTI launches (Site Admin)
-  shadow: true
-  description: |-
-    Allows for quickly enabling or disabling LTI launch logging while rolling out
-    at the account level.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
-lti_migration_info:
-  state: hidden
-  display_name: LTI 1.1 to 1.3 Migration Info
-  shadow: true
-  description: When enabled, allows users to view LTI 1.1 to 1.3 migration info on the External Apps page.
-  applies_to: RootAccount
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_oidc_missing_cookie_retry:
   state: hidden
   shadow: true
@@ -265,19 +218,6 @@ lti_resource_link_id_speedgrader_launches_reference_assignment:
     title. With the feature flag off, in SpeedGrader launches, resource_link_id
     and resource_link_title reference the tool (not the assignment) for
     non-NewQuizzes LTI 1.1 tools.
-lti_resource_links_api:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Allow LTI 1.3 Resource Links API
-  description: |-
-    When enabled, the Canvas API for LTI Resource Links is usable. Admins can
-    use this API for visibility into content returned from tools.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_toggle_placements:
   state: hidden
   applies_to: RootAccount
@@ -366,20 +306,6 @@ remove_unwanted_lti_validation_claims:
       state: allowed_on
     ci:
       state: allowed_on
-require_permission_for_app_center_token:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Require Manage LTI permissions to set External App Center token
-  description: |-
-    When enabled, requires any of the manage_lti_* permissions to see the
-    Manage App List button on the External Apps page and to update the token
-    from Eduappcenter, to prevent accidental changes to the app list.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 top_navigation_placement:
   state: hidden
   applies_to: RootAccount
@@ -402,16 +328,3 @@ tune_lti_context_id_history_query:
     improve performance. Caution: for some accounts where this query
     doesn't already time out, enabling this may cause the query to take
     much longer and even time out.
-update_unified_tool_id:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Fetch Unified Tool ID from LP and update it
-  shadow: true
-  description: |-
-    When enabled, it fetches the unified_tool_id from LearnPlatform and updates the
-    unified_tool_id field every time the ContextExternalTool is saved.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on

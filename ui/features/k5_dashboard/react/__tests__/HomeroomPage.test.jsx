@@ -17,13 +17,16 @@
  */
 
 import React from 'react'
-import {render, act, fireEvent, waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import HomeroomPage from '../HomeroomPage'
 import {enableFetchMocks} from 'jest-fetch-mock'
 
 enableFetchMocks()
 
 describe('HomeroomPage', () => {
+  const user = userEvent.setup()
+
   const getProps = (overrides = {}) => ({
     visible: true,
     createPermission: 'admin',
@@ -35,34 +38,36 @@ describe('HomeroomPage', () => {
   })
 
   beforeEach(() => {
-    window.ENV.INITIAL_NUM_K5_CARDS = 3
+    window.ENV = {
+      INITIAL_NUM_K5_CARDS: 3,
+    }
+    fetch.resetMocks()
   })
 
   afterEach(() => {
     localStorage.clear()
-  })
-
-  afterAll(() => {
     window.ENV = {}
+    jest.clearAllMocks()
   })
 
   it('shows loading skeletons while loading for announcements and cards', () => {
-    const {getAllByText, getByText} = render(
+    const {getAllByTestId, getByText} = render(
       <HomeroomPage {...getProps()} loadingAnnouncements={true} loadingCards={true} />,
     )
-    const cards = getAllByText('Loading Card')
-    expect(cards[0]).toBeInTheDocument()
+
+    const skeletons = getAllByTestId('skeletonShimmerBox')
+    expect(skeletons[0]).toBeInTheDocument()
     expect(getByText('Loading Announcement Content')).toBeInTheDocument()
   })
 
   it('shows loading skeletons while loading based off ENV variable', () => {
-    const {getAllByText} = render(<HomeroomPage {...getProps()} loadingCards={true} />)
-    const cards = getAllByText('Loading Card')
-    expect(cards).toHaveLength(3)
-    expect(cards[0]).toBeInTheDocument()
+    const {getAllByTestId} = render(<HomeroomPage {...getProps()} loadingCards={true} />)
+    const skeletons = getAllByTestId('skeletonShimmerBox')
+    expect(skeletons).toHaveLength(3)
+    expect(skeletons[0]).toBeInTheDocument()
   })
 
-  it('replaces card skeletons with content on load', () => {
+  it('replaces card skeletons with content on load', async () => {
     const overrides = {
       cards: [
         {
@@ -79,45 +84,61 @@ describe('HomeroomPage', () => {
       ],
       loadingCards: false,
     }
-    const {queryAllByText, getByText} = render(<HomeroomPage {...getProps(overrides)} />)
-    expect(queryAllByText('Loading Card')).toHaveLength(0)
+    const {queryByLabelText, getByText} = render(<HomeroomPage {...getProps(overrides)} />)
+
+    await waitFor(() => {
+      expect(queryByLabelText('Loading Card')).not.toBeInTheDocument()
+    })
     expect(getByText('Computer Science 101')).toBeInTheDocument()
   })
 
   it('shows a panda and message if the user has no cards', () => {
-    const {getByText, getByTestId} = render(<HomeroomPage {...getProps({cards: []})} />)
+    const {getByTestId, getByText} = render(<HomeroomPage {...getProps({cards: []})} />)
     expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
     expect(getByText("You don't have any active courses yet.")).toBeInTheDocument()
   })
 
   describe('start a new subject button', () => {
     it('is not present if createPermission is set to null', () => {
-      const {queryByText} = render(<HomeroomPage {...getProps({createPermission: null})} />)
-      expect(queryByText('Open new subject modal')).not.toBeInTheDocument()
+      const {queryByTestId} = render(<HomeroomPage {...getProps({createPermission: null})} />)
+      expect(queryByTestId('new-course-button')).not.toBeInTheDocument()
     })
 
     it('is present if createPermission is set to teacher', () => {
-      const {getByText} = render(<HomeroomPage {...getProps({createPermission: 'teacher'})} />)
-      expect(getByText('Open new subject modal')).toBeInTheDocument()
+      const {getByTestId} = render(<HomeroomPage {...getProps({createPermission: 'teacher'})} />)
+      expect(getByTestId('new-course-button')).toBeInTheDocument()
     })
 
     describe('with createPermission set to admin', () => {
       it('is visible', () => {
-        const {getByText} = render(<HomeroomPage {...getProps()} />)
-        expect(getByText('Open new subject modal')).toBeInTheDocument()
+        const {getByTestId} = render(<HomeroomPage {...getProps()} />)
+        expect(getByTestId('new-course-button')).toBeInTheDocument()
       })
 
       it('shows a tooltip on hover', async () => {
-        const {getByText, queryByText} = render(<HomeroomPage {...getProps()} />)
-        await waitFor(() => expect(queryByText('Start a new subject')).not.toBeVisible())
-        fireEvent.focus(getByText('Open new subject modal'))
-        await waitFor(() => expect(getByText('Start a new subject')).toBeVisible())
+        const {getByTestId, getByText} = render(<HomeroomPage {...getProps()} />)
+        const button = getByTestId('new-course-button')
+
+        await waitFor(() => {
+          expect(getByText('Start a new subject')).not.toBeVisible()
+        })
+
+        await user.hover(button)
+
+        await waitFor(() => {
+          expect(getByText('Start a new subject')).toBeVisible()
+        })
       })
 
-      it('opens up the modal on click', () => {
-        const {getByText} = render(<HomeroomPage {...getProps()} />)
-        act(() => getByText('Open new subject modal').click())
-        expect(getByText('Create Subject')).toBeInTheDocument()
+      it('opens up the modal on click', async () => {
+        const {getByTestId, getByText} = render(<HomeroomPage {...getProps()} />)
+        const button = getByTestId('new-course-button')
+
+        await user.click(button)
+
+        await waitFor(() => {
+          expect(getByText('Create Subject')).toBeInTheDocument()
+        })
       })
     })
   })

@@ -111,7 +111,7 @@ describe('DiscussionTopicForm', () => {
       expect(document.queryByTestId('group-discussion-checkbox')).toBeFalsy()
     })
 
-    it('hides post to section, student ToDo, and ungraded options when Graded', () => {
+    it('hides student ToDo, and ungraded options when Graded', () => {
       ENV = {
         FEATURES: {},
         STUDENT_PLANNER_ENABLED: true,
@@ -124,17 +124,15 @@ describe('DiscussionTopicForm', () => {
       }
       Object.assign(window.ENV, ENV)
 
-      const {queryByText, queryByTestId, getByLabelText, queryByLabelText} = setup()
+      const {queryByTestId, getByLabelText, queryByLabelText} = setup()
       expect(queryByLabelText('Add to student to-do')).toBeInTheDocument()
       queryByLabelText('Add to student to-do').click()
       expect(queryByTestId('todo-date-section')).toBeInTheDocument()
-      expect(queryByText('All Sections')).toBeInTheDocument()
-      expect(queryByTestId('assignment-settings-section')).not.toBeInTheDocument()
+      expect(queryByTestId('discussion-assign-to-section')).toBeInTheDocument()
       getByLabelText('Graded').click()
       expect(queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
       expect(queryByTestId('todo-date-section')).not.toBeInTheDocument()
-      expect(queryByLabelText('Post to')).not.toBeInTheDocument()
-      expect(queryByTestId('assignment-settings-section')).toBeInTheDocument()
+      expect(queryByTestId('assignment-assign-to-section')).toBeInTheDocument()
     })
 
     it('does not display AttachButton when CAN_ATTACH is false', () => {

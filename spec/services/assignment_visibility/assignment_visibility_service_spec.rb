@@ -675,7 +675,7 @@ describe AssignmentVisibility::AssignmentVisibilityService do
       end
     end
 
-    describe AssignmentStudentVisibility do
+    describe AssignmentVisibility do
       let!(:course) do
         course = Course.create!
         course.enroll_student(first_student)

@@ -2311,6 +2311,7 @@ CanvasRails::Application.routes.draw do
       get "group_categories/:group_category_id/users", action: :users, as: "group_category_users"
       get "group_categories/:group_category_id/export", action: :export, as: "group_category_export", defaults: { format: :csv }
       post "group_categories/:group_category_id/assign_unassigned_members", action: "assign_unassigned_members", as: "group_category_assign_unassigned_members"
+      post "group_categories/:group_category_id/bulk_manage_groups", action: :bulk_manage_groups
     end
 
     scope(controller: :progress) do
@@ -2656,6 +2657,7 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/course_pacing/:id", action: :destroy
       post "courses/:course_id/course_pacing/:id/publish", action: :publish
       post "courses/:course_id/course_pacing/compress_dates", action: :compress_dates
+      post "courses/:course_id/course_pacing/bulk_create_enrollment_paces", action: :bulk_create_enrollment_paces
     end
 
     scope(controller: :blackout_dates) do
@@ -2898,6 +2900,11 @@ CanvasRails::Application.routes.draw do
     # Progress Service (LTI AGS)
     scope(controller: "lti/ims/progress") do
       get "courses/:course_id/progress/:id", action: :show, as: :lti_progress_show
+    end
+
+    # Asset Service & Asset Report Service (LTI Asset Processor Specs)
+    scope(controller: "lti/ims/asset_processor") do
+      post "asset_processor/:asset_processor_id/report", action: :create_report, as: :lti_asset_processor_create_report
     end
 
     # Dynamic Registration Service

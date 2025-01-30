@@ -181,6 +181,30 @@ describe Types::AssignmentType do
     end
   end
 
+  describe "rubric self assessments" do
+    before do
+      rubric_for_course
+      rubric_association_model(context: course, rubric: @rubric, association_object: assignment, purpose: "grading")
+      course.enable_feature!(:enhanced_rubrics)
+      course.enable_feature!(:platform_service_speedgrader)
+      course.root_account.enable_feature!(:rubric_self_assessment)
+      assignment.update(rubric_self_assessment_enabled: true)
+    end
+
+    it "returns rubric self assessment enabled" do
+      expect(assignment_type.resolve("rubricSelfAssessmentEnabled")).to be true
+    end
+
+    it "returns can_update_rubric_self_assessment" do
+      expect(assignment_type.resolve("canUpdateRubricSelfAssessment")).to be true
+    end
+
+    it "returns can_update_rubric_self_assessment false if the due dates have passed" do
+      assignment.update(due_at: 1.day.ago)
+      expect(assignment_type.resolve("canUpdateRubricSelfAssessment")).to be false
+    end
+  end
+
   it "works with moderated grading" do
     assignment.moderated_grading = true
     assignment.grader_count = 1

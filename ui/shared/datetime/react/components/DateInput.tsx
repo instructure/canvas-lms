@@ -25,6 +25,8 @@ import {Calendar} from '@instructure/ui-calendar'
 import {DateInput} from '@instructure/ui-date-input'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenEndSolid, IconArrowOpenStartSolid} from '@instructure/ui-icons'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 
 import type {ViewProps} from '@instructure/ui-view'
 import type {
@@ -284,7 +286,15 @@ export default function CanvasDateInput({
 
   function invalidText(text: string) {
     if (typeof invalidDateMessage === 'function') return invalidDateMessage(text)
-    if (typeof invalidDateMessage === 'undefined') return I18n.t('Invalid Date')
+    if (typeof invalidDateMessage === 'undefined')
+      return (
+        <View textAlign="center">
+          <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+            <IconWarningSolid />
+          </View>
+          {I18n.t('Invalid date format')}
+        </View>
+      )
     return invalidDateMessage
   }
 

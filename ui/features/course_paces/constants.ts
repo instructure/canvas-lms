@@ -16,6 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('course_paces_projected_dates')
+
 export const WORK_WEEK_DAYS_MENU_OPTIONS = [
   {value: 'mon', label: 'Mondays'},
   {value: 'tue', label: 'Tuesdays'},
@@ -25,3 +29,18 @@ export const WORK_WEEK_DAYS_MENU_OPTIONS = [
   {value: 'sat', label: 'Saturdays'},
   {value: 'sun', label: 'Sundays'},
 ]
+
+export const START_DATE_CAPTIONS = {
+  enrollment: I18n.t('Student enrollment date'),
+  enrollment_time_selection: I18n.t('Determined by student enrollment date'),
+  course: I18n.t('Determined by course start date'),
+  section: I18n.t('Determined by section start date'),
+  empty: I18n.t("Determined by today's date"),
+}
+
+export const END_DATE_CAPTIONS = {
+  default: I18n.t('Determined by course pace'),
+  course: I18n.t('Determined by course end date'),
+  section: I18n.t('Determined by section end date'),
+  empty: I18n.t('Determined by course pace'),
+}

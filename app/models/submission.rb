@@ -134,6 +134,7 @@ class Submission < ActiveRecord::Base
   belongs_to :course, inverse_of: :submissions
   belongs_to :custom_grade_status, inverse_of: :submissions
   has_many :observer_alerts, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :submission
   belongs_to :user
   alias_method :student, :user
   belongs_to :grader, class_name: "User"

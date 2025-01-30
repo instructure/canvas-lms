@@ -21,7 +21,7 @@ import CanvasMultiSelect from '@canvas/multi-select/react'
 import {View} from '@instructure/ui-view'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PropTypes from '@canvas/permissions/react/propTypes'
+import PropTypes from 'prop-types'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -30,7 +30,7 @@ export const TranslationControls = props => {
   const {translationLanguages, setTranslateTargetLanguage} = useContext(
     DiscussionManagerUtilityContext,
   )
-  const [input, setInput] = useState(translationLanguages.current?.[0]?.name || '')
+  const [input, setInput] = useState('')
   const [selected, setSelected] = useState(null)
 
   const handleSelect = selectedArray => {
@@ -69,6 +69,7 @@ export const TranslationControls = props => {
         inputValue={input}
         onInputChange={e => setInput(e.target.value)}
         width="360px"
+        placeholder={I18n.t('Language')}
       >
         {filteredLanguages.map(({id, name}) => (
           <CanvasMultiSelect.Option key={id} id={id} value={id} isSelected={id === selected}>

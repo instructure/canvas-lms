@@ -42,6 +42,7 @@ import type {Lti1p3RegistrationWizardService} from './Lti1p3RegistrationWizardSe
 import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 import {toUndefined} from '../../common/lib/toUndefined'
 import {Footer} from '../registration_wizard_forms/Footer'
+import {isLtiPlacementWithIcon} from '../model/LtiPlacement'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -171,7 +172,14 @@ export const Lti1p3RegistrationWizard = ({
             currentScreen="intermediate"
             reviewing={store.state.reviewing}
             onPreviousClicked={handlePreviousClicked('OverrideURIs')}
-            onNextClicked={handleNextClicked('Icons')}
+            onNextClicked={() => {
+              const placements = store.state.overlayStore.getState().state.placements.placements
+              if (placements?.some(p => isLtiPlacementWithIcon(p))) {
+                handleNextClicked('Icons')()
+              } else {
+                handleNextClicked('Review')()
+              }
+            }}
           />
         </>
       )
@@ -195,7 +203,14 @@ export const Lti1p3RegistrationWizard = ({
           />
           <Footer
             currentScreen="last"
-            onPreviousClicked={handlePreviousClicked('Icons')}
+            onPreviousClicked={() => {
+              const placements = store.state.overlayStore.getState().state.placements.placements
+              if (placements?.some(p => isLtiPlacementWithIcon(p))) {
+                handlePreviousClicked('Icons')()
+              } else {
+                handlePreviousClicked('Naming')()
+              }
+            }}
             updating={!!existingRegistration}
             onNextClicked={() => {
               if (existingRegistration) {

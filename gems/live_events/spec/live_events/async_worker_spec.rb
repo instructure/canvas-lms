@@ -48,9 +48,10 @@ describe LiveEvents::AsyncWorker do
 
   before do
     LiveEvents.max_queue_size = -> { 100 }
+    LiveEvents.retry_throttled_events = -> { true }
     LiveEvents.statsd = nil
     allow(LiveEvents).to receive(:logger).and_return(double(info: nil, error: nil, debug: nil))
-    @worker = LiveEvents::AsyncWorker.new(false, stream_client:, stream_name:)
+    @worker = LiveEvents::AsyncWorker.new(false, stream_client:, stream_name:, retry_throttled_events: true)
     allow(@worker).to receive(:at_exit)
     expect(LiveEvents.logger).to_not receive(:error).with(/Exception making LiveEvents async call/)
     LiveEvents.statsd = statsd_double
@@ -117,9 +118,9 @@ describe LiveEvents::AsyncWorker do
 
         expect(stream_client).to receive(:put_records).with(expected_batch).and_return(results1, results2)
         expect(statsd_double).to receive(:time).and_yield.twice
-        expect(statsd_double).not_to receive(:increment).with("live_events.events.send_errors", any_args)
-        expect(statsd_double).to receive(:increment).with("live_events.events.sends", any_args)
-        expect(statsd_double).to receive(:increment).with("live_events.events.retry", any_args)
+        expect(statsd_double).not_to receive(:distributed_increment).with("live_events.events.send_errors", any_args)
+        expect(statsd_double).to receive(:distributed_increment).with("live_events.events.sends", any_args)
+        expect(statsd_double).to receive(:distributed_increment).with("live_events.events.retry", any_args)
 
         @worker.start!
         @worker.push event, partition_key
@@ -131,28 +132,27 @@ describe LiveEvents::AsyncWorker do
 
         expect(stream_client).to receive(:put_records).exactly(4).times.and_return(results)
         expect(statsd_double).to receive(:time).and_yield.exactly(4).times
-        expect(statsd_double).to receive(:increment).exactly(3).times.with("live_events.events.retry", any_args)
-        expect(statsd_double).to receive(:increment).once.with("live_events.events.final_retry", any_args)
-        expect(statsd_double).to receive(:increment).with("live_events.events.send_errors", any_args)
+        expect(statsd_double).to receive(:distributed_increment).exactly(3).times.with("live_events.events.retry", any_args)
+        expect(statsd_double).to receive(:distributed_increment).once.with("live_events.events.final_retry", any_args)
+        expect(statsd_double).to receive(:distributed_increment).with("live_events.events.send_errors", any_args)
 
         @worker.start!
         @worker.push event, partition_key
         @worker.stop!
       end
 
-      it "writes errors to logger" do
-        results = Aws::Kinesis::Types::PutRecordsOutput.new(
-          records: [
-            Aws::Kinesis::Types::PutRecordsResultEntry.new(error_code: "failure", error_message: "failure message")
-          ]
-        )
-        allow(stream_client).to receive(:put_records).once.and_return(results)
-        expect(statsd_double).to receive(:time).and_yield
-        expect(statsd_double).to receive(:increment).with("live_events.events.send_errors", any_args)
+      it "puts 'ProvisionedThroughputExceeded' records back in the queue for 3 retries that fail" do
+        results = double(records: [double(error_code: "ProvisionedThroughputExceededException", error_message: "provisioned throughput exceeded")])
+
+        expect(stream_client).to receive(:put_records).exactly(4).times.and_return(results)
+        expect(statsd_double).to receive(:time).and_yield.exactly(4).times
+        expect(statsd_double).to receive(:distributed_increment).exactly(4).times.with("live_events.events.throttled")
+        expect(statsd_double).to receive(:distributed_increment).exactly(3).times.with("live_events.events.retry", any_args)
+        expect(statsd_double).to receive(:distributed_increment).once.with("live_events.events.final_retry", any_args)
+        expect(statsd_double).to receive(:distributed_increment).with("live_events.events.send_errors", any_args)
+
         @worker.start!
-
-        4.times { @worker.push event, partition_key }
-
+        @worker.push event, partition_key
         @worker.stop!
       end
     end

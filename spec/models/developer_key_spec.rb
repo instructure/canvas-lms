@@ -234,11 +234,18 @@ describe DeveloperKey do
 
   describe "external tool management" do
     specs_require_sharding
-    include_context "lti_1_3_spec_helper"
+
+    def lti_key_for_account(account)
+      account.shard.activate do
+        lti_developer_key_model(account:).tap do |developer_key|
+          lti_tool_configuration_model(developer_key:)
+        end
+      end
+    end
 
     let(:shard_1_account) { @shard1.activate { account_model } }
-    let(:developer_key) { Account.site_admin.shard.activate { dev_key_model_1_3(account: Account.site_admin) } }
-    let(:shard_2_dev_key) { @shard2.activate { dev_key_model_1_3(account: shard_2_account) } }
+    let(:developer_key) { lti_key_for_account(Account.site_admin) }
+    let(:shard_2_dev_key) { lti_key_for_account(shard_2_account) }
     let(:shard_1_tool) do
       tool = nil
       @shard1.activate do
@@ -282,7 +289,7 @@ describe DeveloperKey do
     end
 
     describe "instrumentation" do
-      let(:developer_key) { @shard1.activate { dev_key_model_1_3(account: shard_1_account) } }
+      let(:developer_key) { lti_key_for_account(shard_1_account) }
 
       def enable_external_tools
         developer_key.enable_external_tools!(account)
@@ -293,8 +300,7 @@ describe DeveloperKey do
 
       before do
         developer_key
-        Account.site_admin.shard.activate { tool_configuration }
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:timing)
       end
 
@@ -305,7 +311,7 @@ describe DeveloperKey do
       context "when method succeeds" do
         it "increments success count" do
           enable_external_tools
-          expect(InstStatsd::Statsd).to have_received(:increment).with("developer_key.manage_external_tools.count", any_args)
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("developer_key.manage_external_tools.count", any_args)
         end
 
         it "tracks success timing" do
@@ -328,7 +334,7 @@ describe DeveloperKey do
 
         it "increments error count" do
           manage_external_tools
-          expect(InstStatsd::Statsd).to have_received(:increment).with("developer_key.manage_external_tools.error.count", any_args)
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("developer_key.manage_external_tools.error.count", any_args)
         end
 
         it "tracks success timing" do
@@ -389,7 +395,6 @@ describe DeveloperKey do
     describe "#disable_external_tools!" do
       before do
         developer_key
-        Account.site_admin.shard.activate { tool_configuration }
         shard_1_tool
         shard_2_tool
         disable_external_tools
@@ -437,7 +442,6 @@ describe DeveloperKey do
     describe "#enable_external_tools!" do
       before do
         developer_key
-        Account.site_admin.shard.activate { tool_configuration }
         shard_1_tool.update!(workflow_state: "disabled")
         shard_2_tool.update!(workflow_state: "disabled")
         @shard1.activate do
@@ -482,6 +486,7 @@ describe DeveloperKey do
       end
 
       let(:new_title) { "New Title!" }
+      let(:tool_configuration) { developer_key.tool_configuration }
 
       before do
         developer_key
@@ -512,8 +517,8 @@ describe DeveloperKey do
       end
 
       context "when non-site admin key" do
-        let(:developer_key) { @shard1.activate { dev_key_model_1_3(account: shard_1_account) } }
-        let(:shard_2_dev_key) { @shard2.activate { dev_key_model_1_3(account: shard_2_account) } }
+        let(:developer_key) { lti_key_for_account(shard_1_account) }
+        let(:shard_2_dev_key) { lti_key_for_account(shard_2_account) }
         let(:shard_1_tool) do
           tool = nil
           @shard1.activate do
@@ -545,8 +550,6 @@ describe DeveloperKey do
           end
           tool
         end
-
-        let(:tool_configuration) { developer_key.tool_configuration }
 
         before do
           update_external_tools
@@ -975,9 +978,7 @@ describe DeveloperKey do
 
           context "when the developer key has an Lti::IMS::Registration for a configuration" do
             let(:developer_key_with_ims_registration) do
-              dk = dev_key_model_1_3
-              # This is necessary because a TC is created automatically; clean this up with INTEROP-8943
-              dk.tool_configuration = nil
+              dk = lti_developer_key_model
               dk.ims_registration = lti_ims_registration_model
               dk.save!
               dk
@@ -1008,7 +1009,13 @@ describe DeveloperKey do
     end
 
     context "when site admin" do
-      let(:key) { Shard.default.activate { dev_key_model_1_3(account: Account.site_admin) } }
+      let(:key) do
+        Shard.default.activate do
+          lti_developer_key_model(account: Account.site_admin).tap do |key|
+            lti_tool_configuration_model(developer_key: key)
+          end
+        end
+      end
 
       it "creates a binding on save" do
         expect(key.developer_key_account_bindings.find_by(account: Account.site_admin)).to be_present
@@ -1081,11 +1088,11 @@ describe DeveloperKey do
       describe "destroy_external_tools!" do
         subject { ContextExternalTool.active }
 
-        include_context "lti_1_3_spec_helper"
         specs_require_sharding
 
         let(:account) { account_model }
-        let(:developer_key) { dev_key_model_1_3(account:) }
+        let(:developer_key) { lti_developer_key_model(account:) }
+        let(:tool_configuration) { lti_tool_configuration_model(developer_key:) }
         let(:tool) do
           t = developer_key.lti_registration.new_external_tool(account)
           t.save!
@@ -1093,6 +1100,7 @@ describe DeveloperKey do
         end
 
         before do
+          tool_configuration
           tool
         end
 

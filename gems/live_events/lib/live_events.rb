@@ -24,6 +24,7 @@ module LiveEvents
   class << self
     attr_accessor :logger, :cache, :statsd, :on_work_unit_end
     attr_reader :stream_client
+    attr_writer :retry_throttled_events
 
     # rubocop:disable Style/TrivialAccessors
     def settings=(settings)
@@ -48,6 +49,10 @@ module LiveEvents
 
     def max_queue_size
       @max_queue_size.call
+    end
+
+    def retry_throttled_events
+      @retry_throttled_events&.call
     end
     # rubocop:enable Style/TrivialAccessors
 
@@ -85,7 +90,7 @@ module LiveEvents
           logger.warn "Starting new LiveEvents worker thread due to fork."
         end
 
-        @worker = LiveEvents::AsyncWorker.new(stream_client: client.stream_client, stream_name: client.stream_name)
+        @worker = LiveEvents::AsyncWorker.new(stream_client: client.stream_client, stream_name: client.stream_name, retry_throttled_events:)
         @launched_pid = Process.pid
       end
 

@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -19,49 +17,80 @@
  */
 
 import FileOptionsCollection from '../FileOptionsCollection'
+import UploadQueue from '../UploadQueue'
 import {
   TYPE,
   ICON_MAKER_ICONS,
   SVG_TYPE,
-} from '../../../../../../packages/canvas-rce/src/rce/plugins/instructure_icon_maker/svg/constants'
+} from '@instructure/canvas-rce/src/rce/plugins/instructure_icon_maker/svg/constants'
 
-describe('applyCategory()', () => {
-  let fileText, fileType
+jest.mock('../UploadQueue')
 
-  const file = () => ({
+interface FileOption {
+  file: {
+    slice: () => {text: () => Promise<string>}
+    type: string
+  }
+  category?: string
+}
+
+describe('FileOptionsCollection', () => {
+  let fileText: string
+  let fileType: string
+
+  const file = (): FileOption['file'] => ({
     slice: () => ({
       text: async () => fileText,
     }),
     type: fileType,
   })
 
-  const fileOptions = () => [
+  const fileOptions = (): FileOption[] => [
     {
       file: file(),
     },
   ]
 
-  const subject = () => FileOptionsCollection.applyCategory(fileOptions())
+  beforeEach(() => {
+    jest.clearAllMocks()
+    FileOptionsCollection.folder = {id: '1'}
+  })
 
-  describe('when the file is an svg', () => {
-    beforeEach(() => {
-      fileType = SVG_TYPE
-    })
+  describe('applyCategory()', () => {
+    const subject = async (): Promise<FileOption[]> =>
+      FileOptionsCollection.applyCategory(fileOptions())
 
-    describe('when the file is a button & icon', () => {
+    describe('when the file is an svg', () => {
       beforeEach(() => {
-        fileText = 'something something ' + TYPE
+        fileType = SVG_TYPE
       })
 
-      it('adds the icon  maker icons category', async () => {
-        const options = await subject()
-        expect(options[0].category).toEqual(ICON_MAKER_ICONS)
+      describe('when the file is a button & icon', () => {
+        beforeEach(() => {
+          fileText = 'something something ' + TYPE
+        })
+
+        it('adds the icon maker icons category', async () => {
+          const options = await subject()
+          expect(options[0].category).toEqual(ICON_MAKER_ICONS)
+        })
+      })
+
+      describe('when the file is not a button & icon', () => {
+        beforeEach(() => {
+          fileText = 'something something not buttons and icons'
+        })
+
+        it('sets the category to undefined', async () => {
+          const options = await subject()
+          expect(options[0].category).toBeUndefined()
+        })
       })
     })
 
-    describe('when the file is not a button & icon', () => {
+    describe('when the file is not an SVG', () => {
       beforeEach(() => {
-        fileText = 'something something not buttons and icons'
+        fileType = 'image/png'
       })
 
       it('sets the category to undefined', async () => {
@@ -71,50 +100,16 @@ describe('applyCategory()', () => {
     })
   })
 
-  describe('when the file is not an SVG', () => {
+  describe('queueUploads()', () => {
     beforeEach(() => {
-      fileType = 'image/png'
+      FileOptionsCollection.setState({
+        resolvedNames: fileOptions(),
+      })
     })
 
-    it('sets the category to undefined', async () => {
-      const options = await subject()
-      expect(options[0].category).toBeUndefined()
+    it('applies categories to each resolved file option', async () => {
+      await FileOptionsCollection.queueUploads(1, 'course')
+      expect(UploadQueue.enqueue).toHaveBeenCalledTimes(1)
     })
-  })
-})
-
-describe('queueUploads()', () => {
-  let fileText, fileType
-
-  const file = () => ({
-    slice: () => ({
-      text: async () => fileText,
-    }),
-    type: fileType,
-  })
-
-  const fileOptions = () => [
-    {
-      file: file(),
-    },
-  ]
-
-  beforeEach(() => {
-    FileOptionsCollection.setState({
-      resolvedNames: fileOptions(),
-    })
-
-    FileOptionsCollection.applyCategory = jest.fn(() => Promise.resolve([]))
-  })
-
-  const subject = () => FileOptionsCollection.queueUploads(1, 'course')
-
-  afterEach(() => jest.resetAllMocks())
-
-  it('applies categories to each resolved file option', () => {
-    subject()
-    expect(FileOptionsCollection.applyCategory).toHaveBeenCalledWith(
-      FileOptionsCollection.state.resolvedNames,
-    )
   })
 })

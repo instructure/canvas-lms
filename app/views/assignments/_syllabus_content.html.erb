@@ -19,7 +19,7 @@
 <% js_env :CAN_READ => can_do(@context, @current_user, :read) %>
 <% js_env :SYLLABUS_BODY => user_content(@syllabus_body || '') %>
 <%
-  show_summary = @context.syllabus_course_summary? && !@context.elementary_enabled?
+  show_summary = @context.syllabus_course_summary? && !@context.elementary_enabled? && !@context.horizon_course?
   if @context.elementary_enabled?
     title_text = t("Important Info")
     submit_btn_text = t("Update Important Info")
@@ -75,7 +75,7 @@ To add some comments, click the "Edit" link at the top.
   <div class="clear"></div>
   <%= f.text_area :syllabus_body, :style => "width: 100%; height: 300px;", :id => "course_syllabus_body" %>
 
-  <% if !@context.elementary_enabled? %>
+  <% if !@context.elementary_enabled? && !@context.horizon_course? %>
     <div class="ic-Form-control ic-Form-control--checkbox">
       <%= f.check_box :syllabus_course_summary, :checked => @context.syllabus_course_summary? %>
       <%= f.label :syllabus_course_summary, :class => 'ic-Label', :en => "Show Course Summary" %>

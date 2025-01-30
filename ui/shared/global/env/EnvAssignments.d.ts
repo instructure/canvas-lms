@@ -52,6 +52,7 @@ export interface EnvAssignmentsA2StudentView {
 
   ASSIGNMENT_ID: string | number
   CONFETTI_ENABLED: boolean
+  CURRENT_USER_CAN_GRADE_SUBMISSION: boolean
   EMOJIS_ENABLED: boolean
   EMOJI_DENY_LIST: any[]
   COURSE_ID: string | number

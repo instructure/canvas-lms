@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
@@ -61,10 +61,12 @@ const buildAssignmentGroup = assignments => {
     position: 1,
     rules: {},
     group_weight: 1,
-    assignments,
+    assignments: [],
   }
   const groups = new AssignmentGroupCollection([group])
-  return groups.models[0]
+  const model = groups.models[0]
+  model.get('assignments').reset(assignments)
+  return model
 }
 
 describe('CreateAssignmentViewAdapter', () => {
@@ -82,10 +84,12 @@ describe('CreateAssignmentViewAdapter', () => {
 
   beforeEach(() => {
     closeHandlerMock = jest.fn()
+    jest.clearAllMocks()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
+    jest.restoreAllMocks()
   })
 
   it('renders the CreateEditAssignmentModal', () => {
@@ -103,10 +107,17 @@ describe('CreateAssignmentViewAdapter', () => {
 
   it('adds assignment to assignment group when save is clicked (Create Mode)', async () => {
     const ag = buildAssignmentGroup([])
-    const savePromise = Promise.resolve({})
-    const saveSpy = jest
-      .spyOn(Backbone.Model.prototype, 'save')
-      .mockImplementation(() => savePromise)
+    const saveResponse = {
+      id: 1,
+      name: 'Test Assignment',
+      points_possible: 100,
+      assignment_group_id: ag.id,
+      submission_types: ['online_text_entry'],
+    }
+    const saveSpy = jest.spyOn(Backbone.Model.prototype, 'save').mockImplementation(function () {
+      this.set(saveResponse)
+      return Promise.resolve(saveResponse)
+    })
 
     const {getByTestId} = renderComponent({
       assignment: null,
@@ -114,30 +125,39 @@ describe('CreateAssignmentViewAdapter', () => {
     })
     const user = userEvent.setup()
 
-    expect(ag.get('assignments')).toHaveLength(0)
-
+    await user.clear(getByTestId('assignment-name-input'))
     await user.type(getByTestId('assignment-name-input'), 'Test Assignment')
+    await user.clear(getByTestId('points-input'))
     await user.type(getByTestId('points-input'), '100')
+
     await user.click(getByTestId('save-button'))
+    await waitFor(() => expect(saveSpy).toHaveBeenCalled())
 
-    // Wait for the save operation to complete
-    await savePromise
-    await new Promise(resolve => setTimeout(resolve, 0)) // Wait for next tick
-
-    expect(ag.get('assignments')).toHaveLength(1)
+    await waitFor(() => {
+      const assignments = ag.get('assignments')
+      expect(assignments).toHaveLength(1)
+      const savedAssignment = assignments.at(0)
+      expect(savedAssignment.get('name')).toBe('Test Assignment')
+      expect(savedAssignment.get('points_possible')).toBe(100)
+      expect(savedAssignment.get('assignment_group_id')).toBe(ag.id)
+    })
   })
 
   it('shows a flash alert when the assignment fails to save', async () => {
+    const error = new Error('Failed to save')
+    const saveSpy = jest.spyOn(Backbone.Model.prototype, 'save').mockRejectedValue(error)
+
     const {getByTestId} = renderComponent()
     const user = userEvent.setup()
 
-    jest.spyOn(Backbone.Model.prototype, 'save').mockRejectedValue(new Error('Failed to save'))
-
     await user.click(getByTestId('save-button'))
 
-    expect(showFlashAlert).toHaveBeenCalledWith({
-      message: expect.any(String),
-      type: 'error',
+    await waitFor(() => {
+      expect(saveSpy).toHaveBeenCalled()
+      expect(showFlashAlert).toHaveBeenCalledWith({
+        message: expect.any(String),
+        type: 'error',
+      })
     })
   })
 })

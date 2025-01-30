@@ -208,6 +208,6 @@ class RubricImport < ApplicationRecord
   end
 
   def track_error
-    InstStatsd::Statsd.increment("#{context.class.to_s.downcase}.rubrics.csv_imported_with_error")
+    InstStatsd::Statsd.distributed_increment("#{context.class.to_s.downcase}.rubrics.csv_imported_with_error")
   end
 end

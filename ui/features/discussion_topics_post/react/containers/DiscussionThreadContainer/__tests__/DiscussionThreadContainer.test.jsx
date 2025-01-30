@@ -34,31 +34,18 @@ import {
 import {User} from '../../../../graphql/User'
 import {waitFor} from '@testing-library/dom'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
-}))
-
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
-}))
-
-jest.mock('../../../utils/constants', () => ({
-  ...jest.requireActual('../../../utils/constants'),
-  HIGHLIGHT_TIMEOUT: 0,
-}))
+jest.mock('@canvas/util/globalUtils')
 
 describe('DiscussionThreadContainer', () => {
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
   const openMock = jest.fn()
+
   beforeAll(() => {
-    delete window.location
-    window.location = {search: ''}
-    window.open = openMock
     window.ENV = {
       course_id: '1',
       SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
+      discussions_reporting: false,
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -70,12 +57,16 @@ describe('DiscussionThreadContainer', () => {
         removeListener: jest.fn(),
       }
     })
+
+    window.open = openMock
   })
 
   afterEach(() => {
     onFailureStub.mockClear()
     onSuccessStub.mockClear()
     openMock.mockClear()
+    window.ENV.discussions_reporting = false
+    jest.clearAllMocks()
   })
 
   const defaultProps = ({
@@ -443,7 +434,7 @@ describe('DiscussionThreadContainer', () => {
     })
 
     describe('when feature flag and setting is enabled', () => {
-      beforeAll(() => {
+      beforeEach(() => {
         window.ENV.discussions_reporting = true
       })
 
@@ -472,7 +463,7 @@ describe('DiscussionThreadContainer', () => {
       })
 
       it('can Report', async () => {
-        const {getByTestId, queryByText} = setup(
+        const {getByTestId, getByText} = setup(
           defaultProps(),
           updateDiscussionEntryParticipantMock({
             reportType: 'other',
@@ -480,8 +471,8 @@ describe('DiscussionThreadContainer', () => {
         )
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        fireEvent.click(queryByText('Report'))
-        fireEvent.click(queryByText('Other'))
+        fireEvent.click(getByText('Report'))
+        fireEvent.click(getByText('Other'))
         fireEvent.click(getByTestId('report-reply-submit-button'))
 
         await waitFor(() => {

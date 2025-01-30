@@ -516,6 +516,10 @@ class CoursePacesController < ApplicationController
     end
   end
 
+  def bulk_create_enrollment_paces
+    @course.run_bulk_assign_enrollment_paces_delayed_job(params[:enrollment_ids], bulk_create_params)
+  end
+
   # @API Update a Course pace
   # Returns the updated course pace
   #
@@ -651,6 +655,7 @@ class CoursePacesController < ApplicationController
         create: [:manage_course_content_add],
         update: [:manage_course_content_edit],
         compress_dates: [:manage_course_content_edit],
+        bulk_create_enrollment_paces: [:manage_course_content_edit],
         master_course_info: [:manage_course_content_edit],
         destroy: [:manage_course_content_delete]
       }
@@ -777,6 +782,20 @@ class CoursePacesController < ApplicationController
       )
       set_context_ids_in(permitted_params)
     end
+  end
+
+  def bulk_create_params
+    @bulk_create_params ||= params.require(:course_pace).permit(
+      :course_id,
+      :course_section_id,
+      :user_id,
+      :end_date,
+      :exclude_weekends,
+      :hard_end_dates,
+      :workflow_state,
+      course_pace_module_items_attributes: %i[duration module_item_id root_account_id],
+      selected_days_to_skip: []
+    )
   end
 
   # Converts the context_id and context_type params to the database column required for that context

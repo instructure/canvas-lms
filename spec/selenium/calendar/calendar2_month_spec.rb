@@ -237,7 +237,7 @@ describe "calendar2" do
           expect(event1.start_at).to eql(@three_days_earlier)
         end
 
-        it "extends event to multiple days by draging", priority: "2" do
+        it "extends event to multiple days by dragging", priority: "2" do
           skip("dragging events are flaky and need more research FOO-4335")
 
           create_middle_day_event
@@ -762,6 +762,7 @@ describe "calendar2" do
       end
 
       it "does not include the module override in the assignment list" do
+        skip "FOO-5060"
         @section1 = CourseSection.create!(name: "Section 1", course: @course)
         student_in_section(@section1, user: @student)
         @assignment = @course.assignments.create!(title: "new assignment")

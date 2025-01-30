@@ -270,6 +270,13 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
 <p>Below is an example of the decoded client_assertion JWT in the above request:</p>
 
   <pre class="example code prettyprint">
+  //Header
+  {
+    "typ": "JWT",
+    "alg": "RS256",
+    "kid": "2019-06-21T14:59:30Z"
+  }
+  //Payload
   {
     "iss": "https://www.my-tool.com",
     "sub": "&lt;client_id&gt;",
@@ -283,9 +290,10 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
 <p>NOTE:</p>
 
 <ul>
- <li> the value of the sub claim should match the client_id of the developer key in Canvas.</li>
- <li> the value of the aud claim should contain either the domain of the Canvas account where the desired data resides, or the domain of the LTI 1.3 OIDC Auth endpoint, as described <a href="file.lti_launch_overview.html#step-2" target="_blank">here</a>.</li> </ul>
-
+ <li>the value of the sub claim should match the client_id of the developer key in Canvas.</li>
+ <li>the value of the aud claim should contain either the domain of the Canvas account where the desired data resides, or the domain of the LTI 1.3 OIDC Auth endpoint, as described <a href="file.lti_launch_overview.html#step-2" target="_blank">here</a>.</li> 
+ <li>if the public key defined on the developer key is a JWK set (specified by an URL) the kid (key ID) value in the signed JWT header must match one of the public keys returned by the public key URL.</li>
+</ul>
 
   <h5>Example Response</h5>
   <table class="request-params">

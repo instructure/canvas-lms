@@ -153,7 +153,6 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
                   )}
                 </Text>
                 <Flex.Item
-                  overflowX="hidden"
                   padding={breakpoints.mobileOnly ? '0 0 0 xx-small' : '0'}
                 >
                   <RolePillContainer

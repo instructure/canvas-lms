@@ -26,13 +26,14 @@ $(document).on('mousedown click keydown', '.al-trigger', function (event) {
 
   let opts = $.extend({noButton: true}, $trigger.data('kyleMenuOptions'))
   if ($trigger.data('append-to-body')) opts.appendMenuTo = 'body'
-
+  const shouldPlaceAbove = hasMoreSpaceAbove($trigger)
   opts = $.extend(opts, {
     popupOpts: {
       position: {
-        my: $trigger.data('popup-my'),
+        my: shouldPlaceAbove ? 'center bottom' : $trigger.data('popup-my'),
         at: $trigger.data('popup-at'),
         within: $trigger.data('popup-within'),
+        offset: shouldPlaceAbove ? '0 -35px' : undefined,
         collision: $trigger.data('popup-collision'),
       },
     },
@@ -40,3 +41,16 @@ $(document).on('mousedown click keydown', '.al-trigger', function (event) {
   new KyleMenu($trigger, opts)
   $trigger.trigger(event)
 })
+
+function hasMoreSpaceAbove($element) {
+  if (!$element || !$element.length) {
+      throw new Error("element is required");
+  }
+
+  const rect = $element[0].getBoundingClientRect();
+
+  const spaceAbove = rect.top; // Distance from element to top of the viewport
+  const spaceBelow = $(window).height() - rect.bottom; // Distance from element to bottom of the viewport
+
+  return spaceAbove > spaceBelow;
+}

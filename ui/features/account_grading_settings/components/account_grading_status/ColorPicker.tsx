@@ -121,7 +121,7 @@ export const ColorPicker = ({
     <View as="div" data-testid="color-picker">
       {renderColorRows()}
 
-      <Flex wrap="wrap" justifyItems="space-between" margin="small 0 0 0">
+      <Flex wrap="wrap" alignItems="start" justifyItems="space-between" margin="small 0 0 0">
         <Flex.Item margin="0 x-small 0 0">
           <ColorPreview currentColor={currentColor} isValidHex={isValidHex} />
         </Flex.Item>
@@ -130,13 +130,28 @@ export const ColorPicker = ({
             <TextInput
               renderLabel={
                 <ScreenReaderContent>
-                  {isValidHex
-                    ? I18n.t('Enter a hexcode here to use a custom color.')
-                    : I18n.t('Invalid hexcode. Enter a valid hexcode here to use a custom color.')}
+                  {I18n.t('Enter a hexcode here to use a custom color.')}
                 </ScreenReaderContent>
               }
               value={currentColor}
               onChange={setInputColor}
+              messages={
+                isValidHex
+                  ? []
+                  : [
+                      {
+                        type: 'error',
+                        text: (
+                          <View textAlign="center">
+                            <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+                              <IconWarningSolid />
+                            </View>
+                            {I18n.t('Invalid format')}
+                          </View>
+                        ),
+                      },
+                    ]
+              }
               onBlur={warnIfInvalid}
               data-testid="color-picker-input"
             />
@@ -158,7 +173,7 @@ const ColorPreview = ({currentColor, isValidHex}: ColorPreviewProps) => {
     <ColorTile hexcode={previewColor} isFocusable={false}>
       {!isValidHex && (
         <Tooltip renderTip={I18n.t('Invalid hexcode')}>
-          <IconWarningSolid color="warning" id="ColorPicker__InvalidHex" />
+          <IconWarningSolid color="error" id="ColorPicker__InvalidHex" />
         </Tooltip>
       )}
     </ColorTile>

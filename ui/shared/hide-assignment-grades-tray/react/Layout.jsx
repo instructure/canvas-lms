@@ -46,6 +46,7 @@ export default function Layout({
   sectionSelectionChanged,
   selectedSectionIds,
   unhiddenCount,
+  showSectionValidation,
 }) {
   const hasSections = sections.length > 0
 
@@ -110,6 +111,7 @@ export default function Layout({
           sectionSelectionChanged={sectionSelectionChanged}
           sections={sections}
           selectedSectionIds={selectedSectionIds}
+          showSectionValidation={showSectionValidation}
         />
       </FormFieldGroup>
     </>

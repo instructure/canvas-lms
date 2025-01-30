@@ -26,97 +26,75 @@ describe('GradeFormatHelper', () => {
   const translateString = I18n.t
 
   beforeEach(() => {
+    jest.resetModules()
+    jest.clearAllMocks()
     jest.spyOn(numberHelper, 'validate').mockImplementation(val => !Number.isNaN(parseFloat(val)))
     jest.spyOn(I18n.constructor.prototype, 't').mockImplementation(translateString)
   })
 
   afterEach(() => {
     jest.clearAllMocks()
+    jest.restoreAllMocks()
   })
 
   describe('.isExcused', () => {
-    it('returns true when given "EX"', () => {
-      expect(GradeFormatHelper.isExcused('EX')).toBe(true)
-    })
+    const testCases = [
+      {input: 'EX', expected: true, desc: 'returns true when given "EX"'},
+      {input: '7', expected: false, desc: 'returns false when given point values'},
+      {input: '7%', expected: false, desc: 'returns false when given percentage values'},
+      {input: 'A', expected: false, desc: 'returns false when given letter grades'},
+    ]
 
-    it('returns false when given point values', () => {
-      expect(GradeFormatHelper.isExcused('7')).toBe(false)
-    })
-
-    it('returns false when given percentage values', () => {
-      expect(GradeFormatHelper.isExcused('7%')).toBe(false)
-    })
-
-    it('returns false when given letter grades', () => {
-      expect(GradeFormatHelper.isExcused('A')).toBe(false)
+    testCases.forEach(({input, expected, desc}) => {
+      it(desc, () => {
+        expect(GradeFormatHelper.isExcused(input)).toBe(expected)
+      })
     })
   })
 
   describe('.formatPointsOutOf()', () => {
-    let grade
-    let pointsPossible
-
-    beforeEach(() => {
-      grade = '7'
-      pointsPossible = '10'
-    })
-
-    const formatPointsOutOf = () => GradeFormatHelper.formatPointsOutOf(grade, pointsPossible)
-
     it('returns the score and points possible as a fraction', () => {
-      expect(formatPointsOutOf()).toBe('7/10')
+      expect(GradeFormatHelper.formatPointsOutOf('7', '10')).toBe('7/10')
     })
 
     it('rounds the score and points possible to two decimal places', () => {
-      grade = '7.123'
-      pointsPossible = '10.456'
-      expect(formatPointsOutOf()).toBe('7.12/10.46')
+      expect(GradeFormatHelper.formatPointsOutOf('7.123', '10.456')).toBe('7.12/10.46')
     })
 
     it('returns null when grade is null', () => {
-      grade = null
-      expect(formatPointsOutOf()).toBeNull()
+      expect(GradeFormatHelper.formatPointsOutOf(null, '10')).toBeNull()
     })
 
     it('returns grade if pointsPossible is null', () => {
-      pointsPossible = null
-      expect(formatPointsOutOf()).toBe(grade)
+      expect(GradeFormatHelper.formatPointsOutOf('7', null)).toBe('7')
     })
   })
 
   describe('.formatGradeInfo()', () => {
-    let options
-    let gradeInfo
-
-    beforeEach(() => {
-      gradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
-    })
-
-    const formatGradeInfo = () => GradeFormatHelper.formatGradeInfo(gradeInfo, options)
-
     it('returns the grade when the pending grade is valid', () => {
-      expect(formatGradeInfo()).toBe('A')
+      const gradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
+      expect(GradeFormatHelper.formatGradeInfo(gradeInfo)).toBe('A')
     })
 
     it('returns the grade when the pending grade is invalid', () => {
-      gradeInfo.valid = false
-      expect(formatGradeInfo()).toBe('A')
+      const gradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: false}
+      expect(GradeFormatHelper.formatGradeInfo(gradeInfo)).toBe('A')
     })
 
     it('returns "–" (en dash) when the pending grade is null', () => {
-      gradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
-      expect(formatGradeInfo()).toBe('–')
+      const gradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+      expect(GradeFormatHelper.formatGradeInfo(gradeInfo)).toBe('–')
     })
 
     it('returns the given default value when the pending grade is null', () => {
-      options = {defaultValue: 'default'}
-      gradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
-      expect(formatGradeInfo()).toBe('default')
+      const gradeInfo = {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+      const options = {defaultValue: 'default'}
+      expect(GradeFormatHelper.formatGradeInfo(gradeInfo, options)).toBe('default')
     })
 
     it('returns "Excused" when the pending grade info includes excused', () => {
-      gradeInfo = {enteredAs: 'excused', excused: true, grade: null, score: null, valid: true}
-      expect(formatGradeInfo()).toBe('Excused')
+      const gradeInfo = {enteredAs: 'excused', excused: true, grade: null, score: null, valid: true}
+      expect(GradeFormatHelper.formatGradeInfo(gradeInfo)).toBe('Excused')
     })
   })
 })

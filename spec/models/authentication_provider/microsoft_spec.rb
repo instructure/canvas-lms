@@ -165,6 +165,13 @@ describe AuthenticationProvider::Microsoft do
       expect(ap.unique_id("token")).to eql claims.merge("tid+oid" => "1234#5678")
     end
 
+    it "correctly chooses upn when chosen as login attribute" do
+      ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenants: "microsoft", login_attribute: "upn")
+      claims = { "tid" => AuthenticationProvider::Microsoft::MICROSOFT_TENANT, "upn" => "john.doe@example.com" }
+      allow(ap).to receive(:claims).and_return(claims)
+      expect(ap.unique_id("token")).to eql claims
+    end
+
     it "enforces the tenant" do
       ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenants: "microsoft")
       expect(ap.send(:tenant_value)).to eql AuthenticationProvider::Microsoft::MICROSOFT_TENANT

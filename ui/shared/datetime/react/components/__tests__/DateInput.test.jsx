@@ -276,7 +276,7 @@ describe('rendered month', () => {
 describe('error messages', () => {
   it('shows an error message if the input date is unparseable', () => {
     const {getByText} = renderAndDirtyInput('asdf')
-    expect(getByText('Invalid Date')).toBeInTheDocument()
+    expect(getByText('Invalid date format')).toBeInTheDocument()
   })
 
   it('clears error messages when the selectedDate changes', () => {
@@ -386,7 +386,7 @@ describe('with defaultToToday set to true', () => {
     fireEvent.change(getInput(), {target: {value: 'asdf'}})
     fireEvent.blur(getInput())
     expect(getInput().value).toBe('asdf')
-    expect(getByText('Invalid Date')).toBeInTheDocument()
+    expect(getByText('Invalid date format')).toBeInTheDocument()
     expect(getByText('This is the hint')).toBeInTheDocument()
   })
 })

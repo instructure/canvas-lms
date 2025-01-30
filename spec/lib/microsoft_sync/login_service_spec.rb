@@ -43,7 +43,7 @@ describe MicrosoftSync::LoginService do
       subject { described_class.new_token("mytenant") }
 
       before do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(Rails.application.credentials).to receive(:microsoft_sync).and_return({
                                                                                       client_id: "theclientid",
                                                                                       client_secret: "thesecret"
@@ -78,7 +78,7 @@ describe MicrosoftSync::LoginService do
 
           it "increments a statsd metric" do
             subject
-            expect(InstStatsd::Statsd).to have_received(:increment).with(
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
               "microsoft_sync.login_service",
               tags: { status_code: "200" }
             )
@@ -94,7 +94,7 @@ describe MicrosoftSync::LoginService do
               MicrosoftSync::Errors::HTTPInvalidStatus,
               /Login service returned 401 for tenant mytenant/
             )
-            expect(InstStatsd::Statsd).to have_received(:increment).with(
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
               "microsoft_sync.login_service",
               tags: { status_code: "401" }
             )
@@ -152,7 +152,7 @@ describe MicrosoftSync::LoginService do
           error = SocketError.new
           expect(HTTParty).to receive(:post).and_raise error
           expect { subject }.to raise_error(error)
-          expect(InstStatsd::Statsd).to have_received(:increment).with(
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "microsoft_sync.login_service",
             tags: { status_code: "error" }
           )

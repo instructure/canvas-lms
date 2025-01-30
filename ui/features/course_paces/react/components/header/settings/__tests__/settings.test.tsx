@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {act, screen} from '@testing-library/react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 import {
   BLACKOUT_DATES,
@@ -31,8 +32,6 @@ import {renderConnected} from '../../../../__tests__/utils'
 import {Settings, type ComponentProps} from '../settings'
 import type {CoursePace} from 'features/course_paces/react/types'
 
-const loadLatestPaceByContext = jest.fn()
-const showLoadingOverlay = jest.fn()
 const toggleExcludeWeekends = jest.fn()
 const toggleSelectedDaysToSkip = jest.fn()
 const updateBlackoutDates = jest.fn()
@@ -48,37 +47,42 @@ const defaultProps: ComponentProps = {
   responsiveSize: 'large',
 }
 
-beforeAll(() => {
-  window.ENV.VALID_DATE_RANGE = {
-    end_at: {date: COURSE.start_at, date_context: 'course'},
-    start_at: {date: COURSE.end_at, date_context: 'course'},
-  }
+beforeEach(() => {
+  fakeENV.setup({
+    VALID_DATE_RANGE: {
+      end_at: {date: COURSE.start_at, date_context: 'course'},
+      start_at: {date: COURSE.end_at, date_context: 'course'},
+    },
+    FEATURES: {
+      course_paces_skip_selected_days: true,
+    },
+  })
 })
+
 afterEach(() => {
   jest.clearAllMocks()
+  fakeENV.teardown()
 })
 
 describe('Settings', () => {
   it('renders a settings menu with toggles and a button to open the blackout dates modal', () => {
-    const {getByRole} = renderConnected(<Settings {...defaultProps} />)
-    const settingsButton = getByRole('button', {name: 'Modify Settings'})
-    expect(settingsButton).toBeInTheDocument()
-
+    renderConnected(<Settings {...defaultProps} />)
+    const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 
-    expect(screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', {name: 'Skip Selected Days'})).toBeInTheDocument()
     expect(screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})).toBeInTheDocument()
   })
 
   it('disables all settings while syncing', () => {
-    const {getByRole} = renderConnected(<Settings {...defaultProps} isSyncing={true} />)
-    const settingsButton = getByRole('button', {name: 'Modify Settings'})
+    renderConnected(<Settings {...{...defaultProps, isSyncing: true}} />)
+    const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 
-    const skipWeekendsToggle = screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})
-    expect(skipWeekendsToggle).toHaveAttribute('aria-disabled', 'true')
+    const skipSelectedDays = screen.getByTestId('skip-selected-days')
+    expect(skipSelectedDays).toHaveClass('css-vjrpp3-menuItem')
     const blackoutDatesBtn = screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})
-    expect(blackoutDatesBtn).toHaveAttribute('aria-disabled', 'true')
+    expect(blackoutDatesBtn).toHaveClass('css-1rkb7b1-menuItem')
   })
 
   it('shows and hides the blackout dates modal correctly', () => {
@@ -113,11 +117,6 @@ describe('Settings', () => {
   })
 
   describe('course_paces_skip_selected_days is enabled', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_skip_selected_days = true
-    })
-
     it('toggles the associated setting when the checkboxes are clicked', () => {
       renderConnected(<Settings {...defaultProps} />)
       const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
@@ -156,9 +155,16 @@ describe('Settings', () => {
   })
 
   describe('course_paces_skip_selected_days is disabled', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_skip_selected_days = false
+    beforeEach(() => {
+      fakeENV.setup({
+        VALID_DATE_RANGE: {
+          end_at: {date: COURSE.start_at, date_context: 'course'},
+          start_at: {date: COURSE.end_at, date_context: 'course'},
+        },
+        FEATURES: {
+          course_paces_skip_selected_days: false,
+        },
+      })
     })
     it('toggles the associated setting when the checkboxes are clicked', () => {
       renderConnected(<Settings {...defaultProps} />)
@@ -173,9 +179,16 @@ describe('Settings', () => {
   })
 
   describe('with course paces redesign', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_redesign = true
+    beforeEach(() => {
+      fakeENV.setup({
+        VALID_DATE_RANGE: {
+          end_at: {date: COURSE.start_at, date_context: 'course'},
+          start_at: {date: COURSE.end_at, date_context: 'course'},
+        },
+        FEATURES: {
+          course_paces_redesign: true,
+        },
+      })
     })
 
     it('renders a button with settings text', () => {

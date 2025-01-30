@@ -23,7 +23,7 @@ require_relative "../graphql_spec_helper"
 RSpec.describe Mutations::AddConversationMessage do
   before do
     allow(InstStatsd::Statsd).to receive(:count)
-    allow(InstStatsd::Statsd).to receive(:increment)
+    allow(InstStatsd::Statsd).to receive(:distributed_increment)
   end
 
   before(:once) do
@@ -113,11 +113,11 @@ RSpec.describe Mutations::AddConversationMessage do
       attachment_ids: [attachment.id]
     )
 
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.react")
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.isReply.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.react")
     expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 1)
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.attachment.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.media.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.attachment.react")
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "addConversationMessage", "errors")).to be_nil
     expect(

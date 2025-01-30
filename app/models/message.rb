@@ -745,14 +745,14 @@ self.user,
       return skip_and_cancel
     end
 
-    InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{notification_name}",
-                                 short_stat: "message.deliver",
-                                 tags: { path_type:, notification_name: })
+    InstStatsd::Statsd.distributed_increment("message.deliver.#{path_type}.#{notification_name}",
+                                             short_stat: "message.deliver",
+                                             tags: { path_type:, notification_name: })
 
     global_account_id = Shard.global_id_for(root_account_id, shard)
-    InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{global_account_id}",
-                                 short_stat: "message.deliver_per_account",
-                                 tags: { path_type:, root_account_id: global_account_id })
+    InstStatsd::Statsd.distributed_increment("message.deliver.#{path_type}.#{global_account_id}",
+                                             short_stat: "message.deliver_per_account",
+                                             tags: { path_type:, root_account_id: global_account_id })
 
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
@@ -767,9 +767,9 @@ self.user,
   end
 
   def skip_and_cancel
-    InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
-                                 short_stat: "message.skip",
-                                 tags: { path_type:, notification_name: })
+    InstStatsd::Statsd.distributed_increment("message.skip.#{path_type}.#{notification_name}",
+                                             short_stat: "message.skip",
+                                             tags: { path_type:, notification_name: })
     cancel
   end
 
@@ -780,9 +780,9 @@ self.user,
     targets = notification_targets
     if targets.empty?
       # Log no_targets_specified error to DataDog
-      InstStatsd::Statsd.increment("message.no_targets_specified",
-                                   short_stat: "message.no_targets_specified",
-                                   tags: { path_type: })
+      InstStatsd::Statsd.distributed_increment("message.no_targets_specified",
+                                               short_stat: "message.no_targets_specified",
+                                               tags: { path_type: })
 
       self.transmission_errors = "No notification targets specified"
       set_transmission_error

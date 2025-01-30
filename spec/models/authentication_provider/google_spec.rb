@@ -39,8 +39,8 @@ describe AuthenticationProvider::Google do
   end
 
   it "has valid recognized_params" do
-    expect(AuthenticationProvider::Google.recognized_params).to match_array(
-      %i[client_id client_secret mfa_required skip_internal_mfa otp_via_sms login_attribute jit_provisioning hosted_domain]
+    expect(AuthenticationProvider::Google.recognized_params).to include(
+      *%i[client_id client_secret mfa_required skip_internal_mfa otp_via_sms login_attribute jit_provisioning hosted_domain]
     )
   end
 

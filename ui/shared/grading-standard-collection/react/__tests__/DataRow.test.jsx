@@ -31,7 +31,6 @@ const renderInTable = ui => {
 
 describe('DataRow not being edited, without a sibling', () => {
   const defaultProps = {
-    key: 0,
     uniqueId: 0,
     row: ['A', 92.346],
     editing: false,
@@ -39,30 +38,33 @@ describe('DataRow not being edited, without a sibling', () => {
     onRowMinScoreChange: jest.fn(),
   }
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('renders in "view" mode', () => {
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={0} {...defaultProps} />)
     expect(getByTestId('grading-standard-row-view')).toBeInTheDocument()
   })
 
   it('returns the correct name from getRowData', () => {
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={0} {...defaultProps} />)
     expect(getByTestId('row-name')).toHaveTextContent('A')
   })
 
   it('sets max score to 100 if there is no sibling row', () => {
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={0} {...defaultProps} />)
     expect(getByTestId('max-score')).toHaveTextContent('100%')
   })
 
   it('rounds the score if not in editing mode', () => {
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={0} {...defaultProps} />)
     expect(getByTestId('min-score')).toHaveTextContent('to 92.35%')
   })
 })
 
 describe('DataRow being edited', () => {
   const defaultProps = {
-    key: 0,
     uniqueId: 0,
     row: ['A', 92.346],
     editing: true,
@@ -72,14 +74,18 @@ describe('DataRow being edited', () => {
     onDeleteRow: jest.fn(),
   }
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('renders in "edit" mode', () => {
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={0} {...defaultProps} />)
     expect(getByTestId('grading-standard-row-edit')).toBeInTheDocument()
   })
 
   it('accepts arbitrary input and saves to state', async () => {
     const user = userEvent.setup()
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={0} {...defaultProps} />)
     const input = getByTestId('min-score-input')
 
     await user.clear(input)
@@ -98,7 +104,7 @@ describe('DataRow being edited', () => {
   })
 
   it('contains contextual screenreader text for inserting row', () => {
-    const {container} = renderInTable(<DataRow {...defaultProps} />)
+    const {container} = renderInTable(<DataRow key={0} {...defaultProps} />)
     const screenreaderTexts = container.getElementsByClassName('screenreader-only')
     const insertText = Array.from(screenreaderTexts).find(
       el => el.textContent === 'Insert row below A',
@@ -107,39 +113,43 @@ describe('DataRow being edited', () => {
   })
 
   it('contains contextual screenreader text for removing row', () => {
-    const {container} = renderInTable(<DataRow {...defaultProps} />)
+    const {container} = renderInTable(<DataRow key={0} {...defaultProps} />)
     const screenreaderTexts = container.getElementsByClassName('screenreader-only')
     const removeText = Array.from(screenreaderTexts).find(el => el.textContent === 'Remove row A')
     expect(removeText).toBeInTheDocument()
   })
 
   it('does not call onRowMinScoreChange if input value is less than 0', async () => {
+    const mockOnRowMinScoreChange = jest.fn()
+    const props = {...defaultProps, onRowMinScoreChange: mockOnRowMinScoreChange}
     const user = userEvent.setup()
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={0} {...props} />)
     const input = getByTestId('min-score-input')
 
     await user.clear(input)
     await user.type(input, '-1')
     fireEvent.blur(input)
 
-    expect(defaultProps.onRowMinScoreChange).not.toHaveBeenCalled()
+    expect(mockOnRowMinScoreChange).not.toHaveBeenCalled()
   })
 
   it('does not call onRowMinScoreChange if input value is greater than 100', async () => {
+    const mockOnRowMinScoreChange = jest.fn()
+    const props = {...defaultProps, onRowMinScoreChange: mockOnRowMinScoreChange}
     const user = userEvent.setup()
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={0} {...props} />)
     const input = getByTestId('min-score-input')
 
     await user.clear(input)
     await user.type(input, '101')
     fireEvent.blur(input)
 
-    expect(defaultProps.onRowMinScoreChange).not.toHaveBeenCalled()
+    expect(mockOnRowMinScoreChange).not.toHaveBeenCalled()
   })
 
   it('calls onRowMinScoreChange when input value is between 0 and 100', async () => {
     const user = userEvent.setup()
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={0} {...defaultProps} />)
     const input = getByTestId('min-score-input')
 
     await user.clear(input)
@@ -154,12 +164,14 @@ describe('DataRow being edited', () => {
     await user.type(input, '0')
     fireEvent.blur(input)
 
-    expect(defaultProps.onRowMinScoreChange).toHaveBeenCalledTimes(3)
+    expect(defaultProps.onRowMinScoreChange).toHaveBeenCalledWith(0, '88')
+    expect(defaultProps.onRowMinScoreChange).toHaveBeenCalledWith(0, '100')
+    expect(defaultProps.onRowMinScoreChange).toHaveBeenCalledWith(0, '0')
   })
 
   it('calls onRowNameChange when input changes', async () => {
     const user = userEvent.setup()
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={0} {...defaultProps} />)
     const input = getByTestId('name-input')
 
     await user.type(input, 'F')
@@ -169,7 +181,7 @@ describe('DataRow being edited', () => {
 
   it('calls onDeleteRow when the delete button is clicked', async () => {
     const user = userEvent.setup()
-    const {getByRole} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByRole} = renderInTable(<DataRow key={0} {...defaultProps} />)
     const deleteButton = getByRole('button', {name: 'Remove row A'})
 
     await user.click(deleteButton)
@@ -180,17 +192,16 @@ describe('DataRow being edited', () => {
 
 describe('DataRow with a sibling', () => {
   const defaultProps = {
-    key: 1,
+    uniqueId: 1,
     row: ['A-', 90],
     siblingRow: ['A', 92.346],
-    uniqueId: 1,
     editing: false,
     round: number => Math.round(number * 100) / 100,
     onRowMinScoreChange: jest.fn(),
   }
 
   it("shows the max score as the sibling's min score", () => {
-    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const {getByTestId} = renderInTable(<DataRow key={1} {...defaultProps} />)
     expect(getByTestId('max-score')).toHaveTextContent('< 92.35%')
   })
 })

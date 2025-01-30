@@ -271,6 +271,12 @@ class GroupsController < ApplicationController
   #   - "tabs": Include the list of tabs configured for each group.  See the
   #     {api:TabsController#index List available tabs API} for more information.
   #
+  # @argument collaboration_state [String]
+  #   Filter groups by their collaboration state:
+  #   - "all": Return both collaborative and non-collaborative groups
+  #   - "collaborative": Return only collaborative groups (default)
+  #   - "non_collaborative": Return only non-collaborative groups
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/1/groups \
   #          -H 'Authorization: Bearer <token>'
@@ -280,10 +286,26 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
 
     page_has_instui_topnav
-    @groups = @context.groups.active
+    @groups = @context.combined_groups_and_differentiation_tags.active
     unless params[:filter].nil?
       @groups = @groups.left_outer_joins(:users).where("groups.name ILIKE :query OR users.name ILIKE :query", query: "%#{ActiveRecord::Base.sanitize_sql_like(params[:filter])}%")
     end
+
+    collaboration_state = params[:collaboration_state].presence || "collaborative"
+    case collaboration_state
+    when "collaborative"
+      @groups = @groups.where(non_collaborative: false)
+    when "non_collaborative"
+      return unless authorized_action(@context, @current_user, %i[manage_tags_add manage_tags_manage manage_tags_delete])
+
+      @groups = @groups.where(non_collaborative: true)
+    when "all"
+      # IF FAIL, EXCLUDE NON-COLLABORATIVE
+      unless @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+        @groups = @groups.where(non_collaborative: false)
+      end
+    end
+
     @groups = all_groups = @groups.order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
                                   .eager_load(:group_category).preload(:root_account)
 
@@ -303,6 +325,10 @@ class GroupsController < ApplicationController
     end
 
     unless api_request?
+      if @context.is_a?(Course) && @context.horizon_course?
+        redirect_to named_context_url(@context, :course_users_path)
+        return
+      end
       # The Groups end-point relies on the People's tab configuration since it's a subsection of it.
       return unless tab_enabled?(Course::TAB_PEOPLE)
 
@@ -327,8 +353,33 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @categories  = @context.group_categories.order(Arel.sql("role <> 'student_organized'"), GroupCategory.best_unicode_collation_key("name")).preload(:root_account)
+        @categories = @context.combined_group_and_differentiation_tag_categories.order(Arel.sql("role <> 'student_organized'"), GroupCategory.best_unicode_collation_key("name")).preload(:root_account)
+        case collaboration_state
+        when "collaborative"
+          @categories = @categories.where(non_collaborative: false)
+        when "non_collaborative"
+          @categories = @categories.where(non_collaborative: true)
+        when "all"
+          # IF FAIL, EXCLUDE NON-COLLABORATIVE
+          unless @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+            @categories = @categories.where(non_collaborative: false)
+          end
+        end
+
         @user_groups = @current_user.group_memberships_for(@context) if @current_user
+        if @user_groups
+          case collaboration_state
+          when "collaborative"
+            @user_groups = @user_groups.where(non_collaborative: false)
+          when "non_collaborative"
+            @user_groups = @user_groups.where(non_collaborative: true)
+          when "all"
+            # IF FAIL, EXCLUDE NON-COLLABORATIVE
+            unless @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+              @user_groups = @user_groups.where(non_collaborative: false)
+            end
+          end
+        end
 
         if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
           categories_json = @categories.map { |cat| group_category_json(cat, @current_user, session, include: %w[progress_url unassigned_users_count groups_count]) }

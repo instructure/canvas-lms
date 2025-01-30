@@ -170,6 +170,7 @@ describe('SettingsPanel', () => {
       {
         lockUntilChecked: false,
         moduleName: 'Week 12',
+        moduleNameDirty: true,
         nameInputMessages: [],
         lockUntilInputMessages: [],
         prerequisites: [],
@@ -191,6 +192,7 @@ describe('SettingsPanel', () => {
       {
         lockUntilChecked: false,
         moduleName: 'Week 1',
+        moduleNameDirty: false,
         nameInputMessages: [],
         lockUntilInputMessages: [],
         prerequisites: [],
@@ -309,6 +311,29 @@ describe('SettingsPanel', () => {
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       expect(onDidSubmitMock).toHaveBeenCalled()
       expect(onDismissMock).not.toHaveBeenCalled()
+    })
+
+    it('calls updateParentData with moduleNameDirty state', async () => {
+      const updateParentDataMock = jest.fn()
+      const {unmount, findByTestId} = renderComponent({updateParentData: updateParentDataMock})
+      await userEvent.type(await findByTestId('module-name-input'), '2')
+      unmount()
+      expect(updateParentDataMock).toHaveBeenCalledWith(
+        {
+          lockUntilChecked: false,
+          moduleName: 'Week 12',
+          moduleNameDirty: true,
+          nameInputMessages: [],
+          lockUntilInputMessages: [],
+          prerequisites: [],
+          publishFinalGrade: false,
+          requireSequentialProgress: false,
+          requirementCount: 'all',
+          requirements: [],
+          unlockAt: '',
+        },
+        true,
+      )
     })
   })
 

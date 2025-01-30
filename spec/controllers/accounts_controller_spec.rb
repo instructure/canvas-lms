@@ -317,24 +317,6 @@ describe AccountsController do
         @account.reload
         expect(@account.settings[:app_center_access_token]).to be_nil
       end
-
-      context "with flag disabled" do
-        before do
-          @account.disable_feature!(:require_permission_for_app_center_token)
-        end
-
-        it "updates 'app_center_access_token'" do
-          access_token = SecureRandom.uuid
-          post "update", params: { id: @account.id,
-                                   account: {
-                                     settings: {
-                                       app_center_access_token: access_token
-                                     }
-                                   } }
-          @account.reload
-          expect(@account.settings[:app_center_access_token]).to eq access_token
-        end
-      end
     end
 
     it "updates 'emoji_deny_list'" do
@@ -2281,12 +2263,12 @@ describe AccountsController do
     end
 
     it "emits account_calendars.settings.visit to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       account_admin_user(account: @account)
       user_session(@user)
       get "account_calendar_settings", params: { account_id: @account.id }
 
-      expect(InstStatsd::Statsd).to have_received(:increment).once.with("account_calendars.settings.visit")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("account_calendars.settings.visit")
     end
   end
 end

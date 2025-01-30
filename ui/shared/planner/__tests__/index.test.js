@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {act, findByTestId, getByTestId, render, waitFor} from '@testing-library/react'
 import moxios from 'moxios'
-import {findByTestId, render, waitFor, getByTestId, act} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import {
-  store,
   initializePlanner,
   loadPlannerDashboard,
-  resetPlanner,
+  reloadPlannerForObserver,
   renderToDoSidebar,
   renderWeeklyPlannerHeader,
-  reloadPlannerForObserver,
+  resetPlanner,
+  store,
 } from '../index'
 import {initialize as alertInitialize} from '../utilities/alertUtils'
 
@@ -151,9 +151,18 @@ describe('with mock api', () => {
     })
 
     it('renders into provided element', async () => {
-      renderToDoSidebar(document.querySelector('#dashboard-sidebar'))
-      await findByTestId(document.body, 'ToDoSidebar')
-      expect(document.querySelector('.todo-list-header')).toBeTruthy()
+      const {findByTestId} = render(renderToDoSidebar(document.querySelector('#dashboard-sidebar')))
+
+      // Wait for loading state to complete
+      await waitFor(() => {
+        expect(document.querySelector('[data-testid="todo-sidebar-spinner"]')).toBeTruthy()
+      })
+
+      // Wait for actual component to render
+      await waitFor(() => {
+        expect(findByTestId('ToDoSidebar')).toBeTruthy()
+        expect(document.querySelector('.todo-list-header')).toBeTruthy()
+      })
     })
   })
 
@@ -166,11 +175,10 @@ describe('with mock api', () => {
     })
 
     it('renders the WeeklyPlannerHeader', async () => {
-       
       const {findByTestId} = render(renderWeeklyPlannerHeader({visible: false}))
-
-      const wph = await findByTestId('WeeklyPlannerHeader')
-      expect(wph).toBeInTheDocument()
+      await waitFor(() => {
+        expect(findByTestId('WeeklyPlannerHeader')).toBeTruthy()
+      })
     })
   })
 

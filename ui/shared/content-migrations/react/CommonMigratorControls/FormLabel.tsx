@@ -21,22 +21,32 @@ import {Text} from '@instructure/ui-text'
 
 type FormLabelProps = {
   children?: ReactNode
+  htmlFor?: string
 }
 
 type RequiredFormLabelProps = {
   showErrorState: boolean
   children?: ReactNode
+  htmlFor?: string
 }
 
-export const FormLabel = ({children}: FormLabelProps) => {
-  return <Text weight="bold">{children}</Text>
-}
-
-export const RequiredFormLabel = ({children, showErrorState}: RequiredFormLabelProps) => {
+export const FormLabel = ({children, htmlFor}: FormLabelProps) => {
   return (
-    <FormLabel>
+    <label htmlFor={htmlFor}>
+      <Text weight="bold">
+        {children}
+      </Text>
+    </label>
+  )
+}
+
+export const RequiredFormLabel = ({children, showErrorState, htmlFor}: RequiredFormLabelProps) => {
+  return (
+    <FormLabel htmlFor={htmlFor}>
       {children}
-      <Text color={showErrorState ? 'danger' : 'primary'}> *</Text>
+      <Text color={showErrorState ? 'danger' : 'primary'}>
+        <span aria-hidden={true}> *</span>
+      </Text>
     </FormLabel>
   )
 }

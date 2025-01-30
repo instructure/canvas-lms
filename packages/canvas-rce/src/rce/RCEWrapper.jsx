@@ -34,7 +34,7 @@ import getCookie from '../common/getCookie'
 import formatMessage from '../format-message'
 import * as contentInsertion from './contentInsertion'
 import indicatorRegion from './indicatorRegion'
-import editorLanguage from './editorLanguage'
+import {editorLanguage} from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
 import {sanitizePlugins} from './sanitizePlugins'
 import RCEGlobals from './RCEGlobals'
@@ -104,7 +104,7 @@ function injectTinySkin() {
     document.createTextNode(`
       #discussion-edit-view .rce-wrapper input[readonly] {font-weight: normal;}
       #quiz_edit_wrapper .rce-wrapper input[readonly] {font-weight: normal; padding-left: .75rem;}
-    `)
+    `),
   )
 
   const beforeMe =
@@ -267,7 +267,7 @@ class RCEWrapper extends React.Component {
     this.pendingEventHandlers = []
 
     this.ltiToolFavorites = externalToolsForToolbar(this.props.ltiTools).map(
-      e => `instructure_external_button_${e.id}`
+      e => `instructure_external_button_${e.id}`,
     )
 
     this.pluginsToExclude = parsePluginsToExclude(props.editorOptions?.plugins || [])
@@ -300,7 +300,7 @@ class RCEWrapper extends React.Component {
     if (tinyauxlist.length) {
       const myaux = tinyauxlist[tinyauxlist.length - 1]
       if (myaux.id) {
-        // eslint-disable-next-line no-console
+         
         console.error('Unexpected ID on my tox-tinymce-aux element')
       }
       myaux.id = `tinyaux-${this.id}`
@@ -364,8 +364,8 @@ class RCEWrapper extends React.Component {
     if (this.mceInstance().dom.doc.querySelector(`[data-placeholder-for]`)) {
       status = promptFunc(
         formatMessage(
-          'Content is still being uploaded, if you continue it will not be embedded properly.'
-        )
+          'Content is still being uploaded, if you continue it will not be embedded properly.',
+        ),
       )
     }
 
@@ -421,7 +421,7 @@ class RCEWrapper extends React.Component {
       const ifr = this.iframe
       if (ifr) {
         const editor_body_style = ifr.contentWindow.getComputedStyle(
-          this.iframe.contentDocument.body
+          this.iframe.contentDocument.body,
         )
         const editor_ht =
           ifr.contentDocument.body.clientHeight -
@@ -466,8 +466,8 @@ class RCEWrapper extends React.Component {
       code !== '' &&
       window.confirm(
         formatMessage(
-          'Content in the editor will be changed. Press Cancel to keep the original content.'
-        )
+          'Content in the editor will be changed. Press Cancel to keep the original content.',
+        ),
       )
     ) {
       this.mceInstance().setContent(code)
@@ -544,7 +544,7 @@ class RCEWrapper extends React.Component {
     return insertPlaceholder(
       this.mceInstance(),
       fileMetaProps.name,
-      placeholderInfoFor(fileMetaProps)
+      placeholderInfoFor(fileMetaProps),
     )
   }
 
@@ -1017,7 +1017,7 @@ class RCEWrapper extends React.Component {
         'title',
         formatMessage('Rich Text Area. Press {OSKey}+F8 for Rich Content Editor shortcuts.', {
           OSKey: determineOSDependentKey(),
-        })
+        }),
       )
     }
 
@@ -1192,7 +1192,7 @@ class RCEWrapper extends React.Component {
           // make the editor content and autosave content never match up
           const editorContent = this.patchAutosavedContent(
             editor.getContent({no_events: true}),
-            true
+            true,
           )
           const autosavedContent = this.patchAutosavedContent(autosaved.content, true)
 
@@ -1207,7 +1207,7 @@ class RCEWrapper extends React.Component {
         }
       } catch (ex) {
         // log and ignore
-        // eslint-disable-next-line no-console
+         
         console.error('Failed initializing rce autosave', ex)
       }
     }
@@ -1307,7 +1307,7 @@ class RCEWrapper extends React.Component {
           this.cleanupAutoSave(true)
           this.doAutoSave(e, true)
         } else {
-          console.error('Autosave failed:', ex) // eslint-disable-line no-console
+          console.error('Autosave failed:', ex)  
         }
       }
     }
@@ -1331,7 +1331,7 @@ class RCEWrapper extends React.Component {
         p =>
           p.nodeName !== 'BR' &&
           !p.getAttribute('data-mce-bogus') &&
-          p.getAttribute('data-mce-type') !== 'bookmark'
+          p.getAttribute('data-mce-type') !== 'bookmark',
       )
       .map(p => p.nodeName.toLowerCase())
       .reverse()
@@ -1353,7 +1353,7 @@ class RCEWrapper extends React.Component {
       const container = editor.getContainer()
       if (!container) return
       const currentContainerHeight = Number.parseInt(container.style.height, 10)
-      if (isNaN(currentContainerHeight)) return // eslint-disable-line no-restricted-globals
+      if (isNaN(currentContainerHeight)) return  
       const modifiedHeight = currentContainerHeight + coordinates.deltaY
       const newHeight = `${modifiedHeight}px`
       container.style.height = newHeight
@@ -1378,7 +1378,7 @@ class RCEWrapper extends React.Component {
       },
       {
         skip_focus: true,
-      }
+      },
     )
   }
 
@@ -1392,7 +1392,7 @@ class RCEWrapper extends React.Component {
           this.setState({a11yErrorsCount: errors.length})
         },
       },
-      {skip_focus: true}
+      {skip_focus: true},
     )
   }
 
@@ -1435,7 +1435,7 @@ class RCEWrapper extends React.Component {
         })
       })
       .catch(ex => {
-        // eslint-disable-next-line no-console
+         
         console.error('Failed loading the AIToolsTray', ex)
       })
   }
@@ -1605,7 +1605,7 @@ class RCEWrapper extends React.Component {
 
       toolbar: mergeToolbar(
         getToolbarForVariant(this.variant, this.ltiToolFavorites),
-        options.toolbar
+        options.toolbar,
       ),
 
       contextmenu: '', // show the browser's native context menu
@@ -1646,7 +1646,7 @@ class RCEWrapper extends React.Component {
         ],
         // filter out the plugins designated for removal
         sanitizePlugins(options.plugins)?.filter(p => p.length > 0 && p[0] !== '-'),
-        this.pluginsToExclude
+        this.pluginsToExclude,
       ),
       textpattern_patterns: [
         {start: '* ', cmd: 'InsertUnorderedList'},
@@ -1709,7 +1709,7 @@ class RCEWrapper extends React.Component {
           }
         },
         // initialize the RCE when it gets close to entering the viewport
-        {root: null, rootMargin: '200px 0px', threshold: 0.0}
+        {root: null, rootMargin: '200px 0px', threshold: 0.0},
       )
       this.intersectionObserver.observe(this._editorPlaceholderRef.current)
     }

@@ -33,15 +33,15 @@ export function Highlight({...props}) {
     if (!element) {
       return
     }
-    let eventType = 'onfocusin' in element ? 'focusin' : 'focus'
-    let bubbles = 'onfocusin' in element
+    const eventType = 'onfocusin' in element ? 'focusin' : 'focus'
+    const bubbles = 'onfocusin' in element
     let event
 
     if ('createEvent' in document) {
       event = document.createEvent('Event')
       event.initEvent(eventType, bubbles, true)
     } else if ('Event' in window) {
-      event = new Event(eventType, {bubbles: bubbles, cancelable: true})
+      event = new Event(eventType, {bubbles, cancelable: true})
     }
 
     element.focus()
@@ -73,6 +73,7 @@ export function Highlight({...props}) {
       className={classNames({[className]: props.isHighlighted})}
       data-testid={props.isHighlighted ? 'isHighlighted' : 'notHighlighted'}
       ref={highlightRef}
+      data-entry-id={props.discussionEntryId}
     >
       {props.children}
     </div>
@@ -85,6 +86,7 @@ Highlight.propTypes = {
    */
   isHighlighted: PropTypes.bool,
   children: PropTypes.node,
+  discussionEntryId: PropTypes.string,
 }
 
 Highlight.defaultProps = {

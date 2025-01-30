@@ -243,8 +243,6 @@ export type SiteAdminFeatureId =
   | 'account_level_blackout_dates'
   | 'course_paces_for_students'
   | 'course_paces_redesign'
-  | 'selective_release_ui_api'
-  | 'assign_to_improved_search'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'
   | 'featured_help_links'
@@ -283,6 +281,8 @@ export type RootAccountFeatureId =
   | 'course_paces_skip_selected_days'
   | 'course_pace_download_document'
   | 'course_pace_draft_state'
+  | 'course_pace_time_selection'
+  | 'course_pace_pacing_status_labels'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

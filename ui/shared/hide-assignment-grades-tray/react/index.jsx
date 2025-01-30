@@ -43,6 +43,7 @@ function initialShowState() {
     hidingGrades: false,
     open: true,
     selectedSectionIds: [],
+    showSectionValidation: false,
   }
 }
 
@@ -63,6 +64,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
       open: false,
       selectedSectionIds: [],
       submissions: [],
+      showSectionValidation: false,
     }
   }
 
@@ -78,7 +80,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
   }
 
   hideBySectionsChanged(hideBySections) {
-    this.setState({hideBySections, selectedSectionIds: []})
+    this.setState({hideBySections, selectedSectionIds: [], showSectionValidation: false})
   }
 
   async onHideClick() {
@@ -88,13 +90,10 @@ export default class HideAssignmentGradesTray extends PureComponent {
 
     if (this.state.hideBySections) {
       if (selectedSectionIds.length === 0) {
-        showFlashAlert({
-          message: I18n.t('At least one section must be selected to hide grades by section.'),
-          type: 'error',
-        })
-
-        return
+        return this.setState({showSectionValidation: true})
       }
+
+      this.setState({showSectionValidation: false})
 
       hideRequest = hideAssignmentGradesForSections(assignment.id, selectedSectionIds)
       successMessage = I18n.t(
@@ -150,7 +149,8 @@ export default class HideAssignmentGradesTray extends PureComponent {
       return null
     }
 
-    const {assignment, containerName, onExited, sections, submissions} = this.state
+    const {assignment, containerName, onExited, sections, submissions, showSectionValidation} =
+      this.state
 
     const unhiddenCount = submissions.filter(submission => isHideable(submission)).length
 
@@ -188,6 +188,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
           sectionSelectionChanged={this.sectionSelectionChanged}
           selectedSectionIds={this.state.selectedSectionIds}
           unhiddenCount={unhiddenCount}
+          showSectionValidation={showSectionValidation}
         />
       </Tray>
     )

@@ -238,7 +238,7 @@ describe('EditView', () => {
     const data = {submission_types: ['student_annotation']}
     const errors = view.validateBeforeSave(data, {})
     const annotatedDocumentError = errors['online_submission_types[student_annotation]'][0]
-    expect(annotatedDocumentError.message).toBe('You must attach a file')
+    expect(annotatedDocumentError.message).toBe('This submission type requires a file upload')
   })
 
   it('validates presence of attachment use justification when assignment has type annotatable_attachment', () => {
@@ -251,7 +251,7 @@ describe('EditView', () => {
     const errors = view.validateBeforeSave(data, {})
     expect(errors.usage_rights_use_justification).toBeTruthy()
     expect(errors.usage_rights_use_justification[0].message).toBe(
-      'You must set document usage rights',
+      'Identifying the usage rights is required',
     )
   })
 

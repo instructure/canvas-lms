@@ -127,7 +127,7 @@ describe('SavedIconMakerList()', () => {
             sort: 'date_added',
             order: 'desc',
           }}
-        />
+        />,
       )
       await flushPromises()
       expect(mockContent.fetchInitialImages).toHaveBeenCalledTimes(2)
@@ -152,7 +152,7 @@ describe('SavedIconMakerList()', () => {
 
     it('dispatches a "loading" action', () => {
       expect(props.onImageEmbed.mock.calls[0][0]).toMatchInlineSnapshot(`
-        Object {
+        {
           "content_type": "image/png",
           "date": "2021-11-03T19:21:27Z",
           "display_name": "image_one.png",

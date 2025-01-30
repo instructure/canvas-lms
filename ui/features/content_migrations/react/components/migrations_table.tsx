@@ -16,25 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useCallback} from 'react'
-import type {SetStateAction, Dispatch} from 'react'
+import React from 'react'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import {Heading} from '@instructure/ui-heading'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Responsive} from '@instructure/ui-responsive'
 import type {ContentMigrationItem, UpdateMigrationItemType} from './types'
 import MigrationRow from './migration_row'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
-type MigrationsResponse = {json: ContentMigrationItem[]}
+const LoadingSpinner = () => (
+  <View as="div" margin="medium none" textAlign="center">
+    <Spinner size="small" renderTitle={I18n.t('Loading')} />
+  </View>
+)
+
 
 type ContentMigrationsTableViewProps = {
   migrations: ContentMigrationItem[]
+  isLoading: boolean
   updateMigrationItem: (
     migrationId: string,
     data: any,
@@ -44,10 +49,11 @@ type ContentMigrationsTableViewProps = {
 
 const ContentMigrationsTableCondensedView = ({
   migrations,
+  isLoading,
   updateMigrationItem,
 }: ContentMigrationsTableViewProps) => {
   return (
-    <Flex direction="column" gap="small">
+    <Flex justifyItems="center" direction="column" gap="small">
       {migrations.map((cm: ContentMigrationItem) => (
         <MigrationRow
           key={cm.id}
@@ -56,12 +62,14 @@ const ContentMigrationsTableCondensedView = ({
           updateMigrationItem={updateMigrationItem}
         />
       ))}
+      {isLoading && (<LoadingSpinner />)}
     </Flex>
   )
 }
 
 const ContentMigrationsTableExpandedView = ({
   migrations,
+  isLoading,
   updateMigrationItem,
 }: ContentMigrationsTableViewProps) => {
   return (
@@ -76,55 +84,29 @@ const ContentMigrationsTableExpandedView = ({
             updateMigrationItem={updateMigrationItem}
           />
         ))}
+        {isLoading && 
+          <Table.Row>
+            <Table.Cell colSpan={6} textAlign="center">
+              <LoadingSpinner />
+            </Table.Cell>
+          </Table.Row>
+        }
       </Table.Body>
     </Table>
   )
 }
 
+export type ContentMigrationsTableProps = {
+  migrations: ContentMigrationItem[]
+  isLoading: boolean
+  updateMigrationItem: UpdateMigrationItemType
+}
+
 export const ContentMigrationsTable = ({
   migrations,
-  setMigrations,
-}: {
-  migrations: ContentMigrationItem[]
-  setMigrations: Dispatch<SetStateAction<ContentMigrationItem[]>>
-}) => {
-  useEffect(() => {
-    doFetchApi({
-      path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`,
-      params: {per_page: 25},
-    })
-      // @ts-expect-error
-      .then((response: MigrationsResponse) => setMigrations(_prevMigrations => response.json))
-      .catch(showFlashError(I18n.t("Couldn't load previous content migrations")))
-  }, [setMigrations])
-
-  const updateMigrationItem: UpdateMigrationItemType = useCallback(
-    async (migrationId: string, data: any, noXHR: boolean | undefined) => {
-      if (noXHR) {
-        setMigrations(prevMigrations =>
-          prevMigrations.map((m: ContentMigrationItem) =>
-            m.id === migrationId ? {...m, ...data} : m,
-          ),
-        )
-      } else {
-        try {
-          const response = await doFetchApi<ContentMigrationItem>({
-            path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/${migrationId}`,
-          })
-          const json = response.json
-          setMigrations(prevMigrations =>
-            prevMigrations.map((m: ContentMigrationItem) =>
-              m.id === migrationId ? {...json, ...data} : m,
-            ),
-          )
-          return json
-        } catch {
-          showFlashError(I18n.t("Couldn't update content migrations"))
-        }
-      }
-    },
-    [setMigrations],
-  )
+  isLoading,
+  updateMigrationItem,
+}: ContentMigrationsTableProps) => {
 
   return (
     <>
@@ -142,6 +124,7 @@ export const ContentMigrationsTable = ({
             return (
               <ContentMigrationsTableExpandedView
                 migrations={migrations}
+                isLoading={isLoading}
                 updateMigrationItem={updateMigrationItem}
               />
             )
@@ -149,6 +132,7 @@ export const ContentMigrationsTable = ({
             return (
               <ContentMigrationsTableCondensedView
                 migrations={migrations}
+                isLoading={isLoading}
                 updateMigrationItem={updateMigrationItem}
               />
             )

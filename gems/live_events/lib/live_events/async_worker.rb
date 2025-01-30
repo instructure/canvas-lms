@@ -28,13 +28,15 @@ module LiveEvents
 
     MAX_BYTE_THRESHOLD = 5_000_000
     KINESIS_RECORD_SIZE_LIMIT = 1_000_000
+    KINESIS_RECORD_LIMIT = 500
     RETRY_LIMIT = 3
 
-    def initialize(start_thread = true, stream_client:, stream_name:)
+    def initialize(start_thread = true, stream_client:, stream_name:, retry_throttled_events:)
       @queue = Queue.new
       @logger = LiveEvents.logger
       @stream_client = stream_client
       @stream_name = stream_name
+      @retry_throttled_events = retry_throttled_events
 
       start! if start_thread
     end
@@ -93,7 +95,7 @@ module LiveEvents
           # r will be nil on first pass
           records = [r].compact
           total_bytes = (r.is_a?(Hash) && r[:total_bytes]) || 0
-          while !@queue.empty? && total_bytes < MAX_BYTE_THRESHOLD
+          while !@queue.empty? && total_bytes < MAX_BYTE_THRESHOLD && records.size < KINESIS_RECORD_LIMIT
             r = @queue.pop
             break if r == :stop || (records.size == 1 && records.first == :stop)
 
@@ -142,27 +144,39 @@ module LiveEvents
     end
 
     def process_results(res, records)
+      throttled = false
       res.records.each_with_index do |r, i|
         record = records[i]
-        if r.error_code == "InternalFailure"
+        if r.error_code.present?
+          if r.error_code == "ProvisionedThroughputExceededException"
+            next unless @retry_throttled_events
+
+            throttled = true
+          end
+
           record[:retries_count] ||= 0
           record[:retries_count] += 1
 
           if record[:retries_count] <= RETRY_LIMIT
             @queue.push(record)
-            LiveEvents.statsd&.increment("#{record[:statsd_prefix]}.retry", tags: record[:tags])
+            LiveEvents.statsd&.distributed_increment("#{record[:statsd_prefix]}.retry", tags: record[:tags])
           else
             internal_error_message = "This record has failed too many times an will no longer be retried. #{r.error_message}"
             log_unprocessed(record, r.error_code, internal_error_message)
-            LiveEvents.statsd&.increment("#{record[:statsd_prefix]}.final_retry", tags: record[:tags])
+            LiveEvents.statsd&.distributed_increment("#{record[:statsd_prefix]}.final_retry", tags: record[:tags])
           end
-
-        elsif r.error_code.present?
-          log_unprocessed(record, r.error_code, r.error_message)
         else
-          LiveEvents.statsd&.increment("#{record[:statsd_prefix]}.sends", tags: record[:tags])
+          LiveEvents.statsd&.distributed_increment("#{record[:statsd_prefix]}.sends", tags: record[:tags])
         end
       end
+      allow_kinesis_shard_to_recover if throttled
+    end
+
+    # 1 second is enough to for the kinesis shard to unblock itself,
+    # and introduce jitter to avoid all app servers retrying at the same time
+    def allow_kinesis_shard_to_recover
+      LiveEvents.statsd&.distributed_increment("live_events.events.throttled")
+      sleep rand(0.7..1.5) # rubocop:disable Lint/NoSleep
     end
 
     def log_unprocessed(record, error_code, error_message)
@@ -172,7 +186,7 @@ module LiveEvents
       logger.debug(
         "Failed event data: #{record[:data]}"
       )
-      LiveEvents.statsd&.increment(
+      LiveEvents.statsd&.distributed_increment(
         "#{record[:statsd_prefix]}.send_errors",
         tags: record[:tags].merge(error_code:)
       )

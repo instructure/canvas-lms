@@ -21,6 +21,7 @@ import React from 'react'
 import {responsiveQuerySizes} from '../../../../util/utils'
 import {translateInboxMessage} from '../../../utils/inbox_translator'
 import {MessageDetailItem} from '../MessageDetailItem'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
@@ -50,6 +51,19 @@ const setup = props => {
 }
 
 describe('MessageDetailItem', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      CONVERSATIONS: {
+        ATTACHMENTS_FOLDER_ID: '1',
+      },
+      inbox_translation_enabled: true,
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   beforeAll(() => {
     // Add appropriate mocks for responsive
     window.matchMedia = jest.fn().mockImplementation(() => {

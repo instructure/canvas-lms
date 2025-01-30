@@ -55,14 +55,14 @@ module LearnPlatform
       response = CanvasHttp.get(url, headers)
 
       if response.is_a?(Net::HTTPSuccess)
-        InstStatsd::Statsd.increment("learn_platform_api.success", tags: { event_type: "get_unified_tool_id" })
+        InstStatsd::Statsd.distributed_increment("learn_platform_api.success", tags: { event_type: "get_unified_tool_id" })
         JSON.parse(response.body, symbolize_names: true)[:unified_tool_id]
       else
-        InstStatsd::Statsd.increment("learn_platform_api.error.http_failure", tags: { event_type: "get_unified_tool_id", status_code: response.code })
+        InstStatsd::Statsd.distributed_increment("learn_platform_api.error.http_failure", tags: { event_type: "get_unified_tool_id", status_code: response.code })
         false
       end
     rescue CanvasHttp::Error
-      InstStatsd::Statsd.increment("learn_platform_api.error", tags: { event_type: "get_unified_tool_id" })
+      InstStatsd::Statsd.distributed_increment("learn_platform_api.error", tags: { event_type: "get_unified_tool_id" })
       false
     end
   end

@@ -19,6 +19,8 @@
 const {execSync, exec} = require('child_process')
 const util = require('util')
 const path = require('path')
+const {ESLint} = require('eslint')
+const pluginReactCompiler = require('eslint-plugin-react-compiler')
 
 const execAsync = util.promisify(exec)
 const projectRoot = path.resolve(__dirname, '..')
@@ -30,7 +32,7 @@ const colors = {
   yellow: '\x1b[33m',
   gray: '\x1b[90m',
   bold: '\x1b[1m',
-  white: '\x1b[37m'
+  white: '\x1b[37m',
 }
 
 function colorize(color, text) {
@@ -55,6 +57,7 @@ const sections = {
   javascript: 'javascript',
   typescript: 'typescript',
   outdatedPackages: 'outdated',
+  reactCompiler: 'react-compiler',
 }
 
 // Parse command line arguments
@@ -113,6 +116,7 @@ Available sections:
   javascript      - JavaScript files
   typescript      - TypeScript suppressions
   outdated        - Outdated packages
+  react-compiler  - React Compiler Rule Violations
 `)
   process.exit(0)
 }
@@ -196,7 +200,7 @@ async function getRandomTsSuppressionFile(type, verbose = false) {
 async function showTsSuppressionStats(type, verbose = false) {
   const count = await countTsSuppressions(type, verbose)
   console.log(colorize('yellow', `- Total files with @${type}: ${bold(count)}`))
-  
+
   if (count > 0) {
     const files = await getGrepMatchingFiles('\\.(ts|tsx)$', `@${type}`, verbose)
     if (verbose) {
@@ -244,7 +248,7 @@ async function getRandomJqueryImportFile(verbose = false) {
 async function showJqueryImportStats(verbose = false) {
   const count = await countJqueryImports(verbose)
   console.log(colorize('yellow', `- Files with jQuery imports: ${bold(count)}`))
-  
+
   if (count > 0) {
     if (verbose) {
       const cmd =
@@ -296,9 +300,13 @@ async function getRandomSinonImportFile(verbose = false) {
 async function showSinonImportStats(verbose = false) {
   const count = await countSinonImports(verbose)
   console.log(colorize('yellow', `- Files with Sinon imports: ${bold(count)}`))
-  
+
   if (count > 0) {
-    const files = await getGrepMatchingFiles('__tests__.*\\.(js|jsx|ts|tsx)$', '\\bsinon\\b', verbose)
+    const files = await getGrepMatchingFiles(
+      '__tests__.*\\.(js|jsx|ts|tsx)$',
+      '\\bsinon\\b',
+      verbose,
+    )
     if (verbose) {
       files.sort().forEach(file => {
         console.log(colorize('gray', `  ${file}`))
@@ -344,7 +352,7 @@ async function getRandomEnzymeImportFile(verbose = false) {
 async function showEnzymeImportStats(verbose = false) {
   const count = await countEnzymeImports(verbose)
   console.log(colorize('yellow', `- Files with Enzyme imports: ${bold(count)}`))
-  
+
   if (count > 0) {
     if (verbose) {
       const cmd =
@@ -615,7 +623,7 @@ async function showReactStringRefStats(verbose = false) {
     if (verbose) {
       const cmd =
         'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-        'xargs grep -l "\\bref=\\\"[^\\\"]*\\\""' // Fix the string-refs grep pattern
+        'xargs grep -l "\\bref=\\"[^\\"]*\\""' // Fix the string-refs grep pattern
       const {stdout} = await execAsync(cmd, {cwd: projectRoot})
       const files = stdout.trim().split('\n').filter(Boolean)
       files.sort().forEach(file => {
@@ -732,6 +740,123 @@ async function showDefaultPropsStats(verbose = false) {
   }
 }
 
+// Add loading indicator helpers
+function startSpinner(message) {
+  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
+  let i = 0
+  process.stdout.write('\r' + frames[0] + ' ' + message)
+  return setInterval(() => {
+    i = (i + 1) % frames.length
+    process.stdout.write('\r' + frames[i] + ' ' + message)
+  }, 80)
+}
+
+function stopSpinner(interval) {
+  clearInterval(interval)
+  process.stdout.write('\r\x1b[K') // Clear the line
+}
+
+function createReactCompilerESLint() {
+  return new ESLint({
+    cache: true,
+    baseConfig: {
+      plugins: {
+        'react-compiler': pluginReactCompiler,
+      },
+      rules: {
+        'react-compiler/react-compiler': 'warn',
+      },
+    },
+  })
+}
+
+async function countReactCompilerViolations() {
+  try {
+    const spinner = startSpinner('Analyzing files in `ui/` for react-compiler violations...')
+    const eslint = createReactCompilerESLint()
+
+    const results = await eslint.lintFiles(['ui/**/*.{js,jsx,ts,tsx}'])
+    stopSpinner(spinner)
+
+    const violations = results.flatMap(result =>
+      result.messages.filter(msg => msg.ruleId === 'react-compiler/react-compiler'),
+    )
+    return violations.length
+  } catch (error) {
+    console.error(colorize('red', `Error counting react-compiler violations: ${error.message}`))
+    return 0
+  }
+}
+
+async function getRandomReactCompilerViolationFile() {
+  try {
+    const spinner = startSpinner('Finding files with react-compiler violations...')
+    const eslint = createReactCompilerESLint()
+
+    const results = await eslint.lintFiles(['ui/**/*.{js,jsx,ts,tsx}'])
+    stopSpinner(spinner)
+
+    const filesWithViolations = results
+      .filter(result => result.messages.some(msg => msg.ruleId === 'react-compiler/react-compiler'))
+      .map(result => {
+        const message = result.messages.find(msg => msg.ruleId === 'react-compiler/react-compiler')
+        return `${result.filePath}:${message.line}:${message.column}`
+      })
+
+    if (filesWithViolations.length === 0) {
+      return null
+    }
+
+    const randomFile = filesWithViolations[Math.floor(Math.random() * filesWithViolations.length)]
+    return normalizePath(path.relative(projectRoot, randomFile))
+  } catch (error) {
+    console.error(
+      colorize('red', `Error finding react-compiler violation example: ${error.message}`),
+    )
+    return null
+  }
+}
+
+async function showReactCompilerViolationStats(verbose = false) {
+  const count = await countReactCompilerViolations()
+  console.log(colorize('yellow', `- Files with react-compiler violations: ${bold(count)}`))
+
+  if (count > 0) {
+    if (verbose) {
+      const spinner = startSpinner('Getting detailed list of react-compiler violations...')
+      const eslint = createReactCompilerESLint()
+
+      const results = await eslint.lintFiles(['ui/**/*.{js,jsx,ts,tsx}'])
+      stopSpinner(spinner)
+
+      const filesWithViolations = results
+        .filter(result =>
+          result.messages.some(msg => msg.ruleId === 'react-compiler/react-compiler'),
+        )
+        .map(result => {
+          const message = result.messages.find(
+            msg => msg.ruleId === 'react-compiler/react-compiler',
+          )
+          return normalizePath(
+            `${path.relative(projectRoot, result.filePath)}:${message.line}:${message.column}`,
+          )
+        })
+        .sort()
+
+      filesWithViolations.forEach(file => {
+        console.log(colorize('gray', `  ${file}`))
+      })
+    } else {
+      const randomFile = await getRandomReactCompilerViolationFile()
+      if (randomFile) {
+        console.log(colorize('gray', `  Example: ${randomFile}`))
+      } else {
+        console.log(colorize('green', `No violations found!`))
+      }
+    }
+  }
+}
+
 function getSectionTitle(section) {
   const titles = {
     skipped: ['Skipped Tests', '(fix or remove)'],
@@ -746,22 +871,25 @@ function getSectionTitle(section) {
     class: ['React Class Component Files', '(convert to function components)'],
     javascript: ['JavaScript Files', '(convert to TypeScript)'],
     typescript: ['TypeScript Suppressions', ''],
-    outdated: ['Outdated Packages', '']
+    outdated: ['Outdated Packages', ''],
+    reactCompiler: ['React Compiler Rule Violations', ''],
   }
-  
+
   const [title, note] = titles[section] || [section, '']
-  return note ? colorize('white', bold(title)) + ' ' + colorize('gray', note) : colorize('white', bold(title))
+  return note
+    ? colorize('white', bold(title)) + ' ' + colorize('gray', note)
+    : colorize('white', bold(title))
 }
 
 async function printDashboard() {
   try {
     const options = parseArgs()
-    
+
     if (options.help) {
       printHelp()
     }
 
-    console.log(bold(colorize('green','\nTech Debt Summary\n')))
+    console.log(bold(colorize('green', '\nTech Debt Summary\n')))
 
     const selectedSection = options.section
     const verbose = options.verbose
@@ -846,6 +974,11 @@ async function printDashboard() {
       await checkOutdatedPackages(verbose)
     }
 
+    if (!selectedSection || selectedSection === 'react-compiler') {
+      console.log(getSectionTitle('react-compiler'))
+      await showReactCompilerViolationStats(verbose)
+      console.log()
+    }
   } catch (error) {
     console.error(colorize('red', `Error: ${error.message}`))
     process.exit(1)

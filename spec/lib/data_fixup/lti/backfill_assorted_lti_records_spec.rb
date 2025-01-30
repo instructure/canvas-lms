@@ -22,11 +22,12 @@ RSpec.describe DataFixup::Lti::BackfillAssortedLtiRecords do
   subject { DataFixup::Lti::BackfillAssortedLtiRecords.run }
 
   let(:developer_key) do
-    key = dev_key_model_1_3(account:)
+    key = lti_developer_key_model(account:)
     key.update!(workflow_state: "deleted")
     reg = key.lti_registration
     key.update(lti_registration: nil, skip_lti_sync: true)
-    key.tool_configuration.update(lti_registration: nil)
+    tool_configuration = lti_tool_configuration_model(developer_key: key)
+    tool_configuration.update(lti_registration: nil)
     reg.delete
     key.developer_key_account_bindings.first.lti_registration_account_binding.delete
     key

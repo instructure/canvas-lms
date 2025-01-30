@@ -711,5 +711,38 @@ describe "submissions" do
         end
       end
     end
+
+    it "student can see discussion checkpoint scores but cannot edit them" do
+      Account.default.enable_feature! :discussion_checkpoints
+      teacher = teacher_in_course(active_all: true).user
+      student = student_in_course(active_all: true).user
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion Topic", user: teacher)
+      topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 5, reply_to_entry_required_count: 2)
+      assignment = topic.assignment
+
+      # Create submission for the student
+      entry_by_teacher = topic.discussion_entries.create!(user: @teacher, message: "reply to topic by teacher")
+      topic.discussion_entries.create!(user: student, message: "reply to topic by student")
+      2.times do
+        topic.discussion_entries.create!(user: student, message: "reply to entry by student", root_entry_id: entry_by_teacher.id, parent_id: entry_by_teacher.id)
+      end
+
+      # Grade the student
+      topic.reply_to_topic_checkpoint.grade_student(student, grade: 8, grader: teacher)
+      topic.reply_to_entry_checkpoint.grade_student(student, grade: 4, grader: teacher)
+
+      # Load page as student
+      user_session(student)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{student.id}"
+      wait_for_ajaximations
+
+      # Check that the student can see the grades
+      expect(ff("[data-testid='default-grade-input']")[0][:value]).to eq "8"
+      expect(ff("[data-testid='default-grade-input']")[1][:value]).to eq "4"
+
+      # Check that the checkpoint inputs are disabled
+      expect(ff("[data-testid='default-grade-input']")[0][:disabled]).to eq "true"
+      expect(ff("[data-testid='default-grade-input']")[1][:disabled]).to eq "true"
+    end
   end
 end

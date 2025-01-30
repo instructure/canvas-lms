@@ -40,6 +40,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/util/jquery/fixDialogButtons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import replaceTags from '@canvas/util/replaceTags'
+import useStore from '../stores'
 
 const I18n = createI18nScope('edit_rubric')
 
@@ -717,6 +718,14 @@ rubricEditing.init = function () {
 
   rubricEditing.htmlBody = $('html,body')
 
+  const rubricContainer = $('.rubric_container.rubric')
+  const rubricVisible = !$('.add_rubric_link').is(':visible')
+  if (rubricContainer && rubricVisible) {
+    const containerId = rubricContainer.attr('id') ?? ''
+    const rubricId = containerId.split('rubric_')[1];
+    useStore.setState({ rubricId });
+  }
+
   $('#rubrics')
     .on('click', '.edit_criterion_link, .long_description_link', function (event) {
       event.preventDefault()
@@ -963,6 +972,7 @@ rubricEditing.init = function () {
             if (callback && $.isFunction(callback)) {
               callback()
             }
+            useStore.setState({rubricId: undefined})
           })
         },
       })
@@ -1264,6 +1274,7 @@ rubricEditing.init = function () {
           if (!rubric.permissions?.update) {
             $rubric.find('.edit_rubric_link').addClass('copy_edit')
           }
+          useStore.setState({rubricId: rubric.id})
         },
         () => {
           $rubric_dialog.loadingImage('remove')
@@ -1405,6 +1416,7 @@ rubricEditing.init = function () {
         $(this).parents('tr').hide()
 
         const rubric = data.rubric
+        useStore.setState({rubricId: rubric.id})
 
         rubric.rubric_association_id = data.rubric_association.id
         rubric.use_for_grading = data.rubric_association.use_for_grading

@@ -68,6 +68,7 @@ export default class UsageRightsSelectBox extends React.Component {
     showMessage: PropTypes.bool,
     contextType: PropTypes.string,
     contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    hideErrors: PropTypes.func,
   }
 
   state = {
@@ -120,6 +121,8 @@ export default class UsageRightsSelectBox extends React.Component {
       showCreativeCommonsOptions: event.target.value === 'creative_commons',
       showMessage: this.props.showMessage && event.target.value === 'choose',
     })
+    if(this.props.hideErrors)
+      this.props.hideErrors('usage_rights_use_justification_errors')
   }
 
   // This method only really applies to firefox which doesn't handle onChange
@@ -208,6 +211,8 @@ export default class UsageRightsSelectBox extends React.Component {
               {this.renderContentOptions()}
             </select>
           </div>
+          {/* Usage Rights Error Container */}
+          <div id="usage_rights_use_justification_errors"></div>
         </div>
         {this.state.showCreativeCommonsOptions && this.renderShowCreativeCommonsOptions()}
         <div className="control-group">

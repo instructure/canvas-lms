@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from '@testing-library/react'
+import {render, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
 import Layout from '../Layout'
 
@@ -31,39 +31,38 @@ jest.mock('@canvas/apollo-v3', () => ({
 
 describe('AssignmentPostingPolicyTray Layout', () => {
   let container
-  let context
+  let getByRole
+  let getByText
 
   function getCancelButton() {
-    return [...container.querySelectorAll('button')].find(button => button.textContent === 'Cancel')
+    return getByRole('button', {name: /^cancel$/i})
   }
 
   function getSaveButton() {
-    return [...container.querySelectorAll('button')].find(button => button.textContent === 'Save')
-  }
-
-  function getLabel(text) {
-    return [...container.querySelectorAll('label')].find(label => label.textContent.includes(text))
-  }
-
-  function getInputByLabel(label) {
-    const labelElement = getLabel(label)
-    if (!labelElement) return undefined
-    return document.getElementById(labelElement.htmlFor)
+    return getByRole('button', {name: /^save$/i})
   }
 
   function getAutomaticallyPostInput() {
-    return getInputByLabel('Automatically')
+    return getByRole('radio', {name: /automatically.*grades.*entered/i})
   }
 
   function getManuallyPostInput() {
-    return getInputByLabel('Manually')
+    return getByRole('radio', {name: /manually.*grades.*hidden/i})
   }
 
   function getLabelWithManualPostingDetail() {
-    return getLabel('While the grades for this assignment are set to manual')
+    try {
+      return getByText(/while the grades for this assignment are set to manual/i)
+    } catch {
+      return undefined
+    }
   }
 
+  let context
+  let user
+
   beforeEach(() => {
+    user = userEvent.setup()
     context = {
       allowAutomaticPosting: true,
       allowCanceling: true,
@@ -74,21 +73,25 @@ describe('AssignmentPostingPolicyTray Layout', () => {
       originalPostManually: true,
       selectedPostManually: false,
     }
-    const {container: renderedContainer} = render(
+    const utils = render(
       <MockedProvider mocks={[]} addTypename={false}>
         <Layout {...context} />
-      </MockedProvider>,
+      </MockedProvider>
     )
-    container = renderedContainer
+    container = utils.container
+    getByRole = utils.getByRole
+    getByText = utils.getByText
   })
 
   afterEach(() => {
+    cleanup()
+    user = null
+    context = null
     container = null
   })
 
   it('clicking "Cancel" button calls the onDismiss prop', async () => {
-    await userEvent.click(getCancelButton())
-    await new Promise(resolve => setTimeout(resolve, 0))
+    await user.click(getCancelButton())
     expect(context.onDismiss).toHaveBeenCalledTimes(1)
   })
 
@@ -97,14 +100,19 @@ describe('AssignmentPostingPolicyTray Layout', () => {
   })
 
   it('the "Cancel" button is disabled when allowCanceling is false', () => {
-    context.allowCanceling = false
-    const {container: newContainer} = render(<Layout {...context} />)
-    container = newContainer
+    cleanup()
+    const newContext = {...context, allowCanceling: false}
+    const utils = render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <Layout {...newContext} />
+      </MockedProvider>
+    )
+    getByRole = utils.getByRole
     expect(getCancelButton().disabled).toBe(true)
   })
 
   it('clicking "Save" button calls the onSave prop', async () => {
-    await userEvent.click(getSaveButton())
+    await user.click(getSaveButton())
     expect(context.onSave).toHaveBeenCalledTimes(1)
   })
 
@@ -113,9 +121,14 @@ describe('AssignmentPostingPolicyTray Layout', () => {
   })
 
   it('the "Save" button is disabled when allowSaving is false', () => {
-    context.allowSaving = false
-    const {container: newContainer} = render(<Layout {...context} />)
-    container = newContainer
+    cleanup()
+    const newContext = {...context, allowSaving: false}
+    const utils = render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <Layout {...newContext} />
+      </MockedProvider>
+    )
+    getByRole = utils.getByRole
     expect(getSaveButton().disabled).toBe(true)
   })
 
@@ -131,9 +144,14 @@ describe('AssignmentPostingPolicyTray Layout', () => {
 
   describe('when allowAutomaticPosting is false', () => {
     beforeEach(() => {
-      context.allowAutomaticPosting = false
-      const {container: newContainer} = render(<Layout {...context} />)
-      container = newContainer
+      cleanup()
+      const newContext = {...context, allowAutomaticPosting: false}
+      const utils = render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <Layout {...newContext} />
+        </MockedProvider>
+      )
+      getByRole = utils.getByRole
     })
 
     it('the "Automatically" radio input is disabled', () => {
@@ -147,9 +165,15 @@ describe('AssignmentPostingPolicyTray Layout', () => {
 
   describe('when selectedPostManually is true', () => {
     beforeEach(() => {
-      context.selectedPostManually = true
-      const {container: newContainer} = render(<Layout {...context} />)
-      container = newContainer
+      cleanup()
+      const newContext = {...context, selectedPostManually: true}
+      const utils = render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <Layout {...newContext} />
+        </MockedProvider>
+      )
+      getByRole = utils.getByRole
+      getByText = utils.getByText
     })
 
     it('the "Manually" radio input is selected', () => {
@@ -172,28 +196,38 @@ describe('AssignmentPostingPolicyTray Layout', () => {
   })
 
   it('clicking the "Manually" input calls onPostPolicyChanged', async () => {
-    await userEvent.click(getManuallyPostInput())
+    await user.click(getManuallyPostInput())
     expect(context.onPostPolicyChanged).toHaveBeenCalledTimes(1)
   })
 
   it('clicking the "Manually" input passes postManually: true to onPostPolicyChanged', async () => {
-    await userEvent.click(getManuallyPostInput())
+    await user.click(getManuallyPostInput())
     expect(context.onPostPolicyChanged).toHaveBeenCalledWith({postManually: true})
   })
 
   it('clicking the "Automatically" input calls onPostPolicyChanged', async () => {
-    context.selectedPostManually = true
-    const {container: newContainer} = render(<Layout {...context} />)
-    container = newContainer
-    await userEvent.click(getAutomaticallyPostInput())
-    expect(context.onPostPolicyChanged).toHaveBeenCalledTimes(1)
+    cleanup()
+    const newContext = {...context, selectedPostManually: true}
+    const utils = render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <Layout {...newContext} />
+      </MockedProvider>
+    )
+    getByRole = utils.getByRole
+    await user.click(getAutomaticallyPostInput())
+    expect(newContext.onPostPolicyChanged).toHaveBeenCalledTimes(1)
   })
 
   it('clicking the "Automatically" input passes postManually: false to onPostPolicyChanged', async () => {
-    context.selectedPostManually = true
-    const {container: newContainer} = render(<Layout {...context} />)
-    container = newContainer
-    await userEvent.click(getAutomaticallyPostInput())
-    expect(context.onPostPolicyChanged).toHaveBeenCalledWith({postManually: false})
+    cleanup()
+    const newContext = {...context, selectedPostManually: true}
+    const utils = render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <Layout {...newContext} />
+      </MockedProvider>
+    )
+    getByRole = utils.getByRole
+    await user.click(getAutomaticallyPostInput())
+    expect(newContext.onPostPolicyChanged).toHaveBeenCalledWith({postManually: false})
   })
 })

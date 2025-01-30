@@ -86,4 +86,13 @@ describe('CreateOrEditSetModal::SelfSignup::', () => {
       expect(onChange).toHaveBeenCalledWith({selfSignup: true, bySection: true})
     })
   })
+
+  it('renders self sign up end date helper text when FF is enabled', () => {
+    const state = {selfSignup: true, bySection: false}
+    const {queryByText} = render(
+      <Wrapper state={state} props={{...defaultProps, selfSignupEndDateEnabled: true}} />,
+    )
+    expect(queryByText('With this option enabled, students can move themselves from one group to another. However, you can set an end date to close self sign-up to prevent students from joining or changing groups after a certain date.')).toBeInTheDocument()
+    expect(queryByText('Note that as long as this option is enabled, students can move themselves from one group to another.')).not.toBeInTheDocument()
+  })
 })

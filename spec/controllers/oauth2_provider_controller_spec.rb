@@ -960,7 +960,20 @@ describe OAuth2ProviderController do
             other_key.save!
           end
 
-          it { is_expected.to have_http_status :bad_request }
+          it { expect(subject).to have_http_status :bad_request }
+        end
+
+        context "with public key url setting and invalid kid in the header" do
+          before do
+            allow(CanvasHttp).to receive(:get).and_return(double(body: '{"keys": []}'))
+            key.public_jwk_url = "http://localhost"
+            key.save!
+          end
+
+          it do
+            expect(subject).to have_http_status :bad_request
+            expect(response.body).to match(/KidNotFound/)
+          end
         end
 
         context "with missing assertion" do

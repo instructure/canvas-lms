@@ -161,15 +161,6 @@ describe "teacher k5 course dashboard" do
       expect(assignment_edit_button).to be_displayed
     end
 
-    it "shows add module modal when +Module button is clicked" do
-      Account.site_admin.disable_feature! :selective_release_ui_api
-      get "/courses/#{@subject_course.id}#modules"
-
-      click_add_module_button
-
-      expect(add_module_modal).to be_displayed
-    end
-
     it "shows add module items modal when + button is clicked" do
       get "/courses/#{@subject_course.id}#modules"
 

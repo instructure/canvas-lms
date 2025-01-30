@@ -24,6 +24,8 @@ import FilesHeader from '../FilesHeader/FilesHeader'
 import AllContextsNameLink from './AllContextsNameLink'
 import {Responsive} from '@instructure/ui-responsive'
 import canvas from '@instructure/ui-themes'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('files_v2')
 
@@ -66,6 +68,13 @@ const AllMyFilesTable = ({size}: AllMyFilesTableProps) => {
   return (
     <>
       <FilesHeader size={size} isUserContext={true} disableButtons={true} />
+      <Flex justifyItems="space-between" margin="medium 0">
+        <Flex.Item shouldGrow={true}>
+          <Text>
+            <b>{I18n.t('All My Files')}</b>
+          </Text>
+        </Flex.Item>
+      </Flex>
       <Table caption={I18n.t('All My Files')} hover={true}>
         <Table.Head renderSortLabel="sdfasdf">
           <Table.Row>

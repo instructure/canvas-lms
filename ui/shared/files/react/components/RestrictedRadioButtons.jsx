@@ -75,7 +75,7 @@ class RestrictedRadioButtons extends React.Component {
       text: I18n.t('Publish'),
       selectedOptionKey: 'published',
       iconClasses: 'icon-publish icon-Solid RestrictedRadioButtons__publish_icon',
-      onChange() {
+      onChange: () => {
         this.updateBtnEnable()
         this.setState({selectedOption: 'published'})
       },
@@ -85,7 +85,7 @@ class RestrictedRadioButtons extends React.Component {
       text: I18n.t('Unpublish'),
       selectedOptionKey: 'unpublished',
       iconClasses: 'icon-unpublish RestrictedRadioButtons__icon',
-      onChange() {
+      onChange: () => {
         this.updateBtnEnable()
         this.setState({selectedOption: 'unpublished'})
       },
@@ -95,7 +95,7 @@ class RestrictedRadioButtons extends React.Component {
       selectedOptionKey: 'link_only',
       text: I18n.t('Only available with link'),
       iconClasses: 'icon-line icon-off RestrictedRadioButtons__icon',
-      onChange() {
+      onChange: () => {
         this.updateBtnEnable()
         this.setState({selectedOption: 'link_only'})
       },
@@ -105,7 +105,7 @@ class RestrictedRadioButtons extends React.Component {
       selectedOptionKey: 'date_range',
       text: I18n.t('Schedule availability'),
       iconClasses: 'icon-line icon-calendar-month RestrictedRadioButtons__icon',
-      onChange() {
+      onChange: () => {
         this.updateBtnEnable()
         this.setState({selectedOption: 'date_range'})
       },
@@ -183,7 +183,7 @@ class RestrictedRadioButtons extends React.Component {
                 type="radio"
                 name="permissions"
                 checked={this.isPermissionChecked(option)}
-                onChange={option.onChange.bind(this)}
+                onChange={option.onChange}
               />
               <i className={option.iconClasses} aria-hidden={true} />
               {option.text}

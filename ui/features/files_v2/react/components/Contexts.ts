@@ -22,6 +22,7 @@ interface FileManagementContextProps {
   folderId: string
   contextType: string
   contextId: string
+  showingAllContexts: boolean
 }
 
 export const FileManagementContext = createContext({} as FileManagementContextProps)

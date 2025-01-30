@@ -19,7 +19,6 @@
 #
 
 # @API LTI Registrations
-# @internal
 # @beta
 #
 # API for accessing and configuring LTI registrations in a root account.
@@ -514,7 +513,7 @@
 #         "display_type": {
 #           "description": "The Canvas layout to use when launching the tool. See the Navigation Placement docs.",
 #           "example": "full_width_in_context",
-#           "type": "string"
+#           "type": "string",
 #           "enum": [
 #             "default",
 #             "full_width",
@@ -1570,7 +1569,7 @@ class Lti::RegistrationsController < ApplicationController
 
   def report_error(exception, code = nil)
     code ||= response_code_for_rescue(exception) if exception
-    InstStatsd::Statsd.increment("canvas.lti_registrations_controller.request_error", tags: { action: action_name, code: })
+    InstStatsd::Statsd.distributed_increment("canvas.lti_registrations_controller.request_error", tags: { action: action_name, code: })
   end
 
   def filter_registrations_by_search_query(registrations, search_terms)

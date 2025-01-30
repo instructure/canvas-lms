@@ -17,19 +17,20 @@
  */
 
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {Flex} from '@instructure/ui-flex'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {View} from '@instructure/ui-view'
-import type {CoursePace, PaceContext, Section, StoreState} from '../../types'
-import {Text} from '@instructure/ui-text'
-import {Pill} from '@instructure/ui-pill'
-import {IconUserSolid} from '@instructure/ui-icons'
-import {getBlueprintLocked} from '../../reducers/ui'
-import {getIsDraftPace} from '../../reducers/course_paces'
+import { Flex } from '@instructure/ui-flex'
+import { useScope as createI18nScope } from '@canvas/i18n'
+import { View } from '@instructure/ui-view'
+import type { CoursePace, PaceContext, Section, StoreState } from '../../types'
+import { Text } from '@instructure/ui-text'
+import { Pill } from '@instructure/ui-pill'
+import { IconUserSolid } from '@instructure/ui-icons'
+import { getBlueprintLocked } from '../../reducers/ui'
+import { getIsDraftPace } from '../../reducers/course_paces'
 import Settings from '../header/settings/settings'
 import BlueprintLock from '../header/blueprint_lock'
+import CourseStats from './CourseStats'
 
 const I18n = createI18nScope('course_paces_modal')
 
@@ -91,6 +92,7 @@ const PaceModalHeading = ({
   }
 
   const renderDetails = () => {
+
     return (
       <>
         <Text tabIndex={0} data-testid="pace-type" as="div" size="medium" weight="bold">
@@ -104,12 +106,14 @@ const PaceModalHeading = ({
             Draft
           </Pill>
         ) : null}
-        <Flex as="div" margin="medium none">
-          <IconUserSolid size="medium" />
-          <View data-testid="pace-info" as="div" margin="none small">
-            {renderPaceInfo()}
-          </View>
-        </Flex>
+        {(window.ENV.FEATURES.course_pace_time_selection) ? 
+          <CourseStats paceContext={paceContext} />
+          :(<Flex as="div" margin="medium none">
+            <IconUserSolid size="medium" />
+            <View data-testid="pace-info" as="div" margin="none small">
+              {renderPaceInfo()}
+            </View>
+          </Flex>)}
       </>
     )
   }

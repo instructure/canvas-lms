@@ -132,19 +132,19 @@ docker compose exec web bundle exec rspec spec
 Run all Jest tests with:
 
 ```bash
-docker compose run --rm js-tests yarn test:jest
+docker compose run --rm web yarn test:jest
 ```
 
 Or run a targeted subset of tests:
 
 ```bash
-docker compose run --rm js-tests yarn test:jest ui/features/speed_grader/react/__tests__/CommentArea.test.js
+docker compose run --rm web yarn test:jest ui/features/speed_grader/react/__tests__/CommentArea.test.js
 ```
 
 To run a targeted subset of tests in watch mode, use `test:jest:watch` and specify the paths to the test files as one or more arguments, e.g.:
 
 ```bash
-docker compose run --rm js-tests yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
+docker compose run --rm web yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
 ```
 
 ### Selenium

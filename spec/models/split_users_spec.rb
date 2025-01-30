@@ -160,7 +160,7 @@ describe SplitUsers do
       it "restores lti_id and uuid when these were overwritten by move_lti_ids" do
         restored_orig_lti_id = restored_user.lti_id
         restored_orig_uuid = restored_user.uuid
-        restored_lti_context_id = Lti::Asset.opaque_identifier_for(restored_user)
+        restored_lti_context_id = Lti::V1p1::Asset.opaque_identifier_for(restored_user)
         source_orig_lti_id = source_user.lti_id
         source_orig_uuid = source_user.uuid
         # (source_lti_context_id must be nil for this move to actually happen)
@@ -182,9 +182,9 @@ describe SplitUsers do
         merge_data = UserMergeData.active.splitable.find_by(user: source_user, from_user: restored_user)
         old_uuid = merge_data.items.where(item_type: "uuid").pick(:item)
         source_user.update!(uuid: old_uuid)
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         expect { SplitUsers.split_db_users(source_user, merge_data) }.not_to raise_error
-        expect(InstStatsd::Statsd).to have_received(:increment).once.with("split_users.undo_move_lti_ids.unique_constraint_failure")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("split_users.undo_move_lti_ids.unique_constraint_failure")
         expect(restored_user.reload).not_to be_deleted
         expect(source_user).not_to be_deleted
       end

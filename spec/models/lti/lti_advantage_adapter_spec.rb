@@ -23,7 +23,7 @@ describe Lti::LtiAdvantageAdapter do
   include_context "lti_1_3_spec_helper"
   include Lti::RedisMessageClient
 
-  let!(:lti_user_id) { Lti::Asset.opaque_identifier_for(@student) }
+  let!(:lti_user_id) { Lti::V1p1::Asset.opaque_identifier_for(@student) }
   let(:return_url) { "http://www.platform.com/return_url" }
   let(:user) { @student }
   let(:opts) { { resource_type: "course_navigation", domain: "test.com" } }

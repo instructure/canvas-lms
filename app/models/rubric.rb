@@ -134,7 +134,7 @@ class Rubric < ActiveRecord::Base
     # remove this and 'unarchive' method when feature flag is removed
     return unless enhanced_rubrics_enabled?
 
-    InstStatsd::Statsd.increment("#{context.class.to_s.downcase}.rubrics.archived")
+    InstStatsd::Statsd.distributed_increment("#{context.class.to_s.downcase}.rubrics.archived")
     super
   end
 
@@ -608,6 +608,6 @@ class Rubric < ActiveRecord::Base
   end
 
   def self.rubric_self_assessment_enabled?(context_to_check)
-    context_to_check.feature_enabled?(:enhanced_rubrics) && context_to_check.feature_enabled?(:platform_service_speedgrader) && context_to_check.root_account.feature_enabled?(:rubric_self_assessment)
+    context_to_check.feature_enabled?(:enhanced_rubrics) && context_to_check.root_account.feature_enabled?(:rubric_self_assessment)
   end
 end

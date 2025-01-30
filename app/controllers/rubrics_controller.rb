@@ -30,6 +30,11 @@ class RubricsController < ApplicationController
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
     return unless authorized_action(@context, @current_user, permission)
 
+    if @context.is_a?(Course) && @context.horizon_course?
+      redirect_to named_context_url(@context, :context_context_modules_url)
+      return
+    end
+
     js_env ROOT_OUTCOME_GROUP: get_root_outcome,
            PERMISSIONS: {
              manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
@@ -284,7 +289,7 @@ class RubricsController < ApplicationController
 
   def track_metrics
     if @association_object.is_a?(Assignment)
-      InstStatsd::Statsd.increment("#{@context.class.to_s.downcase}.rubrics.created_from_assignment")
+      InstStatsd::Statsd.distributed_increment("#{@context.class.to_s.downcase}.rubrics.created_from_assignment")
     end
   end
 end

@@ -19,14 +19,18 @@
 import React from 'react'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {canvasPlatformSettings} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import {type LtiPlacement} from '../../model/LtiPlacement'
+import type {LtiPlacement} from '../../model/LtiPlacement'
 
 export const usePlacements = (registration: LtiImsRegistration): LtiPlacement[] => {
   return React.useMemo(() => {
-    return (
-      canvasPlatformSettings(registration.default_configuration)?.settings.placements.map(
-        p => p.placement,
-      ) ?? []
-    )
-  }, [registration.default_configuration])
+    return getPlacements(registration)
+  }, [registration])
+}
+
+export const getPlacements = (registration: LtiImsRegistration): LtiPlacement[] => {
+  return (
+    canvasPlatformSettings(registration.default_configuration)?.settings.placements.map(
+      p => p.placement,
+    ) ?? []
+  )
 }

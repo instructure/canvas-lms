@@ -124,7 +124,7 @@ export const RubricTable = ({
             sortDirection={sortedColumn === 'Criterion' ? sortDirection : undefined}
             data-testid="rubric-criterion-header"
           >
-            {I18n.t('Criterion')}
+            {I18n.t('Criteria')}
           </ColHeader>
           <ColHeader
             id="LocationUsed"

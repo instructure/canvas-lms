@@ -41,11 +41,11 @@ module Canvas
       # which is usually a subsystem label
       stat_tags[:type] = all_tags[:type]
       stat_tags[:category] = category.to_s
-      InstStatsd::Statsd.increment("errors.#{level}", tags: stat_tags)
+      InstStatsd::Statsd.distributed_increment("errors.#{level}", tags: stat_tags)
       if cause_category.present?
         # if there's an inner exception, let's stat that one too.
         cause_tags = stat_tags.merge({ category: cause_category.to_s })
-        InstStatsd::Statsd.increment("errors.#{level}", tags: cause_tags)
+        InstStatsd::Statsd.distributed_increment("errors.#{level}", tags: cause_tags)
       end
     end
   end

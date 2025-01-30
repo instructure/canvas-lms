@@ -170,7 +170,7 @@ class CommunicationChannelsController < ApplicationController
     skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&
                         (Account.site_admin.grants_right?(@current_user, :manage_students) || @domain_root_account.grants_right?(@current_user, :manage_students))
 
-    InstStatsd::Statsd.increment("communication_channels.create.skip_confirmation") if skip_confirmation
+    InstStatsd::Statsd.distributed_increment("communication_channels.create.skip_confirmation") if skip_confirmation
 
     if params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
       unless @access_token

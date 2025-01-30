@@ -384,11 +384,15 @@ class Pseudonym < ActiveRecord::Base
     communication_channels.each { |cc| cc.update_attribute(:workflow_state, "retired") }
   end
 
+  def invalid_email?
+    (!account || account.email_pseudonyms) &&
+      !deleted? &&
+      (unique_id.blank? ||
+        !EmailAddressValidator.valid?(unique_id))
+  end
+
   def validate_unique_id
-    if (!account || account.email_pseudonyms) &&
-       !deleted? &&
-       (unique_id.blank? ||
-       !EmailAddressValidator.valid?(unique_id))
+    if invalid_email?
       errors.add(:unique_id, "not_email")
       throw :abort
     end

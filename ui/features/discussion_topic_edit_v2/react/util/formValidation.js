@@ -112,7 +112,6 @@ const validateGradedDiscussionFields = (
 
   if (
     ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT &&
-    ENV.FEATURES?.selective_release_ui_api &&
     assignedInfoList &&
     postToSis
   ) {

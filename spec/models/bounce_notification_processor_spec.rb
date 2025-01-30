@@ -124,15 +124,15 @@ describe BounceNotificationProcessor do
       expect(queue).to expectation
       allow(bnp).to receive(:bounce_queue).and_return(queue)
       allow(CommunicationChannel).to receive(:bounce_for_path)
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       bnp.process
-      expect(InstStatsd::Statsd).to have_received(:increment)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment)
         .with("bounce_notification_processor.processed.transient").once
-      expect(InstStatsd::Statsd).to have_received(:increment)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment)
         .with("bounce_notification_processor.processed.no_bounce").twice
-      expect(InstStatsd::Statsd).to have_received(:increment)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment)
         .with("bounce_notification_processor.processed.suppression").exactly(3).times
-      expect(InstStatsd::Statsd).to have_received(:increment)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment)
         .with("bounce_notification_processor.processed.permanent").exactly(4).times
     end
   end

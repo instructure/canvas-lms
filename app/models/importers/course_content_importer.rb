@@ -251,12 +251,12 @@ module Importers
         Lti::PlatformNotificationService.notify_tools_in_course(course, notice)
       end
 
-      InstStatsd::Statsd.increment("content_migrations.import_success")
+      InstStatsd::Statsd.distributed_increment("content_migrations.import_success")
       duration = Time.zone.now - migration.created_at
       InstStatsd::Statsd.timing("content_migrations.import_duration", duration, tags: { migration_type: migration.migration_type })
       migration.imported_migration_items
     rescue Exception # rubocop:disable Lint/RescueException
-      InstStatsd::Statsd.increment("content_migrations.import_failure")
+      InstStatsd::Statsd.distributed_increment("content_migrations.import_failure")
       raise
     end
 

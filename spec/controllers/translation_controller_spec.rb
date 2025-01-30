@@ -24,7 +24,7 @@ describe TranslationController do
 
   before do
     allow(Translation).to receive_messages(available?: true, create: "translated.")
-    allow(InstStatsd::Statsd).to receive(:increment)
+    allow(InstStatsd::Statsd).to receive(:distributed_increment)
     user_session(@user)
   end
 
@@ -35,7 +35,7 @@ describe TranslationController do
     expect(response).to be_successful
     expect(Translation).to have_received(:create).exactly(2)
     expect(response.parsed_body["translated_text"]).to eq("translated.\ntranslated.")
-    expect(InstStatsd::Statsd).to have_received(:increment).with("translation.inbox_compose")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.inbox_compose")
   end
 
   it "POST #translate" do
@@ -47,7 +47,7 @@ describe TranslationController do
 
     # Assert
     expect(response).to be_successful
-    expect(InstStatsd::Statsd).to have_received(:increment).with("translation.discussions")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.discussions")
     expect(response.parsed_body["translated_text"]).to eq("translated.")
   end
 
@@ -67,7 +67,7 @@ describe TranslationController do
 
       # Assert
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:increment).with("translation.inbox")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.inbox")
     end
   end
 end

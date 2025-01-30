@@ -18,8 +18,8 @@
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import WikiPageIndexEditDialog from './WikiPageIndexEditDialog'
 import WikiPageDeleteDialog from '@canvas/wiki/backbone/views/WikiPageDeleteDialog'
+import renderWikiPageIndexEditModal from '../../react/WikiPageIndexEditModal'
 import PublishIconView from '@canvas/publish-icon-view'
 import LockIconView from '@canvas/lock-icon'
 import template from '../../jst/WikiPageIndexItem.handlebars'
@@ -59,6 +59,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     this.optionProperty('contextName')
     this.optionProperty('selectedPages')
     this.optionProperty('collectionHasTodoDate')
+    this.optionProperty('editModalRoot')
   }
 
   initialize() {
@@ -92,7 +93,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
       json.cannot_edit_by_master_course = json.master_course_restrictions.content
     }
 
-    json.show_assign_to = !!ENV.FEATURES?.selective_release_ui_api && this.contextName === 'courses'
+    json.show_assign_to = this.contextName === 'courses'
     json.wiki_page_menu_tools = ENV.wiki_page_menu_tools || []
     json.wiki_page_menu_tools.forEach(tool => {
       return (tool.url = tool.base_url + `&pages[]=${this.model.get('page_id')}`)
@@ -159,23 +160,25 @@ export default class WikiPageIndexItemView extends Backbone.View {
   editPage(ev = {}) {
     ev.preventDefault()
 
-    const $curCog = $(ev.target).parents('td').children().find('.al-trigger')
-
-    const editDialog = new WikiPageIndexEditDialog({
+    renderWikiPageIndexEditModal(this.editModalRoot, {
       model: this.model,
-      returnFocusTo: $curCog,
+      modalOpen: true,
+      closeModal: this.closeEditModal.bind(this),
     })
-    editDialog.open()
+  }
+
+  closeEditModal = focusEl => {
+    renderWikiPageIndexEditModal(this.editModalRoot, {
+      model: this.model,
+      modalOpen: false,
+      closeModal: this.closeEditModal.bind(this),
+    })
 
     const {indexView} = this
-    const {collection} = this
-    return editDialog.on('success', function () {
-      indexView.focusAfterRenderSelector = `a#${this.model.get('page_id')}-menu.al-trigger`
-      indexView.currentSortField = null
-      indexView.renderSortHeaders()
-
-      return collection.fetch({page: 'current'})
-    })
+    indexView.focusAfterRenderSelector = focusEl
+    indexView.currentSortField = null
+    indexView.renderSortHeaders()
+    return this.collection.fetch({page: 'current'})
   }
 
   deletePage(ev = {}) {

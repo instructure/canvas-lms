@@ -18,14 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CoursePacing::PaceContextsPresenter
-  def self.as_json(pace_context)
+  def self.as_json(pace_context, overdue_items_by_user = {})
     {
       name: display_name_for(pace_context),
       type: pace_context.class_name,
       item_id: pace_context.id,
       associated_section_count: pace_context.try(:course_sections).try(:count),
       associated_student_count: pace_context.try(:student_enrollments).try(:count),
-      applied_pace: applied_pace_for(pace_context)
+      applied_pace: applied_pace_for(pace_context),
+      on_pace: on_pace_for(pace_context, overdue_items_by_user)
     }
   end
 
@@ -49,5 +50,15 @@ class CoursePacing::PaceContextsPresenter
       duration: applied_pace.duration,
       last_modified: applied_pace.published_at&.utc
     }
+  end
+
+  def self.on_pace_for(pace_context, overdue_items_by_user)
+    # Only calculate on_pace for StudentEnrollment
+    return nil unless pace_context.is_a?(StudentEnrollment)
+
+    overdue_items = overdue_items_by_user[pace_context.user.id] || []
+
+    # If there are no overdue items, the student is on pace
+    overdue_items.empty?
   end
 end

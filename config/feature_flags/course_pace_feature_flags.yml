@@ -10,3 +10,15 @@ course_pace_download_document:
   applies_to: RootAccount
   display_name: Course Pace Download Document
   description: Allows for downloading a document that contains the course pace information
+
+course_pace_time_selection:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Pace Select dates and time
+  description: Allows for selecting dates and times for the course pace
+
+course_pace_pacing_status_labels:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Pace Display student and assignment pace status
+  description: Allows for diaplaying On Pace or Off Pace labels for students and module items

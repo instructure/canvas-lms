@@ -94,15 +94,39 @@ describe SisBatch do
     expect(enrollment.scores.exists?).to be true
   end
 
+  it "restores ad-hoc assignment overrides when restoring enrollments" do
+    course = @account.courses.create!(name: "one", sis_source_id: "c1")
+    user = user_with_managed_pseudonym(account: @account, sis_user_id: "u1")
+    group = course.groups.create! name: "group1"
+    group.add_user(user)
+    course.enroll_user(user, "StudentEnrollment", enrollment_state: "active")
+    assignment = assignment_model(course:, only_visible_to_overrides: true)
+    override = assignment_override_model(assignment:)
+    aos = override.assignment_override_students.create!(user:)
+
+    batch = process_csv_data([%(course_id,user_id,role,status
+                                c1,u1,student,deleted)])
+    expect(batch.reload.data[:statistics][:AssignmentOverrideStudent]).to eq({ created: 0, restored: 0, deleted: 1 })
+    expect(override.reload).to be_deleted
+    expect(aos.reload).to be_deleted
+    aos_rollback_data = batch.roll_back_data.where(context: aos).to_a
+    expect(aos_rollback_data.map { |d| [d.previous_workflow_state, d.updated_workflow_state] }).to eq [["active", "deleted"]]
+
+    batch.restore_states_for_batch
+    expect(batch.reload.data[:statistics][:AssignmentOverrideStudent]).to eq({ created: 0, restored: 1, deleted: 1 })
+    expect(override.reload).to be_active
+    expect(aos.reload).to be_active
+  end
+
   it "logs stats" do
-    allow(InstStatsd::Statsd).to receive(:increment)
+    allow(InstStatsd::Statsd).to receive(:distributed_increment)
     process_csv_data([%(user_id,login_id,status
                         user_1,user_1,active)])
-    expect(InstStatsd::Statsd).to have_received(:increment).with("sis_batch_completed", tags: { failed: false })
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("sis_batch_completed", tags: { failed: false })
   end
 
   it "restores linked observers when restoring enrollments" do
-    allow(InstStatsd::Statsd).to receive(:increment)
+    allow(InstStatsd::Statsd).to receive(:distributed_increment)
     course = @account.courses.create!(name: "one", sis_source_id: "c1", workflow_state: "available")
     user = user_with_managed_pseudonym(account: @account, sis_user_id: "u1")
     observer = user_with_managed_pseudonym(account: @account)
@@ -119,7 +143,7 @@ describe SisBatch do
     run_jobs
     expect(student_enrollment.reload.workflow_state).to eq "active"
     expect(observer_enrollment.reload.workflow_state).to eq "active"
-    expect(InstStatsd::Statsd).to have_received(:increment).with("sis_batch_restored", tags:)
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("sis_batch_restored", tags:)
   end
 
   it "captures job failures on restore" do

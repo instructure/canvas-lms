@@ -22,8 +22,24 @@ import {updateModuleItem} from '../jquery/utils'
 import publishOneModuleHelperModule from '../utils/publishOneModuleHelper'
 import {initBody, makeModuleWithItems} from './testHelpers'
 import type {KeyedModuleItems} from '../react/types'
+import RelockModulesDialog from '@canvas/relock-modules-dialog'
 
-const mockDoFetchApi = jest.fn() as jest.MockedFunction<typeof doFetchApi>
+jest.mock('@canvas/do-fetch-api-effect', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}))
+
+jest.mock('@canvas/relock-modules-dialog', () => {
+  return jest.fn().mockImplementation(() => ({
+    renderIfNeeded: jest.fn().mockImplementation(json => {
+      if (json.relock_warning) {
+        const dialog = document.createElement('div')
+        dialog.className = 'relock-modules-dialog'
+        document.body.appendChild(dialog)
+      }
+    }),
+  }))
+})
 
 const {
   batchUpdateOneModuleApiCall,
@@ -38,8 +54,6 @@ const {
 } = {
   ...publishOneModuleHelperModule,
 }
-
-jest.mock('@canvas/do-fetch-api-effect')
 
 jest.mock('../jquery/utils', () => {
   const originalModule = jest.requireActual('../jquery/utils')
@@ -61,17 +75,18 @@ describe('publishOneModuleHelper', () => {
   })
 
   beforeEach(() => {
-    mockDoFetchApi.mockResolvedValue({
-      response: new Response('', {status: 200}),
-      text: '',
-      json: {published: true},
-    })
+    ;(doFetchApi as jest.Mock).mockImplementation(() =>
+      Promise.resolve({
+        response: new Response('', {status: 200}),
+        text: '',
+        json: {published: true},
+      }),
+    )
     initBody()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    mockDoFetchApi.mockReset()
     document.body.innerHTML = ''
   })
 
@@ -84,7 +99,7 @@ describe('publishOneModuleHelper', () => {
     afterEach(() => {
       spy.mockRestore()
     })
-    it('calls batchUpdateOneModuleApiCall with the correct argumets', () => {
+    it('calls batchUpdateOneModuleApiCall with the correct argumets', async () => {
       const spy = jest.spyOn(publishOneModuleHelperModule, 'batchUpdateOneModuleApiCall')
       const courseId = 1
       const moduleId = 1
@@ -121,7 +136,7 @@ describe('publishOneModuleHelper', () => {
     afterEach(() => {
       spy.mockRestore()
     })
-    it('calls batchUpdateOneModuleApiCall with the correct argumets', () => {
+    it('calls batchUpdateOneModuleApiCall with the correct argumets', async () => {
       const courseId = 1
       const moduleId = 1
       const skipItems = false
@@ -138,33 +153,38 @@ describe('publishOneModuleHelper', () => {
   })
 
   describe('batchUpdateOneModuleApiCall', () => {
-    let spy: jest.SpyInstance
-    let spy2: jest.SpyInstance
+    let spy: jest.SpyInstance | null = null
+    let spy2: jest.SpyInstance | null = null
     beforeEach(() => {
       makeModuleWithItems(1, [117, 119], false)
       makeModuleWithItems(2, [217, 219], true)
-
-      // the batch update
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        text: '',
-        json: {published: true},
-      })
     })
     afterEach(() => {
       spy?.mockRestore()
+      // @ts-expect-error
       spy2?.mockRestore()
     })
 
     it('PUTS the batch request then GETs the updated results', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        text: '',
-        json: [
-          {id: '117', published: true},
-          {id: '119', published: true},
-        ],
-      })
+      ;(doFetchApi as jest.Mock)
+        .mockImplementationOnce(() =>
+          Promise.resolve({
+            response: new Response('', {status: 200}),
+            text: '',
+            json: {published: true},
+          }),
+        )
+        .mockImplementationOnce(() =>
+          Promise.resolve({
+            response: new Response('', {status: 200}),
+            text: '',
+            json: [
+              {id: '117', published: true},
+              {id: '119', published: true},
+            ],
+          }),
+        )
+
       await batchUpdateOneModuleApiCall(1, 2, false, true, 'loading message', 'success message')
 
       expect(doFetchApi).toHaveBeenCalledTimes(2)
@@ -205,81 +225,114 @@ describe('publishOneModuleHelper', () => {
     })
 
     it('updates the module items when skipping item update', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        text: '',
-        json: [{id: '117', published: true}],
-      })
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        text: '',
-        json: [{id: '119', published: true}],
-      })
       spy = jest.spyOn(publishOneModuleHelperModule, 'updateModuleItemsPublishedStates')
-      spy2 = jest.spyOn(publishOneModuleHelperModule, 'updateModuleItemPublishedState')
-      await batchUpdateOneModuleApiCall(1, 1, true, true, 'loading message', 'success message')
-      expect(spy).toHaveBeenCalledTimes(1)
-      expect(spy).toHaveBeenCalledWith(1, undefined, true)
-      // one for each item when disabling before the update +
-      // one for each item after the fetch completes (which happens over 2 pages)
-      // even if skipItems is true
-      expect(spy2).toHaveBeenCalledTimes(4)
+      await batchUpdateOneModuleApiCall(1, 2, false, true, 'loading message', 'success message')
+      await waitFor(() => {
+        expect(spy).toHaveBeenCalledTimes(1)
+        expect(spy).toHaveBeenCalledWith(2, undefined, true)
+      })
     })
 
     it('updates the module items when publishing item update', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        text: '',
-        json: [{id: '117', published: true}],
-      })
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        text: '',
-        json: [{id: '119', published: true}],
-      })
-      spy = jest.spyOn(publishOneModuleHelperModule, 'updateModuleItemsPublishedStates')
-      spy2 = jest.spyOn(publishOneModuleHelperModule, 'updateModuleItemPublishedState')
-      await batchUpdateOneModuleApiCall(1, 1, true, false, 'loading message', 'success message')
+      spy = jest.spyOn(publishOneModuleHelperModule, 'fetchModuleItemPublishedState')
+      await batchUpdateOneModuleApiCall(1, 2, false, false, 'loading message', 'success message')
       expect(spy).toHaveBeenCalledTimes(1)
-      expect(spy).toHaveBeenCalledWith(1, undefined, true)
-      expect(spy2).toHaveBeenCalledTimes(4)
+      expect(spy).toHaveBeenCalledWith(1, 2)
     })
 
     it('shows an alert if not all items were published', async () => {
-      mockDoFetchApi.mockReset()
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        text: '',
-        json: {published: true, publish_warning: true},
-      })
+      ;(doFetchApi as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          response: new Response('', {status: 200}),
+          text: '',
+          json: {published: true, publish_warning: true},
+        }),
+      )
 
-      await batchUpdateOneModuleApiCall(1, 1, true, true, 'loading message', 'success message')
-      expect(getAllByText(document.body, 'Some module items could not be published')).toHaveLength(
-        2,
-      ) // one visual, one screenreader alert
+      await batchUpdateOneModuleApiCall(1, 2, false, true, 'loading message', 'success message')
+      await waitFor(() => {
+        expect(
+          getAllByText(document.body, 'Some module items could not be published'),
+        ).toHaveLength(2)
+      })
     })
 
     it('shows an alert if the publish failed', async () => {
-      mockDoFetchApi.mockRejectedValueOnce(new Error('whoops'))
+      ;(doFetchApi as jest.Mock).mockRejectedValueOnce(new Error('whoops'))
 
       await batchUpdateOneModuleApiCall(1, 1, true, true, 'loading message', 'success message')
-      expect(
-        getAllByText(document.body, 'There was an error while saving your changes'),
-      ).toHaveLength(2) // one visual, one screenreader alert
+      await waitFor(() => {
+        expect(
+          getAllByText(document.body, 'There was an error while saving your changes'),
+        ).toHaveLength(2)
+      })
     })
 
     it('shows the re-lock modal when necessary', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        text: '',
-        json: {published: true, relock_warning: true},
-      })
+      ;(doFetchApi as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          response: new Response('', {status: 200}),
+          text: '',
+          json: {published: true, relock_warning: true},
+        }),
+      )
 
-      await batchUpdateOneModuleApiCall(1, 1, true, true, 'loading message', 'success message')
-      expect(
-        // @ts-expect-error
-        getByText(document.querySelector('.ui-dialog'), 'Requirements Changed'),
-      ).toBeInTheDocument()
+      await batchUpdateOneModuleApiCall(1, 2, false, true, 'loading message', 'success message')
+      await waitFor(() => {
+        expect(document.querySelector('.relock-modules-dialog')).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('fetchModuleItemPublishedState', () => {
+    beforeEach(() => {
+      makeModuleWithItems(1, [117, 119], false)
+    })
+
+    it('GETs the module item states', async () => {
+      ;(doFetchApi as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({
+          response: new Response('', {status: 200}),
+          text: '',
+          json: [{id: '117', published: true}],
+        }),
+      )
+
+      await fetchModuleItemPublishedState(1, 1)
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'GET',
+        path: '/api/v1/courses/1/modules/1/items',
+      })
+    })
+
+    it('exhausts paginated responses', async () => {
+      ;(doFetchApi as jest.Mock)
+        .mockImplementationOnce(() =>
+          Promise.resolve({
+            response: new Response('', {status: 200}),
+            text: '',
+            json: [{id: '117', published: true}],
+            link: {next: {url: '/next-page'}},
+          }),
+        )
+        .mockImplementationOnce(() =>
+          Promise.resolve({
+            response: new Response('', {status: 200}),
+            text: '',
+            json: [{id: '119', published: true}],
+          }),
+        )
+
+      await fetchModuleItemPublishedState(1, 1)
+      expect(doFetchApi).toHaveBeenCalledTimes(2)
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'GET',
+        path: '/api/v1/courses/1/modules/1/items',
+      })
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'GET',
+        path: '/next-page',
+      })
     })
   })
 
@@ -422,39 +475,6 @@ describe('publishOneModuleHelper', () => {
           .querySelector('#context_module_item_2117 .ig-row')
           ?.classList.contains('ig-published'),
       ).toBe(false)
-    })
-  })
-
-  describe('fetchModuleItemPublishedState', () => {
-    beforeEach(() => {
-      mockDoFetchApi.mockResolvedValue({
-        response: new Response('', {status: 200}),
-        text: '',
-        json: [],
-      })
-    })
-    it('GETs the module item states', () => {
-      fetchModuleItemPublishedState(7, 8)
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'GET',
-        path: '/api/v1/courses/7/modules/8/items',
-      })
-    })
-    it('exhausts paginated responses', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        text: '',
-        json: [{id: '1', published: true}],
-        link: {next: {url: '/another/page'}},
-      })
-
-      fetchModuleItemPublishedState(7, 8)
-      await waitFor(() => expect(doFetchApi).toHaveBeenCalledTimes(2))
-      expect(doFetchApi).toHaveBeenLastCalledWith({
-        method: 'GET',
-        path: '/another/page',
-      })
     })
   })
 

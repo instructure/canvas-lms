@@ -21,6 +21,7 @@ import type {FilterItem} from '../../models/Filter'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import type {DiscoverParams} from '../../hooks/useDiscoverQueryParams'
 
 const I18n = createI18nScope('lti_registrations')
@@ -68,8 +69,12 @@ export default function FilterTags(props: {
             return (
               <Flex.Item padding="0 small 0 0" key={filter.id}>
                 <Tag
-                  ref={el => el && (tagRefs.current[index] = el)}
-                  text={filter.name}
+                 ref={el => el && (tagRefs.current[index] = el)}
+                 text={
+                    <AccessibleContent alt={I18n.t('Remove filter %{filterName}', {filterName: filter.name})}>
+                      {filter.name}
+                    </AccessibleContent>
+                  }
                   dismissible={true}
                   onClick={() => removeFilter(filter, index)}
                 />

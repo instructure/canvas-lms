@@ -143,31 +143,31 @@ describe "Wiki Pages" do
       end
 
       it "sets focus back to the cog menu if you cancel the dialog" do
-        f(".ui-dialog-buttonset .btn").click
+        fj("button:contains('Cancel')").click
         check_element_has_focus(f("tbody .al-trigger"))
       end
 
       it "sets focus back to the cog if you press escape" do
-        f(".ui-dialog-buttonset .btn").send_keys(:escape)
+        f('[data-testid="wikiTitleEditModal"] input').send_keys(:escape)
         check_element_has_focus(f("tbody .al-trigger"))
       end
 
       it "sets focus back to the cog if you click the dialog close button" do
-        f(".ui-dialog-titlebar-close").click
+        f('[data-testid="wikiTitleEditModalHeader"] button').click
         check_element_has_focus(f("tbody .al-trigger"))
       end
 
       it "returns focus to the dialog if you cancel, then reopen the dialog" do
-        f(".ui-dialog-titlebar-close").click
+        f('[data-testid="wikiTitleEditModalHeader"] button').click
         check_element_has_focus(f("tbody .al-trigger"))
         f("tbody .al-trigger").click
         f(".edit-menu-item").click
         wait_for_ajaximations
-        check_element_has_focus(ff(".page-edit-dialog .edit-control-text").last)
+        check_element_has_focus(f('[data-testid="wikiTitleEditModalHeader"] button'))
       end
 
       it "sets focus back to the cog menu if you edit the title and save" do
-        f(".ui-dialog-buttonset .btn-primary").click
+        fj("button:contains('Save')").click
         wait_for_ajaximations
         check_element_has_focus(f("tbody .al-trigger"))
       end

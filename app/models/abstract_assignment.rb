@@ -61,6 +61,7 @@ class AbstractAssignment < ActiveRecord::Base
     graders_anonymous_to_graders
     anonymous_instructor_annotations
   ].freeze
+  HORIZON_SUBMISSION_TYPES = %w[online_text_entry online_upload external_tool].freeze
 
   DEFAULT_POINTS_POSSIBLE = 0
 
@@ -105,7 +106,6 @@ class AbstractAssignment < ActiveRecord::Base
   has_many :provisional_grades, through: :submissions
   belongs_to :annotatable_attachment, class_name: "Attachment"
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :assignment_student_visibilities, inverse_of: :assignment, foreign_key: :assignment_id
   has_one :quiz, class_name: "Quizzes::Quiz", inverse_of: :assignment, foreign_key: :assignment_id
   belongs_to :assignment_group
   has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }, inverse_of: :assignment, foreign_key: :assignment_id
@@ -210,6 +210,7 @@ class AbstractAssignment < ActiveRecord::Base
   validates :grader_count, numericality: true
   validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
   validates :sis_source_id, uniqueness: { scope: :root_account_id }, allow_nil: true
+  validates_with HorizonValidators::AssignmentValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true
@@ -875,7 +876,7 @@ class AbstractAssignment < ActiveRecord::Base
     return unless quiz_lti?
 
     if anonymous_grading_changed?(to: true)
-      InstStatsd::Statsd.increment("assignment.new_quiz.anonymous.enabled")
+      InstStatsd::Statsd.distributed_increment("assignment.new_quiz.anonymous.enabled")
     end
   end
 
@@ -2566,7 +2567,7 @@ class AbstractAssignment < ActiveRecord::Base
     # move the following 2 lines out of the trnx
     # make the trnx simpler. The trnx will have fewer locks and rollbacks.
     homework_lti_user_id_hash = students.to_h do |student|
-      [student.global_id, Lti::Asset.opaque_identifier_for(student)]
+      [student.global_id, Lti::V1p1::Asset.opaque_identifier_for(student)]
     end
     submissions = find_or_create_submissions(students, Submission.preload(:grading_period)).sort_by(&:id)
 
@@ -3176,8 +3177,8 @@ class AbstractAssignment < ActiveRecord::Base
   scope :for_course, ->(course_id) { where(context_type: "Course", context_id: course_id) }
   scope :for_group_category, ->(group_category_id) { where(group_category_id:) }
 
-  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:).map(&:assignment_id)
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids, assignment_ids = nil|
+    visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:, assignment_ids:).map(&:assignment_id)
 
     if visible_assignment_ids.any?
       where(id: visible_assignment_ids)

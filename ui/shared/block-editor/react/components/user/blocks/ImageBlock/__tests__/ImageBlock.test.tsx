@@ -81,7 +81,7 @@ describe('ImageBlock', () => {
         height: 201,
       })
       const img = container.querySelector('.image-block') as HTMLElement
-      expect(img).toHaveStyle({height: '201%', width: '101%'})
+      expect(img).toHaveStyle({width: '101%', height: '201px'})
     })
 
     it('should render %width and auto height with "percent" sizeVariant and maintainAspectRatio', () => {
@@ -93,8 +93,7 @@ describe('ImageBlock', () => {
         maintainAspectRatio: true,
       })
       const img = container.querySelector('.image-block') as HTMLElement
-      expect(img).toHaveStyle({height: 'auto'})
-      expect(img.style.width).toMatch(/%$/)
+      expect(img).toHaveStyle({width: '101%', height: 'auto'})
     })
   })
 

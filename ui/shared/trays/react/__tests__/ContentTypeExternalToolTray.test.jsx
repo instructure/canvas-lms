@@ -22,10 +22,14 @@ import {render, fireEvent} from '@testing-library/react'
 import ContentTypeExternalToolTray from '../ContentTypeExternalToolTray'
 
 describe('ContentTypeExternalToolTray', () => {
-  const tool = {id: '1', base_url: 'https://one.lti.com/', title: 'First LTI'}
+  let tool
   const onDismiss = jest.fn()
   const onExternalContentReady = jest.fn()
   const extraQueryParams = {param1: 'value1', param2: 'value2'}
+
+  beforeEach(() => {
+    tool = {id: '1', base_url: 'https://one.lti.com/', title: 'First LTI'}
+  })
 
   function renderTray(props) {
     return render(
@@ -53,7 +57,7 @@ describe('ContentTypeExternalToolTray', () => {
   it('calls onDismiss when close button is clicked', () => {
     const {getByText} = renderTray()
     fireEvent.click(getByText('Close'))
-    expect(onDismiss.mock.calls).toHaveLength(1)
+    expect(onDismiss).toHaveBeenCalledTimes(1)
   })
 
   describe('external content message handling', () => {

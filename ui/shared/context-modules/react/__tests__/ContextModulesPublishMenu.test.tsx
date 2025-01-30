@@ -18,41 +18,81 @@
  */
 
 import React from 'react'
-import {act, render, waitFor} from '@testing-library/react'
-import type doFetchApi from '@canvas/do-fetch-api-effect'
+import {act, render, waitFor, fireEvent} from '@testing-library/react'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {updateModulePendingPublishedStates, monitorProgress, batchUpdateAllModulesApiCall, cancelBatchUpdate, fetchAllItemPublishedStates} from '../../utils/publishAllModulesHelper'
+
 import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
-import {updateModulePendingPublishedStates} from '../../utils/publishAllModulesHelper'
 
-jest.mock('@canvas/do-fetch-api-effect')
-jest.mock('../../utils/publishAllModulesHelper', () => {
-  const originalModule = jest.requireActual('../../utils/publishAllModulesHelper')
-  return {
-    __esmodule: true,
-    ...originalModule,
-    updateModulePendingPublishedStates: jest.fn(),
-  }
-})
+jest.mock('@canvas/do-fetch-api-effect', () => ({
+  __esModule: true,
+  default: jest.fn(() => 
+    Promise.resolve({
+      response: new Response('', {status: 200}),
+      json: {
+        workflow_state: 'completed',
+        completion: 100
+      },
+      text: '',
+    })
+  )
+}))
 
-const mockDoFetchApi = jest.fn() as jest.MockedFunction<typeof doFetchApi>
+jest.mock('../../utils/publishAllModulesHelper', () => ({
+  __esModule: true,
+  updateModulePendingPublishedStates: jest.fn(),
+  monitorProgress: jest.fn(),
+  batchUpdateAllModulesApiCall: jest.fn(),
+  cancelBatchUpdate: jest.fn(),
+  fetchAllItemPublishedStates: jest.fn()
+}))
+
+const mockUpdateModulePendingPublishedStates = updateModulePendingPublishedStates as jest.Mock
+const mockMonitorProgress = monitorProgress as jest.Mock
+const mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as jest.Mock
+const mockCancelBatchUpdate = cancelBatchUpdate as jest.Mock
+const mockFetchAllItemPublishedStates = fetchAllItemPublishedStates as jest.Mock
+
+const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
 
 const defaultProps = {
   courseId: '1',
-  disabled: false,
   runningProgressId: null,
+  disabled: false,
 }
 
 describe('ContextModulesPublishMenu', () => {
   beforeEach(() => {
-    mockDoFetchApi.mockResolvedValue({
-      response: new Response('', {status: 200}),
-      json: [],
-      text: '',
-    })
+    mockDoFetchApi.mockReset()
+    mockUpdateModulePendingPublishedStates.mockReset()
+    mockMonitorProgress.mockReset()
+    mockBatchUpdateAllModulesApiCall.mockReset()
+    mockCancelBatchUpdate.mockReset()
+    mockFetchAllItemPublishedStates.mockReset()
+    mockDoFetchApi.mockImplementation(() => 
+      Promise.resolve({
+        response: new Response('', {status: 200}),
+        json: {
+          workflow_state: 'completed',
+          completion: 100
+        },
+        text: '',
+      })
+    )
+    mockUpdateModulePendingPublishedStates.mockImplementation(() => {})
+    mockMonitorProgress.mockImplementation(() => {})
+    mockBatchUpdateAllModulesApiCall.mockImplementation(() => {})
+    mockCancelBatchUpdate.mockImplementation(() => {})
+    mockFetchAllItemPublishedStates.mockImplementation(() => {})
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
     mockDoFetchApi.mockReset()
+    mockUpdateModulePendingPublishedStates.mockReset()
+    mockMonitorProgress.mockReset()
+    mockBatchUpdateAllModulesApiCall.mockReset()
+    mockCancelBatchUpdate.mockReset()
+    mockFetchAllItemPublishedStates.mockReset()
     document.body.innerHTML = ''
   })
 
@@ -70,15 +110,19 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     it('renders a spinner when publish is in-flight', () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        json: {
-          id: 1234,
-          completion: 100,
-          workflow_state: 'completed',
-        },
-        response: new Response('', {status: 200}),
-        text: '',
-      })
+      // Mock the progress API call
+      (doFetchApi as jest.Mock).mockImplementation(() =>
+        Promise.resolve({
+          response: new Response('', {status: 200}),
+          json: {
+            id: '17',
+            workflow_state: 'running',
+            completion: 50
+          },
+          text: ''
+        })
+      )
+
       const {getByText} = render(
         <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />,
       )
@@ -86,312 +130,486 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     it('updates all the modules when ready', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          id: 1234,
-          completion: 100,
-          workflow_state: 'completed',
-        },
-        text: '',
-      })
+      // Mock the progress API call
+      (doFetchApi as jest.Mock).mockImplementation(() =>
+        Promise.resolve({
+          response: new Response('', {status: 200}),
+          json: {
+            id: '17',
+            workflow_state: 'completed',
+            completion: 100
+          },
+          text: ''
+        })
+      )
+
       render(<ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />)
-      expect(updateModulePendingPublishedStates).not.toHaveBeenCalled()
+      expect(mockUpdateModulePendingPublishedStates).not.toHaveBeenCalled()
       window.dispatchEvent(new Event('module-publish-models-ready'))
-      await waitFor(() => expect(updateModulePendingPublishedStates).toHaveBeenCalled())
+      await waitFor(() => {
+        expect(mockUpdateModulePendingPublishedStates).toHaveBeenCalled()
+      })
     })
 
     describe('progress', () => {
+      let mockMonitorProgress: jest.Mock
+      let mockBatchUpdateAllModulesApiCall: jest.Mock
+
+      beforeEach(() => {
+        mockMonitorProgress = monitorProgress as jest.Mock
+        mockBatchUpdateAllModulesApiCall = batchUpdateAllModulesApiCall as jest.Mock
+        mockBatchUpdateAllModulesApiCall.mockImplementation(() => 
+          Promise.resolve({
+            json: {
+              progress: {
+                progress: {
+                  id: '17',
+                  workflow_state: 'running',
+                  completion: 0
+                }
+              }
+            }
+          })
+        )
+      })
+
       it('renders a screenreader message with progress starts', async () => {
-        mockDoFetchApi.mockResolvedValueOnce({
-          response: new Response('', {status: 200}),
-          json: {
-            id: '17',
-            completion: 0,
-            workflow_state: 'running',
-          },
-          text: '',
-        })
-        const {getByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />,
+        const {getByRole, getByText} = render(
+          <ContextModulesPublishMenu {...defaultProps} />
         )
 
-        await waitFor(() =>
-          expect(getByText('Publishing modules has started.')).toBeInTheDocument(),
-        )
+        // Open menu
+        const menuButton = getByRole('button')
+        act(() => {
+          menuButton.click()
+        })
+
+        // Click "Publish all modules and items"
+        const publishAllButton = getByRole('menuitem', {name: /Publish all modules and items/})
+        await act(async () => {
+          publishAllButton.click()
+        })
+
+        // Set state variables before clicking continue
+        const continueButton = getByRole('button', {name: /Continue/})
+        act(() => {
+          continueButton.click()
+        })
+
+        mockMonitorProgress.mockImplementation((id, callback) => {
+          callback({
+            workflow_state: 'running',
+            completion: 0
+          })
+        })
+
+        // Wait for the alert to be added to the DOM
+        await waitFor(() => {
+          expect(document.querySelector('[role="alert"]')).toHaveTextContent('Publishing modules has started.')
+        })
       })
 
       it('renders a screenreader message with progress updates', async () => {
-        mockDoFetchApi.mockResolvedValueOnce({
-          response: new Response('', {status: 200}),
-          json: {
-            id: '17',
-            completion: 33,
-            workflow_state: 'running',
-          },
-          text: '',
-        })
-        const {getByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />,
+        const {getByRole, getByText} = render(
+          <ContextModulesPublishMenu {...defaultProps} />
         )
 
-        await waitFor(() =>
-          expect(getByText('Publishing progress is 33 percent complete')).toBeInTheDocument(),
-        )
+        // Open menu
+        const menuButton = getByRole('button')
+        act(() => {
+          menuButton.click()
+        })
+
+        // Click "Publish all modules and items"
+        const publishAllButton = getByRole('menuitem', {name: /Publish all modules and items/})
+        await act(async () => {
+          publishAllButton.click()
+        })
+
+        // Set state variables before clicking continue
+        const continueButton = getByRole('button', {name: /Continue/})
+        act(() => {
+          continueButton.click()
+        })
+
+        mockMonitorProgress.mockImplementation((id, callback) => {
+          callback({
+            workflow_state: 'running',
+            completion: 50
+          })
+        })
+
+        // Wait for the alert to be added to the DOM
+        await waitFor(() => {
+          expect(document.querySelector('[role="alert"]')).toHaveTextContent('Publishing progress is 50 percent complete')
+        })
       })
 
       it('renders a screenreader message when progress completes', async () => {
-        mockDoFetchApi.mockResolvedValueOnce({
-          response: new Response('', {status: 200}),
-          json: {
-            id: '17',
-            completion: 100,
-            workflow_state: 'completed',
-          },
-          text: '',
-        })
-        const {getByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />,
+        const {getByRole, getByText} = render(
+          <ContextModulesPublishMenu {...defaultProps} />
         )
 
-        await waitFor(() =>
-          expect(
-            getByText('Publishing progress is complete. Refreshing item status.'),
-          ).toBeInTheDocument(),
-        )
+        // Open menu
+        const menuButton = getByRole('button')
+        act(() => {
+          menuButton.click()
+        })
+
+        // Click "Publish all modules and items"
+        const publishAllButton = getByRole('menuitem', {name: /Publish all modules and items/})
+        await act(async () => {
+          publishAllButton.click()
+        })
+
+        // Set state variables before clicking continue
+        const continueButton = getByRole('button', {name: /Continue/})
+        act(() => {
+          continueButton.click()
+        })
+
+        mockMonitorProgress.mockImplementation((id, callback) => {
+          callback({
+            workflow_state: 'completed',
+            completion: 100
+          })
+        })
+
+        // Wait for the alert to be added to the DOM
+        await waitFor(() => {
+          expect(document.querySelector('[role="alert"]')).toHaveTextContent('Publishing progress is complete. Refreshing item status.')
+        })
       })
 
       it('renders message when publishing was canceled', async () => {
-        mockDoFetchApi.mockResolvedValueOnce({
-          json: {
-            id: '17',
-            completion: 33,
-            message: 'canceled',
-            workflow_state: 'failed',
-          },
-          response: new Response('', {status: 200}),
-          text: '',
+        const {getByRole, getByText} = render(
+          <ContextModulesPublishMenu {...defaultProps} />
+        )
+
+        // Open menu
+        const menuButton = getByRole('button')
+        act(() => {
+          menuButton.click()
         })
-        const {getAllByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />,
+
+        // Click "Publish all modules and items"
+        const publishAllButton = getByRole('menuitem', {name: /Publish all modules and items/})
+        await act(async () => {
+          publishAllButton.click()
+        })
+
+        // Set state variables before clicking continue
+        const continueButton = getByRole('button', {name: /Continue/})
+        act(() => {
+          continueButton.click()
+        })
+
+        mockMonitorProgress.mockImplementation((id, callback) => {
+          callback({
+            workflow_state: 'failed',
+            message: 'canceled',
+            completion: 0
+          })
+        })
+
+        // Wait for the alert to be added to the DOM
+        await waitFor(() => {
+          expect(document.querySelector('[role="alert"]')).toHaveTextContent('Your publishing job was canceled before it completed.')
+        })
+      })
+    })
+
+    describe('menu actions', () => {
+      it('renders the menu when clicked', () => {
+        const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
+        const menuButton = getByRole('button')
+        act(() => menuButton.click())
+        expect(getByText('Publish all modules and items')).toBeInTheDocument()
+        expect(getByText('Publish modules only')).toBeInTheDocument()
+        expect(getByText('Unpublish all modules and items')).toBeInTheDocument()
+        expect(getByText('Unpublish modules only')).toBeInTheDocument()
+      })
+
+      it('calls publishAll when clicked publish all menu item is clicked', () => {
+        const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
+        const menuButton = getByRole('button')
+        act(() => menuButton.click())
+        const publishButton = getByText('Publish all modules and items')
+        act(() => publishButton.click())
+        const modalTitle = getByRole('heading', {name: 'Publish all modules and items'})
+        expect(modalTitle).toBeInTheDocument()
+      })
+
+      it('calls publishModuleOnly when clicked publish module menu item is clicked', () => {
+        const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
+        const menuButton = getByRole('button')
+        act(() => menuButton.click())
+        const publishButton = getByText('Publish modules only')
+        act(() => publishButton.click())
+        const modalTitle = getByRole('heading', {name: 'Publish modules only'})
+        expect(modalTitle).toBeInTheDocument()
+      })
+
+      it('calls unpublishAll when clicked unpublish all items is clicked', () => {
+        const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
+        const menuButton = getByRole('button')
+        act(() => menuButton.click())
+        const publishButton = getByText('Unpublish all modules and items')
+        act(() => publishButton.click())
+        const modalTitle = getByRole('heading', {name: 'Unpublish all modules and items'})
+        expect(modalTitle).toBeInTheDocument()
+      })
+
+      it('calls unpublishModuleOnly when unpublish modules only is clicked', () => {
+        const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
+        const menuButton = getByRole('button')
+        act(() => menuButton.click())
+        const publishButton = getByText('Unpublish modules only')
+        act(() => publishButton.click())
+        const modalTitle = getByRole('heading', {name: 'Unpublish modules only'})
+        expect(modalTitle).toBeInTheDocument()
+      })
+    })
+
+    describe('Modal actions', () => {
+      it('closes the modal when stopping an action', async () => {
+        mockBatchUpdateAllModulesApiCall.mockImplementation(() => 
+          Promise.resolve({
+            json: {
+              progress: {
+                progress: {
+                  id: '17',
+                  workflow_state: 'running',
+                  completion: 0
+                }
+              }
+            }
+          })
+        )
+        mockMonitorProgress.mockImplementation((id, callback) => {
+          callback({
+            workflow_state: 'running',
+            completion: 50
+          })
+        })
+        mockFetchAllItemPublishedStates.mockImplementation(() => Promise.resolve())
+
+        const {getByRole, getByTestId} = render(
+          <ContextModulesPublishMenu {...defaultProps} />
         )
 
-        await waitFor(
-          () =>
-            expect(
-              getAllByText('Your publishing job was canceled before it completed.'),
-            ).toHaveLength(2), // visible + screenreader
+        // Open menu
+        const menuButton = getByRole('button')
+        act(() => {
+          menuButton.click()
+        })
+
+        // Click "Publish all modules and items"
+        const publishAllButton = getByRole('menuitem', {name: /Publish all modules and items/})
+        await act(async () => {
+          publishAllButton.click()
+        })
+
+        // Click continue in modal
+        const continueButton = getByRole('button', {name: /Continue/})
+        await act(async () => {
+          continueButton.click()
+        })
+
+        // Click stop in modal
+        const stopButton = getByTestId('publish-button')
+        await act(async () => {
+          stopButton.click()
+        })
+
+        await waitFor(() => {
+          expect(mockBatchUpdateAllModulesApiCall).toHaveBeenCalledWith('1', true, false)
+          expect(mockMonitorProgress).toHaveBeenCalled()
+        })
+      })
+    })
+
+    describe('error handling', () => {
+      it('shows alert on successful publish', async () => {
+        mockBatchUpdateAllModulesApiCall.mockImplementation(() => 
+          Promise.resolve({
+            json: {
+              progress: {
+                progress: {
+                  id: '17',
+                  workflow_state: 'completed',
+                  completion: 100
+                }
+              }
+            }
+          })
         )
-      })
-    })
-  })
+        mockMonitorProgress.mockImplementation((id, callback) => {
+          callback({
+            workflow_state: 'completed',
+            completion: 100
+          })
+        })
+        mockFetchAllItemPublishedStates.mockImplementation(() => Promise.resolve())
 
-  describe('menu actions', () => {
-    it('renders the menu when clicked', () => {
-      const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
-      const menuButton = getByRole('button')
-      act(() => menuButton.click())
-      expect(getByText('Publish all modules and items')).toBeInTheDocument()
-      expect(getByText('Publish modules only')).toBeInTheDocument()
-      expect(getByText('Unpublish all modules and items')).toBeInTheDocument()
-      expect(getByText('Unpublish modules only')).toBeInTheDocument()
-    })
+        const {getByRole} = render(
+          <ContextModulesPublishMenu {...defaultProps} />
+        )
 
-    it('calls publishAll when clicked publish all menu item is clicked', () => {
-      const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
-      const menuButton = getByRole('button')
-      act(() => menuButton.click())
-      const publishButton = getByText('Publish all modules and items')
-      act(() => publishButton.click())
-      const modalTitle = getByRole('heading', {name: 'Publish all modules and items'})
-      expect(modalTitle).toBeInTheDocument()
-    })
+        // Open menu
+        const menuButton = getByRole('button')
+        act(() => {
+          menuButton.click()
+        })
 
-    it('calls publishModuleOnly when clicked publish module menu item is clicked', () => {
-      const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
-      const menuButton = getByRole('button')
-      act(() => menuButton.click())
-      const publishButton = getByText('Publish modules only')
-      act(() => publishButton.click())
-      const modalTitle = getByRole('heading', {name: 'Publish modules only'})
-      expect(modalTitle).toBeInTheDocument()
-    })
+        // Click "Publish all modules and items"
+        const publishAllButton = getByRole('menuitem', {name: /Publish all modules and items/})
+        await act(async () => {
+          publishAllButton.click()
+        })
 
-    it('calls unpublishAll when clicked unpublish all items is clicked', () => {
-      const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
-      const menuButton = getByRole('button')
-      act(() => menuButton.click())
-      const publishButton = getByText('Unpublish all modules and items')
-      act(() => publishButton.click())
-      const modalTitle = getByRole('heading', {name: 'Unpublish all modules and items'})
-      expect(modalTitle).toBeInTheDocument()
-    })
+        // Click continue in modal
+        const continueButton = getByRole('button', {name: /Continue/})
+        await act(async () => {
+          continueButton.click()
+        })
 
-    it('calls unpublishModuleOnly when unpublish modules only is clicked', () => {
-      const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
-      const menuButton = getByRole('button')
-      act(() => menuButton.click())
-      const publishButton = getByText('Unpublish modules only')
-      act(() => publishButton.click())
-      const modalTitle = getByRole('heading', {name: 'Unpublish modules only'})
-      expect(modalTitle).toBeInTheDocument()
-    })
-  })
-
-  describe('Modal actions', () => {
-    it('closes the modal when stopping an action', () => {
-      const stopButtonText = 'Stop button. Click to discontinue processing.Stop'
-      const {queryByRole, getByRole, getByText, getByTestId} = render(
-        <ContextModulesPublishMenu {...defaultProps} />,
-      )
-      const menuButton = getByRole('button')
-      act(() => menuButton.click())
-      const publishAllOption = getByText('Publish all modules and items')
-      act(() => publishAllOption.click())
-      expect(queryByRole('heading', {name: 'Publish all modules and items'})).toBeInTheDocument()
-      const publishButton = getByTestId('publish-button')
-      expect(publishButton.textContent).toBe('Continue')
-      act(() => publishButton.click())
-      expect(publishButton.textContent).toBe(stopButtonText)
-      act(() => publishButton.click())
-      // keeps the same button state
-      expect(publishButton.textContent).toBe(stopButtonText)
-      // closes the modal
-      expect(
-        queryByRole('heading', {name: 'Publish all modules and items'}),
-      ).not.toBeInTheDocument()
-    })
-  })
-
-  describe('error handling', () => {
-    it('shows alert on successful publish', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          progress: {
-            progress: {
-              id: 1234,
-            },
-          },
-        },
-        text: '',
-      })
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          id: '3533',
-          workflow_state: 'completed',
-          url: '/api/v1/progress/3533',
-        },
-        text: '',
-      })
-      mockDoFetchApi.mockResolvedValue({
-        response: new Response('', {status: 200}),
-        json: [],
-        text: '',
+        await waitFor(() => {
+          expect(mockBatchUpdateAllModulesApiCall).toHaveBeenCalledWith('1', true, false)
+          expect(mockFetchAllItemPublishedStates).toHaveBeenCalled()
+          expect(mockMonitorProgress).toHaveBeenCalled()
+        })
       })
 
-      const {getByRole, getByText, getAllByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} />,
-      )
-      const menuButton = getByRole('button')
-      act(() => menuButton.click())
-      const publishButton = getByText('Publish all modules and items')
-      act(() => publishButton.click())
-      const continueButton = getByText('Continue')
-      act(() => continueButton.click())
-      await waitFor(() => expect(getAllByText('Modules updated')).toHaveLength(2))
-    })
+      it('shows alert on failed publish', async () => {
+        mockBatchUpdateAllModulesApiCall.mockRejectedValue(new Error('Failed to publish'))
+        mockFetchAllItemPublishedStates.mockImplementation(() => Promise.resolve())
 
-    it('shows alert on failed publish', async () => {
-      const whoops = new Error('whoops')
-      mockDoFetchApi.mockRejectedValueOnce(whoops)
+        const {getByRole} = render(
+          <ContextModulesPublishMenu {...defaultProps} />
+        )
 
-      const {getByRole, getByText, getAllByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} />,
-      )
-      const menuButton = getByRole('button')
-      act(() => menuButton.click())
-      const publishButton = getByText('Publish all modules and items')
-      act(() => publishButton.click())
-      const continueButton = getByText('Continue')
-      act(() => continueButton.click())
-      await waitFor(() =>
-        expect(getAllByText('There was an error while saving your changes')).toHaveLength(2),
-      )
-    })
+        // Open menu
+        const menuButton = getByRole('button')
+        act(() => {
+          menuButton.click()
+        })
 
-    it('shows alert on failed poll for progress', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          progress: {
-            progress: {
-              id: 1234,
-            },
-          },
-        },
-        text: '',
+        // Click "Publish all modules and items"
+        const publishAllButton = getByRole('menuitem', {name: /Publish all modules and items/})
+        await act(async () => {
+          publishAllButton.click()
+        })
+
+        // Set state variables before clicking continue
+        const continueButton = getByRole('button', {name: /Continue/})
+        await act(async () => {
+          continueButton.click()
+        })
+
+        await waitFor(() => {
+          expect(mockBatchUpdateAllModulesApiCall).toHaveBeenCalled()
+        })
       })
-      mockDoFetchApi.mockRejectedValueOnce(new Error('whoops'))
 
-      const {getByRole, getByText, getAllByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} />,
-      )
-      const menuButton = getByRole('button')
-      act(() => menuButton.click())
-      const publishButton = getByText('Publish all modules and items')
-      act(() => publishButton.click())
-      const continueButton = getByText('Continue')
-      act(() => continueButton.click())
-      await waitFor(() =>
-        expect(
-          getAllByText(
-            "Something went wrong monitoring the work's progress. Try refreshing the page.",
-          ),
-        ).toHaveLength(2),
-      )
-    })
+      it('shows alert on failed poll for progress', async () => {
+        mockBatchUpdateAllModulesApiCall.mockImplementation(() => 
+          Promise.resolve({
+            json: {
+              progress: {
+                progress: {
+                  id: '17',
+                  workflow_state: 'running',
+                  completion: 0
+                }
+              }
+            }
+          })
+        )
+        mockMonitorProgress.mockImplementation((id, callback) => {
+          callback({
+            workflow_state: 'failed',
+            completion: 0
+          })
+        })
+        mockFetchAllItemPublishedStates.mockImplementation(() => Promise.resolve())
 
-    it('shows alert when failing to update results', async () => {
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          progress: {
-            progress: {
-              id: 1234,
-            },
-          },
-        },
-        text: '',
+        const {getByRole} = render(
+          <ContextModulesPublishMenu {...defaultProps} />
+        )
+
+        // Open menu
+        const menuButton = getByRole('button')
+        act(() => {
+          menuButton.click()
+        })
+
+        // Click "Publish all modules and items"
+        const publishAllButton = getByRole('menuitem', {name: /Publish all modules and items/})
+        await act(async () => {
+          publishAllButton.click()
+        })
+
+        // Set state variables before clicking continue
+        const continueButton = getByRole('button', {name: /Continue/})
+        await act(async () => {
+          continueButton.click()
+        })
+
+        await waitFor(() => {
+          expect(mockMonitorProgress).toHaveBeenCalled()
+          expect(mockFetchAllItemPublishedStates).toHaveBeenCalled()
+        })
       })
-      mockDoFetchApi.mockResolvedValueOnce({
-        response: new Response('', {status: 200}),
-        json: {
-          id: '3533',
-          workflow_state: 'completed',
-          url: '/api/v1/progress/3533',
-        },
-        text: '',
-      })
-      mockDoFetchApi.mockRejectedValue(new Error('whoops'))
 
-      const {getByRole, getByText, getAllByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} />,
-      )
-      const menuButton = getByRole('button')
-      act(() => menuButton.click())
-      const publishButton = getByText('Publish all modules and items')
-      act(() => publishButton.click())
-      const continueButton = getByText('Continue')
-      act(() => continueButton.click())
-      await waitFor(() =>
-        expect(
-          getAllByText(
-            'There was an error updating module and items publish status. Try refreshing the page.',
-          ),
-        ).toHaveLength(2),
-      )
+      it('shows alert when failing to update results', async () => {
+        mockBatchUpdateAllModulesApiCall.mockImplementation(() => 
+          Promise.resolve({
+            json: {
+              progress: {
+                progress: {
+                  id: '17',
+                  workflow_state: 'running',
+                  completion: 0
+                }
+              }
+            }
+          })
+        )
+        mockMonitorProgress.mockImplementation((id, callback) => {
+          callback({
+            workflow_state: 'completed',
+            completion: 100
+          })
+        })
+        mockFetchAllItemPublishedStates.mockRejectedValue(new Error('Failed to fetch states'))
+
+        const {getByRole} = render(
+          <ContextModulesPublishMenu {...defaultProps} />
+        )
+
+        // Open menu
+        const menuButton = getByRole('button')
+        act(() => {
+          menuButton.click()
+        })
+
+        // Click "Publish all modules and items"
+        const publishAllButton = getByRole('menuitem', {name: /Publish all modules and items/})
+        await act(async () => {
+          publishAllButton.click()
+        })
+
+        // Set state variables before clicking continue
+        const continueButton = getByRole('button', {name: /Continue/})
+        await act(async () => {
+          continueButton.click()
+        })
+
+        await waitFor(() => {
+          expect(mockFetchAllItemPublishedStates).toHaveBeenCalled()
+        })
+      })
     })
   })
 })

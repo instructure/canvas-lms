@@ -1096,15 +1096,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     end
   end
 
-  context "with selective_release_ui_api flag ON" do
-    before do
-      Account.site_admin.enable_feature!(:selective_release_ui_api)
-    end
-
-    after do
-      Account.site_admin.disable_feature!(:selective_release_ui_api)
-    end
-
+  context "with selective release" do
     it "updates ungraded assignment overrides" do
       student1 = @course.enroll_student(User.create!, enrollment_state: "active").user
       student2 = @course.enroll_student(User.create!, enrollment_state: "active").user
@@ -1151,23 +1143,6 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       result = run_mutation(id: announcement1.id, specific_sections: "all")
       expect(result["errors"]).to be_nil
       expect(Announcement.last.is_section_specific).to be_falsy
-    end
-
-    it "does not update ungraded assignment overrides if flag is off" do
-      Account.site_admin.disable_feature!(:selective_release_ui_api)
-
-      student1 = @course.enroll_student(User.create!, enrollment_state: "active").user
-      student2 = @course.enroll_student(User.create!, enrollment_state: "active").user
-      @course.enroll_student(User.create!, enrollment_state: "active").user
-
-      ungraded_discussion_overrides = {
-        studentIds: [student1.id, student2.id]
-      }
-      result = run_mutation(id: @topic.id, ungraded_discussion_overrides:)
-      expect(result["errors"]).to be_nil
-
-      new_override = DiscussionTopic.last.active_assignment_overrides.first
-      expect(new_override).to be_nil
     end
   end
 

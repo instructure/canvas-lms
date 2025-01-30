@@ -71,7 +71,7 @@ class Login::OAuthBaseController < ApplicationController
       )
     end
 
-    pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_ids, @aac)
+    pseudonym = @aac.account.pseudonyms.for_auth_configuration(unique_ids, @aac)
     if !pseudonym && need_email_verification?(unique_ids, @aac)
       increment_statsd(:failure, reason: :need_email_verification)
       return

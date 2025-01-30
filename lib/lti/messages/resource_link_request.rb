@@ -83,7 +83,7 @@ module Lti::Messages
     # the associated assignment or from the request parameters. fall back to the
     # context rlid only if needed
     def launch_resource_link_id
-      resource_link&.resource_link_uuid || Lti::Asset.opaque_identifier_for(@context)
+      resource_link&.resource_link_uuid || Lti::V1p1::Asset.opaque_identifier_for(@context)
     end
 
     def unexpanded_custom_parameters

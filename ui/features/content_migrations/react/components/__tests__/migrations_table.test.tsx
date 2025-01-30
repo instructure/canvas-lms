@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor, screen} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import ContentMigrationsTable from '../migrations_table'
 import fetchMock from 'fetch-mock'
 import type {ContentMigrationItem} from '../types'
@@ -39,11 +39,19 @@ const migrations: ContentMigrationItem[] = [
     created_at: 'Apr 15 at 9:11pm',
   },
 ]
-let setMigrationsMock: () => void
 
-const renderComponent = () => {
+const renderComponent = (
+  {
+    migrationArray = migrations,
+    isLoading = false,
+  }: 
+  {
+    migrationArray?: ContentMigrationItem[],
+    isLoading?: boolean,
+  }
+) => {
   return render(
-    <ContentMigrationsTable migrations={migrations} setMigrations={setMigrationsMock} />,
+    <ContentMigrationsTable migrations={migrationArray} isLoading={isLoading} updateMigrationItem={jest.fn()} />
   )
 }
 
@@ -56,7 +64,6 @@ describe('ContentMigrationTable', () => {
   })
 
   beforeAll(() => {
-    setMigrationsMock = jest.fn(() => {})
     window.ENV.COURSE_ID = '0'
     fetchMock.mock('/api/v1/courses/0/content_migrations?per_page=25', ['api_return'])
   })
@@ -73,7 +80,7 @@ describe('ContentMigrationTable', () => {
     })
 
     it('renders the table', () => {
-      renderComponent()
+      renderComponent({})
 
       const headers = Array.from(document.querySelectorAll('span[as="th"]')).map(e => e.textContent)
       const data = Array.from(document.querySelectorAll('span[as="td"]')).map(e => e.textContent)
@@ -96,13 +103,10 @@ describe('ContentMigrationTable', () => {
       ])
     })
 
-    it('calls the API', async () => {
-      renderComponent()
+    it('displays the loading spinner', () => {
+      renderComponent({isLoading: true})
 
-      expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
-      await waitFor(() => {
-        expect(setMigrationsMock).toHaveBeenCalledWith(expect.any(Function))
-      })
+      expect(screen.getByLabelText('Loading')).toBeInTheDocument()
     })
   })
 
@@ -118,7 +122,7 @@ describe('ContentMigrationTable', () => {
     })
 
     it('renders the table', () => {
-      renderComponent()
+      renderComponent({})
 
       expect(screen.getByRole('table', {hidden: false})).toBeInTheDocument()
       expect(
@@ -129,13 +133,10 @@ describe('ContentMigrationTable', () => {
       ).toBeInTheDocument()
     })
 
-    it('calls the API', async () => {
-      renderComponent()
+    it('displays the loading spinner', () => {
+      renderComponent({isLoading: true})
 
-      expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
-      await waitFor(() => {
-        expect(setMigrationsMock).toHaveBeenCalledWith(expect.any(Function))
-      })
+      expect(screen.getByLabelText('Loading')).toBeInTheDocument()
     })
   })
 })

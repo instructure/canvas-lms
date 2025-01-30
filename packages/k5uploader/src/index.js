@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Uploader from './uploader'
-import KalturaSession from './kaltura_session'
-import mBus from './message_bus'
-import Messenger from './messenger'
-import EntryService from './entry_service'
-import UiconfService from './uiconf_service'
-import k5Options from './k5_options'
+import Uploader from './uploader.js'
+import KalturaSession from './kaltura_session.js'
+import mBus from './message_bus.js'
+import Messenger from './messenger.js'
+import EntryService from './entry_service.js'
+import UiconfService from './uiconf_service.js'
+import k5Options from './k5_options.js'
 
 /**
  * @type Class

@@ -26,7 +26,6 @@ import {View} from '@instructure/ui-view'
 import React from 'react'
 import type {LtiPlacement} from '../model/LtiPlacement'
 import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
-import htmlEscape from '@instructure/html-escape'
 
 const I18n = createI18nScope('lti_registration.wizard')
 
@@ -60,7 +59,7 @@ export const NamingConfirmation = ({
         <Text
           dangerouslySetInnerHTML={{
             __html: I18n.t('Choose a nickname for *%{toolName}*.', {
-              toolName: htmlEscape(toolName),
+              toolName: toolName,
               wrapper: ['<strong>$1</strong>'],
             }),
           }}

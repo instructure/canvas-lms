@@ -452,9 +452,9 @@ describe CoursePace do
 
     it "logs if the assignment being updated has been completed" do
       @assignment.submit_homework(@student, body: "Test")
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       expect(@course_pace.publish).to be(true)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.submitted_assignment_date_change")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.submitted_assignment_date_change")
     end
 
     it "compresses to hard end dates" do
@@ -631,22 +631,22 @@ describe CoursePace do
     end
 
     it "writes the number of course-type course paces to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       @course_pace = @course.course_paces.create! workflow_state: "active"
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.course_paces.count").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.course_paces.count").once
     end
 
     it "writes the number of section-type course paces to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       @new_section = @course.course_sections.create! name: "new_section"
       @section_plan = @course.course_paces.create! course_section: @new_section
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.section_paces.count").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.section_paces.count").once
     end
 
     it "writes the number of user-type course paces to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       @course.course_paces.create!(user: @student, workflow_state: "active")
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.user_paces.count").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.user_paces.count").once
     end
   end
 
@@ -665,25 +665,25 @@ describe CoursePace do
     it "increments the course pace deletion to statsd" do
       # This destroy does work and we log it here, but in general, the code doesn't allow for the default
       # course pace to be deleted for now.
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       course_pace = @course.course_paces.create! workflow_state: "active"
       course_pace.destroy!
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_course_pace").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.deleted_course_pace").once
     end
 
     it "increments the section-type course pace deletion to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       new_section = @course.course_sections.create! name: "new_section"
       section_plan = @course.course_paces.create! course_section: new_section
       section_plan.destroy!
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_section_pace").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.deleted_section_pace").once
     end
 
     it "increments the student-type course pace deletion to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       user_plan = @course.course_paces.create!(user: @student, workflow_state: "active")
       user_plan.destroy!
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_user_pace").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.deleted_user_pace").once
     end
   end
 
@@ -706,14 +706,14 @@ describe CoursePace do
       end
 
       it "increments on initial publish when weekend days selected to be skipped" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
         @course_pace = @course.course_paces.create!(
           workflow_state: "active",
           selected_days_to_skip: SKIP_WEEKEND_DAYS
         )
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
       end
 
       it "does not decrement on initial publish when no days selected to skipped" do
@@ -728,7 +728,7 @@ describe CoursePace do
       end
 
       it "increments on subsequent publish when no days selected then weekend days selected to be skipped" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
         @course_pace = @course.course_paces.create!(
@@ -739,11 +739,11 @@ describe CoursePace do
         @course_pace.publish
 
         expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
       end
 
       it "decrements on subsequent publish when weekend days initially selected then de selected to be skipped" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
         @course_pace = @course.course_paces.create!(
@@ -753,7 +753,7 @@ describe CoursePace do
         @course_pace.update!(selected_days_to_skip: NOT_SKIP_WEEKEND_DAYS)
         @course_pace.publish
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
         expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
       end
     end
@@ -764,14 +764,14 @@ describe CoursePace do
       end
 
       it "increments on initial publish when exclude_weekends set to true" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
         @course_pace = @course.course_paces.create!(
           workflow_state: "active",
           exclude_weekends: true
         )
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
       end
 
       it "does not decrement on initial publish when exclude_weekends set to false" do
@@ -786,7 +786,7 @@ describe CoursePace do
       end
 
       it "increments on subsequent publish when exclude_weekends initially false then set to true" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
         @course_pace = @course.course_paces.create!(
@@ -797,11 +797,11 @@ describe CoursePace do
         @course_pace.publish
 
         expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
       end
 
       it "increments on subsequent publish when exclude_weekends initially true then set to false" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
         @course_pace = @course.course_paces.create!(
@@ -811,7 +811,7 @@ describe CoursePace do
         @course_pace.update!(exclude_weekends: false)
         @course_pace.publish
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.weekends_excluded")
         expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
       end
     end
@@ -1075,6 +1075,218 @@ describe CoursePace do
         @course.course_paces.create!(course_section: @section1, workflow_state: "deleted")
         @course.course_paces.create!(user_id: @student1, workflow_state: "deleted")
         expect(@course_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student1.id, @student2.id)
+      end
+    end
+  end
+
+  describe "#overdue_unsubmitted_student_module_items_by_student" do
+    before :once do
+      course_with_student active_all: true
+      @course.root_account.enable_feature!(:course_paces)
+      @course.enable_course_paces = true
+      @course.time_zone = "UTC"
+      @course.save!
+
+      @context_module = @course.context_modules.create!(workflow_state: "active")
+      @assignment = @course.assignments.create!(
+        workflow_state: "published",
+        submission_types: "online_upload"
+      )
+      @tag = @assignment.context_module_tags.create!(
+        context_module: @context_module,
+        context: @course,
+        tag_type: "context_module",
+        workflow_state: "active"
+      )
+
+      @course_pace = @course.course_paces.create!(workflow_state: "active")
+      @course_pace_module_item = @course_pace.course_pace_module_items.create!(
+        module_item: @tag,
+        duration: 1
+      )
+
+      @course_pace.publish
+      @student_enrollment = @course.student_enrollments.find_by!(user_id: @student.id)
+      @student_enrollment.update!(
+        start_at: Time.zone.today,
+        end_at: Time.zone.today + 30.days
+      )
+    end
+
+    context "when there are no enrollments or users provided" do
+      it "returns an empty hash" do
+        result = @course_pace.overdue_unsubmitted_student_module_items_by_student([])
+        expect(result).to eq({})
+      end
+    end
+
+    context "when the assignment is overdue and unsubmitted" do
+      before :once do
+        @student_enrollment.update!(start_at: 7.days.ago)
+        @course_pace.publish
+      end
+
+      it "returns a hash with overdue items for the user" do
+        result = @course_pace.overdue_unsubmitted_student_module_items_by_student([@student.id])
+
+        expect(result).to be_a(Hash)
+        expect(result.keys).to include(@student.id)
+
+        overdue_items = result[@student.id]
+        expect(overdue_items).not_to be_empty
+        expect(overdue_items.first.module_item.content_id).to eq(@assignment.id)
+      end
+    end
+
+    context "when the assignment is published but not overdue" do
+      before :once do
+        @student_enrollment.update!(start_at: Time.zone.today)
+        @course_pace.publish
+      end
+
+      it "does not return the module item because it's not overdue" do
+        result = @course_pace.overdue_unsubmitted_student_module_items_by_student([@student.id])
+        expect(result[@student.id]).to be_empty
+      end
+    end
+
+    context "when the assignment is overdue but the student has already submitted" do
+      before :once do
+        @student_enrollment.update!(start_at: 2.days.ago)
+        @course_pace.publish
+
+        @assignment.submit_homework(@student, body: "My submission")
+      end
+
+      it "does not return the module item because the student already submitted" do
+        result = @course_pace.overdue_unsubmitted_student_module_items_by_student([@student.id])
+        expect(result[@student.id]).to be_empty
+      end
+    end
+
+    context "when the assignment is unpublished" do
+      before :once do
+        @assignment.update!(workflow_state: "unpublished")
+        @course_pace.publish
+      end
+
+      it "does not return the item because it's not submittable" do
+        result = @course_pace.overdue_unsubmitted_student_module_items_by_student([@student.id])
+        expect(result[@student.id]).to be_empty
+      end
+    end
+  end
+
+  describe "#module_item_submission_status_by_student" do
+    before :once do
+      @context_module = @course.context_modules.create!(workflow_state: "active")
+      @assignment = @course.assignments.create!(
+        workflow_state: "published",
+        submission_types: "online_upload"
+      )
+      @tag = @assignment.context_module_tags.create!(
+        context_module: @context_module,
+        context: @course,
+        tag_type: "context_module",
+        workflow_state: "active"
+      )
+
+      @course_pace_module_item = @course_pace.course_pace_module_items.create!(
+        module_item: @tag,
+        duration: 1
+      )
+
+      @course_pace.publish
+
+      @student_enrollment = @course.student_enrollments.find_by!(user_id: @student.id)
+    end
+
+    context "when user_ids or module_item_ids are empty" do
+      it "returns an empty hash if user_ids is empty" do
+        result = @course_pace.module_item_submission_status_by_student([], [@tag.id])
+        expect(result).to eq({})
+      end
+
+      it "returns a hash with empty sub-hashes if module_item_ids is empty" do
+        result = @course_pace.module_item_submission_status_by_student([@student.id], [])
+        expect(result).to eq({ @student.id => {} })
+      end
+    end
+
+    context "when the assignment is published but no submissions exist" do
+      it "marks has_submission as false and submittable as true" do
+        result = @course_pace.module_item_submission_status_by_student([@student.id], [@assignment.context_module_tags.first.id])
+        expect(result[@student.id]).to be_present
+
+        module_item_id = @assignment.context_module_tags.first.id
+        expect(result[@student.id][module_item_id]).to include(
+          has_submission: false,
+          submittable: true
+        )
+      end
+    end
+
+    context "when the assignment is published and a student submission exists" do
+      before :once do
+        @assignment.submit_homework(@student, body: "My submission")
+      end
+
+      it "marks has_submission as true and submittable as true" do
+        result = @course_pace.module_item_submission_status_by_student([@student.id], [@tag.id])
+        module_item_id = @tag.id
+        expect(result[@student.id][module_item_id]).to include(
+          has_submission: true,
+          submittable: true
+        )
+      end
+    end
+
+    context "when the assignment is unpublished" do
+      before :once do
+        @assignment.update!(workflow_state: "unpublished")
+      end
+
+      it "marks the item as not submittable" do
+        result = @course_pace.module_item_submission_status_by_student([@student.id], [@tag.id])
+        module_item_id = @tag.id
+        expect(result[@student.id][module_item_id][:submittable]).to be false
+      end
+    end
+
+    context "when multiple students and multiple module items are provided" do
+      before :once do
+        @student2 = user_model
+        @course.enroll_student(@student2, enrollment_state: "active")
+
+        @assignment2 = @course.assignments.create!(workflow_state: "published")
+        @tag2 = @assignment2.context_module_tags.create!(
+          context_module: @context_module,
+          context: @course,
+          tag_type: "context_module",
+          workflow_state: "active"
+        )
+
+        @course_pace.course_pace_module_items.create!(module_item: @tag2, duration: 1)
+        @course_pace.publish
+
+        # Student1 has a submission on assignment1, Student2 has no submissions
+        @assignment.submit_homework(@student, body: "Student 1 submission")
+      end
+
+      it "returns status for all users and all module items" do
+        user_ids = [@student.id, @student2.id]
+        module_item_ids = [@tag.id, @tag2.id]
+
+        result = @course_pace.module_item_submission_status_by_student(user_ids, module_item_ids)
+        expect(result.keys.sort).to eq([@student.id, @student2.id].sort)
+
+        # For student 1
+        expect(result[@student.id][@tag.id][:has_submission]).to be(true)
+        expect(result[@student.id][@tag2.id][:has_submission]).to be(false)
+
+        # For student 2 (no submissions)
+        expect(result[@student2.id][@tag.id][:has_submission]).to be(false)
+        expect(result[@student2.id][@tag2.id][:has_submission]).to be(false)
       end
     end
   end

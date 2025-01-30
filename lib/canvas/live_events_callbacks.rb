@@ -158,6 +158,10 @@ module Canvas::LiveEventsCallbacks
       elsif !obj.unsubmitted?
         Canvas::LiveEvents.submission_updated(obj)
       end
+
+      if changes["custom_grade_status_id"]
+        Canvas::LiveEvents.submission_custom_grade_status(obj, changes["custom_grade_status_id"].first)
+      end
     when User
       Canvas::LiveEvents.user_updated(obj)
     when CourseSection

@@ -18,90 +18,63 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Lti::AssetProcessor, type: :model do
-  let(:root_account) { Account.default }
-  let(:context_external_tool) { external_tool_1_3_model }
-  let(:assignment) { assignment_model }
-  let(:asset_processor) do
-    Lti::AssetProcessor.create!(root_account:,
-                                context_external_tool:,
-                                assignment:,
-                                url: "http://example.com",
-                                title: "title",
-                                text: "text",
-                                custom: { custom: "custom" },
-                                icon: { icon: "icon" },
-                                window: { window: "window" },
-                                iframe: { iframe: "iframe" },
-                                report: { report: "report" })
-  end
-
   describe "create" do
     context "validations" do
-      it "without account, it fails" do
-        expect { Lti::AssetProcessor.create!(context_external_tool:, assignment:) }.to raise_error(ActiveRecord::RecordInvalid)
+      subject { lti_asset_processor_model }
+
+      it { is_expected.to be_valid }
+      it { is_expected.to validate_length_of(:url).is_at_most(4.kilobytes) }
+      it { is_expected.to validate_length_of(:title).is_at_most(255) }
+      it { is_expected.to validate_length_of(:text).is_at_most(255) }
+
+      it "defaults to workflow_state=active" do
+        expect(lti_asset_processor_model(workflow_state: nil).active?).to be_truthy
       end
 
-      it "without CET, it fails" do
-        expect { Lti::AssetProcessor.create!(root_account:, assignment:) }.to raise_error(ActiveRecord::RecordInvalid)
-      end
+      it { is_expected.to belong_to(:context_external_tool).required }
+      it { is_expected.to belong_to(:assignment).required }
+      it { is_expected.to have_many(:asset_reports).dependent(:destroy) }
 
-      it "without assignment, it fails" do
-        expect { Lti::AssetProcessor.create!(root_account:, context_external_tool:) }.to raise_error(ActiveRecord::RecordInvalid)
-      end
-
-      it "is invalid if url exceeds 4 kilobytes" do
-        ap = Lti::AssetProcessor.new(root_account:, context_external_tool:, assignment:, url: "a" * (4.kilobytes + 1))
-        expect(ap).not_to be_valid
-        expect(ap.errors[:url].to_s).to include("is too long")
-      end
-
-      it "is invalid if title exceeds 255 characters" do
-        ap = Lti::AssetProcessor.new(root_account:, context_external_tool:, assignment:, title: "a" * 256)
-        expect(ap).not_to be_valid
-        expect(ap.errors[:title].to_s).to include("is too long")
-      end
-
-      it "is invalid if text exceeds 255 characters" do
-        ap = Lti::AssetProcessor.new(root_account:, context_external_tool:, assignment:, text: "a" * 256)
-        expect(ap).not_to be_valid
-        expect(ap.errors[:text].to_s).to include("is too long")
-      end
-
-      it "with CET, root_account and assignment it succeeds" do
-        expect(asset_processor).to be_persisted
-        expect(asset_processor.active?).to be_truthy
-      end
-
-      it "supports associations" do
-        expect(asset_processor.context_external_tool.id).to eq(context_external_tool.id)
-        expect(asset_processor.assignment.id).to eq(assignment.id)
-        expect(context_external_tool.lti_asset_processor_ids).to include(asset_processor.id)
-        expect(assignment.lti_asset_processor_ids).to include(asset_processor.id)
+      it "supports associations from ContextExternalTool and Assignment" do
+        expect(subject.context_external_tool.lti_asset_processor_ids).to include(subject.id)
+        expect(subject.assignment.lti_asset_processor_ids).to include(subject.id)
       end
 
       it "is not deleted when CET is destroyed to be able to attach it again to tool after tool reinstall" do
-        expect(asset_processor.context_external_tool.id).to eq(context_external_tool.id)
-        context_external_tool.destroy!
-        expect(asset_processor.reload.active?).to be_truthy
-        expect(context_external_tool.lti_asset_processors.first.id).to equal asset_processor.id
+        cet = subject.context_external_tool
+        cet.destroy!
+        expect(subject.reload.active?).to be_truthy
+        expect(cet.lti_asset_processors.first.id).to equal subject.id
       end
 
       it "is soft deleted when Assignment is destroyed but foreign key is kept" do
-        expect(asset_processor.assignment.id).to eq(assignment.id)
-        assignment.destroy!
-        expect(asset_processor.reload.active?).not_to be_truthy
-        expect(assignment.lti_asset_processors.first.id).to equal asset_processor.id
+        assign = subject.assignment
+        assign.destroy!
+        expect(subject.reload.active?).not_to be_truthy
+        expect(assign.lti_asset_processors.first.id).to equal subject.id
       end
 
       it "resolves root account through assignment" do
-        expect(asset_processor.root_account).to equal assignment.root_account
+        expect(subject.root_account_id).to equal subject.assignment.root_account_id
       end
 
       it "validates root account of context external tool" do
-        asset_processor.context_external_tool.root_account = account_model
-        expect(asset_processor).not_to be_valid
-        expect(asset_processor.errors[:context_external_tool].to_s).to include("root account")
+        subject.context_external_tool.root_account = account_model
+        expect(subject).not_to be_valid
+        expect(subject.errors[:context_external_tool].to_s).to include("root account")
       end
+    end
+  end
+
+  describe "supported_types" do
+    it "returns supported types from the 'report' hash" do
+      model = lti_asset_processor_model(report: { "supportedTypes" => ["a", "b"] })
+      expect(model.supported_types).to eq(["a", "b"])
+    end
+
+    it "returns nil when 'report' is not a present" do
+      model = lti_asset_processor_model(report: nil)
+      expect(model.supported_types).to be_nil
     end
   end
 end

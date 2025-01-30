@@ -342,70 +342,51 @@ module Lti
 
       subject { tool_configuration }
 
-      context "update_unified_tool_id FF is on" do
-        before do
-          tool_configuration.developer_key.root_account.enable_feature!(:update_unified_tool_id)
-        end
-
-        it "calls the LearnPlatform::GlobalApi service and update the unified_tool_id attribute" do
-          allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id).and_return(unified_tool_id)
-          subject.save
-          run_jobs
-          expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id).with(
-            { lti_domain: settings["extensions"].first["domain"],
-              lti_name: settings["title"],
-              lti_tool_id: settings["extensions"].first["tool_id"],
-              lti_url: settings["target_link_uri"],
-              lti_version: "1.3" }
-          )
-          tool_configuration.reload
-          expect(tool_configuration.unified_tool_id).to eq(unified_tool_id)
-        end
-
-        it "starts a background job to update the unified_tool_id" do
-          expect do
-            subject.save
-          end.to change(Delayed::Job, :count).by(1)
-        end
-
-        context "when the configuration is already existing" do
-          before do
-            subject.save
-            run_jobs
-          end
-
-          context "when the configuration's settings changed" do
-            it "calls the LearnPlatform::GlobalApi service" do
-              allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id)
-              subject.title = "new title"
-              subject.save
-              run_jobs
-              expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id)
-            end
-          end
-
-          context "when the configuration's privacy_level changed" do
-            it "does not call the LearnPlatform::GlobalApi service" do
-              allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id)
-              subject.privacy_level = "new privacy_level"
-              subject.save
-              run_jobs
-              expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
-            end
-          end
-        end
+      it "calls the LearnPlatform::GlobalApi service and update the unified_tool_id attribute" do
+        allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id).and_return(unified_tool_id)
+        subject.save
+        run_jobs
+        expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id).with(
+          { lti_domain: settings["extensions"].first["domain"],
+            lti_name: settings["title"],
+            lti_tool_id: settings["extensions"].first["tool_id"],
+            lti_url: settings["target_link_uri"],
+            lti_version: "1.3" }
+        )
+        tool_configuration.reload
+        expect(tool_configuration.unified_tool_id).to eq(unified_tool_id)
       end
 
-      context "update_unified_tool_id FF is off" do
+      it "starts a background job to update the unified_tool_id" do
+        expect do
+          subject.save
+        end.to change(Delayed::Job, :count).by(1)
+      end
+
+      context "when the configuration is already existing" do
         before do
-          tool_configuration.developer_key.root_account.disable_feature!(:update_unified_tool_id)
+          subject.save
+          run_jobs
         end
 
-        it "does not call the LearnPlatform::GlobalApi service" do
-          allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id)
-          subject
-          run_jobs
-          expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
+        context "when the configuration's settings changed" do
+          it "calls the LearnPlatform::GlobalApi service" do
+            allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id)
+            subject.title = "new title"
+            subject.save
+            run_jobs
+            expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id)
+          end
+        end
+
+        context "when the configuration's privacy_level changed" do
+          it "does not call the LearnPlatform::GlobalApi service" do
+            allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id)
+            subject.privacy_level = "new privacy_level"
+            subject.save
+            run_jobs
+            expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
+          end
         end
       end
     end
@@ -1276,7 +1257,7 @@ module Lti
       let(:tool_configuration) { untransformed_tool_configuration }
 
       it "remains equivalent after multiple transforms" do
-        settings = tool_configuration.settings.merge("public_jwk_url" => nil)
+        settings = tool_configuration.settings
         tool_configuration.transform!
         new_settings = tool_configuration.settings
         expect(new_settings).to eq settings

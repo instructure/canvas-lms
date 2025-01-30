@@ -121,21 +121,6 @@ describe "selective_release module item assign to tray" do
       expect(item_type_text.text).to eq("Quiz")
     end
 
-    it "does not show tray when flag if off after item indent" do
-      Account.site_admin.disable_feature! :selective_release_ui_api
-      go_to_modules
-      add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A Classic Quiz") do
-        f("label[for=classic_quizzes_radio]").click
-      end
-      module_item = ContentTag.last
-
-      manage_module_item_button(module_item).click
-      click_manage_module_item_indent(module_item)
-      manage_module_item_button(module_item).click
-
-      expect(element_exists?(manage_module_item_assign_to_selector(module_item.id))).to be_falsey
-    end
-
     it "shows the assign to option for newly-created items that a teacher can manage" do
       go_to_modules
       add_new_module_item_and_yield("#assignments_select", "Assignment", "[ Create Assignment ]", "New Assignment Title")

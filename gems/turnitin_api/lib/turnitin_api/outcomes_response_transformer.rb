@@ -57,7 +57,7 @@ module TurnitinApi
           error_msg ||= :unknown
 
           stats_tags = { status: resp.status, message: error_msg }
-          InstStatsd::Statsd.increment("lti.tii.outcomes_response_bad", tags: stats_tags)
+          InstStatsd::Statsd.distributed_increment("lti.tii.outcomes_response_bad", tags: stats_tags)
 
           body = resp.env[:raw_body] || resp.body
           raise InvalidResponse,

@@ -19,11 +19,6 @@
 import formatMessage from '../../format-message'
 import '../tinymce/vi_VN'
 
-const locale = {
-  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
-    "message": "{ count, plural,\n  other {}\n}"
-  }
-}
-
+const locale = {"count_plural_one_item_loaded_other_items_loaded_857023b7":{"message":"{ count, plural,\n  other {}\n}"}}
 
 formatMessage.addLocale({'vi-VN': locale})

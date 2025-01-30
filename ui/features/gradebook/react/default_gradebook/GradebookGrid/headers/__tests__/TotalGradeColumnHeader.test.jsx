@@ -626,7 +626,7 @@ describe('GradebookGrid TotalGradeColumnHeader', () => {
 
       it('Enter opens the "Options" menu', () => {
         handleKeyDown(13) // Enter
-        expect(menuContent).toBeTruthy()
+        expect(component.state.menuShown).toBe(true)
       })
 
       it('returns false for Enter', () => {

@@ -64,12 +64,27 @@ describe "courses/settings" do
     end
 
     it "display info on crosslisted sections" do
+      @subaccount.courses.create!
       @course.course_sections.create!
-      @course.course_sections.last.update(nonxlist_course_id: @subaccount.courses.first.id)
+      @course.course_sections.last.update(nonxlist_course_id: @subaccount.courses.last.id)
       view_context(@course, @user)
       assign(:current_user, @user)
       render
+
       expect(response).to have_tag("div.course_section_crosslist")
+      expect(response).to include "Section Crosslisted From:"
+    end
+
+    it "display read only info for section in original course" do
+      @subaccount.courses.create!
+      @course.course_sections.create!
+      CourseSection.last.update(course_id: @subaccount.courses.last.id, nonxlist_course_id: @course.id)
+      view_context(@course, @user)
+      assign(:current_user, @user)
+      render
+
+      expect(response).to have_tag("div.course_section_crosslist")
+      expect(response).to include "Section Crosslisted To:"
     end
   end
 
