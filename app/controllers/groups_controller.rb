@@ -353,7 +353,7 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @categories = @context.combined_group_and_differentiation_tag_categories.order(Arel.sql("role <> 'student_organized'"), GroupCategory.best_unicode_collation_key("name")).preload(:root_account)
+        @categories = @context.combined_group_and_differentiation_tag_categories.active.order(Arel.sql("role <> 'student_organized'"), GroupCategory.best_unicode_collation_key("name")).preload(:root_account)
         case collaboration_state
         when "collaborative"
           @categories = @categories.where(non_collaborative: false)
