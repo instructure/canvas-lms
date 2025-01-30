@@ -88,7 +88,11 @@ class NewContentMigrationPage
     end
 
     def course_search_input
-      f("#Select_1")
+      f("#course-copy-select-course")
+    end
+
+    def course_search_input_has_options?
+      course_search_input.attribute("aria-expanded") == "true"
     end
 
     def course_search_result(id)
