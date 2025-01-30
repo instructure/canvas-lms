@@ -106,6 +106,7 @@ ko:
       unexpectedDeleteError: "오류가 발생했습니다. 이번에는 삭제할 수 없습니다."
       updateSuccess: "성공적으로 업데이트함"
     length_error: "255글자보다 적어야 함"
+    title: "이 그룹의 이름"
   OutcomeView: 
     length_error: "255글자보다 적어야 함"
     mastery_error: "0보다 크거나 같아야 함"

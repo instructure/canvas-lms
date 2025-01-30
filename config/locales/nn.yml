@@ -143,6 +143,7 @@ nn:
       updateSuccess: Oppdatert
       userDeleteError: "Læringsmålgruppe inneheld eit eller fleire mål som er tilpassa innhaldet."
     length_error: "Må vere 255 teikn eller mindre"
+    title: "Set namn på gruppa"
   OutcomeView: 
     length_error: "Må vere 255 teikn eller mindre"
     mastery_at_nan_error: "Må være eit tal"

@@ -139,6 +139,7 @@ tr:
       updateSuccess: "Güncelleme başarılı"
       userDeleteError: "Öğrenme Çıktısı Grubu şu anda içerik ile eşleştirilmiş bir veya daha fazla öğrenme çıktısı içermektedir."
     length_error: "255 karakter veya daha az olmalıdır"
+    title: "Bu gruba isim verin"
   OutcomeView: 
     length_error: "255 karakter veya daha az olmalıdır"
     mastery_error: "0 a eşit ya da daha büyük olmalıdır"
