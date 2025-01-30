@@ -68,6 +68,12 @@ def run_migration(cm = nil)
   worker_class.new(cm.id).perform
 end
 
+def test_search_course_field(course)
+  input_canvas_select(NewContentMigrationPage.course_search_input, course.name)
+  option_text = instui_select_option(NewContentMigrationPage.course_search_input, course.id, select_by: :value).text
+  expect(option_text).to eq "#{course.name}\nTerm: #{course.term_name}"
+end
+
 def import(cm = nil)
   cm ||= @course.content_migrations.last
   cm.reload
@@ -322,7 +328,7 @@ describe "content migrations", :non_parallel do
       expect(NewContentMigrationPage.course_search_input_has_options?).to be false
     end
 
-    it "finds courses in other accounts", priority: "1", skip: "issues with cc search" do
+    it "finds courses in other accounts", priority: "1" do
       new_account1 = account_model
       enrolled_course = Course.create!(name: "faraway course", account: new_account1)
       enrolled_course.enroll_teacher(@user).accept
@@ -336,15 +342,8 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      search = NewContentMigrationPage.course_search_input
-      search.send_keys("another")
-      wait_for_ajaximations
-      expect(NewContentMigrationPage.course_search_results_visible[0].text).to eq admin_course.name
-
-      search.clear
-      search.send_keys("faraway")
-      wait_for_ajaximations
-      expect(NewContentMigrationPage.course_search_results_visible[0].text).to eq enrolled_course.name
+      test_search_course_field(admin_course)
+      test_search_course_field(enrolled_course)
     end
 
     context "Qti Enabled" do

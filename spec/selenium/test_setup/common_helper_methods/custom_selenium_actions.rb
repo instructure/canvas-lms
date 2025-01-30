@@ -478,6 +478,21 @@ module CustomSeleniumActions
     element_or_css(elem_or_css)
   end
 
+  def instui_select_option(select, option_text, select_by: text)
+    cselect = instui_select(select)
+    option_list_id = cselect.attribute("aria-controls")
+    if option_list_id.blank?
+      cselect.click
+      option_list_id = cselect.attribute("aria-controls")
+    end
+
+    if select_by == :text
+      fj("##{option_list_id} [role='option']:contains(#{option_text})")
+    else
+      f("##{option_list_id} [role='option'][#{select_by}='#{option_text}']")
+    end
+  end
+
   def clear_canvas_select(select)
     cselect = canvas_select(select)
     # clear the input field
@@ -507,18 +522,7 @@ module CustomSeleniumActions
   # (tested with the CanvasSelect wrapper and instui SimpleSelect,
   # untested with a raw instui Select)
   def click_INSTUI_Select_option(select, option_text, select_by = :text)
-    cselect = instui_select(select)
-    option_list_id = cselect.attribute("aria-controls")
-    if option_list_id.blank?
-      cselect.click
-      option_list_id = cselect.attribute("aria-controls")
-    end
-
-    if select_by == :text
-      fj("##{option_list_id} [role='option']:contains(#{option_text})").click
-    else
-      f("##{option_list_id} [role='option'][#{select_by}='#{option_text}']").click
-    end
+    instui_select_option(select, option_text, select_by: select_by).click
   end
 
   def INSTUI_Select_options(select)
