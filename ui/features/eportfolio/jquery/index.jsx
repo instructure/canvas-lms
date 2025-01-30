@@ -31,7 +31,7 @@ import React from 'react'
 import {QueryProvider} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import SectionList from '../react/SectionList'
-import PageList from '../react/PageList'
+import PageContainer from '../react/PageContainer'
 import ReactDOM from 'react-dom/client'
 import userSettings from '@canvas/user-settings'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
@@ -195,7 +195,7 @@ function renderPageList(portfolio, isOwner, sectionId) {
     const root = ReactDOM.createRoot(pageListContainer)
     root.render(
       <QueryProvider>
-        <PageList
+        <PageContainer
           portfolio={portfolio}
           isOwner={isOwner}
           sectionId={sectionId}
@@ -207,32 +207,33 @@ function renderPageList(portfolio, isOwner, sectionId) {
 }
 
 $(document).ready(function () {
-  const fetchPortfolio = async () => {
-    const {json} = await doFetchApi({
-      path: `/eportfolios/${ENV.eportfolio_id}`,
-    })
-    return json
+  if (ENV.eportfolio_id) {
+    const fetchPortfolio = async () => {
+      const {json} = await doFetchApi({
+        path: `/eportfolios/${ENV.eportfolio_id}`,
+      })
+      return json
+    }
+    fetchPortfolio()
+      .then(portfolio => {
+        const isOwner = ENV.owner_view
+        const sectionId = ENV.category_id
+        renderSectionList(portfolio, isOwner)
+        renderPageList(portfolio, isOwner, sectionId)
+      })
+      .catch(() => {
+        const sectionListContainer = document.getElementById('section_list_mount')
+        if (sectionListContainer) {
+          const root = ReactDOM.createRoot(sectionListContainer)
+          root.render(<Alert variant="error">{I18n.t('Failed to load section list')}</Alert>)
+        }
+        const pageListContainer = document.getElementById('page_list_mount')
+        if (pageListContainer) {
+          const root = ReactDOM.createRoot(pageListContainer)
+          root.render(<Alert variant="error">{I18n.t('Failed to load page list')}</Alert>)
+        }
+      })
   }
-  fetchPortfolio()
-    .then(portfolio => {
-      const isOwner = ENV.owner_view
-      const sectionId = ENV.category_id
-      renderSectionList(portfolio, isOwner)
-      renderPageList(portfolio, isOwner, sectionId)
-    })
-    .catch(() => {
-      console.log('Failed to load section list')
-      const sectionListContainer = document.getElementById('section_list_mount')
-      if (sectionListContainer) {
-        const root = ReactDOM.createRoot(sectionListContainer)
-        root.render(<Alert variant="error">{I18n.t('Failed to load section list')}</Alert>)
-      }
-      const pageListContainer = document.getElementById('page_list_mount')
-      if (pageListContainer) {
-        const root = ReactDOM.createRoot(pageListContainer)
-        root.render(<Alert variant="error">{I18n.t('Failed to load page list')}</Alert>)
-      }
-    })
   // Add ePortfolio related
   $('.add_eportfolio_link').click(function (event) {
     event.preventDefault()
