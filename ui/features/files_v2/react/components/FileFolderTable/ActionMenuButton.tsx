@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
@@ -24,6 +24,7 @@ import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {FileManagementContext} from '../Contexts'
 import {type File, type Folder} from '../../../interfaces/File'
+import {RenameModal} from "../RenameModal";
 
 import {
   IconMoreLine,
@@ -58,10 +59,11 @@ const ActionMenuButton = ({
   const actionLabel = I18n.t('Actions')
   const currentContext = useContext(FileManagementContext)
   const contextType = currentContext?.contextType
+  const [renamingFile, setRenamingFile] = useState<null | File | Folder>(null)
 
   const triggerButton = () => {
     return size !== 'large' ? (
-      <Button 
+      <Button
         display={size == 'small' ? 'block' : 'inline-block'}
         data-testid="action-menu-button-small"
       >
@@ -78,10 +80,11 @@ const ActionMenuButton = ({
     )
   }
 
-  const renderMenuItem = (index:number, {icon, text, separator}:{
+  const renderMenuItem = (index:number, {icon, text, separator, onClick}:{
     icon?: any,
     text?: string,
     separator?: boolean,
+    onClick?: () => void,
     visible?: boolean,
   }) => {
     const key = index+'-'+row.id
@@ -89,7 +92,7 @@ const ActionMenuButton = ({
       return <Menu.Separator key={key} />
     }
     return (
-      <Menu.Item key={key}>
+      <Menu.Item key={key} onClick={onClick}>
         <Flex alignItems="center" gap="x-small">
           <Flex.Item>{React.createElement(icon, {inline: false})}</Flex.Item>
           <Flex.Item><Text>{text}</Text></Flex.Item>
@@ -106,7 +109,7 @@ const ActionMenuButton = ({
 
   const filteredItems = (row.folder_id ?
     [ // files
-      {icon: IconEditLine, text: I18n.t('Rename'), visible: rename_move_permissions},
+      {icon: IconEditLine, text: I18n.t('Rename'), visible: rename_move_permissions, onClick: () => { setRenamingFile(row) }},
       {icon: IconDownloadLine, text: I18n.t('Download')},
       {icon: IconPermissionsLine, text: I18n.t('Edit Permissions'), visible: userCanEditFilesForContext},
       {icon: IconCloudLockLine, text: I18n.t('Manage Usage Rights'), visible: has_usage_rights},
@@ -117,7 +120,7 @@ const ActionMenuButton = ({
       {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions},
     ] :
     [ // folder
-      {icon: IconEditLine, text: I18n.t('Rename'), visible: rename_move_permissions},
+      {icon: IconEditLine, text: I18n.t('Rename'), visible: rename_move_permissions, onClick: () => { setRenamingFile(row) }},
       {icon: IconDownloadLine, text: I18n.t('Download')},
       {icon: IconPermissionsLine, text: I18n.t('Edit Permissions'), visible: userCanEditFilesForContext},
       {icon: IconCloudLockLine, text: I18n.t('Manage Usage Rights'), visible: has_usage_rights},
@@ -128,9 +131,12 @@ const ActionMenuButton = ({
   ).filter(({visible}) => visible !== false)
 
   return (
-    <Menu placement="bottom" trigger={triggerButton()}>
-      {filteredItems.map((item, i) => renderMenuItem(i, item))}
-    </Menu>
+    <>
+      <Menu placement="bottom" trigger={triggerButton()}>
+        {filteredItems.map((item, i) => renderMenuItem(i, item))}
+      </Menu>
+      <RenameModal renamingFile={renamingFile} setRenamingFile={setRenamingFile}/>
+    </>
   )
 }
 
