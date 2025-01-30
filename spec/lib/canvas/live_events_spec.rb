@@ -2757,8 +2757,8 @@ describe Canvas::LiveEvents do
         grading_period_id: score.grading_period_id,
         override_status: score.custom_grade_status&.name,
         override_status_id: score.custom_grade_status_id,
-        old_override_status: nil,
-        old_override_status_id: nil,
+        old_override_status: "",
+        old_override_status_id: "",
         updated_at: score.updated_at,
       }
 
@@ -2782,8 +2782,8 @@ describe Canvas::LiveEvents do
         user_id: @enrollment.user_id,
         course_id: @enrollment.course_id,
         grading_period_id: score.grading_period_id,
-        override_status: nil,
-        override_status_id: nil,
+        override_status: "",
+        override_status_id: "",
         old_override_status: custom_grade_status&.name,
         old_override_status_id: custom_grade_status&.id,
         updated_at: score.updated_at,
@@ -2815,8 +2815,8 @@ describe Canvas::LiveEvents do
         submission_id: submission.id,
         user_id: submission.user_id,
         course_id: submission.course_id,
-        old_submission_status_id: nil,
-        old_submission_status: nil,
+        old_submission_status_id: "",
+        old_submission_status: "",
         submission_status: submission.custom_grade_status&.name,
         submission_status_id: submission.custom_grade_status_id,
         updated_at: submission.updated_at,
@@ -2841,8 +2841,8 @@ describe Canvas::LiveEvents do
         course_id: submission.course_id,
         old_submission_status_id: custom_grade_status.id,
         old_submission_status: custom_grade_status.name,
-        submission_status: nil,
-        submission_status_id: nil,
+        submission_status: "",
+        submission_status_id: "",
         updated_at: submission.updated_at,
       }
 
