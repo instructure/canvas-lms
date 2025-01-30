@@ -1117,6 +1117,7 @@ function DiscussionTopicForm({
                     value="checkpoints"
                     inline={true}
                     checked={isCheckpoints}
+                    disabled={currentDiscussionTopic?.assignment?.hasSubmittedSubmissions}
                     onChange={() => {
                       setIsCheckpoints(!isCheckpoints)
                       setIsThreaded(true)
