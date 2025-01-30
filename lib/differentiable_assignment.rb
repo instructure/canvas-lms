@@ -24,6 +24,7 @@ module DifferentiableAssignment
 
   def visible_to_user?(user)
     return true unless differentiated_assignments_applies?
+    return false if user.nil?
 
     is_visible = false
     Shard.with_each_shard(user.associated_shards) do
