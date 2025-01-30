@@ -17,6 +17,9 @@
  */
 
 import {type Folder, type File} from '../interfaces/File'
+import {getIconByType} from "@canvas/mime/react/mimeClassIconHelper";
+import React from "react";
+import {IconFolderLockedSolid, IconFolderSolid} from "@instructure/ui-icons";
 
 export const isFile = (item: File | Folder): item is File => {
   return 'display_name' in item
@@ -27,3 +30,18 @@ export const getUniqueId = (item: File | Folder) => {
 }
 
 export const pluralizeContextTypeString = (contextType: string) => `${contextType.toLowerCase()}s`
+
+export const getIcon = (item: File | Folder, isFile: boolean, iconUrl?: string) => {
+  if (isFile) {
+    if (!iconUrl) {
+      const IconComponent = getIconByType(item.mime_class)
+      return React.cloneElement(IconComponent, {color: 'primary'})
+    }
+  } else {
+    return item.for_submissions ? (
+        <IconFolderLockedSolid data-testid="locked-folder-icon" color="primary" />
+    ) : (
+        <IconFolderSolid data-testid="folder-icon" color="primary" />
+    )
+  }
+}

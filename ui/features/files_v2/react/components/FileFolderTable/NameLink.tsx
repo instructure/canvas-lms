@@ -19,13 +19,12 @@
 import React, {useState, useEffect} from 'react'
 import {useLocation, Link} from 'react-router-dom'
 import {Flex} from '@instructure/ui-flex'
-import {IconFolderLockedSolid, IconFolderSolid} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import FilePreviewModal from './FilePreviewModal'
-import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {type File, type Folder} from '../../../interfaces/File'
+import {getIcon} from '../../../utils/fileFolderUtils'
 import {generateUrlPath} from '../../../utils/folderUtils'
 import {generatePreviewUrlPath} from '../../../utils/fileUtils'
 
@@ -136,21 +135,6 @@ const NameLink = ({item, isStacked}: NameLinkProps) => {
       {renderFilePreviewModal()}
     </>
   )
-}
-
-const getIcon = (item: File | Folder, isFile: boolean, iconUrl?: string) => {
-  if (isFile) {
-    if (!iconUrl) {
-      const IconComponent = getIconByType(item.mime_class)
-      return React.cloneElement(IconComponent, {color: 'primary'})
-    }
-  } else {
-    return item.for_submissions ? (
-      <IconFolderLockedSolid data-testid="locked-folder-icon" color="primary" />
-    ) : (
-      <IconFolderSolid data-testid="folder-icon" color="primary" />
-    )
-  }
 }
 
 export default NameLink
