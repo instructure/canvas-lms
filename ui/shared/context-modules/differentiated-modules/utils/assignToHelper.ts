@@ -41,27 +41,57 @@ export const setContainScrollBehavior = (element: HTMLElement | null) => {
   }
 }
 
+/********************* Generating Assignment Override Payload *********************/
+
+const studentOverridePayload = (students: AssigneeOption[], overrideId: string | undefined): AssignmentOverridePayload => ({
+  student_ids: students.map(student => student.id.split('-')[1]),
+  id: overrideId,
+})
+
+const getStudentOverride = (studentAssignees: AssigneeOption[]): AssignmentOverridePayload => {
+  const studentOverrideId = studentAssignees.find(assignee => assignee.overrideId)?.overrideId
+  return studentOverridePayload(studentAssignees, studentOverrideId)
+}
+
+const sectionOverridePayload = (section: AssigneeOption): AssignmentOverridePayload => ({
+  course_section_id: section.id.split('-')[1],
+  id: section.overrideId,
+})
+
+const getSectionOverrides = (sectionAssignees: AssigneeOption[]) => {
+  return sectionAssignees.map(section => sectionOverridePayload(section))
+}
+
+const differentiationTagOverridePayload = (tag: AssigneeOption): AssignmentOverridePayload => ({
+  group_id: tag.id.split('-')[1],
+  id: tag.overrideId,
+})
+
+const getDifferentiationTagOverrides = (differentiationTagAssignees: AssigneeOption[]) => {
+  return differentiationTagAssignees.map(tag => differentiationTagOverridePayload(tag))
+}
+
+const separateAssigneesByType = (selectedAssignees: AssigneeOption[]) => {
+  const studentAssignees = selectedAssignees.filter(assignee => assignee.id.includes('student'))
+  const sectionAssignees = selectedAssignees.filter(assignee => assignee.id.includes('section'))
+  const differentiationTagAssignees = selectedAssignees.filter(assignee => assignee.id.includes('tag'))
+  return {studentAssignees, sectionAssignees, differentiationTagAssignees}
+}
+
 export const generateAssignmentOverridesPayload = (
   selectedAssignees: AssigneeOption[],
 ): AssignmentOverridesPayload => {
-  const studentsOverrideId = selectedAssignees.find(
-    assignee => assignee.id.includes('student') && assignee.overrideId,
-  )?.overrideId
-  const sectionOverrides = selectedAssignees
-    .filter(assignee => assignee.id.includes('section'))
-    ?.map(section => ({
-      course_section_id: section.id.split('-')[1],
-      id: section.overrideId,
-    }))
-  const studentIds = selectedAssignees
-    .filter(assignee => assignee.id.includes('student'))
-    ?.map(({id}) => id.split('-')[1])
-  const overrides: AssignmentOverridePayload[] = [...sectionOverrides]
-  if (studentIds.length > 0) {
-    overrides.push({
-      id: studentsOverrideId,
-      student_ids: studentIds,
-    })
+  const {studentAssignees, sectionAssignees, differentiationTagAssignees} = separateAssigneesByType(selectedAssignees)
+  const sectionOverrides = getSectionOverrides(sectionAssignees)
+  const differentiationTagOverrides = getDifferentiationTagOverrides(differentiationTagAssignees)
+
+  const overrides: AssignmentOverridePayload[] = [
+    ...sectionOverrides,
+    ...differentiationTagOverrides,
+  ]
+
+  if (studentAssignees.length > 0) {
+    overrides.push(getStudentOverride(studentAssignees))
   }
 
   return {overrides}

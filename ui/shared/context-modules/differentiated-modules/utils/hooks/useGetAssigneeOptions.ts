@@ -18,7 +18,7 @@
 
 import {useMemo} from 'react'
 import {useQuery} from '@canvas/query'
-import {getSections, getStudents, getGroups} from './queryFn'
+import {getSections, getStudents, getGroups, getDifferentiationTags} from './queryFn'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AssigneeOption} from '../../react/Item/types'
@@ -79,10 +79,21 @@ export const useGetAssigneeOptions = ({
     },
   })
 
+  const {data: differentiationTagsParsedResult, isFetching: isDifferentiationTagsLoading} = useQuery({
+    queryKey: ['differentiationTags', ENV.current_user_id, courseId, params],
+    queryFn: getDifferentiationTags,
+    enabled: shouldFetch,
+    onError: () => {
+      showFlashError(I18n.t('An error occurred while fetching differentiation tags'))
+      setHasErrors(true)
+    },
+  })
+
   const baseFetchedOptions = useMemo(() => {
     const combinedOptions = [
       ...(sectionsParsedResult ?? []),
       ...(groupsParsedResult ?? []),
+      ...(differentiationTagsParsedResult ?? []),
       ...(studentsParsedResult ?? []),
     ]
 
@@ -100,11 +111,11 @@ export const useGetAssigneeOptions = ({
       'id',
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sectionsParsedResult, groupsParsedResult, studentsParsedResult])
+  }, [sectionsParsedResult, groupsParsedResult, studentsParsedResult, differentiationTagsParsedResult])
 
   const isLoading = useMemo(
-    () => isSectionsLoading || isStudentsLoading || isGroupsLoading,
-    [isSectionsLoading, isStudentsLoading, isGroupsLoading],
+    () => isSectionsLoading || isStudentsLoading || isGroupsLoading || isDifferentiationTagsLoading,
+    [isSectionsLoading, isStudentsLoading, isGroupsLoading, isDifferentiationTagsLoading],
   )
 
   return {

@@ -45,7 +45,7 @@ module Api::V1::AssignmentOverride
       when "Group"
         json[:group_id] = override.set_id
         json[:non_collaborative] = override.set.non_collaborative?
-        json[:group_category_id] = override.assignment.group_category_id
+        json[:group_category_id] = override.set[:group_category_id]
       when "CourseSection"
         json[:course_section_id] = override.set_id
       when "Course"
