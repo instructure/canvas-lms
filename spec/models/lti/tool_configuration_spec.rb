@@ -24,16 +24,6 @@ module Lti
   describe ToolConfiguration do
     include_context "lti_1_3_spec_helper"
 
-    let(:public_jwk) do
-      {
-        "kty" => "RSA",
-        "e" => "AQAB",
-        "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
-        "kid" => "2018-09-18T21:55:18Z",
-        "alg" => "RS256",
-        "use" => "sig"
-      }
-    end
     let(:tool_configuration) do
       described_class.new(
         developer_key:,
@@ -58,21 +48,21 @@ module Lti
     end
     let(:lti_registration) { developer_key.lti_registration }
     let(:disabled_placements) { [] }
-    let(:privacy_level) { internal_configuration[:privacy_level] }
-    let(:title) { internal_configuration[:title] }
-    let(:description) { internal_configuration[:description] }
-    let(:domain) { internal_configuration[:domain] }
-    let(:tool_id) { internal_configuration[:tool_id] }
-    let(:target_link_uri) { "http://lti13testtool.docker/blti_launch" }
-    # let(:oidc_initiation_url) { internal_configuration[:oidc_initiation_url] }
-    let(:oidc_initiation_urls) { internal_configuration[:oidc_initiation_urls] }
-    let(:public_jwk_url) { internal_configuration[:public_jwk_url] }
-    # let(:public_jwk) { internal_configuration[:public_jwk] }
-    let(:custom_fields) { internal_configuration[:custom_fields] }
-    # let(:scopes) { internal_configuration[:scopes] }
-    let(:redirect_uris) { internal_configuration[:redirect_uris] }
-    let(:launch_settings) { internal_configuration[:launch_settings] }
-    let(:placements) { internal_configuration[:placements] }
+    let(:privacy_level) { internal_lti_configuration[:privacy_level] }
+    let(:title) { internal_lti_configuration[:title] }
+    let(:description) { internal_lti_configuration[:description] }
+    let(:domain) { internal_lti_configuration[:domain] }
+    let(:tool_id) { internal_lti_configuration[:tool_id] }
+    let(:target_link_uri) { internal_lti_configuration[:target_link_uri] }
+    let(:oidc_initiation_url) { internal_lti_configuration[:oidc_initiation_url] }
+    let(:oidc_initiation_urls) { internal_lti_configuration[:oidc_initiation_urls] }
+    let(:public_jwk_url) { internal_lti_configuration[:public_jwk_url] }
+    let(:public_jwk) { internal_lti_configuration[:public_jwk] }
+    let(:custom_fields) { internal_lti_configuration[:custom_fields] }
+    let(:scopes) { internal_lti_configuration[:scopes] }
+    let(:redirect_uris) { internal_lti_configuration[:redirect_uris] }
+    let(:launch_settings) { internal_lti_configuration[:launch_settings] }
+    let(:placements) { internal_lti_configuration[:placements] }
     let(:developer_key) { DeveloperKey.create!(is_lti_key: true, public_jwk_url: "https://example.com", redirect_uris: ["https://example.com"]) }
 
     def make_placement(type, message_type, extra = {})
@@ -520,7 +510,7 @@ module Lti
       let_once(:account) { Account.create! }
       let(:params) do
         {
-          settings: settings.with_indifferent_access,
+          settings: canvas_lti_configuration.with_indifferent_access,
           privacy_level: "public"
         }
       end
@@ -532,24 +522,24 @@ module Lti
       end
 
       it "adds scopes to dev key" do
-        expect(tool_configuration.developer_key.scopes).to eq(settings["scopes"])
+        expect(tool_configuration.developer_key.scopes).to eq(canvas_lti_configuration["scopes"])
       end
 
       it "set `target_link_uri` to developer_key.redirect_uris" do
         expect(tool_configuration.developer_key.redirect_uris.size).to eq 1
-        expect(tool_configuration.developer_key.redirect_uris.first).to eq settings["target_link_uri"]
+        expect(tool_configuration.developer_key.redirect_uris.first).to eq canvas_lti_configuration["target_link_uri"]
       end
 
       context "with extra custom fields provided" do
         let(:params) { super().merge(custom_fields: "foo=bar") }
 
         it "merges all custom fields" do
-          expect(tool_configuration.custom_fields).to eq settings["custom_fields"].merge({ "foo" => "bar" })
+          expect(tool_configuration.custom_fields).to eq canvas_lti_configuration["custom_fields"].merge({ "foo" => "bar" })
         end
       end
 
       context "when scopes is nil" do
-        let(:settings) { super().except("scopes", :scopes) }
+        let(:canvas_lti_configuration) { super().except("scopes", :scopes) }
 
         it "sets scopes to []" do
           expect(tool_configuration.scopes).to eq []
@@ -558,7 +548,7 @@ module Lti
       end
 
       context "with provided redirect_uris" do
-        let(:redirect_uris) { [settings["target_link_uri"], "http://example.com"] }
+        let(:redirect_uris) { [canvas_lti_configuration["target_link_uri"], "http://example.com"] }
         let(:tool_configuration) { described_class.create_tool_config_and_key!(account, params, redirect_uris) }
 
         it "sets the redirect_uris on the DeveloperKey" do
@@ -571,7 +561,7 @@ module Lti
       end
 
       it "correctly sets custom_fields" do
-        expect(tool_configuration.custom_fields).to eq settings["custom_fields"]
+        expect(tool_configuration.custom_fields).to eq canvas_lti_configuration["custom_fields"]
       end
 
       it "correctly sets privacy_level" do
@@ -579,7 +569,7 @@ module Lti
       end
 
       it "sets redirect_uris column" do
-        expect(tool_configuration[:redirect_uris]).to eq [settings["target_link_uri"]]
+        expect(tool_configuration[:redirect_uris]).to eq [canvas_lti_configuration["target_link_uri"]]
       end
 
       %i[title
@@ -590,13 +580,13 @@ module Lti
          public_jwk_url
          scopes].each do |field|
         it "sets #{field} column" do
-          expect(tool_configuration[field]).to eq settings[field.to_s]
+          expect(tool_configuration[field]).to eq canvas_lti_configuration[field.to_s]
         end
       end
 
       %i[domain tool_id].each do |field|
         it "sets #{field} column from extensions" do
-          expect(tool_configuration[field]).to eq settings.dig("extensions", 0, field.to_s)
+          expect(tool_configuration[field]).to eq canvas_lti_configuration.dig("extensions", 0, field.to_s)
         end
       end
 
@@ -610,7 +600,7 @@ module Lti
       end
 
       context "when tool_config creation fails" do
-        let(:settings) { { tool: "foo" } }
+        let(:canvas_lti_configuration) { { tool: "foo" } }
 
         it "does not create dev key" do
           expect(DeveloperKey.where(account:).count).to eq 0
@@ -628,7 +618,7 @@ module Lti
         let(:url) { "https://www.mytool.com/config/json" }
         let(:stubbed_response) do
           double(
-            :body => settings.to_json,
+            :body => canvas_lti_configuration.to_json,
             "[]" => "application/json;",
             :is_a? => true
           )
@@ -639,16 +629,16 @@ module Lti
         end
 
         it "fetches JSON from the URL" do
-          expect(tool_configuration.target_link_uri).to eq settings["target_link_uri"]
+          expect(tool_configuration.target_link_uri).to eq canvas_lti_configuration["target_link_uri"]
         end
 
         it "adds scopes to dev key" do
-          expect(tool_configuration.developer_key.scopes).to eq(settings["scopes"])
+          expect(tool_configuration.developer_key.scopes).to eq(canvas_lti_configuration["scopes"])
         end
 
         it "set `target_link_uri` to developer_key.redirect_uris" do
           expect(tool_configuration.developer_key.redirect_uris.size).to eq 1
-          expect(tool_configuration.developer_key.redirect_uris.first).to eq settings["target_link_uri"]
+          expect(tool_configuration.developer_key.redirect_uris.first).to eq canvas_lti_configuration["target_link_uri"]
         end
 
         context "when a timeout occurs" do
@@ -710,20 +700,6 @@ module Lti
           end
         end
       end
-    end
-
-    describe "placements" do
-      subject { tool_configuration.placements }
-
-      it "returns the appropriate placements" do
-        expect(subject).to eq(settings["extensions"].first["settings"]["placements"])
-      end
-    end
-
-    describe "domain" do
-      subject { tool_configuration.domain }
-
-      it { is_expected.to eq(settings["extensions"].first["domain"]) }
     end
 
     describe "verify_placements" do

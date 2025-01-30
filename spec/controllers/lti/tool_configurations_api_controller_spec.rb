@@ -57,14 +57,14 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       developer_key_id: dev_key_id,
       tool_configuration: {
         privacy_level:,
-        settings:
+        settings: canvas_lti_configuration
       }
     }.compact
   end
 
   before do
     user_session(admin)
-    settings["extensions"][0]["privacy_level"] = privacy_level || extension_privacy_level
+    canvas_lti_configuration["extensions"][0]["privacy_level"] = privacy_level || extension_privacy_level
     request.accept = "application/json"
     request.content_type = "application/json"
   end
@@ -98,7 +98,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
   shared_examples_for "an endpoint that accepts a settings_url" do
     let(:ok_response) do
       double(
-        :body => settings.to_json,
+        :body => canvas_lti_configuration.to_json,
         :is_a? => true,
         "[]" => "application/json"
       )
@@ -127,7 +127,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
       it "uses the tool configuration JSON from the settings_url" do
         subject
-        expect(config_from_response.target_link_uri).to eq settings["target_link_uri"]
+        expect(config_from_response.target_link_uri).to eq canvas_lti_configuration["target_link_uri"]
       end
 
       context "when developer_key.redirect_uris is a blank string" do
@@ -136,7 +136,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         it "does not overwrite the URL's redirect uris with a blank string redirect uri" do
           subject
 
-          expect(config_from_response.developer_key.redirect_uris).to eq [settings["target_link_uri"]]
+          expect(config_from_response.developer_key.redirect_uris).to eq [canvas_lti_configuration["target_link_uri"]]
         end
       end
 
@@ -163,7 +163,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
           subject
 
-          expect(config_from_response.developer_key.redirect_uris).to eq [settings["target_link_uri"]]
+          expect(config_from_response.developer_key.redirect_uris).to eq [canvas_lti_configuration["target_link_uri"]]
         end
       end
 
@@ -285,7 +285,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     end
 
     it "sets the developer key oidc_initiation_url" do
-      expect(subject.oidc_initiation_url).to eq oidc_initiation_url
+      expect(subject.oidc_initiation_url).to eq canvas_lti_configuration["oidc_initiation_url"]
     end
 
     context "when scopes are invalid" do
@@ -317,7 +317,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         "use" => "sig"
       }
     end
-    let(:settings) do
+    let(:canvas_lti_configuration) do
       s = super()
       s["public_jwk_url"] = "https://test.com"
       s
@@ -328,27 +328,25 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     end
 
     context "when the public jwk is missing" do
-      let(:public_jwk) { nil }
+      before do
+        canvas_lti_configuration.delete("public_jwk")
+      end
 
       it { is_expected.to be_nil }
     end
 
     context "when the public jwk url is missing" do
-      let(:settings) do
-        s = super()
-        s.delete("public_jwk_url")
-        s
+      before do
+        canvas_lti_configuration.delete("public_jwk_url")
       end
 
       it { is_expected.to be_nil }
     end
 
     context "when both the public jwk and public jwk url are missing" do
-      let(:public_jwk) { nil }
-      let(:settings) do
-        s = super()
-        s.delete("public_jwk_url")
-        s
+      before do
+        canvas_lti_configuration.delete("public_jwk")
+        canvas_lti_configuration.delete("public_jwk_url")
       end
 
       it { is_expected.to be_present }
@@ -361,6 +359,10 @@ RSpec.describe Lti::ToolConfigurationsApiController do
           "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
           "kid" => "2018-09-18T21:55:18Z"
         }
+      end
+
+      before do
+        canvas_lti_configuration["public_jwk"] = public_jwk
       end
 
       it { is_expected.to be_present }
@@ -378,6 +380,10 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         }
       end
 
+      before do
+        canvas_lti_configuration["public_jwk"] = public_jwk
+      end
+
       it { is_expected.to be_present }
     end
 
@@ -391,6 +397,10 @@ RSpec.describe Lti::ToolConfigurationsApiController do
           "alg" => "RS256",
           "use" => "sig"
         }
+      end
+
+      before do
+        canvas_lti_configuration["public_jwk"] = public_jwk
       end
 
       it { is_expected.to be_present }
@@ -442,10 +452,9 @@ RSpec.describe Lti::ToolConfigurationsApiController do
   describe "#update" do
     subject { put :update, params: }
 
-    let(:target_link_uri) { new_url }
-
     before do
       tool_configuration
+      canvas_lti_configuration["target_link_uri"] = new_url
     end
 
     context do

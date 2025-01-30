@@ -44,6 +44,12 @@ describe DeveloperKey do
     )
   end
 
+  let(:public_jwk) do
+    key_hash = CanvasSecurity::RSAKeyPair.new.public_jwk.to_h
+    key_hash["kty"] = key_hash["kty"].to_s
+    key_hash
+  end
+
   describe "#tokens_expire_in" do
     let(:developer_key) { DeveloperKey.new }
 
@@ -212,11 +218,6 @@ describe DeveloperKey do
   end
 
   describe "default values for is_lti_key" do
-    let(:public_jwk) do
-      key_hash = CanvasSecurity::RSAKeyPair.new.public_jwk.to_h
-      key_hash["kty"] = key_hash["kty"].to_s
-      key_hash
-    end
     let(:public_jwk_url) { "https://hello.world.com" }
 
     it "throws error if public jwk and public jwk are absent" do
@@ -1025,7 +1026,6 @@ describe DeveloperKey do
           )
         end
 
-        include_context "lti_1_3_spec_helper"
         specs_require_sharding
 
         context "when developer key is an LTI key" do
