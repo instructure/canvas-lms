@@ -136,6 +136,7 @@ hu:
       updateSuccess: "A frissítés sikeres"
       userDeleteError: "Az eredménycsoport egy vagy több olyan eredményt tartalmaz, amelyek jelenleg a tartalomhoz vannak hangolva."
     length_error: "Maximum 255 karakter hosszú lehet"
+    title: "A csoport elnevezése"
   OutcomeView: 
     length_error: "Maximum 255 karakter hosszú lehet"
     mastery_at_nan_error: "Számnak kell lennie"
