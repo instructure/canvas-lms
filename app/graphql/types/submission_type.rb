@@ -65,7 +65,7 @@ module Types
       load_association(:course).then do
         load_association(:assignment).then do
           if !Account.site_admin.feature_enabled?(:graphql_honor_anonymous_grading) ||
-             !(object.course.grants_right?(current_user, :manage_grades) && object.assignment.anonymize_students?)
+             object.can_read_submission_user_name?(current_user, session)
             object.user_id
           end
         end
