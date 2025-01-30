@@ -131,6 +131,7 @@ he:
       unexpectedDeleteError: "משהו השתבש. לא ניתן לבטל כרגע."
       updateSuccess: "עודכן בהצלחה"
     length_error: "255 תווים לכל היותר "
+    title: "מתן שם לקבוצה זו"
   OutcomeView: 
     length_error: "255 תווים לכל היותר "
     mastery_error: "צריך להיות גדול או שווה 0"
