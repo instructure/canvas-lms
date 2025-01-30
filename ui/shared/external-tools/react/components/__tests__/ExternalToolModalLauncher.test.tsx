@@ -23,7 +23,7 @@ import ExternalToolModalLauncher from '../ExternalToolModalLauncher'
 function generateProps(overrides = {}) {
   return {
     title: 'Modal Title',
-    tool: {placements: {course_assignments_menu: {}}},
+    tool: {placements: {course_assignments_menu: {}}, definition_id: 1},
     isOpen: false,
     onRequestClose: () => {},
     contextType: 'course',
@@ -109,5 +109,31 @@ describe('ExternalToolModalLauncher', () => {
     const {getByTitle} = render(<ExternalToolModalLauncher {...generateProps({isOpen: true})} />)
     const iframe = getByTitle('Modal Title')
     expect(iframe).toHaveAttribute('data-lti-launch', 'true')
+  })
+
+  describe('iframe get correct src', () => {
+    test('without resourceSelection param', () => {
+      const props = generateProps({isOpen: true})
+      const {getByTitle} = render(<ExternalToolModalLauncher {...props} />)
+      const iframe = getByTitle(props.title)
+      expect(iframe).toHaveAttribute(
+        'src',
+        `/courses/${props.contextId}/external_tools/${props.tool.definition_id}?display=borderless&launch_type=${props.launchType}`
+      )
+    })
+
+    test('with resourceSelection param', () => {
+      const props = generateProps({isOpen: true, resourceSelection: true})
+      const {getByTitle} = render(
+        <ExternalToolModalLauncher
+          {...props}
+        />
+      )
+      const iframe = getByTitle(props.title)
+      expect(iframe).toHaveAttribute(
+        'src',
+        `/courses/${props.contextId}/external_tools/${props.tool.definition_id}/resource_selection?display=borderless&launch_type=${props.launchType}`
+      )
+    })
   })
 })

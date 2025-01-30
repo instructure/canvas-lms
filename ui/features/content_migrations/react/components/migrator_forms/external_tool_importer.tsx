@@ -125,6 +125,7 @@ const ExternalToolImporter = ({
         contextId={contextId}
         launchType={'migration_selection'}
         onExternalContentReady={handleExternalContentReady}
+        resourceSelection
       />
 
       <CommonMigratorControls
