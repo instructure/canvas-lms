@@ -386,6 +386,34 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.published?).to be false
   end
 
+  it "handles the published state change from false to true and sets posted_at and last_reply_at correctly" do
+    @topic.unpublish!
+    expect(@topic.published?).to be false
+
+    result = run_mutation({ id: @topic.id, published: true })
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
+    @topic.reload
+    expect(@topic.published?).to be true
+    expect(@topic.posted_at).to be_within(1.second).of(Time.zone.now)
+    expect(@topic.last_reply_at).to be_within(1.second).of(Time.zone.now)
+  end
+
+  it "does not change posted_at but updates last_reply_at when published is already true" do
+    @topic.publish!
+    expect(@topic.published?).to be true
+    original_posted_at = @topic.posted_at
+
+    sleep 2 # Ensure there is a noticeable time difference
+    result = run_mutation({ id: @topic.id, published: true })
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
+    @topic.reload
+    expect(@topic.published?).to be true
+    expect(@topic.posted_at).to eq original_posted_at
+    expect(@topic.last_reply_at).to be_within(1.second).of(Time.zone.now)
+  end
+
   it "locks the discussion topic" do
     expect(@topic.locked).to be false
 
