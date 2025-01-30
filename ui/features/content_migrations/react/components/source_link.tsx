@@ -73,7 +73,7 @@ export const SourceLink = ({item}: {item: ContentMigrationItem}) => {
   }
 
   return link ? (
-    <Link href={link}>
+    <Link href={link} display="block">
       <span style={ellipsisStyle}>{text}</span>
     </Link>
   ) : (
