@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Factories
-  LTI_1_3_CONFIG_PATH = "spec/fixtures/lti/lti-1.3-tool-config.json"
-
   def dev_key_model(opts = {})
     @dev_key = DeveloperKey.create!(dev_key_valid_attributes(opts).merge(opts))
   end
