@@ -54,8 +54,6 @@ class AccountNotification < ActiveRecord::Base
       return
     end
 
-    return unless account.root_account?
-
     roles = account_notification_roles.map(&:role_name)
     return if roles.count > 0 && !roles.intersect?(["StudentEnrollment", "ObserverEnrollment"])
 
