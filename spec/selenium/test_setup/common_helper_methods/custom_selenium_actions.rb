@@ -451,12 +451,8 @@ module CustomSeleniumActions
   end
 
   def search_for_option(select_css, option_text, option_value)
-    element = fj(select_css)
-    # for search select inputs required to type some text before selecting an option
-    element.send_keys(option_text.split.first)
-    Selenium::WebDriver::Wait.new(timeout: 5).until do
-      element.attribute("aria-expanded") == "true"
-    end
+    element = canvas_select(select_css)
+    input_canvas_select(element, option_text)
     click_INSTUI_Select_option(element, option_value, :value)
   end
 
@@ -470,15 +466,48 @@ module CustomSeleniumActions
     end
   end
 
-  def INSTUI_select(elem_or_css)
+  def element_or_css(elem_or_css)
     elem_or_css.is_a?(String) ? fj(elem_or_css) : elem_or_css
+  end
+
+  def canvas_select(elem_or_css)
+    element_or_css(elem_or_css)
+  end
+
+  def instui_select(elem_or_css)
+    element_or_css(elem_or_css)
+  end
+
+  def clear_canvas_select(select)
+    cselect = canvas_select(select)
+    # clear the input field
+    cselect.send_keys [:control, "a"], :backspace
+  end
+
+  def input_canvas_select(select, text, option_exists: true)
+    wait = Selenium::WebDriver::Wait.new(timeout: 5)
+    cselect = canvas_select(select)
+    clear_canvas_select(select)
+
+    # if the option doesn't exist, we need to type the first word of the option
+    # otherwise all space characters will be ignored
+    unless option_exists
+      cselect.send_keys(text.split.first)
+      wait.until { cselect.attribute("aria-expanded") == "false" }
+      return
+    end
+
+    text.split.flat_map { |w| [w, :space] }[0...-1].each do |word|
+      cselect.send_keys(word)
+      wait.until { cselect.attribute("aria-expanded") == "true" }
+    end
   end
 
   # implementation of click_option for use with INSTU's Select
   # (tested with the CanvasSelect wrapper and instui SimpleSelect,
   # untested with a raw instui Select)
   def click_INSTUI_Select_option(select, option_text, select_by = :text)
-    cselect = INSTUI_select(select)
+    cselect = instui_select(select)
     option_list_id = cselect.attribute("aria-controls")
     if option_list_id.blank?
       cselect.click
@@ -493,14 +522,14 @@ module CustomSeleniumActions
   end
 
   def INSTUI_Select_options(select)
-    cselect = INSTUI_select(select)
+    cselect = instui_select(select)
     cselect.click # open the options list
     option_list_id = cselect.attribute("aria-controls")
     ff("##{option_list_id} [role='option']")
   end
 
   def INSTUI_Menu_options(menu)
-    menu = INSTUI_select(menu)
+    menu = instui_select(menu)
     menu.click # option the options list
     ff("[aria-labelledby='#{menu.attribute("id")}'] [role='menuitemradio']")
   end

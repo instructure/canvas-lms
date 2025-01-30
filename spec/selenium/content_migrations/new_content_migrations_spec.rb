@@ -280,19 +280,17 @@ describe "content migrations", :non_parallel do
       @copy_from.enroll_teacher(@user).accept
     end
 
-    it "only shows courses the user is authorized to see", priority: "1", skip: "issues with cc search" do
+    it "only shows courses the user is authorized to see", priority: "1" do
       new_course = Course.create!(name: "please don't see me")
       visit_page
       select_migration_type
       wait_for_ajaximations
 
-      NewContentMigrationPage.course_search_input.send_keys(@copy_from.name)
-      NewContentMigrationPage.course_search_input.send_keys(:enter)
-      wait_for_ajaximations
-      expect(NewContentMigrationPage.course_search_result(@copy_from.id.to_s)).to be_displayed
+      input_canvas_select(NewContentMigrationPage.course_search_input, @copy_from.name)
+      expect(NewContentMigrationPage.course_search_input_has_options?).to be true
 
-      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(NewContentMigrationPage.course_search_result(new_course.id.to_s)).not_to be_displayed
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name, option_exists: false)
+      expect(NewContentMigrationPage.course_search_input_has_options?).to be false
 
       user_logged_in(active_all: true)
       @course.enroll_teacher(@user, enrollment_state: "active")
@@ -302,8 +300,8 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name, option_exists: false)
+      expect(NewContentMigrationPage.course_search_input_has_options?).to be false
     end
 
     it "includes completed courses when checked", priority: "1", skip: "issues with cc search" do
