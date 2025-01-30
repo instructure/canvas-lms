@@ -120,6 +120,7 @@ uk:
       unexpectedDeleteError: "Щось пішло не так. Не доступно для видалення зараз."
       updateSuccess: "Успішно оновлено"
     length_error: "Має бути 255 символів, чи менше"
+    title: "Ім'я цієї групи"
   OutcomeView: 
     length_error: "Має бути 255 символів, чи менше"
     mastery_error: "Має бути більше або дорівнювати 0"
