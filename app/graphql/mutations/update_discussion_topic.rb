@@ -63,7 +63,14 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     end
 
     unless input[:published].nil?
-      input[:published] ? discussion_topic.publish! : discussion_topic.unpublish!
+      was_published = discussion_topic.published?
+      if input[:published] && !was_published
+        discussion_topic.publish!
+      elsif input[:published] && was_published
+        discussion_topic.edit!
+      else
+        discussion_topic.unpublish!
+      end
     end
 
     if !input[:remove_attachment].nil? && input[:remove_attachment]

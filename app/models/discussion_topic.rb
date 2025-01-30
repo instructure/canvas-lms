@@ -1034,6 +1034,11 @@ class DiscussionTopic < ActiveRecord::Base
     save!
   end
 
+  def edit!
+    self.last_reply_at = Time.zone.now
+    save!
+  end
+
   def unpublish
     self.workflow_state = "unpublished"
   end
