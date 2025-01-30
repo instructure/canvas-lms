@@ -304,7 +304,7 @@ describe "content migrations", :non_parallel do
       expect(NewContentMigrationPage.course_search_input_has_options?).to be false
     end
 
-    it "includes completed courses when checked", priority: "1", skip: "issues with cc search" do
+    it "includes completed courses when checked", priority: "1" do
       new_course = Course.create!(name: "completed course")
       new_course.enroll_teacher(@user).accept
       new_course.complete!
@@ -313,13 +313,13 @@ describe "content migrations", :non_parallel do
 
       select_migration_type
       wait_for_ajaximations
-      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name)
+      expect(NewContentMigrationPage.course_search_input_has_options?).to be true
 
       NewContentMigrationPage.include_completed_courses_checkbox.click
       wait_for_ajaximations
-      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name, option_exists: false)
+      expect(NewContentMigrationPage.course_search_input_has_options?).to be false
     end
 
     it "finds courses in other accounts", priority: "1", skip: "issues with cc search" do

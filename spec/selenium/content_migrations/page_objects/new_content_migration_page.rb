@@ -120,7 +120,7 @@ class NewContentMigrationPage
     end
 
     def include_completed_courses_checkbox
-      f("#include_completed_courses")
+      fxpath('//*[text()="Include completed courses"]')
     end
 
     def migration_progress_items
