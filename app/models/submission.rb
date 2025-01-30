@@ -3152,7 +3152,7 @@ class Submission < ActiveRecord::Base
 
   def partially_submitted?
     return false if assignment.nil?
-    return false unless assignment.checkpoints_parent?
+    return false unless assignment.has_sub_assignments?
 
     assignment.sub_assignments.each do |sub_assignment|
       return true if sub_assignment.submissions.where(user_id:, submission_type: "discussion_topic").where.not(submitted_at: nil).exists?

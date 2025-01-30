@@ -590,6 +590,15 @@ describe "SpeedGrader - discussion submissions" do
         expect(f("#this_student_does_not_have_a_submission")).to be_displayed
       end
 
+      it "does not display the no submission message if student has a partial submission and the checkpoints flag is off", :ignore_js_errors do
+        @checkpointed_discussion.reply_to_topic_checkpoint.submit_homework(@student, submission_type: "discussion_topic", submitted_at: Time.now.utc)
+        @course.root_account.disable_feature!(:discussion_checkpoints)
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+        wait_for_ajaximations
+        expect(f("#this_student_does_not_have_a_submission")).to_not be_displayed
+      end
+
       it "displays the no submission message if student has no submission" do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
         wait_for_ajaximations

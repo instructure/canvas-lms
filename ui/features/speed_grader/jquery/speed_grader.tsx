@@ -2777,7 +2777,11 @@ EG = {
   showSubmissionDetails() {
     // if there is a submission
     const currentSubmission = this.currentStudent.submission
-    if (currentSubmission && currentSubmission.workflow_state !== 'unsubmitted') {
+    if (
+      currentSubmission &&
+      (currentSubmission.workflow_state !== 'unsubmitted' ||
+        !this.currentStudent.submission?.['partially_submitted?'])
+    ) {
       this.refreshSubmissionsToView()
       // @ts-expect-error
       let index = currentSubmission.submission_history.length - 1
@@ -2902,16 +2906,21 @@ EG = {
     $submissions_container.children().hide()
     $('.speedgrader_alert').hide()
 
-    if (this.currentStudent?.submission?.['partially_submitted?']) {
+    // @ts-expect-error
+    if (this.currentStudent?.submission?.['partially_submitted?'] && ENV.discussion_checkpoints) {
       this.renderSubmissionPreview()
       return
     }
 
-    if (
-      !this.currentStudent.submission ||
-      !this.currentStudent.submission.submission_type ||
-      this.currentStudent.submission.workflow_state === 'unsubmitted'
-    ) {
+    const hasNoSubmission = !this.currentStudent.submission
+    const hasNoSubmissionTypeWithoutPartial =
+      !this.currentStudent.submission?.submission_type &&
+      !this.currentStudent.submission?.['partially_submitted?']
+    const isUnsubmittedWithoutPartial =
+      this.currentStudent.submission?.workflow_state === 'unsubmitted' &&
+      !this.currentStudent.submission?.['partially_submitted?']
+
+    if (hasNoSubmission || hasNoSubmissionTypeWithoutPartial || isUnsubmittedWithoutPartial) {
       $this_student_does_not_have_a_submission.show()
       if (!ENV.SINGLE_NQ_SESSION_ENABLED || !externalToolLaunchOptions.singleLtiLaunch) {
         this.emptyIframeHolder()
