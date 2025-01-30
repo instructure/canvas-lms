@@ -150,7 +150,7 @@ module Interfaces::SubmissionInterface
     load_association(:course).then do
       load_association(:assignment).then do
         if !Account.site_admin.feature_enabled?(:graphql_honor_anonymous_grading) ||
-           !(submission.course.grants_right?(current_user, :manage_grades) && submission.assignment.anonymize_students?)
+           submission.can_read_submission_user_name?(current_user, session)
           load_association(:user)
         end
       end
