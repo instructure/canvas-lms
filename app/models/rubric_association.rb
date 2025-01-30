@@ -99,7 +99,8 @@ class RubricAssociation < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :rubric_association_created
-    p.to { context.students }
+    p.to { context.respond_to?(:students) ? context.students : [] }
+
     p.whenever do |record|
       record.just_created && !record.context.is_a?(Course)
     end
