@@ -60,6 +60,10 @@ class SubmissionSearch
       search_scope = search_scope.where(user_id: representative_id(@options[:user_id]))
     end
 
+    if @options[:anonymous_id].present?
+      search_scope = search_scope.where(anonymous_id: @options[:anonymous_id])
+    end
+
     if @options[:enrollment_types].present?
       search_scope = search_scope.where(user_id:
         @course.enrollments.select(:user_id).where(type: @options[:enrollment_types]))

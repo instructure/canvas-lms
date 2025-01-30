@@ -1308,5 +1308,28 @@ describe Types::AssignmentType do
                )).to be_nil
       end
     end
+
+    context "anonymous_student_identities" do
+      context "when user does not have manage_grades permission" do
+        let(:context) { { current_user: student } }
+
+        it "returns null in place of the PostPolicy" do
+          resolver = GraphQLTypeTester.new(assignment, context)
+          expect(resolver.resolve("anonymousStudentIdentities {anonymousId}")).to be_nil
+        end
+      end
+
+      context "when user has manage_grades permission" do
+        let(:context) { { current_user: teacher } }
+        let(:resolver) { GraphQLTypeTester.new(assignment, context) }
+
+        it "returns the anonymous student identities for the assignment" do
+          assignment.anonymous_grading = true
+          assignment.save!
+          result = resolver.resolve("anonymousStudentIdentities {anonymousId}")
+          expect(result).to match_array(assignment.submissions.pluck(:anonymous_id))
+        end
+      end
+    end
   end
 end

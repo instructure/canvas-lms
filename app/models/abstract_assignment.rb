@@ -4185,7 +4185,8 @@ class AbstractAssignment < ActiveRecord::Base
     @anonymous_student_identities ||= all_submissions.active.order(Arel.sql('anonymous_id COLLATE "C" ASC')).order("md5(id::text) ASC").each_with_object({}).with_index(1) do |(identity, identities), student_number|
       identities[identity["user_id"]] = {
         name: I18n.t("Student %{student_number}", { student_number: }),
-        position: student_number
+        position: student_number,
+        anonymous_id: identity["anonymous_id"]
       }
     end
   end

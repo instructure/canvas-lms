@@ -1453,7 +1453,6 @@ class GradebooksController < ApplicationController
     # SGP is currently disabled for moderated and anonymously graded assignments
     if @assignment.present?
       return false if @assignment.moderated_grading
-      return false if @assignment.anonymous_grading
     end
 
     return false if Services::PlatformServiceSpeedgrader.launch_url.blank?
