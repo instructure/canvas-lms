@@ -683,9 +683,11 @@ describe "submissions" do
   end
 
   context "discussion_checkpoints" do
-    it "does not have keyboard-only next and previous buttons" do
+    it "still displays the submission without full discussion context no matter the feature flags set" do
       Account.default.enable_feature! :react_discussions_post
       Account.default.enable_feature! :discussion_checkpoints
+      Account.default.enable_feature! :discussions_speedgrader_revisit
+
       teacher_in_course(active_all: true)
       @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
       Checkpoints::DiscussionCheckpointCreatorService.call(
@@ -709,10 +711,19 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@checkpointed_discussion.assignment.id}/submissions/#{@student.id}"
 
       in_frame("preview_frame") do
-        in_frame("discussion_preview_iframe") do
-          wait_for_ajaximations
-          expect(f("body")).not_to contain_jqcss("[data-testid='jump-to-speedgrader-navigation']")
-        end
+        expect(f("#discussion_view_link")).to be_displayed
+        expect(f("body")).not_to contain_css("#discussion_preview_iframe")
+      end
+
+      Account.default.enable_feature! :react_discussions_post
+      Account.default.disable_feature! :discussion_checkpoints
+      Account.default.disable_feature! :discussions_speedgrader_revisit
+
+      get "/courses/#{@course.id}/assignments/#{@checkpointed_discussion.assignment.id}/submissions/#{@student.id}"
+
+      in_frame("preview_frame") do
+        expect(f("#discussion_view_link")).to be_displayed
+        expect(f("body")).not_to contain_css("#discussion_preview_iframe")
       end
     end
 

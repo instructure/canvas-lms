@@ -214,6 +214,58 @@ describe "SpeedGrader - discussion submissions" do
       end
     end
 
+    context "discussions_speedgrader_revisit" do
+      before do
+        @course.account.enable_feature!(:discussions_speedgrader_revisit)
+      end
+
+      context "Default Discussion View Options" do
+        it "is set to No Context by default and retains on save" do
+          Speedgrader.visit(@course.id, @assignment.id)
+          f("button[title='Settings']").click
+          fj("li:contains('Options')").click
+          expect(f("input[value='discussion_view_no_context']").attribute("checked")).to eq("true")
+          expect(f("body")).not_to contain_jqcss("button[data-testid='discussions-previous-reply-button']")
+
+          Speedgrader.submit_settings_form
+          expect(f("body")).not_to contain_jqcss("button[data-testid='discussions-previous-reply-button']")
+        end
+
+        it "applies and persists new Discussion View Options selection" do
+          Speedgrader.visit(@course.id, @assignment.id)
+          f("button[title='Settings']").click
+          fj("li:contains('Options')").click
+          fj("label:contains('Show replies in context')").click
+          fj(".ui-dialog-buttonset .ui-button:visible:last").click
+
+          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
+
+          in_frame("speedgrader_iframe") do
+            in_frame("discussion_preview_iframe") do
+              wait_for_ajaximations
+              expect(f("body")).to contain_jqcss(".discussions-search-filter")
+            end
+          end
+
+          Speedgrader.visit(@course.id, @assignment.id)
+
+          f("button[title='Settings']").click
+          fj("li:contains('Options')").click
+          expect(f("input[value='discussion_view_with_context']").attribute("checked")).to eq("true")
+          fj(".ui-dialog-buttonset .ui-button:visible:first").click
+
+          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
+
+          in_frame("speedgrader_iframe") do
+            in_frame("discussion_preview_iframe") do
+              wait_for_ajaximations
+              expect(f("body")).to contain_jqcss(".discussions-search-filter")
+            end
+          end
+        end
+      end
+    end
+
     context "with checkpoint submissions" do
       before do
         Account.site_admin.enable_feature!(:react_discussions_post)

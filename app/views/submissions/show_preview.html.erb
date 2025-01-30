@@ -38,8 +38,7 @@
     annotation_context = @submission.annotation_context(attempt: @submission.attempt)
     preview_url_opts[:annotation_context] = annotation_context.launch_id
   end
-
-  show_full_discussion_immediately = @context.root_account.feature_enabled?(:discussion_checkpoints)
+  show_full_discussion_immediately = params[:show_full_discussion_immediately]
 %>
 
 <% css_bundle :submission %>
