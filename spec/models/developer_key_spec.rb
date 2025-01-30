@@ -658,7 +658,6 @@ describe DeveloperKey do
 
   describe "site_admin_lti scope" do
     specs_require_sharding
-    include_context "lti_1_3_spec_helper"
 
     context "when root account and site admin keys exist" do
       subject do
@@ -902,7 +901,8 @@ describe DeveloperKey do
       end
 
       describe "after_update" do
-        include_context "lti_1_3_spec_helper"
+        let_once(:developer_key) { lti_developer_key_model(account:) }
+        let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration) }
 
         let(:user) { user_model }
         let(:developer_key_with_scopes) do
@@ -1129,7 +1129,8 @@ describe DeveloperKey do
     end
 
     describe "after_save" do
-      include_context "lti_1_3_spec_helper"
+      let_once(:developer_key) { lti_developer_key_model(account:) }
+      let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration) }
 
       before do
         developer_key_not_saved.tool_configuration = tool_configuration.dup

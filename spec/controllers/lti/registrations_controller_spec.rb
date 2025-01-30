@@ -19,9 +19,11 @@
 #
 
 require_relative "../../lti_1_3_tool_configuration_spec_helper"
-require_relative "../../lti_1_3_spec_helper"
 
 RSpec.describe Lti::RegistrationsController do
+  # Introduces internal_lti_configuration and canvas_lti_configuration
+  include_context "lti_1_3_tool_configuration_spec_helper"
+
   let(:response_json) do
     body = response.parsed_body
     body.is_a?(Array) ? body.map(&:with_indifferent_access) : body.with_indifferent_access
@@ -205,9 +207,6 @@ RSpec.describe Lti::RegistrationsController do
       end
 
       context "when developer key is deleted" do
-        # introduces `tool_configuration`
-        include_context "lti_1_3_tool_configuration_spec_helper"
-
         let(:developer_key) { lti_developer_key_model(account:) }
         let(:registration) { developer_key.lti_registration }
 
@@ -829,9 +828,6 @@ RSpec.describe Lti::RegistrationsController do
           as: :json
       response
     end
-
-    # Includes canvas_lti_configuration and internal_lti_configuration
-    include_context "lti_1_3_spec_helper"
 
     let(:params) do
       {
@@ -1593,9 +1589,6 @@ RSpec.describe Lti::RegistrationsController do
            as: :json
       response
     end
-
-    # Introduces internal_lti_configuration and canvas_lti_configuration
-    include_context "lti_1_3_tool_configuration_spec_helper"
 
     let(:params) do
       {

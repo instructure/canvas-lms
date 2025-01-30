@@ -126,6 +126,8 @@ describe Lti::Overlay do
   describe "self.apply_to" do
     subject { Lti::Overlay.apply_to(data, internal_config) }
 
+    let(:developer_key) { lti_developer_key_model(account:) }
+    let(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration) }
     let(:internal_config) { tool_configuration.reload.internal_lti_configuration.with_indifferent_access }
     let(:data) do
       {
@@ -146,9 +148,6 @@ describe Lti::Overlay do
       }
     end
     let(:root_keys) { Schemas::Lti::Overlay::ROOT_KEYS }
-
-    # Introduces tool configuration for overlay testing
-    include_context "lti_1_3_spec_helper"
 
     it "overlays top-level keys properly" do
       expect(subject.slice(root_keys)).to eq(data.slice(root_keys).with_indifferent_access)

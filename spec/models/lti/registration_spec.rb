@@ -250,7 +250,8 @@ RSpec.describe Lti::Registration do
     let_once(:registration) { lti_registration_model(account:) }
 
     context "the registration is associated with a manual registration" do
-      include_context "lti_1_3_spec_helper"
+      let_once(:developer_key) { lti_developer_key_model(account:) }
+      let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration) }
 
       before do
         tool_configuration.update!(lti_registration: registration, placements: [{ placement: "global_navigation", target_link_uri: "https://example.com/launch" }])

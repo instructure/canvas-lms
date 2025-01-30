@@ -496,14 +496,14 @@ describe DeveloperKeysController do
       end
 
       context "an overlay exists for one of the keys" do
-        # bring in tool_configuration
-        include_context "lti_1_3_spec_helper"
         let(:developer_key) do
-          developer_key_model(account: test_domain_root_account, public_jwk_url: "http://example.com", is_lti_key: true)
+          lti_developer_key_model(account: test_domain_root_account).tap do |developer_key|
+            lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration)
+          end
         end
         let(:overlay) do
           Lti::Overlay.create!(account: test_domain_root_account,
-                               registration: tool_configuration.lti_registration,
+                               registration: developer_key.lti_registration,
                                updated_by: user_model,
                                data: {
                                  "placements" => {

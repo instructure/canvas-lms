@@ -2997,6 +2997,11 @@ describe ExternalToolsController do
     context "with 1.3 tool" do
       include_context "lti_1_3_spec_helper"
 
+      let(:developer_key) do
+        lti_developer_key_model(account:).tap do |developer_key|
+          lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration)
+        end
+      end
       let(:tool) do
         t = developer_key.lti_registration.new_external_tool(@course)
         t.save!
