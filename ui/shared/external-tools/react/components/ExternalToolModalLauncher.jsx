@@ -39,6 +39,7 @@ export default class ExternalToolModalLauncher extends React.Component {
     launchType: PropTypes.string.isRequired,
     contextModuleId: PropTypes.string,
     onExternalContentReady: PropTypes.func,
+    resourceSelection: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -88,6 +89,7 @@ export default class ExternalToolModalLauncher extends React.Component {
         this.props.contextId,
         '/external_tools/',
         this.props.tool.definition_id,
+        this.props.resourceSelection ? '/resource_selection' : '',
         '?display=borderless&launch_type=',
         this.props.launchType,
         this.props.contextModuleId && '&context_module_id=',
