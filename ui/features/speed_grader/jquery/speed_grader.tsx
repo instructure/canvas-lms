@@ -560,6 +560,15 @@ export function initDropdown() {
   const hideStudentNames = utils.shouldHideStudentNames()
   $('#hide_student_names').prop('checked', hideStudentNames)
 
+  // default_discussion_view initial selected radio button
+  const defaultDiscussionView = getDefaultDiscussionView()
+  const defaultDiscussionViewElement = document.querySelector(
+    `input[name="default_discussion_view"][value="${defaultDiscussionView}"]`,
+  )
+  if (defaultDiscussionViewElement) {
+    defaultDiscussionViewElement.setAttribute('checked', 'checked')
+  }
+
   $('#show_new_sg_ui').on('click', function () {
     const searchParams = new URLSearchParams(window.location.search)
 
@@ -744,6 +753,21 @@ function setupHeader() {
     submitSettingsForm(e: JQuery.SubmitEvent) {
       e.preventDefault()
 
+      // a checkpoints rerender will conditionally show/remove the DiscussionNavigation component
+      // it will also rerender the submission preview iframe (the left pane)
+      let needsCheckPointsRerender = false
+      const selectedDefaultDiscussionView = document.querySelector(
+        "input[name='default_discussion_view']:checked",
+      )
+      if (selectedDefaultDiscussionView) {
+        const currentDefaultDiscussionView = userSettings.get('default_discussion_view')
+        const newDefaultDiscussionView = selectedDefaultDiscussionView.getAttribute('value')
+        if (currentDefaultDiscussionView !== newDefaultDiscussionView) {
+          userSettings.set('default_discussion_view', newDefaultDiscussionView)
+          needsCheckPointsRerender = true
+        }
+      }
+
       const sortBy = $('#eg_sort_by').val()
       const sortByChanged = sortBy !== utils.sortByCriteria()
       userSettings.set('eg_sort_by', sortBy)
@@ -777,6 +801,11 @@ function setupHeader() {
       }).then(() => {
         if (needsReload) {
           SpeedgraderHelpers.reloadPage()
+        } else if (needsCheckPointsRerender) {
+          EG.renderSubmissionPreview()
+          userSettings.get('default_discussion_view') === 'discussion_view_with_context'
+            ? renderDiscussionsNavigation()
+            : clearDiscussionsNavigation()
         }
       })
     },
@@ -872,10 +901,28 @@ function renderRubricsCheckpointsInfo() {
   }
 }
 
+function getDefaultDiscussionView() {
+  // logic:
+  // when the discussion_checkpoints feature is disabled, the default view should be discussion_view_no_context
+  // when the discussion_checkpoints feature is enabled, we check for the following things:
+  // - if the discussions_speedgrader_revisit feature is disabled, the default view should be discussion_view_with_context
+  // - if the discussions_speedgrader_revisit feature is enabled, we check for even more things:
+  //   - if userSettings.get('default_discussion_view') exists, we use that, otherwise we default to discussion_view_no_context
+  const discussionCheckpointsEnabled = ENV.FEATURES?.discussion_checkpoints
+  const discussionsSpeedgraderRevisitEnabled = ENV.FEATURES?.discussions_speedgrader_revisit
+  if (!discussionCheckpointsEnabled) {
+    return 'discussion_view_no_context'
+  } else if (!discussionsSpeedgraderRevisitEnabled) {
+    return 'discussion_view_with_context'
+  } else {
+    return userSettings.get('default_discussion_view') || 'discussion_view_no_context'
+  }
+}
+
 function renderDiscussionsNavigation() {
   const mountPoint = document.getElementById(SPEED_GRADER_DISCUSSIONS_NAVIGATION_MOUNT_POINT)
 
-  if (mountPoint) {
+  if (getDefaultDiscussionView() === 'discussion_view_with_context' && mountPoint) {
     ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
   }
 }
@@ -2977,7 +3024,11 @@ EG = {
     )
     const hideStudentNames = utils.shouldHideStudentNames() ? '&hide_student_name=1' : ''
     const entryId = ENV.ENTRY_ID ? `&entry_id=${ENV.ENTRY_ID}` : ''
-    const queryParams = `${iframePreviewVersion}${hideStudentNames}${entryId}`
+    const showFullDiscussionImmediately =
+      getDefaultDiscussionView() === 'discussion_view_with_context'
+        ? `&show_full_discussion_immediately=1`
+        : ''
+    const queryParams = `${iframePreviewVersion}${hideStudentNames}${entryId}${showFullDiscussionImmediately}`
     const src = `/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/${anonymizableSubmissionId}?preview=true${queryParams}`
     const iframe = SpeedgraderHelpers.buildIframe(
       htmlEscape(src),
