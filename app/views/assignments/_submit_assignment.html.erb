@@ -75,17 +75,17 @@
       <%= form_tag(submission_create_url, {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
         <%= hidden_field :submission, :submission_type, :value => "online_url" %>
         <table class="formtable" style="width: 100%;">
-          <tr>
-            <td colspan="2">
-              <%= t 'instructions.online_url', "Copy and paste the link to the web site you'd like to submit for this assignment." %>
-                <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
+          <% if @assignment.has_group_category? %>
+            <tr>
+              <td colspan="2">
+                <%= render :partial => "assignments/group_submission_reminder" %>
               </td>
-          </tr>
+            </tr>
+          <% end %>
           <tr>
             <td colspan="2">
-              <%= blabel :submission, :url, :en => "Website URL" %>
-              &nbsp;&nbsp;
-              <%= text_field :submission, :url, :style => "min-width: 250px;" %>
+              <%= hidden_field :submission, :url %>
+              <div id="online_url_submission_input"></div>
             </td>
           </tr>
           <% unless @context.account.grants_right?(@current_user, :make_submission_comments) %>

@@ -73,7 +73,7 @@ describe "assignments" do
 
     it "validates that website url submissions are allowed" do
       update_assignment_attributes(@assignment, :submission_types, "online_url")
-      expect(f("#submission_url")).to be_displayed
+      expect(f("#online-url-input")).to be_displayed
     end
 
     it "validates that text entry submissions are allowed" do

@@ -756,6 +756,27 @@ describe SubmissionsController do
         expect(response).to redirect_to(/[?&]submitted=2/)
       end
     end
+
+    it "returns redirect_url if should_redirect_to_assignment is true" do
+      course_with_student_logged_in(active_all: true)
+
+      assignment = @course.assignments.create!(
+        title: "some assignment",
+        submission_types: "online_url"
+      )
+
+      post "create",
+           params: {
+             course_id: @course.id,
+             assignment_id: assignment.id,
+             submission: { submission_type: "online_url", url: "url" },
+             should_redirect_to_assignment: true
+           },
+           format: "json"
+
+      json = response.parsed_body
+      expect(json["redirect_url"]).to include("/courses/#{@course.id}/assignments/#{assignment.id}?submitted=")
+    end
   end
 
   describe "GET zip" do
