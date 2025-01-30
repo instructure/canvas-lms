@@ -1107,10 +1107,10 @@ module Canvas::LiveEvents
       user_id: enrollment.user_id,
       course_id: enrollment.course_id,
       grading_period_id: score.grading_period_id,
-      override_status: score.custom_grade_status&.name,
-      override_status_id: score.custom_grade_status_id,
-      old_override_status: old_status&.name,
-      old_override_status_id: old_status&.id,
+      override_status: score.custom_grade_status&.name || "",
+      override_status_id: score.custom_grade_status_id || "",
+      old_override_status: old_status&.name || "",
+      old_override_status_id: old_status&.id || "",
       updated_at: score.updated_at,
     }
     post_event_stringified("final_grade_custom_status", data, amended_context(course))
@@ -1125,10 +1125,10 @@ module Canvas::LiveEvents
       submission_id: submission.id,
       user_id: submission.user_id,
       course_id: submission.course_id,
-      old_submission_status_id:,
-      old_submission_status: old_status&.name,
-      submission_status: submission.custom_grade_status&.name,
-      submission_status_id: submission.custom_grade_status_id,
+      old_submission_status_id: old_submission_status_id || "",
+      old_submission_status: old_status&.name || "",
+      submission_status: submission.custom_grade_status&.name || "",
+      submission_status_id: submission.custom_grade_status_id || "",
       updated_at: submission.updated_at,
     }
     post_event_stringified("submission_custom_grade_status", data, amended_context(course))
