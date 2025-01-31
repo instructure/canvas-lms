@@ -2495,6 +2495,7 @@ uk:
       not_yet_graded: "*Оцінка досі відсутня*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
       score_with_points_possible_screenreader: "Рахунок: %{score} з можливих %{pointsPossible} балів."
+    assignment_submit_success: "Завдання було успішно відправлено."
     assignments_list_right_side: 
       links: 
         see_current_grades: "Дивитися мої оцінки до цього часу"
@@ -9402,6 +9403,7 @@ uk:
       ellipsis: "..."
       quoted_text_toggle: "Показати цитований текст"
       word_separator: " "
+  license_bdede4fb: Ліцензія
   license_help: 
     content_license_help: "Допомога ліцензування контенту"
   license_type_6b74b543: "Тип Ліцензії"
@@ -11920,6 +11922,7 @@ uk:
   no_placements_enabled_f705f28: "Не доступне розміщення"
   no_points_possible_368669d: "Можливі бали відсутні"
   no_points_possible_72db3a55: "Можливі бали відсутні"
+  no_preview_available_e8e71199: "Попередній перегляд недоступний"
   no_results_3cda4e72: "Результати відсутні"
   no_results_f36777ee: "Немає результатів"
   no_results_found_2ace1494: "Результатів не знайдено"
