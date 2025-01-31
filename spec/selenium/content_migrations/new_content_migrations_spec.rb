@@ -468,7 +468,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "sets pre-populate date adjustment settings", skip: "issues with cc search" do
+    it "sets pre-populate date adjustment settings" do
       new_course = Course.create!(name: "date adjust", start_at: "Jul 1, 2012", conclude_at: "Jul 11, 2012")
       new_course.enroll_teacher(@user).accept
 
@@ -479,15 +479,15 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type
       wait_for_ajaximations
-      click_option("#courseSelect", new_course.id.to_s, :value)
+      search_for_option("#course-copy-select-course", new_course.name, new_course.id.to_s)
 
-      CourseCopyPage.date_adjust_checkbox.click
+      NewContentMigrationPage.date_adjust_checkbox.click
       NewContentMigrationPage.all_content_radio.click
 
       submit
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      expect(opts["shift_dates"]).to eq "1"
+      expect(opts["shift_dates"]).to be true
       expect(opts["day_substitutions"]).to eq({})
       expected = {
         "old_start_date" => "Jul 1, 2012",
