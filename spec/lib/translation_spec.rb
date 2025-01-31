@@ -121,7 +121,7 @@ describe "Translation" do
     it "uses the cache if key is present" do
       # Arrange
       @user.locale = "es"
-      allow(Canvas.redis).to receive(:get).with(["translated_languages", @user.locale].cache_key).and_return({ language: "languages" }.to_json)
+      allow(Rails.cache).to receive(:fetch).with(["translated_languages", @user.locale].cache_key).and_return({ "language" => "languages" })
 
       # Act
       resp = Translation.translated_languages(@user)
@@ -132,14 +132,14 @@ describe "Translation" do
 
     it "caches the translation results" do
       # Arrange
-      allow(Canvas.redis).to receive(:set)
+      allow(Rails.cache).to receive(:write)
       @user.locale = "es"
 
       # Act
       Translation.translated_languages(@user)
 
       # Assert
-      expect(Canvas.redis).to have_received(:set).exactly(1)
+      expect(Rails.cache).to have_received(:write).exactly(1)
     end
   end
 
