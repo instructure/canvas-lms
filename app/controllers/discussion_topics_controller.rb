@@ -235,7 +235,33 @@
 #           "type": "boolean"
 #         },
 #         "sort_by_rating": {
-#           "description": "Whether or not entries should be sorted by rating.",
+#           "description": "DEPRECATED, Whether or not entries should be sorted by rating.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "sort_order": {
+#           "description": "How entries should be sorted by default.",
+#           "example": "asc",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "asc",
+#               "desc"
+#             ]
+#           }
+#         },
+#         "sort_order_locked": {
+#           "description": "Can users decide their preferred sort order.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "expand": {
+#           "description": "Threaded replies should be expanded by default.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "expand_locked": {
+#           "description": "Can users decide their preferred thread expand setting.",
 #           "example": true,
 #           "type": "boolean"
 #         }
@@ -1152,8 +1178,20 @@ class DiscussionTopicsController < ApplicationController
   # @argument only_graders_can_rate [Boolean]
   #   If true, only graders will be allowed to rate entries.
   #
+  # @argument sort_order [String, "asc"|"desc"]
+  #   Default sort order of the discussion. Accepted values are "asc", "desc".
+  #
+  # @argument sort_order_locked [Boolean]
+  #   If true, users cannot choose their prefered sort order
+  #
+  # @argument expanded [Boolean]
+  #   If true, thread will be expanded by default
+  #
+  # @argument expanded_locked [Boolean]
+  #   If true, users cannot choose their prefered thread expansion setting
+  #
   # @argument sort_by_rating [Boolean]
-  #   If true, entries will be sorted by rating.
+  #  (DEPRECATED) If true, entries will be sorted by rating.
   #
   # @argument attachment [File]
   #   A multipart/form-data form-field-style attachment.
@@ -1254,8 +1292,20 @@ class DiscussionTopicsController < ApplicationController
   # @argument only_graders_can_rate [Boolean]
   #   If true, only graders will be allowed to rate entries.
   #
+  # @argument sort_order [String, "asc"|"desc"]
+  #   Default sort order of the discussion. Accepted values are "asc", "desc".
+  #
+  # @argument sort_order_locked [Boolean]
+  #   If true, users cannot choose their prefered sort order
+  #
+  # @argument expanded [Boolean]
+  #   If true, thread will be expanded by default
+  #
+  # @argument expanded_locked [Boolean]
+  #   If true, users cannot choose their prefered thread expansion setting
+  #
   # @argument sort_by_rating [Boolean]
-  #   If true, entries will be sorted by rating.
+  #   (DEPRECATED) If true, entries will be sorted by rating.
   #
   # @argument specific_sections [String]
   #   A comma-separated list of sections ids to which the discussion topic
@@ -1566,6 +1616,24 @@ class DiscussionTopicsController < ApplicationController
 
     if discussion_topic_hash.key?(:message)
       discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
+    end
+
+    if Account.site_admin.feature_enabled?(:discussion_default_sort)
+      @topic.sort_order_locked = params[:sort_order_locked] unless params[:sort_order_locked].nil?
+      unless params[:sort_order].nil?
+        if DiscussionTopic::SortOrder::TYPES.include?(params[:sort_order])
+          @topic.sort_order = params[:sort_order]
+        else
+          @errors[:sort_order] = t(:error_sort_order,
+                                   "Sort order type not valid")
+        end
+
+      end
+    end
+
+    if Account.site_admin.feature_enabled?(:discussion_default_expand)
+      @topic.expanded = params[:expanded] unless params[:expanded].nil?
+      @topic.expanded_locked = params[:expanded_locked] unless params[:expanded_locked].nil?
     end
 
     prefer_assignment_availability_dates(discussion_topic_hash)
