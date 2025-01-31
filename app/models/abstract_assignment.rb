@@ -2949,6 +2949,7 @@ class AbstractAssignment < ActiveRecord::Base
 
     progress.set_results(results)
     attachment.destroy!
+    zip_extractor.remove_extracted_files!
   end
 
   def submission_reupload_progress
