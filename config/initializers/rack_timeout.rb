@@ -8,7 +8,6 @@ end
 Rack::Timeout.register_state_change_observer(:check_for_slow_requests) do |env|
   unless env["sentry_sent"]
     info = env[::Rack::Timeout::ENV_INFO_KEY]
-    Rails.logger.info("Rack Timeout Request Details ID: #{info.id}")
     request_id = info.id
     if info.service && info.service > 30
       env["sentry_sent"] = true
