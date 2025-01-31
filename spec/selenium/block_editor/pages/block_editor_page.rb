@@ -166,6 +166,14 @@ module BlockEditorPage
     f(block_resize_handle_selector(direction))
   end
 
+  def use_the_rce_button
+    f(".new_rce_page")
+  end
+
+  def rce_container
+    f(".ic-RichContentEditor")
+  end
+
   def block_toolbar
     f(".block-toolbar")
   end

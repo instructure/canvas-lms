@@ -46,6 +46,15 @@ describe "Block Editor", :ignore_js_errors do
       create_wiki_page(@course)
     end
 
+    context "Preexisting user text editor preference" do
+      it "respects explicit rce choice for new pages" do
+        @user.set_preference(:text_editor_preference, "block_editor")
+        get "/courses/#{@course.id}/pages"
+        use_the_rce_button.click
+        expect(rce_container).to be_displayed
+      end
+    end
+
     context "Start from Scratch" do
       it "shows the template chooser modal with a default page block" do
         expect(template_chooser).to be_displayed
