@@ -2171,6 +2171,7 @@ hy:
       save: Պահպանել
       validating: "Պահպանվում է..."
       weight_groups: "Սահմանել վերջնական գնահատականը, հիմնվելով հանձնարարությունների խմբերի վրա:"
+    assignment_submit_success: "Հանձնարարությունը հաջողությամբ ուղարկված է:"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Կառավարել հանձնարարությունները"
@@ -8901,6 +8902,7 @@ hy:
       ellipsis: "..."
       quoted_text_toggle: "ցույց տալ մեջբերվող տեքստը"
       word_separator: "-"
+  license_bdede4fb: Արտոնագիր
   license_help: 
     content_license_help: "Օժանդակություն բովանդակության լիցենզավորման հարցում"
   light_blue_5374f600: "Բաց կապույտ"
@@ -11343,6 +11345,7 @@ hy:
   no_password_was_given_472222e5: "Գաղտնաբառ տրված չէ "
   no_placements_enabled_f705f28: "Տեղադրումները միացված չեն"
   no_points_possible_368669d: "Հնարավոր միավորներ չկան"
+  no_preview_available_e8e71199: "Նախնական դիտումը հասանելի չէ"
   no_results_3cda4e72: "Արդյունքներ չկան"
   no_results_found_2ace1494: "Ոչ մի արդյունք չի գտնվել"
   no_results_found_58717065: "Արդյունքներ չեն ստացվել"
