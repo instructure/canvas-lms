@@ -23,7 +23,6 @@ module Factories
     email = opts.delete(:email)
     @user = User.create!(valid_user_attributes.merge(opts))
     @user.email = email if email # set e-mail after record creation
-    @user.enable_feature!(:new_user_tutorial_on_off) if opts[:new_user]
     @user
   end
 
@@ -65,7 +64,6 @@ module Factories
     end
     @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
     @cc = communication_channel(@user, opts) if opts[:active_cc]
-    @user.enable_feature!(:new_user_tutorial_on_off) if opts[:new_user]
     @user
   end
 

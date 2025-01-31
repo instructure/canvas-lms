@@ -32,7 +32,6 @@ describe FeatureFlags do
 
   before do
     silence_undefined_feature_flag_errors
-    allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(InstStatsd::Statsd).to receive(:distributed_increment)
     allow(Feature).to receive(:definitions).and_return({
                                                          "site_admin_feature" => Feature.new(feature: "site_admin_feature", applies_to: "SiteAdmin", state: "allowed"),
