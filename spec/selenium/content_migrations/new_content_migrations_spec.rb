@@ -85,7 +85,7 @@ def test_selective_content(source_course = nil)
   visit_page
 
   # Open selective dialog
-  expect(NewContentMigrationPage.progress_status_label).to include_text("Waiting for Selection")
+  expect(NewContentMigrationPage.progress_status_label).to include_text("Waiting for selection")
   NewContentMigrationPage.select_content_button.click
   wait_for_ajaximations
 
@@ -386,14 +386,14 @@ describe "content migrations", :non_parallel do
         expect(@course.quizzes.first.quiz_questions.count).to eq 11
       end
 
-      it "selectively copies content", priority: "1", skip: "issues with cc search" do
+      it "selectively copies content", priority: "1" do
         skip unless Qti.qti_enabled?
         visit_page
 
         select_migration_type
         wait_for_ajaximations
 
-        click_option("#courseSelect", @copy_from.id.to_s, :value)
+        search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s)
         NewContentMigrationPage.specific_content_radio.click
         submit
 

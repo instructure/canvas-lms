@@ -76,15 +76,15 @@ class NewContentMigrationPage
     end
 
     def select_content_button
-      f('td [data-cid="BaseButton Button"]')
+      find_button("Select content")
     end
 
     def all_assignments_checkbox
-      f('input[data-testid="checkbox-copy[all_assignments]]"]')
+      f('input[data-testid="checkbox-copy[all_assignments]"] + label')
     end
 
     def select_content_submit_button
-      f(".selectContentDialog input[type=submit]")
+      f("#content-selection-modal button[data-testid='select-content-button']")
     end
 
     def content
