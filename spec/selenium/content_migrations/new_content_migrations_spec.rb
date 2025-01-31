@@ -538,7 +538,7 @@ describe "content migrations", :non_parallel do
       expect(@course.lock_all_announcements).to be_truthy
     end
 
-    it "persists topic 'allow liking' settings across course copy", priority: "2", skip: "issues with cc search" do
+    it "persists topic 'allow liking' settings across course copy", priority: "2" do
       @copy_from.discussion_topics.create!(
         title: "Liking Allowed Here",
         message: "Like I said, liking is allowed",
@@ -548,14 +548,14 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type
       wait_for_ajaximations
-      click_option("#courseSelect", @copy_from.id.to_s, :value)
+      search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s)
       NewContentMigrationPage.all_content_radio.click
       submit
       run_jobs
       # Wait until the item is imported on the back-end, otherwise the selenium tools will fail the test due to runtime
       keep_trying_until { ContentMigration.last.workflow_state == "imported" }
       @course.reload
-      expect(@course.discussion_topics.last.allow_rating).to be_truthy
+      expect(@course.discussion_topics.last.allow_rating).to be true
     end
   end
 
