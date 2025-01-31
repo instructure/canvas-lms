@@ -119,7 +119,7 @@ describe "API Authentication", type: :request do
           get response["Location"]
           expect(response).to render_template("oauth2_provider/confirm")
 
-          post "/login/oauth2/accept", params: { authenticity_token: cookies["_csrf_token"] }
+          post "/login/oauth2/accept", params: { custom_csrf_token: session[:oauth2][:custom_csrf_token] }
 
           expect(response).to be_redirect
           expect(response["Location"]).to match(%r{/login/oauth2/auth\?})
@@ -235,7 +235,7 @@ describe "API Authentication", type: :request do
         expect(response["Location"]).to match(%r{/login/oauth2/confirm$})
         get response["Location"]
         expect(response).to render_template("oauth2_provider/confirm")
-        post "/login/oauth2/accept", params: { authenticity_token: cookies["_csrf_token"] }
+        post "/login/oauth2/accept", params: { custom_csrf_token: session[:oauth2][:custom_csrf_token] }
         expect(response).to be_redirect
         expect(response["Location"]).to match(%r{/login/oauth2/auth\?})
         code = response["Location"].match(/code=([^?&]+)/)[1]
@@ -285,7 +285,7 @@ describe "API Authentication", type: :request do
         follow_redirect!
         expect(response).to be_successful
 
-        post "/login/oauth2/accept", params: { authenticity_token: controller.send(:form_authenticity_token) }
+        post "/login/oauth2/accept", params: { custom_csrf_token: session[:oauth2][:custom_csrf_token] }
 
         code = response["Location"].match(/code=([^?&]+)/)[1]
         expect(code).to be_present
@@ -330,7 +330,7 @@ describe "API Authentication", type: :request do
             expect(response["Location"]).to match(%r{/login/oauth2/confirm$})
             get response["Location"]
             expect(response).to render_template("oauth2_provider/confirm")
-            post "/login/oauth2/accept", params: { authenticity_token: cookies["_csrf_token"] }
+            post "/login/oauth2/accept", params: { custom_csrf_token: session[:oauth2][:custom_csrf_token] }
 
             expect(response).to be_redirect
             expect(response["Location"]).to match(%r{/login/oauth2/auth\?})
@@ -395,7 +395,7 @@ describe "API Authentication", type: :request do
               expect(response).to be_redirect
               expect(response["Location"]).to match(%r{/login/oauth2/confirm$})
               get response["Location"]
-              post "/login/oauth2/accept", params: { authenticity_token: cookies["_csrf_token"] }
+              post "/login/oauth2/accept", params: { custom_csrf_token: session[:oauth2][:custom_csrf_token] }
 
               expect(response).to be_redirect
               expect(response["Location"]).to match(%r{http://www.example.com/my_uri?})
