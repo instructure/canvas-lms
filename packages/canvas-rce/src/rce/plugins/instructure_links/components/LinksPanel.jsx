@@ -25,18 +25,32 @@ import NavigationPanel from './NavigationPanel'
 import CollectionPanel from './CollectionPanel'
 
 import {View} from '@instructure/ui-view'
-import {pickProps} from '@instructure/ui-react-utils'
 
 function LinksPanel(props) {
   const isCourse = props.contextType === 'course'
   const isGroup = props.contextType === 'group'
 
-  const collectionProps = pickProps(props, CollectionPanel.propTypes)
+  const commonCollectionProps = {
+    collections: props.collections,
+    contextId: props.contextId,
+    contextType: props.contextType,
+    fetchInitialPage: props.fetchInitialPage,
+    fetchNextPage: props.fetchNextPage,
+    newPageLinkExpanded: props.newPageLinkExpanded,
+    onChangeAccordion: props.onChangeAccordion,
+    onLinkClick: props.onLinkClick,
+    renderNewPageLink: props.renderNewPageLink,
+    searchString: props.searchString,
+    selectedAccordionIndex: props.selectedAccordionIndex,
+    suppressRenderEmpty: props.suppressRenderEmpty,
+    toggleNewPageForm: props.toggleNewPageForm,
+  }
+
   return (
     <View as="div" data-testid="instructure_links-LinksPanel">
       {(isCourse || isGroup) && (
         <CollectionPanel
-          {...collectionProps}
+          {...commonCollectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
           selectedLink={props.selectedLink}
@@ -47,7 +61,7 @@ function LinksPanel(props) {
 
       {isCourse && (
         <CollectionPanel
-          {...collectionProps}
+          {...commonCollectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
           selectedLink={props.selectedLink}
@@ -58,7 +72,7 @@ function LinksPanel(props) {
 
       {isCourse && (
         <CollectionPanel
-          {...collectionProps}
+          {...commonCollectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
           selectedLink={props.selectedLink}
@@ -69,7 +83,7 @@ function LinksPanel(props) {
 
       {(isCourse || isGroup) && (
         <CollectionPanel
-          {...collectionProps}
+          {...commonCollectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
           selectedLink={props.selectedLink}
@@ -80,7 +94,7 @@ function LinksPanel(props) {
 
       {(isCourse || isGroup) && (
         <CollectionPanel
-          {...collectionProps}
+          {...commonCollectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
           selectedLink={props.selectedLink}
@@ -91,7 +105,7 @@ function LinksPanel(props) {
 
       {isCourse && (
         <CollectionPanel
-          {...collectionProps}
+          {...commonCollectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
           selectedLink={props.selectedLink}
