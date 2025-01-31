@@ -92,7 +92,7 @@ class ApplicationController < ActionController::Base
   }, :root_path, class: 'home')
 
   def register_request_id_in_thread
-    Thread.current.thread_variable_set('request_id', request.uuid)
+    Thread.current.thread_variable_set('request_id', env[::Rack::Timeout::ENV_INFO_KEY].id)
   end
   ##
   # Sends data from rails to JavaScript
