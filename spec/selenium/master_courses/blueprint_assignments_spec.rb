@@ -205,7 +205,6 @@ describe "blueprint courses assignments" do
       @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/assignments"
-
       hover_and_click(".edit_assignment")
 
       expect(f("[data-testid='assignment-name-input']")).to be_disabled
@@ -220,7 +219,6 @@ describe "blueprint courses assignments" do
       # restrict nothing
       @tag.update(restrictions: {})
 
-      # This is a bit of a hack to get the assignment id
       get "/courses/#{@copy_to.id}/assignments"
       hover_and_click(".edit_assignment")
 
@@ -230,6 +228,22 @@ describe "blueprint courses assignments" do
       expect(f("#Selectable_0")).not_to be_disabled
       # Time
       expect(f("#Select_0")).not_to be_disabled
+    end
+
+    it "allows certain fields to be edited when allowed by blueprint course" do
+      # restrict everything but content and points
+      @tag.update(restrictions: { content: false, points: false, due_dates: true, availability_dates: true })
+
+      get "/courses/#{@copy_to.id}/assignments"
+      hover_and_click(".edit_assignment")
+
+      expect(f("[data-testid='assignment-name-input']")).not_to be_disabled
+      expect(f("[data-testid='points-input']")).not_to be_disabled
+
+      # Date
+      expect(f("#Selectable_0")).to be_disabled
+      # Time
+      expect(f("#Select_0")).to be_disabled
     end
   end
 
