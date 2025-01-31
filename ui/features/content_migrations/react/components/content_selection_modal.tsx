@@ -171,6 +171,7 @@ export const ContentSelectionModal = ({
         {I18n.t('Select content')}
       </Button>
       <Modal
+        id="content-selection-modal"
         open={open}
         onDismiss={() => setOpen(false)}
         size="medium"
@@ -193,6 +194,7 @@ export const ContentSelectionModal = ({
             {I18n.t('Cancel')}
           </Button>
           <Button
+            data-testid="select-content-button"
             color="primary"
             interaction={hasErrors || isLoading ? 'disabled' : 'enabled'}
             onClick={handleSubmit}
