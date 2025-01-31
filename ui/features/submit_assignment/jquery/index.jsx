@@ -175,16 +175,7 @@ ready(function () {
       const self = this
       const $turnitin = $(this).find('.turnitin_pledge')
       const $vericite = $(this).find('.vericite_pledge')
-      // warn users if they entered an invalid URL
-      const urlSubmission = document.getElementById('online_url_submission_input')
-      if (urlSubmission) {
-        const input = document.getElementById('submission_url').value
-        if (!input) {
-          handleOnlineUrlSubmissionError()
-          return false
-        }
-      }
-  
+
       if (!verifyPledgeIsChecked($turnitin)) {
         event.preventDefault()
         event.stopPropagation()
@@ -635,7 +626,7 @@ ready(() => {
   $('#submit_media_recording_form .submit_button')
     .prop('disabled', true)
     .text(I18n.t('messages.record_before_submitting', 'Record Before Submitting'))
-  $('#media_media_recording_submission_holder .record_media_comment_link').click(event => {
+  $('.button-container .record_media_comment_link').click(event => {
     event.preventDefault()
     $('#media_media_recording_submission').mediaComment('create', 'any', (id, type) => {
       $('#submit_media_recording_form .submit_button')
@@ -645,7 +636,13 @@ ready(() => {
       $('#submit_media_recording_form .media_comment_type').val(type)
       $('#media_media_recording_submission_holder').children().hide()
       $('#media_media_recording_ready').show()
-      $('#media_comment_submit_button').prop('disabled', false)
+      $('#media_comment_submit_button').show()
+      // Hide the record button
+      const recordMediaButton = document.querySelector('.button-container .record_media_comment_link')
+      recordMediaButton.style.display = 'none'
+      // Show the submit button
+      const submitMediaButton = document.getElementById('media_comment_submit_button')
+      submitMediaButton.style.display = ''
       $('#media_media_recording_thumbnail').attr('id', 'media_comment_' + id)
     })
   })
