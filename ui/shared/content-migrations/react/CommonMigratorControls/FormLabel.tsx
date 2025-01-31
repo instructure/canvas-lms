@@ -17,7 +17,11 @@
  */
 
 import React, {type ReactNode} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+const I18n = createI18nScope('app_shared_components')
 
 type FormLabelProps = {
   children?: ReactNode
@@ -46,6 +50,7 @@ export const RequiredFormLabel = ({children, showErrorState, htmlFor}: RequiredF
       {children}
       <Text color={showErrorState ? 'danger' : 'primary'}>
         <span aria-hidden={true}> *</span>
+        <ScreenReaderContent>{I18n.t('Required')}</ScreenReaderContent>
       </Text>
     </FormLabel>
   )
