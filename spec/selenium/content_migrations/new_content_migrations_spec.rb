@@ -367,15 +367,14 @@ describe "content migrations", :non_parallel do
         worker_class.new(cm.id).perform
       end
 
-      it "copies all content from a course", priority: "1", skip: "issues with cc search" do
+      it "copies all content from a course", priority: "1" do
         skip unless Qti.qti_enabled?
         visit_page
 
         select_migration_type
         wait_for_ajaximations
 
-        click_option("#courseSelect", @copy_from.id.to_s, :value)
-        NewContentMigrationPage.all_content_radio.click
+        search_for_option("#course-copy-select-course", @copy_from.name, @copy_from.id.to_s)
         submit
 
         run_migration
