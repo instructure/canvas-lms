@@ -7915,6 +7915,7 @@ describe Assignment do
       )
 
       # invoke the job that was created by the previous step
+      expect_any_instance_of(ZipExtractor).to receive(:remove_extracted_files!)
       job = Delayed::Job.where(tag: "Assignment#generate_comments_from_files").order(:id).last
       job.invoke_job
     end
