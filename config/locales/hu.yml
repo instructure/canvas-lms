@@ -3712,6 +3712,7 @@ hu:
       not_yet_graded: "*Még nincs értékelve*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pont"
       score_with_points_possible_screenreader: "Eredmény: %{score} az %{pointsPossible} pontból. "
+    assignment_submit_success: "A feladat sikeresen beadva."
     assignments_list_right_side: 
       links: 
         see_current_grades: "Eddigi értékeléseim megtekintése"
@@ -13738,6 +13739,7 @@ hu:
       quoted_text_toggle: "idézett szöveg megjelenítése"
       word_separator: " "
   liberty_union_hsd_grade_report_d1c3d45: "Liberty Union HSD Osztályzat Riport"
+  license_bdede4fb: Licenc
   license_help: 
     content_license_help: "Segítség a tartalom licenceléshez"
   license_type_6b74b543: Licenctípus
@@ -16946,6 +16948,7 @@ hu:
   no_placements_enabled_f705f28: "Nincsenek engedélyezett elhelyezések"
   no_points_possible_368669d: "Nincsenek elérhető pontok"
   no_points_possible_72db3a55: "Nincsenek elérhető pontok"
+  no_preview_available_e8e71199: "Nem érhető el előnézet"
   no_quizzes_found_c80c537a: "Nem található kvíz."
   no_recent_announcements_abf950d5: "Nincsenek friss hirdetmények"
   no_restrictions_79a892d2: "Nincs korlátozás"
