@@ -3524,6 +3524,7 @@ fa:
       save: "ذخیره سازی"
       validating: "در حال ذخیره سازی..."
       weight_groups: "وزن دار کردن نمره نهایی بر مبنای گروه های تکلیف"
+    assignment_submit_success: "تکلیف با موفقیت ارسال شد."
     assignments_list_right_side: 
       links: 
         manage_assignments: "مدیریت تکلیف ها"
@@ -13401,6 +13402,7 @@ fa:
       ellipsis: "..."
       quoted_text_toggle: "نمایش متن نقل شده"
       word_separator: " "
+  license_bdede4fb: مجوز
   license_help: 
     content_license_help: "راهنمای مجوز دادن به محتوا"
   license_type_6b74b543: "نوع مجوز"
@@ -16497,6 +16499,7 @@ fa:
   no_placements_enabled_f705f28: "هیچ جای گذاری فعال نشده است"
   no_points_possible_368669d: "امتیازهای ممکن موجود نیست"
   no_points_possible_72db3a55: "امتیاز ممکن موجود نیست"
+  no_preview_available_e8e71199: "پیش نمایش موجود نیست"
   no_results_3cda4e72: "نتیجه موجود نیست"
   no_results_f36777ee: "نتیجه موجود نیست"
   no_results_found_2ace1494: "نتیجه ای یافت نشد"
