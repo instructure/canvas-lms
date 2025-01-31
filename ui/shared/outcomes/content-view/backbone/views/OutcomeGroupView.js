@@ -61,6 +61,7 @@ export default class OutcomeGroupView extends OutcomeContentBase {
               createElement(TextInput, {
                 name: 'title',
                 id: 'outcome_group_title',
+                isRequired: true,
                 defaultValue: this.instUIInputs.title.root?.initialValue,
                 width: '30ch',
                 placeholder: I18n.t('New Outcome Group'),
