@@ -145,7 +145,7 @@ const CreateTicketForm = forwardRef(function CreateTicketForm(
             email: formData.email,
             url: window.location.toString(),
             context_asset_string: window.ENV.context_asset_string,
-            user_roles: window.ENV.current_user_roles,
+            user_roles: window.ENV.current_user_roles?.join(','),
           },
         },
       })
@@ -194,7 +194,7 @@ const CreateTicketForm = forwardRef(function CreateTicketForm(
       <input
         type="hidden"
         name="error[user_roles]"
-        value={window.ENV.current_user_roles || undefined}
+        value={window.ENV.current_user_roles?.join(',') || undefined}
       />
 
       {/* this is a honeypot field (as copied from the old code) … it's hidden via css, but spam bots don’t know that … */}
