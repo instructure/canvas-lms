@@ -160,4 +160,27 @@ describe('CreateAssignmentViewAdapter', () => {
       })
     })
   })
+
+  it('disables certain fields if locked by blueprint course', async () => {
+    const assignmentOverride = {
+      is_master_course_child_content: true,
+      master_course_restrictions: {
+        content: true,
+        points: false,
+        due_dates: true,
+      }
+    }
+    const {getByTestId, getByLabelText} = renderComponent({
+      assignment: new Assignment(buildAssignment(assignmentOverride)),
+    })
+    await waitFor(() => {
+      // Should be disabled because they are locked by blueprint course
+      expect(getByTestId('assignment-name-input')).toBeDisabled()
+      expect(getByLabelText('Date')).toBeDisabled()
+      expect(getByLabelText('Time')).toBeDisabled()
+
+      // Not controlled by blueprint course
+      expect(getByTestId('points-input')).not.toBeDisabled()
+    })
+  })
 })
