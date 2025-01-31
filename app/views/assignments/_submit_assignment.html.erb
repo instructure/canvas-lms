@@ -188,7 +188,7 @@
         <table class="formtable" style="width: 100%;">
           <tr>
             <td colspan="2" style="padding-bottom: 10px;">
-              <%= t 'instructions.media_recording', "Use the link below to record your submission.  Click \"Save\" when you're finished and ready to submit." %>
+              <%= t 'instructions.media_recording', "Use the button below to record your submission." %>
                 <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
             </td>
           </tr><tr>
@@ -200,7 +200,6 @@
                     <%= image_tag "media_comment.png", :alt => '' %>
                   </div>
                 </div>
-                <a href="#" class="record_media_comment_link btn" style="font-size: 1.1em;"><%= image_tag "record.gif", :alt => '' %> <%= t 'buttons.record_media', "Record / Upload Media" %></a>
                 <div id="media_media_recording_submission" class="pull-left" style="display: none; width: auto; border: 2px solid #444;">
                 </div>
                 <div class="clear"></div>
@@ -226,7 +225,8 @@
           <tr>
             <td colspan="2" class='button-container'>
               <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
-              <button type="submit" class="btn btn-primary" disabled="disabled" id="media_comment_submit_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+              <button type="button" class="record_media_comment_link btn btn-primary"><i class="icon-Line icon-add-media"></i> <%= t 'buttons.record_media', "Record / Upload Media" %></button>
+              <button type="submit" class="btn btn-primary" style="display: none;" id="media_comment_submit_button"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
             </td>
           </tr><tr style="display: none;">
             <td colspan="2" style="text-align: center;">
