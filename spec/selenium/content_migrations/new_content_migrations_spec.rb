@@ -428,42 +428,35 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "sets day substitution and date adjustment settings", priority: "1", skip: "issues with cc search" do
-      # TODO: fix click_option
+    it "sets day substitution and date adjustment settings", priority: "1" do
       new_course = Course.create!(name: "day sub")
       new_course.enroll_teacher(@user).accept
 
       visit_page
       select_migration_type
       wait_for_ajaximations
-      click_option("#courseSelect", new_course.id.to_s, :value)
+      search_for_option("#course-copy-select-course", new_course.name, new_course.id.to_s)
 
-      CourseCopyPage.date_adjust_checkbox.click
-      3.times do
-        CourseCopyPage.add_day_substitution_button.click
-      end
+      NewContentMigrationPage.date_adjust_checkbox.click
+      3.times { NewContentMigrationPage.add_day_substitution_button.click }
 
-      expect(CourseCopyPage.day_substitution_containers.count).to eq 3
-      CourseCopyPage.day_substitution_delete_button.click # Remove day substitution
-      expect(CourseCopyPage.day_substitution_containers.count).to eq 2
+      expect(NewContentMigrationPage.number_of_day_substitutions).to eq 3
+      NewContentMigrationPage.day_substitution_delete_button_by_index(3).click
+      expect(NewContentMigrationPage.number_of_day_substitutions).to eq 2
 
-      click_option("#daySubstitution ul > div:nth-child(1) .currentDay", "1", :value)
-      click_option("#daySubstitution ul > div:nth-child(1) .subDay", "2", :value)
+      NewContentMigrationPage.select_day_substition_range(1, "Monday", "Tuesday")
+      NewContentMigrationPage.select_day_substition_range(2, "Tuesday", "Wednesday")
 
-      click_option("#daySubstitution ul > div:nth-child(2) .currentDay", "2", :value)
-      click_option("#daySubstitution ul > div:nth-child(2) .subDay", "3", :value)
-
-      CourseCopyPage.old_start_date_input.send_keys("7/1/2012")
-      CourseCopyPage.old_end_date_input.send_keys("Jul 11, 2012")
-      CourseCopyPage.new_start_date_input.clear
-      CourseCopyPage.new_start_date_input.send_keys("8-5-2012")
-      CourseCopyPage.new_end_date_input.send_keys("Aug 15, 2012")
+      replace_and_proceed(NewContentMigrationPage.old_start_date_input, "7/1/2012")
+      replace_and_proceed(NewContentMigrationPage.old_end_date_input, "Jul 11, 2012")
+      replace_and_proceed(NewContentMigrationPage.new_start_date_input, "8-5-2012")
+      replace_and_proceed(NewContentMigrationPage.new_end_date_input, "Aug 15, 2012")
 
       NewContentMigrationPage.all_content_radio.click
       submit
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      expect(opts["shift_dates"]).to eq "1"
+      expect(opts["shift_dates"]).to be true
       expect(opts["day_substitutions"]).to eq({ "1" => "2", "2" => "3" })
       expected = {
         "old_start_date" => "Jul 1, 2012",
