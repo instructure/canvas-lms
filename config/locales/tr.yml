@@ -2875,6 +2875,7 @@ tr:
       save: Kaydet
       validating: Kaydediliyor...
       weight_groups: "Ödev gruplarına göre final notununun ağırlığını belirleyin"
+    assignment_submit_success: "Ödev başarıyla gönderildi."
     assignments_list_right_side: 
       links: 
         manage_assignments: "Ödevleri Yönet"
@@ -10829,6 +10830,7 @@ tr:
       ellipsis: "..."
       quoted_text_toggle: "alıntılanan metni göster"
       word_separator: " "
+  license_bdede4fb: Lisans
   license_help: 
     content_license_help: "İçerik Lisanslama Yardımı"
   light_blue_5374f600: "Açık Mavi"
@@ -13466,6 +13468,7 @@ tr:
   no_outcome_selected_16d15753: "Öğrenci Çıktısı Seçilmedi"
   no_password_was_given_472222e5: "Şifre verilmedi"
   no_points_possible_368669d: "Olası Puan Yok"
+  no_preview_available_e8e71199: "No Preview Available"
   no_results_3cda4e72: "Sonuç Yok"
   no_results_found_2ace1494: "Hiç Sonuç Bulunamadı"
   no_results_found_58717065: "Sonuç bulunamadı"
