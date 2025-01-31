@@ -4098,6 +4098,7 @@ nn:
       save: Lagre
       validating: "Lagrar ...\""
       weight_groups: "Vekte sluttkarakter basert på oppgåvegrupper"
+    assignment_submit_success: "Oppgåva er levert."
     assignments_list_right_side: 
       links: 
         manage_assignments: "Administrer oppgåver"
@@ -14983,6 +14984,7 @@ nn:
       quoted_text_toggle: "vis sitert tekst"
       word_separator: " "
   liberty_union_hsd_grade_report_d1c3d45: "Liberty Union HSD vurderingsrapport"
+  license_bdede4fb: Lisens
   license_help: 
     content_license_help: "Hjelp til lisensiering av innhald"
   license_type_6b74b543: Lisenstype
@@ -18250,6 +18252,7 @@ nn:
   no_placements_enabled_f705f28: "Ingen plasseringar er aktivert"
   no_points_possible_368669d: "Ingen moglege poeng"
   no_points_possible_72db3a55: "Ingen moglege poeng"
+  no_preview_available_e8e71199: "Ingen tilgjengelege førehandsvisingar"
   no_quizzes_found_c80c537a: "Ingen quizar funne"
   no_recent_announcements_abf950d5: "Ingen nylege kunngjeringar"
   no_restrictions_79a892d2: "Ingen restriksjonar"
