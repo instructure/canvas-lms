@@ -1790,6 +1790,7 @@ ko:
       save: 저장
       validating: "저장 중..."
       weight_groups: "과제 그룹을 바탕으로 최종 평가를 가중"
+    assignment_submit_success: "과제를 성공적으로 제출했습니다."
     assignments_list_right_side: 
       links: 
         manage_assignments: "과제 관리"
@@ -7438,6 +7439,7 @@ ko:
       ellipsis: "..."
       quoted_text_toggle: "인용된 텍스트 표시"
       word_separator: " "
+  license_bdede4fb: 라이선스
   license_help: 
     content_license_help: "내용 라이선싱 도움말"
   link_7262adec: Link
@@ -9572,6 +9574,7 @@ ko:
   no_migration_file: "내용 마이그레이션을 위해 필요한 파일입니다."
   no_password_was_given_472222e5: "암호가 없음"
   no_points_possible_368669d: "가능한 점수 없음"
+  no_preview_available_e8e71199: "미리 보기 없음"
   no_results_3cda4e72: "결과 없음"
   no_results_found_2ace1494: "찾은 결과 없음"
   no_results_found_58717065: "결과 없음"
