@@ -117,6 +117,7 @@ el:
       unexpectedDeleteError: "Κάτι δεν πήγε σωστά. Η διαγραφή δεν είναι, αυτή τη στιγμή, δυνατή."
       updateSuccess: "Επιτυχής ενημέρωση"
     length_error: "Πρέπει να έχει μήκος 255 χαρακτήρες ή λιγότερο"
+    title: "Όνομα Ομάδας"
   OutcomeView: 
     length_error: "Πρέπει να έχει μήκος 255 χαρακτήρες ή λιγότερο"
     mastery_error: "Πρέπει να είναι μεγαλύτερο ή ίσο από 0"
@@ -7909,6 +7910,7 @@ el:
     text_helper: 
       ellipsis: "..."
       quoted_text_toggle: "προβολή κειμένου που παρατίθεται"
+  license_bdede4fb: Άδεια
   license_help: 
     content_license_help: "Βοήθεια για την Αδειοδότηση του Περιεχομένου"
   light_blue_5374f600: "Μπλε Ανοιχτό"
@@ -10090,6 +10092,7 @@ el:
   no_outcome_selected_16d15753: "Δεν έχει επιλεγεί Αποτέλεσμα"
   no_password_was_given_472222e5: "Δεν δόθηκε κωδικός πρόσβασης"
   no_placements_enabled_f705f28: "Δεν έχουν Ενεργοποιηθεί Τοποθετήσεις"
+  no_preview_available_e8e71199: "Προβολή μη διαθέσιμη"
   no_results_3cda4e72: "Δεν υπάρχουν Αποτελέσματα"
   no_results_f36777ee: "Κανένα αποτέλεσμα"
   no_results_found_2ace1494: "Δεν βρέθηκαν αποτελέσματα"
