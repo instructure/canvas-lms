@@ -201,7 +201,7 @@ describe('CreateTicketForm', () => {
             email: '',
             url: window.location.toString(),
             context_asset_string: window.ENV.context_asset_string,
-            user_roles: window.ENV.current_user_roles,
+            user_roles: window.ENV.current_user_roles?.join(','),
           }),
         },
       })
