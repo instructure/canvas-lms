@@ -1123,7 +1123,7 @@ module ApplicationHelper
 
   def tutorials_enabled?
     @domain_root_account&.feature_enabled?(:new_user_tutorial) &&
-      @current_user&.feature_enabled?(:new_user_tutorial_on_off)
+      @current_user&.show_new_user_tutorial?
   end
 
   def set_tutorial_js_env
@@ -1133,9 +1133,7 @@ module ApplicationHelper
       @context.is_a?(Course) && tutorials_enabled? &&
       @context.grants_right?(@current_user, session, :manage)
 
-    is_user_tutorial_enabled =
-      @current_user&.feature_enabled?(:new_user_tutorial_on_off)
-
+    is_user_tutorial_enabled = @current_user&.show_new_user_tutorial?
     js_env NEW_USER_TUTORIALS: { is_enabled: }
     js_env NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: { is_enabled: is_user_tutorial_enabled }
   end

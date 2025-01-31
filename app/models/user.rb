@@ -61,7 +61,6 @@ class User < ActiveRecord::Base
 
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
-  after_create :set_default_feature_flags
   after_update :clear_cached_short_name, if: ->(user) { user.saved_change_to_short_name? || (user["short_name"].nil? && user.saved_change_to_name?) }
   validate :preserve_lti_id, on: :update
 
@@ -1106,10 +1105,6 @@ class User < ActiveRecord::Base
     self.lti_id ||= SecureRandom.uuid
   end
 
-  def set_default_feature_flags
-    enable_feature!(:new_user_tutorial_on_off) unless Rails.env.test?
-  end
-
   def sortable_name
     self.sortable_name = super ||
                          User.last_name_first(self.name, likely_already_surname_first: false)
@@ -1943,6 +1938,18 @@ class User < ActiveRecord::Base
 
   def new_user_tutorial_statuses
     get_preference(:new_user_tutorial_statuses) || {}
+  end
+
+  # on this date we started creating an enabled :new_user_tutorial_on_off FF for every new user.
+  # changing the default to `allowed_on` let us avoid doing that (tbf this wasn't an option then)
+  TUTORIAL_FF_INTRO_DATE = Date.new(2017, 4, 22)
+  def show_new_user_tutorial?
+    if created_at < TUTORIAL_FF_INTRO_DATE
+      # avoid implicitly enabling the feature for old users (they need to explicitly toggle it on)
+      lookup_feature_flag(:new_user_tutorial_on_off)&.state == "on"
+    else
+      feature_enabled?(:new_user_tutorial_on_off)
+    end
   end
 
   def apply_contrast(colors)
