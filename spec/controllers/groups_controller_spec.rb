@@ -363,6 +363,38 @@ describe GroupsController do
         expect(assigns[:js_env][:self_signup_deadline_enabled]).to be_falsey
       end
     end
+
+    context "context_groups renders successfully" do
+      it "for a student" do
+        user_session(@student)
+        get "index", params: { course_id: @course.id }, format: :html
+        expect(response).to be_successful
+      end
+
+      it "for a teacher" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }, format: :html
+        expect(response).to be_successful
+      end
+
+      context "with deprecate_context_groups_old_view FF enabled" do
+        before do
+          Account.site_admin.enable_feature!(:deprecate_context_groups_old_view)
+        end
+
+        it "for a student" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }, format: :html
+          expect(response).to be_successful
+        end
+
+        it "for a teacher" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }, format: :html
+          expect(response).to be_successful
+        end
+      end
+    end
   end
 
   describe "group_json" do
