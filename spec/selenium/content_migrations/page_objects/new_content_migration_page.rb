@@ -175,6 +175,14 @@ class NewContentMigrationPage
       fxpath('//*[@aria-hidden="true" and text()="Substitution"]/ancestor::button')
     end
 
+    def day_substitution_delete_button_by_index(index)
+      f("#remove-substitution-#{index}")
+    end
+
+    def number_of_day_substitutions
+      ffxpath('//*[text()="Move from:"]').count
+    end
+
     def add_day_containers
       ff("#daySubstitution ul > div")
     end
