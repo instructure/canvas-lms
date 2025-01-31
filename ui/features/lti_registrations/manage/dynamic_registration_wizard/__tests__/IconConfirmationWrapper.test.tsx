@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
-import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
+import {createRegistrationOverlayStore} from '../RegistrationOverlayState'
 import {IconConfirmationWrapper} from '../components/IconConfirmationWrapper'
 import {render, screen} from '@testing-library/react'
 import * as ue from '@testing-library/user-event'
@@ -148,15 +148,15 @@ describe('IconConfirmation', () => {
     )
   })
 
-  it("should render the tool's provided default icon if no value is provided at the placement level", () => {
+  it("should render the tool's provided default icon if no value is provided at the placement level", async () => {
     const config = mockConfigWithPlacements([
       LtiPlacements.GlobalNavigation,
       LtiPlacements.FileIndexMenu,
     ])
-    config.extensions![0].settings.icon_url = 'http://example.com/icon.png'
-    config.extensions![0].settings.placements.find(
-      p => p.placement === 'file_index_menu',
-    )!.icon_url = 'http://example.com/icon2.png'
+    config.placements!.find(p => p.placement === 'global_navigation')!.icon_url =
+      'http://example.com/icon.png'
+    config.placements!.find(p => p.placement === 'file_index_menu')!.icon_url =
+      'http://example.com/icon2.png'
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     render(
@@ -174,8 +174,9 @@ describe('IconConfirmation', () => {
       selector: 'input',
     })
 
+    await userEvent.clear(input)
     expect(input).toHaveValue('')
-    expect(screen.getByAltText('Global Navigation icon')).toHaveProperty(
+    expect(screen.getByAltText('Global Navigation icon')).toHaveAttribute(
       'src',
       'http://example.com/icon.png',
     )

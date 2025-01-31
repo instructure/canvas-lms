@@ -109,9 +109,11 @@ export const ReviewScreen = ({
             size="small"
           >
             {scopes.length === 0 ? (
-              <Text size="small" fontStyle="italic">
-                {I18n.t('No permissions requested')}
-              </Text>
+              <List.Item>
+                <Text size="small" fontStyle="italic">
+                  {I18n.t('No permissions requested')}
+                </Text>
+              </List.Item>
             ) : (
               scopes.map(scope => (
                 <List.Item key={scope}>

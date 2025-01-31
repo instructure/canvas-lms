@@ -841,13 +841,15 @@ RSpec.describe Lti::RegistrationsController do
 
     let(:other_admin) { account_admin_user(account:) }
     let(:registration) { developer_key.lti_registration }
-    let(:developer_key) { lti_developer_key_model(account:) }
-    let(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: registration) }
+    let(:developer_key) do
+      lti_developer_key_model(account:).tap do |dk|
+        lti_tool_configuration_model(developer_key: dk, lti_registration: dk.lti_registration)
+      end
+    end
+    let(:tool_configuration) { developer_key.tool_configuration }
     let(:admin_nickname) { "New Name" }
     let(:name) { "foo" }
     let(:vendor) { "vendor" }
-
-    before { tool_configuration }
 
     it "is successful" do
       expect(subject).to be_successful
@@ -939,7 +941,23 @@ RSpec.describe Lti::RegistrationsController do
         }
       end
 
+      before { tool_configuration.destroy }
+
       it { is_expected.to be_successful }
+
+      context "disabling scopes" do
+        let(:params) do
+          super().tap do |p|
+            p[:overlay][:disabled_scopes] = [ims_registration.internal_lti_configuration[:scopes][0]]
+          end
+        end
+
+        it "is successful" do
+          ims_registration
+          expect(subject).to be_successful
+          expect(registration.reload.developer_key.scopes).not_to include(ims_registration.internal_lti_configuration[:scopes][0])
+        end
+      end
 
       context "trying to update it's base configuration" do
         let(:params) do

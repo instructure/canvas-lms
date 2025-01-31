@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {PlacementsConfirmationWrapper} from '../components/PlacementsConfirmationWrapper'
 import {UNDOCUMENTED_PLACEMENTS} from '../../registration_wizard_forms/PlacementsConfirmation'
-import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
+import {createRegistrationOverlayStore} from '../RegistrationOverlayState'
 import {LtiPlacements} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 
@@ -96,7 +96,7 @@ describe('PlacementsConfirmation', () => {
     expect(checkbox).toBeNull()
   })
 
-  it("shows the analytics hub placement if the tool has requested it", () => {
+  it('shows the analytics hub placement if the tool has requested it', () => {
     const config = mockConfigWithPlacements([
       LtiPlacements.CourseNavigation,
       LtiPlacements.AnalyticsHub,
@@ -148,7 +148,7 @@ describe('PlacementsConfirmation', () => {
 
   it("renders the default disabled checkbox as on when the registration has default='disabled'", () => {
     const config = mockConfigWithPlacements([LtiPlacements.CourseNavigation])
-    config.extensions![0].settings.placements[0].default = 'disabled'
+    config.placements![0].default = 'disabled'
 
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
@@ -178,7 +178,7 @@ describe('PlacementsConfirmation', () => {
 
   it('renders the default disabled checkbox as off when the overlay has default="enabled" but the registration has the opposite', () => {
     const config = mockConfigWithPlacements([LtiPlacements.CourseNavigation])
-    config.extensions![0].settings.placements[0].default = 'disabled'
+    config.placements![0].default = 'disabled'
 
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)

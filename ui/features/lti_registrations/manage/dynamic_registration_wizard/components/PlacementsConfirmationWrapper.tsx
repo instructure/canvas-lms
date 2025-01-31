@@ -17,15 +17,14 @@
  */
 
 import React from 'react'
-import type {RegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
+import type {RegistrationOverlayStore} from '../RegistrationOverlayState'
 import {PlacementsConfirmation} from '../../registration_wizard_forms/PlacementsConfirmation'
 import {useOverlayStore} from '../hooks/useOverlayStore'
-import {usePlacements} from '../hooks/usePlacements'
-import { InternalOnlyLtiPlacements } from '../../model/LtiPlacement'
+import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
+import {InternalOnlyLtiPlacements} from '../../model/LtiPlacement'
 
 export type PlacementsConfirmationProps = {
-  registration: LtiImsRegistration
+  registration: LtiRegistrationWithConfiguration
   overlayStore: RegistrationOverlayStore
 }
 
@@ -34,23 +33,24 @@ export const PlacementsConfirmationWrapper = ({
   overlayStore,
 }: PlacementsConfirmationProps) => {
   const [overlayState, actions] = useOverlayStore(overlayStore)
-  const registrationPlacements = overlayState.registration.placements ?? []
-  const requestedPlacements = registrationPlacements.map(p => p.type)
-  const placements = usePlacements(registration)
-    .filter(p => !InternalOnlyLtiPlacements.includes(p as any) || requestedPlacements.includes(p))
-
+  const requestedPlacements = Object.keys(overlayState.overlay.placements ?? {})
+  const placements = registration.configuration.placements
+    .filter(
+      p =>
+        !InternalOnlyLtiPlacements.includes(p.placement as any) ||
+        requestedPlacements.includes(p.placement),
+    )
+    .map(p => p.placement)
 
   return (
     <PlacementsConfirmation
-      appName={registration.client_name}
+      appName={registration.name}
       availablePlacements={placements}
       enabledPlacements={placements.filter(
-        p => !overlayState.registration.disabledPlacements?.includes(p),
+        p => !overlayState.overlay.disabled_placements?.includes(p),
       )}
       courseNavigationDefaultHidden={
-        // @ts-expect-error
-        overlayState.registration.placements?.find(p => p.type === 'course_navigation')?.default ===
-          'disabled' ?? false
+        overlayState.overlay.placements?.course_navigation?.default === 'disabled'
       }
       onToggleDefaultDisabled={() =>
         actions.updatePlacement('course_navigation')(prevState => {

@@ -31,7 +31,7 @@ import {
 import {
   fetchRegistrationToken,
   getLtiImsRegistrationById,
-  getRegistrationByUUID,
+  getLtiRegistrationByUUID,
   updateRegistrationOverlay,
 } from './manage/api/ltiImsRegistration'
 import {
@@ -41,6 +41,7 @@ import {
   fetchThirdPartyToolConfiguration,
   updateRegistration,
   fetchLtiRegistration,
+  deleteRegistration,
 } from './manage/api/registrations'
 import type {DynamicRegistrationWizardService} from './manage/dynamic_registration_wizard/DynamicRegistrationWizardService'
 import {InheritedKeyRegistrationWizard} from './manage/inherited_key_registration_wizard/InheritedKeyRegistrationWizard'
@@ -92,13 +93,12 @@ const router = createBrowserRouter(
 )
 
 const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
-  deleteDeveloperKey,
   fetchRegistrationToken,
-  getRegistrationByUUID,
-  getLtiImsRegistrationById,
+  getRegistrationByUUID: getLtiRegistrationByUUID,
+  fetchLtiRegistration: fetchLtiRegistration,
   updateDeveloperKeyWorkflowState,
-  updateAdminNickname,
-  updateRegistrationOverlay,
+  updateRegistration: updateRegistration,
+  deleteRegistration: deleteRegistration,
 }
 
 const jsonUrlWizardService: JsonUrlWizardService = {

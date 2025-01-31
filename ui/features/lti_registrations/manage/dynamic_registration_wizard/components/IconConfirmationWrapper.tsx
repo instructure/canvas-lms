@@ -17,20 +17,19 @@
  */
 
 import React from 'react'
-import {
-  canvasPlatformSettings,
-  type RegistrationOverlayStore,
-} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
-import {usePlacements} from '../hooks/usePlacements'
-import {LtiPlacementsWithIcons, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
+import type {RegistrationOverlayStore} from '../RegistrationOverlayState'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import type {DynamicRegistrationActions} from '../DynamicRegistrationWizardState'
 import {IconConfirmation} from '../../registration_wizard_forms/IconConfirmation'
-
+import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
+import {
+  type LtiPlacement,
+  LtiPlacementsWithIcons,
+  type LtiPlacementWithIcon,
+} from '../../model/LtiPlacement'
 export type IconConfirmationProps = {
   overlayStore: RegistrationOverlayStore
-  registration: LtiImsRegistration
+  registration: LtiRegistrationWithConfiguration
   reviewing: boolean
   transitionToConfirmationState: DynamicRegistrationActions['transitionToConfirmationState']
   transitionToReviewingState: DynamicRegistrationActions['transitionToReviewingState']
@@ -44,7 +43,7 @@ export const IconConfirmationWrapper = ({
   transitionToReviewingState,
 }: IconConfirmationProps) => {
   const [overlayState, actions] = useOverlayStore(overlayStore)
-  const placements = usePlacements(registration)
+  const placements = registration.configuration.placements.map(p => p.placement)
   const iconPlacements = React.useMemo(
     () =>
       placements.filter((p): p is LtiPlacementWithIcon =>
@@ -53,7 +52,7 @@ export const IconConfirmationWrapper = ({
     [placements],
   )
   const placementsWithUrls = iconPlacements.reduce((acc, placement) => {
-    const iconUrl = overlayState.registration.placements?.find(p => p.type === placement)?.icon_url
+    const iconUrl = overlayState.overlay.placements?.[placement]?.icon_url
     return {
       ...acc,
       [placement]: iconUrl ?? '',
@@ -63,10 +62,8 @@ export const IconConfirmationWrapper = ({
   return (
     <IconConfirmation
       allPlacements={placements}
-      topLevelDefaultIconUrl={
-        canvasPlatformSettings(registration.tool_configuration)?.settings.icon_url || undefined
-      }
-      name={overlayState.adminNickname ?? registration.client_name}
+      internalConfig={registration.configuration}
+      name={overlayState.adminNickname ?? registration.name}
       placementIconOverrides={placementsWithUrls}
       onPreviousButtonClicked={() =>
         transitionToConfirmationState('IconConfirmation', 'NamingConfirmation')
@@ -74,7 +71,7 @@ export const IconConfirmationWrapper = ({
       onNextButtonClicked={() => transitionToReviewingState('IconConfirmation')}
       reviewing={reviewing}
       setPlacementIconUrl={actions.updateIconUrl}
-      developerKeyId={registration.developer_key_id}
+      developerKeyId={registration.developer_key_id ?? undefined}
     />
   )
 }

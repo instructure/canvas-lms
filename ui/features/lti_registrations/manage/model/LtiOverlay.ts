@@ -34,4 +34,4 @@ export const ZLtiOverlay = z.object({
   updated_by: ZUser,
 })
 
-export type LtiRegistration = z.infer<typeof ZLtiOverlay>
+export type LtiOverlay = z.infer<typeof ZLtiOverlay>
