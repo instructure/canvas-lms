@@ -30,6 +30,10 @@ class NewContentMigrationPage
       '[data-cid="BaseButton Button"]'
     end
 
+    def course_search_input_selector
+      "#course-copy-select-course"
+    end
+
     def migration_type_options
       INSTUI_Select_options('[data-testid="select-content-type-dropdown"]')
     end
@@ -169,6 +173,10 @@ class NewContentMigrationPage
 
     def date_adjust_checkbox
       fxpath('//*[text()="Adjust events and due dates"]')
+    end
+
+    def date_remove_radio
+      f('input[value="remove_dates"] + label')
     end
 
     def add_day_substitution_button

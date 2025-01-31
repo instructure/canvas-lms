@@ -500,23 +500,23 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "removes dates", priority: "1", skip: "issues with cc search" do
+    it "removes dates", priority: "1" do
       new_course = Course.create!(name: "date remove", start_at: "Jul 1, 2014", conclude_at: "Jul 11, 2014")
       new_course.enroll_teacher(@user).accept
 
       visit_page
       select_migration_type
       wait_for_ajaximations
-      click_option("#courseSelect", new_course.id.to_s, :value)
+      search_for_option(NewContentMigrationPage.course_search_input_selector, new_course.name, new_course.id.to_s)
 
-      CourseCopyPage.date_adjust_checkbox.click
-      CourseCopyPage.date_remove_option.click
+      NewContentMigrationPage.date_adjust_checkbox.click
+      NewContentMigrationPage.date_remove_radio.click
       NewContentMigrationPage.all_content_radio.click
 
       submit
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      expect(opts["remove_dates"]).to eq "1"
+      expect(opts["remove_dates"]).to be true
     end
 
     it "retains announcement content settings after course copy", priority: "2" do
