@@ -2710,6 +2710,7 @@ he:
       save: שמירה
       validating: שומר...
       weight_groups: "שקלול הציון הסופי בהתבסס על קבוצות המשימה"
+    assignment_submit_success: "המשימה הוגשה בהצלחה"
     assignments_list_right_side: 
       links: 
         manage_assignments: "ניהול משימות"
@@ -10754,6 +10755,7 @@ he:
       ellipsis: "..."
       quoted_text_toggle: "מציג ציטוט"
       word_separator: " "
+  license_bdede4fb: רישיון
   license_help: 
     content_license_help: "עזרה ברישוי תוכן"
   license_type_6b74b543: "סוג רשיון"
@@ -13373,6 +13375,7 @@ he:
   no_placements_enabled_f705f28: "לא הופעלו הצבות"
   no_points_possible_368669d: "אין ניקוד אפשרי"
   no_points_possible_72db3a55: "אין ניקוד אפשרי"
+  no_preview_available_e8e71199: "תצוגה מקדימה אינה זמינה"
   no_results_3cda4e72: "אין תוצאות"
   no_results_f36777ee: "אין תוצאות"
   no_results_found_2ace1494: "לא נמצאו תוצאות"
