@@ -17,7 +17,6 @@
  */
 import {create} from 'zustand'
 import {isSuccessful, type ApiResult} from '../../common/lib/apiResult/ApiResult'
-import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZUnifiedToolId, type UnifiedToolId} from '../model/UnifiedToolId'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
@@ -62,12 +61,6 @@ export type RegistrationWizardModalState = {
    * Contains the state of the Name input for the Manual method
    */
   manualAppName: string
-  /**
-   * The ID of the LTI IMS Registration to edit. If this is set, the registration wizard will
-   * open to the Dynamic Registration review screen, once the registration has been loaded from the backend.
-   * If this is not set, the registration wizard will follow the typical flow.
-   */
-  ltiImsRegistrationId?: LtiImsRegistrationId
   /**
    * The ID of the existing registration to edit. If this is set, the registration wizard will
    * open to the Manual Registration review screen, once the registration has been loaded from the backend.
@@ -251,15 +244,15 @@ export const openDynamicRegistrationWizard = (
  * This will open the registration wizard to the review screen, once the registration has been loaded
  * from the backend.
  *
- * @param ltiImsRegistrationId The ID of the LTI IMS Registration to edit.
+ * @param existingRegistrationId The ID of the LTI IMS Registration to edit.
  * @param onSuccessfulInstallation A callback to run after the update is finished successfully.
  */
 export const openEditDynamicRegistrationWizard = (
-  ltiImsRegistrationId: LtiImsRegistrationId,
+  existingRegistrationId: LtiRegistrationId,
   onSuccessfulInstallation?: () => void,
 ) => {
   openRegistrationWizard({
-    ltiImsRegistrationId,
+    existingRegistrationId,
     registering: true,
     exitOnCancel: true,
     onSuccessfulInstallation,

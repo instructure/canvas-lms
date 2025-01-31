@@ -1292,7 +1292,7 @@ class Lti::RegistrationsController < ApplicationController
   # @argument name [String] The name of the tool
   # @argument admin_nickname [String] The admin-configured friendly display name for the registration
   # @argument configuration [Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool. Note that updating the base tool configuration of a registration associated with a Dynamic Registration is not allowed.
-  # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration.
+  # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration. Note that updating the overlay of a registration associated with a Dynamic Registration IS allowed.
   # @argument workflow_state [String, "on" | "off" | "allow"]
   #  The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
   #
@@ -1344,6 +1344,9 @@ class Lti::RegistrationsController < ApplicationController
                  updated_overlay.apply_to(configuration_params)[:scopes]
                elsif updated_overlay.blank? && configuration_params.present?
                  configuration_params[:scopes]
+               elsif updated_overlay.present?
+                 # Get the result of applying the overlay to the existing configuration.
+                 registration.internal_lti_configuration(include_overlay: true)[:scopes]
                else
                  nil
                end
@@ -1537,7 +1540,9 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def registration
-    @registration ||= Lti::Registration.active.find(params[:id])
+    @registration ||= Lti::Registration.active
+                                       .eager_load(:ims_registration, :manual_configuration, :developer_key)
+                                       .find(params[:id])
   end
 
   def overlay

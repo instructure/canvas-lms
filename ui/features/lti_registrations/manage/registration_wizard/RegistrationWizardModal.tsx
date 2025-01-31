@@ -71,7 +71,7 @@ export type RegistrationWizardModalProps = {
 export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => {
   const state = useRegistrationModalWizardState(s => s)
 
-  const label = state.ltiImsRegistrationId ? I18n.t('Edit App') : I18n.t('Install App')
+  const label = state.existingRegistrationId ? I18n.t('Edit App') : I18n.t('Install App')
 
   return (
     <Responsive
@@ -174,11 +174,11 @@ const ModalBodyWrapper = ({
           accountId={accountId}
           unifiedToolId={state.unifiedToolId}
           unregister={state.unregister}
-          registrationId={state.ltiImsRegistrationId}
+          registrationId={state.existingRegistrationId}
           onSuccessfulRegistration={() => {
             state.close()
             showFlashSuccess(
-              state.ltiImsRegistrationId
+              state.existingRegistrationId
                 ? I18n.t('App updated successfully!')
                 : I18n.t('App installed successfully!'),
             )()

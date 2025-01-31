@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import type {RegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
+import type {RegistrationOverlayStore} from '../RegistrationOverlayState'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {PrivacyConfirmation} from '../../registration_wizard_forms/PrivacyConfirmation'
 import {LtiPrivacyLevels} from '../../model/LtiPrivacyLevel'
@@ -37,7 +37,7 @@ export const PrivacyConfirmationWrapper = ({
     <PrivacyConfirmation
       appName={toolName}
       privacyLevelOnChange={level => actions.updatePrivacyLevel(level)}
-      selectedPrivacyLevel={state.registration.privacy_level || LtiPrivacyLevels.Anonymous}
+      selectedPrivacyLevel={state.overlay.privacy_level || LtiPrivacyLevels.Anonymous}
     />
   )
 }

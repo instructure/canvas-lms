@@ -56,6 +56,12 @@ export const ZLtiRegistrationWithConfiguration = ZLtiRegistration.extend({
 
 export type LtiRegistrationWithConfiguration = z.infer<typeof ZLtiRegistrationWithConfiguration>
 
+export const ZLtiRegistrationWithAllInformation = ZLtiRegistrationWithConfiguration.extend({
+  overlaid_configuration: ZInternalLtiConfiguration,
+})
+
+export type LtiRegistrationWithAllInformation = z.infer<typeof ZLtiRegistrationWithAllInformation>
+
 export const isForcedOn = (reg: LtiRegistration) =>
   reg.inherited &&
   reg.account_binding?.account_id === reg.account_id &&

@@ -42,9 +42,8 @@ import {Footer} from './Footer'
 
 const I18n = createI18nScope('lti_registration.wizard')
 export type IconConfirmationProps = {
-  internalConfig?: InternalLtiConfiguration
+  internalConfig: InternalLtiConfiguration
   name: string
-  topLevelDefaultIconUrl?: string
   developerKeyId?: DeveloperKeyId
   allPlacements: LtiPlacement[]
   placementIconOverrides: Partial<Record<LtiPlacementWithIcon, string>>
@@ -56,7 +55,6 @@ export type IconConfirmationProps = {
 
 export const IconConfirmation = ({
   name,
-  topLevelDefaultIconUrl,
   internalConfig,
   developerKeyId,
   allPlacements,
@@ -108,8 +106,8 @@ export const IconConfirmation = ({
               {placementsWithIcons.map(placement => {
                 // prefer the placement-specific icon, but fall back to the top-level default
                 const defaultIcon =
-                  internalConfig?.placements?.find(p => p.placement === placement)?.icon_url ??
-                  topLevelDefaultIconUrl
+                  internalConfig.placements?.find(p => p.placement === placement)?.icon_url ??
+                  internalConfig.launch_settings?.icon_url
                 return (
                   <IconOverrideInput
                     key={placement}

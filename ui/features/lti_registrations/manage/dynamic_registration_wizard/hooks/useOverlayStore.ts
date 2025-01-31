@@ -21,7 +21,7 @@ import type {
   RegistrationOverlayActions,
   RegistrationOverlayState,
   RegistrationOverlayStore,
-} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
+} from '../RegistrationOverlayState'
 
 export const useOverlayStore = (
   overlayStore: RegistrationOverlayStore,

@@ -69,7 +69,7 @@ type Column = {
   ) => React.ReactNode
 }
 
-const ellispsisStyles = {overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}
+const ellipsisStyles = {overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}
 
 const renderEditButton = (r: LtiRegistration) => {
   const imsRegistrationId = r.ims_registration_id
@@ -80,7 +80,7 @@ const renderEditButton = (r: LtiRegistration) => {
     return (
       <Menu.Item
         onClick={() => {
-          openEditDynamicRegistrationWizard(imsRegistrationId)
+          openEditDynamicRegistrationWizard(r.id, refreshRegistrations)
         }}
       >
         {I18n.t('Edit App')}
@@ -90,9 +90,7 @@ const renderEditButton = (r: LtiRegistration) => {
     return (
       <Menu.Item
         onClick={() => {
-          openEditManualRegistrationWizard(r.id, () => {
-            refreshRegistrations()
-          })
+          openEditManualRegistrationWizard(r.id, refreshRegistrations)
         }}
       >
         {I18n.t('Edit App')}
@@ -130,7 +128,7 @@ const Columns: ReadonlyArray<Column> = [
             src={`/lti/tool_default_icon?id=${r.id}&name=${r.name}`}
           />
         )}
-        <div style={ellispsisStyles} title={r.name}>
+        <div style={ellipsisStyles} title={r.name}>
           {r.name}
         </div>
       </Flex>
@@ -143,7 +141,7 @@ const Columns: ReadonlyArray<Column> = [
     sortable: true,
     render: r =>
       r.admin_nickname ? (
-        <div style={ellispsisStyles} title={r.admin_nickname}>
+        <div style={ellipsisStyles} title={r.admin_nickname}>
           {r.admin_nickname}
         </div>
       ) : null,
@@ -162,9 +160,9 @@ const Columns: ReadonlyArray<Column> = [
     sortable: true,
     render: r => {
       if (r.created_by === 'Instructure') {
-        return <div style={ellispsisStyles}>{I18n.t('Instructure')}</div>
+        return <div style={ellipsisStyles}>{I18n.t('Instructure')}</div>
       } else if (r.created_by) {
-        return <div style={ellispsisStyles}>{r.created_by.short_name}</div>
+        return <div style={ellipsisStyles}>{r.created_by.short_name}</div>
       } else {
         return (
           <div>
@@ -190,9 +188,9 @@ const Columns: ReadonlyArray<Column> = [
     sortable: true,
     render: r => {
       if (r.updated_by === 'Instructure') {
-        return <div style={ellispsisStyles}>{I18n.t('Instructure')}</div>
+        return <div style={ellipsisStyles}>{I18n.t('Instructure')}</div>
       } else if (r.updated_by) {
-        return <div style={ellispsisStyles}>{r.updated_by.short_name}</div>
+        return <div style={ellipsisStyles}>{r.updated_by.short_name}</div>
       } else {
         return (
           <div>
