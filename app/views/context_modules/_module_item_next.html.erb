@@ -369,7 +369,9 @@
                 <% end %>
               <% end %>
               <% if @can_delete || module_item.nil? %>
-                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
+                <% unless @context.horizon_course? && module_item && module_item.published? %>
+                  <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
+                <% end %>
               <% end %>
             </ul>
           <% else %>

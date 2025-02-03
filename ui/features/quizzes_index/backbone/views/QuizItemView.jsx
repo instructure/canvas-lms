@@ -127,6 +127,9 @@ export default class ItemView extends Backbone.View {
   }
 
   afterRender() {
+    if (ENV.horizon_course) {
+      this.publishIconView.$el.addClass('disabled')
+    }
     return this.$el.toggleClass('quiz-loading-overrides', !!this.model.get('loadingOverrides'))
   }
 
