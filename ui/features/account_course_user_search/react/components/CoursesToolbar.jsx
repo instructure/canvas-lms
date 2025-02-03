@@ -183,8 +183,7 @@ export default function CoursesToolbar({
             {can_create_courses && (
               <Grid.Col width="auto">
                 <NewCourseModal terms={terms}>
-                  <Button aria-label={I18n.t('Create new course')}>
-                    <IconPlusLine />
+                  <Button renderIcon={IconPlusLine} aria-label={I18n.t('Create new course')}>
                     {I18n.t('Course')}
                   </Button>
                 </NewCourseModal>
