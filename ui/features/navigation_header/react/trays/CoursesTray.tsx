@@ -27,6 +27,7 @@ import {Link} from '@instructure/ui-link'
 import {useQuery} from '@canvas/query'
 import {SplitCoursesList, CourseListItemContent} from '../lists/SplitCoursesList'
 import coursesQuery, {hideHomeroomCourseIfK5Student} from '../queries/coursesQuery'
+import {hideHorizonCourseIfStudent} from '../../../../shared/horizon/react/index'
 import type {Course} from '../../../../api.d'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
@@ -43,7 +44,8 @@ export default function CoursesTray() {
       fetchAtLeastOnce: true,
     },
     refetchOnMount: false,
-    select: courses => courses.filter(hideHomeroomCourseIfK5Student),
+    select: courses =>
+      courses.filter(hideHomeroomCourseIfK5Student).filter(hideHorizonCourseIfStudent),
   })
   const k5User = window.ENV.K5_USER
 

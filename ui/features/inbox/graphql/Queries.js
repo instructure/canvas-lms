@@ -247,7 +247,10 @@ export const CONVERSATION_MESSAGES_QUERY = gql`
 `
 
 export const COURSES_QUERY = gql`
-  query GetUserCourses($userID: ID!) {
+  query GetUserCourses(
+    $userID: ID!
+    $horizonCourses: Boolean
+  ) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
         id
@@ -262,7 +265,7 @@ export const COURSES_QUERY = gql`
             ...Course
           }
         }
-        enrollments {
+        enrollments(horizonCourses: $horizonCourses) {
           ...Enrollment
         }
       }

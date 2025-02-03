@@ -55,7 +55,6 @@ export default async function coursesQuery({signal}: QueryFunctionContext): Prom
   let path = getFirstPageUrl()
 
   while (path) {
-    // eslint-disable-next-line no-await-in-loop
     const {json, link} = await doFetchApi<Course[]>({path, fetchOpts})
     if (json) data.push(...json)
     // @ts-expect-error

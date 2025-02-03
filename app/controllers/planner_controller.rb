@@ -146,7 +146,7 @@ class PlannerController < ApplicationController
           items = Api.paginate(items, self, params.key?(:user_id) ? api_v1_user_planner_items_url : api_v1_planner_items_url)
           use_html_comment = params[:use_html_comment] || false
           {
-            json: planner_items_json(items, @user, session, { due_after: start_date, due_before: end_date, use_html_comment: }),
+            json: planner_items_json(items, @user, @domain_root_account, session, { due_after: start_date, due_before: end_date, use_html_comment: }),
             link: response.headers["Link"].to_s,
           }
         end
