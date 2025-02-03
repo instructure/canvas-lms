@@ -18,12 +18,26 @@
 
 import {shouldCompressImage, compressImage} from '../compressionUtils'
 
-jest.spyOn(global, 'FileReader').mockImplementation(function () {
-  this.readAsDataURL = () => {
-    this.result = 'data:image/jpeg;base64,SGVsbG8sIFdvcmxkIQ=='
-    this.onloadend()
+// Mock FileReader for compression tests
+class MockFileReader {
+  constructor() {
+    this.DONE = FileReader.DONE
+    this.EMPTY = FileReader.EMPTY
+    this.LOADING = FileReader.LOADING
+    this.readyState = FileReader.EMPTY
   }
-})
+
+  readAsDataURL() {
+    this.readyState = FileReader.LOADING
+    Promise.resolve().then(() => {
+      this.readyState = FileReader.DONE
+      this.result = 'data:image/jpeg;base64,SGVsbG8sIFdvcmxkIQ=='
+      this.onloadend?.()
+    })
+  }
+}
+
+global.FileReader = MockFileReader
 
 global.Image = class {
   constructor() {
