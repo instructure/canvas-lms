@@ -74,6 +74,22 @@ module Types
 
     field :anonymous_id, ID, null: true
 
+    field :enrollments_connection, EnrollmentType.connection_type, null: true
+    def enrollments_connection
+      load_association(:course).then do |course|
+        return nil unless course.grants_any_right?(
+          current_user,
+          session,
+          :read_roster,
+          :view_all_grades,
+          :manage_grades
+        )
+
+        scope = course.apply_enrollment_visibility(course.all_enrollments, current_user, include: :inactive)
+        scope.where(user_id: submission.user_id)
+      end
+    end
+
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
     end
