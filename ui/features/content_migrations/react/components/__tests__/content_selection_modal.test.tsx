@@ -80,6 +80,59 @@ describe('ContentSelectionModal', () => {
       })
     })
 
+    describe('when selectiveData contains nested sub_items_url', () => {
+      const subItemUrl1 = 'http://mock.sub-items.url1'
+      const selectiveDataWithSubItems1 = [
+        {
+          property: 'copy[sub_item1]',
+          title: 'sub_item1',
+          type: 'course_settings',
+          sub_items_url: subItemUrl1,
+          submodule_count: 1,
+          count: 1,
+        },
+      ]
+      const subItemUrl2 = 'http://mock.sub-items.url2'
+      const selectiveDataWithSubItems2 = [
+        {
+          property: 'copy[sub_item2]',
+          title: 'sub_item2',
+          type: 'course_settings',
+          sub_items_url: subItemUrl2,
+          submodule_count: 1,
+          count: 1,
+        },
+      ]
+
+      beforeEach(() => {
+        // @ts-expect-error
+        doFetchApi.mockImplementationOnce(() => Promise.resolve({json: selectiveDataWithSubItems1}))
+        // @ts-expect-error
+        doFetchApi.mockImplementationOnce(() => Promise.resolve({json: selectiveDataWithSubItems2}))
+        // @ts-expect-error
+        doFetchApi.mockImplementationOnce(() => Promise.resolve({json: selectiveData}))
+      })
+
+      it('fetches nested sub items', async () => {
+        renderComponent()
+        const button = screen.getByRole('button', {name: 'Select content'})
+        await userEvent.click(button)
+
+        expect(doFetchApi).toHaveBeenNthCalledWith(1, {
+          path: '/api/v1/courses/1/content_migrations/2/selective_data',
+          method: 'GET',
+        })
+        expect(doFetchApi).toHaveBeenNthCalledWith(2, {
+          path: subItemUrl1,
+          method: 'GET',
+        })
+        expect(doFetchApi).toHaveBeenNthCalledWith(3, {
+          path: subItemUrl2,
+          method: 'GET',
+        })
+      })
+    })
+
     it('shows content selection data', async () => {
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})

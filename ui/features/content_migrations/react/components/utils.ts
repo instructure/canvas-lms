@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {CheckboxTreeNode} from '@canvas/content-migrations'
+import type {CheckboxTreeNode, ItemType} from '@canvas/content-migrations'
 import type {Item} from './content_selection_modal'
 import type {GenericItemResponse, Migrator, SelectiveDataRequest} from './types'
 
@@ -57,6 +57,25 @@ export const timeout = (delay: number) => {
   return new Promise(resolve => setTimeout(resolve, delay))
 }
 
+const adjustCheckboxTreeNodesByImportAsOneModuleItemState = (checkboxTreeNodes: Record<string, CheckboxTreeNode>): void => {
+  const typesForRootNodeUncheck: Set<ItemType> = new Set<ItemType>
+
+  Object.values(checkboxTreeNodes).forEach(node => {
+    // set parent checkbox state to false if the node importAsOneModuleItemState is set to
+    // import as a standalone module, that was the previous UI's behaviour
+    if (node.importAsOneModuleItemState === 'on' && node.parentId) {
+      checkboxTreeNodes[node.parentId].checkboxState = 'unchecked'
+      typesForRootNodeUncheck.add(node.type)
+    }
+  })
+
+  Object.values(checkboxTreeNodes).forEach(node => {
+    if (!node.parentId && typesForRootNodeUncheck.has(node.type)) {
+      node.checkboxState = 'unchecked'
+    }
+  })
+}
+
 export const generateSelectiveDataResponse = (
   migrationId: string,
   userId: string,
@@ -65,18 +84,21 @@ export const generateSelectiveDataResponse = (
   const nonRootElements: Record<string, Record<string, '1'>> = {}
   const rootElements: Record<string, '1'> = {}
 
-  Object.values(checkboxTreeNodes).forEach(item => {
+  adjustCheckboxTreeNodesByImportAsOneModuleItemState(checkboxTreeNodes)
+
+  Object.values(checkboxTreeNodes).forEach(node => {
     if (
-      item.migrationId &&
-      (item.checkboxState === 'indeterminate' || item.checkboxState === 'checked')
+      node.migrationId &&
+      (node.checkboxState === 'indeterminate' || node.checkboxState === 'checked')
     ) {
-      nonRootElements[item.type] ||= {}
-      nonRootElements[item.type][item.migrationId] = '1'
+      nonRootElements[node.type] ||= {}
+      nonRootElements[node.type][node.migrationId] = '1'
     }
 
+
     // These are the all_discussions, all_assignments, all_* elements
-    if (!item.migrationId && item.checkboxState === 'checked') {
-      const match = item.id.match(/\[(.*?)\]/)
+    if (!node.migrationId && node.checkboxState === 'checked') {
+      const match = node.id.match(/\[(.*?)\]/)
       const value = match ? match[1] : null
       if (value) {
         rootElements[value] = '1'
@@ -99,7 +121,7 @@ export const mapToCheckboxTreeNodes = (
   const checkboxTreeNodes: Record<string, CheckboxTreeNode> = {}
 
   items.forEach(item => {
-    const {id, label, type, children, linkedId, checkboxState, migrationId} = item
+    const {id, label, type, children, linkedId, checkboxState, migrationId, isSubModule} = item
     checkboxTreeNodes[id] = {
       id,
       label,
@@ -117,7 +139,11 @@ export const mapToCheckboxTreeNodes = (
     }
 
     if (migrationId) {
-      checkboxTreeNodes[id].migrationId = migrationId
+      checkboxTreeNodes[id].migrationId = `id_${migrationId}`
+    }
+
+    if (isSubModule) {
+      checkboxTreeNodes[id].importAsOneModuleItemState = 'off'
     }
 
     if (children) {
@@ -125,11 +151,20 @@ export const mapToCheckboxTreeNodes = (
     }
   })
 
+  Object.values(checkboxTreeNodes).forEach(node => {
+    if (node.importAsOneModuleItemState && node.parentId) {
+      const parentNode = checkboxTreeNodes[node.parentId]
+      if (parentNode && parentNode.importAsOneModuleItemState) {
+        node.importAsOneModuleItemState = 'disabled'
+      }
+    }
+  })
+
   return checkboxTreeNodes
 }
 
 export const responseToItem = (
-  {type, title, property, sub_items, linked_resource, migration_id}: GenericItemResponse,
+  {type, title, property, sub_items, linked_resource, migration_id, submodule_count}: GenericItemResponse,
   translator: {t: Function},
 ): Item => {
   const base: Item = {
@@ -144,7 +179,13 @@ export const responseToItem = (
   }
 
   if (sub_items && sub_items.length > 0) {
-    base.children = sub_items.map(sub_item => responseToItem(sub_item, translator))
+    base.children = sub_items.map(sub_item => {
+      const item = responseToItem(sub_item, translator)
+      if (submodule_count && submodule_count > 0) {
+        item.isSubModule = true
+      }
+      return item
+    })
   }
 
   if (linked_resource) {

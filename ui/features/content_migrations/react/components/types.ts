@@ -95,6 +95,8 @@ export type GenericItemResponse = {
   title: string
   type: ItemType
   sub_items?: GenericItemResponse[]
+  sub_items_url?: string
+  submodule_count?: number // this only exist for modules
   linked_resource?: {
     migration_id: string
     type: ItemType
