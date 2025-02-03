@@ -634,9 +634,10 @@ export type Course = Readonly<{
     {
       id: string
       name: string
-    }
+    },
   ]
   restrict_enrollments_to_course_dates: boolean
+  horizon_course: boolean
 }>
 
 export type ContentMigration = Readonly<{

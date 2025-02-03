@@ -1042,6 +1042,9 @@ class Course < ActiveRecord::Base
   scope :homeroom, -> { where(homeroom_course: true) }
   scope :syncing_subjects, -> { joins("INNER JOIN #{Course.quoted_table_name} AS homeroom ON homeroom.id = courses.homeroom_course_id").where("homeroom.homeroom_course = true AND homeroom.workflow_state <> 'deleted'").where(sis_batch_id: nil).where(sync_enrollments_from_homeroom: true) }
 
+  scope :horizon, -> { where(horizon_course: true) }
+  scope :not_horizon, -> { where(horizon_course: false) }
+
   def potential_collaborators
     current_users
   end

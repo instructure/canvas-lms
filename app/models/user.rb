@@ -2999,6 +2999,10 @@ class User < ActiveRecord::Base
                       favorites + courses.reject { |c| can_favorite.call(c) }
                     end
     ActiveRecord::Associations.preload(@menu_courses, :enrollment_term)
+    @menu_courses = @menu_courses.reject do |c|
+      is_student = roles(c.root_account).all? { |role| ["student", "user"].include?(role) }
+      is_student && c.horizon_course?
+    end
     @menu_courses
   end
 

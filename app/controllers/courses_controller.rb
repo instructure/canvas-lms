@@ -538,7 +538,7 @@ class CoursesController < ApplicationController
   def load_enrollments_for_index
     all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :course, :course_section).to_a
     if @current_user.roles(@domain_root_account).all? { |role| role == "student" || role == "user" }
-      all_enrollments = all_enrollments.reject { |e| e.course.elementary_homeroom_course? }
+      all_enrollments = all_enrollments.reject { |e| e.course.elementary_homeroom_course? || e.course.horizon_course? }
     end
     @past_enrollments = []
     @current_enrollments = []

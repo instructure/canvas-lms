@@ -142,7 +142,7 @@ module Api::V1::PlannerItem
     end
   end
 
-  def planner_items_json(items, user, session, opts = {})
+  def planner_items_json(items, user, account, session, opts = {})
     preload_items = items.each_with_object([]) do |item, memo|
       memo << item
       if item.try(:submittable_object) && item.is_a?(Assignment)
@@ -162,6 +162,9 @@ module Api::V1::PlannerItem
     ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) || i.is_a?(::SubAssignment) }, user, opts:)
     discussions = context_items.select { |i| i.is_a?(::DiscussionTopic) }
     topics_status = topics_status_for(user, discussions.map(&:id))
+
+    is_student = user&.roles(account)&.all? { |role| ["student", "user"].include?(role) }
+    items = items.reject { |item| item.respond_to?(:context) && item.context.is_a?(Course) && item&.context&.horizon_course? } if is_student
 
     items.map do |item|
       planner_item_json(item, user, session, opts.merge(submission_statuses: ss, topics_status:))
