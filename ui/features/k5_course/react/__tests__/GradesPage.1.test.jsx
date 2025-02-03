@@ -24,26 +24,16 @@ import {
   MOCK_GRADING_PERIODS_EMPTY,
   MOCK_GRADING_PERIODS_NORMAL,
   MOCK_ASSIGNMENT_GROUPS,
-  MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
   MOCK_ENROLLMENTS,
-  MOCK_ENROLLMENTS_WITH_OBSERVED_USERS,
-  MOCK_GRADEBOOK_HIDDEN_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
 } from './mocks'
 
 const GRADING_PERIODS_URL = encodeURI(
   '/api/v1/courses/12?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores',
 )
-const OBSERVER_GRADING_PERIODS_URL = encodeURI(
-  '/api/v1/courses/12?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores&include[]=observed_users',
-)
 const ASSIGNMENT_GROUPS_URL = encodeURI(
   '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments',
 )
-const OBSERVER_ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments&include[]=observed_users',
-)
 const ENROLLMENTS_URL = '/api/v1/courses/12/enrollments?user_id=1'
-const OBSERVER_ENROLLMENTS_URL = '/api/v1/courses/12/enrollments?user_id=1&include=observed_users'
 
 const dtf = new Intl.DateTimeFormat('en', {
   // MMM D, YYYY h:mma
@@ -146,7 +136,7 @@ describe('GradesPage', () => {
     })
 
     it('renders the returned assignment details', async () => {
-      const {getByText, queryByText, findByText} = render(<GradesPage {...getProps()} />)
+      const {queryByText, findByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
       const formattedDueDate = dateFormatter('2020-04-18T05:59:59Z')
 
@@ -344,222 +334,6 @@ describe('GradesPage', () => {
         expect(getByText('Total: 89.39%')).toBeInTheDocument()
       })
       expect(fetchMock.calls()).toHaveLength(3)
-    })
-  })
-
-  describe('learning mastery gradebook', () => {
-    it('shows no tabs if LMGB is disabled', () => {
-      const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
-      expect(getByText('Assignment')).toBeInTheDocument()
-      expect(queryByText('Assignments')).not.toBeInTheDocument()
-      expect(queryByText('Learning Mastery')).not.toBeInTheDocument()
-    })
-
-    it('shows tabs for both gradebooks if LMGB is enabled', () => {
-      const {getByRole} = render(<GradesPage {...getProps({showLearningMasteryGradebook: true})} />)
-      expect(getByRole('tab', {name: 'Assignments', selected: true})).toBeInTheDocument()
-      expect(getByRole('tab', {name: 'Learning Mastery'})).toBeInTheDocument()
-    })
-
-    it('shows LMGB and hides assignments when clicking on the tab', async () => {
-      const {getByRole, getByText, queryByText} = render(
-        <GradesPage {...getProps({showLearningMasteryGradebook: true})} />,
-      )
-      act(() => getByRole('tab', {name: 'Learning Mastery'}).click())
-      ;['Assignment', 'Due Date', 'Assignment Group', 'Score'].forEach(header => {
-        expect(queryByText(header)).not.toBeInTheDocument()
-      })
-      expect(getByText('Learning outcome gradebook for History')).toBeInTheDocument()
-      await waitFor(() => expect(queryByText('Loading outcome results')).not.toBeInTheDocument())
-      expect(getByText('An error occurred loading outcomes data.')).toBeInTheDocument()
-    })
-  })
-
-  describe('observer support', () => {
-    beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
-      fetchMock.get(OBSERVER_ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
-      fetchMock.get(OBSERVER_ENROLLMENTS_URL, MOCK_ENROLLMENTS_WITH_OBSERVED_USERS)
-    })
-
-    it('only shows assignment details for the observed user', async () => {
-      const {getByText, rerender} = render(<GradesPage {...getProps({observedUserId: '5'})} />)
-      let formattedSubmittedDate = dateFormatter('2021-09-20T23:55:08Z')
-      await waitFor(() => {
-        ;[
-          'Assignment 3',
-          `Submitted ${formattedSubmittedDate}`,
-          'Assignments',
-          '6 pts',
-          'Out of 10 pts',
-        ].forEach(label => {
-          expect(getByText(label)).toBeInTheDocument()
-        })
-      })
-      formattedSubmittedDate = dateFormatter('2021-09-22T21:25:08Z')
-      rerender(<GradesPage {...getProps({observedUserId: '6'})} />)
-      ;[
-        'Assignment 3',
-        `Submitted ${formattedSubmittedDate}`,
-        'Assignments',
-        '8 pts',
-        'Out of 10 pts',
-      ].forEach(label => {
-        expect(getByText(label)).toBeInTheDocument()
-      })
-    })
-
-    it('does not show assignment details for the observed user when it is hidden for student page', async () => {
-      fetchMock.get(
-        OBSERVER_ASSIGNMENT_GROUPS_URL,
-        MOCK_GRADEBOOK_HIDDEN_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
-        {overwriteRoutes: true},
-      )
-
-      const {getByText, queryByText, getByTestId} = render(
-        <GradesPage {...getProps({observedUserId: '5'})} />,
-      )
-      await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
-      expect(getByText("You don't have any grades yet.")).toBeInTheDocument()
-      expect(getByTestId('empty-grades-panda')).toBeInTheDocument()
-      ;['Assignment', 'Due Date', 'Assignment Group', 'Score'].forEach(header => {
-        expect(queryByText(header)).not.toBeInTheDocument()
-      })
-    })
-
-    it('displays fetched course total grade for the observed user', async () => {
-      const {getByText, queryByText, rerender} = render(
-        <GradesPage {...getProps({observedUserId: '5'})} />,
-      )
-
-      await waitFor(() => {
-        expect(getByText('Total: 88.00%')).toBeInTheDocument()
-        expect(getByText('History Total: 88.00%')).toBeInTheDocument()
-        expect(queryByText('Total: 76.20%')).not.toBeInTheDocument()
-      })
-
-      rerender(<GradesPage {...getProps({observedUserId: '6'})} />)
-      await waitFor(() => {
-        expect(getByText('Total: 76.20%')).toBeInTheDocument()
-        expect(getByText('History Total: 76.20%')).toBeInTheDocument()
-        expect(queryByText('Total: 88.00%')).not.toBeInTheDocument()
-      })
-    })
-
-    it('displays assignment group totals for the observed user when expanded', async () => {
-      const {getByText, findByText, queryByText, rerender} = render(
-        <GradesPage {...getProps({observedUserId: '6'})} />,
-      )
-      const totalsButton = await findByText('View Assignment Group Totals')
-      expect(queryByText('Assignments: 80.00%')).not.toBeInTheDocument()
-      act(() => totalsButton.click())
-      expect(getByText('Assignments: 80.00%')).toBeInTheDocument()
-      rerender(<GradesPage {...getProps({observedUserId: '5'})} />)
-      expect(getByText('Assignments: 60.00%')).toBeInTheDocument()
-    })
-
-    it('routes the user to the observee submissions when the "View feedback" link is clicked', async () => {
-      const {getByRole} = render(<GradesPage {...getProps({observedUserId: '5'})} />)
-      await waitFor(() => {
-        const link = getByRole('link', {name: 'View feedback'})
-        expect(link).toBeInTheDocument()
-        expect(link.href).toBe('http://localhost:3000/courses/30/assignments/9/submissions/5')
-      })
-    })
-  })
-
-  describe('with Restrict Quantitative Data enabled', () => {
-    let mockAssignmentGroups = []
-    beforeEach(() => {
-      fetchMock.get(GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
-      fetchMock.get(ENROLLMENTS_URL, MOCK_ENROLLMENTS)
-      window.ENV = {
-        RESTRICT_QUANTITATIVE_DATA: true,
-        GRADING_SCHEME: DEFAULT_GRADING_SCHEME,
-      }
-      mockAssignmentGroups = JSON.parse(JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
-    })
-
-    it('renders the returned assignment details as a letter grade only', async () => {
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
-
-      const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
-      await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
-      const formattedDueDate = dateFormatter('2020-04-18T05:59:59Z')
-
-      const expectedValues = ['WWII Report', formattedDueDate, 'Reports', 'A']
-      expectedValues.forEach(value => {
-        expect(getByText(value)).toBeInTheDocument()
-      })
-
-      const removedValues = ['9.5 pts', 'Out of 10 pts']
-      removedValues.forEach(value => {
-        expect(queryByText(value)).not.toBeInTheDocument()
-      })
-    })
-
-    it('renders a pass_fail assignment correctly', async () => {
-      mockAssignmentGroups[0].assignments[0].submission.score = 10
-      mockAssignmentGroups[0].assignments[0].submission.grade = 'complete'
-      mockAssignmentGroups[0].assignments[0].grading_type = 'pass_fail'
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
-
-      const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
-      await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
-      const formattedDueDate = dateFormatter('2020-04-18T05:59:59Z')
-
-      const expectedValues = ['WWII Report', formattedDueDate, 'Reports', 'Complete']
-      expectedValues.forEach(value => {
-        expect(getByText(value)).toBeInTheDocument()
-      })
-
-      const removedValues = ['10 pts', 'Out of 10 pts']
-      removedValues.forEach(value => {
-        expect(queryByText(value)).not.toBeInTheDocument()
-      })
-    })
-
-    it('renders assignments with 10/0 points possible correctly', async () => {
-      mockAssignmentGroups[0].assignments[0].submission.score = 10
-      mockAssignmentGroups[0].assignments[0].submission.grade = '10'
-      mockAssignmentGroups[0].assignments[0].points_possible = 0
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
-
-      const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
-      await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
-      const formattedDueDate = dateFormatter('2020-04-18T05:59:59Z')
-
-      const expectedValues = ['WWII Report', formattedDueDate, 'Reports', 'A']
-      expectedValues.forEach(value => {
-        expect(getByText(value)).toBeInTheDocument()
-      })
-
-      const removedValues = ['10 pts', 'Out of 0 pts']
-      removedValues.forEach(value => {
-        expect(queryByText(value)).not.toBeInTheDocument()
-      })
-    })
-
-    it('renders assignments with 0/0 points possible correctly', async () => {
-      mockAssignmentGroups[0].assignments[0].submission.score = 0
-      mockAssignmentGroups[0].assignments[0].submission.grade = '0'
-      mockAssignmentGroups[0].assignments[0].points_possible = 0
-
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
-
-      const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
-      await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
-      const formattedDueDate = dateFormatter('2020-04-18T05:59:59Z')
-
-      const expectedValues = ['WWII Report', formattedDueDate, 'Reports', 'Complete']
-      expectedValues.forEach(value => {
-        expect(getByText(value)).toBeInTheDocument()
-      })
-
-      const removedValues = ['0 pts', 'Out of 0 pts', 'A', 'F']
-      removedValues.forEach(value => {
-        expect(queryByText(value)).not.toBeInTheDocument()
-      })
     })
   })
 })
