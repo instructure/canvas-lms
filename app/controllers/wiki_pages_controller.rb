@@ -174,8 +174,12 @@ class WikiPagesController < ApplicationController
       wiki_index_menu_tools: external_tools_display_hashes(:wiki_index_menu),
       DISPLAY_SHOW_ALL_LINK: tab_enabled?(context.class::TAB_PAGES, no_render: true) && !@k5_details_view,
       CAN_SET_TODO_DATE: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
-      text_editor_preference: @current_user&.reload&.get_preference(:text_editor_preference)
     }
+
+    if @context.account.feature_enabled?(:block_editor)
+      @wiki_pages_env[:text_editor_preference] = @current_user&.reload&.get_preference(:text_editor_preference)
+    end
+
     if context.is_a?(Course)
       @wiki_pages_env[:VALID_DATE_RANGE] = CourseDateRange.new(context)
       @wiki_pages_env[:SECTION_LIST] = context.course_sections.active.map do |section|
