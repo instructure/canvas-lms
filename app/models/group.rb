@@ -557,11 +557,16 @@ class Group < ActiveRecord::Base
       ]
 
       given do |user, session|
-        user && has_member?(user) &&
-          (!context || context.is_a?(Account) || context.grants_any_right?(user, session, :send_messages, :send_messages_all))
-      end
-      can :send_messages and can :send_messages_all
+        next false unless user
 
+        if context.nil? || context.is_a?(Account)
+          has_member?(user)
+        else
+          context.grants_any_right?(user, session, :send_messages, :send_messages_all)
+        end
+      end
+      can :send_messages
+      can :send_messages_all
       # if I am a member of this group and I can moderate_forum in the group's context
       # (makes it so group members cant edit each other's discussion entries)
       given { |user, session| user && has_member?(user) && (!context || context.grants_right?(user, session, :moderate_forum)) }

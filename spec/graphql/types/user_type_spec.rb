@@ -688,6 +688,24 @@ describe Types::UserType do
       )
     end
 
+    let(:teacher_type) do
+      GraphQLTypeTester.new(
+        @teacher,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    let(:ta_type) do
+      GraphQLTypeTester.new(
+        @ta,
+        current_user: @ta,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
     it "returns nil if the user is not the current user" do
       result = user_type.resolve("recipients { usersConnection { nodes { _id } } }")
       expect(result).to be_nil
@@ -744,6 +762,92 @@ describe Types::UserType do
       known_users = @student.address_book.search_users(context: "course_#{@course.id}_students").paginate(per_page: 3)
       result = type.resolve("recipients(context: \"course_#{@course.id}_students\") { usersConnection { nodes { _id } } }")
       expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
+    end
+
+    context "differentiation tags" do
+      before do
+        Account.default.enable_feature!(:differentiation_tags)
+        @collaborative_category = @course.group_categories.create!(name: "Collaborative Category", non_collaborative: false)
+        @collaborative_group = @course.groups.create!(name: "Collaborative group", group_category: @collaborative_category)
+        @collaborative_group.add_user(@student)
+
+        @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+        @non_collaborative_group = @course.groups.create!(name: "non Collaborative group", group_category: @non_collaborative_category)
+        @non_collaborative_group.add_user(@student)
+      end
+
+      describe "teacher type" do
+        it "returns differentiation tags" do
+          result = teacher_type.resolve("recipients(context: \"course_#{@course.id}\") { contextsConnection { nodes { name } } }")
+          expect(result).to include("Differentiation Tags")
+        end
+
+        it "returns differentiation tag details" do
+          result = teacher_type.resolve("recipients(context: \"course_#{@course.id}_differentiation_tags\") { contextsConnection { nodes { name } } }")
+          expect(result).to eq(["non Collaborative group"])
+        end
+
+        it "returns differentiation tag users" do
+          result = teacher_type.resolve("recipients(context: \"differentiation_tag_#{@non_collaborative_group.id}\") { usersConnection { nodes { name } } }")
+          expect(result).to eq([@student.name])
+        end
+
+        it "returns group tag users" do
+          result = teacher_type.resolve("recipients(context: \"group_#{@collaborative_group.id}\") { usersConnection { nodes { name } } }")
+          expect(result).to eq([@student.name])
+        end
+
+        it "does not return differentiation tags when flag is off" do
+          Account.default.disable_feature!(:differentiation_tags)
+
+          result = teacher_type.resolve("recipients(context: \"course_#{@course.id}\") { contextsConnection { nodes { name } } }")
+          expect(result).not_to include("Differentiation Tags")
+        end
+      end
+
+      describe "student type" do
+        it "does not return differentiation tags" do
+          result = type.resolve("recipients(context: \"course_#{@course.id}\") { contextsConnection { nodes { name } } }")
+          expect(result).not_to include("Differentiation Tags")
+        end
+
+        it "does not return differentiation tag details" do
+          result = type.resolve("recipients(context: \"course_#{@course.id}_differentiation_tags\") { contextsConnection { nodes { name } } }")
+          expect(result).to eq([])
+        end
+
+        it "does not return differentiation tag users" do
+          result = type.resolve("recipients(context: \"differentiation_tag_#{@non_collaborative_group.id}\") { usersConnection { nodes { name } } }")
+          expect(result).to eq([])
+        end
+
+        it "does not allow circumventing permissions by calling group" do
+          result = type.resolve("recipients(context: \"group_#{@non_collaborative_group.id}\") { usersConnection { nodes { name } } }")
+          expect(result).to eq([])
+        end
+      end
+
+      describe "ta type" do
+        it "does not return differentiation tags" do
+          result = ta_type.resolve("recipients(context: \"course_#{@course.id}\") { contextsConnection { nodes { name } } }")
+          expect(result).not_to include("Differentiation Tags")
+        end
+
+        it "does not return differentiation tag details" do
+          result = ta_type.resolve("recipients(context: \"course_#{@course.id}_differentiation_tags\") { contextsConnection { nodes { name } } }")
+          expect(result).to eq([])
+        end
+
+        it "does not return differentiation tag users" do
+          result = ta_type.resolve("recipients(context: \"differentiation_tag_#{@non_collaborative_group.id}\") { usersConnection { nodes { name } } }")
+          expect(result).to eq([])
+        end
+
+        it "does not allow circumventing permissions by calling group" do
+          result = ta_type.resolve("recipients(context: \"group_#{@non_collaborative_group.id}\") { usersConnection { nodes { name } } }")
+          expect(result).to eq([])
+        end
+      end
     end
   end
 
