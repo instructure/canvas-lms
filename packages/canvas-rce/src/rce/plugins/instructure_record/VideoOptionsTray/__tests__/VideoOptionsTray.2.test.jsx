@@ -69,140 +69,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
     tray = VideoOptionsTrayDriver.find()
   }
 
-  it('is optionally rendered open', () => {
-    props.open = true
-    renderComponent()
-    expect(tray).not.toBeNull()
-  })
-
-  it('is optionally rendered closed', () => {
-    props.open = false
-    renderComponent()
-    expect(tray).toBeNull()
-  })
-
-  it('is labeled with "Video Options Tray"', () => {
-    renderComponent()
-    expect(tray.label).toEqual('Video Options Tray')
-  })
-
-  describe('Title field', () => {
-    it('uses the value of titleText in the given video options', () => {
-      props.videoOptions.titleText = 'A turtle in a party suit.'
-      renderComponent()
-      expect(tray.titleText).toEqual('A turtle in a party suit.')
-    })
-
-    it('is blank when the given video options titleText is blank', () => {
-      props.videoOptions.titleText = ''
-      renderComponent()
-      expect(tray.titleText).toEqual('')
-    })
-  })
-
-  describe('"Display Options" field', () => {
-    it('is set to "embed" by default', () => {
-      renderComponent()
-      expect(tray.displayAs).toEqual('embed')
-    })
-
-    it('can be set to "Display Text Link"', () => {
-      renderComponent()
-      tray.setDisplayAs('link')
-      expect(tray.displayAs).toEqual('link')
-    })
-
-    it('can be reset to "Embed Image"', () => {
-      renderComponent()
-      tray.setDisplayAs('link')
-      tray.setDisplayAs('embed')
-      expect(tray.displayAs).toEqual('embed')
-    })
-  })
-
-  describe('"Size" field', () => {
-    it('is set using the given image options', () => {
-      renderComponent()
-      expect(tray.size).toEqual('Medium')
-    })
-
-    it('can be re-set to "Medium"', async () => {
-      renderComponent()
-      await tray.setSize('Large')
-      await tray.setSize('Medium')
-      expect(tray.size).toEqual('Medium')
-    })
-
-    it('can be set to "Large"', async () => {
-      renderComponent()
-      await tray.setSize('Large')
-      expect(tray.size).toEqual('Large')
-    })
-
-    it('can be set to "Custom"', async () => {
-      renderComponent()
-      await tray.setSize('Custom')
-      expect(tray.size).toEqual('Custom')
-    })
-
-    it('requires 320px custom width', () => {
-      props.videoOptions.videoSize = 'custom'
-      props.videoOptions.appliedWidth = 310
-      renderComponent()
-      // I don't know why, but getByText does not find the string,
-      // though I can prove it's there
-      expect(/Pixels must be at least 320/.test(tray.messageText())).toBeTruthy()
-    })
-  })
-
-  describe('"Closed Captions Panel"', () => {
-    it('is displayed when feature flag is true', async () => {
-      renderComponent()
-      await waitFor(() => {
-        expect(tray.$closedCaptionPanel).toBeInTheDocument()
-      })
-    })
-
-    it('does not steal focus when changing other parts of the tray', async () => {
-      renderComponent()
-      await waitFor(() => {
-        expect(tray.$closedCaptionPanel).toBeInTheDocument()
-      })
-      tray.$titleTextField.focus()
-      tray.setTitleText('hello')
-      expect(tray.$titleTextField).toBe(document.activeElement)
-    })
-  })
-
-  describe('"Done" button', () => {
-    describe('when Title Text is present', () => {
-      beforeEach(() => {
-        renderComponent()
-        tray.setTitleText('A turtle in a party suit.')
-      })
-
-      it('is enabled', () => {
-        expect(tray.doneButtonDisabled).toEqual(false)
-      })
-    })
-
-    describe('when Title Text is not present', () => {
-      beforeEach(() => {
-        renderComponent()
-        tray.setTitleText('')
-      })
-
-      it('is disabled ', () => {
-        expect(tray.doneButtonDisabled).toEqual(true)
-      })
-
-      it('is enabled when "Display Text Link" is selected', () => {
-        tray.setDisplayAs('link')
-        expect(tray.doneButtonDisabled).toEqual(false)
-      })
-    })
-  })
-
   describe('requestSubtitlesFromIframe', () => {
     it('is not called when subtitles are present', () => {
       renderComponent()
@@ -230,7 +96,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         event => {
           Object.assign(event, {preventDefault})
         },
-        true
+        true,
       )
       tray.$doneButton.click()
       expect(preventDefault).toHaveBeenCalledTimes(1)
@@ -262,7 +128,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
         expect(appliedWidth).toEqual(400)
         const expectedHt = Math.round(
-          (props.videoOptions.naturalHeight / props.videoOptions.naturalWidth) * 400
+          (props.videoOptions.naturalHeight / props.videoOptions.naturalWidth) * 400,
         )
         expect(appliedHeight).toEqual(expectedHt)
       })
@@ -271,35 +137,35 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
 
   describe('Attachment Media Options Tray', () => {
     it('does not have closed caption controls or title input for locked attachments', async () => {
-      const getFileMock = jest
-        .spyOn(RceApiSource.prototype, 'getFile')
-        .mockImplementation(() => {
-          return Promise.resolve({
-            "id": "10",
-            "is_master_course_child_content": true,
-            "restricted_by_master_course": true,
-          })
+      const getFileMock = jest.spyOn(RceApiSource.prototype, 'getFile').mockImplementation(() => {
+        return Promise.resolve({
+          id: '10',
+          is_master_course_child_content: true,
+          restricted_by_master_course: true,
         })
+      })
       props.videoOptions = {attachmentId: 10}
       renderComponent()
-      await waitFor(() => {expect(getFileMock).toHaveBeenCalled()})
+      await waitFor(() => {
+        expect(getFileMock).toHaveBeenCalled()
+      })
       expect(tray.$closedCaptionPanel).not.toBeInTheDocument()
       expect(tray.$titleTextField).not.toBeInTheDocument()
     })
 
     it('shows closed caption controls and title input for unlocked attachments', async () => {
-      const getFileMock = jest
-        .spyOn(RceApiSource.prototype, 'getFile')
-        .mockImplementation(() => {
-          return Promise.resolve({
-            "id": "10",
-            "is_master_course_master_content": true,
-            "restricted_by_master_course": true,
-          })
+      const getFileMock = jest.spyOn(RceApiSource.prototype, 'getFile').mockImplementation(() => {
+        return Promise.resolve({
+          id: '10',
+          is_master_course_master_content: true,
+          restricted_by_master_course: true,
         })
+      })
       props.videoOptions = {attachmentId: 10}
       renderComponent()
-      await waitFor(() => {expect(getFileMock).toHaveBeenCalled()})
+      await waitFor(() => {
+        expect(getFileMock).toHaveBeenCalled()
+      })
       expect(tray.$closedCaptionPanel).toBeInTheDocument()
       expect(tray.$titleTextField).toBeInTheDocument()
     })
