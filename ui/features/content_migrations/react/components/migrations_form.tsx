@@ -20,7 +20,7 @@ import React, {useEffect, useState, useCallback, useMemo} from 'react'
 import type {SetStateAction, Dispatch} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
@@ -178,6 +178,7 @@ export const ContentMigrationsForm = ({
         const overriddenJson = overrideDefaultWorkflowState(json as ContentMigrationItem)
         setMigrations(prevMigrations => [overriddenJson].concat(prevMigrations))
       }
+      showFlashSuccess(I18n.t('Content migration queued.'))()
     },
     [chosenMigrator, handleFileProgress, onResetForm, setMigrations],
   )
