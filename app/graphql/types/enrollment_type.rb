@@ -55,6 +55,8 @@ module Types
   class EnrollmentType < ApplicationObjectType
     graphql_name "Enrollment"
 
+    include GraphQLHelpers::AnonymousGrading
+
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
@@ -66,12 +68,12 @@ module Types
 
     field :user, UserType, null: true
     def user
-      load_association(:user)
+      unless_hiding_user_for_anonymous_grading { load_association(:user) }
     end
 
     field :associated_user, UserType, null: true
     def associated_user
-      load_association(:associated_user)
+      unless_hiding_user_for_anonymous_grading { load_association(:associated_user) }
     end
 
     field :course, CourseType, null: true
@@ -83,7 +85,7 @@ module Types
 
     field :section, SectionType, null: true
     def section
-      load_association(:course_section)
+      unless_hiding_user_for_anonymous_grading { load_association(:course_section) }
     end
 
     field :state, EnrollmentWorkflowState, method: :workflow_state, null: false
@@ -106,17 +108,19 @@ module Types
     end
     DEFAULT_GRADING_PERIOD = "default_grading_period"
     def grades(grading_period_id: DEFAULT_GRADING_PERIOD)
-      Promise.all([
-                    load_association(:scores),
-                    load_association(:user),
-                    load_association(:course)
-                  ]).then do
-        if grading_period_id == DEFAULT_GRADING_PERIOD
-          Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then do |gp, _|
-            load_grades(gp&.id)
+      unless_hiding_user_for_anonymous_grading do
+        Promise.all([
+                      load_association(:scores),
+                      load_association(:user),
+                      load_association(:course)
+                    ]).then do
+          if grading_period_id == DEFAULT_GRADING_PERIOD
+            Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then do |gp, _|
+              load_grades(gp&.id)
+            end
+          else
+            load_grades(grading_period_id)
           end
-        else
-          load_grades(grading_period_id)
         end
       end
     end

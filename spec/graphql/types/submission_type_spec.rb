@@ -1037,4 +1037,29 @@ describe Types::SubmissionType do
       expect(submission_type.resolve("userId")).to be_nil
     end
   end
+
+  describe "enrollments" do
+    let(:other_section) { @course.course_sections.create! name: "other section" }
+    let(:other_teacher) do
+      @course.enroll_teacher(user_factory, section: other_section, limit_privileges_to_course_section: true).user
+    end
+
+    it "works" do
+      expect(
+        submission_type.resolve(
+          "enrollmentsConnection { nodes { _id } }",
+          current_user: @teacher
+        )
+      ).to match_array @course.enrollments.where(user_id: @submission.user_id).map(&:to_param)
+    end
+
+    it "doesn't return users not visible to current_user" do
+      expect(
+        submission_type.resolve(
+          "enrollmentsConnection { nodes { _id } }",
+          current_user: other_teacher
+        )
+      ).to be_empty
+    end
+  end
 end
