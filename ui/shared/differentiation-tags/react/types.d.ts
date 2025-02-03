@@ -19,6 +19,7 @@
 export interface DifferentiationTagCategory {
   id: number
   name: string
+  groups?: DifferentiationTagGroup[]
 }
 
 export interface DifferentiationTagGroup {
@@ -26,10 +27,9 @@ export interface DifferentiationTagGroup {
   name: string
 }
 
-export interface DifferentiationTagSet {
-  id: number
-  name: string
-  groups?: DifferentiationTagGroup[]
-}
-
 export type ModalMode = 'create' | 'edit'
+export type ModalTagMode = 'single' | 'multi'
+
+export interface Course {
+  readonly id: string
+}

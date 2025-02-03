@@ -17,3 +17,9 @@
  */
 
 export const QUERY_STALE_TIME = 300000 // 5 minutes
+
+export const CREATE_MODE = 'create'
+export const EDIT_MODE = 'edit'
+export const SINGLE_TAG = 'single'
+export const MULTIPLE_TAGS = 'multi'
+export const CREATE_NEW_SET_OPTION = 'create-set'

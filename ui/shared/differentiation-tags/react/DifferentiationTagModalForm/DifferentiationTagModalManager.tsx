@@ -19,7 +19,11 @@
 import React from 'react'
 import {QueryProvider} from '@canvas/query'
 import DifferentiationTagModalForm from './DifferentiationTagModalForm'
-import {useDifferentiationTagSet} from '../hooks/useDifferentiationTagSet'
+import {useDifferentiationTagCategoriesIndex} from '../hooks/useDifferentiationTagCategoriesIndex'
+import type {Course, DifferentiationTagCategory} from '../types.d'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+
+declare const ENV: GlobalEnv & Course
 
 export interface DifferentiationTagModalManagerProps {
   isOpen: boolean
@@ -31,7 +35,18 @@ export interface DifferentiationTagModalManagerProps {
 function DifferentiationTagModalContainer(props: DifferentiationTagModalManagerProps) {
   const {isOpen, onClose, mode, differentiationTagCategoryId} = props
 
-  const {data: tagSet} = useDifferentiationTagSet(differentiationTagCategoryId, true)
+  const courseID = Number(ENV?.course?.id)
+  const hasValidCourseID = typeof courseID === 'number' && !isNaN(courseID)
+
+  const {data} = useDifferentiationTagCategoriesIndex(courseID, {
+    includeDifferentiationTags: true,
+    enabled: hasValidCourseID,
+  })
+
+  const categories: DifferentiationTagCategory[] = data?.map(({id, name}) => ({id, name})) || []
+  const tagSet: DifferentiationTagCategory | undefined = data?.find(
+    set => set.id === differentiationTagCategoryId,
+  )
 
   return (
     <DifferentiationTagModalForm
@@ -39,6 +54,7 @@ function DifferentiationTagModalContainer(props: DifferentiationTagModalManagerP
       onClose={onClose}
       mode={mode}
       differentiationTagSet={tagSet}
+      categories={categories}
     />
   )
 }
