@@ -291,12 +291,12 @@ function filterStudents(criterion: FilterCriterion, students: Student[], cutoff:
         }
         break
       case 'scored_more_than':
-        if (student.score && student.score > cutoff) {
+        if (typeof student.score === 'number' && student.score > cutoff) {
           newfilteredStudents.push(student)
         }
         break
       case 'scored_less_than':
-        if (student.score && student.score < cutoff) {
+        if (typeof student.score === 'number' && student.score < cutoff) {
           newfilteredStudents.push(student)
         }
         break
@@ -311,12 +311,12 @@ function filterStudents(criterion: FilterCriterion, students: Student[], cutoff:
         }
         break
       case 'total_grade_higher_than':
-        if (student.currentScore && student.currentScore > cutoff) {
+        if (typeof student.currentScore === 'number' && student.currentScore > cutoff) {
           newfilteredStudents.push(student)
         }
         break
       case 'total_grade_lower_than':
-        if (student.currentScore && student.currentScore < cutoff) {
+        if (typeof student.currentScore === 'number' && student.currentScore < cutoff) {
           newfilteredStudents.push(student)
         }
         break

@@ -222,8 +222,7 @@ function expectToBeUnselected(cell: HTMLElement) {
   expect(unselectedElement).toBeInTheDocument()
 }
 
-// unskip in EVAL-2535
-describe.skip('MessageStudentsWhoDialog', () => {
+describe('MessageStudentsWhoDialog', () => {
   it('hides the list of students and observers initially', async () => {
     const mocks = await makeMocks()
 
@@ -237,7 +236,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
   })
 
-  it('shows students sorted by sortable name when the table is shown', async () => {
+  // unskip in EVAL-2535
+  it.skip('shows students sorted by sortable name when the table is shown', async () => {
     const mocks = await makeMocks()
 
     const {getByRole, getAllByRole, findByRole} = render(
@@ -261,7 +261,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(studentCells[4]).toHaveTextContent('Charlie Xi')
   })
 
-  it('shows observers sorted by the sortable name of the associated user when the table is shown', async () => {
+  // unskip in EVAL-2535
+  it.skip('shows observers sorted by the sortable name of the associated user when the table is shown', async () => {
     const mocks = await makeMocks()
 
     const {findByRole, getByRole, getAllByRole} = render(
@@ -285,7 +286,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(observerCells[4]).toHaveTextContent('')
   })
 
-  it('shows observers in the same cell sorted by the sortable name when observing the same student', async () => {
+  // unskip in EVAL-2535
+  it.skip('shows observers in the same cell sorted by the sortable name when observing the same student', async () => {
     const mocks = await makeMocks([], true)
 
     const {findByRole, getByRole, getAllByRole} = render(
@@ -308,7 +310,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(observerCells[4]).toHaveTextContent('')
   })
 
-  it('includes the total number of students in the checkbox label', async () => {
+  // unskip in EVAL-2535
+  it.skip('includes the total number of students in the checkbox label', async () => {
     const mocks = await makeMocks()
 
     const {findByRole} = render(
@@ -319,7 +322,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(await findByRole('checkbox', {name: /Students/})).toHaveAccessibleName('4 Students')
   })
 
-  it('updates total number of students in checkbox label when student is removed from list', async () => {
+  // unskip in EVAL-2535
+  it.skip('updates total number of students in checkbox label when student is removed from list', async () => {
     const mocks = await makeMocks()
 
     const {findByRole, findByTestId, findAllByTestId} = render(
@@ -341,7 +345,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(await findByTestId('total-student-checkbox')).toHaveAccessibleName('3 Students')
   })
 
-  it('includes the total number of observers in the checkbox label', async () => {
+  // unskip in EVAL-2535
+  it.skip('includes the total number of observers in the checkbox label', async () => {
     const mocks = await makeMocks()
 
     const {findByRole} = render(
@@ -352,7 +357,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('2 Observers')
   })
 
-  it('updates total number of observers in checkbox label when observer is added to list', async () => {
+  // unskip in EVAL-2535
+  it.skip('updates total number of observers in checkbox label when observer is added to list', async () => {
     const mocks = await makeMocks()
 
     const {findByRole, findByTestId, findAllByTestId} = render(
@@ -1116,7 +1122,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
   })
 
-  describe('default subject', () => {
+  // unskip in EVAL-2535
+  describe.skip('default subject', () => {
     it('is set to the first criteria that is listed upon opening the modal', async () => {
       const mocks = await makeMocks()
       const {findByTestId} = render(
@@ -1172,7 +1179,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
   })
 
-  describe('students selection', () => {
+  // unskip in EVAL-2535
+  describe.skip('students selection', () => {
     beforeEach(() => {
       students[0].submittedAt = null
       students[1].submittedAt = null
@@ -1329,7 +1337,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
   })
 
-  describe('observers selection', () => {
+  // unskip in EVAL-2535
+  describe.skip('observers selection', () => {
     beforeEach(() => {
       students[0].submittedAt = null
       students[1].submittedAt = null
@@ -1570,7 +1579,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
   })
 
-  describe('onSend', () => {
+  // unskip in EVAL-2535
+  describe.skip('onSend', () => {
     let onClose: jest.Mock<any, any>
     let onSend: jest.Mock<any, any>
 
