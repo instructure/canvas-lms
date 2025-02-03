@@ -20,6 +20,7 @@ import {
   type ItemType,
   type CheckboxTreeNode,
   type CheckboxState,
+  type SwitchState,
   TreeSelector,
 } from './react/TreeSelector/TreeSelector'
 
@@ -35,7 +36,7 @@ import {
 } from './react/CommonMigratorControls/types'
 
 export {TreeSelector}
-export type {CheckboxTreeNode, CheckboxState, ItemType}
+export type {CheckboxTreeNode, CheckboxState, ItemType, SwitchState}
 export {CommonMigratorControls}
 export type {
   AdjustDates,

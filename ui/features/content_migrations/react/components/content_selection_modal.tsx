@@ -43,6 +43,7 @@ export type Item = {
   children?: Item[]
   linkedId?: string
   checkboxState: CheckboxState
+  isSubModule?: boolean
 }
 
 type SelectiveDataResponse = (GenericItemResponse & {count?: number; sub_items_url?: string})[]
@@ -65,14 +66,33 @@ export const ContentSelectionModal = ({
 
   const I18n = useI18nScope('content_migrations_redesign')
 
-  const getChildSelectiveData = async (
-    response: SelectiveDataResponse,
-    setHasErrors: (hasErrors: boolean) => void,
+  const loadSubItemsFromSubItemUrls = useCallback(async (
+    url: string
+  ): Promise<GenericItemResponse[]> => {
+    const {json} = await doFetchApi<GenericItemResponse[]>({
+      path: url,
+      method: 'GET',
+    })
+    if (!json) {
+      return []
+    }
+
+    for (const subItem of json) {
+      if (subItem.sub_items_url && subItem.submodule_count) {
+        subItem.sub_items = await loadSubItemsFromSubItemUrls(subItem.sub_items_url)
+      }
+    }
+
+    return json
+  }, [])
+
+  const getCheckboxTreeNodes = useCallback(async (
+    response: SelectiveDataResponse
   ): Promise<Record<string, CheckboxTreeNode>> => {
-    const rootItems: Item[] = []
+    const items: Item[] = []
 
     for (const {type, title, property, sub_items, count, sub_items_url, migration_id} of response) {
-      const rootItem = responseToItem(
+      const item = responseToItem(
         {
           type,
           title,
@@ -84,22 +104,15 @@ export const ContentSelectionModal = ({
       )
 
       if (sub_items_url && count) {
-        const {json} = await doFetchApi<GenericItemResponse[]>({
-          path: sub_items_url,
-          method: 'GET',
-        })
-        if (!json) {
-          setHasErrors(true)
-          continue
-        }
-        rootItem.label = I18n.t('%{title} (%{count})', {title, count})
-        rootItem.children = json.map(jsonElement => responseToItem(jsonElement, I18n))
+        const rootSubItems = await loadSubItemsFromSubItemUrls(sub_items_url)
+        item.children = rootSubItems.map(subItem => responseToItem(subItem, I18n))
+        item.label = I18n.t('%{title} (%{count})', {title, count})
       }
-      rootItems.push(rootItem)
+      items.push(item)
     }
 
-    return mapToCheckboxTreeNodes(rootItems)
-  }
+    return mapToCheckboxTreeNodes(items)
+  }, [I18n, loadSubItemsFromSubItemUrls])
 
   const handleEntered = useCallback(async () => {
     setHasErrors(false)
@@ -114,14 +127,14 @@ export const ContentSelectionModal = ({
         setCheckboxTreeNodes({})
         return
       }
-      const mappedItems = await getChildSelectiveData(json, setHasErrors)
-      setCheckboxTreeNodes(mappedItems)
+      const checkboxTreeNodes = await getCheckboxTreeNodes(json)
+      setCheckboxTreeNodes(checkboxTreeNodes)
     } catch {
       setHasErrors(true)
     } finally {
       setIsLoading(false)
     }
-  }, [courseId, getChildSelectiveData, migration.id])
+  }, [courseId, getCheckboxTreeNodes, migration.id])
 
   const handleSubmit = () => {
     doFetchApi({

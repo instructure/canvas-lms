@@ -41,8 +41,11 @@ import {
   IconSettingsLine,
   IconSyllabusLine,
 } from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 
 export type CheckboxState = 'checked' | 'unchecked' | 'indeterminate'
+
+export type SwitchState = 'on' | 'off' | 'disabled'
 
 export type CheckboxTreeNode = {
   id: string
@@ -53,6 +56,7 @@ export type CheckboxTreeNode = {
   childrenIds: string[]
   checkboxState: CheckboxState
   migrationId?: string
+  importAsOneModuleItemState?: SwitchState
 }
 
 export type TreeSelectorProps = {
@@ -60,9 +64,11 @@ export type TreeSelectorProps = {
   onChange: (modifiedItems: Record<string, CheckboxTreeNode>) => void
 }
 
+type DispatcherType = CheckboxState | 'importAsOneModuleItem'
+
 type ItemProps = {
   currentItem: CheckboxTreeNode
-  dispatch: (action: {type: CheckboxState; payload: string}) => void
+  dispatch: (action: {type: DispatcherType; payload: string}) => void
   expanded?: boolean
   checkboxTreeNodes?: Record<string, CheckboxTreeNode>
 }
@@ -114,15 +120,15 @@ const ICONS: Record<ItemType, ComponentClass<any>> = {
   blueprint_settings: IconSettingsLine,
 }
 
-const updateChildrenToNextCheckState = (
+const updateChildrenToNextState = (
   item: CheckboxTreeNode,
   newState: Record<string, CheckboxTreeNode>,
-  nextCheckState: CheckboxState,
+  updaterFunction: (treeNodes: Record<string, CheckboxTreeNode>, childId: string) => void,
 ) => {
   const updateChild = (currentItem: CheckboxTreeNode) => {
     currentItem.childrenIds.forEach(childId => {
       const childItem = newState[childId]
-      newState[childId] = {...childItem, checkboxState: nextCheckState}
+      updaterFunction(newState, childId)
       if (childItem) updateChild(childItem)
     })
   }
@@ -165,7 +171,9 @@ const uncheckAllChildrenAction = (
     const nextCheckState = 'unchecked'
     newState[item.id] = {...item, checkboxState: nextCheckState}
 
-    updateChildrenToNextCheckState(item, newState, nextCheckState)
+    updateChildrenToNextState(item, newState, (treeNodes, childId) => {
+      treeNodes[childId] = {... treeNodes[childId], checkboxState: nextCheckState}
+    })
     updateParentsWithoutKnowAboutChildren(item, newState)
   }
 
@@ -189,9 +197,34 @@ const toggleCheckBoxByIdAction = (
   return newState
 }
 
+const toggleImportAsOneModuleItem = (
+  state: Record<string, CheckboxTreeNode>,
+  id: string,
+): Record<string, CheckboxTreeNode> => {
+  const newState = {...state}
+  const item = newState[id]
+
+  if (item) {
+    const nextImportAsOneModuleItemState = item.importAsOneModuleItemState === 'on' ? 'off' : 'on'
+    newState[item.id] = {...item, importAsOneModuleItemState: nextImportAsOneModuleItemState}
+    if (nextImportAsOneModuleItemState === 'off') {
+      updateChildrenToNextState(item, newState, (treeNodes, childId) => {
+        treeNodes[childId] = {...treeNodes[childId], importAsOneModuleItemState: 'disabled'}
+      })
+    }
+    if (nextImportAsOneModuleItemState === 'on') {
+      updateChildrenToNextState(item, newState, (treeNodes, childId) => {
+        treeNodes[childId] = {...treeNodes[childId], importAsOneModuleItemState: 'off'}
+      })
+    }
+  }
+
+  return newState
+}
+
 const reducer = (
   state: Record<string, CheckboxTreeNode>,
-  action: {type: CheckboxState; payload: string},
+  action: {type: DispatcherType; payload: string},
 ) => {
   switch (action.type) {
     case 'unchecked':
@@ -199,6 +232,8 @@ const reducer = (
       return toggleCheckBoxByIdAction(state, action.payload)
     case 'indeterminate':
       return uncheckAllChildrenAction(state, action.payload)
+    case 'importAsOneModuleItem':
+      return toggleImportAsOneModuleItem(state, action.payload)
     default:
       return state
   }
@@ -230,6 +265,7 @@ const isParentItem = (item: CheckboxTreeNode) => {
 const areEqualChild = (prevProps: ItemProps, nextProps: ItemProps) => {
   return (
     prevProps.currentItem.checkboxState === nextProps.currentItem.checkboxState &&
+    prevProps.currentItem.importAsOneModuleItemState === nextProps.currentItem.importAsOneModuleItemState &&
     prevProps.dispatch === nextProps.dispatch
   )
 }
@@ -238,32 +274,95 @@ const areEqualParent = (prevProps: ItemProps, nextProps: ItemProps) => {
   const prevNodes = prevProps.checkboxTreeNodes || {}
   const nextNodes = nextProps.checkboxTreeNodes || {}
 
-  const hasChildCheckboxStateChangedRecursive = (
+  const hasChildStateChangedRecursive = (
     currentItem: CheckboxTreeNode,
-    prevNodes: Record<string, CheckboxTreeNode>,
-    nextNodes: Record<string, CheckboxTreeNode>,
+    prevNodesParam: Record<string, CheckboxTreeNode>,
+    nextNodesParam: Record<string, CheckboxTreeNode>,
   ): boolean => {
+    if (prevNodesParam[currentItem.id].importAsOneModuleItemState !== nextNodesParam[currentItem.id].importAsOneModuleItemState) {
+      return true
+    }
+
     return currentItem.childrenIds.some(childId => {
-      const child = prevNodes[childId]
+      const child = prevNodesParam[childId]
       if (child.childrenIds.length > 0) {
-        return hasChildCheckboxStateChangedRecursive(child, prevNodes, nextNodes)
+        return hasChildStateChangedRecursive(child, prevNodesParam, nextNodesParam)
       }
-      return child.checkboxState !== nextNodes[childId].checkboxState
+
+      return child.checkboxState !== nextNodesParam[childId].checkboxState ||
+        prevNodesParam[childId].importAsOneModuleItemState !== nextNodesParam[childId].importAsOneModuleItemState
     })
   }
 
-  const hasChildCheckboxStateChanged = hasChildCheckboxStateChangedRecursive(
+  const hasChildStateChanged = hasChildStateChangedRecursive(
     prevProps.currentItem,
     prevNodes,
     nextNodes,
   )
 
   return (
-    !hasChildCheckboxStateChanged &&
+    !hasChildStateChanged &&
     prevProps.currentItem.checkboxState === nextProps.currentItem.checkboxState &&
+    prevProps.currentItem.importAsOneModuleItemState === nextProps.currentItem.importAsOneModuleItemState &&
     prevProps.expanded === nextProps.expanded &&
     prevProps.dispatch === nextProps.dispatch
   )
+}
+
+const SubModuleSwitch = ({
+  checkboxState,
+  dispatch,
+  currentItem,
+} : {
+  checkboxState: CheckboxState
+  dispatch: (action: {type: DispatcherType; payload: string}) => void
+  currentItem: CheckboxTreeNode
+}) => {
+  const I18n = useI18nScope('collapsable_list')
+  const {importAsOneModuleItemState} = currentItem
+
+  const handleCheckboxChange = () => {
+    dispatch({type: 'importAsOneModuleItem', payload: currentItem.id})
+  }
+
+  const checkboxLabel = (disabled: boolean) => (
+    <>
+      <Text>{I18n.t('Import as a standalone module')}</Text>
+      <br/>
+      {disabled ?
+        <Text color="secondary">{I18n.t('Selection is disabled, as the parent is not selected as a standalone module import item.')}</Text> :
+        <Text color="secondary">{I18n.t('If not selected, this item will be imported as one module item.')}</Text>
+      }
+    </>
+  )
+
+  const switchDisabled = importAsOneModuleItemState === 'disabled'
+  const switchOn = importAsOneModuleItemState === 'on'
+  const checkBoxChecked = checkboxState === 'checked'
+
+  if (checkBoxChecked && importAsOneModuleItemState !== undefined) {
+    return (
+      <View
+        margin="xx-small 0 xx-small x-large"
+        as="div"
+      >
+        <Flex direction="row" wrap="wrap">
+          <Checkbox
+            label={checkboxLabel(switchDisabled)}
+            value="small"
+            variant="toggle"
+            size="small"
+            data-testid={`switch-${currentItem.id}`}
+            disabled={switchDisabled}
+            checked={switchOn}
+            onChange={handleCheckboxChange}
+          />
+        </Flex>
+      </View>
+    )
+  }
+
+  return <></>
 }
 
 const Child = memo(({currentItem, dispatch}: ItemProps) => {
@@ -279,22 +378,33 @@ const Child = memo(({currentItem, dispatch}: ItemProps) => {
   }
 
   return (
-    <Flex margin="0 0 0 x-large" padding="small 0 small xxx-small">
-      <FlexItem margin="0 x-small 0 0">
-        <Checkbox
-          checked={checkboxState === 'checked'}
-          onChange={handleCheckboxChange}
-          label={<ScreenReaderContent>{label}</ScreenReaderContent>}
-          data-testid={`checkbox-${id}`}
+    <Flex direction="column">
+      <FlexItem>
+        <SubModuleSwitch
+          checkboxState={checkboxState}
+          dispatch={dispatch}
+          currentItem={currentItem}
         />
       </FlexItem>
-      {ParentIcon && (
-        <FlexItem margin="0 small 0 0">
-          <ParentIcon size="small" />
-        </FlexItem>
-      )}
-      <FlexItem shouldShrink={true}>
-        <Text aria-hidden="true">{label}</Text>
+      <FlexItem>
+        <Flex margin="0 0 0 x-large" padding="small 0 small xxx-small">
+          <FlexItem margin="0 x-small 0 0">
+            <Checkbox
+              checked={checkboxState === 'checked'}
+              onChange={handleCheckboxChange}
+              label={<ScreenReaderContent>{label}</ScreenReaderContent>}
+              data-testid={`checkbox-${id}`}
+            />
+          </FlexItem>
+          {ParentIcon && (
+            <FlexItem margin="0 small 0 0">
+              <ParentIcon size="x-small" />
+            </FlexItem>
+          )}
+          <FlexItem shouldShrink={true}>
+            <Text aria-hidden="true">{label}</Text>
+          </FlexItem>
+        </Flex>
       </FlexItem>
     </Flex>
   )
@@ -336,6 +446,11 @@ const Parent = memo(
     return (
       <Flex margin="xxx-small 0 0 0" width="100%" direction="column">
         <FlexItem shouldShrink={true}>
+          <SubModuleSwitch
+            checkboxState={checkboxState}
+            dispatch={dispatch}
+            currentItem={currentItem}
+          />
           <ToggleGroup
             data-testid={`toggle-${id}`}
             toggleLabel={I18n.t('%{label}, Navigate inside to interact with the checkbox', {label})}
@@ -355,7 +470,7 @@ const Parent = memo(
                 </FlexItem>
                 {ParentIcon && (
                   <FlexItem shouldShrink={true}>
-                    <ParentIcon size="small" />
+                    <ParentIcon size="x-small" />
                   </FlexItem>
                 )}
                 <FlexItem padding="0 small" shouldShrink={true}>
@@ -413,7 +528,11 @@ export const TreeSelector = ({
                 expanded={false}
               />
             ) : (
-              <Child currentItem={rootItem} dispatch={checkDispatch} />
+              <Flex padding="xx-small 0 0 0" width="100%" direction="column">
+                <FlexItem shouldShrink={true}>
+                  <Child currentItem={rootItem} dispatch={checkDispatch} />
+                </FlexItem>
+              </Flex>
             )}
           </Fragment>
         )
