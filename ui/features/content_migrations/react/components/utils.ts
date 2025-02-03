@@ -18,7 +18,7 @@
 
 import type {CheckboxTreeNode} from '@canvas/content-migrations'
 import type {Item} from './content_selection_modal'
-import type {GenericItemResponse, SelectiveDataRequest} from './types'
+import type {GenericItemResponse, Migrator, SelectiveDataRequest} from './types'
 
 export const humanReadableSize = (size: number): string => {
   const units = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
@@ -28,6 +28,29 @@ export const humanReadableSize = (size: number): string => {
     ++i
   }
   return size.toFixed(1) + ' ' + units[i]
+}
+
+const compareStrings = (a: string | undefined, b: string | undefined): number => {
+  const str1 = a || ''
+  const str2 = b || ''
+  return str1.localeCompare(str2)
+}
+
+export const compareMigrators = (a: Migrator, b: Migrator): number => {
+  const higherPriority = ['course_copy_importer', 'canvas_cartridge_importer'];
+  if (higherPriority.includes(a.type) && higherPriority.includes(b.type)) {
+    return compareStrings(a.name, b.name)
+  }
+
+  if (higherPriority.includes(a.type)) {
+    return -1
+  }
+
+  if (higherPriority.includes(b.type)) {
+    return 1
+  }
+
+  return compareStrings(a.name, b.name)
 }
 
 export const timeout = (delay: number) => {
