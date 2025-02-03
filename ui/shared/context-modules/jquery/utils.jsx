@@ -525,7 +525,7 @@ export function openExternalTool(ev) {
     setExternalToolModal({
       tool,
       launchType,
-      returnFocusTo: $('.al-trigger')[0],
+      returnFocusTo: $(`#context_module_${currentModuleId} .al-trigger`)[0],
       contextModuleId: currentModuleId,
     })
     return
@@ -548,6 +548,14 @@ export function openExternalTool(ev) {
   setExternalToolTray(tool, moduleData, launchType, $('.al-trigger')[0])
 }
 
+let externalToolRoot = null
+const getExternalToolRoot = function() {
+  if (!externalToolRoot) {
+    externalToolRoot = createRoot($('#external-tool-mount-point')[0])
+  }
+  return externalToolRoot
+}
+
 function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', returnFocusTo) {
   const handleDismiss = () => {
     setExternalToolTray(null)
@@ -557,7 +565,7 @@ function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', 
     }
   }
 
-  const root = createRoot($('#external-tool-mount-point')[0])
+  const root = getExternalToolRoot()
   root.render(
     <ContentTypeExternalToolTray
       tool={tool}
@@ -590,7 +598,7 @@ function setExternalToolModal({
     returnFocusTo.focus()
   }
 
-  const root = createRoot($('#external-tool-mount-point')[0])
+  const root = getExternalToolRoot()
   root.render(
     <ExternalToolModalLauncher
       tool={tool}
