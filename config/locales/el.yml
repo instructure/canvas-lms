@@ -2137,6 +2137,7 @@ el:
       not_yet_graded: "*Δεν έχει βαθμολογηθεί ακόμα*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} μόρια"
       score_with_points_possible_screenreader: "Βαθμολογία: %{score} από %{pointsPossible} μόρια."
+    assignment_submit_success: "Η εργασία υποβλήθηκε επιτυχώς."
     assignments_list_right_side: 
       links: 
         see_current_grades: "Εμφάνιση των βαθμών μου μέχρι τώρα"
