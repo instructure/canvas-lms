@@ -17,9 +17,9 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {useQuery} from '@canvas/query'
+import {useInfiniteQuery, type QueryFunctionContext} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
@@ -35,45 +35,50 @@ import {
   IconSortLine,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
-import type {ePortfolioSection, ePortfolio, ePortfolioPage} from './types'
+import type {ePortfolio, ePortfolioPage} from './types'
 import PageEditModal from './PageEditModal'
+import { View } from '@instructure/ui-view'
+
 
 const I18n = createI18nScope('eportfolio')
 
 interface Props {
   readonly sectionId: number
+  readonly sectionName: string
   readonly portfolio: ePortfolio
   readonly isOwner: boolean
   readonly onUpdate: (json: ePortfolioPage) => void
-}
-
-type PageData = {
-  section: ePortfolioSection
-  pages: ePortfolioPage[]
-}
-
-const fetchSectionAndPages = async (portfolioId: number, sectionId: number): Promise<PageData> => {
-  const section = await doFetchApi<ePortfolioSection>({
-    path: `/eportfolios/${portfolioId}/categories/${sectionId}`,
-  })
-  const pages = await doFetchApi<ePortfolioPage[]>({
-    path: `/eportfolios/${portfolioId}/categories/${sectionId}/pages`,
-  })
-  if (section.json && pages.json) {
-    return {section: section.json, pages: pages.json}
-  } else {
-    return {} as PageData
-  }
+  readonly isLoading: boolean
 }
 
 function PageList(props: Props) {
   const [modalType, setModalType] = useState('')
   const [selectedPage, setSelectedPage] = useState<ePortfolioPage | null>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
-  const {data, isError, isLoading, refetch} = useQuery<PageData>({
-    queryFn: () => fetchSectionAndPages(props.portfolio.id, props.sectionId),
-    queryKey: ['portfolioPageList', props.portfolio.id, props.sectionId],
-  })
+  const fetchPages = async ({pageParam = '1'} : QueryFunctionContext): Promise<{json: ePortfolioPage[], nextPage: string | null}> => {
+    const params = {
+      page: pageParam,
+      per_page: '10',
+    }
+    const {json, link} = await doFetchApi<ePortfolioPage[]>({
+      path: `/eportfolios/${props.portfolio.id}/categories/${props.sectionId}/pages`,
+      params
+    })
+    const nextPage = link?.next ? link.next.page : null
+    if (json) {
+      return {json, nextPage}
+    }
+    return {json: [], nextPage: null}
+  }
+
+  const {data, refetch, fetchNextPage, isFetching, isFetchingNextPage, hasNextPage, isSuccess} =
+    useInfiniteQuery({
+      queryKey: ['portfolioPageList', props.portfolio.id, props.sectionId],
+      queryFn: fetchPages,
+      staleTime: 10 * 60 * 1000, // 10 minutes
+      getNextPageParam: lastPage => lastPage.nextPage,
+    })
 
   const onConfirm = (json?: undefined | ePortfolioPage) => {
     if (json) {
@@ -96,6 +101,28 @@ function PageList(props: Props) {
     setModalType(type)
   }
 
+  function clearPageLoadTrigger() {
+    if (observerRef.current === null) return
+    observerRef.current.disconnect()
+    observerRef.current = null
+  }
+
+  function setPageLoadTrigger(ref: Element | null) {
+    if (ref === null) return
+    clearPageLoadTrigger()
+    observerRef.current = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) {
+        fetchNextPage()
+        clearPageLoadTrigger()
+      }
+    })
+    observerRef.current.observe(ref)
+  }
+
+  const isTriggerRow = (row: number, numOfPages: number) => row === numOfPages - 1 && !!hasNextPage && !isFetching
+  const setTrigger = (row: number, numOfPages: number) =>
+    isTriggerRow(row, numOfPages) ? (ref: Element | null) => setPageLoadTrigger(ref) : undefined
+
   const renderModal = (pages: ePortfolioPage[]) => {
     if (modalType !== '') {
       return (
@@ -112,7 +139,7 @@ function PageList(props: Props) {
     }
   }
 
-  const renderPageRow = (page: ePortfolioPage) => {
+  const renderPageRow = (page: ePortfolioPage, index: number, pageLength: number) => {
     const options = [
       <Menu.Item
         key="rename"
@@ -125,7 +152,7 @@ function PageList(props: Props) {
         </Flex>
       </Menu.Item>,
     ]
-    if (data && data.pages.length > 1) {
+    if (pageLength > 1) {
       options.push(
         <Menu.Item
           key="move"
@@ -155,7 +182,7 @@ function PageList(props: Props) {
       <Table.Row key={page.id}>
         <Table.Cell>
           <Link href={page.entry_url}>
-            <Text>{page.name}</Text>
+            <Text elementRef={setTrigger(index, pageLength)}>{page.name}</Text>
           </Link>
         </Table.Cell>
         <Table.Cell>
@@ -180,38 +207,43 @@ function PageList(props: Props) {
     )
   }
 
-  if (isError) {
-    return <Alert variant="error">{I18n.t('Failed to load ePortfolio pages')}</Alert>
-  } else if (isLoading) {
+  if ((isFetching && !isFetchingNextPage) || props.isLoading) {
     return <Spinner size="medium" renderTitle={I18n.t('Loading ePortfolio pages')} />
-  } else {
+  } else if (!isSuccess) {
+    return <Alert variant="error">{I18n.t('Failed to load ePortfolio pages')}</Alert>
+  }
+   else {
+    const allPages = data.pages.reduce<ePortfolioPage[]>((acc, val) => acc.concat(val.json), []);
     return (
-      <Flex direction="column">
+      <Flex direction="column" gap="xx-small">
         <Text weight="bold" size="large">
-          {data.section.name}
+          {props.sectionName}
         </Text>
         <Text>{I18n.t('Pages')}</Text>
-        <Table margin="x-small 0" caption={I18n.t('List of pages')}>
-          <Table.Body>
-            {data.pages.map((page: ePortfolioPage) => {
-              return renderPageRow(page)
-            })}
-          </Table.Body>
-        </Table>
-        {props.isOwner ? (
-          <>
-            {renderModal(data.pages)}
-            <Button
-              margin="x-small 0"
-              data-testid="add-page-button"
-              renderIcon={<IconAddLine />}
-              textAlign="start"
-              onClick={() => setModalType('add')}
+      <View display="block" maxHeight="600px" margin="0" overflowY="auto">
+          <Table caption={I18n.t('List of pages')}>
+              <Table.Body>
+                {allPages.map((page: ePortfolioPage, index: number) => {
+                  return renderPageRow(page, index, allPages.length)
+                })}
+              </Table.Body>
+          </Table>
+          {isFetchingNextPage ? <Spinner size="small" renderTitle={I18n.t('Loading ePortfolio pages')}/> : null}
+      </View>
+      {props.isOwner ? (
+        <>
+          {renderModal(allPages)}
+          <Button
+            margin="0 0 xx-small 0"
+            data-testid="add-page-button"
+            renderIcon={<IconAddLine />}
+            textAlign="start"
+            onClick={() => setModalType('add')}
             >
-              {I18n.t('Add Page')}
-            </Button>
-          </>
-        ) : null}
+            {I18n.t('Add Page')}
+          </Button>
+        </>
+      ) : null}
       </Flex>
     )
   }
