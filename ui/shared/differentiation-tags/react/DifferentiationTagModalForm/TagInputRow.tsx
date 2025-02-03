@@ -87,6 +87,7 @@ const TagInputRow: React.FC<TagInputRowProps> = ({
               : undefined
           }
           isRequired
+          data-testid="tag-name-input"
         />
         {totalTags > 1 && (
           <IconButton

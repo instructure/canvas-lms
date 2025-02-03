@@ -33,14 +33,14 @@ describe('DifferentiationTagTrayManager', () => {
     courseID: 123,
   }
 
-  const renderComponent = (mockReturn = {}) => {
+  const renderComponent = (mockReturn = {}, props = {}) => {
     const defaultMock = {
       data: [],
       isLoading: false,
       error: null,
     }
     mockUseDifferentiationTagCategoriesIndex.mockReturnValue({...defaultMock, ...mockReturn})
-    render(<DifferentiationTagTrayManager {...defaultProps} />)
+    render(<DifferentiationTagTrayManager {...defaultProps} {...props} />)
   }
 
   beforeEach(() => {
@@ -63,6 +63,14 @@ describe('DifferentiationTagTrayManager', () => {
     expect(screen.getByText(/Error loading tag differentiation tag categories/)).toBeInTheDocument()
     expect(screen.getByText(/Failed to fetch/)).toBeInTheDocument()
   })
+  it('shows error message when course id is not provided', () => {
+    const error = new Error('A valid course ID is required')
+    renderComponent({error}, {courseID: undefined})
+    expect(
+      screen.getByText(/Error loading tag differentiation tag categories:/),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/A valid course ID is required./)).toBeInTheDocument()
+  })
 
   it('displays differentiation tag categories when data is retrieved from the hook', () => {
     const mockCategories = [
@@ -76,7 +84,10 @@ describe('DifferentiationTagTrayManager', () => {
 
   it('calls onClose when close button is clicked', async () => {
     renderComponent()
-    const closeButton = screen.getByRole('button', {name: 'Close Differentiation Tag Tray'})
+    const closeButton = screen.getByRole('button', {
+      name: 'Close Differentiation Tag Tray',
+      hidden: true,
+    })
 
     await userEvent.click(closeButton)
     expect(defaultProps.onClose).toHaveBeenCalled()
@@ -84,7 +95,10 @@ describe('DifferentiationTagTrayManager', () => {
 
   it('calls useDifferentiationTagCategoriesIndex with correct courseID', () => {
     renderComponent()
-    expect(mockUseDifferentiationTagCategoriesIndex).toHaveBeenCalledWith(123, true)
+    expect(mockUseDifferentiationTagCategoriesIndex).toHaveBeenCalledWith(123, {
+      enabled: true,
+      includeDifferentiationTags: true,
+    })
   })
 
   it('renders help text when there are no differentiation tags', () => {

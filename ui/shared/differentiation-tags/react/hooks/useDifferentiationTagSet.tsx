@@ -18,18 +18,18 @@
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useQuery} from '@tanstack/react-query'
 import {QUERY_STALE_TIME} from '../util/constants'
-import type {DifferentiationTagSet} from '../types'
+import type {DifferentiationTagCategory} from '../types'
 
 export const useDifferentiationTagSet = (
   differentiationTagSetId: number | undefined,
   includeDifferentiationTags?: boolean,
 ) => {
-  return useQuery<DifferentiationTagSet, Error>({
+  return useQuery<DifferentiationTagCategory, Error>({
     queryKey: ['differentiationTagSet', differentiationTagSetId, includeDifferentiationTags],
     queryFn: async () => {
       if (!differentiationTagSetId) throw new Error('Missing category ID')
 
-      const response = await doFetchApi<DifferentiationTagSet>({
+      const response = await doFetchApi<DifferentiationTagCategory>({
         path: `/api/v1/group_categories/${differentiationTagSetId}`,
         headers: {
           Accept: 'application/json',
