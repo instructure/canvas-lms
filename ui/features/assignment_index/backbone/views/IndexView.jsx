@@ -24,7 +24,7 @@ import keyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDial
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import template from '../../jst/IndexView.handlebars'
 import NoAssignments from '../../jst/NoAssignmentsSearch.handlebars'
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
@@ -121,7 +121,8 @@ IndexView.prototype.afterRender = function () {
     const contextId = parseInt(contextInfo[1], 10)
     const requestBulkEditFn = (!ENV.COURSE_HOME && this.requestBulkEdit) || void 0
     if (this.$settingsMountPoint.length) {
-      ReactDOM.render(
+      const settingsRoot = createRoot(this.$settingsMountPoint[0])
+      settingsRoot?.render(
         React.createElement(IndexMenu, {
           store: this.indexMenuStore,
           contextType,
@@ -140,29 +141,28 @@ IndexView.prototype.afterRender = function () {
           hasAssignments: ENV.HAS_ASSIGNMENTS,
           assignmentGroupsCollection: this.collection,
         }),
-        this.$settingsMountPoint[0],
       )
     }
   }
   if (this.$indexCreateMountPoint.length) {
-    ReactDOM.render(
+    const indexRoot = createRoot(this.$indexCreateMountPoint[0])
+    indexRoot?.render(
       React.createElement(IndexCreate, {
         newAssignmentUrl: ENV.URLS.new_assignment_url,
         quizLtiEnabled: ENV.QUIZ_LTI_ENABLED,
         manageAssignmentAddPermission: ENV.PERMISSIONS.manage_assignments_add,
       }),
-      this.$indexCreateMountPoint[0],
     )
   }
   if (this.bulkEditMode && this.$bulkEditRoot.length) {
-    ReactDOM.render(
+    const bulkEditRoot = createRoot(this.$bulkEditRoot[0])
+    bulkEditRoot?.render(
       React.createElement(BulkEditIndex, {
         courseId: ENV.COURSE_ID,
         onCancel: this.cancelBulkEdit,
         onSave: this.handleBulkEditSaved,
         defaultDueTime: ENV.DEFAULT_DUE_TIME,
       }),
-      this.$bulkEditRoot[0],
     )
   }
   this.filterKeyBindings()
@@ -175,30 +175,33 @@ IndexView.prototype.afterRender = function () {
     window.onkeydown = this.focusOnAssignments
   }
 
-  ReactDOM.render(
-    <TextInput
-      onChange={e => {
-        // Sends events to hidden input to utilize backbone
-        const hiddenInput = $('[data-view=inputFilter]')
-        hiddenInput[0].value = e.target?.value
-        hiddenInput.keyup()
-      }}
-      display="inline-block"
-      type="text"
-      data-testid="assignment-search-input"
-      placeholder={I18n.t('Search...')}
-      width="16rem"
-      renderLabel={
-        <ScreenReaderContent>
-          {I18n.t(
-            'Search assignments. As you type in this field, the list of assignments will be automatically filtered to only include those whose names match your input.',
-          )}
-        </ScreenReaderContent>
-      }
-      renderBeforeInput={() => <IconSearchLine />}
-    />,
-    this.$el.find('#search_input_container')[0],
-  )
+  this.$inputMountPoint = $('#search_input_container')
+  if (this.$inputMountPoint?.length) {
+    const inputRoot = createRoot(this.$inputMountPoint[0])
+    inputRoot?.render(
+      <TextInput
+        onChange={e => {
+          // Sends events to hidden input to utilize backbone
+          const hiddenInput = $('[data-view=inputFilter]')
+          hiddenInput[0].value = e.target?.value
+          hiddenInput.keyup()
+        }}
+        display="inline-block"
+        type="text"
+        data-testid="assignment-search-input"
+        placeholder={I18n.t('Search...')}
+        width="16rem"
+        renderLabel={
+          <ScreenReaderContent>
+            {I18n.t(
+              'Search assignments. As you type in this field, the list of assignments will be automatically filtered to only include those whose names match your input.',
+            )}
+          </ScreenReaderContent>
+        }
+        renderBeforeInput={() => <IconSearchLine />}
+      />
+    )
+  }
   return this.selectGradingPeriod()
 }
 

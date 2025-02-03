@@ -223,8 +223,9 @@ describe('AssignmentIndex', () => {
 
   it("should show 'Add Quiz/Test' button if quiz lti is enabled", () => {
     ENV.QUIZ_LTI_ENABLED = true
+    ENV.FEATURES.instui_nav = false
     const view = createAssignmentIndex({withAssignmentSettings: true})
-    const $button = view.$('#new_quiz_lti')
+    const $button = view.$('.new_quiz_lti')
     expect($button).toHaveLength(1)
     expect($button.attr('href')).toMatch(/\?quiz_lti$/)
   })
