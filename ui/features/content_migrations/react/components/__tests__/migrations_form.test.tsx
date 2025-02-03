@@ -236,6 +236,12 @@ describe('ContentMigrationForm', () => {
     expect(screen.queryByTestId('submitMigration')).not.toBeInTheDocument()
   })
 
+  it('shows success alert after submitting', async () => {
+    renderComponent()
+    await submitAMigration()
+    expect(screen.getAllByText('Content migration queued.')[0]).toBeInTheDocument()
+  })
+
   describe('migration type', () => {
     const selectMigrator = async (migratorName: string) => {
       await userEvent.click(screen.getByText(migratorName))
