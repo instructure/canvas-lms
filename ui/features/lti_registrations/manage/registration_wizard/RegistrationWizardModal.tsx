@@ -83,28 +83,30 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
         />
         <Heading>{label}</Heading>
       </Modal.Header>
-      {!state.registering ? (
-        <ProgressBar
-          meterColor="info"
-          shouldAnimate={true}
-          size="x-small"
-          screenReaderLabel={I18n.t('Installation Progress')}
-          valueNow={0}
-          valueMax={100}
-          themeOverride={{
-            trackBottomBorderWidth: '0',
-          }}
-          margin="0 0 small"
-        />
-      ) : null}
+      <Modal.Body>
+        {!state.registering ? (
+          <ProgressBar
+            meterColor="info"
+            shouldAnimate={true}
+            size="x-small"
+            screenReaderLabel={I18n.t('Installation Progress')}
+            valueNow={0}
+            valueMax={100}
+            themeOverride={{
+              trackBottomBorderWidth: '0',
+            }}
+            margin="0 0 small"
+          />
+        ) : null}
 
-      <ModalBodyWrapper
-        state={state}
-        accountId={props.accountId}
-        dynamicRegistrationWizardService={props.dynamicRegistrationWizardService}
-        lti1p3RegistrationWizardService={props.lti1p3RegistrationWizardService}
-        jsonUrlWizardService={props.jsonUrlWizardService}
-      />
+        <ModalBodyWrapper
+          state={state}
+          accountId={props.accountId}
+          dynamicRegistrationWizardService={props.dynamicRegistrationWizardService}
+          lti1p3RegistrationWizardService={props.lti1p3RegistrationWizardService}
+          jsonUrlWizardService={props.jsonUrlWizardService}
+        />
+      </Modal.Body>
     </Modal>
   )
 }
