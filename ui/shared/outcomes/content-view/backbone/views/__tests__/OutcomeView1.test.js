@@ -38,6 +38,12 @@ const buildOutcome1 = () =>
     calculation_int: '65',
   })
 
+const waitFrames = async frames => {
+  for (let i = 0; i < frames; i++) {
+    await new Promise(resolve => requestAnimationFrame(resolve))
+  }
+}
+
 function buildOutcome(outcomeOptions, outcomeLinkOptions) {
   const base = {
     context_type: 'Course',
@@ -101,11 +107,12 @@ describe('OutcomeView', () => {
       expect(outcome1Instance.outcomeLink.outcome.id).toBeTruthy()
     })
 
-    it('renders placeholder text properly for new outcomes', () => {
+    it('renders placeholder text properly for new outcomes', async () => {
       const view = createView({
         model: newOutcome(),
         state: 'add',
       })
+      await waitFrames(10)
       expect(view.$('input[name="title"]').attr('placeholder')).toBe('New Outcome')
       // Description placeholder is not currently implemented in the template
     })
@@ -181,7 +188,7 @@ describe('OutcomeView', () => {
       expect($calcMethods.eq(4).val()).toBe('average') // Last option is 'average'
     })
 
-    it('updates calculation int when calculation method is changed', () => {
+    it('updates calculation int when calculation method is changed', async () => {
       const model = newOutcome({
         calculation_method: 'decaying_average',
         calculation_int: 65,
@@ -192,12 +199,15 @@ describe('OutcomeView', () => {
       })
 
       model.set('calculation_method', 'n_mastery')
+      await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('5')
 
       model.set('calculation_method', 'highest')
+      await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('')
 
       model.set('calculation_method', 'decaying_average')
+      await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('65')
     })
   })
