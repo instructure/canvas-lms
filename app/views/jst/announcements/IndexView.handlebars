@@ -96,6 +96,14 @@
     <h5 style="padding-left: 1.5rem;">
       {{#t "there_are_no_announcements_show"}}There are no announcements to show{{/t}}
     </h5>
+    {{#if options.permissions.create}}
+      <div style="margin:auto; text-align: center; margin-top: 20px">
+        <a href="{{new_topic_url}}" class="btn btn-large btn-primary">
+          <i class="icon-plus"></i>
+          {{#t}}Announcement{{/t}}
+        </a>
+      </div>
+    {{/if}}
     <h3 class="announcement-heading expired">Expired</h3>
     <ul id="expired-announcements" class="sm-announcements"></ul>
   {{else}}
