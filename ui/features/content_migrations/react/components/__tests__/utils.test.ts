@@ -614,9 +614,15 @@ describe('generateSelectiveDataResponse', () => {
           checkboxState: 'indeterminate',
         },
       }
+
+      const modifiedExpectedResponse = {
+        ...expectedResponse,
+        copy: {}
+      }
+
       expect(
         generateSelectiveDataResponse('migration_1', 'user_1', modifiedTreeNodes),
-      ).toStrictEqual(expectedResponse)
+      ).toStrictEqual(modifiedExpectedResponse)
     })
 
     it('does not generate a selective data request for groups type on unchecked state', () => {

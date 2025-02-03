@@ -35,7 +35,7 @@ class SelectContentPage
     end
 
     def submit_button
-      fxpath("//*[@data-cid='ModalFooter']//button[2]")
+      fxpath("//*[@aria-label='Select Content for Import']//button[2]")
     end
   end
 end

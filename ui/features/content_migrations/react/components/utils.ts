@@ -88,8 +88,7 @@ export const generateSelectiveDataResponse = (
 
   Object.values(checkboxTreeNodes).forEach(node => {
     if (
-      node.migrationId &&
-      (node.checkboxState === 'indeterminate' || node.checkboxState === 'checked')
+      node.migrationId && node.checkboxState === 'checked'
     ) {
       nonRootElements[node.type] ||= {}
       nonRootElements[node.type][node.migrationId] = '1'

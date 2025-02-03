@@ -154,7 +154,7 @@ describe "content migrations", :non_parallel do
       @filename = "cc_outcomes.imscc"
     end
 
-    it "selectively copies outcomes", skip: "selective content migration bug CLAB-975" do
+    it "selectively copies outcomes" do
       visit_page
 
       fill_migration_form
