@@ -42,10 +42,17 @@ module Types
   class SubmissionType < ApplicationObjectType
     graphql_name "Submission"
 
+    include GraphQLHelpers::AnonymousGrading
+
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::SubmissionInterface
     implements Interfaces::LegacyIDInterface
+
+    def initialize(object, context)
+      super
+      anonymous_grading_scoped_context(object)
+    end
 
     global_id_field :id
 
@@ -62,14 +69,7 @@ module Types
 
     field :user_id, ID, null: true
     def user_id
-      load_association(:course).then do
-        load_association(:assignment).then do
-          if !Account.site_admin.feature_enabled?(:graphql_honor_anonymous_grading) ||
-             object.can_read_submission_user_name?(current_user, session)
-            object.user_id
-          end
-        end
-      end
+      unless_hiding_user_for_anonymous_grading { object.user_id }
     end
 
     field :anonymous_id, ID, null: true
