@@ -20,7 +20,7 @@
 
 class MessageableUser
   class Calculator
-    CONTEXT_RECIPIENT = /\A(course|section|group|discussion_topic)_(\d+)(_([a-z]+))?\z/
+    CONTEXT_RECIPIENT = /\A(course|section|group|differentiation_tag|discussion_topic)_(\d+)(?:_([a-z_]+))?\z/
     INDIVIDUAL_RECIPIENT = /\A\d+\z/
 
     # all work is done within the context of a user. avoid passing it around in
@@ -397,8 +397,7 @@ class MessageableUser
         context_type = "section" if context_type == "course_section"
         context_id_or_object = asset_string_or_asset
       end
-
-      enrollment_type = $4
+      enrollment_type = $3
       if enrollment_type == "admins"
         enrollment_types = ["TeacherEnrollment", "TaEnrollment"]
       elsif enrollment_type
@@ -408,7 +407,7 @@ class MessageableUser
       case context_type
       when "course" then messageable_users_in_course_scope(context_id_or_object, enrollment_types, options)
       when "section" then messageable_users_in_section_scope(context_id_or_object, enrollment_types, options)
-      when "group" then messageable_users_in_group_scope(context_id_or_object, options)
+      when "group", "differentiation_tag" then messageable_users_in_group_scope(context_id_or_object, options)
       when "announcement", "discussion_topic" then messageable_users_in_discussion_scope(context_id_or_object, options)
       end
     end
@@ -505,7 +504,7 @@ class MessageableUser
       group.shard.activate do
         if options[:admin_context] || fully_visible_group_ids.include?(group.id)
           # bail early if user doesn't have permission to message group members
-          return if group&.context.is_a?(Course) && !group.context.grants_right?(@user, nil, :send_messages)
+          return if group&.context.is_a?(Course) && !group.grants_right?(@user, nil, :send_messages)
 
           group_user_scope.where("group_memberships.group_id" => group.id).merge(active_users_in_group_context.except(:joins))
         elsif section_visible_group_ids.include?(group.id)
