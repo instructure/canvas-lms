@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -47,10 +45,10 @@ const exampleCustomColumns: CustomColumn[] = [
 
 describe('customColumnsState', () => {
   const url = '/api/v1/courses/1/custom_gradebook_columns'
-  let network
+  let network: NetworkFake
 
   function getRequests() {
-    return network.getRequests(request => request.path === url)
+    return network.getRequests()
   }
 
   beforeEach(() => {
@@ -76,7 +74,7 @@ describe('customColumnsState', () => {
       })
       store.getState().fetchCustomColumns()
       await network.allRequestsReady()
-      const [{params}] = getRequests()
+      const [{ params }] = getRequests()
       expect(params.per_page).toStrictEqual('45')
     })
   })
@@ -85,8 +83,8 @@ describe('customColumnsState', () => {
     beforeEach(async () => {
       store.getState().fetchCustomColumns()
       await network.allRequestsReady()
-      const [{response}] = getRequests()
-      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
+      const [{ response }] = getRequests()
+      setPaginationLinkHeader(response, { first: 1, current: 1, next: 2, last: 3 })
       response.setJson(exampleCustomColumns.slice(0, 1))
       response.send()
       await network.allRequestsReady()
@@ -100,7 +98,7 @@ describe('customColumnsState', () => {
     })
 
     it('uses the same path for each page', () => {
-      const [{path}] = getRequests()
+      const [{ path }] = getRequests()
       getRequests()
         .slice(1)
         .forEach(request => {
@@ -109,11 +107,11 @@ describe('customColumnsState', () => {
     })
 
     it('uses the same parameters for each page', () => {
-      const [{params}] = getRequests()
+      const [{ params }] = getRequests()
       getRequests()
         .slice(1)
         .forEach(request => {
-          const {page, ...pageParams} = request.params
+          const { page, ...pageParams } = request.params
           expect(pageParams).toStrictEqual(params)
         })
     })
@@ -126,8 +124,8 @@ describe('customColumnsState', () => {
       await network.allRequestsReady()
 
       // Resolve the first page
-      const [{response}] = getRequests()
-      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
+      const [{ response }] = getRequests()
+      setPaginationLinkHeader(response, { first: 1, current: 1, next: 2, last: 3 })
       response.setJson(exampleCustomColumns.slice(0, 1))
       response.send()
       jest.advanceTimersByTime(1)
@@ -155,7 +153,7 @@ describe('customColumnsState', () => {
     beforeEach(async () => {
       store.getState().fetchCustomColumns()
       await network.allRequestsReady()
-      const [{response}] = getRequests()
+      const [{ response }] = getRequests()
       response.setJson(exampleCustomColumns.slice(0, 1))
       response.send()
       jest.advanceTimersByTime(1)
