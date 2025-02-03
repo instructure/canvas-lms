@@ -17,14 +17,74 @@
  */
 
 import {
+  compareMigrators,
   mapToCheckboxTreeNodes,
   generateSelectiveDataResponse,
   humanReadableSize,
   responseToItem,
 } from '../utils'
-import type {GenericItemResponse} from '../types'
+import type {GenericItemResponse, Migrator} from '../types'
 import type {Item} from '../content_selection_modal'
 import type {CheckboxTreeNode} from '@canvas/content-migrations'
+
+describe('compareMigrators', () => {
+  const migratorFactory = (type: string, name: string): Migrator => {
+    return {
+      type,
+      name,
+      requires_file_upload: true,
+      required_settings: ''
+    }
+  }
+
+  describe('when one migrator has higher priority, and other does not', () => {
+    it('returns -1 when `a` migrator has higher priority no string comparison is applied', () => {
+      const a = migratorFactory('course_copy_importer', 'D')
+      const b = migratorFactory('zip_file_importer', 'A')
+
+      expect(compareMigrators(a, b)).toBe(-1)
+    })
+
+    it('returns 1 when `b` migrator has higher priority no string comparison is applied', () => {
+      const a = migratorFactory('zip_file_importer', 'A')
+      const b = migratorFactory('canvas_cartridge_importer', 'D')
+
+      expect(compareMigrators(a, b)).toBe(1)
+    })
+  })
+
+  describe('when both migrators have higher priority', () => {
+    it('returns -1 when `a` migrator name has lower string comparison', () => {
+      const a = migratorFactory('canvas_cartridge_importer', 'A')
+      const b = migratorFactory('course_copy_importer', 'D')
+
+      expect(compareMigrators(a, b)).toBe(-1)
+    })
+
+    it('returns 1 when `b` migrator name has lower string comparison', () => {
+      const a = migratorFactory('course_copy_importer', 'D')
+      const b = migratorFactory('canvas_cartridge_importer', 'A')
+
+      expect(compareMigrators(a, b)).toBe(1)
+    })
+  })
+
+  describe('when both migrators have lower priority', () => {
+    it('returns -1 when `a` migrator name has lower string comparison', () => {
+      const a = migratorFactory('zip_file_importer', 'A')
+      const b = migratorFactory('zip_file_importer', 'D')
+
+      expect(compareMigrators(a, b)).toBe(-1)
+    })
+
+    it('returns 1 when `b` migrator name has lower string comparison', () => {
+      const a = migratorFactory('zip_file_importer', 'D')
+      const b = migratorFactory('zip_file_importer', 'A')
+
+      expect(compareMigrators(a, b)).toBe(1)
+    })
+  })
+})
 
 describe('humanReadableSize', () => {
   it('returns Bytes', () => {
