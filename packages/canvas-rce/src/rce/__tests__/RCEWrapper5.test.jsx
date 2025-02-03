@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, act, waitFor} from '@testing-library/react'
 
 import RCEWrapper from '../RCEWrapper'
 
@@ -100,10 +100,9 @@ describe('RCEWrapper', () => {
   })
 
   describe('limit the number or RCEs fully rendered on page load', () => {
-    let ReactDOM
-
     function renderAnotherRCE(callback, additionalProps = {}) {
-      ReactDOM.render(
+      const container = document.getElementById('here')
+      render(
         <RCEWrapper
           textareaId={textareaId}
           tinymce={fakeTinyMCE}
@@ -114,13 +113,14 @@ describe('RCEWrapper', () => {
           {...trayProps()}
           {...additionalProps}
         />,
-        document.getElementById('here'),
-        callback,
+        {container}
       )
+      if (callback) {
+        callback()
+      }
     }
-    beforeAll(() => {
-      ReactDOM = require('react-dom')
 
+    beforeAll(() => {
       if (!('IntersectionObserver' in window)) {
         window.IntersectionObserver = function () {
           return {
@@ -138,40 +138,44 @@ describe('RCEWrapper', () => {
     `
     })
 
-    it('renders them all if no max is set', done => {
-      renderAnotherRCE(() => {
-        expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(3)
-        done()
+    it('renders them all if no max is set', async () => {
+      renderAnotherRCE(async () => {
+        await waitFor(() => {
+          expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(3)
+        })
       })
     })
 
-    it('renders them all if maxInitRenderedRCEs is <0', done => {
+    it('renders them all if maxInitRenderedRCEs is <0', async () => {
       renderAnotherRCE(
-        () => {
-          expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(3)
-          done()
+        async () => {
+          await waitFor(() => {
+            expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(3)
+          })
         },
         {maxInitRenderedRCEs: -1},
       )
     })
 
-    it('limits them to maxInitRenderedRCEs value', done => {
+    it('limits them to maxInitRenderedRCEs value', async () => {
       renderAnotherRCE(
-        () => {
-          expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(2)
-          done()
+        async () => {
+          await waitFor(() => {
+            expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(2)
+          })
         },
         {maxInitRenderedRCEs: 2},
       )
     })
 
-    it('copes with missing IntersectionObserver', done => {
+    it('copes with missing IntersectionObserver', async () => {
       delete window.IntersectionObserver
 
       renderAnotherRCE(
-        () => {
-          expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(3)
-          done()
+        async () => {
+          await waitFor(() => {
+            expect(document.querySelectorAll('.rce-wrapper')).toHaveLength(3)
+          })
         },
         {maxInitRenderedRCEs: 2},
       )
