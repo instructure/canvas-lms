@@ -86,6 +86,7 @@ end
 
 module Interfaces::SubmissionInterface
   include Interfaces::BaseInterface
+  include GraphQLHelpers::AnonymousGrading
 
   description "Types for submission or submission history"
 
@@ -147,14 +148,7 @@ module Interfaces::SubmissionInterface
 
   field :user, Types::UserType, null: true
   def user
-    load_association(:course).then do
-      load_association(:assignment).then do
-        if !Account.site_admin.feature_enabled?(:graphql_honor_anonymous_grading) ||
-           submission.can_read_submission_user_name?(current_user, session)
-          load_association(:user)
-        end
-      end
-    end
+    unless_hiding_user_for_anonymous_grading { load_association(:user) }
   end
 
   field :attempt, Integer, null: false
