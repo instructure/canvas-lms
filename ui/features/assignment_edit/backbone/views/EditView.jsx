@@ -1268,6 +1268,7 @@ EditView.prototype.toJSON = function () {
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
+    is_horizon_course: !!ENV.horizon_course
   })
 }
 

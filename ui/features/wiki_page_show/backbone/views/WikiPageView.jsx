@@ -117,6 +117,10 @@ export default class WikiPageView extends Backbone.View {
     this.publishButtonView.$el.appendTo(this.$publishButton)
     this.publishButtonView.render()
 
+    if (ENV.horizon_course) {
+      this.publishButtonView.$el.addClass('disabled')
+    }
+
     // Attach the immersive reader button if enabled
     const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
     const immersive_reader_mobile_mount_point = document.getElementById(
