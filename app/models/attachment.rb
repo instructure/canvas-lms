@@ -2184,6 +2184,15 @@ class Attachment < ActiveRecord::Base
     "#{folder_path}/#{display_name}"
   end
 
+  def sanitized_full_display_path
+    # Produce a path that is cross-platform compatible by removing
+    # chars considered invalid by some OSes, e.g. colon in Windows
+    full_display_path
+      .split("/")
+      .map { |segment| segment.gsub(/[^a-zA-Z0-9\-_.]/, "_") }
+      .join("/")
+  end
+
   def matches_full_display_path?(path)
     fd_path = full_display_path
     fd_path == path || URI::DEFAULT_PARSER.unescape(fd_path) == path || fd_path.casecmp?(path) || URI::DEFAULT_PARSER.unescape(fd_path).casecmp?(path)

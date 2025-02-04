@@ -632,6 +632,15 @@ describe Attachment do
     end
   end
 
+  context "sanitized_full_display_path" do
+    let(:f) { folder_model(name: "folder<with>bad:chars", context: course_model) }
+    let(:a) { attachment_model(filename: "file\"with\\bad|chars?in*name.txt", folder: f) }
+
+    it "replaces disallowed characters in the attachment path" do
+      expect(a.sanitized_full_display_path).to end_with("folder_with_bad_chars/file_with_bad_chars_in_name.txt")
+    end
+  end
+
   context "destroy" do
     let(:a) { attachment_model(uploaded_data: default_uploaded_data) }
 
