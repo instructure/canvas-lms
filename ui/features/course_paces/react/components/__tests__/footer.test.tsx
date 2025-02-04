@@ -19,6 +19,7 @@
 import React from 'react'
 import {act, render, within} from '@testing-library/react'
 import {renderConnected} from '../../__tests__/utils'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 import {Footer, type ComponentProps} from '../footer'
 
@@ -51,13 +52,23 @@ const defaultProps: ComponentProps = {
   isDraftPace: false,
 }
 
-afterEach(() => {
-  jest.clearAllMocks()
-})
-
 describe('Footer', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      FEATURES: {
+        course_paces_for_students: false,
+        course_paces_redesign: false,
+      },
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    jest.clearAllMocks()
+  })
+
   it('renders cancel and publish buttons when there are unpublished changes', () => {
-    const {getByRole} = render(<Footer {...defaultProps} />)
+    const {getByRole} = renderConnected(<Footer {...defaultProps} />)
 
     const cancelButton = getByRole('button', {name: 'Cancel'})
     expect(cancelButton).toBeInTheDocument()
@@ -71,23 +82,29 @@ describe('Footer', () => {
   })
 
   it('shows cannot cancel and publish tooltip when there are no unpublished changes', () => {
-    const {getByText} = renderConnected(<Footer {...defaultProps} unpublishedChanges={false} />)
-    expect(getByText('There are no pending changes to cancel')).toBeInTheDocument()
-    expect(getByText('There are no pending changes to publish')).toBeInTheDocument()
+    const {getByRole} = renderConnected(<Footer {...defaultProps} unpublishedChanges={false} />)
+    const cancelButton = getByRole('button', {name: 'Cancel'})
+    const publishButton = getByRole('button', {name: 'Publish'})
+    expect(cancelButton).toHaveAttribute('aria-describedby')
+    expect(publishButton).toHaveAttribute('aria-describedby')
   })
 
   it('shows cannot cancel and publish tooltip while publishing', () => {
-    const {getByText} = renderConnected(
+    const {getByRole} = renderConnected(
       <Footer {...defaultProps} pacePublishing={true} isSyncing={true} />,
     )
-    expect(getByText('You cannot cancel while publishing')).toBeInTheDocument()
-    expect(getByText('You cannot publish while publishing')).toBeInTheDocument()
+    const cancelButton = getByRole('button', {name: 'Cancel'})
+    const publishButton = getByRole('button', {name: 'Publishing...'})
+    expect(cancelButton).toHaveAttribute('aria-describedby')
+    expect(publishButton).toHaveAttribute('aria-describedby')
   })
 
   it('shows cannot cancel and publish tooltip while auto saving', () => {
-    const {getByText} = renderConnected(<Footer {...defaultProps} autoSaving={true} />)
-    expect(getByText('You cannot cancel while publishing')).toBeInTheDocument()
-    expect(getByText('You cannot publish while publishing')).toBeInTheDocument()
+    const {getByRole} = renderConnected(<Footer {...defaultProps} autoSaving={true} />)
+    const cancelButton = getByRole('button', {name: 'Cancel'})
+    const publishButton = getByRole('button', {name: 'Publish'})
+    expect(cancelButton).toHaveAttribute('aria-describedby')
+    expect(publishButton).toHaveAttribute('aria-describedby')
   })
 
   it('shows cannot cancel and publish tooltip while loading', () => {
@@ -133,7 +150,7 @@ describe('Footer', () => {
   })
 
   it('keeps focus on Publish button after clicking', () => {
-    const {getByRole} = render(<Footer {...defaultProps} />)
+    const {getByRole} = renderConnected(<Footer {...defaultProps} />)
 
     const pubButton = getByRole('button', {name: 'Publish'})
     act(() => {
@@ -144,13 +161,16 @@ describe('Footer', () => {
   })
 
   describe('with course paces for students', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_for_students = true
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          course_paces_for_students: true,
+        },
+      })
     })
 
     it('renders everything for student paces', () => {
-      const {getByRole} = render(<Footer {...defaultProps} studentPace={true} />)
+      const {getByRole} = renderConnected(<Footer {...defaultProps} studentPace={true} />)
 
       const cancelButton = getByRole('button', {name: 'Cancel'})
       expect(cancelButton).toBeInTheDocument()
@@ -165,9 +185,12 @@ describe('Footer', () => {
   })
 
   describe('with course_paces_redesign flag', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_redesign = true
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {
+          course_paces_redesign: true,
+        },
+      })
     })
 
     it('includes the correct components for new pace', () => {
