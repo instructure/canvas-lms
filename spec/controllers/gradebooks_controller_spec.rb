@@ -3024,6 +3024,17 @@ describe GradebooksController do
       expect(response).to render_template(classic_sg_template, locals: { anonymous_grading: false })
     end
 
+    it "sets :discussions_speedgrader_revisit to true" do
+      @subaccount = account_model(parent_account: Account.default, name: "subaccount")
+      course_with_teacher(active_all: true, account: @subaccount)
+      controller.instance_variable_set(:@domain_root_account, @course.root_account)
+      controller.instance_variable_set(:@brand_account, @subaccount)
+      @course.account.enable_feature!(:discussions_speedgrader_revisit)
+
+      expect(@course.root_account.feature_enabled?(:discussions_speedgrader_revisit)).to be_falsy
+      expect(controller.js_env[:FEATURES][:discussions_speedgrader_revisit]).to be_truthy
+    end
+
     it "redirects the user if course's large_roster? setting is true" do
       allow_any_instance_of(Course).to receive(:large_roster?).and_return(true)
 

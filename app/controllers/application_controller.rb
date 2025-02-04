@@ -375,7 +375,6 @@ class ApplicationController < ActionController::Base
     rce_find_replace
     courses_popout_sisid
     dashboard_graphql_integration
-    discussion_checkpoints
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
     horizon_course_setting
@@ -412,10 +411,12 @@ class ApplicationController < ActionController::Base
     course_pace_time_selection
     course_pace_pacing_status_labels
     modules_requirements_allow_percentage
+    discussion_checkpoints
   ].freeze
-  JS_ENV_BRAND_ACCOUNT_FEATURES = [
-    :embedded_release_notes,
-    :consolidated_media_player
+  JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
+    embedded_release_notes
+    consolidated_media_player
+    discussions_speedgrader_revisit
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_BRAND_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
