@@ -67,7 +67,7 @@ class RubricCSVImporter
       {
         description: rating_description,
         long_description: row[rating_indices[:long_description_indices][index]],
-        points: row[rating_indices[:points_indices][index]].to_i
+        points: row[rating_indices[:points_indices][index]].to_f
       }
     end.compact
 
