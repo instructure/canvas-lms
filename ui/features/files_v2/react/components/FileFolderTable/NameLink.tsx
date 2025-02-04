@@ -21,7 +21,6 @@ import {useLocation, Link} from 'react-router-dom'
 import {Flex} from '@instructure/ui-flex'
 import {IconFolderLockedSolid, IconFolderSolid} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import FilePreviewModal from './FilePreviewModal'
@@ -68,9 +67,22 @@ const NameLink = ({item, isStacked}: NameLinkProps) => {
 
   const renderIconComponent = () => {
     if (iconUrl) {
-      return <Img src={iconUrl} width={pxSize} height={pxSize} alt="" data-testid="name-icon" />
+      return (
+        <Img
+          src={iconUrl}
+          width={pxSize}
+          height={pxSize}
+          margin="0 x-small 0 0"
+          alt=""
+          data-testid="name-icon"
+        />
+      )
     }
-    return isStacked ? <>{icon}</> : <span style={{fontSize: '2em'}}>{icon}</span>
+    return isStacked ? (
+      <>{icon}</>
+    ) : (
+      <span style={{fontSize: '2em', margin: '0 .5rem 0 0'}}>{icon}</span>
+    )
   }
 
   const renderTextComponent = () => {
@@ -79,9 +91,9 @@ const NameLink = ({item, isStacked}: NameLinkProps) => {
         <Text>{name}</Text>
       </View>
     ) : (
-      <TruncateText>
+      <div style={{whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden'}}>
         <Text>{name}</Text>
-      </TruncateText>
+      </div>
     )
   }
 
@@ -110,7 +122,12 @@ const NameLink = ({item, isStacked}: NameLinkProps) => {
         ) : (
           <Flex>
             <Flex.Item margin="0 0 x-small 0">{renderIconComponent()}</Flex.Item>
-            <Flex.Item margin="0 0 0 small" shouldShrink={true}>
+            <Flex.Item
+              margin="0 0 0 small"
+              shouldShrink={true}
+              shouldGrow={false}
+              overflowX="hidden"
+            >
               {renderTextComponent()}
             </Flex.Item>
           </Flex>

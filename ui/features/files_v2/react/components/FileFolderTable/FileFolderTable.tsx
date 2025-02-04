@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useContext, useEffect, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -25,7 +25,6 @@ import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useQuery, queryClient} from '@canvas/query'
 import {type File, type Folder} from '../../../interfaces/File'
@@ -102,7 +101,7 @@ const columnRenderers: {
   modified_by: ({row}) =>
     'user' in row && row.user?.display_name ? (
       <Link isWithinText={false} href={row.user.html_url}>
-        <TruncateText>{row.user.display_name}</TruncateText>
+        <Text>{row.user.display_name}</Text>
       </Link>
     ) : null,
   size: ({row}) =>
@@ -197,9 +196,12 @@ const FileFolderTable = ({
     showFlashError(I18n.t('Failed to fetch files and folders'))
   }
 
-  const rows: (File | Folder)[] = !isFetching && data?.rows && data.rows.length > 0 ? data.rows : []
+  const rows: (File | Folder)[] = useMemo(
+    () => (!isFetching && data?.rows && data.rows.length > 0 ? data.rows : []),
+    [data?.rows, isFetching],
+  )
 
-  const toggleRowSelection = (rowId: string) => {
+  const toggleRowSelection = useCallback((rowId: string) => {
     setSelectedRows(prev => {
       const newSet = new Set(prev)
       if (newSet.has(rowId)) {
@@ -209,15 +211,15 @@ const FileFolderTable = ({
       }
       return newSet
     })
-  }
+  }, [])
 
-  const toggleSelectAll = () => {
+  const toggleSelectAll = useCallback(() => {
     if (selectedRows.size === rows.length) {
       setSelectedRows(new Set()) // Unselect all
     } else {
       setSelectedRows(new Set(rows.map(row => getUniqueId(row)))) // Select all
     }
-  }
+  }, [rows, selectedRows.size])
 
   const handleColumnHeaderClick = useCallback(
     (columnId: string) => {
