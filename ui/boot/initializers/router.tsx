@@ -44,16 +44,24 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/act_as_modal/react/ActAsModalRoute')}
       />
       <Route
+        path="/users/:userId"
+        lazy={() => import('../../features/page_views/react/PageViewsRoute')}
+      />
+      <Route
         path="/accounts/:accountId/users/:userId"
         lazy={() => import('../../features/page_views/react/PageViewsRoute')}
+      />
+      <Route
+        path="/accounts/:accountId/settings/*"
+        lazy={() => import('../../features/alerts/react/AlertListRoute')}
       />
       <Route
         path="/accounts"
         lazy={() => import('../../features/account_manage/react/AccountListRoute')}
       />
       <Route
-        path="/users/:userId"
-        lazy={() => import('../../features/page_views/react/PageViewsRoute')}
+        path="/courses/:courseId/settings/*"
+        lazy={() => import('../../features/alerts/react/AlertListRoute')}
       />
 
       {accountGradingSettingsRoutes}
@@ -74,8 +82,8 @@ const portalRouter = createBrowserRouter(
       {window.ENV.enhanced_rubrics_enabled && RubricRoutes}
 
       <Route path="*" element={<></>} />
-    </Route>
-  )
+    </Route>,
+  ),
 )
 
 // ensure lazy evaluation at render time, preventing `I18n.t()` eager lookup violations

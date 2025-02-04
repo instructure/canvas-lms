@@ -39,5 +39,6 @@ export interface EnvContentMigrations {
   OLD_END_DATE?: string
   current_context?: {
     id: string
+    type: string
   }
 }
