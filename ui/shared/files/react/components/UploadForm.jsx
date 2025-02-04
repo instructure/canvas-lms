@@ -38,8 +38,8 @@ export const UploadFormPropTypes = {
   onEmptyOrClose: func,
   onRenameFileMessage: func,
   onLockFileMessage: func,
-  onZipFileUpload: func,
-  onFileRename: func,
+  onFileOptionsChange: func,
+  useCanvasModals: bool,
 }
 
 class UploadForm extends React.Component {
@@ -55,8 +55,8 @@ class UploadForm extends React.Component {
     onEmptyOrClose: () => {},
     onRenameFileMessage: () => {},
     onLockFileMessage: () => {},
-    onZipFileUpload: null,
-    onFileRename: null,
+    onFileOptionsChange: () => {},
+    useCanvasModals: true,
   }
 
   constructor(props) {
@@ -189,6 +189,8 @@ class UploadForm extends React.Component {
         }
       }
     }
+
+    this.props.onFileOptionsChange(this.state)
   }
 
   UNSAFE_componentWillMount() {
@@ -204,7 +206,7 @@ class UploadForm extends React.Component {
   }
 
   renderZipFileOptionsForm() {
-    if (this.props.onZipFileUpload) return null
+    if (!this.props.useCanvasModals) return null
 
     return (
       <ZipFileOptionsForm
@@ -216,7 +218,7 @@ class UploadForm extends React.Component {
   }
 
   renderFileRenameForm() {
-    if (this.props.onFileRename) return null
+    if (!this.props.useCanvasModals) return null
 
     return (
       <FileRenameForm

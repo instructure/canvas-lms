@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,14 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {type Folder, type File} from '../interfaces/File'
+import UploadButton from './UploadButton'
 
-export const isFile = (item: File | Folder): item is File => {
-  return 'display_name' in item
-}
-
-export const getUniqueId = (item: File | Folder) => {
-  return isFile(item) ? item.uuid : item.id
-}
-
-export const pluralizeContextTypeString = (contextType: string) => `${contextType.toLowerCase()}s`
+export default UploadButton
+export type {UploadButton}
