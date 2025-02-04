@@ -32,6 +32,7 @@ class DelayedMessage < ActiveRecord::Base
       :conversation_message,
       :course,
       :discussion_topic,
+      :mention,
       :enrollment,
       :attachment,
       :assignment_override,

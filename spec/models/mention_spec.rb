@@ -35,4 +35,18 @@ describe Mention do
       expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_mention.created")
     end
   end
+
+  describe "Notifications" do
+    it "creates a delayed notification for the mentioned user" do
+      Notification.where(name: "Discussion Mention", category: "DiscussionMention").first_or_create
+
+      @mentioned_user = User.create!(name: "Mentioned User")
+      np_cc = communication_channel(@mentioned_user, { username: "c@instructure.com", active_cc: true })
+      np_cc.notification_policies.first.update!(frequency: "weekly")
+
+      mention = Mention.create!(user_id: @mentioned_user.id, discussion_entry_id: @entry.id, root_account_id: @topic.root_account_id)
+      expect(np_cc.delayed_messages.first).not_to be_nil
+      expect(np_cc.delayed_messages.first.context).to eq(mention)
+    end
+  end
 end
