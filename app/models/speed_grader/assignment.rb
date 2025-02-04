@@ -146,6 +146,8 @@ module SpeedGrader
           provisional_grader: provisional_grader_or_moderator?
         ) || []
 
+      rubric_assessments_by_user_id = current_user_rubric_assessments.group_by(&:user_id)
+
       # include all the rubric assessments if a moderator
       all_provisional_rubric_assessments =
         if grading_role == :moderator
@@ -208,10 +210,7 @@ module SpeedGrader
           end
           json[:rubric_assessments] =
             rubric_assessments_to_json(
-              rubric_assessments:
-                current_user_rubric_assessments.select do |assessment|
-                  assessment.user_id == student.id
-                end,
+              rubric_assessments: rubric_assessments_by_user_id.fetch(student.id, []),
               submissions:
             )
           json[:fake_student] = !!student.preferences[:fake_student]
