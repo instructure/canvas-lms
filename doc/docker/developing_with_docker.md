@@ -130,6 +130,19 @@ Go ahead and do so.
 Debug configurations will already be set up.
 You can attach to the currently running web server, or run specs for the currently active spec file.
 
+Canvas also comes with the Ruby LSP rspec extension in development mode.
+
+Add the following to your VS Code settings to run rspec tests via CodeLense UI elements:
+```json
+...
+"rubyLsp.addonSettings": {
+  "Ruby LSP RSpec": {
+    "rspecCommand": "cd /usr/src/app && rspec"
+  }
+}
+...
+```
+
 ### Debugging
 
 A Ruby debug server is running in development mode on the web and job containers

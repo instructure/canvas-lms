@@ -23,6 +23,7 @@ group :development do
   gem "spring-commands-rspec", "1.0.4"
   gem "spring-commands-rubocop", "~> 0.4"
   gem "active_record_query_trace", "~> 1.8", require: false
+  gem "ruby-lsp-rspec", "~> 0.1.18", require: false
 
   gem "debug", "~> 1.10", platform: :mri, require: false
 end
