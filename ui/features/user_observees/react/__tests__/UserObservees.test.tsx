@@ -22,7 +22,7 @@ import {QueryClient} from '@tanstack/react-query'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
-import React from 'react'
+
 import UserObservees, {type Observee} from '../UserObservees'
 
 jest.mock('@canvas/util/globalUtils', () => ({
@@ -57,7 +57,8 @@ describe('UserObservees', () => {
     id: '11',
     name: 'Zelda Minish',
   }
-  const GET_POST_OBSERVEES_URI = `/api/v1/users/${userId}/observees`
+  const POST_OBSERVEES_URI = `/api/v1/users/${userId}/observees`
+  const GET_OBSERVEES_URI = `/api/v1/users/${userId}/observees?per_page=100`
   const createDeleteObserveeUri = (id: string) => `/api/v1/users/self/observees/${id}`
   const confirmMock = jest.fn().mockReturnValue(true)
   global.confirm = confirmMock
@@ -70,7 +71,7 @@ describe('UserObservees', () => {
     )
 
   beforeAll(() => {
-    fetchMock.get(GET_POST_OBSERVEES_URI, [])
+    fetchMock.get(GET_OBSERVEES_URI, [])
     global.window = Object.create(window)
   })
 
@@ -91,7 +92,7 @@ describe('UserObservees', () => {
   describe('when failing to fetch observees', () => {
     it('should show the error message', async () => {
       fetchMock.get(
-        GET_POST_OBSERVEES_URI,
+        GET_OBSERVEES_URI,
         {status: 500, body: {error: 'Unknown error'}},
         {overwriteRoutes: true},
       )
@@ -104,7 +105,7 @@ describe('UserObservees', () => {
 
   describe('when observees are fetched successfully', () => {
     it('should show the list of observees', async () => {
-      fetchMock.get(GET_POST_OBSERVEES_URI, observees)
+      fetchMock.get(GET_OBSERVEES_URI, observees)
       renderComponent()
 
       const expectations = observees.map(async observee => {
@@ -133,12 +134,12 @@ describe('UserObservees', () => {
         it('should show the built in confirm dialog and redirect', async () => {
           const redirectUrl = 'http://redirect-to.com'
           fetchMock
-            .get(GET_POST_OBSERVEES_URI, [], {overwriteRoutes: true})
-            .get(GET_POST_OBSERVEES_URI, [newObservee], {
+            .get(GET_OBSERVEES_URI, [], {overwriteRoutes: true})
+            .get(GET_OBSERVEES_URI, [newObservee], {
               overwriteRoutes: true,
             })
           fetchMock.post(
-            GET_POST_OBSERVEES_URI,
+            POST_OBSERVEES_URI,
             {...newObservee, redirect: redirectUrl},
             {overwriteRoutes: true},
           )
@@ -158,9 +159,9 @@ describe('UserObservees', () => {
       describe('and no redirect needed', () => {
         it('should show the student in the list of observees and a success banner', async () => {
           fetchMock
-            .get(GET_POST_OBSERVEES_URI, [], {overwriteRoutes: true})
-            .get(GET_POST_OBSERVEES_URI, [newObservee], {overwriteRoutes: true})
-          fetchMock.post(GET_POST_OBSERVEES_URI, newObservee, {overwriteRoutes: true})
+            .get(GET_OBSERVEES_URI, [], {overwriteRoutes: true})
+            .get(GET_OBSERVEES_URI, [newObservee], {overwriteRoutes: true})
+          fetchMock.post(POST_OBSERVEES_URI, newObservee, {overwriteRoutes: true})
           renderComponent()
           const pairingCode = screen.getByLabelText('Student Pairing Code *')
           const submit = screen.getByLabelText('Student')
@@ -180,8 +181,8 @@ describe('UserObservees', () => {
 
     describe('and the request failed', () => {
       it('should show an error banner', async () => {
-        fetchMock.get(GET_POST_OBSERVEES_URI, [], {overwriteRoutes: true})
-        fetchMock.post(GET_POST_OBSERVEES_URI, {status: 500}, {overwriteRoutes: true})
+        fetchMock.get(GET_OBSERVEES_URI, [], {overwriteRoutes: true})
+        fetchMock.post(POST_OBSERVEES_URI, {status: 500}, {overwriteRoutes: true})
         renderComponent()
         const pairingCode = screen.getByLabelText('Student Pairing Code *')
         const submit = screen.getByLabelText('Student')
@@ -200,7 +201,7 @@ describe('UserObservees', () => {
     describe('and the request was successful', () => {
       it('should show a success banner and remove the student from the list', async () => {
         const [observeeToDelete, ...remainingObervees] = observees
-        fetchMock.get(GET_POST_OBSERVEES_URI, observees, {overwriteRoutes: true})
+        fetchMock.get(GET_OBSERVEES_URI, observees, {overwriteRoutes: true})
         fetchMock.delete(
           createDeleteObserveeUri(observeeToDelete.id),
           {...observeeToDelete},
@@ -209,7 +210,7 @@ describe('UserObservees', () => {
         renderComponent()
         const removeButton = await screen.findByLabelText(`Remove ${observeeToDelete.name}`)
 
-        fetchMock.get(GET_POST_OBSERVEES_URI, remainingObervees, {overwriteRoutes: true})
+        fetchMock.get(GET_OBSERVEES_URI, remainingObervees, {overwriteRoutes: true})
         await userEvent.click(removeButton)
 
         const banner = await screen.findAllByText(`No longer observing ${observeeToDelete.name}.`)
@@ -222,7 +223,7 @@ describe('UserObservees', () => {
     describe('and the request failed', () => {
       it('should show an error banner', async () => {
         const [observeeToDelete] = observees
-        fetchMock.get(GET_POST_OBSERVEES_URI, observees, {overwriteRoutes: true})
+        fetchMock.get(GET_OBSERVEES_URI, observees, {overwriteRoutes: true})
         fetchMock.delete(
           createDeleteObserveeUri(observeeToDelete.id),
           {status: 500},
