@@ -20,7 +20,6 @@ import React, {Suspense} from 'react'
 import {Editor} from '@tinymce/tinymce-react'
 import _ from 'lodash'
 import {StoreProvider} from './plugins/shared/StoreContext'
-import {RCEWrapperInterface} from './types'
 
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'

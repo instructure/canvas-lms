@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {jest} from '@jest/globals'
 import * as actions from '../files'
 import {spiedStore} from './utils'
 
