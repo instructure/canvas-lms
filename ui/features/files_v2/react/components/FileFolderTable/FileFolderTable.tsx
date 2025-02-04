@@ -190,7 +190,8 @@ const FileFolderTable = ({
 
   useEffect(() => {
     const listener = (event: FilesCollectionEvent) => {
-      if (event === 'add') queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+      if (['add', 'remove', 'refetch'].includes(event))
+        queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
     }
     currentFolder?.addListener(listener)
 

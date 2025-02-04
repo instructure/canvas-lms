@@ -22,7 +22,10 @@ export type BackboneModel = {attributes: File}
 
 export type MainFolderWrapperListener = (event: FilesCollectionEvent) => void
 
-export type FilesCollectionEvent = 'add'
+// add is triggered when used adds a file,
+// remove when user removes or replaces a file and
+// refetch when the user uploads an expanded zip file.
+export type FilesCollectionEvent = 'add' | 'remove' | 'refetch'
 
 export class FileFolderWrapper {
   private fileOrFolder: File | Folder
@@ -34,9 +37,13 @@ export class FileFolderWrapper {
   get<T>(attribute: string) {
     return this.fileOrFolder[attribute] as T
   }
+
+  get id() {
+    return this.fileOrFolder.id
+  }
 }
 
-export class FilesCollectionWrapper extends Array<FileFolderWrapper> {
+export class FileFolderCollectionWrapper extends Array<FileFolderWrapper> {
   private readonly folder: MainFolderWrapper
 
   constructor(folder: MainFolderWrapper) {
@@ -45,11 +52,25 @@ export class FilesCollectionWrapper extends Array<FileFolderWrapper> {
   }
 
   // This is used in ui/shared/files/react/modules/FileOptionsCollection.jsx,
-  // needed for compatibility
+  // needed for compatibility after file upload
   add(item: BackboneModel) {
     const fileWrapper = new FileFolderWrapper(item.attributes)
     this.push(fileWrapper)
     this.folder.emit('add')
+  }
+
+  // This is used in ui/shared/files/react/modules/FileUploader.js,
+  // needed for compatibility after a file replace is done
+  remove(item: FileFolderWrapper) {
+    const index = this.indexOf(item)
+    if (index > -1) {
+      this.splice(index, 1)
+    }
+    this.folder.emit('remove')
+  }
+
+  get(fileId: string) {
+    return this.find(i => i.get('id') === fileId)
   }
 
   set(items: Array<FileFolderWrapper>) {
@@ -60,16 +81,22 @@ export class FilesCollectionWrapper extends Array<FileFolderWrapper> {
   clear() {
     this.length = 0
   }
+  // This is used in ui/shared/files/react/modules/ZipUploader.js,
+  // needed for compatibility after migration completes
+  fetch() {
+    this.folder.emit('refetch')
+    return Promise.resolve()
+  }
 }
 
 export class MainFolderWrapper {
   private readonly folder: Folder
-  private readonly filesCollection: FilesCollectionWrapper
+  private readonly filesFoldersCollection: FileFolderCollectionWrapper
   private readonly listeners: Set<MainFolderWrapperListener>
 
   constructor(folder: Folder) {
     this.folder = folder
-    this.filesCollection = new FilesCollectionWrapper(this)
+    this.filesFoldersCollection = new FileFolderCollectionWrapper(this)
     this.listeners = new Set()
   }
 
@@ -90,7 +117,11 @@ export class MainFolderWrapper {
   }
 
   get files() {
-    return this.filesCollection
+    return this.filesFoldersCollection
+  }
+
+  get folders() {
+    return this.filesFoldersCollection
   }
 
   get id() {
