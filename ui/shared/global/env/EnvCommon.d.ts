@@ -316,11 +316,15 @@ export type RootAccountFeatureId =
   | 'course_pace_pacing_status_labels'
   | 'modules_requirements_allow_percentage'
   | 'lti_asset_processor'
+  | 'discussion_checkpoints'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type BrandAccountFeatureId = 'embedded_release_notes' | 'consolidated_media_player'
+export type BrandAccountFeatureId =
+| 'embedded_release_notes'
+| 'consolidated_media_player'
+| 'discussions_speedgrader_revisit'
 
 /**
  * Feature id exported in ApplicationController that aren't mentioned in
