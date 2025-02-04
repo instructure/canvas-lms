@@ -268,7 +268,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
             defaultValue="1p3"
           >
             <RadioInput value="1p3" label="1.3" />
-            <RadioInput value="1p1" label="1.1" data-heap="lti-registration-1p1-interest" />
+            <RadioInput value="1p1" label="1.1" data-pendo="lti-registration-1p1-interest" />
           </RadioInputGroup>
         </View>
         {props.state.lti_version === '1p3' && (
