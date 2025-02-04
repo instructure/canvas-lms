@@ -280,49 +280,82 @@ end
 def generate_mastery_path_course
   puts "Generate Course with Mastery Path"
   course_with_enrollments
+
   @course.conditional_release = true
   @course.save!
 
-  @trigger_assignment = create_assignment(@course, "Mastery Path Main Assignment", 10)
-  @set1_assmt1 = create_assignment(@course, "Set 1 Assessment 1", 10)
-  @set2_assmt1 = create_assignment(@course, "Set 2 Assessment 1", 10)
-  @set2_assmt2 = create_assignment(@course, "Set 2 Assessment 2", 10)
-  @set3a_assmt = create_assignment(@course, "Set 3a Assessment", 10)
-  @set3b_assmt = create_assignment(@course, "Set 3b Assessment", 10)
+  @trigger_assignment = @course.assignments.create!(
+    title: "Trigger Assignment",
+    grading_type: "points",
+    points_possible: 100,
+    # due_at: 1.day.ago(now),
+    submission_types: "online_text_entry"
+  )
 
-  graded_discussion = create_discussion(@course, @teacher)
+  @set1_assignment = @course.assignments.create!(
+    title: "Set 1 Assignment",
+    points_possible: 10,
+    only_visible_to_overrides: true
+  )
+  @set1_assignment.assignment_overrides.create!(
+    set_type: "Noop",
+    set_id: 1,
+    all_day: false,
+    title: "Mastery Paths",
+    unlock_at_overridden: true,
+    lock_at_overridden: true,
+    due_at_overridden: true
+  )
+  @set2_assignment = @course.assignments.create!(
+    title: "Set 2 Assignment",
+    points_possible: 10,
+    only_visible_to_overrides: true
+  )
+  @set2_assignment.assignment_overrides.create!(
+    set_type: "Noop",
+    set_id: 1,
+    all_day: false,
+    title: "Mastery Paths",
+    unlock_at_overridden: true,
+    lock_at_overridden: true,
+    due_at_overridden: true
+  )
+  @set3_assignment = @course.assignments.create!(
+    title: "Set 3 Assignment",
+    points_possible: 10,
+    only_visible_to_overrides: true
+  )
+  @set3_assignment.assignment_overrides.create!(
+    set_type: "Noop",
+    set_id: 1,
+    all_day: false,
+    title: "Mastery Paths",
+    unlock_at_overridden: true,
+    lock_at_overridden: true,
+    due_at_overridden: true
+  )
 
   course_module = @course.context_modules.create!(name: "Mastery Path Module")
   course_module.add_item(id: @trigger_assignment.id, type: "assignment")
-  course_module.add_item(id: @set1_assmt1.id, type: "assignment")
-  course_module.add_item(id: graded_discussion.id, type: "discussion_topic")
-  course_module.add_item(id: @set2_assmt1.id, type: "assignment")
-  course_module.add_item(id: @set2_assmt2.id, type: "assignment")
-  course_module.add_item(id: @set3a_assmt.id, type: "assignment")
-  course_module.add_item(id: @set3b_assmt.id, type: "assignment")
+  course_module.add_item(id: @set1_assignment.id, type: "assignment")
+  course_module.add_item(id: @set2_assignment.id, type: "assignment")
+  course_module.add_item(id: @set3_assignment.id, type: "assignment")
 
   ranges = [
     ConditionalRelease::ScoringRange.new(lower_bound: 0.7, upper_bound: 1.0, assignment_sets: [
                                            ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set1_assmt1.id),
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: graded_discussion.assignment_id)
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set1_assignment.id)
                                                                                  ])
                                          ]),
     ConditionalRelease::ScoringRange.new(lower_bound: 0.4, upper_bound: 0.7, assignment_sets: [
                                            ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt1.id),
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt2.id)
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assignment.id)
                                                                                  ])
                                          ]),
     ConditionalRelease::ScoringRange.new(lower_bound: 0, upper_bound: 0.4, assignment_sets: [
                                            ConditionalRelease::AssignmentSet.new(
                                              assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
-                                               assignment_id: @set3a_assmt.id
-                                             )]
-                                           ),
-                                           ConditionalRelease::AssignmentSet.new(
-                                             assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
-                                               assignment_id: @set3b_assmt.id
+                                               assignment_id: @set3_assignment.id
                                              )]
                                            )
                                          ])
