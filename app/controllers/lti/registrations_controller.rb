@@ -109,13 +109,13 @@
 #         "created_by": {
 #           "description": "The user that created this registration. Not always present. If a string, this registration was created by Instructure.",
 #           "example": { "type": "User" },
-#           "type": ["string", "User"],
+#           "type": "string|User",
 #           "$ref": "User"
 #         },
 #         "updated_by": {
 #           "description": "The user that last updated this registration. Not always present. If a string, this registration was last updated by Instructure.",
 #           "example": { "type": "User" },
-#           "type": ["string", "User"],
+#           "type": "string|User",
 #           "$ref": "User"
 #         },
 #         "root_account_id": {
