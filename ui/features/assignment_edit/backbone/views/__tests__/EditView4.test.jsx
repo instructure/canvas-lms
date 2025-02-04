@@ -36,6 +36,7 @@ import ExternalToolModalLauncher from '@canvas/external-tools/react/components/E
 import fetchMock from 'jest-fetch-mock'
 // ReactDOM might be required for dynamic rendering in certain scenarios.
 import ReactDOM from 'react-dom'
+import { waitFor } from '@testing-library/react'
 
 jest.mock('jquery-ui', () => {
   const $ = require('jquery')
@@ -299,6 +300,38 @@ describe('EditView', () => {
       window.postMessage(message, window.origin)
 
       expect(view.$el).toBeTruthy()
+    })
+  })
+
+  describe('Asset Processor Modal Launcher', () => {
+    it('attaches AssetProcessorModalLauncher component when FF is on', async () => {
+      window.ENV.FEATURES = {lti_asset_processor: true}
+      const view = createEditView()
+      await waitFor(() => {
+        expect(view.$activityAssetProcessorContainer.children()).toHaveLength(1)
+      })
+    })
+
+    it('does not attach AssetProcessorModalLauncher component when FF is off', async () => {
+      window.ENV.FEATURES = {lti_asset_processor: false}
+      const view = createEditView()
+      await waitFor(() => {
+        expect(view.$activityAssetProcessorContainer.children()).toHaveLength(0)
+      })
+      // Ensure no children are added after the initial render
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      expect(view.$activityAssetProcessorContainer.children()).toHaveLength(0)
+    })
+
+    it('does not attach AssetProcessorModalLauncher when editing an existing assignment', async () => {
+      window.ENV.FEATURES = {lti_asset_processor: true}
+      const view = createEditView({id: 1})
+      await waitFor(() => {
+        expect(view.$activityAssetProcessorContainer.children()).toHaveLength(0)
+      })
+      // Ensure no children are added after the initial render
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      expect(view.$activityAssetProcessorContainer.children()).toHaveLength(0)
     })
   })
 

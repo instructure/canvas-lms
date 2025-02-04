@@ -95,6 +95,17 @@ describe('ExternalToolModalLauncher', () => {
 
       expect(onRequestCloseMock).toHaveBeenCalledTimes(1)
     })
+
+    test('invokes onDeepLinkingResponse prop when window receives externalContentCancel event', () => {
+      const onDeepLinkingResponseMock = jest.fn()
+      const props = generateProps({onDeepLinkingResponse: onDeepLinkingResponseMock})
+
+      render(<ExternalToolModalLauncher {...props} />)
+
+      sendPostMessage({subject: 'LtiDeepLinkingResponse'})
+
+      expect(onDeepLinkingResponseMock).toHaveBeenCalledTimes(1)
+    })
   })
 
   test('sets the iframe allowances', async () => {

@@ -1140,6 +1140,46 @@ module Lti
               expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
             end
           end
+
+          context "when a content item for a ActivityAssetProcessor is received" do
+            before do
+              course
+              user_session(@user)
+              context_external_tool
+            end
+
+            let(:content_items) do
+              [
+                { type: "ltiAssetProcessor", url: launch_url, title: "Asset Processor 1" },
+                { type: "ltiResourceLink", url: launch_url, title: "Item 1" }
+              ]
+            end
+
+            let(:return_url_params) { super().merge(placement: "ActivityAssetProcessor") }
+
+            it "does not create a resource link" do
+              expect do
+                subject
+              end.to_not change { Lti::ResourceLink.count }
+            end
+
+            it "does not create an Lti::AssetProcessor" do
+              expect do
+                subject
+              end.to_not change { Lti::AssetProcessor.count }
+            end
+
+            it "includes tool_id and ltiAssetProcessor type content items in the js_env deep_link_response" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                tool_id: context_external_tool.id,
+                content_items: content_items.reject { |item| item[:type] == "ltiResourceLink" }
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
+            end
+          end
         end
 
         context "LTI tools replace content functionality with missing scope" do
