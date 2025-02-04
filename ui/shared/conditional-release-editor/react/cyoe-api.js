@@ -106,6 +106,9 @@ const CyoeApi = {
       )
     })
     asg.category = category ? category.id : OTHER_ID
+    if (asg.category === 'assignment' && asg.is_quiz_lti_assignment){
+      asg.category = 'quiz'
+    }
   },
 
   _depaginate: (url, allResults = []) => {
