@@ -18,7 +18,6 @@
 
 import {enhanceUserContent} from '../enhance_user_content'
 import {Mathml} from '../mathml'
-import formatMessage from '../../format-message'
 import * as instructureHelper from '../instructure_helper'
 
 jest.useFakeTimers()

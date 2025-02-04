@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {jest} from '@jest/globals'
 import moxios from 'moxios'
 import * as actions from '../upload'
 import * as filesActions from '../files'
