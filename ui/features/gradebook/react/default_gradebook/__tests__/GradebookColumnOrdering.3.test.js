@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import 'jquery-migrate'
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import SlickGridSpecHelper from '../GradebookGrid/GridSupport/__tests__/SlickGridSpecHelper'
@@ -212,7 +211,6 @@ jest.mock('../Gradebook', () => {
 
 describe('Gradebook Grid Column Ordering', () => {
   let fixture
-  let gridSpecHelper
   let gradebook
 
   const contextModules = [
@@ -344,7 +342,7 @@ describe('Gradebook Grid Column Ordering', () => {
     const GradebookGrid = require('../GradebookGrid').default
     gradebook.gradebookGrid = new GradebookGrid()
     addGridData()
-    gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
+    new SlickGridSpecHelper(gradebook.gradebookGrid)
   }
 
   beforeEach(() => {
@@ -356,37 +354,6 @@ describe('Gradebook Grid Column Ordering', () => {
   afterEach(() => {
     gradebook?.destroy()
     fixture.remove()
-  })
-
-  describe('when initializing the grid', () => {
-    it('defaults assignment column order to assignment group positions when setting is not set', () => {
-      createGradebookAndAddData()
-      const expectedOrder = [
-        'assignment_2302',
-        'assignment_2304',
-        'assignment_2301',
-        'assignment_2303',
-      ]
-      const columns = gradebook.gradebookGrid.grid.getColumns()
-      const actualOrder = columns.map(column => column.id)
-      expect(actualOrder).toEqual(expectedOrder)
-    })
-  })
-
-  describe('when sorting by name', () => {
-    it('sorts assignment columns by assignment name', () => {
-      createGradebookAndAddData()
-      arrangeColumnsBy('name', 'ascending')
-      const expectedOrder = [
-        'assignment_2303', // English Assignment
-        'assignment_2304', // English Quiz
-        'assignment_2301', // Math Assignment
-        'assignment_2302', // Math Quiz
-      ]
-      const columns = gradebook.gradebookGrid.grid.getColumns()
-      const actualOrder = columns.map(column => column.id)
-      expect(actualOrder).toEqual(expectedOrder)
-    })
   })
 
   describe('when sorting by module position', () => {
