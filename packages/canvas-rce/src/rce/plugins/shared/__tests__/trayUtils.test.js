@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {resetTrayHeight, getTrayHeight} from '../trayUtils'
+
 beforeEach(() => {
   jest.resetModules()
 })
@@ -27,18 +29,18 @@ afterEach(() => {
 describe('trayUtils', () => {
   describe('getTrayHeight', () => {
     it('defaults tray height to 100vh when the masquerade bar is not present', () => {
-      const {getTrayHeight} = require('../trayUtils')
+      resetTrayHeight()
       expect(getTrayHeight()).toBe('100vh')
     })
 
     it('adjusts height by 50px when the masquerade bar is present', () => {
-      const {getTrayHeight} = require('../trayUtils')
+      resetTrayHeight()
       document.body.classList.add('is-masquerading-or-student-view')
       expect(getTrayHeight()).toBe('calc(100vh - 50px)')
     })
 
     it('only checks for the masquerade bar once', () => {
-      const {getTrayHeight} = require('../trayUtils')
+      resetTrayHeight()
       jest.spyOn(document, 'querySelector')
       getTrayHeight()
       getTrayHeight()
