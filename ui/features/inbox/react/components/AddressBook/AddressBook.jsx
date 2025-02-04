@@ -128,7 +128,7 @@ export const AddressBook = ({
   const showContextSelect = useMemo(() => {
     // Legacy discussions don't allow messages to all groups/sections
     // The mutation also doesn't allow using a course groups or sections asset string as a recipient
-    const disabledContextSelectOptions = ['groups', 'sections']
+    const disabledContextSelectOptions = ['groups', 'sections', 'tags']
     let contextID = currentFilter?.context?.contextID
 
     if (!hasSelectAllFilterOption || !contextID || inputValue) {
