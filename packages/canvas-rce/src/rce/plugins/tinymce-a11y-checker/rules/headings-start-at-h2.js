@@ -51,7 +51,7 @@ export default {
       dataKey: 'alert',
       variant: 'warning',
       message: formatMessage(
-        'You may need to adjust additional headings to maintain page hierarchy.'
+        'You may need to adjust additional headings to maintain page hierarchy.',
       ),
     },
   ],
@@ -75,7 +75,7 @@ export default {
 
   why: () =>
     formatMessage(
-      "Webpages should only have a single H1, which is automatically used by the page's Title. The first heading in your content should be an H2."
+      "Webpages should only have a single H1, which is automatically used by the page's Title. The first heading in your content should be an H2.",
     ),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/H42.html',

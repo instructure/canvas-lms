@@ -27,7 +27,7 @@ function renderComponent() {
         I am a button
       </ShowOnFocusButton>
       <input id="focusme" />
-    </div>
+    </div>,
   )
 }
 

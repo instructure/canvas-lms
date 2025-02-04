@@ -67,12 +67,12 @@ export default {
 
   message: () =>
     formatMessage(
-      'Image filenames should not be used as the alt attribute describing the image content.'
+      'Image filenames should not be used as the alt attribute describing the image content.',
     ),
 
   why: () =>
     formatMessage(
-      'Screen readers cannot determine what is displayed in an image without alternative text, and filenames are often meaningless strings of numbers and letters that do not describe the context or meaning.'
+      'Screen readers cannot determine what is displayed in an image without alternative text, and filenames are often meaningless strings of numbers and letters that do not describe the context or meaning.',
     ),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/F30.html',

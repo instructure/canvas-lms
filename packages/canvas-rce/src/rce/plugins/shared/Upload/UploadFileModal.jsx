@@ -71,7 +71,7 @@ const UploadFileModal = React.forwardRef(
       forBlockEditorUse = false,
       uploading = false,
     },
-    ref
+    ref,
   ) => {
     const [theFile, setFile] = useState(preselectedFile)
     const [error, setError] = useState(null)
@@ -105,7 +105,7 @@ const UploadFileModal = React.forwardRef(
       setDisplayAs(event.target.value)
     }
 
-    const handleRequestTabChange = (index) => {
+    const handleRequestTabChange = index => {
       setSelectedPanel(panels[index])
       setFileUrl('')
     }
@@ -161,7 +161,7 @@ const UploadFileModal = React.forwardRef(
             },
             contentProps,
             source,
-            onDismiss
+            onDismiss,
           )
         }}
         open={true}
@@ -305,19 +305,13 @@ const UploadFileModal = React.forwardRef(
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={onDismiss}>{formatMessage('Close')}</Button>&nbsp;
-          <Button
-            color="primary"
-            type="submit"
-            disabled={submitDisabled || uploading}
-          >
-            {uploading
-              ? formatMessage('Submitting...')
-              : formatMessage('Submit')}
+          <Button color="primary" type="submit" disabled={submitDisabled || uploading}>
+            {uploading ? formatMessage('Submitting...') : formatMessage('Submit')}
           </Button>
         </Modal.Footer>
       </Modal>
     )
-  }
+  },
 )
 
 UploadFileModal.propTypes = {

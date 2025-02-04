@@ -72,10 +72,10 @@ interface DoFetchError extends Error {
 }
 
 const modifyAllTaskMessage = formatMessage(
-  'Hello. Please describe the modifications you would like to make to your composition.'
+  'Hello. Please describe the modifications you would like to make to your composition.',
 )
 const modifySelectionTaskMessage = formatMessage(
-  'Hello. Please describe the modifications you would like to make to your selection.'
+  'Hello. Please describe the modifications you would like to make to your selection.',
 )
 const generateTaskMessage = formatMessage('Please decribe what you would like to compose.')
 
@@ -179,7 +179,7 @@ export const AIToolsTray = ({
       setWaitingForResponse(true)
 
       // the .finally triggered the error even though there is a .catch
-      // eslint-disable-next-line promise/catch-or-return
+       
       doFetchApi({
         path: '/api/v1/rich_content/generate',
         method: 'POST',
@@ -218,7 +218,7 @@ export const AIToolsTray = ({
           setWaitingForResponse(false)
         })
     },
-    [contextId, currentContent, task]
+    [contextId, currentContent, task],
   )
   const handleCloseTray = useCallback(() => {
     onClose()
@@ -236,7 +236,7 @@ export const AIToolsTray = ({
       data: {
         value?: string | number
         id?: string
-      }
+      },
     ) => {
       setTask(data.value as AITask)
       setWaitingForResponse(false)
@@ -246,7 +246,7 @@ export const AIToolsTray = ({
         message: data.value === 'modify' ? getModifyTaskMessage() : generateTaskMessage,
       })
     },
-    [getModifyTaskMessage]
+    [getModifyTaskMessage],
   )
 
   const handlePromptChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -263,7 +263,7 @@ export const AIToolsTray = ({
     (responseText: string) => {
       onInsertContent(responseText)
     },
-    [onInsertContent]
+    [onInsertContent],
   )
 
   const handleCopyResponse = useCallback(async (responseText: string) => {
@@ -295,7 +295,7 @@ export const AIToolsTray = ({
   }, [getResponse, userPrompt])
 
   const handleDislikeResponse = useCallback(() => {
-    // eslint-disable-next-line no-console
+     
     console.log('dislike response') // TODO: what?
   }, [])
 
@@ -307,7 +307,7 @@ export const AIToolsTray = ({
         setResponseHtml(message.message)
       }
     },
-    []
+    [],
   )
 
   const handleCloseResponseModal = useCallback(() => {
@@ -442,8 +442,8 @@ export const AIToolsTray = ({
       messages.push(
         renderChatBox(
           {id: msgid(), type: 'waiting', message: formatMessage('Waiting for response')},
-          'ai-waiting-message'
-        )
+          'ai-waiting-message',
+        ),
       )
     }
     return messages

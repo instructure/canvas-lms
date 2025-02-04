@@ -37,7 +37,7 @@ describe('CustomNumberInput', () => {
         processValueCallback={v => (v > 10 ? 10 : v)}
         formatValueCallback={v => `${v}%`}
         {...otherSettings}
-      />
+      />,
     )
 
   it('increment using up arrow', () => {
@@ -109,7 +109,7 @@ describe('CustomNumberInput', () => {
         () => {
           expect(callback).toHaveBeenCalledWith('10')
         },
-        {timeout}
+        {timeout},
       )
     })
 
@@ -121,7 +121,7 @@ describe('CustomNumberInput', () => {
         () => {
           expect(input.value).toEqual('10%')
         },
-        {timeout}
+        {timeout},
       )
     })
 
@@ -133,7 +133,7 @@ describe('CustomNumberInput', () => {
         () => {
           expect(onChangeFn).toHaveBeenCalledWith(10)
         },
-        {timeout}
+        {timeout},
       )
     })
 
@@ -156,7 +156,7 @@ describe('CustomNumberInput', () => {
           const messageContainer = container.querySelector('label > span > span:last-child')
           expect(messageContainer.textContent).toEqual('Invalid entry.')
         },
-        {timeout}
+        {timeout},
       )
     })
   })

@@ -118,7 +118,7 @@ tinymce.PluginManager.add('instructure_record', function (ed) {
           text: item.text,
           value: item.value,
           onAction: () => doMenuItem(ed, item.value),
-        }))
+        })),
       ),
     onSetup(api) {
       // @ts-expect-error

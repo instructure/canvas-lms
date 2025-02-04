@@ -51,7 +51,7 @@ const ShowMessage = () => {
         <i className="icon-warning" />
         <span style={{paddingLeft: '10px'}}>
           {formatMessage(
-            "If you do not select usage rights now, this file will be unpublished after it's uploaded."
+            "If you do not select usage rights now, this file will be unpublished after it's uploaded.",
           )}
         </span>
       </span>
@@ -88,7 +88,9 @@ const UsageRightsSelectBox = ({
       value: 'public_domain',
     },
     {
-      display: formatMessage('The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'),
+      display: formatMessage(
+        'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws',
+      ),
       value: 'fair_use',
     },
     {
@@ -167,7 +169,14 @@ const UsageRightsSelectBox = ({
 UsageRightsSelectBox.propTypes = {
   usageRightsState: PropTypes.shape({
     ccLicense: PropTypes.string,
-    usageRight: PropTypes.oneOf(['choose', 'own_copyright', 'used_by_permission', 'public_domain', 'fair_use', 'creative_commons']),
+    usageRight: PropTypes.oneOf([
+      'choose',
+      'own_copyright',
+      'used_by_permission',
+      'public_domain',
+      'fair_use',
+      'creative_commons',
+    ]),
     copyrightHolder: PropTypes.string,
   }),
   setUsageRightsState: PropTypes.func,

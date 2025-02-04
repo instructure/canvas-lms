@@ -32,7 +32,7 @@ export default function LoadingStatus({loader}) {
            one {# item loaded}
          other {# items loaded}
        }`,
-      {count: loader.lastRecordsLoaded}
+      {count: loader.lastRecordsLoaded},
     )
   }
 

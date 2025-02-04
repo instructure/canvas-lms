@@ -221,7 +221,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(1.5)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -234,7 +234,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(2)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -247,7 +247,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(1.5)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -260,7 +260,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(1.5)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -273,7 +273,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(1.5)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -286,7 +286,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(1)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -299,7 +299,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(1)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -312,7 +312,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(1)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -325,7 +325,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(1)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -338,7 +338,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).not.toHaveBeenCalled()
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -351,7 +351,7 @@ describe('ZoomControls', () => {
           () => {
             expect(callback).not.toHaveBeenCalled()
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -365,7 +365,7 @@ describe('ZoomControls', () => {
             const messageContainer = container.querySelector('label > span > span:last-child')
             expect(messageContainer.textContent).toEqual('Invalid entry.')
           },
-          {timeout}
+          {timeout},
         )
       })
     })
@@ -396,7 +396,7 @@ describe('ZoomControls', () => {
       const zoomInButton = getByRole('button', {name: /zoom in image/i})
       fireEvent.click(zoomInButton)
       expect(showFlashAlert).toHaveBeenLastCalledWith(
-        expectedMessage(scaleRatio + BUTTON_SCALE_STEP)
+        expectedMessage(scaleRatio + BUTTON_SCALE_STEP),
       )
     })
 
@@ -405,7 +405,7 @@ describe('ZoomControls', () => {
       const zoomOutButton = getByRole('button', {name: /zoom out image/i})
       fireEvent.click(zoomOutButton)
       expect(showFlashAlert).toHaveBeenLastCalledWith(
-        expectedMessage(scaleRatio - BUTTON_SCALE_STEP)
+        expectedMessage(scaleRatio - BUTTON_SCALE_STEP),
       )
     })
 

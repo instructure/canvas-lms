@@ -29,7 +29,7 @@ describe('ConditionalTooltip', () => {
         on={['hover']}
         children={<p>child 1</p>} // eslint-disable-line react/no-children-prop
         {...overrideProps}
-      />
+      />,
     )
   }
 

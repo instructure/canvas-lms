@@ -88,7 +88,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
 
   function printCurrentTime() {
     const now = new Date()
-    // eslint-disable-next-line no-console
+     
     console.log(`Current time: ${now.toLocaleTimeString()}`)
   }
 
@@ -125,7 +125,9 @@ describe('RCE Plugins > CanvasContentTray', () => {
   it('clears search string on tray close', async () => {
     const mockOnChangeSearchString = jest.fn()
     renderComponent(
-      getProps({storeProps: {...storeInitialState, onChangeSearchString: mockOnChangeSearchString}})
+      getProps({
+        storeProps: {...storeInitialState, onChangeSearchString: mockOnChangeSearchString},
+      }),
     )
     await showTrayForPlugin('links')
     const close = await component.findByTestId('CloseButton_ContentTray')
@@ -178,7 +180,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
       await waitFor(() => {
         expect(LinkDisplay).toHaveBeenCalledWith(
           expect.objectContaining({placeholderText: 'some filename'}),
-          {}
+          {},
         )
       })
     })
@@ -279,35 +281,35 @@ describe('RCE Plugins > CanvasContentTray', () => {
       await showTrayForPlugin('links')
       await advanceTimersAndPrintTime()
       await waitFor(() =>
-        expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
+        expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument(),
       )
     })
     it('is the documents panel for document content types', async () => {
       await showTrayForPlugin('course_documents')
       await advanceTimersAndPrintTime()
       await waitFor(() =>
-        expect(component.getByTestId('instructure_links-DocumentsPanel')).toBeInTheDocument()
+        expect(component.getByTestId('instructure_links-DocumentsPanel')).toBeInTheDocument(),
       )
     })
     it('is the images panel for image content types', async () => {
       await showTrayForPlugin('course_images')
       await advanceTimersAndPrintTime()
       await waitFor(() =>
-        expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
+        expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument(),
       )
     })
     it('is the images panel for icon maker content types', async () => {
       await showTrayForPlugin('list_icon_maker_icons')
       await advanceTimersAndPrintTime()
       await waitFor(() =>
-        expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
+        expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument(),
       )
     })
     it('is the media panel for media content types', async () => {
       await showTrayForPlugin('course_media')
       await advanceTimersAndPrintTime()
       await waitFor(() =>
-        expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument()
+        expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument(),
       )
     })
 
@@ -315,7 +317,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
       await showTrayForPlugin('all')
       await advanceTimersAndPrintTime()
       await waitFor(() =>
-        expect(component.getByTestId('instructure_links-FilesPanel')).toBeInTheDocument()
+        expect(component.getByTestId('instructure_links-FilesPanel')).toBeInTheDocument(),
       )
     })
   })
@@ -338,7 +340,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
 
       await showTrayForPlugin('links')
       await waitFor(() =>
-        expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
+        expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument(),
       )
 
       const closeBtn = component.getByTestId('CloseButton_ContentTray').querySelector('button')

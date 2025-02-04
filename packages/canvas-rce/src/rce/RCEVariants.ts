@@ -84,7 +84,7 @@ export function getMenuForVariant(variant: RCEVariant): MenusSpec {
 
 export function getToolbarForVariant(
   variant: RCEVariant,
-  ltiToolFavorites: string[] = []
+  ltiToolFavorites: string[] = [],
 ): ToolbarGroupSetting[] {
   if (variant === 'lite') {
     return [
@@ -200,7 +200,7 @@ export function getToolbarForVariant(
 
 export function getStatusBarFeaturesForVariant(
   variant: RCEVariant,
-  ai_text_tools: boolean = false
+  ai_text_tools: boolean = false,
 ): StatusBarFeature[] {
   if (variant === 'lite' || variant === 'text-only') {
     return ['keyboard_shortcuts', 'a11y_checker', 'word_count']

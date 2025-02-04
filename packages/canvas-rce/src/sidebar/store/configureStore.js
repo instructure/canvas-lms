@@ -26,7 +26,7 @@ export default function (props, state) {
   const store = createStore(
     batching(rootReducer),
     state || initialState(props),
-    applyMiddleware(thunk, batch)
+    applyMiddleware(thunk, batch),
   )
 
   return store

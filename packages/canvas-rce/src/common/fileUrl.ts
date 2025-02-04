@@ -35,7 +35,7 @@ interface ParsedUrl {
 
 function parseCanvasUrl(
   url: string | undefined | null,
-  canvasOrigin: string = window.location.origin
+  canvasOrigin: string = window.location.origin,
 ): ParsedUrl | null {
   if (!url) {
     return null
@@ -129,7 +129,7 @@ function changeDownloadToWrapParams(parsedUrl: ParsedUrl): ParsedUrl {
 function addContext(
   parsedUrl: ParsedUrl,
   contextType: string,
-  contextId: string | number
+  contextId: string | number,
 ): ParsedUrl {
   // if this is a http://canvas/files... url. change it to be contextual
   if (parsedUrl.pathname && /^\/files/.test(parsedUrl.pathname)) {
@@ -163,7 +163,7 @@ export function fixupFileUrl(
   contextType: string,
   contextId: string | number,
   fileInfo: {href?: string; url?: string; uuid?: string},
-  canvasOrigin?: string
+  canvasOrigin?: string,
 ): {href?: string; url?: string; uuid?: string} {
   const key = fileInfo.href ? 'href' : 'url'
   if (fileInfo[key]) {

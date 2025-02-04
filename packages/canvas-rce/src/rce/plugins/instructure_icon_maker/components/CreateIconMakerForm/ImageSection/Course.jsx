@@ -42,7 +42,7 @@ const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
       type: svgActions.SET_ERROR,
       payload: formatMessage(
         'GIF/PNG format images larger than {size} KB are not currently supported.',
-        {size: MAX_GIF_PNG_SIZE_BYTES / 1024}
+        {size: MAX_GIF_PNG_SIZE_BYTES / 1024},
       ),
     })
   }
@@ -60,7 +60,7 @@ const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
         previewHeight: PREVIEW_HEIGHT,
       })
     } catch (e) {
-      // eslint-disable-next-line no-console
+       
       console.error(e)
     }
     dispatch({...actions.SET_COMPRESSION_STATUS, payload: true})

@@ -155,14 +155,14 @@ export default function FindReplaceTray({
     showReplaceAlert === ''
       ? ''
       : showReplaceAlert === 'replace'
-      ? formatMessage('Replaced {alertFindText} with {alertReplaceText}', {
-          alertFindText,
-          alertReplaceText,
-        })
-      : formatMessage('Replaced all {alertFindText} with {alertReplaceText}', {
-          alertFindText,
-          alertReplaceText,
-        })
+        ? formatMessage('Replaced {alertFindText} with {alertReplaceText}', {
+            alertFindText,
+            alertReplaceText,
+          })
+        : formatMessage('Replaced all {alertFindText} with {alertReplaceText}', {
+            alertFindText,
+            alertReplaceText,
+          })
 
   const renderReplaceAlert = () => {
     if (!showReplaceAlert) {

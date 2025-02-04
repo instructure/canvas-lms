@@ -104,7 +104,7 @@ export default class TrayController {
       })
       .then(() => container?.contentWindow.location.reload())
       .catch(ex => {
-        // eslint-disable-next-line no-console
+         
         console.error('Failed updating audio captions', ex)
       })
   }
@@ -121,12 +121,12 @@ export default class TrayController {
           cb(event?.data?.payload)
         }
       },
-      {signal: this._subtitleListener.signal}
+      {signal: this._subtitleListener.signal},
     )
 
     this._audioContainer?.contentWindow?.postMessage(
       {subject: 'media_tracks_request'},
-      bridge.canvasOrigin
+      bridge.canvasOrigin,
     )
   }
 

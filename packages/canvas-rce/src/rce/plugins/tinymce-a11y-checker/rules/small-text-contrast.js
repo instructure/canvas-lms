@@ -72,12 +72,12 @@ export default {
 
   message: () =>
     formatMessage(
-      'Text smaller than 18pt (or bold 14pt) should display a minimum contrast ratio of 4.5:1.'
+      'Text smaller than 18pt (or bold 14pt) should display a minimum contrast ratio of 4.5:1.',
     ),
 
   why: () =>
     formatMessage(
-      'Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision.'
+      'Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision.',
     ),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/G17.html',

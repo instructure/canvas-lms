@@ -61,7 +61,7 @@ export function parseUrlPath(url: string) {
  */
 export function relativeHttpUrlForHostname<TInput extends string | null | undefined>(
   inputUrlStr: TInput,
-  origin: string
+  origin: string,
 ): TInput {
   if (inputUrlStr == null || inputUrlStr === '') {
     return inputUrlStr
@@ -122,7 +122,7 @@ export function relativeHttpUrlForHostname<TInput extends string | null | undefi
  */
 export function addQueryParamsToUrl(
   inputUrlStr: string | null | undefined,
-  queryParams: Record<string, string | null | undefined>
+  queryParams: Record<string, string | null | undefined>,
 ): string | null {
   if (inputUrlStr == null) {
     return null

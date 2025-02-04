@@ -66,7 +66,7 @@ const ColorPicker = ({tabs, colorsInUse, onCancel, onSave}: ColorPickerProps) =>
   const [currBgColor, setCurrBgColor] = useState<string | undefined>(
     isTransparent(tabs.background?.color)
       ? tabs.effectiveBgColor || '#ffffff'
-      : tabs.background?.color
+      : tabs.background?.color,
   )
   const [currBorderColor, setCurrBorderColor] = useState(tabs.border?.color)
   const [activeTab, setActiveTab] = useState<ColorTab>(() => {
@@ -76,13 +76,13 @@ const ColorPicker = ({tabs, colorsInUse, onCancel, onSave}: ColorPickerProps) =>
   })
   const [defaultColors] = useState(getDefaultColors())
   const [customForeground, setCustomForeground] = useState<boolean>(
-    !!tabs.foreground?.color && tabs.foreground.color !== tabs.foreground.default
+    !!tabs.foreground?.color && tabs.foreground.color !== tabs.foreground.default,
   )
   const [customBackground, setCustomBackground] = useState<boolean>(
-    !isTransparent(tabs.background?.color) && tabs.background?.color !== tabs.background?.default
+    !isTransparent(tabs.background?.color) && tabs.background?.color !== tabs.background?.default,
   )
   const [customBorder, setCustomBorder] = useState<boolean>(
-    !isTransparent(tabs.border?.color) && tabs.border?.color !== tabs.border?.default
+    !isTransparent(tabs.border?.color) && tabs.border?.color !== tabs.border?.default,
   )
 
   const handleFgColorChange = useCallback((newColor: string) => {
@@ -101,11 +101,11 @@ const ColorPicker = ({tabs, colorsInUse, onCancel, onSave}: ColorPickerProps) =>
   const handleTabChange = useCallback(
     (
       _event: React.MouseEvent<ViewOwnProps> | React.KeyboardEvent<ViewOwnProps>,
-      tabData: {index: number; id?: string}
+      tabData: {index: number; id?: string},
     ) => {
       setActiveTab(tabData.id as ColorTab)
     },
-    []
+    [],
   )
 
   const handleChangePickAColor = useCallback(
@@ -128,7 +128,7 @@ const ColorPicker = ({tabs, colorsInUse, onCancel, onSave}: ColorPickerProps) =>
         }
       }
     },
-    [activeTab]
+    [activeTab],
   )
 
   const handleCancel = useCallback(() => {
@@ -178,7 +178,7 @@ const ColorPicker = ({tabs, colorsInUse, onCancel, onSave}: ColorPickerProps) =>
     }
     // return only unique colors
     return [...defaults, ...(colorsInUse?.[variant] || [])].filter(
-      (c, i, a) => a.indexOf(c) === i && !isTransparent(c)
+      (c, i, a) => a.indexOf(c) === i && !isTransparent(c),
     )
   }
 
@@ -208,13 +208,13 @@ const ColorPicker = ({tabs, colorsInUse, onCancel, onSave}: ColorPickerProps) =>
         rgbBlueInputScreenReaderLabel={formatMessage('Input field for blue')}
         rgbAlphaInputScreenReaderLabel={formatMessage('Input field for alpha')}
         colorSliderNavigationExplanationScreenReaderLabel={formatMessage(
-          "You are on a color slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively"
+          "You are on a color slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively",
         )}
         alphaSliderNavigationExplanationScreenReaderLabel={formatMessage(
-          "You are on an alpha slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively"
+          "You are on an alpha slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively",
         )}
         colorPaletteNavigationExplanationScreenReaderLabel={formatMessage(
-          "You are on a color palette. To navigate on the palette up, left, down or right, use the 'W', 'A', 'S' and 'D' buttons respectively"
+          "You are on a color palette. To navigate on the palette up, left, down or right, use the 'W', 'A', 'S' and 'D' buttons respectively",
         )}
       />
     )

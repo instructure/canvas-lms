@@ -124,7 +124,7 @@ export default class Checker extends React.Component {
         } else {
           this._check(done)
         }
-      }
+      },
     )
   }
 

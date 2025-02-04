@@ -79,7 +79,7 @@ export type ContentItemThumbnailJson = DeepPartialNullable<{
 }>
 
 export function isContentItemThumbnailJson(
-  input: any
+  input: any,
 ): input is ContentItemThumbnailJson & {url: string} {
   return typeof input === 'object' && typeof input.url === 'string'
 }
@@ -91,7 +91,7 @@ export type ContentItemIframeJson = DeepPartialNullable<{
 }>
 
 export function isContentItemIframeJson(
-  input: any
+  input: any,
 ): input is ContentItemIframeJson & {src: string} {
   return typeof input === 'object' && typeof input.src === 'string'
 }

@@ -63,12 +63,12 @@ export function renderIntoDiv(editorEl: HTMLElement, props: any, cb?: (ref: any)
     getTranslations(language)
       .then(() => render(editorEl, props, cb))
       .catch(err => {
-        // eslint-disable-next-line no-console
+         
         console.error(
           'Failed loading the language file for',
           language,
           'RCE is falling back to English.\n Cause:',
-          err
+          err,
         )
         render(editorEl, props, cb)
       })

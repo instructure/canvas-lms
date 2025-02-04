@@ -33,7 +33,7 @@ describe('Context reducer', () => {
 
     it('returns the new context type', () => {
       expect(changeContextType(state, {type: actions.CHANGE_CONTEXT_TYPE, payload: 'user'})).toBe(
-        'user'
+        'user',
       )
     })
   })

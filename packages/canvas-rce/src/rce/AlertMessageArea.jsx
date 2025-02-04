@@ -46,7 +46,7 @@ AlertMessageArea.propTypes = {
       id: number,
       variant: string,
       text: string,
-    })
+    }),
   ).isRequired,
   afterDismiss: func,
   liveRegion: func.isRequired,

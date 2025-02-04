@@ -37,7 +37,7 @@ function renderComponent(props) {
       unlock_at={null}
       onClick={() => {}}
       {...props}
-    />
+    />,
   )
 }
 

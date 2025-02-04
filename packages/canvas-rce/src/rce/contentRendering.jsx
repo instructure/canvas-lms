@@ -56,7 +56,7 @@ export function renderLinkedImage(linkElem, image, canvasOrigin) {
   return renderToStaticMarkup(
     <a href={absoluteToRelativeUrl(linkHref, canvasOrigin)} data-mce-href={linkHref}>
       {constructJSXImageElement(image, canvasOrigin, {doNotLink: true})}
-    </a>
+    </a>,
   )
 }
 
@@ -116,8 +116,8 @@ export function renderVideo(video, canvasOrigin) {
       data-media-type="video"
       src="${src}"
       style="width:${VIDEO_SIZE_DEFAULT.width};height:${
-    VIDEO_SIZE_DEFAULT.height
-  };display:inline-block;"
+        VIDEO_SIZE_DEFAULT.height
+      };display:inline-block;"
       title="${formatMessage('Video player for {title}', {
         title: video.title || video.name || video.text,
       })}"></iframe>
@@ -134,8 +134,8 @@ export function renderAudio(audio, canvasOrigin) {
       data-media-type="audio"
       src="${src}"
       style="width:${AUDIO_PLAYER_SIZE.width};height:${
-    AUDIO_PLAYER_SIZE.height
-  };display:inline-block;"
+        AUDIO_PLAYER_SIZE.height
+      };display:inline-block;"
       title="${formatMessage('Audio player for {title}', {
         title: audio.title || audio.name || audio.text,
       })}"></iframe>

@@ -39,9 +39,9 @@ describe('MathML and MathJax it', () => {
     mathml.loadMathJax('bogus')
     expect(
       Array.from(document.querySelectorAll('script[src]')).filter(el =>
-        el.src.includes('//cdnjs.cloudflare.com/ajax/libs/mathjax')
-      ).length
-    ).toEqual(1)
+        el.src.includes('//cdnjs.cloudflare.com/ajax/libs/mathjax'),
+      ),
+    ).toHaveLength(1)
   })
 
   it('loadMathJax does not load mathJax if already loaded', () => {
@@ -54,9 +54,9 @@ describe('MathML and MathJax it', () => {
     mathml.loadMathJax('bogus')
     expect(
       Array.from(document.querySelectorAll('script[src]')).filter(el =>
-        el.src.includes('//cdnjs.cloudflare.com/ajax/libs/mathjax')
-      ).length
-    ).toEqual(0)
+        el.src.includes('//cdnjs.cloudflare.com/ajax/libs/mathjax'),
+      ),
+    ).toHaveLength(0)
   })
 
   it("loadMathJax doesn't download mathjax if in-flight", () => {
@@ -64,9 +64,9 @@ describe('MathML and MathJax it', () => {
     mathml.loadMathJax('bogus')
     expect(
       Array.from(document.querySelectorAll('script[src]')).filter(el =>
-        el.src.includes('//cdnjs.cloudflare.com/ajax/libs/mathjax')
-      ).length
-    ).toEqual(1)
+        el.src.includes('//cdnjs.cloudflare.com/ajax/libs/mathjax'),
+      ),
+    ).toHaveLength(1)
   })
 
   it('isMathJaxLoaded return true', () => {
@@ -177,7 +177,7 @@ describe('isMathInElement, with new_math_equation_handling on', () => {
           target: elem,
           features: {new_math_equation_handling: true},
         },
-      })
+      }),
     )
     expect(stub).toHaveBeenCalledWith(elem)
   })
@@ -235,7 +235,7 @@ describe('mathEquationHelper', () => {
       >
     `
     mathImageHelper.catchEquationImages(root)
-    expect(document.querySelectorAll('img[mathjaxified]').length).toEqual(1)
+    expect(document.querySelectorAll('img[mathjaxified]')).toHaveLength(1)
     expect(document.querySelector('.math_equation_latex').textContent).toEqual('\\(17\\)')
   })
 
@@ -255,7 +255,7 @@ describe('mathEquationHelper', () => {
     `
     const imgarr = [root, otherhtml]
     expect(mathImageHelper.catchEquationImages(imgarr)).toBeTruthy()
-    expect(document.querySelectorAll('img[mathjaxified]').length).toEqual(1)
+    expect(document.querySelectorAll('img[mathjaxified]')).toHaveLength(1)
     expect(document.querySelector('.math_equation_latex').textContent).toEqual('\\(17\\)')
   })
 

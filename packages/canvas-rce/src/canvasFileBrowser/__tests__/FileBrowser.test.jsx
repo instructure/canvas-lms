@@ -93,7 +93,7 @@ describe('FileBrowser', () => {
         const folder = await waitFor(() => getByText('My files'))
         fireEvent.click(folder)
         const mediaProcessingMessage = await waitFor(() =>
-          getByText('Media file is processing. Please try again later.')
+          getByText('Media file is processing. Please try again later.'),
         )
         const pendingMediaFileName = await waitFor(() => getByText('im-still-pending.mp4'))
 
@@ -177,7 +177,7 @@ describe('FileBrowser', () => {
         return within(folderButton).getByRole('img')
       })
       expect(icon.src).toEqual(
-        'http://canvas.docker/images/thumbnails/172/KEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ'
+        'http://canvas.docker/images/thumbnails/172/KEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ',
       )
     })
 

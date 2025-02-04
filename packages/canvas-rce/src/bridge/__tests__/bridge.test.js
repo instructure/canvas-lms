@@ -171,7 +171,7 @@ describe('Editor/Sidebar bridge', () => {
       it('insertLink with no active editor is a no-op, but warns', () => {
         Bridge.focusEditor(undefined)
         Bridge.insertLink(link)
-        expect(console.warn).toHaveBeenCalled() // eslint-disable-line no-console
+        expect(console.warn).toHaveBeenCalled()  
       })
 
       it('adds selectionDetails to links', () => {
@@ -394,7 +394,7 @@ describe('Bridge actions, embed image', () => {
     expect(mockEditor.insertLink).toHaveBeenCalledWith(
       expect.objectContaining({
         embed: {type: 'image'},
-      })
+      }),
     )
   })
 

@@ -89,7 +89,7 @@ class DefaultError {
   static build(_error) {
     return {
       text: formatMessage(
-        'Something went wrong. Check your connection, reload the page, and try again.'
+        'Something went wrong. Check your connection, reload the page, and try again.',
       ),
       variant: 'error',
     }

@@ -50,10 +50,10 @@ export default function LinkOptionsTray(props) {
   const [autoOpenPreview, setAutoOpenPreview] = useState(content.displayAs === DISPLAY_AS_EMBED)
   const [disableInlinePreview, setDisableInlinePreview] = useState(
     content.displayAs === DISPLAY_AS_EMBED_DISABLED ||
-      content.displayAs === DISPLAY_AS_DOWNLOAD_LINK
+      content.displayAs === DISPLAY_AS_DOWNLOAD_LINK,
   )
   const [displayOptionSelection, setDisplayOptionSelection] = useState(
-    initialPreviewSelection(content)
+    initialPreviewSelection(content),
   )
 
   useEffect(() => {
@@ -255,7 +255,7 @@ LinkOptionsTray.propTypes = {
         },
         props,
         'content',
-        'LinkOptionsTray'
+        'LinkOptionsTray',
       )
     }
   },

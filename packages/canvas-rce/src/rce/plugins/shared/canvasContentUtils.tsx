@@ -23,7 +23,7 @@ import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
 
 const thePanels = {
   icon_maker_icons: React.lazy(
-    () => import('../instructure_icon_maker/components/SavedIconMakerList')
+    () => import('../instructure_icon_maker/components/SavedIconMakerList'),
   ),
   links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
   images: React.lazy(() => import('../instructure_image/Images')),

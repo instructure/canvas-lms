@@ -41,7 +41,7 @@ describe('PanelFilter', () => {
         searchString=""
         contentType="course"
         {...props}
-      />
+      />,
     )
   }
 

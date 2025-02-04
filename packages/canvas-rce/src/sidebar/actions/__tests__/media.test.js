@@ -229,7 +229,7 @@ describe('Media actions', () => {
       try {
         await actions.updateMediaObject({media_object_id: 'moid', title: 'title'})(
           dispatch,
-          getState
+          getState,
         )
       } catch (e) {
         expect(alertHandler.alertFunc).toHaveBeenCalled()

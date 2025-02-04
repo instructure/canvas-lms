@@ -73,14 +73,14 @@ export interface ExternalToolsEnv {
  * Gets the environment information for the external tools dialog for a given tinyMCE editor.
  */
 export function externalToolsEnvFor(
-  editor: ExternalToolsEditor | null | undefined
+  editor: ExternalToolsEditor | null | undefined,
 ): ExternalToolsEnv {
   const props: () => RCEWrapperProps | undefined = () =>
     (RCEWrapper.getByEditor(editor as Editor)?.props as RCEWrapperProps) ?? undefined
   let cachedCanvasToolId: string | null | undefined
 
   function nonNullishArray<T>(
-    arr: Array<T | null | undefined> | null | undefined
+    arr: Array<T | null | undefined> | null | undefined,
   ): T[] | null | undefined {
     return arr?.filter(it => it != null) as T[]
   }

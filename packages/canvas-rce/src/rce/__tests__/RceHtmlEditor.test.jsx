@@ -53,21 +53,21 @@ describe('RceHtmlEditor', () => {
     const editorRef = {current: null}
     const onChange = jest.fn()
     const {container} = render(
-      <RceHtmlEditor ref={editorRef} code="<div><div>Text</div></div>" onChange={onChange} />
+      <RceHtmlEditor ref={editorRef} code="<div><div>Text</div></div>" onChange={onChange} />,
     )
     jest.advanceTimersByTime(1000)
 
     // is 1 without beautify.html(), 3 with
-    expect(container.querySelectorAll('.cm-line').length).toBe(3)
+    expect(container.querySelectorAll('.cm-line')).toHaveLength(3)
   })
 
   it('does not add non-semantic whitespace when beautifying', () => {
     const editorRef = {current: null}
     const {container} = render(
-      <RceHtmlEditor ref={editorRef} code="<a><span>Links</span> are great</a>" />
+      <RceHtmlEditor ref={editorRef} code="<a><span>Links</span> are great</a>" />,
     )
     jest.advanceTimersByTime(1000)
 
-    expect(container.querySelectorAll('.cm-line').length).toBe(1)
+    expect(container.querySelectorAll('.cm-line')).toHaveLength(1)
   })
 })

@@ -43,8 +43,8 @@ describe('fileShape', () => {
           },
         },
         'documents',
-        'someComponent'
-      )
+        'someComponent',
+      ),
     ).toBeUndefined()
   })
 
@@ -73,8 +73,8 @@ describe('fileShape', () => {
           },
         },
         'images',
-        'someComponent'
-      )
+        'someComponent',
+      ),
     ).toBeUndefined()
   })
 
@@ -105,8 +105,8 @@ describe('fileShape', () => {
           },
         },
         'media',
-        'someComponent'
-      )
+        'someComponent',
+      ),
     ).toBeUndefined()
   })
 
@@ -134,11 +134,11 @@ describe('fileShape', () => {
         },
       },
       'documents',
-      'someComponent'
+      'someComponent',
     )
 
     expect(consoleError).toHaveBeenCalledWith(
-      'Warning: Failed someComponent type: The someComponent `docs.files[0].content_type` is marked as required in `someComponent`, but its value is `undefined`.'
+      'Warning: Failed someComponent type: The someComponent `docs.files[0].content_type` is marked as required in `someComponent`, but its value is `undefined`.',
     )
   })
 
@@ -166,8 +166,8 @@ describe('fileShape', () => {
           },
         },
         'documents',
-        'someCompnent'
-      )
+        'someCompnent',
+      ),
     ).toMatchObject({
       message:
         'Invalid prop `documents` supplied to `someCompnent`. "searchString" must be a string.',
@@ -181,8 +181,8 @@ describe('fileShape', () => {
           documents: undefined,
         },
         'documents',
-        'someComponent'
-      )
+        'someComponent',
+      ),
     ).toBeUndefined()
   })
 
@@ -194,8 +194,8 @@ describe('fileShape', () => {
         },
         'documents',
         'someComponent',
-        true
-      )
+        true,
+      ),
     ).toMatchObject({
       message: 'Required prop `documents` not supplied to `someComponent`. Validation failed.',
     })

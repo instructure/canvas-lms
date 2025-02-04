@@ -59,7 +59,7 @@ export default function RestoreAutoSaveModal(props) {
         <View as="div" margin="small">
           <Alert variant="info" margin="none">
             {formatMessage(
-              'Auto-saved content exists. Would you like to load the auto-saved content instead?'
+              'Auto-saved content exists. Would you like to load the auto-saved content instead?',
             )}
           </Alert>
         </View>

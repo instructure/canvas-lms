@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 // TODO: we get complaints about <Overlay> because it can be either a Modal or a Tray
 // and they have different props. I don't have time to fix this the right way now.
@@ -96,7 +97,7 @@ export default class ExternalToolDialog extends React.Component<
       const canvasOrigin = env.canvasOrigin
 
       urlStr = `${canvasOrigin}/${contextType}s/${contextId}/external_tools/${encodeURIComponent(
-        button.id
+        button.id,
       )}/resource_selection`
     }
     this.setState({
@@ -151,7 +152,7 @@ export default class ExternalToolDialog extends React.Component<
             ...contentData,
             class: 'lti-embed',
           },
-          env
+          env,
         ).codePayload
 
         env.rceWrapper?.insertCode(code)
@@ -189,7 +190,7 @@ export default class ExternalToolDialog extends React.Component<
 
   handleClose = () => {
     const msg = formatMessage('Are you sure you want to cancel? Changes you made may not be saved.')
-    // eslint-disable-next-line no-alert
+
     if (window.confirm(msg)) {
       this.close()
     }
@@ -308,7 +309,7 @@ export default class ExternalToolDialog extends React.Component<
             id="external_tool_button_frame"
             style={{
               height: this.calcIFrameHeight(),
-              width: state.button?.use_tray ? '100%' : state.button?.width ?? 800,
+              width: state.button?.use_tray ? '100%' : (state.button?.width ?? 800),
               border: '0',
               display: 'block',
               visibility: state.iframeLoaded ? 'visible' : 'hidden',

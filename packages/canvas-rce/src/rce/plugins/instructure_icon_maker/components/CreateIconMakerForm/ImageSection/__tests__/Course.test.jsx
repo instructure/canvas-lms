@@ -208,7 +208,7 @@ describe('Course()', () => {
         expect(props.dispatch).toHaveBeenCalledWith({
           ...actions.SET_IMAGE_COLLECTION_OPEN,
           payload: false,
-        })
+        }),
       )
     })
 
@@ -348,7 +348,7 @@ describe('Course()', () => {
         expect(props.dispatch).toHaveBeenCalledWith({
           ...actions.SET_IMAGE_COLLECTION_OPEN,
           payload: false,
-        })
+        }),
       )
     })
   })

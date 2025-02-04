@@ -33,7 +33,7 @@ describe('performTextEditActionsOnString', () => {
         selStart: 0,
         selEnd: 0,
         actions: [{action: 'insert', text: 'foo'}],
-      })
+      }),
     ).toEqual({
       text: 'foo',
       selStart: 3,
@@ -48,7 +48,7 @@ describe('performTextEditActionsOnString', () => {
         selStart: 4,
         selEnd: 4,
         actions: [{action: 'insert', text: ' other '}],
-      })
+      }),
     ).toEqual({
       text: 'some other thing',
       selStart: 11,
@@ -63,7 +63,7 @@ describe('performTextEditActionsOnString', () => {
         selStart: 4,
         selEnd: 7,
         actions: [{action: 'insert', text: 'foobar'}],
-      })
+      }),
     ).toEqual({
       text: 'one foobar three',
       selStart: 10,
@@ -78,7 +78,7 @@ describe('performTextEditActionsOnString', () => {
         selStart: 4,
         selEnd: 7,
         actions: [{action: 'wrapSelection', before: '<<', after: '>>'}],
-      })
+      }),
     ).toEqual({
       text: 'one <<two>> three',
       selStart: 6,
@@ -111,7 +111,7 @@ describe('performTextEditActionOnTextarea', () => {
     expect(textFieldEdit.wrapSelection as jest.Mock).toHaveBeenCalledWith(
       textarea,
       'before',
-      'after'
+      'after',
     )
 
     performTextEditActionOnTextarea(textarea, {
