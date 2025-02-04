@@ -20,6 +20,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ConfigurationForm from '../ConfigurationForm'
+import $ from 'jquery'
 
 describe('ConfigurationForm', () => {
   const renderConfigurationForm = (props = {}) => {
@@ -32,8 +33,21 @@ describe('ConfigurationForm', () => {
     return render(<ConfigurationForm {...defaultProps} {...props} />)
   }
 
+  beforeEach(() => {
+    // Mock jQuery's ajax method to prevent actual network requests
+    $.ajax = jest.fn().mockImplementation(() => ({
+      done: jest.fn().mockReturnThis(),
+      fail: jest.fn().mockReturnThis(),
+      always: jest.fn().mockReturnThis(),
+    }))
+
+    // Mock jQuery's animate method since we use it for scrolling
+    $.fn.animate = jest.fn()
+  })
+
   afterEach(() => {
     document.body.innerHTML = ''
+    jest.clearAllMocks()
   })
 
   describe('form type rendering', () => {
@@ -100,59 +114,61 @@ describe('ConfigurationForm', () => {
         customFields: 'a=1\nb=2\nc=3',
       }
 
-      renderConfigurationForm({
+      const {getByLabelText, getByRole} = renderConfigurationForm({
         configurationType: 'manual',
         handleSubmit,
         tool,
       })
 
       // Fill in form fields
-      const nameInput = screen.getByLabelText('Name *')
+      const nameInput = getByLabelText('Name *')
       await userEvent.clear(nameInput)
       await userEvent.type(nameInput, tool.name)
 
-      const consumerKeyInput = screen.getByLabelText('Consumer Key')
+      const consumerKeyInput = getByLabelText('Consumer Key')
       await userEvent.clear(consumerKeyInput)
       await userEvent.type(consumerKeyInput, tool.consumerKey)
 
-      const sharedSecretInput = screen.getByLabelText('Shared Secret')
+      const sharedSecretInput = getByLabelText('Shared Secret')
       await userEvent.clear(sharedSecretInput)
       await userEvent.type(sharedSecretInput, tool.sharedSecret)
 
-      const urlInput = screen.getByLabelText('Launch URL *')
+      const urlInput = getByLabelText('Launch URL *')
       await userEvent.clear(urlInput)
       await userEvent.type(urlInput, tool.url)
 
-      const domainInput = screen.getByLabelText('Domain')
+      const domainInput = getByLabelText('Domain')
       await userEvent.clear(domainInput)
       await userEvent.type(domainInput, tool.domain)
 
-      const descriptionInput = screen.getByLabelText('Description')
+      const descriptionInput = getByLabelText('Description')
       await userEvent.clear(descriptionInput)
       await userEvent.type(descriptionInput, tool.description)
 
-      const customFieldsInput = screen.getByLabelText('Custom Fields')
+      const customFieldsInput = getByLabelText('Custom Fields')
       await userEvent.clear(customFieldsInput)
       await userEvent.type(customFieldsInput, tool.customFields)
 
-      const submitButton = screen.getByRole('button', {name: /submit/i})
+      const submitButton = getByRole('button', {name: /submit/i})
       await userEvent.click(submitButton)
 
-      expect(handleSubmit).toHaveBeenCalledWith(
-        'manual',
-        {
-          name: 'My App',
-          consumerKey: 'key',
-          sharedSecret: 'secret',
-          url: 'http://example.com',
-          domain: '',
-          description: 'My super awesome example app',
-          customFields: 'a=1\nb=2\nc=3',
-          privacyLevel: 'anonymous',
-          verifyUniqueness: 'true',
-        },
-        expect.any(Object),
-      )
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith(
+          'manual',
+          {
+            name: 'My App',
+            consumerKey: 'key',
+            sharedSecret: 'secret',
+            url: 'http://example.com',
+            domain: '',
+            description: 'My super awesome example app',
+            customFields: 'a=1\nb=2\nc=3',
+            privacyLevel: 'anonymous',
+            verifyUniqueness: 'true',
+          },
+          expect.any(Object),
+        )
+      })
     })
 
     it('saves url form with trimmed props', async () => {
@@ -164,43 +180,45 @@ describe('ConfigurationForm', () => {
         configUrl: '  http://example.com',
       }
 
-      renderConfigurationForm({
+      const {getByLabelText, getByRole} = renderConfigurationForm({
         configurationType: 'url',
         handleSubmit,
         tool,
       })
 
       // Fill in form fields
-      const nameInput = screen.getByLabelText('Name *')
+      const nameInput = getByLabelText('Name *')
       await userEvent.clear(nameInput)
       await userEvent.type(nameInput, tool.name)
 
-      const consumerKeyInput = screen.getByLabelText('Consumer Key')
+      const consumerKeyInput = getByLabelText('Consumer Key')
       await userEvent.clear(consumerKeyInput)
       await userEvent.type(consumerKeyInput, tool.consumerKey)
 
-      const sharedSecretInput = screen.getByLabelText('Shared Secret')
+      const sharedSecretInput = getByLabelText('Shared Secret')
       await userEvent.clear(sharedSecretInput)
       await userEvent.type(sharedSecretInput, tool.sharedSecret)
 
-      const configUrlInput = screen.getByLabelText('Config URL *')
+      const configUrlInput = getByLabelText('Config URL *')
       await userEvent.clear(configUrlInput)
       await userEvent.type(configUrlInput, tool.configUrl)
 
-      const submitButton = screen.getByRole('button', {name: /submit/i})
+      const submitButton = getByRole('button', {name: /submit/i})
       await userEvent.click(submitButton)
 
-      expect(handleSubmit).toHaveBeenCalledWith(
-        'url',
-        {
-          name: 'My App',
-          consumerKey: 'key',
-          sharedSecret: 'secret',
-          configUrl: 'http://example.com',
-          verifyUniqueness: 'true',
-        },
-        expect.any(Object),
-      )
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith(
+          'url',
+          {
+            name: 'My App',
+            consumerKey: 'key',
+            sharedSecret: 'secret',
+            configUrl: 'http://example.com',
+            verifyUniqueness: 'true',
+          },
+          expect.any(Object),
+        )
+      })
     })
 
     it('saves xml form with trimmed props', async () => {
@@ -212,43 +230,45 @@ describe('ConfigurationForm', () => {
         xml: '  some xml',
       }
 
-      renderConfigurationForm({
+      const {getByLabelText, getByRole} = renderConfigurationForm({
         configurationType: 'xml',
         handleSubmit,
         tool,
       })
 
       // Fill in form fields
-      const nameInput = screen.getByLabelText('Name *')
+      const nameInput = getByLabelText('Name *')
       await userEvent.clear(nameInput)
       await userEvent.type(nameInput, tool.name)
 
-      const consumerKeyInput = screen.getByLabelText('Consumer Key')
+      const consumerKeyInput = getByLabelText('Consumer Key')
       await userEvent.clear(consumerKeyInput)
       await userEvent.type(consumerKeyInput, tool.consumerKey)
 
-      const sharedSecretInput = screen.getByLabelText('Shared Secret')
+      const sharedSecretInput = getByLabelText('Shared Secret')
       await userEvent.clear(sharedSecretInput)
       await userEvent.type(sharedSecretInput, tool.sharedSecret)
 
-      const xmlInput = screen.getByLabelText('XML Configuration')
+      const xmlInput = getByLabelText('XML Configuration')
       await userEvent.clear(xmlInput)
       await userEvent.type(xmlInput, tool.xml)
 
-      const submitButton = screen.getByRole('button', {name: /submit/i})
+      const submitButton = getByRole('button', {name: /submit/i})
       await userEvent.click(submitButton)
 
-      expect(handleSubmit).toHaveBeenCalledWith(
-        'xml',
-        {
-          name: 'My App',
-          consumerKey: 'key',
-          sharedSecret: 'secret',
-          xml: 'some xml',
-          verifyUniqueness: 'true',
-        },
-        expect.any(Object),
-      )
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith(
+          'xml',
+          {
+            name: 'My App',
+            consumerKey: 'key',
+            sharedSecret: 'secret',
+            xml: 'some xml',
+            verifyUniqueness: 'true',
+          },
+          expect.any(Object),
+        )
+      })
     })
 
     it('saves lti2 form with trimmed props', async () => {
@@ -257,27 +277,29 @@ describe('ConfigurationForm', () => {
         registrationUrl: '  https://lti-tool-provider-example..com/register',
       }
 
-      renderConfigurationForm({
+      const {getByLabelText, getByRole} = renderConfigurationForm({
         configurationType: 'lti2',
         handleSubmit,
         tool,
       })
 
       // Fill in form fields
-      const registrationUrlInput = screen.getByLabelText('Registration URL *')
+      const registrationUrlInput = getByLabelText('Registration URL *')
       await userEvent.clear(registrationUrlInput)
       await userEvent.type(registrationUrlInput, tool.registrationUrl)
 
-      const submitButton = screen.getByRole('button', {name: /launch registration tool/i})
+      const submitButton = getByRole('button', {name: /launch registration tool/i})
       await userEvent.click(submitButton)
 
-      expect(handleSubmit).toHaveBeenCalledWith(
-        'lti2',
-        {
-          registrationUrl: 'https://lti-tool-provider-example..com/register',
-        },
-        expect.any(Object),
-      )
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith(
+          'lti2',
+          {
+            registrationUrl: 'https://lti-tool-provider-example..com/register',
+          },
+          expect.any(Object),
+        )
+      })
     })
   })
 
