@@ -80,6 +80,8 @@ ready(() => {
     return
   }
 
+  speedGrader.setupForSG2()
+
   const mountPoint = document.querySelector('#react-router-portals')
 
   // The feature must be enabled AND we must be handed the speedgrader platform URL

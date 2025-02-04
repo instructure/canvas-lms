@@ -1155,6 +1155,10 @@ function refreshGrades(
   retry?: (submission: Submission, originalSubmission: Submission, numRequests: number) => boolean,
   retryDelay?: number,
 ) {
+  if (!EG.currentStudent) {
+    // tell SG2 to refetch the submission
+    return window.postMessage({subject: 'canvas.refetchSubmission'}, '*')
+  }
   const courseId = ENV.course_id
   const originalSubmission = {...EG.currentStudent.submission}
   const assignmentId = originalSubmission.assignment_id
@@ -4621,6 +4625,10 @@ export default {
     $(document).ready(() => {
       EG.domReady()
     })
+  },
+
+  setupForSG2() {
+    snapshotCache = {}
   },
 
   teardown() {
