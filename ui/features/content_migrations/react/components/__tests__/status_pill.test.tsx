@@ -52,17 +52,17 @@ describe('StatusPill', () => {
   describe('when the workflowState is completed', () => {
     const workflowState = 'completed'
 
-    it('renders the Completed text', () => {
-      render(<StatusPill workflowState={workflowState} hasIssues={false} />)
-      expect(screen.getByText('Completed')).toBeInTheDocument()
-    })
-
     describe('when there was no issue', () => {
       const hasIssues = false
 
       it('renders with the success color', () => {
         const color = getColor({workflowState, hasIssues})
         expect(color).toEqual('success')
+      })
+
+      it('renders the Completed text', () => {
+        render(<StatusPill workflowState={workflowState} hasIssues={hasIssues} />)
+        expect(screen.getByText('Completed')).toBeInTheDocument()
       })
     })
 
@@ -72,6 +72,11 @@ describe('StatusPill', () => {
       it('renders with the warning color', () => {
         const color = getColor({workflowState, hasIssues})
         expect(color).toEqual('warning')
+      })
+
+      it('renders the Partially Completed text', () => {
+        render(<StatusPill workflowState={workflowState} hasIssues={hasIssues} />)
+        expect(screen.getByText('Partially Completed')).toBeInTheDocument()
       })
     })
   })
