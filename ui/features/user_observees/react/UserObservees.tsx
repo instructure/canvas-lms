@@ -76,7 +76,7 @@ function UserObservees({userId}: UserObserveesProps) {
     queryKey: ['user_observees', userId],
     queryFn: async () => {
       const {json} = await doFetchApi<Array<Observee>>({
-        path: `/api/v1/users/${userId}/observees`,
+        path: `/api/v1/users/${userId}/observees?per_page=100`,
         method: 'GET',
       })
 
