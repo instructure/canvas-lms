@@ -45,7 +45,7 @@ describe('placeholderInfoFor', () => {
           preview: squareImageDataUri,
         },
         contentType: 'image/png',
-      })
+      }),
     ).toEqual({
       type: 'block',
       ariaLabel: 'Loading placeholder for square.png',
@@ -69,7 +69,7 @@ describe('placeholderInfoFor', () => {
         name: 'square.png',
         domObject: blob,
         contentType: 'image/png',
-      })
+      }),
     ).toEqual({
       type: 'block',
       ariaLabel: 'Loading placeholder for square.png',
@@ -93,7 +93,7 @@ describe('placeholderInfoFor', () => {
         name: 'square.png',
         domObject: file,
         contentType: 'image/png',
-      })
+      }),
     ).toEqual({
       type: 'block',
       ariaLabel: 'Loading placeholder for square.png',
@@ -116,7 +116,7 @@ describe('placeholderInfoFor', () => {
         },
         contentType: 'image/png',
         displayAs: 'link',
-      })
+      }),
     ).toEqual({
       type: 'inline',
       ariaLabel: 'Loading placeholder for square.png',
@@ -132,7 +132,7 @@ describe('placeholderInfoFor', () => {
         name: 'video.mp4',
         domObject: {},
         contentType: 'video/mp4',
-      })
+      }),
     ).toEqual({
       type: 'block',
       ariaLabel: 'Loading placeholder for video.mp4',
@@ -151,7 +151,7 @@ describe('placeholderInfoFor', () => {
         name: 'audio.mp3',
         domObject: {},
         contentType: 'audio/mpeg',
-      })
+      }),
     ).toEqual({
       type: 'block',
       visibleLabel: 'audio.mp3',
@@ -170,7 +170,7 @@ describe('placeholderInfoFor', () => {
         name: 'file.txt',
         domObject: {},
         contentType: 'text/plain',
-      })
+      }),
     ).toEqual({
       type: 'inline',
       visibleLabel: 'file.txt',
@@ -187,7 +187,7 @@ describe('placeholderInfoFor', () => {
         domObject: {},
         contentType: 'text/plain',
         title: 'actual-file-name.txt',
-      })
+      }),
     ).toEqual({
       type: 'inline',
       visibleLabel: 'actual-file-name.txt',
@@ -210,11 +210,11 @@ describe('insertPlaceholder', () => {
         type: 'inline',
         visibleLabel: 'test-file.txt',
         ariaLabel: 'Loading placeholder for test-file.txt',
-      })
+      }),
     )
 
     const placeholderElem = editor.dom.doc.querySelector(
-      '*[data-placeholder-for=test-file\\.txt]'
+      '*[data-placeholder-for=test-file\\.txt]',
     ) as HTMLElement
 
     expect(jsdomInnerText(placeholderElem)).toContain('test-file.txt')
@@ -233,11 +233,11 @@ describe('insertPlaceholder', () => {
         width: '123px',
         height: '456px',
         vAlign: 'middle',
-      })
+      }),
     )
 
     const placeholderElem = editor.dom.doc.querySelector(
-      '*[data-placeholder-for=test-file\\.png]'
+      '*[data-placeholder-for=test-file\\.png]',
     ) as HTMLElement
 
     expect(jsdomInnerText(placeholderElem)).toContain('test-file.png')

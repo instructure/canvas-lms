@@ -78,7 +78,7 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
 
       it('includes the url of the link', () => {
         expect(getContentFromElement($element, editor).url).toEqual(
-          'http://example.instructure.com/files/3201/download?download_frd=1'
+          'http://example.instructure.com/files/3201/download?download_frd=1',
         )
       })
 
@@ -206,7 +206,7 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       describe('.altText', () => {
         it('is the alt text of the image when present', () => {
           expect(getContentFromElement($element, editor).altText).toEqual(
-            'The ineffable Bill Murray'
+            'The ineffable Bill Murray',
           )
         })
 
@@ -242,7 +242,7 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
 
       it('sets the url to the src of the image', () => {
         expect(getContentFromElement($element, editor).url).toEqual(
-          'https://www.fillmurray.com/200/200'
+          'https://www.fillmurray.com/200/200',
         )
       })
     })
@@ -421,7 +421,7 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       const $selectedNode = document.createElement('span')
       $selectedNode.setAttribute(
         'data-mce-p-src',
-        'http://example.instructure.com/media_attachments_iframe/12345678'
+        'http://example.instructure.com/media_attachments_iframe/12345678',
       )
       $selectedNode.setAttribute('data-mce-p-data-media-type', 'video')
       $selectedNode.innerHTML = '<iframe/>'
@@ -436,7 +436,7 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       const $selectedNode = document.createElement('span')
       $selectedNode.setAttribute(
         'data-mce-p-src',
-        'http://example.instructure.com/media_attachments_iframe/12345678'
+        'http://example.instructure.com/media_attachments_iframe/12345678',
       )
       $selectedNode.setAttribute('data-mce-p-data-media-type', 'audio')
       $selectedNode.innerHTML = '<iframe/>'

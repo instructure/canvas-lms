@@ -28,7 +28,7 @@ export default function wrapInitCb(
       id: string
       contentWindow: Window
     }) => void
-  }
+  },
 ) {
   // mirror attributes onto tinymce editor (if this can be done
   // via tiny api, it is preferable, but I dont see a way)

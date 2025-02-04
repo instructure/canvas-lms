@@ -20,7 +20,7 @@ import {addQueryParamsToUrl} from '../../../../util/url-util'
 
 export function addParentFrameContextToUrl(
   inputUrlStr: string | null | undefined,
-  containingCanvasLtiToolId: string | null | undefined
+  containingCanvasLtiToolId: string | null | undefined,
 ): string | null {
   if (containingCanvasLtiToolId == null || containingCanvasLtiToolId.length === 0) {
     return inputUrlStr ?? null

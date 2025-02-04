@@ -21,6 +21,7 @@ import {openToolDialogFor} from './dialog-helper'
 import {simpleCache} from '../../../util/simpleCache'
 import {instUiIconsArray} from '../../../util/instui-icon-helper'
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import {IconLtiSolid} from '@instructure/ui-icons/es/svg'
 
@@ -32,9 +33,9 @@ export interface ExternalToolMenuItem {
 }
 
 interface ExternalToolData {
-  id: string;
-  on_by_default?: boolean | null;
-  favorite?: boolean | null;
+  id: string
+  on_by_default?: boolean | null
+  favorite?: boolean | null
 }
 
 export function externalToolsForToolbar<T extends ExternalToolData>(tools: T[]): T[] {
@@ -52,9 +53,9 @@ export function externalToolsForToolbar<T extends ExternalToolData>(tools: T[]):
 
   return Array.from(set.values()).sort((a, b) => {
     if (a.on_by_default && !b.on_by_default) {
-      return -1;
+      return -1
     } else if (!a.on_by_default && b.on_by_default) {
-      return 1;
+      return 1
     } else {
       // This *should* always be a string, but there might be cases where it isn't,
       // especially when this method is used outside of TypeScript files.
@@ -70,7 +71,7 @@ export class RceToolWrapper {
   static forEditorEnv(
     env: ExternalToolsEnv,
     toolConfigs = env.availableRceLtiTools,
-    mruIds = loadMruToolIds()
+    mruIds = loadMruToolIds(),
   ): RceToolWrapper[] {
     return toolConfigs.map(it => new RceToolWrapper(env, it, mruIds))
   }
@@ -86,7 +87,7 @@ export class RceToolWrapper {
   constructor(
     public readonly env: ExternalToolsEnv,
     private readonly toolInfo: RceLtiToolInfo,
-    mruToolIds: string[]
+    mruToolIds: string[],
   ) {
     this.iconId = registerToolIcon(env, toolInfo)
     this.isMruTool = mruToolIds.includes(String(toolInfo.id))
@@ -199,7 +200,7 @@ function registerToolIcon(env: ExternalToolsEnv, toolInfo: RceLtiToolInfo): stri
   } else if (iconGlyphName != null && iconGlyphName.length > 0) {
     // InstUI icon used
     const instUiIcon = instUiIconsArray.find(
-      it => it.variant === 'Line' && it.glyphName === iconGlyphName
+      it => it.variant === 'Line' && it.glyphName === iconGlyphName,
     )
 
     if (instUiIcon != null) {
@@ -239,7 +240,6 @@ export function loadMruToolIds(): string[] {
   try {
     list = JSON.parse(window.localStorage?.getItem('ltimru') ?? '[]')
   } catch (ex) {
-    // eslint-disable-next-line no-console
     console.warn('Found bad LTI MRU data', (ex as Error).message)
   }
 
@@ -253,7 +253,6 @@ export function storeMruToolIds(toolIds: string[]): void {
   try {
     window.localStorage?.setItem('ltimru', JSON.stringify(toolIds))
   } catch (ex) {
-    // eslint-disable-next-line no-console
     console.warn('Cannot save LTI MRU list', (ex as Error).message)
   }
 }
@@ -272,7 +271,7 @@ export function addMruToolId(toolId: string, env: ExternalToolsEnv): string[] {
 
 export function buildToolMenuItems(
   availableTools: RceToolWrapper[],
-  viewAllItem: ExternalToolMenuItem
+  viewAllItem: ExternalToolMenuItem,
 ): ExternalToolMenuItem[] {
   return [
     ...availableTools

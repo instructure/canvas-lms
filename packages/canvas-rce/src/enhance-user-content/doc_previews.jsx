@@ -221,7 +221,7 @@ export function loadDocPreview($container, options) {
         }
       }
       showLoadingImage($container, 'centered')
-       
+
       fetch(url)
         .then(response => {
           if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`)
@@ -235,7 +235,6 @@ export function loadDocPreview($container, options) {
           }
         })
         .catch(ex => {
-           
           console.error(ex)
         })
         .finally(() => {
@@ -265,7 +264,7 @@ export function sanitizeUrl(url) {
   const defaultUrl = 'about:blank'
   try {
     const parsedUrl = new URL(url, window.location.origin)
-     
+
     if (parsedUrl.protocol === 'javascript:') {
       return defaultUrl
     }

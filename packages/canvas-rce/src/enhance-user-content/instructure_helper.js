@@ -140,7 +140,7 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
       method: 'GET',
       headers: {Accept: 'application/json'},
       credentials: 'include',
-    }
+    },
   )
     .then(response => {
       if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`)
@@ -196,7 +196,7 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
         message: formatMessage('Failed getting file contents'),
         type: 'error',
       })
-      // eslint-disable-next-line no-console
+       
       console.error(ex)
       resetInlinePreview($link)
 

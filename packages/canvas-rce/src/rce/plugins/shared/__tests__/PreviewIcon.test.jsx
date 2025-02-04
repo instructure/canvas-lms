@@ -105,7 +105,7 @@ describe('PreviewIcon()', () => {
       const {getByTestId} = subject(props)
 
       expect(getByTestId('preview-icon')).toHaveStyle(
-        'background: linear-gradient(135deg, rgb(255, 255, 255) 50%, rgb(255, 0, 0) 50%, rgb(255, 0, 0) 53%, rgb(255, 255, 255) 53%)'
+        'background: linear-gradient(135deg, rgb(255, 255, 255) 50%, rgb(255, 0, 0) 50%, rgb(255, 0, 0) 53%, rgb(255, 255, 255) 53%)',
       )
     })
   })

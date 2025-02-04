@@ -50,7 +50,7 @@ describe('UploadFile', () => {
         trayProps={trayProps}
         onDismiss={handleDismiss}
         panels={['COMPUTER', 'URL']}
-      />
+      />,
     )
 
     const closeBtn = getAllByText('Close')[0]
@@ -69,7 +69,7 @@ describe('UploadFile', () => {
         onDismiss={handleDismiss}
         onSubmit={handleSubmit}
         panels={['COMPUTER', 'URL']}
-      />
+      />,
     )
     // We need to make sure that a file is present, or the submit button will be disabled.
     const fakeFile = new File(['(⌐□_□)'], 'somename.png', {
@@ -98,7 +98,7 @@ describe('UploadFile', () => {
           trayProps={trayProps}
           onDismiss={() => {}}
           panels={['COMPUTER', 'URL']}
-        />
+        />,
       )
 
       expect(getByLabelText('Computer')).toBeInTheDocument()
@@ -113,7 +113,7 @@ describe('UploadFile', () => {
           trayProps={trayProps}
           onDismiss={() => {}}
           panels={['COMPUTER']}
-        />
+        />,
       )
 
       expect(getByLabelText('Computer')).toBeInTheDocument()
@@ -131,7 +131,7 @@ describe('UploadFile', () => {
           onDismiss={() => {}}
           onSubmit={() => {}}
           panels={['COMPUTER', 'URL']}
-        />
+        />,
       )
 
       const urlTab = getByText('URL')
@@ -149,7 +149,7 @@ describe('UploadFile', () => {
           onDismiss={() => {}}
           onSubmit={() => {}}
           panels={['COMPUTER', 'URL']}
-        />
+        />,
       )
 
       const computerTab = getByText('Computer')
@@ -167,7 +167,7 @@ describe('UploadFile', () => {
           onDismiss={() => {}}
           onSubmit={() => {}}
           panels={['COMPUTER', 'URL']}
-        />
+        />,
       )
 
       const urlTab = getByText('URL')
@@ -177,7 +177,7 @@ describe('UploadFile', () => {
       const computerTab = getByText('Computer')
       await userEvent.click(computerTab)
       const fileDrop = await waitFor(() =>
-        getByText('Drag and drop, or click to browse your computer')
+        getByText('Drag and drop, or click to browse your computer'),
       )
       expect(fileDrop).toBeVisible()
     })
@@ -236,7 +236,7 @@ describe('UploadFile', () => {
           'images/*',
           'COMPUTER',
           {theFile: fakeFile},
-          {startMediaUpload: fakeMediaUpload}
+          {startMediaUpload: fakeMediaUpload},
         )
         expect(fakeMediaUpload).toHaveBeenCalledWith('images', {
           parentFolderId: 'media',
@@ -259,7 +259,7 @@ describe('UploadFile', () => {
           'video/*',
           'COMPUTER',
           {theFile: fakeFile},
-          {startMediaUpload: fakeMediaUpload}
+          {startMediaUpload: fakeMediaUpload},
         )
         expect(fakeMediaUpload).toHaveBeenCalledWith('media', {
           parentFolderId: 'media',
@@ -284,7 +284,7 @@ describe('UploadFile', () => {
             theFile: fakeFile,
             imageOptions: {altText: '(╯°□°）╯︵ ┻━┻', displayAs: 'embed', isDecorativeImage: true},
           },
-          {startMediaUpload: fakeMediaUpload}
+          {startMediaUpload: fakeMediaUpload},
         )
         expect(fakeMediaUpload).toHaveBeenCalledWith('images', {
           altText: '(╯°□°）╯︵ ┻━┻',
@@ -311,7 +311,7 @@ describe('UploadFile', () => {
           'audio/*',
           'COMPUTER',
           {theFile: fakeFile},
-          {startMediaUpload: fakeMediaUpload}
+          {startMediaUpload: fakeMediaUpload},
         )
         expect(fakeMediaUpload).toHaveBeenCalledWith('media', {
           parentFolderId: 'media',
@@ -334,7 +334,7 @@ describe('UploadFile', () => {
           'video/*',
           'COMPUTER',
           {theFile: fakeFile},
-          {startMediaUpload: fakeMediaUpload}
+          {startMediaUpload: fakeMediaUpload},
         )
         expect(fakeMediaUpload).toHaveBeenCalledWith('documents', {
           parentFolderId: 'media',
@@ -360,7 +360,7 @@ describe('UploadFile', () => {
           onDismiss={() => {}}
           onSubmit={fakeOnSubmit}
           panels={['COMPUTER', 'URL']}
-        />
+        />,
       )
     })
 

@@ -31,7 +31,7 @@ export const handleUpload = (error, uploadData, onUploadComplete, uploadBookmark
   if (error?.name === 'FileSizeError') {
     err_msg = formatMessage(
       'Size of caption file is greater than the maximum {max} kb allowed file size.',
-      {max: error.maxBytes / 1000}
+      {max: error.maxBytes / 1000},
     )
   }
 
@@ -106,7 +106,7 @@ export default function (ed, document) {
           />
         )}
       </StoreProvider>,
-      container
+      container,
     )
   })
 }

@@ -120,7 +120,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
           subject: 'preview_file',
           file_id: '2',
         },
-        canvasOrigin
+        canvasOrigin,
       )
     })
 
@@ -135,7 +135,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
           file_id: '2',
           verifier: 'xyzzy',
         },
-        canvasOrigin
+        canvasOrigin,
       )
     })
 
@@ -151,7 +151,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
           access_token: 'xyzzy',
           instfs_id: 'stuff',
         },
-        canvasOrigin
+        canvasOrigin,
       )
     })
 
@@ -181,7 +181,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
           subject: 'preview_file',
           file_id: '17~76640',
         },
-        canvasOrigin
+        canvasOrigin,
       )
     })
   })

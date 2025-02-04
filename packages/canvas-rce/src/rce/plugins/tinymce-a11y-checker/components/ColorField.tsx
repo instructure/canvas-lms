@@ -37,7 +37,7 @@ export default class ColorField extends React.Component<Props> {
   }
 
   handleTextChange = (
-    event: React.ChangeEvent<HTMLInputElement> & {target: {name: string; value: string}}
+    event: React.ChangeEvent<HTMLInputElement> & {target: {name: string; value: string}},
   ) => {
     const rgba = parseRGBA(event.target.value.trim())
     const newValue = rgba ? stringifyRGBA(restrictColorValues(rgba)) : this.props.value

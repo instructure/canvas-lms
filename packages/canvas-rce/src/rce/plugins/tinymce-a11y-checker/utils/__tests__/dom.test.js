@@ -162,7 +162,7 @@ describe('splitStyleAttribute', () => {
 describe('createStyleString', () => {
   test('creates a style string given a style object', () => {
     expect(dom.createStyleString({'background-color': '#000000', color: '#ffffff'})).toBe(
-      'background-color:#000000;color:#ffffff;'
+      'background-color:#000000;color:#ffffff;',
     )
   })
 

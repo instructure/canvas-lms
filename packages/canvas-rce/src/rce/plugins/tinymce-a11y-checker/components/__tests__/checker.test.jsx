@@ -63,7 +63,7 @@ describe('checker', () => {
     child2 = node.appendChild(document.createElement('div'))
     const instanceRef = React.createRef()
     renderResult = render(
-      <Checker ref={instanceRef} getBody={() => node} editor={fakeEditor} onFixError={jest.fn()} />
+      <Checker ref={instanceRef} getBody={() => node} editor={fakeEditor} onFixError={jest.fn()} />,
     )
     instance = instanceRef.current
   })
@@ -81,12 +81,12 @@ describe('checker', () => {
       child.setAttribute('data-ignore-a11y-check', '')
       node.removeChild(child2)
       await promisify(instance.check.bind(instance))()
-      expect(instance.state.errors.length).toBe(0)
+      expect(instance.state.errors).toHaveLength(0)
     })
 
     test('checks nodes without data-ignore-a11y-check', async () => {
       await promisify(instance.check.bind(instance))()
-      expect(instance.state.errors.length).toBe(2)
+      expect(instance.state.errors).toHaveLength(2)
     })
 
     test('passes config to rule test functions', async () => {
@@ -117,11 +117,11 @@ describe('checker', () => {
           getBody={() => node}
           additionalRules={[asyncTestRule]}
           editor={fakeEditor}
-        />
+        />,
       )
       instance = instanceRef.current
       await promisify(instanceRef.current.check.bind(instance))()
-      expect(instance.state.errors.length).toBe(4)
+      expect(instance.state.errors).toHaveLength(4)
     })
 
     test('calls beforeCheck when provided it as a config option', async () => {
@@ -175,7 +175,7 @@ describe('checker', () => {
           ref={instanceRef}
           getBody={() => node}
           editor={{...fakeEditor, someObject: true}}
-        />
+        />,
       )
       instance = instanceRef.current
       const beforeCallback = jest.fn()

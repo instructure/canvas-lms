@@ -34,7 +34,7 @@ export function makeExternalLinkIcon(forLink) {
   $icon.innerHTML = IconExternalLinkSVG
   $icon.firstChild.setAttribute(
     'style',
-    'width:1em; height:1em; vertical-align:middle; fill:currentColor'
+    'width:1em; height:1em; vertical-align:middle; fill:currentColor',
   )
 
   const srspan = document.createElement('span')

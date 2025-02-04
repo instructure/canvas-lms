@@ -146,7 +146,7 @@ AudioOptionsTray.propTypes = {
     tracks: arrayOf(
       shape({
         locale: string.isRequired,
-      })
+      }),
     ),
   }).isRequired,
 }
@@ -156,5 +156,5 @@ AudioOptionsTray.defaultProps = {
   onExited: null,
   onDismiss: null,
   onSave: null,
-  requestSubtitlesFromIframe: () => {}
+  requestSubtitlesFromIframe: () => {},
 }

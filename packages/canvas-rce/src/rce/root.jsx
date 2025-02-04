@@ -56,7 +56,6 @@ export function renderIntoDiv(target, props, renderCallback) {
       )
     })
     .catch(err => {
-       
       console.error('Failed loading RCE', err)
     })
 }

@@ -36,7 +36,7 @@ export const shouldIgnoreClose = (target: HTMLElement, editorId?: string): boole
 const elementTreeHasAttribute = (
   target: HTMLElement | null,
   attribute: string,
-  value: string
+  value: string,
 ): boolean => {
   while (target) {
     // @ts-expect-error

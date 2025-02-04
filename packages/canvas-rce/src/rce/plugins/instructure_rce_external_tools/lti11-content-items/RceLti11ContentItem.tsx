@@ -45,14 +45,14 @@ export class RceLti11ContentItem {
 
   static fromJSON(
     contentItem: RceLti11ContentItemJson,
-    env: ExternalToolsEnv = externalToolsEnvFor(tinymce.activeEditor)
+    env: ExternalToolsEnv = externalToolsEnvFor(tinymce.activeEditor),
   ): RceLti11ContentItem {
     return new RceLti11ContentItem(contentItem, env)
   }
 
   constructor(
     contentItem: RceLti11ContentItemJson,
-    env: ExternalToolsEnv = externalToolsEnvFor(tinymce.activeEditor)
+    env: ExternalToolsEnv = externalToolsEnvFor(tinymce.activeEditor),
   ) {
     this.contentItem = contentItem
     this.env = env
@@ -85,7 +85,7 @@ export class RceLti11ContentItem {
   get url() {
     return (this.isLTI ? this.contentItem.canvasURL : this.contentItem.url)?.replace(
       /^(data:text\/html|javascript:)/,
-      '#$1'
+      '#$1',
     )
   }
 
@@ -159,7 +159,7 @@ export class RceLti11ContentItem {
 
     if (isStudioContentItemCustomJson(this.contentItem.custom)) {
       const studioAttributes: StudioMediaOptionsAttributes = studioAttributesFrom(
-        this.contentItem.custom
+        this.contentItem.custom,
       )
       const ds = displayStyleFrom(studioAttributes)
       if (ds) iframe.style.display = ds

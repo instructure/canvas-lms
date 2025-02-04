@@ -115,7 +115,7 @@ tinymce.PluginManager.add('instructure_image', function (editor) {
           text: item.text,
           value: item.value,
           onAction: () => doMenuItem(editor, item.value),
-        }))
+        })),
       ),
     onSetup(api) {
       // @ts-expect-error

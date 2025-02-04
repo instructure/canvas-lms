@@ -77,8 +77,8 @@ function registerFavoriteAppsToolbarButtons(editor: ExternalToolsEditor) {
   externalToolsForToolbar(allTools).forEach(toolInfo =>
     editor.ui.registry.addButton(
       `instructure_external_button_${toolInfo.id}`,
-      toolInfo.asToolbarButton()
-    )
+      toolInfo.asToolbarButton(),
+    ),
   )
 }
 
@@ -113,7 +113,7 @@ function openToolSelectionDialog(editor: ExternalToolsEditor) {
 
   ReactDOM.render(
     <ExternalToolSelectionDialog onDismiss={handleDismiss} ltiButtons={availableTools} />,
-    ensureToolDialogContainerElem()
+    ensureToolDialogContainerElem(),
   )
 }
 

@@ -128,7 +128,7 @@ export default class EquationEditorModal extends Component {
     {
       leading: false,
       trailing: true,
-    }
+    },
   )
 
   setPreviewElementContent() {
@@ -235,11 +235,11 @@ export default class EquationEditorModal extends Component {
     this.mathField?.setOptions({macros: {}})
   }
 
-  setMathField(formula){
+  setMathField(formula) {
     this.mathField.setValue(formula)
   }
 
-  getMathFiled(){
+  getMathFiled() {
     return this.mathField.getValue()
   }
 

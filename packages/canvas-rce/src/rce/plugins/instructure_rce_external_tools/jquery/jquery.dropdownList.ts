@@ -44,13 +44,12 @@ declare global {
       options:
         | 'hide'
         | 'remove'
-        | (Partial<DropdownListOptions> & {options?: Record<string, Function | undefined>})
+        | (Partial<DropdownListOptions> & {options?: Record<string, Function | undefined>}),
     ) => this) & {
       defaults: DropdownListOptions
     }
   }
 }
-
 ;(function (global: typeof globalThis) {
   // @ts-expect-error
   const $ = global.jQuery || global.$
@@ -77,7 +76,7 @@ declare global {
         let $list = $div.children('div.list')
         if (!$list.length) {
           $div = $(
-            "<div id='instructure_dropdown_list'><div class='list ui-widget-content'></div></div>"
+            "<div id='instructure_dropdown_list'><div class='list ui-widget-content'></div></div>",
           ).appendTo('body')
           $(document)
             .mousedown((event: MouseEvent | TouchEvent) => {
@@ -167,7 +166,7 @@ declare global {
               "  <span tabindex='-1'>" +
               optionHtml.toString() +
               '</span>' +
-              '</div>'
+              '</div>',
           ).appendTo($list)
           function unhoverOtherOptions() {
             $option
@@ -222,7 +221,7 @@ declare global {
     },
     {
       defaults: {height: 250, width: 'auto'} as DropdownListOptions,
-    }
+    },
   )
   // @ts-expect-error
 })(typeof window !== 'undefined' ? window : this)

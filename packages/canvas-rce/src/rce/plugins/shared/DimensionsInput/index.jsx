@@ -30,11 +30,15 @@ import DimensionInput from './DimensionInput'
 
 export {default as useDimensionsState} from './useDimensionsState'
 
-const errorMessage = (message) => {
-  return <Flex gap="xx-small" alignItems="center">
-          <IconWarningSolid color="error" />
-          <Text color="danger" size="small">{message}</Text>
-        </Flex>
+const errorMessage = message => {
+  return (
+    <Flex gap="xx-small" alignItems="center">
+      <IconWarningSolid color="error" />
+      <Text color="danger" size="small">
+        {message}
+      </Text>
+    </Flex>
+  )
 }
 
 const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
@@ -74,14 +78,20 @@ export default function DimensionsInput(props) {
   const message = getMessage(dimensionsState, minWidth, minHeight, minPercentage)
   const secondaryMessage = {...message, text: ''}
 
-  const displayMessage = (message) => {
+  const displayMessage = message => {
     if (!message) {
       return
     }
 
-    return <div data-testid="message">{
-      message.type === 'error' ? errorMessage(message.text) : <Text size="small">{message.text}</Text>
-    }</div>
+    return (
+      <div data-testid="message">
+        {message.type === 'error' ? (
+          errorMessage(message.text)
+        ) : (
+          <Text size="small">{message.text}</Text>
+        )}
+      </div>
+    )
   }
 
   return (

@@ -49,7 +49,7 @@ export const handleSubmit = (
   storeProps,
   // @ts-expect-error
   _source,
-  afterInsert: Function = () => undefined
+  afterInsert: Function = () => undefined,
 ) => {
   Bridge.focusEditor(RCEWrapper.getByEditor(editor)) // necessary since it blurred when the modal opened
   const {altText, isDecorativeImage, displayAs} = uploadData?.imageOptions || {}

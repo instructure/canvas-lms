@@ -21,7 +21,7 @@ import {BaseLinkContentItemJson} from '../Lti13ContentItemJson'
 
 // Base content item type
 export default class BaseLinkContentItem<
-  TJson extends BaseLinkContentItemJson
+  TJson extends BaseLinkContentItemJson,
 > extends RceLti13ContentItem<TJson> {
   override toHtmlString() {
     if (this.iframe?.src != null) {

@@ -55,7 +55,7 @@ export default function (editor: Editor) {
           icon: button.icon,
           text: button.text,
           onAction: () => editor.execCommand(button.cmd),
-        }))
+        })),
       ),
 
     onSetup: api => {

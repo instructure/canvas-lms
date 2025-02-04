@@ -127,7 +127,7 @@ describe('processEditorContentItems', () => {
         // Bypass type checking to ensure it can handle bad data from javascript
         ev as any,
         externalToolsEnvFor(editor),
-        dialog
+        dialog,
       )
       expect(dialog.close).not.toHaveBeenCalled()
     })
@@ -170,7 +170,7 @@ describe('processEditorContentItems', () => {
           },
         },
         externalToolsEnvFor(editor),
-        dialog
+        dialog,
       )
       expect(dialog.close).toHaveBeenCalled()
 
@@ -200,7 +200,7 @@ describe('processEditorContentItems', () => {
           },
         },
         externalToolsEnvFor(editor),
-        dialog
+        dialog,
       )
       expect(dialog.close).toHaveBeenCalled()
 
@@ -224,28 +224,28 @@ describe('processEditorContentItems', () => {
           },
         },
         externalToolsEnvFor(editor),
-        null
+        null,
       )
     })
 
     it('creates content for a link content item', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         1,
-        '<a href="http://www.test.com" title="link title" target="_blank">link text</a>'
+        '<a href="http://www.test.com" title="link title" target="_blank">link text</a>',
       )
     })
 
     it('creates content for an LTI ResourceLink content item', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         2,
-        '<a href="test?display=borderless" title="link title" target="_blank">link text</a>'
+        '<a href="test?display=borderless" title="link title" target="_blank">link text</a>',
       )
     })
 
     it('creates content for an image content item', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         3,
-        '<img src="http://www.test.com/image" width="100" height="200">'
+        '<img src="http://www.test.com/image" width="100" height="200">',
       )
     })
 
@@ -256,7 +256,7 @@ describe('processEditorContentItems', () => {
     it('inserts an ltiEndpoint link for content items with a lookup_uuid', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         5,
-        '<a href="test?display=borderless&amp;resource_link_lookup_uuid=somerandomuuid" title="link title" target="_blank">link text</a>'
+        '<a href="test?display=borderless&amp;resource_link_lookup_uuid=somerandomuuid" title="link title" target="_blank">link text</a>',
       )
     })
   })
@@ -273,21 +273,21 @@ describe('processEditorContentItems', () => {
           },
         },
         externalToolsEnvFor(editor),
-        null
+        null,
       )
     })
 
     it('creates content for a link content item', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         1,
-        '<a href="http://www.test.com" title="link title" target="_blank">user selection</a>'
+        '<a href="http://www.test.com" title="link title" target="_blank">user selection</a>',
       )
     })
 
     it('creates content for an LTI ResourceLink content item', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         2,
-        '<a href="test?display=borderless" title="link title" target="_blank">user selection</a>'
+        '<a href="test?display=borderless" title="link title" target="_blank">user selection</a>',
       )
     })
   })

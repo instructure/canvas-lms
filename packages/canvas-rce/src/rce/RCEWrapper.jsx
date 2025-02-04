@@ -300,7 +300,6 @@ class RCEWrapper extends React.Component {
     if (tinyauxlist.length) {
       const myaux = tinyauxlist[tinyauxlist.length - 1]
       if (myaux.id) {
-         
         console.error('Unexpected ID on my tox-tinymce-aux element')
       }
       myaux.id = `tinyaux-${this.id}`
@@ -1207,7 +1206,7 @@ class RCEWrapper extends React.Component {
         }
       } catch (ex) {
         // log and ignore
-         
+
         console.error('Failed initializing rce autosave', ex)
       }
     }
@@ -1307,7 +1306,7 @@ class RCEWrapper extends React.Component {
           this.cleanupAutoSave(true)
           this.doAutoSave(e, true)
         } else {
-          console.error('Autosave failed:', ex)  
+          console.error('Autosave failed:', ex)
         }
       }
     }
@@ -1353,7 +1352,7 @@ class RCEWrapper extends React.Component {
       const container = editor.getContainer()
       if (!container) return
       const currentContainerHeight = Number.parseInt(container.style.height, 10)
-      if (isNaN(currentContainerHeight)) return  
+      if (isNaN(currentContainerHeight)) return
       const modifiedHeight = currentContainerHeight + coordinates.deltaY
       const newHeight = `${modifiedHeight}px`
       container.style.height = newHeight
@@ -1435,7 +1434,6 @@ class RCEWrapper extends React.Component {
         })
       })
       .catch(ex => {
-         
         console.error('Failed loading the AIToolsTray', ex)
       })
   }

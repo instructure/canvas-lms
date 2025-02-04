@@ -44,7 +44,7 @@ export type DoFetchApiOpts = {
   method?: string
   headers?: {[k: string]: string}
   params?: QueryParameterRecord
-  // eslint-disable-next-line no-undef
+   
   body?: BodyInit
   fetchOpts?: RequestInit
 }
@@ -79,12 +79,12 @@ export default async function doFetchApi<T = unknown>({
     body,
     method,
     ...finalFetchOptions,
-    // eslint-disable-next-line no-undef
+     
     credentials: finalFetchOptions.credentials as RequestCredentials,
   })
   if (!response.ok) {
     const err = new Error(
-      `doFetchApi received a bad response: ${response.status} ${response.statusText}`
+      `doFetchApi received a bad response: ${response.status} ${response.statusText}`,
     )
     Object.assign(err, {response}) // in case anyone wants to check it for something
     throw err

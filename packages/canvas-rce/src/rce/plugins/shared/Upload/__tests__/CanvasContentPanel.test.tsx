@@ -133,7 +133,7 @@ describe('CanvasContentPanel', () => {
         plugin={defaultPlugin}
         setFileUrl={mockSetFileUrl}
         {...overrideProps}
-      />
+      />,
     )
   }
 
@@ -142,7 +142,7 @@ describe('CanvasContentPanel', () => {
       () => {
         expect(screen.queryByText('Loading')).not.toBeInTheDocument()
       },
-      {timeout: 3000}
+      {timeout: 3000},
     )
   }
 
@@ -178,7 +178,7 @@ describe('CanvasContentPanel', () => {
       fireEvent.click(screen.getByText('image_one.png'))
       await waitFor(() => {
         expect(mockSetFileUrl).toHaveBeenCalledWith(
-          'http://canvas.docker/courses/21/files/722?wrap=1'
+          'http://canvas.docker/courses/21/files/722?wrap=1',
         )
       })
     })
@@ -262,7 +262,7 @@ describe('CanvasContentPanel', () => {
       fireEvent.click(screen.getByText('image_one.png'))
       await waitFor(() => {
         expect(mockSetFileUrl).toHaveBeenCalledWith(
-          'http://canvas.docker/courses/21/files/722?wrap=1'
+          'http://canvas.docker/courses/21/files/722?wrap=1',
         )
       })
     })

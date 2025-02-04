@@ -173,7 +173,7 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
           event => {
             Object.assign(event, {preventDefault})
           },
-          true
+          true,
         )
         tray.$doneButton.click()
         expect(preventDefault).toHaveBeenCalledTimes(1)

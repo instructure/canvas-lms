@@ -29,7 +29,7 @@ function renderComponent(props) {
       describedByID="dbid"
       onClick={() => {}}
       {...props}
-    />
+    />,
   )
 }
 
@@ -76,7 +76,7 @@ describe('RCE "Links" Plugin > Link', () => {
         const icon = queryIconByName(container, lt.icon)
         expect(icon).toBeInTheDocument()
         expect(icon.getAttribute('data-type')).toEqual(
-          lt.type === 'quizzes' && lt.quiz_type === 'quizzes.next' ? 'quizzes.next' : lt.type
+          lt.type === 'quizzes' && lt.quiz_type === 'quizzes.next' ? 'quizzes.next' : lt.type,
         )
       })
 

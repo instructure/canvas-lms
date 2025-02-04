@@ -46,7 +46,7 @@ const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
  */
 export function filterItemsByTitleSubstring<T extends {title: string}>(
   searchString: string | undefined | null,
-  items: T[]
+  items: T[],
 ): T[] {
   if (searchString == null || searchString.length === 0) {
     return items
@@ -113,7 +113,7 @@ export function ExternalToolSelectionDialog(props: ExternalToolSelectionDialogPr
               one {# result}
               other {# results}
             }`,
-                  {count: filteredResults.length}
+                  {count: filteredResults.length},
                 )}
             </Alert>
 

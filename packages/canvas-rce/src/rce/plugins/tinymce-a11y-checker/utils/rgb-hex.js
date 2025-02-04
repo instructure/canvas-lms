@@ -53,12 +53,11 @@ export default (red, green, blue, alpha) => {
     } else {
       throw new TypeError(`Expected alpha value (${alpha}) as a fraction or percentage`)
     }
-     
+
     alpha = (alpha | (1 << 8)).toString(16).slice(1)
   } else {
     alpha = ''
   }
 
-   
   return (blue | (green << 8) | (red << 16) | (1 << 24)).toString(16).slice(1) + alpha
 }

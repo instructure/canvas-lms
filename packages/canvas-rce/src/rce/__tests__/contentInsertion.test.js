@@ -149,7 +149,7 @@ describe('contentInsertion', () => {
       link.url = 'https://yodawg.com:3001/some/path'
       contentInsertion.insertLink(editor, link, canvasOrigin)
       expect(editor.content).toEqual(
-        '<a href="https://yodawg.com:3001/some/path" title="Here Be Links">Click On Me</a>'
+        '<a href="https://yodawg.com:3001/some/path" title="Here Be Links">Click On Me</a>',
       )
     })
 
@@ -157,7 +157,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'image'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>',
       )
     })
 
@@ -165,7 +165,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'scribd'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>',
       )
     })
 
@@ -191,7 +191,7 @@ describe('contentInsertion', () => {
         it('uses the link "text"', () => {
           contentInsertion.insertLink(editor, link)
           expect(editor.content).toEqual(
-            '<a href="/some/path" title="Here Be Links">Click On Me</a>'
+            '<a href="/some/path" title="Here Be Links">Click On Me</a>',
           )
         })
       })
@@ -201,7 +201,7 @@ describe('contentInsertion', () => {
       link.embed = {noPreview: true}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" class="instructure_file_link no_preview">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" class="instructure_file_link no_preview">Click On Me</a>',
       )
     })
 
@@ -210,7 +210,7 @@ describe('contentInsertion', () => {
       link.class = 'instructure_file_link foo'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" data-canvas-previewable="true" class="instructure_file_link foo">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" data-canvas-previewable="true" class="instructure_file_link foo">Click On Me</a>',
       )
     })
 
@@ -219,7 +219,7 @@ describe('contentInsertion', () => {
       link['data-course-type'] = 'wikiPages'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" data-course-type="wikiPages" data-published="true">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" data-course-type="wikiPages" data-published="true">Click On Me</a>',
       )
     })
 
@@ -234,7 +234,7 @@ describe('contentInsertion', () => {
       link.href = 'www.google.com'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="http://www.google.com" title="Here Be Links">link me</a>'
+        '<a href="http://www.google.com" title="Here Be Links">link me</a>',
       )
     })
 
@@ -266,7 +266,7 @@ describe('contentInsertion', () => {
       link.href = 'www.google.com'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="http://www.google.com" title="Here Be Links">Click On Me</a>'
+        '<a href="http://www.google.com" title="Here Be Links">Click On Me</a>',
       )
     })
 
@@ -288,7 +288,7 @@ describe('contentInsertion', () => {
       link.text = '3 < 4'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="http://www.google.com" title="PB&amp;J">3 &lt; 4</a>'
+        '<a href="http://www.google.com" title="PB&amp;J">3 &lt; 4</a>',
       )
     })
 
@@ -298,7 +298,7 @@ describe('contentInsertion', () => {
       link.text = '"quote test"'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="http://www.google.com" title="PB&amp;J">&quot;quote test&quot;</a>'
+        '<a href="http://www.google.com" title="PB&amp;J">&quot;quote test&quot;</a>',
       )
     })
   })
@@ -346,7 +346,7 @@ describe('contentInsertion', () => {
       image.url = 'https://yodawg.com:3001/some/path'
       contentInsertion.insertImage(editor, image, canvasOrigin)
       expect(editor.content).toEqual(
-        '<img alt="Here Be Images" src="https://yodawg.com:3001/some/path"/>'
+        '<img alt="Here Be Images" src="https://yodawg.com:3001/some/path"/>',
       )
     })
 
@@ -369,7 +369,7 @@ describe('contentInsertion', () => {
       }
       contentInsertion.insertImage(editor, image)
       expect(editor.content).toEqual(
-        '<img alt="Here Be Images" src="/some/path/preview" width="100px" style="float:left"/>'
+        '<img alt="Here Be Images" src="/some/path/preview" width="100px" style="float:left"/>',
       )
     })
 
@@ -400,7 +400,7 @@ describe('contentInsertion', () => {
       })
       contentInsertion.insertImage(editor, image)
       expect(editor.content).toEqual(
-        '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path/preview"/></a>'
+        '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path/preview"/></a>',
       )
     })
   })
@@ -511,7 +511,7 @@ describe('contentInsertion', () => {
         'mceInsertContent',
         false,
         '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
-        {skip_focus: true}
+        {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -524,7 +524,7 @@ describe('contentInsertion', () => {
         'mceInsertContent',
         false,
         '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
-        {skip_focus: true}
+        {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -560,7 +560,7 @@ describe('contentInsertion', () => {
         'mceInsertContent',
         false,
         '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
-        {skip_focus: true}
+        {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -572,7 +572,7 @@ describe('contentInsertion', () => {
         'mceInsertContent',
         false,
         '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=/url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
-        {skip_focus: true}
+        {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -599,7 +599,7 @@ describe('contentInsertion', () => {
         'mceInsertContent',
         false,
         '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_attachments_iframe/17?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
-        {skip_focus: true}
+        {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -612,7 +612,7 @@ describe('contentInsertion', () => {
         'mceInsertContent',
         false,
         '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="/media_attachments_iframe/maybe?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
-        {skip_focus: true}
+        {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -637,7 +637,7 @@ describe('contentInsertion', () => {
         'mceInsertContent',
         false,
         '<iframe data-media-id="m-media-id" data-media-type="audio" src="/media_attachments_iframe/maybe?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
-        {skip_focus: true}
+        {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -649,7 +649,7 @@ describe('contentInsertion', () => {
         'mceInsertContent',
         false,
         '<iframe data-media-id="29" data-media-type="audio" src="/media_attachments_iframe/29?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
-        {skip_focus: true}
+        {skip_focus: true},
       )
       expect(result).toEqual('the inserted iframe')
     })

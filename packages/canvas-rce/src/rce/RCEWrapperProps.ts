@@ -37,7 +37,7 @@ export const toolbarPropType = PropTypes.arrayOf(
     // each is the name of the button some plugin has
     // registered with tinymce
     items: PropTypes.arrayOf(PropTypes.string).isRequired,
-  })
+  }),
 )
 
 export type ToolbarPropType = {
@@ -56,7 +56,7 @@ export const menuPropType = PropTypes.objectOf(
     // items is a space separated list it menu_items
     // some plugin has registered with tinymce
     items: PropTypes.string.isRequired,
-  })
+  }),
 )
 
 export interface MenuItem {
@@ -92,7 +92,7 @@ export const ltiToolsPropType = PropTypes.arrayOf(
       }),
       PropTypes.any,
     ]),
-  })
+  }),
 )
 
 export interface CanvasIconClass {

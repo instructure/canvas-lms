@@ -113,7 +113,7 @@ describe('RCEWrapper', () => {
           {...trayProps()}
           {...additionalProps}
         />,
-        {container}
+        {container},
       )
       if (callback) {
         callback()

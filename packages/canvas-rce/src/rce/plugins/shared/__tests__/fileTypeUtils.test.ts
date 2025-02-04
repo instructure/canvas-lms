@@ -154,7 +154,7 @@ describe('fileTypeUtils', () => {
     it('returns word icon for word processing types', () => {
       expect(getIconFromType('application/msword')).toBe(IconMsWordLine)
       expect(
-        getIconFromType('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        getIconFromType('application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
       ).toBe(IconMsWordLine)
       expect(getIconFromType('application/vnd.apple.pages')).toBe(IconMsWordLine)
     })
@@ -162,7 +162,9 @@ describe('fileTypeUtils', () => {
     it('returns powerpoint icon for presentation types', () => {
       expect(getIconFromType('application/vnd.ms-powerpoint')).toBe(IconMsPptLine)
       expect(
-        getIconFromType('application/vnd.openxmlformats-officedocument.presentationml.presentation')
+        getIconFromType(
+          'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        ),
       ).toBe(IconMsPptLine)
       expect(getIconFromType('application/vnd.apple.keynote')).toBe(IconMsPptLine)
     })
@@ -170,7 +172,7 @@ describe('fileTypeUtils', () => {
     it('returns excel icon for spreadsheet types', () => {
       expect(getIconFromType('application/vnd.ms-excel')).toBe(IconMsExcelLine)
       expect(
-        getIconFromType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        getIconFromType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
       ).toBe(IconMsExcelLine)
       expect(getIconFromType('application/vnd.apple.numbers')).toBe(IconMsExcelLine)
     })
@@ -350,7 +352,7 @@ describe('fileTypeUtils', () => {
         }
         const url = mediaPlayerURLFromFile(file)
         expect(url).toBe(
-          '/media_attachments_iframe/123?type=video&embedded=true&verifier=something'
+          '/media_attachments_iframe/123?type=video&embedded=true&verifier=something',
         )
       })
 

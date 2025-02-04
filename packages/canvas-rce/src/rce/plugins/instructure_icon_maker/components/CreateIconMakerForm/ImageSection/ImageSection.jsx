@@ -113,11 +113,11 @@ export const ImageSection = ({settings, onChange, editor, canvasOrigin}) => {
   useEffect(() => {
     if (state.icon && state.icon in SingleColorSVG) {
       dispatch({...actions.START_LOADING})
-      // eslint-disable-next-line promise/catch-or-return
+       
       convertFileToBase64(
         new Blob([SingleColorSVG[state.icon].source(state.iconFillColor)], {
           type: 'image/svg+xml',
-        })
+        }),
       ).then(base64Image => {
         dispatch({...actions.SET_IMAGE, payload: base64Image})
         dispatch({...actions.STOP_LOADING})
@@ -136,7 +136,7 @@ export const ImageSection = ({settings, onChange, editor, canvasOrigin}) => {
       })
       createCroppedImageSvg(newCropperSettings, settings.imageSettings.image)
         .then(generatedSvg =>
-          convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
+          convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'})),
         )
         .then(base64Image => {
           onChange({
@@ -144,7 +144,7 @@ export const ImageSection = ({settings, onChange, editor, canvasOrigin}) => {
             payload: base64Image,
           })
         })
-        // eslint-disable-next-line no-console
+         
         .catch(error => console.error(error))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

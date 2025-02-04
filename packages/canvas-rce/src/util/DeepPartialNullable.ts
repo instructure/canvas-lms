@@ -33,10 +33,10 @@ export type DeepPartialOptional<T> = {
   [K in keyof T]?: T[K] extends object
     ? DeepPartialOptional<T[K]>
     : T[K] extends object | null
-    ? DeepPartialOptional<T[K]> | null
-    : T[K] extends object | undefined
-    ? DeepPartialOptional<T[K]> | undefined
-    : T[K] extends object | null | undefined
-    ? DeepPartialOptional<T[K]> | null | undefined
-    : T[K]
+      ? DeepPartialOptional<T[K]> | null
+      : T[K] extends object | undefined
+        ? DeepPartialOptional<T[K]> | undefined
+        : T[K] extends object | null | undefined
+          ? DeepPartialOptional<T[K]> | null | undefined
+          : T[K]
 }

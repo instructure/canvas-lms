@@ -32,7 +32,7 @@ export default function doFileUpload(
     accept?: string
     panels?: UploadFilePanelId[]
     preselectedFile?: File
-  }
+  },
 ): {
   /**
    * Resolves when the dialog is shown.
@@ -89,7 +89,7 @@ export default function doFileUpload(
           onSubmit={wrappedSubmit}
           canvasOrigin={bridge.canvasOrigin}
         />,
-        container
+        container,
       )
 
       shownResolve()
