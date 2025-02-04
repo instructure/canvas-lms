@@ -511,5 +511,69 @@ describe MissingPolicyApplicator do
         expect(submission.reload.score).to be_nil
       end
     end
+
+    describe "mastery paths and missing policy applicator" do
+      let(:mastery_path_course) do
+        course_with_teacher(active_all: true)
+        @student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+
+        @course.conditional_release = true
+        @course.save!
+
+        @trigger_assignment = @course.assignments.create!(
+          title: "Trigger Assignment",
+          grading_type: "points",
+          points_possible: 100,
+          # due_at: 1.hour.ago(now),
+          submission_types: "online_text_entry"
+        )
+
+        @set1_assignment = @course.assignments.create!(
+          title: "Set 1 Assignment",
+          points_possible: 10,
+          only_visible_to_overrides: true
+        )
+        @set1_assignment.assignment_overrides.create!(
+          set_type: "Noop",
+          set_id: 1,
+          all_day: false,
+          title: "Mastery Paths",
+          unlock_at_overridden: true,
+          lock_at_overridden: true,
+          due_at_overridden: true
+        )
+
+        course_module = @course.context_modules.create!(name: "Mastery Path Module")
+        course_module.add_item(id: @trigger_assignment.id, type: "assignment")
+        course_module.add_item(id: @set1_assignment.id, type: "assignment")
+
+        ranges = [
+          ConditionalRelease::ScoringRange.new(lower_bound: 0, upper_bound: 0.4, assignment_sets: [
+                                                 ConditionalRelease::AssignmentSet.new(
+                                                   assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
+                                                     assignment_id: @set1_assignment.id
+                                                   )]
+                                                 )
+                                               ])
+        ]
+        @rule = @course.conditional_release_rules.create!(trigger_assignment: @trigger_assignment, scoring_ranges: ranges)
+      end
+
+      it "triggers unlocking of mastery path assignment when missing grade is applied" do
+        mastery_path_course
+        late_policy_missing_enabled
+
+        @trigger_assignment.update!(due_at: 1.hour.from_now(now))
+        # this is a hack to force the submissions in a missing state before the Missing Policy Applicator runs.
+        # Timecop isn't sufficient here because the missing check in the DB uses CURRENT_TIMESTAMP
+        # which isn't impacted by Timecop time travel.
+        @trigger_assignment.submissions.update_all(late_policy_status: "missing")
+        Timecop.travel(2.hours.from_now(now)) do
+          applicator.apply_missing_deductions
+          cr_action = ConditionalRelease::AssignmentSetAction.where(student_id: @student.id).first
+          expect(cr_action).not_to be_nil
+        end
+      end
+    end
   end
 end
