@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const mathliveCss = require('mathlive/dist/mathlive-fonts.css')
+import mathliveCss from 'mathlive/dist/mathlive-fonts.css'
 
 const cssRules = `.ML__popover {
   /* Override this so it shows up on top of dialogs */

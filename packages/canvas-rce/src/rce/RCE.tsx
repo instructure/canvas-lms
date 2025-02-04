@@ -28,11 +28,13 @@ import tinyRCE from './tinyRCE'
 import getTranslations from '../getTranslations'
 import '@instructure/canvas-theme'
 import {Editor} from 'tinymce'
+// @ts-expect-error
+import generateId from 'format-message-generate-id/underscored_crc32'
 
 if (!process || !process.env || !process.env.BUILD_LOCALE) {
   formatMessage.setup({
     locale: 'en',
-    generateId: require('format-message-generate-id/underscored_crc32'),
+    generateId,
     missingTranslation: 'ignore',
   })
 }
@@ -76,7 +78,6 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
         setTranslations(true)
       })
       .catch(err => {
-         
         console.error('Failed loading the language file for', locale, '\n Cause:', err)
         setTranslations(false)
       })

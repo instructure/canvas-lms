@@ -21,11 +21,12 @@ import {render, unmountComponentAtNode} from 'react-dom'
 import RCEWrapper from './RCEWrapper'
 import normalizeProps from './normalizeProps'
 import formatMessage from '../format-message'
+import generateId from 'format-message-generate-id/underscored_crc32'
 
 if (!process || !process.env || !process.env.BUILD_LOCALE) {
   formatMessage.setup({
     locale: 'en',
-    generateId: require('format-message-generate-id/underscored_crc32'),
+    generateId,
     missingTranslation: 'ignore',
   })
 }
@@ -51,11 +52,11 @@ export function renderIntoDiv(target, props, renderCallback) {
         () => {
           // pass it back
           renderCallback && renderCallback(renderedComponent.current)
-        }
+        },
       )
     })
     .catch(err => {
-      // eslint-disable-next-line no-console
+       
       console.error('Failed loading RCE', err)
     })
 }
