@@ -24,20 +24,32 @@ import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
+import {FileManagementContext} from '../../Contexts'
 
 const renderComponent = () => {
   return render(
-    <MockedQueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AllMyFilesTable />
-      </BrowserRouter>
-    </MockedQueryClientProvider>,
+    <FileManagementContext.Provider
+      value={{
+        folderId: '1',
+        contextType: 'course',
+        contextId: '1',
+        showingAllContexts: false,
+        currentFolder: null,
+      }}
+    >
+      <MockedQueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AllMyFilesTable />
+        </BrowserRouter>
+      </MockedQueryClientProvider>
+    </FileManagementContext.Provider>,
   )
 }
 
 describe('AllMyFilesTable', () => {
   beforeAll(() => {
     setupFilesEnv(true)
+    window.ENV.context_asset_string = 'courses_1'
   })
 
   it('renders each context', () => {
