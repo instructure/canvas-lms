@@ -39,6 +39,7 @@ export default class ExternalToolModalLauncher extends React.Component {
     launchType: PropTypes.string.isRequired,
     contextModuleId: PropTypes.string,
     onExternalContentReady: PropTypes.func,
+    onDeepLinkingResponse: PropTypes.func,
     resourceSelection: PropTypes.bool,
   }
 
@@ -66,6 +67,7 @@ export default class ExternalToolModalLauncher extends React.Component {
     this.removeExternalContentListener = handleExternalContentMessages({
       ready: this.onExternalToolCompleted,
       cancel: () => this.onExternalToolCompleted({}),
+      onDeepLinkingResponse: this.props.onDeepLinkingResponse,
     })
   }
 

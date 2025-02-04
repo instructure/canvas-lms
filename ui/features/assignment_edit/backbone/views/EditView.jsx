@@ -47,6 +47,7 @@ import {AssignmentSubmissionTypeContainer} from '../../react/AssignmentSubmissio
 import DefaultToolForm from '../../react/DefaultToolForm'
 import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSelectBox'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
+import {attach as assetProcessorModalAttach} from '../../react/AssetProcessorModalLauncher'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import setUsageRights from '@canvas/files/util/setUsageRights'
@@ -127,6 +128,7 @@ const LTI_EXT_MASTERY_CONNECT = 'https://canvas.instructure.com/lti/mastery_conn
 const DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE = 'context_external_tool'
 
 const EXTERNAL_TOOL_URL_INPUT_NAME = 'external_tool_tag_attributes[url]'
+const ACTIVITY_ASSET_PROCESSOR_CONTAINER = '#activity_asset_processor_container'
 
 /*
 xsslint safeString.identifier srOnly
@@ -265,6 +267,7 @@ EditView.prototype.els = {
     els['' + ANONYMOUS_GRADING_BOX] = '$anonymousGradingBox'
     els['' + POST_TO_SIS_BOX] = '$postToSisBox'
     els['' + ASSIGNMENT_EXTERNAL_TOOLS] = '$assignmentExternalTools'
+    els['' + ACTIVITY_ASSET_PROCESSOR_CONTAINER] = '$activityAssetProcessorContainer'
     els['' + HIDE_ZERO_POINT_QUIZZES_BOX] = '$hideZeroPointQuizzesBox'
     els['' + HIDE_ZERO_POINT_QUIZZES_OPTION] = '$hideZeroPointQuizzesOption'
     els['' + OMIT_FROM_FINAL_GRADE_BOX] = '$omitFromFinalGradeBox'
@@ -1202,6 +1205,11 @@ EditView.prototype.afterRender = function () {
     parseInt(ENV.COURSE_ID, 10),
     parseInt(this.assignment.id, 10),
   )
+  if (this.assignment.isNew() && window.ENV?.FEATURES?.lti_asset_processor) {
+    this.AssetProcessorModalLauncher = assetProcessorModalAttach(
+      this.$activityAssetProcessorContainer.get(0)
+    )
+  }
   this._attachEditorToDescription()
   this.togglePeerReviewsAndGroupCategoryEnabled()
   this.handleOnlineSubmissionTypeChange()
@@ -1381,6 +1389,21 @@ EditView.prototype.getFormData = function () {
       data.external_tool_tag_attributes.line_item,
     )
   }
+  function parseContentItem(item) {
+    item.custom = tryJsonParse(item.custom);
+    item.icon = tryJsonParse(item.icon);
+    item.window = tryJsonParse(item.window);
+    item.iframe = tryJsonParse(item.iframe);
+    item.report = tryJsonParse(item.report);
+    return item;
+  }
+  
+  if (data.asset_processors && data.asset_processors.length > 0) {
+    data.asset_processors = data.asset_processors.map(asset_processor =>
+      asset_processor.map(parseContentItem)
+    );
+  }
+
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)
   }

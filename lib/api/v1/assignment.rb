@@ -1103,6 +1103,8 @@ module Api::V1::Assignment
     end
 
     apply_external_tool_settings(assignment, assignment_params)
+    apply_asset_processor_settings(assignment, assignment_params) if assignment.root_account.feature_enabled?(:lti_asset_processor)
+
     overrides = pull_overrides_from_params(assignment_params)
 
     if assignment_params[:allowed_extensions].present? && assignment_params[:allowed_extensions].length > Assignment.maximum_string_length
@@ -1232,6 +1234,16 @@ module Api::V1::Assignment
     end
   end
 
+  def apply_asset_processor_settings(assignment, assignment_params)
+    # I'm limiting this for create because updating is a can of worms right now
+    if assignment.new_record? && assignment_params["asset_processors"].present? && asset_processor_capable?(assignment_params)
+      assignment_params["asset_processors"].flatten.each do |content_item|
+        ap = Lti::AssetProcessor.build_for_assignment(content_item)
+        assignment.lti_asset_processors << ap
+      end
+    end
+  end
+
   def assignment_configuration_tool(assignment_params)
     tool_id = assignment_params["similarityDetectionTool"].split("_").last.to_i
     tool = nil
@@ -1260,6 +1272,12 @@ module Api::V1::Assignment
       assignment_params["submission_types"].present? &&
       (assignment_params["submission_types"].include?("online_upload") ||
       assignment_params["submission_types"].include?("online_text_entry"))
+  end
+
+  def asset_processor_capable?(assignment_params)
+    assignment_params["submission_type"] == "online" &&
+      assignment_params["submission_types"].present? &&
+      assignment_params["submission_types"].include?("online_upload")
   end
 
   def submissions_download_url(context, assignment)
