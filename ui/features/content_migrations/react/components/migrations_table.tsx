@@ -111,7 +111,7 @@ export const ContentMigrationsTable = ({
   return (
     <>
       <Heading level="h2" as="h2" margin="small 0">
-        {I18n.t('Import Queue')}
+        {I18n.t('Import Activity')}
       </Heading>
       <hr role="presentation" aria-hidden="true" />
       <Responsive
