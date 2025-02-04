@@ -2129,24 +2129,24 @@ class Submission < ActiveRecord::Base
       end
       self.class.connection.after_transaction_commit do
         Auditors::GradeChange.record(submission: self, skip_insert: !grade_changed)
-        queue_conditional_release_grade_change_handler if grade_changed || (force_audit && posted_at.present?)
+        maybe_queue_conditional_release_grade_change_handler if grade_changed || (force_audit && posted_at.present?)
       end
     end
   end
 
   def queue_conditional_release_grade_change_handler
+    strand = "conditional_release_grade_change:#{global_assignment_id}"
+    ConditionalRelease::OverrideHandler.delay_if_production(priority: Delayed::LOW_PRIORITY, strand:)
+                                       .handle_grade_change(self)
+    assignment&.delay_if_production(strand:)&.multiple_module_actions([user_id], :scored, score)
+  end
+
+  def maybe_queue_conditional_release_grade_change_handler
     shard.activate do
       return unless graded? && posted?
-      # use request caches to handle n+1's when updating a lot of submissions in the same course in one request
-      return unless RequestCache.cache("conditional_release_feature_enabled", course_id) do
-        course.conditional_release?
-      end
 
-      if ConditionalRelease::Rule.is_trigger_assignment?(assignment)
-        strand = "conditional_release_grade_change:#{global_assignment_id}"
-        ConditionalRelease::OverrideHandler.delay_if_production(priority: Delayed::LOW_PRIORITY, strand:)
-                                           .handle_grade_change(self)
-        assignment&.delay_if_production(strand:)&.multiple_module_actions([user_id], :scored, score)
+      if assignment.present? && assignment.queue_conditional_release_grade_change_handler?
+        queue_conditional_release_grade_change_handler
       end
     end
   end

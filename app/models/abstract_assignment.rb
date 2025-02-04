@@ -257,6 +257,17 @@ class AbstractAssignment < ActiveRecord::Base
   # sis_source_id as sis_assignment_id.
   alias_attribute :sis_assignment_id, :sis_source_id
 
+  def queue_conditional_release_grade_change_handler?
+    shard.activate do
+      # use request caches to handle n+1's when updating a lot of submissions in the same course in one request
+      return false unless RequestCache.cache("conditional_release_feature_enabled", context_id) do
+        course.conditional_release?
+      end
+
+      ConditionalRelease::Rule.is_trigger_assignment?(self)
+    end
+  end
+
   def checkpoint?
     false
   end
