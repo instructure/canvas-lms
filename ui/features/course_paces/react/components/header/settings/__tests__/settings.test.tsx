@@ -152,6 +152,44 @@ describe('Settings', () => {
       const selectedDaysCounterPill = screen.getByTestId('selected_days_counter')
       expect(selectedDaysCounterPill).toHaveTextContent('5')
     })
+
+    it('disables the last day selector when all other days are skipped', () => {
+      const coursePace = {
+        ...DEFAULT_STORE_STATE.coursePace,
+        selected_days_to_skip: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+      } as CoursePace
+
+      const state = {...DEFAULT_STORE_STATE, coursePace}
+
+      renderConnected(<Settings {...defaultProps} />, state)
+      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+      act(() => settingsButton.click())
+
+      const skipSelectedDaysOption = screen.getByRole('menuitem', {name: /Skip Selected Days/i})
+      act(() => skipSelectedDaysOption.click())
+
+      const sundaysOption = screen.getByRole('menuitemcheckbox', {name: 'Sundays'})
+
+      expect(sundaysOption.getAttribute('aria-disabled')).toBe('true')
+    })
+
+    it('disables weekend selector when all week days are skipped', () => {
+      const coursePace = {
+        ...DEFAULT_STORE_STATE.coursePace,
+        selected_days_to_skip: ['mon', 'tue', 'wed', 'thu', 'fri'],
+      } as CoursePace
+
+      const state = {...DEFAULT_STORE_STATE, coursePace}
+
+      renderConnected(<Settings {...defaultProps} />, state)
+      const settingsButton = screen.getByRole('button', {name: 'Modify Settings'})
+      act(() => settingsButton.click())
+
+      const skipSelectedDaysOption = screen.getByRole('menuitem', {name: /Skip Selected Days/i})
+      act(() => skipSelectedDaysOption.click())
+
+      expect(screen.getByRole('menuitemcheckbox', {name: 'Weekends'}).getAttribute('aria-disabled')).toBe('true')
+    })
   })
 
   describe('course_paces_skip_selected_days is disabled', () => {
