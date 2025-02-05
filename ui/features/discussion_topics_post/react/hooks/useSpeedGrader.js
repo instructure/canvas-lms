@@ -44,6 +44,7 @@ export default function useSpeedGrader() {
 
   function sendPostMessage(message) {
     window.postMessage(message, '*')
+    window.top.postMessage(message, '*')
   }
 
   function handlePreviousStudentReply() {

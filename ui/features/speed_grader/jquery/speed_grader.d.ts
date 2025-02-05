@@ -830,6 +830,7 @@ export type SpeedGraderStore = SpeedGraderResponse & {
   studentSectionIdsMap: any
   studentsWithSubmissions: StudentWithSubmission[]
   submissionsMap: Record<string, Submission>
+  student_entries: any
 }
 
 export type DocumentPreviewOptions = {

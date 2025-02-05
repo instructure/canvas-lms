@@ -32,6 +32,7 @@ type SpeedGraderStore = {
   studentAssessment?: RubricAssessmentUnderscore
   selfAssessment?: RubricAssessmentUnderscore | null
   rubricSavedComments?: Record<string, string[]>
+  student_entries?: object
 }
 
 const useStore = create(
@@ -45,6 +46,7 @@ const useStore = create(
     rubricHidePoints: false,
     studentAssessment: undefined,
     rubricSavedComments: {},
+    student_entries: {},
   })),
 )
 
