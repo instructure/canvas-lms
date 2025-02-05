@@ -279,6 +279,9 @@ module SpeedGrader
       end
 
       discussion_checkpoints_enabled = assignment.root_account.feature_enabled?(:discussion_checkpoints)
+      if assignment.submission_types.include?("discussion_topic")
+        res[:student_entries] = assignment.discussion_topic.discussion_entries.pluck(:user_id, :id).group_by(&:first).transform_values { |entries| entries.map(&:last) }
+      end
 
       res[:submissions] =
         submissions.map do |sub|

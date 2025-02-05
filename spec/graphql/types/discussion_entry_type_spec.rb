@@ -598,9 +598,9 @@ describe Types::DiscussionEntryType do
     entry_type = GraphQLTypeTester.new(entry, current_user: @teacher)
     sub_entry_type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
 
-    result = entry_type.resolve("rootEntryPageNumber(perPage: 5,sortOrder: desc)")
+    result = entry_type.resolve("rootEntryPageNumber(perPage: 5)")
     expect(result).to eq 0
-    result = sub_entry_type.resolve("rootEntryPageNumber(perPage: 5,sortOrder: desc)")
+    result = sub_entry_type.resolve("rootEntryPageNumber(perPage: 5)")
     expect(result).to eq 0
 
     entry = topic.discussion_entries.where(message: "reply to topic 4").first
@@ -608,9 +608,9 @@ describe Types::DiscussionEntryType do
     entry_type = GraphQLTypeTester.new(entry, current_user: @teacher)
     sub_entry_type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
 
-    result = entry_type.resolve("rootEntryPageNumber(perPage: 5,sortOrder: desc)")
+    result = entry_type.resolve("rootEntryPageNumber(perPage: 5)")
     expect(result).to eq 1
-    result = sub_entry_type.resolve("rootEntryPageNumber(perPage: 5,sortOrder: desc)")
+    result = sub_entry_type.resolve("rootEntryPageNumber(perPage: 5)")
     expect(result).to eq 1
   end
 

@@ -160,6 +160,7 @@ import {createRoot} from 'react-dom/client'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 import {SpeedGraderDiscussionsNavigation} from '../react/SpeedGraderDiscussionsNavigation'
+import {SpeedGraderDiscussionsNavigation2} from '../react/SpeedGraderDiscussionsNavigation2'
 
 declare global {
   interface Window {
@@ -873,7 +874,6 @@ function renderHiddenSubmissionPill(submission: Submission) {
 
 function renderCheckpoints(submission: Submission) {
   const mountPoint = document.getElementById(SPEED_GRADER_CHECKPOINTS_MOUNT_POINT)
-
   if (mountPoint) {
     ReactDOM.render(
       <SpeedGraderCheckpointsWrapper
@@ -926,11 +926,25 @@ function renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
     if (temporaryDiscussionContextView === 'discussion_view_no_context') {
       return
     } else if (temporaryDiscussionContextView === 'discussion_view_with_context' && mountPoint) {
-      ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
+      if (ENV.FEATURES.discussions_speedgrader_revisit) {
+        const currentUrl = new URL(window.location.href)
+        const params = new URLSearchParams(currentUrl.search)
+        ReactDOM.render(<SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />, mountPoint)
+      }
+      else{
+        ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
+      }
       return
     }
   } else if (getDefaultDiscussionView() === 'discussion_view_with_context' && mountPoint) {
-    ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
+    if (ENV.FEATURES.discussions_speedgrader_revisit) {
+      const currentUrl = new URL(window.location.href)
+      const params = new URLSearchParams(currentUrl.search)
+      ReactDOM.render(<SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />, mountPoint)
+    }
+    else{
+      ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
+    }
     return
   } else {
     return

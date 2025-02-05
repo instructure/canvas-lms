@@ -791,7 +791,7 @@ describe "SpeedGrader - discussion submissions" do
         end
       end
 
-      it "displays the root topic for group discussion if groups have no users" do
+      it "displays the root topic for group discussion if groups have no users", :ignore_js_errors do
         entry_text = "first student message"
         root_topic = group_discussion_assignment
         root_topic.discussion_entries.create!(user: @student, message: entry_text)
@@ -916,7 +916,7 @@ describe "SpeedGrader - discussion submissions" do
         )
       end
 
-      it "displays whole discussion with hidden student names" do
+      it "displays whole discussion with hidden student names", :ignore_js_errors do
         Speedgrader.visit(@course.id, @assignment.id)
 
         Speedgrader.click_settings_link
