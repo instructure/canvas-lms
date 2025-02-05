@@ -2332,6 +2332,7 @@ hu:
       login: Belépés
     no_text: "Nincs szöveg"
   albanian_21ed929e: Albán
+  alert_d2c8ef98: Figyelmeztetés
   alerts: 
     alert: 
       buttons: 
@@ -2924,6 +2925,8 @@ hu:
   always_include_dates_1ae2935e: "Mindig tartalmazza a dátumokat"
   always_include_dates_74b3721d: "Dátumok Befoglalása Mindig;"
   an_active_role_already_exists_with_that_name_205864bf: "Ezzel a névvel már létezik aktív szerepkör"
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "Egy figyelmeztetést generáltunk minden hallgató számára, aki megfelel az összes szempontnak. Minden nap ellenőrizni fogjuk és értesítéseket fogunk küldeni a hallgatónak, oktatónak és/vagy a fiókadminnak, amíg a kiváltó probléma meg nem oldódik."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "Egy figyelmeztetést generáltunk minden hallgató számára, aki megfelel az összes szempontnak. Minden nap ellenőrizni fogjuk és értesítéseket fogunk küldeni a hallgatónak és/vagy az oktatónak, amíg a kiváltó probléma meg nem oldódik."
   an_amazing_discussion_assignment_e5c8bd6b: "Csodálatos fórumfeladat"
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Egy API kulcs szükséges az Akadémiai Teljesítményértékelés használatához"
   an_assignment_name_dc624e70: "Egy feladat neve"
@@ -9643,6 +9646,7 @@ hu:
   edit_a_copy_43ecaed6: "másolat szerkesztése"
   edit_a_copy_of_this_grading_scheme_807a86b9: "Az osztályozási rendszer egy példányának szerkesztése"
   edit_account_name_for_account_name_ae3633e8: "%{account_name} fiók nevének szerkesztése"
+  edit_alert_739bb0ba: "Figyelmeztetés szerkesztése"
   edit_all_other_course_content_c8dd98d3: "Minden más kurzus tartalom szerkesztése"
   edit_and_delete_their_own_posts_f4f7cc6: "Saját bejegyzés szerkesztése és törlése"
   edit_and_delete_their_own_replies_e5b9d793: "Szerkessze és törölje saját válaszait"
@@ -16983,6 +16987,7 @@ hu:
   no_such_source_context_80a659ba: "nincs ilyen forráskörnyezet"
   no_such_target_context_21158b9: "nincs ilyen célkörnyezet"
   no_such_target_group_7e183d46: "nincs ilyen célcsoport"
+  no_teacher_interaction_de8d91bc: "Nincs oktatói interakció"
   no_template_accounts_in_this_region_5e84955d: "Nincsenek sablon fiókok ebben a régióban"
   no_template_selected_f59e797: "Nincs kiválasztott sablon"
   no_terms_eab5ee7b: "Nincsenek félévek"
@@ -18211,7 +18216,7 @@ hu:
   permissions_manage_9eea4f8f: "Engedélyek - kezelés"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: " Engedélyezi az összes \"includes\" paraméter használatát ehhez a fejlesztői kulcshoz. Az „Includes” paraméterek hozzáférést biztosíthatnak további adatokhoz, amelyek nem tartoznak az alább kiválasztott hatókörbe."
   permitted_api_endpoints_b092c4cc: "Engedélyezett API végpontok"
-  persian_a8cadb95: Persian
+  persian_a8cadb95: perzsa
   persists_the_used_authentication_provider_when_log_15113afc: "Megőrzi a bejelentkezéskor használt hitelesítési szolgáltatót, és az új bejelentkezéseknél alapértelmezés szerint az alapértelmezett szolgáltatót használja.                        "
   personal_pronouns_7d271f52: "Személyes névmások"
   peru_51_d3d38d1f: "Peru (+51)"
@@ -21523,6 +21528,7 @@ hu:
   saturday_af8feb7f: Szombat
   saudi_arabia_966_d01ed717: "Szaúd-Arábia (+966)"
   save_11a80ec3: Mentés
+  save_alert_b64f9fa3: "Figyelmeztetés mentése"
   save_and_publish_1b765e7: "Mentés és közzététel"
   save_as_draft_341d4577: "Mentés vázlatként"
   save_changes_698abe77: "Módosítások mentése"
@@ -23954,6 +23960,7 @@ hu:
   submitted_on_bb3b53fc: Beküldve
   submitted_on_date_13c89fb: "Beküldve %{date}"
   submitted_submitdate_bdd3bf09: "Beküldve: %{submitDate}"
+  submitting_b90fac62: Beküldés...
   submitting_types_7c5a7096: "Beadás: %{types}"
   subscribe_4b301fb7: Feliratkozás
   subscribe_failed_2eb62de0: "Sikertelen feliratkozás"
@@ -25839,6 +25846,7 @@ hu:
   treat_ungraded_as_0_d38c2b41: "Osztályzat nélküliek kezelése 0-ként"
   tree_browser: 
     folder_tree_instructions: "Használja a fel és le nyilakat a fán való navigáláshoz. Nyomja meg a jobbrát a kinyitáshoz, a balrát az összecsukáshoz, az entert az elem kiválasztásához."
+  trigger_f0ee1fbf: "Kiváltó szempont"
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad és Tobago (+1)"
   trophy: 
     star_display_name: Csillagozás
@@ -26012,6 +26020,8 @@ hu:
     one: "Nem értékelt, 1 megszerezhető pont"
     other: "Ungraded, %{formattedPoints} megszerezhető pont"
   ungraded_submissions_44efb0ec: "Nem értékelt beadandók"
+  ungraded_submissions_count_63fcf6d1: "Nem értékelt beadandók (darabszám)"
+  ungraded_submissions_time_bafaa609: "Nem értékelt beadandók (idő)"
   ungraded_survey_ad7de790: "Nem értékelt felmérés"
   unique_user_id_dfca1a7f: "Egyedi felhasználói azonosító"
   united_arab_emirates_971_649b3750: "Egyesült Arab Emírségek (+971)"
