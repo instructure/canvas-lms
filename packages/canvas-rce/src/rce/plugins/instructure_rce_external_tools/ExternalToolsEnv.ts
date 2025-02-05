@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor} from 'tinymce'
-import {RCEWrapperInterface, RCEWrapperProps} from '../../types'
+import type {Editor} from 'tinymce'
+import type {ExternalToolsEditor, RCEWrapperInterface, RCEWrapperProps} from '../../types'
 import RCEWrapper from '../../RCEWrapper'
 import {fallbackIframeAllowances} from './constants'
 
@@ -27,23 +27,6 @@ import {fallbackIframeAllowances} from './constants'
  * They're actually the available LTI Tool configurations, so we give them a more reasonable name here.
  */
 export type RceLtiToolInfo = NonNullable<NonNullable<RCEWrapperProps['ltiTools']>[number]>
-
-/**
- * Subset of TinyMCE used by the ExternalTools dialog. Used to document the subset of the API that we use so
- * it's easier to test.
- */
-export interface ExternalToolsEditor {
-  id: string
-  selection?: {
-    getContent(): string
-  }
-  getContent(): string
-  // @ts-expect-error
-  focus()
-  editorContainer: HTMLElement
-  $: Editor['$']
-  ui: Editor['ui']
-}
 
 export interface ExternalToolsEnv {
   editor: ExternalToolsEditor | null

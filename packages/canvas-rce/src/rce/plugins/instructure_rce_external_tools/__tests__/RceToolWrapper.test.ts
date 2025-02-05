@@ -18,15 +18,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  addMruToolId,
-  buildToolMenuItems,
-  externalToolsForToolbar,
-  RceToolWrapper,
-} from '../RceToolWrapper'
+import {addMruToolId, buildToolMenuItems, RceToolWrapper} from '../RceToolWrapper'
 import {createDeepMockProxy} from '../../../../util/__tests__/deepMockProxy'
 import {ExternalToolsEditor, externalToolsEnvFor} from '../ExternalToolsEnv'
 import {IconLtiLine, IconLtiSolid} from '@instructure/ui-icons/es/svg'
+import {externalToolsForToolbar} from '../util/externalToolsForToolbar'
 
 describe('RceExternalToolHelper', () => {
   describe('buttonConfig', () => {

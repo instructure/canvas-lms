@@ -220,7 +220,7 @@ export interface CanvasRcePropTypes {
   timezone?: string
 
   onFocus?: (rceWrapper: RCEWrapper) => void
-  onBlur?: (event: Event) => void
+  onBlur: (event: React.FocusEvent<HTMLElement>) => void
   onInit?: (tinymce_editor: Editor) => void
 
   /**

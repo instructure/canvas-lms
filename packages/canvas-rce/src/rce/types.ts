@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {Editor} from 'tinymce'
+
 // Common interfaces used across RCE components
 export interface RCEWrapperInterface {
   id: string
@@ -29,3 +31,40 @@ export interface RCEWrapperInterface {
 
 // Re-export the props type to avoid circular dependencies
 export type {RCEWrapperProps} from './RCEWrapperProps'
+
+export type AlertVariant = 'info' | 'warning' | 'error' | 'success'
+
+export type AlertMessage = {
+  id: number
+  text: string
+  variant: AlertVariant
+}
+
+export type RCETrayProps = {
+  contextId: string
+  contextType: string
+  host: string
+  jwt: string
+  containingContext?: {
+    contextType: string
+    contextId: string
+    userId: string
+  }
+}
+
+/**
+ * Subset of TinyMCE used by the ExternalTools dialog. Used to document the subset of the API that we use so
+ * it's easier to test.
+ */
+export interface ExternalToolsEditor {
+  id: string
+  selection?: {
+    getContent(): string
+  }
+  getContent(): string
+  // @ts-expect-error
+  focus()
+  editorContainer: HTMLElement
+  $: Editor['$']
+  ui: Editor['ui']
+}
