@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 // TODO: we get complaints about <Overlay> because it can be either a Modal or a Tray
 // and they have different props. I don't have time to fix this the right way now.
 /*
@@ -144,6 +142,7 @@ export default class ExternalToolDialog extends React.Component<
     if (contentItems.length === 1 && contentItems[0]['@type'] === 'lti_replace') {
       const code = contentItems[0].text
 
+      // @ts-expect-error
       env.rceWrapper?.setCode(code)
     } else {
       contentItems.forEach(contentData => {
@@ -155,6 +154,7 @@ export default class ExternalToolDialog extends React.Component<
           env,
         ).codePayload
 
+        // @ts-expect-error
         env.rceWrapper?.insertCode(code)
       })
     }
@@ -249,11 +249,13 @@ export default class ExternalToolDialog extends React.Component<
           <input
             type="hidden"
             name="com_instructure_course_canvas_resource_type"
+            // @ts-expect-error
             value={props.env.rceWrapper?.getResourceIdentifiers().resourceType}
           />
           <input
             type="hidden"
             name="com_instructure_course_canvas_resource_id"
+            // @ts-expect-error
             value={props.env.rceWrapper?.getResourceIdentifiers().resourceId}
           />
           {state.form.parent_frame_context != null && (
