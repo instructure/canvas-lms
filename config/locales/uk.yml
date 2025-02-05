@@ -1899,6 +1899,7 @@ uk:
       details: детальніше...
       login: Вхід
     no_text: "Текст відсутній"
+  alert_d2c8ef98: Оповіщення
   alerts: 
     alert: 
       buttons: 
@@ -2007,6 +2008,8 @@ uk:
   alphabetically_60ab47e4: "В алфавітному порядку"
   alt_text_611fb322: "Альтернативний текст"
   always_3a59e701: Завжди
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "Попередження генерується для кожного студента, який відповідає критерію. Перевірка відбувається кожного дня і повідомлення будуть надіслані студенту, викладачу, та/або на обліковий запис адміністратора доки проблема не буде вирішена."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "Попередження генерується для кожного студента, який відповідає критерію. Перевірка відбувається кожного дня і повідомлення будуть надіслані студенту та/або викладачу доки проблема не буде вирішена."
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Для використання Academic Benchmarks потрібен ключ API"
   an_assignment_name_dc624e70: "Назва завдання"
   an_auto_generated_chronological_summary_of_your_co_eeafee13: "Автоматично згенерований підсумок вашого курсу"
@@ -6900,6 +6903,7 @@ uk:
   ecollege_name: "Конвертер Е-коледжу"
   ecuador_593_dfcc235a: "Еквадор (+593)"
   edit_account_name_for_account_name_ae3633e8: "Редагувати ім'я облікового запису для %{account_name}"
+  edit_alert_739bb0ba: "Редагувати оповіщення"
   edit_and_delete_their_own_posts_f4f7cc6: "Редагувати або видалити їхні власні повідомлення"
   edit_announcement_title_cce0b4e: "Рудагувати оголошення %{title}"
   edit_app_b0cc1c17: "Редагувати застосунок"
@@ -11938,6 +11942,7 @@ uk:
   no_subject_970aad80: "Без теми"
   no_submission_fb131a40: "Відповіді немає"
   no_submission_for_assignment_a9cb6fe2: "Відсутній матеріал для %{assignment}"
+  no_teacher_interaction_de8d91bc: "Відсутня взаємодія з викладачем"
   no_terms_eab5ee7b: "Немає термінів"
   no_time_limit_for_long_running_conferences_d49fdfad: "Немає обмеження часу (для тривалих конференцій)"
   no_tls_618add1a: "Немає TLS"
@@ -15455,6 +15460,7 @@ uk:
   sample_data_e4fd01ff: "Зразок даних"
   saudi_arabia_966_d01ed717: "Саудівська Аравія (+966)"
   save_11a80ec3: Зберегти
+  save_alert_b64f9fa3: "Зберегти оповіщення"
   save_changes_698abe77: "Зберегти зміни"
   save_grading_period_daaaddea: "Зберегти період оцінювання"
   save_grading_period_set_e029fa88: "Зберегти налаштування періоду оцінювання"
@@ -17128,6 +17134,7 @@ uk:
   submitted_late_3741af29: "Відправлено запізно"
   submitted_late_97730017: "Відправлено запізно"
   submitted_submitdate_bdd3bf09: "Відправлено: %{submitDate}"
+  submitting_b90fac62: Надсилання...
   submitting_types_7c5a7096: "Відправлено: %{types}"
   subscribe_4b301fb7: Підписатися
   subscribed_fe74d22a: Підписано
@@ -17924,6 +17931,7 @@ uk:
   treat_ungraded_as_0_d38c2b41: "Враховувати не здані як 0"
   tree_browser: 
     folder_tree_instructions: "Використовуйте клавіші зі стрілками вгору та вниз для навігації по дереву. Натискайте стрілку вправо, щоб розгорнути папки, ліворуч для згортання, клавішу Enter щоб обрати виділений елемент."
+  trigger_f0ee1fbf: Тригер
   trinidad_and_tobago_1_fc2d8d1c: "Тринідад і Тобаго (+1)"
   trophy: 
     star_display_name: "Помітити зіркою"
@@ -17988,6 +17996,8 @@ uk:
   ungraded_answers_31ef2df7: "Неоцінені відповіді"
   ungraded_ed0c6f98: Неоцінений
   ungraded_submissions_44efb0ec: "Неоцінені відправлення"
+  ungraded_submissions_count_63fcf6d1: "Завдання, що не були оцінені (Кількість)"
+  ungraded_submissions_time_bafaa609: "Завдання, які не були оцінені (Час)"
   ungraded_survey_ad7de790: "Неоцінене Опитування"
   united_arab_emirates_971_649b3750: "Об'єднані Арабські Емірати (+971)"
   united_kingdom_44_880b06ad: "Великобританія (+44)"

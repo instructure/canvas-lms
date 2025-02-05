@@ -1414,6 +1414,7 @@ ko:
       details: "세부 정보"
       login: 로그인
     no_text: "텍스트 없음"
+  alert_d2c8ef98: 알림
   alerts: 
     alert: 
       buttons: 
@@ -1473,6 +1474,8 @@ ko:
   allow_self_sign_up_7520f8c5: "직접 등록 허용"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "달력 행사 복제 허용하기"
   always_3a59e701: 항상
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사, 계정 관리자에게 보냅니다."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사에게 보냅니다."
   an_integer_value_is_required_e073bd46: "정수 값이 필요함"
   analytics: 
     course: 
@@ -5358,6 +5361,7 @@ ko:
   e_mail_only_2cc5e513: 이메일만
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege 변환기"
+  edit_alert_739bb0ba: "알림 편집"
   edit_and_delete_their_own_posts_f4f7cc6: "자신의 게시물을 편집하거나 삭제"
   edit_assignment_group_c04c4af0: "과제 그룹 편집"
   edit_c5fbea07: 편집
@@ -9582,6 +9586,7 @@ ko:
   no_students_have_taken_the_quiz_yet_e667644b: "어떤 학생도 이 퀴즈를 치르지 않음"
   no_students_have_taken_the_survey_yet_d378cd35: "어떤 학생도 이 설문을 치르지 않음"
   no_submission_fb131a40: "제출물 없음"
+  no_teacher_interaction_de8d91bc: "교사 상호 작용 없음"
   no_time_limit_for_long_running_conferences_d49fdfad: "시간 제한 없음(장기 회의)"
   not_deleted_2a7f63ef: "(삭제 안 됨)"
   not_installed_37a21a76: "설치 안 됨"
@@ -12287,6 +12292,7 @@ ko:
   run_report_743fdf5f: "보고서 실행"
   running_totals_d6f45b6b: "누적 합계"
   save_11a80ec3: 저장
+  save_alert_b64f9fa3: "알림 저장"
   save_key_b4dede06: "키 저장"
   save_login_bba1272: "로그인 저장"
   save_settings_cafe79a5: "설정 저장"
@@ -13549,6 +13555,7 @@ ko:
   submitted_318fad53: 제출됨
   submitted_b37e2ff0: 제출일
   submitted_d5ba370a: "제출:"
+  submitting_b90fac62: "제출 중..."
   subscribe_4b301fb7: 구독
   subscribed_fe74d22a: 구독함
   substitution_713c65b9: 대체
@@ -14003,6 +14010,8 @@ ko:
   unauthorized: "권한이 없음"
   underline_all_links_description: "링크 밑줄 치기는 탐색 메뉴, 대시보드, 페이지 사이드바에 있는 링크들을 *밑줄 친* 문자열로 표시합니다. 이 기능은  사용자가 서식 있는 내용 편집기에서 생성한 항목 링크들에 적용되는 기능이 아닙니다. 그것들은 모든 사용자에게 항상 밑줄 친 문자열로 표시합니다."
   underline_links_e7cf9b4f: "링크 밑줄 치기"
+  ungraded_submissions_count_63fcf6d1: "평가 안 된 제출물 (개수)"
+  ungraded_submissions_time_bafaa609: "평가 안 된 제출물 (시간)"
   ungraded_survey_ad7de790: "평가 안 된 설문"
   unknown: "알 수 없음"
   unknown_47a3b725: "알 수 없음"
