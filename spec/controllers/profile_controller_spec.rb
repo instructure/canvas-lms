@@ -79,6 +79,22 @@ describe ProfileController do
         expect(assigns(:user_data)[:common_contexts][1]["id"]).to eql(group.id)
         expect(assigns(:user_data)[:common_contexts][1]["roles"]).to eql(["Member"])
       end
+
+      it "does not include differentiation Tags in @user_data" do
+        user_session(@teacher)
+        student_in_course(user: @user, active_all: true)
+
+        @non_collaborative_group_category = @course.group_categories.create!(name: "Test non collaborative", non_collaborative: true)
+        @non_collaborative_group = @course.groups.create!(name: "Non Collaborative group", group_category: @non_collaborative_group_category)
+        @non_collaborative_group.add_user(@user, "accepted")
+        @non_collaborative_group.add_user(@teacher, "accepted")
+
+        get "show", params: { user_id: @user.id }
+        # Expect that the non-collaborative group is not included in the common contexts
+        # The only common_context included is the course
+        expect(assigns(:user_data)[:common_contexts].size).to be(1)
+        expect(assigns(:user_data)[:common_contexts][0]["id"]).to eql(@course.id)
+      end
     end
   end
 
