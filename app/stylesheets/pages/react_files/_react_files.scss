@@ -380,7 +380,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   padding-#{direction(right)}: 5px;
 }
 
-.current_uploads {
+.current_uploads, .current_downloads {
   border-radius: 10px;
   border: dashed $ic-color-neutral 2px;
   padding: 10px;
