@@ -2182,7 +2182,11 @@ class UsersController < ApplicationController
     end
 
     if @user.grants_right?(@current_user, :manage_user_details)
-      managed_attributes.push(:time_zone, :locale, :event)
+      managed_attributes.push(:event)
+    end
+
+    if @user.grants_right?(@current_user, :update_profile)
+      managed_attributes.push(:time_zone, :locale)
     end
 
     if @user.grants_right?(@current_user, :update_avatar)
