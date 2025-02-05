@@ -190,6 +190,7 @@ export const CriterionRow = ({
   const updateAssessmentData = (params: Partial<UpdateAssessmentData>) => {
     const updatedCriterionAssessment: UpdateAssessmentData = {
       ...criterionAssessment,
+      ratingId: criterionAssessment?.id,
       ...params,
       criterionId: criterion.id,
     }
