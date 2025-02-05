@@ -197,7 +197,7 @@ export default class UsageRightsSelectBox extends React.Component {
       <div className="UsageRightsSelectBox__container">
         <div className="control-group">
           <label className="control-label" htmlFor="usageRightSelector">
-            {I18n.t('Usage Right:')}
+            {I18n.t('Usage Rights')}<span style={{ fontSize: "1.5em", position: "relative", top: "0.2em" }}>*</span>:
           </label>
           <div className="controls">
             <select
