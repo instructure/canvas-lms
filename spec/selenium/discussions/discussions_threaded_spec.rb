@@ -1602,8 +1602,37 @@ describe "threaded discussions" do
       user_session(@teacher)
 
       get "/courses/#{@course.id}/discussion_topics/#{discussion_topic.id}"
-
       expect(fj("div:contains('This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled at the root account level. To enable this functionality, please contact an administrator to activate the feature flag.')")).to be_present
+    end
+
+    it "should not show alert when discussion has sub assignments but the checkpoints feature flag is disabled to students" do
+      Account.site_admin.enable_feature! :discussion_checkpoints
+
+      discussion_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+      due_at = 2.days.from_now
+      replies_required = 2
+
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic:,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: }],
+        points_possible: 5
+      )
+
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic:,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: }],
+        points_possible: 10,
+        replies_required:
+      )
+
+      Account.site_admin.disable_feature! :discussion_checkpoints
+
+      user_session(@student)
+
+      get "/courses/#{@course.id}/discussion_topics/#{discussion_topic.id}"
+      expect(f("body")).not_to contain_jqcss("div:contains('This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled at the root account level. To enable this functionality, please contact an administrator to activate the feature flag.')")
     end
   end
 end

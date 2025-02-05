@@ -154,7 +154,10 @@ export const DiscussionTopicAlertManager = props => {
           )
         }
 
-        if (ENV.checkpointed_discussion_without_feature_flag) {
+        if (
+          ENV.checkpointed_discussion_without_feature_flag &&
+          props?.discussionTopic?.permissions?.manageCourseContentEdit
+        ) {
           applicableAlerts.push(
             <Alert
               key="checkpointed-discussion-without-feature-flag"
