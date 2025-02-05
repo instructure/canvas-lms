@@ -257,8 +257,8 @@ describe('Course()', () => {
         }
       })
 
-      originalResponse = global.Response
-      global.Response = function () {
+      originalResponse = window.Response
+      window.Response = function () {
         this.blob = () => {
           return Promise.resolve('XXXXXXXX')
         }
@@ -275,7 +275,7 @@ describe('Course()', () => {
 
     afterAll(() => {
       fetchMock.restore()
-      global.Response = originalResponse
+      window.Response = originalResponse
     })
 
     it('dispatches a "stop loading" action', () => {
