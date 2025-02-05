@@ -1360,6 +1360,23 @@ describe DiscussionTopic do
       }.from(1).to(0).and not_change(student1.stream_item_instances, :count)
     end
 
+    it "removes streams when a student is unassigned from the discussion" do
+      section1 = @course.course_sections.create!
+      @student1 = create_enrolled_user(@course, section1, name: "student 1", enrollment_type: "StudentEnrollment")
+      topic = @course.discussion_topics.create!(title: "Discussion", user: @teacher, only_visible_to_overrides: true)
+      topic.overrides_changed = true
+
+      override = topic.assignment_overrides.create!
+      override.assignment_override_students.create!(user: @student1)
+
+      expect(@student.stream_item_instances.count).to eq 1
+
+      topic.assignment_overrides.last.destroy
+      topic.save!
+
+      expect(@student.stream_item_instances.count).to eq 0
+    end
+
     it "removes stream items from users if updated to a delayed post in the future" do
       announcement = @course.announcements.create!(title: "Lemon Loves Panda", message: "Because panda is home")
 
