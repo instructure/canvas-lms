@@ -29,6 +29,10 @@ module FilesPage
     fxpath("//button[descendant::text()[contains(., 'All My Files')]]")
   end
 
+  def upload_button
+    fxpath("//button[descendant::text()[contains(., 'Upload')]]")
+  end
+
   def create_folder_button
     f("[data-testid='create-folder-button']")
   end
@@ -47,6 +51,18 @@ module FilesPage
 
   def table_rows
     ff("tbody tr")
+  end
+
+  def all_files_table_rows
+    driver.find_elements(:css, "tr[data-testid='table-row']")
+  end
+
+  def get_item_content_files_table(row_index, col_index)
+    driver.find_element(:css, "tbody tr[data-testid='table-row']:nth-of-type(#{row_index}) td:nth-of-type(#{col_index})").text
+  end
+
+  def header_name_files_table
+    f("[data-testid='name']")
   end
 
   def create_folder_input
