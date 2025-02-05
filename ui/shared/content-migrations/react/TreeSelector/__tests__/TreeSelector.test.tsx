@@ -297,6 +297,14 @@ describe('TreeSelector', () => {
     expect(component.getAllByText('My sub-child item 3')[1]).toBeInTheDocument()
   })
 
+  describe('expand screen reader', () => {
+    it('find first screen reader texts of first level nodes', () => {
+      const component = renderComponent(defaultProps)
+      expect(component.getByText('My parent item 1, View All')).toBeInTheDocument()
+      expect(component.getByText('My parent item 2, View All')).toBeInTheDocument()
+    })
+  })
+
   describe('checked, unchecked state', () => {
     it('checks/un-checks for single child item', async () => {
       const onChangeMock = jest.fn()

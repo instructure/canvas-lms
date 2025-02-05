@@ -453,7 +453,7 @@ const Parent = memo(
           />
           <ToggleGroup
             data-testid={`toggle-${id}`}
-            toggleLabel={I18n.t('%{label}, Navigate inside to interact with the checkbox', {label})}
+            toggleLabel={I18n.t('%{label}, View All', {label})}
             expanded={expandedState}
             onToggle={handleExpand}
             border={false}
