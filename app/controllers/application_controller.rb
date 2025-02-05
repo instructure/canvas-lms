@@ -2138,7 +2138,7 @@ class ApplicationController < ActionController::Base
   def content_tag_redirect(context, tag, error_redirect_symbol, tag_type = nil)
     url_params = (tag.tag_type == "context_module") ? { module_item_id: tag.id } : {}
     if tag.content_type == "Assignment"
-      use_edit_url = params[:build].nil? && @context.grants_any_right?(@current_user, :manage_assignments, :manage_assignments_edit) && tag.quiz_lti
+      use_edit_url = params[:build].nil? && @context.grants_right?(@current_user, :manage_assignments_edit) && tag.quiz_lti
       url_params[:quiz_lti] = true if use_edit_url
       redirect_symbol = use_edit_url ? :edit_context_assignment_url : :context_assignment_url
       redirect_to named_context_url(context, redirect_symbol, tag.content_id, url_params)
@@ -3041,14 +3041,7 @@ class ApplicationController < ActionController::Base
     rights = [*RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_grades, :read_grades, :manage]
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
-    if @context.root_account.feature_enabled?(:granular_permissions_manage_assignments)
-      permissions[:manage_assignments] = permissions[:manage_assignments_edit]
-      permissions[:manage] = permissions[:manage_assignments_edit]
-    else
-      permissions[:manage_assignments_add] = permissions[:manage_assignments]
-      permissions[:manage_assignments_delete] = permissions[:manage_assignments]
-      permissions[:manage] = permissions[:manage_assignments]
-    end
+    permissions[:manage] = permissions[:manage_assignments_edit]
     permissions[:by_assignment_id] = @context.assignments.to_h do |assignment|
       [assignment.id,
        {

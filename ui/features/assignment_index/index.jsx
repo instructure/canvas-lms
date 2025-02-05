@@ -67,7 +67,7 @@ let assignmentSyncSettingsView = false
 let createGroupView = false
 let showByView = false
 
-if (ENV.PERMISSIONS.manage_assignments) {
+if (ENV.PERMISSIONS.manage_assignments_edit) {
   assignmentSettingsView = new AssignmentSettingsView({
     model: course,
     assignmentGroups,
@@ -88,7 +88,7 @@ if (ENV.PERMISSIONS.manage_assignments_add) {
     userIsAdmin,
   })
 }
-if (!ENV.PERMISSIONS.manage_assignments && !ENV.PERMISSIONS.manage_assignments_add) {
+if (!ENV.PERMISSIONS.manage_assignments_edit && !ENV.PERMISSIONS.manage_assignments_add) {
   showByView = new ToggleShowByView({
     course,
     assignmentGroups,

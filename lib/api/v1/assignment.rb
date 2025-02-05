@@ -242,7 +242,7 @@ module Api::V1::Assignment
       hash["description"] = description
     end
 
-    can_manage = assignment.context.grants_any_right?(user, :manage, :manage_grades, :manage_assignments, :manage_assignments_edit)
+    can_manage = assignment.context.grants_any_right?(user, :manage, :manage_grades, :manage_assignments_edit)
     hash["muted"] = assignment.muted?
     hash["html_url"] = course_assignment_url(assignment.context_id, assignment)
     if can_manage

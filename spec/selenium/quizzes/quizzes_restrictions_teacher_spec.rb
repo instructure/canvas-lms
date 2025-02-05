@@ -201,7 +201,7 @@ describe "quiz restrictions as a teacher" do
     quiz.generate_quiz_data
     quiz.save!
 
-    @course.account.role_overrides.create!(permission: :manage_assignments, role: teacher_role, enabled: false)
+    @course.account.role_overrides.create!(permission: :manage_assignments_add, role: teacher_role, enabled: false)
 
     expect(@quiz.grants_right?(@user, :manage)).to be_falsey
     expect(@course.grants_right?(@user, :read_as_admin)).to be_truthy

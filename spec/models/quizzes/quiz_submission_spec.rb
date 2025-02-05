@@ -918,7 +918,7 @@ describe Quizzes::QuizSubmission do
         RoleOverride.create!(
           context: Account.default,
           role: teacher_role,
-          permission: "manage_assignments",
+          permission: "manage_assignments_edit",
           enabled: false
         )
         course_with_teacher(active_all: true)

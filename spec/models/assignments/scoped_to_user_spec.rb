@@ -52,7 +52,7 @@ module Assignments
         expect(scope_filter.scope).not_to include(inactive)
       end
 
-      it "returns unpublished assignments if user can :manage_assignments" do
+      it "returns unpublished assignments if user can :manage_assignments_add" do
         expect(@course.grants_right?(@teacher, :manage_assignments_add)).to be_truthy,
                                                                             "precondition"
         expect(unpublished.workflow_state).to eq("unpublished"), "precondition"
@@ -60,7 +60,7 @@ module Assignments
         expect(scope_filter.scope).to include(unpublished)
       end
 
-      it "does not return unpublished assignments if user cannot :manage_assignments" do
+      it "does not return unpublished assignments if user cannot :manage_assignments_add" do
         expect(@course.grants_right?(@student, :manage_assignments_add)).to be_falsey,
                                                                             "precondition"
         expect(unpublished.workflow_state).to eq("unpublished"), "precondition"

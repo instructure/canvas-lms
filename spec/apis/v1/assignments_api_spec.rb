@@ -7400,7 +7400,7 @@ describe AssignmentsApiController, type: :request do
       @new_dates = (7..9).map { |x| x.days.from_now }
     end
 
-    it "requires manage_assignments rights" do
+    it "requires manage_assignments_edit rights" do
       student_in_course(active_all: true)
       api_bulk_update(@course, [], expected_status: 403)
     end

@@ -725,26 +725,6 @@ Rails.application.config.to_prepare do
         group: "manage_course_designer_enrollments",
         group_label: -> { I18n.t("Users - Designers") }
       },
-      manage_assignments: {
-        label: -> { I18n.t("permissions.manage_assignments", "Manage (add / edit / delete) assignments and quizzes") },
-        label_v2: -> { I18n.t("Assignments and Quizzes - add / edit / delete") },
-        available_to: %w[
-          TaEnrollment
-          DesignerEnrollment
-          TeacherEnrollment
-          ObserverEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: %w[
-          TaEnrollment
-          DesignerEnrollment
-          TeacherEnrollment
-          AccountAdmin
-        ],
-        acts_as_access_token_scope: true,
-        account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
-      },
       manage_assignments_add: {
         label: -> { I18n.t("Add assignments and quizzes") },
         label_v2: -> { I18n.t("Assignments and Quizzes - add") },
@@ -764,8 +744,7 @@ Rails.application.config.to_prepare do
         ],
         acts_as_access_token_scope: true,
         group: "manage_assignments_and_quizzes",
-        group_label: -> { I18n.t("Manage Assignments and Quizzes") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
+        group_label: -> { I18n.t("Manage Assignments and Quizzes") }
       },
       manage_assignments_edit: {
         label: -> { I18n.t("Manage / edit assignments and quizzes") },
@@ -786,8 +765,7 @@ Rails.application.config.to_prepare do
         ],
         acts_as_access_token_scope: true,
         group: "manage_assignments_and_quizzes",
-        group_label: -> { I18n.t("Manage Assignments and Quizzes") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
+        group_label: -> { I18n.t("Manage Assignments and Quizzes") }
       },
       manage_assignments_delete: {
         label: -> { I18n.t("Delete assignments and quizzes") },
@@ -808,8 +786,7 @@ Rails.application.config.to_prepare do
         ],
         acts_as_access_token_scope: true,
         group: "manage_assignments_and_quizzes",
-        group_label: -> { I18n.t("Manage Assignments and Quizzes") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
+        group_label: -> { I18n.t("Manage Assignments and Quizzes") }
       },
       manage_account_calendar_visibility: {
         label: -> { I18n.t("Change visibility of account calendars") },
