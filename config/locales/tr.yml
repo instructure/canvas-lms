@@ -2165,6 +2165,7 @@ tr:
       details: ayrıntılar...
       login: "Oturum Aç"
     no_text: "Metin yok"
+  alert_d2c8ef98: Uyarı
   alerts: 
     alert: 
       buttons: 
@@ -2308,6 +2309,8 @@ tr:
   alt_text_611fb322: "Etiket Metni"
   always_3a59e701: "Her zaman"
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Her zaman canvas zengin içerik hizmetinden zengin metin editörünü ve kenar kubuğunu her yere yükle. "
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "Kriterlerin tümünü karşılayan her bir öğrenci için bir uyarı oluşturulur.  Uyarılar her gün kontrol edilir ve sorun sebebi çözülene kadar öğrenci, öğretmen ve/veya hesap yöneticisine bildirimler gönderilir."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "Kriterlerin tümünü karşılayan her bir öğrenci için bir uyarı oluşturulur.  Uyarılar her gün kontrol edilip neden olan sorun çözülene kadar öğrenci, öğretmen ve/veya hesap yöneticisine bildirimler gönderilecek."
   an_amazing_discussion_assignment_e5c8bd6b: "Harika bir tartışma ödevi"
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Akademik Karşılaştırma'yı kullanmak için API anahtarı gerekiyor"
   an_assignment_name_dc624e70: "Bir Ödev Adı"
@@ -7835,6 +7838,7 @@ tr:
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege Dönüştürücü"
   ecuador_593_dfcc235a: "Ekvator (+593)"
+  edit_alert_739bb0ba: "Uyarıyı düzenle"
   edit_and_delete_their_own_posts_f4f7cc6: "Kendi gönderilerini sil ve düzenle"
   edit_announcement_title_cce0b4e: "Duyuruyu düzenle %{title}"
   edit_app_b0cc1c17: "Uygulamayı Düzenle"
@@ -13478,6 +13482,7 @@ tr:
   no_students_have_taken_the_quiz_yet_e667644b: "Henüz bu kısa sınavı yapan öğrenci yok"
   no_students_have_taken_the_survey_yet_d378cd35: "Henüz anketi yapan öğrenci yok"
   no_submission_fb131a40: "Gönderi Yok"
+  no_teacher_interaction_de8d91bc: "Öğretmen Etkileşimi Yok"
   no_terms_eab5ee7b: "Dönem Yok"
   no_time_limit_for_long_running_conferences_d49fdfad: "Süre sınırı yok (uzun süreli canlı dersler için)"
   no_tls_618add1a: "TLS Yok"
@@ -17221,6 +17226,7 @@ tr:
   salesforce_account_id_eb5c78ad: "Salesforce Hesap Id"
   saudi_arabia_966_d01ed717: "Suudi Arabistan (+966)"
   save_11a80ec3: Kaydet
+  save_alert_b64f9fa3: "Uyarıyı Kaydet"
   save_changes_698abe77: "Değişiklikleri Kaydet"
   save_key_b4dede06: "Anahtarı Kaydet"
   save_learning_mastery_82889d8b: "Öğrenme Yeterliliğini Kaydet"
@@ -18934,6 +18940,7 @@ tr:
   submitted_datetime_fa2e9287: "Gönderildi: %{dateTime}"
   submitted_files_82dd3009: "Gönderilen Dosyalar"
   submitted_late_3741af29: "Geç gönderildi"
+  submitting_b90fac62: Gönderiliyor...
   submitting_types_7c5a7096: "Gönderiliyor: %{types}"
   subscribe_4b301fb7: "Takip Et"
   subscribe_to_title_c7d6bbd2: "%{title} 'e üye ol"
@@ -19525,6 +19532,7 @@ tr:
   treat_ungraded_as_0_d38c2b41: "Notlandırılmamışları 0 olarak kabul et"
   tree_browser: 
     folder_tree_instructions: "Ağaç üzerinde gezinmek için aşağı ve yukarı ok tuşlarını kullanın. Klasörleri genişletmek için sağ oka, daraltmak için sol oka ve seçmek için enter tuşuna basın."
+  trigger_f0ee1fbf: Tetikleyici
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad Tobago (+1)"
   trophy: 
     star_display_name: "Yıldız Ver"
@@ -19575,6 +19583,8 @@ tr:
   unenroll_943490fb: "Dersten kaydı sil"
   unenrolled_users_e7632d24: "Kaydı silinmiş kullanıcılar"
   ungraded_submissions_44efb0ec: "Notlandırılmamış Gönderiler"
+  ungraded_submissions_count_63fcf6d1: "Notlandırılmamış Gönderiler (Sayı)"
+  ungraded_submissions_time_bafaa609: "Notlandırılmamış Gönderiler (Zaman)"
   ungraded_survey_ad7de790: "Notlandırılmamış Anket"
   united_arab_emirates_971_649b3750: "Birleşik Arap Emirlikleri (+971)"
   united_kingdom_44_880b06ad: "İngiltere (+44)"
