@@ -40,3 +40,35 @@ export const generateUrlPath = (folder: Folder) => {
   }
   return `/folder/${relativePath}`
 }
+
+// The root folder only needs to have context info for use in breadcrumbs
+export const createStubRootFolder = (
+  context_id: string,
+  plural_context_type: string,
+  root_folder_id: string,
+): Folder => {
+  return {
+    id: root_folder_id,
+    name: '',
+    parent_folder_id: null,
+    context_id: context_id,
+    context_type: plural_context_type.toLowerCase().slice(0, -1),
+    hidden: false,
+    full_name: '',
+    created_at: '',
+    updated_at: '',
+    lock_at: '',
+    unlock_at: '',
+    position: 0,
+    locked: false,
+    locked_for_user: false,
+    folders_count: 0,
+    files_count: 0,
+    folders_url: '',
+    files_url: '',
+    hidden_for_user: false,
+    locked_by: null,
+    can_upload: false,
+    for_submissions: false,
+  }
+}
