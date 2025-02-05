@@ -100,7 +100,7 @@
       </div>
     <% else %>
       <table class="ratings" style="<%= hidden if rubric && rubric.free_form_criterion_comments %>"><tr>
-        <% ratings = (criterion.ratings rescue nil); ratings = nil if ratings && ratings.length < 2  %>
+        <% ratings = (criterion.ratings rescue nil); ratings = nil if ratings&.empty? %>
         <% ratings ||= [Rubric::Rating.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), Rubric::Rating.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
         <% ratings.each_index do |idx| %>
           <% rating = ratings[idx];
