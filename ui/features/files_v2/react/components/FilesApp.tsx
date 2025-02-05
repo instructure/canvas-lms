@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
@@ -61,11 +61,42 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
     const baseUrl = `/api/v1/folders/${folderId}/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
 
     setBaseUrl(baseUrl)
-    setCurrentUrl(`${baseUrl}&sort=${sortBy}&order=${sortDirection}`)
-    setDiscoveredPages({1: baseUrl})
+    const newCurrentUrl = `${baseUrl}&sort=${sortBy}&order=${sortDirection}`
+    setCurrentUrl(newCurrentUrl)
+    setDiscoveredPages({1: newCurrentUrl})
+    setCurrentPageNumber(1)
 
     currentFolderWrapper.current = new MainFolderWrapper(currentFolder)
   }, [folders, sortBy, sortDirection])
+
+  const handleTableLoadingStatusChange = useCallback((isLoading: boolean) => {
+    setIsTableLoading(isLoading)
+  }, [])
+
+  const handlePaginationLinkChange = useCallback(
+    (links: Record<string, string>) => {
+      if (links.next && !discoveredPages[currentPageNumber + 1]) {
+        setDiscoveredPages(prev => {
+          const newLinks = {...prev, [currentPageNumber + 1]: links.next}
+          return newLinks
+        })
+      }
+    },
+    [currentPageNumber, discoveredPages],
+  )
+
+  const handlePageChange = useCallback(
+    (pageNumber: number) => {
+      setCurrentPageNumber(pageNumber)
+      setCurrentUrl(discoveredPages[pageNumber])
+    },
+    [discoveredPages],
+  )
+
+  const handlesortChange = useCallback((newSortBy: string, newSortDirection: string) => {
+    setSortBy(newSortBy)
+    setSortDirection(newSortDirection)
+  }, [])
 
   if (!folders || folders.length === 0) {
     showFlashError(I18n.t('Failed to retrieve folder information'))
@@ -87,30 +118,6 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
     userCanAddFilesForContext || userCanEditFilesForContext || userCanDeleteFilesForContext
   const usageRightsRequiredForContext =
     filesEnv.contextFor({contextType, contextId})?.usage_rights_required || false
-
-  const handleTableLoadingStatusChange = (isLoading: boolean) => {
-    setIsTableLoading(isLoading)
-  }
-
-  const handlePaginationLinkChange = (links: Record<string, string>) => {
-    if (links.next && !discoveredPages[currentPageNumber + 1]) {
-      setDiscoveredPages(prev => ({...prev, [currentPageNumber + 1]: links.next}))
-    }
-  }
-
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPageNumber(pageNumber)
-    setCurrentUrl(discoveredPages[pageNumber])
-  }
-
-  const handlePageReset = (newSortBy: string, newSortDirection: string) => {
-    setSortBy(newSortBy)
-    setSortDirection(newSortDirection)
-    const newInitialUrl = `${baseUrl}&sort=${newSortBy}&order=${newSortDirection}`
-    setCurrentUrl(newInitialUrl)
-    setCurrentPageNumber(1)
-    setDiscoveredPages({1: newInitialUrl})
-  }
 
   return (
     <FileManagementContext.Provider
@@ -134,7 +141,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
             currentUrl={currentUrl}
             onPaginationLinkChange={handlePaginationLinkChange}
             onLoadingStatusChange={handleTableLoadingStatusChange}
-            onPageReset={handlePageReset}
+            onSortChange={handlesortChange}
           />
         )}
         <Flex padding="small none none none" justifyItems="space-between">

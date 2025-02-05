@@ -71,14 +71,48 @@ describe "files index page" do
         expect(content).to include_text("new folder")
       end
 
-      it "Can paginate through files" do
-        51.times do |i|
-          attachment_model(content_type: "application/pdf", context: @course, display_name: "file#{i}.pdf")
+      context("with a large number of files") do
+        before do
+          51.times do |i|
+            attachment_model(content_type: "application/pdf", context: @course, size: 100 - i, display_name: "file#{i.to_s.rjust(2, "0")}.pdf")
+          end
         end
-        get "/courses/#{@course.id}/files"
-        pagination_button_by_index(1).click
-        # that's just how sorting works
-        expect(content).to include_text("file9.pdf")
+
+        it "Can paginate through files" do
+          get "/courses/#{@course.id}/files"
+          pagination_button_by_index(1).click
+          # that's just how sorting works
+          expect(content).to include_text("file50.pdf")
+        end
+
+        describe "sorting" do
+          it "Can sort by size" do
+            get "/courses/#{@course.id}/files"
+            column_heading_by_name("size").click
+            expect(column_heading_by_name("size")).to have_attribute("aria-sort", "ascending")
+          end
+
+          it "Can paginate sorted files" do
+            get "/courses/#{@course.id}/files"
+            column_heading_by_name("size").click
+            expect(column_heading_by_name("size")).to have_attribute("aria-sort", "ascending")
+            pagination_button_by_index(1).click
+            expect(content).to include_text("file00.pdf")
+            pagination_button_by_index(0).click
+            expect(content).to include_text("file50.pdf")
+            expect(content).to include_text("file01.pdf")
+          end
+
+          it "resets to the first page when sorting changes" do
+            get "/courses/#{@course.id}/files"
+            column_heading_by_name("size").click
+            expect(column_heading_by_name("size")).to have_attribute("aria-sort", "ascending")
+            pagination_button_by_index(1).click
+            expect(content).to include_text("file00.pdf")
+            column_heading_by_name("name").click
+            expect(content).to include_text("file00.pdf")
+          end
+        end
       end
     end
 

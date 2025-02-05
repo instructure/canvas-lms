@@ -22,6 +22,7 @@ import {FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
 import {renderComponent} from './testUtils'
 
 describe('FileFolderTable', () => {
+  const onSortChange = jest.fn()
   beforeEach(() => {
     fetchMock.get(/.*\/folders/, {
       body: FAKE_FOLDERS_AND_FILES,
@@ -37,6 +38,7 @@ describe('FileFolderTable', () => {
 
   afterEach(() => {
     fetchMock.restore()
+    onSortChange.mockClear()
   })
 
   describe('sort functionality', () => {
@@ -45,18 +47,20 @@ describe('FileFolderTable', () => {
       const nameHeader = await findByTestId('name')
       expect(nameHeader).toHaveAttribute('aria-sort', 'ascending')
     })
+
     it('sorts by column ascending when a column header is clicked', async () => {
-      const {findByTestId} = renderComponent()
+      const {findByTestId} = renderComponent({onSortChange})
       const sizeHeader = await findByTestId('size')
       expect(sizeHeader).toHaveAttribute('aria-sort', 'none')
       fireEvent.click(sizeHeader.querySelector('button') as HTMLButtonElement)
       await waitFor(() => {
         expect(sizeHeader).toHaveAttribute('aria-sort', 'ascending')
       })
+      expect(onSortChange).toHaveBeenCalledWith('size', 'asc')
     })
 
     it('sorts by column descending when clicked twice', async () => {
-      const {findByTestId} = renderComponent()
+      const {findByTestId} = renderComponent({onSortChange})
       const sizeHeader = await findByTestId('size')
       expect(sizeHeader).toHaveAttribute('aria-sort', 'none')
       fireEvent.click(sizeHeader.querySelector('button') as HTMLButtonElement)
@@ -67,6 +71,7 @@ describe('FileFolderTable', () => {
       await waitFor(() => {
         expect(sizeHeader).toHaveAttribute('aria-sort', 'descending')
       })
+      expect(onSortChange).toHaveBeenCalledWith('size', 'desc')
     })
 
     it('resets to ascending sort when column header is clicked a third time', async () => {
