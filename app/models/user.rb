@@ -1368,6 +1368,7 @@ class User < ActiveRecord::Base
       manage_calendar
       send_messages
       update_avatar
+      update_profile
       view_feature_flags
       manage_feature_flags
       api_show_user
@@ -1425,7 +1426,7 @@ class User < ActiveRecord::Base
       check_accounts_right?(user, :manage_user_logins) && adminable_accounts.select(&:root_account?).all? { |a| has_subset_of_account_permissions?(user, a) }
     end
     can :manage_user_details and can :rename and can :update_avatar and can :remove_avatar and
-      can :manage_feature_flags and can :view_feature_flags
+      can :manage_feature_flags and can :view_feature_flags and can :update_profile
 
     given { |user| pseudonyms.shard(self).any? { |p| p.grants_right?(user, :update) } }
     can :merge
