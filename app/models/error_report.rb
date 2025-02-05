@@ -32,6 +32,7 @@ class ErrorReport < ActiveRecord::Base
   define_callbacks :on_send_to_external
 
   def send_to_external
+    truncate_fields_for_external
     run_callbacks(:on_send_to_external)
   end
 
@@ -191,6 +192,14 @@ class ErrorReport < ActiveRecord::Base
     end
   end
 
+  def subject=(val)
+    if !val || val.length < self.class.maximum_text_length
+      super
+    else
+      super(val[0, self.class.maximum_text_length])
+    end
+  end
+
   def comments=(val)
     if !val || val.length < self.class.maximum_text_length
       super
@@ -200,7 +209,7 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def url=(val)
-    super(LoggingFilter.filter_uri(val))
+    val ? super(LoggingFilter.filter_uri(val)) : super
   end
 
   def safe_url?
@@ -229,5 +238,30 @@ class ErrorReport < ActiveRecord::Base
 
   def self.categories
     distinct_values("category")
+  end
+
+  private
+
+  def truncate_fields_for_external
+    # Truncate fields that are too long for external systems to handle
+    # 255 characters is still quite generous for a subject line
+    # If url is populated it will remain preserved in its entirety in the http_env as HTTP_REFERER
+    self.url = truncate_query_params_in_url(url) if url.present?
+    self.subject = subject.truncate(self.class.maximum_string_length) if subject.present?
+  end
+
+  def truncate_query_params_in_url(url, max_length = self.class.maximum_string_length)
+    return url if url.length <= max_length
+
+    uri = URI.parse(url)
+    base_url = "#{uri.scheme}://#{uri.host}#{uri.path}" # preserve the scheme, host, and path
+    remaining_length = max_length - base_url.length - 1 # 1 for the "?" character
+
+    if uri.query
+      truncated_query = uri.query[0, remaining_length]
+      "#{base_url}?#{truncated_query}"
+    else
+      base_url
+    end
   end
 end
