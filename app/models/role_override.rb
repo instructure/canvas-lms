@@ -100,7 +100,6 @@ class RoleOverride < ActiveRecord::Base
     remove_designer_from_course
   ].freeze
   GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS = %i[
-    manage_assignments
     manage_assignments_add
     manage_assignments_edit
     manage_assignments_delete

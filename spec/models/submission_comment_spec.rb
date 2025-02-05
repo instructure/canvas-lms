@@ -745,7 +745,7 @@ RSpec.describe SubmissionComment do
         end
 
         it "submitter comments can be read by an instructor who cannot manage assignments but can view the submitter's grades" do
-          RoleOverride.create!(context: course.account, permission: :manage_assignments, role: ta_role, enabled: false)
+          RoleOverride.create!(context: course.account, permission: :manage_assignments_edit, role: ta_role, enabled: false)
           expect(comment.grants_right?(ta, :read)).to be true
         end
 

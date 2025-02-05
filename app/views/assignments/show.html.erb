@@ -83,7 +83,7 @@
             <i class='icon-permissions'></i> <%= t('Assign To') %>
           </button>
         <% end %>
-        <% if @context.grants_any_right?(@current_user, :manage_assignments, :manage_assignments_edit) %>
+        <% if @context.grants_right?(@current_user, :manage_assignments_edit) %>
           <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link<%= ' disabled' unless can_do(@assignment, @current_user, :update) %>'>
             <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
             <% unless can_do(@assignment, @current_user, :update) %>

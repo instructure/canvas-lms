@@ -82,7 +82,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
 
       @course.account.role_overrides.create!({
                                                role: teacher_role,
-                                               permission: "manage_assignments",
+                                               permission: "manage_assignments_add",
                                                enabled: false
                                              })
 

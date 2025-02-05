@@ -2038,14 +2038,7 @@ class AbstractAssignment < ActiveRecord::Base
       can :manage_files_delete
 
     given do |user, session|
-      !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments)
-    end
-    can :create and can :read
-
-    given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments_add)
+      context.grants_right?(user, session, :manage_assignments_add)
     end
     can :create and can :read
 
@@ -2053,18 +2046,8 @@ class AbstractAssignment < ActiveRecord::Base
     can :update
 
     given do |user, session|
-      !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments) &&
-        (context.account_membership_allows(user) ||
-         !in_closed_grading_period?)
-    end
-    can :delete
-
-    given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments_delete) &&
-        (context.account_membership_allows(user) ||
-         !in_closed_grading_period?)
+      context.grants_right?(user, session, :manage_assignments_delete) &&
+        (context.account_membership_allows(user) || !in_closed_grading_period?)
     end
     can :delete
 
@@ -2072,13 +2055,13 @@ class AbstractAssignment < ActiveRecord::Base
       next false unless user
       next false if submission_types == "discussion_topic" && !context.grants_right?(user, session, :moderate_forum)
 
-      context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+      context.grants_right?(user, session, :manage_assignments_edit)
     end
     can :manage_assign_to
   end
 
   def user_can_update?(user, session = nil)
-    return false unless context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+    return false unless context.grants_right?(user, session, :manage_assignments_edit)
     return true unless moderated_grading?
 
     # a moderated assignment may only be edited by the assignment's moderator (assuming one has

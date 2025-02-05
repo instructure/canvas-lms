@@ -42,30 +42,17 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
   set_policy do
     given do |user, session|
-      !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :read_question_banks) &&
-        context.grants_right?(user, session, :manage_assignments)
-    end
-    can :read and can :create and can :update and can :delete and can :manage
-
-    given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :read_question_banks) &&
-        context.grants_right?(user, session, :manage_assignments_add)
+      context.grants_all_rights?(user, session, :read_question_banks, :manage_assignments_add)
     end
     can :read and can :create
 
     given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :read_question_banks) &&
-        context.grants_right?(user, session, :manage_assignments_edit)
+      context.grants_all_rights?(user, session, :read_question_banks, :manage_assignments_edit)
     end
     can :read and can :update and can :manage
 
     given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :read_question_banks) &&
-        context.grants_right?(user, session, :manage_assignments_delete)
+      context.grants_all_rights?(user, session, :read_question_banks, :manage_assignments_delete)
     end
     can :read and can :delete
 

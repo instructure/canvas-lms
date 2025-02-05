@@ -68,7 +68,7 @@ class Quizzes::QuizzesController < ApplicationController
       return unless authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
 
-      can_manage = @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
+      can_manage = @context.grants_right?(@current_user, session, :manage_assignments_edit)
 
       quiz_index = scoped_quizzes_index
       quiz_index += scoped_new_quizzes_index if quiz_lti_enabled?
@@ -590,7 +590,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def publish
-    if authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
+    if authorized_action(@context, @current_user, :manage_assignments_edit)
       @quizzes = @context.quizzes.active.where(id: params[:quizzes])
       @quizzes.each(&:publish!)
 
@@ -607,7 +607,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def unpublish
-    if authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
+    if authorized_action(@context, @current_user, :manage_assignments_edit)
       @quizzes = @context.quizzes.active.where(id: params[:quizzes]).select(&:available?)
       @quizzes.each(&:unpublish!)
 

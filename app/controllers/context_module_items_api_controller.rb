@@ -565,7 +565,7 @@ class ContextModuleItemsApiController < ApplicationController
   #
   def select_mastery_path
     return unless authorized_action(@context, @current_user, :read)
-    return unless @student == @current_user || authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
+    return unless @student == @current_user || authorized_action(@context, @current_user, :manage_assignments_edit)
     return render json: { message: "mastery paths not enabled" }, status: :bad_request unless cyoe_enabled?(@context)
     return render json: { message: "assignment_set_id required" }, status: :bad_request unless params[:assignment_set_id]
 

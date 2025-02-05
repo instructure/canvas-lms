@@ -1426,7 +1426,7 @@ class DiscussionTopic < ActiveRecord::Base
       next false unless user && context.is_a?(Course) && context.grants_right?(user, session, :moderate_forum)
 
       if assignment_id
-        context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+        context.grants_right?(user, session, :manage_assignments_edit)
       else
         context.user_is_admin?(user) || context.account_membership_allows(user) || !context.visibility_limited_to_course_sections?(user)
       end
@@ -1437,7 +1437,7 @@ class DiscussionTopic < ActiveRecord::Base
       next false unless user && context.is_a?(Course) && context.grants_right?(user, session, :create_forum)
 
       if assignment_id
-        context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_add)
+        context.grants_right?(user, session, :manage_assignments_add)
       else
         context.user_is_admin?(user) || context.account_membership_allows(user) || !context.visibility_limited_to_course_sections?(user)
       end

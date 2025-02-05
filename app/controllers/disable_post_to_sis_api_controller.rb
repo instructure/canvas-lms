@@ -94,7 +94,7 @@ class DisablePostToSisApiController < ApplicationController
   end
 
   def require_authorized_user
-    head :unauthorized unless context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
+    head :unauthorized unless context.grants_right?(@current_user, session, :manage_assignments_edit)
   end
 
   def require_valid_grading_period
