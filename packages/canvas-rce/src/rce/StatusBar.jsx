@@ -46,7 +46,7 @@ export const PRETTY_HTML_EDITOR_VIEW = 'PRETTY'
 export const RAW_HTML_EDITOR_VIEW = 'RAW'
 
 // I don't know why eslint is reporting this, the props are all used
- 
+
 StatusBar.propTypes = {
   id: string.isRequired,
   rceIsFullscreen: bool,
@@ -74,10 +74,8 @@ StatusBar.defaultProps = {
   disabledPlugins: [],
 }
 
- 
-
 // we use the array index because pathname may not be unique
- 
+
 function renderPathString({path}) {
   return path.reduce((result, pathName, index) => {
     return result.concat(
@@ -90,7 +88,6 @@ function renderPathString({path}) {
     )
   }, [])
 }
- 
 
 function emptyTagIcon() {
   return (

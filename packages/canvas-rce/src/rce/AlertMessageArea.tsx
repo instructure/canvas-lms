@@ -17,18 +17,32 @@
  */
 import {Alert} from '@instructure/ui-alerts'
 import React from 'react'
-import {arrayOf, func, number, shape, string} from 'prop-types'
+import type {AlertVariant} from './types'
+
+interface AlertMessageAreaProps {
+  messages: {
+    id: number
+    variant: AlertVariant
+    text: string
+  }[]
+  afterDismiss: (messageId: number) => void
+  liveRegion: () => Element
+}
 
 /**
  * Shows messages that have been provided to it in the RCE
  */
-export default function AlertMessageArea({messages, afterDismiss, liveRegion}) {
+export default function AlertMessageArea({
+  messages,
+  afterDismiss,
+  liveRegion,
+}: AlertMessageAreaProps) {
   return (
     <div>
       {messages.map(message => (
         <Alert
           key={message.id}
-          variant={message.variant || message.type || 'info'}
+          variant={message.variant || 'info'}
           timeout={10000}
           liveRegion={liveRegion}
           onDismiss={() => afterDismiss(message.id)}
@@ -38,16 +52,4 @@ export default function AlertMessageArea({messages, afterDismiss, liveRegion}) {
       ))}
     </div>
   )
-}
-
-AlertMessageArea.propTypes = {
-  messages: arrayOf(
-    shape({
-      id: number,
-      variant: string,
-      text: string,
-    }),
-  ).isRequired,
-  afterDismiss: func,
-  liveRegion: func.isRequired,
 }

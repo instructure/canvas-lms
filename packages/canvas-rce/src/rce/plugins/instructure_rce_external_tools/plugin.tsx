@@ -20,16 +20,13 @@ import tinymce from 'tinymce'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {
-  RceToolWrapper,
-  buildToolMenuItems,
-  ExternalToolMenuItem,
-  externalToolsForToolbar,
-} from './RceToolWrapper'
+import {RceToolWrapper, buildToolMenuItems, ExternalToolMenuItem} from './RceToolWrapper'
 import formatMessage from '../../../format-message'
 import {ExternalToolSelectionDialog} from './components/ExternalToolSelectionDialog/ExternalToolSelectionDialog'
 import {ensureToolDialogContainerElem} from './dialog-helper'
-import {ExternalToolsEditor, externalToolsEnvFor} from './ExternalToolsEnv'
+import {externalToolsEnvFor} from './ExternalToolsEnv'
+import {externalToolsForToolbar} from './util/externalToolsForToolbar'
+import {ExternalToolsEditor} from '../../types'
 
 // Register plugin
 tinymce.PluginManager.add('instructure_rce_external_tools', initExternalToolsLocalPlugin)

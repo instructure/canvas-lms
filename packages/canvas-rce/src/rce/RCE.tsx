@@ -27,7 +27,7 @@ import wrapInitCb from './wrapInitCb'
 import tinyRCE from './tinyRCE'
 import getTranslations from '../getTranslations'
 import '@instructure/canvas-theme'
-import {Editor} from 'tinymce'
+import type {Editor} from 'tinymce'
 // @ts-expect-error
 import generateId from 'format-message-generate-id/underscored_crc32'
 
@@ -78,6 +78,7 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
         setTranslations(true)
       })
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.error('Failed loading the language file for', locale, '\n Cause:', err)
         setTranslations(false)
       })
@@ -121,7 +122,9 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
     return <>{formatMessage('Loading...')}</>
   } else {
     return (
+      // @ts-expect-error
       <RCEWrapper
+        name="content"
         ref={rceRef}
         tinymce={tinyRCE}
         readOnly={readOnly}
@@ -288,7 +291,7 @@ export interface RCEPropTypes {
   userCacheKey?: string
 
   onFocus?: (rce: RCEWrapper) => void
-  onBlur?: (event: Event) => void
+  onBlur?: (event: React.FocusEvent<HTMLElement>) => void
   onInit?: (editor: Editor) => void
   onContentChange?: (content: string) => void
 

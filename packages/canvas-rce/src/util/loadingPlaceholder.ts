@@ -113,7 +113,7 @@ export function removePlaceholder(editor: Editor, unencodedName: string) {
  */
 export async function insertPlaceholder(
   editor: Editor,
-  unencodedName: string,
+  unencodedName: string | undefined,
   placeholderInfoPromise: Promise<PlaceholderInfo>,
 ): Promise<HTMLElement> {
   const placeholderId = `placeholder-${placeholderIdCounter++}`
@@ -125,7 +125,7 @@ export async function insertPlaceholder(
       false,
       `<span
             aria-label="${formatMessage('Loading')}"
-            data-placeholder-for="${encodeURIComponent(unencodedName)}"
+            data-placeholder-for="${encodeURIComponent(unencodedName || '')}"
             id="${placeholderId}"
             class="mceNonEditable"
             style="user-select: none; pointer-events: none; user-focus: none; display: inline-flex;"
