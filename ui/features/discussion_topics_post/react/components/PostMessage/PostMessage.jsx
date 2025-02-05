@@ -24,7 +24,6 @@ import {
   getDisplayName,
   responsiveQuerySizes,
   getTranslation,
-  translationSeparator,
 } from '../../utils'
 import {DiscussionManagerUtilityContext, SearchContext} from '../../utils/constants'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
@@ -36,8 +35,15 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
+import AiIcon from '@canvas/ai-icon'
 
 const I18n = createI18nScope('discussion_posts')
+
+const hrStyle = {
+  borderStyle: 'dashed none none',
+  borderWidth: '2px',
+  margin: 0,
+}
 
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
@@ -57,7 +63,7 @@ export function PostMessage({...props}) {
     heading = 'h' + depth.toString()
   }
 
-  const {translateTargetLanguage} = useContext(DiscussionManagerUtilityContext)
+  const {translationLanguages, translateTargetLanguage} = useContext(DiscussionManagerUtilityContext)
   const [translatedTitle, setTranslatedTitle] = useState(null)
   const [translatedMessage, setTranslatedMessage] = useState(null)
   const [isTranslating, setIsTranslating] = useState(false)
@@ -120,31 +126,11 @@ export function PostMessage({...props}) {
           {props.title ? (
             <View margin={responsiveProps.titleMargin} display={responsiveProps.titleDisplay}>
               <Text size={responsiveProps.titleTextSize} data-testid="message_title" weight="bold">
-                {translatedTitle ? (
-                  <>
-                    <AccessibleContent
-                      alt={I18n.t('Discussion Topic: %{title}', {title: props.title})}
-                    >
-                      {props.title}
-                    </AccessibleContent>
-                    <AccessibleContent alt={translationSeparator}>
-                      {translationSeparator}
-                    </AccessibleContent>
-                    <AccessibleContent alt={translatedTitle} data-testid="post-title-translated">
-                      {translateTargetLanguage ? (
-                        <span lang={translateTargetLanguage}>{translatedTitle}</span>
-                      ) : (
-                        translatedTitle
-                      )}
-                    </AccessibleContent>
-                  </>
-                ) : (
-                  <AccessibleContent
-                    alt={I18n.t('Discussion Topic: %{title}', {title: props.title})}
-                  >
-                    {props.title}
-                  </AccessibleContent>
-                )}
+                <AccessibleContent
+                  alt={I18n.t('Discussion Topic: %{title}', {title: props.title})}
+                >
+                  {props.title}
+                </AccessibleContent>
               </Text>
             </View>
           ) : (
@@ -201,11 +187,29 @@ export function PostMessage({...props}) {
                     props.isTopic ? props.discussionTopic?._id : props.discussionEntry?._id
                   }
                 />
-                {translatedMessage && (
+                {translateTargetLanguage && translatedMessage && (!props.title || translatedTitle) && (
                   <>
-                    <AccessibleContent alt={translationSeparator}>
-                      {translationSeparator}
-                    </AccessibleContent>
+                    <Flex direction="row" alignItems="center" margin="medium 0 medium 0">
+                      <Flex.Item shouldGrow margin="0 small 0 0">
+                        <hr role="presentation" aria-hidden="true" style={hrStyle} />
+                      </Flex.Item>
+                      <Flex.Item>
+                        <Text color="secondary" fontStyle="italic">
+                          <span style={{marginRight: '0.5rem'}}><AiIcon /></span>
+                          <span>
+                            {translationLanguages.current.find(language => language.id === translateTargetLanguage).translated_to_name}
+                          </span>
+                        </Text>
+                      </Flex.Item>
+                      <Flex.Item shouldGrow margin="0 0 0 small">
+                        <hr role="presentation" aria-hidden="true" style={hrStyle} />
+                      </Flex.Item>
+                    </Flex>
+                    <Text size={responsiveProps.titleTextSize} data-testid="message_title_translated" weight="bold">
+                      <AccessibleContent alt={translatedTitle} data-testid="post-title-translated">
+                        <span lang={translateTargetLanguage}>{translatedTitle}</span>
+                      </AccessibleContent>
+                    </Text>
                     <SearchSpan
                       lang={translateTargetLanguage}
                       isSplitView={props.isSplitView}
