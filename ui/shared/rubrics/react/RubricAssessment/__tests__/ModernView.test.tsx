@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ModernView} from '../ModernView'
 import type {RubricCriterion, RubricAssessmentData} from '../../types/rubric'
@@ -69,14 +69,52 @@ const mockCriteria: RubricCriterion[] = [
       },
     ],
   },
+  {
+    id: 'criterion_3',
+    description: 'Application of Knowledge',
+    longDescription: 'Applies knowledge to practical scenarios',
+    points: 0,
+    criterionUseRange: true,
+    masteryPoints: 0,
+    ignoreForScoring: false,
+    ratings: [
+      {
+        id: 'rating_3_1',
+        description: 'Excellent',
+        longDescription: 'Applies knowledge effectively',
+        points: 0,
+      },
+      {
+        id: 'rating_3_2',
+        description: 'Good',
+        longDescription: 'Applies knowledge with minor errors',
+        points: 0,
+      },
+      {
+        id: 'rating_3_3',
+        description: 'Fair',
+        longDescription: 'Applies knowledge with some errors',
+        points: 0,
+      },
+    ],
+  },
 ]
 
 const mockRubricAssessmentData: RubricAssessmentData[] = [
   {
     criterionId: 'criterion_1',
-    points: 8,
+    points: 10,
     comments: 'Good work on the writing',
-    id: 'rating_1_1',
+    id: 'rating_1_2',
+    commentsEnabled: true,
+    description: 'Excellent',
+    ignoreForScoring: false,
+  },
+  {
+    criterionId: 'criterion_3',
+    points: 0,
+    comments: '',
+    id: 'rating_3_2',
     commentsEnabled: true,
     description: 'Excellent',
     ignoreForScoring: false,
@@ -135,7 +173,7 @@ describe('ModernView', () => {
 
     const assessment = mockRubricAssessmentData[0]
     const pointsInput = screen.getByTestId(`criterion-score-${assessment.criterionId}`)
-    expect(pointsInput).toHaveValue('8')
+    expect(pointsInput).toHaveValue('10')
     expect(screen.getByText(assessment.comments)).toBeInTheDocument()
   })
 
@@ -144,20 +182,21 @@ describe('ModernView', () => {
     render(<ModernView {...defaultProps} />)
 
     const criterion = mockCriteria[0]
-    const rating = criterion.ratings[0]
+    const nextRating = criterion.ratings[0]
+    const currentRating = criterion.ratings[1]
     // Find rating button by data-testid which includes rating ID and index
-    const ratingButton = screen.getByTestId(`rating-button-${rating.id}-0`)
+    const ratingButton = screen.getByTestId(`rating-button-${nextRating.id}-0`)
     await user.click(ratingButton.querySelector('button') as HTMLElement)
 
     expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledWith({
       comments: mockRubricAssessmentData[0].comments,
       commentsEnabled: mockRubricAssessmentData[0].commentsEnabled,
       criterionId: criterion.id,
-      description: rating.description,
-      id: rating.id,
+      description: nextRating.description,
+      id: currentRating.id,
       ignoreForScoring: mockRubricAssessmentData[0].ignoreForScoring,
-      points: rating.points,
-      ratingId: rating.id,
+      points: nextRating.points,
+      ratingId: nextRating.id,
     })
   })
 
@@ -182,7 +221,7 @@ describe('ModernView', () => {
     render(<ModernView {...defaultProps} isPreviewMode={true} />)
 
     // Points input is replaced with text in preview mode
-    const pointsText = screen.getByText('8')
+    const pointsText = screen.getByText('10')
     expect(pointsText).toBeInTheDocument()
 
     // Rating buttons should be disabled
@@ -225,6 +264,33 @@ describe('ModernView', () => {
       ...mockRubricAssessmentData[0],
       criterionId: 'criterion_1',
       comments: 'Test comment',
+      ratingId: mockRubricAssessmentData[0].id,
     })
+  })
+
+  it(`comment blur does not clear rating for criterion where ratings' points are different`, async () => {
+    render(<ModernView {...defaultProps} />)
+
+    const commentInput = screen.getByTestId('comment-text-area-criterion_1')
+    fireEvent.blur(commentInput)
+
+    expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledWith({
+      ...mockRubricAssessmentData[0],
+      ratingId: mockRubricAssessmentData[0].id,
+    })
+    expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledTimes(1)
+  })
+
+  it(`comment blur does not clear rating for criterion where ratings' points are equal`, async () => {
+    render(<ModernView {...defaultProps} />)
+
+    const commentInput = screen.getByTestId('comment-text-area-criterion_3')
+    fireEvent.blur(commentInput)
+
+    expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledWith({
+      ...mockRubricAssessmentData[1],
+      ratingId: mockRubricAssessmentData[1].id,
+    })
+    expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledTimes(1)
   })
 })
