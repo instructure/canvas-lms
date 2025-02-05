@@ -40,7 +40,6 @@ import {
 } from '@canvas/upload-media-translations'
 import {Modal} from '@instructure/ui-modal'
 import {NumberInput} from '@instructure/ui-number-input'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
@@ -63,9 +62,8 @@ import {
   addAttachmentsFn,
   removeAttachmentFn,
 } from '@canvas/message-attachments'
-import type {CamelizedAssignment, CamelizedStudent} from '@canvas/grading/grading.d'
+import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 import {View} from '@instructure/ui-view'
-import type {AxiosResponse} from 'axios'
 
 export enum MSWLaunchContext {
   ASSIGNMENT_CONTEXT,
@@ -715,7 +713,8 @@ const MessageStudentsWhoDialog = ({
       setSelectedObservers(
         filteredStudents.reduce(
           (map, student) => {
-            map[student.id] = [...observersByStudentID[student.id].map(observer => observer._id)]
+            const observersForStudent = observersByStudentID[student.id] ?? []
+            map[student.id] = [...observersForStudent.map(observer => observer._id)]
 
             return map
           },
