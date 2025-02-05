@@ -189,4 +189,54 @@ describe ErrorReport do
       expect(report.safe_url?).to be false
     end
   end
+
+  describe "#truncate_fields_for_external" do
+    let(:error_report) { ErrorReport.new }
+
+    it "truncates the URL if it is present" do
+      error_report.url = "https://www.example.com/path?query=param&another_param=long_value&another_param=long_value \
+                          &another_param=long_value&another_param=long_value&another_param=long_value \
+                          &another_param=long_value&another_param=long_value&another_param=long_value"
+      error_report.send(:truncate_fields_for_external)
+      expect(error_report.url.length).to be <= ErrorReport.maximum_string_length
+    end
+
+    it "truncates the subject if it is present" do
+      error_report.subject = "a" * 200
+      error_report.send(:truncate_fields_for_external)
+      expect(error_report.subject.length).to be <= ErrorReport.maximum_string_length
+    end
+
+    it "does not change the URL if it is not present" do
+      error_report.url = nil
+      error_report.send(:truncate_fields_for_external)
+      expect(error_report.url).to be_nil
+    end
+
+    it "does not change the subject if it is not present" do
+      error_report.subject = nil
+      error_report.send(:truncate_fields_for_external)
+      expect(error_report.subject).to be_nil
+    end
+  end
+
+  describe "#truncate_query_params_in_url" do
+    let(:error_report) { ErrorReport.new }
+
+    it "returns the original URL if it is within the maximum length" do
+      url = "https://www.example.com/path?query=param"
+      expect(error_report.send(:truncate_query_params_in_url, url, 50)).to eq(url)
+    end
+
+    it "truncates the URL if it exceeds the maximum length" do
+      url = "https://www.example.com/path?query=param&another_param=long_value"
+      truncated_url = error_report.send(:truncate_query_params_in_url, url, 40)
+      expect(truncated_url).to eq("https://www.example.com/path?query=param")
+    end
+
+    it "handles URLs without query parameters" do
+      url = "https://www.example.com/path"
+      expect(error_report.send(:truncate_query_params_in_url, url, 50)).to eq(url)
+    end
+  end
 end
