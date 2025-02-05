@@ -9,7 +9,7 @@ Rack::Timeout.register_state_change_observer(:check_for_slow_requests) do |env|
   unless env["sentry_sent"]
     info = env[::Rack::Timeout::ENV_INFO_KEY]
     request_id = info.id
-    if info.service && info.service > 5
+    if info.service && info.service > 30
       env["sentry_sent"] = true
       begin
         slow_thread = Thread.list.find { |thread| thread.thread_variable_get("request_id") == request_id}
