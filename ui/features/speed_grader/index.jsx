@@ -38,6 +38,7 @@ import {updateCommentSuggestionsEnabled} from './mutations/comment_bank/updateCo
 import {saveRubricAssessment} from './mutations/saveRubricAssessmentMutation'
 import {updateSubmissionSecondsLate} from './mutations/updateSubmissionSecondsLateMutation'
 import {reassignAssignment} from './mutations/reassignAssignmentMutation'
+import { deleteAttachment } from './mutations/deleteAttachmentMutation'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -121,6 +122,7 @@ ready(() => {
           updateSubmissionGrade,
           createSubmissionComment,
           deleteSubmissionComment,
+          deleteAttachment,
           hideAssignmentGradesForSections,
           postAssignmentGradesForSections,
           postDraftSubmissionComment,
