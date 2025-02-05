@@ -2964,7 +2964,7 @@ class ApplicationController < ActionController::Base
 
   def common_contexts(common_courses, common_groups, current_user, session)
     courses = Course.active.where(id: common_courses.keys).to_a
-    groups = Group.active.where(id: common_groups.keys).to_a
+    groups = Group.active.where(id: common_groups.keys).collaborative.to_a
 
     common_courses = courses.map do |course|
       course_json(course, current_user, session, ["html_url"], false).merge({
