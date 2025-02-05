@@ -934,6 +934,70 @@ describe "assignments" do
         wait_for_ajaximations
         expect(f("#right-side-wrapper")).to include_text("Submitted!")
       end
+
+      describe "validations" do
+        context "file upload" do
+          it "shows an error on submit and clears it if the user select a file" do
+            get "/courses/#{@course.id}/assignments"
+            wait_for_new_page_load { f(".new_assignment").click }
+            f("#assignment_name").send_keys("Validation for Annotated Document Submission Type")
+
+            f("#assignment_annotated_document").click
+            wait_for_ajaximations
+
+            submit_assignment_form
+            expect(f("#online_submission_types\\[student_annotation\\]_errors")).to include_text("This submission type requires a file upload")
+
+            # select attachment from file explorer
+            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
+            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+
+            expect(f("#online_submission_types\\[student_annotation\\]_errors")).not_to include_text("This submission type requires a file upload")
+          end
+
+          it "shows an error on submit and clears it if the user uncheck Student Annotation" do
+            get "/courses/#{@course.id}/assignments"
+            wait_for_new_page_load { f(".new_assignment").click }
+            f("#assignment_name").send_keys("Validation for Annotated Document Submission Type")
+
+            f("#assignment_annotated_document").click
+            wait_for_ajaximations
+
+            submit_assignment_form
+            expect(f("#online_submission_types\\[student_annotation\\]_errors")).to include_text("This submission type requires a file upload")
+
+            # Uncheck Student Annotation
+            f("#assignment_annotated_document").click
+            wait_for_ajaximations
+
+            expect(f("#online_submission_types\\[student_annotation\\]_errors")).not_to include_text("This submission type requires a file upload")
+          end
+        end
+
+        context "usage rights" do
+          it "shows an error on submit and clears it on changing usage rights" do
+            get "/courses/#{@course.id}/assignments"
+            wait_for_new_page_load { f(".new_assignment").click }
+            f("#assignment_name").send_keys("Validation for Usage Rights")
+
+            f("#assignment_annotated_document").click
+            wait_for_ajaximations
+
+            # select attachment from file explorer
+            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
+            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+
+            submit_assignment_form
+            wait_for_ajaximations
+
+            expect(f("#usage_rights_use_justification_errors")).to include_text("Identifying the usage rights is required")
+
+            f("#usageRightSelector").click
+            fxpath('//*[@id="usageRightSelector"]/option[2]').click
+            expect(f("#usage_rights_use_justification_errors")).not_to include_text("Identifying the usage rights is required")
+          end
+        end
+      end
     end
 
     context "frozen assignment" do

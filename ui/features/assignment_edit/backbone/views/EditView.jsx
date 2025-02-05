@@ -732,6 +732,7 @@ EditView.prototype.toggleRestrictFileUploads = function () {
 }
 
 EditView.prototype.toggleAnnotatedDocument = function () {
+  this.hideErrors("online_submission_types[student_annotation]_errors")
   const isAnonymous = this.$anonymousGradingBox.prop('checked')
   this.$annotatedDocumentOptions.toggleAccessibly(this.$allowAnnotatedDocument.prop('checked'))
   if (this.$allowAnnotatedDocument.prop('checked')) {
