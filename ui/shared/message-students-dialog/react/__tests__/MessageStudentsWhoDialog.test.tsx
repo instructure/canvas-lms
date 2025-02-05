@@ -345,15 +345,21 @@ describe('MessageStudentsWhoDialog', () => {
     expect(await findByTestId('total-student-checkbox')).toHaveAccessibleName('3 Students')
   })
 
-  // unskip in EVAL-2535
-  it.skip('includes the total number of observers in the checkbox label', async () => {
-    const mocks = await makeMocks()
+  it('includes the total number of observers selected in the checkbox label', async () => {
+    students.forEach(student => {
+      student.submittedAt = null
+      student.workflowState = 'unsubmitted'
+    })
 
+    const mocks = await makeMocks()
     const {findByRole} = render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <MessageStudentsWhoDialog {...makeProps()} />
       </MockedProvider>,
     )
+    const checkbox = await findByRole('checkbox', {name: /Observers/})
+    expect(checkbox).toHaveAccessibleName('0 Observers')
+    fireEvent.click(checkbox)
     expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('2 Observers')
   })
 
