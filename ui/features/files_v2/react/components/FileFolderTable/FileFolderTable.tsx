@@ -46,6 +46,7 @@ import {FileManagementContext} from '../Contexts'
 import {FileFolderWrapper, FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
 import BlueprintIconButton from './BlueprintIconButton'
 import {Alert} from '@instructure/ui-alerts'
+import CurrentDownloads from '../FilesHeader/CurrentDownloads'
 
 const I18n = createI18nScope('files_v2')
 
@@ -317,6 +318,7 @@ const FileFolderTable = ({
       {renderTableActionsHead()}
       <View display="block" margin="0 0 medium">
         <CurrentUploads />
+        <CurrentDownloads rows={rows} />
       </View>
       <Table caption={tableCaption} hover={true} layout={isStacked ? 'stacked' : 'fixed'}>
         <Table.Head

@@ -31,6 +31,7 @@ import {
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import { downloadZip } from '../../../utils/downloadUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -67,6 +68,7 @@ const BulkActionButtons = ({
               disabled={!isEnabled}
               renderIcon={<IconDownloadLine />}
               screenReaderLabel={I18n.t('Download')}
+              onClick={() => downloadZip(selectedRows)}
             />
           </Flex.Item>
           {userCanDeleteFilesForContext && (

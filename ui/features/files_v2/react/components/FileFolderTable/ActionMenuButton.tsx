@@ -24,7 +24,8 @@ import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {FileManagementContext} from '../Contexts'
 import {type File, type Folder} from '../../../interfaces/File'
-import {RenameModal} from '../RenameModal'
+import {RenameModal} from "../RenameModal";
+import { downloadFile, downloadZip } from '../../../utils/downloadUtils'
 
 import {
   IconMoreLine,
@@ -137,7 +138,11 @@ const ActionMenuButton = ({
                 setRenamingFile(row)
               },
             },
-            {icon: IconDownloadLine, text: I18n.t('Download')},
+            {
+              icon: IconDownloadLine,
+              text: I18n.t('Download'),
+              onClick: () => downloadFile(row.url)
+            },
             {
               icon: IconPermissionsLine,
               text: I18n.t('Edit Permissions'),
@@ -165,8 +170,19 @@ const ActionMenuButton = ({
           ]
         : [
             // folder
-            {icon: IconEditLine, text: I18n.t('Rename'), visible: rename_move_permissions},
-            {icon: IconDownloadLine, text: I18n.t('Download')},
+            {
+              icon: IconEditLine,
+              text: I18n.t('Rename'),
+              visible: rename_move_permissions,
+              onClick: () => {
+                setRenamingFile(row)
+              },
+            },
+            {
+              icon: IconDownloadLine,
+              text: I18n.t('Download'),
+              onClick: () => downloadZip(new Set([row.id])),
+            },
             {
               icon: IconPermissionsLine,
               text: I18n.t('Edit Permissions'),
