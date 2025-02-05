@@ -26,6 +26,9 @@ import indicate, {
 } from '../indicate'
 
 beforeEach(() => {
+  // Remove any existing style elements
+  document.querySelectorAll('style').forEach(el => el.remove())
+
   document.body.innerHTML = `
   <p id="p1">
     first para
