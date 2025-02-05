@@ -225,8 +225,8 @@ describe('FileFolderTable', () => {
         isMasterCourse: true,
         isChildCourse: false,
         accountId: '1',
-        course: {id: '1', name: "course", enrollment_term_id: '1'},
-        masterCourse: {id: '1', name: "course", enrollment_term_id: '1'},
+        course: {id: '1', name: 'course', enrollment_term_id: '1'},
+        masterCourse: {id: '1', name: 'course', enrollment_term_id: '1'},
       }
       renderComponent()
 

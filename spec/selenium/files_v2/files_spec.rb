@@ -114,6 +114,14 @@ describe "files index page" do
           end
         end
       end
+
+      it "Can search for files" do
+        folder = Folder.create!(name: "parent", context: @course)
+        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf", folder:)
+        get "/courses/#{@course.id}/files"
+        search_input.send_keys(file_attachment.display_name)
+        expect(table_item_by_name(file_attachment.display_name)).to be_displayed
+      end
     end
 
     context("as a student") do
@@ -168,6 +176,16 @@ describe "files index page" do
 
         table_item_by_name(@course.name).click
         table_item_by_name(folder.name).click
+        expect(table_item_by_name(file_attachment.display_name)).to be_displayed
+      end
+
+      it "Can search for files" do
+        folder = Folder.create!(name: "parent", context: @teacher)
+        file_attachment = attachment_model(content_type: "application/pdf", context: @teacher, display_name: "file1.pdf", folder:)
+        get "/files"
+
+        table_item_by_name("My Files").click
+        search_input.send_keys(file_attachment.display_name)
         expect(table_item_by_name(file_attachment.display_name)).to be_displayed
       end
     end

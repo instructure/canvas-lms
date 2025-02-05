@@ -144,6 +144,7 @@ export interface FileFolderTableProps {
   onPaginationLinkChange: (links: Record<string, string>) => void
   onLoadingStatusChange: (isLoading: boolean) => void
   onSortChange: (sortBy: string, sortDir: 'asc' | 'desc') => void
+  searchString?: string
 }
 
 const FileFolderTable = ({
@@ -156,6 +157,7 @@ const FileFolderTable = ({
   onPaginationLinkChange,
   onLoadingStatusChange,
   onSortChange,
+  searchString = '',
 }: FileFolderTableProps) => {
   const {currentFolder} = useContext(FileManagementContext)
   const isStacked = size !== 'large'
@@ -168,6 +170,9 @@ const FileFolderTable = ({
     queryKey: ['files', currentUrl],
     queryFn: () => {
       setSelectedRows(new Set())
+      if (searchString.length === 1) {
+        return Promise.resolve({rows: [], links: {}})
+      }
       return fetchFilesAndFolders(currentUrl, onLoadingStatusChange)
     },
     staleTime: 0,
@@ -250,7 +255,7 @@ const FileFolderTable = ({
     return (
       <Flex gap="small" margin="0 0 medium" direction={direction}>
         <Flex.Item padding="xx-small" shouldShrink={true} shouldGrow={true}>
-          <Breadcrumbs folders={folderBreadcrumbs} size={size} />
+          <Breadcrumbs folders={folderBreadcrumbs} size={size} search={searchString} />
         </Flex.Item>
 
         <Flex.Item padding="xx-small">
@@ -271,6 +276,7 @@ const FileFolderTable = ({
     size,
     userCanDeleteFilesForContext,
     userCanEditFilesForContext,
+    searchString,
   ])
 
   const tableCaption = I18n.t(
@@ -320,6 +326,7 @@ const FileFolderTable = ({
       <SubTableContent
         isLoading={isLoading || isFetching}
         isEmpty={rows.length === 0 && !isFetching}
+        searchString={searchString}
       />
     </>
   )

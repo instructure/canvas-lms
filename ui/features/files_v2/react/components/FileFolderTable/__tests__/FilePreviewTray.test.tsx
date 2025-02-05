@@ -23,7 +23,7 @@ import FilePreviewTray from '../FilePreviewTray'
 import {type File} from '../../../../interfaces/File'
 
 describe('FilePreviewTray', () => {
-  const mockDismiss = jest.fn(() => console.log('mockDismiss called'))
+  const mockDismiss = jest.fn()
 
   const mockFileProps = {
     id: '1',

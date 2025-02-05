@@ -67,7 +67,7 @@ const AllMyFilesTable = ({size}: AllMyFilesTableProps) => {
 
   return (
     <>
-      <FilesHeader size={size} isUserContext={true} disableButtons={true} />
+      <FilesHeader size={size} isUserContext={true} shouldHideUploadButtons={true} />
       <Flex justifyItems="space-between" margin="medium 0">
         <Flex.Item shouldGrow={true}>
           <Text>

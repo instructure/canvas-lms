@@ -36,6 +36,7 @@ export const defaultProps: FileFolderTableProps = {
   onPaginationLinkChange: jest.fn(),
   onLoadingStatusChange: jest.fn(),
   onSortChange: jest.fn(),
+  searchString: '',
 }
 
 export const renderComponent = (props = {}) => {

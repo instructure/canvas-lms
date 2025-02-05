@@ -65,4 +65,8 @@ module FilesPage
   def column_heading_by_name(name)
     f("[data-testid='#{name}']")
   end
+
+  def search_input
+    f("[data-testid='files-search-input']")
+  end
 end

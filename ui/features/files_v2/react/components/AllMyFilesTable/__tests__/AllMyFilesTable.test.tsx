@@ -60,12 +60,12 @@ describe('AllMyFilesTable', () => {
     expect(secondRow).toBeInTheDocument()
   })
 
-  it('disables top nav buttons', () => {
+  it('hides top nav upload buttons', () => {
     renderComponent()
-    const folderButton = screen.getByRole('button', {name: /folder/i})
-    const uploadButton = screen.getByRole('button', {name: /upload/i})
-    expect(folderButton).toBeDisabled()
-    expect(uploadButton).toBeDisabled()
+    const folderButton = screen.queryByRole('button', {name: /folder/i})
+    const uploadButton = screen.queryByRole('button', {name: /upload/i})
+    expect(folderButton).not.toBeInTheDocument()
+    expect(uploadButton).not.toBeInTheDocument()
   })
 
   it('does not render All My Files button', () => {

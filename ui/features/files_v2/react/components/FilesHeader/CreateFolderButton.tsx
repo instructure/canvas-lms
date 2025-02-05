@@ -25,18 +25,16 @@ const I18n = createI18nScope('files_v2')
 
 interface CreateFolderButtonProps {
   buttonDisplay: 'block' | 'inline-block'
-  isDisabled: boolean
   onClick: () => void
 }
 
-const CreateFolderButton = ({buttonDisplay, isDisabled, onClick}: CreateFolderButtonProps) => {
+const CreateFolderButton = ({buttonDisplay, onClick}: CreateFolderButtonProps) => {
   return (
     <Button
       color="secondary"
       margin="none x-small small none"
       renderIcon={<IconAddLine />}
       display={buttonDisplay}
-      disabled={isDisabled}
       onClick={onClick}
       data-testid="create-folder-button"
     >

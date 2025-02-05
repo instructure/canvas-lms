@@ -100,41 +100,42 @@ const LargeBreadcrumbs = ({items}: BreadcrumbsProps) => {
 const ResponsiveBreadcrumbs = ({folders, size, search}: ResponsiveBreadcrumbsProps) => {
   const {contextType, contextId, showingAllContexts} = useContext(FileManagementContext)
 
+  const breadcrumbs = folders.map((folder, index) => {
+    const folderContextType = (folder.context_type || '').toLowerCase()
+    const folderContextId = (folder.context_id || -1).toString()
+    const isContextRoot = folderContextType === contextType && folderContextId === contextId
+    const isRootCrumb = index === 0 && isContextRoot
+
+    let name
+    if (!folder.parent_folder_id) {
+      const context = filesEnv.contextFor({
+        contextType: folderContextType,
+        contextId: folderContextId,
+      })
+      name = context?.name
+    }
+    name ||= folder.custom_name || folder.name
+
+    const url = isRootCrumb && !showingAllContexts ? '/' : generateUrlPath(folder)
+    return {id: folder.id, name, url}
+  })
+
   if (search) {
-    // Search results breadcrumbs
-    return null
-  } else if (folders.length == 0) {
-    return null
-  } else {
-    const breadcrumbs = folders.map((folder, index) => {
-      const folderContextType = (folder.context_type || '').toLowerCase()
-      const folderContextId = (folder.context_id || -1).toString()
-      const isContextRoot = folderContextType === contextType && folderContextId === contextId
-      const isRootCrumb = index === 0 && isContextRoot
-
-      let name
-      if (!folder.parent_folder_id) {
-        const context = filesEnv.contextFor({
-          contextType: folderContextType,
-          contextId: folderContextId,
-        })
-        name = context?.name
-      }
-      name ||= folder.custom_name || folder.name
-
-      const url = isRootCrumb && !showingAllContexts ? '/' : generateUrlPath(folder)
-      return {id: folder.id, name, url}
+    breadcrumbs.push({
+      id: 'search',
+      name: I18n.t('Search results for "%{search}"', {search}),
+      url: '',
     })
+  }
 
-    if (showingAllContexts) {
-      breadcrumbs.unshift({id: 'all-my-files', name: I18n.t('All My Files'), url: '/'})
-    }
+  if (showingAllContexts) {
+    breadcrumbs.unshift({id: 'all-my-files', name: I18n.t('All My Files'), url: '/'})
+  }
 
-    if (size === 'small') {
-      return <SmallBreadcrumbs items={breadcrumbs} />
-    } else {
-      return <LargeBreadcrumbs items={breadcrumbs} />
-    }
+  if (size === 'small') {
+    return <SmallBreadcrumbs items={breadcrumbs} />
+  } else {
+    return <LargeBreadcrumbs items={breadcrumbs} />
   }
 }
 

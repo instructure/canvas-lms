@@ -32,6 +32,7 @@ import {type Folder} from '../../interfaces/File'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {FileManagementContext} from './Contexts'
 import {MainFolderWrapper} from '../../utils/fileFolderWrappers'
+import SearchBar from './SearchBar'
 
 const I18n = createI18nScope('files_v2')
 
@@ -44,12 +45,11 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const showingAllContexts = filesEnv.showingAllContexts
   const [isTableLoading, setIsTableLoading] = useState(true)
   const [currentPageNumber, setCurrentPageNumber] = useState(1)
-  const [baseUrl, setBaseUrl] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<string>('name')
   const [sortDirection, setSortDirection] = useState<string>('asc')
   const [currentUrl, setCurrentUrl] = useState<string>('')
   const [discoveredPages, setDiscoveredPages] = useState<{[key: number]: string}>({})
-  const folders = useLoaderData() as Folder[] | null
+  const {folders, searchTerm} = useLoaderData() as {folders: Folder[] | null; searchTerm: string}
   const currentFolderWrapper = useRef<MainFolderWrapper | null>(null)
 
   // the useEffect is necessary to protect against folders being empty
@@ -58,16 +58,22 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
 
     const currentFolder = folders[folders.length - 1]
     const folderId = currentFolder.id
-    const baseUrl = `/api/v1/folders/${folderId}/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
+    const contextId = currentFolder.context_id
+    const contextType = currentFolder.context_type.toLowerCase()
+    let baseUrl
+    if (searchTerm) {
+      baseUrl = `/api/v1/${contextType}s/${contextId}/files?search_term=${searchTerm}&per_page=50&include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
+    } else {
+      baseUrl = `/api/v1/folders/${folderId}/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
+    }
 
-    setBaseUrl(baseUrl)
     const newCurrentUrl = `${baseUrl}&sort=${sortBy}&order=${sortDirection}`
     setCurrentUrl(newCurrentUrl)
     setDiscoveredPages({1: newCurrentUrl})
     setCurrentPageNumber(1)
 
     currentFolderWrapper.current = new MainFolderWrapper(currentFolder)
-  }, [folders, sortBy, sortDirection])
+  }, [folders, searchTerm, sortBy, sortDirection])
 
   const handleTableLoadingStatusChange = useCallback((isLoading: boolean) => {
     setIsTableLoading(isLoading)
@@ -131,6 +137,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
     >
       <View as="div">
         <FilesHeader size={size} isUserContext={isUserContext} />
+        <SearchBar initialValue={searchTerm} />
         {currentUrl && (
           <FileFolderTable
             size={size}
@@ -142,6 +149,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
             onPaginationLinkChange={handlePaginationLinkChange}
             onLoadingStatusChange={handleTableLoadingStatusChange}
             onSortChange={handlesortChange}
+            searchString={searchTerm}
           />
         )}
         <Flex padding="small none none none" justifyItems="space-between">
