@@ -61,4 +61,8 @@ module FilesPage
   def pagination_button_by_index(index)
     pagination_container.find_elements(:css, "button")[index]
   end
+
+  def column_heading_by_name(name)
+    f("[data-testid='#{name}']")
+  end
 end

@@ -143,7 +143,7 @@ export interface FileFolderTableProps {
   folderBreadcrumbs: Folder[]
   onPaginationLinkChange: (links: Record<string, string>) => void
   onLoadingStatusChange: (isLoading: boolean) => void
-  onPageReset: (sortBy: string, sortDir: 'asc' | 'desc') => void
+  onSortChange: (sortBy: string, sortDir: 'asc' | 'desc') => void
 }
 
 const FileFolderTable = ({
@@ -155,7 +155,7 @@ const FileFolderTable = ({
   folderBreadcrumbs,
   onPaginationLinkChange,
   onLoadingStatusChange,
-  onPageReset,
+  onSortChange,
 }: FileFolderTableProps) => {
   const {currentFolder} = useContext(FileManagementContext)
   const isStacked = size !== 'large'
@@ -227,9 +227,9 @@ const FileFolderTable = ({
       const newCol = columnId
       setSortColumn(newCol)
       setSortDirection(newDir)
-      onPageReset(newCol, newDir)
+      onSortChange(newCol, newDir)
     },
-    [onPageReset, sortColumn, sortDirection],
+    [onSortChange, sortColumn, sortDirection],
   )
 
   const allRowsSelected = rows.length != 0 && selectedRows.size === rows.length

@@ -35,7 +35,7 @@ export const defaultProps: FileFolderTableProps = {
   folderBreadcrumbs: [],
   onPaginationLinkChange: jest.fn(),
   onLoadingStatusChange: jest.fn(),
-  onPageReset: jest.fn(),
+  onSortChange: jest.fn(),
 }
 
 export const renderComponent = (props = {}) => {
