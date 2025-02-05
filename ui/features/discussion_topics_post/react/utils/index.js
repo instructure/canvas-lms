@@ -475,5 +475,3 @@ export const getTranslation = async (text, translateTargetLanguage) => {
 
   return json.translated_text
 }
-
-export const translationSeparator = '\n\n----------\n\n\n'

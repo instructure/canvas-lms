@@ -69,7 +69,9 @@ const setupWithTranslationLanguageSelected = (props, {searchTerm = ''} = {}) => 
   return render(
     <DiscussionManagerUtilityContext.Provider
       value={{
-        translationLanguages: [{id: 'en', name: 'English'}],
+        translationLanguages: {
+          current: [{id: 'en', name: 'English', translated_to_name: 'Translated to English'}],
+        },
         translateTargetLanguage: 'en',
       }}
     >
@@ -169,7 +171,7 @@ describe('PostMessage', () => {
     it('should display the translated message when translation is complete', async () => {
       getTranslation.mockImplementation(() => Promise.resolve('<p>Translated message</p>'))
 
-      const {findByTestId} = setupWithTranslationLanguageSelected({
+      const {findByTestId, findByText} = setupWithTranslationLanguageSelected({
         message: '<p>Leforditando uzenet<p/>',
         title: 'Gondolatok',
       })
@@ -177,30 +179,36 @@ describe('PostMessage', () => {
       expect(getTranslation).toHaveBeenCalled()
       const translatedMessage = await findByTestId('post-message-translated')
       expect(translatedMessage.children[0]).toHaveTextContent('Translated message')
+      const translationSeparator = await findByText('Translated to English')
+      expect(translationSeparator).toBeInTheDocument()
     })
 
     it('should not display the translated message if there is no translation', async () => {
       getTranslation.mockImplementation(() => Promise.resolve(''))
 
-      const {queryByTestId} = setupWithTranslationLanguageSelected({
+      const {queryByTestId, queryByText} = setupWithTranslationLanguageSelected({
         message: '<p>Leforditando uzenet<p/>',
         title: 'Gondolatok',
       })
 
       await waitFor(() => expect(getTranslation).toHaveBeenCalled())
       expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
+      const translationSeparator = await queryByText('Translated to English')
+      expect(translationSeparator).not.toBeInTheDocument()
     })
 
     it('should not display the translated message if the translation fails', async () => {
       getTranslation.mockImplementation(() => Promise.reject(new Error('Translation error')))
 
-      const {queryByTestId} = setupWithTranslationLanguageSelected({
+      const {queryByTestId, queryByText} = setupWithTranslationLanguageSelected({
         message: '<p>Leforditando uzenet<p/>',
         title: 'Gondolatok',
       })
 
       await waitFor(() => expect(getTranslation).toHaveBeenCalled())
       expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
+      const translationSeparator = await queryByText('Translated to English')
+      expect(translationSeparator).not.toBeInTheDocument()
     })
   })
 })
