@@ -94,6 +94,10 @@ jest.mock('../../../../../shared/StoreContext', () => {
   }
 })
 
+jest.mock('../../../../../shared/fileUtils', () => ({
+  convertFileToBase64: jest.fn(() => Promise.resolve('data:image/png;base64,CROPPED'))
+}))
+
 jest.mock('../../../../../../../bridge', () => {
   return {
     trayProps: {
@@ -110,8 +114,6 @@ jest.mock('../../../../../shared/ImageCropper/imageCropUtils', () => {
       }),
   }
 })
-
-jest.mock('../../../../../shared/fileUtils')
 
 describe('ImageSection', () => {
   let scrollIntoView
@@ -131,7 +133,6 @@ describe('ImageSection', () => {
   beforeEach(() => {
     scrollIntoView = jest.fn()
     window.HTMLElement.prototype.scrollIntoView = scrollIntoView
-    convertFileToBase64.mockImplementation(() => Promise.resolve('data:image/png;base64,CROPPED'))
   })
 
   afterEach(async () => {
