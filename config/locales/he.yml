@@ -2175,6 +2175,7 @@ he:
   alphabetically_60ab47e4: "בסדר אלף בית"
   always_3a59e701: תמיד
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "תמיד יש לטעון את עורך התוכן העשיר והסרגל הצידי משרות התוכן העשיר של קנבס בכל המקומות"
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "התראה נוצרת עבור כל תלמיד אשר עונה כל כל הקריטריונים. הן נבדקות כל יום, והודעות ישלחו לתלמיד ו  או למורה עד אשר הגורם לבעיה ייפתר."
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "נדרש מפתח API כדי להשתמש בתקני השוואה אקדמים"
   an_assignment_name_dc624e70: "שם מטלה"
   an_auto_generated_chronological_summary_of_your_co_eeafee13: "סיכום כרונולוגי מיוצר-אוטומטית לקורס שלך"
@@ -13387,6 +13388,7 @@ he:
   no_students_have_taken_the_survey_yet_d378cd35: "תלמידים טרם השתתפו בסקר"
   no_submission_fb131a40: "אין הגשה"
   no_submission_for_assignment_a9cb6fe2: "אין הגשה עבור %{assignment}"
+  no_teacher_interaction_de8d91bc: "אין מעורבות מורה"
   no_time_limit_for_long_running_conferences_d49fdfad: "אין מגבלת זמן (לשיחות ועידה ארוכות)"
   no_tls_618add1a: "אין TLS"
   no_unassigned_terms_deb7b76b: "אין תקופות שלא שויכו"
@@ -17165,6 +17167,7 @@ he:
   saudi_arabia_1f0dcbdc: "ערב הסעודית"
   saudi_arabia_966_d01ed717: "ערב הסעודית (+966)"
   save_11a80ec3: שמירה
+  save_alert_b64f9fa3: "שמירת התראה"
   save_changes_698abe77: "שמירת שינויים"
   save_grading_period_daaaddea: "שמירת תקופת הערכה"
   save_grading_period_set_e029fa88: "שמירת אוגדן תקופות הערכה"
@@ -19776,6 +19779,7 @@ he:
   treat_ungraded_as_0_d38c2b41: "התיחסות לאי מתן ציון כאל 0"
   tree_browser: 
     folder_tree_instructions: "יש להשתמש בחיצי מעלה מטה כדי לנווט בעץ. לחיצת חץ ימיני כדי להרחיב ענף נבחר בעץ וחץ שמאלי כדי לכווץ ענף נבחר בעץ."
+  trigger_f0ee1fbf: משפעל
   trophy: 
     star_display_name: "הוספת כוכבית"
   true_false_823761a9: "נכון/לא נכון"
