@@ -2498,6 +2498,7 @@ nn:
     no_text: "Ingen tekst"
   alarm_706bc080: alarm
   albanian_21ed929e: Albansk
+  alert_d2c8ef98: Varsel
   alerts: 
     alert: 
       buttons: 
@@ -3287,6 +3288,8 @@ nn:
   always_include_dates_74b3721d: "Inkluder alltid datoar;"
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
   an_active_role_already_exists_with_that_name_205864bf: "Ei aktiv rolle med det namnet finst allereie."
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "Eit varsel er generert for kvar student som fyller alle kriteria. Dei blir kontrollerte kvar dag, og varsel blir sende til studenten, faglæraren og/eller kontoadministrator til utløysarproblemet er løyst."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "Eit varsel er generert for kvar student som fyller alle kriteria. Dei blir kontrollerte kvar dag, og varsel blir sende til studenten og/eller faglæraren til utløysarproblemet er løyst."
   an_amazing_discussion_assignment_e5c8bd6b: "Ei super diskusjonsoppgåve"
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
   an_assignment_name_dc624e70: "Eit oppgåvenamn"
@@ -10472,6 +10475,7 @@ nn:
   ecuador_593_dfcc235a: "Ecuador (+593) "
   edit_a_copy_43ecaed6: "Endre ein kopi"
   edit_account_name_for_account_name_ae3633e8: "Rediger kontonamnet for %{account_name}"
+  edit_alert_739bb0ba: "Rediger varselet"
   edit_all_other_course_content_c8dd98d3: "Rediger alt anna emneinnhald"
   edit_and_delete_their_own_posts_f4f7cc6: "Rediger og slett eigne innlegg"
   edit_and_delete_their_own_replies_e5b9d793: "Rediger og slett eigne svar"
@@ -18289,6 +18293,7 @@ nn:
   no_such_source_context_80a659ba: "ingen slik kildekontekst"
   no_such_target_context_21158b9: "ingen slik målkontekst"
   no_such_target_group_7e183d46: "ingen slik målgruppe"
+  no_teacher_interaction_de8d91bc: "Ingen faglærarinteraksjon"
   no_template_accounts_in_this_region_5e84955d: "Ingen malkontoar i denne regionen"
   no_template_selected_f59e797: "Ingen mal vald"
   no_terms_eab5ee7b: "Utan semester"
@@ -22977,6 +22982,7 @@ nn:
   saudi_arabia_1f0dcbdc: Saudi-Arabia
   saudi_arabia_966_d01ed717: "Saudi-Arabia (+966)"
   save_11a80ec3: Lagre
+  save_alert_b64f9fa3: "Lagre varsel"
   save_and_customize_19eb7a7b: "Lagre og tilpass"
   save_and_publish_1b765e7: "Lagre og publiser"
   save_as_draft_341d4577: "Lagre som utkast"
@@ -25640,6 +25646,7 @@ nn:
   submitted_on_bb3b53fc: "Levert den"
   submitted_on_date_13c89fb: "Levert den %{date}"
   submitted_submitdate_bdd3bf09: "Innlevert %{submitDate}"
+  submitting_b90fac62: Leverer...
   submitting_types_7c5a7096: "Leverer: %{types}"
   subscribe_4b301fb7: Abonner
   subscribe_failed_2eb62de0: "Abonnering mislukkast"
@@ -27608,6 +27615,7 @@ nn:
   treat_ungraded_as_0_d38c2b41: "Behandle ikkje vurderte som 0"
   tree_browser: 
     folder_tree_instructions: "Bruk navigasjonspilene opp eller ned for å bla gjennom trestrukturen. Trykk høgre for å vise mappene, trykk venstre for å skjule dei og trykk på Enter for elementet du har valt."
+  trigger_f0ee1fbf: Utløysar
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad og Tobago (+1)"
   trophy: 
     balloon_description: "Ballong skildring"
@@ -27839,6 +27847,8 @@ nn:
   ungraded_out_of_pointspossible_2d6d81da: "ikkje vurdert av %{pointsPossible}"
   ungraded_pointspossible_e2f86bd9: "ikkje vurdert/%{pointsPossible}"
   ungraded_submissions_44efb0ec: "Innleveringar som ikkje er vurderte"
+  ungraded_submissions_count_63fcf6d1: "Ikkje vurderte innleveringar (tal)"
+  ungraded_submissions_time_bafaa609: "Ikkje vurderte innleveringar (tid)"
   ungraded_survey_ad7de790: "Undersøking som ikkje er vurdert"
   unique_user_id_dfca1a7f: "Unik bruker ID"
   united_arab_emirates_971_649b3750: "Dei sameinte arabiske emirata (+971)"
