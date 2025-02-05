@@ -1698,6 +1698,7 @@ hy:
       details: մանրամասներ...
       login: "Մուտք համակարգ"
     no_text: "Տեքստ չկա"
+  alert_d2c8ef98: Նախազգուշացում
   alerts: 
     alert: 
       buttons: 
@@ -1772,6 +1773,8 @@ hy:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Թույլ տալ օգտատերերին ստանալ Canvas համակարգից հաղորդագրություններ արտասահմանյան հեռախոսահամարին "
   alphabetically_60ab47e4: "Այբբենական կարգով"
   always_3a59e701: Միշտ
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "Ծանուցումը ստեղծվում է յուրաքանչյուր այն ունկնդրի համար, ով բավարարում է բոլոր չափանիշերին: Նրանք ստուգվում են ամեն օր և ծանուցումները ուղարկվում են ունկնդրին, դասավանդողին և/կամ հաշվի ադմինիստրատորին մինչև խնդրի լուծումը:"
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "Ծանուցումը ստեղծվում է յուրաքանչյուր այն ունկնդրի համար, ով բավարարում է բոլոր չափանիշերին: Նրանք ստուգվում են ամեն օր և ծանուցումները ուղարկվում են ունկնդրին և/կամ դասավանդողին մինչև խնդրի լուծումը:"
   an_error_occured_please_try_again_e59b65b: "Տեղի է ունեցել սխալ: Փորձեք կրկին:"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Սխալ է տեղի ունեցել*, խնդրում ենք ավելի ուշ տեղադրել ձեր պատասխանը "
   an_error_occurred_publishing_grades_cfdf7631: "Գնահատականները հրապարակելիս սխալ է տեղի ունեցել:"
@@ -6358,6 +6361,7 @@ hy:
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Յուրաքանչյուր տող մեկ հանձնարարություն է: Շեղանկյունը կատարման ամսաթիվն է, իսկ գիծը ձգվում է մինչև հանձնարարության ուղարկման ամսաթիվը: Կանաչ գույնով նշված են *ժամանակին ուղարկված աշխատանքները*, դեղին գույնով նշված են **ուշ ուղարկված աշխատանքները**, իսկ կարմիրով՝ ***չուղարկված աշխատանքները***: Մոխրագույն շեղանկյունները կատարման ժամկետ չունեցող հանձնարարություններ են, որոնք տեղադրվում են ուղարկման պահին:   "
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege փոխարկիչ"
+  edit_alert_739bb0ba: "Խմբագրել ծանուցումը"
   edit_and_delete_their_own_posts_f4f7cc6: "Խմբագրել և ջնջել իրենց սեփական հաղորդագրությունները"
   edit_app_b0cc1c17: "Խմբագրել հավելվածը"
   edit_assignment_ebf22a72: "Խմբագրել հանձնարարությունը"
@@ -11355,6 +11359,7 @@ hy:
   no_students_have_taken_the_quiz_yet_e667644b: "Ոչ մի ունկնդիր դեռևս չի սկսել թեստը"
   no_students_have_taken_the_survey_yet_d378cd35: "Ոչ մի ունկնդիր դեռևս չի սկսել հարցումը"
   no_submission_fb131a40: "Չկան ներկայացված աշխատանքներ"
+  no_teacher_interaction_de8d91bc: "Դասավանդողի կողմից փոխգործակցության բացակայություն "
   no_time_limit_for_long_running_conferences_d49fdfad: "Ժամանակային սահմանափակումներ չկան (երկարատև կոնֆերանսների համար)"
   no_tls_618add1a: "TLS չկա"
   no_usage_rights_object_supplied_304b8d40: "Տրված չէ 'օգտագործման իրավունքներ' օբյեկտը"
@@ -14803,6 +14808,7 @@ hy:
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Այնպիսի մեծություններ, ինչպիսիք են  'Canvas_URL__c' հավանաբար շուտով կանհետանան:"
   sample_data_e4fd01ff: "Ընտրանքային տվյալներ"
   save_11a80ec3: Պահպանել
+  save_alert_b64f9fa3: "Պահպանել ծանուցումը"
   save_key_b4dede06: "Պահպանել բանալին"
   save_login_bba1272: "Պահպանել մուտքի տվյալները"
   save_settings_cafe79a5: "Պահպանել կարգաբերումները"
@@ -16413,6 +16419,7 @@ hy:
   submitted_b37e2ff0: "ուղարկված է"
   submitted_d5ba370a: "Ուղարկված է՝"
   submitted_datetime_fa2e9287: "Ուղարկված է՝ %{dateTime}"
+  submitting_b90fac62: "Ուղարկվում է..."
   submitting_types_7c5a7096: "Ուղարկվում է. %{types}"
   subscribe_4b301fb7: Բաժանորդագրվել
   subscribed_fe74d22a: "Բաժանորդագրված եք"
@@ -17008,6 +17015,8 @@ hy:
   undo_a7be8fef: Ետարկել
   unenroll_943490fb: "Գրանցումից հանել"
   ungraded_submissions_44efb0ec: "Չգնահատված հանձնարարություններ"
+  ungraded_submissions_count_63fcf6d1: "Չգնահատված ուղարկված նյութերի թիվը"
+  ungraded_submissions_time_bafaa609: "Ներկայացված չգնահատված նյութ (ժամանակ)"
   ungraded_survey_ad7de790: "Չգնահատված հարցում"
   unknown: "Անհայտ է"
   unknown_47a3b725: "Անհայտ է"
