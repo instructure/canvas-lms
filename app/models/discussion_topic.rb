@@ -49,7 +49,7 @@ class DiscussionTopic < ActiveRecord::Base
   restrict_columns :availability_dates, %i[unlock_at delayed_post_at lock_at]
   restrict_assignment_columns
 
-  attr_writer :can_unpublish, :preloaded_subentry_count, :sections_changed
+  attr_writer :can_unpublish, :preloaded_subentry_count, :sections_changed, :overrides_changed
   attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries, :notify_users
 
   module DiscussionTypes
@@ -1201,6 +1201,18 @@ class DiscussionTopic < ActiveRecord::Base
     if lock || section
       delay_if_production.partially_clear_stream_items(locked_by_module: lock, section_specific: section)
     end
+    if @overrides_changed
+      delay_if_production.clear_invalid_stream_items
+    end
+  end
+
+  def clear_invalid_stream_items
+    user_ids = []
+
+    stream_item&.stream_item_instances&.where(workflow_state: "unread")&.find_each do |item|
+      destroy_item_and_track(item, user_ids) unless visible_for?(item.user)
+    end
+    clear_stream_item_cache_for(user_ids)
   end
 
   def partially_clear_stream_items(locked_by_module: false, section_specific: false)
