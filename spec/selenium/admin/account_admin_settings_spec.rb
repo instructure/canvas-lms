@@ -312,7 +312,7 @@ describe "root account basic settings" do
     user_quota += 15
     replace_content(user_quota_input, user_quota.to_s)
 
-    submit_form("#default-quotas")
+    submit_form("[aria-label='Default Account Quotas form']")
     wait_for_ajax_requests
 
     # ensure the account was updated properly
