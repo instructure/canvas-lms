@@ -39,7 +39,7 @@ export interface UserDetails {
   name: string
   short_name: string
   sortable_name: string
-  email: string
+  email?: string
   time_zone: string
 }
 
@@ -51,8 +51,8 @@ const createValidationSchema = (canManageUserDetails: boolean) =>
     ...(canManageUserDetails && {
       email: z
         .string()
-        .min(1, I18n.t('Email is required.'))
-        .email(I18n.t('Invalid email address.')),
+        .email(I18n.t('Invalid email address.'))
+        .or(z.literal('')),
       time_zone: z.string().optional(),
     }),
   })
@@ -89,11 +89,16 @@ const EditUserDetails = ({
   const buttonText = isSubmitting ? I18n.t('Updating User Details...') : I18n.t('Update Details')
 
   const handleFormSubmit = async (user: UserDetails) => {
+    let userData = user
+    if (user.email === '') {
+      const {email, ...rest} = user
+      userData = rest
+    }
     try {
       const {json} = await doFetchApi<UserDetails>({
         path: `/users/${userId}`,
         method: 'PATCH',
-        body: {user},
+        body: {user: userData},
       })
 
       onSubmit(json!)
@@ -205,7 +210,6 @@ const EditUserDetails = ({
                 render={({field}) => (
                   <TextInput
                     {...field}
-                    isRequired={true}
                     renderLabel={I18n.t('Default Email')}
                     messages={getFormErrorMessage(errors, 'email')}
                   />

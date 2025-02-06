@@ -134,7 +134,14 @@ export default class CreateOrUpdateUserModal extends React.Component {
     if (await this.hasErrors(this.state.errors)) return
     const method = {create: 'POST', update: 'PUT'}[this.props.createOrUpdate]
 
-    axios({url: this.props.url, method, data: this.state.data}).then(
+    // exclude email if it's blank
+    const {user, pseudonym} = this.state.data
+    let userData = user
+    if (user.email === "" || user.email == null) {
+      const {email, ...rest} = user
+      userData = rest
+    }
+    axios({url: this.props.url, method, data: {user: userData, pseudonym}}).then(
       response => {
         const getUserObj = o => (o.user ? getUserObj(o.user) : o)
         const user = getUserObj(response.data)
@@ -158,92 +165,89 @@ export default class CreateOrUpdateUserModal extends React.Component {
         this.setState({errors})
       }
     )
-}
-
-hasErrors = async () => {
-  const showCustomizedLoginId = this.props.customized_login_handle_name || this.props.delegated_authentication
-
-  if (this.props.createOrUpdate === 'create' && showCustomizedLoginId) {
-    if (await this.isBlank('pseudonym[path]')) {
-      this.pathRef.current.focus()
-    }
   }
-  if (this.props.createOrUpdate === 'create') {
-    if (await this.isBlank('pseudonym[unique_id]')) {
-      this.uniqueRef.current.focus()
+
+  hasErrors = async () => {
+    const showCustomizedLoginId = this.props.customized_login_handle_name || this.props.delegated_authentication
+
+    if (this.props.createOrUpdate === 'create' && showCustomizedLoginId) {
+      if (await this.isBlank('pseudonym[path]')) {
+        this.pathRef.current.focus()
+      }
     }
-  } else {
-    if (await this.isBlank('user[email]')) {
-      this.emailRef.current.focus()
+    if (this.props.createOrUpdate === 'create') {
+      if (await this.isBlank('pseudonym[unique_id]')) {
+        this.uniqueRef.current.focus()
+      }
+    } else {
+      if (await this.isBlank('user[email]')) {
+        this.emailRef.current.focus()
+      }
     }
+    if (await this.isBlank('user[name]')) {
+      this.nameRef.current.focus()
+    }
+    const errorArray = Object.values(this.state.errors)
+    return errorArray.some(error => error !== undefined)
   }
-  if (await this.isBlank('user[name]')) {
-    this.nameRef.current.focus()
-  }
-  const errorArray = Object.values(this.state.errors)
-  return errorArray.some(error => error !== undefined)
-}
 
-isBlank = (field, currentValue) => {
-  // return true/false after state is set
-  return new Promise((resolve) => {
-    let isBlank = true
+  isBlank = (field, currentValue) => {
+    // return true/false after state is set
+    return new Promise((resolve) => {
+      let isBlank = true
 
-    this.setState((prevState) => {
-      const updatedValue =
-        currentValue !== undefined ? currentValue : get(this.state.data, field)?.toString()
-      let newState = update(prevState, {
-        data: { $set: prevState.data },
-        errors: { $set: prevState.errors },
-      })
+      this.setState((prevState) => {
+        const updatedValue =
+          currentValue !== undefined ? currentValue : get(this.state.data, field)?.toString()
+        let newState = update(prevState, {
+          data: { $set: prevState.data },
+          errors: { $set: prevState.errors },
+        })
 
-      if (updatedValue === '' || updatedValue === undefined) {
-        if (field === 'user[name]') {
-          newState = update(newState, {
-            errors: { [field]: { $set: I18n.t('Name is required.') } },
-          })
-        } else if (field === 'pseudonym[unique_id]') {
-          newState = update(newState, {
-            errors: { [field]: { $set: I18n.t('Email is required.') } },
-          })
-        } else if (field === 'pseudonym[path]') {
-          const message = this.props.customized_login_handle_name ? I18n.t('%{login_handle} is required', {
-            login_handle: this.props.customized_login_handle_name,
-          }) : I18n.t('Email is required')
-          newState = update(newState, {
-            errors: { [field]: { $set: message } },
-          })
+        if (updatedValue === '' || updatedValue === undefined) {
+          if (field === 'user[name]') {
+            newState = update(newState, {
+              errors: { [field]: { $set: I18n.t('Name is required.') } },
+            })
+          } else if (field === 'pseudonym[unique_id]') {
+            newState = update(newState, {
+              errors: { [field]: { $set: I18n.t('Email is required.') } },
+            })
+          } else if (field === 'pseudonym[path]') {
+            const message = this.props.customized_login_handle_name ? I18n.t('%{login_handle} is required', {
+              login_handle: this.props.customized_login_handle_name,
+            }) : I18n.t('Email is required')
+            newState = update(newState, {
+              errors: { [field]: { $set: message } },
+            })
+          } else {
+            newState = update(newState, { errors: { [field]: { $set: undefined } } })
+            isBlank = false
+          }
         } else if (field === 'user[email]') {
-          newState = update(newState, {
-            errors: { [field]: { $set: I18n.t('Email is required.') } },
-          })
-        }
-      } else if (field === 'user[email]') {
-        // we are doing the same validation the backend does
-        // so we are requiring a domain for the email
-        const splitEmail = updatedValue.split('@')
-        const domain = splitEmail.length > 1 ? splitEmail[1] : ''
-        if (domain === '') {
-          newState = update(newState, {
-            errors: { [field]: { $set: I18n.t('Email is invalid.') } },
-          })
+          // we are doing the same validation the backend does
+          // so we are requiring a domain for the email
+          const splitEmail = updatedValue.split('@')
+          const domain = splitEmail.length > 1 ? splitEmail[1] : ''
+          if (domain === '') {
+            newState = update(newState, {
+              errors: { [field]: { $set: I18n.t('Email is invalid.') } },
+            })
+          } else {
+            newState = update(newState, { errors: { [field]: { $set: undefined } } })
+            isBlank = false
+          }
         } else {
           newState = update(newState, { errors: { [field]: { $set: undefined } } })
           isBlank = false
         }
-      } else {
-        newState = update(newState, { errors: { [field]: { $set: undefined } } })
-        isBlank = false
-      }
 
-      return newState
-    }, () => {
-      resolve(isBlank)
+        return newState
+      }, () => {
+        resolve(isBlank)
+      })
     })
-  })
-}
-
-
+  }
 
   renderMessage = message => {
     if (message === undefined) return []
@@ -350,7 +354,6 @@ isBlank = (field, currentValue) => {
           renderLabel={I18n.t('Default Email')}
           onChange={e => this.onChange(emailField, e.target.value)}
           value={get(this.state.data, emailField)?.toString()}
-          isRequired={true}
           ref={this.emailRef}
           messages={emailErrors.length > 0 ? emailErrors : emailHint}
         />
