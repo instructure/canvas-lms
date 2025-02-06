@@ -33,6 +33,7 @@ describe('DifferentiationTagTrayManager', () => {
     courseID: 123,
   }
 
+  let user: ReturnType<typeof userEvent.setup>
   const renderComponent = (mockReturn = {}, props = {}) => {
     const defaultMock = {
       data: [],

@@ -31,6 +31,7 @@ import {nanoid} from 'nanoid'
 import 'jquery-kyle-menu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import UserTaggedModal from '@canvas/differentiation-tags/react/UserTaggedModal/UserTaggedModal'
+import MessageBus from '../../util/MessageBus'
 
 const I18n = createI18nScope('RosterUserView')
 
@@ -315,7 +316,7 @@ export default class RosterUserView extends Backbone.View {
       RosterUserView.selectedUsers = RosterUserView.selectedUsers.filter(id => id !== userId)
     }
 
-    this.trigger('userSelectionChanged', {
+    MessageBus.trigger('userSelectionChanged', {
       model: this.model,
       selected: isChecked,
       selectedUsers: RosterUserView.selectedUsers,
