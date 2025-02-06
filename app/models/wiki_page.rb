@@ -335,7 +335,7 @@ class WikiPage < ActiveRecord::Base
   scope :order_by_id, -> { order(:id) }
 
   def low_level_locked_for?(user, opts = {})
-    return false if opts[:check_policies] && grants_right?(user, :update)
+    return false if opts[:check_policies] && wiki.grants_right?(user, :view_unpublished_items)
 
     RequestCache.cache(locked_request_cache_key(user)) do
       locked = false
