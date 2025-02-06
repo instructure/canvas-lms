@@ -11,8 +11,13 @@ Rack::Timeout.register_state_change_observer(:check_for_slow_requests) do |env|
     request_id = info.id
     if info.service && info.service > 30
       env["sentry_sent"] = true
-      backtrace = Thread.list.find { |thread| thread.thread_variable_get("request_id") == request_id}.backtrace
-      Sentry.capture_exception(SlowTransactionError.new(backtrace))
+      begin
+        slow_thread = Thread.list.find { |thread| thread.thread_variable_get("request_id") == request_id}
+        slow_thread.thread_variable_get('sentry_hub').capture_exception(SlowTransactionError.new(slow_thread.backtrace))
+      rescue
+         # Ignored
+      end
     end
   end
 end
+
