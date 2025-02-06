@@ -104,7 +104,7 @@ export function formatUserAgent(view: APIPageView): string {
 function hourParts(secs: number): HourParts {
   const hours = Math.floor(secs / 3600)
   const minutes = Math.floor((secs % 3600) / 60)
-  const seconds = secs % 60
+  const seconds = Math.round(secs % 60) // Intl.DurationFormat needs integer values
 
   return {hours, minutes, seconds}
 }
