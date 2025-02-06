@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,22 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export type ePortfolioPage = {
-  id: number
-  name: string
-  position: number
-  entry_url: string
-}
-export type ePortfolio = {
-  id: number
-  name: string
-  public: boolean
-  profile_url: string | null
-  eportfolio_url?: string
-}
-export type ePortfolioSection = {
-  id: number
-  name: string
-  position: number
-  category_url: string
+
+export interface EnvPortfolio {
+  eportfolio_id: number
+  category_id: number
+  owner_view: boolean
 }
