@@ -1686,6 +1686,7 @@ el:
       details: λεπτομέρειες...
       login: Είσοδος
     no_text: "Δεν υπάρχει κείμενο"
+  alert_d2c8ef98: Συναγερμός
   alerts: 
     alert: 
       buttons: 
@@ -1763,6 +1764,8 @@ el:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Επιτρέπει στους χρήστες με διεθνείς τηλεφωνικούς αριθμούς να λαμβάνουν γραπτά μηνύματα από το Canvas."
   alphabetically_60ab47e4: Αλφαβητικά
   always_3a59e701: Πάντα
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "Δημιουργείται μια ειδοποίηση για κάθε μαθητή που πληρεί όλα τα κριτήρια. Ελέγχονται καθημερινά, και οι ειδοποιήσεις θα αποστέλλονται σε μαθητή, δάσκαλο και/ή λογαριασμό διαχειριστή μέχρι το πρόβλημα να λυθεί."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "Δημιουργείται μια ειδοποίηση για κάθε σπουδαστή που πληρεί όλα τα κριτήρια. Ελέγχονται καθημερινά, και οι ειδοποιήσεις θα αποστέλλονται σε φοιτητή/τρια, καθηγητή/τρια μέχρι το πρόβλημα να λυθεί."
   an_assignment_name_dc624e70: "Ένα Όνομα Εργασίας"
   an_error_occured_please_try_again_e59b65b: "Συνέβη ένα σφάλμα. Παρακαλούμε ξαναπροσπαθήστε."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Συνέβη ένα σφάλμα*, παρακαλούμε απαντήστε ξανά αργότερα"
@@ -5884,6 +5887,7 @@ el:
   e_mail_only_2cc5e513: "Μόνο ηλεκτρονική διεύθυνση"
   ecollege_file_description: Ecollege
   ecollege_name: "Μετατροπέας Ecollege"
+  edit_alert_739bb0ba: "Επεξεργασία ειδοποίησης"
   edit_and_delete_their_own_posts_f4f7cc6: "Επεξεργασία και διαγραφή των δικών τους δημοσιεύσεων"
   edit_app_b0cc1c17: "Διαμόρφωση Εφαρμογής"
   edit_assignment_ebf22a72: "Τροποποίηση Εργασίας"
@@ -10104,6 +10108,7 @@ el:
   no_students_have_taken_the_quiz_yet_e667644b: "Κανένας μαθητής δεν έχει κάνει ακόμα το κουίζ"
   no_students_have_taken_the_survey_yet_d378cd35: "Κανένας Σπουδαστής δεν έχει απαντήσει ακόμη στη δημοσκόπηση"
   no_submission_fb131a40: "Καμία υποβολή"
+  no_teacher_interaction_de8d91bc: "Δεν έχει υπάρξει αλληλοεπίδραση με τον Καθηγητή/α"
   no_time_limit_for_long_running_conferences_d49fdfad: "Δεν υπάρχει όριο χρόνου (για μακροχρόνιες συνεδρίες)"
   no_tls_618add1a: "Χωρίς TLS"
   no_usage_rights_object_supplied_304b8d40: "Δεν παρέχονται «usage_rights» αντικειμένου"
@@ -13253,6 +13258,7 @@ el:
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Η ίδια τιμή με το «Canvas_URL__c» ενδεχομένως να εξαφανιστεί σύντομα"
   sample_data_e4fd01ff: "Δείγμα Δεδομένων"
   save_11a80ec3: Αποθήκευση
+  save_alert_b64f9fa3: "Αποθήκευση Συναγερμού"
   save_changes_698abe77: "Αποθήκευση Αλλαγών "
   save_grading_period_daaaddea: "Αποθήκευση Περιόδου Βαθμολόγησης"
   save_key_b4dede06: "Αποθήκευση Κλειδιού"
@@ -14633,6 +14639,7 @@ el:
   submitted_b37e2ff0: υποβλήθηκε
   submitted_d5ba370a: "Υποβλήθηκε:"
   submitted_datetime_fa2e9287: "<mrk mid=\"1154\" mtype=\"seg\">Υποβλήθηκε:</mrk> <mrk mid=\"1155\" mtype=\"seg\">%{dateTime}</mrk>"
+  submitting_b90fac62: "Υποβολή σε εξέλιξη..."
   submitting_types_7c5a7096: "<mrk mid=\"5857\" mtype=\"seg\">Υποβολή σε εξέλιξη:</mrk> <mrk mid=\"5858\" mtype=\"seg\">%{types}</mrk>"
   subscribe_4b301fb7: Εγγραφή
   subscribed_fe74d22a: "Έγινε εγγραφή"
@@ -15221,6 +15228,8 @@ el:
   undo_a7be8fef: Αναίρεση
   unenroll_943490fb: "Διαγραφή -απο το μάθημα-"
   ungraded_submissions_44efb0ec: "Μη Βαθμολογημένες Υποβολές"
+  ungraded_submissions_count_63fcf6d1: "Υποβολές εργασιών που δεν έχουν βαθμολογηθεί(Σύνολο)"
+  ungraded_submissions_time_bafaa609: "Αβαθμολόγητες Υποβολές (Χρόνος)"
   ungraded_survey_ad7de790: "Μη Βαθμολογημένη Δημοσκόπηση"
   unknown: Άγνωστο
   unknown_47a3b725: Άγνωστο
