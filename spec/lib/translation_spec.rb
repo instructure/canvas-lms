@@ -51,23 +51,6 @@ describe Translation do
     end
   end
 
-  describe "language_matches_user_locale?" do
-    let(:user) { double("User", locale: "es") }
-
-    it "returns true if the language of the text matches the user locale" do
-      expect(described_class.language_matches_user_locale?(user, "Hola, mundo!")).to be true
-    end
-
-    it "returns false if the language of the text does not match the user locale" do
-      expect(described_class.language_matches_user_locale?(user, "Hello, world!")).to be false
-    end
-
-    it "defaults to English if the user locale is nil" do
-      allow(user).to receive(:locale).and_return(nil)
-      expect(described_class.language_matches_user_locale?(user, "Hello, world!")).to be true
-    end
-  end
-
   describe "translate_text" do
     let(:text) { "Hello, world!" }
     let(:result) { double("Result", translated_text: "Hola, mundo!") }

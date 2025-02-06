@@ -74,20 +74,6 @@ export async function translateText(args: TranslateArgs, text: string): Promise<
   return result.json.translated_text
 }
 
-export async function translateInboxMessage(text: string): Promise<string> {
-  const result = await doFetchApi({
-    method: 'POST',
-    path: '/translate/message',
-    body: {
-      inputs: {
-        text,
-      },
-    },
-  })
-  // @ts-expect-error
-  return result.json.translated_text
-}
-
 /**
  * Strip the signature from the body, so that it can be added back later.
  * */
