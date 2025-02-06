@@ -222,6 +222,17 @@ lti_registrations_page:
       state: allowed_on
     ci:
       state: allowed_on
+lti_registrations_usage_data:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Apps - Usage Data
+  description: When enabled, the Usage Data tab will appear in Canvas Apps.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_report_multiple_schema_validation_errors:
   state: hidden
   shadow: true
