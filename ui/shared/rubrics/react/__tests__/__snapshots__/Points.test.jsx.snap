@@ -19,7 +19,6 @@ exports[`The Points component renders the component when assessing with the expe
       margin="none small none none"
       shouldGrow={false}
       shouldShrink={false}
-      size="4rem"
     >
       <TextInput
         autoComplete="off"
