@@ -350,6 +350,10 @@ describe Types::EnrollmentType do
       expect(enrollment_type.resolve("section { _id }", context)).to be_nil
     end
 
+    it "returns nil for _id" do
+      expect(enrollment_type.resolve("_id", context)).to be_nil
+    end
+
     it "returns nil for the associated user" do
       observer = User.create!
       observer_enrollment = observer_in_course(course: @course, user: observer)

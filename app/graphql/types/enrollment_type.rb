@@ -59,12 +59,16 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
-    implements Interfaces::LegacyIDInterface
     implements Interfaces::AssetStringInterface
 
     alias_method :enrollment, :object
 
     global_id_field :id
+
+    field :_id, ID, "legacy canvas id", method: :id, null: true
+    def _id
+      unless_hiding_user_for_anonymous_grading { enrollment.id }
+    end
 
     field :user, UserType, null: true
     def user
