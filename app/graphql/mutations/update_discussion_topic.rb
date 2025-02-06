@@ -123,8 +123,8 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
           # Instantiate and execute UpdateAssignment mutation
           assignment_mutation = Mutations::UpdateAssignment.new(object: nil, context:, field: nil)
           assignment_result = assignment_mutation.resolve(input: updated_assignment_args)
-          discussion_topic.lock_at = input[:assignment][:lock_at] unless input[:lock_at]
-          discussion_topic.unlock_at = input[:assignment][:unlock_at] unless input[:unlock_at]
+          discussion_topic.lock_at = input[:assignment][:lock_at] if input[:assignment][:set_assignment] != false
+          discussion_topic.unlock_at = input[:assignment][:unlock_at] if input[:assignment][:set_assignment] != false
 
           if assignment_result[:errors]
             return { errors: assignment_result[:errors] }
@@ -151,8 +151,8 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
         end
 
         discussion_topic.assignment = assignment_create_result[:assignment]
-        discussion_topic.lock_at = input[:assignment][:lock_at] if input[:assignment][:lock_at]
-        discussion_topic.unlock_at = input[:assignment][:unlock_at] if input[:assignment][:unlock_at]
+        discussion_topic.lock_at = input[:assignment][:lock_at]
+        discussion_topic.unlock_at = input[:assignment][:unlock_at]
       end
 
       # Assignment must be present to set checkpoints

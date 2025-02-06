@@ -142,8 +142,8 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         created_assignment = working_assignment[:assignment]
 
         discussion_topic.assignment = created_assignment
-        discussion_topic.lock_at = created_assignment.lock_at unless input[:lock_at]
-        discussion_topic.unlock_at = created_assignment.unlock_at unless input[:unlock_at]
+        discussion_topic.lock_at = created_assignment.lock_at
+        discussion_topic.unlock_at = created_assignment.unlock_at
       end
 
       # Assignment must be present to set checkpoints
