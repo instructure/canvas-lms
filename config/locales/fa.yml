@@ -2244,6 +2244,7 @@ fa:
       login: ورود
     no_text: "متن موجود نیست"
   albanian_21ed929e: آلبانی
+  alert_d2c8ef98: هشدار
   alerts: 
     alert: 
       buttons: 
@@ -2792,6 +2793,8 @@ fa:
   always_include_dates_1ae2935e: "همیشه تاریخ‌ها درج شود"
   always_include_dates_74b3721d: "همیشه تاریخ‌ها درج شود;"
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "RCE و نوار کناری همیشه از یک سرویس محتوای غنی کانواس بارگذاری شود"
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "یک هشدار برای هر دانشجو که همه ضوابط را رعایت کرده باشد ایجاد می شود. آنها هر روز بررسی می شوند، و اطلاعیه ها تا زمان رفع مشکل برای دانشجو، استاد و/یا مدیر حساب ارسال خواهند شد."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "یک هشدار برای هر دانشجو که همه ضوابط را رعایت کرده باشد، ایجاد می شود. آنها هر روز بررسی می شوند، و اطلاعیه ها تا زمان رفع مشکل برای دانشجو و/یا استاد ارسال خواهند شد."
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "یک کلید API برای استفاده کردن از معیارهای علمی لازم است"
   an_assignment_name_dc624e70: "یک نام تکلیف"
   an_auto_generated_chronological_summary_of_your_co_eeafee13: "یک خلاصه زمانی تولید شده به صورت خودکار از درس شما"
@@ -9425,6 +9428,7 @@ fa:
   ecollege_name: "مبدل Ecollege"
   ecuador_593_dfcc235a: "اکوادر (+593)"
   edit_account_name_for_account_name_ae3633e8: "ویرایش نام حساب برای %{account_name}"
+  edit_alert_739bb0ba: "ویرایش اخطار"
   edit_and_delete_their_own_posts_f4f7cc6: "ویرایش و حذف ارسال های خود"
   edit_and_delete_their_own_replies_e5b9d793: "ویرایش و حذف پاسخ های خود"
   edit_announcement_title_cce0b4e: "ویرایش اطلاعیه %{title}"
@@ -16522,6 +16526,7 @@ fa:
   no_submissions_164cea23: "مورد ارسالی وجود ندارد"
   no_such_source_context_80a659ba: "چنین منبع زمینه ای وجود ندارد"
   no_such_target_context_21158b9: "چنین زمینه هدفی وجود ندارد"
+  no_teacher_interaction_de8d91bc: "استاد تعامل نداشته است"
   no_template_selected_f59e797: "هیچ الگویی انتخاب نشده است"
   no_terms_eab5ee7b: "نیمسال موجود نیست"
   no_time_limit_for_long_running_conferences_d49fdfad: "بدون محدودیت زمانی (برای کنفرانس های طولانی مدت)"
@@ -20864,6 +20869,7 @@ fa:
   saudi_arabia_1f0dcbdc: "عربستان صعودی"
   saudi_arabia_966_d01ed717: "عربستان سعودی (+966)"
   save_11a80ec3: "ذخیره سازی"
+  save_alert_b64f9fa3: "ذخیره سازی هشدار"
   save_and_customize_19eb7a7b: "ذخیره و شخصی‌سازی"
   save_and_publish_1b765e7: "ذخیره و انتشار"
   save_changes_698abe77: "ذخیره سازی تغییرات"
@@ -23188,6 +23194,7 @@ fa:
   submitted_on_a09f839e: "ارسال شده در"
   submitted_on_bb3b53fc: "ارسال شده در"
   submitted_submitdate_bdd3bf09: "ارسال شده: %{submitDate}"
+  submitting_b90fac62: "در حال ارسال..."
   submitting_types_7c5a7096: "در حال ارسال: %{types}"
   subscribe_4b301fb7: اشتراک
   subscribe_failed_2eb62de0: "اشتراک انجام نشد"
@@ -24527,6 +24534,7 @@ fa:
   treat_ungraded_as_0_d38c2b41: "به طور نمره گذاری نشده به عنوان 0 در نظر گرفته شود"
   tree_browser: 
     folder_tree_instructions: "از کلیدهای پیمایش بالا و پایین برای پیمایش در درخت استفاده کنید. کلید راست را برای باز کردن پوشه ها، کلید چپ را برای جمع کردن و کلید enter را برای انتخاب مورد انتخابی فشار دهید."
+  trigger_f0ee1fbf: محرک
   trinidad_and_tobago_1_fc2d8d1c: "ترینیداد و توباگو (+1)"
   trophy: 
     star_display_name: "ستاره دار کردن"
@@ -24645,6 +24653,8 @@ fa:
   ungraded_ed0c6f98: "نمره دهی نشده"
   ungraded_pointspossible_e2f86bd9: "غیر قابل استفاده/%{pointsPossible}"
   ungraded_submissions_44efb0ec: "موردهای ارسالی نمره گذاری نشده"
+  ungraded_submissions_count_63fcf6d1: "موردهای ارسالی نمره گذاری نشده (تعداد)"
+  ungraded_submissions_time_bafaa609: "موردهای ارسالی نمره گذاری نشده  (زمان)"
   ungraded_survey_ad7de790: "نظرسنجی نمره گذاری نشده"
   united_arab_emirates_971_649b3750: "امارات متحده عربی (+971)"
   united_arab_emirates_a71e57c6: "امارات متحده عربی"
