@@ -2222,8 +2222,8 @@ describe ContentMigration do
       expect(destination_att1.media_entry_id).to be_truthy
       expect(destination_att2.media_entry_id).to be_truthy
       @zip_file = Zip::File.open(@copy_from.content_exports.last.attachment.open.path)
-      expect(@copy_to.wiki_pages.first.body).to eq("<iframe data-media-type=\"audio\" data-media-id=\"#{destination_att1.media_entry_id}\" src=\"/media_attachments_iframe/#{destination_att1.id}?embedded=true&amp;type=audio\"></iframe>")
-      expect(@copy_to.wiki_pages.last.body).to eq("<iframe data-media-type=\"video\" data-media-id=\"#{destination_att2.media_entry_id}\" src=\"/media_attachments_iframe/#{destination_att2.id}?embedded=true&amp;type=video\"></iframe>")
+      expect(@copy_to.wiki_pages.first.body).to eq(%(<iframe data-media-type="audio" data-media-id="#{destination_att1.media_entry_id}" loading="lazy" src="/media_attachments_iframe/#{destination_att1.id}?embedded=true&amp;type=audio"></iframe>))
+      expect(@copy_to.wiki_pages.last.body).to eq(%(<iframe data-media-type="video" data-media-id="#{destination_att2.media_entry_id}" loading="lazy" src="/media_attachments_iframe/#{destination_att2.id}?embedded=true&amp;type=video"></iframe>))
       expect(@zip_file.find_entry("web_resources/Uploaded Media/first.webm")).not_to be_nil
       expect(@zip_file.find_entry("web_resources/Uploaded Media/second.webm")).not_to be_nil
     end

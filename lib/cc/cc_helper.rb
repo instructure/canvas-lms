@@ -503,6 +503,8 @@ module CC
     def self.file_query_string(sub_path)
       return if sub_path.blank?
 
+      sub_path = CGI.unescapeHTML(sub_path)
+
       qs = []
       begin
         uri = URI.parse(sub_path)
