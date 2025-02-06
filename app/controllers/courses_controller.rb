@@ -366,6 +366,9 @@ class CoursesController < ApplicationController
   before_action :check_limited_access_for_students, only: %i[create_file]
   before_action :check_horizon_redirect, only: [:show]
 
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:show, :settings]
+
   include Api::V1::Course
   include Api::V1::Progress
   include K5Mode
@@ -2229,7 +2232,7 @@ class CoursesController < ApplicationController
         return
       end
 
-      @context = api_find(Course.active, params[:id])
+      @context ||= api_find(Course.active, params[:id])
 
       if @context.horizon_course? && !request.path.include?("/modules")
         redirect_to course_context_modules_path(@context.id)
@@ -3806,7 +3809,7 @@ class CoursesController < ApplicationController
         session[:masquerade_return_to] = params[:leave_student_view]
         leave_student_view
       elsif params[:reset_test_student]
-        @context = api_find(Course.active, params[:id])
+        @context ||= api_find(Course.active, params[:id])
         reset_test_student
       end
     end

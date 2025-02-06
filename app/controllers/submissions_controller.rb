@@ -95,6 +95,9 @@ class SubmissionsController < SubmissionsBaseController
   before_action :get_course_from_section, only: :create
   before_action :require_context
 
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   include K5Mode
 
   def index

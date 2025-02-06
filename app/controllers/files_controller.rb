@@ -159,6 +159,9 @@ class FilesController < ApplicationController
     show_relative
   ]
 
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   before_action :open_limited_cors, only: [:show]
   before_action :open_cors, only: %i[
     api_create api_create_success api_create_success_cors show_thumbnail

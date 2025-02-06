@@ -23,6 +23,10 @@ class WikiPagesController < ApplicationController
   include SubmittableHelper
 
   before_action :require_context
+
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   before_action :get_wiki_page, except: [:front_page]
   before_action :set_front_page, only: [:front_page]
   before_action :set_pandapub_read_token

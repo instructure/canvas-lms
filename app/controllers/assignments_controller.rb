@@ -36,6 +36,10 @@ class AssignmentsController < ApplicationController
   include ObserverEnrollmentsHelper
   include SyllabusHelper
   before_action :require_context
+
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: %i[index show syllabus]
+
   include K5Mode
   add_crumb(
     proc { t "#crumbs.assignments", "Assignments" },
