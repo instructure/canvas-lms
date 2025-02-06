@@ -35,11 +35,26 @@ describe('ConfigurationForm', () => {
 
   beforeEach(() => {
     // Mock jQuery's ajax method to prevent actual network requests
-    $.ajax = jest.fn().mockImplementation(() => ({
-      done: jest.fn().mockReturnThis(),
-      fail: jest.fn().mockReturnThis(),
-      always: jest.fn().mockReturnThis(),
-    }))
+    const mockJQueryResponse = {
+      done: jest.fn(function (callback) {
+        callback?.()
+        return this
+      }),
+      fail: jest.fn(function (_callback) {
+        return this
+      }),
+      always: jest.fn(function (callback) {
+        callback?.()
+        return this
+      }),
+      abort: jest.fn(),
+      state: () => 'resolved',
+      status: 200,
+      statusText: 'OK',
+      responseJSON: {},
+    }
+
+    $.ajax = jest.fn().mockReturnValue(mockJQueryResponse)
 
     // Mock jQuery's animate method since we use it for scrolling
     $.fn.animate = jest.fn()
@@ -48,6 +63,7 @@ describe('ConfigurationForm', () => {
   afterEach(() => {
     document.body.innerHTML = ''
     jest.clearAllMocks()
+    jest.restoreAllMocks()
   })
 
   describe('form type rendering', () => {
