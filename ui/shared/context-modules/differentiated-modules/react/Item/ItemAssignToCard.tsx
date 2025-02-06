@@ -170,6 +170,7 @@ export default forwardRef(function ItemAssignToCard(
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
   const dateInputRefs = useRef<Record<string, HTMLInputElement>>({})
   const timeInputRefs = useRef<Record<string, HTMLInputElement>>({})
+  const prevIsCheckpointedRef = useRef(isCheckpointed)
   const dateValidator = useMemo(
     () =>
       new DateValidator({
@@ -279,6 +280,20 @@ export default forwardRef(function ItemAssignToCard(
     if (newError.length !== error.length) setError(newError)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAssigneeIds.length])
+
+  useEffect(() => {
+    // Check if we've transitioned from true to false
+    if (prevIsCheckpointedRef.current && !isCheckpointed) {
+      setReplyToTopicDueDate(null)
+      setRequiredRepliesDueDate(null)
+    }
+
+    if (!prevIsCheckpointedRef.current && isCheckpointed) {
+      setDueDate(null)
+    }
+
+    prevIsCheckpointedRef.current = isCheckpointed
+  }, [isCheckpointed])
 
   useImperativeHandle(ref, () => ({
     showValidations() {
