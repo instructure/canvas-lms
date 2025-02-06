@@ -29,9 +29,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import {QueryProvider} from '@canvas/query'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import SectionList from '../react/SectionList'
-import PageContainer from '../react/PageContainer'
+import PortfolioPortal from '../react/PortfolioPortal'
 import ReactDOM from 'react-dom/client'
 import userSettings from '@canvas/user-settings'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
@@ -52,7 +50,8 @@ import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/progressbar'
 import 'jqueryui/sortable'
-import {Alert} from '@instructure/ui-alerts'
+import CreatePortfolioForm from '../react/CreatePortfolioForm'
+import {Portal} from '@instructure/ui-portal'
 
 const I18n = createI18nScope('eportfolio')
 
@@ -177,62 +176,42 @@ function saveObject($obj, type) {
   return true
 }
 
-function renderSectionList(portfolio, isOwner) {
-  const sectionListContainer = document.getElementById('section_list_mount')
-  if (sectionListContainer) {
-    const root = ReactDOM.createRoot(sectionListContainer)
-    root.render(
-      <QueryProvider>
-        <SectionList portfolio={portfolio} isOwner={isOwner} />
-      </QueryProvider>,
+function renderCreateForm() {
+  const createContainer = document.getElementById('create_portfolio_mount')
+  const formContainer = document.getElementById('create_portfolio_form_mount')
+
+  if (createContainer) {
+    return (
+      <Portal open={true} mountNode={createContainer}>
+        <CreatePortfolioForm formMount={formContainer} />
+      </Portal>
     )
   }
 }
 
-function renderPageList(portfolio, isOwner, sectionId) {
+function renderPortal(portfolio_id) {
+  const sectionListContainer = document.getElementById('section_list_mount')
   const pageListContainer = document.getElementById('page_list_mount')
-  if (pageListContainer) {
-    const root = ReactDOM.createRoot(pageListContainer)
-    root.render(
-      <QueryProvider>
-        <PageContainer
-          portfolio={portfolio}
-          isOwner={isOwner}
-          sectionId={sectionId}
-          onUpdate={json => $(document).triggerHandler('page_updated', json)}
-        />
-      </QueryProvider>,
-    )
-  }
+
+  return (
+    <QueryProvider>
+      <PortfolioPortal
+        portfolioId={portfolio_id}
+        sectionListNode={sectionListContainer}
+        pageListNode={pageListContainer}
+        onPageUpdate={json => $(document).triggerHandler('page_updated', json)}
+      />
+    </QueryProvider>
+  )
 }
 
 $(document).ready(function () {
-  if (ENV.eportfolio_id) {
-    const fetchPortfolio = async () => {
-      const {json} = await doFetchApi({
-        path: `/eportfolios/${ENV.eportfolio_id}`,
-      })
-      return json
-    }
-    fetchPortfolio()
-      .then(portfolio => {
-        const isOwner = ENV.owner_view
-        const sectionId = ENV.category_id
-        renderSectionList(portfolio, isOwner)
-        renderPageList(portfolio, isOwner, sectionId)
-      })
-      .catch(() => {
-        const sectionListContainer = document.getElementById('section_list_mount')
-        if (sectionListContainer) {
-          const root = ReactDOM.createRoot(sectionListContainer)
-          root.render(<Alert variant="error">{I18n.t('Failed to load section list')}</Alert>)
-        }
-        const pageListContainer = document.getElementById('page_list_mount')
-        if (pageListContainer) {
-          const root = ReactDOM.createRoot(pageListContainer)
-          root.render(<Alert variant="error">{I18n.t('Failed to load page list')}</Alert>)
-        }
-      })
+  const portfolio_id = ENV.eportfolio_id
+  const root = ReactDOM.createRoot(document.getElementById('eportfolio_portal_mount'))
+  if (portfolio_id) {
+    root.render(renderPortal(portfolio_id))
+  } else {
+    root.render(renderCreateForm())
   }
   // Add ePortfolio related
   $('.add_eportfolio_link').click(function (event) {
@@ -467,14 +446,14 @@ $(document).ready(function () {
     handle: '.move_link',
     helper: 'clone',
     axis: 'y',
-    start(event, ui) {
+    start(_event, ui) {
       const $section = $(ui.item)
       if ($section.getTemplateData({textValues: ['section_type']}).section_type === 'rich_text') {
         const $richText = $section.find('.edit_section')
         RichContentEditor.destroyRCE($richText)
       }
     },
-    stop(event, ui) {
+    stop(_event, ui) {
       const $section = $(ui.item)
       if ($section.getTemplateData({textValues: ['section_type']}).section_type === 'rich_text') {
         const $richText = $section.find('.edit_section')
@@ -672,7 +651,7 @@ $(document).ready(function () {
         $('#submission_' + submission_id + ',#recent_submission_' + submission_id).addClass(
           'already_used',
         )
-      } catch (e) {}
+      } catch (_e) {}
       /* eslint-enable no-empty */
       let url = $(this).find('.eportfolio_named_entry_url').attr('href')
       url = replaceTags(url, 'category_slug', entry.category_slug)
@@ -734,7 +713,7 @@ $(document).ready(function () {
       $(this).addClass('active')
     },
   })
-  $(document).bind('page_added page_updated', (event, data) => {
+  $(document).bind('page_added page_updated', (_event, data) => {
     const entry = data.eportfolio_entry
     const $activePage = $('#eportfolio_entry_' + entry.id)
     if ($activePage.length) {

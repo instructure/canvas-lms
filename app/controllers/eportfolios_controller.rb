@@ -107,7 +107,13 @@ class EportfoliosController < ApplicationController
           @portfolio.ensure_defaults
           flash[:notice] = t("notices.created", "ePortfolio successfully created")
           format.html { redirect_to eportfolio_url(@portfolio) }
-          format.json { render json: @portfolio.as_json(permissions: { user: @current_user, session: }) }
+          format.json do
+            portfolio_json = @portfolio.as_json(permissions: { user: @current_user, session: })
+            if params[:include_redirect]
+              portfolio_json["eportfolio_url"] = eportfolio_url(@portfolio)
+            end
+            render json: portfolio_json
+          end
         else
           format.html do
             rce_js_env
