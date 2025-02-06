@@ -258,7 +258,7 @@ module Lti::IMS
         # 5xx and other unexpected errors
         return render_error(err_message, :internal_server_error)
       end
-      submit_homework(attachments) if new_submission? && activity_started?
+      submit_homework(attachments) if new_submission? && trigger_submission?
       update_or_create_result
       json[:resultUrl] = result_url
 
@@ -280,6 +280,7 @@ module Lti::IMS
     ].freeze
     SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url external_tool online_upload].freeze
     DEFAULT_SUBMISSION_TYPE = "external_tool"
+    ACTIVITY_PROGRESSES_NEEDS_GRADING = %w[Submitted Completed].freeze
 
     def scopes_matcher
       self.class.all_of(TokenScopes::LTI_AGS_SCORE_SCOPE)
@@ -598,8 +599,12 @@ module Lti::IMS
       parsed
     end
 
-    def activity_started?
-      params[:activityProgress] != "Initialized"
+    def trigger_submission?
+      if context.root_account.feature_enabled?(:ags_score_trigger_needs_grading_after_submitted)
+        ACTIVITY_PROGRESSES_NEEDS_GRADING.include?(params[:activityProgress])
+      else
+        params[:activityProgress] != "Initialized"
+      end
     end
   end
 end

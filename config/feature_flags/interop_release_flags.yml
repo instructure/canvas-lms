@@ -9,6 +9,20 @@ ags_improved_course_concluded_response_codes:
     along with a helpful message indicating that the tool cannot access concluded
     courses.
   applies_to: RootAccount
+ags_score_trigger_needs_grading_after_submitted:
+  state: hidden
+  shadow: true
+  display_name: Prevents LTI AGS Score publish service incorrectly trigger Needs Grading icon 
+  description: |-
+    If enabled, the AGS Score publish service endpoint will not trigger showing the Needs Grading icon in the gradebook 
+    when activityProgress is Initialized or Started or InProgress just when it is Submitted or Completed.
+    If disabled only Initialized activityProgress will not trigger showing the Needs Grading icon in the gradebook.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 assignment_edit_placement_not_on_announcements:
   state: hidden
   applies_to: SiteAdmin
