@@ -296,27 +296,6 @@ module Translation
       fragment.to_html
     end
 
-    def language_matches_user_locale?(user, text)
-      locale = if user.locale.nil?
-                 "en"
-               else
-                 trim_locale(user.locale)
-               end
-      result = trim_locale(CLD.detect_language(text)[:code])
-      result == locale
-    end
-
-    def translate_message(text:, user:)
-      src_lang = trim_locale(CLD.detect_language(text)[:code])
-      tgt_lang = if user.locale.nil?
-                   "en"
-                 else
-                   trim_locale(user.locale)
-                 end
-
-      translate_text(text: text, src_lang: src_lang, tgt_lang: tgt_lang)
-    end
-
     def translate_message_sagemaker(text:, user:)
       translated_text = []
       src_lang = trim_locale(CLD.detect_language(text)[:code])

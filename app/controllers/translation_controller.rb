@@ -21,7 +21,7 @@ class TranslationController < ApplicationController
 
   before_action :require_context, only: :translate
   before_action :require_user
-  before_action :require_inbox_translation, only: %i[translate_paragraph translate_message]
+  before_action :require_inbox_translation, only: %i[translate_paragraph]
 
   # Skip the authenticity token as this is an API endpoint.
   skip_before_action :verify_authenticity_token, only: [:translate]
@@ -54,23 +54,6 @@ class TranslationController < ApplicationController
       render json: translate_large_passage(original_text: required_params[:text],
                                            src_lang: required_params[:src_lang],
                                            tgt_lang: required_params[:tgt_lang])
-    end
-  end
-
-  def translate_message
-    # First, check to see if the language that we've been given matches the language of the user.
-    if Translation.language_matches_user_locale?(@current_user, required_params[:text])
-      return render json: { status: "language_matches" }
-    end
-
-    # This action is used for inbox inbound messages
-    InstStatsd::Statsd.distributed_increment("translation.inbox")
-
-    # Translate the message
-    if Account.site_admin.feature_enabled?(:ai_translation_improvements)
-      render json: { translated_text: Translation.translate_message(text: required_params[:text], user: @current_user) }
-    else
-      render json: { translated_text: Translation.translate_message_sagemaker(text: required_params[:text], user: @current_user) }
     end
   end
 

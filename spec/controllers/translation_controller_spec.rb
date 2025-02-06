@@ -104,47 +104,4 @@ describe TranslationController do
       expect(response.parsed_body["translated_text"]).to eq("translated.")
     end
   end
-
-  describe "#translate_message" do
-    before do
-      allow(Translation).to receive_messages(
-        available?: true,
-        translate_message: "translated.",
-        language_matches_user_locale?: false
-      )
-    end
-
-    context "when language matches user locale" do
-      it "renders language matches" do
-        allow(Translation).to receive_messages(language_matches_user_locale?: true)
-        post :translate_message, params: { course_id: @course.id, inputs: params }
-
-        expect(response).to be_successful
-        expect(response.parsed_body["status"]).to eq("language_matches")
-      end
-    end
-
-    context "feature is not enabled" do
-      it "renders unauthorized action" do
-        allow(Translation).to receive_messages(available?: false)
-        post :translate_message, params: { course_id: @course.id, inputs: params }
-
-        expect(response).to have_http_status(:unauthorized)
-      end
-    end
-
-    it "logs the metric" do
-      post :translate_message, params: { course_id: @course.id, inputs: params }
-
-      expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.inbox")
-    end
-
-    it "responds with translated message" do
-      post :translate_message, params: { course_id: @course.id, inputs: params }
-
-      expect(response).to be_successful
-      expect(response.parsed_body["translated_text"]).to eq("translated.")
-    end
-  end
 end
