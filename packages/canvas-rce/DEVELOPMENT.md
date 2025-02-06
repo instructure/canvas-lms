@@ -79,7 +79,7 @@ or anything else that gets mounted in a react portal comes with 2 requirements
 
 1. Include the attribute `data-mce-component={true}` on the `<Modal>` or ` <Tray>`. This tells the RCE
    that the modal is part of the RCE and not to fire a `blur` event when it closes and loses focus.
-1. Include `mountNode={instuPopupMountNode}` on thew `<Modal>` or `<Tray>`. The `instuiPopupMountNode`
+1. Include `mountNode={instuiPopupMountNodeFn}` on thew `<Modal>` or `<Tray>`. The `instuiPopupMountNodeFn`
    function is imported from `src/util/fullscreenHelpers` within the `canvas-rce` package or `@instructure/canvs-rce` from outside. This function will mount modals in the `<div class="rce-wrapper">` when the RCE is fullscreen, where it will not be hidden behind the RCE.
 
 ## Upgrading TinyMCE

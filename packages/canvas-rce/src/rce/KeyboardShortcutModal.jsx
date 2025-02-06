@@ -26,7 +26,7 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import formatMessage from '../format-message'
 import {determineOSDependentKey} from './userOS'
-import {instuiPopupMountNode} from '../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../util/fullscreenHelpers'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default function KeyboardShortcutModal(props) {
@@ -37,7 +37,7 @@ export default function KeyboardShortcutModal(props) {
       data-testid="RCE_KeyboardShortcutModal"
       data-mce-component={true}
       label={formatMessage('Keyboard Shortcuts')}
-      mountNode={instuiPopupMountNode}
+      mountNode={instuiPopupMountNodeFn}
       open={props.open}
       shouldCloseOnDocumentClick={true}
       shouldReturnFocus={true}

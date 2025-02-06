@@ -29,7 +29,7 @@ import {RceLti11ContentItem} from '../../lti11-content-items/RceLti11ContentItem
 import formatMessage from '../../../../../format-message'
 import {ExternalToolsEnv} from '../../ExternalToolsEnv'
 import {RceToolWrapper} from '../../RceToolWrapper'
-import {instuiPopupMountNode} from '../../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../../util/fullscreenHelpers'
 import {ExternalToolDialogTray} from './ExternalToolDialogTray'
 import {ExternalToolDialogModal} from './ExternalToolDialogModal'
 import {showFlashAlert} from '../../../../../common/FlashAlert'
@@ -268,7 +268,7 @@ export default class ExternalToolDialog extends React.Component<
         </form>
         <Overlay
           open={state.open}
-          mountNode={instuiPopupMountNode}
+          mountNode={instuiPopupMountNodeFn()}
           label={label}
           onOpen={this.handleOpen}
           onClose={this.handleRemove}

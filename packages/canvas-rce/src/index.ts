@@ -40,7 +40,7 @@ export {
 export * from './enhance-user-content/index'
 
 export const defaultConfiguration = defaultTinymceConfig
-export {instuiPopupMountNode} from './util/fullscreenHelpers'
+export {instuiPopupMountNodeFn} from './util/fullscreenHelpers'
 export {Mathml}
 
 export {RCEVariantValues} from './rce/RCEVariants'
@@ -63,7 +63,6 @@ export function renderIntoDiv(editorEl: HTMLElement, props: any, cb?: (ref: any)
     getTranslations(language)
       .then(() => render(editorEl, props, cb))
       .catch(err => {
-         
         console.error(
           'Failed loading the language file for',
           language,

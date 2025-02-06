@@ -25,7 +25,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import formatMessage from '../../../../format-message'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 
 import RceApiSource from '../../../../rcs/api'
 import ImageOptionsForm from '../ImageOptionsForm'
@@ -140,7 +140,7 @@ const UploadFileModal = React.forwardRef(
         data-mce-component={true}
         as="form"
         label={label}
-        mountNode={instuiPopupMountNode}
+        mountNode={instuiPopupMountNodeFn}
         size="large"
         overflow="fit"
         onDismiss={onDismiss}

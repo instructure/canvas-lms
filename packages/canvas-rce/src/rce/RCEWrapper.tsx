@@ -47,7 +47,7 @@ import {
   FS_ENABLED,
   FS_EXIT,
   FS_REQUEST,
-  instuiPopupMountNode,
+  instuiPopupMountNodeFn,
 } from '../util/fullscreenHelpers'
 
 import indicate from '../common/indicate'
@@ -1583,7 +1583,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       'openAccessibilityChecker',
       false,
       {
-        mountNode: instuiPopupMountNode,
+        mountNode: instuiPopupMountNodeFn,
         triggerElementId,
         onFixError: (errors: Array<unknown>) => {
           this.setState({a11yErrorsCount: errors.length})
@@ -2188,7 +2188,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                 )}
                 {this.props.trayProps?.containingContext && (
                   <CanvasContentTray
-                    mountNode={instuiPopupMountNode}
+                    mountNode={instuiPopupMountNodeFn}
                     key={this.id}
                     canvasOrigin={this.getCanvasUrl()}
                     bridge={bridge}
@@ -2210,7 +2210,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                   <this.AIToolsTray
                     open={this.state.AIToolsOpen}
                     container={document.querySelector('[role="main"]')}
-                    mountNode={instuiPopupMountNode}
+                    mountNode={instuiPopupMountNodeFn}
                     contextId={trayProps.contextId}
                     contextType={trayProps.contextId}
                     currentContent={this.getCurrentContentForAI()}

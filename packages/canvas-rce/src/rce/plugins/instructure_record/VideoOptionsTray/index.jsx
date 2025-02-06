@@ -45,7 +45,7 @@ import RceApiSource from '../../../../rcs/api'
 import formatMessage from '../../../../format-message'
 import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 import {getTrayHeight} from '../../shared/trayUtils'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import {parsedStudioOptionsPropType} from '../../shared/StudioLtiSupportUtils'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
@@ -197,7 +197,7 @@ export default function VideoOptionsTray({
               ? formatMessage('Studio Media Options Tray')
               : formatMessage('Video Options Tray')
           }
-          mountNode={instuiPopupMountNode}
+          mountNode={instuiPopupMountNodeFn}
           onDismiss={onRequestClose}
           onEntered={onEntered}
           onExited={onExited}
@@ -280,7 +280,7 @@ export default function VideoOptionsTray({
                           <View as="div" padding="small small xx-small small">
                             <SimpleSelect
                               id={`${id}-size`}
-                              mountNode={instuiPopupMountNode}
+                              mountNode={instuiPopupMountNodeFn}
                               disabled={displayAs !== 'embed'}
                               renderLabel={formatMessage('Size')}
                               messages={messagesForSize}
@@ -326,7 +326,7 @@ export default function VideoOptionsTray({
                               userLocale={Bridge.userLocale}
                               updateSubtitles={handleUpdateSubtitles}
                               liveRegion={getLiveRegion}
-                              mountNode={instuiPopupMountNode}
+                              mountNode={instuiPopupMountNodeFn}
                             />
                           </FormFieldGroup>
                         </Flex.Item>

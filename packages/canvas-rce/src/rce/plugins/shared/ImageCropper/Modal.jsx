@@ -29,7 +29,7 @@ import {Preview} from './Preview'
 import {Controls} from './controls'
 import {ImageCropperSettingsPropTypes} from './propTypes'
 import {DirectionRegion} from './DirectionRegion'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 
 const renderBody = (image, settings, dispatch, message, loading) => {
   if (loading) {
@@ -100,7 +100,7 @@ export const ImageCropperModal = ({
       data-mce-component={true}
       as="form"
       label={formatMessage('Crop Image')}
-      mountNode={instuiPopupMountNode}
+      mountNode={instuiPopupMountNodeFn}
       size="large"
       open={open}
       onDismiss={onClose}
