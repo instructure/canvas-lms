@@ -22,13 +22,14 @@ import template from '../../jst/index.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import AddPeopleApp from '@canvas/add-people'
 import React from 'react'
+import {each, isString, defer, find, partial, isArray} from 'lodash'
 import {createRoot} from 'react-dom/client'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
-import {Button} from '@instructure/ui-buttons'
-import DifferentiationTagTrayManager from '@canvas/differentiation-tags/react/DifferentiationTagTray/DifferentiationTagTrayManager'
+import UserDifferentiationTagManager from '@canvas/differentiation-tags/react/UserDifferentiationTagManager/UserDifferentiationTagManager'
+import MessageBus from '../../util/MessageBus'
 
 const I18n = createI18nScope('RosterView')
 
@@ -102,16 +103,7 @@ export default class RosterView extends Backbone.View {
     }
 
     this.$addUsersButton.on('click', this.showCreateUsersModal.bind(this))
-    const manageTagsTray = this.$el.find('#manageTagsTray')[0]
-    if (manageTagsTray && ENV.permissions.can_manage_differentiation_tags) {
-      this.manageTagsTray = createRoot(manageTagsTray)
-      this.manageTagsTray.render(
-        <Button onClick={() => this.renderDifferentiationTagTray(true)}>
-          {I18n.t('Manage Tags')}
-        </Button>,
-      )
-    }
-
+    this.mountUserDiffTagManager([])
     const canReadSIS = 'permissions' in ENV ? !!ENV.permissions.read_sis : true
     const canAddUser = role => role.addable_by_user
 
@@ -127,6 +119,7 @@ export default class RosterView extends Backbone.View {
   }
 
   attach() {
+    MessageBus.on('userSelectionChanged', this.HandleUserSelected, this)
     return this.collection.on('setParam deleteParam', this.fetch, this)
   }
 
@@ -171,31 +164,23 @@ export default class RosterView extends Backbone.View {
   showCreateUsersModal() {
     return this.addPeopleApp.open()
   }
-  renderDifferentiationTagTray(open) {
-    // Only support this in course contexts
-    if (!this.course_id()) {
-      return
-    }
-    const returnFocusTo = document.querySelector('#manageTagsTray button')
-    const mountPoint = document.getElementById('differentiationTagTray')
 
-    const onTrayClose = () => {
-      this.renderDifferentiationTagTray(false)
-      returnFocusTo?.focus()
-    }
-
-    if (mountPoint) {
-      if (!this.differentiationTagTrayRoot) {
-        this.differentiationTagTrayRoot = createRoot(mountPoint)
-      }
-      this.differentiationTagTrayRoot.render(
-        <DifferentiationTagTrayManager
-          isOpen={open}
-          onClose={onTrayClose}
-          courseID={ENV.course.id}
+  mountUserDiffTagManager(users) {
+    const userDTManager = this.$el.find('#userDiffTagManager')[0]
+    if (userDTManager && ENV.permissions.can_manage_differentiation_tags) {
+      if(!this.userDTManager)
+        this.userDTManager = createRoot(userDTManager) 
+      this.userDTManager.render(
+        <UserDifferentiationTagManager
+        courseId={ENV.course.id}  
+        users={users}
         />,
       )
     }
+  }
+
+  HandleUserSelected(event) {
+    this.mountUserDiffTagManager(event.selectedUsers)
   }
 
   remove() {
@@ -207,15 +192,14 @@ export default class RosterView extends Backbone.View {
       this.differentiationTagTrayRoot.unmount()
       this.differentiationTagTrayRoot = null
     }
-    if (this.manageTagsTray) {
-      this.manageTagsTray.unmount()
-      this.manageTagsTray = null
+    if (this.userDTManager) {
+      this.userDTManager.unmount()
+      this.userDTManager = null
     }
     super.remove()
   }
 }
 RosterView.initClass()
-
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
 }
