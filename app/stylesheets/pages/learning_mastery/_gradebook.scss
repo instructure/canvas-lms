@@ -421,11 +421,8 @@ $gradebook_cell_padding_top: 8px;
 
 .total-column-tooltip {
   width: 250px;
-  height: 60px;
   white-space: pre-line;
-  padding-top: 5px;
-  padding-bottom: 55px;
-  margin-bottom: -50px;
+  padding: 5px 0;
 }
 
 .container_1 .slick-cell:last-child .gradebook-tooltip {
