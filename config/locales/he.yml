@@ -2062,6 +2062,7 @@ he:
       details: פרטים...
       login: התחברות
     no_text: "אין תוכן"
+  alert_d2c8ef98: התראה
   alerts: 
     alert: 
       buttons: 
@@ -2175,6 +2176,7 @@ he:
   alphabetically_60ab47e4: "בסדר אלף בית"
   always_3a59e701: תמיד
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "תמיד יש לטעון את עורך התוכן העשיר והסרגל הצידי משרות התוכן העשיר של קנבס בכל המקומות"
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "התראה נוצרת עבור כל תלמיד אשר עונה כל כל הקריטריונים. הן נבדקות כל יום, והודעות ישלחו לתלמיד, למורה, ו / או למנהל המערכת עד אשר הגורם לבעיה ייפתר."
   an_alert_is_generated_for_each_student_that_meets__fcd175ac: "התראה נוצרת עבור כל תלמיד אשר עונה כל כל הקריטריונים. הן נבדקות כל יום, והודעות ישלחו לתלמיד ו  או למורה עד אשר הגורם לבעיה ייפתר."
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "נדרש מפתח API כדי להשתמש בתקני השוואה אקדמים"
   an_assignment_name_dc624e70: "שם מטלה"
@@ -7555,6 +7557,7 @@ he:
   ecollege_name: "ממיר Ecollege"
   ecuador_593_dfcc235a: "אקודור (+593)"
   edit_account_name_for_account_name_ae3633e8: "עריכת שם חשבון עבור %{account_name}"
+  edit_alert_739bb0ba: "ערוך התראה"
   edit_and_delete_their_own_posts_f4f7cc6: "עריכת וביטול הפרסומים שלהם עצמם."
   edit_announcement_title_cce0b4e: "עריכת הכרזה %{title}"
   edit_app_b0cc1c17: "עריכת אפליקציה"
@@ -19028,6 +19031,7 @@ he:
   submitted_files_82dd3009: "קבצים שהוגשו"
   submitted_late_3741af29: "הוגש באיחור"
   submitted_submitdate_bdd3bf09: "הוגש: %{submitDate}"
+  submitting_b90fac62: מבצע...
   submitting_types_7c5a7096: "בהגשה: %{types}"
   subscribe_4b301fb7: הרשמה
   subscribed_fe74d22a: "רשום "
@@ -19840,6 +19844,8 @@ he:
   unenrolled_users_e7632d24: "משתמשים לא רשומים"
   ungraded_answers_31ef2df7: "תשובות ללא הערכה"
   ungraded_submissions_44efb0ec: "הגשות שלא הוערכו"
+  ungraded_submissions_count_63fcf6d1: "(כמות) הגשות שלא הוערכו."
+  ungraded_submissions_time_bafaa609: "משימות שלא קיבלו ציון (בפרק זמן)"
   ungraded_survey_ad7de790: "סקר שלא להערכה"
   united_arab_emirates_971_649b3750: "איחוד האמירויות (+971)"
   united_arab_emirates_a71e57c6: "איחוד האמירויות הערבי"
