@@ -395,8 +395,13 @@ export const CriterionRow = ({
               overflowY="hidden"
             >
               {isPreviewMode ? (
-                <View as="div" margin="0 0 0 0" height="48px">
-                  <Text>{commentText}</Text>
+                <View as="div" margin="0 0 0 0">
+                  {/* The "pre-wrap" style is necessary to preserve white spaces in submitted
+                    comments. However, it could not be directly assigned to the <Text />
+                    component, so a <span /> child element was added instead. */}
+                  <Text>
+                    <span style={{whiteSpace: 'pre-wrap'}}>{commentText}</span>
+                  </Text>
                 </View>
               ) : (
                 <TextArea
