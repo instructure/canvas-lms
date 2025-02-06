@@ -210,4 +210,66 @@ describe('ItemAssignToCard', () => {
       })
     })
   })
+
+  it('stops displaying "Unlock date cannot be after reply to topic due date" error when isCheckpointed is set to false', async () => {
+    // Provide props that will trigger the error when isCheckpointed is true:
+    // In this case, reply_to_topic_due_at is earlier than unlock_at, which triggers the error.
+    const errorProps: Partial<ItemAssignToCardProps> = {
+      isCheckpointed: true,
+      reply_to_topic_due_at: '2024-05-05T00:00:00-06:00',
+      unlock_at: '2024-05-06T00:00:00-06:00',
+    }
+    const {getAllByText, queryByText, rerender} = render(
+      <MockedQueryProvider>
+        <ItemAssignToCard {...props} {...errorProps} />
+      </MockedQueryProvider>,
+    )
+
+    await waitFor(() => {
+      expect(
+        getAllByText(/Unlock date cannot be after reply to topic due date/i)[0],
+      ).toBeInTheDocument()
+    })
+
+    // Rerender the component with isCheckpointed set to false.
+    rerender(
+      <MockedQueryProvider>
+        <ItemAssignToCard {...props} {...errorProps} isCheckpointed={false} />
+      </MockedQueryProvider>,
+    )
+
+    await waitFor(() => {
+      expect(
+        queryByText(/Unlock date cannot be after reply to topic due date/i),
+      ).not.toBeInTheDocument()
+    })
+  })
+
+  it('stops displaying "Unlock date cannot be after due date" error when isCheckpointed is set to true', async () => {
+    const errorProps: Partial<ItemAssignToCardProps> = {
+      isCheckpointed: true,
+      due_at: '2024-05-05T00:00:00-06:00',
+      unlock_at: '2024-05-06T00:00:00-06:00',
+    }
+    const {getAllByText, queryByText, rerender} = render(
+      <MockedQueryProvider>
+        <ItemAssignToCard {...props} {...errorProps} isCheckpointed={false} />
+      </MockedQueryProvider>,
+    )
+
+    await waitFor(() => {
+      expect(getAllByText(/Unlock date cannot be after due date/i)[0]).toBeInTheDocument()
+    })
+
+    // Rerender the component with isCheckpointed set to false.
+    rerender(
+      <MockedQueryProvider>
+        <ItemAssignToCard {...props} {...errorProps} isCheckpointed={true} />
+      </MockedQueryProvider>,
+    )
+
+    await waitFor(() => {
+      expect(queryByText(/Unlock date cannot be after due date/i)).not.toBeInTheDocument()
+    })
+  })
 })
