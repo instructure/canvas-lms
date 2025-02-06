@@ -35,6 +35,9 @@ class GradebooksController < ApplicationController
   before_action :require_context
   before_action :require_user, only: %i[speed_grader speed_grader_settings grade_summary grading_rubrics update_final_grade_overrides]
 
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:show, :grade_summary]
+
   include K5Mode
 
   batch_jobs_in_actions only: :update_submission, batch: { priority: Delayed::LOW_PRIORITY }
