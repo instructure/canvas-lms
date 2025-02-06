@@ -32,7 +32,7 @@ import formatMessage from '../../../../format-message'
 import MemoizedEquationEditorToolbar from '../EquationEditorToolbar'
 import {containsAdvancedSyntax} from './advancedOnlySyntax'
 import * as advancedPreference from './advancedPreference'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 
 import {css} from 'aphrodite'
 import {MathJaxDirective, Mathml} from '../../../../enhance-user-content/mathml'
@@ -250,7 +250,7 @@ export default class EquationEditorModal extends Component {
       <Modal
         data-mce-component={true}
         label={formatMessage('Equation Editor')}
-        mountNode={instuiPopupMountNode}
+        mountNode={instuiPopupMountNodeFn}
         onClose={onModalClose}
         onDismiss={this.handleModalCancel}
         open={true}

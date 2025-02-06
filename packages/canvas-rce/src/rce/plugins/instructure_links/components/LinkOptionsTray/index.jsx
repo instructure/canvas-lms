@@ -37,7 +37,7 @@ import {
   DISPLAY_AS_DOWNLOAD_LINK,
 } from '../../../shared/ContentSelection'
 import {getTrayHeight} from '../../../shared/trayUtils'
-import {instuiPopupMountNode} from '../../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../../util/fullscreenHelpers'
 
 export default function LinkOptionsTray(props) {
   const content = props.content || {}
@@ -150,7 +150,7 @@ export default function LinkOptionsTray(props) {
       data-testid="RCELinkOptionsTray"
       data-mce-component={true}
       label={formatMessage('Link Options')}
-      mountNode={instuiPopupMountNode}
+      mountNode={instuiPopupMountNodeFn}
       onDismiss={props.onRequestClose}
       onEntered={props.onEntered}
       onExited={props.onExited}

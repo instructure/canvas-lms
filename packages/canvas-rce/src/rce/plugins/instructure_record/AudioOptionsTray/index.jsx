@@ -27,7 +27,7 @@ import {StoreProvider} from '../../shared/StoreContext'
 import Bridge from '../../../../bridge'
 import formatMessage from '../../../../format-message'
 import {getTrayHeight} from '../../shared/trayUtils'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import {Heading} from '@instructure/ui-heading'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
@@ -64,7 +64,7 @@ export default function AudioOptionsTray({
           key="audio-options-tray"
           data-mce-component={true}
           label={formatMessage('Audio Options Tray')}
-          mountNode={instuiPopupMountNode}
+          mountNode={instuiPopupMountNodeFn}
           onDismiss={onDismiss}
           onEntered={onEntered}
           onExited={onExited}

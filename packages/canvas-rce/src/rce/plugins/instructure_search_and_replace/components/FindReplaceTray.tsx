@@ -23,7 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {View} from '@instructure/ui-view'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import formatMessage from '../../../../format-message'
 import {Tray} from '@instructure/ui-tray'
 import {TextInput, TextInputProps} from '@instructure/ui-text-input'
@@ -245,7 +245,7 @@ export default function FindReplaceTray({
     <Tray
       data-mce-component={true}
       label={formatMessage('Find and Replace')}
-      mountNode={instuiPopupMountNode}
+      mountNode={instuiPopupMountNodeFn()}
       onDismiss={onRequestClose}
       open={true}
       placement="end"

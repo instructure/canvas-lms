@@ -38,7 +38,7 @@ import {validIcon} from '../utils/iconValidation'
 import {IconMakerFormHasChanges} from '../utils/IconMakerFormHasChanges'
 import bridge from '../../../../bridge'
 import {shouldIgnoreClose} from '../utils/IconMakerClose'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 
 const INVALID_MESSAGE = formatMessage(
   'One of the following styles must be added to save an icon: Icon Color, Outline Size, Icon Text, or Image',
@@ -156,10 +156,10 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
   const [initialSettings, setInitialSettings] = useState({...defaultState})
   const isModified = useRef(false)
 
-  const [mountNode, setMountNode] = useState(instuiPopupMountNode())
+  const [mountNode, setMountNode] = useState(instuiPopupMountNodeFn())
 
   const handleFullscreenChange = useCallback(() => {
-    setMountNode(instuiPopupMountNode())
+    setMountNode(instuiPopupMountNodeFn())
   }, [])
 
   // These useRef objects are needed because when the tray is closed using the escape key
@@ -203,7 +203,7 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
     if (!!hasOpenModal()) return
     // RCE already uses browser's confirm dialog for unsaved changes
     // Its use here in the Icon Maker tray keeps that consistency
-     
+
     if (isModified.current && !confirm(UNSAVED_CHANGES_MESSAGE)) {
       return
     }
@@ -267,7 +267,6 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
       .then(writeIconToRCE)
       .then(() => setIsOpen(false))
       .catch(err => {
-         
         console.error(err)
         setStatus(statuses.ERROR)
       })
