@@ -54,6 +54,21 @@ describe "quiz show page assign to" do
     expect(icon_type_exists?("Quiz")).to be true
   end
 
+  it "closes the assign to tray on dismiss" do
+    get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}"
+
+    click_quiz_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    expect(tray_header.text).to eq("test quiz")
+    expect(icon_type_exists?("Quiz")).to be true
+
+    click_cancel_button
+    keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+  end
+
   it "assigns student and saves override", :ignore_js_errors do
     get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}"
 
