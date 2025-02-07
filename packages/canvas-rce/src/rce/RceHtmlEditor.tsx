@@ -15,16 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {func, string} from 'prop-types'
+import React, {useEffect, useState} from 'react'
 import formatMessage from '../format-message'
 import {SourceCodeEditor} from '@instructure/ui-source-code-editor'
 import beautify from 'js-beautify'
 
-const RceHtmlEditor = React.forwardRef((props, editorRef) => {
-  const [code, setCode] = useState(props.code)
+interface RceHtmlEditorProps {
+  code: string
+  height?: string
+  onChange?: (value: string) => void
+}
+
+const RceHtmlEditor = React.forwardRef<HTMLDivElement, RceHtmlEditorProps>((props, editorRef) => {
+  const [_code, setCode] = useState(props.code)
   const label = formatMessage('html code editor')
-  const [dir, setDir] = useState(getComputedStyle(document.body, null).direction)
+  const [dir, setDir] = useState<'ltr' | 'rtl'>(
+    getComputedStyle(document.body, null).direction as 'ltr' | 'rtl',
+  )
 
   useEffect(() => {
     // INSTUI sets the CodeEditor's surrounding label's
@@ -48,17 +55,19 @@ const RceHtmlEditor = React.forwardRef((props, editorRef) => {
       document.head.appendChild(stylesheet)
     }
     // odds are, this won't change the dir.
-    setDir(getComputedStyle(editorRef.current || document.body, null).direction)
+    if (editorRef && 'current' in editorRef) {
+      setDir(getComputedStyle(editorRef.current || document.body, null).direction as 'ltr' | 'rtl')
+    }
   }, [dir, editorRef])
 
-  const direction = ['ltr', 'rtl'].includes(dir) ? dir : 'ltr'
+  const direction: 'ltr' | 'rtl' | undefined = ['ltr', 'rtl'].includes(dir) ? dir : 'ltr'
 
   // setting height on the container keeps the RCE toolbar from jumping
   return (
     <div
       ref={editorRef}
       className="RceHtmlEditor"
-      style={{height: props.height, overflow: 'hidden', textAlign: 'start'}}
+      style={{height: props.height || 'auto', overflow: 'hidden', textAlign: 'start'}}
     >
       <SourceCodeEditor
         label={label}
@@ -69,24 +78,19 @@ const RceHtmlEditor = React.forwardRef((props, editorRef) => {
         spellcheck={true}
         direction={direction}
         rtlMoveVisually={true}
-        height={props.height}
+        height={props.height || 'auto'}
         defaultValue={beautify.html(props.code)}
         onChange={value => {
           setCode(value)
-          props.onChange(value)
+          props.onChange?.(value)
         }}
       />
     </div>
   )
 })
-RceHtmlEditor.propTypes = {
-  code: string.isRequired,
-  height: string,
-  onChange: func,
-}
+
 RceHtmlEditor.defaultProps = {
-  height: 'auto',
-  onChange: _value => {},
+  onChange: (_value: string) => {},
 }
 
 export default RceHtmlEditor

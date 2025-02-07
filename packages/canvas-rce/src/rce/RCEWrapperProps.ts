@@ -140,13 +140,13 @@ export const editorOptionsPropType = PropTypes.shape({
 
 export type HeightType = number | string
 export interface EditorOptionsPropType {
-  height: HeightType
-  toolbar: ToolbarPropType
-  menu: MenuPropType
-  plugins: string[]
-  readonly: boolean
-  selector: string
-  init_instance_callback: () => void
+  height?: HeightType
+  toolbar?: ToolbarPropType
+  menu?: MenuPropType
+  plugins?: string[]
+  readonly?: boolean
+  selector?: string
+  init_instance_callback?: () => void
 }
 
 export const externalToolsConfigPropType = PropTypes.shape({

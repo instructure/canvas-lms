@@ -174,6 +174,11 @@ let alertIdValue = 0
 
 interface RCEWrapperProps {
   ai_text_tools?: boolean
+  autosave?: {
+    enabled?: boolean
+    maxAge?: number
+    interval?: number
+  }
   canvasOrigin: string
   defaultContent?: string
   editorOptions: Record<string, unknown>
@@ -182,7 +187,7 @@ interface RCEWrapperProps {
   handleUnmount?: () => void
   instRecordDisabled?: boolean
   language: string
-  liveRegion: () => Element
+  liveRegion?: HTMLElement | null | (() => HTMLElement | null | undefined)
   ltiToolFavorites?: string[]
   maxInitRenderedRCEs: number
   name: string
@@ -196,13 +201,9 @@ interface RCEWrapperProps {
   textareaClassName?: string
   textareaId: string
   tinymce: typeof tinymce
-  userCacheKey?: string
   trayProps: RCETrayProps
   use_rce_icon_maker?: boolean
-  autosave?: {
-    enabled: boolean
-    maxAge: number
-  }
+  userCacheKey?: string
 }
 
 interface RCEWrapperState {
@@ -1394,7 +1395,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       } catch (ex) {
         // log and ignore
 
-        // eslint-disable-next-line no-console
         console.error('Failed initializing rce autosave', ex)
       }
     }
@@ -2029,10 +2029,8 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           <RceHtmlEditor
             // @ts-expect-error
             ref={this._prettyHtmlEditorRef}
-            // @ts-expect-error
             height={this.state.height}
             code={this.getCode()}
-            // @ts-expect-error
             onChange={value => {
               const node = this.getTextarea()
               if (node) {
@@ -2100,6 +2098,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                 )}
                 <AlertMessageArea
                   messages={this.state.messages}
+                  // @ts-expect-error
                   liveRegion={this.props.liveRegion}
                   afterDismiss={this.removeAlert}
                 />
@@ -2201,6 +2200,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                     />
                   </Suspense>
                 ) : null}
+                {/* @ts-expect-error */}
                 <Alert screenReaderOnly={true} liveRegion={this.props.liveRegion}>
                   {this.state.announcement}
                 </Alert>

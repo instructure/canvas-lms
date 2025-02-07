@@ -44,8 +44,8 @@ export type RCETrayProps = {
   canUploadFiles: boolean
   contextId: string
   contextType: string
-  host: string
-  jwt: string
+  host?: string
+  jwt?: string
   containingContext?: {
     contextType: string
     contextId: string
@@ -69,8 +69,7 @@ export interface ExternalToolsEditor {
     getContent(): string
   }
   getContent(): string
-  // @ts-expect-error
-  focus()
+  focus(): void
   editorContainer: HTMLElement
   $: Editor['$']
   ui: Editor['ui']
