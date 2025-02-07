@@ -20,7 +20,6 @@
 
 require_relative "../api_spec_helper"
 require_relative "../../lti_spec_helper"
-require_relative "../../lti_1_3_spec_helper"
 
 module Lti
   describe LtiAppsController, type: :request do
@@ -289,7 +288,7 @@ module Lti
     describe "#index" do
       subject { api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps", params) }
 
-      include_context "lti_1_3_spec_helper"
+      include_context "key_storage_helper"
 
       let(:params) do
         {

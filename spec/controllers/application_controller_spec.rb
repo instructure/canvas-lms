@@ -19,7 +19,6 @@
 #
 
 require_relative "../spec_helper"
-require_relative "../lti_1_3_spec_helper"
 
 RSpec.describe ApplicationController do
   context "group 1" do
@@ -1177,7 +1176,7 @@ RSpec.describe ApplicationController do
             end
             let_once(:account) { Account.default }
 
-            include_context "lti_1_3_spec_helper"
+            include_context "key_storage_helper"
 
             before do
               tool.developer_key = developer_key
