@@ -36,6 +36,7 @@ const defaultEnvPermissions = {
   read_sis: false,
   can_manage_differentiation_tags: false,
   allow_assign_to_differentiation_tags: false,
+  active_granular_enrollment_permissions: []
 }
 
 const defaultEnvCourse = {
@@ -45,7 +46,7 @@ const defaultEnvCourse = {
   user_services_url: '',
   observer_pairing_codes_url: '',
   hideSectionsOnCourseUsersPage: false,
-  hideCheckboxesOnCourseUsersPage: false
+  concluded: false
 }
 
 export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeopleContextType => {
@@ -72,7 +73,8 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     view_user_logins: canViewLoginIdColumn,
     read_sis: canViewSisIdColumn,
     can_manage_differentiation_tags: canManageDifferentiationTags,
-    allow_assign_to_differentiation_tags: allowAssignToDifferentiationTags
+    allow_assign_to_differentiation_tags: allowAssignToDifferentiationTags,
+    active_granular_enrollment_permissions: activeGranularEnrollmentPermissions
   } = permissions
 
   const {
@@ -81,10 +83,12 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     interactions_report_url: interactionsReportUrl,
     user_services_url: userServicesUrl,
     observer_pairing_codes_url: observerPairingCodesUrl,
-    hideSectionsOnCourseUsersPage: hideSectionsOnCourseUsersPage
+    hideSectionsOnCourseUsersPage: hideSectionsOnCourseUsersPage,
+    concluded: courseConcluded
   } = course
 
   return {
+    activeGranularEnrollmentPermissions,
     allowAssignToDifferentiationTags,
     canReadRoster,
     canAllowCourseAdminActions,
@@ -96,6 +100,7 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     canViewAllGrades,
     canViewLoginIdColumn,
     canViewSisIdColumn,
+    courseConcluded,
     hideSectionsOnCourseUsersPage,
     userIsInstructor,
     selfRegistration,

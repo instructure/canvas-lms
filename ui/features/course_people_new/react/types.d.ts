@@ -31,6 +31,7 @@ interface EnvPermissions {
   read_sis: boolean
   can_manage_differentiation_tags: boolean
   allow_assign_to_differentiation_tags: boolean
+  active_granular_enrollment_permissions: string[]
 }
 
 interface EnvCourse {
@@ -41,6 +42,7 @@ interface EnvCourse {
   observer_pairing_codes_url: string
   hideSectionsOnCourseUsersPage: boolean
   allowAssignToDifferentiationTags: boolean
+  concluded: boolean
 }
 
 export interface CoursePeopleEnv {
@@ -50,6 +52,7 @@ export interface CoursePeopleEnv {
 }
 
 export interface CoursePeopleContextType {
+  activeGranularEnrollmentPermissions: string[]
   allowAssignToDifferentiationTags: boolean
   canAllowCourseAdminActions: boolean
   canGenerateObserverPairingCode: boolean
@@ -60,6 +63,7 @@ export interface CoursePeopleContextType {
   canReadRoster: boolean
   canViewAllGrades: boolean
   courseRootUrl: string
+  courseConcluded: boolean
   groupsUrl: string
   interactionsReportUrl: string
   observerPairingCodesUrl: string
@@ -90,6 +94,13 @@ export type Enrollment = {
   }
 }
 
+export type CustomLink = {
+  id: string
+  text: string
+  url: string
+  icon_class: string
+}
+
 export type User = {
   id: string
   short_name: string
@@ -99,4 +110,5 @@ export type User = {
   sis_user_id: string
   last_login: string
   enrollments: Enrollment[]
+  custom_links?: CustomLink[]
 }

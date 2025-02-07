@@ -22,19 +22,24 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconMoreLine} from '@instructure/ui-icons'
 import UserLink from './UserLink'
+import UserMenu from './UserMenu'
 import UserLastActivity from './UserLastActivity'
 import UserRole from './UserRole'
 import {totalActivity} from '../../../util/utils'
+import {
+  TEACHER_ENROLLMENT,
+  TA_ENROLLMENT,
+  DESIGNER_ENROLLMENT,
+  OBSERVER_ENROLLMENT,
+} from '../../../util/constants'
 import useCoursePeopleContext from '../../hooks/useCoursePeopleContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {User} from '../../types.d'
 
 const I18n = createI18nScope('course_people')
 
-type RosterTableRowProps = {
+export type RosterTableRowProps = {
   user: User
   isSelected: boolean
   handleSelectRow: (selected: boolean, id: string) => void
@@ -51,9 +56,10 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
     login_id: loginId,
     sis_user_id: sisUserId,
     avatar_url: avatarUrl,
-    enrollments,
+    custom_links: customLinks,
     pronouns
   } = user
+
   const {
     courseRootUrl,
     canViewLoginIdColumn,
@@ -61,13 +67,37 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
     canReadReports,
     hideSectionsOnCourseUsersPage,
     canManageDifferentiationTags,
+    canAllowCourseAdminActions,
+    canManageStudents,
     allowAssignToDifferentiationTags
   } = useCoursePeopleContext()
-  const userLink = `${courseRootUrl}/users/${uid}`
 
-  const renderSections = () => (enrollments || []).map(e => (
-    <View as="div" key={`enrollment-${e.id}`}>{e.name}</View>)
+  const enrollments = user?.enrollments || []
+  const userLink = `${courseRootUrl}/users/${uid}`
+  const canRemoveUsers = enrollments.every(e => e.can_be_removed)
+  const canManage = enrollments.some(e =>
+    [TEACHER_ENROLLMENT, TA_ENROLLMENT, DESIGNER_ENROLLMENT].includes(e.type),
   )
+    ? canAllowCourseAdminActions
+    : enrollments.some(e => e.type === OBSERVER_ENROLLMENT)
+      ? canAllowCourseAdminActions || canManageStudents
+      : canManageStudents
+
+  const onResendInvitationHandler = () => {}
+  const onLinkStudentsHandler = () => {}
+  const onEditSectionsHandler = () => {}
+  const onEditRolesHandler = () => {}
+  const onReactivateUserHandler = () => {}
+  const onDeactivateUserHandler = () => {}
+  const onRemoveUserHandler = () => {}
+  const onCustomLinkSelectHandler = () => {}
+
+  const renderSections = () =>
+    enrollments.map(e => (
+      <View as="div" key={`enrollment-${e.id}`}>
+        {e.name}
+      </View>
+    ))
 
   return (
     <Table.Row data-testid={`table-row-${uid}`}>
@@ -122,7 +152,7 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
             </Table.Cell>
           )
         : <></>
-      }  
+      }
       <Table.Cell>
         <UserRole enrollments={enrollments} />
       </Table.Cell>
@@ -144,15 +174,30 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
           )
         : <></>
       }
-      <Table.Cell textAlign="end" data-testid={`options-menu-user-${uid}`}>
-        <IconButton
-          size="small"
-          renderIcon={<IconMoreLine />}
-          withBackground={false}
-          withBorder={false}
-          screenReaderLabel={I18n.t('Manage %{name}', {name})}
-        />
-      </Table.Cell>
+      {canRemoveUsers || canManage
+        ? (
+            <Table.Cell textAlign="end">
+              <UserMenu
+                uid={uid}
+                name={name}
+                userUrl={userLink}
+                enrollments={enrollments}
+                customLinks={customLinks}
+                canManage={canManage}
+                canRemoveUsers={canRemoveUsers}
+                onResendInvitation={onResendInvitationHandler}
+                onLinkStudents={onLinkStudentsHandler}
+                onEditSections={onEditSectionsHandler}
+                onEditRoles={onEditRolesHandler}
+                onReactivateUser={onReactivateUserHandler}
+                onDeactivateUser={onDeactivateUserHandler}
+                onRemoveUser={onRemoveUserHandler}
+                onCustomLinkSelect={onCustomLinkSelectHandler}
+              />
+            </Table.Cell>
+          )
+        : <></>
+      }
     </Table.Row>
   )
 }
