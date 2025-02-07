@@ -4155,6 +4155,7 @@ ko:
       turnitin_comments: "Turnitin 설명"
   course_members_are_free_to_join_9b2603d4: "과목 구성원은 자유롭게 참여"
   course_navigation_dd035109: "과목 탐색"
+  course_quota_8f7f74c: "과목 할당량"
   course_restore: 
     restore_error: "과목 복원을 시도하는 중에 오류가 발생했습니다. 과목이 복원되지 않았습니다."
   course_rubrics_881dcf0: "과목 루브릭"
@@ -4969,6 +4970,7 @@ ko:
       second: 초
       year: 년
   debugging_f98fcd74: 디버깅
+  default_account_quotas_e34112fd: "기본 계정 할당량"
   default_conference_title: "%{course_name} 회의"
   default_question_name: 문제
   default_question_text: "질문 텍스트"
@@ -6069,6 +6071,7 @@ ko:
     titles: 
       bookmark_search: "북마크 검색: %{service_name}"
   find_a_course_94301b4d: "과목 찾기"
+  find_course_or_group_a7de09a4: "과목이나 그룹 찾기"
   find_flickr_image_view: 
     find_cc_on_flickr: "Flickr에서 크리에이티브 커먼즈 이미지 찾기"
     search: 검색
@@ -6651,6 +6654,7 @@ ko:
     name_unavailable: "%{name}은(는) 이미 사용 중입니다."
     self_signup_for_courses: "자동 등록은 과목 그룹이나 커뮤니티를 대상으로만 사용할 수 있음"
   group_files_82e5dcdb: "그룹 파일"
+  group_id_b0f6af89: "그룹 ID"
   group_membership: 
     errors: 
       group_full: "그룹이 꽉 찼습니다."
@@ -6658,6 +6662,7 @@ ko:
   group_name_b69c144: "그룹 이름"
   group_name_group_calendar_7f10e0ed: "%{group_name} - 그룹 달력"
   group_pages_656556f3: "그룹 페이지"
+  group_quota_290dbc6b: "그룹 할당량"
   group_set_4d1e7b06: "그룹 집합"
   group_settings: 
     invitation_sent: "초대 보냄"
@@ -7601,6 +7606,7 @@ ko:
   manage_profile_pictures_40c958ce: "프로필 사진 관리"
   manual_entry_e4a4f99a: "수동 항목"
   manually_mark_posts_as_read_afa5d035: "게시물을 읽은 것으로 표시"
+  manually_settable_quotas_ea3759e7: "수동으로 설정할 수 있는 할당량"
   mark_all_as_read_8f3bdf57: "모두 읽음으로 표시"
   mark_all_as_unread_a435be3d: "모두 읽지 않음으로 표시"
   mark_as_read_47ec83dd: "읽음으로 표시"
@@ -7686,6 +7692,7 @@ ko:
   media_objects: 
     media_objects_not_configured: "미디어 개체가 구성되지 않음"
   meets_expectations_bb179565: "기대를 만족함"
+  megabytes_885404ef: 메가바이트
   members_af25c21d: 구성원
   members_are_free_to_join_defa5929: "구성원이 자유롭게 참여"
   membership_by_invitation_only_9bc27199: "초대에 의해서만 참여"
@@ -14033,7 +14040,9 @@ ko:
   update_details_6abfed16: "세부 정보 업데이트"
   update_module_b984c2e5: "모듈 업데이트"
   update_password_4bc5cb1f: "암호 업데이트"
+  update_quota_81381226: "할당량 업데이트"
   update_settings_9b422d0f: "설정 업데이트"
+  updating_73d0718c: "업데이트 중..."
   updating_user_details_b8520b3e: "사용자 세부 정보 업데이트 중..."
   upload_8b403d05: 업로드
   upload_a_picture_9f5f6e3c: "사진 업로드"
@@ -14186,6 +14195,7 @@ ko:
       profile: 프로필
       settings: 설정
   user_profile_picture_46bffbc7: "사용자 프로필 사진"
+  user_quota_12cb58b7: "사용자 할당량"
   user_s_settings_d65644b4: "%{user}의 설정"
   user_service: 
     descriptions: 
