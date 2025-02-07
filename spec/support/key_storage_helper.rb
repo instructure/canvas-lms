@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
+RSpec.shared_context "key_storage_helper", shared_context: :metadata do
   let(:fallback_proxy) do
     DynamicSettings::FallbackProxy.new({
                                          CanvasSecurity::KeyStorage::PAST => CanvasSecurity::KeyStorage.new_key,

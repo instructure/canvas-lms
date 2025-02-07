@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../lti_1_3_spec_helper"
 require_relative "../lib/token_scopes/last_known_accepted_scopes"
 require_relative "../lib/token_scopes/spec_helper"
 

@@ -19,10 +19,9 @@
 #
 
 require_relative "../api_spec_helper"
-require_relative "../../lti_1_3_spec_helper"
 
 describe DeveloperKeysController, type: :request do
-  include_context "lti_1_3_spec_helper"
+  include_context "key_storage_helper"
   let(:sa_id) { Account.site_admin.id }
 
   describe "GET 'index'" do

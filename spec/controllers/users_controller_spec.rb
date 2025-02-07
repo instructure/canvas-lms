@@ -19,7 +19,6 @@
 #
 
 require "feedjira"
-require_relative "../lti_1_3_spec_helper"
 require_relative "../helpers/k5_common"
 
 describe UsersController do
@@ -133,7 +132,7 @@ describe UsersController do
     end
 
     context "using LTI 1.3 when specified" do
-      include_context "lti_1_3_spec_helper"
+      include_context "key_storage_helper"
 
       let(:verifier) { "e5e774d015f42370dcca2893025467b414d39009dfe9a55250279cca16f5f3c2704f9c56fef4cea32825a8f72282fa139298cf846e0110238900567923f9d057" }
       let(:redis_key) { "#{assigns[:domain_root_account].class_name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
