@@ -88,7 +88,6 @@ describe('ContentSelectionModal', () => {
           title: 'sub_item1',
           type: 'course_settings',
           sub_items_url: subItemUrl1,
-          submodule_count: 1,
           count: 1,
         },
       ]
@@ -99,7 +98,6 @@ describe('ContentSelectionModal', () => {
           title: 'sub_item2',
           type: 'course_settings',
           sub_items_url: subItemUrl2,
-          submodule_count: 1,
           count: 1,
         },
       ]
