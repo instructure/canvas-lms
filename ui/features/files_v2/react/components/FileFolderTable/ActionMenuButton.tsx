@@ -25,7 +25,8 @@ import {Text} from '@instructure/ui-text'
 import {FileManagementContext} from '../Contexts'
 import {type File, type Folder} from '../../../interfaces/File'
 import {RenameModal} from '../RenameModal'
-import {downloadFile, downloadZip} from '../../../utils/downloadUtils'
+import DeleteModal from './DeleteModal'
+import { downloadFile, downloadZip } from '../../../utils/downloadUtils'
 
 import {
   IconMoreLine,
@@ -64,6 +65,17 @@ const ActionMenuButton = ({
   const currentContext = useContext(FileManagementContext)
   const contextType = currentContext?.contextType
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [itemsToDelete, setItemsToDelete] = useState<(File | Folder)[]>([])
+
+  const handleDeleteClick = () => {
+    setItemsToDelete([row])
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
 
   const triggerButton = useCallback(() => {
     return size !== 'large' ? (
@@ -170,7 +182,7 @@ const ActionMenuButton = ({
               visible: rename_move_permissions,
             },
             {separator: true, visible: delete_permissions},
-            {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions},
+            {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions, onClick: handleDeleteClick},
           ]
         : [
             // folder
@@ -201,7 +213,7 @@ const ActionMenuButton = ({
               visible: rename_move_permissions,
             },
             {separator: true, visible: delete_permissions},
-            {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions},
+            {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions, onClick: handleDeleteClick},
           ]
       ).filter(({visible}) => visible !== false),
     [
@@ -252,6 +264,11 @@ const ActionMenuButton = ({
         renamingItem={row}
         isOpen={isRenameModalOpen}
         onClose={() => setIsRenameModalOpen(false)}
+      />
+      <DeleteModal
+        open={isModalOpen}
+        items={itemsToDelete}
+        onClose={handleCloseModal}
       />
       {buildTrays()}
     </>

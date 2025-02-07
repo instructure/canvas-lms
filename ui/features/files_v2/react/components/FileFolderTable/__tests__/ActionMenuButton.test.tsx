@@ -18,18 +18,27 @@
 
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {BrowserRouter as Router} from 'react-router-dom'
 import ActionMenuButton from '../ActionMenuButton'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
 import {FileManagementContext} from '../../Contexts'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import fetchMock from 'fetch-mock'
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: jest.fn(),
+}))
 
 let defaultProps: any
 let defaultContext: any
 
 const renderComponent = (props = {}, context = {}) => {
   return render(
-    <FileManagementContext.Provider value={{...defaultContext, ...context}}>
-      <ActionMenuButton {...defaultProps} {...props} />
-    </FileManagementContext.Provider>,
+    <Router>
+      <FileManagementContext.Provider value={{...defaultContext, ...context}}>
+        <ActionMenuButton {...defaultProps} {...props} />
+      </FileManagementContext.Provider>
+    </Router>,
   )
 }
 
@@ -48,6 +57,11 @@ describe('ActionMenuButton', () => {
       folderId: '1',
       showingAllContexts: false,
     }
+  })
+
+  afterEach(() => {
+    fetchMock.restore()
+    jest.clearAllMocks()
   })
 
   describe('when item is a file', () => {
@@ -93,7 +107,7 @@ describe('ActionMenuButton', () => {
       })
     })
 
-    it('does not renders items when userCanEditFilesForContext is false', async () => {
+    it('does not render items when userCanEditFilesForContext is false', async () => {
       renderComponent({userCanEditFilesForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
@@ -112,7 +126,7 @@ describe('ActionMenuButton', () => {
       })
     })
 
-    it('does not renders items when userCanDeleteFilesForContext is false', async () => {
+    it('does not render items when userCanDeleteFilesForContext is false', async () => {
       renderComponent({userCanDeleteFilesForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
@@ -131,7 +145,7 @@ describe('ActionMenuButton', () => {
       })
     })
 
-    it('does not renders items when usageRightsRequiredForContext is false', async () => {
+    it('does not render items when usageRightsRequiredForContext is false', async () => {
       renderComponent({usageRightsRequiredForContext: false})
 
       const button = screen.getByTestId('action-menu-button-large')
@@ -150,7 +164,7 @@ describe('ActionMenuButton', () => {
       })
     })
 
-    it('does not renders items when when locked by blueprint', async () => {
+    it('does not render items when locked by blueprint', async () => {
       renderComponent({
         row: {
           ...FAKE_FILES[0],
@@ -229,6 +243,49 @@ describe('ActionMenuButton', () => {
 
       await waitFor(() => {
         expect(screen.getByRole('heading', {name: 'Rename'})).toBeInTheDocument()
+      })
+    })
+  })
+  describe('Delete behavior', () => {
+    it('opens delete modal when delete button is clicked', async () => {
+      renderComponent()
+
+      const button = screen.getByTestId('action-menu-button-large')
+      fireEvent.click(button)
+
+      const deleteButton = await screen.findByText('Delete')
+      fireEvent.click(deleteButton)
+
+      expect(await screen.findByText('Deleting this item cannot be undone. Do you want to continue?')).toBeInTheDocument()
+    })
+
+    it('renders flash error when delete fails', async () => {
+      fetchMock.delete(/.*\/files\/1\?force=true/, 500, {overwriteRoutes: true})
+      renderComponent()
+
+      const button = screen.getByTestId('action-menu-button-large')
+      fireEvent.click(button)
+
+      const deleteButton = await screen.findByText('Delete')
+      fireEvent.click(deleteButton)
+
+      const confirmButton = await screen.getByTestId('modal-delete-button')
+      fireEvent.click(confirmButton)
+
+      await waitFor(() => {
+        expect(showFlashError).toHaveBeenCalledWith('Failed to delete items. Please try again.')
+      })
+    })
+
+    it('does not render "Delete" when userCanDeleteFilesForContext is false', async () => {
+      renderComponent({userCanDeleteFilesForContext: false})
+
+      const button = screen.getByTestId('action-menu-button-large')
+      expect(button).toBeInTheDocument()
+
+      fireEvent.click(button)
+      await waitFor(() => {
+        expect(screen.queryByText('Delete')).toBeNull()
       })
     })
   })
