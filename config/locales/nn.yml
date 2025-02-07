@@ -8220,6 +8220,7 @@ nn:
   course_quiz_export_1f59f15: "Eksport av emnequiz"
   course_quiz_extensions_4102f98f: "Utvidingar for quiz på emne"
   course_quizzes_c337653c: Emnequizar
+  course_quota_8f7f74c: Emnekvote
   course_restore: 
     restore_error: "Det oppstod ein feil under gjenoppretting av emnet. Emnet er ikkje gjenoppretta."
   course_results_updated_df9d1c95: "Emneresultat oppdatert."
@@ -9418,6 +9419,7 @@ nn:
   deep_purple_bb3e2907: "Mørk lilla"
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Djupt nøsta svar er ikkje lenger støtta. Svaret ditt vil bli vist på første sida av denne tråden."
   default_9db103d: Standard
+  default_account_quotas_e34112fd: "Standard kontokvoter"
   default_canvas_grading_scheme_ab769633: "Standard vurderingsskjema for Canvas"
   default_conference_title: "%{course_name} konferanse"
   default_course_pace_ce0ba0f3: "Standard emneframdrift"
@@ -11830,6 +11832,7 @@ nn:
   find_an_existing_grading_scheme_d836ea: "Finn eit gjeldande karakterskjema"
   find_an_outcome_919328e6: "Finn eit læringsmål"
   find_appointment_85d6922e: "Finn avtale"
+  find_course_or_group_a7de09a4: "Finn emne eller gruppe"
   find_flickr_image_view: 
     find_cc_on_flickr: "Finn Creative Commons-bilde på Flickr"
     safesearch_warning_flickr: "Flickr viser SafeSearch-filtrerte bilder som er publisert opent under ein Creative Commons-lisens. Ver likevel merksam ved bruk. Bildeeigarar kan ha gjort ein for dårleg jobb med å kategorisere bilda, slik at uønska innhald ikkje vert fanga opp av søkefiltera. "
@@ -13040,6 +13043,7 @@ nn:
   group_groupname_entered_2a0624a0: "Gruppe \"%{groupName}\" lagt inn."
   group_guid_has_already_appeared_in_this_import_78f35ff3: "Gruppa \"%{guid}\" er allereie importert"
   group_home_249cb392: Gruppeforside
+  group_id_b0f6af89: Gruppe-ID
   group_id_e76ac9b5: gruppe-id
   group_import_api_documentation_7d0d28ee: "Gruppeimport API-dokumentasjon"
   group_is_for_a_different_section_6a843a4d: "Gruppa høyrer til ein annan seksjon"
@@ -13074,6 +13078,7 @@ nn:
   group_not_found_d13d85b9: "fann ikkje gruppe"
   group_pages_656556f3: Gruppesider
   group_people_50e9785b: "Gruppér personar"
+  group_quota_290dbc6b: Gruppekvote
   group_roster_1846bf84: Gruppeliste
   group_saved_successfully_fcd5ca66: "Lagring av gruppe vellukka"
   group_select_330df8bd: "Vel gruppevis"
@@ -15553,6 +15558,7 @@ nn:
   manually_mark_posts_as_read_afa5d035: "Merk innlegg manuelt, som lesne"
   manually_mark_replies_as_read_580adc59: "Merk innlegg manuelt, som lesne"
   manually_post_grades_18248306: "Post vurderingar manuelt"
+  manually_settable_quotas_ea3759e7: "Kvoter som kan innstillast manuelt"
   maori_new_zealand_5380a95f: "Māori (New Zealand)"
   march_bbe310ee: Mars
   mark_all_announcement_read_eda5292b: "Marker alle kunngjeringar som lest"
@@ -15723,6 +15729,7 @@ nn:
   medium_skin_tone_8608d74e: "Middels hudfarge"
   meets_expectations_bb179565: "Innfrir forventningar"
   meets_mastery_754e1c06: "Møter meistringsnivå"
+  megabytes_885404ef: megabyte
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmar av maksimalt %{max_membership}"
   members_af25c21d: Medlemmar
   members_are_free_to_join_defa5929: "Medlemmar kan delta"
@@ -28006,6 +28013,7 @@ nn:
   update_pages_c91d7ba: "Oppdater sider"
   update_password_4bc5cb1f: "Oppdater passord"
   update_public_jwk_9f25f520: "Oppdater offentlig JWK"
+  update_quota_81381226: "Oppdater kvote"
   update_rating_6d29c2ef: "Oppdater vurdering"
   update_settings_9b422d0f: "Oppdater innstillingar"
   update_tool_7d48ef2a: "Oppdater %{tool}"
@@ -28026,6 +28034,7 @@ nn:
       og meir oppdatert brukaropplevelse
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "Oppdateringar ved JSON API auth error HTTP kode og JSON status felt"
   updating_6edbab78: Oppdaterer
+  updating_73d0718c: Oppdaterer...
   updating_discussion_failed_aadb2d35: "Oppdatering av diskusjon mislukkast"
   updating_publication_date_62cc1622: "Oppdaterer publiseringsdato"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Oppdatering av Catalog URL vil gjere den gamle URL-en utilgjengeleg for brukarar med ein gong! Dersom det er konfigurert ein eksisterande betalingsbehandlar, vil endringar kreve hjelp frå en Catalog-ingeniør."
@@ -28350,6 +28359,7 @@ nn:
       settings: Innstillingar
   user_profile_d56261fc: Brukarprofil
   user_profile_picture_46bffbc7: Brukarprofilbilde
+  user_quota_12cb58b7: Brukarkvote
   user_removed_successfully_20a3889d: "Brukar vart fjerna"
   user_results_updated_9ce38dce: "Brukerresultat oppdatert."
   user_s_email_only_401dbaba: "Kun brukar sin e-post"
