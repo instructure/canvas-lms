@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {STUDENT_ENROLLMENT, TEACHER_ENROLLMENT, TA_ENROLLMENT} from './constants'
 import type {Enrollment, User} from '../react/types'
 
 export const enrollments: Enrollment[] = [
@@ -23,14 +24,16 @@ export const enrollments: Enrollment[] = [
     id: '1',
     name: 'Section 1',
     role: 'Student',
-    type: 'StudentEnrollment',
+    type: STUDENT_ENROLLMENT,
+    can_be_removed: true,
     enrollment_state: 'active',
     last_activity: '2025-01-01T12:00:00Z',
   }, {
     id: '2',
     name: 'Section 2',
     role: 'Teacher',
-    type: 'TeacherEnrollment',
+    type: TEACHER_ENROLLMENT,
+    can_be_removed: true,
     enrollment_state: 'invited',
     last_activity: '2025-01-02T12:00:00Z',
     total_activity: 20778,
@@ -38,7 +41,8 @@ export const enrollments: Enrollment[] = [
     id: '3',
     name: 'Section 3',
     role: 'TA',
-    type: 'TaEnrollment',
+    type: TA_ENROLLMENT,
+    can_be_removed: true,
     enrollment_state: 'inactive',
     last_activity: '2025-01-08T12:00:00Z',
   }

@@ -31,7 +31,8 @@ describe('RosterTable', () => {
     canViewSisIdColumn: true,
     canManageDifferentiationTags: true,
     hideSectionsOnCourseUsersPage: false,
-    allowAssignToDifferentiationTags: true
+    allowAssignToDifferentiationTags: true,
+    activeGranularEnrollmentPermissions: [],
   }
 
   beforeEach(() => {

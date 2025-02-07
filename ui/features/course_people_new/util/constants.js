@@ -18,7 +18,9 @@
 
 export const TEACHER_ENROLLMENT = 'TeacherEnrollment'
 export const STUDENT_ENROLLMENT = 'StudentEnrollment'
+export const TA_ENROLLMENT = 'TaEnrollment'
 export const OBSERVER_ENROLLMENT = 'ObserverEnrollment'
+export const DESIGNER_ENROLLMENT = 'DesignerEnrollment'
 
 export const ACTIVE_ENROLLMENT = 'active'
 export const INACTIVE_ENROLLMENT = 'inactive'
