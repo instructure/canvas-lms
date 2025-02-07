@@ -948,7 +948,7 @@ describe RubricAssessment do
 
       context "discussion_checkpoints" do
         before do
-          Account.site_admin.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
         end
 
         it "does not grade students for checkpointed discussions" do

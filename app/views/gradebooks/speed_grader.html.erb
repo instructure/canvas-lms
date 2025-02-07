@@ -206,7 +206,7 @@
           </div>
 
           <div class="content_box">
-            <% if @domain_root_account.feature_enabled?(:discussion_checkpoints) && @assignment.submission_types == 'discussion_topic' %>
+            <% if @assignment.context.discussion_checkpoints_enabled? && @assignment.submission_types == 'discussion_topic' %>
               <div id="speed_grader_discussions_navigation_mount_point"></div>
             <% end %>
             <% if @assignment.active_rubric_association? %>

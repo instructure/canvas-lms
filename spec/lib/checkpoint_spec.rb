@@ -23,7 +23,7 @@ describe Checkpoint do
       course_with_teacher(active_all: true)
 
       parent_assignment = @course.assignments.create!
-      parent_assignment.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
 
       sub_assignment = SubAssignment.new(
         name: "Assignment Name",

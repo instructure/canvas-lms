@@ -95,9 +95,11 @@ describe "discussions index" do
 
     before :once do
       Account.default.enable_feature! :discussion_create
-      Account.default.enable_feature! :discussion_checkpoints
       Account.default.enable_feature! :react_discussions_post
       setup_course_and_students
+      sub_account = Account.create!(name: "Sub Account", parent_account: Account.default)
+      @course.update!(account: sub_account)
+      sub_account.enable_feature! :discussion_checkpoints
     end
 
     it "show checkpoint info on the index page", :ignore_js_errors do

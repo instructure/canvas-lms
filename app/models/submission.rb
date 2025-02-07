@@ -3220,7 +3220,7 @@ class Submission < ActiveRecord::Base
   end
 
   def checkpoint_submission?
-    assignment.present? && assignment.checkpoint? && !!root_account&.feature_enabled?(:discussion_checkpoints)
+    assignment.present? && assignment.checkpoint? && !!assignment.context.discussion_checkpoints_enabled?
   end
 
   def checkpoint_attributes_changed?

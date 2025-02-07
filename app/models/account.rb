@@ -854,6 +854,10 @@ class Account < ActiveRecord::Base
       .first
   end
 
+  def discussion_checkpoints_enabled?
+    feature_enabled?(:discussion_checkpoints)
+  end
+
   def file_namespace
     if Shard.current == Shard.birth
       "account_#{root_account.local_id}"

@@ -121,7 +121,9 @@ describe "discussions index" do
 
     context "discussion with checkpoints" do
       before :once do
-        Account.site_admin.enable_feature! :discussion_checkpoints
+        sub_account = Account.create!(name: "Sub Account", parent_account: Account.default)
+        @course.update!(account: sub_account)
+        @course.account.enable_feature! :discussion_checkpoints
         @reply_to_topic, _, @topic = graded_discussion_topic_with_checkpoints(context: @course, title: "foo")
       end
 
@@ -235,7 +237,7 @@ describe "discussions index" do
     end
 
     it "duplicates a checkpointed discussion properly" do
-      Account.site_admin.enable_feature! :discussion_checkpoints
+      @course.account.enable_feature! :discussion_checkpoints
       checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
       checkpointed_discussion.assignment.lock_at = 3.days.from_now
       checkpointed_discussion.assignment.unlock_at = 3.days.ago

@@ -2442,7 +2442,7 @@ describe Assignment do
   describe "#has_student_submissions_for_sub_assignments?" do
     context "checkpointed assignment" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, reply_to_entry_required_count: 2)
       end
 
@@ -2465,7 +2465,7 @@ describe Assignment do
   describe "#can_unpublish?" do
     context "checkpointed assignment" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, = graded_discussion_topic_with_checkpoints(context: @course)
       end
 
@@ -2479,7 +2479,7 @@ describe Assignment do
   describe "#assignment_ids_with_sub_assignment_submissions" do
     context "checkpointed assignment" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, = graded_discussion_topic_with_checkpoints(context: @course)
         @other_assignment = @course.assignments.create(title: "other assignment", points_possible: 10)
       end
@@ -11700,7 +11700,7 @@ describe Assignment do
 
   describe "checkpointed assignments" do
     before do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @parent = @course.assignments.create!(has_sub_assignments: true, workflow_state: "published", grading_type: "points")
       @first_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
       @second_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)

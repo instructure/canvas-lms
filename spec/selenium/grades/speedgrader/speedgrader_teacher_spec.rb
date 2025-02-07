@@ -343,7 +343,7 @@ describe "SpeedGrader" do
     describe "discussion_checkpoints" do
       it "displays not_graded if SubAssignment needs_grading" do
         course_with_teacher_logged_in
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @student = student_in_course(course: @course, active_all: true).user
         @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
         @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)

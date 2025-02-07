@@ -21,7 +21,7 @@ describe Checkpoints::GroupOverrideCreatorService do
   describe ".call" do
     before(:once) do
       course = course_model
-      course.root_account.enable_feature!(:discussion_checkpoints)
+      course.account.enable_feature!(:discussion_checkpoints)
       @group = course.groups.create!
       topic = DiscussionTopic.create_graded_topic!(course:, title: "graded topic")
       topic.update!(group_category_id: @group.group_category_id)

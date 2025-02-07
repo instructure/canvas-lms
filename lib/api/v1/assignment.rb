@@ -175,7 +175,7 @@ module Api::V1::Assignment
     hash["grades_published"] = assignment.grades_published? if opts[:include_grades_published]
     hash["graded_submissions_exist"] = assignment.graded_submissions_exist?
 
-    if opts[:include_checkpoints] && assignment.root_account.feature_enabled?(:discussion_checkpoints)
+    if opts[:include_checkpoints] && assignment.context.discussion_checkpoints_enabled?
       hash["has_sub_assignments"] = assignment.has_sub_assignments?
       hash["checkpoints"] = assignment.sub_assignments.map { |sub_assignment| Checkpoint.new(sub_assignment, user).as_json }
     end

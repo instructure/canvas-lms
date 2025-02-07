@@ -48,7 +48,7 @@ module Api::V1::Submission
     # information. Only return it if the caller has permissions.
     hash["body"] = nil if assignment.quiz? && !submission.user_can_read_grade?(current_user)
 
-    if includes.include?("sub_assignment_submissions") && assignment.root_account.feature_enabled?(:discussion_checkpoints)
+    if includes.include?("sub_assignment_submissions") && context.discussion_checkpoints_enabled?
       hash["has_sub_assignment_submissions"] = assignment.has_sub_assignments
       hash["sub_assignment_submissions"] = (assignment.has_sub_assignments &&
                                            assignment.sub_assignments&.map do |sub_assignment|
@@ -253,7 +253,7 @@ module Api::V1::Submission
       json_fields << "anonymous_id"
     end
 
-    if attempt.checkpoints_needs_grading? && attempt.root_account&.feature_enabled?(:discussion_checkpoints)
+    if attempt.checkpoints_needs_grading? && context.discussion_checkpoints_enabled?
       attempt.workflow_state = "pending_review"
       attempt.submission_type = attempt.submission_type || attempt.assignment&.submission_types
     end

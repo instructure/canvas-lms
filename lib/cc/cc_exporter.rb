@@ -194,7 +194,7 @@ module CC
     private
 
     def discussion_checkpoints_enabled?
-      @content_export&.context&.root_account&.feature_enabled?(:discussion_checkpoints) || false
+      @content_export&.context&.discussion_checkpoints_enabled? || false
     end
 
     def copy_all_to_zip

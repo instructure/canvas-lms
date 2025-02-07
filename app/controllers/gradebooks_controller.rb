@@ -896,7 +896,7 @@ class GradebooksController < ApplicationController
 
             submission[:dont_overwrite_grade] = dont_overwrite_grade
             submission.delete(:final) if submission[:final] && !@assignment.permits_moderation?(@current_user)
-            if params.key?(:sub_assignment_tag) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
+            if params.key?(:sub_assignment_tag) && @context.discussion_checkpoints_enabled?
               submission[:sub_assignment_tag] = params[:sub_assignment_tag]
             end
             subs = @assignment.grade_student(@user, submission.merge(skip_grader_check: is_default_grade_for_missing))
@@ -978,7 +978,7 @@ class GradebooksController < ApplicationController
           course: @context
         ).map { |c| { submission_comment: c } }
 
-        if assignment.root_account.feature_enabled?(:discussion_checkpoints)
+        if assignment.context.discussion_checkpoints_enabled?
           submission_json[:has_sub_assignment_submissions] = assignment.has_sub_assignments
           submission_json[:sub_assignment_submissions] = (assignment.has_sub_assignments &&
             assignment.sub_assignments&.map do |sub_assignment|

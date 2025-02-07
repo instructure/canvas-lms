@@ -320,7 +320,6 @@ export type RootAccountFeatureId =
   | 'course_pace_pacing_with_mastery_paths'
   | 'modules_requirements_allow_percentage'
   | 'lti_asset_processor'
-  | 'discussion_checkpoints'
   | 'course_pace_weighted_assignments'
   | 'course_pace_allow_bulk_pace_assign'
 
@@ -331,6 +330,7 @@ export type BrandAccountFeatureId =
   | 'embedded_release_notes'
   | 'consolidated_media_player'
   | 'discussions_speedgrader_revisit'
+  | 'discussion_checkpoints'
 
 /**
  * Feature id exported in ApplicationController that aren't mentioned in

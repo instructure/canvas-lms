@@ -139,7 +139,7 @@ class SubAssignment < AbstractAssignment
   end
 
   def checkpoint_changes?
-    !!root_account&.feature_enabled?(:discussion_checkpoints) && checkpoint_attributes_changed?
+    !!context.discussion_checkpoints_enabled? && checkpoint_attributes_changed?
   end
 
   def checkpoint_attributes_changed?

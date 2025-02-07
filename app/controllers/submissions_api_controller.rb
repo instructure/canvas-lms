@@ -452,7 +452,7 @@ class SubmissionsApiController < ApplicationController
     includes = Array(params[:include])
 
     assignment_scope = @context.assignments.published.preload(:quiz, :discussion_topic, :post_policy)
-    if includes.include?("sub_assignment_submissions") && @context.root_account.feature_enabled?(:discussion_checkpoints)
+    if includes.include?("sub_assignment_submissions") && @context.discussion_checkpoints_enabled?
       assignment_scope = assignment_scope.preload(:sub_assignments)
     end
 
@@ -878,7 +878,7 @@ class SubmissionsApiController < ApplicationController
           submission[:sticker] = params[:submission].delete(:sticker)
         end
 
-        if params.key?(:sub_assignment_tag) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
+        if params.key?(:sub_assignment_tag) && @assignment.context.discussion_checkpoints_enabled?
           submission[:sub_assignment_tag] = params.delete(:sub_assignment_tag)
         end
 

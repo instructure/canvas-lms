@@ -40,7 +40,7 @@ class Mutations::UpdateSubmissionGrade < Mutations::BaseMutation
     response = {}
 
     # Grab parent submission data if this submission is for a child assignment (i.e. a checkpointed discussion)
-    if submission.root_account&.feature_enabled?(:discussion_checkpoints) && submission.assignment.is_a?(SubAssignment) && errors.none?
+    if submission.course.discussion_checkpoints_enabled? && submission.assignment.is_a?(SubAssignment) && errors.none?
       sub_assignment = submission.assignment
       parent_assignment = Assignment.find(sub_assignment.parent_assignment_id)
       parent_assignment_submission = Submission.find_by(assignment_id: parent_assignment.id, user_id: submission.user_id)

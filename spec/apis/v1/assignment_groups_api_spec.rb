@@ -386,7 +386,7 @@ describe AssignmentGroupsController, type: :request do
 
   describe "checkpoints in-place" do
     before do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
 
       setup_groups
 

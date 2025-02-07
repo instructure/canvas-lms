@@ -104,7 +104,7 @@ class Assignment < AbstractAssignment
   end
 
   def checkpoints_parent?
-    has_sub_assignments? && root_account&.feature_enabled?(:discussion_checkpoints)
+    has_sub_assignments? && context.discussion_checkpoints_enabled?
   end
 
   def update_from_sub_assignment(changed_attributes)
