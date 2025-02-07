@@ -53,6 +53,22 @@ describe "assignments show page assign to" do
     expect(item_type_text.text).to include("25 pts")
   end
 
+  it "closes the assign to tray on dismiss" do
+    get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+
+    AssignmentPage.click_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    expect(tray_header.text).to eq("test assignment")
+    expect(icon_type_exists?("Assignment")).to be true
+    expect(item_type_text.text).to include("25 pts")
+
+    click_cancel_button
+    keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+  end
+
   it "assigns student and saves assignment", :ignore_js_errors do
     get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
 
