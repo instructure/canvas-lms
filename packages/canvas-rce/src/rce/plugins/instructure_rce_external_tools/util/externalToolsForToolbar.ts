@@ -16,19 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-interface ExternalToolData {
-  id: string
-  on_by_default?: boolean | null
-  favorite?: boolean | null
-}
+import type {ExternalToolData} from '../../../types'
 
 export function externalToolsForToolbar<T extends ExternalToolData>(tools: T[]): T[] {
   // Limit of not on_by_default but favorited tools is 2
   const favorited = tools.filter(it => it.favorite && !it.on_by_default).slice(0, 2) || []
   const onByDefault = tools.filter(it => it.on_by_default && it.favorite) || []
 
-  const set = new Map<string, T>()
-
+  const set = new Map<string | number, T>()
   // Remove possible overlaps between favorited and onByDefault, otherwise
   // we'd have duplicate buttons in the toolbar.
   for (const toolInfo of favorited.concat(onByDefault)) {
