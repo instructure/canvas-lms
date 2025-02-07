@@ -60,32 +60,33 @@ module DataFixup
     #   DataFixup::BulkColumnUpdater.new(User, :name).update! do |fn|
     #     fn.call [[1, "Alice"], [2, "Bob"]]
     #   end
+    # @return [Integer] number of rows updated
     def update!(&)
       @temp_table_name = generate_temp_table_name
       @logger = Logger.new(@log_filename) if @log_filename
       create_temp_table!
       yield method(:write_to_temp_table!)
       flush_temp_table!
-      true
     rescue => e
       if @logger
         log "ERROR: #{e.inspect}"
-        false
+        -1
       else
         raise
       end
     ensure
       @temp_table_name = nil
-      # Force close of session to delete the temporary table:
-      begin
-        model_class.connection.disconnect!
-
-        log "Disconnected from DB"
-      rescue => e
-        log "ERROR reconnecting: #{e.inspect}"
-      end
+      force_close_session_to_delete_temp_table!
       @logger&.close
       @logger = nil
+    end
+
+    def force_close_session_to_delete_temp_table!
+      model_class.connection.disconnect!
+
+      log "Disconnected from DB"
+    rescue => e
+      log "ERROR reconnecting: #{e.inspect}"
     end
 
     def log(line)
@@ -203,6 +204,8 @@ module DataFixup
         WHERE t.id = tt.id
       SQL
       log "Flush #{quoted_temp_table_name} to #{model_class.quoted_table_name} complete: #{result.cmd_tuples} rows updated"
+
+      result.cmd_tuples
     end
   end
 end
