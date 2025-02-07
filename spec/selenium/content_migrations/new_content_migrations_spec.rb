@@ -401,7 +401,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    context "with selectable_outcomes_in_course_copy enabled", skip: "issues with cc search" do
+    context "with selectable_outcomes_in_course_copy enabled" do
       before do
         root = @copy_from.root_outcome_group(true)
         outcome_model(context: @copy_from, title: "root1")
@@ -414,12 +414,13 @@ describe "content migrations", :non_parallel do
         outcome_model(context: @copy_from, outcome_group: subgroup, title: "non-root3")
       end
 
-      it "selectively copies outcomes", skip: "issues with CC search" do
+      it "selectively copies outcomes" do
         visit_page
 
         select_migration_type
         wait_for_ajaximations
 
+        search_for_option(NewContentMigrationPage.course_search_input_selector, @copy_from.name, @copy_from.id.to_s)
         NewContentMigrationPage.specific_content_radio.click
         submit
 
@@ -643,7 +644,7 @@ describe "content migrations", :non_parallel do
     end
   end
 
-  it "is able to selectively import common cartridge submodules", skip: "CC 1.1 not implemented" do
+  it "is able to selectively import common cartridge submodules" do
     course_with_teacher_logged_in
     cm = ContentMigration.new(context: @course, user: @user)
     cm.migration_type = "common_cartridge_importer"
@@ -666,28 +667,15 @@ describe "content migrations", :non_parallel do
 
     NewContentMigrationPage.select_content_button.click
     wait_for_ajaximations
-    NewContentMigrationPage.module.click
+    SelectContentPage.module_parent.click
     wait_for_ajaximations
-
-    submod = NewContentMigrationPage.submodule
-    expect(submod).to include_text("1 sub-module")
-    submod.find_element(:css, "a.checkbox-caret").click
+    SelectContentPage.module_option_caret_by_name("Your Mom, Research, & You").click
     wait_for_ajaximations
-
-    expect(submod.find_element(:css, ".module_options")).to_not be_displayed
-
-    sub_submod = submod.find_element(:css, "li.normal-treeitem")
-    expect(sub_submod).to include_text("Study Guide")
-
-    sub_submod.find_element(:css, 'input[type="checkbox"]').click
+    SelectContentPage.module_option_checkbox_by_name("Study Guide").click
     wait_for_ajaximations
-
-    expect(submod.find_element(:css, ".module_options")).to be_displayed # should show the module option now
-    # select to import submodules individually
-    radio_to_click = submod.find_element(:css, 'input[type="radio"][value="separate"]')
-    move_to_click("label[for=#{radio_to_click["id"]}]")
-
-    NewContentMigrationPage.select_content_submit_button.click
+    SelectContentPage.import_as_standalone_module_switch_by_name("Study Guide").click
+    wait_for_ajaximations
+    SelectContentPage.submit_button.click
     wait_for_ajaximations
 
     run_jobs
