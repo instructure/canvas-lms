@@ -78,7 +78,7 @@ export const ContentSelectionModal = ({
     }
 
     for (const subItem of json) {
-      if (subItem.sub_items_url && subItem.submodule_count) {
+      if (subItem.sub_items_url) {
         subItem.sub_items = await loadSubItemsFromSubItemUrls(subItem.sub_items_url)
       }
     }
