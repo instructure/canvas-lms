@@ -90,7 +90,8 @@ class CC::Importer::CCWorker < Canvas::Migration::Worker::Base
   end
 
   def discussion_checkpoints_enabled?(content_migration)
-    content_migration&.context&.root_account&.feature_enabled?(:discussion_checkpoints) || false
+    # if context is not an account, then context is either a course or a group, both belong to an account
+    content_migration.context.discussion_checkpoints_enabled?
   end
 
   def self.enqueue(content_migration)

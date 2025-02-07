@@ -28,7 +28,7 @@ class Mutations::UpdateSubmissionGradeStatus < Mutations::BaseMutation
   field :submission, Types::SubmissionType, null: true
   def resolve(input:)
     submission = Submission.find(input[:submission_id])
-    if input[:checkpoint_tag].present? && submission.root_account&.feature_enabled?(:discussion_checkpoints)
+    if input[:checkpoint_tag].present? && submission.course.discussion_checkpoints_enabled?
       submission = submission.effective_checkpoint_submission(input[:checkpoint_tag])
     end
 

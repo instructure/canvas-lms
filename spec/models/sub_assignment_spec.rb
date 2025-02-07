@@ -94,7 +94,7 @@ describe SubAssignment do
 
   describe "discussion checkpoints" do
     before do
-      @parent_assignment.root_account.enable_feature!(:discussion_checkpoints)
+      @parent_assignment.course.account.enable_feature!(:discussion_checkpoints)
       @parent_assignment.update!(title: "graded topic", submission_types: "discussion_topic")
       @topic = @parent_assignment.discussion_topic
       @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
@@ -114,7 +114,7 @@ describe SubAssignment do
     end
 
     it "does not update the parent assignment when the checkpoints flag is disabled" do
-      @topic.root_account.disable_feature!(:discussion_checkpoints)
+      @topic.course.account.disable_feature!(:discussion_checkpoints)
       expect { @checkpoint.update!(points_possible: 4) }.not_to change {
         @topic.assignment.reload.points_possible
       }
@@ -128,7 +128,7 @@ describe SubAssignment do
   describe "scope: visible_to_students_in_course_with_da" do
     before do
       course_with_student(active_all: true)
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
     end
 
@@ -328,7 +328,7 @@ describe SubAssignment do
   describe "title_with_id" do
     before(:once) do
       @course = course_factory(active_course: true)
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
     end
 
@@ -359,7 +359,7 @@ describe SubAssignment do
   describe "to_atom" do
     before :once do
       course_model
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @required_replies = 2
       @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(
         context: @course,
@@ -381,7 +381,7 @@ describe SubAssignment do
   describe "title_with_required_replies" do
     before :once do
       course_model
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @required_replies = 2
       @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(
         context: @course,

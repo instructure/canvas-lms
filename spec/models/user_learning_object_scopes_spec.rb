@@ -371,7 +371,7 @@ describe UserLearningObjectScopes do
 
     context "sub_assignments" do
       before :once do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         course_with_student(active_all: true)
         @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
       end
@@ -745,7 +745,7 @@ describe UserLearningObjectScopes do
 
     context "is_sub_assignment" do
       before do
-        @course1.root_account.enable_feature!(:discussion_checkpoints)
+        @course1.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course1)
         @reply_to_topic.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
       end
@@ -759,7 +759,7 @@ describe UserLearningObjectScopes do
       end
 
       it "returns only checkpointed sub-assignments from the given course" do
-        @course2.root_account.enable_feature!(:discussion_checkpoints)
+        @course2.account.enable_feature!(:discussion_checkpoints)
         reply_to_topic2, _reply_to_entry2 = graded_discussion_topic_with_checkpoints(context: @course2)
         reply_to_topic2.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
 

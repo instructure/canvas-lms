@@ -40,7 +40,7 @@ describe Types::AssignmentType do
   let(:teacher_checkpoint_assignment_type) { GraphQLTypeTester.new(checkpoint_assignment, current_user: teacher) }
 
   before do
-    course.root_account.enable_feature!(:discussion_checkpoints)
+    course.account.enable_feature!(:discussion_checkpoints)
 
     Checkpoints::DiscussionCheckpointCreatorService.call(
       discussion_topic: topic,

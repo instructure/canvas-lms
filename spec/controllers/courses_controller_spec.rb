@@ -1542,7 +1542,7 @@ describe CoursesController do
         end
 
         it "includes discussion checkpoints if discussion checkpoints enabled" do
-          @course1.root_account.enable_feature!(:discussion_checkpoints)
+          @course1.account.enable_feature!(:discussion_checkpoints)
           @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course1)
           get "show", params: { id: @course1.id }
           expect(assigns(:upcoming_assignments)).to include @reply_to_topic

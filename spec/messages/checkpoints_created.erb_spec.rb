@@ -25,7 +25,7 @@ describe "checkpoints_created" do
 
   before :once do
     course_model
-    @course.root_account.enable_feature!(:discussion_checkpoints)
+    @course.account.enable_feature!(:discussion_checkpoints)
 
     topic = graded_discussion_topic(context: @course)
 

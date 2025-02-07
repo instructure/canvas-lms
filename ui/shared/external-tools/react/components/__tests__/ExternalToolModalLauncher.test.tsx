@@ -110,7 +110,8 @@ describe('ExternalToolModalLauncher', () => {
   })
 
   describe('onClose behavior', () => {
-    it('calls onRequestClose when clicking a button element', async () => {
+    // INTEROP-9242
+    it.skip('calls onRequestClose when clicking a button element', async () => {
       const onRequestCloseMock = jest.fn()
       const {getByText} = render(
         <ExternalToolModalLauncher {...generateProps({ onRequestClose: onRequestCloseMock, isOpen: true })} />

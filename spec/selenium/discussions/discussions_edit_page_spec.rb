@@ -1614,7 +1614,7 @@ describe "discussions" do
           context "checkpoints" do
             it "shows reply to topic input on graded discussion with sub assignments" do
               Account.site_admin.enable_feature!(:discussion_checkpoints)
-              @course.root_account.enable_feature!(:discussion_checkpoints)
+              @course.account.enable_feature!(:discussion_checkpoints)
               assignment = @course.assignments.create!(
                 name: "Assignment",
                 submission_types: ["online_text_entry"],
@@ -1640,7 +1640,7 @@ describe "discussions" do
 
             it "shows required replies input on graded discussion with sub assignments" do
               Account.site_admin.enable_feature!(:discussion_checkpoints)
-              @course.root_account.enable_feature!(:discussion_checkpoints)
+              @course.account.enable_feature!(:discussion_checkpoints)
               @student1 = student_in_course(course:, active_all: true).user
               @student2 = student_in_course(course:, active_all: true).user
               @course_section = course.course_sections.create!(name: "section alpha")
@@ -1748,7 +1748,7 @@ describe "discussions" do
             it "displays an error when the availability date is after the due date" do
               skip("Need validations to work for this one to pass")
               Account.site_admin.enable_feature!(:discussion_checkpoints)
-              @course.root_account.enable_feature!(:discussion_checkpoints)
+              @course.account.enable_feature!(:discussion_checkpoints)
               assignment = @course.assignments.create!(
                 name: "Assignment",
                 submission_types: ["online_text_entry"],
@@ -1879,7 +1879,7 @@ describe "discussions" do
 
         context "checkpoints" do
           before do
-            course.root_account.enable_feature!(:discussion_checkpoints)
+            course.account.enable_feature!(:discussion_checkpoints)
             @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course:, title: "checkpointed discussion")
             Checkpoints::DiscussionCheckpointCreatorService.call(
               discussion_topic: @checkpointed_discussion,

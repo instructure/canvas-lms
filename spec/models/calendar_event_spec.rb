@@ -303,7 +303,7 @@ describe CalendarEvent do
       context "discussion with checkpoints" do
         before :once do
           course_model
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
           @required_replies = 2
           @reply_to_topic, @reply_to_entry, @topic = graded_discussion_topic_with_checkpoints(
             context: @course,

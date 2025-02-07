@@ -219,7 +219,7 @@ describe "Api::V1::Assignment" do
 
       context "discussion_checkpoints enabled without checkpoints" do
         before do
-          assignment.root_account.enable_feature!(:discussion_checkpoints)
+          assignment.course.account.enable_feature!(:discussion_checkpoints)
         end
 
         it "returns false for the has_sub_assignments attribute and [] for the checkpoints attribute" do
@@ -231,7 +231,7 @@ describe "Api::V1::Assignment" do
 
       context "discussion_checkpoints enabled with checkpoints" do
         before do
-          assignment.root_account.enable_feature!(:discussion_checkpoints)
+          assignment.course.account.enable_feature!(:discussion_checkpoints)
 
           assignment.update_attribute(:has_sub_assignments, true)
 
@@ -352,7 +352,7 @@ describe "Api::V1::Assignment" do
       describe "checkpointed assignments" do
         before do
           @student1 = student_in_course(course: @course, active_all: true).user
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
 
           @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
           Checkpoints::DiscussionCheckpointCreatorService.call(

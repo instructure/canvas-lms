@@ -369,7 +369,9 @@ describe "assignments" do
       end
 
       it "preserves all assignment attributes for checkpointed discussion when opening and submitting without changes using more options", :ignore_js_errors do
-        Account.site_admin.enable_feature!(:discussion_checkpoints)
+        sub_account = Account.create!(name: "sub1", parent_account: Account.default)
+        @course.update!(account: sub_account)
+        sub_account.enable_feature!(:discussion_checkpoints)
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
@@ -491,7 +493,9 @@ describe "assignments" do
       end
 
       it "preserves all assignment attributes for checkpointed discussion when opening and submitting without changes" do
-        Account.site_admin.enable_feature!(:discussion_checkpoints)
+        sub_account = Account.create!(name: "sub1", parent_account: Account.default)
+        sub_account.enable_feature!(:discussion_checkpoints)
+        @course.update!(account: sub_account)
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
@@ -2031,9 +2035,10 @@ describe "assignments" do
 
   context "with discussion_checkpoints" do
     before :once do
-      course_with_teacher({ user: @teacher, active_course: true, active_enrollment: true })
+      sub_account = Account.create!(name: "sub account", parent_account: Account.default)
+      course_with_teacher({ user: @teacher, active_course: true, active_enrollment: true, account: sub_account })
+      sub_account.enable_feature! :discussion_checkpoints
 
-      Account.site_admin.enable_feature! :discussion_checkpoints
       @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
       Checkpoints::DiscussionCheckpointCreatorService.call(
         discussion_topic: @checkpointed_discussion,

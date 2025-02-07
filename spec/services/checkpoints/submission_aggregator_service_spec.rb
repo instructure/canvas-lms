@@ -21,7 +21,7 @@ describe Checkpoints::SubmissionAggregatorService do
   describe ".call" do
     before(:once) do
       @course = course_model
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @student = student_in_course(course: @course, active_all: true).user
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
       @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
@@ -49,7 +49,7 @@ describe Checkpoints::SubmissionAggregatorService do
       end
 
       it "returns false when checkpoint discussions are disabled" do
-        @course.root_account.disable_feature!(:discussion_checkpoints)
+        @course.account.disable_feature!(:discussion_checkpoints)
         expect(service_call).to be false
       end
 

@@ -1380,7 +1380,7 @@ describe PlannerController do
 
       context "discussion checkpoints FF" do
         before :once do
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
           @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
         end
 
@@ -1397,7 +1397,7 @@ describe PlannerController do
         end
 
         it "does not include discussion checkpoints when FF disabled" do
-          @course.root_account.disable_feature!(:discussion_checkpoints)
+          @course.account.disable_feature!(:discussion_checkpoints)
           get :index
           response_json = json_parse(response.body)
           items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }

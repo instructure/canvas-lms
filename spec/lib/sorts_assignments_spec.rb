@@ -646,7 +646,7 @@ describe SortsAssignments do
 
       context "with discussion checkpoints" do
         before do
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
           @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
         end
 

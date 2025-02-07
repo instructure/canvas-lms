@@ -1614,7 +1614,7 @@ describe "discussions" do
 
         context "checkpoints" do
           before do
-            course.root_account.enable_feature!(:discussion_checkpoints)
+            course.account.enable_feature!(:discussion_checkpoints)
           end
 
           it "successfully creates a discussion topic with checkpoints" do

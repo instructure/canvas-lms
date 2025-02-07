@@ -1499,7 +1499,7 @@ describe "Common Cartridge exporting" do
       context "when is_discussion_checkpoints_enabled is disabled" do
         let(:expected_settings) { { is_discussion_checkpoints_enabled: false } }
 
-        before { @course.root_account.disable_feature!(:discussion_checkpoints) }
+        before { @course.account.disable_feature!(:discussion_checkpoints) }
 
         it "calls converter_class with proper settings" do
           expect(CC::Importer::Canvas::Converter).to receive(:new).with(hash_including(expected_settings)).and_call_original
@@ -1510,7 +1510,7 @@ describe "Common Cartridge exporting" do
       context "when is_discussion_checkpoints_enabled is enabled" do
         let(:expected_settings) { { is_discussion_checkpoints_enabled: true } }
 
-        before { @course.root_account.enable_feature!(:discussion_checkpoints) }
+        before { @course.account.enable_feature!(:discussion_checkpoints) }
 
         it "calls converter_class with proper settings" do
           expect(CC::Importer::Canvas::Converter).to receive(:new).with(hash_including(expected_settings)).and_call_original

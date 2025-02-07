@@ -417,7 +417,6 @@ class ApplicationController < ActionController::Base
     course_pace_pacing_with_mastery_paths
     course_pace_weighted_assignments
     modules_requirements_allow_percentage
-    discussion_checkpoints
     course_pace_allow_bulk_pace_assign
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
@@ -425,6 +424,7 @@ class ApplicationController < ActionController::Base
     embedded_release_notes
     consolidated_media_player
     discussions_speedgrader_revisit
+    discussion_checkpoints
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest(
     [
@@ -1493,7 +1493,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_upcoming_assignments(course)
-    include_discussion_checkpoints = course.root_account.feature_enabled?(:discussion_checkpoints)
+    include_discussion_checkpoints = course.discussion_checkpoints_enabled?
     visible_assignments = AssignmentGroup.visible_assignments(
       @current_user,
       course,
@@ -3056,12 +3056,18 @@ class ApplicationController < ActionController::Base
 
     current_user_has_been_observer_in_this_course = @context.user_has_been_observer?(@current_user)
 
+    # as of the time of this writing, there are only 2 places where set_js_assignment_data is called:
+    # 1. assignments_controller (context of this will be Course)
+    # 2. courses_controller (context of this will be Account)
+    # discussion_checkpoints_enabled? works for either context
+    account_has_discussion_checkpoints_enabled = @context.discussion_checkpoints_enabled?
+
     prefetch_xhr(api_v1_course_assignment_groups_url(
                    @context,
                    include: [
                      "assignments",
                      "discussion_topic",
-                     @domain_root_account.feature_enabled?(:discussion_checkpoints) && "checkpoints",
+                     account_has_discussion_checkpoints_enabled && "checkpoints",
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
                      permissions[:manage] && "module_ids",
                      peer_reviews_for_a2_enabled? && "assessment_requests"
@@ -3096,7 +3102,7 @@ class ApplicationController < ActionController::Base
              current_user_has_been_observer_in_this_course:,
              observed_student_ids: ObserverEnrollment.observed_student_ids(@context, @current_user),
              apply_assignment_group_weights: @context.apply_group_weights?,
-             DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
+             DISCUSSION_CHECKPOINTS_ENABLED: account_has_discussion_checkpoints_enabled
            })
 
     conditional_release_js_env(includes: :active_rules)
@@ -3120,7 +3126,7 @@ class ApplicationController < ActionController::Base
                              }
                            end,
              DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
-             DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
+             DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
            })
     js_env(active_grading_periods: GradingPeriod.json_for(@context, @current_user)) if @context.grading_periods?
   end
