@@ -151,6 +151,20 @@ RSpec.describe Lti::RegistrationsController do
         lti_registration_model(account: Account.site_admin, name: "Site admin registration with no binding")
       end
 
+      context "when using 'self' for the account_id parameter" do
+        let(:url) { "/api/v1/accounts/self/lti_registrations" }
+
+        it "is successful" do
+          expect_any_instance_of(Lti::RegistrationsController)
+            .to receive(:api_find)
+            .with(Account.active, "self")
+            .once
+            .and_return(account)
+          subject
+          expect(response_json[:total]).to eq(4)
+        end
+      end
+
       it "is successful" do
         subject
         expect(response).to be_successful

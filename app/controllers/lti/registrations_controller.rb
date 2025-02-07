@@ -952,9 +952,8 @@ class Lti::RegistrationsController < ApplicationController
       # eager loaded instead of preloaded for use in where queries
       eager_load_models = [:lti_registration_account_bindings]
       all_active_registrations = Lti::Registration.active.preload(preload_models).eager_load(eager_load_models)
-
       # Get all registrations on this account, regardless of their bindings
-      account_registrations = all_active_registrations.where(account_id: params[:account_id])
+      account_registrations = all_active_registrations.where(account: @account)
 
       # Get all registration account bindings that are bound to the site admin account and that are "on,"
       # since they will apply to this account (and all accounts)
@@ -981,7 +980,7 @@ class Lti::RegistrationsController < ApplicationController
       # are uniquely being inherited from a different account.
       inherited_on_registration_ids = Lti::RegistrationAccountBinding
                                       .where(workflow_state: "on")
-                                      .where(account_id: params[:account_id])
+                                      .where(account: @account)
                                       .where.not(registration_id: account_registrations.map(&:id))
                                       .pluck(:registration_id)
                                       .uniq
