@@ -28,9 +28,8 @@ import tinyRCE from './tinyRCE'
 import getTranslations from '../getTranslations'
 import '@instructure/canvas-theme'
 import type {Editor} from 'tinymce'
-// @ts-expect-error
 import generateId from 'format-message-generate-id/underscored_crc32'
-import type {RCETrayProps} from './types'
+import {RCETrayProps} from './types'
 
 if (!process || !process.env || !process.env.BUILD_LOCALE) {
   formatMessage.setup({
@@ -122,7 +121,6 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
     return <>{formatMessage('Loading...')}</>
   } else {
     return (
-      // @ts-expect-error
       <RCEWrapper
         name="content"
         ref={rceRef}
@@ -284,7 +282,6 @@ export interface RCEPropTypes {
 RCE.defaultProps = {
   autosave: {enabled: false, maxAge: 3600000},
   defaultContent: '',
-  // @ts-expect-error
   editorOptions: {},
   renderKBShortcutModal: true,
   highContrastCSS: [],

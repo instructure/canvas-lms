@@ -26,7 +26,7 @@ interface AlertMessageAreaProps {
     text: string
   }[]
   afterDismiss: (messageId: number) => void
-  liveRegion: () => Element
+  liveRegion?: () => HTMLElement | null | undefined
 }
 
 /**
@@ -44,6 +44,7 @@ export default function AlertMessageArea({
           key={message.id}
           variant={message.variant || 'info'}
           timeout={10000}
+          // @ts-expect-error
           liveRegion={liveRegion}
           onDismiss={() => afterDismiss(message.id)}
         >

@@ -246,7 +246,6 @@ export interface CanvasRcePropTypes {
 
 const defaultProps: Partial<CanvasRcePropTypes> = {
   autosave: true,
-  // @ts-expect-error
   editorOptions: {},
   maxInitRenderedRCEs: -1,
   mirroredAttrs: {},
