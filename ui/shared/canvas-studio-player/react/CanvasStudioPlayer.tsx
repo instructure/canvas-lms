@@ -101,7 +101,6 @@ export default function CanvasStudioPlayer({
   const containerRef = useRef<any>(null)
 
   const boundingBox = useCallback(() => {
-    // @ts-expect-error
     const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement
     const isEmbedded =
       window.frameElement?.tagName === 'IFRAME' ||
@@ -183,7 +182,6 @@ export default function CanvasStudioPlayer({
   }, [handlePlayerSize])
 
   const includeFullscreen =
-    // @ts-expect-error
     (document.fullscreenEnabled || document.webkitFullscreenEnabled) && type === 'video'
 
   function renderNoPlayer() {

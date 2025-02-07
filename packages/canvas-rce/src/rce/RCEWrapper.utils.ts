@@ -147,3 +147,18 @@ export function parsePluginsToExclude(plugins: string[]) {
     .filter(plugin => plugin.length > 0 && plugin[0] === '-')
     .map(pluginToIgnore => pluginToIgnore.slice(1))
 }
+
+// if a placeholder image shows up in autosaved content, we have to remove it
+// because the data url gets converted to a blob, which is not valid when restored.
+// besides, the placeholder is intended to be temporary while the file
+// is being uploaded
+export function patchAutosavedContent(content: string, asText: boolean = false) {
+  const temp = document.createElement('div')
+  temp.innerHTML = content
+  temp.querySelectorAll('[data-placeholder-for]').forEach(placeholder => {
+    // @ts-expect-error
+    placeholder.parentElement.removeChild(placeholder)
+  })
+  if (asText) return temp.textContent
+  return temp.innerHTML
+}

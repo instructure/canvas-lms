@@ -41,6 +41,7 @@ export type AlertMessage = {
 }
 
 export type RCETrayProps = {
+  canUploadFiles: boolean
   contextId: string
   contextType: string
   host: string
@@ -50,6 +51,12 @@ export type RCETrayProps = {
     contextId: string
     userId: string
   }
+  filesTabDisabled?: boolean
+  refreshToken?: () => void
+  source?: {
+    fetchImages: () => void
+  }
+  themeUrl?: string
 }
 
 /**
@@ -67,4 +74,23 @@ export interface ExternalToolsEditor {
   editorContainer: HTMLElement
   $: Editor['$']
   ui: Editor['ui']
+}
+
+export interface ExternalToolData {
+  id: string | number
+  on_by_default?: boolean | null
+  favorite?: boolean | null
+}
+
+// Extend Document interface to include webkit-specific fullscreen properties
+declare global {
+  interface Document {
+    fullscreenElement?: HTMLElement | null
+    webkitExitFullscreen(): Promise<void>
+    webkitFullscreenElement?: HTMLElement | null
+    webkitFullscreenEnabled?: boolean
+  }
+  interface HTMLDivElement {
+    webkitRequestFullscreen(): Promise<void>
+  }
 }

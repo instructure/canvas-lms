@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import RceHtmlEditor from '../RceHtmlEditor'
 
+// @ts-expect-error
 document.createRange = () => {
   return {
     setStart: () => {},
@@ -45,6 +46,7 @@ describe('RceHtmlEditor', () => {
 
   it('renders', () => {
     const editorRef = {current: null}
+    // @ts-expect-error
     const {getByText} = render(<RceHtmlEditor ref={editorRef} code="" />)
     expect(getByText('html code editor')).toBeInTheDocument()
   })
@@ -53,6 +55,7 @@ describe('RceHtmlEditor', () => {
     const editorRef = {current: null}
     const onChange = jest.fn()
     const {container} = render(
+      // @ts-expect-error
       <RceHtmlEditor ref={editorRef} code="<div><div>Text</div></div>" onChange={onChange} />,
     )
     jest.advanceTimersByTime(1000)
@@ -64,6 +67,7 @@ describe('RceHtmlEditor', () => {
   it('does not add non-semantic whitespace when beautifying', () => {
     const editorRef = {current: null}
     const {container} = render(
+      // @ts-expect-error
       <RceHtmlEditor ref={editorRef} code="<a><span>Links</span> are great</a>" />,
     )
     jest.advanceTimersByTime(1000)

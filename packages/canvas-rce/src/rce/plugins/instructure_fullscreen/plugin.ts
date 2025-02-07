@@ -31,7 +31,6 @@ tinymce.PluginManager.add('instructure_fullscreen', function (editor) {
     icon: 'fullscreen',
     onAction: () => editor.execCommand('instructureFullscreen'),
     onSetup(api) {
-      // @ts-expect-error
       api.setDisabled(!!document[FS_ELEMENT])
       return () => undefined
     },
@@ -42,7 +41,6 @@ tinymce.PluginManager.add('instructure_fullscreen', function (editor) {
     icon: 'fullscreen_exit',
     onAction: () => editor.execCommand('instructureFullscreen'),
     onSetup(api) {
-      // @ts-expect-error
       api.setDisabled(!document[FS_ELEMENT])
       return () => undefined
     },
