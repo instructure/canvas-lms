@@ -1,27 +1,30 @@
 <div class="message-students-dialog form-dialog-content">
   <div class="message-recipients-group-container">
-    <label for="message-recipients-group">
-     {{#t}}Recipients:{{/t}}
-    </label>
+    <div class="label-container">
+      <label for="message-recipients-group">
+       {{#t}}Recipients:{{/t}}
+      </label>
+    </div>
 
-    {{#ifEqual recipientGroups.length 1}}
-      {{recipientGroups.0.name}}
-      <input type="hidden" name="recipientGroupName" value="{{recipientGroups.0.name}}" />
-    {{else}}
-      <select name="recipientGroupName" id="message-recipients-group">
-        {{#each recipientGroups}}
-          <option value="{{name}}">{{name}}</option>
-        {{/each}}
-      </select>
-    {{/ifEqual}}
+    <div class="select-container">
+      {{#ifEqual recipientGroups.length 1}}
+        {{recipientGroups.0.name}}
+        <input type="hidden" name="recipientGroupName" value="{{recipientGroups.0.name}}" />
+      {{else}}
+        <select name="recipientGroupName" id="message-recipients-group" class="labeled-error">
+          {{#each recipientGroups}}
+            <option value="{{name}}">{{name}}</option>
+          {{/each}}
+        </select>
+      {{/ifEqual}}
+    </div>
   </div>
 
   <div id="message-recipients">
     {{> ui/shared/message-students-dialog/jst/_messageStudentsWhoRecipientList.handlebars this}}
   </div>
 
-  <textarea name=body></textarea>
-
+  <textarea name="body" id="message-body" class="labeled-error"></textarea>
 </div>
 <div class="form-controls">
   <button class="btn dialog_closer btn-secondary" type="button"
