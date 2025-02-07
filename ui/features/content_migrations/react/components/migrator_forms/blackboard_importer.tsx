@@ -41,14 +41,8 @@ const BlackboardImporter = ({
   fileUploadProgress,
   isSubmitting,
 }: BlackboardImporterProps) => {
-  const {
-    setFile,
-    fileError,
-    questionBankSettings,
-    setQuestionBankSettings,
-    questionBankError,
-    handleSubmit,
-  } = useSubmitHandlerWithQuestionBank(onSubmit)
+  const {setFile, fileError, questionBankSettings, setQuestionBankSettings, handleSubmit} =
+    useSubmitHandlerWithQuestionBank(onSubmit)
 
   return (
     <>
@@ -61,7 +55,6 @@ const BlackboardImporter = ({
       />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
-        questionBankError={questionBankError}
         disable={isSubmitting}
         questionBankSettings={questionBankSettings}
       />

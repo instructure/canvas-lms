@@ -71,6 +71,14 @@ const convertDateShiftOptions = (
   }
 }
 
+const convertSettings = (formDateShiftOptions: submitMigrationFormData): Record<string, any> => {
+  const convertedSettings = {...formDateShiftOptions.settings}
+  if (!convertedSettings.question_bank_name) {
+    delete convertedSettings.question_bank_name
+  }
+  return convertedSettings
+}
+
 export const convertFormDataToMigrationCreateRequest = (
   formData: submitMigrationFormData,
   courseId: string,
@@ -81,7 +89,7 @@ export const convertFormDataToMigrationCreateRequest = (
     migration_type: chosenMigrator,
     date_shift_options: convertDateShiftOptions(formData),
     selective_import: formData.selective_import || false,
-    settings: formData.settings,
+    settings: convertSettings(formData),
     pre_attachment: formData.pre_attachment,
   }
 }

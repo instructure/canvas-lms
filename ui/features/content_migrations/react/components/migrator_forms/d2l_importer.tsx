@@ -36,14 +36,8 @@ type D2LImporterProps = {
 }
 
 const D2LImporter = ({onSubmit, onCancel, fileUploadProgress, isSubmitting}: D2LImporterProps) => {
-  const {
-    setFile,
-    fileError,
-    questionBankSettings,
-    setQuestionBankSettings,
-    questionBankError,
-    handleSubmit,
-  } = useSubmitHandlerWithQuestionBank(onSubmit)
+  const {setFile, fileError, questionBankSettings, setQuestionBankSettings, handleSubmit} =
+    useSubmitHandlerWithQuestionBank(onSubmit)
 
   return (
     <>
@@ -56,7 +50,6 @@ const D2LImporter = ({onSubmit, onCancel, fileUploadProgress, isSubmitting}: D2L
       />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
-        questionBankError={questionBankError}
         disable={isSubmitting}
         questionBankSettings={questionBankSettings}
       />

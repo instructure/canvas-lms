@@ -34,27 +34,10 @@ describe('from handler hooks', () => {
       expect(result.current.file).toBeNull()
       expect(result.current.fileError).toBe(false)
       expect(result.current.questionBankSettings).toBeNull()
-      expect(result.current.questionBankError).toBe(false)
     })
 
     describe('question banks', () => {
-      it('should have true questionBankError on empty question bank name', () => {
-        const {result} = renderHook(() => useSubmitHandlerWithQuestionBank(mockOnSubmit))
-        const settings: QuestionBankSettings = {question_bank_name: ''}
-
-        act(() => {
-          result.current.setQuestionBankSettings(settings)
-        })
-
-        act(() => {
-          result.current.handleSubmit({settings: {}})
-        })
-
-        expect(result.current.questionBankSettings).toEqual(settings)
-        expect(result.current.questionBankError).toBe(true)
-      })
-
-      it('should have false questionBankError on not empty question bank name', () => {
+      it('should use question bank name', () => {
         const {result} = renderHook(() => useSubmitHandlerWithQuestionBank(mockOnSubmit))
         const settings: QuestionBankSettings = {question_bank_name: 'Valid Name'}
 
@@ -67,7 +50,6 @@ describe('from handler hooks', () => {
         })
 
         expect(result.current.questionBankSettings?.question_bank_name).toBe('Valid Name')
-        expect(result.current.questionBankError).toBe(false)
       })
     })
 
@@ -116,7 +98,6 @@ describe('from handler hooks', () => {
         })
 
         expect(result.current.fileError).toBe(false)
-        expect(result.current.questionBankError).toBe(false)
         expect(mockOnSubmit).toHaveBeenCalledWith(
           {
             settings: {question_bank_name: 'Valid Name', extra_info: 'extra'},
@@ -145,7 +126,6 @@ describe('from handler hooks', () => {
         })
 
         expect(result.current.fileError).toBe(true)
-        expect(result.current.questionBankError).toBe(true)
         expect(mockOnSubmit).not.toHaveBeenCalled()
       })
     })
