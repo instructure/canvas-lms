@@ -616,6 +616,13 @@ class WikiPage < ActiveRecord::Base
                                                  copy_title: result.title
                                                })
     end
+
+    if estimated_duration
+      # we have to save result here because we need the result.id to create the estimated_duration
+      result.save!
+      result.estimated_duration = EstimatedDuration.new({ wiki_page_id: result.id, duration: estimated_duration.duration.iso8601 })
+    end
+
     result
   end
 

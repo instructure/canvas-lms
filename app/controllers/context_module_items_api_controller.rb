@@ -727,7 +727,7 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(original_tag.context_module, @current_user, :update)
       if original_tag.duplicate_able?
         new_content = original_tag.content.duplicate
-        new_content.save!
+        new_content.save! unless new_content.persisted?
         new_tag = original_tag.context_module.add_item({
                                                          type: original_tag.content_type,
                                                          indent: original_tag.indent,

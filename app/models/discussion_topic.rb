@@ -574,6 +574,13 @@ class DiscussionTopic < ActiveRecord::Base
     # For some reason, the relation doesn't take care of this for us. Don't understand why.
     # Without this line, *two* discussion topic duplicates appear when a save is performed.
     result.assignment&.discussion_topic = result
+
+    if estimated_duration
+      # we have to save result here because we need the result.id to create the estimated_duration
+      result.save!
+      result.estimated_duration = EstimatedDuration.new({ discussion_topic_id: result.id, duration: estimated_duration.duration.iso8601 })
+    end
+
     result
   end
 

@@ -284,4 +284,38 @@ module ModulesIndexPage
     unpublish_module_and_items_option.click
     wait_for_ajax_requests
   end
+
+  def click_on_edit_item_link(tag_id)
+    f("#context_module_item_#{tag_id} .al-trigger").click
+    fj(".edit_item_link:visible").click
+  end
+
+  def click_on_duplicate_item_link(tag_id)
+    f("#context_module_item_#{tag_id} .al-trigger").click
+    fj(".duplicate_item_link:visible").click
+  end
+
+  def check_estimated_duration_in_editor(exists, visible)
+    expect(element_exists?(".ui-dialog")).to be_truthy
+    if exists
+      expect(element_exists?("#estimated_duration_edit")).to be_truthy
+      if visible
+        expect(f("#estimated_duration_edit")).to be_displayed
+      else
+        expect(f("#estimated_duration_edit")).not_to be_displayed
+      end
+    else
+      expect(element_exists?("#estimated_duration_edit")).to be_falsey
+    end
+  end
+
+  def close_editor_dialog
+    fj(".ui-dialog-titlebar-close:visible").click
+  end
+
+  def save_edit_item_form
+    form = f("#edit_item_form")
+    form.submit
+    wait_for_ajaximations
+  end
 end
