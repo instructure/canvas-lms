@@ -19,15 +19,21 @@
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import BulkActionButtons from '../BulkActionButtons'
+import {type File, type Folder} from '../../../../interfaces/File'
 
 let defaultProps: any
 describe('BulkActionButtons', () => {
   beforeEach(() => {
     defaultProps = {
+      size: 'medium',
       selectedRows: new Set(['1', '2']),
       totalRows: 10,
       userCanEditFilesForContext: true,
       userCanDeleteFilesForContext: true,
+      rows: [
+        {id: '1', uuid: '1', display_name: 'File 1'} as File,
+        {id: '2', uuid: '2', display_name: 'File 2'} as File,
+      ],
     }
   })
 
@@ -74,4 +80,77 @@ describe('BulkActionButtons', () => {
     const button = screen.getByTestId('bulk-actions-more-button')
     expect(button.closest('button')).toHaveAttribute('disabled')
   })
+
+  it('renders the delete button as disabled when no rows are selected', () => {
+    defaultProps.selectedRows = new Set()
+    render(<BulkActionButtons {...defaultProps} />)
+    const deleteButton = screen.getByTestId('bulk-actions-delete-button')
+    expect(deleteButton.closest('button')).toHaveAttribute('disabled')
+  })
+
+  it('renders the delete button as enabled when rows are selected', () => {
+    render(<BulkActionButtons {...defaultProps} />)
+    const deleteButton = screen.getByTestId('bulk-actions-delete-button')
+    expect(deleteButton.closest('button')).not.toHaveAttribute('disabled')
+  })
+
+  it('opens the delete modal with selected rows when delete button is clicked', async () => {
+    render(<BulkActionButtons {...defaultProps} />)
+    const deleteButton = screen.getByTestId('bulk-actions-delete-button')
+    fireEvent.click(deleteButton)
+    expect(await screen.findByText('Delete Items')).toBeInTheDocument()
+  })
+
+  it('renders the more button as disabled when no rows are selected', () => {
+    defaultProps.selectedRows = new Set()
+    render(<BulkActionButtons {...defaultProps} />)
+    const moreButton = screen.getByTestId('bulk-actions-more-button')
+    expect(moreButton.closest('button')).toHaveAttribute('disabled')
+  })
+
+  it('renders the more button as enabled when rows are selected', () => {
+    render(<BulkActionButtons {...defaultProps} />)
+    const moreButton = screen.getByTestId('bulk-actions-more-button')
+    expect(moreButton.closest('button')).not.toHaveAttribute('disabled')
+  })
+
+  it('renders the manage access button when userCanEditFilesForContext is true', async () => {
+    render(<BulkActionButtons {...defaultProps} />)
+    const moreButton = screen.getByTestId('bulk-actions-more-button')
+    fireEvent.click(moreButton)
+    await waitFor(() => {
+      expect(screen.getByTestId('bulk-actions-manage-usage-rights-button')).toBeInTheDocument()
+    })
+  })
+
+  it('does not render the manage access button when userCanEditFilesForContext is false', async () => {
+    defaultProps.userCanEditFilesForContext = false
+    render(<BulkActionButtons {...defaultProps} />)
+    const moreButton = screen.getByTestId('bulk-actions-more-button')
+    fireEvent.click(moreButton)
+    await waitFor(() => {
+      expect(screen.queryByTestId('bulk-actions-manage-usage-rights-button')).toBeNull()
+    })
+  })
+
+  it('renders the move button when userCanEditFilesForContext is true', async () => {
+    render(<BulkActionButtons {...defaultProps} />)
+    const moreButton = screen.getByTestId('bulk-actions-more-button')
+    fireEvent.click(moreButton)
+    await waitFor(() => {
+      expect(screen.getByTestId('bulk-actions-move-button')).toBeInTheDocument()
+    })
+  })
+
+  it('does not render the move button when userCanEditFilesForContext is false', async () => {
+    defaultProps.userCanEditFilesForContext = false
+    render(<BulkActionButtons {...defaultProps} />)
+    const moreButton = screen.getByTestId('bulk-actions-more-button')
+    fireEvent.click(moreButton)
+    await waitFor(() => {
+      expect(screen.queryByTestId('bulk-actions-move-button')).toBeNull()
+    })
+  })
 })
+
+

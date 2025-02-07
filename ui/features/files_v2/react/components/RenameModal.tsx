@@ -142,7 +142,7 @@ export const RenameModal = ({
           </View>
         ) : (
           <>
-            <FileFolderInfo item={renamingItem} />
+            <FileFolderInfo items={[renamingItem]} />
             <div style={{paddingTop: '1.5rem'}}>
               <TextInput
                 defaultValue={isFile(renamingItem) ? renamingItem.display_name : renamingItem.name}

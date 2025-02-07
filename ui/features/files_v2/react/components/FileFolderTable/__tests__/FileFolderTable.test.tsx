@@ -21,6 +21,12 @@ import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
 import {renderComponent} from './testUtils'
+import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashSuccess: jest.fn(),
+  showFlashError: jest.fn(),
+}))
 
 describe('FileFolderTable', () => {
   let flashElements: any
@@ -37,6 +43,7 @@ describe('FileFolderTable', () => {
     fetchMock.restore()
     document.body.removeChild(flashElements)
     flashElements = undefined
+    jest.clearAllMocks()
   })
 
   it('renders filedrop when no results and not loading', async () => {
@@ -258,6 +265,55 @@ describe('FileFolderTable', () => {
       renderComponent()
 
       expect(screen.queryByText('Blueprint')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('FileFolderTable - delete behavior', () => {
+    it('opens delete modal when delete button is clicked', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+
+      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+      await user.click(rowCheckboxes[0])
+
+      const deleteButton = screen.getByTestId('bulk-actions-delete-button')
+      await user.click(deleteButton)
+
+      expect(await screen.findByText('Deleting this item cannot be undone. Do you want to continue?')).toBeInTheDocument()
+    })
+
+    it('renders flash success when items are deleted successfully', async () => {
+      const user = userEvent.setup()
+      fetchMock.delete(/.*\/folders\/46\?force=true/, 200, { overwriteRoutes: true })
+      renderComponent()
+
+      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+      await user.click(rowCheckboxes[0])
+
+      const deleteButton = screen.getByTestId('bulk-actions-delete-button')
+      await user.click(deleteButton)
+
+      const confirmButton = await screen.getByTestId('modal-delete-button')
+      await user.click(confirmButton)
+
+      expect(showFlashSuccess).toHaveBeenCalledWith('1 item deleted successfully')
+    })
+
+    it('renders flash error when delete fails', async () => {
+      const user = userEvent.setup()
+      fetchMock.delete(/.*\/folders\/46\?force=true/, 500, { overwriteRoutes: true })
+      renderComponent()
+
+      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+      await user.click(rowCheckboxes[0])
+
+      const deleteButton = screen.getByTestId('bulk-actions-delete-button')
+      await user.click(deleteButton)
+
+      const confirmButton = await screen.getByTestId('modal-delete-button')
+      await user.click(confirmButton)
+
+      expect(showFlashError).toHaveBeenCalledWith('Failed to delete items. Please try again.')
     })
   })
 })

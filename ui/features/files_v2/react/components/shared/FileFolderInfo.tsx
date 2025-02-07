@@ -26,30 +26,66 @@ import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
+import {IconCollectionLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('files_v2')
 
-const FileFolderInfo = ({item}: {item: File | Folder}) => (
-  <View as="div" borderWidth="small" borderRadius="medium" padding="xxx-small">
-    <Flex padding="x-small" gap="small">
-      <Flex.Item>
-        {item.thumbnail_url ? (
-          <Img height="3em" width="3em" alt="" src={item.thumbnail_url} />
-        ) : (
-          getIcon(item, !!item.folder_id, item.thumbnail_url, {size: 'medium'})
-        )}
-      </Flex.Item>
+interface FileFolderInfoProps {
+  items: (File | Folder)[]
+}
 
-      <Flex.Item shouldGrow={true} shouldShrink={true}>
-        <Text weight="bold">
-          <TruncateText position="middle">
-            {item.display_name || item.filename || item.name}
-          </TruncateText>
-        </Text>
-        <Text size="small">{item.size ? formatFileSize(item.size) : I18n.t('Folder')}</Text>
-      </Flex.Item>
-    </Flex>
-  </View>
-)
+const FileFolderInfo = ({items}: FileFolderInfoProps) => {
+  if (items.length === 0) return null
+
+  if (items.length > 1) {
+    return (
+      <View as="div" borderWidth="small" borderRadius="medium" padding="xxx-small" key="multiple-items">
+        <Flex padding="x-small" gap="small">
+          <Flex.Item>
+            <IconCollectionLine
+                data-testid="multiple-items-icon"
+                color="primary"
+                title={I18n.t('Multiple Items')}
+                size="medium"
+            />
+          </Flex.Item>
+
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
+            <Text weight="bold">
+              <TruncateText position="middle">
+                {I18n.t('Selected Items (%{count})', {count: items.length})}
+              </TruncateText>
+            </Text>
+          </Flex.Item>
+        </Flex>
+      </View>
+    )
+  }
+
+  const item = items[0]
+
+  return (
+    <View as="div" borderWidth="small" borderRadius="medium" padding="xxx-small" key={item.id}>
+      <Flex padding="x-small" gap="small">
+        <Flex.Item>
+          {item.thumbnail_url ? (
+            <Img height="3em" width="3em" alt="" src={item.thumbnail_url} />
+          ) : (
+            getIcon(item, !!item.folder_id, item.thumbnail_url, {size: 'medium'})
+          )}
+        </Flex.Item>
+
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
+          <Text weight="bold">
+            <TruncateText position="middle">
+              {item.display_name || item.filename || item.name}
+            </TruncateText>
+          </Text>
+          <Text size="small">{item.size ? formatFileSize(item.size) : I18n.t('Folder')}</Text>
+        </Flex.Item>
+      </Flex>
+    </View>
+  )
+}
 
 export default FileFolderInfo

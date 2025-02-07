@@ -139,7 +139,7 @@ const DirectShareCourseTray = ({open, onDismiss, courseId, file}: DirectShareCou
     >
       <Flex direction="column">
         <Flex.Item padding="small">
-          <FileFolderInfo item={file} />
+          <FileFolderInfo items={[file]} />
         </Flex.Item>
         {warningVisible && (
           <Flex.Item padding="small">
