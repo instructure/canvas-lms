@@ -5390,6 +5390,7 @@ uk:
   course_pages_449f1dd4: "Сторінки курсу"
   course_people_3058c948: "Люди курсу"
   course_quizzes_c337653c: "Контрольні роботи курсу"
+  course_quota_8f7f74c: "Квота курсу"
   course_restore: 
     restore_error: "Відбулася помилка при спробі відновити цей курс. Курс не був відновлений."
   course_role_role_type_119c2f64: "Роль курсу: %{role_type}"
@@ -6281,6 +6282,7 @@ uk:
   deep_orange_4c7eea99: Темно-помаранчевий
   deep_purple_bb3e2907: Темно-фіолетовий
   default_9db103d: "За замовчуванням"
+  default_account_quotas_e34112fd: "Квоти облікового запису за замовчуванням"
   default_conference_title: "%{course_name} конференція"
   default_email_5cb9fa04: "Електронна пошта за замовчуванням"
   default_email_9efb7fbd: "Електронна пошта за замовчуванням"
@@ -7784,6 +7786,7 @@ uk:
   find_an_existing_grading_scheme_d836ea: "Знайти існуючу схему оцінювання"
   find_an_outcome_919328e6: "Знайти результат"
   find_appointment_85d6922e: "Знайти призначення"
+  find_course_or_group_a7de09a4: "Знайти курс або групу"
   find_flickr_image_view: 
     find_cc_on_flickr: "Знайти зображення творчих спільнот на Flickr"
     search: Пошук
@@ -8442,6 +8445,7 @@ uk:
   group_group_name_is_for_a_different_section_4d84d256: "Група %{group_name} призначена для іншого розділу"
   group_group_name_is_full_297880d6: "Група %{group_name} повна"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "До групи %{group_name} можна приєднатися тільки за запрошенням"
+  group_id_b0f6af89: "ID групи"
   group_is_for_a_different_section_6a843a4d: "Група призначена для іншого розділу"
   group_is_full_56849d78: "Група повна"
   group_is_joined_by_invitation_only_d00f5a63: "До групи можна приєднатися тільки за запрошенням"
@@ -8465,6 +8469,7 @@ uk:
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} в %{group_category_name} категорії груп"
   group_name_is_required_5547bc0b: "Ім'я групи обов'язкове"
   group_pages_656556f3: "Сторінки групи"
+  group_quota_290dbc6b: "Квота групи"
   group_roster_1846bf84: "Реєстр груп"
   group_select_330df8bd: "Вибір групи"
   group_set_4d1e7b06: "Набір груп"
@@ -9712,6 +9717,7 @@ uk:
   manual_8c2665de: Керівництво
   manual_entry_e4a4f99a: "Ручне введення"
   manually_mark_posts_as_read_afa5d035: "Вручну позначити повідомлення як прочитані"
+  manually_settable_quotas_ea3759e7: "Квоти, які налаштовуються вручну"
   mark_all_as_read_8f3bdf57: "Позначити все як Прочитане"
   mark_all_as_unread_a435be3d: "Позначити все як Непрочитане"
   mark_as_done_6fa48d2f: "Позначити як виконане"
@@ -9831,6 +9837,7 @@ uk:
   median_score_4657e907: "Середня:  %{score}"
   meets_expectations_bb179565: "Відповідає очікуванням"
   meets_mastery_754e1c06: "Відповідає майстерності"
+  megabytes_885404ef: мегабайтів
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} учасників з максимально %{max_membership}"
   members_af25c21d: Учасники
   members_are_free_to_join_defa5929: "Учасники можуть вільно приєднатися"
@@ -18079,6 +18086,7 @@ uk:
   update_link_b7cab181: "Оновити посилання"
   update_module_b984c2e5: "Оновити модуль"
   update_password_4bc5cb1f: "Оновити пароль"
+  update_quota_81381226: "Оновити квоту"
   update_rating_6d29c2ef: "Оновити рейтинг"
   update_settings_9b422d0f: "Налаштування оновлення"
   update_tool_7d48ef2a: "Оновити %{tool}"
@@ -18089,6 +18097,7 @@ uk:
   updated_terms_of_service_82f34148: "Оновити Умови надання сервісу"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Оновлений інтерфейс користувача для пошуку та відображення користувачів і курсів в обліковому записі."
   updating_6edbab78: Оновлення
+  updating_73d0718c: Оновлення...
   updating_user_details_b8520b3e: "Оновлення даних користувача..."
   upload_8b403d05: Завантажити
   upload_a_picture_9f5f6e3c: "Завантажити зображення"
@@ -18309,6 +18318,7 @@ uk:
       settings: Налаштування
   user_profile_d56261fc: "Профіль користувача"
   user_profile_picture_46bffbc7: "Зображення профілю користувача"
+  user_quota_12cb58b7: "Квота користувача"
   user_s_settings_d65644b4: "Налаштування %{user}"
   user_search_panel_18f80511: "Панель пошуку користувачів"
   user_search_results_f5445b8b: "Результати пошуку користувачів"
