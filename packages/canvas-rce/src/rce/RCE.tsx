@@ -79,7 +79,6 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
         setTranslations(true)
       })
       .catch(err => {
-         
         console.error('Failed loading the language file for', locale, '\n Cause:', err)
         setTranslations(false)
       })
@@ -242,24 +241,7 @@ export interface RCEPropTypes {
    * properties necessary for the RCE to us the RCS
    * if missing, RCE features that require the RCS are omitted
    */
-  rcsProps?: {
-    canUploadFiles: RCETrayProps
-    contextId: string
-    contextType: string
-    containingContext?: {
-      contextType: string
-      contextId: string
-      userId: string
-    }
-    filesTabDisabled?: boolean
-    host?: (props: any, propName: any, componentName: any) => void
-    jwt?: (props: any, propName: any, componentName: any) => void
-    refreshToken?: () => void
-    source?: {
-      fetchImages: () => void
-    }
-    themeUrl?: string
-  }
+  rcsProps?: RCETrayProps
 
   /**
    * enable the custom icon maker feature (temporary until the feature is forced on)
