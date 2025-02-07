@@ -403,14 +403,6 @@ export default function CanvasContentTray(props) {
 
 CanvasContentTray.globalOpenCount = 0
 
-function requiredWithoutSource(props, propName, componentName) {
-  if (props.source == null && props[propName] == null) {
-    throw new Error(
-      `The prop \`${propName}\` is marked as required in \`${componentName}\`, but its value is \`${props[propName]}\`.`,
-    )
-  }
-}
-
 // Changes made here may need to be reflected in the trayProps type in CanvasContentPanel
 const trayPropsMap = {
   canUploadFiles: bool.isRequired,
@@ -422,8 +414,8 @@ const trayPropsMap = {
     userId: string.isRequired,
   }),
   filesTabDisabled: bool,
-  host: requiredWithoutSource,
-  jwt: requiredWithoutSource,
+  host: string,
+  jwt: string,
   refreshToken: func,
   source: shape({
     fetchImages: func.isRequired,
@@ -443,7 +435,7 @@ CanvasContentTray.propTypes = {
 }
 
 // the way we define trayProps, eslint doesn't recognize the following as props
- 
+
 CanvasContentTray.defaultProps = {
   canUploadFiles: false,
   filesTabDisabled: false,
@@ -451,4 +443,3 @@ CanvasContentTray.defaultProps = {
   source: null,
   themeUrl: null,
 }
- 

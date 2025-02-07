@@ -172,6 +172,7 @@ const ImageBlock = ({
         ) : null}
 
         <div
+          // @ts-expect-error
           ref={imgRef}
           dangerouslySetInnerHTML={{__html: svg || ''}}
           style={{width: '100%', height: '100%', objectFit: imgConstrain, display: 'inline-block'}}

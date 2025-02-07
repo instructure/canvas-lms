@@ -18,7 +18,7 @@
 
 import React, {ReactNode, Suspense} from 'react'
 import {Editor} from '@tinymce/tinymce-react'
-// eslint-disable-next-line no-redeclare
+
 import tinymce from 'tinymce'
 import type {Editor as TinyMCEEditor} from 'tinymce'
 import _ from 'lodash'
@@ -95,6 +95,7 @@ import {
   mergePlugins,
   mergeToolbar,
   parsePluginsToExclude,
+  patchAutosavedContent,
 } from './RCEWrapper.utils'
 import {AlertMessage, RCETrayProps} from './types'
 import {externalToolsForToolbar} from './plugins/instructure_rce_external_tools/util/externalToolsForToolbar'
@@ -399,7 +400,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     if (tinyauxlist.length) {
       const myaux = tinyauxlist[tinyauxlist.length - 1]
       if (myaux.id) {
-        // eslint-disable-next-line no-console
         console.error('Unexpected ID on my tox-tinymce-aux element')
       }
       myaux.id = `tinyaux-${this.id}`
@@ -812,7 +812,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   _isFullscreen() {
-    // @ts-expect-error
     return !!(this.state.fullscreenState.isTinyFullscreen || document[FS_ELEMENT])
   }
 
@@ -840,21 +839,18 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   _exitFullscreen() {
-    // @ts-expect-error
     if (document[FS_ELEMENT]) {
       const tinymenuhost = this._myTinymceAuxDiv()
       if (tinymenuhost) {
         tinymenuhost.remove()
         document.body.appendChild(tinymenuhost)
       }
-      // @ts-expect-error
       document[FS_EXIT]()
     }
   }
 
   // @ts-expect-error
   _onFullscreenChange = event => {
-    // @ts-expect-error
     if (document[FS_ELEMENT]) {
       // @ts-expect-error
       this.resizeObserver.observe(document[FS_ELEMENT])
@@ -877,9 +873,8 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   _handleFullscreenResize = () => {
-    // @ts-expect-error
     const ht = window.visualViewport?.height || document[FS_ELEMENT]?.offsetHeight
-    this._setHeight(ht - this._getStatusBarHeight())
+    this._setHeight((ht || 0) - this._getStatusBarHeight())
   }
 
   _getStatusBarHeight(): number {
@@ -1383,17 +1378,14 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           // We'll compare just the text of the autosave content, since
           // Canvas is prone to swizzling images and iframes which will
           // make the editor content and autosave content never match up
-          const editorContent = this.patchAutosavedContent(
-            editor.getContent({no_events: true}),
-            true,
-          )
-          const autosavedContent = this.patchAutosavedContent(autosaved.content, true)
+          const editorContent = patchAutosavedContent(editor.getContent({no_events: true}), true)
+          const autosavedContent = patchAutosavedContent(autosaved.content, true)
 
           if (autosavedContent !== editorContent) {
             this.setState({
               confirmAutoSave: true,
               // @ts-expect-error
-              autoSavedContent: this.patchAutosavedContent(autosaved.content),
+              autoSavedContent: patchAutosavedContent(autosaved.content),
             })
           } else {
             this.storage.removeItem(this.autoSaveKey)
@@ -1438,22 +1430,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     })
     // let the content be restored
     debounce(this.checkAccessibility, 1000)()
-  }
-
-  // if a placeholder image shows up in autosaved content, we have to remove it
-  // because the data url gets converted to a blob, which is not valid when restored.
-  // besides, the placeholder is intended to be temporary while the file
-  // is being uploaded
-  // @ts-expect-error
-  patchAutosavedContent(content: string, asText) {
-    const temp = document.createElement('div')
-    temp.innerHTML = content
-    temp.querySelectorAll('[data-placeholder-for]').forEach(placeholder => {
-      // @ts-expect-error
-      placeholder.parentElement.removeChild(placeholder)
-    })
-    if (asText) return temp.textContent
-    return temp.innerHTML
   }
 
   getAutoSaved(key: string) {
@@ -1511,7 +1487,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           this.cleanupAutoSave(true)
           this.doAutoSave(e, true)
         } else {
-          // eslint-disable-next-line no-console
           console.error('Autosave failed:', ex)
         }
       }
@@ -1653,7 +1628,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         })
       })
       .catch(ex => {
-        // eslint-disable-next-line no-console
         console.error('Failed loading the AIToolsTray', ex)
       })
   }
@@ -1758,7 +1732,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       canvasPlugins.push('instructure_icon_maker')
     }
 
-    // @ts-expect-error
     if (document[FS_ENABLED]) {
       canvasPlugins.push('instructure_fullscreen')
     }
@@ -2094,7 +2067,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         <style>{this.style.css}</style>
         <StoreProvider
           jwt={this.props.trayProps?.jwt}
-          // @ts-expect-error
           refreshToken={this.props.trayProps?.refreshToken}
           host={this.props.trayProps?.host}
           contextType={this.props.trayProps?.contextType}

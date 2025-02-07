@@ -31,6 +31,5 @@ export const FS_ENABLED = document.fullscreenEnabled
   ? 'fullscreenEnabled'
   : 'webkitFullscreenEnabled'
 
-export const instuiPopupMountNodeFn: () => HTMLElement | null | undefined =
-  // @ts-expect-error
-  () => document.fullscreenElement || document.webkitFullscreenElement
+export const instuiPopupMountNodeFn: () => HTMLElement | null | undefined = () =>
+  document.fullscreenElement || document.webkitFullscreenElement

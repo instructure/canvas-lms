@@ -30,6 +30,7 @@ import '@instructure/canvas-theme'
 import type {Editor} from 'tinymce'
 // @ts-expect-error
 import generateId from 'format-message-generate-id/underscored_crc32'
+import type {RCETrayProps} from './types'
 
 if (!process || !process.env || !process.env.BUILD_LOCALE) {
   formatMessage.setup({
@@ -78,7 +79,7 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
         setTranslations(true)
       })
       .catch(err => {
-        // eslint-disable-next-line no-console
+         
         console.error('Failed loading the language file for', locale, '\n Cause:', err)
         setTranslations(false)
       })
@@ -242,7 +243,7 @@ export interface RCEPropTypes {
    * if missing, RCE features that require the RCS are omitted
    */
   rcsProps?: {
-    canUploadFiles: boolean
+    canUploadFiles: RCETrayProps
     contextId: string
     contextType: string
     containingContext?: {
@@ -298,9 +299,10 @@ export interface RCEPropTypes {
   externalToolsConfig?: ExternalToolsConfig
 }
 
-const defaultProps = {
+RCE.defaultProps = {
   autosave: {enabled: false, maxAge: 3600000},
   defaultContent: '',
+  // @ts-expect-error
   editorOptions: {},
   renderKBShortcutModal: true,
   highContrastCSS: [],
@@ -316,8 +318,5 @@ const defaultProps = {
   onContentChange: () => undefined,
   onInit: () => undefined,
 }
-
-// @ts-expect-error
-RCE.defaultProps = defaultProps
 
 export default RCE
