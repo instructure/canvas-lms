@@ -135,14 +135,6 @@ class NewContentMigrationPage
       f("#courseSelectWarning")
     end
 
-    def module
-      f('li.top-level-treeitem[data-type="context_modules"] a.checkbox-caret')
-    end
-
-    def submodule
-      f('li.top-level-treeitem[data-type="context_modules"] li.normal-treeitem')
-    end
-
     def external_tool_launch_button
       external_tool_launch.find_element(:xpath, "../parent::button")
     end

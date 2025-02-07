@@ -27,10 +27,34 @@ class SelectContentPage
     end
 
     def outcome_option_caret_by_name(name)
-      fxpath("//*[contains(text(), '#{name}')]/ancestor::button")
+      option_caret_by_name(name)
     end
 
     def outcome_option_checkbox_by_name(name)
+      option_checkbox_by_name(name)
+    end
+
+    def module_parent
+      fxpath("//*[contains(text(), 'Modules')]/ancestor::button")
+    end
+
+    def module_option_caret_by_name(name)
+      option_caret_by_name(name)
+    end
+
+    def module_option_checkbox_by_name(name)
+      option_checkbox_by_name(name)
+    end
+
+    def option_caret_by_name(name)
+      fxpath("//*[contains(text(), '#{name}')]/ancestor::button")
+    end
+
+    def import_as_standalone_module_switch_by_name(name)
+      fxpath("//*[contains(text(), '#{name}')]/ancestor::span//*[contains(text(), 'Import as a standalone module')]")
+    end
+
+    def option_checkbox_by_name(name)
       fxpath("//*[contains(text(), '#{name}')]/ancestor::label//span[@aria-hidden='true']")
     end
 
