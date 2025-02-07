@@ -20,6 +20,7 @@ import {render, screen} from '@testing-library/react'
 import React from 'react'
 import '@testing-library/jest-dom'
 import {waitFor} from '@testing-library/dom'
+import {userEvent} from '@testing-library/user-event'
 import {HelpTrayProvider, useHelpTray} from '..'
 
 const TestComponent = () => {
@@ -38,8 +39,17 @@ const TestComponent = () => {
 }
 
 describe('HelpTrayContext', () => {
+  let originalHash: string
+
+  beforeEach(() => {
+    originalHash = window.location.hash
+    window.history.pushState(null, '', '/')
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+  })
+
   afterEach(() => {
-    window.location.hash = ''
+    window.history.pushState(null, '', originalHash)
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
   })
 
   it('renders without crashing', () => {
@@ -61,7 +71,7 @@ describe('HelpTrayContext', () => {
     })
 
     it('initializes isHelpTrayOpen to true if the hash is #help', () => {
-      window.location.hash = '#help'
+      window.history.pushState(null, '', '#help')
       render(
         <HelpTrayProvider>
           <TestComponent />
@@ -71,7 +81,6 @@ describe('HelpTrayContext', () => {
     })
 
     it('initializes isHelpTrayOpen to false if the hash is not #help', () => {
-      window.location.hash = ''
       render(
         <HelpTrayProvider>
           <TestComponent />
@@ -82,45 +91,45 @@ describe('HelpTrayContext', () => {
   })
 
   describe('state updates', () => {
-    it('allows openHelpTray to set isHelpTrayOpen to true', () => {
+    it('allows openHelpTray to set isHelpTrayOpen to true', async () => {
       render(
         <HelpTrayProvider>
           <TestComponent />
         </HelpTrayProvider>,
       )
       const openButton = screen.getByTestId('openTrayButton')
-      openButton.click()
+      await userEvent.click(openButton)
       expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true')
     })
 
-    it('allows closeHelpTray to set isHelpTrayOpen to false', () => {
+    it('allows closeHelpTray to set isHelpTrayOpen to false', async () => {
       render(
         <HelpTrayProvider>
           <TestComponent />
         </HelpTrayProvider>,
       )
       const openButton = screen.getByTestId('openTrayButton')
-      const closeButton = screen.getByTestId('closeTrayButton')
-      openButton.click()
+      await userEvent.click(openButton)
       expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true')
-      closeButton.click()
+      const closeButton = screen.getByTestId('closeTrayButton')
+      await userEvent.click(closeButton)
       expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('false')
     })
   })
 
   describe('hash synchronization', () => {
-    it('updates the hash to #help when openHelpTray is called', () => {
+    it('updates the hash to #help when openHelpTray is called', async () => {
       render(
         <HelpTrayProvider>
           <TestComponent />
         </HelpTrayProvider>,
       )
       const openButton = screen.getByTestId('openTrayButton')
-      openButton.click()
+      await userEvent.click(openButton)
       expect(window.location.hash).toBe('#help')
     })
 
-    it('removes the hash when closeHelpTray is called', () => {
+    it('removes the hash when closeHelpTray is called', async () => {
       window.location.hash = '#help'
       render(
         <HelpTrayProvider>
@@ -128,7 +137,7 @@ describe('HelpTrayContext', () => {
         </HelpTrayProvider>,
       )
       const closeButton = screen.getByTestId('closeTrayButton')
-      closeButton.click()
+      await userEvent.click(closeButton)
       expect(window.location.hash).toBe('')
     })
 
@@ -139,10 +148,9 @@ describe('HelpTrayContext', () => {
         </HelpTrayProvider>,
       )
       expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('false')
-      window.location.hash = '#help'
-      await waitFor(() => {
-        expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true')
-      })
+      window.history.pushState(null, '', '#help')
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+      await waitFor(() => expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true'))
     })
 
     it('updates isHelpTrayOpen to false when the hash changes away from #help', async () => {
