@@ -161,6 +161,61 @@ window.modules = (function () {
       )
     },
 
+    updateEstimatedDurations() {
+      if (!ENV.horizon_course){
+        return
+      }
+      return $.ajaxJSON(
+        ENV.CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL,
+        'GET',
+        {},
+        data => {
+          $(() => {
+            $.each(data, (module_id, durations_by_id) => {
+              let estimatedDurationSum = 0
+              let $context_module_item
+
+              $.each(durations_by_id, (id, info) => {
+                $context_module_item = $('#context_module_item_' + id)
+                const data = {
+                  estimated_duration_minutes: info.estimated_duration_minutes,
+                  can_set_estimated_duration: info.can_set_estimated_duration,
+                  estimated_duration_display: '',
+                }
+                if (info.estimated_duration_minutes != null && info.estimated_duration_minutes > 0) {
+                  estimatedDurationSum += info.estimated_duration_minutes
+                  $context_module_item.find('.ig-row').removeClass('no-estimated-duration')
+                  data.estimated_duration_display = I18n.t('%{minutes} Mins', {minutes: info.estimated_duration_minutes})
+                } else {
+                  $context_module_item.find('.ig-row').addClass('no-estimated-duration')
+                }
+                $context_module_item.fillTemplateData({
+                  data,
+                  htmlValues: ['estimated_duration_display', 'estimated_duration_minutes', 'can_set_estimated_duration'],
+                })
+              })
+
+              const $moduleHeader = $('#context_module_' + module_id).find('.ig-header')
+              const headerData = {
+                estimated_duration_header_title: '',
+                estimated_duration_header_minutes: ''
+              }
+
+              if (estimatedDurationSum > 0) {
+                headerData.estimated_duration_header_title = I18n.t('Time to Complete:')
+                headerData.estimated_duration_header_minutes = I18n.t('%{minutes} Mins', {minutes: estimatedDurationSum})
+              }
+
+              $moduleHeader.fillTemplateData({
+                data: headerData,
+                htmlValues: ['estimated_duration_header_title', 'estimated_duration_header_minutes'],
+              })
+            })
+          })
+        },
+      )
+    },
+
     updateModuleItemPositions(event, ui) {
       const $module = ui.item.parents('.context_module')
       const moduleId = $module.attr('id').substring('context_module_'.length)
@@ -1029,6 +1084,7 @@ modules.initModuleManagement = async function (duplicate) {
           }
           $newModule.find('.collapse_module_link').focus()
           modules.updateAssignmentData()
+          modules.updateEstimatedDurations()
           // Unbind event handlers with 'off' because they will get re-bound in initModuleManagement
           // and we don't want them to be called twice on click.
           $(document).off('click', '.delete_module_link')
@@ -1127,6 +1183,7 @@ modules.initModuleManagement = async function (duplicate) {
           modules.addItemToModule($module, data.content_tag)
           $module.find('.context_module_items.ui-sortable').sortable('refresh')
           modules.updateAssignmentData()
+          modules.updateEstimatedDurations()
         },
         _data => {},
       ).done(() => {
@@ -1146,7 +1203,7 @@ modules.initModuleManagement = async function (duplicate) {
     event.preventDefault()
     const $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger')
     const $item = $(this).parents('.context_module_item')
-    const data = $item.getTemplateData({textValues: ['url', 'indent', 'new_tab']})
+    const data = $item.getTemplateData({textValues: ['url', 'indent', 'new_tab', 'estimated_duration_minutes', 'can_set_estimated_duration']})
     data.title = $item.find('.title').attr('title')
     data.indent = modules.currentIndent($item)
     $('#edit_item_form')
@@ -1160,6 +1217,12 @@ modules.initModuleManagement = async function (duplicate) {
     const isDisabled =
       !get(ENV, 'MASTER_COURSE_SETTINGS.IS_MASTER_COURSE') && !!get(restrictions, 'content')
     $titleInput.prop('disabled', isDisabled)
+
+    if(data.can_set_estimated_duration === 'false') {
+      $('#estimated_duration_edit').css({display: 'none'})
+    } else {
+      $('#estimated_duration_edit').css({display: 'table-row'})
+    }
 
     $('#edit_item_form')
       .dialog({
@@ -1205,6 +1268,7 @@ modules.initModuleManagement = async function (duplicate) {
         modules.updateAllItemInstances(data.content_tag)
       }
       modules.updateAssignmentData()
+      modules.updateEstimatedDurations()
       $(this).dialog('close')
     },
     error(data) {
@@ -1247,6 +1311,7 @@ modules.initModuleManagement = async function (duplicate) {
           $(this).slideUp(function () {
             $(this).remove()
             modules.updateTaggedItems()
+            modules.updateEstimatedDurations()
             $placeToFocus.focus()
             refreshDuplicateLinkStatus($currentModule)
           })
@@ -1500,6 +1565,7 @@ modules.initModuleManagement = async function (duplicate) {
           initNewItemPublishButton($item, data.content_tag)
           initNewItemDirectShare($item, data.content_tag)
           modules.updateAssignmentData()
+          modules.updateEstimatedDurations()
 
           $item.find('.lock-icon').data({
             moduleType: data.content_tag.type,
@@ -1532,6 +1598,7 @@ modules.initModuleManagement = async function (duplicate) {
         initNewItemPublishButton($item, data.content_tag)
         initNewItemDirectShare($item, data.content_tag)
         modules.updateAssignmentData()
+        modules.updateEstimatedDurations()
 
         $item.find('.lock-icon').data({
           moduleType: data.content_tag.type,
@@ -1854,6 +1921,7 @@ modules.updateAssignmentData(() => {
     }
   })
 })
+modules.updateEstimatedDurations()
 
 $(document).ready(function () {
   $('.context_module').each(function () {

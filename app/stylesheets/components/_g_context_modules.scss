@@ -85,6 +85,16 @@ $context_module_bg_color: $ic-color-light;
         }
       }
     }
+
+    // Same for the estimated duration
+    // .estimated_duration_display.ig-details__item
+    &.no-estimated-duration {
+      .ig-details__item:nth-last-child(3) {
+        &:after {
+          display: none;
+        }
+      }
+    }
   }
 
   h2 .name {

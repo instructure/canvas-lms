@@ -439,6 +439,12 @@ class AbstractAssignment < ActiveRecord::Base
 
     result.post_to_sis = false
 
+    if estimated_duration
+      # we have to save result here because we need the result.id to create the estimated_duration
+      result.save!
+      result.estimated_duration = EstimatedDuration.new({ assignment_id: result.id, duration: estimated_duration.duration.iso8601 })
+    end
+
     result
   end
 

@@ -142,6 +142,8 @@
           <span class="position" style="display: none;"><%= module_item && module_item.position %></span>
           <span class="url" style="display: none;"><%= module_item.try(:url) if @can_view %></span>
           <span class="new_tab" style="display: none;"><%= module_item.try(:new_tab) ? '1' : '0' if @can_view %></span>
+          <span class="estimated_duration_minutes" style="display: none;"></span>
+          <span class="can_set_estimated_duration" style="display: none;"></span>
         </span>
       </div>
 
@@ -165,7 +167,7 @@
         <%end%>
         <div class="due_date_display ig-details__item"></div>
         <% if module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true))%>
-            <div class="points_possible_display ig-details__item"></div>
+          <div class="points_possible_display ig-details__item"></div>
         <%end%>
         <div class="requirement-description ig-details__item">
           <span class="completion_requirement">
@@ -233,6 +235,7 @@
             </span>
           </span>
         </div> <!-- requirement description end -->
+        <div class="estimated_duration_display ig-details__item"></div>
         <div class="mc_objectives ig-details__item"></div>
       </div>
       <% if module_item && module_item.content_type == 'ContextModuleSubHeader' %>

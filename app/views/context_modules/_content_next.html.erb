@@ -251,6 +251,32 @@ context_modules_header_props = {
           </td>
         </tr>
         <% end %>
+        <% if @context.horizon_course? %>
+        <tr id="estimated_duration_edit">
+          <td colspan="2">
+            <%= f.blabel :estimated_duration, :en => "Time to Complete" %>
+            <span>
+              <%= f.number_field :estimated_duration_minutes, min: 0, :style => "width: 40px;", id: "estimated_minutes" %>
+              <%= t(:estimated_duration_minutes, "Minutes") %>
+              <button
+                class="Button Button--icon-action-danger"
+                onClick="resetMinutes(event)"
+                title="<%= t(:remove_button_text, "Reset duration minutes") %>"
+                aria-label="<%= t(:remove_button_text, "Reset duration minutes") %>"
+                type="button">
+                <i class="icon-trouble"></i>
+              </button>
+            </span>
+            <script>
+              function resetMinutes(event) {
+                if (event != null) {
+                  event.preventDefault()
+                }
+                document.getElementById('estimated_minutes').value = 0
+              }
+            </script></td>
+        </tr>
+        <% end %>
         <tr class="external">
           <td colspan="2">
             <%= f.check_box :new_tab %>

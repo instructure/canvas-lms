@@ -61,6 +61,10 @@
     >
       <i class="icon-mini-arrow-down"></i>
       <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
+      <% if @context.horizon_course? %>
+        <span class="estimated_duration_header_title"></span>
+        <span class="estimated_duration_header_minutes"></span>
+      <%end%>
     </span>
     <span
       role="button"
@@ -74,6 +78,10 @@
     >
       <i class="icon-mini-arrow-right"></i>
       <span class="name ellipsis"><%= context_module.try_rescue(:name) || nbsp %></span>
+      <% if @context.horizon_course? %>
+        <span class="estimated_duration_header_title"></span>
+        <span class="estimated_duration_header_minutes"></span>
+      <%end%>
     </span>
     <%= render :partial => "context_modules/prerequisites_message", :locals => {:viewable => @can_view, :context_module => context_module} %>
     <div class="module_header_items">

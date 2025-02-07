@@ -2425,6 +2425,7 @@ class CoursesController < ApplicationController
           )
 
           js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
+          js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
 
           js_bundle :context_modules
           css_bundle :content_next, :context_modules2
@@ -2454,6 +2455,7 @@ class CoursesController < ApplicationController
           grading_standard = @context.grading_standard_or_default
           js_env(
             CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
+            CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url),
             PERMISSIONS: {
               manage: @context.grants_right?(@current_user, session, :manage),
               manage_groups: @context.grants_any_right?(@current_user,
