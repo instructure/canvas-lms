@@ -24,6 +24,8 @@ import AddUnassignedMenu from '../AddUnassignedMenu'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {waitFor} from '@testing-library/react'
+
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)
@@ -110,5 +112,30 @@ describe('AddUnassignedMenu', () => {
     sendResponse('POST', '/api/v1/groups/777/memberships', {})
     equal(waldo.get('group'), view.group)
     ok(!users.contains(waldo))
+  })
+
+  test('does not hide immediately on outerclick after opening', async () => {
+    // Create a dummy content element with id "content" so that position() doesn't fail.
+    const $dummyContent = $(
+      '<div id="content" style="position: relative; top: 0; height: 500px;"></div>',
+    ).appendTo('#fixtures')
+    const $dummyTarget = $('<div></div>').appendTo('#fixtures')
+
+    // Open the popover.
+    view.showBy($dummyTarget)
+
+    // Wait for the menu to render
+    await waitFor(() => {
+      expect(document.body.contains(view.el)).toBe(true)
+    })
+
+    // Trigger an outerclick event as soon as it renders.
+    view.$el.triggerHandler('outerclick', [document.createElement('div')])
+
+    // Verify that the menu didn't close
+    expect(document.body.contains(view.el)).toBe(true)
+
+    $dummyTarget.remove()
+    $dummyContent.remove()
   })
 })
