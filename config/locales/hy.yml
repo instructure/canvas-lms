@@ -4879,6 +4879,7 @@ hy:
   course_pages_449f1dd4: "Դասընթացի էջեր"
   course_people_3058c948: "Դասընթացն անցնող մարդիկ"
   course_quizzes_c337653c: "Դասընթացի թեստեր"
+  course_quota_8f7f74c: "Դասընթացի քվոտա"
   course_restore: 
     restore_error: "Դասընթացը վերականգնելիս սխալ է տեղի ունեցել: Դասընթացը չի վերականգնվել:"
   course_roles_d2d5d666: "Դասընթացի դերեր"
@@ -5793,6 +5794,7 @@ hy:
   decrease_indent_d9cf469d: "Փոքրացնել Ներսի Տողագլուխը"
   deep_orange_4c7eea99: "Մուգ նարնջագույն"
   deep_purple_bb3e2907: "Մուգ մանուշակագույն"
+  default_account_quotas_e34112fd: "Հաշվի՝ լռությամբ ընդունված քվոտաներ"
   default_conference_title: "%{course_name} կոնֆերանս"
   default_grade_cannot_be_set_to_ex_723caa59: "Լռությամբ ընդունվող գնահատականը չի կարող սահմանվել %{ex}"
   default_question_bank_c7bcc5e7: "Լռելյայն ընդունված հարցերի շտեմարան"
@@ -7211,6 +7213,7 @@ hy:
       bookmark_search: "Էջանիշի որոնում՝ %{service_name}"
   find_a_course_94301b4d: "Գտնել դասընթաց"
   find_an_existing_grading_scheme_d836ea: "Գտնել առկա գնահատման համակարգը"
+  find_course_or_group_a7de09a4: "Գտնել դասընթաց կամ խումբ"
   find_flickr_image_view: 
     find_cc_on_flickr: "Գտնել Creative Commons պատկերներ Flickr-ում"
     search: Որոնել
@@ -7952,6 +7955,7 @@ hy:
   group_group_name_is_for_a_different_section_4d84d256: "%{group_name} խումբը նախատեսված է մեկ այլ բաժնի համար"
   group_group_name_is_full_297880d6: "%{group_name} խումբը  համալրված է"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "%{group_name} խմբին կարելի է միանալ միայն հրավերի առկայության դեպքում"
+  group_id_b0f6af89: "Խմբի մուտքանուն"
   group_is_for_a_different_section_6a843a4d: "Խումբը նախատեսված է մեկ այլ բաժնի համար"
   group_is_full_56849d78: "Խումբը համալրված է"
   group_is_joined_by_invitation_only_d00f5a63: "Խմբին կարելի է միանալ միայն հրավերի առկայության դեպքում"
@@ -7974,6 +7978,7 @@ hy:
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} խումբը %{group_category_name} խմբի կատեգորիայում"
   group_name_is_required_5547bc0b: "Անհրաժեշտ է նշել խմբի անունը"
   group_pages_656556f3: "Խմբի էջեր"
+  group_quota_290dbc6b: "Խմբի քվոտա"
   group_set_4d1e7b06: "Խմբերի շարք"
   group_set_name_2aed2347: "Խմբերի շարքի անվանումը"
   group_settings: 
@@ -9144,6 +9149,7 @@ hy:
   manual_8c2665de: Ձեռքով
   manual_entry_e4a4f99a: "Մուտքագրում ձեռքով"
   manually_mark_posts_as_read_afa5d035: "Մեխանիկական եղանակով նշել գրառումները որպես ընթերցված"
+  manually_settable_quotas_ea3759e7: "Մեխանիկական եղանակով սահմանվող քվոտաներ"
   mark_all_as_read_8f3bdf57: "Բոլորը նշել որպես ընթերցված"
   mark_all_as_unread_a435be3d: "Բոլորը նշել որպես չընթերցված"
   mark_as_done_6fa48d2f: "Նշել որպես կատարված"
@@ -9249,6 +9255,7 @@ hy:
   median_score_4657e907: "Միջին՝ %{score}"
   meets_expectations_bb179565: "Համապատասխանում է սպասումներին"
   meets_mastery_754e1c06: "Համապատասխանում է անցողիկ միավորին"
+  megabytes_885404ef: մեգաբայթեր
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{max_membership} անդամակցության առավելագույն թվից  %{member_count} անդամներ "
   members_af25c21d: Անդամներ
   members_are_free_to_join_defa5929: "Անդամները կարող են միանալ"
@@ -17068,12 +17075,14 @@ hy:
   update_grade_b47eb3ff: "Թարմացնել գնահատականը"
   update_module_b984c2e5: "Թարմացնել մոդուլը"
   update_password_4bc5cb1f: "Թարմացնել գաղտնաբառը"
+  update_quota_81381226: "Թարմացնել քվոտան"
   update_settings_9b422d0f: "Թարմացնել կարգաբերումները"
   update_tool_7d48ef2a: "Թարմացնել %{tool}"
   update_your_notification_settings_ed9564f3: "Թարմացնել ծանուցման ձեր կարգաբերումները"
   updated_at_2eeb6a42: "Թարմացվել է"
   updated_group_group_name_727b1d98: "%{group_name} թարմացված խումբ"
   updating_6edbab78: "Թարմացվում է"
+  updating_73d0718c: Թարմացում...
   updating_user_details_b8520b3e: "Օգտատիրոջ տվյալների թարմացում..."
   upload_8b403d05: Բեռնել
   upload_a_css_file_ec22214b: "Բեռնել CSS ֆայլ..."
@@ -17257,6 +17266,7 @@ hy:
       profile: Պրոֆիլ
       settings: Կարգաբերումներ
   user_profile_d56261fc: "Օգտատիրոջ պրոֆիլը"
+  user_quota_12cb58b7: "Օգտատիրոջ քվոտա"
   user_s_settings_d65644b4: "%{user}-ի հաշվի կարգաբերումներ"
   user_selected_answer: "Դուք ընտրել եք"
   user_selected_wrong: "Ճիշտ պատասխանն էր՝ %{correct_answer_text}:"
