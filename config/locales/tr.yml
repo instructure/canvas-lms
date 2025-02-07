@@ -6120,6 +6120,7 @@ tr:
   course_pages_449f1dd4: "Ders Sayfaları"
   course_people_3058c948: "Ders Katılımcıları"
   course_quizzes_c337653c: "Ders Kısa Sınavları"
+  course_quota_8f7f74c: "Ders Kotası"
   course_restore: 
     restore_error: "Ders onarımı denemesi başarısız oldu. Ders onarılamıyor."
   course_roles_1314f962: "Ders rolleri"
@@ -7148,6 +7149,7 @@ tr:
   deep_orange_4c7eea99: "Koyu Turuncu"
   deep_purple_bb3e2907: "Koyu Mor"
   default_9db103d: Varsayılan
+  default_account_quotas_e34112fd: "Varsayılan Hesap Kotaları"
   default_conference_title: "%{course_name} Canlı Dersi"
   default_email_5cb9fa04: "Varsayılan E-Posta:"
   default_email_9efb7fbd: "Varsayılan E-Posta"
@@ -8858,6 +8860,7 @@ tr:
   find_an_existing_grading_scheme_d836ea: "Varolan Notlandırma Şeması Bul"
   find_an_outcome_919328e6: "Bir Öğrenme Çıktısı Ara"
   find_appointment_85d6922e: "Randevu Ara"
+  find_course_or_group_a7de09a4: "Ders veya grup ara"
   find_flickr_image_view: 
     find_cc_on_flickr: "Flickr'da Creative Commons Lisanslı görseller bul"
     search: Ara
@@ -9723,6 +9726,7 @@ tr:
   group_group_name_is_for_a_different_section_4d84d256: "%{group_name} grubu başka bir bölüm içindir"
   group_group_name_is_full_297880d6: "%{group_name} Grubu dolu"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "%{group_name} Grubuna katılım sadece davetiye ile olabilir"
+  group_id_b0f6af89: "Grup Numarası"
   group_is_for_a_different_section_6a843a4d: "Grup farklı bir bölüm içindir"
   group_is_full_56849d78: "Grup dolu"
   group_is_joined_by_invitation_only_d00f5a63: "Gruba giriş sadece davetiye ile olabilir"
@@ -9746,6 +9750,7 @@ tr:
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} grubu %{group_category_name} grup kategorisindedir"
   group_name_is_required_5547bc0b: "Grup ismi gereklidir"
   group_pages_656556f3: "Grup Sayfaları"
+  group_quota_290dbc6b: "Grup Kotası"
   group_set_4d1e7b06: "Grup Seti"
   group_set_name_2aed2347: "Grup Adı Ver"
   group_settings: 
@@ -11118,6 +11123,7 @@ tr:
   manually_9de23e1f: Manuel
   manually_mark_posts_as_read_afa5d035: "Elle okundu olarak işaretle"
   manually_post_grades_18248306: "Manuel Olarak Notları Yayınla"
+  manually_settable_quotas_ea3759e7: "Manuel Ayarlanabilir Kotalar"
   mark_all_as_read_8f3bdf57: "Hepsini Okundu Olarak İşaretle"
   mark_all_as_unread_a435be3d: "Hepsini Okunmadı Olarak İşaretle"
   mark_as_done_6fa48d2f: "Tamamlandı olarak işaretle"
@@ -11230,6 +11236,7 @@ tr:
   median_score_4657e907: "Ortalama: %{score}"
   meets_expectations_bb179565: "Beklentileri Karşılıyor"
   meets_mastery_754e1c06: "Yeterliği Karşılıyor"
+  megabytes_885404ef: megabyte
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{max_membership} maksimum üyeden %{member_count} üye"
   members_af25c21d: Üyeler
   members_are_free_to_join_defa5929: "Üyeler katılabilir"
@@ -19645,6 +19652,7 @@ tr:
   update_link_b7cab181: "Bağlantı güncelle"
   update_module_b984c2e5: "Modülü Güncelle"
   update_password_4bc5cb1f: "Şifremi Güncelle"
+  update_quota_81381226: "Güncelleme Kotası"
   update_settings_9b422d0f: "Ayarları Güncelle"
   update_tool_7d48ef2a: "%{tool} güncelle"
   update_your_notification_settings_ed9564f3: "Bildirim ayarlarınızı güncelleyin"
@@ -19652,6 +19660,7 @@ tr:
   updated_at_ab9f625d: updated_at
   updated_group_group_name_727b1d98: "%{group_name} Grubu Güncellendi"
   updating_6edbab78: Güncelleniyor
+  updating_73d0718c: Güncelleniyor...
   updating_user_details_b8520b3e: "Kullanıcı Ayrıntıları Güncelleniyor..."
   upload_8b403d05: Yükle
   upload_a_picture_9f5f6e3c: "Fotoğraf yükle"
@@ -19846,6 +19855,7 @@ tr:
       settings: Ayarlar
   user_profile_d56261fc: "Kullanıcı Profili"
   user_profile_picture_46bffbc7: "Kullanıcı profil resmi"
+  user_quota_12cb58b7: "Kullanıcı Kotası"
   user_s_settings_d65644b4: "%{user}'nın Ayarları"
   user_search_results_f5445b8b: "Kullanıcı Arama Sonuçları"
   user_selected_answer: Seçtiniz

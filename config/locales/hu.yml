@@ -7604,6 +7604,7 @@ hu:
   course_quiz_export_1f59f15: "Kurzus kvíz exportálása"
   course_quiz_extensions_4102f98f: "Kurzus Kvíz Kiegészítések"
   course_quizzes_c337653c: Kurzuskvízek
+  course_quota_8f7f74c: Kurzuskvóta
   course_readiness_60d7c923: "Kurzus készültség"
   course_restore: 
     restore_error: "Hiba történt a kurzus helyreállítása során. A kurzust nem állítottuk helyre."
@@ -8700,6 +8701,7 @@ hu:
   deeply_nested_replies_are_no_longer_supported_your_cfe125da: " A mélyen egymásba ágyazott válaszok már nem támogatottak. Válasza azon az oldalon jelenik meg, amelyen éppen tartózkodik."
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "A mélyen beágyazott válaszok már nem támogatottak. Válasza ennek a szálnak az első oldalán fog megjelenni."
   default_9db103d: Alapértelmezett
+  default_account_quotas_e34112fd: "Alapértelmezett fiókkvóta"
   default_canvas_grading_scheme_ab769633: "Alapértelmezett Canvas osztályozási rendszer"
   default_conference_title: "%{course_name} konferencia"
   default_course_pace_ce0ba0f3: "Alapértelmezett Kurzus ütemezés"
@@ -11089,6 +11091,7 @@ hu:
   find_an_outcome_919328e6: "Tanulási eredmény keresése"
   find_and_replace_rce_plugin_23b67e6c: "RCE Plugin keresése és cseréje"
   find_appointment_85d6922e: "Találjon megbeszélés-időpontot"
+  find_course_or_group_a7de09a4: "Kurzus vagy csoport keresése"
   find_flickr_image_view: 
     find_cc_on_flickr: "Képek keresése a Flickr Creative Commons segítségével"
     safesearch_warning_flickr: "A Flickr a Biztonságos Keresés képeket jeleníti meg a Creative Commons Public Domain területén. A biztonságos keresési eredmények azonban nem garantáltak, mivel előfordulhat, hogy egyes képek nem tartalmazzák a tulajdonosuk által meghatározott biztonsági szintet."
@@ -11948,6 +11951,7 @@ hu:
   group_groupname_entered_2a0624a0: "%{groupName}csoport megadva"
   group_guid_has_already_appeared_in_this_import_78f35ff3: "A \"%{guid}\" csoport már megjelent ebben az importban"
   group_home_249cb392: "Csoport kezdőlap"
+  group_id_b0f6af89: Csoportazonosító
   group_id_e76ac9b5: "group id"
   group_import_api_documentation_7d0d28ee: "Csoport importálás API dokumentáció"
   group_is_for_a_different_section_6a843a4d: "A csoport egy másik szekciónak van fenntartva"
@@ -11986,6 +11990,7 @@ hu:
   group_not_found_d13d85b9: "csoport nem található"
   group_pages_656556f3: Csoportoldalak
   group_people_50e9785b: "Csoport résztvevők"
+  group_quota_290dbc6b: Csoportkvóta
   group_roster_1846bf84: Csoportnévsor
   group_saved_successfully_fcd5ca66: "Csoport mentése sikeres"
   group_select_330df8bd: "Csoport kijelölés"
@@ -14291,6 +14296,7 @@ hu:
   manually_mark_posts_as_read_afa5d035: "Bejegyzések manuális megjelölése olvasottként"
   manually_mark_replies_as_read_580adc59: "Válaszok megjelölése olvasottként manuálisan"
   manually_post_grades_18248306: "Értékelések elküldése manuálisan"
+  manually_settable_quotas_ea3759e7: "Manuálisan beállítható kvóták"
   maori_new_zealand_5380a95f: "Māori (New Zealand)"
   march_bbe310ee: Március
   mark_all_announcement_read_eda5292b: "Jelölje meg az összes olvasott hirdetményt"
@@ -14462,6 +14468,7 @@ hu:
   meet_the_instructure_learning_platform_b1a3ff1b: "Ismerje meg az Instructure Learning Platformot:"
   meets_expectations_bb179565: "Megfelel az elvárásoknak"
   meets_mastery_754e1c06: "Megfelel a jártassági szintnek"
+  megabytes_885404ef: megabyte
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} taggal elértük a maximális létszámot %{max_membership}"
   members_af25c21d: Tagok
   members_are_free_to_join_defa5929: "A tagok szabadon csatlakozhatnak"
@@ -26165,6 +26172,7 @@ hu:
   update_pages_c91d7ba: "Oldalak frissítése"
   update_password_4bc5cb1f: "Jelszó frissítése"
   update_public_jwk_9f25f520: "Frissítés nyilvános JWK"
+  update_quota_81381226: "Kvóta frissítése"
   update_rating_6d29c2ef: "Értékelés frissítése"
   update_settings_9b422d0f: "Beállítások frissítése"
   update_tool_7d48ef2a: "%{tool} frissítése"
@@ -26182,6 +26190,7 @@ hu:
       \x20                       "
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "A JSON API auth error HTTP kód és a JSON státusz mező frissítései"
   updating_6edbab78: Frissítés
+  updating_73d0718c: Frissítés...
   updating_discussion_failed_aadb2d35: "A Fórum frissítése sikertelen"
   updating_publication_date_62cc1622: "A közzététel dátumának frissítése"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "A katalógus URL-jének frissítése azonnali hatállyal elérhetetlenné teszi a régi URL-t a felhasználók számára! Ha egy meglévő fizetési processzor van beállítva, a változtatásokhoz egy katalógusmérnök segítségére lesz szükség."
@@ -26497,6 +26506,7 @@ hu:
       settings: Beállítások
   user_profile_d56261fc: "Felhasználói profil"
   user_profile_picture_46bffbc7: "Felhasználói profilkép"
+  user_quota_12cb58b7: "Felhasználói kvóta"
   user_removed_successfully_20a3889d: "Felhasználó sikeresen eltávolítva"
   user_results_updated_9ce38dce: "A felhasználó eredményei frissítésre kerültek."
   user_s_email_only_401dbaba: "Csak a felhasználó e-mail címe"

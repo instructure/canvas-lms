@@ -7366,6 +7366,7 @@ fa:
   course_people_3058c948: "افراد درس"
   course_quiz_extensions_4102f98f: "پسوندهای آزمون درس "
   course_quizzes_c337653c: "آزمون‌های درس"
+  course_quota_8f7f74c: "سهمیه درس"
   course_restore: 
     restore_error: "در هنگام تلاش برای بازیابی درس، خطایی رخ داد. درس بازیابی نشد.."
   course_results_updated_df9d1c95: "نتایج درس به روز شد."
@@ -8527,6 +8528,7 @@ fa:
   deep_purple_bb3e2907: "ارغوانی پر رنگ"
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "پاسخ‌های تو در تو دیگر پشتیبانی نمی‌شوند. پاسخ شما در صفحه اول این تاپیک نمایش داده می شود."
   default_9db103d: "پیش فرض"
+  default_account_quotas_e34112fd: "سهمیه های پیش فرض حساب"
   default_conference_title: "کنفرانس %{course_name} "
   default_dates_a0a2ae26: "تاریخ های پیش فرض"
   default_due_time_9d0e9140: "زمان مقرر پیش فرض"
@@ -10785,6 +10787,7 @@ fa:
   find_an_existing_grading_scheme_d836ea: "یافتن طرح نمره گذاری موجود"
   find_an_outcome_919328e6: "یافتن نتیجه"
   find_appointment_85d6922e: "یافتن قرار ملاقات"
+  find_course_or_group_a7de09a4: "یافتن درس یا گروه"
   find_flickr_image_view: 
     find_cc_on_flickr: "یافتن تصاویر کریتیو کامنز در فلیکر"
     safesearch_warning_flickr: "فلیکر تصاویر جستجوی ایمن را در دامنه عمومی کریتیو کامنز نمایش می دهد. با این حال، نتایج جستجوی ایمن تضمین نمی شود، زیرا ممکن است برخی از تصاویر دارای سطح ایمنی مشخصی توسط صاحبان آن‌ها نباشد. "
@@ -11878,6 +11881,7 @@ fa:
   group_group_name_is_not_available_at_this_time_971001c1: "گروه %{group_name} در این زمان فعال نیست. "
   group_guid_has_already_appeared_in_this_import_78f35ff3: "گروه \"%{guid}\" قبلاً در این ورود ظاهر شده است."
   group_home_249cb392: "صفحه اصلی گروه"
+  group_id_b0f6af89: "شناسه گروه"
   group_id_e76ac9b5: "شناسه گروه"
   group_is_for_a_different_section_6a843a4d: "گروه برای یک بخش دیگر است"
   group_is_full_56849d78: "گروه تکمیل شده است"
@@ -11907,6 +11911,7 @@ fa:
   group_not_found_d13d85b9: "گروه یافت نشد"
   group_pages_656556f3: "صفحه های گروه"
   group_people_50e9785b: "افراد گروه"
+  group_quota_290dbc6b: "سهمیه گروه"
   group_roster_1846bf84: "فهرست گروه"
   group_saved_successfully_fcd5ca66: "گروه با موفقیت ذخیره شد!"
   group_select_330df8bd: "گروه انتخاب شد"
@@ -13830,6 +13835,7 @@ fa:
   manually_9de23e1f: "بطور دستی"
   manually_mark_posts_as_read_afa5d035: "علامتگذاری دستی ارسال ها به عنوان خوانده شده"
   manually_post_grades_18248306: "ارسال نمرات بصورت دستی"
+  manually_settable_quotas_ea3759e7: "سهمیه های قابل تنظیم به طور دستی"
   mark_all_as_read_8f3bdf57: "علامتگذاری همه به عنوان خوانده شده"
   mark_all_as_read_a995ffbe: "همه را به عنوان خوانده شده علامت بزن"
   mark_all_as_unread_10e7f0fe: "علامت گذاری همه به عنوان خوانده نشده"
@@ -13972,6 +13978,7 @@ fa:
   medium_light_skin_tone_6c4a27fb: "رنگ پوست متوسط تا روشن"
   meets_expectations_bb179565: "مطابق با انتظارات"
   meets_mastery_754e1c06: "با تسلط مطابقت دارد"
+  megabytes_885404ef: مگابایت
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} عضو از حداکثر %{max_membership}"
   members_af25c21d: اعضا
   members_are_free_to_join_defa5929: "اعضا برای پیوستن به گروه آزاد هستند"
@@ -24784,6 +24791,7 @@ fa:
   update_name_6581781d: "به روز رسانی %{name}"
   update_pages_c91d7ba: "به روز رسانی صفحات"
   update_password_4bc5cb1f: "بهنگام سازی رمز عبور"
+  update_quota_81381226: "بهنگام سازی سهمیه"
   update_rating_6d29c2ef: "به روزرسانی رتبه بندی"
   update_settings_9b422d0f: "بهنگام سازی تنظیمات"
   update_tool_7d48ef2a: "بهنگام سازی %{tool}"
@@ -24796,6 +24804,7 @@ fa:
   updated_terms_of_service_82f34148: "ضوابط استفاده از سرویس به‌روزرسانی شد"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "واسط کاربر بهنگام شده برای جستجو و نمایش کاربران و درس ها در یک حساب."
   updating_6edbab78: "در حال بهنگام سازی"
+  updating_73d0718c: "در حال بهنگام سازی..."
   updating_discussion_failed_aadb2d35: "به هنگام سازی گفتگو انجام نشد"
   updating_user_details_b8520b3e: "در حال بهنگام سازی اطلاعات کاربر..."
   upload_8b403d05: بارگذاری
@@ -25070,6 +25079,7 @@ fa:
       settings: تنظیمات
   user_profile_d56261fc: "رخ نمای کاربر"
   user_profile_picture_46bffbc7: "تصویر رخ نمای کاربر"
+  user_quota_12cb58b7: "سهمیه کاربر"
   user_removed_successfully_20a3889d: "کاربر با موفقیت حذف شد"
   user_results_updated_9ce38dce: "نتایج کاربر به روز شد."
   user_s_settings_d65644b4: "تنظیمات %{user}"
