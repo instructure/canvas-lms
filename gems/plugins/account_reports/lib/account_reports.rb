@@ -126,7 +126,7 @@ module AccountReports
                        else
                          " Unable to create error_report_id for #{e}"
                        end
-      finalize_report(account_report, error_message)
+      finalize_report(account_report, error_message, exception: e)
       @er = nil
     end
   end
@@ -231,21 +231,23 @@ module AccountReports
     account_report.attachment = attachment
   end
 
-  def self.failed_report(account_report)
+  def self.failed_report(account_report, exception: nil)
     fail_text = if @er
                   I18n.t("Failed, please report the following error code to your system administrator: ErrorReport:%{error};",
                          error: @er.id.to_s)
+                elsif exception.is_a?(CustomReports::Rubrics::RootAccountRequiredError)
+                  I18n.t("This report can only be run on the root account.")
                 else
                   I18n.t("Failed, the report failed to generate a file. Please try again.")
                 end
     account_report.parameters["extra_text"] = fail_text
   end
 
-  def self.finalize_report(account_report, message, csv = nil)
+  def self.finalize_report(account_report, message, csv = nil, exception: nil)
     account_report.reload
     report_attachment(account_report, csv)
     account_report.message = message
-    failed_report(account_report) unless csv
+    failed_report(account_report, exception:) unless csv
     if account_report.workflow_state == "aborted"
       account_report.parameters["extra_text"] = I18n.t("Report has been aborted")
     else
