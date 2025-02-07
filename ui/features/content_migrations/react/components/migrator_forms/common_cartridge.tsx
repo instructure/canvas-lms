@@ -44,14 +44,8 @@ const CommonCartridgeImporter = ({
   isSubmitting,
 }: CommonCartridgeImporterProps) => {
   const [isQuestionBankDisabled, setIsQuestionBankDisabled] = useState(false)
-  const {
-    setFile,
-    fileError,
-    questionBankSettings,
-    setQuestionBankSettings,
-    questionBankError,
-    handleSubmit,
-  } = useSubmitHandlerWithQuestionBank(onSubmit)
+  const {setFile, fileError, questionBankSettings, setQuestionBankSettings, handleSubmit} =
+    useSubmitHandlerWithQuestionBank(onSubmit)
 
   return (
     <>
@@ -64,7 +58,6 @@ const CommonCartridgeImporter = ({
       />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
-        questionBankError={questionBankError}
         disable={isSubmitting || isQuestionBankDisabled}
         notCompatible={isQuestionBankDisabled}
         questionBankSettings={questionBankSettings}

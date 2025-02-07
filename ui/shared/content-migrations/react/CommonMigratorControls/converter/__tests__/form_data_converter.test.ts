@@ -170,4 +170,37 @@ describe('convertFormDataToMigrationCreateRequest', () => {
       })
     })
   })
+
+  describe('settings', () => {
+    describe('question bank', () => {
+      const testQuestionBankNameRemoval = (
+        questionBankName: string | null | undefined,
+        expected: string | undefined,
+      ) => {
+        const formData: submitMigrationFormData = {
+          ...baseFormData,
+          settings: {question_bank_name: questionBankName},
+        }
+
+        const result = convertFormDataToMigrationCreateRequest(formData, courseId, chosenMigrator)
+        expect(result.settings.question_bank_name).toBe(expected)
+      }
+
+      it('should remove empty question bank name', () => {
+        testQuestionBankNameRemoval('', undefined)
+      })
+
+      it('should remove null question bank name', () => {
+        testQuestionBankNameRemoval(null, undefined)
+      })
+
+      it('should remove undefined question bank name', () => {
+        testQuestionBankNameRemoval(undefined, undefined)
+      })
+
+      it('should use question bank name when not empty', () => {
+        testQuestionBankNameRemoval('Valid Name', 'Valid Name')
+      })
+    })
+  })
 })
