@@ -18,6 +18,7 @@
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {replaceLocation} from '@canvas/util/globalUtils'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -99,7 +100,7 @@ const SignIn = () => {
           setOtpRequired(true)
         } else if (response.data?.pseudonym) {
           isRedirectingRef.current = true
-          window.location.replace(response.data.location || '/dashboard')
+          replaceLocation(response.data.location || '/dashboard')
         } else {
           handleFailedLogin()
         }
@@ -181,6 +182,8 @@ const SignIn = () => {
               onChange={handleUsernameChange}
               renderLabel={loginHandleName}
               value={username}
+              isRequired={true}
+              data-testid="username-input"
             />
 
             <TextInput
@@ -193,6 +196,8 @@ const SignIn = () => {
               renderLabel={I18n.t('Password')}
               type="password"
               value={password}
+              isRequired={true}
+              data-testid="password-input"
             />
 
             <Flex.Item overflowY="visible" overflowX="visible">
@@ -201,7 +206,13 @@ const SignIn = () => {
           </Flex>
 
           <Flex direction="column" gap="mediumSmall">
-            <Button type="submit" color="primary" display="block" disabled={isUiActionPending}>
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={isUiActionPending}
+              data-testid="login-button"
+            >
               {I18n.t('Log In')}
             </Button>
 
