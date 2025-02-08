@@ -33,6 +33,7 @@ const RememberMeCheckbox = () => {
       onChange={() => setRememberMe(!rememberMe)}
       inline={true}
       disabled={isUiActionPending}
+      data-testid="remember-me-checkbox"
     />
   )
 }
