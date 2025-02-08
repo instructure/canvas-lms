@@ -48,6 +48,19 @@ export default class AddUnassignedUsersView extends CollectionView {
     }
   }
 
+  render() {
+    super.render()
+
+    // If a parent view is provided then retain focus on it
+    if (this.options.parentView && typeof this.options.parentView.refocusSearch === 'function') {
+      setTimeout(() => {
+        this.options.parentView.refocusSearch()
+      }, 10)
+    }
+
+    return this
+  }
+
   toJSON() {
     return {
       users: this.collection.toJSON(),
