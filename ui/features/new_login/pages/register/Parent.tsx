@@ -319,7 +319,7 @@ const Parent = () => {
           {I18n.t('Create a Parent Account')}
         </Heading>
 
-        <Text>{I18n.t('All fields are required.')}</Text>
+        <Text>{I18n.t('* Required Fields')}</Text>
       </Flex>
 
       <form onSubmit={handleCreateParent} noValidate={true}>
@@ -330,60 +330,71 @@ const Parent = () => {
               autoComplete="email"
               autoCorrect="none"
               disabled={isUiActionPending}
+              isRequired={true}
               inputRef={inputElement => (emailInputRef.current = inputElement)}
               messages={createErrorMessage(emailError)}
               onChange={handleEmailChange}
               renderLabel={I18n.t('Email Address')}
               value={email}
+              data-testid="email-input"
             />
 
             <TextInput
               autoComplete="new-password"
               disabled={isUiActionPending}
+              isRequired={true}
               inputRef={inputElement => (passwordInputRef.current = inputElement)}
               messages={createErrorMessage(passwordError)}
               onChange={handlePasswordChange}
               renderLabel={I18n.t('Password')}
               type="password"
               value={password}
+              data-testid="password-input"
             />
 
             <TextInput
               autoComplete="new-password"
               disabled={isUiActionPending}
+              isRequired={true}
               inputRef={inputElement => (confirmPasswordInputRef.current = inputElement)}
               messages={createErrorMessage(confirmPasswordError)}
               onChange={handleConfirmPasswordChange}
               renderLabel={I18n.t('Confirm Password')}
               type="password"
               value={confirmPassword}
+              data-testid="confirm-password-input"
             />
 
             <TextInput
               autoCorrect="none"
               disabled={isUiActionPending}
+              isRequired={true}
               inputRef={inputElement => (nameInputRef.current = inputElement)}
               messages={createErrorMessage(nameError)}
               onChange={handleNameChange}
               renderLabel={I18n.t('Full Name')}
               value={name}
+              data-testid="name-input"
             />
 
             <TextInput
               autoCapitalize="none"
               autoCorrect="none"
               disabled={isUiActionPending}
+              isRequired={true}
               inputRef={inputElement => (pairingCodeInputRef.current = inputElement)}
               messages={createErrorMessage(pairingCodeError)}
               onChange={handlePairingCodeChange}
               renderLabel={I18n.t('Student Pairing Code')}
               value={pairingCode}
+              data-testid="pairing-code-input"
             />
 
             <Text>
               <Link
                 href="https://community.canvaslms.com/t5/Canvas-Resource-Documents/Pairing-Codes-FAQ/ta-p/388738"
                 target="_blank"
+                data-testid="pairing-code-link"
               >
                 {I18n.t('What is a pairing code?')}
               </Link>
@@ -400,6 +411,7 @@ const Parent = () => {
                 onChange={handleTermsChange}
                 privacyPolicyUrl={privacyPolicyUrl}
                 termsOfUseUrl={termsOfUseUrl}
+                isRequired={true}
               />
             </Flex.Item>
           )}
@@ -424,7 +436,13 @@ const Parent = () => {
               {I18n.t('Back to Login')}
             </Button>
 
-            <Button type="submit" color="primary" display="block" disabled={isUiActionPending}>
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={isUiActionPending}
+              data-testid="submit-button"
+            >
               {I18n.t('Next')}
             </Button>
           </Flex>
