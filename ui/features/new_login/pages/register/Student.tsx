@@ -327,7 +327,7 @@ const Student = () => {
           {I18n.t('Create a Student Account')}
         </Heading>
 
-        <Text>{I18n.t('All fields are required.')}</Text>
+        <Text>{I18n.t('* Required Fields')}</Text>
       </Flex>
 
       <form onSubmit={handleCreateStudent} noValidate={true}>
@@ -340,6 +340,8 @@ const Student = () => {
               onChange={(_, value) => setName(value)}
               renderLabel={I18n.t('Full Name')}
               value={name}
+              isRequired={true}
+              data-testid="name-input"
             />
 
             <TextInput
@@ -352,6 +354,8 @@ const Student = () => {
               onChange={handleUsernameChange}
               renderLabel={I18n.t('Username')}
               value={username}
+              isRequired={true}
+              data-testid="username-input"
             />
 
             <TextInput
@@ -363,6 +367,8 @@ const Student = () => {
               renderLabel={I18n.t('Password')}
               type="password"
               value={password}
+              isRequired={true}
+              data-testid="password-input"
             />
 
             <TextInput
@@ -374,6 +380,8 @@ const Student = () => {
               renderLabel={I18n.t('Confirm Password')}
               type="password"
               value={confirmPassword}
+              isRequired={true}
+              data-testid="confirm-password-input"
             />
 
             <TextInput
@@ -385,6 +393,8 @@ const Student = () => {
               onChange={handleJoinCodeChange}
               renderLabel={I18n.t('Join Code')}
               value={joinCode}
+              isRequired={true}
+              data-testid="join-code-input"
             />
 
             {requireEmail && (
@@ -397,6 +407,8 @@ const Student = () => {
                 onChange={handleEmailChange}
                 renderLabel={I18n.t('Email Address')}
                 value={email}
+                isRequired={true}
+                data-testid="email-input"
               />
             )}
           </Flex>
@@ -411,6 +423,7 @@ const Student = () => {
                 onChange={handleTermsChange}
                 privacyPolicyUrl={privacyPolicyUrl}
                 termsOfUseUrl={termsOfUseUrl}
+                isRequired={true}
               />
             </Flex.Item>
           )}
@@ -435,7 +448,13 @@ const Student = () => {
               {I18n.t('Back to Login')}
             </Button>
 
-            <Button type="submit" color="primary" display="block" disabled={isUiActionPending}>
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={isUiActionPending}
+              data-testid="submit-button"
+            >
               {I18n.t('Next')}
             </Button>
           </Flex>
