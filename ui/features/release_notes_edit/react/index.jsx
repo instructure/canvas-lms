@@ -17,6 +17,7 @@
  */
 
 import React, {useReducer, useState, useCallback} from 'react'
+import {array} from 'prop-types'
 import {cloneDeep} from 'lodash'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
@@ -64,7 +65,7 @@ function notesReducer(prevState, action) {
   return prevState
 }
 
-export default function ReleaseNotesEdit({envs, langs}) {
+function ReleaseNotesEdit({envs, langs}) {
   const [state, dispatch] = useReducer(notesReducer, {
     notes: [],
     nextPage: null,
@@ -162,3 +163,9 @@ export default function ReleaseNotesEdit({envs, langs}) {
     </>
   )
 }
+
+ReleaseNotesEdit.propTypes = {
+  envs: array.isRequired,
+  langs: array.isRequired,
+}
+export default ReleaseNotesEdit
