@@ -99,4 +99,54 @@ describe('TermsAndPolicyCheckbox', () => {
     )
     expect(container).toBeEmptyDOMElement()
   })
+
+  it('displays the “required” indicator and associates with ARIA when isRequired is true', () => {
+    render(
+      <TermsAndPolicyCheckbox
+        id="terms-checkbox"
+        checked={false}
+        isDisabled={false}
+        onChange={jest.fn()}
+        isRequired={true}
+        termsOfUseUrl={termsOfUseUrl}
+      />,
+    )
+    const checkbox = screen.getByTestId('terms-and-policy-checkbox')
+    expect(checkbox).toHaveAttribute('aria-required', 'true')
+    expect(screen.getByText('*')).toBeInTheDocument()
+  })
+
+  it('does not display the “required” indicator when isRequired is false or undefined', () => {
+    render(
+      <TermsAndPolicyCheckbox
+        id="terms-checkbox"
+        checked={false}
+        isDisabled={false}
+        onChange={jest.fn()}
+        isRequired={false}
+        termsOfUseUrl={termsOfUseUrl}
+      />,
+    )
+    const checkbox = screen.getByTestId('terms-and-policy-checkbox')
+    expect(checkbox).not.toHaveAttribute('aria-required')
+    expect(screen.queryByText('*')).not.toBeInTheDocument()
+  })
+
+  it('prevents form submission when isRequired is true and the checkbox is unchecked', async () => {
+    const mockOnChange = jest.fn()
+    render(
+      <TermsAndPolicyCheckbox
+        id="terms-checkbox"
+        checked={false}
+        isDisabled={false}
+        onChange={mockOnChange}
+        isRequired={true}
+        termsOfUseUrl={termsOfUseUrl}
+      />,
+    )
+    const checkbox = screen.getByTestId('terms-and-policy-checkbox')
+    expect(checkbox).not.toBeChecked()
+    checkbox.focus()
+    expect(mockOnChange).not.toHaveBeenCalled()
+  })
 })
