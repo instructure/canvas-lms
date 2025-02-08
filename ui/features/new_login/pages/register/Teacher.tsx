@@ -221,7 +221,7 @@ const Teacher = () => {
           {I18n.t('Create a Teacher Account')}
         </Heading>
 
-        <Text>{I18n.t('All fields are required.')}</Text>
+        <Text>{I18n.t('* Required Fields')}</Text>
       </Flex>
 
       <form onSubmit={handleCreateTeacher} noValidate={true}>
@@ -236,6 +236,8 @@ const Teacher = () => {
               onChange={handleEmailChange}
               renderLabel={I18n.t('Email Address')}
               value={email}
+              isRequired={true}
+              data-testid="email-input"
             />
 
             <TextInput
@@ -246,6 +248,8 @@ const Teacher = () => {
               onChange={handleNameChange}
               renderLabel={I18n.t('Full Name')}
               value={name}
+              isRequired={true}
+              data-testid="name-input"
             />
           </Flex>
 
@@ -259,6 +263,7 @@ const Teacher = () => {
                 onChange={handleTermsChange}
                 privacyPolicyUrl={privacyPolicyUrl}
                 termsOfUseUrl={termsOfUseUrl}
+                isRequired={true}
               />
             </Flex.Item>
           )}
@@ -283,7 +288,13 @@ const Teacher = () => {
               {I18n.t('Back to Login')}
             </Button>
 
-            <Button type="submit" color="primary" display="block" disabled={isUiActionPending}>
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={isUiActionPending}
+              data-testid="submit-button"
+            >
               {I18n.t('Next')}
             </Button>
           </Flex>
