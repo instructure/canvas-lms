@@ -227,7 +227,6 @@ class Lti::Registration < ActiveRecord::Base
     # callback on the developer key.
     internal_config = ims_registration&.internal_lti_configuration ||
                       manual_configuration&.internal_lti_configuration ||
-                      developer_key&.tool_configuration&.internal_lti_configuration ||
                       {}
 
     return internal_config unless include_overlay
@@ -259,15 +258,14 @@ class Lti::Registration < ActiveRecord::Base
     end
 
     unified_tool_id = ims_registration&.unified_tool_id ||
-                      manual_configuration&.unified_tool_id ||
-                      developer_key&.tool_configuration&.unified_tool_id
+                      manual_configuration&.unified_tool_id
 
     Schemas::InternalLtiConfiguration
       .to_deployment_configuration(base_config, unified_tool_id:)
   end
 
   def privacy_level
-    ims_registration&.privacy_level || manual_configuration&.privacy_level || developer_key&.tool_configuration&.privacy_level || DEFAULT_PRIVACY_LEVEL
+    ims_registration&.privacy_level || manual_configuration&.privacy_level || DEFAULT_PRIVACY_LEVEL
   end
 
   # TODO: this will eventually need to account for 1.1 registrations
@@ -304,9 +302,7 @@ class Lti::Registration < ActiveRecord::Base
                         &.with_indifferent_access
                         &.dig(:disabledPlacements) || []
       else
-        manual_configuration&.disabled_placements ||
-          developer_key&.tool_configuration&.disabled_placements ||
-          []
+        manual_configuration&.disabled_placements || []
       end
   end
 
