@@ -30,6 +30,7 @@ import {Avatar} from '@instructure/ui-avatar'
 import {nanoid} from 'nanoid'
 import 'jquery-kyle-menu'
 import '@canvas/jquery/jquery.disableWhileLoading'
+import UserTaggedModal from '@canvas/differentiation-tags/react/UserTaggedModal/UserTaggedModal'
 
 const I18n = createI18nScope('RosterUserView')
 
@@ -51,6 +52,7 @@ export default class RosterUserView extends Backbone.View {
       'focus *': 'focus',
       'blur *': 'blur',
       'change .select-user-checkbox': 'handleCheckboxChange',
+      'click .user-tags-icon': 'handleTagIconClick'
     }
   }
 
@@ -320,6 +322,30 @@ export default class RosterUserView extends Backbone.View {
     })
   }
 
+  handleTagIconClick(e) {
+    this.renderUserTagModal(true, this.model.id, this.model.get('name'))
+  }
+
+  renderUserTagModal(isOpen, userId, userName) {
+    const el = document.getElementById('userTagsModalContainer')
+    const returnFocusTo = document.getElementById(`tag-icon-id-${userId}`)
+    const onModalClose = (userId, userName) => {
+      this.renderUserTagModal(false, userId, userName)
+      returnFocusTo?.focus()
+    }
+    if(!this.userTagModalContainer)
+      this.userTagModalContainer = createRoot(el)
+    this.userTagModalContainer.render(
+      <UserTaggedModal 
+        isOpen={isOpen}
+        courseId={ENV.course.id}
+        userId={userId}
+        userName={userName}
+        onClose={onModalClose}
+      />
+    )
+  }
+
   focus() {
     return this.$el.addClass('al-hover-container-active table-hover-row')
   }
@@ -345,11 +371,16 @@ export default class RosterUserView extends Backbone.View {
       )
       this._reactRoot = root
     }
+    this.userTagModalContainer = null
   }
 
   remove() {
     if (this._reactRoot) {
       this._reactRoot.unmount()
+    }
+    if(this.userTagModalContainer) {
+      this.userTagModalContainer.unmount()
+      this.userTagModalContainer = null
     }
     return super.remove(...arguments)
   }
