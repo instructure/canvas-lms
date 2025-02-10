@@ -20,8 +20,10 @@
 module VisibilityHelpers
   module Common
     def service_cache_fetch(service:, course_ids: nil, user_ids: nil, additional_ids: nil, &)
-      key = service_cache_key(service:, course_ids:, user_ids:, additional_ids:)
-      Rails.cache.fetch(key, expires_in: 1.minute, &)
+      # TODO: LX-2224 Add Visibility Caching back with Dynamic Expiration
+      # key = service_cache_key(service:, course_ids:, user_ids:, additional_ids:)
+      # Rails.cache.fetch(key, expires_in: 1.minute, &)
+      yield
     end
 
     private
