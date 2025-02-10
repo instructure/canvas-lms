@@ -4609,6 +4609,7 @@ el:
   course_pages_449f1dd4: "Σελίδες Μαθήματος"
   course_people_3058c948: "Άτομα στο Μάθημα"
   course_quizzes_c337653c: "Κουίζ του Μαθήματος"
+  course_quota_8f7f74c: "Ποσοστώσεις Μαθήματος"
   course_restore: 
     restore_error: "<mrk mid=\"5695\" mtype=\"seg\">Παρουσιάστηκε σφάλμα κατά την προσπάθεια επαναφοράς του μαθήματος.</mrk> <mrk mid=\"5696\" mtype=\"seg\">Το μάθημα δεν επαναφέρθηκε.</mrk>"
   course_roles_d2d5d666: "Ρόλοι Μαθήματος"
@@ -5371,6 +5372,7 @@ el:
   decrease_indent_d9cf469d: "Μείωση Εσοχής Κειμένου"
   deep_orange_4c7eea99: "Βαθύ πορτοκαλί"
   deep_purple_bb3e2907: "Βαθύ μοβ"
+  default_account_quotas_e34112fd: "Ποσοστώσεις Προεπιλεγμένου Λογαριασμού"
   default_conference_title: "Συνεδρία για το μάθημα %{course_name}"
   default_email_9efb7fbd: "Προεπιλεγμένη Ηλεκτρονική Διεύθυνση"
   default_grade_cannot_be_set_to_ex_723caa59: "Ο προεπιλεγμένος βαθμός δεν μπορεί να είναι %{ex}"
@@ -6583,6 +6585,7 @@ el:
   find_8d605019: Εύρεση
   find_a_course_94301b4d: "Βρείτε ένα Μάθημα"
   find_an_existing_grading_scheme_d836ea: "Εύρεση Υπάρχοντος Κανονισμού Βαθμολόγησης"
+  find_course_or_group_a7de09a4: "Εύρεση μαθήματος ή ομάδας"
   find_flickr_image_view: 
     find_cc_on_flickr: "Εύρεση εικόνων Creative Commons στο Flickr"
     search: Αναζήτηση
@@ -7100,6 +7103,7 @@ el:
   group_group_name_is_for_a_different_section_4d84d256: "Η ομάδα %{group_name} είναι για διαφορετικό τομέα"
   group_group_name_is_full_297880d6: "Η ομάδα %{group_name} είναι πλήρης"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "Η συμμετοχή στην ομάδα %{group_name} είναι δυνατή μόνο κατόπιν πρόσκλησης"
+  group_id_b0f6af89: "ID Ομάδας"
   group_is_for_a_different_section_6a843a4d: "Η ομάδα είναι για διαφορετικό τομέα"
   group_is_full_56849d78: "Η ομάδα είναι πλήρης"
   group_is_joined_by_invitation_only_d00f5a63: "Η συμμετοχή στην ομάδα είναι δυνατή μόνο κατόπιν πρόσκλησης"
@@ -7122,6 +7126,7 @@ el:
   group_name_in_group_category_name_group_category_29bf3254: "Ομάδα %{group_name} στην κατηγορία ομάδας %{group_category_name}"
   group_name_is_required_5547bc0b: "Απαιτείται όνομα ομάδας"
   group_pages_656556f3: "Σελίδες Ομάδας"
+  group_quota_290dbc6b: "Ποσόστωση Ομάδων"
   group_roster_1846bf84: "Πίνακας Ομάδας"
   group_set_4d1e7b06: "Σετ Ομάδων"
   group_set_name_2aed2347: "Όνομα Σετ Ομάδων"
@@ -8135,6 +8140,7 @@ el:
   manual_8c2665de: Εγχειρίδιο
   manual_entry_e4a4f99a: "Χειροκίνητη Καταχώριση"
   manually_mark_posts_as_read_afa5d035: "Χειροκίνητη επισήμανση των δημοσιεύσεων ως αναγνωσμένων"
+  manually_settable_quotas_ea3759e7: "Μη Αυτόματα Ρυθμιζόμενες Ποσοστώσεις"
   mark_all_as_read_8f3bdf57: "Επισήμανση Όλων σαν Αναγνωσμένα"
   mark_all_as_unread_a435be3d: "Επισήμανση Όλων σαν Μη Αναγνωσμένα"
   mark_as_done_6fa48d2f: "Επισήμανση ως ολοκληρωμένο"
@@ -8246,6 +8252,7 @@ el:
   median_score_4657e907: "<mrk mid=\"1110\" mtype=\"seg\">Διάμεσος:</mrk> <mrk mid=\"1111\" mtype=\"seg\">%{score}</mrk>"
   meets_expectations_bb179565: "Ικανοποιεί τις Προσδοκίες"
   meets_mastery_754e1c06: "Είναι σε Επίπεδο Επιδεξιότητας"
+  megabytes_885404ef: megabytes
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} μέλη από μέγιστο αριθμό %{max_membership} μελών"
   members_af25c21d: Μέλη
   members_are_free_to_join_defa5929: "Τα μέλη μπορούν ελεύθερα να συμμετάσχουν"
@@ -15277,6 +15284,7 @@ el:
   update_grade_b47eb3ff: "Ενημέρωση Βαθμού"
   update_module_b984c2e5: "Ενημέρωση Αρθρώματος"
   update_password_4bc5cb1f: "Ενημέρωση Κωδικού Πρόσβασης"
+  update_quota_81381226: "Ενημέρωση Ποσόστωσης"
   update_settings_9b422d0f: "Ενημέρωση Ρυθμίσεων"
   update_tool_7d48ef2a: "Ενημέρωση %{tool}"
   update_your_notification_settings_ed9564f3: "Ενημέρωση των ρυθμίσεων ειδοποιήσεών σας"
@@ -15284,6 +15292,7 @@ el:
   updated_group_group_name_727b1d98: "Η Ομάδα %{group_name} Ενημερώθηκε"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Ενημερωμένο UI για αναζήτηση και εμφάνιση χρηστών και μαθημάτων σε κάποιον λογαριασμό."
   updating_6edbab78: "Ενημέρωση σε εξέλιξη"
+  updating_73d0718c: "Ενημέρωση σε εξέλιξη..."
   updating_user_details_b8520b3e: "Γίνεται Ενημέρωση των Λεπτομερειών Χρήστη..."
   upload_8b403d05: Μεταφόρτωση
   upload_a_picture_9f5f6e3c: "Μεταφόρτωση Φωτογραφίας"
@@ -15461,6 +15470,7 @@ el:
       profile: Προφιλ
       settings: Ρυθμίσεις
   user_profile_d56261fc: "Προφίλ Χρήστη"
+  user_quota_12cb58b7: "Ποσόστωση Χρήστη"
   user_s_settings_d65644b4: "Ρυθμίσεις του/της %{user}"
   user_search_results_f5445b8b: "Αποτελέσματα Αναζήτησης Χρήστη"
   user_selected_answer: Επιλέξατε
