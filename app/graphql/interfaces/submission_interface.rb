@@ -520,7 +520,7 @@ module Interfaces::SubmissionInterface
   delegate :word_count, to: :object
 
   def version_query_param(submission)
-    if submission.attempt.present? && submission.attempt > 0
+    if submission.attempt.present? && submission.attempt > 0 && submission.submission_type != "online_quiz"
       submission.attempt - 1
     else
       submission.attempt
