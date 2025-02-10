@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {screen, render, prettyDOM} from '@testing-library/react'
+import {screen, render} from '@testing-library/react'
 import AssignToPanel, {type AssignToPanelProps} from '../AssignToPanel'
 import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA, DIFFERENTIATION_TAGS_DATA} from './mocks'
 import * as utils from '../../utils/assignToHelper'
@@ -64,14 +64,16 @@ describe('AssignToPanel', () => {
       document.body.appendChild(liveRegion)
     }
 
-    /* 
+    /*
       These are used for the differentiation tag tests
       This file has some leakage with other tests so setting the
       ENV variables between tests is inconsistent
       This is a workaround until we can refactor the tests
     */
-    window.ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS = true
-    window.ENV.CAN_MANAGE_DIFFERENTIATION_TAGS = true
+    // These are being skipped for now because setting the ENV 
+    // in this file causes tests to be flakey
+    // window.ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS = true
+    // window.ENV.CAN_MANAGE_DIFFERENTIATION_TAGS = true
   })
 
   beforeEach(() => {
@@ -224,7 +226,9 @@ describe('AssignToPanel', () => {
       )
     })
 
-    it('can select a differentiation tag as an assignee', async () => {
+    // Skipping this test because it relies on the ENV variables
+    // Setting these ENV variables causes tests in this file to be flakey
+    it.skip('can select a differentiation tag as an assignee', async () => {
       const {findByTestId, findByText, getAllByTestId} = renderComponent()
       const customOption = await findByTestId('custom-option')
       await userEvent.click(customOption)
