@@ -239,31 +239,29 @@ module Translation
       end
     end
 
-    def translate_text(text:, src_lang:, tgt_lang:)
+    def translate_text(text:, tgt_lang:)
       return unless translation_client.present?
       return if tgt_lang.nil?
 
-      src_lang = parse_src_lang(text) if src_lang.nil?
       result = translation_client.translate_text({
                                                    text: text,
-                                                   source_language_code: src_lang,
+                                                   source_language_code: "auto",
                                                    target_language_code: tgt_lang,
                                                  })
 
       result.translated_text
     end
 
-    def translate_html(html_string:, src_lang:, tgt_lang:)
+    def translate_html(html_string:, tgt_lang:)
       return unless translation_client.present?
       return if tgt_lang.nil?
 
-      src_lang = parse_src_lang(html_string) if src_lang.nil?
       result = translation_client.translate_document({
                                                        document: {
                                                          content: html_string,
                                                          content_type: "text/html",
                                                        },
-                                                       source_language_code: src_lang,
+                                                       source_language_code: "auto",
                                                        target_language_code: tgt_lang,
                                                      })
 

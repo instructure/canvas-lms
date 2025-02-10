@@ -34,7 +34,6 @@ class TranslationController < ApplicationController
     InstStatsd::Statsd.distributed_increment("translation.discussions")
     if Account.site_admin.feature_enabled?(:ai_translation_improvements)
       render json: { translated_text: Translation.translate_html(html_string: required_params[:text],
-                                                                 src_lang: required_params[:src_lang],
                                                                  tgt_lang: required_params[:tgt_lang]) }
     else
       render json: { translated_text: Translation.translate_html_sagemaker(html_string: required_params[:text],
@@ -48,7 +47,6 @@ class TranslationController < ApplicationController
     InstStatsd::Statsd.distributed_increment("translation.inbox_compose")
     if Account.site_admin.feature_enabled?(:ai_translation_improvements)
       render json: { translated_text: Translation.translate_text(text: required_params[:text],
-                                                                 src_lang: required_params[:src_lang],
                                                                  tgt_lang: required_params[:tgt_lang]) }
     else
       render json: translate_large_passage(original_text: required_params[:text],

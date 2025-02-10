@@ -57,27 +57,16 @@ describe Translation do
 
     it "returns nil if translation client is not present" do
       allow(described_class).to receive(:translation_client).and_return(nil)
-      expect(described_class.translate_text(text: text, src_lang: "en", tgt_lang: "es")).to be_nil
+      expect(described_class.translate_text(text: text, tgt_lang: "es")).to be_nil
     end
 
     it "returns nil if tgt_lang is nil" do
-      expect(described_class.translate_text(text: text, src_lang: "en", tgt_lang: nil)).to be_nil
-    end
-
-    it "determines source language from text if nil" do
-      hungarian_text = "Hello, világ!"
-      allow(translation_client).to receive(:translate_text).and_return(result)
-      expect(described_class.translate_text(text: hungarian_text, src_lang: nil, tgt_lang: "es")).to eq("Hola, mundo!")
-      expect(translation_client).to have_received(:translate_text).with(
-        text: hungarian_text,
-        source_language_code: "hu",
-        target_language_code: "es"
-      )
+      expect(described_class.translate_text(text: text, tgt_lang: nil)).to be_nil
     end
 
     it "translates text when src_lang and tgt_lang are provided" do
       allow(translation_client).to receive(:translate_text).and_return(result)
-      expect(described_class.translate_text(text: text, src_lang: "en", tgt_lang: "es")).to eq("Hola, mundo!")
+      expect(described_class.translate_text(text: text, tgt_lang: "es")).to eq("Hola, mundo!")
     end
   end
 
@@ -91,30 +80,16 @@ describe Translation do
 
     it "returns nil if translation client is not present" do
       allow(described_class).to receive(:translation_client).and_return(nil)
-      expect(described_class.translate_html(html_string: html, src_lang: "en", tgt_lang: "es")).to be_nil
+      expect(described_class.translate_html(html_string: html, tgt_lang: "es")).to be_nil
     end
 
     it "returns nil if tgt_lang is nil" do
-      expect(described_class.translate_html(html_string: html, src_lang: "en", tgt_lang: nil)).to be_nil
-    end
-
-    it "determines source language from text if nil" do
-      hungarian_html = "Hello, világ!"
-      allow(translation_client).to receive(:translate_document).and_return(result)
-      expect(described_class.translate_html(html_string: hungarian_html, src_lang: nil, tgt_lang: "es")).to eq("<p>Hola, mundo!</p>")
-      expect(translation_client).to have_received(:translate_document).with(
-        document: {
-          content: hungarian_html,
-          content_type: "text/html",
-        },
-        source_language_code: "hu",
-        target_language_code: "es"
-      )
+      expect(described_class.translate_html(html_string: html, tgt_lang: nil)).to be_nil
     end
 
     it "translates text when src_lang and tgt_lang are provided" do
       allow(translation_client).to receive(:translate_document).and_return(result)
-      expect(described_class.translate_html(html_string: html, src_lang: "en", tgt_lang: "es")).to eq("<p>Hola, mundo!</p>")
+      expect(described_class.translate_html(html_string: html, tgt_lang: "es")).to eq("<p>Hola, mundo!</p>")
     end
   end
 end
