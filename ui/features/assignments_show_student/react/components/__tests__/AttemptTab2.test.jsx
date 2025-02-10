@@ -570,19 +570,13 @@ describe('ContentTabs', () => {
       const progressBars = await findAllByRole('progressbar')
       expect(progressBars).toHaveLength(2)
 
-      expect(progressBars[0]).toHaveAttribute('aria-valuenow', '10')
-      expect(progressBars[0]).toHaveAttribute('aria-valuemax', '100')
-      expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
       expect(progressBars[0]).toHaveAttribute(
-        'aria-label',
+        'aria-valuetext',
         'Upload progress for file1.pdf 10 percent',
       )
 
-      expect(progressBars[1]).toHaveAttribute('aria-valuenow', '50')
-      expect(progressBars[1]).toHaveAttribute('aria-valuemax', '250')
-      expect(progressBars[1]).toHaveAttribute('aria-valuetext', '20 percent')
       expect(progressBars[1]).toHaveAttribute(
-        'aria-label',
+        'aria-valuetext',
         'Upload progress for file2.pdf 20 percent',
       )
     })
@@ -621,11 +615,8 @@ describe('ContentTabs', () => {
       const progressBars = await findAllByRole('progressbar')
       expect(progressBars).toHaveLength(1)
 
-      expect(progressBars[0]).toHaveAttribute('aria-valuenow', '10')
-      expect(progressBars[0]).toHaveAttribute('aria-valuemax', '100')
-      expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
       expect(progressBars[0]).toHaveAttribute(
-        'aria-label',
+        'aria-valuetext',
         'Upload progress for http://localhost/some-lti-file 10 percent',
       )
     })
@@ -654,7 +645,7 @@ describe('ContentTabs', () => {
       progressHandlers[0]({loaded: 10, total: 100})
 
       const progressBars = await findAllByRole('progressbar')
-      expect(progressBars[0]).toHaveAttribute('aria-label', 'Upload progress for x.pdf 10 percent')
+      expect(progressBars[0]).toHaveAttribute('aria-valuetext', 'Upload progress for x.pdf 10 percent')
 
       expect(uploadFileModule.uploadFile.mock.calls[0][1]).toEqual({
         url: 'http://localhost/some-lti-file',

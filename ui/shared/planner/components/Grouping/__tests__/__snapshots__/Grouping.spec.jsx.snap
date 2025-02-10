@@ -7,13 +7,13 @@ exports[`grouping contains link pointing to course url 1`] = `
   .Grouping-styles__root {
     font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     margin: 1.5rem 0 0 0;
-    border-color: #0374B5;
-    color: #0374B5;
+    border-color: #2B7ABC;
+    color: #2B7ABC;
     line-height: 1.25;
     position: relative;
     display: flex;
   }
-  
+
   .Grouping-styles__title {
     position: relative;
     z-index: 1;
@@ -26,7 +26,7 @@ exports[`grouping contains link pointing to course url 1`] = `
     text-decoration: none;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #0374B5;
+    color: #2B7ABC;
     border-top-left-radius: 0.125rem;
     min-width: 1px;
     overflow: hidden;
@@ -44,7 +44,7 @@ exports[`grouping contains link pointing to course url 1`] = `
     left: 0;
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%);
   }
-  
+
   .Grouping-styles__hero {
     position: relative;
     display: flex;
@@ -63,22 +63,22 @@ exports[`grouping contains link pointing to course url 1`] = `
   .Grouping-styles__hero .Grouping-styles__groupingName {
     text-decoration: undefined;
   }
-  
+
   .Grouping-styles__hero,
   .Grouping-styles__overlay {
     border-bottom-inline-start-radius: 0.25rem;
     border-top-inline-start-radius: 0.25rem;
   }
-  
+
   .Grouping-styles__heroHover:focus, .Grouping-styles__heroHover:hover {
     text-decoration: none;
   }
   .Grouping-styles__heroHover:focus .Grouping-styles__title, .Grouping-styles__heroHover:hover .Grouping-styles__title {
     text-decoration: underline;
   }
-  
+
   .Grouping-styles__overlay {
-    background-color: #0374B5;
+    background-color: #2B7ABC;
     opacity: 1;
     width: 100%;
     height: 100%;
@@ -89,18 +89,18 @@ exports[`grouping contains link pointing to course url 1`] = `
   .Grouping-styles__overlay.Grouping-styles__withImage {
     opacity: 0.75;
   }
-  
+
   .Grouping-styles__items {
     flex: 1;
     list-style-type: none;
     margin: 0;
     padding: 0;
     border-top: 0.0625rem solid;
-    border-color: #0374B5;
-    color: #0374B5;
+    border-color: #2B7ABC;
+    color: #2B7ABC;
     min-width: 1px;
   }
-  
+
   .Grouping-styles__medium.Grouping-styles__root, .Grouping-styles__small.Grouping-styles__root {
     display: block;
     margin: 0;
@@ -226,13 +226,13 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
   .Grouping-styles__root {
     font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     margin: 1.5rem 0 0 0;
-    border-color: #0374B5;
-    color: #0374B5;
+    border-color: #2B7ABC;
+    color: #2B7ABC;
     line-height: 1.25;
     position: relative;
     display: flex;
   }
-  
+
   .Grouping-styles__title {
     position: relative;
     z-index: 1;
@@ -245,7 +245,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
     text-decoration: none;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #0374B5;
+    color: #2B7ABC;
     border-top-left-radius: 0.125rem;
     min-width: 1px;
     overflow: hidden;
@@ -263,7 +263,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
     left: 0;
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%);
   }
-  
+
   .Grouping-styles__hero {
     position: relative;
     display: flex;
@@ -282,22 +282,22 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
   .Grouping-styles__hero .Grouping-styles__groupingName {
     text-decoration: undefined;
   }
-  
+
   .Grouping-styles__hero,
   .Grouping-styles__overlay {
     border-bottom-inline-start-radius: 0.25rem;
     border-top-inline-start-radius: 0.25rem;
   }
-  
+
   .Grouping-styles__heroHover:focus, .Grouping-styles__heroHover:hover {
     text-decoration: none;
   }
   .Grouping-styles__heroHover:focus .Grouping-styles__title, .Grouping-styles__heroHover:hover .Grouping-styles__title {
     text-decoration: underline;
   }
-  
+
   .Grouping-styles__overlay {
-    background-color: #0374B5;
+    background-color: #2B7ABC;
     opacity: 1;
     width: 100%;
     height: 100%;
@@ -308,18 +308,18 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
   .Grouping-styles__overlay.Grouping-styles__withImage {
     opacity: 0.75;
   }
-  
+
   .Grouping-styles__items {
     flex: 1;
     list-style-type: none;
     margin: 0;
     padding: 0;
     border-top: 0.0625rem solid;
-    border-color: #0374B5;
-    color: #0374B5;
+    border-color: #2B7ABC;
+    color: #2B7ABC;
     min-width: 1px;
   }
-  
+
   .Grouping-styles__medium.Grouping-styles__root, .Grouping-styles__small.Grouping-styles__root {
     display: block;
     margin: 0;
@@ -442,13 +442,13 @@ exports[`renders the base component with required props 1`] = `
   .Grouping-styles__root {
     font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     margin: 1.5rem 0 0 0;
-    border-color: #0374B5;
-    color: #0374B5;
+    border-color: #2B7ABC;
+    color: #2B7ABC;
     line-height: 1.25;
     position: relative;
     display: flex;
   }
-  
+
   .Grouping-styles__title {
     position: relative;
     z-index: 1;
@@ -461,7 +461,7 @@ exports[`renders the base component with required props 1`] = `
     text-decoration: none;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #0374B5;
+    color: #2B7ABC;
     border-top-left-radius: 0.125rem;
     min-width: 1px;
     overflow: hidden;
@@ -479,7 +479,7 @@ exports[`renders the base component with required props 1`] = `
     left: 0;
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%);
   }
-  
+
   .Grouping-styles__hero {
     position: relative;
     display: flex;
@@ -498,22 +498,22 @@ exports[`renders the base component with required props 1`] = `
   .Grouping-styles__hero .Grouping-styles__groupingName {
     text-decoration: undefined;
   }
-  
+
   .Grouping-styles__hero,
   .Grouping-styles__overlay {
     border-bottom-inline-start-radius: 0.25rem;
     border-top-inline-start-radius: 0.25rem;
   }
-  
+
   .Grouping-styles__heroHover:focus, .Grouping-styles__heroHover:hover {
     text-decoration: none;
   }
   .Grouping-styles__heroHover:focus .Grouping-styles__title, .Grouping-styles__heroHover:hover .Grouping-styles__title {
     text-decoration: underline;
   }
-  
+
   .Grouping-styles__overlay {
-    background-color: #0374B5;
+    background-color: #2B7ABC;
     opacity: 1;
     width: 100%;
     height: 100%;
@@ -524,18 +524,18 @@ exports[`renders the base component with required props 1`] = `
   .Grouping-styles__overlay.Grouping-styles__withImage {
     opacity: 0.75;
   }
-  
+
   .Grouping-styles__items {
     flex: 1;
     list-style-type: none;
     margin: 0;
     padding: 0;
     border-top: 0.0625rem solid;
-    border-color: #0374B5;
-    color: #0374B5;
+    border-color: #2B7ABC;
+    color: #2B7ABC;
     min-width: 1px;
   }
-  
+
   .Grouping-styles__medium.Grouping-styles__root, .Grouping-styles__small.Grouping-styles__root {
     display: block;
     margin: 0;
@@ -661,13 +661,13 @@ exports[`renders to do items correctly 1`] = `
   .Grouping-styles__root {
     font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     margin: 1.5rem 0 0 0;
-    border-color: #0374B5;
-    color: #0374B5;
+    border-color: #2B7ABC;
+    color: #2B7ABC;
     line-height: 1.25;
     position: relative;
     display: flex;
   }
-  
+
   .Grouping-styles__title {
     position: relative;
     z-index: 1;
@@ -680,7 +680,7 @@ exports[`renders to do items correctly 1`] = `
     text-decoration: none;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #0374B5;
+    color: #2B7ABC;
     border-top-left-radius: 0.125rem;
     min-width: 1px;
     overflow: hidden;
@@ -698,7 +698,7 @@ exports[`renders to do items correctly 1`] = `
     left: 0;
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%);
   }
-  
+
   .Grouping-styles__hero {
     position: relative;
     display: flex;
@@ -717,22 +717,22 @@ exports[`renders to do items correctly 1`] = `
   .Grouping-styles__hero .Grouping-styles__groupingName {
     text-decoration: undefined;
   }
-  
+
   .Grouping-styles__hero,
   .Grouping-styles__overlay {
     border-bottom-inline-start-radius: 0.25rem;
     border-top-inline-start-radius: 0.25rem;
   }
-  
+
   .Grouping-styles__heroHover:focus, .Grouping-styles__heroHover:hover {
     text-decoration: none;
   }
   .Grouping-styles__heroHover:focus .Grouping-styles__title, .Grouping-styles__heroHover:hover .Grouping-styles__title {
     text-decoration: underline;
   }
-  
+
   .Grouping-styles__overlay {
-    background-color: #0374B5;
+    background-color: #2B7ABC;
     opacity: 1;
     width: 100%;
     height: 100%;
@@ -743,18 +743,18 @@ exports[`renders to do items correctly 1`] = `
   .Grouping-styles__overlay.Grouping-styles__withImage {
     opacity: 0.75;
   }
-  
+
   .Grouping-styles__items {
     flex: 1;
     list-style-type: none;
     margin: 0;
     padding: 0;
     border-top: 0.0625rem solid;
-    border-color: #0374B5;
-    color: #0374B5;
+    border-color: #2B7ABC;
+    color: #2B7ABC;
     min-width: 1px;
   }
-  
+
   .Grouping-styles__medium.Grouping-styles__root, .Grouping-styles__small.Grouping-styles__root {
     display: block;
     margin: 0;

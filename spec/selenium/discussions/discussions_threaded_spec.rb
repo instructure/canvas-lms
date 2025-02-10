@@ -1018,7 +1018,7 @@ describe "threaded discussions" do
       )
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       f("button[data-testid='thread-actions-menu']").click
-      fj("li:contains('Edit')").click
+      fj("[class*=menuItem__label]:contains('Edit')").click
       wait_for_ajaximations
       type_in_tiny("textarea", edit_text)
       fj("button:contains('Save')").click
@@ -1044,7 +1044,7 @@ describe "threaded discussions" do
       )
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       f("button[data-testid='thread-actions-menu']").click
-      fj("li:contains('Edit')").click
+      fj("[class*=menuItem__label]:contains('Edit')").click
       wait_for_ajaximations
       type_in_tiny("textarea", edit_text)
       fj("button:contains('Save')").click
@@ -1171,8 +1171,8 @@ describe "threaded discussions" do
 
       it "does not allow editing or deleting for a concluded student" do
         f("button[data-testid='thread-actions-menu']").click
-        expect(f("body")).not_to contain_jqcss("li:contains('Edit')")
-        expect(f("body")).not_to contain_jqcss("li:contains('Delete')")
+        expect(f("body")).not_to contain_jqcss("[class*=menuItem__label]:contains('Edit')")
+        expect(f("body")).not_to contain_jqcss("[class*=menuItem__label]:contains('Delete')")
       end
     end
 
@@ -1185,7 +1185,7 @@ describe "threaded discussions" do
       @topic.lock!
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       f("button[data-testid='thread-actions-menu']").click
-      expect(f("body")).not_to contain_jqcss("li:contains('Edit')")
+      expect(f("body")).not_to contain_jqcss("[class*=menuItem__label]:contains('Edit')")
     end
 
     it "deletes a reply" do
@@ -1198,7 +1198,7 @@ describe "threaded discussions" do
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       f("button[data-testid='thread-actions-menu']").click
-      fj("li:contains('Delete')").click
+      fj("[class*=menuItem__label]:contains('Delete')").click
       driver.switch_to.alert.accept
       wait_for_ajax_requests
       entry.reload
@@ -1218,7 +1218,7 @@ describe "threaded discussions" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       expect(fj("span:contains('1 Reply')")).to be_present
       f("button[data-testid='thread-actions-menu']").click
-      fj("li:contains('Delete')").click
+      fj("[class*=menuItem__label]:contains('Delete')").click
       driver.switch_to.alert.accept
       wait_for_ajax_requests
       entry.reload
@@ -1276,7 +1276,7 @@ describe "threaded discussions" do
 
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         f("button[data-testid='thread-actions-menu']").click
-        fj("li:contains('Report')").click
+        fj("[class*=menuItem__label]:contains('Report')").click
         expect(fj("h2:contains('Report Reply')")).to be_present
 
         # side test, click away from modal and make sure it closes
@@ -1285,12 +1285,12 @@ describe "threaded discussions" do
 
         # resume main test
         move_to_click("button[data-testid='thread-actions-menu']")
-        fj("li:contains('Report')").click
+        fj("[class*=menuItem__label]:contains('Report')").click
         move_to_click("input[value='offensive']")
         f("button[data-testid='report-reply-submit-button']").click
         wait_for_ajaximations
         move_to_click("button[data-testid='thread-actions-menu']")
-        expect(fj("li:contains('Reported')")).to be_present
+        expect(fj("[class*=menuItem__label]:contains('Reported')")).to be_present
       end
     end
 

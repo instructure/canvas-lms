@@ -41,7 +41,7 @@ describe('UploadProgress', () => {
       renderComponent()
       const progressBar = document.body.querySelector('progress')
       expect(progressBar).toHaveAttribute('value', '50')
-      expect(progressBar).toHaveAttribute('aria-label', 'foo.txt - 50 percent uploaded 50 / 100')
+      expect(progressBar).toHaveAttribute('aria-valuetext', 'foo.txt - 50 percent uploaded 50 / 100')
     })
 
     it('with success message', () => {
@@ -49,7 +49,7 @@ describe('UploadProgress', () => {
       renderComponent()
       const progressBar = document.body.querySelector('progress')
       expect(progressBar).toHaveAttribute('value', '100')
-      expect(progressBar).toHaveAttribute('aria-label', 'foo.txt uploaded successfully! 100 / 100')
+      expect(progressBar).toHaveAttribute('aria-valuetext', 'foo.txt uploaded successfully! 100 / 100')
     })
 
     it('with error message', () => {
@@ -58,7 +58,7 @@ describe('UploadProgress', () => {
       renderComponent()
       const progressBar = document.body.querySelector('progress')
       expect(progressBar).toHaveAttribute('value', '50')
-      expect(progressBar).toHaveAttribute('aria-label', 'Error: Error uploading file. 50 / 100')
+      expect(progressBar).toHaveAttribute('aria-valuetext', 'Error: Error uploading file. 50 / 100')
     })
   })
 

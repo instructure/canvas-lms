@@ -39,7 +39,7 @@ const defaultProps = () => ({
   isToggleLocking: false,
   permissions: defaultPermissions(),
   atomFeedUrl: null,
-  searchAnnouncements: () => Promise.reject(new Error('Not Implemented')),
+  searchAnnouncements: () => {},
   toggleSelectedAnnouncementsLock: () => Promise.reject(new Error('Not Implemented')),
   deleteSelectedAnnouncements: () => Promise.reject(new Error('Not Implemented')),
   searchInputRef: null,
@@ -135,8 +135,7 @@ describe('IndexHeader', () => {
       const filterButton = screen.getByRole('button', {name: 'Announcement Filter'})
       await user.click(filterButton)
 
-      const filterMenu = screen.getAllByRole('menu')[1]
-      const allKeys = filterMenu.querySelectorAll('li')
+      const allKeys = screen.getAllByRole('menuitemradio')
       expect(allKeys).toHaveLength(2)
 
       await user.click(allKeys[1])

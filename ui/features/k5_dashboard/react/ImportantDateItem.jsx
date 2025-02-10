@@ -96,8 +96,8 @@ const ImportantDateItem = ({title, context, color, type, url}) => (
           href={url}
           isWithinText={false}
           themeOverride={{
-            color: k5ThemeVariables.colors.textDarkest,
-            hoverColor: k5ThemeVariables.colors.textDarkest,
+            color: k5ThemeVariables.colors.contrasts.grey125125,
+            hoverColor: k5ThemeVariables.colors.contrasts.grey125125,
             fontWeight: 700,
           }}
         >

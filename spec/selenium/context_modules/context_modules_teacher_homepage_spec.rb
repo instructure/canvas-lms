@@ -126,7 +126,7 @@ describe "context modules" do
         expect(tag.reload).to be_published
         refresh_page
         f("#course_publish_button button").click
-        f("ul[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
+        f("div[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
         expect(f("span.publish-icon.published.publish-icon-published")).to be_displayed
         expect(tag).to be_published
       end

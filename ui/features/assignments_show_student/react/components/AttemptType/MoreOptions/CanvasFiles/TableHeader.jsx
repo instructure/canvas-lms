@@ -28,7 +28,7 @@ const I18n = createI18nScope('assignments_2')
 
 const TableHeader = props => {
   const headerStyle = {
-    borderBottom: `1px solid ${theme.colors.borderMedium}`,
+    borderBottom: `1px solid ${theme.colors.contrasts.grey1214}`,
   }
 
   const renderTableHeader = (name, size, key, grow) => (

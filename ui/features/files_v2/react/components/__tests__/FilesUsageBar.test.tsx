@@ -76,7 +76,8 @@ describe('FilesUsageBar', () => {
     const percentageText = await screen.findByText(`50% of ${quota} used`)
     expect(percentageText).toBeInTheDocument()
 
-    const progressBar = screen.getByLabelText(/File Storage Quota Used/i)
+    const progressBar = document.querySelector('progress[aria-valuetext="File Storage Quota Used 50% of 1 KB used"]');
+
     expect(progressBar).toBeInTheDocument()
   })
 

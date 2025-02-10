@@ -40,8 +40,8 @@ export default function buildStyle() {
     fontFamily: variables.typography.fontFamily,
     fontWeight: variables.typography.fontWeightNormal,
     lineHeight: variables.typography.lineHeightCondensed,
-    color: variables.colors.oxford,
-    background: variables.colors.white,
+    color: variables.colors.contrasts.grey100100,
+    background: variables.colors.contrasts.white1010,
     marginTop: variables.spacing.large,
     borderWidth: variables.borders.widthSmall,
     paddingWidth: variables.spacing.small,
@@ -60,11 +60,11 @@ export default function buildStyle() {
     border-bottom-width: ${theme.borderWidth};
     border-bottom-style: solid;
   }
-  
+
   .${classNames.nothingPlannedContent} {
     padding: ${theme.paddingWidth} 0 0 0;
   }
-  
+
   .${classNames.nothingPlannedContainer} {
     position: absolute;
     left: 0;
@@ -76,11 +76,11 @@ export default function buildStyle() {
     justify-content: center;
     align-items: center;
   }
-  
+
   .${classNames.nothingPlanned} {
     padding-top: ${theme.paddingWidth};
   }
-  
+
   .${classNames.small} .${classNames.nothingPlannedContent} {
     display: flex;
     flex-direction: column-reverse;

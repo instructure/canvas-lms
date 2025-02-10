@@ -30,7 +30,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
             </div>
           </div>
           <div
-            class="css-1wbrhzw-drawerTray transition--fade-entered"
+            class="css-1bzuhml-drawerTray transition--fade-entered"
             data-drawer-tray="DrawerLayout_0"
             data-testid="drawer-layout-tray"
           >
@@ -63,14 +63,14 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                         class="css-btw693-closeButton"
                       >
                         <button
-                          class="css-1hj8nz2-view--inlineBlock-baseButton"
+                          class="css-11auhcu-view--inlineBlock-baseButton"
                           cursor="pointer"
                           dir="ltr"
                           tabindex="0"
                           type="button"
                         >
                           <span
-                            class="css-1leqwnv-baseButton__content"
+                            class="css-19dh8cm-baseButton__content"
                           >
                             <span
                               class="css-qi8ml9-baseButton__childrenLayout"
@@ -103,7 +103,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                                   </svg>
                                 </span>
                                 <span
-                                  class="css-1sr5vj2-screenReaderContent"
+                                  class="css-r9cwls-screenReaderContent"
                                 >
                                   Close
                                 </span>
@@ -205,7 +205,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
           </div>
         </div>
         <div
-          class="css-1wbrhzw-drawerTray transition--fade-entered"
+          class="css-1bzuhml-drawerTray transition--fade-entered"
           data-drawer-tray="DrawerLayout_0"
           data-testid="drawer-layout-tray"
         >
@@ -238,14 +238,14 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                       class="css-btw693-closeButton"
                     >
                       <button
-                        class="css-1hj8nz2-view--inlineBlock-baseButton"
+                        class="css-11auhcu-view--inlineBlock-baseButton"
                         cursor="pointer"
                         dir="ltr"
                         tabindex="0"
                         type="button"
                       >
                         <span
-                          class="css-1leqwnv-baseButton__content"
+                          class="css-19dh8cm-baseButton__content"
                         >
                           <span
                             class="css-qi8ml9-baseButton__childrenLayout"
@@ -278,7 +278,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                                 </svg>
                               </span>
                               <span
-                                class="css-1sr5vj2-screenReaderContent"
+                                class="css-r9cwls-screenReaderContent"
                               >
                                 Close
                               </span>

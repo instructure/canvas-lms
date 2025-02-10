@@ -288,7 +288,7 @@ class FileUpload extends Component {
       display: desktop ? 'block' : 'inline',
       width: desktop ? '100%' : '60px',
       zIndex: 99,
-      backgroundColor: theme.colors.backgroundLight,
+      backgroundColor: theme.colors.contrasts.grey1111,
       padding: desktop ? `${theme.spacing.medium} 0` : '0',
     }
     const lineStyle = {
@@ -296,7 +296,7 @@ class FileUpload extends Component {
       width: desktop ? '1px' : '100%',
       left: desktop ? '50%' : '0',
       position: 'absolute',
-      backgroundColor: theme.colors.backgroundDark,
+      backgroundColor: theme.colors.contrasts.grey4570,
     }
 
     return (
@@ -388,7 +388,7 @@ class FileUpload extends Component {
     // uploaded don't have that set yet, so use the local name (which we've set
     // to the URL for files from an LTI).
     const displayName = file.displayName || file.name
-    const cellTheme = {background: theme.colors.backgroundLight}
+    const cellTheme = {background: theme.colors.contrasts.grey1111}
 
     return (
       <Table.Row key={file._id}>
@@ -428,7 +428,7 @@ class FileUpload extends Component {
   }
 
   renderUploadedFiles = files => {
-    const cellTheme = {background: theme.colors.backgroundLight}
+    const cellTheme = {background: theme.colors.contrasts.grey1111}
 
     return (
       <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">

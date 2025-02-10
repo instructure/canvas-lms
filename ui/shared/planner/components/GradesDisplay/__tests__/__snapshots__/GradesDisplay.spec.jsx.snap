@@ -5,7 +5,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
   <style>
     
   .GradesDisplay-styles__course {
-    border-bottom-color: #0374B5;
+    border-bottom-color: #2B7ABC;
   }
   
   </style>
@@ -114,7 +114,7 @@ exports[`renders a loading spinner when loading 1`] = `
   <style>
     
   .GradesDisplay-styles__course {
-    border-bottom-color: #0374B5;
+    border-bottom-color: #2B7ABC;
   }
   
   </style>
@@ -191,7 +191,7 @@ exports[`renders an ErrorAlert if there is an error loading grades 1`] = `
   <style>
     
   .GradesDisplay-styles__course {
-    border-bottom-color: #0374B5;
+    border-bottom-color: #2B7ABC;
   }
   
   </style>
@@ -251,7 +251,7 @@ exports[`renders some course grades 1`] = `
   <style>
     
   .GradesDisplay-styles__course {
-    border-bottom-color: #0374B5;
+    border-bottom-color: #2B7ABC;
   }
   
   </style>

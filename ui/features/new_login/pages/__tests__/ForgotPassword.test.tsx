@@ -104,7 +104,7 @@ describe('ForgotPassword', () => {
         const requiredLabels = screen.getAllByText(/\*$/)
         requiredLabels.forEach(label => {
           const style = window.getComputedStyle(label)
-          expect(style.color).toBe('rgb(224, 6, 31)')
+          expect(style.color).toBe('rgb(199, 31, 35)')
         })
       })
 

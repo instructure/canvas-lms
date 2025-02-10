@@ -27,8 +27,6 @@ import {possibleString, possibleStringRange} from '../Points'
 import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
 import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton'
 
-const {shamrock} = colors
-
 type VerticalButtonDisplayProps = {
   isPreviewMode: boolean
   isSelfAssessment: boolean
@@ -128,7 +126,7 @@ export const VerticalButtonDisplay = ({
                     padding="xx-small"
                     margin="0 0 x-small xx-small"
                     data-testid={`rating-details-${rating.id}`}
-                    themeOverride={{borderColorBrand: shamrock, borderWidthMedium: '0.188rem'}}
+                    themeOverride={{borderColorBrand: colors.contrasts.green4570, borderWidthMedium: '0.188rem'}}
                   >
                     <View as="div">
                       <Text size="x-small" weight="bold">

@@ -117,6 +117,6 @@ describe('StudentRangesView', () => {
 
     // Verify first range content is visible
     const firstRangeContent = document.getElementById('Expandable_0')
-    expect(firstRangeContent).toHaveClass('css-2yuqo3-toggleDetails__details')
+    expect(firstRangeContent).toHaveClass('css-1u67g6d-toggleDetails__details')
   })
 })

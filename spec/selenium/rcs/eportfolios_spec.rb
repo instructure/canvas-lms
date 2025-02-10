@@ -99,7 +99,7 @@ describe "eportfolios" do
       expect(pages.length).to eq 1
       last_page = pages.last
       last_page.find("button").click
-      expect(f("ul[role='menu']")).not_to include_text("Delete")
+      expect(f("div[role='menu']")).not_to include_text("Delete")
     end
 
     it "reorders a page", :ignore_js_errors, priority: "1" do
@@ -144,7 +144,7 @@ describe "eportfolios" do
       expect(sections.length).to eq 1
       last_section = sections.last
       last_section.find("button").click
-      expect(f("ul[role='menu']")).not_to include_text("Delete")
+      expect(f("div[role='menu']")).not_to include_text("Delete")
     end
 
     it "reorders a section", :ignore_js_errors, priority: "1" do

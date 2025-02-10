@@ -170,7 +170,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu(discussion.title)
-    const allKeys = list.querySelectorAll('li')
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(3)
     expect(allKeys[0].textContent.includes('Close for comments')).toBe(true)
     expect(allKeys[1].textContent.includes('Pin')).toBe(true)
@@ -262,7 +262,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll('li')
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Move To')).toBe(true)
   })
@@ -278,7 +278,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll('li')
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Pin')).toBe(true)
   })
@@ -301,7 +301,7 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll('li')
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('SpeedGrader')).toBe(true)
   })
@@ -317,7 +317,8 @@ describe('DiscussionRow', () => {
     )
 
     const list = await openManageMenu('Hello World')
-    const allKeys = list.querySelectorAll('li')
+
+    const allKeys = list.querySelectorAll("[class*='menuItem__label']");
     expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Duplicate')).toBe(true)
   })

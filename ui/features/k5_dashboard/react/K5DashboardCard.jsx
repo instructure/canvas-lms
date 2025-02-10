@@ -156,8 +156,8 @@ export const AssignmentLinks = ({
             display="block"
             isWithinText={false}
             themeOverride={{
-              color: k5ThemeVariables.colors.textDarkest,
-              hoverColor: k5ThemeVariables.colors.textDarkest,
+              color: k5ThemeVariables.colors.contrasts.grey125125,
+              hoverColor: k5ThemeVariables.colors.contrasts.grey125125,
             }}
           >
             <AccessibleContent
@@ -187,8 +187,8 @@ export const AssignmentLinks = ({
               display="block"
               isWithinText={false}
               themeOverride={{
-                color: k5ThemeVariables.colors.textDanger,
-                hoverColor: k5ThemeVariables.colors.textDanger,
+                color: k5ThemeVariables.colors.contrasts.red4570,
+                hoverColor: k5ThemeVariables.colors.contrasts.red4570,
               }}
             >
               <AccessibleContent
@@ -308,8 +308,8 @@ const K5DashboardCard = ({
             display="block"
             isWithinText={false}
             themeOverride={{
-              color: k5ThemeVariables.colors.textDarkest,
-              hoverColor: k5ThemeVariables.colors.textDarkest,
+              color: k5ThemeVariables.colors.contrasts.grey125125,
+              hoverColor: k5ThemeVariables.colors.contrasts.grey125125,
               fontWeight: 700,
             }}
           >

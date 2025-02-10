@@ -18,7 +18,7 @@ exports[`can handles no items 1`] = `
           </span>
         </h2>
         <span
-          class="css-1gx2f2-text"
+          class="css-10573t-text"
           letter-spacing="normal"
           wrap="normal"
         >
@@ -41,7 +41,7 @@ exports[`can handles no items 1`] = `
         </span>
       </h2>
       <span
-        class="css-1gx2f2-text"
+        class="css-10573t-text"
         letter-spacing="normal"
         wrap="normal"
       >

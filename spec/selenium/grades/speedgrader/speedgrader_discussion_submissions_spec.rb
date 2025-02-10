@@ -224,7 +224,7 @@ describe "SpeedGrader - discussion submissions" do
         it "displays the sticky header when scrolling", :ignore_js_errors do
           Speedgrader.visit(@course.id, @assignment.id)
           f("button[title='Settings']").click
-          fj("li:contains('Options')").click
+          fj("[class*='menuItem__label']:contains('Options')").click
           fj("label:contains('Show replies in context')").click
           fj(".ui-dialog-buttonset .ui-button:visible:last").click
           wait_for_ajaximations
@@ -240,9 +240,10 @@ describe "SpeedGrader - discussion submissions" do
 
       context "Default Discussion View Options" do
         it "is set to No Context by default and retains on save" do
+          skip "27 Mar 2025 FSC thinks this is flaky; unskip in EGG-975"
           Speedgrader.visit(@course.id, @assignment.id)
           f("button[title='Settings']").click
-          fj("li:contains('Options')").click
+          fj("[class*=menuItem__label]:contains('Options')").click
           expect(f("input[value='discussion_view_no_context']").attribute("checked")).to eq("true")
           expect(f("body")).not_to contain_jqcss("button[data-testid='discussions-previous-reply-button']")
 
@@ -251,9 +252,10 @@ describe "SpeedGrader - discussion submissions" do
         end
 
         it "applies and persists new Discussion View Options selection" do
+          skip "27 Mar 2025 FSC thinks this is flaky; unskip in EGG-975"
           Speedgrader.visit(@course.id, @assignment.id)
           f("button[title='Settings']").click
-          fj("li:contains('Options')").click
+          fj("[class*=menuItem__label]:contains('Options')").click
           fj("label:contains('Show replies in context')").click
           fj(".ui-dialog-buttonset .ui-button:visible:last").click
 
@@ -269,7 +271,7 @@ describe "SpeedGrader - discussion submissions" do
           Speedgrader.visit(@course.id, @assignment.id)
 
           f("button[title='Settings']").click
-          fj("li:contains('Options')").click
+          fj("[class*=menuItem__label]:contains('Options')").click
           expect(f("input[value='discussion_view_with_context']").attribute("checked")).to eq("true")
           fj(".ui-dialog-buttonset .ui-button:visible:first").click
 

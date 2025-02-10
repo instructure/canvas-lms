@@ -332,7 +332,7 @@ describe('ProgressBar for loading data', () => {
     )
 
     expect(getByRole('progressbar')).toHaveAttribute(
-      'aria-label',
+      'aria-valuetext',
       'Loading Gradebook submissions 0 / 60000',
     )
   })

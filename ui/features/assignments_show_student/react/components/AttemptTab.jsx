@@ -528,8 +528,8 @@ export default class AttemptTab extends Component {
             {selectedType != null && (
               <div
                 style={{
-                  backgroundColor: theme.colors.backgroundLight,
-                  borderTop: `2px solid ${theme.colors.borderMedium}`,
+                  backgroundColor: theme.colors.contrasts.grey1111,
+                  borderTop: `2px solid ${theme.colors.contrasts.grey1214}`,
                 }}
               >
                 {this.renderByType(selectedType, context, this.props.selectedExternalTool)}

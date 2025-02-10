@@ -67,8 +67,8 @@ describe('HeadingBlockToolbar', () => {
     expect(h3).toBeInTheDocument()
     expect(h4).toBeInTheDocument()
 
-    const li = h2.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+    const li = h2?.parentElement?.parentElement as HTMLLIElement
+    expect(li?.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
   })
 
   it('calls changes the level prop on changing the level', async () => {
@@ -96,9 +96,9 @@ describe('HeadingBlockToolbar', () => {
 
     expect(defaultSz).toBeInTheDocument()
     expect(rem3).toBeInTheDocument()
-
-    const li = rem3.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+    
+    const li = rem3?.parentElement?.parentElement as HTMLLIElement
+    expect(li?.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
   })
 
   it('sets the font size', async () => {

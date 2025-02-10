@@ -76,7 +76,6 @@ const renderTableBody = (
       <Table.Row
         key={getUniqueId(row)}
         data-testid="table-row"
-        themeOverride={isSelected ? {borderColor: 'brand'} : undefined}
       >
         {...rowHead}
       </Table.Row>
