@@ -16434,6 +16434,7 @@ hy:
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Հաջողություն՝ Բոլոր օգտագործողները այս դոմեյնի այժմ կտեսնեն այս բրենդինգը:"
   success_grades_were_published_to_the_grade_book_da3b4fba: "Գնահատականները հաջողությամբ հրապարկվել են գնահատականների մատյանում"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model}-ը հաջողությամբ տեղափոխվել է %{newGroup}"
+  suggestions_b8b03b9d: Առաջարկություններ
   summary_statistics_f74852a5: "Վիճակագրության ամփոփագիր"
   support: 
     array: 
