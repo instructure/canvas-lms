@@ -19049,6 +19049,7 @@ he:
   successfully_moved_model_to_newgroup_f7b7aa5a: "העברה מוצלחת של %{model} אל %{newGroup}"
   successfully_resubmitted_to_turnitin_c908de0f: "נשלח מחדש בהצלחה ל turnitin."
   successfully_resubmitted_to_vericite_dab924b6: "נשלח מחדש בהצלחה ל VeriCite"
+  suggestions_b8b03b9d: "הצעות:"
   sum_of_all_files_in_mb_2b705055: "סך גודל כל הקבצים במגהבייט MB"
   summary_statistics_f74852a5: "סטטיסטיקה מסכמת"
   support: 
