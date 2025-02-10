@@ -136,7 +136,11 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
       }}
     >
       <View as="div">
-        <FilesHeader size={size} isUserContext={isUserContext} />
+        <FilesHeader
+          size={size}
+          isUserContext={isUserContext}
+          shouldHideUploadButtons={!userCanAddFilesForContext}
+        />
         <SearchBar initialValue={searchTerm} />
         {currentUrl && (
           <FileFolderTable

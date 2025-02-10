@@ -101,4 +101,24 @@ describe('FilesApp', () => {
     const nextPageButton = screen.queryByRole('button', {name: '1'})
     expect(nextPageButton).not.toBeInTheDocument()
   })
+
+  it('does render Upload File or Create Folder buttons when user has permission', async () => {
+    renderComponent('course_12345')
+    const uploadButton = await screen.findByRole('button', {name: 'Upload'})
+    const createFolderButton = await screen.findByRole('button', {name: 'Folder'})
+    expect(uploadButton).toBeInTheDocument()
+    expect(createFolderButton).toBeInTheDocument()
+  })
+
+  it('does not render Upload File or Create Folder buttons when user does not have permission', async () => {
+    filesEnv.userHasPermission = jest.fn().mockReturnValue(false)
+    renderComponent('course_12345')
+    // necessary to prevent false positives
+    const allMyFilesButton = await screen.findByRole('button', {name: /all my files/i})
+    const uploadButton = screen.queryByRole('button', {name: 'Upload'})
+    const createFolderButton = screen.queryByRole('button', {name: 'Folder'})
+    expect(allMyFilesButton).toBeInTheDocument()
+    expect(uploadButton).not.toBeInTheDocument()
+    expect(createFolderButton).not.toBeInTheDocument()
+  })
 })
