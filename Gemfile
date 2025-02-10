@@ -85,8 +85,21 @@ module GemOverride
     vendor_path = File.expand_path("vendor/#{name}", __dir__)
     if File.directory?(vendor_path)
       super(name, path: vendor_path, **kwargs)
+    elsif pinned_github_gems.key?(name)
+      repo, ref = pinned_github_gems[name].split(":")
+      super(name, github: repo, ref: ref)
     else
       super
+    end
+  end
+
+  private
+
+  def pinned_github_gems
+    @pinned_github_gems ||= ENV.fetch("CANVAS_PINNED_GITHUB_GEMS", "").split(",").each_with_object({}) do |entry, hash|
+      owner_repo, branch = entry.split(":")
+      owner, repo = owner_repo.split("/")
+      hash[repo] = "#{owner}/#{repo}:#{branch}"
     end
   end
 end

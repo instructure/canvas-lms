@@ -1,5 +1,8 @@
 FROM local/base-runner
 
+ARG CANVAS_PINNED_GITHUB_GEMS
+ENV CANVAS_PINNED_GITHUB_GEMS=${CANVAS_PINNED_GITHUB_GEMS}
+
 RUN --mount=type=bind,from=local/cache-helper,source=/tmp/dst,target=/cache-helper \
   tar --no-same-owner -xf /cache-helper/ruby-runner.tar -C ${APP_HOME}
 
