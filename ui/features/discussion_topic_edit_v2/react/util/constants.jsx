@@ -67,9 +67,9 @@ export const maximumReplyToEntryRequiredCount = 10
 export const REPLY_TO_TOPIC = 'reply_to_topic'
 export const REPLY_TO_ENTRY = 'reply_to_entry'
 
-export const DEFAULT_SORT_ORDER = 'desc'
+export const DEFAULT_SORT_ORDER = 'asc'
 export const DEFAULT_SORT_ORDER_LOCKED = false
-export const DEFAULT_EXPANDED_STATE = false
+export const DEFAULT_EXPANDED_STATE = true
 export const DEFAULT_EXPANDED_LOCKED = false
 
 export const useShouldShowContent = (
