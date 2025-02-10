@@ -2048,7 +2048,7 @@ class ApplicationController < ActionController::Base
       data = { errors: [{ message: "Revoked access token." }] }
     when AuthenticationMethods::ExpiredAccessTokenError
       add_www_authenticate_header
-      data = { errors: [{ message: "Expired access token." }] }
+      data = { errors: [{ message: "Expired access token.", expired_at: @access_token&.permanent_expires_at }] }
     when AuthenticationMethods::AccessTokenError
       add_www_authenticate_header
       data = { errors: [{ message: "Invalid access token." }] }
