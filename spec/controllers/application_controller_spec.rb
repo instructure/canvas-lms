@@ -2769,10 +2769,10 @@ RSpec.describe ApplicationController do
           %i[
             calendar_contexts_limit
             open_registration
-            inbox_auto_response
-            inbox_signature_block
-            inbox_auto_response_for_students
-            inbox_signature_block_for_students
+            enable_inbox_signature_block
+            disable_inbox_signature_block_for_students
+            enable_inbox_auto_response
+            disable_inbox_auto_response_for_students
           ]
         )
       end
