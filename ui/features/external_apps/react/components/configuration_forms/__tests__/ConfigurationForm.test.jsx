@@ -117,9 +117,9 @@ describe('ConfigurationForm', () => {
     })
   })
 
-  describe('form submission', () => {
-    // cf. INTEROP-9131
-    it.skip('saves manual form with trimmed props', async () => {
+  // cf. INTEROP-9131
+  describe.skip('form submission', () => {
+    it('saves manual form with trimmed props', async () => {
       const handleSubmit = jest.fn()
       const tool = {
         name: '  My App',
