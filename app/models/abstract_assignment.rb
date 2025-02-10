@@ -4211,11 +4211,19 @@ class AbstractAssignment < ActiveRecord::Base
 
     return false if rubric_association.rubric_assessments.where(assessment_type: "self_assessment").any?
 
+    return false if has_group_category?
+
     earliest_due_date = submissions.active.minimum(:cached_due_date)
 
     return true if earliest_due_date.nil?
 
     Time.zone.now < earliest_due_date
+  end
+
+  def rubric_self_assessment_enabled?
+    return false if has_group_category?
+
+    rubric_self_assessment_enabled
   end
 
   private

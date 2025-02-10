@@ -35,7 +35,7 @@ describe Mutations::SetRubricSelfAssessment do
     rubric_model(course:)
     rubric_association_model(user: teacher, context: course, association_object: @assignment, purpose: "grading", rubric: @rubric)
     course.enable_feature!(:enhanced_rubrics)
-    course.enable_feature!(:platform_service_speedgrader)
+    course.enable_feature!(:assignments_2_student)
     course.root_account.enable_feature!(:rubric_self_assessment)
   end
 
@@ -73,13 +73,13 @@ describe Mutations::SetRubricSelfAssessment do
     it "returns error when enhanced rubrics feature is not enabled" do
       course.disable_feature!(:enhanced_rubrics)
       result = CanvasSchema.execute(mutation_str, context:)
-      expect(result.dig("errors", 0, "message")).to eq "enhanced_rubrics, rubric_self_assesment and platform_service_speedgrader must be enabled"
+      expect(result.dig("errors", 0, "message")).to eq "enhanced_rubrics, rubric_self_assesment and assignments_2_student must be enabled"
     end
 
     it "returns errors when rubric self assessment feature is not enabled" do
       course.root_account.disable_feature!(:rubric_self_assessment)
       result = CanvasSchema.execute(mutation_str, context:)
-      expect(result.dig("errors", 0, "message")).to eq "enhanced_rubrics, rubric_self_assesment and platform_service_speedgrader must be enabled"
+      expect(result.dig("errors", 0, "message")).to eq "enhanced_rubrics, rubric_self_assesment and assignments_2_student must be enabled"
     end
   end
 
@@ -128,6 +128,20 @@ describe Mutations::SetRubricSelfAssessment do
 
       result = CanvasSchema.execute(mutation_str, context:)
       expect(result.dig("errors", 0, "message")).to eq "Assignment has self assessments or due date has passed"
+    end
+  end
+
+  context "when executed on a group assignment" do
+    before do
+      group_category = course.group_categories.create!(name: "Group Category")
+      @group = group_category.groups.create!(name: "Group", context: course)
+      group_membership_model(group: @group, user: student)
+      @assignment.update!(group_category: group_category)
+    end
+
+    it "returns error when group assignment" do
+      result = CanvasSchema.execute(mutation_str, context:)
+      expect(result.dig("errors", 0, "message")).to eq "Cannot set rubric self assessment for group assignments"
     end
   end
 end
