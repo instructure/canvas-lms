@@ -33,3 +33,9 @@ export type ModalTagMode = 'single' | 'multi'
 export interface Course {
   readonly id: string
 }
+
+export interface UserTags {
+  id: number
+  name: string
+  groupCategoryName: string
+}
