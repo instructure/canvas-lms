@@ -159,6 +159,11 @@ export type ConfirmationStateType = Exclude<
 >
 type ReviewingStateType = Exclude<ConfirmationStateType, 'Enabling' | 'DeletingDevKey' | 'Updating'>
 
+export const isReviewingState = (
+  state: DynamicRegistrationWizardState,
+): state is ConfirmationState<ReviewingStateType> =>
+  state._type.endsWith('Confirmation') || state._type === 'Reviewing'
+
 /**
  * Helper for constructing a 'confirmation' state (a substate of the confirmation screen)
  */

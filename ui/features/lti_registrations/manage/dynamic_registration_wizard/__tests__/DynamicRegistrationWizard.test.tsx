@@ -236,6 +236,14 @@ describe('DynamicRegistrationWizard', () => {
         expect(mockAlert).not.toHaveBeenCalled()
       })
     })
+
+    it('tries to delete the registration when the X button is clicked', async () => {
+      await setup()
+      await userEvent.click(screen.getByText(/Close/i, {ignore: false}).closest('button')!)
+      await waitFor(() => {
+        expect(deleteRegistration).toHaveBeenCalledWith(accountId, reg.id)
+      })
+    })
   })
 
   describe('IconConfirmation', () => {
