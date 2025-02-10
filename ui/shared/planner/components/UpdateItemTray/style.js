@@ -28,7 +28,7 @@ export default function buildStyle() {
   const {variables} = getThemeVars()
 
   const theme = {
-    background: variables.colors.white,
+    background: variables.colors.contrasts.white1010,
   }
 
   const classNames = {

@@ -354,7 +354,7 @@ const ProxyUploadModal = ({
       return
     }
 
-    const cellTheme = {background: theme.colors.backgroundLight}
+    const cellTheme = {background: theme.colors.contrasts.grey1111}
 
     return (
       <Table
@@ -398,7 +398,7 @@ const ProxyUploadModal = ({
     // uploaded don't have that set yet, so use the local name (which we've set
     // to the URL for files from an LTI)
     const displayName = file.display_name || file.name
-    const cellTheme = {background: theme.colors.backgroundLight}
+    const cellTheme = {background: theme.colors.contrasts.grey1111}
     return (
       <Table.Row key={file._id || file.id}>
         <Table.Cell themeOverride={cellTheme}>{getFileThumbnail(file, 'small')}</Table.Cell>

@@ -102,7 +102,7 @@ describe "Screenreader Gradebook grading" do
       it "goes to last entry", :ignore_js_errors do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_first_entry.id}"
         f("button[title='Settings']").click
-        fj("li:contains('Options')").click
+        fj("[class*='menuItem__label']:contains('Options')").click
         fj("label:contains('Show replies in context')").click
         fj(".ui-dialog-buttonset .ui-button:visible:last").click
 
@@ -131,7 +131,7 @@ describe "Screenreader Gradebook grading" do
       it "goes to first entry", :ignore_js_errors do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@student_2_last_entry.id}"
         f("button[title='Settings']").click
-        fj("li:contains('Options')").click
+        fj("[class*='menuItem__label']:contains('Options')").click
         fj("label:contains('Show replies in context')").click
         fj(".ui-dialog-buttonset .ui-button:visible:last").click
 
@@ -161,7 +161,7 @@ describe "Screenreader Gradebook grading" do
       it "can navigate prev and next", :ignore_js_errors do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student1.id}&entry_id=#{@student_2_first_entry.id}"
         f("button[title='Settings']").click
-        fj("li:contains('Options')").click
+        fj("[class*='menuItem__label']:contains('Options')").click
         fj("label:contains('Show replies in context')").click
         fj(".ui-dialog-buttonset .ui-button:visible:last").click
 

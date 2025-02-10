@@ -83,7 +83,7 @@ const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef, courseContext
     <div
       className="ic-Dashboard-tabs"
       ref={containerRef}
-      style={{backgroundColor: k5ThemeVariables.colors.background.backgroundLightest}}
+      style={{backgroundColor: k5ThemeVariables.colors.contrasts.white1010}}
     >
       <View as="div" borderWidth="none none small none">
         {children(sticky)}

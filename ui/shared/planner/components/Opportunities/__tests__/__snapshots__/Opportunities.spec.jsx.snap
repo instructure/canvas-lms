@@ -13,13 +13,13 @@ exports[`renders nothing if no opportunities 1`] = `
     max-width: 100%;
     line-height: 1.25;
   }
-  
+
   .Opportunities-styles__header {
-    border-bottom: 0.0625rem solid #C7CDD1;
+    border-bottom: 0.0625rem solid #E8EAEC;
     text-align: center;
     margin-bottom: 0.25rem;
   }
-  
+
   .Opportunities-styles__list {
     list-style-type: none;
     color: undefined;
@@ -27,7 +27,7 @@ exports[`renders nothing if no opportunities 1`] = `
     padding: 0;
     box-sizing: border-box;
   }
-  
+
   .Opportunities-styles__item {
     margin: 0;
     padding: 0;
@@ -36,14 +36,14 @@ exports[`renders nothing if no opportunities 1`] = `
     margin-bottom: 0.75rem;
   }
   .Opportunities-styles__item:not(:first-of-type) {
-    border-top: 0.0625rem solid #C7CDD1;
+    border-top: 0.0625rem solid #E8EAEC;
     padding-top: 0.375rem;
   }
-  
+
   .Opportunities-styles__loading {
     text-align: center;
   }
-  
+
   #Opportunities-styles__tabs_container &gt; div:first-child {
     display: inline-block;
   }
@@ -140,13 +140,13 @@ exports[`renders the base component correctly with one of each kind of opportuni
     max-width: 100%;
     line-height: 1.25;
   }
-  
+
   .Opportunities-styles__header {
-    border-bottom: 0.0625rem solid #C7CDD1;
+    border-bottom: 0.0625rem solid #E8EAEC;
     text-align: center;
     margin-bottom: 0.25rem;
   }
-  
+
   .Opportunities-styles__list {
     list-style-type: none;
     color: undefined;
@@ -154,7 +154,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
     padding: 0;
     box-sizing: border-box;
   }
-  
+
   .Opportunities-styles__item {
     margin: 0;
     padding: 0;
@@ -163,14 +163,14 @@ exports[`renders the base component correctly with one of each kind of opportuni
     margin-bottom: 0.75rem;
   }
   .Opportunities-styles__item:not(:first-of-type) {
-    border-top: 0.0625rem solid #C7CDD1;
+    border-top: 0.0625rem solid #E8EAEC;
     padding-top: 0.375rem;
   }
-  
+
   .Opportunities-styles__loading {
     text-align: center;
   }
-  
+
   #Opportunities-styles__tabs_container &gt; div:first-child {
     display: inline-block;
   }
@@ -299,13 +299,13 @@ exports[`renders the right course with the right opportunity 1`] = `
     max-width: 100%;
     line-height: 1.25;
   }
-  
+
   .Opportunities-styles__header {
-    border-bottom: 0.0625rem solid #C7CDD1;
+    border-bottom: 0.0625rem solid #E8EAEC;
     text-align: center;
     margin-bottom: 0.25rem;
   }
-  
+
   .Opportunities-styles__list {
     list-style-type: none;
     color: undefined;
@@ -313,7 +313,7 @@ exports[`renders the right course with the right opportunity 1`] = `
     padding: 0;
     box-sizing: border-box;
   }
-  
+
   .Opportunities-styles__item {
     margin: 0;
     padding: 0;
@@ -322,14 +322,14 @@ exports[`renders the right course with the right opportunity 1`] = `
     margin-bottom: 0.75rem;
   }
   .Opportunities-styles__item:not(:first-of-type) {
-    border-top: 0.0625rem solid #C7CDD1;
+    border-top: 0.0625rem solid #E8EAEC;
     padding-top: 0.375rem;
   }
-  
+
   .Opportunities-styles__loading {
     text-align: center;
   }
-  
+
   #Opportunities-styles__tabs_container &gt; div:first-child {
     display: inline-block;
   }

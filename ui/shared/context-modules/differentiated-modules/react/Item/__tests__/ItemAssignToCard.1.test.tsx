@@ -124,16 +124,16 @@ describe('ItemAssignToCard', () => {
   })
 
   describe('describes the render order', () => {
-    it('renders the Due Date 1st from the top', () => {
+    it('renders the Due Date 1st from the top',  async () => {
       window.ENV.DEFAULT_DUE_TIME = '08:00:00'
       const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({due_at: undefined})
       const dateInput = getByLabelText('Due Date')
       fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
       getByRole('option', {name: /10 november 2020/i}).click()
-      expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')
+      await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM'))
     })
 
-    it('renders the Reply to Topic Due Date 1st from the top', () => {
+    it('renders the Reply to Topic Due Date 1st from the top', async () => {
       window.ENV.DEFAULT_DUE_TIME = '08:00:00'
       // @ts-expect-error
       window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
@@ -144,10 +144,12 @@ describe('ItemAssignToCard', () => {
       const dateInput = getByLabelText('Reply to Topic Due Date')
       fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
       getByRole('option', {name: /10 november 2020/i}).click()
-      expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')
+
+      await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM'))
+      
     })
 
-    it('renders the Required Replies Due Date 2nd from the top', () => {
+    it('renders the Required Replies Due Date 2nd from the top', async () => {
       window.ENV.DEFAULT_DUE_TIME = '08:00:00'
       // @ts-expect-error
       window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
@@ -158,7 +160,8 @@ describe('ItemAssignToCard', () => {
       const dateInput = getByLabelText('Required Replies Due Date')
       fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
       getByRole('option', {name: /10 november 2020/i}).click()
-      expect(getAllByLabelText('Time')[1]).toHaveValue('8:00 AM')
+
+      await waitFor(() =>  expect(getAllByLabelText('Time')[1]).toHaveValue('8:00 AM'))
     })
 
     describe('isCheckpointed is true', () => {
@@ -175,7 +178,7 @@ describe('ItemAssignToCard', () => {
         expect(getAllByLabelText('Time')[2]).toHaveValue('12:00 AM')
       })
 
-      it('renders the Available Until 4th from the top', () => {
+      it('renders the Available Until 4th from the top', async () => {
         // @ts-expect-error
         window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
         const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
@@ -185,7 +188,8 @@ describe('ItemAssignToCard', () => {
         const dateInput = getByLabelText('Until')
         fireEvent.change(dateInput, {target: {value: 'Nov 14, 2020'}})
         getByRole('option', {name: /14 november 2020/i}).click()
-        expect(getAllByLabelText('Time')[3]).toHaveValue('11:59 PM')
+
+        await waitFor(() => expect(getAllByLabelText('Time')[3]).toHaveValue('11:59 PM'))      
       })
     })
   })
@@ -237,13 +241,14 @@ describe('ItemAssignToCard', () => {
     expect(onDelete).toHaveBeenCalledWith('assign-to-card-001')
   })
 
-  it('defaults to 11:59pm for due dates if has null due time on click', () => {
+  it('defaults to 11:59pm for due dates if has null due time on click', async () => {
     window.ENV.DEFAULT_DUE_TIME = undefined
     const {getByLabelText, getByRole, getAllByLabelText} = renderComponent()
     const dateInput = getByLabelText('Due Date')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    expect(getAllByLabelText('Time')[0]).toHaveValue('11:59 PM')
+
+    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('11:59 PM'))   
   })
 
   it('defaults to 11:59pm for due dates if has null due time on blur', async () => {
@@ -266,31 +271,33 @@ describe('ItemAssignToCard', () => {
     })
   })
 
-  it('defaults to 11:59pm for due dates if has undefined due time', () => {
+  it('defaults to 11:59pm for due dates if has undefined due time', async () => {
     window.ENV.DEFAULT_DUE_TIME = undefined
     const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({due_at: undefined})
     const dateInput = getByLabelText('Due Date')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    expect(getAllByLabelText('Time')[0]).toHaveValue('11:59 PM')
+    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('11:59 PM')) 
+    
   })
 
-  it('defaults to the default due time for due dates from ENV if has null due time', () => {
+  it('defaults to the default due time for due dates from ENV if has null due time', async () => {
     window.ENV.DEFAULT_DUE_TIME = '08:00:00'
     const {getByLabelText, getByRole, getAllByLabelText} = renderComponent()
     const dateInput = getByLabelText('Due Date')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')
+    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')) 
+    
   })
 
-  it('defaults to the default due time for due dates from ENV if has undefined due time', () => {
+  it('defaults to the default due time for due dates from ENV if has undefined due time', async () => {
     window.ENV.DEFAULT_DUE_TIME = '08:00:00'
     const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({due_at: undefined})
     const dateInput = getByLabelText('Due Date')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')
+    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')) 
   })
 
   it('defaults to midnight for available from dates if it is null on click', () => {
@@ -328,12 +335,12 @@ describe('ItemAssignToCard', () => {
     expect(getAllByLabelText('Time')[1]).toHaveValue('12:00 AM')
   })
 
-  it('defaults to 11:59 PM for available until dates if it is null on click', () => {
+  it('defaults to 11:59 PM for available until dates if it is null on click', async () => {
     const {getByLabelText, getByRole, getAllByLabelText} = renderComponent()
     const dateInput = getByLabelText('Until')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')
+    await waitFor(() => expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')) 
   })
 
   it('defaults to 11:59 PM for available until dates if it is null on blur', async () => {
@@ -355,12 +362,12 @@ describe('ItemAssignToCard', () => {
     })
   })
 
-  it('defaults to 11:59 PM for available until dates if it is undefined', () => {
+  it('defaults to 11:59 PM for available until dates if it is undefined', async () => {
     const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({lock_at: undefined})
     const dateInput = getByLabelText('Until')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')
+    await waitFor(() => expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')) 
   })
 
   it('renders context module link', () => {

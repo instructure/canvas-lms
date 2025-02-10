@@ -30,10 +30,11 @@ import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 // @ts-expect-error
 type Crumb = EnvCommon['breadcrumbs'][0]
 
-const {porcelain} = getCurrentTheme()?.colors ?? {porcelain: 'white'}
+const colors= getCurrentTheme()?.colors
+
 const overrides = {
-  desktopBackgroundInverse: porcelain,
-  smallViewportBackgroundInverse: porcelain,
+  desktopBackgroundInverse: colors?.contrasts?.grey1111 ?? "white",
+  smallViewportBackgroundInverse: colors?.contrasts?.grey1111 ?? "white",
   desktopZIndex: 99,
   smallViewportZIndex: 99,
   smallViewportTrayZIndex: 99,

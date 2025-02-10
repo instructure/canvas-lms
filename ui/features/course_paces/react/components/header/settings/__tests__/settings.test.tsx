@@ -80,9 +80,9 @@ describe('Settings', () => {
     act(() => settingsButton.click())
 
     const skipSelectedDays = screen.getByTestId('skip-selected-days')
-    expect(skipSelectedDays).toHaveClass('css-vjrpp3-menuItem')
+    expect(skipSelectedDays).toHaveClass('css-1pj8lp9-menuItem')
     const blackoutDatesBtn = screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})
-    expect(blackoutDatesBtn).toHaveClass('css-1rkb7b1-menuItem')
+    expect(blackoutDatesBtn).toHaveClass('css-1mh06e9-menuItem')
   })
 
   it('shows and hides the blackout dates modal correctly', () => {

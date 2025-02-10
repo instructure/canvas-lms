@@ -44,7 +44,7 @@ export default function TeacherFooter(props) {
 
   const style = {
     backgroundColor: theme.colors.white,
-    borderColor: theme.colors.borderMedium,
+    borderColor: theme.colors.contrasts.grey1214,
     paddingRight: padding,
     paddingLeft: padding,
   }

@@ -303,7 +303,7 @@ class MediaAttempt extends React.Component {
                   <Flex.Item>
                     <div
                       style={{
-                        backgroundColor: theme.colors.backgroundDark,
+                        backgroundColor: theme.colors.contrasts.grey4570,
                         height: desktop ? '9em' : '1px',
                         width: desktop ? '1px' : '9em',
                       }}
@@ -315,7 +315,7 @@ class MediaAttempt extends React.Component {
                   <Flex.Item>
                     <div
                       style={{
-                        backgroundColor: theme.colors.backgroundDark,
+                        backgroundColor: theme.colors.contrasts.grey4570,
                         height: desktop ? '9em' : '1px',
                         width: desktop ? '1px' : '9em',
                       }}

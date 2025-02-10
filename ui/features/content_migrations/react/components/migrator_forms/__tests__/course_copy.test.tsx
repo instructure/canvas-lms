@@ -48,8 +48,8 @@ const defaultEnv = {
   SHOW_SELECT: false,
 }
 
-const searchForACourse = 'Search for a course *'
-const selectACourse = 'Select a course *'
+const searchForACourse = 'Search for a course'
+const selectACourse = 'Select a course'
 const addToImportQueue = 'Add to Import Queue'
 
 describe('CourseCopyImporter', () => {

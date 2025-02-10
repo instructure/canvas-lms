@@ -44,6 +44,7 @@ describe('TagSelect', () => {
   it('shows the menu', () => {
     const {getByText} = renderComponent()
     const trigger = getByText('Apply Filters').closest('button')
+    
     trigger?.click()
     expect(getByText('Home')).toBeInTheDocument()
     expect(getByText('Resource')).toBeInTheDocument()
@@ -54,12 +55,12 @@ describe('TagSelect', () => {
 
   it('checks the selected tags', () => {
     const selectedTags = ['home', 'resource', 'intro']
-    const {getByText} = renderComponent({selectedTags})
+    const {getByText, debug} = renderComponent({selectedTags})
     const trigger = getByText('Apply Filters').closest('button')
     trigger?.click()
 
     for (const tag of Object.keys(AvailableTags)) {
-      const li = getByText(AvailableTags[tag]).closest('li')
+      const li = getByText(AvailableTags[tag]).parentElement
       const isChecked = selectedTags.includes(tag)
       expect(isMenuItemChecked(li as HTMLLIElement)).toBe(isChecked)
     }

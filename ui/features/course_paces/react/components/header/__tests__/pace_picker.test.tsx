@@ -56,13 +56,13 @@ describe('PacePicker', () => {
     act(() => picker.click())
     expect(screen.getByRole('menuitem', {name: 'Course'})).toBeInTheDocument()
 
-    const sections = screen.getByRole('button', {name: 'Sections'})
+    const sections = screen.getByRole('menuitem', {name: 'Sections'})
     expect(sections).toBeInTheDocument()
     act(() => sections.click())
     expect(screen.getByRole('menuitem', {name: 'Hackers'})).toBeInTheDocument()
     expect(screen.getByRole('menuitem', {name: 'Mercenaries'})).toBeInTheDocument()
 
-    const students = screen.getByRole('button', {name: 'Students'})
+    const students = screen.getByRole('menuitem', {name: 'Students'})
     expect(students).toBeInTheDocument()
     act(() => students.click())
     const henry = screen.getByRole('menuitem', {name: 'Henry Dorsett Case'})
@@ -82,12 +82,12 @@ describe('PacePicker', () => {
     expect(selectPaceContextFn).toHaveBeenCalledWith('Course', COURSE.id)
 
     act(() => picker.click())
-    act(() => screen.getByRole('button', {name: 'Sections'}).click())
+    act(() => screen.getByRole('menuitem', {name: 'Sections'}).click())
     act(() => screen.getByRole('menuitem', {name: 'Hackers'}).click())
     expect(selectPaceContextFn).toHaveBeenCalledWith('Section', SORTED_SECTIONS[0].id)
 
     act(() => picker.click())
-    act(() => screen.getByRole('button', {name: 'Students'}).click())
+    act(() => screen.getByRole('menuitem', {name: 'Students'}).click())
     act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
     expect(selectPaceContextFn).toHaveBeenCalledWith('Enrollment', ENROLLMENT_2.id)
   })
@@ -116,8 +116,8 @@ describe('PacePicker', () => {
     act(() => picker.click())
 
     expect(screen.getByRole('menuitem', {name: 'Course'})).toBeInTheDocument()
-    expect(screen.getByRole('button', {name: 'Sections'})).toBeInTheDocument()
-    expect(screen.queryByRole('button', {name: 'Students'})).not.toBeInTheDocument()
+    expect(screen.getByRole('menuitem', {name: 'Sections'})).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', {name: 'Students'})).not.toBeInTheDocument()
   })
 
   it('renders a drop-down with course and students only if no sections exist', () => {
@@ -126,8 +126,8 @@ describe('PacePicker', () => {
     act(() => picker.click())
 
     expect(screen.getByRole('menuitem', {name: 'Course'})).toBeInTheDocument()
-    expect(screen.getByRole('button', {name: 'Students'})).toBeInTheDocument()
-    expect(screen.queryByRole('button', {name: 'Sections'})).not.toBeInTheDocument()
+    expect(screen.getByRole('menuitem', {name: 'Students'})).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', {name: 'Sections'})).not.toBeInTheDocument()
   })
 
   describe('warning modal', () => {
@@ -138,7 +138,7 @@ describe('PacePicker', () => {
       const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
-      act(() => screen.getByRole('button', {name: 'Students'}).click())
+      act(() => screen.getByRole('menuitem', {name: 'Students'}).click())
       act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
       expect(getByText(/You have unpublished changes to your course pace./)).toBeInTheDocument()
     })
@@ -150,7 +150,7 @@ describe('PacePicker', () => {
       const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
-      act(() => screen.getByRole('button', {name: 'Students'}).click())
+      act(() => screen.getByRole('menuitem', {name: 'Students'}).click())
       act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
       expect(getByText(/You have unpublished changes to your section pace./)).toBeInTheDocument()
     })
@@ -162,7 +162,7 @@ describe('PacePicker', () => {
       const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
-      act(() => screen.getByRole('button', {name: 'Students'}).click())
+      act(() => screen.getByRole('menuitem', {name: 'Students'}).click())
       act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
       const cancelBtn = getByText('Keep Editing').closest('button')
       act(() => cancelBtn?.click())
@@ -176,7 +176,7 @@ describe('PacePicker', () => {
       const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
-      act(() => screen.getByRole('button', {name: 'Students'}).click())
+      act(() => screen.getByRole('menuitem', {name: 'Students'}).click())
       act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
       const cancelBtn = getByText('Keep Editing').closest('button')
       act(() => cancelBtn?.click())
@@ -190,7 +190,7 @@ describe('PacePicker', () => {
       const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
-      act(() => screen.getByRole('button', {name: 'Students'}).click())
+      act(() => screen.getByRole('menuitem', {name: 'Students'}).click())
       act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
       const confirmBtn = getByText('Discard Changes').closest('button')
       act(() => confirmBtn?.click())

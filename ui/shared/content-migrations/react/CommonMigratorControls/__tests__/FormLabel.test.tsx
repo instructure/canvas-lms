@@ -40,13 +40,13 @@ describe('RequiredFormLabel', () => {
     const {getByText} = render(
       <RequiredFormLabel showErrorState={false}>Test Label</RequiredFormLabel>,
     )
-    expect(getByText('*')).toHaveStyle('color: rgb(45, 59, 69)')
+    expect(getByText('*')).toHaveStyle('color: rgb(39, 53, 64)')
   })
 
   it('displays the asterisk in danger color when showErrorState is true', () => {
     const {getByText} = render(
       <RequiredFormLabel showErrorState={true}>Test Label</RequiredFormLabel>,
     )
-    expect(getByText('*')).toHaveStyle('color: rgb(224, 6, 31)')
+    expect(getByText('*')).toHaveStyle('color: rgb(230,36,41)')
   })
 })

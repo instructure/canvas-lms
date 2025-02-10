@@ -50,7 +50,8 @@ const getRatings = ratings => {
 
 const componentOverrides = {
   Link: {
-    color: 'licorice',
+    // TODO: this should be changed to theme.colors.contrasts.grey125125
+    color: '#273540',
   },
 }
 

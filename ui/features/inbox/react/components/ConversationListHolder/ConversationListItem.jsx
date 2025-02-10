@@ -160,7 +160,7 @@ export const ConversationListItem = ({...props}) => {
                     countUntil={99}
                     standalone={true}
                     themeOverride={{
-                      colorPrimary: colors.backgroundDarkest,
+                      colorPrimary: colors.contrasts.grey125125,
                       borderRadius: '0.25rem',
                       fontSize: '0.8125rem',
                       fontWeight: '700',

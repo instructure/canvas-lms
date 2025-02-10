@@ -27,8 +27,6 @@ import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
 import {possibleString, possibleStringRange} from '../Points'
 import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton'
 
-const {shamrock} = colors
-
 type HorizontalButtonDisplayProps = {
   isPreviewMode: boolean
   isSelfAssessment: boolean
@@ -89,7 +87,7 @@ export const HorizontalButtonDisplay = ({
           padding="xx-small"
           margin="0 xx-small small xx-small"
           data-testid={`rating-details-${selectedRatingDescription?.id}`}
-          themeOverride={{borderColorBrand: shamrock, borderWidthMedium: '0.188rem'}}
+          themeOverride={{borderColorBrand: colors.contrasts.green4570, borderWidthMedium: '0.188rem'}}
         >
           <View as="div">
             <Text size="x-small" weight="bold">

@@ -271,11 +271,11 @@ class EditPage extends React.Component {
       <div className="EditPage" data-testid="edit-page">
         <Breadcrumb label={I18n.t('You are here:')}>
           <Breadcrumb.Link href="/calendar">{I18n.t('Calendar')}</Breadcrumb.Link>
-          {this.state.appointmentGroup.title && (
-            <Breadcrumb.Link>
+          {...(this.state.appointmentGroup.title ?
+            [<Breadcrumb.Link>
               {I18n.t('Edit %{pageTitle}', {pageTitle: this.state.appointmentGroup.title})}
-            </Breadcrumb.Link>
-          )}
+            </Breadcrumb.Link>]
+          :[])}
         </Breadcrumb>
         <ScreenReaderContent>
           <h1>

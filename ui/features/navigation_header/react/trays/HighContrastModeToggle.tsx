@@ -21,7 +21,7 @@ import {bool} from 'prop-types'
 import React, {useEffect, useState, useRef} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {colors as hcmColors} from '@instructure/canvas-high-contrast-theme'
+import {canvasHighContrast} from '@instructure/ui-themes'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
@@ -32,22 +32,22 @@ import {IconInfoLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('ProfileTray')
 
-const {porcelain, licorice, shamrock, brand} = hcmColors.values
-
 // The checkbox toggle is the only thing we have to worry about here,
 // as all the other page elements are just primary-color text, which is
 // the same in both the normal Canvas theme and the Canvas High Contrast
 // theme.
+const hcmColors = canvasHighContrast?.colors
+
 const checkboxThemeOverrides = {
-  color: porcelain,
-  toggleBackground: porcelain,
-  labelColor: licorice,
-  background: licorice,
-  borderColor: licorice,
-  uncheckedIconColor: licorice,
-  checkedBackground: shamrock,
-  checkedIconColor: shamrock,
-  focusOutlineColor: brand,
+  color: hcmColors?.contrasts?.grey1111,
+  toggleBackground: hcmColors?.contrasts?.grey1111,
+  labelColor: hcmColors?.contrasts?.grey125125,
+  background: hcmColors?.contrasts?.grey125125,
+  borderColor: hcmColors?.contrasts?.grey125125,
+  uncheckedIconColor: hcmColors?.contrasts?.grey125125,
+  checkedBackground: hcmColors?.contrasts?.green4570,
+  checkedIconColor: hcmColors?.contrasts?.green4570,
+  focusOutlineColor: hcmColors?.contrasts?.blue4570,
 }
 
 type HighContrastLabelProps = {

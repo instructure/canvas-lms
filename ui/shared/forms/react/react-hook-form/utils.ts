@@ -27,5 +27,5 @@ export const getFormErrorMessage = <T extends {}>(errors: FieldErrors<T>, fieldN
 }
 
 export const isDateTimeInputInvalid = (ref: RefObject<DateTimeInput>) => {
-  return ref.current?.state?.message?.type === 'error'
+  return ref.current?.state?.message?.type === 'error' || ref.current?.state?.message?.type === 'newError'
 }

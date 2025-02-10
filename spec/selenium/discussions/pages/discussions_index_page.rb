@@ -139,7 +139,7 @@ class DiscussionsIndex
     end
 
     def manage_discussions_menu
-      f("ul[role='menu']")
+      f("div[role='menu']")
     end
 
     def discussion_settings_button

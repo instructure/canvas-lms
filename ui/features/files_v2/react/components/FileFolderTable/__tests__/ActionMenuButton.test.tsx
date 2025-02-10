@@ -225,7 +225,7 @@ describe('ActionMenuButton', () => {
       const renameButton = async () => await screen.findByRole('menuitem', {name: 'Rename'})
       await user.click(await renameButton())
 
-      const input = async () => await screen.findByRole('textbox', {name: 'File Name *'})
+      const input = async () => await screen.findByRole('textbox', {name: 'File Name'})
       expect(await input()).toHaveValue(FAKE_FILES[0].name)
 
       const cancelButton = screen.getByRole('button', {name: 'Cancel'})

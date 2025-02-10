@@ -119,8 +119,8 @@ describe('CalendarEventDetailsForm', () => {
     const startInput = getByTestId('event-form-start-time')
     const endInput = getByTestId('event-form-end-time')
     await user.type(startInput, '8:14 AM')
-    await user.tripleClick(endInput)
-    await user.type(endInput, '9:38 AM')
+    //this is necessary due to flaky insUI-jest interactions
+    await userEvent.type(endInput, "{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}9:38 AM{Enter}")
     expect(startInput.value).toBe('8:14 AM')
     expect(endInput.value).toBe('9:38 AM')
   })
