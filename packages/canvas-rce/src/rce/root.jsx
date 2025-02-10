@@ -23,7 +23,7 @@ import normalizeProps from './normalizeProps'
 import formatMessage from '../format-message'
 import generateId from 'format-message-generate-id/underscored_crc32'
 
-if (!process || !process.env || !process.env.BUILD_LOCALE) {
+if (!process.env.BUILD_LOCALE) {
   formatMessage.setup({
     locale: 'en',
     generateId,
