@@ -484,7 +484,7 @@ class AssignmentsController < ApplicationController
           assigned_rubric:,
           rubric_association:,
           rubric_self_assessment_ff_enabled: Rubric.rubric_self_assessment_enabled?(@context),
-          rubric_self_assessment_enabled: @assignment.rubric_self_assessment_enabled,
+          rubric_self_assessment_enabled: @assignment.rubric_self_assessment_enabled?,
           can_update_rubric_self_assessment: @assignment.can_update_rubric_self_assessment?,
         }
 
