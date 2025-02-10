@@ -447,10 +447,10 @@ class ApplicationController < ActionController::Base
     default_settings = %i[calendar_contexts_limit open_registration]
     if Account.site_admin.feature_enabled?(:inbox_settings)
       inbox_settings = %i[
-        inbox_auto_response
-        inbox_signature_block
-        inbox_auto_response_for_students
-        inbox_signature_block_for_students
+        enable_inbox_signature_block
+        disable_inbox_signature_block_for_students
+        enable_inbox_auto_response
+        disable_inbox_auto_response_for_students
       ]
     end
     settings = default_settings
@@ -463,7 +463,6 @@ class ApplicationController < ActionController::Base
     js_env_settings = js_env_root_account_settings
     js_env_settings_hash = Digest::SHA256.hexdigest(js_env_settings.sort.join(","))
     account_settings_hash = Digest::SHA256.hexdigest(@domain_root_account[:settings].to_s)
-
     # can be invalidated by a settings change on the domain root account
     # or an update to js_env_root_account_settings
     MultiCache.fetch(["js_env_root_account_settings", js_env_settings_hash, account_settings_hash].cache_key) do
