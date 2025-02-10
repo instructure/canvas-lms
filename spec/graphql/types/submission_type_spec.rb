@@ -931,6 +931,11 @@ describe Types::SubmissionType do
   describe "previewUrl" do
     let(:preview_url) { submission_type.resolve("previewUrl") }
 
+    let(:quiz) do
+      quiz_with_submission
+      @quiz
+    end
+
     it "returns the preview URL when a student has submitted" do
       @assignment.submit_homework(@student, body: "test")
       expected_url = "http://test.host/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1&version=0"
@@ -999,6 +1004,17 @@ describe Types::SubmissionType do
         expect(@submission.attempt).to eq 1
         expect(@submission.versions.maximum(:number)).to eq 2
         expect(submission_type.resolve("previewUrl")).to eq expected_url
+      end
+    end
+
+    it "includes a 'version' query param that corresponds to the submission version number when it's an old quiz" do
+      @quiz_assignment = quiz.assignment
+      @quiz_submission = @quiz_assignment.submission_for_student(@student)
+      quiz_submission_type_for_teacher = GraphQLTypeTester.new(@quiz_submission, current_user: @teacher, request: ActionDispatch::TestRequest.create)
+      expected_url = "http://test.host/courses/#{@course.id}/assignments/#{@quiz_assignment.id}/submissions/#{@student.id}?preview=1&version=1"
+      aggregate_failures do
+        expect(@quiz_submission.attempt).to eq 1
+        expect(quiz_submission_type_for_teacher.resolve("previewUrl")).to eq expected_url
       end
     end
 
