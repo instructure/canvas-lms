@@ -22,9 +22,11 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import numberHelper from '@canvas/i18n/numberHelper'
-import {IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
+import {IconPlusLine, IconTrashLine, IconWarningSolid} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {FormMessage} from '@instructure/ui-form-field'
+import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
@@ -47,6 +49,25 @@ interface ComponentProps {
   displayScalingFactor: number
   editSchemeDataDisabled: boolean
 }
+
+const errorMessages = {
+  invalidEntry: I18n.t('Invalid entry'),
+  enterALetterGrade: I18n.t('Enter a letter grade'),
+}
+
+const errorMessage = (message: any): FormMessage => ({
+  text: (
+    <Flex justifyItems="start" alignItems="center" direction="row" gap="x-small">
+      <Flex.Item align="start">
+        <IconWarningSolid color="error" />
+      </Flex.Item>
+      <Flex.Item>
+        <Text color="danger">{message}</Text>
+      </Flex.Item>
+    </Flex>
+  ),
+  type: 'error',
+})
 
 export const GradingSchemeDataRowInput = ({
   letterGrade,
@@ -180,7 +201,7 @@ export const GradingSchemeDataRowInput = ({
                 messages={[
                   letterGradeValid
                     ? {text: <></>, type: 'hint'}
-                    : {text: I18n.t('Enter a letter grade'), type: 'error'},
+                    : errorMessage(errorMessages.enterALetterGrade),
                 ]}
                 style={{margin: '0'}}
                 disabled={editSchemeDataDisabled}
@@ -213,7 +234,7 @@ export const GradingSchemeDataRowInput = ({
                     messages={[
                       highRangeValid
                         ? {text: <></>, type: 'hint'}
-                        : {text: I18n.t('Invalid entry'), type: 'error'},
+                        : errorMessage(errorMessages.invalidEntry),
                     ]}
                     disabled={editSchemeDataDisabled}
                   />
@@ -266,7 +287,7 @@ export const GradingSchemeDataRowInput = ({
                     messages={[
                       lowRangeValid
                         ? {text: <></>, type: 'hint'}
-                        : {text: I18n.t('Invalid entry'), type: 'error'},
+                        : errorMessage(errorMessages.invalidEntry),
                     ]}
                     disabled={editSchemeDataDisabled}
                   />
