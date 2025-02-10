@@ -47,6 +47,8 @@ import type {FormMessage} from '@instructure/ui-form-field'
 import type {Lti1p3RegistrationWizardService} from '../lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 import {EditLti1p3RegistrationWizard} from '../lti_1p3_registration_form/EditLti1p3RegistrationWizard'
 import {Responsive} from '@instructure/ui-responsive'
+import {ResponsiveWrapper} from '../registration_wizard_forms/ResponsiveWrapper'
+import {Header} from '../registration_wizard_forms/Header'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -74,63 +76,19 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
   const label = state.existingRegistrationId ? I18n.t('Edit App') : I18n.t('Install App')
 
   return (
-    <Responsive
-      match="media"
-      query={{
-        // A good rough estimation for mobile/tablet is 768px, or 48rem with 1rem=16px
-        mobile: {maxWidth: '48rem'},
-        desktop: {minWidth: '48rem'},
-      }}
-      props={{
-        mobile: {
-          size: 'fullscreen',
-          spacing: 'compact',
-          offset: 'small',
-        },
-        desktop: {
-          size: 'medium',
-          spacing: undefined,
-          offset: 'medium',
-        },
-      }}
-      render={modalProps => {
-        return (
-          <Modal label={label} open={state.open} size={modalProps?.size || 'medium'}>
-            <Modal.Header spacing={modalProps?.spacing}>
-              <CloseButton
-                placement="end"
-                offset={modalProps?.offset || 'medium'}
-                onClick={state.close}
-                screenReaderLabel={I18n.t('Close')}
-              />
-              <Heading>{label}</Heading>
-            </Modal.Header>
-            {!state.registering ? (
-              <ProgressBar
-                meterColor="info"
-                shouldAnimate={true}
-                size="x-small"
-                screenReaderLabel={I18n.t('Installation Progress')}
-                valueNow={0}
-                valueMax={100}
-                themeOverride={{
-                  trackBottomBorderWidth: '0',
-                }}
-                margin="0 0 small"
-              />
-            ) : null}
-
-            <ModalBodyWrapper
-              state={state}
-              accountId={props.accountId}
-              dynamicRegistrationWizardService={props.dynamicRegistrationWizardService}
-              lti1p3RegistrationWizardService={props.lti1p3RegistrationWizardService}
-              jsonUrlWizardService={props.jsonUrlWizardService}
-            />
-          </Modal>
-        )
-      }}
-    ></Responsive>
+    <ResponsiveWrapper
+      render={modalProps => (
+        <Modal label={label} open={state.open} size={modalProps?.size || 'medium'}>
+          <ModalBodyWrapper
+            state={state}
+            accountId={props.accountId}
+            dynamicRegistrationWizardService={props.dynamicRegistrationWizardService}
+            lti1p3RegistrationWizardService={props.lti1p3RegistrationWizardService}
+            jsonUrlWizardService={props.jsonUrlWizardService}
+          />
+        </Modal>
+      )}
+    />
   )
 }
 
@@ -226,7 +184,7 @@ const ModalBodyWrapper = ({
       )
     } else {
       return (
-        <InitializationModalBody
+        <InitializationModal
           state={state}
           accountId={accountId}
           jsonUrlWizardService={jsonUrlWizardService}
@@ -235,7 +193,7 @@ const ModalBodyWrapper = ({
     }
   } else {
     return (
-      <InitializationModalBody
+      <InitializationModal
         state={state}
         accountId={accountId}
         jsonUrlWizardService={jsonUrlWizardService}
@@ -259,7 +217,7 @@ const renderDebugMessage = (jsonUrlFetch: JsonFetchStatus) => {
   }
 }
 
-const InitializationModalBody = (props: InitializationModalBodyProps) => {
+const InitializationModal = (props: InitializationModalBodyProps) => {
   const [debugging, setDebugging] = React.useState(false)
 
   React.useEffect(() => {
@@ -276,6 +234,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
 
   return (
     <>
+      <Header onClose={props.state.close} editing={!!props.state.existingRegistrationId} />
       <RegistrationModalBody>
         <View display="block" margin="0 0 medium 0">
           <RadioInputGroup
