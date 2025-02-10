@@ -36,7 +36,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $WEBPACK_BUILDER_TAG: additional tag for the webpack-builder image
 #   - set to patchset unique ID for builds to reference without knowing about the hash ID
 
-export CACHE_VERSION="2023-04-05.1"
+export CACHE_VERSION="2025-02-11.1"
 export DOCKER_BUILDKIT=1
 
 if [[ "$WRITE_BUILD_CACHE" == "1" ]]; then
@@ -69,6 +69,9 @@ BASE_RUNNER_BUILD_ARGS=(
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
   --build-arg RUBY="$RUBY"
 )
+RUBY_RUNNER_BUILD_ARGS=(
+  --build-arg CANVAS_PINNED_GITHUB_GEMS="${CANVAS_PINNED_GITHUB_GEMS}"
+)
 WEBPACK_RUNNER_BUILD_ARGS=(
   --build-arg SKIP_SOURCEMAPS="$SKIP_SOURCEMAPS"
   --build-arg RAILS_LOAD_ALL_LOCALES="$RAILS_LOAD_ALL_LOCALES"
@@ -81,6 +84,7 @@ BASE_RUNNER_PARTS=(
 )
 RUBY_RUNNER_PARTS=(
   "${BASE_RUNNER_PARTS[@]}"
+  "${RUBY_RUNNER_BUILD_ARGS[@]}"
   $RUBY_RUNNER_DOCKERFILE_MD5
   $RUBY_RUNNER_MD5
 )
@@ -172,6 +176,7 @@ if [[ -z "${WEBPACK_ASSETS_SELECTED_TAG}" || "${FORCE_BUILD_WEBPACK-0}" == "1" ]
         tag_many $BASE_RUNNER_SELECTED_TAG local/base-runner ${BASE_RUNNER_TAGS[SAVE_TAG]}
 
         docker build \
+          "${RUBY_RUNNER_BUILD_ARGS[@]}" \
           --label "BASE_RUNNER_SELECTED_TAG=$BASE_RUNNER_SELECTED_TAG" \
           --tag "${RUBY_RUNNER_TAGS[SAVE_TAG]}" \
           - < Dockerfile.jenkins.ruby-runner
