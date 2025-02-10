@@ -745,6 +745,7 @@ describe "API Authentication", type: :request do
       expect(response["WWW-Authenticate"]).to eq %(Bearer realm="canvas-lms")
       json = JSON.parse(response.body)
       expect(json["errors"].first["message"]).to eq "Expired access token."
+      expect(json["errors"].first["expired_at"]).to eq @token.permanent_expires_at.iso8601
     end
 
     it "errors if the developer key is inactive" do
