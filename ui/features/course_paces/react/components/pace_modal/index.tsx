@@ -58,10 +58,10 @@ import {
   getPlannedEndDate,
   getUnappliedChangesExist,
 } from '../../reducers/course_paces'
+import { isBulkEnrollment , getSelectedPaceContext } from '../../reducers/pace_contexts'
 import { getResponsiveSize } from '../../reducers/ui'
 import type { SummarizedChange } from '../../utils/change_tracking'
 import PaceModalHeading from './heading'
-import { getSelectedPaceContext } from '../../reducers/pace_contexts'
 import { getEnrolledSection } from '../../reducers/enrollments'
 import PaceModalStats from './stats'
 import { generateModalLauncherId } from '../../utils/utils'
@@ -82,6 +82,7 @@ interface StoreProps {
   readonly compression: number
   readonly compressDates: any
   readonly uncompressDates: any
+  readonly isBulkEnrollment: boolean
 }
 
 interface DispatchProps {
@@ -122,7 +123,9 @@ export const PaceModal = ({
       return I18n.t('Loading...')
     }
 
-    if (props.coursePace.context_type === 'Course') {
+    if(props.isBulkEnrollment) {
+      return I18n.t('Bulk Edit Student Pacing')
+    } else if (props.coursePace.context_type === 'Course') {
       title = I18n.t('Course Pace')
     } else if (props.coursePace.context_type === 'Section') {
       title = I18n.t('Section Pace')
@@ -307,6 +310,7 @@ const mapStateToProps = (state: StoreState) => {
       state.paceContexts.selectedContextType === 'student_enrollment'
         ? getEnrolledSection(state, parseInt(state.paceContexts.selectedContext?.item_id || '', 10))
         : null,
+    isBulkEnrollment: isBulkEnrollment(state),
   }
 }
 

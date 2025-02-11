@@ -2708,6 +2708,10 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :delete, as: :delete_student_enrollment_pace
     end
 
+    scope(controller: "course_pacing/bulk_student_enrollment_paces_api") do
+      get "courses/:course_id/bulk_student_enrollments/student_bulk_pace_edit_view", action: :student_bulk_pace_edit_view, as: :student_bulk_pace_edit_view
+    end
+
     scope(controller: "course_pacing/pace_contexts_api") do
       get "courses/:course_id/pace_contexts", action: :index, as: :pace_contexts
     end

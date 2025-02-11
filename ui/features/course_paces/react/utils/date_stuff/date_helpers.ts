@@ -227,7 +227,7 @@ export const generateDatesCaptions = (
   captions.startDate = getStartDateCaption(startDateValue, coursePace, contextType)
 
   if (contextType === 'enrollment') {
-    const appliedPaceContextType = appliedPace.type.toLocaleLowerCase()
+    const appliedPaceContextType = appliedPace?.type.toLocaleLowerCase()
     const paceType = ['course', 'section'].includes(appliedPaceContextType)
       ? appliedPaceContextType
       : 'default'

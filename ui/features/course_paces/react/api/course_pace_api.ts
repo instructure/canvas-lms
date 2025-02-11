@@ -67,13 +67,27 @@ export const update = (coursePace: CoursePace, extraSaveParams = {}) =>
     },
   }).then(({json}) => json)
 
-export const create = (coursePace: CoursePace, extraSaveParams = {}) =>
+  export const create = (coursePace: CoursePace, extraSaveParams = {}) =>
   doFetchApi<{course_pace: CoursePace; progress: Progress}>({
     path: `/api/v1/courses/${coursePace.course_id}/course_pacing`,
     method: 'POST',
     body: {
       ...extraSaveParams,
       course_pace: transformCoursePaceForApi(coursePace),
+    },
+  }).then(({json}) => json)
+
+export const createBulkPace = (coursePace: CoursePace, enrollmentIds: string[]) =>
+  doFetchApi<{course_pace: CoursePace; progress: Progress}>({
+    path: `/api/v1/courses/${coursePace.course_id}/course_pacing/bulk_create_enrollment_paces`,
+    method: 'POST',
+    body: {
+      course_id: coursePace.course_id,
+      course_section_id: null,
+      user_id: null,
+      hard_end_dates: null,
+      course_pace: transformCoursePaceForApi(coursePace),
+      enrollment_ids: enrollmentIds
     },
   }).then(({json}) => json)
 
@@ -99,22 +113,23 @@ export const resetToLastPublished = (contextType: PaceContextTypes, contextId: s
 export const load = (coursePaceId: string) =>
   doFetchApi<CoursePace>({path: `/api/v1/course_pacing/${coursePaceId}`}).then(({json}) => json)
 
-export const getNewCoursePaceFor = (
-  courseId: string,
-  context: PaceContextTypes,
-  contextId: string,
-) => {
-  let url = `/api/v1/courses/${courseId}/course_pacing/new`
-  if (context === 'Section') {
-    url = `/api/v1/courses/${courseId}/course_pacing/new?course_section_id=${contextId}`
-  } else if (context === 'Enrollment') {
-    url = `/api/v1/courses/${courseId}/course_pacing/new?enrollment_id=${contextId}`
+  export const getNewCoursePaceFor = (
+    courseId: string,
+    context: PaceContextTypes,
+    contextId: string,
+    isBulkEnrollment: boolean
+  ) => {
+
+    const baseUrl = `/api/v1/courses/${courseId}/course_pacing/new`
+  
+    const url = isBulkEnrollment || context === 'Enrollment'
+      ?  `${baseUrl}?enrollment_id=${contextId}`
+      : context === 'Section'
+      ? `${baseUrl}?course_section_id=${contextId}`
+      : baseUrl
+  
+    return doFetchApi<{ course_pace: CoursePace; progress: Progress }>({ path: url }).then(({ json }) => json)
   }
-  return doFetchApi<{
-    course_pace: CoursePace
-    progress: Progress
-  }>({path: url}).then(({json}) => json)
-}
 
 export const relinkToParentPace = (paceId: string) =>
   doFetchApi<{course_pace: CoursePace}>({

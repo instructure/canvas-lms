@@ -85,8 +85,8 @@ export interface ModuleWithDueDates extends Module {
   itemsWithDates: CoursePaceItemWithDate[]
 }
 
-export type PaceContextTypes = 'Course' | 'Section' | 'Enrollment'
-export type APIPaceContextTypes = 'course' | 'section' | 'student_enrollment'
+export type PaceContextTypes = 'Course' | 'Section' | 'Enrollment' | 'BulkEnrollment'
+export type APIPaceContextTypes = 'course' | 'section' | 'student_enrollment' | 'bulk_enrollment'
 export type WorkflowStates = 'unpublished' | 'active' | 'deleted'
 export type ProgressStates = 'queued' | 'running' | 'completed' | 'failed'
 export type ContextTypes = 'user' | 'course' | 'term' | 'hypothetical'
@@ -185,6 +185,8 @@ export interface UIState {
   readonly editingBlackoutDates: boolean
   readonly blueprintLocked?: boolean
   readonly showWeightedAssignmentsTray: boolean
+  readonly bulkEditModalOpen: boolean
+  readonly selectedBulkStudents: string[]
 }
 
 export type SortableColumn = 'name' | null
@@ -206,6 +208,20 @@ export interface PaceContextsState {
   readonly contextsPublishing: PaceContextProgress[]
 }
 
+export interface BulkEditStudentsState {
+  readonly searchTerm: string
+  readonly filterSection: string
+  readonly filterPaceStatus: string
+  readonly sortBy: SortableColumn
+  readonly orderType: OrderType
+  readonly page: number
+  readonly pageCount: number
+  readonly isLoading: boolean
+  readonly error?: string
+  readonly students: Student[]
+  readonly sections: Section[]
+}
+
 export interface StoreState {
   readonly original: OriginalState
   readonly coursePace: CoursePacesState
@@ -215,6 +231,7 @@ export interface StoreState {
   readonly course: Course
   readonly blackoutDates: BlackoutDateState
   readonly paceContexts: PaceContextsState
+  readonly bulkEditStudents: BulkEditStudentsState
 }
 
 export interface Pace {
@@ -243,6 +260,21 @@ export interface PaceContextProgress {
 export interface PaceContextsApiResponse {
   pace_contexts: PaceContext[]
   total_entries: number
+}
+
+export type BulkStudentsApiResponse = {
+  students: Student[],
+  sections: Section[],
+  pages: number
+}
+
+export type Student = {
+  id: string
+  name: string
+  sections: Section[]
+  paceStatus: string
+  enrollmentDate: string
+  enrollmentId: string
 }
 
 export interface PaceContextsAsyncActionPayload {

@@ -416,6 +416,7 @@ class ApplicationController < ActionController::Base
     course_pace_weighted_assignments
     modules_requirements_allow_percentage
     discussion_checkpoints
+    course_pace_allow_bulk_pace_assign
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
     embedded_release_notes

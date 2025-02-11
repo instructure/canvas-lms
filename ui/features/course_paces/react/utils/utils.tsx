@@ -29,6 +29,7 @@ export const API_CONTEXT_TYPE_MAP: {[k in APIPaceContextTypes]: PaceContextTypes
   course: 'Course',
   section: 'Section',
   student_enrollment: 'Enrollment',
+  bulk_enrollment: 'BulkEnrollment'
 }
 
 export const CONTEXT_TYPE_MAP: {[k: string]: PaceContextTypes} = {

@@ -51,6 +51,7 @@ const defaultProps: ResponsiveComponentProps = {
   compressDates: jest.fn(),
   uncompressDates: jest.fn(),
   setOuterResponsiveSize: jest.fn(),
+  isBulkEnrollment: false
 }
 
 afterEach(() => {

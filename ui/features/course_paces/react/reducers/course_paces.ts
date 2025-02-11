@@ -52,12 +52,11 @@ import { calculatePaceDuration, calendarDaysToPaceDuration, isTimeToCompleteCale
 
 const initialProgress = window.ENV.COURSE_PACE_PROGRESS
 
-// @ts-expect-error
 export const initialState: CoursePacesState = ({
   ...getInitialCoursePace(),
   course: window.ENV.COURSE,
   publishingProgress: initialProgress,
-} || {}) as CoursePacesState
+}) as CoursePacesState
 
 const getModuleItems = (modules: Module[]) =>
   ([] as CoursePaceItem[]).concat(...modules.map(m => m.items))
