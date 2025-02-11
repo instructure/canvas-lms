@@ -87,6 +87,18 @@ describe ObserverAlertsApiController, type: :request do
       expect(json.pluck("id")).to eq alerts.map(&:id).reverse
     end
 
+    it "excludes alerts where enrollment is inactive" do
+      @student.enrollments.where(course_id: @course.id).update!(workflow_state: "inactive")
+      json = api_call_as_user(@observer, :get, @path, @params)
+      expect(json.length).to eq 0
+    end
+
+    it "excludes alerts where enrollment is deleted" do
+      @student.enrollments.where(course_id: @course.id).destroy_all
+      json = api_call_as_user(@observer, :get, @path, @params)
+      expect(json.length).to eq 0
+    end
+
     it "doesnt return alerts for other students" do
       user = user_model
       link = add_linked_observer(user, @observer)

@@ -38,6 +38,31 @@ class ObserverAlert < ActiveRecord::Base
 
   scope :active, -> { where.not(workflow_state: ["dismissed", "deleted"]) }
   scope :unread, -> { where(workflow_state: "unread") }
+  scope :belongs_to_enrolled, lambda { |student, observer|
+    enrolled_alert_ids = []
+    enrolled_courses = []
+    %w[DiscussionTopic Assignment Submission Course].each do |context_type|
+      # get distinct context ids
+      alert_context_ids = where(context_type:).distinct.reorder(nil).pluck(:context_id)
+      context_class = context_type.classify.constantize
+
+      # group context ids by course ids so we don't instantiate the same enrollment multiple times
+      alert_context_ids.each do |context_id|
+        course_id = if context_type == "Course"
+                      context_class.find(context_id).id
+                    else
+                      context_class.find(context_id).course.id
+                    end
+        if enrolled_courses.include?(course_id)
+          enrolled_alert_ids.concat(where(context_type:, context_id:).pluck(:id))
+        elsif Enrollment.active_or_pending_by_date.where(user_id: student.id, course_id: course_id).shard(observer).exists?
+          enrolled_courses << course_id
+          enrolled_alert_ids.concat(where(context_type:, context_id:).pluck(:id))
+        end
+      end
+    end
+    where(id: enrolled_alert_ids).or(where(context_type: "AccountNotification"))
+  }
 
   def validate_users_link
     unless users_are_still_linked?
