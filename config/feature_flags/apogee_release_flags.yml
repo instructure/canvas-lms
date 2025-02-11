@@ -429,3 +429,14 @@ graphql_honor_anonymous_grading:
       state: on
     development:
       state: on
+submission_comment_media_auto_captioning:
+  state: hidden
+  applies_to: RootAccount
+  root_opt_in: true
+  display_name: Auto Captioning of Media Submission Comments
+  description: This feature enables automatic captioning of media submission comments.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed

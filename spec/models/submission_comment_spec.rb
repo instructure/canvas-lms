@@ -169,6 +169,22 @@ RSpec.describe SubmissionComment do
     end
   end
 
+  describe "#request_captions" do
+    it "does not call the request_captions method if FF is off" do
+      submission_comment = @submission.submission_comments.create!(valid_attributes)
+      expect(submission_comment).not_to receive(:request_captions)
+      submission_comment.save!
+    end
+
+    it "calls the request_captions method if FF is on" do
+      root_account = @submission.context.root_account
+      root_account.enable_feature!(:submission_comment_media_auto_captioning)
+      submission_comment = @submission.submission_comments.create!(valid_attributes)
+      expect(submission_comment).to receive(:request_captions)
+      submission_comment.save!
+    end
+  end
+
   describe "#body" do
     it "aliases comment" do
       submission_comment = SubmissionComment.new(comment: "a body")
