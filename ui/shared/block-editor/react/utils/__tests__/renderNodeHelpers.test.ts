@@ -24,7 +24,13 @@ const createDOM = () => {
   mountPoint.style.height = '150px'
   document.body.appendChild(mountPoint)
   // @ts-expect-error
-  mountPoint.getBoundingClientRect = jest.fn(() => ({top: 0, left: 0, width: 300, height: 150}))
+  mountPoint.getBoundingClientRect = jest.fn(() => ({top: 0, left: 0, width: 300, height: 300}))
+
+  const topbar = document.createElement('div')
+  topbar.className = 'topbar'
+  document.body.appendChild(topbar)
+  // @ts-expect-error
+  topbar.getBoundingClientRect = jest.fn(() => ({bottom: 100}))
 
   const domNode = document.createElement('div')
   domNode.style.position = 'relative'
@@ -34,9 +40,9 @@ const createDOM = () => {
   domNode.style.height = '100px'
   mountPoint.appendChild(domNode)
   // @ts-expect-error
-  domNode.getBoundingClientRect = jest.fn(() => ({top: 16, left: 16, width: 100, height: 100}))
+  domNode.getBoundingClientRect = jest.fn(() => ({top: 200, left: 50, width: 100, height: 100}))
 
-  return {mountPoint, domNode}
+  return {mountPoint, domNode, topbar}
 }
 
 const createToolbar = (mountPoint: HTMLElement) => {
@@ -57,7 +63,7 @@ describe('renderNodeHelpers', () => {
       const theToolbar = createToolbar(mountPoint)
 
       const result = getToolbarPos(domNode, mountPoint, theToolbar)
-      expect(result).toEqual({top: -14, left: 11})
+      expect(result).toEqual({top: 170, left: 45})
     })
 
     it('returns the correct position without an offset', () => {
@@ -65,14 +71,14 @@ describe('renderNodeHelpers', () => {
       const theToolbar = createToolbar(mountPoint)
 
       const result = getToolbarPos(domNode, mountPoint, theToolbar, false)
-      expect(result).toEqual({top: 16, left: 16})
+      expect(result).toEqual({top: 200, left: 50})
     })
 
-    it('returns the correct position without an vertical offset if the toolbar is not present', () => {
+    it('returns the correct position without a vertical offset if the toolbar is not present', () => {
       const {mountPoint, domNode} = createDOM()
 
       const result = getToolbarPos(domNode, mountPoint, null, true)
-      expect(result).toEqual({top: 16, left: 11})
+      expect(result).toEqual({top: 200, left: 45})
     })
 
     it('returns 0, 0 if domNode is null', () => {
@@ -81,6 +87,17 @@ describe('renderNodeHelpers', () => {
 
       const result = getToolbarPos(null, mountPoint, theToolbar)
       expect(result).toEqual({top: 0, left: 0})
+    })
+
+    it('moves toolbar below node when it would overlap with topbar', () => {
+      const {mountPoint, domNode} = createDOM()
+      const theToolbar = createToolbar(mountPoint)
+
+      // @ts-expect-error
+      domNode.getBoundingClientRect = jest.fn(() => ({top: 75, left: 50, width: 100, height: 100}))
+
+      const result = getToolbarPos(domNode, mountPoint, theToolbar)
+      expect(result).toEqual({top: 175, left: 45})
     })
   })
 })

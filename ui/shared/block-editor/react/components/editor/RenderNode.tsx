@@ -135,6 +135,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
       }
     }
     if (!hoverNode || hoverNode.id === 'ROOT') return null
+    if (hoverNode.events.selected) return null
 
     const hoverName = hoverNode.data.custom.displayName || hoverNode.data.displayName
 
