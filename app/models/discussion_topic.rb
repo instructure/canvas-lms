@@ -121,6 +121,7 @@ class DiscussionTopic < ActiveRecord::Base
   validate :only_course_topics_can_be_section_specific
   validate :assignments_cannot_be_section_specific
   validate :course_group_discussion_cannot_be_section_specific
+  validate :collapsed_not_enforced
 
   sanitize_field :message, CanvasSanitize::SANITIZE
   copy_authorized_links(:message) { [context, nil] }
@@ -2198,5 +2199,12 @@ class DiscussionTopic < ActiveRecord::Base
 
   def enough_replies_for_checkpoint?(reply_to_entries)
     reply_to_entries.count >= reply_to_entry_required_count
+  end
+
+  # For the current business logic we don't allow collapsed discussion locking in any scenarios
+  def collapsed_not_enforced
+    if !expanded && expanded_locked
+      errors.add(:expanded_locked, t("Cannot lock a collapsed discussion"))
+    end
   end
 end
