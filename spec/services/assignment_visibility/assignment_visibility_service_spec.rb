@@ -675,6 +675,23 @@ describe AssignmentVisibility::AssignmentVisibilityService do
       end
     end
 
+    context "with caching" do
+      specs_require_cache(:redis_cache_store)
+
+      it "does not treat nil and [] as the same cache key" do
+        # the visibility query has different results for nil arguments and [] arguments
+        # so we must ensure the cache key is different as well
+        course_with_differentiated_assignments_enabled
+        assignment_with_false_only_visible_to_overrides
+        # with passing nil assignment_ids
+        visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id).map(&:assignment_id)
+        expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
+        # with passing an empty array to assignment_ids
+        visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, course_ids: @course.id, assignment_ids: []).map(&:assignment_id)
+        expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsey
+      end
+    end
+
     describe AssignmentVisibility do
       let!(:course) do
         course = Course.create!
