@@ -103,6 +103,59 @@ describe "gradebooks/grade_summary" do
     expect(response.body).to match(/Test Student scores are not included in grade statistics./)
   end
 
+  describe "comments thread" do
+    before do
+      stub_kaltura
+      course_with_teacher
+      student_in_course(active_all: true)
+      view_context
+      a = @course.assignments.create!(title: "some assignment", submission_types: ["online_text_entry"])
+      @sub = a.submit_homework(@student, submission_type: "online_text_entry", body: "o hai")
+      assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
+      @cell_selector = "table#grades_summary > tbody > tr[id^=comments_thread] > td > table.score_details_table > tbody > tr > td"
+    end
+
+    it "shows pure text comments correctly" do
+      @sub.add_comment(author: @teacher, comment: "Pure text comment")
+      render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment response.body
+
+      cell = doc.at_css(@cell_selector)
+      expect(cell).not_to be_nil
+      expect(cell.inner_html).to include('<span style="white-space: pre-wrap;">Pure text comment</span>')
+    end
+
+    it "shows RCE comments correctly" do
+      @sub.add_comment(author: @teacher, comment: "<p>RCE comment</p>")
+      render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment response.body
+
+      cell = doc.at_css(@cell_selector)
+      expect(cell).not_to be_nil
+      expect(cell.inner_html).to include('<span style="white-space: pre-wrap;"><p>RCE comment</p></span>')
+    end
+
+    it "sanitization prohibits XSS attacks" do
+      @sub.add_comment(author: @teacher, comment: '<p>Doing an XSS attack</p><script>alert("Hello! This is an alert message.");</script>')
+      render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment response.body
+
+      cell = doc.at_css(@cell_selector)
+      expect(cell).not_to be_nil
+      expect(cell.inner_html).to include('<span style="white-space: pre-wrap;"><p>Doing an XSS attack</p></span>')
+    end
+
+    it "sanitization corrects invalid HTML syntax" do
+      @sub.add_comment(author: @teacher, comment: "<h3>Doing an XSS attack</p>")
+      render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment response.body
+
+      cell = doc.at_css(@cell_selector)
+      expect(cell).not_to be_nil
+      expect(cell.inner_html).to include('<span style="white-space: pre-wrap;"><h3>Doing an XSS attack<p></p></h3></span>')
+    end
+  end
+
   describe "submission details link" do
     before do
       course_with_teacher
