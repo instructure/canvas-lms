@@ -68,6 +68,7 @@ describe "SpeedGrader - discussion submissions" do
 
     # check for correct submissions in SpeedGrader iframe
     in_frame "speedgrader_iframe", "#discussion_view_link" do
+      expect(f("#main")).to include_text("The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for")
       expect(f("#main")).to include_text(@first_message)
       expect(f("#main")).not_to include_text(@second_message)
     end
@@ -261,6 +262,29 @@ describe "SpeedGrader - discussion submissions" do
               wait_for_ajaximations
               expect(f("body")).to contain_jqcss(".discussions-search-filter")
             end
+          end
+        end
+      end
+
+      context "No Context Discussion preview header message" do
+        it "it displays a group discussion aware message" do
+          entry_text = "first student message in group1"
+          root_topic = group_discussion_assignment
+          @group1.add_user(@student, "accepted")
+
+          root_topic.child_topic_for(@student).discussion_entries.create!(user: @student, message: entry_text)
+          Speedgrader.visit(@course.id, root_topic.assignment.id)
+
+          in_frame "speedgrader_iframe", "#discussion_view_link" do
+            expect(f("#main")).to include_text("The submissions for the assignment are posts in the assignment's discussion for this group. You can view the discussion posts for")
+            expect(f("#main")).to include_text(entry_text)
+          end
+        end
+
+        it "it displays a non-group discussion aware message" do
+          Speedgrader.visit(@course.id, @assignment.id)
+          in_frame "speedgrader_iframe", "#discussion_view_link" do
+            expect(f("#main")).to include_text("The submissions for the assignment are posts in the assignment's discussion. You can view the discussion posts for")
           end
         end
       end
