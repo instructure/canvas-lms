@@ -8909,6 +8909,7 @@ nn:
   create_a_temporary_enrollment_167f05f1: "Opprett ei midlertidig påmelding"
   create_account_263ec6: "Opprett konto"
   create_an_ba36d171: "Opprett ein"
+  create_an_eportfolio_1841e34a: "Opprett e-portefølje"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Opprett og administrer online quizar og undersøkingar, både vurderte og ikkje-vurderte. "
   create_and_edit_scores_4177662c: "Opprett og endre resultat"
   create_announcement_7ebf0845: "Opprett kunngjering"
@@ -29249,6 +29250,7 @@ nn:
   working_b1f63edf: arbeider...
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Vil du godta eller avslå oppdateringa?"
   would_you_like_to_enable_this_app_ccdf735d: "Vil du aktivere denne appen?"
+  would_you_like_to_expand_the_contents_of_filename__35b40cc5: "Vil du utvide innhaldet i \"%{fileName}\" til gjeldande mappe eller laste opp ZIP-fila som ho er?"
   would_you_like_to_go_back_to_include_1d279044: "Vil du gå tilbake og inkludere:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Vil du at studentane skal halde fram på emnet eller vil du låse modulane på nytt til nye krav er fullførte?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "Bryt tekst i titlar i kalenderen si månadsvising "
@@ -29620,6 +29622,7 @@ nn:
   zip_file_display: Filimport
   zip_file_file_description: "Pakk ut ZIP-fil til mappe"
   zip_file_name: ZIP-fil
+  zip_file_options_9a2af6c1: "Alternativ for ZIP-fil"
   zip_file_options_form: 
     expand: Utvid
     message: "Vil du utvide innhaldet i \"%{fileName}\" til gjeldande mappe eller laste opp ZIP-fila som ho er?"
