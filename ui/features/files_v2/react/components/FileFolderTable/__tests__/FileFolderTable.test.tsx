@@ -16,19 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, screen, waitFor} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
 import {renderComponent} from './testUtils'
 
 describe('FileFolderTable', () => {
+  let flashElements: any
+
   beforeEach(() => {
     fetchMock.get(/.*\/folders/, FAKE_FOLDERS_AND_FILES)
+    flashElements = document.createElement('div')
+    flashElements.setAttribute('id', 'flash_screenreader_holder')
+    flashElements.setAttribute('role', 'alert')
+    document.body.appendChild(flashElements)
   })
 
   afterEach(() => {
     fetchMock.restore()
+    document.body.removeChild(flashElements)
+    flashElements = undefined
   })
 
   it('renders filedrop when no results and not loading', async () => {
@@ -162,6 +170,18 @@ describe('FileFolderTable', () => {
         expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(true)
       })
     })
+
+    it('updates select screen reader alert when rows are selected', async () => {
+      const user = userEvent.setup()
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true, delay: 0})
+      renderComponent()
+
+      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+      await user.click(rowCheckboxes[0])
+
+      // includes alert and the visible text
+      expect(screen.getAllByText('1 of 1 selected')).toHaveLength(2)
+    })
   })
 
   describe('rights column', () => {
@@ -215,7 +235,7 @@ describe('FileFolderTable', () => {
       await user.click(selectAllCheckbox)
       rowCheckboxes.forEach(checkbox => expect(checkbox).toBeChecked())
 
-      expect(screen.getByText('1 of 1 selected')).toBeInTheDocument()
+      expect(screen.getAllByText('1 of 1 selected')).toHaveLength(2)
     })
   })
 

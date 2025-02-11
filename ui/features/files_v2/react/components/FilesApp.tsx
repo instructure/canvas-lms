@@ -33,6 +33,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {FileManagementContext} from './Contexts'
 import {MainFolderWrapper} from '../../utils/fileFolderWrappers'
 import SearchBar from './SearchBar'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('files_v2')
 
@@ -49,6 +50,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const [sortDirection, setSortDirection] = useState<string>('asc')
   const [currentUrl, setCurrentUrl] = useState<string>('')
   const [discoveredPages, setDiscoveredPages] = useState<{[key: number]: string}>({})
+  const [paginationSRText, setPaginationSRText] = useState<string>('')
   const {folders, searchTerm} = useLoaderData() as {folders: Folder[] | null; searchTerm: string}
   const currentFolderWrapper = useRef<MainFolderWrapper | null>(null)
 
@@ -81,12 +83,21 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
 
   const handlePaginationLinkChange = useCallback(
     (links: Record<string, string>) => {
+      let srTotalPageNumber = Object.keys(discoveredPages).length
       if (links.next && !discoveredPages[currentPageNumber + 1]) {
         setDiscoveredPages(prev => {
           const newLinks = {...prev, [currentPageNumber + 1]: links.next}
           return newLinks
         })
+        srTotalPageNumber++
       }
+
+      setPaginationSRText(
+        I18n.t('Table page %{currentPageNumber} of %{totalPageNumber}', {
+          currentPageNumber,
+          totalPageNumber: srTotalPageNumber,
+        }),
+      )
     },
     [currentPageNumber, discoveredPages],
   )
@@ -159,6 +170,14 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
         <Flex padding="small none none none" justifyItems="space-between">
           <Flex.Item size="50%">{userCanManageFilesForContext && <FilesUsageBar />}</Flex.Item>
           <Flex.Item size="auto" padding="none medium none none">
+            <Alert
+              liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+              liveRegionPoliteness="polite"
+              screenReaderOnly
+              data-testid="pagination-announcement"
+            >
+              {paginationSRText}
+            </Alert>
             {!isTableLoading && totalPageNumber > 1 && (
               <Pagination
                 as="nav"
