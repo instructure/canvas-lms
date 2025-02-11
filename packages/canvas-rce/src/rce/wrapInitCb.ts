@@ -16,20 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {EditorOptions} from './types'
+
 export default function wrapInitCb(
   mirroredAttrs: Record<string, string>,
-  editorOptions: {
-    init_instance_callback?: (ed: {
-      getElement: () => HTMLElement | undefined
-      on: (event: string, handler: (e: unknown) => void) => void
-      selection: {getBookmark: (v: number) => unknown}
-      removed: boolean
-      undoManager: {typing: boolean; add: () => void}
-      id: string
-      contentWindow: Window
-    }) => void
-  },
-) {
+  editorOptions: EditorOptions,
+): EditorOptions {
   // mirror attributes onto tinymce editor (if this can be done
   // via tiny api, it is preferable, but I dont see a way)
   const oldInitInstCb = editorOptions.init_instance_callback

@@ -27,7 +27,7 @@ import EditorConfig from '../tinymce.config'
 import loadEventListeners from '../loadEventListeners'
 import shouldUseFeature, {Feature} from '../shouldUseFeature'
 import tinymce, {Editor} from 'tinymce'
-import type {EditorOptionsPropType} from '@instructure/canvas-rce/es/rce/RCEWrapperProps'
+import type {EditorOptions} from '@instructure/canvas-rce/es/rce/RCEWrapperProps'
 
 // the ref you add via <CanvasRce ref={yourRef} /> will be a reference
 // to the underlying RCEWrapper. You probably shouldn't use it until
@@ -108,7 +108,6 @@ const CanvasRce = forwardRef(function CanvasRce(
       autosave={autosave_}
       canvasOrigin={ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin || ''}
       defaultContent={defaultContent}
-      // @ts-expect-error
       editorOptions={tinymceConfig}
       highContrastCSS={
         window.ENV?.url_for_high_contrast_tinymce_editor_css
@@ -169,7 +168,7 @@ export interface CanvasRcePropTypes {
    * tinymce configuration overrides
    * see RCEWrapper's editorOptionsPropType for details.
    */
-  editorOptions?: EditorOptionsPropType
+  editorOptions?: EditorOptions
 
   /**
    * height of the RCE. If a number, in px

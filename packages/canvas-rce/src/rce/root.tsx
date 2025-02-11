@@ -22,6 +22,7 @@ import RCEWrapper from './RCEWrapper'
 import normalizeProps from './normalizeProps'
 import formatMessage from '../format-message'
 import generateId from 'format-message-generate-id/underscored_crc32'
+import type {EditorOptions} from './types'
 
 if (!process.env.BUILD_LOCALE) {
   formatMessage.setup({
@@ -31,27 +32,32 @@ if (!process.env.BUILD_LOCALE) {
   })
 }
 
-export function renderIntoDiv(target, props, renderCallback) {
+export function renderIntoDiv(
+  target: HTMLElement,
+  props: EditorOptions,
+  renderCallback?: (ref: RCEWrapper) => void,
+) {
   import('./tinyRCE')
     .then(module => {
       const tinyRCE = module.default
 
-      // normalize props
-      props = normalizeProps(props, tinyRCE)
+      const normalizedProps = normalizeProps(props, tinyRCE)
 
-      formatMessage.setup({locale: props.language})
+      formatMessage.setup({locale: normalizedProps.language})
       // render the editor to the target element
-      const renderedComponent = createRef()
+      const renderedComponent = createRef<RCEWrapper>()
       render(
         <RCEWrapper
           ref={renderedComponent}
-          {...props}
+          {...normalizedProps}
           handleUnmount={() => unmountComponentAtNode(target)}
         />,
         target,
         () => {
           // pass it back
-          renderCallback && renderCallback(renderedComponent.current)
+          if (renderCallback && renderedComponent.current) {
+            renderCallback(renderedComponent.current)
+          }
         },
       )
     })

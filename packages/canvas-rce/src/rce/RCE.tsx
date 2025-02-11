@@ -19,7 +19,7 @@
 import React, {forwardRef, useState} from 'react'
 import formatMessage from '../format-message'
 import RCEWrapper from './RCEWrapper'
-import {EditorOptionsPropType, type ExternalToolsConfig, LtiToolsPropType} from './RCEWrapperProps'
+import type {ExternalToolsConfig, LtiToolsPropType} from './RCEWrapperProps'
 import {RCEVariant} from './RCEVariants'
 import {editorLanguage} from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
@@ -29,7 +29,7 @@ import getTranslations from '../getTranslations'
 import '@instructure/canvas-theme'
 import type {Editor} from 'tinymce'
 import generateId from 'format-message-generate-id/underscored_crc32'
-import {RCETrayProps} from './types'
+import type {EditorOptions, RCETrayProps} from './types'
 
 if (!process || !process.env || !process.env.BUILD_LOCALE) {
   formatMessage.setup({
@@ -162,9 +162,9 @@ export interface RCEPropTypes {
 
   /**
    * tinymce configuration. See defaultTinymceConfig for all the defaults
-   * and RCEWrapper.editorOptionsPropType for stuff you may want to include
+   * and RCEWrapper.EditorOptions for stuff you may want to include
    */
-  editorOptions?: EditorOptionsPropType
+  editorOptions?: EditorOptions
 
   /**
    * there's an open bug when RCE is rendered in a Modal form

@@ -28,7 +28,7 @@ type Props = {
   label: string
   name: string
   value: string
-  onChange: (e: any) => void
+  onChange: (e: {target: {name: string; value: string}}) => void
 }
 
 export default class ColorField extends React.Component<Props> {

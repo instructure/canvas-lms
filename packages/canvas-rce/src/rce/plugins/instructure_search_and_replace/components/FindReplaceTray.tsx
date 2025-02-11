@@ -98,8 +98,8 @@ export default function FindReplaceTray({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function usePrevious(value: any) {
-    const ref = useRef()
+  function usePrevious(value: string) {
+    const ref = useRef<string>()
     useEffect(() => {
       ref.current = value
     }, [value])

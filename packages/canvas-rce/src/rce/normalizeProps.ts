@@ -17,10 +17,15 @@
  */
 
 import wrapInitCb from './wrapInitCb'
+import tinymce from 'tinymce'
+import type {EditorOptions, NormalizedEditorOptions} from './types'
 
-export default function (props, tinymce) {
-  const initialEditorOptions = props.editorOptions(tinymce)
-  const editorOptions = wrapInitCb(props.mirroredAttrs, initialEditorOptions)
+export default function normalizeProps(
+  props: EditorOptions,
+  tinyMCE: typeof tinymce,
+): NormalizedEditorOptions {
+  const initialEditorOptions = props.editorOptions ? props.editorOptions(tinyMCE) : {}
+  const editorOptions = wrapInitCb(props.mirroredAttrs || {}, initialEditorOptions)
 
   return {
     // other props, including overrides
@@ -29,6 +34,6 @@ export default function (props, tinymce) {
     // enforced values, in addition to props and cannot be overridden by
     // props
     editorOptions,
-    tinymce,
+    tinymce: tinyMCE,
   }
 }

@@ -17,12 +17,17 @@
  */
 
 import React from 'react'
-import {number, shape} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import formatMessage from '../../format-message'
 
-export default function LoadingStatus({loader}) {
+export default function LoadingStatus({
+  loader,
+}: {
+  loader: {
+    lastRecordsLoaded: number
+  }
+}) {
   let itemsLoadedText = null
 
   if (loader.lastRecordsLoaded > 0) {
@@ -41,10 +46,4 @@ export default function LoadingStatus({loader}) {
       {itemsLoadedText}
     </ScreenReaderContent>
   )
-}
-
-LoadingStatus.propTypes = {
-  loader: shape({
-    lastRecordsLoaded: number.isRequired,
-  }).isRequired,
 }
