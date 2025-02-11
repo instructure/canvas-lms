@@ -67,7 +67,7 @@ class ApplicationController < ActionController::Base
   before_action :require_reacceptance_of_terms
   before_action :clear_policy_cache
   before_action :setup_live_events_context
-  after_action :log_page_view, unless: -> { request.path.include?("api/v1/") }
+  after_action :log_page_view
   after_action :discard_flash_if_xhr
   after_action :cache_buster
   before_action :initiate_session_from_token
