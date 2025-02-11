@@ -5890,6 +5890,7 @@ uk:
   create_a_new_module_6f31b0fe: "Створити новий модуль"
   create_a_new_user_for_address_7487e9c9: "Створити нового користувача для \"%{address}\""
   create_account_263ec6: "Створити обліковий запис"
+  create_an_eportfolio_1841e34a: "Створити Е-портфоліо"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Створюйте та адмініструйте онлайн тести та опитування, як з оцінкою так і без."
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Створюйте стільки тем для обговорення, скільки потрібно, завдання
@@ -18888,6 +18889,7 @@ uk:
   workflow_state_cc8d711a: "Стан робочого процесу"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Ви бажаєте прийняти чи відхилити це оновлення?"
   would_you_like_to_enable_this_app_ccdf735d: "Хочете увімкнути цей додаток?"
+  would_you_like_to_expand_the_contents_of_filename__35b40cc5: "Ви хочете розархівувати вміст \"%{fileName}\" у поточну теку, чи завантажити файл zip як є?"
   would_you_like_to_go_back_to_include_1d279044: "Чи хочете Ви вернутися назад, щоб включити:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Хотіли б ви дозволити студентам продовжувати курс, чи хочете заблокувати ці модулі до виконання нових вимог?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "Завершіть назви подій у вікні перегляду календаря місяцю"
@@ -19066,6 +19068,7 @@ uk:
   zip_file_display: "Імпорт файлу"
   zip_file_file_description: "Розпакуйте .zip файл у папку"
   zip_file_name: ".zip файл"
+  zip_file_options_9a2af6c1: "Параметри Zip-файлу"
   zip_file_options_form: 
     expand: "Розгорнути його"
     message: "Ви хочете розархівувати вміст \"%{fileName}\" у поточну теку, чи завантажити файл zip як є?"
