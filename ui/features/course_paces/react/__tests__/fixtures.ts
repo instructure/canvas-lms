@@ -33,6 +33,7 @@ import type {
   PaceContextsApiResponse,
   StoreState,
   PaceContext,
+  BulkEditStudentsState,
 } from '../types'
 
 window.ENV.TIMEZONE = 'America/Denver'
@@ -467,15 +468,61 @@ export const DEFAULT_UI_STATE: UIState = {
   outerResponsiveSize: 'large',
   savingDraft: false,
   showWeightedAssignmentsTray: false,
+  bulkEditModalOpen: false,
+  selectedBulkStudents: []
+}
+
+export const DEFAULT_BULK_EDIT_STUDENTS_STATE: BulkEditStudentsState = {
+    searchTerm: '',
+    filterSection: '',
+    filterPaceStatus: '',
+    sortBy: 'name',
+    orderType: 'asc',
+    page: 1,
+    pageCount: 2,
+    students: [
+      {
+        id: '1',
+        name: 'John',
+        enrollmentId: '1',
+        enrollmentDate: '2025-02-01',
+        paceStatus: "on-pace",
+        sections: [
+          { id: 'math', name: 'Math', course_id: "1" }
+        ]
+      },
+      {
+        id: '2',
+        name: 'Maria',
+        enrollmentId: '2',
+        enrollmentDate: '2025-02-02',
+        paceStatus: "on-pace",
+        sections: [
+          {
+            id: 'science',
+            name: 'Science',
+            course_id: "1"
+          }
+        ]
+      },
+    ],
+    sections: [
+      { id: 'all', name: 'All Sections', course_id: "1" },
+      { id: 'math', name: 'Math', course_id: "1" },
+      { id: 'science', name: 'Science', course_id: "1" },
+    ],
+    isLoading: false,
+    error: '',
 }
 
 export const DEFAULT_STORE_STATE: StoreState = {
   blackoutDates: DEFAULT_BLACKOUT_DATE_STATE,
   course: COURSE,
   enrollments: ENROLLMENTS,
-  coursePace: {...PRIMARY_PACE},
+  coursePace: { ...PRIMARY_PACE },
   sections: SECTIONS,
-  original: {coursePace: PRIMARY_PACE, blackoutDates: BLACKOUT_DATES},
+  original: { coursePace: PRIMARY_PACE, blackoutDates: BLACKOUT_DATES },
   paceContexts: PACE_CONTEXTS_DEFAULT_STATE,
   ui: DEFAULT_UI_STATE,
+  bulkEditStudents: DEFAULT_BULK_EDIT_STUDENTS_STATE
 }

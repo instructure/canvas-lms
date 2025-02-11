@@ -2364,6 +2364,7 @@ class Course < ActiveRecord::Base
     Enrollment.where(id: enrollment_ids).find_each do |enrollment|
       pace_create_params[:user_id] = enrollment.user_id
       pace_create_params[:workflow_state] = "active"
+      pace_create_params[:course_id] = enrollment.course_id
       pace = enrollment.course_paces.new(pace_create_params)
 
       if pace.save

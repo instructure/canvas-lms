@@ -722,6 +722,8 @@
 - verb: PUT
   path: '/api/v1/courses/:course_id/blueprint_templates/:template_id/update_associations'
 - verb: GET
+  path: '/api/v1/courses/:course_id/bulk_student_enrollments/student_bulk_pace_edit_view'
+- verb: GET
   path: '/api/v1/courses/:course_id/bulk_user_progress'
 - verb: GET
   path: '/api/v1/courses/:course_id/calendar_events/timetable'

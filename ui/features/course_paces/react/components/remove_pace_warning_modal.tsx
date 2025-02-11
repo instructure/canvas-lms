@@ -43,6 +43,7 @@ const MODAL_HEADER_TEXT: Record<PaceContextTypes, string> = {
   Section: I18n.t('Remove this Section Pace?'),
   Enrollment: I18n.t('Remove this Student Pace?'),
   Course: I18n.t('Remove this Course Pace?'),
+  BulkEnrollment: I18n.t('Remove this Bulk Student Pace?'),
 }
 
 export const RemovePaceWarningModal = ({

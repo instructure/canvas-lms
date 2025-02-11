@@ -55,6 +55,9 @@ export const paceContextsInitialState: PaceContextsState = {
   contextsPublishing: uniqPaces,
 }
 
+export const isBulkEnrollment = (state: StoreState) => state.paceContexts.selectedContext?.type === 'BulkEnrollment'
+export const getSelectedBulkStudents = (state: StoreState) => state.paceContexts.selectedContext?.item_id.split(",") || []
+
 export const getSelectedPaceContext = (state: StoreState): PaceContext | null =>
   state.paceContexts.selectedContext
 

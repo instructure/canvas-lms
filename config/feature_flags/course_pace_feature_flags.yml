@@ -29,9 +29,13 @@ course_pace_pacing_with_mastery_paths:
   display_name: Course Paces with Mastery Paths
   description: Supplemental logic and UX for supporting Course Paces with Mastery Paths
 
-
 course_pace_weighted_assignments:
   state: hidden
   applies_to: RootAccount
   display_name: Course Pace Weighted Assignments
   description: Allows for setting the weight of assignments in the course pace
+course_pace_allow_bulk_pace_assign:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Allow bulk pace assignment to multiple students
+  description: Allows for selecting various students and applying a bulk pace to all of them

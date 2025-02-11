@@ -320,6 +320,7 @@ export type RootAccountFeatureId =
   | 'lti_asset_processor'
   | 'discussion_checkpoints'
   | 'course_pace_weighted_assignments'
+  | 'course_pace_allow_bulk_pace_assign'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

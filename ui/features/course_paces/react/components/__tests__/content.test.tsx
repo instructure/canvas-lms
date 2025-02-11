@@ -427,5 +427,50 @@ describe('PaceContextsContent', () => {
         expect(await queryByTestId(`select-all-paces-checkbox`)).not.toBeInTheDocument()
       })
     })
+
+    describe('when course_pace_download_document feature is disabled', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES ||= {}
+        window.ENV.FEATURES.course_paces_redesign = true
+        window.ENV.FEATURES.course_pace_download_document = false
+      })
+
+      it('does not render download button', async () => {
+        const paceContextsState: PaceContextsState = {
+          ...DEFAULT_STORE_STATE.paceContexts,
+        }
+        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+        const {queryByTestId} = renderConnected(<PaceContent />, state)
+
+        expect(await queryByTestId(`download-selected-button`)).not.toBeInTheDocument()
+      })
+
+      it('does not render select all checkbox', async () => {
+        const paceContextsState: PaceContextsState = {
+          ...DEFAULT_STORE_STATE.paceContexts,
+        }
+        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+        const {queryByTestId} = renderConnected(<PaceContent />, state)
+
+        expect(await queryByTestId(`select-all-paces-checkbox`)).not.toBeInTheDocument()
+      })
+    })
+    describe('when course_pace_allow_bulk_pace_assign feature is disabled', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES ||= {}
+        window.ENV.FEATURES.course_paces_redesign = true
+        window.ENV.FEATURES.course_pace_allow_bulk_pace_assign = false
+      })
+
+      it('does not render the bulk edit button button', async () => {
+        const paceContextsState: PaceContextsState = {
+          ...DEFAULT_STORE_STATE.paceContexts,
+        }
+        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+        const {queryByTestId} = renderConnected(<PaceContent />, state)
+
+        expect(await queryByTestId(`bulk-edit-student-paces-button`)).not.toBeInTheDocument()
+      })
+    })
   })
 })

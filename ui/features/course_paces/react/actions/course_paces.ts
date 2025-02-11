@@ -39,6 +39,7 @@ import * as Api from '../api/course_pace_api'
 import {transformBlackoutDatesForApi} from '../api/blackout_dates_api'
 import {getPaceName, getIsUnpublishedNewPace} from '../reducers/course_paces'
 import {paceContextsActions} from './pace_contexts'
+import {getSelectedBulkStudents, isBulkEnrollment} from '../reducers/pace_contexts'
 
 const I18n = createI18nScope('course_paces_actions')
 
@@ -137,6 +138,32 @@ const thunkActions = {
         })
     }
   },
+  publishBulkEnrollmentPaces: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
+    return (dispatch, getState) => {
+      dispatch(uiActions.clearCategoryError('publish'))
+
+      const pace = getState().coursePace
+      const enrollmentIds = getSelectedBulkStudents(getState())
+      pace.workflow_state = 'active'
+      dispatch(uiActions.startSyncing())
+
+      return Api.createBulkPace(pace, enrollmentIds)
+        .then(responseBody => {
+          dispatch(uiActions.syncingCompleted())
+          dispatch(uiActions.closeBulkEditModal())
+          dispatch(uiActions.hidePaceModal())
+          showFlashAlert({
+            message: I18n.t('All changes were applied to the %{pacesCount} student course paces successfully.', {pacesCount: enrollmentIds.length}),
+            err: null,
+            type: 'success',
+          })
+        })
+        .catch(error => {
+          dispatch(uiActions.setCategoryError('publish', error?.toString()))
+          dispatch(uiActions.syncingCompleted())
+        })
+    }
+  },
   // TODO: when blackout dates are changed we have to possibly publish changes
   // to the pace in the UI + save all existing paces
   publishPaceAndSaveAll: (
@@ -152,20 +179,23 @@ const thunkActions = {
   syncUnpublishedChanges: (saveAsDraft?: boolean) => {
     return (dispatch: any, getState: any) => {
       dispatch(uiActions.clearCategoryError('publish'))
-
-      if (getBlackoutDatesUnsynced(getState())) {
-        dispatch(uiActions.startSyncing())
-        return dispatch(blackoutDateActions.syncBlackoutDates())
-          .then(() => {
-            return dispatch(coursePaceActions.publishPaceAndSaveAll(saveAsDraft)).then(() => {
+      if (isBulkEnrollment(getState())) {
+        return dispatch(coursePaceActions.publishBulkEnrollmentPaces())
+      } else {
+        if (getBlackoutDatesUnsynced(getState())) {
+          dispatch(uiActions.startSyncing())
+          return dispatch(blackoutDateActions.syncBlackoutDates())
+            .then(() => {
+              return dispatch(coursePaceActions.publishPaceAndSaveAll(saveAsDraft)).then(() => {
+                dispatch(uiActions.syncingCompleted())
+              })
+            })
+            .catch(() => {
               dispatch(uiActions.syncingCompleted())
             })
-          })
-          .catch(() => {
-            dispatch(uiActions.syncingCompleted())
-          })
-      } else {
-        return dispatch(coursePaceActions.publishPace(saveAsDraft))
+        } else {
+          return dispatch(coursePaceActions.publishPace(saveAsDraft))
+        }
       }
     }
   },
@@ -251,6 +281,7 @@ const thunkActions = {
     contextId: string,
     afterAction: LoadingAfterAction = coursePaceActions.saveCoursePace,
     openModal: boolean = true,
+    isBulkEnrollment: boolean = false
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       if (openModal) {
@@ -259,9 +290,8 @@ const thunkActions = {
       }
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
-
       return (
-        Api.getNewCoursePaceFor(getState().course.id, contextType, contextId)
+        Api.getNewCoursePaceFor(getState().course.id, contextType, contextId, isBulkEnrollment)
           // @ts-expect-error
           .then(({course_pace: coursePace, progress}) => {
             if (!coursePace) throw new Error(I18n.t('Response body was empty'))
@@ -340,6 +370,7 @@ const thunkActions = {
         Course: 'course',
         Section: 'section',
         Enrollment: 'student_enrollment',
+        BulkEnrollment: 'bulk_enrollment'
       }
       const selectedContextType = CONTEXT_TYPE_MAP[getState().ui.selectedContextType]
       return Api.removePace(getState().coursePace)

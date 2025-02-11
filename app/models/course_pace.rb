@@ -489,9 +489,11 @@ class CoursePace < ActiveRecord::Base
     quiz_ids = quiz_map.keys
 
     assignment_submissions = Submission.where(user_id: user_ids, assignment_id: assignment_ids)
+                                       .where.not(workflow_state: ["unsubmitted", "deleted"])
                                        .order(user_id: :asc, assignment_id: :asc, created_at: :desc)
 
     quiz_submissions = Quizzes::QuizSubmission.where(user_id: user_ids, quiz_id: quiz_ids)
+                                              .where.not(workflow_state: ["unsubmitted", "deleted"])
                                               .order(user_id: :asc, quiz_id: :asc, created_at: :desc)
 
     grouped_assignment_submissions = assignment_submissions.group_by { |s| [s.user_id, s.assignment_id] }
@@ -526,7 +528,7 @@ class CoursePace < ActiveRecord::Base
                       when Assignment
                         content.submission_types != "none" && content.workflow_state == "published"
                       when Quizzes::Quiz
-                        content.workflow_state == "published"
+                        content.workflow_state == "available"
                       else
                         false
                       end

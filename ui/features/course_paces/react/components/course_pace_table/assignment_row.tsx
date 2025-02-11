@@ -264,7 +264,12 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   }
 
   renderDurationInput = () => {
-    if (this.props.isStudentPace && !window.ENV.FEATURES.course_paces_for_students) {
+    const contextType = this.props.context_type;
+    if (
+      this.props.isStudentPace &&
+      !window.ENV.FEATURES.course_paces_for_students
+      && contextType !== 'BulkEnrollment'
+    ) {
       return (
         <Flex height="2.375rem" alignItems="center" justifyItems="center">
           {this.state.duration}
@@ -352,11 +357,11 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       : null
 
     return status ? (
-      <span style={{whiteSpace: "nowrap"}}>
+      <div style={{whiteSpace: "nowrap", marginTop: 5}}>
         <Text color="danger">
           <IconWarningLine size="x-small" /> {status}
         </Text>
-      </span>
+      </div>
     ) : null
   }
 

@@ -31,16 +31,17 @@ import type {ThunkAction} from 'redux-thunk'
 import type {Action} from 'redux'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {CONTEXT_TYPE_MAP} from '../utils/utils'
-import {coursePaceActions} from './course_paces'
 
 const I18n = createI18nScope('pace_contexts_actions')
 
-export interface FetchContextsActionParams {
-  contextType: APIPaceContextTypes
+export interface CommonFilterParams {
   page?: number
   searchTerm?: string
   sortBy?: SortableColumn
   orderType?: OrderType
+}
+export interface FetchContextsActionParams extends CommonFilterParams {
+  contextType: APIPaceContextTypes
   contextIds?: string[]
   // @ts-expect-error
   afterFetch?: (contexts) => void
@@ -123,7 +124,7 @@ const thunkActions = {
       }
     }
   },
-  syncPublishingPaces: (restart: boolean = false): ThunkAction<void, StoreState, void, Action> => {
+  syncPublishingPaces: (loadLatestPaceByContextAction: Function, restart: boolean = false): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
       const {contextsPublishing, entries} = getState().paceContexts
       const loadedCodes = entries.map(({type, item_id}) => `${type}${item_id}`)
@@ -139,7 +140,7 @@ const thunkActions = {
       contextsToLoad.forEach(({pace_context}) => {
         const contextType = CONTEXT_TYPE_MAP[pace_context.type]
         dispatch(
-          coursePaceActions.loadLatestPaceByContext(contextType, pace_context.item_id, null, false),
+          loadLatestPaceByContextAction(contextType, pace_context.item_id, null, false),
         )
         dispatch(regularActions.updatePublishingPaces(updatedPaceContextsProgress))
       })
