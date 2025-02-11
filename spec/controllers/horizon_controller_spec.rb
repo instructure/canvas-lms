@@ -1,0 +1,144 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2025 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+describe HorizonController do
+  describe "GET canvas_career_validation" do
+    it "should success when course has no errors" do
+      course_factory(active_all: true)
+      @course.announcements.create!(title: "Announcement 1", message: "Message 1")
+      @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry")
+
+      account_admin_user
+      user_session(@admin)
+
+      get "validate_course", params: { course_id: @course.id }
+
+      json = json_parse(response.body)
+      expect(json).to eq({ "errors" => {} })
+    end
+
+    it "unauthorized for user" do
+      course_with_student_logged_in(active_all: true)
+
+      get "validate_course", format: :json, params: { course_id: @course.id }
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "unauthorized for teacher" do
+      course_with_teacher_logged_in(active_all: true)
+
+      get "validate_course", format: :json, params: { course_id: @course.id }
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "returns error when course has discussions" do
+      course_factory(active_all: true)
+      @course.discussion_topics.create!(title: "Discussion 1")
+
+      account_admin_user
+      user_session(@admin)
+
+      get "validate_course", format: :json, params: { course_id: @course.id }
+
+      json = json_parse(response.body)
+      expect(json["errors"]).to have_key("discussions")
+    end
+
+    it "returns error when course has groups" do
+      course_factory(active_all: true)
+      group = @course.groups.create!(name: "Group 1")
+
+      account_admin_user
+      user_session(@admin)
+
+      get "validate_course", format: :json, params: { course_id: @course.id }
+
+      json = json_parse(response.body)
+      expect(json["errors"]).to have_key("groups")
+      expect(json["errors"]["groups"].first).to include(
+        "id" => group.id,
+        "name" => "Group 1"
+      )
+    end
+
+    it "returns error when course has classic quizzes" do
+      course_factory(active_all: true)
+      quiz = @course.quizzes.create!(title: "Quiz 1")
+
+      account_admin_user
+      user_session(@admin)
+
+      get "validate_course", format: :json, params: { course_id: @course.id }
+
+      json = json_parse(response.body)
+      expect(json["errors"]).to have_key("quizzes")
+      expect(json["errors"]["quizzes"].first).to include(
+        "id" => quiz.id,
+        "name" => "Quiz 1"
+      )
+    end
+
+    it "returns errors when multiple items have errors" do
+      course_factory(active_all: true)
+      @course.discussion_topics.create!(title: "Discussion 1")
+      @course.quizzes.create!(title: "Problem Quiz")
+
+      account_admin_user
+      user_session(@admin)
+
+      get "validate_course", format: :json, params: { course_id: @course.id }
+
+      json = json_parse(response.body)
+      expect(json["errors"].keys).to include("discussions", "quizzes")
+    end
+
+    it "returns some errors when course has mixed learning objects" do
+      course_factory(active_all: true)
+      @course.discussion_topics.create!(title: "Discussion 1")
+      @course.announcements.create!(title: "Announcement 1", message: "Message 1")
+      a1 = @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry")
+      a2 = @course.assignments.create!(name: "Assignment 2", points_possible: 20)
+      a3 = @course.assignments.create!(name: "Assignment 3", points_possible: 30, submission_types: "online_text_entry")
+
+      account_admin_user
+      user_session(@admin)
+      rubric = @course.rubrics.create! { |r| r.user = @admin }
+      rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                 hide_score_total: "0",
+                                                                                 purpose: "grading",
+                                                                                 skip_updating_points_possible: false,
+                                                                                 update_if_existing: true,
+                                                                                 use_for_grading: "1",
+                                                                                 association_object: a3
+                                                                               })
+      rubric_assoc = RubricAssociation.generate(@admin, rubric, @course, rubric_association_params)
+      a2.update!(peer_reviews: true)
+      a2.save!
+      a3.rubric_association = rubric_assoc
+      a3.save!
+
+      get "validate_course", params: { course_id: @course.id }
+      json = json_parse(response.body)
+
+      expect(json["errors"]["assignments"].any? { |a| a["name"] == a1.name }).to be_falsey
+      expect(json["errors"]["assignments"].any? { |a| a["name"] == a2.name }).to be_truthy
+      expect(json["errors"]["assignments"].any? { |a| a["name"] == a3.name }).to be_truthy
+    end
+  end
+end

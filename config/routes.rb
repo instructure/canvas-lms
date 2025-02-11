@@ -517,6 +517,8 @@ CanvasRails::Application.routes.draw do
     put "grading_schemes/:id" => "grading_schemes_json#update"
     get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
     get "grading_schemes/:id" => "grading_schemes_json#show"
+
+    get "canvas_career_validation" => "horizon#validate_course"
   end
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
 
