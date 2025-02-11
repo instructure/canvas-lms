@@ -40,6 +40,7 @@ if settings.present?
       Folio::InvalidPage
       Turnitin::Errors::SubmissionNotScoredError
       ActiveRecord::ConcurrentMigrationError
+      Rack::Timeout::RequestTimeoutException
     }
     config.before_send = lambda do |event, hint|
       if event.exception&.instance_variable_get(:@values)&.first&.type == "ActiveRecord::RecordInvalid" && hint[:exception].message == "Validation failed: Email is invalid"
