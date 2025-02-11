@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect, useState} from 'react'
-import {SimpleSelect} from '@instructure/ui-simple-select'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconCheckLine} from '@instructure/ui-icons'
+import React, { useCallback, useEffect, useState } from 'react'
+import { SimpleSelect } from '@instructure/ui-simple-select'
+import { ScreenReaderContent } from '@instructure/ui-a11y-content'
+import { useScope as createI18nScope } from '@canvas/i18n'
+import { IconCheckLine } from '@instructure/ui-icons'
 
 const I18n = createI18nScope('discussions_posts')
 const getSortConfig = () => {
@@ -37,14 +37,14 @@ interface SortFilterDropDownProps {
   onSortClick?: () => void
 }
 
-const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({isLocked, selectedSortType, onSortClick}) => {
+const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({ isLocked, selectedSortType, onSortClick }) => {
   const [actualSortType, setActualSortType] = useState(selectedSortType)
 
   useEffect(() => {
     setActualSortType(selectedSortType)
   }, [selectedSortType])
 
-  const handleSortOrderTypeChange = useCallback(
+  const handleSortOrderTypeChange =
     (
       _event: React.SyntheticEvent,
       data: {
@@ -52,13 +52,13 @@ const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({isLocked, selecte
         id?: string
       },
     ) => {
-      setActualSortType(data.value as string)
-      if (onSortClick) {
-        onSortClick()
+      if (data.value !== actualSortType) {
+        setActualSortType(data.value as string)
+        if (onSortClick) {
+          onSortClick()
+        }
       }
-    },
-    [onSortClick],
-  )
+    }
 
   return (
     <span data-testid="sort-order-dropdown">
@@ -76,7 +76,7 @@ const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({isLocked, selecte
               id={viewOption}
               key={viewOption}
               value={viewOption}
-              renderBeforeLabel={viewOption === actualSortType ? <IconCheckLine /> : <span/>}
+              renderBeforeLabel={viewOption === actualSortType ? <IconCheckLine /> : <span />}
             >
               {viewOptionLabel()}
             </SimpleSelect.Option>
