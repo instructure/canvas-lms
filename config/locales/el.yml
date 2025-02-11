@@ -5076,6 +5076,7 @@ el:
   create_132b3be1: Δημιουργία
   create_a_new_account_4cf7c0f9: "Δημιουργία Νέου Λογαριασμού"
   create_account_263ec6: "Δημιουργία Λογαριασμού"
+  create_an_eportfolio_1841e34a: "Δημιουργία ePortfolio"
   create_assignment_68532ceb: "Δημιουργία Εργασίας"
   create_course_9a69b32c: "Δημιουργία Μαθήματος"
   create_course_9dc5b61a: "Δημιουργία Μαθήματος"
@@ -14653,6 +14654,7 @@ el:
   substitution_713c65b9: Υποκατάσταση
   success_grades_were_published_to_the_grade_book_da3b4fba: "<mrk mid=\"6237\" mtype=\"seg\">Τέλεια!</mrk> <mrk mid=\"6238\" mtype=\"seg\">Οι βαθμοί δημοσιεύθηκαν στο βιβλίο βαθμών.</mrk>"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Το %{model} μετακινήθηκε στην ομάδα %{newGroup} επιτυχώς"
+  suggestions_b8b03b9d: Προτάσεις
   summary_statistics_f74852a5: "Ανακεφαλαιωτικά Στατιστικά"
   support: 
     array: 
@@ -15964,6 +15966,7 @@ el:
   workflow_state_cc8d711a: "Κατάσταση Ροής Εργασιών"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Θα θέλατε να αποδεχτείτε ή να παραβλέψετε αυτή την ενημέρωση;"
   would_you_like_to_enable_this_app_ccdf735d: "Θα θέλετε να ενεργοποιήσετε αυτή την εφαρμογή;"
+  would_you_like_to_expand_the_contents_of_filename__35b40cc5: "Θα θέλατε να επεκτείνετε τα περιεχόμενα του «%{fileName}» σε αυτόν τον φάκελο ή θα μεταφορτώσετε το αρχείο zip ως έχει;"
   would_you_like_to_go_back_to_include_1d279044: "Θα θέλατε να πάτε πίσω για να περιλάβετε:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Θα θέλατε να επιτρέψετε στους σπουδαστές να συνεχίσουν στο μάθημα ή θέλετε να ξανακλειδώσετε αυτές τις ενότητες μέχρι να καλυφθούν οι νέες απαιτήσεις;"
   wrong_answer_comments_14963a24: "Σχόλια λάθος απάντησης"
@@ -16081,6 +16084,7 @@ el:
   zip_file_display: "Εισαγωγή Αρχείου"
   zip_file_file_description: "Αποσυμπίεση αρχείου .zip στον φάκελο"
   zip_file_name: ".zip αρχείο"
+  zip_file_options_9a2af6c1: "Επίλογές αρχείου τύπου Zip"
   zip_file_options_form: 
     expand: "Αποσυμπιέστε το"
     message: "Θα θέλατε να επεκτείνετε τα περιεχόμενα του «%{fileName}» σε αυτόν τον φάκελο ή θα μεταφορτώσετε το αρχείο zip ως έχει;"
