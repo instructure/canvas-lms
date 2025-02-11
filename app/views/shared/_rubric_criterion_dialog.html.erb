@@ -23,6 +23,10 @@
         <label class="rating_form_label"><%= t "Description" %>
           <textarea class="description" rows="1" name="description"></textarea>
         </label>
+        <i class="icon-warning icon-Solid description_error_message"
+           aria-hidden="true" style="color: red; display: none">
+          <%= t('Please include a description') %>
+        </i>
       </div>
       <div>
         <label class="rating_form_label"><%= t "Long Description" %>
@@ -83,6 +87,9 @@
       <div>
         <label for="rating_form_title" class="rating_form_label"><%= t "Rating Title" %></label>
         <input id="rating_form_title" type="text" class="rating_description" style="width: 90%;" name="description"/>
+        <i class="icon-warning icon-Solid description_error_message" aria-hidden="true" style="color: red; display: none">
+          <%= t('Please include a rating title') %>
+        </i>
       </div>
       <div>
         <label for="rating_form_description" class="rating_form_label"><%= t "Rating Description" %></label>
