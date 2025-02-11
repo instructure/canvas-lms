@@ -512,6 +512,15 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.expanded).to be true
       expect(@topic.expanded_locked).to be true
     end
+
+    it "should not allow !expanded and expanded_locked" do
+      Account.site_admin.enable_feature!(:discussion_default_expand)
+      result = api_call(:post,
+                        "/api/v1/courses/#{@course.id}/discussion_topics",
+                        { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
+                        { expanded: "false", expanded_locked: "true" })
+      expect(result["errors"]["expanded_locked"]).to be_present
+    end
   end
 
   context "anonymous discussions" do
