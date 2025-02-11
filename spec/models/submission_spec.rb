@@ -6812,6 +6812,38 @@ describe Submission do
         expect(@submission.visible_rubric_assessments_for(@reviewing_student)[0].assessor).to eql(@reviewing_student)
       end
     end
+
+    context "self assessments" do
+      before(:once) do
+        course = Course.create!
+        @student = course.enroll_student(User.create!, workflow_state: "active").user
+
+        assignment = course.assignments.create!(peer_reviews: true, anonymous_peer_reviews: true)
+        rubric_association = rubric_association_model(context: course, association_object: assignment, purpose: "grading")
+
+        @submission = assignment.submission_for_student(@student)
+        rubric_association.rubric_assessments.create!({
+                                                        artifact: @submission,
+                                                        assessment_type: "self_assessment",
+                                                        assessor: @student,
+                                                        rubric: rubric_association.rubric,
+                                                        user: @student
+                                                      })
+      end
+
+      it "includes self assessments" do
+        assessments = @submission.visible_rubric_assessments_for(@student)
+        expect(assessments.count).to eq 1
+        expect(assessments.first.assessment_type).to eq "self_assessment"
+      end
+
+      it "includes self assessments no matter the attempt" do
+        @submission.update!(attempt: 2)
+        assessments = @submission.visible_rubric_assessments_for(@student, attempt: 2)
+        expect(assessments.count).to eq 1
+        expect(assessments.first.assessment_type).to eq "self_assessment"
+      end
+    end
   end
 
   describe "#rubric_assessment" do
