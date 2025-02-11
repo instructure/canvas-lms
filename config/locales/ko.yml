@@ -4683,6 +4683,7 @@ ko:
     unauthorized: 
       invalid_link: "사용한 등록 링크가 더 이상 유효하지 않은 것으로 보입니다. 과목 강사에게 문의하여 올바르게 등록되었는지 확인하시기 바랍니다."
   courses_43204aae: 과목
+  create_an_eportfolio_1841e34a: "ePortfolio 만들기"
   create_course_9a69b32c: "과목 만들기"
   create_course_9dc5b61a: "과목 만들기"
   create_discussion_topics_8330d52b: "토론 주제 만들기"
