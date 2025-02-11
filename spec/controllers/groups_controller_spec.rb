@@ -73,6 +73,18 @@ describe GroupsController do
       expect(assigns[:categories].length).to be(2)
     end
 
+    it "js_env group_categories only includes non-deleted categories" do
+      user_session(@teacher)
+      active_category = @course.group_categories.create!(name: "Active Category")
+      deleted_category = @course.group_categories.create!(name: "Deleted Category")
+      deleted_category.update!(deleted_at: Time.now.utc)
+
+      get "index", params: { course_id: @course.id }
+
+      group_categories = assigns[:js_env][:group_categories]
+      expect(group_categories.pluck("id")).to contain_exactly(active_category.id)
+    end
+
     it "returns groups in sorted by group category name, then group name for student view" do
       user_session(@student)
       category1 = @course.group_categories.create(name: "1")
