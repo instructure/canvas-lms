@@ -8200,6 +8200,7 @@ hu:
   create_a_temporary_enrollment_167f05f1: "Ideiglenes beiratkozás létrehozása"
   create_account_263ec6: "Fiók létrehozása"
   create_an_ba36d171: "Hozzon létre egy"
+  create_an_eportfolio_1841e34a: "e-portfólió létrehozása"
   create_and_edit_line_items_cacad0fa: "Sorelemek létrehozása és szerkesztése"
   create_and_edit_scores_4177662c: "Pontszámok létrehozása és szerkesztése"
   create_announcement_7ebf0845: "Hirdetmény létrehozása"
@@ -27397,6 +27398,7 @@ hu:
   working_b1f63edf: dolgozik...
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Elfogadja vagy elveti ezt a frissítést?"
   would_you_like_to_enable_this_app_ccdf735d: "Szeretné engedélyezni ezt az alkalmazást? "
+  would_you_like_to_expand_the_contents_of_filename__35b40cc5: "Ki szeretné csomagolni a \"%{fileName}\" tartalmát a jelenlegi mappába, vagy töltsük fel a zip fájlt, ahogy van?"
   would_you_like_to_go_back_to_include_1d279044: "Vissza szeretne lépni, hogy belevegye:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Szeretné, hogy a hallgatók folytathassák a kurzust, vagy újra lezárja a modult, amíg az új követelmények teljesülnek?"
   would_you_like_to_send_a_notification_to_users_tha_d56681c9: "Szeretne értesítést küldeni a felhasználóknak, hogy a Hirdetményt szerkesztették?"
@@ -27788,6 +27790,7 @@ hu:
   zip_file_display: "Fájl importálása"
   zip_file_file_description: ".zip kicsomagolása mappába"
   zip_file_name: ".zip fájl"
+  zip_file_options_9a2af6c1: "Zip fájl beállítások"
   zip_file_options_form: 
     expand: Kicsomagolás
     message: "Ki szeretné csomagolni a \"%{fileName}\" tartalmát a jelenlegi mappába, vagy töltsük fel a zip fájlt, ahogy van?"
