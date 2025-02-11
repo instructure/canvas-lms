@@ -8073,6 +8073,7 @@ fa:
   create_a_new_user_for_address_7487e9c9: "یک کاربر جدید برای ‍‍%{address} ایجاد کنید"
   create_account_263ec6: "ایجاد حساب"
   create_an_ba36d171: "ایجاد یک"
+  create_an_eportfolio_1841e34a: "ایجاد یک مجموعه اسناد الکترونیکی"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "ایجاد و اجرای آزمون‌ها و نظرسنجی‌های آنلاین نمره گذاری شده یا نمره گذاری نشده."
   create_announcements_above_1c36202b: "اطلاعیه‌ها را در بالا ایجاد کنید."
   create_anonymous_discussion_topics_d573e88e: "موضوعات بحث ناشناس ایجاد را کنید"
@@ -25851,6 +25852,7 @@ fa:
   working_b1f63edf: "در حال کارکردن..."
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "مایلید این بهنگام سازی قبول یا رد شود؟"
   would_you_like_to_enable_this_app_ccdf735d: "مایلید این برنامه فعال شود؟"
+  would_you_like_to_expand_the_contents_of_filename__35b40cc5: "می خواهید که محتوای \"%{fileName}\" را در پوشه فعلی باز کنید، یا فایل zip را همان طور که هست، بارگذاری کنید؟"
   would_you_like_to_go_back_to_include_1d279044: "مایلید برای شامل سازی برگردید؟"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "مایلید به دانشجویان اجازه دهید به درس ادامه دهند یا می خواهید این ماژول ها را تا زمان تکمیل شدن الزامات جدید دوباره قفل کنید؟"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "مخفی کردن عنوان های رویداد در نمای ماه تقویم"
@@ -26129,6 +26131,7 @@ fa:
       uploading_complete: "بارگذاری انجام شد!"
     zip_import_filename: "zip_ورود_%{id}.zip"
   zip_file_name: "فایل zip."
+  zip_file_options_9a2af6c1: "گزینه های فایل Zip"
   zip_file_options_form: 
     expand: "باز کردن آن"
     message: "می خواهید که محتوای \"%{fileName}\" را در پوشه فعلی باز کنید، یا فایل zip را همان طور که هست، بارگذاری کنید؟"

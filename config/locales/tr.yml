@@ -6763,6 +6763,7 @@ tr:
   create_a_new_account_4cf7c0f9: "Yeni Bir Hesap Oluştur"
   create_a_new_module_6f31b0fe: "Yeni bir Modül Oluştur"
   create_account_263ec6: "Hesap Oluştur"
+  create_an_eportfolio_1841e34a: "Bir ePortfolyo Oluştur"
   create_announcements_above_1c36202b: "Bir duyuru oluşturun"
   create_assignment_68532ceb: "Ödev Oluştur"
   create_content_for_your_course_500a7032: "Dersiniz için içerik oluşturun"
@@ -20450,6 +20451,7 @@ tr:
   workflow_state_3a5c99d2: workflow_state
   workflow_state_cc8d711a: "İş akış Durumu"
   would_you_like_to_enable_this_app_ccdf735d: "Bu uygulamayı etkinleştirmek ister misiniz?"
+  would_you_like_to_expand_the_contents_of_filename__35b40cc5: "\"%{fileName}\" nın içeriğini mevcut klasörde açmak mı istersiniz yoksa zip li dosyayı olduğu gibi yüklemek mi?"
   would_you_like_to_go_back_to_include_1d279044: "Aşağıdakileri dahil etmek için geri dönmek ister misiniz:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Öğrenciler derse devam etsinler mi yoksa yeni gereksinimler tamamlanana kadar bu modülleri yeniden kilitlemek mi istersiniz?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "Takvim ay görünümünde etkinlik başlıklarını katla"
@@ -20564,6 +20566,7 @@ tr:
       uploading_complete: "Yükleme tamamlandı!"
     zip_import_filename: "zip_import_%{id}.zip"
   zip_file_name: ".zip dosyası"
+  zip_file_options_9a2af6c1: "Zip dosyası ayarları"
   zip_file_options_form: 
     expand: "Bunu Genişlet"
     message: "\"%{fileName}\" nın içeriğini mevcut klasörde açmak mı istersiniz yoksa zip li dosyayı olduğu gibi yüklemek mi?"
