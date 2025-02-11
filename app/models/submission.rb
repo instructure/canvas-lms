@@ -2942,7 +2942,8 @@ class Submission < ActiveRecord::Base
     effective_attempt = (attempt == 0) ? nil : attempt
 
     rubric_assessments.each_with_object([]) do |assessment, assessments_for_attempt|
-      if assessment.artifact_attempt == effective_attempt
+      # Always return self-assessments and assessments for the effective attempt
+      if assessment.artifact_attempt == effective_attempt || assessment.assessment_type == "self_assessment"
         assessments_for_attempt << assessment
       else
         version = assessment.versions.find { |v| v.model.artifact_attempt == effective_attempt }
