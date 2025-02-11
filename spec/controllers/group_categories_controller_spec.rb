@@ -1000,6 +1000,14 @@ describe GroupCategoriesController do
       get "index", params: { course_id: @course.id }, format: :json
       assert_forbidden
     end
+
+    it "does not double render" do
+      user_session(@student)
+
+      expect(controller).to receive(:render).once.and_call_original
+      get :index, params: { course_id: @course.id }, format: :json
+      assert_forbidden
+    end
   end
 
   context "Differentiation Tags" do

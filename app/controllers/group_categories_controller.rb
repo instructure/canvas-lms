@@ -178,8 +178,6 @@ class GroupCategoriesController < ApplicationController
           includes.concat(params[:includes]) if params[:includes]
 
           render json: paginated_categories.map { |c| group_category_json(c, @current_user, session, include: includes) }
-        else
-          render json: { error: "Unauthorized" }, status: :forbidden
         end
       end
     end
