@@ -18,7 +18,7 @@
 
 import * as browser from '../common/browser'
 
-export default function (ev, html) {
+export default function (ev: DragEvent, html: string) {
   // default data to store
   let format = 'text/html'
   let data = html
@@ -29,7 +29,9 @@ export default function (ev, html) {
     // (e.g. when dragging an image) that confuses tinymce's onDrop handler
     // into suppressing the drop event. fortunately, calling clear() on the
     // items will also clear the ev.dataTransfer.files.
-    ev.dataTransfer.items.clear()
+    if (ev.dataTransfer) {
+      ev.dataTransfer.items.clear()
+    }
   } else if (browser.ie()) {
     // pre-Edge Internet Explorer doesn't like setData with a type other than
     // 'Text' or 'URL'. fortunately tinymce already provides a workaround
@@ -48,5 +50,7 @@ export default function (ev, html) {
   }
 
   // place the data into the dataTransfer so it's available for the drop event
-  ev.dataTransfer.setData(format, data)
+  if (ev.dataTransfer) {
+    ev.dataTransfer.setData(format, data)
+  }
 }

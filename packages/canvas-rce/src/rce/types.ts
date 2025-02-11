@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import tinymce from 'tinymce'
 import type {Editor} from 'tinymce'
 
 // Common interfaces used across RCE components
 export interface RCEWrapperInterface {
   id: string
-  tinymce?: any
+  tinymce?: typeof tinymce
   mceInstance?: () => any
   insertCode?: (code: string) => void
   replaceCode?: (code: string) => void
@@ -92,4 +93,40 @@ declare global {
   interface HTMLDivElement {
     webkitRequestFullscreen(): Promise<void>
   }
+}
+
+export type InitInstanceCallback = (ed: Editor) => void
+
+export type ToolbarPropType = {
+  name: string
+  items: string[]
+}
+
+export type HeightType = number | string
+
+export interface MenuItem {
+  title?: string
+  items: string
+}
+
+export type MenuPropType = Record<string, MenuItem>
+
+export type EditorOptions = {
+  editorOptions?: (tinyMCE: typeof tinymce) => EditorOptions
+  height?: HeightType
+  init_instance_callback?: InitInstanceCallback
+  language?: string
+  menu?: MenuPropType
+  name?: string
+  mirroredAttrs?: Record<string, string>
+  plugins?: string[]
+  readonly?: boolean
+  selector?: string
+  textareaId?: string
+  toolbar?: ToolbarPropType[]
+}
+
+export type NormalizedEditorOptions = Omit<EditorOptions, 'editorOptions'> & {
+  editorOptions: Record<string, unknown>
+  tinymce: typeof tinymce
 }

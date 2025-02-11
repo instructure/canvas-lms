@@ -97,7 +97,7 @@ import {
   parsePluginsToExclude,
   patchAutosavedContent,
 } from './RCEWrapper.utils'
-import {AlertMessage, RCETrayProps} from './types'
+import {AlertMessage, EditorOptions, RCETrayProps} from './types'
 import {externalToolsForToolbar} from './plugins/instructure_rce_external_tools/util/externalToolsForToolbar'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
@@ -181,16 +181,16 @@ interface RCEWrapperProps {
   }
   canvasOrigin: string
   defaultContent?: string
-  editorOptions: Record<string, unknown>
+  editorOptions: EditorOptions
   editorView?: string
   features: Record<string, unknown>
   handleUnmount?: () => void
   instRecordDisabled?: boolean
-  language: string
+  language?: string
   liveRegion?: HTMLElement | null | (() => HTMLElement | null | undefined)
   ltiToolFavorites?: string[]
   maxInitRenderedRCEs: number
-  name: string
+  name?: string
   onBlur?: (event: React.FocusEvent<HTMLElement>) => void
   onContentChange?: (content: string) => void
   onFocus?: (rce: RCEWrapper) => void
@@ -199,7 +199,7 @@ interface RCEWrapperProps {
   readOnly?: boolean
   renderKBShortcutModal?: boolean
   textareaClassName?: string
-  textareaId: string
+  textareaId?: string
   tinymce: typeof tinymce
   trayProps: RCETrayProps
   use_rce_icon_maker?: boolean
@@ -366,7 +366,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       e => `instructure_external_button_${e.id}`,
     )
 
-    // @ts-expect-error
     this.pluginsToExclude = parsePluginsToExclude(props.editorOptions?.plugins || [])
 
     // @ts-expect-error
@@ -748,7 +747,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   getTextarea(): HTMLTextAreaElement | null {
-    const node = document.getElementById(this.props.textareaId)
+    const node = this.props.textareaId && document.getElementById(this.props.textareaId)
     if (node instanceof HTMLTextAreaElement) {
       return node
     }
