@@ -23,9 +23,10 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import FilesHeader from '../FilesHeader/FilesHeader'
 import AllContextsNameLink from './AllContextsNameLink'
 import {Responsive} from '@instructure/ui-responsive'
-import canvas from '@instructure/ui-themes'
+import canvasTheme from '@instructure/ui-themes'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('files_v2')
 
@@ -46,7 +47,8 @@ const AllMyFilesTable = ({size}: AllMyFilesTableProps) => {
     const sortedContexts =
       sortDir === 'none'
         ? contexts
-        : contexts.sort((a, b) => {
+        : // doesn't mutate the original array
+          [...contexts].sort((a, b) => {
             return sortDir === 'ascending'
               ? a.name.localeCompare(b.name)
               : b.name.localeCompare(a.name)
@@ -90,6 +92,17 @@ const AllMyFilesTable = ({size}: AllMyFilesTableProps) => {
         </Table.Head>
         <Table.Body>{renderSortedRows()}</Table.Body>
       </Table>
+      <Alert
+        liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+        liveRegionPoliteness="polite"
+        screenReaderOnly
+        data-testid="sort-announcement"
+      >
+        {sortDir != 'none' &&
+          I18n.t('Sorted by name in %{sortDir} order', {
+            sortDir,
+          })}
+      </Alert>
     </>
   )
 }
@@ -99,8 +112,8 @@ const ResponsiveAllMyFilesTable = () => {
     <Responsive
       match="media"
       query={{
-        small: {maxWidth: canvas.breakpoints.small},
-        medium: {maxWidth: canvas.breakpoints.tablet},
+        small: {maxWidth: canvasTheme.breakpoints.small},
+        medium: {maxWidth: canvasTheme.breakpoints.tablet},
       }}
       render={(_props: any, matches: string[] | undefined) => (
         <AllMyFilesTable size={(matches?.[0] as 'small' | 'medium') || 'large'} />

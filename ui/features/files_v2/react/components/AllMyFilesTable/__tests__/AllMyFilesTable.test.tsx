@@ -25,6 +25,7 @@ import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import {FileManagementContext} from '../../Contexts'
+import userEvent from '@testing-library/user-event'
 
 const renderComponent = () => {
   return render(
@@ -47,9 +48,23 @@ const renderComponent = () => {
 }
 
 describe('AllMyFilesTable', () => {
+  let flashElements: any
+
   beforeAll(() => {
     setupFilesEnv(true)
     window.ENV.context_asset_string = 'courses_1'
+  })
+
+  beforeEach(() => {
+    flashElements = document.createElement('div')
+    flashElements.setAttribute('id', 'flash_screenreader_holder')
+    flashElements.setAttribute('role', 'alert')
+    document.body.appendChild(flashElements)
+  })
+
+  afterEach(() => {
+    document.body.removeChild(flashElements)
+    flashElements = undefined
   })
 
   it('renders each context', () => {
@@ -74,16 +89,26 @@ describe('AllMyFilesTable', () => {
     expect(allMyFilesButton).not.toBeInTheDocument()
   })
 
-  it('sorts contexts on click', () => {
+  it('sorts contexts on click', async () => {
+    const user = userEvent.setup()
     renderComponent()
 
     const rows = screen.getAllByRole('link')
     expect(rows[0].textContent).toContain('My Files')
     expect(rows[1].textContent).toContain('Course 1')
-    screen.getByRole('button', {name: /name/i}).click()
+    await user.click(screen.getByRole('button', {name: /name/i}))
 
     const newRows = screen.getAllByRole('link')
     expect(newRows[0].textContent).toContain('Course 1')
     expect(newRows[1].textContent).toContain('My Files')
+  })
+
+  it('updates screen reader alert on sort', async () => {
+    const user = userEvent.setup()
+    renderComponent()
+    await user.click(screen.getByRole('button', {name: /name/i}))
+    expect(screen.getByText('Sorted by name in ascending order')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', {name: /name/i}))
+    expect(await screen.findByText('Sorted by name in descending order')).toBeInTheDocument()
   })
 })
