@@ -27,9 +27,8 @@ import PropTypes from 'prop-types'
 const I18n = createI18nScope('discussions_posts')
 
 export const ExpandCollapseThreadsButton = props => {
-  const {setAllThreadsStatus, expandedThreads, setExpandedThreads} = useContext(SearchContext)
-  const displayExpanded = expandedThreads.length > 0
-  const buttonText = props.expandedLocked || !displayExpanded ? I18n.t('Expand Threads') : I18n.t('Collapse Threads')
+  const {setAllThreadsStatus, setExpandedThreads} = useContext(SearchContext)
+  const buttonText = props.expandedLocked || !props.isExpanded ? I18n.t('Expand Threads') : I18n.t('Collapse Threads')
 
   useEffect(() => {
     if (props.isExpanded) {
@@ -41,16 +40,10 @@ export const ExpandCollapseThreadsButton = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const onExpandCollapseClick = () => {
-    if (displayExpanded === props.isExpanded) {
-      props.onCollapseRepliesToggle(!props.isExpanded)
-    }
-    if (displayExpanded) {
-      setExpandedThreads([])
-      setAllThreadsStatus(AllThreadsState.Collapsed)
-    } else {
-      setAllThreadsStatus(AllThreadsState.Expanded)
-    }
+  const handleExpandCollapseClick = () => {
+    props.onCollapseRepliesToggle(!props.isExpanded)
+    setExpandedThreads([])
+    setAllThreadsStatus(props.isExpanded ? AllThreadsState.Collapsed : AllThreadsState.Expanded)
     setTimeout(() => {
       setAllThreadsStatus(AllThreadsState.None)
     }, 0)
@@ -59,8 +52,8 @@ export const ExpandCollapseThreadsButton = props => {
   const button = (
     <Button
       display="block"
-      onClick={() => onExpandCollapseClick()}
-      renderIcon={displayExpanded ? <IconExpandLine /> : <IconCollapseLine />}
+      onClick={handleExpandCollapseClick}
+      renderIcon={props.expandedLocked || !props.isExpanded ? <IconExpandLine /> : <IconCollapseLine />}
       data-testid="ExpandCollapseThreads-button"
       disabled={props.disabled || false}
     >
