@@ -3911,5 +3911,25 @@ describe DiscussionTopic do
         expect(@topic.sort_order_for_user(@student)).to eq "desc"
       end
     end
+
+    context "topic participant when creating the topic" do
+      it "does create the participant with the proper expanded and sort order values" do
+        sort_order = "asc"
+        expanded = false
+        topic1 = @course.discussion_topics.create!(user: @teacher, sort_order:, expanded:)
+
+        participant = topic1.participant(@teacher)
+        expect(participant.sort_order).to eq sort_order
+        expect(participant.expanded).to eq expanded
+
+        sort_order = "desc"
+        expanded = true
+        topic2 = @course.discussion_topics.create!(user: @teacher, sort_order:, expanded:)
+
+        participant = topic2.participant(@teacher)
+        expect(participant.sort_order).to eq sort_order
+        expect(participant.expanded).to eq expanded
+      end
+    end
   end
 end

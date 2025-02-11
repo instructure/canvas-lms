@@ -469,7 +469,14 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def create_participant
-    discussion_topic_participants.create(user:, workflow_state: "read", unread_entry_count: 0, subscribed: !subscription_hold(user, nil)) if user
+    if user
+      discussion_topic_participants.create(user:,
+                                           workflow_state: "read",
+                                           unread_entry_count: 0,
+                                           subscribed: !subscription_hold(user, nil),
+                                           expanded:,
+                                           sort_order:)
+    end
   end
 
   def update_materialized_view
@@ -776,12 +783,12 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.sort_order = if context.feature_enabled?(:discussion_default_sort)
                                            sort_order_locked ? sort_order : opts[:sort_order]
                                          else
-                                           opts[:sort_order] || sort_order || DiscussionTopic::SortOrder::DESC
+                                           opts[:sort_order].nil? ? sort_order : opts[:sort_order]
                                          end
           topic_participant.expanded = if context.feature_enabled?(:discussion_default_expand)
                                          expanded_locked ? expanded : opts[:expanded]
                                        else
-                                         opts[:expanded] || expanded || false
+                                         opts[:expanded].nil? ? expanded : opts[:expanded]
                                        end
           topic_participant.save
         end
@@ -2179,7 +2186,12 @@ class DiscussionTopic < ActiveRecord::Base
     return expanded if Account.site_admin.feature_enabled?(:discussion_default_expand) && expanded_locked
 
     current_user ||= self.current_user
-    participant(current_user)&.expanded || expanded || false
+
+    if participant(current_user).nil?
+      expanded || false
+    else
+      participant(current_user)&.expanded || false
+    end
   end
 
   private
