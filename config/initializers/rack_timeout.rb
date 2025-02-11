@@ -16,7 +16,7 @@ Rack::Timeout.register_state_change_observer(:check_for_slow_requests) do |env|
   unless env["sentry_sent"]
     info = env[::Rack::Timeout::ENV_INFO_KEY]
     request_id = info.id
-    slow_threshold = 50
+    slow_threshold = ENV.fetch("SLOW_QUERY_THRESHOLD", 50).to_i
     actual_time = info.service
 
     if actual_time && actual_time > slow_threshold
