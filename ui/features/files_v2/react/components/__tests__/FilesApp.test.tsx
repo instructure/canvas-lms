@@ -28,6 +28,8 @@ import {createMemoryRouter, RouterProvider} from 'react-router-dom'
 import {FAKE_FOLDERS} from '../../../fixtures/fakeData'
 
 describe('FilesApp', () => {
+  let flashElements: any
+
   beforeEach(() => {
     setupFilesEnv()
     fetchMock.get(/.*\/by_path/, [FAKE_FOLDERS[0]], {overwriteRoutes: true})
@@ -36,10 +38,18 @@ describe('FilesApp', () => {
     })
     fetchMock.get(/.*\/files\/quota/, {quota_used: 500, quota: 1000}, {overwriteRoutes: true})
     filesEnv.userHasPermission = jest.fn().mockReturnValue(true)
+
+    flashElements = document.createElement('div')
+    flashElements.setAttribute('id', 'flash_screenreader_holder')
+    flashElements.setAttribute('role', 'alert')
+    document.body.appendChild(flashElements)
   })
 
   afterEach(() => {
     fetchMock.resetHistory()
+
+    document.body.removeChild(flashElements)
+    flashElements = undefined
   })
 
   const renderComponent = (contextAssetString: string) => {

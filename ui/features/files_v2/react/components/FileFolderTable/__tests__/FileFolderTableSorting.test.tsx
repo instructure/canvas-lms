@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, waitFor} from '@testing-library/react'
+import {fireEvent, waitFor, screen} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import {FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
 import {renderComponent} from './testUtils'
 
 describe('FileFolderTable', () => {
+  let flashElements: any
   const onSortChange = jest.fn()
   beforeEach(() => {
     fetchMock.get(/.*\/folders/, {
@@ -34,11 +35,17 @@ describe('FileFolderTable', () => {
       headers: {Link: '<p2url>; rel="current", <p1url>; rel="first"'},
       status: 200,
     })
+    flashElements = document.createElement('div')
+    flashElements.setAttribute('id', 'flash_screenreader_holder')
+    flashElements.setAttribute('role', 'alert')
+    document.body.appendChild(flashElements)
   })
 
   afterEach(() => {
     fetchMock.restore()
     onSortChange.mockClear()
+    document.body.removeChild(flashElements)
+    flashElements = undefined
   })
 
   describe('sort functionality', () => {
@@ -108,6 +115,22 @@ describe('FileFolderTable', () => {
       })
 
       expect(onLoadingStatusChange).toHaveBeenCalledWith(false)
+    })
+
+    it('updates sorting screenreader alert', async () => {
+      renderComponent()
+      // this includes sr alert and the table caption
+      const alert = await screen.findAllByText(/sorted by name in ascending order/i)
+      expect(alert).toHaveLength(2)
+
+      const sizeHeader = await screen.findByTestId('created_at')
+      expect(sizeHeader).toHaveAttribute('aria-sort', 'none')
+      fireEvent.click(sizeHeader.querySelector('button') as HTMLButtonElement)
+      await waitFor(() => {
+        expect(sizeHeader).toHaveAttribute('aria-sort', 'ascending')
+      })
+      const newAlert = await screen.findAllByText(/sorted by created in ascending order/i)
+      expect(newAlert).toHaveLength(2)
     })
   })
 })

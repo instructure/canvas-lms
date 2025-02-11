@@ -45,6 +45,7 @@ import {View} from '@instructure/ui-view'
 import {FileManagementContext} from '../Contexts'
 import {FileFolderWrapper, FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
 import BlueprintIconButton from './BlueprintIconButton'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('files_v2')
 
@@ -162,6 +163,7 @@ const FileFolderTable = ({
   const {currentFolder} = useContext(FileManagementContext)
   const isStacked = size !== 'large'
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
+  const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>('')
 
   const [sortColumn, setSortColumn] = useState<string>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('asc')
@@ -207,23 +209,45 @@ const FileFolderTable = ({
     [data?.rows, isFetching],
   )
 
-  const toggleRowSelection = useCallback((rowId: string) => {
-    setSelectedRows(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(rowId)) {
-        newSet.delete(rowId)
-      } else {
-        newSet.add(rowId)
-      }
-      return newSet
-    })
-  }, [])
+  const toggleRowSelection = useCallback(
+    (rowId: string) => {
+      setSelectedRows(prev => {
+        const newSet = new Set(prev)
+        if (newSet.has(rowId)) {
+          newSet.delete(rowId)
+        } else {
+          newSet.add(rowId)
+        }
+        setSelectionAnnouncement(
+          I18n.t('%{selected} of %{total} selected', {
+            selected: newSet.size,
+            total: rows.length,
+          }),
+        )
+
+        return newSet
+      })
+    },
+    [rows?.length],
+  )
 
   const toggleSelectAll = useCallback(() => {
     if (selectedRows.size === rows.length) {
       setSelectedRows(new Set()) // Unselect all
+      setSelectionAnnouncement(
+        I18n.t('%{selected} of %{total} selected', {
+          selected: 0,
+          total: rows.length,
+        }),
+      )
     } else {
       setSelectedRows(new Set(rows.map(row => getUniqueId(row)))) // Select all
+      setSelectionAnnouncement(
+        I18n.t('%{selected} of %{total} selected', {
+          selected: rows.length,
+          total: rows.length,
+        }),
+      )
     }
   }, [rows, selectedRows.size])
 
@@ -282,7 +306,10 @@ const FileFolderTable = ({
 
   const tableCaption = I18n.t(
     'Files and Folders: sorted by %{sortColumn} in %{sortDirection} order',
-    {sortColumn, sortDirection},
+    {
+      sortColumn: columnHeaders.find(header => header.id === sortColumn)?.title || sortColumn,
+      sortDirection: sortDirection === 'asc' ? 'ascending' : 'descending',
+    },
   )
 
   return (
@@ -329,6 +356,27 @@ const FileFolderTable = ({
         isEmpty={rows.length === 0 && !isFetching}
         searchString={searchString}
       />
+      {selectionAnnouncement && (
+        <Alert
+          liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+          liveRegionPoliteness="polite"
+          screenReaderOnly
+          data-testid="selection-announcement"
+        >
+          {selectionAnnouncement}
+        </Alert>
+      )}
+      <Alert
+        liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+        liveRegionPoliteness="polite"
+        screenReaderOnly
+        data-testid="sort-announcement"
+      >
+        {I18n.t('Sorted by %{sortColumn} in %{sortDirection} order', {
+          sortColumn: columnHeaders.find(header => header.id === sortColumn)?.title || sortColumn,
+          sortDirection: sortDirection === 'asc' ? 'ascending' : 'descending',
+        })}
+      </Alert>
     </>
   )
 }
