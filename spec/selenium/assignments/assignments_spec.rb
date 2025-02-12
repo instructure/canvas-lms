@@ -566,6 +566,85 @@ describe "assignments" do
       expect(driver.title).to include(assignment_name + " edit")
     end
 
+    context "submission attempts" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "validates number of attempts must be less than or equal to 100" do
+        get "/courses/#{@course.id}/assignments/new"
+
+        f("#assignment_name").send_keys("Test Assignment")
+        click_option("#assignment_submission_type", "Online")
+        f("#assignment_text_entry").click
+        click_option(find_by_test_id("allowed_attempts_type"), "Limited")
+
+        allowed_attempts_input = find_by_test_id("allowed_attempts_input")
+        # 1 attempt is prepopulated so we need to clear it first with backspace
+        allowed_attempts_input.send_keys("\b")
+        allowed_attempts_input.send_keys("101")
+
+        submit_assignment_form
+
+        error_msg = f("#allowed_attempts_errors")
+        expect(error_msg).to include_text("Number of attempts must be less than or equal to 100")
+      end
+
+      it "validates number of attempts must be greater than 0" do
+        get "/courses/#{@course.id}/assignments/new"
+
+        f("#assignment_name").send_keys("Test Assignment")
+        click_option("#assignment_submission_type", "Online")
+        f("#assignment_text_entry").click
+        click_option(find_by_test_id("allowed_attempts_type"), "Limited")
+
+        allowed_attempts_input = find_by_test_id("allowed_attempts_input")
+        allowed_attempts_input.send_keys("\b")
+        allowed_attempts_input.send_keys("0")
+
+        submit_assignment_form
+
+        error_msg = f("#allowed_attempts_errors")
+        expect(error_msg).to include_text("Number of attempts must be a number greater than 0")
+      end
+
+      it "allows valid number of attempts" do
+        get "/courses/#{@course.id}/assignments/new"
+
+        f("#assignment_name").send_keys("Test Assignment")
+        click_option("#assignment_submission_type", "Online")
+        f("#assignment_text_entry").click
+        click_option(find_by_test_id("allowed_attempts_type"), "Limited")
+
+        allowed_attempts_input = find_by_test_id("allowed_attempts_input")
+        allowed_attempts_input.send_keys("\b")
+        allowed_attempts_input.send_keys("5")
+
+        expect_new_page_load { submit_assignment_form }
+
+        # Verify no error message
+        expect(f("body")).not_to contain_css("#allowed_attempts_errors")
+        assignment = @course.assignments.last
+        expect(assignment.allowed_attempts).to eq 5
+      end
+
+      it "allows unlimited attempts" do
+        get "/courses/#{@course.id}/assignments/new"
+
+        f("#assignment_name").send_keys("Test Assignment")
+        click_option("#assignment_submission_type", "Online")
+        f("#assignment_text_entry").click
+        click_option(find_by_test_id("allowed_attempts_type"), "Unlimited")
+
+        expect_new_page_load { submit_assignment_form }
+
+        # Verify no error message
+        expect(f("body")).not_to contain_css("#allowed_attempts_errors")
+        assignment = @course.assignments.last
+        expect(assignment.allowed_attempts).to be_nil
+      end
+    end
+
     # EVAL-3711 Remove this test when instui_nav feature flag is removed
     it "creates an assignment using main add button", :xbrowser, priority: "1" do
       assignment_name = "first assignment"
