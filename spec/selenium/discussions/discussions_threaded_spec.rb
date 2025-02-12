@@ -1634,5 +1634,24 @@ describe "threaded discussions" do
       get "/courses/#{@course.id}/discussion_topics/#{discussion_topic.id}"
       expect(f("body")).not_to contain_jqcss("div:contains('This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled at the root account level. To enable this functionality, please contact an administrator to activate the feature flag.')")
     end
+
+    context "NO header stickiness" do
+      before do
+        @topic = create_discussion("Discussion With Sticky Hheader", "threaded")
+        5.times do |i|
+          @topic.discussion_entries.create!(
+            user: @teacher,
+            message: "root entry #{i + 1}"
+          )
+        end
+        user_session(@teacher)
+      end
+
+      it "should not have sticky header even when :discussions_speedgrader_revisit feature flag is ON" do
+        @course.account.enable_feature! :discussions_speedgrader_revisit
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(f("body")).not_to contain_css("div[data-testid='sticky-toolbar']")
+      end
+    end
   end
 end

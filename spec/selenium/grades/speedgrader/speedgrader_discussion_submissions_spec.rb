@@ -220,6 +220,24 @@ describe "SpeedGrader - discussion submissions" do
         @course.account.enable_feature!(:discussions_speedgrader_revisit)
       end
 
+      context "sticky header" do
+        it "displays the sticky header when scrolling", :ignore_js_errors do
+          Speedgrader.visit(@course.id, @assignment.id)
+          f("button[title='Settings']").click
+          fj("li:contains('Options')").click
+          fj("label:contains('Show replies in context')").click
+          fj(".ui-dialog-buttonset .ui-button:visible:last").click
+          wait_for_ajaximations
+          in_frame("speedgrader_iframe") do
+            in_frame("discussion_preview_iframe") do
+              wait_for_ajaximations
+              scroll_page_to_bottom
+              expect(f("div[data-testid='sticky-toolbar']")).to be_present
+            end
+          end
+        end
+      end
+
       context "Default Discussion View Options" do
         it "is set to No Context by default and retains on save" do
           Speedgrader.visit(@course.id, @assignment.id)
