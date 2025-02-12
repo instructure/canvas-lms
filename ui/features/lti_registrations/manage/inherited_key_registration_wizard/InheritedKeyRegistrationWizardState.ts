@@ -17,7 +17,7 @@
  */
 
 import {create} from 'zustand'
-import {type ApiResult} from '../../common/lib/apiResult/ApiResult'
+import type {ApiResult} from '../../common/lib/apiResult/ApiResult'
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 
@@ -25,11 +25,16 @@ import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
  * Actions for the inherited key registration modal
  */
 export interface InheritedKeyActions {
-  open: (developerKeyId: DeveloperKeyId, onSuccessfulInstallation?: () => void) => void
+  open: (
+    developerKeyId: DeveloperKeyId,
+    onSuccessfulInstallation?: OnSuccessfulInstallation,
+  ) => void
   close: () => void
   loaded: (result: ApiResult<LtiRegistrationWithConfiguration>) => void
   install: () => void
 }
+
+export type OnSuccessfulInstallation = (config: LtiRegistrationWithConfiguration) => void
 
 /**
  *
@@ -42,19 +47,19 @@ export type InheritedKeyWizardState = {
     }
   | {
       _type: 'RequestingRegistration'
-      onSuccessfulInstallation?: () => void
+      onSuccessfulInstallation?: OnSuccessfulInstallation
       developerKeyId: DeveloperKeyId
     }
   | {
       _type: 'RegistrationLoaded'
       result: ApiResult<LtiRegistrationWithConfiguration>
-      onSuccessfulInstallation?: () => void
+      onSuccessfulInstallation?: OnSuccessfulInstallation
       developerKeyId: DeveloperKeyId
     }
   | {
       _type: 'InstallingRegistration'
       result: ApiResult<LtiRegistrationWithConfiguration>
-      onSuccessfulInstallation?: () => void
+      onSuccessfulInstallation?: OnSuccessfulInstallation
       developerKeyId: DeveloperKeyId
     }
 )
@@ -102,7 +107,7 @@ export const useInheritedKeyWizardState = create<
   }
   return {
     state: {_type: 'Initial', open: false},
-    open: (developerKeyId: DeveloperKeyId, onSuccessfulInstallation?: () => void) => {
+    open: (developerKeyId: DeveloperKeyId, onSuccessfulInstallation?: OnSuccessfulInstallation) => {
       set(
         stateForTag('RequestingRegistration', {
           open: true,
@@ -138,7 +143,7 @@ const inheritedKeyState = useInheritedKeyWizardState.getState()
 
 export const openInheritedKeyWizard = (
   developerKeyId: DeveloperKeyId,
-  onSuccessfulInstallation?: () => void,
+  onSuccessfulInstallation?: OnSuccessfulInstallation,
 ) => {
   inheritedKeyState.open(developerKeyId, onSuccessfulInstallation)
 }

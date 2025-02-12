@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import * as React from 'react'
 import {render, screen, waitFor, cleanup} from '@testing-library/react'
 import {ZAccountId} from '../../model/AccountId'
 import {ZDeveloperKeyId} from '../../model/developer_key/DeveloperKeyId'
@@ -27,6 +26,7 @@ import {
 import type {InheritedKeyService} from '../InheritedKeyService'
 import {success} from '../../../common/lib/apiResult/ApiResult'
 import {mockRegistration} from '../../pages/manage/__tests__/helpers'
+import userEvent from '@testing-library/user-event'
 
 describe('RegistrationWizardModal', () => {
   let error: (...data: any[]) => void
@@ -62,9 +62,10 @@ describe('RegistrationWizardModal', () => {
   describe('When opened', () => {
     const accountId = ZAccountId.parse('123')
     const developerKeyId = ZDeveloperKeyId.parse('abc')
+    const onSuccessfulInstallation = jest.fn()
 
     beforeEach(() => {
-      openInheritedKeyWizard(developerKeyId)
+      openInheritedKeyWizard(developerKeyId, onSuccessfulInstallation)
       bindGlobalLtiRegistration.mockClear()
       fetchRegistrationByClientId.mockClear()
     })
@@ -138,6 +139,32 @@ describe('RegistrationWizardModal', () => {
       })
       expect(installButton).toBeInTheDocument()
       await waitFor(() => expect(installButton).toBeEnabled())
+    })
+
+    it('should call the onSuccessfulInstallation callback when the registration is installed', async () => {
+      fetchRegistrationByClientId.mockResolvedValue(
+        success(
+          mockRegistration('An Example App', 2, {
+            description: 'An Example App',
+            placements: [
+              {
+                placement: 'course_navigation',
+                message_type: 'LtiResourceLinkRequest',
+                text: 'An_Example_App',
+              },
+            ],
+          }),
+        ),
+      )
+      bindGlobalLtiRegistration.mockResolvedValue(success({}))
+      render(<InheritedKeyRegistrationWizard accountId={accountId} service={inheritedKeyService} />)
+      const installButton = screen.getByRole('button', {
+        name: /Install App/i,
+      })
+      expect(installButton).toBeInTheDocument()
+      await waitFor(() => expect(installButton).toBeEnabled())
+      await userEvent.click(installButton)
+      await waitFor(() => expect(onSuccessfulInstallation).toHaveBeenCalled())
     })
   })
 })

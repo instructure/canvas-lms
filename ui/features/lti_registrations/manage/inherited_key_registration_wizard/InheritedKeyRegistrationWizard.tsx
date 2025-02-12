@@ -31,7 +31,7 @@ import {InheritedKeyRegistrationReview} from './InheritedKeyRegistrationReview'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {formatApiResultError} from '../../common/lib/apiResult/ApiResult'
-import {flashError} from 'jquery'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -83,29 +83,25 @@ export const InheritedKeyRegistrationWizard = (props: InheritedKeyRegistrationWi
           type="submit"
           margin="small"
           disabled={state._type !== 'RegistrationLoaded'}
-          onClick={() => {
-            // set to installing,
-            // then install the app???
+          onClick={async () => {
             if (state._type === 'RegistrationLoaded' && state.result._type === 'Success') {
               install()
+              const config = state.result.data
 
-              props.service
-                .bindGlobalLtiRegistration(props.accountId, state.result.data.id)
-                .then(result => {
-                  // redirect to the app list
-                  // or show an error
-                  if (result._type === 'Success') {
-                    // show error
-                    close()
-                    setTimeout(() => {
-                      state.onSuccessfulInstallation?.()
-                    })
-                  } else {
-                    console.error('Failed to install app', formatApiResultError(result))
-                    close()
-                    flashError(I18n.t('Failed to install app'))
-                  }
-                })
+              const result = await props.service.bindGlobalLtiRegistration(
+                props.accountId,
+                state.result.data.id,
+              )
+
+              if (result._type === 'Success') {
+                close()
+                showFlashSuccess(I18n.t('App installed successfully.'))()
+                state.onSuccessfulInstallation?.(config)
+              } else {
+                close()
+                console.error('Failed to install app', formatApiResultError(result))
+                showFlashError(I18n.t('Failed to install app.'))()
+              }
             }
           }}
         >
