@@ -98,7 +98,7 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
     observerRef.current.observe(ref)
   }
 
-  const {data, fetchNextPage, isFetching, isFetchingNextPage, hasNextPage, isSuccess} =
+  const {data, fetchNextPage, isFetching, isFetchingNextPage, hasNextPage, isSuccess, error} =
     useInfiniteQuery({
       queryKey: ['page_views', props.userId, props.startDate],
       queryFn: fetchPageViews,
@@ -108,12 +108,31 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
 
   if (isFetching && !isFetchingNextPage) return <Spinner renderTitle={I18n.t('Loading')} />
 
-  if (!isSuccess)
-    return (
-      <Alert variant="error" margin="small">
-        {I18n.t('Could not retrieve page views')}
-      </Alert>
-    )
+  if (!isSuccess) {
+    // if we have an error, then the query failed, display an alert
+    if (error) {
+      let errorText: string
+      const {response} = error as any // a response means an error from doFetchApi
+      if (typeof response !== 'undefined')
+        errorText = `API error: ${response.status} ${response.statusText}, fetching ${response.url}`
+      else {
+        const err = error as Error
+        errorText = `Error formatting table: ${err.name}, ${err.message}`
+      }
+      return (
+        <Alert variant="error" margin="small">
+          <p>
+            <strong>{I18n.t('Could not retrieve page views')}</strong>
+            <br />
+            {errorText}
+          </p>
+        </Alert>
+      )
+    }
+    // if there is no error, then the query is still loading / retrying / something else
+    // all we know is that an API fetch is not in progress but we still don't have data yet
+    else return <Spinner renderTitle={I18n.t('Loading')} />
+  }
 
   const uniqueViews: Record<string, PageView> = {}
   data.pages.forEach(page => {
