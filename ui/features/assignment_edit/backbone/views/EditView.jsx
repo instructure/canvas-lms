@@ -1507,8 +1507,9 @@ EditView.prototype.showErrors = function (errors) {
     const errorsContainer = document.getElementById(`${key}_errors`)
     if(errorsContainer){
       const root = this.errorRoots[key] ?? createRoot(errorsContainer)
+      const noMargin = ['allowed_attempts'].includes(key)
       root.render(
-        <Flex as="div" alignItems="center" margin="0 0 0 medium">
+        <Flex as="div" alignItems="center" margin={noMargin ? '0' : '0 0 0 medium'}>
           <Flex.Item as="div" margin="0 xx-small xxx-small 0">
             <IconWarningSolid color="error" />
           </Flex.Item>
@@ -1808,13 +1809,19 @@ EditView.prototype._validateAllowedAttempts = function (data, errors) {
     return errors
   }
   const value = parseInt(data.allowed_attempts, 10)
-  if (!(value > 0 || value === -1)) {
-    errors.allowed_attempts = [
-      {
-        message: I18n.t('Number of attempts must be a number greater than 0'),
-      },
-    ]
+
+  let message
+  if (isNaN(value) || !(value > 0 || value === -1)) {
+    message = I18n.t('Number of attempts must be a number greater than 0')
+  } else if (value > 100) {
+    message = I18n.t('Number of attempts must be less than or equal to 100')
   }
+
+  if (message) {
+    errors.allowed_attempts = [{message}]
+    $(document).trigger('validateAllowedAttempts', {error: true})
+  }
+
   return errors
 }
 
@@ -1974,6 +1981,10 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
 }
 
 EditView.prototype.renderAllowedAttempts = function () {
+  const clearErrors = () => {
+    $(document).trigger('validateAllowedAttempts', {error: false})
+    this.hideErrors('allowed_attempts_errors')
+  }
   if (!(typeof ENV !== 'undefined' && ENV !== null ? ENV.assignment_attempts_enabled : void 0)) {
     return
   }
@@ -1981,6 +1992,7 @@ EditView.prototype.renderAllowedAttempts = function () {
     limited: this.model.get('allowed_attempts') > 0,
     attempts: this.model.get('allowed_attempts'),
     locked: !!this.lockedItems.settings,
+    onHideErrors: clearErrors,
   }
   const mountPoint = document.querySelector('#allowed-attempts-target')
   // eslint-disable-next-line react/no-render-return-value

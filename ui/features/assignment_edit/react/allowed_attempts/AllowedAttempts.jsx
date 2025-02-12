@@ -17,11 +17,13 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React, {useRef} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
 import {bool, func, number} from 'prop-types'
 import shortid from '@canvas/shortid'
 import {FormField} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
+import {View} from '@instructure/ui-view'
+import $ from 'jquery'
 
 const I18n = createI18nScope('allowed_attempts')
 
@@ -31,6 +33,7 @@ AllowedAttempts.propTypes = {
   locked: bool,
   onLimitedChange: func.isRequired,
   onAttemptsChange: func.isRequired,
+  onHideErrors: func.isRequired,
 }
 
 AllowedAttempts.defaultProps = {
@@ -44,15 +47,25 @@ export default function AllowedAttempts({
   locked,
   onLimitedChange,
   onAttemptsChange,
+  onHideErrors,
 }) {
   const selectIdRef = useRef(shortid())
   const limitedValue = limited ? 'limited' : 'unlimited'
   const attemptsValue = limited ? attempts || '' : -1
-  const attemptsMessages =
-    attemptsValue !== '' ? [] : [{text: I18n.t('Must be a number'), type: 'error'}]
+  const [validationError, setValidationError] = useState(false)
+  const attemptsMessages = validationError
+    ? [{text: '', type: 'error'}]
+    : []
+
+  useEffect(() => {
+    $(document).on('validateAllowedAttempts', (_e, data) => setValidationError(!!data.error))
+
+    return () => $(document).off('validateAllowedAttempts')
+  }, [setValidationError])
 
   function handleLimitedChange(e) {
     onLimitedChange(e.target.value === 'limited')
+    onHideErrors()
   }
 
   function handleAttemptsChange(e) {
@@ -62,16 +75,19 @@ export default function AllowedAttempts({
     } else if (!Number.isNaN(newValue)) {
       onAttemptsChange(newValue)
     } // else don't call it with NaN
+    onHideErrors()
   }
 
   function handleIncrementOrDecrement(step) {
+    let updatedAttempts
     if (attempts === null) {
-      onAttemptsChange(1)
-      return
+      updatedAttempts = 1
+    } else {
+      updatedAttempts = attempts + step
+      if (updatedAttempts < 1) updatedAttempts = 1
     }
-    let result = attempts + step
-    if (result < 1) result = 1
-    onAttemptsChange(result)
+    onAttemptsChange(updatedAttempts)
+    onHideErrors()
   }
 
   return (
@@ -82,6 +98,7 @@ export default function AllowedAttempts({
           value={limitedValue}
           disabled={locked}
           onChange={handleLimitedChange}
+          data-testid="allowed_attempts_type"
         >
           <option value="unlimited">{I18n.t('Unlimited')}</option>
           <option value="limited">{I18n.t('Limited')}</option>
@@ -101,8 +118,11 @@ export default function AllowedAttempts({
           onChange={handleAttemptsChange}
           onIncrement={() => handleIncrementOrDecrement(1)}
           onDecrement={() => handleIncrementOrDecrement(-1)}
+          data-testid="allowed_attempts_input"
+          aria-describedby="allowed_attempts_errors"
         />
       </div>
+      <View as="div" id="allowed_attempts_errors" padding="small 0 0 0" />
     </>
   )
 }
