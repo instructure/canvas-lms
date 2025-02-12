@@ -24,8 +24,8 @@ import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {FileManagementContext} from '../Contexts'
 import {type File, type Folder} from '../../../interfaces/File'
-import {RenameModal} from "../RenameModal";
-import { downloadFile, downloadZip } from '../../../utils/downloadUtils'
+import {RenameModal} from '../RenameModal'
+import {downloadFile, downloadZip} from '../../../utils/downloadUtils'
 
 import {
   IconMoreLine,
@@ -62,7 +62,7 @@ const ActionMenuButton = ({
   const actionLabel = I18n.t('Actions')
   const currentContext = useContext(FileManagementContext)
   const contextType = currentContext?.contextType
-  const [renamingFile, setRenamingFile] = useState<null | File | Folder>(null)
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false)
 
   const triggerButton = useCallback(() => {
     return size !== 'large' ? (
@@ -134,14 +134,12 @@ const ActionMenuButton = ({
               icon: IconEditLine,
               text: I18n.t('Rename'),
               visible: rename_move_permissions,
-              onClick: () => {
-                setRenamingFile(row)
-              },
+              onClick: () => setIsRenameModalOpen(true),
             },
             {
               icon: IconDownloadLine,
               text: I18n.t('Download'),
-              onClick: () => downloadFile(row.url)
+              onClick: () => downloadFile(row.url),
             },
             {
               icon: IconPermissionsLine,
@@ -174,9 +172,7 @@ const ActionMenuButton = ({
               icon: IconEditLine,
               text: I18n.t('Rename'),
               visible: rename_move_permissions,
-              onClick: () => {
-                setRenamingFile(row)
-              },
+              onClick: () => setIsRenameModalOpen(true),
             },
             {
               icon: IconDownloadLine,
@@ -238,7 +234,11 @@ const ActionMenuButton = ({
       <Menu placement="bottom" trigger={triggerButton()}>
         {filteredItems.map((item, i) => renderMenuItem(i, item))}
       </Menu>
-      <RenameModal renamingFile={renamingFile} setRenamingFile={setRenamingFile} />
+      <RenameModal
+        renamingItem={row}
+        isOpen={isRenameModalOpen}
+        onClose={() => setIsRenameModalOpen(false)}
+      />
       {buildTrays()}
     </>
   )
