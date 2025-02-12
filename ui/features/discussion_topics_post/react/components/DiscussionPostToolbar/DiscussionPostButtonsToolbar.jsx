@@ -214,26 +214,6 @@ const DiscussionPostButtonsToolbar = props => {
         </Drilldown.Option>,
       )
     }
-    if (props.breakpoints.mobileOnly) {
-      options.push(
-        <Drilldown.Option
-          id="sort"
-          value="sort"
-          key="sort"
-          disabled={false}
-          onOptionClick={props.onSortClick}
-        >
-          <Flex gap="small">
-            {props.sortDirection === 'desc' ? (
-              <IconArrowDownLine data-testid="DownArrow" />
-            ) : (
-              <IconArrowUpLine data-testid="UpArrow" />
-            )}
-            {I18n.t('Sort')}
-          </Flex>
-        </Drilldown.Option>,
-      )
-    }
     if (ENV.user_can_summarize && !props.isSummaryEnabled) {
       options.push(
         <Drilldown.Option
@@ -304,7 +284,7 @@ const DiscussionPostButtonsToolbar = props => {
 
     const buttonsMobile = ENV.current_user_is_student
       ? [renderExpandsThreads(), renderSort(), renderGroup()]
-      : [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions)]
+      : [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions), renderSort()]
 
     const padding = props.breakpoints.mobileOnly ? 'xx-small' : 'xxx-small'
 
