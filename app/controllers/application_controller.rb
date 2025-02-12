@@ -413,6 +413,7 @@ class ApplicationController < ActionController::Base
     course_pace_draft_state
     course_pace_time_selection
     course_pace_pacing_status_labels
+    course_pace_pacing_with_mastery_paths
     modules_requirements_allow_percentage
     discussion_checkpoints
   ].freeze

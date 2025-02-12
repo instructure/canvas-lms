@@ -150,6 +150,7 @@ export interface EnvCommon {
   SETTINGS: Record<Setting, boolean>
   RAILS_ENVIRONMENT: 'development' | 'CD' | 'Beta' | 'Production' | string
   IN_PACED_COURSE: boolean
+  CONDITIONAL_RELEASE_SERVICE_ENABLED?: boolean
   PARSE_LINK_HEADER_THROW_ON_MAXLEN_EXCEEDED?: boolean
   PREFERENCES?: {
     hide_dashcard_color_overlays: boolean
@@ -314,6 +315,7 @@ export type RootAccountFeatureId =
   | 'course_pace_draft_state'
   | 'course_pace_time_selection'
   | 'course_pace_pacing_status_labels'
+  | 'course_pace_pacing_with_mastery_paths'
   | 'modules_requirements_allow_percentage'
   | 'lti_asset_processor'
   | 'discussion_checkpoints'

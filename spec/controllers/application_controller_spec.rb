@@ -3314,3 +3314,11 @@ RSpec.describe ApplicationController, "#set_js_env" do
     end
   end
 end
+
+RSpec.describe ApplicationController, "#cached_js_env_account_features" do
+  it "includes new feature flags" do
+    flags = controller.cached_js_env_account_features
+
+    expect(flags).to have_key(:course_pace_pacing_with_mastery_paths)
+  end
+end

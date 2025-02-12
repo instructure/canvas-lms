@@ -587,4 +587,47 @@ describe "assignments show page assign to" do
       expect(overrides[1][:due_for]).to eq("1 Student")
     end
   end
+
+  context "with course paces and mastery paths on" do
+    before(:once) do
+      @course.account.enable_feature!(:course_paces)
+      @course.root_account.enable_feature!(:course_pace_pacing_with_mastery_paths)
+      @course.update(
+        enable_course_paces: true,
+        conditional_release: true
+      )
+    end
+
+    it "sets an assignment override for mastery paths when mastery path toggle is turned on" do
+      get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+
+      AssignmentPage.click_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      AssignmentPage.mastery_path_toggle.click
+      click_save_button
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      expect(@assignment1.assignment_overrides.active.find_by(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)).to be_present
+    end
+
+    it "removes assignment override for mastery paths when mastery path toggle is turned off" do
+      @assignment1.assignment_overrides.create(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+
+      AssignmentPage.click_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      AssignmentPage.mastery_path_toggle.click
+      click_save_button
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      expect(@assignment1.assignment_overrides.active.find_by(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)).not_to be_present
+    end
+  end
 end

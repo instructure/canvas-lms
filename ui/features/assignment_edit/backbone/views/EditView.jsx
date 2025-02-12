@@ -312,6 +312,7 @@ EditView.prototype.initialize = function (options) {
   this.assignment = this.model
   this.setDefaultsIfNew()
   this.dueDateOverrideView = options.views['js-assignment-overrides']
+  this.masteryPathToggleView = options.views['js-assignment-overrides-mastery-path']
 
   this.on(
     'success',
@@ -1257,6 +1258,10 @@ EditView.prototype.toJSON = function () {
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         : void 0) || false,
+    coursePaceWithMasteryPath:
+      (typeof ENV !== 'undefined' && ENV !== null
+        ? ENV.IN_PACED_COURSE && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths
+        : void 0) || false,
     lockedItems: this.lockedItems,
     cannotEditGrades: this.cannotEditGrades,
     anonymousGradingEnabled:
@@ -1344,8 +1349,15 @@ EditView.prototype.getFormData = function () {
     data.lock_at = null
     data.unlock_at = null
   }
-  data.only_visible_to_overrides = this.dueDateOverrideView.setOnlyVisibleToOverrides()
-  data.assignment_overrides = this.dueDateOverrideView.getOverrides()
+  
+  if (ENV.COURSE_PACE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths) {
+    data.assignment_overrides = this.masteryPathToggleView.getOverrides()
+    data.only_visible_to_overrides = this.masteryPathToggleView.setOnlyVisibleToOverrides()
+  } else {
+    data.assignment_overrides = this.dueDateOverrideView.getOverrides()
+    data.only_visible_to_overrides = this.dueDateOverrideView.setOnlyVisibleToOverrides()
+  }
+
   if (this.shouldPublish) {
     data.published = true
   }

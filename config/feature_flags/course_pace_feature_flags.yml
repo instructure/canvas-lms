@@ -22,3 +22,9 @@ course_pace_pacing_status_labels:
   applies_to: RootAccount
   display_name: Course Pace Display student and assignment pace status
   description: Allows for diaplaying On Pace or Off Pace labels for students and module items
+
+course_pace_pacing_with_mastery_paths:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Paces with Mastery Paths
+  description: Supplemental logic and UX for supporting Course Paces with Mastery Paths
