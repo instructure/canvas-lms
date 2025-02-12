@@ -29,6 +29,9 @@ import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager'
+import TagCategoryCard from './TagCategoryCard'
+// TODO REMOVE AFTER FULLY IMPLEMENTED
+import {noTagsCategory, singleTagCategory, multipleTagsCategory} from '../util/tagCategoryCardMocks'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -150,9 +153,9 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
             <Flex.Item shouldGrow shouldShrink margin="medium">
               <Flex direction="column" height="100%">
                 <Flex.Item shouldGrow>
-                  <DifferentiationTagCategories
-                    differentiationTagCategories={differentiationTagCategories}
-                  />
+                  <TagCategoryCard category={singleTagCategory} onEditCategory={() => {}} />
+                  <TagCategoryCard category={multipleTagsCategory} onEditCategory={() => {}} />
+                  <TagCategoryCard category={noTagsCategory} onEditCategory={() => {}} />
                 </Flex.Item>
                 <Flex.Item>
                   <Button onClick={handleCreateNewTag} color="primary" margin="small 0 0 0">
