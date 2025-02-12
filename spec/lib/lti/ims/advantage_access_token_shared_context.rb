@@ -22,7 +22,8 @@ shared_context "advantage access token context" do
     Account.default
   end
   let_once(:developer_key) do
-    dk = dev_key_model_1_3(account: root_account)
+    dk = lti_developer_key_model(account: root_account)
+    lti_tool_configuration_model(developer_key: dk)
     dk.developer_key_account_bindings.first.update! workflow_state: "on"
     dk
   end

@@ -17,13 +17,12 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import htmlEscape from '@instructure/html-escape'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import React from 'react'
-import {type LtiScope} from '@canvas/lti/model/LtiScope'
+import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 
 const I18n = createI18nScope('lti_registration.wizard')
@@ -68,7 +67,7 @@ export const PermissionConfirmation = ({
           dangerouslySetInnerHTML={{
             __html: I18n.t("*%{toolName}* hasn't requested any permissions.", {
               wrapper: '<strong>$1</strong>',
-              toolName: htmlEscape(appName),
+              toolName: appName,
             }),
           }}
         />
@@ -78,7 +77,7 @@ export const PermissionConfirmation = ({
             dangerouslySetInnerHTML={{
               __html: I18n.t(
                 "*%{toolName}* is requesting permission to perform the following actions. We have chosen the app's recommended default settings. Please note that altering these defaults might impact the app's performance.",
-                {toolName: htmlEscape(appName), wrapper: '<strong>$1</strong>'},
+                {toolName: appName, wrapper: '<strong>$1</strong>'},
               ),
             }}
           />

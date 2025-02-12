@@ -81,7 +81,7 @@ describe UserMerge do
       expect(user1.reload.past_lti_ids.take.user_lti_id).to eq old_lti
       expect(user1.past_lti_ids.take.user_lti_context_id).to eq old_lti_context
       user3 = user_model
-      Lti::Asset.opaque_identifier_for(user3)
+      Lti::V1p1::Asset.opaque_identifier_for(user3)
       UserMerge.from(user1).into(user3)
       expect(user3.reload.past_lti_ids.find_by(context_id: course1).user_lti_id).to eq user_1_old_lti
       expect(user3.past_lti_ids.find_by(context_id: course2).user_lti_id).to eq old_lti
@@ -870,7 +870,7 @@ describe UserMerge do
       @shard1.activate do
         account = Account.create!
         @user1 = user_with_pseudonym(username: "user1@example.com", active_all: 1, account:)
-        Lti::Asset.opaque_identifier_for(@user1)
+        Lti::V1p1::Asset.opaque_identifier_for(@user1)
       end
       course = course_factory(active_all: true)
       user2 = user_with_pseudonym(username: "user2@example.com", active_all: 1)
@@ -891,7 +891,7 @@ describe UserMerge do
         @shard1.activate do
           account1 = Account.create!
           @user1 = user_with_pseudonym(username: "user1@example.com", account: account1)
-          @lti_context_id_1 = Lti::Asset.opaque_identifier_for(@user1)
+          @lti_context_id_1 = Lti::V1p1::Asset.opaque_identifier_for(@user1)
           @lti_id_1 = @user1.lti_id
           @uuid1 = @user1.uuid
           course_with_student account: account1, user: @user1, active_all: true
@@ -920,9 +920,9 @@ describe UserMerge do
       it "falls back on the old behavior if unique constraint check fails" do
         # force a constraint violation by stubbing out the shadow record update
         expect(@user1).to receive(:update_shadow_records_synchronously!).at_least(:once).and_return(nil)
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         expect { UserMerge.from(@user1).into(@user2) }.not_to raise_error
-        expect(InstStatsd::Statsd).to have_received(:increment).with("user_merge.move_lti_ids.unique_constraint_failure")
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("user_merge.move_lti_ids.unique_constraint_failure")
         expect(@user1.reload).to be_deleted
         expect(@user1.lti_context_id).to eq @lti_context_id_1
         expect(@user2.past_lti_ids.shard(@shard1).where(user_lti_context_id: @lti_context_id_1)).to exist
@@ -951,7 +951,7 @@ describe UserMerge do
       end
 
       it "doesn't move lti ids if the target user has an lti_context_id" do
-        lti_context_id_2 = Lti::Asset.opaque_identifier_for(@user2)
+        lti_context_id_2 = Lti::V1p1::Asset.opaque_identifier_for(@user2)
         UserMerge.from(@user1).into(@user2)
         expect(@user1.reload.lti_context_id).to eq @lti_context_id_1
         expect(@user2.reload.lti_context_id).to eq lti_context_id_2

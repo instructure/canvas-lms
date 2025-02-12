@@ -76,12 +76,6 @@ describe Mutations::SetRubricSelfAssessment do
       expect(result.dig("errors", 0, "message")).to eq "enhanced_rubrics, rubric_self_assesment and platform_service_speedgrader must be enabled"
     end
 
-    it "returns error when platform service speedgrader feature is not enabled" do
-      course.disable_feature!(:platform_service_speedgrader)
-      result = CanvasSchema.execute(mutation_str, context:)
-      expect(result.dig("errors", 0, "message")).to eq "enhanced_rubrics, rubric_self_assesment and platform_service_speedgrader must be enabled"
-    end
-
     it "returns errors when rubric self assessment feature is not enabled" do
       course.root_account.disable_feature!(:rubric_self_assessment)
       result = CanvasSchema.execute(mutation_str, context:)

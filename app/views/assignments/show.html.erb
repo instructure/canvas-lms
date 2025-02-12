@@ -66,12 +66,13 @@
         </h1>
       </div>
       <div class='assignment-buttons'>
+        <span id="loading-spinner"></span>
         <button
           id="assignment_publish_button"
           data-id='<%= @assignment.id %>'
           class='btn <%= "published" if @assignment.published? %> <%= "disabled" unless assignment_publishing_enabled?(@assignment, @current_user) %>'>
         </button>
-        <% if @assignment.grants_right?(@current_user, :manage_assign_to) && Account.site_admin.feature_enabled?(:selective_release_ui_api) %>
+        <% if @assignment.grants_right?(@current_user, :manage_assign_to) %>
           <button
             class='btn assign-to-link'
             data-assignment-name="<%= @assignment.title %>"
@@ -246,7 +247,7 @@
       </table>
     <% end %>
 
-    <% if can_do(@assignment, @current_user, :update) %>
+    <% if can_do(@assignment, @current_user, :update) && !@context.horizon_course? %>
       <% if Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
         <div id="enhanced-rubric-assignment-edit-mount-point"></div>
       <% else %>
@@ -282,4 +283,7 @@
 
 <% if !Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
   <%= render partial: "shared/rubrics_component" %>
+  <% if Rubric.rubric_self_assessment_enabled?(@context) %>
+    <div id="enhanced-rubric-self-assessment-edit"></div>
+  <% end %>
 <% end %>

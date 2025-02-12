@@ -305,6 +305,26 @@ module CoursePacesPageObject
     "[data-testid='pace-info']"
   end
 
+  def pace_course_stats_info_selector
+    "[data-testid='course-stats-info']"
+  end
+
+  def pace_start_date_input_selector
+    "[data-testid='start-date-input']"
+  end
+
+  def pace_end_date_input_selector
+    "[data-testid='end-date-input']"
+  end
+
+  def pace_weeks_number_input_selector
+    "[data-testid='weeks-number-input']"
+  end
+
+  def pace_days_number_input_selector
+    "[data-testid='days-number-input']"
+  end
+
   def remove_pace_button_selector
     "[data-testid='remove-pace-button']"
   end
@@ -624,6 +644,26 @@ module CoursePacesPageObject
 
   def pace_info
     f(pace_info_selector)
+  end
+
+  def pace_course_stats_info
+    f(pace_course_stats_info_selector)
+  end
+
+  def pace_start_date_input
+    f(pace_start_date_input_selector)
+  end
+
+  def pace_end_date_input
+    f(pace_end_date_input_selector)
+  end
+
+  def pace_weeks_number_input
+    f(pace_weeks_number_input_selector)
+  end
+
+  def pace_days_number_input
+    f(pace_days_number_input_selector)
   end
 
   def remove_pace_button

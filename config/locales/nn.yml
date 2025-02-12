@@ -2498,6 +2498,7 @@ nn:
     no_text: "Ingen tekst"
   alarm_706bc080: alarm
   albanian_21ed929e: Albansk
+  alert_d2c8ef98: Varsel
   alerts: 
     alert: 
       buttons: 
@@ -3287,6 +3288,8 @@ nn:
   always_include_dates_74b3721d: "Inkluder alltid datoar;"
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
   an_active_role_already_exists_with_that_name_205864bf: "Ei aktiv rolle med det namnet finst allereie."
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "Eit varsel er generert for kvar student som fyller alle kriteria. Dei blir kontrollerte kvar dag, og varsel blir sende til studenten, faglæraren og/eller kontoadministrator til utløysarproblemet er løyst."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "Eit varsel er generert for kvar student som fyller alle kriteria. Dei blir kontrollerte kvar dag, og varsel blir sende til studenten og/eller faglæraren til utløysarproblemet er løyst."
   an_amazing_discussion_assignment_e5c8bd6b: "Ei super diskusjonsoppgåve"
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
   an_assignment_name_dc624e70: "Eit oppgåvenamn"
@@ -4098,6 +4101,7 @@ nn:
       save: Lagre
       validating: "Lagrar ...\""
       weight_groups: "Vekte sluttkarakter basert på oppgåvegrupper"
+    assignment_submit_success: "Oppgåva er levert."
     assignments_list_right_side: 
       links: 
         manage_assignments: "Administrer oppgåver"
@@ -8216,6 +8220,7 @@ nn:
   course_quiz_export_1f59f15: "Eksport av emnequiz"
   course_quiz_extensions_4102f98f: "Utvidingar for quiz på emne"
   course_quizzes_c337653c: Emnequizar
+  course_quota_8f7f74c: Emnekvote
   course_restore: 
     restore_error: "Det oppstod ein feil under gjenoppretting av emnet. Emnet er ikkje gjenoppretta."
   course_results_updated_df9d1c95: "Emneresultat oppdatert."
@@ -8904,6 +8909,7 @@ nn:
   create_a_temporary_enrollment_167f05f1: "Opprett ei midlertidig påmelding"
   create_account_263ec6: "Opprett konto"
   create_an_ba36d171: "Opprett ein"
+  create_an_eportfolio_1841e34a: "Opprett e-portefølje"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Opprett og administrer online quizar og undersøkingar, både vurderte og ikkje-vurderte. "
   create_and_edit_scores_4177662c: "Opprett og endre resultat"
   create_announcement_7ebf0845: "Opprett kunngjering"
@@ -9414,6 +9420,7 @@ nn:
   deep_purple_bb3e2907: "Mørk lilla"
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Djupt nøsta svar er ikkje lenger støtta. Svaret ditt vil bli vist på første sida av denne tråden."
   default_9db103d: Standard
+  default_account_quotas_e34112fd: "Standard kontokvoter"
   default_canvas_grading_scheme_ab769633: "Standard vurderingsskjema for Canvas"
   default_conference_title: "%{course_name} konferanse"
   default_course_pace_ce0ba0f3: "Standard emneframdrift"
@@ -10471,6 +10478,7 @@ nn:
   ecuador_593_dfcc235a: "Ecuador (+593) "
   edit_a_copy_43ecaed6: "Endre ein kopi"
   edit_account_name_for_account_name_ae3633e8: "Rediger kontonamnet for %{account_name}"
+  edit_alert_739bb0ba: "Rediger varselet"
   edit_all_other_course_content_c8dd98d3: "Rediger alt anna emneinnhald"
   edit_and_delete_their_own_posts_f4f7cc6: "Rediger og slett eigne innlegg"
   edit_and_delete_their_own_replies_e5b9d793: "Rediger og slett eigne svar"
@@ -11825,6 +11833,7 @@ nn:
   find_an_existing_grading_scheme_d836ea: "Finn eit gjeldande karakterskjema"
   find_an_outcome_919328e6: "Finn eit læringsmål"
   find_appointment_85d6922e: "Finn avtale"
+  find_course_or_group_a7de09a4: "Finn emne eller gruppe"
   find_flickr_image_view: 
     find_cc_on_flickr: "Finn Creative Commons-bilde på Flickr"
     safesearch_warning_flickr: "Flickr viser SafeSearch-filtrerte bilder som er publisert opent under ein Creative Commons-lisens. Ver likevel merksam ved bruk. Bildeeigarar kan ha gjort ein for dårleg jobb med å kategorisere bilda, slik at uønska innhald ikkje vert fanga opp av søkefiltera. "
@@ -13035,6 +13044,7 @@ nn:
   group_groupname_entered_2a0624a0: "Gruppe \"%{groupName}\" lagt inn."
   group_guid_has_already_appeared_in_this_import_78f35ff3: "Gruppa \"%{guid}\" er allereie importert"
   group_home_249cb392: Gruppeforside
+  group_id_b0f6af89: Gruppe-ID
   group_id_e76ac9b5: gruppe-id
   group_import_api_documentation_7d0d28ee: "Gruppeimport API-dokumentasjon"
   group_is_for_a_different_section_6a843a4d: "Gruppa høyrer til ein annan seksjon"
@@ -13069,6 +13079,7 @@ nn:
   group_not_found_d13d85b9: "fann ikkje gruppe"
   group_pages_656556f3: Gruppesider
   group_people_50e9785b: "Gruppér personar"
+  group_quota_290dbc6b: Gruppekvote
   group_roster_1846bf84: Gruppeliste
   group_saved_successfully_fcd5ca66: "Lagring av gruppe vellukka"
   group_select_330df8bd: "Vel gruppevis"
@@ -14983,6 +14994,7 @@ nn:
       quoted_text_toggle: "vis sitert tekst"
       word_separator: " "
   liberty_union_hsd_grade_report_d1c3d45: "Liberty Union HSD vurderingsrapport"
+  license_bdede4fb: Lisens
   license_help: 
     content_license_help: "Hjelp til lisensiering av innhald"
   license_type_6b74b543: Lisenstype
@@ -15547,6 +15559,7 @@ nn:
   manually_mark_posts_as_read_afa5d035: "Merk innlegg manuelt, som lesne"
   manually_mark_replies_as_read_580adc59: "Merk innlegg manuelt, som lesne"
   manually_post_grades_18248306: "Post vurderingar manuelt"
+  manually_settable_quotas_ea3759e7: "Kvoter som kan innstillast manuelt"
   maori_new_zealand_5380a95f: "Māori (New Zealand)"
   march_bbe310ee: Mars
   mark_all_announcement_read_eda5292b: "Marker alle kunngjeringar som lest"
@@ -15717,6 +15730,7 @@ nn:
   medium_skin_tone_8608d74e: "Middels hudfarge"
   meets_expectations_bb179565: "Innfrir forventningar"
   meets_mastery_754e1c06: "Møter meistringsnivå"
+  megabytes_885404ef: megabyte
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmar av maksimalt %{max_membership}"
   members_af25c21d: Medlemmar
   members_are_free_to_join_defa5929: "Medlemmar kan delta"
@@ -18250,6 +18264,7 @@ nn:
   no_placements_enabled_f705f28: "Ingen plasseringar er aktivert"
   no_points_possible_368669d: "Ingen moglege poeng"
   no_points_possible_72db3a55: "Ingen moglege poeng"
+  no_preview_available_e8e71199: "Ingen tilgjengelege førehandsvisingar"
   no_quizzes_found_c80c537a: "Ingen quizar funne"
   no_recent_announcements_abf950d5: "Ingen nylege kunngjeringar"
   no_restrictions_79a892d2: "Ingen restriksjonar"
@@ -18286,6 +18301,7 @@ nn:
   no_such_source_context_80a659ba: "ingen slik kildekontekst"
   no_such_target_context_21158b9: "ingen slik målkontekst"
   no_such_target_group_7e183d46: "ingen slik målgruppe"
+  no_teacher_interaction_de8d91bc: "Ingen faglærarinteraksjon"
   no_template_accounts_in_this_region_5e84955d: "Ingen malkontoar i denne regionen"
   no_template_selected_f59e797: "Ingen mal vald"
   no_terms_eab5ee7b: "Utan semester"
@@ -22974,6 +22990,7 @@ nn:
   saudi_arabia_1f0dcbdc: Saudi-Arabia
   saudi_arabia_966_d01ed717: "Saudi-Arabia (+966)"
   save_11a80ec3: Lagre
+  save_alert_b64f9fa3: "Lagre varsel"
   save_and_customize_19eb7a7b: "Lagre og tilpass"
   save_and_publish_1b765e7: "Lagre og publiser"
   save_as_draft_341d4577: "Lagre som utkast"
@@ -25637,6 +25654,7 @@ nn:
   submitted_on_bb3b53fc: "Levert den"
   submitted_on_date_13c89fb: "Levert den %{date}"
   submitted_submitdate_bdd3bf09: "Innlevert %{submitDate}"
+  submitting_b90fac62: Leverer...
   submitting_types_7c5a7096: "Leverer: %{types}"
   subscribe_4b301fb7: Abonner
   subscribe_failed_2eb62de0: "Abonnering mislukkast"
@@ -25671,6 +25689,7 @@ nn:
   successfully_saved_the_comment_c87681fd: "Kommentar er lagra"
   successfully_updated_the_comment_946360d5: "Kommentar er oppdatert"
   suffix_294d5cc4: Suffiks
+  suggestions_b8b03b9d: "Forslag:"
   sum_of_all_files_in_mb_2b705055: "summen av alle filene i MB"
   summarize_7c7fc78c: Oppsummere
   summarize_discussions_using_ai_a1259ac: "Oppsummer diskusjonar med bruk av KI"
@@ -27605,6 +27624,7 @@ nn:
   treat_ungraded_as_0_d38c2b41: "Behandle ikkje vurderte som 0"
   tree_browser: 
     folder_tree_instructions: "Bruk navigasjonspilene opp eller ned for å bla gjennom trestrukturen. Trykk høgre for å vise mappene, trykk venstre for å skjule dei og trykk på Enter for elementet du har valt."
+  trigger_f0ee1fbf: Utløysar
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad og Tobago (+1)"
   trophy: 
     balloon_description: "Ballong skildring"
@@ -27836,6 +27856,8 @@ nn:
   ungraded_out_of_pointspossible_2d6d81da: "ikkje vurdert av %{pointsPossible}"
   ungraded_pointspossible_e2f86bd9: "ikkje vurdert/%{pointsPossible}"
   ungraded_submissions_44efb0ec: "Innleveringar som ikkje er vurderte"
+  ungraded_submissions_count_63fcf6d1: "Ikkje vurderte innleveringar (tal)"
+  ungraded_submissions_time_bafaa609: "Ikkje vurderte innleveringar (tid)"
   ungraded_survey_ad7de790: "Undersøking som ikkje er vurdert"
   unique_user_id_dfca1a7f: "Unik bruker ID"
   united_arab_emirates_971_649b3750: "Dei sameinte arabiske emirata (+971)"
@@ -27993,6 +28015,7 @@ nn:
   update_pages_c91d7ba: "Oppdater sider"
   update_password_4bc5cb1f: "Oppdater passord"
   update_public_jwk_9f25f520: "Oppdater offentlig JWK"
+  update_quota_81381226: "Oppdater kvote"
   update_rating_6d29c2ef: "Oppdater vurdering"
   update_settings_9b422d0f: "Oppdater innstillingar"
   update_tool_7d48ef2a: "Oppdater %{tool}"
@@ -28013,6 +28036,7 @@ nn:
       og meir oppdatert brukaropplevelse
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "Oppdateringar ved JSON API auth error HTTP kode og JSON status felt"
   updating_6edbab78: Oppdaterer
+  updating_73d0718c: Oppdaterer...
   updating_discussion_failed_aadb2d35: "Oppdatering av diskusjon mislukkast"
   updating_publication_date_62cc1622: "Oppdaterer publiseringsdato"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Oppdatering av Catalog URL vil gjere den gamle URL-en utilgjengeleg for brukarar med ein gong! Dersom det er konfigurert ein eksisterande betalingsbehandlar, vil endringar kreve hjelp frå en Catalog-ingeniør."
@@ -28337,6 +28361,7 @@ nn:
       settings: Innstillingar
   user_profile_d56261fc: Brukarprofil
   user_profile_picture_46bffbc7: Brukarprofilbilde
+  user_quota_12cb58b7: Brukarkvote
   user_removed_successfully_20a3889d: "Brukar vart fjerna"
   user_results_updated_9ce38dce: "Brukerresultat oppdatert."
   user_s_email_only_401dbaba: "Kun brukar sin e-post"
@@ -29225,6 +29250,7 @@ nn:
   working_b1f63edf: arbeider...
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Vil du godta eller avslå oppdateringa?"
   would_you_like_to_enable_this_app_ccdf735d: "Vil du aktivere denne appen?"
+  would_you_like_to_expand_the_contents_of_filename__35b40cc5: "Vil du utvide innhaldet i \"%{fileName}\" til gjeldande mappe eller laste opp ZIP-fila som ho er?"
   would_you_like_to_go_back_to_include_1d279044: "Vil du gå tilbake og inkludere:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Vil du at studentane skal halde fram på emnet eller vil du låse modulane på nytt til nye krav er fullførte?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "Bryt tekst i titlar i kalenderen si månadsvising "
@@ -29596,6 +29622,7 @@ nn:
   zip_file_display: Filimport
   zip_file_file_description: "Pakk ut ZIP-fil til mappe"
   zip_file_name: ZIP-fil
+  zip_file_options_9a2af6c1: "Alternativ for ZIP-fil"
   zip_file_options_form: 
     expand: Utvid
     message: "Vil du utvide innhaldet i \"%{fileName}\" til gjeldande mappe eller laste opp ZIP-fila som ho er?"

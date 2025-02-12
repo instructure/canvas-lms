@@ -578,22 +578,6 @@ describe "context modules" do
         expect(find_with_jquery('.module_dnd input[type="file"]')).to be_nil
       end
 
-      it "creating a new module should display a drag and drop area without differentiated modules" do
-        Account.site_admin.disable_feature! :selective_release_ui_api
-
-        get "/courses/#{@course.id}/modules"
-        wait_for_ajaximations
-
-        f("button.add_module_link").click
-        wait_for_ajaximations
-
-        replace_content(f("#context_module_name"), "New Module")
-        f("#add_context_module_form button.submit_button").click
-        wait_for_ajaximations
-
-        expect(ff('.module_dnd input[type="file"]')).to have_size(2)
-      end
-
       it "creating a new module should display a drag and drop area with differentiated modules" do
         get "/courses/#{@course.id}/modules"
 
@@ -603,13 +587,6 @@ describe "context modules" do
 
         expect(ff('.module_dnd input[type="file"]')).to have_size(2)
       end
-    end
-
-    it "adds a file item to a module when differentiated modules is disabled", priority: "1" do
-      Account.site_admin.disable_feature! :selective_release_ui_api
-      get "/courses/#{@course.id}/modules"
-      manually_add_module_item("#attachments_select", "File", file_name)
-      expect(f(".context_module_item")).to include_text(file_name)
     end
 
     it "adds a file item to a module when differentiated modules is enabled", priority: "1" do

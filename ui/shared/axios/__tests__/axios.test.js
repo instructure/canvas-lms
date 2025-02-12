@@ -20,7 +20,6 @@ import axios from '../index'
 import moxios from 'moxios'
 
 const ok = value => expect(value).toBeTruthy()
-const equal = (value, expected) => expect(value).toEqual(expected)
 
 describe('Custom Axios Tests', () => {
   beforeEach(() => {
@@ -31,32 +30,23 @@ describe('Custom Axios Tests', () => {
     moxios.uninstall()
   })
 
-  test('Accept headers request stringified ids', done => {
+  test('Accept headers request stringified ids', async () => {
     moxios.stubRequest('/some/url', {
       status: 200,
       responseText: 'hello',
     })
 
-    axios.get('/some/url').then(response => {
-      ok(response.config.headers.Accept.includes('application/json+canvas-string-ids'))
-      done()
-    })
-
-    moxios.wait(() => {})
+    const response = await axios.get('/some/url')
+    ok(response.config.headers.Accept.includes('application/json+canvas-string-ids'))
   })
 
-  test('passes X-Requested-With header', done => {
+  test('passes X-Requested-With header', async () => {
     moxios.stubRequest('/some/url', {
       status: 200,
       responseText: 'hello',
     })
 
-    // eslint-disable-next-line promise/catch-or-return
-    axios.get('/some/url').then(response => {
-      ok(response.config.headers['X-Requested-With'] === 'XMLHttpRequest')
-      done()
-    })
-
-    moxios.wait(() => {})
+    const response = await axios.get('/some/url')
+    ok(response.config.headers['X-Requested-With'] === 'XMLHttpRequest')
   })
 })

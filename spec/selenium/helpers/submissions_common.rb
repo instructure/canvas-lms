@@ -36,6 +36,28 @@ module SubmissionsCommon
     assignment
   end
 
+  def comment_save_button
+    fj('button:contains("Save")')
+  end
+
+  def create_text_file(file_path, content)
+    File.write(file_path, content)
+  end
+
+  def upload_submission_comment_file
+    Dir.mktmpdir do |tmpdir|
+      # Create text files in the temp directory
+      txt_file_1 = File.join(tmpdir, "file1.txt")
+      create_text_file(txt_file_1, "This is the content of file1.")
+      f(".attach_comment_file_link").click
+      wait_for_ajaximations
+
+      f('#add_comment_form input[type="file"]').send_keys(txt_file_1)
+      wait_for_ajaximations
+      expect(f("[data-testid='submission_comment_file_tag']")).to be_displayed
+    end
+  end
+
   def open_media_comment_dialog
     move_to_click(".media_comment_link")
     # swf and stuff loads, give it a sec to do its thing

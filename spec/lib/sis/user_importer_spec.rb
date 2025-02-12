@@ -89,6 +89,47 @@ describe SIS::UserImporter do
       end
     end
 
+    context "when not setting the sortable_name" do
+      let(:user) do
+        user = user_with_pseudonym(account:, name: "Existing User", sis_user_id: "existing_user_sis_id")
+        cc = user.communication_channels.first
+        pseudo = user.pseudonyms.first
+        cc.pseudonym_id = pseudo.id
+        cc.workflow_state = "active"
+        cc.save!
+        pseudo.sis_communication_channel_id = cc.id
+        pseudo.communication_channel_id = cc.id
+        pseudo.save!
+        user.short_name = user.name
+        user.stuck_sis_fields = []
+        user.save!
+        user
+      end
+
+      it "specifying full name will not cause a sync" do
+        previous_sortable_name = user.sortable_name
+        # user.short_name will return name if short name is null in the db
+        previous_short_name = user.read_attribute(:short_name)
+
+        # specifying just the full name to what is is already set to. This could cause changes to sortable name
+        # and short_name, but shouldn't since the end result would be the same thing.
+        user_row = SIS::Models::User.new(
+          user_id: user.pseudonyms.first.sis_user_id,
+          login_id: user.pseudonyms.first.unique_id,
+          status: "active",
+          full_name: user.name,
+          email: user.pseudonyms.first.unique_id
+        )
+
+        user_importer.add_user(user_row)
+        user_importer.process_batch
+        user.reload
+
+        expect(user.sortable_name).to eq(previous_sortable_name)
+        expect(user.short_name).to eq(previous_short_name)
+      end
+    end
+
     context "when no matching login exists" do
       context "when there is a user found in an implementation of the other_user hook" do
         let(:other_user) { user_model }

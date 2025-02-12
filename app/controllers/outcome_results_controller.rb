@@ -559,7 +559,7 @@ class OutcomeResultsController < ApplicationController
 
   def handle_inst_statsd_outcomes_page_views
     if student_lmgb_view? || observer_lmgb_view?
-      InstStatsd::Statsd.increment("outcomes_page_views", tags: { type: "student_lmgb" })
+      InstStatsd::Statsd.distributed_increment("outcomes_page_views", tags: { type: "student_lmgb" })
     end
   end
 

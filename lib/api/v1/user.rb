@@ -177,7 +177,7 @@ module Api::V1::User
       end
 
       if tool_includes.include?("lti_id") || includes.include?("lti_id")
-        json[:lti_id] = Lti::Asset.old_id_for_user_in_context(user, context) || user.lti_context_id
+        json[:lti_id] = Lti::V1p1::Asset.old_id_for_user_in_context(user, context) || user.lti_context_id
       end
 
       if includes.include?("uuid")

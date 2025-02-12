@@ -92,7 +92,14 @@ class ContextController < ApplicationController
         active_granular_enrollment_permissions: get_active_granular_enrollment_permissions(@context),
         read_reports: @context.grants_right?(@current_user, session, :read_reports),
         can_add_groups: can_do(@context.groups.temp_record, @current_user, :create),
-        can_allow_course_admin_actions: @context.grants_right?(@current_user, session, :allow_course_admin_actions)
+        can_allow_course_admin_actions: @context.grants_right?(@current_user, session, :allow_course_admin_actions),
+        can_manage_differentiation_tags: @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
+        can_generate_observer_pairing_code: @context.grants_right?(@current_user, :generate_observer_pairing_code),
+        can_read_prior_roster: @context.grants_right?(@current_user, session, :read_prior_roster),
+        can_read_roster: @context.grants_right?(@current_user, session, :read_roster),
+        can_view_all_grades: @context.grants_right?(@current_user, session, :view_all_grades),
+        self_registration: @context.root_account.self_registration?,
+        user_is_instructor: @context.user_is_instructor?(@current_user)
       }
 
       js_env({
@@ -111,7 +118,12 @@ class ContextController < ApplicationController
                  concluded: @context.concluded?,
                  available: @context.available?,
                  pendingInvitationsCount: @context.invited_count_visible_to(@current_user),
-                 hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
+                 hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user),
+                 groups_url: context_url(@context, :context_groups_url),
+                 prior_enrollments_url: course_prior_users_path(@context),
+                 interactions_report_url: user_course_teacher_activity_url(@current_user, @context),
+                 user_services_url: context_url(@context, :context_user_services_url),
+                 observer_pairing_codes_url: course_observer_pairing_codes_url(@context)
                }
              })
       set_tutorial_js_env
@@ -148,6 +160,13 @@ class ContextController < ApplicationController
 
     @secondary_users ||= {}
     @groups = @context.try(:groups)&.active || []
+
+    # Render Modernized People Page if feature flag is enabled
+    if @context.is_a?(Course) && @context.root_account.feature_enabled?(:people_page_modernization)
+      add_crumb t("People"), context_url(@context, :context_users_url)
+      js_bundle :course_people_new
+      render html: "", layout: true
+    end
   end
 
   def prior_users

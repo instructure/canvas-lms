@@ -282,7 +282,7 @@ module Lti
                          if @tool.use_1_3?
                            observed_users.map { |u| u.lookup_lti_id(lti_helper.course) }.join(",")
                          else
-                           observed_users.map { |u| Lti::Asset.opaque_identifier_for(u) }.join(",")
+                           observed_users.map { |u| Lti::V1p1::Asset.opaque_identifier_for(u) }.join(",")
                          end
                        },
                        COURSE_GUARD,
@@ -551,7 +551,7 @@ module Lti
     #   ```
     register_expansion "Context.id",
                        [],
-                       -> { Lti::Asset.opaque_identifier_for(@context) },
+                       -> { Lti::V1p1::Asset.opaque_identifier_for(@context) },
                        default_name: "context_id"
 
     # The Canvas global identifier for the launch context
@@ -1348,7 +1348,7 @@ module Lti
                        [],
                        lambda {
                          @current_user.groups.active.where(context_type: "Course", context_id: @context.id).map do |g|
-                           Lti::Asset.opaque_identifier_for(g)
+                           Lti::V1p1::Asset.opaque_identifier_for(g)
                          end.join(",")
                        },
                        -> { @current_user && @context.is_a?(Course) }

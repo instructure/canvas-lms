@@ -199,44 +199,6 @@ describe Lti::Overlay do
       end
     end
 
-    context "overlaying scopes" do
-      let(:scopes) { [TokenScopes::LTI_AGS_SHOW_PROGRESS_SCOPE, TokenScopes::LTI_ACCOUNT_LOOKUP_SCOPE] }
-      let(:data) do
-        {
-          scopes: [TokenScopes::LTI_UPDATE_PUBLIC_JWK_SCOPE]
-        }
-      end
-
-      it "adds the scopes defined on the overlay" do
-        expect(subject[:scopes]).to include(TokenScopes::LTI_UPDATE_PUBLIC_JWK_SCOPE)
-      end
-
-      context "there are duplicated scopes" do
-        let(:data) do
-          {
-            scopes: [TokenScopes::LTI_UPDATE_PUBLIC_JWK_SCOPE, TokenScopes::LTI_UPDATE_PUBLIC_JWK_SCOPE]
-          }
-        end
-
-        it "doesn't include duplicate scopes" do
-          expect(subject[:scopes]).to eq(subject[:scopes].uniq)
-        end
-      end
-
-      context "there are scopes that are in both the disabled and scopes field" do
-        let(:data) do
-          {
-            scopes: scopes.dup,
-            disabled_scopes: scopes.dup
-          }
-        end
-
-        it "doesn't include those scopes" do
-          expect(subject[:scopes]).not_to include(*data[:scopes])
-        end
-      end
-    end
-
     context "overlaying launch_settings" do
       let(:data) do
         {

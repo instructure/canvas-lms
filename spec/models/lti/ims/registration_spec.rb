@@ -53,7 +53,7 @@ module Lti::IMS
         lti_registration: developer_key.lti_registration
       }.compact)
     end
-    let(:developer_key) { dev_key_model_1_3 }
+    let(:developer_key) { lti_developer_key_model }
 
     it "is soft_deleted when destroy is called" do
       registration.destroy

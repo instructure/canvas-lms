@@ -100,17 +100,22 @@ describe('ItemCog', () => {
     fakeENV.teardown()
   })
 
-  it('deletes model when delete link is pressed', () => {
-    const ajaxSpy = jest.spyOn($, 'ajax')
-    render(<ItemCog {...sampleProps(true, true, true)} />, {container: fixtures})
+  it('deletes model when delete link is pressed', async () => {
+    jest.spyOn($, 'ajax')
+    const model = new Folder({id: 999})
+    const destroySpy = jest.spyOn(model, 'destroy')
+    render(<ItemCog {...sampleProps(true, true, true)} model={model} />, {container: fixtures})
 
-    fireEvent.click(screen.getByTestId('deleteLink'))
+    await userEvent.click(screen.getByTestId('settingsCogBtn'))
+    await userEvent.click(screen.getByTestId('deleteLink'))
 
     expect(window.confirm).toHaveBeenCalledTimes(1)
-    expect(ajaxSpy).toHaveBeenCalledWith(
+    expect(destroySpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        url: '/api/v1/folders/999',
-        data: expect.objectContaining({force: 'true'}),
+        emulateHTTP: true,
+        emulateJSON: true,
+        data: {force: 'true'},
+        wait: true,
       }),
     )
   })

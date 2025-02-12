@@ -81,7 +81,6 @@ module Lti::IMS
   #
   class NoticeHandlersController < ApplicationController
     include Concerns::AdvantageServices
-    include Api::V1::DeveloperKey
 
     before_action :require_feature_enabled
     before_action :validate_tool_id
@@ -176,7 +175,7 @@ module Lti::IMS
     end
 
     def tool
-      @tool ||= ContextExternalTool.find(params.require(:context_external_tool_id))
+      @tool ||= ContextExternalTool.active.find(params.require(:context_external_tool_id))
     rescue ActiveRecord::RecordNotFound
       render_error("not found", :not_found)
     end

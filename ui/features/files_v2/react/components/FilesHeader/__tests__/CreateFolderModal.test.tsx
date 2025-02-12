@@ -18,7 +18,7 @@
 
 import React from 'react'
 import CreateFolderModal from '../CreateFolderModal'
-import {render, screen} from '@testing-library/react'
+import {render, screen, within} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
@@ -32,7 +32,9 @@ const defaultProps = {
 
 const renderComponent = (props = {}) => {
   return render(
-    <FileManagementContext.Provider value={{folderId: '1', contextType: 'course', contextId: '1'}}>
+    <FileManagementContext.Provider
+      value={{folderId: '1', contextType: 'course', contextId: '1', showingAllContexts: false}}
+    >
       <MockedQueryClientProvider client={queryClient}>
         <CreateFolderModal {...defaultProps} {...props} />
       </MockedQueryClientProvider>
@@ -60,7 +62,8 @@ describe('CreateFolderModal', () => {
   it('closes when Close Button is clicked', async () => {
     const user = userEvent.setup()
     renderComponent()
-    const closeButton = screen.getByRole('button', {name: /close/i})
+    const dialog = screen.getByRole('dialog', {name: 'Create Folder'})
+    const closeButton = within(dialog).getByRole('button', {name: /close/i})
     await user.click(closeButton)
     expect(defaultProps.onRequestClose).toHaveBeenCalled()
   })

@@ -183,3 +183,34 @@ export const setRubricSelfAssessment = async ({
     throw new Error('Failed to set rubric self assessment on assignment')
   }
 }
+
+export const ASSIGNMENT_RUBRIC_SELF_ASSESSMENTS_QUERY = gql`
+  query GetAssignmentRubricSelfAssessmentSettings($assignmentId: ID!) {
+    assignment(id: $assignmentId) {
+      canUpdateRubricSelfAssessment
+      rubricSelfAssessmentEnabled
+    }
+  }
+`
+type RubricSelfAssessmentSettingsParams = {
+  queryKey: (string | number)[]
+}
+type RubricSelfAssessmentSettingsResponse = {
+  assignment: {
+    canUpdateRubricSelfAssessment: boolean
+    rubricSelfAssessmentEnabled: boolean
+  }
+}
+export const getRubricSelfAssessmentSettings = async ({queryKey}: RubricSelfAssessmentSettingsParams) => {
+  const [_, assignmentId] = queryKey
+  const {
+    assignment: {canUpdateRubricSelfAssessment, rubricSelfAssessmentEnabled}
+  } = await executeQuery<RubricSelfAssessmentSettingsResponse>(ASSIGNMENT_RUBRIC_SELF_ASSESSMENTS_QUERY, {
+    assignmentId,
+  })
+
+  return {
+    canUpdateRubricSelfAssessment,
+    rubricSelfAssessmentEnabled,
+  }
+}

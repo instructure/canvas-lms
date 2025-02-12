@@ -227,10 +227,14 @@ class ConversationMessage < ActiveRecord::Base
 
   def log_conversation_message_metrics
     stat = "inbox.message.created.react"
-    InstStatsd::Statsd.increment(stat)
+    InstStatsd::Statsd.distributed_increment(stat)
   end
 
   def check_for_out_of_office_participants
+    Rails.logger.info("Checking for out of office participants")
+    Rails.logger.info("Feature enabled: #{Account.site_admin.feature_enabled?(:inbox_settings)}")
+    Rails.logger.info("Setting enabled: #{context&.enable_inbox_auto_response?}")
+    Rails.logger.info("conversation present: #{conversation.present?}")
     if Account.site_admin.feature_enabled?(:inbox_settings) && context.enable_inbox_auto_response? && conversation.present?
       delay_if_production(
         priority: Delayed::LOW_PRIORITY,

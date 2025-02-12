@@ -21,6 +21,7 @@ import {act, render, fireEvent, waitFor} from '@testing-library/react'
 import $ from 'jquery'
 import store from '../../lib/ExternalAppsStore'
 import ExternalToolsTableRow from '../ExternalToolsTableRow'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const tools = [
   {
@@ -69,16 +70,26 @@ const tools = [
 
 const ajax = $.ajax
 beforeEach(() => {
+  fakeENV.setup({
+    FEATURES: {
+      top_navigation_placement: true,
+    },
+  })
   store.setState({
     externalTools: tools,
     hasMore: false,
     isLoaded: true,
     isLoading: false,
   })
+  global.INST = {
+    editorButtons: []
+  }
 })
 
 afterEach(() => {
+  fakeENV.teardown()
   $.ajax = ajax
+  delete global.INST
 })
 
 function renderRow(props) {
@@ -86,7 +97,6 @@ function renderRow(props) {
   const tbody = document.createElement('tbody')
   table.appendChild(tbody)
   document.body.appendChild(table)
-  window.ENV.FEATURES = {top_navigation_placement: true}
   return render(
     <ExternalToolsTableRow
       tool={tools[0]}
@@ -133,7 +143,14 @@ describe('ExternalToolsTableRow', () => {
 
   describe('with the lti_favorites', () => {
     it('shows toggle with current tool favorite state when false and Editor placement is active', () => {
-      const {getByLabelText} = renderRow({showLTIFavoriteToggles: true})
+      const tool = {
+        ...tools[0],
+        is_rce_favorite: false,
+        is_top_nav_favorite: false,
+        editor_button_settings: {enabled: true},
+        top_navigation_settings: {enabled: true}
+      }
+      const {getByLabelText} = renderRow({tool, showLTIFavoriteToggles: true})
       expect(getByLabelText('RCE Favorite')).toBeInTheDocument()
       expect(getByLabelText('Top Navigation Favorite')).toBeInTheDocument()
       const checkbox = getByLabelText('RCE Favorite').closest('input[type="checkbox"]')
@@ -173,7 +190,20 @@ describe('ExternalToolsTableRow', () => {
     })
 
     it('disables toggle if 2 tools are already favorites and this row is not a favorite', () => {
+      const tool = {
+        ...tools[0],
+        app_id: 'test_tool',
+        is_rce_favorite: false,
+        is_top_nav_favorite: false,
+        editor_button_settings: {enabled: true},
+        top_navigation_settings: {enabled: true}
+      }
+      global.INST.editorButtons = [
+        {id: 'other_tool', on_by_default: true},
+        {id: 'another_tool', on_by_default: true}
+      ]
       const {getByLabelText} = renderRow({
+        tool,
         rceFavoriteCount: 2,
         topNavFavoriteCount: 2,
         showLTIFavoriteToggles: true,

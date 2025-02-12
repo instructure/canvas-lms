@@ -180,11 +180,7 @@ module ContextModulesCommon
   end
 
   def manually_add_module_item(item_select_selector, module_name, item_name)
-    if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-      add_module_with_tray(module_name + "Module")
-    else
-      add_module(module_name + "Module")
-    end
+    add_module_with_tray(module_name + "Module")
     f(".ig-header-admin .al-trigger").click
     wait_for_ajaximations
     f(".add_module_item_link").click
@@ -261,21 +257,6 @@ module ContextModulesCommon
 
   def select_module_item(select_element_css, item_text)
     click_option(select_element_css, item_text)
-  end
-
-  def new_module_form
-    f(".add_module_link").click
-    fj("#add_context_module_form:visible")
-  end
-
-  def add_module(module_name = "Test Module")
-    wait_for_modules_ui
-    add_form = new_module_form
-    replace_content(add_form.find_element(:id, "context_module_name"), module_name)
-    submit_form(add_form)
-    wait_for_ajaximations
-    expect(add_form).not_to be_displayed
-    expect(f("#context_modules")).to include_text(module_name)
   end
 
   def add_module_with_tray(module_name = "Test Module")

@@ -42,24 +42,24 @@ const setup = ({
   isUnread = false,
   isForcedRead = false,
   isSplitView = false,
-  createdAt = new Date().toLocaleString('en-US', {
+  createdAt = new Date('2025-01-18T18:42:00').toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
     minute: 'numeric',
     hour12: true,
   }),
-  editedAt = new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+  editedAt = new Date('2025-01-17T18:42:00').toISOString(), // 1 day ago
   delayedPostAt = '',
   isTopic = false,
-  editedTimingDisplay = new Date(Date.now() - 86400000).toLocaleString('en-US', {
+  editedTimingDisplay = new Date('2025-01-17T18:42:00').toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
     minute: 'numeric',
     hour12: true,
   }), // 1 day ago
-  lastReplyAtDisplay = new Date(Date.now() - 172800000).toLocaleString('en-US', {
+  lastReplyAtDisplay = new Date('2025-01-16T18:42:00').toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
@@ -240,7 +240,7 @@ describe('AuthorInfo', () => {
       const container = setup()
       expect(
         container.getByText(
-          new Date().toLocaleString('en-US', {
+          new Date('2025-01-18T18:42:00').toLocaleString('en-US', {
             month: 'short',
             day: 'numeric',
             hour: 'numeric',
@@ -256,7 +256,7 @@ describe('AuthorInfo', () => {
       const editedByTextElement = container.getByTestId('editedByText')
       expect(editedByTextElement.textContent).toContain('Edited by Severus Snape')
       expect(editedByTextElement.textContent).toContain(
-        new Date(Date.now() - 86400000).toLocaleString('en-US', {
+        new Date('2025-01-17T18:42:00').toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
           hour: 'numeric',
@@ -270,7 +270,7 @@ describe('AuthorInfo', () => {
       const container = setup()
       expect(
         container.getByText(
-          `Last reply ${new Date(Date.now() - 172800000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true})}`,
+          `Last reply ${new Date('2025-01-16T18:42:00').toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true})}`,
         ),
       ).toBeInTheDocument()
     })
@@ -278,21 +278,21 @@ describe('AuthorInfo', () => {
     it('render the last edited date if it is in the past for teachers', () => {
       window.ENV.current_user_roles = ['teacher']
       const container = setup({
-        createdAt: new Date().toLocaleString('en-US', {
+        createdAt: new Date('2025-01-18T18:42:00').toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
           hour: 'numeric',
           minute: 'numeric',
           hour12: true,
         }),
-        editedTimingDisplay: new Date().toLocaleString('en-US', {
+        editedTimingDisplay: new Date('2025-01-18T18:42:00').toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
           hour: 'numeric',
           minute: 'numeric',
           hour12: true,
         }),
-        delayedPostAt: new Date(Date.now() + 86400000).toISOString(), // 1 day in future
+        delayedPostAt: new Date('2025-01-19T18:42:00').toISOString(), // 1 day in future
       })
       expect(container.queryByTestId('editedByText')).toBeInTheDocument()
     })
@@ -300,7 +300,7 @@ describe('AuthorInfo', () => {
     it('does not render the last edited date if it is in the past for students', () => {
       window.ENV.current_user_roles = ['student']
       const container = setup({
-        createdAt: new Date().toLocaleString('en-US', {
+        createdAt: new Date('2025-01-18T18:42:00').toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
           hour: 'numeric',
@@ -309,14 +309,14 @@ describe('AuthorInfo', () => {
         }),
         editedAt: null,
         editor: null,
-        delayedPostAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+        delayedPostAt: new Date('2025-01-17T18:42:00').toISOString(), // 1 day ago
         isTopic: true,
       })
       expect(container.queryByTestId('editedByText')).not.toBeInTheDocument()
     })
 
     describe('when the edited date is after the posted date', () => {
-      const createdAt = new Date()
+      const createdAt = new Date('2025-01-18T18:42:00')
       const delayedPostAt = new Date(createdAt.getTime() + 86400000) // One day after creation
       const editedTimingDisplay = new Date(delayedPostAt.getTime() + 30000) // Edited 30s after posting
 
@@ -352,7 +352,7 @@ describe('AuthorInfo', () => {
     it('duplicates the created date for teacher if instant post', () => {
       window.ENV.current_user_roles = ['teacher']
       const container = setup({
-        createdAt: new Date().toLocaleString('en-US', {
+        createdAt: new Date('2025-01-18T18:42:00').toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
           hour: 'numeric',
@@ -361,7 +361,7 @@ describe('AuthorInfo', () => {
         }),
         isTopic: true,
       })
-      const currentDate = new Date().toLocaleString('en-US', {
+      const currentDate = new Date('2025-01-18T18:42:00').toLocaleString('en-US', {
         month: 'short',
         day: 'numeric',
         hour: 'numeric',
@@ -375,7 +375,7 @@ describe('AuthorInfo', () => {
     it('do not show duplication when not published', () => {
       window.ENV.current_user_roles = ['teacher']
       const container = setup({
-        createdAt: new Date().toLocaleString('en-US', {
+        createdAt: new Date('2025-01-18T18:42:00').toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
           hour: 'numeric',
@@ -385,7 +385,7 @@ describe('AuthorInfo', () => {
         isTopic: true,
         published: false,
       })
-      const currentDate = new Date().toLocaleString('en-US', {
+      const currentDate = new Date('2025-01-18T18:42:00').toLocaleString('en-US', {
         month: 'short',
         day: 'numeric',
         hour: 'numeric',
@@ -399,14 +399,14 @@ describe('AuthorInfo', () => {
     it('student only sees "Posted" for instant post', () => {
       window.ENV.current_user_roles = ['student']
       const container = setup({
-        createdAt: new Date().toLocaleString('en-US', {
+        createdAt: new Date('2025-01-18T18:42:00').toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
           hour: 'numeric',
           minute: 'numeric',
           hour12: true,
         }),
-        delayedPostAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+        delayedPostAt: new Date('2025-01-17T18:42:00').toISOString(), // 1 day ago
         isTopic: true,
         editedAt: null,
         editor: null,

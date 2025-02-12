@@ -138,22 +138,10 @@ const renderDueDates = lockedItems => {
       courseId: ENV.COURSE_ID,
     })
 
-    if (ENV.FEATURES?.selective_release_ui_api) {
-      overrideView.bind('tray:open', () => {
-        $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', true)
-        $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', true)
-      })
-
-      overrideView.bind('tray:close', () => {
-        $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', false)
-        $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', false)
-      })
-
-      $('#quiz_post_to_sis').on('change', e => {
-        const postToSISChecked = e.target.checked
-        quizModel.set('post_to_sis', postToSISChecked)
-      })
-    }
+    $('#quiz_post_to_sis').on('change', e => {
+      const postToSISChecked = e.target.checked
+      quizModel.set('post_to_sis', postToSISChecked)
+    })
 
     overrideView.render()
   }

@@ -112,7 +112,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       discussion_topic.anonymous_state = anonymous_state
     end
 
-    if (!input.key?(:ungraded_discussion_overrides) && !Account.site_admin.feature_enabled?(:selective_release_ui_api)) || is_announcement
+    if is_announcement
       # TODO: deprecate discussion_topic_section_visibilities for assignment_overrides LX-1498
       set_sections(input[:specific_sections], discussion_topic)
       invalid_sections = verify_specific_section_visibilities(discussion_topic) || []

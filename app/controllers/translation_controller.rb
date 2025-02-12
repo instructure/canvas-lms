@@ -31,7 +31,7 @@ class TranslationController < ApplicationController
     return render_unauthorized_action unless Translation.available?(@context, :translation) && @context.grants_right?(@current_user, session, :read)
 
     # This action is used for dicussions
-    InstStatsd::Statsd.increment("translation.discussions")
+    InstStatsd::Statsd.distributed_increment("translation.discussions")
 
     render json: { translated_text: Translation.translate_html(html_string: required_params[:text],
                                                                src_lang: required_params[:src_lang],
@@ -44,7 +44,7 @@ class TranslationController < ApplicationController
   #
   def translate_paragraph
     # This action is used for inbox_compose
-    InstStatsd::Statsd.increment("translation.inbox_compose")
+    InstStatsd::Statsd.distributed_increment("translation.inbox_compose")
 
     render json: translate_large_passage(original_text: required_params[:text],
                                          src_lang: required_params[:src_lang],
@@ -58,7 +58,7 @@ class TranslationController < ApplicationController
     end
 
     # This action is used for inbox inbound messages
-    InstStatsd::Statsd.increment("translation.inbox")
+    InstStatsd::Statsd.distributed_increment("translation.inbox")
 
     # Translate the message
     render json: { translated_text: Translation.translate_message(text: required_params[:text], user: @current_user) }

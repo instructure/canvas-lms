@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import KalturaRequestBuilder from '../kaltura_request_builder'
+import KalturaRequestBuilder from '../kaltura_request_builder.js'
 
 describe('KalturaRequestBuilder', () => {
   it('holds settings, url, and file', () => {

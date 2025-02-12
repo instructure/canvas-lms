@@ -23,7 +23,7 @@ require_relative "../graphql_spec_helper"
 RSpec.describe Mutations::CreateConversation do
   before do
     allow(InstStatsd::Statsd).to receive(:count)
-    allow(InstStatsd::Statsd).to receive(:increment)
+    allow(InstStatsd::Statsd).to receive(:distributed_increment)
   end
 
   before(:once) do
@@ -134,11 +134,11 @@ RSpec.describe Mutations::CreateConversation do
     enrollment.save
     @student.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
     result = run_mutation(recipients: [new_user.id.to_s], body: "yo", context_code: @course.asset_string, media_comment_id: "m-whatever", media_comment_type: "video")
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.react")
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.react")
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.created.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.sent.react")
     expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 1)
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.media.react")
     expect(result.dig("data", "createConversation", "errors")).to be_nil
     expect(
       result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
@@ -186,11 +186,11 @@ RSpec.describe Mutations::CreateConversation do
       media_comment_type: "video",
       attachment_ids: [attachment.id]
     )
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.react")
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.created.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.sent.react")
     expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 1)
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.attachment.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.media.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.attachment.react")
     expect(result.dig("data", "createConversation", "errors")).to be_nil
     expect(
       result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
@@ -498,15 +498,15 @@ RSpec.describe Mutations::CreateConversation do
       @student.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
 
       run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 1", group_conversation: true, bulk_message: true, context_code: @course.asset_string, media_comment_id: "m-whatever", media_comment_type: "video")
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.individual_message_option.react")
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.sent.individual_message_option.react")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.sent.react")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 2)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.media.react")
       run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 2", group_conversation: true, bulk_message: true, context_code: @course.asset_string, media_comment_id: "m-whatever", media_comment_type: "video")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.react", 2).at_least(:twice)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.react").at_least(:twice)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.react").at_least(:twice)
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 2).at_least(:twice)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react").at_least(:twice)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.media.react").at_least(:twice)
       expect(Conversation.count).to eql(@old_count + 4)
       result = user_type.resolve("conversationsConnection(scope: \"sent\") { nodes { conversation { subject } } }")
       expect(result).to match(["yo 2", "yo 2", "yo 1", "yo 1"])
@@ -563,7 +563,7 @@ RSpec.describe Mutations::CreateConversation do
       expect(
         result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
       ).to eql "foo"
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.account_context.react")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.sent.account_context.react")
     end
   end
 end

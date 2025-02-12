@@ -17,6 +17,7 @@
  */
 
 import FileOptionsCollection from '../FileOptionsCollection'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const equal = (a, b) => expect(a).toEqual(b)
 
@@ -52,10 +53,23 @@ function createFileOption(fileName, dup, optionName) {
 
 describe('FileOptionsCollection', () => {
   beforeEach(() => {
+    fakeENV.setup({
+      context_asset_string: 'course_1',
+      current_user: {id: '1'},
+      permissions: {
+        manage_files: true,
+        manage_files_edit: true,
+      },
+    })
     FileOptionsCollection.resetState()
+    FileOptionsCollection.setUploadOptions({
+      alwaysRename: false,
+      alwaysUploadZips: false,
+    })
   })
 
   afterEach(() => {
+    fakeENV.teardown()
     FileOptionsCollection.resetState()
   })
 
@@ -71,34 +85,35 @@ describe('FileOptionsCollection', () => {
 
   test('findMatchingFile returns falsy value when no matching file exists', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
-    equal(FileOptionsCollection.findMatchingFile('xyz') != null, false)
+    expect(FileOptionsCollection.findMatchingFile('xyz')).toBeFalsy()
   })
+
   test('segregateOptionBuckets divides files into collision and resolved buckets', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
     const one = createFileOption('file_name.txt', 'overwrite', 'option_name.txt')
     const two = createFileOption('foo')
     const {collisions, resolved} = FileOptionsCollection.segregateOptionBuckets([one, two])
-    equal(collisions.length, 1)
-    equal(resolved.length, 1)
-    equal(collisions[0].file.name, 'foo')
+    expect(collisions).toHaveLength(1)
+    expect(resolved).toHaveLength(1)
+    expect(collisions[0].file.name).toBe('foo')
   })
 
   test('segregateOptionBuckets uses fileOptions name over actual file name', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
     const one = createFileOption('file_name.txt', 'rename', 'foo')
     const {collisions, resolved} = FileOptionsCollection.segregateOptionBuckets([one])
-    equal(collisions.length, 1)
-    equal(resolved.length, 0)
-    equal(collisions[0].file.name, 'file_name.txt')
+    expect(collisions).toHaveLength(1)
+    expect(resolved).toHaveLength(0)
+    expect(collisions[0].file.name).toBe('file_name.txt')
   })
 
   test('segregateOptionBuckets name conflicts marked as overwrite are considered resolved', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
     const one = createFileOption('foo', 'overwrite')
     const {collisions, resolved} = FileOptionsCollection.segregateOptionBuckets([one])
-    equal(collisions.length, 0)
-    equal(resolved.length, 1)
-    equal(resolved[0].file.name, 'foo')
+    expect(collisions).toHaveLength(0)
+    expect(resolved).toHaveLength(1)
+    expect(resolved[0].file.name).toBe('foo')
   })
 
   test('segregateOptionBuckets detects zip files', () => {
@@ -106,8 +121,8 @@ describe('FileOptionsCollection', () => {
     const one = createFileOption('other.zip')
     one.file.type = 'application/zip'
     const {resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
-    equal(resolved.length, 0)
-    equal(zips[0].file.name, 'other.zip')
+    expect(resolved).toHaveLength(0)
+    expect(zips[0].file.name).toBe('other.zip')
   })
 
   test('segregateOptionBuckets ignores zip files that have an expandZip option', () => {
@@ -116,8 +131,8 @@ describe('FileOptionsCollection', () => {
     one.file.type = 'application/zip'
     one.expandZip = false
     const {resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
-    equal(resolved.length, 1)
-    equal(zips.length, 0)
+    expect(resolved).toHaveLength(1)
+    expect(zips).toHaveLength(0)
   })
 
   test('segregateOptionBuckets ignores zip file names when expandZip option is true', () => {
@@ -126,37 +141,37 @@ describe('FileOptionsCollection', () => {
     one.file.type = 'application/zip'
     one.expandZip = true
     const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
-    equal(resolved.length, 1)
-    equal(collisions.length, 0)
-    equal(zips.length, 0)
+    expect(resolved).toHaveLength(1)
+    expect(collisions).toHaveLength(0)
+    expect(zips).toHaveLength(0)
   })
 
   test('segregateOptionBuckets skips files', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
     const one = createFileOption('foo', 'skip')
     const {collisions, resolved} = FileOptionsCollection.segregateOptionBuckets([one])
-    equal(collisions.length, 0)
-    equal(resolved.length, 0)
+    expect(collisions).toHaveLength(0)
+    expect(resolved).toHaveLength(0)
   })
 
   test('segregateOptionBuckets treats zip files like regular files if alwaysUploadZips is true', () => {
     setupFolderWith(['other.zip', 'bar', 'baz'])
+    FileOptionsCollection.setUploadOptions({alwaysUploadZips: true})
     const one = createFileOption('other.zip')
     one.file.type = 'application/zip'
-    FileOptionsCollection.setUploadOptions({alwaysUploadZips: true})
     const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
-    equal(resolved.length, 0)
-    equal(collisions.length, 1)
-    equal(zips.length, 0)
+    expect(resolved).toHaveLength(0)
+    expect(collisions).toHaveLength(1)
+    expect(zips).toHaveLength(0)
   })
 
   test('segregateOptionBuckets automaticaly renames files when alwaysRename is true', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
-    const one = createFileOption('foo')
     FileOptionsCollection.setUploadOptions({alwaysRename: true})
+    const one = createFileOption('foo')
     const {collisions, resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
-    equal(resolved.length, 1)
-    equal(collisions.length, 0)
-    equal(zips.length, 0)
+    expect(resolved).toHaveLength(1)
+    expect(collisions).toHaveLength(0)
+    expect(zips).toHaveLength(0)
   })
 })

@@ -43,6 +43,19 @@ This was added for some legacy code, not sure if it'll work well elsewhere.
 <input type="text" placeholder="Sortable Name"> <div class="hint-text">The name displayed in sorted lists</div>
 ```
 
+## Error outline
+
+For form inputs that error we need outline it the color red.
+
+```html
+  <form>
+    <select name="reviewee_id" id="reviewee_id" style="margin: 0px;" class="error-outline">
+      <option value="">[ Select Student ]</option>
+      <option value="23" class="student_23">Neal, Chawn</option>
+    </select>
+  </form>
+```
+
 ## Dialog Form
 
 Add the class `form-dialog` to get the `form-controls` to display properly in a
@@ -79,6 +92,11 @@ input[type=text].loading {
 .hint-text {
   @include fontSize(12px);
   color: $ic-hint-text;
+}
+
+.error-outline {
+  outline: 1px solid $ic-bg-light-danger-text !important;
+  border-radius: 3px;
 }
 
 input + .hint-text {

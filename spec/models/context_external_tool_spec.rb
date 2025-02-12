@@ -778,11 +778,11 @@ describe ContextExternalTool do
     end
 
     it "returns the correct deployment_id" do
-      expect(tool.deployment_id).to eq "#{tool.id}:#{Lti::Asset.opaque_identifier_for(tool.context)}"
+      expect(tool.deployment_id).to eq "#{tool.id}:#{Lti::V1p1::Asset.opaque_identifier_for(tool.context)}"
     end
 
     it "sends only 255 chars" do
-      allow(Lti::Asset).to receive(:opaque_identifier_for).and_return("a" * 256)
+      allow(Lti::V1p1::Asset).to receive(:opaque_identifier_for).and_return("a" * 256)
       expect(tool.deployment_id.size).to eq 255
     end
   end
@@ -3196,7 +3196,7 @@ describe ContextExternalTool do
     it "uses the global_asset_id for new assets that are stored in the db" do
       expect(@course.lti_context_id).to be_nil
       @tool = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      context_id = Lti::Asset.global_context_id_for(@course)
+      context_id = Lti::V1p1::Asset.global_context_id_for(@course)
       @tool.opaque_identifier_for(@course)
       @course.reload
       expect(@course.lti_context_id).to eq context_id
@@ -4267,135 +4267,74 @@ describe ContextExternalTool do
       )
     end
 
-    context "update_unified_tool_id FF is on" do
+    context "the tool version is 1.1" do
+      let(:tool_version) { "1.1" }
+
       before do
-        tool.context.root_account.enable_feature!(:update_unified_tool_id)
+        allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id).and_return(unified_tool_id)
       end
 
-      context "the tool version is 1.1" do
-        let(:tool_version) { "1.1" }
-
-        before do
-          allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id).and_return(unified_tool_id)
-        end
-
-        it "calls the LearnPlatform::GlobalApi service and update the unified_tool_id attribute" do
-          subject.save
-          run_jobs
-          expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id).with(
-            { lti_domain: tool_domain,
-              lti_name: tool_name,
-              lti_tool_id: tool_id,
-              lti_url: tool_url,
-              lti_version: tool_version }
-          )
-          tool.reload
-          expect(tool.unified_tool_id).to eq(unified_tool_id)
-        end
-
-        it "starts a background job to update the unified_tool_id" do
-          expect do
-            subject.save
-          end.to change(Delayed::Job, :count).by(1)
-        end
-
-        context "when the tool is a redirect tool" do
-          let(:redirect_url) { "https://example.com" }
-
-          before do
-            tool.tool_id = "redirect"
-            tool.settings[:custom_fields] = { "url" => redirect_url }
-          end
-
-          it "calls the LearnPlatform::GlobalApi service with the correct lti_redirect_url" do
-            subject.save
-            run_jobs
-            expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id).with(hash_including(lti_redirect_url: redirect_url))
-          end
-        end
+      it "calls the LearnPlatform::GlobalApi service and update the unified_tool_id attribute" do
+        subject.save
+        run_jobs
+        expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id).with(
+          { lti_domain: tool_domain,
+            lti_name: tool_name,
+            lti_tool_id: tool_id,
+            lti_url: tool_url,
+            lti_version: tool_version }
+        )
+        tool.reload
+        expect(tool.unified_tool_id).to eq(unified_tool_id)
       end
 
-      context "the tool version is 1.3" do
-        let(:tool_version) { "1.3" }
-        let(:account) { account_model }
-
-        let_once(:developer_key) { dev_key_model_1_3(account:) }
-        let_once(:tool) do
-          ContextExternalTool.new(
-            context: @course,
-            consumer_key: "key",
-            shared_secret: "secret",
-            name: tool_name,
-            tool_id:,
-            domain: tool_domain,
-            url: tool_url,
-            lti_version: tool_version,
-            root_account: @root_account,
-            developer_key:
-          )
-        end
-
-        before do
-          tc = tool.developer_key.tool_configuration
-          tc.update_column(:unified_tool_id, unified_tool_id)
-          run_jobs # to empty the job queue
-        end
-
-        it "does not call the LearnPlatform::GlobalApi service" do
-          allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id)
+      it "starts a background job to update the unified_tool_id" do
+        expect do
           subject.save
-          run_jobs
-          expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
-        end
-
-        it "does update the unified_tool_id attribute" do
-          subject.save
-          run_jobs
-          tool.reload
-          expect(tool.unified_tool_id).to eq(unified_tool_id)
-        end
+        end.to change(Delayed::Job, :count).by(1)
       end
 
-      context "when the tool is already existing" do
+      context "when the tool is a redirect tool" do
+        let(:redirect_url) { "https://example.com" }
+
         before do
+          tool.tool_id = "redirect"
+          tool.settings[:custom_fields] = { "url" => redirect_url }
+        end
+
+        it "calls the LearnPlatform::GlobalApi service with the correct lti_redirect_url" do
           subject.save
           run_jobs
-          allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id)
-        end
-
-        context "when the tool is 'deleted'" do
-          it "does not call the LearnPlatform::GlobalApi service" do
-            subject.workflow_state = "deleted"
-            subject.name = "new name"
-            subject.save
-            run_jobs
-            expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
-          end
-        end
-
-        context "when the tool's name changed" do
-          it "calls the LearnPlatform::GlobalApi service" do
-            subject.name = "new name"
-            subject.save
-            run_jobs
-            expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id)
-          end
-        end
-
-        context "when the tool's description changed" do
-          it "does not call the LearnPlatform::GlobalApi service" do
-            subject.description = "new description"
-            subject.save
-            run_jobs
-            expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
-          end
+          expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id).with(hash_including(lti_redirect_url: redirect_url))
         end
       end
     end
 
-    context "update_unified_tool_id FF is off" do
+    context "the tool version is 1.3" do
+      let(:tool_version) { "1.3" }
+      let(:account) { account_model }
+
+      let_once(:developer_key) { lti_developer_key_model(account:) }
+      let_once(:tool_configuration) do
+        lti_tool_configuration_model(developer_key:, unified_tool_id:)
+      end
+      let_once(:tool) do
+        ContextExternalTool.new(
+          context: @course,
+          consumer_key: "key",
+          shared_secret: "secret",
+          name: tool_name,
+          tool_id:,
+          domain: tool_domain,
+          url: tool_url,
+          lti_version: tool_version,
+          root_account: @root_account,
+          developer_key:
+        )
+      end
+
       before do
-        tool.context.root_account.disable_feature!(:update_unified_tool_id)
+        run_jobs # to empty the job queue
       end
 
       it "does not call the LearnPlatform::GlobalApi service" do
@@ -4404,12 +4343,55 @@ describe ContextExternalTool do
         run_jobs
         expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
       end
+
+      it "does update the unified_tool_id attribute" do
+        subject.save
+        run_jobs
+        tool.reload
+        expect(tool.unified_tool_id).to eq(unified_tool_id)
+      end
+    end
+
+    context "when the tool is already existing" do
+      before do
+        subject.save
+        run_jobs
+        allow(LearnPlatform::GlobalApi).to receive(:get_unified_tool_id)
+      end
+
+      context "when the tool is 'deleted'" do
+        it "does not call the LearnPlatform::GlobalApi service" do
+          subject.workflow_state = "deleted"
+          subject.name = "new name"
+          subject.save
+          run_jobs
+          expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
+        end
+      end
+
+      context "when the tool's name changed" do
+        it "calls the LearnPlatform::GlobalApi service" do
+          subject.name = "new name"
+          subject.save
+          run_jobs
+          expect(LearnPlatform::GlobalApi).to have_received(:get_unified_tool_id)
+        end
+      end
+
+      context "when the tool's description changed" do
+        it "does not call the LearnPlatform::GlobalApi service" do
+          subject.description = "new description"
+          subject.save
+          run_jobs
+          expect(LearnPlatform::GlobalApi).not_to have_received(:get_unified_tool_id)
+        end
+      end
     end
 
     context "unified_tool_id backfill job" do
       let(:tool) { external_tool_model }
 
-      it "can save last_udapted" do
+      it "can save last_updated" do
         now = Time.zone.now
         tool.unified_tool_id_last_updated_at = now
         expect(tool.save).to be true

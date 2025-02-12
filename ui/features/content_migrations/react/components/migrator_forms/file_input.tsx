@@ -26,7 +26,7 @@ import {ProgressBar} from '@instructure/ui-progress'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
-import {FormLabel, RequiredFormLabel, ErrorFormMessage} from '@canvas/content-migrations'
+import {FormLabel, RequiredFormLabel} from '@canvas/content-migrations'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
@@ -40,10 +40,7 @@ type MigrationFileInputProps = {
 }
 
 const getHintMessage = (text: string): FormMessage => ({text, type: 'hint'})
-const getErrorMessage = (text: string): FormMessage => ({
-  text: <ErrorFormMessage>{text}</ErrorFormMessage>,
-  type: 'error',
-})
+const getErrorMessage = (text: string): FormMessage => ({text, type: 'newError'})
 
 const formLabelText = I18n.t('Source')
 
@@ -99,15 +96,18 @@ const MigrationFileInput = ({
   return (
     <>
       <View margin="none none x-small none" style={{display: 'block'}}>
-        <label htmlFor="migrationFileUpload">
-          {isRequired ? (
-            <RequiredFormLabel showErrorState={formMessage && formMessage.type === 'error'}>
-              {formLabelText}
-            </RequiredFormLabel>
-          ) : (
-            <FormLabel>{formLabelText}</FormLabel>
-          )}
-        </label>
+        {isRequired ? (
+          <RequiredFormLabel
+            showErrorState={formMessage && formMessage.type === 'newError'}
+            htmlFor="migrationFileUpload"
+          >
+            {formLabelText}
+          </RequiredFormLabel>
+        ) : (
+          <FormLabel htmlFor="migrationFileUpload">
+            {formLabelText}
+          </FormLabel>
+        )}
       </View>
       <FileDrop
         id="migrationFileUpload"

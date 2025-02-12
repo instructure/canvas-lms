@@ -109,6 +109,17 @@ describe Group do
     end
   end
 
+  it "does not create new group if Horizon course" do
+    context = course_model
+    group_category = context.group_categories.create(name: "worldCup")
+    Account.site_admin.enable_feature!(:horizon_course_setting)
+    @course.update!(horizon_course: true)
+    @course.save!
+    expect do
+      Group.create!(name: "group1", group_category:, context:)
+    end.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
   describe "#grading_standard_or_default" do
     context "when the Group belongs to a Course" do
       it "returns the grading scheme being used by the course, if one exists" do

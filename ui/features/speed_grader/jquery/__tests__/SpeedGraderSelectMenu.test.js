@@ -26,6 +26,14 @@ import SpeedGraderSelectMenu, {
 } from '../speed_grader_select_menu'
 
 describe('SpeedGraderSelectMenu', () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
   describe('#updateSelectMenuStatus', () => {
     const students = [
       {
@@ -81,7 +89,7 @@ describe('SpeedGraderSelectMenu', () => {
 
     describe('without sections', () => {
       it('ignores null students', () => {
-        selectMenu.updateSelectMenuStatus({student: null})
+        selectMenu.updateSelectMenuStatus({student: null, anonymizableId: 'id'})
         expect(true).toBeTruthy() // does not error
       })
 
@@ -257,14 +265,17 @@ describe('SpeedGraderSelectMenu', () => {
               data: {'section-id': 0},
               name: 'Show all sections',
               className: {raw: 'section_0'},
+              anonymizableId: 'id',
             },
             {
               id: 'section_123',
               data: {'section-id': 123},
               name: 'Not everybody',
               className: {raw: 'section_123'},
+              anonymizableId: 'id',
             },
           ],
+          anonymizableId: 'id',
         }
         menuOptions.unshift(sections)
       })
@@ -304,6 +315,7 @@ describe('SpeedGraderSelectMenu (2)', () => {
   let selectMenu
 
   beforeEach(() => {
+    jest.useFakeTimers()
     fixtureNode = document.createElement('div')
     fixtureNode.id = 'fixtures'
     document.body.appendChild(fixtureNode)
@@ -324,6 +336,7 @@ describe('SpeedGraderSelectMenu (2)', () => {
   })
 
   afterEach(() => {
+    jest.useRealTimers()
     fixtureNode.remove()
     $('.ui-selectmenu-menu').remove()
   })
@@ -530,6 +543,7 @@ describe('SpeedGraderSelectMenu - rendered select control (2)', () => {
   let optionsArray
 
   beforeEach(() => {
+    jest.useFakeTimers()
     fixtureNode = document.createElement('div')
     fixtureNode.id = 'fixtures'
     document.body.appendChild(fixtureNode)
@@ -578,6 +592,7 @@ describe('SpeedGraderSelectMenu - rendered select control (2)', () => {
   })
 
   afterEach(() => {
+    jest.useRealTimers()
     fixtureNode.remove()
     $('.ui-selectmenu-menu').remove()
   })

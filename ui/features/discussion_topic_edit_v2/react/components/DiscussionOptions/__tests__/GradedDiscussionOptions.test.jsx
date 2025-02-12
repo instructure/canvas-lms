@@ -75,12 +75,11 @@ describe('GradedDiscussionOptions', () => {
     })
   })
 
-  describe('with selective_release_ui_api enabled', () => {
+  describe('with selective release', () => {
     beforeEach(() => {
       fetchMock.get(SECTIONS_URL, [])
       fetchMock.get(STUDENTS_URL, [])
       fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
-      ENV.FEATURES.selective_release_ui_api = true
       ENV.COURSE_ID = '1'
     })
 

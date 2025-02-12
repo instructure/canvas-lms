@@ -144,7 +144,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
 
       it "must post the context_id to the configured tools" do
         assert_requested(:post, export_url, {
-                           body: hash_including(context_id: Lti::Asset.opaque_identifier_for(@course))
+                           body: hash_including(context_id: Lti::V1p1::Asset.opaque_identifier_for(@course))
                          })
       end
 
@@ -180,7 +180,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
         it "must format request body as nested query" do
           assert_requested(:post, export_url, {
                              body: Rack::Utils.build_nested_query({
-                                                                    context_id: Lti::Asset.opaque_identifier_for(@course),
+                                                                    context_id: Lti::V1p1::Asset.opaque_identifier_for(@course),
                                                                     tool_consumer_instance_guid: @root_account.lti_guid,
                                                                     custom_course_id: @course.id.to_s
                                                                   })
@@ -213,7 +213,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
         it "must format request body as json" do
           assert_requested(:post, export_url, {
                              body: {
-                               context_id: Lti::Asset.opaque_identifier_for(@course),
+                               context_id: Lti::V1p1::Asset.opaque_identifier_for(@course),
                                tool_consumer_instance_guid: @root_account.lti_guid,
                              }
                            })

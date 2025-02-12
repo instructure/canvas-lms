@@ -22,6 +22,7 @@ class SisBatchRollBackData < ActiveRecord::Base
   belongs_to :context, polymorphic: %i[abstract_course
                                        account
                                        account_user
+                                       assignment_override_student
                                        communication_channel
                                        course
                                        course_section
@@ -49,7 +50,8 @@ class SisBatchRollBackData < ActiveRecord::Base
                      Enrollment
                      GroupMembership
                      UserObserver
-                     AccountUser].freeze
+                     AccountUser
+                     AssignmentOverrideStudent].freeze
 
   def self.cleanup_expired_data
     expired_data.in_batches(of: 10_000).delete_all

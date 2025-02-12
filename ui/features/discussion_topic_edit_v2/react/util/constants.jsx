@@ -88,7 +88,7 @@ export const useShouldShowContent = (
     !isGraded &&
     !isGroupDiscussion &&
     !isGroupContext &&
-    !(ENV.FEATURES?.selective_release_ui_api && !isAnnouncement)
+    isAnnouncement
 
   const shouldShowAnonymousOptions =
     !isGroupContext &&
@@ -134,7 +134,6 @@ export const useShouldShowContent = (
   const shouldShowAssignToForUngradedDiscussions =
     !isAnnouncement &&
     !isGraded &&
-    ENV.FEATURES?.selective_release_ui_api &&
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
 
   const shouldShowAllowParticipantsToCommentOption =

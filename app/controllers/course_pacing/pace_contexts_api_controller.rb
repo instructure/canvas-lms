@@ -54,8 +54,12 @@ class CoursePacing::PaceContextsApiController < ApplicationController
   def index
     contexts = CoursePacing::PaceContextsService.new(@context).contexts_of_type(@type, params: filter_params)
     paginated_contexts = Api.paginate(contexts, self, api_v1_pace_contexts_url, total_entries: contexts.count)
+
+    @course_pace_pacing_status_labels_enabled = @context.root_account.feature_enabled?(:course_pace_pacing_status_labels)
+    overdue_items_by_user = @course_pace_pacing_status_labels_enabled ? fetch_overdue_items_by_user(contexts) : {}
+
     render json: {
-      pace_contexts: paginated_contexts.map { |c| CoursePacing::PaceContextsPresenter.as_json(c) },
+      pace_contexts: paginated_contexts.map { |c| CoursePacing::PaceContextsPresenter.as_json(c, overdue_items_by_user) },
       total_entries: contexts.count
     }
   end
@@ -81,5 +85,22 @@ class CoursePacing::PaceContextsApiController < ApplicationController
 
   def filter_params
     params.permit(:sort, :order, :search_term, :contexts)
+  end
+
+  def fetch_overdue_items_by_user(contexts)
+    # Fetch overdue items if type is of student enrollment
+    contexts.each_with_object({}) do |context, overdue_items_by_user|
+      next unless context.is_a?(StudentEnrollment)
+
+      course_pace = CoursePace.pace_for_context(context.course, context)
+
+      unless course_pace
+        overdue_items_by_user[context.user_id] = []
+        next
+      end
+
+      overdue_items = course_pace.overdue_unsubmitted_student_module_items_by_student([context.user_id])
+      overdue_items_by_user[context.user_id] = overdue_items[context.user_id] || []
+    end
   end
 end

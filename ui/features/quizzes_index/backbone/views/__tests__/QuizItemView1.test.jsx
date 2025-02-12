@@ -79,14 +79,13 @@ const createView = (quiz, options = {}) => {
 
   ENV.context_asset_string = 'course_1'
   ENV.SHOW_SPEED_GRADER_LINK = true
-  ENV.FEATURES.selective_release_ui_api = options.selective_release
 
   const view = new QuizItemView({model: quiz, publishIconView: icon})
   const $fixtures = $('<div id="fixtures" />').appendTo(document.body)
   view.$el.appendTo($fixtures)
 
   // Set up assign-to link
-  if (options.selective_release && options.canManage) {
+  if (options.canManage) {
     const assignToLink = $(`
       <div class="assign-to-link">
         <a href="#" data-quiz-context-id="1" data-quiz-name="${quiz.get(
@@ -184,7 +183,6 @@ describe('QuizItemView', () => {
     const quiz = createQuiz({id: 1, title: 'Foo'})
     const view = createView(quiz, {
       canManage: true,
-      selective_release: true,
     })
     expect(view.$('.assign-to-link')).toHaveLength(1)
   })
@@ -193,16 +191,6 @@ describe('QuizItemView', () => {
     const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
     const view = createView(quiz, {
       canManage: false,
-      selective_release: true,
-    })
-    expect(view.$('.assign-to-link')).toHaveLength(0)
-  })
-
-  it('cannot assign assignment when flag is off', () => {
-    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-    const view = createView(quiz, {
-      canManage: true,
-      selective_release: false,
     })
     expect(view.$('.assign-to-link')).toHaveLength(0)
   })

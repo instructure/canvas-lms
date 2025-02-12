@@ -155,7 +155,6 @@
               </li>
               {{/if}}
               {{#if canManageAssignTo}}
-                {{#if differentiatedModulesFlag}}
                   <li>
                     <a
                       class="assign-to-link icon-permissions"
@@ -170,7 +169,6 @@
                       data-focus-returns-to="assign_{{id}}_manage_link"
                     >{{#t}}Assign To...{{/t}}</a>
                   </li>
-                {{/if}}
               {{/if}}
               {{#unless is_locked}}
                 <li role="presentation">
@@ -247,7 +245,6 @@
               </li>
               {{/if}}
               {{#if canManageAssignTo}}
-                {{#if differentiatedModulesFlag}}
                   <li>
                     <a
                       class="assign-to-link icon-permissions"
@@ -262,7 +259,6 @@
                       data-focus-returns-to="assign_{{id}}_manage_link"
                     >{{#t}}Assign To...{{/t}}</a>
                   </li>
-                {{/if}}
               {{/if}}
               {{#ifAll can_update cyoe.isCyoeAble}}
               <li role="presentation">

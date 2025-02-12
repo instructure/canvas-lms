@@ -97,14 +97,14 @@ module Lti
             end
 
             if !account.root_account.feature_enabled?(:lti_oidc_missing_cookie_retry) || params[:retried] == "true"
-              InstStatsd::Statsd.increment("lti.oidc_login_required_error", tags: {
-                                             account: account&.global_id,
-                                             client_id: oidc_params[:client_id],
-                                           })
+              InstStatsd::Statsd.distributed_increment("lti.oidc_login_required_error", tags: {
+                                                         account: account&.global_id,
+                                                         client_id: oidc_params[:client_id],
+                                                       })
               render("lti/ims/authentication/login_required_error_screen", status: :unauthorized, layout: "borderless_lti", formats: :html)
             else
               # In some cases resubmitting the request from within Canvas can fix the missing cookie problem (see INTEROP-8868)
-              InstStatsd::Statsd.increment("lti.oidc_missing_cookie_retry", tags: { client_id: oidc_params[:client_id] })
+              InstStatsd::Statsd.distributed_increment("lti.oidc_missing_cookie_retry", tags: { client_id: oidc_params[:client_id] })
               @oidc_params = oidc_params
               render("lti/ims/authentication/missing_cookie_fix", status: :ok, layout: "borderless_lti", formats: :html)
             end
@@ -115,7 +115,7 @@ module Lti
           validate_launch_eligibility!
 
           if params[:retried] == "true"
-            InstStatsd::Statsd.increment("lti.oidc_missing_cookie_retry_worked", tags: { client_id: oidc_params[:client_id] })
+            InstStatsd::Statsd.distributed_increment("lti.oidc_missing_cookie_retry_worked", tags: { client_id: oidc_params[:client_id] })
           end
 
           render(
@@ -143,7 +143,7 @@ module Lti
       def validate_current_user!
         return if public_course? && @current_user.blank?
 
-        if !@current_user || Lti::Asset.opaque_identifier_for(@current_user, context:) != oidc_params[:login_hint]
+        if !@current_user || Lti::V1p1::Asset.opaque_identifier_for(@current_user, context:) != oidc_params[:login_hint]
           set_oidc_error!("login_required", "Must have an active user session")
         end
       end

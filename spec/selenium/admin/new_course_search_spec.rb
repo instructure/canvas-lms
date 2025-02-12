@@ -193,6 +193,28 @@ describe "new account course search" do
     expect(rows.first).to include_text("Test Course Name")
   end
 
+  it "creates a new course from the 'Add a New Course' dialog with only required fields" do
+    visit_courses(@account)
+
+    # fill out the form
+    click_add_course_button
+    expect(add_course_modal).to be_displayed
+    enter_course_name("Test Course Name")
+    enter_reference_code("TCN 101")
+    submit_new_course
+
+    # make sure it got saved to db correctly
+    new_course = Course.last
+
+    expect(new_course.name).to eq("Test Course Name")
+    expect(new_course.course_code).to eq("TCN 101")
+    expect(new_course.account.name).to eq(@account.name)
+    expect(new_course.enrollment_term.name).to eq("Default Term")
+
+    # make sure it shows up on the page
+    expect(rows.first).to include_text("Test Course Name")
+  end
+
   it "lists course name at top of add user modal", priority: "1" do
     named_course = course_factory(account: @account, course_name: "course factory with name")
 

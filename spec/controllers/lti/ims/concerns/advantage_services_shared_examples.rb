@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-shared_examples_for "advantage services" do
+shared_examples_for "advantage services" do |skip_mime_type_checks_on_error: false, route_includes_context: true|
   let(:extra_tool_context) { raise "Override in spec" }
 
   shared_examples "extra developer key and account tool check" do
@@ -57,7 +57,7 @@ shared_examples_for "advantage services" do
       context "and that tool is the only tool" do
         let(:before_send_request) { -> { tool.destroy! } }
 
-        it_behaves_like "mime_type check"
+        it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
         it "returns 401 unauthorized and complains about missing tool" do
           expect(response).to have_http_status :unauthorized
@@ -77,13 +77,14 @@ shared_examples_for "advantage services" do
       send_request
     end
 
-    context "with unknown context" do
-      let(:context_id) { unknown_context_id }
+    if route_includes_context
+      context "with unknown context" do
+        let(:context_id) { unknown_context_id }
 
-      it_behaves_like "mime_type check"
-
-      it "returns 404 not found" do
-        expect(response).to have_http_status :not_found
+        it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
+        it "returns 404 not found" do
+          expect(response).to have_http_status :not_found
+        end
       end
     end
 
@@ -94,7 +95,7 @@ shared_examples_for "advantage services" do
         end
       end
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 404 not found" do
         expect(response).to have_http_status :not_found
@@ -108,7 +109,7 @@ shared_examples_for "advantage services" do
         end
       end
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing developer key" do
         expect(response).to have_http_status :unauthorized
@@ -119,7 +120,7 @@ shared_examples_for "advantage services" do
     context "with deleted tool" do
       let(:before_send_request) { -> { tool.destroy! } }
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing tool" do
         expect(response).to have_http_status :unauthorized
@@ -130,7 +131,7 @@ shared_examples_for "advantage services" do
     context "with no tool" do
       let(:tool) { nil }
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing tool" do
         expect(response).to have_http_status :unauthorized
@@ -271,7 +272,7 @@ shared_examples_for "advantage services" do
         )
       end
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing tool" do
         expect(response).to have_http_status :unauthorized
@@ -304,7 +305,7 @@ shared_examples_for "advantage services" do
         )
       end
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing tool" do
         expect(response).to have_http_status :unauthorized

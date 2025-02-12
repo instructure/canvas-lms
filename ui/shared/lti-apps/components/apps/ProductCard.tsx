@@ -34,9 +34,11 @@ type ProductCardProps = {
 
 const ProductCard = (props: ProductCardProps) => {
   const {product} = props
-  const productUrl = `${window.location.origin}${window.location.pathname}/product_detail/${
+  const accountId = ENV.ACCOUNT_ID
+  const pathname = window.location.pathname.includes(instructorAppsRoute) ? `/courses/${accountId}/settings` : `/accounts/${accountId}/apps`
+  const productUrl = `${window.location.origin}${pathname}/product_detail/${
     product.global_product_id
-  }${window.location.pathname.endsWith(instructorAppsRoute) ? instructorAppsHash : ''}`
+  }${window.location.pathname.includes(instructorAppsRoute) ? instructorAppsHash : ''}`
 
   return (
     <Flex.Item>

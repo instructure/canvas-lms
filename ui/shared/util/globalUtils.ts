@@ -49,3 +49,7 @@ export function forceReload(): void {
 export function windowAlert(message: string): void {
   window.alert(message)
 }
+
+export function windowConfirm(message: string): boolean {
+  return window.confirm(message)
+}

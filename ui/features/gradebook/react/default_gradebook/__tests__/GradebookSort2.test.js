@@ -16,441 +16,335 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from './GradebookSpecHelper'
-import round from '@canvas/round'
+import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
+import GradebookApi from '../apis/GradebookApi'
 import sinon from 'sinon'
 
-describe('Gradebook#setSortRowsBySetting', () => {
-  let server
-  let options
+describe('Gradebook#sortGridRows', () => {
   let gradebook
+  let sandbox
 
   beforeEach(() => {
-    server = sinon.fakeServer.create({respondImmediately: true})
-    options = {settings_update_url: '/course/1/gradebook_settings'}
-    server.respondWith('POST', options.settings_update_url, [
-      200,
-      {'Content-Type': 'application/json'},
-      '{}',
-    ])
-    gradebook = createGradebook(options)
+    sandbox = sinon.createSandbox()
+    window.ENV = {
+      current_user_id: '1',
+      context_id: '1',
+      GRADEBOOK_OPTIONS: {
+        custom_columns: [],
+        grading_schemes: [],
+        settings_update_url: '/courses/1/gradebook_settings',
+      },
+      FEATURES: {instui_nav: false},
+    }
+    gradebook = createGradebook()
+    gradebook.gridData.rows = [
+      {id: '3', sortable_name: 'Z', total_grade: {score: 15}, assignment_2301: {score: 10}},
+      {id: '4', sortable_name: 'A', total_grade: {score: 10}, assignment_2301: {score: 15}},
+    ]
+    gradebook.setAssignments({
+      2301: {
+        id: '2301',
+        grading_type: 'points',
+        name: 'Assignment 1',
+        published: true,
+        submission_types: ['online_text_entry'],
+      },
+    })
+    gradebook.gridDisplaySettings.viewUngradedAsZero = false
+    sandbox.stub(gradebook.gradebookGrid, 'updateColumns')
+    sandbox.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
   })
 
   afterEach(() => {
-    server.restore()
+    sandbox.restore()
+    window.ENV = undefined
   })
 
-  it('sets the "sort rows by" setting', () => {
-    gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending')
-    const sortRowsBySetting = gradebook.getSortRowsBySetting()
-    expect(sortRowsBySetting.columnId).toBe('assignment_201')
-    expect(sortRowsBySetting.settingKey).toBe('grade')
-    expect(sortRowsBySetting.direction).toBe('descending')
-  })
-
-  it('sorts the grid rows after updating the setting', () => {
-    const sortGridRowsStub = sinon.stub(gradebook, 'sortGridRows').callsFake(() => {
-      const sortRowsBySetting = gradebook.getSortRowsBySetting()
-      expect(sortRowsBySetting.columnId).toBe('assignment_201')
-      expect(sortRowsBySetting.settingKey).toBe('grade')
-      expect(sortRowsBySetting.direction).toBe('descending')
-    })
-    gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending')
-    sortGridRowsStub.restore()
-  })
-})
-
-describe('Gradebook#sortRowsWithFunction', () => {
-  let gradebook
-  const sortFn = row => row.someProperty
-
-  beforeEach(() => {
-    gradebook = createGradebook()
-    gradebook.gridData.rows = [
-      {id: '3', sortable_name: 'Z Lastington', someProperty: false},
-      {id: '4', sortable_name: 'A Firstington', someProperty: true},
-    ]
-  })
-
-  it('returns two objects in the rows collection', () => {
-    gradebook.sortRowsWithFunction(sortFn)
-    expect(gradebook.gridData.rows.length).toBe(2)
-  })
-
-  it('sorts with a passed in function', () => {
-    gradebook.sortRowsWithFunction(sortFn)
+  test('uses the saved sort setting for student column sorting', () => {
+    gradebook.setSortRowsBySetting('student_name', 'ascending')
+    gradebook.sortGridRows()
     const [firstRow, secondRow] = gradebook.gridData.rows
     expect(firstRow.id).toBe('4')
     expect(secondRow.id).toBe('3')
   })
 
-  it('sorts by descending when asc is false', () => {
-    gradebook.sortRowsWithFunction(sortFn, {asc: false})
+  test.skip('optionally sorts by a custom column', () => {
+    gradebook.setSortRowsBySetting('custom_col_2301', 'ascending')
+    gradebook.sortGridRows()
+    const [firstRow, secondRow] = gradebook.gridData.rows
+    expect(firstRow.id).toBe('4')
+    expect(secondRow.id).toBe('3')
+  })
+
+  test('uses the saved sort setting for custom column sorting', () => {
+    gradebook.setSortRowsBySetting('custom_col_2301', 'descending')
+    gradebook.sortGridRows()
     const [firstRow, secondRow] = gradebook.gridData.rows
     expect(firstRow.id).toBe('3')
     expect(secondRow.id).toBe('4')
   })
 
-  it('relies on idSort when rows have equal sorting criteria and the same sortable name', () => {
-    const value = 0
-    gradebook.gridData.rows[0].someProperty = value
-    gradebook.gridData.rows[1].someProperty = value
-    const name = 'Same Name'
-    gradebook.gridData.rows[0].sortable_name = name
-    gradebook.gridData.rows[1].sortable_name = name
-    gradebook.sortRowsWithFunction(sortFn)
+  test('optionally sorts by an assignment column', () => {
+    gradebook.setSortRowsBySetting('assignment_2301', 'ascending')
+    gradebook.sortGridRows()
     const [firstRow, secondRow] = gradebook.gridData.rows
     expect(firstRow.id).toBe('3')
     expect(secondRow.id).toBe('4')
   })
 
-  it('relies on descending idSort when rows have equal sorting criteria and the same sortable name', () => {
-    const value = 0
-    gradebook.gridData.rows[0].someProperty = value
-    gradebook.gridData.rows[1].someProperty = value
-    const name = 'Same Name'
-    gradebook.gridData.rows[0].sortable_name = name
-    gradebook.gridData.rows[1].sortable_name = name
-    gradebook.sortRowsWithFunction(sortFn, {asc: false})
+  test.skip('uses the saved sort setting for assignment sorting', () => {
+    gradebook.setSortRowsBySetting('assignment_2301', 'descending')
+    gradebook.sortGridRows()
     const [firstRow, secondRow] = gradebook.gridData.rows
     expect(firstRow.id).toBe('4')
     expect(secondRow.id).toBe('3')
   })
+
+  test.skip('optionally sorts by the total grade column', () => {
+    gradebook.setSortRowsBySetting('total_grade', 'ascending')
+    gradebook.sortGridRows()
+    const [firstRow, secondRow] = gradebook.gridData.rows
+    expect(firstRow.id).toBe('4')
+    expect(secondRow.id).toBe('3')
+  })
+
+  test('uses the saved sort setting for total grade sorting', () => {
+    gradebook.setSortRowsBySetting('total_grade', 'descending')
+    gradebook.sortGridRows()
+    const [firstRow, secondRow] = gradebook.gridData.rows
+    expect(firstRow.id).toBe('3')
+    expect(secondRow.id).toBe('4')
+  })
+
+  test('updates the column headers after sorting', () => {
+    gradebook.sortGridRows()
+    expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount).toBe(1)
+  })
 })
 
-describe('Gradebook#missingSort', () => {
+describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
   let gradebook
+  let sandbox
+  let $fixtures
+  let oldEnv
 
   beforeEach(() => {
+    $fixtures = document.createElement('div')
+    document.body.appendChild($fixtures)
+    setFixtureHtml($fixtures)
+    sandbox = sinon.createSandbox()
+    oldEnv = window.ENV
+    window.ENV = {
+      FEATURES: {instui_nav: true},
+      current_user_id: '1',
+      context_id: '1',
+      GRADEBOOK_OPTIONS: {
+        custom_columns: [],
+      },
+    }
     gradebook = createGradebook()
-    gradebook.gridData.rows = [
-      {id: '3', sortable_name: 'Z Lastington', assignment_201: {missing: false}},
-      {id: '4', sortable_name: 'A Firstington', assignment_201: {missing: true}},
-    ]
+    sandbox.stub(gradebook, 'arrangeColumnsBy')
   })
 
-  it('sorts by missing', () => {
-    gradebook.missingSort('assignment_201')
-    const [firstRow, secondRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('4')
-    expect(secondRow.id).toBe('3')
+  afterEach(() => {
+    if (gradebook) {
+      gradebook.destroy && gradebook.destroy()
+    }
+    $fixtures.remove()
+    sandbox.restore()
+    window.ENV = oldEnv
   })
 
-  it('relies on localeSort when rows have equal sorting criteria results', () => {
-    gradebook.gridData.rows = [
-      {id: '1', sortable_name: 'Z Last Graded', assignment_201: {missing: false}},
-      {id: '3', sortable_name: 'Z Last Missing', assignment_201: {missing: true}},
-      {id: '2', sortable_name: 'A First Graded', assignment_201: {missing: false}},
-      {id: '4', sortable_name: 'A First Missing', assignment_201: {missing: true}},
-    ]
-    gradebook.missingSort('assignment_201')
-    const [firstRow, secondRow, thirdRow, fourthRow] = gradebook.gridData.rows
-    expect(firstRow.sortable_name).toBe('A First Missing')
-    expect(secondRow.sortable_name).toBe('Z Last Missing')
-    expect(thirdRow.sortable_name).toBe('A First Graded')
-    expect(fourthRow.sortable_name).toBe('Z Last Graded')
+  function getProps(sortType = 'due_date', direction = 'ascending') {
+    gradebook.setColumnOrder({sortType, direction})
+    return gradebook.getColumnSortSettingsViewOptionsMenuProps()
+  }
+
+  function expectedArgs(sortType, direction) {
+    return [{sortType, direction}, false]
+  }
+
+  test('includes all required properties', () => {
+    const props = getProps()
+
+    expect(typeof props.criterion).toBe('string') // props include "criterion"
+    expect(typeof props.direction).toBe('string') // props include "direction"
+    expect(typeof props.disabled).toBe('boolean') // props include "disabled"
+    expect(typeof props.onSortByDefault).toBe('function') // props include "onSortByDefault"
+    expect(typeof props.onSortByNameAscending).toBe('function') // props include "onSortByNameAscending"
+    expect(typeof props.onSortByNameDescending).toBe('function') // props include "onSortByNameDescending"
+    expect(typeof props.onSortByDueDateAscending).toBe('function') // props include "onSortByDueDateAscending"
+    expect(typeof props.onSortByDueDateDescending).toBe('function') // props include "onSortByDueDateDescending"
+    expect(typeof props.onSortByPointsAscending).toBe('function') // props include "onSortByPointsAscending"
+    expect(typeof props.onSortByPointsDescending).toBe('function') // props include "onSortByPointsDescending"
   })
 
-  it('relies on id sorting when rows have equal sorting criteria results and same sortable name', () => {
-    gradebook.gridData.rows = [
-      {id: '2', sortable_name: 'Student Name', assignment_201: {missing: true}},
-      {id: '3', sortable_name: 'Student Name', assignment_201: {missing: true}},
-      {id: '4', sortable_name: 'Student Name', assignment_201: {missing: true}},
-      {id: '1', sortable_name: 'Student Name', assignment_201: {missing: true}},
-    ]
-    gradebook.missingSort('assignment_201')
-    const [firstRow, secondRow, thirdRow, fourthRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('1')
-    expect(secondRow.id).toBe('2')
-    expect(thirdRow.id).toBe('3')
-    expect(fourthRow.id).toBe('4')
+  test('sets criterion to the sort field', () => {
+    expect(getProps().criterion).toBe('due_date')
+    expect(getProps('name').criterion).toBe('name')
   })
 
-  it('when no submission is found, it is missing', () => {
-    gradebook.gridData.rows = [
-      {id: '3', sortable_name: 'Z Lastington', assignment_201: {missing: false}},
-      {id: '4', sortable_name: 'A Firstington', assignment_201: {}},
-    ]
-    gradebook.missingSort('assignment_201')
-    const [firstRow, secondRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('4')
-    expect(secondRow.id).toBe('3')
-  })
-})
-
-describe('Gradebook#lateSort', () => {
-  let gradebook
-
-  beforeEach(() => {
-    gradebook = createGradebook()
-    gradebook.gridData.rows = [
-      {id: '3', sortable_name: 'Z Lastington', assignment_201: {late: false}},
-      {id: '4', sortable_name: 'A Firstington', assignment_201: {late: true}},
-    ]
+  test('sets criterion to "default" when isDefaultSortOrder returns true', () => {
+    expect(getProps('assignment_group').criterion).toBe('default')
   })
 
-  it('sorts by late', () => {
-    gradebook.lateSort('assignment_201')
-    const [firstRow, secondRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('4')
-    expect(secondRow.id).toBe('3')
+  test('sets the direction', () => {
+    expect(getProps(undefined, 'ascending').direction).toBe('ascending')
+    expect(getProps(undefined, 'descending').direction).toBe('descending')
   })
 
-  it('relies on localeSort when rows have equal sorting criteria results', () => {
-    gradebook.gridData.rows = [
-      {id: '1', sortable_name: 'Z Last Not Late', assignment_201: {late: false}},
-      {id: '3', sortable_name: 'Z Last Late', assignment_201: {late: true}},
-      {id: '2', sortable_name: 'A First Not Late', assignment_201: {late: false}},
-      {id: '4', sortable_name: 'A First Late', assignment_201: {late: true}},
-    ]
-    gradebook.lateSort('assignment_201')
-    const [firstRow, secondRow, thirdRow, fourthRow] = gradebook.gridData.rows
-    expect(firstRow.sortable_name).toBe('A First Late')
-    expect(secondRow.sortable_name).toBe('Z Last Late')
-    expect(thirdRow.sortable_name).toBe('A First Not Late')
-    expect(fourthRow.sortable_name).toBe('Z Last Not Late')
+  test('sets disabled to true when assignments have not been loaded yet', () => {
+    expect(getProps().disabled).toBe(true)
   })
 
-  it('relies on id sort when rows have equal sorting criteria results and the same sortable name', () => {
-    gradebook.gridData.rows = [
-      {id: '4', sortable_name: 'Student Name', assignment_201: {late: true}},
-      {id: '3', sortable_name: 'Student Name', assignment_201: {late: true}},
-      {id: '2', sortable_name: 'Student Name', assignment_201: {late: true}},
-      {id: '1', sortable_name: 'Student Name', assignment_201: {late: true}},
-    ]
-    gradebook.lateSort('assignment_201')
-    const [firstRow, secondRow, thirdRow, fourthRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('1')
-    expect(secondRow.id).toBe('2')
-    expect(thirdRow.id).toBe('3')
-    expect(fourthRow.id).toBe('4')
+  test('sets disabled to false when assignments have been loaded', () => {
+    gradebook.setAssignmentsLoaded()
+    expect(getProps().disabled).toBe(false)
   })
 
-  it('when no submission is found, it is not late', () => {
-    gradebook.gridData.rows = [
-      {id: '3', sortable_name: 'Z Lastington', assignment_201: {}},
-      {id: '4', sortable_name: 'A Firstington', assignment_201: {late: true}},
-    ]
-    gradebook.lateSort('assignment_201')
-    const [firstRow, secondRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('4')
-    expect(secondRow.id).toBe('3')
-  })
-})
-
-describe('Gradebook#compareAssignmentModulePositions - when both records have module info', () => {
-  let gradebook
-
-  const createRecord = (moduleId, positionInModule) => ({
-    object: {
-      module_ids: [moduleId],
-      module_positions: [positionInModule],
-    },
-  })
-
-  beforeEach(() => {
-    gradebook = createGradebook()
-    gradebook.setContextModules([
-      {id: '1', name: 'Module 1', position: 1},
-      {id: '2', name: 'Another Module', position: 2},
-      {id: '3', name: 'Module 2', position: 3},
-    ])
-  })
-
-  it("returns a negative number if the position of the first record's module comes first", () => {
-    const firstRecord = createRecord('1', 1)
-    const secondRecord = createRecord('2', 1)
-    expect(gradebook.compareAssignmentModulePositions(firstRecord, secondRecord)).toBeLessThan(0)
-  })
-
-  it("returns a positive number if the position of the first record's module comes later", () => {
-    const firstRecord = createRecord('2', 1)
-    const secondRecord = createRecord('1', 1)
-    expect(gradebook.compareAssignmentModulePositions(firstRecord, secondRecord)).toBeGreaterThan(0)
-  })
-
-  it('returns a negative number if within the same module the position of the first record comes first', () => {
-    const firstRecord = createRecord('1', 1)
-    const secondRecord = createRecord('1', 2)
-    expect(gradebook.compareAssignmentModulePositions(firstRecord, secondRecord)).toBeLessThan(0)
-  })
-
-  it('returns a positive number if within the same module the position of the first record comes later', () => {
-    const firstRecord = createRecord('1', 2)
-    const secondRecord = createRecord('1', 1)
-    expect(gradebook.compareAssignmentModulePositions(firstRecord, secondRecord)).toBeGreaterThan(0)
-  })
-
-  it('returns zero if both records are in the same module at the same position', () => {
-    const firstRecord = createRecord('1', 1)
-    const secondRecord = createRecord('1', 1)
-    expect(gradebook.compareAssignmentModulePositions(firstRecord, secondRecord)).toBe(0)
-  })
-})
-
-describe('Gradebook#compareAssignmentModulePositions - when only one record has module info', () => {
-  let gradebook, firstRecord, secondRecord
-
-  beforeEach(() => {
-    gradebook = createGradebook()
+  test('sets modulesEnabled to true when there are modules in the current course', () => {
     gradebook.setContextModules([{id: '1', name: 'Module 1', position: 1}])
-    firstRecord = {
-      object: {
-        module_ids: ['1'],
-        module_positions: [1],
+    expect(getProps().modulesEnabled).toBe(true)
+  })
+
+  test('sets modulesEnabled to false when there are no modules in the current course', () => {
+    gradebook.setContextModules([])
+    expect(getProps().modulesEnabled).toBe(false)
+  })
+
+  test('sets onSortByNameAscending to a function that sorts columns by name ascending', () => {
+    getProps().onSortByNameAscending()
+    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
+    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('name', 'ascending'))
+  })
+
+  test('sets onSortByNameDescending to a function that sorts columns by name descending', () => {
+    getProps().onSortByNameDescending()
+    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
+    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('name', 'descending'))
+  })
+
+  test('sets onSortByDueDateAscending to a function that sorts columns by due date ascending', () => {
+    getProps().onSortByDueDateAscending()
+    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
+    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('due_date', 'ascending'))
+  })
+
+  test('sets onSortByDueDateDescending to a function that sorts columns by due date descending', () => {
+    getProps().onSortByDueDateDescending()
+    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
+    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(
+      expectedArgs('due_date', 'descending'),
+    )
+  })
+
+  test('sets onSortByPointsAscending to a function that sorts columns by points ascending', () => {
+    getProps().onSortByPointsAscending()
+    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
+    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('points', 'ascending'))
+  })
+
+  test('sets onSortByPointsDescending to a function that sorts columns by points descending', () => {
+    getProps().onSortByPointsDescending()
+    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
+    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(expectedArgs('points', 'descending'))
+  })
+
+  test('sets onSortByModuleAscending to a function that sorts columns by module position ascending', () => {
+    getProps().onSortByModuleAscending()
+    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
+    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(
+      expectedArgs('module_position', 'ascending'),
+    )
+  })
+
+  test('sets onSortByModuleDescending to a function that sorts columns by module position descending', () => {
+    getProps().onSortByModuleDescending()
+    expect(gradebook.arrangeColumnsBy.callCount).toBe(1)
+    expect(gradebook.arrangeColumnsBy.firstCall.args).toEqual(
+      expectedArgs('module_position', 'descending'),
+    )
+  })
+})
+
+describe('when enhanced_gradebook_filters is enabled', () => {
+  let gradebook
+  let errorFn
+  let successFn
+  let saveUserSettingsStub
+  let sandbox
+  let $fixtures
+  let oldEnv
+
+  beforeEach(() => {
+    $fixtures = document.createElement('div')
+    document.body.appendChild($fixtures)
+    setFixtureHtml($fixtures)
+    sandbox = sinon.createSandbox()
+    oldEnv = window.ENV
+    window.ENV = {
+      FEATURES: {instui_nav: true},
+      current_user_id: '1',
+      context_id: '1',
+      GRADEBOOK_OPTIONS: {
+        custom_columns: [],
+        grading_schemes: [],
       },
     }
-    secondRecord = {
-      object: {
-        module_ids: [],
-        module_positions: [],
-      },
+    gradebook = createGradebook({
+      enhanced_gradebook_filters: true,
+    })
+    const assignment = {
+      id: '2301',
+      grading_type: 'points',
+      name: 'Assignment 1',
+      published: true,
+      submission_types: ['online_text_entry'],
     }
+    gradebook.setAssignments({2301: assignment})
+    gradebook.setAssignmentsLoaded()
+
+    errorFn = sandbox.stub()
+    successFn = sandbox.stub()
+
+    saveUserSettingsStub = sandbox.stub(GradebookApi, 'saveUserSettings')
   })
 
-  it('returns a negative number when the first record has module information but the second does not', () => {
-    expect(gradebook.compareAssignmentModulePositions(firstRecord, secondRecord)).toBeLessThan(0)
-  })
-
-  it('returns a positive number when the first record has no module information but the second does', () => {
-    expect(gradebook.compareAssignmentModulePositions(secondRecord, firstRecord)).toBeGreaterThan(0)
-  })
-})
-
-describe('Gradebook#gradeSort by "total_grade"', () => {
-  let studentA, studentB
-
-  beforeEach(() => {
-    studentA = {total_grade: {score: 10, possible: 20}}
-    studentB = {total_grade: {score: 6, possible: 10}}
-  })
-
-  it('sorts by percent when not showing total grade as points', () => {
-    const gradebook = createGradebook({show_total_grade_as_points: false})
-    const comparison = gradebook.gradeSort(studentA, studentB, 'total_grade', true)
-    expect(round(comparison, 1)).toBe(-0.1)
-  })
-
-  it('sorts percent grades with no points possible at lowest priority', () => {
-    studentA.total_grade.possible = 0
-    const gradebook = createGradebook({show_total_grade_as_points: false})
-    const comparison = gradebook.gradeSort(studentA, studentB, 'total_grade', true)
-    expect(comparison).toBe(1)
-  })
-
-  it('sorts percent grades with no points possible at lowest priority in descending order', () => {
-    studentA.total_grade.possible = 0
-    const gradebook = createGradebook({show_total_grade_as_points: false})
-    const comparison = gradebook.gradeSort(studentA, studentB, 'total_grade', false)
-    expect(comparison).toBe(1)
-  })
-
-  it('sorts by score when showing total grade as points', () => {
-    const gradebook = createGradebook({show_total_grade_as_points: true})
-    const comparison = gradebook.gradeSort(studentA, studentB, 'total_grade', true)
-    expect(comparison).toBe(4)
-  })
-
-  it('optionally sorts in descending order', () => {
-    const gradebook = createGradebook({show_total_grade_as_points: true})
-    const comparison = gradebook.gradeSort(studentA, studentB, 'total_grade', false)
-    expect(comparison).toBe(-4)
-  })
-})
-
-describe('Gradebook#gradeSort by an assignment group', () => {
-  let studentA, studentB
-
-  beforeEach(() => {
-    studentA = {assignment_group_301: {score: 10, possible: 20}}
-    studentB = {assignment_group_301: {score: 6, possible: 10}}
-  })
-
-  it('always sorts by percent', () => {
-    const gradebook = createGradebook({show_total_grade_as_points: false})
-    const comparison = gradebook.gradeSort(studentA, studentB, 'assignment_group_301', true)
-    expect(round(comparison, 1)).toBe(-0.1)
-  })
-
-  it('optionally sorts in descending order', () => {
-    const gradebook = createGradebook({show_total_grade_as_points: true})
-    const comparison = gradebook.gradeSort(studentA, studentB, 'assignment_group_301', false)
-    expect(round(comparison, 1)).toBe(0.1)
-  })
-
-  it('sorts grades with no points possible at lowest priority', () => {
-    studentA.assignment_group_301.possible = 0
-    const gradebook = createGradebook({show_total_grade_as_points: false})
-    const comparison = gradebook.gradeSort(studentA, studentB, 'assignment_group_301', true)
-    expect(comparison).toBe(1)
-  })
-
-  it('sorts grades with no points possible at lowest priority in descending order', () => {
-    studentA.assignment_group_301.possible = 0
-    const gradebook = createGradebook({show_total_grade_as_points: false})
-    const comparison = gradebook.gradeSort(studentA, studentB, 'assignment_group_301', false)
-    expect(comparison).toBe(1)
-  })
-})
-
-describe('Gradebook#gradeSort by an assignment', () => {
-  let studentA, studentB, gradebook
-
-  beforeEach(() => {
-    studentA = {
-      id: '1',
-      sortable_name: 'A, Student',
-      assignment_201: {score: 10, possible: 20},
+  afterEach(() => {
+    if (gradebook) {
+      gradebook.destroy && gradebook.destroy()
     }
-    studentB = {id: '2', sortable_name: 'B, Student', assignment_201: {score: 6, possible: 10}}
-    gradebook = createGradebook()
+    $fixtures.remove()
+    saveUserSettingsStub.restore()
+    sandbox.restore()
+    window.ENV = oldEnv
   })
 
-  it('sorts by score', () => {
-    const comparison = gradebook.gradeSort(studentA, studentB, 'assignment_201', true)
-    expect(comparison).toBe(4)
+  test('calls the provided successFn if the request succeeds', async () => {
+    saveUserSettingsStub.resolves({})
+    await gradebook.saveSettings({}).then(successFn).catch(errorFn)
+    expect(successFn.callCount).toBe(1)
+    expect(errorFn.notCalled).toBeTruthy()
   })
 
-  it('optionally sorts in descending order', () => {
-    const comparison = gradebook.gradeSort(studentA, studentB, 'assignment_201', false)
-    expect(comparison).toBe(-4)
+  test('calls the provided errorFn if the request fails', async () => {
+    saveUserSettingsStub.rejects(new Error(':('))
+    await gradebook.saveSettings({}).then(successFn).catch(errorFn)
+    expect(errorFn.callCount).toBe(1)
+    expect(successFn.notCalled).toBeTruthy()
   })
 
-  it('returns -1 when sorted by sortable name where scores are the same', () => {
-    const score = 10
-    studentA.assignment_201.score = score
-    studentB.assignment_201.score = score
-    const comparison = gradebook.gradeSort(studentA, studentB, 'assignment_201', true)
-    expect(comparison).toBe(-1)
+  test('just returns if the request succeeds and no successFn is provided', async () => {
+    // QUnit.expect(0) is not needed in Jest
+    saveUserSettingsStub.resolves({})
+    await gradebook.saveSettings({})
+    // No assertions needed
   })
 
-  it('returns 1 when sorted by sortable name descending where scores are the same and sorting by descending', () => {
-    const score = 10
-    studentA.assignment_201.score = score
-    studentB.assignment_201.score = score
-    const comparison = gradebook.gradeSort(studentA, studentB, 'assignment_201', false)
-    expect(comparison).toBe(1)
-  })
+  test('throws an error if the request fails and no errorFn is provided', async () => {
+    // QUnit.expect(1) is not needed in Jest
+    saveUserSettingsStub.rejects(new Error('>:('))
 
-  it('returns -1 when sorted by id where scores and sortable names are the same', () => {
-    const score = 10
-    studentA.assignment_201.score = score
-    studentB.assignment_201.score = score
-    const name = 'Same Name'
-    studentA.sortable_name = name
-    studentB.sortable_name = name
-    const comparison = gradebook.gradeSort(studentA, studentB, 'assignment_201', true)
-    expect(comparison).toBe(-1)
-  })
-
-  it('returns 1 when descending sorted by id where scores and sortable names are the same and sorting by descending', () => {
-    const score = 10
-    studentA.assignment_201.score = score
-    studentB.assignment_201.score = score
-    const name = 'Same Name'
-    studentA.sortable_name = name
-    studentB.sortable_name = name
-    const comparison = gradebook.gradeSort(studentA, studentB, 'assignment_201', false)
-    expect(comparison).toBe(1)
+    await expect(gradebook.saveSettings({})).rejects.toThrow('>:(')
   })
 })

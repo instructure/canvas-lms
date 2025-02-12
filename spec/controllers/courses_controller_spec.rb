@@ -1289,6 +1289,15 @@ describe CoursesController do
       expect(session[:become_user_id]).to be_nil
     end
 
+    it "redirects to the modules page for horizon courses" do
+      user_session(@teacher)
+      Account.site_admin.enable_feature!(:horizon_course_setting)
+      @course.update!(horizon_course: true)
+
+      get "show", params: { id: @course.id }
+      expect(response).to redirect_to("#{course_url(@course)}/modules")
+    end
+
     it "allows student view student to view unpublished courses" do
       @course.update_attribute :workflow_state, "claimed"
       user_session(@teacher)
@@ -3337,35 +3346,35 @@ describe CoursesController do
       context "logging master courses and course pacing" do
         before do
           Account.default.enable_feature!(:course_paces)
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
         end
 
         it "does not increment the counter when course pacing is not enabled" do
           put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
-          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.blueprint_course")
+          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.paced.blueprint_course")
         end
 
         it "increments the counter when course pacing is already enabled" do
           put "update", params: { id: @course.id, course: { enable_course_paces: "1" } }, format: "json"
           put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
-          expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.blueprint_course").once
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.blueprint_course").once
         end
 
         it "increments the counter when course pacing is enabled at the same time as blueprint" do
           put "update", params: { id: @course.id, course: { blueprint: "1", enable_course_paces: "1" } }, format: "json"
-          expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.blueprint_course").once
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.blueprint_course").once
         end
 
         it "increments the counter when course pacing is enabled after blueprint has already been enabled" do
           put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
           put "update", params: { id: @course.id, course: { enable_course_paces: "1" } }, format: "json"
 
-          expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.blueprint_course")
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.blueprint_course")
         end
 
         it "does not increment the count if a random course items is updated" do
           put "update", params: { id: @course.id, course: { course_format: "online" } }, format: "json"
-          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.blueprint_course")
+          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.paced.blueprint_course")
         end
       end
     end

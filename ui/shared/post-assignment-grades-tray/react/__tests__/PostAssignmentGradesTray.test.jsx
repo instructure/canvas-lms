@@ -434,10 +434,7 @@ describe('PostAssignmentGradesTray', () => {
           await waitForTrayToOpen()
           await userEvent.click(screen.getByRole('checkbox', {name: /specific sections/i}))
           await userEvent.click(screen.getByRole('button', {name: 'Post'}))
-          expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
-            message: 'At least one section must be selected to post grades by section.',
-            type: 'error',
-          })
+          expect(screen.getByText('Please select at least one option')).toBeInTheDocument()
         })
 
         it('shows success message when sections are selected and posting succeeds', async () => {

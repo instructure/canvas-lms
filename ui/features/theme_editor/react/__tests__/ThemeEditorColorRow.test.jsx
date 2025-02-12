@@ -56,12 +56,14 @@ describe('ThemeEditorColorRow Component', () => {
     rerender(<ThemeEditorColorRow {...invalidProps} />)
     const input = screen.getByRole('textbox')
     input.focus()
-    expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(screen.getByTestId('warning-message')).toBeInTheDocument()
 
     // Test invalid and not focused
     input.blur()
-    expect(screen.getByRole('alert')).toBeInTheDocument()
-    expect(screen.getByRole('alert')).toHaveTextContent("'invalid-color' is not a valid color.")
+    expect(screen.getByTestId('warning-message')).toBeInTheDocument()
+    expect(screen.getByTestId('warning-message')).toHaveTextContent(
+      "'invalid-color' is not a valid color.",
+    )
   })
 
   it('validates color values correctly', async () => {

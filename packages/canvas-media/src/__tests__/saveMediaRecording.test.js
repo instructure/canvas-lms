@@ -23,6 +23,7 @@ import saveMediaRecording, {
   saveClosedCaptions,
   saveClosedCaptionsForAttachment,
 } from '../saveMediaRecording'
+import {vi} from 'vitest'
 
 function mediaServerSession() {
   return {
@@ -70,7 +71,7 @@ describe('saveMediaRecording', () => {
       status: 500,
       response: {error: 'womp womp'},
     })
-    const doneFunction = jest.fn()
+    const doneFunction = vi.fn()
     sinon.stub(K5Uploader.prototype, 'loadUiConf').callsFake(() => 'mock')
     await saveMediaRecording({}, rcsConfig, doneFunction)
     expect(doneFunction).toHaveBeenCalledTimes(1)
@@ -82,8 +83,8 @@ describe('saveMediaRecording', () => {
       status: 200,
       response: mediaServerSession(),
     })
-    const doneFunction = jest.fn()
-    const progressFunction = jest.fn()
+    const doneFunction = vi.fn()
+    const progressFunction = vi.fn()
     return saveMediaRecording({}, rcsConfig, doneFunction, progressFunction).then(uploader => {
       uploader.dispatchEvent('K5.fileError', {error: 'womp womp'}, uploader)
       expect(doneFunction).toHaveBeenCalledTimes(1)
@@ -96,9 +97,9 @@ describe('saveMediaRecording', () => {
       status: 200,
       response: mediaServerSession(),
     })
-    const doneFunction = jest.fn()
-    const progressFunction = jest.fn()
-    const uploadFileFunc = jest.fn()
+    const doneFunction = vi.fn()
+    const progressFunction = vi.fn()
+    const uploadFileFunc = vi.fn()
     return saveMediaRecording({file: 'thing'}, rcsConfig, doneFunction, progressFunction).then(
       uploader => {
         uploader.uploadFile = uploadFileFunc
@@ -114,9 +115,9 @@ describe('saveMediaRecording', () => {
       status: 200,
       response: mediaServerSession(),
     })
-    const doneFunction = jest.fn()
-    const progressFunction = jest.fn()
-    const uploadFileFunc = jest.fn()
+    const doneFunction = vi.fn()
+    const progressFunction = vi.fn()
+    const uploadFileFunc = vi.fn()
     return saveMediaRecording({file: 'thing'}, rcsConfig, doneFunction, progressFunction).then(
       uploader => {
         uploader.uploadFile = uploadFileFunc
@@ -181,8 +182,8 @@ describe('saveMediaRecording', () => {
       status: 200,
       response: {data: 'media object data'},
     })
-    const doneFunction2 = jest.fn()
-    const progressFunction = jest.fn()
+    const doneFunction2 = vi.fn()
+    const progressFunction = vi.fn()
     return saveMediaRecording(
       {file: 'thing', type: 'video/mp4'},
       rcsConfig,
@@ -204,8 +205,8 @@ describe('saveMediaRecording', () => {
       status: 200,
       response: {data: 'media object data'},
     })
-    const doneFunction2 = jest.fn()
-    const progressFunction = jest.fn()
+    const doneFunction2 = vi.fn()
+    const progressFunction = vi.fn()
     return saveMediaRecording({file: 'thing'}, rcsConfig, doneFunction2, progressFunction).then(
       async uploader => {
         uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
@@ -229,8 +230,8 @@ describe('saveMediaRecording', () => {
       status: 500,
       response: {error: 'womp womp'},
     })
-    const doneFunction2 = jest.fn()
-    const progressFunction = jest.fn()
+    const doneFunction2 = vi.fn()
+    const progressFunction = vi.fn()
     return saveMediaRecording({file: 'thing'}, rcsConfig, doneFunction2, progressFunction).then(
       async uploader => {
         uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
@@ -253,8 +254,8 @@ describe('saveMediaRecording', () => {
       status: 500,
       response: {error: 'womp womp'},
     })
-    const doneFunction2 = jest.fn()
-    const progressFunction = jest.fn()
+    const doneFunction2 = vi.fn()
+    const progressFunction = vi.fn()
     return saveMediaRecording({file: 'thing'}, rcsConfig, doneFunction2, progressFunction).then(
       async uploader => {
         uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)

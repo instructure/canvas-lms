@@ -190,7 +190,7 @@ describe ExternalToolsController do
 
         it 'sets the "login_hint" to the current user lti id' do
           subject
-          expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::Asset.opaque_identifier_for(@teacher)
+          expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::V1p1::Asset.opaque_identifier_for(@teacher)
         end
 
         it "caches the the LTI 1.3 launch" do
@@ -2075,7 +2075,8 @@ describe ExternalToolsController do
       include_context "lti_1_3_spec_helper"
 
       let(:tool_id) { (response.status == 200) ? response.parsed_body["id"] : -1 }
-      let(:developer_key) { dev_key_model_1_3(account:, settings:) }
+      let_once(:tool_configuration) { lti_tool_configuration_model(developer_key: developer_key) }
+      let_once(:developer_key) { lti_developer_key_model(account:) }
       let_once(:user) { account_admin_user(account:) }
       let_once(:account) { account_model }
       let(:params) do
@@ -2210,8 +2211,8 @@ describe ExternalToolsController do
       end
 
       context "create via client id" do
-        include_context "lti_1_3_spec_helper"
-        let(:developer_key) { dev_key_model_1_3(account: @course.account, settings:) }
+        let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:) }
+        let_once(:developer_key) { lti_developer_key_model(account: @course.account) }
 
         before do
           tool = developer_key.lti_registration.new_external_tool(@course)
@@ -3105,7 +3106,7 @@ describe ExternalToolsController do
         end
 
         let(:user) { @shard2.activate { user_model(name: "cross-shard user") } }
-        let(:developer_key) { dev_key_model_1_3(account:) }
+        let(:developer_key) { lti_developer_key_model(account:).tap { |dk| lti_tool_configuration_model(developer_key: dk) } }
         let(:account) { Account.default }
         let(:tool_root_account) { account_model }
         let(:access_token) { pseudonym(user).user.access_tokens.create(purpose: "test") }
@@ -3305,9 +3306,9 @@ describe ExternalToolsController do
 
   def opaque_id(asset)
     if asset.respond_to?(:lti_context_id)
-      Lti::Asset.global_context_id_for(asset)
+      Lti::V1p1::Asset.global_context_id_for(asset)
     else
-      Lti::Asset.context_id_for(asset)
+      Lti::V1p1::Asset.context_id_for(asset)
     end
   end
 

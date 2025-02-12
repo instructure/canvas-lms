@@ -1,30 +1,30 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`data returns the proper object 1`] = `
-Object {
+{
   "header": "none",
 }
 `;
 
 exports[`form returns the proper object 1`] = `
-Array [
-  Object {
+[
+  {
     "dataKey": "header",
     "label": "Set table header",
-    "options": Array [
-      Array [
+    "options": [
+      [
         "none",
         "No headers",
       ],
-      Array [
+      [
         "row",
         "Header row",
       ],
-      Array [
+      [
         "col",
         "Header column",
       ],
-      Array [
+      [
         "both",
         "Header row and column",
       ],

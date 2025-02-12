@@ -20,6 +20,7 @@ import React, {useCallback, useState} from 'react'
 
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {uid} from '@instructure/uid'
 import {type QuestionChoice} from '../../../../../assets/data/quizQuestions'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -33,6 +34,7 @@ type MultipleChoiceQuestionProps = {
 const MultipleChoiceQuestion = ({question, onAnswerChange}: MultipleChoiceQuestionProps) => {
   const [correctAnswer] = useState<string>(question.scoring_data.value)
   const [answer, setAnswer] = useState<string | undefined>(undefined)
+  const [qid] = useState<string>(uid('question', 2))
 
   const handleAnswerChange = useCallback(
     (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
@@ -47,7 +49,7 @@ const MultipleChoiceQuestion = ({question, onAnswerChange}: MultipleChoiceQuesti
       <div style={{margin: '0 0 .75rem'}} dangerouslySetInnerHTML={{__html: question.item_body}} />
       <RadioInputGroup
         description={<ScreenReaderContent>{I18n.t('Choose one')}</ScreenReaderContent>}
-        name={`question-${question.id}`}
+        name={qid}
         value={answer}
         onChange={handleAnswerChange}
         key={`question-${question.id}`}

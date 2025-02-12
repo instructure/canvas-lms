@@ -23,7 +23,6 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   self.plugin = :microsoft
   plugin_settings :application_id, application_secret: :application_secret_dec
 
-  SENSITIVE_PARAMS = [:application_secret].freeze
   # Tenant IDs are always GUIDs, but we will translate the GUID for
   # the Microsoft personal account tenant to "microsoft" for ease
   # of identification. "guests" and "common" are special cases that
@@ -60,8 +59,12 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     super - open_id_connect_params + %i[tenant login_attribute jit_provisioning tenants].freeze
   end
 
+  def self.sensitive_params
+    [*super, :application_secret].freeze
+  end
+
   def self.login_attributes
-    %w[tid+oid sub email oid preferred_username].freeze
+    %w[tid+oid sub email oid preferred_username upn].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
@@ -72,6 +75,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
       preferred_username
       oid
       sub
+      upn
     ].freeze
   end
 
@@ -147,7 +151,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   def scope
     result = []
     requested_attributes = [login_attribute] + federated_attributes.values.pluck("attribute")
-    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username tid+oid])
+    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username tid+oid upn])
     result << "email" if requested_attributes.include?("email")
     result.join(" ")
   end

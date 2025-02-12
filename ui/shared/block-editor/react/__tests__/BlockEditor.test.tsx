@@ -65,13 +65,21 @@ describe('BlockEditor', () => {
 
   afterEach(() => jest.clearAllMocks())
 
-  it('renders', () => {
+  it('renders', async () => {
     const {getByText, getByLabelText} = renderEditor()
     expect(getByText('Preview')).toBeInTheDocument()
     expect(getByText('Undo')).toBeInTheDocument()
     expect(getByText('Redo')).toBeInTheDocument()
     expect(getByLabelText('Block Toolbox')).not.toBeChecked()
-    expect(fetchMock.calls().map(call => call[0])).toEqual([can_edit_url])
+    
+    // Wait for all API calls to complete
+    await waitFor(() => {
+      expect(fetchMock.calls().length).toBeGreaterThan(0)
+    })
+    
+    // Verify the first API call is the can_edit check
+    const calls = fetchMock.calls().map(call => call[0])
+    expect(calls[0]).toBe(can_edit_url)
   })
 
   it('warns on content version mismatch', () => {

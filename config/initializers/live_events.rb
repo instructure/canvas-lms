@@ -36,6 +36,7 @@ Rails.configuration.to_prepare do
   LiveEvents.cache = Rails.cache
   LiveEvents.statsd = InstStatsd::Statsd
   LiveEvents.max_queue_size = -> { Setting.get("live_events_max_queue_size", 5000).to_i }
+  LiveEvents.retry_throttled_events = -> { Setting.get("live_events_retry_throttled_events", true) == true }
   LiveEvents.settings = -> { YAML.safe_load(DynamicSettings.find(tree: :private, default_ttl: 2.hours)["live_events.yml", failsafe_cache: Rails.root.join("config")] || "{}") }
   LiveEvents.aws_credentials = lambda do |settings|
     if settings["vault_credential_path"]

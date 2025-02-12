@@ -70,7 +70,7 @@ def getLocalWorkDir() {
 }
 
 def isPatchsetPublishable() {
-  env.PUBLISH_PATCHSET_IMAGE == "1"
+  env.PUBLISH_PATCHSET_IMAGE == '1'
 }
 
 def isPatchsetRetriggered() {
@@ -117,7 +117,7 @@ def postFn(status) {
       }
     }
 
-    build(job: "/Canvas/helpers/junit-uploader", parameters: [
+    build(job: '/Canvas/helpers/junit-uploader', parameters: [
       string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
       string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
       string(name: 'SOURCE', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
@@ -329,11 +329,11 @@ pipeline {
                 // vote. Work around this by disabling the build start message and setting EMULATE_BUILD_START=1
                 // in the Build Parameters section.
                 // https://issues.jenkins.io/browse/JENKINS-28339
-                if (commitMessageFlag("emulate-build-start") as Boolean) {
-                  submitGerritReview("", "Build Started ${RUN_DISPLAY_URL}")
+                if (commitMessageFlag('emulate-build-start') as Boolean) {
+                  submitGerritReview('', "Build Started ${RUN_DISPLAY_URL}")
                 }
 
-                if (commitMessageFlag("skip-ci") as Boolean) {
+                if (commitMessageFlag('skip-ci') as Boolean) {
                   currentBuild.result = 'NOT_BUILT'
                   submitGerritReview('--label Lint-Review=-2', 'Build not executed due to [skip-ci] flag')
                   error '[skip-ci] flag enabled: skipping the build'
@@ -455,7 +455,7 @@ pipeline {
                         finalStep
                       ]
 
-                      buildDockerImageStage.patchsetImage(asyncSteps.join("\n"))
+                      buildDockerImageStage.patchsetImage(asyncSteps.join('\n'))
                     }
 
                   extendedStage(filesChangedStage.STAGE_NAME_POST_BUILD)
@@ -473,7 +473,7 @@ pipeline {
                   extendedStage('Generate Crystalball Prediction')
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
-                    .required(!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master")
+                    .required(!configuration.isChangeMerged() && env.GERRIT_REFSPEC != 'refs/heads/master')
                     .timeout(2)
                     .execute { stageConfig, buildConfig ->
                       if (filesChangedStage.hasErbFiles(buildConfig)) {
@@ -518,7 +518,7 @@ pipeline {
                     .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && sh(script: "${WORKSPACE}/build/new-jenkins/locales-changes.sh", returnStatus: true) == 0)
                     .execute {
                         submitGerritReview('--label Lint-Review=-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
-                      }
+                    }
 
                   extendedStage('Webpack Bundle Size Check')
                     .hooks(buildSummaryReportHooks.call())
@@ -595,6 +595,18 @@ pipeline {
                   parallel(nestedStages)
                 }
 
+                extendedStage('Javascript (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
+                  def nestedStages = [:]
+
+                  extendedStage('Javascript')
+                    .hooks(buildSummaryReportHooks.withRunManifest(true))
+                    .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
+                      string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
+                    ])
+
+                  parallel(nestedStages)
+                }
+
                 extendedStage('Linters (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(LINTERS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
                   extendedStage('Linters - Dependency Check')
                     .nodeRequirements(label: nodeLabel(), podTemplate: dependencyCheckStage.nodeRequirementsTemplate(), container: 'dependency-check')
@@ -632,7 +644,7 @@ pipeline {
 
                   // Trigger Crystalball map build if spec files were added or removed, will not vote on builds.
                   // Only trigger for main-postmerge job.
-                  if (env.JOB_NAME == "Canvas/main-postmerge" && configuration.isChangeMerged() && filesChangedStage.hasNewDeletedSpecFiles(buildConfig)) {
+                  if (env.JOB_NAME == 'Canvas/main-postmerge' && configuration.isChangeMerged() && filesChangedStage.hasNewDeletedSpecFiles(buildConfig)) {
                     build(wait: false, job: 'Canvas/helpers/crystalball-map')
                   }
 

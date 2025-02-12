@@ -83,7 +83,7 @@ const useFetchAssignees = ({
     const defaultOptions = everyoneOption ? [everyoneOption] : []
     if (courseSettingsIsSuccess) {
       const courseSettings = fetchedCourseSettings?.json as {conditional_release: boolean}
-      if (courseSettings.conditional_release) {
+      if (courseSettings?.conditional_release) {
         defaultOptions.push({id: 'mastery_paths', value: I18n.t('Mastery Paths')})
       }
     } else if (fetchedCourseSettings) {

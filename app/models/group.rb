@@ -109,6 +109,8 @@ class Group < ActiveRecord::Base
     record.errors.add attr, t(:greater_than_1, "Must be greater than 1") unless value.to_i > 1
   end
 
+  validates_with HorizonValidators::GroupValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
+
   def refresh_group_discussion_topics
     if group_category
       group_category.discussion_topics.active.each(&:update_subtopics)

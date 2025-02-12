@@ -67,6 +67,8 @@ export default class CreateDSRModal extends React.Component {
 
   state = {...initialState}
 
+  requestRef = React.createRef()
+
   UNSAFE_componentWillMount() {
     this.setState(
       update(this.state, {
@@ -127,10 +129,13 @@ export default class CreateDSRModal extends React.Component {
 
   onChange = (field, value) => {
     this.setState(prevState => {
-      const newState = update(prevState, {
+      let newState = update(prevState, {
         data: unflatten({[field]: {$set: value}}),
         errors: {$set: {}},
       })
+      if (value === "" || value === undefined) {
+        newState = update(newState, {errors: {[field]: {$set: [I18n.t('Request name is required')]}}})
+      }
       return newState
     })
   }
@@ -138,7 +143,10 @@ export default class CreateDSRModal extends React.Component {
   close = () => this.setState({open: false})
 
   onSubmit = () => {
-    if (!isEmpty(this.state.errors)) return
+    if (!isEmpty(this.state.errors)) {
+      this.requestRef.current.focus()
+      return
+    }
     const url = `/api/v1/accounts/${this.props.accountId}/users/${this.props.user.id}/dsr_request`
     const method = 'POST'
 
@@ -160,7 +168,7 @@ export default class CreateDSRModal extends React.Component {
         $.flashError(I18n.t('Something went wrong creating the DSR request.'))
         this.setState({
           errors: {
-            request_name: ['Invalid request name'],
+            request_name: [I18n.t('Invalid request name')],
           },
         })
       },
@@ -187,6 +195,7 @@ export default class CreateDSRModal extends React.Component {
     <span>
       <Modal
         as="form"
+        noValidate={true}
         onSubmit={preventDefault(this.onSubmit)}
         open={this.state.open}
         onDismiss={this.close}
@@ -198,6 +207,7 @@ export default class CreateDSRModal extends React.Component {
             <Flex.Item padding="small medium">
               <TextInput
                 key="request_name"
+                ref={this.requestRef}
                 renderLabel={I18n.t('DSR Request Name')}
                 label={I18n.t('DSR Request Name')}
                 data-testid={I18n.t('DSR Request Name')}
@@ -205,7 +215,7 @@ export default class CreateDSRModal extends React.Component {
                 onChange={e => this.onChange('request_name', e.target.value)}
                 isRequired={true}
                 messages={(this.state.errors.request_name || [])
-                  .map(errMsg => ({type: 'error', text: errMsg}))
+                  .map(errMsg => ({type: 'newError', text: errMsg}))
                   .filter(Boolean)}
               />
             </Flex.Item>
@@ -251,8 +261,7 @@ export default class CreateDSRModal extends React.Component {
       {React.Children.map(this.props.children, child =>
         // when you click whatever is the child element to this, open the modal
         React.cloneElement(child, {
-          onClick: (...args) => {
-            if (child.props.onClick) child.props.onClick(...args)
+          onClick: () => {
             this.setState({open: true})
           },
         }),

@@ -282,20 +282,6 @@ describe "context modules" do
         .to eq "Prerequisites: #{@module1.name}, #{@module2.name}"
     end
 
-    it "does not have a prerequisites section when creating the first module" do
-      Account.site_admin.disable_feature! :selective_release_ui_api
-      get "/courses/#{@course.id}/modules"
-
-      form = new_module_form
-      expect(f(".prerequisites_entry", form)).not_to be_displayed
-      replace_content(form.find_element(:id, "context_module_name"), "first")
-      submit_form(form)
-      wait_for_ajaximations
-
-      form = new_module_form
-      expect(f(".prerequisites_entry", form)).to be_displayed
-    end
-
     it "rearranges modules" do
       m1 = @course.context_modules.create!(name: "module 1")
       m2 = @course.context_modules.create!(name: "module 2")
@@ -312,20 +298,6 @@ describe "context modules" do
       expect(m1.position).to eq 2
       m2.reload
       expect(m2.position).to eq 1
-    end
-
-    it "validates locking a module item display functionality without differentiated modules" do
-      Account.site_admin.disable_feature! :selective_release_ui_api
-
-      get "/courses/#{@course.id}/modules"
-      add_form = new_module_form
-      lock_check_click
-      wait_for_ajaximations
-      expect(add_form.find_element(:css, ".unlock_module_at_details")).to be_displayed
-      # verify unlock
-      lock_check_click
-      wait_for_ajaximations
-      expect(add_form.find_element(:css, ".unlock_module_at_details")).not_to be_displayed
     end
 
     it "validates locking a module item display functionality with differentiated modules" do

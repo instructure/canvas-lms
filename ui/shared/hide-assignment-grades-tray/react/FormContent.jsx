@@ -41,6 +41,7 @@ export default function FormContent({
   sectionSelectionChanged,
   sections,
   selectedSectionIds,
+  showSectionValidation,
 }) {
   if (hidingGrades) {
     return (
@@ -64,6 +65,7 @@ export default function FormContent({
           sections={sections}
           sectionSelectionChanged={sectionSelectionChanged}
           selectedSectionIds={selectedSectionIds}
+          showSectionValidation={showSectionValidation}
         />
       )}
 
@@ -84,7 +86,12 @@ export default function FormContent({
           </Flex.Item>
 
           <Flex.Item>
-            <Button onClick={onHideClick} disabled={!gradesPublished} color="primary">
+            <Button
+              onClick={onHideClick}
+              disabled={!gradesPublished}
+              color="primary"
+              data-testid="hide-grades-button"
+            >
               {I18n.t('Hide')}
             </Button>
           </Flex.Item>

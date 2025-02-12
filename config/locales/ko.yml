@@ -1414,6 +1414,7 @@ ko:
       details: "세부 정보"
       login: 로그인
     no_text: "텍스트 없음"
+  alert_d2c8ef98: 알림
   alerts: 
     alert: 
       buttons: 
@@ -1473,6 +1474,8 @@ ko:
   allow_self_sign_up_7520f8c5: "직접 등록 허용"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "달력 행사 복제 허용하기"
   always_3a59e701: 항상
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사, 계정 관리자에게 보냅니다."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사에게 보냅니다."
   an_integer_value_is_required_e073bd46: "정수 값이 필요함"
   analytics: 
     course: 
@@ -1790,6 +1793,7 @@ ko:
       save: 저장
       validating: "저장 중..."
       weight_groups: "과제 그룹을 바탕으로 최종 평가를 가중"
+    assignment_submit_success: "과제를 성공적으로 제출했습니다."
     assignments_list_right_side: 
       links: 
         manage_assignments: "과제 관리"
@@ -4151,6 +4155,7 @@ ko:
       turnitin_comments: "Turnitin 설명"
   course_members_are_free_to_join_9b2603d4: "과목 구성원은 자유롭게 참여"
   course_navigation_dd035109: "과목 탐색"
+  course_quota_8f7f74c: "과목 할당량"
   course_restore: 
     restore_error: "과목 복원을 시도하는 중에 오류가 발생했습니다. 과목이 복원되지 않았습니다."
   course_rubrics_881dcf0: "과목 루브릭"
@@ -4678,6 +4683,7 @@ ko:
     unauthorized: 
       invalid_link: "사용한 등록 링크가 더 이상 유효하지 않은 것으로 보입니다. 과목 강사에게 문의하여 올바르게 등록되었는지 확인하시기 바랍니다."
   courses_43204aae: 과목
+  create_an_eportfolio_1841e34a: "ePortfolio 만들기"
   create_course_9a69b32c: "과목 만들기"
   create_course_9dc5b61a: "과목 만들기"
   create_discussion_topics_8330d52b: "토론 주제 만들기"
@@ -4965,6 +4971,7 @@ ko:
       second: 초
       year: 년
   debugging_f98fcd74: 디버깅
+  default_account_quotas_e34112fd: "기본 계정 할당량"
   default_conference_title: "%{course_name} 회의"
   default_question_name: 문제
   default_question_text: "질문 텍스트"
@@ -5357,6 +5364,7 @@ ko:
   e_mail_only_2cc5e513: 이메일만
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege 변환기"
+  edit_alert_739bb0ba: "알림 편집"
   edit_and_delete_their_own_posts_f4f7cc6: "자신의 게시물을 편집하거나 삭제"
   edit_assignment_group_c04c4af0: "과제 그룹 편집"
   edit_c5fbea07: 편집
@@ -6064,6 +6072,7 @@ ko:
     titles: 
       bookmark_search: "북마크 검색: %{service_name}"
   find_a_course_94301b4d: "과목 찾기"
+  find_course_or_group_a7de09a4: "과목이나 그룹 찾기"
   find_flickr_image_view: 
     find_cc_on_flickr: "Flickr에서 크리에이티브 커먼즈 이미지 찾기"
     search: 검색
@@ -6646,6 +6655,7 @@ ko:
     name_unavailable: "%{name}은(는) 이미 사용 중입니다."
     self_signup_for_courses: "자동 등록은 과목 그룹이나 커뮤니티를 대상으로만 사용할 수 있음"
   group_files_82e5dcdb: "그룹 파일"
+  group_id_b0f6af89: "그룹 ID"
   group_membership: 
     errors: 
       group_full: "그룹이 꽉 찼습니다."
@@ -6653,6 +6663,7 @@ ko:
   group_name_b69c144: "그룹 이름"
   group_name_group_calendar_7f10e0ed: "%{group_name} - 그룹 달력"
   group_pages_656556f3: "그룹 페이지"
+  group_quota_290dbc6b: "그룹 할당량"
   group_set_4d1e7b06: "그룹 집합"
   group_settings: 
     invitation_sent: "초대 보냄"
@@ -7438,6 +7449,7 @@ ko:
       ellipsis: "..."
       quoted_text_toggle: "인용된 텍스트 표시"
       word_separator: " "
+  license_bdede4fb: 라이선스
   license_help: 
     content_license_help: "내용 라이선싱 도움말"
   link_7262adec: Link
@@ -7595,6 +7607,7 @@ ko:
   manage_profile_pictures_40c958ce: "프로필 사진 관리"
   manual_entry_e4a4f99a: "수동 항목"
   manually_mark_posts_as_read_afa5d035: "게시물을 읽은 것으로 표시"
+  manually_settable_quotas_ea3759e7: "수동으로 설정할 수 있는 할당량"
   mark_all_as_read_8f3bdf57: "모두 읽음으로 표시"
   mark_all_as_unread_a435be3d: "모두 읽지 않음으로 표시"
   mark_as_read_47ec83dd: "읽음으로 표시"
@@ -7680,6 +7693,7 @@ ko:
   media_objects: 
     media_objects_not_configured: "미디어 개체가 구성되지 않음"
   meets_expectations_bb179565: "기대를 만족함"
+  megabytes_885404ef: 메가바이트
   members_af25c21d: 구성원
   members_are_free_to_join_defa5929: "구성원이 자유롭게 참여"
   membership_by_invitation_only_9bc27199: "초대에 의해서만 참여"
@@ -9572,6 +9586,7 @@ ko:
   no_migration_file: "내용 마이그레이션을 위해 필요한 파일입니다."
   no_password_was_given_472222e5: "암호가 없음"
   no_points_possible_368669d: "가능한 점수 없음"
+  no_preview_available_e8e71199: "미리 보기 없음"
   no_results_3cda4e72: "결과 없음"
   no_results_found_2ace1494: "찾은 결과 없음"
   no_results_found_58717065: "결과 없음"
@@ -9579,6 +9594,7 @@ ko:
   no_students_have_taken_the_quiz_yet_e667644b: "어떤 학생도 이 퀴즈를 치르지 않음"
   no_students_have_taken_the_survey_yet_d378cd35: "어떤 학생도 이 설문을 치르지 않음"
   no_submission_fb131a40: "제출물 없음"
+  no_teacher_interaction_de8d91bc: "교사 상호 작용 없음"
   no_time_limit_for_long_running_conferences_d49fdfad: "시간 제한 없음(장기 회의)"
   not_deleted_2a7f63ef: "(삭제 안 됨)"
   not_installed_37a21a76: "설치 안 됨"
@@ -12284,6 +12300,7 @@ ko:
   run_report_743fdf5f: "보고서 실행"
   running_totals_d6f45b6b: "누적 합계"
   save_11a80ec3: 저장
+  save_alert_b64f9fa3: "알림 저장"
   save_key_b4dede06: "키 저장"
   save_login_bba1272: "로그인 저장"
   save_settings_cafe79a5: "설정 저장"
@@ -13546,9 +13563,11 @@ ko:
   submitted_318fad53: 제출됨
   submitted_b37e2ff0: 제출일
   submitted_d5ba370a: "제출:"
+  submitting_b90fac62: "제출 중..."
   subscribe_4b301fb7: 구독
   subscribed_fe74d22a: 구독함
   substitution_713c65b9: 대체
+  suggestions_b8b03b9d: "제안:"
   support: 
     array: 
       last_word_connector: ", "
@@ -14000,6 +14019,8 @@ ko:
   unauthorized: "권한이 없음"
   underline_all_links_description: "링크 밑줄 치기는 탐색 메뉴, 대시보드, 페이지 사이드바에 있는 링크들을 *밑줄 친* 문자열로 표시합니다. 이 기능은  사용자가 서식 있는 내용 편집기에서 생성한 항목 링크들에 적용되는 기능이 아닙니다. 그것들은 모든 사용자에게 항상 밑줄 친 문자열로 표시합니다."
   underline_links_e7cf9b4f: "링크 밑줄 치기"
+  ungraded_submissions_count_63fcf6d1: "평가 안 된 제출물 (개수)"
+  ungraded_submissions_time_bafaa609: "평가 안 된 제출물 (시간)"
   ungraded_survey_ad7de790: "평가 안 된 설문"
   unknown: "알 수 없음"
   unknown_47a3b725: "알 수 없음"
@@ -14021,7 +14042,9 @@ ko:
   update_details_6abfed16: "세부 정보 업데이트"
   update_module_b984c2e5: "모듈 업데이트"
   update_password_4bc5cb1f: "암호 업데이트"
+  update_quota_81381226: "할당량 업데이트"
   update_settings_9b422d0f: "설정 업데이트"
+  updating_73d0718c: "업데이트 중..."
   updating_user_details_b8520b3e: "사용자 세부 정보 업데이트 중..."
   upload_8b403d05: 업로드
   upload_a_picture_9f5f6e3c: "사진 업로드"
@@ -14174,6 +14197,7 @@ ko:
       profile: 프로필
       settings: 설정
   user_profile_picture_46bffbc7: "사용자 프로필 사진"
+  user_quota_12cb58b7: "사용자 할당량"
   user_s_settings_d65644b4: "%{user}의 설정"
   user_service: 
     descriptions: 

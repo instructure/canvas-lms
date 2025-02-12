@@ -23,7 +23,7 @@ import {toQueryString} from '@instructure/query-string-encoding'
 import type {QueryParameterRecord} from '@instructure/query-string-encoding/index.d'
 import z from 'zod'
 
-const jsonRegEx = new RegExp('^application/json', 'i')
+const jsonRegEx = /^application\/json/i
 
 function constructRelativeUrl({
   path,

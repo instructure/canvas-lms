@@ -109,19 +109,38 @@ module GradebookCommon
   def set_checkpoints_default_grade(reply_to_topic_value, reply_to_entry_value)
     move_to_click('[data-menu-item-id="set-default-grade"]')
     dialog = find_with_jquery(".ui-dialog:visible")
-    f("input[name=reply_to_topic_input]").send_keys(reply_to_topic_value)
-    f("input[name=reply_to_entry_input]").send_keys(reply_to_entry_value)
+    ff("[data-testid='default-grade-input']")[0].send_keys(reply_to_topic_value)
+    ff("[data-testid='default-grade-input']")[1].send_keys(reply_to_entry_value)
     submit_dialog(dialog, ".ui-button")
     accept_alert
+  end
+
+  def select_pass_fail_type(value)
+    if value == "Complete"
+      "complete-dropdown-option"
+    elsif value == "Incomplete"
+      "incomplete-dropdown-option"
+    elsif value == "---"
+      "empty-dropdown-option"
+    end
   end
 
   def set_checkpoints_default_grade_for_pass_fail(reply_to_topic_value, reply_to_entry_value)
     move_to_click('[data-menu-item-id="set-default-grade"]')
     dialog = find_with_jquery(".ui-dialog:visible")
-    f("input[name=reply_to_topic_input]").click
-    fj("li:contains('#{reply_to_topic_value}')").click
-    f("input[name=reply_to_entry_input]").click
-    fj("li:contains('#{reply_to_entry_value}')").click
+
+    reply_to_topic_select = ff("[data-testid='select-dropdown']")[0]
+    reply_to_topic_select_option = select_pass_fail_type(reply_to_topic_value)
+
+    reply_to_topic_select.click
+    f("[data-testid='#{reply_to_topic_select_option}'").click
+
+    reply_to_entry_select = ff("[data-testid='select-dropdown']")[1]
+    reply_to_entry_select_option = select_pass_fail_type(reply_to_entry_value)
+
+    reply_to_entry_select.click
+    f("[data-testid='#{reply_to_entry_select_option}']").click
+
     submit_dialog(dialog, ".ui-button")
     accept_alert
   end

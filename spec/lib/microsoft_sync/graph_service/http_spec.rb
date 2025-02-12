@@ -45,7 +45,7 @@ describe MicrosoftSync::GraphService::Http do
       WebMock.stub_request(http_method, url).and_return(responses)
 
       allow(InstStatsd::Statsd).to receive(:count).and_call_original
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
     end
 
     let(:http_method) { :get }
@@ -125,7 +125,7 @@ describe MicrosoftSync::GraphService::Http do
         .with("microsoft_sync.graph_service.quota_read",
               1,
               tags: { msft_endpoint: "get_foo", extra_tag: "abc" })
-      expect(InstStatsd::Statsd).to have_received(:increment)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment)
         .with("microsoft_sync.graph_service.success",
               tags: { msft_endpoint: "get_foo", extra_tag: "abc", status_code: "200" })
     end
@@ -150,10 +150,10 @@ describe MicrosoftSync::GraphService::Http do
 
         it 'increments an "expected" counter and not an "error" counter' do
           result
-          expect(InstStatsd::Statsd).to have_received(:increment)
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment)
             .with("microsoft_sync.graph_service.expected",
                   tags: { extra_tag: "abc", msft_endpoint: "get_foo", status_code: "409" })
-          expect(InstStatsd::Statsd).to_not have_received(:increment)
+          expect(InstStatsd::Statsd).to_not have_received(:distributed_increment)
             .with("microsoft_sync.graph_service.error", anything)
         end
 
@@ -162,10 +162,10 @@ describe MicrosoftSync::GraphService::Http do
 
           it 'increments "expected" counters and raises an new error of the class' do
             expect { result }.to raise_error(custom_error_class)
-            expect(InstStatsd::Statsd).to have_received(:increment)
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment)
               .with("microsoft_sync.graph_service.expected",
                     tags: { extra_tag: "abc", msft_endpoint: "get_foo", status_code: "409" })
-            expect(InstStatsd::Statsd).to_not have_received(:increment)
+            expect(InstStatsd::Statsd).to_not have_received(:distributed_increment)
               .with("microsoft_sync.graph_service.error", anything)
           end
         end
@@ -188,10 +188,10 @@ describe MicrosoftSync::GraphService::Http do
 
         it 'raises an error and increments an "error" counter' do
           expect { result }.to raise_error(MicrosoftSync::Errors::HTTPConflict)
-          expect(InstStatsd::Statsd).to have_received(:increment)
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment)
             .with("microsoft_sync.graph_service.error",
                   tags: { extra_tag: "abc", msft_endpoint: "get_foo", status_code: "409" })
-          expect(InstStatsd::Statsd).to_not have_received(:increment)
+          expect(InstStatsd::Statsd).to_not have_received(:distributed_increment)
             .with("microsoft_sync.graph_service.expected", anything)
         end
       end
@@ -216,13 +216,13 @@ describe MicrosoftSync::GraphService::Http do
 
         it 'increments a "retried" statsd counter' do
           subject.request(:post, "foo/bar", body: { hello: "world" })
-          expect(InstStatsd::Statsd).to have_received(:increment).with(
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "microsoft_sync.graph_service.retried",
             tags: { msft_endpoint: "post_foo",
                     extra_tag: "abc",
                     status_code: status_code_statsd_tag }
           )
-          expect(InstStatsd::Statsd).to have_received(:increment).with(
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "microsoft_sync.graph_service.success",
             tags: { msft_endpoint: "post_foo", extra_tag: "abc", status_code: "200" }
           )
@@ -245,13 +245,13 @@ describe MicrosoftSync::GraphService::Http do
 
         it 'fails and increments "retried" and "error" statsd counters' do
           expect { subject.request(:post, "foo/bar", body: { hello: "world" }) }.to raise_error(error_class)
-          expect(InstStatsd::Statsd).to have_received(:increment).with(
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "microsoft_sync.graph_service.retried",
             tags: { msft_endpoint: "post_foo",
                     extra_tag: "abc",
                     status_code: status_code_statsd_tag }
           )
-          expect(InstStatsd::Statsd).to have_received(:increment).with(
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "microsoft_sync.graph_service.intermittent",
             tags: { msft_endpoint: "post_foo",
                     extra_tag: "abc",

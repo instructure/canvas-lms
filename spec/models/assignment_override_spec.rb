@@ -117,6 +117,93 @@ describe AssignmentOverride do
     expect(@override2.set).to eq [@student]
   end
 
+  describe "validations for group set" do
+    before do
+      @now = Time.zone.now.change(sec: 0)
+      @group_category = @course.group_categories.create!(name: "Collaborative Group", non_collaborative: false)
+      @group_category.create_groups(1)
+      @collaborative_group = @group_category.groups.first
+
+      @student_in_group = student_in_course(context: @course, active_all: true).user
+      @group_assignment = @course.assignments.create!(due_at: 2.weeks.from_now(@now), title: "Collaborative Assignment", group_category: @group_category)
+    end
+
+    it "allows collaborative group set" do
+      @collaborative_group.add_user(@student_in_group)
+
+      override = @group_assignment.assignment_overrides.create!(
+        due_at: 4.days.from_now(@now),
+        due_at_overridden: true,
+        set: @collaborative_group
+      )
+
+      expect(override).to be_valid
+    end
+
+    it "rejects collaborative group set in different group category set" do
+      another_group_category = @course.group_categories.create!(name: "Another Collaborative Group", non_collaborative: false)
+      another_group_category.create_groups(1)
+
+      another_collab_group = another_group_category.groups.first
+      override = @group_assignment.assignment_overrides.create(
+        due_at: 4.days.from_now(@now),
+        due_at_overridden: true,
+        set: another_collab_group
+      )
+
+      expect(override).not_to be_valid
+    end
+
+    context "with allow_assign_to_differentiation_tags setting enabled" do
+      before do
+        @course.account.settings = { allow_assign_to_differentiation_tags: true }
+        @course.account.save!
+        @course.account.reload
+
+        @group_category = @course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)
+        @group_category.create_groups(1)
+        @differentiation_tag_group = @group_category.groups.first
+        @diff_tag_assignment = @course.assignments.create!(due_at: 2.weeks.from_now(@now), title: "Non Collaborative Assignment")
+
+        @differentiation_tag_group.add_user(@student_in_group)
+      end
+
+      it "allows non-collaborative group set" do
+        override = @diff_tag_assignment.assignment_overrides.create!(
+          due_at: 4.days.from_now(@now),
+          due_at_overridden: true,
+          set: @differentiation_tag_group
+        )
+        expect(override).to be_valid
+      end
+
+      it "rejects non collaborative group set when group assignment" do
+        @diff_tag_assignment.update!(group_category: @group_category)
+        override = @diff_tag_assignment.assignment_overrides.create(
+          due_at: 4.days.from_now(@now),
+          due_at_overridden: true,
+          set: @differentiation_tag_group
+        )
+
+        expect(override).not_to be_valid
+      end
+
+      it "rejects non collaborative group set when account setting is disabled" do
+        @course.account.settings = { allow_assign_to_differentiation_tags: false }
+        @course.account.save!
+        @course.account.reload
+
+        override = @diff_tag_assignment.assignment_overrides.create(
+          due_at: 4.days.from_now(@now),
+          due_at_overridden: true,
+          set: @differentiation_tag_group
+        )
+
+        expect(override).not_to be_valid
+      end
+    end
+  end
+
   describe "#for_nonactive_enrollment?" do
     before(:once) do
       @override = assignment_override_model(course: @course, set: @course.default_section)

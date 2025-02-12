@@ -83,6 +83,8 @@ describe PageViewsController do
     before do
       allow(PageView).to receive(:pv4?).and_return(true)
       ConfigFile.stub("pv4", {})
+      account_admin_user
+      user_session(@user)
     end
 
     after do
@@ -91,9 +93,6 @@ describe PageViewsController do
 
     describe "GET 'index'" do
       it "properly plumbs through time restrictions" do
-        account_admin_user
-        user_session(@user)
-
         expect_any_instance_of(PageView::Pv4Client).to receive(:fetch)
           .with(
             @user,
@@ -113,8 +112,6 @@ describe PageViewsController do
       end
 
       it "plumbs through time restrictions in csv also" do
-        account_admin_user
-        user_session(@user)
         Setting.set("page_views_csv_export_rows", "99")
         expect_any_instance_of(PageView::Pv4Client).to receive(:fetch)
           .with(
@@ -131,6 +128,20 @@ describe PageViewsController do
                       end_time: "2016-03-15T00:00:00Z" },
             format: :csv
         expect(response).to be_successful
+      end
+
+      it "returns service_unavailable status when PageView::Pv4Client::Pv4EmptyResponse is raised" do
+        allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4EmptyResponse)
+        get :index, params: { user_id: @user.id }, format: :json
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.parsed_body["error"]).to eq("Page view data is not available at this time")
+      end
+
+      it "returns bad_gateway status when PageView::Pv4Client::Pv4Timeout is raised" do
+        allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4Timeout)
+        get :index, params: { user_id: @user.id }, format: :json
+        expect(response).to have_http_status(:bad_gateway)
+        expect(response.parsed_body["error"]).to eq("Page Views service is temporarily unavailable")
       end
     end
   end

@@ -37,7 +37,7 @@ describe Lti::IMS::AuthenticationController do
   let(:verifier) { SecureRandom.hex 64 }
   let(:client_id) { developer_key.global_id }
   let(:context) { account_model }
-  let(:login_hint) { Lti::Asset.opaque_identifier_for(user, context:) }
+  let(:login_hint) { Lti::V1p1::Asset.opaque_identifier_for(user, context:) }
   let(:nonce) { SecureRandom.uuid }
   let(:prompt) { "none" }
   let(:redirect_uri) { "https://redirect.tool.com?foo=bar" }
@@ -193,9 +193,9 @@ describe Lti::IMS::AuthenticationController do
     context "when retried" do
       it "increments the lti.oidc_missing_cookie_retry_worked" do
         params["retried"] = "true"
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         expect(authorize).to render_template("lti/ims/authentication/authorize")
-        expect(InstStatsd::Statsd).to have_received(:increment).with("lti.oidc_missing_cookie_retry_worked", tags: { client_id: client_id.to_s })
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("lti.oidc_missing_cookie_retry_worked", tags: { client_id: client_id.to_s })
       end
     end
 
@@ -315,12 +315,12 @@ describe Lti::IMS::AuthenticationController do
           end
 
           it "increments the lti.oidc_login_required_error metric" do
-            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(InstStatsd::Statsd).to receive(:distributed_increment)
             authorize
-            expect(InstStatsd::Statsd).to have_received(:increment).with("lti.oidc_login_required_error", tags: {
-                                                                           account: context.global_id,
-                                                                           client_id: client_id.to_s
-                                                                         })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("lti.oidc_login_required_error", tags: {
+                                                                                       account: context.global_id,
+                                                                                       client_id: client_id.to_s
+                                                                                     })
           end
         end
 
@@ -337,9 +337,9 @@ describe Lti::IMS::AuthenticationController do
           end
 
           it "increments the lti.oidc_missing_cookie_retry" do
-            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(InstStatsd::Statsd).to receive(:distributed_increment)
             authorize
-            expect(InstStatsd::Statsd).to have_received(:increment).with("lti.oidc_missing_cookie_retry", tags: { client_id: client_id.to_s })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("lti.oidc_missing_cookie_retry", tags: { client_id: client_id.to_s })
           end
         end
 

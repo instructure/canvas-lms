@@ -19,8 +19,8 @@
 
 module DataFixup::RemoveTwitterAuthProviders
   def self.run
-    ids = AuthenticationProvider.where(auth_type: "twitter").active.ids
-    Pseudonym.where(authentication_provider_id: ids).find_each(&:destroy)
+    ids = AuthenticationProvider.where(auth_type: "twitter").ids
+    Pseudonym.where(authentication_provider_id: ids).active.find_each(&:destroy)
     AuthenticationProvider.where(id: ids).update_all(workflow_state: "deleted")
   end
 end

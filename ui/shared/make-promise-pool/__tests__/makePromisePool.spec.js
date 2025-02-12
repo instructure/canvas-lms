@@ -19,14 +19,18 @@
 import makePromisePool from '../index'
 
 describe('makePromisePool', () => {
+  let activeWorkers = 0
+
+  afterEach(() => {
+    activeWorkers = 0
+  })
+
   test('makePromisePool respects the pool size', async () => {
     const dataList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     const options = {
-      internvalTime: 10,
+      internvalTime: 50,
       poolSize: 2,
     }
-
-    let activeWorkers = 0
 
     function makePromise() {
       activeWorkers++
@@ -37,11 +41,12 @@ describe('makePromisePool', () => {
           expect(activeWorkers).toBeLessThanOrEqual(options.poolSize)
           activeWorkers--
           resolve()
-        }, Math.random() * 50)
+        }, 20)
       })
     }
 
     await makePromisePool(dataList, makePromise, options)
+    expect(activeWorkers).toBe(0)
   })
 
   test('makePromisePool reports successes and failures correctly', async () => {
@@ -52,24 +57,23 @@ describe('makePromisePool', () => {
     }
 
     function makePromise(num) {
-      if (num % 2 === 0) {
-        return Promise.resolve({})
-      } else {
-        return Promise.reject('odd number') // eslint-disable-line prefer-promise-reject-errors
-      }
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (num % 2 === 0) {
+            resolve({})
+          } else {
+            reject(new Error('odd number'))
+          }
+        }, 20)
+      })
     }
 
     const results = await makePromisePool(dataList, makePromise, options)
-    expect(results).toEqual({
-      successes: [
-        {data: 2, res: {}},
-        {data: 4, res: {}},
-      ],
-      failures: [
-        {data: 1, err: 'odd number'},
-        {data: 3, err: 'odd number'},
-        {data: 5, err: 'odd number'},
-      ],
-    })
+    expect(results.successes).toHaveLength(2)
+    expect(results.failures).toHaveLength(3)
+    expect(results.successes.map(s => s.data)).toEqual([2, 4])
+    expect(results.failures.map(f => f.data)).toEqual([1, 3, 5])
+    expect(results.failures.every(f => f.err instanceof Error)).toBe(true)
+    expect(results.failures.every(f => f.err.message === 'odd number')).toBe(true)
   })
 })

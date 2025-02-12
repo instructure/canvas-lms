@@ -18,7 +18,7 @@
 
 import formatMessage from 'format-message'
 
-const generateId = require('format-message-generate-id/underscored_crc32')
+const generateId = require('format-message-generate-id/underscored_crc32.js')
 
 const ns = formatMessage.namespace()
 

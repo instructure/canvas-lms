@@ -29,6 +29,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import type {LatePolicyCamelized, LatePolicyValidationErrors} from '../gradebook.d'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import NumberHelper from '@canvas/i18n/numberHelper'
+import {IconWarningSolid} from '@instructure/ui-icons'
 
 import Round from '@canvas/round'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -81,7 +82,22 @@ function messages(names, validationErrors) {
   const errors = names.map(name => validationErrors[name])
   return errors.reduce(
     // @ts-expect-error
-    (acc, error) => (error ? acc.concat([{text: error, type: 'error'}]) : acc),
+    (acc, error) =>
+      error
+        ? acc.concat([
+            {
+              text: (
+                <View textAlign="center">
+                  <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+                    <IconWarningSolid />
+                  </View>
+                  {error}
+                </View>
+              ),
+              type: 'error',
+            },
+          ])
+        : acc,
     [],
   )
 }
@@ -151,10 +167,9 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
 
   missingPolicyMessages = messages.bind(this, ['missingSubmissionDeduction'])
 
-  latePolicyMessages = messages.bind(this, [
-    'lateSubmissionDeduction',
-    'lateSubmissionMinimumPercent',
-  ])
+  latePolicyMessages = messages.bind(this, ['lateSubmissionDeduction'])
+
+  letSubmissionMinimumMessages = messages.bind(this, ['lateSubmissionMinimumPercent'])
 
   componentDidUpdate(_prevProps: Props, prevState: State) {
     if (!prevState.showAlert || this.state.showAlert) {
@@ -352,14 +367,14 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
 
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Missing policies')}</ScreenReaderContent>}
-          messages={this.missingPolicyMessages(validationErrors)}
         >
           <View as="div" margin="small small small large">
             <div className="NumberInput__Container">
-              <Grid vAlign="bottom" colSpacing="small">
+              <Grid vAlign="top" colSpacing="small">
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      messages={this.missingPolicyMessages(validationErrors)}
                       allowStringValue={true}
                       data-testid="missing-submission-grade"
                       id="missing-submission-grade"
@@ -368,7 +383,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       inputRef={m => {
                         this.missingSubmissionDeductionInput = m
                       }}
-                      renderLabel={I18n.t('Grade for missing submissions')}
+                      renderLabel={I18n.t('Grade for missing submissions %')}
                       disabled={
                         !this.getLatePolicyAttribute('missingSubmissionDeductionEnabled') ||
                         !this.props.gradebookIsEditable
@@ -384,11 +399,6 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       placeholder="100"
                       showArrows={false}
                     />
-                  </Grid.Col>
-                  <Grid.Col width="auto">
-                    <View margin="0 0 x-small" display="block">
-                      <Text weight="bold">{I18n.t('%')}</Text>
-                    </View>
                   </Grid.Col>
                 </Grid.Row>
               </Grid>
@@ -422,14 +432,14 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
 
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Late policies')}</ScreenReaderContent>}
-          messages={this.latePolicyMessages(validationErrors)}
         >
           <View as="div" margin="small small small large">
             <div style={{display: 'flex', alignItems: 'center'}}>
-              <Grid vAlign="bottom" colSpacing="small">
+              <Grid vAlign="top" colSpacing="small">
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      messages={this.latePolicyMessages(validationErrors)}
                       allowStringValue={true}
                       id="late-submission-deduction"
                       // @ts-expect-error
@@ -437,7 +447,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       inputRef={l => {
                         this.lateSubmissionDeductionInput = l
                       }}
-                      renderLabel={I18n.t('Late submission deduction')}
+                      renderLabel={I18n.t('Late submission deduction %')}
                       disabled={
                         !this.getLatePolicyAttribute('lateSubmissionDeductionEnabled') ||
                         !this.props.gradebookIsEditable
@@ -450,12 +460,8 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       onChange={(_event, val) => this.handleChange('lateSubmissionDeduction', val)}
                       placeholder="0"
                       showArrows={false}
+                      data-testid="late-submission-deduction"
                     />
-                  </Grid.Col>
-                  <Grid.Col width="auto">
-                    <View margin="0 0 x-small" display="block">
-                      <Text weight="bold">{I18n.t('%')}</Text>
-                    </View>
                   </Grid.Col>
                   <Grid.Col width="auto">
                     <CanvasSelect
@@ -481,6 +487,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      messages={this.letSubmissionMinimumMessages(validationErrors)}
                       allowStringValue={true}
                       id="late-submission-minimum-percent"
                       // @ts-expect-error
@@ -488,7 +495,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       inputRef={l => {
                         this.lateSubmissionMinimumPercentInput = l
                       }}
-                      renderLabel={I18n.t('Lowest possible grade')}
+                      renderLabel={I18n.t('Lowest possible grade %')}
                       value={this.currentInputDisplayValue(
                         'lateSubmissionMinimumPercent',
                         MIN_PERCENTAGE_INPUT,
@@ -506,11 +513,6 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       showArrows={false}
                       data-testid="late-submission-minimum-percent"
                     />
-                  </Grid.Col>
-                  <Grid.Col width="auto">
-                    <View margin="0 0 x-small" display="block">
-                      <Text weight="bold">{I18n.t('%')}</Text>
-                    </View>
                   </Grid.Col>
                 </Grid.Row>
               </Grid>

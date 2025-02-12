@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -25,7 +25,17 @@ import {updateModuleItem} from '../../jquery/utils'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
 import {initBody, makeModuleWithItems} from '../../__tests__/testHelpers'
 
-jest.mock('@canvas/do-fetch-api-effect')
+jest.mock('@canvas/do-fetch-api-effect', () => ({
+  __esModule: true,
+  default: jest.fn(() =>
+    Promise.resolve({
+      response: new Response('', {status: 200}),
+      json: {published: true},
+      text: '',
+    } as DoFetchApiResults<{published: boolean}>),
+  ),
+}))
+
 jest.mock('@canvas/context-modules/jquery/utils', () => {
   const originalModule = jest.requireActual('@canvas/context-modules/jquery/utils')
   return {
@@ -35,7 +45,8 @@ jest.mock('@canvas/context-modules/jquery/utils', () => {
   }
 })
 
-const mockDoFetchApi = jest.fn() as jest.MockedFunction<typeof doFetchApi>
+const mockDoFetchApi = jest.requireMock('@canvas/do-fetch-api-effect')
+  .default as jest.MockedFunction<typeof doFetchApi>
 
 const defaultProps = {
   courseId: '1',
@@ -47,12 +58,17 @@ const defaultProps = {
 
 const PUBLISH_URL = '/api/v1/courses/1/modules/1'
 
+const mockResponse = new Response('', {status: 200})
+mockResponse.json = () => Promise.resolve({published: true})
+
 beforeEach(() => {
-  mockDoFetchApi.mockResolvedValue({
-    response: new Response('', {status: 200}),
-    json: {published: true},
-    text: '',
-  })
+  mockDoFetchApi.mockImplementation(() =>
+    Promise.resolve({
+      response: mockResponse,
+      json: {published: true},
+      text: '',
+    } as DoFetchApiResults<{published: boolean}>),
+  )
   initBody()
   makeModuleWithItems(1, [117, 119])
 })
@@ -102,7 +118,7 @@ describe('ContextModulesPublishIcon', () => {
 
   it('renders the menu when clicked', () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button')
+    const menuButton = getByRole('button', {hidden: true})
     act(() => menuButton.click())
     expect(getByText('Publish module and all items')).toBeInTheDocument()
     expect(getByText('Publish module only')).toBeInTheDocument()
@@ -112,7 +128,10 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls publishAll when clicked publish all menu item is clicked', async () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {name: 'Lesson 2 module publish options, published'})
+    const menuButton = getByRole('button', {
+      name: 'Lesson 2 module publish options, published',
+      hidden: true,
+    })
     menuButton.click()
     const publishButton = getByText('Publish module and all items')
     publishButton.click()
@@ -129,7 +148,10 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls publishModuleOnly when clicked publish module menu item is clicked', async () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {name: 'Lesson 2 module publish options, published'})
+    const menuButton = getByRole('button', {
+      name: 'Lesson 2 module publish options, published',
+      hidden: true,
+    })
     menuButton.click()
     const publishButton = getByText('Publish module only')
     publishButton.click()
@@ -146,7 +168,10 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls unpublishAll when clicked unpublish all items is clicked', async () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {name: 'Lesson 2 module publish options, published'})
+    const menuButton = getByRole('button', {
+      name: 'Lesson 2 module publish options, published',
+      hidden: true,
+    })
     menuButton.click()
     const publishButton = getByText('Unpublish module and all items')
     publishButton.click()
@@ -163,7 +188,10 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls unpublishModuleOnly when unpublish module only is clicked', async () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button', {name: 'Lesson 2 module publish options, published'})
+    const menuButton = getByRole('button', {
+      name: 'Lesson 2 module publish options, published',
+      hidden: true,
+    })
     menuButton.click()
     const publishButton = getByText('Unpublish module only')
     publishButton.click()
@@ -183,7 +211,7 @@ describe('ContextModulesPublishIcon', () => {
       const {getByRole, getByText} = render(
         <ContextModulesPublishIcon {...defaultProps} published={false} />,
       )
-      const menuButton = getByRole('button')
+      const menuButton = getByRole('button', {hidden: true})
       menuButton.click()
       const publishButton = getByText('Publish module and all items')
       publishButton.click()
@@ -222,7 +250,7 @@ describe('ContextModulesPublishIcon', () => {
       const {getByRole, getByText} = render(
         <ContextModulesPublishIcon {...defaultProps} published={true} />,
       )
-      const menuButton = getByRole('button')
+      const menuButton = getByRole('button', {hidden: true})
       menuButton.click()
       const publishButton = getByText('Unpublish module and all items')
       userEvent.click(publishButton)
@@ -267,7 +295,7 @@ describe('ContextModulesPublishIcon', () => {
       const {getByRole, getByText} = render(
         <ContextModulesPublishIcon {...defaultProps} published={true} />,
       )
-      const menuButton = getByRole('button')
+      const menuButton = getByRole('button', {hidden: true})
       menuButton.click()
       const publishButton = getByText('Unpublish module and all items')
       userEvent.click(publishButton)

@@ -89,6 +89,9 @@ Performance:
   Severity: error
 Performance/CollectionLiteralInLoop:
   Severity: convention # not auto-correctable; can be a pain to fix and isn't necessarily performance critical
+  Exclude: # don't care about performance in specs
+    - "gems/plugins/*/spec_canvas/**/*"
+    - "spec/**/*"
 Performance/MethodObjectAsBlock:
   Enabled: false # decreases expressiveness
 

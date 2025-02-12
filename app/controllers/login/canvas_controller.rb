@@ -171,7 +171,7 @@ class Login::CanvasController < ApplicationController
   protected
 
   def aac
-    @domain_root_account.authentication_providers.where(auth_type: params[:controller].sub(%r{^login/}, "")).active.take!
+    @aac ||= @domain_root_account.authentication_providers.where(auth_type: params[:controller].sub(%r{^login/}, "")).active.take!
   end
   alias_method :validate_auth_type, :aac
 

@@ -20,6 +20,7 @@ import {Table} from '@instructure/ui-table'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {File, Folder} from 'features/files_v2/interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
+import {getUniqueId} from '../../../utils/fileFolderUtils'
 
 // Need to render in this manner to satisfy TypeScript and make sure headers are rendered in stacked view
 const renderTableBody = (
@@ -32,37 +33,39 @@ const renderTableBody = (
   columnRenderers: Record<string, Function>,
   toggleRowSelection: (id: string) => void,
   userCanEditFilesForContext: boolean,
+  userCanDeleteFilesForContext: boolean,
   usageRightsRequiredForContext: boolean,
 ) => {
   return rows.map(row => {
-    const isSelected = selectedRows.has(row.id)
+    const isSelected = selectedRows.has(getUniqueId(row))
     const rowHead = [
       <Table.RowHeader key="select">
         <Checkbox
           label=""
           size={size}
           checked={isSelected}
-          onChange={() => toggleRowSelection(row.id)}
+          onChange={() => toggleRowSelection(getUniqueId(row))}
           data-testid="row-select-checkbox"
         />
       </Table.RowHeader>,
       ...columnHeaders.map(column => (
         <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
-          {columnRenderers[column.id](
-            row,
-            isStacked,
-            userCanEditFilesForContext,
-            usageRightsRequiredForContext,
-            size,
-            isSelected,
-            () => toggleRowSelection(row.id),
-          )}
+          {columnRenderers[column.id]({
+            row: row,
+            isStacked: isStacked,
+            userCanEditFilesForContext: userCanEditFilesForContext,
+            userCanDeleteFilesForContext: userCanDeleteFilesForContext,
+            usageRightsRequiredForContext: usageRightsRequiredForContext,
+            size: size,
+            isSelected: isSelected,
+            toggleSelect: () => toggleRowSelection(getUniqueId(row)),
+          })}
         </Table.Cell>
       )),
     ]
     return (
       <Table.Row
-        key={row.id}
+        key={getUniqueId(row)}
         data-testid="table-row"
         themeOverride={isSelected ? {borderColor: 'brand'} : undefined}
       >

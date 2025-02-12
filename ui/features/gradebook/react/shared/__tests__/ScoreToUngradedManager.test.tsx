@@ -67,6 +67,8 @@ describe('ScoreToUngradedManager', () => {
     let manager
     beforeEach(() => {
       manager = new ScoreToUngradedManager(workingProcess)
+      // Ensure process is set correctly
+      manager.process = {...workingProcess}
     })
 
     afterEach(() => {

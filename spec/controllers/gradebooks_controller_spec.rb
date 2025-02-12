@@ -1791,10 +1791,10 @@ describe GradebooksController do
           # The initial show view will redirect to show without the view query param the first time,
           #  and because RSpec doesn't follow redirects well, we stub out a few things to simulate
           #  the redirects
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
           allow_any_instance_of(GradebooksController).to receive(:preferred_gradebook_view).and_return("learning_mastery")
           get "show", params: { course_id: @course.id, view: "" }
-          expect(InstStatsd::Statsd).to have_received(:increment).with(
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "outcomes_page_views",
             tags: { type: "teacher_lmgb" }
           )
@@ -2673,8 +2673,7 @@ describe GradebooksController do
 
     context "moderated grading" do
       before :once do
-        @assignment = @course.assignments.create!(title: "some assignment", moderated_grading: true, grader_count: 1)
-        @student = @course.enroll_student(User.create!(name: "some user"), enrollment_state: :active).user
+        @assignment = @course.assignments.create!(title: "yet another assignment", moderated_grading: true, grader_count: 1)
       end
 
       before do
@@ -2808,10 +2807,10 @@ describe GradebooksController do
 
         post "update_submission",
              params: { course_id: @course.id,
-                       submission: { score: 100,
+                       submission: { score: 100.to_s,
                                      comment: "provisional!",
-                                     assignment_id: @assignment.id,
-                                     user_id: @student.id,
+                                     assignment_id: @assignment.id.to_s,
+                                     user_id: @student.id.to_s,
                                      provisional: true } },
              format: :json
         expect(response).to_not be_successful
@@ -2825,10 +2824,10 @@ describe GradebooksController do
 
         post "update_submission",
              params: { course_id: @course.id,
-                       submission: { score: 100,
+                       submission: { score: 100.to_s,
                                      comment: "provisional!",
-                                     assignment_id: @assignment.id,
-                                     user_id: @student.id,
+                                     assignment_id: @assignment.id.to_s,
+                                     user_id: @student.id.to_s,
                                      provisional: true } },
              format: :json
         expect(response).to be_successful
@@ -2842,10 +2841,10 @@ describe GradebooksController do
 
         post "update_submission",
              params: { course_id: @course.id,
-                       submission: { score: 100,
+                       submission: { score: 100.to_s,
                                      comment: "provisional!",
-                                     assignment_id: @assignment.id,
-                                     user_id: @student.id,
+                                     assignment_id: @assignment.id.to_s,
+                                     user_id: @student.id.to_s,
                                      provisional: true,
                                      final: true } },
              format: :json
@@ -2879,8 +2878,8 @@ describe GradebooksController do
         post_params = {
           course_id: @course.id,
           submission: {
-            score: 100.to_s,
-            comment: "provisional comment",
+            score: 66.to_s,
+            comment: "not the end",
             assignment_id: @assignment.id.to_s,
             user_id: @student.id.to_s,
             provisional: true,
@@ -3016,10 +3015,13 @@ describe GradebooksController do
       user_session(@teacher)
     end
 
+    let(:classic_sg_template) { :speed_grader }
+    let(:platform_sg_template) { :bare }
+
     it "renders speed_grader template with locals" do
       @assignment.publish
       get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
-      expect(response).to render_template(:speed_grader, locals: { anonymous_grading: false })
+      expect(response).to render_template(classic_sg_template, locals: { anonymous_grading: false })
     end
 
     it "redirects the user if course's large_roster? setting is true" do
@@ -3046,18 +3048,20 @@ describe GradebooksController do
     end
 
     it "loads the platform speedgrader when the feature flag is on and the platform_sg flag is passed" do
+      expect(Services::PlatformServiceSpeedgrader).to receive(:launch_url).at_least(:once).and_return("http://example.com")
       @assignment.publish
       Account.site_admin.enable_feature!(:platform_service_speedgrader)
       get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).to render_template(:bare, locals: { anonymous_grading: false })
+      expect(response).to render_template(platform_sg_template, locals: { anonymous_grading: false })
     end
 
     it "loads the platform speedgrader when the account allows it and the course enables it" do
+      expect(Services::PlatformServiceSpeedgrader).to receive(:launch_url).at_least(:once).and_return("http://example.com")
       @assignment.publish
       Account.site_admin.allow_feature!(:platform_service_speedgrader)
       @course.enable_feature!(:platform_service_speedgrader)
       get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).to render_template(:bare, locals: { anonymous_grading: false })
+      expect(response).to render_template(platform_sg_template, locals: { anonymous_grading: false })
     end
 
     it "does not load the platform speedgrader when the assignment is moderated" do
@@ -3069,7 +3073,7 @@ describe GradebooksController do
       Account.site_admin.allow_feature!(:platform_service_speedgrader)
       @course.enable_feature!(:platform_service_speedgrader)
       get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).to render_template(:speed_grader)
+      expect(response).to render_template(classic_sg_template)
     end
 
     it "does not load the platform speedgrader when the assignment is anonymously graded" do
@@ -3079,7 +3083,7 @@ describe GradebooksController do
       Account.site_admin.allow_feature!(:platform_service_speedgrader)
       @course.enable_feature!(:platform_service_speedgrader)
       get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).to render_template(:speed_grader)
+      expect(response).to render_template(classic_sg_template)
     end
 
     it "does not load the platform speedgrader when the account allows it and the course disables it" do
@@ -3087,7 +3091,16 @@ describe GradebooksController do
       Account.site_admin.allow_feature!(:platform_service_speedgrader)
       @course.disable_feature!(:platform_service_speedgrader)
       get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).not_to render_template(:bare, locals: { anonymous_grading: false })
+      expect(response).not_to render_template(platform_sg_template, locals: { anonymous_grading: false })
+    end
+
+    it "falls back to classic speedgrader when launch URL is missing" do
+      expect(Services::PlatformServiceSpeedgrader).to receive(:launch_url).at_least(:once).and_return(nil)
+      Account.site_admin.allow_feature!(:platform_service_speedgrader)
+      @course.enable_feature!(:platform_service_speedgrader)
+      get "speed_grader", params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      expect(response).to render_template(classic_sg_template)
     end
 
     describe "js_env" do

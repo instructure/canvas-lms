@@ -48,10 +48,10 @@ describe "User Profile API", type: :request do
 
   before :once do
     @admin = account_admin_user
-    @admin_lti_user_id = Lti::Asset.opaque_identifier_for(@admin)
+    @admin_lti_user_id = Lti::V1p1::Asset.opaque_identifier_for(@admin)
     course_with_student(user: user_with_pseudonym(name: "Student", username: "pvuser@example.com"))
     @student.pseudonym.update_attribute(:sis_user_id, "sis-user-id")
-    Lti::Asset.opaque_identifier_for(@student)
+    Lti::V1p1::Asset.opaque_identifier_for(@student)
     @user = @admin
     Account.default.tap { |a| a.enable_service(:avatars) }.save
     user_with_pseudonym(user: @user)

@@ -28,8 +28,6 @@ import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {InfoButton} from './InfoButton'
 import {DateAdjustments} from './DateAdjustments'
 import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from './types'
-import {RequiredFormLabel} from './FormLabel'
-import {ErrorFormMessage} from '../errorFormMessage'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
@@ -282,17 +280,13 @@ export const CommonMigratorControls = ({
       {canSelectContent && (
         <View as="div" margin="medium none none none" width="100%" maxWidth="28.75rem">
           <RadioInputGroup
-            name={I18n.t('Selective import')}
-            layout="stacked"
-            description={
-              <RequiredFormLabel showErrorState={contentError}>
-                {I18n.t('Content')}
-              </RequiredFormLabel>
-            }
+            name="selective_import"
+            description={I18n.t('Content')}
             defaultValue="non_selective"
+            isRequired
+            messages={contentError ? [{text: I18n.t('You must choose a content option'), type: 'newError'}] : []}
           >
             <RadioInput
-              name="selective_import"
               value="non_selective"
               label={allContentText}
               onChange={(e: React.SyntheticEvent<Element, Event>) => {
@@ -318,7 +312,6 @@ export const CommonMigratorControls = ({
               ) : null}
             </>
             <RadioInput
-              name="selective_import"
               value="selective"
               label={I18n.t('Select specific content')}
               onChange={(e: React.SyntheticEvent<Element, Event>) => {
@@ -329,11 +322,6 @@ export const CommonMigratorControls = ({
               disabled={isSubmitting}
             />
           </RadioInputGroup>
-          {contentError && (
-            <p>
-              <ErrorFormMessage>{I18n.t('You must choose a content option')}</ErrorFormMessage>
-            </p>
-          )}
         </View>
       )}
 

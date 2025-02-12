@@ -595,7 +595,7 @@ class ContentMigration < ActiveRecord::Base
     capture_job_id
     save
 
-    Lti::Asset.opaque_identifier_for(context)
+    Lti::V1p1::Asset.opaque_identifier_for(context)
 
     all_files_path = nil
     begin

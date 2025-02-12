@@ -23,6 +23,7 @@ import $ from 'jquery'
 
 describe('ConferenceView', () => {
   let container
+  let mockScreenReaderMessage
 
   const createConferenceView = (conferenceOpts = {}) => {
     const defaultOpts = {
@@ -51,7 +52,8 @@ describe('ConferenceView', () => {
 
     const conference = new Conference({...defaultOpts, ...conferenceOpts})
     const view = new ConferenceView({model: conference})
-    container = document.createElement('div')
+    container = document.createElement('ul')
+    container.setAttribute('data-testid', 'conference-view-container')
     container.id = 'fixtures'
     document.body.appendChild(container)
     view.$el.appendTo($(container))
@@ -62,7 +64,13 @@ describe('ConferenceView', () => {
     window.ENV = {
       context_asset_string: 'course_1',
     }
-    $.screenReaderFlashMessage = jest.fn()
+    mockScreenReaderMessage = jest.fn()
+    $.screenReaderFlashMessage = mockScreenReaderMessage
+    
+    // Create a mock jQuery promise
+    const mockDeferred = $.Deferred()
+    mockDeferred.resolve({deleted: true})
+    $.ajaxJSON = jest.fn().mockReturnValue(mockDeferred)
   })
 
   afterEach(() => {
@@ -71,12 +79,13 @@ describe('ConferenceView', () => {
       container.remove()
       container = null
     }
+    jest.resetAllMocks()
     jest.restoreAllMocks()
   })
 
   it('renders the conference view', () => {
-    const view = createConferenceView()
-    expect(view.el).toBeInTheDocument()
+    createConferenceView()
+    expect(container).toBeInTheDocument()
   })
 
   it('shows screenreader message when deleting a conference', async () => {
@@ -93,15 +102,12 @@ describe('ConferenceView', () => {
     event.preventDefault = jest.fn()
     await view.delete(event)
 
-    expect($.screenReaderFlashMessage).toHaveBeenCalledWith('Conference was deleted')
-    mockConfirm.mockRestore()
+    expect(mockScreenReaderMessage).toHaveBeenCalledWith('Conference was deleted')
+    expect(mockDestroy).toHaveBeenCalled()
   })
 
   it('shows screenreader message when deleting recordings', async () => {
     const mockConfirm = jest.spyOn(window, 'confirm').mockImplementation(() => true)
-    const ajaxDeferred = $.Deferred()
-    ajaxDeferred.resolve({deleted: true})
-    $.ajaxJSON = jest.fn().mockReturnValue(ajaxDeferred)
 
     const conferenceWithRecordings = {
       id: 1,
@@ -145,7 +151,6 @@ describe('ConferenceView', () => {
     expect($.ajaxJSON).toHaveBeenCalledWith('/recording/recording', 'DELETE', {
       recording_id: '954cc3',
     })
-    mockConfirm.mockRestore()
   })
 
   it('renders adobe connect link correctly', () => {
@@ -188,14 +193,13 @@ describe('ConferenceView', () => {
     }
 
     createConferenceView(adobeConnectConference)
-    const link = document.querySelector('#adobe-connect-playback-link')
+    const link = container.querySelector('#adobe-connect-playback-link')
     expect(link).toHaveAttribute('href', 'www.blah.com')
   })
 
-  // Skip accessibility test for now as it requires more setup
-  it.skip('is accessible', async () => {
-    const view = createConferenceView()
-    const results = await axe.run(view.el)
-    expect(results.violations.length).toBe(0)
+  it('is accessible', async () => {
+    createConferenceView()
+    const results = await axe.run(container)
+    expect(results.violations).toHaveLength(0)
   })
 })

@@ -147,7 +147,14 @@ module Interfaces::SubmissionInterface
 
   field :user, Types::UserType, null: true
   def user
-    load_association(:user)
+    load_association(:course).then do
+      load_association(:assignment).then do
+        if !Account.site_admin.feature_enabled?(:graphql_honor_anonymous_grading) ||
+           !(submission.course.grants_right?(current_user, :manage_grades) && submission.assignment.anonymize_students?)
+          load_association(:user)
+        end
+      end
+    end
   end
 
   field :attempt, Integer, null: false
@@ -493,7 +500,9 @@ module Interfaces::SubmissionInterface
           submission.course_id,
           assignment.discussion_topic.id,
           host: context[:request].host_with_port,
-          embed: true
+          embed: true,
+          persist: 1,
+          student_id: submission.user_id
         )
       else
         GraphQLHelpers::UrlHelpers.course_assignment_submission_url(

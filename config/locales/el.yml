@@ -117,6 +117,7 @@ el:
       unexpectedDeleteError: "Κάτι δεν πήγε σωστά. Η διαγραφή δεν είναι, αυτή τη στιγμή, δυνατή."
       updateSuccess: "Επιτυχής ενημέρωση"
     length_error: "Πρέπει να έχει μήκος 255 χαρακτήρες ή λιγότερο"
+    title: "Όνομα Ομάδας"
   OutcomeView: 
     length_error: "Πρέπει να έχει μήκος 255 χαρακτήρες ή λιγότερο"
     mastery_error: "Πρέπει να είναι μεγαλύτερο ή ίσο από 0"
@@ -1685,6 +1686,7 @@ el:
       details: λεπτομέρειες...
       login: Είσοδος
     no_text: "Δεν υπάρχει κείμενο"
+  alert_d2c8ef98: Συναγερμός
   alerts: 
     alert: 
       buttons: 
@@ -1762,6 +1764,8 @@ el:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Επιτρέπει στους χρήστες με διεθνείς τηλεφωνικούς αριθμούς να λαμβάνουν γραπτά μηνύματα από το Canvas."
   alphabetically_60ab47e4: Αλφαβητικά
   always_3a59e701: Πάντα
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "Δημιουργείται μια ειδοποίηση για κάθε μαθητή που πληρεί όλα τα κριτήρια. Ελέγχονται καθημερινά, και οι ειδοποιήσεις θα αποστέλλονται σε μαθητή, δάσκαλο και/ή λογαριασμό διαχειριστή μέχρι το πρόβλημα να λυθεί."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "Δημιουργείται μια ειδοποίηση για κάθε σπουδαστή που πληρεί όλα τα κριτήρια. Ελέγχονται καθημερινά, και οι ειδοποιήσεις θα αποστέλλονται σε φοιτητή/τρια, καθηγητή/τρια μέχρι το πρόβλημα να λυθεί."
   an_assignment_name_dc624e70: "Ένα Όνομα Εργασίας"
   an_error_occured_please_try_again_e59b65b: "Συνέβη ένα σφάλμα. Παρακαλούμε ξαναπροσπαθήστε."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Συνέβη ένα σφάλμα*, παρακαλούμε απαντήστε ξανά αργότερα"
@@ -2136,6 +2140,7 @@ el:
       not_yet_graded: "*Δεν έχει βαθμολογηθεί ακόμα*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} μόρια"
       score_with_points_possible_screenreader: "Βαθμολογία: %{score} από %{pointsPossible} μόρια."
+    assignment_submit_success: "Η εργασία υποβλήθηκε επιτυχώς."
     assignments_list_right_side: 
       links: 
         see_current_grades: "Εμφάνιση των βαθμών μου μέχρι τώρα"
@@ -4604,6 +4609,7 @@ el:
   course_pages_449f1dd4: "Σελίδες Μαθήματος"
   course_people_3058c948: "Άτομα στο Μάθημα"
   course_quizzes_c337653c: "Κουίζ του Μαθήματος"
+  course_quota_8f7f74c: "Ποσοστώσεις Μαθήματος"
   course_restore: 
     restore_error: "<mrk mid=\"5695\" mtype=\"seg\">Παρουσιάστηκε σφάλμα κατά την προσπάθεια επαναφοράς του μαθήματος.</mrk> <mrk mid=\"5696\" mtype=\"seg\">Το μάθημα δεν επαναφέρθηκε.</mrk>"
   course_roles_d2d5d666: "Ρόλοι Μαθήματος"
@@ -5070,6 +5076,7 @@ el:
   create_132b3be1: Δημιουργία
   create_a_new_account_4cf7c0f9: "Δημιουργία Νέου Λογαριασμού"
   create_account_263ec6: "Δημιουργία Λογαριασμού"
+  create_an_eportfolio_1841e34a: "Δημιουργία ePortfolio"
   create_assignment_68532ceb: "Δημιουργία Εργασίας"
   create_course_9a69b32c: "Δημιουργία Μαθήματος"
   create_course_9dc5b61a: "Δημιουργία Μαθήματος"
@@ -5366,6 +5373,7 @@ el:
   decrease_indent_d9cf469d: "Μείωση Εσοχής Κειμένου"
   deep_orange_4c7eea99: "Βαθύ πορτοκαλί"
   deep_purple_bb3e2907: "Βαθύ μοβ"
+  default_account_quotas_e34112fd: "Ποσοστώσεις Προεπιλεγμένου Λογαριασμού"
   default_conference_title: "Συνεδρία για το μάθημα %{course_name}"
   default_email_9efb7fbd: "Προεπιλεγμένη Ηλεκτρονική Διεύθυνση"
   default_grade_cannot_be_set_to_ex_723caa59: "Ο προεπιλεγμένος βαθμός δεν μπορεί να είναι %{ex}"
@@ -5882,6 +5890,7 @@ el:
   e_mail_only_2cc5e513: "Μόνο ηλεκτρονική διεύθυνση"
   ecollege_file_description: Ecollege
   ecollege_name: "Μετατροπέας Ecollege"
+  edit_alert_739bb0ba: "Επεξεργασία ειδοποίησης"
   edit_and_delete_their_own_posts_f4f7cc6: "Επεξεργασία και διαγραφή των δικών τους δημοσιεύσεων"
   edit_app_b0cc1c17: "Διαμόρφωση Εφαρμογής"
   edit_assignment_ebf22a72: "Τροποποίηση Εργασίας"
@@ -6577,6 +6586,7 @@ el:
   find_8d605019: Εύρεση
   find_a_course_94301b4d: "Βρείτε ένα Μάθημα"
   find_an_existing_grading_scheme_d836ea: "Εύρεση Υπάρχοντος Κανονισμού Βαθμολόγησης"
+  find_course_or_group_a7de09a4: "Εύρεση μαθήματος ή ομάδας"
   find_flickr_image_view: 
     find_cc_on_flickr: "Εύρεση εικόνων Creative Commons στο Flickr"
     search: Αναζήτηση
@@ -7094,6 +7104,7 @@ el:
   group_group_name_is_for_a_different_section_4d84d256: "Η ομάδα %{group_name} είναι για διαφορετικό τομέα"
   group_group_name_is_full_297880d6: "Η ομάδα %{group_name} είναι πλήρης"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "Η συμμετοχή στην ομάδα %{group_name} είναι δυνατή μόνο κατόπιν πρόσκλησης"
+  group_id_b0f6af89: "ID Ομάδας"
   group_is_for_a_different_section_6a843a4d: "Η ομάδα είναι για διαφορετικό τομέα"
   group_is_full_56849d78: "Η ομάδα είναι πλήρης"
   group_is_joined_by_invitation_only_d00f5a63: "Η συμμετοχή στην ομάδα είναι δυνατή μόνο κατόπιν πρόσκλησης"
@@ -7116,6 +7127,7 @@ el:
   group_name_in_group_category_name_group_category_29bf3254: "Ομάδα %{group_name} στην κατηγορία ομάδας %{group_category_name}"
   group_name_is_required_5547bc0b: "Απαιτείται όνομα ομάδας"
   group_pages_656556f3: "Σελίδες Ομάδας"
+  group_quota_290dbc6b: "Ποσόστωση Ομάδων"
   group_roster_1846bf84: "Πίνακας Ομάδας"
   group_set_4d1e7b06: "Σετ Ομάδων"
   group_set_name_2aed2347: "Όνομα Σετ Ομάδων"
@@ -7909,6 +7921,7 @@ el:
     text_helper: 
       ellipsis: "..."
       quoted_text_toggle: "προβολή κειμένου που παρατίθεται"
+  license_bdede4fb: Άδεια
   license_help: 
     content_license_help: "Βοήθεια για την Αδειοδότηση του Περιεχομένου"
   light_blue_5374f600: "Μπλε Ανοιχτό"
@@ -8128,6 +8141,7 @@ el:
   manual_8c2665de: Εγχειρίδιο
   manual_entry_e4a4f99a: "Χειροκίνητη Καταχώριση"
   manually_mark_posts_as_read_afa5d035: "Χειροκίνητη επισήμανση των δημοσιεύσεων ως αναγνωσμένων"
+  manually_settable_quotas_ea3759e7: "Μη Αυτόματα Ρυθμιζόμενες Ποσοστώσεις"
   mark_all_as_read_8f3bdf57: "Επισήμανση Όλων σαν Αναγνωσμένα"
   mark_all_as_unread_a435be3d: "Επισήμανση Όλων σαν Μη Αναγνωσμένα"
   mark_as_done_6fa48d2f: "Επισήμανση ως ολοκληρωμένο"
@@ -8239,6 +8253,7 @@ el:
   median_score_4657e907: "<mrk mid=\"1110\" mtype=\"seg\">Διάμεσος:</mrk> <mrk mid=\"1111\" mtype=\"seg\">%{score}</mrk>"
   meets_expectations_bb179565: "Ικανοποιεί τις Προσδοκίες"
   meets_mastery_754e1c06: "Είναι σε Επίπεδο Επιδεξιότητας"
+  megabytes_885404ef: megabytes
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} μέλη από μέγιστο αριθμό %{max_membership} μελών"
   members_af25c21d: Μέλη
   members_are_free_to_join_defa5929: "Τα μέλη μπορούν ελεύθερα να συμμετάσχουν"
@@ -10090,6 +10105,7 @@ el:
   no_outcome_selected_16d15753: "Δεν έχει επιλεγεί Αποτέλεσμα"
   no_password_was_given_472222e5: "Δεν δόθηκε κωδικός πρόσβασης"
   no_placements_enabled_f705f28: "Δεν έχουν Ενεργοποιηθεί Τοποθετήσεις"
+  no_preview_available_e8e71199: "Προβολή μη διαθέσιμη"
   no_results_3cda4e72: "Δεν υπάρχουν Αποτελέσματα"
   no_results_f36777ee: "Κανένα αποτέλεσμα"
   no_results_found_2ace1494: "Δεν βρέθηκαν αποτελέσματα"
@@ -10100,6 +10116,7 @@ el:
   no_students_have_taken_the_quiz_yet_e667644b: "Κανένας μαθητής δεν έχει κάνει ακόμα το κουίζ"
   no_students_have_taken_the_survey_yet_d378cd35: "Κανένας Σπουδαστής δεν έχει απαντήσει ακόμη στη δημοσκόπηση"
   no_submission_fb131a40: "Καμία υποβολή"
+  no_teacher_interaction_de8d91bc: "Δεν έχει υπάρξει αλληλοεπίδραση με τον Καθηγητή/α"
   no_time_limit_for_long_running_conferences_d49fdfad: "Δεν υπάρχει όριο χρόνου (για μακροχρόνιες συνεδρίες)"
   no_tls_618add1a: "Χωρίς TLS"
   no_usage_rights_object_supplied_304b8d40: "Δεν παρέχονται «usage_rights» αντικειμένου"
@@ -13249,6 +13266,7 @@ el:
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Η ίδια τιμή με το «Canvas_URL__c» ενδεχομένως να εξαφανιστεί σύντομα"
   sample_data_e4fd01ff: "Δείγμα Δεδομένων"
   save_11a80ec3: Αποθήκευση
+  save_alert_b64f9fa3: "Αποθήκευση Συναγερμού"
   save_changes_698abe77: "Αποθήκευση Αλλαγών "
   save_grading_period_daaaddea: "Αποθήκευση Περιόδου Βαθμολόγησης"
   save_key_b4dede06: "Αποθήκευση Κλειδιού"
@@ -14629,12 +14647,14 @@ el:
   submitted_b37e2ff0: υποβλήθηκε
   submitted_d5ba370a: "Υποβλήθηκε:"
   submitted_datetime_fa2e9287: "<mrk mid=\"1154\" mtype=\"seg\">Υποβλήθηκε:</mrk> <mrk mid=\"1155\" mtype=\"seg\">%{dateTime}</mrk>"
+  submitting_b90fac62: "Υποβολή σε εξέλιξη..."
   submitting_types_7c5a7096: "<mrk mid=\"5857\" mtype=\"seg\">Υποβολή σε εξέλιξη:</mrk> <mrk mid=\"5858\" mtype=\"seg\">%{types}</mrk>"
   subscribe_4b301fb7: Εγγραφή
   subscribed_fe74d22a: "Έγινε εγγραφή"
   substitution_713c65b9: Υποκατάσταση
   success_grades_were_published_to_the_grade_book_da3b4fba: "<mrk mid=\"6237\" mtype=\"seg\">Τέλεια!</mrk> <mrk mid=\"6238\" mtype=\"seg\">Οι βαθμοί δημοσιεύθηκαν στο βιβλίο βαθμών.</mrk>"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Το %{model} μετακινήθηκε στην ομάδα %{newGroup} επιτυχώς"
+  suggestions_b8b03b9d: Προτάσεις
   summary_statistics_f74852a5: "Ανακεφαλαιωτικά Στατιστικά"
   support: 
     array: 
@@ -15217,6 +15237,8 @@ el:
   undo_a7be8fef: Αναίρεση
   unenroll_943490fb: "Διαγραφή -απο το μάθημα-"
   ungraded_submissions_44efb0ec: "Μη Βαθμολογημένες Υποβολές"
+  ungraded_submissions_count_63fcf6d1: "Υποβολές εργασιών που δεν έχουν βαθμολογηθεί(Σύνολο)"
+  ungraded_submissions_time_bafaa609: "Αβαθμολόγητες Υποβολές (Χρόνος)"
   ungraded_survey_ad7de790: "Μη Βαθμολογημένη Δημοσκόπηση"
   unknown: Άγνωστο
   unknown_47a3b725: Άγνωστο
@@ -15264,6 +15286,7 @@ el:
   update_grade_b47eb3ff: "Ενημέρωση Βαθμού"
   update_module_b984c2e5: "Ενημέρωση Αρθρώματος"
   update_password_4bc5cb1f: "Ενημέρωση Κωδικού Πρόσβασης"
+  update_quota_81381226: "Ενημέρωση Ποσόστωσης"
   update_settings_9b422d0f: "Ενημέρωση Ρυθμίσεων"
   update_tool_7d48ef2a: "Ενημέρωση %{tool}"
   update_your_notification_settings_ed9564f3: "Ενημέρωση των ρυθμίσεων ειδοποιήσεών σας"
@@ -15271,6 +15294,7 @@ el:
   updated_group_group_name_727b1d98: "Η Ομάδα %{group_name} Ενημερώθηκε"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Ενημερωμένο UI για αναζήτηση και εμφάνιση χρηστών και μαθημάτων σε κάποιον λογαριασμό."
   updating_6edbab78: "Ενημέρωση σε εξέλιξη"
+  updating_73d0718c: "Ενημέρωση σε εξέλιξη..."
   updating_user_details_b8520b3e: "Γίνεται Ενημέρωση των Λεπτομερειών Χρήστη..."
   upload_8b403d05: Μεταφόρτωση
   upload_a_picture_9f5f6e3c: "Μεταφόρτωση Φωτογραφίας"
@@ -15448,6 +15472,7 @@ el:
       profile: Προφιλ
       settings: Ρυθμίσεις
   user_profile_d56261fc: "Προφίλ Χρήστη"
+  user_quota_12cb58b7: "Ποσόστωση Χρήστη"
   user_s_settings_d65644b4: "Ρυθμίσεις του/της %{user}"
   user_search_results_f5445b8b: "Αποτελέσματα Αναζήτησης Χρήστη"
   user_selected_answer: Επιλέξατε
@@ -15941,6 +15966,7 @@ el:
   workflow_state_cc8d711a: "Κατάσταση Ροής Εργασιών"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Θα θέλατε να αποδεχτείτε ή να παραβλέψετε αυτή την ενημέρωση;"
   would_you_like_to_enable_this_app_ccdf735d: "Θα θέλετε να ενεργοποιήσετε αυτή την εφαρμογή;"
+  would_you_like_to_expand_the_contents_of_filename__35b40cc5: "Θα θέλατε να επεκτείνετε τα περιεχόμενα του «%{fileName}» σε αυτόν τον φάκελο ή θα μεταφορτώσετε το αρχείο zip ως έχει;"
   would_you_like_to_go_back_to_include_1d279044: "Θα θέλατε να πάτε πίσω για να περιλάβετε:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Θα θέλατε να επιτρέψετε στους σπουδαστές να συνεχίσουν στο μάθημα ή θέλετε να ξανακλειδώσετε αυτές τις ενότητες μέχρι να καλυφθούν οι νέες απαιτήσεις;"
   wrong_answer_comments_14963a24: "Σχόλια λάθος απάντησης"
@@ -16058,6 +16084,7 @@ el:
   zip_file_display: "Εισαγωγή Αρχείου"
   zip_file_file_description: "Αποσυμπίεση αρχείου .zip στον φάκελο"
   zip_file_name: ".zip αρχείο"
+  zip_file_options_9a2af6c1: "Επίλογές αρχείου τύπου Zip"
   zip_file_options_form: 
     expand: "Αποσυμπιέστε το"
     message: "Θα θέλατε να επεκτείνετε τα περιεχόμενα του «%{fileName}» σε αυτόν τον φάκελο ή θα μεταφορτώσετε το αρχείο zip ως έχει;"

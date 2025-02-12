@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import ReactDOM from 'react-dom'
 
 import bridge from '../../../bridge'
 import {StoreProvider} from '../shared/StoreContext'
@@ -33,12 +33,8 @@ export default function (ed, document, type) {
     let container = document.querySelector(`#${ICONS_TRAY_CONTAINER_ID}`)
     const trayProps = bridge.trayProps.get(ed)
 
-    let root = null
     const handleUnmount = () => {
-      if (root) {
-        root.unmount()
-        root = null
-      }
+      ReactDOM.unmountComponentAtNode(container)
       ed.focus(false)
     }
 
@@ -53,21 +49,18 @@ export default function (ed, document, type) {
       handleUnmount()
     }
 
-    root = createRoot(container)
-    root.render(
+    ReactDOM.render(
       <StoreProvider {...trayProps}>
         {() => (
           <IconMakerTray
             editor={ed}
             editing={type === EDIT_ICON_MAKER}
-            onUnmount={() => {
-              root.unmount()
-              handleUnmount()
-            }}
+            onUnmount={handleUnmount}
             canvasOrigin={bridge.canvasOrigin}
           />
         )}
       </StoreProvider>,
+      container,
     )
   })
 }

@@ -99,3 +99,7 @@ it('changes the output when selection_width changes', () => {
 it('changes the output when custom_fields changes', () => {
   checkChange(['custom_fields'], 'handleCustomFieldsChange', 'foo=bar', {foo: 'bar'})
 })
+
+it('changes the output when domain is cleared', () => {
+  checkChange(['extensions', '0', 'domain'], 'handleDomainChange', '')
+})

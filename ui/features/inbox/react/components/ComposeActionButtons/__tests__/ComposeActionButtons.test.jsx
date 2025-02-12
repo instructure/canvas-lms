@@ -17,53 +17,69 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ComposeActionButtons} from '../ComposeActionButtons'
 
-const createProps = overrides => {
-  return {
-    onAttachmentUpload: jest.fn(),
-    onMediaUpload: overrides?.hasOwnProperty('onMediaUpload') ? overrides.onMediaUpload : jest.fn(),
-    onCancel: jest.fn(),
-    onSend: jest.fn(),
-    isSending: false,
-    ...overrides,
-  }
-}
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: () => {},
+  showFlashError: () => () => {},
+}))
+
+const createProps = overrides => ({
+  onAttachmentUpload: jest.fn(),
+  onMediaUpload: overrides?.hasOwnProperty('onMediaUpload') ? overrides.onMediaUpload : jest.fn(),
+  onCancel: jest.fn(),
+  onSend: jest.fn(),
+  isSending: false,
+  ...overrides,
+})
 
 describe('ComposeActionButtons', () => {
+  afterEach(() => {
+    cleanup()
+    jest.clearAllMocks()
+  })
+
   describe('attachment upload', () => {
-    it('triggers onAttachmentUpload when file is uploaded', () => {
+    it('triggers onAttachmentUpload when file is uploaded', async () => {
+      const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      fireEvent.click(getByTestId('attachment-upload'))
-      fireEvent.change(getByTestId('attachment-input'))
+      
+      const file = new File(['test'], 'test.txt', {type: 'text/plain'})
+      const input = getByTestId('attachment-input')
+      
+      await user.upload(input, file)
+      
       expect(props.onAttachmentUpload).toHaveBeenCalled()
     })
 
     it('triggers onAttachmentUpload again when file was previously uploaded', async () => {
+      const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
 
-      const file = new File(['my-image'], 'my-image.png', {type: 'image/png'})
+      const file = new File(['test-image'], 'test-image.png', {type: 'image/png'})
       const input = getByTestId('attachment-input')
 
-      await userEvent.upload(input, file)
+      await user.upload(input, file)
+      expect(props.onAttachmentUpload).toHaveBeenCalledTimes(1)
 
-      input.value = ''
-
-      await userEvent.upload(input, file)
-
+      const secondFile = new File(['test-image-2'], 'test-image-2.png', {type: 'image/png'})
+      await user.upload(input, secondFile)
       expect(props.onAttachmentUpload).toHaveBeenCalledTimes(2)
     })
   })
 
   describe('media upload', () => {
-    it('calls onMediaUpload when clicked', () => {
+    it('calls onMediaUpload when clicked', async () => {
+      const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      fireEvent.click(getByTestId('media-upload'))
+      
+      await user.click(getByTestId('media-upload'))
+      
       expect(props.onMediaUpload).toHaveBeenCalled()
     })
 
@@ -77,25 +93,31 @@ describe('ComposeActionButtons', () => {
 
     it('disables the media upload button if hasMediaComment is true', () => {
       const props = createProps({hasMediaComment: true})
-      const container = render(<ComposeActionButtons {...props} />)
-      expect(container.getByTestId('media-upload')).toBeDisabled()
+      const {getByTestId} = render(<ComposeActionButtons {...props} />)
+      expect(getByTestId('media-upload')).toBeDisabled()
     })
   })
 
   describe('message cancel button', () => {
-    it('calls onCancel when clicked', () => {
+    it('calls onCancel when clicked', async () => {
+      const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      fireEvent.click(getByTestId('cancel-button'))
+      
+      await user.click(getByTestId('cancel-button'))
+      
       expect(props.onCancel).toHaveBeenCalled()
     })
   })
 
   describe('message send button', () => {
-    it('calls onSend when clicked', () => {
+    it('calls onSend when clicked', async () => {
+      const user = userEvent.setup()
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
-      fireEvent.click(getByTestId('send-button'))
+      
+      await user.click(getByTestId('send-button'))
+      
       expect(props.onSend).toHaveBeenCalled()
     })
 

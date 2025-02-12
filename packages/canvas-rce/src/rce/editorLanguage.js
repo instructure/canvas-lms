@@ -108,4 +108,4 @@ function editorLanguage(locale) {
   return mapping[locale.split('-')[0]]
 }
 
-module.exports = editorLanguage
+exports.editorLanguage = editorLanguage

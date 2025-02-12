@@ -2122,7 +2122,7 @@ class DiscussionTopic < ActiveRecord::Base
   def ungraded_discussion_overrides(current_user = nil)
     current_user ||= self.current_user
     return unless current_user
-    return nil if assignment.present? || context_type == "Group" || is_announcement || !Account.site_admin.feature_enabled?(:selective_release_ui_api)
+    return nil if assignment.present? || context_type == "Group" || is_announcement
 
     overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(self, current_user)
 

@@ -17,11 +17,8 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import ReactDOM from 'react-dom'
 import formatMessage from '../format-message'
-
-// Map to store root instances for each loading image
-const loadingImageRoots = new WeakMap()
 import {Spinner} from '@instructure/ui-spinner'
 import {getData, setData} from './jqueryish_funcs'
 
@@ -91,7 +88,7 @@ export function showLoadingImage($link, position = 'adjacent') {
 
     $imageHolder.setAttribute(
       'style',
-      `z-index: ${zIndex}; position: absolute; top: ${top}; left: ${left}; margin-inline-start: ${imageMarginInlineStart}; margin-top: ${imageMarginTop}`,
+      `z-index: ${zIndex}; position: absolute; top: ${top}; left: ${left}; margin-inline-start: ${imageMarginInlineStart}; margin-top: ${imageMarginTop}`
     )
     document.body.appendChild($imageHolder)
   } else {
@@ -99,13 +96,11 @@ export function showLoadingImage($link, position = 'adjacent') {
     const left = `${offsetLeft}px`
     $imageHolder.setAttribute(
       'style',
-      `z-index:${zIndex}; position: absolute; top: ${top}; left: ${left}; margin-inline-start:${imageMarginInlineStart}; margin-top: ${imageMarginTop}`,
+      `z-index:${zIndex}; position: absolute; top: ${top}; left: ${left}; margin-inline-start:${imageMarginInlineStart}; margin-top: ${imageMarginTop}`
     )
     $link.appendChild($imageHolder)
   }
-  const root = createRoot($imageHolder)
-  root.render(<Spinner size="x-small" renderTitle={formatMessage('Loading')} />)
-  loadingImageRoots.set($imageHolder, root)
+  ReactDOM.render(<Spinner size="x-small" renderTitle={formatMessage('Loading')} />, $imageHolder)
   return $link
 }
 
@@ -114,11 +109,6 @@ export function removeLoadingImage($link) {
   const list = getData($link, 'loading_images') || []
   list.forEach(item => {
     if (item) {
-      const root = loadingImageRoots.get(item)
-      if (root) {
-        root.unmount()
-        loadingImageRoots.delete(item)
-      }
       item.remove()
     }
   })
@@ -165,7 +155,7 @@ export function loadDocPreview($container, options) {
     const canvadocWrapper = document.createElement('div')
     canvadocWrapper.setAttribute(
       'style',
-      'overflow: auto; resize: vertical; border: 1px solid transparent; height: 100%;',
+      'overflow: auto; resize: vertical; border: 1px solid transparent; height: 100%;'
     )
     $container.appendChild(canvadocWrapper)
 
@@ -226,7 +216,7 @@ export function loadDocPreview($container, options) {
         }
       }
       showLoadingImage($container, 'centered')
-       
+      // eslint-disable-next-line promise/catch-or-return
       fetch(url)
         .then(response => {
           if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`)
@@ -240,7 +230,7 @@ export function loadDocPreview($container, options) {
           }
         })
         .catch(ex => {
-           
+          // eslint-disable-next-line no-console
           console.error(ex)
         })
         .finally(() => {
@@ -252,7 +242,7 @@ export function loadDocPreview($container, options) {
     const paragraph = document.createElement('p')
     if (opts.attachment_preview_processing) {
       paragraph.textContent = formatMessage(
-        'The document preview is currently being processed. Please try again later.',
+        'The document preview is currently being processed. Please try again later.'
       )
     } else {
       paragraph.textContent = formatMessage('This document cannot be displayed within Canvas.')
@@ -270,7 +260,7 @@ export function sanitizeUrl(url) {
   const defaultUrl = 'about:blank'
   try {
     const parsedUrl = new URL(url, window.location.origin)
-     
+    // eslint-disable-next-line no-script-url
     if (parsedUrl.protocol === 'javascript:') {
       return defaultUrl
     }

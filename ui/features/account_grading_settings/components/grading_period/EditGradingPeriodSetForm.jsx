@@ -78,10 +78,15 @@ class GradingPeriodSetForm extends React.Component {
     }
 
     this.state = {set: buildSet(set)}
+    this.titleRef = React.createRef()
+    this.cancelButtonRef = React.createRef()
+    this.saveButtonRef = React.createRef()
+    this.weightedCheckboxRef = React.createRef()
+    this.displayTotalsCheckboxRef = React.createRef()
   }
 
   componentDidMount() {
-    ReactDOM.findDOMNode(this.refs.title).focus()
+    this.titleRef.current.focus()
   }
 
   changeTitle = e => {
@@ -126,7 +131,7 @@ class GradingPeriodSetForm extends React.Component {
 
   renderSaveAndCancelButtons = () => (
     <div className="ic-Form-actions below-line">
-      <Button disabled={this.props.disabled} onClick={this.triggerCancel} ref="cancelButton">
+      <Button disabled={this.props.disabled} onClick={this.triggerCancel} ref={this.cancelButtonRef}>
         {I18n.t('Cancel')}
       </Button>
       &nbsp;
@@ -135,7 +140,7 @@ class GradingPeriodSetForm extends React.Component {
         disabled={this.props.disabled}
         aria-label={I18n.t('Save Grading Period Set')}
         onClick={this.triggerSave}
-        ref="saveButton"
+        ref={this.saveButtonRef}
       >
         {I18n.t('Save')}
       </Button>
@@ -154,7 +159,7 @@ class GradingPeriodSetForm extends React.Component {
                 </label>
                 <input
                   id="set-name"
-                  ref="title"
+                  ref={this.titleRef}
                   className="ic-Input"
                   placeholder={I18n.t('Set name...')}
                   title={I18n.t('Grading Period Set Title')}
@@ -173,7 +178,7 @@ class GradingPeriodSetForm extends React.Component {
               <div className="ic-Input pad-box top-only">
                 <Checkbox
                   ref={ref => {
-                    this.weightedCheckbox = ref
+                    this.weightedCheckboxRef = ref
                   }}
                   label={I18n.t('Weighted grading periods')}
                   value="weighted"
@@ -184,7 +189,7 @@ class GradingPeriodSetForm extends React.Component {
               <div className="ic-Input pad-box top-only">
                 <Checkbox
                   ref={ref => {
-                    this.displayTotalsCheckbox = ref
+                    this.displayTotalsCheckboxRef = ref
                   }}
                   label={I18n.t('Display totals for All Grading Periods option')}
                   value="totals"

@@ -17,9 +17,9 @@
  */
 
 import EventDataSource from '../EventDataSource'
-import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import moment from 'moment-timezone'
 import $ from 'jquery'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock timezone functions
 jest.mock('@instructure/moment-utils', () => ({
@@ -40,6 +40,12 @@ describe('EventDataSource', () => {
   beforeEach(() => {
     originalZone = moment.tz.guess()
     moment.tz.setDefault('America/Denver')
+
+    fakeENV.setup({
+      TIMEZONE: 'America/Denver',
+      CONTEXT_TIMEZONE: 'America/Denver',
+      TIMEZONE_OFFSET: -420, // MST offset in minutes
+    })
 
     // Create test dates in Denver timezone
     date1 = moment.tz('2015-11-01T20:00:00', 'America/Denver')
@@ -131,7 +137,8 @@ describe('EventDataSource', () => {
 
   afterEach(() => {
     moment.tz.setDefault(originalZone)
-    jest.clearAllMocks()
+    fakeENV.teardown()
+    server?.restore?.()
   })
 
   describe('overlapping ranges', () => {

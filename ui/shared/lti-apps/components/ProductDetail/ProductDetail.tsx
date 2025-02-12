@@ -22,6 +22,7 @@ import {useLocation} from 'react-router-dom'
 import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 import useSimilarProducts from '../../queries/useSimilarProducts'
 import useProduct from '../../queries/useProduct'
+import { pickPreferredIntegration } from '@canvas/lti-apps/utils/pickPreferredIntegration'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
@@ -47,7 +48,7 @@ import {instructorAppsRoute} from '@canvas/lti-apps/utils/route'
 const I18n = createI18nScope('lti_registrations')
 
 type ProductDetailProps = {
-  renderConfigureButton?: (buttonWidth: 'block' | 'inline-block', lti: Lti) => JSX.Element
+  renderConfigureButton?: (buttonWidth: 'block' | 'inline-block', lti: Lti[]) => JSX.Element
 }
 
 const ProductDetail = (props: ProductDetailProps) => {
@@ -68,11 +69,6 @@ const ProductDetail = (props: ProductDetailProps) => {
 
   const {product, isLoading, isError} = useProduct({productId: currentProductId})
   const productDescription = stripHtmlTags(product?.description)
-  const lti_13 = product?.lti_configurations.lti_13
-  const integrationData =
-    (lti_13?.placements?.length ?? 0) > 0 || (lti_13?.services?.length ?? 0) > 0
-      ? product?.lti_configurations.lti_13
-      : product?.lti_configurations.lti_11
 
   const params = () => {
     return {
@@ -90,8 +86,9 @@ const ProductDetail = (props: ProductDetailProps) => {
     (otherProducts: Product) => otherProducts.global_product_id !== currentProductId,
   )
 
-  const ltiConfiguration = product?.tool_integration_configurations
-
+  const ltiConfiguration = product?.canvas_lti_configurations
+  const relevantIntegration = pickPreferredIntegration(ltiConfiguration ? ltiConfiguration : [])
+  
   const intDetailClickHandler = (title: string, content: string) => {
     setIntDetailModalOpen(true)
     setIntDetailTitle(title)
@@ -116,7 +113,7 @@ const ProductDetail = (props: ProductDetailProps) => {
       <Flex margin={buttonMargins}>
         <Flex.Item shouldGrow={true} margin={tabletMargin}>
           {props.renderConfigureButton && ltiConfiguration
-            ? props.renderConfigureButton(buttonWidth, ltiConfiguration)
+            ? props.renderConfigureButton(buttonWidth, product?.canvas_lti_configurations)
             : null}
         </Flex.Item>
       </Flex>
@@ -342,7 +339,7 @@ const ProductDetail = (props: ProductDetailProps) => {
               </Link>
             )}
             <ExternalLinks product={product} />
-            <LtiConfigurationDetail integrationData={integrationData} />
+            <LtiConfigurationDetail integrationData={relevantIntegration} />
             <Flex margin="medium 0 0 0">
               <Flex.Item margin="0 0 small 0">
                 <Heading level="h2" themeOverride={{h2FontWeight: 700}}>

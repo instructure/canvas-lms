@@ -31,14 +31,14 @@ module Canvas
       end
 
       before do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
       end
 
       let(:data) { {} }
 
       it "increments the error level by default" do
         described_class.capture("something", data)
-        expect(InstStatsd::Statsd).to have_received(:increment) do |key, data|
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment) do |key, data|
           expect(key).to eq("errors.error")
           expect(data[:tags][:category]).to eq("something")
         end
@@ -46,7 +46,7 @@ module Canvas
 
       it "uses the exception name for the category tag" do
         described_class.capture(StandardError.new, data, :warn)
-        expect(InstStatsd::Statsd).to have_received(:increment) do |key, data|
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment) do |key, data|
           expect(key).to eq("errors.warn")
           expect(data[:tags][:category]).to eq("StandardError")
         end
@@ -55,7 +55,7 @@ module Canvas
       it "increments the inner exception too" do
         got_inner = false
         got_outer = false
-        allow(InstStatsd::Statsd).to receive(:increment) do |_key, data|
+        allow(InstStatsd::Statsd).to receive(:distributed_increment) do |_key, data|
           cat = data[:tags][:category]
           got_inner = true if cat == "Canvas::FakeErrorStatsError"
           got_outer = true if cat == "Canvas::OuterErrorStatsError"

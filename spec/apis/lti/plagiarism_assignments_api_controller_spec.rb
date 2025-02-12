@@ -59,7 +59,7 @@ module Lti
           "due_at" => assignment.due_at.iso8601,
           "points_possible" => assignment.points_possible,
           "lti_id" => assignment.lti_context_id,
-          "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
+          "lti_course_id" => Lti::V1p1::Asset.opaque_identifier_for(assignment.context),
           "course_id" => assignment.context.global_id
         }
       end

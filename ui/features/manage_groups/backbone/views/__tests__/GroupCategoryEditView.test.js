@@ -69,4 +69,27 @@ describe('GroupCategoryEditView', () => {
     equal(view.$autoGroupLeaderControls.find("input[value='RANDOM']").prop('checked'), true)
     equal(view.$autoGroupLeaderControls.find("input[value='FIRST']").prop('checked'), false)
   })
+
+  test('renders correct description based on ENV.self_signup_deadline_enabled', () => {
+    // Test when self_signup_deadline_enabled is true
+    fakeENV.setup({ allow_self_signup: true, self_signup_deadline_enabled: true })
+    view = new GroupCategoryEditView({ model: groupCategory })
+    view.render()
+
+    const descriptionWithDeadline = 'You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. With this option enabled, students can move themselves from one group to another. However, you can set an end date to close self sign-up to prevent students from joining or changing groups after a certain date.'
+    expect(view.$('.icon-question').attr('title').trim()).toEqual(descriptionWithDeadline)
+
+    view.remove()
+    document.getElementById('fixtures').innerHTML = ''
+
+    // Test when self_signup_deadline_enabled is false
+    fakeENV.setup({ allow_self_signup: true, self_signup_deadline_enabled: false })
+    view = new GroupCategoryEditView({ model: groupCategory })
+    view.render()
+
+    const descriptionWithoutDeadline = 'You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. With this option enabled, students can move themselves from one group to another. Note that as long as this option is enabled, students can move themselves from one group to another.'
+    expect(view.$('.icon-question').attr('title').trim()).toEqual(descriptionWithoutDeadline)
+
+    fakeENV.teardown()
+  })
 })

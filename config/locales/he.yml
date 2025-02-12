@@ -2062,6 +2062,7 @@ he:
       details: פרטים...
       login: התחברות
     no_text: "אין תוכן"
+  alert_d2c8ef98: התראה
   alerts: 
     alert: 
       buttons: 
@@ -2175,6 +2176,8 @@ he:
   alphabetically_60ab47e4: "בסדר אלף בית"
   always_3a59e701: תמיד
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "תמיד יש לטעון את עורך התוכן העשיר והסרגל הצידי משרות התוכן העשיר של קנבס בכל המקומות"
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "התראה נוצרת עבור כל תלמיד אשר עונה כל כל הקריטריונים. הן נבדקות כל יום, והודעות ישלחו לתלמיד, למורה, ו / או למנהל המערכת עד אשר הגורם לבעיה ייפתר."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "התראה נוצרת עבור כל תלמיד אשר עונה כל כל הקריטריונים. הן נבדקות כל יום, והודעות ישלחו לתלמיד ו  או למורה עד אשר הגורם לבעיה ייפתר."
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "נדרש מפתח API כדי להשתמש בתקני השוואה אקדמים"
   an_assignment_name_dc624e70: "שם מטלה"
   an_auto_generated_chronological_summary_of_your_co_eeafee13: "סיכום כרונולוגי מיוצר-אוטומטית לקורס שלך"
@@ -2710,6 +2713,7 @@ he:
       save: שמירה
       validating: שומר...
       weight_groups: "שקלול הציון הסופי בהתבסס על קבוצות המשימה"
+    assignment_submit_success: "המשימה הוגשה בהצלחה"
     assignments_list_right_side: 
       links: 
         manage_assignments: "ניהול משימות"
@@ -5867,6 +5871,7 @@ he:
   course_pages_449f1dd4: "דפי קורס"
   course_people_3058c948: "אנשי קורס"
   course_quizzes_c337653c: "בחני קורס"
+  course_quota_8f7f74c: "מכסות קורס"
   course_restore: 
     restore_error: "אירעה שגירה בעת הנסיון לשחזר את הקורס. הקורס לא שוחזר."
   course_role_role_type_119c2f64: "תפקיד בקורס: %{role_type}"
@@ -6473,6 +6478,7 @@ he:
   create_a_new_module_6f31b0fe: "יצירת מודול חדש"
   create_a_new_user_for_address_7487e9c9: "יצירת משתמש חדש עבור \"%{address}\""
   create_account_263ec6: "יצירת חשבון"
+  create_an_eportfolio_1841e34a: "יצירת ePortfolio"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "יצירת וניהול בחנים וסקרים מקוונים, בין אם להערכה או בלעדיה"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: "יצירת נושאי דיון רבים ככל שנחוץ. כמטלות להערכה או כפורום לשיתוף רעיונות ומידע"
   create_assignment_68532ceb: "יצירת משימה"
@@ -6869,6 +6875,7 @@ he:
   deep_orange_4c7eea99: "כתום כהה"
   deep_purple_bb3e2907: "סגול כהה"
   default_9db103d: "ברירת מחדל"
+  default_account_quotas_e34112fd: "ברירות מחדל למכסות חשבון"
   default_conference_title: "שיחת ועידה בקורס %{course_name} "
   default_email_5cb9fa04: "דוא\"ל ברירת מחדל"
   default_email_9efb7fbd: "דוא\"ל ברירת מחדל"
@@ -7553,6 +7560,7 @@ he:
   ecollege_name: "ממיר Ecollege"
   ecuador_593_dfcc235a: "אקודור (+593)"
   edit_account_name_for_account_name_ae3633e8: "עריכת שם חשבון עבור %{account_name}"
+  edit_alert_739bb0ba: "ערוך התראה"
   edit_and_delete_their_own_posts_f4f7cc6: "עריכת וביטול הפרסומים שלהם עצמם."
   edit_announcement_title_cce0b4e: "עריכת הכרזה %{title}"
   edit_app_b0cc1c17: "עריכת אפליקציה"
@@ -8585,6 +8593,7 @@ he:
   find_an_existing_grading_scheme_d836ea: "מציאת סכימת הערכה קיימת"
   find_an_outcome_919328e6: "מציאת השגי למידה"
   find_appointment_85d6922e: "איתור פגישה"
+  find_course_or_group_a7de09a4: "מציאת קורס או קבוצה"
   find_flickr_image_view: 
     find_cc_on_flickr: "מציאת תמונות בפליקר עם רישוי במסגרת  Creative Commons"
     search: חיפוש
@@ -9585,6 +9594,7 @@ he:
   group_group_name_is_for_a_different_section_4d84d256: "הקבוצה %{group_name}  מיועדת להקבצה אחרת"
   group_group_name_is_full_297880d6: "הקבוצה %{group_name}  כבר מלאה"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "ההצטרפות לקבוצה %{group_name}  בהזמנה בלבד"
+  group_id_b0f6af89: "מזהה קבוצה"
   group_is_for_a_different_section_6a843a4d: "הקבוצה מיועדת להקבצה אחרת"
   group_is_full_56849d78: "הקבוצה מלאה"
   group_is_joined_by_invitation_only_d00f5a63: "ההצטרפות לקבוצה בהזמנה בלבד"
@@ -9608,6 +9618,7 @@ he:
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} ב %{group_category_name} קטגורית קבוצה"
   group_name_is_required_5547bc0b: "נדרש שם קבוצה"
   group_pages_656556f3: "דפי קבוצה"
+  group_quota_290dbc6b: "מכסות קבוצה"
   group_roster_1846bf84: "לוח משתתפי הקבוצה"
   group_select_330df8bd: "בחירה קבוצתית"
   group_set_4d1e7b06: "אוסף קבוצות"
@@ -10754,6 +10765,7 @@ he:
       ellipsis: "..."
       quoted_text_toggle: "מציג ציטוט"
       word_separator: " "
+  license_bdede4fb: רישיון
   license_help: 
     content_license_help: "עזרה ברישוי תוכן"
   license_type_6b74b543: "סוג רשיון"
@@ -11085,6 +11097,7 @@ he:
   manual_8c2665de: ידני
   manual_entry_e4a4f99a: "מופע ידני"
   manually_mark_posts_as_read_afa5d035: "סימון ידני של פרסומים כנקראו"
+  manually_settable_quotas_ea3759e7: "מכסות להגדרה ידנית"
   mark_all_as_read_8f3bdf57: "סימון הכל כנקרא"
   mark_all_as_unread_a435be3d: "סימון הכל כלא נקרא"
   mark_as_done_6fa48d2f: "סימון כבוצע"
@@ -11205,6 +11218,7 @@ he:
   median_score_4657e907: "חציון: %{score}"
   meets_expectations_bb179565: "עונה על הציפיות"
   meets_mastery_754e1c06: "עונה על דרישות ההתמחות"
+  megabytes_885404ef: מגהבייט
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} חברים מתוך מכסימום של %{max_membership}"
   members_af25c21d: חברים
   members_are_free_to_join_defa5929: "חברים חופשיים להצטרף"
@@ -13373,6 +13387,7 @@ he:
   no_placements_enabled_f705f28: "לא הופעלו הצבות"
   no_points_possible_368669d: "אין ניקוד אפשרי"
   no_points_possible_72db3a55: "אין ניקוד אפשרי"
+  no_preview_available_e8e71199: "תצוגה מקדימה אינה זמינה"
   no_results_3cda4e72: "אין תוצאות"
   no_results_f36777ee: "אין תוצאות"
   no_results_found_2ace1494: "לא נמצאו תוצאות"
@@ -13384,6 +13399,7 @@ he:
   no_students_have_taken_the_survey_yet_d378cd35: "תלמידים טרם השתתפו בסקר"
   no_submission_fb131a40: "אין הגשה"
   no_submission_for_assignment_a9cb6fe2: "אין הגשה עבור %{assignment}"
+  no_teacher_interaction_de8d91bc: "אין מעורבות מורה"
   no_time_limit_for_long_running_conferences_d49fdfad: "אין מגבלת זמן (לשיחות ועידה ארוכות)"
   no_tls_618add1a: "אין TLS"
   no_unassigned_terms_deb7b76b: "אין תקופות שלא שויכו"
@@ -17162,6 +17178,7 @@ he:
   saudi_arabia_1f0dcbdc: "ערב הסעודית"
   saudi_arabia_966_d01ed717: "ערב הסעודית (+966)"
   save_11a80ec3: שמירה
+  save_alert_b64f9fa3: "שמירת התראה"
   save_changes_698abe77: "שמירת שינויים"
   save_grading_period_daaaddea: "שמירת תקופת הערכה"
   save_grading_period_set_e029fa88: "שמירת אוגדן תקופות הערכה"
@@ -19022,6 +19039,7 @@ he:
   submitted_files_82dd3009: "קבצים שהוגשו"
   submitted_late_3741af29: "הוגש באיחור"
   submitted_submitdate_bdd3bf09: "הוגש: %{submitDate}"
+  submitting_b90fac62: מבצע...
   submitting_types_7c5a7096: "בהגשה: %{types}"
   subscribe_4b301fb7: הרשמה
   subscribed_fe74d22a: "רשום "
@@ -19032,6 +19050,7 @@ he:
   successfully_moved_model_to_newgroup_f7b7aa5a: "העברה מוצלחת של %{model} אל %{newGroup}"
   successfully_resubmitted_to_turnitin_c908de0f: "נשלח מחדש בהצלחה ל turnitin."
   successfully_resubmitted_to_vericite_dab924b6: "נשלח מחדש בהצלחה ל VeriCite"
+  suggestions_b8b03b9d: "הצעות:"
   sum_of_all_files_in_mb_2b705055: "סך גודל כל הקבצים במגהבייט MB"
   summary_statistics_f74852a5: "סטטיסטיקה מסכמת"
   support: 
@@ -19773,6 +19792,7 @@ he:
   treat_ungraded_as_0_d38c2b41: "התיחסות לאי מתן ציון כאל 0"
   tree_browser: 
     folder_tree_instructions: "יש להשתמש בחיצי מעלה מטה כדי לנווט בעץ. לחיצת חץ ימיני כדי להרחיב ענף נבחר בעץ וחץ שמאלי כדי לכווץ ענף נבחר בעץ."
+  trigger_f0ee1fbf: משפעל
   trophy: 
     star_display_name: "הוספת כוכבית"
   true_false_823761a9: "נכון/לא נכון"
@@ -19833,6 +19853,8 @@ he:
   unenrolled_users_e7632d24: "משתמשים לא רשומים"
   ungraded_answers_31ef2df7: "תשובות ללא הערכה"
   ungraded_submissions_44efb0ec: "הגשות שלא הוערכו"
+  ungraded_submissions_count_63fcf6d1: "(כמות) הגשות שלא הוערכו."
+  ungraded_submissions_time_bafaa609: "משימות שלא קיבלו ציון (בפרק זמן)"
   ungraded_survey_ad7de790: "סקר שלא להערכה"
   united_arab_emirates_971_649b3750: "איחוד האמירויות (+971)"
   united_arab_emirates_a71e57c6: "איחוד האמירויות הערבי"
@@ -19901,6 +19923,7 @@ he:
   update_link_b7cab181: "עדכון קישור"
   update_module_b984c2e5: "עדכון מודול"
   update_password_4bc5cb1f: "עדכון סיסמה"
+  update_quota_81381226: "עדכון מכסות"
   update_settings_9b422d0f: "עדכון הגדרות"
   update_tool_7d48ef2a: "עדכון %{tool}"
   update_your_notification_settings_ed9564f3: "עדכון הגדרות ההתראות שלך"
@@ -19908,6 +19931,7 @@ he:
   updated_group_group_name_727b1d98: "עדכון קבוצה %{group_name}"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "ממשק משתמש מעודכן לחיפוש והצגת משתמשים וקורסים של חשבון נבחר."
   updating_6edbab78: מעדכן
+  updating_73d0718c: מעדכן...
   updating_user_details_b8520b3e: "עדכון פרטי משתמש..."
   upload_8b403d05: העלאה
   upload_a_picture_9f5f6e3c: "העלאת תמונה"
@@ -20139,6 +20163,7 @@ he:
       settings: הגדרות
   user_profile_d56261fc: "פרופיל משתמש"
   user_profile_picture_46bffbc7: "תמונת הפרופיל של המשתמש"
+  user_quota_12cb58b7: "מכסות משתמש"
   user_s_settings_d65644b4: "ההגדרות של %{user} "
   user_search_panel_18f80511: "חלון חפוש משתמשים"
   user_search_results_f5445b8b: "תוצאות חיפוש משתמשים"

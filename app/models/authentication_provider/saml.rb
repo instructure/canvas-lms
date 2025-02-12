@@ -47,6 +47,10 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     ].freeze
   end
 
+  def self.sensitive_params
+    [*super, :metadata].freeze
+  end
+
   def self.deprecated_params
     %i[change_password_url login_handle_name unknown_user_url].freeze
   end
@@ -101,8 +105,6 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
        idp_logout_response_xml_encrypted: -> { t("IdP LogoutResponse XML") },
      }]
   end
-
-  SENSITIVE_PARAMS = [:metadata].freeze
 
   before_validation :set_saml_defaults
   before_validation :download_metadata

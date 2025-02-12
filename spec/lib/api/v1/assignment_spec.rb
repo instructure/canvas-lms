@@ -1029,7 +1029,7 @@ describe "Api::V1::Assignment" do
     let_once(:assignment) { Assignment.new(context: course) }
     let_once(:course) { course_model }
     let_once(:account) { assignment.root_account }
-    let_once(:developer_key) { dev_key_model_1_3(account:) }
+    let_once(:developer_key) { lti_developer_key_model(account:) }
     let_once(:user) { user_model }
 
     context "external tool url" do

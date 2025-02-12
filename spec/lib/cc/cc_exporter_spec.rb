@@ -378,7 +378,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/first.png\"></div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/first.png\" loading=\"lazy\"></div>"
 
       check_resource_node(@att, CC::CCHelper::WEBCONTENT)
       check_resource_node(@att2, CC::CCHelper::WEBCONTENT, false)
@@ -433,8 +433,8 @@ describe "Common Cartridge exporting" do
       check_resource_node(quiz, CC::CCHelper::ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(quiz)}/assessment_qti.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq %(<div>Image yo: <img src="$IMS-CC-FILEBASE$/unfiled/first.png"></div>)
-      expect(doc.at_css("section").children[3].at_css("presentation material mattext").text).to eq %(<div><img src="$IMS-CC-FILEBASE$/assessment_questions/test%20my%20file?%20hai!&amp;.png?canvas_download=1"></div>)
+      expect(doc.at_css("presentation material mattext").text).to eq %(<div>Image yo: <img src="$IMS-CC-FILEBASE$/unfiled/first.png" loading="lazy"></div>)
+      expect(doc.at_css("section").children[3].at_css("presentation material mattext").text).to eq %(<div><img src="$IMS-CC-FILEBASE$/assessment_questions/test%20my%20file?%20hai!&amp;.png?canvas_download=1" loading="lazy"></div>)
 
       check_resource_node(att1, CC::CCHelper::WEBCONTENT)
       check_resource_node(att2, CC::CCHelper::WEBCONTENT)
@@ -547,8 +547,8 @@ describe "Common Cartridge exporting" do
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
       export_html = <<~HTML.strip
-        <div><p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4?canvas_=1&amp;canvas_qs_embedded=true&amp;canvas_qs_type=video" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
-        <p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
+        <div><p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id" loading="lazy"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4?canvas_=1&amp;canvas_qs_embedded=true&amp;canvas_qs_type=video" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
+        <p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id" loading="lazy"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
         <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/hidden/test.mp4"></a></p></div>
       HTML
       expect(doc.at_css("presentation material mattext").text).to match_ignoring_whitespace export_html
@@ -597,7 +597,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@page, CC::CCHelper::WEBCONTENT)
 
       export_html = <<~HTML.strip
-        <p><audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/hidden/292.mp3" data-media-id="some-kaltura-id" data-media-type="audio"></audio></p>
+        <p><audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id" loading="lazy"><source src="$IMS-CC-FILEBASE$/hidden/292.mp3" data-media-id="some-kaltura-id" data-media-type="audio"></audio></p>
         <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment audio_comment" href="$IMS-CC-FILEBASE$/hidden/292.mp3"></a></p>
       HTML
 
@@ -647,7 +647,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@page, CC::CCHelper::WEBCONTENT)
 
       export_html = <<~HTML.strip
-        <p><audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/Uploaded Media/test.mp4" data-media-id="some-kaltura-id" data-media-type="audio"></audio></p>
+        <p><audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id" loading="lazy"><source src="$IMS-CC-FILEBASE$/Uploaded Media/test.mp4" data-media-id="some-kaltura-id" data-media-type="audio"></audio></p>
         <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment audio_comment" href="$IMS-CC-FILEBASE$/Uploaded Media/test.mp4"></a></p>
       HTML
       expect(@zip_file.read("wiki_content/some-page.html")).to include export_html
@@ -695,7 +695,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@page, CC::CCHelper::WEBCONTENT)
 
       export_html = <<~HTML.strip
-        <p><audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4" data-media-id="some-kaltura-id" data-media-type="audio"></audio></p>
+        <p><audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id" loading="lazy"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4" data-media-id="some-kaltura-id" data-media-type="audio"></audio></p>
         <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment audio_comment" href="$IMS-CC-FILEBASE$/hidden/test.mp4"></a></p>
       HTML
       expect(@zip_file.read("wiki_content/some-page.html")).to include export_html
@@ -737,7 +737,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_qti.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/not_actually_first.png\"></div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/not_actually_first.png\" loading=\"lazy\"></div>"
 
       check_resource_node(@att, CC::CCHelper::WEBCONTENT)
 

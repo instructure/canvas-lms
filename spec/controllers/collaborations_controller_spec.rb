@@ -140,8 +140,8 @@ describe CollaborationsController do
       let(:course) { @course }
       let(:url) { "http://www.example.com/launch" }
       let(:domain) { "example.com" }
-      let(:developer_key_1) { dev_key_model_1_3(account: @course.account) }
-      let(:developer_key_2) { dev_key_model_1_3(account: @course.account) }
+      let(:developer_key_1) { lti_developer_key_model(account: @course.account) }
+      let(:developer_key_2) { lti_developer_key_model(account: @course.account) }
       let(:tool_1) { external_tool_1_3_model(context: @course, developer_key: developer_key_1, opts: { url:, name: "1.3 tool 1" }) }
       let(:tool_2) { external_tool_1_3_model(context: @course, developer_key: developer_key_2, opts: { url:, name: "1.3 tool 2" }) }
       let(:content_item_1) do
@@ -224,7 +224,7 @@ describe CollaborationsController do
       end
 
       it "includes collaborator old_lti_id" do
-        Lti::Asset.opaque_identifier_for(@student)
+        Lti::V1p1::Asset.opaque_identifier_for(@student)
         UserPastLtiId.create!(user: @student, context: @collab.context, user_lti_id: @student.lti_id, user_lti_context_id: "old_lti_id", user_uuid: "old")
         get "members", params: { id: @collab.id, include: ["collaborator_lti_id"] }
         @student.reload
@@ -266,7 +266,7 @@ describe CollaborationsController do
 
     let(:url) { "http://www.example.com/launch" }
     let(:domain) { "example.com" }
-    let(:developer_key) { dev_key_model_1_3(account: @course.account) }
+    let(:developer_key) { lti_developer_key_model(account: @course.account) }
     let(:new_tool) { external_tool_1_3_model(context: @course, developer_key:, opts: { url:, name: "1.3 tool" }) }
     let(:old_tool) { external_tool_model(context: @course, opts: { url:, domain: }) }
 
@@ -442,7 +442,7 @@ describe CollaborationsController do
           let(:content_item) do
             super().merge(
               Collaboration::DEEP_LINKING_EXTENSION => {
-                groups: [Lti::Asset.opaque_identifier_for(group)]
+                groups: [Lti::V1p1::Asset.opaque_identifier_for(group)]
               }
             )
           end
@@ -505,7 +505,7 @@ describe CollaborationsController do
       it "adds users if sent" do
         user_session(@teacher)
         users = Array.new(2) { student_in_course(course: @course, active_all: true).user }
-        lti_user_ids = users.map { |student| Lti::Asset.opaque_identifier_for(student) }
+        lti_user_ids = users.map { |student| Lti::V1p1::Asset.opaque_identifier_for(student) }
         content_items.first["ext_canvas_visibility"] = { users: lti_user_ids }
         post "create", params: { course_id: @course.id, contentItems: content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
@@ -516,7 +516,7 @@ describe CollaborationsController do
         user_session(@teacher)
         group = group_model(context: @course)
         group.add_user(@teacher, "active")
-        content_items.first["ext_canvas_visibility"] = { groups: [Lti::Asset.opaque_identifier_for(group)] }
+        content_items.first["ext_canvas_visibility"] = { groups: [Lti::V1p1::Asset.opaque_identifier_for(group)] }
         post "create", params: { course_id: @course.id, contentItems: content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
         expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])
@@ -609,7 +609,7 @@ describe CollaborationsController do
       it "adds users if sent" do
         user_session(@teacher)
         users = Array.new(2) { student_in_course(course: @course, active_all: true).user }
-        lti_user_ids = users.map { |student| Lti::Asset.opaque_identifier_for(student) }
+        lti_user_ids = users.map { |student| Lti::V1p1::Asset.opaque_identifier_for(student) }
         content_items.first["ext_canvas_visibility"] = { users: lti_user_ids }
         put "update", params: { id: collaboration.id, course_id: @course.id, contentItems: content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
@@ -620,7 +620,7 @@ describe CollaborationsController do
         user_session(@teacher)
         group = group_model(context: @course)
         group.add_user(@teacher, "active")
-        content_items.first["ext_canvas_visibility"] = { groups: [Lti::Asset.opaque_identifier_for(group)] }
+        content_items.first["ext_canvas_visibility"] = { groups: [Lti::V1p1::Asset.opaque_identifier_for(group)] }
         put "update", params: { id: collaboration.id, course_id: @course.id, contentItems: content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
         expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])
@@ -631,8 +631,8 @@ describe CollaborationsController do
         group = group_model(context: @course)
         group.add_user(@teacher, "active")
         content_items.first["ext_canvas_visibility"] = {
-          groups: [Lti::Asset.opaque_identifier_for(group)],
-          users: [Lti::Asset.opaque_identifier_for(@teacher)]
+          groups: [Lti::V1p1::Asset.opaque_identifier_for(group)],
+          users: [Lti::V1p1::Asset.opaque_identifier_for(@teacher)]
         }
         2.times do
           put "update", params: { id: collaboration.id, course_id: @course.id, contentItems: content_items.to_json }

@@ -19,14 +19,21 @@
 import React from 'react'
 import PastGlobalAnnouncements from '../PastGlobalAnnouncements'
 import {render, fireEvent} from '@testing-library/react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('past_global_announcements::pastGlobalAnnouncements', () => {
   describe('render announcements', () => {
-    beforeAll(() => {
-      window.ENV.global_notifications = {
-        current: ['<div><p>This is an active announcement</p></div>'],
-        past: ['<div><p>This is a past announcement</p></div>'],
-      }
+    beforeEach(() => {
+      fakeENV.setup({
+        global_notifications: {
+          current: ['<div><p>This is an active announcement</p></div>'],
+          past: ['<div><p>This is a past announcement</p></div>'],
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
     })
 
     it('checks that the document contains active announcements', () => {
@@ -42,11 +49,17 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
   })
 
   describe('render image if there are no announcements', () => {
-    beforeAll(() => {
-      window.ENV.global_notifications = {
-        current: [],
-        past: [],
-      }
+    beforeEach(() => {
+      fakeENV.setup({
+        global_notifications: {
+          current: [],
+          past: [],
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
     })
 
     it('checks that a dessert svg is rendered in the current section', async () => {
@@ -63,41 +76,60 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
 
   describe('pagination', () => {
     it('checks paging for current section is working', async () => {
-      window.ENV.global_notifications = {
-        current: [
-          '<div><p>This is current page one</p></div>',
-          '<div><p>This is current page two</p></div>',
-        ],
-        past: [],
-      }
+      fakeENV.setup({
+        global_notifications: {
+          current: [
+            '<div><p>This is current page one</p></div>',
+            '<div><p>This is current page two</p></div>',
+          ],
+          past: [],
+        },
+      })
+
       const {findByText} = render(<PastGlobalAnnouncements />)
       expect(await findByText('This is current page one')).toBeVisible()
       fireEvent.click(await findByText('2'))
       expect(await findByText('This is current page two')).toBeVisible()
+
+      fakeENV.teardown()
     })
 
     it('checks paging for past section is working', async () => {
-      window.ENV.global_notifications = {
-        current: [],
-        past: [
-          '<div><p>This is past page one</p></div>',
-          '<div><p>This is past page two</p></div>',
-        ],
-      }
+      fakeENV.setup({
+        global_notifications: {
+          current: [],
+          past: [
+            '<div><p>This is past page one</p></div>',
+            '<div><p>This is past page two</p></div>',
+          ],
+        },
+      })
+
       const {findByText} = render(<PastGlobalAnnouncements />)
       fireEvent.click(await findByText('Recent'))
       expect(await findByText('This is past page one')).toBeVisible()
       fireEvent.click(await findByText('2'))
       expect(await findByText('This is past page two')).toBeVisible()
+
+      fakeENV.teardown()
     })
   })
 
   describe('with instui_nav feature flag on', () => {
     beforeEach(() => {
-      window.ENV.FEATURES.instui_nav = true
+      fakeENV.setup({
+        FEATURES: {
+          instui_nav: true,
+        },
+        global_notifications: {
+          current: [],
+          past: [],
+        },
+      })
     })
+
     afterEach(() => {
-      window.ENV.FEATURES.instui_nav = false
+      fakeENV.teardown()
     })
 
     it('checks that SimpleSelect is displayed for lower resolution', () => {
@@ -107,7 +139,7 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
 
     it('checks that Tabs are displayed for higher resolutions', () => {
       const {getByTestId} = render(<PastGlobalAnnouncements breakpoints={{desktop: true}} />)
-      expect(getByTestId('GlobalAnnouncementCurrentTab')).toBeVisible()
+      expect(getByTestId('GlobalAnnouncementTabs')).toBeVisible()
     })
 
     it('checks that the "Global Announcements" header is visible', () => {

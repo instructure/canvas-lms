@@ -562,6 +562,19 @@ body .disabled_link {
   font-size: 0.8em;
   padding-#{direction(left)}: 10px;
   color: $ic-dim-helper-text;
+  .error-message {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    color: $ic-color-danger;
+    i.icon-warning.icon-Solid {
+      margin-right: 8px;
+    }
+  }
+}
+.hasDatepicker.error,
+.hasDatepicker.error:focus{
+  border: 1px solid $ic-color-danger;
 }
 
 #submission_preview {

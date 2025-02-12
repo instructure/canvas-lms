@@ -19,7 +19,7 @@
 
 module Lti::IMS::NamesAndRolesMatchers
   def expected_lti_id(entity)
-    entity.is_a?(User) ? entity.lti_id : Lti::Asset.opaque_identifier_for(entity)
+    entity.is_a?(User) ? entity.lti_id : Lti::V1p1::Asset.opaque_identifier_for(entity)
   end
 
   def expected_course_lti_roles(*enrollment)
@@ -113,7 +113,7 @@ module Lti::IMS::NamesAndRolesMatchers
       "email" => (user.email if %w[public email_only].include?(privacy(opts))),
       "lis_person_sourcedid" => (expected_sourced_id(user) if %w[public name_only].include?(privacy(opts))),
       "user_id" => expected_lti_id(Lti::IMS::Providers::MembershipsProvider.unwrap(user)),
-      "lti11_legacy_user_id" => Lti::Asset.opaque_identifier_for(user)
+      "lti11_legacy_user_id" => Lti::V1p1::Asset.opaque_identifier_for(user)
     }.compact
   end
 

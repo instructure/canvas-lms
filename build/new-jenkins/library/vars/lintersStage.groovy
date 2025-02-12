@@ -73,7 +73,7 @@ def typescriptStage(stages) {
   { ->
     callableWithDelegate(queueTestStage())(stages,
       name: 'TypeScript',
-      command: 'export NODE_OPTIONS="--max-old-space-size=8192" && node_modules/.bin/tsc -p tsconfig.json --noEmit'
+      command: './build/new-jenkins/linters/run-ts-type-check.sh'
     )
   }
 }

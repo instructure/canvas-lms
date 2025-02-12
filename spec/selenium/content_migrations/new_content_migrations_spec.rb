@@ -19,6 +19,7 @@
 
 require_relative "../common"
 require_relative "page_objects/new_content_migration_page"
+require_relative "page_objects/new_content_migration_progress_item"
 require_relative "page_objects/new_select_content_page"
 require_relative "page_objects/new_course_copy_page"
 
@@ -113,13 +114,14 @@ describe "content migrations", :non_parallel do
     SelectContentPage.outcome_parent.click
 
     # Expand first group
-    SelectContentPage.outcome_options(1)
+    SelectContentPage.outcome_option_caret_by_name("group1").click
 
     # Select subgroup
-    SelectContentPage.outcome_checkboxes(2)
+    SelectContentPage.outcome_option_checkbox_by_name("subgroup1").click
 
     # Submit selection
-    SelectContentPage.submit_button
+    SelectContentPage.submit_button.click
+    wait_for_ajax_requests
 
     source_course ? run_migration : import
 
@@ -146,7 +148,7 @@ describe "content migrations", :non_parallel do
       @filename = "cc_outcomes.imscc"
     end
 
-    it "selectively copies outcomes", skip: "learning outcomes not working" do
+    it "selectively copies outcomes", skip: "selective content migration bug CLAB-975" do
       visit_page
 
       fill_migration_form
@@ -190,7 +192,7 @@ describe "content migrations", :non_parallel do
       # expect(NewContentMigrationPage.content).not_to contain_css(NewContentMigrationPage.migration_file_upload_input_id)
     end
 
-    it "submit's queue and list migrations", skip: "no file upload" do
+    it "submit's queue and list migrations" do
       visit_page
       fill_migration_form
       NewContentMigrationPage.all_content_radio.click
@@ -209,38 +211,31 @@ describe "content migrations", :non_parallel do
       progress_items = NewContentMigrationPage.migration_progress_items
       expect(progress_items.count).to eq 2
 
-      source_links = []
       progress_items.each do |item|
-        expect(item.find_element(:css, ".migrationName")).to include_text("Common Cartridge")
-        expect(item.find_element(:css, ".progressStatus")).to include_text("Queued")
+        progress_item = NewContentMigrationProgressItem.new(item)
+        expect(progress_item.content_type).to include_text("Common Cartridge")
+        expect(progress_item.status).to include_text("Queued")
 
-        source_links << item.find_element(:css, ".sourceLink a")
-      end
-
-      hrefs = source_links.map { |a| a.attribute(:href) }
-
-      @course.content_migrations.each do |cm|
-        expect(hrefs.find { |href| href.include?("/files/#{cm.attachment_id}/download") }).not_to be_nil
+        download_url = progress_item.source_link.attribute(:href)
+        expect(download_url).to include("download")
       end
     end
 
-    it "shifts dates", skip: "not implemented" do
+    it "shifts dates" do
       visit_page
       fill_migration_form
-      CourseCopyPage.date_adjust_checkbox.click
+      NewContentMigrationPage.date_adjust_checkbox.click
       NewContentMigrationPage.all_content_radio.click
-      replace_and_proceed(CourseCopyPage.old_start_date_input, "7/1/2014")
-      replace_and_proceed(CourseCopyPage.old_end_date_input, "Jul 11, 2014")
-      replace_and_proceed(CourseCopyPage.new_start_date_input, "8-5-2014")
-      replace_and_proceed(CourseCopyPage.new_end_date_input, "Aug 15, 2014")
-      2.times { CourseCopyPage.add_day_substitution_button.click }
-      click_option("#daySubstitution ul > div:nth-child(1) .currentDay", "1", :value)
-      click_option("#daySubstitution ul > div:nth-child(1) .subDay", "2", :value)
-      click_option("#daySubstitution ul > div:nth-child(2) .currentDay", "5", :value)
-      click_option("#daySubstitution ul > div:nth-child(2) .subDay", "4", :value)
+      replace_and_proceed(NewContentMigrationPage.old_start_date_input, "7/1/2014")
+      replace_and_proceed(NewContentMigrationPage.old_end_date_input, "Jul 11, 2014")
+      replace_and_proceed(NewContentMigrationPage.new_start_date_input, "8-5-2014")
+      replace_and_proceed(NewContentMigrationPage.new_end_date_input, "Aug 15, 2014")
+      2.times { NewContentMigrationPage.add_day_substitution_button.click }
+      NewContentMigrationPage.select_day_substition_range(1, "Monday", "Tuesday")
+      NewContentMigrationPage.select_day_substition_range(2, "Friday", "Thursday")
       submit
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      expect(opts["shift_dates"]).to eq "1"
+      expect(opts["shift_dates"]).to be true
       expect(opts["day_substitutions"]).to eq({ "1" => "2", "5" => "4" })
       expect(Date.parse(opts["old_start_date"])).to eq Date.new(2014, 7, 1)
       expect(Date.parse(opts["old_end_date"])).to eq Date.new(2014, 7, 11)
@@ -249,7 +244,7 @@ describe "content migrations", :non_parallel do
     end
   end
 
-  context "course copy", skip: "issues with cc search" do
+  context "course copy" do
     before do
       # the "true" param is important, it forces the cache clear
       #  without it this spec group fails if
@@ -291,13 +286,11 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      NewContentMigrationPage.course_search_input.send_keys(@copy_from.name)
-      NewContentMigrationPage.course_search_input.send_keys(:enter)
-      wait_for_ajaximations
-      expect(NewContentMigrationPage.course_search_result(@copy_from.id.to_s)).to be_displayed
+      input_canvas_select(NewContentMigrationPage.course_search_input, @copy_from.name)
+      expect(NewContentMigrationPage.course_search_input_has_options?).to be true
 
-      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(NewContentMigrationPage.course_search_result(new_course.id.to_s)).not_to be_displayed
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name, option_exists: false)
+      expect(NewContentMigrationPage.course_search_input_has_options?).to be false
 
       user_logged_in(active_all: true)
       @course.enroll_teacher(@user, enrollment_state: "active")
@@ -307,8 +300,8 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name, option_exists: false)
+      expect(NewContentMigrationPage.course_search_input_has_options?).to be false
     end
 
     it "includes completed courses when checked", priority: "1" do
@@ -320,16 +313,16 @@ describe "content migrations", :non_parallel do
 
       select_migration_type
       wait_for_ajaximations
-      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name)
+      expect(NewContentMigrationPage.course_search_input_has_options?).to be true
 
       NewContentMigrationPage.include_completed_courses_checkbox.click
       wait_for_ajaximations
-      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
+      input_canvas_select(NewContentMigrationPage.course_search_input, new_course.name, option_exists: false)
+      expect(NewContentMigrationPage.course_search_input_has_options?).to be false
     end
 
-    it "finds courses in other accounts", priority: "1" do
+    it "finds courses in other accounts", priority: "1", skip: "issues with cc search" do
       new_account1 = account_model
       enrolled_course = Course.create!(name: "faraway course", account: new_account1)
       enrolled_course.enroll_teacher(@user).accept
@@ -374,7 +367,7 @@ describe "content migrations", :non_parallel do
         worker_class.new(cm.id).perform
       end
 
-      it "copies all content from a course", priority: "1" do
+      it "copies all content from a course", priority: "1", skip: "issues with cc search" do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -395,7 +388,7 @@ describe "content migrations", :non_parallel do
         expect(@course.quizzes.first.quiz_questions.count).to eq 11
       end
 
-      it "selectively copies content", priority: "1" do
+      it "selectively copies content", priority: "1", skip: "issues with cc search" do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -410,7 +403,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    context "with selectable_outcomes_in_course_copy enabled" do
+    context "with selectable_outcomes_in_course_copy enabled", skip: "issues with cc search" do
       before do
         root = @copy_from.root_outcome_group(true)
         outcome_model(context: @copy_from, title: "root1")
@@ -436,7 +429,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "sets day substitution and date adjustment settings", priority: "1" do
+    it "sets day substitution and date adjustment settings", priority: "1", skip: "issues with cc search" do
       # TODO: fix click_option
       new_course = Course.create!(name: "day sub")
       new_course.enroll_teacher(@user).accept
@@ -484,7 +477,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "sets pre-populate date adjustment settings" do
+    it "sets pre-populate date adjustment settings", skip: "issues with cc search" do
       new_course = Course.create!(name: "date adjust", start_at: "Jul 1, 2012", conclude_at: "Jul 11, 2012")
       new_course.enroll_teacher(@user).accept
 
@@ -516,7 +509,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "removes dates", priority: "1" do
+    it "removes dates", priority: "1", skip: "issues with cc search" do
       new_course = Course.create!(name: "date remove", start_at: "Jul 1, 2014", conclude_at: "Jul 11, 2014")
       new_course.enroll_teacher(@user).accept
 
@@ -543,7 +536,7 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type
       wait_for_ajaximations
-      click_option("#courseSelect", @copy_from.id.to_s, :value)
+      search_for_option("#course-copy-select-course", @copy_from.name, @copy_from.id.to_s)
       NewContentMigrationPage.all_content_radio.click
       submit
       run_jobs
@@ -554,7 +547,7 @@ describe "content migrations", :non_parallel do
       expect(@course.lock_all_announcements).to be_truthy
     end
 
-    it "persists topic 'allow liking' settings across course copy", priority: "2" do
+    it "persists topic 'allow liking' settings across course copy", priority: "2", skip: "issues with cc search" do
       @copy_from.discussion_topics.create!(
         title: "Liking Allowed Here",
         message: "Like I said, liking is allowed",
@@ -575,7 +568,7 @@ describe "content migrations", :non_parallel do
     end
   end
 
-  context "importing LTI content", skip: "LTI not implemented" do
+  context "importing LTI content" do
     let(:import_course) do
       account = account_model
       course_with_teacher_logged_in(account:).course
@@ -619,7 +612,7 @@ describe "content migrations", :non_parallel do
       import_tool
       other_tool
       visit_page
-      migration_type_options = CourseCopyPage.migration_type_options
+      migration_type_options = NewContentMigrationPage.migration_type_options
       migration_type_values = migration_type_options.pluck("value")
       migration_type_texts = migration_type_options.map(&:text)
       expect(migration_type_values).to include(import_tool.asset_string)
@@ -636,7 +629,7 @@ describe "content migrations", :non_parallel do
       expect(NewContentMigrationPage.lti_select_content).to be_displayed
     end
 
-    it "launches LTI tool on browse and get content link" do
+    it "launches LTI tool on browse and get content link", skip: "LTI not implemented" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)

@@ -119,6 +119,16 @@ class SubmissionsController < SubmissionsBaseController
     begin
       @assignment = @submission_for_show.assignment
       @submission = @submission_for_show.submission
+
+      # If the assignment has checkpoints
+      # We need to find reply_to_topic sub assignment and reply_to_entry sub assignment and their submissions
+      if @assignment.checkpoints_parent?
+        @reply_to_topic_assignment = @assignment.find_checkpoint(CheckpointLabels::REPLY_TO_TOPIC)
+        @reply_to_entry_assignment = @assignment.find_checkpoint(CheckpointLabels::REPLY_TO_ENTRY)
+
+        @reply_to_topic_submission = @reply_to_topic_assignment.submissions.find_by(user_id: @submission.user)
+        @reply_to_entry_submission = @reply_to_entry_assignment.submissions.find_by(user_id: @submission.user)
+      end
     rescue ActiveRecord::RecordNotFound
       return render_user_not_found
     end
@@ -143,8 +153,8 @@ class SubmissionsController < SubmissionsBaseController
 
   # @API Submit an assignment
   #
-  # Make a submission for an assignment. You must be enrolled as a student in
-  # the course/section to do this.
+  # Make a submission for an assignment. You must be actively enrolled as a student in
+  # the course/section to do this. Concluded and pending enrollments are not permitted.
   #
   # All online turn-in submission types are supported in this API. However,
   # there are a few things that are not yet supported:

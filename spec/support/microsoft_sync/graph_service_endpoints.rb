@@ -51,7 +51,7 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
       @url_logger.stub_request(http_method, url, response, url_variables, with_params)
     end
 
-    allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+    allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
     allow(InstStatsd::Statsd).to receive(:count).and_call_original
 
     # Test retry on intermittent errors without internal retry
@@ -90,7 +90,7 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
             MicrosoftSync::Errors::HTTPNotFound,
             /Graph service returned 404 for tenant mytenant.*uh-oh!/
           )
-          expect(InstStatsd::Statsd).to have_received(:increment)
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment)
             .with("microsoft_sync.graph_service.notfound", tags: statsd_tags)
         end
       end
@@ -105,7 +105,7 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
             MicrosoftSync::Errors::HTTPInvalidStatus,
             /Graph service returned #{code} for tenant mytenant.*uh-oh!/
           )
-          expect(InstStatsd::Statsd).to have_received(:increment)
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment)
             .with("microsoft_sync.graph_service.error", tags: statsd_tags)
         end
       end
@@ -121,7 +121,7 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
           MicrosoftSync::Errors::HTTPTooManyRequests,
           /Graph service returned 429 for tenant mytenant.*uh-oh!/
         )
-        expect(InstStatsd::Statsd).to have_received(:increment)
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment)
           .with("microsoft_sync.graph_service.throttled", tags: statsd_tags)
       end
 
@@ -137,7 +137,7 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
         error = Timeout::Error.new
         expect(HTTParty).to receive(http_method.to_sym).and_raise error
         expect { subject }.to raise_error(error)
-        expect(InstStatsd::Statsd).to have_received(:increment).with(
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "microsoft_sync.graph_service.intermittent",
           tags: statsd_tags.merge(status_code: "Timeout__Error")
         )
@@ -158,7 +158,7 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
 
         expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, message)
 
-        expect(InstStatsd::Statsd).to have_received(:increment)
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment)
           .with("microsoft_sync.graph_service.error", tags: statsd_tags)
       end
     end
@@ -176,14 +176,14 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
           expect(e).to be_a(MicrosoftSync::GraphService::Http::ApplicationNotAuthorizedForTenant)
           expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelError)
         end
-        expect(InstStatsd::Statsd).to have_received(:increment)
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment)
           .with("microsoft_sync.graph_service.error", tags: statsd_tags)
       end
     end
 
     it "increments a success statsd metric on success" do
       subject
-      expect(InstStatsd::Statsd).to have_received(:increment).with(
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
         "microsoft_sync.graph_service.success", tags: {
           msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
           extra_tag: "abc",

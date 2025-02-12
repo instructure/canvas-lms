@@ -214,7 +214,7 @@ describe('ViewRubrics Tests', () => {
         queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText} = renderComponent()
 
-        const criterionHeader = getByText('Criterion')
+        const criterionHeader = getByText('Criteria')
         fireEvent.click(criterionHeader)
 
         const sortedCriterion = ['1', '3']
@@ -226,7 +226,7 @@ describe('ViewRubrics Tests', () => {
         queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText} = renderComponent()
 
-        const criterionHeader = getByText('Criterion')
+        const criterionHeader = getByText('Criteria')
         fireEvent.click(criterionHeader)
         fireEvent.click(criterionHeader)
         fireEvent.click(criterionHeader)
@@ -451,7 +451,7 @@ describe('ViewRubrics Tests', () => {
         queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText} = renderComponent()
 
-        const criterionHeader = getByText('Criterion')
+        const criterionHeader = getByText('Criteria')
         fireEvent.click(criterionHeader)
 
         const sortedCriterion = ['1', '3']
@@ -463,7 +463,7 @@ describe('ViewRubrics Tests', () => {
         queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText} = renderComponent()
 
-        const criterionHeader = getByText('Criterion')
+        const criterionHeader = getByText('Criteria')
         fireEvent.click(criterionHeader)
         fireEvent.click(criterionHeader)
         fireEvent.click(criterionHeader)

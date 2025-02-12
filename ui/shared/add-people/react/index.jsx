@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import {bindActionCreators} from 'redux'
 import {connect, Provider} from 'react-redux'
 import natcompare from '@canvas/util/natcompare'
@@ -28,7 +28,8 @@ import AddPeople from './components/add_people'
 
 export default class AddPeopleApp {
   constructor(root, props) {
-    this.root = root // DOM node we render into
+    this.root = createRoot(root) // Create root for React 19
+    this.domRoot = root // Keep reference to DOM node
     this.closer = this.close.bind(this) // close us
     this.onCloseCallback = props.onClose // tell our parent
     this.theme = props.theme || 'canvas'
@@ -90,17 +91,16 @@ export default class AddPeopleApp {
   }
 
   unmount() {
-    ReactDOM.unmountComponentAtNode(this.root)
+    this.root.unmount()
   }
 
   render(isOpen) {
     const ConnectedApp = this.ConnectedApp
      
-    ReactDOM.render(
+    this.root.render(
       <Provider store={this.store}>
         <ConnectedApp isOpen={isOpen} onClose={this.closer} theme={this.theme} />
-      </Provider>,
-      this.root,
+      </Provider>
     )
   }
 }

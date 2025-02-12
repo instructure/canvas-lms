@@ -2244,6 +2244,7 @@ fa:
       login: ورود
     no_text: "متن موجود نیست"
   albanian_21ed929e: آلبانی
+  alert_d2c8ef98: هشدار
   alerts: 
     alert: 
       buttons: 
@@ -2792,6 +2793,8 @@ fa:
   always_include_dates_1ae2935e: "همیشه تاریخ‌ها درج شود"
   always_include_dates_74b3721d: "همیشه تاریخ‌ها درج شود;"
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "RCE و نوار کناری همیشه از یک سرویس محتوای غنی کانواس بارگذاری شود"
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "یک هشدار برای هر دانشجو که همه ضوابط را رعایت کرده باشد ایجاد می شود. آنها هر روز بررسی می شوند، و اطلاعیه ها تا زمان رفع مشکل برای دانشجو، استاد و/یا مدیر حساب ارسال خواهند شد."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "یک هشدار برای هر دانشجو که همه ضوابط را رعایت کرده باشد، ایجاد می شود. آنها هر روز بررسی می شوند، و اطلاعیه ها تا زمان رفع مشکل برای دانشجو و/یا استاد ارسال خواهند شد."
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "یک کلید API برای استفاده کردن از معیارهای علمی لازم است"
   an_assignment_name_dc624e70: "یک نام تکلیف"
   an_auto_generated_chronological_summary_of_your_co_eeafee13: "یک خلاصه زمانی تولید شده به صورت خودکار از درس شما"
@@ -3524,6 +3527,7 @@ fa:
       save: "ذخیره سازی"
       validating: "در حال ذخیره سازی..."
       weight_groups: "وزن دار کردن نمره نهایی بر مبنای گروه های تکلیف"
+    assignment_submit_success: "تکلیف با موفقیت ارسال شد."
     assignments_list_right_side: 
       links: 
         manage_assignments: "مدیریت تکلیف ها"
@@ -7362,6 +7366,7 @@ fa:
   course_people_3058c948: "افراد درس"
   course_quiz_extensions_4102f98f: "پسوندهای آزمون درس "
   course_quizzes_c337653c: "آزمون‌های درس"
+  course_quota_8f7f74c: "سهمیه درس"
   course_restore: 
     restore_error: "در هنگام تلاش برای بازیابی درس، خطایی رخ داد. درس بازیابی نشد.."
   course_results_updated_df9d1c95: "نتایج درس به روز شد."
@@ -8068,6 +8073,7 @@ fa:
   create_a_new_user_for_address_7487e9c9: "یک کاربر جدید برای ‍‍%{address} ایجاد کنید"
   create_account_263ec6: "ایجاد حساب"
   create_an_ba36d171: "ایجاد یک"
+  create_an_eportfolio_1841e34a: "ایجاد یک مجموعه اسناد الکترونیکی"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "ایجاد و اجرای آزمون‌ها و نظرسنجی‌های آنلاین نمره گذاری شده یا نمره گذاری نشده."
   create_announcements_above_1c36202b: "اطلاعیه‌ها را در بالا ایجاد کنید."
   create_anonymous_discussion_topics_d573e88e: "موضوعات بحث ناشناس ایجاد را کنید"
@@ -8523,6 +8529,7 @@ fa:
   deep_purple_bb3e2907: "ارغوانی پر رنگ"
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "پاسخ‌های تو در تو دیگر پشتیبانی نمی‌شوند. پاسخ شما در صفحه اول این تاپیک نمایش داده می شود."
   default_9db103d: "پیش فرض"
+  default_account_quotas_e34112fd: "سهمیه های پیش فرض حساب"
   default_conference_title: "کنفرانس %{course_name} "
   default_dates_a0a2ae26: "تاریخ های پیش فرض"
   default_due_time_9d0e9140: "زمان مقرر پیش فرض"
@@ -9424,6 +9431,7 @@ fa:
   ecollege_name: "مبدل Ecollege"
   ecuador_593_dfcc235a: "اکوادر (+593)"
   edit_account_name_for_account_name_ae3633e8: "ویرایش نام حساب برای %{account_name}"
+  edit_alert_739bb0ba: "ویرایش اخطار"
   edit_and_delete_their_own_posts_f4f7cc6: "ویرایش و حذف ارسال های خود"
   edit_and_delete_their_own_replies_e5b9d793: "ویرایش و حذف پاسخ های خود"
   edit_announcement_title_cce0b4e: "ویرایش اطلاعیه %{title}"
@@ -10780,6 +10788,7 @@ fa:
   find_an_existing_grading_scheme_d836ea: "یافتن طرح نمره گذاری موجود"
   find_an_outcome_919328e6: "یافتن نتیجه"
   find_appointment_85d6922e: "یافتن قرار ملاقات"
+  find_course_or_group_a7de09a4: "یافتن درس یا گروه"
   find_flickr_image_view: 
     find_cc_on_flickr: "یافتن تصاویر کریتیو کامنز در فلیکر"
     safesearch_warning_flickr: "فلیکر تصاویر جستجوی ایمن را در دامنه عمومی کریتیو کامنز نمایش می دهد. با این حال، نتایج جستجوی ایمن تضمین نمی شود، زیرا ممکن است برخی از تصاویر دارای سطح ایمنی مشخصی توسط صاحبان آن‌ها نباشد. "
@@ -11873,6 +11882,7 @@ fa:
   group_group_name_is_not_available_at_this_time_971001c1: "گروه %{group_name} در این زمان فعال نیست. "
   group_guid_has_already_appeared_in_this_import_78f35ff3: "گروه \"%{guid}\" قبلاً در این ورود ظاهر شده است."
   group_home_249cb392: "صفحه اصلی گروه"
+  group_id_b0f6af89: "شناسه گروه"
   group_id_e76ac9b5: "شناسه گروه"
   group_is_for_a_different_section_6a843a4d: "گروه برای یک بخش دیگر است"
   group_is_full_56849d78: "گروه تکمیل شده است"
@@ -11902,6 +11912,7 @@ fa:
   group_not_found_d13d85b9: "گروه یافت نشد"
   group_pages_656556f3: "صفحه های گروه"
   group_people_50e9785b: "افراد گروه"
+  group_quota_290dbc6b: "سهمیه گروه"
   group_roster_1846bf84: "فهرست گروه"
   group_saved_successfully_fcd5ca66: "گروه با موفقیت ذخیره شد!"
   group_select_330df8bd: "گروه انتخاب شد"
@@ -13401,6 +13412,7 @@ fa:
       ellipsis: "..."
       quoted_text_toggle: "نمایش متن نقل شده"
       word_separator: " "
+  license_bdede4fb: مجوز
   license_help: 
     content_license_help: "راهنمای مجوز دادن به محتوا"
   license_type_6b74b543: "نوع مجوز"
@@ -13824,6 +13836,7 @@ fa:
   manually_9de23e1f: "بطور دستی"
   manually_mark_posts_as_read_afa5d035: "علامتگذاری دستی ارسال ها به عنوان خوانده شده"
   manually_post_grades_18248306: "ارسال نمرات بصورت دستی"
+  manually_settable_quotas_ea3759e7: "سهمیه های قابل تنظیم به طور دستی"
   mark_all_as_read_8f3bdf57: "علامتگذاری همه به عنوان خوانده شده"
   mark_all_as_read_a995ffbe: "همه را به عنوان خوانده شده علامت بزن"
   mark_all_as_unread_10e7f0fe: "علامت گذاری همه به عنوان خوانده نشده"
@@ -13966,6 +13979,7 @@ fa:
   medium_light_skin_tone_6c4a27fb: "رنگ پوست متوسط تا روشن"
   meets_expectations_bb179565: "مطابق با انتظارات"
   meets_mastery_754e1c06: "با تسلط مطابقت دارد"
+  megabytes_885404ef: مگابایت
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} عضو از حداکثر %{max_membership}"
   members_af25c21d: اعضا
   members_are_free_to_join_defa5929: "اعضا برای پیوستن به گروه آزاد هستند"
@@ -16497,6 +16511,7 @@ fa:
   no_placements_enabled_f705f28: "هیچ جای گذاری فعال نشده است"
   no_points_possible_368669d: "امتیازهای ممکن موجود نیست"
   no_points_possible_72db3a55: "امتیاز ممکن موجود نیست"
+  no_preview_available_e8e71199: "پیش نمایش موجود نیست"
   no_results_3cda4e72: "نتیجه موجود نیست"
   no_results_f36777ee: "نتیجه موجود نیست"
   no_results_found_2ace1494: "نتیجه ای یافت نشد"
@@ -16519,6 +16534,7 @@ fa:
   no_submissions_164cea23: "مورد ارسالی وجود ندارد"
   no_such_source_context_80a659ba: "چنین منبع زمینه ای وجود ندارد"
   no_such_target_context_21158b9: "چنین زمینه هدفی وجود ندارد"
+  no_teacher_interaction_de8d91bc: "استاد تعامل نداشته است"
   no_template_selected_f59e797: "هیچ الگویی انتخاب نشده است"
   no_terms_eab5ee7b: "نیمسال موجود نیست"
   no_time_limit_for_long_running_conferences_d49fdfad: "بدون محدودیت زمانی (برای کنفرانس های طولانی مدت)"
@@ -20861,6 +20877,7 @@ fa:
   saudi_arabia_1f0dcbdc: "عربستان صعودی"
   saudi_arabia_966_d01ed717: "عربستان سعودی (+966)"
   save_11a80ec3: "ذخیره سازی"
+  save_alert_b64f9fa3: "ذخیره سازی هشدار"
   save_and_customize_19eb7a7b: "ذخیره و شخصی‌سازی"
   save_and_publish_1b765e7: "ذخیره و انتشار"
   save_changes_698abe77: "ذخیره سازی تغییرات"
@@ -23185,6 +23202,7 @@ fa:
   submitted_on_a09f839e: "ارسال شده در"
   submitted_on_bb3b53fc: "ارسال شده در"
   submitted_submitdate_bdd3bf09: "ارسال شده: %{submitDate}"
+  submitting_b90fac62: "در حال ارسال..."
   submitting_types_7c5a7096: "در حال ارسال: %{types}"
   subscribe_4b301fb7: اشتراک
   subscribe_failed_2eb62de0: "اشتراک انجام نشد"
@@ -23210,6 +23228,7 @@ fa:
   successfully_saved_the_comment_c87681fd: "نظر با موفقیت ذخیره شد"
   successfully_updated_the_comment_946360d5: "نظر به روز رسانی شد"
   suffix_294d5cc4: پسوند
+  suggestions_b8b03b9d: "پیشنهادها:"
   sum_of_all_files_in_mb_2b705055: "مجموع همه فایل ها بر حسب مگابایت"
   summary_statistics_f74852a5: "آمار خلاصه"
   support: 
@@ -24524,6 +24543,7 @@ fa:
   treat_ungraded_as_0_d38c2b41: "به طور نمره گذاری نشده به عنوان 0 در نظر گرفته شود"
   tree_browser: 
     folder_tree_instructions: "از کلیدهای پیمایش بالا و پایین برای پیمایش در درخت استفاده کنید. کلید راست را برای باز کردن پوشه ها، کلید چپ را برای جمع کردن و کلید enter را برای انتخاب مورد انتخابی فشار دهید."
+  trigger_f0ee1fbf: محرک
   trinidad_and_tobago_1_fc2d8d1c: "ترینیداد و توباگو (+1)"
   trophy: 
     star_display_name: "ستاره دار کردن"
@@ -24642,6 +24662,8 @@ fa:
   ungraded_ed0c6f98: "نمره دهی نشده"
   ungraded_pointspossible_e2f86bd9: "غیر قابل استفاده/%{pointsPossible}"
   ungraded_submissions_44efb0ec: "موردهای ارسالی نمره گذاری نشده"
+  ungraded_submissions_count_63fcf6d1: "موردهای ارسالی نمره گذاری نشده (تعداد)"
+  ungraded_submissions_time_bafaa609: "موردهای ارسالی نمره گذاری نشده  (زمان)"
   ungraded_survey_ad7de790: "نظرسنجی نمره گذاری نشده"
   united_arab_emirates_971_649b3750: "امارات متحده عربی (+971)"
   united_arab_emirates_a71e57c6: "امارات متحده عربی"
@@ -24771,6 +24793,7 @@ fa:
   update_name_6581781d: "به روز رسانی %{name}"
   update_pages_c91d7ba: "به روز رسانی صفحات"
   update_password_4bc5cb1f: "بهنگام سازی رمز عبور"
+  update_quota_81381226: "بهنگام سازی سهمیه"
   update_rating_6d29c2ef: "به روزرسانی رتبه بندی"
   update_settings_9b422d0f: "بهنگام سازی تنظیمات"
   update_tool_7d48ef2a: "بهنگام سازی %{tool}"
@@ -24783,6 +24806,7 @@ fa:
   updated_terms_of_service_82f34148: "ضوابط استفاده از سرویس به‌روزرسانی شد"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "واسط کاربر بهنگام شده برای جستجو و نمایش کاربران و درس ها در یک حساب."
   updating_6edbab78: "در حال بهنگام سازی"
+  updating_73d0718c: "در حال بهنگام سازی..."
   updating_discussion_failed_aadb2d35: "به هنگام سازی گفتگو انجام نشد"
   updating_user_details_b8520b3e: "در حال بهنگام سازی اطلاعات کاربر..."
   upload_8b403d05: بارگذاری
@@ -25057,6 +25081,7 @@ fa:
       settings: تنظیمات
   user_profile_d56261fc: "رخ نمای کاربر"
   user_profile_picture_46bffbc7: "تصویر رخ نمای کاربر"
+  user_quota_12cb58b7: "سهمیه کاربر"
   user_removed_successfully_20a3889d: "کاربر با موفقیت حذف شد"
   user_results_updated_9ce38dce: "نتایج کاربر به روز شد."
   user_s_settings_d65644b4: "تنظیمات %{user}"
@@ -25827,6 +25852,7 @@ fa:
   working_b1f63edf: "در حال کارکردن..."
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "مایلید این بهنگام سازی قبول یا رد شود؟"
   would_you_like_to_enable_this_app_ccdf735d: "مایلید این برنامه فعال شود؟"
+  would_you_like_to_expand_the_contents_of_filename__35b40cc5: "می خواهید که محتوای \"%{fileName}\" را در پوشه فعلی باز کنید، یا فایل zip را همان طور که هست، بارگذاری کنید؟"
   would_you_like_to_go_back_to_include_1d279044: "مایلید برای شامل سازی برگردید؟"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "مایلید به دانشجویان اجازه دهید به درس ادامه دهند یا می خواهید این ماژول ها را تا زمان تکمیل شدن الزامات جدید دوباره قفل کنید؟"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "مخفی کردن عنوان های رویداد در نمای ماه تقویم"
@@ -26105,6 +26131,7 @@ fa:
       uploading_complete: "بارگذاری انجام شد!"
     zip_import_filename: "zip_ورود_%{id}.zip"
   zip_file_name: "فایل zip."
+  zip_file_options_9a2af6c1: "گزینه های فایل Zip"
   zip_file_options_form: 
     expand: "باز کردن آن"
     message: "می خواهید که محتوای \"%{fileName}\" را در پوشه فعلی باز کنید، یا فایل zip را همان طور که هست، بارگذاری کنید؟"

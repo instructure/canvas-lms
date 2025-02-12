@@ -25,8 +25,7 @@ export type Product = {
   tagline: string
   description: string
   updated_at: string
-  tool_integration_configurations: Lti
-  lti_configurations: LtiDetail
+  canvas_lti_configurations: Lti[]
   badges: Badges[]
   screenshots: string[]
   terms_of_service_url: string
@@ -57,28 +56,16 @@ export type Company = {
   company_url: string
 }
 
-export type Lti13Config = {
+export type Lti = {
   id: number
   integration_type: string
+  description: string
+  lti_placements: string[]
+  lti_services: string[]
   url?: string
   global_inherited_key?: string
-  unified_tool_id: string
   configuration?: string
-}
-
-export type Lti = {
-  lti_13?: Array<Lti13Config>
-  lti_11?: {id: number; integration_type: string; url: string; unified_tool_id: string}[]
-}
-
-export type LtiDetailProps = {
-  services: string[]
-  placements: string[]
-}
-
-export type LtiDetail = {
-  lti_13?: LtiDetailProps
-  lti_11?: LtiDetailProps
+  unified_tool_id: string
 }
 
 export type Badges = {

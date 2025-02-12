@@ -202,7 +202,7 @@ module.exports = {
       severity: 'error',
       from: {},
       to: {
-        path: '[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx|ls|coffee|litcoffee|coffee[.]md)$',
+        path: '[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx[.]md)$',
       },
     },
     {
@@ -217,14 +217,18 @@ module.exports = {
       from: {
         path: '^(packages)',
         pathNot:
-          '[.](?:|config|spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx|ls|coffee|litcoffee|coffee[.]md)$',
+          '[.](?:|config|spec|setup|test|jest-setup)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx[.]md)$',
       },
       to: {
         dependencyTypes: ['npm-dev'],
         // type only dependencies are not a problem as they don't end up in the
         // production code or are ignored by the runtime.
         dependencyTypesNot: ['type-only'],
-        pathNot: ['node_modules/@types/', 'node_modules/sinon/'],
+        pathNot: [
+          'node_modules/@types/',
+          'node_modules/sinon/',
+          'node_modules/@testing-library/jest-dom/',
+        ],
       },
     },
     {

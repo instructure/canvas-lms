@@ -43,7 +43,7 @@ import {paceContextsActions} from '../actions/pace_contexts'
 import {generateModalLauncherId} from '../utils/utils'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Menu} from '@instructure/ui-menu'
-import {IconDownloadLine, IconMoreLine} from '@instructure/ui-icons'
+import {IconDownloadLine, IconMoreLine, IconCheckLine, IconWarningLine} from '@instructure/ui-icons'
 
 import type {SpinnerProps} from '@instructure/ui-spinner'
 import type {ViewProps} from '@instructure/ui-view'
@@ -203,21 +203,31 @@ const PaceContextsTable = ({
             key: 'name',
             label: I18n.t('Student'),
             content: I18n.t('Student'),
-            width: '35%',
+            width: '30%',
             sortable: true,
           },
+          ...(
+            window.ENV.FEATURES.course_pace_pacing_status_labels
+              ? [{
+                  key: 'paceStatus',
+                  label: I18n.t('Pace Status'),
+                  content: I18n.t('Pace Status'),
+                  width: '20%'
+                }]
+              : []
+          ),
           {
             key: 'pace',
             label: I18n.t('Assigned Pace'),
             content: I18n.t('Assigned Pace'),
-            width: '25%',
+            width: '20%',
           },
-          {key: 'paceType', label: I18n.t('Pace Type'), content: I18n.t('Pace Type'), width: '20%'},
+          {key: 'paceType', label: I18n.t('Pace Type'), content: I18n.t('Pace Type'), width: '15%'},
           {
             key: 'modified',
             label: I18n.t('Last Modified'),
             content: I18n.t('Last Modified'),
-            width: '20%',
+            width: '15%',
           },
         ]
         break
@@ -256,7 +266,7 @@ const PaceContextsTable = ({
   }
 
   const getValuesByContextType = (paceContext: PaceContext) => {
-    let values: string[] = []
+    let values: any[] = []
     const appliedPace = paceContext?.applied_pace
     const appliedPaceType = paceContext?.applied_pace?.type || ''
     switch (contextType) {
@@ -276,14 +286,23 @@ const PaceContextsTable = ({
         ]
         break
       }
-      case 'student_enrollment':
+      case 'student_enrollment': {
+        const studentOnPace = paceContext.on_pace ?
+          <Text color="success"><IconCheckLine size="x-small" /> {I18n.t("On Pace")}</Text> :
+          <Text color="danger"><IconWarningLine size="x-small" /> {I18n.t("Off Pace")}</Text>
         values = [
           renderContextLink(paceContext),
+          ...(
+            window.ENV.FEATURES.course_pace_pacing_status_labels
+              ? [studentOnPace]
+              : []
+          ),
           appliedPace?.name,
           PACE_TYPES[appliedPaceType] || appliedPaceType,
           renderLastModified(paceContext.type, paceContext?.item_id, appliedPace?.last_modified),
         ]
         break
+      }
       default:
         values = []
     }

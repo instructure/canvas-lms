@@ -9,9 +9,7 @@ const importPlugin = require('eslint-plugin-import')
 const lodashPlugin = require('eslint-plugin-lodash')
 const notice = require('eslint-plugin-notice')
 const comments = require('@eslint-community/eslint-plugin-eslint-comments/configs')
-const path = require('path')
-
-const projectRoot = __dirname
+const reactCompiler = require('eslint-plugin-react-compiler')
 
 /** @type {import('eslint').Linter.Config[]} */
 module.exports = [
@@ -201,6 +199,12 @@ module.exports = [
     rules: {
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+    },
+  },
+  {
+    plugins: {'react-compiler': reactCompiler},
+    rules: {
+      'react-compiler/react-compiler': 'warn',
     },
   },
 

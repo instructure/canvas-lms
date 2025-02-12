@@ -22,6 +22,7 @@ import ExternalToolImporter from '../external_tool_importer'
 import userEvent from '@testing-library/user-event'
 import {EXTERNAL_CONTENT_READY} from '@canvas/external-tools/messages'
 import processMigrationContentItem from '../../../../processMigrationContentItem'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const modalTitle = 'External Tool'
 const exampleUrl = 'http://example.com'
@@ -33,8 +34,10 @@ const env = {
 
 describe('ExternalToolImporter', () => {
   const onSubmit = jest.fn()
-  window.ENV = {...window.ENV, ...env}
-  window.addEventListener('message', processMigrationContentItem)
+  beforeEach(() => {
+    fakeENV.setup(env)
+    window.addEventListener('message', processMigrationContentItem)
+  })
 
   const renderComponent = (overrideProps?: any) =>
     render(
@@ -67,6 +70,8 @@ describe('ExternalToolImporter', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
+    fakeENV.teardown()
+    window.removeEventListener('message', processMigrationContentItem)
   })
 
   it('renders the modal open button', async () => {
@@ -114,7 +119,11 @@ describe('ExternalToolImporter', () => {
     await userEvent.click(getByRole('button', {name: 'Find a Course'}))
     sendPostMessage(externalContentReady())
 
-    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    await waitFor(() => {
+      expect(getByRole('button', {name: 'Add to Import Queue', hidden: true})).toBeInTheDocument()
+    })
+
+    await userEvent.click(getByRole('button', {name: 'Add to Import Queue', hidden: true}))
 
     expect(onSubmit).toHaveBeenCalledWith({
       settings: {file_url: exampleUrl},
@@ -129,7 +138,7 @@ describe('ExternalToolImporter', () => {
       await userEvent.click(getByRole('button', {name: 'Find a Course'}))
       sendPostMessage(externalContentReady({contentItems: [{url: null, text: 'example'}]}))
 
-      await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+      await userEvent.click(getByRole('button', {name: 'Add to Import Queue', hidden: true}))
 
       expect(onSubmit).not.toHaveBeenCalled()
     })

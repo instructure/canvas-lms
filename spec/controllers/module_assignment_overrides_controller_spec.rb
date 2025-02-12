@@ -20,7 +20,6 @@
 
 describe ModuleAssignmentOverridesController do
   before :once do
-    Account.site_admin.enable_feature!(:selective_release_ui_api)
     course_with_teacher(active_all: true, course_name: "Awesome Course")
     @student1 = student_in_course(active_all: true, name: "Student 1").user
     @student2 = student_in_course(active_all: true, name: "Student 2").user
@@ -32,6 +31,9 @@ describe ModuleAssignmentOverridesController do
     @adhoc_override1.assignment_override_students.create!(user: @student2)
     @adhoc_override2 = @module1.assignment_overrides.create!(set_type: "ADHOC")
     @adhoc_override2.assignment_override_students.create!(user: @student3)
+    @diff_tag_cat = @course.group_categories.create!(context: @course, name: "Differentiation Tags", non_collaborative: true)
+    @diff_tag = @course.groups.create!(context: @course, group_category: @diff_tag_cat, name: "Differentiation Tag Group 1", non_collaborative: true)
+    @diff_tag_override1 = @module1.assignment_overrides.create!(set_type: "Group", set_id: @diff_tag.id)
   end
 
   before do
@@ -44,7 +46,7 @@ describe ModuleAssignmentOverridesController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.length).to be 3
+      expect(json.length).to be 4
 
       expect(json[0]["id"]).to be @section_override1.id
       expect(json[0]["context_module_id"]).to be @module1.id
@@ -67,6 +69,12 @@ describe ModuleAssignmentOverridesController do
       expect(json[2]["students"].length).to eq 1
       expect(json[2]["students"][0]["id"]).to eq @student3.id
       expect(json[2]["students"][0]["name"]).to eq "Student 3"
+
+      expect(json[3]["id"]).to be @diff_tag_override1.id
+      expect(json[3]["context_module_id"]).to be @module1.id
+      expect(json[3]["title"]).to eq @diff_tag.name
+      expect(json[3]["group"]["id"]).to eq @diff_tag.id
+      expect(json[3]["group"]["non_collaborative"]).to eq @diff_tag.non_collaborative
     end
 
     it "does not include deleted assignment overrides" do
@@ -75,7 +83,7 @@ describe ModuleAssignmentOverridesController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.pluck("id")).to contain_exactly(@section_override1.id, @adhoc_override1.id)
+      expect(json.pluck("id")).to contain_exactly(@section_override1.id, @adhoc_override1.id, @diff_tag_override1.id)
     end
 
     it "returns 404 if the course doesn't exist" do
@@ -102,17 +110,61 @@ describe ModuleAssignmentOverridesController do
       expect(response).to be_not_found
     end
 
-    it "returns 404 if the selective_release_ui_api flag is disabled" do
-      Account.site_admin.disable_feature!(:selective_release_ui_api)
-      get :index, params: { course_id: @course.id, context_module_id: @module1.id }
-      expect(response).to be_not_found
-    end
-
     it "returns unauthorized if the user doesn't have manage_course_content_edit permission" do
       student = student_in_course.user
       user_session(student)
       get :index, params: { course_id: @course.id, context_module_id: @module1.id }
       expect(response).to be_unauthorized
+    end
+
+    describe "differentiation tags" do
+      before do
+        @course.account.settings[:allow_assign_to_differentiation_tags] = true
+        @course.account.save!
+      end
+
+      def returns_non_collaborative_field_for_group_overrides
+        get :index, params: { course_id: @course.id, context_module_id: @module1.id }
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        expect(json.length).to be 4
+        expect(json[3]["group"]["id"]).to eq @diff_tag_override1.group.id
+        expect(json[3]["group"]["non_collaborative"]).to eq @diff_tag_override1.group.non_collaborative
+      end
+
+      it "returns differentiation tags for group overrides" do
+        returns_non_collaborative_field_for_group_overrides
+      end
+
+      context "works with TAs" do
+        before do
+          @ta = user_factory(active_all: true)
+          @course.enroll_user(@ta, "TaEnrollment", enrollment_state: "active")
+
+          user_session(@ta)
+        end
+
+        it "returns the non_collaborative field for group overrides" do
+          returns_non_collaborative_field_for_group_overrides
+        end
+      end
+
+      context "unauthorized for students" do
+        before do
+          @tag2 = @course.groups.create!(group_category: @diff_tag_cat, name: "Tag Group 1", non_collaborative: true)
+          @student = user_factory(active_all: true)
+          @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
+
+          user_session(@student)
+        end
+
+        it "returns 400 unauthorized error" do
+          put :bulk_update, params: { course_id: @course.id,
+                                      context_module_id: @module1.id,
+                                      overrides: [{ "group_id" => @tag2.id }] }
+          expect(response).to have_http_status :unauthorized
+        end
+      end
     end
   end
 
@@ -229,8 +281,8 @@ describe ModuleAssignmentOverridesController do
                                               { "id" => @adhoc_override1.id, "student_ids" => [@student1.id, @student2.id] },
                                               { "id" => @adhoc_override2.id, "student_ids" => [@student3.id] }] }
       expect(response).to have_http_status :no_content
-      expect(@module1.assignment_overrides.reload.to_a).to eq overrides
-      expect(@module1.assignment_override_students.reload.to_a).to eq students
+      expect(@module1.assignment_overrides.reload.to_a).to match_array(overrides)
+      expect(@module1.assignment_override_students.reload.to_a).to match_array(students)
     end
 
     it "updates the module's assignment submissions" do
@@ -273,12 +325,6 @@ describe ModuleAssignmentOverridesController do
 
     it "returns 404 if the course doesn't exist" do
       put :bulk_update, params: { course_id: 0, context_module_id: @module1.id, overrides: [] }
-      expect(response).to be_not_found
-    end
-
-    it "returns 404 if the selective_release_ui_api flag is disabled" do
-      Account.site_admin.disable_feature!(:selective_release_ui_api)
-      put :bulk_update, params: { course_id: @course.id, context_module_id: @module1.id, overrides: [] }
       expect(response).to be_not_found
     end
 
@@ -345,6 +391,171 @@ describe ModuleAssignmentOverridesController do
         expect(sub_assignment_submission_ids).to include @student2.id
         expect(sub_assignment_submission_ids).to include @student3.id
         expect(sub_assignment_submission_ids).to include extra_override_student.id
+      end
+    end
+
+    context "differentiation tags" do
+      before do
+        @course.account.settings[:allow_assign_to_differentiation_tags] = true
+        @course.account.save!
+      end
+
+      it "returns 400 if an override param has both students_ids, group_id and course_section_id" do
+        put :bulk_update, params: { course_id: @course.id,
+                                    context_module_id: @module1.id,
+                                    overrides: [{ "course_section_id" => 1, "student_ids" => [1, 2], "group_id" => 1 }] }
+        expect(response).to be_bad_request
+        json = json_parse(response.body)
+        expect(json["error"]).to eq "cannot provide group_id, course_section_id, and student_ids on the same override"
+      end
+
+      it "returns 400 if an override param has both group_id and course_section_id" do
+        put :bulk_update, params: { course_id: @course.id,
+                                    context_module_id: @module1.id,
+                                    overrides: [{ "course_section_id" => 1, "group_id" => 1 }] }
+        expect(response).to be_bad_request
+        json = json_parse(response.body)
+        expect(json["error"]).to eq "cannot provide group_id and course_section_id on the same override"
+      end
+
+      it "returns 400 if an override param has both group_id and student_ids" do
+        put :bulk_update, params: { course_id: @course.id,
+                                    context_module_id: @module1.id,
+                                    overrides: [{ "student_ids" => [1, 2], "group_id" => 1 }] }
+        expect(response).to be_bad_request
+        json = json_parse(response.body)
+        expect(json["error"]).to eq "cannot provide group_id and student_ids on the same override"
+      end
+
+      it "returns 400 if allow_assign_to_differentiation_tags setting is disabled and group_id is present" do
+        @course.account.settings[:allow_assign_to_differentiation_tags] = false
+        @course.account.save!
+        put :bulk_update, params: { course_id: @course.id,
+                                    context_module_id: @module1.id,
+                                    overrides: [{ "group_id" => 1 }] }
+        expect(response).to be_bad_request
+        json = json_parse(response.body)
+        expect(json["error"]).to eq "group_id is not allowed as an override"
+      end
+
+      def check_bulk_update_response(tag)
+        expect(response).to have_http_status :no_content
+        expect(@module1.assignment_overrides.active.count).to eq 1
+        expect(@module1.assignment_overrides.active.first.set_type).to eq "Group"
+        expect(@module1.assignment_overrides.active.first.set_id).to eq tag.id
+        expect(@module1.assignment_overrides.active.first.title).to eq tag.name
+      end
+
+      def updates_existing_differentiation_tag_group_overrides
+        tag2 = @course.groups.create!(group_category: @diff_tag_cat, name: "Tag Group 1", non_collaborative: true)
+        put :bulk_update, params: { course_id: @course.id,
+                                    context_module_id: @module1.id,
+                                    overrides: [{ "id" => @diff_tag_override1.id, "group_id" => tag2.id }] }
+        check_bulk_update_response(tag2)
+      end
+
+      def deletes_and_creates_new_differentiation_tag_group_overrides
+        tag2 = @course.groups.create!(group_category: @diff_tag_cat, name: "Tag Group 1", non_collaborative: true)
+        put :bulk_update, params: { course_id: @course.id,
+                                    context_module_id: @module1.id,
+                                    overrides: [{ "group_id" => tag2.id }] }
+        check_bulk_update_response(tag2)
+      end
+
+      it "updates existing differentiation tag group overrides" do
+        updates_existing_differentiation_tag_group_overrides
+      end
+
+      it "deletes and creates differentiation tag group overrides" do
+        deletes_and_creates_new_differentiation_tag_group_overrides
+      end
+
+      context "works with TAs" do
+        before do
+          @ta = user_factory(active_all: true)
+          @course.enroll_user(@ta, "TaEnrollment", enrollment_state: "active")
+
+          user_session(@ta)
+        end
+
+        it "updates existing differentiation tag group overrides" do
+          updates_existing_differentiation_tag_group_overrides
+        end
+
+        it "deletes and creates differentiation tag group overrides" do
+          deletes_and_creates_new_differentiation_tag_group_overrides
+        end
+      end
+
+      context "not allowed for students" do
+        before do
+          @tag2 = @course.groups.create!(group_category: @diff_tag_cat, name: "Tag Group 1", non_collaborative: true)
+          @student = user_factory(active_all: true)
+          @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
+
+          user_session(@student)
+        end
+
+        it "returns 400 unauthorized error" do
+          put :bulk_update, params: { course_id: @course.id,
+                                      context_module_id: @module1.id,
+                                      overrides: [{ "group_id" => @tag2.id }] }
+          expect(response).to have_http_status :unauthorized
+        end
+      end
+
+      it "updates multiple existing and new overrides" do
+        section2 = @course.course_sections.create!(name: "Section 2")
+        section3 = @course.course_sections.create!(name: "Section 3")
+        tag2 = @course.groups.create!(group_category: @diff_tag_cat, name: "Tag Group 2", non_collaborative: true)
+        tag3 = @course.groups.create!(group_category: @diff_tag_cat, name: "Tag Group 3", non_collaborative: true)
+        student4 = student_in_course(active_all: true, name: "Student 4").user
+        request.content_type = "application/json"
+        put :bulk_update, params: { course_id: @course.id,
+                                    context_module_id: @module1.id,
+                                    overrides: [{ "id" => @section_override1.id, "course_section_id" => section2.id },
+                                                { "course_section_id" => section3.id },
+                                                { "id" => @diff_tag_override1.id, "group_id" => tag2.id },
+                                                { "group_id" => tag3.id },
+                                                { "id" => @adhoc_override1.id, "student_ids" => [@student2.id, @student3.id] },
+                                                { "student_ids" => [@student1.id, student4.id], "title" => "test" }] }
+        expect(response).to have_http_status :no_content
+        aos = @module1.assignment_overrides.active
+        expect(aos.count).to eq 6
+        expect(aos).to include(@section_override1, @diff_tag_override1, @adhoc_override1)
+
+        expect(@section_override1.reload.set_type).to eq "CourseSection"
+        expect(@section_override1.set_id).to eq section2.id
+        expect(@section_override1.title).to eq "Section 2"
+
+        expect(@diff_tag_override1.reload.set_type).to eq "Group"
+        expect(@diff_tag_override1.set_id).to eq tag2.id
+        expect(@diff_tag_override1.title).to eq tag2.name
+
+        expect(@adhoc_override1.reload.set_type).to eq "ADHOC"
+        expect(@adhoc_override1.title).to eq "No Title"
+        expect(@adhoc_override1.assignment_override_students.active.pluck(:user_id)).to contain_exactly(@student2.id, @student3.id)
+
+        expect(aos.where(set_id: section3.id, set_type: "CourseSection").first.title).to eq "Section 3"
+        expect(aos.where(set_id: tag3.id, set_type: "Group").first.title).to eq tag3.name
+
+        new_adhoc_override = aos.where(set_type: "ADHOC").where.not(id: @adhoc_override1.id).first
+        expect(new_adhoc_override.title).to eq "test"
+        expect(new_adhoc_override.assignment_override_students.active.pluck(:user_id)).to contain_exactly(@student1.id, student4.id)
+      end
+
+      it "doesn't make changes if the passed overrides are the same" do
+        overrides = @module1.assignment_overrides.to_a
+        students = @module1.assignment_override_students.to_a
+        put :bulk_update, params: { course_id: @course.id,
+                                    context_module_id: @module1.id,
+                                    overrides: [{ "id" => @section_override1.id, "course_section_id" => @course.course_sections.first.id },
+                                                { "id" => @diff_tag_override1.id, "group_id" => @diff_tag.id },
+                                                { "id" => @adhoc_override1.id, "student_ids" => [@student1.id, @student2.id] },
+                                                { "id" => @adhoc_override2.id, "student_ids" => [@student3.id] }] }
+        expect(response).to have_http_status :no_content
+        expect(@module1.assignment_overrides.reload.to_a).to match_array(overrides)
+        expect(@module1.assignment_override_students.reload.to_a).to match_array(students)
       end
     end
   end

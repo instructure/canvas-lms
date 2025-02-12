@@ -18,12 +18,18 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import round from '@canvas/round'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import isNumber from 'lodash/isNumber'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
+import {Flex} from '@instructure/ui-flex'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Tag} from '@instructure/ui-tag'
+import {Text} from '@instructure/ui-text'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
 import {datetimeString} from '@canvas/datetime/date-functions'
@@ -36,6 +42,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rubrics/jquery/rubric_assessment'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
+import CheckpointGradeRoot from '../react/CheckpointGradeRoot'
 
 const I18n = createI18nScope('submissions')
 /* global rubricAssessment */
@@ -245,6 +252,35 @@ function insertEmoji(emoji) {
 // while submissionsSpec.jsx triggers it after setup is complete.
 export function setup() {
   $(document).ready(function () {
+    // Render Checkpoint Score Boxes if applicable
+    // The mount point is only available if checkpoints are enabled and the assignment has checkpoints
+    // For reference the mount point is located in the "views/submissions/show.html.erb" file
+    const mountPoint = document.getElementById('checkpoints-grade-inputs-mount-point')
+    if (mountPoint) {
+      const root = createRoot(mountPoint)
+      const props = {
+        assignment: {
+          grading_type: ENV.GRADING_TYPE,
+          total_score: ENV.SUBMISSION.submission.grade || '',
+          checkpoint_submissions: [
+            {
+              tag: 'reply_to_topic',
+              points_possible: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.points_possible,
+              submission_score: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.entered_score,
+              submission_id: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.submission_id,
+            },
+            {
+              tag: 'reply_to_entry',
+              points_possible: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.points_possible,
+              submission_score: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.entered_score,
+              submission_id: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.submission_id,
+            },
+          ],
+        },
+      }
+      root.render(<CheckpointGradeRoot {...props} />)
+    }
+
     if (ENV.EMOJIS_ENABLED) {
       ReactDOM.render(
         <EmojiPicker insertEmoji={insertEmoji} />,
@@ -256,6 +292,7 @@ export function setup() {
         document.getElementById('emoji-quick-picker-container'),
       )
     }
+    let textAreaErrorRoot
     const comments = document.getElementsByClassName('comment_content')
     Array.from(comments).forEach(comment => {
       const content = comment.dataset.content
@@ -263,6 +300,19 @@ export function setup() {
         ? sanitizeHtml(content)
         : formatMessage(content)
       comment.innerHTML = formattedComment
+    })
+    const textAreaContainer = document.getElementById('textarea-container')
+    const textAreaElement = document.querySelector('textarea.grading_comment')
+    const clearTextAreaErrors = () => {
+      if (textAreaErrorRoot) {
+        textAreaErrorRoot.unmount()
+        textAreaContainer?.classList.remove('error-outline')
+        textAreaContainer?.removeAttribute('aria-label')
+      }
+    }
+    textAreaElement?.addEventListener('input', _event => {
+      // clear any errors when input changes
+      clearTextAreaErrors()
     })
     $('.comments .comment_list .play_comment_link').mediaCommentThumbnail('small')
     $(window).bind('resize', windowResize).triggerHandler('resize')
@@ -286,6 +336,14 @@ export function setup() {
         'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
         'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
       }
+      const fileInputs = $("#add_comment_form input[type='file']")
+      let hasFiles = false
+      fileInputs.each((_idx, input) => {
+        if (input.files.length > 0) {
+          hasFiles = true
+          return
+        }
+      })
 
       const anonymizableIdKey = ENV.SUBMISSION.user_id ? 'user_id' : 'anonymous_id'
       formData[`submission[${anonymizableIdKey}]`] = ENV.SUBMISSION[anonymizableIdKey]
@@ -302,7 +360,7 @@ export function setup() {
         }
         if (
           !formData['submission[comment]'] &&
-          $("#add_comment_form input[type='file']").length > 0
+          hasFiles
         ) {
           formData['submission[comment]'] = I18n.t(
             'see_attached_files',
@@ -310,17 +368,33 @@ export function setup() {
           )
         }
       }
-      if (!formData['submission[comment]'] && !formData['submission[media_comment_id]']) {
+      if (!formData['submission[comment]'] && !formData['submission[media_comment_id]'] && !hasFiles) {
         $('.submission_header').loadingImage('remove')
         $('.save_comment_button').prop('disabled', false)
+        textAreaElement?.focus()
+        const message = I18n.t('Comment or file required to save')
+        textAreaContainer?.classList.add('error-outline')
+        textAreaContainer?.setAttribute('aria-label', message)
+        const textAreaErrorContainer = document.getElementById('textarea-error-container')
+        textAreaErrorRoot = createRoot(textAreaErrorContainer)
+        textAreaErrorRoot.render(
+          <Flex id="error_text" as="div" alignItems="center" justifyItems="start" margin="xx-small 0 small 0">
+            <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+              <IconWarningSolid color="error" />
+            </Flex.Item>
+            <Text size="small" color="danger">
+              {message}
+            </Text>
+          </Flex>
+        )
         return
       }
-      if ($("#add_comment_form input[type='file']").length > 0) {
+      if (hasFiles) {
         $.ajaxJSONFiles(
           url + '.text',
           method,
           formData,
-          $("#add_comment_form input[type='file']"),
+          fileInputs,
           submissionLoaded,
         )
       } else {
@@ -358,6 +432,51 @@ export function setup() {
       const $attachment = $('#comment_attachment_input_blank').clone(true).removeAttr('id')
       $attachment.find('input').attr('name', 'attachments[' + fileIndex++ + '][uploaded_data]')
       $('#add_comment_form .comment_attachments').append($attachment.slideDown())
+    })
+    document.addEventListener('change', function(event) {
+      if (event.target.matches('#add_comment_form input[type="file"]')) {
+        const inputElement = event.target
+        const parentElement = inputElement.parentNode
+
+        if (inputElement.files && inputElement.files.length > 0) {
+          const fileName = inputElement.files[0].name
+
+          // Hide the input element
+          inputElement.style.height = '0'
+          inputElement.style.width = '0'
+          // Also remove the link to remove the input
+          const deleteLink = Array.from(parentElement.children).find(
+            child => child.classList.contains('delete_comment_attachment_link')
+          )
+          deleteLink?.remove()
+
+          // Clear any existing errors
+          clearTextAreaErrors()
+
+          // Replace with Pill
+          const container = document.createElement('div')
+          parentElement.appendChild(container)
+          const fileRoot = createRoot(container)
+          const removeFile = (root, input) => {
+            root.unmount()
+            input.remove()
+          }
+          fileRoot.render(
+            <Flex direction='column' margin="0 0 small 0">
+              <Flex.Item>
+                <Tag
+                  text={<AccessibleContent alt={fileName}>{fileName}</AccessibleContent>}
+                  dismissible={true}
+                  onClick={() => removeFile(fileRoot, inputElement)}
+                  data-testid="submission_comment_file_tag"
+                />
+              </Flex.Item>
+            </Flex>
+          )
+        } else {
+          console.log('No file selected')
+        }
+      }
     })
     $('.delete_comment_attachment_link').click(function (event) {
       event.preventDefault()

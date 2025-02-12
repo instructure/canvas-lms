@@ -260,6 +260,36 @@ describe GradebookUserIds do
     end
   end
 
+  describe "filtering by student group (differentiation_tags)" do
+    let_once(:differentiation_tag_category) do
+      dtc = @course.group_categories.create!(name: "differentiation_tags", non_collaborative: true)
+      dtc.create_groups(3)
+
+      dtc.groups.first.add_user(@student1)
+      dtc.groups.second.add_user(@student2)
+      dtc.groups.third.add_user(@student3)
+      dtc
+    end
+
+    let_once(:differentiation_tag_group) { differentiation_tag_category.groups.first }
+    let_once(:differentiation_tag_group2) { differentiation_tag_category.groups.second }
+
+    before :once do
+      @teacher.preferences[:gradebook_settings] = {
+        @course.global_id => {
+          filter_rows_by: {
+            student_group_id: differentiation_tag_group.id
+          }
+        }
+      }
+      Account.site_admin.enable_feature!(:differentiation_tags)
+    end
+
+    it "returns students in the selected differentiation tag" do
+      expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id)
+    end
+  end
+
   it "sorts by sortable name ascending if the user does not have any saved sort preferences" do
     @teacher.preferences[:gradebook_settings] = {}
     expected_result = [@student1.id, @student4.id, @student3.id, @student2.id, @fake_student.id]

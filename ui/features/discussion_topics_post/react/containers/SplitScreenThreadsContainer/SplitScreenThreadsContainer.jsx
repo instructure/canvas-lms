@@ -52,6 +52,7 @@ import {useMutation} from '@apollo/client'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
+import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -304,21 +305,43 @@ const SplitScreenThreadContainer = props => {
     })
   }
 
+  const onThreadReplyKeyboard = e => {
+    if (
+      e.detail.entryId === props.discussionEntry._id &&
+      props?.discussionEntry?.permissions?.reply
+    ) {
+      onThreadReply()
+    }
+  }
+  useEventHandler(KeyboardShortcuts.ON_THREAD_REPLY_KEYBOARD, onThreadReplyKeyboard)
+
+  const onThreadReply = () => {
+    props.onOpenSplitScreenView(props.discussionEntry._id, true)
+  }
+
   if (props?.discussionEntry?.permissions?.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
         authorName={getDisplayName(props.discussionEntry)}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
-        onClick={() => props.onOpenSplitScreenView(props.discussionEntry._id, true)}
+        onClick={onThreadReply}
         isSplitScreenView={true}
       />,
     )
   }
-  if (
+
+  const canViewAndRate =
     props.discussionEntry.permissions.viewRating &&
     (props.discussionEntry.permissions.rate || props.discussionEntry.ratingSum > 0)
-  ) {
+  const toggleRatingKeyboard = e => {
+    if (canViewAndRate && e.detail.entryId === props.discussionEntry._id) {
+      props.onToggleRating(props.discussionEntry)
+    }
+  }
+  useEventHandler(KeyboardShortcuts.TOGGLE_RATING_KEYBOARD, toggleRatingKeyboard)
+
+  if (canViewAndRate) {
     threadActions.push(
       <ThreadingToolbar.Like
         key={`like-${props.discussionEntry.id}`}
@@ -346,6 +369,16 @@ const SplitScreenThreadContainer = props => {
     )
   }
 
+  const onShowRepliesKeyboard = e => {
+    if (e.detail.entryId === props.discussionEntry._id && props.discussionEntry.subentriesCount) {
+      onShowReplies()
+    }
+  }
+  const onShowReplies = () => {
+    props.onOpenSplitScreenView(props.discussionEntry._id, false)
+  }
+  useEventHandler(KeyboardShortcuts.ON_SHOW_REPLIES_KEYBOARD, onShowRepliesKeyboard)
+
   if (props.discussionEntry.subentriesCount) {
     threadActions.push(
       <ThreadingToolbar.Expansion
@@ -354,9 +387,37 @@ const SplitScreenThreadContainer = props => {
         authorName={getDisplayName(props.discussionEntry)}
         expandText={I18n.t('View Replies')}
         isExpanded={false}
-        onClick={() => props.onOpenSplitScreenView(props.discussionEntry._id, false)}
-      />,
+        onClick={onShowReplies}
+      />
     )
+  }
+
+  const onDeleteKeyboard = e => {
+    if (
+      e.detail.entryId === props.discussionEntry._id &&
+      props.discussionEntry.permissions?.delete
+    ) {
+      onDelete()
+    }
+  }
+  useEventHandler(KeyboardShortcuts.ON_DELETE_KEYBOARD, onDeleteKeyboard)
+
+  const onDelete = () => {
+    props.onDelete(props.discussionEntry)
+  }
+
+  const onEditKeyboard = e => {
+    if (
+      e.detail.entryId === props.discussionEntry._id &&
+      props.discussionEntry.permissions?.update
+    ) {
+      onEdit()
+    }
+  }
+  useEventHandler(KeyboardShortcuts.ON_EDIT_KEYBOARD, onEditKeyboard)
+
+  const onEdit = () => {
+    setIsEditing(true)
   }
 
   return (
@@ -374,7 +435,10 @@ const SplitScreenThreadContainer = props => {
       render={responsiveProps => (
         <div ref={onThreadRefCurrentSet}>
           <View as="div" padding={responsiveProps.padding}>
-            <Highlight isHighlighted={props.isHighlighted}>
+            <Highlight
+              isHighlighted={props.isHighlighted}
+              discussionEntryId={props.discussionEntry._id}
+            >
               <Flex padding="small">
                 <Flex.Item shouldShrink={true} shouldGrow={true}>
                   <DiscussionEntryContainer
@@ -388,18 +452,8 @@ const SplitScreenThreadContainer = props => {
                         id={props.discussionEntry.id}
                         isUnread={!props.discussionEntry.entryParticipant?.read}
                         onToggleUnread={() => props.onToggleUnread(props.discussionEntry)}
-                        onDelete={
-                          props.discussionEntry.permissions?.delete
-                            ? () => props.onDelete(props.discussionEntry)
-                            : null
-                        }
-                        onEdit={
-                          props.discussionEntry.permissions?.update
-                            ? () => {
-                                setIsEditing(true)
-                              }
-                            : null
-                        }
+                        onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
+                        onEdit={props.discussionEntry.permissions?.update ? onEdit : null}
                         onOpenInSpeedGrader={
                           props.discussionTopic.permissions?.speedGrader
                             ? () => props.onOpenInSpeedGrader(props.discussionEntry)

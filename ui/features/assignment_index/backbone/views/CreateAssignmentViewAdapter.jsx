@@ -1,4 +1,3 @@
-/* eslint-disable no-fallthrough */
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *
@@ -218,10 +217,13 @@ const getFrozenFields = assignment => {
       switch (r) {
         case 'content':
           if (restrictions[r]) addFrozenField(fields, 'name')
+          break
         case 'points':
           if (restrictions[r]) addFrozenField(fields, 'points')
+          break
         case 'due_dates':
           if (restrictions[r]) addFrozenField(fields, 'due_at')
+          break
       }
     })
   }

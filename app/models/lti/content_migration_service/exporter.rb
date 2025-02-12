@@ -103,7 +103,7 @@ module Lti
 
       def base_post_body
         {
-          context_id: Lti::Asset.opaque_identifier_for(@course),
+          context_id: Lti::V1p1::Asset.opaque_identifier_for(@course),
           tool_consumer_instance_guid: root_account.lti_guid,
         }
       end

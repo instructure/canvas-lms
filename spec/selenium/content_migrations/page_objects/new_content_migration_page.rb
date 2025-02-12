@@ -30,6 +30,10 @@ class NewContentMigrationPage
       '[data-cid="BaseButton Button"]'
     end
 
+    def migration_type_options
+      INSTUI_Select_options('[data-testid="select-content-type-dropdown"]')
+    end
+
     # Selectors
     def migration_type_dropdown
       f("#Select_0")
@@ -52,11 +56,11 @@ class NewContentMigrationPage
     end
 
     def all_content_radio
-      f('[for="RadioInput_0"]')
+      fxpath('//*[text()="All content"]')
     end
 
     def specific_content_radio
-      f('[for="RadioInput_1"]')
+      fxpath('//*[text()="Select specific content"]')
     end
 
     def progress_status_label
@@ -84,7 +88,11 @@ class NewContentMigrationPage
     end
 
     def course_search_input
-      f("#Select_1")
+      f("#course-copy-select-course")
+    end
+
+    def course_search_input_has_options?
+      course_search_input.attribute("aria-expanded") == "true"
     end
 
     def course_search_result(id)
@@ -112,11 +120,11 @@ class NewContentMigrationPage
     end
 
     def include_completed_courses_checkbox
-      f("#include_completed_courses")
+      fxpath('//*[text()="Include completed courses"]')
     end
 
     def migration_progress_items
-      ff(".migrationProgressItem")
+      find_table_rows("Content Migrations")
     end
 
     def course_select_warning
@@ -152,11 +160,44 @@ class NewContentMigrationPage
     end
 
     def external_tool_launch
-      f("#converter .externalToolLaunch")
+      fxpath('//*[text()="Find a Course"]')
     end
 
     def lti_select_content
-      f("#converter .selectContent")
+      fxpath('//*[text()="Content"]')
+    end
+
+    def date_adjust_checkbox
+      fxpath('//*[text()="Adjust events and due dates"]')
+    end
+
+    def add_day_substitution_button
+      fxpath('//*[@aria-hidden="true" and text()="Substitution"]/ancestor::button')
+    end
+
+    def add_day_containers
+      ff("#daySubstitution ul > div")
+    end
+
+    def old_start_date_input
+      find_by_test_id("old_start_date")
+    end
+
+    def old_end_date_input
+      find_by_test_id("old_end_date")
+    end
+
+    def new_start_date_input
+      find_by_test_id("new_start_date")
+    end
+
+    def new_end_date_input
+      find_by_test_id("new_end_date")
+    end
+
+    def select_day_substition_range(index, from_weekday, to_weekday)
+      click_option("#day-substition-from-#{index}", from_weekday)
+      click_option("#day-substition-to-#{index}", to_weekday)
     end
   end
 end

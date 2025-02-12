@@ -18,6 +18,73 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Lti
+  # @API LTI Launch Definitions
+  #
+  # @model Lti::LaunchDefinition
+  #   {
+  #     "id": "Lti::LaunchDefinition",
+  #     "description": "A bare-bones representation of an LTI tool used by Canvas to launch the tool",
+  #     "properties": {
+  #       "definition_type": {
+  #         "description": "The type of the launch definition. Always 'ContextExternalTool'",
+  #         "example": "ContextExternalTool",
+  #         "type": "string"
+  #       },
+  #       "definition_id": {
+  #         "description": "The Canvas ID of the tool",
+  #         "example": "123",
+  #         "type": "string"
+  #       },
+  #       "name": {
+  #         "description": "The display name of the tool for the given placement",
+  #         "example": "My Tool",
+  #         "type": "string"
+  #       },
+  #      "description": {
+  #         "description": "The description of the tool for the given placement.",
+  #         "example": "This is a tool that does things.",
+  #         "type": "string"
+  #       },
+  #      "url": {
+  #         "description": "The launch URL for the tool",
+  #         "example": "https://www.example.com/launch",
+  #         "type": "string"
+  #       },
+  #      "domain": {
+  #         "description": "The domain of the tool",
+  #         "example": "example.com",
+  #         "type": "string"
+  #       },
+  #      "placements": {
+  #         "description": "Placement-specific config for given placements",
+  #         "example": { "assignment_selection": { "type": "Lti::PlacementLaunchDefinition" } },
+  #         "type": "object"
+  #       }
+  #     }
+  #   }
+  #
+  # @model Lti::PlacementLaunchDefinition
+  #   {
+  #     "id": "Lti::PlacementLaunchDefinition",
+  #     "description": "A bare-bones LTI configuration for a specific placement",
+  #     "properties": {
+  #       "message_type": {
+  #         "description": "The LTI launch message type",
+  #         "example": "LtiResourceLinkRequest",
+  #         "type": "string"
+  #       },
+  #       "url": {
+  #         "description": "The launch URL for this placement",
+  #         "example": "https://www.example.com/launch?placement=assignment_selection",
+  #         "type": "string"
+  #       },
+  #       "title": {
+  #         "description": "The title of the tool for this placement",
+  #         "example": "My Tool (Assignment Selection)",
+  #         "type": "string"
+  #       }
+  #     }
+  #   }
   class LtiAppsController < ApplicationController
     before_action :require_context
     before_action :require_user, except: [:launch_definitions]
@@ -35,6 +102,14 @@ module Lti
       end
     end
 
+    # @API List LTI Launch Definitions
+    #
+    # List all tools available in this context for the given placements, in the form of Launch Definitions.
+    # Used primarily by the Canvas frontend. API users should consider using the External Tools API instead.
+    # This endpoint is cached for 10 minutes!
+    #
+    # @argument placements[Array] The placements to return launch definitions for. If not provided, an empty list will be returned.
+    # @argument only_visible[Boolean] If true, only return launch definitions that are visible to the current user. Defaults to true.
     def launch_definitions
       placements = params["placements"] || []
       if authorized_for_launch_definitions(@context, @current_user, placements)

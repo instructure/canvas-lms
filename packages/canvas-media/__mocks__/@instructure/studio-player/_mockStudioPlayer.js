@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+const React = require('react')
+
 module.exports = {
-  StudioPlayer: () => null
-};
+  StudioPlayer: () => <div data-testid="studio-player" />,
+}

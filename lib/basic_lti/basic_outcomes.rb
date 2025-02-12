@@ -43,8 +43,8 @@ module BasicLTI
   module BasicOutcomes
     class Unauthorized < StandardError
       def initialize(msg)
-        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.bad_requests",
-                                     tags: { error_code: "Unauthorized" })
+        InstStatsd::Statsd.distributed_increment("lti.1_1.basic_outcomes.bad_requests",
+                                                 tags: { error_code: "Unauthorized" })
         super
       end
 
@@ -55,8 +55,8 @@ module BasicLTI
 
     class InvalidRequest < StandardError
       def initialize(msg)
-        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.bad_requests",
-                                     tags: { error_code: "InvalidRequest" })
+        InstStatsd::Statsd.distributed_increment("lti.1_1.basic_outcomes.bad_requests",
+                                                 tags: { error_code: "InvalidRequest" })
         super
       end
 
@@ -232,7 +232,7 @@ module BasicLTI
         op = operation_ref_identifier.underscore
         return false unless respond_to?(:"handle_#{op}", true)
 
-        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.requests", tags: { op:, type: request_type })
+        InstStatsd::Statsd.distributed_increment("lti.1_1.basic_outcomes.requests", tags: { op:, type: request_type })
 
         # Write results are disabled for concluded users, read results are still allowed
         if op != "read_result" && !user_enrollment_active?(assignment, user)
@@ -260,7 +260,7 @@ module BasicLTI
           # Exits out of the first job and creates a second one so that the run_at time won't hold back
           # the entire n_strand. Also creates it in a different strand for retries, so we shouldn't block
           # any incoming uploads.
-          InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.fetch_jobs_failures")
+          InstStatsd::Statsd.distributed_increment("lti.1_1.basic_outcomes.fetch_jobs_failures")
           job_options = {
             priority: Delayed::HIGH_PRIORITY,
             # because inst-jobs only takes 2 items from an array to make a string strand
@@ -277,7 +277,7 @@ module BasicLTI
             attempt_number
           )
         else
-          InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.fetch_jobs")
+          InstStatsd::Statsd.distributed_increment("lti.1_1.basic_outcomes.fetch_jobs")
           create_homework_submission submission_hash, assignment, user
         end
       end
@@ -292,7 +292,7 @@ module BasicLTI
         self.code_major = "failure"
         self.description = description
         self.error_code = code
-        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.failures", tags: { op: operation_ref_identifier.underscore, type: request_type, error_code: code })
+        InstStatsd::Statsd.distributed_increment("lti.1_1.basic_outcomes.failures", tags: { op: operation_ref_identifier.underscore, type: request_type, error_code: code })
       end
 
       def failure?

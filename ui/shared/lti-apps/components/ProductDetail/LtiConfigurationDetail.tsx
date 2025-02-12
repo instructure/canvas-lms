@@ -20,31 +20,35 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
-import type {LtiDetailProps} from '../../models/Product'
+import type {Lti} from '../../models/Product'
 
 const I18n = createI18nScope('lti_registrations')
 interface LtiConfigurationDetailProps {
-  integrationData: LtiDetailProps | undefined
+  integrationData: Lti | undefined
 }
 
 const LtiConfigurationDetail = (props: LtiConfigurationDetailProps) => {
+  const description = I18n.t('Description')
   const placements = I18n.t('Placements')
   const services = I18n.t('Services')
+  const emptyDescription = <Text>{I18n.t('There is no integration description for this tool')}</Text>
   const emptyPlacements = <List.Item>{I18n.t('There are no placements for this tool')}</List.Item>
   const emptyServices = <List.Item>{I18n.t('There are no services for this tool')}</List.Item>
 
   const renderPlacements = () => {
-    return props.integrationData?.placements.map(placement => {
-      return <List.Item>{placement}</List.Item>
+    return props.integrationData?.lti_placements.map((placement) => {
+      return <List.Item key={placement}>{placement}</List.Item>
     })
   }
 
   const renderServices = () => {
-    return props.integrationData?.services.map(service => {
-      return <List.Item>{service}</List.Item>
+    return props.integrationData?.lti_services.map((service) => {
+      return <List.Item key={service}>{service}</List.Item>
     })
   }
+
   const placementsArray = renderPlacements() ?? []
   const servicesArray = renderServices() ?? []
 
@@ -52,33 +56,39 @@ const LtiConfigurationDetail = (props: LtiConfigurationDetailProps) => {
     return (
       <div>
         <Flex>
-          <Flex.Item margin="medium 0 0 0">
+          <Flex.Item margin="medium 0 small 0">
             <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
               {I18n.t('Integration Details')}
             </Heading>
           </Flex.Item>
         </Flex>
         <Flex direction="column">
-          <div>
+          <Flex direction="column" margin="x-small 0 0 0">
             <Flex.Item margin="0 0 0 x-small">
+              <Heading level="h4" as="h3">
+                {description}
+              </Heading>
+            </Flex.Item>
+            <Flex.Item margin="x-small 0 x-small x-small">
+              {props.integrationData?.description.length === undefined ? emptyDescription : <div dangerouslySetInnerHTML={{__html: props.integrationData.description}} />}
+            </Flex.Item>
+          </Flex>
+            <Flex.Item margin="x-small 0 0 x-small">
               <Heading level="h4" as="h3">
                 {placements}
               </Heading>
             </Flex.Item>
-            <List margin="x-small 0 0 0">
+            <List margin="x-small 0 small 0">
               {placementsArray.length === 0 ? emptyPlacements : renderPlacements()}
             </List>
-          </div>
-          <div>
             <Flex.Item margin="0 0 0 x-small">
               <Heading level="h4" as="h3">
                 {services}
               </Heading>
             </Flex.Item>
-            <List margin="x-small 0 small 0">
+            <List margin="x-small 0 x-small 0">
               {servicesArray.length === 0 ? emptyServices : renderServices()}
             </List>
-          </div>
         </Flex>
       </div>
     )

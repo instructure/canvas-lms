@@ -40,16 +40,12 @@ export type AssignmentSubmissionTypeContainerProps = {
   onRemoveResource: () => void
 }
 
-declare const ENV: GlobalEnv & {
-  ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED: boolean
-}
-
 export function AssignmentSubmissionTypeContainer(
   props: AssignmentSubmissionTypeContainerProps,
 ): React.ReactElement | null {
   if (!props.tool) {
     return null
-  } else if (ENV.ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED && props.resource) {
+  } else if (props.resource) {
     return (
       <AssignmentSubmissionTypeSelectionResourceLinkCard
         tool={props.tool}

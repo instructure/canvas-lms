@@ -53,6 +53,7 @@ describe LiveEvents::Client do
     stub_config
     allow(LiveEvents).to receive_messages(logger: double(info: nil, error: nil, warn: nil), stream_client: fclient)
     LiveEvents.max_queue_size = -> { 100 }
+    LiveEvents.retry_throttled_events = -> { true }
     LiveEvents.clear_context!
 
     @client = LiveEvents::Client.new nil, fclient, test_stream_name

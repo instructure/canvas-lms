@@ -42,7 +42,7 @@ module Lti
         course = params[:course]
 
         context = {
-          id: Lti::Asset.opaque_identifier_for(course),
+          id: Lti::V1p1::Asset.opaque_identifier_for(course),
           label: course.course_code,
           title: course.name,
           type: [Lti::SubstitutionsHelper::LIS_V2_ROLE_MAP[course.class] || course.class.to_s]
@@ -50,7 +50,7 @@ module Lti
 
         source_course = params[:source_course]
         origin_contexts = if source_course.present?
-                            [Lti::Asset.opaque_identifier_for(source_course)]
+                            [Lti::V1p1::Asset.opaque_identifier_for(source_course)]
                           else
                             nil
                           end

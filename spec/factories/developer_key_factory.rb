@@ -29,35 +29,26 @@ module Factories
     account = opts[:account].presence
     name = opts[:name] || "A Random Dev Key"
     email = opts[:email] || "test@example.com"
+    scopes = opts[:scopes] || []
 
     {
       name:,
       email:,
-      account:
+      account:,
+      scopes:
     }
   end
 
-  def dev_key_model_1_3(opts = {})
+  def lti_developer_key_model(opts = {})
     opts[:account] ||= Account.default
-    opts = dev_key_valid_attributes({ is_lti_key: true,
-                                      public_jwk_url: "http://example.com/jwks" }.merge(opts))
-
-    tool_configuration_params = {
-      settings: opts[:settings].presence || JSON.parse(Rails.root.join(LTI_1_3_CONFIG_PATH).read)
-    }.with_indifferent_access
-    Lti::ToolConfiguration.create_tool_config_and_key!(opts[:account], tool_configuration_params)
-
-    # special case to remove the account if the account was site admin; when the dev
-    # key is created, if the account is site admin, the account on the dev key will be set
-    # to nil. We need to keep it that way and not stomp over it with a new account value here.
     opts[:account] = nil if opts[:account].site_admin?
-
-    DeveloperKey.last.update!(opts)
-    DeveloperKey.last
+    opts = dev_key_valid_attributes(opts).merge({ is_lti_key: true, public_jwk_url: "http://example.com/jwks" })
+    DeveloperKey.create!(opts)
   end
+  alias_method :dev_key_model_1_3, :lti_developer_key_model
 
   def dev_key_model_dyn_reg(opts = {})
-    key = dev_key_model_1_3(opts)
+    key = lti_developer_key_model(opts)
     registration(key)
     key
   end
@@ -83,7 +74,7 @@ module Factories
       claims: []
     }
     scopes = []
-    registration = Lti::IMS::Registration.new({
+    Lti::IMS::Registration.create!({
       redirect_uris:,
       initiate_login_uri:,
       client_name:,
@@ -93,9 +84,9 @@ module Factories
       tos_uri:,
       policy_uri:,
       lti_tool_configuration:,
-      scopes:
+      scopes:,
+      developer_key: key,
+      lti_registration: key.lti_registration
     }.compact)
-    registration.developer_key = key
-    registration
   end
 end

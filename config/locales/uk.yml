@@ -1899,6 +1899,7 @@ uk:
       details: детальніше...
       login: Вхід
     no_text: "Текст відсутній"
+  alert_d2c8ef98: Оповіщення
   alerts: 
     alert: 
       buttons: 
@@ -2007,6 +2008,8 @@ uk:
   alphabetically_60ab47e4: "В алфавітному порядку"
   alt_text_611fb322: "Альтернативний текст"
   always_3a59e701: Завжди
+  an_alert_is_generated_for_each_student_that_meets__c36e3561: "Попередження генерується для кожного студента, який відповідає критерію. Перевірка відбувається кожного дня і повідомлення будуть надіслані студенту, викладачу, та/або на обліковий запис адміністратора доки проблема не буде вирішена."
+  an_alert_is_generated_for_each_student_that_meets__fcd175ac: "Попередження генерується для кожного студента, який відповідає критерію. Перевірка відбувається кожного дня і повідомлення будуть надіслані студенту та/або викладачу доки проблема не буде вирішена."
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Для використання Academic Benchmarks потрібен ключ API"
   an_assignment_name_dc624e70: "Назва завдання"
   an_auto_generated_chronological_summary_of_your_co_eeafee13: "Автоматично згенерований підсумок вашого курсу"
@@ -2495,6 +2498,7 @@ uk:
       not_yet_graded: "*Оцінка досі відсутня*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
       score_with_points_possible_screenreader: "Рахунок: %{score} з можливих %{pointsPossible} балів."
+    assignment_submit_success: "Завдання було успішно відправлено."
     assignments_list_right_side: 
       links: 
         see_current_grades: "Дивитися мої оцінки до цього часу"
@@ -5386,6 +5390,7 @@ uk:
   course_pages_449f1dd4: "Сторінки курсу"
   course_people_3058c948: "Люди курсу"
   course_quizzes_c337653c: "Контрольні роботи курсу"
+  course_quota_8f7f74c: "Квота курсу"
   course_restore: 
     restore_error: "Відбулася помилка при спробі відновити цей курс. Курс не був відновлений."
   course_role_role_type_119c2f64: "Роль курсу: %{role_type}"
@@ -5885,6 +5890,7 @@ uk:
   create_a_new_module_6f31b0fe: "Створити новий модуль"
   create_a_new_user_for_address_7487e9c9: "Створити нового користувача для \"%{address}\""
   create_account_263ec6: "Створити обліковий запис"
+  create_an_eportfolio_1841e34a: "Створити Е-портфоліо"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Створюйте та адмініструйте онлайн тести та опитування, як з оцінкою так і без."
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Створюйте стільки тем для обговорення, скільки потрібно, завдання
@@ -6277,6 +6283,7 @@ uk:
   deep_orange_4c7eea99: Темно-помаранчевий
   deep_purple_bb3e2907: Темно-фіолетовий
   default_9db103d: "За замовчуванням"
+  default_account_quotas_e34112fd: "Квоти облікового запису за замовчуванням"
   default_conference_title: "%{course_name} конференція"
   default_email_5cb9fa04: "Електронна пошта за замовчуванням"
   default_email_9efb7fbd: "Електронна пошта за замовчуванням"
@@ -6899,6 +6906,7 @@ uk:
   ecollege_name: "Конвертер Е-коледжу"
   ecuador_593_dfcc235a: "Еквадор (+593)"
   edit_account_name_for_account_name_ae3633e8: "Редагувати ім'я облікового запису для %{account_name}"
+  edit_alert_739bb0ba: "Редагувати оповіщення"
   edit_and_delete_their_own_posts_f4f7cc6: "Редагувати або видалити їхні власні повідомлення"
   edit_announcement_title_cce0b4e: "Рудагувати оголошення %{title}"
   edit_app_b0cc1c17: "Редагувати застосунок"
@@ -7779,6 +7787,7 @@ uk:
   find_an_existing_grading_scheme_d836ea: "Знайти існуючу схему оцінювання"
   find_an_outcome_919328e6: "Знайти результат"
   find_appointment_85d6922e: "Знайти призначення"
+  find_course_or_group_a7de09a4: "Знайти курс або групу"
   find_flickr_image_view: 
     find_cc_on_flickr: "Знайти зображення творчих спільнот на Flickr"
     search: Пошук
@@ -8437,6 +8446,7 @@ uk:
   group_group_name_is_for_a_different_section_4d84d256: "Група %{group_name} призначена для іншого розділу"
   group_group_name_is_full_297880d6: "Група %{group_name} повна"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "До групи %{group_name} можна приєднатися тільки за запрошенням"
+  group_id_b0f6af89: "ID групи"
   group_is_for_a_different_section_6a843a4d: "Група призначена для іншого розділу"
   group_is_full_56849d78: "Група повна"
   group_is_joined_by_invitation_only_d00f5a63: "До групи можна приєднатися тільки за запрошенням"
@@ -8460,6 +8470,7 @@ uk:
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} в %{group_category_name} категорії груп"
   group_name_is_required_5547bc0b: "Ім'я групи обов'язкове"
   group_pages_656556f3: "Сторінки групи"
+  group_quota_290dbc6b: "Квота групи"
   group_roster_1846bf84: "Реєстр груп"
   group_select_330df8bd: "Вибір групи"
   group_set_4d1e7b06: "Набір груп"
@@ -9402,6 +9413,7 @@ uk:
       ellipsis: "..."
       quoted_text_toggle: "Показати цитований текст"
       word_separator: " "
+  license_bdede4fb: Ліцензія
   license_help: 
     content_license_help: "Допомога ліцензування контенту"
   license_type_6b74b543: "Тип Ліцензії"
@@ -9706,6 +9718,7 @@ uk:
   manual_8c2665de: Керівництво
   manual_entry_e4a4f99a: "Ручне введення"
   manually_mark_posts_as_read_afa5d035: "Вручну позначити повідомлення як прочитані"
+  manually_settable_quotas_ea3759e7: "Квоти, які налаштовуються вручну"
   mark_all_as_read_8f3bdf57: "Позначити все як Прочитане"
   mark_all_as_unread_a435be3d: "Позначити все як Непрочитане"
   mark_as_done_6fa48d2f: "Позначити як виконане"
@@ -9825,6 +9838,7 @@ uk:
   median_score_4657e907: "Середня:  %{score}"
   meets_expectations_bb179565: "Відповідає очікуванням"
   meets_mastery_754e1c06: "Відповідає майстерності"
+  megabytes_885404ef: мегабайтів
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} учасників з максимально %{max_membership}"
   members_af25c21d: Учасники
   members_are_free_to_join_defa5929: "Учасники можуть вільно приєднатися"
@@ -11920,6 +11934,7 @@ uk:
   no_placements_enabled_f705f28: "Не доступне розміщення"
   no_points_possible_368669d: "Можливі бали відсутні"
   no_points_possible_72db3a55: "Можливі бали відсутні"
+  no_preview_available_e8e71199: "Попередній перегляд недоступний"
   no_results_3cda4e72: "Результати відсутні"
   no_results_f36777ee: "Немає результатів"
   no_results_found_2ace1494: "Результатів не знайдено"
@@ -11935,6 +11950,7 @@ uk:
   no_subject_970aad80: "Без теми"
   no_submission_fb131a40: "Відповіді немає"
   no_submission_for_assignment_a9cb6fe2: "Відсутній матеріал для %{assignment}"
+  no_teacher_interaction_de8d91bc: "Відсутня взаємодія з викладачем"
   no_terms_eab5ee7b: "Немає термінів"
   no_time_limit_for_long_running_conferences_d49fdfad: "Немає обмеження часу (для тривалих конференцій)"
   no_tls_618add1a: "Немає TLS"
@@ -15452,6 +15468,7 @@ uk:
   sample_data_e4fd01ff: "Зразок даних"
   saudi_arabia_966_d01ed717: "Саудівська Аравія (+966)"
   save_11a80ec3: Зберегти
+  save_alert_b64f9fa3: "Зберегти оповіщення"
   save_changes_698abe77: "Зберегти зміни"
   save_grading_period_daaaddea: "Зберегти період оцінювання"
   save_grading_period_set_e029fa88: "Зберегти налаштування періоду оцінювання"
@@ -17125,6 +17142,7 @@ uk:
   submitted_late_3741af29: "Відправлено запізно"
   submitted_late_97730017: "Відправлено запізно"
   submitted_submitdate_bdd3bf09: "Відправлено: %{submitDate}"
+  submitting_b90fac62: Надсилання...
   submitting_types_7c5a7096: "Відправлено: %{types}"
   subscribe_4b301fb7: Підписатися
   subscribed_fe74d22a: Підписано
@@ -17138,6 +17156,7 @@ uk:
   successfully_resubmitted_to_turnitin_c908de0f: "Успішно повторно відправлено до turnitin"
   successfully_resubmitted_to_vericite_dab924b6: "Успішно повторно відправлено до VeriCite"
   successfully_updated_the_comment_946360d5: "Коментар успішно оновлено"
+  suggestions_b8b03b9d: "Пропозиції:"
   sum_of_all_files_in_mb_2b705055: "сума всіх файлів в MB"
   summary_statistics_f74852a5: "Підсумкова статистика"
   support: 
@@ -17921,6 +17940,7 @@ uk:
   treat_ungraded_as_0_d38c2b41: "Враховувати не здані як 0"
   tree_browser: 
     folder_tree_instructions: "Використовуйте клавіші зі стрілками вгору та вниз для навігації по дереву. Натискайте стрілку вправо, щоб розгорнути папки, ліворуч для згортання, клавішу Enter щоб обрати виділений елемент."
+  trigger_f0ee1fbf: Тригер
   trinidad_and_tobago_1_fc2d8d1c: "Тринідад і Тобаго (+1)"
   trophy: 
     star_display_name: "Помітити зіркою"
@@ -17985,6 +18005,8 @@ uk:
   ungraded_answers_31ef2df7: "Неоцінені відповіді"
   ungraded_ed0c6f98: Неоцінений
   ungraded_submissions_44efb0ec: "Неоцінені відправлення"
+  ungraded_submissions_count_63fcf6d1: "Завдання, що не були оцінені (Кількість)"
+  ungraded_submissions_time_bafaa609: "Завдання, які не були оцінені (Час)"
   ungraded_survey_ad7de790: "Неоцінене Опитування"
   united_arab_emirates_971_649b3750: "Об'єднані Арабські Емірати (+971)"
   united_kingdom_44_880b06ad: "Великобританія (+44)"
@@ -18066,6 +18088,7 @@ uk:
   update_link_b7cab181: "Оновити посилання"
   update_module_b984c2e5: "Оновити модуль"
   update_password_4bc5cb1f: "Оновити пароль"
+  update_quota_81381226: "Оновити квоту"
   update_rating_6d29c2ef: "Оновити рейтинг"
   update_settings_9b422d0f: "Налаштування оновлення"
   update_tool_7d48ef2a: "Оновити %{tool}"
@@ -18076,6 +18099,7 @@ uk:
   updated_terms_of_service_82f34148: "Оновити Умови надання сервісу"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Оновлений інтерфейс користувача для пошуку та відображення користувачів і курсів в обліковому записі."
   updating_6edbab78: Оновлення
+  updating_73d0718c: Оновлення...
   updating_user_details_b8520b3e: "Оновлення даних користувача..."
   upload_8b403d05: Завантажити
   upload_a_picture_9f5f6e3c: "Завантажити зображення"
@@ -18296,6 +18320,7 @@ uk:
       settings: Налаштування
   user_profile_d56261fc: "Профіль користувача"
   user_profile_picture_46bffbc7: "Зображення профілю користувача"
+  user_quota_12cb58b7: "Квота користувача"
   user_s_settings_d65644b4: "Налаштування %{user}"
   user_search_panel_18f80511: "Панель пошуку користувачів"
   user_search_results_f5445b8b: "Результати пошуку користувачів"
@@ -18864,6 +18889,7 @@ uk:
   workflow_state_cc8d711a: "Стан робочого процесу"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Ви бажаєте прийняти чи відхилити це оновлення?"
   would_you_like_to_enable_this_app_ccdf735d: "Хочете увімкнути цей додаток?"
+  would_you_like_to_expand_the_contents_of_filename__35b40cc5: "Ви хочете розархівувати вміст \"%{fileName}\" у поточну теку, чи завантажити файл zip як є?"
   would_you_like_to_go_back_to_include_1d279044: "Чи хочете Ви вернутися назад, щоб включити:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Хотіли б ви дозволити студентам продовжувати курс, чи хочете заблокувати ці модулі до виконання нових вимог?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "Завершіть назви подій у вікні перегляду календаря місяцю"
@@ -19042,6 +19068,7 @@ uk:
   zip_file_display: "Імпорт файлу"
   zip_file_file_description: "Розпакуйте .zip файл у папку"
   zip_file_name: ".zip файл"
+  zip_file_options_9a2af6c1: "Параметри Zip-файлу"
   zip_file_options_form: 
     expand: "Розгорнути його"
     message: "Ви хочете розархівувати вміст \"%{fileName}\" у поточну теку, чи завантажити файл zip як є?"

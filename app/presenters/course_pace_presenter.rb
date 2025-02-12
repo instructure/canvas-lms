@@ -62,8 +62,30 @@ class CoursePacePresenter
   def items_json(items)
     return [] unless items
 
+    module_item_ids = extract_module_item_ids(items)
+    content_tags = load_and_assign_content_tags(module_item_ids)
+    submission_statuses = course_pace.module_item_submission_status_by_student([course_pace.user_id], module_item_ids)
+
+    build_items_json(items, content_tags, submission_statuses)
+  end
+
+  def extract_module_item_ids(items)
+    items.map { |ppmi| ppmi.module_item.id }
+  end
+
+  def load_and_assign_content_tags(module_item_ids)
+    content_tags = ContentTag.where(id: module_item_ids)
+    assignment_content_ids = content_tags.select { |tag| tag.content_type == "Assignment" }.map(&:content_id)
+    assignments = Assignment.where(id: assignment_content_ids).index_by(&:id)
+    content_tags.each { |tag| tag.content = assignments[tag.content_id] if tag.content_type == "Assignment" }
+    content_tags
+  end
+
+  def build_items_json(items, content_tags, submission_statuses)
     items.map do |ppmi|
       module_item = ppmi.module_item
+      submission_status = submission_statuses[course_pace.user_id][module_item.id] || { has_submission: false, submission_date: nil, submittable: false }
+      content = content_tags.find { |tag| tag.id == module_item.id }&.content
       {
         id: ppmi.id,
         duration: ppmi.duration,
@@ -71,11 +93,13 @@ class CoursePacePresenter
         root_account_id: ppmi.root_account_id,
         module_item_id: module_item.id,
         assignment_title: module_item.title,
-        points_possible: TextHelper.round_if_whole(module_item.try_rescue(:assignment).try_rescue(:points_possible)),
+        points_possible: TextHelper.round_if_whole(content&.try_rescue(:points_possible)),
         assignment_link: "#{course_url(course_pace.course, only_path: true)}/modules/items/#{module_item.id}",
         position: module_item.position,
         module_item_type: module_item.content_type,
-        published: module_item.published?
+        published: module_item.published?,
+        submitted_at: submission_status[:submission_date],
+        submittable: submission_status[:submittable]
       }
     end
   end
@@ -95,15 +119,25 @@ class CoursePacePresenter
   end
 
   def course_pace_module_items
-    @course_pace_module_items ||= if course_pace.persisted?
-                                    course_pace.course_pace_module_items.joins(:module_item)
-                                               .preload(module_item: [:context_module])
-                                               .order("content_tags.position ASC")
-                                  else
-                                    course_pace.course_pace_module_items.sort do |a, b|
-                                      a.module_item.position <=> b.module_item.position
-                                    end
-                                  end.group_by { |ppmi| ppmi.module_item.context_module }
-                                  .sort_by { |context_module, _items| context_module.position }
+    @course_pace_module_items ||= begin
+      items = if course_pace.persisted?
+                course_pace.course_pace_module_items
+                           .joins(:module_item)
+                           .preload(module_item: [:context_module])
+                           .order("content_tags.position ASC")
+              else
+                course_pace.course_pace_module_items
+              end
+
+      module_item_ids = items.filter_map(&:module_item_id).uniq
+      module_items = ContentTag.where(id: module_item_ids).preload(:context_module).index_by(&:id)
+
+      items.each do |ppmi|
+        ppmi.module_item = module_items[ppmi.module_item_id]
+      end
+
+      items.group_by { |ppmi| ppmi.module_item.context_module }
+           .sort_by { |context_module, _items| context_module&.position || Float::INFINITY }
+    end
   end
 end

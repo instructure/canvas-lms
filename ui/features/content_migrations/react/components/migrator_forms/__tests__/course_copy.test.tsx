@@ -22,6 +22,7 @@ import CourseCopyImporter from '../course_copy'
 import userEvent from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {sharedDateParsingTests} from './shared_form_cases'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -29,17 +30,26 @@ const onSubmit = jest.fn()
 const onCancel = jest.fn()
 
 const renderComponent = (overrideProps?: any) =>
-  render(<CourseCopyImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
+  render(
+    <CourseCopyImporter
+      onSubmit={onSubmit}
+      onCancel={onCancel}
+      isSubmitting={false}
+      {...overrideProps}
+    />,
+  )
 
 describe('CourseCopyImporter', () => {
-  beforeAll(() => {
+  beforeEach(() => {
+    fakeENV.setup({
+      current_user: {
+        id: '0',
+      },
+      SHOW_BP_SETTINGS_IMPORT_OPTION: true,
+    })
+
     // @ts-expect-error
-    window.ENV.current_user = {
-      id: '0',
-    }
-    window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = true
-    // @ts-expect-error
-    doFetchApi.mockReturnValue(
+    doFetchApi.mockImplementation(() =>
       Promise.resolve({
         json: [
           {
@@ -61,7 +71,10 @@ describe('CourseCopyImporter', () => {
     )
   })
 
-  afterEach(() => jest.clearAllMocks())
+  afterEach(() => {
+    jest.clearAllMocks()
+    fakeENV.teardown()
+  })
 
   it('searches for matching courses and includes concluded by default', async () => {
     renderComponent()
@@ -129,9 +142,17 @@ describe('CourseCopyImporter', () => {
   })
 
   it('Does not renders BP settings import option when the destination course is marked ineligible', async () => {
-    window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = false
+    fakeENV.setup({
+      current_user: {
+        id: '0',
+      },
+      SHOW_BP_SETTINGS_IMPORT_OPTION: false,
+    })
     renderComponent()
     await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
+    await waitFor(async () => {
+      await expect(screen.findByText('Mathmatics')).resolves.toBeInTheDocument()
+    })
     await userEvent.click(await screen.findByText('Mathmatics'))
     expect(screen.queryByText('Import Blueprint Course settings')).toBeNull()
   })

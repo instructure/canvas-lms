@@ -36,24 +36,11 @@ import {
 } from '../../shared/api/backend_serializer'
 import type {CoursePace, OptionalDate, Pace, PaceDuration, ResponsiveSizes} from '../../types'
 import {coursePaceActions} from '../../actions/course_paces'
+import { generateDatesCaptions, getEndDateValue } from '../../utils/date_stuff/date_helpers'
 
 const I18n = createI18nScope('course_paces_projected_dates')
 
 const DASH = String.fromCharCode(0x2013)
-
-const START_DATE_CAPTIONS = {
-  enrollment: I18n.t('Student enrollment date'),
-  course: I18n.t('Determined by course start date'),
-  section: I18n.t('Determined by section start date'),
-  empty: I18n.t("Determined by today's date"),
-}
-
-const END_DATE_CAPTIONS = {
-  default: I18n.t('Determined by course pace'),
-  course: I18n.t('Determined by course end date'),
-  section: I18n.t('Determined by section end date'),
-  empty: I18n.t('Determined by course pace'),
-}
 
 interface PassedProps {
   readonly coursePace: CoursePace
@@ -80,53 +67,9 @@ export const PaceModalStats = ({
 }: PassedProps) => {
   const [dateFormatter, setDateFormat] = useState(coursePaceDateFormatter)
   const [shrink, setShrink] = useState(responsiveSize !== 'large')
-  const enrollmentType = coursePace.context_type === 'Enrollment'
   const startDateValue = coursePace.start_date
-  let endDateValue
-  if (enrollmentType) {
-    if (window.ENV.FEATURES.course_paces_for_students) {
-      endDateValue = coursePace.end_date || plannedEndDate
-    } else {
-      endDateValue = plannedEndDate
-    }
-  } else {
-    endDateValue =
-      coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
-  }
+  const endDateValue = getEndDateValue(coursePace, plannedEndDate)
 
-  // @ts-expect-error
-  const getStartDateCaption = contextType => {
-    if (startDateValue && coursePace.start_date_context !== 'hypothetical') {
-      // @ts-expect-error
-      return START_DATE_CAPTIONS[contextType]
-    }
-    return START_DATE_CAPTIONS.empty
-  }
-  // @ts-expect-error
-  const getEndDateCaption = contextType => {
-    if (endDateValue && coursePace.end_date_context !== 'hypothetical') {
-      // @ts-expect-error
-      return END_DATE_CAPTIONS[contextType]
-    }
-    return END_DATE_CAPTIONS.empty
-  }
-
-  const generateDatesCaptions = () => {
-    const contextType = coursePace.context_type.toLocaleLowerCase()
-    const captions = {startDate: START_DATE_CAPTIONS.empty, endDate: END_DATE_CAPTIONS.empty}
-    captions.startDate = getStartDateCaption(contextType)
-
-    if (contextType === 'enrollment') {
-      const appliedPaceContextType = appliedPace.type.toLocaleLowerCase()
-      const paceType = ['course', 'section'].includes(appliedPaceContextType)
-        ? appliedPaceContextType
-        : 'default'
-      captions.endDate = getEndDateCaption(paceType)
-      return captions
-    }
-    captions.endDate = getEndDateCaption(contextType)
-    return captions
-  }
 
   useEffect(() => {
     const isSmallScreen = responsiveSize !== 'large'
@@ -183,7 +126,7 @@ export const PaceModalStats = ({
   }
 
   const renderDates = () => {
-    const captions = generateDatesCaptions()
+    const captions = generateDatesCaptions(coursePace, startDateValue, endDateValue, appliedPace)
     return (
       <View
         as="div"

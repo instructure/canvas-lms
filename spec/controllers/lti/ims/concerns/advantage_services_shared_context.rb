@@ -62,16 +62,11 @@ shared_context "advantage services context" do
   end
 
   def send_http
-    if request_method == :get
-      get action, params: params_overrides
-    elsif request_method == :post
-      post action, params: params_overrides, body: body_overrides
-    elsif request_method == :put
-      put action, params: params_overrides, body: body_overrides
-    elsif request_method == :delete
-      delete action, params: params_overrides
-    else
-      raise "Unsupported request method"
+    case request_method
+    when :get, :delete
+      send request_method, action, params: params_overrides
+    when :post, :put
+      send request_method, action, params: (body_overrides || {}).merge(params_overrides)
     end
   end
 

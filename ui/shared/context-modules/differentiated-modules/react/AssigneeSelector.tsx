@@ -130,7 +130,7 @@ const AssigneeSelector = ({
   const handleInputChange = debounce(value => {
     setSearchTerm(value)
 
-    if (value.length >= 2 && isLoading && ENV.FEATURES?.assign_to_improved_search) {
+    if (value.length >= 2 && isLoading) {
       setSearchLoading(true)
       doFetchApi({
         path: `/api/v1/courses/${courseId}/users?search_term=${value}&enrollment_type=student&per_page=100`,
@@ -216,25 +216,7 @@ const AssigneeSelector = ({
         size={size}
         selectedOptionIds={selectedOptionIds}
         onChange={handleChange}
-        renderAfterInput={
-          isLoading && !ENV.FEATURES?.assign_to_improved_search ? (
-            <Spinner
-              renderTitle={
-                <ScreenReaderContent>
-                  {I18n.t('Loading student, section, and group data')}
-                </ScreenReaderContent>
-              }
-              size="x-small"
-            />
-          ) : (
-            <></>
-          )
-        }
-        placeholder={
-          ENV.FEATURES?.assign_to_improved_search && selectedOptionIds.length <= 2
-            ? I18n.t('Start typing to search...')
-            : undefined
-        }
+        placeholder={I18n.t('Start typing to search...')}
         customOnInputChange={handleInputChange}
         visibleOptionsCount={10}
         isLoading={isLoading && searchLoading}
