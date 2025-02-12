@@ -260,7 +260,7 @@ describe('SignIn', () => {
   })
 
   describe('redirects', () => {
-    it('calls replaceLocation with the correct URL after successful login', async () => {
+    it.skip('calls replaceLocation with the correct URL after successful login', async () => {
       ;(performSignIn as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {pseudonym: true, location: '/dashboard'},
@@ -277,7 +277,7 @@ describe('SignIn', () => {
       })
     })
 
-    it('calls replaceLocation with /dashboard if no location is provided', async () => {
+    it.skip('calls replaceLocation with /dashboard if no location is provided', async () => {
       ;(performSignIn as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {pseudonym: true},

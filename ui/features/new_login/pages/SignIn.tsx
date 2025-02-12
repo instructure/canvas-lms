@@ -100,7 +100,7 @@ const SignIn = () => {
           setOtpRequired(true)
         } else if (response.data?.pseudonym) {
           isRedirectingRef.current = true
-          replaceLocation(response.data.location || '/dashboard')
+          document.location.href = response.data.location || '/dashboard'
         } else {
           handleFailedLogin()
         }

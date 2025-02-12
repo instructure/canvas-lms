@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import authenticityToken from '@canvas/authenticity-token'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {ApiResponse, LoginResponse} from '../types'
 
@@ -23,11 +24,14 @@ export const performSignIn = async (
   username: string,
   password: string,
   rememberMe: boolean,
+  csrfToken?: string,
 ): Promise<ApiResponse<LoginResponse>> => {
+  const token = csrfToken || authenticityToken()
   const {json, response} = await doFetchApi<LoginResponse>({
     path: '/login/canvas',
     method: 'POST',
     body: {
+      authenticity_token: token,
       pseudonym_session: {
         unique_id: username,
         password,
@@ -39,11 +43,16 @@ export const performSignIn = async (
   return {status: response.status, data: json ?? ({} as LoginResponse)}
 }
 
-export const forgotPassword = async (email: string): Promise<ApiResponse<{requested: boolean}>> => {
+export const forgotPassword = async (
+  email: string,
+  csrfToken?: string,
+): Promise<ApiResponse<{requested: boolean}>> => {
+  const token = csrfToken || authenticityToken()
   const {json, response} = await doFetchApi<{requested: boolean}>({
     path: '/forgot_password',
     method: 'POST',
     body: {
+      authenticity_token: token,
       pseudonym_session: {
         unique_id_forgot: email,
       },
