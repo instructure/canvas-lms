@@ -461,17 +461,24 @@ export const getTranslation = async (text, translateTargetLanguage) => {
 
   const apiPath = `/courses/${ENV.course_id}/translate`
 
-  const {json} = await doFetchApi({
-    method: 'POST',
-    path: apiPath,
-    body: {
-      inputs: {
-        src_lang: 'en', // TODO: detect source language.
-        tgt_lang: translateTargetLanguage,
-        text,
+  try {
+    const {json} = await doFetchApi({
+      method: 'POST',
+      path: apiPath,
+      body: {
+        inputs: {
+          src_lang: 'en', // TODO: detect source language.
+          tgt_lang: translateTargetLanguage,
+          text,
+        },
       },
-    },
-  })
+    })
 
-  return json.translated_text
+    return json.translated_text
+  } catch (e) {
+    const response = await e.response.json()
+    const error = new Error()
+    Object.assign(error, {...response})
+    throw error
+  }
 }

@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "aws-sdk-translate"
+
 describe TranslationController do
   let(:context) { instance_double(Course) }
   let(:params) do
@@ -33,6 +35,7 @@ describe TranslationController do
 
   before do
     allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    allow(Account.site_admin).to receive(:feature_enabled?).and_return(false)
     allow(Account.site_admin).to receive(:feature_enabled?).with(:ai_translation_improvements).and_return(true)
     user_session(@user)
   end
@@ -102,6 +105,95 @@ describe TranslationController do
 
       expect(response).to be_successful
       expect(response.parsed_body["translated_text"]).to eq("translated.")
+    end
+  end
+
+  describe "Exception Handling" do
+    context "when Translation::SameLanguageTranslationError is raised" do
+      before do
+        error = Translation::SameLanguageTranslationError
+        allow_any_instance_of(TranslationController).to receive(:translate).and_raise(error)
+      end
+
+      it "renders a same-language error response" do
+        post :translate, params: { course_id: @course.id, inputs: params }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "info", message: "Translation is identical to source language." } })
+      end
+    end
+
+    context "when Aws::Translate::Errors::UnsupportedLanguagePairException is raised" do
+      before do
+        mock_response = OpenStruct.new(body: StringIO.new({
+          "__type" => "UnsupportedLanguagePairException",
+          "Message" => "Unsupported language pair: en to hu.",
+          "SourceLanguageCode" => "en",
+          "TargetLanguageCode" => "hu"
+        }.to_json))
+
+        mock_context = OpenStruct.new(http_response: mock_response)
+        error = Aws::Translate::Errors::UnsupportedLanguagePairException.new(mock_context, "Detected language low confidence")
+        allow_any_instance_of(TranslationController).to receive(:translate).and_raise(error)
+      end
+
+      it "renders an unsupported language pair error" do
+        post :translate, params: { course_id: @course.id, inputs: params }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Translation from English to Hungarian is not supported." } })
+      end
+    end
+
+    context "when Aws::Translate::Errors::DetectedLanguageLowConfidenceException is raised" do
+      before do
+        error = Aws::Translate::Errors::DetectedLanguageLowConfidenceException.new(
+          Aws::EmptyStructure.new, "Detected language low confidence"
+        )
+
+        allow_any_instance_of(TranslationController).to receive(:translate).and_raise(error)
+      end
+
+      it "renders a low confidence error response" do
+        post :translate, params: { course_id: @course.id, inputs: params }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Couldn’t identify source language." } })
+      end
+    end
+
+    context "when Aws::Translate::Errors::TextSizeLimitExceededException is raised" do
+      before do
+        error = Aws::Translate::Errors::TextSizeLimitExceededException.new(
+          Aws::EmptyStructure.new, "Couldn’t translate because the text is too long."
+        )
+
+        allow_any_instance_of(TranslationController).to receive(:translate).and_raise(error)
+      end
+
+      it "renders a text size limit exceeded error response" do
+        post :translate, params: { course_id: @course.id, inputs: params }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Couldn’t translate because the text is too long." } })
+      end
+    end
+
+    context "when a generic Aws::Translate::Errors::ServiceError is raised" do
+      before do
+        error = Aws::Translate::Errors::ServiceError.new(
+          Aws::EmptyStructure.new, "There was an unexpected error during translation."
+        )
+
+        allow_any_instance_of(TranslationController).to receive(:translate).and_raise(error)
+      end
+
+      it "renders a generic AWS Translate error response" do
+        post :translate, params: { course_id: @course.id, inputs: params }
+
+        expect(response).to have_http_status(:internal_server_error)
+        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "There was an unexpected error during translation." } })
+      end
     end
   end
 end

@@ -23,6 +23,9 @@ require "pragmatic_segmenter"
 require "nokogiri"
 
 module Translation
+  class SameLanguageTranslationError < StandardError
+  end
+
   class << self
     include Aws::SageMakerRuntime
     # The languages are imported from https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
@@ -249,6 +252,7 @@ module Translation
                                                    target_language_code: tgt_lang,
                                                  })
 
+      check_same_language(result)
       result.translated_text
     end
 
@@ -265,6 +269,7 @@ module Translation
                                                        target_language_code: tgt_lang,
                                                      })
 
+      check_same_language(result)
       result.translated_document.content
     end
 
@@ -343,6 +348,10 @@ module Translation
     end
 
     private
+
+    def check_same_language(translation_result)
+      raise SameLanguageTranslationError if translation_result.source_language_code == translation_result.target_language_code
+    end
 
     def parse_src_lang(text)
       result = trim_locale(CLD.detect_language(text)[:code])
