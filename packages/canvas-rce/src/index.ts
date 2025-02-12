@@ -25,6 +25,7 @@ import {setLocale} from './common/natcompare'
 import {Mathml} from './enhance-user-content/mathml'
 import type {EditorOptions} from './rce/RCEWrapperProps'
 import RCEWrapper from './rce/RCEWrapper'
+export type {Editor} from 'tinymce'
 
 export {
   getContrastStatus,
