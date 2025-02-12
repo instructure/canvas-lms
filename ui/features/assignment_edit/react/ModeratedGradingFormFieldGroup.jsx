@@ -44,6 +44,8 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
     moderatedGradingEnabled: bool.isRequired,
     onGraderCommentsVisibleToGradersChange: func.isRequired,
     onModeratedGradingChange: func.isRequired,
+    hideNumberInputErrors: func,
+    hideFinalGraderErrors: func,
   }
 
   static defaultProps = {
@@ -88,6 +90,7 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
                   currentGraderCount={this.props.currentGraderCount}
                   availableGradersCount={this.props.availableGradersCount}
                   locale={this.props.locale}
+                  hideErrors={this.props.hideNumberInputErrors}
                 />
 
                 <GraderCommentVisibilityCheckbox
@@ -98,6 +101,7 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
                 <FinalGraderSelectMenu
                   availableModerators={this.props.availableModerators}
                   finalGraderID={this.props.finalGraderID}
+                  hideErrors={this.props.hideFinalGraderErrors}
                 />
 
                 <GraderNamesVisibleToFinalGraderCheckbox

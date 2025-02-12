@@ -1391,6 +1391,7 @@ describe "assignments" do
         final_grader: @teacher
       )
       @assignment.publish
+      @course.root_account.enable_feature!(:moderated_grading)
     end
 
     it "denies access for a regular student to the moderation page", priority: "1" do
@@ -1403,6 +1404,37 @@ describe "assignments" do
       @assignment.update_attribute(:moderated_grading, false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
       expect(f("#content h1").text).to eql "Whoops... Looks like nothing is here!"
+    end
+
+    it "validates grader count must be greater than 0 and final grader must be selected" do
+      get "/courses/#{@course.id}/assignments/new"
+
+      f("#assignment_name").send_keys("Grader count must be greater than 0")
+      f("#assignment_moderated_grading").click
+      f("#grader_count").send_keys("\b")
+      f("#grader_count").send_keys("0")
+
+      submit_assignment_form
+
+      grader_count_error_msg = f("#grader_count_errors")
+      expect(grader_count_error_msg).to include_text("Must have at least one grader")
+
+      final_grader_error_msg = f("#final_grader_id_errors")
+      expect(final_grader_error_msg).to include_text("Must select a grader")
+    end
+
+    it "validates grader count must be less than MODERATED_GRADING_GRADER_LIMIT" do
+      get "/courses/#{@course.id}/assignments/new"
+
+      f("#assignment_name").send_keys("Grader count must be less than a maximum")
+      f("#assignment_moderated_grading").click
+      f("#grader_count").send_keys("\b")
+      f("#grader_count").send_keys("01234567890123456789012")
+
+      submit_assignment_form
+
+      grader_count_error_msg = f("#grader_count_errors")
+      expect(grader_count_error_msg).to include_text("Only a maximum of #{Course::MODERATED_GRADING_GRADER_LIMIT} graders can be assigned")
     end
   end
 

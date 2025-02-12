@@ -321,7 +321,7 @@ describe('EditView#validateFinalGrader', () => {
   it('returns an error if moderated grading is turned on and there is no final grader', () => {
     const view = createEditView()
     const errors = view.validateFinalGrader({moderated_grading: 'on', final_grader_id: null})
-    expect(errors.final_grader_id[0].message).toBe('Grader is required')
+    expect(errors.final_grader_id[0].message).toBe('Must select a grader')
   })
 })
 
@@ -362,7 +362,7 @@ describe('EditView#validateGraderCount', () => {
     expect(errors).toEqual({
       grader_count: [
         {
-          message: 'Grader count is required',
+          message: 'Must have at least one grader',
         },
       ],
     })
@@ -370,11 +370,11 @@ describe('EditView#validateGraderCount', () => {
 
   it('returns an error if moderated grading is turned on and grader count is 0', () => {
     const view = createEditView()
-    const errors = view.validateGraderCount({moderated_grading: 'on', grader_count: '0'})
+    const errors = view.validateGraderCount({moderated_grading: 'on', grader_count: 0})
     expect(errors).toEqual({
       grader_count: [
         {
-          message: 'Grader count cannot be 0',
+          message: 'Must have at least one grader',
         },
       ],
     })
