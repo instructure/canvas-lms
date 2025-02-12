@@ -118,9 +118,10 @@ class MediaAttempt extends React.Component {
     if (!mediaObject) {
       return null
     }
-    mediaObject.mediaSources.forEach(mediaSource => {
-      mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
-    })
+    const mediaSources = mediaObject.mediaSources.map(mediaSource => ({
+      ...mediaSource,
+      label: `${mediaSource.width}x${mediaSource.height}`,
+    }))
     const mediaTracks = mediaObject.mediaTracks.map(track => ({
       src: `/media_objects/${mediaObject._id}/media_tracks/${track._id}`,
       label: track.locale,
@@ -129,6 +130,7 @@ class MediaAttempt extends React.Component {
     }))
     const shouldRenderWithIframeURL = mediaObject.mediaSources.length === 0 && this.props.iframeURL
     const autoCCTrack = getAutoTrack(mediaObject.mediaTracks)
+
     return (
       <Flex direction="column" alignItems="center">
         <Flex.Item data-testid="media-recording" width="100%">
@@ -155,7 +157,7 @@ class MediaAttempt extends React.Component {
           ) : (
             <MediaPlayer
               tracks={mediaTracks}
-              sources={mediaObject.mediaSources}
+              sources={mediaSources}
               captionPosition="bottom"
               autoShowCaption={autoCCTrack}
             />
