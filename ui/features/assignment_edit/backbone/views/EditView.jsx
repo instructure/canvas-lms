@@ -1513,13 +1513,16 @@ EditView.prototype.fieldSelectors = Object.assign(
 )
 
 EditView.prototype.showErrors = function (errors) {
+  errors = this.sortErrorsByVerticalScreenPosition(errors)
+  let shouldFocus = true
   Object.entries(errors).forEach(([key, value]) => {
     // For this to function properly
     // the error containers must have an ID formatted as ${key}_errors.
-    const errorsContainer = document.getElementById(`${key}_errors`)
+    const errorsContainerID = `${key}_errors`
+    const errorsContainer = document.getElementById(errorsContainerID)
     if(errorsContainer){
       const root = this.errorRoots[key] ?? createRoot(errorsContainer)
-      const noMargin = ['allowed_attempts'].includes(key)
+      const noMargin = ['allowed_attempts', 'final_grader_id', 'grader_count'].includes(key)
       root.render(
         <Flex as="div" alignItems="center" margin={noMargin ? '0' : '0 0 0 medium'}>
           <Flex.Item as="div" margin="0 xx-small xxx-small 0">
@@ -1530,8 +1533,16 @@ EditView.prototype.showErrors = function (errors) {
           </Text>
         </Flex>
       )
-      this.errorRoots[`${key}_errors`] = root
+      this.errorRoots[errorsContainerID] = root
       delete errors[key]
+      const element = this.getElement(key)
+      if(element){
+        element.setAttribute("aria-describedby", errorsContainerID)
+        if(shouldFocus){
+          element.focus()
+          shouldFocus = false
+        }
+      }
     }
   })
 
@@ -1546,6 +1557,38 @@ EditView.prototype.showErrors = function (errors) {
       return this.conditionalReleaseEditor.focusOnError()
     }
   }
+}
+
+EditView.prototype.sortErrorsByVerticalScreenPosition = function (errors) {
+  return Object.entries(errors)
+    .map(([errorKey, errorMessage]) => {
+      const errorElement = this.getElement(errorKey)
+      if (!errorElement) return null
+
+      const elementRect = errorElement.getBoundingClientRect()
+      const verticalPosition = elementRect.top + window.scrollY
+
+      return { errorKey, errorMessage, verticalPosition }
+    })
+    .filter(errorEntry => errorEntry !== null)
+    .sort((firstError, secondError) => firstError.verticalPosition - secondError.verticalPosition)
+    .reduce((sortedErrors, errorEntry) => {
+      sortedErrors[errorEntry.errorKey] = errorEntry.errorMessage
+      return sortedErrors
+    }, {})
+}
+
+EditView.prototype.getElement = function (key) {
+  const byId = document.getElementById(key)
+  if (byId) return byId
+
+  const byName = document.querySelector(`[name="${key}"]`)
+  if (byName) return byName
+
+  const byCustomSelector =  document.querySelector(EditView.prototype.fieldSelectors[key])
+  if(byCustomSelector) return byCustomSelector
+
+  return null
 }
 
 EditView.prototype.hideErrors = function (containerId) {
@@ -1591,9 +1634,10 @@ EditView.prototype.validateFinalGrader = function (data) {
   if (data.moderated_grading === 'on' && !data.final_grader_id) {
     errors.final_grader_id = [
       {
-        message: I18n.t('Grader is required'),
+        message: I18n.t('Must select a grader'),
       },
     ]
+    $(document).trigger('validateFinalGraderSelectedValue', {error: true})
   }
   return errors
 }
@@ -1603,26 +1647,18 @@ EditView.prototype.validateGraderCount = function (data) {
   if (data.moderated_grading !== 'on') {
     return errors
   }
+  let message
   if (!data.grader_count) {
-    errors.grader_count = [
-      {
-        message: I18n.t('Grader count is required'),
-      },
-    ]
-  } else if (data.grader_count === '0') {
-    errors.grader_count = [
-      {
-        message: I18n.t('Grader count cannot be 0'),
-      },
-    ]
-  } else if (parseInt(data.grader_count, 10) > ENV.MODERATED_GRADING_GRADER_LIMIT) {
-    errors.grader_count = [
-      {
-        message: I18n.t('Only a maximum of %{max} graders can be assigned', {
+    message = I18n.t('Must have at least one grader')
+  } else if (data.grader_count > ENV.MODERATED_GRADING_GRADER_LIMIT) {
+    message = I18n.t('Only a maximum of %{max} graders can be assigned', {
           max: ENV.MODERATED_GRADING_GRADER_LIMIT,
-        }),
-      },
-    ]
+        })
+  }
+
+  if(message) {
+    errors.grader_count = [{message}]
+    $(document).trigger('validateGraderCountNumber', {error: true})
   }
   return errors
 }
@@ -1971,6 +2007,14 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
   if (!ENV.MODERATED_GRADING_ENABLED || this.assignment.isQuizLTIAssignment()) {
     return
   }
+  const clearNumberInputErrors = () => {
+    $(document).trigger('validateGraderCountNumber', {error: false})
+    this.hideErrors('grader_count_errors')
+  }
+  const clearFinalGraderSelectErrors = () => {
+    $(document).trigger('validateFinalGraderSelectedValue', {error: false})
+    this.hideErrors('final_grader_id_errors')
+  }
   const props = {
     availableModerators: ENV.AVAILABLE_MODERATORS,
     currentGraderCount: this.assignment.get('grader_count'),
@@ -1985,6 +2029,8 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
     availableGradersCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT,
     onGraderCommentsVisibleToGradersChange: this.handleGraderCommentsVisibleToGradersChanged,
     onModeratedGradingChange: this.handleModeratedGradingChanged,
+    hideNumberInputErrors: clearNumberInputErrors,
+    hideFinalGraderErrors: clearFinalGraderSelectErrors,
   }
   const formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
   const mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
