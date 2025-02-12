@@ -21,7 +21,7 @@ import React, {useState} from 'react'
 
 import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 import {PreviousArrow, NextArrow} from './Arrows'
-import {settings, calculateArrowDisableIndex} from './utils'
+import {responsiveCarouselSettings, calculateArrowDisableIndex} from './utils'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 
@@ -43,7 +43,7 @@ type ProductCarouselProps = {
 function ProductCarousel(props: ProductCarouselProps) {
   const {products, companyName} = props
   const slider = React.useRef<Slider>(null)
-  const updatedSettings = settings(products)
+  const updatedSettings = responsiveCarouselSettings(products)
   const {isDesktop, isTablet, isMobile} = useBreakpoints()
   const updatedArrowDisableIndex = calculateArrowDisableIndex(
     products,
@@ -72,13 +72,16 @@ function ProductCarousel(props: ProductCarouselProps) {
         </Flex.Item>
         {(products?.length ?? 0) > 1 && (
           <Flex direction="row">
+            <div style={{marginRight: '0.8rem'}}>
             <PreviousArrow
               currentSlideNumber={currentSlideNumber}
               slider={slider}
               screenReaderLabel={I18n.t('More Tools by %{companyName} previous button', {
                 companyName: companyName,
               })}
+              
             />
+            </div>
             <NextArrow
               currentSlideNumber={currentSlideNumber}
               slider={slider}
