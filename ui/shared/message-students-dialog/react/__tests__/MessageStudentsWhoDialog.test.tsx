@@ -26,8 +26,6 @@ import MessageStudentsWhoDialog, {
 } from '../MessageStudentsWhoDialog'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
-import mockGraphqlQuery from '@canvas/graphql-query-mock'
-import {OBSERVER_ENROLLMENTS_QUERY, type ObserverEnrollmentQueryResult} from '../../graphql/Queries'
 import type {CamelizedAssignment} from '@canvas/grading/grading'
 const students: Student[] = [
   {
@@ -1499,80 +1497,84 @@ describe('MessageStudentsWhoDialog', () => {
   })
 
   describe('send message button', () => {
-    it('is disabled when the message body is empty', async () => {
+    let onSend: jest.Mock<any, any>
+
+    beforeEach(() => {
+      onSend = jest.fn()
+      students.forEach(student => {
+        student.submittedAt = null
+      })
+    })
+
+    it('does not call onSend when the message body is empty', async () => {
       makeMocks()
 
       const {findByRole, getByTestId} = render(
         <MockedQueryClientProvider client={queryClient}>
-          <MessageStudentsWhoDialog {...makeProps()} />
+          <MessageStudentsWhoDialog {...makeProps({onSend})} />
         </MockedQueryClientProvider>,
       )
-
-      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
-      fireEvent.click(recipientsButton)
 
       const messageTextArea = getByTestId('message-input')
       fireEvent.change(messageTextArea, {target: {value: ''}})
 
       const sendButton = await findByRole('button', {name: 'Send'})
-      expect(sendButton).toBeDisabled()
+      fireEvent.click(sendButton)
+      expect(onSend).not.toHaveBeenCalled()
     })
 
-    it('is disabled when the message body has only whitespaces', async () => {
+    it('does not call onSend when the message body has only whitespaces', async () => {
       makeMocks()
 
       const {findByRole, getByTestId} = render(
         <MockedQueryClientProvider client={queryClient}>
-          <MessageStudentsWhoDialog {...makeProps()} />
+          <MessageStudentsWhoDialog {...makeProps({onSend})} />
         </MockedQueryClientProvider>,
       )
-
-      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
-      fireEvent.click(recipientsButton)
 
       const messageTextArea = getByTestId('message-input')
       fireEvent.change(messageTextArea, {target: {value: '   '}})
 
       const sendButton = await findByRole('button', {name: 'Send'})
-      expect(sendButton).toBeDisabled()
+      fireEvent.click(sendButton)
+      expect(onSend).not.toHaveBeenCalled()
     })
 
-    it('is disabled when there are no students/observers selected', async () => {
+    it('does not call onSend when there are no students/observers selected', async () => {
       makeMocks()
 
-      const {findByRole} = render(
+      const {findByLabelText, findByRole, getByTestId} = render(
         <MockedQueryClientProvider client={queryClient}>
-          <MessageStudentsWhoDialog {...makeProps()} />
+          <MessageStudentsWhoDialog {...makeProps({onSend})} />
         </MockedQueryClientProvider>,
       )
 
-      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
-      const checkbox = (await findByRole('checkbox', {name: /Students/})) as HTMLInputElement
+      const messageTextArea = getByTestId('message-input')
+      fireEvent.change(messageTextArea, {target: {value: 'FOO BAR'}})
 
-      fireEvent.click(recipientsButton)
+      const checkbox = (await findByLabelText(/Students/)) as HTMLInputElement;
       fireEvent.click(checkbox)
 
       const sendButton = await findByRole('button', {name: 'Send'})
-      expect(sendButton).toBeDisabled()
+      fireEvent.click(sendButton)
+      expect(onSend).not.toHaveBeenCalled()
     })
 
-    it('is enabled when the message body is not empty and there is at least one student/observer selected', async () => {
+    it('calls onSend when the message body is not empty and there is at least one student/observer selected', async () => {
       makeMocks()
 
       const {findByRole, getByTestId} = render(
         <MockedQueryClientProvider client={queryClient}>
-          <MessageStudentsWhoDialog {...makeProps()} />
+          <MessageStudentsWhoDialog {...makeProps({onSend})} />
         </MockedQueryClientProvider>,
       )
-
-      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
-      fireEvent.click(recipientsButton)
 
       const messageTextArea = getByTestId('message-input')
       fireEvent.change(messageTextArea, {target: {value: 'FOO BAR'}})
 
       const sendButton = await findByRole('button', {name: 'Send'})
-      expect(sendButton).not.toBeDisabled()
+      fireEvent.click(sendButton)
+      expect(onSend).toHaveBeenCalled()
     })
   })
 
