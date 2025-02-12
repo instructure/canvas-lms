@@ -323,9 +323,10 @@ module CanvasHttp
   # returns a tempfile with a filename based on the uri (same extension, if
   # there was an extension)
   def self.tempfile_for_uri(uri)
-    basename = File.basename(uri.path)
+    basename = File.basename(uri.path || "")
     basename, ext = basename.split(".", 2)
-    basename = basename.slice(0, 100)
+    basename = (basename || "").slice(0, 100)
+
     tmpfile = if ext
                 Tempfile.new([basename, ext])
               else
