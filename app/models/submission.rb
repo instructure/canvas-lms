@@ -3176,8 +3176,8 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def lti_attempt_id
-    "#{lti_id}:#{attempt}"
+  def lti_attempt_id(attempt = nil)
+    "#{lti_id}:#{attempt || self.attempt}"
   end
 
   private
