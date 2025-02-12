@@ -50,146 +50,186 @@ describe('ActionMenuButton', () => {
     }
   })
 
-  it('renders all items for file type', async () => {
-    renderComponent()
+  describe('when item is a file', () => {
+    beforeEach(() => {
+      defaultProps.row = FAKE_FILES[0]
+    })
 
-    const button = screen.getByTestId('action-menu-button-large')
-    expect(button).toBeInTheDocument()
+    it('renders all items for file type', async () => {
+      renderComponent()
 
-    fireEvent.click(button)
-    await waitFor(() => {
-      expect(screen.getByText('Rename')).toBeInTheDocument()
-      expect(screen.getByText('Download')).toBeInTheDocument()
-      expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
-      expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
-      expect(screen.getByText('Send To...')).toBeInTheDocument()
-      expect(screen.getByText('Copy To...')).toBeInTheDocument()
-      expect(screen.getByText('Move To...')).toBeInTheDocument()
-      expect(screen.getByText('Delete')).toBeInTheDocument()
+      const button = screen.getByTestId('action-menu-button-large')
+      expect(button).toBeInTheDocument()
+
+      fireEvent.click(button)
+      await waitFor(() => {
+        expect(screen.getByText('Rename')).toBeInTheDocument()
+        expect(screen.getByText('Download')).toBeInTheDocument()
+        expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
+        expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
+        expect(screen.getByText('Send To...')).toBeInTheDocument()
+        expect(screen.getByText('Copy To...')).toBeInTheDocument()
+        expect(screen.getByText('Move To...')).toBeInTheDocument()
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
+    })
+
+    it('renders items when context is groups', async () => {
+      renderComponent({}, {contextType: 'groups'})
+
+      const button = screen.getByTestId('action-menu-button-large')
+      expect(button).toBeInTheDocument()
+
+      fireEvent.click(button)
+      await waitFor(() => {
+        expect(screen.getByText('Rename')).toBeInTheDocument()
+        expect(screen.getByText('Download')).toBeInTheDocument()
+        expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
+        expect(screen.queryByText('Manage Usage Rights')).toBeNull()
+        expect(screen.queryByText('Send To...')).toBeNull()
+        expect(screen.queryByText('Copy To...')).toBeNull()
+        expect(screen.getByText('Move To...')).toBeInTheDocument()
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
+    })
+
+    it('does not renders items when userCanEditFilesForContext is false', async () => {
+      renderComponent({userCanEditFilesForContext: false})
+
+      const button = screen.getByTestId('action-menu-button-large')
+      expect(button).toBeInTheDocument()
+
+      fireEvent.click(button)
+      await waitFor(() => {
+        expect(screen.queryByText('Rename')).toBeNull()
+        expect(screen.getByText('Download')).toBeInTheDocument()
+        expect(screen.queryByText('Edit Permissions')).toBeNull()
+        expect(screen.queryByText('Manage Usage Rights')).toBeNull()
+        expect(screen.queryByText('Send To...')).toBeNull()
+        expect(screen.queryByText('Copy To...')).toBeNull()
+        expect(screen.queryByText('Move To...')).toBeNull()
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
+    })
+
+    it('does not renders items when userCanDeleteFilesForContext is false', async () => {
+      renderComponent({userCanDeleteFilesForContext: false})
+
+      const button = screen.getByTestId('action-menu-button-large')
+      expect(button).toBeInTheDocument()
+
+      fireEvent.click(button)
+      await waitFor(() => {
+        expect(screen.getByText('Rename')).toBeInTheDocument()
+        expect(screen.getByText('Download')).toBeInTheDocument()
+        expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
+        expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
+        expect(screen.getByText('Send To...')).toBeInTheDocument()
+        expect(screen.getByText('Copy To...')).toBeInTheDocument()
+        expect(screen.getByText('Move To...')).toBeInTheDocument()
+        expect(screen.queryByText('Delete')).toBeNull()
+      })
+    })
+
+    it('does not renders items when usageRightsRequiredForContext is false', async () => {
+      renderComponent({usageRightsRequiredForContext: false})
+
+      const button = screen.getByTestId('action-menu-button-large')
+      expect(button).toBeInTheDocument()
+
+      fireEvent.click(button)
+      await waitFor(() => {
+        expect(screen.getByText('Rename')).toBeInTheDocument()
+        expect(screen.getByText('Download')).toBeInTheDocument()
+        expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
+        expect(screen.queryByText('Manage Usage Rights')).toBeNull()
+        expect(screen.getByText('Send To...')).toBeInTheDocument()
+        expect(screen.getByText('Copy To...')).toBeInTheDocument()
+        expect(screen.getByText('Move To...')).toBeInTheDocument()
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
+    })
+
+    it('does not renders items when when locked by blueprint', async () => {
+      renderComponent({
+        row: {
+          ...FAKE_FILES[0],
+          ...{restricted_by_master_course: true, is_master_course_child_content: true},
+        },
+      })
+
+      const button = screen.getByTestId('action-menu-button-large')
+      expect(button).toBeInTheDocument()
+
+      fireEvent.click(button)
+      await waitFor(() => {
+        expect(screen.queryByText('Rename')).toBeNull()
+        expect(screen.getByText('Download')).toBeInTheDocument()
+        expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
+        expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
+        expect(screen.getByText('Send To...')).toBeInTheDocument()
+        expect(screen.getByText('Copy To...')).toBeInTheDocument()
+        expect(screen.queryByText('Move To...')).toBeNull()
+        expect(screen.queryByText('Delete')).toBeNull()
+      })
+    })
+
+    it('render small size button', async () => {
+      renderComponent({size: 'small'})
+
+      const button = screen.getByTestId('action-menu-button-small')
+      expect(button).toBeInTheDocument()
+    })
+
+    it('opens the rename modal', async () => {
+      renderComponent()
+
+      const button = screen.getByTestId('action-menu-button-large')
+      fireEvent.click(button)
+
+      const renameButton = await screen.findByText('Rename')
+      fireEvent.click(renameButton)
+
+      await waitFor(() => {
+        expect(screen.getByRole('heading', {name: 'Rename'})).toBeInTheDocument()
+      })
     })
   })
 
-  it('renders all items for folder type', async () => {
-    renderComponent({row: FAKE_FOLDERS[0]})
-
-    const button = screen.getByTestId('action-menu-button-large')
-    expect(button).toBeInTheDocument()
-
-    fireEvent.click(button)
-    await waitFor(() => {
-      expect(screen.getByText('Rename')).toBeInTheDocument()
-      expect(screen.getByText('Download')).toBeInTheDocument()
-      expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
-      expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
-      expect(screen.getByText('Move To...')).toBeInTheDocument()
-      expect(screen.getByText('Delete')).toBeInTheDocument()
-    })
-  })
-
-  it('renders items when context is groups', async () => {
-    renderComponent({}, {contextType: 'groups'})
-
-    const button = screen.getByTestId('action-menu-button-large')
-    expect(button).toBeInTheDocument()
-
-    fireEvent.click(button)
-    await waitFor(() => {
-      expect(screen.getByText('Rename')).toBeInTheDocument()
-      expect(screen.getByText('Download')).toBeInTheDocument()
-      expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
-      expect(screen.queryByText('Manage Usage Rights')).toBeNull()
-      expect(screen.queryByText('Send To...')).toBeNull()
-      expect(screen.queryByText('Copy To...')).toBeNull()
-      expect(screen.getByText('Move To...')).toBeInTheDocument()
-      expect(screen.getByText('Delete')).toBeInTheDocument()
-    })
-  })
-
-  it('does not renders items when userCanEditFilesForContext is false', async () => {
-    renderComponent({userCanEditFilesForContext: false})
-
-    const button = screen.getByTestId('action-menu-button-large')
-    expect(button).toBeInTheDocument()
-
-    fireEvent.click(button)
-    await waitFor(() => {
-      expect(screen.queryByText('Rename')).toBeNull()
-      expect(screen.getByText('Download')).toBeInTheDocument()
-      expect(screen.queryByText('Edit Permissions')).toBeNull()
-      expect(screen.queryByText('Manage Usage Rights')).toBeNull()
-      expect(screen.queryByText('Send To...')).toBeNull()
-      expect(screen.queryByText('Copy To...')).toBeNull()
-      expect(screen.queryByText('Move To...')).toBeNull()
-      expect(screen.getByText('Delete')).toBeInTheDocument()
-    })
-  })
-
-  it('does not renders items when userCanDeleteFilesForContext is false', async () => {
-    renderComponent({userCanDeleteFilesForContext: false})
-
-    const button = screen.getByTestId('action-menu-button-large')
-    expect(button).toBeInTheDocument()
-
-    fireEvent.click(button)
-    await waitFor(() => {
-      expect(screen.getByText('Rename')).toBeInTheDocument()
-      expect(screen.getByText('Download')).toBeInTheDocument()
-      expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
-      expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
-      expect(screen.getByText('Send To...')).toBeInTheDocument()
-      expect(screen.getByText('Copy To...')).toBeInTheDocument()
-      expect(screen.getByText('Move To...')).toBeInTheDocument()
-      expect(screen.queryByText('Delete')).toBeNull()
-    })
-  })
-
-  it('does not renders items when usageRightsRequiredForContext is false', async () => {
-    renderComponent({usageRightsRequiredForContext: false})
-
-    const button = screen.getByTestId('action-menu-button-large')
-    expect(button).toBeInTheDocument()
-
-    fireEvent.click(button)
-    await waitFor(() => {
-      expect(screen.getByText('Rename')).toBeInTheDocument()
-      expect(screen.getByText('Download')).toBeInTheDocument()
-      expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
-      expect(screen.queryByText('Manage Usage Rights')).toBeNull()
-      expect(screen.getByText('Send To...')).toBeInTheDocument()
-      expect(screen.getByText('Copy To...')).toBeInTheDocument()
-      expect(screen.getByText('Move To...')).toBeInTheDocument()
-      expect(screen.getByText('Delete')).toBeInTheDocument()
-    })
-  })
-
-  it('does not renders items when when locked by blueprint', async () => {
-    renderComponent({
-      row: {
-        ...FAKE_FILES[0],
-        ...{restricted_by_master_course: true, is_master_course_child_content: true},
-      },
+  describe('when item is a folder', () => {
+    beforeEach(() => {
+      defaultProps.row = FAKE_FOLDERS[0]
     })
 
-    const button = screen.getByTestId('action-menu-button-large')
-    expect(button).toBeInTheDocument()
+    it('renders all items for folder type', async () => {
+      renderComponent()
 
-    fireEvent.click(button)
-    await waitFor(() => {
-      expect(screen.queryByText('Rename')).toBeNull()
-      expect(screen.getByText('Download')).toBeInTheDocument()
-      expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
-      expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
-      expect(screen.getByText('Send To...')).toBeInTheDocument()
-      expect(screen.getByText('Copy To...')).toBeInTheDocument()
-      expect(screen.queryByText('Move To...')).toBeNull()
-      expect(screen.queryByText('Delete')).toBeNull()
+      const button = screen.getByTestId('action-menu-button-large')
+      expect(button).toBeInTheDocument()
+
+      fireEvent.click(button)
+      await waitFor(() => {
+        expect(screen.getByText('Rename')).toBeInTheDocument()
+        expect(screen.getByText('Download')).toBeInTheDocument()
+        expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
+        expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
+        expect(screen.getByText('Move To...')).toBeInTheDocument()
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
     })
-  })
 
-  it('render small size button', async () => {
-    renderComponent({size: 'small'})
+    it('opens the rename modal', async () => {
+      renderComponent()
 
-    const button = screen.getByTestId('action-menu-button-small')
-    expect(button).toBeInTheDocument()
+      const button = screen.getByTestId('action-menu-button-large')
+      fireEvent.click(button)
+
+      const renameButton = await screen.findByText('Rename')
+      fireEvent.click(renameButton)
+
+      await waitFor(() => {
+        expect(screen.getByRole('heading', {name: 'Rename'})).toBeInTheDocument()
+      })
+    })
   })
 })

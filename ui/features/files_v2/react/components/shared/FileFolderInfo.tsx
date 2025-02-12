@@ -34,7 +34,7 @@ const FileFolderInfo = ({item}: {item: File | Folder}) => (
     <Flex padding="x-small" gap="small">
       <Flex.Item>
         {item.thumbnail_url ? (
-          <Img height="3em" width="3em" alt={I18n.t('File thumbnail')} src={item.thumbnail_url} />
+          <Img height="3em" width="3em" alt="" src={item.thumbnail_url} />
         ) : (
           getIcon(item, !!item.folder_id, item.thumbnail_url, {size: 'medium'})
         )}
