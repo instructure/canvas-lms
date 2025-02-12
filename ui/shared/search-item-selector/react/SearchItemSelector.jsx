@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect, useCallback} from 'react'
-import {func, string, object, number, node, shape, instanceOf} from 'prop-types'
+import {func, string, object, number, bool, node, shape, instanceOf, arrayOf} from 'prop-types'
 
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import useDebouncedSearchTerm from './hooks/useDebouncedSearchTerm'
@@ -40,22 +40,40 @@ SearchItemSelector.propTypes = {
   mountNodeRef: shape({
     current: instanceOf(Element),
   }),
+  onInputChanged: func,
+  inputRef: func,
+  messages: arrayOf(
+    shape({
+      text: string,
+      type: string,
+    }),
+  ),
+  isRequired: bool,
 }
 
 SearchItemSelector.defaultProps = {
   onItemSelected: () => {},
   itemSearchFunction: () => {},
   renderLabel: '',
+  contextId: '',
+  renderOption: null,
+  additionalParams: {},
   minimumSearchLength: MINIMUM_SEARCH_LENGTH,
   isSearchableTerm: term => (term?.length || 0) >= MINIMUM_SEARCH_LENGTH,
-  additionalParams: {},
+  placeholder: null,
+  manualSelection: null,
+  mountNodeRef: null,
+  onInputChanged: () => {},
+  inputRef: null,
+  messages: [],
+  isRequired: false,
 }
 
 export default function SearchItemSelector({
   onItemSelected,
   renderLabel,
   itemSearchFunction,
-  contextId = '',
+  contextId,
   renderOption,
   additionalParams,
   mountNodeRef,
@@ -63,6 +81,10 @@ export default function SearchItemSelector({
   isSearchableTerm,
   placeholder,
   manualSelection,
+  onInputChanged,
+  inputRef,
+  messages,
+  isRequired,
 }) {
   const [items, setItems] = useState(null)
   const [error, setError] = useState(null)
@@ -115,6 +137,7 @@ export default function SearchItemSelector({
     setSearchTerm(ev.target.value)
     if (selectedItem !== null && !manualSelection) onItemSelected(null)
     setSelectedItem(null)
+    onInputChanged(ev)
   }
 
   // If there's an error, throw it to an ErrorBoundary
@@ -134,6 +157,7 @@ export default function SearchItemSelector({
         ))
 
   const selectProps = {
+    isRequired,
     options: itemOptions,
     isLoading: isLoading || searchTermIsPending,
     inputValue,
@@ -145,6 +169,8 @@ export default function SearchItemSelector({
     onInputChange: handleInputChanged,
     onOptionSelected: handleItemSelected,
     mountNode: mountNodeRef?.current,
+    inputRef,
+    messages,
     onFocus,
   }
   return <CanvasAsyncSelect {...selectProps}>{itemOptions}</CanvasAsyncSelect>

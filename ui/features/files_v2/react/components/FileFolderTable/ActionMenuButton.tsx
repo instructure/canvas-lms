@@ -40,6 +40,7 @@ import {
   IconExpandItemsLine,
 } from '@instructure/ui-icons'
 import DirectShareUserTray from './DirectShareUserTray'
+import DirectShareCourseTray from './DirectShareCourseTray'
 
 const I18n = createI18nScope('files_v2')
 
@@ -58,7 +59,7 @@ const ActionMenuButton = ({
   usageRightsRequiredForContext,
   row,
 }: ActionMenuButtonProps) => {
-  const [modal, setModal] = useState<'send-to' | null>(null)
+  const [modal, setModal] = useState<'send-to' | 'copy-to' | null>(null)
   const actionLabel = I18n.t('Actions')
   const currentContext = useContext(FileManagementContext)
   const contextType = currentContext?.contextType
@@ -157,7 +158,12 @@ const ActionMenuButton = ({
               visible: send_copy_permissions,
               onClick: () => setModal('send-to'),
             },
-            {icon: IconDuplicateLine, text: I18n.t('Copy To...'), visible: send_copy_permissions},
+            {
+              icon: IconDuplicateLine,
+              text: I18n.t('Copy To...'),
+              visible: send_copy_permissions,
+              onClick: () => setModal('copy-to'),
+            },
             {
               icon: IconExpandItemsLine,
               text: I18n.t('Move To...'),
@@ -220,6 +226,14 @@ const ActionMenuButton = ({
         {file && ENV.COURSE_ID && (
           <DirectShareUserTray
             open={modal === 'send-to'}
+            onDismiss={onDismissTray}
+            courseId={ENV.COURSE_ID}
+            file={file}
+          />
+        )}
+        {file && ENV.COURSE_ID && (
+          <DirectShareCourseTray
+            open={modal === 'copy-to'}
             onDismiss={onDismissTray}
             courseId={ENV.COURSE_ID}
             file={file}
