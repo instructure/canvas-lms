@@ -72,7 +72,7 @@ const OtpForm = () => {
 
   const redirectTo = (url: string) => {
     isRedirectingRef.current = true
-    replaceLocation(url)
+    document.location.href = url
   }
 
   const initiateOtp = useCallback(async () => {

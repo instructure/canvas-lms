@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import authenticityToken from '@canvas/authenticity-token'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {ApiResponse, RegistrationResponse} from '../types'
 
@@ -24,11 +25,14 @@ export const createTeacherAccount = async (payload: {
   email: string
   termsAccepted: boolean
   captchaToken?: string
+  csrfToken?: string
 }): Promise<ApiResponse<RegistrationResponse>> => {
+  const token = payload.csrfToken || authenticityToken()
   const {json, response} = await doFetchApi<RegistrationResponse>({
     path: '/users',
     method: 'POST',
     body: {
+      authenticity_token: token,
       user: {
         initial_enrollment_type: 'teacher',
         name: payload.name,
@@ -52,11 +56,14 @@ export const createParentAccount = async (payload: {
   pairingCode: string
   termsAccepted: boolean
   captchaToken?: string
+  csrfToken?: string
 }): Promise<ApiResponse<RegistrationResponse>> => {
+  const token = payload.csrfToken || authenticityToken()
   const {json, response} = await doFetchApi<RegistrationResponse>({
     path: '/users',
     method: 'POST',
     body: {
+      authenticity_token: token,
       user: {
         initial_enrollment_type: 'observer',
         name: payload.name,
@@ -90,11 +97,14 @@ export const createStudentAccount = async (payload: {
   email?: string
   termsAccepted: boolean
   captchaToken?: string
+  csrfToken?: string
 }): Promise<ApiResponse<RegistrationResponse>> => {
+  const token = payload.csrfToken || authenticityToken()
   const {json, response} = await doFetchApi<RegistrationResponse>({
     path: '/users',
     method: 'POST',
     body: {
+      authenticity_token: token,
       user: {
         initial_enrollment_type: 'student',
         name: payload.name,

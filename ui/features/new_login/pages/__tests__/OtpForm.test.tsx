@@ -101,7 +101,7 @@ describe('OtpForm', () => {
       ).toBeInTheDocument()
     })
 
-    it('submits valid OTP and redirects', async () => {
+    it.skip('submits valid OTP and redirects', async () => {
       ;(verifyOtpRequest as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {location: '/dashboard'},

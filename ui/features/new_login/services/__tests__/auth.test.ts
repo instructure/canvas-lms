@@ -19,6 +19,8 @@
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {forgotPassword, performSignIn} from '../auth'
 
+jest.mock('@canvas/authenticity-token', () => jest.fn(() => 'testCsrfToken'))
+
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
   default: jest.fn(),
@@ -41,6 +43,7 @@ describe('Auth Service', () => {
         path: '/login/canvas',
         method: 'POST',
         body: {
+          authenticity_token: 'testCsrfToken',
           pseudonym_session: {
             unique_id: 'testUser',
             password: 'testPassword',
@@ -77,6 +80,7 @@ describe('Auth Service', () => {
         path: '/forgot_password',
         method: 'POST',
         body: {
+          authenticity_token: 'testCsrfToken',
           pseudonym_session: {
             unique_id_forgot: 'test@example.com',
           },

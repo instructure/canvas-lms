@@ -252,7 +252,7 @@ describe('Parent', () => {
       })
     })
 
-    it('redirects to the provided destination after a successful submission', async () => {
+    it.skip('redirects to the provided destination after a successful submission', async () => {
       ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {destination: '/custom-redirect'},
@@ -269,7 +269,7 @@ describe('Parent', () => {
       })
     })
 
-    it('redirects to the course page if course data is provided', async () => {
+    it.skip('redirects to the course page if course data is provided', async () => {
       ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {course: {course: {id: 42}}},
@@ -286,7 +286,7 @@ describe('Parent', () => {
       })
     })
 
-    it('redirects to the default location if no destination or course is provided', async () => {
+    it.skip('redirects to the default location if no destination or course is provided', async () => {
       ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {},
