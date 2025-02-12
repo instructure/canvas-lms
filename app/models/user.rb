@@ -172,6 +172,7 @@ class User < ActiveRecord::Base
   has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", "deleted").order(:display_name).preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: "Attachment"
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Assignment"
   has_many :mentions, inverse_of: :user
+  has_many :discussion_entries
   has_many :discussion_entry_drafts, inverse_of: :user
   has_many :discussion_entry_versions, inverse_of: :user
   has_many :all_attachments, as: "context", class_name: "Attachment"
