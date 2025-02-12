@@ -330,7 +330,6 @@ const ItemAssignToTrayContent = ({
           }
           pageCount++
         }
-
         const combinedResponse = allResponses.reduce(
           (acc, response) => ({
             ...response,
@@ -368,7 +367,6 @@ const ItemAssignToTrayContent = ({
             }
           })
         }
-
         // @ts-expect-error
         const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
         const allModuleAssignees: string[] = []
@@ -415,6 +413,11 @@ const ItemAssignToTrayContent = ({
                 // @ts-expect-error
                 allModuleAssignees.push(...override.student_ids.map(id => `student-${id}`))
               }
+              // Normal groups are not supported for module overrides 
+              // but differentiation tags are supported
+              if (override.group_id && override.non_collaborative === true) {
+                allModuleAssignees.push(`tag-${override.group_id}`)
+              }
             }
             let removeCard = false
             let filteredStudents = override.students
@@ -448,7 +451,7 @@ const ItemAssignToTrayContent = ({
             if (override.course_id) {
               defaultOptions.push('everyone')
             }
-            if (override.group_id) {
+            if (override.group_id && !override.non_collaborative) {
               defaultOptions.push(`group-${override.group_id}`)
               initialAssigneeOptions.push({
                 id: `group-${override.group_id}`,
@@ -457,13 +460,18 @@ const ItemAssignToTrayContent = ({
                 group: 'Groups',
               })
             }
+            // Differentiation Tags
+            if (override.group_id && override.non_collaborative) {
+              defaultOptions.push(`tag-${override.group_id}`)
+              initialAssigneeOptions.push({
+                id: `tag-${override.group_id}`,
+                value: override.title,
+                groupCategoryId: override.group_category_id,
+                group: 'Tags',
+              })
+            }
             removeCard = removeCard || override.student_ids?.length === 0
-            if (
-              removeCard ||
-              (override.context_module_id &&
-                override?.course_section_id &&
-                overriddenTargets?.sections?.includes(override?.course_section_id))
-            ) {
+            if (removeCard || shouldRemoveCard(override, overriddenTargets)) {
               return
             }
             const cardId = makeCardId()
@@ -554,6 +562,23 @@ const ItemAssignToTrayContent = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [onCardRemove, setAssignToCards],
   )
+
+  const shouldRemoveCard = (override: ItemAssignToCardSpec, overriddenTargets: any) => {
+    if (!overriddenTargets) {
+      return false
+    }
+    const alreadyHasItemSectionOverride = (
+      override.context_module_id
+      && override?.course_section_id
+      && overriddenTargets?.sections?.includes(override.course_section_id)
+    )
+    const alreadyHasItemDifferentiationTagOverride = (
+      override.context_module_id
+      && override?.group_id
+      && overriddenTargets?.differentiationTags?.includes(override.group_id)
+    )
+    return (alreadyHasItemSectionOverride || alreadyHasItemDifferentiationTagOverride)
+  }
 
   const handleCardValidityChange = useCallback(
     (cardId: string, isValid: boolean) => {

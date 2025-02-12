@@ -642,6 +642,30 @@ describe DiscussionTopicsController do
         override.assignment_override_students.create!(user: student)
       end
     end
+
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+      end
+
+      it "adds differentiation tags information if account setting is on" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "students cannot manage differentiation tags" do
+        user_session(@student)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
+      end
+    end
   end
 
   describe "GET 'show'" do
@@ -860,6 +884,34 @@ describe DiscussionTopicsController do
       expect(assigns[:js_bundles].first).to include(:discussion_topics_post)
       expect(assigns[:_crumbs]).to include(["Discussions", "/courses/#{@course.id}/discussion_topics", {}])
       expect(controller.js_env[:discussion_topic_menu_tools].first).to eq commons_hash
+    end
+
+    context "assign to differentiation tags (for discussion redesign only)" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.enable_feature! :react_discussions_post
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+      end
+
+      it "adds differentiation tags information if account setting is on" do
+        user_session(@teacher)
+        @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello")
+        get "show", params: { course_id: @course.id, id: @discussion.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "CAN_MANAGE_DIFFERENTIAITON_TAGS is false if user cannot manage tags" do
+        user_session(@student)
+        @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello")
+        get "show", params: { course_id: @course.id, id: @discussion.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
+      end
     end
 
     it "does not work for announcements in a public course" do

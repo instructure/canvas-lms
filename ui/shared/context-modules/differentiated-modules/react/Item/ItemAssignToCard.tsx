@@ -367,7 +367,7 @@ export default forwardRef(function ItemAssignToCard(
 
       const dateInputRef = dateInputRefs.current[unparsedFieldKey]
       const timeInputRef = timeInputRefs.current[unparsedFieldKey]
-      const isDateInputEmpty = dateInputRef.value.trim() === ''
+      const isDateInputEmpty = dateInputRef?.value.trim() === ''
       const unparsedFieldExists = unparsedFieldKeys.has(unparsedFieldKey)
       const newUnparsedFieldKeys = new Set(Array.from(unparsedFieldKeys))
 

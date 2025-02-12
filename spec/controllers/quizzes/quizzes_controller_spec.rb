@@ -247,6 +247,24 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+      end
+
+      it "differentiation tags information is true if account setting is on and user can manage tags" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+    end
+
     context "DIRECT_SHARE_ENABLED" do
       before :once do
         course_quiz
@@ -616,6 +634,33 @@ describe Quizzes::QuizzesController do
       attach = assigns[:js_env][:ATTACHMENTS][attachment.id]
       expect(attach[:id]).to eq attachment.id
       expect(attach[:display_name]).to eq attachment.display_name
+    end
+
+    context "assign to differentiation tags" do
+      before do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+      end
+
+      it "differentiation tags information is true if account setting is on and user can manage tags" do
+        course_quiz
+        user_session(@teacher)
+        get "show", params: { course_id: @course.id, id: @quiz.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "differentiation tags information is not available if user can not manage tags" do
+        course_quiz
+        user_session(@student)
+        get "show", params: { course_id: @course.id, id: @quiz.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be_nil
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be_nil
+      end
     end
 
     describe "js_env SUBMISSION_VERSIONS_URL" do
