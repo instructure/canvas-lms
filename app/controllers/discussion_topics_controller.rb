@@ -450,10 +450,14 @@ class DiscussionTopicsController < ApplicationController
                               nil
                             end
 
+        assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
           FEATURE_FLAGS_URL: feature_flags_url,
           DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
+          ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+          CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
           HAS_SIDE_COMMENT_DISCUSSIONS: Account.site_admin.feature_enabled?(:disallow_threaded_replies_fix_alert) ? @context.active_discussion_topics.only_discussion_topics.where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT).exists? : false,
           totalDiscussions: scope.count,
           permissions: {
@@ -900,12 +904,17 @@ class DiscussionTopicsController < ApplicationController
 
       edit_url = context_url(@topic.context, :edit_context_discussion_topic_url, @topic)
       edit_url += "?embed=true" if params[:embed] == "true"
+
+      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+
       js_env({
                course_id: params[:course_id] || @context.course&.id,
                context_type: @topic.context_type,
                context_id: @context.id,
                EDIT_URL: edit_url,
                PEER_REVIEWS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_peer_reviews_url, @topic.assignment.id) : nil,
+               ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+               CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
                discussion_topic_id: @topic.id,
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),

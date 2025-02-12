@@ -136,14 +136,14 @@ export const getDifferentiationTags = async ({queryKey}: {queryKey: any}) => {
   if (!ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS || !ENV.CAN_MANAGE_DIFFERENTIATION_TAGS) {
     return []
   }
-
   const [, , currentCourseId, currentParams] = queryKey
-  currentParams.collaboration_state = 'non_collaborative'
-  currentParams.include = 'group_category'
-
   const result = await doFetchApi({
     path: `/api/v1/courses/${currentCourseId}/groups`,
-    params: currentParams,
+    params: {
+      collaboration_state: 'non_collaborative',
+      include: 'group_category',
+      ...currentParams,
+    },
   })
   const parsedResult: AssigneeOption[] = await processResult(
     // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.

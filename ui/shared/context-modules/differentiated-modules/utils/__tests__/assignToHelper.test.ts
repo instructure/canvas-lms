@@ -127,12 +127,14 @@ describe('assitnToHelper', () => {
       const expectedPayload = <DateDetailsPayload>{
         assignment_overrides: [
           {
-            due_at: null,
+            due_at: undefined,
             id: undefined,
-            lock_at: null,
+            lock_at: undefined,
             noop_id: 1,
-            unlock_at: null,
+            unlock_at: undefined,
             title: 'Mastery Paths',
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
             unassign_item: false,
           },
         ] as unknown as DateDetailsOverride[],
@@ -140,7 +142,7 @@ describe('assitnToHelper', () => {
       }
       expect(generateDateDetailsPayload(cards, false, [])).toEqual(expectedPayload)
     })
-  
+
     it('returns a course override if allowed and an everyone card was created', () => {
       const cards: ItemAssignToCardSpec[] = [
         {
@@ -157,9 +159,11 @@ describe('assitnToHelper', () => {
           {
             due_at: '2021-01-01T00:00:00Z',
             id: '1',
-            lock_at: null,
+            lock_at: undefined,
             course_id: 'everyone',
-            unlock_at: null,
+            unlock_at: undefined,
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
             unassign_item: false,
           },
         ] as unknown as DateDetailsOverride[],
@@ -167,7 +171,7 @@ describe('assitnToHelper', () => {
       }
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })
-  
+
     it('does not include override id for a course override if not originally a course override', () => {
       const cards: ItemAssignToCardSpec[] = [
         {
@@ -181,11 +185,11 @@ describe('assitnToHelper', () => {
       const expectedPayload = <DateDetailsPayload>{
         assignment_overrides: [
           {
-            due_at: null,
+            due_at: undefined,
             id: undefined,
-            lock_at: null,
+            lock_at: undefined,
             course_id: 'everyone',
-            unlock_at: null,
+            unlock_at: undefined,
             unassign_item: false,
           },
         ] as unknown as DateDetailsOverride[],
@@ -193,7 +197,7 @@ describe('assitnToHelper', () => {
       }
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })
-  
+
     it('does not include override id for a section override if not originally a section', () => {
       const cards: ItemAssignToCardSpec[] = [
         {
@@ -220,7 +224,38 @@ describe('assitnToHelper', () => {
       }
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })
-  
+
+    it('includes differentiation tags in payload', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['tag-1'] as string[],
+          defaultOptions: ['student-1'],
+          due_at: '2021-02-01T00:00:00Z',
+          lock_at: '2021-05-01T00:00:00Z',
+          unlock_at: '2021-01-01T00:00:00Z',
+        } as ItemAssignToCardSpec,
+      ]
+      const expectedPayload = <DateDetailsPayload>{
+        assignment_overrides: [
+          {
+            due_at: '2021-02-01T00:00:00Z',
+            id: undefined,
+            lock_at: '2021-05-01T00:00:00Z',
+            group_id: '1',
+            unlock_at: '2021-01-01T00:00:00Z',
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
+            unassign_item: false,
+          },
+        ] as unknown as DateDetailsOverride[],
+        only_visible_to_overrides: true,
+      }
+      expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
+    })
+
     it('includes an unassigned override for any deleted module assignees', () => {
       const cards: ItemAssignToCardSpec[] = [
         {
@@ -306,9 +341,11 @@ describe('assitnToHelper', () => {
           {
             due_at: '2021-01-01T00:00:00Z',
             id: '1',
-            lock_at: null,
+            lock_at: undefined,
             course_id: 'everyone',
-            unlock_at: null,
+            unlock_at: undefined,
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
             unassign_item: false,
           },
           {
@@ -317,6 +354,8 @@ describe('assitnToHelper', () => {
             lock_at: undefined,
             course_section_id: '1',
             unlock_at: undefined,
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
             unassign_item: false,
           },
         ] as unknown as DateDetailsOverride[],

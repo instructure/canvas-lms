@@ -55,6 +55,31 @@ describe WikiPagesController do
       expect(response).to be_successful
       expect(assigns[:js_env][:FEATURES][:BLOCK_EDITOR]).to be(true)
     end
+
+    context "assign to differentiation tags" do
+      before do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+      end
+
+      it "adds differentiation tags information if account setting is on" do
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "does not add differentiation tags information if user cannot manage tags" do
+        course_with_student(active_all: true)
+        user_session(@student)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be_nil
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be_nil
+      end
+    end
   end
 
   context "with page" do

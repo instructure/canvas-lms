@@ -326,6 +326,23 @@ describe "selective_release module item assign to tray" do
         @diff_tag2 = @course.groups.create!(name: "Differentiation Tag 2", group_category: @differentiation_tag_category, non_collaborative: true)
       end
 
+      it "can add differentiation tag to a card and persist the override" do
+        go_to_modules
+        manage_module_item_button(@module_item1).click
+        click_manage_module_item_assign_to(@module_item1)
+        keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+        click_add_assign_to_card
+        select_module_item_assignee(1, @diff_tag1.name)
+        expect(module_item_assign_to_card.count).to be(2)
+
+        click_save_button
+        manage_module_item_button(@module_item1).click
+        click_manage_module_item_assign_to(@module_item1)
+        expect(module_item_assign_to_card.count).to be(2)
+        expect(assign_to_in_tray("Remove #{@diff_tag1.name}")[0]).to be_displayed
+      end
+
       it "Displays inherrited differentiation tags from module" do
         # Create a module override for differentiation tag
         go_to_modules
@@ -343,6 +360,40 @@ describe "selective_release module item assign to tray" do
 
         expect(module_item_assign_to_card.count).to be(1)
         expect(assign_to_in_tray("Remove #{@diff_tag1.name}")[0]).to be_displayed
+        expect(f('[data-testid="context-module-text"]').text).to eq("Inherited from Module 1")
+      end
+
+      it "can override an inherited module override for differentiation tags" do
+        go_to_modules
+
+        # Add diff tag module override
+        @module = ContextModule.find(@module_item1.context_module_id)
+        manage_module_button(@module).click
+        module_index_menu_tool_link("Assign To...").click
+        click_custom_access_radio
+        assignee_selection.send_keys("Differentiation")
+        click_option(assignee_selection, "Differentiation Tag 1")
+        click_settings_tray_update_module_button
+
+        # Open item from module
+        manage_module_item_button(@module_item1).click
+        click_manage_module_item_assign_to(@module_item1)
+        expect(f('[data-testid="context-module-text"]').text).to eq("Inherited from Module 1")
+        expect(assign_to_due_date(0).attribute("value")).to eq("")
+        expect(assign_to_due_time(0).attribute("value")).to eq("")
+
+        # Select a due date for the inherited override
+        update_due_date(0, "12/31/2022")
+        update_due_time(0, "11:59 PM")
+        click_save_button
+
+        # Open item from module again and see that it is no longer inherited
+        manage_module_item_button(@module_item1).click
+        click_manage_module_item_assign_to(@module_item1)
+
+        expect(module_item_assign_to_card.count).to be(1)
+        expect(assign_to_due_date(0).attribute("value")).to eq("Dec 31, 2022")
+        expect(assign_to_due_time(0).attribute("value")).to eq("11:59 PM")
       end
     end
 
