@@ -68,6 +68,7 @@ const DiscussionTopicManager = props => {
   const [showTranslationControl, setShowTranslationControl] = useState(false)
   // Start as null, populate when ready.
   const [translateTargetLanguage, setTranslateTargetLanguage] = useState(null)
+  const [translationLoading, setTranslationLoading] = useState(false)
   const [focusSelector, setFocusSelector] = useState('')
 
   const searchContext = {
@@ -152,6 +153,8 @@ const DiscussionTopicManager = props => {
     setShowTranslationControl,
     translateTargetLanguage,
     setTranslateTargetLanguage,
+    translationLoading,
+    setTranslationLoading,
     isSummaryEnabled,
     setIsSummaryEnabled,
   }

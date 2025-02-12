@@ -65,27 +65,42 @@ const setup = (props, {searchTerm = ''} = {}) => {
   )
 }
 
-const setupWithTranslationLanguageSelected = (props, {searchTerm = ''} = {}) => {
+const setupWithTranslationLanguageSelected = (props, {
+  searchTerm = '',
+  initLoading = true,
+  loading = false,
+  translateTargetLanguage = 'en',
+} = {}) => {
+  const Wrapper = ({ children }) => {
+    const [translationLoading, setTranslationLoading] = React.useState(initLoading);
+
+    return (
+      <DiscussionManagerUtilityContext.Provider
+        value={{
+          translationLanguages: {
+            current: [{ id: 'en', name: 'English', translated_to_name: 'Translated to English' }],
+          },
+          translateTargetLanguage,
+          translationLoading,
+          setTranslationLoading: () => setTranslationLoading(loading),
+        }}
+      >
+        <SearchContext.Provider value={{ searchTerm }}>{children}</SearchContext.Provider>
+      </DiscussionManagerUtilityContext.Provider>
+    );
+  };
+
   return render(
-    <DiscussionManagerUtilityContext.Provider
-      value={{
-        translationLanguages: {
-          current: [{id: 'en', name: 'English', translated_to_name: 'Translated to English'}],
-        },
-        translateTargetLanguage: 'en',
-      }}
-    >
-      <SearchContext.Provider value={{searchTerm}}>
-        <PostMessage
-          author={User.mock()}
-          timingDisplay="Jan 1 2000"
-          message="Posts are fun"
-          title="Thoughts"
-          {...props}
-        />
-      </SearchContext.Provider>
-    </DiscussionManagerUtilityContext.Provider>,
-  )
+    <Wrapper>
+      <PostMessage
+        author={User.mock()}
+        timingDisplay="Jan 1 2000"
+        message="Posts are fun"
+        title="Thoughts"
+        {...props}
+      />
+    </Wrapper>
+  );
 }
 
 describe('PostMessage', () => {
@@ -168,6 +183,37 @@ describe('PostMessage', () => {
   })
 
   describe('AI translation', () => {
+    it('should display loading spinner and text while translation is in progress', async () => {
+      getTranslation.mockImplementation(() => Promise.resolve('<p>Translated message</p>'))
+
+      const { findByText} = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: 'Gondolatok',
+      }, {loading: true})
+
+      expect(getTranslation).toHaveBeenCalled()
+      const spinner = await findByText('Translating')
+      expect(spinner).toBeInTheDocument()
+      const loadingText = await findByText('Translating Text')
+      expect(loadingText).toBeInTheDocument()
+    })
+
+    it('should not display separator and translated message while translation is in progress', async () => {
+      getTranslation.mockImplementation(() => Promise.resolve('<p>Translated message</p>'))
+
+      const { queryByText, queryByTestId } = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: 'Gondolatok',
+      }, {loading: true})
+
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      expect(queryByTestId('post-title-translated')).not.toBeInTheDocument()
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
+      const translationSeparator = await queryByText('Translated to English')
+      expect(translationSeparator).not.toBeInTheDocument()
+    })
+
     it('should display the translated message when translation is complete', async () => {
       getTranslation.mockImplementation(() => Promise.resolve('<p>Translated message</p>'))
 
@@ -177,13 +223,68 @@ describe('PostMessage', () => {
       })
 
       expect(getTranslation).toHaveBeenCalled()
+      const translatedTitle = await findByTestId('post-title-translated')
+      expect(translatedTitle.children[0]).toHaveTextContent('Translated message')
       const translatedMessage = await findByTestId('post-message-translated')
       expect(translatedMessage.children[0]).toHaveTextContent('Translated message')
       const translationSeparator = await findByText('Translated to English')
       expect(translationSeparator).toBeInTheDocument()
     })
 
-    it('should not display the translated message if there is no translation', async () => {
+    it('should not display error when translation is complete', async () => {
+      getTranslation.mockImplementation(() => Promise.resolve('<p>Translated message</p>'))
+
+      const {queryByTestId} = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: 'Gondolatok',
+      })
+
+      expect(getTranslation).toHaveBeenCalled()
+      expect(queryByTestId('error_type_error')).not.toBeInTheDocument()
+      expect(queryByTestId('error_type_info')).not.toBeInTheDocument()
+    })
+
+    it('should display the translated title even if there is no message', async () => {
+      getTranslation
+        .mockImplementationOnce(() => Promise.resolve('<p>Translated message</p>'))
+        .mockImplementationOnce(() => Promise.resolve(''))
+
+
+      const {findByTestId, findByText, queryByTestId} = setupWithTranslationLanguageSelected({
+        message: '',
+        title: 'Gondolatok',
+      })
+
+      expect(getTranslation).toHaveBeenCalled()
+      const translatedTitle = await findByTestId('post-title-translated')
+      expect(translatedTitle.children[0]).toHaveTextContent('Translated message')
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
+      const translationSeparator = await findByText('Translated to English')
+      expect(translationSeparator).toBeInTheDocument()
+    })
+
+    it('should display the translated message even if there is no title', async () => {
+      getTranslation
+        .mockImplementationOnce(() => Promise.resolve(''))
+        .mockImplementationOnce(() => Promise.resolve('<p>Translated message</p>'))
+
+
+      const {findByTestId, findByText, queryByTestId} = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: '',
+      })
+
+      expect(getTranslation).toHaveBeenCalled()
+      const translatedTitle = await findByTestId('post-message-translated')
+      expect(translatedTitle.children[0]).toHaveTextContent('Translated message')
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      expect(queryByTestId('post-title-translated')).not.toBeInTheDocument()
+      const translationSeparator = await findByText('Translated to English')
+      expect(translationSeparator).toBeInTheDocument()
+    })
+
+    it('should not display separator and translated message if there is no translation', async () => {
       getTranslation.mockImplementation(() => Promise.resolve(''))
 
       const {queryByTestId, queryByText} = setupWithTranslationLanguageSelected({
@@ -192,23 +293,93 @@ describe('PostMessage', () => {
       })
 
       await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      expect(queryByTestId('post-title-translated')).not.toBeInTheDocument()
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
       expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
       const translationSeparator = await queryByText('Translated to English')
       expect(translationSeparator).not.toBeInTheDocument()
     })
 
-    it('should not display the translated message if the translation fails', async () => {
-      getTranslation.mockImplementation(() => Promise.reject(new Error('Translation error')))
+    it('should not display separator and translated message if language is not set or reset', async () => {
+      getTranslation.mockImplementation(() => Promise.resolve('<p>Translated message</p>'))
 
       const {queryByTestId, queryByText} = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: 'Gondolatok',
+      }, {translateTargetLanguage: null})
+
+      expect(queryByTestId('post-title-translated')).not.toBeInTheDocument()
+      expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
+      const translationSeparator = await queryByText('Translated to English')
+      expect(translationSeparator).not.toBeInTheDocument()
+    })
+
+    it('should display separator and error with error_type message if translation fails with generic error', async () => {
+      getTranslation.mockImplementation(() => Promise.reject(new Error('Translation error')))
+
+      const {findByText, findByTestId, queryByTestId} = setupWithTranslationLanguageSelected({
         message: '<p>Leforditando uzenet<p/>',
         title: 'Gondolatok',
       })
 
       await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      const translationSeparator = await findByText('Translated to English')
+      expect(translationSeparator).toBeInTheDocument()
+      const errorMessage = await findByTestId('error_type_error')
+      expect(errorMessage).toHaveTextContent('There was an unexpected error during translation.')
+      expect(queryByTestId('error_type_info')).not.toBeInTheDocument()
+    })
+
+    it('should display separator and error with error_type message if translation fails with specific error with error type', async () => {
+      const message = 'very big error happened'
+      const error = new Error()
+      Object.assign(error, {translationError: {type: 'error', message}})
+      getTranslation.mockImplementation(() => Promise.reject(error))
+
+      const {findByText, findByTestId, queryByTestId} = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: 'Gondolatok',
+      })
+
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      const translationSeparator = await findByText('Translated to English')
+      expect(translationSeparator).toBeInTheDocument()
+      const errorMessage = await findByTestId('error_type_error')
+      expect(errorMessage).toHaveTextContent(message)
+      expect(queryByTestId('error_type_info')).not.toBeInTheDocument()
+    })
+
+    it('should display separator and error with info_type message if translation fails with specific error with info type', async () => {
+      const message = 'little bit error happened'
+      const error = new Error()
+      Object.assign(error, {translationError: {type: 'info', message}})
+      getTranslation.mockImplementation(() => Promise.reject(error))
+
+      const {findByText, findByTestId, queryByTestId} = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: 'Gondolatok',
+      })
+
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      const translationSeparator = await findByText('Translated to English')
+      expect(translationSeparator).toBeInTheDocument()
+      const errorMessage = await findByTestId('error_type_info')
+      expect(errorMessage).toHaveTextContent(message)
+      expect(queryByTestId('error_type_error')).not.toBeInTheDocument()
+    })
+
+    it('should not display the translated message if error happens', async () => {
+      getTranslation.mockImplementation(() => Promise.reject(new Error('Translation error')))
+
+      const {queryByTestId} = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: 'Gondolatok',
+      })
+
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      expect(queryByTestId('post-title-translated')).not.toBeInTheDocument()
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
       expect(queryByTestId('post-message-translated')).not.toBeInTheDocument()
-      const translationSeparator = await queryByText('Translated to English')
-      expect(translationSeparator).not.toBeInTheDocument()
     })
   })
 })
