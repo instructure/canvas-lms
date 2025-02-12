@@ -87,6 +87,19 @@ describe('App', () => {
     })
   })
 
+  it('fetches first page of migrations on mount', async () => {
+    render(<App />)
+
+    await waitFor(() => {
+      expect(doFetchApi).toHaveBeenCalledWith({
+        path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`,
+        params: { per_page: 25, page: 1 },
+      })
+    })
+
+    expect(screen.getByText(/Common Cartridge/)).toBeInTheDocument()
+  })
+
   describe('when api call fails', () => {
     it('displays an error message', async () => {
       // @ts-expect-error
@@ -109,9 +122,6 @@ describe('App', () => {
         expect(screen.queryAllByText("Couldn't load previous content migrations").length).toBeGreaterThan(0)
         expect(screen.queryByText('Loading')).not.toBeInTheDocument()
       })
-      
-      
     })
   })
-
 })
