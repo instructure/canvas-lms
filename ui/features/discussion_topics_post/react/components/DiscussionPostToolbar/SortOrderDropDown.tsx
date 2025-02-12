@@ -35,9 +35,10 @@ interface SortFilterDropDownProps {
   isLocked: boolean
   selectedSortType: string
   onSortClick?: () => void
+  width?: string
 }
 
-const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({ isLocked, selectedSortType, onSortClick }) => {
+const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({ isLocked, selectedSortType, onSortClick, width }) => {
   const [actualSortType, setActualSortType] = useState(selectedSortType)
 
   useEffect(() => {
@@ -68,6 +69,7 @@ const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({ isLocked, select
         defaultValue={actualSortType}
         onChange={handleSortOrderTypeChange}
         disabled={isLocked}
+        width={width}
       >
         <SimpleSelect.Group renderLabel={I18n.t('Sort by')}>
           {Object.entries(getSortConfig()).map(([viewOption, viewOptionLabel]) => (
@@ -76,7 +78,6 @@ const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({ isLocked, select
               id={viewOption}
               key={viewOption}
               value={viewOption}
-              renderBeforeLabel={viewOption === actualSortType ? <IconCheckLine /> : <span />}
             >
               {viewOptionLabel()}
             </SimpleSelect.Option>
