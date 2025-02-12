@@ -159,6 +159,10 @@ class AssignmentCreateEditPage
       ff(error_box_selector)
     end
 
+    def mastery_path_toggle
+      f("[data-testid='MasteryPathToggle'] svg[name='IconCheck'], [data-testid='MasteryPathToggle'] svg[name='IconX']")
+    end
+
     # Moderated Grading Options
     def select_grader_dropdown
       f("select[name='final_grader_id']")
