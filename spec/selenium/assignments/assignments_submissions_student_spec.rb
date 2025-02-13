@@ -149,7 +149,7 @@ describe "submissions" do
       wait_for_new_page_load { f(".submit_assignment_link").click }
       f('button[type="submit"]').click
 
-      expect(f(".error_text")).to be
+      expect(f("#body_errors")).to include_text("Text entry must not be empty")
     end
 
     it "does not break when you open and close the media comment dialog", priority: "1" do
@@ -368,7 +368,7 @@ describe "submissions" do
       # it should not actually submit and pop up an error message
       expect { submit_form(assignment_form) }.not_to change { submission.reload.updated_at }
       expect(submission.reload.body).to be_nil
-      expect(ff(".error_box")[1]).to include_text("Required")
+      expect(f("#body_errors")).to include_text("Text entry must not be empty")
 
       # now make sure it works
       body_text = "now it is not blank"
@@ -381,7 +381,7 @@ describe "submissions" do
       @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f(".submit_assignment_link").click
-      body_html = '<span style="width: 18rem; height: 1rem; vertical-align: middle;" aria-label="Loading" data-placeholder-for="filename">  </span>'
+      body_html = '<p><span style="width: 18rem; height: 1rem; vertical-align: middle;" aria-label="Loading" data-placeholder-for="filename">  </span></p>'
       switch_editor_views # switch to html editor
       switch_to_raw_html_editor
       tinymce = f("#submission_body")
@@ -392,15 +392,15 @@ describe "submissions" do
       submission = @assignment.submissions.find_by!(user_id: @student)
       # it should not actually submit and pop up an error message
       expect { submit_form(assignment_form) }.not_to change { submission.reload.updated_at }
-      expect(ff(".error_box")[1]).to include_text("File has not finished uploading")
+      expect(f("#body_errors")).to include_text("File has not finished uploading")
 
       # now make sure it works with finished upload
       tinymce.clear
-      body_html = '<a title="filename" href="fileref" target="_blank" data-canvas-previewable="false">filename</a>&nbsp;'
+      body_html = '<p><a title="filename" href="fileref" target="_blank" data-canvas-previewable="false">filename</a>&nbsp;</p>'
       tinymce.click
       tinymce.send_keys(body_html)
       expect { submit_form(assignment_form) }.to change { submission.reload.updated_at }
-      expect(submission.reload.body).to eq "<p>#{body_html}</p>"
+      expect(submission.reload.body).to eq body_html
     end
 
     it "does not allow a submission with only comments", priority: "1" do
@@ -416,7 +416,7 @@ describe "submissions" do
 
       # it should not actually submit and pop up an error message
       expect { submit_form("#submit_online_text_entry_form") }.not_to change { submission.reload.updated_at }
-      expect(ff(".error_box")[1]).to include_text("Required")
+      expect(f("#body_errors")).to include_text("Text entry must not be empty")
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
