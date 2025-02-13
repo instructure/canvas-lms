@@ -166,7 +166,7 @@ describe Lti::PlatformNotificationService do
     end
   end
 
-  describe "notify_tools" do
+  describe "notify_tools_in_account" do
     let(:builder) { Lti::Pns::LtiHelloWorldNoticeBuilder.new({ custom: 1 }) }
     let(:builder2) { Lti::Pns::LtiHelloWorldNoticeBuilder.new({ custom: 2 }) }
 
@@ -191,7 +191,7 @@ describe Lti::PlatformNotificationService do
         "webhook",
         '{"url":"http://www.tool.com/launch/handler"}'
       )
-      Lti::PlatformNotificationService.notify_tools(tool.account, builder)
+      Lti::PlatformNotificationService.notify_tools_in_account(tool.account, builder)
     end
 
     it "raises an ArgumentError when builders have different notice_types" do
@@ -199,7 +199,7 @@ describe Lti::PlatformNotificationService do
       allow(builder2).to receive_messages(build: '{"jwt":"jwt"}', notice_type: "OtherNoticeType")
       allow(LtiAdvantage::Messages::JwtMessage).to receive(:create_jws).and_return("signed_jwt")
       expect do
-        Lti::PlatformNotificationService.notify_tools(tool.account, builder, builder2)
+        Lti::PlatformNotificationService.notify_tools_in_account(tool.account, builder, builder2)
       end.to raise_error(ArgumentError, "builders must have the same notice_type")
     end
 
@@ -221,7 +221,7 @@ describe Lti::PlatformNotificationService do
           { url: "http://www.tool.com/launch/handler" }.to_json
         )
       end
-      Lti::PlatformNotificationService.notify_tools(tool.account, *builders)
+      Lti::PlatformNotificationService.notify_tools_in_account(tool.account, *builders)
     end
   end
 

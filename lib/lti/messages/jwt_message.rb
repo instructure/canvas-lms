@@ -216,8 +216,7 @@ module Lti::Messages
     def include_assignment_and_grade_service_claims?
       include_claims?(:assignment_and_grade_service) &&
         (@context.is_a?(Course) || @context.is_a?(Group)) &&
-        @tool.developer_key.scopes.intersect?(TokenScopes::LTI_AGS_SCOPES) &&
-        @expander.controller.present?
+        @tool.developer_key.scopes.intersect?(TokenScopes::LTI_AGS_SCOPES)
     end
 
     # Follows 1EdTech Platform Notification Spec (not final/public as of Oct 2024)
@@ -233,7 +232,7 @@ module Lti::Messages
       @message.assignment_and_grade_service.scope = @tool.developer_key.scopes & TokenScopes::LTI_AGS_SCOPES
 
       @message.assignment_and_grade_service.lineitems =
-        @expander.controller.lti_line_item_index_url(
+        Rails.application.routes.url_helpers.lti_line_item_index_url(
           host: @context.root_account.environment_specific_domain, course_id: course_id_for_ags_url
         )
     end

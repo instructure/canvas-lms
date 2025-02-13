@@ -2625,6 +2625,7 @@ class AbstractAssignment < ActiveRecord::Base
       hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
       homework.add_comment(hash)
     end
+    Lti::AssetProcessorNotifier.notify_asset_processors(primary_homework)
     touch_context
     primary_homework
   end
