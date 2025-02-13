@@ -788,15 +788,16 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
-          topic_participant.sort_order = if context.feature_enabled?(:discussion_default_sort)
-                                           sort_order_locked ? sort_order : opts[:sort_order]
+
+          topic_participant.sort_order = if opts[:sort_order].nil?
+                                           topic_participant.sort_order.nil? ? sort_order : topic_participant.sort_order
                                          else
-                                           opts[:sort_order].nil? ? sort_order : opts[:sort_order]
+                                           opts[:sort_order]
                                          end
-          topic_participant.expanded = if context.feature_enabled?(:discussion_default_expand)
-                                         expanded_locked ? expanded : opts[:expanded]
+          topic_participant.expanded = if opts[:expanded].nil?
+                                         topic_participant.expanded.nil? ? expanded : topic_participant.expanded
                                        else
-                                         opts[:expanded].nil? ? expanded : opts[:expanded]
+                                         opts[:expanded]
                                        end
           topic_participant.save
         end
