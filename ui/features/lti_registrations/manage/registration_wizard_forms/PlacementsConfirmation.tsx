@@ -73,7 +73,6 @@ const I18n = createI18nScope('lti_registration.wizard')
 export const UNDOCUMENTED_PLACEMENTS = [
   LtiPlacements.ConferenceSelection, // Locked behind a Site Admin FF that's off
   LtiPlacements.SimilarityDetection, // Only really relevant for LTI 2
-  LtiPlacements.AnalyticsHub,
 ]
 
 export const PlacementsConfirmation = ({
@@ -84,7 +83,6 @@ export const PlacementsConfirmation = ({
   onTogglePlacement,
   onToggleDefaultDisabled,
 }: PlacementsConfirmationProps) => {
-
   return (
     <>
       <Heading level="h3" margin="0 0 x-small 0">
