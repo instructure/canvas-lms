@@ -32,7 +32,6 @@ const I18n = createI18nScope('new_login')
 
 const breakpoints = {
   tablet: {minWidth: canvas.breakpoints.tablet}, // 768px
-  desktop: {minWidth: canvas.breakpoints.desktop}, // 1024px
 }
 
 interface Props {
@@ -52,49 +51,42 @@ const ContentLayout = ({children}: Props) => {
     return <Loading title={I18n.t('Loading page …')} />
   }
 
+  const renderContentLayout = (isTablet: boolean) => (
+    <View
+      as="div"
+      height="100%"
+      position="relative"
+      className={classNames({
+        [styles['contentLayout--tablet']]: isTablet,
+      })}
+    >
+      <View
+        as="div"
+        className={classNames(styles.contentLayout__content, {
+          [styles['contentLayout__content--tablet']]: isTablet,
+        })}
+        background="primary"
+        position="relative"
+        stacking="above"
+      >
+        {isDataLoading ? (
+          // show a loading spinner during data fetching
+          renderLoading()
+        ) : (
+          // suspense fallback for lazy-loaded components
+          <Suspense fallback={renderLoading()}>{children}</Suspense>
+        )}
+      </View>
+
+      <Background className={classNames(styles.contentLayout__background)} />
+    </View>
+  )
+
   return (
     <Responsive match="media" query={breakpoints} elementRef={setResponsiveRef}>
       {(_props, matches) => {
-        const isDesktop = matches?.includes('desktop')
-        const isTablet = matches?.includes('tablet')
-        const isTabletOnly = isTablet && !isDesktop
-
-        return (
-          <View
-            as="div"
-            height="100%"
-            position="relative"
-            className={classNames({
-              [styles['contentLayout--desktop']]: isDesktop,
-              [styles['contentLayout--tablet']]: isTabletOnly,
-            })}
-          >
-            <View
-              as="div"
-              className={classNames(styles.contentLayout__content, {
-                [styles['contentLayout__content--desktop']]: isDesktop,
-                [styles['contentLayout__content--tablet']]: isTabletOnly,
-              })}
-              background="primary"
-              position="relative"
-              stacking="above"
-            >
-              {isDataLoading ? (
-                // show a loading spinner during data fetching
-                renderLoading()
-              ) : (
-                // suspense fallback for lazy-loaded components
-                <Suspense fallback={renderLoading()}>{children}</Suspense>
-              )}
-            </View>
-
-            <Background
-              className={classNames(styles.contentLayout__background, {
-                [styles['contentLayout__background--desktop']]: isDesktop,
-              })}
-            />
-          </View>
-        )
+        const isTablet = matches?.includes('tablet') || false
+        return renderContentLayout(isTablet)
       }}
     </Responsive>
   )

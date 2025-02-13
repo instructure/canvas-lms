@@ -32,12 +32,20 @@ afterAll(() => {
 })
 
 describe('ReCaptcha', () => {
-  it('mounts without crashing', () => {
+  it('mounts without crashing and renders with the correct size', () => {
     const siteKey = 'test-site-key'
     const onVerify = jest.fn()
     const {container} = render(<ReCaptcha siteKey={siteKey} onVerify={onVerify} />)
     expect(container).toBeInTheDocument()
     expect(window.grecaptcha.ready).toHaveBeenCalled()
-    expect(window.grecaptcha.render).toHaveBeenCalled()
+    expect(window.grecaptcha.render).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        sitekey: siteKey,
+        size: 'normal',
+        theme: 'light',
+        callback: onVerify,
+      }),
+    )
   })
 })
