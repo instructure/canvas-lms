@@ -100,6 +100,7 @@ describe('PeopleValidationIssues', () => {
         inviteUsersURL={inviteUsersURL}
         onChangeDuplicate={noop}
         onChangeMissing={noop}
+        fieldsRefAndError={{}}
       />,
     )
 

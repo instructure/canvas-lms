@@ -90,7 +90,7 @@ const dupeList = {
   bob: {
     address: 'bob',
     createNew: false,
-    newUserInfo: undefined,
+    newUserInfo: {email: '', name: ''},
     selectedUserId: -1,
     skip: false,
     userList: [
@@ -126,7 +126,7 @@ const dupeList = {
   sally: {
     address: 'sally',
     createNew: false,
-    newUserInfo: undefined,
+    newUserInfo: {email: '', name: ''},
     selectedUserId: -1,
     skip: false,
     userList: [
@@ -386,7 +386,7 @@ describe('Course Enrollment Add People Reducer', () => {
       actions.enqueueNewForDuplicate({
         address: 'bob',
         newUserInfo: USER_BOB,
-      })
+      }),
     )
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
@@ -404,7 +404,7 @@ describe('Course Enrollment Add People Reducer', () => {
       actions.enqueueNewForMissing({
         address: 'amelia',
         newUserInfo: USER_AMELIA,
-      })
+      }),
     )
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
@@ -420,7 +420,7 @@ describe('Course Enrollment Add People Reducer', () => {
         address: 'amelia',
         newUserInfo: USER_AMELIA,
       }),
-      runningState
+      runningState,
     )
     // Then unselect the user
     const newState = reduce(
@@ -428,12 +428,20 @@ describe('Course Enrollment Add People Reducer', () => {
         address: 'amelia',
         newUserInfo: false,
       }),
-      runningState
+      runningState,
     )
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
-    deepEqual(newState.userValidationResult.missing.amelia.newUserInfo, USER_AMELIA, 'newUserInfo should be preserved')
-    equal(newState.userValidationResult.missing.amelia.createNew, false, 'createNew should be false')
+    deepEqual(
+      newState.userValidationResult.missing.amelia.newUserInfo,
+      USER_AMELIA,
+      'newUserInfo should be preserved',
+    )
+    equal(
+      newState.userValidationResult.missing.amelia.createNew,
+      false,
+      'createNew should be false',
+    )
   })
 
   // creating users
@@ -469,7 +477,11 @@ describe('Course Enrollment Add People Reducer', () => {
     const newState = reduce(actions.createUsersSuccess(API_CREATE_RESPONSE2))
     deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
     deepEqual(newState.inputParams, INITIAL_STATE.inputParams, 'inputParams')
-    deepEqual(newState.apiState, {pendingCount: 0, error: ['no@nope.net: Error message']}, 'api error should be an array')
+    deepEqual(
+      newState.apiState,
+      {pendingCount: 0, error: ['no@nope.net: Error message']},
+      'api error should be an array',
+    )
     deepEqual(
       newState.userValidationResult,
       INITIAL_STATE.userValidationResult,

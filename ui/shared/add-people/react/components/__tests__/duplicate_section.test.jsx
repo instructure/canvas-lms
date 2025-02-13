@@ -55,6 +55,7 @@ const defaultProps = {
   onSelectDuplicate: jest.fn(),
   onNewForDuplicate: jest.fn(),
   onSkipDuplicate: jest.fn(),
+  fieldsRefAndError: {},
 }
 
 describe('DuplicateSection', () => {

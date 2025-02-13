@@ -19,7 +19,7 @@
 import React from 'react'
 import PeopleSearch from '../people_search'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 
 injectGlobalAlertContainers()
 
@@ -34,26 +34,55 @@ describe('PeopleSearch', () => {
       {id: '1', b: 'secB'},
     ],
   }
+  const textareaMatchers = {
+    email: new RegExp('enter the email addresses', 'i'),
+    sis_user_id: new RegExp('enter the sis ids', 'i'),
+    login_id: new RegExp('enter the login ids', 'i'),
+  }
 
   test('displays Email Address as default label', () => {
-    const wrapper = render(<PeopleSearch {...props} />)
-    expect(wrapper.queryByText('Email Addresses (required)')).toBeInTheDocument()
+    render(<PeopleSearch {...props} />)
+
+    const textarea = screen.getByText(textareaMatchers.email)
+    expect(textarea).toBeInTheDocument()
   })
 
   test('displays proper label for sis searchType', () => {
-    const wrapper = render(<PeopleSearch {...props} searchType="sis_user_id" />)
-    expect(wrapper.queryByText('SIS IDs (required)')).toBeInTheDocument()
+    render(<PeopleSearch {...props} searchType="sis_user_id" />)
+
+    const textarea = screen.getByText(textareaMatchers.sis_user_id)
+    expect(textarea).toBeInTheDocument()
   })
 
   test('displays proper label for unique_id searchType', () => {
-    const wrapper = render(<PeopleSearch {...props} searchType="unique_id" />)
-    expect(wrapper.queryByText('Login IDs (required)')).toBeInTheDocument()
+    render(<PeopleSearch {...props} searchType="unique_id" />)
+
+    const textarea = screen.getByText(textareaMatchers.login_id)
+    expect(textarea).toBeInTheDocument()
   })
 
   test('displays role and section', () => {
-    const wrapper = render(<PeopleSearch {...props} />)
-    expect(wrapper.queryByTestId('people-search-role-section-container')).toBeInTheDocument()
-    expect(wrapper.queryByText('Role')).toBeInTheDocument()
-    expect(wrapper.queryByText('Section')).toBeInTheDocument()
+    render(<PeopleSearch {...props} />)
+
+    expect(screen.getByTestId('people-search-role-section-container')).toBeInTheDocument()
+    expect(screen.getByText('Role')).toBeInTheDocument()
+    expect(screen.getByText('Section')).toBeInTheDocument()
   })
+
+  test.each([
+    {name: 'Email Addresses', searchType: 'cc_path'},
+    {name: 'SIS ID', searchType: 'sis_user_id'},
+    {name: 'Login ID', searchType: 'unique_id'},
+  ])(
+    `it should show an error when the "Next" button is clicked and $name field is empty`,
+    async ({searchType}) => {
+      const errorMessageText = {text: 'This field is required.', type: 'newError'}
+      render(
+        <PeopleSearch {...props} searchType={searchType} searchInputError={errorMessageText} />,
+      )
+
+      const errorMessage = screen.getByText(errorMessageText.text)
+      expect(errorMessage).toBeInTheDocument()
+    },
+  )
 })
