@@ -283,6 +283,18 @@ rich-content-service:
   app-host: "http://rce.canvas.docker:3000"
 ```
 
+### StatsD
+The optional StatsD service simply intercepts UDP traffic to port 8125 and echoes it.
+
+This is useful if you want to understand what metrics are being sent to DataDog when
+the application is running in production.
+
+To enable this service, add `docker-compose/statsd.override.yml` to your .env file
+
+Next, stop and start any running containers (a restart is not sufficient since environment variables change).
+
+Finally, tail the statsd service logs to see what metrics Canvas is recording: `docker compose logs -ft statsd`.
+
 ## Tips
 
 It will likely be helpful to alias the various docker-compose commands like `docker-compose run --rm web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.
