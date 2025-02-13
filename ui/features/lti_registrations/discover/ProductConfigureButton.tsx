@@ -150,7 +150,7 @@ const buttonIsEnabled = (
     (jsonFetchStatus._tag === 'loaded' && isSuccessful(jsonFetchStatus.result)) ||
     integration?.integration_type === 'lti_13_global_inherited_key'
   ) {
-    return window.ENV.FEATURES.lti_registrations_next
+    return window.ENV.FEATURES.lti_registrations_page
   } else {
     return false
   }

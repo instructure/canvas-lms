@@ -27,7 +27,6 @@ describe "Apps Page" do
 
   before(:once) do
     account.enable_feature!(:lti_registrations_page)
-    account.enable_feature!(:lti_registrations_next)
   end
 
   before do
