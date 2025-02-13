@@ -101,6 +101,14 @@ describe LearnPlatform::GlobalApi do
       it "reads from Consul" do
         expect(subject).to eq(url)
       end
+
+      context "when there is an extra '/'" do
+        let(:url) { "https://example.com/" }
+
+        it "chomps it off" do
+          expect(subject).to eq("https://example.com")
+        end
+      end
     end
 
     context "when endpoint is not configured" do
@@ -178,6 +186,48 @@ describe LearnPlatform::GlobalApi do
       it "returns unified_tool_id" do
         expect(subject).to eq(unified_tool_id)
       end
+    end
+  end
+
+  describe ".post_unified_tool_id_bulk_load_callback" do
+    include WebMock::API
+
+    before do
+      allow(described_class).to receive_messages(credentials: { learn_platform_basic_token: "fake-auth" }, endpoint: "https://fakelearnplatform.instructure.com")
+    end
+
+    let(:callback_url) do
+      "https://fakelearnplatform.instructure.com/api/v2/lti/unified_tool_id_bulk_load"
+    end
+
+    let(:payload) do
+      {
+        id: "foo",
+        region: "us-east-1",
+        row_stats: { "total" => 1, "shard_failed" => 1 },
+        shard_issues: { "failed" => [1] },
+        error: { "code" => "waz" },
+      }
+    end
+
+    it "hits the LearnPlatform callback URL and returns the response" do
+      stubbed = stub_request(:post, callback_url).with do |req|
+        expect(req.headers["Content-Type"]).to eq("application/json")
+        expect(req.headers["Authorization"]).to eq("Basic fake-auth")
+        expect(JSON.parse(req.body)).to eq(payload.transform_keys(&:to_s))
+      end.to_return(status: 200)
+
+      result = described_class.post_unified_tool_id_bulk_load_callback(**payload)
+      assert_requested(stubbed)
+      expect(result).to be_a(Net::HTTPOK)
+    end
+
+    it "raises CanvasHttp::InvalidResponseCodeError if a non-2xx status is returned" do
+      stubbed = stub_request(:post, callback_url).to_return(status: 429)
+      expect do
+        described_class.post_unified_tool_id_bulk_load_callback(**payload)
+      end.to raise_error(CanvasHttp::InvalidResponseCodeError)
+      assert_requested(stubbed)
     end
   end
 end
