@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { createRoot } from 'react-dom/client'
+import {createRoot} from 'react-dom/client'
 import {bindActionCreators} from 'redux'
 import {connect, Provider} from 'react-redux'
 import natcompare from '@canvas/util/natcompare'
@@ -55,6 +55,7 @@ export default class AddPeopleApp {
         role: props.roles.length ? props.roles[0].id : '',
         section: sections.length ? sections[0].id : '',
         canReadSIS: props.canReadSIS,
+        searchInputError: null,
       },
       apiState: defaultState.apiState,
       userValidationResult: defaultState.userValidationResult,
@@ -80,7 +81,9 @@ export default class AddPeopleApp {
   close() {
     this.render(false)
     if (typeof this.onCloseCallback === 'function') {
-      this.onCloseCallback()
+      setTimeout(() => {
+        this.onCloseCallback()
+      }, 0)
     }
   }
 
@@ -96,11 +99,11 @@ export default class AddPeopleApp {
 
   render(isOpen) {
     const ConnectedApp = this.ConnectedApp
-     
+
     this.root.render(
       <Provider store={this.store}>
         <ConnectedApp isOpen={isOpen} onClose={this.closer} theme={this.theme} />
-      </Provider>
+      </Provider>,
     )
   }
 }

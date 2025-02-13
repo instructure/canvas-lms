@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React from 'react'
+import React, {MutableRefObject} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {TextArea} from '@instructure/ui-text-area'
@@ -26,87 +26,83 @@ import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconUserSolid} from '@instructure/ui-icons'
 import {courseParamsShape, inputParamsShape} from './shapes'
-import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
 import {Flex} from '@instructure/ui-flex'
+import {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('PeopleSearch')
 
-class PeopleSearch extends React.Component {
+type SearchType = 'sis_user_id' | 'unique_id' | 'cc_path'
+
+type Role = {id: string; label: string}
+
+type Section = {id: string; name: string}
+
+interface PeopleSearchProps {
+  searchType: SearchType
+  nameList: string
+  role?: Role['id']
+  section?: string
+  limitPrivilege?: boolean
+  roles: Array<Role>
+  sections: Array<Section>
+  canReadSIS?: boolean
+  textareaRef?: MutableRefObject<HTMLTextAreaElement | null>
+  searchInputError?: FormMessage | null
+  onChange?: (
+    params: Partial<
+      Pick<
+        PeopleSearchProps,
+        'searchType' | 'canReadSIS' | 'limitPrivilege' | 'nameList' | 'role'
+      > & {section: Section['id']}
+    >,
+  ) => void
+}
+
+class PeopleSearch extends React.Component<PeopleSearchProps> {
   static propTypes = {...inputParamsShape, ...courseParamsShape}
 
-  static defaultProps = {
+  static defaultProps: PeopleSearchProps = {
     searchType: 'cc_path',
     nameList: '',
+    roles: [],
+    sections: [],
   }
 
-  constructor(props) {
-    super(props)
-
-    this.namelistta = null
-  }
-
-  shouldComponentUpdate(nextProps /* nextState */) {
+  shouldComponentUpdate(nextProps: PeopleSearchProps) {
     return (
       nextProps.searchType !== this.props.searchType ||
       nextProps.nameList !== this.props.nameList ||
       nextProps.role !== this.props.role ||
       nextProps.section !== this.props.section ||
-      nextProps.limitPrivilege !== this.props.limitPrivilege
+      nextProps.limitPrivilege !== this.props.limitPrivilege ||
+      nextProps.searchInputError !== this.props.searchInputError
     )
   }
 
-  // event handlers ------------------------------------
-  // inst-ui form elements are currently inconsistent in what args they send
-  // to their onChange handler. Some send the event, others just the new value.
-  // When they all send the event, we can coallesce these onChange handlers
-  // into one and use the name attribute to set the proper state
-  onChangeSearchType = newValue => {
-    this.props.onChange({searchType: newValue})
+  onChangeSearchType = (newValue: string) => {
+    this.props.onChange?.({searchType: newValue as SearchType})
   }
 
-  onChangeNameList = event => {
-    this.props.onChange({nameList: event.target.value})
+  onChangeNameList = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    this.props.onChange?.({nameList: event.target.value})
   }
 
-  onChangeSection = (event, optionValue) => {
-    this.props.onChange({section: optionValue})
+  onChangeSection = (_event: React.ChangeEvent<HTMLSelectElement>, optionValue: string) => {
+    this.props.onChange?.({section: optionValue})
   }
 
-  onChangeRole = (event, optionValue) => {
-    this.props.onChange({role: optionValue})
+  onChangeRole = (_event: React.ChangeEvent<HTMLSelectElement>, optionValue: string) => {
+    this.props.onChange?.({role: optionValue})
   }
 
-  onChangePrivilege = event => {
-    this.props.onChange({limitPrivilege: event.target.checked})
+  onChangePrivilege = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.onChange?.({limitPrivilege: event.target.checked})
   }
 
-  // validate the user's input of names in the textbox
-  // @returns: a message for <TextArea> or null
-  getHint() {
-    let message = ' ' // that's a copy/pasted en-space to trick TextArea into
-    // reserving space for the message so the UI doesn't jump
-    if (this.props.nameList.length > 0 && this.props.searchType === 'cc_path') {
-      // search by email
-      const users = parseNameList(this.props.nameList)
-      const badEmail = users.find(u => {
-        const email = findEmailInEntry(u)
-        return !emailValidator.test(email)
-      })
-      if (badEmail) {
-        message = I18n.t('It looks like you have an invalid email address: "%{addr}"', {
-          addr: badEmail,
-        })
-      }
-    }
-    return [{text: message, type: 'hint'}]
-  }
-
-  // rendering ------------------------------------
   render() {
     let exampleText = ''
     let description = ''
     let inputLabel = ''
-    const message = this.getHint()
 
     switch (this.props.searchType) {
       case 'sis_user_id':
@@ -114,14 +110,14 @@ class PeopleSearch extends React.Component {
         description = I18n.t(
           'Enter the SIS IDs of the users you would like to add, separated by commas or line breaks',
         )
-        inputLabel = I18n.t('SIS IDs (required)')
+        inputLabel = I18n.t('SIS IDs')
         break
       case 'unique_id':
         exampleText = 'lsmith, mfoster'
         description = I18n.t(
           'Enter the login IDs of the users you would like to add, separated by commas or line breaks',
         )
-        inputLabel = I18n.t('Login IDs (required)')
+        inputLabel = I18n.t('Login IDs')
         break
       case 'cc_path':
       default:
@@ -129,7 +125,7 @@ class PeopleSearch extends React.Component {
         description = I18n.t(
           'Enter the email addresses of the users you would like to add, separated by commas or line breaks',
         )
-        inputLabel = I18n.t('Email Addresses (required)')
+        inputLabel = I18n.t('Email Addresses')
     }
 
     return (
@@ -138,7 +134,7 @@ class PeopleSearch extends React.Component {
           name="search_type"
           defaultValue={this.props.searchType}
           description={I18n.t('Add user(s) by')}
-          onChange={(e, val) => this.onChangeSearchType(val)}
+          onChange={(_event, value) => this.onChangeSearchType(value)}
           layout="columns"
         >
           <RadioInput
@@ -170,15 +166,19 @@ class PeopleSearch extends React.Component {
                 <ScreenReaderContent>{description}</ScreenReaderContent>
               </>
             }
+            required
             autoGrow={false}
             resize="vertical"
             height="9em"
             value={this.props.nameList}
             placeholder={exampleText}
-            textareaRef={ta => {
-              this.namelistta = ta
+            textareaRef={textarea => {
+              if (!this.props.textareaRef) {
+                return
+              }
+              this.props.textareaRef.current = textarea
             }}
-            messages={message}
+            messages={this.props.searchInputError ? [this.props.searchInputError] : undefined}
             onChange={this.onChangeNameList}
           />
         </fieldset>
@@ -193,7 +193,7 @@ class PeopleSearch extends React.Component {
               <CanvasSelect
                 label={I18n.t('Role')}
                 id="peoplesearch_select_role"
-                value={this.props.role || (this.props.roles.length ? this.props.roles[0].id : null)}
+                value={this.props.role || (this.props.roles.length ? this.props.roles[0].id : '')}
                 onChange={this.onChangeRole}
               >
                 {this.props.roles.map(r => (
@@ -209,7 +209,7 @@ class PeopleSearch extends React.Component {
                 id="peoplesearch_select_section"
                 value={
                   this.props.section ||
-                  (this.props.sections.length ? this.props.sections[0].id : null)
+                  (this.props.sections.length ? this.props.sections[0].id : '')
                 }
                 onChange={this.onChangeSection}
               >
