@@ -128,7 +128,7 @@ const MigrationFileInput = ({
             </Text>
           </View>
         }
-        maxWidth="22.5rem"
+        maxWidth="46.5rem"
       />
       {isSubmitting && (
         <View as="div" margin="small 0 0" maxWidth="22.5rem">

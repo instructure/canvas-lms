@@ -23,6 +23,7 @@ import userEvent from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {sharedDateParsingTests} from './shared_form_cases'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {within} from '@testing-library/dom'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -39,14 +40,21 @@ const renderComponent = (overrideProps?: any) =>
     />,
   )
 
+const defaultEnv = {
+  current_user: {
+    id: '0',
+  },
+  SHOW_BP_SETTINGS_IMPORT_OPTION: true,
+  SHOW_SELECT: false,
+}
+
+const searchForACourse = 'Search for a course *'
+const selectACourse = 'Select a course *'
+const addToImportQueue = 'Add to Import Queue'
+
 describe('CourseCopyImporter', () => {
   beforeEach(() => {
-    fakeENV.setup({
-      current_user: {
-        id: '0',
-      },
-      SHOW_BP_SETTINGS_IMPORT_OPTION: true,
-    })
+    fakeENV.setup({...defaultEnv})
 
     // @ts-expect-error
     doFetchApi.mockImplementation(() =>
@@ -77,32 +85,32 @@ describe('CourseCopyImporter', () => {
   })
 
   it('searches for matching courses and includes concluded by default', async () => {
-    renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
+    const {getByRole, getByText} = renderComponent()
+    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/users/0/manageable_courses?term=math&include=concluded',
       })
     })
-    expect(screen.getByText('Mathmatics')).toBeInTheDocument()
+    expect(getByText('Mathmatics')).toBeInTheDocument()
   })
 
   it('searches for matching courses and display proper terms', async () => {
-    renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
+    const {getByRole, getByText} = renderComponent()
+    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/users/0/manageable_courses?term=math&include=concluded',
       })
     })
-    expect(screen.getByText('Term: Default term')).toBeInTheDocument()
-    expect(screen.getByText('Term: Other term')).toBeInTheDocument()
+    expect(getByText('Term: Default term')).toBeInTheDocument()
+    expect(getByText('Term: Other term')).toBeInTheDocument()
   })
 
   it('searches for matching courses excluding concluded', async () => {
-    renderComponent()
-    await userEvent.click(screen.getByRole('checkbox', {name: 'Include completed courses'}))
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
+    const {getByRole} = renderComponent()
+    await userEvent.click(getByRole('checkbox', {name: 'Include completed courses'}))
+    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/users/0/manageable_courses?term=math',
@@ -112,10 +120,10 @@ describe('CourseCopyImporter', () => {
   })
 
   it('calls onSubmit', async () => {
-    renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
-    await userEvent.click(await screen.findByText('Mathmatics'))
-    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    const {getByRole, findByText} = renderComponent()
+    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
+    await userEvent.click(await findByText('Mathmatics'))
+    await userEvent.click(getByRole('button', {name: addToImportQueue}))
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         settings: expect.objectContaining({
@@ -126,8 +134,8 @@ describe('CourseCopyImporter', () => {
   })
 
   it('calls onCancel', async () => {
-    renderComponent()
-    await userEvent.click(screen.getByRole('button', {name: 'Clear'}))
+    const {getByRole} = renderComponent()
+    await userEvent.click(getByRole('button', {name: 'Clear'}))
     expect(onCancel).toHaveBeenCalled()
   })
 
@@ -135,44 +143,39 @@ describe('CourseCopyImporter', () => {
   // So instead of mocking it here and testing the prop being passed to the mock
   // we're following the precedent and testing all the way to the child in this suite
   it('Renders BP settings import option if appropriate', async () => {
-    renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
-    await userEvent.click(await screen.findByText('Mathmatics'))
-    await expect(await screen.getByText('Import Blueprint Course settings')).toBeInTheDocument()
+    const {getByRole, findByText, getByText} = renderComponent()
+    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
+    await userEvent.click(await findByText('Mathmatics'))
+    await expect(await getByText('Import Blueprint Course settings')).toBeInTheDocument()
   })
 
   it('Does not renders BP settings import option when the destination course is marked ineligible', async () => {
-    fakeENV.setup({
-      current_user: {
-        id: '0',
-      },
-      SHOW_BP_SETTINGS_IMPORT_OPTION: false,
-    })
-    renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
+    fakeENV.setup({...defaultEnv, SHOW_BP_SETTINGS_IMPORT_OPTION: false,})
+    const {getByRole, findByText, queryByText} = renderComponent()
+    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
     await waitFor(async () => {
-      await expect(screen.findByText('Mathmatics')).resolves.toBeInTheDocument()
+      await expect(findByText('Mathmatics')).resolves.toBeInTheDocument()
     })
-    await userEvent.click(await screen.findByText('Mathmatics'))
-    expect(screen.queryByText('Import Blueprint Course settings')).toBeNull()
+    await userEvent.click(await findByText('Mathmatics'))
+    expect(queryByText('Import Blueprint Course settings')).toBeNull()
   })
 
   it('Does not render BP settings import option when the selected course is not a blueprint', async () => {
-    renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'biol')
+    const {queryByText} = renderComponent()
+    await userEvent.type(screen.getByRole('combobox', {name: searchForACourse}), 'biol')
     await userEvent.click(await screen.findByText('Biology'))
-    expect(screen.queryByText('Import Blueprint Course settings')).toBeNull()
+    expect(queryByText('Import Blueprint Course settings')).toBeNull()
   })
 
   it('disable inputs while uploading', async () => {
-    renderComponent({isSubmitting: true})
+    const {getByRole} = renderComponent({isSubmitting: true})
     await waitFor(() => {
-      expect(screen.getByRole('button', {name: 'Clear'})).toBeDisabled()
-      expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
-      expect(screen.getByRole('combobox', {name: 'Search for a course *'})).toBeDisabled()
-      expect(screen.getByRole('radio', {name: /All content/})).toBeDisabled()
-      expect(screen.getByRole('radio', {name: 'Select specific content'})).toBeDisabled()
-      expect(screen.getByRole('checkbox', {name: 'Adjust events and due dates'})).toBeDisabled()
+      expect(getByRole('button', {name: 'Clear'})).toBeDisabled()
+      expect(getByRole('button', {name: /Adding.../})).toBeDisabled()
+      expect(getByRole('combobox', {name: searchForACourse})).toBeDisabled()
+      expect(getByRole('radio', {name: /All content/})).toBeDisabled()
+      expect(getByRole('radio', {name: 'Select specific content'})).toBeDisabled()
+      expect(getByRole('checkbox', {name: 'Adjust events and due dates'})).toBeDisabled()
     })
   })
 
@@ -203,23 +206,176 @@ describe('CourseCopyImporter', () => {
     }
 
     it('parse the date from found course start date', async () => {
-      const {getByRole} = renderComponent()
+      const {getByRole, findByText} = renderComponent()
 
-      await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
-      await userEvent.click(await screen.findByText('Mathmatics'))
+      await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
       await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
 
       expectDateField('old_start_date', 'Oct 14 at 8pm')
     })
 
     it('parse the date from found course end date', async () => {
-      const {getByRole} = renderComponent()
+      const {getByRole, findByText} = renderComponent()
 
-      await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
-      await userEvent.click(await screen.findByText('Mathmatics'))
+      await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
       await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
 
       expectDateField('old_end_date', 'Oct 16 at 8pm')
+    })
+  })
+
+  describe('SHOW_SELECT behaviour', () => {
+    describe('when enabled', () => {
+      beforeEach(() => {
+        fakeENV.setup({...defaultEnv, SHOW_SELECT: true})
+      })
+
+      it('should render the dropdown', () => {
+        const {queryByRole} = renderComponent()
+        expect(queryByRole('combobox', {name: selectACourse})).not.toBeNull()
+      })
+
+      it('should render the search field', () => {
+        const {queryByRole} = renderComponent()
+        expect(queryByRole('combobox', {name: searchForACourse})).not.toBeNull()
+      })
+
+      it('should be disabled initially', () => {
+        const {getByRole} = renderComponent()
+        expect(getByRole('combobox', {name: selectACourse})).toBeDisabled()
+        expect(getByRole('combobox', {name: searchForACourse})).toBeDisabled()
+      })
+
+      it('should call the manageable_courses', async () => {
+        renderComponent()
+
+        await waitFor(() => {
+          expect(doFetchApi).toHaveBeenCalledWith({
+            path: '/users/0/manageable_courses?include=concluded',
+          })
+        })
+      })
+
+      it('should group the manageable course by terms', async () => {
+        const {getByRole} = renderComponent()
+
+        await waitFor(() => expect(getByRole('combobox', {name: selectACourse})).toBeEnabled())
+        await userEvent.click(getByRole('combobox', {name: selectACourse}))
+
+        const defaultTermGroup = getByRole('group', { name: /Default term/ })
+        expect(defaultTermGroup).toBeInTheDocument()
+        expect(within(defaultTermGroup).getByRole('option', {name: /Mathmatics/})).toBeInTheDocument()
+
+        const otherTermGroup = getByRole('group', { name: /Other term/ })
+        expect(otherTermGroup).toBeInTheDocument()
+        expect(within(otherTermGroup).getByRole('option', {name: /Biology/})).toBeInTheDocument()
+      })
+
+      describe('select course via search field', () => {
+        const populateSearchField = async () => {
+          const component = renderComponent()
+
+          await waitFor(() => {
+            expect(component.getByRole('combobox', {name: searchForACourse})).toBeEnabled()
+          })
+          await userEvent.type(component.getByRole('combobox', {name: searchForACourse}), 'math')
+          await userEvent.click(await component.findByText('Mathmatics'))
+          return component
+        }
+
+        it('should set the same value for dropdown on search change', async () => {
+          const component = await populateSearchField()
+          expect((component.getByTestId('course-copy-select-preloaded-courses') as HTMLInputElement).value)
+            .toBe('Mathmatics')
+        })
+
+        it('should clear the dropdown on search field change', async () => {
+          const component = await populateSearchField()
+          await userEvent.type(component.getByRole('combobox', {name: searchForACourse}), 'invalid')
+          expect((component.getByTestId('course-copy-select-preloaded-courses') as HTMLInputElement).value)
+            .toBe('')
+        })
+
+        it('should throw invalid message on empty selected course', async () => {
+          const component = await populateSearchField()
+          await userEvent.type(component.getByRole('combobox', {name: searchForACourse}), 'invalid')
+          await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
+
+          expect(component.queryAllByText(/You must select a course to copy content from/)).toHaveLength(2)
+          expect(onSubmit).not.toHaveBeenCalled()
+        })
+
+        it('should send the selected course in submit', async () => {
+          const component = await populateSearchField()
+          await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
+          expect(onSubmit).toHaveBeenCalledWith(
+            expect.objectContaining({
+              settings: expect.objectContaining({
+                source_course_id: '0',
+              }),
+            }),
+          )
+        })
+      })
+
+      describe('select course via preloaded course dropdown', () => {
+        const openPreloadedCoursesDropdown = async () => {
+          const component = renderComponent()
+
+          await waitFor(() => {
+            expect(component.getByRole('combobox', {name: selectACourse})).toBeEnabled()
+          })
+          await userEvent.click(component.getByRole('combobox', {name: selectACourse}))
+          return component
+        }
+
+        it('should set the same value for search field on dropdown change', async () => {
+          const component = await openPreloadedCoursesDropdown()
+          await userEvent.click(component.getByRole('option', { name: /Mathmatics/ }))
+          expect((component.getByTestId('course-copy-select-course') as HTMLInputElement).value)
+            .toBe('Mathmatics')
+        })
+
+        it('should throw invalid message on empty selected course', async () => {
+          const component = await openPreloadedCoursesDropdown()
+          await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
+
+          expect(component.queryAllByText(/You must select a course to copy content from/)).toHaveLength(2)
+          expect(onSubmit).not.toHaveBeenCalled()
+        })
+
+        it('should send the selected course in submit', async () => {
+          const component = await openPreloadedCoursesDropdown()
+          await userEvent.click(component.getByRole('option', { name: /Mathmatics/ }))
+          await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
+
+          expect(onSubmit).toHaveBeenCalledWith(
+            expect.objectContaining({
+              settings: expect.objectContaining({
+                source_course_id: '0',
+              }),
+            }),
+          )
+        })
+      })
+    })
+
+    describe('when disabled', () => {
+      beforeEach(() => {
+        fakeENV.setup({...defaultEnv, SHOW_SELECT: false})
+      })
+
+      it('should not render the dropdown', () => {
+        const {queryByRole} = renderComponent()
+        expect(queryByRole('combobox', {name: selectACourse})).toBeNull()
+      })
+
+      it('should render the search field', () => {
+        const {queryByRole} = renderComponent()
+        expect(queryByRole('combobox', {name: searchForACourse})).not.toBeNull()
+      })
     })
   })
 })
