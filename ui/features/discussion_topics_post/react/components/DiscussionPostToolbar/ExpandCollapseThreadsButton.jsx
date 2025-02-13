@@ -28,7 +28,7 @@ const I18n = createI18nScope('discussions_posts')
 
 export const ExpandCollapseThreadsButton = props => {
   const {setAllThreadsStatus, setExpandedThreads} = useContext(SearchContext)
-  const buttonText = props.expandedLocked || !props.isExpanded ? I18n.t('Expand Threads') : I18n.t('Collapse Threads')
+  const buttonText = props.expandedLocked || props.isExpanded ? I18n.t('Collapse Threads') : I18n.t('Expand Threads')
 
   useEffect(() => {
     if (props.isExpanded) {
@@ -53,7 +53,7 @@ export const ExpandCollapseThreadsButton = props => {
     <Button
       display="block"
       onClick={handleExpandCollapseClick}
-      renderIcon={props.expandedLocked || !props.isExpanded ? <IconExpandLine /> : <IconCollapseLine />}
+      renderIcon={props.expandedLocked || props.isExpanded ? <IconCollapseLine /> : <IconExpandLine />}
       data-testid="ExpandCollapseThreads-button"
       disabled={props.disabled || false}
     >
