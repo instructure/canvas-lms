@@ -83,6 +83,8 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS]).not_to be_nil
           expect(assigns[:js_env][:OLD_START_DATE]).to_not be_nil
           expect(assigns[:js_env][:OLD_END_DATE]).to_not be_nil
+          expect(assigns[:js_env][:NEW_USER_TUTORIALS]).to_not be_nil
+          expect(assigns[:js_env][:NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT]).to_not be_nil
         end
 
         it "exports proper environment variables with the flag ON" do
