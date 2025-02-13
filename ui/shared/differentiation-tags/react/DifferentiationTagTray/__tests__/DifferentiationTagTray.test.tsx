@@ -15,9 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DifferentiationTagTray from '../DifferentiationTagTray'
 import type {DifferentiationTagTrayProps} from '../DifferentiationTagTray'
@@ -169,8 +168,129 @@ describe('DifferentiationTagTray', () => {
         {id: 2, name: 'Category 2', groups: []},
       ]
       renderComponent({differentiationTagCategories: mockCategories})
-
       expect(screen.queryByTestId('differentiation-tag-pagination')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('DifferentiationTagTray - search and filtering logic', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+
+    afterEach(() => {
+      jest.runOnlyPendingTimers()
+      jest.useRealTimers()
+    })
+
+    it('displays all categories when search input is empty', () => {
+      const mockCategories = [
+        {id: 1, name: 'Advanced', groups: []},
+        {id: 2, name: 'Remedial', groups: []},
+      ]
+      renderComponent({differentiationTagCategories: mockCategories})
+      expect(screen.getByText('Advanced')).toBeInTheDocument()
+      expect(screen.getByText('Remedial')).toBeInTheDocument()
+    })
+
+    it('filters categories based on matching category name', async () => {
+      const user = userEvent.setup({delay: null})
+      const mockCategories = [
+        {id: 1, name: 'Advanced', groups: []},
+        {id: 2, name: 'Remedial', groups: []},
+      ]
+      renderComponent({differentiationTagCategories: mockCategories})
+      const searchInput = screen.getByPlaceholderText('Search for Tag')
+
+      // Type a search term that should match only "Advanced"
+      await user.clear(searchInput)
+      await user.type(searchInput, 'adv')
+
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+
+      expect(screen.getByText('Advanced')).toBeInTheDocument()
+      expect(screen.queryByText('Remedial')).not.toBeInTheDocument()
+    })
+
+    it('filters categories based on matching group name', async () => {
+      const user = userEvent.setup({delay: null})
+      const mockCategories = [
+        {
+          id: 1,
+          name: 'Advanced',
+          groups: [{id: 1, name: 'Math Group', members_count: 10}],
+        },
+        {
+          id: 2,
+          name: 'Remedial',
+          groups: [{id: 2, name: 'Science Group', members_count: 5}],
+        },
+      ]
+      renderComponent({differentiationTagCategories: mockCategories})
+      const searchInput = screen.getByPlaceholderText('Search for Tag')
+
+      // Type a search term that matches the group name in the second category
+      await user.clear(searchInput)
+      await user.type(searchInput, 'sci')
+
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+
+      expect(screen.getByText('Remedial')).toBeInTheDocument()
+      expect(screen.queryByText('Advanced')).not.toBeInTheDocument()
+    })
+
+    it('shows "No matching tags found." message when search does not match any category or group', async () => {
+      const user = userEvent.setup({delay: null})
+      const mockCategories = [
+        {id: 1, name: 'Advanced', groups: []},
+        {id: 2, name: 'Remedial', groups: []},
+      ]
+      renderComponent({differentiationTagCategories: mockCategories})
+      const searchInput = screen.getByPlaceholderText('Search for Tag')
+
+      await user.clear(searchInput)
+      await user.type(searchInput, 'nonexistent')
+
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+
+      expect(screen.getByText('No matching tags found.')).toBeInTheDocument()
+    })
+
+    it('resets pagination to the first page when the search term changes', async () => {
+      const user = userEvent.setup({delay: null})
+      // Create 5 categories (itemsPerPage is 4 so page 2 will show only the 5th)
+      const mockCategories = Array.from({length: 5}, (_, i) => ({
+        id: i + 1,
+        name: `Category ${i + 1}`,
+        groups: [],
+      }))
+      renderComponent({differentiationTagCategories: mockCategories})
+
+      // Initially, page 1 should show Category 1-4
+      expect(screen.getByText('Category 1')).toBeInTheDocument()
+      expect(screen.queryByText('Category 5')).not.toBeInTheDocument()
+
+      // Navigate to page 2 via pagination
+      const pageTwoButton = screen.getByText('2').closest('button')
+      await user.click(pageTwoButton!)
+      expect(screen.getByText('Category 5')).toBeInTheDocument()
+
+      // Now, type in the search input which should trigger the useEffect to reset pagination to page 1
+      const searchInput = screen.getByPlaceholderText('Search for Tag')
+      await user.clear(searchInput)
+      await user.type(searchInput, 'Category')
+      act(() => {
+        jest.advanceTimersByTime(300)
+      })
+
+      // The pagination should reset to page 1 so that Category 1 is visible and Category 5 is not
+      expect(screen.getByText('Category 1')).toBeInTheDocument()
+      expect(screen.queryByText('Category 5')).not.toBeInTheDocument()
     })
   })
 })
