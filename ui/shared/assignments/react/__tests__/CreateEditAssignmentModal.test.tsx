@@ -129,6 +129,20 @@ describe('CreateEditAssignmentModal', () => {
     expect(getByText('Name must be at least 3 characters.')).toBeInTheDocument()
   })
 
+  it('renders proper error messages in "Points" field', () => {
+    const {getByTestId, getByText} = render(<CreateEditAssignmentModal {...defaultProps()} />)
+
+    fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
+    fireEvent.change(getByTestId('points-input'), {target: {value: '-1'}})
+    fireEvent.click(getByTestId('save-button'))
+    expect(getByText('Points must be zero or greater.')).toBeInTheDocument()
+    expect(getByTestId('points-input')).toHaveFocus()
+
+    fireEvent.change(getByTestId('points-input'), {target: {value: '1000000000'}})
+    fireEvent.click(getByTestId('save-button'))
+    expect(getByText('Points cannot exceed 999,999,999.')).toBeInTheDocument()
+  })
+
   describe('create mode', () => {
     it('renders correct components in create mode', () => {
       const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps()} />)
@@ -176,7 +190,7 @@ describe('CreateEditAssignmentModal', () => {
       const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps()} />)
 
       expect(getByTestId('assignment-name-input')).toHaveValue('')
-      expect(getByTestId('points-input')).toHaveValue('0')
+      expect(getByTestId('points-input')).toHaveValue(0)
     })
 
     it('prevents saving when required fields are empty', () => {
@@ -272,6 +286,40 @@ describe('CreateEditAssignmentModal', () => {
         syncToSIS: false,
       }, true)
     })
+
+    it('allows saving when point input contains decimal values', () => {
+      const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps()} />)
+
+      fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
+      fireEvent.change(getByTestId('points-input'), {target: {value: '35.35'}})
+      fireEvent.click(getByTestId('save-button'))
+
+      expect(onSaveHandlerMock).toHaveBeenCalledWith({
+        type: 'none',
+        name: 'Test Assignment',
+        dueAt: '',
+        points: 35.35,
+        publish: false,
+        syncToSIS: false,
+      }, true)
+    })
+
+    it('allows users to enter "0" for points input', () => {
+      const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps()} />)
+
+      fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
+      fireEvent.change(getByTestId('points-input'), {target: {value: '0'}})
+      fireEvent.click(getByTestId('save-button'))
+
+      expect(onSaveHandlerMock).toHaveBeenCalledWith({
+        type: 'none',
+        name: 'Test Assignment',
+        dueAt: '',
+        points: 0,
+        publish: false,
+        syncToSIS: false,
+      }, true)
+    })
   })
 
   describe('edit mode', () => {
@@ -290,7 +338,7 @@ describe('CreateEditAssignmentModal', () => {
 
       expect(getByTestId('assignment-name-input')).toHaveValue('Test Assignment')
       expect(getAllByText('Sunday, January 14, 2024 12:00 AM')[0]).toBeInTheDocument()
-      expect(getByTestId('points-input')).toHaveValue('100')
+      expect(getByTestId('points-input')).toHaveValue(100)
     })
 
     it('save buttons are enabled when required fields are populated', () => {
