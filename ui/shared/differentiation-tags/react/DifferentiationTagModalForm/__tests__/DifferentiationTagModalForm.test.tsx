@@ -20,23 +20,17 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DifferentiationTagModalForm from '../DifferentiationTagModalForm'
-import type {DifferentiationTagCategory} from '../../types'
 import type {DifferentiationTagModalFormProps} from '../DifferentiationTagModalForm'
 import '@testing-library/jest-dom'
 import {CREATE_MODE, EDIT_MODE} from '../../util/constants'
+
+import {multipleTagsCategory, singleTagCategory} from '../../util/tagCategoryCardMocks'
 
 describe('DifferentiationTagModalForm', () => {
   const user = userEvent.setup({delay: 0})
 
   const onCloseMock = jest.fn()
-  const mockTagSet: DifferentiationTagCategory = {
-    id: 1,
-    name: 'Original Tag Set',
-    groups: [
-      {id: 1, name: 'Group 1'},
-      {id: 2, name: 'Group 2'},
-    ],
-  }
+  const mockTagSet = multipleTagsCategory
 
   const renderComponent = (props: Partial<DifferentiationTagModalFormProps> = {}) => {
     const defaultProps = {
@@ -144,17 +138,12 @@ describe('DifferentiationTagModalForm', () => {
 
     it('renders tag inputs for each group', () => {
       renderComponent({mode: EDIT_MODE, differentiationTagSet: mockTagSet})
-      expect(screen.getByDisplayValue('Group 1')).toBeInTheDocument()
-      expect(screen.getByDisplayValue('Group 2')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Variant A')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Variant B')).toBeInTheDocument()
     })
 
     it('does not render the "+ Add another tag" button when in edit single mode', () => {
-      const singleMockSet: DifferentiationTagCategory = {
-        id: 1,
-        name: 'Original Tag Set',
-        groups: [{id: 1, name: 'Group 1'}],
-      }
-      renderComponent({mode: EDIT_MODE, differentiationTagSet: singleMockSet})
+      renderComponent({mode: EDIT_MODE, differentiationTagSet: singleTagCategory})
       expect(screen.queryByText('+ Add another tag')).not.toBeInTheDocument()
     })
 
@@ -164,21 +153,13 @@ describe('DifferentiationTagModalForm', () => {
     })
 
     it('populates tag set name and tag variants correctly in edit view (multi mode)', async () => {
-      const multiTagSet = {
-        id: 3,
-        name: 'Prepopulated Tag Set',
-        groups: [
-          {id: 10, name: 'Tag A'},
-          {id: 11, name: 'Tag B'},
-        ],
-      }
-      renderComponent({mode: EDIT_MODE, differentiationTagSet: multiTagSet})
+      renderComponent({mode: EDIT_MODE, differentiationTagSet: multipleTagsCategory})
       const multipleTagRadio = screen.getByLabelText('Multiple Tags')
       expect(multipleTagRadio).toBeChecked()
       const tagSetNameInput = screen.getByTestId('tag-set-name')
-      expect(tagSetNameInput).toHaveValue('Prepopulated Tag Set')
-      expect(screen.getByDisplayValue('Tag A')).toBeInTheDocument()
-      expect(screen.getByDisplayValue('Tag B')).toBeInTheDocument()
+      expect(tagSetNameInput).toHaveValue('Reading Groups')
+      expect(screen.getByDisplayValue('Variant A')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Variant B')).toBeInTheDocument()
     })
 
     it("doesn't switch to single tag mode when removing a tag in edit mode with multiple tags", async () => {
@@ -219,8 +200,8 @@ describe('DifferentiationTagModalForm', () => {
     })
 
     // Edit both tag inputs
-    const tag1Input = screen.getByDisplayValue('Group 1')
-    const tag2Input = screen.getByDisplayValue('Group 2')
+    const tag1Input = screen.getByDisplayValue('Variant A')
+    const tag2Input = screen.getByDisplayValue('Variant B')
 
     await user.clear(tag1Input)
     await user.paste('Updated Group 1')
@@ -283,15 +264,7 @@ describe('DifferentiationTagModalForm', () => {
   })
 
   it('shows error when tag set name is empty in edit mode with multi tag mode', async () => {
-    const mockMultiTagSet: DifferentiationTagCategory = {
-      id: 2,
-      name: 'Edit Tag Set',
-      groups: [
-        {id: 1, name: 'Group 1'},
-        {id: 2, name: 'Group 2'},
-      ],
-    }
-    renderComponent({mode: EDIT_MODE, differentiationTagSet: mockMultiTagSet})
+    renderComponent({mode: EDIT_MODE, differentiationTagSet: multipleTagsCategory})
 
     // Clear the tag set name (initially populated in edit mode) to trigger the error.
     const tagSetNameInput = screen.getByTestId('tag-set-name')
