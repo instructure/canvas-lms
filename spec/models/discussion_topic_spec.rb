@@ -992,6 +992,22 @@ describe DiscussionTopic do
       expect(topic.stream_item).not_to be_nil
     end
 
+    describe "#effective_group_category_id" do
+      it "returns the group_category_id if it's set" do
+        group_category = @course.group_categories.create!(name: "category")
+        topic = @course.discussion_topics.build(title: "Group Topic Title")
+        topic.group_category = group_category
+        topic.save!
+
+        expect(topic.effective_group_category_id).to eq group_category.id
+      end
+
+      it "returns nil if the group_category_id is not set" do
+        topic = @course.discussion_topics.build(title: "Topic Title")
+        expect(topic.effective_group_category_id).to be_nil
+      end
+    end
+
     describe "#update_based_on_date" do
       it "is active when delayed_post_at is in the past" do
         topic = delayed_discussion_topic(title: "title",

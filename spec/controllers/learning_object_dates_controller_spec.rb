@@ -1108,7 +1108,7 @@ describe LearningObjectDatesController do
           expect(response).to be_bad_request
         end
 
-        it "throws error if group assignment" do
+        it "allows assigning differentiation tag group to group assignment" do
           collab_group_cat = @course.group_categories.create!(name: "Collaborative Group", non_collaborative: false)
           collab_group_cat.create_groups(1)
           collab_group = collab_group_cat.groups.first
@@ -1121,12 +1121,10 @@ describe LearningObjectDatesController do
             group_category_id: collab_group_cat.id
           )
 
-          params = { course_id: @course.id,
-                     assignment_id: group_assignment.id }
+          { course_id: @course.id,
+            assignment_id: group_assignment.id }
 
-          put :update, params: { **params, assignment_overrides: [{ group_id: @group.id, due_at: 7.days.from_now.to_json }] }
-
-          expect(response).to be_bad_request
+          adds_an_override_for_a_group
         end
 
         context "works with TAs" do
