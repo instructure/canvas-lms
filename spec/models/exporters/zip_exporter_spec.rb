@@ -27,6 +27,26 @@ describe "Exporters::ZipExporter" do
     let(:teacher) { course.enroll_teacher(User.create!).user }
     let(:settings) { {} }
 
+    describe "with InstFS enabled" do
+      before do
+        allow(InstFS).to receive(:enabled?).and_return(true)
+      end
+
+      it "uses InstFS to store the file" do
+        expect(InstFS).to receive(:direct_upload).and_return("got-u")
+        content_export = course.content_exports.create!(
+          user: teacher,
+          workflow_state: "created",
+          selected_content: { folders: { "folder_#{folder.id}": "1" } }
+        )
+
+        content_export.save!
+
+        export_file = Exporters::ZipExporter.new(content_export).export
+        expect(export_file.instfs_uuid).to eq "got-u"
+      end
+    end
+
     shared_examples_for "exports for users with file access" do
       it "includes the course attachment" do
         expect(Zip::File.open(subject.open).entries.map(&:to_s)).to eq ["file.txt"]

@@ -37,7 +37,7 @@ module Canvas::Migration::Worker
 
     att = Attachment.new
     att.context = content_migration
-    att.uploaded_data = uploaded_data
+    Attachments::Storage.store_for_attachment(att, uploaded_data)
     att.save
     content_migration.overview_attachment = att
     content_migration.save
@@ -62,7 +62,7 @@ module Canvas::Migration::Worker
       upload_file = Canvas::UploadedFile.new(zip_file, "application/zip")
       att = Attachment.new
       att.context = content_migration
-      att.uploaded_data = upload_file
+      Attachments::Storage.store_for_attachment(att, upload_file)
       att.save
       File.unlink(zip_file)
       content_migration.exported_attachment = att
