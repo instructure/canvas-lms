@@ -99,6 +99,7 @@ import {
 } from './RCEWrapper.utils'
 import {AlertMessage, EditorOptions, RCETrayProps} from './types'
 import {externalToolsForToolbar} from './plugins/instructure_rce_external_tools/util/externalToolsForToolbar'
+import {initScreenreaderOnFormat} from './screenreaderOnFormat'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -1176,6 +1177,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     // focus-trapping components, so they properly ignore trapping focus on click.
     editor.on('click', () => window.document.body.click(), true)
     editor.on('Cut Change input Undo Redo', debounce(this.handleInputChange, 1000))
+    initScreenreaderOnFormat(editor)
     this.announceContextToolbars(editor)
 
     if (this.isAutoSaving) {
