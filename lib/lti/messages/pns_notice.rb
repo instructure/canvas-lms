@@ -28,7 +28,7 @@ module Lti::Messages
     def initialize(tool:, context:, notice:, user: nil, opts: nil, expander: nil)
       extra_claims = opts&.delete(:extra_claims) || []
       opts = {
-        claim_group_whitelist: %i[security context custom_params] + extra_claims,
+        claim_group_whitelist: %i[security context custom_params assignment_and_grade_service] + extra_claims,
         extension_blacklist: [:placement]
       }.merge(opts || {})
       opts[:claim_group_whitelist]&.delete(:custom_params) if expander.nil?
@@ -46,6 +46,11 @@ module Lti::Messages
       @message.notice.id = @notice[:id]
       @message.notice.timestamp = @notice[:timestamp]
       @message.notice.type = @notice[:type]
+    end
+
+    def unexpanded_custom_parameters
+      # Add message-specific custom params (e.g. specified by Asset Processor deep linking response)
+      super.merge!(@opts[:custom_params] || {})
     end
   end
 end

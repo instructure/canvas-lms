@@ -19,10 +19,18 @@
 
 module Lti
   module Pns
+    # This class is responsible for building the LtiAssetProcessorSubmissionNotice notice.
+    # This kind of PNS notice is sent by the Lti::AssetProcessorNotifier to an Asset Processor service to notify it of a new submission.
     class LtiAssetProcessorSubmissionNoticeBuilder < NoticeBuilder
-      attr_reader :params
-
-      REQUIRED_PARAMS = %i[activity_id for_user_id assets notice_event_timestamp].freeze
+      REQUIRED_PARAMS = %i[
+        assignment
+        asset_report_service_url
+        assets
+        custom
+        for_user_id
+        notice_event_timestamp
+        submission_lti_id
+      ].freeze
       REQUIRED_ASSETS_PARAMS = %i[asset_id url sha256_checksum timestamp size content_type].freeze
 
       def initialize(params)
@@ -49,16 +57,25 @@ module Lti
       def custom_ims_claims(_tool)
         {
           for_user: {
-            user_id: params[:for_user_id],
+            user_id: @params[:for_user_id],
+          },
+          assetreport: {
+            scope: [
+              TokenScopes::LTI_ASSET_REPORT_SCOPE
+            ],
+            report_url: @params[:asset_report_service_url]
           },
           assetservice: {
             scope: [
-              params[:scopes] || "https://purl.imsglobal.org/spec/lti-ap/scope/asset.readonly"
+              TokenScopes::LTI_ASSET_READ_ONLY_SCOPE
             ],
-            assets: params[:assets].map { |asset| asset_claim(asset) }
+            assets: @params[:assets].map { |asset| asset_claim(asset) }
           },
           activity: {
-            id: params[:activity_id],
+            id: @params[:assignment].lti_context_id,
+          },
+          submission: {
+            id: @params[:submission_lti_id],
           }
         }
       end
@@ -67,20 +84,25 @@ module Lti
         {}
       end
 
+      # Use Course as context of the notice. This allows us to send the AGS claims in the notice.
+      def custom_context
+        @params[:assignment].context
+      end
+
       def asset_claim(asset)
         asset.slice(*REQUIRED_ASSETS_PARAMS, :title, :filename).compact
       end
 
       def notice_event_timestamp
-        params[:notice_event_timestamp]
+        @params[:notice_event_timestamp]
       end
 
       def user
-        params[:user]
+        @params[:user]
       end
 
       def opts
-        { extra_claims: %i[roles target_link_uri] }
+        { extra_claims: %i[roles], custom_params: @params[:custom] }
       end
     end
   end

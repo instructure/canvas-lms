@@ -130,7 +130,7 @@ class Attachment < ActiveRecord::Base
   has_many :discussion_entry_drafts, inverse_of: :attachment
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :attachment
   has_one :estimated_duration, dependent: :destroy, inverse_of: :attachment
-  has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :attachment
+  has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :attachment, dependent: :destroy
 
   before_save :set_root_account_id
   before_save :infer_display_name
@@ -1736,6 +1736,7 @@ class Attachment < ActiveRecord::Base
               .union(ContentTag.not_deleted.where(context_type: "Attachment", context_id: attachments))
               .find_each(&:destroy)
     while MediaObject.where(attachment_id: attachments).limit(1000).update_all(attachment_id: nil, updated_at: Time.now.utc) > 0 do end
+    Lti::Asset.where(attachment_id: attachments).in_batches(of: 1000).destroy_all
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
     User.joins("INNER JOIN #{Attachment.quoted_table_name} ON attachments.context_id = users.id

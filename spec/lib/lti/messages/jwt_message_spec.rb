@@ -662,15 +662,12 @@ describe Lti::Messages::JwtMessage do
 
     before do
       allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical_domain")
-      allow(controller).to receive(:lti_line_item_index_url)
-        .with({ host: "canonical_domain", course_id: course.id })
-        .and_return("lti_line_item_index_url")
     end
 
     shared_examples "assignment and grade service claim check" do
       describe "AGS line items url" do
         it "sets the AGS lineitems url" do
-          expect(lti_advantage_service_claim["lineitems"]).to eq "lti_line_item_index_url"
+          expect(lti_advantage_service_claim["lineitems"]).to eq "http://canonical_domain/api/lti/courses/#{course.id}/line_items"
         end
       end
 

@@ -114,11 +114,17 @@ class Submission < ActiveRecord::Base
   ].freeze
 
   attr_readonly :assignment_id
-  attr_accessor :visible_to_user,
+  attr_accessor :assignment_changed_not_sub,
+                :grade_change_event_author_id,
+                :grade_posting_in_progress,
+                :grading_error_message,
+                :override_lti_id_lock,
+                :require_submission_type_is_valid,
+                :saved_by,
+                :score_unchanged,
                 :skip_grade_calc,
                 :skip_grader_check,
-                :grade_posting_in_progress,
-                :score_unchanged
+                :visible_to_user
 
   # This can be set to true to force late policy behaviour that would
   # be skipped otherwise. See #late_policy_relevant_changes? and
@@ -134,7 +140,7 @@ class Submission < ActiveRecord::Base
   belongs_to :course, inverse_of: :submissions
   belongs_to :custom_grade_status, inverse_of: :submissions
   has_many :observer_alerts, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :submission
+  has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :submission, dependent: :nullify
   belongs_to :user
   alias_method :student, :user
   belongs_to :grader, class_name: "User"
@@ -201,7 +207,7 @@ class Submission < ActiveRecord::Base
   validate :extra_attempts_can_only_be_set_on_online_uploads
   validate :ensure_attempts_are_in_range, unless: :proxy_submission?
   validate :submission_type_is_valid, if: :require_submission_type_is_valid
-  attr_accessor :require_submission_type_is_valid
+  validate :preserve_lti_id, on: :update
 
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
   scope :deleted, -> { where("submissions.workflow_state = 'deleted'") }
@@ -418,11 +424,6 @@ class Submission < ActiveRecord::Base
 
   sanitize_field :body, CanvasSanitize::SANITIZE
 
-  attr_accessor :saved_by,
-                :assignment_changed_not_sub,
-                :grading_error_message,
-                :grade_change_event_author_id
-
   # Because set_anonymous_id makes database calls, delay it until just before
   # validation. Otherwise if we place it in any earlier (e.g.
   # before/after_initialize), every Submission.new will make database calls.
@@ -438,6 +439,7 @@ class Submission < ActiveRecord::Base
   before_save :reset_redo_request
   before_save :remove_sticker, if: :will_save_change_to_attempt?
   before_save :clear_body_word_count, if: -> { body.nil? }
+  before_save :set_lti_id
   after_save :update_body_word_count_later, if: -> { saved_change_to_body? && get_word_count_from_body? }
   after_save :touch_user
   after_save :clear_user_submissions_cache
@@ -529,6 +531,7 @@ class Submission < ActiveRecord::Base
       grade_matches_current_submission
       published_score
       published_grade
+      lti_id
     ]).present?
   end
 
@@ -3173,6 +3176,10 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def lti_attempt_id
+    "#{lti_id}:#{attempt}"
+  end
+
   private
 
   def checkpoint_changes?
@@ -3240,6 +3247,21 @@ class Submission < ActiveRecord::Base
 
   def set_root_account_id
     self.root_account_id ||= assignment&.course&.root_account_id
+  end
+
+  def preserve_lti_id
+    errors.add(:lti_id, "Cannot change lti_id!") if lti_id_changed? && !lti_id_was.nil? && !override_lti_id_lock
+  end
+
+  def set_lti_id
+    # Old records may not have an lti_id, so we need to set one
+    self.lti_id ||= SecureRandom.uuid
+  end
+
+  # For internal use only.
+  # The lti_id field on its own is not enough to uniquely identify a submission; use lti_attempt_id instead.
+  def lti_id
+    read_attribute(:lti_id)
   end
 
   def set_anonymous_id

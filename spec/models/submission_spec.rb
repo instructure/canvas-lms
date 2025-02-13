@@ -9691,4 +9691,35 @@ describe Submission do
       expect { @checkpoint_submission.update!(score: 3) }.not_to change { @parent_submission.reload.score }
     end
   end
+
+  describe "lti_attempt_id is set automatically" do
+    before do
+      course_with_teacher
+      @assignment = @course.assignments.create!(title: "some assignment")
+      @submission = @assignment.submissions.create!(user: @teacher)
+    end
+
+    it "for new submissions" do
+      expect(@submission.lti_attempt_id.length).to be > 30
+    end
+
+    it "for existing submissions on save" do
+      @submission.update_column(:lti_id, nil)
+      @submission.save!
+      expect(@submission.lti_attempt_id.length).to be > 30
+    end
+
+    it "does not change already existing lti_id, but lit_attempt_id is different" do
+      old_lti_attempt_id = @submission.lti_attempt_id
+      @submission.update(attempt: 2)
+      expect(@submission.reload.lti_attempt_id.split(":").first).to eq old_lti_attempt_id.split(":").first
+      expect(@submission.lti_attempt_id).not_to eq old_lti_attempt_id
+    end
+
+    it "cannot change already existing lti_id" do
+      @submission.lti_id = "new_id"
+      expect(@submission.save).to be_falsey
+      expect(@submission.errors[:lti_id]).to include("Cannot change lti_id!")
+    end
+  end
 end
