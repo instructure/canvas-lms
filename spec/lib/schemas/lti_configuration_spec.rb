@@ -21,8 +21,8 @@
 require_relative "../../lti_1_3_tool_configuration_spec_helper"
 
 describe Schemas::LtiConfiguration do
-  # introduces `settings` (hard-coded JSON LtiConfiguration)
-  # and `internal_configuration` (hard-coded JSON InternalLtiConfiguration)
+  # introduces `canvas_lti_configuration` (hard-coded JSON LtiConfiguration)
+  # and `internal_lti_configuration` (hard-coded JSON InternalLtiConfiguration)
   include_context "lti_1_3_tool_configuration_spec_helper"
 
   describe "#validate" do
@@ -56,7 +56,7 @@ describe Schemas::LtiConfiguration do
     end
 
     context "with full valid configuration" do
-      let(:json) { settings }
+      let(:json) { canvas_lti_configuration }
 
       it "returns no errors" do
         expect(subject).to be_empty
@@ -65,7 +65,7 @@ describe Schemas::LtiConfiguration do
 
     context "with submission_type_selection" do
       let(:json) do
-        settings.tap do |s|
+        canvas_lti_configuration.tap do |s|
           s["extensions"].first["settings"]["placements"] << {
             placement: "submission_type_selection",
             description:,
@@ -101,14 +101,14 @@ describe Schemas::LtiConfiguration do
   end
 
   describe ".from_internal_lti_configuration" do
-    subject { Schemas::LtiConfiguration.from_internal_lti_configuration(internal_configuration) }
+    subject { Schemas::LtiConfiguration.from_internal_lti_configuration(internal_lti_configuration) }
 
     it "returns a valid LtiConfiguration" do
       expect(Schemas::LtiConfiguration.new.validate(subject).to_a).to be_empty
     end
 
     it "returns a LtiConfiguration with the same values as the InternalLtiConfiguration" do
-      expect(subject).to eq(settings.deep_symbolize_keys)
+      expect(subject).to eq(canvas_lti_configuration.deep_symbolize_keys)
     end
   end
 end

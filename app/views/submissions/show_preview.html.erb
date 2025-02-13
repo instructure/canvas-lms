@@ -38,8 +38,7 @@
     annotation_context = @submission.annotation_context(attempt: @submission.attempt)
     preview_url_opts[:annotation_context] = annotation_context.launch_id
   end
-
-  show_full_discussion_immediately = @context.root_account.feature_enabled?(:discussion_checkpoints)
+  show_full_discussion_immediately = params[:show_full_discussion_immediately]
 %>
 
 <% css_bundle :submission %>
@@ -65,6 +64,7 @@
 
       topic_to_show = @assignment.discussion_topic.for_group_discussion? ? @assignment.discussion_topic.child_topic_for(@user) : @assignment.discussion_topic
       topic_to_show ||= @assignment.discussion_topic
+      discussion_speedgrader_revisit_enabled = @assignment.context.account.feature_enabled?(:discussions_speedgrader_revisit)
       discussion_iframe_src = context_url(topic_to_show.context, :context_discussion_topic_url, topic_to_show.id, url_opts)
     %>
   <% unless show_full_discussion_immediately %>
@@ -72,16 +72,30 @@
       <p>
         <% if assignment_visible_to_user = @assignment.visible_to_user?(@current_user)%>
           <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
-            <%= t('group_discussion_submission_description',
-                    "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*.",
-                    :user => user_name,
-                    :wrapper => "<a id='discussion_view_link' href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true)}\"><b>\\1</b></a>") %>
+            <% if discussion_speedgrader_revisit_enabled %>
+              <%= t('group_discussion_submission_description_toggle',
+                      "The submissions for the assignment are posts in the assignment's discussion for this group. You can view the discussion posts for %{user} below, or you can *switch to viewing the full group discussion context.*",
+                      :user => user_name,
+                      :wrapper => "<a id='discussion_view_link' href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true)}\"><b>\\1</b></a>") %>
+            <% else %>
+              <%= t('group_discussion_submission_description',
+                      "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*.",
+                      :user => user_name,
+                      :wrapper => "<a id='discussion_view_link' href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true)}\"><b>\\1</b></a>") %>
+            <% end %>          
           <% else %>
-            <%= t('discussion_submission_description',
-                    "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*.",
-                    :user => user_name,
-                    # legacy discussions uses headless, hide student name, and student id, while discussions redesign uses embed
-                    :wrapper => "<a id='discussion_view_link' href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true)}\"><b>\\1</b></a>") %>
+            <% if discussion_speedgrader_revisit_enabled %>
+              <%= t('discussion_submission_description_toggle',
+                      "The submissions for the assignment are posts in the assignment's discussion. You can view the discussion posts for %{user} below, or you can *switch to viewing the full discussion context.*",
+                      :user => user_name,
+                      :wrapper => "<a id='discussion_view_link' href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true)}\"><b>\\1</b></a>") %>  
+            <% else %>
+              <%= t('discussion_submission_description',
+                      "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*.",
+                      :user => user_name,
+                      # legacy discussions uses headless, hide student name, and student id, while discussions redesign uses embed
+                      :wrapper => "<a id='discussion_view_link' href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true)}\"><b>\\1</b></a>") %>
+            <% end %>
           <% end %>
         <% else %>
           <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>

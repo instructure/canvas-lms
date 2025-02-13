@@ -84,6 +84,66 @@ RSpec.describe SecurityController, type: :request do
   end
 
   describe "openid_configuration" do
+    let(:messages) do
+      [{ "type" => "LtiResourceLinkRequest",
+         "placements" =>
+       ["https://canvas.instructure.com/lti/account_navigation",
+        "https://canvas.instructure.com/lti/analytics_hub",
+        "https://canvas.instructure.com/lti/assignment_edit",
+        "https://canvas.instructure.com/lti/assignment_group_menu",
+        "https://canvas.instructure.com/lti/assignment_index_menu",
+        "https://canvas.instructure.com/lti/assignment_menu",
+        "https://canvas.instructure.com/lti/assignment_selection",
+        "https://canvas.instructure.com/lti/assignment_view",
+        "https://canvas.instructure.com/lti/collaboration",
+        "https://canvas.instructure.com/lti/conference_selection",
+        "https://canvas.instructure.com/lti/course_assignments_menu",
+        "https://canvas.instructure.com/lti/course_home_sub_navigation",
+        "https://canvas.instructure.com/lti/course_navigation",
+        "https://canvas.instructure.com/lti/course_settings_sub_navigation",
+        "https://canvas.instructure.com/lti/discussion_topic_index_menu",
+        "https://canvas.instructure.com/lti/discussion_topic_menu",
+        "https://canvas.instructure.com/lti/file_index_menu",
+        "https://canvas.instructure.com/lti/file_menu",
+        "https://canvas.instructure.com/lti/global_navigation",
+        "https://canvas.instructure.com/lti/homework_submission",
+        "https://canvas.instructure.com/lti/link_selection",
+        "https://canvas.instructure.com/lti/migration_selection",
+        "https://canvas.instructure.com/lti/module_group_menu",
+        "https://canvas.instructure.com/lti/module_index_menu",
+        "https://canvas.instructure.com/lti/module_index_menu_modal",
+        "https://canvas.instructure.com/lti/module_menu_modal",
+        "https://canvas.instructure.com/lti/module_menu",
+        "https://canvas.instructure.com/lti/post_grades",
+        "https://canvas.instructure.com/lti/quiz_index_menu",
+        "https://canvas.instructure.com/lti/quiz_menu",
+        "https://canvas.instructure.com/lti/similarity_detection",
+        "https://canvas.instructure.com/lti/student_context_card",
+        "https://canvas.instructure.com/lti/submission_type_selection",
+        "https://canvas.instructure.com/lti/tool_configuration",
+        "https://canvas.instructure.com/lti/top_navigation",
+        "https://canvas.instructure.com/lti/user_navigation",
+        "https://canvas.instructure.com/lti/wiki_index_menu",
+        "https://canvas.instructure.com/lti/wiki_page_menu",
+        "ContentArea"] },
+       { "type" => "LtiDeepLinkingRequest",
+         "placements" =>
+         ["https://canvas.instructure.com/lti/assignment_selection",
+          "ActivityAssetProcessor",
+          "https://canvas.instructure.com/lti/collaboration",
+          "https://canvas.instructure.com/lti/conference_selection",
+          "https://canvas.instructure.com/lti/course_assignments_menu",
+          "https://canvas.instructure.com/lti/editor_button",
+          "https://canvas.instructure.com/lti/homework_submission",
+          "https://canvas.instructure.com/lti/link_selection",
+          "https://canvas.instructure.com/lti/migration_selection",
+          "https://canvas.instructure.com/lti/module_index_menu_modal",
+          "https://canvas.instructure.com/lti/module_menu_modal",
+          "https://canvas.instructure.com/lti/submission_type_selection",
+          "ContentArea",
+          "RichTextEditor"] }]
+    end
+
     before do
       allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.instructure.com")
     end
@@ -105,7 +165,6 @@ RSpec.describe SecurityController, type: :request do
     end
 
     it "contains the correct information" do
-      messages = SecurityController.messages_supported
       notice_types = SecurityController.notice_types_supported
 
       get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
@@ -149,6 +208,23 @@ RSpec.describe SecurityController, type: :request do
         get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
         expect(response).to have_http_status :ok
         expect(response.parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys] - [TokenScopes::LTI_PNS_SCOPE])
+      end
+    end
+
+    context "when the lti_asset_processor feature flag is off" do
+      before do
+        Account.default.disable_feature!(:lti_asset_processor)
+      end
+
+      it "contains the correct information" do
+        messages.each { |message| message["placements"] -= ["ActivityAssetProcessor"] }
+
+        get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+
+        expect(response).to have_http_status :ok
+        parsed_body = response.parsed_body
+        lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
+        expect(lti_platform_configuration["messages_supported"]).to eq messages
       end
     end
 

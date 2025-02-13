@@ -19,7 +19,7 @@
 import React, {forwardRef, useState} from 'react'
 import formatMessage from '../format-message'
 import RCEWrapper from './RCEWrapper'
-import {EditorOptionsPropType, type ExternalToolsConfig, LtiToolsPropType} from './RCEWrapperProps'
+import type {ExternalToolsConfig, LtiToolsPropType} from './RCEWrapperProps'
 import {RCEVariant} from './RCEVariants'
 import {editorLanguage} from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
@@ -27,12 +27,14 @@ import wrapInitCb from './wrapInitCb'
 import tinyRCE from './tinyRCE'
 import getTranslations from '../getTranslations'
 import '@instructure/canvas-theme'
-import {Editor} from 'tinymce'
+import type {Editor} from 'tinymce'
+import generateId from 'format-message-generate-id/underscored_crc32'
+import type {EditorOptions, RCETrayProps} from './types'
 
 if (!process || !process.env || !process.env.BUILD_LOCALE) {
   formatMessage.setup({
     locale: 'en',
-    generateId: require('format-message-generate-id/underscored_crc32'),
+    generateId,
     missingTranslation: 'ignore',
   })
 }
@@ -76,7 +78,6 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
         setTranslations(true)
       })
       .catch(err => {
-         
         console.error('Failed loading the language file for', locale, '\n Cause:', err)
         setTranslations(false)
       })
@@ -121,6 +122,7 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
   } else {
     return (
       <RCEWrapper
+        name="content"
         ref={rceRef}
         tinymce={tinyRCE}
         readOnly={readOnly}
@@ -160,9 +162,9 @@ export interface RCEPropTypes {
 
   /**
    * tinymce configuration. See defaultTinymceConfig for all the defaults
-   * and RCEWrapper.editorOptionsPropType for stuff you may want to include
+   * and RCEWrapper.EditorOptions for stuff you may want to include
    */
-  editorOptions?: EditorOptionsPropType
+  editorOptions?: EditorOptions
 
   /**
    * there's an open bug when RCE is rendered in a Modal form
@@ -237,24 +239,7 @@ export interface RCEPropTypes {
    * properties necessary for the RCE to us the RCS
    * if missing, RCE features that require the RCS are omitted
    */
-  rcsProps?: {
-    canUploadFiles: boolean
-    contextId: string
-    contextType: string
-    containingContext?: {
-      contextType: string
-      contextId: string
-      userId: string
-    }
-    filesTabDisabled?: boolean
-    host?: (props: any, propName: any, componentName: any) => void
-    jwt?: (props: any, propName: any, componentName: any) => void
-    refreshToken?: () => void
-    source?: {
-      fetchImages: () => void
-    }
-    themeUrl?: string
-  }
+  rcsProps?: RCETrayProps
 
   /**
    * enable the custom icon maker feature (temporary until the feature is forced on)
@@ -287,14 +272,14 @@ export interface RCEPropTypes {
   userCacheKey?: string
 
   onFocus?: (rce: RCEWrapper) => void
-  onBlur?: (event: Event) => void
+  onBlur?: (event: React.FocusEvent<HTMLElement>) => void
   onInit?: (editor: Editor) => void
   onContentChange?: (content: string) => void
 
   externalToolsConfig?: ExternalToolsConfig
 }
 
-const defaultProps = {
+RCE.defaultProps = {
   autosave: {enabled: false, maxAge: 3600000},
   defaultContent: '',
   editorOptions: {},
@@ -312,8 +297,5 @@ const defaultProps = {
   onContentChange: () => undefined,
   onInit: () => undefined,
 }
-
-// @ts-expect-error
-RCE.defaultProps = defaultProps
 
 export default RCE

@@ -51,6 +51,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   has_many :ignores, as: :asset
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :quiz
+  has_one :estimated_duration, dependent: :destroy, inverse_of: :quiz
 
   validates :description, length: { maximum: maximum_long_text_length, allow_blank: true }
   validates :title, length: { maximum: maximum_string_length, allow_nil: true }
@@ -67,6 +68,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   }
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [context, nil] }
+  validates_with HorizonValidators::QuizzesValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
 
   before_save :generate_quiz_data_on_publish, if: :workflow_state_changed?
   before_save :build_assignment
@@ -1119,36 +1121,18 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   set_policy do
     given do |user, session|
-      !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments)
-    end
-    can :manage and can :read and can :create and can :update and can :submit and can :preview
-
-    given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments_add)
+      context.grants_right?(user, session, :manage_assignments_add)
     end
     can :read and can :create
 
     given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments_edit)
+      context.grants_right?(user, session, :manage_assignments_edit)
     end
     can :manage and can :read and can :update and can :submit and can :preview
 
     given do |user, session|
-      !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments) &&
-        (context.account_membership_allows(user) ||
-         !due_for_any_student_in_closed_grading_period?)
-    end
-    can :delete
-
-    given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments_delete) &&
-        (context.account_membership_allows(user) ||
-         !due_for_any_student_in_closed_grading_period?)
+      context.grants_right?(user, session, :manage_assignments_delete) &&
+        (context.account_membership_allows(user) || !due_for_any_student_in_closed_grading_period?)
     end
     can :delete
 
@@ -1187,7 +1171,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     given { |user| context.grants_right?(user, :view_quiz_answer_audits) }
     can :view_answer_audits
 
-    given { |user, session| user && context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
+    given { |user, session| user && context.grants_right?(user, session, :manage_assignments_edit) }
     can :manage_assign_to
   end
 

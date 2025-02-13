@@ -57,6 +57,7 @@ const SEARCH_SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?
 const STUDENT_CONTEXTS_API_WITH_DESC_SORTING = `/api/v1/courses/${COURSE.id}/pace_contexts?type=student_enrollment&page=1&per_page=10&sort=name&order=desc`
 const INIT_PACE_PROGRESS_STATUS_POLL = `/api/v1/courses/${COURSE.id}/course_pacing/new?enrollment_id=${firstStudent.item_id}`
 const INIT_SECTION_PACE_PROGRESS_STATUS_POLL = `/api/v1/courses/${COURSE.id}/course_pacing/new?course_section_id=${secondSection.item_id}`
+const COURSE_REPORT_LAST_API = `/api/v1/courses/${COURSE.id}/reports/course_pace_docx`
 
 const MINUTE = 1000 * 60
 const HOUR = MINUTE * 60
@@ -84,6 +85,7 @@ describe('PaceContextsContent', () => {
     fetchMock.get(STUDENT_CONTEXTS_API, PACE_CONTEXTS_STUDENTS_RESPONSE)
     fetchMock.get(SEARCH_SECTION_CONTEXTS_API, PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE)
     fetchMock.get(SECTION_PACE_CREATION_API, {course_pace: {}, progress: null})
+    fetchMock.get(COURSE_REPORT_LAST_API, {})
     jest.clearAllMocks()
   })
 

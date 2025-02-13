@@ -203,7 +203,7 @@ class RubricAssociation < ActiveRecord::Base
 
   def user_can_self_assess_for?(assessor: nil, assessee: nil, assessment_type: nil)
     assessment_type == "self_assessment" &&
-      assignment&.rubric_self_assessment_enabled &&
+      assignment&.rubric_self_assessment_enabled? &&
       assessor == assessee &&
       rubric_assessments.where(assessment_type: "self_assessment", user_id: assessor).empty?
   end

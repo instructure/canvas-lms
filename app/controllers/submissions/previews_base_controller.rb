@@ -66,7 +66,7 @@ module Submissions
           @anonymize_students = anonymize_students?
           flash.now[:notice] = flash_message if flash_message
           render template: "submissions/show_preview", locals: {
-            anonymize_students: @anonymize_students
+            anonymize_students: @anonymize_students,
           }
         end
       end

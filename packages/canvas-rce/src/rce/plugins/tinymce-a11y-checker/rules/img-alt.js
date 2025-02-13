@@ -67,7 +67,7 @@ export default {
 
   why: () =>
     formatMessage(
-      'Screen readers cannot determine what is displayed in an image without alternative text, which describes the content and meaning of the image.'
+      'Screen readers cannot determine what is displayed in an image without alternative text, which describes the content and meaning of the image.',
     ),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/H37.html',

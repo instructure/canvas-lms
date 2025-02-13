@@ -19,45 +19,46 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import TopLevelButtons from '../TopLevelButtons'
+import {FileManagementContext} from '../../Contexts'
+
+const defaultProps = {
+  isUserContext: false,
+  size: 'small',
+  onCreateFolderButtonClick: jest.fn(),
+}
+
+const defaultContext = {
+  contextType: 'course',
+  contextId: '1',
+  folderId: '1',
+  showingAllContexts: false,
+}
+
+const renderComponent = (props?: any, context?: any) => {
+  return render(
+    <FileManagementContext.Provider value={{...defaultContext, ...context}}>
+      <TopLevelButtons {...defaultProps} {...props} />
+    </FileManagementContext.Provider>,
+  )
+}
 
 describe('TopLevelButtons', () => {
   it('renders "All My Files" button when isUserContext is false', () => {
-    render(
-      <TopLevelButtons
-        isUserContext={false}
-        size="small"
-        isDisabled={false}
-        onCreateFolderButtonClick={() => {}}
-      />,
-    )
+    renderComponent()
 
     const allMyFilesButton = screen.getByText(/All My Files/i)
     expect(allMyFilesButton).toBeInTheDocument()
   })
 
   it('does not render "All My Files" button when isUserContext is true', () => {
-    render(
-      <TopLevelButtons
-        isUserContext={true}
-        size="small"
-        isDisabled={false}
-        onCreateFolderButtonClick={() => {}}
-      />,
-    )
+    renderComponent({isUserContext: true})
 
     const allMyFilesButton = screen.queryByText(/All My Files/i)
     expect(allMyFilesButton).not.toBeInTheDocument()
   })
 
   it('renders upload button last when size is not small', () => {
-    render(
-      <TopLevelButtons
-        isUserContext={false}
-        size="medium"
-        isDisabled={false}
-        onCreateFolderButtonClick={() => {}}
-      />,
-    )
+    renderComponent({size: 'medium'})
 
     const buttons = screen.getAllByRole('button')
     expect(buttons[0]).toHaveTextContent(/All My Files/i)
@@ -66,18 +67,20 @@ describe('TopLevelButtons', () => {
   })
 
   it('renders upload button first when size is small', () => {
-    render(
-      <TopLevelButtons
-        isUserContext={false}
-        size="small"
-        isDisabled={false}
-        onCreateFolderButtonClick={() => {}}
-      />,
-    )
+    renderComponent({size: 'small'})
 
     const buttons = screen.getAllByRole('button')
     expect(buttons[0]).toHaveTextContent(/Upload/i)
     expect(buttons[1]).toHaveTextContent(/Folder/i)
     expect(buttons[2]).toHaveTextContent(/All My Files/i)
+  })
+
+  it('does not render upload or create folder buttons when shouldHideUploadButtons is true', () => {
+    renderComponent({shouldHideUploadButtons: true})
+
+    const uploadButton = screen.queryByText(/Upload/i)
+    const createFolderButton = screen.queryByText(/Folder/i)
+    expect(uploadButton).not.toBeInTheDocument()
+    expect(createFolderButton).not.toBeInTheDocument()
   })
 })

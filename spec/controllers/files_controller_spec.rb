@@ -1974,6 +1974,26 @@ describe FilesController do
         expect(attachment).not_to be_nil
         expect(attachment.shard).to eq @shard1
       end
+
+      it "stores the correct root_account_id on the attachment for a cross-shard account when the context is on the birth shard" do
+        account = @shard1.activate { Account.create! }
+        user = User.create!(name: "me")
+        Attachment.current_root_account = account
+        post "api_capture", params: {
+          user_id: user.global_id,
+          context_type: "User",
+          context_id: user.global_id,
+          token: @token,
+          name: "test.txt",
+          size: 42,
+          content_type: "text/plain",
+          instfs_uuid: 1,
+          folder_id: user.profile_pics_folder.global_id,
+        }
+        assert_status(201)
+        attachment = assigns[:attachment]
+        expect(attachment.root_account_id).to eq account.global_id
+      end
     end
   end
 

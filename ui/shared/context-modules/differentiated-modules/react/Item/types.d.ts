@@ -129,6 +129,7 @@ export interface AssigneeOption {
   value: string
   sisID?: string
   groupCategoryId?: string
+  groupCategoryName?: string
   overrideId?: string
   group?: string
 }

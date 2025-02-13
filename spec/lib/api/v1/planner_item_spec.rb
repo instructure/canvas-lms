@@ -26,6 +26,7 @@ describe Api::V1::PlannerItem do
     teacher_in_course active_all: true
     @reviewer = student_in_course(course: @course, active_all: true).user
     @student = student_in_course(course: @course, active_all: true).user
+    @account = @course.root_account
     for_course = { course: @course }
 
     assignment_quiz [], for_course
@@ -656,7 +657,7 @@ describe Api::V1::PlannerItem do
           course = account.courses.create!
           discussion_topic_model(context: course)
         end
-        json = api.planner_items_json([topic1, topic2], @student, session)
+        json = api.planner_items_json([topic1, topic2], @student, @account, session)
         expect(json.pluck(:plannable_id)).to match_array([topic1.id, topic2.id])
       end
     end
@@ -669,12 +670,12 @@ describe Api::V1::PlannerItem do
     end
 
     it "if use_html_comment true returns submission comments with html tags" do
-      json = api.planner_items_json([@assignment], @student, session, { use_html_comment: true })
+      json = api.planner_items_json([@assignment], @student, @account, session, { use_html_comment: true })
       expect(json.first[:submissions][:feedback][:comment]).to eq("<div>html comment</div>")
     end
 
     it "if use_html_comment false returns submission comments without htl tags" do
-      json = api.planner_items_json([@assignment], @student, session)
+      json = api.planner_items_json([@assignment], @student, @account, session)
       expect(json.first[:submissions][:feedback][:comment]).to eq("html comment")
     end
   end

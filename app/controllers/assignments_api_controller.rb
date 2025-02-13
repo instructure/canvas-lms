@@ -865,8 +865,7 @@ class AssignmentsApiController < ApplicationController
     return unless authorized_action(old_assignment, @current_user, :create)
 
     if target_course.present?
-      course_permission = target_course.root_account.feature_enabled?(:granular_permissions_manage_assignments) ? :manage_assignments_add : :manage_assignments
-      return unless authorized_action(target_course, @current_user, course_permission)
+      return unless authorized_action(target_course, @current_user, :manage_assignments_add)
     end
 
     new_assignment = old_assignment.duplicate(
@@ -1077,7 +1076,7 @@ class AssignmentsApiController < ApplicationController
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
-      if @context.grants_any_right?(user, :manage_assignments, :manage_assignments_edit)
+      if @context.grants_right?(user, :manage_assignments_edit)
         Assignment.preload_can_unpublish(assignments)
       end
 
@@ -1663,7 +1662,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @returns Progress
   def bulk_update
-    return render_json_unauthorized unless @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
+    return render_json_unauthorized unless @context.grants_right?(@current_user, session, :manage_assignments_edit)
 
     data = params.permit(_json: [:id, all_dates: %i[id base due_at unlock_at lock_at]]).to_h[:_json]
     return render json: { message: "expected array" }, status: :bad_request unless data.is_a?(Array)

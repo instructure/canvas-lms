@@ -67,7 +67,18 @@ module.exports = tseslint.config(
       '@typescript-eslint/no-this-alias': 'off',
       '@typescript-eslint/no-unsafe-function-type': 'warn',
       '@typescript-eslint/no-unused-expressions': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
       '@typescript-eslint/no-wrapper-object-types': 'warn',
       'no-undef': 'warn',
     },
@@ -94,7 +105,7 @@ module.exports = tseslint.config(
       'no-unexpected-multiline': 'warn',
       'no-unsafe-optional-chaining': 'warn',
       'no-unused-expressions': 'off',
-      'no-unused-vars': 'warn',
+      'no-unused-vars': 'off', // use @typescript-eslint/no-unused-vars instead
       'no-useless-escape': 'warn',
       'prefer-const': 'warn',
       'prefer-rest-params': 'off',
@@ -167,7 +178,7 @@ module.exports = tseslint.config(
     rules: {
       'import/no-dynamic-require': 'warn',
       'import/no-nodejs-modules': 'warn',
-      'import/no-unresolved': 'warn',
+      'import/no-unresolved': 'off', // not working properly
       'import/named': 'off',
       'import/namespace': 'off',
     },
@@ -235,5 +246,5 @@ module.exports = tseslint.config(
       'jest/valid-expect': 'error',
       'react/no-deprecated': 'warn',
     },
-  }
+  },
 )

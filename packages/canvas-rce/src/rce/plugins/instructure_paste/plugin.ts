@@ -63,7 +63,7 @@ function initStore(initProps) {
         })
         // @ts-expect-error
         .catch(_err => {
-          // eslint-disable-next-line no-console
+           
           console.error('The Paste plugin failed to get canvas session data.')
         })
     } else {
@@ -98,7 +98,7 @@ tinymce.PluginManager.add(
         // In all probability, the file upload will fail too, but I feel like we have to do something here.
         showFlashAlert({
           message: formatMessage(
-            'If Usage Rights are required, the file will not publish until enabled in the Files page.'
+            'If Usage Rights are required, the file will not publish until enabled in the Files page.',
           ),
           type: 'info',
         } as any)
@@ -174,7 +174,7 @@ tinymce.PluginManager.add(
         // @ts-expect-error
         showFlashAlert({
           message: formatMessage(
-            'One or more files failed to paste. Please try uploading or dragging and dropping files.'
+            'One or more files failed to paste. Please try uploading or dragging and dropping files.',
           ),
           type: 'error',
         })
@@ -189,12 +189,12 @@ tinymce.PluginManager.add(
 
         // This will finish once the dialog is closed, if one was created, putting this in a loop allows us
         // to show a dialog for each file without them conflicting.
-        // eslint-disable-next-line no-await-in-loop
+         
         await requestFileInsertion(file)
       }
     }
 
     editor.on('paste', handlePasteOrDrop)
     editor.on('drop', handlePasteOrDrop)
-  }
+  },
 )

@@ -57,7 +57,7 @@ export default {
 
   why: () =>
     formatMessage(
-      'Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table.'
+      'Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table.',
     ),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/H39.html',

@@ -20,6 +20,9 @@ import React from 'react'
 import {QueryProvider} from '@canvas/query'
 import DifferentiationTagTray from './DifferentiationTagTray'
 import {useDifferentiationTagCategoriesIndex} from '../hooks/useDifferentiationTagCategoriesIndex'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('differentiation_tags')
 
 interface DifferentiationTagTrayManagerProps {
   isOpen: boolean
@@ -27,16 +30,21 @@ interface DifferentiationTagTrayManagerProps {
   courseID: number
 }
 
-function DifferentiationTagTrayContainer({
-  isOpen,
-  onClose,
-  courseID,
-}: DifferentiationTagTrayManagerProps) {
+function DifferentiationTagTrayContainer(props: DifferentiationTagTrayManagerProps) {
+  const {isOpen, onClose, courseID} = props
+  const hasValidCourseID = typeof courseID === 'number' && !isNaN(courseID)
+
   const {
     data: differentiationTagCategories,
-    isLoading,
-    error,
-  } = useDifferentiationTagCategoriesIndex(courseID, true)
+    isLoading: isHookLoading,
+    error: hookError,
+  } = useDifferentiationTagCategoriesIndex(courseID, {
+    includeDifferentiationTags: true,
+    enabled: hasValidCourseID,
+  })
+
+  const error = hasValidCourseID ? hookError : new Error(I18n.t('A valid course ID is required.'))
+  const isLoading = hasValidCourseID ? isHookLoading : false
 
   return (
     <DifferentiationTagTray
@@ -56,7 +64,11 @@ export default function DifferentiationTagTrayManager({
 }: DifferentiationTagTrayManagerProps) {
   return (
     <QueryProvider>
-      <DifferentiationTagTrayContainer isOpen={isOpen} onClose={onClose} courseID={courseID} />
+      <DifferentiationTagTrayContainer
+        isOpen={isOpen}
+        onClose={onClose}
+        courseID={Number(courseID)}
+      />
     </QueryProvider>
   )
 }

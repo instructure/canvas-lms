@@ -61,7 +61,7 @@ describe('SVGList', () => {
         expect.stringContaining('art'),
         expect.objectContaining({
           label: 'Art Icon',
-        })
+        }),
       )
     })
   })

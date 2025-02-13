@@ -124,7 +124,7 @@ module Types
 
     field :can_manage, Boolean, null: true
     def can_manage
-      course.grants_any_right?(current_user, :manage_content, :manage_course_content_edit)
+      course.grants_right?(current_user, :manage_course_content_edit)
     end
 
     field :can_read_announcements, Boolean, null: true

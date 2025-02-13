@@ -511,6 +511,22 @@
       </p>
     <% end %>
 
+    <% if @context.account.feature_enabled?(:discussions_speedgrader_revisit) %>
+      <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+        <legend class="ic-Legend"><%= t("Default Discussion View Options") %></legend>
+          <div class="ic-Form-control ic-Form-control--radio">
+          <div class="ic-Radio">
+            <input type="radio" id="discussion_view_no_context" name="default_discussion_view" value="discussion_view_no_context">
+            <label class="ic-Label" for="discussion_view_no_context"><%= t('buttons.discussion_view_no_context', "Show replies without discussion context") %></label>
+          </div>
+          <div class="ic-Radio">
+            <input type="radio" id="discussion_view_with_context" name="default_discussion_view" value="discussion_view_with_context">
+            <label class="ic-Label" for="discussion_view_with_context"><%= t('buttons.discussion_view_with_context', "Show replies in context") %></label>
+          </div>
+        </div>
+      </fieldset>
+    <% end %>
+
     <div class="button-container">
       <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
       <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>

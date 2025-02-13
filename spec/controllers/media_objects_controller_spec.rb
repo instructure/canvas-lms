@@ -1220,7 +1220,7 @@ describe MediaObjectsController do
       it "returns true as long as user can update attachment" do
         teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: @course.root_account.id)
         RoleOverride.create!(
-          permission: "manage_content",
+          permission: "manage_course_content_edit",
           enabled: false,
           role: teacher_role,
           account: @course.root_account

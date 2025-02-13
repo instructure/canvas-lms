@@ -50,7 +50,7 @@ context_modules_header_props = {
     courseId: @context.id,
     runningProgressId: @progress&.id,
     disabled: @modules.empty?,
-    visible: @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
+    visible: @context.grants_right?(@current_user, session, :manage_course_content_edit),
   },
   expandCollapseAll: {
     label: t('Collapse All'),
@@ -111,7 +111,7 @@ context_modules_header_props = {
           </button>
         <% end %>
       <% end %>
-      <% if @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit) %>
+      <% if @context.grants_right?(@current_user, session, :manage_course_content_edit) %>
         <div id="context-modules-publish-menu" data-course-id="<%= @context.id %>" data-progress-id="<%= @progress&.id %>" style="display: inline-block;" data-disabled="<%= @modules.empty? %>"></div>
       <% end %>
       <% if @can_add %>
@@ -121,7 +121,7 @@ context_modules_header_props = {
           <%= t('Module') %>
         </button>
       <% end %>
-      <% if @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add) && (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?) %>
+      <% if @context.grants_right?(@current_user, session, :manage_course_content_add) && (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?) %>
         <div class="inline-block module_index_tools">
           <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#" data-popup-collision="flip">
             <i class="icon-more" aria-hidden="true"></i>
@@ -251,6 +251,32 @@ context_modules_header_props = {
           </td>
         </tr>
         <% end %>
+        <% if @context.horizon_course? %>
+        <tr id="estimated_duration_edit">
+          <td colspan="2">
+            <%= f.blabel :estimated_duration, :en => "Time to Complete" %>
+            <span>
+              <%= f.number_field :estimated_duration_minutes, min: 0, :style => "width: 40px;", id: "estimated_minutes" %>
+              <%= t(:estimated_duration_minutes, "Minutes") %>
+              <button
+                class="Button Button--icon-action-danger"
+                onClick="resetMinutes(event)"
+                title="<%= t(:remove_button_text, "Reset duration minutes") %>"
+                aria-label="<%= t(:remove_button_text, "Reset duration minutes") %>"
+                type="button">
+                <i class="icon-trouble"></i>
+              </button>
+            </span>
+            <script>
+              function resetMinutes(event) {
+                if (event != null) {
+                  event.preventDefault()
+                }
+                document.getElementById('estimated_minutes').value = 0
+              }
+            </script></td>
+        </tr>
+        <% end %>
         <tr class="external">
           <td colspan="2">
             <%= f.check_box :new_tab %>
@@ -325,7 +351,7 @@ context_modules_header_props = {
       <label class="screenreader-only" for="criterion_min_score"><%= t('Minimum Score') %></label>
       <input id="criterion_min_score" type="text" class="min_score" style="width: 30px; margin-<%= direction('right') %>: 5px;"/>
       <span class="points_possible_parent"><%= t 'assignment_points_possible', '/ %{points_possible}', :points_possible => '<span class="points_possible">&nbsp;</span>'.html_safe %></span>
-    </pan>
+    </span>
   </div>
   <%= image_tag "flagged_question_dim.png", :id => "criterion_image_min_score", :class => "image not_blank", :alt => t('images.alt.min_score', "minimum score"), :title => t('images.title.min_score', "Students must get at least a %{min_score} on this item before the module is considered complete", :min_score => "{{ min_score }}") %>
   <%= image_tag "preview_dim.png", :id => "criterion_image_must_view", :class => "image not_blank", :alt => t('images.alt.must_view', "must view"), :title => t('images.title.must_view', "Students must view this item before the module is considered complete") %>

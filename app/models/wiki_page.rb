@@ -62,6 +62,8 @@ class WikiPage < ActiveRecord::Base
   has_many :wiki_page_lookups, inverse_of: :wiki_page
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
   has_one :block_editor, as: :context, dependent: :destroy
+  has_one :estimated_duration, dependent: :destroy, inverse_of: :wiki_page
+
   accepts_nested_attributes_for :block_editor, allow_destroy: true
   acts_as_url :title, sync_url: true
 
@@ -333,7 +335,7 @@ class WikiPage < ActiveRecord::Base
   scope :order_by_id, -> { order(:id) }
 
   def low_level_locked_for?(user, opts = {})
-    return false if opts[:check_policies] && grants_right?(user, :update)
+    return false if opts[:check_policies] && wiki.grants_right?(user, :view_unpublished_items)
 
     RequestCache.cache(locked_request_cache_key(user)) do
       locked = false
@@ -614,6 +616,13 @@ class WikiPage < ActiveRecord::Base
                                                  copy_title: result.title
                                                })
     end
+
+    if estimated_duration
+      # we have to save result here because we need the result.id to create the estimated_duration
+      result.save!
+      result.estimated_duration = EstimatedDuration.new({ wiki_page_id: result.id, duration: estimated_duration.duration.iso8601 })
+    end
+
     result
   end
 

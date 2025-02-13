@@ -27,6 +27,7 @@ import {
   IconEyeLine,
   IconCloudLockLine,
   IconExpandItemsLine,
+  IconPermissionsLine,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -101,13 +102,25 @@ const BulkActionButtons = ({
               </Menu.Item>
 
               {userCanEditFilesForContext && (
-                <Menu.Item data-testid="bulk-actions-manage-access-button">
+                <Menu.Item data-testid="bulk-actions-edit-permissions-button">
+                  <Flex alignItems="center" gap="x-small">
+                    <Flex.Item>
+                      <IconPermissionsLine inline={false} />
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Text>{I18n.t('Edit Permissions')}</Text>
+                    </Flex.Item>
+                  </Flex>
+                </Menu.Item>
+              )}
+              {userCanEditFilesForContext && (
+                <Menu.Item data-testid="bulk-actions-manage-usage-rights-button">
                   <Flex alignItems="center" gap="x-small">
                     <Flex.Item>
                       <IconCloudLockLine inline={false} />
                     </Flex.Item>
                     <Flex.Item>
-                      <Text>{I18n.t('Manage Access')}</Text>
+                      <Text>{I18n.t('Manage Usage Rights')}</Text>
                     </Flex.Item>
                   </Flex>
                 </Menu.Item>

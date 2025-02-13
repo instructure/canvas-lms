@@ -28,7 +28,7 @@ describe('ImageOptionsForm', () => {
     expect(screen.queryByText('Display Options')).not.toBeInTheDocument()
     expect(screen.queryByText('Embed Image')).not.toBeInTheDocument()
     expect(
-      screen.queryByLabelText('Display Text Link (Opens in a new tab)')
+      screen.queryByLabelText('Display Text Link (Opens in a new tab)'),
     ).not.toBeInTheDocument()
   })
 

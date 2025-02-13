@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
@@ -17,15 +18,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  addMruToolId,
-  buildToolMenuItems,
-  externalToolsForToolbar,
-  RceToolWrapper,
-} from '../RceToolWrapper'
+import {addMruToolId, buildToolMenuItems, RceToolWrapper} from '../RceToolWrapper'
 import {createDeepMockProxy} from '../../../../util/__tests__/deepMockProxy'
 import {ExternalToolsEditor, externalToolsEnvFor} from '../ExternalToolsEnv'
 import {IconLtiLine, IconLtiSolid} from '@instructure/ui-icons/es/svg'
+import {externalToolsForToolbar} from '../util/externalToolsForToolbar'
 
 describe('RceExternalToolHelper', () => {
   describe('buttonConfig', () => {
@@ -54,7 +51,7 @@ describe('RceExternalToolHelper', () => {
           description: button.description,
           title: button.name,
           image: expect.stringContaining(button.icon_url),
-        })
+        }),
       )
     })
 
@@ -69,7 +66,7 @@ describe('RceExternalToolHelper', () => {
             favorite: true,
             canvas_icon_class: 'icon-lti',
           },
-          []
+          [],
         )
         expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
         expect(result.iconId).toEqual('lti_tool_b0')
@@ -85,7 +82,7 @@ describe('RceExternalToolHelper', () => {
             favorite: true,
             canvas_icon_class: 'icon_lti',
           },
-          []
+          [],
         )
         expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
         expect(result.iconId).toEqual('lti_tool_b0')
@@ -101,7 +98,7 @@ describe('RceExternalToolHelper', () => {
             favorite: true,
             canvas_icon_class: 'lti',
           },
-          []
+          [],
         )
         expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
         expect(result.iconId).toEqual('lti_tool_b0')
@@ -139,13 +136,13 @@ describe('RceExternalToolHelper', () => {
           description: button.description,
           title: button.name,
           image: button.icon_url,
-        })
+        }),
       )
 
       expect(result).toEqual(
         expect.not.objectContaining({
           icon: expect.anything(),
-        })
+        }),
       )
     })
 
@@ -156,7 +153,7 @@ describe('RceExternalToolHelper', () => {
           name: 'SomeName',
           id: '_SomeId',
         },
-        []
+        [],
       )
       expect(config.title).toEqual('SomeName')
     })
@@ -170,7 +167,7 @@ describe('RceExternalToolHelper', () => {
           icon_url: 'example.com',
           canvas_icon_class: 'some_icon',
         },
-        []
+        [],
       )
       expect(config.iconId).toEqual('lti_tool__SomeId')
       expect(config.image).toEqual('example.com')
@@ -186,7 +183,7 @@ describe('RceExternalToolHelper', () => {
             icon_url: 'example.com',
           },
         },
-        []
+        [],
       )
       expect(config.iconId).toEqual('lti_tool__SomeId')
       expect(config.image).toEqual('example.com')
@@ -203,7 +200,7 @@ describe('RceExternalToolHelper', () => {
             icon_url: 'example2.com',
           },
         },
-        []
+        [],
       )
       expect(config.iconId).toEqual('lti_tool__SomeId')
       expect(config.image).toEqual('example.com')
@@ -219,7 +216,7 @@ describe('RceExternalToolHelper', () => {
             icon_url: {a: 'whatever'},
             canvas_icon_class: {b: 'something else'},
           },
-          []
+          [],
         )
       }).not.toThrow()
     })
@@ -235,8 +232,8 @@ describe('RceExternalToolHelper', () => {
               icon_url: 'example.com',
             },
           ],
-          ['12']
-        ).find(it => it.isMruTool)?.id
+          ['12'],
+        ).find(it => it.isMruTool)?.id,
       ).toBe('12')
 
       expect(
@@ -249,8 +246,8 @@ describe('RceExternalToolHelper', () => {
               icon_url: 'example.com',
             },
           ],
-          ['12']
-        ).find(it => it.isMruTool)?.id
+          ['12'],
+        ).find(it => it.isMruTool)?.id,
       ).toBe('12')
     })
   })
@@ -330,7 +327,7 @@ describe('RceExternalToolHelper', () => {
             favorite: true,
             icon_url: '/path/to/cool_icon',
           },
-          ['1', '2']
+          ['1', '2'],
         ),
         new RceToolWrapper(
           externalToolsEnvFor(fakeEditor),
@@ -341,15 +338,15 @@ describe('RceExternalToolHelper', () => {
             favorite: false,
             icon_url: '/path/to/cool_icon',
           },
-          ['1', '2']
-        )
+          ['1', '2'],
+        ),
       )
     })
     it('creates menu items in alpha order', () => {
       const result = buildToolMenuItems(availableTools, {
         type: 'menuitem',
         text: 'view all',
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
+
         onAction: () => {},
       })
       expect(result[0].text).toEqual('AAA tool')
@@ -372,7 +369,7 @@ describe('RceExternalToolHelper', () => {
         favorite: true,
         icon_url: '/path/to/cool_icon',
       },
-      mruTools
+      mruTools,
     )
 
     const favoriteTool2 = new RceToolWrapper(
@@ -384,7 +381,7 @@ describe('RceExternalToolHelper', () => {
         favorite: true,
         icon_url: '/path/to/cool_icon',
       },
-      mruTools
+      mruTools,
     )
 
     const favoriteTool3 = new RceToolWrapper(
@@ -396,7 +393,7 @@ describe('RceExternalToolHelper', () => {
         favorite: true,
         icon_url: '/path/to/cool_icon',
       },
-      mruTools
+      mruTools,
     )
 
     const onByDefaultTool = new RceToolWrapper(
@@ -409,7 +406,7 @@ describe('RceExternalToolHelper', () => {
         icon_url: '/path/to/cool_icon',
         on_by_default: true,
       },
-      mruTools
+      mruTools,
     )
 
     const regularTool = new RceToolWrapper(
@@ -422,7 +419,7 @@ describe('RceExternalToolHelper', () => {
         on_by_default: false,
         icon_url: '/path/to/cool_icon',
       },
-      mruTools
+      mruTools,
     )
 
     const favoriteAndOn = new RceToolWrapper(
@@ -435,19 +432,27 @@ describe('RceExternalToolHelper', () => {
         on_by_default: true,
         icon_url: '/path/to/cool_icon',
       },
-      mruTools
+      mruTools,
     )
 
     beforeEach(() => {
       fakeEditor = createDeepMockProxy<ExternalToolsEditor>()
-      tools = [favoriteTool, favoriteAndOn, onByDefaultTool, favoriteTool2, favoriteTool3, regularTool, favoriteTool]
+      tools = [
+        favoriteTool,
+        favoriteAndOn,
+        onByDefaultTool,
+        favoriteTool2,
+        favoriteTool3,
+        regularTool,
+        favoriteTool,
+      ]
     })
 
     it('pulls out both favorite and on_by_default tools and deduplicates', () => {
       const result = externalToolsForToolbar(tools)
 
       expect(result.map(e => e.id)).toStrictEqual(
-        [favoriteAndOn, favoriteTool, favoriteTool2].map(e => e.id)
+        [favoriteAndOn, favoriteTool, favoriteTool2].map(e => e.id),
       )
     })
   })

@@ -19,8 +19,13 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {NamingConfirmationWrapper} from '../components/NamingConfirmationWrapper'
-import {mockConfigWithPlacements, mockRegistration} from './helpers'
-import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
+import {
+  mockConfigWithPlacements,
+  mockRegistration,
+  mockToolConfiguration,
+  mockOverlay,
+} from './helpers'
+import {createRegistrationOverlayStore} from '../RegistrationOverlayState'
 import userEvent from '@testing-library/user-event'
 import {LtiPlacements} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
@@ -54,20 +59,9 @@ describe('NamingConfirmation', () => {
   })
 
   it("lets's users change the description", async () => {
-    const reg = mockRegistration(
-      {
-        lti_tool_configuration: {
-          description: 'Foo',
-          claims: [],
-          domain: 'test.com',
-          messages: [],
-          target_link_uri: 'test.com',
-        },
-      },
-      {
-        description: 'Foo',
-      },
-    )
+    const reg = mockRegistration({
+      configuration: mockToolConfiguration({description: 'Foo'}),
+    })
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
     render(<NamingConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
@@ -82,6 +76,32 @@ describe('NamingConfirmation', () => {
     expect(input).toHaveValue(newDescription)
   })
 
+  it('renders the nickname from the registration if it exists', () => {
+    const reg = mockRegistration({
+      admin_nickname: 'Foo',
+    })
+    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+
+    render(<NamingConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
+
+    expect(screen.getByLabelText(/Administration Nickname/i)).toHaveValue('Foo')
+  })
+
+  it('renders the description from the overlay if it exists', () => {
+    const reg = mockRegistration({
+      overlay: mockOverlay({
+        data: {
+          description: 'Bar',
+        },
+      }),
+    })
+    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+
+    render(<NamingConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
+
+    expect(screen.getByLabelText(/Choose a description/i)).toHaveValue('Bar')
+  })
+
   it('excludes disabled placements', () => {
     const placements = [
       LtiPlacements.CourseAssignmentsMenu,
@@ -92,7 +112,7 @@ describe('NamingConfirmation', () => {
     const config = mockConfigWithPlacements(placements)
     const reg = mockRegistration(
       {
-        client_name: 'A Great Little Name',
+        name: 'A Great Little Name',
       },
       config,
     )
@@ -117,7 +137,7 @@ describe('NamingConfirmation', () => {
     const config = mockConfigWithPlacements(placements)
     const reg = mockRegistration(
       {
-        client_name: 'A Great Little Name',
+        name: 'A Great Little Name',
       },
       config,
     )

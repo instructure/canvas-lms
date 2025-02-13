@@ -15,8 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import PropTypes from 'prop-types'
 
-type RequirementType = 'view' | 'mark' | 'submit' | 'score' | 'contribute'
+export const sizeShape = PropTypes.oneOf(['small', 'medium', 'large'])
+
+type RequirementType = 'view' | 'mark' | 'submit' | 'score' | 'contribute' | 'percentage'
+
+export type PointsInputMessages=  Array<{requirementId: string, message: string}>
+
+export type ScoreType = 'score' | 'percentage'
 
 type ResourceType =
   | 'assignment'
@@ -41,6 +48,7 @@ export interface ModuleItem extends Module {
 export interface AssignmentOverride {
   context_module_id: string
   id: string
+  title: string
   students: {
     id: string
     name: string
@@ -48,6 +56,11 @@ export interface AssignmentOverride {
   course_section: {
     id: string
     name: string
+  }
+  group: {
+    id: string
+    group_category_id: string
+    non_collaborative: boolean
   }
 }
 
@@ -59,6 +72,11 @@ interface SectionOverride {
 interface StudentsOverride {
   id?: string
   student_ids: string[]
+}
+
+interface DifferentiationTagOverride {
+  id?: string
+  group_id: string | undefined
 }
 
 export type ItemType =
@@ -80,7 +98,10 @@ export type IconType =
   | 'wiki_page'
   | null
 
-export type AssignmentOverridePayload = SectionOverride | StudentsOverride
+export type AssignmentOverridePayload =
+  | SectionOverride 
+  | StudentsOverride
+  | DifferentiationTagOverride
 
 export type AssignmentOverridesPayload = {
   overrides: AssignmentOverridePayload[]
@@ -98,14 +119,14 @@ interface BaseRequirement extends ModuleItem {
 
 interface AssignmentRequirement extends BaseRequirement {
   resource: 'assignment'
-  type: Extract<RequirementType, 'view' | 'mark' | 'submit' | 'score'>
+  type: Extract<RequirementType, 'view' | 'mark' | 'submit' | 'score' | 'percentage'>
   minimumScore: string
   pointsPossible: null | string
 }
 
 interface QuizRequirement extends BaseRequirement {
   resource: 'quiz'
-  type: Extract<RequirementType, 'view' | 'submit' | 'score'>
+  type: Extract<RequirementType, 'view' | 'submit' | 'score' | 'percentage'>
   minimumScore: string
   pointsPossible: null | string
 }
@@ -122,7 +143,7 @@ interface PageRequirement extends BaseRequirement {
 
 interface DiscussionRequirement extends BaseRequirement {
   resource: 'discussion'
-  type: Extract<RequirementType, 'view' | 'contribute' | 'submit' | 'score'>
+  type: Extract<RequirementType, 'view' | 'contribute' | 'submit' | 'score' | 'percentage'>
   graded: boolean
   minimumScore: string
   pointsPossible: null | string

@@ -45,10 +45,10 @@ export const createErrorMessage = (text: string): FormMessage[] =>
  */
 export const handleRegistrationRedirect = (data: any): void => {
   if (data.destination) {
-    replaceLocation(data.destination)
+    document.location.href = data.destination
   } else if (data.course) {
-    replaceLocation(`/courses/${data.course.course.id}?registration_success=1`)
+    document.location.href = `/courses/${data.course.course.id}?registration_success=1`
   } else {
-    replaceLocation('/?registration_success=1')
+    document.location.href = '/?registration_success=1'
   }
 }

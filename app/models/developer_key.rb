@@ -432,7 +432,7 @@ class DeveloperKey < ActiveRecord::Base
                                              created_by: current_user,
                                              updated_by: current_user,
                                              admin_nickname: name,
-                                             name: tool_configuration&.settings&.dig("title") || "Unnamed tool",
+                                             name: tool_configuration_name,
                                              workflow_state:,
                                              ims_registration:,
                                              skip_lti_sync: true,
@@ -449,12 +449,16 @@ class DeveloperKey < ActiveRecord::Base
       return
     end
 
-    lti_registration.update!(name: tool_configuration&.settings&.dig("title") || "Unnamed tool",
+    lti_registration.update!(name: tool_configuration_name,
                              admin_nickname: name,
                              updated_by: current_user,
                              workflow_state:,
                              skip_lti_sync: true,
                              manual_configuration: referenced_tool_configuration)
+  end
+
+  def tool_configuration_name
+    tool_configuration&.internal_lti_configuration&.dig(:title) || "Unnamed tool"
   end
 
   def validate_lti_fields

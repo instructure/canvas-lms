@@ -56,6 +56,7 @@ describe('CourseCopyForm', () => {
     start_at: startAt,
     end_at: endAt,
     restrict_enrollments_to_course_dates: true,
+    horizon_course: false,
   }
 
   const terms = [
@@ -265,8 +266,11 @@ describe('CourseCopyForm', () => {
             course: {...course, restrict_enrollments_to_course_dates: false},
           })
 
-          expect(getAllByText('Term start and end dates cannot be modified here, only on the Term Details page under Admin.'))
-            .toHaveLength(2)
+          expect(
+            getAllByText(
+              'Term start and end dates cannot be modified here, only on the Term Details page under Admin.',
+            ),
+          ).toHaveLength(2)
         })
       })
 
@@ -292,8 +296,11 @@ describe('CourseCopyForm', () => {
             course: {...course, restrict_enrollments_to_course_dates: true},
           })
 
-          expect(queryByText('Term start and end dates cannot be modified here, only on the Term Details page under Admin.'))
-          .not.toBeInTheDocument()
+          expect(
+            queryByText(
+              'Term start and end dates cannot be modified here, only on the Term Details page under Admin.',
+            ),
+          ).not.toBeInTheDocument()
         })
       })
     })

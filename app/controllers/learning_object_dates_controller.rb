@@ -191,6 +191,7 @@ class LearningObjectDatesController < ApplicationController
     when "Quizzes::Quiz"
       update_quiz(asset, object_update_params.except(:reply_to_topic_due_at, :required_replies_due_at))
     when "DiscussionTopic"
+      asset.overrides_changed = true
       if asset == overridable
         update_ungraded_object(asset, object_update_params)
       else

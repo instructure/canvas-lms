@@ -20,23 +20,21 @@ import React, {FC} from 'react'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import CoursePeopleOptionsMenu from './CoursePeopleOptionsMenu'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const CoursePeopleHeader: FC = () => {
-  const I18n = useI18nScope('course_people')
+const I18n = createI18nScope('course_people')
 
-  return (
-    <Flex justifyItems="space-between" width="100%">
-      <Flex.Item as="div">
-        <Heading data-testid="course-people-header" level="h1">
-          {I18n.t('People')}
-        </Heading>
-      </Flex.Item>
-      <Flex.Item as="div">
-        <CoursePeopleOptionsMenu />
-      </Flex.Item>
-    </Flex>
-  )
-}
+const CoursePeopleHeader: FC = () => (
+  <Flex justifyItems="space-between" width="100%">
+    <Flex.Item as="div">
+      <Heading data-testid="course-people-header" level="h1">
+        {I18n.t('People')}
+      </Heading>
+    </Flex.Item>
+    <Flex.Item as="div">
+      <CoursePeopleOptionsMenu />
+    </Flex.Item>
+  </Flex>
+)
 
 export default CoursePeopleHeader

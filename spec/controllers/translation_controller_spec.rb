@@ -17,57 +17,91 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe TranslationController do
+  let(:context) { instance_double(Course) }
+  let(:params) do
+    {
+      text: "Hello world",
+      src_lang: "en",
+      tgt_lang: "es"
+    }
+  end
+
   before :once do
     @user = user_factory(active_all: true)
     @student = course_with_student(active_all: true).user
   end
 
   before do
-    allow(Translation).to receive_messages(available?: true, create: "translated.")
     allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    allow(Account.site_admin).to receive(:feature_enabled?).with(:ai_translation_improvements).and_return(true)
     user_session(@user)
   end
 
-  it "POST #translate_paragraph" do
-    post :translate_paragraph, params: { course_id: @course.id, inputs: { text: "test text.\nthis is test text.", src_lang: "en", tgt_lang: "es" } }
+  describe "#translate" do
+    before do
+      allow(Translation).to receive_messages(available?: true, translate_html: "translated.")
+      allow(controller).to receive(:user_can_read?).and_return(true)
+    end
 
-    # Should have been two sentences.
-    expect(response).to be_successful
-    expect(Translation).to have_received(:create).exactly(2)
-    expect(response.parsed_body["translated_text"]).to eq("translated.\ntranslated.")
-    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.inbox_compose")
-  end
+    context "when user is unauthorized" do
+      it "renders unauthorized action" do
+        allow(controller).to receive(:user_can_read?).and_return(false)
+        post :translate, params: { course_id: @course.id, inputs: params }
 
-  it "POST #translate" do
-    # Arrange
-    user_session(@student)
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
 
-    # Act
-    post :translate, params: { course_id: @course.id, inputs: { text: "Test text", src_lang: "en", tgt_lang: "es" } }
+    context "feature is not enabled" do
+      it "renders unauthorized action" do
+        allow(Translation).to receive_messages(available?: false)
+        post :translate, params: { course_id: @course.id, inputs: params }
 
-    # Assert
-    expect(response).to be_successful
-    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.discussions")
-    expect(response.parsed_body["translated_text"]).to eq("translated.")
-  end
-
-  describe "POST #translate_message" do
-    it "matches language, no tranlation" do
-      # Act
-      post :translate_message, params: { inputs: { text: "Test text." } }
-
-      # Assert
-      expect(response).to be_successful
-      expect(response.parsed_body["status"]).to eq("language_matches")
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
 
     it "logs the metric" do
-      # Act
-      post :translate_message, params: { inputs: { text: "¿Dónde está el baño?" } }
+      post :translate, params: { course_id: @course.id, inputs: params }
 
-      # Assert
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.inbox")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.discussions")
+    end
+
+    it "responds with translated message" do
+      post :translate, params: { course_id: @course.id, inputs: params }
+
+      expect(response).to be_successful
+      expect(response.parsed_body["translated_text"]).to eq("translated.")
+    end
+  end
+
+  describe "#translate_paragraph" do
+    before do
+      allow(Translation).to receive_messages(available?: true, translate_text: "translated.")
+    end
+
+    context "feature is not enabled" do
+      it "renders unauthorized action" do
+        allow(Translation).to receive_messages(available?: false)
+        post :translate_paragraph, params: { course_id: @course.id, inputs: params }
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    it "logs the metric" do
+      post :translate_paragraph, params: { course_id: @course.id, inputs: params }
+
+      expect(response).to be_successful
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.inbox_compose")
+    end
+
+    it "responds with translated message" do
+      post :translate_paragraph, params: { course_id: @course.id, inputs: params }
+
+      expect(response).to be_successful
+      expect(response.parsed_body["translated_text"]).to eq("translated.")
     end
   end
 end

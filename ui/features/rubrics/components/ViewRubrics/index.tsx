@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {queryClient, useQuery} from '@canvas/query'
+import {queryClient, useAllPages, useQuery} from '@canvas/query'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
@@ -47,6 +47,7 @@ import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {type FetchUsedLocationResponse, UsedLocationsModal} from './UsedLocationsModal'
 import {ImportRubric} from './ImportRubric'
 import {colors} from '@instructure/canvas-theme'
+import {InfiniteData} from '@tanstack/react-query'
 
 const {Item: FlexItem} = Flex
 
@@ -62,6 +63,10 @@ export type ViewRubricsProps = {
   canImportExportRubrics?: boolean
   showHeader?: boolean
 }
+
+const rubricsFromPage = (page: RubricQueryResponse) => (page ? page.rubricsConnection.nodes : [])
+const rubricsFromPages = (resp: InfiniteData<RubricQueryResponse>) =>
+  resp?.pages.flatMap(rubricsFromPage)
 
 export const ViewRubrics = ({
   canManageRubrics = false,
@@ -108,7 +113,7 @@ export const ViewRubrics = ({
       }
       setActiveRubrics(updatedActiveRubrics)
       showFlashSuccess(I18n.t('Rubric archived successfully'))()
-    } catch (error) {
+    } catch (_error) {
       showFlashError(I18n.t('Error Archiving Rubric'))()
     }
   }
@@ -124,13 +129,16 @@ export const ViewRubrics = ({
       }
       setArchivedRubrics(updatedArchivedRubrics)
       showFlashSuccess(I18n.t('Rubric un-archived successfully'))()
-    } catch (error) {
+    } catch (_error) {
       showFlashError(I18n.t('Error Un-Archiving Rubric'))()
     }
   }
 
   let queryVariables: FetchRubricVariables
-  let fetchQuery: (queryVariables: FetchRubricVariables) => Promise<RubricQueryResponse>
+  let fetchQuery: (
+    pageParam: string | null,
+    queryVariables: FetchRubricVariables,
+  ) => Promise<RubricQueryResponse>
   let queryKey: string = ''
 
   if (isAccount) {
@@ -143,9 +151,17 @@ export const ViewRubrics = ({
     queryKey = `courseRubrics-${courseId}`
   }
 
-  const {data, isLoading} = useQuery({
+  const getNextPageParam = (lastPage: RubricQueryResponse) => {
+    const {pageInfo} = lastPage.rubricsConnection
+    return pageInfo.hasNextPage ? pageInfo.endCursor : null
+  }
+
+  const {data: paginatedRubrics, isLoading} = useAllPages({
     queryKey: [queryKey],
-    queryFn: async () => fetchQuery(queryVariables),
+    queryFn: async ({pageParam}) => fetchQuery(pageParam, queryVariables),
+    meta: {fetchAtLeastOnce: true},
+    refetchOnMount: true,
+    getNextPageParam,
   })
 
   const {data: rubricPreview, isLoading: isLoadingPreview} = useQuery({
@@ -154,43 +170,49 @@ export const ViewRubrics = ({
     enabled: !!rubricIdForPreview,
   })
 
-  useEffect(() => {
-    if (data) {
-      const {activeRubricsInitialState, archivedRubricsInitialState} =
-        data.rubricsConnection.nodes.reduce(
-          (prev, curr) => {
-            const rubric: Rubric = {
-              id: curr.id,
-              title: curr.title,
-              pointsPossible: curr.pointsPossible,
-              criteriaCount: curr.criteriaCount,
-              ratingOrder: curr.ratingOrder,
-              hidePoints: curr.hidePoints,
-              freeFormCriterionComments: curr.freeFormCriterionComments,
-              workflowState: curr.workflowState,
-              buttonDisplay: curr.buttonDisplay,
-              criteria: curr.criteria ?? [],
-              hasRubricAssociations: curr.hasRubricAssociations,
-            }
+  const rubrics = useMemo(
+    () => paginatedRubrics && rubricsFromPages(paginatedRubrics),
+    [paginatedRubrics],
+  )
 
-            const activeStates = ['active', 'draft']
-            activeStates.includes(curr.workflowState ?? '')
-              ? prev.activeRubricsInitialState.push(rubric)
-              : prev.archivedRubricsInitialState.push(rubric)
-            return prev
-          },
-          {activeRubricsInitialState: [] as Rubric[], archivedRubricsInitialState: [] as Rubric[]},
-        )
+  useEffect(() => {
+    if (rubrics) {
+      const {activeRubricsInitialState, archivedRubricsInitialState} = rubrics.reduce(
+        (prev, curr) => {
+          const rubric: Rubric = {
+            id: curr.id,
+            title: curr.title,
+            pointsPossible: curr.pointsPossible,
+            criteriaCount: curr.criteriaCount,
+            ratingOrder: curr.ratingOrder,
+            hidePoints: curr.hidePoints,
+            freeFormCriterionComments: curr.freeFormCriterionComments,
+            workflowState: curr.workflowState,
+            buttonDisplay: curr.buttonDisplay,
+            criteria: curr.criteria ?? [],
+            hasRubricAssociations: curr.hasRubricAssociations,
+          }
+
+          const activeStates = ['active', 'draft']
+          if (activeStates.includes(curr.workflowState ?? '')) {
+            prev.activeRubricsInitialState.push(rubric)
+          } else {
+            prev.archivedRubricsInitialState.push(rubric)
+          }
+          return prev
+        },
+        {activeRubricsInitialState: [] as Rubric[], archivedRubricsInitialState: [] as Rubric[]},
+      )
       setActiveRubrics(activeRubricsInitialState)
       setArchivedRubrics(archivedRubricsInitialState)
     }
-  }, [data])
+  }, [rubrics])
 
   if (isLoading) {
     return <LoadingIndicator />
   }
 
-  if (!data) {
+  if (!rubrics) {
     return null
   }
 

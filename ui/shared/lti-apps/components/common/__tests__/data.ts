@@ -21,7 +21,7 @@ import type {Product, Company, Lti, Badges, Tag} from '../../../models/Product'
 const company: Company = {
   id: 2,
   name: 'Instructure',
-  company_url: 'google.com',
+  company_url: 'instructure.com',
 }
 
 const canvas_lti_configurations: Lti[] = [
@@ -46,7 +46,7 @@ const product: Product[] = [
     global_product_id: '1',
     name: 'Product 1',
     company,
-    logo_url: 'google.com',
+    logo_url: 'logourl.com',
     tagline: 'Product 1 tagline',
     description: 'Product 1 description',
     updated_at: '2024-01-01',
@@ -54,10 +54,10 @@ const product: Product[] = [
     integration_resources: {comments: null, resources: []},
     badges,
     screenshots: ['greatimage'],
-    terms_of_service_url: 'google.com',
-    privacy_policy_url: 'google.com',
-    accessibility_url: 'google.com',
-    support_url: 'google.com',
+    terms_of_service_url: 'tos.com',
+    privacy_policy_url: 'privacypolicy.com',
+    accessibility_url: 'accessibility.com',
+    support_url: 'support.com',
     tags,
   },
 ]

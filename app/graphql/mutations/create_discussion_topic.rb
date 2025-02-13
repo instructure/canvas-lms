@@ -69,7 +69,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
     # TODO: return an error when user tries to create a graded anonymous discussion
 
-    if input[:todo_date] && !discussion_topic_context.grants_any_right?(current_user, session, :manage_content, :manage_course_content_add)
+    if input[:todo_date] && !discussion_topic_context.grants_right?(current_user, session, :manage_course_content_add)
       return validation_error(I18n.t("You do not have permission to add this topic to the student to-do list."))
     end
 
@@ -120,6 +120,11 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       unless invalid_sections.empty?
         return validation_error(I18n.t("You do not have permissions to modify discussion for section(s) %{section_ids}", section_ids: invalid_sections.join(", ")))
       end
+    end
+
+    # Validating default expand input data
+    if input.key?(:expanded) && input.key?(:expanded_locked) && (!input[:expanded] && input[:expanded_locked])
+      return validation_error(I18n.t("Cannot set default thread state locked, when threads are collapsed"))
     end
 
     process_common_inputs(input, is_announcement, discussion_topic)

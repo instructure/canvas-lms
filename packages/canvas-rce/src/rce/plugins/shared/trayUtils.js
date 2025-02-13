@@ -20,6 +20,10 @@ const MASQUERADE_SELECTOR = 'body.is-masquerading-or-student-view'
 
 let trayHeight = null
 
+export const resetTrayHeight = () => {
+  trayHeight = null
+}
+
 // Adjusts the height that slide-out trays should take up based on the presence
 // or absence of the masquerade bottom bar. Caches the result of this check
 // forever, since we always reload the bundle when you enter/leave masquerade.

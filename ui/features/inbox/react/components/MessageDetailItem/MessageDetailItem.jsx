@@ -34,9 +34,6 @@ import {ConversationContext} from '../../../util/constants'
 import {MediaAttachment} from '@canvas/message-attachments'
 import {formatMessage, containsHtmlTags} from '@canvas/util/TextHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Spinner} from '@instructure/ui-spinner'
-import {translationSeparator} from '../../utils/constants'
-import {translateInboxMessage} from '../../utils/inbox_translator'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 
 const I18n = createI18nScope('conversations_2')
@@ -48,55 +45,11 @@ export const MessageDetailItem = ({...props}) => {
   const {
     conversationMessage: {mediaComment} = {},
   } = props
-  const [translatedMessage, setTranslatedMessage] = useState('')
-  const [translationError, setTranslationError] = useState('')
-  const [isTranslating, setIsTranslating] = useState(false)
-  const translateInboundMessage = ENV?.inbox_translation_enabled
   const isMessageHtml = containsHtmlTags(props.conversationMessage?.htmlBody)
 
-  useEffect(() => {
-    if (translateInboundMessage == null || !translateInboundMessage) {
-      return
-    }
-
-    // We've already translated
-    if (translatedMessage !== '') {
-      return
-    }
-
-    // Should translate here, check the body for the separator.
-    // If we have the separator in the message, don't translate.
-    if (props.conversationMessage?.body.includes(translationSeparator)) {
-      return
-    }
-
-    const doTranslation = async () => {
-      setIsTranslating(true)
-      setTranslationError('')
-
-      try {
-        // Send the translation call to the backend.
-        const translated_text = await translateInboxMessage(props.conversationMessage?.body)
-
-        if (translated_text) {
-          setTranslatedMessage(translationSeparator.concat(translated_text))
-        }
-      } catch {
-        setTranslationError(I18n.t('Error while trying to translate message'))
-      } finally {
-        setIsTranslating(false)
-      }
-    }
-
-    doTranslation()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [translatedMessage])
-
-  const messageBody = (
-    isMessageHtml
+  const messageBody = isMessageHtml
       ? sanitizeHtml(props.conversationMessage?.htmlBody)
       : formatMessage(props.conversationMessage?.body)
-  ).concat(translatedMessage)
   return (
     <Responsive
       match="media"
@@ -178,21 +131,6 @@ export const MessageDetailItem = ({...props}) => {
               </Flex.Item>
             )}
           </Flex>
-          {isTranslating && (
-            <Flex justifyItems="start">
-              <Flex.Item>
-                <Spinner renderTitle={I18n.t('Translating')} size="x-small" />
-              </Flex.Item>
-              <Flex.Item margin="0 0 0 x-small">
-                <Text>{I18n.t('Checking for Translation')}</Text>
-              </Flex.Item>
-            </Flex>
-          )}
-          {!isTranslating && translationError && (
-            <Alert variant="error" margin="small" timeout={3000}>
-              {translationError}
-            </Alert>
-          )}
           <Text
             wrap="break-word"
             size={responsiveProps.messageBody}

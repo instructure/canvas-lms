@@ -42,10 +42,17 @@ module Types
   class SubmissionType < ApplicationObjectType
     graphql_name "Submission"
 
+    include GraphQLHelpers::AnonymousGrading
+
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::SubmissionInterface
     implements Interfaces::LegacyIDInterface
+
+    def initialize(object, context)
+      super
+      anonymous_grading_scoped_context(object)
+    end
 
     global_id_field :id
 
@@ -62,17 +69,26 @@ module Types
 
     field :user_id, ID, null: true
     def user_id
-      load_association(:course).then do
-        load_association(:assignment).then do
-          if !Account.site_admin.feature_enabled?(:graphql_honor_anonymous_grading) ||
-             !(object.course.grants_right?(current_user, :manage_grades) && object.assignment.anonymize_students?)
-            object.user_id
-          end
-        end
-      end
+      unless_hiding_user_for_anonymous_grading { object.user_id }
     end
 
     field :anonymous_id, ID, null: true
+
+    field :enrollments_connection, EnrollmentType.connection_type, null: true
+    def enrollments_connection
+      load_association(:course).then do |course|
+        return nil unless course.grants_any_right?(
+          current_user,
+          session,
+          :read_roster,
+          :view_all_grades,
+          :manage_grades
+        )
+
+        scope = course.apply_enrollment_visibility(course.all_enrollments, current_user, include: :inactive)
+        scope.where(user_id: submission.user_id)
+      end
+    end
 
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}

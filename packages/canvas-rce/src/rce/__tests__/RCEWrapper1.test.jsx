@@ -20,13 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import FakeEditor from './FakeEditor'
 
-import RCEWrapper, {
-  mergeMenu,
-  mergeMenuItems,
-  mergePlugins,
-  mergeToolbar,
-  parsePluginsToExclude,
-} from '../RCEWrapper'
+import RCEWrapper from '../RCEWrapper'
 
 const textareaId = 'myUniqId'
 const canvasOrigin = 'https://canvas:3000'

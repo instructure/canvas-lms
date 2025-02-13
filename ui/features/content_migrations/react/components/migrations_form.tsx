@@ -20,7 +20,7 @@ import React, {useEffect, useState, useCallback, useMemo} from 'react'
 import type {SetStateAction, Dispatch} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
@@ -33,9 +33,9 @@ import ZipFileImporter from './migrator_forms/zip_file'
 import type {
   AttachmentProgressResponse,
   ContentMigrationItem,
-  Migrator,
   onSubmitMigrationFormCallback,
   MigrationCreateRequestBody,
+  Migrator,
 } from './types'
 import CommonCartridgeImporter from './migrator_forms/common_cartridge'
 import MoodleZipImporter from './migrator_forms/moodle_zip'
@@ -45,6 +45,7 @@ import D2LImporter from './migrator_forms/d2l_importer'
 import AngelImporter from './migrator_forms/angel_importer'
 import BlackboardImporter from './migrator_forms/blackboard_importer'
 import ExternalToolImporter from './migrator_forms/external_tool_importer'
+import { compareMigrators } from './utils'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
@@ -177,6 +178,7 @@ export const ContentMigrationsForm = ({
         const overriddenJson = overrideDefaultWorkflowState(json as ContentMigrationItem)
         setMigrations(prevMigrations => [overriddenJson].concat(prevMigrations))
       }
+      showFlashSuccess(I18n.t('Content migration queued.'))()
     },
     [chosenMigrator, handleFileProgress, onResetForm, setMigrations],
   )
@@ -190,9 +192,7 @@ export const ContentMigrationsForm = ({
         // TODO: webct_scraper is not supported anymore, this should be removed from backend too.
         const filteredMigrators = response.json.filter((m: Migrator) => m.type !== 'webct_scraper')
         setMigrators(
-          filteredMigrators.sort((a: Migrator, _: Migrator) =>
-            a.type === 'course_copy_importer' || a.type === 'canvas_cartridge_importer' ? -1 : 0,
-          ),
+          filteredMigrators.sort(compareMigrators),
         )
       })
       .catch(showFlashError(I18n.t("Couldn't load migrators")))

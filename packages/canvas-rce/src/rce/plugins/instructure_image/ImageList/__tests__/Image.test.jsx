@@ -107,7 +107,7 @@ describe('RCE "Images" Plugin > Image', () => {
         event => {
           Object.assign(event, {preventDefault})
         },
-        true
+        true,
       )
       fireEvent.click(getImage())
       expect(preventDefault).toHaveBeenCalledTimes(1)

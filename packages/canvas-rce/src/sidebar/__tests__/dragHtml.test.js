@@ -80,7 +80,7 @@ describe('dragHtml', () => {
       dragHtml(ev, html)
       expect(ev.dataTransfer.setData).toHaveBeenCalledWith(
         'Text',
-        `data:text/mce-internal,rcs-sidebar,${escape(html)}`
+        `data:text/mce-internal,rcs-sidebar,${escape(html)}`,
       )
     })
 

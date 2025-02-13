@@ -72,6 +72,11 @@ class MissingPolicyApplicator
         workflow_state: "graded"
       )
 
+      # For items where we need to use the missing values right away to trigger a conditional release rule
+      if !assignment.post_manually? && assignment.queue_conditional_release_grade_change_handler?
+        submissions.each(&:queue_conditional_release_grade_change_handler)
+      end
+
       if assignment.checkpoint?
         submissions.each(&:aggregate_checkpoint_submissions)
       end

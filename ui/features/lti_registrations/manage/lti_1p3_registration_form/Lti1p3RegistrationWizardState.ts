@@ -137,13 +137,13 @@ export const createLti1p3RegistrationWizardState = ({
         internalConfig,
       )
 
-      const result = await service.updateLtiRegistration(
+      const result = await service.updateLtiRegistration({
         accountId,
         registrationId,
-        config,
+        internalConfig: config,
         overlay,
-        get().state.overlayStore.getState().state.naming.nickname,
-      )
+        adminNickname: get().state.overlayStore.getState().state.naming.nickname,
+      })
 
       if (isSuccessful(result)) {
         onSuccessfulUpdate()

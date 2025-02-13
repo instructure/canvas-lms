@@ -19,18 +19,12 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {responsiveQuerySizes} from '../../../../util/utils'
-import {translateInboxMessage} from '../../../utils/inbox_translator'
 import {MessageDetailItem} from '../MessageDetailItem'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
   responsiveQuerySizes: jest.fn(),
-}))
-
-jest.mock('../../../utils/inbox_translator', () => ({
-  ...jest.requireActual('../../../utils/inbox_translator'),
-  translateInboxMessage: jest.fn(),
 }))
 
 const defaultProps = {
@@ -364,7 +358,7 @@ describe('MessageDetailItem', () => {
         }))
       })
 
-      it('Should emite correct Mobile Test Id', async () => {
+      it('Should emit correct Mobile Test Id', async () => {
         const {findByTestId} = setup()
         const item = await findByTestId('message-detail-item-mobile')
         expect(item).toBeTruthy()
@@ -378,7 +372,7 @@ describe('MessageDetailItem', () => {
         }))
       })
 
-      it('Should emite correct Tablet Test Id', async () => {
+      it('Should emit correct Tablet Test Id', async () => {
         const {findByTestId} = setup()
         const item = await findByTestId('message-detail-item-tablet')
         expect(item).toBeTruthy()
@@ -392,25 +386,11 @@ describe('MessageDetailItem', () => {
         }))
       })
 
-      it('Should emite correct Desktop Test Id', async () => {
+      it('Should emit correct Desktop Test Id', async () => {
         const {findByTestId} = setup()
         const item = await findByTestId('message-detail-item-desktop')
         expect(item).toBeTruthy()
       })
-    })
-
-    describe('AI Translation', () => {
-      it('Should show an Alert if a translation error happens', async () => {
-        translateInboxMessage.mockImplementation(() => {
-          throw new Error('Some translation error')
-        })
-
-        const {getByText} = setup({body: 'Egy uzenet mas (angoltol eltero) nyelven.'})
-
-        setTimeout(() => {
-          expect(getByText('Error while trying to translate message')).toBeInTheDocument()
-        })
-      }, 1000)
     })
   })
 })

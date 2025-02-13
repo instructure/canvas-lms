@@ -226,6 +226,10 @@ $(() => {
       courseID: ENV.COURSE_ID,
       assetType: 'Assignment',
       assetID: ENV.ASSIGNMENT_ID,
+      onFetchSuccess: () => {
+        $('.module-sequence-footer-right').prepend($('#mark-as-done-container'))
+        $('#mark-as-done-container').css({'margin-right': '4px'})
+      },
       location: window.location,
     })
   })

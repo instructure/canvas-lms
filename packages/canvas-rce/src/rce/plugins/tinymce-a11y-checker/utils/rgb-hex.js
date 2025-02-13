@@ -20,7 +20,7 @@
  * This file is taken from the rgb-hex npm module to ensure it is transpiled.
  */
 
-module.exports = (red, green, blue, alpha) => {
+export default (red, green, blue, alpha) => {
   const isPercent = (red + (alpha || '')).toString().includes('%')
 
   if (typeof red === 'string') {
@@ -53,12 +53,11 @@ module.exports = (red, green, blue, alpha) => {
     } else {
       throw new TypeError(`Expected alpha value (${alpha}) as a fraction or percentage`)
     }
-    // eslint-disable-next-line no-bitwise
+
     alpha = (alpha | (1 << 8)).toString(16).slice(1)
   } else {
     alpha = ''
   }
 
-  // eslint-disable-next-line no-bitwise
   return (blue | (green << 8) | (red << 16) | (1 << 24)).toString(16).slice(1) + alpha
 }

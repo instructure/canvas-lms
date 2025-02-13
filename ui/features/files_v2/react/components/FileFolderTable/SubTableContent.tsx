@@ -25,20 +25,61 @@ import {IconUploadLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {List} from '@instructure/ui-list'
 
 const I18n = createI18nScope('files_v2')
 
 interface SubTableContentProps {
   isLoading: boolean
   isEmpty: boolean
+  searchString: string
 }
 
-const SubTableContent = ({isLoading, isEmpty}: SubTableContentProps) => {
-  return isLoading ? (
-    <Flex as="div" alignItems="center" justifyItems="center" padding="medium">
-      <Spinner renderTitle={I18n.t('Loading data')} />
-    </Flex>
-  ) : (
+const SubTableContent = ({isLoading, isEmpty, searchString}: SubTableContentProps) => {
+  if (isLoading) {
+    return (
+      <Flex as="div" alignItems="center" justifyItems="center" padding="medium">
+        <Spinner renderTitle={I18n.t('Loading data')} />
+      </Flex>
+    )
+  }
+
+  if (isEmpty && searchString) {
+    return (
+      <View as="div" padding="medium 0 0 0">
+        <div>
+          <Heading level="h3" margin="0 0 small 0">
+            {I18n.t('No Results')}
+          </Heading>
+        </div>
+        <div>
+          <Text>
+            {I18n.t('We could not find anything that matches "{{searchString}}" in files.', {
+              searchString,
+            })}
+          </Text>
+        </div>
+        <div>
+          <Heading level="h4" margin="small 0 small 0">
+            {I18n.t('Suggestions:')}
+          </Heading>
+        </div>
+        <List margin="0 0 medium">
+          <List.Item>
+            <Text>{I18n.t('Check spelling')}</Text>
+          </List.Item>
+          <List.Item>
+            <Text>{I18n.t('Try different keywords')}</Text>
+          </List.Item>
+          <List.Item>
+            <Text>{I18n.t('Enter at least 2 letters in the search box')}</Text>
+          </List.Item>
+        </List>
+      </View>
+    )
+  }
+
+  return (
     <View as="div" padding="large none none none">
       {isEmpty && (
         <FileDrop

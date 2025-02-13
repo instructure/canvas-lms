@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../lti_1_3_spec_helper"
 require_relative "../lib/token_scopes/last_known_accepted_scopes"
 require_relative "../lib/token_scopes/spec_helper"
 
@@ -42,6 +41,12 @@ describe DeveloperKey do
       email: "test@test.com",
       redirect_uri: "http://test.com"
     )
+  end
+
+  let(:public_jwk) do
+    key_hash = CanvasSecurity::RSAKeyPair.new.public_jwk.to_h
+    key_hash["kty"] = key_hash["kty"].to_s
+    key_hash
   end
 
   describe "#tokens_expire_in" do
@@ -212,11 +217,6 @@ describe DeveloperKey do
   end
 
   describe "default values for is_lti_key" do
-    let(:public_jwk) do
-      key_hash = CanvasSecurity::RSAKeyPair.new.public_jwk.to_h
-      key_hash["kty"] = key_hash["kty"].to_s
-      key_hash
-    end
     let(:public_jwk_url) { "https://hello.world.com" }
 
     it "throws error if public jwk and public jwk are absent" do
@@ -581,7 +581,7 @@ describe DeveloperKey do
           ContextExternalTool
             .where(id: tool.id)
             .update_all(context_id: Course.last&.id.to_i + 1, context_type: "Course")
-          developer_key.tool_configuration.configuration["oidc_initiation_url"] = "example.com"
+          developer_key.tool_configuration.oidc_initiation_url = "example.com"
           developer_key.tool_configuration.save!
           update_external_tools
           run_jobs
@@ -657,7 +657,6 @@ describe DeveloperKey do
 
   describe "site_admin_lti scope" do
     specs_require_sharding
-    include_context "lti_1_3_spec_helper"
 
     context "when root account and site admin keys exist" do
       subject do
@@ -689,10 +688,7 @@ describe DeveloperKey do
       let(:lti_site_admin_key) do
         Account.site_admin.shard.activate do
           k = DeveloperKey.create!(skip_lti_sync: true)
-          Lti::ToolConfiguration.create!(
-            developer_key: k,
-            settings: settings.merge(public_jwk: tool_config_public_jwk)
-          )
+          lti_tool_configuration_model(developer_key: k)
           k
         end
       end
@@ -904,7 +900,8 @@ describe DeveloperKey do
       end
 
       describe "after_update" do
-        include_context "lti_1_3_spec_helper"
+        let_once(:developer_key) { lti_developer_key_model(account:) }
+        let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration) }
 
         let(:user) { user_model }
         let(:developer_key_with_scopes) do
@@ -1028,7 +1025,6 @@ describe DeveloperKey do
           )
         end
 
-        include_context "lti_1_3_spec_helper"
         specs_require_sharding
 
         context "when developer key is an LTI key" do
@@ -1132,7 +1128,8 @@ describe DeveloperKey do
     end
 
     describe "after_save" do
-      include_context "lti_1_3_spec_helper"
+      let_once(:developer_key) { lti_developer_key_model(account:) }
+      let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration) }
 
       before do
         developer_key_not_saved.tool_configuration = tool_configuration.dup

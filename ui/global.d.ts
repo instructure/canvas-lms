@@ -133,6 +133,7 @@ declare global {
       required: string[]
       success: (data: any) => void
       beforeSubmit?: (data: any) => void
+      error?: (data: JQuery.jqXHR) => void
     }) => void
     formErrors: (errors: Record<string, string>) => void
     getTemplateData: (options: {textValues: string[]}) => Record<string, unknown>

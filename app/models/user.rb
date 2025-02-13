@@ -87,6 +87,7 @@ class User < ActiveRecord::Base
 
   has_many :enrollments, dependent: :destroy
   has_many :course_paces, dependent: :destroy
+  has_many :course_reports, dependent: :destroy
 
   has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }, class_name: "Enrollment", multishard: true
   has_many :not_removed_enrollments, -> { where.not(workflow_state: %w[rejected deleted inactive]) }, class_name: "Enrollment", multishard: true
@@ -172,6 +173,7 @@ class User < ActiveRecord::Base
   has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", "deleted").order(:display_name).preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: "Attachment"
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Assignment"
   has_many :mentions, inverse_of: :user
+  has_many :discussion_entries
   has_many :discussion_entry_drafts, inverse_of: :user
   has_many :discussion_entry_versions, inverse_of: :user
   has_many :all_attachments, as: "context", class_name: "Attachment"
@@ -1357,7 +1359,6 @@ class User < ActiveRecord::Base
       read_files
       read_as_admin
       manage
-      manage_content
       manage_course_content_add
       manage_course_content_edit
       manage_course_content_delete
@@ -3000,6 +3001,10 @@ class User < ActiveRecord::Base
                       favorites + courses.reject { |c| can_favorite.call(c) }
                     end
     ActiveRecord::Associations.preload(@menu_courses, :enrollment_term)
+    @menu_courses = @menu_courses.reject do |c|
+      is_student = roles(c.root_account).all? { |role| ["student", "user"].include?(role) }
+      is_student && c.horizon_course?
+    end
     @menu_courses
   end
 

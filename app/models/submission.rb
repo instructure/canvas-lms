@@ -2129,24 +2129,24 @@ class Submission < ActiveRecord::Base
       end
       self.class.connection.after_transaction_commit do
         Auditors::GradeChange.record(submission: self, skip_insert: !grade_changed)
-        queue_conditional_release_grade_change_handler if grade_changed || (force_audit && posted_at.present?)
+        maybe_queue_conditional_release_grade_change_handler if grade_changed || (force_audit && posted_at.present?)
       end
     end
   end
 
   def queue_conditional_release_grade_change_handler
+    strand = "conditional_release_grade_change:#{global_assignment_id}"
+    ConditionalRelease::OverrideHandler.delay_if_production(priority: Delayed::LOW_PRIORITY, strand:)
+                                       .handle_grade_change(self)
+    assignment&.delay_if_production(strand:)&.multiple_module_actions([user_id], :scored, score)
+  end
+
+  def maybe_queue_conditional_release_grade_change_handler
     shard.activate do
       return unless graded? && posted?
-      # use request caches to handle n+1's when updating a lot of submissions in the same course in one request
-      return unless RequestCache.cache("conditional_release_feature_enabled", course_id) do
-        course.conditional_release?
-      end
 
-      if ConditionalRelease::Rule.is_trigger_assignment?(assignment)
-        strand = "conditional_release_grade_change:#{global_assignment_id}"
-        ConditionalRelease::OverrideHandler.delay_if_production(priority: Delayed::LOW_PRIORITY, strand:)
-                                           .handle_grade_change(self)
-        assignment&.delay_if_production(strand:)&.multiple_module_actions([user_id], :scored, score)
+      if assignment.present? && assignment.queue_conditional_release_grade_change_handler?
+        queue_conditional_release_grade_change_handler
       end
     end
   end
@@ -2942,7 +2942,8 @@ class Submission < ActiveRecord::Base
     effective_attempt = (attempt == 0) ? nil : attempt
 
     rubric_assessments.each_with_object([]) do |assessment, assessments_for_attempt|
-      if assessment.artifact_attempt == effective_attempt
+      # Always return self-assessments and assessments for the effective attempt
+      if assessment.artifact_attempt == effective_attempt || assessment.assessment_type == "self_assessment"
         assessments_for_attempt << assessment
       else
         version = assessment.versions.find { |v| v.model.artifact_attempt == effective_attempt }
@@ -3152,7 +3153,7 @@ class Submission < ActiveRecord::Base
 
   def partially_submitted?
     return false if assignment.nil?
-    return false unless assignment.checkpoints_parent?
+    return false unless assignment.has_sub_assignments?
 
     assignment.sub_assignments.each do |sub_assignment|
       return true if sub_assignment.submissions.where(user_id:, submission_type: "discussion_topic").where.not(submitted_at: nil).exists?

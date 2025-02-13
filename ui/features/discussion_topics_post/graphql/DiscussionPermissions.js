@@ -29,7 +29,6 @@ export const DiscussionPermissions = {
       rate
       read
       readAsAdmin
-      manageContent
       manageCourseContentAdd
       manageCourseContentEdit
       manageCourseContentDelete
@@ -57,7 +56,6 @@ export const DiscussionPermissions = {
     rate: bool,
     read: bool,
     readAsAdmin: bool,
-    manageContent: bool,
     manageCourseContentAdd: bool,
     manageCourseContentEdit: bool,
     manageCourseContentDelete: bool,
@@ -84,7 +82,6 @@ export const DiscussionPermissions = {
     rate = true,
     read = true,
     readAsAdmin = true,
-    manageContent = true,
     manageCourseContentAdd = true,
     manageCourseContentEdit = true,
     manageCourseContentDelete = true,
@@ -109,7 +106,6 @@ export const DiscussionPermissions = {
     rate,
     read,
     readAsAdmin,
-    manageContent,
     manageCourseContentAdd,
     manageCourseContentEdit,
     manageCourseContentDelete,

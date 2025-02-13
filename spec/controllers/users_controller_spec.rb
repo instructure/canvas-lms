@@ -19,7 +19,6 @@
 #
 
 require "feedjira"
-require_relative "../lti_1_3_spec_helper"
 require_relative "../helpers/k5_common"
 
 describe UsersController do
@@ -133,7 +132,7 @@ describe UsersController do
     end
 
     context "using LTI 1.3 when specified" do
-      include_context "lti_1_3_spec_helper"
+      include_context "key_storage_helper"
 
       let(:verifier) { "e5e774d015f42370dcca2893025467b414d39009dfe9a55250279cca16f5f3c2704f9c56fef4cea32825a8f72282fa139298cf846e0110238900567923f9d057" }
       let(:redis_key) { "#{assigns[:domain_root_account].class_name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
@@ -404,7 +403,7 @@ describe UsersController do
 
     it "does not include courses for which the user doesnt have the appropriate rights" do
       @role1 = custom_account_role("subadmin", account: Account.default)
-      account_admin_user_with_role_changes(role: @role1, role_changes: { manage_content: false, read_course_content: false })
+      account_admin_user_with_role_changes(role: @role1, role_changes: { read_course_content: false })
       course_with_user("TeacherEnrollment", course_name: "A", active_all: true, user: @admin)
       course_with_user("StudentEnrollment", course_name: "B", active_all: true, user: @admin)
 

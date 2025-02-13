@@ -607,7 +607,11 @@ class UsersController < ApplicationController
     courses = course_ids.present? ? api_find_all(Course, course_ids) : nil
 
     @stream_items = @user.cached_recent_stream_items(contexts: courses)
+    is_student = @user.roles(@domain_root_account).all? { |role| ["student", "user"].include?(role) }
     if stale?(etag: @stream_items)
+      if is_student
+        @stream_items = @stream_items.reject { |i| i&.course&.horizon_course? }
+      end
       render partial: "shared/recent_activity", layout: false
     end
   end
@@ -888,7 +892,6 @@ class UsersController < ApplicationController
       @courses.select! do |c|
         c.grants_any_right?(
           @current_user,
-          :manage_content,
           *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
         )
       end

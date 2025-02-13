@@ -31,6 +31,7 @@ import {View} from '@instructure/ui-view'
 import {AddressBookContainer} from './AddressBookContainer/AddressBookContainer'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../util/utils'
+import {hideHorizonCourseIfStudent} from '../../../../shared/horizon/react/index'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -81,9 +82,11 @@ const MessageListActionContainer = props => {
         assetString: 'all_courses',
       },
     ],
-    favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes,
-    moreCourses,
-    concludedCourses,
+    favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes.filter(
+      hideHorizonCourseIfStudent,
+    ),
+    moreCourses: moreCourses.filter(hideHorizonCourseIfStudent),
+    concludedCourses: concludedCourses.filter(hideHorizonCourseIfStudent),
     groups: data?.legacyNode?.favoriteGroupsConnection?.nodes,
   }
 

@@ -28,21 +28,36 @@ module CC::Importer::Canvas
       Dir["#{wiki_dir}/**/**"].each do |path|
         next if File.directory?(path)
 
-        doc = open_file_html5(path)
+        doc = json?(path) ? open_json(path) : open_file_html5(path)
         wikis << convert_wiki(doc, path)
       end
 
       wikis
     end
 
+    def open_json(path)
+      JSON.parse File.read(path)
+    end
+
+    def json?(path)
+      File.basename(path)[-5..] == ".json"
+    end
+
     def convert_wiki(doc, path)
       wiki = {}
-      wiki_name = File.basename(path).sub(".html", "")
-      title, body, meta = begin
-        get_html_title_and_body_and_meta_fields(doc)
-      rescue EncodingError
-        get_html_title_and_body_and_meta_fields(open_file_xml(path))
+
+      wiki_name = File.basename(path).sub(".html", "").sub(".json", "")
+
+      if json?(path)
+        title, block_editor, meta = doc.slice("title", "block_editor", "meta").values
+      else
+        title, body, meta = begin
+          get_html_title_and_body_and_meta_fields(doc)
+        rescue EncodingError
+          get_html_title_and_body_and_meta_fields(open_file_xml(path))
+        end
       end
+
       wiki[:title] = title
       wiki[:migration_id] = meta["identifier"]
       wiki[:editing_roles] = meta["editing_roles"]
@@ -51,13 +66,14 @@ module CC::Importer::Canvas
       # should keep in case we import old packages
       wiki[:workflow_state] = "unpublished" if meta["hide_from_students"] == "true" && (wiki[:workflow_state].nil? || wiki[:workflow_state] == "active")
       wiki[:front_page] = meta["front_page"] == "true"
-      wiki[:text] = body
+      wiki[:text] = body if body
       wiki[:url_name] = wiki_name
       wiki[:assignment] = nil
       wiki[:todo_date] = meta["todo_date"]
       wiki[:publish_at] = meta["publish_at"]
       wiki[:unlock_at] = meta["unlock_at"]
       wiki[:lock_at] = meta["lock_at"]
+      wiki[:block_editor] = block_editor if block_editor
       if (asg_id = meta["assignment_identifier"])
         wiki[:assignment] = {
           migration_id: asg_id,

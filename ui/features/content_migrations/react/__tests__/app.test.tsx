@@ -74,8 +74,8 @@ describe('App', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('Common Cartridge')).toBeInTheDocument()
-      expect(screen.getByText('Zip File')).toBeInTheDocument()
+      expect(screen.getByText(/Common Cartridge/)).toBeInTheDocument()
+      expect(screen.getByText(/Zip File/)).toBeInTheDocument()
     })
   })
 

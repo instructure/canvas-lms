@@ -128,7 +128,7 @@
     <div class="header-bar-right">
       <div class="header-group-left">
         <button id="quiz-publish-link"
-          class='btn quiz-publish-button <%= "disabled" unless @quiz.can_unpublish? %>'
+          class='btn quiz-publish-button <%= "disabled" if @context.horizon_course? || !@quiz.can_unpublish? %>'
           <%= 'data-tooltip' unless @quiz.can_unpublish? %>>
         </button>
         <%= link_to_preview_quiz('class' => "btn", 'id' => "preview_quiz_button", 'preview' => 1) %>

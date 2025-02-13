@@ -61,10 +61,18 @@ module LearningOutcomeContext
       nil
     end
 
+    # Returns all outcomes that are created or imported in the context as well as outcomes
+    # that are available to import from the context's associated accounts
+    # (i.e. sub-account level and account-level outcomes)
     def available_outcomes
       [self, *associated_accounts].uniq.map do |context|
         [context.linked_learning_outcomes, context.created_learning_outcomes.active]
       end.flatten.uniq
+    end
+
+    # Returns only outcomes that are manually created or imported in the context
+    def associated_outcomes
+      [linked_learning_outcomes, created_learning_outcomes.active].flatten.uniq
     end
 
     def has_outcomes?

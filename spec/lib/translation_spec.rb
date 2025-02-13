@@ -16,158 +16,105 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-NO_SRC_LANG = {
-  endpoint_name: "translation-endpoint",
-  body: { inputs: { src_lang: "es", tgt_lang: "en", text: "¿Dónde está el baño?" } }.to_json,
-  content_type: "application/json",
-  accept: "application/json"
-}.freeze
-
-USER_LOCALE_SET = {
-  endpoint_name: "translation-endpoint",
-  body: { inputs: { src_lang: "es", tgt_lang: "sv", text: "¿Dónde está el baño?" } }.to_json,
-  content_type: "application/json",
-  accept: "application/json"
-}.freeze
+require "aws-sdk-translate"
 
 class MockResponse
-  def read
-    { translated_text: "translated" }.to_json
+  def content
+    "<p>Hola, mundo!</p>"
   end
 end
 
-class MockCredentials
-  def set?
-    true
-  end
-end
+describe Translation do
+  let(:translation_client) { double("Translation") }
 
-require "aws-sdk-sagemakerruntime"
-
-describe "Translation" do
   before do
-    # Mock DynamicSettings to return our endpoint.
-    allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
-    allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "sagemaker.yml" => { "endpoint_name" => "translation-endpoint" }.to_yaml })
-
-    # Mock statsd to allow it to receive what we expect
-    allow(InstStatsd::Statsd).to receive(:distributed_increment)
-
-    # Mock the runtime and the credential provider
-    @runtime_mock = instance_double(Aws::SageMakerRuntime::Client)
-    allow(Canvas::AwsCredentialProvider).to receive(:new).and_return(MockCredentials.new)
-    allow(Aws::SageMakerRuntime::Client).to receive(:new).and_return(@runtime_mock)
-
-    # Mock the response that the runtime returns.
-    @mock_response = instance_double(Aws::SageMakerRuntime::Types::InvokeEndpointOutput)
-    allow(@mock_response).to receive(:body).and_return(MockResponse.new)
-    allow(@runtime_mock).to receive(:invoke_endpoint).and_return(@mock_response)
-
-    # Mock user
-    @user = user_factory(active_all: true)
+    allow(described_class).to receive(:translation_client).and_return(translation_client)
+    allow(Account.site_admin).to receive(:feature_enabled?).with(:ai_translation_improvements).and_return(true)
   end
 
-  describe ":create" do
-    it "detects src_lang if not present" do
-      Translation.create(tgt_lang: "en", text: "¿Dónde está el baño?")
-      expect(@runtime_mock).to have_received(:invoke_endpoint).with(NO_SRC_LANG)
+  describe "available?" do
+    let(:context) { double("Context", feature_enabled?: true) }
+
+    it "returns true if feature flag is enabled and translation client is present" do
+      expect(described_class.available?(context, :some_flag)).to be true
     end
 
-    it "trims locale for src_lang" do
-      expect(CLD).to receive(:detect_language).and_return({ code: "es-ES" })
-      Translation.create(tgt_lang: "en", text: "¿Dónde está el baño?")
-      expect(@runtime_mock).to have_received(:invoke_endpoint).with(NO_SRC_LANG)
+    it "returns false if feature flag is disabled" do
+      allow(context).to receive(:feature_enabled?).with(:some_flag).and_return(false)
+      expect(described_class.available?(context, :some_flag)).to be false
     end
 
-    it "requires user or tgt lang set" do
-      expect(Translation.create(text: "hello, world")).to be_nil
-    end
-
-    it "uses trimmed user locale if tgt_lang not set" do
-      @user.locale = "sv-x-k12"
-      Translation.create(user: @user, src_lang: "es", text: "¿Dónde está el baño?")
-      expect(@runtime_mock).to have_received(:invoke_endpoint).with(USER_LOCALE_SET)
-    end
-
-    it "increments the translation metric" do
-      Translation.create(tgt_lang: "en", text: "¿Dónde está el baño?")
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.create.es.en")
+    it "returns false if translation client is not present" do
+      allow(described_class).to receive(:translation_client).and_return(nil)
+      expect(described_class.available?(context, :some_flag)).to be false
     end
   end
 
-  describe ":translated_languages" do
-    it "does not translate controls if locale is english" do
-      @user.locale = "en"
-      allow(Translation).to receive(:create)
-      Translation.translated_languages(@user)
-      expect(Translation).not_to have_received(:create)
+  describe "translate_text" do
+    let(:text) { "Hello, world!" }
+    let(:result) { double("Result", translated_text: "Hola, mundo!") }
+
+    it "returns nil if translation client is not present" do
+      allow(described_class).to receive(:translation_client).and_return(nil)
+      expect(described_class.translate_text(text: text, src_lang: "en", tgt_lang: "es")).to be_nil
     end
 
-    it "does not translate if no locale" do
-      allow(Translation).to receive(:create)
-      Translation.translated_languages(@user)
-      expect(Translation).not_to have_received(:create)
+    it "returns nil if tgt_lang is nil" do
+      expect(described_class.translate_text(text: text, src_lang: "en", tgt_lang: nil)).to be_nil
     end
 
-    it "translates if non-english locale is set" do
-      @user.locale = "es"
-      allow(Translation).to receive(:create)
-      Translation.translated_languages(@user)
-      expect(Translation).to have_received(:create).exactly(Translation.languages.length).times
+    it "determines source language from text if nil" do
+      hungarian_text = "Hello, világ!"
+      allow(translation_client).to receive(:translate_text).and_return(result)
+      expect(described_class.translate_text(text: hungarian_text, src_lang: nil, tgt_lang: "es")).to eq("Hola, mundo!")
+      expect(translation_client).to have_received(:translate_text).with(
+        text: hungarian_text,
+        source_language_code: "hu",
+        target_language_code: "es"
+      )
     end
 
-    it "uses the cache if key is present" do
-      # Arrange
-      @user.locale = "es"
-      allow(Canvas.redis).to receive(:get).with(["translated_languages", @user.locale].cache_key).and_return({ language: "languages" }.to_json)
-
-      # Act
-      resp = Translation.translated_languages(@user)
-
-      # Assert
-      expect(resp).to eq({ "language" => "languages" })
-    end
-
-    it "caches the translation results" do
-      # Arrange
-      allow(Canvas.redis).to receive(:set)
-      @user.locale = "es"
-
-      # Act
-      Translation.translated_languages(@user)
-
-      # Assert
-      expect(Canvas.redis).to have_received(:set).exactly(1)
+    it "translates text when src_lang and tgt_lang are provided" do
+      allow(translation_client).to receive(:translate_text).and_return(result)
+      expect(described_class.translate_text(text: text, src_lang: "en", tgt_lang: "es")).to eq("Hola, mundo!")
     end
   end
 
-  describe ":language_matches_user_locale?" do
-    it "does match" do
-      @user.locale = "es"
-      expect(Translation.language_matches_user_locale?(@user, "¿Dónde está el baño?")).to be_truthy
+  describe "translate_html" do
+    let(:html) { "<p>Hello, world!</p>" }
+    let(:result) { double("Result", translated_document: MockResponse.new) }
+
+    before do
+      allow(described_class).to receive(:translation_client).and_return(translation_client)
     end
 
-    it "does not match" do
-      @user.locale = "en"
-      expect(Translation.language_matches_user_locale?(@user, "¿Dónde está el baño?")).to be_falsey
-    end
-  end
-
-  describe ":translate_html" do
-    it "translates HTML" do
-      allow(Translation).to receive(:create).and_return("fake")
-      text = "<p>Hello mom!</p><p>I am a person</p>"
-      expected = "<p>fake</p><p>fake</p>"
-      expect(Translation.translate_html(html_string: text)).to eq(expected)
+    it "returns nil if translation client is not present" do
+      allow(described_class).to receive(:translation_client).and_return(nil)
+      expect(described_class.translate_html(html_string: html, src_lang: "en", tgt_lang: "es")).to be_nil
     end
 
-    it "translates HTML but leaves whitespace-only strings" do
-      allow(Translation).to receive(:create).and_return("fake")
-      text = "<p>Hello mom!</p><p>&nbsp;</p>"
-      not_expected = "<p>fake</p><p>fake</p>"
-      expect(Translation.translate_html(html_string: text)).to_not eq(not_expected)
+    it "returns nil if tgt_lang is nil" do
+      expect(described_class.translate_html(html_string: html, src_lang: "en", tgt_lang: nil)).to be_nil
+    end
+
+    it "determines source language from text if nil" do
+      hungarian_html = "Hello, világ!"
+      allow(translation_client).to receive(:translate_document).and_return(result)
+      expect(described_class.translate_html(html_string: hungarian_html, src_lang: nil, tgt_lang: "es")).to eq("<p>Hola, mundo!</p>")
+      expect(translation_client).to have_received(:translate_document).with(
+        document: {
+          content: hungarian_html,
+          content_type: "text/html",
+        },
+        source_language_code: "hu",
+        target_language_code: "es"
+      )
+    end
+
+    it "translates text when src_lang and tgt_lang are provided" do
+      allow(translation_client).to receive(:translate_document).and_return(result)
+      expect(described_class.translate_html(html_string: html, src_lang: "en", tgt_lang: "es")).to eq("<p>Hola, mundo!</p>")
     end
   end
 end

@@ -37,7 +37,7 @@ import {
   DISPLAY_AS_DOWNLOAD_LINK,
 } from '../../../shared/ContentSelection'
 import {getTrayHeight} from '../../../shared/trayUtils'
-import {instuiPopupMountNode} from '../../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../../util/fullscreenHelpers'
 
 export default function LinkOptionsTray(props) {
   const content = props.content || {}
@@ -50,10 +50,10 @@ export default function LinkOptionsTray(props) {
   const [autoOpenPreview, setAutoOpenPreview] = useState(content.displayAs === DISPLAY_AS_EMBED)
   const [disableInlinePreview, setDisableInlinePreview] = useState(
     content.displayAs === DISPLAY_AS_EMBED_DISABLED ||
-      content.displayAs === DISPLAY_AS_DOWNLOAD_LINK
+      content.displayAs === DISPLAY_AS_DOWNLOAD_LINK,
   )
   const [displayOptionSelection, setDisplayOptionSelection] = useState(
-    initialPreviewSelection(content)
+    initialPreviewSelection(content),
   )
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export default function LinkOptionsTray(props) {
       data-testid="RCELinkOptionsTray"
       data-mce-component={true}
       label={formatMessage('Link Options')}
-      mountNode={instuiPopupMountNode}
+      mountNode={instuiPopupMountNodeFn}
       onDismiss={props.onRequestClose}
       onEntered={props.onEntered}
       onExited={props.onExited}
@@ -255,7 +255,7 @@ LinkOptionsTray.propTypes = {
         },
         props,
         'content',
-        'LinkOptionsTray'
+        'LinkOptionsTray',
       )
     }
   },

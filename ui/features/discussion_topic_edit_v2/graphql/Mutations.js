@@ -39,6 +39,10 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $podcastEnabled: Boolean
     $podcastHasStudentPosts: Boolean
     $locked: Boolean
+    $expanded: Boolean
+    $expandedLocked: Boolean
+    $sortOrder: DiscussionSortOrderType
+    $sortOrderLocked: Boolean
     $discussionType: DiscussionTopicDiscussionType
     $isAnnouncement: Boolean
     $specificSections: String
@@ -68,6 +72,10 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         podcastEnabled: $podcastEnabled
         podcastHasStudentPosts: $podcastHasStudentPosts
         locked: $locked
+        expanded: $expanded
+        expandedLocked: $expandedLocked
+        sortOrder: $sortOrder
+        sortOrderLocked: $sortOrderLocked
         isAnnouncement: $isAnnouncement
         specificSections: $specificSections
         groupCategoryId: $groupCategoryId
@@ -97,6 +105,10 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         podcastHasStudentPosts
         isAnnouncement
         replyToEntryRequiredCount
+        expanded
+        expandedLocked
+        sortOrder
+        sortOrderLocked
         assignment {
           _id
           name
@@ -161,6 +173,10 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $podcastEnabled: Boolean
     $podcastHasStudentPosts: Boolean
     $locked: Boolean
+    $expanded: Boolean
+    $expandedLocked: Boolean
+    $sortOrder: DiscussionSortOrderType
+    $sortOrderLocked: Boolean
     $discussionType: DiscussionTopicDiscussionType
     $specificSections: String
     $fileId: ID
@@ -190,6 +206,10 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         podcastEnabled: $podcastEnabled
         podcastHasStudentPosts: $podcastHasStudentPosts
         locked: $locked
+        expanded: $expanded
+        expandedLocked: $expandedLocked
+        sortOrder: $sortOrder
+        sortOrderLocked: $sortOrderLocked
         specificSections: $specificSections
         groupCategoryId: $groupCategoryId
         fileId: $fileId
@@ -222,6 +242,10 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         podcastHasStudentPosts
         isAnnouncement
         replyToEntryRequiredCount
+        expanded
+        expandedLocked
+        sortOrder
+        sortOrderLocked
         attachment {
           ...Attachment
         }

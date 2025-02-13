@@ -47,6 +47,10 @@ export const DiscussionTopic = {
       published
       canGroup
       replyToEntryRequiredCount
+      expanded
+      expandedLocked
+      sortOrder
+      sortOrderLocked
       visibleToEveryone
       onlyVisibleToOverrides
       isSectionSpecific
@@ -97,6 +101,10 @@ export const DiscussionTopic = {
     lockAt: string,
     published: bool,
     replyToEntryRequiredCount: number,
+    expanded: bool,
+    expandedLocked: bool,
+    sortOrder: string,
+    sortOrderLocked: bool,
     visibleToEveryone: bool,
     onlyVisibleToOverrides: bool,
     courseSections: arrayOf(Section.shape),
@@ -129,6 +137,10 @@ export const DiscussionTopic = {
     lockAt = null,
     published = true,
     replyToEntryRequiredCount = 1,
+    expanded = false,
+    expandedLocked = false,
+    sortOrder = 'desc',
+    sortOrderLocked = false,
     visibleToEveryone = false,
     onlyVisibleToOverrides = false,
     courseSections = [Section.mock()],
@@ -156,6 +168,10 @@ export const DiscussionTopic = {
     lockAt,
     published,
     replyToEntryRequiredCount,
+    expanded,
+    expandedLocked,
+    sortOrder,
+    sortOrderLocked,
     visibleToEveryone,
     onlyVisibleToOverrides,
     courseSections,

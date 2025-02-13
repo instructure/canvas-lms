@@ -26,9 +26,11 @@ const I18n = createI18nScope('content_migrations_redesign')
 export const CompletionProgressBar = ({
   workflowState,
   completion,
+  size = 'small',
 }: {
   workflowState: ContentMigrationWorkflowState
   completion?: number
+  size?: "small" | "x-small" | "medium" | "large"
 }) => {
   if (typeof completion !== 'number') {
     return null
@@ -42,7 +44,7 @@ export const CompletionProgressBar = ({
     default:
       return (
         <ProgressBar
-          size="small"
+          size={size}
           meterColor="info"
           screenReaderLabel={I18n.t('Loading completion')}
           valueNow={completion}

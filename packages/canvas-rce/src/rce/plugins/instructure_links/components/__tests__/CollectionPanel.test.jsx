@@ -47,7 +47,7 @@ function renderComponent(props) {
       onChangeAccordion={() => {}}
       selectedAccordionIndex="assignments"
       {...props}
-    />
+    />,
   )
 }
 

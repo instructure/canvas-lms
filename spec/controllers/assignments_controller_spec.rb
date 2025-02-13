@@ -316,12 +316,12 @@ describe AssignmentsController do
         expect(@course.reload.assignment_groups.count).to eq 1
       end
 
-      it "separates manage_assignments and manage_grades permissions" do
+      it "separates manage_assignments_edit and manage_grades permissions" do
         user_session(@teacher)
         @course.account.role_overrides.create! role: teacher_role, permission: "manage_assignments_edit", enabled: false
         get "index", params: { course_id: @course.id }
         expect(assigns[:js_env][:PERMISSIONS][:manage_grades]).to be_truthy
-        expect(assigns[:js_env][:PERMISSIONS][:manage_assignments]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:manage_assignments_edit]).to be_falsey
         expect(assigns[:js_env][:PERMISSIONS][:manage]).to be_falsey
         expect(assigns[:js_env][:PERMISSIONS][:manage_course]).to be_truthy
       end
@@ -365,14 +365,14 @@ describe AssignmentsController do
     context "assign to differentiation tags" do
       before :once do
         @course.account.enable_feature! :assign_to_differentiation_tags
-      end
-
-      it "is true if account setting is on" do
+        @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = true
           a.save!
         end
+      end
 
+      it "is true if account setting is on" do
         user_session(@teacher)
         get "index", params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
@@ -387,6 +387,18 @@ describe AssignmentsController do
         user_session(@teacher)
         get "index", params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be false
+      end
+
+      it "CAN_MANAGE_DIFFERENTIATION_TAGS is true if user can manage tags" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "CAN_MANAGE_DIFFERENTIATION_TAGS is false if user cannot manage tags" do
+        user_session(@student)
+        get "index", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
       end
     end
   end
@@ -1864,14 +1876,14 @@ describe AssignmentsController do
     context "assign to differentiation tags" do
       before :once do
         @course.account.enable_feature! :assign_to_differentiation_tags
-      end
-
-      it "is true if account setting is on" do
+        @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = true
           a.save!
         end
+      end
 
+      it "is true if account setting is on" do
         user_session(@teacher)
         get "show", params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
@@ -1887,6 +1899,24 @@ describe AssignmentsController do
         get "show", params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be false
       end
+
+      it "CAN_MANAGE_DIFFERENTIATION_TAGS is true if user can manage tags" do
+        user_session(@teacher)
+        get "show", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "CAN_MANAGE_DIFFERENTIATION_TAGS is false if user cannot manage tags" do
+        user_session(@student)
+        get "show", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
+      end
+    end
+
+    it "shows assignment was submitted successfully alert if submitted in url" do
+      user_session(@student)
+      get :show, params: { course_id: @course.id, id: @assignment.id, submitted: 0 }
+      expect(flash[:notice]).to match(/Assignment successfully submitted./)
     end
   end
 
@@ -2886,28 +2916,6 @@ describe AssignmentsController do
 
       expect(@assignment.reload).to be_published
     end
-
-    context "granular_permissions" do
-      before do
-        @course.root_account.enable_feature!(:granular_permissions_manage_assignments)
-      end
-
-      it "requires authorization" do
-        post "publish_quizzes", params: { course_id: @course.id, quizzes: [@assignment.id] }
-        assert_unauthorized
-      end
-
-      it "publishes unpublished assignments" do
-        user_session(@teacher)
-        @assignment = @course.assignments.build(title: "New quiz!", workflow_state: "unpublished")
-        @assignment.save!
-
-        expect(@assignment).not_to be_published
-        post "publish_quizzes", params: { course_id: @course.id, quizzes: [@assignment.id] }
-
-        expect(@assignment.reload).to be_published
-      end
-    end
   end
 
   describe "POST 'unpublish'" do
@@ -2924,27 +2932,6 @@ describe AssignmentsController do
       post "unpublish_quizzes", params: { course_id: @course.id, quizzes: [@assignment.id] }
 
       expect(@assignment.reload).not_to be_published
-    end
-
-    context "granular_permissions" do
-      before do
-        @course.root_account.enable_feature!(:granular_permissions_manage_assignments)
-      end
-
-      it "requires authorization" do
-        post "unpublish_quizzes", params: { course_id: @course.id, quizzes: [@assignment.id] }
-        assert_unauthorized
-      end
-
-      it "unpublishes published quizzes" do
-        user_session(@teacher)
-        @assignment = @course.assignments.create(title: "New quiz!", workflow_state: "published")
-
-        expect(@assignment).to be_published
-        post "unpublish_quizzes", params: { course_id: @course.id, quizzes: [@assignment.id] }
-
-        expect(@assignment.reload).not_to be_published
-      end
     end
   end
 

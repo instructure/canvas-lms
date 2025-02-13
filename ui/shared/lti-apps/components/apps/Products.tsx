@@ -110,7 +110,9 @@ export const Products = (props: {
   return (
     <>
       {(isFilterApplied && isLoading) || (!isFilterApplied && isLoadingDisplayGroups) ? (
-        <Spinner />
+        <Flex justifyItems="center">
+          <Spinner renderTitle={I18n.t('Loading apps')} margin="xx-large" />
+        </Flex>
       ) : isFilterApplied ? (
         <>
           {renderProducts(tools)}

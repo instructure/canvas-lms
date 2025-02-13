@@ -64,7 +64,7 @@ export const onSubmit = (dispatch, onChange) => (_editor, _accept, _selectedPane
       type: svgActions.SET_ERROR,
       payload: formatMessage(
         'GIF/PNG format images larger than {size} KB are not currently supported.',
-        {size: MAX_GIF_PNG_SIZE_BYTES / 1024}
+        {size: MAX_GIF_PNG_SIZE_BYTES / 1024},
       ),
     })
   }

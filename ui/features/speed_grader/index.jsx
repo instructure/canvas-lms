@@ -38,6 +38,8 @@ import {updateCommentSuggestionsEnabled} from './mutations/comment_bank/updateCo
 import {saveRubricAssessment} from './mutations/saveRubricAssessmentMutation'
 import {updateSubmissionSecondsLate} from './mutations/updateSubmissionSecondsLateMutation'
 import {reassignAssignment} from './mutations/reassignAssignmentMutation'
+import {deleteAttachment} from './mutations/deleteAttachmentMutation'
+import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -78,6 +80,8 @@ ready(() => {
     speedGrader.setup()
     return
   }
+
+  speedGrader.setupForSG2()
 
   const mountPoint = document.querySelector('#react-router-portals')
 
@@ -121,6 +125,7 @@ ready(() => {
           updateSubmissionGrade,
           createSubmissionComment,
           deleteSubmissionComment,
+          deleteAttachment,
           hideAssignmentGradesForSections,
           postAssignmentGradesForSections,
           postDraftSubmissionComment,
@@ -153,6 +158,7 @@ ready(() => {
           useHighContrast: window.ENV.use_high_contrast ?? false,
           commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
           lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
+          ltiIframeAllowances: iframeAllowances(),
         },
         features: {
           extendedSubmissionState: window.ENV.FEATURES.extended_submission_state ?? false,

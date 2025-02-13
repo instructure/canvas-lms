@@ -22,7 +22,7 @@ module Assignments
     def scope
       concat_scope { context.active_assignments }
       concat_scope do
-        unless can?(:read_as_admin) || can?(:manage_assignments) || can?(:manage_assignments_add) || can?(:manage_assignments_edit) || can?(:manage_assignments_delete)
+        unless can?(:read_as_admin) || can?(:manage_assignments_add) || can?(:manage_assignments_edit) || can?(:manage_assignments_delete)
           @relation.published
         end
       end

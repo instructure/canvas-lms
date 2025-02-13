@@ -75,37 +75,6 @@ const DiscussionPostButtonsToolbar = props => {
       </span>
     )
 
-  const renderSort = () => (
-    <Tooltip
-      renderTip={props.sortDirection === 'desc' ? I18n.t('Newest First') : I18n.t('Oldest First')}
-      width="78px"
-      data-testid="sortButtonTooltip"
-    >
-      <span className="discussions-sort-button">
-        <Button
-          style={{width: '100%'}}
-          display="block"
-          onClick={props.onSortClick}
-          renderIcon={
-            props.sortDirection === 'desc' ? (
-              <IconArrowDownLine data-testid="DownArrow" />
-            ) : (
-              <IconArrowUpLine data-testid="UpArrow" />
-            )
-          }
-          data-testid="sortButton"
-        >
-          {I18n.t('Sort')}
-          <ScreenReaderContent>
-            {props.sortDirection === 'asc'
-              ? I18n.t('Sorted by Ascending')
-              : I18n.t('Sorted by Descending')}
-          </ScreenReaderContent>
-        </Button>
-      </span>
-    </Tooltip>
-  )
-
   const renderSplitScreen = () =>
     !isSpeedGraderInTopUrl && (
       <SplitScreenButton
@@ -135,11 +104,12 @@ const DiscussionPostButtonsToolbar = props => {
 
   const renderExpandsThreads = () => (
     <ExpandCollapseThreadsButton
-      isExpanded={props.isExpanded}
+      isExpanded={props.isExpanded || (props.discDefaultExpandEnabled && props.isExpandedLocked)}
       onCollapseRepliesToggle={props.onCollapseRepliesToggle}
       showText={true}
       tooltipEnabled={props.breakpoints.ICEDesktop}
-      disabled={props.userSplitScreenPreference}
+      disabled={props.userSplitScreenPreference || (props.discDefaultExpandEnabled && props.isExpandedLocked)}
+      expandedLocked={props.isExpandedLocked}
     />
   )
 
@@ -197,26 +167,6 @@ const DiscussionPostButtonsToolbar = props => {
           <Flex gap="small">
             <IconGroupLine />
             {I18n.t('Group')}
-          </Flex>
-        </Drilldown.Option>,
-      )
-    }
-    if (props.breakpoints.mobileOnly) {
-      options.push(
-        <Drilldown.Option
-          id="sort"
-          value="sort"
-          key="sort"
-          disabled={false}
-          onOptionClick={props.onSortClick}
-        >
-          <Flex gap="small">
-            {props.sortDirection === 'desc' ? (
-              <IconArrowDownLine data-testid="DownArrow" />
-            ) : (
-              <IconArrowUpLine data-testid="UpArrow" />
-            )}
-            {I18n.t('Sort')}
           </Flex>
         </Drilldown.Option>,
       )
@@ -282,7 +232,6 @@ const DiscussionPostButtonsToolbar = props => {
     const drillDownOptions = createDrillDownOptions()
     const buttonsDesktop = [
       renderButtonDrillDown(drillDownOptions),
-      renderSort(),
       renderSplitScreen(),
       renderExpandsThreads(),
       renderAvatar(),
@@ -290,7 +239,7 @@ const DiscussionPostButtonsToolbar = props => {
     ]
 
     const buttonsMobile = ENV.current_user_is_student
-      ? [renderExpandsThreads(), renderSort(), renderGroup()]
+      ? [renderExpandsThreads(), renderGroup()]
       : [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions)]
 
     const padding = props.breakpoints.mobileOnly ? 'xx-small' : 'xxx-small'
@@ -370,6 +319,10 @@ DiscussionPostButtonsToolbar.propTypes = {
   isExpanded: PropTypes.bool,
   breakpoints: breakpointsShape,
   showAssignTo: PropTypes.bool,
+  isSortOrderLocked: PropTypes.bool,
+  isExpandedLocked: PropTypes.bool,
+  discDefaultSortEnabled: PropTypes.bool,
+  discDefaultExpandEnabled: PropTypes.bool,
 }
 
 export default DiscussionPostButtonsToolbar

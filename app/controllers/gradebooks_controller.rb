@@ -534,7 +534,7 @@ class GradebooksController < ApplicationController
       gradebook_column_size_settings_url: change_gradebook_column_size_course_gradebook_url,
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_score_to_ungraded_progress: last_score_to_ungraded,
-      gradebook_import_url: new_course_gradebook_upload_path(@context),
+      gradebook_import_url: course_gradebook_uploads_path(@context),
       gradebook_is_editable:,
       grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       graded_late_submissions_exist:,
@@ -709,7 +709,7 @@ class GradebooksController < ApplicationController
       gradebook_column_size_settings: gradebook_column_size_preferences,
       gradebook_column_size_settings_url: change_gradebook_column_size_course_gradebook_url,
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
-      gradebook_import_url: new_course_gradebook_upload_path(@context),
+      gradebook_import_url: course_gradebook_uploads_path(@context),
       gradebook_is_editable:,
       grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       graded_late_submissions_exist:,
@@ -1453,7 +1453,6 @@ class GradebooksController < ApplicationController
     # SGP is currently disabled for moderated and anonymously graded assignments
     if @assignment.present?
       return false if @assignment.moderated_grading
-      return false if @assignment.anonymous_grading
     end
 
     return false if Services::PlatformServiceSpeedgrader.launch_url.blank?

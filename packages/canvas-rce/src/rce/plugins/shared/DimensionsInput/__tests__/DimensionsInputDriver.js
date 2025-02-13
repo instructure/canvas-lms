@@ -22,7 +22,7 @@ import {queryByLabelText, getByTestId} from '@testing-library/react'
 export default class DimensionsInputDriver {
   static find($parent) {
     const $fieldset = [...$parent.querySelectorAll('fieldset')].find($element =>
-      $element.textContent.includes('Dimensions')
+      $element.textContent.includes('Dimensions'),
     )
 
     if ($fieldset == null) {
@@ -64,10 +64,10 @@ export default class DimensionsInputDriver {
 
   get messageTexts() {
     const messageContainer = this.$dimensionsInput.querySelector(
-      'fieldset legend span:last-child span:first-child span'
+      'fieldset legend span:last-child span:first-child span',
     )
     return [...messageContainer.querySelectorAll('span')].map($message =>
-      $message.textContent.trim()
+      $message.textContent.trim(),
     )
   }
 }

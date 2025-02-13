@@ -30,6 +30,10 @@ class NewContentMigrationPage
       '[data-cid="BaseButton Button"]'
     end
 
+    def course_search_input_selector
+      "#course-copy-select-course"
+    end
+
     def migration_type_options
       INSTUI_Select_options('[data-testid="select-content-type-dropdown"]')
     end
@@ -72,15 +76,15 @@ class NewContentMigrationPage
     end
 
     def select_content_button
-      f('td [data-cid="BaseButton Button"]')
+      find_button("Select content")
     end
 
     def all_assignments_checkbox
-      f('input[data-testid="checkbox-copy[all_assignments]]"]')
+      f('input[data-testid="checkbox-copy[all_assignments]"] + label')
     end
 
     def select_content_submit_button
-      f(".selectContentDialog input[type=submit]")
+      f("#content-selection-modal button[data-testid='select-content-button']")
     end
 
     def content
@@ -131,16 +135,8 @@ class NewContentMigrationPage
       f("#courseSelectWarning")
     end
 
-    def module
-      f('li.top-level-treeitem[data-type="context_modules"] a.checkbox-caret')
-    end
-
-    def submodule
-      f('li.top-level-treeitem[data-type="context_modules"] li.normal-treeitem')
-    end
-
     def external_tool_launch_button
-      f("button#externalToolLaunch")
+      external_tool_launch.find_element(:xpath, "../parent::button")
     end
 
     def lti_iframe
@@ -148,7 +144,7 @@ class NewContentMigrationPage
     end
 
     def lti_title
-      f(".ui-dialog-title")
+      fxpath('//*[@aria-label="Launch External Tool"]//h2')
     end
 
     def basic_lti_link
@@ -156,7 +152,7 @@ class NewContentMigrationPage
     end
 
     def file_name_label
-      f("#converter .file_name")
+      fxpath('//*[text()="lti embedded link"]')
     end
 
     def external_tool_launch
@@ -171,8 +167,20 @@ class NewContentMigrationPage
       fxpath('//*[text()="Adjust events and due dates"]')
     end
 
+    def date_remove_radio
+      f('input[value="remove_dates"] + label')
+    end
+
     def add_day_substitution_button
       fxpath('//*[@aria-hidden="true" and text()="Substitution"]/ancestor::button')
+    end
+
+    def day_substitution_delete_button_by_index(index)
+      f("#remove-substitution-#{index}")
+    end
+
+    def number_of_day_substitutions
+      ffxpath('//*[text()="Move from:"]').count
     end
 
     def add_day_containers

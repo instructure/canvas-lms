@@ -55,7 +55,7 @@ services:
       - postgres
       - redis
     ports:
-    - "12345:12345"
+    - "12345-12354:12345-12354"
     networks:
       default:
         aliases:

@@ -24,20 +24,47 @@ import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
+import {FileManagementContext} from '../../Contexts'
+import userEvent from '@testing-library/user-event'
 
 const renderComponent = () => {
   return render(
-    <MockedQueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AllMyFilesTable />
-      </BrowserRouter>
-    </MockedQueryClientProvider>,
+    <FileManagementContext.Provider
+      value={{
+        folderId: '1',
+        contextType: 'course',
+        contextId: '1',
+        showingAllContexts: false,
+        currentFolder: null,
+      }}
+    >
+      <MockedQueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AllMyFilesTable />
+        </BrowserRouter>
+      </MockedQueryClientProvider>
+    </FileManagementContext.Provider>,
   )
 }
 
 describe('AllMyFilesTable', () => {
+  let flashElements: any
+
   beforeAll(() => {
     setupFilesEnv(true)
+    window.ENV.context_asset_string = 'courses_1'
+  })
+
+  beforeEach(() => {
+    flashElements = document.createElement('div')
+    flashElements.setAttribute('id', 'flash_screenreader_holder')
+    flashElements.setAttribute('role', 'alert')
+    document.body.appendChild(flashElements)
+  })
+
+  afterEach(() => {
+    document.body.removeChild(flashElements)
+    flashElements = undefined
   })
 
   it('renders each context', () => {
@@ -48,12 +75,12 @@ describe('AllMyFilesTable', () => {
     expect(secondRow).toBeInTheDocument()
   })
 
-  it('disables top nav buttons', () => {
+  it('hides top nav upload buttons', () => {
     renderComponent()
-    const folderButton = screen.getByRole('button', {name: /folder/i})
-    const uploadButton = screen.getByRole('button', {name: /upload/i})
-    expect(folderButton).toBeDisabled()
-    expect(uploadButton).toBeDisabled()
+    const folderButton = screen.queryByRole('button', {name: /folder/i})
+    const uploadButton = screen.queryByRole('button', {name: /upload/i})
+    expect(folderButton).not.toBeInTheDocument()
+    expect(uploadButton).not.toBeInTheDocument()
   })
 
   it('does not render All My Files button', () => {
@@ -62,16 +89,26 @@ describe('AllMyFilesTable', () => {
     expect(allMyFilesButton).not.toBeInTheDocument()
   })
 
-  it('sorts contexts on click', () => {
+  it('sorts contexts on click', async () => {
+    const user = userEvent.setup()
     renderComponent()
 
     const rows = screen.getAllByRole('link')
     expect(rows[0].textContent).toContain('My Files')
     expect(rows[1].textContent).toContain('Course 1')
-    screen.getByRole('button', {name: /name/i}).click()
+    await user.click(screen.getByRole('button', {name: /name/i}))
 
     const newRows = screen.getAllByRole('link')
     expect(newRows[0].textContent).toContain('Course 1')
     expect(newRows[1].textContent).toContain('My Files')
+  })
+
+  it('updates screen reader alert on sort', async () => {
+    const user = userEvent.setup()
+    renderComponent()
+    await user.click(screen.getByRole('button', {name: /name/i}))
+    expect(screen.getByText('Sorted by name in ascending order')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', {name: /name/i}))
+    expect(await screen.findByText('Sorted by name in descending order')).toBeInTheDocument()
   })
 })

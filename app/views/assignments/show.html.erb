@@ -66,11 +66,11 @@
         </h1>
       </div>
       <div class='assignment-buttons'>
-        <span id="loading-spinner"></span>
+        <span id="overlay-loading-spinner"></span>
         <button
           id="assignment_publish_button"
           data-id='<%= @assignment.id %>'
-          class='btn <%= "published" if @assignment.published? %> <%= "disabled" unless assignment_publishing_enabled?(@assignment, @current_user) %>'>
+          class='btn <%= "published" if @assignment.published? %> <%= "disabled" if @context.horizon_course? || !assignment_publishing_enabled?(@assignment, @current_user) %>'
         </button>
         <% if @assignment.grants_right?(@current_user, :manage_assign_to) %>
           <button
@@ -83,7 +83,7 @@
             <i class='icon-permissions'></i> <%= t('Assign To') %>
           </button>
         <% end %>
-        <% if @context.grants_any_right?(@current_user, :manage_assignments, :manage_assignments_edit) %>
+        <% if @context.grants_right?(@current_user, :manage_assignments_edit) %>
           <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link<%= ' disabled' unless can_do(@assignment, @current_user, :update) %>'>
             <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
             <% unless can_do(@assignment, @current_user, :update) %>

@@ -1360,6 +1360,23 @@ describe DiscussionTopic do
       }.from(1).to(0).and not_change(student1.stream_item_instances, :count)
     end
 
+    it "removes streams when a student is unassigned from the discussion" do
+      section1 = @course.course_sections.create!
+      @student1 = create_enrolled_user(@course, section1, name: "student 1", enrollment_type: "StudentEnrollment")
+      topic = @course.discussion_topics.create!(title: "Discussion", user: @teacher, only_visible_to_overrides: true)
+      topic.overrides_changed = true
+
+      override = topic.assignment_overrides.create!
+      override.assignment_override_students.create!(user: @student1)
+
+      expect(@student.stream_item_instances.count).to eq 1
+
+      topic.assignment_overrides.last.destroy
+      topic.save!
+
+      expect(@student.stream_item_instances.count).to eq 0
+    end
+
     it "removes stream items from users if updated to a delayed post in the future" do
       announcement = @course.announcements.create!(title: "Lemon Loves Panda", message: "Because panda is home")
 
@@ -3892,6 +3909,26 @@ describe DiscussionTopic do
         @topic.update!(sort_order_locked: true, sort_order: "asc")
         @topic.update_or_create_participant(current_user: @student, sort_order: "desc")
         expect(@topic.sort_order_for_user(@student)).to eq "desc"
+      end
+    end
+
+    context "topic participant when creating the topic" do
+      it "does create the participant with the proper expanded and sort order values" do
+        sort_order = "asc"
+        expanded = false
+        topic1 = @course.discussion_topics.create!(user: @teacher, sort_order:, expanded:)
+
+        participant = topic1.participant(@teacher)
+        expect(participant.sort_order).to eq sort_order
+        expect(participant.expanded).to eq expanded
+
+        sort_order = "desc"
+        expanded = true
+        topic2 = @course.discussion_topics.create!(user: @teacher, sort_order:, expanded:)
+
+        participant = topic2.participant(@teacher)
+        expect(participant.sort_order).to eq sort_order
+        expect(participant.expanded).to eq expanded
       end
     end
   end

@@ -61,20 +61,7 @@ class ZipExtractor
     FileUtils.rm_rf(dirname)
   end
 
-  def make_safe_haven
-    return @dirname if @dirname
-
-    @dirname = safe_haven_name
-    FileUtils.mkdir(@dirname)
-    @dirname
-  end
-  alias_method :dirname, :make_safe_haven
-
-  def safe_haven_name
-    dirname = "/tmp/#{CanvasSlug.generate}"
-    while File.exist?(dirname)
-      dirname = "/tmp/#{CanvasSlug.generate}"
-    end
-    dirname
+  def dirname
+    @dirname ||= Dir.mktmpdir
   end
 end

@@ -72,7 +72,6 @@ export function AvailableFromDateTimeInput({
   )
 
   const availableFromDateProps = {
-    key,
     id: key,
     disabled:
       Boolean(blueprintDateLocks?.includes('availability_dates')) || disabledWithGradingPeriod,

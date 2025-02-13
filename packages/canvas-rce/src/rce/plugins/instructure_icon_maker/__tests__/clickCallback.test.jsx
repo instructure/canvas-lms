@@ -17,14 +17,9 @@
  */
 
 import clickCallback, {ICONS_TRAY_CONTAINER_ID} from '../clickCallback'
-import ReactDOM from 'react-dom'
 import FakeEditor from '../../../__tests__/FakeEditor'
-import {waitFor} from '@testing-library/react'
-
-jest.mock('react-dom', () => ({
-  ...jest.requireActual('react-dom'),
-  unmountComponentAtNode: jest.fn(),
-}))
+import {waitFor} from '@testing-library/dom'
+import {act} from '@testing-library/react'
 
 describe('clickCallback()', () => {
   const subject = type => clickCallback(new FakeEditor(), document, type)
@@ -33,7 +28,9 @@ describe('clickCallback()', () => {
     beforeEach(() => (document.body.innerHTML = ''))
 
     it('creates the container', async () => {
-      subject('create_icon_maker_icon')
+      await act(async () => {
+        subject('create_icon_maker_icon')
+      })
 
       await waitFor(() => {
         expect(document.getElementById(ICONS_TRAY_CONTAINER_ID)).toBeTruthy()
@@ -41,7 +38,9 @@ describe('clickCallback()', () => {
     })
 
     it('mounts the component', async () => {
-      subject('create_icon_maker_icon')
+      await act(async () => {
+        subject('create_icon_maker_icon')
+      })
 
       await waitFor(() => {
         expect(document.querySelector('[data-testid="icon-name"]')).toBeTruthy()
@@ -51,7 +50,9 @@ describe('clickCallback()', () => {
 
   describe('when the container exists', () => {
     beforeEach(async () => {
-      subject('edit_icon_maker_icon')
+      await act(async () => {
+        subject('edit_icon_maker_icon')
+      })
 
       await waitFor(() => {
         expect(document.querySelector('[data-testid="icon-name"]')).toBeTruthy()
@@ -59,9 +60,10 @@ describe('clickCallback()', () => {
     })
 
     it('re-mounts the component', async () => {
-      subject('create_icon_maker_icon')
+      await act(async () => {
+        subject('create_icon_maker_icon')
+      })
 
-      await waitFor(() => expect(ReactDOM.unmountComponentAtNode).toHaveBeenCalled())
       await waitFor(() => {
         expect(document.querySelector('[data-testid="icon-name"]')).toBeTruthy()
       })

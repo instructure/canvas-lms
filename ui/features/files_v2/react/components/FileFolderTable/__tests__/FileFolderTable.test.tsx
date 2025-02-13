@@ -16,53 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import FileFolderTable from '..'
-import {BrowserRouter} from 'react-router-dom'
-import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {QueryClient} from '@tanstack/react-query'
 import fetchMock from 'fetch-mock'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
-import {FileManagementContext} from '../../Contexts'
-
-const defaultProps = {
-  size: 'large' as 'large' | 'small' | 'medium',
-  userCanEditFilesForContext: true,
-  userCanDeleteFilesForContext: true,
-  usageRightsRequiredForContext: false,
-  paginationLinks: {},
-  onLoadingStatusChange: jest.fn(),
-  currentUrl:
-    '/api/v1/folders/1/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status',
-  onPaginationLinkChange: jest.fn(),
-  folderBreadcrumbs: [],
-}
-
-const renderComponent = (props = {}) => {
-  const queryClient = new QueryClient()
-
-  return render(
-    <BrowserRouter>
-      <MockedQueryClientProvider client={queryClient}>
-        <FileManagementContext.Provider
-          value={{contextType: 'course', contextId: '1', folderId: '1', showingAllContexts: false}}
-        >
-          <FileFolderTable {...defaultProps} {...props} />
-        </FileManagementContext.Provider>
-      </MockedQueryClientProvider>
-    </BrowserRouter>,
-  )
-}
+import {renderComponent} from './testUtils'
 
 describe('FileFolderTable', () => {
+  let flashElements: any
+
   beforeEach(() => {
     fetchMock.get(/.*\/folders/, FAKE_FOLDERS_AND_FILES)
+    flashElements = document.createElement('div')
+    flashElements.setAttribute('id', 'flash_screenreader_holder')
+    flashElements.setAttribute('role', 'alert')
+    document.body.appendChild(flashElements)
   })
 
   afterEach(() => {
     fetchMock.restore()
+    document.body.removeChild(flashElements)
+    flashElements = undefined
   })
 
   it('renders filedrop when no results and not loading', async () => {
@@ -95,7 +69,7 @@ describe('FileFolderTable', () => {
     expect(screen.getByText(FAKE_FOLDERS_AND_FILES[0].name)).toBeInTheDocument()
   })
 
-  describe('FileFolderTable - modifiedBy column', () => {
+  describe('modified_by column', () => {
     it('renders link with user profile of file rows when modified by user', async () => {
       fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true})
       const {display_name, html_url} = FAKE_FILES[0].user || {}
@@ -119,7 +93,7 @@ describe('FileFolderTable', () => {
     })
   })
 
-  describe('FileFolderTable - selection behavior', () => {
+  describe('selection behavior', () => {
     it('allows row selection and highlights selected rows', async () => {
       const user = userEvent.setup()
       fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true, delay: 0})
@@ -196,9 +170,21 @@ describe('FileFolderTable', () => {
         expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(true)
       })
     })
+
+    it('updates select screen reader alert when rows are selected', async () => {
+      const user = userEvent.setup()
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true, delay: 0})
+      renderComponent()
+
+      const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
+      await user.click(rowCheckboxes[0])
+
+      // includes alert and the visible text
+      expect(screen.getAllByText('1 of 1 selected')).toHaveLength(2)
+    })
   })
 
-  describe('FileFolderTable - rights column', () => {
+  describe('rights column', () => {
     it('does not render rights column when usage rights are not required', async () => {
       fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true})
       renderComponent({usageRightsRequiredForContext: false})
@@ -227,7 +213,7 @@ describe('FileFolderTable', () => {
     })
   })
 
-  describe('FileFolderTable - bulk actions behavior', () => {
+  describe('bulk actions behavior', () => {
     it('disabled buttons when elements are not selected', async () => {
       fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], {
         overwriteRoutes: true,
@@ -249,7 +235,29 @@ describe('FileFolderTable', () => {
       await user.click(selectAllCheckbox)
       rowCheckboxes.forEach(checkbox => expect(checkbox).toBeChecked())
 
-      expect(screen.getByText('1 of 1 selected')).toBeInTheDocument()
+      expect(screen.getAllByText('1 of 1 selected')).toHaveLength(2)
+    })
+  })
+
+  describe('FileFolderTable - blueprint behavior', () => {
+    it('renders the BP column', async () => {
+      ENV.BLUEPRINT_COURSES_DATA = {
+        isMasterCourse: true,
+        isChildCourse: false,
+        accountId: '1',
+        course: {id: '1', name: 'course', enrollment_term_id: '1'},
+        masterCourse: {id: '1', name: 'course', enrollment_term_id: '1'},
+      }
+      renderComponent()
+
+      expect(screen.queryByText('Blueprint')).toBeInTheDocument()
+    })
+
+    it('does not render the BP column', async () => {
+      ENV.BLUEPRINT_COURSES_DATA = undefined
+      renderComponent()
+
+      expect(screen.queryByText('Blueprint')).not.toBeInTheDocument()
     })
   })
 })

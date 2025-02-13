@@ -116,7 +116,7 @@ describe "Gradebook Controls" do
       Gradebook.open_action_menu
       Gradebook.action_menu_item_selector("import").click
 
-      expect(driver.current_url).to include "courses/#{@course.id}/gradebook_upload/new"
+      expect(driver.current_url).to include "courses/#{@course.id}/gradebook_uploads"
     end
   end
 
@@ -126,7 +126,7 @@ describe "Gradebook Controls" do
       Gradebook.visit(@course)
       Gradebook.select_import(@course)
 
-      expect(driver.current_url).to include "courses/#{@course.id}/gradebook_upload/new"
+      expect(driver.current_url).to include "courses/#{@course.id}/gradebook_uploads"
     end
   end
 end

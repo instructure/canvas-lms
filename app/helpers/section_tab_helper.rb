@@ -22,11 +22,9 @@ module SectionTabHelper
   PERMISSIONS_TO_PRECALCULATE = [
     :create_conferences,
     :create_forum,
-    :manage_assignments,
     :manage_assignments_add,
     :manage_assignments_edit,
     :manage_assignments_delete,
-    :manage_content,
     :manage_files_add,
     :manage_files_edit,
     :manage_files_delete,

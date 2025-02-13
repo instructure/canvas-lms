@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import authenticityToken from '@canvas/authenticity-token'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {ApiResponse, OtpInitiationResponse, OtpVerifyResponse} from '../types'
 
@@ -31,11 +32,14 @@ export const initiateOtpRequest = async (): Promise<ApiResponse<OtpInitiationRes
 export const verifyOtpRequest = async (
   verificationCode: string,
   rememberMe: boolean,
+  csrfToken?: string,
 ): Promise<ApiResponse<OtpVerifyResponse>> => {
+  const token = csrfToken || authenticityToken()
   const {json, response} = await doFetchApi<OtpVerifyResponse>({
     path: '/login/otp',
     method: 'POST',
     body: {
+      authenticity_token: token,
       otp_login: {
         verification_code: verificationCode,
         remember_me: rememberMe ? '1' : '0',
@@ -46,10 +50,14 @@ export const verifyOtpRequest = async (
   return {status: response.status, data: json ?? ({} as OtpVerifyResponse)}
 }
 
-export const cancelOtpRequest = async () => {
+export const cancelOtpRequest = async (csrfToken?: string) => {
+  const token = csrfToken || authenticityToken()
   const {json, response} = await doFetchApi({
     path: '/login/otp/cancel',
     method: 'DELETE',
+    body: {
+      authenticity_token: token,
+    },
   })
 
   return {status: response.status, data: json ?? {}}

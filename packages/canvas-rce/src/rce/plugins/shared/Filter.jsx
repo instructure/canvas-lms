@@ -66,7 +66,7 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
         renderBeforeLabel={IconFolderLine}
       >
         {fileLabelFromContext('course')}
-      </SimpleSelect.Option>
+      </SimpleSelect.Option>,
     )
   }
 
@@ -79,7 +79,7 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
         renderBeforeLabel={IconFolderLine}
       >
         {fileLabelFromContext('group')}
-      </SimpleSelect.Option>
+      </SimpleSelect.Option>,
     )
   }
 
@@ -93,9 +93,9 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
         renderBeforeLabel={IconFolderLine}
       >
         {fileLabelFromContext(
-          contentType === 'links' || contentSubtype === 'all' ? 'files' : 'user'
+          contentType === 'links' || contentSubtype === 'all' ? 'files' : 'user',
         )}
-      </SimpleSelect.Option>
+      </SimpleSelect.Option>,
     )
   }
 
@@ -108,7 +108,7 @@ function renderType(
   mountNode,
   onChange,
   userContextType,
-  containingContextType
+  containingContextType,
 ) {
   // Check containingContextType so that we always show context links
   if (containingContextType === 'course' || containingContextType === 'group') {
@@ -218,7 +218,7 @@ export default function Filter(props) {
           mountNode,
           onChange,
           userContextType,
-          containingContextType
+          containingContextType,
         )}
       {contentType !== 'links' && (
         <Flex margin="small none none none">

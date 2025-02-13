@@ -75,7 +75,7 @@ export const RubricSelfAssessmentSettings = ({
           renderTip={
             <View width='336px' as='div'>
               {
-                I18n.t('This toggle will be disabled if the due date has passed OR there have already been self-assessments made on this assignment.')
+                I18n.t('This toggle will be disabled if the due date has passed OR there have already been self-assessments made on this assignment OR if the assignment is a group assignment.')
               }
             </View>
           }

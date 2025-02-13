@@ -55,6 +55,6 @@ export default function (editor: Editor, document: Document) {
         return ['', '']
       }}
     />,
-    container
+    container,
   )
 }

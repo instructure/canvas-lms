@@ -288,9 +288,11 @@
       {{#t "#buttons.cancel"}}Cancel{{/t}}
     </button>
     {{#unless published}}
-      <button type="button" class="btn btn-default save_and_publish">
-        {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
-      </button>
+      {{#unless is_horizon_course}}
+        <button type="button" class="btn btn-default save_and_publish">
+          {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
+        </button>
+      {{/unless}}
     {{/unless}}
     {{#if showBuildButton}}
       <button type="button" class="btn btn-default save_button">

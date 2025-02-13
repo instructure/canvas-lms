@@ -22,7 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import RequirementCountInput from './RequirementCountInput'
 import RequirementSelector from './RequirementSelector'
-import type {Requirement, ModuleItem} from './types'
+import type {Requirement, ModuleItem, PointsInputMessages} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 
@@ -38,6 +38,8 @@ export interface RequirementFormProps {
   onAddRequirement: (requirement: Requirement) => void
   onDropRequirement: (index: number) => void
   onUpdateRequirement: (requirement: Requirement, index: number) => void
+  pointsInputMessages: PointsInputMessages
+  validatePointsInput: (requirement: Requirement) => void
 }
 
 export default function RequirementForm({
@@ -50,6 +52,8 @@ export default function RequirementForm({
   onAddRequirement,
   onDropRequirement,
   onUpdateRequirement,
+  pointsInputMessages,
+  validatePointsInput
 }: RequirementFormProps) {
   const addRequirementButton = createRef<Button>()
   const internalLastAction = useRef<{action: 'add' | 'delete'; index: number} | null>(null)
@@ -126,6 +130,8 @@ export default function RequirementForm({
           index={index}
           focusDropdown={focus?.type === 'dropdown' && focus?.index === index}
           focusDeleteButton={focus?.type === 'button' && focus?.index === index}
+          pointsInputMessages={pointsInputMessages}
+          validatePointsInput={validatePointsInput}
         />
       ))}
       {availableModuleItems.length > 0 && (

@@ -69,8 +69,7 @@ describe "Pace Contexts API" do
         end
       end
 
-      it "successfully calls the pace_context api when granular perms on" do
-        Account.root_accounts.first.enable_feature!(:granular_permissions_manage_course_content)
+      it "successfully calls the pace_context api" do
         get api_v1_pace_contexts_path(course.id), params: { type: "course", format: :json }
         expect(response).to have_http_status :ok
       end

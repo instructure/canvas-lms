@@ -42,10 +42,10 @@ tinymce.create('tinymce.plugins.AccessibilityChecker', {
               additionalRules={additionalRules}
               mountNode={mountNode}
               onClose={() => {
-                isCheckerOpen = false;
-                if(triggerElementId){
-                    const button = document.querySelectorAll(`[data-btn-id=${triggerElementId}]`);
-                    button[0]?.focus();
+                isCheckerOpen = false
+                if (triggerElementId) {
+                  const button = document.querySelectorAll(`[data-btn-id=${triggerElementId}]`)
+                  button[0]?.focus()
                 }
               }}
               onFixError={onFixError}
@@ -60,11 +60,11 @@ tinymce.create('tinymce.plugins.AccessibilityChecker', {
               if (config) getInstance(instance => instance.setConfig(config))
               pendingInstanceCallbacks.forEach(cb => cb(instance))
               instance.check(done)
-            }
+            },
           )
           isCheckerOpen = true
         }
-      }
+      },
     )
 
     ed.addCommand('checkAccessibility', function (ui, {done, config, additionalRules}) {

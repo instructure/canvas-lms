@@ -5,11 +5,6 @@ default_recaptcha_registration_enable:
   display_name: Enable Recaptcha by default for self-registration
   description: Requires Recaptcha for self-registration by default
   applies_to: SiteAdmin
-granular_permissions_manage_course_content:
-  state: allowed_on
-  applies_to: RootAccount
-  display_name: Granular permissions for managing course content
-  description: Add granularity to permissions around managing all other course content
 course_templates:
   state: hidden
   applies_to: RootAccount
@@ -26,11 +21,6 @@ allow_unconfirmed_users_in_user_list:
   applies_to: RootAccount
   display_name: Allow Unconfirmed E-mail Addresses When Adding Users
   description: This is technicaly a security vulnerability, but some schools need to preserve their workflows for a while.
-granular_permissions_manage_assignments:
-  state: allowed_on
-  applies_to: RootAccount
-  display_name: Granular permissions for assignments and quizzes
-  description: Separate out granular add and delete permissions for assignments and quizzes from the existing manage permission that controls all three.
 course_admin_role_masquerade_permission_check:
   state: allowed
   applies_to: RootAccount

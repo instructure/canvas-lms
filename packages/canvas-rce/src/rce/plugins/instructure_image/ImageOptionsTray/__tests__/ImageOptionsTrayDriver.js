@@ -78,7 +78,7 @@ export default class ImageOptionsTrayDriver {
 
   get $doneButton() {
     return [...this.$element.querySelectorAll('button,[role="button"]')].find(
-      $button => $button.textContent.trim() === 'Done'
+      $button => $button.textContent.trim() === 'Done',
     )
   }
 

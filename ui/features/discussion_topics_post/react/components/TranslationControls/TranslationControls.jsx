@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useMemo, useState} from 'react'
+import React, {forwardRef, useContext, useImperativeHandle, useMemo, useState} from 'react'
 import CanvasMultiSelect from '@canvas/multi-select/react'
 import {View} from '@instructure/ui-view'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
@@ -26,7 +26,7 @@ import PropTypes from 'prop-types'
 const I18n = createI18nScope('discussion_posts')
 
 // TODO: Translate the language co> ntrols into the canvas target locale.
-export const TranslationControls = props => {
+export const TranslationControls = forwardRef((props, ref) => {
   const {translationLanguages, setTranslateTargetLanguage} = useContext(
     DiscussionManagerUtilityContext,
   )
@@ -61,8 +61,17 @@ export const TranslationControls = props => {
     )
   }, [translationLanguages, input])
 
+  const reset = () => {
+    setInput('')
+    setSelected(null)
+  }
+
+  useImperativeHandle(ref, () => ({
+    reset,
+  }))
+
   return (
-    <View as="div" margin="x-small 0 0">
+    <View ref={ref} as="div" margin="x-small 0 0">
       <CanvasMultiSelect
         label={I18n.t('Translate to')}
         onChange={handleSelect}
@@ -79,7 +88,7 @@ export const TranslationControls = props => {
       </CanvasMultiSelect>
     </View>
   )
-}
+})
 
 TranslationControls.propTypes = {
   setTranslationLanguage: PropTypes.func,

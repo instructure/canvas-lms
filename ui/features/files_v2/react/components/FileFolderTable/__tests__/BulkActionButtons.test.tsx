@@ -40,7 +40,8 @@ describe('BulkActionButtons', () => {
     fireEvent.click(moreButton)
 
     await waitFor(() => {
-      expect(screen.getByTestId('bulk-actions-manage-access-button')).toBeInTheDocument()
+      expect(screen.getByTestId('bulk-actions-manage-usage-rights-button')).toBeInTheDocument()
+      expect(screen.getByTestId('bulk-actions-edit-permissions-button')).toBeInTheDocument()
       expect(screen.getByTestId('bulk-actions-move-button')).toBeInTheDocument()
     })
   })
@@ -59,7 +60,8 @@ describe('BulkActionButtons', () => {
     fireEvent.click(moreButton)
 
     await waitFor(() => {
-      expect(screen.queryByTestId('bulk-actions-manage-access-button')).toBeNull()
+      expect(screen.queryByTestId('bulk-actions-manage-usage-rights-button')).toBeNull()
+      expect(screen.queryByTestId('bulk-actions-edit-permissions-button')).toBeNull()
       expect(screen.queryByTestId('bulk-actions-move-button')).toBeNull()
     })
   })

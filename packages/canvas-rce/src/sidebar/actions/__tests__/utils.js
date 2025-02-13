@@ -19,7 +19,6 @@
 import {createStore, applyMiddleware} from 'redux'
 import {thunk} from 'redux-thunk'
 import {batch, batching} from 'redux-batch-middleware'
-import {jest} from '@jest/globals'
 
 // creates a reducer that just alerts a spy on each action and leaves state
 // alone. the associated spy is hung off the returned reducer

@@ -20,6 +20,10 @@ def getFuzzyTagSuffix() {
   return "fuzzy-${env.IMAGE_CACHE_MERGE_SCOPE}"
 }
 
+def getPinnedGitHubGems() {
+  return commitMessageFlag("pin-github-gems") as String
+}
+
 def getRailsLoadAllLocales() {
   return configuration.isChangeMerged() ? 1 : commitMessageFlag('rails-load-all-locales').asBooleanInteger()
 }
@@ -153,6 +157,7 @@ def premergeCacheImage() {
       "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
       "READ_BUILD_CACHE=0",
       "WRITE_BUILD_CACHE=1",
+      "CANVAS_PINNED_GITHUB_GEMS=${getPinnedGitHubGems()}",
     ]) {
       slackSendCacheBuild {
         try {
@@ -203,6 +208,7 @@ def patchsetImage(asyncStepsStr = '', platformSuffix = '') {
         "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
         "READ_BUILD_CACHE=${readBuildCache}",
         "WRITE_BUILD_CACHE=0",
+        "CANVAS_PINNED_GITHUB_GEMS=${getPinnedGitHubGems()}",
       ]) {
         try {
           sh """#!/bin/bash

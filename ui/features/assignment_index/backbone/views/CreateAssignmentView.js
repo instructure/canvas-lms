@@ -92,7 +92,7 @@ CreateAssignmentView.prototype.onSaveSuccess = function () {
   CreateAssignmentView.__super__.onSaveSuccess.apply(this, arguments)
   ENV.PERMISSIONS.by_assignment_id &&
     (ENV.PERMISSIONS.by_assignment_id[this.model.id] = {
-      update: ENV.PERMISSIONS.manage_assignments,
+      update: ENV.PERMISSIONS.manage_assignments_edit,
     })
   if (this.assignmentGroup) {
     this.assignmentGroup.get('assignments').add(this.model)

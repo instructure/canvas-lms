@@ -120,6 +120,8 @@ const ForgotPassword = () => {
             renderLabel={loginHandleName}
             type="email"
             value={email}
+            isRequired={true}
+            data-testid="email-input"
           />
 
           <Flex direction="row" gap="small">
@@ -128,11 +130,18 @@ const ForgotPassword = () => {
               display="block"
               onClick={handleCancel}
               disabled={isUiActionPending}
+              data-testid="cancel-button"
             >
               {I18n.t('Back to Login')}
             </Button>
 
-            <Button type="submit" color="primary" display="block" disabled={isUiActionPending}>
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={isUiActionPending}
+              data-testid="submit-button"
+            >
               {I18n.t('Next')}
             </Button>
           </Flex>
@@ -144,11 +153,11 @@ const ForgotPassword = () => {
   const confirmationMessage = (
     <>
       <Flex direction="column" gap="small">
-        <Heading as="h1" level="h2">
+        <Heading as="h1" level="h2" data-testid="confirmation-heading">
           {I18n.t('Check your email')}
         </Heading>
 
-        <Text>
+        <Text data-testid="confirmation-message">
           {I18n.t(
             'A recovery email has been sent to %{email}. Please check your inbox and follow the instructions to reset your password. This may take up to 10 minutes. If you don’t receive an email, be sure to check your spam folder.',
             {email: submittedEmail},
@@ -156,7 +165,12 @@ const ForgotPassword = () => {
         </Text>
       </Flex>
 
-      <Button color="secondary" display="block" onClick={handleCancel}>
+      <Button
+        color="secondary"
+        display="block"
+        onClick={handleCancel}
+        data-testid="confirmation-back-button"
+      >
         {I18n.t('Back to login')}
       </Button>
     </>

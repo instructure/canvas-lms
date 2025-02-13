@@ -33,14 +33,10 @@ $('#coenrollment_link').click(function (event) {
   const template = $(this).data('template')
   const path = $(this).data('path')
   loadSignupDialog
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    .then(signupDialog => {
+    .then((signupDialog: (id: string, title: string, path: string) => void) => {
       signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
     })
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    .catch(error => {
+    .catch((error: Error) => {
       throw new Error('Failed to load signup dialog', error)
     })
 })
@@ -69,8 +65,7 @@ $('#forgot_password_form').formSubmit({
     // Focus on the close button of the alert we just put up, per a11y
     $('#flash_message_holder button.close_link').focus()
   },
-  // @ts-expect-error
-  error(_data) {
+  error(_data: JQuery.jqXHR) {
     $(this).loadingImage('remove')
   },
 })

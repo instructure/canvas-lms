@@ -174,6 +174,37 @@ describe "calendar2" do
           expect(undated_events.size).to eq 1
           expect(undated_events.first.text).to eq "asdfjkasldfjklasdjfklasdjfklasjf..."
         end
+
+        it "shouldn't show unpublished undated events for observer" do
+          course_with_observer_logged_in
+          @course.assignments.create!(title: "pizza party", workflow_state: "unpublished")
+          get "/calendar2"
+
+          f("#undated-events-button").click
+          wait_for_ajaximations
+          expect(f("#undated-events").text).to eq "No undated items."
+        end
+
+        it "shouldn't show unpublished undated events for student" do
+          course_with_student_logged_in
+          @course.assignments.create!(title: "pizza party", workflow_state: "unpublished")
+          get "/calendar2"
+
+          f("#undated-events-button").click
+          wait_for_ajaximations
+          expect(f("#undated-events").text).to eq "No undated items."
+        end
+
+        it "should show unpublished undated events for teacher" do
+          course_with_teacher_logged_in
+          @course.assignments.create!(title: "pizza party", workflow_state: "unpublished")
+          get "/calendar2"
+
+          f("#undated-events-button").click
+          wait_for_ajaximations
+          undated_events = ff("#undated-events > ul > li")
+          expect(undated_events.size).to eq 1
+        end
       end
     end
   end

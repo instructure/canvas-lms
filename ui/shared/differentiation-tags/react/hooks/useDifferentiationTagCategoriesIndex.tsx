@@ -19,14 +19,24 @@
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useQuery} from '@tanstack/react-query'
 import {QUERY_STALE_TIME} from '../util/constants'
-import {DifferentiationTagCategory} from '../types'
+import {DifferentiationTagCategory, DifferentiationTagGroup} from '../types'
+
+interface UseDifferentiationTagCategoriesOptions {
+  includeDifferentiationTags?: boolean
+  enabled?: boolean
+}
 
 export const useDifferentiationTagCategoriesIndex = (
   courseId: number,
-  includeGroups: boolean = false,
+  options: UseDifferentiationTagCategoriesOptions = {},
 ) => {
+  const hasValidCourseId = !isNaN(courseId)
+  const {includeDifferentiationTags = false, enabled = true} = options
+
   const fetchDifTagCategories = async () => {
-    const response = await doFetchApi<Array<{id: number; name: string}>>({
+    const response = await doFetchApi<
+      Array<{id: number; name: string; groups: DifferentiationTagGroup[]}>
+    >({
       path: `/api/v1/courses/${courseId}/group_categories`,
       headers: {
         Accept: 'application/json',
@@ -34,26 +44,27 @@ export const useDifferentiationTagCategoriesIndex = (
       },
       params: {
         collaboration_state: 'non_collaborative',
-        ...(includeGroups && {'includes[]': 'groups'}),
+        ...(includeDifferentiationTags && {'includes[]': 'groups'}),
       },
     })
 
-    if (!response.json) {
-      throw new Error('Failed to fetch differentiation tag categories')
-    }
-
-    return response.json.map(
+    return (response.json || []).map(
       (item): DifferentiationTagCategory => ({
         id: item.id,
         name: item.name,
+        groups: item.groups || [],
       }),
     )
   }
 
   return useQuery<DifferentiationTagCategory[], Error>({
-    queryKey: ['differentiationTagCategories', courseId, includeGroups],
+    queryKey: ['differentiationTagCategories', courseId, includeDifferentiationTags],
     queryFn: fetchDifTagCategories,
-    enabled: !!courseId,
+    enabled: hasValidCourseId && enabled,
     staleTime: QUERY_STALE_TIME,
+    retry: (failureCount, error) => {
+      if (error.message.includes('404') || !hasValidCourseId) return false
+      return failureCount < 3
+    },
   })
 }

@@ -257,6 +257,7 @@ const AssigneeSelector = ({
               key={option.id}
               group={option.group}
               tagText={option.value}
+              data-testid={'assignee_selector_option'}
             >
               <Text as="div">{option.value}</Text>
               {option.sisID && (
@@ -266,6 +267,15 @@ const AssigneeSelector = ({
                   color={highlightedOptionId === option.id ? 'secondary-inverse' : 'secondary'}
                 >
                   {option.sisID}
+                </Text>
+              )}
+              {option.groupCategoryName && (
+                <Text
+                  as="div"
+                  size="small"
+                  color={highlightedOptionId === option.id ? 'secondary-inverse' : 'secondary'}
+                >
+                  {option.groupCategoryName}
                 </Text>
               )}
             </CanvasMultiSelectOption>

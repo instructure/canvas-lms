@@ -39,7 +39,7 @@ function useKeysEvents(
   setTempTranslateY,
   isMoving,
   setIsMoving,
-  dispatch
+  dispatch,
 ) {
   // Refs that manage the keydown acceleration
   const direction = useRef(0)
@@ -88,9 +88,9 @@ function useKeysEvents(
         setIsMoving(false)
       },
       KEY_EVENT_DELAY,
-      {trailing: true}
+      {trailing: true},
     ),
-    []
+    [],
   )
 
   useEffect(() => {
@@ -98,7 +98,7 @@ function useKeysEvents(
       // If the active element is in the modal header, footer or controls.
       if (
         EVENT_EXCEPTION_ELEMENT_IDS.some(id =>
-          document.getElementById(id)?.contains(document.activeElement)
+          document.getElementById(id)?.contains(document.activeElement),
         )
       ) {
         return
@@ -127,7 +127,7 @@ function useMouseAndTouchEvents(
   tempTranslateY,
   setTempTranslateX,
   setTempTranslateY,
-  setIsMoving
+  setIsMoving,
 ) {
   const initialPageX = useRef(0)
   const initialPageY = useRef(0)
@@ -210,7 +210,7 @@ export function useKeyMouseTouchEvents(translateX, translateY, dispatch) {
     setTempTranslateY,
     isMoving,
     setIsMoving,
-    dispatch
+    dispatch,
   )
 
   const [onMouseDown, onTouchStart] = useMouseAndTouchEvents(
@@ -218,7 +218,7 @@ export function useKeyMouseTouchEvents(translateX, translateY, dispatch) {
     tempTranslateY,
     setTempTranslateX,
     setTempTranslateY,
-    setIsMoving
+    setIsMoving,
   )
 
   // Updates the reducer state when user stops moving.

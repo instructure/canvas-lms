@@ -45,7 +45,7 @@ class RichContentApiController < ApplicationController
   def generate
     account = Context.get_account(@context)
     return render_unauthorized_action unless account.feature_enabled?(:ai_text_tools)
-    return unless authorized_action(@context, @current_user, %i[manage_content manage_course_content_edit])
+    return unless authorized_action(@context, @current_user, :manage_course_content_edit)
 
     llm_generate_config = LLMConfigs.config_for("rich_content_generate")
     llm_modify_config = LLMConfigs.config_for("rich_content_modify")

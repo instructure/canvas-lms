@@ -20,6 +20,15 @@
 
 require_relative "report_spec_helper"
 
+class FakeAccountReport
+  attr_accessor :parameters, :user
+
+  def initialize
+    @parameters = {}
+    @user = @admin
+  end
+end
+
 describe "Account Reports" do
   include ReportSpecHelper
 
@@ -149,6 +158,17 @@ describe "Account Reports" do
     run_jobs
     expect(count).to eq 1
     expect(ar.reload).to be_error
+  end
+
+  describe ".failed_report" do
+    let(:account_report) { FakeAccountReport.new }
+
+    it "when exception is a RootAccountRequiredError it sets a more descriptive message" do
+      exception = CustomReports::Rubrics::RootAccountRequiredError.new
+      AccountReports.failed_report(account_report, exception:)
+      message = "This report can only be run on the root account."
+      expect(account_report.parameters["extra_text"]).to eq message
+    end
   end
 
   describe "sharding" do

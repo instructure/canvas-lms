@@ -20,7 +20,6 @@
 
 require_relative "../../spec_helper"
 require_relative "../../lti_spec_helper"
-require_relative "../../lti_1_3_spec_helper"
 
 module Lti
   describe AppCollator do

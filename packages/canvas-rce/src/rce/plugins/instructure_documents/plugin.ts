@@ -109,7 +109,7 @@ tinymce.PluginManager.add('instructure_documents', function (ed) {
           text: item.text,
           value: item.value,
           onAction: () => doMenuItem(ed, item.value),
-        }))
+        })),
       ),
     onSetup(api) {
       function handleNodeChange() {

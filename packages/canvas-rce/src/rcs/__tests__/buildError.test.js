@@ -76,7 +76,7 @@ describe('buildError()', () => {
 
     it('yields the default error message', () => {
       expect(subject().text).toEqual(
-        'Something went wrong. Check your connection, reload the page, and try again.'
+        'Something went wrong. Check your connection, reload the page, and try again.',
       )
     })
 

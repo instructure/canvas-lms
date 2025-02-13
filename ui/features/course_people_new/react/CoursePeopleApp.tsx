@@ -22,25 +22,25 @@ import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import CoursePeopleContext, {getCoursePeopleContext} from './contexts/CoursePeopleContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import RosterTable from './components/RosterTable/RosterTable'
 
-const CoursePeopleApp: FC = () => {
-  const I18n = useI18nScope('course_people')
+const I18n = createI18nScope('course_people')
 
-  return (
-    <CoursePeopleContext.Provider value={getCoursePeopleContext()}>
-      <ErrorBoundary
-        errorComponent={
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorCategory={I18n.t('Course People Error Page')}
-          />
-        }
-      >
-        <CoursePeopleHeader />
-      </ErrorBoundary>
-    </CoursePeopleContext.Provider>
-  )
-}
+const CoursePeopleApp: FC = () => (
+  <CoursePeopleContext.Provider value={getCoursePeopleContext()}>
+    <ErrorBoundary
+      errorComponent={
+        <GenericErrorPage
+          imageUrl={errorShipUrl}
+          errorCategory={I18n.t('Course People Error Page')}
+        />
+      }
+    >
+      <CoursePeopleHeader />
+      <RosterTable />
+    </ErrorBoundary>
+  </CoursePeopleContext.Provider>
+)
 
 export default CoursePeopleApp

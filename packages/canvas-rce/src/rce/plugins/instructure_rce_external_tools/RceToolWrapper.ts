@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ExternalToolsEnv, RceLtiToolInfo} from './ExternalToolsEnv'
+import type {ExternalToolsEnv, RceLtiToolInfo} from './ExternalToolsEnv'
 import {openToolDialogFor} from './dialog-helper'
 import {simpleCache} from '../../../util/simpleCache'
 import {instUiIconsArray} from '../../../util/instui-icon-helper'
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import {IconLtiSolid} from '@instructure/ui-icons/es/svg'
 
@@ -31,38 +32,6 @@ export interface ExternalToolMenuItem {
   onAction: () => void
 }
 
-interface ExternalToolData {
-  id: string;
-  on_by_default?: boolean | null;
-  favorite?: boolean | null;
-}
-
-export function externalToolsForToolbar<T extends ExternalToolData>(tools: T[]): T[] {
-  // Limit of not on_by_default but favorited tools is 2
-  const favorited = tools.filter(it => it.favorite && !it.on_by_default).slice(0, 2) || []
-  const onByDefault = tools.filter(it => it.on_by_default && it.favorite) || []
-
-  const set = new Map<string, T>()
-
-  // Remove possible overlaps between favorited and onByDefault, otherwise
-  // we'd have duplicate buttons in the toolbar.
-  for (const toolInfo of favorited.concat(onByDefault)) {
-    set.set(toolInfo.id, toolInfo)
-  }
-
-  return Array.from(set.values()).sort((a, b) => {
-    if (a.on_by_default && !b.on_by_default) {
-      return -1;
-    } else if (!a.on_by_default && b.on_by_default) {
-      return 1;
-    } else {
-      // This *should* always be a string, but there might be cases where it isn't,
-      // especially when this method is used outside of TypeScript files.
-      return a.id.toString().localeCompare(b.id.toString(), undefined, {numeric: true})
-    }
-  })
-}
-
 /**
  * Helper class for the connection between an external tool registration and a particular TinyMCE instance.
  */
@@ -70,7 +39,7 @@ export class RceToolWrapper {
   static forEditorEnv(
     env: ExternalToolsEnv,
     toolConfigs = env.availableRceLtiTools,
-    mruIds = loadMruToolIds()
+    mruIds = loadMruToolIds(),
   ): RceToolWrapper[] {
     return toolConfigs.map(it => new RceToolWrapper(env, it, mruIds))
   }
@@ -86,7 +55,7 @@ export class RceToolWrapper {
   constructor(
     public readonly env: ExternalToolsEnv,
     private readonly toolInfo: RceLtiToolInfo,
-    mruToolIds: string[]
+    mruToolIds: string[],
   ) {
     this.iconId = registerToolIcon(env, toolInfo)
     this.isMruTool = mruToolIds.includes(String(toolInfo.id))
@@ -199,7 +168,7 @@ function registerToolIcon(env: ExternalToolsEnv, toolInfo: RceLtiToolInfo): stri
   } else if (iconGlyphName != null && iconGlyphName.length > 0) {
     // InstUI icon used
     const instUiIcon = instUiIconsArray.find(
-      it => it.variant === 'Line' && it.glyphName === iconGlyphName
+      it => it.variant === 'Line' && it.glyphName === iconGlyphName,
     )
 
     if (instUiIcon != null) {
@@ -239,7 +208,6 @@ export function loadMruToolIds(): string[] {
   try {
     list = JSON.parse(window.localStorage?.getItem('ltimru') ?? '[]')
   } catch (ex) {
-    // eslint-disable-next-line no-console
     console.warn('Found bad LTI MRU data', (ex as Error).message)
   }
 
@@ -253,7 +221,6 @@ export function storeMruToolIds(toolIds: string[]): void {
   try {
     window.localStorage?.setItem('ltimru', JSON.stringify(toolIds))
   } catch (ex) {
-    // eslint-disable-next-line no-console
     console.warn('Cannot save LTI MRU list', (ex as Error).message)
   }
 }
@@ -272,7 +239,7 @@ export function addMruToolId(toolId: string, env: ExternalToolsEnv): string[] {
 
 export function buildToolMenuItems(
   availableTools: RceToolWrapper[],
-  viewAllItem: ExternalToolMenuItem
+  viewAllItem: ExternalToolMenuItem,
 ): ExternalToolMenuItem[] {
   return [
     ...availableTools

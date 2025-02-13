@@ -153,6 +153,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (
       (this.queryParams.get('editor') === 'block_editor' || window.ENV.text_editor_preference === "block_editor")
       && this.model.get('body') == null
+      && this.model.get('editor') !== 'rce'
     ) {
       json.edit_with_block_editor = true
     }
@@ -189,7 +190,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   renderStudentTodoAtDate() {
     const elt = this.$studentTodoAtContainer[0]
     if (elt) {
-       
+
       return createRoot(elt).render(
         <DueDateCalendarPicker
           dateType="todo_date"
@@ -241,7 +242,9 @@ export default class WikiPageEditView extends ValidatedFormView {
 
     let chose_block_editor = window.location.href.split("?").filter((piece) => { return piece.indexOf('editor=block_editor') !== -1 }).length === 1
     if(!chose_block_editor){
-      chose_block_editor = window.ENV.text_editor_preference === "block_editor" && this.model.get('body') == null
+      chose_block_editor = window.ENV.text_editor_preference === "block_editor"
+        && this.model.get('body') == null
+        && this.model.get('editor') !== 'rce'
     }
 
     if ( (this.model.get('editor') === 'block_editor' && this.model.get('block_editor_attributes')) || chose_block_editor ) {

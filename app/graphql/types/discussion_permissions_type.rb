@@ -74,15 +74,6 @@ module Types
       object[:loader].load(:read_as_admin)
     end
 
-    field :manage_content, Boolean, null: true
-    def manage_content
-      Loaders::PermissionsLoader.for(
-        object[:discussion_topic].context,
-        current_user:,
-        session:
-      ).load(:manage_content)
-    end
-
     field :manage_course_content_add, Boolean, null: true
     def manage_course_content_add
       Loaders::PermissionsLoader.for(

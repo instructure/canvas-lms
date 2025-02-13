@@ -40,6 +40,13 @@ module Lti::Messages
         document_targets: %w[iframe window].freeze,
         media_types: %w[application/vnd.ims.lti.v1.ltilink].freeze
       }.freeze,
+      "ActivityAssetProcessor" => {
+        accept_multiple: true,
+        accept_types: %w[ltiAssetProcessor].freeze,
+        auto_create: true,
+        document_targets: %w[iframe window].freeze,
+        media_types: %w[application/vnd.ims.lti.v1.ltilink].freeze
+      }.freeze,
       "collaboration" => {
         accept_multiple: false,
         accept_types: %w[ltiResourceLink].freeze,

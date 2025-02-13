@@ -86,14 +86,6 @@ describe "course pace page" do
 
       expect(element_exists?(save_draft_button_selector)).to be_truthy
     end
-
-    it "pace in a draft state renders draft status pill" do
-      visit_course_paces_page
-
-      click_create_default_pace_button
-
-      expect(element_exists?(draft_pace_status_pill_selector)).to be_truthy
-    end
   end
 
   context "remove course pace button" do

@@ -176,6 +176,32 @@ describe "context modules" do
         module_index_menu_tool_link("Edit").click
         expect(element_exists?(remove_requirement_button_selector, true)).to be_falsey
       end
+
+      context "course_pace_time_selection is enabled" do
+        before do
+          @course.root_account.enable_feature!(:modules_requirements_allow_percentage)
+          @course.root_account.reload
+        end
+
+        it "select percentage type and validate number input", :ignore_js_errors do
+          add_existing_module_item("AssignmentModule", @assignment)
+          go_to_modules
+
+          @course.reload
+          smodule = @course.context_modules.first
+
+          manage_module_button(smodule).click
+          module_index_menu_tool_link("Edit").click
+
+          click_add_requirement_button
+
+          select_requirement_item_option(0, @assignment.title)
+          select_requirement_type_option(0, "Score at least")
+          select_score_type_option(0, "Percentage")
+
+          expect(element_exists?(number_input_selector(0))).to be_truthy
+        end
+      end
     end
   end
 end

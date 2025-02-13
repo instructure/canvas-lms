@@ -21,12 +21,14 @@ module VisibilityHelpers
   module Common
     def service_cache_fetch(service:, course_ids: nil, user_ids: nil, additional_ids: nil, &)
       key = service_cache_key(service:, course_ids:, user_ids:, additional_ids:)
-      Rails.cache.fetch(key, expires_in: 1.minute, &)
+      Rails.cache.fetch(key, expires_in: VisibilityHelpers::CacheSettings.ttl, &)
     end
 
     private
 
     def sanitize_and_stringify_ids(ids)
+      return "nil" if ids.nil?
+
       Array(ids).map { |id| id.respond_to?(:id) ? id.id : id }.sort.join(",")
     end
 

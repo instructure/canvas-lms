@@ -125,7 +125,11 @@ module BlockEditorPage
   end
 
   def open_block_toolbox_to_tab(tab_name)
-    block_toolbox_toggle.click
+    begin
+      expect(f("#tab-#{tab_name}")).to be_displayed
+    rescue Selenium::WebDriver::Error::NoSuchElementError # rubocop:disable Specs/NoNoSuchElementError
+      block_toolbox_toggle.click
+    end
     f("#tab-#{tab_name}").click
   end
 
@@ -162,6 +166,14 @@ module BlockEditorPage
     f(block_resize_handle_selector(direction))
   end
 
+  def use_the_rce_button
+    f(".new_rce_page")
+  end
+
+  def rce_container
+    f(".ic-RichContentEditor")
+  end
+
   def block_toolbar
     f(".block-toolbar")
   end
@@ -176,6 +188,10 @@ module BlockEditorPage
 
   def block_toolbar_delete_button_selector
     ".block-toolbar button:contains('Delete')"
+  end
+
+  def block_toolbar_button
+    fj("#{group_block_inner_selector}:contains('Click me')")
   end
 
   def block_toolbar_delete_button
@@ -216,7 +232,7 @@ module BlockEditorPage
   end
 
   def text_block
-    f(".text-block")
+    f(".rce-text-block")
   end
 
   # Sections
@@ -273,6 +289,18 @@ module BlockEditorPage
   # blocks
   def page_block
     f(".page-block")
+  end
+
+  def block_tag_selector
+    ".block-tag"
+  end
+
+  def block_tag
+    f(block_tag_selector)
+  end
+
+  def button_block
+    f(".button-block")
   end
 
   def group_block_child
@@ -373,6 +401,22 @@ module BlockEditorPage
 
   def text_block_popup
     f("#rce-text-block-popup")
+  end
+
+  def editor_area
+    f("#editor-area")
+  end
+
+  def top_bar_action(action)
+    f("[data-testid='topbar-button-#{action}']")
+  end
+
+  def preview_modal_background_image
+    f(".block-editor-previewview")
+  end
+
+  def preview_modal_close_button
+    f("[data-testid='preview-modal-close-button']")
   end
 
   # Toolbox

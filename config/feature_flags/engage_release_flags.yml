@@ -35,3 +35,9 @@ discussions_speedgrader_revisit:
   applies_to: Account
   display_name: Discussions SpeedGrader Revisit
   description: Contains improvements to Discussions in Speedgrader. i.e. Toggling, Traversal, Overall experience. Requires react_discussions_post and discussion_checkpoints feature flags to completely work.
+deprecate_context_groups_old_view:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Deprecate Legacy View of Context Groups
+  description: Removes dead code from the context groups view that is no longer used.
+  

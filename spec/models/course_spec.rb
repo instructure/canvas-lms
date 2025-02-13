@@ -5949,39 +5949,6 @@ describe Course do
         @shard1.activate do
           acct = Account.create!
           course_with_student(active_all: 1, account: acct)
-          @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
-        end
-        @site_admin = user_factory
-        site_admin = Account.site_admin
-        site_admin.account_users.create!(user: @user)
-
-        @shard1.activate do
-          expect(@course.grants_right?(@site_admin, :manage_content)).to be_truthy
-          expect(@course.grants_right?(@teacher, :manage_content)).to be_truthy
-          expect(@course.grants_right?(@student, :manage_content)).to be_falsey
-        end
-
-        expect(@course.grants_right?(@site_admin, :manage_content)).to be_truthy
-      end
-
-      enable_cache do
-        # do it in a different order
-        @shard1.activate do
-          expect(@course.grants_right?(@student, :manage_content)).to be_falsey
-          expect(@course.grants_right?(@teacher, :manage_content)).to be_truthy
-          expect(@course.grants_right?(@site_admin, :manage_content)).to be_truthy
-        end
-
-        expect(@course.grants_right?(@site_admin, :manage_content)).to be_truthy
-      end
-    end
-
-    it "properly returns site admin permissions from another shard (granular permissions)" do
-      enable_cache do
-        @shard1.activate do
-          acct = Account.create!
-          course_with_student(active_all: 1, account: acct)
-          @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
         end
         @site_admin = user_factory
         site_admin = Account.site_admin
@@ -6722,7 +6689,7 @@ describe Course do
 
     it "shows all modules to teachers even when course is concluded" do
       @course.complete!
-      expect(@course.grants_right?(@teacher, :manage_content)).to be(false)
+      expect(@course.grants_right?(@teacher, :manage_course_content_edit)).to be(false)
       expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
     end
 

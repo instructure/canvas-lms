@@ -794,6 +794,19 @@ describe "Discussion Topic Show" do
       end
     end
 
+    context "Horizon course" do
+      before do
+        Account.site_admin.enable_feature!(:horizon_course_setting)
+        @course.horizon_course = true
+        @course.save!
+      end
+
+      it "does not navigate to discussions" do
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(element_exists?(".discussion-reply-box")).to be_falsey
+      end
+    end
+
     context "when Discussion Summary feature flag is ON" do
       before do
         Account.default.enable_feature!(:discussion_summary)
@@ -836,6 +849,8 @@ describe "Discussion Topic Show" do
         expect(Discussion.summary_generate_button).to be_present
         expect(Discussion.summary_disable_button).to be_present
         expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
+
+        scroll_into_view Discussion.summary_like_button
 
         Discussion.click_summary_like_button
         Discussion.click_summary_dislike_button

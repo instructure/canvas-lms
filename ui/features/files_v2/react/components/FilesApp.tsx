@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
@@ -31,6 +31,9 @@ import {useLoaderData} from 'react-router-dom'
 import {type Folder} from '../../interfaces/File'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {FileManagementContext} from './Contexts'
+import {MainFolderWrapper} from '../../utils/fileFolderWrappers'
+import SearchBar from './SearchBar'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('files_v2')
 
@@ -43,9 +46,13 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const showingAllContexts = filesEnv.showingAllContexts
   const [isTableLoading, setIsTableLoading] = useState(true)
   const [currentPageNumber, setCurrentPageNumber] = useState(1)
-  const [currentUrl, setCurrentUrl] = useState<string | null>(null)
+  const [sortBy, setSortBy] = useState<string>('name')
+  const [sortDirection, setSortDirection] = useState<string>('asc')
+  const [currentUrl, setCurrentUrl] = useState<string>('')
   const [discoveredPages, setDiscoveredPages] = useState<{[key: number]: string}>({})
-  const folders = useLoaderData() as Folder[] | null
+  const [paginationSRText, setPaginationSRText] = useState<string>('')
+  const {folders, searchTerm} = useLoaderData() as {folders: Folder[] | null; searchTerm: string}
+  const currentFolderWrapper = useRef<MainFolderWrapper | null>(null)
 
   // the useEffect is necessary to protect against folders being empty
   useEffect(() => {
@@ -53,11 +60,60 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
 
     const currentFolder = folders[folders.length - 1]
     const folderId = currentFolder.id
-    const initialUrl = `/api/v1/folders/${folderId}/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
+    const contextId = currentFolder.context_id
+    const contextType = currentFolder.context_type.toLowerCase()
+    let baseUrl
+    if (searchTerm) {
+      baseUrl = `/api/v1/${contextType}s/${contextId}/files?search_term=${searchTerm}&per_page=50&include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
+    } else {
+      baseUrl = `/api/v1/folders/${folderId}/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
+    }
 
-    setCurrentUrl(initialUrl)
-    setDiscoveredPages({1: initialUrl})
-  }, [folders])
+    const newCurrentUrl = `${baseUrl}&sort=${sortBy}&order=${sortDirection}`
+    setCurrentUrl(newCurrentUrl)
+    setDiscoveredPages({1: newCurrentUrl})
+    setCurrentPageNumber(1)
+
+    currentFolderWrapper.current = new MainFolderWrapper(currentFolder)
+  }, [folders, searchTerm, sortBy, sortDirection])
+
+  const handleTableLoadingStatusChange = useCallback((isLoading: boolean) => {
+    setIsTableLoading(isLoading)
+  }, [])
+
+  const handlePaginationLinkChange = useCallback(
+    (links: Record<string, string>) => {
+      let srTotalPageNumber = Object.keys(discoveredPages).length
+      if (links.next && !discoveredPages[currentPageNumber + 1]) {
+        setDiscoveredPages(prev => {
+          const newLinks = {...prev, [currentPageNumber + 1]: links.next}
+          return newLinks
+        })
+        srTotalPageNumber++
+      }
+
+      setPaginationSRText(
+        I18n.t('Table page %{currentPageNumber} of %{totalPageNumber}', {
+          currentPageNumber,
+          totalPageNumber: srTotalPageNumber,
+        }),
+      )
+    },
+    [currentPageNumber, discoveredPages],
+  )
+
+  const handlePageChange = useCallback(
+    (pageNumber: number) => {
+      setCurrentPageNumber(pageNumber)
+      setCurrentUrl(discoveredPages[pageNumber])
+    },
+    [discoveredPages],
+  )
+
+  const handlesortChange = useCallback((newSortBy: string, newSortDirection: string) => {
+    setSortBy(newSortBy)
+    setSortDirection(newSortDirection)
+  }, [])
 
   if (!folders || folders.length === 0) {
     showFlashError(I18n.t('Failed to retrieve folder information'))
@@ -80,25 +136,23 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const usageRightsRequiredForContext =
     filesEnv.contextFor({contextType, contextId})?.usage_rights_required || false
 
-  const handleTableLoadingStatusChange = (isLoading: boolean) => {
-    setIsTableLoading(isLoading)
-  }
-
-  const handlePaginationLinkChange = (links: Record<string, string>) => {
-    if (links.next && !discoveredPages[currentPageNumber + 1]) {
-      setDiscoveredPages(prev => ({...prev, [currentPageNumber + 1]: links.next}))
-    }
-  }
-
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPageNumber(pageNumber)
-    setCurrentUrl(discoveredPages[pageNumber])
-  }
-
   return (
-    <FileManagementContext.Provider value={{folderId, contextType, contextId, showingAllContexts}}>
+    <FileManagementContext.Provider
+      value={{
+        folderId,
+        contextType,
+        contextId,
+        showingAllContexts,
+        currentFolder: currentFolderWrapper.current,
+      }}
+    >
       <View as="div">
-        <FilesHeader size={size} isUserContext={isUserContext} />
+        <FilesHeader
+          size={size}
+          isUserContext={isUserContext}
+          shouldHideUploadButtons={!userCanAddFilesForContext}
+        />
+        <SearchBar initialValue={searchTerm} />
         {currentUrl && (
           <FileFolderTable
             size={size}
@@ -109,11 +163,21 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
             currentUrl={currentUrl}
             onPaginationLinkChange={handlePaginationLinkChange}
             onLoadingStatusChange={handleTableLoadingStatusChange}
+            onSortChange={handlesortChange}
+            searchString={searchTerm}
           />
         )}
         <Flex padding="small none none none" justifyItems="space-between">
           <Flex.Item size="50%">{userCanManageFilesForContext && <FilesUsageBar />}</Flex.Item>
           <Flex.Item size="auto" padding="none medium none none">
+            <Alert
+              liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+              liveRegionPoliteness="polite"
+              screenReaderOnly
+              data-testid="pagination-announcement"
+            >
+              {paginationSRText}
+            </Alert>
             {!isTableLoading && totalPageNumber > 1 && (
               <Pagination
                 as="nav"

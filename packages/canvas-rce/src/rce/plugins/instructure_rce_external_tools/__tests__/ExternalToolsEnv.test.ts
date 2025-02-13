@@ -17,7 +17,7 @@
  */
 
 import RCEWrapper from '../../../RCEWrapper'
-import {RCEWrapperInterface} from '../../../types'
+import type {RCEWrapperInterface} from '../../../types'
 import {externalToolsEnvFor, ExternalToolsEditor} from '../ExternalToolsEnv'
 import {fallbackIframeAllowances} from '../constants'
 

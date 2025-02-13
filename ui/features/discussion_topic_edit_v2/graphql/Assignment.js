@@ -70,6 +70,7 @@ export const Assignment = {
           }
         }
       }
+      hasSubmittedSubmissions
     }
     ${AssignmentGroup.fragment}
     ${AssignmentOverride.fragment}
@@ -110,6 +111,7 @@ export const Assignment = {
         tag: string,
       }),
     ),
+    hasSubmittedSubmissions: bool,
   }),
 
   mock: ({
@@ -130,6 +132,7 @@ export const Assignment = {
     assignmentOverrides = null,
     hasSubAssignments = false,
     checkpoints = [],
+    hasSubmittedSubmissions = false,
   } = {}) => ({
     id,
     _id,
@@ -148,6 +151,7 @@ export const Assignment = {
     assignmentOverrides,
     hasSubAssignments,
     checkpoints,
+    hasSubmittedSubmissions,
     __typename: 'Assignment',
   }),
 }

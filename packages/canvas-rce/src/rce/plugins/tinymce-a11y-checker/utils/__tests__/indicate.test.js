@@ -26,6 +26,9 @@ import indicate, {
 } from '../indicate'
 
 beforeEach(() => {
+  // Remove any existing style elements
+  document.querySelectorAll('style').forEach(el => el.remove())
+
   document.body.innerHTML = `
   <p id="p1">
     first para
@@ -71,13 +74,13 @@ describe('indicate', () => {
     indicate(document.getElementById('p1'))
     expect(document.querySelector(`style#${A11Y_CHECKER_STYLE_ELEM_ID}`)).toBeTruthy()
     indicate(document.getElementById('p1'))
-    expect(document.querySelectorAll('style').length).toEqual(1)
+    expect(document.querySelectorAll('style')).toHaveLength(1)
   })
 
   it('injects the css into the style element', () => {
     indicate(document.getElementById('s3'))
     expect(document.getElementById(A11Y_CHECKER_STYLE_ELEM_ID).textContent).toEqual(
-      `body>:nth-child(3)>:nth-child(3){${INDICATOR_STYLE}}`
+      `body>:nth-child(3)>:nth-child(3){${INDICATOR_STYLE}}`,
     )
   })
 })

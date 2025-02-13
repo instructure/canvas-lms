@@ -36,7 +36,7 @@ describe('contentRendering', () => {
     it('uses link data to build html', () => {
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>',
       )
     })
 
@@ -45,7 +45,7 @@ describe('contentRendering', () => {
       link.href = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>',
       )
     })
 
@@ -53,7 +53,7 @@ describe('contentRendering', () => {
       link.title = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Click On Me</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Click On Me</a>',
       )
     })
 
@@ -61,7 +61,7 @@ describe('contentRendering', () => {
       link.text = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Here Be Links</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Here Be Links</a>',
       )
     })
 
@@ -70,7 +70,7 @@ describe('contentRendering', () => {
       link.title = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Link</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Link</a>',
       )
     })
 
@@ -87,7 +87,7 @@ describe('contentRendering', () => {
         '<a ' +
           'href="/users/2/files/17/download?verifier=xyzzy" target="_blank" rel="noopener" title="Link" ' +
           'class="instructure_file_link instructure_scribd_file">' +
-          'somefile.pdf</a>'
+          'somefile.pdf</a>',
       )
     })
 
@@ -95,7 +95,7 @@ describe('contentRendering', () => {
       link.href = 'http://example.com/users/2/files/17/download?verifier=xyzzy'
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="http://example.com/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+        '<a href="http://example.com/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>',
       )
     })
 
@@ -103,7 +103,7 @@ describe('contentRendering', () => {
       link.href = '/users/2/files/17/preview?verifier=xyzzy'
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+        '<a href="/users/2/files/17?verifier=xyzzy" title="Here Be Links">Click On Me</a>',
       )
     })
   })
@@ -264,7 +264,7 @@ describe('contentRendering', () => {
             media_entry_id: 'media-entry-id',
             id: 'id',
             file_id: 'file-id',
-          })
+          }),
       )
 
       it('returns media-id', () => {
@@ -279,7 +279,7 @@ describe('contentRendering', () => {
             media_entry_id: 'media-entry-id',
             id: 'id',
             file_id: 'file-id',
-          })
+          }),
       )
 
       it('returns media_entry_id', () => {
@@ -293,7 +293,7 @@ describe('contentRendering', () => {
           (media = {
             id: 'id',
             file_id: 'file-id',
-          })
+          }),
       )
 
       it('returns id', () => {
@@ -306,7 +306,7 @@ describe('contentRendering', () => {
         () =>
           (media = {
             file_id: 'file-id',
-          })
+          }),
       )
 
       it('returns file_id', () => {

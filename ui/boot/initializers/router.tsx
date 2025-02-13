@@ -44,16 +44,24 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/act_as_modal/react/ActAsModalRoute')}
       />
       <Route
+        path="/users/:userId"
+        lazy={() => import('../../features/page_views/react/PageViewsRoute')}
+      />
+      <Route
         path="/accounts/:accountId/users/:userId"
         lazy={() => import('../../features/page_views/react/PageViewsRoute')}
+      />
+      <Route
+        path="/accounts/:accountId/settings/*"
+        lazy={() => import('../../features/alerts/react/AlertListRoute')}
       />
       <Route
         path="/accounts"
         lazy={() => import('../../features/account_manage/react/AccountListRoute')}
       />
       <Route
-        path="/users/:userId"
-        lazy={() => import('../../features/page_views/react/PageViewsRoute')}
+        path="/courses/:courseId/settings/*"
+        lazy={() => import('../../features/alerts/react/AlertListRoute')}
       />
 
       {accountGradingSettingsRoutes}
@@ -74,23 +82,24 @@ const portalRouter = createBrowserRouter(
       {window.ENV.enhanced_rubrics_enabled && RubricRoutes}
 
       <Route path="*" element={<></>} />
-    </Route>
-  )
+    </Route>,
+  ),
 )
+
+// ensure lazy evaluation at render time, preventing `I18n.t()` eager lookup violations
+export function FallbackSpinner() {
+  const I18n = createI18nScope('main')
+  return <Spinner renderTitle={I18n.t('Loading page')} data-testid="fallback-spinner" />
+}
 
 export function loadReactRouter() {
   const mountNode = document.querySelector('#react-router-portals')
-
-  const I18n = createI18nScope('main')
   if (mountNode) {
     const root = ReactDOM.createRoot(mountNode)
     root.render(
       <QueryProvider>
-        <RouterProvider
-          router={portalRouter}
-          fallbackElement={<Spinner renderTitle={I18n.t('Loading page')} />}
-        />
-      </QueryProvider>
+        <RouterProvider router={portalRouter} fallbackElement={<FallbackSpinner />} />
+      </QueryProvider>,
     )
   }
 }

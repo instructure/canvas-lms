@@ -26,6 +26,7 @@ export type ePortfolio = {
   name: string
   public: boolean
   profile_url: string | null
+  eportfolio_url?: string
 }
 export type ePortfolioSection = {
   id: number

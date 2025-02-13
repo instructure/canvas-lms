@@ -270,7 +270,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
           event => {
             Object.assign(event, {preventDefault})
           },
-          true
+          true,
         )
         tray.$doneButton.click()
         expect(preventDefault).toHaveBeenCalledTimes(1)

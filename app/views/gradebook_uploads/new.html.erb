@@ -45,6 +45,18 @@
         <%= f.file_field :uploaded_data, class: 'ic-Input' %>
       </div>
 
+      <% if @no_file_message.present? %>
+        <p
+          class="ic-Form-message ic-Form-message--error"
+          style="color: #E62429; margin: 0; display: flex; align-items: center;"
+          role="alert"
+          aria-live="assertive"
+        >
+          <i class="icon-warning icon-Solid" aria-hidden="true" style="margin-right: 4px"></i>
+          <%= @no_file_message %>
+        </p>
+      <% end %>
+
       <div class="ic-Form-actions">
         <%= f.submit t("Upload Data"), class: "Button Button--primary" %>
       </div>

@@ -24,6 +24,7 @@ import React from 'react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import SubmissionManager from '../SubmissionManager'
 import store from '../stores'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -41,25 +42,55 @@ jest.useFakeTimers()
 
 describe('SubmissionManager', () => {
   beforeAll(() => {
-    window.INST = window.INST || {}
-    window.INST.editorButtons = []
+    fakeENV.setup({
+      INST: {
+        editorButtons: [],
+      },
+    })
+  })
+
+  afterAll(() => {
+    fakeENV.teardown()
   })
 
   beforeEach(() => {
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
   })
 
-  describe('self assessment', () => {
-    const originalENV = window.ENV
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
+  describe('self assessment', () => {
     beforeEach(() => {
-      originalENV.enhanced_rubrics_enabled = true
+      store.setState({
+        selfAssessment: {
+          data: null,
+        },
+        displayedAssessment: null,
+        isSavingRubricAssessment: false,
+      })
+      fakeENV.setup({
+        enhanced_rubrics_enabled: true,
+        peerReviewModeEnabled: false,
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
     })
 
     const renderComponent = async (assignmentOverrides = {}, isSubmitted = true) => {
       const props = await mockAssignmentAndSubmission({
         Submission: {
-          ...(isSubmitted ? SubmissionMocks.submitted : SubmissionMocks.missing),
+          ...(isSubmitted
+            ? {
+                ...SubmissionMocks.submitted,
+                state: 'submitted',
+                submissionStatus: 'submitted',
+                attempt: 1,
+              }
+            : SubmissionMocks.missing),
         },
       })
       props.assignment.rubric = {
@@ -90,7 +121,6 @@ describe('SubmissionManager', () => {
         ],
       }
       props.assignment.rubricSelfAssessmentEnabled = true
-
       props.assignment = {...props.assignment, ...assignmentOverrides}
 
       return render(
@@ -100,63 +130,77 @@ describe('SubmissionManager', () => {
       )
     }
 
-    it('does not render self assessment button when FF is OFF', async () => {
-      originalENV.enhanced_rubrics_enabled = false
+    it('does not render self assessment button when feature flag is disabled', async () => {
+      fakeENV.setup({enhanced_rubrics_enabled: false})
       const {queryByTestId} = await renderComponent()
 
       expect(queryByTestId('self-assess-button')).not.toBeInTheDocument()
     })
 
-    it('does not render self assessment button when assignment does not have a rubric', async () => {
+    it('does not render self assessment button without a rubric', async () => {
       const {queryByTestId} = await renderComponent({rubric: null})
 
       expect(queryByTestId('self-assess-button')).not.toBeInTheDocument()
     })
 
-    it('does not render self assessment button when assignment has a rubric but self assessment is disabled', async () => {
+    it('does not render self assessment button when self assessment is disabled', async () => {
       const {queryByTestId} = await renderComponent({rubricSelfAssessmentEnabled: false})
 
       expect(queryByTestId('self-assess-button')).not.toBeInTheDocument()
     })
 
-    it('does not render self assessment button when in peer review mode', async () => {
-      originalENV.peerReviewModeEnabled = false
-      const {queryByTestId} = await renderComponent({rubricSelfAssessmentEnabled: false})
-
-      expect(queryByTestId('self-assess-button')).not.toBeInTheDocument()
-    })
-
-    it('renders self assessment button when assignment has a rubric and self assessment is enabled', async () => {
+    it('does not render self assessment button in peer review mode', async () => {
+      fakeENV.setup({peerReviewModeEnabled: true})
       const {queryByTestId} = await renderComponent()
 
-      expect(queryByTestId('self-assess-button')).toBeInTheDocument()
+      expect(queryByTestId('self-assess-button')).not.toBeInTheDocument()
     })
 
-    it('renders self assessment button as disabled if the user has not submitted the assignment', async () => {
+    it('renders disabled self assessment button when assignment is not submitted', async () => {
       const {getByTestId} = await renderComponent({}, false)
 
       expect(getByTestId('self-assess-button')).toBeDisabled()
     })
 
-    it('renders self assessment button as enabled if the user has submitted the assignment', async () => {
+    it('renders enabled self assessment button when assignment is submitted', async () => {
       const {getByTestId} = await renderComponent()
 
-      expect(getByTestId('self-assess-button')).not.toBeDisabled()
+      expect(getByTestId('self-assess-button')).toBeEnabled()
     })
 
-    it('opens rubric assessment tray when self assessment button is clicked', async () => {
+    it('opens rubric assessment tray on self assessment button click', async () => {
+      store.setState({
+        displayedAssessment: {
+          data: [
+            {
+              criterion_id: '1',
+              points: {value: 10, valid: true},
+              description: 'Rating 1',
+              comments: '',
+            },
+          ],
+        },
+        isSavingRubricAssessment: false,
+        selfAssessment: null,
+      })
       const {getByTestId} = await renderComponent()
 
       fireEvent.click(getByTestId('self-assess-button'))
 
+      // First verify the tray opens
       expect(getByTestId('enhanced-rubric-assessment-tray')).toBeInTheDocument()
       expect(getByTestId('rubric-assessment-horizontal-display')).toBeInTheDocument()
       expect(getByTestId('rubric-self-assessment-instructions')).toBeInTheDocument()
-      expect(getByTestId('rubric-self-assessment-rating-button-1')).not.toBeDisabled()
-      expect(getByTestId('rubric-self-assessment-rating-button-0')).not.toBeDisabled()
+
+      // Then verify the buttons are enabled
+      const ratingButton1 = getByTestId('rubric-self-assessment-rating-button-1')
+      const ratingButton0 = getByTestId('rubric-self-assessment-rating-button-0')
+
+      expect(ratingButton1).not.toHaveAttribute('disabled')
+      expect(ratingButton0).not.toHaveAttribute('disabled')
     })
 
-    it('renders the rubric assessment tray in preview mode when the user has already self assessed', async () => {
+    it('shows read-only rubric assessment tray when already self assessed', async () => {
       store.setState({
         selfAssessment: {
           data: [

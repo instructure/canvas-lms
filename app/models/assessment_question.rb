@@ -58,19 +58,17 @@ class AssessmentQuestion < ActiveRecord::Base
 
   set_policy do
     given do |user, session|
-      context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+      context.grants_right?(user, session, :manage_assignments_edit)
     end
     can :read and can :create and can :update and can :delete
 
     given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments_add)
+      context.grants_right?(user, session, :manage_assignments_add)
     end
     can :read and can :create
 
     given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        context.grants_right?(user, session, :manage_assignments_delete)
+      context.grants_right?(user, session, :manage_assignments_delete)
     end
     can :read and can :delete
   end

@@ -21,8 +21,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AsyncComponents from '../default_gradebook/AsyncComponents'
-import {ApolloProvider} from '@apollo/client'
-import {createClient} from '@canvas/apollo-v3'
+import {QueryProvider} from '@canvas/query'
 
 export const showMessageStudentsWithObserversModal = async (props, focusAtEnd) => {
   const mountPoint = document.querySelector("[data-component='MessageStudentsWithObserversModal']")
@@ -37,9 +36,9 @@ export const showMessageStudentsWithObserversModal = async (props, focusAtEnd) =
     const MessageStudentsWhoDialog = await AsyncComponents.loadMessageStudentsWithObserversDialog()
 
     ReactDOM.render(
-      <ApolloProvider client={createClient()}>
+      <QueryProvider>
         <MessageStudentsWhoDialog {...dialogeProps} />
-      </ApolloProvider>,
+      </QueryProvider>,
       mountPoint,
     )
   }

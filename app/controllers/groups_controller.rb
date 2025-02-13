@@ -290,7 +290,9 @@ class GroupsController < ApplicationController
     unless params[:filter].nil?
       @groups = @groups.left_outer_joins(:users).where("groups.name ILIKE :query OR users.name ILIKE :query", query: "%#{ActiveRecord::Base.sanitize_sql_like(params[:filter])}%")
     end
-
+    unless params[:user_id].nil?
+      @groups = @groups.left_outer_joins(:users).where({ users: { id: params[:user_id] } })
+    end
     collaboration_state = params[:collaboration_state].presence || "collaborative"
     case collaboration_state
     when "collaborative"
@@ -435,7 +437,9 @@ class GroupsController < ApplicationController
                      @current_user,
                      session,
                      include: Array(params[:include]),
-                     include_inactive_users:)
+                     include_inactive_users:).tap do |json|
+            json[:group_category_name] = g.group_category.name if collaboration_state == "non_collaborative" && params[:user_id]
+          end
         }
       end
     end

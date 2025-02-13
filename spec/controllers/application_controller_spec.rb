@@ -19,7 +19,6 @@
 #
 
 require_relative "../spec_helper"
-require_relative "../lti_1_3_spec_helper"
 
 RSpec.describe ApplicationController do
   context "group 1" do
@@ -949,7 +948,7 @@ RSpec.describe ApplicationController do
         let(:course) { course_model }
 
         before do
-          allow(course).to receive(:grants_any_right?).and_return true
+          allow(course).to receive(:grants_right?).and_return true
           controller.instance_variable_set(:@context, course)
         end
 
@@ -1177,7 +1176,7 @@ RSpec.describe ApplicationController do
             end
             let_once(:account) { Account.default }
 
-            include_context "lti_1_3_spec_helper"
+            include_context "key_storage_helper"
 
             before do
               tool.developer_key = developer_key
@@ -2770,10 +2769,10 @@ RSpec.describe ApplicationController do
           %i[
             calendar_contexts_limit
             open_registration
-            inbox_auto_response
-            inbox_signature_block
-            inbox_auto_response_for_students
-            inbox_signature_block_for_students
+            enable_inbox_signature_block
+            disable_inbox_signature_block_for_students
+            enable_inbox_auto_response
+            disable_inbox_auto_response_for_students
           ]
         )
       end

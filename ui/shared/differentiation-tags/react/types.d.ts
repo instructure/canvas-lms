@@ -19,4 +19,23 @@
 export interface DifferentiationTagCategory {
   id: number
   name: string
+  groups?: DifferentiationTagGroup[]
+}
+
+export interface DifferentiationTagGroup {
+  id: number
+  name: string
+}
+
+export type ModalMode = 'create' | 'edit'
+export type ModalTagMode = 'single' | 'multi'
+
+export interface Course {
+  readonly id: string
+}
+
+export interface UserTags {
+  id: number
+  name: string
+  groupCategoryName: string
 }

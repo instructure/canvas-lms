@@ -19,6 +19,8 @@
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {createParentAccount, createStudentAccount, createTeacherAccount} from '../register'
 
+jest.mock('@canvas/authenticity-token', () => jest.fn(() => 'testCsrfToken'))
+
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
   default: jest.fn(),
@@ -45,6 +47,7 @@ describe('Register Service', () => {
       path: '/users',
       method: 'POST',
       body: {
+        authenticity_token: 'testCsrfToken',
         user: {
           initial_enrollment_type: 'teacher',
           name: 'Test Teacher',
@@ -89,6 +92,7 @@ describe('Register Service', () => {
         path: '/users',
         method: 'POST',
         body: {
+          authenticity_token: 'testCsrfToken',
           user: {
             name: 'Test Parent',
             terms_of_use: '1',
@@ -146,6 +150,7 @@ describe('Register Service', () => {
         path: '/users',
         method: 'POST',
         body: {
+          authenticity_token: 'testCsrfToken',
           user: {
             name: 'Test Student',
             terms_of_use: '1',
@@ -183,6 +188,7 @@ describe('Register Service', () => {
         path: '/users',
         method: 'POST',
         body: {
+          authenticity_token: 'testCsrfToken',
           user: {
             name: 'Test Student',
             terms_of_use: '1',

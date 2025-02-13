@@ -83,6 +83,8 @@ describe('imageSection()', () => {
   })
 
   describe('with an invalid action', () => {
-    expect(() => subject({type: 'Banana'})).toThrow('Unknown action for image selection reducer')
+    it('throws an error', () => {
+      expect(() => subject({type: 'Banana'})).toThrow('Unknown action for image selection reducer')
+    })
   })
 })

@@ -28,10 +28,10 @@ const I18n = createI18nScope('files_v2')
 interface FilesHeaderProps {
   size: 'small' | 'medium' | 'large'
   isUserContext: boolean
-  disableButtons?: boolean
+  shouldHideUploadButtons?: boolean
 }
 
-const FilesHeader = ({size, isUserContext, disableButtons = false}: FilesHeaderProps) => {
+const FilesHeader = ({size, isUserContext, shouldHideUploadButtons = false}: FilesHeaderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const handleOpenModal = () => {
@@ -63,8 +63,8 @@ const FilesHeader = ({size, isUserContext, disableButtons = false}: FilesHeaderP
             <TopLevelButtons
               size={size}
               isUserContext={isUserContext}
-              isDisabled={disableButtons}
               onCreateFolderButtonClick={handleOpenModal}
+              shouldHideUploadButtons={shouldHideUploadButtons}
             />
           </Flex.Item>
         </Flex>

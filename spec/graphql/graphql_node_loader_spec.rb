@@ -107,5 +107,57 @@ describe GraphQLNodeLoader do
         end
       end
     end
+
+    describe "SubmissionByAssignmentAndUser" do
+      let!(:course) { course_model }
+      let!(:teacher) { teacher_in_course(active_all: true, course:).user }
+      let!(:student) { student_in_course(active_all: true, course:).user }
+      let(:context) { { current_user: teacher } }
+      let!(:assignment) { assignment_model(course:, anonymous_grading: true) }
+
+      it "does not return a submission for a teacher if the assignment is actively anonymous" do
+        GraphQL::Batch.batch do
+          GraphQLNodeLoader.load("SubmissionByAssignmentAndUser",
+                                 { assignment_id: assignment.id, user_id: student.id },
+                                 context).then do |result|
+            expect(result).to be_nil
+          end
+        end
+      end
+
+      it "does return a submission for a teacher if the assignment is not actively anonymous" do
+        assignment.submissions.update_all(workflow_state: :graded, posted_at: 1.day.ago)
+
+        GraphQL::Batch.batch do
+          GraphQLNodeLoader.load("SubmissionByAssignmentAndUser",
+                                 { assignment_id: assignment.id, user_id: student.id },
+                                 context).then do |result|
+            expect(result).not_to be_nil
+          end
+        end
+      end
+
+      it "does return a submission to a teacher for a non-anonymous assignment" do
+        assignment.update!(anonymous_grading: false)
+
+        GraphQL::Batch.batch do
+          GraphQLNodeLoader.load("SubmissionByAssignmentAndUser",
+                                 { assignment_id: assignment.id, user_id: student.id },
+                                 context).then do |result|
+            expect(result).not_to be_nil
+          end
+        end
+      end
+
+      it "does return a submission to a student for an assignment" do
+        GraphQL::Batch.batch do
+          GraphQLNodeLoader.load("SubmissionByAssignmentAndUser",
+                                 { assignment_id: assignment.id, user_id: student.id },
+                                 { current_user: student }).then do |result|
+            expect(result).not_to be_nil
+          end
+        end
+      end
+    end
   end
 end

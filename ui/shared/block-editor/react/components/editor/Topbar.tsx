@@ -63,7 +63,7 @@ export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
       <Flex justifyItems="space-between" padding="x-small">
         <Flex.Item>
           <Flex gap="small">
-            <Button onClick={handleOpenPreview} size="small">
+            <Button onClick={handleOpenPreview} size="small" data-testid="topbar-button-preview">
               Preview
             </Button>
             <IconButton
@@ -72,6 +72,7 @@ export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
               onClick={() => actions.history.undo()}
               disabled={!canUndo}
               size="small"
+              data-testid="topbar-button-undo"
             >
               <IconUndo size="x-small" />
             </IconButton>
@@ -81,6 +82,7 @@ export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
               onClick={() => actions.history.redo()}
               disabled={!canRedo}
               size="small"
+              data-testid="topbar-button-redo"
             >
               <IconRedo size="x-small" />
             </IconButton>

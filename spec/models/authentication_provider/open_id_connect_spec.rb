@@ -94,6 +94,43 @@ describe AuthenticationProvider::OpenIDConnect do
       subject.valid?
     end
 
+    context "when an authentication provider is restored" do
+      let(:discovery_url) { "https://somewhere/.well-known/openid-configuration" }
+
+      before do
+        allow(subject.class).to receive(:restorable?).and_return true
+
+        subject.discovery_url = discovery_url
+        subject.workflow_state = "deleted"
+        subject.save(validate: false)
+      end
+
+      it "fetches the discovery document" do
+        expect(CanvasHttp).to receive(:get).with(discovery_url).and_return(
+          instance_double(Net::HTTPOK, value: 200, body: { issuer: "me" }.to_json)
+        )
+
+        subject.update!(workflow_state: "active")
+      end
+    end
+
+    context "when a restorable authentication provider is deleted" do
+      let(:discovery_url) { "https://somewhere/.well-known/openid-configuration" }
+
+      before do
+        allow(subject.class).to receive(:restorable?).and_return true
+
+        subject.discovery_url = discovery_url
+        subject.save(validate: false)
+      end
+
+      it "fetches the discovery document" do
+        expect(CanvasHttp).not_to receive(:get)
+
+        subject.destroy!
+      end
+    end
+
     it "infers the discovery URL from the issuer" do
       subject.issuer = "https://somewhere"
       response = instance_double(Net::HTTPOK, value: 200, body: { issuer: "me" }.to_json)

@@ -79,8 +79,8 @@ describe "assignments" do
       expect(f("#assignment_#{@assignment.id}").text).to include(@assignment.title)
     end
 
-    it "does not kersplode on the index without the `manage_assignments` permission" do
-      account_admin_user_with_role_changes(role_changes: { manage_assignments: false })
+    it "does not kersplode on the index without the `manage_assignments_edit` permission" do
+      account_admin_user_with_role_changes(role_changes: { manage_assignments_edit: false })
       user_session(@user)
 
       get "/courses/#{@course.id}/assignments"

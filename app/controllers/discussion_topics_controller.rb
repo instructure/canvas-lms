@@ -235,7 +235,33 @@
 #           "type": "boolean"
 #         },
 #         "sort_by_rating": {
-#           "description": "Whether or not entries should be sorted by rating.",
+#           "description": "DEPRECATED, Whether or not entries should be sorted by rating.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "sort_order": {
+#           "description": "How entries should be sorted by default.",
+#           "example": "asc",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "asc",
+#               "desc"
+#             ]
+#           }
+#         },
+#         "sort_order_locked": {
+#           "description": "Can users decide their preferred sort order.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "expand": {
+#           "description": "Threaded replies should be expanded by default.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "expand_locked": {
+#           "description": "Can users decide their preferred thread expand setting.",
 #           "example": true,
 #           "type": "boolean"
 #         }
@@ -307,6 +333,11 @@ class DiscussionTopicsController < ApplicationController
       return unless authorized_action(@context.announcements.temp_record, @current_user, :read)
     else
       return unless authorized_action(@context.discussion_topics.temp_record, @current_user, :read)
+
+      if !api_request? && @context.is_a?(Course) && @context.horizon_course?
+        redirect_to course_context_modules_path(@context.id)
+        return
+      end
     end
 
     return child_topic if is_child_topic?
@@ -419,17 +450,21 @@ class DiscussionTopicsController < ApplicationController
                               nil
                             end
 
+        assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
           FEATURE_FLAGS_URL: feature_flags_url,
           DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
+          ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+          CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
           HAS_SIDE_COMMENT_DISCUSSIONS: Account.site_admin.feature_enabled?(:disallow_threaded_replies_fix_alert) ? @context.active_discussion_topics.only_discussion_topics.where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT).exists? : false,
           totalDiscussions: scope.count,
           permissions: {
             create: @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create),
             moderate: user_can_moderate,
             change_settings: user_can_edit_course_settings?,
-            manage_content: @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
+            manage_content: @context.grants_right?(@current_user, session, :manage_course_content_edit),
             publish: user_can_moderate,
             read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin),
           },
@@ -515,6 +550,10 @@ class DiscussionTopicsController < ApplicationController
 
   def edit
     @topic ||= @context.all_discussion_topics.find(params[:id])
+    if !api_request? && @context.is_a?(Course) && @context.horizon_course? && !@topic.is_announcement
+      redirect_to course_context_modules_path(@context.id)
+      return
+    end
     page_has_instui_topnav
     if @topic.root_topic_id && @topic.has_group_category?
       return redirect_to edit_course_discussion_topic_url(@context.context_id, @topic.root_topic_id)
@@ -535,7 +574,7 @@ class DiscussionTopicsController < ApplicationController
         CAN_SET_GROUP: can_set_group_category,
         CAN_EDIT_GRADES: can_do(@context, @current_user, :manage_grades),
         # if not a course content manager, or if topic is graded, do not show add to todo list checkbox
-        CAN_MANAGE_CONTENT: @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add),
+        CAN_MANAGE_CONTENT: @context.grants_right?(@current_user, session, :manage_course_content_add),
         CAN_MANAGE_ASSIGN_TO_GRADED: @context.discussion_topics.temp_record(assignment_id: 0).grants_right?(@current_user, session, @topic.new_record? ? :create_assign_to : :manage_assign_to),
         CAN_MANAGE_ASSIGN_TO_UNGRADED: @context.discussion_topics.temp_record(assignment_id: nil).grants_right?(@current_user, session, @topic.new_record? ? :create_assign_to : :manage_assign_to),
       }
@@ -635,6 +674,8 @@ class DiscussionTopicsController < ApplicationController
       DISCUSSION_CHECKPOINTS_ENABLED: @context.root_account.feature_enabled?(:discussion_checkpoints),
       ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: Account.site_admin.feature_enabled?(:assignment_edit_placement_not_on_announcements),
       ANNOUNCEMENTS_COMMENTS_DISABLED: Announcement.new(context: @context).comments_disabled?,
+      DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
+      DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -643,7 +684,7 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value]
     end
     js_hash[:STUDENT_PLANNER_ENABLED] =
-      @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+      @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
     if @topic.is_section_specific && @context.is_a?(Course)
       selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
@@ -724,6 +765,10 @@ class DiscussionTopicsController < ApplicationController
 
   def show
     @topic = @context.all_discussion_topics.find(params[:id])
+    if @context.is_a?(Course) && @context.horizon_course? && !@topic.is_announcement
+      redirect_to course_context_modules_path(@context.id)
+      return
+    end
     page_has_instui_topnav
     # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
     @locked = @topic.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
@@ -859,13 +904,18 @@ class DiscussionTopicsController < ApplicationController
 
       edit_url = context_url(@topic.context, :edit_context_discussion_topic_url, @topic)
       edit_url += "?embed=true" if params[:embed] == "true"
+
+      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+
       js_env({
                course_id: params[:course_id] || @context.course&.id,
                context_type: @topic.context_type,
                context_id: @context.id,
                EDIT_URL: edit_url,
                PEER_REVIEWS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_peer_reviews_url, @topic.assignment.id) : nil,
-               discussion_topic_id: params[:id],
+               ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+               CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
+               discussion_topic_id: @topic.id,
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
                rce_mentions_in_discussions: @context.feature_enabled?(:react_discussions_post) && !@topic.anonymous?,
@@ -874,7 +924,7 @@ class DiscussionTopicsController < ApplicationController
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
                discussion_translation_available: Translation.available?(@context, :translation), # Is translation enabled on the course.
                ai_translation_improvements: Account.site_admin.feature_enabled?(:ai_translation_improvements),
-               discussion_translation_languages: Translation.available?(@context, :translation) ? Translation.translated_languages(@current_user) : [],
+               discussion_translation_languages: Translation.available?(@context, :translation) ? Translation.languages : [],
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),
                discussion_summary_enabled: @topic.summary_enabled,
@@ -899,6 +949,8 @@ class DiscussionTopicsController < ApplicationController
                checkpointed_discussion_without_feature_flag:
                  @topic.assignment&.has_sub_assignments? && !@domain_root_account&.feature_enabled?(:discussion_checkpoints),
                DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
+               DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
+               DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
              })
       unless @locked
         InstStatsd::Statsd.distributed_increment("discussion_topic.visit.redesign")
@@ -1135,8 +1187,20 @@ class DiscussionTopicsController < ApplicationController
   # @argument only_graders_can_rate [Boolean]
   #   If true, only graders will be allowed to rate entries.
   #
+  # @argument sort_order [String, "asc"|"desc"]
+  #   Default sort order of the discussion. Accepted values are "asc", "desc".
+  #
+  # @argument sort_order_locked [Boolean]
+  #   If true, users cannot choose their prefered sort order
+  #
+  # @argument expanded [Boolean]
+  #   If true, thread will be expanded by default
+  #
+  # @argument expanded_locked [Boolean]
+  #   If true, users cannot choose their prefered thread expansion setting
+  #
   # @argument sort_by_rating [Boolean]
-  #   If true, entries will be sorted by rating.
+  #  (DEPRECATED) If true, entries will be sorted by rating.
   #
   # @argument attachment [File]
   #   A multipart/form-data form-field-style attachment.
@@ -1148,6 +1212,9 @@ class DiscussionTopicsController < ApplicationController
   #   topic specific to sections, then this parameter may be omitted or set to
   #   "all".  Can only be present only on announcements and only those that are
   #   for a course (as opposed to a group).
+  #
+  # @argument lock_comment [Boolean]
+  #   If is_announcement and lock_comment are true, ‘Allow Participants to Comment’ setting is disabled.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
@@ -1234,8 +1301,20 @@ class DiscussionTopicsController < ApplicationController
   # @argument only_graders_can_rate [Boolean]
   #   If true, only graders will be allowed to rate entries.
   #
+  # @argument sort_order [String, "asc"|"desc"]
+  #   Default sort order of the discussion. Accepted values are "asc", "desc".
+  #
+  # @argument sort_order_locked [Boolean]
+  #   If true, users cannot choose their prefered sort order
+  #
+  # @argument expanded [Boolean]
+  #   If true, thread will be expanded by default
+  #
+  # @argument expanded_locked [Boolean]
+  #   If true, users cannot choose their prefered thread expansion setting
+  #
   # @argument sort_by_rating [Boolean]
-  #   If true, entries will be sorted by rating.
+  #   (DEPRECATED) If true, entries will be sorted by rating.
   #
   # @argument specific_sections [String]
   #   A comma-separated list of sections ids to which the discussion topic
@@ -1243,6 +1322,9 @@ class DiscussionTopicsController < ApplicationController
   #   topic specific to sections, then this parameter may be omitted or set to
   #   "all".  Can only be present only on announcements and only those that are
   #   for a course (as opposed to a group).
+  #
+  # @argument lock_comment [Boolean]
+  #   If is_announcement and lock_comment are true, ‘Allow Participants to Comment’ setting is disabled.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
@@ -1511,6 +1593,22 @@ class DiscussionTopicsController < ApplicationController
     discussion_topic_hash = params.permit(*allowed_fields)
     only_pinning = discussion_topic_hash.except(*%w[pinned]).blank?
 
+    # Handle the locked parameter
+    if @topic.is_announcement
+      params[:locked] = if params[:lock_comment].present?
+                          value_to_boolean(params[:lock_comment])
+                        elsif params[:locked].present?
+                          value_to_boolean(params[:locked])
+                        else
+                          false
+                        end
+    end
+
+    if @topic.is_announcement && params[:locked]
+      discussion_topic_hash.delete(:discussion_type)
+      discussion_topic_hash.delete(:require_initial_post)
+    end
+
     # allow pinning/unpinning if a subtopic and we can update the root
     topic_to_check = (only_pinning && @topic.root_topic) ? @topic.root_topic : @topic
     return unless authorized_action(topic_to_check, @current_user, (is_new ? :create : :update))
@@ -1527,6 +1625,24 @@ class DiscussionTopicsController < ApplicationController
 
     if discussion_topic_hash.key?(:message)
       discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
+    end
+
+    if Account.site_admin.feature_enabled?(:discussion_default_sort)
+      @topic.sort_order_locked = params[:sort_order_locked] unless params[:sort_order_locked].nil?
+      unless params[:sort_order].nil?
+        if DiscussionTopic::SortOrder::TYPES.include?(params[:sort_order])
+          @topic.sort_order = params[:sort_order]
+        else
+          @errors[:sort_order] = t(:error_sort_order,
+                                   "Sort order type not valid")
+        end
+
+      end
+    end
+
+    if Account.site_admin.feature_enabled?(:discussion_default_expand)
+      @topic.expanded = params[:expanded] unless params[:expanded].nil?
+      @topic.expanded_locked = params[:expanded_locked] unless params[:expanded_locked].nil?
     end
 
     prefer_assignment_availability_dates(discussion_topic_hash)
@@ -1668,7 +1784,7 @@ class DiscussionTopicsController < ApplicationController
     end
     return unless params[:todo_date]
 
-    if !authorized_action(@topic.context, @current_user, [:manage_content, :manage_course_content_add])
+    if !authorized_action(@topic.context, @current_user, :manage_course_content_add)
       @errors[:todo_date] = t(:error_todo_date_unauthorized,
                               "You do not have permission to add this topic to the student to-do list.")
     elsif (@topic.assignment || params[:assignment]) && !remove_assign

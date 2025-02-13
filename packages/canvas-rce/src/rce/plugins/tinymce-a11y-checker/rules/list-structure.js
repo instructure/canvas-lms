@@ -33,7 +33,7 @@ const bulletMarkers = ['*', '-'].map(c => '\\' + c).join('|')
 const orderedMarkers = ['.', ')'].map(c => '\\' + c).join('|')
 
 const listLikeRegex = new RegExp(
-  `^\\s*(?:(?:[${bulletMarkers}])|(?:(${orderedChars})[${orderedMarkers}]))\\s+`
+  `^\\s*(?:(?:[${bulletMarkers}])|(?:(${orderedChars})[${orderedMarkers}]))\\s+`,
 )
 
 const isTextList = elem => elem.tagName === 'P' && listLikeRegex.test(elem.textContent)
@@ -158,7 +158,7 @@ export default {
 
   why: () =>
     formatMessage(
-      'When markup is used that visually formats items as a list but does not indicate the list relationship, users may have difficulty in navigating the information.'
+      'When markup is used that visually formats items as a list but does not indicate the list relationship, users may have difficulty in navigating the information.',
     ),
 
   link: 'https://www.w3.org/TR/2016/NOTE-WCAG20-TECHS-20161007/H48',

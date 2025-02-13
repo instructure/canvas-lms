@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {connect} from 'react-redux'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
@@ -29,7 +29,7 @@ import {getSelectedDaysToSkip} from '../../../reducers/course_paces'
 import {Pill} from '@instructure/ui-pill'
 import type {CoursePace, ResponsiveSizes, StoreState} from 'features/course_paces/react/types'
 import {renderManageBlackoutDates} from './helpers'
-import {WORK_WEEK_DAYS_MENU_OPTIONS} from '../../../../constants'
+import {WORK_WEEK_DAYS_MENU_OPTIONS, WEEK_DAYS_VALUES} from '../../../../constants'
 import MainMenu from './MainMenu'
 import type {MenuPlacement} from './SettingsMenu'
 
@@ -62,11 +62,31 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
   const [skipWeekends, setSkipWeekends] = useState(skipWeekendsSelected)
 
   const toggleSkipWeekends = () => {
-    const newskipWeekends = !skipWeekends
-    setSkipWeekends(newskipWeekends)
-    const newSelectedDaysToSkip = newskipWeekends ? ['sat', 'sun'] : []
+    const newSelectedDaysToSkip = props.selectedDaysToSkip.filter((value) => WEEK_DAYS_VALUES.includes(value))
+
+    if (!skipWeekends) {
+      newSelectedDaysToSkip.push('sat', 'sun')
+    }
+
+    setSkipWeekends(!skipWeekends)
     props.toggleSelectedDaysToSkip(newSelectedDaysToSkip)
   }
+
+  useEffect(() => {
+    if (props.selectedDaysToSkip.includes('sat') && props.selectedDaysToSkip.includes('sun')) {
+      setSkipWeekends(true)
+    } else {
+      setSkipWeekends(false)
+    }
+  }, [props.selectedDaysToSkip])
+
+  const disableLastDay = useMemo(() => {
+    return props.selectedDaysToSkip.length === 6
+  }, [props.selectedDaysToSkip.length])
+
+  const disableWeekends = useMemo(() => {
+    return props.selectedDaysToSkip.filter((day) => WEEK_DAYS_VALUES.includes(day)).length === 5
+  }, [props.selectedDaysToSkip])
 
   const backButton = (
     <Menu.Item
@@ -152,7 +172,7 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
             type="checkbox"
             selected={skipWeekends}
             onSelect={toggleSkipWeekends}
-            disabled={props.isSyncing}
+            disabled={props.isSyncing || disableWeekends}
             data-testid="skip-weekends-toggle"
           >
             Weekends
@@ -173,7 +193,7 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
           >
             {WORK_WEEK_DAYS_MENU_OPTIONS.map(({value, label}, _) => {
               return (
-                <Menu.Item key={value} type="checkbox" value={value}>
+                <Menu.Item key={value} type="checkbox" value={value} disabled={!props.selectedDaysToSkip.includes(value) && disableLastDay}>
                   {label}
                 </Menu.Item>
               )

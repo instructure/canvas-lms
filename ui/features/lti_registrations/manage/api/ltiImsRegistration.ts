@@ -19,11 +19,12 @@ import type {RegistrationOverlay} from '../model/RegistrationOverlay'
 import {parseFetchResult} from '../../common/lib/apiResult/ApiResult'
 import {ZDynamicRegistrationToken} from '../model/DynamicRegistrationToken'
 import {ZLtiImsRegistration} from '../model/lti_ims_registration/LtiImsRegistration'
-import {type AccountId} from '../model/AccountId'
+import type {AccountId} from '../model/AccountId'
 import type {DynamicRegistrationTokenUUID} from '../model/DynamicRegistrationTokenUUID'
 import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
+import {ZLtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 
 /**
  * Fetch a newly generated registration token which will
@@ -60,13 +61,13 @@ export const fetchRegistrationToken = (
  *   from the registration token
  * @returns
  */
-export const getRegistrationByUUID = (
+export const getLtiRegistrationByUUID = (
   accountId: AccountId,
   registrationUuid: DynamicRegistrationTokenUUID,
 ) =>
-  parseFetchResult(ZLtiImsRegistration)(
+  parseFetchResult(ZLtiRegistrationWithConfiguration)(
     fetch(
-      `/api/lti/accounts/${accountId}/registrations/uuid/${registrationUuid}`,
+      `/api/lti/accounts/${accountId}/lti_registrations/uuid/${registrationUuid}`,
       defaultFetchOptions(),
     ),
   )

@@ -21,34 +21,42 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconUploadLine} from '@instructure/ui-icons'
 import CreateFolderButton from './CreateFolderButton'
+import UploadButton from './UploadButton'
 
 const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
   isUserContext: boolean
   size: string
-  isDisabled: boolean
   onCreateFolderButtonClick: () => void
+  shouldHideUploadButtons?: boolean
 }
 
 const TopLevelButtons = ({
   isUserContext,
   size,
-  isDisabled,
   onCreateFolderButtonClick,
+  shouldHideUploadButtons = false,
 }: TopLevelButtonsProps) => {
   const buttonDisplay = size === 'small' ? 'block' : 'inline-block'
 
+  const createFolderButton = () => {
+    if (shouldHideUploadButtons) return null
+
+    return <CreateFolderButton buttonDisplay={buttonDisplay} onClick={onCreateFolderButtonClick} />
+  }
+
   const uploadButton = () => {
+    if (shouldHideUploadButtons) return null
+
     return (
-      <Button
+      <UploadButton
         color="primary"
         margin="none none small none"
         renderIcon={<IconUploadLine />}
         display={buttonDisplay}
-        disabled={isDisabled}
       >
         {I18n.t('Upload')}
-      </Button>
+      </UploadButton>
     )
   }
 
@@ -56,12 +64,7 @@ const TopLevelButtons = ({
     if (isUserContext) return null
     return (
       <a href="/files" tabIndex={-1}>
-        <Button
-          color="secondary"
-          margin="none x-small small none"
-          display={buttonDisplay}
-          disabled={isDisabled}
-        >
+        <Button color="secondary" margin="none x-small small none" display={buttonDisplay}>
           {I18n.t('All My Files')}
         </Button>
       </a>
@@ -72,11 +75,7 @@ const TopLevelButtons = ({
     return (
       <>
         {uploadButton()}
-        <CreateFolderButton
-          buttonDisplay={buttonDisplay}
-          isDisabled={isDisabled}
-          onClick={onCreateFolderButtonClick}
-        />
+        {createFolderButton()}
         {allMyFilesButton()}
       </>
     )
@@ -85,11 +84,7 @@ const TopLevelButtons = ({
   return (
     <>
       {allMyFilesButton()}
-      <CreateFolderButton
-        buttonDisplay={buttonDisplay}
-        isDisabled={isDisabled}
-        onClick={onCreateFolderButtonClick}
-      />
+      {createFolderButton()}
       {uploadButton()}
     </>
   )

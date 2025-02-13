@@ -67,7 +67,7 @@ describe('RCE "Images" Plugin > Images', () => {
   function getLoadMoreButton() {
     return (
       [...component.container.querySelectorAll('button')].find(
-        $button => $button.textContent.trim() === 'Load More'
+        $button => $button.textContent.trim() === 'Load More',
       ) || null
     )
   }

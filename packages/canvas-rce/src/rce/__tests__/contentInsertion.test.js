@@ -149,7 +149,7 @@ describe('contentInsertion', () => {
       link.url = 'https://yodawg.com:3001/some/path'
       contentInsertion.insertLink(editor, link, canvasOrigin)
       expect(editor.content).toEqual(
-        '<a href="https://yodawg.com:3001/some/path" title="Here Be Links">Click On Me</a>'
+        '<a href="https://yodawg.com:3001/some/path" title="Here Be Links">Click On Me</a>',
       )
     })
 
@@ -157,7 +157,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'image'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>',
       )
     })
 
@@ -165,7 +165,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'scribd'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>',
       )
     })
 
@@ -191,7 +191,7 @@ describe('contentInsertion', () => {
         it('uses the link "text"', () => {
           contentInsertion.insertLink(editor, link)
           expect(editor.content).toEqual(
-            '<a href="/some/path" title="Here Be Links">Click On Me</a>'
+            '<a href="/some/path" title="Here Be Links">Click On Me</a>',
           )
         })
       })
@@ -201,7 +201,7 @@ describe('contentInsertion', () => {
       link.embed = {noPreview: true}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" class="instructure_file_link no_preview">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" class="instructure_file_link no_preview">Click On Me</a>',
       )
     })
 
@@ -210,7 +210,7 @@ describe('contentInsertion', () => {
       link.class = 'instructure_file_link foo'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" data-canvas-previewable="true" class="instructure_file_link foo">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" data-canvas-previewable="true" class="instructure_file_link foo">Click On Me</a>',
       )
     })
 
@@ -219,7 +219,7 @@ describe('contentInsertion', () => {
       link['data-course-type'] = 'wikiPages'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" data-course-type="wikiPages" data-published="true">Click On Me</a>'
+        '<a href="/some/path" title="Here Be Links" data-course-type="wikiPages" data-published="true">Click On Me</a>',
       )
     })
 
@@ -234,7 +234,7 @@ describe('contentInsertion', () => {
       link.href = 'www.google.com'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="http://www.google.com" title="Here Be Links">link me</a>'
+        '<a href="http://www.google.com" title="Here Be Links">link me</a>',
       )
     })
 
@@ -266,7 +266,7 @@ describe('contentInsertion', () => {
       link.href = 'www.google.com'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="http://www.google.com" title="Here Be Links">Click On Me</a>'
+        '<a href="http://www.google.com" title="Here Be Links">Click On Me</a>',
       )
     })
 
@@ -288,7 +288,7 @@ describe('contentInsertion', () => {
       link.text = '3 < 4'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="http://www.google.com" title="PB&amp;J">3 &lt; 4</a>'
+        '<a href="http://www.google.com" title="PB&amp;J">3 &lt; 4</a>',
       )
     })
 
@@ -298,7 +298,7 @@ describe('contentInsertion', () => {
       link.text = '"quote test"'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="http://www.google.com" title="PB&amp;J">&quot;quote test&quot;</a>'
+        '<a href="http://www.google.com" title="PB&amp;J">&quot;quote test&quot;</a>',
       )
     })
   })

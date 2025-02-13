@@ -79,7 +79,7 @@ module AddressBook
       case context_type
       when "course" then Course
       when "section" then CourseSection
-      when "group" then Group
+      when "group", "differentiation_tag" then Group
       when "discussion_topic" then DiscussionTopic
       end
     context_class.find(context_id)

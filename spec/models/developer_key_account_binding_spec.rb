@@ -17,11 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../lti_1_3_spec_helper"
-
 RSpec.describe DeveloperKeyAccountBinding do
-  include_context "lti_1_3_spec_helper"
-
   let(:account) { account_model }
   let(:developer_key) { DeveloperKey.create! }
   let(:dev_key_binding) do

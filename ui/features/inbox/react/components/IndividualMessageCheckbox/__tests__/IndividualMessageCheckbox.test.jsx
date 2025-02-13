@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, fireEvent} from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {IndividualMessageCheckbox} from '../IndividualMessageCheckbox'
 import {responsiveQuerySizes} from '../../../../util/utils'
@@ -62,7 +62,7 @@ describe('Button', () => {
       onChange: onChangeMock,
     })
     fireEvent.click(individualCheckbox)
-    expect(onChangeMock.mock.calls.length).toBe(1)
+    expect(onChangeMock.mock.calls).toHaveLength(1)
   })
 
   it('should show checkbox as checked when prop is present', () => {
@@ -75,6 +75,36 @@ describe('Button', () => {
   it('should not show checkbox as checked when prop is missing', () => {
     const {individualCheckbox} = setup()
     expect(individualCheckbox.checked).toBe(false)
+  })
+
+  describe('checkedAndDisabled prop', () => {
+    it('should render checked and disabled checkbox when true', () => {
+      const props = {
+        checkedAndDisabled: true,
+        onChange: jest.fn(),
+        title: 'Test Item',
+      }
+
+      render(<IndividualMessageCheckbox {...props} />)
+
+      const checkbox = screen.getByTestId('individual-message-checkbox-mobile')
+      expect(checkbox).toBeChecked()
+      expect(checkbox).toBeDisabled()
+    })
+
+    it('should render unchecked and enabled checkbox when false', () => {
+      const props = {
+        checkedAndDisabled: false,
+        onChange: jest.fn(),
+        title: 'Test Item',
+      }
+
+      render(<IndividualMessageCheckbox {...props} />)
+
+      const checkbox = screen.getByTestId('individual-message-checkbox-mobile')
+      expect(checkbox).not.toBeChecked()
+      expect(checkbox).not.toBeDisabled()
+    })
   })
 
   describe('Responsive', () => {

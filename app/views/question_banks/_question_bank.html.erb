@@ -30,7 +30,7 @@
       <% unbookmark_bank_text = t('Unbookmark %{bank}', :bank => title) %>
       <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}") %>" class="Button Button--icon-action bookmark_bank_link" title="<%= bookmark_bank_text %>" style="<%= hidden unless not_yet_bookmarked %>"><span class="screenreader-only"><%= bookmark_bank_text %></span><i class="icon-bookmark" aria-hidden="true"></i></a>
       <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}", :unbookmark => 1) %>" class="Button Button--icon-action bookmark_bank_link" title="<%= unbookmark_bank_text %>" style="<%= hidden if not_yet_bookmarked %>"><span class="screenreader-only"><%= unbookmark_bank_text %></span><i class="icon-remove-bookmark" aria-hidden="true"></i></a>
-      <% if context == @context && @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit, :manage_assignments_delete) %>
+      <% if context == @context && @context.grants_any_right?(@current_user, session, :manage_assignments_edit, :manage_assignments_delete) %>
         <% edit_bank_text = t('Edit %{bank}', :bank => title) %>
         <% delete_bank_text = t('Delete %{bank}', :bank => title) %>
         <span style="<%= hidden if question_bank && !can_do(question_bank, @current_user, :update) %>">

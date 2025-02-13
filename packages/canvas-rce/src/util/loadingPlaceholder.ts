@@ -31,7 +31,7 @@ import {isTextNode} from './elem-util'
  * Determines what type of placeholder is appropriate for a given file information.
  */
 export async function placeholderInfoFor(
-  fileMetaProps: PlaceHoldableThingInfo
+  fileMetaProps: PlaceHoldableThingInfo,
 ): Promise<PlaceholderInfo> {
   const fileName = fileMetaProps.title ?? fileMetaProps.name
   const visibleLabel = trimmedOrNull(fileName) ?? formatMessage('Loading...')
@@ -90,7 +90,7 @@ export async function placeholderInfoFor(
 
 export function removePlaceholder(editor: Editor, unencodedName: string) {
   const placeholderElem = editor.dom.doc.querySelector(
-    `[data-placeholder-for="${encodeURIComponent(unencodedName)}"]`
+    `[data-placeholder-for="${encodeURIComponent(unencodedName)}"]`,
   ) as HTMLDivElement
 
   // Fail gracefully
@@ -102,7 +102,7 @@ export function removePlaceholder(editor: Editor, unencodedName: string) {
     // Cleanup data URIs
     placeholderElem.querySelectorAll('img').forEach(
       // Revoking non-object URLs is safe
-      img => URL.revokeObjectURL(img.src)
+      img => URL.revokeObjectURL(img.src),
     )
   })
 }
@@ -113,8 +113,8 @@ export function removePlaceholder(editor: Editor, unencodedName: string) {
  */
 export async function insertPlaceholder(
   editor: Editor,
-  unencodedName: string,
-  placeholderInfoPromise: Promise<PlaceholderInfo>
+  unencodedName: string | undefined,
+  placeholderInfoPromise: Promise<PlaceholderInfo>,
 ): Promise<HTMLElement> {
   const placeholderId = `placeholder-${placeholderIdCounter++}`
 
@@ -125,13 +125,13 @@ export async function insertPlaceholder(
       false,
       `<span
             aria-label="${formatMessage('Loading')}"
-            data-placeholder-for="${encodeURIComponent(unencodedName)}"
+            data-placeholder-for="${encodeURIComponent(unencodedName || '')}"
             id="${placeholderId}"
             class="mceNonEditable"
             style="user-select: none; pointer-events: none; user-focus: none; display: inline-flex;"
-          ></span>&nbsp;`
+          ></span>&nbsp;`,
       // Without the trailing &nbsp;, tinymce will place the cursor inside the placeholder, which we don't want.
-    )
+    ),
   )
 
   const placeholderElem = editor.dom.doc.querySelector(`#${placeholderId}`) as HTMLDivElement
@@ -174,7 +174,7 @@ export async function insertPlaceholder(
     // Create the spinner
     placeholderElem.innerHTML = spinnerSvg(
       placeholderInfo.type === 'inline' ? 'x-small' : 'medium',
-      placeholderId + '-label'
+      placeholderId + '-label',
     )
 
     const spinnerElem = placeholderElem.firstElementChild as SVGElement

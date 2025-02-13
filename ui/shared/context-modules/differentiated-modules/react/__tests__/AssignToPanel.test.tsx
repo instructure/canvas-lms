@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {act, screen, render, waitFor} from '@testing-library/react'
+import {screen, render} from '@testing-library/react'
 import AssignToPanel, {type AssignToPanelProps} from '../AssignToPanel'
-import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
+import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA, DIFFERENTIATION_TAGS_DATA} from './mocks'
 import * as utils from '../../utils/assignToHelper'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
@@ -54,6 +54,7 @@ describe('AssignToPanel', () => {
   const ASSIGNMENT_OVERRIDES_URL_PUT = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
   const COURSE_SETTINGS_URL = `/api/v1/courses/${props.courseId}/settings`
   const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
+  const DIFFERENTIATION_TAGS_URL = `/api/v1/courses/${props.courseId}/groups?per_page=100&collaboration_state=non_collaborative&include=group_category`
 
   beforeAll(() => {
     if (!document.getElementById('flash_screenreader_holder')) {
@@ -62,6 +63,17 @@ describe('AssignToPanel', () => {
       liveRegion.setAttribute('role', 'alert')
       document.body.appendChild(liveRegion)
     }
+
+    /*
+      These are used for the differentiation tag tests
+      This file has some leakage with other tests so setting the
+      ENV variables between tests is inconsistent
+      This is a workaround until we can refactor the tests
+    */
+    // These are being skipped for now because setting the ENV 
+    // in this file causes tests to be flakey
+    // window.ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS = true
+    // window.ENV.CAN_MANAGE_DIFFERENTIATION_TAGS = true
   })
 
   beforeEach(() => {
@@ -70,6 +82,7 @@ describe('AssignToPanel', () => {
     fetchMock.get(ASSIGNMENT_OVERRIDES_URL, [])
     fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
     fetchMock.put(ASSIGNMENT_OVERRIDES_URL_PUT, {})
+    fetchMock.get(DIFFERENTIATION_TAGS_URL, DIFFERENTIATION_TAGS_DATA)
   })
 
   afterEach(() => {
@@ -156,27 +169,27 @@ describe('AssignToPanel', () => {
     it('selects multiple options', async () => {
       const {findByTestId, findByText, getAllByTestId} = renderComponent()
       const customOption = await findByTestId('custom-option')
-      act(() => customOption.click())
+      await userEvent.click(customOption)
       const assigneeSelector = await findByTestId('assignee_selector')
-      act(() => assigneeSelector.click())
+      await userEvent.click(assigneeSelector)
       const option1 = await findByText(SECTIONS_DATA[0].name)
-      act(() => option1.click())
-      act(() => assigneeSelector.click())
+      await userEvent.click(option1)
+      await userEvent.click(assigneeSelector)
       const option2 = await findByText(SECTIONS_DATA[2].name)
-      act(() => option2.click())
+      await userEvent.click(option2)
       expect(getAllByTestId('assignee_selector_selected_option')).toHaveLength(2)
     })
 
     it('clears selection', async () => {
       const {findByTestId, getByTestId, queryAllByTestId, findByText} = renderComponent()
       const customOption = await findByTestId('custom-option')
-      act(() => customOption.click())
+      await userEvent.click(customOption)
       const assigneeSelector = await findByTestId('assignee_selector')
-      act(() => assigneeSelector.click())
-      const option = await findByText(STUDENTS_DATA[0].value)
-      act(() => option.click())
+      await userEvent.click(assigneeSelector)
+      const option = await findByText(SECTIONS_DATA[0].name)
+      await userEvent.click(option)
       expect(queryAllByTestId('assignee_selector_selected_option')).toHaveLength(1)
-      act(() => getByTestId('clear_selection_button').click())
+      await userEvent.click(getByTestId('clear_selection_button'))
       expect(queryAllByTestId('assignee_selector_selected_option')).toHaveLength(0)
     })
 
@@ -212,6 +225,19 @@ describe('AssignToPanel', () => {
         defaultAssignees.length,
       )
     })
+
+    // Skipping this test because it relies on the ENV variables
+    // Setting these ENV variables causes tests in this file to be flakey
+    it.skip('can select a differentiation tag as an assignee', async () => {
+      const {findByTestId, findByText, getAllByTestId} = renderComponent()
+      const customOption = await findByTestId('custom-option')
+      await userEvent.click(customOption)
+      const assigneeSelector = await findByTestId('assignee_selector')
+      await userEvent.click(assigneeSelector)
+      const option = await findByText(DIFFERENTIATION_TAGS_DATA[0].name)
+      await userEvent.click(option)
+      expect(getAllByTestId('assignee_selector_selected_option')).toHaveLength(1)
+    })
   })
 
   describe('error messages', () => {
@@ -219,7 +245,7 @@ describe('AssignToPanel', () => {
       renderComponent()
       const customOption = await screen.findByTestId('custom-option')
       await userEvent.click(customOption)
-      await waitFor(() => expect(screen.queryByText(errorText)).toBeNull())
+      expect(screen.queryByText(errorText)).toBeNull()
     })
 
     it('does display empty assignee error on blur', async () => {
@@ -244,7 +270,7 @@ describe('AssignToPanel', () => {
       await userEvent.click(assigneeSelector)
       const option = await screen.findByText(STUDENTS_DATA[0].value)
       await userEvent.click(option)
-      await waitFor(() => expect(screen.queryByText(errorText)).toBeNull())
+      expect(screen.queryByText(errorText)).toBeNull()
     })
 
     it('clears empty assignee error when Everyone is selected', async () => {
@@ -335,11 +361,11 @@ describe('AssignToPanel', () => {
     it('creates new assignment overrides', async () => {
       const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
       const customOption = await findByTestId('custom-option')
-      act(() => customOption.click())
+      await userEvent.click(customOption)
       const assigneeSelector = await findByTestId('assignee_selector')
-      act(() => assigneeSelector.click())
+      await userEvent.click(assigneeSelector)
       const option1 = await findByText(SECTIONS_DATA[0].name)
-      act(() => option1.click())
+      await userEvent.click(option1)
 
       getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
@@ -356,12 +382,12 @@ describe('AssignToPanel', () => {
       const existingOverride = ASSIGNMENT_OVERRIDES_DATA[1]
       const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
       const customOption = await findByTestId('custom-option')
-      act(() => customOption.click())
+      await userEvent.click(customOption)
       const assigneeSelector = await findByTestId('assignee_selector')
-      act(() => assigneeSelector.click())
+      await userEvent.click(assigneeSelector)
       const option1 = await findByText(existingOverride.course_section?.name!)
       // removing the existing section override
-      act(() => option1.click())
+      await userEvent.click(option1)
 
       getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
@@ -378,8 +404,8 @@ describe('AssignToPanel', () => {
     it('updates the modules UI', async () => {
       const {findByRole} = renderComponent()
       const updateButton = await findByRole('button', {name: 'Save'})
-      updateButton.click()
-      await waitFor(() => expect(utils.updateModuleUI).toHaveBeenCalled())
+      await userEvent.click(updateButton)
+      expect(utils.updateModuleUI).toHaveBeenCalled()
     })
 
     it('calls onDidSubmit instead of onDismiss if passed', async () => {

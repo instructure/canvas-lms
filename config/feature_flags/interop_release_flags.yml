@@ -9,11 +9,40 @@ ags_improved_course_concluded_response_codes:
     along with a helpful message indicating that the tool cannot access concluded
     courses.
   applies_to: RootAccount
+ags_score_trigger_needs_grading_after_submitted:
+  state: hidden
+  shadow: true
+  display_name: Prevents LTI AGS Score publish service incorrectly trigger Needs Grading icon 
+  description: |-
+    If enabled, the AGS Score publish service endpoint will not trigger showing the Needs Grading icon in the gradebook 
+    when activityProgress is Initialized or Started or InProgress just when it is Submitted or Completed.
+    If disabled only Initialized activityProgress will not trigger showing the Needs Grading icon in the gradebook.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 assignment_edit_placement_not_on_announcements:
   state: hidden
   applies_to: SiteAdmin
   display_name: Prevents LTI tools with assignment_edit placement from being launched on Announcements page
   description: When enabled, an LTI tool with the assignment_edit placement will not be launched on the Announcement page.
+csrf_oauth2_fix:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Use custom CSRF protection on OAuth2 confirmation page
+  description: |-
+    If enabled, the standard CSRF token protection will be turned off on the /login/oauth2/accept endpoint.
+    Custom CSRF protection will be used instead, which does not use cookies, so it will work better in LTI workflows.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 disable_graphql_authentication:
   state: hidden
   display_name: Disable authentication for GraphQL

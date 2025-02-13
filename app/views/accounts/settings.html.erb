@@ -1100,6 +1100,7 @@ acknowledge that you have read and agreed to the
   <% if can_do(@context, @current_user, :manage_storage_quotas) %>
     <div id="tab-quotas">
       <h2 class="screenreader-only"><%= t('headings.quotas', "Account Quotas") %></h2>
+      <div id="quotas_tab_content_mount_point"></div>
     </div>
   <% end %>
   <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && @account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
@@ -1565,8 +1566,7 @@ acknowledge that you have read and agreed to the
   <% end %>
   <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
       <div id="tab-alerts">
-        <h2><%= t(:alerts_title, "Alerts") %></h2>
-        <%= render :partial => 'alerts/alerts' %>
+        <div id="alerts_mount_point"></div> 
       </div>
   <% end %>
   <% if can_do(@context, @current_user, :view_feature_flags) %>

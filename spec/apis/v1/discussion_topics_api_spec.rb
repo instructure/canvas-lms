@@ -490,6 +490,37 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.title).to eq "test title"
       expect(@topic.assignment).to be_nil
     end
+
+    it "create sort order field when is flag on" do
+      Account.site_admin.enable_feature!(:discussion_default_sort)
+      api_call(:post,
+               "/api/v1/courses/#{@course.id}/discussion_topics",
+               { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
+               { sort_order: "asc", sort_order_locked: "true" })
+      @topic = @course.discussion_topics.order(:id).last
+      expect(@topic.sort_order).to eq "asc"
+      expect(@topic.sort_order_locked).to be true
+    end
+
+    it "create expanded field order when is flag on" do
+      Account.site_admin.enable_feature!(:discussion_default_expand)
+      api_call(:post,
+               "/api/v1/courses/#{@course.id}/discussion_topics",
+               { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
+               { expanded: "true", expanded_locked: "true" })
+      @topic = @course.discussion_topics.order(:id).last
+      expect(@topic.expanded).to be true
+      expect(@topic.expanded_locked).to be true
+    end
+
+    it "should not allow !expanded and expanded_locked" do
+      Account.site_admin.enable_feature!(:discussion_default_expand)
+      result = api_call(:post,
+                        "/api/v1/courses/#{@course.id}/discussion_topics",
+                        { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
+                        { expanded: "false", expanded_locked: "true" })
+      expect(result["errors"]["expanded_locked"]).to be_present
+    end
   end
 
   context "anonymous discussions" do
@@ -2028,6 +2059,28 @@ describe DiscussionTopicsController, type: :request do
 
         @topic.reload
         expect(@topic).not_to be_locked
+      end
+
+      it "update sort order field when is flag on" do
+        Account.site_admin.enable_feature!(:discussion_default_sort)
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+                 { sort_order: "asc", sort_order_locked: "true" })
+        @topic.reload
+        expect(@topic.sort_order).to eq "asc"
+        expect(@topic.sort_order_locked).to be true
+      end
+
+      it "update expanded field order when is flag on" do
+        Account.site_admin.enable_feature!(:discussion_default_expand)
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+                 { expanded: "true", expanded_locked: "true" })
+        @topic.reload
+        expect(@topic.expanded).to be true
+        expect(@topic.expanded_locked).to be true
       end
     end
 

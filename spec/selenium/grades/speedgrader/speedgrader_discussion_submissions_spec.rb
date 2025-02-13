@@ -68,6 +68,7 @@ describe "SpeedGrader - discussion submissions" do
 
     # check for correct submissions in SpeedGrader iframe
     in_frame "speedgrader_iframe", "#discussion_view_link" do
+      expect(f("#main")).to include_text("The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for")
       expect(f("#main")).to include_text(@first_message)
       expect(f("#main")).not_to include_text(@second_message)
     end
@@ -210,6 +211,81 @@ describe "SpeedGrader - discussion submissions" do
         in_frame("discussion_preview_iframe") do
           wait_for_ajaximations
           expect(f("div[data-testid='discussion-root-entry-container'] div.highlight-discussion").text).to include entry_3.message
+        end
+      end
+    end
+
+    context "discussions_speedgrader_revisit" do
+      before do
+        @course.account.enable_feature!(:discussions_speedgrader_revisit)
+      end
+
+      context "Default Discussion View Options" do
+        it "is set to No Context by default and retains on save" do
+          Speedgrader.visit(@course.id, @assignment.id)
+          f("button[title='Settings']").click
+          fj("li:contains('Options')").click
+          expect(f("input[value='discussion_view_no_context']").attribute("checked")).to eq("true")
+          expect(f("body")).not_to contain_jqcss("button[data-testid='discussions-previous-reply-button']")
+
+          Speedgrader.submit_settings_form
+          expect(f("body")).not_to contain_jqcss("button[data-testid='discussions-previous-reply-button']")
+        end
+
+        it "applies and persists new Discussion View Options selection" do
+          Speedgrader.visit(@course.id, @assignment.id)
+          f("button[title='Settings']").click
+          fj("li:contains('Options')").click
+          fj("label:contains('Show replies in context')").click
+          fj(".ui-dialog-buttonset .ui-button:visible:last").click
+
+          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
+
+          in_frame("speedgrader_iframe") do
+            in_frame("discussion_preview_iframe") do
+              wait_for_ajaximations
+              expect(f("body")).to contain_jqcss(".discussions-search-filter")
+            end
+          end
+
+          Speedgrader.visit(@course.id, @assignment.id)
+
+          f("button[title='Settings']").click
+          fj("li:contains('Options')").click
+          expect(f("input[value='discussion_view_with_context']").attribute("checked")).to eq("true")
+          fj(".ui-dialog-buttonset .ui-button:visible:first").click
+
+          expect(f("button[data-testid='discussions-previous-reply-button']")).to be_present
+
+          in_frame("speedgrader_iframe") do
+            in_frame("discussion_preview_iframe") do
+              wait_for_ajaximations
+              expect(f("body")).to contain_jqcss(".discussions-search-filter")
+            end
+          end
+        end
+      end
+
+      context "No Context Discussion preview header message" do
+        it "it displays a group discussion aware message" do
+          entry_text = "first student message in group1"
+          root_topic = group_discussion_assignment
+          @group1.add_user(@student, "accepted")
+
+          root_topic.child_topic_for(@student).discussion_entries.create!(user: @student, message: entry_text)
+          Speedgrader.visit(@course.id, root_topic.assignment.id)
+
+          in_frame "speedgrader_iframe", "#discussion_view_link" do
+            expect(f("#main")).to include_text("The submissions for the assignment are posts in the assignment's discussion for this group. You can view the discussion posts for")
+            expect(f("#main")).to include_text(entry_text)
+          end
+        end
+
+        it "it displays a non-group discussion aware message" do
+          Speedgrader.visit(@course.id, @assignment.id)
+          in_frame "speedgrader_iframe", "#discussion_view_link" do
+            expect(f("#main")).to include_text("The submissions for the assignment are posts in the assignment's discussion. You can view the discussion posts for")
+          end
         end
       end
     end
@@ -588,6 +664,15 @@ describe "SpeedGrader - discussion submissions" do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
         wait_for_ajaximations
         expect(f("#this_student_does_not_have_a_submission")).to be_displayed
+      end
+
+      it "does not display the no submission message if student has a partial submission and the checkpoints flag is off", :ignore_js_errors do
+        @checkpointed_discussion.reply_to_topic_checkpoint.submit_homework(@student, submission_type: "discussion_topic", submitted_at: Time.now.utc)
+        @course.root_account.disable_feature!(:discussion_checkpoints)
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
+        wait_for_ajaximations
+        expect(f("#this_student_does_not_have_a_submission")).to_not be_displayed
       end
 
       it "displays the no submission message if student has no submission" do

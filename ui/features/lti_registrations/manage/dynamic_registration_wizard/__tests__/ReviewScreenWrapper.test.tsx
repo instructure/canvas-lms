@@ -20,13 +20,10 @@ import {screen, render} from '@testing-library/react'
 
 import React from 'react'
 import {ReviewScreenWrapper} from '../components/ReviewScreenWrapper'
-import {mockConfigWithPlacements, mockRegistration} from './helpers'
+import {mockConfigWithPlacements, mockRegistration, mockToolConfiguration} from './helpers'
 import {LtiPlacements, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
-import {
-  canvasPlatformSettings,
-  createRegistrationOverlayStore,
-} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
+import {createRegistrationOverlayStore} from '../RegistrationOverlayState'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 
@@ -68,7 +65,7 @@ describe('ReviewScreen', () => {
 
     expect(screen.getByText('Permissions')).toBeInTheDocument()
 
-    for (const scope of reg.scopes) {
+    for (const scope of reg.configuration.scopes) {
       expect(screen.getByText(i18nLtiScope(scope))).toBeInTheDocument()
     }
     expect(screen.getByRole('button', {name: 'Edit Permissions'})).toBeInTheDocument()
@@ -79,7 +76,7 @@ describe('ReviewScreen', () => {
       LtiPlacements.CourseNavigation,
       LtiPlacements.GlobalNavigation,
     ])
-    config.extensions![0].privacy_level = 'public'
+    config.privacy_level = 'public'
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     render(
@@ -92,11 +89,7 @@ describe('ReviewScreen', () => {
 
     expect(screen.getByText('Data Sharing')).toBeInTheDocument()
     expect(
-      screen.getByText(
-        i18nLtiPrivacyLevelDescription(
-          canvasPlatformSettings(reg.tool_configuration)?.privacy_level!,
-        ),
-      ),
+      screen.getByText(i18nLtiPrivacyLevelDescription(reg.configuration.privacy_level!)),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', {name: 'Edit Data Sharing'})).toBeInTheDocument()
   })
@@ -144,15 +137,18 @@ describe('ReviewScreen', () => {
         state: {
           ...s.state,
           adminNickname: nickname,
-          registration: {
-            ...s.state.registration,
+          overlay: {
+            ...s.state.overlay,
             description,
-            placements: s.state.registration.placements!.map(p => {
-              return {
-                ...p,
-                label: placementLabel,
-              }
-            }),
+            placements: Object.fromEntries(
+              Object.entries(s.state.overlay.placements!).map(([k, p]) => [
+                k,
+                {
+                  ...p,
+                  text: placementLabel,
+                },
+              ]),
+            ),
           },
         },
       }
@@ -168,9 +164,7 @@ describe('ReviewScreen', () => {
     expect(screen.getByText('Naming')).toBeInTheDocument()
     expect(screen.getByText(nickname)).toBeInTheDocument()
     expect(screen.getByText(description)).toBeInTheDocument()
-    expect(screen.getAllByText(placementLabel)).toHaveLength(
-      canvasPlatformSettings(reg.tool_configuration)!.settings.placements.length,
-    )
+    expect(screen.getAllByText(placementLabel)).toHaveLength(reg.configuration.placements.length)
     expect(screen.getByText('Edit Naming')).toBeInTheDocument()
   })
 
@@ -180,7 +174,7 @@ describe('ReviewScreen', () => {
         LtiPlacements.CourseNavigation,
         LtiPlacements.GlobalNavigation,
       ])
-      config.extensions![0].settings.placements.forEach(p => {
+      config.placements!.forEach(p => {
         p.icon_url = 'https://example.com/icon.png'
       })
 
@@ -208,13 +202,18 @@ describe('ReviewScreen', () => {
         LtiPlacements.EditorButton,
       ]
       const config = mockConfigWithPlacements(placements)
-      config.extensions![0].settings.placements.forEach(p => {
+      config.placements!.forEach(p => {
         p.icon_url = ''
       })
 
-      const reg = mockRegistration({}, config)
-      canvasPlatformSettings(reg.tool_configuration)!.settings.icon_url =
-        'https://example.com/icon.png'
+      const reg = mockRegistration({
+        configuration: mockToolConfiguration({
+          ...config,
+          launch_settings: {
+            icon_url: 'https://example.com/icon.png',
+          },
+        }),
+      })
 
       const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
@@ -236,7 +235,7 @@ describe('ReviewScreen', () => {
         LtiPlacements.FileIndexMenu,
       ]
       const config = mockConfigWithPlacements(placements)
-      config.extensions![0].settings.placements.forEach(p => {
+      config.placements!.forEach(p => {
         p.icon_url = 'https://example.com/icon.png'
       })
 
@@ -249,14 +248,17 @@ describe('ReviewScreen', () => {
           ...s,
           state: {
             ...s.state,
-            registration: {
-              ...s.state.registration,
-              placements: s.state.registration.placements!.map(p => {
-                return {
-                  ...p,
-                  icon_url: 'https://example.com/custom-icon.png',
-                }
-              }),
+            overlay: {
+              ...s.state.overlay,
+              placements: Object.fromEntries(
+                Object.entries(s.state.overlay.placements!).map(([k, p]) => [
+                  k,
+                  {
+                    ...p,
+                    icon_url: 'https://example.com/custom-icon.png',
+                  },
+                ]),
+              ),
             },
           },
         }
@@ -281,12 +283,12 @@ describe('ReviewScreen', () => {
         LtiPlacements.EditorButton,
       ]
       const config = mockConfigWithPlacements(placements)
-      config.extensions![0].settings.placements.forEach(p => {
+      config.placements!.forEach(p => {
         p.icon_url = ''
       })
 
       const reg = mockRegistration({}, config)
-      canvasPlatformSettings(reg.tool_configuration)!.settings.icon_url = ''
+      reg.configuration.launch_settings!.icon_url = ''
 
       const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
@@ -308,12 +310,12 @@ describe('ReviewScreen', () => {
         LtiPlacements.FileIndexMenu,
       ]
       const config = mockConfigWithPlacements(placements)
-      config.extensions![0].settings.placements.forEach(p => {
+      config.placements!.forEach(p => {
         p.icon_url = ''
       })
 
       const reg = mockRegistration({}, config)
-      canvasPlatformSettings(reg.tool_configuration)!.settings.icon_url = ''
+      reg.configuration.launch_settings!.icon_url = ''
 
       const overlayStore = createRegistrationOverlayStore('Foo', reg)
 

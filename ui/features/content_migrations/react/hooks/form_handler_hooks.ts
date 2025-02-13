@@ -38,22 +38,9 @@ const submit = (
   }
 }
 
-const isFormInvalid = (
-  formData: any,
-  setFileError: Dispatch<SetStateAction<boolean>>,
-  questionBankSettings?: QuestionBankSettings | null,
-  setQuestionBankError?: Dispatch<SetStateAction<boolean>>,
-): boolean => {
+const isFormInvalid = (formData: any, setFileError: Dispatch<SetStateAction<boolean>>): boolean => {
   if (!formData) {
     setFileError(true)
-    if (questionBankSettings && setQuestionBankError) {
-      setQuestionBankError(true)
-    }
-    return true
-  }
-
-  if (questionBankSettings?.question_bank_name === '') {
-    setQuestionBankError && setQuestionBankError(true)
     return true
   }
 
@@ -90,12 +77,11 @@ const useSubmitHandlerWithQuestionBank = (onSubmit: onSubmitMigrationFormCallbac
   const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>(
     null,
   )
-  const [questionBankError, setQuestionBankError] = useState<boolean>(false)
 
   const handleSubmit = useCallback(
     // @ts-expect-error
     formData => {
-      if (isFormInvalid(formData, setFileError, questionBankSettings, setQuestionBankError)) {
+      if (isFormInvalid(formData, setFileError)) {
         return
       }
 
@@ -114,7 +100,6 @@ const useSubmitHandlerWithQuestionBank = (onSubmit: onSubmitMigrationFormCallbac
     fileError,
     questionBankSettings,
     setQuestionBankSettings,
-    questionBankError,
     handleSubmit,
   }
 }

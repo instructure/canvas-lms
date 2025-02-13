@@ -347,6 +347,17 @@ module CC
         query.sub(original_param, new_param)
       end
 
+      def json_page(block_editor, title, meta_fields = {})
+        json = {}
+        json["title"] = title
+        json["meta"] = meta_fields
+        json["block_editor"] = {
+          "blocks" => @rewriter.translate_blocks(block_editor),
+          "editor_version" => block_editor.editor_version
+        }
+        json.to_json
+      end
+
       def html_page(html, title, meta_fields = {})
         content = html_content(html)
         meta_html = ""

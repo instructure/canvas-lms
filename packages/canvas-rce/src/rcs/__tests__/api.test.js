@@ -71,8 +71,8 @@ describe('fetchImages()', () => {
     await subject()
     expect(
       fetchMock.called(
-        '/api/documents?contextType=course&contextId=undefined&content_types=image&sort=undefined&order=undefined&category=uncategorized'
-      )
+        '/api/documents?contextType=course&contextId=undefined&content_types=image&sort=undefined&order=undefined&category=uncategorized',
+      ),
     ).toEqual(true)
   })
 })
@@ -105,7 +105,7 @@ describe('fetchFilesForFolder()', () => {
     await subject()
     expect(apiSource.fetchPage).toHaveBeenCalledWith(
       `/api/files?per_page=5&search_term=${encodedSearchString}`,
-      'theJWT'
+      'theJWT',
     )
   })
 })
@@ -136,7 +136,7 @@ describe('fetchMedia', () => {
     await subject()
     expect(apiSource.apiFetch).toHaveBeenCalledWith(
       'http://test.com/api/documents?contextType=course&contextId=1&content_types=video,audio&sort=name&order=asc',
-      {Authorization: 'Bearer theJWT'}
+      {Authorization: 'Bearer theJWT'},
     )
   })
 })
@@ -176,7 +176,7 @@ describe('saveClosedCaptions()', () => {
         },
         origin: 'http://test.com',
       },
-      maxBytes
+      maxBytes,
     )
   })
 
@@ -193,7 +193,7 @@ describe('saveClosedCaptions()', () => {
         },
         origin: 'http://test.com',
       },
-      maxBytes
+      maxBytes,
     )
   })
 
@@ -209,14 +209,14 @@ describe('saveClosedCaptions()', () => {
         },
         origin: 'http://test.com',
       },
-      maxBytes
+      maxBytes,
     )
   })
 
   describe('with a captions file that is too large', () => {
     beforeEach(() => {
       saveClosedCaptions.mockImplementation(
-        jest.requireActual('@instructure/canvas-media').saveClosedCaptions
+        jest.requireActual('@instructure/canvas-media').saveClosedCaptions,
       )
       maxBytes = 5
     })
@@ -243,7 +243,7 @@ describe('updateMediaData()', () => {
       'http://test.com/api/media_objects/m-id?user_entered_title=',
       expect.anything(),
       null,
-      expect.anything()
+      expect.anything(),
     )
   })
 
@@ -255,7 +255,7 @@ describe('updateMediaData()', () => {
       'http://test.com/api/media_attachments/123?user_entered_title=',
       expect.anything(),
       null,
-      expect.anything()
+      expect.anything(),
     )
   })
 })

@@ -18,6 +18,7 @@
 
 import {K5Uploader} from '@instructure/k5uploader'
 import {fileEmbed} from '../common/mimeClass'
+import mediaTranslations from '../rce/plugins/instructure_record/mediaTranslations'
 
 /* eslint no-console: 0 */
 export default class Bridge {
@@ -96,8 +97,7 @@ export default class Bridge {
   // are in English
   get uploadMediaTranslations() {
     if (!this._uploadMediaTranslations) {
-      const module = require('../rce/plugins/instructure_record/mediaTranslations')
-      this._uploadMediaTranslations = module.default
+      this._uploadMediaTranslations = mediaTranslations
     }
     return this._uploadMediaTranslations
   }
