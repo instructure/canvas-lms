@@ -21,18 +21,20 @@ import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 export const generateFolderByPathUrl = (path: string) => {
   let contextType = filesEnv.contexts[0].contextType
   let contextId = filesEnv.contexts[0].contextId
+  let uriEscapedPath = encodeURIComponent(path).replace(/%2F/g, '/')
+
   if (filesEnv.showingAllContexts) {
     const LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^/]*/
     // users_1 or courses_102
-    const pluralAssetString = path.split('/')[1]
+    const pluralAssetString = uriEscapedPath.split('/')[1]
     const context = filesEnv.contextsDictionary[pluralAssetString] || filesEnv.contexts[0]
     // this removes users_1 or course_102 from the path for the correct api call
-    path = path.replace(LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH, '')
+    uriEscapedPath = uriEscapedPath.replace(LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH, '')
     contextType = context.contextType
     contextId = context.contextId
   }
 
-  return `/api/v1/${contextType}/${contextId}/folders/by_path${path}`
+  return `/api/v1/${contextType}/${contextId}/folders/by_path${uriEscapedPath}`
 }
 
 export const generateFilesQuotaUrl = (singularContextType: string, contextId: string) => {
