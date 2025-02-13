@@ -99,7 +99,7 @@ export const useShouldShowContent = (
       ENV.allow_student_anonymous_discussion_topics)
 
   const shouldShowViewSettings =
-    !isStudent &&
+    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE &&
     !isAnnouncement &&
     (ENV.DISCUSSION_DEFAULT_EXPAND_ENABLED || ENV.DISCUSSION_DEFAULT_SORT_ENABLED)
 
