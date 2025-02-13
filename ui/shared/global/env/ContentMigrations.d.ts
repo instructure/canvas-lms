@@ -35,6 +35,7 @@ export interface EnvContentMigrations {
   NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS?: boolean
   EXPORT_WARNINGS?: string[]
   SHOW_BP_SETTINGS_IMPORT_OPTION?: boolean
+  SHOW_SELECT?: boolean
   OLD_START_DATE?: string
   OLD_END_DATE?: string
   current_context?: {

@@ -31,6 +31,9 @@ end
 def select_migration_type(type = nil)
   type ||= @type
   NewContentMigrationPage.migration_type_dropdown.click
+  Selenium::WebDriver::Wait.new(timeout: 5).until do
+    NewContentMigrationPage.migration_type_dropdown.attribute("aria-expanded") == "true"
+  end
   NewContentMigrationPage.migration_type_option_by_id(type).click
 end
 
@@ -43,7 +46,6 @@ def select_migration_file(opts = {})
 end
 
 def fill_migration_form(opts = {})
-  select_migration_type("empty") unless opts[:type] == "empty"
   select_migration_type(opts[:type])
   select_migration_file(opts)
 end

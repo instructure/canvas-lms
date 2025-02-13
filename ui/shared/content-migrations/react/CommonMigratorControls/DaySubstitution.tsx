@@ -114,7 +114,7 @@ export default ({
           interaction={interaction}
           renderLabel={<ScreenReaderContent>{I18n.t('Move from')}</ScreenReaderContent>}
           onChange={handleMoveFromSelectChange}
-          width={isMobileView ? '100%' : '18.75rem'}
+          width={isMobileView ? '100%' : '19.5rem'}
         >
           {renderWeekDaySelectOptions(WEEKDAYS)}
         </SimpleSelect>
@@ -132,7 +132,7 @@ export default ({
           interaction={interaction}
           onChange={handleMoveToSelectChange}
           renderLabel={<ScreenReaderContent>{I18n.t('Move to')}</ScreenReaderContent>}
-          width={isMobileView ? '100%' : '18.75rem'}
+          width={isMobileView ? '100%' : '19.5rem'}
         >
           {renderWeekDaySelectOptions(WEEKDAYS)}
         </SimpleSelect>

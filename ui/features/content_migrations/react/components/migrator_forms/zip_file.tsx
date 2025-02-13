@@ -267,7 +267,7 @@ const ZipFileImporter = ({
         isRequired={true}
       />
       {!isSubmitting && (
-        <View as="div" margin="medium none none none" maxWidth="22.5rem">
+        <View as="div" margin="medium none none none" maxWidth="46.5rem">
           {folders.length > 0 ? (
             <>
               <RequiredFormLabel

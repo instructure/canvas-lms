@@ -168,7 +168,7 @@ export const DateAdjustments = ({
                         </ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '18.75rem'}
+                      width={isMobileView ? '100%' : '19.5rem'}
                       messages={timeZonedFormMessages(
                         courseTimeZone,
                         userTimeZone,
@@ -198,7 +198,7 @@ export const DateAdjustments = ({
                         </ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '18.75rem'}
+                      width={isMobileView ? '100%' : '19.5rem'}
                       messages={timeZonedFormMessages(courseTimeZone, userTimeZone, start_to_date)}
                       dataTestid="new_start_date"
                     />
@@ -225,7 +225,7 @@ export const DateAdjustments = ({
                         </ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '18.75rem'}
+                      width={isMobileView ? '100%' : '19.5rem'}
                       messages={timeZonedFormMessages(courseTimeZone, userTimeZone, end_from_date)}
                       dataTestid="old_end_date"
                     />
@@ -249,7 +249,7 @@ export const DateAdjustments = ({
                         <ScreenReaderContent>{I18n.t('Select new end date')}</ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '18.75rem'}
+                      width={isMobileView ? '100%' : '19.5rem'}
                       messages={timeZonedFormMessages(courseTimeZone, userTimeZone, end_to_date)}
                       dataTestid="new_end_date"
                     />

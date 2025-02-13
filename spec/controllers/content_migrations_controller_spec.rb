@@ -71,6 +71,7 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:SELECT_OPTIONS]).not_to be_nil
           expect(assigns[:js_env][:QUESTION_BANKS]).not_to be_nil
           expect(assigns[:js_env][:COURSE_ID]).not_to be_nil
+          expect(assigns[:js_env][:SHOW_SELECT]).not_to be_nil
           expect(assigns[:js_env][:CONTENT_MIGRATIONS]).not_to be_nil
           expect(assigns[:js_env][:SHOW_SELECT]).not_to be_nil
           expect(assigns[:js_env][:CONTENT_MIGRATIONS_EXPIRE_DAYS]).not_to be_nil
@@ -93,7 +94,6 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:QUESTION_BANKS]).not_to be_nil
           expect(assigns[:js_env][:COURSE_ID]).not_to be_nil
           expect(assigns[:js_env][:CONTENT_MIGRATIONS]).to be_nil
-          expect(assigns[:js_env][:SHOW_SELECT]).to be_nil
           expect(assigns[:js_env][:CONTENT_MIGRATIONS_EXPIRE_DAYS]).to be_nil
           expect(assigns[:js_env][:QUIZZES_NEXT_ENABLED]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_IMPORT]).not_to be_nil
