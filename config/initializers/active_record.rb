@@ -1519,7 +1519,7 @@ module UpdateAndDeleteAllWithLimit
     if limit_value || offset_value
       scope = lock_for_subquery_update.except(:select).select(primary_key)
       filter = materialize_subquery_filter(scope)
-      base_class.unscoped.where(filter).delete_all
+      unscoped.where(filter).delete_all
     else
       super
     end
@@ -1529,7 +1529,7 @@ module UpdateAndDeleteAllWithLimit
     if limit_value || offset_value
       scope = lock_for_subquery_update.except(:select).select(primary_key)
       filter = materialize_subquery_filter(scope)
-      base_class.unscoped.where(filter).update_all(updates)
+      unscoped.where(filter).update_all(updates)
     else
       super
     end
