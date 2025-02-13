@@ -292,7 +292,7 @@ describe "RCE Next toolbar features", :ignore_js_errors do
       rce_wysiwyg_state_setup(@course, text, html: true)
       click_ltr
       in_frame rce_page_body_ifr_id do
-        expect(f("#tinymce p").attribute("dir")).to eq "ltr"
+        expect(f("#tinymce p").attribute("dir")).to eq ""
       end
     end
 
