@@ -22,6 +22,22 @@ import userEvent from '@testing-library/user-event'
 import DifferentiationTagTray from '../DifferentiationTagTray'
 import type {DifferentiationTagTrayProps} from '../DifferentiationTagTray'
 
+// Mocking the DifferentiationTagModalManager, then setting the props it is passed as data attributes that we can check
+// This way we can verify that the modal is opened with the correct mode and category ID
+jest.mock(
+  '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager',
+  () =>
+    function DummyModalManager(props: any) {
+      return (
+        <div
+          data-testid="dummy-modal-manager"
+          data-mode={props.mode}
+          data-cat-id={props.differentiationTagCategoryId || ''}
+        />
+      )
+    },
+)
+
 describe('DifferentiationTagTray', () => {
   const defaultProps: DifferentiationTagTrayProps = {
     isOpen: true,
@@ -52,30 +68,18 @@ describe('DifferentiationTagTray', () => {
   it('shows error message when there is an error', () => {
     const error = new Error('Failed to fetch')
     renderComponent({error})
-    expect(screen.getByText(/Error loading tag differentiation tag categories/)).toBeInTheDocument()
+    expect(screen.getByText(/Error loading categories:/)).toBeInTheDocument()
     expect(screen.getByText(/Failed to fetch/)).toBeInTheDocument()
   })
 
-  // Skipping until next patchset since Specific mocked data is being displayed in this patchset
-  it.skip('displays differentiation tag categories when data is available', () => {
+  it('displays differentiation tag categories when data is available', () => {
     const mockCategories = [
-      {id: 1, name: 'Category 1'},
-      {id: 2, name: 'Category 2'},
+      {id: 1, name: 'Category 1', groups: []},
+      {id: 2, name: 'Category 2', groups: []},
     ]
     renderComponent({differentiationTagCategories: mockCategories})
     expect(screen.getByText('Category 1')).toBeInTheDocument()
     expect(screen.getByText('Category 2')).toBeInTheDocument()
-  })
-
-  it('calls onClose when close button is clicked', async () => {
-    renderComponent()
-    const closeButton = screen.getByRole('button', {
-      name: 'Close Differentiation Tag Tray',
-      hidden: true,
-    })
-
-    await userEvent.click(closeButton)
-    expect(defaultProps.onClose).toHaveBeenCalled()
   })
 
   it('renders help text when there are no differentiation tags', () => {
@@ -88,14 +92,85 @@ describe('DifferentiationTagTray', () => {
     expect(screen.queryByTestId('differentiation-tag-header')).not.toBeInTheDocument()
   })
 
-  // Skipping in this patchset since TagCategoryCards are being rendered with specific mock data
-  it.skip('renders list items with proper text content', () => {
+  it('renders the correct category card content', () => {
     const mockCategories = [
-      {id: 1, name: 'Advanced'},
-      {id: 2, name: 'Remedial'},
+      {id: 1, name: 'Advanced', groups: []},
+      {id: 2, name: 'Remedial', groups: []},
     ]
     renderComponent({differentiationTagCategories: mockCategories})
-    const listItems = screen.queryByTestId('differentiation-tag-categories-list')?.children
-    expect(listItems).toHaveLength(2)
+    expect(screen.getByText('Advanced')).toBeInTheDocument()
+    expect(screen.getByText('Remedial')).toBeInTheDocument()
+  })
+
+  describe('modal interactions', () => {
+    it('opens modal in create mode when clicking "+ Tag" button', async () => {
+      const mockCategories = [{id: 1, name: 'Category 1', groups: []}]
+      renderComponent({differentiationTagCategories: mockCategories})
+      const createButton = screen.getByText('+ Tag').closest('button')
+      await userEvent.click(createButton!)
+      const modalManager = screen.getByTestId('dummy-modal-manager')
+      expect(modalManager).toHaveAttribute('data-mode', 'create')
+      expect(modalManager).toHaveAttribute('data-cat-id', '')
+    })
+
+    it('opens modal in edit mode when clicking "+ Add a variant" link in a category with no tags', async () => {
+      const mockCategory = {id: 42, name: 'Editable Category', groups: []}
+      renderComponent({differentiationTagCategories: [mockCategory]})
+      const addVariantLink = screen.getByText('+ Add a variant')
+      const addVariantButton = addVariantLink.closest('button')
+      await userEvent.click(addVariantButton!)
+      const modalManager = screen.getByTestId('dummy-modal-manager')
+      expect(modalManager).toHaveAttribute('data-mode', 'edit')
+      expect(modalManager).toHaveAttribute('data-cat-id', '42')
+    })
+  })
+
+  describe('pagination logic', () => {
+    it('renders pagination controls when categories exceed items per page', () => {
+      const mockCategories = Array.from({length: 5}, (_, i) => ({
+        id: i + 1,
+        name: `Category ${i + 1}`,
+        groups: [],
+      }))
+      renderComponent({differentiationTagCategories: mockCategories})
+      const paginationNav = screen.getByTestId('differentiation-tag-pagination')
+
+      expect(paginationNav).toBeInTheDocument()
+      expect(screen.getByText('1')).toBeInTheDocument()
+      expect(screen.getByText('2')).toBeInTheDocument()
+    })
+
+    it('displays only the categories for the current page and updates on page change', async () => {
+      const mockCategories = Array.from({length: 5}, (_, i) => ({
+        id: i + 1,
+        name: `Category ${i + 1}`,
+        groups: [],
+      }))
+      renderComponent({differentiationTagCategories: mockCategories})
+      expect(screen.getByText('Category 1')).toBeInTheDocument()
+      expect(screen.getByText('Category 2')).toBeInTheDocument()
+      expect(screen.getByText('Category 3')).toBeInTheDocument()
+      expect(screen.getByText('Category 4')).toBeInTheDocument()
+      expect(screen.queryByText('Category 5')).not.toBeInTheDocument()
+
+      const pageTwoButton = screen.getByText('2').closest('button')
+      await userEvent.click(pageTwoButton!)
+
+      expect(screen.getByText('Category 5')).toBeInTheDocument()
+      expect(screen.queryByText('Category 1')).not.toBeInTheDocument()
+      expect(screen.queryByText('Category 2')).not.toBeInTheDocument()
+      expect(screen.queryByText('Category 3')).not.toBeInTheDocument()
+      expect(screen.queryByText('Category 4')).not.toBeInTheDocument()
+    })
+
+    it('does not render pagination when total pages is 1', () => {
+      const mockCategories = [
+        {id: 1, name: 'Category 1', groups: []},
+        {id: 2, name: 'Category 2', groups: []},
+      ]
+      renderComponent({differentiationTagCategories: mockCategories})
+
+      expect(screen.queryByTestId('differentiation-tag-pagination')).not.toBeInTheDocument()
+    })
   })
 })

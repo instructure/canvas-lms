@@ -25,19 +25,12 @@ import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import TagInfo from './TagInfo'
+import {DifferentiationTagCategory} from '../types'
 
 const I18n = createI18nScope('differentiation_tags')
 
 export interface TagCategoryCardProps {
-  category: {
-    id: number
-    name: string
-    groups: Array<{
-      id: number
-      name: string
-      members_count: number
-    }>
-  }
+  category: DifferentiationTagCategory
   onEditCategory: (id: number) => void
 }
 
