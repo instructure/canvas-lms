@@ -403,6 +403,17 @@ describe WikiPage do
     end
   end
 
+  describe "#effective_group_category_id" do
+    # if and when a wiki page is allowed to be configured as a group page, this method
+    # will need to be updated to return the group category id associated with the page object
+    # or with an assignment that is created for the page.  However, it will be designed in the future.
+    it "returns nil" do
+      course_with_teacher
+      @page = @course.wiki_pages.create(title: "unpublished page", workflow_state: "unpublished")
+      expect(@page.effective_group_category_id).to be_nil
+    end
+  end
+
   describe "#can_edit_page?" do
     it "is true if the user has manage_wiki_update rights" do
       course_with_teacher(active_all: true)

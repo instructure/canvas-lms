@@ -156,6 +156,13 @@ class WikiPage < ActiveRecord::Base
     current_lookup&.slug || super
   end
 
+  # This group_category_id is used to identify a learning object as a group assignment
+  # since wiki pages cannot be configured as a group assignment,
+  # it will return nil for now.
+  def effective_group_category_id
+    nil
+  end
+
   def should_create_lookup?
     # covers page creation and title changes, and undeletes
     saved_change_to_title? || (saved_change_to_workflow_state? && workflow_state_before_last_save == "deleted")

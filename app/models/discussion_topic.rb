@@ -293,6 +293,10 @@ class DiscussionTopic < ActiveRecord::Base
     !!group_category_id
   end
 
+  def effective_group_category_id
+    has_group_category? ? group_category_id : nil
+  end
+
   def set_schedule_delayed_transitions
     @delayed_post_at_changed = delayed_post_at_changed? || unlock_at_changed?
     if delayed_post_at? && @delayed_post_at_changed

@@ -1341,6 +1341,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     assignment.try(:group_category_id)
   end
 
+  def effective_group_category_id
+    group_category_id
+  end
+
   def publish
     self.workflow_state = "available"
   end
