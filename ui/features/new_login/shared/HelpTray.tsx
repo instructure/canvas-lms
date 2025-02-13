@@ -53,7 +53,7 @@ const HelpTray = () => {
                 offset="medium"
                 onClick={closeHelpTray}
                 placement="end"
-                screenReaderLabel={I18n.t('Close help tray')}
+                screenReaderLabel={I18n.t('Close help tray.')}
               />
             </Flex.Item>
           </Flex>

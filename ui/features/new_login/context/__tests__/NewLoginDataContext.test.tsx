@@ -80,7 +80,7 @@ describe('NewLoginDataContext', () => {
         ],
         loginHandleName: 'exampleLoginHandle',
         loginLogoUrl: 'https://example.com/logo.svg',
-        loginLogoText: 'Welcome to Canvas',
+        loginLogoText: 'Welcome to Canvas.',
         bodyBgColor: '#ffffff',
         bodyBgImage: 'https://example.com/bg.jpg',
         isPreviewMode: true,
@@ -97,7 +97,7 @@ describe('NewLoginDataContext', () => {
     expect(screen.getByTestId('authProviders')).toHaveTextContent('Google, Microsoft')
     expect(screen.getByTestId('loginHandleName')).toHaveTextContent('exampleLoginHandle')
     expect(screen.getByTestId('loginLogoUrl')).toHaveTextContent('https://example.com/logo.svg')
-    expect(screen.getByTestId('loginLogoText')).toHaveTextContent('Welcome to Canvas')
+    expect(screen.getByTestId('loginLogoText')).toHaveTextContent('Welcome to Canvas.')
     expect(screen.getByTestId('bodyBgColor')).toHaveTextContent('#ffffff')
     expect(screen.getByTestId('bodyBgImage')).toHaveTextContent('https://example.com/bg.jpg')
     expect(screen.getByTestId('isPreviewMode')).toHaveTextContent('true')

@@ -54,7 +54,7 @@ const TermsAndPolicyCheckbox = ({
   let translatedText = ''
   let splitText: string[] = []
   if (termsOfUseUrl && privacyPolicyUrl) {
-    translatedText = I18n.t('You agree to the %{termsOfUseLink} and %{privacyPolicyLink}.', {
+    translatedText = I18n.t('You agree to the %{termsOfUseLink} & %{privacyPolicyLink}.', {
       termsOfUseLink: 'ZZZZ_TERMS',
       privacyPolicyLink: 'ZZZZ_PRIVACY',
     })

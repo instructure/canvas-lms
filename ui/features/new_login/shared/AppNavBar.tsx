@@ -87,7 +87,7 @@ const AppNavBar = () => {
                   }
                 >
                   <TopNavBar.Item id="browseCourses" href="/search/all_courses">
-                    {I18n.t('Browse courses')}
+                    {I18n.t('Browse Courses')}
                   </TopNavBar.Item>
                 </TopNavBar.ActionItems>
               ) : undefined

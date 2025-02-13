@@ -98,7 +98,7 @@ const Landing = () => {
     <Flex direction="column" gap="large">
       <Flex direction="column" gap="small">
         <Heading as="h1" level="h2">
-          {I18n.t('Create your account')}
+          {I18n.t('Create Your Account')}
         </Heading>
 
         <Flex.Item overflowX="visible" overflowY="visible">

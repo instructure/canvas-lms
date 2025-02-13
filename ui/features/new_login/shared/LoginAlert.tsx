@@ -25,15 +25,14 @@ const I18n = createI18nScope('new_login')
 
 interface Props {
   invalidLoginFaqUrl: string | null
-  onClose: () => void
   loginHandleName: string
 }
 
-function LoginAlert({invalidLoginFaqUrl, onClose, loginHandleName}: Props) {
+function LoginAlert({invalidLoginFaqUrl, loginHandleName}: Props) {
   if (invalidLoginFaqUrl) {
     const translatedText = I18n.t(
       'Please verify your %{loginHandleName} or password and try again. Trouble logging in? %{faqLink}.',
-      {loginHandleName, faqLink: 'ZZZZ_FAQ'},
+      {loginHandleName: loginHandleName.toLowerCase(), faqLink: 'ZZZZ_FAQ'},
     )
     const splitText = translatedText.split(/ZZZZ_FAQ/)
 
@@ -43,13 +42,11 @@ function LoginAlert({invalidLoginFaqUrl, onClose, loginHandleName}: Props) {
         hasShadow={false}
         liveRegionPoliteness="assertive"
         isLiveRegionAtomic={true}
-        renderCloseButtonLabel={I18n.t('Dismiss error message')}
-        onDismiss={onClose}
       >
         <>
           {splitText[0]}
           <Link href={invalidLoginFaqUrl} target="_blank">
-            {I18n.t('Check out our Login FAQs')}
+            {I18n.t('Check out our Login FAQs.')}
           </Link>
           {splitText[1]}
         </>
@@ -63,11 +60,9 @@ function LoginAlert({invalidLoginFaqUrl, onClose, loginHandleName}: Props) {
       hasShadow={false}
       liveRegionPoliteness="assertive"
       isLiveRegionAtomic={true}
-      renderCloseButtonLabel={I18n.t('Dismiss error message')}
-      onDismiss={onClose}
     >
       {I18n.t('Please verify your %{loginHandleName} or password and try again.', {
-        loginHandleName,
+        loginHandleName: loginHandleName.toLowerCase(),
       })}
     </Alert>
   )
