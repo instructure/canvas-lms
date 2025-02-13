@@ -27,6 +27,8 @@ module VisibilityHelpers
     private
 
     def sanitize_and_stringify_ids(ids)
+      return "nil" if ids.nil?
+
       Array(ids).map { |id| id.respond_to?(:id) ? id.id : id }.sort.join(",")
     end
 
