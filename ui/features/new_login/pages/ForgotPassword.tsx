@@ -48,7 +48,11 @@ const ForgotPassword = () => {
     setEmailError('')
 
     if (!EMAIL_REGEX.test(email)) {
-      setEmailError(I18n.t('Please enter a valid %{loginHandleName} address.', {loginHandleName}))
+      setEmailError(
+        I18n.t('Please enter a valid %{loginHandleName}.', {
+          loginHandleName: loginHandleName?.toLowerCase(),
+        }),
+      )
       emailInputRef.current?.focus()
       return false
     }
@@ -71,7 +75,7 @@ const ForgotPassword = () => {
         setEmail('')
         setEmailSent(true)
       } else {
-        setEmailError(I18n.t('No account found for this email address'))
+        setEmailError(I18n.t('No account found for this email address.'))
         emailInputRef.current?.focus()
       }
     } catch (error: any) {
@@ -93,13 +97,13 @@ const ForgotPassword = () => {
     <>
       <Flex direction="column" gap="small">
         <Heading as="h1" level="h2">
-          {I18n.t('Forgot your password?')}
+          {I18n.t('Forgot password?')}
         </Heading>
 
         <Text>
           {I18n.t(
             'Enter your %{loginHandleName} and we’ll send you a link to change your password.',
-            {loginHandleName},
+            {loginHandleName: loginHandleName?.toLowerCase()},
           )}
         </Text>
       </Flex>
@@ -129,7 +133,7 @@ const ForgotPassword = () => {
               disabled={isUiActionPending}
               data-testid="cancel-button"
             >
-              {I18n.t('Back to Login')}
+              {I18n.t('Back')}
             </Button>
 
             <Button
@@ -151,7 +155,7 @@ const ForgotPassword = () => {
     <>
       <Flex direction="column" gap="small">
         <Heading as="h1" level="h2" data-testid="confirmation-heading">
-          {I18n.t('Check your email')}
+          {I18n.t('Check Your Email')}
         </Heading>
 
         <Text data-testid="confirmation-message">
@@ -168,7 +172,7 @@ const ForgotPassword = () => {
         onClick={handleCancel}
         data-testid="confirmation-back-button"
       >
-        {I18n.t('Back to login')}
+        {I18n.t('Back')}
       </Button>
     </>
   )

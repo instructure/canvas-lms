@@ -88,7 +88,7 @@ describe('ForgotPassword', () => {
       it('displays a required validation message', async () => {
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.click(submitButton)
-        const errorMessage = await screen.findByText('Please enter a valid Email address.')
+        const errorMessage = await screen.findByText('Please enter a valid email.')
         expect(errorMessage).toBeInTheDocument()
       })
 
@@ -114,7 +114,7 @@ describe('ForgotPassword', () => {
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.type(emailInput, 'invalid-email')
         await userEvent.click(submitButton)
-        const errorMessage = await screen.findByText('Please enter a valid Email address.')
+        const errorMessage = await screen.findByText('Please enter a valid email.')
         expect(errorMessage).toBeInTheDocument()
       })
     })

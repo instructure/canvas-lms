@@ -61,22 +61,31 @@ const SignIn = () => {
   }, [otpRequired])
 
   const validateForm = (): boolean => {
+    let hasValidationError = false
+    let focusTarget: HTMLInputElement | null = null
+
     setUsernameError('')
     setPasswordError('')
 
     if (username.trim() === '') {
-      setUsernameError(I18n.t('Please enter your %{loginHandleName}', {loginHandleName}))
-      usernameInputRef.current?.focus()
-      return false
+      setUsernameError(
+        I18n.t('Please enter your %{loginHandleName}', {
+          loginHandleName: loginHandleName?.toLowerCase(),
+        }),
+      )
+      focusTarget = usernameInputRef.current
+      hasValidationError = true
     }
 
     if (password.trim() === '') {
-      setPasswordError(I18n.t('Please enter your password'))
-      passwordInputRef.current?.focus()
-      return false
+      setPasswordError(I18n.t('Please enter your password.'))
+      if (!focusTarget) focusTarget = passwordInputRef.current
+      hasValidationError = true
     }
 
-    return true
+    if (focusTarget) focusTarget.focus()
+
+    return !hasValidationError
   }
 
   const handleFailedLogin = () => {
@@ -124,10 +133,6 @@ const SignIn = () => {
     setPassword(value.trim())
   }
 
-  const handleAlertDismiss = () => {
-    setLoginFailed(false)
-  }
-
   if (otpRequired && !isPreviewMode) {
     return <OtpForm />
   }
@@ -136,7 +141,7 @@ const SignIn = () => {
     <Flex direction="column" gap="large">
       <Flex direction="column" gap="small">
         <Heading as="h1" level="h2">
-          {I18n.t('Welcome to Canvas')}
+          {I18n.t('Welcome to Canvas.')}
         </Heading>
 
         {selfRegistrationType && (
@@ -152,17 +157,9 @@ const SignIn = () => {
         )}
       </Flex>
 
-      {authProviders && authProviders.length > 0 && (
-        <Flex direction="column" gap="large">
-          <SSOButtons />
-          <View as="hr" borderWidth="small none none none" margin="small none" />
-        </Flex>
-      )}
-
       {loginFailed && (
         <LoginAlert
           invalidLoginFaqUrl={invalidLoginFaqUrl ?? null}
-          onClose={handleAlertDismiss}
           loginHandleName={loginHandleName || ''}
         />
       )}
@@ -172,6 +169,7 @@ const SignIn = () => {
           <Flex direction="column" gap="mediumSmall">
             <TextInput
               autoComplete="username"
+              autoCapitalize="none"
               disabled={isUiActionPending}
               id="username"
               inputRef={inputElement => (usernameInputRef.current = inputElement)}
@@ -202,7 +200,7 @@ const SignIn = () => {
             </Flex.Item>
           </Flex>
 
-          <Flex direction="column" gap="mediumSmall">
+          <Flex direction="column" gap="small">
             <Button
               type="submit"
               color="primary"
@@ -219,6 +217,12 @@ const SignIn = () => {
           </Flex>
         </Flex>
       </form>
+
+      {authProviders && authProviders.length > 0 && (
+        <Flex direction="column" gap="large">
+          <SSOButtons />
+        </Flex>
+      )}
     </Flex>
   )
 }

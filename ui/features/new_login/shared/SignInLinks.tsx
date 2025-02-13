@@ -18,6 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {assignLocation} from '@canvas/util/globalUtils'
+import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import type {ViewOwnProps} from '@instructure/ui-view'
@@ -37,39 +38,49 @@ const SignInLinks = () => {
 
   const isDisabled = isPreviewMode || isUiActionPending
 
-  const handleNavigate = (path: string) => (event: React.MouseEvent<ViewOwnProps>) => {
-    event.preventDefault()
-    if (!isDisabled) {
-      navigate(path)
+  const handleNavigate =
+    (path: string) =>
+    (event: React.MouseEvent<ViewOwnProps> | React.KeyboardEvent<ViewOwnProps>) => {
+      event.preventDefault()
+      if (!isDisabled) {
+        navigate(path)
+      }
     }
-  }
 
-  const handleForgotPasswordUrl = (url: string) => (event: React.MouseEvent<ViewOwnProps>) => {
-    event.preventDefault()
-    if (!isDisabled) {
-      assignLocation(url)
+  const handleForgotPasswordUrl =
+    (url: string) =>
+    (event: React.MouseEvent<ViewOwnProps> | React.KeyboardEvent<ViewOwnProps>) => {
+      event.preventDefault()
+      if (!isDisabled) {
+        assignLocation(url)
+      }
     }
-  }
 
   return (
     <Flex direction="column" gap="small">
       {isSignIn && (
         <Flex.Item overflowX="visible" overflowY="visible">
           {forgotPasswordUrl ? (
-            <Link href={forgotPasswordUrl} onClick={handleForgotPasswordUrl(forgotPasswordUrl)}>
+            <CondensedButton
+              href={forgotPasswordUrl}
+              onClick={handleForgotPasswordUrl(forgotPasswordUrl)}
+            >
               {I18n.t('Forgot password?')}
-            </Link>
+            </CondensedButton>
           ) : (
-            <Link onClick={handleNavigate(ROUTES.FORGOT_PASSWORD)}>
+            <CondensedButton
+              href={ROUTES.FORGOT_PASSWORD}
+              onClick={handleNavigate(ROUTES.FORGOT_PASSWORD)}
+            >
               {I18n.t('Forgot password?')}
-            </Link>
+            </CondensedButton>
           )}
         </Flex.Item>
       )}
 
       {isForgotPassword && (
         <Flex.Item overflowX="visible" overflowY="visible">
-          <Link onClick={handleNavigate(ROUTES.SIGN_IN)}>{I18n.t('Sign in')}</Link>
+          <Link onClick={handleNavigate(ROUTES.SIGN_IN)}>{I18n.t('Log in')}</Link>
         </Flex.Item>
       )}
     </Flex>
