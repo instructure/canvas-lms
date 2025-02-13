@@ -260,7 +260,6 @@ const InitializationModal = (props: InitializationModalBodyProps) => {
                 renderLabel={I18n.t('Install Method')}
                 assistiveText="Use arrow keys to navigate options."
                 value={props.state.method}
-                disabled={!window.ENV.FEATURES.lti_registrations_next}
                 onChange={(_e, {value}) => {
                   if (value === 'dynamic_registration') {
                     props.state.updateMethod('dynamic_registration')
@@ -278,23 +277,17 @@ const InitializationModal = (props: InitializationModalBodyProps) => {
                 <SimpleSelect.Option id="dynamic_registration" value="dynamic_registration">
                   {I18n.t('Dynamic Registration')}
                 </SimpleSelect.Option>
-                {window.ENV.FEATURES.lti_registrations_next && (
-                  <SimpleSelect.Option id="json_url" value="json_url">
-                    {I18n.t('Enter URL')}
-                  </SimpleSelect.Option>
-                )}
+                <SimpleSelect.Option id="json_url" value="json_url">
+                  {I18n.t('Enter URL')}
+                </SimpleSelect.Option>
 
-                {window.ENV.FEATURES.lti_registrations_next && (
-                  <SimpleSelect.Option id="json" value="json">
-                    {I18n.t('JSON')}
-                  </SimpleSelect.Option>
-                )}
+                <SimpleSelect.Option id="json" value="json">
+                  {I18n.t('JSON')}
+                </SimpleSelect.Option>
 
-                {window.ENV.FEATURES.lti_registrations_next && (
-                  <SimpleSelect.Option id="manual" value="manual">
-                    {I18n.t('Manual')}
-                  </SimpleSelect.Option>
-                )}
+                <SimpleSelect.Option id="manual" value="manual">
+                  {I18n.t('Manual')}
+                </SimpleSelect.Option>
               </SimpleSelect>
             </View>
             {props.state.method === 'dynamic_registration' && (

@@ -216,7 +216,7 @@ lti_registrations_page:
   beta: true
   applies_to: RootAccount
   display_name: LTI Apps Page
-  description: When enabled, the LTI Apps page will be available in the Account navigation sidebar..
+  description: When enabled, the LTI Apps page will be available in the Account navigation sidebar.
   environments:
     development:
       state: allowed_on
