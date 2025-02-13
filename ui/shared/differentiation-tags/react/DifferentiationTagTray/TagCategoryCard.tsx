@@ -101,4 +101,4 @@ function TagCategoryCard({category, onEditCategory}: TagCategoryCardProps) {
   )
 }
 
-export default TagCategoryCard
+export default React.memo(TagCategoryCard)

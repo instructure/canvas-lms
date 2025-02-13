@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState, useMemo, useCallback} from 'react'
+
+import React, {useState, useMemo, useCallback, useEffect} from 'react'
 import pandasBalloonUrl from '../images/pandasBalloon.svg'
 import {Tray} from '@instructure/ui-tray'
 import {Flex} from '@instructure/ui-flex'
@@ -30,6 +31,7 @@ import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/D
 import TagCategoryCard from './TagCategoryCard'
 import {Pagination} from '@instructure/ui-pagination'
 import {DifferentiationTagCategory} from '../types'
+import DifferentiationTagSearch from './DifferentiationTagSearch'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -95,10 +97,15 @@ const EmptyState = ({onCreate}: {onCreate: () => void}) => (
 export default function DifferentiationTagTray(props: DifferentiationTagTrayProps) {
   const {isOpen, onClose, differentiationTagCategories, isLoading, error} = props
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 4
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
 
   const handleCreateNewTag = () => {
     setModalMode('create')
@@ -106,13 +113,28 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
     setIsModalOpen(true)
   }
 
-  const totalPages = Math.ceil(differentiationTagCategories.length / itemsPerPage)
+  // Filter categories based on the search term.
+  const filteredCategories = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return differentiationTagCategories
+    }
+    const lowerSearchTerm = searchTerm.toLowerCase()
+    return differentiationTagCategories.filter(category => {
+      const categoryMatches = category.name.toLowerCase().includes(lowerSearchTerm)
+      const groupMatches =
+        category.groups &&
+        category.groups.some(group => group.name.toLowerCase().includes(lowerSearchTerm))
+      return categoryMatches || groupMatches
+    })
+  }, [differentiationTagCategories, searchTerm])
 
-  // Get the categories for the current page
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage)
+
+  // Get the categories for the current page from the filtered list.
   const paginatedCategories = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage
-    return differentiationTagCategories.slice(startIndex, startIndex + itemsPerPage)
-  }, [differentiationTagCategories, currentPage, itemsPerPage])
+    return filteredCategories.slice(startIndex, startIndex + itemsPerPage)
+  }, [filteredCategories, currentPage, itemsPerPage])
 
   const handleEditCategory = useCallback((categoryId: number) => {
     setModalMode('edit')
@@ -143,6 +165,13 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
           <Header onClose={onClose} />
 
           <Flex padding="0 small" direction="column">
+            <Flex.Item shouldGrow shouldShrink overflowX="visible" overflowY="visible">
+              <DifferentiationTagSearch
+                onSearch={setSearchTerm}
+                delay={300}
+                initialValue={searchTerm}
+              />
+            </Flex.Item>
             <Flex.Item overflowX="visible" overflowY="visible">
               <Button onClick={handleCreateNewTag} color="primary" margin="x-small none">
                 {I18n.t('+ Tag')}
@@ -162,6 +191,10 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
             </Flex.Item>
           ) : differentiationTagCategories.length === 0 ? (
             <EmptyState onCreate={handleCreateNewTag} />
+          ) : filteredCategories.length === 0 && searchTerm.trim() ? (
+            <Flex.Item shouldGrow shouldShrink margin="medium" textAlign="center">
+              <Text>{I18n.t('No matching tags found.')}</Text>
+            </Flex.Item>
           ) : (
             <Flex.Item shouldGrow shouldShrink margin="none">
               <Flex direction="column" margin="0 small">
