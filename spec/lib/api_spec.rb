@@ -681,7 +681,7 @@ describe Api do
     end
 
     it "properly generates an escaped arg string" do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, { scope: "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND \(id IN \('1',2,3\)\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, { root_account_id_column: "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND \(id IN \('1',2,3\)\)\)/)
     end
 
     it "works with no columns" do
@@ -689,11 +689,11 @@ describe Api do
     end
 
     it "adds in joins if the sis_mapping has some with columns" do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, { scope: "scope", joins: "some joins" }, Account.default).eager_load_values).to eq ["some joins"]
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, { root_account_id_column: "scope", joins: "some joins" }, Account.default).eager_load_values).to eq ["some joins"]
     end
 
     it "works with a few different column types and account scopings" do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => { ids: [1, 2, 3] }, "id2" => { ids: %w[a b c] }, "id3" => { ids: %w[s1 s2 s3] } }, { scope: "some_scope", is_not_scoped_to_account: ["id3"] }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND \(id1 IN \(1,2,3\)\)\) OR \(some_scope = #{Account.default.id} AND \(id2 IN \('a','b','c'\)\)\) OR id3 IN \('s1','s2','s3'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => { ids: [1, 2, 3] }, "id2" => { ids: %w[a b c] }, "id3" => { ids: %w[s1 s2 s3] } }, { root_account_id_column: "some_scope", is_not_scoped_to_account: ["id3"] }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND \(id1 IN \(1,2,3\)\)\) OR \(some_scope = #{Account.default.id} AND \(id2 IN \('a','b','c'\)\)\) OR id3 IN \('s1','s2','s3'\)\)/)
     end
 
     it "fails if we're scoping to an account and the scope isn't provided" do

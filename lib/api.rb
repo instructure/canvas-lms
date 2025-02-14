@@ -112,73 +112,81 @@ module Api
   end
 
   SIS_MAPPINGS = {
-    "courses" =>
-      { lookups: { "sis_course_id" => "sis_source_id",
-                   "id" => "id",
-                   "sis_integration_id" => "integration_id",
-                   "lti_context_id" => "lti_context_id",
-                   "uuid" => "uuid" }.freeze,
-        is_not_scoped_to_account: ["id"].freeze,
-        scope: "root_account_id" }.freeze,
-    "enrollment_terms" =>
-      { lookups: { "sis_term_id" => "sis_source_id",
-                   "id" => "id",
-                   "sis_integration_id" => "integration_id" }.freeze,
-        is_not_scoped_to_account: ["id"].freeze,
-        scope: "root_account_id" }.freeze,
-    "users" =>
-      { lookups: { "sis_user_id" => "pseudonyms.sis_user_id",
-                   "sis_login_id" => {
-                     column: "LOWER(pseudonyms.unique_id)",
-                     transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
-                   },
-                   "id" => "users.id",
-                   "sis_integration_id" => "pseudonyms.integration_id",
-                   "lti_context_id" => "users.lti_context_id", # leaving for legacy reasons
-                   "lti_user_id" => {
-                     column: [
-                       "users.lti_context_id",
-                       "user_past_lti_ids.user_lti_context_id",
-                     ],
-                     joins_needed_for_query: [:past_lti_ids],
-                   },
-                   "lti_1_1_id" => "users.lti_context_id",
-                   "lti_1_3_id" => "users.lti_id",
-                   "uuid" => "users.uuid" }.freeze,
-        is_not_scoped_to_account: ["users.id", "users.lti_context_id", "user_past_lti_ids.user_lti_context_id", "users.lti_id", "users.uuid"].freeze,
-        scope: "pseudonyms.account_id",
-        joins: :pseudonym }.freeze,
-    "accounts" =>
-      { lookups: { "sis_account_id" => "sis_source_id",
-                   "id" => "id",
-                   "sis_integration_id" => "integration_id",
-                   "lti_context_id" => "lti_context_id",
-                   "uuid" => "uuid" }.freeze,
-        is_not_scoped_to_account: %w[id lti_context_id uuid].freeze,
-        scope: "root_account_id" }.freeze,
-    "course_sections" =>
-      { lookups: { "sis_section_id" => "sis_source_id",
-                   "id" => "id",
-                   "sis_integration_id" => "integration_id" }.freeze,
-        is_not_scoped_to_account: ["id"].freeze,
-        scope: "root_account_id" }.freeze,
-    "groups" =>
-        { lookups: { "sis_group_id" => "sis_source_id",
-                     "lti_context_id" => "lti_context_id",
-                     "id" => "id" }.freeze,
-          is_not_scoped_to_account: ["id"].freeze,
-          scope: "root_account_id" }.freeze,
-    "group_categories" =>
-        { lookups: { "sis_group_category_id" => "sis_source_id",
-                     "id" => "id" }.freeze,
-          is_not_scoped_to_account: ["id"].freeze,
-          scope: "root_account_id" }.freeze,
-    "assignments" =>
-        { lookups: { "sis_assignment_id" => "sis_source_id",
-                     "id" => "id",
-                     "lti_context_id" => "lti_context_id" }.freeze,
-          is_not_scoped_to_account: ["id"].freeze,
-          scope: "root_account_id" }.freeze,
+    "courses" => {
+      lookups: { "sis_course_id" => "sis_source_id",
+                 "id" => "id",
+                 "sis_integration_id" => "integration_id",
+                 "lti_context_id" => "lti_context_id",
+                 "uuid" => "uuid" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "enrollment_terms" => {
+      lookups: { "sis_term_id" => "sis_source_id",
+                 "id" => "id",
+                 "sis_integration_id" => "integration_id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "users" => {
+      lookups: { "sis_user_id" => "pseudonyms.sis_user_id",
+                 "sis_login_id" => {
+                   column: "LOWER(pseudonyms.unique_id)",
+                   transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
+                 }.freeze,
+                 "id" => "users.id",
+                 "sis_integration_id" => "pseudonyms.integration_id",
+                 "lti_context_id" => "users.lti_context_id", # leaving for legacy reasons
+                 "lti_user_id" => {
+                   column: [
+                     "users.lti_context_id",
+                     "user_past_lti_ids.user_lti_context_id",
+                   ].freeze,
+                   scope: ->(relation) { relation.left_joins(:past_lti_ids) }.freeze,
+                 }.freeze,
+                 "lti_1_1_id" => "users.lti_context_id",
+                 "lti_1_3_id" => "users.lti_id",
+                 "uuid" => "users.uuid" }.freeze,
+      is_not_scoped_to_account: ["users.id", "users.lti_context_id", "user_past_lti_ids.user_lti_context_id", "users.lti_id", "users.uuid"].freeze,
+      root_account_id_column: "pseudonyms.account_id",
+      joins: :pseudonym
+    }.freeze,
+    "accounts" => {
+      lookups: { "sis_account_id" => "sis_source_id",
+                 "id" => "id",
+                 "sis_integration_id" => "integration_id",
+                 "lti_context_id" => "lti_context_id",
+                 "uuid" => "uuid" }.freeze,
+      is_not_scoped_to_account: %w[id lti_context_id uuid].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "course_sections" => {
+      lookups: { "sis_section_id" => "sis_source_id",
+                 "id" => "id",
+                 "sis_integration_id" => "integration_id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "groups" => {
+      lookups: { "sis_group_id" => "sis_source_id",
+                 "lti_context_id" => "lti_context_id",
+                 "id" => "id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "group_categories" => {
+      lookups: { "sis_group_category_id" => "sis_source_id",
+                 "id" => "id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "assignments" => {
+      lookups: { "sis_assignment_id" => "sis_source_id",
+                 "id" => "id",
+                 "lti_context_id" => "lti_context_id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
   }.freeze
 
   MAX_ID = ((2**63) - 1)
@@ -221,7 +229,7 @@ module Api
     # returns an object like {
     #   "column_name" => {
     #     ids: [column_value, ...].uniq,
-    #     joins_needed_for_query: [relation_name, ...] <-- optional
+    #     scope: [Proc, ...] <-- optional
     #   }
     # }
     columns = {}
@@ -242,10 +250,10 @@ module Api
             sis_id = column[:transform].call(sis_id)
           end
         end
-        if (joins_needed_for_query = column[:joins_needed_for_query])
+        if (scope = column[:scope])
           columns[column_name] ||= {}
-          columns[column_name][:joins_needed_for_query] ||= []
-          columns[column_name][:joins_needed_for_query] << joins_needed_for_query
+          columns[column_name][:scope] ||= []
+          columns[column_name][:scope] << scope
         end
         column = column_name
       end
@@ -299,14 +307,18 @@ module Api
     relation = relation.all unless relation.is_a?(ActiveRecord::Relation)
 
     if columns.keys.flatten.length == 1 && not_scoped_to_account?(columns.keys.first, sis_mapping)
-      queryable_columns = {}
-      columns.each_pair { |column_name, value| queryable_columns[column_name] = value[:ids] }
-      relation = relation.where(queryable_columns)
+      column_def = columns.first.last
+      Array.wrap(column_def[:scope]).each do |proc|
+        relation = proc.call(relation)
+      end
+      relation = relation.where(columns.first.first => column_def[:ids])
     else
       args = []
       query = []
       columns.each_key do |column|
-        relation = relation.left_outer_joins(columns[column][:joins_needed_for_query]) if columns[column][:joins_needed_for_query]
+        Array.wrap(columns[column][:scope]).each do |proc|
+          relation = proc.call(relation)
+        end
         if not_scoped_to_account?(column, sis_mapping)
           conditions = []
           if column.is_a?(Array)
@@ -320,7 +332,7 @@ module Api
           end
           query << conditions.join(" OR ").to_s
         else
-          raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
+          raise ArgumentError, "missing scope for collection" unless sis_mapping[:root_account_id_column]
 
           ids = columns[column][:ids]
           if ids.any?(Array)
@@ -349,7 +361,7 @@ module Api
                 conditions << "#{column} IN (?)"
                 sub_args << ids
               end
-              sub_query << "(#{sis_mapping[:scope]} = #{root_account.id} AND (#{conditions.join(" OR ")}))"
+              sub_query << "(#{sis_mapping[:root_account_id_column]} = #{root_account.id} AND (#{conditions.join(" OR ")}))"
             end
             if Shard.current == relation.primary_shard
               query.concat(sub_query)
