@@ -17,19 +17,20 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {map, some, every, find, filter, reject, isEmpty} from 'lodash'
-import Backbone from '@canvas/backbone'
+import {map, some, every, find as _find, filter, reject, isEmpty} from 'lodash'
+import {View} from '@canvas/backbone'
 import template from '../../jst/rosterUser.handlebars'
 import EditSectionsView from './EditSectionsView'
 import EditRolesView from './EditRolesView'
 import InvitationsView from './InvitationsView'
-import LinkToStudentsView from './LinkToStudentsView'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {Avatar} from '@instructure/ui-avatar'
+import LinkToStudents from '../../react/LinkToStudents'
 import {nanoid} from 'nanoid'
 import 'jquery-kyle-menu'
 import '@canvas/jquery/jquery.disableWhileLoading'
+import RosterDialogMixin from './RosterDialogMixin'
 import UserTaggedModal from '@canvas/differentiation-tags/react/UserTaggedModal/UserTaggedModal'
 import MessageBus from '../../util/MessageBus'
 
@@ -37,11 +38,12 @@ const I18n = createI18nScope('RosterUserView')
 
 let editSectionsDialog = null
 let editRolesDialog = null
-let linkToStudentsDialog = null
 let invitationDialog = null
 
-export default class RosterUserView extends Backbone.View {
+export default class RosterUserView extends View {
   static initClass() {
+    this.mixin(RosterDialogMixin)
+
     this.prototype.tagName = 'tr'
 
     this.prototype.className = 'rosterUser al-hover-container'
@@ -53,7 +55,7 @@ export default class RosterUserView extends Backbone.View {
       'focus *': 'focus',
       'blur *': 'blur',
       'change .select-user-checkbox': 'handleCheckboxChange',
-      'click .user-tags-icon': 'handleTagIconClick'
+      'click .user-tags-icon': 'handleTagIconClick',
     }
   }
 
@@ -81,7 +83,7 @@ export default class RosterUserView extends Backbone.View {
 
   contextCardJSON(json) {
     let enrollment
-    if ((enrollment = find(json.enrollments, e => e.type === 'StudentEnrollment'))) {
+    if ((enrollment = _find(json.enrollments, e => e.type === 'StudentEnrollment'))) {
       return (json.course_id = enrollment.course_id)
     }
   }
@@ -201,12 +203,42 @@ export default class RosterUserView extends Backbone.View {
     return editRolesDialog.render().show()
   }
 
-  linkToStudents() {
-    if (!linkToStudentsDialog) {
-      linkToStudentsDialog = new LinkToStudentsView()
+  getUniqueObservees(enrollments) {
+    const uniqueObserveesMap = new Map()
+
+    for (const enrollment of enrollments) {
+      if (uniqueObserveesMap.has(enrollment.observed_user.id)) {
+        continue
+      }
+      uniqueObserveesMap.set(enrollment.observed_user.id, enrollment.observed_user)
     }
-    linkToStudentsDialog.model = this.model
-    return linkToStudentsDialog.render().show()
+
+    return Array.from(uniqueObserveesMap.values())
+  }
+
+  linkToStudents() {
+    const mountPoint = document.getElementById('link_to_students_mount_point')
+    const root = createRoot(mountPoint)
+    const observer = this.model.attributes
+    const observerEnrollmentsWithObservedUser = observer.enrollments.filter(
+      enrollment => enrollment.type === 'ObserverEnrollment' && enrollment.observed_user,
+    )
+    const initialObservees = this.getUniqueObservees(observerEnrollmentsWithObservedUser)
+    const course = ENV.current_context
+
+    root.render(
+      <LinkToStudents
+        observer={observer}
+        initialObservees={initialObservees}
+        course={course}
+        onSubmit={(addedEnrollments, removedEnrollments) => {
+          this.updateEnrollments(addedEnrollments, removedEnrollments)
+        }}
+        onClose={() => {
+          root.unmount()
+        }}
+      />,
+    )
   }
 
   deactivateUser() {
@@ -334,16 +366,15 @@ export default class RosterUserView extends Backbone.View {
       this.renderUserTagModal(false, userId, userName)
       returnFocusTo?.focus()
     }
-    if(!this.userTagModalContainer)
-      this.userTagModalContainer = createRoot(el)
+    if (!this.userTagModalContainer) this.userTagModalContainer = createRoot(el)
     this.userTagModalContainer.render(
-      <UserTaggedModal 
+      <UserTaggedModal
         isOpen={isOpen}
         courseId={ENV.course.id}
         userId={userId}
         userName={userName}
         onClose={onModalClose}
-      />
+      />,
     )
   }
 
@@ -379,7 +410,7 @@ export default class RosterUserView extends Backbone.View {
     if (this._reactRoot) {
       this._reactRoot.unmount()
     }
-    if(this.userTagModalContainer) {
+    if (this.userTagModalContainer) {
       this.userTagModalContainer.unmount()
       this.userTagModalContainer = null
     }
