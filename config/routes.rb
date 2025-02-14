@@ -612,6 +612,7 @@ CanvasRails::Application.routes.draw do
     end
 
     get :export, as: :export_portfolio
+    get :recent_submissions, as: :recent_submissions
     get ":category_name" => "eportfolio_categories#show", :as => :named_category
     get ":category_name/:entry_name" => "eportfolio_entries#show", :as => :named_category_entry
   end

@@ -192,6 +192,7 @@ function renderCreateForm() {
 function renderPortal(portfolio_id) {
   const sectionListContainer = document.getElementById('section_list_mount')
   const pageListContainer = document.getElementById('page_list_mount')
+  const submissionContainer = document.getElementById('recent_submission_mount')
 
   return (
     <QueryProvider>
@@ -199,6 +200,7 @@ function renderPortal(portfolio_id) {
         portfolioId={portfolio_id}
         sectionListNode={sectionListContainer}
         pageListNode={pageListContainer}
+        submissionNode={submissionContainer}
         onPageUpdate={json => $(document).triggerHandler('page_updated', json)}
       />
     </QueryProvider>
@@ -585,97 +587,6 @@ $(document).ready(function () {
       $section.formErrors(data.errors || data)
     },
   })
-  $('#recent_submissions .submission').keydown(function (event) {
-    const count = $(event.target).closest('a').length
-    if (count === 0 || count === 1) {
-      const code = event.which
-      if (code === 13 || code === 32) {
-        if (count === 0) {
-          // Add Submission
-          $(this).click()
-        } else if (count === 1) {
-          // Open Submission
-          $(event.target).closest('a')[0].click()
-        }
-      }
-    }
-  })
-  $('#recent_submissions .submission').click(function (event) {
-    if ($(event.target).closest('a').length === 0) {
-      event.preventDefault()
-      event.stopPropagation()
-      $(this).removeClass('active-leaf')
-      $('#category_select').triggerHandler('change')
-      const id = $(this).getTemplateData({textValues: ['submission_id']}).submission_id
-      $('#add_submission_form .submission_id').val(id)
-      const assignment = $(this).find('.assignment_title').text()
-      const context = $(this).find('.context_name').text()
-      $('#add_submission_form .submission_description').val(
-        I18n.t('default_description', 'This is my %{assignment} submission for %{course}.', {
-          assignment,
-          course: context,
-        }),
-      )
-      $('#add_submission_form')
-        .dialog({
-          title: I18n.t('titles.add_submission', 'Add Page for Submission'),
-          width: 400,
-          open() {
-            $(this).find(':text:visible:first').val(assignment).focus().select()
-            $(document).triggerHandler('submission_dialog_opened')
-          },
-          modal: true,
-          zIndex: 1000,
-        })
-        .fixDialogButtons()
-    }
-  })
-  $('#add_submission_form .cancel_button').click(() => {
-    $('#add_submission_form').dialog('close')
-  })
-  $('#add_submission_form').formSubmit({
-    processData(_data) {
-      const url = $(this).find('.add_eportfolio_entry_url').attr('href')
-      $(this).attr('action', url)
-    },
-    beforeSubmit(_data) {
-      $(this).loadingImage()
-    },
-    success(data) {
-      $(this).loadingImage('remove')
-      $(this).dialog('close')
-      const entry = data.eportfolio_entry
-      /* eslint-disable no-empty */
-      try {
-        const submission_id = entry.content[1].submission_id
-        $('#submission_' + submission_id + ',#recent_submission_' + submission_id).addClass(
-          'already_used',
-        )
-      } catch (_e) {}
-      /* eslint-enable no-empty */
-      let url = $(this).find('.eportfolio_named_entry_url').attr('href')
-      url = replaceTags(url, 'category_slug', entry.category_slug)
-      url = replaceTags(url, 'slug', entry.slug)
-      window.location.href = url
-      $(document).triggerHandler('page_added', data)
-    },
-  })
-  $('#category_select')
-    .change(function () {
-      const id = $(this).val()
-      if (id === 'new') {
-        return
-      }
-      $('#page_select_list .page_select:not(#page_select_blank)').remove()
-      $('#structure_category_' + id)
-        .find('.entry_list li.entry')
-        .each(function () {
-          const $page = $('#page_select_blank').clone(true).removeAttr('id')
-          $page.text($(this).getTemplateData({textValues: ['name']}).name)
-          $('#page_select_list').append($page.show())
-        })
-    })
-    .triggerHandler('change')
 
   $('.delete_comment_link').click(function (event) {
     event.preventDefault()

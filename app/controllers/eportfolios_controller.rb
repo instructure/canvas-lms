@@ -19,8 +19,10 @@
 #
 
 class EportfoliosController < ApplicationController
-  include Api::V1::Eportfolio
   include EportfolioPage
+  include Api::V1::Eportfolio
+  include Api::V1::Submission
+
   before_action :require_user, only: [:index, :user_index]
   before_action :reject_student_view_student
   before_action :verified_user_check, only: %i[index user_index create]
@@ -240,6 +242,33 @@ class EportfoliosController < ApplicationController
       end
     else
       authorized_action(nil, nil, :bad_permission)
+    end
+  end
+
+  # could be moved to submissions controller, but I'll leave it here for now
+  def recent_submissions
+    if authorized_action(@portfolio, @current_user, :read)
+
+      if @portfolio.grants_right?(@current_user, session, :manage) && (@current_user && @current_user == @portfolio.user)
+        recent_submissions = Submission.joins(:course).joins(:assignment)
+                                       .where(user_id: @current_user, workflow_state: %w[submitted graded])
+                                       .where.not(course: { workflow_state: %w[created claimed deleted] })
+                                       .where.not(assignment: { workflow_state: %w[unpublished deleted] })
+                                       .order(Arel.sql("COALESCE(submissions.submitted_at, submissions.created_at) DESC"))
+        paginated_submissions = Api.paginate(recent_submissions, self, eportfolio_recent_submissions_url)
+      else
+        paginated_submissions = []
+      end
+
+      submission_json = paginated_submissions.map do |s|
+        submission_json(s, s.assignment, @current_user, session).tap do |hash|
+          hash["assignment_name"] = s.assignment.name
+          hash["course_name"] = s.course.name
+          hash["attachment_count"] = s.attachments.length
+          hash["preview_url"] = context_url(s.assignment.context, :context_assignment_submission_url, s.assignment_id, @portfolio.user.id)
+        end
+      end
+      render json: submission_json
     end
   end
 
