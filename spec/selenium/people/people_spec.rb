@@ -604,9 +604,8 @@ describe "people" do
       get "/courses/#{@course.id}/users"
       f(".ObserverEnrollment .icon-more").click
       fln("Link to Students").click
-      fln("Remove linked student #{@student1.name}", f("#token_#{@student1.id}")).click
-      f(".ui-dialog-buttonset .btn-primary").click
-      wait_for_ajax_requests
+      f("[data-testid='observee-tag-#{@student1.id}'").click
+      f("[aria-label='Update']").click
       expect(@observer.enrollments.not_deleted.map(&:associated_user_id)).not_to include @student1.id
       expect(@observer.enrollments.not_deleted.map(&:associated_user_id)).to include @student2.id
     end
