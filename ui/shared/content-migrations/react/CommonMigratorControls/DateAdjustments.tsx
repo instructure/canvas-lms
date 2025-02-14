@@ -264,24 +264,29 @@ export const DateAdjustments = ({
                     onRemoveSubstitution={removeSubstitution}
                   />
                 ))}
-                <Button
-                  margin="medium none none none"
-                  onClick={() => {
-                    const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
-                    tmp.date_shift_options.day_substitutions.push({from: 0, to: 0, id: subs_id++})
-                    setDateAdjustments(tmp)
-                  }}
-                  color="secondary"
-                  width={isMobileView ? '100%' : '8.5rem'}
-                  disabled={disabled}
-                >
-                  <PresentationContent>
-                    <IconAddLine /> {I18n.t('Substitution')}
-                  </PresentationContent>
-                  <ScreenReaderContent>{I18n.t('Add substitution')}</ScreenReaderContent>
-                </Button>
+                <Flex as="div" direction={isMobileView ? 'column' : 'row'}>
+                  <Button
+                    margin="medium none none none"
+                    onClick={() => {
+                      const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
+                      tmp.date_shift_options.day_substitutions.push({from: 0, to: 0, id: subs_id++})
+                      setDateAdjustments(tmp)
+                    }}
+                    color="secondary"
+                    width={isMobileView ? '100%' : '8.5rem'}
+                    disabled={disabled}
+                    textAlign="center"
+                    interaction={disabled ? 'disabled' : 'enabled'}
+                  >
+                    <PresentationContent>
+                      <IconAddLine /> {I18n.t('Substitution')}
+                    </PresentationContent>
+                    <ScreenReaderContent>{I18n.t('Add substitution')}</ScreenReaderContent>
+                  </Button>
+                </Flex>
               </>
             ) : null}
+            { isMobileView && <hr role="presentation" aria-hidden="true" style={{margin: '1.5rem 0 0 0'}} />}
           </View>
         )
       }}
