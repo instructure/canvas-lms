@@ -3662,6 +3662,7 @@ ko:
       add_prerequisite: "*%{module}*에 필수 조건 추가"
       buttons: 
         add_prerequisite: "필수 조건 추가"
+      estimated_duration_minutes: 분
       headings: 
         add_prerequisite: "%{name}에 필수 조건 추가"
         course_modules: "과목 모듈"
@@ -5389,6 +5390,7 @@ ko:
       criterion_long_description: "기준 상세 설명"
       find_existing_rubric: "기존 루브릭 찾기"
   edit_rubric_7d4d139d: "루브릭 편집"
+  edit_sections_7d0e4e34: "섹션 편집"
   edit_survey_b0d6890d: "설문 편집"
   edit_this_key_1ee53473: "이 키 편집"
   editor: 
@@ -7467,6 +7469,7 @@ ko:
     titles: 
       link_to_student: "학생에게 연결"
   link_only_995966e: 링크만
+  link_to_students_91edf7ea: "학생에게 연결"
   linked_assignment_message: "과제 '%{title}'와(과) 연결됨"
   linked_discussion_topic_message: "토론 주제'%{title}'와(과) 연결됨"
   linked_quiz_message: "퀴즈 '%{title}'와(과) 연결됨"
@@ -12082,6 +12085,7 @@ ko:
   remove_edf2b8a7: (제거)
   remove_email_address_b1820820: "이메일 주소 제거하기"
   remove_f47dc62a: 제거
+  remove_from_course_6fb47aee: "과목에서 제거"
   remove_media_comment_f4afdb4b: "미디어 설명 제거"
   remove_name_from_group_487cce74: "%{name}을(를) 그룹에서 제거"
   remove_row_c198da5a: "행 삭제"
@@ -12099,6 +12103,7 @@ ko:
   reports_1b9ab7a7: 보고서
   request_id_1499afb0: "요청 ID"
   required_5f7ef8c0: 필수
+  resend_invitation_486bd513: "초대 다시 보내기"
   reset_this_contact_method_s_bounce_count_3845ecf4: "이 연락 방법의 응답 횟수 재설정하기"
   restore_6d523f1d: 복원
   restore_courses_182e162e: "과목 복원"
