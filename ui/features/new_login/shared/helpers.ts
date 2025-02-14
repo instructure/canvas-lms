@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {replaceLocation} from '@canvas/util/globalUtils'
+import {assignLocation} from '@canvas/util/globalUtils'
 import type {FormMessage} from '@instructure/ui-form-field'
 
 /**
@@ -45,10 +45,10 @@ export const createErrorMessage = (text: string): FormMessage[] =>
  */
 export const handleRegistrationRedirect = (data: any): void => {
   if (data.destination) {
-    document.location.href = data.destination
+    assignLocation(data.destination)
   } else if (data.course) {
-    document.location.href = `/courses/${data.course.course.id}?registration_success=1`
+    assignLocation(`/courses/${data.course.course.id}?registration_success=1`)
   } else {
-    document.location.href = '/?registration_success=1'
+    assignLocation('/?registration_success=1')
   }
 }

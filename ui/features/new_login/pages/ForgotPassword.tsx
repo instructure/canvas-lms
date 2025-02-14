@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -74,11 +74,8 @@ const ForgotPassword = () => {
         setEmailError(I18n.t('No account found for this email address'))
         emailInputRef.current?.focus()
       }
-    } catch (_error: unknown) {
-      showFlashAlert({
-        message: I18n.t('Something went wrong. Please try again later.'),
-        type: 'error',
-      })
+    } catch (error: any) {
+      showFlashError(I18n.t('Something went wrong. Please try again later.'))(error)
     } finally {
       setIsUiActionPending(false)
     }

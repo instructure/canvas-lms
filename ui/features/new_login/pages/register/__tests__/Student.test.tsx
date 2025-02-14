@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {assignLocation} from '@canvas/util/globalUtils'
 import {cleanup, render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -25,7 +26,7 @@ import {createStudentAccount} from '../../../services'
 import Student from '../Student'
 
 jest.mock('@canvas/util/globalUtils', () => ({
-  replaceLocation: jest.fn(),
+  assignLocation: jest.fn(),
 }))
 
 jest.mock('../../../services', () => ({
@@ -277,6 +278,40 @@ describe('Student', () => {
           'Something went wrong. Please try again later.',
         )
         expect(flashAlert).toBeInTheDocument()
+      })
+    })
+
+    it('redirects to the provided destination after a successful submission', async () => {
+      ;(createStudentAccount as jest.Mock).mockResolvedValueOnce({
+        status: 200,
+        data: {destination: '/custom-redirect'},
+      })
+      setup()
+      await userEvent.type(screen.getByTestId('name-input'), 'Student User')
+      await userEvent.type(screen.getByTestId('username-input'), 'studentusername')
+      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await userEvent.type(screen.getByTestId('join-code-input'), 'JOIN123')
+      await userEvent.click(screen.getByTestId('submit-button'))
+      await waitFor(() => {
+        expect(assignLocation).toHaveBeenCalledWith('/custom-redirect')
+      })
+    })
+
+    it('redirects to the default location if no destination is provided', async () => {
+      ;(createStudentAccount as jest.Mock).mockResolvedValueOnce({
+        status: 200,
+        data: {},
+      })
+      setup()
+      await userEvent.type(screen.getByTestId('name-input'), 'Student User')
+      await userEvent.type(screen.getByTestId('username-input'), 'studentusername')
+      await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
+      await userEvent.type(screen.getByTestId('confirm-password-input'), 'ValidPassword123!')
+      await userEvent.type(screen.getByTestId('join-code-input'), 'JOIN123')
+      await userEvent.click(screen.getByTestId('submit-button'))
+      await waitFor(() => {
+        expect(assignLocation).toHaveBeenCalledWith('/?registration_success=1')
       })
     })
   })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {replaceLocation} from '@canvas/util/globalUtils'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {within} from '@testing-library/dom'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import {userEvent} from '@testing-library/user-event'
@@ -27,7 +27,7 @@ import {createTeacherAccount} from '../../../services'
 import Teacher from '../Teacher'
 
 jest.mock('@canvas/util/globalUtils', () => ({
-  replaceLocation: jest.fn(),
+  assignLocation: jest.fn(),
 }))
 
 jest.mock('../../../services', () => ({
@@ -194,7 +194,7 @@ describe('Teacher', () => {
       })
     })
 
-    it.skip('redirects to the provided destination after a successful submission', async () => {
+    it('redirects to the provided destination after a successful submission', async () => {
       ;(createTeacherAccount as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {destination: '/custom-redirect'},
@@ -204,11 +204,11 @@ describe('Teacher', () => {
       await userEvent.type(screen.getByTestId('name-input'), 'Teacher Name')
       await userEvent.click(screen.getByTestId('submit-button'))
       await waitFor(() => {
-        expect(replaceLocation).toHaveBeenCalledWith('/custom-redirect')
+        expect(assignLocation).toHaveBeenCalledWith('/custom-redirect')
       })
     })
 
-    it.skip('redirects to the default location if no destination is provided', async () => {
+    it('redirects to the default location if no destination is provided', async () => {
       ;(createTeacherAccount as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {},
@@ -218,7 +218,7 @@ describe('Teacher', () => {
       await userEvent.type(screen.getByTestId('name-input'), 'Teacher Name')
       await userEvent.click(screen.getByTestId('submit-button'))
       await waitFor(() => {
-        expect(replaceLocation).toHaveBeenCalledWith('/?registration_success=1')
+        expect(assignLocation).toHaveBeenCalledWith('/?registration_success=1')
       })
     })
   })
