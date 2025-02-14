@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef} from 'react'
 
 import {CommonMigratorControls, ErrorFormMessage} from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
@@ -59,6 +59,7 @@ const ExternalToolImporter = ({
   const [url, setUrl] = React.useState('')
   const [urlError, setUrlError] = React.useState(false)
   const [titleValue, setTitleValue] = React.useState('')
+  const courseSelectRef = useRef<HTMLButtonElement | null>(null)
 
   const {contextType, contextId, selectedToolid} = useMemo(() => {
     const contextInfo = ENV?.context_asset_string?.split('_')
@@ -81,6 +82,7 @@ const ExternalToolImporter = ({
       formData.settings.file_url = url
       setUrlError(!url)
       if (!url) {
+        courseSelectRef.current?.focus()
         return
       }
       onSubmit(formData)
@@ -98,11 +100,24 @@ const ExternalToolImporter = ({
   }
 
   const openExternalToolModal = () => setIsOpen(true)
+  const getFindCourseButtonAriaLabel = () => {
+    if (urlError) {
+      return `${I18n.t('File upload or URL is required')} ${I18n.t('Find a Course')}`
+    }
+    return I18n.t('Find a Course')
+  }
 
   return (
     <>
       <Flex>
-        <Button onClick={openExternalToolModal}>{I18n.t('Find a Course')}</Button>
+        <Button
+          onClick={openExternalToolModal}
+          elementRef={ref => (courseSelectRef.current = ref as HTMLButtonElement)}
+          data-testid="find-course-button"
+          aria-label={getFindCourseButtonAriaLabel()}
+        >
+          {I18n.t('Find a Course')}
+        </Button>
         {!!titleValue && (
           <View as="div" margin="small">
             {titleValue}

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState, useRef} from 'react'
 
 import {
   CommonMigratorControls,
@@ -101,7 +101,7 @@ const SelectedFolderName = ({folderName, clearFolderName}: SelectedFolderNamePro
     <Flex alignItems="center" gap="x-small">
       <IconFolderLine />
       <Flex.Item shouldShrink shouldGrow>
-        <Text weight="bold" size="small" >
+        <Text weight="bold" size="small">
           <TruncateText>{folderName}</TruncateText>
         </Text>
       </Flex.Item>
@@ -130,18 +130,24 @@ const ZipFileImporter = ({
   const [searchValue, setSearchValue] = useState('')
   const [fileError, setFileError] = useState<boolean>(false)
   const [folderError, setFolderError] = useState<boolean>(false)
+  const folderInputRef = useRef<HTMLInputElement | null>(null)
+
+  const handleErrorFocus = (folderError: boolean) => {
+    if (folderError) {
+      folderInputRef.current?.focus()
+    }
+  }
 
   const handleSubmit: onSubmitMigrationFormCallback = useCallback(
     formData => {
-      if (!file) {
-        setFileError(true)
-      }
+      const fileError = !file
+      const folderError = !folder
 
-      if (!folder) {
-        setFolderError(true)
-      }
+      setFileError(fileError)
+      setFolderError(folderError)
 
-      if (!file || !folder) {
+      if (fileError || folderError) {
+        handleErrorFocus(folderError)
         return
       }
 
@@ -270,10 +276,7 @@ const ZipFileImporter = ({
         <View as="div" margin="medium none none none" maxWidth="46.5rem">
           {folders.length > 0 ? (
             <>
-              <RequiredFormLabel
-                showErrorState={folderError}
-                htmlFor="folder-search"
-              >
+              <RequiredFormLabel showErrorState={folderError} htmlFor="folder-search">
                 {I18n.t('Upload to')}
               </RequiredFormLabel>
               <View as="div" margin="x-small 0 medium" data-testid="fileName">
@@ -298,6 +301,12 @@ const ZipFileImporter = ({
                 }}
                 renderBeforeInput={<IconSearchLine inline={false} />}
                 renderAfterInput={renderClearButton()}
+                inputRef={ref => (folderInputRef.current = ref)}
+                messages={
+                  folderError
+                    ? [{text: I18n.t('Please select a folder'), type: 'screenreader-only'}]
+                    : []
+                }
               />
               <View
                 as="div"

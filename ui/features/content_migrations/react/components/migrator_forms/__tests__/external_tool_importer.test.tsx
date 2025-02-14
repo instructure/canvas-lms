@@ -132,6 +132,12 @@ describe('ExternalToolImporter', () => {
     })
   })
 
+  it('focuses on input after course input error', async () => {
+    const {getByRole, getByTestId} = renderComponent()
+    await userEvent.click(getByRole('button', {name: 'Add to Import Queue', hidden: true}))
+    await expect(getByTestId('find-course-button')).toHaveFocus()
+  })
+
   describe('external content url is empty', () => {
     it('does not submit the form', async () => {
       const {getByRole} = renderComponent()
