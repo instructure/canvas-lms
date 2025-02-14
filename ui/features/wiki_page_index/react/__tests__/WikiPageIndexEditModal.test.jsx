@@ -21,6 +21,7 @@ import {createRoot} from 'react-dom/client'
 import WikiPage from '../../../../shared/wiki/backbone/models/WikiPage'
 import WikiPageIndexItemView from '../../backbone/views/WikiPageIndexItemView'
 import renderWikiPageIndexEditModal from '../WikiPageIndexEditModal'
+import {TITLE_MAX_LENGTH} from '@canvas/wiki/utils/constants'
 
 const wikiPageModel = new WikiPage({page_id: 1, title: 'hi'})
 wikiPageModel.initialize({url: 'page-1'}, {contextAssetString: 'course_1'})
@@ -87,5 +88,18 @@ describe('renderWikiPageTitle', () => {
 
     expect(input).toHaveFocus()
     expect(getByText('A title is required')).toBeInTheDocument()
+  })
+
+  it('errors if the title is too long', () => {
+    const props = getProps()
+    const component = renderWikiPageIndexEditModal(viewElement.editModalRoot, props)
+    const {getByTestId, getByText} = render(component)
+
+    const input = getByTestId('page-title-input')
+    fireEvent.change(input, {target: {value: 'a'.repeat(TITLE_MAX_LENGTH + 1)}})
+    getByTestId('save-button').click()
+
+    expect(input).toHaveFocus()
+    expect(getByText(`Title can't exceed ${TITLE_MAX_LENGTH} characters`)).toBeInTheDocument()
   })
 })
