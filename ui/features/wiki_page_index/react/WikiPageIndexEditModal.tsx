@@ -25,6 +25,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import type {FormMessage} from '@instructure/ui-form-field'
 import type {Root} from 'react-dom/client'
+import {TITLE_MAX_LENGTH} from '@canvas/wiki/utils/constants'
 
 const I18n = createI18nScope('wiki_pages')
 
@@ -84,6 +85,11 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
       errors.push({
         type: 'newError',
         text: I18n.t('A title is required'),
+      })
+    } else if (name.length > TITLE_MAX_LENGTH) {
+      errors.push({
+        type: 'newError',
+        text: I18n.t("Title can't exceed %{max} characters", {max: TITLE_MAX_LENGTH}),
       })
     }
 
