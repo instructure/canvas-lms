@@ -18,12 +18,9 @@
 
 import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {formatFileSize} from '@canvas/util/fileHelper'
 import {Modal} from '@instructure/ui-modal'
-import {Text} from '@instructure/ui-text'
 import FilePreviewTray from './FilePreviewTray'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
-import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -34,11 +31,12 @@ import {
   IconImageSolid,
   IconInfoSolid,
   IconDownloadSolid,
-  IconOffLine,
   IconPrinterSolid,
   IconXSolid,
 } from '@instructure/ui-icons'
 import {type File} from '../../../interfaces/File'
+import NoFilePreviewAvailable from "./NoFilePreviewAvailable";
+import FilePreviewIframe from "./FilePreviewIframe";
 
 const I18n = createI18nScope('files_v2')
 
@@ -46,6 +44,16 @@ interface FilePreviewModalProps {
   isOpen: boolean
   onClose: () => void
   item: File
+}
+
+const previewableTypes = ['image','pdf','html','doc','text']
+
+const renderFilePreview = (item: File) => {
+  if (item.preview_url && previewableTypes.includes(item.mime_class)) {
+    return (<FilePreviewIframe item={item}/>)
+  } else {
+    return (<NoFilePreviewAvailable item={item}/>)
+  }
 }
 
 const FilePreviewModal = ({isOpen, onClose, item}: FilePreviewModalProps) => {
@@ -128,51 +136,7 @@ const FilePreviewModal = ({isOpen, onClose, item}: FilePreviewModalProps) => {
       <Modal.Body padding="none">
         <DrawerLayout onOverlayTrayChange={handleOverlayTrayChange}>
           <DrawerLayout.Content label={I18n.t('File Preview')}>
-            <Flex height="100%" alignItems="center" justifyItems="center" id="file-preview">
-              <Flex.Item>
-                <View
-                  as="div"
-                  display="inline-block"
-                  textAlign="center"
-                  margin="auto"
-                  padding="large"
-                  background="primary"
-                  borderRadius="medium"
-                >
-                  <Flex direction="column" alignItems="center" gap="small">
-                    <Flex.Item>
-                      <IconOffLine size="medium" />
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Text size="x-large" weight="bold">
-                        {I18n.t('No Preview Available')}
-                      </Text>
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Flex gap="small">
-                        <Flex.Item>
-                          <Text>{name}</Text>
-                        </Flex.Item>
-                        {'size' in item && (
-                          <Flex.Item>
-                            <Text color="secondary">{formatFileSize(item.size)}</Text>
-                          </Flex.Item>
-                        )}
-                      </Flex>
-                    </Flex.Item>
-                    <Flex.Item padding="x-small">
-                      <Button
-                        renderIcon={<IconDownloadSolid />}
-                        href={item.url}
-                        id="download-button"
-                      >
-                        {I18n.t('Download')}
-                      </Button>
-                    </Flex.Item>
-                  </Flex>
-                </View>
-              </Flex.Item>
-            </Flex>
+            {renderFilePreview(item)}
           </DrawerLayout.Content>
           <DrawerLayout.Tray
             open={isTrayOpen}
