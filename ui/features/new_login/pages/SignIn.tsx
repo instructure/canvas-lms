@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {replaceLocation} from '@canvas/util/globalUtils'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -100,7 +100,7 @@ const SignIn = () => {
           setOtpRequired(true)
         } else if (response.data?.pseudonym) {
           isRedirectingRef.current = true
-          document.location.href = response.data.location || '/dashboard'
+          assignLocation(response.data.location || '/dashboard')
         } else {
           handleFailedLogin()
         }
@@ -109,10 +109,7 @@ const SignIn = () => {
       if (error.response?.status === 400) {
         handleFailedLogin()
       } else {
-        showFlashAlert({
-          message: I18n.t('There was an error logging in. Please try again.'),
-          type: 'error',
-        })
+        showFlashError(I18n.t('Something went wrong. Please try again later.'))(error)
       }
     } finally {
       if (!isRedirectingRef.current) setIsUiActionPending(false)

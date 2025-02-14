@@ -18,7 +18,7 @@
 
 import React from 'react'
 import '@testing-library/jest-dom'
-import {replaceLocation} from '@canvas/util/globalUtils'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {within} from '@testing-library/dom'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -49,7 +49,7 @@ jest.mock('../../services/auth', () => ({
 
 jest.mock('@canvas/util/globalUtils', () => ({
   ...jest.requireActual('@canvas/util/globalUtils'),
-  replaceLocation: jest.fn(),
+  assignLocation: jest.fn(),
 }))
 
 describe('SignIn', () => {
@@ -190,7 +190,7 @@ describe('SignIn', () => {
   })
 
   describe('error handling', () => {
-    it('displays a flash alert with an error message when a network or unexpected API error occurs', async () => {
+    it('displays a flash error with an error message when a network or unexpected API error occurs', async () => {
       ;(performSignIn as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
@@ -201,7 +201,7 @@ describe('SignIn', () => {
       await waitFor(() => {
         const alertContainer = document.querySelector('.flashalert-message') as HTMLElement
         const flashAlert = within(alertContainer!).getByText(
-          /there was an error logging in\. please try again\./i,
+          'Something went wrong. Please try again later.',
         )
         expect(flashAlert).toBeInTheDocument()
       })
@@ -212,13 +212,11 @@ describe('SignIn', () => {
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
-
       await userEvent.type(usernameInput, 'user@example.com')
       await userEvent.type(passwordInput, 'wrongpassword')
       await userEvent.click(loginButton)
-
       await waitFor(() => {
-        const loginAlert = screen.getByText(/please verify your email or password and try again/i)
+        const loginAlert = screen.getByText('Please verify your Email or password and try again.')
         expect(loginAlert).toBeInTheDocument()
       })
     })
@@ -260,7 +258,7 @@ describe('SignIn', () => {
   })
 
   describe('redirects', () => {
-    it.skip('calls replaceLocation with the correct URL after successful login', async () => {
+    it('calls assignLocation with the correct URL after successful login', async () => {
       ;(performSignIn as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {pseudonym: true, location: '/dashboard'},
@@ -272,12 +270,12 @@ describe('SignIn', () => {
       await userEvent.type(passwordInput, 'password123')
       await userEvent.click(loginButton)
       await waitFor(() => {
-        expect(replaceLocation).toHaveBeenCalledWith('/dashboard')
-        expect(replaceLocation).toHaveBeenCalledTimes(1)
+        expect(assignLocation).toHaveBeenCalledWith('/dashboard')
+        expect(assignLocation).toHaveBeenCalledTimes(1)
       })
     })
 
-    it.skip('calls replaceLocation with /dashboard if no location is provided', async () => {
+    it('calls assignLocation with /dashboard if no location is provided', async () => {
       ;(performSignIn as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {pseudonym: true},
@@ -289,8 +287,8 @@ describe('SignIn', () => {
       await userEvent.type(passwordInput, 'password123')
       await userEvent.click(loginButton)
       await waitFor(() => {
-        expect(replaceLocation).toHaveBeenCalledWith('/dashboard')
-        expect(replaceLocation).toHaveBeenCalledTimes(1)
+        expect(assignLocation).toHaveBeenCalledWith('/dashboard')
+        expect(assignLocation).toHaveBeenCalledTimes(1)
       })
     })
   })
