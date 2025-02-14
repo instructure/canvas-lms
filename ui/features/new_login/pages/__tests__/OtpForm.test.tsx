@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {replaceLocation} from '@canvas/util/globalUtils'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -26,7 +26,7 @@ import {cancelOtpRequest, verifyOtpRequest} from '../../services'
 import OtpForm from '../OtpForm'
 
 jest.mock('@canvas/util/globalUtils', () => ({
-  replaceLocation: jest.fn(),
+  assignLocation: jest.fn(),
 }))
 
 jest.mock('../../services', () => ({
@@ -101,7 +101,7 @@ describe('OtpForm', () => {
       ).toBeInTheDocument()
     })
 
-    it.skip('submits valid OTP and redirects', async () => {
+    it('submits valid OTP and redirects', async () => {
       ;(verifyOtpRequest as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {location: '/dashboard'},
@@ -110,7 +110,7 @@ describe('OtpForm', () => {
       await waitFor(() => expect(screen.getByTestId('otp-input')).toBeInTheDocument())
       await userEvent.type(screen.getByTestId('otp-input'), '123456')
       await userEvent.click(screen.getByTestId('verify-button'))
-      await waitFor(() => expect(replaceLocation).toHaveBeenCalledWith('/dashboard'))
+      await waitFor(() => expect(assignLocation).toHaveBeenCalledWith('/dashboard'))
     })
   })
 
