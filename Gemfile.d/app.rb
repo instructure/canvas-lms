@@ -80,6 +80,7 @@ gem "inst-jobs-statsd", "~> 4.0"
 gem "json_schemer", "~> 2.0"
 gem "json-jwt", "~> 1.13", require: false
 gem "link_header", "0.0.8"
+gem "logger", "~> 1.5"
 gem "marginalia", "1.11.1", require: false
 gem "method_source", "~> 1.1"
 gem "mime-types", "~> 3.5"
