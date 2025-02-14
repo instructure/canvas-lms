@@ -185,6 +185,7 @@ class ContextModulesApiController < ApplicationController
       end
 
       opts[:can_view_published] = @context.grants_right?((@student || @current_user), session, :read_as_admin)
+      opts[:can_have_estimated_time] = @context.horizon_course?
       render json: modules_and_progressions.filter_map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }
     end
   end
@@ -222,6 +223,7 @@ class ContextModulesApiController < ApplicationController
       prog = @student ? mod.evaluate_for(@student) : nil
 
       opts = { can_view_published: @context.grants_right?(@current_user, session, :read_as_admin) }
+      opts[:can_have_estimated_time] = @context.horizon_course?
       render json: module_json(mod, @student || @current_user, session, prog, includes, opts)
     end
   end
