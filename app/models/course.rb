@@ -2828,7 +2828,7 @@ class Course < ActiveRecord::Base
           cm.add_imported_item(new_file.folder, key: new_file.folder.id)
           map_merge(file, new_file)
         rescue => e
-          Canvas::Errors.capture(e)
+          Canvas::Errors.capture(e) unless e.message.include?("Cannot create attachments in deleted folders")
           Rails.logger.error "Couldn't copy file: #{e}"
           cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", name: file.display_name || file.path_name), $!)
         end
