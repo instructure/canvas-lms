@@ -208,6 +208,29 @@ describe('ActionMenuButton', () => {
         expect(screen.getByRole('heading', {name: 'Rename'})).toBeInTheDocument()
       })
     })
+
+    it('closes and reopens the rename modal without clearing the name', async () => {
+      renderComponent()
+      const menuButton = await screen.findByRole('button', {name: 'Actions'})
+      fireEvent.click(menuButton)
+      // can't just re-use the variable because it gets removed from DOM
+      const renameButton = async () => await screen.findByRole('menuitem', {name: 'Rename'})
+      fireEvent.click(await renameButton())
+
+      const input = async () => await screen.findByRole('textbox', {name: 'File Name *'})
+      expect(await input()).toHaveValue(FAKE_FILES[0].name)
+
+      const cancelButton = screen.getByRole('button', {name: 'Cancel'})
+      fireEvent.click(cancelButton)
+      // necessary for onExited to fire
+      await waitFor(() => {
+        expect(screen.queryByRole('heading', {name: 'Rename', hidden: true})).toBeNull()
+      })
+
+      fireEvent.click(menuButton)
+      fireEvent.click(await renameButton())
+      expect(await input()).toHaveValue(FAKE_FILES[0].name)
+    })
   })
 
   describe('when item is a folder', () => {
@@ -256,7 +279,9 @@ describe('ActionMenuButton', () => {
       const deleteButton = await screen.findByText('Delete')
       fireEvent.click(deleteButton)
 
-      expect(await screen.findByText('Deleting this item cannot be undone. Do you want to continue?')).toBeInTheDocument()
+      expect(
+        await screen.findByText('Deleting this item cannot be undone. Do you want to continue?'),
+      ).toBeInTheDocument()
     })
 
     it('renders flash error when delete fails', async () => {

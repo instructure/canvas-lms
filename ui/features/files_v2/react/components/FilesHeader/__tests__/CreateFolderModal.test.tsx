@@ -75,4 +75,32 @@ describe('CreateFolderModal', () => {
     await user.click(createFolderButton)
     expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
   })
+
+  it('submits on enter', async () => {
+    const user = userEvent.setup()
+    renderComponent()
+    const input = screen.getByRole('textbox', {name: /Folder Name/i})
+    await user.type(input, '{enter}')
+    expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
+  })
+
+  it('displays loading spinner when submitting', async () => {
+    const user = userEvent.setup()
+    fetchMock.post(/.*\/folders/, new Promise(() => {}), {overwriteRoutes: true})
+    renderComponent()
+    const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
+    await user.click(createFolderButton)
+    expect(screen.getByTestId('create-folder-spinner')).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
+    expect(screen.getByRole('button', {name: 'Create Folder'})).toBeDisabled()
+  })
+
+  it('does not close when there is an error', async () => {
+    const user = userEvent.setup()
+    fetchMock.post(/.*\/folders/, 500, {overwriteRoutes: true})
+    renderComponent()
+    const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
+    await user.click(createFolderButton)
+    expect(defaultProps.onRequestClose).not.toHaveBeenCalled()
+  })
 })
