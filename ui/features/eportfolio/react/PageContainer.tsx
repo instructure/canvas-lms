@@ -28,44 +28,42 @@ import {Text} from '@instructure/ui-text'
 const I18n = createI18nScope('eportfolio')
 
 interface Props {
-    readonly sectionId: number
-    readonly portfolio: ePortfolio
-    readonly isOwner: boolean
-    readonly onUpdate: (json: ePortfolioPage) => void
-  }
+  readonly sectionId: number
+  readonly portfolio: ePortfolio
+  readonly isOwner: boolean
+  readonly onUpdate: (json: ePortfolioPage) => void
+}
 
-const fetchSection = async (portfolioId: number, sectionId: number) : Promise<ePortfolioSection> => {
-    const section = await doFetchApi<ePortfolioSection>({
-        path: `/eportfolios/${portfolioId}/categories/${sectionId}`,
-    })
-    return section.json!
+const fetchSection = async (portfolioId: number, sectionId: number): Promise<ePortfolioSection> => {
+  const section = await doFetchApi<ePortfolioSection>({
+    path: `/eportfolios/${portfolioId}/categories/${sectionId}`,
+  })
+  return section.json!
 }
 
 export default function PageContainer(props: Props) {
+  const {data, isError, isLoading} = useQuery<ePortfolioSection>({
+    queryKey: ['portfolioSection', props.portfolio.id, props.sectionId],
+    queryFn: () => fetchSection(props.portfolio.id, props.sectionId),
+  })
 
-    const {data, isError, isLoading} = useQuery<ePortfolioSection>({
-        queryKey: ['portfolioSection', props.portfolio.id, props.sectionId],
-        queryFn: () => fetchSection(props.portfolio.id, props.sectionId),
-    })
-
-    if (isError) {
-        return (
-            <Alert variant="error">
-                <Text>{I18n.t('Failed to retrieve Page List.')}</Text>
-            </Alert>
-        )
-    }
-
-    const sectionName = data?.name ? data.name : ''
+  if (isError) {
     return (
-        <PageList
-            isLoading={isLoading}
-            sectionId={props.sectionId}
-            sectionName={sectionName}
-            portfolio={props.portfolio}
-            isOwner={props.isOwner}
-            onUpdate={props.onUpdate}
-        />
+      <Alert variant="error">
+        <Text>{I18n.t('Failed to retrieve Page List.')}</Text>
+      </Alert>
     )
+  }
 
+  const sectionName = data?.name ? data.name : ''
+  return (
+    <PageList
+      isLoading={isLoading}
+      sectionId={props.sectionId}
+      sectionName={sectionName}
+      portfolio={props.portfolio}
+      isOwner={props.isOwner}
+      onUpdate={props.onUpdate}
+    />
+  )
 }

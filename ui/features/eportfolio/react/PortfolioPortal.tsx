@@ -20,11 +20,11 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useQuery} from '@canvas/query'
 import {Portal} from '@instructure/ui-portal'
 import PageContainer from './PageContainer'
-import SectionList from './SectionList'
 import {ePortfolio, ePortfolioPage} from './types'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
+import SectionContainer from './SectionContainer'
 
 const I18n = createI18nScope('eportfolio')
 
@@ -32,6 +32,7 @@ interface Props {
   readonly portfolioId: number
   readonly sectionListNode: HTMLElement
   readonly pageListNode: HTMLElement
+  readonly submissionNode: HTMLElement
   readonly onPageUpdate: (json: ePortfolioPage) => void
 }
 
@@ -81,7 +82,15 @@ export default function PortfolioPortal(props: Props) {
         </Alert>
       )
     }
-    return <SectionList portfolio={data} isOwner={isOwner} />
+    return (
+      <SectionContainer
+        portfolio={data}
+        isOwner={isOwner}
+        sectionId={sectionId}
+        sectionListNode={props.sectionListNode}
+        submissionListNode={props.submissionNode}
+      />
+    )
   }
 
   return (

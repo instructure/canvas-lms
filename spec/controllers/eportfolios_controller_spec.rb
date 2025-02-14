@@ -500,6 +500,28 @@ describe EportfoliosController do
     end
   end
 
+  describe "GET 'recent_submssions'" do
+    before do
+      course_with_student_and_submitted_homework
+      eportfolio
+    end
+
+    it "requires authorization" do
+      get "recent_submissions", params: { eportfolio_id: @portfolio.id }
+      expect(response.response_code).to eq(401)
+    end
+
+    it "returns a list of recent submissions" do
+      user_session(@student)
+      get "recent_submissions", params: { eportfolio_id: @portfolio.id }
+      expect(response.response_code).to eq(200)
+      json = json_parse(response.body)
+      expect(json.length).to eq(1)
+      expect(json[0]["assignment_name"]).to eq(@assignment.name)
+      expect(json[0]["course_name"]).to eq(@course.name)
+    end
+  end
+
   describe "GET 'export'" do
     before(:once) do
       eportfolio

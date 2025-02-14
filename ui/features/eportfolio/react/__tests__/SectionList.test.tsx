@@ -24,18 +24,21 @@ import {queryClient} from '@canvas/query'
 describe('SectionList', () => {
   const portfolio = {id: 0, name: 'Test Portfolio', public: true, profile_url: 'path/to/profile'}
   const sectionList = [
-    {name: 'First Section', id: 1, category_url: '/path/to/first'},
-    {name: 'Second Section', id: 2, category_url: 'path/to/second'},
+    {name: 'First Section', id: 1, position: 1, category_url: '/path/to/first'},
+    {name: 'Second Section', id: 2, position: 2, category_url: 'path/to/second'},
   ]
 
-  beforeAll(() => {
-    queryClient.setQueryData(['portfolioSectionList', 0], sectionList)
-  })
+  const defaultProps = {
+    portfolio,
+    isOwner: true,
+    onConfirm: jest.fn(),
+    sections: sectionList,
+  }
 
   it('fetches and renders a list of sections', async () => {
     const {findByText} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <SectionList portfolio={portfolio} isOwner={true} />
+        <SectionList {...defaultProps} />
       </MockedQueryClientProvider>,
     )
     expect(await findByText('First Section')).toBeInTheDocument()
@@ -45,7 +48,7 @@ describe('SectionList', () => {
   it('renders the user profile', async () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <SectionList portfolio={portfolio} isOwner={true} />
+        <SectionList {...defaultProps} />
       </MockedQueryClientProvider>,
     )
     const profileButton = await findByTestId('user-profile')
@@ -56,7 +59,7 @@ describe('SectionList', () => {
   it('does not render menu if user is not the owner', async () => {
     const {queryByTestId, findByText} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <SectionList portfolio={portfolio} isOwner={false} />
+        <SectionList {...defaultProps} isOwner={false} />
       </MockedQueryClientProvider>,
     )
     expect(await findByText('First Section')).toBeInTheDocument()
@@ -66,7 +69,7 @@ describe('SectionList', () => {
   it('opens add modal', async () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <SectionList portfolio={portfolio} isOwner={true} />
+        <SectionList {...defaultProps} />
       </MockedQueryClientProvider>,
     )
     const addSection = await findByTestId('add-section-button')
@@ -77,7 +80,7 @@ describe('SectionList', () => {
   it('open rename modal', async () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <SectionList portfolio={portfolio} isOwner={true} />
+        <SectionList {...defaultProps} />
       </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('1-menu')
@@ -90,7 +93,7 @@ describe('SectionList', () => {
   it('opens delete modal', async () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <SectionList portfolio={portfolio} isOwner={true} />
+        <SectionList {...defaultProps} />
       </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('2-menu')
@@ -103,7 +106,7 @@ describe('SectionList', () => {
   it('open move modal', async () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <SectionList portfolio={portfolio} isOwner={true} />
+        <SectionList {...defaultProps} />
       </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('1-menu')
@@ -116,7 +119,7 @@ describe('SectionList', () => {
   it('does not render profile button if no link if provided', async () => {
     const {findByText, queryByText} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <SectionList portfolio={{...portfolio, profile_url: null}} isOwner={true} />
+        <SectionList {...defaultProps} portfolio={{...portfolio, profile_url: null}} />
       </MockedQueryClientProvider>,
     )
     expect(await findByText('First Section')).toBeInTheDocument()
