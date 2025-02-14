@@ -4252,6 +4252,7 @@ hy:
       buttons: 
         add_prerequisite: "Ավելացնել նախնական պայման"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: Րոպե
       headings: 
         add_prerequisite: "Ավելացնել նախնական պայման %{name}-ին"
         course_modules: "Դասընթացի մոդուլներ"
@@ -6400,6 +6401,7 @@ hy:
       criterion_long_description: "Չափանիշի երկար նկարագրություն"
       find_existing_rubric: "Գտնել գոյություն ունեցող ռուբրիկը"
   edit_rubric_7d4d139d: "Խմբագրել ռուբրիկը"
+  edit_sections_7d0e4e34: "Խմբագրել բաժինները"
   edit_survey_b0d6890d: "Խմբագրել հարցումը"
   edit_this_key_1ee53473: "Խմբագրել այս բանալին"
   edit_toolname_app_23cfbb8: "Խմբագրել %{toolName}  հավելվածը"
@@ -8944,6 +8946,7 @@ hy:
   link_selection_1486c5d0: "Հղումների ընտրություն"
   link_title_189888b7: "Հղման անվանում"
   link_title_d959a7b3: "Հղման վերնագիր"
+  link_to_students_91edf7ea: "Կապել ունկնդիրների հետ"
   link_url_cf96376: "Հղման url- հասցե"
   linked_assignment_message: "կապակցված է \"%{title}\" հանձնարարության հետ"
   linked_discussion_topic_message: "կապակցված է \"%{title}\" քննարկման թեմայի հետ"
@@ -12513,6 +12516,7 @@ hy:
   post_grades_to_sis_97ece878: "Գնահատականները տեղադրել SIS-ում"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Գործնական թեստ"
+  preparing_download_percent_complete_34b48e4d: "Ներբեռնման նախապատրաստում: %{percent}% ավարտված է"
   prerequisites_49659f16: Նախապայմաններ՝
   prerequisites_98b324e0: Նախապայմաններ
   prerequisites_lookup: 
@@ -14536,6 +14540,7 @@ hy:
   remove_dates_5a5a8df2: "Հանել ամսաթվերը"
   remove_f47dc62a: Հանել
   remove_filter_68de01d4: "Հեռացնել ֆիլտրները"
+  remove_from_course_6fb47aee: "Հանել դասընթացից"
   remove_icon_a4646413: "հանել պատկերը"
   remove_media_comment_f4afdb4b: "Հանել մուլտիմեդիա մեկնաբանությունը"
   remove_name_as_leader_3e03780a: " %{name} հանել առաջնորդությունից"
@@ -14571,6 +14576,7 @@ hy:
   required_5f7ef8c0: "Պահանջվում է"
   reregister_9ab95a57: "Կրկին գրանցել"
   reregister_toolname_3dde0bfc: "Վերագրանցել %{toolName}"
+  resend_invitation_486bd513: "Կրկին ուղարկել հրավերը"
   reset_from_322d819a: "Սկզբնական Վիճակին Բերել Սկսած"
   reset_to_ee9265ef: "Սկզբնական Վիճակին Բերել Դեպի"
   respondus_lockdown_browser_support_413352eb: "Respondus LockDow բրաուզերի աջակցությունը"
