@@ -65,6 +65,9 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.prototype.className = 'form-horizontal edit-form validated-form-view'
     this.prototype.dontRenableAfterSaveSuccess = true
     this.prototype.disablingDfd = new $.Deferred()
+    this.prototype.attributes = {
+      novalidate: true,
+    }
     this.optionProperty('wiki_pages_path')
     this.optionProperty('WIKI_RIGHTS')
     this.optionProperty('PAGE_RIGHTS')
@@ -242,6 +245,7 @@ export default class WikiPageEditView extends ValidatedFormView {
         canEdit: this.toJSON().CAN.EDIT_TITLE,
         viewElement: this.$el,
         validationCallback: this.validateFormData,
+        isRequired: true,
       })
     }
 

@@ -18,7 +18,7 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {debounce} from '@instructure/debounce'
-import type {Message} from '../react/renderWikiPageTitle'
+import type {FormMessage} from '@instructure/ui-form-field'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 
@@ -29,7 +29,7 @@ type AvailabilityResponse = {
   errors?: Array<{message: string}>
 }
 
-export function conflictMessage(): Message {
+export function conflictMessage(): FormMessage {
   const text = ENV.context_asset_string.startsWith('group')
     ? I18n.t('There is already a page in this group with this title.')
     : I18n.t('There is already a page in this course with this title.')
@@ -68,7 +68,7 @@ export async function fetchTitleAvailability(title: string): Promise<boolean> {
 
 export async function checkForTitleConflict(
   title: string,
-  callback: (messages: Message[]) => void,
+  callback: (messages: FormMessage[]) => void,
 ) {
   try {
     const conflict = await fetchTitleAvailability(title)

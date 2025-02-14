@@ -22,8 +22,8 @@ import {TextInput} from '@instructure/ui-text-input'
 import type {TextInputProps} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {IconWarningSolid} from '@instructure/ui-icons'
 import {Heading} from '@instructure/ui-heading'
+import type {FormMessage} from '@instructure/ui-form-field'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type JQuery from 'jquery'
 import type WikiPageEditView from '../backbone/views/WikiPageEditView'
@@ -38,11 +38,6 @@ interface ComponentProps {
   validationCallback: (data: Record<string, unknown>) => ValidationResult
 }
 
-export interface Message {
-  text: React.ReactNode
-  type: 'error' | 'hint' | 'success' | 'screenreader-only'
-}
-
 interface FormDataError {
   message: string
   type: string
@@ -55,7 +50,7 @@ interface ValidationResult {
 export type Props = TextInputProps & ComponentProps
 
 const EditableContent = (props: Props) => {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<FormMessage[]>([])
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
@@ -65,13 +60,9 @@ const EditableContent = (props: Props) => {
       const dataErrors = props.validationCallback(data)
       const titleErrors = dataErrors?.title || []
       if (titleErrors.length > 0) {
-        const parsedErrors: Message[] = titleErrors.map((error: FormDataError) => ({
-          text: (
-            <>
-              <IconWarningSolid /> {error.message}
-            </>
-          ),
-          type: 'error',
+        const parsedErrors: FormMessage[] = titleErrors.map((error: FormDataError) => ({
+          text: error.message,
+          type: 'newError',
         }))
         setMessages(parsedErrors)
         return false
