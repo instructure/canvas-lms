@@ -4069,6 +4069,7 @@ el:
       buttons: 
         add_prerequisite: "Προσθήκη Προαπαιτούμενου"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: Λεπτά
       headings: 
         add_prerequisite: "Προσθήκη Προαπαιτούμενου στο %{name}"
         course_modules: "Αρθρώματα Μαθήματος"
@@ -5927,6 +5928,7 @@ el:
     titles: 
       find_existing_rubric: "Βρείτε Υπάρχουσα Ρουμπρίκα"
   edit_rubric_7d4d139d: "Επεξεργασία Ρουμπρίκας"
+  edit_sections_7d0e4e34: "Επεξεργασία Τομέων"
   edit_survey_b0d6890d: "Τροποποίησης Δημοσκόπισης"
   edit_this_key_1ee53473: "Επεξεργασία αυτού του κλειδιού"
   edit_toolname_app_23cfbb8: "Τροποποίηση %{toolName} Εφαρμογής"
@@ -7952,6 +7954,7 @@ el:
   link_number_3_7118ff64: "Σύνδεσμος αρ. 3"
   link_only_995966e: "μόνο Σύνδεσμος"
   link_selection_1486c5d0: "Επιλογή Συνδέσμου"
+  link_to_students_91edf7ea: "Σύνδεσμος με Σπουδαστές"
   link_url_cf96376: "Url συνδέσμου"
   linked_assignment_message: "έγινε σύνδεση με την Εργασία «%{title}»"
   linked_discussion_topic_message: "έγινε σύνδεση με το Θέμα Συζήτησης «%{title}»"
@@ -12998,6 +13001,7 @@ el:
   remove_f47dc62a: Αφαίρεση
   remove_filename_87f3781e: "αφαίρεση %{filename}"
   remove_filter_68de01d4: "Αφαίρεση Φίλτου"
+  remove_from_course_6fb47aee: "Αφαίρεση από το Μάθημα"
   remove_icon_a4646413: "αφαίρεση εικονιδίου"
   remove_image_341340b3: "Αφαίρεση Εικόνας"
   remove_media_comment_f4afdb4b: "Αφαίρεση πολυμεσιτικού σχόλιου"
