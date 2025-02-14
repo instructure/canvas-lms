@@ -284,25 +284,80 @@ describe "SpeedGrader - discussion submissions" do
         end
       end
 
-      context "No Context Discussion preview header message" do
-        it "it displays a group discussion aware message" do
+      context "discussion context temporary toggling", :ignore_js_errors do
+        it "toggles back and forth group discussions just fine" do
           entry_text = "first student message in group1"
           root_topic = group_discussion_assignment
           @group1.add_user(@student, "accepted")
 
-          root_topic.child_topic_for(@student).discussion_entries.create!(user: @student, message: entry_text)
+          entry = root_topic.child_topic_for(@student).discussion_entries.create!(user: @student, message: entry_text)
           Speedgrader.visit(@course.id, root_topic.assignment.id)
+          wait_for_ajaximations
 
-          in_frame "speedgrader_iframe", "#discussion_view_link" do
+          # every time a temporary toggle is clicked, iframes get removed and recreated
+          in_frame "speedgrader_iframe" do
+            wait_for_ajaximations
             expect(f("#main")).to include_text("The submissions for the assignment are posts in the assignment's discussion for this group. You can view the discussion posts for")
             expect(f("#main")).to include_text(entry_text)
+            f("#discussion_temporary_toggle").click
+          end
+          wait_for_ajaximations
+
+          in_frame "speedgrader_iframe" do
+            wait_for(method: nil, timeout: 5) { f("#discussion_preview_iframe") }
+            in_frame("discussion_preview_iframe") do
+              wait_for(method: nil, timeout: 5) { f("div.highlight-discussion") }
+              # test higlighting
+              expect(f("div.highlight-discussion").text).to include(entry.message)
+              # test header elements
+              expect(fj("button:contains('Expand Threads')")).to be_present
+              expect("f[data-testid='groups-menu-btn']").to be_present
+              expect(f("span[data-testid='toggle-filter-menu']")).to be_present
+              expect(f("input[data-testid='search-filter']")).to be_present
+              expect(f("button[data-testid='sortButton']")).to be_present
+              # click on temporary toggle
+              f("button#switch-to-individual-posts-link").click
+            end
+          end
+          wait_for_ajaximations
+
+          # again in the legacy view
+          in_frame "speedgrader_iframe" do
+            f("#discussion_temporary_toggle").click
+          end
+          wait_for_ajaximations
+
+          # again in the full view
+          in_frame "speedgrader_iframe" do
+            wait_for(method: nil, timeout: 5) { f("#discussion_preview_iframe") }
+            in_frame("discussion_preview_iframe") do
+              f("button#switch-to-individual-posts-link").click
+            end
+          end
+          wait_for_ajaximations
+
+          in_frame "speedgrader_iframe" do
+            expect(f("#discussion_temporary_toggle")).to be_present
           end
         end
 
-        it "it displays a non-group discussion aware message" do
+        it "it toggles non-group discussions just fine" do
           Speedgrader.visit(@course.id, @assignment.id)
-          in_frame "speedgrader_iframe", "#discussion_view_link" do
+          in_frame "speedgrader_iframe" do
             expect(f("#main")).to include_text("The submissions for the assignment are posts in the assignment's discussion. You can view the discussion posts for")
+            f("#discussion_temporary_toggle").click
+          end
+          wait_for_ajaximations
+
+          in_frame "speedgrader_iframe" do
+            in_frame("discussion_preview_iframe") do
+              f("button#switch-to-individual-posts-link").click
+            end
+          end
+          wait_for_ajaximations
+
+          in_frame "speedgrader_iframe" do
+            expect(f("#discussion_temporary_toggle")).to be_present
           end
         end
       end
@@ -774,9 +829,7 @@ describe "SpeedGrader - discussion submissions" do
       end
     end
 
-    it "hides student names and shows name of grading teacher" \
-       "entries on both discussion links",
-       priority: "2" do
+    it "hides student names and shows name of grading teacher entries on both discussion links" do
       teacher = @course.teachers.first
       teacher_message = "why did the taco cross the road?"
 
