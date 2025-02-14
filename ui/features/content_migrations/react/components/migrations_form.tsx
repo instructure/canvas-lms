@@ -199,7 +199,7 @@ export const ContentMigrationsForm = ({
   }, [])
 
   return (
-    <View as="div" margin="small none xx-large none">
+    <View as="div" margin="small none medium none">
       <Heading level="h1" as="h1" margin="0 0 small">
         {I18n.t('Import Content')}
       </Heading>
@@ -253,7 +253,6 @@ export const ContentMigrationsForm = ({
             isSubmitting,
             externalToolTitle,
           })}
-          <hr role="presentation" aria-hidden="true" />
         </>
       )}
     </View>

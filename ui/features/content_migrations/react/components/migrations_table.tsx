@@ -75,16 +75,18 @@ export const ContentMigrationsTable = ({
     fetchNext();
   }
 
+  const migrationsExpireDays = ENV.CONTENT_MIGRATIONS_EXPIRE_DAYS;
+
   return (
     <View as="div" borderWidth='small 0 0 0' padding='small 0 0 0'>
       <Heading level="h3" as="h3" margin="small 0">
         {I18n.t('Content imports')}
       </Heading>
-      <View as="div" margin="small 0 medium 0">
+      {!!migrationsExpireDays && <View as="div" margin="small 0 medium 0">
         {I18n.t(
-          'Content import files cannot be downloaded after 30 days.',
+          'Content import files cannot be downloaded after %{days} days.', { days: migrationsExpireDays }
         )}
-      </View>
+      </View>}
       <Responsive
         match="media"
         query={{

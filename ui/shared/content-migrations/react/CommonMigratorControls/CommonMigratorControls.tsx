@@ -23,11 +23,14 @@ import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
+import {canvas} from '@instructure/ui-theme-tokens'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {InfoButton} from './InfoButton'
 import {DateAdjustments} from './DateAdjustments'
 import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from './types'
+import {Flex} from '@instructure/ui-flex'
+import {Responsive} from '@instructure/ui-responsive'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
@@ -347,25 +350,49 @@ export const CommonMigratorControls = ({
       )}
 
       <View as="div" margin="medium none none none">
-        <Button disabled={isSubmitting} onClick={onCancel} data-testid="clear-migration-button">
-          <CancelLabel />
-        </Button>
-        <Button
-          disabled={isSubmitting}
-          data-testid="submitMigration"
-          onClick={handleSubmit}
-          margin="small"
-          color="primary"
+        <Responsive
+          match="media"
+          query={{
+            small: {maxWidth: canvas.breakpoints.medium},
+          }}
         >
-          {isSubmitting ? (
-            <>
-              <Spinner size="x-small" renderTitle={<SubmittingLabel />} /> &nbsp;
-              <SubmittingLabel />
-            </>
-          ) : (
-            <SubmitLabel />
-          )}
-        </Button>
+          {(_props, matches) => {
+            const isMobileView = matches?.includes('small') || false
+            return (
+              <Flex as="div" direction={isMobileView ? 'column' : 'row'}>
+                <Button
+                  disabled={isSubmitting}
+                  data-testid="clear-migration-button"
+                  onClick={onCancel}
+                  color="secondary"
+                  width={isMobileView ? '100%' : '8.5rem'}
+                  margin={isMobileView ? "none none small none" : "none small none none"}
+                  textAlign="center"
+                  
+                >
+                  <CancelLabel />
+                </Button>
+                <Button
+                  disabled={isSubmitting}
+                  data-testid="submitMigration"
+                  onClick={handleSubmit}
+                  color="primary"
+                  width={isMobileView ? '100%' : '8.5rem'}
+                  textAlign="center"
+                >
+                  {isSubmitting ? (
+                  <>
+                    <Spinner size="x-small" renderTitle={<SubmittingLabel />} /> &nbsp;
+                    <SubmittingLabel />
+                  </>
+                ) : (
+                  <SubmitLabel />
+                )}
+                </Button>
+              </Flex>
+            )
+          }}
+        </Responsive>
       </View>
     </>
   )

@@ -21,6 +21,7 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import ContentMigrationsTable from '../migrations_table'
 import fetchMock from 'fetch-mock'
 import type {ContentMigrationItem} from '../types'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const migrations: ContentMigrationItem[] = [
   {
@@ -151,6 +152,22 @@ describe('ContentMigrationTable', () => {
       await waitFor(() => {
         expect(fetchNext).toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('Content migration expire', () => {
+    it('renders the message with correct days', () => {
+      fakeENV.setup({CONTENT_MIGRATIONS_EXPIRE_DAYS: 30})
+      renderComponent({})
+
+      expect(screen.getByText('Content import files cannot be downloaded after 30 days.')).toBeInTheDocument()
+    })
+
+    it('does not renders the message when ENV.CONTENT_MIGRATIONS_EXPIRE_DAYS is not set', () => {
+      fakeENV.setup({CONTENT_MIGRATIONS_EXPIRE_DAYS: undefined})
+      renderComponent({})
+
+      expect(screen.queryByText(/Content import files cannot be downloaded after/)).not.toBeInTheDocument()
     })
   })
 })
