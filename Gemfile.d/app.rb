@@ -46,6 +46,7 @@ gem "aws-sdk-sagemakerruntime", "~> 1.61", require: false
 gem "aws-sdk-translate", "~> 1.77", require: false
 gem "rqrcode", "~> 2.2", require: false
 gem "bcrypt", "~> 3.1"
+gem "benchmark", "~> 0.4", require: false
 gem "bigdecimal", "~> 3.1"
 gem "browser", "~> 6.0", require: false
 gem "business_time", "0.13.0"

@@ -129,6 +129,7 @@ PATH
     canvas_dynamodb (0.0.1)
       aws-sdk-applicationautoscaling (~> 1.26)
       aws-sdk-dynamodb (~> 1.32)
+      benchmark (~> 0.4)
     canvas_errors (0.1.0)
       activesupport
       code_ownership
@@ -421,6 +422,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     base64 (0.2.0)
     bcrypt (3.1.20)
+    benchmark (0.4.0)
     bigdecimal (3.1.8)
     bindata (2.5.0)
     bluecloth (2.2.0)
@@ -1237,6 +1239,7 @@ DEPENDENCIES
   aws-sdk-sqs (~> 1.53)
   aws-sdk-translate (~> 1.77)
   bcrypt (~> 3.1)
+  benchmark (~> 0.4)
   bigdecimal (~> 3.1)
   bluecloth (= 2.2.0)
   bookmarked_collection!
