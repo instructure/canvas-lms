@@ -27,4 +27,33 @@ $(document).ready(() => {
   })
 
   $('.play_media_recording_link').mediaCommentThumbnail()
+
+  if (ENV.FEATURES?.discussions_speedgrader_revisit) {
+    $('#discussion_temporary_toggle').click(function (event) {
+      event.preventDefault()
+      window.parent.postMessage(
+        {
+          subject: 'SG.switchToFullContext',
+        },
+        '*',
+      )
+    })
+  }
+
+  const discussionPreviewIframe = $('#discussion_preview_iframe')
+  discussionPreviewIframe.on('load', function () {
+    const iframeWindow = discussionPreviewIframe[0].contentWindow
+    if (iframeWindow) {
+      iframeWindow.addEventListener('message', function (event) {
+        if (event.data && event.data.subject === 'SG.switchToIndividualPosts') {
+          window.parent.postMessage(
+            {
+              subject: 'SG.switchToIndividualPosts',
+            },
+            '*',
+          )
+        }
+      })
+    }
+  })
 })

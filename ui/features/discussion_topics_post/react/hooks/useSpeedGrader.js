@@ -56,10 +56,16 @@ export default function useSpeedGrader() {
     sendPostMessage(message)
   }
 
+  const handleSwitchClick = () => {
+    const message = {subject: 'SG.switchToIndividualPosts'}
+    sendPostMessage(message)
+  }
+
   return {
     isInSpeedGrader,
     handlePreviousStudentReply,
     handleNextStudentReply,
     handleJumpFocusToSpeedGrader,
+    handleSwitchClick,
   }
 }

@@ -90,16 +90,31 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
       case 'quizzesNext.register':
         EG.setGradeReadOnly(true)
         return registerCb(postChangeSubmissionMessage, message.payload || {singleLtiLaunch: true})
+
       case 'quizzesNext.submissionUpdate':
         return refreshGradesCb(quizzesNextChange, retryRefreshGrades, 1000)
+      /* falls through */
       case 'quizzesNext.previousStudent':
         return EG.prev()
+      /* falls through */
       case 'quizzesNext.nextStudent':
         return EG.next()
+      /* falls through */
       case 'SG.focusPreviousStudentButton':
         if (prevButton) {
-          prevButton.focus()
+          return prevButton.focus()
         }
+      /* falls through */
+      case 'SG.switchToIndividualPosts':
+        EG.renderSubmissionPreview('iframe', 'discussion_view_no_context')
+        EG.clearDiscussionsNavigation()
+        return
+      /* falls through */
+      case 'SG.switchToFullContext':
+        EG.renderSubmissionPreview('iframe', 'discussion_view_with_context')
+        EG.renderDiscussionsNavigation('discussion_view_with_context')
+        return
+      /* falls through */
     }
   }
 
