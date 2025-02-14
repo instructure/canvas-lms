@@ -6500,6 +6500,7 @@ fa:
       buttons: 
         add_prerequisite: "افزودن پیش نیاز"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: "دقیقه ها"
       headings: 
         add_prerequisite: "افزودن پیش نیاز به %{name}"
         course_modules: "ماژول‌های درس"
@@ -9516,6 +9517,7 @@ fa:
   edit_rubric_7d4d139d: "ویرایش دستورالعمل ارزیابی"
   edit_rubric_title_104d6fd2: "ویرایش دستورالعمل ارزیابی : %{title}"
   edit_section_name_558cc89: "ویرایش بخش \"%{name}\""
+  edit_sections_7d0e4e34: "ویرایش بخش ها"
   edit_status_612572db: "وضعیت ویرایش"
   edit_submission_status_from_speedgrader_5e1b1cd4: "ویرایش وضعیت ارسال از اسپیدگرید"
   edit_survey_b0d6890d: "ویرایش نظرسنجی"
@@ -13458,6 +13460,7 @@ fa:
   link_title_189888b7: "عنوان پیوند"
   link_title_d959a7b3: "عنوان پیوند"
   link_to_lti_tools_608df3b0: "پیوند به ابزارهای lti."
+  link_to_students_91edf7ea: "پیوند دادن به دانشجویان"
   link_url_a213671c: "نشانی اینترنتی پیوند"
   link_url_cf96376: "نشانی اینترنتی پیوند"
   link_validation_is_running_caf08ced: "پیوند تأیید اعتبار درحال اجرا است"
@@ -18195,6 +18198,7 @@ fa:
   ppt_534cb87: PPT
   practice_quiz_19a8505d: "آزمون تمرینی"
   pre_processing_92865c1d: "پیش پردازش"
+  preparing_download_percent_complete_34b48e4d: "در حال آماده سازی بارگیری: %{percent}% انجام شده است"
   prerequisite_completion_period_c562d63: "دوره کامل  پیش نیاز"
   prerequisites_49659f16: "پیش نیازها:"
   prerequisites_98b324e0: "پیش نیازها"
@@ -20437,6 +20441,7 @@ fa:
   remove_filename_dab5c02e: "حذف %{filename}"
   remove_filter_68de01d4: "حذف فیلتر"
   remove_filter_6f7204e2: "حذف فیلتر"
+  remove_from_course_6fb47aee: "حذف از درس"
   remove_grading_scheme_title_d3942a08: "حذف طرح نمره گذاری %{title}"
   remove_group_5d2f2f2d: "حذف گروه"
   remove_group_981d6a02: "حذف گروه؟"
@@ -20545,6 +20550,7 @@ fa:
   reregister_9ab95a57: "ثبت نام دوباره"
   reregister_toolname_3dde0bfc: "ثبت نام دوباره %{toolName}"
   reschedule_9f780bb8: "زمان بندی دوباره"
+  resend_invitation_486bd513: "ارسال دوباره دعوت نامه"
   reserved_by_d563e7d2: "رزرو شده توسط:"
   reserved_by_you_cd03b62d: "رزرو شده توسط شما"
   reserved_f247b60b: "رزرو شده"
