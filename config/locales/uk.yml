@@ -4706,6 +4706,7 @@ uk:
       buttons: 
         add_prerequisite: "Додати умови"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: Хвилини
       headings: 
         add_prerequisite: "Додати умови до %{name}"
         course_modules: "Розділи курса"
@@ -6967,6 +6968,7 @@ uk:
       find_existing_rubric: "Знайти існуючу рубрику"
   edit_rubric_7d4d139d: "Редагувати категорію"
   edit_section_name_558cc89: "Редагувати Розділ \"%{name}\""
+  edit_sections_7d0e4e34: "Редагувати розділи"
   edit_survey_b0d6890d: "Редагувати огляд"
   edit_term_name_29a8a322: "Редагувати термін %{name}"
   edit_text_27d8aa3d: "Редагувати %{text}"
@@ -9455,6 +9457,7 @@ uk:
   link_only_995966e: "Тільки посилання"
   link_selection_1486c5d0: "Вибір посилання"
   link_title_189888b7: "Заголовок посилання"
+  link_to_students_91edf7ea: "Посилання на студентів"
   link_url_a213671c: "URL посилання"
   link_url_cf96376: "Url посилання"
   linked_assignment_message: "Пов'язано з завданням '%{title}'"
@@ -13251,6 +13254,7 @@ uk:
   powerschool_a30f0bfc: "Потужна школа"
   practice_quiz_19a8505d: "Практичне завдання"
   pre_processing_92865c1d: "Попередня обробка"
+  preparing_download_percent_complete_34b48e4d: "Підготовка завантаження: %{percent} % завершено"
   prerequisites_49659f16: "Передумови:"
   prerequisites_98b324e0: Передумови
   prerequisites_lookup: 
@@ -15154,6 +15158,7 @@ uk:
   remove_f47dc62a: Видалити
   remove_filename_87f3781e: "видалити %{filename}"
   remove_filter_68de01d4: "Видалити фільтр"
+  remove_from_course_6fb47aee: "Видалити з курсу"
   remove_icon_a4646413: "видалити значок"
   remove_image_341340b3: "Видалити зображення"
   remove_label_11d96b8f: "Видалити %{label}"
@@ -15212,6 +15217,7 @@ uk:
   reregister_9ab95a57: "Зареєструватися заново "
   reregister_toolname_3dde0bfc: "Зареєструватися заново %{toolName}"
   reschedule_9f780bb8: Перепланувати
+  resend_invitation_486bd513: "Переслати запрошення"
   reserved_by_d563e7d2: "Зарезервовано:"
   reserved_by_you_cd03b62d: "Зарезервовано вами"
   reserved_f247b60b: Зарезервовано
