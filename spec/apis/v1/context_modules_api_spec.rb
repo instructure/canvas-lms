@@ -293,6 +293,93 @@ describe "Modules API", type: :request do
         end
       end
 
+      context "index including estimated duration" do
+        before do
+          Account.default.enable_feature!(:horizon_course_setting)
+          @course.update!(horizon_course: true)
+          @course.save!
+
+          @module4 = @course.context_modules.create(name: "module4")
+          @wiki_page_est = @course.wiki_pages.create!(title: "Wiki Page 1", body: "")
+          @wiki_page_est.workflow_state = "active"
+          @wiki_page_est.save!
+          EstimatedDuration.create!(wiki_page_id: @wiki_page_est.id, duration: 30.minutes)
+          @wiki_page_tag_est = @module4.add_item(id: @wiki_page_est.id, type: "wiki_page")
+
+          @wiki_page_est2 = @course.wiki_pages.create!(title: "Wiki Page 2", body: "")
+          @wiki_page_est2.workflow_state = "active"
+          @wiki_page_est2.save!
+          EstimatedDuration.create!(wiki_page_id: @wiki_page_est2.id, duration: 12.minutes)
+          @wiki_page_tag_est2 = @module4.add_item(id: @wiki_page_est2.id, type: "wiki_page")
+          @module4.save!
+
+          @module5 = @course.context_modules.create(name: "module5")
+          @assignment_est = @course.assignments.create!(name: "Assignment Est")
+          @assignment_est.publish! if @assignment_est.unpublished?
+          EstimatedDuration.create!(assignment_id: @assignment_est.id, duration: 45.minutes)
+          @assignment_tag_est = @module5.add_item(id: @assignment_est.id, type: "assignment")
+          @module5.save!
+        end
+
+        def do_api_call_with_items
+          api_call(:get,
+                   "/api/v1/courses/#{@course.id}/modules?include[]=items&include[]=estimated_durations",
+                   controller: "context_modules_api",
+                   action: "index",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   include: %w[items estimated_durations])
+        end
+
+        def do_api_calls_without_items
+          api_call(:get,
+                   "/api/v1/courses/#{@course.id}/modules?include[]=estimated_durations",
+                   controller: "context_modules_api",
+                   action: "index",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   include: %w[estimated_durations])
+        end
+
+        it "includes estimated duration on the module" do
+          json = do_api_calls_without_items
+          estimated_duration_module = json.find { |mod| mod["id"] == @module4.id }["estimated_duration"]
+          estimated_duration_module2 = json.find { |mod| mod["id"] == @module5.id }["estimated_duration"]
+          expect(estimated_duration_module).to eq("PT42M")
+          expect(estimated_duration_module2).to eq("PT45M")
+        end
+
+        it "includes estimated duration for the module and the items" do
+          json = do_api_call_with_items
+          estimated_duration_module = json.find { |mod| mod["id"] == @module4.id }["estimated_duration"]
+          estimated_duration_module2 = json.find { |mod| mod["id"] == @module5.id }["estimated_duration"]
+          estimated_duration1 = json.find { |mod| mod["id"] == @module4.id }["items"].find { |item| item["id"] == @wiki_page_tag_est.id }["estimated_duration"]
+          estimated_duration2 = json.find { |mod| mod["id"] == @module4.id }["items"].find { |item| item["id"] == @wiki_page_tag_est2.id }["estimated_duration"]
+          estimated_duration3 = json.find { |mod| mod["id"] == @module5.id }["items"].find { |item| item["id"] == @assignment_tag_est.id }["estimated_duration"]
+          expect(estimated_duration_module).to eq("PT42M")
+          expect(estimated_duration_module2).to eq("PT45M")
+          expect(estimated_duration1).to eq("PT30M")
+          expect(estimated_duration2).to eq("PT12M")
+          expect(estimated_duration3).to eq("PT45M")
+        end
+
+        it "does not includes estimated duration details if the course is not horizon course" do
+          @course.update!(horizon_course: false)
+          @course.save!
+          json = do_api_call_with_items
+          estimated_duration_module = json.find { |mod| mod["id"] == @module4.id }["estimated_duration"]
+          estimated_duration_module2 = json.find { |mod| mod["id"] == @module5.id }["estimated_duration"]
+          estimated_duration1 = json.find { |mod| mod["id"] == @module4.id }["items"].find { |item| item["id"] == @wiki_page_tag_est.id }["estimated_duration"]
+          estimated_duration2 = json.find { |mod| mod["id"] == @module4.id }["items"].find { |item| item["id"] == @wiki_page_tag_est2.id }["estimated_duration"]
+          estimated_duration3 = json.find { |mod| mod["id"] == @module5.id }["items"].find { |item| item["id"] == @assignment_tag_est.id }["estimated_duration"]
+          expect(estimated_duration_module).to be_nil
+          expect(estimated_duration_module2).to be_nil
+          expect(estimated_duration1).to be_nil
+          expect(estimated_duration2).to be_nil
+          expect(estimated_duration3).to be_nil
+        end
+      end
+
       it "skips items for modules that have too many" do
         stub_const("Api::MAX_PER_PAGE", 3)
         json = api_call(:get,
@@ -446,6 +533,76 @@ describe "Modules API", type: :request do
           expect(wiki_page_details).to include(
             "locked_for_user" => false
           )
+        end
+      end
+
+      context "index including estimated duration" do
+        before do
+          Account.default.enable_feature!(:horizon_course_setting)
+          @course.update!(horizon_course: true)
+          @course.save!
+
+          @module4 = @course.context_modules.create(name: "module4")
+          @wiki_page_est = @course.wiki_pages.create!(title: "Wiki Page 1", body: "")
+          @wiki_page_est.workflow_state = "active"
+          @wiki_page_est.save!
+          EstimatedDuration.create!(wiki_page_id: @wiki_page_est.id, duration: 30.minutes)
+          @wiki_page_tag_est = @module4.add_item(id: @wiki_page_est.id, type: "wiki_page")
+          @wiki_page_est2 = @course.wiki_pages.create!(title: "Wiki Page 2", body: "")
+          @wiki_page_est2.workflow_state = "active"
+          @wiki_page_est2.save!
+          EstimatedDuration.create!(wiki_page_id: @wiki_page_est2.id, duration: 12.minutes)
+          @wiki_page_tag_est2 = @module4.add_item(id: @wiki_page_est2.id, type: "wiki_page")
+          @module4.save!
+        end
+
+        it "includes estimated duration on the module" do
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/modules/#{@module4.id}?include[]=items&include[]=estimated_durations",
+                          controller: "context_modules_api",
+                          action: "show",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          include: %w[items estimated_durations],
+                          id: @module4.id.to_s)
+          estimated_duration_module = json["estimated_duration"]
+          expect(estimated_duration_module).to eq("PT42M")
+        end
+
+        it "includes estimated duration for the module and the items" do
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/modules/#{@module4.id}?include[]=items&include[]=estimated_durations",
+                          controller: "context_modules_api",
+                          action: "show",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          include: %w[items estimated_durations],
+                          id: @module4.id.to_s)
+          estimated_duration_module = json["estimated_duration"]
+          estimated_duration1 = json["items"].find { |item| item["id"] == @wiki_page_tag_est.id }["estimated_duration"]
+          estimated_duration2 = json["items"].find { |item| item["id"] == @wiki_page_tag_est2.id }["estimated_duration"]
+          expect(estimated_duration_module).to eq("PT42M")
+          expect(estimated_duration1).to eq("PT30M")
+          expect(estimated_duration2).to eq("PT12M")
+        end
+
+        it "does not includes estimated duration details if the course is not horizon course" do
+          @course.update!(horizon_course: false)
+          @course.save!
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/modules/#{@module4.id}?include[]=items&include[]=estimated_durations",
+                          controller: "context_modules_api",
+                          action: "show",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          include: %w[items estimated_durations],
+                          id: @module4.id.to_s)
+          estimated_duration_module = json["estimated_duration"]
+          estimated_duration1 = json["items"].find { |item| item["id"] == @wiki_page_tag_est.id }["estimated_duration"]
+          estimated_duration2 = json["items"].find { |item| item["id"] == @wiki_page_tag_est2.id }["estimated_duration"]
+          expect(estimated_duration_module).to be_nil
+          expect(estimated_duration1).to be_nil
+          expect(estimated_duration2).to be_nil
         end
       end
 
