@@ -5357,6 +5357,7 @@ tr:
       buttons: 
         add_prerequisite: "Ön Koşul Ekle"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: Dakikalar
       headings: 
         add_prerequisite: "%{name} ismine Ön Koşul Ekle"
         course_modules: "Ders Modülleri"
@@ -7899,6 +7900,7 @@ tr:
       edit_rubric_rating: "Dereceyi Düzenle"
       find_existing_rubric: "Varolan Denetim Listesi Bul"
   edit_rubric_7d4d139d: "Değerlendirme Listesini Düzenle"
+  edit_sections_7d0e4e34: "Bölümleri Düzenle"
   edit_survey_b0d6890d: "Anketi Düzenle"
   edit_this_announcement_ae6e17b3: "Bu Duyuruyu Düzenle"
   edit_this_collaboration_393b1a9a: "Bu İşbirliğini  Düzenle"
@@ -10875,6 +10877,7 @@ tr:
   link_selection_1486c5d0: "Bağlantı Seçimi"
   link_title_189888b7: "Bağlantı Başlığı"
   link_title_d959a7b3: "Link başlığı"
+  link_to_students_91edf7ea: "Öğrencilere Bağlantı Ver"
   link_url_a213671c: "Bağlantı URL"
   link_url_cf96376: "Link Url"
   linked_assignment_message: "Ödev '%{title}' ile bağlantılı"
@@ -14857,6 +14860,7 @@ tr:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Notlar yayınlandığında tarayıcınız yenilenir. Bu biraz zaman alabilir."
   posting_to_students_eaa57964: "Öğrencilere yayınlanıyor"
   practice_quiz_19a8505d: "Kısa Sınav Denemesi"
+  preparing_download_percent_complete_34b48e4d: "İndirilmeye hazırlanıyor: %{percent}% complate"
   prerequisites_49659f16: "Ön Koşullar:"
   prerequisites_98b324e0: "Ön koşullar"
   prerequisites_lookup: 
@@ -16931,6 +16935,7 @@ tr:
   remove_edf2b8a7: (Kaldır)
   remove_f47dc62a: Kaldır
   remove_filter_68de01d4: "Filtreyi Kaldır"
+  remove_from_course_6fb47aee: "Dersten Sil"
   remove_image_341340b3: "Görseli sil"
   remove_media_comment_f4afdb4b: "Medya yorumunu sil"
   remove_name_as_leader_3e03780a: "%{name}'i liderlikten kaldır"
@@ -16971,6 +16976,7 @@ tr:
   requirement_f5b75da1: Gereksinimler
   requirements_c64bcef3: Gereksinimler
   reregister_9ab95a57: "Tekrar kayıt ol"
+  resend_invitation_486bd513: "Tekrar Davetiye Yolla"
   reserved_f247b60b: "Rezerve edildi"
   reset_95a81614: Sıfırla
   reset_from_322d819a: "Şuradan Ayarla"
