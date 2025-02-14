@@ -500,7 +500,7 @@ class DiscussionTopicsController < ApplicationController
         render html: "", layout: true
       end
 
-      InstStatsd::Statsd.distributed_increment("discussion_topic.index.visit")
+      InstStatsd::Statsd.increment("discussion_topic.index.visit")
       InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.count(&:pinned))
       InstStatsd::Statsd.count("discussion_topic.index.visit.discussions", @topics&.length)
       InstStatsd::Statsd.count("discussion_topic.index.visit.closed_for_comments", @topics&.count(&:locked))
@@ -953,7 +953,7 @@ class DiscussionTopicsController < ApplicationController
                DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
              })
       unless @locked
-        InstStatsd::Statsd.distributed_increment("discussion_topic.visit.redesign")
+        InstStatsd::Statsd.increment("discussion_topic.visit.redesign")
         InstStatsd::Statsd.count("discussion_topic.visit.entries.redesign", @topic.discussion_entries.count)
         InstStatsd::Statsd.count("discussion_topic.visit.pages.redesign", (@topic.discussion_entries.count / 20).ceil)
       end
@@ -1098,7 +1098,7 @@ class DiscussionTopicsController < ApplicationController
             css_bundle :tinymce, :discussions, :learning_outcomes
 
             unless @locked
-              InstStatsd::Statsd.distributed_increment("discussion_topic.visit.legacy")
+              InstStatsd::Statsd.increment("discussion_topic.visit.legacy")
               InstStatsd::Statsd.count("discussion_topic.visit.entries.legacy", @topic.discussion_entries.count)
               InstStatsd::Statsd.count("discussion_topic.visit.pages.legacy", (@topic.discussion_entries.count / 50).ceil)
             end
@@ -1700,42 +1700,42 @@ class DiscussionTopicsController < ApplicationController
         include_usage_rights = @context.try(:usage_rights_required?)
 
         if is_new
-          InstStatsd::Statsd.distributed_increment("discussion_topic.created")
+          InstStatsd::Statsd.increment("discussion_topic.created")
 
           if params[:podcast_enabled] == "1"
-            InstStatsd::Statsd.distributed_increment("discussion_topic.created.podcast_feed_enabled")
+            InstStatsd::Statsd.increment("discussion_topic.created.podcast_feed_enabled")
           end
 
           if params[:allow_rating] == "1"
-            InstStatsd::Statsd.distributed_increment("discussion_topic.created.allow_liking_enabled")
+            InstStatsd::Statsd.increment("discussion_topic.created.allow_liking_enabled")
           end
 
           if params[:attachment]
-            InstStatsd::Statsd.distributed_increment("discussion_topic.created.attachment")
+            InstStatsd::Statsd.increment("discussion_topic.created.attachment")
           end
 
           if !params[:delayed_post_at]&.empty? || !params[:lock_at]&.empty?
-            InstStatsd::Statsd.distributed_increment("discussion_topic.created.scheduled")
+            InstStatsd::Statsd.increment("discussion_topic.created.scheduled")
           end
 
           if params[:anonymous_state] == "partial_anonymity"
-            InstStatsd::Statsd.distributed_increment("discussion_topic.created.partial_anonymity")
+            InstStatsd::Statsd.increment("discussion_topic.created.partial_anonymity")
           end
 
           if params[:anonymous_state] == "full_anonymity"
-            InstStatsd::Statsd.distributed_increment("discussion_topic.created.full_anonymity")
+            InstStatsd::Statsd.increment("discussion_topic.created.full_anonymity")
           end
 
           if params[:assignment]
-            InstStatsd::Statsd.distributed_increment("discussion_topic.created.graded")
+            InstStatsd::Statsd.increment("discussion_topic.created.graded")
           end
 
           if @context.is_a?(Group)
-            InstStatsd::Statsd.distributed_increment("discussion_topic.created.group")
+            InstStatsd::Statsd.increment("discussion_topic.created.group")
           end
 
           if request.params[:assignment] && request.params[:assignment][:assignment_overrides] && request.params[:assignment][:assignment_overrides].length > 1
-            InstStatsd::Statsd.distributed_increment("discussion_topic.created.multiple_due_dates")
+            InstStatsd::Statsd.increment("discussion_topic.created.multiple_due_dates")
           end
         end
 

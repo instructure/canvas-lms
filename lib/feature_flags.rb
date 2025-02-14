@@ -210,7 +210,7 @@ module FeatureFlags
 
   def persist_result(feature, result)
     persist_result_context(feature, result)
-    InstStatsd::Statsd.distributed_increment("feature_flag_check", tags: { feature:, enabled: result.to_s })
+    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature:, enabled: result.to_s })
     result
   end
 

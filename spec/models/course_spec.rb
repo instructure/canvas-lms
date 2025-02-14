@@ -7382,58 +7382,58 @@ describe Course do
 
     context "end date stats on date change or publishing" do
       it "increments and decrements on end date existence change" do
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
         Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now, settings: { enable_course_paces: true }).offer!
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.has_end_date").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.has_end_date").once
 
         Course.last.update! restrict_enrollments_to_course_dates: false
         expect(InstStatsd::Statsd).to have_received(:decrement).with("course.paced.has_end_date").once
       end
 
       it "increments and decrements on pace status change" do
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
         Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now).offer!
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.has_end_date").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").once
 
         Course.last.update! settings: { enable_course_paces: true }
         expect(InstStatsd::Statsd).to have_received(:decrement).with("course.unpaced.has_end_date").once
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.has_end_date").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.has_end_date").once
       end
 
       it "increments and decrements on pace status and end date existence concurrently" do
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
         Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now).offer!
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.has_end_date").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").once
 
         Course.last.update! restrict_enrollments_to_course_dates: false, settings: { enable_course_paces: true }
         expect(InstStatsd::Statsd).to have_received(:decrement).with("course.unpaced.has_end_date").once
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.paced.has_end_date")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.has_end_date")
 
         Course.last.update! restrict_enrollments_to_course_dates: true, settings: { enable_course_paces: false }
         expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.paced.has_end_date")
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.has_end_date").twice
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").twice
       end
 
       it "ignores unpublished date having changes" do
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
         Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now)
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.unpaced.has_end_date")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.unpaced.has_end_date")
         Course.last.update! settings: { enable_course_paces: true }
         expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.unpaced.has_end_date")
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.paced.has_end_date")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.has_end_date")
       end
     end
 
     context "course with course pacing on or off" do
       before do
         Account.default.enable_feature!(:course_paces)
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
         @course = Course.create!
       end
@@ -7443,20 +7443,20 @@ describe Course do
         @course.save!
         @course.offer!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
       end
 
       it "does not increment when only option is updated" do
         @course.enable_course_paces = true
         @course.save!
 
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.paced.paced_courses")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.paced_courses")
       end
 
       it "increments count for non-paced course when initially published" do
         @course.offer!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.paced_courses").once
       end
 
       it "increments paced count on already published course from when going from unpaced to paced" do
@@ -7464,43 +7464,43 @@ describe Course do
         @course.enable_course_paces = true
         @course.save!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
       end
 
       it "increments paced count on already published course from when going from paced to unpaced" do
         @course.enable_course_paces = true
         @course.save!
         @course.offer!
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
 
         @course.enable_course_paces = false
         @course.save!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.paced_courses").once
       end
 
       it "increments the appropriate bucket when republishing" do
         @course.enable_course_paces = true
         @course.save!
         @course.offer!
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.paced_courses").once
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.unpaced.paced_courses")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.unpaced.paced_courses")
 
         @course.claim!
 
         @course.enable_course_paces = false
         @course.save!
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.unpaced.paced_courses")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.unpaced.paced_courses")
 
         @course.offer!
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.paced_courses").once
       end
     end
 
     context "course format logging" do
       before do
         Account.default.enable_feature!(:course_paces)
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
         @course = Course.create!
       end
@@ -7510,7 +7510,7 @@ describe Course do
         @course.save!
         @course.offer!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.unset").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.unset").once
       end
 
       it "increments the course format count for unset when paced course published for the first time" do
@@ -7519,7 +7519,7 @@ describe Course do
         @course.save!
         @course.offer!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.unset").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.unset").once
       end
 
       it "increments the course format count for blended when unpaced course published for the first time" do
@@ -7527,7 +7527,7 @@ describe Course do
         @course.save!
         @course.offer!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.blended").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.blended").once
         expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.unpaced.blended")
       end
 
@@ -7537,7 +7537,7 @@ describe Course do
         @course.save!
         @course.offer!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.blended").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.blended").once
       end
 
       it "increments the course format count for on_campus when unpaced course published for the first time" do
@@ -7545,7 +7545,7 @@ describe Course do
         @course.save!
         @course.offer!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.on_campus").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.on_campus").once
       end
 
       it "increments the course format count for on_campus when paced course published for the first time" do
@@ -7554,7 +7554,7 @@ describe Course do
         @course.save!
         @course.offer!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.on_campus").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.on_campus").once
       end
 
       it "increments the course format count for online when unpaced course published for the first time" do
@@ -7562,7 +7562,7 @@ describe Course do
         @course.save!
         @course.offer!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.online").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.online").once
       end
 
       it "increments the course format count for online when paced course published for the first time" do
@@ -7571,14 +7571,14 @@ describe Course do
         @course.save!
         @course.offer!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.online").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.online").once
       end
 
       it "does not increment unpaced stat when only option is updated and not published" do
         @course.course_format = nil
         @course.save!
 
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.unpaced.unset")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.unpaced.unset")
       end
 
       it "does not increment paced stat when only option is updated and not published" do
@@ -7586,7 +7586,7 @@ describe Course do
         @course.enable_course_paces = true
         @course.save!
 
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.paced.unset")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.unset")
       end
 
       it "increments unset count on already published unpaced course" do
@@ -7594,8 +7594,8 @@ describe Course do
         @course.enable_course_paces = true
         @course.save!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.unset").once
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.unset").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.unset").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.unset").once
       end
 
       it "increments change to online on unpaced course" do
@@ -7603,8 +7603,8 @@ describe Course do
         @course.course_format = "online"
         @course.save!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.unset").once
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.online").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.unset").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.online").once
       end
 
       it "increments blended count on already published paced course" do
@@ -7614,24 +7614,24 @@ describe Course do
         @course.course_format = "blended"
         @course.save!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.unset").once
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.blended").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.unset").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.blended").once
       end
 
       it "paced course starts blended goes to unpaced and format unset" do
         @course.enable_course_paces = true
         @course.course_format = "blended"
         @course.save!
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.paced.blended")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.blended")
 
         @course.offer!
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.paced.blended").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.blended").once
 
         @course.course_format = nil
         @course.enable_course_paces = false
         @course.save!
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.unpaced.unset").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.unset").once
       end
     end
   end
@@ -7861,7 +7861,7 @@ describe Course do
 
       describe "updates metric if setting is enabled/disabled" do
         before do
-          allow(InstStatsd::Statsd).to receive(:distributed_increment)
+          allow(InstStatsd::Statsd).to receive(:increment)
         end
 
         it "increments enabled log when setting is turned on" do
@@ -7870,7 +7870,7 @@ describe Course do
           @course.save!
           expect(@course.restrict_quantitative_data).to be true
 
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.settings.restrict_quantitative_data.enabled").once
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled").once
         end
 
         it "increments disabled log when setting is turned off" do
@@ -7882,8 +7882,8 @@ describe Course do
           @course.save!
           expect(@course.restrict_quantitative_data).to be false
 
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.settings.restrict_quantitative_data.enabled").once.ordered
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course.settings.restrict_quantitative_data.disabled").once.ordered
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled").once.ordered
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.settings.restrict_quantitative_data.disabled").once.ordered
         end
 
         it "doesn't increment either log when settings update but RQD setting is unchanged" do
@@ -7892,8 +7892,8 @@ describe Course do
           @course.save!
           expect(@course.hide_final_grade).to be true
 
-          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.settings.restrict_quantitative_data.enabled")
-          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course.settings.restrict_quantitative_data.disabled")
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled")
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.disabled")
         end
       end
 

@@ -209,11 +209,11 @@ describe CalendarsController do
     end
 
     it "emits calendar.visit metric to statsd with appropriate enrollment tags" do
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
       course_with_teacher(user: @user, active_all: true)
 
       get "show", params: { user_id: @user.id }
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("calendar.visit", tags: %w[enrollment_type:StudentEnrollment enrollment_type:TeacherEnrollment])
+      expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.visit", tags: %w[enrollment_type:StudentEnrollment enrollment_type:TeacherEnrollment])
     end
 
     context "with sharding" do

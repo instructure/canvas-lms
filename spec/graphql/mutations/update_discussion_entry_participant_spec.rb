@@ -68,7 +68,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
   end
 
   before do
-    allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    allow(InstStatsd::Statsd).to receive(:increment)
   end
 
   it "updates the read state" do
@@ -129,7 +129,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
     ).to eq "other"
     @discussion_entry.reload
     expect(@discussion_entry.report_type?(@discussion_entry.user)).to eq "other"
-    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_entry_participant.report.created")
+    expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_entry_participant.report.created")
   end
 
   describe "forcedReadState attribute mutations" do

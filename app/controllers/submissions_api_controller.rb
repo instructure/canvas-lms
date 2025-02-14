@@ -874,7 +874,7 @@ class SubmissionsApiController < ApplicationController
         end
 
         if params[:submission].key?(:sticker)
-          InstStatsd::Statsd.distributed_increment("submission_stickers.sticker_applied")
+          InstStatsd::Statsd.increment("submission_stickers.sticker_applied")
           submission[:sticker] = params[:submission].delete(:sticker)
         end
 
@@ -1684,14 +1684,14 @@ class SubmissionsApiController < ApplicationController
   def track_update_metrics(submission, params)
     custom_grade_status_id = params.dig(:submission, :custom_grade_status_id).to_s
     if !custom_grade_status_id.empty? && custom_grade_status_id != submission.custom_grade_status_id.to_s
-      InstStatsd::Statsd.distributed_increment("custom_grade_status.applied_to.submission")
+      InstStatsd::Statsd.increment("custom_grade_status.applied_to.submission")
     end
 
     if params.dig(:submission, :posted_grade)
       if params["originator"] == "individual_gradebook"
-        InstStatsd::Statsd.distributed_increment("individual_gradebook.submission.posted_grade")
+        InstStatsd::Statsd.increment("individual_gradebook.submission.posted_grade")
       elsif params["originator"] == "gradebook"
-        InstStatsd::Statsd.distributed_increment("gradebook.submission.posted_grade")
+        InstStatsd::Statsd.increment("gradebook.submission.posted_grade")
       end
     end
   end

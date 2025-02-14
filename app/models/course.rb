@@ -503,7 +503,7 @@ class Course < ActiveRecord::Base
 
     return unless just_published || (has_end_date != had_end_date) || (settings_before_last_save[:enable_course_paces] != settings[:enable_course_paces])
 
-    InstStatsd::Statsd.distributed_increment(enable_course_paces ? "course.paced.has_end_date" : "course.unpaced.has_end_date") if has_end_date
+    InstStatsd::Statsd.increment(enable_course_paces ? "course.paced.has_end_date" : "course.unpaced.has_end_date") if has_end_date
 
     return if just_published # Don't decrement on publish
 
@@ -4536,7 +4536,7 @@ class Course < ActiveRecord::Base
   def log_course_pacing_publish_update
     if publishing?
       statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
-      InstStatsd::Statsd.distributed_increment("course.#{statsd_bucket}.paced_courses")
+      InstStatsd::Statsd.increment("course.#{statsd_bucket}.paced_courses")
     end
   end
 
@@ -4544,7 +4544,7 @@ class Course < ActiveRecord::Base
     if publishing?
       statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
       course_format_value = course_format.nil? ? "unset" : course_format
-      InstStatsd::Statsd.distributed_increment("course.#{statsd_bucket}.#{course_format_value}")
+      InstStatsd::Statsd.increment("course.#{statsd_bucket}.#{course_format_value}")
     end
   end
 
@@ -4603,7 +4603,7 @@ class Course < ActiveRecord::Base
 
     statsd_bucket = new_enable_paces_setting ? "paced" : "unpaced"
 
-    InstStatsd::Statsd.distributed_increment("course.#{statsd_bucket}.paced_courses")
+    InstStatsd::Statsd.increment("course.#{statsd_bucket}.paced_courses")
 
     log_course_format_update unless @course_format_change
   end
@@ -4615,7 +4615,7 @@ class Course < ActiveRecord::Base
     new_stats_course_format = setting_changes[1][:course_format].nil? ? "unset" : setting_changes[1][:course_format]
 
     statsd_bucket = new_enable_paces_setting ? "paced" : "unpaced"
-    InstStatsd::Statsd.distributed_increment("course.#{statsd_bucket}.#{new_stats_course_format}")
+    InstStatsd::Statsd.increment("course.#{statsd_bucket}.#{new_stats_course_format}")
   end
 
   def log_rqd_setting_enable_or_disable
@@ -4628,9 +4628,9 @@ class Course < ActiveRecord::Base
     return unless old_rqd_setting != new_rqd_setting # Skip if RQD setting was not changed
 
     if old_rqd_setting == false && new_rqd_setting == true
-      InstStatsd::Statsd.distributed_increment("course.settings.restrict_quantitative_data.enabled")
+      InstStatsd::Statsd.increment("course.settings.restrict_quantitative_data.enabled")
     elsif old_rqd_setting == true && new_rqd_setting == false
-      InstStatsd::Statsd.distributed_increment("course.settings.restrict_quantitative_data.disabled")
+      InstStatsd::Statsd.increment("course.settings.restrict_quantitative_data.disabled")
     end
   end
 end

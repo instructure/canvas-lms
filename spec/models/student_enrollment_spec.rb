@@ -268,11 +268,11 @@ describe StudentEnrollment do
 
         it "logs a stat if a student is added to multiple sections that have published paces" do
           @unpublished_section_pace.publish
-          allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
+          allow(InstStatsd::Statsd).to receive(:increment).and_call_original
           student = student_in_section(@section1)
-          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course_pacing.student_with_multiple_sections_with_paces")
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course_pacing.student_with_multiple_sections_with_paces")
           student_in_section(@section2, user: student, allow_multiple_enrollments: true)
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.student_with_multiple_sections_with_paces").at_least(:once)
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.student_with_multiple_sections_with_paces").at_least(:once)
         end
       end
     end

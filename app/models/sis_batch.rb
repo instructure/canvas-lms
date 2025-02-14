@@ -422,7 +422,7 @@ class SisBatch < ActiveRecord::Base
     self.progress = 100 if import_finished
     self.ended_at = Time.now.utc
     save!
-    InstStatsd::Statsd.distributed_increment("sis_batch_completed", tags: { failed: @has_errors })
+    InstStatsd::Statsd.increment("sis_batch_completed", tags: { failed: @has_errors })
 
     if !data[:running_immediately] && account.sis_batches.needs_processing.exists?
       self.class.queue_job_for_account(account) # check if there's anything that needs to be run
@@ -962,7 +962,7 @@ class SisBatch < ActiveRecord::Base
     restore_progress&.complete
     self.workflow_state = (undelete_only || unconclude_only || batch_mode) ? "partially_restored" : "restored"
     tags = { undelete_only:, unconclude_only:, batch_mode: }
-    InstStatsd::Statsd.distributed_increment("sis_batch_restored", tags:)
+    InstStatsd::Statsd.increment("sis_batch_restored", tags:)
     save!
   end
 

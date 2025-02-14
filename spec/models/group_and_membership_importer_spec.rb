@@ -238,10 +238,10 @@ describe GroupAndMembershipImporter do
     end
 
     it "logs stat on new groups" do
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
       import_csv_data(%(user_id,group_name
         user_4,anugroup))
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+      expect(InstStatsd::Statsd).to have_received(:increment).with(
         "groups.auto_create",
         tags: {
           split_type: "csv",

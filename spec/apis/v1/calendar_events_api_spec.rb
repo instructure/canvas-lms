@@ -1666,18 +1666,18 @@ describe CalendarEventsApiController, type: :request do
     describe "statsd metrics" do
       it "emits calendar.calendar_event.create with single tag when creating a new event" do
         course_with_student(course: @course, user: @user, active_all: true)
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         api_call(:post,
                  "/api/v1/calendar_events",
                  { controller: "calendar_events_api", action: "create", format: "json" },
                  { calendar_event: { context_code: @course.asset_string, title: "single event" } })
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment enrollment_type:StudentEnrollment calendar_event_type:single])
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment enrollment_type:StudentEnrollment calendar_event_type:single])
       end
 
       it "emits calendar.calendar_event.create with recurring tag when creating a new recurring event" do
         start_at = Time.zone.now.utc.change(hour: 0, min: 1)
         end_at = Time.zone.now.utc.change(hour: 23)
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         api_call(:post,
                  "/api/v1/calendar_events",
                  { controller: "calendar_events_api", action: "create", format: "json" },
@@ -1690,13 +1690,13 @@ describe CalendarEventsApiController, type: :request do
                                        interval: "1",
                                        frequency: "weekly"
                                      } } })
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment calendar_event_type:recurring])
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment calendar_event_type:recurring])
       end
 
       it "emits calendar.calendar_event.create with series tag when creating a new event series" do
         start_at = Time.zone.now.utc.change(hour: 0, min: 1)
         end_at = Time.zone.now.utc.change(hour: 23)
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         api_call(:post,
                  "/api/v1/calendar_events",
                  { controller: "calendar_events_api", action: "create", format: "json" },
@@ -1705,7 +1705,7 @@ describe CalendarEventsApiController, type: :request do
                                      start_at: start_at.iso8601,
                                      end_at: end_at.iso8601,
                                      rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=3" } })
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment calendar_event_type:series])
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment calendar_event_type:series])
       end
     end
 
@@ -4437,7 +4437,7 @@ describe CalendarEventsApiController, type: :request do
       end
 
       before do
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:count)
       end
 
@@ -4445,7 +4445,7 @@ describe CalendarEventsApiController, type: :request do
       let_once(:end_date) { 1.week.from_now }
 
       it "logs when event count exceeds page size" do
-        expect(InstStatsd::Statsd).to receive(:distributed_increment).with("calendar.events_api.per_page_exceeded.count").once
+        expect(InstStatsd::Statsd).to receive(:increment).with("calendar.events_api.per_page_exceeded.count").once
         expect(InstStatsd::Statsd).to receive(:count).with("calendar.events_api.per_page_exceeded.value", 2).once
         api_call_as_user(@teacher,
                          :get,
@@ -4463,7 +4463,7 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "does not log if the page size is not exceeded" do
-        expect(InstStatsd::Statsd).not_to receive(:distributed_increment).with("calendar.events_api.per_page_exceeded.count")
+        expect(InstStatsd::Statsd).not_to receive(:increment).with("calendar.events_api.per_page_exceeded.count")
         expect(InstStatsd::Statsd).not_to receive(:count).with("calendar.events_api.per_page_exceeded.value")
         api_call_as_user(@teacher,
                          :get,

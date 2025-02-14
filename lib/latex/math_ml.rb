@@ -28,11 +28,11 @@ module Latex
 
     def parse
       InstStatsd::Statsd.time("#{strategy}.parse_attempt") do
-        InstStatsd::Statsd.distributed_increment("#{strategy}.parse_attempt.count")
+        InstStatsd::Statsd.increment("#{strategy}.parse_attempt.count")
         begin
           send(:"#{strategy}_parse")
         rescue Racc::ParseError, Ritex::LexError, Ritex::Error, CanvasHttp::Error, Timeout::Error
-          InstStatsd::Statsd.distributed_increment("#{strategy}.parse_failure.count")
+          InstStatsd::Statsd.increment("#{strategy}.parse_failure.count")
           return ""
         end
       end

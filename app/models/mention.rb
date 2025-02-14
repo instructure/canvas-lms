@@ -55,6 +55,6 @@ class Mention < ApplicationRecord
   end
 
   def log_created_mention_metrics
-    InstStatsd::Statsd.distributed_increment("discussion_mention.created")
+    InstStatsd::Statsd.increment("discussion_mention.created")
   end
 end

@@ -289,7 +289,7 @@ class RubricsController < ApplicationController
 
   def track_metrics
     if @association_object.is_a?(Assignment)
-      InstStatsd::Statsd.distributed_increment("#{@context.class.to_s.downcase}.rubrics.created_from_assignment")
+      InstStatsd::Statsd.increment("#{@context.class.to_s.downcase}.rubrics.created_from_assignment")
     end
   end
 end
