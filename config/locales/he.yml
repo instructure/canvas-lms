@@ -5117,6 +5117,7 @@ he:
       buttons: 
         add_prerequisite: "הוספת דרישה מוקדמת"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: דקות
       headings: 
         add_prerequisite: "הוספת דרישה מוקדמת ל %{name}"
         course_modules: "מודולי הקורס"
@@ -7624,6 +7625,7 @@ he:
       find_existing_rubric: "מציאת רובריקה קיימת"
   edit_rubric_7d4d139d: "עריכת רובריקה "
   edit_section_name_558cc89: "עריכת סעיף \"%{name}\""
+  edit_sections_7d0e4e34: "עריכת הקבצה"
   edit_survey_b0d6890d: "עריכת סקר"
   edit_term_name_29a8a322: "עריכת תקופה %{name}"
   edit_text_27d8aa3d: "עריכת %{text}"
@@ -10809,6 +10811,7 @@ he:
   link_selection_1486c5d0: "בחירת קישור"
   link_title_189888b7: "כותרת קישור"
   link_title_d959a7b3: "כותרת קישור"
+  link_to_students_91edf7ea: "קישור אל התלמידים"
   link_to_url_52dd935c: "קישור לכתובת דף"
   link_url_a213671c: "כתובת הקישור"
   link_url_cf96376: "כתובת קישור"
@@ -14761,6 +14764,7 @@ he:
   posted_at_4cfce2c3: "%{posted_at}"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "תרגול בוחן"
+  preparing_download_percent_complete_34b48e4d: "הורדה בשלבי הכנה: %{percent}% הושלם"
   prerequisites_49659f16: "דרישות מוקדמות:"
   prerequisites_98b324e0: "דרישות מוקדמות"
   prerequisites_lookup: 
@@ -16864,6 +16868,7 @@ he:
   remove_f47dc62a: הסרה
   remove_filename_87f3781e: "הסרת %{filename}"
   remove_filter_68de01d4: "ביטול מסנן"
+  remove_from_course_6fb47aee: "הסרה מהקורס"
   remove_icon_a4646413: "הסרת צלמית"
   remove_image_341340b3: "הסרת תמונה"
   remove_media_comment_f4afdb4b: "הסרת תגובת מדיה"
@@ -16920,6 +16925,7 @@ he:
   reregister_9ab95a57: "רישום מחדש"
   reregister_toolname_3dde0bfc: "רישום מחדש של %{toolName}"
   reschedule_9f780bb8: "תזמון מחודש"
+  resend_invitation_486bd513: "שליחה מחדש של הזמנה"
   reserved_by_d563e7d2: "הוזמן ע\"י"
   reserved_by_you_cd03b62d: "הוזמן על ידך"
   reserved_f247b60b: שמור

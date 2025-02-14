@@ -6692,6 +6692,7 @@ hu:
       buttons: 
         add_prerequisite: "Előfeltétel hozzáadása"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: perc
       headings: 
         add_prerequisite: "Előfeltétel hozzáadása ehhez: %{name}"
         course_modules: Modulok
@@ -9740,6 +9741,7 @@ hu:
   edit_rubric_7d4d139d: "Értékelőtábla szerkesztése"
   edit_rubric_title_104d6fd2: "%{title}értékelőtábla szerkesztése"
   edit_section_name_558cc89: "%{name}szekció szerkesztése"
+  edit_sections_7d0e4e34: "Szekciók szerkesztése"
   edit_status_612572db: "Státusz szerkesztése"
   edit_status_dialog_for_editbuttonlabel_7e829fbd: "A %{editButtonLabel} szerkesztési állapot párbeszédpanelje"
   edit_submission_status_from_speedgrader_5e1b1cd4: "A Gyorsértékelőből származó beadási státusz szerkesztése"
@@ -13804,6 +13806,7 @@ hu:
   link_selection_1486c5d0: "Link kiválasztása"
   link_title_189888b7: "Link címe"
   link_to_lti_tools_608df3b0: "Link az lti eszközökhöz."
+  link_to_students_91edf7ea: "Hivatkozás hallgatókra"
   link_url_a213671c: "Hivatkozás webcíme"
   link_url_cf96376: "Link URL"
   link_validation_is_running_caf08ced: "A Link ellenőrzés jelenleg fut"
@@ -18891,6 +18894,7 @@ hu:
   pre_processing_92865c1d: Előfeldolgozás
   precise_link_replacement_on_content_migrations_51976596: "Pontos linkhelyettesítés a tartalom áttelepítésekor"
   prefer_lti_tools_with_a_matching_client_id_when_fi_b6cf4809: "Külső eszköz keresésekor a megfelelő ügyfél-azonosítóval rendelkező LTI-eszközök előnyben részesítése"
+  preparing_download_percent_complete_34b48e4d: "Letöltés előkészítése: %{percent}% kész"
   prerequisite_f361cd61: Előfeltétel
   prerequisites_49659f16: "Előfeltételek:"
   prerequisites_98b324e0: Előfeltételek
@@ -20986,6 +20990,7 @@ hu:
   remove_filter_68de01d4: "Szűrő eltávolítása"
   remove_filter_6f7204e2: "szűrő eltávolítása"
   remove_filtername_filter_6b6d7063: "%{filterName} szűrő eltávolítása"
+  remove_from_course_6fb47aee: "Eltávolítás a kurzusból"
   remove_from_to_to_from_substitutes_4a6dc71d: "A '%{from}' és a '%{to}' közötti rész eltávolítása a helyettesítőkből"
   remove_grading_scheme_title_d3942a08: "Osztályzási rendszer eltávolítása: %{title}"
   remove_group_5d2f2f2d: "csoport eltávolítása"
@@ -21157,6 +21162,7 @@ hu:
   reregister_9ab95a57: Újraregisztrálás
   reregister_toolname_3dde0bfc: "%{toolName} újra regisztrálása"
   reschedule_9f780bb8: Átütemezés
+  resend_invitation_486bd513: "Meghívó újraküldése"
   reserved_by_d563e7d2: "Lefoglalva:"
   reserved_by_you_cd03b62d: "Lefoglalva Önnek"
   reserved_f247b60b: Foglalt
@@ -26539,6 +26545,7 @@ hu:
   user_vaildation_issues_panel_66b66945: "Felhasználói értékelési kérdések panel"
   user_with_genitive_settings_b39e02ba: "%{user_with_genitive} Beállításai"
   usercount_respondents_1521244: "%{userCount} válaszadó"
+  usercount_selected_24930f90: "%{userCount} kijelölve"
   userinfo_d21114ef: "Felhasználó adatai"
   username_47bb5bbe: Felhasználónév
   username_could_not_be_found_6c3e8383: "Felhasználónév nem található"
