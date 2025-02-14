@@ -31,13 +31,13 @@ class RubricAssessment
 
       if new_record?
         if assessment_type == "peer_review"
-          InstStatsd::Statsd.distributed_increment("grading.rubric.peer_review_assessed_#{version}")
+          InstStatsd::Statsd.increment("grading.rubric.peer_review_assessed_#{version}")
         else
-          InstStatsd::Statsd.distributed_increment("grading.rubric.teacher_assessed_#{version}")
+          InstStatsd::Statsd.increment("grading.rubric.teacher_assessed_#{version}")
         end
       end
 
-      InstStatsd::Statsd.distributed_increment("grading.rubric.teacher_leaves_feedback_#{version}") if should_track_feedback?
+      InstStatsd::Statsd.increment("grading.rubric.teacher_leaves_feedback_#{version}") if should_track_feedback?
     end
 
     def should_track_feedback?

@@ -59,7 +59,7 @@ class BounceNotificationProcessor
       if bounce_notification
         process_bounce_notification(bounce_notification)
       else
-        InstStatsd::Statsd.distributed_increment("bounce_notification_processor.processed.no_bounce")
+        InstStatsd::Statsd.increment("bounce_notification_processor.processed.no_bounce")
       end
 
       # this job gets scheduled every 5 minutes and then can queue additional
@@ -92,7 +92,7 @@ class BounceNotificationProcessor
            else
              "transient"
            end
-    InstStatsd::Statsd.distributed_increment("bounce_notification_processor.processed.#{type}")
+    InstStatsd::Statsd.increment("bounce_notification_processor.processed.#{type}")
 
     bouncy_addresses(bounce_notification).each do |address|
       cache_key = "bounce_notification_#{address}"

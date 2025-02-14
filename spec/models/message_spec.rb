@@ -419,7 +419,7 @@ describe Message do
     end
 
     it "logs stats on deliver" do
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
       account = account_model
       @message = message_model(dispatch_at: 1.second.ago,
                                notification_name: "my_name",
@@ -431,7 +431,7 @@ describe Message do
                                root_account: account)
       expect(@message).to receive(:dispatch).and_return(true)
       @message.deliver
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+      expect(InstStatsd::Statsd).to have_received(:increment).with(
         "message.deliver.email.my_name",
         {
           short_stat: "message.deliver",
@@ -439,7 +439,7 @@ describe Message do
         }
       )
 
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+      expect(InstStatsd::Statsd).to have_received(:increment).with(
         "message.deliver.email.#{@message.root_account.global_id}",
         {
           short_stat: "message.deliver_per_account",

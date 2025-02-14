@@ -237,19 +237,19 @@ module Types
       if object == context[:current_user]
         conversations_scope = case scope
                               when "unread"
-                                InstStatsd::Statsd.distributed_increment("inbox.visit.scope.unread.pages_loaded.react")
+                                InstStatsd::Statsd.increment("inbox.visit.scope.unread.pages_loaded.react")
                                 object.conversations.unread
                               when "starred"
-                                InstStatsd::Statsd.distributed_increment("inbox.visit.scope.starred.pages_loaded.react")
+                                InstStatsd::Statsd.increment("inbox.visit.scope.starred.pages_loaded.react")
                                 object.starred_conversations
                               when "sent"
-                                InstStatsd::Statsd.distributed_increment("inbox.visit.scope.sent.pages_loaded.react")
+                                InstStatsd::Statsd.increment("inbox.visit.scope.sent.pages_loaded.react")
                                 object.all_conversations.sent
                               when "archived"
-                                InstStatsd::Statsd.distributed_increment("inbox.visit.scope.archived.pages_loaded.react")
+                                InstStatsd::Statsd.increment("inbox.visit.scope.archived.pages_loaded.react")
                                 object.conversations.archived
                               else
-                                InstStatsd::Statsd.distributed_increment("inbox.visit.scope.inbox.pages_loaded.react")
+                                InstStatsd::Statsd.increment("inbox.visit.scope.inbox.pages_loaded.react")
                                 object.conversations.default
                               end
 
@@ -492,7 +492,7 @@ module Types
         submission_ids = StreamItem.where(id: shard_stream_items.map(&:stream_item_id)).pluck(:asset_id)
         submissions += Submission.where(id: submission_ids)
       end
-      InstStatsd::Statsd.distributed_increment("inbox.visit.scope.submission_comments.pages_loaded.react")
+      InstStatsd::Statsd.increment("inbox.visit.scope.submission_comments.pages_loaded.react")
       # on FE we use newest submission comment to render date so use that first.
       submissions.sort_by { |t| t.submission_comments.last.created_at || t.last_comment_at }.reverse
     rescue

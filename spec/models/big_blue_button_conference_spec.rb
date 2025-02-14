@@ -165,7 +165,7 @@ describe BigBlueButtonConference do
     it "initiates with the correct default values when bbb_modal_update is OFF" do
       Account.site_admin.disable_feature! :bbb_modal_update
       allow(@bbb).to receive(:send_request).and_return({ createTime: Time.zone.now })
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
 
       # these are the defaults defined in the BigBlueButtonConference model
       @bbb.user_settings = {
@@ -193,17 +193,17 @@ describe BigBlueButtonConference do
                                                                      guestPolicy: :any
                                                                    }
                                                                  ))
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("bigbluebutton.started")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("bigbluebutton.started")
 
       # we will only track these settings when we explicitly include them in the request,
       # and not rely on BBB provider defaults
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.record")
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.share_webcam")
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.share_microphone")
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.send_public_chat")
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.send_private_chat")
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.enable_waiting_room")
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.share_other_webcams")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.record")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.share_webcam")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.share_microphone")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.send_public_chat")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.send_private_chat")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.enable_waiting_room")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.share_other_webcams")
     end
 
     context "when :bbb_modal_update is ON" do
@@ -213,7 +213,7 @@ describe BigBlueButtonConference do
 
       it "send the correct bbb_modal_update default params" do
         allow(@bbb).to receive(:send_request).and_return({ createTime: Time.zone.now })
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
 
         # these are the defaults defined in the BigBlueButtonConference model
         @bbb.user_settings = {
@@ -239,20 +239,20 @@ describe BigBlueButtonConference do
                                                                      webcamsOnlyForModerator: false,
                                                                      guestPolicy: "ALWAYS_ACCEPT"
                                                                    ))
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("bigbluebutton.started")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("bigbluebutton.started")
 
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.record")
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("bigbluebutton.start.setting.share_webcam")
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("bigbluebutton.start.setting.share_microphone")
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("bigbluebutton.start.setting.send_public_chat")
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("bigbluebutton.start.setting.send_private_chat")
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("bigbluebutton.start.setting.share_other_webcams")
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.enable_waiting_room")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.record")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("bigbluebutton.start.setting.share_webcam")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("bigbluebutton.start.setting.share_microphone")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("bigbluebutton.start.setting.send_public_chat")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("bigbluebutton.start.setting.send_private_chat")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("bigbluebutton.start.setting.share_other_webcams")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.enable_waiting_room")
       end
 
       it "send the correct bbb_modal_update supplied params" do
         allow(@bbb).to receive(:send_request).and_return({ createTime: Time.zone.now })
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
 
         # these are the opposites of the defaults
         @bbb.user_settings = {
@@ -279,15 +279,15 @@ describe BigBlueButtonConference do
                                                                      guestPolicy: "ASK_MODERATOR"
                                                                    ))
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("bigbluebutton.started")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("bigbluebutton.started")
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("bigbluebutton.start.setting.record")
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.share_webcam")
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.share_microphone")
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.send_public_chat")
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.send_private_chat")
-        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("bigbluebutton.start.setting.share_other_webcams")
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("bigbluebutton.start.setting.enable_waiting_room")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("bigbluebutton.start.setting.record")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.share_webcam")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.share_microphone")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.send_public_chat")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.send_private_chat")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("bigbluebutton.start.setting.share_other_webcams")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("bigbluebutton.start.setting.enable_waiting_room")
       end
     end
 

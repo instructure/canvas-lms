@@ -53,7 +53,7 @@ describe "Translation" do
     allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "sagemaker.yml" => { "endpoint_name" => "translation-endpoint" }.to_yaml })
 
     # Mock statsd to allow it to receive what we expect
-    allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    allow(InstStatsd::Statsd).to receive(:increment)
 
     # Mock the runtime and the credential provider
     @runtime_mock = instance_double(Aws::SageMakerRuntime::Client)
@@ -93,7 +93,7 @@ describe "Translation" do
 
     it "increments the translation metric" do
       Translation.create(tgt_lang: "en", text: "¿Dónde está el baño?")
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.create.es.en")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("translation.create.es.en")
     end
   end
 

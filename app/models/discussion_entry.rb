@@ -108,7 +108,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def log_discussion_entry_metrics
-    InstStatsd::Statsd.distributed_increment("discussion_entry.created")
+    InstStatsd::Statsd.increment("discussion_entry.created")
   end
 
   def parse_and_create_mentions

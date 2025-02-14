@@ -665,7 +665,7 @@ describe MicrosoftSync::SyncerSteps do
         allow(graph_service.groups).to receive(:remove_users_ignore_missing)
 
         allow(Rails.logger).to receive(:warn)
-        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
         allow(InstStatsd::Statsd).to receive(:count).and_call_original
 
         subject
@@ -673,7 +673,7 @@ describe MicrosoftSync::SyncerSteps do
         expect(Rails.logger).to have_received(:warn).twice.with(
           /Skipping add for 3: .*debuginfo/
         )
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).twice.with(
+        expect(InstStatsd::Statsd).to have_received(:increment).twice.with(
           "microsoft_sync.syncer_steps.skipped_batches.add",
           tags: { sync_type: sync_type_statsd_tag }
         )
@@ -721,7 +721,7 @@ describe MicrosoftSync::SyncerSteps do
           .twice.and_return(membership_change_result_double(2, "debuginfo"))
 
         allow(Rails.logger).to receive(:warn)
-        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
         allow(InstStatsd::Statsd).to receive(:count).and_call_original
 
         subject
@@ -729,7 +729,7 @@ describe MicrosoftSync::SyncerSteps do
         expect(Rails.logger).to have_received(:warn).twice.with(
           /Skipping remove for 2.*debuginfo/
         )
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).twice.with(
+        expect(InstStatsd::Statsd).to have_received(:increment).twice.with(
           "microsoft_sync.syncer_steps.skipped_batches.remove",
           tags: { sync_type: sync_type_statsd_tag }
         )
@@ -967,9 +967,9 @@ describe MicrosoftSync::SyncerSteps do
         end
 
         it "increments the statsd counter partial_into_full" do
-          allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
+          allow(InstStatsd::Statsd).to receive(:increment).and_call_original
           subject
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment)
+          expect(InstStatsd::Statsd).to have_received(:increment)
             .with("microsoft_sync.syncer_steps.partial_into_full")
         end
 
@@ -1083,9 +1083,9 @@ describe MicrosoftSync::SyncerSteps do
               end
 
               it "increments the statsd counter partial_into_full_throttled" do
-                allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
+                allow(InstStatsd::Statsd).to receive(:increment).and_call_original
                 subject
-                expect(InstStatsd::Statsd).to have_received(:distributed_increment)
+                expect(InstStatsd::Statsd).to have_received(:increment)
                   .with("microsoft_sync.syncer_steps.partial_into_full_throttled")
               end
             end

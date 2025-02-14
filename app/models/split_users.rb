@@ -173,7 +173,7 @@ class SplitUsers
     # and move on. this is a rare case, but it can happen if we swap source user lti/uuid
     # values (to the restored/target user) that match the merge data items we're trying to restore
     # to the source user.
-    InstStatsd::Statsd.distributed_increment("split_users.undo_move_lti_ids.unique_constraint_failure")
+    InstStatsd::Statsd.increment("split_users.undo_move_lti_ids.unique_constraint_failure")
   end
 
   def check_and_update_local_ids(records)
