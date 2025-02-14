@@ -168,7 +168,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
       it 'increments the "expected" counter' do
         allow(endpoints).to receive(:add_users_via_batch)
         subject
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment)
+        expect(InstStatsd::Statsd).to have_received(:increment)
           .with("microsoft_sync.graph_service.expected",
                 tags: hash_including(msft_endpoint: "patch_groups"))
       end

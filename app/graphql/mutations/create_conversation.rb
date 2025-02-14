@@ -94,21 +94,21 @@ class Mutations::CreateConversation < Mutations::BaseMutation
                                                .order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
         Conversation.preload_participants(conversations.map(&:conversation))
         ConversationParticipant.preload_latest_messages(conversations, @current_user)
-        InstStatsd::Statsd.distributed_increment("inbox.message.sent.react")
+        InstStatsd::Statsd.increment("inbox.message.sent.react")
         InstStatsd::Statsd.count("inbox.conversation.created.react", conversations.count)
-        InstStatsd::Statsd.distributed_increment("inbox.conversation.sent.react")
+        InstStatsd::Statsd.increment("inbox.conversation.sent.react")
         InstStatsd::Statsd.count("inbox.message.sent.recipients.react", recipients.count)
         if context_type == "Account" || context_type.nil?
-          InstStatsd::Statsd.distributed_increment("inbox.conversation.sent.account_context.react")
+          InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.react")
         end
         if message.has_media_objects || input[:media_comment_id]
-          InstStatsd::Statsd.distributed_increment("inbox.message.sent.media.react")
+          InstStatsd::Statsd.increment("inbox.message.sent.media.react")
         end
         if message[:attachment_ids].present?
-          InstStatsd::Statsd.distributed_increment("inbox.message.sent.attachment.react")
+          InstStatsd::Statsd.increment("inbox.message.sent.attachment.react")
         end
         if input[:bulk_message]
-          InstStatsd::Statsd.distributed_increment("inbox.conversation.sent.individual_message_option.react")
+          InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.react")
         end
         return { conversations: }
       else
@@ -125,21 +125,21 @@ class Mutations::CreateConversation < Mutations::BaseMutation
           update_for_sender: false,
           cc_author: true
         )
-        InstStatsd::Statsd.distributed_increment("inbox.conversation.created.react")
-        InstStatsd::Statsd.distributed_increment("inbox.message.sent.react")
-        InstStatsd::Statsd.distributed_increment("inbox.conversation.sent.react")
+        InstStatsd::Statsd.increment("inbox.conversation.created.react")
+        InstStatsd::Statsd.increment("inbox.message.sent.react")
+        InstStatsd::Statsd.increment("inbox.conversation.sent.react")
         InstStatsd::Statsd.count("inbox.message.sent.recipients.react", recipients.count)
         if message.has_media_objects || input[:media_comment_id]
-          InstStatsd::Statsd.distributed_increment("inbox.message.sent.media.react")
+          InstStatsd::Statsd.increment("inbox.message.sent.media.react")
         end
         if message[:attachment_ids].present?
-          InstStatsd::Statsd.distributed_increment("inbox.message.sent.attachment.react")
+          InstStatsd::Statsd.increment("inbox.message.sent.attachment.react")
         end
         if context_type == "Account" || context_type.nil?
-          InstStatsd::Statsd.distributed_increment("inbox.conversation.sent.account_context.react")
+          InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.react")
         end
         if input[:bulk_message]
-          InstStatsd::Statsd.distributed_increment("inbox.conversation.sent.individual_message_option.react")
+          InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.react")
         end
         return { conversations: [conversation] }
       end

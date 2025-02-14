@@ -151,7 +151,7 @@ module Lti
         end
       rescue => e
         code ||= response_code_for_rescue(e) if e
-        InstStatsd::Statsd.distributed_increment("canvas.deep_linking_controller.request_error", tags: { code: })
+        InstStatsd::Statsd.increment("canvas.deep_linking_controller.request_error", tags: { code: })
         raise e
       end
 

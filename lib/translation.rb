@@ -333,7 +333,7 @@ module Translation
       if tgt_lang.nil?
         tgt_lang = trim_locale(user.locale)
       end
-      InstStatsd::Statsd.distributed_increment("translation.create.#{src_lang}.#{tgt_lang}")
+      InstStatsd::Statsd.increment("translation.create.#{src_lang}.#{tgt_lang}")
       # TODO: Error handling of invoke endpoint.
       response = sagemaker_client.invoke_endpoint(
         endpoint_name: @endpoint,

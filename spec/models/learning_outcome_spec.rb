@@ -167,7 +167,7 @@ describe LearningOutcome do
     end
 
     it "adding outcomes to a rubric should increment datadog counter" do
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
       @rubric = Rubric.new(context: @course)
       @rubric.data = [
         {
@@ -192,16 +192,16 @@ describe LearningOutcome do
         }
       ]
       @rubric.save!
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("learning_outcome.align", tags: { type: @rubric.class.name })
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("feature_flag_check", any_args).at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("learning_outcome.align", tags: { type: @rubric.class.name })
+      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "adding outcomes to an AssessmentQuestionBank should increment datadog counter" do
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
       @question_bank = AssessmentQuestionBank.create(context: @course)
       @outcome.align(@question_bank, @course, mastery_score: 0.5)
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("learning_outcome.align", tags: { type: @question_bank.class.name })
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("feature_flag_check", any_args).at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("learning_outcome.align", tags: { type: @question_bank.class.name })
+      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "allows learning outcome rows in the rubric" do

@@ -160,8 +160,8 @@ describe RubricImport do
 
     describe "succeeded" do
       it "should run the import with single rubric and criteria" do
-        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
-        expect(InstStatsd::Statsd).to receive(:distributed_increment).with("account.rubrics.csv_imported").at_least(:once)
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+        expect(InstStatsd::Statsd).to receive(:increment).with("account.rubrics.csv_imported").at_least(:once)
         import = create_import_manually(full_csv)
         import.run
 

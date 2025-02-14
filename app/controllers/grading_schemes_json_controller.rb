@@ -320,19 +320,19 @@ class GradingSchemesJsonController < ApplicationController
 
   def track_update_metrics(grading_standard)
     if grading_standard.changed.include?("points_based")
-      InstStatsd::Statsd.distributed_increment("grading_scheme.update.points_based") if grading_standard.points_based
-      InstStatsd::Statsd.distributed_increment("grading_scheme.update.percentage_based") unless grading_standard.points_based
+      InstStatsd::Statsd.increment("grading_scheme.update.points_based") if grading_standard.points_based
+      InstStatsd::Statsd.increment("grading_scheme.update.percentage_based") unless grading_standard.points_based
     end
     if grading_standard.changed.include?("workflow_state")
-      InstStatsd::Statsd.distributed_increment("grading_scheme.update.workflow_archived") if grading_standard.archived
-      InstStatsd::Statsd.distributed_increment("grading_scheme.update.workflow_active") if grading_standard.active
-      InstStatsd::Statsd.distributed_increment("grading_scheme.update.workflow_deleted") if grading_standard.deleted
+      InstStatsd::Statsd.increment("grading_scheme.update.workflow_archived") if grading_standard.archived
+      InstStatsd::Statsd.increment("grading_scheme.update.workflow_active") if grading_standard.active
+      InstStatsd::Statsd.increment("grading_scheme.update.workflow_deleted") if grading_standard.deleted
     end
   end
 
   def track_create_metrics(grading_standard)
-    InstStatsd::Statsd.distributed_increment("grading_scheme.create.points_based") if grading_standard.points_based
-    InstStatsd::Statsd.distributed_increment("grading_scheme.create.percentage_based") unless grading_standard.points_based
+    InstStatsd::Statsd.increment("grading_scheme.create.points_based") if grading_standard.points_based
+    InstStatsd::Statsd.increment("grading_scheme.create.percentage_based") unless grading_standard.points_based
   end
 
   def validate_read_permission

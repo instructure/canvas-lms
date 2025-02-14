@@ -2521,9 +2521,9 @@ class Account < ActiveRecord::Base
 
     # If an account's RQD setting hasn't been changed before, old_rqd_setting will be nil
     if (old_rqd_setting == false || old_rqd_setting.nil?) && new_rqd_setting == true
-      InstStatsd::Statsd.distributed_increment("account.settings.restrict_quantitative_data.enabled")
+      InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.enabled")
     elsif old_rqd_setting == true && new_rqd_setting == false
-      InstStatsd::Statsd.distributed_increment("account.settings.restrict_quantitative_data.disabled")
+      InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.disabled")
     end
   end
 
