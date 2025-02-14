@@ -7250,6 +7250,7 @@ nn:
       buttons: 
         add_prerequisite: "Legg til føresetnad"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: Minutt
       headings: 
         add_prerequisite: "Legg til føresetnad til %{name}"
         course_modules: Emnemodular
@@ -10573,6 +10574,7 @@ nn:
   edit_rubric_7d4d139d: "Rediger vurderingsskjema"
   edit_rubric_title_104d6fd2: "Endre vurderingsskjema: %{title}"
   edit_section_name_558cc89: "Rediger seksjon \"%{name}\""
+  edit_sections_7d0e4e34: "Rediger seksjonar"
   edit_status_612572db: "Rediger status"
   edit_submission_status_from_speedgrader_5e1b1cd4: "Rediger innleveringsstatus frå SpeedGrader"
   edit_survey_b0d6890d: "Rediger undersøking"
@@ -15048,6 +15050,7 @@ nn:
   link_title_189888b7: Lenketittel
   link_title_d959a7b3: Lenketittel
   link_to_lti_tools_608df3b0: "Lenke til LTI-verktøy."
+  link_to_students_91edf7ea: "Lenker til studentar"
   link_to_url_52dd935c: "Lenke til URL"
   link_url_a213671c: Lenke-URL
   link_url_cf96376: Lenke-URL
@@ -20249,6 +20252,7 @@ nn:
   ppt_9393890d: ppt
   practice_quiz_19a8505d: Øvingsquiz
   pre_processing_92865c1d: "Førebur behandling"
+  preparing_download_percent_complete_34b48e4d: "Førebur nedlasting: %{percent}% fullført"
   prerequisite_completion_period_c562d63: "Periode føresetnaden må ferdigstillast innanfor"
   prerequisite_f361cd61: Forhåndskrav
   prerequisites_49659f16: "Føresetnader:"
@@ -22421,6 +22425,7 @@ nn:
   remove_filter_68de01d4: "Fjern filter"
   remove_filter_6f7204e2: "Fjern filter"
   remove_filtername_filter_6b6d7063: "Fjern %{filterName} filter"
+  remove_from_course_6fb47aee: "Fjern frå emnet"
   remove_grading_scheme_title_d3942a08: "Fjern vurderingsskjema %{title}"
   remove_group_5d2f2f2d: "Fjern gruppe"
   remove_group_981d6a02: "Fjern gruppe?"
@@ -22608,6 +22613,7 @@ nn:
   reregister_9ab95a57: "Ny registrering"
   reregister_toolname_3dde0bfc: "Registrer %{toolName} på nytt"
   reschedule_9f780bb8: "Planlegg på nytt"
+  resend_invitation_486bd513: "Send invitasjonen på nytt"
   reserved_by_d563e7d2: "Reservert av:"
   reserved_by_you_cd03b62d: "Reservert av meg"
   reserved_f247b60b: Reservert
