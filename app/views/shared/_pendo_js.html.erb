@@ -1,0 +1,53 @@
+<%
+# Copyright (C) 2025 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+<script type="text/javascript">
+  (function loadPendo(apiKey) {
+    // Inject the Pendo agent script
+    (function loadPendoAgent(global, document, tagName, namespace) {
+      const pendo = global[namespace] = global[namespace] || {};
+      pendo._q = pendo._q || [];
+
+      const methods = ['initialize', 'identify', 'updateOptions', 'pageLoad', 'track'];
+      methods.forEach(method => {
+        pendo[method] = pendo[method] || function(...args) {
+          const action = method === 'initialize' ? 'unshift' : 'push';
+          pendo._q[action]([method, ...args]);
+        };
+      });
+
+      const scriptElement = document.createElement(tagName);
+      scriptElement.async = true;
+      scriptElement.src = `https://cdn.pendo.io/agent/static/${apiKey}/pendo.js`;
+      const firstScript = document.getElementsByTagName(tagName)[0];
+      firstScript.parentNode.insertBefore(scriptElement, firstScript);
+    })(window, document, 'script', 'pendo');
+
+    // Delay initialization to allow the Pendo agent script to load
+    setTimeout(() => {
+      pendo.initialize({
+        visitor: {
+          id: ENV.current_user_uuid,
+          role: ENV.current_user_roles[ENV.current_user_roles.length - 1],
+        },
+        account: {
+          id: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
+        },
+      });
+    }, 1000);
+  })('<%= usage_metrics_api_key %>');
+</script>

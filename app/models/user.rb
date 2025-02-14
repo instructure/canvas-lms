@@ -2021,20 +2021,6 @@ class User < ActiveRecord::Base
     super
   end
 
-  def heap_id(root_account: nil)
-    # this is called in read-only contexts where we can't create a missing uuid
-    # (uuid-less users should be rare in real life but they exist in specs and maybe unauthenticated requests)
-    return nil unless self["uuid"]
-
-    # for an explanation of these, see
-    # https://instructure.atlassian.net/wiki/spaces/HEAP/pages/85854749165/RFC+Advanced+HEAP+installation
-    if root_account
-      "uu-2-#{Digest::SHA256.hexdigest(uuid)}-#{root_account.uuid}"
-    else
-      "uu-1-#{Digest::SHA256.hexdigest(uuid)}"
-    end
-  end
-
   def self.serialization_excludes
     %i[
       uuid
