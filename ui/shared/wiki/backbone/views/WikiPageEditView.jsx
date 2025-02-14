@@ -31,6 +31,7 @@ import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
 import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 import {LATEST_BLOCK_DATA_VERSION} from '@canvas/block-editor/react/utils'
+import {TITLE_MAX_LENGTH} from '../../utils/constants'
 
 const I18n = createI18nScope('pages')
 
@@ -358,6 +359,15 @@ export default class WikiPageEditView extends ValidatedFormView {
         {
           type: 'required',
           message: I18n.t('A page title is required'),
+        },
+      ]
+    }
+
+    if (data.title?.length > TITLE_MAX_LENGTH) {
+      errors.title = [
+        {
+          type: 'too_long',
+          message: I18n.t("Title can't exceed %{max} characters", {max: TITLE_MAX_LENGTH}),
         },
       ]
     }
