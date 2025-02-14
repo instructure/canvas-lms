@@ -72,6 +72,8 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
   const [selectedCourse, setSelectedCourse] = useState<CourseOption | null>(null)
   const [selectedCourseError, setSelectedCourseError] = useState<boolean>(false)
   const [includeCompletedCourses, setIncludeCompletedCourses] = useState<boolean>(true)
+  const courseSelectInputRef = useRef<HTMLInputElement | null>(null)
+  const courseSelectDropdownRef = useRef<HTMLInputElement | null>(null)
 
   const composeManageableCourseURL = useCallback(
     (currentSearchParam?: string, includeConcluded?: boolean) => {
@@ -201,17 +203,21 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
     },
     [preloadedCourses],
   )
-
   const handleSubmit: onSubmitMigrationFormCallback = useCallback(
     formData => {
       formData.settings.source_course_id = selectedCourse?.id
       setSelectedCourseError(!selectedCourse)
       if (!selectedCourse) {
+        if (isShowSelect) {
+          courseSelectDropdownRef.current?.focus()
+        } else {
+          courseSelectInputRef.current?.focus()
+        }
         return
       }
       onSubmit(formData)
     },
-    [selectedCourse, onSubmit],
+    [selectedCourse, onSubmit, isShowSelect],
   )
 
   const interaction = isSubmitting || isPreloadedCoursesLoading ? 'disabled' : 'enabled'
@@ -254,6 +260,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
                         messages={messages}
                         value={value}
                         scrollToHighlightedOption={true}
+                        inputRef={ref => (courseSelectDropdownRef.current = ref)}
                       >
                         <CanvasSelect.Option
                           key="emptyOption"
@@ -305,6 +312,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
                     messages={messages}
                     value={value}
                     scrollToHighlightedOption={true}
+                    inputRef={ref => (courseSelectInputRef.current = ref)}
                   >
                     {courseOptions.length > 0 ? (
                       courseOptions.map((option: CourseOption) => {

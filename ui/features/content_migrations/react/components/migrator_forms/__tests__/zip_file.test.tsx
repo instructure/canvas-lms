@@ -198,7 +198,7 @@ describe('ZipFileImporter', () => {
 
       await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
-      expect(screen.getByText('Please select a folder')).toBeInTheDocument()
+      expect(screen.getAllByText('Please select a folder')[0]).toBeInTheDocument()
     })
   })
 
@@ -227,6 +227,17 @@ describe('ZipFileImporter', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
         expect(screen.getByText(expectedFileMissingError)).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('focus after error', () => {
+    it('focuses on input after folder error', async () => {
+      renderComponent()
+      const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
+      const input = screen.getByTestId('migrationFileUpload')
+      await userEvent.upload(input, file)
+      await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+      expect(screen.getByPlaceholderText('Search folders')).toHaveFocus()
     })
   })
 })

@@ -378,4 +378,20 @@ describe('CourseCopyImporter', () => {
       })
     })
   })
+
+  describe('course input error focus', () => {
+    it('when SHOW_SELECT is false it focuses on input', async () => {
+      renderComponent()
+      await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+      expect(screen.getByTestId('course-copy-select-course')).toHaveFocus()
+    })
+
+    it('when SHOW_SELECT is true it focuses on dropdown', async () => {
+      fakeENV.setup({...defaultEnv, SHOW_SELECT: true})
+      renderComponent()
+      await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+      expect(screen.getByTestId('course-copy-select-preloaded-courses')).toHaveFocus()
+    })
+  })
+
 })
