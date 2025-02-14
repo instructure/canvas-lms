@@ -235,6 +235,39 @@ describe "Module Items API", type: :request do
       end
     end
 
+    context "show item with estimated duration" do
+      before do
+        Account.default.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: true)
+        @course.save!
+
+        @module_est = @course.context_modules.create(name: "module_est")
+        @assignment_est = @course.assignments.create!(name: "Assignment Est")
+        @assignment_est.publish! if @assignment_est.unpublished?
+        EstimatedDuration.create!(assignment_id: @assignment_est.id, duration: 12.minutes)
+        @assignment_tag_est = @module_est.add_item(id: @assignment_est.id, type: "assignment")
+        @module_est.save!
+      end
+
+      let(:json) do
+        api_call(:get,
+                 "/api/v1/courses/#{@course.id}/modules/#{@module_est.id}/items/#{@assignment_tag_est.id}?include[]=estimated_durations",
+                 controller: "context_module_items_api",
+                 action: "show",
+                 format: "json",
+                 course_id: @course.id.to_s,
+                 module_id: @module_est.id.to_s,
+                 include: %w[estimated_durations],
+                 id: @assignment_tag_est.id.to_s)
+      end
+
+      let(:estimated_duration) { json["estimated_duration"] }
+
+      it "includes item estimated duration" do
+        expect(estimated_duration).to eq("PT12M")
+      end
+    end
+
     it "returns the url for external tool items" do
       tool = @course.context_external_tools.create!(name: "b", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
       @module1.add_item(type: "external_tool", title: "Tool", id: tool.id, url: "http://www.google.com", new_tab: false, indent: 0)
@@ -1826,6 +1859,56 @@ describe "Module Items API", type: :request do
         expect(external_url_details["lock_info"]).to include(
           "asset_string" => @module1.asset_string
         )
+      end
+    end
+
+    context "index items with estimated duration" do
+      before do
+        Account.default.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: true)
+        @course.save!
+
+        @module_est = @course.context_modules.create(name: "module_est")
+        @assignment_est = @course.assignments.create!(name: "Assignment Est")
+        @assignment_est.publish! if @assignment_est.unpublished?
+        EstimatedDuration.create!(assignment_id: @assignment_est.id, duration: 12.minutes)
+        @assignment_tag_est = @module_est.add_item(id: @assignment_est.id, type: "assignment")
+        @wiki_page_est = @course.wiki_pages.create!(title: "Wiki Page Est")
+        @wiki_page_est.workflow_state = "active"
+        @wiki_page_est.save!
+        EstimatedDuration.create!(wiki_page_id: @wiki_page_est.id, duration: 30.minutes)
+        @wiki_page_tag_est = @module_est.add_item(id: @wiki_page_est.id, type: "wiki_page")
+        @module_est.save!
+      end
+
+      def api_call_with_items
+        api_call(:get,
+                 "/api/v1/courses/#{@course.id}/modules/#{@module_est.id}/items?include[]=estimated_durations",
+                 controller: "context_module_items_api",
+                 action: "index",
+                 format: "json",
+                 course_id: @course.id.to_s,
+                 module_id: @module_est.id.to_s,
+                 include: %w[estimated_durations])
+      end
+
+      it "includes estimated duration" do
+        json = api_call_with_items
+        assignment_duration = json.find { |item| item["id"] == @assignment_tag_est.id }["estimated_duration"]
+        wiki_page_duration = json.find { |item| item["id"] == @wiki_page_tag_est.id }["estimated_duration"]
+        expect(assignment_duration).to eq("PT12M")
+        expect(wiki_page_duration).to eq("PT30M")
+      end
+
+      it "does not includes estimated duration when course is not horizon" do
+        Account.default.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: false)
+        @course.save!
+        json = api_call_with_items
+        assignment_duration = json.find { |item| item["id"] == @assignment_tag_est.id }["estimated_duration"]
+        wiki_page_duration = json.find { |item| item["id"] == @wiki_page_tag_est.id }["estimated_duration"]
+        expect(assignment_duration).to be_nil
+        expect(wiki_page_duration).to be_nil
       end
     end
 
