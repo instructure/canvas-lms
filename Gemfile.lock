@@ -140,6 +140,7 @@ PATH
     canvas_http (1.0.0)
       canvas_cache
       legacy_multipart
+      logger (~> 1.5)
     canvas_kaltura (1.0.0)
       canvas_http
       canvas_slug
@@ -188,6 +189,7 @@ PATH
       activesupport (>= 5.0)
       config_file
       diplomat (>= 2.5.1)
+      logger (~> 1.5)
       railties
     event_stream (0.1.0)
       activerecord (>= 4.2)
@@ -1329,6 +1331,7 @@ DEPENDENCIES
   letter_opener (~> 1.8)
   link_header (= 0.0.8)
   live_events!
+  logger (~> 1.5)
   lti-advantage!
   lti_outbound!
   luminosity_contrast (= 0.2.1)
