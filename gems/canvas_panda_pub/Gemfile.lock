@@ -16,6 +16,7 @@ PATH
     canvas_http (1.0.0)
       canvas_cache
       legacy_multipart
+      logger (~> 1.5)
 
 PATH
   remote: ../canvas_slug
@@ -82,7 +83,7 @@ GEM
       public_suffix (>= 2.0.2, < 7.0)
     aes_key_wrap (1.1.0)
     base64 (0.2.0)
-    bigdecimal (3.1.8)
+    bigdecimal (3.1.9)
     bindata (2.5.0)
     builder (3.3.0)
     concurrent-ruby (1.3.4)

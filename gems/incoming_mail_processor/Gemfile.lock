@@ -106,7 +106,7 @@ GEM
     aws-sigv4 (1.10.1)
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.2.0)
-    bigdecimal (3.1.8)
+    bigdecimal (3.1.9)
     builder (3.3.0)
     code_ownership (1.38.1)
       code_teams (~> 1.0)
