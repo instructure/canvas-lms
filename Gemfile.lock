@@ -518,7 +518,7 @@ GEM
       mustache
       pygments.rb
       redcarpet
-    dumb_delegator (1.0.0)
+    dumb_delegator (1.1.0)
     encrypted_cookie_store-instructure (1.2.13)
       actionpack (>= 4.2, < 7.2)
     erubi (1.13.0)
