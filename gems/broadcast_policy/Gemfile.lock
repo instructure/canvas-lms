@@ -28,7 +28,7 @@ GEM
       activerecord (>= 5.2)
     base64 (0.2.0)
     bigdecimal (3.1.9)
-    concurrent-ruby (1.3.4)
+    concurrent-ruby (1.3.5)
     connection_pool (2.4.1)
     date (3.4.1)
     debug (1.10.0)
