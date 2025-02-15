@@ -100,7 +100,7 @@ GEM
     diff-lcs (1.6.0)
     digest-murmurhash (1.1.1)
     drb (2.2.1)
-    erubi (1.13.0)
+    erubi (1.13.1)
     faraday (2.10.1)
       faraday-net_http (>= 2.0, < 3.2)
       logger

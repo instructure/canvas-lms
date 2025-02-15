@@ -91,7 +91,7 @@ GEM
     diff-lcs (1.6.0)
     digest-murmurhash (1.1.1)
     drb (2.2.1)
-    erubi (1.13.0)
+    erubi (1.13.1)
     guardrail (3.0.3)
       activerecord (>= 6.1, < 7.2)
       railties (>= 6.1, < 7.2)

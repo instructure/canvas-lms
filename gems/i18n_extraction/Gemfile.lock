@@ -30,7 +30,7 @@ GEM
     connection_pool (2.4.1)
     diff-lcs (1.6.0)
     drb (2.2.1)
-    erubi (1.13.0)
+    erubi (1.13.1)
     globby (0.1.2)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)

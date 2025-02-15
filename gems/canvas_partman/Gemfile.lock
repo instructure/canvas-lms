@@ -58,7 +58,7 @@ GEM
     diff-lcs (1.6.0)
     docile (1.4.1)
     drb (2.2.1)
-    erubi (1.13.0)
+    erubi (1.13.1)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     io-console (0.8.0)
