@@ -72,13 +72,13 @@ describe Attachments::Verification do
 
   context "verifying a verifier" do
     before do
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
     end
 
     it "verifies a legacy verifier for read and download" do
       expect(v.valid_verifier_for_permission?(attachment.uuid, :read)).to be(true)
       expect(v.valid_verifier_for_permission?(attachment.uuid, :download)).to be(true)
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("attachments.legacy_verifier_success").twice
+      expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.legacy_verifier_success").twice
     end
 
     it "accepts the uuid of another copy of the file" do
@@ -87,14 +87,14 @@ describe Attachments::Verification do
       v2 = Attachments::Verification.new(clone)
       expect(v2.valid_verifier_for_permission?(attachment.uuid, :read)).to be true
       expect(v2.valid_verifier_for_permission?(attachment.uuid, :download)).to be true
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("attachments.related_verifier_success").twice
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("feature_flag_check", any_args).at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.related_verifier_success").twice
+      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "returns false on an invalid verifier" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_raise(CanvasSecurity::InvalidToken)
       expect(v.valid_verifier_for_permission?("token", :read)).to be(false)
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("attachments.token_verifier_invalid")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_invalid")
     end
 
     it "returns false on a verifier that is not of type String" do
@@ -107,7 +107,7 @@ describe Attachments::Verification do
                                                                                 id: attachment.global_id + 1
                                                                               })
       expect(v.valid_verifier_for_permission?("token", :read)).to be(false)
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("attachments.token_verifier_id_mismatch")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_id_mismatch")
     end
 
     it "does not let a student download an attachment that's locked" do
@@ -119,7 +119,7 @@ describe Attachments::Verification do
                                                                               }).twice
       expect(v2.valid_verifier_for_permission?("token", :read)).to be(true)
       expect(v2.valid_verifier_for_permission?("token", :download)).to be(false)
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("attachments.token_verifier_success").twice
+      expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_success").twice
     end
 
     it "follows custom permissions" do

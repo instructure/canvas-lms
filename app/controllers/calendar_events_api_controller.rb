@@ -624,7 +624,7 @@ class CalendarEventsApiController < ApplicationController
           raise ActiveRecord::Rollback
         else
           statsd_event_create_tags = @current_user.participating_enrollments.pluck(:type).uniq.map { |type| "enrollment_type:#{type}" }.append("calendar_event_type:#{event_type_tag}")
-          InstStatsd::Statsd.distributed_increment("calendar.calendar_event.create", tags: statsd_event_create_tags)
+          InstStatsd::Statsd.increment("calendar.calendar_event.create", tags: statsd_event_create_tags)
 
           original_event = events.shift
           render json: event_json(
@@ -2125,7 +2125,7 @@ class CalendarEventsApiController < ApplicationController
     # the limit. We're tracking to see how often this happens.
     per_page = Api.per_page_for(self)
     if event_count > per_page
-      InstStatsd::Statsd.distributed_increment("calendar.events_api.per_page_exceeded.count")
+      InstStatsd::Statsd.increment("calendar.events_api.per_page_exceeded.count")
       InstStatsd::Statsd.count("calendar.events_api.per_page_exceeded.value", event_count)
     end
   end

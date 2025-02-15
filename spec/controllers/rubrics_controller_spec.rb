@@ -1092,7 +1092,7 @@ describe RubricsController do
       before do
         course_with_teacher_logged_in(active_all: true)
         @assignment = @course.assignments.create!(assignment_valid_attributes)
-        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
       end
 
       let(:create_params) do
@@ -1151,19 +1151,19 @@ describe RubricsController do
         end
 
         it "track rubric created with old version" do
-          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.created_old").at_least(:once)
+          expect(InstStatsd::Statsd).to receive(:increment).with("course.rubrics.created_old").at_least(:once)
 
           post "create", params: create_params
         end
 
         it "track creationfrom assignments ui" do
-          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.created_from_assignment").at_least(:once)
+          expect(InstStatsd::Statsd).to receive(:increment).with("course.rubrics.created_from_assignment").at_least(:once)
 
           post "create", params: create_params
         end
 
         it "track rubric updated with old version" do
-          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.updated_old").at_least(:once)
+          expect(InstStatsd::Statsd).to receive(:increment).with("course.rubrics.updated_old").at_least(:once)
 
           rubric_association_model(user: @user, context: @course)
           put "update", params: { course_id: @course.id, id: @rubric.id, rubric: { title: "new title" } }
@@ -1176,27 +1176,27 @@ describe RubricsController do
         end
 
         it "track rubric created with enhanced version" do
-          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.created_enhanced").at_least(:once)
+          expect(InstStatsd::Statsd).to receive(:increment).with("course.rubrics.created_enhanced").at_least(:once)
 
           post "create", params: create_params
         end
 
         it "track rubric duplicate" do
-          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.duplicated_enhanced").at_least(:once)
+          expect(InstStatsd::Statsd).to receive(:increment).with("course.rubrics.duplicated_enhanced").at_least(:once)
           create_params["rubric"]["is_duplicate"] = true
           post "create", params: create_params
         end
 
         it "track rubric updated with enhanced version" do
-          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.updated_enhanced").at_least(:once)
+          expect(InstStatsd::Statsd).to receive(:increment).with("course.rubrics.updated_enhanced").at_least(:once)
 
           rubric_association_model(user: @user, context: @course)
           put "update", params: { course_id: @course.id, id: @rubric.id, rubric: { title: "new title" } }
         end
 
         it "track rubric aligned with outcome" do
-          allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
-          expect(InstStatsd::Statsd).to receive(:distributed_increment)
+          allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+          expect(InstStatsd::Statsd).to receive(:increment)
             .with("rubrics_management.rubric_criterion.aligned_with_outcome_used_for_scoring")
             .at_least(:once)
           outcome_group = @course.root_outcome_group

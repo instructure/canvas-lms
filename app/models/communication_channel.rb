@@ -311,12 +311,12 @@ class CommunicationChannel < ActiveRecord::Base
     case path_type
     when TYPE_SMS
       if Setting.get("mfa_via_sms", true) == "true" && e164_path && account&.feature_enabled?(:notification_service)
-        InstStatsd::Statsd.distributed_increment("message.deliver.sms.one_time_password",
-                                                 short_stat: "message.deliver",
-                                                 tags: { path_type: "sms", notification_name: "one_time_password" })
-        InstStatsd::Statsd.distributed_increment("message.deliver.sms.#{account.global_id}",
-                                                 short_stat: "message.deliver_per_account",
-                                                 tags: { path_type: "sms", root_account_id: account.global_id })
+        InstStatsd::Statsd.increment("message.deliver.sms.one_time_password",
+                                     short_stat: "message.deliver",
+                                     tags: { path_type: "sms", notification_name: "one_time_password" })
+        InstStatsd::Statsd.increment("message.deliver.sms.#{account.global_id}",
+                                     short_stat: "message.deliver_per_account",
+                                     tags: { path_type: "sms", root_account_id: account.global_id })
         Services::NotificationService.process(
           "otp:#{global_id}",
           message,
@@ -434,7 +434,7 @@ class CommunicationChannel < ActiveRecord::Base
     # can be used for any root_account, so just set root_account_ids from user.
     self.root_account_ids = user.root_account_ids
     if root_account_ids_changed? && log
-      InstStatsd::Statsd.distributed_increment("communication_channel.root_account_ids_set")
+      InstStatsd::Statsd.increment("communication_channel.root_account_ids_set", short_stat: "communication_channel.root_account_ids_set")
     end
     save! if persist_changes && root_account_ids_changed?
   end

@@ -462,8 +462,8 @@ class GroupCategory < ActiveRecord::Base
                  end
 
     if split_type
-      InstStatsd::Statsd.distributed_increment("groups.auto_create",
-                                               tags: { split_type:, root_account_id: root_account&.global_id, root_account_name: root_account&.name })
+      InstStatsd::Statsd.increment("groups.auto_create",
+                                   tags: { split_type:, root_account_id: root_account&.global_id, root_account_name: root_account&.name })
     end
 
     by_section = @group_by_section && context.is_a?(Course)

@@ -920,9 +920,9 @@ describe UserMerge do
       it "falls back on the old behavior if unique constraint check fails" do
         # force a constraint violation by stubbing out the shadow record update
         expect(@user1).to receive(:update_shadow_records_synchronously!).at_least(:once).and_return(nil)
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         expect { UserMerge.from(@user1).into(@user2) }.not_to raise_error
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("user_merge.move_lti_ids.unique_constraint_failure")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("user_merge.move_lti_ids.unique_constraint_failure")
         expect(@user1.reload).to be_deleted
         expect(@user1.lti_context_id).to eq @lti_context_id_1
         expect(@user2.past_lti_ids.shard(@shard1).where(user_lti_context_id: @lti_context_id_1)).to exist

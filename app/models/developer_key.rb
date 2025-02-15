@@ -528,7 +528,7 @@ class DeveloperKey < ActiveRecord::Base
     tags = { method: }
     latency = (Time.zone.now.to_i - start_time) * 1000 # ms for DD
 
-    InstStatsd::Statsd.distributed_increment("#{stat_prefix}.count", tags:)
+    InstStatsd::Statsd.increment("#{stat_prefix}.count", tags:)
     InstStatsd::Statsd.timing("#{stat_prefix}.latency", latency, tags:)
 
     if exception

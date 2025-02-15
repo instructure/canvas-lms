@@ -3072,7 +3072,7 @@ describe "Users API", type: :request do
 
       it "emits user.set_custom_color to statsd" do
         course_with_student(active_all: true)
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         api_call(
           :put,
           "/api/v1/users/#{@user.id}/colors/course_#{@course.id}",
@@ -3086,7 +3086,7 @@ describe "Users API", type: :request do
           {},
           { expected_status: 200 }
         )
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("user.set_custom_color", tags: %w[enrollment_type:StudentEnrollment])
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("user.set_custom_color", tags: %w[enrollment_type:StudentEnrollment])
       end
     end
 
