@@ -40,7 +40,7 @@ GEM
     crack (1.0.0)
       bigdecimal
       rexml
-    diff-lcs (1.5.1)
+    diff-lcs (1.6.0)
     dogstatsd-ruby (5.6.3)
     drb (2.2.1)
     faraday (2.10.1)

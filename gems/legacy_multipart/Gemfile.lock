@@ -14,7 +14,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    diff-lcs (1.5.1)
+    diff-lcs (1.6.0)
     logger (1.6.6)
     mime-types (3.6.0)
       logger

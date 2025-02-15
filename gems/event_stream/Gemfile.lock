@@ -83,7 +83,7 @@ GEM
     connection_pool (2.4.1)
     crass (1.0.6)
     date (3.4.1)
-    diff-lcs (1.5.1)
+    diff-lcs (1.6.0)
     docile (1.4.1)
     dogstatsd-ruby (5.6.3)
     drb (2.2.1)
