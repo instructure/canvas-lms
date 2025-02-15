@@ -141,7 +141,7 @@ GEM
       faraday (~> 2.0)
       faraday-follow_redirects
     logger (1.6.6)
-    loofah (2.23.1)
+    loofah (2.24.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     mini_portile2 (2.8.8)
