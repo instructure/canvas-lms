@@ -79,7 +79,7 @@ GEM
     nokogiri (1.17.2-x86_64-linux)
       racc (~> 1.4)
     pg (1.5.9)
-    psych (5.2.1)
+    psych (5.2.3)
       date
       stringio
     racc (1.8.1)

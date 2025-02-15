@@ -91,7 +91,7 @@ GEM
     parser (3.3.6.0)
       ast (~> 2.4.1)
       racc
-    psych (5.2.1)
+    psych (5.2.3)
       date
       stringio
     racc (1.8.1)
