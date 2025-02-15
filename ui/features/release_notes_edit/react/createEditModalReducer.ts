@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {createDefaultState} from './util'
+import {type ReleaseNoteEditing} from './types'
+
 export enum Actions {
   RESET = 1,
   SET_TARGET_ROLES,
@@ -26,36 +29,13 @@ export enum Actions {
   SET_SUBMIT,
 }
 
-type Transition = {action: Actions; payload?: any}
-export type ReleaseNote = {
-  id?: string
-  target_roles: string[]
-  langs: {[key: string]: {title: string; description: string}}
-  show_ats: {[key: string]: string}
-  published: boolean
-  elementsWithErrors: {[key: string]: string}
-  isSubmitting: boolean
-}
+export type Transition = {action: Actions; payload?: any}
 export type ReducerParams = {
-  state: ReleaseNote
+  state: ReleaseNoteEditing
   dispatch: (t: Transition) => void
 }
 
-const DEFAULT_STATE: ReleaseNote = {
-  target_roles: ['user'],
-  langs: {en: {title: '', description: ''}},
-  show_ats: {},
-  published: false,
-  elementsWithErrors: {},
-  isSubmitting: false,
-}
-
-export function createDefaultState(current: ReleaseNote | null) {
-  if (current) return {...DEFAULT_STATE, ...current}
-  return DEFAULT_STATE
-}
-
-export function reducer(state: ReleaseNote, transition: Transition): ReleaseNote {
+export function reducer(state: ReleaseNoteEditing, transition: Transition): ReleaseNoteEditing {
   const {action, payload} = transition
   const {env, key, lang, value} = payload ?? {}
 

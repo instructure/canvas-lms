@@ -17,27 +17,53 @@
  */
 
 import React, {useReducer, useState, useCallback} from 'react'
-import {array} from 'prop-types'
 import {cloneDeep} from 'lodash'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {Alert} from '@instructure/ui-alerts'
+import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import NotesTable from './NotesTable'
 import CreateEditModal from './CreateEditModal'
+import type {Links} from '@canvas/parse-link-header/parseLinkHeader'
+import type {ReleaseNote} from './types'
 
 const I18n = createI18nScope('release_notes')
 
-function notesReducer(prevState, action) {
+type Notes = {
+  notes: ReleaseNote[]
+  nextPage: string | null
+  loading: boolean
+  error?: Error
+}
+type NotesReducerTransition = {
+  type:
+    | 'FETCH_LOADING'
+    | 'FETCH_META'
+    | 'FETCH_SUCCESS'
+    | 'FETCH_ERROR'
+    | 'PUBLISHED_STATE'
+    | 'UPSERT_NOTE'
+    | 'REMOVE_NOTE'
+  payload: any
+}
+
+function isFetchApiError(error: Error): error is FetchApiError {
+  return error instanceof FetchApiError
+}
+
+function notesReducer(prevState: Notes, action: NotesReducerTransition) {
   if (action.type === 'FETCH_LOADING') {
     return {...prevState, loading: action.payload}
   } else if (action.type === 'FETCH_META') {
+    if (!action.payload) return prevState // if no link header, do nothing
     return {...prevState, nextPage: action.payload.next}
   } else if (action.type === 'FETCH_SUCCESS') {
     const newNotes = [...prevState.notes]
-    action.payload.forEach(row => {
+    const fetchedNotes = action.payload as ReleaseNote[]
+    fetchedNotes.forEach(row => {
       if (!prevState.notes.some(n => n.id === row.id)) {
         newNotes.push(row)
       }
@@ -46,7 +72,7 @@ function notesReducer(prevState, action) {
   } else if (action.type === 'PUBLISHED_STATE') {
     const newNotes = cloneDeep(prevState.notes)
     const relevantNote = newNotes.find(n => n.id === action.payload.id)
-    relevantNote.published = action.payload.state
+    if (relevantNote) relevantNote.published = action.payload.state
     return {...prevState, notes: newNotes}
   } else if (action.type === 'UPSERT_NOTE') {
     const newNotes = [...prevState.notes]
@@ -61,11 +87,18 @@ function notesReducer(prevState, action) {
   } else if (action.type === 'REMOVE_NOTE') {
     const newNotes = prevState.notes.filter(note => note.id !== action.payload.id)
     return {...prevState, notes: newNotes}
+  } else if (action.type === 'FETCH_ERROR') {
+    return {...prevState, error: action.payload as Error}
   }
   return prevState
 }
 
-function ReleaseNotesEdit({envs, langs}) {
+interface ReleaseNotesEditProps {
+  envs: string[]
+  langs: string[]
+}
+
+export default function ReleaseNotesEdit({envs, langs}: ReleaseNotesEditProps): JSX.Element {
   const [state, dispatch] = useReducer(notesReducer, {
     notes: [],
     nextPage: null,
@@ -73,9 +106,9 @@ function ReleaseNotesEdit({envs, langs}) {
   })
   const [page, setPage] = useState(null)
   const [showDialog, setShowDialog] = useState(false)
-  const [currentNote, setCurrentNote] = useState(null)
+  const [currentNote, setCurrentNote] = useState<ReleaseNote | null>(null)
 
-  const editNote = useCallback(note => {
+  const editNote = useCallback((note: ReleaseNote) => {
     setCurrentNote(note)
     setShowDialog(true)
   }, [])
@@ -87,14 +120,17 @@ function ReleaseNotesEdit({envs, langs}) {
 
   useFetchApi({
     path: '/api/v1/release_notes',
-    success: useCallback(response => {
+    success: useCallback((response: ReleaseNote[]) => {
       dispatch({type: 'FETCH_SUCCESS', payload: response})
     }, []),
-    meta: useCallback(({link}) => {
+    meta: useCallback(({link}: {link?: Links; response: any}) => {
       dispatch({type: 'FETCH_META', payload: link})
     }, []),
-    error: useCallback(error => dispatch({type: 'FETCH_ERROR', payload: error}), []),
-    loading: useCallback(loading => dispatch({type: 'FETCH_LOADING', payload: loading}), []),
+    error: useCallback((error: Error) => dispatch({type: 'FETCH_ERROR', payload: error}), []),
+    loading: useCallback(
+      (loading: boolean) => dispatch({type: 'FETCH_LOADING', payload: loading}),
+      [],
+    ),
     params: {
       includes: ['langs'],
       per_page: 20,
@@ -102,21 +138,24 @@ function ReleaseNotesEdit({envs, langs}) {
     },
   })
 
-  const setPublished = useCallback(async (id, publishedState) => {
-    await doFetchApi({
-      path: `/api/v1/release_notes/${id}/published`,
-      method: publishedState ? 'PUT' : 'DELETE',
-    })
-    dispatch({
-      type: 'PUBLISHED_STATE',
-      payload: {
-        id,
-        state: publishedState,
-      },
-    })
-  }, [])
+  const setPublished = useCallback(
+    async (id: Required<ReleaseNote>['id'], publishedState: boolean): Promise<void> => {
+      await doFetchApi({
+        path: `/api/v1/release_notes/${id}/published`,
+        method: publishedState ? 'PUT' : 'DELETE',
+      })
+      dispatch({
+        type: 'PUBLISHED_STATE',
+        payload: {
+          id,
+          state: publishedState,
+        },
+      })
+    },
+    [],
+  )
 
-  const upsertNote = useCallback(async newNote => {
+  const upsertNote = useCallback(async (newNote: ReleaseNote) => {
     const note = await doFetchApi({
       path: `/api/v1/release_notes${newNote.id ? `/${newNote.id}` : ''}`,
       method: newNote.id ? 'PUT' : 'POST',
@@ -126,7 +165,7 @@ function ReleaseNotesEdit({envs, langs}) {
     setShowDialog(false)
   }, [])
 
-  const deleteNote = useCallback(async id => {
+  const deleteNote = useCallback(async (id: Required<ReleaseNote>['id']): Promise<void> => {
     await doFetchApi({
       path: `/api/v1/release_notes/${id}`,
       method: 'DELETE',
@@ -136,6 +175,30 @@ function ReleaseNotesEdit({envs, langs}) {
 
   if (state.loading) {
     return <Spinner renderTitle={I18n.t('Loading')} />
+  }
+
+  if (state.error) {
+    let errorText: string
+    if (isFetchApiError(state.error)) {
+      const {status, statusText, url} = state.error.response
+      errorText = I18n.t('API %{status} %{statusText} fetching %{url}', {
+        status,
+        statusText,
+        url,
+      })
+    } else {
+      const {name, message} = state.error
+      errorText = I18n.t('non-API error, type %{name}, %{message}', {name, message})
+    }
+    return (
+      <Alert variant="error" margin="small">
+        <p>
+          <strong>{I18n.t('An error occurred while loading the release notes')}</strong>
+          <br />
+          {errorText}
+        </p>
+      </Alert>
+    )
   }
 
   return (
@@ -163,9 +226,3 @@ function ReleaseNotesEdit({envs, langs}) {
     </>
   )
 }
-
-ReleaseNotesEdit.propTypes = {
-  envs: array.isRequired,
-  langs: array.isRequired,
-}
-export default ReleaseNotesEdit

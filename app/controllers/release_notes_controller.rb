@@ -100,8 +100,8 @@ class ReleaseNotesController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @context.site_admin?
 
     @page_title = t("Canvas Release Notes")
-    js_bundle :release_notes_edit
     set_active_tab "release_notes"
+    add_crumb t("Release Notes")
     js_env({
              release_notes_langs: allowed_langs,
              release_notes_envs: allowed_envs,

@@ -35,6 +35,7 @@ import {EnvProfiles} from './EnvProfiles'
 import {EnvChangePassword} from './EnvChangePassword'
 import {EnvAlerts} from './EnvAlerts'
 import {EnvPortfolio} from './EnvPortfolio'
+import {EnvReleaseNotes} from './EnvReleaseNotes'
 
 /**
  * Top level ENV variable.
@@ -68,5 +69,6 @@ export type GlobalEnv =
         EnvProfiles &
         EnvChangePassword &
         EnvAlerts &
+        EnvReleaseNotes &
         EnvPortfolio
     >

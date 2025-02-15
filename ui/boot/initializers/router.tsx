@@ -48,6 +48,10 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/page_views/react/PageViewsRoute')}
       />
       <Route
+        path="/accounts/site_admin/release_notes"
+        lazy={() => import('../../features/release_notes_edit/react/ReleaseNotesEditRoute')}
+      />
+      <Route
         path="/accounts/:accountId/users/:userId"
         lazy={() => import('../../features/page_views/react/PageViewsRoute')}
       />

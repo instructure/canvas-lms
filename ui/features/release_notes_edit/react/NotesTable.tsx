@@ -21,10 +21,18 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 
 import NotesTableRow from './NotesTableRow'
+import {type ReleaseNote} from './types'
 
 const I18n = createI18nScope('release_notes')
 
-export default function NotesTable({notes, setPublished, editNote, deleteNote}) {
+interface NotesTableProps {
+  notes: ReleaseNote[]
+  setPublished: (id: Required<ReleaseNote>['id'], published: boolean) => void
+  editNote: (note: ReleaseNote) => void
+  deleteNote: (id: Required<ReleaseNote>['id']) => void
+}
+
+export default function NotesTable({notes, setPublished, editNote, deleteNote}: NotesTableProps) {
   return (
     <Table margin="small 0" caption={I18n.t('Release Notes')}>
       <Table.Head>
@@ -42,7 +50,7 @@ export default function NotesTable({notes, setPublished, editNote, deleteNote}) 
         {notes.map(note => (
           <NotesTableRow
             note={note}
-            togglePublished={() => setPublished(note.id, !note.published)}
+            togglePublished={() => setPublished(note.id!, !note.published)}
             editNote={editNote}
             deleteNote={deleteNote}
             key={note.id}

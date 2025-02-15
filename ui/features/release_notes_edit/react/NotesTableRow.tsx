@@ -30,12 +30,26 @@ import {Table} from '@instructure/ui-table'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {rolesObject} from './util'
+import {type ReleaseNote} from './types'
 
 const I18n = createI18nScope('release_notes')
 
-const formatLanguage = new Intl.DisplayNames(['en'], {type: 'language'})
+const locales = ENV?.LOCALES || navigator.languages || ['en-US']
+const formatLanguage = new Intl.DisplayNames(locales, {type: 'language'})
 
-export default function NotesTableRow({note, togglePublished, editNote, deleteNote}) {
+interface NotesTableRowProps {
+  note: ReleaseNote
+  togglePublished: () => void
+  editNote: (note: ReleaseNote) => void
+  deleteNote: (id: Required<ReleaseNote>['id']) => void
+}
+
+export default function NotesTableRow({
+  note,
+  togglePublished,
+  editNote,
+  deleteNote,
+}: NotesTableRowProps): JSX.Element {
   return (
     <Table.Row>
       <Table.Cell>{note.langs.en.title}</Table.Cell>
@@ -75,7 +89,7 @@ export default function NotesTableRow({note, togglePublished, editNote, deleteNo
             <IconEditLine size="x-small" />
             <View padding="0 small">{I18n.t('Edit')}</View>
           </Menu.Item>
-          <Menu.Item value="remove" onClick={() => deleteNote(note.id)}>
+          <Menu.Item value="remove" onClick={() => deleteNote(note.id!)}>
             <IconTrashLine size="x-small" />
             <View padding="0 small">{I18n.t('Remove')}</View>
           </Menu.Item>
