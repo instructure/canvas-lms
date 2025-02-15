@@ -527,8 +527,8 @@ GEM
       tzinfo
     expgen (0.1.1)
       parslet
-    factory_bot (6.5.0)
-      activesupport (>= 5.0.0)
+    factory_bot (6.5.1)
+      activesupport (>= 6.1.0)
     faraday (2.10.1)
       faraday-net_http (>= 2.0, < 3.2)
       logger
