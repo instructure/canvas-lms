@@ -17,7 +17,6 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PropTypes from 'prop-types'
 import React, {useReducer, useEffect, useState, useRef, createContext, useContext} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -26,23 +25,23 @@ import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import CanvasMultiSelect from '@canvas/multi-select'
-import {FormFieldGroup} from '@instructure/ui-form-field'
+import {FormFieldGroup, type FormMessage} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {pick, capitalize} from 'lodash'
-import {reducer, createDefaultState, Actions as A} from './createEditModalReducer'
-
-import {roles} from './util'
+import {reducer, Actions as A, type ReducerParams} from './createEditModalReducer'
+import {roles, createDefaultState} from './util'
+import {ReleaseNoteEditing, type ReleaseNote} from './types'
 
 const I18n = createI18nScope('release_notes')
 
 const locales = ENV?.LOCALES || navigator.languages || ['en-US']
 const formatLanguage = new Intl.DisplayNames(locales, {type: 'language'})
 
-const Context = createContext({state: createDefaultState(null), dispatch: () => {}})
+const Context = createContext<ReducerParams>({state: createDefaultState(null), dispatch: () => {}})
 
 // Given an array of elements, sort them by their vertical position
-function sortByVerticalPosition(elts) {
+function sortByVerticalPosition(elts: HTMLElement[]): HTMLElement[] {
   return elts
     .filter(elt => typeof elt !== 'undefined')
     .map(elt => ({elt, rect: elt.getBoundingClientRect()}))
@@ -50,16 +49,16 @@ function sortByVerticalPosition(elts) {
     .map(item => item.elt)
 }
 
-function SelectDateForEnv({env}) {
-  const [messages, setMessages] = useState([])
+function SelectDateForEnv({env}: {env: string}): JSX.Element {
+  const [messages, setMessages] = useState<FormMessage[]>([])
   const {state, dispatch} = useContext(Context)
   const value = state.show_ats[env]
   const {isSubmitting} = state
-  const el = useRef(undefined)
+  const el = useRef<HTMLElement | null>(null)
   const key = `date-${env}`
 
-  function validate(v, display) {
-    const dateMessages = []
+  function validate(v: string | undefined, display: boolean) {
+    const dateMessages: FormMessage[] = []
     if (typeof v === 'undefined')
       dateMessages.push({text: I18n.t('Release date is required'), type: 'newError'})
     else {
@@ -73,7 +72,7 @@ function SelectDateForEnv({env}) {
     else dispatch({action: A.SET_ERROR_ELEMENT, payload: {key, value: el.current}})
   }
 
-  function handleChange(_e, isoValue) {
+  function handleChange(_e: unknown, isoValue?: string) {
     validate(isoValue, true)
     dispatch({action: A.SET_RELEASE_DATE, payload: {env, value: isoValue}})
   }
@@ -100,21 +99,17 @@ function SelectDateForEnv({env}) {
   )
 }
 
-SelectDateForEnv.propTypes = {
-  env: PropTypes.string.isRequired,
-}
-
-function SelectTitleForLang({lang}) {
-  const [messages, setMessages] = useState([])
+function SelectTitleForLang({lang}: {lang: string}): JSX.Element {
+  const [messages, setMessages] = useState<FormMessage[]>([])
   const {state, dispatch} = useContext(Context)
   const value = state.langs[lang]?.title || ''
   const {isSubmitting} = state
-  const el = useRef(undefined)
+  const el = useRef<HTMLElement | null>(null)
   const key = `title-${lang}`
   const isRequired = lang === 'en'
 
-  function validate(v, display) {
-    const textMessages = []
+  function validate(v: string, display: boolean) {
+    const textMessages: FormMessage[] = []
     if (isRequired && v.length === 0)
       textMessages.push({text: I18n.t('Required for English locale'), type: 'newError'})
     if (display || isSubmitting) setMessages(textMessages)
@@ -122,7 +117,7 @@ function SelectTitleForLang({lang}) {
     else dispatch({action: A.SET_ERROR_ELEMENT, payload: {key, value: el.current}})
   }
 
-  function handleChange(_e, v) {
+  function handleChange(_e: React.ChangeEvent<HTMLInputElement>, v: string) {
     const value = v.trimStart()
     validate(value, true)
     dispatch({action: A.SET_LANG_ATTR, payload: {lang, key: 'title', value}})
@@ -144,21 +139,17 @@ function SelectTitleForLang({lang}) {
   )
 }
 
-SelectTitleForLang.propTypes = {
-  lang: PropTypes.string.isRequired,
-}
-
-function SelectDescForLang({lang}) {
-  const [messages, setMessages] = useState([])
+function SelectDescForLang({lang}: {lang: string}): JSX.Element {
+  const [messages, setMessages] = useState<FormMessage[]>([])
   const {state, dispatch} = useContext(Context)
   const value = state.langs[lang]?.description || ''
   const {isSubmitting} = state
-  const el = useRef(undefined)
+  const el = useRef<HTMLElement | null>(null)
   const key = `desc-${lang}`
   const isRequired = lang === 'en'
 
-  function validate(v, display) {
-    const textMessages = []
+  function validate(v: string, display: boolean) {
+    const textMessages: FormMessage[] = []
     if (isRequired && v.length === 0)
       textMessages.push({text: I18n.t('Required for English locale'), type: 'newError'})
     if (display || isSubmitting) setMessages(textMessages)
@@ -166,7 +157,7 @@ function SelectDescForLang({lang}) {
     else dispatch({action: A.SET_ERROR_ELEMENT, payload: {key, value: el.current}})
   }
 
-  function handleChange(e) {
+  function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     const value = e.target.value.trimStart()
     validate(value, true)
     dispatch({action: A.SET_LANG_ATTR, payload: {lang, key: 'description', value}})
@@ -188,11 +179,23 @@ function SelectDescForLang({lang}) {
   )
 }
 
-SelectDescForLang.propTypes = {
-  lang: PropTypes.string.isRequired,
+export interface CreateEditModalProps {
+  open: boolean
+  onClose: () => void
+  onSubmit: (payload: ReleaseNote) => void
+  currentNote: ReleaseNote | null
+  envs: string[]
+  langs: string[]
 }
 
-function CreateEditModal({open, onClose, onSubmit, currentNote, envs, langs}) {
+function CreateEditModal({
+  open,
+  onClose,
+  onSubmit,
+  currentNote,
+  envs,
+  langs,
+}: CreateEditModalProps): JSX.Element {
   const [state, dispatch] = useReducer(reducer, createDefaultState(null))
   const isPublished = Boolean(currentNote?.published)
   const errorElements = sortByVerticalPosition(Object.values(state.elementsWithErrors))
@@ -203,7 +206,7 @@ function CreateEditModal({open, onClose, onSubmit, currentNote, envs, langs}) {
 
   const label = currentNote ? I18n.t('Edit Release Note') : I18n.t('New Release Note')
 
-  function submit(payload) {
+  function submit(payload: ReleaseNoteEditing) {
     dispatch({action: A.SET_SUBMIT})
     if (errorElements.length > 0) {
       errorElements[0].focus()
@@ -258,7 +261,7 @@ function CreateEditModal({open, onClose, onSubmit, currentNote, envs, langs}) {
           >
             {roles.map(role => {
               return (
-                <CanvasMultiSelect.Option id={role.id} value={role.id} key={role.id}>
+                <CanvasMultiSelect.Option label="" id={role.id} value={role.id} key={role.id}>
                   {role.label}
                 </CanvasMultiSelect.Option>
               )
@@ -313,15 +316,6 @@ function CreateEditModal({open, onClose, onSubmit, currentNote, envs, langs}) {
       </Modal.Footer>
     </Modal>
   )
-}
-
-CreateEditModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  currentNote: PropTypes.object,
-  envs: PropTypes.array.isRequired,
-  langs: PropTypes.array.isRequired,
 }
 
 export default CreateEditModal

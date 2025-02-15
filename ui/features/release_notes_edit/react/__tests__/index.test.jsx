@@ -17,9 +17,8 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import ReleaseNotesEdit from '../index'
-import useFetchApi from '@canvas/use-fetch-api-hook'
 import fetchMock from 'fetch-mock'
 
 const exampleNote = {
@@ -36,21 +35,31 @@ const exampleNote = {
 }
 
 describe('release notes editing parent', () => {
+  afterEach(() => {
+    fetchMock.restore()
+  })
+
   it('renders spinner while loading', () => {
-    jest.fn().mockImplementation(useFetchApi)
+    const notes = [exampleNote]
+    fetchMock.getOnce(new RegExp('/api/v1/release_notes'), notes)
     const {getByText} = render(<ReleaseNotesEdit envs={['test']} langs={['en', 'es']} />)
+    // if we don't wait for the fetch result, we'll see the loading spinner
     expect(getByText(/loading/i)).toBeInTheDocument()
   })
 
-  it('displays table with successful retrieval and not loading', () => {
+  it('displays table, not spinner, upon successful retrieval', async () => {
     const notes = [exampleNote]
-    fetchMock.getOnce('/api/v1/release_notes?includes%5B%5D=langs&per_page=20&page=null', notes)
-    const {getByText, queryByText} = render(
+    fetchMock.getOnce(new RegExp('/api/v1/release_notes'), notes)
+    const {findByText, queryByText} = render(
       <ReleaseNotesEdit envs={['test']} langs={['en', 'es']} />,
     )
-    waitFor(() => {
-      expect(getByText(notes[0].langs.en.title)).toBeInTheDocument()
-      expect(queryByText(/loading/i)).not.toBeInTheDocument()
-    })
+    expect(await findByText(notes[0].langs.en.title)).toBeInTheDocument()
+    expect(queryByText(/loading/i)).toBeNull()
+  })
+
+  it('displays error message upon failed retrieval', async () => {
+    fetchMock.getOnce(new RegExp('/api/v1/release_notes'), 500)
+    const {findByText} = render(<ReleaseNotesEdit envs={['test']} langs={['en', 'es']} />)
+    expect(await findByText('API 500 Internal Server Error', {exact: false})).toBeInTheDocument()
   })
 })
