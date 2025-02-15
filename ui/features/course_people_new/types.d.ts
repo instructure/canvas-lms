@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PENDING_ENROLLMENT, INACTIVE_ENROLLMENT, ACTIVE_ENROLLMENT} from './util/constants'
+import {
+  ACTIVE_ENROLLMENT,
+  INACTIVE_ENROLLMENT,
+  PENDING_ENROLLMENT
+} from './react/util/constants'
+
 interface EnvPermissions {
   can_read_roster: boolean
   can_allow_course_admin_actions: boolean
@@ -35,6 +40,7 @@ interface EnvPermissions {
 }
 
 interface EnvCourse {
+  id: string
   groups_url: string
   prior_enrollments_url: string
   interactions_report_url: string
@@ -46,7 +52,7 @@ interface EnvCourse {
 }
 
 export interface CoursePeopleEnv {
-  COURSE_ROOT_URL: string
+  current_user_id: string
   permissions: EnvPermissions
   course: EnvCourse
 }
@@ -62,7 +68,7 @@ export interface CoursePeopleContextType {
   canReadReports: boolean
   canReadRoster: boolean
   canViewAllGrades: boolean
-  courseRootUrl: string
+  courseId: string
   courseConcluded: boolean
   groupsUrl: string
   interactionsReportUrl: string
@@ -74,41 +80,45 @@ export interface CoursePeopleContextType {
   canViewLoginIdColumn: boolean
   canViewSisIdColumn: boolean
   hideSectionsOnCourseUsersPage: boolean
+  currentUserId: string
 }
 
-export type EnrollmentState = typeof PENDING_ENROLLMENT | typeof INACTIVE_ENROLLMENT | typeof ACTIVE_ENROLLMENT | undefined
+export type EnrollmentState = typeof ACTIVE_ENROLLMENT | typeof INACTIVE_ENROLLMENT | typeof PENDING_ENROLLMENT
 
 export type Enrollment = {
-  id: string
-  name: string
-  role: string
+  _id: string
   type: string
-  last_activity: string | null
-  total_activity?: number
-  can_be_removed?: boolean
-  enrollment_state: EnrollmentState
-  temporary_enrollment_source_user_id?: string
-  associatedUser?: {
-    id: string
+  sisRole: string
+  state: EnrollmentState
+  lastActivityAt: string | null
+  totalActivityTime: number | null
+  canBeRemoved: boolean
+  htmlUrl: string
+  section: {
+    _id: string
     name: string
   }
+  temporaryEnrollmentSourceUserId: string | null
+  associatedUser: {
+    _id: string
+    name: string
+  } | null
 }
 
 export type CustomLink = {
-  id: string
+  _id: string
   text: string
   url: string
   icon_class: string
 }
 
 export type User = {
-  id: string
-  short_name: string
-  login_id: string
-  avatar_url: string
-  pronouns?: string
-  sis_user_id: string
-  last_login: string
+  _id: string
+  name: string
+  loginId: string
+  avatarUrl: string
+  pronouns: string | null
+  sisId: string
   enrollments: Enrollment[]
-  custom_links?: CustomLink[]
+  customLinks: CustomLink[] | null
 }

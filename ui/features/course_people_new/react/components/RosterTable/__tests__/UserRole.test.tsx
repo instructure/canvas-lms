@@ -21,66 +21,45 @@ import {render} from '@testing-library/react'
 import UserRole from '../UserRole'
 import {
   TEACHER_ENROLLMENT,
-  STUDENT_ENROLLMENT,
   OBSERVER_ENROLLMENT
 } from '../../../../util/constants'
-import type {Enrollment} from '../../../types'
+import type {Enrollment} from '../../../../types'
+import {mockEnrollment} from '../../../../graphql/Mocks'
 
 describe('UserRole', () => {
-  const defaultEnrollment: Enrollment = {
-    id: '1',
-    name: 'Section 1',
-    type: STUDENT_ENROLLMENT,
-    role: STUDENT_ENROLLMENT,
-    last_activity: null,
-    enrollment_state: 'active'
-  }
-
-  const observerEnrollment: Enrollment = {
-    id: '2',
-    name: 'Section 2',
-    type: OBSERVER_ENROLLMENT,
-    role: OBSERVER_ENROLLMENT,
-    last_activity: null,
-    enrollment_state: 'active',
-    associatedUser: {
-      id: '4',
-      name: 'John Doe'
-    }
-  }
-
-  const temporaryEnrollment: Enrollment = {
-    id: '3',
-    name: 'Section 3',
-    type: TEACHER_ENROLLMENT,
-    role: TEACHER_ENROLLMENT,
-    last_activity: null,
-    enrollment_state: 'active',
-    temporary_enrollment_source_user_id: '5'
-  }
+  const studentEnrollment: Enrollment = mockEnrollment()
+  const teacherEnrollment: Enrollment = mockEnrollment({
+    enrollmentId: '2',
+    enrollmentType: TEACHER_ENROLLMENT
+  })
+  const observerEnrollment: Enrollment = mockEnrollment({
+    enrollmentType: OBSERVER_ENROLLMENT,
+    hasAssociatedUser: true
+  })
+  const temporaryEnrollment: Enrollment = mockEnrollment({
+    enrollmentType: TEACHER_ENROLLMENT,
+    isTemporaryEnrollment: true
+  })
 
   it('renders single role', () => {
-    const {getByText} = render(<UserRole enrollments={[defaultEnrollment]} />)
+    const {getByText} = render(<UserRole enrollments={[studentEnrollment]} />)
     expect(getByText('Student')).toBeInTheDocument()
   })
 
   it('renders multiple roles', () => {
-    const multipleEnrollments = [
-      defaultEnrollment,
-      {...defaultEnrollment, id: '2', type: TEACHER_ENROLLMENT, role: TEACHER_ENROLLMENT}
-    ]
-    const {getByText} = render(<UserRole enrollments={multipleEnrollments} />)
+    const multipleEnrollments = [studentEnrollment, teacherEnrollment]
+    const {getByText, debug} = render(<UserRole enrollments={multipleEnrollments} />)
     expect(getByText('Student')).toBeInTheDocument()
     expect(getByText('Teacher')).toBeInTheDocument()
   })
 
   it('renders observer enrollment with associated user', () => {
     const {getByText} = render(<UserRole enrollments={[observerEnrollment]} />)
-    expect(getByText('Observing: John Doe')).toBeInTheDocument()
+    expect(getByText('Observing: Jane Doe')).toBeInTheDocument()
   })
 
   it('renders nothing for observer enrollment without associated user', () => {
-    const enrollment = {...observerEnrollment, associatedUser: undefined}
+    const enrollment = {...observerEnrollment, associatedUser: null}
     const {container} = render(<UserRole enrollments={[enrollment]} />)
     expect(container.firstChild).toBeNull()
   })

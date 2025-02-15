@@ -19,20 +19,25 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import StatusPill from '../StatusPill'
+import {
+  ACTIVE_ENROLLMENT,
+  PENDING_ENROLLMENT,
+  INACTIVE_ENROLLMENT
+} from '../../../../util/constants'
 
 describe('StatusPill', () => {
   it('renders nothing when neither isPending nor isInactive', () => {
-    const {container} = render(<StatusPill state={'active'}/>)
+    const {container} = render(<StatusPill state={ACTIVE_ENROLLMENT}/>)
     expect(container).toBeEmptyDOMElement()
   })
 
   it('shows inactive status when isInactive is true', () => {
-    const {getByText} = render(<StatusPill state={'inactive'} />)
+    const {getByText} = render(<StatusPill state={INACTIVE_ENROLLMENT} />)
     expect(getByText('Inactive')).toBeInTheDocument()
   })
 
   it('shows pending status when isPending is true', () => {
-    const {getByText} = render(<StatusPill state={'invited'} />)
+    const {getByText} = render(<StatusPill state={PENDING_ENROLLMENT} />)
     expect(getByText('Pending')).toBeInTheDocument()
   })
 })

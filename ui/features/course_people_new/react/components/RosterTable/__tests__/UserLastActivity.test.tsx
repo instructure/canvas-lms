@@ -20,14 +20,19 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import UserLastActivity from '../UserLastActivity'
 import {timeEventToString} from '../../../../util/utils'
-import {enrollments} from '../../../../util/mocks'
+import {OBSERVER_ENROLLMENT} from '../../../../util/constants'
+import {mockEnrollment} from '../../../../graphql/Mocks'
 
 jest.mock('../../../../util/utils', () => ({
-  timeEventToString: jest.fn(() => 'Jan 1, 2025 at 12:00pm')
+  timeEventToString: jest.fn(() => 'Feb 18, 2025 at 12:00pm')
 }))
 
 describe('UserLastActivity', () => {
-  const defaultEnrollments = enrollments.slice(0,2)
+  const mockedLastActivity = 'Feb 18, 2025 at 12:00pm'
+  const defaultEnrollments = [
+    mockEnrollment({enrollmentId: '1'}),
+    mockEnrollment({enrollmentId: '2', lastActivityAt: '2025-02-17T10:17:35-06:00'})
+  ]
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -35,37 +40,34 @@ describe('UserLastActivity', () => {
 
   it('renders last activity dates for valid enrollments', () => {
     const {getAllByText} = render(<UserLastActivity enrollments={defaultEnrollments} />)
-    const activities = getAllByText('Jan 1, 2025 at 12:00pm')
+    const activities = getAllByText(mockedLastActivity)
     expect(activities).toHaveLength(2)
     expect(timeEventToString).toHaveBeenCalledTimes(2)
   })
 
   it('filters out observer enrollments', () => {
-    const enrollmentsWithObserver = enrollments.slice(0,3).map(e => {
-      if (e.id === '3') return {...e, type: 'ObserverEnrollment'}
-      return e
-    })
+    const enrollmentsWithObserver = [
+      mockEnrollment({enrollmentId: '1'}),
+      mockEnrollment({enrollmentId: '2', enrollmentType: OBSERVER_ENROLLMENT})
+    ]
     const {getAllByText} = render(<UserLastActivity enrollments={enrollmentsWithObserver} />)
-    const activities = getAllByText('Jan 1, 2025 at 12:00pm')
-    expect(activities).toHaveLength(2)
-    expect(timeEventToString).toHaveBeenCalledTimes(2)
+    const activities = getAllByText(mockedLastActivity)
+    expect(activities).toHaveLength(1)
+    expect(timeEventToString).toHaveBeenCalledTimes(1)
   })
 
-  it('skips enrollments with no/null last_activity', () => {
-    const enrollmentsWithNull = enrollments.slice(0,3).map(e => {
-      if (e.id === '3') return {...e, last_activity: null}
-      return e
-    })
-    const {getAllByText} = render(<UserLastActivity enrollments={enrollmentsWithNull} />)
-    const activities = getAllByText('Jan 1, 2025 at 12:00pm')
-    expect(activities).toHaveLength(2)
-    expect(timeEventToString).toHaveBeenCalledTimes(2)
+  it('skips enrollments without last activity', () => {
+    const enrollmentsNoLastActivity = [defaultEnrollments[0], {...defaultEnrollments[1], lastActivityAt: null}]
+    const {getAllByText} = render(<UserLastActivity enrollments={enrollmentsNoLastActivity} />)
+    const activities = getAllByText(mockedLastActivity)
+    expect(activities).toHaveLength(1)
+    expect(timeEventToString).toHaveBeenCalledTimes(1)
   })
 
   it('formats dates with correct parameters', () => {
     render(<UserLastActivity enrollments={defaultEnrollments} />)
-    expect(timeEventToString).toHaveBeenCalledWith('2025-01-01T12:00:00Z')
-    expect(timeEventToString).toHaveBeenCalledWith('2025-01-02T12:00:00Z')
+    expect(timeEventToString).toHaveBeenCalledWith(defaultEnrollments[0].lastActivityAt)
+    expect(timeEventToString).toHaveBeenCalledWith(defaultEnrollments[1].lastActivityAt)
   })
 
   it('handles empty enrollments array', () => {

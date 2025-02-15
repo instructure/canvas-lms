@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {type FC} from 'react'
 import {View} from '@instructure/ui-view'
 import {timeEventToString} from '../../../util/utils'
 import {OBSERVER_ENROLLMENT} from '../../../util/constants'
-import {Enrollment} from '../../types'
+import {Enrollment} from '../../../types'
 
-const UserLastActivity: React.FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
-  (enrollments || []).map(enrollment => {
+const UserLastActivity: FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
+  enrollments.map(enrollment => {
     if (enrollment.type === OBSERVER_ENROLLMENT) return null
-    if (!enrollment.last_activity) return null
+    if (!enrollment.lastActivityAt) return null
 
     return (
-      <View as="div" key={`last-activity-${enrollment.id}`} data-testid={`last-activity-${enrollment.id}`}>
-        {timeEventToString(enrollment.last_activity)}
+      <View as="div" key={`last-activity-${enrollment._id}`} data-testid={`last-activity-${enrollment._id}`}>
+        {timeEventToString(enrollment.lastActivityAt)}
       </View>
     )
   })
