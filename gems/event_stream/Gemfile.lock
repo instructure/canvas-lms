@@ -91,7 +91,7 @@ GEM
     docile (1.4.1)
     dogstatsd-ruby (5.6.3)
     drb (2.2.1)
-    erubi (1.13.0)
+    erubi (1.13.1)
     folio-pagination (0.0.12)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)

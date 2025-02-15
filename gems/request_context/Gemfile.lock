@@ -106,7 +106,7 @@ GEM
       deep_merge (~> 1.2)
       faraday (>= 0.9, < 3.0, != 2.0.0)
     drb (2.2.1)
-    erubi (1.13.0)
+    erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
     faraday (2.10.1)
