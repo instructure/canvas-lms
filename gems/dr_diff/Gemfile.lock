@@ -7,7 +7,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    bigdecimal (3.1.8)
+    bigdecimal (3.1.9)
     csv (3.3.1)
     date (3.4.1)
     debug (1.10.0)
