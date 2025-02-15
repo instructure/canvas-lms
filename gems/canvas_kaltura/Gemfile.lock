@@ -134,7 +134,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.17.2-x86_64-linux)
       racc (~> 1.4)
-    psych (5.2.1)
+    psych (5.2.3)
       date
       stringio
     public_suffix (6.0.1)

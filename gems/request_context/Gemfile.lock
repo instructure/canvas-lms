@@ -160,7 +160,7 @@ GEM
       racc (~> 1.4)
     packs-specification (0.0.10)
       sorbet-runtime
-    psych (5.2.1)
+    psych (5.2.3)
       date
       stringio
     raabro (1.4.0)
