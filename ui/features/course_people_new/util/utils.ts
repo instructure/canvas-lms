@@ -17,7 +17,7 @@
  */
 
 const {floor} = Math
-import type {Enrollment} from '../react/types'
+import type {Enrollment} from '../types'
 import I18nObj, {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')
@@ -57,7 +57,7 @@ export const timeEventToString = (date: string = '', i18n_date_format: string = 
 }
 
 export const totalActivity = (enrollments: Enrollment[]) => {
-  const times = (enrollments || []).map(e => e.total_activity || 0)
+  const times = enrollments.map(e => e.totalActivityTime || 0)
   const maxTime = Math.max(...times)
   return (maxTime && maxTime > 0) ? secondsToTime(maxTime) : ''
 }

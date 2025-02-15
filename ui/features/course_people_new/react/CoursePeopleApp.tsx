@@ -17,6 +17,7 @@
  */
 
 import React, {FC} from 'react'
+import {QueryProvider} from '@canvas/query'
 import CoursePeopleHeader from './components/PageHeader/CoursePeopleHeader'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -28,19 +29,21 @@ import RosterTable from './components/RosterTable/RosterTable'
 const I18n = createI18nScope('course_people')
 
 const CoursePeopleApp: FC = () => (
-  <CoursePeopleContext.Provider value={getCoursePeopleContext()}>
-    <ErrorBoundary
-      errorComponent={
-        <GenericErrorPage
-          imageUrl={errorShipUrl}
-          errorCategory={I18n.t('Course People Error Page')}
-        />
-      }
-    >
-      <CoursePeopleHeader />
-      <RosterTable />
-    </ErrorBoundary>
-  </CoursePeopleContext.Provider>
+  <QueryProvider>
+    <CoursePeopleContext.Provider value={getCoursePeopleContext()}>
+      <ErrorBoundary
+        errorComponent={
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorCategory={I18n.t('Course People Error Page')}
+          />
+        }
+      >
+        <CoursePeopleHeader />
+        <RosterTable />
+      </ErrorBoundary>
+    </CoursePeopleContext.Provider>
+  </QueryProvider>
 )
 
 export default CoursePeopleApp

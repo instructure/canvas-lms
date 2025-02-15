@@ -25,3 +25,12 @@ export const DESIGNER_ENROLLMENT = 'DesignerEnrollment'
 export const ACTIVE_ENROLLMENT = 'active'
 export const INACTIVE_ENROLLMENT = 'inactive'
 export const PENDING_ENROLLMENT = 'invited'
+
+export const TEACHER_ROLE = 'teacher'
+export const TA_ROLE = 'ta'
+export const STUDENT_ROLE = 'student'
+export const OBSERVER_ROLE = 'observer'
+export const DESIGNER_ROLE = 'designer'
+
+export const ASCENDING = 'ascending'
+export const DESCENDING = 'descending'
