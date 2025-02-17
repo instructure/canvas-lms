@@ -15772,6 +15772,7 @@ uk:
   see_turnitin_results_cd9d4a6c: "Побачити Turnitin результати"
   see_vericite_results_b44dd8c8: "Побачити результати VeriCite "
   select_1e849959: "[ Обрати ]"
+  select_a_course_40bc3229: "Виберіть курс"
   select_a_grading_period_5ea50f1: "Обрати період оцінювання..."
   select_a_grading_period_aab25483: "Обрати період оцінювання"
   select_a_log_type_to_search_247fc6b4: "Виберіть тип входу для пошуку."
@@ -16681,6 +16682,7 @@ uk:
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Щось пішло не так. Будь ласка, спробуйте оновити сторінку. Якщо проблема не зникне, можливо забагато записів \"%{assignmentTitle}\" для завантаження SpeedGrader."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Щось пійшло не так при спробі повторно активувати користувача. Будь-ласка спробуйте пізніше."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Щось пійшло не так при спробі оновити роль користувача. Будь-ласка спробуйте пізніше."
+  something_went_wrong_updating_the_user_s_student_l_1047109c: "Щось пішло не так під час спроби оновлення користувацького посилання студента. Будь-ласка спробуйте пізніше."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Щось пійшло не так при спробі синхронізувати оцінки з SIS. Будь-ласка спробуйте пізніше."
   something_went_wrong_while_deactivating_the_user_p_8ff3e261: "Щось пійшло не так при спробі деактивувати користувача. Будь-ласка спробуйте пізніше."
   sort_40afa70: "Сортувати:"
@@ -18722,6 +18724,7 @@ uk:
   what_should_the_csv_file_look_like_985a59ac: "Як має виглядати файл CSV?"
   what_would_you_like_to_do_next_2835397e: "Що б ви хотіли робити далі?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Під час додавання декількох користувачів використовуйте коми або перехід на наступний рядок для відділення користувачів."
+  when_an_observer_is_linked_to_a_student_they_have__489e2b71: "Коли спостерігач пов'язаний зі студентом, вони мають доступ до оцінок цього студента і курсу взаємодій."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Це сторінка, яку побачать люди, коли відвідуватимуть цей курс. Ви можете налаштувати її для показу потоку активності, списку модулів курсу, навчального плану або власної сторінки, яку ви самі створюєте. За замовчуванням - це потік активності курсу."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       Це перша сторінка, яку побачать люди, коли відвідуватимуть ваш курс.
