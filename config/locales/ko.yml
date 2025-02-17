@@ -12462,6 +12462,7 @@ ko:
         current_enrollments: "현재 등록"
         decrosslist_section: "섹션 교차 나열 해제"
   sections_94731e51: "모든 섹션"
+  select_a_course_40bc3229: "과목 선택"
   select_a_log_type_to_search_247fc6b4: "검색하려는 로그 유형을 선택하십시오."
   select_calendars_d5fa50b6: "달력 선택하기"
   select_content: "내용 선택"
@@ -13285,6 +13286,7 @@ ko:
   some_settings_have_been_administratively_locked_9e3ee880: "일부 설정은 관리를 위해 잠겨있습니다."
   some_systems_recycle_their_ids_for_each_new_export_884b8e46: "어떤 시스템은 새로 내보내기를 할 때마다 ID를 재활용합니다. 그 결과, 내보낸 다른 문제 은행이 같은 ID를 갖게 됩니다. 평가 자료를 잃지 않으려면 ID를 무시하고 개체를 다른 것으로 처리해야 합니다. 이 옵션을 선택하면 이러한 안전 기능을 사용하지 않고 같은 ID를 가진 기존 평가 자료를 덮어쓰게 됩니다."
   someone_bbbc538b: 아무개
+  something_went_wrong_updating_the_user_s_student_l_1047109c: "사용자의 학생 링크 업데이트 중에 오류가 발생했습니다. 다시 시도해 주시기 바랍니다."
   sort_by_e75f9e3e: "정렬 조건"
   source_c377a469: 원본
   speed_grader: 
@@ -14525,6 +14527,7 @@ ko:
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "나의 과목에 오신 것을 환영합니다! 과목들의 목록을 편집하려면 \"모든 과목\"을 클릭하고 표시할 과목들에 별표 표시를 하십시오."
   what_should_the_csv_file_look_like_985a59ac: "CSV 파일은 어떻게 보입니까?"
   what_would_you_like_to_do_next_2835397e: "다음에 어떤 작업을 하시겠습니까?"
+  when_an_observer_is_linked_to_a_student_they_have__489e2b71: "감독자를 학생에게 연결하면 학생의 평점과 과목 상호 작용을 액세스할 수 있습니다."
   which_login_to_change_4707fbc6: "변경하려는 로그인"
   widget: 
     upload_media_track_form: 
