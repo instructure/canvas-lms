@@ -11237,6 +11237,7 @@ el:
       GradingAssignment, GradingAssignmentScore.</mrk>
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Εξάσκηση στο Κουίζ"
+  preparing_download_percent_complete_34b48e4d: "<mrk mid=\"5744\" mtype=\"seg\">Προετοιμασία λήψης:</mrk> <mrk mid=\"5745\" mtype=\"seg\">%{percent}% ολοκληρώθηκε</mrk>"
   prerequisites_49659f16: "Προαπαιτούμενα:"
   prerequisites_98b324e0: Προαπαιτούμενα
   prerequisites_lookup: 
@@ -13506,6 +13507,7 @@ el:
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Δείτε μερικά εργαλεία LTI* που λειτουργούν τέλεια με το Canvas."
   see_this_assignment_in_speedgrader_14b8abaf: "Εμφάνιση της εργασίας στο speedgrader"
   see_vericite_results_b44dd8c8: "Προβολή των αποτελεσμάτων του VeriCite"
+  select_a_course_40bc3229: "Επιλέξτε ένα μάθημα"
   select_a_grading_period_5ea50f1: "Επιλογή Περιόδου Βαθμολόγησης..."
   select_a_grading_period_aab25483: "Επιλογή Περιόδου Βαθμολόγησης"
   select_a_log_type_to_search_247fc6b4: "Επιλέξτε έναν τύπο καταγραφής για αναζήτηση."
@@ -14276,6 +14278,7 @@ el:
   someone_bbbc538b: Κάποιος
   something_went_wrong_re_activating_the_user_please_82c3e7a: "<mrk mid=\"4894\" mtype=\"seg\">Κάτι δεν πήγε σωστά κατά την επανενεργοποίηση του χρήστη.</mrk> <mrk mid=\"4895\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "<mrk mid=\"1498\" mtype=\"seg\">Κάτι δεν πήγε σωστά κατά την ενημέρωση του ρόλου του χρήστη.</mrk> <mrk mid=\"1499\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
+  something_went_wrong_updating_the_user_s_student_l_1047109c: "<mrk mid=\"5554\" mtype=\"seg\">Κάτι δεν πήγε σωστά κατά την ενημέρωση του ρόλου των συνδέσμων σπουδαστή για αυτόν τον χρήστη.</mrk> <mrk mid=\"5555\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
   sortable_name_73f707cf: "Όνομα που μπορεί να ταξινομηθεί"
   source_c377a469: Source
   source_code_2395ca74: "Πηγαίος κώδικας"
@@ -15805,6 +15808,7 @@ el:
   well_below_mastery_37664bdc: "Αρκετά Κάτω από το Επίπεδο Επιδεξιότητας"
   what_should_the_csv_file_look_like_985a59ac: "Πως πρέπει να είναι το CSV αρχείο;"
   what_would_you_like_to_do_next_2835397e: "Τι θα θέλατε να κάνετε έπειτα;"
+  when_an_observer_is_linked_to_a_student_they_have__489e2b71: "Όταν κάποιος παρατηρητής συνδέεται με κάποιον σπουδαστή, έχει πρόσβαση στους βαθμούς και στις αλληλεπιδράσεις μαθημάτων του σπουδαστή αυτού."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "<mrk mid=\"4369\" mtype=\"seg\">Όταν επισκέπτεται κάποιος το μάθημα, αυτή είναι η σελίδα που θα βλέπει.</mrk>  <mrk mid=\"4370\" mtype=\"seg\">Μπορείτε να ρυθμίσετε να εμφανίζεται η ροή δραστηριοτήτων, η λίστα των ενοτήτων του μαθήματος, το αναλυτικό πρόγραμμα ή κάποια προσαρμοσμένη σελίδα που θα δημιουργήσετε εσείς.</mrk>  <mrk mid=\"4371\" mtype=\"seg\">Η προεπιλεγμένη ρύθμιση είναι η ροή δραστηριοτήτων.</mrk>"
   where_would_you_like_to_move_title_fabd6e8f: "Πού θα θέλατε να μετακινήσετε το %{title};"
   which_login_to_change_4707fbc6: "Ποια σύνδεση να αλλάξει"
