@@ -1307,11 +1307,41 @@ rubricEditing.init = function () {
 
   let forceSubmit = false,
     skipPointsUpdate = false
+
+  const validForm = ($rubric, data) => {
+    const removeTitleError = () => {
+      $rubric.find('.rubric_title .title_error_message').css('display', 'none')
+      $rubric.find('.rubric_title [name="title"]').css('border', '1px solid #CCC')
+    }
+
+    const addTitleError = () => {
+      $rubric.find('.rubric_title .title_error_message').css('display', 'inline-flex')
+      $rubric.find('.rubric_title [name="title"]').css('border', '1px solid #D01A19')
+    }
+
+    const validTitle = () => {
+      if (!data['rubric[title]'] || data['rubric[title]'].trim().length === 0) {
+        addTitleError()
+        clearTimeout($rubric.data('titleErrorDisplayed'))
+        const titleErrorDisplayed = setTimeout(removeTitleError, 5000)
+        $rubric.data('titleErrorDisplayed', titleErrorDisplayed)
+        return false
+      }
+
+      return true
+    }
+
+    return validTitle()
+  }
+
   $('#edit_rubric_form').formSubmit({
     processData() {
       const $rubric = $(this).parents('.rubric')
       if (!$rubric.find('.criterion:not(.blank)').length) return false
       const data = rubricEditing.rubricData($rubric)
+
+      if (!validForm($rubric, data)) return false
+
       if (
         ENV.MASTER_COURSE_DATA &&
         ENV.MASTER_COURSE_DATA.restricted_by_master_course &&
