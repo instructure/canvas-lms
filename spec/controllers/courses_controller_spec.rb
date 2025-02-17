@@ -1291,7 +1291,7 @@ describe CoursesController do
 
     it "redirects to the modules page for horizon courses" do
       user_session(@teacher)
-      Account.site_admin.enable_feature!(:horizon_course_setting)
+      @course.account.enable_feature!(:horizon_course_setting)
       @course.update!(horizon_course: true)
 
       get "show", params: { id: @course.id }

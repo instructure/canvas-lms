@@ -123,6 +123,7 @@ const featureBundles: {
   graphiql: () => import('./features/graphiql/index'),
   group_submission_reminder: () => import('./features/group_submission_reminder/index'),
   groups: () => import('./features/groups/index'),
+  horizon_toggle: () => import('./features/horizon_toggle/index'),
   inbox: () => import('./features/inbox/index'),
   inlined_preview: () => import('./features/inlined_preview/index'),
   inst_fs_service_worker: () => import('./features/inst_fs_service_worker/index'),
