@@ -15066,6 +15066,7 @@ hy:
         decrosslist_section: "Այս բաժինը ջնջել խաչաձև ցուցակից"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Որոշ LTI գործիքներ* որոնք գերազանց են աշխատում Canvas -ի հետ:"
   see_this_assignment_in_speedgrader_14b8abaf: "Տես այս հանձնարարությունը «Արագ գնահատման համակարգ»-ում"
+  select_a_course_40bc3229: "Ընտրել դասընթացը"
   select_a_grading_period_5ea50f1: "Ընտրել գնահատման ժամանակահատված..."
   select_a_grading_period_aab25483: "Ընտրել գնահատման ժամանակահատվածը"
   select_a_log_type_to_search_247fc6b4: "Որոնումների համար ընտրեք մատյանի տեսակը"
@@ -16041,6 +16042,7 @@ hy:
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Օգտատիրոջ կարգավիճակի ապաակտիվացման ժամանակ սխալ է տեղի ունեցել: Ավելի ուշ կրկին փորձեք:"
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Օգտատիրոջ կարգավիճակի  կրկին ակտիվացման ժամանակ սխալ է տեղի ունեցել: Ավելի ուշ կրկին փորձեք:"
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Օգտատիրոջ դերի թարմացման ժամանակ սխալ է տեղի ունեցել: Ավելի ուշ կրկին փորձեք:"
+  something_went_wrong_updating_the_user_s_student_l_1047109c: "Սխալ է տեղի ունեցել օգտատիրոջ ուսանողական հղումները թարմացնելիս: Փորձեք ավելի ուշ:"
   sortable_name_73f707cf: "Տեսակավորման ենթակա անուն"
   source_c377a469: Աղբյուր
   source_code_2395ca74: "Աղբյուրի կոդ"
@@ -17656,6 +17658,7 @@ hy:
   well_below_mastery_37664bdc: "Բավական ցածր է անցողիկ միավորներից "
   what_should_the_csv_file_look_like_985a59ac: "Ի՞նչ տեսք պետք է ունենա CSV ֆայլը:"
   what_would_you_like_to_do_next_2835397e: "Ինչ կցանկանայիք անել հաջորդ քայլում"
+  when_an_observer_is_linked_to_a_student_they_have__489e2b71: "Երբ դիտորդը կապակցված է ունկնդրի հետ, նրան հասանելի են ունկնդրի գնահատականները և դասընթացի շրջանակում փոխգործողությունները:"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Երբ մարդիկ այցելում են դասընթացը, նրանք տեսնում են հենց այս էջը: Դուք կարող եք կարգաբերել այն այնպես, որ ցույց տա գործողությունների հոսքը, մոդուլների, ուսումնական ծրագրերի ցուցակը կամ դնել Ձեր կողմից ստեղծված  օգտատիրոջ էջը: Լռելյայն ընդունված տարբերակը ցուցադրում է դասընթացի գործողությունների հոսքը: "
   where_would_you_like_to_move_title_fabd6e8f: "Ու՞ր կցանկանայիք տեղափոխել %{title}:"
   which_login_to_change_4707fbc6: "Որ մուտքի տվյալները պետք է փոխել"
