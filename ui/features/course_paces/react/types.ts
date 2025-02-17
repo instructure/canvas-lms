@@ -61,6 +61,7 @@ export interface CoursePaceItem {
   readonly published: boolean
   readonly submittable: boolean
   readonly submitted_at?: string | null
+  readonly assignment_id?: string | null
   compressed_due_date?: string
 }
 
@@ -149,6 +150,13 @@ export type CategoryErrors = {[category: string]: string}
 export type OriginalState = {
   coursePace: CoursePace
   blackoutDates: BlackoutDate[]
+}
+
+export type MasteryPathsData = {
+  isCyoeAble?: boolean
+  isTrigger?: boolean,
+  isReleased?: boolean,
+  releasedLabel?: string
 }
 
 export interface UIState {

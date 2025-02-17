@@ -189,6 +189,21 @@ describe CoursePacesController do
                                                                     }))
     end
 
+    it "includes or excludes CONDITIONAL_RELEASE_ENV based on Mastery Paths setting" do
+      [true, false].each do |enabled|
+        @course.update!(conditional_release: enabled)
+        get :index, params: { course_id: @course.id }
+
+        js_env = controller.js_env
+
+        if enabled
+          expect(js_env).to have_key(:CONDITIONAL_RELEASE_ENV)
+        else
+          expect(js_env).to_not have_key(:CONDITIONAL_RELEASE_ENV)
+        end
+      end
+    end
+
     it "does not create a course pace if no primary course paces are available" do
       @course_pace.update(user_id: @student)
       expect(@course.course_paces.count).to eq(1)

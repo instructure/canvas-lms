@@ -20,7 +20,7 @@ import React from 'react'
 import {act, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderRow} from '@canvas/util/react/testing/TableHelper'
-
+import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import {
   BLACKOUT_DATES,
   PACE_ITEM_1,
@@ -33,6 +33,10 @@ import {renderConnected} from '../../../__tests__/utils'
 import {AssignmentRow, type ComponentProps} from '../assignment_row'
 
 const setPaceItemDuration = jest.fn()
+
+jest.mock('@canvas/conditional-release-cyoe-helper', () => ({
+  getItemData: jest.fn()
+}))
 
 const defaultProps: ComponentProps = {
   coursePace: PRIMARY_PACE,
@@ -293,6 +297,35 @@ describe('AssignmentRow', () => {
     )
     expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
     expect(queryByText(LATE_SUBMISSION_TEXT)).toBeNull()
+  })
+
+  it('returns null when isTrigger and releasedLabel are both false', () => {
+    (CyoeHelper.getItemData as jest.Mock).mockReturnValue({ isTrigger: false, releasedLabel: '' })
+
+    const { queryByTestId } = renderConnected(renderRow(<AssignmentRow {...{...defaultProps, context_type: 'Section'}} />))
+
+    expect(queryByTestId(`mastery-paths-data-${defaultProps.coursePaceItem.module_item_id}`)).toBeNull()
+  })
+
+  it('renders Mastery Paths link when isTrigger is true and moduleItemId is provided', () => {
+    (CyoeHelper.getItemData as jest.Mock).mockReturnValue({ isTrigger: true, releasedLabel: '' })
+    window.ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
+    const { getByText } = renderConnected(renderRow(<AssignmentRow {...{...defaultProps, context_type: 'Section'}} />))
+    const link = getByText('Mastery Paths')
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute(
+      'href',
+      `${ENV.CONTEXT_URL_ROOT}/modules/items/${defaultProps.coursePaceItem.module_item_id}/edit_mastery_paths`
+    )
+  })
+
+  it('renders both Mastery Paths link and Pill when isTrigger is true and releasedLabel is provided', () => {
+    (CyoeHelper.getItemData as jest.Mock).mockReturnValue({ isTrigger: true, releasedLabel: '100 pts - 70 pts' })
+    window.ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
+    const { getByText } = renderConnected(renderRow(<AssignmentRow {...{...defaultProps, context_type: 'Section'}} />))
+
+    expect(getByText('Mastery Paths')).toBeInTheDocument()
+    expect(getByText('100 pts - 70 pts')).toBeInTheDocument()
   })
 
   describe('localized', () => {
