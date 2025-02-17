@@ -68,7 +68,10 @@ class CoursePacePresenter
 
     if pace_context.is_a? Enrollment
       docx_replace(doc, "[Student Name]", pace_context.user.name)
-      docx_replace(doc, "[On Pace/ Off Pace]", "TODO")
+
+      overdue_items = course_pace.overdue_unsubmitted_student_module_items_by_student([pace_context.user.id])
+      is_off_pace = overdue_items[pace_context.user.id].present? && overdue_items[pace_context.user.id].count > 0
+      docx_replace(doc, "[On Pace/ Off Pace]", is_off_pace ? "Off Pace" : "On Pace")
     elsif pace_context.is_a? CourseSection
       docx_replace(doc, "[Section Name]", pace_context.name)
       docx_replace(doc, "[x] students in this section", "#{pace_context.students.count} students in this section")
