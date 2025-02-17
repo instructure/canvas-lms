@@ -149,7 +149,7 @@ ready(() => {
     const defaultDueTimeRoot = createRoot(defaultDueTimeContainer)
     defaultDueTimeRoot.render(
       <Suspense fallback={<Loading />}>
-        <CourseDefaultDueTime />
+        <CourseDefaultDueTime canManage={ENV.PERMISSIONS.manage} />
       </Suspense>,
     )
   }

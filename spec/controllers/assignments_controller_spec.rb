@@ -1813,21 +1813,8 @@ describe AssignmentsController do
         expect(assigns[:js_env][:PERMISSIONS]).not_to include :can_edit_grades
       end
 
-      context "with default_due_time feature flag disabled" do
+      context "default_due_time" do
         before do
-          Account.site_admin.disable_feature!(:default_due_time)
-          user_session(@teacher)
-        end
-
-        it "does not set DEFAULT_DUE_TIME in the ENV" do
-          get :show, params: { course_id: @course.id, id: @assignment.id }
-          expect(assigns[:js_env][:DEFAULT_DUE_TIME]).to be_nil
-        end
-      end
-
-      context "with default_due_time feature flag enabled" do
-        before do
-          Account.site_admin.enable_feature!(:default_due_time)
           Account.default.update(settings: { default_due_time: { value: "22:00:00" } })
           user_session(@teacher)
         end
