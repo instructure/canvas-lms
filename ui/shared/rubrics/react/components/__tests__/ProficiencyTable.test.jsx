@@ -138,7 +138,7 @@ describe('default proficiency', () => {
     wrapper.instance().handleDescriptionChange(0)('')
     wrapper.find('Button').last().simulate('click')
     expect(findProficiencyRatings(wrapper).first().prop('descriptionError')).toBe(
-      'Missing required description',
+      'Please include a rating title',
     )
   })
 
@@ -150,7 +150,7 @@ describe('default proficiency', () => {
     wrapper.instance().removeBillboard()
     wrapper.instance().handlePointsChange(0)('')
     wrapper.find('Button').last().simulate('click')
-    expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Invalid points')
+    expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Invalid format')
   })
 
   it('setting invalid points sets error', async () => {
@@ -161,7 +161,7 @@ describe('default proficiency', () => {
     wrapper.instance().removeBillboard()
     wrapper.instance().handlePointsChange(0)('1.1.1')
     wrapper.find('Button').last().simulate('click')
-    expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Invalid points')
+    expect(findProficiencyRatings(wrapper).first().prop('pointsError')).toBe('Invalid format')
   })
 
   it('setting negative points sets error', async () => {

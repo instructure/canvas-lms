@@ -22,7 +22,7 @@
 */
 
 import React from 'react'
-import {render, cleanup} from '@testing-library/react'
+import {render, cleanup, fireEvent} from '@testing-library/react'
 import ProficiencyRating from '../ProficiencyRating'
 import {userEvent} from '@testing-library/user-event'
 
@@ -36,17 +36,18 @@ const defaultProps = (props = {}) => ({
   onDescriptionChange: () => {},
   onMasteryChange: () => {},
   onPointsChange: () => {},
+  onBlurChange: () => {},
   points: '10.0',
   ...props,
 })
 
 const renderProficiencyRating = (props = {}) =>
   render(
-    <table>
-      <tbody>
+    <span>
+      <span>
         <ProficiencyRating {...defaultProps(props)} />
-      </tbody>
-    </table>,
+      </span>
+    </span>,
   )
 
 describe('ProficiencyRating', () => {
@@ -152,4 +153,47 @@ describe('ProficiencyRating', () => {
 
     expect(onDelete).toHaveBeenCalledTimes(0)
   })
+
+  it('calls onBlurChange with correct parameters when description input loses focus', async () => {
+    const onBlurChange = jest.fn()
+    const wrapper = renderProficiencyRating({ onBlurChange })
+
+    const descriptionInput = wrapper.container.querySelector('input[value="Stellar"]')
+    fireEvent.blur(descriptionInput)
+    expect(onBlurChange).toHaveBeenCalledWith('Stellar', 'description')
+  })
+
+  it('calls onBlurChange with correct parameters when points input loses focus', () => {
+    const onBlurChange = jest.fn()
+    const wrapper = renderProficiencyRating({ onBlurChange })
+
+    const pointsInput = wrapper.container.querySelectorAll('input')[2]
+    fireEvent.blur(pointsInput)
+
+    expect(onBlurChange).toHaveBeenCalledWith('10', 'points')
+  })
+
+  it('shows error message when description input is empty and loses focus', () => {
+    const onBlurChange = jest.fn();
+    const wrapper = renderProficiencyRating({ onBlurChange, descriptionError: 'Description is required' })
+
+    const descriptionInput = wrapper.container.querySelector('input[value="Stellar"]')
+    fireEvent.change(descriptionInput, { target: { value: '' } })
+    fireEvent.blur(descriptionInput)
+
+    expect(onBlurChange).toHaveBeenCalledWith('', 'description')
+    expect(wrapper.container).toHaveTextContent('Description is required')
+  })
+
+  it('shows error message when points input is empty and loses focus', () => {
+    const onBlurChange = jest.fn();
+    const wrapper = renderProficiencyRating({ onBlurChange, pointsError: 'Invalid points' })
+
+    const pointsInput = wrapper.container.querySelector('input[value="10"]')
+    fireEvent.change(pointsInput, { target: { value: '' } })
+    fireEvent.blur(pointsInput)
+
+    expect(onBlurChange).toHaveBeenCalledWith('', 'points')
+    expect(wrapper.container).toHaveTextContent('Invalid points')
+  });
 })
