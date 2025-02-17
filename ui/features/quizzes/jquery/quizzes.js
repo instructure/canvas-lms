@@ -1282,24 +1282,33 @@ scoreValidation = {
   },
 
   initValidators() {
+    const $inputField = $('.points-possible')
     $('input#quiz_points_possible')
-      .on('invalid:not_a_number', function (e) {
-        $(this).errorBox(
+      .on('invalid:not_a_number', function () {
+        renderError(
+          $inputField,
           I18n.t(
             'errors.quiz_score_not_a_number',
             'Score must be a number between 0 and 2,000,000,000.',
-          ),
+          )
         )
       })
-      .on('invalid:greater_than', function (e) {
-        $(this).errorBox(I18n.t('errors.quiz_score_too_short', 'Score must be greater than 0.'))
-      })
-      .on('invalid:less_than', function (e) {
-        $(this).errorBox(
-          I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.'),
+      .on('invalid:greater_than', function () {
+        renderError(
+          $inputField,
+          I18n.t('errors.quiz_score_too_short', 'Score must be greater than 0.')
         )
       })
-    $('input#quiz_points_possible').change(this.validatePoints)
+      .on('invalid:less_than', function () {
+        renderError(
+          $inputField,
+          I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.')
+        )
+      })
+      .on('valid', function() {
+        restoreOriginalMessage($inputField)
+      })
+      .on('change', () => this.validatePoints())
   },
 
   validatePoints() {
@@ -1308,13 +1317,12 @@ scoreValidation = {
 
     if (value && Number.isNaN(Number(numVal))) {
       $('input#quiz_points_possible').trigger('invalid:not_a_number')
-      // valid = false;
     } else if (numVal > 2000000000) {
       $('input#quiz_points_possible').trigger('invalid:less_than')
-      // valid = false;
     } else if (numVal < 0) {
       $('input#quiz_points_possible').trigger('invalid:greater_than')
-      // valid = false;
+    } else {
+      $('input#quiz_points_possible').trigger('valid')
     }
   },
 
@@ -1337,7 +1345,7 @@ const ipFilterValidation = {
 
   initValidators() {
     $('#quiz_ip_filter').on('invalid:ip_filter', function (e) {
-      $(this).errorBox(I18n.t('IP filter is not valid.'))
+      renderError($('.ip-filter'), I18n.t('IP filter is not valid.'))
     })
   },
 
@@ -1348,6 +1356,31 @@ const ipFilterValidation = {
 
       // Prevent $.fn.formErrors from giving error box with cryptic message.
       delete resp.invalid_ip_filter
+    }
+  },
+}
+
+const timeLimitValidation = {
+  init() {
+    this.initValidators.apply(this)
+    $('#quiz_options_form').on('xhrError', this.onFormError)
+  },
+
+  initValidators() {
+    $('#quiz_time_limit').on('invalid:time_limit', function (e) {
+      const $inputField = $('.time-limit')
+
+      renderError($inputField, I18n.t('errors.invalid_time_limit', 'Time limit is not valid.'))
+    })
+  },
+
+  onFormError(e, resp) {
+    if (resp && resp.invalid_time_limit) {
+      const event = 'invalid:time_limit'
+      $('#quiz_time_limit').triggerHandler(event)
+
+      // Prevent $.fn.formErrors from giving error box with cryptic message.
+      delete resp.invalid_time_limit
     }
   },
 }
@@ -1395,14 +1428,19 @@ correctAnswerVisibility = {
     const that = correctAnswerVisibility
 
     that.$toggler.on('invalid:bad_range', () => {
-      $('#quiz_hide_correct_answers_at').errorBox(
+      renderError(
+        $('.hide-correct-answers'),
         I18n.t(
           'errors.invalid_show_correct_answers_range',
           'Hide date cannot be before show date.',
-        ),
+        )
       )
 
       return true
+    })
+
+    that.$toggler.on('valid', () => {
+      restoreOriginalMessage($('.hide-correct-answers'))
     })
 
     that.$pickers.on('change', that.validateRange)
@@ -1421,18 +1459,13 @@ correctAnswerVisibility = {
     const $hide_at = that.$options.find('#quiz_hide_correct_answers_at')
     const $show_at = that.$options.find('#quiz_show_correct_answers_at')
 
-    // Clear any existing error boxes
-    that.$pickers.each(function () {
-      const $errorBox = $(this).data('associated_error_box')
-
-      if ($errorBox) {
-        $errorBox.remove()
-      }
-    })
+    restoreOriginalMessage($('#quiz_show_correct_answers_options'))
 
     if ($show_at.val().length && $hide_at.val().length) {
       if ($show_at.data().date >= $hide_at.data().date) {
         that.$toggler.triggerHandler('invalid:bad_range')
+      } else {
+        that.$toggler.triggerHandler('valid')
       }
     }
   },
@@ -1920,6 +1953,51 @@ function formatFloatOrPercentage(val) {
   }
 }
 
+function renderError(inputContainer, message) {
+  const inputMessageContainer = inputContainer.find('.input-message__container')
+
+  if (!inputMessageContainer.length) {
+    console.warn('renderError was called on a non-message container', inputContainer)
+    return
+  }
+
+  const inputField = inputContainer.find('input').last()
+  const inputMessageText = inputMessageContainer.find('.input-message__text')
+
+  inputContainer.addClass('invalid')
+  inputField.attr('aria-invalid', 'true')
+  inputMessageContainer.addClass('error').removeClass('hidden')
+  inputMessageText
+    .attr({
+      'aria-live': 'polite',
+      'aria-atomic': 'true'
+    })
+    .text(message)
+  inputMessageText.addClass('error_text')
+
+  inputContainer.find('.asterisk').addClass('error')
+}
+
+function restoreOriginalMessage(inputContainer) {
+  const inputMessageContainer = inputContainer.find('.input-message__container')
+  const inputField = inputContainer.find('input').last()
+  const textToRestore = inputMessageContainer.data('original-text') || ''
+  const inputMessageText = inputMessageContainer.find('.input-message__text')
+
+  inputContainer.removeClass('invalid')
+  inputField.removeAttr('aria-invalid')
+  inputMessageContainer.removeClass('error')
+
+  inputMessageText.removeAttr('aria-live').removeAttr('aria-atomic').text(textToRestore)
+    .removeClass('error_text')
+
+  inputContainer.find('.asterisk').removeClass('error')
+
+  if (textToRestore === '') {
+    inputMessageContainer.addClass('hidden')
+  }
+}
+
 function toggleConditionalReleaseTab(quizType) {
   if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
     if (quizType === 'assignment') {
@@ -1940,6 +2018,7 @@ ready(function () {
   correctAnswerVisibility.init()
   scoreValidation.init()
   ipFilterValidation.init()
+  timeLimitValidation.init()
   renderDueDates(lockedItems)
 
   if ($('#assignment_external_tools').length) {
@@ -1968,6 +2047,10 @@ ready(function () {
   $('#questions').on('mouseover', '.answer', function (event) {
     $('#questions .answer.hover').removeClass('hover')
     $(this).addClass('hover')
+  })
+
+  $('#quiz_title').on('input', function () {
+    restoreOriginalMessage($('#quiz-title-container'))
   })
 
   $quiz_options_form
@@ -2022,6 +2105,7 @@ ready(function () {
       } else {
         $item.data('saved_value', $(this).val())
         $item.val('--')
+        restoreOriginalMessage($('#multiple_attempts_suboptions'))
       }
     })
     .triggerHandler('change', [true])
@@ -2064,8 +2148,9 @@ ready(function () {
     if ($('#enable_quiz_ip_filter').is(':checked')) {
       if (!data['quiz[ip_filter]']) {
         erratic = true
-        $('#quiz_ip_filter').errorBox(
-          I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address'),
+        renderError(
+          $('.ip-filter'),
+          I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address')
         )
       }
     }
@@ -2073,8 +2158,9 @@ ready(function () {
     if ($('#enable_quiz_access_code').is(':checked')) {
       if (!data['quiz[access_code]']) {
         erratic = true
-        $('#quiz_access_code').errorBox(
-          I18n.t('errors.missing_access_code', 'You must enter an access code'),
+        renderError(
+          $('.access-code'),
+          I18n.t('errors.missing_access_code', 'You must enter an access code')
         )
       }
     }
@@ -2082,6 +2168,34 @@ ready(function () {
     if (erratic) {
       e.preventDefault()
     }
+  })
+
+  $('#quiz_points_possible').on('input', function () {
+    restoreOriginalMessage($('#quiz_points_possible'))
+  })
+
+  $('#time_limit_option').on('change', function () {
+    restoreOriginalMessage($('.time-limit'))
+  })
+
+  $('#quiz_time_limit').on('input', function () {
+    restoreOriginalMessage($('.time-limit'))
+  })
+
+  $('#enable_quiz_access_code').on('change', function () {
+    restoreOriginalMessage($('.access-code'))
+  })
+
+  $('#enable_quiz_ip_filter').on('change', function () {
+    restoreOriginalMessage($('.ip-filter'))
+  })
+
+  $('#quiz_access_code').on('input', function () {
+    restoreOriginalMessage($('.access-code'))
+  })
+
+  $('#quiz_ip_filter').on('input', function () {
+    restoreOriginalMessage($('.ip-filter'))
   })
 
   $('#quiz_require_lockdown_browser').change(function () {
@@ -2169,6 +2283,7 @@ ready(function () {
 
   $('#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts')
     .change(() => {
+      const $inputField = $('#multiple_attempts_suboptions')
       const checked =
         $('#multiple_attempts_option').prop('checked') &&
         $('#limit_attempts_option').prop('checked')
@@ -2177,16 +2292,22 @@ ready(function () {
         const $attempts = $('#quiz_allowed_attempts')
         const $attemptsVal = $attempts.val()
         if (isNaN($attemptsVal)) {
-          alert(I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers'))
+          renderError(
+            $inputField,
+            I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers')
+          )
           $attempts.val('')
         } else if ($attemptsVal.length > 3) {
-          alert(
+          renderError(
+            $inputField,
             I18n.t(
               'quiz_attempts_length_error',
               'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left',
-            ),
+            )
           )
           $attempts.val('')
+        } else {
+          restoreOriginalMessage($inputField)
         }
       } else {
         $('#hide_results_only_after_last').prop('checked', false)
@@ -2199,6 +2320,7 @@ ready(function () {
 
   $quiz_options_form.formSubmit({
     object_name: 'quiz',
+    disableErrorBox: true,
 
     processData(data) {
       RichContentEditor.closeRCE($('#quiz_description'))
@@ -2213,7 +2335,6 @@ ready(function () {
         maxNameLength = ENV.MAX_NAME_LENGTH
       }
 
-      let valid = true
       const validationData = {
         assignment_overrides: overrideView.getAllDates(),
         postToSIS: data['quiz[post_to_sis]'] === '1',
@@ -2229,31 +2350,25 @@ ready(function () {
       })
 
       if (keys(overrideErrs).length > 0) {
-        valid = false
         forEach(overrideErrs, err => {
           err.showError(err.element, err.message)
         })
+        return false
       }
+
       if (validationHelper.nameTooLong()) {
-        valid = false
-        const headerOffset = $('#quiz_title')
-          .errorBox(
-            I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1}),
-          )
-          .offset()
-        $('html,body').scrollTo({top: headerOffset.top, left: 0})
-      }
-      if (!valid) {
+        renderError(
+          $('.title'),
+          I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})
+        )
         return false
       }
 
       if (quiz_title.length === 0) {
-        const offset = $('#quiz_title')
-          .errorBox(I18n.t('errors.field_is_required', 'This field is required'))
-          .offset()
-        $('html,body').scrollTo({top: offset.top, left: 0})
+        renderError($('.title'), I18n.t('errors.field_is_required', 'This field is required'))
         return false
       }
+
       data['quiz[title]'] = quiz_title
 
       data['quiz[points_possible'] = numberHelper.parse(
@@ -2318,6 +2433,7 @@ ready(function () {
           return false
         }
       }
+
 
       const serializingEvent = $.Event('serializing')
 
@@ -3039,7 +3155,6 @@ ready(function () {
 
     const $ans = $(this).parents('.answer')
     const $ansHeader = $ans.closest('.question').find('.answers_header')
-    $('.errorBox').not('#error_box_template').remove()
     $ans.remove()
     $ansHeader.focus()
   })
@@ -4116,9 +4231,10 @@ ready(function () {
     processData(data) {
       const quizGroupQuestionPoints = numberHelper.parse(data['quiz_group[question_points]'])
       if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
-        $(this)
-          .find("input[name='quiz_group[question_points]']")
-          .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
+        // TODO: Implement on-field validation errors
+        // $(this)
+        //   .find("input[name='quiz_group[question_points]']")
+        //   .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
         return false
       } else {
         data['quiz_group[question_points]'] = quizGroupQuestionPoints

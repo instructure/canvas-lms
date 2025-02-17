@@ -1419,7 +1419,7 @@ describe Quizzes::Quiz do
         quiz = @course.quizzes.create! title: "test quiz"
         quiz.time_limit = -60
         expect(quiz.save).to be_falsey
-        expect(quiz.errors["time_limit"]).to be_present
+        expect(quiz.errors["invalid_time_limit"]).to be_present
       end
 
       it "does not validate time_limit if not changed" do

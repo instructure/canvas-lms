@@ -24,13 +24,18 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
 <div id="options_tab">
   <%= form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :id => "quiz_options_form", :class => 'form-horizontal bootstrap-form'} do %>
     <div style="position: relative;">
-      <div class="title">
+      <div class="form-control title" id="quiz-title-container">
         <% if content_is_locked %>
           <h1 id="quiz_title" class="title"><%= @quiz.title.html_safe %></h1>
           <input type="hidden" name="quiz[title]" value="<%=@quiz.title%>"/>
         <% else %>
-          <label for="quiz_title" class="screenreader-only"><%= t('Quiz Title') %></label>
-          <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254", :autofocus => true %>
+          <label for="quiz_title" class="bold form-control__label"><%= t('Quiz Title') %><span class="asterisk">*</span></label>
+          <%= text_field :quiz, :title, :maxlength => "254", :autofocus => true, :required => true,
+                         :class => "form-control__input", "aria-describedby" => "quiz_title_message" %>
+          <div class="form-control__message input-message__container hidden">
+            <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+            <span id="quiz_title_message" class="input-message__text"></span>
+          </div>
         <% end %>
       </div>
 
@@ -41,7 +46,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
           </div>
           <input type="hidden" name="description" value="<%=@quiz.description%>"/>
         <% else %>
-          <%= before_label(:quiz_instructions, "Quiz Instructions") %>
+          <label for="quiz_description" class="bold"><%= t("Quiz Instructions") %></label>
           <textarea id="quiz_description" style="display: none;width: 100%;margin: 0px auto;height: 125px"><%= @quiz.description %></textarea>
         <% end %>
       </div>
@@ -71,14 +76,21 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
           </div>
         </div>
 
-        <div class="control-group" id="quiz_points_possible" style="<%= hidden unless @quiz.graded_survey? %>">
-          <%= label :quiz, :points_possible, :quiz_score, :en => "Score", :class => 'control-label' %>
-            <div class="controls">
-              <%= text_field :quiz, :points_possible, :style => "width: 50px;", :value => points_possible_display %> pts
-              <div style="font-size: 0.8em;">
-                <%= t("students will automatically receive full credit once they take the survey") %>
-              </div>
+        <div class="control-group form-control points-possible" id="quiz_points_possible" style="<%= hidden unless @quiz.graded_survey? %>">
+          <label class="control-label form-control__label" for="quiz_points_possible">
+            <%= t("Score") %>
+          </label>
+          <div class="controls">
+            <%= text_field :quiz, :points_possible, :class => "form-control__input", :style => "width: 50px;",
+                           :required => true, :value => points_possible_display,
+                           "aria-describedby" => "graded_survey_points_message" %> pts
+            <div class="form-control__message input-message__container" data-original-text="<%= t("Students will automatically receive full credit once they take the survey") %>">
+              <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+              <span id="graded_survey_points_message" class="input-message__text">
+                <%= t("Students will automatically receive full credit once they take the survey") %>
+              </span>
             </div>
+          </div>
         </div>
 
         <div class="control-group">
@@ -97,16 +109,27 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
               <%= t("Shuffle Answers") %>
             </label>
 
-            <div>
-              <label class="checkbox inline nowrap" for="time_limit_option" style="margin-top:-3px;">
+            <div class="inline-input">
+              <label class="checkbox inline nowrap inline-input__label" for="time_limit_option">
                 <input type="checkbox" <%= "checked" if @quiz.time_limit %> name="time_limit" id="time_limit_option"/>
                 <%= t("Time Limit") %>
               </label>
 
-              <label class="checkbox inline" for="quiz_time_limit" style="padding-top:0;">
-                <%= text_field :quiz, :time_limit, :style => "width: 30px;", :"aria-label" => t("How many minutes?") %>
-                <%= t("Minutes") %>
-              </label>
+              <div class="form-control time-limit">
+                <div class="form-control__wrapper">
+                  <%= text_field :quiz, :time_limit, :id => "quiz_time_limit",
+                                 :class => "form-control__input", :style => "width: 30px;",
+                                 :"aria-label" => t("How many minutes?"), "aria-describedby" => "time_limit__message" %>
+                  <label class="time-limit__label" for="quiz_time_limit">
+                    <%= t("Minutes") %>
+                  </label>
+                </div>
+
+                <div class="form-control__message input-message__container hidden">
+                  <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+                  <span id="time_limit__message" class="input-message__text"></span>
+                </div>
+              </div>
             </div>
 
             <% if @context.root_account.feature_enabled?(:timer_without_autosubmission) %>
@@ -134,12 +157,22 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
                   <label for="keep_score_select" class="inline"><%= t("Quiz Score to Keep") %></label>
                   <%= select(:quiz, :scoring_policy, [[render_score_to_keep('keep_highest'), 'keep_highest'], [render_score_to_keep('keep_latest'), 'keep_latest'], [render_score_to_keep('keep_average'), 'keep_average']], {}, :id => 'keep_score_select') %>
                 </div>
-                <div style="margin-top:5px">
+                <div style="display: flex; margin-top:10px">
                   <label for="limit_attempts_option" class="checkbox inline nowrap">
                     <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 1 %> name="limit_attempts" id="limit_attempts_option"/>
                     <%= t("Allowed Attempts") %>
                   </label>
-                  <%= text_field :quiz, :allowed_attempts, :tabindex => "0", :value => (@quiz.allowed_attempts == -1 ? 1 : @quiz.allowed_attempts), :"aria-label" => t("Number of allowed attempts") %>
+                  <div style="display: flex; flex-direction: column">
+                    <%= text_field :quiz, :allowed_attempts, :tabindex => "0",
+                                   :value => (@quiz.allowed_attempts == -1 ? 1 : @quiz.allowed_attempts),
+                                   :"aria-label" => t("Number of allowed attempts"), :class => "form-control__input",
+                                   :required => true, "aria-describedby" => "allowed_attempts__message"
+                    %>
+                    <div style="margin-bottom:10px" class="form-control__message input-message__container hidden" data-original-text="">
+                      <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+                      <span id="allowed_attempts__message" class="input-message__text"></span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -194,41 +227,58 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
                       </label>
                     </div>
 
-                    <label for="quiz_show_correct_answers_at" class="inline">
-                      <%= t('Show Correct Answers at') %>
-                    </label>
+                    <div class="show-correct-answers form-control">
+                      <div class="form-control__wrapper date_field_container inline">
+                        <label for="quiz_show_correct_answers_at" class="inline form-control__label">
+                          <%= t('Show Correct Answers at') %>
+                        </label>
 
-                    <div class="date_field_container inline">
-                      <label class="screenreader-only" id="show_correct_answers_accessible_label">
-                        <%= t("Show Correct Answers At") %>
-                        <%= datepicker_screenreader_prompt %>
-                      </label>
-                      <%= text_field :quiz, :show_correct_answers_at,
-                        :class => "input-medium date_field",
-                        :type => "text",
-                        :value => @quiz.show_correct_answers_at.as_json,
-                        "aria-labelledby" => "show_correct_answers_accessible_label",
-                        "data-tooltip" =>"",
-                        :title => accessible_date_format %>
+                        <label class="screenreader-only form-control__label" id="show_correct_answers_accessible_label">
+                          <%= t("Show Correct Answers At") %>
+                          <%= datepicker_screenreader_prompt %>
+                        </label>
+
+                        <div class="form-control__inline-wrapper">
+                          <%= text_field :quiz, :show_correct_answers_at,
+                            :class => "input-medium date_field form-control__input",
+                            :type => "text",
+                            :value => @quiz.show_correct_answers_at.as_json,
+                            "aria-labelledby" => "show_correct_answers_accessible_label",
+                            "data-tooltip" =>"",
+                            :title => accessible_date_format,
+                            "aria-describedby" => "hide_correct_answers_at_message"
+                          %>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <label for="quiz_hide_correct_answers_at" class="inline">
-                      <%= t('Hide Correct Answers at') %>
-                    </label>
 
-                    <div class="date_field_container inline">
-                      <label class="screenreader-only" id="hide_correct_answers_accessible_label">
+                  <div class="hide-correct-answers form-control">
+                    <div class="form-control__wrapper date_field_container inline">
+                      <label for="quiz_hide_correct_answers_at" class="inline form-control__label">
+                        <%= t('Hide Correct Answers at') %>
+                      </label>
+
+                      <label class="screenreader-only form-control__label" id="hide_correct_answers_accessible_label">
                         <%= t("Hide Correct Answers At") %>
                         <%= datepicker_screenreader_prompt %>
                       </label>
-                      <%= text_field :quiz, :hide_correct_answers_at,
-                        :class => "input-medium date_field",
-                        :type => "text",
-                        :value => @quiz.hide_correct_answers_at.as_json,
-                        "aria-labelledby" => "hide_correct_answers_accessible_label",
-                        "data-tooltip" =>"",
-                        :title => accessible_date_format %>
+
+                      <div class="form-control__inline-wrapper">
+                        <%= text_field :quiz, :hide_correct_answers_at,
+                          :class => "input-medium date_field",
+                          :type => "text",
+                          :value => @quiz.hide_correct_answers_at.as_json,
+                          "aria-labelledby" => "hide_correct_answers_accessible_label",
+                          "data-tooltip" =>"",
+                          :title => accessible_date_format,
+                          "aria-describedby" => "hide_correct_answers_at_message" %>
+
+                        <div class="form-control__message input-message__container hidden">
+                          <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+                          <span id="show_answers__message" class="input-message__text"></span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -261,8 +311,17 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
                 <%= t("Require an access code") %>
               </label>
 
-              <div class="options control-group screenreader-only">
-                <input type="text" tabindex="-1" aria-label="<%=t("Required access code")%>" name="quiz[access_code]" id="quiz_access_code" value="<%= @quiz.access_code %>" placeholder="ex: Password85"  />
+              <div class="options control-group form-control access-code screenreader-only">
+                <label for="quiz_access_code" class="bold form-control__label">
+                  <%= t("Required access code") %><span class="asterisk">*</span>
+                </label>
+                <input type="text" tabindex="-1" name="quiz[access_code]" id="quiz_access_code"
+                       value="<%= @quiz.access_code %>" aria-describedby="access_code_message"
+                       class="form-control__input" />
+                <div class="form-control__message input-message__container" data-original-text="<%= t('ex: Password85') %>">
+                  <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+                  <span id="access_code_message" class="input-message__text"><%= t('ex: Password85') %></span>
+                </div>
               </div>
             </div>
             <div class="option-group">
@@ -270,9 +329,21 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
                 <input type="checkbox" <%= 'checked' if !@quiz.ip_filter.blank? %> id="enable_quiz_ip_filter">
                 <%= t("Filter IP Addresses") %>
               </label>
-              <div class="options control-group screenreader-only" aria-hidden="<%= !@quiz.ip_filter.blank? %>">
-                <input type="text" tabindex="-1" aria-label="<%=t("Filter by IP address")%>" name="quiz[ip_filter]" id="quiz_ip_filter" value="<%= @quiz.ip_filter %>" maxlength="255" placeholder="ex: 192.168.217.1"  />
-                <%= link_to(image_tag("find.png", :alt => t('Find IP Address Filter')), '#', :class => 'ip_filtering_link', :title => t('Find IP Address Filter'), 'aria-label' => t('Find IP Address Filter'), :tabindex => -1) %>
+              <div class="form-control ip-filter options control-group screenreader-only" aria-hidden="<%= !@quiz.ip_filter.blank? %>">
+                <label for="quiz_ip_filter" class="bold form-control__label">
+                  <%= t("Filter by IP address") %><span class="asterisk">*</span>
+                </label>
+                <div class="form-control__wrapper">
+                  <input type="text" class="form-control__input" tabindex="-1" name="quiz[ip_filter]"
+                         id="quiz_ip_filter" value="<%= @quiz.ip_filter %>" maxlength="255"
+                         aria-describedby="filter_ip_message"
+                    />
+                  <%= link_to(image_tag("find.png", :alt => t('Find IP Address Filter')), '#', :class => 'ip_filtering_link', :title => t('Find IP Address Filter'), 'aria-label' => t('Find IP Address Filter'), :tabindex => -1) %>
+                </div>
+                <div class="form-control__message input-message__container" data-original-text="<%= t('ex: 192.168.217.1') %>">
+                  <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+                  <span id="filter_ip_message" class="input-message__text"><%= t('ex: 192.168.217.1') %></span>
+                </div>
               </div>
             </div>
             <% if feature_enabled?(:lockdown_browser) && !@quiz.lockdown_browser_use_lti_tool? %>
