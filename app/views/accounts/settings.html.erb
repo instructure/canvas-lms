@@ -126,7 +126,7 @@
               </td>
             </tr>
             <% end %>
-            <% if !@account.site_admin? && @account.root_account.feature_enabled?(:default_due_time) %>
+            <% if !@account.site_admin? %>
               <%= f.fields_for :settings do |settings| %>
                 <%= settings.fields_for :default_due_time do |ddt| %>
                   <tr>

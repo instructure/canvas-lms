@@ -24,7 +24,11 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_default_due_time')
 
-export default function CourseDefaultDueTime() {
+interface CourseDefaultDueTimeProps {
+  canManage: boolean
+}
+
+export default function CourseDefaultDueTime({canManage} : CourseDefaultDueTimeProps) {
   const FORM_IDS = {
     COURSE_DEFAULT_DUE_TIME: 'course_default_due_time',
   }
@@ -89,6 +93,7 @@ export default function CourseDefaultDueTime() {
         onInputChange={(e, value, isoValue) => handleChange(isoValue)}
         defaultValue={stringTimeToDate(defaultValue)}
         allowNonStepInput={true}
+        interaction={canManage ? 'enabled' : 'disabled'}
       />
     </FormFieldGroup>
   )

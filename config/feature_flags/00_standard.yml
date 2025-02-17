@@ -33,11 +33,6 @@ common_cartridge_page_conversion:
   description: If enabled, Common Cartridge importers will convert HTML files into
     Pages
   applies_to: Course
-default_due_time:
-  state: hidden
-  display_name: Default Due Time
-  description: Adds an account/course setting for a default due time for new assignments
-  applies_to: RootAccount
 disable_alert_timeouts:
   type: setting
   state: allowed
