@@ -23431,6 +23431,7 @@ nn:
   see_turnitin_results_cd9d4a6c: "Sjå Turnitin-resultat"
   see_vericite_results_b44dd8c8: "Sjå VeriCite-resultat"
   select_1e849959: "[ Vel ]"
+  select_a_course_40bc3229: "Vel eit emne"
   select_a_course_4710371f: "Vel eit emne"
   select_a_date_optional_d60168d0: "Vel ein dato (valfri)"
   select_a_grading_period_5ea50f1: "Vel ei karaktersetjingsperiode..."
@@ -24892,6 +24893,7 @@ nn:
   something_went_wrong_please_try_refreshing_the_pag_689be273: "Noko gjekk gale. Prøv å laste sida på nytt."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Noko gjekk gale under aktiveringa av brukaren. Prøv på nytt seinare."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Noko gjekk gale under oppdateringa av brukaren si rolle. Prøv på nytt seinare."
+  something_went_wrong_updating_the_user_s_student_l_1047109c: "Noko gjekk gale under oppdateringa av brukaren sine studentlenker. Prøv på nytt seinare."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Noko gjekk gale under synkronisering av vurderingar til studentinformasjonssystemet. Prøv på nytt seinare."
   something_went_wrong_while_deactivating_the_user_p_8ff3e261: "Noko gjekk gale under deaktiveringa av brukaren. Prøv på nytt seinare."
   something_went_wrong_while_fetching_data_76b3ce71: "Noko gjekk gale når data skulle hentas"
@@ -28992,6 +28994,7 @@ nn:
       laste i ei ny fane. Når dette flagget er skrudd på, vil den haka være vald som standard
       dersom brukaren huka den av førre gong.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Når du skal leggje til fleire brukarar på ein gong, bruk komma eller linjeskift for å skilja brukarane."
+  when_an_observer_is_linked_to_a_student_they_have__489e2b71: "Når ein observatør er lenka til ein student, har begge tilgang til studenten sine vurderingsresultat og emnesamhandlingar."
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: "Studentar kan velje om dei vil svare anonymt. Ditt namn og profilbilde vil alltid vere synleg."
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Når du svarer kan du velje om namnet og profilbildet ditt skal vere synleg for andre studentar, eller om du vil vere anonym."
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Sjølv om den er slått av, kan studentar framleis sende individuelle meldingar til faglærarar på emna, undervisingsassistentar og andre studentar som tilhøyrer grupper på same kontonivå."
