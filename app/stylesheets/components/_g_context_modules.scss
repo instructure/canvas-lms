@@ -84,14 +84,21 @@ $context_module_bg_color: $ic-color-light;
           display: none;
         }
       }
+      &.no-estimated-duration {
+        .ig-details__item:nth-last-child(3) {
+          &:after {
+            display: none;
+          }
+        }
+      }
     }
 
-    // Same for the estimated duration
-    // .estimated_duration_display.ig-details__item
-    &.no-estimated-duration {
-      .ig-details__item:nth-last-child(3) {
-        &:after {
-          display: none;
+    &.with-completion-requirements {
+      &.no-estimated-duration {
+        .ig-details__item:nth-last-child(2) {
+          &:after {
+            display: none;
+          }
         }
       }
     }
@@ -396,7 +403,7 @@ $context_module_bg_color: $ic-color-light;
     padding-#{direction(left)}: 5px;
     margin-top: -4px;
     color: #888;
-    display: block;
+    display: inline;
     .requirement_type {
       display: none;
       .fulfilled {
@@ -407,37 +414,37 @@ $context_module_bg_color: $ic-color-light;
   &.min_score_requirement {
     .completion_requirement,
     .min_score_requirement {
-      display: block;
+      display: inline;
     }
   }
   &.min_percentage_requirement {
     .completion_requirement,
     .min_percentage_requirement {
-      display: block;
+      display: inline;
     }
   }
   &.must_view_requirement {
     .completion_requirement,
     .must_view_requirement {
-      display: block;
+      display: inline;
     }
   }
   &.must_mark_done_requirement {
     .completion_requirement,
     .must_mark_done_requirement {
-      display: block;
+      display: inline;
     }
   }
   &.must_contribute_requirement {
     .completion_requirement,
     .must_contribute_requirement {
-      display: block;
+      display: inline;
     }
   }
   &.must_submit_requirement {
     .completion_requirement,
     .must_submit_requirement {
-      display: block;
+      display: inline;
     }
   }
   .complete_item_icon {
