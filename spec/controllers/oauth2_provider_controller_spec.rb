@@ -774,7 +774,6 @@ describe OAuth2ProviderController do
       let(:service_user) { user_model }
 
       before do
-        Account.site_admin.enable_feature!(:site_admin_service_auth)
         key.update!(service_user:, internal_service: true)
       end
 
