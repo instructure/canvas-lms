@@ -66,7 +66,7 @@ describe "course wiki pages" do
     end
 
     it "does not show the 'Use as First page' button in Horizon courses" do
-      @course.root_account.enable_feature!(:horizon_course_setting)
+      @course.account.enable_feature!(:horizon_course_setting)
       @course.update!(horizon_course: true)
       visit_course_wiki_index_page(@course.id)
       f("tbody .al-trigger").click

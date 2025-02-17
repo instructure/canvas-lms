@@ -3039,7 +3039,7 @@ describe Course do
 
       describe "with horizon_course account setting on" do
         before :once do
-          Account.default.enable_feature!(:horizon_course_setting)
+          @course.account.enable_feature!(:horizon_course_setting)
           @course.update!(horizon_course: true)
           @course.save!
         end

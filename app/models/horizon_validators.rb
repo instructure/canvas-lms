@@ -30,7 +30,7 @@ module HorizonValidators
       end
 
       if record.peer_reviews || record.peer_reviews_assigned
-        record.errors.add(:peer_reviews, "Peer reviews are disabled")
+        record.errors.add(:peer_reviews, "Peer reviews are not supported")
       end
 
       if record.rubric.present?
@@ -48,14 +48,26 @@ module HorizonValidators
   class DiscussionsValidator < ActiveModel::Validator
     def validate(record)
       unless record.is_announcement
-        record.errors.add(:discussion_type, "Cannot create discussions in Horizon courses")
+        record.errors.add(:discussion_type, "Discussions are not supported")
       end
     end
   end
 
   class QuizzesValidator < ActiveModel::Validator
     def validate(record)
-      record.errors.add(:quiz_type, "Classic Quizzes are not supported in Horizon courses")
+      record.errors.add(:quiz_type, "Classic Quizzes are not supported")
+    end
+  end
+
+  class CollaborationsValidator < ActiveModel::Validator
+    def validate(record)
+      record.errors.add(:collaborations, "Collaborations are not supported")
+    end
+  end
+
+  class OutcomesValidator < ActiveModel::Validator
+    def validate(record)
+      record.errors.add(:outcomes, "Outcomes are not supported")
     end
   end
 end

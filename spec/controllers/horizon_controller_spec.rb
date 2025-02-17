@@ -94,6 +94,40 @@ describe HorizonController do
       )
     end
 
+    it "returns error when course has outcomes associated" do
+      course_factory(active_all: true)
+      outcome = @course.learning_outcomes.create!(title: "Outcome 1")
+
+      account_admin_user
+      user_session(@admin)
+
+      get "validate_course", format: :json, params: { course_id: @course.id }
+
+      json = json_parse(response.body)
+      expect(json["errors"]).to have_key("outcomes")
+      expect(json["errors"]["outcomes"].first).to include(
+        "id" => outcome.id,
+        "name" => "Outcome 1"
+      )
+    end
+
+    it "returns error when course has collaborations tools added" do
+      course_factory(active_all: true)
+      collab = @course.collaborations.create!(title: "Collaboration 1")
+
+      account_admin_user
+      user_session(@admin)
+
+      get "validate_course", format: :json, params: { course_id: @course.id }
+
+      json = json_parse(response.body)
+      expect(json["errors"]).to have_key("collaborations")
+      expect(json["errors"]["collaborations"].first).to include(
+        "id" => collab.id,
+        "name" => "Collaboration 1"
+      )
+    end
+
     it "returns errors when multiple items have errors" do
       course_factory(active_all: true)
       @course.discussion_topics.create!(title: "Discussion 1")

@@ -77,6 +77,9 @@
       <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
         <li id="integrations_tab"><a href="#tab-integrations" id="tab-integrations-link"><%= t('Integrations') %></a></li>
       <% end %>
+      <% if @context.account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
+        <li id="canvas_career_tab"><a href="#tab-canvas-career" id="tab-canvas-career-link"><%= t('Canvas Career Beta') %></a></li>
+      <% end %>
     <% end %>
   </ul>
   <div id="tab-details">
@@ -1019,6 +1022,12 @@
 
   <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) && !@context.elementary_homeroom_course? %>
     <div id="tab-integrations"></div>
+  <% end %>
+
+  <% if @context.account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
+      <div id="tab-canvas-career">
+        <% js_bundle :horizon_toggle %>
+      </div>
   <% end %>
 </div><!-- end course details tab -->
 

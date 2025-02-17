@@ -42,23 +42,47 @@ class HorizonController < ApplicationController
     quizzes_validator = HorizonValidators::QuizzesValidator.new
     validate_entites(@context.quizzes, quizzes_validator, errors, "quizzes")
 
+    # check collaborations
+    collaborations_validator = HorizonValidators::CollaborationsValidator.new
+    validate_entites(@context.collaborations, collaborations_validator, errors, "collaborations")
+
+    # check outcomes
+    outcomes_validator = HorizonValidators::OutcomesValidator.new
+    validate_entites(@context.learning_outcomes, outcomes_validator, errors, "outcomes")
+
     render json: { errors: }
   end
 
   private
 
-  def map_to_error_object(id, name, errors)
-    { id:, name:, errors: errors.group_by_attribute }
+  def map_to_error_object(id, name, link, errors)
+    { id:, name:, link:, errors: errors.group_by_attribute }
   end
 
   def validate_entites(entities, validator, errors, error_key)
-    entities.each do |entity|
+    entities.active.each do |entity|
       validator.validate(entity)
       next if entity.errors.empty?
 
       name = entity.respond_to?(:title) ? entity.title : entity.name
+      link = case error_key
+             when "assignments"
+               named_context_url(@context, :context_assignment_url, entity.id)
+             when "discussions"
+               named_context_url(@context, :context_discussion_topic_url, entity.id)
+             when "quizzes"
+               named_context_url(@context, :context_quiz_url, entity.id)
+             when "groups"
+               group_url(entity.id)
+             when "collaborations"
+               named_context_url(@context, :context_collaboration_url, entity.id)
+             when "outcomes"
+               named_context_url(@context, :context_outcome_url, entity.id)
+             else
+               nil
+             end
       errors[error_key] ||= []
-      errors[error_key] << map_to_error_object(entity.id, name, entity.errors)
+      errors[error_key] << map_to_error_object(entity.id, name, link, entity.errors)
     end
   end
 end
