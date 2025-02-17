@@ -17,7 +17,14 @@
  */
 
 import moment from 'moment-timezone'
-import { calculatePaceDuration, calculatePaceItemDuration, calendarDaysToPaceDuration, isTimeToCompleteCalendarDaysValid } from "../utils"
+import {
+  calculatePaceDuration,
+  calculatePaceItemDuration,
+  calendarDaysToPaceDuration,
+  getItemsDurationFromTimeToComplete,
+  getTimeToCompleteCalendarDaysFromItemsDuration,
+  isTimeToCompleteCalendarDaysValid
+} from '../utils'
 import { PACE_ITEM_1, PACE_ITEM_2, PACE_ITEM_3, PRIMARY_PACE } from '../../__tests__/fixtures'
 import { AssignmentWeightening, CoursePaceItem } from '../../types'
 
@@ -184,6 +191,272 @@ describe('utils', () => {
 
       const result = isTimeToCompleteCalendarDaysValid(coursePace, coursePaceItem, blackoutDates)
       expect(result).toBeFalsy()
+    })
+  })
+
+  describe('getTimeToCompleteCalendarDaysFromItemsDuration', () => {
+    const coursePace = {
+      ...PRIMARY_PACE,
+      exclude_weekends: false,
+      start_date: '2021-09-01',
+      time_to_complete_calendar_days: 7,
+    }
+
+    const coursePaceItem: CoursePaceItem[] = [
+      {
+        ...PACE_ITEM_1,
+        duration: 2,
+      },
+      {
+        ...PACE_ITEM_2,
+        duration: 2,
+      },
+      {
+        ...PACE_ITEM_3,
+        duration: 2,
+      },
+    ]
+
+    const blackoutDates = [
+      {
+        id: '30',
+        course_id: PRIMARY_PACE.course_id,
+        event_title: 'Spring break',
+        start_date: moment('2021-09-06'),
+        end_date: moment('2021-09-08'),
+      },
+    ]
+
+    it('calculates correctly time to complete calendar days', () => {
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: false,
+        selected_days_to_skip: [],
+        modules: coursePace.modules.map((module) => {
+          return {
+            ...module,
+            items: coursePaceItem
+          }
+        })
+      }
+
+      const result = getTimeToCompleteCalendarDaysFromItemsDuration(newCoursePace, [])
+      expect(result).toEqual(12)
+    })
+
+    it('calculates correctly time to complete calendar days - exclude weekends', () => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_skip_selected_days = false
+
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: true,
+        selected_days_to_skip: [],
+        modules: coursePace.modules.map((module) => {
+          return {
+            ...module,
+            items: coursePaceItem
+          }
+        })
+      }
+      // Calculates calendar days from 2021-09-01 excluding weekends
+      // pace durations is 13 days, and there are 2 weekends in that period
+      // start date is ignored, so the result is 16
+
+      const result = getTimeToCompleteCalendarDaysFromItemsDuration(newCoursePace, [])
+      expect(result).toEqual(16)
+    })
+
+    it('calculates correctly time to complete calendar days - selected_days_to_skip', () => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_skip_selected_days = true
+
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: false,
+        selected_days_to_skip: ['sun', 'mon', 'fri'],
+        modules: coursePace.modules.map((module) => {
+          return {
+            ...module,
+            items: coursePaceItem
+          }
+        })
+      }
+      // Calculates calendar days from 2021-09-01 excluding Sundays, Mondays and Fridays
+      // pace durations is 13 days, and there are 3 fridays, 3 sundays and 3 Mondays
+      // start date is ignored, so the result is 21
+
+      const result = getTimeToCompleteCalendarDaysFromItemsDuration(newCoursePace, [])
+      expect(result).toEqual(21)
+    })
+
+    it('calculates correctly time to complete calendar days - black out days', () => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_skip_selected_days = false
+
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: true,
+        selected_days_to_skip: [],
+        modules: coursePace.modules.map((module) => {
+          return {
+            ...module,
+            items: coursePaceItem
+          }
+        })
+      }
+      // Calculates calendar days from 2021-09-01 excluding weekends
+      // pace durations is 13 days, days from 2021-09-06 to 2021-09-08 are blacked out
+      // and there are 3 weekends in that period, start date is ignored, so the result is 21
+
+      const result = getTimeToCompleteCalendarDaysFromItemsDuration(newCoursePace, blackoutDates)
+      expect(result).toEqual(21)
+    })
+
+    it('calculates correctly time to complete calendar days - black out days and skip selected days', () => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_skip_selected_days = true
+
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: true,
+        selected_days_to_skip: ['sun', 'mon', 'fri'],
+        modules: coursePace.modules.map((module) => {
+          return {
+            ...module,
+            items: coursePaceItem
+          }
+        })
+      }
+      // Calculates calendar days from 2021-09-01 excluding weekends
+      // pace durations is 13 days, days from 2021-09-07 to 2021-09-08 are blacked out
+      // and there are 4 fridays, 3 sundays and 3 Mondays, start date is ignored, so the result is 24
+
+      const result = getTimeToCompleteCalendarDaysFromItemsDuration(newCoursePace, blackoutDates)
+      expect(result).toEqual(24)
+    })
+  })
+
+  describe('getItemsDurationFromTimeToComplete', () => {
+    const coursePace = {
+      ...PRIMARY_PACE,
+      exclude_weekends: false,
+      start_date: '2021-09-01',
+      time_to_complete_calendar_days: 7,
+    }
+
+    it('durations are 0 because of negative calendarDays', () => {
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: false,
+        selected_days_to_skip: []
+      }
+
+      const result = getItemsDurationFromTimeToComplete(newCoursePace, [], -100, 4)
+      expect(result.duration).toEqual(0)
+      expect(result.remainder).toEqual(0)
+    })
+
+    it('return durations without blackout days, skipped days and exclude_weekends = false', () => {
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: false,
+        selected_days_to_skip: []
+      }
+      // Start date is ignored from calculation,
+      // Calendar days are 11, then 11 / 3 = 3 and 11 % 3 = 2
+      // Then, duration: 3, reminder: 2
+
+      const result = getItemsDurationFromTimeToComplete(newCoursePace, [], 11, 3)
+      expect(result.duration).toEqual(3)
+      expect(result.remainder).toEqual(2)
+    })
+
+    it('return durations with skipped days', () => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_skip_selected_days = true
+
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: false,
+        selected_days_to_skip: ['sun', 'mon', 'fri']
+      }
+      // Start date is ignored from calculation,
+      // Start date is 2021-09-01, Calendar days are 11, so end date is 2021-09-11
+      // excluding Sundays, Mondays and Fridays
+      // Total duration is 6 days, so 6 / 3 = 2
+      // durations: 2, reminder: 0
+
+      const result = getItemsDurationFromTimeToComplete(newCoursePace, [], 11, 3)
+      expect(result.duration).toEqual(2)
+      expect(result.remainder).toEqual(0)
+    })
+
+    it('last calendar day is an skipped day, so it is ignored', () => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_skip_selected_days = true
+
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: false,
+        selected_days_to_skip: ['sun', 'mon', 'fri']
+      }
+      // Start date is ignored from calculation,
+      // excluding Sundays, Mondays and Fridays
+      // Start date is 2021-09-01, Calendar days are 12, 
+      // but end date is 2021-09-12 is sunday, an skipped day, so it is ignored
+      // duration: 2, reminder: 0
+
+      const result = getItemsDurationFromTimeToComplete(newCoursePace, [], 12, 3)
+      expect(result.duration).toEqual(2)
+      expect(result.remainder).toEqual(0)
+    })
+
+    it('return durations with exclude weekends', () => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_skip_selected_days = false
+
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: true,
+        selected_days_to_skip: []
+      }
+      // Start date is ignored from calculation,
+      // Start date is 2021-09-01, Calendar days are 11, so end date is 2021-09-11
+      // excluding Sundays and Saturdays
+      // Total duration is 7 days, so 7 / 3 = 2 and 7 % 3 = 1
+      // duration: 2, reminder: 1
+
+      const result = getItemsDurationFromTimeToComplete(newCoursePace, [], 11, 3)
+      expect(result.duration).toEqual(2)
+      expect(result.remainder).toEqual(1)
+    })
+
+    it('return durations with blackout dates', () => {
+      const newCoursePace = {
+        ...coursePace,
+        exclude_weekends: false,
+        selected_days_to_skip: []
+      }
+
+      const blackoutDates = [
+        {
+          id: '30',
+          course_id: PRIMARY_PACE.course_id,
+          event_title: 'Spring break',
+          start_date: moment('2021-09-06'),
+          end_date: moment('2021-09-08'),
+        },
+      ]
+      // Start date is ignored from calculation,
+      // Start date is 2021-09-01, Calendar days are 11, so end date is 2021-09-11
+      // days from 2021-09-06 to 2021-09-08 are blacked out
+      // Total duration is 9 days, so 9 / 3 = 2 and 9 % 3 = 0
+      // duration: 2, reminder: 2
+
+      const result = getItemsDurationFromTimeToComplete(newCoursePace, blackoutDates, 11, 3)
+      expect(result.duration).toEqual(3)
+      expect(result.remainder).toEqual(0)
     })
   })
 })

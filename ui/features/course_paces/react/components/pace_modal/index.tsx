@@ -278,7 +278,7 @@ export const PaceModal = ({
           }}
           contextType={props.coursePace.context_type}
         />
-      { window.ENV.FEATURES.course_pace_weighted_assignments && <WeightedAssignmentsTray />}
+        {window.ENV.FEATURES.course_pace_weighted_assignments && <WeightedAssignmentsTray />}
       </Modal.Body>
       <Modal.Footer themeOverride={{ padding: '0' }}>
         <Footer

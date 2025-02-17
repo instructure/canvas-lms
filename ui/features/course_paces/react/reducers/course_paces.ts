@@ -48,7 +48,13 @@ import {getSections} from './sections'
 import {getInitialCoursePace, getOriginalBlackoutDates, getOriginalPace} from './original'
 import {getBlackoutDates} from '../shared/reducers/blackout_dates'
 import {type Change, summarizeChanges} from '../utils/change_tracking'
-import { calculatePaceDuration, calendarDaysToPaceDuration, isTimeToCompleteCalendarDaysValid } from '../utils/utils'
+import {
+  calculatePaceDuration,
+  calendarDaysToPaceDuration,
+  getItemsDurationFromTimeToComplete,
+  getTimeToCompleteCalendarDaysFromItemsDuration,
+  isTimeToCompleteCalendarDaysValid,
+} from '../utils/utils'
 
 const initialProgress = window.ENV.COURSE_PACE_PROGRESS
 
@@ -656,6 +662,60 @@ export default (
       return {...state, assignments_weighting: action.payload}
     case CoursePaceConstants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS:
       return {...state, time_to_complete_calendar_days: action.payload}
+    case CoursePaceConstants.SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS:{
+      const modules = state.modules.map(module => {
+        const newItems = module.items.map(item => {
+          if (item.module_item_id === action.payload.paceItemId) {
+        return {
+          ...item,
+          duration: action.payload.duration,
+        }
+          }
+          return item
+        })
+        return {...module, items: newItems}
+      })
+
+      const newState = {...state, modules}
+
+      const timeToCompleteCalendarDays = getTimeToCompleteCalendarDaysFromItemsDuration(
+        newState,
+        action.payload.blackOutDates
+      )
+      return {...state, time_to_complete_calendar_days: timeToCompleteCalendarDays, modules}
+    }
+    case CoursePaceConstants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS: {
+      const timeToCompleteCalendarDays = getTimeToCompleteCalendarDaysFromItemsDuration(
+        state,
+        action.payload.blackOutDates
+      )
+      return {...state, time_to_complete_calendar_days: timeToCompleteCalendarDays}
+    }
+    case CoursePaceConstants.SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE: {
+      const itemsLength = state.modules.flatMap((module) => module.items).length
+      const { duration, remainder } = getItemsDurationFromTimeToComplete(
+        state,
+        action.payload.blackOutDays,
+        action.payload.calendarDays,
+        itemsLength
+      )
+
+      let index = 0
+      const modules = state.modules.map((module) => {
+        const newItems = module.items.map((item) => {
+          const itemDuration = index < remainder ? duration + 1 : duration
+          index++
+
+          return {
+            ...item,
+            duration: itemDuration,
+          }
+        })
+        return { ...module, items: newItems }
+      })
+
+      return { ...state, modules }
+    }
     default:
       return {
         ...state,

@@ -50,6 +50,7 @@ import {
   getSelectedDaysToSkip,
 } from '../../reducers/course_paces'
 import {actions} from '../../actions/course_pace_items'
+import { coursePaceActions } from '../../actions/course_paces'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 import {
   getShowProjections,
@@ -91,6 +92,7 @@ interface StoreProps {
 
 interface DispatchProps {
   readonly setPaceItemDuration: typeof actions.setPaceItemDuration
+  readonly setPaceItemDurationTimeToCompleteCalendarDays: typeof coursePaceActions.setPaceItemDurationTimeToCompleteCalendarDays
 }
 
 interface LocalState {
@@ -227,7 +229,11 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     const duration = parseInt(this.state.duration, 10)
 
     if (!Number.isNaN(duration)) {
-      this.props.setPaceItemDuration(this.props.coursePaceItem.module_item_id, duration)
+      if (window.ENV.FEATURES.course_pace_time_selection) {
+        this.props.setPaceItemDurationTimeToCompleteCalendarDays(this.props.coursePaceItem.module_item_id, duration, this.props.blackoutDates)
+      }else {
+        this.props.setPaceItemDuration(this.props.coursePaceItem.module_item_id, duration)
+      }
     }
   }
 
@@ -489,6 +495,7 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
 
 const ConnectedAssignmentRow = connect(mapStateToProps, {
   setPaceItemDuration: actions.setPaceItemDuration,
+  setPaceItemDurationTimeToCompleteCalendarDays: coursePaceActions.setPaceItemDurationTimeToCompleteCalendarDays
 })(AssignmentRow)
 
 // This hack allows AssignmentRow to be rendered inside an InstUI Table.Body

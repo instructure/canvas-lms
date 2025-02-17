@@ -35,6 +35,7 @@ import {renderConnected} from '../../../__tests__/utils'
 import {AssignmentRow, type ComponentProps} from '../assignment_row'
 
 const setPaceItemDuration = jest.fn()
+const setPaceItemDurationTimeToCompleteCalendarDays = jest.fn()
 
 jest.mock('@canvas/conditional-release-cyoe-helper', () => ({
   getItemData: jest.fn()
@@ -58,6 +59,7 @@ const defaultProps: ComponentProps = {
   blueprintLocked: false,
   selectedDaysToSkip: [],
   context_type: 'Course',
+  setPaceItemDurationTimeToCompleteCalendarDays,
 }
 
 const NO_SUBMISSION_TEXT = 'No Submission'
@@ -364,6 +366,28 @@ describe('AssignmentRow', () => {
     it('localizes the projected dates', () => {
       const {getByText} = renderConnected(renderRow(<AssignmentRow {...defaultProps} />))
       expect(getByText('Wed, 1 Jan 2020')).toBeInTheDocument()
+    })
+  })
+
+  describe('with course_pace_time_selection enabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_pace_time_selection = true
+    })
+
+    it('renders an input that updates the duration for that module item', async () => {
+      const {getByRole} = renderConnected(renderRow(<AssignmentRow {...defaultProps} />))
+      const daysInput = getByRole('textbox', {
+        name: 'Duration for assignment Basic encryption/decryption',
+      }) as HTMLInputElement
+      expect(daysInput).toBeInTheDocument()
+      expect(daysInput.value).toBe('2')
+
+      await userEvent.type(daysInput, '{selectall}{backspace}4')
+      await userEvent.tab()
+
+      expect(setPaceItemDurationTimeToCompleteCalendarDays).toHaveBeenCalled()
+      expect(setPaceItemDurationTimeToCompleteCalendarDays).toHaveBeenCalledWith('60', 4, BLACKOUT_DATES)
     })
   })
 })

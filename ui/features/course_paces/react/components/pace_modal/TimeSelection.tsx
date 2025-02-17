@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useEffect, useState, SetStateAction, Dispatch, useMemo, useCallback } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { Flex } from '@instructure/ui-flex'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
@@ -27,11 +27,13 @@ import { Text } from '@instructure/ui-text'
 import { NumberInput } from '@instructure/ui-number-input'
 import { View } from '@instructure/ui-view'
 import moment from 'moment-timezone'
-import type { CoursePace, OptionalDate, Pace, PaceDuration, ResponsiveSizes, StoreState } from '../../types'
+import _ from 'lodash'
+import type { CoursePace, OptionalDate, Pace, ResponsiveSizes, StoreState } from '../../types'
 import { generateDatesCaptions, rawDaysBetweenInclusive } from '../../utils/date_stuff/date_helpers'
 import { coursePaceActions } from '../../actions/course_paces'
 import { calendarDaysToPaceDuration } from '../../utils/utils'
-import { getPaceDuration } from '../../reducers/course_paces'
+import { getBlackoutDates } from '../../shared/reducers/blackout_dates'
+import { BlackoutDate } from '../../shared/types'
 
 const I18n = createI18nScope('acceptable_use_policy')
 
@@ -44,19 +46,23 @@ interface PassedProps {
 }
 
 interface StoreProps {
-  readonly paceDuration: PaceDuration
+  readonly blackoutDates: BlackoutDate[]
 }
 
 interface DispatchProps {
   readonly setTimeToCompleteCalendarDays: typeof coursePaceActions.setTimeToCompleteCalendarDays
+  readonly setPaceItemsDurationFromTimeToComplete: typeof coursePaceActions.setPaceItemsDurationFromTimeToComplete
+  readonly setStartDate: typeof coursePaceActions.setStartDate
+  readonly setTimeToCompleteCalendarDaysFromItems: typeof coursePaceActions.setTimeToCompleteCalendarDaysFromItems
 }
 
 interface DateInputWithCaptionProps {
   date: OptionalDate
-  setStateDate: Dispatch<SetStateAction<OptionalDate>>
+  onChangeDate: (date: string) => void
   caption: string
   renderLabel: string
   dataTestId: string
+  dateIsDisabled: (date: moment.Moment) => boolean
 }
 
 interface NumberInputWithLabelProps {
@@ -75,54 +81,94 @@ const TimeSelection = (props: TimeSelectionProps) => {
     appliedPace,
     setTimeToCompleteCalendarDays,
     responsiveSize,
+    setPaceItemsDurationFromTimeToComplete,
+    blackoutDates,
+    setStartDate,
+    setTimeToCompleteCalendarDaysFromItems,
   } = props
 
-  const endDateValue = useMemo(() => () => {
-    if (coursePace.end_date)
-      return coursePace.end_date
+  const originalSelectedDaysToSkip = useRef(coursePace.selected_days_to_skip)
+  const originalBlackoutDates = useRef(blackoutDates)
 
-    const startDateMoment = moment(coursePace.start_date).startOf('day')
-
-    return startDateMoment.add(coursePace.time_to_complete_calendar_days - 1, 'days').startOf('day').toISOString()
-  }, [coursePace])
-
-  const originalPaceDuration = calendarDaysToPaceDuration(coursePace.time_to_complete_calendar_days)
-
-  const [startDate, setStartDate] = useState<OptionalDate>(coursePace.start_date)
-  const [endDate, setEndDate] = useState<OptionalDate>(endDateValue)
-  const [weeks, setWeeks] = useState<number>(originalPaceDuration.weeks || 0)
-  const [days, setDays] = useState<number>(originalPaceDuration.days || 0)
-
+  const enrollmentType = coursePace.context_type === 'Enrollment'
   const dateColumnWidth = responsiveSize === "small" ? "100%" : "15.313rem"
-
   const formatDate = (date: Date) => {
     return tz.format(date, 'date.formats.long') || ''
   }
 
-  const enrollmentType = coursePace.context_type === 'Enrollment'
+  const [endDate, setEndDate] = useState<OptionalDate>(null)
+  const [weeks, setWeeks] = useState<number>(0)
+  const [days, setDays] = useState<number>(0)
 
-  const setTimeToComplete = useCallback(() => {
+  useEffect(() => {
+    if (
+      !_.isEqual(coursePace.selected_days_to_skip, originalSelectedDaysToSkip.current) || 
+      !_.isEqual(blackoutDates, originalBlackoutDates.current)
+    ) {
+      setTimeToCompleteCalendarDaysFromItems(blackoutDates)
+      originalSelectedDaysToSkip.current = coursePace.selected_days_to_skip
+      originalBlackoutDates.current = blackoutDates
+    }
+  }, [coursePace.selected_days_to_skip, blackoutDates, setTimeToCompleteCalendarDaysFromItems])
+
+  useEffect(() => {
+    const startDateMoment = moment(coursePace.start_date).startOf('day')
+    const calendarDays = coursePace.time_to_complete_calendar_days === 0 
+      ? 0 
+      : coursePace.time_to_complete_calendar_days
+    const endDateValue = startDateMoment
+      .add(calendarDays, 'days')
+      .startOf('day')
+      .toISOString()
+    setEndDate(endDateValue)
+
+    const originalPaceDuration = calendarDaysToPaceDuration(coursePace.time_to_complete_calendar_days)
+    setWeeks(originalPaceDuration.weeks)
+    setDays(originalPaceDuration.days)
+  }, [coursePace.time_to_complete_calendar_days, coursePace.start_date])
+
+  const setTimeToComplete = (startDate: OptionalDate, endDate: OptionalDate) => {
+    if (!startDate || !endDate) return
+
     const startDateValue = moment(startDate).endOf('day')
     const endDateValue = moment(endDate).endOf('day')
 
     const calendarDays = rawDaysBetweenInclusive(startDateValue, endDateValue)
-    setTimeToCompleteCalendarDays(calendarDays)
+    const calendarDaysValue = calendarDays < 0 ? 0 : calendarDays - 1
 
-    const paceDuration = calendarDaysToPaceDuration(calendarDays)
+    const paceDuration = calendarDaysToPaceDuration(calendarDaysValue)
     setWeeks(paceDuration.weeks)
     setDays(paceDuration.days)
-  }, [startDate, endDate, setTimeToCompleteCalendarDays])
 
-  useEffect(() => {
-    setTimeToComplete();
-  }, [startDate, endDate, setTimeToComplete]);
+    setTimeToCompleteCalendarDays(calendarDaysValue)
+    setPaceItemsDurationFromTimeToComplete(blackoutDates, calendarDaysValue)
+  }
 
-  const captions = generateDatesCaptions(coursePace, startDate, endDate, appliedPace)
+  const onChangeStartDate = (dateValue: string) => {
+    setStartDate(dateValue)
+    setTimeToComplete(dateValue, endDate)
+  }
 
-  const DateInputWithCaption = ({ date, setStateDate, caption, renderLabel, dataTestId }: DateInputWithCaptionProps) => {
-    const onChangeDate = (date: Date | null) => {
-      const dateValue = date ? date.toISOString() : ''
-      setStateDate(dateValue)
+  const onChangeEndDate = (dateValue: string) => {
+    setEndDate(dateValue)
+    setTimeToComplete(coursePace.start_date, dateValue)
+  }
+
+  const captions = generateDatesCaptions(coursePace, coursePace.start_date, endDate, appliedPace)
+  const DateInputWithCaption = ({
+    date,
+    onChangeDate,
+    caption,
+    renderLabel,
+    dataTestId,
+    dateIsDisabled
+  }: DateInputWithCaptionProps) => {
+
+    const onChange = (selectedDate: Date | null) => {
+      if (selectedDate === null) return
+      const dateValue = selectedDate.toISOString()
+      if (dateValue === date) return
+      onChangeDate(dateValue)
     }
 
     return (
@@ -132,18 +178,25 @@ const TimeSelection = (props: TimeSelectionProps) => {
           timezone={coursePaceTimezone}
           formatDate={formatDate}
           selectedDate={date}
-          onSelectedDateChange={onChangeDate}
+          onSelectedDateChange={onChange}
           width={dateColumnWidth}
           display="block"
           withRunningValue={true}
           interaction={undefined}
           dataTestid={dataTestId}
-        />
+          dateIsDisabled={dateIsDisabled} />
       </DateInputContainer>
     )
   }
-
-  const ReadOnlyDateWithCaption = ({ dateValue, caption, dataTestId }: { dateValue: OptionalDate, caption: string, dataTestId: string }) => {
+  const ReadOnlyDateWithCaption = ({
+    dateValue,
+    caption,
+    dataTestId
+  }: {
+    dateValue: OptionalDate,
+    caption: string,
+    dataTestId: string
+  }) => {
     return (
       <LabeledComponent label={I18n.t('Start Date')}>
         <DateInputContainer caption={caption}>
@@ -182,7 +235,6 @@ const TimeSelection = (props: TimeSelectionProps) => {
   }
 
   const NumberInputWithLabel = ({ value, label, renderLabel, unit, dataTestId }: NumberInputWithLabelProps) => {
-
     const updateEndDate = (operation: 'add' | 'subtract') => {
       if (!Number.isInteger(value) || value <= 0 && operation === 'subtract') return
 
@@ -191,11 +243,13 @@ const TimeSelection = (props: TimeSelectionProps) => {
         : moment(endDate).subtract(1, unit)
 
       setEndDate(newEndDate.toISOString(true))
+      setTimeToComplete(coursePace.start_date, newEndDate.toISOString(true))
     }
 
     const onIncrement = () => {
       updateEndDate('add')
     }
+
     const onDecrement = () => {
       updateEndDate('subtract')
     }
@@ -230,25 +284,36 @@ const TimeSelection = (props: TimeSelectionProps) => {
         padding="x-small 0 0 xx-small"
         alignItems="start">
 
-        {enrollmentType
-          ?
-          <ReadOnlyDateWithCaption dateValue={startDate} caption={captions.startDate} dataTestId='start-date-readonly' />
-          :
+        {enrollmentType ? (
+          <ReadOnlyDateWithCaption
+            dateValue={coursePace.start_date}
+            caption={captions.startDate}
+            dataTestId='start-date-readonly'
+          />
+        ) : (
           <DateInputWithCaption
-            key={`start-date`}
-            date={startDate}
-            setStateDate={setStartDate}
+            key="start-date"
+            date={coursePace.start_date}
+            onChangeDate={onChangeStartDate}
             caption={captions.startDate}
             renderLabel={I18n.t('Start Date')}
-            dataTestId='start-date-input' />
-        }
+            dataTestId='start-date-input'
+            dateIsDisabled={(date: moment.Moment) =>
+              Boolean(endDate && date.toISOString() > endDate)
+            }
+          />
+        )}
         <DateInputWithCaption
-          key={`end-date`}
+          key="end-date"
           date={endDate}
-          setStateDate={setEndDate}
+          onChangeDate={onChangeEndDate}
           caption={captions.endDate}
           renderLabel={I18n.t('End Date')}
-          dataTestId='end-date-input' />
+          dataTestId="end-date-input"
+          dateIsDisabled={(date: moment.Moment) =>
+            Boolean(coursePace.start_date && date.toISOString() < coursePace.start_date)
+          }
+        />
         <Flex.Item>
           <LabeledComponent label={I18n.t('Time to Complete Course')}>
             <NumberInputWithLabel
@@ -272,10 +337,13 @@ const TimeSelection = (props: TimeSelectionProps) => {
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
-    paceDuration: getPaceDuration(state),
+    blackoutDates: getBlackoutDates(state),
   }
 }
 
 export default connect(mapStateToProps, {
-  setTimeToCompleteCalendarDays: coursePaceActions.setTimeToCompleteCalendarDays
+  setTimeToCompleteCalendarDays: coursePaceActions.setTimeToCompleteCalendarDays,
+  setPaceItemsDurationFromTimeToComplete: coursePaceActions.setPaceItemsDurationFromTimeToComplete,
+  setStartDate: coursePaceActions.setStartDate,
+  setTimeToCompleteCalendarDaysFromItems: coursePaceActions.setTimeToCompleteCalendarDaysFromItems,
 })(TimeSelection)

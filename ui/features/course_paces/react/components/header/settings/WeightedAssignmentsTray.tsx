@@ -76,7 +76,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
     setWeightedAssignments: setWeightedAssignmentsCoursePace,
     coursePaceItems,
     setPaceItemWeightedDuration,
-    blackoutDates
+    blackoutDates,
   } = props
 
   const alertContainer = useRef<HTMLDivElement | null>(null)
@@ -318,5 +318,5 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 export default connect(mapStateToProps, {
   setWeightedAssignments: coursePaceActions.setWeightedAssignments,
   setPaceItemWeightedDuration: actions.setPaceItemWeightedDuration,
-  onDismiss: uiActions.hideWeightedAssignmentsTray
+  onDismiss: uiActions.hideWeightedAssignmentsTray,
 })(WeightedAssignmentsTray)

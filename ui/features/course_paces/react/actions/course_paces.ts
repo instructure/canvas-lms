@@ -31,7 +31,7 @@ import type {
   StoreState,
   AssignmentWeightening,
 } from '../types'
-import {createAction, type ActionsUnion} from '../shared/types'
+import {BlackoutDate, createAction, type ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
 import {actions as blackoutDateActions} from '../shared/actions/blackout_dates'
 import {getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
@@ -62,6 +62,9 @@ export enum Constants {
   UNCOMPRESS_DATES = 'COURSE_PACE/UNCOMPRESS_ITEM_DATES',
   SET_WEIGHTED_ASSIGNMENTS = 'COURSE_PACE/SET_WEIGHTED_ASSIGNMENTS',
   SET_TIME_TO_COMPLETE_CALENDAR_DAYS = 'COURSE_PACE/SET_TIME_TO_COMPLETE_CALENDAR_DAYS',
+  SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS = 'COURSE_PACE/SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS',
+  SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS= 'COURSE_PACE/SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS',
+  SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE= 'COURSE_PACE/SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE'
 }
 
 /* Action creators */
@@ -84,6 +87,12 @@ const regularActions = {
     createAction(Constants.COURSE_PACE_SAVED, coursePace),
   setWeightedAssignments: (assignmentsWeighting: AssignmentWeightening) => createAction(Constants.SET_WEIGHTED_ASSIGNMENTS, assignmentsWeighting),
   setTimeToCompleteCalendarDays: (days: number) => createAction(Constants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS, days),
+  setPaceItemDurationTimeToCompleteCalendarDays: (paceItemId: string, duration: number, blackOutDates: BlackoutDate[]) =>
+    createAction(Constants.SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS, {paceItemId, duration, blackOutDates}),
+  setTimeToCompleteCalendarDaysFromItems: (blackOutDates: BlackoutDate[]) =>
+    createAction(Constants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS, {blackOutDates}),
+  setPaceItemsDurationFromTimeToComplete: (blackOutDays: BlackoutDate[], calendarDays: number) =>
+    createAction(Constants.SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE, {blackOutDays, calendarDays})
 }
 
 // @ts-expect-error
