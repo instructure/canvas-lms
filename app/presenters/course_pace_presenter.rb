@@ -46,7 +46,7 @@ class CoursePacePresenter
       modules: modules_json,
       context_id:,
       assignments_weighting: assignments_weighting,
-      time_to_complete_calendar_days: course_pace.time_to_complete_calendar_days,
+      time_to_complete_calendar_days: course_pace.time_to_complete_calendar_days || 0,
       context_type:
     }.merge(course_pace.start_date(with_context: true)).merge(course_pace.effective_end_date(with_context: true))
   end

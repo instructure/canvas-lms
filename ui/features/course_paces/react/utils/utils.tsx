@@ -91,3 +91,56 @@ export const isTimeToCompleteCalendarDaysValid = (
 
   return calendarDays <= coursePace.time_to_complete_calendar_days
 }
+
+export const getTimeToCompleteCalendarDaysFromItemsDuration = (
+  coursePace: CoursePace,
+  blackOutDates: BlackoutDate[]
+): number => {
+  const coursePaceItems = coursePace.modules.flatMap((module) => module.items)
+  const paceDueDates = PaceDueDatesCalculator.getDueDates(
+    coursePaceItems,
+    coursePace.exclude_weekends,
+    coursePace.selected_days_to_skip,
+    blackOutDates,
+    coursePace.start_date
+  )
+
+  const endDateValue = moment.max(Object.values(paceDueDates).map((x) => moment(x)))
+  const startDateMoment = moment(coursePace.start_date).startOf('day')
+  return DateHelpers.rawDaysBetweenInclusive(startDateMoment, endDateValue) - 1
+}
+
+export const getItemsDurationFromTimeToComplete = (
+  coursePace: CoursePace,
+  blackOutDays: BlackoutDate[],
+  calendarDays: number,
+  itemsLength: number
+): { duration: number, remainder: number } => {
+  if (calendarDays < 1 || coursePace.start_date === undefined) {
+    return { duration: 0, remainder: 0 }
+  }
+
+  const startDate = DateHelpers.addDays(
+    coursePace.start_date,
+    1,
+    coursePace.exclude_weekends,
+    coursePace.selected_days_to_skip,
+    blackOutDays
+  )
+  const endDate = moment(coursePace.start_date).add(calendarDays, 'days').endOf('day')
+
+  if (moment(startDate).isAfter(endDate)) {
+    return { duration: 0, remainder: 0 }
+  }
+
+  const totalDuration = DateHelpers.daysBetween(
+    startDate,
+    endDate,
+    coursePace.exclude_weekends,
+    coursePace.selected_days_to_skip,
+    blackOutDays,
+  )
+
+  const itemsDuration = Math.floor(totalDuration / itemsLength)
+  return { duration: itemsDuration, remainder: totalDuration % itemsLength }
+}

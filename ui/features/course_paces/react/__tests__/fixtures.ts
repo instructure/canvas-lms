@@ -218,7 +218,8 @@ export const PRIMARY_PACE: CoursePace = {
   course: undefined,
   compressed_due_dates: undefined,
   updated_at: '',
-  assignments_weighting: ASSIGNMENT_WEIGHTING
+  assignments_weighting: ASSIGNMENT_WEIGHTING,
+  time_to_complete_calendar_days: 100,
 }
 
 export const PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED: CoursePace = {
@@ -439,6 +440,7 @@ export const STUDENT_PACE: CoursePace = {
   compressed_due_dates: undefined,
   updated_at: '',
   assignments_weighting: ASSIGNMENT_WEIGHTING,
+  time_to_complete_calendar_days: 100,
 }
 
 export const STUDENT_PACE_UNRELEASED_ITEMS: CoursePace = {

@@ -113,23 +113,18 @@ describe('WeightedAssignmentsTray', () => {
     it('Alert message is shown when validation error', () => {
       const storeState: StoreState = {
         ...defaultStoreState,
-        original: {
-          coursePace: {
-            ...PRIMARY_PACE,
-            workflow_state: 'unpublished',
-            assignments_weighting: {
-              assignment: 2,
-              quiz: 0,
-              discussion: 0,
-              page: 0,
-            },
-            start_date: '2021-12-15',
-            end_date: '2021-12-17',
+        coursePace: {
+          ...PRIMARY_PACE,
+          time_to_complete_calendar_days: 2,
+          assignments_weighting: {
+            assignment: 2,
+            quiz: 2,
+            discussion: 2,
+            page: 2,
           },
-          blackoutDates: BLACKOUT_DATES
         },
       }
-      const {getByTestId} = renderConnected(<WeightedAssignmentsTray />, storeState)
+      const { getByTestId } = renderConnected(<WeightedAssignmentsTray />, storeState)
       const incrementButton = getByTestId('duration-assignment')
         .querySelector('svg[name="IconArrowOpenUp"]')
         ?.closest('button') as HTMLButtonElement
@@ -142,23 +137,21 @@ describe('WeightedAssignmentsTray', () => {
     it('Alert message is focused when validation error and apply button clicked', () => {
       const storeState: StoreState = {
         ...defaultStoreState,
-        original: {
-          coursePace: {
-            ...PRIMARY_PACE,
-            workflow_state: 'unpublished',
-            assignments_weighting: {
-              assignment: 2,
-              quiz: 0,
-              discussion: 0,
-              page: 0,
-            },
-            start_date: '2021-12-15',
-            end_date: '2021-12-17',
+        coursePace: {
+          ...PRIMARY_PACE,
+          workflow_state: 'unpublished',
+          assignments_weighting: {
+            assignment: 8,
+            quiz: 2,
+            discussion: 8,
+            page: 0,
           },
-          blackoutDates: BLACKOUT_DATES
+          time_to_complete_calendar_days: 2,
+          start_date: '2021-12-15',
+          end_date: '2021-12-17',
         },
       }
-      const {getByTestId} = renderConnected(<WeightedAssignmentsTray />, storeState)
+      const { getByTestId } = renderConnected(<WeightedAssignmentsTray />, storeState)
       const incrementButton = getByTestId('duration-assignment')
         .querySelector('svg[name="IconArrowOpenUp"]')
         ?.closest('button') as HTMLButtonElement
@@ -167,7 +160,7 @@ describe('WeightedAssignmentsTray', () => {
       const applyButton = getByTestId('weighted-assignments-apply-button').closest('button') as HTMLButtonElement
       fireEvent.click(applyButton)
 
-      const validationMessage = getByTestId('validation-message')
+      const validationMessage = screen.getByTestId('validation-message')
       expect(validationMessage).toHaveFocus()
     })
   })
