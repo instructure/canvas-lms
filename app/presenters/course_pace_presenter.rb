@@ -91,6 +91,8 @@ class CoursePacePresenter
 
   private
 
+  CONTENT_TYPES = ["Assignment", "Quizzes::Quiz"].freeze
+
   def add_docx_tables(doc)
     module_table_template = doc.tables.first
     course_table_template = doc.tables.last
@@ -196,10 +198,10 @@ class CoursePacePresenter
     return [] unless items
 
     module_item_ids = extract_module_item_ids(items)
-    content_tags = load_and_assign_content_tags(module_item_ids)
+    content_tags, module_item_to_assignment = load_and_assign_content_tags(module_item_ids)
     submission_statuses = course_pace.module_item_submission_status_by_student([course_pace.user_id], module_item_ids)
 
-    build_items_json(items, content_tags, submission_statuses)
+    build_items_json(items, content_tags, module_item_to_assignment, submission_statuses)
   end
 
   def extract_module_item_ids(items)
@@ -208,17 +210,35 @@ class CoursePacePresenter
 
   def load_and_assign_content_tags(module_item_ids)
     content_tags = ContentTag.where(id: module_item_ids)
-    assignment_content_ids = content_tags.select { |tag| tag.content_type == "Assignment" }.map(&:content_id)
+
+    module_item_to_assignment = {}
+    assignment_content_ids = content_tags
+                             .select { |tag| CONTENT_TYPES.include?(tag.content_type) }
+                             .map(&:content_id)
+
     assignments = Assignment.where(id: assignment_content_ids).index_by(&:id)
-    content_tags.each { |tag| tag.content = assignments[tag.content_id] if tag.content_type == "Assignment" }
-    content_tags
+
+    quizzes = Quizzes::Quiz.where(id: assignment_content_ids).index_by(&:id)
+
+    content_tags.each do |tag|
+      if tag.content_type == "Assignment"
+        tag.content = assignments[tag.content_id]
+        module_item_to_assignment[tag.id] = tag.content_id
+      elsif tag.content_type == "Quizzes::Quiz"
+        tag.content = quizzes[tag.content_id]
+        module_item_to_assignment[tag.id] = quizzes[tag.content_id]&.assignment_id
+      end
+    end
+
+    [content_tags, module_item_to_assignment]
   end
 
-  def build_items_json(items, content_tags, submission_statuses)
+  def build_items_json(items, content_tags, module_item_to_assignment, submission_statuses)
     items.map do |ppmi|
       module_item = ppmi.module_item
       submission_status = submission_statuses[course_pace.user_id][module_item.id] || { has_submission: false, submission_date: nil, submittable: false }
       content = content_tags.find { |tag| tag.id == module_item.id }&.content
+      assignment_id = module_item_to_assignment[module_item.id]
       {
         id: ppmi.id,
         duration: ppmi.duration,
@@ -226,6 +246,7 @@ class CoursePacePresenter
         root_account_id: ppmi.root_account_id,
         module_item_id: module_item.id,
         assignment_title: module_item.title,
+        assignment_id: assignment_id,
         points_possible: TextHelper.round_if_whole(content&.try_rescue(:points_possible)),
         assignment_link: "#{course_url(course_pace.course, only_path: true)}/modules/items/#{module_item.id}",
         position: module_item.position,

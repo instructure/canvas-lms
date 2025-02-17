@@ -322,6 +322,7 @@ class CoursePacesController < ApplicationController
       master_course_data[:default_restrictions] = MasterCourses::MasterTemplate.full_template_for(@context).default_restrictions_for(@course_pace) if status == :master
     end
 
+    set_js_assignment_data
     js_env({
              BLACKOUT_DATES: @blackout_dates.as_json(include_root: false),
              CALENDAR_EVENT_BLACKOUT_DATES: @calendar_event_blackout_dates.as_json(include_root: false),
@@ -335,9 +336,10 @@ class CoursePacesController < ApplicationController
              VALID_DATE_RANGE: CourseDateRange.new(@context),
              MASTER_COURSE_DATA: master_course_data,
              IS_MASQUERADING: @current_user && @real_current_user && @real_current_user != @current_user,
-             PACES_PUBLISHING: paces_publishing
-           })
-
+             PACES_PUBLISHING: paces_publishing,
+             CONTEXT_URL_ROOT: polymorphic_path([@context])
+           },
+           true)
     js_bundle :course_paces
     css_bundle :course_paces
   end
