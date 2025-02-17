@@ -20,6 +20,7 @@ import React, {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {datetimeString} from '@canvas/datetime/date-functions'
+import {canvas} from '@instructure/ui-theme-tokens'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -112,9 +113,7 @@ export const DateAdjustments = ({
     <Responsive
       match="media"
       query={{
-        small: {maxWidth: 600},
-        medium: {minWidth: 600},
-        large: {minWidth: 800},
+        small: {maxWidth: canvas.breakpoints.desktop},
       }}
     >
       {(_props, matches) => {
