@@ -675,6 +675,9 @@ module Lti
       end
 
       it "has a substitution for com.instructure.Assignment.lti.id when there is no tool setting" do
+        # the account does not have an `id` hence the mock below.
+        # creating the account with Account.create! creates an ID bu t breaks other tests.
+        allow(course).to receive(:horizon_course?).and_return(false)
         assignment.update(context: course)
         expander = VariableExpander.new(root_account,
                                         account,

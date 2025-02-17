@@ -422,12 +422,28 @@ describe "course settings" do
     end
 
     it "does not show Home tab when in a horizon course" do
-      Account.site_admin.enable_feature!(:horizon_course_setting)
+      @course.account.enable_feature!(:horizon_course_setting)
       @course.update!(horizon_course: true)
       @course.save!
       get "/courses/#{@course.id}/settings#tab-navigation"
       # The Home tab always has this ID
       expect(element_exists?("#nav_edit_tab_id_0")).to be_falsey
+    end
+
+    it "does not show Canvas Career when FF is disabled" do
+      @course.account.disable_feature!(:horizon_course_setting)
+      @course.save!
+      get "/courses/#{@course.id}/settings#tab-details"
+      # The Home tab always has this ID
+      expect(element_exists?("#cavas_career_tab")).to be_falsey
+    end
+
+    it "shows Canvas Career when FF is enabled" do
+      @course.account.enable_feature!(:horizon_course_setting)
+      @course.save!
+      get "/courses/#{@course.id}/settings#tab-details"
+      # The Home tab always has this ID
+      expect(element_exists?("#canvas_career_tab")).to be_truthy
     end
 
     it "changes course details" do

@@ -4466,7 +4466,7 @@ class Course < ActiveRecord::Base
   end
 
   def horizon_course?
-    root_account&.feature_enabled?(:horizon_course_setting) && horizon_course
+    horizon_course && account&.feature_enabled?(:horizon_course_setting)
   end
 
   private

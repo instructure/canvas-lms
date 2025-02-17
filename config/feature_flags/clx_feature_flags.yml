@@ -2,6 +2,7 @@
 horizon_course_setting:
   applies_to: Account
   state: hidden
-  display_name: Horizon course setting
+  display_name: Canvas Career tab
   description: |-
-    Enables the Horizon setting in the course settings page.
+    Enables the Canvas Career tab in the course settings page.
+  beta: true

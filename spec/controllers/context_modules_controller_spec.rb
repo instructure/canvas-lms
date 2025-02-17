@@ -745,12 +745,12 @@ describe ContextModulesController do
 
     describe "with horizon course" do
       before do
-        Account.site_admin.enable_feature!(:horizon_course_setting)
+        @course.account.enable_feature!(:horizon_course_setting)
         @course.update!(horizon_course: true)
       end
 
       after do
-        Account.site_admin.disable_feature!(:horizon_course_setting)
+        @course.account.disable_feature!(:horizon_course_setting)
         @course.update!(horizon_course: false)
       end
 

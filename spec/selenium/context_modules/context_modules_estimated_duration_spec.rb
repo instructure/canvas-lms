@@ -26,7 +26,7 @@ describe "estimated duration editor for module items" do
   context "As a teacher" do
     before(:once) do
       course_with_teacher(active_all: true)
-      Account.site_admin.enable_feature!(:horizon_course_setting)
+      @course.account.enable_feature!(:horizon_course_setting)
 
       @quiz = @course.quizzes.create!(title: "quizz")
       @assignment = @course.assignments.create!(title: "assignment 1", submission_types: "online_text_entry")

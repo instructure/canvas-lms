@@ -112,7 +112,7 @@ describe Group do
   it "does not create new group if Horizon course" do
     context = course_model
     group_category = context.group_categories.create(name: "worldCup")
-    Account.site_admin.enable_feature!(:horizon_course_setting)
+    @course.account.enable_feature!(:horizon_course_setting)
     @course.update!(horizon_course: true)
     @course.save!
     expect do
