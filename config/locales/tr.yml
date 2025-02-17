@@ -17507,6 +17507,7 @@ tr:
   see_this_assignment_in_speedgrader_14b8abaf: "Bu ödevi hızlı notlandırmada gör"
   see_turnitin_results_cd9d4a6c: "Turnitin sonuçlarını göster"
   see_vericite_results_b44dd8c8: "VeriCite sonuçlarına bak"
+  select_a_course_40bc3229: "Ders seçiniz"
   select_a_log_type_to_search_247fc6b4: "Arama yapılacak kayıt türünü seçin."
   select_a_section_37ac1694: "Bölüm seçin"
   select_a_student_adfcc348: "Öğrenci seçiniz"
@@ -18519,6 +18520,7 @@ tr:
   someone: Birisi
   someone_bbbc538b: Birisi
   something_went_wrong_89195131: "Bazı sorunlar oluştu."
+  something_went_wrong_updating_the_user_s_student_l_1047109c: "Öğrenci bağlantısı güncellenirken beklenmeyen bir hata ile karşılaşıldı. Lütfen tekrar deneyiniz."
   sort_by_72dbba9c: "Şuna göre sırala"
   sort_by_e75f9e3e: Sırala
   sortable_name_73f707cf: "Listede Görünen Ad"
@@ -20278,6 +20280,7 @@ tr:
   what_should_the_csv_file_look_like_985a59ac: "CSV dosyası nasıl olmalı?"
   what_would_you_like_to_do_next_2835397e: "Bir sonraki adımda ne yapmak istersiniz?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Çoklu kullanıcı eklerken kullanıcıları ayırmak için aralarına virgül koyun ya da her birini yeni satıra ekleyin"
+  when_an_observer_is_linked_to_a_student_they_have__489e2b71: "Bir gözlemci olarak bir öğrenciye bağlandığınızda, o öğrencinin notlarına ve ders etkileşimleri erişebilirsiniz."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "İnsnalar dersi ziyaret ettiğinde bu sayfayı görecekler. Bu sayfayı etkinlik akışını, ders modüllerinin bir listesini, ders izlencesini veya sizin oluşturduğunuz bir sayfayı gösterecek şekilde ayarlayabilirsiniz. Varsayılan olarak ders etkinlik akışı ayarlıdır."
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "İsimsiz ödevler için notlar yayınlandığında notlar dersteki herkes için yayınlanır. Anonimlik kaldırılacak."
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Seçildiğinde, ders bu tarihlerin dışında salt okunur durumdadır."
