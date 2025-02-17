@@ -76,6 +76,7 @@ const I18n = createI18nScope('instructure')
 //    onSubmit: A callback which will receive 1. a deferred object
 //      encompassing the request(s) triggered by the submit action and 2. the
 //      formData being posted
+//    disableErrorBox: If true, error boxes will not be displayed
 $.fn.formSubmit = function (options) {
   $(this).markRequired(options)
   this.submit(function (event) {
@@ -1122,9 +1123,16 @@ $.fn.formErrors = function (data_errors, options) {
     }
     errorDetails[name] = {object: $obj, message: msg}
     hasErrors = true
-    const offset = $obj.errorBox(raw(msg)).offset()
-    if (offset.top > highestTop) {
-      highestTop = offset.top
+    if (!options ||  !options.disableErrorBox) {
+      const offset = $obj.errorBox(raw(msg)).offset()
+      if (offset.top > highestTop) {
+        highestTop = offset.top
+      }
+    } else {
+      const offset = $obj.offset()
+      if (offset.top > highestTop) {
+        highestTop = $obj.offset().top
+      }
     }
     lastField = $obj
   })
@@ -1135,9 +1143,16 @@ $.fn.formErrors = function (data_errors, options) {
     const $obj = elementErrors[idx][0]
     const msg = elementErrors[idx][1]
     hasErrors = true
-    const offset = $obj.errorBox(msg).offset()
-    if (offset.top > highestTop) {
-      highestTop = offset.top
+    if (!options || !options.disableErrorBox) {
+      const offset = $obj.errorBox(msg).offset()
+      if (offset.top > highestTop) {
+        highestTop = offset.top
+      }
+    } else {
+      const offset = $obj.offset()
+      if (offset.top > highestTop) {
+        highestTop = $obj.offset().top
+      }
     }
   }
   if (hasErrors) {
