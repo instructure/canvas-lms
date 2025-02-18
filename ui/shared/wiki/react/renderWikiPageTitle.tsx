@@ -54,8 +54,9 @@ const EditableContent = (props: Props) => {
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
-    const handleSubmit = (evt?: JQuery.Event) => {
+    const handleSubmit = (evt?: JQuery.SubmitEvent) => {
       evt?.stopPropagation()
+
       const data = props.viewElement.getFormData<Record<string, unknown>>()
       const dataErrors = props.validationCallback(data)
       const titleErrors = dataErrors?.title || []
@@ -66,6 +67,17 @@ const EditableContent = (props: Props) => {
         }))
         setMessages(parsedErrors)
         return false
+      }
+      else {
+        // we show errors from the server if any
+        evt?.result.catch((error: any) => {
+          const titleError = error.responseJSON.errors.title[0]
+          if (titleError) {
+            setMessages([{text: titleError.message, type: 'newError'}])
+            setTimeout(() => inputRef.current?.focus(), 200)
+            return false
+          }
+        })
       }
     }
 
@@ -79,7 +91,7 @@ const EditableContent = (props: Props) => {
     return () => {
       props.viewElement.off('submit', handleSubmit)
     }
-  }, [props])
+  }, [props, inputRef])
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {value} = e.target

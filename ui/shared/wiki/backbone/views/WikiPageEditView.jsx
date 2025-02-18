@@ -32,9 +32,10 @@ import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
 import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 import {LATEST_BLOCK_DATA_VERSION} from '@canvas/block-editor/react/utils'
-import {TITLE_MAX_LENGTH} from '../../utils/constants'
+import {BODY_MAX_LENGTH} from '../../utils/constants'
 import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
+
 
 const I18n = createI18nScope('pages')
 
@@ -238,16 +239,14 @@ export default class WikiPageEditView extends ValidatedFormView {
       this.$studentTodoAtContainer.hide()
     }
 
-    if (window.ENV.FEATURES.permanent_page_links) {
-      renderWikiPageTitle({
-        defaultValue: this.model.get('title'),
-        isContentLocked: !!this.lockedItems.content,
-        canEdit: this.toJSON().CAN.EDIT_TITLE,
-        viewElement: this.$el,
-        validationCallback: this.validateFormData,
-        isRequired: true,
-      })
-    }
+    renderWikiPageTitle({
+      defaultValue: this.model.get('title'),
+      isContentLocked: !!this.lockedItems.content,
+      canEdit: this.toJSON().CAN.EDIT_TITLE,
+      viewElement: this.$el,
+      validationCallback: this.validateFormData,
+      isRequired: true,
+    })
 
     if (this.enableAssignTo) {
       const pageName = this.model.get('title')
@@ -375,14 +374,63 @@ export default class WikiPageEditView extends ValidatedFormView {
     $(event.currentTarget).siblings('a').andSelf().toggle().focus()
   }
 
-  showErrors(errors) {
-    if (window.ENV.FEATURES.permanent_page_links) {
-      // Let the IntsUI TextInput component show the title errors
-      const {title, ...otherErrors} = errors
-      super.showErrors(otherErrors)
+  toggleBodyError(error) {
+    if (error) {
+      const existingError = $('#wiki_page_body_error')
+      $('.edit-content').addClass('has_body_errors')
+      if (existingError.length) {
+        existingError.show()
+      } else {
+        $('<span>', {
+          id: 'wiki_page_body_error',
+          class: 'ic-Form-message ic-Form-message--error', 
+          role: 'alert',
+          'aria-live': 'assertive'
+        })
+        .append($('<i>', {class: 'icon-warning icon-Solid'}))
+        .append(' ' + error.message)
+        .hide()
+        .insertBefore('#wiki_page_body_statusbar')
+        .show()
+      }
     } else {
-      super.showErrors(errors)
+      $('.edit-content').removeClass('has_body_errors')
+      $('#wiki_page_body_error').hide()
     }
+  }
+
+  showErrors(errors) {
+    const {title, body, ...otherErrors} = errors
+    // IntsUI TextInput component show the title errors from server response
+    // show the body errors in a different way
+    if (body && this.model.get('editor') != 'block_editor') {
+      this.toggleBodyError(body[0])
+
+      // tinymce workaround for focus issue
+      if (!tinymce.activeEditor.hidden) {
+        tinymce.activeEditor.fire("focus")
+        tinymce.activeEditor.container.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      } else {
+        const rceHtmlEditor = $('.RceHtmlEditor')
+        if (rceHtmlEditor.length) { 
+          // div[role=textbox] can't be focused
+          rceHtmlEditor[0].scrollIntoView({ behavior: 'smooth', block: 'center' })
+        } else {
+          $('textarea#wiki_page_body')[0].focus()
+        }
+      }
+    } else {
+      if (body) otherErrors.body = body
+    }
+    
+    super.showErrors(otherErrors)
+  }
+
+  hideErrors() {
+    if (this.model.get('editor') != 'block_editor') {
+      this.toggleBodyError(null)
+    }
+    super.hideErrors()
   }
 
   // Validate they entered in a title.
@@ -390,20 +438,22 @@ export default class WikiPageEditView extends ValidatedFormView {
   validateFormData(data) {
     const errors = {}
 
+    // title errors are handled by the TextInput component on server response
+    // this validation is just to avoid sending a request with an empty title
     if (data.title === '') {
       errors.title = [
         {
           type: 'required',
-          message: I18n.t('A page title is required'),
+          message: I18n.t('Title must contain at least one letter or number'),
         },
       ]
     }
 
-    if (data.title?.length > TITLE_MAX_LENGTH) {
-      errors.title = [
+    if (data.body && (new Blob([data.body])).size > BODY_MAX_LENGTH) {
+      errors.body = [
         {
           type: 'too_long',
-          message: I18n.t("Title can't exceed %{max} characters", {max: TITLE_MAX_LENGTH}),
+          message: I18n.t("Input exceeds 500 KB limit. Please reduce the text size."),
         },
       ]
     }

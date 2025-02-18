@@ -151,6 +151,9 @@ describe WikiPage do
     expect(@course.wiki_pages.new(title: "!!!").valid?).not_to be_truthy
     expect(@course.wiki_pages.new(title: "a" * 256).valid?).not_to be_truthy
     expect(@course.wiki_pages.new(title: "asdf").valid?).to be_truthy
+    expect(@course.wiki_pages.new(title: "   ").valid?).not_to be_truthy
+    expect(@course.wiki_pages.new(title: " a ").valid?).to be_truthy
+    expect(@course.wiki_pages.new(title: "は").valid?).to be_truthy # foreign character
   end
 
   it "sets as front page" do
