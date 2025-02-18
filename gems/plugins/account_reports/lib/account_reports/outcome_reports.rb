@@ -671,6 +671,7 @@ module AccountReports
     end
 
     COURSE_CACHE_SIZE = 32
+    private_constant :COURSE_CACHE_SIZE
     def find_cached_course(id)
       @course_cache ||= {}
       @course_cache[id] ||= begin

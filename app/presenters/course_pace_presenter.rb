@@ -94,6 +94,7 @@ class CoursePacePresenter
   private
 
   CONTENT_TYPES = ["Assignment", "Quizzes::Quiz"].freeze
+  private_constant :CONTENT_TYPES
 
   def add_docx_tables(doc)
     module_table_template = doc.tables.first

@@ -592,7 +592,7 @@ class Message < ActiveRecord::Base
     notification.name.parameterize.underscore + "." + path_type + ".erb"
   end
 
-  # rubocop:disable Security/Eval ERB rendering
+  # rubocop:disable Security/Eval -- ERB rendering
   # Public: Apply an HTML email template to this message.
   #
   # Returns an HTML template (or nil).
@@ -803,7 +803,7 @@ self.user,
       e,
       message: "Message delivery failed",
       to:,
-      object: inspect.to_s
+      object: inspect
     )
     error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
     self.transmission_errors = error_string
@@ -1073,7 +1073,7 @@ self.user,
           @exception,
           message: "Message delivery failed",
           to:,
-          object: inspect.to_s
+          object: inspect
         )
       end
 
@@ -1112,7 +1112,7 @@ self.user,
           e,
           message: "SMS delivery failed",
           to:,
-          object: inspect.to_s,
+          object: inspect,
           tags: {
             type: :sms_message
           }

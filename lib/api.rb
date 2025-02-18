@@ -676,9 +676,7 @@ module Api
     Html::Content.process_incoming(html, host:, port:)
   end
 
-  def value_to_boolean(value)
-    Canvas::Plugin.value_to_boolean(value)
-  end
+  delegate :value_to_boolean, to: :"Canvas::Plugin"
 
   # takes a comma separated string, an array, or nil and returns an array
   def self.value_to_array(value)

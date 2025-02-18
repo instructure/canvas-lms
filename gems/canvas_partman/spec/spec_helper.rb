@@ -58,7 +58,7 @@ RSpec.configure do |config|
   config.color = true
   config.order = :random
 
-  def connection
+  def connection # rubocop:disable Rails/Delegate
     ActiveRecord::Base.connection
   end
 

@@ -614,7 +614,7 @@ class SisImportsApiController < ApplicationController
           @content_type = content_type
         end
 
-        # rubocop:disable Style/TrivialAccessors not a Class
+        # rubocop:disable Style/TrivialAccessors -- not a Class
         def file_obj.content_type
           @content_type
         end
@@ -622,7 +622,7 @@ class SisImportsApiController < ApplicationController
         def file_obj.original_filename
           @original_filename
         end
-        # rubocop:enable Style/TrivialAccessors not a Class
+        # rubocop:enable Style/TrivialAccessors -- not a Class
 
         if params[:extension]
           file_obj.set_file_attributes("sis_import.#{params[:extension]}",

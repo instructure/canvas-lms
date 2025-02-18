@@ -197,6 +197,7 @@ class GradeCalculator
   end
 
   LIVE_EVENT_FIELDS = %i[current_score final_score unposted_current_score unposted_final_score].freeze
+  private_constant :LIVE_EVENT_FIELDS
 
   def create_course_grade_live_event(old_score, score)
     return if LIVE_EVENT_FIELDS.all? { |f| old_score.send(f) == score.send(f) }

@@ -50,9 +50,7 @@ module HtmlTextHelper
     end.gsub(/&\w+;/, "")
   end
 
-  def strip_tags(text)
-    HtmlTextHelper.strip_tags(text)
-  end
+  delegate :strip_tags, to: :HtmlTextHelper
 
   # Converts a string of html to plain text, preserving as much of the
   # formatting and information as possible

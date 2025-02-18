@@ -103,9 +103,7 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
 
     attr_reader :session
 
-    def context
-      @working_assignment.context
-    end
+    delegate :context, to: :@working_assignment
 
     def grading_periods?
       @working_assignment.context.try(:grading_periods?)
@@ -115,9 +113,7 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
       ArbitraryStrongishParams::ANYTHING
     end
 
-    def value_to_boolean(value)
-      Canvas::Plugin.value_to_boolean(value)
-    end
+    delegate :value_to_boolean, to: :"Canvas::Plugin"
 
     def process_incoming_html_content(html)
       Api::Html::Content.process_incoming(html)

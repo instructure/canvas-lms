@@ -618,7 +618,7 @@ module Api::V1::Assignment
     prepared_update = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
     return false unless prepared_update[:valid]
 
-    if !(assignment_params["due_at"]).nil? && assignment["only_visible_to_overrides"]
+    if !assignment_params["due_at"].nil? && assignment["only_visible_to_overrides"]
       assignment["only_visible_to_overrides"] = false
     end
 

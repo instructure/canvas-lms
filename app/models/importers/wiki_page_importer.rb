@@ -214,7 +214,7 @@ module Importers
       # elsif hash[:page_type] == "module_toc"
       elsif hash[:topics]
         item.title = t("title_for_topics_category", "%{category} Topics", category: hash[:category_name])
-        description = (hash[:category_description]).to_s
+        description = hash[:category_description].to_s
         description += "\n\n<ul>\n"
         topic_count = 0
         hash[:topics].each do |topic|

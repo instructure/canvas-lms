@@ -41,9 +41,7 @@ module AddressBook
       @cache.store(sender, {}, {})
     end
 
-    def cached?(user)
-      @cache.cached?(user)
-    end
+    delegate :cached?, to: :@cache
 
     # filters the list of given users to those actually known.
     #

@@ -41,6 +41,7 @@ class NotificationEndpoint < ActiveRecord::Base
   private
 
   DIFFERENT_ATTRIBUTES_ERROR_REGEX = /^Invalid parameter: Token Reason: Endpoint (.*) already exists with the same Token, but different attributes.$/
+  private_constant :DIFFERENT_ATTRIBUTES_ERROR_REGEX
 
   def region
     Aws::ARNParser.parse(access_token.developer_key.sns_arn).region

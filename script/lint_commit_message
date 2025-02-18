@@ -14,7 +14,7 @@ def git(command)
   end
 end
 
-# rubocop:disable Style/GlobalVars yeah a global, I'm being lazy and refactoring to an object
+# rubocop:disable Style/GlobalVars -- yeah a global, I'm being lazy and refactoring to an object
 def comment(severity, line, message, link_to_guidelines: false)
   if ENV["GERRIT_REFSPEC"]
     if link_to_guidelines

@@ -23,9 +23,7 @@ require "webmock/rspec"
 class AssignmentApiHarness
   include Api::V1::Assignment
 
-  def value_to_boolean(value)
-    Canvas::Plugin.value_to_boolean(value)
-  end
+  delegate :value_to_boolean, to: :"Canvas::Plugin"
 
   def api_user_content(description, course, user, _)
     "api_user_content(#{description}, #{course.id}, #{user.id})"

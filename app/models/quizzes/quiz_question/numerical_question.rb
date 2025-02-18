@@ -25,9 +25,7 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
       @range = numbers[0]..numbers[1]
     end
 
-    def cover?(number)
-      @range.cover?(number)
-    end
+    delegate :cover?, to: :@range
   end
 
   def i18n_decimal(val)

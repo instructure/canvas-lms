@@ -255,7 +255,7 @@ module Lti
     end
 
     def filtered_json(model:, allow_list:)
-      model.as_json(include_root: false).select { |k, _| allow_list.include?(k) }
+      model.as_json(include_root: false).slice(*allow_list)
     end
   end
 end

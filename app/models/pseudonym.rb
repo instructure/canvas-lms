@@ -701,7 +701,7 @@ class Pseudonym < ActiveRecord::Base
     Canvas::Errors.capture(e, {
                              type: :ldap,
                              message: "LDAP authentication error",
-                             object: inspect.to_s,
+                             object: inspect,
                              unique_id:,
                            })
     nil

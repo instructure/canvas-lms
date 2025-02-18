@@ -144,6 +144,7 @@ module Lti
       quiz_index_menu
       wiki_index_menu
     ].freeze
+    private_constant :INDEX_MENU_TOOL_TYPES
 
     def placement_params(placement, assignment: nil)
       case placement

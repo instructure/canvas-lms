@@ -343,7 +343,7 @@ class RubricAssociation < ActiveRecord::Base
       next unless data
 
       replace_ratings = true
-      has_score = (data[:points]).present?
+      has_score = data[:points].present?
       rating[:id] = data[:rating_id]
       rating[:points] = assessment_points(criterion, data) if has_score
 

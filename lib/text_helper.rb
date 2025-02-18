@@ -252,9 +252,7 @@ module TextHelper
     result.strip.html_safe
   end
 
-  def round_if_whole(value)
-    TextHelper.round_if_whole(value)
-  end
+  delegate :round_if_whole, to: :TextHelper
 
   def self.round_if_whole(value)
     if value.is_a?(Float) && !value.nan? && (i = value.to_i) == value

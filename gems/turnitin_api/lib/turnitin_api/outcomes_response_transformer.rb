@@ -50,20 +50,18 @@ module TurnitinApi
 
     def response
       @response ||= make_call(outcomes_response_json["outcomes_tool_placement_url"]).tap do |resp|
-        if (200..299).cover?(resp.status)
-          resp
-        else
-          error_msg = KNOWN_ERROR_MESSAGES.find { |_name, text| resp.body&.include?(text) }&.first
-          error_msg ||= :unknown
+        next resp if (200..299).cover?(resp.status)
 
-          stats_tags = { status: resp.status, message: error_msg }
-          InstStatsd::Statsd.increment("lti.tii.outcomes_response_bad", tags: stats_tags)
+        error_msg = KNOWN_ERROR_MESSAGES.find { |_name, text| resp.body&.include?(text) }&.first
+        error_msg ||= :unknown
 
-          body = resp.env[:raw_body] || resp.body
-          raise InvalidResponse,
-                "TII returned #{resp.status} code, content length=#{body&.length}, " \
-                "message #{error_msg}, body #{body&.truncate(100).inspect}"
-        end
+        stats_tags = { status: resp.status, message: error_msg }
+        InstStatsd::Statsd.increment("lti.tii.outcomes_response_bad", tags: stats_tags)
+
+        body = resp.env[:raw_body] || resp.body
+        raise InvalidResponse,
+              "TII returned #{resp.status} code, content length=#{body&.length}, " \
+              "message #{error_msg}, body #{body&.truncate(100).inspect}"
       end
     end
 
@@ -78,7 +76,7 @@ module TurnitinApi
     end
 
     def originality_data
-      response.body["outcome_originalityreport"].select { |k, _| %w[breakdown numeric].include?(k) }
+      response.body["outcome_originalityreport"].slice("breakdown", "numeric")
     end
 
     def uploaded_at

@@ -44,13 +44,9 @@ module SeleniumDriverSetup
     SeleniumDriverSetup.set_timeouts(TIMEOUTS.slice(*timeouts.keys))
   end
 
-  def driver
-    SeleniumDriverSetup.driver
-  end
+  delegate :driver, to: :SeleniumDriverSetup
 
-  def app_host_and_port
-    SeleniumDriverSetup.app_host_and_port
-  end
+  delegate :app_host_and_port, to: :SeleniumDriverSetup
 
   def app_url
     "http://#{app_host_and_port}"
@@ -372,7 +368,7 @@ module SeleniumDriverSetup
 
       puts "found available port: #{app_host_and_port}"
     ensure
-      s&.close()
+      s&.close
     end
 
     def start_webserver

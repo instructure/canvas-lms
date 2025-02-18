@@ -99,6 +99,7 @@ module Messages
       "Assignment Submitted",
       "Assignment Resubmitted"
     ].freeze
+    private_constant :SOURCE_AUTHOR_NOTIFICATIONS, :SOURCE_USER_NOTIFICATIONS, :ANONYMIZED_NOTIFICATIONS
 
     def anonymized_asset?
       ANONYMIZED_NOTIFICATIONS.include?(notification_name) && (asset.respond_to?(:user) || asset.respond_to?(:recipient))

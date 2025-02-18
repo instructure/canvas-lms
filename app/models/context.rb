@@ -153,7 +153,7 @@ module Context
 
     # if we're only asking for a subset but the full set is cached return that, but filtered with just what we want
     if only_check.present? && (cache_with_everything = Rails.cache.read([base_cache_key, "everything", self].cache_key))
-      return @active_record_types[only_check] = cache_with_everything.select { |k, _v| only_check.include?(k) }
+      return @active_record_types[only_check] = cache_with_everything.slice(*only_check)
     end
 
     # otherwise compute it and store it in the cache
@@ -179,7 +179,7 @@ module Context
 
   # [[context_type, context_id], ...] -> {[context_type, context_id] => name, ...}
   def self.names_by_context_types_and_ids(context_types_and_ids)
-    ids_by_type = Hash.new([])
+    ids_by_type = Hash.new([].freeze)
     context_types_and_ids.each do |type, id|
       next unless type && CONTEXT_TYPES.include?(type.to_sym)
 

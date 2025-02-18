@@ -878,7 +878,7 @@ RSpec.configure do |config|
     end
   end
 
-  def run_job(job)
+  def run_job(job) # rubocop:disable Rails/Delegate
     Delayed::Testing.run_job(job)
   end
 
@@ -921,9 +921,7 @@ RSpec.configure do |config|
       @code.to_s
     end
 
-    def [](arg)
-      @headers[arg]
-    end
+    delegate :[], to: :@headers
 
     def content_type
       self["content-type"]
