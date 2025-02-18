@@ -1159,7 +1159,7 @@ ul#question_list {
     &.marked {
       font-weight: bold;
       background-image: url("/images/flagged_question#{direction-rtl('-rtl', '')}.png");
-      background-position: direction('left') 3px top 7px;
+      background-position: direction(left) 3px top 7px;
       background-repeat: no-repeat;
       @if $use_high_contrast {
         @include bg-image(flagged_question_hc, png, no-repeat, 3px, 7px, transparent, 10px, 8px);
