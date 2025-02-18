@@ -145,9 +145,11 @@ nn:
     length_error: "Må vere 255 teikn eller mindre"
     title: "Set namn på gruppa"
   OutcomeView: 
+    display_name: "Kortnamn (valfritt)"
     length_error: "Må vere 255 teikn eller mindre"
     mastery_at_nan_error: "Må være eit tal"
     mastery_error: "Må vere større enn eller lik 0"
+    title: "Set namn på læringsmålet"
   OutcomesDirectoryView: 
     flash: 
       error: "Det oppstod ein feil. Oppdater sida og prøv på nytt."

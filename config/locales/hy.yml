@@ -119,8 +119,10 @@ hy:
     length_error: "Պետք է լինի մինչև 255 նիշ"
     title: "Նշել այս խումբը"
   OutcomeView: 
+    display_name: "Ընկերական անուն (ոչ պարտադիր)"
     length_error: "Պետք է լինի մինչև 255 նիշ"
     mastery_error: "Պետք է 0-ին հավասար կամ մեծ լինի"
+    title: "Նշել այս արդյունքը"
   OutcomesDirectoryView: 
     flash: 
       error: "Սխալ է տեղի ունեցել: Խնդրում ենք թարմացնել էջը և փորձել կրկին:"
