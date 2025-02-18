@@ -36,8 +36,7 @@ export default class SubmissionCommentUpdateForm extends SubmissionCommentForm {
 
   commentHasChanged() {
     const comment = this.state.comment.trim()
-    // @ts-expect-error
-    return comment !== this.props.comment.trim()
+    return comment !== this.props.comment?.trim()
   }
 
   commentIsValid() {
