@@ -19,6 +19,6 @@
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 
-const MessageBus = _.extend({}, Backbone.Events);
+const MessageBus = _.extend({}, Backbone.Events)
 
-export default MessageBus;
+export default MessageBus

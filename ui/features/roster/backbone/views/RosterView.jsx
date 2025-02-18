@@ -29,7 +29,7 @@ import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import UserDifferentiationTagManager from '@canvas/differentiation-tags/react/UserDifferentiationTagManager/UserDifferentiationTagManager'
-import MessageBus from '../../util/MessageBus'
+import MessageBus from '@canvas/util/MessageBus'
 
 const I18n = createI18nScope('RosterView')
 
@@ -120,9 +120,13 @@ export default class RosterView extends Backbone.View {
 
   attach() {
     MessageBus.on('userSelectionChanged', this.HandleUserSelected, this)
+    MessageBus.on('removeUserTagIcon', this.removeTagIcon, this)
     return this.collection.on('setParam deleteParam', this.fetch, this)
   }
-
+  removeTagIcon(event) {
+    if(event.hasOwnProperty('userId'))
+      $(`#tag-icon-id-${event.userId}`).remove()
+  }
   fetchOnCreateUsersClose() {
     if (this.addPeopleApp.usersHaveBeenEnrolled()) return this.collection.fetch()
   }

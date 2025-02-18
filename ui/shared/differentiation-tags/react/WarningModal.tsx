@@ -70,7 +70,7 @@ const BaseWarningModal: React.FC<BaseModalProps> = ({
         <Button onClick={onClose} margin="0 x-small 0 0">
           {cancelText}
         </Button>
-        <Button onClick={onContinue} color="primary" type="submit">
+        <Button onClick={onContinue} color="primary" type="button">
           {continueText}
         </Button>
       </Modal.Footer>

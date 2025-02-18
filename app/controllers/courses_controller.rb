@@ -1234,7 +1234,7 @@ class CoursesController < ApplicationController
           end
           user_json(u, @current_user, session, includes, @context, enrollments, excludes).tap do |json|
             json[:group_ids] = active_group_memberships(users)[u.id]&.map(&:group_id) || [] if include_group_ids
-            json[:has_non_collaborative_groups] = u.current_differentiation_tags.count > 0 if can_do(@context, @current_user, :manage_tags_manage)
+            json[:has_non_collaborative_groups] = u.current_differentiation_tags.where(context: @context).count > 0 if can_do(@context, @current_user, :manage_tags_manage)
           end
         }
       end

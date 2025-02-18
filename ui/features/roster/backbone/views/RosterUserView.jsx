@@ -32,7 +32,7 @@ import 'jquery-kyle-menu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import RosterDialogMixin from './RosterDialogMixin'
 import UserTaggedModal from '@canvas/differentiation-tags/react/UserTaggedModal/UserTaggedModal'
-import MessageBus from '../../util/MessageBus'
+import MessageBus from '@canvas/util/MessageBus'
 
 const I18n = createI18nScope('RosterUserView')
 
@@ -365,6 +365,8 @@ export default class RosterUserView extends View {
     const onModalClose = (userId, userName) => {
       this.renderUserTagModal(false, userId, userName)
       returnFocusTo?.focus()
+      this.userTagModalContainer.unmount()
+      this.userTagModalContainer = null
     }
     if (!this.userTagModalContainer) this.userTagModalContainer = createRoot(el)
     this.userTagModalContainer.render(
