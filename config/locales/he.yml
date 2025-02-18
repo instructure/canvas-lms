@@ -133,8 +133,10 @@ he:
     length_error: "255 תווים לכל היותר "
     title: "מתן שם לקבוצה זו"
   OutcomeView: 
+    display_name: "שם ידידותי (אופציונלי)"
     length_error: "255 תווים לכל היותר "
     mastery_error: "צריך להיות גדול או שווה 0"
+    title: "מתן שם לתוצאת למידה זו"
   OutcomesDirectoryView: 
     flash: 
       error: "אירעה שגיאה. יש לרענן את הדף ולנסות שוב"
