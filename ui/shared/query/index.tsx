@@ -21,6 +21,7 @@ import {
   useMutation as baseUseMutation,
   useQuery as baseUseQuery,
   hashQueryKey,
+  QueryClientProvider,
   QueryClient,
   useInfiniteQuery,
 } from '@tanstack/react-query'
@@ -39,6 +40,13 @@ import {useBroadcastWhenFetched, useReception} from './utils'
 
 const CACHE_KEY = 'QUERY_CACHE'
 const CHANNEL_KEY = 'QUERY_CHANNEL'
+const oneDay = 1000 * 60 * 60 * 24
+const commonQueryOptions = {
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
+  refetchOnReconnect: false,
+  retry: false,
+}
 
 if (wasPageReloaded || localStorage.cacheBuster === undefined) {
   localStorage.cacheBuster = v4()
@@ -49,12 +57,9 @@ const cacheBuster: string = String(localStorage.cacheBuster)
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      retry: false,
-      staleTime: 1000 * 60 * 60 * 24, // 1 day,
-      cacheTime: 1000 * 60 * 60 * 24 * 2, // 2 days,
+      ...commonQueryOptions,
+      staleTime: oneDay,
+      cacheTime: oneDay * 2,
     },
   },
 })
@@ -84,6 +89,22 @@ export function QueryProvider({children}: {children: React.ReactNode}) {
     >
       {children}
     </PersistQueryClientProvider>
+  )
+}
+
+export const queryClientWithoutPersist = new QueryClient({
+  defaultOptions: {
+    queries: {
+      ...commonQueryOptions
+    },
+  }
+})
+
+export function QueryProviderWithoutPersist({children}: {children: React.ReactNode}) {
+  return (
+    <QueryClientProvider client={queryClientWithoutPersist}>
+      {children}
+    </QueryClientProvider>
   )
 }
 
