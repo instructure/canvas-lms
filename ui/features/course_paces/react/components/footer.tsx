@@ -182,7 +182,7 @@ export const Footer = ({
       let saveDraftLabel = I18n.t('Save as Draft')
       let draftTip = I18n.t('Save this pace as a draft without publishing.')
       if (!saveDraftEnabled && !isDraftPace) {
-        draftTip = I18n.t('Published paces cannot be saved as a draft.')
+        return null
       } else if (!saveDraftEnabled && !unpublishedChanges) {
         draftTip = I18n.t('Make changes to the pace to save as a draft.')
       }
