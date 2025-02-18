@@ -51,7 +51,7 @@ GEM
     bigdecimal (3.1.9)
     builder (3.3.0)
     concurrent-ruby (1.3.5)
-    connection_pool (2.4.1)
+    connection_pool (2.5.0)
     crass (1.0.6)
     date (3.4.1)
     debug (1.10.0)
