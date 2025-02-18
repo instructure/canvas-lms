@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {QueryProvider} from '@canvas/query'
+import {QueryProviderWithoutPersist} from '@canvas/query'
 import CourseCopy from './components/CourseCopy'
 
 export const App = ({
@@ -33,7 +33,7 @@ export const App = ({
   canImportAsNewQuizzes: boolean
 }) => {
   return (
-    <QueryProvider>
+    <QueryProviderWithoutPersist>
       <CourseCopy
         canImportAsNewQuizzes={canImportAsNewQuizzes}
         courseId={courseId}
@@ -41,7 +41,7 @@ export const App = ({
         courseTimeZone={courseTimeZone}
         userTimeZone={userTimeZone}
       />
-    </QueryProvider>
+    </QueryProviderWithoutPersist>
   )
 }
 export default App

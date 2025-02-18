@@ -49,7 +49,7 @@ describe('CourseCopy', () => {
   })
 
   it('renders loading state on course loading', () => {
-    mockUseQuery.mockReturnValue({isFetchedAfterMount: false})
+    mockUseQuery.mockReturnValue({isLoading: true})
     mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, hasNextPage: false})
 
     const {getByText} = render(<CourseCopy {...defaultProps} />)
@@ -58,7 +58,7 @@ describe('CourseCopy', () => {
   })
 
   it('renders loading state on terms loading', () => {
-    mockUseQuery.mockReturnValue({isFetchedAfterMount: true})
+    mockUseQuery.mockReturnValue({isLoading: false})
     mockUseTermsQuery.mockReturnValue({isLoading: true, isError: false, hasNextPage: false})
 
     const {getByText} = render(<CourseCopy {...defaultProps} />)
@@ -67,7 +67,7 @@ describe('CourseCopy', () => {
   })
 
   it('renders loading state on terms has next page', () => {
-    mockUseQuery.mockReturnValue({isFetchedAfterMount: true})
+    mockUseQuery.mockReturnValue({isLoading: false})
     mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, hasNextPage: true})
 
     const {getByText} = render(<CourseCopy {...defaultProps} />)
@@ -76,7 +76,7 @@ describe('CourseCopy', () => {
   })
 
   it('renders success state', () => {
-    mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: courseData})
+    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
     mockUseTermsQuery.mockReturnValue({
       isLoading: false,
       isError: false,
@@ -92,7 +92,7 @@ describe('CourseCopy', () => {
 
   describe('when there is an error', () => {
     it('renders error state on course loading error', () => {
-      mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: true, data: null})
+      mockUseQuery.mockReturnValue({isLoading: false, isError: true, data: null})
       mockUseTermsQuery.mockReturnValue({
         isLoading: false,
         isError: false,
@@ -106,7 +106,7 @@ describe('CourseCopy', () => {
     })
 
     it('renders error state on terms loading error', () => {
-      mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: null})
+      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: null})
       mockUseTermsQuery.mockReturnValue({
         isLoading: false,
         isError: true,
@@ -120,7 +120,7 @@ describe('CourseCopy', () => {
     })
 
     it('renders error state on terms error but has next page', () => {
-      mockUseQuery.mockReturnValue({isFetchedAfterMount: true})
+      mockUseQuery.mockReturnValue({isLoading: false})
       mockUseTermsQuery.mockReturnValue({
         isLoading: false,
         isError: true,
@@ -136,7 +136,7 @@ describe('CourseCopy', () => {
 
   describe('when there is no data returned', () => {
     it('renders error state on missing course data', () => {
-      mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: null})
+      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: null})
       mockUseTermsQuery.mockReturnValue({
         isLoading: false,
         isError: false,
@@ -150,7 +150,7 @@ describe('CourseCopy', () => {
     })
 
     it('renders error state on missing terms data', () => {
-      mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: {}})
+      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: {}})
       mockUseTermsQuery.mockReturnValue({
         isLoading: false,
         isError: false,
@@ -165,7 +165,7 @@ describe('CourseCopy', () => {
   })
 
   it('handleCancel redirects to the course settings page', () => {
-    mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: courseData})
+    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
     mockUseTermsQuery.mockReturnValue({
       isLoading: false,
       isError: false,
@@ -182,7 +182,7 @@ describe('CourseCopy', () => {
 
   it('handleSubmit calls mutate', () => {
     const mockMutate = jest.fn()
-    mockUseQuery.mockReturnValue({isFetchedAfterMount: true, isError: false, data: courseData})
+    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
     mockUseTermsQuery.mockReturnValue({
       isLoading: false,
       isError: false,
