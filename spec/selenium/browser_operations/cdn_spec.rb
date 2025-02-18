@@ -44,7 +44,7 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
           fingerprints = BrandableCSS.variants.map do |variant|
             data = BrandableCSS.cache_for(bundle_name, variant)
             expect(data[:combinedChecksum]).to match(RE_SHORT_MD5)
-            expect(!!(data[:includesNoVariables])).to eq(includes_no_variables)
+            expect(!!data[:includesNoVariables]).to eq(includes_no_variables)
             data
           end
 

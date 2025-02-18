@@ -87,13 +87,9 @@ module AddressBook
         execute_pager(configure_pager(new_pager, options))
       end
 
-      def new_pager
-        @collection.new_pager
-      end
+      delegate :new_pager, to: :@collection
 
-      def configure_pager(pager, options)
-        @collection.configure_pager(pager, options)
-      end
+      delegate :configure_pager, to: :@collection
 
       def execute_pager(pager)
         @collection.execute_pager(pager)
@@ -101,9 +97,7 @@ module AddressBook
         pager
       end
 
-      def depth
-        @collection.depth
-      end
+      delegate :depth, to: :@collection
     end
 
     def search_users(options = {})

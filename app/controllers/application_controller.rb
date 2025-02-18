@@ -1099,7 +1099,7 @@ class ApplicationController < ActionController::Base
         # Even if there are multiple justifications, we can only reasonably handle one at a time,
         # so just arbitrarily choose the first one
         chosen = can_do.justifications.first
-        send("render_auth_failure_#{chosen.justification}".to_s, chosen.context)
+        send(:"render_auth_failure_#{chosen.justification}", chosen.context)
       else
         render_unauthorized_action
       end

@@ -282,7 +282,7 @@ describe RoleOverride do
 
     def check_permission(role, enabled)
       hash = RoleOverride.permission_for(@account, @permission, role)
-      expect((!!hash[:enabled])).to eq enabled
+      expect(!!hash[:enabled]).to eq enabled
     end
 
     def create_role(base_role, role_name)
@@ -408,7 +408,7 @@ describe RoleOverride do
 
             # check based on sub account
             hash = RoleOverride.permission_for(@course, @permission, @role)
-            expect((!!hash[:enabled])).to eq !@default_perm
+            expect(!!hash[:enabled]).to eq !@default_perm
           end
 
           it "uses permission for role in parent account if the course is the role_context and has the same id as an account" do
@@ -421,7 +421,7 @@ describe RoleOverride do
 
             # check based on sub account
             hash = RoleOverride.permission_for(@course, @permission, @role, @course)
-            expect((!!hash[:enabled])).to eq !@default_perm
+            expect(!!hash[:enabled]).to eq !@default_perm
           end
         end
       end

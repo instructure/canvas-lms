@@ -961,7 +961,7 @@ class GroupCategoriesController < ApplicationController
   def body_file
     file_obj = request.body
 
-    # rubocop:disable Style/TrivialAccessors not a Class
+    # rubocop:disable Style/TrivialAccessors -- not a Class
     file_obj.instance_exec do
       def set_file_attributes(filename, content_type)
         @original_filename = filename

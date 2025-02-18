@@ -219,9 +219,7 @@ module Translation
       ].sort_by { |a| a[:name] }
     end
 
-    def logger
-      Rails.logger
-    end
+    delegate :logger, to: :Rails
 
     def translation_client
       @translation_client ||= create_translation_client

@@ -424,7 +424,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.save
     qs = q.generate_submission(@student)
     qs.submission_data = {
-      "question_#{q.quiz_data[0][:id]}" => (q.quiz_data[0][:answers][0][:id]).to_s,
+      "question_#{q.quiz_data[0][:id]}" => q.quiz_data[0][:answers][0][:id].to_s,
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][1][:id]}" => "1"
     }
@@ -514,7 +514,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.save
     qs = q.generate_submission(@teacher, true)
     qs.submission_data = {
-      "question_#{q.quiz_data[0][:id]}" => (q.quiz_data[0][:answers][0][:id]).to_s,
+      "question_#{q.quiz_data[0][:id]}" => q.quiz_data[0][:answers][0][:id].to_s,
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][1][:id]}" => "1"
     }
@@ -533,7 +533,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.save
     qs = q.generate_submission(@student)
     qs.submission_data = {
-      "question_#{q.quiz_data[0][:id]}" => (q.quiz_data[0][:answers][0][:id]).to_s
+      "question_#{q.quiz_data[0][:id]}" => q.quiz_data[0][:answers][0][:id].to_s
     }
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
@@ -553,7 +553,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.save
     qs = q.generate_submission(fake_student)
     qs.submission_data = {
-      "question_#{q.quiz_data[0][:id]}" => (q.quiz_data[0][:answers][0][:id]).to_s,
+      "question_#{q.quiz_data[0][:id]}" => q.quiz_data[0][:answers][0][:id].to_s,
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][1][:id]}" => "1"
     }

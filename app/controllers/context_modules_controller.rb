@@ -573,7 +573,7 @@ class ContextModulesController < ApplicationController
     @progression.current_position ||= 0 if @progression
     res = {}
     if !@progression
-      nil
+      # do nothing
     elsif @progression.locked?
       res[:locked] = true
       res[:modules] = []

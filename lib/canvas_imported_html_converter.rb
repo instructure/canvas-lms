@@ -39,13 +39,9 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     super(migration_id_converter: Importers::DbMigrationQueryService.new(migration))
   end
 
-  def context
-    @migration.context
-  end
+  delegate :context, to: :@migration
 
-  def context_path
-    @migration_id_converter.context_path
-  end
+  delegate :context_path, to: :@migration_id_converter
 
   def resolve_content_links!
     link_map = link_parser.unresolved_link_map

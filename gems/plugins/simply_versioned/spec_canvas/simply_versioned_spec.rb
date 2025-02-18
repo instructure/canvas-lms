@@ -21,7 +21,7 @@ require "apis/api_spec_helper"
 
 describe "simply_versioned" do
   before :all do
-    class Woozel < ActiveRecord::Base # rubocop:disable Lint/ConstantDefinitionInBlock,RSpec/LeakyConstantDeclaration this needs to be a real class
+    class Woozel < ActiveRecord::Base # rubocop:disable Lint/ConstantDefinitionInBlock,RSpec/LeakyConstantDeclaration -- this needs to be a real class
       simply_versioned explicit: true
     end
 

@@ -240,7 +240,7 @@ class MediaObject < ActiveRecord::Base
         Canvas::Errors.capture(:media_object_failure,
                                {
                                  message: "Kaltura flavor retrieval failed",
-                                 object: inspect.to_s,
+                                 object: inspect,
                                },
                                :warn)
       end

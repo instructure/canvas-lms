@@ -31,9 +31,7 @@ module Canvas
           !@manifest.empty?
         end
 
-        def include?(realpath)
-          @files.include?(realpath)
-        end
+        delegate :include?, to: :@files
 
         def url_for(file)
           #   source looks like "/images/apple-touch-icon.png"

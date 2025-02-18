@@ -173,6 +173,7 @@ module Api
       private
 
       APPLICABLE_ATTRS = %w[href src].freeze
+      private_constant :APPLICABLE_ATTRS
 
       def scrub_links!(node)
         APPLICABLE_ATTRS.each do |attr|

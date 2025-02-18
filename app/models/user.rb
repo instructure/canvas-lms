@@ -1572,9 +1572,7 @@ class User < ActiveRecord::Base
     Setting.get("max_messages_per_day_per_user", 500).to_i
   end
 
-  def max_messages_per_day
-    User.max_messages_per_day
-  end
+  delegate :max_messages_per_day, to: :User
 
   def gravatar_url(size = 50, fallback = nil, request = nil)
     fallback = self.class.avatar_fallback_url(fallback, request)

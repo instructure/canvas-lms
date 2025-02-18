@@ -480,7 +480,7 @@ class Conversation < ActiveRecord::Base
     updated = false
     conversation_participants.shard(self).activate do |conversation_participants|
       if options[:only_users]
-        conversation_participants = conversation_participants.where(user_id:           (options[:only_users]).map(&:id))
+        conversation_participants = conversation_participants.where(user_id:           options[:only_users].map(&:id))
       end
 
       skip_ids = options[:skip_users].try(:map, &:id) || [message.author_id]

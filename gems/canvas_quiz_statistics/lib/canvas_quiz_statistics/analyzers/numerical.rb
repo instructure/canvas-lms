@@ -163,7 +163,7 @@ module CanvasQuizStatistics::Analyzers
     end
 
     def locate_answer(response, answers)
-      answers.detect { |answer| answer[:id] == (response[:answer_id]).to_s }
+      answers.detect { |answer| answer[:id] == response[:answer_id].to_s }
     end
   end
 end

@@ -39,13 +39,9 @@ module CC
                                                            disable_content_rewriting: @exporter.disable_content_rewriting)
       end
 
-      def export_dir
-        @exporter.export_dir
-      end
+      delegate :export_dir, to: :@exporter
 
-      def zip_file
-        @exporter.zip_file
-      end
+      delegate :zip_file, to: :@exporter
 
       def close
         @file&.close

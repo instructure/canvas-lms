@@ -1637,7 +1637,7 @@ class ActiveRecord::Migration
     end
   end
 
-  def tags
+  def tags # rubocop:disable Rails/Delegate
     self.class.tags
   end
 end

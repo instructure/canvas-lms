@@ -61,7 +61,7 @@ module Lti
 
     def membership_service_params
       keys = %w[role page per_page]
-      params.select { |k, _| keys.include?(k) }
+      params.slice(*keys)
     end
 
     def lti_tool_access_enabled?

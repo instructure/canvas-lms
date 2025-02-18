@@ -103,7 +103,7 @@ module AccountReports
     return REPORTS.dup unless settings
 
     enabled_reports = settings.select { |_report, enabled| enabled }.map(&:first)
-    REPORTS.select { |report, _details| enabled_reports.include?(report) }
+    REPORTS.slice(*enabled_reports)
   end
 
   def self.generate_report(account_report, attempt: 1)

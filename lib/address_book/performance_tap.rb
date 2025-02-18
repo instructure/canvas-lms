@@ -57,17 +57,11 @@ module AddressBook
         end
       end
 
-      def depth
-        @source_collection.depth
-      end
+      delegate :depth, to: :@source_collection
 
-      def new_pager
-        @source_collection.new_pager
-      end
+      delegate :new_pager, to: :@source_collection
 
-      def configure_pager(pager, options)
-        @source_collection.configure_pager(pager, options)
-      end
+      delegate :configure_pager, to: :@source_collection
     end
 
     def search_users(options = {})

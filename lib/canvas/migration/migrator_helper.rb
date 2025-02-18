@@ -95,9 +95,7 @@ module Canvas::Migration
       end
     end
 
-    def logger
-      Rails.logger
-    end
+    delegate :logger, to: :Rails
 
     def find_export_dir
       slug = if @settings[:content_migration_id] && @settings[:user_id]

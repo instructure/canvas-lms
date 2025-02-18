@@ -373,7 +373,9 @@ module VeriCite
 
     private
 
-    SUCCESSFUL_RETURN_CODES = (200..299)
+    SUCCESSFUL_RETURN_CODES = 200..299
+    private_constant :SUCCESSFUL_RETURN_CODES
+
     def is_response_success?(response)
       response&.key?(:return_code) && SUCCESSFUL_RETURN_CODES.cover?(Integer(response[:return_code]))
     rescue

@@ -64,9 +64,7 @@ module CC
         @_new_quizzes_export_file ||= URI.open(new_quizzes_export_file_url) # rubocop:disable Security/Open
       end
 
-      def export_dir
-        @manifest.export_dir
-      end
+      delegate :export_dir, to: :@manifest
 
       def new_quizzes_export_file_url
         @manifest.exporter.new_quizzes_export_url

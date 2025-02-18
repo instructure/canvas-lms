@@ -442,6 +442,7 @@ class GradebookExporter
   end
 
   STARTS_WITH_EQUAL = /^\s*=/
+  private_constant :STARTS_WITH_EQUAL
 
   # Returns the student name to use for the export.  If the name
   # starts with =, quote it so anyone pulling the data into Excel

@@ -99,6 +99,7 @@ module RruleHelper
     I18n.t("December"),
   ].freeze
   DAYS_IN_MONTH = [nil, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31].freeze
+  private_constant :DAYS_OF_WEEK, :MONTHS, :DAYS_IN_MONTH
 
   def byday_to_days(byday)
     byday.split(/\s*,\s*/).map { |d| DAYS_OF_WEEK[d] }.join(", ")

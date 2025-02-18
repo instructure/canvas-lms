@@ -121,14 +121,12 @@ module UserLearningObjectScopes
                                              contexts:,
                                              include_concluded:)
       group_ids = group_ids_for_todo_lists(group_ids:, contexts:)
-      ids_by_shard = Hash.new({ course_ids: [], group_ids: [] })
+      ids_by_shard = Hash.new({ course_ids: [].freeze, group_ids: [].freeze }.freeze)
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         ids_by_shard[Shard.current] = { course_ids: shard_course_ids, group_ids: [] }
       end
       Shard.partition_by_shard(group_ids) do |shard_group_ids|
-        shard_hash = ids_by_shard[Shard.current]
-        shard_hash[:group_ids] = shard_group_ids
-        ids_by_shard[Shard.current] = shard_hash
+        ids_by_shard[Shard.current] = ids_by_shard[Shard.current].merge(group_ids: shard_group_ids)
       end
 
       if scope_only

@@ -47,7 +47,7 @@ module Services
       end
 
       it "processes slack message type" do
-        encrypted_slack_key, salt = Canvas::Security.encrypt_password("testkey".to_s, "instructure_slack_encrypted_key")
+        encrypted_slack_key, salt = Canvas::Security.encrypt_password("testkey", "instructure_slack_encrypted_key")
         @account.settings[:encrypted_slack_key] = encrypted_slack_key
         @account.settings[:encrypted_slack_key_salt] = salt
         @account.save!
@@ -58,7 +58,7 @@ module Services
       end
 
       it "expects slack to not call mailer create_message" do
-        encrypted_slack_key, salt = Canvas::Security.encrypt_password("testkey".to_s, "instructure_slack_encrypted_key")
+        encrypted_slack_key, salt = Canvas::Security.encrypt_password("testkey", "instructure_slack_encrypted_key")
         @account.settings[:encrypted_slack_key] = encrypted_slack_key
         @account.settings[:encrypted_slack_key_salt] = salt
         @account.save!

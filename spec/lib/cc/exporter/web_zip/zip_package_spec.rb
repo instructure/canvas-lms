@@ -26,9 +26,7 @@ describe "ZipPackage" do
     end
   end
 
-  def create_key(obj)
-    CC::CCHelper.create_key(obj)
-  end
+  delegate :create_key, to: :"CC::CCHelper"
 
   before :once do
     course_with_student(active_all: true)

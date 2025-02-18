@@ -141,6 +141,7 @@ class SplitUsers
                        ignore: :user_id,
                        user_past_lti_id: :user_id,
                        "Polling::Poll": :user_id }.freeze
+  private_constant :MERGE_ITEM_TYPES
 
   def restore_merge_items
     Shard.with_each_shard(restored_user.associated_shards + restored_user.associated_shards(:weak) + restored_user.associated_shards(:shadow)) do
