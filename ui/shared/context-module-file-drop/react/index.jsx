@@ -142,6 +142,7 @@ export default class ModuleFileDrop extends React.Component {
         const event = new Event('addFileToModule')
         event.moduleId = moduleId
         event.attachment = attachment
+        event.returnToFileDrop = true
         contextModules.dispatchEvent(event)
       }
     }
