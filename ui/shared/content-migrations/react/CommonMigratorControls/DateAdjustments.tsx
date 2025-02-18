@@ -167,7 +167,7 @@ export const DateAdjustments = ({
                         </ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '19.5rem'}
+                      width={isMobileView ? '100%' : '18.5rem'}
                       messages={timeZonedFormMessages(
                         courseTimeZone,
                         userTimeZone,
@@ -179,10 +179,10 @@ export const DateAdjustments = ({
                       as="div"
                       width={isMobileView ? '100%' : '7.5rem'}
                       textAlign={isMobileView ? 'start' : 'center'}
-                      margin={isMobileView ? 'small 0' : 'x-small 0 0'}
+                      margin={isMobileView ? 'small 0' : 'x-small x-small 0'}
                       tabIndex={-1}
                     >
-                      {I18n.t('change to')}
+                      <span style={{whiteSpace: 'nowrap'}}>{I18n.t('change to')}</span>
                     </View>
                     <CanvasDateInput
                       selectedDate={start_to_date}
@@ -197,7 +197,7 @@ export const DateAdjustments = ({
                         </ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '19.5rem'}
+                      width={isMobileView ? '100%' : '18.5rem'}
                       messages={timeZonedFormMessages(courseTimeZone, userTimeZone, start_to_date)}
                       dataTestid="new_start_date"
                     />
@@ -224,7 +224,7 @@ export const DateAdjustments = ({
                         </ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '19.5rem'}
+                      width={isMobileView ? '100%' : '18.5rem'}
                       messages={timeZonedFormMessages(courseTimeZone, userTimeZone, end_from_date)}
                       dataTestid="old_end_date"
                     />
@@ -232,10 +232,10 @@ export const DateAdjustments = ({
                       as="div"
                       width={isMobileView ? '100%' : '7.5rem'}
                       textAlign={isMobileView ? 'start' : 'center'}
-                      margin={isMobileView ? 'small 0' : 'x-small 0 0'}
+                      margin={isMobileView ? 'small 0' : 'x-small x-small 0'}
                       tabIndex={-1}
                     >
-                      {I18n.t('change to')}
+                      <span style={{whiteSpace: 'nowrap'}}>{I18n.t('change to')}</span>
                     </View>
                     <CanvasDateInput
                       selectedDate={end_to_date}
@@ -248,7 +248,7 @@ export const DateAdjustments = ({
                         <ScreenReaderContent>{I18n.t('Select new end date')}</ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '19.5rem'}
+                      width={isMobileView ? '100%' : '18.5rem'}
                       messages={timeZonedFormMessages(courseTimeZone, userTimeZone, end_to_date)}
                       dataTestid="new_end_date"
                     />
