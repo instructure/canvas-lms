@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {CSSProperties, useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator, sizeMediaPlayer} from '@instructure/canvas-media'
 import {CaptionMetaData, StudioPlayer} from '@instructure/studio-player'
@@ -56,6 +56,8 @@ interface CanvasStudioPlayerProps {
   aria_label?: string
   is_attachment?: boolean
   attachment_id?: string
+  show_loader?: boolean
+  maxHeight?: null | string
 }
 
 // The main difference between CanvasMediaPlayer and CanvasStudioPlayer
@@ -71,6 +73,8 @@ export default function CanvasStudioPlayer({
   aria_label = '',
   is_attachment = false,
   attachment_id = '',
+  show_loader = false,
+  maxHeight = null
 }: CanvasStudioPlayerProps) {
   const sorted_sources = Array.isArray(media_sources)
     ? media_sources.sort(byBitrate)
@@ -89,6 +93,7 @@ export default function CanvasStudioPlayer({
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
   const [containerWidth, setContainerWidth] = useState(0)
   const [containerHeight, setContainerHeight] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
   // the ability to set these makes testing easier
   // hint: set these values in a conditional breakpoint in
   // media_player_iframe_content.js where the CanvasStudioPlayer is rendered
@@ -152,15 +157,18 @@ export default function CanvasStudioPlayer({
         : `/media_objects/${media_id}/info`
       let resp
       try {
+        setIsLoading(true)
         setMediaObjNetworkErr(null)
         resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e: any) {
         console.warn(`Error getting ${url}`, e.message)
         setMediaObjNetworkErr(e)
+        setIsLoading(false)
         return
       }
       if (resp?.media_sources?.length) {
         setMediaSources(resp.media_sources.sort(byBitrate))
+        setIsLoading(false)
       } else {
         setRetryAttempt(retryAttempt + 1)
       }
@@ -275,23 +283,46 @@ export default function CanvasStudioPlayer({
     handlePlayerSize({})
   }, [mediaSources, type, boundingBox])
 
+  function renderLoader(){
+    if (retryAttempt >= showBePatientMsgAfterAttempts){
+      setIsLoading(false)
+      return
+    }
+    return <Spinner renderTitle={I18n.t('Loading media')} size="small" margin="small"/>
+  }
+
+  const containerStyle: Partial<CSSProperties> = {
+    height: containerHeight,
+    width: containerWidth
+  }
+
+  if (maxHeight) {
+    containerStyle.maxHeight = maxHeight
+  }
+
   return (
-    <div
-      style={{height: containerHeight, width: containerWidth}}
-      ref={containerRef}
-      data-captions={JSON.stringify(mediaCaptions)}
-    >
-      {mediaSources.length ? (
-        <StudioPlayer
-          src={mediaSources}
-          captions={mediaCaptions}
-          hideFullScreen={!includeFullscreen}
-          title={getAriaLabel()}
-        />
+    <>
+      {isLoading && show_loader ? (
+        renderLoader()
       ) : (
-        renderNoPlayer()
+        <div
+          style={containerStyle}
+          ref={containerRef}
+          data-captions={JSON.stringify(mediaCaptions)}
+        >
+          {mediaSources.length ? (
+            <StudioPlayer
+              src={mediaSources}
+              captions={mediaCaptions}
+              hideFullScreen={!includeFullscreen}
+              title={getAriaLabel()}
+            />
+          ) : (
+            renderNoPlayer()
+          )}
+        </div>
       )}
-    </div>
+    </>
   )
 }
 

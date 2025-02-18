@@ -21,6 +21,11 @@ import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import FilePreviewModal from '../FilePreviewModal'
+import NoFilePreviewAvailable from '../NoFilePreviewAvailable';
+import StudioMediaPlayer from '@canvas/canvas-studio-player';
+
+jest.mock('../NoFilePreviewAvailable', () => jest.fn(() => <div data-testid="no-preview">No preview available</div>));
+jest.mock('@canvas/canvas-studio-player', () => jest.fn(() => <div data-testid="media-player">Media Player</div>));
 
 describe('FilePreviewModal', () => {
 const mockProps = {
@@ -69,5 +74,19 @@ const mockProps = {
   it('does not render the modal when closed', () => {
     render(<FilePreviewModal {...mockProps} isOpen={false} />)
     expect(screen.queryByText('example.pdf')).not.toBeInTheDocument()
+  })
+
+  it('renders StudioMediaPlayer when file is a media type', () => {
+    const mediaProps = { ...mockProps, item: { ...mockProps.item, mime_class: 'video', media_entry_id: 'media-123' } };
+    render(<FilePreviewModal {...mediaProps} />);
+    expect(screen.getByTestId('media-player')).toBeInTheDocument();
+    expect(StudioMediaPlayer).toHaveBeenCalledWith(expect.objectContaining({ media_id: 'media-123' }), {});
+  })
+
+  it('renders NoFilePreviewAvailable for unsupported file types', () => {
+    const unsupportedProps = { ...mockProps, item: { ...mockProps.item, mime_class: 'unsupported' } };
+    render(<FilePreviewModal {...unsupportedProps} />);
+    expect(screen.getByTestId('no-preview')).toBeInTheDocument();
+    expect(NoFilePreviewAvailable).toHaveBeenCalledWith(expect.objectContaining({ item: unsupportedProps.item }), {});
   })
 })

@@ -34,6 +34,7 @@ import {
   IconPrinterSolid,
   IconXSolid,
 } from '@instructure/ui-icons'
+import StudioMediaPlayer from '@canvas/canvas-studio-player'
 import {type File} from '../../../interfaces/File'
 import NoFilePreviewAvailable from "./NoFilePreviewAvailable";
 import FilePreviewIframe from "./FilePreviewIframe";
@@ -47,10 +48,24 @@ interface FilePreviewModalProps {
 }
 
 const previewableTypes = ['image','pdf','html','doc','text']
+const mediaTypes = ['video','audio']
 
 const renderFilePreview = (item: File) => {
   if (item.preview_url && previewableTypes.includes(item.mime_class)) {
     return (<FilePreviewIframe item={item}/>)
+  } else if (mediaTypes.includes(item.mime_class)){
+    return (
+      <Flex as="div" alignItems="center" height="100%" justifyItems="center" wrap="wrap">
+        <StudioMediaPlayer
+          media_id={item.media_entry_id || ''}
+          type={mediaTypes.includes(item.mime_class) ? item.mime_class as "video" | "audio" : undefined}
+          is_attachment={true}
+          attachment_id={item.id}
+          show_loader={true}
+          maxHeight={'100%'}
+        />
+      </Flex>
+    )
   } else {
     return (<NoFilePreviewAvailable item={item}/>)
   }
