@@ -22,12 +22,19 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
+import CanvasRce from '@canvas/rce/react/CanvasRce'
 import styled from 'styled-components'
+import {stripHtmlTags} from '@canvas/util/TextHelper'
+import RCEWrapper from '@instructure/canvas-rce/es/rce/RCEWrapper'
+import {Editor} from 'tinymce'
 import {ViewProps} from '@instructure/ui-view'
 
-const StyledEmojiPickerContainer = styled.span`
-  bottom: 0px;
-  right: 10px;
+const StyledEmojiPickerContainer = styled.span.attrs<{$useRCELite?: boolean}>(props => ({
+  style: {
+    bottom: props.$useRCELite ? '55px' : '0px',
+    right: props.$useRCELite ? '0px' : '10px',
+  },
+}))`
   position: absolute;
 `
 
@@ -42,12 +49,15 @@ type Props = {
 
 type State = {
   comment: string
+  rceKey: number
 }
 
 type InsertEmojiParams = {native: string}
 
 export default abstract class SubmissionCommentForm extends React.Component<Props, State> {
   textarea: HTMLTextAreaElement | null = null
+  rceRef: React.RefObject<RCEWrapper> = React.createRef()
+  tinyeditor: Editor | null = null
 
   constructor(props: Props) {
     super(props)
@@ -57,19 +67,33 @@ export default abstract class SubmissionCommentForm extends React.Component<Prop
       'handleCancel',
       'handleCommentChange',
       'handlePublishComment',
+      'handleRCEFocus',
+      'initRCE',
       'insertEmoji',
+      'isRceLiteEnabled',
+      'mapCommentValueToInputValue',
     ]
     methodsToBind.forEach(method => {
       // @ts-expect-error
       this[method] = this[method].bind(this)
     })
 
-    this.state = {comment: props.comment || ''}
+    // RCE input has to be rerendered if state update happens from outside
+    this.state = {comment: this.mapCommentValueToInputValue(props.comment || ''), rceKey: 0}
   }
 
+  abstract initRCE(tinyeditor: Editor): void
   abstract buttonLabels(): {cancelButtonLabel: string; submitButtonLabel: string}
   abstract showButtons(): boolean
   abstract publishComment(): Promise<void> | void
+
+  isRceLiteEnabled() {
+    return ENV.FEATURES?.rce_lite_enabled_speedgrader_comments
+  }
+
+  mapCommentValueToInputValue(value: string) {
+    return this.isRceLiteEnabled() ? value : (stripHtmlTags(value) ?? '')
+  }
 
   focusTextarea() {
     this.textarea?.focus()
@@ -82,6 +106,7 @@ export default abstract class SubmissionCommentForm extends React.Component<Prop
     e.preventDefault()
 
     this.handleCommentChange(this.props.comment || '', {
+      rerenderRCE: true,
       callback: () => {
         this.props.cancelCommenting()
         callback?.()
@@ -89,15 +114,21 @@ export default abstract class SubmissionCommentForm extends React.Component<Prop
     })
   }
 
-  handleCommentChange(value: string, {callback}: {callback?: () => void} = {}) {
-    this.setState({comment: value}, () => {
+  handleCommentChange(
+    value: string,
+    {rerenderRCE, callback}: {rerenderRCE?: boolean; callback?: () => void} = {},
+  ) {
+    this.setState({comment: value, rceKey: this.state.rceKey + (rerenderRCE ? 1 : 0)}, () => {
       callback?.()
     })
   }
 
   insertEmoji(emoji: InsertEmojiParams) {
-    this.handleCommentChange(this.state.comment + emoji.native)
-    this.focusTextarea()
+    this.handleCommentChange(this.state.comment + emoji.native, {rerenderRCE: true})
+    // input should be focused after inserting an emoji
+    // regular textarea is refocused using this.focusTextarea()
+    // RCE is rerendered on emoji insertion, and it is refocused automatically by onInit
+    if (!this.isRceLiteEnabled()) this.focusTextarea()
   }
 
   handlePublishComment(e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) {
@@ -111,6 +142,11 @@ export default abstract class SubmissionCommentForm extends React.Component<Prop
     return comment.length > 0
   }
 
+  handleRCEFocus() {
+    this.tinyeditor?.selection.select(this.tinyeditor.getBody(), true)
+    this.tinyeditor?.selection.collapse(false)
+  }
+
   bindTextarea(ref: HTMLTextAreaElement | null) {
     this.textarea = ref
   }
@@ -121,17 +157,32 @@ export default abstract class SubmissionCommentForm extends React.Component<Prop
     return (
       <div>
         <div id="textarea-container">
-          <TextArea
-            data-testid="comment-textarea"
-            label={<ScreenReaderContent>{I18n.t('Leave a comment')}</ScreenReaderContent>}
-            placeholder={I18n.t('Leave a comment')}
-            onChange={e => this.handleCommentChange(e.target.value)}
-            value={this.state.comment}
-            textareaRef={this.bindTextarea}
-            resize="vertical"
-          />
+          {this.isRceLiteEnabled() ? (
+            <CanvasRce
+              key={this.state.rceKey}
+              ref={this.rceRef}
+              autosave={false}
+              defaultContent={this.state.comment}
+              height={300}
+              textareaId="comment_rce_textarea"
+              variant="lite"
+              onContentChange={this.handleCommentChange}
+              onFocus={this.handleRCEFocus}
+              onInit={this.initRCE}
+            />
+          ) : (
+            <TextArea
+              data-testid="comment-textarea"
+              label={<ScreenReaderContent>{I18n.t('Leave a comment')}</ScreenReaderContent>}
+              placeholder={I18n.t('Leave a comment')}
+              onChange={e => this.handleCommentChange(e.target.value)}
+              value={this.state.comment}
+              textareaRef={this.bindTextarea}
+              resize="vertical"
+            />
+          )}
           {!!ENV.EMOJIS_ENABLED && (
-            <StyledEmojiPickerContainer>
+            <StyledEmojiPickerContainer $useRCELite={this.isRceLiteEnabled()}>
               <EmojiPicker insertEmoji={this.insertEmoji} />
             </StyledEmojiPickerContainer>
           )}

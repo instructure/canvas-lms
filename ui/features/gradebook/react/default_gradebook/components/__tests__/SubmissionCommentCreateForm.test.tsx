@@ -24,10 +24,11 @@ describe('SubmissionCommentCreateForm', () => {
   let props: any
   let wrapper: ReturnType<typeof mountComponent>
   let ref: React.RefObject<SubmissionCommentCreateForm>
+  let target: HTMLElement
 
   function mountComponent() {
     ref = React.createRef()
-    return render(<SubmissionCommentCreateForm {...props} ref={ref} />)
+    return render(<SubmissionCommentCreateForm {...props} ref={ref} />, {container: target})
   }
 
   const queryCancelButton = () => wrapper.queryByTestId('comment-cancel-button')
@@ -149,6 +150,16 @@ describe('SubmissionCommentCreateForm', () => {
   }
 
   beforeEach(() => {
+    // This is needed to silence the following error:
+    // "[Alert] The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'"
+    // Copied from ui/shared/rce/react/__tests__/CanvasRce.test.jsx
+    const div = document.createElement('div')
+    div.id = 'fixture'
+    div.innerHTML = '<div id="flash_screenreader_holder" role="alert"/><div id="target"/>'
+    document.body.appendChild(div)
+
+    target = document.getElementById('target') as HTMLElement
+
     props = {
       cancelCommenting() {},
       createSubmissionComment() {},
@@ -157,25 +168,74 @@ describe('SubmissionCommentCreateForm', () => {
     }
   })
 
-  test('TextArea is empty, with label and placeholder', async () => {
-    wrapper = mountComponent()
-    const textarea = await getTextarea()
-    expect(textarea).toHaveValue('')
-    textarea.getAttribute('placeholder')
-    expect(textarea.getAttribute('placeholder')).toEqual('Leave a comment')
-    expect(wrapper.container.querySelector('label')?.textContent).toEqual('Leave a comment')
+  afterEach(() => {
+    const fixture = document.getElementById('fixture')
+    if (fixture) document.body.removeChild(fixture)
   })
 
-  test('focuses on the textarea after a successful comment post', async () => {
-    props.createSubmissionComment = jest.fn()
-    wrapper = mountComponent()
-    if (ref.current) jest.spyOn(ref.current, 'focusTextarea')
-    const textarea = await getTextarea()
-    fireEvent.change(textarea, {target: {value: 'some message'}})
-    fireEvent.click(getSubmitButton())
-    expect(ref.current?.focusTextarea).toHaveBeenCalledTimes(1)
-    expect(textarea).toHaveFocus()
+  describe('with RCE Lite enabled', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.rce_lite_enabled_speedgrader_comments = true
+    })
+
+    test('renders RCE input', async () => {
+      const {container, queryByTestId} = mountComponent()
+      await waitFor(() => {
+        expect(container.querySelector('textarea[id="comment_rce_textarea"]')).toBeInTheDocument()
+      })
+      expect(queryByTestId('comment-textarea')).not.toBeInTheDocument()
+    })
+
+    test('focuses on the textarea after a successful comment post', async () => {
+      props.createSubmissionComment = jest.fn()
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: 'some message'}})
+      fireEvent.click(getSubmitButton())
+      await getTextarea()
+
+      expect(ref.current).not.toBeNull()
+      expect(ref.current?.rceRef.current).not.toBeNull()
+      expect(ref.current?.rceRef.current?.focused).toBe(true)
+    })
+
+    commonTestCases()
   })
 
-  commonTestCases()
+  describe('with RCE Lite disabled', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.rce_lite_enabled_speedgrader_comments = false
+    })
+
+    test('renders regular input', () => {
+      const {getByTestId, queryByText} = mountComponent()
+      expect(getByTestId('comment-textarea')).toBeInTheDocument()
+      // RCE displays a loading text initially
+      expect(queryByText(/Loading/)).not.toBeInTheDocument()
+    })
+
+    test('TextArea has a placeholder message', () => {
+      wrapper = mountComponent()
+      const textarea = wrapper.getByPlaceholderText('Leave a comment')
+      expect(textarea).toBeInTheDocument()
+    })
+
+    test('TextArea has a label', () => {
+      wrapper = mountComponent()
+      const textarea = wrapper.getByLabelText('Leave a comment')
+      expect(textarea).toBeInTheDocument()
+    })
+
+    test('focuses on the textarea after a successful comment post', async () => {
+      props.createSubmissionComment = jest.fn()
+      wrapper = mountComponent()
+      if (ref.current) jest.spyOn(ref.current, 'focusTextarea')
+      const textarea = await getTextarea()
+      fireEvent.change(textarea, {target: {value: 'some message'}})
+      fireEvent.click(getSubmitButton())
+      expect(ref.current?.focusTextarea).toHaveBeenCalledTimes(1)
+      expect(textarea).toHaveFocus()
+    })
+
+    commonTestCases()
+  })
 })

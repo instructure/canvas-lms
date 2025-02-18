@@ -23,10 +23,11 @@ describe('SubmissionCommentUpdateForm', () => {
   let props: any
   let wrapper: ReturnType<typeof mountComponent>
   let ref: React.RefObject<SubmissionCommentUpdateForm>
+  let target: HTMLElement
 
   function mountComponent() {
     ref = React.createRef()
-    return render(<SubmissionCommentUpdateForm {...props} ref={ref} />)
+    return render(<SubmissionCommentUpdateForm {...props} ref={ref} />, {container: target})
   }
 
   const getCancelButton = () => wrapper.getByTestId('comment-cancel-button')
@@ -205,6 +206,16 @@ describe('SubmissionCommentUpdateForm', () => {
   }
 
   beforeEach(() => {
+    // This is needed to silence the following error:
+    // "[Alert] The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'"
+    // Copied from ui/shared/rce/react/__tests__/CanvasRce.test.jsx
+    const div = document.createElement('div')
+    div.id = 'fixture'
+    div.innerHTML = '<div id="flash_screenreader_holder" role="alert"/><div id="target"/>'
+    document.body.appendChild(div)
+
+    target = document.getElementById('target') as HTMLElement
+
     props = {
       cancelCommenting() {},
       comment: 'A comment',
@@ -215,22 +226,65 @@ describe('SubmissionCommentUpdateForm', () => {
     }
   })
 
-  test('TextArea has a placeholder message', () => {
-    wrapper = mountComponent()
-    const textarea = wrapper.getByPlaceholderText('Leave a comment')
-    expect(textarea).toBeInTheDocument()
+  afterEach(() => {
+    const fixture = document.getElementById('fixture')
+    if (fixture) document.body.removeChild(fixture)
   })
 
-  test('TextArea has a label', () => {
-    wrapper = mountComponent()
-    const textarea = wrapper.getByLabelText('Leave a comment')
-    expect(textarea).toBeInTheDocument()
+  describe('with RCE Lite enabled', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.rce_lite_enabled_speedgrader_comments = true
+    })
+
+    test('renders RCE input', async () => {
+      const {container, queryByTestId} = mountComponent()
+      await waitFor(() => {
+        expect(container.querySelector('textarea[id="comment_rce_textarea"]')).toBeInTheDocument()
+      })
+      expect(queryByTestId('comment-textarea')).not.toBeInTheDocument()
+    })
+
+    test('focuses on the textarea when mounted', async () => {
+      wrapper = mountComponent()
+      await getTextarea()
+
+      expect(ref.current).not.toBeNull()
+      expect(ref.current?.rceRef.current).not.toBeNull()
+      expect(ref.current?.rceRef.current?.focused).toBe(true)
+    })
+
+    commonTestCases()
   })
 
-  test('focuses on the textarea when mounted', async () => {
-    wrapper = mountComponent()
-    expect(await getTextarea()).toHaveFocus()
-  })
+  describe('with RCE Lite disabled', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.rce_lite_enabled_speedgrader_comments = false
+    })
 
-  commonTestCases()
+    test('renders regular input', () => {
+      const {getByTestId, queryByText} = mountComponent()
+      expect(getByTestId('comment-textarea')).toBeInTheDocument()
+      // RCE displays a loading text initially
+      expect(queryByText(/Loading/)).not.toBeInTheDocument()
+    })
+
+    test('TextArea has a placeholder message', () => {
+      wrapper = mountComponent()
+      const textarea = wrapper.getByPlaceholderText('Leave a comment')
+      expect(textarea).toBeInTheDocument()
+    })
+
+    test('TextArea has a label', () => {
+      wrapper = mountComponent()
+      const textarea = wrapper.getByLabelText('Leave a comment')
+      expect(textarea).toBeInTheDocument()
+    })
+
+    test('focuses on the textarea when mounted', async () => {
+      wrapper = mountComponent()
+      expect(await getTextarea()).toHaveFocus()
+    })
+
+    commonTestCases()
+  })
 })
