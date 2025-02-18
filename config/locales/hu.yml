@@ -138,9 +138,11 @@ hu:
     length_error: "Maximum 255 karakter hosszú lehet"
     title: "A csoport elnevezése"
   OutcomeView: 
+    display_name: "Becenév (opcionális)"
     length_error: "Maximum 255 karakter hosszú lehet"
     mastery_at_nan_error: "Számnak kell lennie"
     mastery_error: "0-nál nagyobb vagy egyenlő lehet"
+    title: "A tanulási eredmény neve"
   OutcomesDirectoryView: 
     flash: 
       error: "Hiba történt! Kérjük, frissítse az oldalt, és próbálja újra!"
