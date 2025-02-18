@@ -117,5 +117,16 @@ describe ErrorsController do
         post "create", params: { error: { id: "garbage" } }
       end.not_to change { ErrorReport.count }
     end
+
+    it "400s if we're out of region" do
+      expect(Shard.current).to receive(:in_current_region?).and_return(false)
+      post "create", params: { error: { id: "garbage" } }
+      expect(response).to be_bad_request
+    end
+
+    it "400s if username is sent" do
+      post "create", params: { error: { username: "causes_error" } }
+      expect(response).to be_bad_request
+    end
   end
 end
