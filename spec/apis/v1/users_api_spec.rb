@@ -398,6 +398,11 @@ describe Api::V1::User do
       expect(@test_api.user_json(@student, @admin, {}, ["uuid"], @course)).to have_key("past_uuid")
     end
 
+    it "includes the user's account UUID when requested" do
+      expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("account_uuid")
+      expect(@test_api.user_json(@student, @admin, {}, ["uuid"], @course)).to have_key("account_uuid")
+    end
+
     it "outputs last_login in json with includes params present" do
       expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("last_login")
       expect(@test_api.user_json(@student, @admin, {}, ["last_login"], @course)).to have_key("last_login")
@@ -1578,7 +1583,8 @@ describe "Users API", type: :request do
                                "sis_user_id" => nil,
                                "login_id" => "bademail@",
                                "locale" => nil,
-                               "uuid" => user.uuid
+                               "uuid" => user.uuid,
+                               "account_uuid" => user.account.uuid
                              })
         end
       end
@@ -1639,7 +1645,8 @@ describe "Users API", type: :request do
           "integration_id" => nil,
           "locale" => "en",
           "confirmation_url" => presenter.confirmation_url,
-          "uuid" => user.uuid
+          "uuid" => user.uuid,
+          "account_uuid" => user.account.uuid
         }
         expect(JSON.parse(response.body)).to eq(expected_response)
       end

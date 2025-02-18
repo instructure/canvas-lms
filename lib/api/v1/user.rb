@@ -184,6 +184,7 @@ module Api::V1::User
         past_uuid = UserPastLtiId.uuid_for_user_in_context(user, context)
         json[:past_uuid] = past_uuid unless past_uuid == user.uuid
         json[:uuid] = user.uuid
+        json[:account_uuid] = @domain_root_account&.uuid
       end
     end
   end
