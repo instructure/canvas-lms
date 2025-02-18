@@ -714,4 +714,121 @@ describe Login::CanvasController do
                                                       ])
     end
   end
+
+  describe "JSON responses in #create" do
+    let(:valid_params) { { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } } }
+    let(:account) { instance_double(Account, mfa_settings: :required) }
+
+    context "when login is successful" do
+      it "returns a JSON response with login_success" do
+        post :create, params: valid_params, as: :json
+        expect(response).to have_http_status(:ok)
+        json_response = response.parsed_body
+        expect(json_response["location"]).to eq(dashboard_url(login_success: 1))
+        expect(json_response["pseudonym"]["user_code"]).to eq(@pseudonym.user_code)
+      end
+    end
+
+    context "when MFA is required but not passed" do
+      let(:auth_provider) { instance_double(AuthenticationProvider, mfa_required: true) }
+
+      before do
+        allow(Account.default).to receive(:canvas_authentication_provider).and_return(auth_provider)
+        @user.update!(otp_secret_key: ROTP::Base32.random)
+      end
+
+      it "returns a JSON response indicating OTP verification is required" do
+        Account.default.settings[:mfa_settings] = :required
+        Account.default.save!
+        post :create, params: valid_params, as: :json
+        expect(response).to have_http_status(:ok)
+        json_response = response.parsed_body
+        expect(json_response).to include("otp_required" => true)
+      end
+    end
+
+    context "when login fails due to invalid credentials" do
+      let(:invalid_params) { { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "wrongpassword" } } }
+
+      it "returns a JSON response with an error message" do
+        post :create, params: invalid_params, as: :json
+        expect(response).to have_http_status(:bad_request)
+        json_response = response.parsed_body
+        expect(json_response["errors"]).to include("Please verify your username or password and try again.")
+      end
+    end
+
+    context "when authenticity token is invalid" do
+      before do
+        allow(controller).to receive(:verify_authenticity_token).and_raise(ActionController::InvalidAuthenticityToken)
+      end
+
+      it "returns a JSON response with an authenticity token error" do
+        post :create, params: valid_params, as: :json
+        expect(response).to have_http_status(:bad_request)
+        json_response = response.parsed_body
+        expect(json_response["errors"]).to include("Invalid Authenticity Token")
+      end
+    end
+
+    context "when session[:oauth2] is present" do
+      before do
+        session[:oauth2] = { client_id: "test_client_id", redirect_uri: "http://example.com", scopes: [], purpose: nil }
+        provider = instance_double(Canvas::OAuth::Provider)
+        allow(Canvas::OAuth::Provider).to receive(:new).and_return(provider)
+        allow(provider).to receive(:authorized_token?).and_return(false)
+        allow(controller).to receive(:oauth2_auth_confirm_url).and_return("http://example.com/confirmation")
+      end
+
+      it "returns a JSON response with a redirect to the OAuth confirmation URL" do
+        post :create, params: valid_params, as: :json
+        expect(response).to have_http_status(:ok)
+        json_response = response.parsed_body
+        expect(json_response["location"]).to eq("http://example.com/confirmation")
+      end
+    end
+
+    context "when session[:confirm] is present" do
+      before do
+        session[:confirm] = "test_confirm_token"
+        session[:expected_user_id] = @user.id
+      end
+
+      it "returns a JSON response redirecting to the registration confirmation path" do
+        post :create, params: valid_params, as: :json
+        expect(response).to have_http_status(:ok)
+        json_response = response.parsed_body
+        expect(json_response["location"]).to eq(
+          registration_confirmation_path("test_confirm_token", login_success: 1, confirm: 1)
+        )
+      end
+    end
+
+    context "when session[:course_uuid] is present" do
+      before do
+        Course.create!(uuid: "test-uuid", workflow_state: "created", account: Account.default)
+        session[:course_uuid] = "test-uuid"
+      end
+
+      it "does not redirect to the course URL due to session reset" do
+        # currently, session[:course_uuid] is cleared by reset_session_for_login,
+        # so the code never reaches the logic that redirects to the course URL;
+        # this seems like a bug because session[:course_uuid] should be preserved
+        post :create, params: valid_params, as: :json
+        expect(response).to have_http_status(:ok)
+        json_response = response.parsed_body
+        # this redirects to dashboard and not course!
+        expect(json_response["location"]).to eq(dashboard_url(login_success: 1))
+      end
+    end
+
+    context "when no special conditions are met" do
+      it "returns a JSON response redirecting to the dashboard URL" do
+        post :create, params: valid_params, as: :json
+        expect(response).to have_http_status(:ok)
+        json_response = response.parsed_body
+        expect(json_response["location"]).to eq(dashboard_url(login_success: 1))
+      end
+    end
+  end
 end

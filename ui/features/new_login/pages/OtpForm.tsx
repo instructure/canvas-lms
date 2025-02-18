@@ -18,7 +18,7 @@
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {replaceLocation} from '@canvas/util/globalUtils'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -72,7 +72,7 @@ const OtpForm = () => {
 
   const redirectTo = (url: string) => {
     isRedirectingRef.current = true
-    document.location.href = url
+    assignLocation(url)
   }
 
   const initiateOtp = useCallback(async () => {

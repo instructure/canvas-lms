@@ -17,6 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import type {ViewOwnProps} from '@instructure/ui-view'
@@ -46,7 +47,7 @@ const SignInLinks = () => {
   const handleForgotPasswordUrl = (url: string) => (event: React.MouseEvent<ViewOwnProps>) => {
     event.preventDefault()
     if (!isDisabled) {
-      window.location.href = url
+      assignLocation(url)
     }
   }
 

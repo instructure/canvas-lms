@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {replaceLocation} from '@canvas/util/globalUtils'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {within} from '@testing-library/dom'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -27,7 +27,7 @@ import {createParentAccount} from '../../../services'
 import Parent from '../Parent'
 
 jest.mock('@canvas/util/globalUtils', () => ({
-  replaceLocation: jest.fn(),
+  assignLocation: jest.fn(),
 }))
 
 jest.mock('../../../services', () => ({
@@ -252,7 +252,7 @@ describe('Parent', () => {
       })
     })
 
-    it.skip('redirects to the provided destination after a successful submission', async () => {
+    it('redirects to the provided destination after a successful submission', async () => {
       ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {destination: '/custom-redirect'},
@@ -265,11 +265,11 @@ describe('Parent', () => {
       await userEvent.type(screen.getByTestId('pairing-code-input'), 'PAIR123')
       await userEvent.click(screen.getByTestId('submit-button'))
       await waitFor(() => {
-        expect(replaceLocation).toHaveBeenCalledWith('/custom-redirect')
+        expect(assignLocation).toHaveBeenCalledWith('/custom-redirect')
       })
     })
 
-    it.skip('redirects to the course page if course data is provided', async () => {
+    it('redirects to the course page if course data is provided', async () => {
       ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {course: {course: {id: 42}}},
@@ -282,11 +282,11 @@ describe('Parent', () => {
       await userEvent.type(screen.getByTestId('pairing-code-input'), 'PAIR123')
       await userEvent.click(screen.getByTestId('submit-button'))
       await waitFor(() => {
-        expect(replaceLocation).toHaveBeenCalledWith('/courses/42?registration_success=1')
+        expect(assignLocation).toHaveBeenCalledWith('/courses/42?registration_success=1')
       })
     })
 
-    it.skip('redirects to the default location if no destination or course is provided', async () => {
+    it('redirects to the default location if no destination or course is provided', async () => {
       ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
         status: 200,
         data: {},
@@ -299,7 +299,7 @@ describe('Parent', () => {
       await userEvent.type(screen.getByTestId('pairing-code-input'), 'PAIR123')
       await userEvent.click(screen.getByTestId('submit-button'))
       await waitFor(() => {
-        expect(replaceLocation).toHaveBeenCalledWith('/?registration_success=1')
+        expect(assignLocation).toHaveBeenCalledWith('/?registration_success=1')
       })
     })
   })
