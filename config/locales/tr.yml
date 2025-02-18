@@ -141,8 +141,10 @@ tr:
     length_error: "255 karakter veya daha az olmalıdır"
     title: "Bu gruba isim verin"
   OutcomeView: 
+    display_name: "Takma ad (opsiyonel)"
     length_error: "255 karakter veya daha az olmalıdır"
     mastery_error: "0 a eşit ya da daha büyük olmalıdır"
+    title: "Bu öğrenme çıktısına isim verin"
   OutcomesDirectoryView: 
     flash: 
       error: "Bir hata meydana geldi. Lütfen sayfayı yenileyin ve tekrar deneyin."
