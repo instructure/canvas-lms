@@ -613,7 +613,7 @@ describe "conversations new" do
 
         # Verify that the send validations verify that there are no selected recipients
         fj("button:contains('Send')").click
-        expect(ffj("span:contains('Please select a recipient.')")[1]).to be_displayed
+        expect(ffj("span:contains('Please select a recipient')")[1]).to be_displayed
       end
     end
   end

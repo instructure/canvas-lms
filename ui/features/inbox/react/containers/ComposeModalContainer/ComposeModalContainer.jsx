@@ -316,7 +316,7 @@ const ComposeModalContainer = props => {
     const errors = [] // Initialize an array to collect errors
 
     if (!body) {
-      const errorMessage = I18n.t('Please insert a message body.')
+      const errorMessage = I18n.t('Please insert a message')
       setBodyMessages([{text: errorMessage, type: 'error'}])
       errors.push(errorMessage) // Add error message to the array
       isValid = false
@@ -329,7 +329,7 @@ const ComposeModalContainer = props => {
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       } else if (props.selectedIds.length === 0) {
-        const errorMessage = I18n.t('Please select a recipient.')
+        const errorMessage = I18n.t('Please select a recipient')
         setAddressBookMessages([{text: errorMessage, type: 'error'}])
         errors.push(errorMessage) // Add error message to the array
         isValid = false

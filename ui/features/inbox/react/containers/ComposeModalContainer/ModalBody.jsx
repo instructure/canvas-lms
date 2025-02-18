@@ -20,7 +20,7 @@ import {ConversationMessage} from '../../../graphql/ConversationMessage'
 import {MessageBody} from '../../components/MessageBody/MessageBody'
 import {PastMessages} from '../../components/PastMessages/PastMessages'
 import PropTypes from 'prop-types'
-import React, {useState} from 'react'
+import React from 'react'
 
 import {AttachmentDisplay, MediaAttachment} from '@canvas/message-attachments'
 import {Flex} from '@instructure/ui-flex'
@@ -28,11 +28,19 @@ import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 import TranslationControls from '../../components/TranslationControls/TranslationControls'
+import {PresentationContent} from '@instructure/ui-a11y-content'
+import {ComposeInputWrapper} from '../../components/ComposeInputWrapper/ComposeInputWrapper'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Text} from '@instructure/ui-text'
 
 const {Item} = Flex
 
+const I18n = createI18nScope('conversations_2')
+
 const ModalBody = props => {
   const shouldTranslate = ENV?.inbox_translation_enabled
+  const invalidBody = !!props.bodyMessages?.length
+
   return (
     <Modal.Body padding="none">
       {props.modalError && (
@@ -43,11 +51,21 @@ const ModalBody = props => {
       <Flex direction="column" width="100%" height="100%">
         {props.children}
         <View borderWidth="small none none none" padding="x-small">
-          <MessageBody
-            onBodyChange={props.onBodyChange}
-            messages={props.bodyMessages}
-            inboxSignatureBlock={props.inboxSignatureBlock}
-            signature={props.signature}
+          <ComposeInputWrapper
+            title={
+              <PresentationContent>
+                <Text>{I18n.t('Message')}</Text>
+                <Text color={invalidBody ? 'danger' : 'primary'}>{' *'}</Text>
+              </PresentationContent>
+            }
+            input={
+              <MessageBody
+                onBodyChange={props.onBodyChange}
+                messages={props.bodyMessages}
+                inboxSignatureBlock={props.inboxSignatureBlock}
+                signature={props.signature}
+              />
+            }
           />
           {shouldTranslate && (
             <TranslationControls
