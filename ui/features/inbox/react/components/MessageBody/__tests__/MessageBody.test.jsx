@@ -58,7 +58,7 @@ describe('MessageBody', () => {
     const props = createProps({
       messages: [
         {
-          text: 'Please insert a message body.',
+          text: 'Please insert a message',
           type: 'error',
         },
       ],

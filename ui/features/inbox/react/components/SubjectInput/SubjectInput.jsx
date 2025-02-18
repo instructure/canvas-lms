@@ -32,7 +32,7 @@ export const SubjectInput = ({value, onChange, onBlur, onFocus}) => {
     <ComposeInputWrapper
       title={
         <PresentationContent>
-          <Text size="small">{I18n.t('Subject')}</Text>
+          <Text>{I18n.t('Subject')}</Text>
         </PresentationContent>
       }
       input={
