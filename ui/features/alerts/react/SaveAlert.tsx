@@ -53,7 +53,7 @@ const validationSchema = z
       }),
     ),
     selectedTrigger: z.optional(z.nativeEnum(CriterionType)),
-    sendTo: z.array(z.string()).min(1, 'Please select at least one option.'),
+    sendTo: z.array(z.string()).min(1, I18n.t('Please select at least one option.')),
     doNotResend: z.boolean(),
     resendEvery: z.number(),
   })
@@ -61,7 +61,7 @@ const validationSchema = z
     if (!chosenTriggers.length) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Please add at least one trigger.',
+        message: I18n.t('Please add at least one trigger.'),
         path: ['selectedTrigger'],
         fatal: true,
       })

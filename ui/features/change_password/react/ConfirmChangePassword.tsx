@@ -58,7 +58,7 @@ export type PasswordPolicyAndPseudonym = {
 }
 
 const createValidationSchema = (
-  passwordPoliciesAndPseudonyms: ConfirmChangePasswordProps['passwordPoliciesAndPseudonyms']
+  passwordPoliciesAndPseudonyms: ConfirmChangePasswordProps['passwordPoliciesAndPseudonyms'],
 ) =>
   z
     .object({
@@ -80,7 +80,9 @@ const createValidationSchema = (
       if (isTooShort) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Must be at least ${minCharacterLength} characters.`,
+          message: I18n.t('Must be at least %{minCharacterLength} characters.', {
+            minCharacterLength,
+          }),
           path: ['password'],
           fatal: true,
         })
@@ -91,7 +93,7 @@ const createValidationSchema = (
       if (password !== password_confirmation) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Passwords do not match.',
+          message: I18n.t('Passwords do not match.'),
           path: ['password_confirmation'],
         })
       }
@@ -154,7 +156,7 @@ const ConfirmChangePassword = ({
           : defaultPolicy
         const normalizedError = PseudonymModel.prototype.normalizeErrors(
           errorResponse.pseudonym,
-          policy
+          policy,
         )
 
         for (const fieldName in normalizedError) {
@@ -206,7 +208,7 @@ const ConfirmChangePassword = ({
                         <SimpleSelect.Option key={pseudonymId} id={pseudonymId} value={pseudonymId}>
                           {`${currentPseudonym.unique_id} - ${currentPseudonym.account_display_name}`}
                         </SimpleSelect.Option>
-                      )
+                      ),
                     )}
                   </SimpleSelect>
                 )}
