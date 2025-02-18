@@ -25,7 +25,7 @@ PATH
   remote: gems/i18n_extraction
   specs:
     i18n_extraction (0.0.1)
-      activesupport (>= 3.2)
+      activesupport
       i18nliner (~> 0.1)
       ruby_parser (~> 3.7)
       sexp_processor (~> 4.14, >= 4.14.1)
@@ -34,7 +34,7 @@ PATH
   remote: gems/i18n_tasks
   specs:
     i18n_tasks (0.0.1)
-      activesupport (>= 6)
+      activesupport
       i18n (>= 0.7, < 2)
       i18n_extraction
       ruby_parser (~> 3.7)
@@ -99,7 +99,7 @@ PATH
     acts_as_list (0.0.1)
       activerecord (>= 3.2)
     adheres_to_policy (0.0.1)
-      activesupport (>= 3.2)
+      activesupport
     attachment_fu (1.0.0)
       activerecord (>= 3.2)
       railties (>= 3.2)
@@ -135,7 +135,7 @@ PATH
       code_ownership
       inst-jobs
     canvas_ext (1.0.0)
-      activesupport (>= 3.2)
+      activesupport
       tzinfo
     canvas_http (1.0.0)
       canvas_cache
@@ -173,7 +173,7 @@ PATH
     canvas_text_helper (0.0.1)
       i18n
     canvas_time (1.0.0)
-      activesupport (>= 3.2)
+      activesupport
       tzinfo
     canvas_unzip (0.0.1)
       activesupport
@@ -200,7 +200,7 @@ PATH
     google_drive (1.0.0)
       google-apis-drive_v3 (~> 0.43)
     html_text_helper (0.0.1)
-      activesupport (>= 3.2)
+      activesupport
       canvas_text_helper
       nokogiri
       sanitize (~> 6.0)

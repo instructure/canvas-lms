@@ -36,17 +36,21 @@ GEM
       railties (>= 7.0, < 7.2)
     activesupport (7.1.5.1)
       base64
+      benchmark (>= 0.3)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
       connection_pool (>= 2.2.5)
       drb
       i18n (>= 1.6, < 2)
+      logger (>= 1.4.2)
       minitest (>= 5.1)
       mutex_m
+      securerandom (>= 0.3)
       tzinfo (~> 2.0)
     after_transaction_commit (2.2.2)
       activerecord (>= 5.2)
     base64 (0.2.0)
+    benchmark (0.4.0)
     bigdecimal (3.1.9)
     builder (3.3.0)
     code_ownership (1.38.3)
@@ -86,6 +90,7 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
+    logger (1.6.6)
     loofah (2.24.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -153,6 +158,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.2)
+    securerandom (0.4.1)
     sorbet-runtime (0.5.11834)
     stringio (3.1.3)
     thor (1.3.2)

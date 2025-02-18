@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "activesupport", ">= 3.2"
+  spec.add_dependency "activesupport"
   spec.add_dependency "i18nliner", "~> 0.1"
   spec.add_dependency "ruby_parser", "~> 3.7"
   spec.add_dependency "sexp_processor", "~> 4.14", ">= 4.14.1"
