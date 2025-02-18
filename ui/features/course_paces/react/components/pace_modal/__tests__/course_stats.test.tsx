@@ -59,13 +59,13 @@ describe('Pace Modal CourseStats', () => {
     const { getByTestId } = renderConnected(<CourseStats paceContext={COURSE_PACE_CONTEXT} />)
     const assignmentsCountElement = getByTestId('assignments-count')
 
-    expect(assignmentsCountElement.textContent).toBe('Assignments Count:3')
+    expect(assignmentsCountElement.textContent).toBe('Assignment Count:3')
   })
 
   it('Students Enrolled count is shown correctly', () => {
     const { getByTestId } = renderConnected(<CourseStats paceContext={COURSE_PACE_CONTEXT} />)
     const assignmentsCountElement = getByTestId('student-enrollment-count')
 
-    expect(assignmentsCountElement.textContent).toBe('Student Enrolled:31')
+    expect(assignmentsCountElement.textContent).toBe('Students Enrolled:31')
   })
 })

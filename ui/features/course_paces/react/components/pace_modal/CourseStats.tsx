@@ -17,11 +17,14 @@
  */
 
 import React from 'react'
+import { useScope as createI18nScope } from '@canvas/i18n'
 import { connect } from 'react-redux'
 import { StoreState, PaceContext } from '../../types'
 import { Pill } from '@instructure/ui-pill'
 import { Flex } from '@instructure/ui-flex'
 import { getIsDraftPace, getCoursePaceItems } from '../../reducers/course_paces'
+
+const I18n = createI18nScope('course_paces_modal')
 
 interface CourseStatsProps {
   readonly assignmentsCount: number
@@ -48,10 +51,13 @@ export const CourseStats = ({
   return (
     <Flex gap="small" margin="small none" data-testid="course-stats-info">
       {isDraftPace &&
-        <StatusElement title='Status' statValue='Draft' dataTestId='status-draft' />
+        <StatusElement title={I18n.t('Status')} statValue={I18n.t('Draft')} dataTestId='status-draft' />
       }
-      <StatusElement title='Student Enrolled' statValue={paceContext?.associated_student_count} dataTestId='student-enrollment-count' />
-      <StatusElement title='Assignments Count' statValue={assignmentsCount} dataTestId='assignments-count' />
+      {
+        paceContext.type !== "StudentEnrollment" &&
+        <StatusElement title={I18n.t('Students Enrolled')} statValue={paceContext?.associated_student_count} dataTestId='student-enrollment-count' />
+      }
+      <StatusElement title={I18n.t('Assignment Count')} statValue={assignmentsCount} dataTestId='assignments-count' />
     </Flex>
   )
 }

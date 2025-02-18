@@ -410,7 +410,7 @@ describe "course pace page" do
 
         click_create_default_pace_button
 
-        expect(pace_course_stats_info.text).to include("Student Enrolled:2")
+        expect(pace_course_stats_info.text).to include("Students Enrolled:2")
       end
 
       it "shows the actual number of students in a section pace" do
@@ -420,7 +420,7 @@ describe "course pace page" do
         visit_course_paces_page
         click_context_link(@new_section_1.name)
 
-        expect(pace_course_stats_info.text).to include("Student Enrolled:1")
+        expect(pace_course_stats_info.text).to include("Students Enrolled:1")
       end
 
       it "shows the number of assignments in the course pace" do
@@ -432,7 +432,7 @@ describe "course pace page" do
         visit_course_paces_page
         click_context_link(@new_section_1.name)
 
-        expect(pace_course_stats_info.text).to include("Assignments Count:2")
+        expect(pace_course_stats_info.text).to include("Assignment Count:2")
       end
 
       it "shows draft status for an unpublished course pace" do
