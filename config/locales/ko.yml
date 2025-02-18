@@ -110,6 +110,7 @@ ko:
   OutcomeView: 
     length_error: "255글자보다 적어야 함"
     mastery_error: "0보다 크거나 같아야 함"
+    title: "성과 이름"
   OutcomesDirectoryView: 
     flash: 
       error: "오류가 발생했습니다. 페이지를 새로 고친 후에 다시 시도하시기 바랍니다."
