@@ -433,6 +433,7 @@ RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.color = true
   config.order = :random
+  config.filter_run_when_matching :focus
 
   # The Pact specs have prerequisite setup steps so we exclude them by default
   config.filter_run_excluding :pact_live_events if ENV.fetch("RUN_LIVE_EVENTS_CONTRACT_TESTS", "0") == "0"
