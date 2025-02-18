@@ -2064,6 +2064,8 @@ class User < ActiveRecord::Base
     true
   end
 
+  # Legacy method - don't use this since users may belong to multiple accounts and this method is
+  # not aware of context
   def account
     pseudonym&.account || Account.default
   end
