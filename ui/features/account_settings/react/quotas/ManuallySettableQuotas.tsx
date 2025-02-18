@@ -40,14 +40,14 @@ enum SelectOption {
 }
 
 const findEntityValidationSchema = z.object({
-  id: z.string().min(1, 'ID is required.'),
+  id: z.string().min(1, I18n.t('ID is required.')),
   resource: z.enum([SelectOption.Course, SelectOption.Group]),
 })
 const updateQuotasValidationSchema = z.object({
   storage_quota_mb: z
     .string()
-    .min(1, 'Quota is required.')
-    .regex(IS_INTEGER_REGEX, 'Quota must be an integer.'),
+    .min(1, I18n.t('Quota is required.'))
+    .regex(IS_INTEGER_REGEX, I18n.t('Quota must be an integer.')),
 })
 
 type FindEntityFormValues = z.infer<typeof findEntityValidationSchema>

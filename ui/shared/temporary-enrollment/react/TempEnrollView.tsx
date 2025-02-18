@@ -96,14 +96,16 @@ async function handleConfirmAndDeleteEnrollment(tempEnrollments: Enrollment[]): 
     if (successfulDeletions.length > 0) {
       showFlashAlert({
         type: 'success',
-        message: `${successfulDeletions.length} enrollments deleted successfully.`,
+        message: I18n.t(`%{successfulDeletionCount} enrollments deleted successfully.`, {
+          successfulDeletionCount: successfulDeletions.length,
+        }),
       })
     }
     const errorCount = results.filter(result => result.status === 'rejected').length
     if (errorCount > 0) {
       showFlashAlert({
         type: 'error',
-        message: `${errorCount} enrollments could not be deleted.`,
+        message: I18n.t('%{errorCount} enrollments could not be deleted.', {errorCount}),
       })
     }
   }

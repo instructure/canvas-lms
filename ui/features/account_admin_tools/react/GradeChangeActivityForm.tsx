@@ -59,7 +59,7 @@ const validationSchema = z
     ({grader_id, student_id, course_id, assignment_id}) =>
       grader_id || student_id || course_id || assignment_id,
     {
-      message: 'Please enter at least one field.',
+      message: I18n.t('Please enter at least one field.'),
       path: ['grader_id'],
     },
   )
@@ -72,7 +72,7 @@ const validationSchema = z
       return isToDateAfterFromDate
     },
     {
-      message: 'To Date cannot come before From Date.',
+      message: I18n.t('To Date cannot come before From Date.'),
       path: ['end_time'],
     },
   )

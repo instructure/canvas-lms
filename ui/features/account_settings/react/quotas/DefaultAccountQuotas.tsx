@@ -36,17 +36,17 @@ const createValidationSchema = (isRootAccount: boolean) =>
   z.object({
     default_storage_quota_mb: z
       .string()
-      .min(1, 'Course Quota is required.')
-      .regex(IS_INTEGER_REGEX, 'Course Quota must be an integer.'),
+      .min(1, I18n.t('Course Quota is required.'))
+      .regex(IS_INTEGER_REGEX, I18n.t('Course Quota must be an integer.')),
     default_group_storage_quota_mb: z
       .string()
-      .min(1, 'Group Quota is required.')
-      .regex(IS_INTEGER_REGEX, 'Group Quota must be an integer.'),
+      .min(1, I18n.t('Group Quota is required.'))
+      .regex(IS_INTEGER_REGEX, I18n.t('Group Quota must be an integer.')),
     ...(isRootAccount && {
       default_user_storage_quota_mb: z
         .string()
-        .min(1, 'User Quota is required.')
-        .regex(IS_INTEGER_REGEX, 'User Quota must be an integer.'),
+        .min(1, I18n.t('User Quota is required.'))
+        .regex(IS_INTEGER_REGEX, I18n.t('User Quota must be an integer.')),
     }),
   })
 

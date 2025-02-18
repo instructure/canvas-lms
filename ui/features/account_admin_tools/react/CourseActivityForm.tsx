@@ -50,7 +50,7 @@ const validationSchema = z
       return isToDateAfterFromDate
     },
     {
-      message: 'To Date cannot come before From Date.',
+      message: I18n.t('To Date cannot come before From Date.'),
       path: ['end_time'],
     },
   )

@@ -151,7 +151,7 @@ const CreateTicketForm = forwardRef(function CreateTicketForm(
       })
 
       if (result.response.status === 200) {
-        showFlashAlert({message: 'Ticket successfully submitted.', type: 'success'})
+        showFlashAlert({message: I18n.t('Ticket successfully submitted.'), type: 'success'})
         onSubmit()
       } else {
         setErrorMessage(result.json?.message || I18n.t('Error submitting ticket'))
