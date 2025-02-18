@@ -26,7 +26,7 @@ gem "rails", "~> 7.1.3"
   gem "rack", "~> 3.0.11" if $canvas_rails == "7.1"
   # can't upgrade to 2.0 until Rails 7.2
   gem "sqlite3", "~> 1.7"
-gem "switchman", "~> 3.5"
+gem "switchman", "~> 4.0"
 gem "guardrail", "~> 3.0"
 gem "switchman-inst-jobs", "~> 4.0"
 gem "irb", "~> 1.7"

@@ -25,6 +25,7 @@ PATH
       activesupport (>= 5.0)
       config_file
       diplomat (>= 2.5.1)
+      logger (~> 1.5)
       railties
 
 PATH
