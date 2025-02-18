@@ -22,6 +22,14 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
+import styled from 'styled-components'
+import {ViewProps} from '@instructure/ui-view'
+
+const StyledEmojiPickerContainer = styled.span`
+  bottom: 0px;
+  right: 10px;
+  position: absolute;
+`
 
 const I18n = createI18nScope('gradebook')
 
@@ -36,59 +44,65 @@ type State = {
   comment: string
 }
 
-export default class SubmissionCommentForm extends React.Component<Props, State> {
+type InsertEmojiParams = {native: string}
+
+export default abstract class SubmissionCommentForm extends React.Component<Props, State> {
   textarea: HTMLTextAreaElement | null = null
 
   constructor(props: Props) {
     super(props)
     const methodsToBind = [
       'bindTextarea',
+      'focusTextarea',
       'handleCancel',
       'handleCommentChange',
       'handlePublishComment',
       'insertEmoji',
-      'focusTextarea',
     ]
     methodsToBind.forEach(method => {
       // @ts-expect-error
       this[method] = this[method].bind(this)
     })
+
     this.state = {comment: props.comment || ''}
   }
+
+  abstract buttonLabels(): {cancelButtonLabel: string; submitButtonLabel: string}
+  abstract showButtons(): boolean
+  abstract publishComment(): Promise<void> | void
 
   focusTextarea() {
     this.textarea?.focus()
   }
 
-  // @ts-expect-error
-  handleCancel(event: Event, callback) {
-    event.preventDefault()
+  handleCancel(
+    e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>,
+    callback?: () => void,
+  ) {
+    e.preventDefault()
 
-    this.setState({comment: this.props.comment || ''}, () => {
-      this.props.cancelCommenting()
-      if (callback) {
-        callback()
-      }
+    this.handleCommentChange(this.props.comment || '', {
+      callback: () => {
+        this.props.cancelCommenting()
+        callback?.()
+      },
     })
   }
 
-  // @ts-expect-error
-  handleCommentChange(event) {
-    this.setState({comment: event.target.value})
+  handleCommentChange(value: string, {callback}: {callback?: () => void} = {}) {
+    this.setState({comment: value}, () => {
+      callback?.()
+    })
   }
 
-  // @ts-expect-error
-  insertEmoji(emoji) {
-    const value = this.state.comment + emoji.native
-    this.handleCommentChange({target: {value}})
+  insertEmoji(emoji: InsertEmojiParams) {
+    this.handleCommentChange(this.state.comment + emoji.native)
     this.focusTextarea()
   }
 
-  // @ts-expect-error
-  handlePublishComment(event) {
-    event.preventDefault()
+  handlePublishComment(e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) {
+    e.preventDefault()
     this.props.setProcessing(true)
-    // @ts-expect-error
     this.publishComment()?.catch(() => this.props.setProcessing(false))
   }
 
@@ -97,14 +111,13 @@ export default class SubmissionCommentForm extends React.Component<Props, State>
     return comment.length > 0
   }
 
-  // @ts-expect-error
-  bindTextarea(ref) {
+  bindTextarea(ref: HTMLTextAreaElement | null) {
     this.textarea = ref
   }
 
   render() {
-    // @ts-expect-error
     const {cancelButtonLabel, submitButtonLabel} = this.buttonLabels()
+
     return (
       <div>
         <div id="textarea-container">
@@ -112,14 +125,15 @@ export default class SubmissionCommentForm extends React.Component<Props, State>
             data-testid="comment-textarea"
             label={<ScreenReaderContent>{I18n.t('Leave a comment')}</ScreenReaderContent>}
             placeholder={I18n.t('Leave a comment')}
-            onChange={this.handleCommentChange}
+            onChange={e => this.handleCommentChange(e.target.value)}
             value={this.state.comment}
             textareaRef={this.bindTextarea}
+            resize="vertical"
           />
           {!!ENV.EMOJIS_ENABLED && (
-            <span id="emoji-picker-container">
+            <StyledEmojiPickerContainer>
               <EmojiPicker insertEmoji={this.insertEmoji} />
-            </span>
+            </StyledEmojiPickerContainer>
           )}
         </div>
         {!!ENV.EMOJIS_ENABLED && (
@@ -127,7 +141,6 @@ export default class SubmissionCommentForm extends React.Component<Props, State>
             <EmojiQuickPicker insertEmoji={this.insertEmoji} />
           </div>
         )}
-        {/* @ts-expect-error */}
         {this.showButtons() && (
           <div
             style={{
@@ -143,7 +156,6 @@ export default class SubmissionCommentForm extends React.Component<Props, State>
               disabled={this.props.processing}
               label={cancelButtonLabel}
               margin="small small small 0"
-              // @ts-expect-error
               onClick={this.handleCancel}
             >
               {I18n.t('Cancel')}
