@@ -140,9 +140,11 @@ fa:
     length_error: "باید 255 نویسه یا کمتر باشد"
     title: "این گروه را نام گذاری کنید"
   OutcomeView: 
+    display_name: "نام دوستانه (انتخابی)"
     length_error: "باید 255 نویسه یا کمتر باشد"
     mastery_at_nan_error: "حتما باید عدد باشد"
     mastery_error: "باید بزرگتر از 0 یا مساوی با آن باشد"
+    title: "این نتیجه را نام گذاری کنید"
   OutcomesDirectoryView: 
     flash: 
       error: "یک خطا رخ داده است. لطفا صفحه را تازه سازی کنید و دوباره تلاش کنید."
