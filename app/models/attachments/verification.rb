@@ -102,19 +102,21 @@ class Attachments::Verification
   # @param permission (Symbol) - Either :read or :download
   #
   # Returns a boolean
-  def valid_verifier_for_permission?(verifier, permission, session = {})
+  def valid_verifier_for_permission?(verifier, permission, root_account, session = {})
     return false unless verifier.is_a?(String)
 
     # Support for legacy verifiers.
-    if ActiveSupport::SecurityUtils.secure_compare(verifier, attachment.uuid)
-      InstStatsd::Statsd.distributed_increment("attachments.legacy_verifier_success")
-      return true
-    elsif verifier.length == attachment.uuid.length && attachment.related_attachments.where(uuid: verifier).exists?
-      # if we have a uuid-sized verifier that doesn't match, see whether it matches a related attachment
-      # (meaning another copy of the same file, to deal with a question bank migration issue in which
-      # the source file's verifier remains in the URL)
-      InstStatsd::Statsd.distributed_increment("attachments.related_verifier_success")
-      return true
+    unless root_account.feature_enabled?(:disable_file_verifier_access)
+      if ActiveSupport::SecurityUtils.secure_compare(verifier, attachment.uuid)
+        InstStatsd::Statsd.distributed_increment("attachments.legacy_verifier_success")
+        return true
+      elsif verifier.length == attachment.uuid.length && attachment.related_attachments.where(uuid: verifier).exists?
+        # if we have a uuid-sized verifier that doesn't match, see whether it matches a related attachment
+        # (meaning another copy of the same file, to deal with a question bank migration issue in which
+        # the source file's verifier remains in the URL)
+        InstStatsd::Statsd.distributed_increment("attachments.related_verifier_success")
+        return true
+      end
     end
 
     body = decode_verifier(verifier)
