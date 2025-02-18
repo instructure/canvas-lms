@@ -284,7 +284,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
                     </Flex.Item>
                   </>
                 }
-                <Flex.Item shouldGrow={true}>
+                <Flex.Item shouldGrow={true} overflowY="visible">
                   <CanvasSelect
                     id="course-copy-select-course"
                     data-testid="course-copy-select-course"
