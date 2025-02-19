@@ -102,7 +102,7 @@ class MediaObjectsController < ApplicationController
   #
   # @returns MediaObject
   def show
-    if Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && @attachment
+    if @attachment
       render json: media_attachment_api_json(@attachment, @media_object, @current_user, session)
     else
       render json: media_object_api_json(@media_object, @current_user, session)
@@ -141,36 +141,29 @@ class MediaObjectsController < ApplicationController
   #
   # @returns [MediaObject]
   def index
-    media_attachment = Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
     url = if params[:course_id]
             context = Course.find(params[:course_id])
-            media_attachment ? api_v1_course_media_attachments_url : api_v1_course_media_objects_url
+            api_v1_course_media_attachments_url
           elsif params[:group_id]
             context = Group.find(params[:group_id])
-            media_attachment ? api_v1_group_media_attachments_url : api_v1_group_media_objects_url
+            api_v1_group_media_attachments_url
           else
-            media_attachment ? api_v1_media_attachments_url : api_v1_media_objects_url
+            api_v1_media_attachments_url
           end
     scope = if context
               root_folder = Folder.root_folders(context).first
 
               if root_folder.grants_right?(@current_user, :read_contents)
-                if media_attachment
-                  attachment_scope = Attachment.not_deleted.is_media_object.where(context:)
-                  attachment_scope = attachment_scope.select { |att| access_allowed(att, @current_user, :download) }
+                attachment_scope = Attachment.not_deleted.is_media_object.where(context:)
+                attachment_scope = attachment_scope.select { |att| access_allowed(att, @current_user, :download) }
 
-                  MediaObject.by_media_id(attachment_scope.pluck(:media_entry_id))
-                else
-                  MediaObject.active.where(context:)
-                end
+                MediaObject.by_media_id(attachment_scope.pluck(:media_entry_id))
               else
                 render_unauthorized_action # not allowed to view files in the context
               end
-            elsif media_attachment
+            else
               attachment_scope = Attachment.not_deleted.is_media_object.where(context: @current_user)
               MediaObject.by_media_id(attachment_scope.pluck(:media_entry_id))
-            else
-              MediaObject.active.where(context: @current_user)
             end
 
     order_dir = (params[:order] == "desc") ? "desc" : "asc"
@@ -238,12 +231,8 @@ class MediaObjectsController < ApplicationController
         @media_object.save
       end
       media_object_json = @media_object.as_json
-      if Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
-        embedded_iframe_url = media_attachment_iframe_url(@media_object.attachment_id)
-        media_object_json["media_object"]["uuid"] = @media_object.attachment.uuid
-      else
-        embedded_iframe_url = media_object_iframe_url(@media_object.media_id)
-      end
+      embedded_iframe_url = media_attachment_iframe_url(@media_object.attachment_id)
+      media_object_json["media_object"]["uuid"] = @media_object.attachment.uuid
       render json: media_object_json.merge(embedded_iframe_url:)
     end
   end
@@ -303,10 +292,6 @@ class MediaObjectsController < ApplicationController
   end
 
   def iframe_media_player
-    if !Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && @attachment
-      return redirect_to(media_object_iframe_path(@media_object.media_id, params: request.query_parameters))
-    end
-
     # Exclude all global includes from this page
     @exclude_account_js = true
     @embeddable = true
@@ -319,7 +304,7 @@ class MediaObjectsController < ApplicationController
 
     js_env media_object: media_api_json if media_api_json
     js_env attachment: !!@attachment
-    js_env attachment_id: @attachment.id if Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && @attachment
+    js_env attachment_id: @attachment.id if @attachment
     consolidated_media_player_enabled = @attachment&.context&.account&.feature_enabled?(:consolidated_media_player) || (@attachment.nil? && @media_object&.context&.account&.feature_enabled?(:consolidated_media_player))
     # this flag is also injected through the normal js_env for the RCE
     # but it needs to be added separately here for the iframe because of subaccount weirdness

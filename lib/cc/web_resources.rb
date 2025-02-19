@@ -216,20 +216,12 @@ module CC
           root_node.media(identifierref: file_id) do |media_node|
             track_list.each do |track|
               # <track identifierref='(srt resource id)' kind='subtitles' locale='en'/>
-              media_node_creation(media_node, track)
+              media_node.track(track[:content], track.slice(:kind, :locale, :identifierref))
             end
           end
         end
       end
       tracks_file.close
-    end
-
-    def media_node_creation(media_node, track)
-      if Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
-        media_node.track(track[:content], track.slice(:kind, :locale, :identifierref))
-      else
-        media_node.track(track)
-      end
     end
 
     def add_media_tracks
