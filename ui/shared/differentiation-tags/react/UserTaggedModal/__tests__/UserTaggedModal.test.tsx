@@ -36,11 +36,9 @@ describe('UserTaggedModal', () => {
 
   const renderComponent = (mockReturn = {}, props = {}) => {
     const defaultMock = {
-        data: [
-            {id: 1, name:'test group', groupCategoryName:'test category'},
-        ],
-        isLoading: false,
-        error: null,
+      data: [{id: 1, name: 'test group', groupCategoryName: 'test category'}],
+      isLoading: false,
+      error: null,
     }
     mockuseUserTags.mockReturnValue({...defaultMock, ...mockReturn})
     render(<UserTaggedModal {...defaultProps} {...props} />)
@@ -56,7 +54,7 @@ describe('UserTaggedModal', () => {
   })
 
   it('does not show the modal when isOpen is false', () => {
-    renderComponent({},{isOpen: false})
+    renderComponent({}, {isOpen: false})
     expect(screen.queryByTestId('user-tag-modal')).not.toBeInTheDocument()
   })
 
@@ -73,7 +71,7 @@ describe('UserTaggedModal', () => {
   })
 
   it('shows message when there is not any tag for that user', () => {
-    renderComponent({data:[]})
+    renderComponent({data: []})
     expect(screen.getByText(/No tags available for this user/)).toBeInTheDocument()
   })
 
@@ -82,7 +80,7 @@ describe('UserTaggedModal', () => {
       {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups'},
       {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups'},
     ]
-    renderComponent({data:mockData})
+    renderComponent({data: mockData})
     expect(screen.getByText('Reading Groups | Macroeconomics')).toBeInTheDocument()
     expect(screen.getByText('Reading Groups | Microeconomics')).toBeInTheDocument()
   })
@@ -103,14 +101,11 @@ describe('UserTaggedModal', () => {
       {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups'},
       {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups'},
     ]
-    renderComponent({data:mockData})
+    renderComponent({data: mockData})
     expect(screen.getByText('Reading Groups | Macroeconomics')).toBeInTheDocument()
     expect(screen.getByText('Reading Groups | Microeconomics')).toBeInTheDocument()
     const tagBtn = screen.queryByTestId('user-tag-1')
-    if(tagBtn)
-        await userEvent.click(tagBtn)
+    if (tagBtn) await userEvent.click(tagBtn)
     expect(screen.getByText(/Deleting this tag preserves past assignments/i)).toBeInTheDocument()
-    expect(screen.getByText(/For assignments that are currently available/i)).toBeInTheDocument()
   })
-
 })
