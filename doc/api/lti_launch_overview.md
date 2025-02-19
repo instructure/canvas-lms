@@ -13,6 +13,8 @@ Canvas <a href="http://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-
 - <https://canvas.beta.instructure.com> (Beta environment launches)
 - <https://canvas.test.instructure.com> (Test environment launches)
 
+On self-hosted Canvas, the `iss` value must be updated to your Canvas instance's hostname in the `config/security.yml` file, as the default is <https://canvas.instructure.com>.
+
 The request also includes a `login_hint` that is passed in the next step. Last, the request include the `target_link_uri` that has been configured on the Developer key; this is later used by the tool as a recommended final redirect.
 
 <table>
