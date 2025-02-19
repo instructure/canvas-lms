@@ -25,11 +25,12 @@ describe HorizonMode do
     end
   end
 
-  let(:horizon_url) { DynamicSettings.find("horizon")["redirect_url"] }
-
   before :once do
     @course = course_factory(active_all: true)
     course_with_student(active_all: true)
+    account = @course.root_account
+    account.settings[:horizon_domain] = "test.canvasforcareer.com"
+    account.save!
   end
 
   before do
@@ -56,10 +57,25 @@ describe HorizonMode do
       expect(response).to have_http_status :ok
     end
 
+    it "does not redirect if user is account admin" do
+      admin = account_admin_user(account: @course.account)
+      user_session(admin)
+      get :show, params: { id: @course.id }
+      expect(response).to have_http_status :ok
+    end
+
     it "redirects to horizon if user is student" do
       user_session(@student)
       get :show, params: { id: @course.id }
-      expect(response).to redirect_to("#{horizon_url}?reauthenticate=false&canvas_url=/courses/#{@course.id}")
+      expect(response).to redirect_to("https://test.canvasforcareer.com/redirect?canvas_url=%2Fcourses%2F#{@course.id}&reauthenticate=false")
+    end
+
+    it "does not redirect if horizon domain is not set, even if student" do
+      @course.account.settings[:horizon_domain] = nil
+      @course.account.save!
+      user_session(@student)
+      get :show, params: { id: @course.id }
+      expect(response).to have_http_status :ok
     end
   end
 end

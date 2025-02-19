@@ -3851,10 +3851,9 @@ class CoursesController < ApplicationController
     session.delete(:masquerade_return_to)
 
     return_url = course_path(@context)
-    if @context.horizon_course?
-      horizon_redirect_url = DynamicSettings.find("horizon")["redirect_url"]
+    if @context.horizon_course? && @context.root_account.horizon_domain.present?
       canvas_url = params[:reset_test_student] || request.referer
-      redirect_to "#{horizon_redirect_url}?reauthenticate=true&canvas_url=#{canvas_url}"
+      redirect_to @context.root_account.horizon_redirect_url(canvas_url, reauthenticate: true)
     elsif value_to_boolean(params[:redirect_to_referer])
       return_to(request.referer, return_url || dashboard_url)
     else
