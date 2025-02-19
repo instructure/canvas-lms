@@ -93,13 +93,6 @@ export const DeleteTagWarningModal: React.FC<{
             )}
           </p>
         </Text>
-        <Text>
-          <p>
-            {I18n.t(
-              'For assignments that are currently available and have a deadline that has not yet passed, indicate below which should continue to be assigned to tagged students. Unchecked assignments will no longer be assigned to students with the deleted tag and their submissions will be deleted.',
-            )}
-          </p>
-        </Text>
       </View>
     </BaseWarningModal>
   )
@@ -117,13 +110,6 @@ export const RemoveTagWarningModal: React.FC<{
           <p>
             {I18n.t(
               'Removing the tag from a student preserves past assignments in the gradebook and removes the student from any upcoming assignments where they have been assigned via tag.',
-            )}
-          </p>
-        </Text>
-        <Text>
-          <p>
-            {I18n.t(
-              'For assignments that are currently available and have a deadline that has not yet passed, indicate below which should continue to be assigned to the student, unchecked assignments will no longer be assigned to that student.',
             )}
           </p>
         </Text>
