@@ -375,6 +375,7 @@ class ApplicationController < ActionController::Base
     discussion_checkpoints
     discussion_default_sort
     discussion_default_expand
+    discussion_permalink
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
     horizon_course_setting
