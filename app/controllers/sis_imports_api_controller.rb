@@ -597,8 +597,7 @@ class SisImportsApiController < ApplicationController
       raise "invalid import type parameter" unless SisBatch.valid_import_types.key?(params[:import_type])
 
       if !api_request? && @account.current_sis_batch.try(:importing?)
-        return render json: { error: true, error_message: t(:sis_import_in_process_notice, "An SIS import is already in process."), batch_in_progress: true },
-                      as_text: true
+        return render json: { error: true, error_message: t(:sis_import_in_process_notice, "An SIS import is already in process."), batch_in_progress: true }
       end
 
       file_obj = nil

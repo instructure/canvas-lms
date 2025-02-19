@@ -1231,11 +1231,8 @@ class FilesController < ApplicationController
     end
 
     json = attachment_json(@attachment, @current_user, {}, json_params)
-    json.merge!(doc_preview_json(@attachment))
 
-    # render as_text for IE, otherwise it'll prompt
-    # to download the JSON response
-    render json:, as_text: in_app?
+    render json: json.merge!(doc_preview_json(@attachment))
   end
 
   def api_file_status

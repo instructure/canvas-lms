@@ -934,14 +934,6 @@ class GradebooksController < ApplicationController
               location: course_gradebook_url(@assignment.context)
             )
           end
-          format.text do
-            render(
-              json: submissions_json(submissions: @submissions, assignments:),
-              status: :created,
-              location: course_gradebook_url(@assignment.context),
-              as_text: true
-            )
-          end
         else
           error_message = error&.to_s
           flash[:error] = t(
@@ -956,7 +948,6 @@ class GradebooksController < ApplicationController
 
           format.html { render :show, course_id: @assignment.context.id }
           format.json { render json: { errors: error_json }, status: request_error_status }
-          format.text { render json: { errors: error_json }, status: request_error_status }
         end
       end
     end
