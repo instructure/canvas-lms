@@ -48,14 +48,11 @@ module UngradedDiscussionVisibility
             /* join active student enrollments */
             #{VisibilitySqlHelper.enrollment_join_sql}
 
-            /* join context modules */
-            #{VisibilitySqlHelper.module_items_join_sql(content_tag_type: "DiscussionTopic")}
-
-            /* join assignment overrides (assignment or related context module) for CourseSection */
-            #{VisibilitySqlHelper.assignment_override_section_join_sql(id_column_name: "discussion_topic_id")}
-
-            /* filtered to course_id, user_id, discussion_topic_id, and additional conditions */
-            #{VisibilitySqlHelper.section_override_filter_sql(filter_condition_sql:)}
+            #{if Account.site_admin.feature_enabled?(:visibility_performance_improvements)
+                VisibilitySqlHelper.full_section_without_left_joins_sql(filter_condition_sql:, id_column_name: "discussion_topic_id", table_name: DiscussionTopic)
+              else
+                VisibilitySqlHelper.full_section_with_left_joins_sql(filter_condition_sql:, id_column_name: "discussion_topic_id", content_tag_type: "DiscussionTopic")
+              end}
 
             EXCEPT
 
@@ -79,17 +76,11 @@ module UngradedDiscussionVisibility
             /* join active student enrollments */
             #{VisibilitySqlHelper.enrollment_join_sql}
 
-            /* join context modules */
-            #{VisibilitySqlHelper.module_items_join_sql(content_tag_type: "DiscussionTopic")}
-
-            /* join assignment override for 'ADHOC' */
-            #{VisibilitySqlHelper.assignment_override_adhoc_join_sql(id_column_name: "discussion_topic_id")}
-
-            /* join AssignmentOverrideStudent */
-            #{VisibilitySqlHelper.assignment_override_student_join_sql}
-
-            /* filtered to course_id, user_id, discussion_topic_id, and additional conditions */
-            #{VisibilitySqlHelper.adhoc_override_filter_sql(filter_condition_sql:)}
+            #{if Account.site_admin.feature_enabled?(:visibility_performance_improvements)
+                VisibilitySqlHelper.full_adhoc_without_left_joins_sql(filter_condition_sql:, id_column_name: "discussion_topic_id", table_name: DiscussionTopic)
+              else
+                VisibilitySqlHelper.full_adhoc_with_left_joins_sql(filter_condition_sql:, id_column_name: "discussion_topic_id", content_tag_type: "DiscussionTopic")
+              end}
 
             EXCEPT
 

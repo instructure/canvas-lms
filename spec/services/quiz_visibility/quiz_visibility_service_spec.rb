@@ -235,7 +235,7 @@ describe "differentiated_assignments" do
       end
     end
 
-    context "module overrides" do
+    shared_examples_for "module overrides" do
       it "includes everyone else if there no modules and no overrides" do
         quiz_with_false_only_visible_to_overrides
         ensure_user_sees_quiz
@@ -292,6 +292,19 @@ describe "differentiated_assignments" do
         module_override.save!
 
         ensure_user_does_not_see_quiz
+      end
+    end
+
+    context "quizzes with modules" do
+      it_behaves_like "module overrides" do
+        before :once do
+          Account.site_admin.disable_feature!(:visibility_performance_improvements)
+        end
+      end
+      it_behaves_like "module overrides" do
+        before :once do
+          Account.site_admin.enable_feature!(:visibility_performance_improvements)
+        end
       end
     end
 

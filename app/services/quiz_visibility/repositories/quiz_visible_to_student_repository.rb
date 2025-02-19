@@ -48,14 +48,11 @@ module QuizVisibility
             /* join active student enrollments */
             #{VisibilitySqlHelper.enrollment_join_sql}
 
-            /* join context modules */
-            #{VisibilitySqlHelper.module_items_join_sql(content_tag_type: "Quizzes::Quiz")}
-
-            /* join assignment overrides (assignment or related context module) for CourseSection */
-            #{VisibilitySqlHelper.assignment_override_section_join_sql(id_column_name: "quiz_id")}
-
-            /* filtered to course_id, user_id, quiz_id, and additional conditions */
-            #{VisibilitySqlHelper.section_override_filter_sql(filter_condition_sql:)}
+            #{if Account.site_admin.feature_enabled?(:visibility_performance_improvements)
+                VisibilitySqlHelper.full_section_without_left_joins_sql(filter_condition_sql:, id_column_name: "quiz_id", table_name: Quizzes::Quiz)
+              else
+                VisibilitySqlHelper.full_section_with_left_joins_sql(filter_condition_sql:, id_column_name: "quiz_id", content_tag_type: "Quizzes::Quiz")
+              end}
 
             EXCEPT
 
@@ -79,17 +76,11 @@ module QuizVisibility
             /* join active student enrollments */
             #{VisibilitySqlHelper.enrollment_join_sql}
 
-            /* join context modules */
-            #{VisibilitySqlHelper.module_items_join_sql(content_tag_type: "Quizzes::Quiz")}
-
-            /* join assignment override for 'ADHOC' */
-            #{VisibilitySqlHelper.assignment_override_adhoc_join_sql(id_column_name: "quiz_id")}
-
-            /* join AssignmentOverrideStudent */
-            #{VisibilitySqlHelper.assignment_override_student_join_sql}
-
-            /* filtered to course_id, user_id, quiz_id, and additional conditions */
-            #{VisibilitySqlHelper.adhoc_override_filter_sql(filter_condition_sql:)}
+            #{if Account.site_admin.feature_enabled?(:visibility_performance_improvements)
+                VisibilitySqlHelper.full_adhoc_without_left_joins_sql(filter_condition_sql:, id_column_name: "quiz_id", table_name: Quizzes::Quiz)
+              else
+                VisibilitySqlHelper.full_adhoc_with_left_joins_sql(filter_condition_sql:, id_column_name: "quiz_id", content_tag_type: "Quizzes::Quiz")
+              end}
 
             EXCEPT
 

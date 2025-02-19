@@ -412,7 +412,7 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           end
         end
 
-        context "module overrides" do
+        shared_examples_for "module overrides" do
           it "includes everyone else if there no modules and no overrides" do
             assignment_with_false_only_visible_to_overrides
             ensure_user_sees_assignment
@@ -532,6 +532,19 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module", workflow_state: "deleted"
 
             ensure_user_does_not_see_assignment
+          end
+        end
+
+        context "assignments with modules" do
+          it_behaves_like "module overrides" do
+            before :once do
+              Account.site_admin.disable_feature!(:visibility_performance_improvements)
+            end
+          end
+          it_behaves_like "module overrides" do
+            before :once do
+              Account.site_admin.enable_feature!(:visibility_performance_improvements)
+            end
           end
         end
 
