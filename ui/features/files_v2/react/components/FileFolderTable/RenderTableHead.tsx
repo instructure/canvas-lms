@@ -22,7 +22,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 
 // TODO: when we know how to sort by modified_at and published, add them here.
-const SORTABLE_COLUMNS = ['name', 'created_at', 'updated_at', 'size']
+const SORTABLE_COLUMNS = ['name', 'created_at', 'updated_at', 'size', 'modified_by', 'rights']
 
 const isSortable = (column: string) => SORTABLE_COLUMNS.includes(column)
 
