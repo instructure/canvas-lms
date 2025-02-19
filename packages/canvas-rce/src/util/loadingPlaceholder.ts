@@ -19,7 +19,7 @@
 import {isAudio, isImage, isVideo} from '../rce/plugins/shared/fileTypeUtils'
 import {
   AUDIO_PLAYER_SIZE,
-  VIDEO_SIZE_DEFAULT,
+  videoDefaultSize,
 } from '../rce/plugins/instructure_record/VideoOptionsTray/TrayController'
 import formatMessage from '../format-message'
 import {trimmedOrNull} from './string-util'
@@ -66,12 +66,13 @@ export async function placeholderInfoFor(
       image.src = imageUrl
     })
   } else if (typeof type === 'string' && isVideo(type)) {
+    const videoSize = videoDefaultSize()
     return {
       type: 'block',
       visibleLabel,
       ariaLabel,
-      width: VIDEO_SIZE_DEFAULT.width,
-      height: VIDEO_SIZE_DEFAULT.height,
+      width: videoSize.width,
+      height: videoSize.height,
       vAlign: 'bottom',
     }
   } else if (typeof type === 'string' && isAudio(type)) {

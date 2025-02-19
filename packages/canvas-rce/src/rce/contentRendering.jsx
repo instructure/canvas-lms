@@ -21,7 +21,7 @@ import {renderToStaticMarkup} from 'react-dom/server'
 import {cleanUrl} from './contentInsertionUtils'
 import formatMessage from '../format-message'
 import {
-  VIDEO_SIZE_DEFAULT,
+  videoDefaultSize,
   AUDIO_PLAYER_SIZE,
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 import {mediaPlayerURLFromFile} from './plugins/shared/fileTypeUtils'
@@ -109,6 +109,7 @@ export function renderImage(image, canvasOrigin, opts) {
 
 export function renderVideo(video, canvasOrigin) {
   const src = mediaPlayerURLFromFile(video, canvasOrigin)
+  const videoSize = videoDefaultSize()
   return `
   <iframe
       allow="fullscreen"
@@ -117,8 +118,8 @@ export function renderVideo(video, canvasOrigin) {
       data-media-type="video"
       loading="lazy"
       src="${src}"
-      style="width:${VIDEO_SIZE_DEFAULT.width};height:${
-        VIDEO_SIZE_DEFAULT.height
+      style="width:${videoSize.width};height:${
+        videoSize.height
       };display:inline-block;"
       title="${formatMessage('Video player for {title}', {
         title: video.title || video.name || video.text,
