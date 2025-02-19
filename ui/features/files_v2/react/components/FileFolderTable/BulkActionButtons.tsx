@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
@@ -34,7 +34,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import DeleteModal from './DeleteModal'
 import {type File, type Folder} from '../../../interfaces/File'
 import {getUniqueId} from '../../../utils/fileFolderUtils'
-import { downloadZip } from '../../../utils/downloadUtils'
+import {downloadZip} from '../../../utils/downloadUtils'
+import MoveModal from './MoveModal'
 
 const I18n = createI18nScope('files_v2')
 
@@ -55,23 +56,36 @@ const BulkActionButtons = ({
   userCanDeleteFilesForContext,
   rows,
 }: BulkActionButtonsProps) => {
+  const [modalOrTray, setModalOrTray] = useState<'delete' | 'move-to' | null>(null)
   const isEnabled = selectedRows.size >= 1
   const selectedText = !isEnabled
     ? I18n.t('0 selected')
-    : I18n.t('%{selected} of %{total} selected', { selected: selectedRows.size, total: totalRows })
+    : I18n.t('%{selected} of %{total} selected', {selected: selectedRows.size, total: totalRows})
   const justifyItems = size === 'small' ? 'space-between' : 'end'
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [itemsToDelete, setItemsToDelete] = useState<(File | Folder)[]>([])
+  const onDismissModalOrTray = useCallback(() => setModalOrTray(null), [])
 
-  const handleDeleteClick = () => {
-    setItemsToDelete(rows.filter(row => selectedRows.has(getUniqueId(row))))
-    setIsModalOpen(true)
-  }
+  const handleDownload = useCallback(() => downloadZip(selectedRows), [selectedRows])
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-  }
+  const selectedItems = rows.filter(row => selectedRows.has(getUniqueId(row)))
+
+  const buildModals = useCallback(
+    () => (
+      <>
+        <DeleteModal
+          open={modalOrTray === 'delete'}
+          items={selectedItems}
+          onClose={onDismissModalOrTray}
+        />
+        <MoveModal
+          items={selectedItems}
+          open={modalOrTray === 'move-to'}
+          onDismiss={onDismissModalOrTray}
+        />
+      </>
+    ),
+    [modalOrTray, onDismissModalOrTray, selectedItems],
+  )
 
   return (
     <>
@@ -86,8 +100,8 @@ const BulkActionButtons = ({
                 disabled={!isEnabled}
                 renderIcon={<IconDownloadLine />}
                 screenReaderLabel={I18n.t('Download')}
-                onClick={() => downloadZip(selectedRows)}
-            />
+                onClick={handleDownload}
+              />
             </Flex.Item>
             {userCanDeleteFilesForContext && (
               <Flex.Item>
@@ -96,7 +110,7 @@ const BulkActionButtons = ({
                   disabled={!isEnabled}
                   renderIcon={<IconTrashLine />}
                   screenReaderLabel={I18n.t('Delete')}
-                  onClick={handleDeleteClick}
+                  onClick={() => setModalOrTray('delete')}
                 />
               </Flex.Item>
             )}
@@ -148,7 +162,10 @@ const BulkActionButtons = ({
                   </Menu.Item>
                 )}
                 {userCanEditFilesForContext && (
-                  <Menu.Item data-testid="bulk-actions-move-button">
+                  <Menu.Item
+                    data-testid="bulk-actions-move-button"
+                    onClick={() => setModalOrTray('move-to')}
+                  >
                     <Flex alignItems="center" gap="x-small">
                       <Flex.Item>
                         <IconExpandItemsLine inline={false} />
@@ -164,11 +181,7 @@ const BulkActionButtons = ({
           </Flex>
         </Flex.Item>
       </Flex>
-      <DeleteModal
-        open={isModalOpen}
-        items={itemsToDelete}
-        onClose={handleCloseModal}
-      />
+      {buildModals()}
     </>
   )
 }

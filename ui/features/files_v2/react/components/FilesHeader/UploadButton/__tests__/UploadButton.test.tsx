@@ -21,7 +21,7 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import UploadButton from '../UploadButton'
 import {FileManagementContext} from '../../../Contexts'
-import {MainFolderWrapper} from '../../../../../utils/fileFolderWrappers'
+import {BBFolderWrapper} from '../../../../../utils/fileFolderWrappers'
 import {FAKE_COURSE_FOLDER} from '../../../../../fixtures/fakeData'
 
 const createFileOptionsMock = jest.fn()
@@ -65,7 +65,7 @@ const renderComponent = (props = {}) =>
         contextId: '1',
         folderId: '1',
         showingAllContexts: false,
-        currentFolder: new MainFolderWrapper(FAKE_COURSE_FOLDER),
+        currentFolder: new BBFolderWrapper(FAKE_COURSE_FOLDER),
       }}
     >
       <UploadButton {...defaultProps} {...props} />
