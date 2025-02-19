@@ -22,7 +22,6 @@ import template from '../../jst/index.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import AddPeopleApp from '@canvas/add-people'
 import React from 'react'
-import {each, isString, defer, find, partial, isArray} from 'lodash'
 import {createRoot} from 'react-dom/client'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
@@ -30,6 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import UserDifferentiationTagManager from '@canvas/differentiation-tags/react/UserDifferentiationTagManager/UserDifferentiationTagManager'
 import MessageBus from '@canvas/util/MessageBus'
+import {QueryProvider} from '@canvas/query'
 
 const I18n = createI18nScope('RosterView')
 
@@ -121,12 +121,20 @@ export default class RosterView extends Backbone.View {
   attach() {
     MessageBus.on('userSelectionChanged', this.HandleUserSelected, this)
     MessageBus.on('removeUserTagIcon', this.removeTagIcon, this)
+    MessageBus.on('reloadUsersTable', this.reloadUsersTable, this)
     return this.collection.on('setParam deleteParam', this.fetch, this)
   }
+  
   removeTagIcon(event) {
     if(event.hasOwnProperty('userId'))
       $(`#tag-icon-id-${event.userId}`).remove()
   }
+  
+  reloadUsersTable() {
+    this.collection.fetch()
+    $(".select-user-checkbox").prop('checked', false).trigger('change')
+  }
+
   fetchOnCreateUsersClose() {
     if (this.addPeopleApp.usersHaveBeenEnrolled()) return this.collection.fetch()
   }
@@ -173,12 +181,14 @@ export default class RosterView extends Backbone.View {
     const userDTManager = this.$el.find('#userDiffTagManager')[0]
     if (userDTManager && ENV.permissions.can_manage_differentiation_tags) {
       if(!this.userDTManager)
-        this.userDTManager = createRoot(userDTManager) 
+        this.userDTManager = createRoot(userDTManager)
       this.userDTManager.render(
-        <UserDifferentiationTagManager
-        courseId={ENV.course.id}  
-        users={users}
-        />,
+        <QueryProvider>
+          <UserDifferentiationTagManager
+            courseId={ENV.course.id}
+            users={users}
+          />
+        </QueryProvider>
       )
     }
   }

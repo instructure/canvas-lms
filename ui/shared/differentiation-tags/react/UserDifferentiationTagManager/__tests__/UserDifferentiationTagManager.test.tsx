@@ -23,25 +23,37 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import UserDifferentiationTagManager from '../UserDifferentiationTagManager'
 import type {UserDifferentiationTagManagerProps} from '../UserDifferentiationTagManager'
 import {useDifferentiationTagCategoriesIndex} from '../../hooks/useDifferentiationTagCategoriesIndex'
+import {useAddTagMembership} from '../../hooks/useAddTagMembership'
+import $ from 'jquery'
 
 jest.mock('../../hooks/useDifferentiationTagCategoriesIndex')
+jest.mock('../../hooks/useAddTagMembership')
 
 const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as jest.Mock
-
+const mockUseAddTagMembership = useAddTagMembership as jest.Mock
+const mutateMock = jest.fn()
 describe('UserDifferentiationTagManager', () => {
   const defaultProps: UserDifferentiationTagManagerProps = {
     courseId: 1,
-    users:['1','2']
+    users:[1, 2]
   }
   let user: ReturnType<typeof userEvent.setup>
-  const renderComponent = (mockReturn = {}) => {
+  const renderComponent = (mockReturn = {}, props = {}, mutationMockReturn = {}) => {
     const defaultMock = {
       data: [],
       isLoading: false,
       error: null,
     }
+    const defaultMutationMock = {
+      mutate: mutateMock,
+      isLoading: false,
+      isSuccess: true,
+      isError: false,
+      error: null
+    }
     mockUseDifferentiationTagCategoriesIndex.mockReturnValue({...defaultMock, ...mockReturn})
-    render(<UserDifferentiationTagManager {...defaultProps} />)
+    mockUseAddTagMembership.mockReturnValue({...defaultMutationMock, ...mutationMockReturn})
+    render(<UserDifferentiationTagManager {...defaultProps} {...props} />)
   }
 
   beforeEach(() => {
@@ -53,6 +65,8 @@ describe('UserDifferentiationTagManager', () => {
       }
     })
     user = userEvent.setup()
+    $.flashMessage = jest.fn()
+    $.flashError = jest.fn()
   })
 
   it('renders the component correctly', () => {
@@ -100,4 +114,37 @@ describe('UserDifferentiationTagManager', () => {
 
     expect(screen.getByText('No Differentiation Tag Categories Yet')).toBeInTheDocument()
   })
+
+  it('calls useAddTagMembership mutation when user selects a tag from the menu and has at least one user selected', async () => {
+    const mockCategories = [
+      {id: 1, name: 'Category 1', groups: [{id: 1, name: 'Tag 1'}]},
+      {id: 2, name: 'Category 2', groups: []},
+    ]
+    renderComponent({data: mockCategories})
+    const TagAsbutton = screen.getByTestId('user-diff-tag-manager-tag-as-button')
+    await user.click(TagAsbutton)
+
+    expect(screen.getByText('Category 1')).toBeInTheDocument()
+    expect(screen.getByText('Category 2')).toBeInTheDocument()
+    await user.click(screen.getByText('Tag 1'))
+    expect(mutateMock).toHaveBeenCalled()
+  })
+
+  it('does not call useAddTagMembership mutation when user selects a tag from the menu and has no user selected', async () => {
+    const mockCategories = [
+      {id: 1, name: 'Category 1', groups: [{id: 1, name: 'Tag 1'}]},
+      {id: 2, name: 'Category 2', groups: []},
+    ]
+    renderComponent({data: mockCategories}, {users: []})
+    const TagAsbutton = screen.getByTestId('user-diff-tag-manager-tag-as-button')
+    await user.click(TagAsbutton)
+
+    expect(screen.getByText('Category 1')).toBeInTheDocument()
+    expect(screen.getByText('Category 2')).toBeInTheDocument()
+    expect(screen.getByText('Tag 1')).toBeInTheDocument()
+    await user.click(screen.getByText('Tag 1'))
+    expect(mutateMock).not.toHaveBeenCalled()
+  })
 })
+
+
