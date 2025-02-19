@@ -281,9 +281,10 @@
   <%= render :partial => "submit_assignment", locals: { eula_url: eula_url }%>
 <% end %>
 
-<% if !Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+<!--Show partial rubrics ERB if enhanced_rubrics_assignments is not enabled or in Student View-->
+<% if !Rubric.enhanced_rubrics_assignments_enabled?(@context) || !can_do(@context, @current_user, :read_as_admin) %>
   <%= render partial: "shared/rubrics_component" %>
-  <% if Rubric.rubric_self_assessment_enabled?(@context) %>
+  <% if Rubric.rubric_self_assessment_enabled?(@context) && can_do(@context, @current_user, :read_as_admin) %>
     <div id="enhanced-rubric-self-assessment-edit"></div>
   <% end %>
 <% end %>
