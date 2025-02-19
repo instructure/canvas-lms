@@ -114,7 +114,7 @@ export default ({
           interaction={interaction}
           renderLabel={<ScreenReaderContent>{I18n.t('Move from')}</ScreenReaderContent>}
           onChange={handleMoveFromSelectChange}
-          width={isMobileView ? '100%' : '19.5rem'}
+          width={isMobileView ? '100%' : '18.5rem'}
         >
           {renderWeekDaySelectOptions(WEEKDAYS)}
         </SimpleSelect>
@@ -122,7 +122,7 @@ export default ({
           as="div"
           width={isMobileView ? '100%' : '7.5rem'}
           textAlign={isMobileView ? 'start' : 'center'}
-          margin={isMobileView ? 'small 0' : '0'}
+          margin={isMobileView ? 'small 0' : '0 x-small'}
           tabIndex={-1}
         >
           {I18n.t('to')}
@@ -132,7 +132,7 @@ export default ({
           interaction={interaction}
           onChange={handleMoveToSelectChange}
           renderLabel={<ScreenReaderContent>{I18n.t('Move to')}</ScreenReaderContent>}
-          width={isMobileView ? '100%' : '19.5rem'}
+          width={isMobileView ? '100%' : '18.5rem'}
         >
           {renderWeekDaySelectOptions(WEEKDAYS)}
         </SimpleSelect>
