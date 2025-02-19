@@ -652,6 +652,8 @@ class DiscussionTopicsController < ApplicationController
         @context.course_sections.active.order(:name).select { |s| section_visibilities.include?(s.id) }
       end
 
+    assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+
     js_hash = {
       ASSIGNMENT_ID: @topic.assignment_id,
       CONTEXT_ACTION_SOURCE: :discussion_topic,
@@ -660,6 +662,8 @@ class DiscussionTopicsController < ApplicationController
       GROUP_CATEGORIES: categories
               .reject { |c| c.student_organized? || c.non_collaborative? }
               .map { |category| { id: category.id, name: category.name } },
+      ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+      CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
       HAS_GRADING_PERIODS: @context.grading_periods?,
       SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
       ANNOUNCEMENTS_LOCKED: announcements_locked?,

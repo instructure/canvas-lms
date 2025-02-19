@@ -622,9 +622,10 @@ const ItemAssignToTrayContent = ({
         parsedCard.course_section_id = idData[1]
       } else if (parsedCard.id && idData[0] === 'student') {
         parsedCard.short_name = newSelectedOption.value
-      } else if (parsedCard.id && idData[0] === 'group') {
+      } else if ((parsedCard.id && idData[0] === 'group') || (parsedCard.id && idData[0] === 'tag')) {
         parsedCard.group_id = idData[1]
         parsedCard.group_category_id = newSelectedOption.groupCategoryId
+        parsedCard.non_collaborative = idData[0] === 'tag' ? true : false
       } else if (idData && idData[0] === 'mastery_paths') {
         parsedCard.noop_id = '1'
       }
@@ -641,7 +642,7 @@ const ItemAssignToTrayContent = ({
         } else if (data?.[0] === 'student') {
           deleted.short_name = card?.value
           deleted.student_id = data[1]
-        } else if (data?.[0] === 'group') {
+        } else if (data?.[0] === 'group' || data?.[0] === 'tag') {
           deleted.group_id = data[1]
         } else if (data?.[0] === 'mastery_paths') {
           deleted.noop_id = '1'
