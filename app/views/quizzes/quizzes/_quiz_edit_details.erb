@@ -300,6 +300,19 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
         <div class="quiz-overrides-column-right js-assignment-overrides overrideFormFlex">
         </div>
       </div>
+      <% if (
+        @context.root_account.feature_enabled?(:course_pace_pacing_with_mastery_paths) &&
+        ConditionalRelease::Service.enabled_in_context?(@context) &&
+        @context.is_a?(Course) && @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces?
+      ) %>
+        <div>
+          <label class="control-label">
+            <%= t("Mastery Paths") %>
+          </label>
+          <div class="quiz-overrides-column-right js-assignment-overrides-mastery-paths overrideFormFlex">
+          </div>
+        </div>
+      <% end %>
     </div>
   <% end %>
   <%= prefetch_assignment_external_tools %>

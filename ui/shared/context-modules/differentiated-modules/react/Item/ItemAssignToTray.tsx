@@ -522,6 +522,7 @@ export default function ItemAssignToTray({
                       itemType={itemType}
                       itemContentId={itemContentId}
                       useCards
+                      fetchOwnOverrides={false}
                     />
                   </FormField>
                 )

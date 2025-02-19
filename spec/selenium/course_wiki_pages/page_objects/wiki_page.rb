@@ -158,6 +158,10 @@ module CourseWikiPage
     f(editing_roles_input_selector)
   end
 
+  def mastery_path_toggle
+    f("[data-testid='MasteryPathToggle'] svg[name='IconCheck'], [data-testid='MasteryPathToggle'] svg[name='IconX']")
+  end
+
   #------------------------------ Actions -------------------------------
 
   def visit_wiki_page_view(course_id, page_title)

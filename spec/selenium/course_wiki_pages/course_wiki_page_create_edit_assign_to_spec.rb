@@ -147,6 +147,28 @@ describe "wiki pages edit page assign to" do
 
         expect(page.only_visible_to_overrides).to be_falsey
       end
+
+      context "with mastery paths" do
+        before do
+          @course.root_account.enable_feature!(:course_pace_pacing_with_mastery_paths)
+          @course.update(conditional_release: true)
+        end
+
+        it "sets toggles assignment override for mastery paths when mastery path toggle is toggled" do
+          visit_wiki_edit_page(@course.id, @page.title)
+          mastery_path_toggle.click
+          expect_new_page_load { save_wiki_page }
+
+          @page.reload
+          expect(@page.assignment.assignment_overrides.active.find_by(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)).to be_present
+
+          visit_wiki_edit_page(@course.id, @page.title)
+          mastery_path_toggle.click
+          expect_new_page_load { save_wiki_page }
+
+          expect(@page.assignment.assignment_overrides.active.find_by(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)).not_to be_present
+        end
+      end
     end
   end
 end
