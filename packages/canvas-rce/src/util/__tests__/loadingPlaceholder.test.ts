@@ -26,12 +26,22 @@ import {
 import {Editor} from 'tinymce'
 import {
   AUDIO_PLAYER_SIZE,
-  VIDEO_SIZE_DEFAULT,
+  videoDefaultSize,
 } from '../../rce/plugins/instructure_record/VideoOptionsTray/TrayController'
 import {jsdomInnerText} from './jsdomInnerText'
 
 // =====================================================================================================================
 // placeholderInfoFor
+
+jest.mock('../../rce/plugins/instructure_record/VideoOptionsTray/TrayController', () => {
+  const originalModule = jest.requireActual(
+    '../../rce/plugins/instructure_record/VideoOptionsTray/TrayController'
+  )
+  return {
+    ...originalModule,
+    videoDefaultSize: jest.fn(),
+  }
+})
 
 describe('placeholderInfoFor', () => {
   // -------------------------------------------------------------------------------------------------------------------
@@ -127,6 +137,10 @@ describe('placeholderInfoFor', () => {
   // -------------------------------------------------------------------------------------------------------------------
 
   it('should handle video files', async () => {
+    const expectedVideoSize = { width: '200px', height: '100px' }
+    const mockVideoDefaultSize = videoDefaultSize as jest.Mock
+    mockVideoDefaultSize.mockReturnValue(expectedVideoSize)
+
     expect(
       await placeholderInfoFor({
         name: 'video.mp4',
@@ -137,8 +151,8 @@ describe('placeholderInfoFor', () => {
       type: 'block',
       ariaLabel: 'Loading placeholder for video.mp4',
       visibleLabel: 'video.mp4',
-      width: VIDEO_SIZE_DEFAULT.width,
-      height: VIDEO_SIZE_DEFAULT.height,
+      width: expectedVideoSize.width,
+      height: expectedVideoSize.height,
       vAlign: 'bottom',
     })
   })
