@@ -2114,6 +2114,24 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:RESTRICT_QUANTITATIVE_DATA]).to be_falsy
     end
 
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+      end
+
+      it "adds differentiation tags information if account setting is on" do
+        user_session(@teacher)
+        get "edit", params: { course_id: @course.id, id: @topic.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+    end
+
     context "conditional-release" do
       before do
         user_session(@teacher)
