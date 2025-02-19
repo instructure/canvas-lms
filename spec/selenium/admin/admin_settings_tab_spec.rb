@@ -426,7 +426,7 @@ describe "admin settings tab" do
       get "/accounts/#{Account.default.id}/settings"
 
       f("#tab-notifications-link").click
-      f("#account_settings_notifications button[type=submit]").click
+      f(%(#tab-notifications button[data-testid="update-button")).click
       wait_for_ajax_requests
 
       expect(Account.default.settings[:custom_help_links]).to eq [

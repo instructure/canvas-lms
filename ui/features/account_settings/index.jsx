@@ -25,7 +25,6 @@ import CustomHelpLinkSettings from './react/custom_help_link_settings/CustomHelp
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import './jquery/index'
-import FeatureFlags from '@canvas/feature-flags'
 import ready from '@instructure/ready'
 import MicrosoftSyncAccountSettings from '@canvas/integrations/react/accounts/microsoft_sync/MicrosoftSyncAccountSettings'
 import CourseCreationSettings from './react/course_creation_settings/CourseCreationSettings'
@@ -37,8 +36,6 @@ const I18n = createI18nScope('account_settings_jsx_bundle')
 
 ready(() => {
   initializeTopNavPortal()
-
-  ReactDOM.render(<FeatureFlags />, document.getElementById('tab-features'))
 
   if (document.getElementById('custom_help_link_settings')) {
     ReactDOM.render(

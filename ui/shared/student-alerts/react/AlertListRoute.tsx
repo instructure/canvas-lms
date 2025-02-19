@@ -16,11 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Alert, AccountRole} from '../../../shared/student-alerts/react/types'
+import React from 'react'
+import {Portal} from '@instructure/ui-portal'
+import AlertListEntryPoint from './AlertListEntryPoint'
 
-export interface EnvAlerts {
-  ALERTS: {
-    data: Alert[]
-    account_roles?: AccountRole[]
-  }
+export function Component(): JSX.Element | null {
+  const mountPoint = document.getElementById('alerts_mount_point')
+  if (!mountPoint) return null
+  const AlertList = AlertListEntryPoint()
+  if (!AlertList) return null
+  return (
+    <Portal open={true} mountNode={mountPoint}>
+      {AlertList}
+    </Portal>
+  )
 }
