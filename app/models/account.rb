@@ -2625,4 +2625,8 @@ class Account < ActiveRecord::Base
       sub_account.recompute_assignments_using_account_default(grading_standard)
     end
   end
+
+  def horizon_domain
+    settings[:horizon_domain]
+  end
 end
