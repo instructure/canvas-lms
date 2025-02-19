@@ -140,6 +140,7 @@ class GroupMembershipsController < ApplicationController
   # returned
   #
   # @argument user_id [String]
+  # @argument members[] [Integer] bulk add multiple users to a differentiation tag
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \
@@ -148,6 +149,8 @@ class GroupMembershipsController < ApplicationController
   #
   # @returns GroupMembership
   def create
+    return create_differentiation_tag_membership if params[:members]
+
     @user = api_find(User, params[:user_id])
     if authorized_action(GroupMembership.new(group: @group, user: @user), @current_user, :create)
       SubmissionLifecycleManager.with_executing_user(@current_user) do
@@ -157,6 +160,27 @@ class GroupMembershipsController < ApplicationController
           render json: group_membership_json(@membership, @current_user, session, include: ["just_created"])
         else
           render json: @membership.errors, status: :bad_request
+        end
+      end
+    end
+  end
+
+  def create_differentiation_tag_membership
+    users = params[:members]
+    return if users.count == 0
+
+    errors = []
+    if authorized_action(GroupMembership.new(group: @group, user: @current_user), @current_user, :create)
+      SubmissionLifecycleManager.with_executing_user(@current_user) do
+        users.each do |u|
+          user = api_find(User, u)
+          @membership = @group.add_user(user)
+          errors << @membership.errors unless @membership.valid?
+        end
+        if errors.count > 0
+          render json: errors, status: :bad_request
+        else
+          head :ok
         end
       end
     end

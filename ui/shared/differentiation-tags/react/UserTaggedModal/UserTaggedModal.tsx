@@ -51,7 +51,6 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
   const { mutate, isLoading: isDeleting, isSuccess, isError, error: errorDelete, } = useDeleteTagMembership()
   const { data: userTagList, isLoading, isSuccess: isDone, error, refetch } = useUserTags(courseId, userId)
   const tagRefs = useRef<Tag[]>([])
-
   const removeTagMembership = (userId: number, selectedTagId: number) => {
     mutate({groupId: selectedTagId, userId, refetch})
     setIsWarningModalOpen(false)

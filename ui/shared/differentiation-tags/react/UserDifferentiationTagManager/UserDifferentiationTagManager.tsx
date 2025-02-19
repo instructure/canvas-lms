@@ -16,21 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef} from "react"
+import React, {useState, useRef, useEffect} from "react"
 import {Flex} from '@instructure/ui-flex'
 import {Menu} from '@instructure/ui-menu'
 import {Button} from '@instructure/ui-buttons'
-import {IconArrowOpenDownSolid} from '@instructure/ui-icons'
+import {IconArrowOpenDownSolid,IconConfigureSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {QueryProvider} from '@canvas/query'
 import DifferentiationTagTrayManager from '@canvas/differentiation-tags/react/DifferentiationTagTray/DifferentiationTagTrayManager'
 import {useDifferentiationTagCategoriesIndex} from '../hooks/useDifferentiationTagCategoriesIndex'
+import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager'
+import {useAddTagMembership} from '../hooks/useAddTagMembership'
+import MessageBus from '@canvas/util/MessageBus'
+import $ from 'jquery'
+
 const I18n = createI18nScope('differentiation_tags')
 
 export interface UserDifferentiationTagManagerProps {
   courseId: number
-  users: string[]
+  users: number[]
 }
 
 type HandleMenuSelection = (
@@ -74,8 +78,21 @@ const TagAsMenu = (props: {courseId: number, handleMenuSelection: HandleMenuSele
           <IconArrowOpenDownSolid/>
         </Button>
       }
+      maxHeight='20rem'
     >
-      {(differentiationTagCategories?.length ? differentiationTagCategories : empty).map(option => (
+      {(differentiationTagCategories?.length ? differentiationTagCategories : empty).map(option =>
+      option && option.groups && option.groups.length === 1 && option.name === option.groups[0].name ? ([
+        <Menu.Item
+            key={`tag-group-${option.groups[0].id}`}
+            value={option.groups[0].id}
+            themeOverride={{
+              labelPadding: '0.75rem'
+            }}
+          >
+              {option.groups[0].name}
+        </Menu.Item>,
+        <Menu.Separator/>
+        ]) : ([
         <Menu.Group
           key={`tag-set-${option.id}`}
           label={option.name}
@@ -90,21 +107,39 @@ const TagAsMenu = (props: {courseId: number, handleMenuSelection: HandleMenuSele
               }}
             >
                 {groupOption.name}
-              </Menu.Item>
+            </Menu.Item>
           ))}
-        </Menu.Group>
-      ))}
+        </Menu.Group>,
+        <Menu.Separator/>
+      ]))}
+      <Menu.Separator/>
+      <Menu.Item
+        value={-1}
+        themeOverride={{
+          labelPadding: '0.75rem',
+          fontWeight:	700
+        }}
+      >
+        <IconConfigureSolid/> {I18n.t('New Tag')}
+      </Menu.Item>
     </Menu>
   )
 }
 export default function UserDifferentiationTagManager(props: UserDifferentiationTagManagerProps) {
   const {courseId, users} = props
   const manageTagsRefButton = useRef<HTMLElement | null>(null)
-  const [selectedTag, setSelectedTag] = useState<string | number | undefined>(undefined)
   const [isOpen, setIsOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const { mutate, isLoading: isAdding, isSuccess, isError, error: errorAdd, } = useAddTagMembership()
   const handleMenuSelection: HandleMenuSelection = (e, selected) => {
-    if(selected && Array.isArray(selected) && selected.length > 0)
-      setSelectedTag(selected[0])
+    if(selected && Array.isArray(selected) && selected.length > 0 && selected[0]) {
+      if(users.length > 0)
+        mutate({groupId: selected[0], userIds: users})
+      else
+        $.flashError(I18n.t('Select one or more users first'))
+    }
+    else if(selected === -1)
+      setIsModalOpen(true)
   }
 
   const onTrayClose = () => {
@@ -112,6 +147,15 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
     if(manageTagsRefButton.current)
       manageTagsRefButton.current.focus()
   }
+  useEffect(() => {
+    if(isSuccess) {
+      MessageBus.trigger('reloadUsersTable', {})
+      $.flashMessage(I18n.t('Tag added successfully'))
+    }
+    if(isError) {
+      $.flashError(I18n.t('Error: %{error}', {error: errorAdd.message}))
+    }
+  }, [isSuccess, isError])
   return (
     <>
       <Flex as="div" alignItems="center" justifyItems="start" gap="none" direction="row" width="100%" >
@@ -119,12 +163,10 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
           <Text data-testid="user-diff-tag-manager-user-count">{I18n.t('%{userCount} Selected', {userCount: users.length})}</Text>
         </Flex.Item>
         <Flex.Item margin="xx-small">
-          <QueryProvider>
-            <TagAsMenu
-              courseId={courseId}
-              handleMenuSelection={handleMenuSelection}
-            />
-          </QueryProvider>
+          <TagAsMenu
+            courseId={courseId}
+            handleMenuSelection={handleMenuSelection}
+          />
         </Flex.Item>
         <Flex.Item margin="xx-small">
           <Button
@@ -144,6 +186,12 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
         isOpen={isOpen}
         onClose={onTrayClose}
         courseID={courseId}
+      />
+      <DifferentiationTagModalManager
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        mode="create"
+        differentiationTagCategoryId={undefined}
       />
     </>
   )
