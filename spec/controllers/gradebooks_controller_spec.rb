@@ -3058,54 +3058,48 @@ describe GradebooksController do
       expect(response).not_to be_redirect
     end
 
-    it "loads the platform speedgrader when the feature flag is on and the platform_sg flag is passed" do
-      expect(Services::PlatformServiceSpeedgrader).to receive(:launch_url).at_least(:once).and_return("http://example.com")
-      @assignment.publish
-      Account.site_admin.enable_feature!(:platform_service_speedgrader)
-      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).to render_template(platform_sg_template, locals: { anonymous_grading: false })
+    context "when the platform speedgrader launch URL is configured" do
+      before do
+        allow(Services::PlatformServiceSpeedgrader).to receive(:launch_url).and_return("http://example.com")
+      end
+
+      it "loads the platform speedgrader when the feature flag is on and the platform_sg flag is passed" do
+        @assignment.publish
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(response).to render_template(platform_sg_template, locals: { anonymous_grading: false })
+      end
+
+      it "loads the platform speedgrader when the account allows it and the course enables it" do
+        @assignment.publish
+        Account.site_admin.allow_feature!(:platform_service_speedgrader)
+        @course.enable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(response).to render_template(platform_sg_template, locals: { anonymous_grading: false })
+      end
+
+      it "does not load the platform speedgrader when the assignment is moderated" do
+        @assignment.publish
+        @assignment.moderated_grading = true
+        @assignment.final_grader_id = @teacher
+        @assignment.grader_count = 1
+        @assignment.save!
+        Account.site_admin.allow_feature!(:platform_service_speedgrader)
+        @course.enable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(response).to render_template(classic_sg_template)
+      end
+
+      it "does not load the platform speedgrader when the account allows it and the course disables it" do
+        @assignment.publish
+        Account.site_admin.allow_feature!(:platform_service_speedgrader)
+        @course.disable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(response).not_to render_template(platform_sg_template, locals: { anonymous_grading: false })
+      end
     end
 
-    it "loads the platform speedgrader when the account allows it and the course enables it" do
-      expect(Services::PlatformServiceSpeedgrader).to receive(:launch_url).at_least(:once).and_return("http://example.com")
-      @assignment.publish
-      Account.site_admin.allow_feature!(:platform_service_speedgrader)
-      @course.enable_feature!(:platform_service_speedgrader)
-      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).to render_template(platform_sg_template, locals: { anonymous_grading: false })
-    end
-
-    it "does not load the platform speedgrader when the assignment is moderated" do
-      @assignment.publish
-      @assignment.moderated_grading = true
-      @assignment.final_grader_id = @teacher
-      @assignment.grader_count = 1
-      @assignment.save!
-      Account.site_admin.allow_feature!(:platform_service_speedgrader)
-      @course.enable_feature!(:platform_service_speedgrader)
-      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).to render_template(classic_sg_template)
-    end
-
-    it "does not load the platform speedgrader when the assignment is anonymously graded" do
-      @assignment.publish
-      @assignment.anonymous_grading = true
-      @assignment.save!
-      Account.site_admin.allow_feature!(:platform_service_speedgrader)
-      @course.enable_feature!(:platform_service_speedgrader)
-      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).to render_template(classic_sg_template)
-    end
-
-    it "does not load the platform speedgrader when the account allows it and the course disables it" do
-      @assignment.publish
-      Account.site_admin.allow_feature!(:platform_service_speedgrader)
-      @course.disable_feature!(:platform_service_speedgrader)
-      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).not_to render_template(platform_sg_template, locals: { anonymous_grading: false })
-    end
-
-    it "falls back to classic speedgrader when launch URL is missing" do
+    it "falls back to classic speedgrader when the platform speedgrader launch URL is not configured" do
       expect(Services::PlatformServiceSpeedgrader).to receive(:launch_url).at_least(:once).and_return(nil)
       Account.site_admin.allow_feature!(:platform_service_speedgrader)
       @course.enable_feature!(:platform_service_speedgrader)

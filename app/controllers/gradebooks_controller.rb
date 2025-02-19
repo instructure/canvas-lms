@@ -1450,9 +1450,8 @@ class GradebooksController < ApplicationController
   def platform_service_speedgrader_enabled?(params)
     return false unless @context.feature_enabled?(:platform_service_speedgrader)
 
-    # SGP is currently disabled for moderated and anonymously graded assignments
     if @assignment.present?
-      return false if @assignment.moderated_grading
+      return false if @assignment.unsupported_in_speedgrader_2?
     end
 
     return false if Services::PlatformServiceSpeedgrader.launch_url.blank?

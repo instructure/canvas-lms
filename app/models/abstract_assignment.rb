@@ -3351,6 +3351,28 @@ class AbstractAssignment < ActiveRecord::Base
       )
   }
 
+  def unsupported_in_speedgrader_2?
+    unsupported_submissions = Setting.get("submission_types_unsupported_in_sg2", "").strip.split(",")
+    return true if unsupported_submissions.intersect?(submission_types_array)
+
+    unsupported_grading_types = Setting.get("grading_types_unsupported_in_sg2", "").strip.split(",")
+    return true if unsupported_grading_types.include?(grading_type)
+
+    known_features = {
+      moderated: -> { moderated_grading? },
+      peer: -> { peer_reviews? },
+      group: -> { has_group_category? },
+      group_graded_group: -> { grade_as_group? },
+      group_graded_ind: -> { has_group_category? && grade_group_students_individually? },
+      anonymous: -> { anonymous_grading? },
+      anonymized: -> { anonymize_students? },
+      new_quiz: -> { quiz_lti? },
+      rubric: -> { active_rubric_association? },
+    }
+    unsupported_features = Setting.get("assignment_features_unsupported_in_sg2", "moderated").strip.split(",").map(&:to_sym).intersection(known_features.keys)
+    unsupported_features.any? { |feature| known_features.fetch(feature).call }
+  end
+
   def overdue?
     due_at && due_at <= Time.zone.now
   end
