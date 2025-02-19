@@ -21,15 +21,11 @@ module HorizonMode
   # Use this function after @context is set
   def redirect_student_to_horizon
     return unless @context.is_a?(Course) && @context.horizon_course?
+    return if @context.user_is_admin?(@current_user) || @context.cached_account_users_for(@current_user).any?
 
-    return if @context.user_is_admin?(@current_user)
+    redirect_url = @context.root_account.horizon_redirect_url(request.path)
+    return if redirect_url.nil?
 
-    redirect_to_horizon
-  end
-
-  def redirect_to_horizon
-    horizon_redirect_url = DynamicSettings.find("horizon")["redirect_url"]
-    canvas_url = request.path
-    redirect_to "#{horizon_redirect_url}?reauthenticate=false&canvas_url=#{canvas_url}"
+    redirect_to redirect_url
   end
 end

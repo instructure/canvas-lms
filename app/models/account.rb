@@ -2629,4 +2629,13 @@ class Account < ActiveRecord::Base
   def horizon_domain
     settings[:horizon_domain]
   end
+
+  def horizon_redirect_url(canvas_url, reauthenticate: false)
+    return nil unless horizon_domain
+
+    protocol = horizon_domain.include?("localhost") ? "http" : "https"
+    uri = Addressable::URI.parse("#{protocol}://#{horizon_domain}/redirect")
+    uri.query_values = { canvas_url: canvas_url, reauthenticate: reauthenticate }
+    uri.to_s
+  end
 end
