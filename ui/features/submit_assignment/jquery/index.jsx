@@ -90,6 +90,15 @@ ready(function () {
     input.focus()
   }
 
+  const findEmptyFileDrop = () => {
+    for (let i = 0; i <= submissionAttachmentIndex; i++) {
+      const fileDrop = document.getElementById(`submission_file_drop_${i}`)
+      if (!fileDrop?.value) {
+        return fileDrop
+      }
+    }
+  }
+
   // Add InstUI TextInput for online_url_submission
   const urlInput = document.getElementById('online_url_submission_input')
   if (urlInput) {
@@ -267,15 +276,12 @@ ready(function () {
             }
           }
         }
-  
+
+        const fileDrop = findEmptyFileDrop()
         // warn user if they haven't uploaded any files
         if (fileElements.length === 0 && uploadedAttachmentIds === '') {
-          $.flashError(
-            I18n.t(
-              '#errors.no_attached_file',
-              'You must attach at least one file to this assignment',
-            ),
-          )
+          setShouldShowFileRequiredError(true)
+          fileDrop?.focus()
           reenableSubmitButton()
           return false
         }
@@ -283,7 +289,7 @@ ready(function () {
         // throw error if the user tries to upload an empty file
         // to prevent S3 from erroring
         if (emptyFiles.length) {
-          $.flashError(I18n.t('Attached files must be greater than 0 bytes'))
+          fileDrop?.focus()
           reenableSubmitButton()
           return false
         }
@@ -503,29 +509,41 @@ ready(function () {
   })
 
   const webcamBlobs = {}
+  let shouldShowFileRequiredError = false
+  const getShouldShowFileRequiredError = () => shouldShowFileRequiredError
+  const setShouldShowFileRequiredError = value => (shouldShowFileRequiredError = value)
 
   $('.add_another_file_link')
     .click(function (event) {
       event.preventDefault()
-      const clone = $('#submission_attachment_blank').clone(true)
 
-      clone.removeAttr('id').show().insertBefore(this)
+      const emptyFileDrop = findEmptyFileDrop()
+      if (emptyFileDrop) {
+        emptyFileDrop.focus()
+      } else {
+        const clone = $('#submission_attachment_blank').clone(true)
 
-      const wrapperDom = clone.find('.attachment_wrapper')[0]
-      if (wrapperDom) {
-        const index = ++submissionAttachmentIndex
+        clone.removeAttr('id').show().insertBefore(this)
 
-        ReactDOM.render(
-          <Attachment
-            index={index}
-            setBlob={blob => {
-              webcamBlobs[index] = blob
-            }}
-          />,
-          wrapperDom,
-        )
+        const wrapperDom = clone.find('.attachment_wrapper')[0]
+        if (wrapperDom) {
+          const index = ++submissionAttachmentIndex
+
+          ReactDOM.render(
+            <Attachment
+              id={`file_attachment_${index}`}
+              index={index}
+              setBlob={blob => {
+                webcamBlobs[index] = blob
+              }}
+              validFileTypes={ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS}
+              getShouldShowFileRequiredError={getShouldShowFileRequiredError}
+              setShouldShowFileRequiredError={setShouldShowFileRequiredError}
+            />,
+            wrapperDom,
+          )
+        }
       }
-      toggleRemoveAttachmentLinks()
     })
     .click()
 
