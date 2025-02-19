@@ -167,6 +167,7 @@ ready(() => {
           commentLibraryEnabled: window.ENV.COMMENT_LIBRARY_FEATURE_ENABLED ?? false,
           restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED ?? false,
           gradeByStudentEnabled: window.ENV.GRADE_BY_STUDENT_ENABLED ?? false,
+          discussionCheckpointsEnabled: window.ENV.FEATURES.discussion_checkpoints ?? false,
         },
       })
     })

@@ -478,47 +478,26 @@ module Interfaces::SubmissionInterface
 
   field :preview_url, String, "This field is currently under development and its return value is subject to change.", null: true
   def preview_url
-    load_association(:assignment).then do |assignment|
-      if submission.not_submitted?
-        nil
-      elsif submission.submission_type == "basic_lti_launch"
-        GraphQLHelpers::UrlHelpers.retrieve_course_external_tools_url(
-          submission.course_id,
-          assignment_id: submission.assignment_id,
-          url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
-          display: "borderless",
-          host: context[:request].host_with_port
-        )
-      elsif submission.submission_type == "discussion_topic"
-        if assignment.discussion_topic.for_group_discussion?
-          GraphQLHelpers::UrlHelpers.group_discussion_topics_url(
-            assignment.discussion_topic.group_category.group_for(submission.user_id).id,
-            host: context[:request].host_with_port,
-            embed: true,
-            headless: 1,
-            root_discussion_topic_id: assignment.discussion_topic.id,
-            student_id: submission.user_id
-          )
-        else
-          GraphQLHelpers::UrlHelpers.course_discussion_topic_url(
-            submission.course_id,
-            assignment.discussion_topic.id,
-            host: context[:request].host_with_port,
-            embed: true,
-            persist: 1,
-            student_id: submission.user_id
-          )
-        end
-      else
-        GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
-          submission.course_id,
-          submission.assignment_id,
-          submission.user_id,
-          host: context[:request].host_with_port,
-          preview: 1,
-          version: version_query_param(submission)
-        )
-      end
+    if submission.not_submitted?
+      nil
+    elsif submission.submission_type == "basic_lti_launch"
+      GraphQLHelpers::UrlHelpers.retrieve_course_external_tools_url(
+        submission.course_id,
+        assignment_id: submission.assignment_id,
+        url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
+        display: "borderless",
+        host: context[:request].host_with_port
+      )
+    else
+      GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
+        submission.course_id,
+        submission.assignment_id,
+        submission.user_id,
+        host: context[:request].host_with_port,
+        preview: 1,
+        version: version_query_param(submission),
+        **((submission.submission_type == "discussion_topic") ? { show_full_discussion_immediately: true } : {})
+      )
     end
   end
 
