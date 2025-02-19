@@ -1268,7 +1268,8 @@ describe "Folders API", type: :request do
           uploaded_data: StringIO.new("existing file with more content"),
           folder: @root,
           context: @course,
-          user: @user
+          user: @user,
+          usage_rights: UsageRights.create!(context: @course, use_justification: "used_by_permission")
         )
         Timecop.travel(now + 3.minutes)
         @file2 = Attachment.create!(
@@ -1277,7 +1278,19 @@ describe "Folders API", type: :request do
           uploaded_data: StringIO.new("existing file"),
           folder: @root,
           context: @course,
-          hidden: true
+          hidden: true,
+          user_id: User.create!(name: "User"),
+          usage_rights: UsageRights.create!(context: @course, use_justification: "own_copyright")
+        )
+        Timecop.travel(now + 4.minutes)
+        @file3 = Attachment.create!(
+          filename: "file3.txt",
+          display_name: "file3.txt",
+          uploaded_data: StringIO.new("another existing file"),
+          folder: @root,
+          context: @course,
+          user: @user,
+          usage_rights: UsageRights.create!(context: @course, use_justification: "fair_use")
         )
       end
     end
@@ -1293,7 +1306,7 @@ describe "Folders API", type: :request do
       result_names = json.map do |item|
         item["name"] || item["display_name"] || item["filename"]
       end
-      expect(result_names).to eq %w[folder1 folder2 file1.txt file2.txt]
+      expect(result_names).to eq %w[folder1 folder2 file1.txt file2.txt file3.txt]
     end
 
     it "paginates folders and files correctly" do
@@ -1363,7 +1376,7 @@ describe "Folders API", type: :request do
         result_names = json.map do |item|
           item["name"] || item["display_name"]
         end
-        expect(result_names).to eq %w[folder1 folder2 file1.txt file2.txt]
+        expect(result_names).to eq %w[folder1 folder2 file1.txt file2.txt file3.txt]
       end
 
       it "sorts folders by name and files by size if sorting on size" do
@@ -1371,7 +1384,7 @@ describe "Folders API", type: :request do
         result_names = json.map do |item|
           item["name"] || item["display_name"] || item["filename"]
         end
-        expect(result_names).to eq %w[folder1 folder2 file2.txt file1.txt]
+        expect(result_names).to eq %w[folder1 folder2 file2.txt file3.txt file1.txt]
       end
 
       it "sorts folders and files by created_at if sorting on created_at" do
@@ -1379,7 +1392,7 @@ describe "Folders API", type: :request do
         result_names = json.map do |item|
           item["name"] || item["display_name"] || item["filename"]
         end
-        expect(result_names).to eq %w[folder2 folder1 file2.txt file1.txt]
+        expect(result_names).to eq %w[folder2 folder1 file3.txt file2.txt file1.txt]
       end
 
       it "sorts folders and files by updated_at if sorting on updated_at" do
@@ -1387,11 +1400,27 @@ describe "Folders API", type: :request do
         result_names = json.map do |item|
           item["name"] || item["display_name"] || item["filename"]
         end
-        expect(result_names).to eq %w[folder2 folder1 file2.txt file1.txt]
+        expect(result_names).to eq %w[folder2 folder1 file3.txt file2.txt file1.txt]
+      end
+
+      it "sorts folders and files by modified_by if sorting on modified_by" do
+        json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(sort: "modified_by", order: "asc"))
+        result_names = json.map do |item|
+          item["name"] || item["display_name"] || item["filename"]
+        end
+        expect(result_names).to eq %w[folder1 folder2 file1.txt file3.txt file2.txt]
+      end
+
+      it "sorts folders and files by use_justification if sorting on use_justification" do
+        json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(sort: "use_justification", order: "asc"))
+        result_names = json.map do |item|
+          item["name"] || item["display_name"] || item["filename"]
+        end
+        expect(result_names).to eq %w[folder1 folder2 file1.txt file2.txt file3.txt]
       end
 
       it "paginates the results" do
-        json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(per_page: 3, sort: "size", order: "sc"))
+        json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(per_page: 3, sort: "size", order: "asc"))
         expect(json.size).to eq 3
 
         result_names = json.map do |item|
@@ -1404,7 +1433,61 @@ describe "Folders API", type: :request do
         result_names = next_page_json.map do |item|
           item["name"] || item["display_name"] || item["filename"]
         end
-        expect(result_names).to eq ["file1.txt"]
+        expect(result_names).to eq ["file3.txt", "file1.txt"]
+      end
+
+      it "paginates correctly when sorting by modified_by in DESC order with NULL user_id values appearing last" do
+        per_page = 4
+
+        # Create 3 files where user_id is NULL (they should appear on page 2 and 3)
+        3.times do |i|
+          Attachment.create!(
+            filename: "file_null_#{i}.txt",
+            display_name: "file_null_#{i}.txt",
+            uploaded_data: StringIO.new("file"),
+            folder: @root,
+            context: @course,
+            user_id: nil
+          )
+        end
+
+        # Make API request for first page with sorting by modified_by DESC (NULLS LAST)
+        json = api_call(
+          :get,
+          @folders_files_path,
+          @folders_files_path_options.merge(sort: "modified_by", order: "desc", per_page:)
+        )
+
+        result_names = json.map do |item|
+          item["name"] || item["display_name"] || item["filename"]
+        end
+
+        # Ensure first page contains 3 files (all with user_id set)
+        expect(json.size).to eq(per_page)
+        expect(result_names).to eq ["folder1", "folder2", "file2.txt", "file3.txt"]
+
+        # Get the next page
+        next_page = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }
+        expect(next_page).not_to be_nil
+
+        # Make API request for second page
+        json_page_2 = api_call(
+          :get,
+          @folders_files_path,
+          @folders_files_path_options.merge(sort: "modified_by", order: "desc", per_page:, page: next_page["page"])
+        )
+
+        result_names = json_page_2.map do |item|
+          item["name"] || item["display_name"] || item["filename"]
+        end
+
+        # Ensure second page contains 3 files (all with NULL user_id)
+        expect(json_page_2.size).to eq(per_page)
+        expect(result_names).to eq ["file1.txt", "file_null_2.txt", "file_null_1.txt", "file_null_0.txt"]
+
+        # Get the next page
+        next_page = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }
+        expect(next_page).to be_nil
       end
     end
   end
