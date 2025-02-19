@@ -68,8 +68,6 @@ development:
         base_url: "http://localhost:3300"
       csp-logging:
         # host: "https://<csp-violation-report-endpoint>/submit/csp"
-      horizon:
-        redirect_url: 'https://cd.canvashorizon.com/redirect'
     # another service
     pandata:
       ios-pandata-key: IOS_pandata_key
