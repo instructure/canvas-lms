@@ -16,30 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Portal} from '@instructure/ui-portal'
+import React from 'react'
 import AlertList from './AlertList'
 import {calculateUIMetadata} from './utils'
 
-export function Component() {
-  const mountPoint = document.getElementById('alerts_mount_point')
+// This is the directly-renderable Alert List that goes into the
+// account settings and course settings page portals launched by
+// React Router.
+export default function AlertListPortal(): JSX.Element | null {
   const contextType = ENV.current_context?.type
   const alerts = ENV.ALERTS?.data
   const accountRoles = ENV.ALERTS?.account_roles ?? []
 
-  if (!mountPoint || !contextType || !alerts) {
-    return null
-  }
+  if (!contextType || !alerts) return null
 
   const uiMetadata = calculateUIMetadata(accountRoles)
   const contextId = contextType === 'Course' ? ENV.COURSE_ID! : ENV.ACCOUNT_ID!
   return (
-    <Portal open={true} mountNode={mountPoint}>
-      <AlertList
-        alerts={alerts}
-        contextType={contextType}
-        contextId={contextId}
-        uiMetadata={uiMetadata}
-      />
-    </Portal>
+    <AlertList
+      alerts={alerts}
+      contextType={contextType}
+      contextId={contextId}
+      uiMetadata={uiMetadata}
+    />
   )
 }
