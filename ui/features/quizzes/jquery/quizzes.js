@@ -71,10 +71,11 @@ import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExterna
 import {underscoreString} from '@canvas/convert-case'
 import replaceTags from '@canvas/util/replaceTags'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
+import MasteryPathToggleView from '@canvas/mastery-path-toggle/backbone/views/MasteryPathToggle'
 
 const I18n = createI18nScope('quizzes_public')
 
-let dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility, scoreValidation
+let dueDateList, overrideView, masteryPathToggle, quizModel, sectionList, correctAnswerVisibility, scoreValidation
 
 RichContentEditor.preloadRemoteModule()
 
@@ -144,6 +145,15 @@ const renderDueDates = lockedItems => {
     })
 
     overrideView.render()
+
+    if (ENV.IN_PACED_COURSE && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths) {
+      masteryPathToggle = window.masteryPathToggle = new MasteryPathToggleView({
+        el: '.js-assignment-overrides-mastery-paths',
+        model: dueDateList
+      })
+
+      masteryPathToggle.render()
+    }
   }
 }
 

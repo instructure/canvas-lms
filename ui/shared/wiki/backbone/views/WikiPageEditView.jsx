@@ -17,6 +17,7 @@
 
 import $ from 'jquery'
 import React, {lazy, Suspense} from 'react'
+import ReactDOM from 'react-dom'
 import {createRoot} from 'react-dom/client'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import template from '../../jst/WikiPageEdit.handlebars'
@@ -32,6 +33,8 @@ import {renderAssignToTray} from '../../react/renderAssignToTray'
 import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 import {LATEST_BLOCK_DATA_VERSION} from '@canvas/block-editor/react/utils'
 import {TITLE_MAX_LENGTH} from '../../utils/constants'
+import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
+import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
 
 const I18n = createI18nScope('pages')
 
@@ -75,6 +78,11 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.enableAssignTo =
       ENV.COURSE_ID != null &&
       ENV.WIKI_RIGHTS.manage_assign_to
+    this.coursePaceWithMasteryPaths =
+      this.enableAssignTo &&
+      ENV.IN_PACED_COURSE &&
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+      ENV.FEATURES.course_pace_pacing_with_mastery_paths
     const redirect = () => {
       window.location.href = this.model.get('html_url')
     }
@@ -98,9 +106,14 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
 
     const data = this.overrides
-    data.only_visible_to_overrides = ENV.IN_PACED_COURSE
+
+    if (ENV.FEATURES.course_pace_pacing_with_mastery_paths && ENV.IN_PACED_COURSE && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
+      data.only_visible_to_overrides = this.overrides.only_visible_to_overrides
+    } else {
+      data.only_visible_to_overrides = ENV.IN_PACED_COURSE
       ? false
       : this.overrides.only_visible_to_overrides
+    }
 
     $.ajaxJSON(url, 'PUT', JSON.stringify(data), redirect, errorCallBack, {
       contentType: 'application/json',
@@ -149,6 +162,7 @@ export default class WikiPageEditView extends ValidatedFormView {
 
     json.content_is_locked = this.lockedItems.content
     json.show_assign_to = this.enableAssignTo
+    json.course_pace_with_mastery_paths = this.coursePaceWithMasteryPaths
     json.edit_with_block_editor = this.model.get('editor') === 'block_editor'
 
     if (
@@ -239,6 +253,24 @@ export default class WikiPageEditView extends ValidatedFormView {
         this.overrides = payload
       }
       renderAssignToTray(mountElement, {pageId, onSync, pageName})
+    }
+
+    if (this.coursePaceWithMasteryPaths) {
+      const mountElement = document.getElementById('mastery-paths-toggle-edit-page')
+      const onSync = payload => {
+        this.overrides = { assignment_overrides: payload, only_visible_to_overrides: payload.some((override) => override.noop_id == 1) }
+      }
+
+      ReactDOM.render(
+        React.createElement(MasteryPathToggle, {
+          onSync,
+          fetchOwnOverrides: true,
+          courseId: ENV.COURSE_ID,
+          itemType: 'wiki_page',
+          itemContentId: this.model.id
+        }),
+        mountElement,
+      )
     }
 
     let chose_block_editor = window.location.href.split("?").filter((piece) => { return piece.indexOf('editor=block_editor') !== -1 }).length === 1

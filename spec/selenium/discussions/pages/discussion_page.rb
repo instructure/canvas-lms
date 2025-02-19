@@ -240,6 +240,10 @@ class Discussion
       f(sync_to_sis_checkbox_selector)
     end
 
+    def mastery_path_toggle
+      f("[data-testid='MasteryPathToggle'] svg[name='IconCheck'], [data-testid='MasteryPathToggle'] svg[name='IconX']")
+    end
+
     # ---------------------- Actions ----------------------
 
     def topic_title_input
@@ -276,6 +280,10 @@ class Discussion
 
     def group_category_option(group_cat_name)
       fj(group_category_option_selector(group_cat_name))
+    end
+
+    def save_discussion
+      f("button[type='submit']").click
     end
 
     # ---------------------- Actions ----------------------

@@ -2164,6 +2164,47 @@ describe "discussions" do
             expect(ui_ranges[2].text).to include @set3a_assmt.title
             expect(ui_ranges[2].text).to include @set3b_assmt.title
           end
+
+          context "with course paces" do
+            before do
+              Account.site_admin.enable_feature!(:react_discussions_post)
+            end
+
+            it "sets an assignment override for mastery paths when mastery path toggle is turned on" do
+              course_with_teacher_logged_in
+              @course.root_account.enable_feature!(:course_pace_pacing_with_mastery_paths)
+              @course.conditional_release = true
+              @course.enable_course_paces = true
+              @course.save!
+
+              assignment = create_assignment(@course, "Mastery Path Main Assignment", 10)
+              discussion = @course.discussion_topics.create!(assignment: assignment, title: "graded discussion")
+
+              get "/courses/#{@course.id}/discussion_topics/#{discussion.id}/edit"
+              Discussion.mastery_path_toggle.click
+              expect_new_page_load { Discussion.save_discussion }
+
+              expect(assignment.assignment_overrides.active.find_by(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)).to be_present
+            end
+
+            it "removes assignment override for mastery paths when mastery path toggle is turned off" do
+              course_with_teacher_logged_in
+              @course.root_account.enable_feature!(:course_pace_pacing_with_mastery_paths)
+              @course.conditional_release = true
+              @course.enable_course_paces = true
+              @course.save!
+
+              assignment = create_assignment(@course, "Mastery Path Main Assignment", 10)
+              discussion = @course.discussion_topics.create!(assignment: assignment, title: "graded discussion")
+              assignment.assignment_overrides.create(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)
+
+              get "/courses/#{@course.id}/discussion_topics/#{discussion.id}/edit"
+              Discussion.mastery_path_toggle.click
+              expect_new_page_load { Discussion.save_discussion }
+
+              expect(assignment.assignment_overrides.active.find_by(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)).not_to be_present
+            end
+          end
         end
       end
     end
