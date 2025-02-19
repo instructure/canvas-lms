@@ -63,35 +63,43 @@ const Teacher = () => {
   const recaptchaSectionRef = useRef<ReCaptchaSectionRef>(null)
 
   const validateForm = (): boolean => {
+    let hasValidationError = false
+    let focusTarget: HTMLInputElement | null = null
+
     setEmailError('')
     setNameError('')
     setTermsError('')
 
     if (!EMAIL_REGEX.test(email)) {
       setEmailError(ERROR_MESSAGES.invalidEmail)
-      emailInputRef.current?.focus()
-      return false
+      focusTarget = emailInputRef.current
+      hasValidationError = true
     }
 
     if (name.trim() === '') {
       setNameError(ERROR_MESSAGES.nameRequired)
-      nameInputRef.current?.focus()
-      return false
+      if (!focusTarget) focusTarget = nameInputRef.current
+      hasValidationError = true
     }
 
     if (termsRequired && !termsAccepted) {
       setTermsError(ERROR_MESSAGES.termsRequired)
-      const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
-      checkbox?.focus()
-      return false
+      if (!focusTarget) {
+        focusTarget = document.getElementById('terms-checkbox') as HTMLInputElement
+      }
+      hasValidationError = true
     }
 
     if (recaptchaKey) {
       const recaptchaValid = recaptchaSectionRef.current?.validate() ?? true
-      if (!recaptchaValid) return false
+      if (!recaptchaValid) {
+        hasValidationError = true
+      }
     }
 
-    return true
+    if (focusTarget) focusTarget.focus()
+
+    return !hasValidationError
   }
 
   const handleServerErrors = (errors: any) => {
@@ -221,7 +229,9 @@ const Teacher = () => {
           {I18n.t('Create a Teacher Account')}
         </Heading>
 
-        <Text>{I18n.t('* Required Fields')}</Text>
+        <Flex.Item overflowX="visible" overflowY="visible">
+          <ActionPrompt variant="signIn" />
+        </Flex.Item>
       </Flex>
 
       <form onSubmit={handleCreateTeacher} noValidate={true}>
@@ -269,13 +279,11 @@ const Teacher = () => {
           )}
 
           {recaptchaKey && (
-            <Flex justifyItems="center">
-              <ReCaptchaSection
-                ref={recaptchaSectionRef}
-                recaptchaKey={recaptchaKey}
-                onVerify={handleReCaptchaVerify}
-              />
-            </Flex>
+            <ReCaptchaSection
+              ref={recaptchaSectionRef}
+              recaptchaKey={recaptchaKey}
+              onVerify={handleReCaptchaVerify}
+            />
           )}
 
           <Flex direction="row" gap="small">
@@ -285,7 +293,7 @@ const Teacher = () => {
               display="block"
               onClick={handleCancel}
             >
-              {I18n.t('Back to Login')}
+              {I18n.t('Back')}
             </Button>
 
             <Button
@@ -300,10 +308,6 @@ const Teacher = () => {
           </Flex>
         </Flex>
       </form>
-
-      <Flex.Item align="center" overflowX="visible" overflowY="visible">
-        <ActionPrompt variant="signIn" />
-      </Flex.Item>
     </Flex>
   )
 }

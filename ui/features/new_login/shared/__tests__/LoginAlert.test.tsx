@@ -23,15 +23,11 @@ import LoginAlert from '../LoginAlert'
 describe('LoginAlert', () => {
   it('mounts without crashing with invalidLoginFaqUrl', () => {
     render(
-      <LoginAlert
-        invalidLoginFaqUrl="https://example.com/login-faq"
-        onClose={() => {}}
-        loginHandleName="username"
-      />,
+      <LoginAlert invalidLoginFaqUrl="https://example.com/login-faq" loginHandleName="username" />,
     )
   })
 
   it('mounts without crashing without invalidLoginFaqUrl', () => {
-    render(<LoginAlert invalidLoginFaqUrl={null} onClose={() => {}} loginHandleName="username" />)
+    render(<LoginAlert invalidLoginFaqUrl={null} loginHandleName="username" />)
   })
 })

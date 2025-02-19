@@ -20,9 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
-import {Responsive} from '@instructure/ui-responsive'
-import {canvas} from '@instructure/ui-theme-tokens'
-import {View, type ViewOwnProps} from '@instructure/ui-view'
+import {type ViewOwnProps} from '@instructure/ui-view'
 import React from 'react'
 import {useNewLogin, useNewLoginData} from '../context'
 import type {AuthProvider} from '../types'
@@ -82,7 +80,7 @@ const SSOButtons = () => {
         overflowX="visible"
         overflowY="visible"
         shouldGrow={true}
-        size={`calc(50% - ${canvas.spacing.small})`}
+        size="100%"
       >
         <Button
           href={link}
@@ -90,19 +88,12 @@ const SSOButtons = () => {
           disabled={isUiActionPending}
           onClick={handleClick}
           width="100%"
-        >
-          {iconSrc && (
-            <View
-              position="absolute"
-              insetInlineStart="0.625rem"
-              insetBlockStart="50%"
-              style={{
-                transform: 'translateY(-50%)',
-              }}
-            >
+          renderIcon={
+            iconSrc ? (
               <Img display="block" height="1.125rem" src={iconSrc} width="1.125rem" />
-            </View>
-          )}
+            ) : null
+          }
+        >
           {I18n.t('Log in with %{displayName}', {displayName})}
         </Button>
       </Flex.Item>
@@ -110,28 +101,9 @@ const SSOButtons = () => {
   }
 
   return (
-    <Responsive
-      match="media"
-      query={{
-        desktop: {minWidth: canvas.breakpoints.desktop}, // 1024px
-      }}
-    >
-      {(_props, matches) => {
-        const isDesktopOrLarger = matches?.includes('desktop')
-
-        return (
-          <Flex
-            direction={isDesktopOrLarger ? 'row' : 'column'}
-            wrap={isDesktopOrLarger ? 'wrap' : 'no-wrap'}
-            gap="small"
-            justifyItems={isDesktopOrLarger ? 'start' : 'center'}
-            alignItems="stretch"
-          >
-            {authProviders.map(renderProviderButton)}
-          </Flex>
-        )
-      }}
-    </Responsive>
+    <Flex direction="column" wrap="no-wrap" gap="small" justifyItems="center" alignItems="stretch">
+      {authProviders.map(renderProviderButton)}
+    </Flex>
   )
 }
 

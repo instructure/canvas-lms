@@ -63,10 +63,10 @@ describe('ActionPrompt', () => {
       </MemoryRouter>,
     )
     expect(screen.getByText('Already have an account?')).toBeInTheDocument()
-    const link = screen.getByText('Sign in')
+    const link = screen.getByText('Log in')
     expect(link).toBeInTheDocument()
     expect(link).toHaveAttribute('href', ROUTES.SIGN_IN)
-    expect(screen.queryByText('Sign in or')).not.toBeInTheDocument()
+    expect(screen.queryByText('Log in or')).not.toBeInTheDocument()
   })
 
   it('renders the correct text and link for "createAccount" variant', () => {
@@ -79,7 +79,7 @@ describe('ActionPrompt', () => {
         </NewLoginProvider>
       </MemoryRouter>,
     )
-    expect(screen.getByText('Sign in or')).toBeInTheDocument()
+    expect(screen.getByText('Log in or')).toBeInTheDocument()
     const link = screen.getByText('create an account.')
     expect(link).toBeInTheDocument()
     expect(link).toHaveAttribute('href', ROUTES.REGISTER)
@@ -97,10 +97,10 @@ describe('ActionPrompt', () => {
       </MemoryRouter>,
     )
     expect(screen.getByText('Have a pairing code?')).toBeInTheDocument()
-    const link = screen.getByText('Create a parent account')
+    const link = screen.getByText('Create a Parent Account')
     expect(link).toBeInTheDocument()
     expect(link).toHaveAttribute('href', ROUTES.REGISTER_PARENT)
-    expect(screen.queryByText('Sign in or')).not.toBeInTheDocument()
+    expect(screen.queryByText('Log in or')).not.toBeInTheDocument()
   })
 
   it('renders nothing for an invalid variant', () => {
@@ -127,7 +127,7 @@ describe('ActionPrompt', () => {
         </NewLoginProvider>
       </MemoryRouter>,
     )
-    const link = screen.getByText('Sign in')
+    const link = screen.getByText('Log in')
     await userEvent.click(link)
     expect(mockNavigate).toHaveBeenCalledWith(ROUTES.SIGN_IN)
     expect(mockNavigate).toHaveBeenCalledTimes(1)

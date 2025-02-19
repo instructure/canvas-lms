@@ -49,7 +49,7 @@ const ActionPrompt = ({variant}: ActionPromptProps) => {
     case 'createAccount':
       return (
         <Text>
-          {I18n.t('Sign in or')}{' '}
+          {I18n.t('Log in or')}{' '}
           <Link href={ROUTES.REGISTER} onClick={handleNavigate(ROUTES.REGISTER)}>
             {I18n.t('create an account.')}
           </Link>
@@ -60,7 +60,7 @@ const ActionPrompt = ({variant}: ActionPromptProps) => {
         <Text>
           {I18n.t('Already have an account?')}{' '}
           <Link href={ROUTES.SIGN_IN} onClick={handleNavigate(ROUTES.SIGN_IN)}>
-            {I18n.t('Sign in')}
+            {I18n.t('Log in')}
           </Link>
         </Text>
       )
@@ -69,7 +69,7 @@ const ActionPrompt = ({variant}: ActionPromptProps) => {
         <Text>
           {I18n.t('Have a pairing code?')}{' '}
           <Link href={ROUTES.REGISTER_PARENT} onClick={handleNavigate(ROUTES.REGISTER_PARENT)}>
-            {I18n.t('Create a parent account')}
+            {I18n.t('Create a Parent Account')}
           </Link>
         </Text>
       )

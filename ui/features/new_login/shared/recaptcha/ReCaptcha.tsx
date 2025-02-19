@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {canvas} from '@instructure/ui-theme-tokens'
 import {View} from '@instructure/ui-view'
 import React, {useEffect, useRef} from 'react'
 
@@ -31,13 +30,6 @@ interface Props {
   onVerify: (token: string | null) => void
 }
 
-const getReCaptchaSize = (viewportWidth: number): 'compact' | 'normal' => {
-  // unfortunately, base is not a token, see:
-  // node_modules/@instructure/ui-theme-tokens/src/canvas/breakpoints.ts
-  const base = 16
-  return viewportWidth < parseFloat(canvas.breakpoints.tablet) * base ? 'compact' : 'normal'
-}
-
 const ReCaptcha = ({siteKey, onVerify}: Props) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const captchaRenderedRef = useRef(false)
@@ -49,16 +41,12 @@ const ReCaptcha = ({siteKey, onVerify}: Props) => {
       return
     }
 
-    // reCAPTCHA size is determined on initial load and does not dynamically update
-    // this is acceptable as users are unlikely to resize their viewport frequently
-    const size = getReCaptchaSize(window.innerWidth)
-
     grecaptcha.ready(() => {
       if (!captchaRenderedRef.current) {
         containerRef.current!.innerHTML = ''
         grecaptcha.render(containerRef.current!, {
           sitekey: siteKey,
-          size,
+          size: 'normal',
           theme: 'light',
           callback: onVerify,
           'expired-callback': () => {
