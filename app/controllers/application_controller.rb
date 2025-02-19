@@ -2656,11 +2656,6 @@ class ApplicationController < ActionController::Base
     !!(@current_user ? @pseudonym_session : session[:session_id])
   end
 
-  def json_as_text?
-    request.headers["CONTENT_TYPE"].to_s.include?("multipart/form-data") &&
-      (params[:format].to_s != "json" || in_app?)
-  end
-
   def params_are_integers?(*check_params)
     begin
       check_params.each { |p| Integer(params[p]) }
@@ -2705,13 +2700,7 @@ class ApplicationController < ActionController::Base
         json = ActiveSupport::JSON.encode(json_cast(json))
       end
 
-      # fix for some browsers not properly handling json responses to multipart
-      # file upload forms and s3 upload success redirects -- we'll respond with text instead.
-      if options[:as_text] || json_as_text?
-        options[:html] = json.html_safe
-      else
-        options[:json] = json
-      end
+      options[:json] = json
     end
 
     # _don't_ call before_render hooks if we're not returning HTML

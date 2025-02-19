@@ -318,7 +318,7 @@ describe "Files API", type: :request do
       expect(@attachment.reload.open.read).to eq "test file"
     end
 
-    it "renders the response as text/html when in app" do
+    it "renders the response as application/json with no verifiers when in app" do
       s3_storage!
       allow_any_instance_of(FilesController).to receive(:in_app?).and_return(true)
       allow_any_instance_of(FilesController).to receive(:verified_request?).and_return(true)
@@ -331,7 +331,7 @@ describe "Files API", type: :request do
       raw_api_call(:post,
                    "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                    { controller: "files", action: "api_create_success", format: "json", id: @attachment.to_param, uuid: @attachment.uuid })
-      expect(response.headers[content_type_key]).to eq "text/html; charset=utf-8"
+      expect(response.headers[content_type_key]).to eq "application/json; charset=utf-8"
       expect(response.body).not_to include "verifier="
     end
 

@@ -48,12 +48,10 @@ class OutcomeGroupsController < ApplicationController
         data[:outcomes].each do
           group.learning_outcomes.create
         end
-        render json: group.as_json(include: :learning_outcomes),
-               as_text: true
+        render json: group.as_json(include: :learning_outcomes)
       else
         render json: { errors: { base: t(:invalid_file, "Invalid outcome group file") } },
-               status: :bad_request,
-               as_text: true
+               status: :bad_request
       end
     end
   end
