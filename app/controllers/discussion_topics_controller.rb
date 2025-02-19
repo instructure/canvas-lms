@@ -849,11 +849,10 @@ class DiscussionTopicsController < ApplicationController
 
         entry = entry.highest_level_parent_or_self
         sort_order = @topic.sort_order_for_user(@current_user)
-        condition = (sort_order == DiscussionTopic::SortOrder::DESC) ? ">=" : "<="
-        count_before = (sort_order == DiscussionTopic::SortOrder::ASC) ? 1 : 0
-        count_before += @topic.root_discussion_entries
-                              .where(parent_id: nil)
-                              .where("created_at #{condition}?", entry.created_at).count
+        condition = (sort_order == DiscussionTopic::SortOrder::DESC) ? ">" : "<"
+        count_before = @topic.root_discussion_entries
+                             .where(parent_id: nil)
+                             .where("created_at #{condition}?", entry.created_at).count
         env_hash[:current_page] = (count_before / env_hash[:per_page]).ceil
 
       end

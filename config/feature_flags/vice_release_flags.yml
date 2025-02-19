@@ -173,3 +173,10 @@ discussion_default_expand:
   display_name: discussion default expand
   description: |-
     Allow discussion's default expand setting
+
+discussion_permalink:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Discussion permalink
+  description: |-
+    This feature flag enables the Copy Link option in the discussions redesign

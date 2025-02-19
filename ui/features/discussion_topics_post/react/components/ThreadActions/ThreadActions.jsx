@@ -30,6 +30,7 @@ import {
   IconWarningBorderlessSolid,
   IconReplyAll2Line,
   IconCommentLine,
+  IconLinkLine
 } from '@instructure/ui-icons'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -50,6 +51,7 @@ export const ThreadActions = props => {
       isUnread: props.isUnread,
       onToggleUnread: props.onToggleUnread,
       goToTopic: props.goToTopic,
+      permalinkId: props.permalinkId,
       goToParent: props.goToParent,
       goToQuotedReply: props.goToQuotedReply,
       onEdit: props.onEdit,
@@ -158,6 +160,17 @@ const getMenuConfigs = props => {
       selectionCallback: props.goToParent,
     })
   }
+  if (props.permalinkId && ENV?.FEATURES?.discussion_permalink) {
+    options.push({
+      key: 'copyLink',
+      icon: <IconLinkLine />,
+      label: I18n.t('Copy Link'),
+      selectionCallback: async function() {
+        const url = `${window.location.origin}/courses/${ENV.course_id}/discussion_topics/${ENV.discussion_topic_id}?entry_id=${props.permalinkId}`
+        await navigator.clipboard.writeText(url)
+      }
+    })
+  }
   if (props.goToQuotedReply) {
     options.push({
       key: 'toQuotedReply',
@@ -252,6 +265,7 @@ ThreadActions.propTypes = {
   onToggleUnread: PropTypes.func.isRequired,
   isUnread: PropTypes.bool,
   goToTopic: PropTypes.func,
+  permalinkId: PropTypes.string,
   goToParent: PropTypes.func,
   goToQuotedReply: PropTypes.func,
   onEdit: PropTypes.func,

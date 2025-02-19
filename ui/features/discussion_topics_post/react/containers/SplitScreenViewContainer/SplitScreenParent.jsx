@@ -270,6 +270,7 @@ export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
                         onDelete={props.discussionEntry.permissions?.delete ? props.onDelete : null}
                         onEdit={props.discussionEntry.permissions?.update ? onEdit : null}
                         goToTopic={props.goToTopic}
+                        permalinkId={props.discussionEntry._id}
                         onOpenInSpeedGrader={
                           props.discussionTopic.permissions?.speedGrader
                             ? props.onOpenInSpeedGrader
