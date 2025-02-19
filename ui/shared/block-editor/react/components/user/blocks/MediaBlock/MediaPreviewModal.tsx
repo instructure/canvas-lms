@@ -22,7 +22,7 @@ import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import CanvasMediaPlayer from '@canvas/canvas-media-player'
-import StudioMediaPlayer from '@canvas/canvas-studio-player'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const I18n = createI18nScope('block-editor')
@@ -54,7 +54,7 @@ export const MediaPreviewModal = ({
           {ENV.FEATURES?.consolidated_media_player_iframe ? (
             <CanvasMediaPlayer type="video" is_attachment={true} attachment_id={attachmentId} />
           ) : (
-            <StudioMediaPlayer
+            <CanvasStudioPlayer
               media_id=""
               type="video"
               is_attachment={true}
