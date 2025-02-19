@@ -86,8 +86,7 @@ export default class TrayController {
   }
 
   _applyAudioOptions(audioOptions) {
-    const hasAttachmentId =
-      RCEGlobals.getFeatures().media_links_use_attachment_id && audioOptions.attachment_id
+    const hasAttachmentId = audioOptions.attachment_id
 
     if (
       !hasAttachmentId &&
