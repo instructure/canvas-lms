@@ -31,7 +31,7 @@ import {useLoaderData} from 'react-router-dom'
 import {type Folder} from '../../interfaces/File'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {FileManagementContext} from './Contexts'
-import {MainFolderWrapper} from '../../utils/fileFolderWrappers'
+import {BBFolderWrapper} from '../../utils/fileFolderWrappers'
 import SearchBar from './SearchBar'
 import {Alert} from '@instructure/ui-alerts'
 
@@ -52,7 +52,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const [discoveredPages, setDiscoveredPages] = useState<{[key: number]: string}>({})
   const [paginationSRText, setPaginationSRText] = useState<string>('')
   const {folders, searchTerm} = useLoaderData() as {folders: Folder[] | null; searchTerm: string}
-  const currentFolderWrapper = useRef<MainFolderWrapper | null>(null)
+  const currentFolderWrapper = useRef<BBFolderWrapper | null>(null)
 
   // the useEffect is necessary to protect against folders being empty
   useEffect(() => {
@@ -74,7 +74,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
     setDiscoveredPages({1: newCurrentUrl})
     setCurrentPageNumber(1)
 
-    currentFolderWrapper.current = new MainFolderWrapper(currentFolder)
+    currentFolderWrapper.current = new BBFolderWrapper(currentFolder)
   }, [folders, searchTerm, sortBy, sortDirection])
 
   const handleTableLoadingStatusChange = useCallback((isLoading: boolean) => {
@@ -144,6 +144,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
         contextId,
         showingAllContexts,
         currentFolder: currentFolderWrapper.current,
+        rootFolder: folders[0],
       }}
     >
       <View as="div">

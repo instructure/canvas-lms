@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import BulkActionButtons from '../BulkActionButtons'
-import {type File, type Folder} from '../../../../interfaces/File'
+import {type File} from '../../../../interfaces/File'
 
 let defaultProps: any
 describe('BulkActionButtons', () => {
@@ -152,5 +152,3 @@ describe('BulkActionButtons', () => {
     })
   })
 })
-
-

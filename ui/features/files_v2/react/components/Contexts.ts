@@ -17,14 +17,16 @@
  */
 
 import {createContext} from 'react'
-import {MainFolderWrapper} from 'features/files_v2/utils/fileFolderWrappers'
+import {BBFolderWrapper} from 'features/files_v2/utils/fileFolderWrappers'
+import {type Folder} from 'features/files_v2/interfaces/File'
 
 interface FileManagementContextProps {
   folderId: string
   contextType: string
   contextId: string
   showingAllContexts: boolean
-  currentFolder?: MainFolderWrapper | null
+  rootFolder?: Folder
+  currentFolder?: BBFolderWrapper | null
 }
 
 export const FileManagementContext = createContext({} as FileManagementContextProps)
