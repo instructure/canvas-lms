@@ -23,10 +23,25 @@ import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {useCallback, useState} from 'react'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('horizon_toggle_page')
 
 export const HorizonEnabled = () => {
+  const [loading, setLoading] = useState(false)
+
+  const onSubmit = useCallback(async () => {
+    setLoading(true)
+    const response = await doFetchApi<{success: boolean}>({
+      path: `/courses/${ENV.COURSE_ID}/canvas_career_reversion`,
+      method: 'POST',
+    })
+    if (response.json?.success) {
+      window.location.reload()
+    }
+  }, [])
+
   return (
     <View as="div">
       <Pill color="success">{I18n.t('Enabled')}</Pill>
@@ -41,7 +56,9 @@ export const HorizonEnabled = () => {
         </View>
         <Flex gap="x-small" justifyItems="end">
           <Button>{I18n.t('Provide Feedback')}</Button>
-          <Button color="primary">{I18n.t('Revert Course')}</Button>
+          <Button color="primary" onClick={onSubmit} disabled={loading}>
+            {I18n.t('Revert Course')}
+          </Button>
         </Flex>
       </Flex>
     </View>

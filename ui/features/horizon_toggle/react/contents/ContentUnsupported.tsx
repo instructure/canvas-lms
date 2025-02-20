@@ -26,6 +26,7 @@ import {View} from '@instructure/ui-view'
 import {Collaborations} from './Collaborations'
 import {Outcomes} from './Outcomes'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Quizzes} from './Quizzes'
 
 const I18n = createI18nScope('horizon_toggle_page')
 
@@ -38,13 +39,14 @@ export const ContentUnsupported = () => {
       </Flex>
       <Text as="p">
         {I18n.t(
-          'These content types will not be available in Canvas Career. You may modify these items to a supported format or proceed without including them. Discussions will be removed from your course. Collaborations and Outcomes will be hidden.',
+          'These content types will not be available in Canvas Career. You may modify these items to a supported format or proceed without including them. Discussions will be removed from your course. Collaborations and Outcomes will be hidden. Classic Quizzes must be converted to New Quizzes.',
         )}
       </Text>
       <Collaborations />
       <Discussions />
       <Outcomes />
       <Groups />
+      <Quizzes />
     </View>
   )
 }

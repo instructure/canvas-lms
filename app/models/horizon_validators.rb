@@ -29,11 +29,11 @@ module HorizonValidators
         record.errors.add(:submission_types, "Invalid submission types for Horizon course: #{invalid_types}")
       end
 
-      if record.peer_reviews || record.peer_reviews_assigned
+      if record.has_peer_reviews? || record.peer_reviews_assigned
         record.errors.add(:peer_reviews, "Peer reviews are not supported")
       end
 
-      if record.rubric.present?
+      if record.active_rubric_association?
         record.errors.add(:rubric, "Rubric is not supported")
       end
     end

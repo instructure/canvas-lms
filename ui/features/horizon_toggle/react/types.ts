@@ -53,3 +53,21 @@ export type ContentError = {
     }
   }
 }
+
+export type CompletionProgressResponse = {
+  id: number
+  context_id: number
+  context_type: string
+  user_id: number
+  tag: string
+  completion: number
+  workflow_state: ProgressWorkflowState
+  created_at: string
+  updated_at: string
+  message: string | null
+  url: string
+  success?: true
+  errors?: string
+}
+
+export type ProgressWorkflowState = 'queued' | 'running' | 'completed' | 'failed'
