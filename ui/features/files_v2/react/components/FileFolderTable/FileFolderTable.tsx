@@ -136,6 +136,7 @@ setColumnWidths(columnHeaders)
 const columnRenderers: {
   [key: string]: ({
     row,
+    rows,
     isStacked,
     userCanEditFilesForContext,
     userCanDeleteFilesForContext,
@@ -145,6 +146,7 @@ const columnRenderers: {
     toggleSelect,
   }: {
     row: File | Folder
+    rows: (File | Folder)[]
     isStacked: boolean
     userCanEditFilesForContext: boolean
     userCanDeleteFilesForContext: boolean
@@ -154,7 +156,7 @@ const columnRenderers: {
     toggleSelect: () => void
   }) => React.ReactNode
 } = {
-  name: ({row, isStacked}) => <NameLink isStacked={isStacked} item={row} />,
+  name: ({row, rows, isStacked}) => <NameLink isStacked={isStacked} item={row} collection={rows} />,
   created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} />,
   updated_at: ({row}) => (
     <div style={{padding: '0 0.5em'}}>

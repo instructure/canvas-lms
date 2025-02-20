@@ -15,29 +15,26 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from "react";
+import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {File} from "../../../interfaces/File";
+import type {File} from '../../../interfaces/File'
 
 const I18n = createI18nScope('files_v2')
 
 const FilePreviewIframe = ({item}: {item: File}) => (
   <iframe
-    sandbox={
-      item.mime_class == 'html'
-        ? 'allow-same-origin'
-        : 'allow-scripts allow-same-origin'
-    }
+    key={item.id}
+    sandbox={item.mime_class == 'html' ? 'allow-same-origin' : 'allow-scripts allow-same-origin'}
     src={item.preview_url}
     style={{
-      ...(item.mime_class === 'html' ? { backgroundColor: '#f5f5f5' } : {}),
+      ...(item.mime_class === 'html' ? {backgroundColor: '#f5f5f5'} : {}),
       border: 'none',
       display: 'block',
       height: '100%',
       width: '100%',
     }}
     title={I18n.t('Preview for file: %{name}', {
-      name: item.display_name
+      name: item.display_name,
     })}
   />
 )
