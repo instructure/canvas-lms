@@ -676,10 +676,10 @@ module CustomSeleniumActions
 
   ##
   # returns true if a form validation error message is visible, false otherwise
-  def error_displayed?
+  def error_displayed?(class_name = "error_text")
     # after it fades out, it's still visible, just off the screen
     driver.execute_script(
-      "return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0"
+      "return $('.#{class_name}:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0"
     )
   end
 

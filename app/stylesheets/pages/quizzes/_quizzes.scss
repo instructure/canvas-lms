@@ -560,6 +560,14 @@ input[type]:required:invalid {
       }
     }
   }
+  
+  .answers_warning {
+    margin: 0.5rem 0;
+  }
+
+  .answers_warning_message {
+    padding-left: 0.5rem;
+  }
 }
 
 .question_bank {
@@ -1358,6 +1366,12 @@ ul#quiz_versions {
     .form-control__label {
       padding-top: 0.5rem !important;
     }
+  }
+  .answers_warning {
+    margin: 0.5rem 0;
+  }
+  .answers_warning_message {
+    padding-left: 0.5rem;
   }
   #student_submissions_warning,
   #unpublished_changes_message {

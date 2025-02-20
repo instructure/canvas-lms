@@ -1054,6 +1054,7 @@ export const quiz = (window.quiz = {
       result.htmlValues = []
     }
     $formQuestion.find('.answer.hidden').remove()
+    hideAlertBox($('.answers_warning'))
     $form.find("input[name='answer_selection_type']").val(result.answer_selection_type).change()
     $form.find('.add_answer_link').showIf(options.addable)
     var $answers = $formQuestion.find('.form_answers .answer')
@@ -1951,6 +1952,24 @@ function formatFloatOrPercentage(val) {
   } else {
     return I18n.n(valstr)
   }
+}
+function renderAlertBox(inputField, message, focusedElement) {
+  const $inputField = $(inputField)
+  $inputField.removeClass('hidden')
+  $inputField.find('.answers_warning_message').text(message)
+
+  if (focusedElement) {
+    $(focusedElement).attr('aria-describedby', 'answers_warning_alert_box')
+    $(focusedElement).focus().select()
+  }
+}
+
+function hideAlertBox(inputField) {
+  const $inputField = $(inputField)
+  $inputField.addClass('hidden')
+
+  $inputField.find('.answers_warning_message').text('')
+  $(`[aria-describedby="answers_warning_alert_box"]`).removeAttr('aria-describedby')
 }
 
 function renderError(inputContainer, message) {
@@ -3163,6 +3182,7 @@ ready(function () {
 
     const $ans = $(this).parents('.answer')
     const $ansHeader = $ans.closest('.question').find('.answers_header')
+    hideAlertBox($('.answers_warning'))
     $ans.remove()
     $ansHeader.focus()
   })
@@ -3687,6 +3707,7 @@ ready(function () {
 
   $('.add_answer_link').bind('click', function (event, skipFocus) {
     event.preventDefault()
+    hideAlertBox($('.answers_warning'))
     const $question = $(this).parents('.question')
     var answers = []
     let answer_type = null,
@@ -3847,6 +3868,7 @@ ready(function () {
     const $displayQuestion = $(this).prev()
     const $form = $(this)
     $('.errorBox').not('#error_box_template').remove()
+    hideAlertBox($('.answers_warning'))
     var $answers = $form.find('.answer')
     const $question = $(this).find('.question')
     const answers = []
@@ -3865,8 +3887,14 @@ ready(function () {
 
     questionData.assessment_question_bank_id = $('.question_bank_id').text() || ''
     let error_text = null
+    let focused_element = null
     if (questionData.question_type === 'calculated_question') {
       if ($form.find('.combinations_holder .combinations tbody tr').length === 0) {
+        focused_element = $form.find('input[name="min"].float_value.min.variable_setting:visible');
+        // if no element is visible set the focus on the RCE
+        if (focused_element.length === 0 && $form.find('iframe').length > 0) {
+          focused_element =  $form.find('iframe').get(0).contentDocument.body
+        }
         error_text = I18n.t(
           'errors.no_possible_solution',
           'Please generate at least one possible solution',
@@ -3879,6 +3907,7 @@ ready(function () {
           questionData.question_type,
         )
       ) {
+        focused_element = $form.find('.add_answer_link:first')
         error_text = I18n.t('errors.no_answer', 'Please add at least one answer')
       } else if (
         $answers.filter('.correct_answer').length === 0 &&
@@ -3886,6 +3915,7 @@ ready(function () {
           questionData.question_type === 'true_false_question' ||
           questionData.question_tyep === 'missing_word_question')
       ) {
+        focused_element = $form.find('.select_answer_link')
         error_text = I18n.t('errors.no_correct_answer', 'Please choose a correct answer')
       }
     } else if (
@@ -3897,8 +3927,9 @@ ready(function () {
       }
       if (questionData.question_type === 'fill_in_multiple_blanks_question') {
         const $variables = $form.find('.blank_id_select > option')
-        $variables.each((i, answer_blank) => {
+        $variables.each((i) => {
           let blankCount = 0
+
           $answers.filter('.answer_idx_' + i).each((i, element) => {
             const $validInputs = $(element)
               .find($("input[name='answer_text']"))
@@ -3908,6 +3939,7 @@ ready(function () {
             }
           })
           if (blankCount == 0) {
+            focused_element = $form.find('.blank_id_select')
             error_text = I18n.t('Please add at least one non-blank answer for each variable.')
           }
         })
@@ -3919,6 +3951,7 @@ ready(function () {
           .find($("input[name='answer_text']"))
           .not('.disabled_answer')
         if (checkForNotBlanks($validInputs) == 0) {
+          focused_element = $validInputs.first()
           error_text = I18n.t('Please add at least one non-blank answer.')
         }
       }
@@ -3930,7 +3963,7 @@ ready(function () {
         .val()
         .match(/survey/i)
     if (isNotSurvey && error_text) {
-      $form.find('.answers_header').errorBox(error_text, true)
+      renderAlertBox($('.answers_warning'), error_text, focused_element)
       return
     }
     const question = $.extend({}, questionData)
