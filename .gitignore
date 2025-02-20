@@ -100,3 +100,7 @@ coverage-karma
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Allows devs to create their own devcontainer files
+/.devcontainer/*
+/!.devcontainer/.keep
