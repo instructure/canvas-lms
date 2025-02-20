@@ -25,23 +25,55 @@ import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
-import {Link, Outlet, useMatch, useNavigate} from 'react-router-dom'
+import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {openRegistrationWizard} from '../manage/registration_wizard/RegistrationWizardModalState'
 import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingState'
 import {useMedia} from 'react-use'
 import {View} from '@instructure/ui-view'
 import {Pill} from '@instructure/ui-pill'
+import {LtiRegistrationsTab} from './constants'
+import {isLtiRegistrationsDiscoverEnabled} from '../discover/utils'
+import {isLtiRegistrationsUsageEnabled} from '../monitor/utils'
 
 const I18n = createI18nScope('lti_registrations')
 
 export const LtiAppsLayout = React.memo(() => {
   const isManage = useMatch('/manage/*')
+  const isMonitor = useMatch('/monitor/*')
+
   const navigate = useNavigate()
   const isMobile = useMedia('(max-width: 767px)')
 
+  const tabSelected = React.useMemo(() => {
+    return isManage ?
+      LtiRegistrationsTab.manage : isMonitor ?
+      LtiRegistrationsTab.monitor : LtiRegistrationsTab.discover
+  }, [isManage, isMonitor])
+
+  const {isTabManage, isTabDiscover, isTabMonitor} = React.useMemo(() => {
+    return {
+      isTabManage: tabSelected === LtiRegistrationsTab.manage,
+      isTabMonitor: tabSelected === LtiRegistrationsTab.monitor,
+      isTabDiscover: tabSelected === LtiRegistrationsTab.discover,
+    }
+  }, [tabSelected])
+
   const onTabClick = React.useCallback(
     (_: any, tab: {id?: string}) => {
-      navigate(tab.id === 'manage' ? '/manage' : '/')
+      switch (tab.id) {
+        case LtiRegistrationsTab.discover:
+          navigate('/')
+          break
+        case LtiRegistrationsTab.manage:
+          navigate('/manage')
+          break
+        case LtiRegistrationsTab.monitor:
+          navigate('/monitor')
+          break
+        default:
+          navigate('/')
+          break
+      }
     },
     [navigate],
   )
@@ -97,7 +129,7 @@ export const LtiAppsLayout = React.memo(() => {
             <SimpleSelect
               renderLabel=""
               onChange={onTabClick}
-              value={isManage ? 'manage' : 'discover'}
+              value={tabSelected}
             >
               <SimpleSelect.Option id="discover" value="discover">
                 {I18n.t('Discover')}
@@ -111,18 +143,18 @@ export const LtiAppsLayout = React.memo(() => {
         </>
       ) : (
         <Tabs margin="medium auto" padding="medium" onRequestTabChange={onTabClick}>
-          {window.ENV.FEATURES.lti_registrations_discover_page && (
+          {isLtiRegistrationsDiscoverEnabled() && (
             <Tabs.Panel
-              isSelected={!isManage}
-              id="discover"
-              active={!isManage}
-              padding="large 0"
-              href="/"
               renderTitle={
                 <Text style={{color: 'initial', textDecoration: 'initial'}}>
                   {I18n.t('Discover')}
                 </Text>
               }
+              id={LtiRegistrationsTab.discover}
+              active={isTabDiscover}
+              isSelected={isTabDiscover}
+              padding="large 0"
+              href="/"
               themeOverride={{defaultOverflowY: 'unset'}}
             >
               <Outlet />
@@ -132,13 +164,25 @@ export const LtiAppsLayout = React.memo(() => {
             renderTitle={
               <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Manage')}</Text>
             }
-            id="manage"
+            id={LtiRegistrationsTab.manage}
             padding="large x-small"
-            isSelected={!!isManage}
-            active={!!isManage}
+            active={isTabManage}
+            isSelected={isTabManage}
           >
             <Outlet />
           </Tabs.Panel>
+          {isLtiRegistrationsUsageEnabled() ? (
+            <Tabs.Panel
+              renderTitle={
+                <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Monitor')}</Text>
+              }
+              id={LtiRegistrationsTab.monitor}
+              active={isTabMonitor}
+              isSelected={isTabMonitor}
+            >
+              <Outlet />
+            </Tabs.Panel>
+          ): undefined}
         </Tabs>
       )}
     </>

@@ -301,6 +301,7 @@ export type RootAccountFeatureId =
   | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_registrations_next'
   | 'lti_registrations_page'
+  | 'lti_registrations_usage_data'
   | 'mobile_offline_mode'
   | 'product_tours'
   | 'rce_transform_loaded_content'

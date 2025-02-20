@@ -915,6 +915,8 @@ class Lti::RegistrationsController < ApplicationController
                       end
     add_crumb(t("#crumbs.apps", "Apps"), breadcrumb_path)
 
+    inject_lti_usage_env
+
     # allows override of DR url hard-coded into Discover page
     # todo: remove once Discover page retrieves and uses correct DR url
     temp_dr_url = Setting.get("lti_discover_page_dyn_reg_url", "")
@@ -923,10 +925,6 @@ class Lti::RegistrationsController < ApplicationController
                dynamicRegistrationUrl: temp_dr_url
              })
     end
-
-    js_env({
-             canvasAppsLtiUsageUrl: DynamicSettings.find("lti")["canvas_apps_lti_usage_url"] || nil
-           })
 
     render :index
   end
@@ -1584,5 +1582,41 @@ class Lti::RegistrationsController < ApplicationController
   def report_error(exception, code = nil)
     code ||= response_code_for_rescue(exception) if exception
     InstStatsd::Statsd.increment("canvas.lti_registrations_controller.request_error", tags: { action: action_name, code: })
+  end
+
+  def filter_registrations_by_search_query(registrations, search_terms)
+    # all search terms must appear, but each can be in either the name,
+    # admin_nickname, or vendor name. Remove the search terms from the list
+    # as they are found -- keep the registration as a matching result if the
+    # list is empty at the end.
+    registrations.select do |registration|
+      terms_to_find = search_terms.dup
+      terms_to_find.delete_if do |term|
+        attributes = %i[name admin_nickname vendor]
+        attributes.any? do |attribute|
+          registration[attribute]&.downcase&.include?(term)
+        end
+      end
+
+      terms_to_find.empty?
+    end
+  end
+
+  def inject_lti_usage_env
+    js_env({
+             LTI_USAGE: {
+               env: Canvas.environment,
+               region: Canvas.region,
+               canvasBaseUrl: request.base_url,
+               firstName: @current_user.short_name,
+               locale: @current_user.browser_locale,
+               rootAccountId: @domain_root_account.id,
+               rootAccountUuid: @domain_root_account.uuid,
+             },
+           })
+
+    remote_env({
+                 ltiUsage: DynamicSettings.find("lti")["canvas_apps_lti_usage_url"] || nil
+               })
   end
 end
