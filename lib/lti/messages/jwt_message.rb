@@ -216,7 +216,8 @@ module Lti::Messages
     def include_assignment_and_grade_service_claims?
       include_claims?(:assignment_and_grade_service) &&
         (@context.is_a?(Course) || @context.is_a?(Group)) &&
-        @tool.developer_key.scopes.intersect?(TokenScopes::LTI_AGS_SCOPES)
+        @tool.developer_key.scopes.intersect?(TokenScopes::LTI_AGS_SCOPES) &&
+        @expander.controller.present?
     end
 
     # Follows 1EdTech Platform Notification Spec (not final/public as of Oct 2024)
@@ -272,7 +273,8 @@ module Lti::Messages
     def include_names_and_roles_service_claims?
       include_claims?(:names_and_roles_service) &&
         (@context.is_a?(Course) || @context.is_a?(Group)) &&
-        @tool.developer_key&.scopes&.include?(TokenScopes::LTI_NRPS_V2_SCOPE)
+        @tool.developer_key&.scopes&.include?(TokenScopes::LTI_NRPS_V2_SCOPE) &&
+        @expander.controller.present?
     end
 
     def add_names_and_roles_service_claims!
