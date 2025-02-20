@@ -60,7 +60,7 @@ describe('Quizzes', () => {
         <Quizzes />
       </HorizonToggleContext.Provider>,
     )
-    expect(screen.queryByText('Quizzes')).not.toBeInTheDocument()
+    expect(screen.queryByText('Classic Quizzes')).not.toBeInTheDocument()
   })
 
   it('renders quiz items when errors exist', async () => {

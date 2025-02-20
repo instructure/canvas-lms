@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "json"
+
 describe HorizonController do
   describe "GET canvas_career_validation" do
     it "should success when course has no errors" do
@@ -148,7 +150,7 @@ describe HorizonController do
       @course.announcements.create!(title: "Announcement 1", message: "Message 1")
       a1 = @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry")
       a2 = @course.assignments.create!(name: "Assignment 2", points_possible: 20)
-      a3 = @course.assignments.create!(name: "Assignment 3", points_possible: 30, submission_types: "online_text_entry")
+      a3 = @course.assignments.create!(name: "Assignment 3", points_possible: 30, peer_reviews: true)
 
       account_admin_user
       user_session(@admin)
@@ -173,6 +175,89 @@ describe HorizonController do
       expect(json["errors"]["assignments"].any? { |a| a["name"] == a1.name }).to be_falsey
       expect(json["errors"]["assignments"].any? { |a| a["name"] == a2.name }).to be_truthy
       expect(json["errors"]["assignments"].any? { |a| a["name"] == a3.name }).to be_truthy
+    end
+  end
+
+  describe "POST canvas_career_conversion" do
+    it "converts course to Horizon" do
+      course_factory(active_all: true)
+      @course.account.enable_feature!(:horizon_course_setting)
+      @course.discussion_topics.create!(title: "Discussion 1")
+      @course.announcements.create!(title: "Announcement 1", message: "Message 1")
+      @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry")
+      a2 = @course.assignments.create!(name: "Assignment 2", points_possible: 20)
+      a3 = @course.assignments.create!(name: "Assignment 3", points_possible: 30, submission_types: "online_text_entry")
+      @course.assignments.create!(name: "Assignment 4", points_possible: 20)
+      @course.assignments.create!(name: "Assignment 5", points_possible: 20)
+      @course.groups.create!(name: "Group 1")
+      @course.groups.create!(name: "Group 2")
+      @course.groups.create!(name: "Group 3")
+
+      account_admin_user
+      user_session(@admin)
+      rubric = @course.rubrics.create! { |r| r.user = @admin }
+      rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                 hide_score_total: "0",
+                                                                                 purpose: "grading",
+                                                                                 skip_updating_points_possible: false,
+                                                                                 update_if_existing: true,
+                                                                                 use_for_grading: "1",
+                                                                                 association_object: a3
+                                                                               })
+      rubric_assoc = RubricAssociation.generate(@admin, rubric, @course, rubric_association_params)
+      a2.update!(peer_reviews: true)
+      a2.save!
+      a3.rubric_association = rubric_assoc
+      a3.save!
+
+      get "validate_course", params: { course_id: @course.id }
+
+      json = JSON.parse(response.body, { symbolize_names: true })
+
+      # not calling the endpoint directly because it's delayed
+      Courses::HorizonService.convert_course_to_horizon(context: @course, errors: json[:errors])
+
+      expect(@course.discussion_topics.only_discussion_topics.count).to eq(0)
+      expect(@course.assignments.all { |a| a.submission_types == "online_text_entry" && !a.peer_reviews && !a.active_rubric_association? }).to be_truthy
+      expect(@course.groups.count).to eq(3)
+      expect(@course.groups.active.count).to eq(0)
+      expect(@course.horizon_course?).to be_truthy
+    end
+
+    it "converts instantly if course has only compatible learning objects" do
+      course_factory(active_all: true)
+
+      account_admin_user
+      user_session(@admin)
+
+      @course.account.enable_feature!(:horizon_course_setting)
+      @course.assignments.create!(name: "Assignment 1", points_possible: 10, submission_types: "online_text_entry")
+
+      post "convert_course", params: { course_id: @course.id }, format: :json
+
+      json = JSON.parse(response.body, { symbolize_names: true })
+      @course.reload
+      expect(json[:success]).to be_truthy
+      expect(@course.horizon_course?).to be_truthy
+    end
+  end
+
+  describe "POST canvas_career_reversion" do
+    it "reverts course to normal" do
+      course_factory(active_all: true)
+
+      account_admin_user
+      user_session(@admin)
+
+      @course.account.enable_feature!(:horizon_course_setting)
+      @course.update!(horizon_course: true)
+
+      expect(@course.horizon_course?).to be_truthy
+
+      post "revert_course", params: { course_id: @course.id }, format: :json
+
+      @course.reload
+      expect(@course.horizon_course?).to be_falsey
     end
   end
 end

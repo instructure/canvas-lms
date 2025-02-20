@@ -21,7 +21,6 @@ import {Heading} from '@instructure/ui-heading'
 import {IconInfoLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Assignments} from './Assignments'
-import {Quizzes} from './Quizzes'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -41,7 +40,6 @@ export const ContentChanges = () => {
       </Text>
       <Flex gap="small" direction="column">
         <Assignments />
-        <Quizzes />
       </Flex>
     </View>
   )

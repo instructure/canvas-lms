@@ -33,8 +33,6 @@ export const Quizzes = () => {
   }
   return (
     <View as="div">
-      <Heading level="h3">{I18n.t('Quizzes')}</Heading>
-      <Text as="p">{I18n.t('All Classic Quizzes will be converted to New Quizzes format.')}</Text>
       <ContentItems
         label={I18n.t(
           {one: 'Classic Quizzes (%{count} item)', other: 'Classic Quizzes (%{count} items)'},
