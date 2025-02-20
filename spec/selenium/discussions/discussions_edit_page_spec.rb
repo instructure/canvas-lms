@@ -1559,6 +1559,58 @@ describe "discussions" do
             expect(selected_assignee_options.count).to be(1)
           end
 
+          context "differentiaiton tags" do
+            before do
+              @course.account.enable_feature! :assign_to_differentiation_tags
+              @course.account.enable_feature! :differentiation_tags
+              @course.account.tap do |a|
+                a.settings[:allow_assign_to_differentiation_tags] = true
+                a.save!
+              end
+
+              @differentiation_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+              @diff_tag1 = @course.groups.create!(name: "Differentiation Tag 1", group_category: @differentiation_tag_category, non_collaborative: true)
+              @diff_tag2 = @course.groups.create!(name: "Differentiation Tag 2", group_category: @differentiation_tag_category, non_collaborative: true)
+            end
+
+            it "assigns a differentiation tag and saves discussion" do
+              graded_discussion = create_graded_discussion(course)
+
+              due_date = "Sat, 06 Apr 2024 00:00:00.000000000 UTC +00:00"
+              unlock_at = "Fri, 05 Apr 2024 00:00:00.000000000 UTC +00:00"
+              lock_at = "Sun, 07 Apr 2024 00:00:00.000000000 UTC +00:00"
+              graded_discussion.assignment.update!(due_at: due_date, unlock_at:, lock_at:)
+              course.reload
+              # Open page and assignTo tray
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+              click_add_assign_to_card
+              select_module_item_assignee(1, @diff_tag1.name)
+
+              Discussion.save_button.click
+              wait_for_ajaximations
+
+              assignment = Assignment.last
+
+              expect(assignment.assignment_overrides.active.count).to eq 1
+            end
+
+            context "existing differentiation tag overrides" do
+              before do
+                @discussion = create_graded_discussion(@course)
+                @discussion.assignment.assignment_overrides.create!(set_type: "Group", set_id: @diff_tag1.id, title: @diff_tag1.name)
+                @discussion.assignment.assignment_overrides.create!(set_type: "Group", set_id: @diff_tag2.id, title: @diff_tag2.name)
+              end
+
+              it "renders all the override assignees" do
+                get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit"
+
+                # 3 differentiation tags
+                expect(selected_assignee_options.count).to eq 3
+              end
+            end
+          end
+
           context "checkpoints" do
             it "shows reply to topic input on graded discussion with sub assignments" do
               Account.site_admin.enable_feature!(:discussion_checkpoints)

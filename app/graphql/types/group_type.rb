@@ -35,6 +35,8 @@ module Types
 
     field :members_count, Integer, null: true
 
+    field :non_collaborative, Boolean, null: true
+
     field :can_message, Boolean, null: false
     def can_message
       group.grants_right?(current_user, :send_messages)

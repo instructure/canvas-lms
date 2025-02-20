@@ -126,7 +126,7 @@ describe "quiz edit page assign to" do
       @diff_tag2 = @course.groups.create!(name: "Differentiation Tag 2", group_category: @differentiation_tag_category, non_collaborative: true)
     end
 
-    it "assigns a differentiation tag and saves assignment" do
+    it "assigns a differentiation tag and saves quiz" do
       get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}/edit"
 
       click_add_assign_to_card
