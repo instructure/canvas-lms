@@ -567,7 +567,7 @@ class DiscussionTopicsController < ApplicationController
     return render_unauthorized_action unless @topic.visible_for?(@current_user)
 
     @context.try(:require_assignment_group) unless @topic.is_announcement
-    can_set_group_category = ANONYMOUS_STATES.exclude?(@topic.anonymous_state) && @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage) # i.e. not anonymous and not a student
+    can_set_group_category = ANONYMOUS_STATES.exclude?(@topic.anonymous_state) && @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage_groups_add) # i.e. not anonymous and not a student
     hash = {
       URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
       PERMISSIONS: {
@@ -1889,7 +1889,7 @@ class DiscussionTopicsController < ApplicationController
 
   def can_set_group_category?
     error =
-      if !@context.grants_right?(@current_user, session, :manage)
+      if !@context.grants_right?(@current_user, session, :manage_groups_add)
         t("You cannot set a grouped discussion as a student.")
       elsif @topic.is_announcement
         t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")
