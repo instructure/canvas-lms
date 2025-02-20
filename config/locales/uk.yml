@@ -11627,6 +11627,7 @@ uk:
   module_filter_63b17d11: "Фільтр Модуля"
   module_first_to_last_6921f3ec: "Модуль - від першого до останнього"
   module_in_progress_fa600662: "Модуль в процесі"
+  module_item_501fb0c3: "Елемент модуля"
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "Пункт модуля було завершено з найменшою оцінкою %{score}"
   module_item_has_been_viewed_and_is_complete_6d180117: "Пункт модуля переглянуто та завершено"
   module_item_is_locked_19fa60b4: "Елемент модуля заблоковано."
