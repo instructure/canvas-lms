@@ -20,10 +20,8 @@ import React from 'react'
 
 import fakeENV from '@canvas/test-utils/fakeENV'
 import { renderConnected } from '../../../../__tests__/utils'
-
 import { screen, fireEvent } from '@testing-library/react'
 import { actions as uiActions } from '../../../../actions/ui'
-
 import WeightedAssignmentsTray from './../WeightedAssignmentsTray'
 import { StoreState } from '../../../../types'
 import { BLACKOUT_DATES, DEFAULT_STORE_STATE, PRIMARY_PACE } from '../../../../__tests__/fixtures'
@@ -112,7 +110,7 @@ describe('WeightedAssignmentsTray', () => {
       expect(uiActions.hideWeightedAssignmentsTray).toHaveBeenCalled()
     })
 
-    it('Apply button is disabled when validation fails', () => {
+    it('Alert message is shown when validation error', () => {
       const storeState: StoreState = {
         ...defaultStoreState,
         original: {
@@ -131,15 +129,46 @@ describe('WeightedAssignmentsTray', () => {
           blackoutDates: BLACKOUT_DATES
         },
       }
-
-      renderConnected(<WeightedAssignmentsTray />, storeState)
-
-      const incrementButton = screen.getByTestId('duration-assignment')
+      const {getByTestId} = renderConnected(<WeightedAssignmentsTray />, storeState)
+      const incrementButton = getByTestId('duration-assignment')
         .querySelector('svg[name="IconArrowOpenUp"]')
         ?.closest('button') as HTMLButtonElement
       fireEvent.mouseDown(incrementButton)
 
-      expect(screen.getByTestId('weighted-assignments-apply-button')).toBeDisabled()
+      const validationMessage = getByTestId('validation-message')
+      expect(validationMessage).toBeInTheDocument()
+    })
+
+    it('Alert message is focused when validation error and apply button clicked', () => {
+      const storeState: StoreState = {
+        ...defaultStoreState,
+        original: {
+          coursePace: {
+            ...PRIMARY_PACE,
+            workflow_state: 'unpublished',
+            assignments_weighting: {
+              assignment: 2,
+              quiz: 0,
+              discussion: 0,
+              page: 0,
+            },
+            start_date: '2021-12-15',
+            end_date: '2021-12-17',
+          },
+          blackoutDates: BLACKOUT_DATES
+        },
+      }
+      const {getByTestId} = renderConnected(<WeightedAssignmentsTray />, storeState)
+      const incrementButton = getByTestId('duration-assignment')
+        .querySelector('svg[name="IconArrowOpenUp"]')
+        ?.closest('button') as HTMLButtonElement
+      fireEvent.mouseDown(incrementButton)
+
+      const applyButton = getByTestId('weighted-assignments-apply-button').closest('button') as HTMLButtonElement
+      fireEvent.click(applyButton)
+
+      const validationMessage = getByTestId('validation-message')
+      expect(validationMessage).toHaveFocus()
     })
   })
 })
