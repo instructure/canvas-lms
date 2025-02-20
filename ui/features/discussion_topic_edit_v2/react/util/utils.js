@@ -105,7 +105,6 @@ export const buildAssignmentOverrides = discussion => {
     target === discussion.assignment
       ? target.assignmentOverrides
       : target.ungradedDiscussionOverrides
-
   overrides =
     overrides?.nodes?.map(override => ({
       dueDateId: override.id,
@@ -116,6 +115,7 @@ export const buildAssignmentOverrides = discussion => {
       unassignItem: override.unassignItem,
       students: override.set.students,
       title: override.set.name,
+      nonCollaborative: override.set.nonCollaborative,
       ...(override.contextModule && {
         context_module_id: override.contextModule._id,
         context_module_name: override.contextModule.name,
