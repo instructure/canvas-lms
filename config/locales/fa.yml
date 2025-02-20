@@ -15967,6 +15967,7 @@ fa:
   module_filter_63b17d11: "فیلتر ماژول"
   module_first_to_last_6921f3ec: "ماژول- اول به آخر"
   module_in_progress_fa600662: "ماژول در حال پیشرفت"
+  module_item_501fb0c3: "مورد ماژول"
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "مورد ماژول با کسب نمره حداقل %{score} تکمیل شده است"
   module_item_has_been_viewed_and_is_complete_6d180117: "مورد ماژول مشاهده شده است و تکمیل شده است"
   module_item_is_locked_19fa60b4: "مورد ماژول قفل شده است."
