@@ -10,4 +10,5 @@ module LtiAdvantage::Claims
   require_relative "claims/platform"
   require_relative "claims/platform_notification_service"
   require_relative "claims/resource_link"
+  require_relative "claims/activity"
 end
