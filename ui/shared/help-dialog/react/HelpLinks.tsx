@@ -51,9 +51,8 @@ export default function HelpLinks({onClick}: Props) {
   const links = data || []
 
   const featuredLink = links.find(link => link.is_featured)
-  const featuredLinksEnabled = window.ENV.FEATURES.featured_help_links
-  const nonFeaturedLinks = featuredLinksEnabled ? links.filter(link => !link.is_featured) : links
-  const showSeparator = featuredLink && !!nonFeaturedLinks.length && featuredLinksEnabled
+  const nonFeaturedLinks = links.filter(link => !link.is_featured)
+  const showSeparator = featuredLink && !!nonFeaturedLinks.length
 
   const handleClick = (link: HelpLink) => (event: React.MouseEvent<unknown, MouseEvent>) => {
     if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
@@ -81,7 +80,7 @@ export default function HelpLinks({onClick}: Props) {
         <List isUnstyled={true} margin="small 0" itemSpacing="small">
           {nonFeaturedLinks
             .map(link => {
-              const has_new_tag = link.is_new && featuredLinksEnabled
+              const has_new_tag = link.is_new
               return (
                 <List.Item key={`link-${link.id}`}>
                   <Flex justifyItems="space-between" alignItems="center">

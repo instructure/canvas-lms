@@ -80,7 +80,6 @@ class Account::HelpLinks
       link[:text] = link[:text].call if link[:text].respond_to?(:call)
       link[:subtext] = link[:subtext].call if link[:subtext].respond_to?(:call)
       link[:feature_headline] = link[:feature_headline].call if link[:feature_headline].respond_to?(:call)
-      link = link.except(:is_featured, :is_new, :feature_headline) unless Account.site_admin.feature_enabled?(:featured_help_links)
       link
     end
     featured, not_featured = instantiated.partition { |link| link[:is_featured] }

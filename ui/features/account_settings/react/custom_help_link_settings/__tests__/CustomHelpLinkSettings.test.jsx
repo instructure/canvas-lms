@@ -194,90 +194,80 @@ describe('<CustomHelpLinkSettings/>', () => {
     })
   })
 
-  describe('with featured help links', () => {
-    beforeEach(() => {
-      window.ENV = {FEATURES: {featured_help_links: true}}
+  it('allows only one featured link', () => {
+    const props = makeProps()
+    props.links[0].is_featured = true // Ask your instructor
+    const {getByText, getByLabelText, queryAllByText} = render(
+      <CustomHelpLinkSettings {...props} />,
+    )
+    expect(queryAllByText('Featured')).toHaveLength(1)
+    expect(
+      within(getByText('Ask Your Instructor a Question').closest('li')).getByText('Featured'),
+    ).toBeInTheDocument()
+
+    fireEvent.click(getByText('Edit Report a Problem'))
+    fireEvent.click(getByLabelText('Featured'))
+    fireEvent.click(getByText('Update link'))
+    expect(queryAllByText('Featured')).toHaveLength(1)
+    expect(
+      within(getByText('Report a Problem').closest('li')).getByText('Featured'),
+    ).toBeInTheDocument()
+  })
+
+  it('reorders links so that featured is first', () => {
+    const props = makeProps()
+    props.links[0].is_featured = true // Ask your instructor
+    const {container, getByText, getByLabelText} = render(<CustomHelpLinkSettings {...props} />)
+
+    fireEvent.click(getByText('Edit Report a Problem'))
+    fireEvent.click(getByLabelText('Featured'))
+    fireEvent.click(getByText('Update link'))
+    const firstRow = container.querySelectorAll('li')[0]
+    expect(within(firstRow).getByText('Featured')).toBeInTheDocument()
+    expect(within(firstRow).getByText('Report a Problem')).toBeInTheDocument()
+  })
+
+  it('allows only one new link', () => {
+    const props = makeProps()
+    props.links[0].is_new = true // Ask your instructor
+    const {getByText, getByLabelText} = render(<CustomHelpLinkSettings {...props} />)
+    expect(getByText('New')).toBeInTheDocument()
+    expect(
+      within(getByText('Ask Your Instructor a Question').closest('li')).getByText('New'),
+    ).toBeInTheDocument()
+
+    fireEvent.click(getByText('Edit Report a Problem'))
+    fireEvent.click(getByLabelText('New'))
+    fireEvent.click(getByText('Update link'))
+    expect(getByText(/New/)).toBeInTheDocument()
+    expect(
+      within(getByText('Report a Problem').closest('li')).getByText('New'),
+    ).toBeInTheDocument()
+  })
+
+  it('adds link at second position when featured link exists', async () => {
+    const props = makeProps()
+    props.links[0].is_featured = true // Ask your instructor
+    const rendered = render(<CustomHelpLinkSettings {...props} />)
+
+    await addCustomLink(rendered, 'This is not featured')
+
+    expect(
+      within(rendered.container.querySelectorAll('li')[1]).getByText('This is not featured'),
+    ).toBeInTheDocument()
+  })
+
+  it('adds featured link at top position', async () => {
+    const props = makeProps()
+    props.links[0].is_featured = true // Ask your instructor
+    const rendered = render(<CustomHelpLinkSettings {...props} />)
+
+    await addCustomLink(rendered, 'This is newly featured', () => {
+      fireEvent.click(rendered.getByLabelText('Featured'))
     })
 
-    afterEach(() => {
-      window.ENV = {}
-    })
-
-    it('allows only one featured link', () => {
-      const props = makeProps()
-      props.links[0].is_featured = true // Ask your instructor
-      const {getByText, getByLabelText, queryAllByText} = render(
-        <CustomHelpLinkSettings {...props} />,
-      )
-      expect(queryAllByText('Featured')).toHaveLength(1)
-      expect(
-        within(getByText('Ask Your Instructor a Question').closest('li')).getByText('Featured'),
-      ).toBeInTheDocument()
-
-      fireEvent.click(getByText('Edit Report a Problem'))
-      fireEvent.click(getByLabelText('Featured'))
-      fireEvent.click(getByText('Update link'))
-      expect(queryAllByText('Featured')).toHaveLength(1)
-      expect(
-        within(getByText('Report a Problem').closest('li')).getByText('Featured'),
-      ).toBeInTheDocument()
-    })
-
-    it('reorders links so that featured is first', () => {
-      const props = makeProps()
-      props.links[0].is_featured = true // Ask your instructor
-      const {container, getByText, getByLabelText} = render(<CustomHelpLinkSettings {...props} />)
-
-      fireEvent.click(getByText('Edit Report a Problem'))
-      fireEvent.click(getByLabelText('Featured'))
-      fireEvent.click(getByText('Update link'))
-      const firstRow = container.querySelectorAll('li')[0]
-      expect(within(firstRow).getByText('Featured')).toBeInTheDocument()
-      expect(within(firstRow).getByText('Report a Problem')).toBeInTheDocument()
-    })
-
-    it('allows only one new link', () => {
-      const props = makeProps()
-      props.links[0].is_new = true // Ask your instructor
-      const {getByText, getByLabelText} = render(<CustomHelpLinkSettings {...props} />)
-      expect(getByText('New')).toBeInTheDocument()
-      expect(
-        within(getByText('Ask Your Instructor a Question').closest('li')).getByText('New'),
-      ).toBeInTheDocument()
-
-      fireEvent.click(getByText('Edit Report a Problem'))
-      fireEvent.click(getByLabelText('New'))
-      fireEvent.click(getByText('Update link'))
-      expect(getByText(/New/)).toBeInTheDocument()
-      expect(
-        within(getByText('Report a Problem').closest('li')).getByText('New'),
-      ).toBeInTheDocument()
-    })
-
-    it('adds link at second position when featured link exists', async () => {
-      const props = makeProps()
-      props.links[0].is_featured = true // Ask your instructor
-      const rendered = render(<CustomHelpLinkSettings {...props} />)
-
-      await addCustomLink(rendered, 'This is not featured')
-
-      expect(
-        within(rendered.container.querySelectorAll('li')[1]).getByText('This is not featured'),
-      ).toBeInTheDocument()
-    })
-
-    it('adds featured link at top position', async () => {
-      const props = makeProps()
-      props.links[0].is_featured = true // Ask your instructor
-      const rendered = render(<CustomHelpLinkSettings {...props} />)
-
-      await addCustomLink(rendered, 'This is newly featured', () => {
-        fireEvent.click(rendered.getByLabelText('Featured'))
-      })
-
-      expect(
-        within(rendered.container.querySelectorAll('li')[0]).getByText('This is newly featured'),
-      ).toBeInTheDocument()
-    })
+    expect(
+      within(rendered.container.querySelectorAll('li')[0]).getByText('This is newly featured'),
+    ).toBeInTheDocument()
   })
 })

@@ -35,23 +35,9 @@ describe('FeaturedHelpLink', () => {
     handleClick() {},
   }
 
-  beforeEach(() => {
-    window.ENV = {FEATURES: {featured_help_links: true}}
-  })
-
-  afterEach(() => {
-    window.ENV = {}
-  })
-
   it('renders a featured link when enabled', () => {
     const {queryByText} = render(<FeaturedHelpLink {...props} />)
     expect(queryByText('Little Lost? Try here first!')).toBeInTheDocument()
-  })
-
-  it('does not render anything when the FF is disabled', () => {
-    window.ENV = {FEATURES: {featured_help_links: false}}
-    const {queryByText} = render(<FeaturedHelpLink {...props} />)
-    expect(queryByText('Little Lost? Try here first!')).not.toBeInTheDocument()
   })
 
   it('does not render anything when there is no featured link', () => {

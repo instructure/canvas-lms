@@ -89,12 +89,6 @@ epub_export:
   description: This enables users to generate and download course ePub.
   applies_to: Course
   root_opt_in: true
-featured_help_links:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Featured Help Links
-  description: Allows Help Links to be tagged as Featured or New and prominently displays
-    the Featured Help Link in the Help Menu.
 filter_speed_grader_by_student_group:
   state: allowed
   applies_to: RootAccount

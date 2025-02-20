@@ -46,77 +46,67 @@ describe('<CustomHelpLinkForm/>', () => {
     expect(getByLabelText('Link name')).toBeInTheDocument()
   })
 
-  describe('with featured help links', () => {
-    beforeEach(() => {
-      window.ENV = {FEATURES: {featured_help_links: true}}
-    })
+  it('renders featured checkboxes unchecked if features are not selected', () => {
+    const {getByLabelText} = render(<CustomHelpLinkForm {...makeProps()} />)
+    expect(getByLabelText('Featured').checked).toBe(false)
+    expect(getByLabelText('New').checked).toBe(false)
+    expect(getByLabelText('Feature headline').disabled).toBe(true)
+  })
 
-    afterEach(() => {
-      window.ENV = {}
-    })
+  it('renders featured checkbox checked if featured is selected', () => {
+    const {getByLabelText} = render(
+      <CustomHelpLinkForm {...makeProps({link: {is_featured: true, feature_headline: 'foo'}})} />,
+    )
+    expect(getByLabelText('Featured').checked).toBe(true)
+    expect(getByLabelText('Feature headline').disabled).toBe(false)
+    expect(getByLabelText('Feature headline').value).toBe('foo')
+  })
 
-    it('renders featured checkboxes unchecked if features are not selected', () => {
-      const {getByLabelText} = render(<CustomHelpLinkForm {...makeProps()} />)
-      expect(getByLabelText('Featured').checked).toBe(false)
-      expect(getByLabelText('New').checked).toBe(false)
-      expect(getByLabelText('Feature headline').disabled).toBe(true)
-    })
+  it('renders new checkbox checked if new is selected', () => {
+    const {getByLabelText} = render(<CustomHelpLinkForm {...makeProps({link: {is_new: true}})} />)
+    expect(getByLabelText('New').checked).toBe(true)
+  })
 
-    it('renders featured checkbox checked if featured is selected', () => {
-      const {getByLabelText} = render(
-        <CustomHelpLinkForm {...makeProps({link: {is_featured: true, feature_headline: 'foo'}})} />,
-      )
-      expect(getByLabelText('Featured').checked).toBe(true)
-      expect(getByLabelText('Feature headline').disabled).toBe(false)
-      expect(getByLabelText('Feature headline').value).toBe('foo')
-    })
+  it('sets featured to false if new is selected', () => {
+    const {getByLabelText} = render(
+      <CustomHelpLinkForm {...makeProps({link: {is_featured: true}})} />,
+    )
+    fireEvent.click(getByLabelText('New'))
+    expect(getByLabelText('Featured').checked).toBe(false)
+  })
 
-    it('renders new checkbox checked if new is selected', () => {
-      const {getByLabelText} = render(<CustomHelpLinkForm {...makeProps({link: {is_new: true}})} />)
-      expect(getByLabelText('New').checked).toBe(true)
-    })
+  it('sets new to false if featured is selected', () => {
+    const {getByLabelText} = render(<CustomHelpLinkForm {...makeProps({link: {is_new: true}})} />)
+    fireEvent.click(getByLabelText('Featured'))
+    expect(getByLabelText('New').checked).toBe(false)
+  })
 
-    it('sets featured to false if new is selected', () => {
-      const {getByLabelText} = render(
-        <CustomHelpLinkForm {...makeProps({link: {is_featured: true}})} />,
-      )
-      fireEvent.click(getByLabelText('New'))
-      expect(getByLabelText('Featured').checked).toBe(false)
-    })
+  it('clears and restores feature_headline when featured is toggled', () => {
+    const headline = 'This is my headline'
+    const {getByLabelText, getByDisplayValue, queryByDisplayValue} = render(
+      <CustomHelpLinkForm
+        {...makeProps({link: {is_featured: true, feature_headline: headline}})}
+      />,
+    )
+    fireEvent.click(getByLabelText('Featured')) // disable
+    expect(queryByDisplayValue(headline)).toBeNull()
+    fireEvent.click(getByLabelText('Featured')) // re-enable
+    expect(getByDisplayValue(headline)).toBeInTheDocument()
+  })
 
-    it('sets new to false if featured is selected', () => {
-      const {getByLabelText} = render(<CustomHelpLinkForm {...makeProps({link: {is_new: true}})} />)
-      fireEvent.click(getByLabelText('Featured'))
-      expect(getByLabelText('New').checked).toBe(false)
-    })
-
-    it('clears and restores feature_headline when featured is toggled', () => {
-      const headline = 'This is my headline'
-      const {getByLabelText, getByDisplayValue, queryByDisplayValue} = render(
-        <CustomHelpLinkForm
-          {...makeProps({link: {is_featured: true, feature_headline: headline}})}
-        />,
-      )
-      fireEvent.click(getByLabelText('Featured')) // disable
-      expect(queryByDisplayValue(headline)).toBeNull()
-      fireEvent.click(getByLabelText('Featured')) // re-enable
-      expect(getByDisplayValue(headline)).toBeInTheDocument()
-    })
-
-    it('retains feature_headline when is_new is toggled', () => {
-      const headline = 'This is my headline'
-      const {getByLabelText, getByDisplayValue} = render(
-        <CustomHelpLinkForm
-          {...makeProps({link: {is_featured: true, feature_headline: headline}})}
-        />,
-      )
-      fireEvent.click(getByLabelText('New')) // enables new (disables featured)
-      fireEvent.click(getByLabelText('New')) // disables new
-      fireEvent.click(getByLabelText('New')) // enables new
-      fireEvent.click(getByLabelText('Featured'))
-      expect(getByLabelText('Featured').checked).toBe(true)
-      expect(getByLabelText('New').checked).toBe(false)
-      expect(getByDisplayValue('This is my headline')).toBeInTheDocument()
-    })
+  it('retains feature_headline when is_new is toggled', () => {
+    const headline = 'This is my headline'
+    const {getByLabelText, getByDisplayValue} = render(
+      <CustomHelpLinkForm
+        {...makeProps({link: {is_featured: true, feature_headline: headline}})}
+      />,
+    )
+    fireEvent.click(getByLabelText('New')) // enables new (disables featured)
+    fireEvent.click(getByLabelText('New')) // disables new
+    fireEvent.click(getByLabelText('New')) // enables new
+    fireEvent.click(getByLabelText('Featured'))
+    expect(getByLabelText('Featured').checked).toBe(true)
+    expect(getByLabelText('New').checked).toBe(false)
+    expect(getByDisplayValue('This is my headline')).toBeInTheDocument()
   })
 })

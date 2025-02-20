@@ -277,7 +277,6 @@ export type SiteAdminFeatureId =
   | 'course_paces_redesign'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'
-  | 'featured_help_links'
   | 'instui_for_import_page'
   | 'instui_nav'
   | 'media_links_use_attachment_id'

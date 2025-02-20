@@ -462,7 +462,6 @@ describe "admin settings tab" do
     end
 
     it "adds a custom link" do
-      Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
       wait_for_ajaximations
 
@@ -498,7 +497,6 @@ describe "admin settings tab" do
     end
 
     it "adds a custom link with New designation" do
-      Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
       help_options = f(".HelpMenuOptions__Container button")
       scroll_into_view(help_options)

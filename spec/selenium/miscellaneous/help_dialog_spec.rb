@@ -170,7 +170,6 @@ describe "help dialog" do
   context "featured and new links" do
     before do
       user_logged_in(active_all: true)
-      Account.site_admin.enable_feature! :featured_help_links
       Account.default.account_users.create!(user: @user)
     end
 
