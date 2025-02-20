@@ -13118,6 +13118,7 @@ tr:
   module_completed_50c50762: "Modül Tamamlandı"
   module_first_to_last_6921f3ec: "Modül - Birinciden en sonuncuya"
   module_in_progress_fa600662: "Modül İşleniyor"
+  module_item_501fb0c3: "Modül Öğesi"
   module_item_is_locked_19fa60b4: "Modül öğesi kilitli."
   module_item_module_item_name_was_successfully_dele_8626d846: "%{module_item_name} modül öğesi başarıyla silindi."
   module_item_types: 

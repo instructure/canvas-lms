@@ -16383,6 +16383,7 @@ hu:
   module_filter_63b17d11: Modulszűrő
   module_first_to_last_6921f3ec: "Modul - elsőtől az utolsóig"
   module_in_progress_fa600662: "Modul folyamatban"
+  module_item_501fb0c3: Modulelem
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "A modul ezen eleme teljesítve, legalább %{score} pont elérésével."
   module_item_has_been_viewed_and_is_complete_6d180117: "A modul ezen eleme megnézve és teljesítve"
   module_item_is_locked_19fa60b4: "Modulelem zárolva."

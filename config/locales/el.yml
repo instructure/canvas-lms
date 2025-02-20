@@ -9938,6 +9938,7 @@ el:
   module_9775f804: "λειτουργική μονάδα"
   module_completed_50c50762: "Η Ενότητα Ολοκληρώθηκε"
   module_in_progress_fa600662: "Η Ενότητα βρίσκεται Σε Εξέλιξη"
+  module_item_501fb0c3: "Χαρακτηριστικό ενότητας"
   module_item_module_item_name_was_successfully_dele_8626d846: "Το στοιχείο %{module_item_name} της ενότητας διαγράφηκε επιτυχώς."
   module_locked_f6a7ea9d: "Η Ενότητα Κλειδώθηκε"
   module_menu_3201af4e: "Μενού Ενότητας"
