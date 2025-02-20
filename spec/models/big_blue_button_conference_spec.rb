@@ -498,6 +498,16 @@ describe BigBlueButtonConference do
     end
   end
 
+  describe "use_fallback_config?" do
+    let(:bbb) { BigBlueButtonConference.new }
+
+    context "when config is nil" do
+      it "returns false" do
+        expect(bbb.use_fallback_config?).to be false
+      end
+    end
+  end
+
   describe "config fallback" do
     let(:bbb_config) do
       {
