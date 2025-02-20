@@ -1029,6 +1029,18 @@ describe Types::SubmissionType do
         expect(preview_url).to eq "http://test.host/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1&show_full_discussion_immediately=true&version=0"
       end
     end
+
+    context "when the assignment is anonymous" do
+      before do
+        @assignment.update!(anonymous_grading: true)
+      end
+
+      it "returns the preview URL for the submission" do
+        @assignment.submit_homework(@student, body: "test")
+        @submission.update!(posted_at: nil)
+        expect(preview_url).to eq "http://test.host/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{@submission.anonymous_id}?preview=1&version=0"
+      end
+    end
   end
 
   describe "wordCount" do
