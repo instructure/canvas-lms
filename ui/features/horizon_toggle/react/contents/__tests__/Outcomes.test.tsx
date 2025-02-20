@@ -70,6 +70,10 @@ describe('Outcomes', () => {
     )
 
     expect(screen.getByText('Outcomes (2 items)')).toBeInTheDocument()
+    const toggle = screen.getByText('Outcomes')
+    toggle.click()
+    expect(screen.getByText('Outcome 1')).toBeInTheDocument()
+    expect(screen.getByText('Outcome 2')).toBeInTheDocument()
   })
 
   it('displays correct translation for single item', () => {
@@ -98,5 +102,8 @@ describe('Outcomes', () => {
       </HorizonToggleContext.Provider>,
     )
     expect(screen.getByText('Outcomes (1 item)')).toBeInTheDocument()
+    const toggle = screen.getByText('Outcomes')
+    toggle.click()
+    expect(screen.getByText('Outcome 1')).toBeInTheDocument()
   })
 })
