@@ -489,15 +489,31 @@ module Interfaces::SubmissionInterface
         host: context[:request].host_with_port
       )
     else
-      GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
-        submission.course_id,
-        submission.assignment_id,
-        submission.user_id,
-        host: context[:request].host_with_port,
-        preview: 1,
-        version: version_query_param(submission),
-        **((submission.submission_type == "discussion_topic") ? { show_full_discussion_immediately: true } : {})
-      )
+      Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+        is_discussion_topic = submission.submission_type == "discussion_topic"
+        show_full_discussion = is_discussion_topic ? { show_full_discussion_immediately: true } : {}
+        if assignment.anonymize_students?
+          GraphQLHelpers::UrlHelpers.course_assignment_anonymous_submission_url(
+            submission.course_id,
+            submission.assignment_id,
+            submission.anonymous_id,
+            host: context[:request].host_with_port,
+            preview: 1,
+            version: version_query_param(submission),
+            **show_full_discussion
+          )
+        else
+          GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
+            submission.course_id,
+            submission.assignment_id,
+            submission.user_id,
+            host: context[:request].host_with_port,
+            preview: 1,
+            version: version_query_param(submission),
+            **show_full_discussion
+          )
+        end
+      end
     end
   end
 
