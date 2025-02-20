@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 module Factories
   def lti_asset_processor_model(overrides = {})
+    assingment_opts = overrides.delete(:assignment_opts) || {}
+    external_tool_context = overrides.delete(:external_tool_context)
     props = {
       title: "title",
       text: "text",
@@ -28,8 +30,8 @@ module Factories
       report: { supportedTypes: ["originality"], released: false, indicator: true, url: "https://example.com/my_special_target_uri", custom: {} },
     }.with_indifferent_access.merge(overrides)
     props[:context_external_tool] ||=
-      props.delete(:tool) || external_tool_1_3_model
-    props[:assignment] ||= assignment_model
+      props.delete(:tool) || external_tool_1_3_model(context: external_tool_context)
+    props[:assignment] ||= assignment_model(assingment_opts)
     props[:url] ||= props[:context_external_tool].url
     Lti::AssetProcessor.create!(**props)
   end
