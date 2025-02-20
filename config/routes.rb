@@ -1111,6 +1111,11 @@ CanvasRails::Application.routes.draw do
     post "courses/:course_id/translate/paragraph", action: :translate_paragraph, as: :translate_paragraph
   end
 
+  scope(controller: "lti/asset_processor_launch") do
+    get "asset_processors/:asset_processor_id/launch", action: :launch_settings, as: :asset_processor_settings_launch
+    get "asset_processors/:asset_processor_id/reports/:report_id/launch", action: :launch_report, as: :asset_report_launch
+  end
+
   ### API routes ###
 
   # TODO: api routes can't yet take advantage of concerns for DRYness, because of
