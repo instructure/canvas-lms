@@ -427,13 +427,29 @@ module Api::V1::Assignment
 
       if submission.is_a?(Array)
         ActiveRecord::Associations.preload(submission, :quiz_submission) if assignment.quiz?
-        hash["submission"] = submission.map { |s| submission_json(s, assignment, user, session, assignment.context, params[:include], params) }
+        hash["submission"] = submission.map do |s|
+          submission_json(s,
+                          assignment,
+                          user,
+                          session,
+                          assignment.context,
+                          params[:include],
+                          params,
+                          preloaded_enrollments_by_user_id: opts[:preloaded_enrollments_by_user_id])
+        end
         should_show_statistics &&= submission.any? do |s|
           s.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
           s.eligible_for_showing_score_statistics?
         end
       else
-        hash["submission"] = submission_json(submission, assignment, user, session, assignment.context, params[:include], params)
+        hash["submission"] = submission_json(submission,
+                                             assignment,
+                                             user,
+                                             session,
+                                             assignment.context,
+                                             params[:include],
+                                             params,
+                                             preloaded_enrollments_by_user_id: opts[:preloaded_enrollments_by_user_id])
         submission.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
         should_show_statistics &&= submission.eligible_for_showing_score_statistics?
       end

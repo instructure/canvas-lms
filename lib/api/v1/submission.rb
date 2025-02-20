@@ -37,10 +37,11 @@ module Api::V1::Submission
     context = nil,
     includes = [],
     params = {},
-    avatars = false
+    avatars = false,
+    preloaded_enrollments_by_user_id: nil
   )
     context ||= assignment.context
-    hash = submission_attempt_json(submission, assignment, current_user, session, context, params)
+    hash = submission_attempt_json(submission, assignment, current_user, session, context, params, preloaded_enrollments_by_user_id:)
 
     # The "body" attribute is intended to store the contents of text-entry
     # submissions, but for quizzes it contains a string that includes grading
@@ -226,7 +227,8 @@ module Api::V1::Submission
     session,
     context = nil,
     params = {},
-    quiz_submission_version = nil
+    quiz_submission_version = nil,
+    preloaded_enrollments_by_user_id: nil
   )
     context ||= assignment.context
     includes = Array.wrap(params[:include])
@@ -316,7 +318,7 @@ module Api::V1::Submission
             options = {
               anonymous_instructor_annotations: assignment.anonymous_instructor_annotations?,
               enable_annotations: true,
-              enrollment_type: user_type(context, user),
+              enrollment_type: user_type(context, user, preloaded_enrollments_by_user_id),
               include: includes,
               moderated_grading_allow_list: attempt.moderated_grading_allow_list(user),
               skip_permission_checks: true,
