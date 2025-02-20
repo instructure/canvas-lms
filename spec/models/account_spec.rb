@@ -2979,11 +2979,15 @@ describe Account do
     end
 
     it "returns the redirect url with canvas path" do
-      expect(@account.horizon_redirect_url("/courses")).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2Fcourses&reauthenticate=false")
+      expect(@account.horizon_redirect_url("/courses")).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2Fcourses&preview=false&reauthenticate=false")
     end
 
     it "returns the redirect url with reauthenticate param" do
-      expect(@account.horizon_redirect_url("/", reauthenticate: true)).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2F&reauthenticate=true")
+      expect(@account.horizon_redirect_url("/", reauthenticate: true)).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2F&preview=false&reauthenticate=true")
+    end
+
+    it "returns the redirect url with preview param" do
+      expect(@account.horizon_redirect_url("/", preview: true)).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2F&preview=true&reauthenticate=false")
     end
 
     it "returns nil if horizon_domain is not set" do
@@ -2995,7 +2999,7 @@ describe Account do
     it "returns redirect url on localhost with port" do
       @account.settings[:horizon_domain] = "localhost:3002"
       @account.save!
-      expect(@account.horizon_redirect_url("/courses")).to eq("http://localhost:3002/redirect?canvas_url=%2Fcourses&reauthenticate=false")
+      expect(@account.horizon_redirect_url("/courses")).to eq("http://localhost:3002/redirect?canvas_url=%2Fcourses&preview=false&reauthenticate=false")
     end
   end
 end

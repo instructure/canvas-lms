@@ -23,16 +23,21 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {assignLocation} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('horizon_toggle_page')
 
 export const Main = () => {
   const isHorizonCourse = window.ENV?.horizon_course
+  const handlePreview = () => {
+    assignLocation(`/courses/${ENV.COURSE_ID}/student_view?preview=true`)
+  }
+
   return (
     <View as="div">
       <Flex margin="medium 0 small 0" justifyItems="space-between">
         <Heading level="h2">{I18n.t('Switch Learner Experience to Canvas Career')}</Heading>
-        <Button>{I18n.t('Learner Preview')}</Button>
+        <Button onClick={handlePreview}>{I18n.t('Learner Preview')}</Button>
       </Flex>
       {isHorizonCourse ? <HorizonEnabled /> : <HorizonToggle />}
     </View>
