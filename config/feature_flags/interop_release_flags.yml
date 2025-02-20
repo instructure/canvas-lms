@@ -247,7 +247,7 @@ lti_registrations_usage_data:
   shadow: true
   applies_to: RootAccount
   display_name: LTI Apps - Usage Data
-  description: When enabled, the Usage Data tab will appear in Canvas Apps.
+  description: When enabled, the Monitor tab will appear in Canvas Apps.
   environments:
     development:
       state: allowed_on

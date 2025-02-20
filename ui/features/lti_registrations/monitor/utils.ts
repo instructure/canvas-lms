@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type GlobalRemotes = Partial<{
-  speedgrader: string,
-  ltiUsage: string
-}>
+export const isLtiRegistrationsUsageEnabled = () => ENV?.FEATURES?.lti_registrations_usage_data ?? false
+
+export const ltiUsageConfig = () => ENV?.LTI_USAGE ?? {}
+
+export const ltiUsageOptions = () => ({
+    useHighContrast: ENV?.use_high_contrast ?? false
+})

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type GlobalRemotes = Partial<{
-  speedgrader: string,
-  ltiUsage: string
-}>
+import { defaultFetchOptions } from '@canvas/util/xhr';
+
+export const fetchToken = () =>
+  fetch("/api/v1/jwts?canvas_audience=false", {
+    method: "POST",
+    ...defaultFetchOptions(),
+  })
+  .then((resp) => resp.json())
+  .then((data) => ({ token: data.token }))
