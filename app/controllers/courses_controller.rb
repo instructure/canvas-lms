@@ -3849,11 +3849,12 @@ class CoursesController < ApplicationController
     @fake_student = @context.student_view_student
     session[:become_user_id] = @fake_student.id
     session.delete(:masquerade_return_to)
-
     return_url = course_path(@context)
-    if @context.horizon_course? && @context.root_account.horizon_domain.present?
+    is_preview = params[:preview] == "true" && @context.account.feature_enabled?(:horizon_course_setting)
+
+    if @context.root_account.horizon_domain.present? && (is_preview || @context.horizon_course?)
       canvas_url = params[:reset_test_student] || request.referer
-      redirect_to @context.root_account.horizon_redirect_url(canvas_url, reauthenticate: true)
+      redirect_to @context.root_account.horizon_redirect_url(canvas_url, reauthenticate: true, preview: is_preview)
     elsif value_to_boolean(params[:redirect_to_referer])
       return_to(request.referer, return_url || dashboard_url)
     else

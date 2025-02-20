@@ -67,7 +67,7 @@ describe HorizonMode do
     it "redirects to horizon if user is student" do
       user_session(@student)
       get :show, params: { id: @course.id }
-      expect(response).to redirect_to("https://test.canvasforcareer.com/redirect?canvas_url=%2Fcourses%2F#{@course.id}&reauthenticate=false")
+      expect(response).to redirect_to("https://test.canvasforcareer.com/redirect?canvas_url=%2Fcourses%2F#{@course.id}&preview=false&reauthenticate=false")
     end
 
     it "does not redirect if horizon domain is not set, even if student" do
