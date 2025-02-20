@@ -359,6 +359,18 @@ describe('enhanceUserContent()', () => {
       enhanceUserContent()
       expect(document.querySelector('a.external').getAttribute('target')).toEqual('_blank')
     })
+
+    it('adds .external to 3 new links while keeping existing ones', () => {
+      subject(`
+        <a id="link1" href="https://example.com" class="not_external">Not External</a>
+        <a id="link2" href="https://example.com">Regular Link 1</a>
+        <a id="link3" href="https://example.com" class="external">External</a>
+        <a id="link4" href="https://example.com">Regular Link 2</a>
+        <a id="link5" href="https://example.com">Regular Link 3</a>
+      `)
+      enhanceUserContent()
+      expect(document.querySelectorAll("a.external")).toHaveLength(4)
+    })
   })
 
   describe('enhanceUserContent:media', () => {
