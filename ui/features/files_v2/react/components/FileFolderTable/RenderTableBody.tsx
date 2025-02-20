@@ -57,6 +57,7 @@ const renderTableBody = (
         >
           {columnRenderers[column.id]({
             row: row,
+            rows: rows,
             isStacked: isStacked,
             userCanEditFilesForContext: userCanEditFilesForContext,
             userCanDeleteFilesForContext: userCanDeleteFilesForContext,
