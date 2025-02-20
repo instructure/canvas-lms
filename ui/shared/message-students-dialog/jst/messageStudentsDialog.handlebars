@@ -11,7 +11,7 @@
         {{recipientGroups.0.name}}
         <input type="hidden" name="recipientGroupName" value="{{recipientGroups.0.name}}" />
       {{else}}
-        <select name="recipientGroupName" id="message-recipients-group" class="labeled-error">
+        <select name="recipientGroupName" id="message-recipients-group" class="ic-Input labeled-error">
           {{#each recipientGroups}}
             <option value="{{name}}">{{name}}</option>
           {{/each}}
@@ -24,7 +24,7 @@
     {{> ui/shared/message-students-dialog/jst/_messageStudentsWhoRecipientList.handlebars this}}
   </div>
 
-  <textarea name="body" id="message-body" class="labeled-error"></textarea>
+  <textarea name="body" id="message-body" class="ic-Input labeled-error"></textarea>
 </div>
 <div class="form-controls">
   <button class="btn dialog_closer btn-secondary" type="button"
