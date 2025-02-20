@@ -13047,6 +13047,7 @@ he:
   module_filter_63b17d11: "מסנן מודולים"
   module_first_to_last_6921f3ec: "מודולים - מראשון לאחרון"
   module_in_progress_fa600662: "המודול בתהליך"
+  module_item_501fb0c3: "פריט מודול"
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "פריטי המודול הושלמו לאחר השגת ציון של לפחות %{score}"
   module_item_has_been_viewed_and_is_complete_6d180117: "פריטי המודול נבדקו והוא הושלם"
   module_item_is_locked_19fa60b4: "פריט המודול נעול"
