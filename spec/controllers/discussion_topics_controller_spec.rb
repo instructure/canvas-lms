@@ -748,6 +748,14 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be false
       end
 
+      it "CAN_SET_GROUP is true for an account admin lacking manage_courses_admin" do
+        regular_topic = @course.discussion_topics.create!(user: @teacher, title: "Greetings", message: "Hello, and good morning!")
+        account_admin_user_with_role_changes(account: @account, role_changes: { manage_courses_admin: false, manage_groups_add: true })
+        user_session(@admin)
+        get("edit", params: { course_id: @course.id, id: regular_topic.id })
+        expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be true
+      end
+
       it "CAN_SET_GROUP is false when existing discussion_topic is fully anonymous" do
         anon_topic = @course.discussion_topics.create!(title: "some topic", anonymous_state: "full_anonymity")
         user_session(@teacher)
