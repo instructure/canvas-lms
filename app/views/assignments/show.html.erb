@@ -288,3 +288,7 @@
     <div id="enhanced-rubric-self-assessment-edit"></div>
   <% end %>
 <% end %>
+
+<% if Rubric.enhanced_rubrics_assignments_enabled?(@context) && can_do(@context, @current_user, :read_as_admin) %>
+  <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? %>
+<% end %>
