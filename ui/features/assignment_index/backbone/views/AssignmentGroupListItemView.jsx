@@ -728,6 +728,18 @@ AssignmentGroupListItemView.prototype.reloadPage = function () {
   return window.location.reload()
 }
 
+/**
+ * @type {null | import('react-dom/client').Root}
+ */
+let root = null
+const getRoot = () => {
+  if (root === null) {
+    const mountPoint = $('#external-tool-mount-point')[0]
+    root = createRoot(mountPoint)
+  }
+  return root
+}
+
 AssignmentGroupListItemView.prototype.setExternalToolTray = function (tool, returnFocusTo) {
   const handleDismiss = (function (_this) {
     return function () {
@@ -755,9 +767,7 @@ AssignmentGroupListItemView.prototype.setExternalToolTray = function (tool, retu
     onDismiss: handleDismiss,
     open: tool !== null,
   }
-  const mountPoint = $('#external-tool-mount-point')[0]
-  const root = createRoot(mountPoint)
-  root.render(React.createElement(ContentTypeExternalToolTray, props))
+  getRoot().render(React.createElement(ContentTypeExternalToolTray, props))
   return root
 }
 
