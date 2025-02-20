@@ -611,7 +611,12 @@ class Attachment < ActiveRecord::Base
     splits = namespace.try(:split, /_/)
     return nil if splits.blank?
 
-    if splits[1] == "localstorage"
+    # when creating a cross-shard attachment on the birth shard, it will set a local ID
+    # due to account.rb:file_namespace, but it needs to be a global ID or we will reference
+    # the incorrect account
+    if Attachment.current_root_account && Attachment.current_root_account.shard != Shard.current && Shard.current == Shard.birth
+      Attachment.current_root_account.global_id
+    elsif splits[1] == "localstorage"
       splits[3].to_i
     else
       splits[1].to_i
