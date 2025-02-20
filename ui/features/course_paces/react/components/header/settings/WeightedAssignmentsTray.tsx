@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { useScope as createI18nScope } from '@canvas/i18n'
 import { Alert } from '@instructure/ui-alerts'
@@ -38,6 +38,7 @@ import { BlackoutDate } from '../../../shared/types'
 import { getBlackoutDates } from '../../../shared/reducers/blackout_dates'
 import { actions as uiActions } from '../../../actions/ui'
 import { getShowWeightedAssignmentsTray } from '../../../reducers/ui'
+import {Focusable} from '@instructure/ui-focusable'
 
 const I18n = createI18nScope('course_paces_settings')
 
@@ -78,6 +79,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
     blackoutDates
   } = props
 
+  const alertContainer = useRef<HTMLDivElement | null>(null)
   const [weightedAssignments, setWeightedAssignments] = useState<AssignmentWeightening>(coursePace.assignments_weighting)
   const [validationMessage, setValidationMessage] = useState<AlertMessage | undefined>(undefined)
 
@@ -97,6 +99,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
 
   const onApply = useCallback(() => {
     if (validationMessage !== undefined) {
+      alertContainer.current?.focus()
       return
     }
 
@@ -206,11 +209,33 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
   }
 
   const validationAlert = validationMessage ? (
-    <Alert variant={validationMessage.type} margin="xx-small" open={true} data-testid='validation-message'>
-      <Text>
-        {validationMessage.message}
-      </Text>
-    </Alert>
+    <Focusable>
+      {({ focused }: { focused: boolean }) => (
+        <View
+          withFocusOutline={focused}
+          focusPosition="inset"
+          position="relative"
+          as="div"
+          role="button"
+          tabIndex={0}
+          background="primary"
+          display="block"
+          width="100%"
+          borderWidth="0 0 small 0"
+          padding="xxx-small"
+          elementRef={e => {
+            if (e instanceof HTMLDivElement) {
+              alertContainer.current = e
+            }
+          }}
+          data-testid="validation-message"
+        >
+          <Alert variant={validationMessage.type} margin="xx-small" open={true} >
+            <Text>{validationMessage.message}</Text>
+          </Alert>
+        </View>
+      )}
+    </Focusable>
   ) : null
 
   return (
@@ -271,7 +296,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
             <Button type="button" color="secondary" onClick={onDismiss}>
               {I18n.t('Cancel')}
             </Button>
-            <Button type="button" color="primary" onClick={onApply} disabled={validationMessage !== undefined} data-testid="weighted-assignments-apply-button">
+            <Button type="button" color="primary" onClick={onApply} data-testid="weighted-assignments-apply-button">
               {I18n.t('Apply')}
             </Button>
           </Flex>
