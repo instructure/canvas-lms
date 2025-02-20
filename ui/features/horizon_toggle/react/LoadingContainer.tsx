@@ -20,17 +20,13 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = createI18nScope('horizon_toggle_page')
-
-export const LoadingContainer = () => {
-  const loadingMessage = I18n.t('Checking course content...')
+export const LoadingContainer = (props: {loadingText: string}) => {
   return (
     <Flex height="500px" alignItems="start" as="div">
       <View as="div">
-        <Spinner size="small" renderTitle={loadingMessage} />
-        <Text>{loadingMessage}</Text>
+        <Spinner size="small" renderTitle={props.loadingText} />
+        <Text>{props.loadingText}</Text>
       </View>
     </Flex>
   )

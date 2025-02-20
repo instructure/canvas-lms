@@ -17,8 +17,8 @@
  */
 
 import {ContentChanges} from './contents/ContentChanges'
-import {useEffect, useMemo, useState} from 'react'
-import {CanvasCareerValidationResponse} from './types'
+import {useCallback, useEffect, useMemo, useState} from 'react'
+import {CanvasCareerValidationResponse, CompletionProgressResponse} from './types'
 import {HorizonToggleContext} from './HorizonToggleContext'
 import {ContentUnsupported} from './contents/ContentUnsupported'
 import {LoadingContainer} from './LoadingContainer'
@@ -30,12 +30,18 @@ import {Menu} from '@instructure/ui-menu'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('horizon_toggle_page')
 
+const timeout = (delay: number) => {
+  return new Promise(resolve => setTimeout(resolve, delay))
+}
+
 export const HorizonToggle = () => {
   const [data, setData] = useState<CanvasCareerValidationResponse>({errors: {}})
-  const [isLoading, setLoading] = useState(true)
+  const [progress, setProgress] = useState<Partial<CompletionProgressResponse>>({url: ''})
+  const [loadingText, setLoadingText] = useState<string>(I18n.t('Checking course content...'))
   const [isTermsAccepted, setTermsAccepted] = useState(false)
 
   useEffect(() => {
@@ -43,8 +49,8 @@ export const HorizonToggle = () => {
       path: `/courses/${ENV.COURSE_ID}/canvas_career_validation`,
     })
       .then(response => setData(response.json!))
-      .catch(err => console.log(err))
-      .finally(() => setLoading(false))
+      .catch(err => showFlashAlert({message: err.message}))
+      .finally(() => setLoadingText(''))
   }, [])
 
   const hasUnsupportedContent = useMemo(() => {
@@ -52,13 +58,82 @@ export const HorizonToggle = () => {
       data?.errors?.discussions ||
       data?.errors?.groups ||
       data?.errors?.outcomes ||
-      data?.errors?.collaborations
+      data?.errors?.collaborations ||
+      data?.errors?.quizzes
     )
   }, [data])
 
   const hasChangesNeededContent = useMemo(() => {
-    return data?.errors?.quizzes || data?.errors?.assignments
+    return data?.errors?.assignments
   }, [data])
+
+  const fetchProgress = useCallback(async () => {
+    if (!progress?.url) return
+    try {
+      const response = await doFetchApi<CompletionProgressResponse>({
+        path: progress?.url!,
+        method: 'GET',
+      })
+      const json = response.json!
+      await timeout(1000)
+      if (json.workflow_state === 'completed' || json.workflow_state === 'failed') {
+        window.location.reload()
+      } else {
+        await fetchProgress()
+      }
+      setProgress(json)
+    } catch (e: any) {
+      showFlashAlert({
+        message: I18n.t('Could not convert course to Canvas Career. Please try again.'),
+        type: 'error',
+      })
+    }
+  }, [progress])
+
+  const onSubmit = useCallback(async () => {
+    setLoadingText(I18n.t('Converting course to Canvas Career...'))
+    try {
+      const response = await doFetchApi<CompletionProgressResponse>({
+        path: `/courses/${ENV.COURSE_ID}/canvas_career_conversion`,
+        method: 'POST',
+      })
+      const json = response.json!
+      if (json.success) {
+        window.location.reload()
+      }
+      if (json.errors) {
+        showFlashAlert({
+          message: json.errors,
+          type: 'error',
+        })
+        setLoadingText('')
+      }
+      if (json.workflow_state) {
+        setProgress(json)
+      }
+    } catch (e: any) {
+      showFlashAlert({
+        message: I18n.t('Could not convert course to Canvas Career. Please try again.'),
+        type: 'error',
+      })
+      setLoadingText('')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (
+      progress &&
+      progress?.workflow_state !== 'completed' &&
+      progress?.workflow_state !== 'failed'
+    ) {
+      fetchProgress()
+    } else if (
+      (progress && progress?.workflow_state === 'completed') ||
+      progress?.workflow_state === 'failed'
+    ) {
+      window.location.reload()
+    }
+  }, [progress, fetchProgress])
 
   return (
     <View as="div">
@@ -71,10 +146,15 @@ export const HorizonToggle = () => {
         <Flex direction="column" justifyItems="space-between">
           <HorizonToggleContext.Provider value={data}>
             <Flex direction="column" gap="large" as="div">
-              {isLoading && <LoadingContainer />}
-              {hasUnsupportedContent && <ContentUnsupported />}
-              {hasChangesNeededContent && <ContentChanges />}
-              {!hasUnsupportedContent && !hasChangesNeededContent && !isLoading && (
+              {loadingText ? (
+                <LoadingContainer loadingText={loadingText} />
+              ) : (
+                <>
+                  {hasUnsupportedContent && <ContentUnsupported />}
+                  {hasChangesNeededContent && <ContentChanges />}
+                </>
+              )}
+              {!hasUnsupportedContent && !hasChangesNeededContent && !loadingText && (
                 <View as="div" minHeight="500px">
                   <Text as="p">
                     {I18n.t(
@@ -86,7 +166,7 @@ export const HorizonToggle = () => {
             </Flex>
           </HorizonToggleContext.Provider>
           <Flex gap="small" direction="column" margin="small 0 0 0" as="div">
-            {!isLoading && (
+            {!loadingText && (
               <Checkbox
                 label={I18n.t(
                   'I acknowledge that switching to the Canvas Career learner experience may result in some course content being deleted or modified.',
@@ -97,7 +177,11 @@ export const HorizonToggle = () => {
             )}
             <Menu.Separator />
             <Flex justifyItems="end">
-              <Button color="primary" disabled={isLoading || !isTermsAccepted}>
+              <Button
+                color="primary"
+                disabled={!!loadingText || !isTermsAccepted}
+                onClick={onSubmit}
+              >
                 {I18n.t('Switch to Canvas Career')}
               </Button>
             </Flex>

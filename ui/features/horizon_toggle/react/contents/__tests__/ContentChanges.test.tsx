@@ -55,33 +55,12 @@ describe('ContentChanges', () => {
     },
   }
 
-  it('includes Assignments and Quizzes sections', () => {
+  it('includes Assignments section', () => {
     render(
       <HorizonToggleContext.Provider value={mockData}>
         <ContentChanges />
       </HorizonToggleContext.Provider>,
     )
     expect(screen.getByText('Assignments')).toBeInTheDocument()
-    expect(screen.getByText('Quizzes')).toBeInTheDocument()
-  })
-
-  it('renders only Assignments section when no quiz errors exist', () => {
-    render(
-      <HorizonToggleContext.Provider value={{errors: {assignments: mockData.errors.assignments}}}>
-        <ContentChanges />
-      </HorizonToggleContext.Provider>,
-    )
-    expect(screen.getByText('Assignments')).toBeInTheDocument()
-    expect(screen.queryByText('Quizzes')).not.toBeInTheDocument()
-  })
-
-  it('renders only Quizzes section when no assignment errors exist', () => {
-    render(
-      <HorizonToggleContext.Provider value={{errors: {quizzes: mockData.errors.quizzes}}}>
-        <ContentChanges />
-      </HorizonToggleContext.Provider>,
-    )
-    expect(screen.getByText('Quizzes')).toBeInTheDocument()
-    expect(screen.queryByText('Assignments')).not.toBeInTheDocument()
   })
 })

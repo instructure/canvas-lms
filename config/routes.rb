@@ -519,6 +519,8 @@ CanvasRails::Application.routes.draw do
     get "grading_schemes/:id" => "grading_schemes_json#show"
 
     get "canvas_career_validation" => "horizon#validate_course"
+    post "canvas_career_conversion" => "horizon#convert_course"
+    post "canvas_career_reversion" => "horizon#revert_course"
   end
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
 

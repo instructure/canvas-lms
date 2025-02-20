@@ -18,71 +18,50 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class HorizonController < ApplicationController
+  include Api::V1::Progress
+
   before_action :require_user
   before_action :require_context
 
   def validate_course
     return unless authorized_action(@context, @current_user, :manage_courses_admin)
 
-    errors = {}
-
-    # check assignments
-    assignment_validator = HorizonValidators::AssignmentValidator.new
-    validate_entites(@context.assignments, assignment_validator, errors, "assignments")
-
-    # check groups
-    group_validator = HorizonValidators::GroupValidator.new
-    validate_entites(@context.groups, group_validator, errors, "groups")
-
-    # check discussions
-    discussions_validator = HorizonValidators::DiscussionsValidator.new
-    validate_entites(@context.discussion_topics, discussions_validator, errors, "discussions")
-
-    # check quizzes
-    quizzes_validator = HorizonValidators::QuizzesValidator.new
-    validate_entites(@context.quizzes, quizzes_validator, errors, "quizzes")
-
-    # check collaborations
-    collaborations_validator = HorizonValidators::CollaborationsValidator.new
-    validate_entites(@context.collaborations, collaborations_validator, errors, "collaborations")
-
-    # check outcomes
-    outcomes_validator = HorizonValidators::OutcomesValidator.new
-    validate_entites(@context.learning_outcomes, outcomes_validator, errors, "outcomes")
+    errors = Courses::HorizonService.validate_course_contents(@context, method(:named_context_url))
 
     render json: { errors: }
   end
 
-  private
+  def convert_course
+    return unless authorized_action(@context, @current_user, :manage_courses_admin)
 
-  def map_to_error_object(id, name, link, errors)
-    { id:, name:, link:, errors: errors.group_by_attribute }
+    errors = Courses::HorizonService.validate_course_contents(@context, method(:named_context_url))
+
+    # return early if course is horizon compatible
+    if errors.empty?
+      @context.update!(horizon_course: true)
+      return render json: { success: true }
+    end
+
+    # we will not convert quizzes, just return if there are still classic quizzes
+    if errors[:quizzes].present?
+      return render json: { errors: t("There are still classic quizzes in the course. Please convert them to new quizzes first.") }
+    end
+
+    progress = Progress.create!(context: @context, user: @current_user, tag: :convert_course_to_horizon)
+
+    convert_params = {
+      context: @context,
+      errors:
+    }
+
+    progress.process_job(Courses::HorizonService, :convert_course_to_horizon, { run_at: Time.zone.now, priority: Delayed::HIGH_PRIORITY }, **convert_params)
+    render json: progress_json(progress, @current_user, session)
   end
 
-  def validate_entites(entities, validator, errors, error_key)
-    entities.active.each do |entity|
-      validator.validate(entity)
-      next if entity.errors.empty?
+  def revert_course
+    return unless authorized_action(@context, @current_user, :manage_courses_admin)
 
-      name = entity.respond_to?(:title) ? entity.title : entity.name
-      link = case error_key
-             when "assignments"
-               named_context_url(@context, :context_assignment_url, entity.id)
-             when "discussions"
-               named_context_url(@context, :context_discussion_topic_url, entity.id)
-             when "quizzes"
-               named_context_url(@context, :context_quiz_url, entity.id)
-             when "groups"
-               group_url(entity.id)
-             when "collaborations"
-               named_context_url(@context, :context_collaboration_url, entity.id)
-             when "outcomes"
-               named_context_url(@context, :context_outcome_url, entity.id)
-             else
-               nil
-             end
-      errors[error_key] ||= []
-      errors[error_key] << map_to_error_object(entity.id, name, link, entity.errors)
-    end
+    @context.update!(horizon_course: false)
+    render json: { success: true }
   end
 end
