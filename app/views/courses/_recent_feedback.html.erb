@@ -35,7 +35,8 @@
       assignment_id = parent_assignment.id
       parent_assignment_submission_for_user = parent_assignment.submission_for_student(recent_feedback.user) if parent_assignment
       comment = parent_assignment_submission_for_user.last_teacher_comment if parent_assignment_submission_for_user
-      num_replies = parent_assignment.discussion_topic.reply_to_entry_required_count || 1
+      discussion_topic = parent_assignment.discussion_topic || DiscussionTopic.find_by(old_assignment_id: parent_assignment.id)
+      num_replies = discussion_topic&.reply_to_entry_required_count || 1
       title = if assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC
                 t('%{title} Reply to Topic', {title:})
               elsif assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY
