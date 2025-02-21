@@ -24,13 +24,13 @@ import {Tooltip} from '@instructure/ui-tooltip'
 
 interface SummarizeButtonProps {
   onClick: () => void
-  showText: boolean
+  isMobile: boolean
 }
 
 const I18n = createI18nScope('discussions_posts')
 
 export const SummarizeButton: React.FC<SummarizeButtonProps> = props => {
-  const buttonText = I18n.t('Summarize')
+  const buttonText = I18n.t('Summarize Discussion')
   return (
     <Tooltip renderTip={buttonText} width="48px" data-testid="summarizeButtonTooltip">
       <Button
@@ -38,8 +38,9 @@ export const SummarizeButton: React.FC<SummarizeButtonProps> = props => {
         // TODO: choose a more appropriate AI icon as soon as it's available
         renderIcon={<IconSyllabusLine />}
         data-testid="summarize-button"
+        display={props.isMobile ? 'block' : 'inline-block'}
       >
-        {props.showText && buttonText}
+        {buttonText}
       </Button>
     </Tooltip>
   )

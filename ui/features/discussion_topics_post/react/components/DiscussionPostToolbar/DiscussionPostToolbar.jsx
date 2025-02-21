@@ -46,7 +46,6 @@ import {View} from '@instructure/ui-view'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
-import {SummarizeButton} from './SummarizeButton'
 import MoreMenuButton from './MoreMenuButton'
 import AiIcon from '@canvas/ai-icon'
 import {TranslationTriggerModal} from '../TranslationTriggerModal/TranslationTriggerModal'
@@ -315,14 +314,6 @@ export const DiscussionPostToolbar = props => {
                       />
                     </Flex.Item>
                   )}
-                  {ENV.user_can_summarize && !props.isSummaryEnabled && !isSpeedGraderInTopUrl && (
-                    <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                      <SummarizeButton
-                        onClick={props.onSummarizeClick}
-                        showText={!matches.includes('mobile')}
-                      />
-                    </Flex.Item>
-                  )}
                   {translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                       {renderMore()}
@@ -505,8 +496,6 @@ DiscussionPostToolbar.propTypes = {
   discussionAnonymousState: PropTypes.string,
   setUserSplitScreenPreference: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
-  onSummarizeClick: PropTypes.func,
-  isSummaryEnabled: PropTypes.bool,
   closeView: PropTypes.func,
   pointsPossible: PropTypes.number,
   manageAssignTo: PropTypes.bool,

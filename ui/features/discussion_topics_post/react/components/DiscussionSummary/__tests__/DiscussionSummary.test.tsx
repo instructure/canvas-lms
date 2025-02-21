@@ -18,28 +18,42 @@
 
 import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
-import {DiscussionSummary} from '../DiscussionSummary'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {DiscussionSummary, DiscussionSummaryProps} from '../DiscussionSummary'
+import {AlertManagerContext, AlertManagerContextType} from '@canvas/alerts/react/AlertManager'
 import {MockedProvider} from '@apollo/client/testing'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
-const setup = (props = {}) => {
-  const defaultProps = {
+declare const ENV: {
+  discussion_topic_id: string
+  context_id: string
+  context_type: string
+}
+
+const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
+  const defaultProps: DiscussionSummaryProps = {
     onDisableSummaryClick: jest.fn(),
-    breakpoints: {mobileOnly: false},
+    isMobile: false,
+    summary: null,
+    onSetSummary: jest.fn(),
+    isFeedbackLoading: false,
+    onSetIsFeedbackLoading: jest.fn(),
+    liked: false,
+    onSetLiked: jest.fn(),
+    disliked: false,
+    onSetDisliked: jest.fn(),
+    postDiscussionSummaryFeedback: jest.fn().mockResolvedValue(Promise.resolve()),
     ...props,
   }
 
   return render(
     <MockedProvider>
       <AlertManagerContext.Provider
-        // @ts-expect-error
-        value={{setOnFailure: props.setOnFailure || jest.fn(), setOnSuccess: jest.fn()}}
+      // @ts-expect-error
+      value={{setOnFailure: props.setOnFailure || jest.fn(), setOnSuccess: jest.fn()}}
       >
-        {/* @ts-expect-error */}
         <DiscussionSummary {...defaultProps} />
       </AlertManagerContext.Provider>
     </MockedProvider>,
@@ -47,6 +61,7 @@ const setup = (props = {}) => {
 }
 
 describe('DiscussionSummary', () => {
+  const expectedSummary = {id: 1, text: 'This is a discussion summary'}
   let oldEnv: GlobalEnv
 
   beforeEach(() => {
@@ -61,8 +76,7 @@ describe('DiscussionSummary', () => {
   })
 
   afterEach(() => {
-    // @ts-expect-error
-    doFetchApi.mockClear()
+    (doFetchApi as jest.Mock).mockClear()
   })
 
   afterAll(() => {
@@ -77,14 +91,12 @@ describe('DiscussionSummary', () => {
     })
 
     it('should display generic error message when there is an error', async () => {
-      // @ts-expect-error
-      doFetchApi.mockRejectedValue(new Error('Some error message'))
+      (doFetchApi as jest.Mock).mockRejectedValue(new Error('Some error message'))
 
       const {getByTestId} = setup()
 
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
-        // @ts-expect-error
         path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
         params: {userInput: ''},
       })
@@ -96,8 +108,7 @@ describe('DiscussionSummary', () => {
     })
 
     it('should display the response error message when there is an error', async () => {
-      // @ts-expect-error
-      doFetchApi.mockRejectedValue({
+      (doFetchApi as jest.Mock).mockRejectedValue({
         response: {
           json: async () => {
             return {error: 'Some error message.'}
@@ -109,7 +120,6 @@ describe('DiscussionSummary', () => {
 
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
-        // @ts-expect-error
         path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
         params: {userInput: ''},
       })
@@ -118,324 +128,182 @@ describe('DiscussionSummary', () => {
       })
     })
 
-    it('should render course discussion summary text when loaded', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({
-        json: {id: 1, text: 'This is a discussion summary'},
+    it('should reset and call setSummary with the loaded discussion summary in course context', async () => {
+      (doFetchApi as jest.Mock).mockResolvedValue({
+        json: expectedSummary,
       })
+      const setSummary = jest.fn()
+      setup({onSetSummary: setSummary})
 
-      const {getByTestId} = setup()
-
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'GET',
-        // @ts-expect-error
-        path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-        params: {userInput: ''},
-      })
+      expect(setSummary).toHaveBeenNthCalledWith(1, null)
       await waitFor(() => {
-        expect(getByTestId('summary-text')).toHaveTextContent('This is a discussion summary')
-      })
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'POST',
-        // @ts-expect-error
-        path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${
-          // @ts-expect-error
-          ENV.discussion_topic_id
-        }/summaries/${1}/feedback`,
-        body: {
-          _action: 'seen',
-        },
+        expect(setSummary).toHaveBeenNthCalledWith(2, expectedSummary)
       })
     })
 
-    it('should render group discussion summary text when loaded', async () => {
+    it('should render course discussion summary text when provided', async () => {
+      const {getByTestId} = setup({
+        summary: expectedSummary,
+      })
+
+      expect(getByTestId('summary-text')).toHaveTextContent(expectedSummary.text)
+    })
+
+    it('should call postDiscussionSummaryFeedback when summary is provided', async () => {
+      const postDiscussionSummaryFeedback = jest.fn()
+      setup({
+        summary: expectedSummary,
+        postDiscussionSummaryFeedback
+      })
+
+      expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('seen')
+    })
+
+    it('should reset and call setSummary with the loaded discussion summary with group context', async () => {
       window.ENV = {
         ...window.ENV,
         // @ts-expect-error
         context_type: 'Group',
-      }
-
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({
-        json: {id: 1, text: 'This is a discussion summary'},
+      };
+      (doFetchApi as jest.Mock).mockResolvedValue({
+        json: expectedSummary,
       })
+      const setSummary = jest.fn()
+      setup({onSetSummary: setSummary})
 
-      const {getByTestId} = setup()
-
+      expect(setSummary).toHaveBeenNthCalledWith(1, null)
+      await waitFor(() => {
+        expect(setSummary).toHaveBeenNthCalledWith(2, expectedSummary)
+      })
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
-        // @ts-expect-error
         path: `/api/v1/groups/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
         params: {userInput: ''},
       })
-      await waitFor(() => {
-        expect(getByTestId('summary-text')).toHaveTextContent('This is a discussion summary')
-      })
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'POST',
-        // @ts-expect-error
-        path: `/api/v1/groups/${ENV.context_id}/discussion_topics/${
-          // @ts-expect-error
-          ENV.discussion_topic_id
-        }/summaries/${1}/feedback`,
-        body: {
-          _action: 'seen',
-        },
-      })
     })
-  })
+   })
 
   describe('Interactions', () => {
     beforeEach(() => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({json: {id: 1, text: 'This is a discussion summary'}})
+      (doFetchApi as jest.Mock).mockResolvedValueOnce({json: expectedSummary})
     })
 
-    it('should disable summary when disable button is clicked', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({json: {liked: false, disliked: false}})
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({json: {liked: false, disliked: false}})
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({json: {success: true}})
-
-      const {getByTestId} = setup()
-
-      // @ts-expect-error
-      let disableButton
-      await waitFor(() => {
-        disableButton = getByTestId('summary-disable-button')
-      })
-      await waitFor(() => {
-        // @ts-expect-error
-        fireEvent.click(disableButton)
+    it('should call onDisableSummaryClick when disable button is clicked', async () => {
+      const onDisableSummaryClick = jest.fn()
+      const {getByTestId} = setup({
+        summary: expectedSummary,
+        onDisableSummaryClick: onDisableSummaryClick
       })
 
-      // @ts-expect-error
-      expect(doFetchApi.mock.calls).toEqual([
-        [
-          {
-            method: 'GET',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-            params: {userInput: ''},
-          },
-        ],
-        [
-          {
-            method: 'POST',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/1/feedback`,
-            body: {
-              _action: 'seen',
-            },
-          },
-        ],
-        [
-          {
-            method: 'POST',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/1/feedback`,
-            body: {
-              _action: 'disable_summary',
-            },
-          },
-        ],
-        [
-          {
-            method: 'PUT',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/disable`,
-          },
-        ],
-      ])
+      let disableButton: HTMLElement | null = null
+      await waitFor(() => {
+      disableButton = getByTestId('summary-disable-icon-button')
+      })
+      await waitFor(() => {
+        fireEvent.click(disableButton!)
+      })
+
+      expect(onDisableSummaryClick).toHaveBeenCalled()
     })
 
-    it('should generate summary for user input when generate button is clicked', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({json: {liked: false, disliked: false}})
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({
-        json: {id: 2, text: 'This is some other discussion summary'},
+    it('should call fetchSummary with correct parameters when generate button is clicked', async () => {
+      const {getByTestId} = setup({
+        summary: expectedSummary,
       })
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({json: {liked: false, disliked: false}})
 
-      const {getByTestId} = setup()
-
-      // @ts-expect-error
-      let generateButton, userInput
+      let generateButton: HTMLElement | null = null
+      let userInput: HTMLElement | null = null
       await waitFor(() => {
         generateButton = getByTestId('summary-generate-button')
         userInput = getByTestId('summary-user-input')
       })
       await waitFor(() => {
-        // @ts-expect-error
-        fireEvent.change(userInput, {target: {value: 'focus on student feedback'}})
+        fireEvent.change(userInput!, {target: {value: 'focus on student feedback'}})
       })
       await waitFor(() => {
-        // @ts-expect-error
-        fireEvent.click(generateButton)
+        fireEvent.click(generateButton!)
       })
 
-      // @ts-expect-error
-      expect(doFetchApi.mock.calls).toEqual([
-        [
-          {
-            method: 'GET',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-            params: {userInput: ''},
-          },
-        ],
-        [
-          {
-            method: 'POST',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/1/feedback`,
-            body: {
-              _action: 'seen',
-            },
-          },
-        ],
-        [
-          {
-            method: 'GET',
-            params: {userInput: 'focus on student feedback'},
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-          },
-        ],
-        [
-          {
-            method: 'POST',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/2/feedback`,
-            body: {
-              _action: 'seen',
-            },
-          },
-        ],
-      ])
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'GET',
+        path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+        params: {userInput: 'focus on student feedback'},
+      })
     })
 
-    it('should toggle like state when like/dislike button is clicked', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({json: {liked: false, disliked: false}})
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({json: {liked: true, disliked: false}})
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({json: {liked: false, disliked: true}})
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({json: {liked: false, disliked: false}})
+    it('should call postDiscussionSummaryFeedback with like when like button is clicked', async () => {
+      (doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: false}});
+      (doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: true, disliked: false}})
 
-      const {getByTestId} = setup()
-
-      // @ts-expect-error
-      let likeButton, dislikeButton
+      const setLiked = jest.fn()
+      const postDiscussionSummaryFeedback = jest.fn()
+      const {getByTestId} = setup({
+        summary: expectedSummary,
+        postDiscussionSummaryFeedback,
+        liked: false,
+        disliked: false,
+        onSetLiked: setLiked,
+      })
+      let likeButton: HTMLElement | null = null
       await waitFor(() => {
         likeButton = getByTestId('summary-like-button')
+      })
+      await waitFor(() => {
+        fireEvent.click(likeButton!)
+      })
+
+      expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('seen')
+      expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('like')
+    })
+
+    it('should call postDiscussionSummaryFeedback with dislike when dislike button is clicked', async () => {
+      (doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: false}});
+      (doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: true}})
+
+      const setDisliked = jest.fn()
+      const postDiscussionSummaryFeedback = jest.fn()
+      const {getByTestId} = setup({
+        summary: expectedSummary,
+        postDiscussionSummaryFeedback,
+        liked: false,
+        disliked: false,
+        onSetDisliked: setDisliked,
+      })
+      let dislikeButton: HTMLElement | null = null
+      await waitFor(() => {
         dislikeButton = getByTestId('summary-dislike-button')
       })
       await waitFor(() => {
-        // @ts-expect-error
-        fireEvent.click(likeButton)
-      })
-      await waitFor(() => {
-        // @ts-expect-error
-        fireEvent.click(dislikeButton)
-      })
-      await waitFor(() => {
-        // @ts-expect-error
-        fireEvent.click(dislikeButton)
+        fireEvent.click(dislikeButton!)
       })
 
-      // @ts-expect-error
-      expect(doFetchApi.mock.calls).toEqual([
-        [
-          {
-            method: 'GET',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-            params: {userInput: ''},
-          },
-        ],
-        [
-          {
-            method: 'POST',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/1/feedback`,
-            body: {
-              _action: 'seen',
-            },
-          },
-        ],
-        [
-          {
-            method: 'POST',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/1/feedback`,
-            body: {
-              _action: 'like',
-            },
-          },
-        ],
-        [
-          {
-            method: 'POST',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/1/feedback`,
-            body: {
-              _action: 'dislike',
-            },
-          },
-        ],
-        [
-          {
-            method: 'POST',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/1/feedback`,
-            body: {
-              _action: 'reset_like',
-            },
-          },
-        ],
-      ])
+      expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('seen')
+      expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('dislike')
     })
 
-    it('should handle feedback submission failure', async () => {
-      // @ts-expect-error
-      doFetchApi.mockRejectedValue(new Error('Some error message'))
+    it('should call postDiscussionSummaryFeedback with reset_like when dislike is true and dislike button is clicked', async () => {
+      (doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: true}});
+      (doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: false}})
 
-      const setOnFailure = jest.fn()
-      setup({setOnFailure})
+      const setDisliked = jest.fn()
+      const postDiscussionSummaryFeedback = jest.fn()
+      const {getByTestId} = setup({
+        summary: expectedSummary,
+        postDiscussionSummaryFeedback,
+        liked: false,
+        disliked: true,
+        onSetDisliked: setDisliked,
+      })
+      let dislikeButton: HTMLElement | null = null
+      await waitFor(() => {
+        dislikeButton = getByTestId('summary-dislike-button')
+      })
+      await waitFor(() => {
+        fireEvent.click(dislikeButton!)
+      })
 
-      await waitFor(() => {})
-
-      // @ts-expect-error
-      expect(doFetchApi.mock.calls).toEqual([
-        [
-          {
-            method: 'GET',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-            params: {userInput: ''},
-          },
-        ],
-        [
-          {
-            method: 'POST',
-            // @ts-expect-error
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/1/feedback`,
-            body: {
-              _action: 'seen',
-            },
-          },
-        ],
-      ])
-      expect(setOnFailure).toHaveBeenCalledWith(
-        'There was an unexpected error while submitting the discussion summary feedback.',
-      )
+      expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('seen')
+      expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('reset_like')
     })
   })
 })
