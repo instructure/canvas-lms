@@ -874,6 +874,25 @@
 #       }
 #     }
 #
+# @model ListLtiRegistrationsResponse
+#     {
+#       "id": "ListLtiRegistrationsResponse",
+#       "description": "The response for the List LTI Registrations API endpoint",
+#       "properties": {
+#         "total": {
+#           "description": "The total number of LTI registrations across all pages",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "data": {
+#           "description": "The paginated list of LTI::Registrations",
+#           "example": [{ "$ref": "Lti::Registration" }],
+#           "type": "array",
+#           "items": { "$ref": "Lti::Registration" }
+#         }
+#       }
+#     }
+#
 class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
@@ -932,7 +951,7 @@ class Lti::RegistrationsController < ApplicationController
   #   "overlaid_configuration":: the registration's Canvas-style tool configuration, with all overlays applied.
   #   "overlay":: the registration's admin-defined configuration overlay
   #
-  # @returns {"total": "integer", data: [Lti::Registration] }
+  # @returns ListLtiRegistrationsResponse
   #
   # @example_request
   #
