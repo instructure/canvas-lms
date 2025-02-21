@@ -62,6 +62,7 @@ export interface CoursePaceItem {
   readonly submittable: boolean
   readonly submitted_at?: string | null
   readonly assignment_id?: string | null
+  readonly unreleased?: boolean | null
   compressed_due_date?: string
 }
 

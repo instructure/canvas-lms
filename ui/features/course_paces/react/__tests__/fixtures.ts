@@ -158,6 +158,21 @@ export const PACE_ITEM_3: CoursePaceItem = {
   submitted_at: null,
 }
 
+export const PACE_ITEM_4: CoursePaceItem = {
+  id: '53',
+  duration: 3,
+  assignment_title: 'Composite sociology',
+  assignment_link: `/courses/${COURSE.id}/modules/items/53`,
+  points_possible: 1,
+  position: 1,
+  module_item_id: '62',
+  module_item_type: 'Quiz',
+  published: true,
+  submittable: true,
+  submitted_at: null,
+  unreleased: true
+}
+
 export const PACE_MODULE_1: Module = {
   id: '40',
   name: 'How 2 B A H4CK32',
@@ -170,6 +185,13 @@ export const PACE_MODULE_2: Module = {
   name: 'Intro to Corporate Espionage',
   position: 2,
   items: [PACE_ITEM_3],
+}
+
+export const PACE_MODULE_3: Module = {
+  id: '46',
+  name: 'Conditionally Released Items',
+  position: 3,
+  items: [PACE_ITEM_4],
 }
 
 export const EXCLUDE_WEEKENDS_WORK_WEEK_DAYS = ['mon', 'tue', 'wed', 'thu', 'fri']
@@ -412,6 +434,27 @@ export const STUDENT_PACE: CoursePace = {
   workflow_state: 'active',
   exclude_weekends: true,
   modules: [PACE_MODULE_1, PACE_MODULE_2],
+  // @ts-expect-error
+  course: undefined,
+  compressed_due_dates: undefined,
+  updated_at: '',
+  assignments_weighting: ASSIGNMENT_WEIGHTING,
+}
+
+export const STUDENT_PACE_UNRELEASED_ITEMS: CoursePace = {
+  id: '4',
+  course_id: COURSE.id,
+  course_section_id: undefined,
+  user_id: ENROLLMENT_1.user_id,
+  context_type: 'Enrollment',
+  context_id: ENROLLMENT_1.user_id,
+  start_date: '2021-10-01',
+  start_date_context: 'user',
+  end_date: '2021-12-15',
+  end_date_context: 'user',
+  workflow_state: 'active',
+  exclude_weekends: true,
+  modules: [PACE_MODULE_1, PACE_MODULE_2, PACE_MODULE_3],
   // @ts-expect-error
   course: undefined,
   compressed_due_dates: undefined,

@@ -67,6 +67,7 @@ import PaceModalStats from './stats'
 import { generateModalLauncherId } from '../../utils/utils'
 import TimeSelection from './TimeSelection'
 import WeightedAssignmentsTray from '../header/settings/WeightedAssignmentsTray'
+import { Alert } from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('course_paces_modal')
 
@@ -164,6 +165,18 @@ export const PaceModal = ({
     }
   }
 
+  const renderMasteryPathWarning = () => {
+    if (!ENV.FEATURES.course_pace_pacing_with_mastery_paths || !ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
+      return null
+    }
+    return (
+      <Alert variant="warning" margin="small">
+        All assignments in any Mastery Path are not assigned to all students.
+        As a student progresses through any Mastery Path, assignments will be assigned based on a student&apos;s performance.
+      </Alert>
+    )
+  }
+
   const headerSection = window.ENV.FEATURES.course_pace_time_selection ? (
     <TimeSelection
       coursePace={props.coursePace}
@@ -231,6 +244,7 @@ export const PaceModal = ({
               paceContext={props.selectedPaceContext}
               contextName={props.paceName}
             />
+            {renderMasteryPathWarning()}
             {headerSection}
             <Body />
             <Tray

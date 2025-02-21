@@ -202,8 +202,56 @@ class CoursePacePresenter
     module_item_ids = extract_module_item_ids(items)
     content_tags, module_item_to_assignment = load_and_assign_content_tags(module_item_ids)
     submission_statuses = course_pace.module_item_submission_status_by_student([course_pace.user_id], module_item_ids)
+    unreleased_statuses = unreleased_item_statuses(items)
 
-    build_items_json(items, content_tags, module_item_to_assignment, submission_statuses)
+    build_items_json(items, content_tags, module_item_to_assignment, submission_statuses, unreleased_statuses)
+  end
+
+  def unreleased_item_statuses(items)
+    return {} unless course_pace.course.root_account.feature_enabled?(:course_pace_pacing_with_mastery_paths)
+    return {} unless course_pace.user_id
+
+    module_item_assignments = {}
+    module_item_quizzes = {}
+    module_item_pages = {}
+    module_item_discussions = {}
+
+    ContentTag.where(id: items.pluck(:module_item_id)).find_each do |module_item|
+      case module_item.content_type
+      when "Assignment"
+        module_item_assignments[module_item.content_id] = module_item.id
+      when "Quizzes::Quiz"
+        module_item_quizzes[module_item.content_id] = module_item.id
+      when "WikiPage"
+        module_item_pages[module_item.content_id] = module_item.id
+      when "DiscussionTopic"
+        module_item_discussions[module_item.content_id] = module_item.id
+      end
+    end
+
+    statuses = {}
+
+    visible_assignment_ids = DifferentiableAssignment.scope_filter(Assignment.where(id: module_item_assignments.keys), course_pace.user, course_pace.course).pluck(:id)
+    (module_item_assignments.keys - visible_assignment_ids).each do |unreleased_assignment_id|
+      statuses[module_item_assignments[unreleased_assignment_id]] = true
+    end
+
+    visible_quiz_ids = DifferentiableAssignment.scope_filter(Quizzes::Quiz.where(id: module_item_quizzes.keys), course_pace.user, course_pace.course).pluck(:id)
+    (module_item_quizzes.keys - visible_quiz_ids).each do |unreleased_quiz_id|
+      statuses[module_item_quizzes[unreleased_quiz_id]] = true
+    end
+
+    visible_page_ids = DifferentiableAssignment.scope_filter(WikiPage.where(id: module_item_pages.keys), course_pace.user, course_pace.course).pluck(:id)
+    (module_item_pages.keys - visible_page_ids).each do |unreleased_page_id|
+      statuses[module_item_pages[unreleased_page_id]] = true
+    end
+
+    visible_discussion_ids = DifferentiableAssignment.scope_filter(DiscussionTopic.where(id: module_item_discussions.keys), course_pace.user, course_pace.course).pluck(:id)
+    (module_item_discussions.keys - visible_discussion_ids).each do |unreleased_discussion_id|
+      statuses[module_item_discussions[unreleased_discussion_id]] = true
+    end
+
+    statuses
   end
 
   def extract_module_item_ids(items)
@@ -235,7 +283,7 @@ class CoursePacePresenter
     [content_tags, module_item_to_assignment]
   end
 
-  def build_items_json(items, content_tags, module_item_to_assignment, submission_statuses)
+  def build_items_json(items, content_tags, module_item_to_assignment, submission_statuses, unreleased_statuses)
     items.map do |ppmi|
       module_item = ppmi.module_item
       submission_status = submission_statuses[course_pace.user_id][module_item.id] || { has_submission: false, submission_date: nil, submittable: false }
@@ -255,7 +303,8 @@ class CoursePacePresenter
         module_item_type: module_item.content_type,
         published: module_item.published?,
         submitted_at: submission_status[:submission_date],
-        submittable: submission_status[:submittable]
+        submittable: submission_status[:submittable],
+        unreleased: unreleased_statuses[module_item.id]
       }
     end
   end
