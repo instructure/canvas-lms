@@ -1038,7 +1038,6 @@ describe ExternalToolsController, type: :request do
       "id" => et&.id,
       "not_selectable" => et&.not_selectable,
       "workflow_state" => "public",
-      "vendor_help_link" => nil,
       "version" => "1.1",
       "unified_tool_id" => "utid_12345",
       "deployment_id" => et&.deployment_id,

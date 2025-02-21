@@ -74,7 +74,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   # add_identity_hash needs to calculate off of other data in the object, so it
   # should always be the last field change callback to run
-  before_save :infer_defaults, :validate_vendor_help_link, :add_identity_hash
+  before_save :infer_defaults, :add_identity_hash
   after_save :touch_context, :check_global_navigation_cache, :clear_tool_domain_cache
   after_commit :update_unified_tool_id, if: :update_unified_tool_id?
   validate :check_for_xml_error
@@ -555,25 +555,6 @@ class ContextExternalTool < ActiveRecord::Base
     (settings[:custom_fields] || {}).map do |key, val|
       "#{key}=#{val}"
     end.sort.join("\n")
-  end
-
-  def vendor_help_link
-    settings[:vendor_help_link]
-  end
-
-  def vendor_help_link=(val)
-    settings[:vendor_help_link] = val
-  end
-
-  def validate_vendor_help_link
-    return if vendor_help_link.blank?
-
-    begin
-      _value, uri = CanvasHttp.validate_url(vendor_help_link)
-      self.vendor_help_link = uri.to_s
-    rescue URI::Error, ArgumentError
-      self.vendor_help_link = nil
-    end
   end
 
   def config_type=(val)
