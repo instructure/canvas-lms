@@ -42,7 +42,13 @@ const TagInfo: React.FC<TagInfoProps> = ({tags, onEdit}) => {
       <Flex direction="column" margin="small 0 0 0">
         <Flex.Item overflowX="visible" overflowY="visible">
           <Text size="small">
-            <Link href="#" margin="small 0 0 0" as="button" onClick={onEdit}>
+            <Link
+              href="#"
+              margin="small 0 0 0"
+              as="button"
+              onClick={onEdit}
+              aria-label={I18n.t('Add a variant to the tag')}
+            >
               {I18n.t('+ Add a variant')}
             </Link>
           </Text>
@@ -96,7 +102,13 @@ const TagInfo: React.FC<TagInfoProps> = ({tags, onEdit}) => {
         </Flex.Item>
         <Flex.Item overflowX="visible" overflowY="visible">
           <Text size="small">
-            <Link href="#" margin="small 0 0 0" as="button" onClick={onEdit}>
+            <Link
+              href="#"
+              margin="small 0 0 0"
+              as="button"
+              onClick={onEdit}
+              aria-label={I18n.t('Add a variant to the tag')}
+            >
               {I18n.t('+ Add a variant')}
             </Link>
           </Text>
