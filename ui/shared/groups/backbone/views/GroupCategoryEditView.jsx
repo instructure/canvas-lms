@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import numberHelper from '@canvas/i18n/numberHelper'
 import {createRoot} from 'react-dom/client'
 import {extend} from '@canvas/backbone/utils'
 import {extend as lodashExtend} from 'lodash'
@@ -25,14 +26,18 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import template from '../../jst/groupCategoryEdit.handlebars'
-import h from '@instructure/html-escape'
 import SelfSignupEndDate from '../../react/CreateOrEditSetModal/SelfSignupEndDate'
+import GroupLimitInput from '../../react/GroupLimitInput'
+import GroupSetNameInput from '../../react/GroupSetNameInput'
 
 const I18n = createI18nScope('groups')
 
 extend(GroupCategoryEditView, DialogFormView)
 
 function GroupCategoryEditView() {
+  this.groupSetNameInputRoot = null
+  this.groupLimitInputRoot = null
+  this.shouldShowEmptyNameError = false
   return GroupCategoryEditView.__super__.constructor.apply(this, arguments)
 }
 
@@ -64,6 +69,30 @@ GroupCategoryEditView.prototype.events = lodashExtend({}, DialogFormView.prototy
   'click .auto-group-leader-toggle': 'toggleAutoGroupLeader',
 })
 
+GroupCategoryEditView.prototype.renderGroupLimitInput = function () {
+  const groupSetNameInputContainer = document.getElementById(`group_set_${this.model.id}_name_input_container`)
+  if (groupSetNameInputContainer) {
+    const getShouldShowEmptyNameError = () => this.shouldShowEmptyNameError
+    const setShouldShowEmptyNameError = (shouldShow) => { this.shouldShowEmptyNameError = shouldShow }
+    const root = this.groupSetNameInputRoot ?? createRoot(groupSetNameInputContainer)
+    root.render(
+      <GroupSetNameInput
+        id={this.model.id}
+        initialValue={groupSetNameInputContainer.dataset.value}
+        getShouldShowEmptyNameError={getShouldShowEmptyNameError}
+        setShouldShowEmptyNameError={setShouldShowEmptyNameError}
+      />
+    )
+  }
+  const groupLimitContainer = document.getElementById(`group_limit_input_container_${this.model.id}`)
+  if (groupLimitContainer) {
+    const root = this.groupLimitInputRoot ?? createRoot(groupLimitContainer)
+    root.render(
+      <GroupLimitInput initialValue={groupLimitContainer.dataset.value} />
+    )
+  }
+}
+
 GroupCategoryEditView.prototype.onSaveSuccess = function () {
   this.shouldKeepNewDate = true
   GroupCategoryEditView.__super__.onSaveSuccess.apply(this, arguments)
@@ -79,6 +108,7 @@ GroupCategoryEditView.prototype.close = function (event) {
 }
 
 GroupCategoryEditView.prototype.afterRender = function () {
+  this.renderGroupLimitInput()
   this.toggleSelfSignup()
   this.toggleAutoGroupLeader()
   return this.setAutoLeadershipFormState()
@@ -136,16 +166,48 @@ GroupCategoryEditView.prototype.toggleSelfSignup = function () {
   return this.$selfSignupControls.find(':input').prop('disabled', disabled)
 }
 
-GroupCategoryEditView.prototype.validateFormData = function (_data, _errors) {
-  const groupLimit = this.$('[name=group_limit]')
-  if (groupLimit.length && !groupLimit[0].validity.valid) {
-    return {
-      group_limit: [
+GroupCategoryEditView.prototype.validateFormData = function (data, _errors) {
+  const errors = {}
+  if (!data.name) {
+    this.shouldShowEmptyNameError = true
+    errors.name = [
+      {
+        message: I18n.t('group_set_name_required', 'Name is required')
+      },
+    ]
+  } else {
+    if (data.name.length > 255) {
+      errors.name = [
         {
-          message: I18n.t('group_limit_number', 'Group limit must be a number'),
+          message: I18n.t('group_set_name_length', 'Name must be 255 characters or less')
         },
-      ],
+      ]
     }
+  }
+
+  if (data.group_limit !== '') {
+    const groupLimitValue = Number(data.group_limit)
+    if (Number.isNaN(groupLimitValue) || !Number.isInteger(groupLimitValue)) {
+      errors.group_limit = [
+        {
+          message: I18n.t('group_limit_number', 'Value must be a whole number'),
+        },
+      ]
+    } else if (numberHelper.parse(groupLimitValue) < 2) {
+      errors.group_limit = [
+        {
+          message: I18n.t('group_limit_min', 'Value must be greater than or equal to 2'),
+        },
+      ]
+    }
+  }
+
+  return errors
+}
+
+GroupCategoryEditView.prototype.showErrors = function (errors) {
+  if (errors.name) {
+    document.getElementById(`category_${this.model.id}_name`)?.focus()
   }
 }
 
@@ -160,11 +222,7 @@ GroupCategoryEditView.prototype.toJSON = function () {
     json,
     {
       enable_self_signup: json.self_signup,
-      restrict_self_signup: json.self_signup === 'restricted',
-      group_limit:
-        '<input name="group_limit"\n        type="number"\n        min="2"\n        class="input-micro"\n        value="' +
-        h((ref = json.group_limit) != null ? ref : '') +
-        '">',
+      restrict_self_signup: json.self_signup === 'restricted'
     },
   )
 }
