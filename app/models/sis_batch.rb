@@ -30,7 +30,7 @@ class SisBatch < ActiveRecord::Base
   belongs_to :errors_attachment, class_name: "Attachment"
   has_many :parallel_importers, inverse_of: :sis_batch
   has_many :sis_batch_errors, inverse_of: :sis_batch, autosave: false
-  has_many :roll_back_data, inverse_of: :sis_batch, class_name: "SisBatchRollBackData", autosave: false
+  has_many :roll_back_data, inverse_of: :sis_batch, class_name: "SisBatchRollBackData", autosave: false, dependent: :destroy
   has_many :progresses, inverse_of: :sis_batch
   belongs_to :generated_diff, class_name: "Attachment"
   belongs_to :batch_mode_term, class_name: "EnrollmentTerm"
