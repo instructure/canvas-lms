@@ -100,13 +100,15 @@ export default function CanvasStudioPlayer({
 
   const containerRef = useRef<any>(null)
 
+  function isEmbedded(): boolean {
+    return window.frameElement?.tagName === 'IFRAME' ||
+           window.location !== window?.top?.location ||
+           !containerRef.current
+  }
+
   const boundingBox = useCallback(() => {
     const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement
-    const isEmbedded =
-      window.frameElement?.tagName === 'IFRAME' ||
-      window.location !== window?.top?.location ||
-      !containerRef.current
-    if (isFullscreen || isEmbedded) {
+    if (isFullscreen || isEmbedded()) {
       return {
         width: window.innerWidth,
         height: window.innerHeight,
@@ -122,12 +124,25 @@ export default function CanvasStudioPlayer({
 
   const handlePlayerSize = useCallback(
     (_event: any) => {
-      const player = window.document.body.querySelector('video')
-      const {width, height} = sizeMediaPlayer(player, type, boundingBox())
-      setContainerHeight(height)
-      setContainerWidth(width)
+      const updateContainerSize = (width: number, height: number) => {
+        setContainerWidth(width)
+        setContainerHeight(height)
+      }
+
+      const boundingBoxDimensions = boundingBox()
+
+      if (isEmbedded()) {
+        updateContainerSize(boundingBoxDimensions.width, boundingBoxDimensions.height)
+      } else if (mediaSources.length) {
+        const player = {
+          videoHeight: mediaSources[0].height,
+          videoWidth: mediaSources[0].width,
+        }
+        const { width, height } = sizeMediaPlayer(player, type, boundingBoxDimensions)
+        updateContainerSize(width, height)
+      }
     },
-    [type, boundingBox],
+    [type, boundingBox, mediaSources],
   )
 
   const fetchSources = useCallback(
@@ -257,15 +272,7 @@ export default function CanvasStudioPlayer({
   }
 
   useEffect(() => {
-    if (mediaSources.length) {
-      const player = {
-        videoHeight: mediaSources[0].height,
-        videoWidth: mediaSources[0].width,
-      }
-      const {width, height} = sizeMediaPlayer(player, type, boundingBox())
-      setContainerWidth(width)
-      setContainerHeight(height)
-    }
+    handlePlayerSize({})
   }, [mediaSources, type, boundingBox])
 
   return (
