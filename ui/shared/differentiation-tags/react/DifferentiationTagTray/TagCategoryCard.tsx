@@ -77,6 +77,7 @@ function TagCategoryCard({category, onEditCategory}: TagCategoryCardProps) {
                 withBorder={false}
                 screenReaderLabel={I18n.t('Edit')}
                 onClick={handleEdit}
+                aria-label={I18n.t('Edit tag set: %{name}', {name})}
               >
                 <IconEditLine />
               </IconButton>
