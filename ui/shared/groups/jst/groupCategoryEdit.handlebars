@@ -1,9 +1,11 @@
 <div class="form-dialog-content pad-box form-inline group-category-edit">
   <fieldset class="pad-box{{#if ENV.allow_self_signup}} dotted-separator{{/if}}">
-    <label>
-      {{#t "group_set_name"}}Group Set Name{{/t}} &nbsp;
-      <input type="text" id="category_{{id}}_name" name="name" value="{{name}}">
-    </label>
+    <div style="display:flex;flex-direction:row;align-items:center">
+      <label>
+        {{#t "group_set_name"}}Group Set Name{{/t}} &nbsp;
+      </label>
+      <div id="group_set_{{id}}_name_input_container" data-value="{{name}}"></div>
+    </div>
   </fieldset>
   {{#if ENV.allow_self_signup}}
   <fieldset class="pad-box dotted-separator">
@@ -22,14 +24,7 @@
         </label>
       </div>
       <div class="control-group">
-        <label>
-          {{#t "limit_group_size"}}
-            Limit groups to {{{group_limit}}} members
-          {{/t}}
-        </label>
-        <span class="hint-text">
-          ({{#t "leave_group_limit_blank"}}Leave blank for no limit{{/t}})
-        </span>
+        <div id="group_limit_input_container_{{id}}" data-value={{group_limit}}></div>
         <div>
           <strong>
             <em>
