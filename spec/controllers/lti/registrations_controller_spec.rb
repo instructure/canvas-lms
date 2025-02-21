@@ -95,6 +95,12 @@ RSpec.describe Lti::RegistrationsController do
       expect(assigns.dig(:js_env, :dynamicRegistrationUrl)).to be_nil
     end
 
+    it "sets canvas_apps_lti_usage_url in ENV to null if it's not present in DynamicSettings" do
+      DynamicSettings.fallback_data = { config: { canvas: { lti: {} } } }.deep_stringify_keys
+      get :index, params: { account_id: account.id }
+      expect(assigns.dig(:js_env, :canvasAppsLtiUsageUrl)).to be_nil
+    end
+
     context "with temp_dr_url" do
       let(:temp_dr_url) { "http://example.com" }
 
@@ -106,6 +112,19 @@ RSpec.describe Lti::RegistrationsController do
       it "sets temp_dr_url in ENV" do
         get :index, params: { account_id: account.id }
         expect(assigns.dig(:js_env, :dynamicRegistrationUrl)).to eq(temp_dr_url)
+      end
+    end
+
+    context "with canvas_apps_lti_usage_url" do
+      let(:canvas_apps_lti_usage_url) { "http://example.com" }
+
+      before do
+        DynamicSettings.fallback_data = { config: { canvas: { lti: { canvas_apps_lti_usage_url: canvas_apps_lti_usage_url } } } }.deep_stringify_keys
+      end
+
+      it "sets canvas_apps_lti_usage_url in ENV" do
+        get :index, params: { account_id: account.id }
+        expect(assigns.dig(:js_env, :canvasAppsLtiUsageUrl)).to eq(canvas_apps_lti_usage_url)
       end
     end
   end

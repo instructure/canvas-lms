@@ -923,6 +923,10 @@ class Lti::RegistrationsController < ApplicationController
              })
     end
 
+    js_env({
+             canvasAppsLtiUsageUrl: DynamicSettings.find("lti")["canvas_apps_lti_usage_url"] || nil
+           })
+
     render :index
   end
 
