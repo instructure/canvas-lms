@@ -74,31 +74,6 @@ describe('DirectShareUserModal', () => {
     fireEvent.click(getByText(name))
   }
 
-  it('disables the send button immediately', () => {
-    const {getByText} = render(<DirectShareUserModal open={true} courseId="1" />)
-    expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
-  })
-
-  it('enables the send button only when a user is selected UNDER TEST', async () => {
-    const {getByText, getAllByText, findByLabelText} = render(
-      <DirectShareUserModal open={true} courseId="1" />,
-    )
-    await selectUser(getByText, findByLabelText)
-    expect(getByText('Send').closest('button').getAttribute('disabled')).toBe(null)
-    // remove the selected user from the list
-    fireEvent.click(getAllByText('abc')[0])
-    expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
-  })
-
-  it('disables the send button when a search has started UNDER TEST', async () => {
-    const {getByText, findByLabelText} = render(
-      <DirectShareUserModal open={true} courseId="1" onDismiss={Function.prototype} />,
-    )
-    await selectUser(getByText, findByLabelText)
-    fireEvent.click(getByText('Send'))
-    expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
-  })
-
   it('starts a share operation and reports status UNDER TEST', async () => {
     fetchMock.postOnce('path:/api/v1/users/self/content_shares', 200)
     const onDismiss = jest.fn()
@@ -159,6 +134,62 @@ describe('DirectShareUserModal', () => {
       await act(() => fetchMock.flush(true))
       expect(getByText(/error/i)).toBeInTheDocument()
       expect(getByText('Send').closest('button').getAttribute('disabled')).toBeNull()
+    })
+  })
+
+  describe('Validation call to action', () => {
+    describe('when the feature flag is enabled', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES = {validate_call_to_action: true}
+      })
+
+      it('does not disable the send button immediately', () => {
+        const {getByText} = render(<DirectShareUserModal open={true} courseId="1" />)
+        expect(getByText('Send').closest('button').getAttribute('disabled')).toBeNull()
+      })
+
+      it('displays an error message when no user is selected', async () => {
+        const {getByText} = render(<DirectShareUserModal open={true} courseId="1" />)
+        fireEvent.click(getByText('Send'))
+        expect(getByText('You must select at least one user')).toBeInTheDocument()
+      })
+
+      it('disables the send button when a search has started UNDER TEST', async () => {
+        const {getByText, findByLabelText} = render(
+          <DirectShareUserModal open={true} courseId="1" onDismiss={Function.prototype} />,
+        )
+        await selectUser(getByText, findByLabelText)
+        fireEvent.click(getByText('Send'))
+        expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
+      })
+
+      it('focuses on user select after error', () => {
+        const {getByText, getByLabelText} = render(<DirectShareUserModal open={true} courseId="1" />)
+        fireEvent.click(getByText('Send'))
+        expect(getByLabelText(/send to:/i)).toHaveFocus()
+      })
+    })
+
+    describe('when the feature flag is disabled', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES = {validate_call_to_action: false}
+      })
+
+      it('disables the send button immediately', () => {
+        const {getByText} = render(<DirectShareUserModal open={true} courseId="1" />)
+        expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
+      })
+
+      it('enables the send button only when a user is selected UNDER TEST', async () => {
+        const {getByText, getAllByText, findByLabelText} = render(
+          <DirectShareUserModal open={true} courseId="1" />,
+        )
+        await selectUser(getByText, findByLabelText)
+        expect(getByText('Send').closest('button').getAttribute('disabled')).toBe(null)
+        // remove the selected user from the list
+        fireEvent.click(getAllByText('abc')[0])
+        expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
+      })
     })
   })
 })
