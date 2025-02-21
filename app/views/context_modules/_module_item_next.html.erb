@@ -72,7 +72,7 @@
     <%= 'dupeable' if module_item&.duplicate_able? %>
   "
 >
-  <div class="ig-row <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' if @is_student %>">
+  <div class="ig-row <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' if @is_student %> no-estimated-duration">
     <% if @can_edit || module_item.nil? %>
     <div aria-hidden="true" class="ig-handle">
       <span
