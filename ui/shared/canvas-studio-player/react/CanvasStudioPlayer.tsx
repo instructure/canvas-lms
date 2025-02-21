@@ -18,12 +18,13 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator, sizeMediaPlayer} from '@instructure/canvas-media'
-import {StudioPlayer} from '@instructure/studio-player'
+import {CaptionMetaData, StudioPlayer} from '@instructure/studio-player'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import {type MediaTrack} from 'api'
 
 declare const ENV: GlobalEnv & {
   locale?: string
@@ -48,7 +49,7 @@ interface CanvasStudioPlayerProps {
   media_id: string
   // TODO: we've asked studio to export definitions for PlayerSrc and CaptionMetaData
   media_sources?: any[]
-  media_tracks?: any[]
+  media_tracks?: MediaTrack[]
   type?: 'audio' | 'video'
   MAX_RETRY_ATTEMPTS?: number
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS?: number
@@ -63,7 +64,7 @@ interface CanvasStudioPlayerProps {
 export default function CanvasStudioPlayer({
   media_id,
   media_sources = [],
-  media_tracks,
+  media_tracks: media_captions,
   type = 'video',
   MAX_RETRY_ATTEMPTS = DEFAULT_MAX_RETRY_ATTEMPTS,
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS = DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS,
@@ -74,17 +75,16 @@ export default function CanvasStudioPlayer({
   const sorted_sources = Array.isArray(media_sources)
     ? media_sources.sort(byBitrate)
     : media_sources
-  const tracks = Array.isArray(media_tracks)
-    ? media_tracks.map(t => ({
-        locale: t.language,
-        language: t.label,
-        inherited: t.inherited,
-        label: t.label,
-        src: t.src,
+  const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
+    ? media_captions.map(t => ({
+        src: t.src || '',
+        label: t.label || '',
+        language: t.language || '',
+        type: t.type === 'vtt' ? 'vtt' : 'srt',
       }))
     : undefined
   const [mediaSources, setMediaSources] = useState(sorted_sources)
-  const [mediaTracks] = useState(tracks)
+  const [mediaCaptions] = useState(captions)
   const [retryAttempt, setRetryAttempt] = useState(0)
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
   const [containerWidth, setContainerWidth] = useState(0)
@@ -279,12 +279,12 @@ export default function CanvasStudioPlayer({
     <div
       style={{height: containerHeight, width: containerWidth}}
       ref={containerRef}
-      data-tracks={JSON.stringify(mediaTracks)}
+      data-captions={JSON.stringify(mediaCaptions)}
     >
       {mediaSources.length ? (
         <StudioPlayer
           src={mediaSources}
-          captions={mediaTracks}
+          captions={mediaCaptions}
           hideFullScreen={!includeFullscreen}
           title={getAriaLabel()}
         />
