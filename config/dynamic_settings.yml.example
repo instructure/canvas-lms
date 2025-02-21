@@ -49,6 +49,7 @@ development:
         internal_tool_domain_allowlist:
           - 'docker'
           - 'localhost'
+        canvas_apps_lti_usage_url: "https://example.com" # Change this to your own URL if need be
       math-man:
         base_url: 'http://mathman.docker'
         use_for_svg: 'false'
