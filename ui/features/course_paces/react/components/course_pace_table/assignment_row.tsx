@@ -28,6 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {
   IconAssignmentLine,
   IconDiscussionLine,
+  IconOffLine,
   IconPublishSolid,
   IconQuizLine,
   IconUnpublishedLine,
@@ -61,6 +62,7 @@ import type {Change} from '../../utils/change_tracking'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
+import { Tooltip } from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('course_paces_assignment_row')
 
@@ -333,6 +335,15 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
               </Text>
             </div>
           )}
+          {
+            ENV.FEATURES.course_pace_pacing_with_mastery_paths && this.props.coursePaceItem.unreleased && (
+              <div>
+                <Text size="x-small" color="danger">
+                  <IconWarningLine size="x-small" /> {I18n.t("Based on Mastery Path results this assignment may not be assigned to this student.")}
+                </Text>
+              </div>
+            )
+          }
         </div>
       </Flex>
     )
@@ -370,6 +381,15 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
     return (
       <Flex gap="small" data-testid={`mastery-paths-data-${moduleItemId}`}>
+        {
+          ENV.FEATURES.course_pace_pacing_with_mastery_paths && this.props.coursePaceItem.unreleased && (
+            <Flex.Item>
+              <Tooltip renderTip={I18n.t("This student may not have visibility to this assignment based on their Mastery path assessment results.")}>
+                <IconOffLine size="x-small" />
+              </Tooltip>
+            </Flex.Item>
+          )
+        }
         {isTrigger && moduleItemId && (
           <Flex.Item>
             <Link href={`${ENV.CONTEXT_URL_ROOT}/modules/items/${moduleItemId}/edit_mastery_paths`}>

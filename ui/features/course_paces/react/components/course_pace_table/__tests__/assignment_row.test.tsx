@@ -25,8 +25,10 @@ import {
   BLACKOUT_DATES,
   PACE_ITEM_1,
   PACE_ITEM_3,
+  PACE_ITEM_4,
   PRIMARY_PACE,
   STUDENT_PACE,
+  STUDENT_PACE_UNRELEASED_ITEMS
 } from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
 
@@ -60,6 +62,7 @@ const defaultProps: ComponentProps = {
 
 const NO_SUBMISSION_TEXT = 'No Submission'
 const LATE_SUBMISSION_TEXT = 'Late Submission'
+const UNRELEASED_ASSIGNMENT_TEXT = 'Based on Mastery Path results this assignment may not be assigned to this student.'
 
 beforeAll(() => {
   ENV.CONTEXT_TIMEZONE = 'America/New_York' // to match defaultProps.dueDate
@@ -297,6 +300,28 @@ describe('AssignmentRow', () => {
     )
     expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
     expect(queryByText(LATE_SUBMISSION_TEXT)).toBeNull()
+  })
+
+  it('renders unreleasd indicator when the item is unreleased', () => {
+    window.ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
+
+    const rowProps = {
+      ...defaultProps,
+      dueDate: "2025-01-01",
+      coursePace: STUDENT_PACE_UNRELEASED_ITEMS,
+      context_type: "Enrollment",
+    }
+
+    const {getByText} = renderConnected(
+      renderRow(
+        <AssignmentRow
+          {...rowProps}
+          coursePaceItem={PACE_ITEM_4}
+        />
+      )
+    )
+
+    expect(getByText(UNRELEASED_ASSIGNMENT_TEXT)).toBeInTheDocument()
   })
 
   it('returns null when isTrigger and releasedLabel are both false', () => {

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_relative "../conditional_release_spec_helper"
+
 RSpec::Matchers.define :docx_includes do |expected|
   match do |actual|
     doc = Docx::Document.open(actual)
@@ -166,6 +168,24 @@ describe CoursePacePresenter do
       expect(second_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct3.id}")
       expect(second_module_item[:module_item_type]).to eq("Assignment")
       expect(second_module_item[:published]).to be(true)
+    end
+
+    context "with mastery paths for enrollment paces" do
+      before do
+        @course.root_account.enable_feature!(:course_pace_pacing_with_mastery_paths)
+        @course.update(conditional_release: true)
+        setup_course_with_native_conditional_release(course: @course)
+        course_pace_model(course: @course, user: @student)
+      end
+
+      it "sets 'unreleased' attribute true for conditionally released but not yet released module items" do
+        formatted_plan = CoursePacePresenter.new(@course_pace).as_json
+
+        last_module = formatted_plan[:modules].last
+        first_module_item = last_module[:items].first
+
+        expect(first_module_item[:unreleased]).to be true
+      end
     end
   end
 
