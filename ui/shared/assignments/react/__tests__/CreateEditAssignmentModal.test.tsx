@@ -44,6 +44,20 @@ describe('CreateEditAssignmentModal', () => {
     frozenFields: [],
   }
 
+  const notGradedAssignmentData: ModalAssignment = {
+    type: 'not_graded',
+    name: 'Test Not Graded Assignment',
+    dueAt: '2024-01-14T00:00:00Z',
+    unlockAt: '2024-01-12T00:00:00Z',
+    lockAt: '2024-01-20T00:00:00Z',
+    allDates: [],
+    points: 0,
+    isPublished: false,
+    multipleDueDates: false,
+    differentiatedAssignment: false,
+    frozenFields: [],
+  }
+
   const defaultProps = (overrides: object = {}): CreateEditAssignmentModalProps => ({
     assignment: undefined,
     userIsAdmin: true,
@@ -78,7 +92,7 @@ describe('CreateEditAssignmentModal', () => {
 
   it('calls onMoreOptionsHandler with form data when more options button is clicked', () => {
     const {getByTestId, getByPlaceholderText, getByText} = render(
-      <CreateEditAssignmentModal {...defaultProps({assgnment: assignmentData})} />,
+      <CreateEditAssignmentModal {...defaultProps({assignment: assignmentData})} />,
     )
 
     fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
@@ -93,11 +107,11 @@ describe('CreateEditAssignmentModal', () => {
       {
         type: 'none',
         name: 'Test Assignment',
-        dueAt: '2024-01-15T23:59:00.000Z',
+        dueAt: '2024-01-15T00:00:00.000Z',
         points: 100,
         syncToSIS: false,
       },
-      true,
+      false,
     )
   })
 
@@ -184,6 +198,31 @@ describe('CreateEditAssignmentModal', () => {
       fireEvent.click(getAllByTestId('assignment-type-option')[2])
 
       expect(getByTestId('assignment-type-select')).toHaveValue('Quiz')
+    })
+
+    it('hides points input when selecting not_graded assignment type and saves with 0 points', () => {
+      const {queryByTestId, getByTestId, getAllByTestId} = render(
+        <CreateEditAssignmentModal {...defaultProps()} />,
+      )
+
+      fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
+      fireEvent.change(getByTestId('points-input'), {target: {value: '100'}})
+      fireEvent.click(getByTestId('assignment-type-select'))
+      fireEvent.click(getAllByTestId('assignment-type-option')[4])
+
+      expect(getByTestId('assignment-type-select')).toHaveValue('Not Graded')
+
+      expect(queryByTestId('points-input')).not.toBeInTheDocument()
+      fireEvent.click(getByTestId('save-button'))
+
+      expect(onSaveHandlerMock).toHaveBeenCalledWith({
+        type: 'not_graded',
+        name: 'Test Assignment',
+        dueAt: '',
+        points: 0,
+        publish: false,
+        syncToSIS: false,
+      }, true)
     })
 
     it('does not populate fields with assignment data in create mode', () => {
@@ -319,6 +358,11 @@ describe('CreateEditAssignmentModal', () => {
         publish: false,
         syncToSIS: false,
       }, true)
+    })
+
+    it('does not display points input field when type is not_graded', () => {
+      const {queryByTestId} = render(<CreateEditAssignmentModal {...defaultProps({assignment: notGradedAssignmentData})} />)
+      expect(queryByTestId('points-input')).not.toBeInTheDocument()
     })
   })
 
