@@ -213,7 +213,8 @@ export default function NotificationSettings(props: NotificationSettingsProps): 
     )
   }
 
-  async function updateSettings(): Promise<void> {
+  async function updateSettings(e: React.FormEvent): Promise<void> {
+    e.preventDefault()
     const valid = validateCustomName(customName)
     if (!valid) {
       if (customNameInputElement.current) customNameInputElement.current.focus()
@@ -245,13 +246,7 @@ export default function NotificationSettings(props: NotificationSettingsProps): 
   }
 
   return (
-    <form
-      noValidate={true}
-      onSubmit={e => {
-        e.preventDefault()
-        updateSettings()
-      }}
-    >
+    <form noValidate={true} onSubmit={updateSettings}>
       {renderFromSettings()}
       {renderSampleHeaders()}
       {renderExternalServicesNotificationSettings()}

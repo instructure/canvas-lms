@@ -162,3 +162,4 @@ const AlertList = ({alerts: initialAlerts, contextId, contextType, uiMetadata}: 
 }
 
 export default AlertList
+export {calculateUIMetadata} from './utils'
