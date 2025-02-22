@@ -24,7 +24,7 @@ import type {Spacing} from '@instructure/emotion'
 
 export type FormattedErrorMessageProps = {
   message: string,
-  margin: Spacing,
+  margin?: Spacing,
   iconMargin?: Spacing,
 }
 
