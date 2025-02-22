@@ -155,7 +155,7 @@ module ConditionalRelease
           @tags = [@trigger_assmt, @set1_assmt1, @set2_assmt1, @set3a_assmt, @set3b_assmt].map do |assignment|
             assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
           end
-          @course_pace = @course.course_paces.create! workflow_state: "active", published_at: Time.zone.now
+          @course_pace = @course.course_paces.create! workflow_state: "active", published_at: Time.zone.now, selected_days_to_skip: []
           @course_pace_module_items = @tags.map do |tag|
             @course_pace.course_pace_module_items.create! module_item: tag
           end
@@ -164,7 +164,6 @@ module ConditionalRelease
         end
 
         it "creates the assignment override with the due date from the course pace" do
-          skip "Broken Test"
           ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
 
           override = @set3a_assmt.assignment_overrides.last
