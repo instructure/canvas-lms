@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import TagCategoryCard, {TagCategoryCardProps} from '../TagCategoryCard'
 import {
@@ -25,8 +25,20 @@ import {
   singleTagCategory,
   multipleTagsCategory,
 } from '../../util/tagCategoryCardMocks'
+import {useDeleteDifferentiationTagCategory} from '../../hooks/useDeleteDifferentiationTagCategory'
+
+jest.mock('../../hooks/useDeleteDifferentiationTagCategory')
 
 describe('TagCategoryCard', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    // Set a default mock return value so that deleteMutation is defined in all tests.
+    ;(useDeleteDifferentiationTagCategory as jest.Mock).mockReturnValue({
+      mutate: jest.fn(),
+      isLoading: false,
+    })
+  })
+
   const renderComponent = (props?: Partial<TagCategoryCardProps>) => {
     const defaultProps: TagCategoryCardProps = {
       category: noTagsCategory,
@@ -96,5 +108,71 @@ describe('TagCategoryCard', () => {
     const addVariantLink = screen.getByText('+ Add a variant')
     await userEvent.click(addVariantLink)
     expect(onEditCategoryMock).toHaveBeenCalledWith(6)
+  })
+
+  describe('Delete functionality', () => {
+    it('opens the delete warning modal when delete button is clicked', async () => {
+      renderComponent()
+      const deleteButton = screen.getByText('Delete').closest('button')
+      if (!deleteButton) throw new Error('Delete button not found')
+      await userEvent.click(deleteButton)
+      expect(screen.getByText('Delete Tag')).toBeInTheDocument()
+    })
+
+    it('displays a loading state in the modal when deletion is in progress', async () => {
+      ;(useDeleteDifferentiationTagCategory as jest.Mock).mockReturnValue({
+        mutate: jest.fn(),
+        isLoading: true,
+      })
+      renderComponent()
+      const deleteButton = screen.getByText('Delete').closest('button')
+      if (!deleteButton) throw new Error('Delete button not found')
+      await userEvent.click(deleteButton)
+      // The confirm button should now display "Deleting..." and be disabled.
+      const confirmButton = screen.getByText('Deleting...').closest('button')
+      if (!confirmButton) throw new Error('Confirm button not found')
+      expect(confirmButton).toBeDisabled()
+    })
+
+    it('calls the delete mutation and closes the modal on successful deletion', async () => {
+      const mockMutate = jest.fn((_, {onSuccess}) => {
+        onSuccess && onSuccess()
+      })
+      ;(useDeleteDifferentiationTagCategory as jest.Mock).mockReturnValue({
+        mutate: mockMutate,
+        isLoading: false,
+      })
+      renderComponent()
+      const deleteButton = screen.getByText('Delete').closest('button')
+      if (!deleteButton) throw new Error('Delete button not found')
+      await userEvent.click(deleteButton)
+      const confirmButton = screen.getByText('Confirm').closest('button')
+      if (!confirmButton) throw new Error('Confirm button not found')
+      await userEvent.click(confirmButton)
+      await waitFor(() => {
+        expect(screen.queryByText('Delete Tag')).not.toBeInTheDocument()
+      })
+      expect(mockMutate).toHaveBeenCalled()
+    })
+
+    it('displays an error message when deletion fails', async () => {
+      const mockMutate = jest.fn((_, {onError}) => {
+        onError && onError(new Error('Deletion failed'))
+      })
+      ;(useDeleteDifferentiationTagCategory as jest.Mock).mockReturnValue({
+        mutate: mockMutate,
+        isLoading: false,
+      })
+      renderComponent()
+      const deleteButton = screen.getByText('Delete').closest('button')
+      if (!deleteButton) throw new Error('Delete button not found')
+      await userEvent.click(deleteButton)
+      const confirmButton = screen.getByText('Confirm').closest('button')
+      if (!confirmButton) throw new Error('Confirm button not found')
+      await userEvent.click(confirmButton)
+      expect(screen.getByText('Deletion failed')).toBeInTheDocument()
+      // The modal should remain open for the user to retry.
+      expect(screen.getByText('Delete Tag')).toBeInTheDocument()
+    })
   })
 })

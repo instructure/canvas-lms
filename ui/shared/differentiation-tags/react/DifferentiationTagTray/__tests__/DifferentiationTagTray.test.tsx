@@ -20,6 +20,7 @@ import {render, screen, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DifferentiationTagTray from '../DifferentiationTagTray'
 import type {DifferentiationTagTrayProps} from '../DifferentiationTagTray'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 // Mocking the DifferentiationTagModalManager, then setting the props it is passed as data attributes that we can check
 // This way we can verify that the modal is opened with the correct mode and category ID
@@ -47,7 +48,11 @@ describe('DifferentiationTagTray', () => {
   }
 
   const renderComponent = (props: Partial<DifferentiationTagTrayProps> = {}) => {
-    render(<DifferentiationTagTray {...defaultProps} {...props} />)
+    render(
+      <MockedQueryProvider>
+        <DifferentiationTagTray {...defaultProps} {...props} />
+      </MockedQueryProvider>,
+    )
   }
 
   beforeEach(() => {

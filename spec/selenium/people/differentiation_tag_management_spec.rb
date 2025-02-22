@@ -162,6 +162,16 @@ describe "Differentiation Tag Management" do
           expect(fj("h3:contains('Differentiation Tags')")).to be_displayed
           expect(fj("button:contains('Get Started')")).to be_displayed
         end
+
+        it "deletes a tag category when the delete button is pressed" do
+          ffj("button:contains('Delete')")[0].click
+          wait_for_ajaximations
+          fj("button:contains('Confirm')").click
+          wait_for_ajaximations
+
+          expect(f("body")).not_to contain_jqcss("span:contains('single tag')")
+          expect(@course.differentiation_tag_categories.count).to eq 1
+        end
       end
 
       context "user differentiation tag manager" do
