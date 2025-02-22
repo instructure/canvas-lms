@@ -65,7 +65,7 @@ const portalRouter = createBrowserRouter(
       />
       <Route
         path="/courses/:courseId/settings/*"
-        lazy={() => import('@canvas/student-alerts/react/AlertListRoute')}
+        lazy={() => import('../../features/course_settings/react/CourseSettingsRoute')}
       />
 
       {accountGradingSettingsRoutes}

@@ -19,7 +19,6 @@
 import React from 'react'
 import {useParams} from 'react-router-dom'
 import {Portal} from '@instructure/ui-portal'
-import NotificationSettings from './notification_settings'
 import FeatureFlags from '@canvas/feature-flags'
 import AlertList, {calculateUIMetadata} from '@canvas/student-alerts/react/AlertList'
 
@@ -32,25 +31,6 @@ type PortalMount = {
 // entire settings page settings page React code! Just repeat the pattern
 // for each tab or bundle you want to render.
 
-// notifications tab
-function notificationsTab(portals: PortalMount[], accountId?: string): void {
-  const mountPoint = document.getElementById('tab-notifications')
-  if (!mountPoint) return
-  const data = JSON.parse(mountPoint.dataset.values ?? '{}')
-  portals.push({
-    mountPoint,
-    component: (
-      <NotificationSettings
-        externalWarning={data.externalWarning}
-        customNameOption={data.customNameOption}
-        customName={data.customName}
-        defaultName={data.defaultName}
-        accountId={accountId!}
-      />
-    ),
-  })
-}
-
 // Feature Flags tab
 function featureFlagsTab(portals: PortalMount[]): void {
   const mountPoint = document.getElementById('tab-features')
@@ -62,9 +42,9 @@ function featureFlagsTab(portals: PortalMount[]): void {
 }
 
 // Alerts tab
-function alertsTab(portals: PortalMount[], accountId?: string): void {
+function alertsTab(portals: PortalMount[], courseId?: string): void {
   const mountPoint = document.getElementById('alerts_mount_point')
-  if (!mountPoint || !accountId) return
+  if (!mountPoint || !courseId) return
 
   const alerts = ENV.ALERTS?.data
   if (typeof alerts === 'undefined') return
@@ -76,8 +56,8 @@ function alertsTab(portals: PortalMount[], accountId?: string): void {
     component: (
       <AlertList
         alerts={alerts}
-        contextType="Account"
-        contextId={accountId}
+        contextType="Course"
+        contextId={courseId}
         uiMetadata={uiMetadata}
       />
     ),
@@ -88,9 +68,8 @@ export function Component(): JSX.Element | null {
   const params = useParams()
   const portals: Array<PortalMount> = []
 
-  notificationsTab(portals, params.accountId)
   featureFlagsTab(portals)
-  alertsTab(portals, params.accountId)
+  alertsTab(portals, params.courseId)
 
   return (
     <>

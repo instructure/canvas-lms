@@ -70,8 +70,12 @@ describe('NotificationSettings::', () => {
     expect(input).toHaveValue('Jackson Roykirk')
   })
 
-  it('adds error message to input field and focuses on it when trying to update with it empty', async () => {
+  it('does not make an API call and highlights an empty required field', async () => {
+    const id = '1'
+    // simulate an API error so we don't try to reload the window
+    fetchMock.putOnce(`/accounts/${id}`, 500)
     const {container, getByTestId} = renderComponent({
+      accountId: id,
       customNameOption: 'custom',
       customName: '',
     })
@@ -80,6 +84,9 @@ describe('NotificationSettings::', () => {
     await userEvent.click(updateButton)
     expect(input).toHaveFocus()
     expect(container).toHaveTextContent('Please enter a custom "From" name.')
+    // wait just a bit... long enough for a (wrong) API call to be made if it's going to
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(fetchMock.called()).toBe(false)
   })
 
   it('sends the right data when updating', async () => {
@@ -98,8 +105,9 @@ describe('NotificationSettings::', () => {
     await userEvent.type(customNameInput, 'Jackson Roykirk')
     await userEvent.click(updateButton)
     await waitFor(() => expect(fetchMock.called()).toBe(true))
-    const body = fetchMock.lastOptions()?.body as FormData
-    const formData = formDataToObject(body)
+    const apiParms = fetchMock.lastOptions()
+    const formData = formDataToObject(apiParms?.body as FormData)
+    expect(apiParms?.method).toBe('PUT')
     expect(formData['account[settings][external_notification_warning]']).toBe('1')
     expect(formData['account[settings][outgoing_email_default_name]']).toBe('Jackson Roykirk')
   })

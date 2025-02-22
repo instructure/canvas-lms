@@ -29,7 +29,6 @@ import configureStore from './react/store/configureStore'
 import initialState from './react/store/initialState'
 import './jquery/index'
 import '@canvas/grading-standards'
-import FeatureFlags from '@canvas/feature-flags'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import QuantitativeDataOptions from './react/components/QuantitativeDataOptions'
@@ -86,11 +85,6 @@ ready(() => {
   }
 
   const navView = new NavigationView({el: $('#tab-navigation')})
-
-  if (document.getElementById('tab-features')) {
-    const featuresRoot = createRoot(document.getElementById('tab-features'))
-    featuresRoot.render(<FeatureFlags disableDefaults={true} />)
-  }
 
   $(() => navView.render())
 
