@@ -44,6 +44,7 @@ export const useDifferentiationTagCategoriesIndex = (
       },
       params: {
         collaboration_state: 'non_collaborative',
+        per_page: 60,
         ...(includeDifferentiationTags && {'includes[]': 'groups'}),
       },
     })
@@ -58,7 +59,7 @@ export const useDifferentiationTagCategoriesIndex = (
   }
 
   return useQuery<DifferentiationTagCategory[], Error>({
-    queryKey: ['differentiationTagCategories', courseId, includeDifferentiationTags],
+    queryKey: ['differentiationTagCategories', Number(courseId), includeDifferentiationTags],
     queryFn: fetchDifTagCategories,
     enabled: hasValidCourseId && enabled,
     staleTime: QUERY_STALE_TIME,
