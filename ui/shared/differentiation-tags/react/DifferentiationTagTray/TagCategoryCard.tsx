@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -26,16 +26,23 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import TagInfo from './TagInfo'
 import {DifferentiationTagCategory} from '../types'
+import {useDeleteDifferentiationTagCategory} from '../hooks/useDeleteDifferentiationTagCategory'
+import {DeleteTagWarningModal} from '../WarningModal'
 
 const I18n = createI18nScope('differentiation_tags')
 
 export interface TagCategoryCardProps {
   category: DifferentiationTagCategory
   onEditCategory: (id: number) => void
+  onDeleteFocusFallback?: () => void
 }
 
-function TagCategoryCard({category, onEditCategory}: TagCategoryCardProps) {
+function TagCategoryCard({category, onEditCategory, onDeleteFocusFallback}: TagCategoryCardProps) {
   const {name, groups = []} = category
+
+  const deleteMutation = useDeleteDifferentiationTagCategory()
+  const [isWarningModalOpen, setIsWarningModalOpen] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const handleEdit = (event: React.KeyboardEvent<any> | React.MouseEvent<any, MouseEvent>) => {
     event.preventDefault()
@@ -43,62 +50,95 @@ function TagCategoryCard({category, onEditCategory}: TagCategoryCardProps) {
   }
 
   const handleDelete = () => {
-    // TODO: Add delete functionality
-    console.log('delete')
+    setDeleteError(null)
+    setIsWarningModalOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    deleteMutation.mutate(
+      {differentiationTagCategoryId: category.id},
+      {
+        onSuccess: () => {
+          setIsWarningModalOpen(false)
+          if (onDeleteFocusFallback) {
+            onDeleteFocusFallback()
+          }
+        },
+        onError: (error: Error) => {
+          setDeleteError(error.message)
+        },
+      },
+    )
+  }
+
+  const handleCancelDelete = () => {
+    setIsWarningModalOpen(false)
+    setDeleteError(null)
   }
 
   return (
-    <View padding="small medium" margin="small 0" display="block" borderWidth="small">
-      <Flex justifyItems="space-between" width="100%">
-        <Flex.Item shouldGrow shouldShrink>
-          <Flex direction="column">
-            <Flex.Item>
-              <TruncateText>{name}</TruncateText>
-            </Flex.Item>
-            <Flex.Item>
-              {groups.length < 2 && (
-                <View margin="0 0 small 0" as="div">
-                  <Text size="small" color="secondary">
-                    {groups.length === 0 ? I18n.t('No tags in tag set') : I18n.t('Single tag')}
-                  </Text>
-                </View>
-              )}
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
+    <>
+      <View padding="small medium" margin="small 0" display="block" borderWidth="small">
+        <Flex justifyItems="space-between" width="100%">
+          <Flex.Item shouldGrow shouldShrink>
+            <Flex direction="column">
+              <Flex.Item>
+                <TruncateText>{name}</TruncateText>
+              </Flex.Item>
+              <Flex.Item>
+                {groups.length < 2 && (
+                  <View margin="0 0 small 0" as="div">
+                    <Text size="small" color="secondary">
+                      {groups.length === 0 ? I18n.t('No tags in tag set') : I18n.t('Single tag')}
+                    </Text>
+                  </View>
+                )}
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
 
-        <Flex.Item align="start" margin="0 0 0 small" shouldShrink={false}>
-          <Flex>
-            <Flex.Item margin="0 x-small 0 0">
-              <IconButton
-                color="primary"
-                size="small"
-                withBackground={false}
-                withBorder={false}
-                screenReaderLabel={I18n.t('Edit')}
-                onClick={handleEdit}
-                aria-label={I18n.t('Edit tag set: %{name}', {name})}
-              >
-                <IconEditLine />
-              </IconButton>
-            </Flex.Item>
-            <Flex.Item>
-              <IconButton
-                color="primary"
-                size="small"
-                withBackground={false}
-                withBorder={false}
-                screenReaderLabel={I18n.t('Delete')}
-                onClick={handleDelete}
-              >
-                <IconTrashLine />
-              </IconButton>
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
-      </Flex>
-      <TagInfo tags={groups} onEdit={handleEdit} />
-    </View>
+          <Flex.Item align="start" margin="0 0 0 small" shouldShrink={false}>
+            <Flex>
+              <Flex.Item margin="0 x-small 0 0">
+                <IconButton
+                  color="primary"
+                  size="small"
+                  withBackground={false}
+                  withBorder={false}
+                  screenReaderLabel={I18n.t('Edit')}
+                  onClick={handleEdit}
+                  aria-label={I18n.t('Edit tag set: %{name}', {name})}
+                >
+                  <IconEditLine />
+                </IconButton>
+              </Flex.Item>
+              <Flex.Item>
+                <IconButton
+                  color="primary"
+                  size="small"
+                  withBackground={false}
+                  withBorder={false}
+                  screenReaderLabel={I18n.t('Delete')}
+                  onClick={handleDelete}
+                >
+                  <IconTrashLine />
+                </IconButton>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+        </Flex>
+        <TagInfo tags={groups} onEdit={handleEdit} />
+      </View>
+
+      <DeleteTagWarningModal
+        open={isWarningModalOpen}
+        onClose={handleCancelDelete}
+        onContinue={handleConfirmDelete}
+        isLoading={deleteMutation.isLoading}
+      >
+        {deleteError && <Text color="danger">{deleteError}</Text>}
+      </DeleteTagWarningModal>
+    </>
   )
 }
 
