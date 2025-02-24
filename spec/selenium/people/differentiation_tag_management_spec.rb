@@ -196,6 +196,180 @@ describe "Differentiation Tag Management" do
           expect(fj("span:contains('#{@multiple_tags_2.name}')")).to be_displayed
         end
       end
+
+      context "create/edit modal" do
+        context "from tray" do
+          before do
+            fj("button:contains('Manage Tags')").click
+            wait_for_ajaximations
+          end
+
+          it "Creates a single tag" do
+            # Open the create modal from the tray
+            fj("button:contains('+ Tag')").click
+            wait_for_ajaximations
+
+            # Ensure the modal header is correct
+            expect(fj("h2:contains('Create Tag')")).to be_displayed
+
+            # Fill in the single tag input
+            tag_input = f("[data-testid='tag-name-input']")
+            tag_input.send_keys("New Single Tag")
+
+            # Submit the form
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            # Verify that the modal is closed and the new tag is visible in the tray
+            expect(f("body")).not_to contain_jqcss("h2:contains('Create Tag')")
+            expect(fj("span:contains('New Single Tag')")).to be_displayed
+          end
+
+          it "Creates a multiple tag" do
+            # Open the create modal from the tray
+            fj("button:contains('+ Tag')").click
+            wait_for_ajaximations
+
+            # Switch to multiple tag mode by adding a variant
+            fj("button:contains('+ Add another tag')").click
+            wait_for_ajaximations
+
+            # Fill in both tag inputs
+            tag_inputs = ff("[data-testid='tag-name-input']")
+            tag_inputs[0].send_keys("Variant 1")
+            tag_inputs[1].send_keys("Variant 2")
+
+            # For multiple tags, a Tag Set Name is required – fill it in
+            tag_set_input = f("input[name='tag-set-name']")
+            tag_set_input.send_keys("New Tag Set")
+
+            # Submit the form
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            # Verify that the modal is closed and both tag variants appear in the tray
+            expect(f("body")).not_to contain_jqcss("h2:contains('Create Tag')")
+            expect(fj("span:contains('Variant 1')")).to be_displayed
+            expect(fj("span:contains('Variant 2')")).to be_displayed
+          end
+
+          it "Adds a new tag to an existing tag set" do
+            # Open the edit modal for an existing multiple tag set
+            f("button[aria-label='Edit tag set: #{@multiple_tags.name}']").click
+            wait_for_ajaximations
+
+            # Click the button to add a new variant (updated selector)
+            fj("button:contains('+ Add another tag')").click
+            wait_for_ajaximations
+
+            # Fill in the new tag variant input (assumed to be the last input)
+            tag_inputs = ff("[data-testid='tag-name-input']")
+            new_variant_input = tag_inputs.last
+            new_variant_input.send_keys("Additional Variant")
+
+            # Submit the form
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            # Verify that the new variant appears alongside the existing ones
+            expect(fj("span:contains('Additional Variant')")).to be_displayed
+            expect(fj("span:contains('#{@multiple_tags_1.name}')")).to be_displayed
+            expect(fj("span:contains('#{@multiple_tags_2.name}')")).to be_displayed
+          end
+
+          it "Displays correct edit data for a single tag" do
+            # Open the edit modal for a single tag
+            f("button[aria-label='Edit tag set: #{@single_tag.name}']").click
+            wait_for_ajaximations
+
+            # Verify that the modal shows the correct header and fields
+            expect(fj("span:contains('Edit Tag')")).to be_displayed
+            expect(fj("span:contains('Tag Name')")).to be_displayed
+
+            # Ensure that 'Tag Set Name' is not displayed for a single tag
+            expect(f("body")).not_to contain_jqcss("span:contains('Tag Set Name')")
+
+            # Check that the input has the correct value
+            expect(f("[data-testid='tag-name-input']")).to have_value(@single_tag.name)
+          end
+
+          it "Displays correct edit data for a multiple tag" do
+            # Open the edit modal for a multiple tag set
+            f("button[aria-label='Edit tag set: #{@multiple_tags.name}']").click
+            wait_for_ajaximations
+
+            # Verify that the modal shows both Tag Set Name and tag variant fields
+            expect(fj("span:contains('Edit Tag')")).to be_displayed
+            expect(fj("span:contains('Tag Set Name')")).to be_displayed
+            expect(fj("span:contains('Tag Name')")).to be_displayed
+            expect(fj("span:contains('Tag Name (Variant 1)')")).to be_displayed
+            expect(fj("span:contains('Tag Name (Variant 2)')")).to be_displayed
+
+            # Verify the correct values in each tag input field
+            tag_inputs = ff("[data-testid='tag-name-input']")
+            expect(tag_inputs[0]).to have_value(@multiple_tags_1.name)
+            expect(tag_inputs[1]).to have_value(@multiple_tags_2.name)
+          end
+
+          it "Displays correct edit data for a tag set with one tag but different names" do
+            # Setup a differentiation tag set with a different tag set name from its single tag name.
+            single_diff_set = @course.group_categories.create!(name: "Diff Set", non_collaborative: true)
+            diff_set_group = @course.groups.create!(name: "Different Tag", group_category: single_diff_set)
+
+            # Refresh the page and open the differentiation tag tray so the new tag set appears
+            refresh_page
+            wait_for_ajaximations
+            fj("button:contains('Manage Tags')").click
+            wait_for_ajaximations
+
+            # Open the edit modal for this tag set (updated selector if needed)
+            f("button[aria-label='Edit tag set: #{single_diff_set.name}']").click
+            wait_for_ajaximations
+
+            # Verify that both 'Tag Set Name' and 'Tag Name' fields are displayed
+            expect(fj("span:contains('Edit Tag')")).to be_displayed
+            expect(fj("span:contains('Tag Set Name')")).to be_displayed
+            expect(fj("span:contains('Tag Name')")).to be_displayed
+
+            # Check that the inputs have the correct values
+            expect(f("[data-testid='tag-set-name']")).to have_value(single_diff_set.name)
+            expect(f("[data-testid='tag-name-input']")).to have_value(diff_set_group.name)
+          end
+
+          it "deletes, adds, updates tags correctly in one request" do
+            # Open the edit modal for a multiple tag set
+            f("button[aria-label='Edit tag set: #{@multiple_tags.name}']").click
+            original_tag_ids = @multiple_tags.groups.pluck(:id)
+            wait_for_ajaximations
+
+            # Update the first tag's name
+            tag_inputs = ff("[data-testid='tag-name-input']")
+            second_input = tag_inputs[1]
+            second_input.send_keys("added text")
+
+            # Delete the second tag variant via its remove button (updated selector)
+            ff("button[data-testid='remove-tag']")[0].click
+            wait_for_ajaximations
+
+            # Add a new tag variant (updated button text)
+            fj("button:contains('+ Add another tag')").click
+            wait_for_ajaximations
+            tag_inputs = ff("[data-testid='tag-name-input']")
+            new_input = tag_inputs.last
+            new_input.send_keys("New Variant")
+
+            # Submit the form
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+            # Verify that the updated and new tags appear, and the deleted tag is absent
+            expect(fj("span:contains('New Variant')")).to be_displayed
+            expect(fj("span:contains('tag variant 2added text')")).to be_displayed
+
+            # verify that the group ids are different
+            expect(@multiple_tags.reload.groups.active.pluck(:id)).not_to eq(original_tag_ids)
+          end
+        end
+      end
     end
 
     context "without permissions" do
