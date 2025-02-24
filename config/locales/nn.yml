@@ -9168,6 +9168,7 @@ nn:
   custom_6ed5c8b7: eigendefinert
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Custom CSS og Javascript kan føre til problem med tilgangar eller skape konflikt ved framtidige   oppdateringar av Canvas! "
   custom_fields_fc3e55af: "Eigendefinerte felt"
+  custom_from_name_38a3d784: "Eigendefinert\"Frå\" Namn"
   custom_gradebook_columns_81944594: "Eigendefinerte kolonnar i vurderingsoversikta"
   custom_link_details_35fd38fc: "Tilpassa lenkedetaljar"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Eigendefinerte koplingar som kan leggast til i hurtigmenyen for dialogboksen"
@@ -9425,6 +9426,7 @@ nn:
   default_9db103d: Standard
   default_account_quotas_e34112fd: "Standard kontokvoter"
   default_canvas_grading_scheme_ab769633: "Standard vurderingsskjema for Canvas"
+  default_canvas_setting_fa6e6f81: "Standard Canvas-innstilling"
   default_conference_title: "%{course_name} konferanse"
   default_course_pace_ce0ba0f3: "Standard emneframdrift"
   default_dates_a0a2ae26: Standarddatoar
@@ -9573,6 +9575,7 @@ nn:
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Sletting av ein brukar vil øydelegge alle deira ePortfolioar. Alternativt kan ePortfolioar bli individuelt merka som 'spam' eller 'trygt' for å ende synlegheiten deira."
   deleting_assignment_22d5851d: "slettar oppgåve"
   deleting_custom_status_statusname_5bd7dfa9: "Slettar tilpassa status %{statusName}"
+  deleting_e2bd8cc9: Slettar...
   deleting_f2ff0d09: Slettar
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demonstrasjonsområde må ha reCAPTCHA-innstillingar for å konfigurerast. Ta kontakt med områdeadministrator for denne førekomsten i Canvas."
@@ -10242,6 +10245,7 @@ nn:
   display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Namn som skal visast:"
   display_name_b80c243e: "Namn som skal visast"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "Vis popup-åtvaring ein gong på sida for varslingsinnstillingar."
   display_student_filter_options_ab034cfa: "Vis val for studentfilter"
   display_to_students_e1301f99: "Vis for studentar"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Vis alle karakterane når rullegardinmenyen \"Alle karakterperiodane\" er vald (Fleire karakterperiodar må vere aktivert)."
@@ -11181,6 +11185,7 @@ nn:
   error_adding_files_97ba198e: "Feil under tillegging av fil."
   error_adding_files_to_conversation_message_58e83876: "Feil under vedlegging av filer i samtalemelding "
   error_adding_files_to_submission_draft_6acac337: "Det oppstod ein feil under kopling av filer til innleveringsutkast"
+  error_afac7133: "Feil:"
   error_archiving_rubric_f6e6740e: "Feil under arkivering av vurderingsskjema"
   error_associating_assignment_assignment_name_with__d92e9acf: "Det oppstod ein feil under kobling av innleveringa \"%{assignment_name}\" til eit LTI-verktøy. "
   error_canceling_draft_ec3dbdc9: "Feil under kansellering av utkast"
@@ -13262,6 +13267,7 @@ nn:
     group_atom_feed: "Gruppe i Atom-format"
     group_limit_number: "Gruppeavgrensing må vere eit tal"
     group_name: Gruppenamn
+    group_set_name_required: "Namn er obligatorisk"
     groups_count: "Grupper (%{count})"
     index: 
       heading_current_groups: "Gjeldande grupper"
@@ -14898,6 +14904,7 @@ nn:
   learning_outcomes_import_eca3a09c: "Læringsmål - importer"
   leave_5e852989: Forlate
   leave_a_comment_7991725b: "Gi eit svar"
+  leave_blank_for_no_limit_e8f80808: "La stå tom, utan avgrensing"
   leave_group_group_name_6847c632: "Forlate gruppa %{group_name}"
   left_group_group_name_aac4e813: "Forlét gruppa %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -18695,6 +18702,7 @@ nn:
   notifications_cbfa7704: Varsel
   notifications_off_80da021c: "Varsel av"
   notifications_search_results_80a0b06f: "Søkeresultat varsel"
+  notifications_sent_to_external_services_c4a86b78: "Varsel sende til eksterne tenester"
   notifications_unsupported_65f6bf65: "Varsel er ikkje støtta"
   notifications_view_f9a60770: "Varsler - vis"
   notifications_will_not_be_sent_retroactively_for_a_e84dc84e: "Varsel vil ikkje bli sendt ut i ettertid for kunngjeringar som er laga før du publiserer emnet ditt eller før emnet sin startdato. Du kan vurdere å bruke avvent publisering på ein dato litt fram i tid"
@@ -22245,6 +22253,7 @@ nn:
   received_throttled_response_from_microsoft_api_whi_f0e664bd: "Mottok strupa respons frå Microsoft API under oppretting av batch-spørring"
   recent_activity_51239235: "Nyleg aktivitet"
   recent_announcements_8becc59c: "Nylege kunngjeringar"
+  recent_canvas_notifications_81395de6: "Nylege Canvas-varsel"
   recent_f19e8c64: Siste
   recent_history_bcb0f4c0: "Nyleg historikk"
   recent_history_tray_241a384e: "Nyleg historikk-meny"
@@ -22523,6 +22532,7 @@ nn:
   reply_for_subject_ae247d1e: "Svar for %{subject}"
   reply_from_author_a2806c77: "Svar frå %{author}"
   reply_from_name: "%{name} via Canvas-varsel"
+  reply_to_9fa43ebe: "Send svar til"
   reply_to_authorname_f209e84a: "Svar til %{authorName}"
   reply_to_comment_72d96728: "Svar til kommentar"
   reply_to_conversation_f1aa0d4: "Svar til samtaletråd"
@@ -28722,6 +28732,7 @@ nn:
   value_d842f16d: Verdi
   value_is_not_a_valid_date_23c2d0a2: "%{value} er ikkje ein gyldig dato"
   value_is_not_valid_563afee6: "%{value} er ikkje gyldig"
+  value_must_be_a_whole_number_23c79120: "Gruppeavgrensing må vere eit tal"
   value_must_be_positive_3e086d5a: "Verdien skal vere positiv"
   value_removed_bba9430c: "%{value} fjerna"
   vanity_url_76f93382: "Personleg URL"
