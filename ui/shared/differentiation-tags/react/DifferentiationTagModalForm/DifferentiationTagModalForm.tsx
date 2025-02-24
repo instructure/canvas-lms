@@ -38,6 +38,7 @@ import {
   MULTIPLE_TAGS,
   CREATE_NEW_SET_OPTION,
 } from '../util/constants'
+import {useBulkManageDifferentiationTags} from '../hooks/useBulkManageDifferentiationTags'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -62,20 +63,28 @@ export type DifferentiationTagModalFormProps = {
   differentiationTagSet?: DifferentiationTagCategory
   mode: ModalMode
   categories?: DifferentiationTagCategory[]
+  courseId: number
 }
 
 export default function DifferentiationTagModalForm(props: DifferentiationTagModalFormProps) {
-  const {isOpen, onClose, mode, categories, differentiationTagSet} = props
+  const {isOpen, onClose, mode, categories, differentiationTagSet, courseId} = props
+
+  const {mutateAsync: bulkManageDifferentiationTags} = useBulkManageDifferentiationTags()
+
   const tagSetNameRef = useRef<HTMLInputElement | null>(null)
   const inputRefs = useRef<Record<number, HTMLInputElement | null>>({})
 
   const getInitialState = useCallback(() => {
-    let computedTagMode: ModalTagMode
-    if (mode === CREATE_MODE) {
+    let computedTagMode: ModalTagMode = MULTIPLE_TAGS
+
+    if (
+      mode === CREATE_MODE ||
+      (differentiationTagSet?.groups?.length === 1 &&
+        differentiationTagSet.name === differentiationTagSet.groups[0].name)
+    ) {
       computedTagMode = SINGLE_TAG
-    } else {
-      computedTagMode = differentiationTagSet?.groups?.length === 1 ? SINGLE_TAG : MULTIPLE_TAGS
     }
+
     return {
       isSubmitting: false,
       errors: {} as Record<string, string>,
@@ -109,7 +118,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
     initialState.previousTags,
   )
 
-  // When mode or differentiationTagSet change, reset the state.
+  // Reset whenever mode or differentiationTagSet change
   useEffect(() => {
     const newState = getInitialState()
     setIsSubmitting(newState.isSubmitting)
@@ -216,12 +225,15 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
 
   const handleFormSubmit = useCallback(async () => {
     const newErrors: Record<string, string> = {}
+
+    // Validate tags
     tags.forEach(tag => {
       if (!tag.name.trim()) {
         newErrors[String(tag.id)] = I18n.t('Tag Name is required')
       }
     })
 
+    // Validate the tag set name in certain scenarios
     if (
       (mode === CREATE_MODE &&
         selectedCategoryId === CREATE_NEW_SET_OPTION &&
@@ -233,6 +245,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
 
     if (Object.keys(newErrors).length > 0) {
       handleSetErrors(newErrors)
+      // Focus the first error field
       setTimeout(() => {
         const firstErrorKey = Object.keys(newErrors)[0]
         if (firstErrorKey) {
@@ -254,11 +267,113 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
 
     try {
       handleSetSubmitting(true)
+
+      // ----------------------------------------------------------
+      // DETERMINE groupCategoryId, groupCategoryName, AND OPS
+      // ----------------------------------------------------------
+
+      let groupCategoryId: number | undefined
+      let groupCategoryName: string | undefined
+
+      // 1) Decide if we're operating on an existing category or a new one
+      if (mode === CREATE_MODE) {
+        // If selectedCategoryId is numeric, user is adding tags to an existing category
+        if (!isNaN(parseInt(selectedCategoryId, 10))) {
+          groupCategoryId = parseInt(selectedCategoryId, 10)
+          // We do NOT rename it
+          groupCategoryName = undefined
+        } else if (selectedCategoryId === SINGLE_TAG) {
+          // Must create a brand new category with the single tag's name
+          groupCategoryId = undefined
+          groupCategoryName = tags[0].name
+        } else {
+          // CREATE_NEW_SET_OPTION -> brand new category, named by user
+          groupCategoryId = undefined
+          groupCategoryName = tagSetName
+        }
+      } else {
+        // EDIT_MODE
+        if (differentiationTagSet?.id) {
+          groupCategoryId = differentiationTagSet.id
+        }
+        if (tagMode === SINGLE_TAG) {
+          // do NOT update the name
+          groupCategoryName = undefined
+        } else {
+          // MULTIPLE_TAGS -> rename with the user-provided name
+          groupCategoryName = tagSetName
+        }
+      }
+
+      // ----------------------------------------------------------
+      // BUILD create/update/delete ops
+      // ----------------------------------------------------------
+      // In CREATE_MODE with an existing category, we only add new tags.
+      // In EDIT_MODE we do full create/update/delete according to old vs. new.
+      const oldTags = differentiationTagSet?.groups ?? []
+      const newTags = tags
+
+      let createOps: Array<{name: string}> = []
+      let updateOps: Array<{id: number; name: string}> = []
+      let deleteOps: Array<{id: number}> = []
+
+      if (mode === CREATE_MODE && !isNaN(parseInt(selectedCategoryId, 10))) {
+        // CREATE_MODE + existing category: only create new tags
+        createOps = newTags.map(t => ({name: t.name}))
+      } else if (mode === CREATE_MODE) {
+        // CREATE_MODE + brand new category
+        createOps = newTags.map(t => ({name: t.name}))
+      } else {
+        // EDIT_MODE
+        // 1) For each new tag with an existing id, see if the name changed => update
+        // 2) For each new tag with no old id => create
+        // 3) For each old tag not present in new => delete
+        const oldIds = oldTags.map(o => o.id)
+        const newIds = newTags.map(n => n.id)
+
+        // create
+        createOps = newTags.filter(t => !oldIds.includes(t.id)).map(t => ({name: t.name}))
+
+        // update
+        updateOps = newTags
+          .filter(t => oldIds.includes(t.id))
+          .filter(t => {
+            const oldTag = oldTags.find(o => o.id === t.id)
+            return oldTag && oldTag.name !== t.name
+          })
+          .map(t => ({id: t.id, name: t.name}))
+
+        // delete
+        deleteOps = oldTags.filter(o => !newIds.includes(o.id)).map(o => ({id: o.id}))
+      }
+
+      await bulkManageDifferentiationTags({
+        courseId,
+        groupCategoryId,
+        groupCategoryName,
+        operations: {
+          create: createOps.length ? createOps : undefined,
+          update: updateOps.length ? updateOps : undefined,
+          delete: deleteOps.length ? deleteOps : undefined,
+        },
+      })
+
+      // If mutation succeeds, close the modal
       handleClose()
     } finally {
       handleSetSubmitting(false)
     }
-  }, [tags, tagSetName, mode, tagMode, selectedCategoryId, isSubmitting, differentiationTagSet])
+  }, [
+    tags,
+    tagSetName,
+    mode,
+    tagMode,
+    selectedCategoryId,
+    isSubmitting,
+    differentiationTagSet,
+    bulkManageDifferentiationTags,
+    courseId,
+  ])
 
   const handleAddTagClick = useCallback(() => {
     handleAddTag()

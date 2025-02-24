@@ -23,8 +23,23 @@ import DifferentiationTagModalForm from '../DifferentiationTagModalForm'
 import type {DifferentiationTagModalFormProps} from '../DifferentiationTagModalForm'
 import '@testing-library/jest-dom'
 import {CREATE_MODE, EDIT_MODE} from '../../util/constants'
-
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {multipleTagsCategory, singleTagCategory} from '../../util/tagCategoryCardMocks'
+
+jest.mock('@canvas/do-fetch-api-effect', () => ({
+  __esModule: true,
+  default: jest.fn(() =>
+    Promise.resolve({
+      response: {ok: true},
+      json: {
+        created: [],
+        updated: [],
+        deleted: [],
+        group_category: {id: 1, name: 'Mock Tag Set'},
+      },
+    }),
+  ),
+}))
 
 describe('DifferentiationTagModalForm', () => {
   const user = userEvent.setup({delay: 0})
@@ -37,10 +52,15 @@ describe('DifferentiationTagModalForm', () => {
       isOpen: true,
       mode: CREATE_MODE,
       onClose: onCloseMock,
+      courseId: 1,
       ...props,
     } as DifferentiationTagModalFormProps
 
-    render(<DifferentiationTagModalForm {...defaultProps} />)
+    render(
+      <MockedQueryProvider>
+        <DifferentiationTagModalForm {...defaultProps} />
+      </MockedQueryProvider>,
+    )
   }
 
   beforeEach(() => {
