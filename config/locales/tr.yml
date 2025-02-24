@@ -5812,6 +5812,7 @@ tr:
   count_items_deleted_successfully_a287aa53: 
     one: "%{name} başarıyla silindi."
     other: "%{count} öğe başarıyla silindi."
+  count_items_deleted_successfully_b5d06e4b: "%{count} öğe başarıyla silindi"
   count_items_found_224f86d3: 
     zero: "Hiçbir öğe bulunamadı"
   count_items_selected_91814713: 
@@ -6956,6 +6957,7 @@ tr:
   curving_assignments_e9479ee3: "Ödevlere çan eğrisi uygulama"
   custom_6979cd81: Özelleştir
   custom_fields_fc3e55af: "Varsayılan Alanlar"
+  custom_from_name_38a3d784: "Varsayılan \"Kimden\" İsmi"
   custom_link_details_35fd38fc: "Özelleştirilmiş bağlantı ayrıntıları"
   custom_outcomes_31a741f5: "Varsayılan Çıktılar"
   customize_74cdc895: Özelleştir
@@ -7154,6 +7156,7 @@ tr:
   deep_purple_bb3e2907: "Koyu Mor"
   default_9db103d: Varsayılan
   default_account_quotas_e34112fd: "Varsayılan Hesap Kotaları"
+  default_canvas_setting_fa6e6f81: "Varsayılan Canvas Ayarları"
   default_conference_title: "%{course_name} Canlı Dersi"
   default_email_5cb9fa04: "Varsayılan E-Posta:"
   default_email_9efb7fbd: "Varsayılan E-Posta"
@@ -7222,6 +7225,7 @@ tr:
   deleted_ce03674d: silindi
   deleted_topic_notice: "Konu silindi"
   deleting_6421031e: siliniyor...
+  deleting_e2bd8cc9: Siliniyor...
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo siteler için Recaptcha ayarları yapılmış olmalıdır. Canvas'ın bu uygulaması için lütfen site yöneticiniz ile görüşün."
   demos: 
@@ -7724,6 +7728,7 @@ tr:
   display_course_catalog: "Bu kök hesapta \"Bu dersi herkese açık dersler listesi\" işareti etkinleştirilmiş olarak aranabilir ders listesi göster."
   display_name_6c2cfc58: "Görünen Ad:"
   display_name_b80c243e: "Görünen Ad"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "Bildirim Terchileri sayfasında bir seferlik anlık uyarı göster"
   display_totals_for_all_grading_periods_ad1ea050: "\"Tüm Notlandırma Peryotları\" için Toplamları Göster"
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Bölüm derslerinde kayıtlı tüm öğrenciler arasında derslerdeki güncel
@@ -8373,6 +8378,7 @@ tr:
   epub_exporting_f5592ff2: "Epub Dışa Aktarılıyor"
   error_59293a2c: hata
   error_98e81528: Hata
+  error_afac7133: "Hata:"
   error_deleting_name_reason_11f9d399: "%{name}'i silerken hata oluştu: %{reason}"
   error_duplicating_module_4b023042: "Modülün kopyası oluşturulurken hata oluştu"
   error_in_mastery_paths_range_index_7d17ddac: "%{index}yeterlilik süreci aralığında %{error}"
@@ -9921,6 +9927,7 @@ tr:
     group_atom_feed: "Grup Atom Beslemesi"
     group_limit_number: "Grup limiti bir sayı olmalıdır"
     group_name: "Grup Adı"
+    group_set_name_required: "İsim zorunludur"
     groups_count: "Gruplar (%{count})"
     index: 
       heading_current_groups: "Geçerli Gruplar"
@@ -10752,6 +10759,7 @@ tr:
       \x20 öğrenme çıktısının yeterliliğini belirleme kullanılabilecek eşik puan değeri belirleyin.\n"
   learning_outcomes_import_eca3a09c: "Öğrenme Çıktıları - içeri aktar"
   leave_5e852989: Ayrıl
+  leave_blank_for_no_limit_e8f80808: "Limitsiz için boş bırakın"
   leave_group_group_name_6847c632: "%{group_name} grubundan ayrıl"
   left_group_group_name_aac4e813: "%{group_name} Grubundan Ayrıldı"
   less_than_a_minute_ago_9f45e2a5: "bir dakikadan daha az"
@@ -13768,6 +13776,7 @@ tr:
   notification_preferences_cf47083d: "Bildirim Tercihleri"
   notification_settings_652dc60b: "Bildirim Ayarları"
   notifications_cbfa7704: Bildirimler
+  notifications_sent_to_external_services_c4a86b78: "Harici Servislere Gönderilen Bildirimler"
   notifications_view_f9a60770: "Bildirimler - göster"
   notify_users_this_quiz_has_changed_c5b05995: "Kısa sınav değişikliği ile ilgili kullanıcıları bilgilendir"
   now_click_the_agenda_button_607fb40e: "Şimdi *Gündem* butonuna tıklayın"
@@ -16847,6 +16856,7 @@ tr:
   recaptcha_not_configured_3a6ef9ee: "Recaptcha yapılandırılmadı"
   recent_activity_51239235: "En Son Etkinlik"
   recent_announcements_8becc59c: "Son Duyurular"
+  recent_canvas_notifications_81395de6: "En Son Canvas Bildirimleri"
   recent_student: 
     last_logged_in: "son oturum %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} Azalan Ortalama"
@@ -16963,6 +16973,7 @@ tr:
   reply_389d6fb9: Yanıtla
   reply_all_80298bee: "Hepsini yanıtla"
   reply_from_name: "Canvas Bildirimleri aracılığı ile %{name}"
+  reply_to_9fa43ebe: Yanıtla
   reply_to_comment_72d96728: "Yoruma Cevap Yaz"
   reply_to_current_message_55391f5b: "Şimdiki Mesaja Cevap yaz"
   reply_to_main_discussion_29823888: "Asıl Tartışmaya Cevap Yaz"
@@ -20182,6 +20193,7 @@ tr:
     is_required: "Bu alan zorunludur"
   validate_links_in_content_b1630fba: "İçerikteki Bağlantıları Doğrula"
   validation_error_3b943100: "Doğrulama Hatası"
+  value_must_be_a_whole_number_23c79120: "Grup limiti bir sayı olmalıdır"
   value_must_be_positive_3e086d5a: "Değer pozitif olmalıdır"
   venezuela_58_959d01f7: "Venezuella (+58)"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite benzerlik puanı -- daha fazla bilgi"
