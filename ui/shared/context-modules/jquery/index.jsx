@@ -1218,10 +1218,12 @@ modules.initModuleManagement = async function (duplicate) {
       !get(ENV, 'MASTER_COURSE_SETTINGS.IS_MASTER_COURSE') && !!get(restrictions, 'content')
     $titleInput.prop('disabled', isDisabled)
 
-    if(data.can_set_estimated_duration === 'false') {
-      $('#estimated_duration_edit').css({display: 'none'})
-    } else {
-      $('#estimated_duration_edit').css({display: 'table-row'})
+    if (ENV.horizon_course) {
+      if(data.can_set_estimated_duration === 'false') {
+        $('#estimated_duration_edit').css({display: 'none'})
+      } else {
+        $('#estimated_duration_edit').css({display: 'table-row'})
+      }
     }
 
     $('#edit_item_form')
@@ -1926,7 +1928,7 @@ modules.updateAssignmentData(() => {
     }
   })
 })
-modules.updateEstimatedDurations()
+
 
 $(document).ready(function () {
   $('.context_module').each(function () {
@@ -1935,6 +1937,10 @@ $(document).ready(function () {
   if (ENV.IS_STUDENT) {
     $('.context_module').addClass('student-view')
     $('.context_module_item .ig-row').addClass('student-view')
+  }
+
+  if (ENV.horizon_course){
+    modules.updateEstimatedDurations()
   }
 
   $('.external_url_link').click(function (event) {
