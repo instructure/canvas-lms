@@ -20,7 +20,7 @@
 
 # @API CommMessages
 #
-# API for accessing the messages (emails, sms, X.com, etc) that have
+# API for accessing the messages (emails, sms, etc) that have
 # been sent to a user.
 #
 # @model CommMessage
