@@ -30,7 +30,7 @@ export const singleTagCategory: TagCategoryCardProps['category'] = {
   groups: [
     {
       id: 101,
-      name: 'Variant A',
+      name: 'Honors',
       members_count: 15,
     },
   ],
@@ -54,6 +54,18 @@ export const multipleTagsCategory: TagCategoryCardProps['category'] = {
       id: 203,
       name: 'Variant C with a long name 123 321',
       members_count: 30,
+    },
+  ],
+}
+
+export const tagSetWithOneTag: TagCategoryCardProps['category'] = {
+  id: 3,
+  name: 'Reading Groups',
+  groups: [
+    {
+      id: 201,
+      name: 'Variant A',
+      members_count: 15,
     },
   ],
 }
