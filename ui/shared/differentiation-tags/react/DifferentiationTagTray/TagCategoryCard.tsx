@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -43,6 +43,16 @@ function TagCategoryCard({category, onEditCategory, onDeleteFocusFallback}: TagC
   const deleteMutation = useDeleteDifferentiationTagCategory()
   const [isWarningModalOpen, setIsWarningModalOpen] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  const mode = useMemo(() => {
+    if (groups.length === 0) {
+      return 'EMPTY_TAG_MODE'
+    }
+    if (groups.length === 1 && groups[0].name === name) {
+      return 'SINGLE_TAG_MODE'
+    }
+    return 'MULTI_TAG_MODE'
+  }, [groups, name])
 
   const handleEdit = (event: React.KeyboardEvent<any> | React.MouseEvent<any, MouseEvent>) => {
     event.preventDefault()
@@ -86,10 +96,18 @@ function TagCategoryCard({category, onEditCategory, onDeleteFocusFallback}: TagC
                 <TruncateText>{name}</TruncateText>
               </Flex.Item>
               <Flex.Item>
-                {groups.length < 2 && (
+                {mode === 'EMPTY_TAG_MODE' && (
                   <View margin="0 0 small 0" as="div">
                     <Text size="small" color="secondary">
-                      {groups.length === 0 ? I18n.t('No tags in tag set') : I18n.t('Single tag')}
+                      {I18n.t('No tags in tag set')}
+                    </Text>
+                  </View>
+                )}
+
+                {mode === 'SINGLE_TAG_MODE' && (
+                  <View margin="0 0 small 0" as="div">
+                    <Text size="small" color="secondary">
+                      {I18n.t('Single tag')}
                     </Text>
                   </View>
                 )}
@@ -127,7 +145,8 @@ function TagCategoryCard({category, onEditCategory, onDeleteFocusFallback}: TagC
             </Flex>
           </Flex.Item>
         </Flex>
-        <TagInfo tags={groups} onEdit={handleEdit} />
+
+        <TagInfo tags={groups} onEdit={handleEdit} multiMode={mode === 'MULTI_TAG_MODE'} />
       </View>
 
       <DeleteTagWarningModal

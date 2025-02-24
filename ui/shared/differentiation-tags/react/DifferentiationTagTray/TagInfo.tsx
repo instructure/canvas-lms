@@ -34,9 +34,10 @@ export interface TagData {
 export interface TagInfoProps {
   tags: TagData[]
   onEdit: React.MouseEventHandler<any>
+  multiMode?: boolean
 }
 
-const TagInfo: React.FC<TagInfoProps> = ({tags, onEdit}) => {
+const TagInfo: React.FC<TagInfoProps> = ({tags, onEdit, multiMode = false}) => {
   if (tags.length === 0) {
     return (
       <Flex direction="column" margin="small 0 0 0">
@@ -55,7 +56,7 @@ const TagInfo: React.FC<TagInfoProps> = ({tags, onEdit}) => {
         </Flex.Item>
       </Flex>
     )
-  } else if (tags.length === 1) {
+  } else if (tags.length === 1 && !multiMode) {
     return (
       <Text>
         {I18n.t(

@@ -24,6 +24,7 @@ import {
   noTagsCategory,
   singleTagCategory,
   multipleTagsCategory,
+  tagSetWithOneTag,
 } from '../../util/tagCategoryCardMocks'
 import {useDeleteDifferentiationTagCategory} from '../../hooks/useDeleteDifferentiationTagCategory'
 
@@ -63,6 +64,13 @@ describe('TagCategoryCard', () => {
     expect(screen.getByText(singleTagCategory.name)).toBeInTheDocument()
     expect(screen.getByText('15 students')).toBeInTheDocument()
     expect(screen.getByText('Single tag')).toBeInTheDocument()
+  })
+
+  it('displays information for a single group', () => {
+    renderComponent({category: tagSetWithOneTag})
+    expect(screen.getByText(tagSetWithOneTag.name)).toBeInTheDocument()
+    expect(screen.getByText('15 students')).toBeInTheDocument()
+    expect(screen.queryByText('Single tag')).not.toBeInTheDocument()
   })
 
   it('displays information for multiple groups', () => {
