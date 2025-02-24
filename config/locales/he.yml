@@ -6643,6 +6643,7 @@ he:
   custom_6979cd81: ידני
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "עדוכנים ידניים של CSS ו Javascript יכולים לגרום לבעיות נגישות או להיות בניגוד עם שינויים עתידיים של קנבס"
   custom_fields_fc3e55af: "שדות להגדרה גמישה"
+  custom_from_name_38a3d784: "הגדרה אישית של השם ב\"נשלח מ\""
   custom_link_details_35fd38fc: "פרטי קישור מותאם"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "קישורים מותאמים על מנת לכלול את חלון השיחה של עזרה."
   customize_74cdc895: התאמה
@@ -6879,6 +6880,7 @@ he:
   deep_purple_bb3e2907: "סגול כהה"
   default_9db103d: "ברירת מחדל"
   default_account_quotas_e34112fd: "ברירות מחדל למכסות חשבון"
+  default_canvas_setting_fa6e6f81: "הגדרת ברירות המחדל של קנבס"
   default_conference_title: "שיחת ועידה בקורס %{course_name} "
   default_email_5cb9fa04: "דוא\"ל ברירת מחדל"
   default_email_9efb7fbd: "דוא\"ל ברירת מחדל"
@@ -6949,6 +6951,7 @@ he:
   deleted_ce03674d: בוטל
   deleted_topic_notice: "הנושא בוטל"
   deleting_6421031e: מבטל...
+  deleting_e2bd8cc9: מבטל...
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "אתרי הדגמה מחייבים קינפוג הגדרות Recaptcha. נא לפנות למנהל המערכת שלכם בנושא כלי זה של קנבס."
   demos: 
@@ -7456,6 +7459,7 @@ he:
   display_course_catalog: "הצגת רשימה ניתנת לחיפוש של קורסים מחשבון בסיס זה המאפשרים \"הכללת קורס זה באינדקס הקורסים הפתוחים לכל\" "
   display_name_6c2cfc58: "הצגת השם:"
   display_name_b80c243e: "שם להצגה"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "הצגה חד פעמית של חלון קופץ עם אזהרה לגבי העדפות של דף ה\"הכרזות / הודעות\""
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "הצגת כלל הציונים כאשר נבחרת אפשרות מהרשימה הנפתחת \"כל תקופות ההערכה\" (האפשרות תקופות ציונים מרובות צריכה להיות מופעלת)"
   display_total_grades_when_the_all_grading_periods__4e6add83: "הצגת הערכה מסכמת כאשר נבחרה האפשרות החלון הנפתח \"כל תקופות ההערכה\" (חייבות להיות תקופות הערכה)"
   display_totals_for_all_grading_periods_ad1ea050: "הצגת סה\"כ של \"כל תקופות ההערכה\""
@@ -8096,6 +8100,7 @@ he:
   epub_exporting_f5592ff2: "ייצוא ePub"
   error_59293a2c: שגיאה
   error_98e81528: שגיאה
+  error_afac7133: "שגיאה: "
   error_deleting_name_reason_11f9d399: "שגיאת נסיון ביטול %{name}: מסיבה %{reason}"
   error_duplicating_module_4b023042: "שגיאת מודול כפול"
   error_exporting_gradebook_msg_6ea31e2f: "שגיאת ייצוא ספר הציונים: %{msg}"
@@ -9787,6 +9792,7 @@ he:
     group_atom_feed: "אטום פיד של קבוצה"
     group_limit_number: "מגבלת חברי הקבוצה צריכה להיות ערך מספרי"
     group_name: "שם הקבוצה"
+    group_set_name_required: "נדרש שם"
     groups_count: "קבוצות (%{count})"
     index: 
       heading_current_groups: "קבוצות נוכחיות"
@@ -10672,6 +10678,7 @@ he:
   learning_outcome_name_9cb475e6: "שם הישגי הלמידה"
   leave_5e852989: עזיבה
   leave_a_comment_7991725b: "השארת הערה"
+  leave_blank_for_no_limit_e8f80808: "יש להשאיר ריק אם אין מגבלה "
   leave_group_group_name_6847c632: "עזיבת קבוצה %{group_name}"
   left_group_group_name_aac4e813: "עזבת קבוצה %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -13694,6 +13701,7 @@ he:
       scheduling: תיזמון
   notification_preferences_cf47083d: "העדפות תזכורות"
   notifications_cbfa7704: הודעות
+  notifications_sent_to_external_services_c4a86b78: "הודעות שנשלחו למערכות חיצוניות"
   notify_users_this_quiz_has_changed_c5b05995: "הודעה למשתמשים שבוחן זה השתנה"
   now_click_the_agenda_button_607fb40e: "כעת יש להקליק על כפתור *אג'נדה*"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "כעת, כשהקורס הוגדר וזמין, רשימת תיוג זו כבר אינה נחוצה. אך אנו בכל זאת נשמור אותה בסביבה במקרה שיש צורך לנסות משהו חדש, או סתם כעזרה נוספת בעת ביצוע שינויים לתוכן הקורס."
@@ -16757,6 +16765,7 @@ he:
   ready_to_enroll_panel_46f45abb: "מוכן לרישום פאנל"
   recaptcha_not_configured_3a6ef9ee: "Recaptcha  אינה מקונפגת"
   recent_announcements_8becc59c: "הכרזות אחרונות"
+  recent_canvas_notifications_81395de6: "תזכורות קנבס אחרונות"
   recent_student: 
     last_logged_in: "התחברות אחרונה ב %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} ממוצע נע משוקלל"
@@ -16905,6 +16914,7 @@ he:
   reply_389d6fb9: השב/י
   reply_all_80298bee: "השב/י לכולם"
   reply_from_name: "%{name} באמצעות הודעות קנבס"
+  reply_to_9fa43ebe: השב
   reply_to_comment_72d96728: "תגובה להערה"
   reply_to_current_message_55391f5b: "הגב/י להודעה הנוכחית"
   reply_to_main_discussion_29823888: "תגובה לדיון מרכזי"
@@ -20476,6 +20486,7 @@ he:
     is_required: "חובה למלא שדה זה"
   validate_links_in_content_b1630fba: "בדיקת תקינות הקישורים שבתוכן."
   validation_error_3b943100: "שגיאת ואלידציה"
+  value_must_be_a_whole_number_23c79120: "מגבלת חברי הקבוצה צריכה להיות ערך מספרי"
   value_must_be_positive_3e086d5a: "הערך חייב להיות חיובי"
   vanity_url_76f93382: "כתובת דף קלה לזכירה"
   vendor_code_lti_2_ef36207b: "קוד ספק  (LTI 2):"
