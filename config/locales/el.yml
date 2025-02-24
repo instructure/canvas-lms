@@ -12908,6 +12908,7 @@ el:
     updated_at: "Ημερομηνία Τροποποίησης"
     updated_at_short: Τροποποιήθηκε
   recaptcha_not_configured_3a6ef9ee: "Δεν έχουν ρυθμιστεί τα recaptcha"
+  recent_canvas_notifications_81395de6: "Πρόσφατες Ειδοποιήσεις Canvas"
   recent_student: 
     last_logged_in: "πιο πρόσφατη σύνδεση στις %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} Υπολογισμός Με Μεγαλύτερο Βάρος στις Πιο Πρόσφατες Βαθμολογίες"
