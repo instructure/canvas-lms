@@ -63,6 +63,7 @@ const fetchOutcomes = (courseId, studentId) => {
   let outcomeAssignmentsByOutcomeId
   let outcomeResultsByOutcomeId
   let assignmentsByAssignmentId
+  let ratingsByOutcomeIdByAssignmentId
 
   function fetchWithDispatch(url) {
     return fetchUrl(url, dispatch)
@@ -76,12 +77,39 @@ const fetchOutcomes = (courseId, studentId) => {
       `/api/v1/courses/${courseId}/outcome_rollups?user_ids[]=${studentId}&per_page=100`,
     ),
     fetchWithDispatch(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`),
+    (async () => {
+      let page = 1
+      let results = []
+      while (true) {
+        const data = await fetchWithDispatch(
+          `/api/v1/courses/${courseId}/assignments?per_page=100&page=${page}`,
+        )
+        results = results.concat(data)
+        if (data.length < 100) {
+          break
+        }
+        page++
+      }
+      return results
+    })()
   ])
-    .then(([groups, links, rollups, alignments]) => {
+    .then(([groups, links, rollups, alignments, allAssignments]) => {
       outcomeGroups = groups
       outcomeLinks = links
       outcomeRollups = rollups
       outcomeAssignmentsByOutcomeId = _.groupBy(alignments, 'learning_outcome_id')
+      ratingsByOutcomeIdByAssignmentId = allAssignments.reduce((acc, a) => {
+        const outcomesInRubric =  a.rubric?.reduce((acc, criterion) => {
+          if (criterion.outcome_id) {
+            acc[criterion.outcome_id] = criterion.ratings
+          }
+          return acc
+        }, {}) || {}
+        if(Object.keys(outcomesInRubric).length) {
+          acc[a.id] = outcomesInRubric
+        }
+        return acc
+      }, {})
     })
     .then(() => {
       const outcomeIds = outcomeLinks.map(link => link.outcome.id)
@@ -137,13 +165,17 @@ const fetchOutcomes = (courseId, studentId) => {
         }
       })
 
-      // add results, assignments
+      // add results, assignments, ratings from rubric
       outcomes.forEach(outcome => {
         outcome.assignments = outcomeAssignmentsByOutcomeId[outcome.id] || []
         outcome.results = outcomeResultsByOutcomeId[outcome.id] || []
         outcome.results.forEach(result => {
           const key = result.links.assignment || result.links.alignment
           result.assignment = assignmentsByAssignmentId[key]
+          result.outcomeRatingsFromRubric =
+            ratingsByOutcomeIdByAssignmentId[
+              result.assignment.id.split('_').pop()]?.[outcome.id
+            ]
         })
       })
       return {outcomeGroups, outcomes}

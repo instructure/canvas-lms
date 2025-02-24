@@ -25,27 +25,11 @@ import {Text} from '@instructure/ui-text'
 import {IconAssignmentLine, IconQuizLine, IconHighlighterLine} from '@instructure/ui-icons'
 import * as shapes from './shapes'
 import Ratings from '@canvas/rubrics/react/Ratings'
+import {scoreFromPercent, scaleScore} from './scoreCalculation'
 
 import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('IndividiualStudentMasteryAssignmentResult')
-
-const scoreFromPercent = (percent, outcome) => {
-  if (outcome.points_possible > 0) {
-    return +(percent * outcome.points_possible).toFixed(2)
-  } else {
-    return +(percent * outcome.mastery_points).toFixed(2)
-  }
-}
-
-const scaleScore = (score, possible, outcome) => {
-  if (!possible) return score
-  if (outcome.points_possible > 0) {
-    return +((score / possible) * outcome.points_possible).toFixed(2)
-  } else {
-    return +((score / possible) * outcome.mastery_points).toFixed(2)
-  }
-}
 
 const renderLinkedResult = (name, url, isQuiz) => (
   <Link
@@ -72,12 +56,15 @@ const renderUnlinkedResult = name => (
 )
 
 const AssignmentResult = ({outcome, result, outcomeProficiency}) => {
-  const {ratings} = outcome
+  const ratings = result.outcomeRatingsFromRubric || outcome.ratings
+  const pointsPossibleFromOutcomeRatingsFromRubric = result.outcomeRatingsFromRubric
+  ? Math.max(...ratings.map(rating => rating.points)) || null
+  : null
   const {html_url: url, name, submission_types: types} = result.assignment
   const isQuiz = types && types.indexOf('online_quiz') >= 0
   const score = result.percent
-    ? scoreFromPercent(result.percent, outcome)
-    : scaleScore(result.score, result.points_possible, outcome)
+    ? scoreFromPercent(result.percent, outcome, pointsPossibleFromOutcomeRatingsFromRubric)
+    : scaleScore(result.score, result.points_possible, outcome, pointsPossibleFromOutcomeRatingsFromRubric)
   return (
     <Flex padding="small" direction="column" alignItems="stretch">
       <Flex.Item>
