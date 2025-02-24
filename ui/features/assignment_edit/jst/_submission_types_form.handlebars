@@ -271,25 +271,23 @@
                    value="{{externalToolIframeHeight}}"/>
 
             <div class="ic-Input-group">
-              <div class="ic-Input-group__add-on" aria-hidden="true">
-                <i class="icon-link"></i>
-              </div>
-
-              <input id="assignment_external_tool_tag_attributes_url"
+              <div class="ic-Input"
+                   style="margin-right:5px;margin-left:0px;border-top-right-radius:3px;border-bottom-right-radius:3px"
+                   id="assignment_external_tool_tag_attributes_url_container" >
+                 <input id="assignment_external_tool_tag_attributes_url"
                      name="external_tool_tag_attributes[url]"
                      class="ic-Input"
-                     type="url"
                      value="{{externalToolUrl}}"
+                     type="text"
                      placeholder="http://www.example.com/launch"
+                     style="margin-right:5px;margin-left:0px;border-top-right-radius:3px;border-bottom-right-radius:3px;height:100%"
                   {{disabledIfIncludes frozenAttributes "submission_types"}} />
+              </div>
               <button id="assignment_external_tool_tag_attributes_url_find"
-                      class="Button"
+                      class="btn btn-secondary"
                       type="button"
                       {{disabledIfIncludes frozenAttributes "submission_types"}}
-              >
-                  {{#t}}Find{{/t}}
-              </button>
-
+              >{{#t}}Find{{/t}}</button>
               {{#if submissionTypesFrozen}}
               <input name="external_tool_tag_attributes[url]"
                      type="hidden"
@@ -297,6 +295,7 @@
               {{/if}}
 
             </div>
+            <div id="external_tool_tag_attributes[url]_errors"></div>
           </div>
           <input id="assignment_external_tool_tag_attributes_content_type"
                  name="external_tool_tag_attributes[content_type]"
