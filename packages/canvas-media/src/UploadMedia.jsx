@@ -129,6 +129,7 @@ export class UploadMediaModal extends React.Component {
     }
 
     this.modalBodyRef = React.createRef()
+    this.computerPanelRef = React.createRef()
   }
 
   inferSelectedPanel = tabs => {
@@ -143,25 +144,14 @@ export class UploadMediaModal extends React.Component {
     return selectedPanel
   }
 
-  isReady = () => {
-    if (this.props.disableSubmitWhileUploading && this.state.uploading) {
-      return false
-    }
-
-    switch (this.state.selectedPanel) {
-      case PANELS.COMPUTER:
-        return !!this.state.computerFile
-      case PANELS.RECORD:
-        return !!this.state.recordedFile
-      default:
-        return false
-    }
-  }
-
   handleSubmit = () => {
     switch (this.state.selectedPanel) {
       case PANELS.COMPUTER: {
-        this.uploadFile(this.state.computerFile)
+        this.computerPanelRef.current?.updateValidationMessages();
+        const {computerFile} = this.state
+        if (computerFile?.title?.trim()) {
+          this.uploadFile(computerFile)
+        }
         break
       }
       case PANELS.RECORD: {
@@ -177,12 +167,7 @@ export class UploadMediaModal extends React.Component {
   }
 
   submitEnabled = () => {
-    switch (this.state.selectedPanel) {
-      case PANELS.COMPUTER:
-        return this.isReady() && !!this.state.computerFile?.title
-      default:
-        return this.isReady()
-    }
+    return !this.props.disableSubmitWhileUploading || !this.state.uploading
   }
 
   uploadFile(file) {
@@ -313,6 +298,7 @@ export class UploadMediaModal extends React.Component {
           >
             <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
               <ComputerPanel
+                ref={this.computerPanelRef}
                 theFile={this.state.computerFile}
                 setFile={file => this.setState({computerFile: file})}
                 hasUploadedFile={this.state.hasUploadedFile}
