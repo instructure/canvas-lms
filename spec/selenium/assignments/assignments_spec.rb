@@ -1219,6 +1219,32 @@ describe "assignments" do
 
         expect(assignment.reload.primary_resource_link.custom).to eq(custom_params)
       end
+
+      it "shows an error on submit for an empty External Tool URL" do
+        assignment
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        # clear the external tool url input
+        tool.url.each_char { f("#assignment_external_tool_tag_attributes_url").send_keys(:backspace) }
+        submit_assignment_form
+
+        expect(f("#external_tool_tag_attributes\\[url\\]_errors")).to include_text("External Tool URL cannot be left blank")
+      end
+
+      it "shows an error on submit for an invalid External Tool URL" do
+        assignment
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        # clear the external tool url input
+        tool.url.each_char { f("#assignment_external_tool_tag_attributes_url").send_keys(:backspace) }
+        # replace with invalid url
+        f("#assignment_external_tool_tag_attributes_url").send_keys("invalid")
+        submit_assignment_form
+
+        expect(f("#external_tool_tag_attributes\\[url\\]_errors")).to include_text('Enter a valid URL or use "Find" button to search for an external tool')
+      end
     end
 
     context "publishing" do

@@ -126,6 +126,8 @@ const LTI_EXT_MASTERY_CONNECT = 'https://canvas.instructure.com/lti/mastery_conn
 
 const DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE = 'context_external_tool'
 
+const EXTERNAL_TOOL_URL_INPUT_NAME = 'external_tool_tag_attributes[url]'
+
 /*
 xsslint safeString.identifier srOnly
  */
@@ -292,6 +294,7 @@ EditView.prototype.events = {
     events['change ' + GROUP_CATEGORY_BOX] = 'handleGroupCategoryChange'
     events['change ' + ANONYMOUS_GRADING_BOX] = 'handleAnonymousGradingChange'
     events['change ' + HIDE_ZERO_POINT_QUIZZES_BOX] = 'handleHideZeroPointQuizChange'
+    events['input ' + `[name="${EXTERNAL_TOOL_URL_INPUT_NAME}"]`] = 'clearErrorsOnInput'
     if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
       events.change = 'onChange'
     }
@@ -1520,14 +1523,15 @@ EditView.prototype.showErrors = function (errors) {
     // the error containers must have an ID formatted as ${key}_errors.
     const errorsContainerID = `${key}_errors`
     const errorsContainer = document.getElementById(errorsContainerID)
-    if(errorsContainer){
+    if (errorsContainer) {
       const root = this.errorRoots[key] ?? createRoot(errorsContainer)
       const noMargin = ['allowed_attempts', 'final_grader_id', 'grader_count'].includes(key)
+      const marginTop = [EXTERNAL_TOOL_URL_INPUT_NAME].includes(key)
       root.render(
-        <Flex as="div" alignItems="center" margin={noMargin ? '0' : '0 0 0 medium'}>
-          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+        <Flex as="div" alignItems="center" margin={noMargin ? '0' : marginTop ? 'xx-small 0 0 0' : '0 0 0 medium'}>
+          <Flex as="div" margin={value[0].longMessage ? '0 xx-small medium 0' : '0 xx-small xxx-small 0'}>
             <IconWarningSolid color="error" />
-          </Flex.Item>
+          </Flex>
           <Text size="small" color="danger">
             {value[0].message}
           </Text>
@@ -1536,9 +1540,14 @@ EditView.prototype.showErrors = function (errors) {
       this.errorRoots[errorsContainerID] = root
       delete errors[key]
       const element = this.getElement(key)
-      if(element){
+      if (element) {
         element.setAttribute("aria-describedby", errorsContainerID)
-        if(shouldFocus){
+
+        if ([EXTERNAL_TOOL_URL_INPUT_NAME].includes(key)) {
+          this.getElement('assignment_external_tool_tag_attributes_url_container')?.classList.add('error-outline')
+        }
+
+        if (shouldFocus) {
           element.focus()
           shouldFocus = false
         }
@@ -1586,15 +1595,24 @@ EditView.prototype.getElement = function (key) {
   if (byName) return byName
 
   const byCustomSelector =  document.querySelector(EditView.prototype.fieldSelectors[key])
-  if(byCustomSelector) return byCustomSelector
+  if (byCustomSelector) return byCustomSelector
 
   return null
 }
 
+EditView.prototype.clearErrorsOnInput = function (event) {
+  const key = event.target.name
+  this.hideErrors(`${key}_errors`)
+}
+
 EditView.prototype.hideErrors = function (containerId) {
-  const container = document.getElementById(containerId)
   this.errorRoots[containerId]?.unmount()
   delete this.errorRoots[containerId]
+
+  if (containerId === `${EXTERNAL_TOOL_URL_INPUT_NAME}_errors`) {
+    const element = this.getElement('assignment_external_tool_tag_attributes_url_container')
+    element?.classList.remove('error-outline')
+  }
 }
 
 EditView.prototype.validateBeforeSave = function (data, errors) {
@@ -1814,20 +1832,26 @@ EditView.prototype._validateExternalTool = function (data, errors) {
     return errors
   }
 
-  let ref, ref1
-  if (
-    data.grading_type !== 'not_graded' &&
-    $.trim(
-      (ref = data.external_tool_tag_attributes) != null
-        ? (ref1 = ref.url) != null
-          ? ref1.toString()
-          : void 0
-        : void 0,
-    ).length === 0
-  ) {
-    const message = I18n.t('External Tool URL cannot be left blank')
-    errors['external_tool_tag_attributes[url]'] = [{message}]
-    errors['default-tool-launch-button'] = [{message}]
+  let message
+  let longMessage = false
+  const toolUrl = data.external_tool_tag_attributes?.url?.toString()?.trim() || ''
+  if (data.grading_type !== 'not_graded' && !toolUrl) {
+    message = I18n.t('External Tool URL cannot be left blank')
+  } else {
+    // We are moving the url input validation to this method so we can display our own
+    // errors instead of the native browser tooltip error.
+    try {
+      new URL(toolUrl)
+      // do nothing if it is a valid url
+    } catch {
+      message = I18n.t('Enter a valid URL or use "Find" button to search for an external tool')
+      longMessage = true
+    }
+  }
+
+  if (message) {
+    errors[EXTERNAL_TOOL_URL_INPUT_NAME] = [{message, longMessage}]
+    errors['default-tool-launch-button'] = [{message, longMessage}]
   }
 
   // This can happen when:
@@ -1842,8 +1866,8 @@ EditView.prototype._validateExternalTool = function (data, errors) {
     data.external_tool_tag_attributes.content_type ===
       DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
   ) {
-    const message = I18n.t('Please click below to launch the tool and select a resource.')
-    errors.assignment_submission_container = [{message}]
+    message = I18n.t('Please click below to launch the tool and select a resource.')
+    errors.assignment_submission_container = [{message, longMessage}]
   }
 
   return errors
