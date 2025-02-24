@@ -4808,6 +4808,7 @@ ko:
     this_is_permanent: "상대 평가를 실행 취소할 수 없습니다. 상대 평가 이전의 평점 이력은 사용할 수 있으나 상대 평가 동작은 되돌릴 수 없습니다."
   curving_assignments_e9479ee3: "과제 상대 평가"
   custom_fields_fc3e55af: "사용자 정의 필드"
+  custom_from_name_38a3d784: "사용자 정의 \"보낸 사람\" 이름"
   customize_74cdc895: "사용자 정의"
   d2l_display: Desire2Learn
   d2l_file_description: "D2L 내보내기 .zip 형식"
@@ -4974,6 +4975,7 @@ ko:
       year: 년
   debugging_f98fcd74: 디버깅
   default_account_quotas_e34112fd: "기본 계정 할당량"
+  default_canvas_setting_fa6e6f81: "기본 Canvas 설정"
   default_conference_title: "%{course_name} 회의"
   default_question_name: 문제
   default_question_text: "질문 텍스트"
@@ -4988,6 +4990,7 @@ ko:
   delete_this_file_683804a1: "이 파일 삭제"
   delete_time_range_e14461a0: "시간 범위 삭제"
   deleted_topic_notice: "해당 주제가 삭제됨"
+  deleting_e2bd8cc9: "삭제 중..."
   delicious_7f9ac66f: Delicious
   demos: 
     _register: 
@@ -5346,6 +5349,7 @@ ko:
     unsubscribed: "구독 해제함"
     unsubscribed_hint: "이 주제를 구독하고 있지 않습니다. 구독하려면 클릭합니다."
   discussions_a5f96392: 토론
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "알림 기본 설정 페이지에 팝업 경고를 한 번 표시합니다."
   does_not_meet_expectations_b0736d20: "기대치에 미치지 못함"
   domain_3b54c511: 도메인
   done_editing_9f7379d9: "편집 마침"
@@ -6828,6 +6832,7 @@ ko:
       other: "그룹 %{count}개"
     group_atom_feed: "그룹 Atom 피드"
     group_name: "그룹 이름"
+    group_set_name_required: "이름이 필요함"
     groups_count: "그룹 (%{count}개)"
     index: 
       heading_current_groups: "현재 그룹"
@@ -7369,6 +7374,7 @@ ko:
   learning_outcome: 
     no_comment: "의견 없음"
     no_description: "설명 없음"
+  leave_blank_for_no_limit_e8f80808: "(제한이 없으면 공란으로 둠)"
   less_than_a_minute_ago_9f45e2a5: "1분 전 이내"
   lib: 
     angel: 
@@ -9814,6 +9820,7 @@ ko:
       scheduling: 일정
   notification_settings_652dc60b: "알림 설정"
   notifications_cbfa7704: 알림
+  notifications_sent_to_external_services_c4a86b78: "외부 서비스에 보낸 알림"
   number: 
     currency: 
       format: 
@@ -12011,6 +12018,7 @@ ko:
     updated_at: 수정일
     view: 보기
   recent_announcements_8becc59c: "최신 공지"
+  recent_canvas_notifications_81395de6: "최근 Canvas 알림"
   recent_student: 
     last_logged_in: "%{last_login}에 마지막으로 로그인"
   recipient_input: 
@@ -12101,6 +12109,7 @@ ko:
         am_pm: 오전/오후
   reply_389d6fb9: "답변 작성..."
   reply_all_80298bee: "전체 회신"
+  reply_to_9fa43ebe: 회신
   report_inappropriate_picture_af4eefeb: "부적절한 사진 보고"
   reports_1b9ab7a7: 보고서
   request_id_1499afb0: "요청 ID"
