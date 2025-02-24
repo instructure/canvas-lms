@@ -8305,6 +8305,7 @@ fa:
   custom_6979cd81: سفارشی
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "CSS و جاوااسکریپت سفارشی ممکن است مشکلات دسترس پذیری یا تضاد با بهنگام سازی های آتی کانواس به وجود آورد!"
   custom_fields_fc3e55af: "جاهای خالی سفارشی"
+  custom_from_name_38a3d784: "سفارشی کردن نام «فرستنده»"
   custom_gradebook_columns_81944594: "ستون‌های دفتر نمره گذاری سفارشی"
   custom_link_details_35fd38fc: "جزئیات پیوند سفارشی"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "پیوندهای سفارشی برای درج در منوی فرعی گفتگوی راهنما"
@@ -8533,6 +8534,7 @@ fa:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "پاسخ‌های تو در تو دیگر پشتیبانی نمی‌شوند. پاسخ شما در صفحه اول این تاپیک نمایش داده می شود."
   default_9db103d: "پیش فرض"
   default_account_quotas_e34112fd: "سهمیه های پیش فرض حساب"
+  default_canvas_setting_fa6e6f81: "تنظیمات پیش فرض کانواس"
   default_conference_title: "کنفرانس %{course_name} "
   default_dates_a0a2ae26: "تاریخ های پیش فرض"
   default_due_time_9d0e9140: "زمان مقرر پیش فرض"
@@ -8651,6 +8653,7 @@ fa:
   deleted_topic_notice: "این عنوان حذف شده است"
   deleting_6421031e: "در حال حذف..."
   deleting_assignment_22d5851d: "حذف کردن تکلیف"
+  deleting_e2bd8cc9: "در حال حذف..."
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "تارنماهای آزمایشی برای پیکربندی به تنظیمات تصویر امنیتی نیاز دارند. لطفا برای این مورد کانواس، به مدیر تارنما مراجعه کنید."
   demos: 
@@ -9239,6 +9242,7 @@ fa:
   display_course_catalog: "فهرست قابل جستجوی درس های موجود در این حساب ریشه را در حالی که پرچم «شامل سازی این درس در فهرست عمومی درس» فعال شده است»، نمایش دهید."
   display_name_6c2cfc58: "نام قابل مشاهده:"
   display_name_b80c243e: "نام قابل مشاهده"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "هشدار باز شونده برای یک بار در صفحه تنظیمات دلخواه اطلاعیه نمایش داده شود."
   display_student_filter_options_ab034cfa: "نمایش گزینه های فیلتر دانشجو"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "نمایش مجموع نمره ها در هنگام انتخاب گزینه بازشونده «همه دوره های نمره گذاری» (چند دوره نمره گذاری باید فعال شود)."
   display_totals_for_all_grading_periods_ad1ea050: "نمایش مجموع ها برای «همه دوره های نمره گذاری»"
@@ -10084,6 +10088,7 @@ fa:
   error_adding_files_97ba198e: "خطا در هنگام اضافه کردن فایل ها"
   error_adding_files_to_conversation_message_58e83876: "خطا در افزودن فایل به قسمت پیام مکالمات"
   error_adding_files_to_submission_draft_6acac337: "خطا در افزودن فایل برای ارسال پیش نویس"
+  error_afac7133: "خطا:"
   error_associating_assignment_assignment_name_with__d92e9acf: "خطا در مرتبط کردن تکلیف \"%{assignment_name}\" با یک ابزار LTl."
   error_canceling_draft_ec3dbdc9: "خطا در لغو پیش نویس"
   error_creating_comment_cbbfc0f0: "خطا در ایجاد نظر"
@@ -12085,6 +12090,7 @@ fa:
     group_atom_feed: "تک خوراک خبری گروه"
     group_limit_number: "حداکثر ظرفیت گروه باید یک عدد باشد"
     group_name: "نام گروه"
+    group_set_name_required: "نام لازم است"
     groups_count: "گروه ها (%{count})"
     index: 
       heading_current_groups: "گروه های فعلی"
@@ -13319,6 +13325,7 @@ fa:
   learning_outcomes_import_eca3a09c: "ورود - نتایج یادگیری "
   leave_5e852989: "خارج شدن"
   leave_a_comment_7991725b: "اظهار نظر"
+  leave_blank_for_no_limit_e8f80808: "برای عدم محدودیت، خالی بگذارید"
   leave_group_group_name_6847c632: "خارج شدن از گروه %{group_name}"
   left_group_group_name_aac4e813: "گروه %{group_name} را ترک کرد"
   len_maxlen_97f1c88d: "%{maxLen}/%{len}"
@@ -16885,6 +16892,7 @@ fa:
   notifications_cbfa7704: "اطلاعیه ها"
   notifications_off_80da021c: "اعلان ها خاموش است"
   notifications_search_results_80a0b06f: "نتایج جستجوی اطلاعیه‌ها"
+  notifications_sent_to_external_services_c4a86b78: "اطلاعیه ها برای سرویس های بیرونی ارسال شد"
   notifications_unsupported_65f6bf65: "اعلان ها پشتیبانی نمی شوند"
   notifications_view_f9a60770: "اطلاعیه - مشاهده "
   notify_immediately_d1749c07: "فورا اطلاع دهید"
@@ -20309,6 +20317,7 @@ fa:
   received_content_53049822: "محتوای دریافت شده"
   recent_activity_51239235: "فعالیت اخیر"
   recent_announcements_8becc59c: "اطلاعیه‌های اخیر"
+  recent_canvas_notifications_81395de6: "اطلاعیه های اخیر کانواس"
   recent_student: 
     last_logged_in: "آخرین ورود در %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} میانگین جدیدترین نمره ها"
@@ -20498,6 +20507,7 @@ fa:
   reply_all_80298bee: "پاسخ به همه"
   reply_all_b864cd0e: "پاسخ به همه"
   reply_from_name: "%{name} از طریق اطلاعیه های کانواس "
+  reply_to_9fa43ebe: "ارسال پاسخ به"
   reply_to_comment_72d96728: "پاسخ به نظر"
   reply_to_conversation_f1aa0d4: "ارسال پاسخ به گفتگو"
   reply_to_conversation_subject_4b2e6fe7: "ارسال پاسخ به گفتگو %{subject}"
@@ -25436,6 +25446,7 @@ fa:
   value_added_1846cc30: "%{value} اضافه شده"
   value_d842f16d: مقدار
   value_is_not_a_valid_date_23c2d0a2: "%{value} یک تاریخ معتبر نیست."
+  value_must_be_a_whole_number_23c79120: "حداکثر ظرفیت گروه باید یک عدد باشد"
   value_must_be_positive_3e086d5a: "مقدار باید مثبت باشد"
   value_removed_bba9430c: "%{value} حذف شده"
   vanity_url_76f93382: "نشانی اینترنتی منحصربفرد تارنما برای مقاصد بازاریابی"
