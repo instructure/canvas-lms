@@ -20,8 +20,7 @@
 
 # @API Communication Channels
 #
-# API for accessing users' email addresses, SMS phone numbers, and X.com
-# communication channels.
+# API for accessing users' email and SMS communication channels.
 #
 # In this API, the `:user_id` parameter can always be replaced with `self` if
 # the requesting user is asking for his/her own information.

@@ -274,7 +274,7 @@ class AuthenticationProvidersController < ApplicationController
   #
   # Add external authentication provider(s) for the account.
   # Services may be Apple, CAS, Facebook, GitHub, Google, LDAP, LinkedIn,
-  # Microsoft, OpenID Connect, SAML, or X.com.
+  # Microsoft, OpenID Connect, or SAML.
   #
   # Each authentication provider is specified as a set of parameters as
   # described below. A provider specification must include an 'auth_type'
@@ -632,7 +632,6 @@ class AuthenticationProvidersController < ApplicationController
   # - federated_attributes [Optional]
   #
   #   See FederatedAttributesConfig. Any value is allowed for the provider attribute names.
-
   #
   # @example_request
   #   # Create LDAP config
@@ -728,8 +727,9 @@ class AuthenticationProvidersController < ApplicationController
   end
 
   # @API Update authentication provider
-  # Update an authentication provider using the same options as the create endpoint.
-  # You can not update an existing provider to a new authentication type.
+  # Update an authentication provider using the same options as the
+  # {api:AuthenticationProvidersController#create Add authentication provider} endpoint.
+  # You cannot update an existing provider to a new authentication type.
   #
   # @example_request
   #   # update SAML config
@@ -829,7 +829,7 @@ class AuthenticationProvidersController < ApplicationController
     }
   end
 
-  # @API show account auth settings
+  # @API Show account auth settings
   #
   # The way to get the current state of each account level setting
   # that's relevant to Single Sign On configuration
@@ -845,7 +845,7 @@ class AuthenticationProvidersController < ApplicationController
     render json: sso_settings_json(@account)
   end
 
-  # @API update account auth settings
+  # @API Update account auth settings
   #
   # For various cases of mixed SSO configurations, you may need to set some
   # configuration at the account level to handle the particulars of your
