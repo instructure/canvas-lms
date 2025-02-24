@@ -332,6 +332,38 @@ describe GroupMembership do
 
       expect(@membership.user_id).to eq @student.id
     end
+
+    it "does not allow ta without permissions to add to a tag" do
+      Account.default.enable_feature!(:differentiation_tags)
+      teacher_in_course(active_all: true)
+      student_in_course(active_all: true)
+      ta_in_course(active_all: true)
+      @category = @course.group_categories.build(name: "category 1", non_collaborative: true)
+      @category.save!
+
+      @group = @category.groups.create!(context: @course)
+      @membership = @group.add_user(@student)
+
+      # By default TAs don't have Dif tag permissions
+      expect(@membership.grants_right?(@ta, :read)).to be_falsey
+      expect(@membership.grants_right?(@ta, :delete)).to be_falsey
+      expect(@membership.grants_right?(@ta, :update)).to be_falsey
+      expect(@membership.grants_right?(@ta, :create)).to be_falsey
+      expect(@membership.check_policy(@ta)).to be_empty
+
+      # Students shouldn't have these permissions for dif tags
+      expect(@membership.grants_right?(@student, :read)).to be_falsey
+      expect(@membership.grants_right?(@student, :delete)).to be_falsey
+      expect(@membership.grants_right?(@student, :update)).to be_falsey
+      expect(@membership.grants_right?(@student, :create)).to be_falsey
+      expect(@membership.check_policy(@student)).to be_empty
+
+      # Teachers have these permissions by default
+      expect(@membership.grants_right?(@teacher, :read)).to be_truthy
+      expect(@membership.grants_right?(@teacher, :delete)).to be_truthy
+      expect(@membership.grants_right?(@teacher, :update)).to be_truthy
+      expect(@membership.grants_right?(@teacher, :create)).to be_truthy
+    end
   end
 
   it "updates group leadership as membership changes" do
