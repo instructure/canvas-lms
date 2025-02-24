@@ -27,10 +27,10 @@ const handleClickEvent = event => {
   if (ENV.STUDENT_CONTEXT_CARDS_ENABLED && studentId && courseId) {
     event.preventDefault()
     // 'StudentTray__Container is provided by application controller, but for the
-    // case of showing discussions in speedgrader, we need to look for the iframe's grandparent
+    // case of showing discussions in speedgrader, we need to look for the iframe's parent
     const container =
       document.getElementById('StudentTray__Container') ||
-      window.parent.parent.document.getElementById('StudentTray__Container')
+      window.parent.document.getElementById('StudentTray__Container')
 
     const returnFocusToHandler = () => {
       const focusableItems = [$(event.target)]
@@ -44,7 +44,6 @@ const handleClickEvent = event => {
       return focusableItems
     }
 
-     
     ReactDOM.render(
       <StudentContextTray
         key={`student_context_card_${courseId}_${studentId}`}
