@@ -33,12 +33,13 @@ describe "users" do
       course_factory.enroll_student(@user)
 
       get "/users/#{@user.id}"
-      pseudonym_form = f("#edit_pseudonym_form")
       f(".add_pseudonym_link").click
       wait_for_ajaximations
-      pseudonym_form.find_element(:css, "#pseudonym_unique_id").send_keys("new_user")
-      pseudonym_form.find_element(:css, "#pseudonym_password").send_keys("qwertyuiop")
-      pseudonym_form.find_element(:css, "#pseudonym_password_confirmation").send_keys("qwertyuiop")
+      pseudonym_form = f("[aria-label='Add Login']")
+      password = "qwertyuiop"
+      pseudonym_form.find_element(:css, "[name='unique_id']").send_keys("new_user")
+      pseudonym_form.find_element(:css, "[name='password']").send_keys(password)
+      pseudonym_form.find_element(:css, "[name='password_confirmation']").send_keys(password)
       submit_form(pseudonym_form)
       wait_for_ajaximations
 
@@ -46,7 +47,7 @@ describe "users" do
       expect(new_login).not_to be_nil
       expect(new_login.find_element(:css, ".account_name").text).not_to be_blank
       pseudonym = Pseudonym.by_unique_id("new_user").first
-      expect(pseudonym.valid_password?("qwertyuiop")).to be_truthy
+      expect(pseudonym.valid_password?(password)).to be_truthy
     end
   end
 
