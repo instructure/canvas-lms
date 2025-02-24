@@ -73,7 +73,7 @@ class QuestionBanksController < ApplicationController
     add_crumb(@bank.title)
 
     if params[:fixup_quiz_math_questions] == "1" && @bank.grants_right?(@current_user, session, :update)
-      InstStatsd::Statsd.distributed_increment("fixingup_quiz_math_banks")
+      InstStatsd::Statsd.increment("fixingup_quiz_math_banks")
       @bank = fixup_quiz_questions_with_bad_math(@bank, question_bank: true)
     end
 

@@ -34,7 +34,7 @@ class TranslationController < ApplicationController
     # Don't allow users that can't access, or if translation is not available
     return render_unauthorized_action unless Translation.available?(@context, :translation) && user_can_read?
 
-    InstStatsd::Statsd.distributed_increment("translation.discussions")
+    InstStatsd::Statsd.increment("translation.discussions")
     if Account.site_admin.feature_enabled?(:ai_translation_improvements)
       render json: { translated_text: Translation.translate_html(html_string: required_params[:text],
                                                                  tgt_lang: required_params[:tgt_lang]) }
@@ -46,7 +46,7 @@ class TranslationController < ApplicationController
   end
 
   def translate_paragraph
-    InstStatsd::Statsd.distributed_increment("translation.inbox_compose")
+    InstStatsd::Statsd.increment("translation.inbox_compose")
     if Account.site_admin.feature_enabled?(:ai_translation_improvements)
       render json: { translated_text: Translation.translate_text(text: required_params[:text],
                                                                  tgt_lang: required_params[:tgt_lang]) }

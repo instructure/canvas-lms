@@ -118,9 +118,9 @@ describe LiveEvents::AsyncWorker do
 
         expect(stream_client).to receive(:put_records).with(expected_batch).and_return(results1, results2)
         expect(statsd_double).to receive(:time).and_yield.twice
-        expect(statsd_double).not_to receive(:distributed_increment).with("live_events.events.send_errors", any_args)
-        expect(statsd_double).to receive(:distributed_increment).with("live_events.events.sends", any_args)
-        expect(statsd_double).to receive(:distributed_increment).with("live_events.events.retry", any_args)
+        expect(statsd_double).not_to receive(:increment).with("live_events.events.send_errors", any_args)
+        expect(statsd_double).to receive(:increment).with("live_events.events.sends", any_args)
+        expect(statsd_double).to receive(:increment).with("live_events.events.retry", any_args)
 
         @worker.start!
         @worker.push event, partition_key
@@ -132,9 +132,9 @@ describe LiveEvents::AsyncWorker do
 
         expect(stream_client).to receive(:put_records).exactly(4).times.and_return(results)
         expect(statsd_double).to receive(:time).and_yield.exactly(4).times
-        expect(statsd_double).to receive(:distributed_increment).exactly(3).times.with("live_events.events.retry", any_args)
-        expect(statsd_double).to receive(:distributed_increment).once.with("live_events.events.final_retry", any_args)
-        expect(statsd_double).to receive(:distributed_increment).with("live_events.events.send_errors", any_args)
+        expect(statsd_double).to receive(:increment).exactly(3).times.with("live_events.events.retry", any_args)
+        expect(statsd_double).to receive(:increment).once.with("live_events.events.final_retry", any_args)
+        expect(statsd_double).to receive(:increment).with("live_events.events.send_errors", any_args)
 
         @worker.start!
         @worker.push event, partition_key
@@ -147,9 +147,9 @@ describe LiveEvents::AsyncWorker do
         expect(stream_client).to receive(:put_records).exactly(4).times.and_return(results)
         expect(statsd_double).to receive(:time).and_yield.exactly(4).times
         expect(statsd_double).to receive(:distributed_increment).exactly(4).times.with("live_events.events.throttled")
-        expect(statsd_double).to receive(:distributed_increment).exactly(3).times.with("live_events.events.retry", any_args)
-        expect(statsd_double).to receive(:distributed_increment).once.with("live_events.events.final_retry", any_args)
-        expect(statsd_double).to receive(:distributed_increment).with("live_events.events.send_errors", any_args)
+        expect(statsd_double).to receive(:increment).exactly(3).times.with("live_events.events.retry", any_args)
+        expect(statsd_double).to receive(:increment).once.with("live_events.events.final_retry", any_args)
+        expect(statsd_double).to receive(:increment).with("live_events.events.send_errors", any_args)
 
         @worker.start!
         @worker.push event, partition_key

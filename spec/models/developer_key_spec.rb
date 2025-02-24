@@ -298,7 +298,7 @@ describe DeveloperKey do
 
       before do
         developer_key
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:timing)
       end
 
@@ -309,7 +309,7 @@ describe DeveloperKey do
       context "when method succeeds" do
         it "increments success count" do
           enable_external_tools
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("developer_key.manage_external_tools.count", any_args)
+          expect(InstStatsd::Statsd).to have_received(:increment).with("developer_key.manage_external_tools.count", any_args)
         end
 
         it "tracks success timing" do
@@ -332,7 +332,7 @@ describe DeveloperKey do
 
         it "increments error count" do
           manage_external_tools
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("developer_key.manage_external_tools.error.count", any_args)
+          expect(InstStatsd::Statsd).to have_received(:increment).with("developer_key.manage_external_tools.error.count", any_args)
         end
 
         it "tracks success timing" do

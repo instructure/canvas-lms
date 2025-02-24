@@ -49,7 +49,7 @@ class Mutations::UpdateConversationParticipants < Mutations::BaseMutation
     conversation_participants.map do |cp|
       # the update method will delete from the input hash
       params_dup = update_params.dup
-      InstStatsd::Statsd.distributed_increment("inbox.conversation.unarchived.react") if cp.workflow_state == "archived" && unarchivable_states.include?(update_params[:workflow_state])
+      InstStatsd::Statsd.increment("inbox.conversation.unarchived.react") if cp.workflow_state == "archived" && unarchivable_states.include?(update_params[:workflow_state])
       cp.update(params_dup)
     end
     InstStatsd::Statsd.count("inbox.conversation.archived.react", conversation_participants.count) if update_params[:workflow_state] == "archived"

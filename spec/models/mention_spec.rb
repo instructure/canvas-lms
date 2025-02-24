@@ -27,12 +27,12 @@ describe Mention do
 
   describe "Metrics" do
     before do
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
     end
 
     it "increment discussion_mention.created" do
       Mention.create!(user_id: @user.id, discussion_entry_id: @entry.id, root_account_id: @topic.root_account_id)
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_mention.created")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_mention.created")
     end
   end
 

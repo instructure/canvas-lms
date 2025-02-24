@@ -461,7 +461,7 @@ describe RubricAssessment do
       end
 
       it "assessing a rubric with outcome criterion should increment datadog counter" do
-        allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
         @outcome.update!(data: nil)
         criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         @association.assess({
@@ -475,8 +475,8 @@ describe RubricAssessment do
                                 }
                               }
                             })
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("feature_flag_check", any_args).at_least(:once)
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("learning_outcome_result.create")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
+        expect(InstStatsd::Statsd).to have_received(:increment).with("learning_outcome_result.create")
       end
 
       it "uses default ratings for scoring" do
@@ -1049,9 +1049,9 @@ describe RubricAssessment do
 
   describe "create" do
     it "sets the root_account_id using rubric" do
-      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
-      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("grading.rubric.teacher_assessed_old").at_least(:once)
-      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("grading.rubric.teacher_leaves_feedback_old").at_least(:once)
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      expect(InstStatsd::Statsd).to receive(:increment).with("grading.rubric.teacher_assessed_old").at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:increment).with("grading.rubric.teacher_leaves_feedback_old").at_least(:once)
       assessment = @association.assess({
                                          user: @student,
                                          assessor: @teacher,

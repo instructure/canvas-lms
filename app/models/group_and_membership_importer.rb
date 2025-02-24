@@ -149,10 +149,10 @@ class GroupAndMembershipImporter < ActiveRecord::Base
   end
 
   def create_new_group(name)
-    InstStatsd::Statsd.distributed_increment("groups.auto_create",
-                                             tags: { split_type: "csv",
-                                                     root_account_id: group_category.root_account&.global_id,
-                                                     root_account_name: group_category.root_account&.name })
+    InstStatsd::Statsd.increment("groups.auto_create",
+                                 tags: { split_type: "csv",
+                                         root_account_id: group_category.root_account&.global_id,
+                                         root_account_name: group_category.root_account&.name })
     group_category.groups.create!(name:, context: group_category.context)
   end
 
