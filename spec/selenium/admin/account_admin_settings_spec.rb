@@ -336,8 +336,8 @@ describe "root account basic settings" do
     account.reload
     expect(account.settings[:ip_filters]).to be_present # should not have cleared them if we didn't do anything
 
-    filter = ff(".ip_filter").detect(&:displayed?)
-    el = filter.find_element(:css, ".delete_filter_link")
+    filter = ff(%(span[data-testid="ip-filter"])).detect(&:displayed?)
+    el = filter.find_element(:css, %([data-testid="delete-ip-filter"]))
     el.location_once_scrolled_into_view
     el.click
 
