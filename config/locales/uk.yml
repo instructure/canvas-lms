@@ -6051,6 +6051,7 @@ uk:
   custom_6979cd81: Звичай
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Призначені для користувача CSS і Javascript може викликати проблеми доступності або конфлікти з майбутніми оновленнями Canvas!"
   custom_fields_fc3e55af: "Поля користувача"
+  custom_from_name_38a3d784: "Назва поля \"From\" , надана користувачем"
   custom_link_details_35fd38fc: "Подробиці посилання на замовлення "
   customize_74cdc895: Налаштувати
   customize_this_menu_efa72a9: "Налаштувати це меню"
@@ -6287,6 +6288,7 @@ uk:
   deep_purple_bb3e2907: Темно-фіолетовий
   default_9db103d: "За замовчуванням"
   default_account_quotas_e34112fd: "Квоти облікового запису за замовчуванням"
+  default_canvas_setting_fa6e6f81: "Налаштування Canvas по замовчуванню"
   default_conference_title: "%{course_name} конференція"
   default_email_5cb9fa04: "Електронна пошта за замовчуванням"
   default_email_9efb7fbd: "Електронна пошта за замовчуванням"
@@ -6351,6 +6353,7 @@ uk:
   deleted_ce03674d: видалено
   deleted_topic_notice: "Ця тема видалена"
   deleting_6421031e: видалення...
+  deleting_e2bd8cc9: Видалення...
   delicious_7f9ac66f: Смачний
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Демо-сайти вимагають налаштування параметрів Recaptcha. Будь ласка, зверніться до адміністратора сайту стосовно цього випадку Canvas."
   demos: 
@@ -6809,6 +6812,7 @@ uk:
   display_course_catalog: "Показати список курсів з можливістю пошуку в цьому кореневому обліковому записі з включеним прапорцем \"Включити цей курс до індексу публічного курсу\"."
   display_name_6c2cfc58: "Відображуване Ім'я:"
   display_name_b80c243e: "Відображуване Ім'я"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "Показати один раз спливаюче попередження на сторінці Налаштування сповіщень."
   display_totals_for_all_grading_periods_option_4a72586: "Показати результати для опції Всі періоди оціновання"
   district_id_6f408184: "Ідентифікатор району"
   divide_into_equal_slots_of_input_value_minutes_fca83452: "Розділити на рівні проміжки по  %{input_value}  хвилин. "
@@ -7413,6 +7417,7 @@ uk:
   epub_exporting_f5592ff2: "Експорт Е-публікації"
   error_59293a2c: помилка
   error_98e81528: Помилка
+  error_afac7133: "Помилка:"
   error_deleting_name_reason_11f9d399: "Помилка видалення %{name}: %{reason}"
   error_duplicating_module_4b023042: "Помилка дублювання модуля"
   error_exporting_gradebook_msg_6ea31e2f: "Помилка експорту журналу: %{msg}"
@@ -8518,6 +8523,7 @@ uk:
       removed: "Набір груп успішно видалений."
     group_atom_feed: "Група Atom Feed"
     group_limit_number: "Обмеження групи повинне буди числом"
+    group_set_name_required: "Ім'я обов'язкове"
     groups_count: "Групи (%{count})"
     index: 
       heading_current_groups: "Поточні групи"
@@ -9325,6 +9331,7 @@ uk:
   learning_outcome_name_9cb475e6: "назва результата навчання "
   leave_5e852989: Залишити
   leave_a_comment_7991725b: "Залишити коментар"
+  leave_blank_for_no_limit_e8f80808: "Залишити порожнім для безліміту"
   leave_group_group_name_6847c632: "Залишити групу %{group_name}"
   left_group_group_name_aac4e813: "Залишено групу %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -12252,6 +12259,7 @@ uk:
   notification_preferences_cf47083d: "Налаштування повідомлень"
   notifications_cbfa7704: Повідомлення
   notifications_search_results_80a0b06f: "Повідомлення про результати пошуку"
+  notifications_sent_to_external_services_c4a86b78: "Повідомлення надіслані зовнішнім сервісам"
   notify_users_this_quiz_has_changed_c5b05995: "Повідомляти користувачів, що цей тест був змінений"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Тепер, коли ваш курс налаштований і доступний, вам мабуть більше не знадобиться цей контрольний список. Проте, ми триматимемо його під рукою на випадок, якщо ви пізніше зрозумієте, що хочете спробувати щось нове, або просто потребуватимете трохи додакової допомоги для внесення змін до вмісту курсу. "
   number: 
@@ -15048,6 +15056,7 @@ uk:
   recaptcha_not_configured_3a6ef9ee: "Recaptcha не налаштована"
   recent_activity_51239235: "Недавня активність"
   recent_announcements_8becc59c: "Останні оголошення"
+  recent_canvas_notifications_81395de6: "Останні повідомлення Canvas"
   recent_student: 
     last_logged_in: "Останній вхід %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt}Розкладений середній"
@@ -15196,6 +15205,7 @@ uk:
   reply_389d6fb9: Відповідь
   reply_all_80298bee: "Відповісти всім"
   reply_from_name: "%{name}через Canvas - повідомлення"
+  reply_to_9fa43ebe: Відповісти-на
   reply_to_comment_72d96728: "Відповісти на коментар"
   reply_to_current_message_55391f5b: "Відповісти на поточне повідомлення"
   reply_to_main_discussion_29823888: "Відповісти на головне обговорення"
@@ -18596,6 +18606,7 @@ uk:
   validate_links_in_content_b1630fba: "Перевірка посилань у вмісті"
   validation_error_3b943100: "Помилка перевірки"
   value_d842f16d: Значення
+  value_must_be_a_whole_number_23c79120: "Обмеження групи повинне буди числом"
   value_must_be_positive_3e086d5a: "Значення має бути позитивним"
   vanity_url_76f93382: "URL марнославства"
   vendor_code_lti_2_ef36207b: "Код постачальника (LTI 2):"
