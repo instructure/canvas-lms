@@ -125,6 +125,46 @@ describe('fetchOutcomes', () => {
         },
       ],
     },
+    assignmentsResponse: [
+      {
+        id: 1,
+        course_id: 1,
+        rubric: [
+          {
+            points: 5,
+            ratings: [
+              {
+                points: 5,
+                description: "Full Marks"
+              },
+              {
+                points: 0,
+                description: "No Marks"
+              }
+            ]
+          },
+          {
+            points: 5,
+            description: "Outcome 1",
+            ratings: [
+              {
+                points: 5,
+                description: "Exceeds Expectations"
+              },
+              {
+                points: 3,
+                description: "Meets Expectations"
+              },
+              {
+                points: 0,
+                description: "Does Not Meet Expectations"
+              }
+            ],
+            outcome_id: 1
+          }
+        ]
+      }
+    ]
   })
 
   const expectedOutcomes = [
@@ -170,6 +210,7 @@ describe('fetchOutcomes', () => {
     rollupsResponse,
     resultsResponses,
     alignmentsResponse,
+    assignmentsResponse,
     fullResponse = false,
   }) => {
     fetchMock.mock('/api/v1/courses/1/outcome_groups?per_page=100', groupsResponse)
@@ -201,6 +242,7 @@ describe('fetchOutcomes', () => {
       }
       return results
     })
+    fetchMock.mock('/api/v1/courses/1/assignments?per_page=100&page=1', assignmentsResponse)
   }
 
   it('throws error if http throws error', async () => {
@@ -214,6 +256,10 @@ describe('fetchOutcomes', () => {
     const {outcomeGroups, outcomes} = await fetchOutcomes(1, 2)
     expect(outcomeGroups).toMatchObject(responses.groupsResponse)
     expect(outcomes).toMatchObject(expectedOutcomes)
+    const testResults = outcomes.map(outcome => outcome.results[0])
+    expect(testResults[0].outcomeRatingsFromRubric)
+      .toMatchObject(responses.assignmentsResponse[0].rubric[1].ratings)
+    expect(testResults[1].outcomeRatingsFromRubric).toBeUndefined()
   })
 
   it('removes hidden results', async () => {
@@ -246,7 +292,7 @@ describe('fetchOutcomes', () => {
     mockAll(responses)
     const {outcomes} = await fetchOutcomes(1, 2)
     expect(outcomes).toHaveLength(20)
-    expect(outcomes.find(o => o.id === 12).results).toHaveLength(1)
+    expect(outcomes.find(outcome => outcome.id === 12).results).toHaveLength(1)
   })
   it('handles an unexpected outcome result', async () => {
     /* the idea here is to simulate an outcome_results response
