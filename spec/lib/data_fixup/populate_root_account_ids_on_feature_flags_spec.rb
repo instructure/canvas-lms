@@ -19,6 +19,7 @@
 
 describe DataFixup::PopulateRootAccountIdsOnFeatureFlags do
   before do
+    allow(Account.site_admin).to receive(:feature_enabled?).with(:instructure_identity_global_flag)
     allow(Feature).to receive(:definitions).and_return(
       {
         "root_account_feature" => Feature.new(feature: "root_account_feature", applies_to: "RootAccount"),
