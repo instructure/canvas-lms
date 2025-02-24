@@ -18,11 +18,15 @@
 
 @import 'base/environment';
 
-.form-inline label {
-  margin: 0;
-}
-.form-inline input, .form-inline button {
-  margin-#{direction(left)}: 0.5em;
+.all_courses_form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+
+  input[type='search'] {
+    width: 250px;
+  }
 }
 #course_summaries {
   margin: 0;
@@ -57,3 +61,13 @@ p {
   bottom: 3px;
   #{direction(right)}: 3px;
 }
+.not_found {
+  padding: 1.5rem;
+  place-items: center;
+
+  &__heading {
+    font-size: 2.375rem;
+    font-weight: 700;
+  }
+}
+
