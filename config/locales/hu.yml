@@ -8445,6 +8445,7 @@ hu:
   custom_6ed5c8b7: egyéni
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Az egyéni CSS és Javascript hozzáférhetőségi problémákat okozhat vagy konfliktusba kerülhet a jövőbeli Canvas frissítésekkel!"
   custom_fields_fc3e55af: "Egyéni mezők"
+  custom_from_name_38a3d784: "Egyéni \"Feladó\" név"
   custom_gradebook_columns_81944594: "Egyedi Osztálynapló Oszlopok"
   custom_link_details_35fd38fc: "Egyéni hivatkozás részletei"
   custom_lti_usage_uwf_b63978a5: "Egyéni LTI használat – UWF"
@@ -8709,6 +8710,7 @@ hu:
   default_9db103d: Alapértelmezett
   default_account_quotas_e34112fd: "Alapértelmezett fiókkvóta"
   default_canvas_grading_scheme_ab769633: "Alapértelmezett Canvas osztályozási rendszer"
+  default_canvas_setting_fa6e6f81: "Alapértelmezett Canvas beállítás"
   default_conference_title: "%{course_name} konferencia"
   default_course_pace_ce0ba0f3: "Alapértelmezett Kurzus ütemezés"
   default_date_will_be_today_s_date_4f85dcdc: "Az alapértelmezett dátum a mai dátum lesz"
@@ -8850,6 +8852,7 @@ hu:
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "A felhasználó törlésével az összes ePortfoliója is megsemmisül. Ehelyett az ePorfolió láthatósága beállítható spamként, vagy biztonságosként. "
   deleting_assignment_22d5851d: "feladat törlése"
   deleting_custom_status_statusname_5bd7dfa9: "Egyéni állapot törlése %{statusName}"
+  deleting_e2bd8cc9: Törlés...
   deleting_f2ff0d09: Törlés
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "A demo oldalhoz szükséges, hogy a Recaptcha beállítások konfigurálva legyenek. Kérjük, vegye fel a kapcsolatot a Canvas adminisztrátorával."
@@ -9426,6 +9429,7 @@ hu:
   display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Megjelenítendő név:"
   display_name_b80c243e: "Megjelenítendő név"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "Jelenjen meg egyszeri felugró figyelmeztetés az Értesítési beállítások oldalon."
   display_student_filter_options_ab034cfa: "Hallgatói szűrő opciók megjelenítése"
   display_totals_for_all_grading_periods_option_4a72586: "Összesítések megjelenítése az összes értékelési időszakra vonatkozóan"
   display_updated_at_d5b25d7b: "%{display_updated_at}"
@@ -10347,6 +10351,7 @@ hu:
   error_adding_files_97ba198e: "Hiba a fájlok hozzáadásakor"
   error_adding_files_to_conversation_message_58e83876: "Hiba történt a fájlok beszélgetési üzenethez való hozzáadásakor"
   error_adding_files_to_submission_draft_6acac337: "Hiba történt a fájlok hozzáadásakor a beadási vázlathoz"
+  error_afac7133: "Hiba:"
   error_archiving_rubric_f6e6740e: "Hiba az értékelőtábla archiválásakor"
   error_associating_assignment_assignment_name_with__d92e9acf: "Hiba történt a következő feladat LTI-eszközhöz való hozzárendelése során: „%{assignment_name}”."
   error_canceling_draft_ec3dbdc9: "Hiba történt a piszkozat visszavonásakor"
@@ -12054,6 +12059,7 @@ hu:
       removed: "Csoporthalmaz sikeresen eltávolítva."
     group_atom_feed: "Csoport Atom hírfolyam"
     group_limit_number: "A csoportlétszám csak szám lehet"
+    group_set_name_required: "A név megadása kötelező"
     groups_count: "Csoportok (%{count})"
     index: 
       heading_current_groups: "Jelenlegi csoportok"
@@ -13652,6 +13658,7 @@ hu:
   learnplatform_provides_product_information_the_url_f491a905: "A LearnPlatform termékinformációkat biztosít. Az alább megadott URL-nek érvényes LearnPlatform környezetre kell mutatnia (például %{url} -- ügyeljen arra, hogy hagyja ki a perjelet"
   leave_5e852989: Elhagyás
   leave_a_comment_7991725b: "Megjegyzés hozzáadása"
+  leave_blank_for_no_limit_e8f80808: "hagyja üresen, ha nincs korlátozás"
   leave_group_group_name_6847c632: " %{group_name} csoport elhagyása"
   left_group_group_name_aac4e813: "Elhagyta a következő csoportot: %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -17389,6 +17396,7 @@ hu:
   notifications_cbfa7704: Értesítések
   notifications_off_80da021c: "Értesítések kikapcsolva"
   notifications_search_results_80a0b06f: "Értesítési keresés eredmények"
+  notifications_sent_to_external_services_c4a86b78: "Értesítések elküldve külső szolgáltatásoknak"
   notifications_unsupported_65f6bf65: "Nem támogatott értesítések"
   notifications_view_f9a60770: "Értesítések - áttekintés"
   notifications_will_not_be_sent_retroactively_for_a_e84dc84e: "A kurzus közzététele vagy a kurzus kezdete előtt létrehozott hirdetményekről nem küldünk visszamenőlegesen értesítést. Vegye fontolóra a Késleltetett közzététel opció használatát, amellyel későbbi időpontra ütemezheti a megjelenést."
@@ -20821,6 +20829,7 @@ hu:
   received_throttled_response_from_microsoft_api_whi_f0e664bd: "A Microsoft API-tól egy kötegelt kérés végrehajtása közben letiltott választ kapott.                        "
   recent_activity_51239235: "Legutóbbi tevékenységek"
   recent_announcements_8becc59c: "Friss hirdetmények"
+  recent_canvas_notifications_81395de6: "Legutóbbi Canvas-értesítések"
   recent_f19e8c64: Legutóbbi
   recent_history_bcb0f4c0: "A közelmúlt történései"
   recent_history_tray_241a384e: "A közelmúlt történéseinek tálcája"
@@ -21087,6 +21096,7 @@ hu:
   reply_for_subject_ae247d1e: "Válasz erre: %{subject}"
   reply_from_author_a2806c77: "Válaszol tőle: %{author}"
   reply_from_name: "%{name} a Canvas-értesítéseken keresztül"
+  reply_to_9fa43ebe: Válaszcím
   reply_to_authorname_f209e84a: "Válasz neki: %{authorName}"
   reply_to_comment_72d96728: "Válasz a megjegyzésre"
   reply_to_conversation_f1aa0d4: "Válasz egy hozzászólásra"
@@ -26840,6 +26850,7 @@ hu:
   value_is_not_a_valid_standard_grade_status_99de23ac: "%{value} nem egy érvényes szabványos osztályzat státusza"
   value_is_not_a_valid_workflow_state_f75c5e59: "%{value} nem érvényes munkafolyamat_állapot"
   value_is_not_valid_563afee6: "%{value} nem érvényes"
+  value_must_be_a_whole_number_23c79120: "A csoportlétszám csak szám lehet"
   value_must_be_positive_3e086d5a: "Az értéknek pozitívnak kell lennie"
   value_removed_bba9430c: "%{value} Eltávolítva"
   value_too_long_allowed_length_is_length_a81d4cf: "Túl hosszú érték, a megengedett hossz %{length}"
