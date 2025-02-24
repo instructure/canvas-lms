@@ -254,9 +254,9 @@ class BigBlueButtonConference < WebConference
   end
 
   def recordings
-    fetch_recordings.map do |recording|
-      recording_formats(recording)
-    end
+    fetch_recordings
+      .reject { |recording| recording[:state] == "deleted" }
+      .map { |recording| recording_formats(recording) }
   end
 
   def recording(recording_id = nil)

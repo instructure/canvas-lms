@@ -121,6 +121,7 @@ describe BigBlueButtonConference do
   describe "plugin setting recording_enabled is enabled" do
     let(:get_recordings_fixture) { Rails.root.join("spec/fixtures/files/conferences/big_blue_button_get_recordings_two.json").read }
     let(:get_recordings_bulk_fixture) { Rails.root.join("spec/fixtures/files/conferences/big_blue_button_get_recordings_bulk.json").read }
+    let(:get_recordings_deleted_fixture) { Rails.root.join("spec/fixtures/files/conferences/big_blue_button_get_recordings_deleted.json").read }
 
     before do
       allow(WebConference).to receive(:plugins).and_return([
@@ -304,6 +305,12 @@ describe BigBlueButtonConference do
       response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
       allow(@bbb).to receive_messages(conference_key: "12345", send_request: response)
       expect(@bbb.recordings).not_to eq []
+    end
+
+    it "properly serializes a response with deleted recordings" do
+      response = JSON.parse(get_recordings_deleted_fixture, { symbolize_names: true })
+      allow(@bbb).to receive_messages(conference_key: "12345", send_request: response)
+      expect(@bbb.recordings).to eq []
     end
 
     it "does not have duration_minutes set to 0" do
