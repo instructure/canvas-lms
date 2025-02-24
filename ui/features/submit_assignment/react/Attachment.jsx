@@ -101,12 +101,13 @@ const Attachment = ({
 
   const clearInputFile = () => {
     getFileDropInput().value = ''
+    fileInputPlaceholderRef.current?.replaceChildren()
     setFile(null)
   }
 
   const handleAcceptFile = (file) => {
     if (file.size === 0) {
-      const errorText = formatErrorMessage(I18n.t('Attached files must be greater than 0 bytes'))
+      const errorText = formatErrorMessage(I18n.t('Attached files must be greater than 0 bytes.'))
       setErrorMessages([{ text: errorText, type: 'error' }])
       // Clear the file from the input since we are not accepting it
       clearInputFile()
@@ -132,6 +133,7 @@ const Attachment = ({
       onClick={() => setOpenWebcamModal(true)}
       margin="none small"
       ref={useWebcamRef}
+      id={`webcam_button_${index}`}
     >
       {I18n.t('Use Webcam')}
     </Button>
@@ -180,7 +182,7 @@ const Attachment = ({
                 data-testid={`submission_file_drop_${index}`}
               />
             </Flex>
-            {(hasMediaFeature() && !dataURL) && (
+            {(hasMediaFeature() && (validFileTypes.length === 0 || validFileTypes.includes('png')) && !dataURL) && (
               <Flex width='100%' margin='small 0'>
                 {useWebcamButton}
               </Flex>
