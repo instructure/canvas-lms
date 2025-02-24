@@ -88,10 +88,7 @@ const Tour = ({roles}: ITour) => {
   React.useEffect(() => {
     // Override the tray dismiss function while this
     // tour is open;
-    if (open) {
-      tourPubSub.publish('navigation-tray-override-dismiss', true)
-    }
-    return () => tourPubSub.publish('navigation-tray-override-dismiss', false)
+    tourPubSub.publish('navigation-tray-override-dismiss', open)
   }, [open])
 
   const handleSoftClose = React.useCallback(
@@ -119,14 +116,15 @@ const Tour = ({roles}: ITour) => {
 
   React.useEffect(() => {
     const escapeClose = (e: any) => {
-      if (e.keyCode === 27) {
-        // Escape Key
+      const hasEscapeKeyPressed = e.keyCode === 27
+
+      if (hasEscapeKeyPressed && !hasOpened) {
         handleSoftClose()
       }
     }
     document.addEventListener('keydown', escapeClose)
     return () => document.removeEventListener('keydown', escapeClose)
-  }, [handleSoftClose])
+  }, [handleSoftClose, hasOpened])
 
   const restoreTrayScreenReader = () => {
     // Restore the nav tray's screen reader visibility
@@ -154,8 +152,9 @@ const Tour = ({roles}: ITour) => {
   React.useEffect(() => {
     if (open) {
       blockApplicationScreenReader()
+    } else {
+      restoreTrayScreenReader()
     }
-    return () => restoreTrayScreenReader()
   }, [open])
 
   React.useEffect(() => {
@@ -197,14 +196,14 @@ const Tour = ({roles}: ITour) => {
     return () => unsub()
   }, [roles])
 
-  if (!currentRole || !steps) return null
+  if (!currentRole || !steps || !open) return null
 
   const firstStepLabels = {
     student: I18n.t('Student Tour'),
     teacher: I18n.t('Teacher Tour'),
     admin: I18n.t('Admin Tour'),
   }
-  if (!open) return null
+
   return (
     <Reactour
       key={`${softClose}-${open}-${currentRole}`}
