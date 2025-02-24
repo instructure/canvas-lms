@@ -156,15 +156,38 @@ describe "BigBlueButton conferences" do
       get conferences_index_page
       name_255_chars = "Y3298V7EQwLC8chKnXTz5IFARakIP0k2Yk0nLQ7owgidY6zDQnh9nCmH8z033TnJ1ssFwYtCkKwyhB7HkUN9ZF3u2s1shsj4vYqUlsEQmPljTGFBtO43pCh1QquQUnM2yCsiS5nnCRefjTK7jMwAiOXTZeyFvPk3tLzPAmOwf1Od6vtOB5nfXFSPVYyxSNcl85ySG8SlBoOULqF1IZV0BwE4TLthJV8Ab1h7xW0CbjHaJLMTQtnWK6ntTLxSNi4"
       f("button[title='New Conference']").click
-      f("input[placeholder='Conference Name']").clear
-      f("input[placeholder='Conference Name']").send_keys name_255_chars
-      f("input[placeholder='Conference Name']").send_keys "a" # 256th char
-      expect(fj("span:contains('Name must be less than 255 characters')")).to be_present
+      name_input = f("input[placeholder='Conference Name']")
+      error_message = "Name must not exceed 255 characters"
+      name_input.clear
+      name_input.send_keys name_255_chars
+      name_input.send_keys "a" # 256th char
+      expect(fj("span:contains('#{error_message}')")).to be_present
+      expect(fj("span:contains('#{error_message}')")).to be_present
       expect(f("button[data-testid='submit-button']")).not_to be_enabled
 
       # bring it back down to 255 chars
-      f("input[placeholder='Conference Name']").send_keys :backspace
-      expect(f("body")).not_to contain_jqcss("span:contains('Name must be less than 255 characters')")
+      name_input.send_keys :backspace
+      expect(f("body")).not_to contain_jqcss("span:contains('#{error_message}')")
+      expect(f("button[data-testid='submit-button']")).to be_enabled
+
+      f("button[data-testid='submit-button']").click
+      wait_for_ajaximations
+      expect(WebConference.count).to be > initial_conference_count
+    end
+
+    it "validates empty name" do
+      initial_conference_count = WebConference.count
+      get conferences_index_page
+      f("button[title='New Conference']").click
+      name_input = f("input[placeholder='Conference Name']")
+      name_input.send_keys "a"
+      name_input.send_keys [:control, "a"], :backspace
+      expect(fj("span:contains('Please fill this field')")).to be_present
+      expect(f("button[data-testid='submit-button']")).not_to be_enabled
+
+      # bring it back down to a char
+      name_input.send_keys "a"
+      expect(f("body")).not_to contain_jqcss("span:contains('Please fill this field')")
       expect(f("button[data-testid='submit-button']")).to be_enabled
 
       f("button[data-testid='submit-button']").click
@@ -176,16 +199,43 @@ describe "BigBlueButton conferences" do
       initial_conference_count = WebConference.count
       get conferences_index_page
       number_larger_than_8_digits = 999_999_990
+      error_message_for_to_many_digits = "Duration must be less than or equal to 99,999,999 minutes"
       f("button[title='New Conference']").click
-      f("span[data-testid='duration-input'] input").clear
-      f("span[data-testid='duration-input'] input").send_keys number_larger_than_8_digits
-      # f("input[placeholder='Conference Name']").send_keys "a" # 256th char
-      expect(fj("span:contains('Duration must be less than 99,999,999 minutes')")).to be_present
+      duration_input = f("span[data-testid='duration-input'] input")
+      duration_input.clear
+      duration_input.send_keys number_larger_than_8_digits
+      expect(fj("span:contains('#{error_message_for_to_many_digits}')")).to be_present
       expect(f("button[data-testid='submit-button']")).not_to be_enabled
 
-      # bring it back down to 255 chars
-      f("span[data-testid='duration-input'] input").send_keys :backspace
-      expect(f("body")).not_to contain_jqcss("span:contains('Duration must be less than 99,999,999 minutes')")
+      # bring it back down to 8 digits
+      duration_input.send_keys :backspace
+      expect(f("body")).not_to contain_jqcss("span:contains('#{error_message_for_to_many_digits}')")
+      expect(f("button[data-testid='submit-button']")).to be_enabled
+
+      f("button[data-testid='submit-button']").click
+      wait_for_ajaximations
+      expect(WebConference.count).to be > initial_conference_count
+    end
+
+    it "validates duration is 0" do
+      initial_conference_count = WebConference.count
+      get conferences_index_page
+      error_message_to_zero = "Duration must be greater than 0 minute"
+      f("button[title='New Conference']").click
+      duration_input = f("span[data-testid='duration-input'] input")
+      duration_input.clear
+      # Default value is 60
+      expect(duration_input.attribute("value")).to eq "60"
+      # Delete two digits (60)
+      duration_input.send_keys :backspace
+      duration_input.send_keys :backspace
+      expect(duration_input.attribute("value")).to eq "0"
+      expect(fj("span:contains('#{error_message_to_zero}')")).to be_present
+      expect(f("button[data-testid='submit-button']")).not_to be_enabled
+
+      # bring it back to one digit instead of 0
+      duration_input.send_keys "1"
+      expect(f("body")).not_to contain_jqcss("span:contains('#{error_message_to_zero}')")
       expect(f("button[data-testid='submit-button']")).to be_enabled
 
       f("button[data-testid='submit-button']").click
