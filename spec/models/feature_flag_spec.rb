@@ -97,6 +97,7 @@ describe FeatureFlag do
     end
 
     it "is false on a root account feature flag with site admin flag set" do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:instructure_identity_global_flag)
       Account.site_admin.allow_feature! :hidden_feature
       t_root_account.enable_feature! :hidden_feature
       expect(t_root_account.lookup_feature_flag(:hidden_feature)).not_to be_unhides_feature

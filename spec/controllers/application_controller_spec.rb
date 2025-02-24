@@ -2783,9 +2783,11 @@ RSpec.describe ApplicationController do
     subject { controller.cached_js_env_root_account_settings }
 
     before do
-      Account.default[:settings] = { calendar_contexts_limit: 10, open_registration: true }
-      Account.default.save!
-      controller.instance_variable_set(:@domain_root_account, Account.default)
+      Account.suspend_callbacks(:sync_account_with_identity) do
+        Account.default[:settings] = { calendar_contexts_limit: 10, open_registration: true }
+        Account.default.save!
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+      end
     end
 
     context "when domain root account has settings attribute" do
