@@ -68,7 +68,7 @@ describe('Attachment', () => {
     const fileInput = getByTestId('file-upload-0')
     const emptyFile = new File([], 'empty.txt', { type: 'text/plain' })
     fireEvent.change(fileInput, { target: { files: [emptyFile] } })
-    expect(getByText('Attached files must be greater than 0 bytes')).toBeInTheDocument()
+    expect(getByText('Attached files must be greater than 0 bytes.')).toBeInTheDocument()
   })
 
   test('displays an error if an invalid file is uploaded', () => {
@@ -106,5 +106,10 @@ describe('Attachment', () => {
     fireEvent.click(getByText('Use This Photo'))
     expect(getByAltText('Captured Image')).toBeInTheDocument()
     expect(props.setBlob).toHaveBeenCalledWith(mockedBlob)
+  })
+
+  it('does not render webcam button when png is not a valid file type', () => {
+    const {queryByLabelText} = render(<Attachment {...getProps({validFileTypes: ['pdf', 'txt']})} />)
+    expect(queryByLabelText('Use Webcam')).not.toBeInTheDocument()
   })
 })

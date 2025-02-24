@@ -92,9 +92,12 @@ ready(function () {
 
   const findEmptyFileDrop = () => {
     for (let i = 0; i <= submissionAttachmentIndex; i++) {
-      const fileDrop = document.getElementById(`submission_file_drop_${i}`)
-      if (!fileDrop?.value) {
-        return fileDrop
+      const inputs = document.querySelectorAll(`#submission_file_drop_${i}`)
+      if (inputs.length > 0) {
+        const fileDrop = inputs[inputs.length - 1]
+        if (!fileDrop?.value) {
+          return fileDrop
+        }
       }
     }
   }

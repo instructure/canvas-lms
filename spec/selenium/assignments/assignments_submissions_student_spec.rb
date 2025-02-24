@@ -226,29 +226,7 @@ describe "submissions" do
       expect(f(".attachment_wrapper")).to be_displayed
     end
 
-    it "renders the webcam wraper when allowed_extensions has png", priority: "1" do
-      @assignment.submission_types = "online_upload"
-      @assignment.allowed_extensions = ["png"]
-      @assignment.save!
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f(".submit_assignment_link").click
-      expect(f(".attachment_wrapper")).to be_displayed
-    end
-
-    it "doesn't render the webcam wraper when allowed_extensions doens't have png", priority: "1" do
-      @assignment.submission_types = "online_upload"
-      @assignment.allowed_extensions = ["pdf"]
-      @assignment.save!
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f(".submit_assignment_link").click
-      expect(element_exists?(".attachment_wrapper")).to be_falsy
-    end
-
     it "does not allow a user to submit a file-submission assignment without attaching a file", priority: "1" do
-      skip("investigate in LA-843")
-      skip_if_safari(:alert)
       @assignment.submission_types = "online_upload"
       @assignment.save!
 
@@ -256,17 +234,10 @@ describe "submissions" do
 
       f(".submit_assignment_link").click
       f("#submit_file_button").click
-      expect_flash_message :error
-
-      # navigate off the page and dismiss the alert box to avoid problems
-      # with other selenium tests
-      f("#section-tabs .home").click
-      driver.switch_to.alert.accept
-      driver.switch_to.default_content
+      expect(f("#FileDrop-messages_0")).to include_text "A file is required to make a submission."
     end
 
     it "does not allow a user to submit a file-submission assignment with an empty file", priority: "1" do
-      skip("flaky, will be fixed in ADMIN-3015")
       @assignment.submission_types = "online_upload"
       @assignment.save!
       _filename, fullpath, _data = get_file("empty_file.txt")
@@ -275,37 +246,72 @@ describe "submissions" do
 
       f(".submit_assignment_link").click
       f(".submission_attachment input").send_keys(fullpath)
-      f("#submit_file_button").click
-      expect_flash_message :error
-
-      # navigate off the page and dismiss the alert box to avoid problems
-      # with other selenium tests
-      f("#section-tabs .home").click
-      driver.switch_to.alert.accept
-      driver.switch_to.default_content
+      expect(f("#FileDrop-messages_0")).to include_text "Attached files must be greater than 0 bytes."
     end
 
     it "does not allow a user to submit a file-submission assignment with an illegal file extension", priority: "1" do
       @assignment.submission_types = "online_upload"
       @assignment.allowed_extensions = ["bash"]
       @assignment.save!
+      _filename, fullpath, _data = get_file("testfile1.txt")
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       f(".submit_assignment_link").click
-
       # Select an assignment that has a wrong file extension
-      _filename, fullpath, _data = get_file("testfile1.txt")
       f(".submission_attachment input").send_keys(fullpath)
 
       # Check that the error is being reported
-      expect(f(".bad_ext_msg")).to include_text("This file type is not allowed")
+      expect(f("#FileDrop-messages_0")).to include_text "This file type is not allowed. Accepted file types are: bash."
+    end
 
-      # navigate off the page and dismiss the alert box to avoid problems
-      # with other selenium tests
-      f("#section-tabs .home").click
-      driver.switch_to.alert.accept
-      driver.switch_to.default_content
+    describe "allows user to add another file input" do
+      it "after uploading a file" do
+        @assignment.submission_types = "online_upload"
+        @assignment.save!
+        _filename, fullpath, _data = get_file("testfile1.txt")
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        f(".submit_assignment_link").click
+
+        f(".submission_attachment input").send_keys(fullpath)
+        f(".add_another_file_link").click
+        expect(f("#submission_file_drop_1")).to be_displayed
+      end
+
+      it "after uploading, clearing, then re-uploading a file" do
+        @assignment.submission_types = "online_upload"
+        @assignment.save!
+        _filename, fullpath, _data = get_file("testfile1.txt")
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        f(".submit_assignment_link").click
+
+        f(".submission_attachment input").send_keys(fullpath)
+        # clear the file input
+        f("#submission_file_tag_0").click
+        # re-upload the file
+        f(".submission_attachment input").send_keys(fullpath)
+
+        f(".add_another_file_link").click
+        expect(f("#submission_file_drop_1")).to be_displayed
+      end
+    end
+
+    it "does not submit files that were uploaded and then cleared" do
+      @assignment.submission_types = "online_upload"
+      @assignment.save!
+      _filename, fullpath, _data = get_file("testfile1.txt")
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f(".submit_assignment_link").click
+
+      f(".submission_attachment input").send_keys(fullpath)
+      # clear the file input
+      f("#submission_file_tag_0").click
+
+      f("#submit_file_button").click
+      expect(f("#FileDrop-messages_1")).to include_text "A file is required to make a submission."
     end
 
     it "shows as not turned in when submission was auto created in speedgrader", priority: "1" do
