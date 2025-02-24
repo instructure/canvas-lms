@@ -23,7 +23,7 @@ require "feedjira"
 describe ConversationsController do
   before do
     allow(InstStatsd::Statsd).to receive(:count)
-    allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    allow(InstStatsd::Statsd).to receive(:increment)
   end
 
   def conversation(opts = {})
@@ -98,7 +98,7 @@ describe ConversationsController do
       get "index", params: { scope: "sent" }, format: "json"
       expect(response).to be_successful
       expect(assigns[:conversations_json].size).to be 3
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.sent.pages_loaded.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.sent.pages_loaded.legacy")
     end
 
     it "returns all starred conversations" do
@@ -111,7 +111,7 @@ describe ConversationsController do
       get "index", params: { scope: "starred" }, format: "json"
       expect(response).to be_successful
       expect(assigns[:conversations_json].size).to be 3
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.starred.pages_loaded.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.starred.pages_loaded.legacy")
     end
 
     it "returns all unread conversations" do
@@ -124,7 +124,7 @@ describe ConversationsController do
       get "index", params: { scope: "unread" }, format: "json"
       expect(response).to be_successful
       expect(assigns[:conversations_json].size).to be 1
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.unread.pages_loaded.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.unread.pages_loaded.legacy")
     end
 
     it "returns all archived conversations" do
@@ -137,7 +137,7 @@ describe ConversationsController do
       get "index", params: { scope: "archived" }, format: "json"
       expect(response).to be_successful
       expect(assigns[:conversations_json].size).to be 1
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.archived.pages_loaded.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.archived.pages_loaded.legacy")
     end
 
     it "returns all inbox (default scope) conversations" do
@@ -149,7 +149,7 @@ describe ConversationsController do
       get "index", params: { scope: "inbox" }, format: "json"
       expect(response).to be_successful
       expect(assigns[:conversations_json].size).to be 3
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.scope.inbox.pages_loaded.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.inbox.pages_loaded.legacy")
     end
 
     it "returns conversations matching the specified filter" do
@@ -281,7 +281,7 @@ describe ConversationsController do
         it "does not increment visit count if not authorized to open inbox" do
           get "index"
           assert_require_login
-          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("inbox.visit.react")
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.visit.react")
         end
 
         it "tallies react inbox stats" do
@@ -304,7 +304,7 @@ describe ConversationsController do
           get "index"
           expect(response).to be_successful
 
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.visit.react")
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.react")
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.inbox.count.react", 2).once
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.sent.count.react", 3).once
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.unread.count.react", 1).once
@@ -354,10 +354,10 @@ describe ConversationsController do
       enrollment.save
       attachment = @user.conversation_attachments_folder.attachments.create!(filename: "somefile.doc", context: @user, uploaded_data: StringIO.new("test"))
       post "create", params: { recipients: [new_user.id.to_s], body: "yo", attachment_ids: [attachment.id] }
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.created.legacy")
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.legacy")
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.sent.legacy")
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.attachment.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.attachment.legacy")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 1)
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
@@ -506,7 +506,7 @@ describe ConversationsController do
         post "create", params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: true, bulk_message: "1" }
         expect(response).to be_successful
 
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.sent.individual_message_option.legacy")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.individual_message_option.legacy")
         expect(Conversation.count).to eql(@old_count + 2)
       end
 
@@ -516,9 +516,9 @@ describe ConversationsController do
           post "create", params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: falsish, media_comment_id: "m-whatever", media_comment_type: "video" }
 
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.legacy", 2)
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.legacy")
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.sent.legacy")
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.media.legacy")
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.legacy")
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 2)
           expect(response).to be_successful
 
@@ -682,10 +682,10 @@ describe ConversationsController do
 
       context "as a siteadmin user with send_messages grants" do
         it "succeeds" do
-          allow(InstStatsd::Statsd).to receive(:distributed_increment)
+          allow(InstStatsd::Statsd).to receive(:increment)
           user_session(site_admin_user)
           post "create", params: { recipients: [User.create.id.to_s], body: "foo" }
-          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.sent.account_context.legacy")
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.account_context.legacy")
           expect(response).to have_http_status :created
         end
       end
@@ -723,7 +723,7 @@ describe ConversationsController do
       course_with_student_logged_in(active_all: true)
       conversation(num_other_users: 2).update_attribute(:workflow_state, "unread")
 
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
       post "update", params: { id: @conversation.conversation_id, conversation: { subscribed: "0", workflow_state: "archived", starred: true } }
 
       expect(response).to be_successful
@@ -731,33 +731,33 @@ describe ConversationsController do
       expect(@conversation.subscribed?).to be_falsey
       expect(@conversation).to be_archived
       expect(@conversation.starred).to be_truthy
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.archived.legacy")
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.starred.legacy")
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("inbox.conversation.archived.react")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.archived.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.starred.legacy")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.archived.react")
     end
 
     it "updates the archived conversation to be read" do
       course_with_student_logged_in(active_all: true)
       conversation(num_other_users: 2).update_attribute(:workflow_state, "archived")
 
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
       post "update", params: { id: @conversation.conversation_id, conversation: { workflow_state: "read" } }
 
       expect(response).to be_successful
       @conversation.reload
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.unarchived.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.legacy")
     end
 
     it "updates the archived conversation to be unread" do
       course_with_student_logged_in(active_all: true)
       conversation(num_other_users: 2).update_attribute(:workflow_state, "archived")
 
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
       post "update", params: { id: @conversation.conversation_id, conversation: { workflow_state: "unread" } }
 
       expect(response).to be_successful
       @conversation.reload
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.unarchived.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.legacy")
     end
 
     it "updates the conversation to be unstarred" do
@@ -768,7 +768,7 @@ describe ConversationsController do
       expect(response).to be_successful
       @conversation.reload
       expect(@conversation.starred).to be_falsey
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.unstarred.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unstarred.legacy")
     end
 
     it "updates the conversation to be unread" do
@@ -779,7 +779,7 @@ describe ConversationsController do
       expect(response).to be_successful
       @conversation.reload
       expect(@conversation.starred).to be_falsey
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.conversation.unread.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unread.legacy")
     end
   end
 
@@ -826,9 +826,9 @@ describe ConversationsController do
       attachment = @user.conversation_attachments_folder.attachments.create!(filename: "somefile.doc", context: @user, uploaded_data: StringIO.new("test"))
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", attachment_ids: [attachment.id] }
 
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.legacy")
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.isReply.legacy")
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.attachment.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.attachment.legacy")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 0)
       expect(response).to be_successful
       expect(@conversation.messages.size).to eq 2
@@ -1035,11 +1035,11 @@ describe ConversationsController do
 
     it "refrains from duplicating the RCE-created media_comment" do
       course_with_student_logged_in(active_all: true)
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
       conversation
       @student.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", media_comment_id: "m-whatever", media_comment_type: "video" }
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.media.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.legacy")
       expect(response).to be_successful
       expect(@student.media_objects.by_media_id("m-whatever").count).to eq 1
     end

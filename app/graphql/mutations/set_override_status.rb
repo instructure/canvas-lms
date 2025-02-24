@@ -37,7 +37,7 @@ module Mutations
       grading_period_id = input[:grading_period_id]
 
       updated_score = enrollment.update_override_status(custom_grade_status:, grading_period_id:)
-      InstStatsd::Statsd.distributed_increment("custom_grade_status.applied_to.final_grade")
+      InstStatsd::Statsd.increment("custom_grade_status.applied_to.final_grade")
       { grades: updated_score }
     rescue ActiveRecord::RecordNotFound => e
       raise GraphQL::ExecutionError, "#{e.model} not found"

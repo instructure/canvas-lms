@@ -66,7 +66,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     context = assignment.context
     submission_type = input[:submission_type]
 
-    InstStatsd::Statsd.distributed_increment("submission.graphql.create.proxy_submit") if input[:student_id].present?
+    InstStatsd::Statsd.increment("submission.graphql.create.proxy_submit") if input[:student_id].present?
 
     verify_authorized_action!(assignment, :read)
     if input[:student_id]

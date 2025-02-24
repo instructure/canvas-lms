@@ -159,14 +159,14 @@ module LiveEvents
 
           if record[:retries_count] <= RETRY_LIMIT
             @queue.push(record)
-            LiveEvents.statsd&.distributed_increment("#{record[:statsd_prefix]}.retry", tags: record[:tags])
+            LiveEvents.statsd&.increment("#{record[:statsd_prefix]}.retry", tags: record[:tags])
           else
             internal_error_message = "This record has failed too many times an will no longer be retried. #{r.error_message}"
             log_unprocessed(record, r.error_code, internal_error_message)
-            LiveEvents.statsd&.distributed_increment("#{record[:statsd_prefix]}.final_retry", tags: record[:tags])
+            LiveEvents.statsd&.increment("#{record[:statsd_prefix]}.final_retry", tags: record[:tags])
           end
         else
-          LiveEvents.statsd&.distributed_increment("#{record[:statsd_prefix]}.sends", tags: record[:tags])
+          LiveEvents.statsd&.increment("#{record[:statsd_prefix]}.sends", tags: record[:tags])
         end
       end
       allow_kinesis_shard_to_recover if throttled
@@ -186,7 +186,7 @@ module LiveEvents
       logger.debug(
         "Failed event data: #{record[:data]}"
       )
-      LiveEvents.statsd&.distributed_increment(
+      LiveEvents.statsd&.increment(
         "#{record[:statsd_prefix]}.send_errors",
         tags: record[:tags].merge(error_code:)
       )

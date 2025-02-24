@@ -2588,7 +2588,7 @@ describe Account do
       account_model
       @account.enable_feature!(:restrict_quantitative_data)
 
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:increment)
     end
 
     it "restrict_quantitative_data? helper returns false by default" do
@@ -2600,7 +2600,7 @@ describe Account do
       @account.save!
       expect(@account.restrict_quantitative_data?).to be true
 
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("account.settings.restrict_quantitative_data.enabled").once
+      expect(InstStatsd::Statsd).to have_received(:increment).with("account.settings.restrict_quantitative_data.enabled").once
     end
 
     it "increments disabled log when setting is turned off" do
@@ -2611,8 +2611,8 @@ describe Account do
       @account.save!
       expect(@account.restrict_quantitative_data?).to be false
 
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("account.settings.restrict_quantitative_data.enabled").once.ordered
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("account.settings.restrict_quantitative_data.disabled").once.ordered
+      expect(InstStatsd::Statsd).to have_received(:increment).with("account.settings.restrict_quantitative_data.enabled").once.ordered
+      expect(InstStatsd::Statsd).to have_received(:increment).with("account.settings.restrict_quantitative_data.disabled").once.ordered
     end
 
     it "doesn't increment either log when settings update but RQD setting is unchanged" do
@@ -2621,8 +2621,8 @@ describe Account do
       @account.save!
       expect(@account.restrict_student_future_view[:value]).to be true
 
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("account.settings.restrict_quantitative_data.enabled")
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("account.settings.restrict_quantitative_data.disabled")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("account.settings.restrict_quantitative_data.enabled")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("account.settings.restrict_quantitative_data.disabled")
     end
 
     it "doesn't increment either counter when parent account setting is changed" do
@@ -2631,14 +2631,14 @@ describe Account do
       @sub_account.save!
 
       expect(@sub_account.restrict_quantitative_data?).to be true
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("account.settings.restrict_quantitative_data.enabled").once
+      expect(InstStatsd::Statsd).to have_received(:increment).with("account.settings.restrict_quantitative_data.enabled").once
 
       @account.settings[:restrict_quantitative_data] = { locked: true, value: false }
       @account.save!
       # Ignores changes completely
       expect(@sub_account.restrict_quantitative_data?).to be true
 
-      expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("account.settings.restrict_quantitative_data.disabled")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("account.settings.restrict_quantitative_data.disabled")
     end
   end
 

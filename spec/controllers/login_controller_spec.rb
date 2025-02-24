@@ -43,7 +43,6 @@ describe LoginController do
 
       expect(InstStatsd::Statsd).to receive(:distributed_increment)
         .with("auth.new.discovery_redirect", tags: { auth_type: nil, domain: "test.host" })
-      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       get "new"
       expect(response).to redirect_to("https://google.com/")
     end

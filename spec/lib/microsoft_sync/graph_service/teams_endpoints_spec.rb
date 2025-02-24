@@ -41,10 +41,10 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
 
       it 'increments an "expected" statsd counter instead of an "notfound" one' do
         subject
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment)
+        expect(InstStatsd::Statsd).to have_received(:increment)
           .with("microsoft_sync.graph_service.expected",
                 tags: hash_including(msft_endpoint: "get_teams"))
-        expect(InstStatsd::Statsd).to_not have_received(:distributed_increment)
+        expect(InstStatsd::Statsd).to_not have_received(:increment)
           .with("microsoft_sync.graph_service.notfound", anything)
       end
     end
@@ -81,9 +81,9 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
       it 'raises a GroupHasNoOwners error and increments an "expected" counter' do
         expect { subject }.to raise_error(MicrosoftSync::Errors::GroupHasNoOwners)
 
-        expect(InstStatsd::Statsd).to_not have_received(:distributed_increment)
+        expect(InstStatsd::Statsd).to_not have_received(:increment)
           .with("microsoft_sync.graph_service.error", anything)
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment)
+        expect(InstStatsd::Statsd).to have_received(:increment)
           .with("microsoft_sync.graph_service.expected",
                 tags: hash_including(msft_endpoint: "post_teams"))
       end
@@ -100,9 +100,9 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
       it 'raises a TeamAlreadyExists error and increments an "expected" counter' do
         expect { subject }.to raise_error(MicrosoftSync::Errors::TeamAlreadyExists)
 
-        expect(InstStatsd::Statsd).to_not have_received(:distributed_increment)
+        expect(InstStatsd::Statsd).to_not have_received(:increment)
           .with("microsoft_sync.graph_service.error", anything)
-        expect(InstStatsd::Statsd).to have_received(:distributed_increment)
+        expect(InstStatsd::Statsd).to have_received(:increment)
           .with("microsoft_sync.graph_service.expected",
                 tags: hash_including(msft_endpoint: "post_teams"))
       end

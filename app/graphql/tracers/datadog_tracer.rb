@@ -35,9 +35,9 @@ module Tracers
 
         op, fields = op_type_and_fields(metadata)
         fields.each do |field|
-          InstStatsd::Statsd.distributed_increment("graphql.#{op}.count", tags: tags.merge(field:))
+          InstStatsd::Statsd.increment("graphql.#{op}.count", tags: tags.merge(field:))
         end
-        InstStatsd::Statsd.distributed_increment("graphql.operation.count", tags:)
+        InstStatsd::Statsd.increment("graphql.operation.count", tags:)
         InstStatsd::Statsd.time("graphql.operation.time", tags:, &)
       else
         yield

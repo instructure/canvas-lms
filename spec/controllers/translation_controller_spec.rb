@@ -34,7 +34,7 @@ describe TranslationController do
   end
 
   before do
-    allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    allow(InstStatsd::Statsd).to receive(:increment)
     allow(Account.site_admin).to receive(:feature_enabled?).and_return(false)
     allow(Account.site_admin).to receive(:feature_enabled?).with(:ai_translation_improvements).and_return(true)
     user_session(@user)
@@ -68,7 +68,7 @@ describe TranslationController do
       post :translate, params: { course_id: @course.id, inputs: params }
 
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.discussions")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("translation.discussions")
     end
 
     it "responds with translated message" do
@@ -97,7 +97,7 @@ describe TranslationController do
       post :translate_paragraph, params: { course_id: @course.id, inputs: params }
 
       expect(response).to be_successful
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("translation.inbox_compose")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("translation.inbox_compose")
     end
 
     it "responds with translated message" do

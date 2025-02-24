@@ -278,9 +278,9 @@ module IncomingMailProcessor
     end
 
     def report_stats(incoming_message, mailbox_account)
-      InstStatsd::Statsd.distributed_increment("incoming_mail_processor.incoming_message_processed.#{mailbox_account.escaped_address}",
-                                               short_stat: "incoming_mail_processor.incoming_message_processed",
-                                               tags: { mailbox: mailbox_account.escaped_address })
+      InstStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed.#{mailbox_account.escaped_address}",
+                                   short_stat: "incoming_mail_processor.incoming_message_processed",
+                                   tags: { mailbox: mailbox_account.escaped_address })
       age = age(incoming_message)
       if age
         stat_name = "incoming_mail_processor.message_age.#{mailbox_account.escaped_address}"
