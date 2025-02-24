@@ -156,7 +156,7 @@ Rails.application.config.to_prepare do
       },
       manage_courses_delete: {
         label: -> { I18n.t("Delete courses") },
-        label_v2: -> { I18n.t("Courses - delete/archive") },
+        label_v2: -> { I18n.t("Courses - delete") },
         group: "manage_courses",
         group_label: -> { I18n.t("Manage Courses") },
         available_to: %w[
@@ -169,9 +169,7 @@ Rails.application.config.to_prepare do
       },
       undelete_courses: {
         label: -> { I18n.t("permissions.undelete_courses", "Undelete courses") },
-        label_v2: -> { I18n.t("Courses - undelete/unarchive") },
-        group: "manage_courses",
-        group_label: -> { I18n.t("Manage Courses") },
+        label_v2: -> { I18n.t("Courses - undelete") },
         admin_tool: true,
         account_only: true,
         available_to: %w[
@@ -191,7 +189,8 @@ Rails.application.config.to_prepare do
           TeacherEnrollment
           DesignerEnrollment
         ],
-        true_for: %w[AccountAdmin]
+        true_for: %w[AccountAdmin],
+        account_allows: ->(a) { a.root_account.feature_enabled?(:course_archival) }
       },
       manage_data_services: {
         label: -> { I18n.t("permissions.manage_data_services", "Manage data services") },
