@@ -119,6 +119,7 @@ const ConfirmChangePassword = ({
     formState: {errors, isSubmitting},
     handleSubmit,
     setError,
+    setFocus,
   } = useForm({
     defaultValues: {
       id: pseudonym.id,
@@ -154,16 +155,19 @@ const ConfirmChangePassword = ({
         const policy = passwordPoliciesAndPseudonyms[data.id]
           ? passwordPoliciesAndPseudonyms[data.id].policy
           : defaultPolicy
-        const normalizedError = PseudonymModel.prototype.normalizeErrors(
-          errorResponse.pseudonym,
-          policy,
-        )
+        const normalizedError: Record<
+          keyof FormValues,
+          Array<string>
+        > = PseudonymModel.prototype.normalizeErrors(errorResponse.pseudonym, policy)
 
-        for (const fieldName in normalizedError) {
+        for (const key in normalizedError) {
+          const fieldName = key as keyof FormValues
+
           for (const message of normalizedError[fieldName]) {
-            setError(fieldName as keyof FormValues, {
+            setError(fieldName, {
               message,
             })
+            setFocus(fieldName)
           }
         }
       } else {
