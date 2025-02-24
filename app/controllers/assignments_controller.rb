@@ -474,6 +474,7 @@ class AssignmentsController < ApplicationController
           assigned_rubric = rubric_json(rubric_association.rubric, @current_user, session, style: "full")
           assigned_rubric[:unassessed] = Rubric.active.unassessed.where(id: rubric_association.rubric.id).exists?
           assigned_rubric[:can_update] = can_update_rubric
+          assigned_rubric[:association_count] = RubricAssociation.active.where(rubric_id: rubric_association.rubric.id, association_type: "Assignment").count
           rubric_association = rubric_association_json(rubric_association, @current_user, session)
         end
 
