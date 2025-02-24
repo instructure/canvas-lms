@@ -41,7 +41,7 @@ export const removeRubricFromAssignment = async (courseId: string, rubricAssocia
   })
 }
 
-export type AssignmentRubric = Rubric & {can_update?: boolean}
+export type AssignmentRubric = Rubric & {can_update?: boolean; association_count?: number}
 export const addRubricToAssignment = async (
   courseId: string,
   assignmentId: string,
@@ -81,7 +81,11 @@ export const addRubricToAssignment = async (
 
   return {
     rubricAssociation: result.rubric_association,
-    rubric: {...mappedRubric, can_update: result.rubric.permissions?.update} as AssignmentRubric,
+    rubric: {
+      ...mappedRubric,
+      can_update: result.rubric.permissions?.update,
+      association_count: result.rubric.association_count,
+    } as AssignmentRubric,
   }
 }
 
@@ -201,13 +205,18 @@ type RubricSelfAssessmentSettingsResponse = {
     rubricSelfAssessmentEnabled: boolean
   }
 }
-export const getRubricSelfAssessmentSettings = async ({queryKey}: RubricSelfAssessmentSettingsParams) => {
+export const getRubricSelfAssessmentSettings = async ({
+  queryKey,
+}: RubricSelfAssessmentSettingsParams) => {
   const [_, assignmentId] = queryKey
   const {
-    assignment: {canUpdateRubricSelfAssessment, rubricSelfAssessmentEnabled}
-  } = await executeQuery<RubricSelfAssessmentSettingsResponse>(ASSIGNMENT_RUBRIC_SELF_ASSESSMENTS_QUERY, {
-    assignmentId,
-  })
+    assignment: {canUpdateRubricSelfAssessment, rubricSelfAssessmentEnabled},
+  } = await executeQuery<RubricSelfAssessmentSettingsResponse>(
+    ASSIGNMENT_RUBRIC_SELF_ASSESSMENTS_QUERY,
+    {
+      assignmentId,
+    },
+  )
 
   return {
     canUpdateRubricSelfAssessment,
