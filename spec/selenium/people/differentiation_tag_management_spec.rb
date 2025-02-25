@@ -330,10 +330,78 @@ describe "Differentiation Tag Management" do
             expect(fj("span:contains('Edit Tag')")).to be_displayed
             expect(fj("span:contains('Tag Set Name')")).to be_displayed
             expect(fj("span:contains('Tag Name')")).to be_displayed
-
             # Check that the inputs have the correct values
             expect(f("[data-testid='tag-set-name']")).to have_value(single_diff_set.name)
             expect(f("[data-testid='tag-name-input']")).to have_value(diff_set_group.name)
+          end
+
+          it "updates just the set name" do
+            # Open the edit modal for a multiple tag set
+            f("button[aria-label='Edit tag set: #{@multiple_tags.name}']").click
+            wait_for_ajaximations
+
+            tag_set_name_input = f("[data-testid='tag-set-name']")
+            tag_set_name_input.send_keys("updated")
+
+            # Submit the form
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+            expect(fj("span:contains('Multiple Tagsupdated')")).to be_displayed
+          end
+
+          it "updates just one tag name" do
+            # Open the edit modal for the tag set
+            f("button[aria-label='Edit tag set: #{@multiple_tags.name}']").click
+            wait_for_ajaximations
+
+            # Update only the first tag's name
+            tag_inputs = ff("[data-testid='tag-name-input']")
+            first_input = tag_inputs.first
+            first_input.send_keys(" updated")
+            wait_for_ajaximations
+
+            # Submit the form
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            # Verify that the updated tag displays the new name
+            expect(fj("span:contains('tag variant 1 updated')")).to be_displayed
+          end
+
+          it "adds just one tag" do
+            # Open the edit modal for the tag set
+            f("button[aria-label='Edit tag set: #{@multiple_tags.name}']").click
+            wait_for_ajaximations
+
+            # Click the button to add a new tag variant
+            fj("button:contains('+ Add another tag')").click
+            wait_for_ajaximations
+
+            # Locate the new tag input field and fill it in
+            tag_inputs = ff("[data-testid='tag-name-input']")
+            new_input = tag_inputs.last
+            new_input.send_keys("New Tag")
+            wait_for_ajaximations
+
+            # Submit the form
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            # Verify that the new tag appears on the page
+            expect(fj("span:contains('New Tag')")).to be_displayed
+          end
+
+          it "deletes one tag" do
+            f("button[aria-label='Edit tag set: #{@multiple_tags.name}']").click
+            wait_for_ajaximations
+
+            ff("button[data-testid='remove-tag']")[0].click
+            wait_for_ajaximations
+
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            expect(f("body")).not_to contain_jqcss("span:contains('tag variant 1')")
           end
 
           it "deletes, adds, updates tags correctly in one request" do
@@ -358,12 +426,16 @@ describe "Differentiation Tag Management" do
             new_input = tag_inputs.last
             new_input.send_keys("New Variant")
 
+            tag_set_name_input = f("[data-testid='tag-set-name']")
+            tag_set_name_input.send_keys("updated")
+
             # Submit the form
             fj("button:contains('Save')").click
             wait_for_ajaximations
             # Verify that the updated and new tags appear, and the deleted tag is absent
             expect(fj("span:contains('New Variant')")).to be_displayed
             expect(fj("span:contains('tag variant 2added text')")).to be_displayed
+            expect(fj("span:contains('Multiple Tagsupdated')")).to be_displayed
 
             # verify that the group ids are different
             expect(@multiple_tags.reload.groups.active.pluck(:id)).not_to eq(original_tag_ids)
