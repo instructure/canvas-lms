@@ -381,6 +381,7 @@ class ApplicationController < ActionController::Base
     horizon_course_setting
     new_quizzes_media_type
     differentiation_tags
+    validate_call_to_action
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours

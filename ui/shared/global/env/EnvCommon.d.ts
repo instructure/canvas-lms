@@ -288,6 +288,7 @@ export type SiteAdminFeatureId =
   | 'courses_popout_sisid'
   | 'dashboard_graphql_integration'
   | 'speedgrader_studio_media_capture'
+  | 'validate_call_to_action'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
