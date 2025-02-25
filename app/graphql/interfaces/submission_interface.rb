@@ -478,7 +478,7 @@ module Interfaces::SubmissionInterface
 
   field :preview_url, String, "This field is currently under development and its return value is subject to change.", null: true
   def preview_url
-    if submission.not_submitted?
+    if submission.not_submitted? && !submission.partially_submitted?
       nil
     elsif submission.submission_type == "basic_lti_launch"
       GraphQLHelpers::UrlHelpers.retrieve_course_external_tools_url(
@@ -490,7 +490,7 @@ module Interfaces::SubmissionInterface
       )
     else
       Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
-        is_discussion_topic = submission.submission_type == "discussion_topic"
+        is_discussion_topic = submission.submission_type == "discussion_topic" || submission.partially_submitted?
         show_full_discussion = is_discussion_topic ? { show_full_discussion_immediately: true } : {}
         if assignment.anonymize_students?
           GraphQLHelpers::UrlHelpers.course_assignment_anonymous_submission_url(
