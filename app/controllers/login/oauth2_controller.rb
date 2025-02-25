@@ -25,7 +25,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
   rescue_from Canvas::TimeoutCutoff, with: :handle_external_timeout
 
   def new
-    nonce = session[:oauth2_nonce] = SecureRandom.hex(24)
+    nonce = push_nonce
     jwt = Canvas::Security.create_jwt({ aac_id: aac.global_id, nonce:, host: request.host_with_port }, 10.minutes.from_now)
     authorize_url = aac.generate_authorize_url(oauth2_login_callback_url, jwt, nonce:, **additional_authorize_params)
 
@@ -50,11 +50,8 @@ class Login::OAuth2Controller < Login::OAuthBaseController
       @aac.debug_set(:debugging, t("Received callback from identity provider"))
       @aac.instance_debugging = true
     end
-
-    unique_id = nil
-    provider_attributes = {}
-    token = nil
-    return unless timeout_protection do
+    timeout_protection do
+      token = nil
       begin
         token = @aac.get_token(params[:code], oauth2_login_callback_url, params)
         token.options[:nonce] = jwt["nonce"]
@@ -63,23 +60,29 @@ class Login::OAuth2Controller < Login::OAuthBaseController
         increment_statsd(:failure, reason: :get_token)
         raise
       end
-      begin
-        unique_id = @aac.unique_id(token)
-        provider_attributes = @aac.provider_attributes(token)
-        @aac = @aac.try(:alternate_provider_for_token, token) || @aac
-      rescue OAuthValidationError => e
-        @aac.debug_set(:validation_error, e.message) if debugging
-        return redirect_to_unknown_user_url(e.message)
-      rescue => e
-        @aac.debug_set(:claims_response, e) if debugging
-        raise
-      end
+      process_token(token)
+    end
+  end
+
+  private
+
+  def process_token(token)
+    unique_id = nil
+    provider_attributes = nil
+    begin
+      unique_id = @aac.unique_id(token)
+      provider_attributes = @aac.provider_attributes(token)
+      @aac = @aac.try(:alternate_provider_for_token, token) || @aac
+    rescue OAuthValidationError => e
+      @aac.debug_set(:validation_error, e.message) if @aac.instance_debugging
+      return redirect_to_unknown_user_url(e.message)
+    rescue => e
+      @aac.debug_set(:claims_response, e) if @aac.instance_debugging
+      raise
     end
 
     find_pseudonym(unique_id, provider_attributes, token)
   end
-
-  protected
 
   def additional_authorize_params
     {}
@@ -106,7 +109,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
     end
 
     begin
-      if jwt["nonce"].blank? || jwt["nonce"] != session.delete(:oauth2_nonce)
+      if jwt["nonce"].blank? || jwt["nonce"] != pop_nonce
         increment_statsd(:failure, reason: :invalid_nonce)
         raise ActionController::InvalidAuthenticityToken
       end
@@ -129,5 +132,21 @@ class Login::OAuth2Controller < Login::OAuthBaseController
 
   def auth_type
     "oauth2"
+  end
+
+  def push_nonce
+    nonce = SecureRandom.hex(24)
+    nonce_array = session[:oauth2_nonce] ||= []
+    nonce_array << nonce
+    nonce
+  end
+
+  def pop_nonce
+    return unless (nonce_array = session[:oauth2_nonce])
+    return nonce if nonce_array.is_a?(String)
+
+    nonce = nonce_array.pop
+    session.delete(:oauth2_nonce) if nonce_array.empty?
+    nonce
   end
 end

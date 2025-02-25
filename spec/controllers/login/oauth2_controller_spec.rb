@@ -46,7 +46,7 @@ describe Login::OAuth2Controller do
     end
 
     it "checks the OAuth2 CSRF token" do
-      session[:oauth2_nonce] = "bob"
+      session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "different")
       get :create, params: { state: jwt }
       # it could be a 422, or 0 if error handling isn't enabled properly in specs
@@ -77,7 +77,7 @@ describe Login::OAuth2Controller do
     end
 
     it "works" do
-      session[:oauth2_nonce] = "bob"
+      session[:oauth2_nonce] = ["bob"]
       expect_any_instantiation_of(aac).to receive(:get_token).and_return(token)
       expect_any_instantiation_of(aac).to receive(:unique_id).with(token).and_return("user")
       expect_any_instantiation_of(aac).to receive(:provider_attributes).with(token).and_return({})
@@ -94,7 +94,7 @@ describe Login::OAuth2Controller do
     end
 
     it "handles multi-valued identifiers from providers" do
-      session[:oauth2_nonce] = "bob"
+      session[:oauth2_nonce] = ["bob"]
       expect_any_instantiation_of(aac).to receive(:get_token).and_return(token)
       expect_any_instantiation_of(aac).to receive(:unique_id).with(token).and_return(["user"])
       expect_any_instantiation_of(aac).to receive(:provider_attributes).with(token).and_return({})
@@ -111,7 +111,7 @@ describe Login::OAuth2Controller do
     end
 
     it "allows the provider to substitute a different provider" do
-      session[:oauth2_nonce] = "bob"
+      session[:oauth2_nonce] = ["bob"]
       account2 = Account.create!(name: "elsewhere")
       aac2 = account2.authentication_providers.create!(auth_type: "saml")
 
@@ -132,7 +132,7 @@ describe Login::OAuth2Controller do
     end
 
     it "doesn't allow deleted users to login" do
-      session[:oauth2_nonce] = "bob"
+      session[:oauth2_nonce] = ["bob"]
       expect_any_instantiation_of(aac).to receive(:get_token).and_return(token)
       expect_any_instantiation_of(aac).to receive(:unique_id).with(token).and_return("user")
       expect_any_instantiation_of(aac).to receive(:provider_attributes).with(token).and_return({})
@@ -152,7 +152,7 @@ describe Login::OAuth2Controller do
       expect_any_instantiation_of(aac).to receive(:unique_id).with(token).and_return("user")
       expect_any_instantiation_of(aac).to receive(:provider_attributes).with(token).and_return({})
 
-      session[:oauth2_nonce] = "bob"
+      session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
 
       get :create, params: { state: jwt }
@@ -165,7 +165,7 @@ describe Login::OAuth2Controller do
       expect_any_instantiation_of(aac).to receive(:unique_id).with(token).and_return(nil)
       expect_any_instantiation_of(aac).to receive(:provider_attributes).with(token).and_return({})
 
-      session[:oauth2_nonce] = "bob"
+      session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
 
       get :create, params: { state: jwt }
@@ -186,7 +186,7 @@ describe Login::OAuth2Controller do
       expect_any_instantiation_of(aac).to receive(:unique_id).with(token).and_return("user")
       expect_any_instantiation_of(aac).to receive(:provider_attributes).with(token).and_return({})
 
-      session[:oauth2_nonce] = "bob"
+      session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
 
       expect(Account.default.pseudonyms.active.by_unique_id("user")).to_not be_exists
@@ -197,7 +197,7 @@ describe Login::OAuth2Controller do
     end
 
     it "redirects to login any time an expired token is noticed" do
-      session[:oauth2_nonce] = "bob"
+      session[:oauth2_nonce] = ["bob"]
       expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::Security::TokenExpired)
       user_with_pseudonym(username: "user", active_all: 1)
       @pseudonym.authentication_provider = aac
@@ -209,7 +209,7 @@ describe Login::OAuth2Controller do
     end
 
     it "redirects to login any time an external timeout is noticed" do
-      session[:oauth2_nonce] = "fred"
+      session[:oauth2_nonce] = ["fred"]
       expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::TimeoutCutoff)
       user_with_pseudonym(username: "user", active_all: 1)
       @pseudonym.authentication_provider = aac
