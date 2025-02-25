@@ -32,7 +32,7 @@ type CoursePeopleQueryResponse = {
 
 const useCoursePeopleQuery = ({courseId}: {courseId: string}) => {
   const {currentUserId} = useCoursePeopleContext()
-  
+
   return useQuery({
     // currentUserId added to key so that data is refetched when swithching between Teacher and Student Views
     queryKey: ['course_people', courseId, currentUserId],
