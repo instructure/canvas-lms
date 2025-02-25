@@ -28,6 +28,7 @@ import {contentMapping} from '@instructure/canvas-rce/src/common/mimeClass'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {StudioPlayer} from '@instructure/studio-player'
+import {MediaPlayer} from '@instructure/ui-media-player'
 
 const I18n = createI18nScope('jquery_media_comments')
 
@@ -365,11 +366,17 @@ const mediaCommentActions = {
               mediaCommentId: id,
             }
 
-            const mediaPlayer = (
+            const mediaPlayer = ENV.FEATURES?.consolidated_media_player ? (
               <StudioPlayer
                 src={sourcesAndTracks.sources}
                 captions={sourcesAndTracks.tracks}
                 title={I18n.t('Play Media Comment')}
+              />
+            ) : (
+              <MediaPlayer
+                tracks={sourcesAndTracks.tracks}
+                sources={sourcesAndTracks.sources}
+                captionPosition="bottom"
               />
             )
 
