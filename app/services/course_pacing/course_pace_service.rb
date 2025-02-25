@@ -34,5 +34,16 @@ class CoursePacing::CoursePaceService < CoursePacing::PaceService
     def course_for(course)
       course
     end
+
+    def off_pace_counts_by_user(contexts)
+      return {} if contexts.empty? || !contexts.first.is_a?(StudentEnrollment) || !contexts.first.course
+
+      users = contexts.map(&:user)
+      course = contexts.first.course
+
+      submissions = course.submissions.where(user: users)
+      missing_submission_ids = submissions.missing.pluck(:id)
+      Submission.where(id: missing_submission_ids).group(:user_id).count
+    end
   end
 end

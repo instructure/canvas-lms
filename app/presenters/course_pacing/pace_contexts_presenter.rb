@@ -56,9 +56,6 @@ class CoursePacing::PaceContextsPresenter
     # Only calculate on_pace for StudentEnrollment
     return nil unless pace_context.is_a?(StudentEnrollment)
 
-    overdue_items = overdue_items_by_user[pace_context.user.id] || []
-
-    # If there are no overdue items, the student is on pace
-    overdue_items.empty?
+    !overdue_items_by_user.key?(pace_context.user_id)
   end
 end

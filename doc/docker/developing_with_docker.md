@@ -206,6 +206,9 @@ specify the paths to the test files as one or more arguments, e.g.:
 
 ```
 docker-compose run --rm webpack yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
+
+
+docker-compose run --rm webpack yarn test:jest:watch ui/features/course_paces/react/components/course_pace_table/__tests__/assignment_row.test.tsx
 ```
 
 ## Selenium

@@ -33,21 +33,24 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
     enrolled_students = fetch_filtered_enrolled_students(course_id)
     active_sections = CourseSection.where(course_id: course_id, workflow_state: "active")
 
-    enrolled_students = apply_sorting(enrolled_students)
-
-    total_students, paginated_students = paginate_students(enrolled_students, offset, per_page)
-
-    students_status = students_on_pace_status(course_id, paginated_students).index_by { |s| s[:student_id] }
+    overdue_items_by_user = CoursePacing::CoursePaceService.off_pace_counts_by_user(enrolled_students)
 
     if params[:filter_pace_status].present?
-      paginated_students.select! do |enrollment|
-        pace_status = students_status[enrollment.user.id]&.dig(:on_pace) ? "on-pace" : "off-pace"
-        pace_status == params[:filter_pace_status]
-      end
+      filtered_student_ids = if params[:filter_pace_status] == "on-pace"
+                               enrolled_students.pluck(:user_id) - overdue_items_by_user.keys
+                             else
+                               overdue_items_by_user.keys
+                             end
+      enrolled_students = enrolled_students.where(user_id: filtered_student_ids)
     end
 
+    enrolled_students = apply_sorting(enrolled_students)
+
+    total_students = enrolled_students.count
+    paginated_students = enrolled_students.limit(per_page).offset(offset)
+
     render json: {
-      students: build_students_data(paginated_students, enrolled_students, students_status),
+      students: build_students_data(paginated_students, enrolled_students, overdue_items_by_user),
       pages: (total_students.to_f / per_page).ceil,
       sections: active_sections.map { |section| build_section_json(section) }
     }
@@ -65,8 +68,7 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
   def fetch_filtered_enrolled_students(course_id)
     students = StudentEnrollment.active
                                 .where(course_id: course_id)
-                                .preload(:user)
-                                .preload(:course_section)
+                                .preload(:user, :course_section)
 
     if params[:filter_section].present?
       students = students.where(course_section_id: params[:filter_section])
@@ -87,12 +89,22 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
   end
 
   def apply_sorting(enrolled_students)
-    if params[:sort].present?
-      order_direction = (params[:order] == "desc") ? "DESC" : "ASC"
-      enrolled_students.joins(:user).order("users.name #{order_direction}")
+    if enrolled_students.is_a?(ActiveRecord::Relation)
+      if params[:sort].present?
+        order_direction = (params[:order] == "desc") ? "DESC" : "ASC"
+        enrolled_students.joins(:user).order("users.name #{order_direction}")
+      else
+        enrolled_students.order(created_at: :desc)
+      end
+    elsif params[:sort].present?
+      order_direction = (params[:order] == "desc") ? -1 : 1
+      enrolled_students.sort_by! { |enrollment| enrollment.user.name.downcase }
+      enrolled_students.reverse! if order_direction == -1
     else
-      enrolled_students.order(created_at: :desc)
+      enrolled_students.sort_by!(&:created_at).reverse!
     end
+
+    enrolled_students
   end
 
   def paginate_students(enrolled_students, offset, per_page)
@@ -102,22 +114,19 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
     [total_students, paginated_students]
   end
 
-  def build_students_data(paginated_students, enrolled_students, students_status)
-    # Pre-fetch all sections for the paginated students in a single query
-    student_ids = paginated_students.map(&:user_id)
-    sections_by_student = enrolled_students
-                          .where(user_id: student_ids)
-                          .preload(:course_section)
-                          .group_by(&:user_id)
-
+  def build_students_data(paginated_students, enrolled_students, overdue_items_by_user)
     paginated_students.map do |enrollment|
       student = enrollment.user
-      student_sections = sections_by_student[student.id]&.filter_map(&:course_section)&.uniq || []
+      student_sections = enrolled_students
+                         .where(user_id: student.id)
+                         .filter_map(&:course_section)
+                         .compact
+                         .uniq
 
       {
         id: student.id.to_s,
         name: student.name,
-        paceStatus: students_status[student.id]&.dig(:on_pace) ? "on-pace" : "off-pace",
+        paceStatus: overdue_items_by_user.key?(student.id) ? "off-pace" : "on-pace",
         enrollmentId: enrollment.id.to_s,
         enrollmentDate: enrollment.created_at.iso8601,
         sections: student_sections.map { |section| build_section_json(section) }
@@ -148,11 +157,8 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
                   .select("assignments.id, assignments.title, assignments.workflow_state,
                             public.assignment_overrides.due_at, public.assignment_override_students.user_id")
 
-    # Get unique assignment IDs to avoid duplicates in the IN clause
-    assignment_ids = assignments.map(&:id).uniq
-
     submissions = Submission
-                  .where(assignment_id: assignment_ids)
+                  .where(assignment_id: assignments.map(&:id))
                   .where.not(workflow_state: ["unsubmitted", "deleted"])
                   .select("DISTINCT ON (user_id, assignment_id) *")
                   .order("user_id, assignment_id, created_at DESC")
