@@ -167,7 +167,7 @@ also found in the placements sub-menu in the left-navigation of this documentati
   </thead>
   <tbody>
 <!-- title -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>title</td>
       <td>
         Required
@@ -178,7 +178,7 @@ also found in the placements sub-menu in the left-navigation of this documentati
       </td>
     </tr>
 <!-- description -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>description</td>
       <td>
                 Required
@@ -189,7 +189,7 @@ also found in the placements sub-menu in the left-navigation of this documentati
       </td>
     </tr>
 <!-- oidc_initiation_url -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>oidc_initiation_url</td>
       <td>
         Required
@@ -200,17 +200,17 @@ also found in the placements sub-menu in the left-navigation of this documentati
       </td>
     </tr>
 <!-- oidc_initiation_urls -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td><a name="param-oidc-initial-urls"></a>oidc_initiation_urls</td>
       <td>
       </td>
       <td>JSON object</td>
       <td class="param-desc">
-<p>Optional region-specific <a href="https://www.imsglobal.org/spec/security/v1p0#step-1-third-party-initiated-login" target="_blank">login initiation urls</a> that Canvas should redirect the User Agent to. Each institution's Canvas install lives in a particular AWS region, typically one close to the institution's physical region. If ths AWS region is listed as a key in this object, the URL in the value will override the default `oidc_initiation_url`. As of 2023, the regions used by Canvas are: us-east-1, us-west-2, ca-central-1, eu-west-1, eu-central-1, ap-southeast-1, ap-southeast-2.
+<p>Optional region-specific <a href="https://www.imsglobal.org/spec/security/v1p0#step-1-third-party-initiated-login" target="_blank">login initiation urls</a> that Canvas should redirect the User Agent to. Each institution's Canvas install lives in a particular AWS region, typically one close to the institution's physical region. If this AWS region is listed as a key in this object, the URL in the value will override the default `oidc_initiation_url`. As of 2023, the regions used by Canvas are: us-east-1, us-west-2, ca-central-1, eu-west-1, eu-central-1, ap-southeast-1, ap-southeast-2.
       </td>
     </tr>
 <!-- target_link_uri -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>target_link_uri</td>
       <td>
         Required
@@ -223,7 +223,7 @@ object for placement-specific target_link_uri's.</p>
       </td>
     </tr>
 <!-- scopes -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>scopes</td>
       <td>
       </td>
@@ -245,7 +245,7 @@ object for placement-specific target_link_uri's.</p>
       </td>
     </tr>
 <!-- extensions -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>extensions</td>
       <td>
       </td>
@@ -257,10 +257,10 @@ object for placement-specific target_link_uri's.</p>
 
 
 <!-- environments -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>environments</td>
       <td>
-        <strong style="color: red;">Ignored<strong>
+        <strong style="color: red;">Ignored</strong>
       </td>
       <td>JSON object</td>
       <td class="param-desc">
@@ -273,7 +273,7 @@ object for placement-specific target_link_uri's.</p>
       </td>
     </tr>
 <!-- public_jwk -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>public_jwk</td>
       <td>
           required, see notes
@@ -284,7 +284,7 @@ object for placement-specific target_link_uri's.</p>
       </td>
     </tr>
 <!-- public_jwk_url -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>public_jwk_url</td>
       <td>
           required, see notes
@@ -295,7 +295,7 @@ object for placement-specific target_link_uri's.</p>
       </td>
     </tr>
 <!-- custom_fields -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>custom_fields</td>
       <td>
       </td>
@@ -313,7 +313,6 @@ object for placement-specific target_link_uri's.</p>
 
 The following fields can be put under `extensions`:
 
-
 <table class="request-params">
   <thead>
     <tr>
@@ -324,7 +323,7 @@ The following fields can be put under `extensions`:
     </tr>
   </thead>
   <tbody>
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>domain</td>
       <td>
       </td>
@@ -333,7 +332,7 @@ The following fields can be put under `extensions`:
         <p>The domain Canvas should use to match clicked LTI links against. This is recommended if <a href="file.content_item.html">deep linking</a> is used.</p>
       </td>
     </tr>
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>tool_id</td>
       <td>
       </td>
@@ -342,7 +341,7 @@ The following fields can be put under `extensions`:
         <p>Allows tools to set a unique identifier for the tool.</p>
       </td>
     </tr>
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>platform</td>
       <td>
       </td>
@@ -351,7 +350,7 @@ The following fields can be put under `extensions`:
         <p>The LMS platform that the extensions belong to. This should always be set to "canvas.instructure.com" for cloud-hosted Canvas.</p>
       </td>
     </tr>
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>privacy_level</td>
       <td>
         Required
@@ -366,7 +365,7 @@ The following fields can be put under `extensions`:
         </p>
       </td>
     </tr>
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>settings</td>
       <td>
       </td>
@@ -376,7 +375,7 @@ The following fields can be put under `extensions`:
       </td>
     </tr>
   </tbody>
-<table>
+</table>
 
 <a name='settings-params'></a>
 
@@ -394,16 +393,23 @@ The following fields can be put under `extensions`:
     </tr>
   </thead>
   <tbody>
-    <tr class="request-param ">
-      <td>text</td>
+    <tr class="request-param">
+      <td>custom_fields</td>
+      <td>
+      </td>
+      <td>JSON object</td>
+      <td class="param-desc">
+<p>Custom fields that will be sent to the tool consumer; can be set at the tool-level or within the "placement" JSON object for placement-specific custom fields. When the tool is launched, all custom fields will be sent to the tool as strings. Read more about <a href="file.tools_variable_substitutions.html" target="_blank">variable substitutions in custom fields.</a></p>
+      </td>
+    </tr>
+    <tr class="request-param">
+      <td>icon_url</td>
       <td>
       </td>
       <td>string</td>
       <td class="param-desc">
-        <p>The default text to show for this tool. Can be set within "settings" for the tool-level display text, or within "placements" object for placement-specific display text.</p>
-      </td>
-    </tr>
-    <tr class="request-param ">
+        <p>The url of the icon to show for this tool. Can be set within the "settings" object for tool-level icons, or in the "placement" object for placement-specific icons. NOTE: Not all placements display an icon.</p>
+    <tr class="request-param">
       <td>labels</td>
       <td>
       </td>
@@ -413,21 +419,33 @@ The following fields can be put under `extensions`:
 </p>
       </td>
     </tr>
-    <tr class="request-param ">
-      <td>icon_url</td>
+    <tr class="request-param">
+      <td>placements</td>
+      <td>
+      </td>
+      <td>array of JSON objects</td>
+      <td class="param-desc">
+<p>Settings to be used for specific tool placements. Values given in this <code>settings.placements</code> array will override the value given in the `settings` object for that particular placement. <a href="#placements-params">See placements parameters below.</a></p>
+      </td>
+    </tr>
+    <tr class="request-param">
+      <td>required_permissions</td>
       <td>
       </td>
       <td>string</td>
       <td class="param-desc">
-        <p>The url of the icon to show for this tool. Can be set within the "settings" object for tool-level icons, or in the "placement" object for placement-specific icons. NOTE: Not all placements display an icon.</p>
-    <tr class="request-param ">
+        <p>Limits tool visibility to users with certain permissions, as defined on the user's built-in Canvas user roles AND the custom roles that you may have created in Canvas. This is a comma-separated string of one or more required permissions, such as <code>manage_groups_add,manage_groups_delete</code> or <code>read_outcomes</code>. The tool will be hidden for users without all specified permissions. If set in placement-specific settings, that placement will be hidden; if set at the tool-level (e.g. under <code>extensions[0]</code>), each of the tool's placements will be hidden. For true access control, please use (instead or in addition) the <a href="file.tools_variable_substitutions.html#Canvas-membership-permissions">Canvas.membership.permissions&lt;&gt;</a> custom variable expansion, and check its value in your tool. To learn more about roles and permissions, and to see the permissions available for this parameter, visit the <a href="roles.html" target="_blank">Roles API docs</a>.
+        </p>
+      </td>
+    </tr>
+    <tr class="request-param">
       <td>selection_height</td>
       <td>
       </td>
       <td>string</td>
       <td class="param-desc">
         <p>The display height of the iframe. This may be ignored or overridden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>selection_width</td>
       <td>
       </td>
@@ -436,33 +454,13 @@ The following fields can be put under `extensions`:
         <p>The display width of the iframe. This may be ignored or overridden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
       </td>
     </tr>
-
-    <tr class="request-param ">
-      <td>required_permissions</td>
+    <tr class="request-param">
+      <td>text</td>
       <td>
       </td>
       <td>string</td>
       <td class="param-desc">
-        <p>Limits tool visibility to users with certain permissions, as defined on the user's built-in Canvas user roles AND the custom roles that you may have created in Canvas. This is a comma-separated string of one or more required permissions, such as <code>manage_groups_add,manage_groups_delete</code> or <code>read_outcomes</code>. The tool will be hidden for users without all specified permissons. If set in placement-specific settings, that placement will be hidden; if set at the tool-level (e.g. under <code>extensions[0]</code>), each of the tool's placements will be hidden. For true access control, please use (instead or in addition) the <a href="file.tools_variable_substitutions.html#Canvas-membership-permissions">Canvas.membership.permissions&lt;&gt;</a> custom variable expansion, and check its value in your tool. To learn more about roles and permissions, and to see the permissions available for this parameter, visit the <a href="roles.html" target="_blank">Roles API docs</a>.
-        </p>
-      </td>
-    </tr>
-    <tr class="request-param ">
-      <td>custom_fields</td>
-      <td>
-      </td>
-      <td>JSON object</td>
-      <td class="param-desc">
-<p>Custom fields that will be sent to the tool consumer; can be set at the tool-level or within the "placement" JSON object for placement-specific custom fields. When the tool is launched, all custom fields will be sent to the tool as strings. Read more about <a href="file.tools_variable_substitutions.html" target="_blank">variable substitutions in custom fields.</a></p>
-      </td>
-    </tr>
-    <tr class="request-param ">
-      <td>placements</td>
-      <td>
-      </td>
-      <td>array of JSON objects</td>
-      <td class="param-desc">
-<p>Settings to be used for specific tool placements. Values given in this <code>settings.placements</code> array will override the value given in the `settings` object for that particular placement. <a ref="#placements-params">See placements parameters below.</a></p>
+        <p>The default text to show for this tool. Can be set within "settings" for the tool-level display text, or within "placements" object for placement-specific display text.</p>
       </td>
     </tr>
   </tbody>
@@ -491,52 +489,17 @@ The following can be put under `extensions.settings.placements`. (Note: `extensi
       <td class="param-desc">
 <p>Name of the placement that this settings object should apply to. <a href="file.placements_overview.html">See full list of placements here.</a></p>
       </td>
-    <tr>
-
-<tr class="request-param ">
-      <td>text</td>
-      <td>
-      </td>
-      <td>string</td>
-      <td class="param-desc">
-        <p>The default text to show for this tool. Can be set within "settings" for the tool-level display text, or within "placements" object for placement-specific display text.</p>
-      </td>
     </tr>
-    <tr class="request-param ">
-      <td>labels</td>
+    <tr class="request-param">
+      <td>custom_fields</td>
       <td>
       </td>
       <td>JSON object</td>
       <td class="param-desc">
-        <p>An object for translations of the "text", used to support internationalization (i18n) / localization (l10n). If the user's Canvas interface is set to one of the languages listed, the tool will display the translated text in place of the value in the "text" field. This JSON object is in the format <code>{"en": "Name", "es": "Nombre"}</code>, where "en" and "es" are IETF language tags. More specific locales ("en-AU") are preferred over less specific ones ("en").  A partial list of language tags can be found <a href="https://en.wikipedia.org/wiki/IETF_language_tag#List_of_common_primary_language_subtags" target="_blank">here</a>. Can be set within "settings" or individual placements.</p>
+<p>Custom fields that will be sent to the tool consumer; can be set at the tool-level or within the "placement" JSON object for placement-specific custom fields. When the tool is launched, all custom fields will be sent to the tool as strings. Read more about <a href="file.tools_variable_substitutions.html" target="_blank">variable substitutions in custom fields.</a></p>
       </td>
     </tr>
-    <tr class="request-param ">
-      <td>icon_url</td>
-      <td>
-      </td>
-      <td>string</td>
-      <td class="param-desc">
-        <p>The url of the icon to show for this tool. Can be set within the "settings" object for tool-level icons, or in the "placement" object for placement-specific icons. NOTE: Not all placements display an icon.</p>
-    <tr class="request-param ">
-      <td>selection_height</td>
-      <td>
-      </td>
-      <td>string</td>
-      <td class="param-desc">
-        <p>The display height of the iframe. This may be ignored or overridden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
-    <tr class="request-param ">
-      <td>selection_width</td>
-      <td>
-      </td>
-      <td>string</td>
-      <td class="param-desc">
-        <p>The display width of the iframe. This may be ignored or overridden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
-      </td>
-    </tr>
-
-<!-- enabled -->
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>enabled</td>
       <td>
       </td>
@@ -545,8 +508,25 @@ The following can be put under `extensions.settings.placements`. (Note: `extensi
 <p>Optional, defaults to `true`. Determines if the placement is enabled.</p>
       </td>
     </tr>
-<!-- message_type -->
-    <tr class="request-param ">
+    <tr class="request-param">
+      <td>icon_url</td>
+      <td>
+      </td>
+      <td>string</td>
+      <td class="param-desc">
+        <p>The url of the icon to show for this tool. Can be set within the "settings" object for tool-level icons, or in the "placement" object for placement-specific icons. NOTE: Not all placements display an icon.</p>
+      </td>
+    </tr>
+    <tr class="request-param">
+      <td>labels</td>
+      <td>
+      </td>
+      <td>JSON object</td>
+      <td class="param-desc">
+        <p>An object for translations of the "text", used to support internationalization (i18n) / localization (l10n). If the user's Canvas interface is set to one of the languages listed, the tool will display the translated text in place of the value in the "text" field. This JSON object is in the format <code>{"en": "Name", "es": "Nombre"}</code>, where "en" and "es" are IETF language tags. More specific locales ("en-AU") are preferred over less specific ones ("en").  A partial list of language tags can be found <a href="https://en.wikipedia.org/wiki/IETF_language_tag#List_of_common_primary_language_subtags" target="_blank">here</a>. Can be set within "settings" or individual placements.</p>
+      </td>
+    </tr>
+    <tr class="request-param">
       <td>message_type</td>
       <td>
       </td>
@@ -561,27 +541,46 @@ The following can be put under `extensions.settings.placements`. (Note: `extensi
         </p>
       </td>
     </tr>
-    <tr class="request-param ">
+    <tr class="request-param">
       <td>required_permissions</td>
       <td>
       </td>
       <td>string</td>
       <td class="param-desc">
-        <p>Limits tool visibility to users with certain permissions, as defined on the user's built-in Canvas user roles AND the custom roles that you may have created in Canvas. This is a comma-separated string of one or more required permissions, such as <code>manage_groups_add,manage_groups_delete</code> or <code>read_outcomes</code>. The tool will be hidden for users without all specified permissons. If set in placement-specific settings, that placement will be hidden; if set at the tool-level (e.g. under <code>extensions[0]</code>), each of the tool's placements will be hidden. For true access control, please use (instead or in addition) the <a href="file.tools_variable_substitutions.html#Canvas-membership-permissions">Canvas.membership.permissions&lt;&gt;</a> custom variable expansion, and check its value in your tool. To learn more about roles and permissions, and to see the permissions available for this parameter, visit the <a href="roles.html" target="_blank">Roles API docs</a>.
-        </p>
+        <p>Limits tool visibility to users with certain permissions, as defined on the user's built-in Canvas user roles AND the custom roles that you may have created in Canvas. This is a comma-separated string of one or more required permissions, such as <code>manage_groups_add,manage_groups_delete</code> or <code>read_outcomes</code>. The tool will be hidden for users without all specified permissions. If set in placement-specific settings, that placement will be hidden; if set at the tool-level (e.g. under <code>extensions[0]</code>), each of the tool's placements will be hidden. For true access control, please use (instead or in addition) the <a href="file.tools_variable_substitutions.html#Canvas-membership-permissions">Canvas.membership.permissions&lt;&gt;</a> custom variable expansion, and check its value in your tool. To learn more about roles and permissions, and to see the permissions available for this parameter, visit the <a href="roles.html" target="_blank">Roles API docs</a>.</p>
       </td>
     </tr>
-    <tr class="request-param ">
-      <td>custom_fields</td>
+    <tr class="request-param">
+      <td>selection_height</td>
       <td>
       </td>
-      <td>JSON object</td>
+      <td>string</td>
       <td class="param-desc">
-<p>Custom fields that will be sent to the tool consumer; can be set at the tool-level or within the "placement" JSON object for placement-specific custom fields. When the tool is launched, all custom fields will be sent to the tool as strings. Read more about <a href="file.tools_variable_substitutions.html" target="_blank">variable substitutions in custom fields.</a></p>
+        <p>The display height of the iframe. This may be ignored or overridden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
+      </td>
+    </tr>
+    <tr class="request-param">
+      <td>selection_width</td>
+      <td>
+      </td>
+      <td>string</td>
+      <td class="param-desc">
+        <p>The display width of the iframe. This may be ignored or overridden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
+      </td>
+    </tr>
+    <tr class="request-param">
+      <td>text</td>
+      <td>
+      </td>
+      <td>string</td>
+      <td class="param-desc">
+        <p>The default text to show for this tool. Can be set within "settings" for the tool-level display text, or within "placements" object for placement-specific display text.</p>
       </td>
     </tr>
   </tbody>
 </table>
+
+<a name="placement-specific-settings"></a>
 
 ### Placement-specific Settings
 
@@ -590,70 +589,59 @@ The following settings only apply to certain placements.
 <table class='request-params'>
   <thead>
     <tr>
-      <th class="param-name">Placement</th>
       <th class="param-name">Parameter</th>
-      <th class="param-req"></th>
+      <th class="param-name">Placement</th>
       <th class="param-type">Type</th>
       <th class="param-desc">Description</th>
     </tr>
   </thead>
   <tbody>
-    <tr class="request-param ">
-      <td>file_menu</td>
+    <tr class="request-param">
       <td>accept_media_types</td>
-      <td>
-      </td>
+      <td>file_menu</td>
       <td>string</td>
       <td class="param-desc">
 <p>A comma-separated list of MIME types, e.g.: <code>"image/jpeg,image/png"</code>. The LTI tool will be shown in the file_menu placement if the file's MIME type matches one of the MIME types in the list. <a href="file.placements_overview.html#file-menu" target="_blank">(Screenshot of the file_menu placement.)</a></p>
       </td>
     </tr>
-    <tr class="request-param ">
-      <td>editor_button</td>
-      <td>use_tray</td>
-      <td>
+    <tr class="request-param">
+      <td>default</td>
+      <td>account_navigation, course_navigation</td>
+      <td>string</td>
+      <td class="param-desc">
+        <p>Whether the tool should be shown in the sidebar.</p>
+        <p class="param-values">
+          <span class="allowed">Allowed values:</span>
+          <code class="enum">enabled</code>, <code class="enum">disabled</code>
+        </p>
       </td>
+    </tr>
+    <tr class="request-param">
+      <td>icon_svg_path_64</td>
+      <td>global_navigation</td>
+      <td>string</td>
+      <td class="param-desc">
+<p>An SVG path to be used for the tool's icon in the global_navigation placement. Note: this should be the SVG path itself, not a URL to an SVG image. The value of this parameter will be used as the <code>d</code> attribute on the SVG's <code>path</code> element. <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d" target="_blank">See MDN for more information.</a></p>
+      </td>
+    </tr>
+    <tr class="request-param">
+      <td>use_tray</td>
+      <td>editor_button</td>
       <td>boolean</td>
       <td class="param-desc">
 <p>Whether the tool should open in the tray (a.k.a. sidebar) rather than a modal window. <code>True</code> means to use the tray, <code>false</code> means to use a modal window. The tray allows the user to still interact with the page while the tray is open; the modal window blocks the rest of the page while the modal window is open.</p>
       </td>
     </tr>
-    <tr class="request-param ">
-      <td>account_navigation</td>
-      <td>default</td>
-      <td>
-      </td>
+    <tr class="request-param">
+      <td>windowTarget</td>
+      <td>account_navigation, course_navigation</td>
       <td>string</td>
       <td class="param-desc">
-        <p>Whether the tool should be shown in the sidebar.</p>
+        <p>Whether the tool should be launched in a new tab.</p>
         <p class="param-values">
           <span class="allowed">Allowed values:</span>
-          <code class="enum">enabled</code>, <code class="enum">disabled</code>
+          <code class="enum">_blank</code>
         </p>
-      </td>
-    </tr>
-    <tr class="request-param ">
-      <td>course_navigation</td>
-      <td>default</td>
-      <td>
-      </td>
-      <td>string</td>
-      <td class="param-desc">
-        <p>Whether the tool should be shown in the sidebar.</p>
-        <p class="param-values">
-          <span class="allowed">Allowed values:</span>
-          <code class="enum">enabled</code>, <code class="enum">disabled</code>
-        </p>
-      </td>
-    </tr>
-    <tr class="request-param ">
-      <td>global_navigation</td>
-      <td>icon_svg_path_64</td>
-      <td>
-      </td>
-      <td>string</td>
-      <td class="param-desc">
-<p>An SVG path to be used for the tool's icon in the global_navigation placement. Note: this should be the SVG path itself, not a URL to an SVG image. The value of this parameter will be used as the <code>d</code> attribute on the SVG's <code>path</code> element. <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d" target="_blank">See MDN for more information.</a></p>
       </td>
     </tr>
   </tbody>
