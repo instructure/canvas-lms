@@ -65,7 +65,8 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
   def fetch_filtered_enrolled_students(course_id)
     students = StudentEnrollment.active
                                 .where(course_id: course_id)
-                                .preload(:user, :course_section)
+                                .preload(:user)
+                                .preload(:course_section)
 
     if params[:filter_section].present?
       students = students.where(course_section_id: params[:filter_section])
@@ -102,13 +103,16 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
   end
 
   def build_students_data(paginated_students, enrolled_students, students_status)
+    # Pre-fetch all sections for the paginated students in a single query
+    student_ids = paginated_students.map(&:user_id)
+    sections_by_student = enrolled_students
+                          .where(user_id: student_ids)
+                          .preload(:course_section)
+                          .group_by(&:user_id)
+
     paginated_students.map do |enrollment|
       student = enrollment.user
-      student_sections = enrolled_students
-                         .where(user_id: student.id)
-                         .filter_map(&:course_section)
-                         .compact
-                         .uniq
+      student_sections = sections_by_student[student.id]&.filter_map(&:course_section)&.uniq || []
 
       {
         id: student.id.to_s,
@@ -144,8 +148,11 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
                   .select("assignments.id, assignments.title, assignments.workflow_state,
                             public.assignment_overrides.due_at, public.assignment_override_students.user_id")
 
+    # Get unique assignment IDs to avoid duplicates in the IN clause
+    assignment_ids = assignments.map(&:id).uniq
+
     submissions = Submission
-                  .where(assignment_id: assignments.map(&:id))
+                  .where(assignment_id: assignment_ids)
                   .where.not(workflow_state: ["unsubmitted", "deleted"])
                   .select("DISTINCT ON (user_id, assignment_id) *")
                   .order("user_id, assignment_id, created_at DESC")
