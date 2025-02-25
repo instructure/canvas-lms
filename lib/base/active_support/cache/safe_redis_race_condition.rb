@@ -73,7 +73,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
   # we only override it to make sure we can recover if
   # we have stale data available, and to make sure unlocking happens
   # no matter what (even if the block dies)
-  def save_block_result_to_cache(name, options)
+  def save_block_result_to_cache(*args, &)
     super
   rescue => e
     raise unless @safe_redis_internal_options[:stale_entry]
@@ -83,6 +83,9 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
     Canvas::Errors.capture(e)
     @safe_redis_internal_options[:stale_entry].value
   ensure
+    name = args.shift
+    args.shift if Rails.version >= "7.2"
+    options = args.shift
     # only unlock if we have an actual lock nonce, not just "true"
     # that happens on failure
     if @safe_redis_internal_options[:lock_nonce].is_a?(String)
