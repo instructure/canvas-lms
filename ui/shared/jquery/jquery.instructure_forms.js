@@ -104,6 +104,7 @@ $.fn.formSubmit = function (options) {
         if (INST && INST.environment !== 'production') throw error
       }
       if (newData === false) {
+        options?.onError?.call($form)
         return false
       } else if (newData) {
         formData = newData

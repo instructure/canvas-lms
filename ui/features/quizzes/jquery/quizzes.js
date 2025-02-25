@@ -2451,6 +2451,14 @@ ready(function () {
       $quiz_edit_wrapper.find('.btn.save_and_publish').prop('disabled', true)
     },
 
+    onError() {
+        $('#quiz_edit_wrapper')
+          .find('.btn.save_quiz_button')
+          .prop('disabled', false)
+          .removeClass('saving')
+          .text(I18n.t('buttons.save', 'Save'))
+    },
+
     onSubmit(promise, data) {
       const form = this
 
