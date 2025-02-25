@@ -5206,6 +5206,7 @@ el:
     this_is_permanent: "<mrk mid=\"7410\" mtype=\"seg\">Δεν είναι δυνατή η αναίρεση της αναπροσαρμογής βαθμών.</mrk> <mrk mid=\"7411\" mtype=\"seg\">Το ιστορικό προ-αναπροσαρμοσμένων βαθμών θα είναι διαθέσιμο, αλλά η ενέργεια της αναπροσαρμογής είναι μη αναστρέψιμη.</mrk>"
   curving_assignments_e9479ee3: "Αναπροσαρμογή εργασιών"
   custom_fields_fc3e55af: "Προσαρμοσμένα Πεδία"
+  custom_from_name_38a3d784: "Προσαρμογή Ονόματος «Από»"
   customize_74cdc895: Παραμετροποίηση
   cutoff_score_74254c89: "κατώτατη βαθμολογία"
   cyan_c1d5f68a: Κυανό
@@ -5377,6 +5378,7 @@ el:
   deep_orange_4c7eea99: "Βαθύ πορτοκαλί"
   deep_purple_bb3e2907: "Βαθύ μοβ"
   default_account_quotas_e34112fd: "Ποσοστώσεις Προεπιλεγμένου Λογαριασμού"
+  default_canvas_setting_fa6e6f81: "Προεπιλεγμένη Ρύθμιση Canvas"
   default_conference_title: "Συνεδρία για το μάθημα %{course_name}"
   default_email_9efb7fbd: "Προεπιλεγμένη Ηλεκτρονική Διεύθυνση"
   default_grade_cannot_be_set_to_ex_723caa59: "Ο προεπιλεγμένος βαθμός δεν μπορεί να είναι %{ex}"
@@ -5416,6 +5418,7 @@ el:
   deleted_ce03674d: διεγράφη
   deleted_topic_notice: "Το θέμα έχει διαγραφεί"
   deleting_6421031e: διαγραφή...
+  deleting_e2bd8cc9: Διαγραφή...
   delicious_7f9ac66f: "Η υπηρεσία Delicious"
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "<mrk mid=\"7254\" mtype=\"seg\">Οι demo ιστοσελίδες απαιτούν το σετάρισμα των ρυθμίσεων Recaptcha.</mrk> <mrk mid=\"7255\" mtype=\"seg\">Παρακαλώ επικοινωνήστε με τον διαχειριστή της ιστοσελίδα σας για αυτή τη σύνδεσή σας στο Canvas.</mrk>"
   demos: 
@@ -5835,6 +5838,7 @@ el:
   dismiss_dacdb625: Παράβλεψη
   display_course_catalog: "Εμφάνισης λίστας με δυνατότητα αναζήτησης μαθημάτων σε αυτόν τον λογαριασμό ρίζας με ενεργοποιημένη την ένδειξη «Συμπεριλάβετε αυτό το μάθημα στο ευρετήριο κοινοποιημένων μαθημάτων»."
   display_name_b80c243e: "Όνομα εμφάνισης"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "Προβολή αναδυόμενης προειδοποίησης που εμφανίζεται μία φορά στη σελίδα των Προτιμήσεων Ειδοποιήσεων."
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "<mrk mid=\"4631\" mtype=\"seg\">Καταμερισμός σε ίσες χρονοθυρίδες %{num_minutes} λεπτών.</mrk> <mrk mid=\"4632\" mtype=\"seg\">*Πηγαίνετε στο*</mrk>"
   do_nothing_9672b478: "Καμία δράση"
   does_not_meet_expectations_b0736d20: "Δεν Ικανοποιεί τις Προσδοκίες"
@@ -6315,6 +6319,7 @@ el:
   epub_exporting_f5592ff2: "Εξαγωγή ePub"
   error_59293a2c: σφάλμα
   error_98e81528: Σφάλμα
+  error_afac7133: "Σφάλμα:"
   error_deleting_name_reason_11f9d399: "<mrk mid=\"7261\" mtype=\"seg\">Σφάλμα κατά τη διαγραφή του %{name}:</mrk> <mrk mid=\"7262\" mtype=\"seg\">%{reason}</mrk>"
   error_reports_7d6c8b1e: "Αναφορές Σφαλμάτων"
   error_uploading_file_e2d31b56: "Σφάλμα μεταφόρτωσης αρχείου."
@@ -7174,6 +7179,7 @@ el:
       removed: "Το σετ ομάδων αφαιρέθηκε επιτυχώς."
     group_atom_feed: "Τροφοδοσία Atom Ομάδας"
     group_limit_number: "Το όριο της ομάδας πρέπει να είναι αριθμός"
+    group_set_name_required: "Απαιτείται όνομα"
     groups_count: "(%{Count}) ομάδες"
     index: 
       heading_current_groups: "Τρέχουσες Ομάδες"
@@ -7845,6 +7851,7 @@ el:
   learning_outcome_id_88ff198c: "id αποτελέσματος εκμάθησης"
   learning_outcome_name_9cb475e6: "όνομα αποτελέσματος εκμάθησης"
   leave_5e852989: Αποχώρηση
+  leave_blank_for_no_limit_e8f80808: "Αφήστε το κενό για μη περιορισμό"
   leave_group_group_name_6847c632: "Αποχώρηση από την ομάδα %{group_name}"
   left_group_group_name_aac4e813: "Αποχωρήσατε από την Ομάδα %{group_name}"
   less_than_a_minute_ago_9f45e2a5: "λιγότερο από ένα λεπτό πριν"
@@ -10359,6 +10366,7 @@ el:
       scheduling: Προγραμματισμός
   notification_preferences_cf47083d: "Προτιμήσεις Ειδοποιήσεων"
   notifications_cbfa7704: Ειδοποιήσεις
+  notifications_sent_to_external_services_c4a86b78: "Οι ειδοποιήσεις στάλθηκαν σε εξωτερικές υπηρεσίες"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "<mrk mid=\"4332\" mtype=\"seg\">Τώρα που το μάθημά σας δημιουργήθηκε και είναι διαθέσιμο, μάλλον δεν χρειάζεστε πια αυτή τη λίστα ελέγχου.</mrk> <mrk mid=\"4333\" mtype=\"seg\">Θα την έχουμε, πάντως, πρόχειρη σε περίπτωση που θελήσετε αργότερα να δοκιμάσετε κάτι καινούργιο ή χρειαστείτε λίγη επιπλέον βοήθεια κατά την πραγματοποίηση αλλαγών στο περιεχόμενο του μαθήματός σας.</mrk>"
   number: 
     currency: 
@@ -13033,6 +13041,7 @@ el:
   reply_389d6fb9: Απάντηση
   reply_all_80298bee: "Απάντηση όλων"
   reply_from_name: "%{name} μέσω των Ειδοποιήσεων του Canvas"
+  reply_to_9fa43ebe: Απάντηση-Προς
   reply_to_comment_72d96728: "Απάντηση στο Σχόλιο"
   reply_to_current_message_55391f5b: "Απάντηση στο Τρέχον Μήνυμα"
   reply_to_main_discussion_29823888: "Απάντηση στην Κύρια Συζήτηση"
@@ -15730,6 +15739,7 @@ el:
     is_required: "Αυτό το πεδίο είναι υποχρεωτικό"
   validate_links_in_content_b1630fba: "Επικύρωση Συνδέσμων στο Περιεχόμενο"
   validation_error_3b943100: "Λάθος στην Επικύρωση"
+  value_must_be_a_whole_number_23c79120: "Το όριο της ομάδας πρέπει να είναι αριθμός"
   value_must_be_positive_3e086d5a: "Η τιμή πρέπει να είναι θετική"
   vanity_url_76f93382: "Vanity URL"
   verification_code_5acd64ef: "Κωδικός Επιβεβαίωσης"
