@@ -284,8 +284,8 @@ describe "SpeedGrader - discussion submissions" do
         end
       end
 
-      context "discussion context temporary toggling", :ignore_js_errors do
-        it "toggles back and forth group discussions just fine" do
+      context "discussion context temporary toggling" do
+        it "toggles back and forth group discussions just fine", :ignore_js_errors do
           entry_text = "first student message in group1"
           root_topic = group_discussion_assignment
           @group1.add_user(@student, "accepted")
@@ -299,6 +299,7 @@ describe "SpeedGrader - discussion submissions" do
             wait_for_ajaximations
             expect(f("#main")).to include_text("The submissions for the assignment are posts in the assignment's discussion for this group. You can view the discussion posts for")
             expect(f("#main")).to include_text(entry_text)
+            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
             f("#discussion_temporary_toggle").click
           end
           wait_for_ajaximations
@@ -323,6 +324,7 @@ describe "SpeedGrader - discussion submissions" do
 
           # again in the legacy view
           in_frame "speedgrader_iframe" do
+            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
             f("#discussion_temporary_toggle").click
           end
           wait_for_ajaximations
@@ -337,6 +339,7 @@ describe "SpeedGrader - discussion submissions" do
           wait_for_ajaximations
 
           in_frame "speedgrader_iframe" do
+            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
             expect(f("#discussion_temporary_toggle")).to be_present
           end
         end
@@ -345,6 +348,7 @@ describe "SpeedGrader - discussion submissions" do
           Speedgrader.visit(@course.id, @assignment.id)
           in_frame "speedgrader_iframe" do
             expect(f("#main")).to include_text("The submissions for the assignment are posts in the assignment's discussion. You can view the discussion posts for")
+            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
             f("#discussion_temporary_toggle").click
           end
           wait_for_ajaximations
@@ -357,7 +361,51 @@ describe "SpeedGrader - discussion submissions" do
           wait_for_ajaximations
 
           in_frame "speedgrader_iframe" do
+            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
             expect(f("#discussion_temporary_toggle")).to be_present
+          end
+        end
+
+        it "toggles back and forth via specific discussion entries just fine", :ignore_js_errors do
+          2.times do |i|
+            @discussion_topic.discussion_entries.create!(user: @student, message: "extra message #{i}")
+          end
+
+          Speedgrader.visit(@course.id, @assignment.id)
+          in_frame "speedgrader_iframe" do
+            wait_for_ajaximations
+            f("[id='discussion_speedgrader_revisit_link_entryId=#{@discussion_topic.discussion_entries.last.id}']").click
+          end
+
+          wait_for_ajaximations
+          in_frame "speedgrader_iframe" do
+            wait_for_ajaximations
+
+            in_frame("discussion_preview_iframe") do
+              wait_for_ajaximations
+
+              expect(f("div[data-testid='isHighlighted']").text).to include(@discussion_topic.discussion_entries.last.message)
+              f("button#switch-to-individual-posts-link").click
+            end
+          end
+
+          wait_for_ajaximations
+          in_frame "speedgrader_iframe" do
+            wait_for(method: nil, timeout: 0.5) { f("#discussion_temporary_toggle") }
+            expect(f("#discussion_temporary_toggle")).to be_present
+
+            f("[id='discussion_speedgrader_revisit_link_entryId=#{@discussion_topic.discussion_entries.first.id}']").click
+          end
+
+          wait_for_ajaximations
+          in_frame "speedgrader_iframe" do
+            wait_for_ajaximations
+
+            in_frame("discussion_preview_iframe") do
+              wait_for_ajaximations
+
+              expect(f("div[data-testid='isHighlighted']").text).to include(@discussion_topic.discussion_entries.first.message)
+            end
           end
         end
       end
@@ -936,7 +984,7 @@ describe "SpeedGrader - discussion submissions" do
         end
       end
 
-      it "displays the root topic for group discussion if groups have no users" do
+      it "displays the root topic for group discussion if groups have no users", :ignore_js_errors do
         entry_text = "first student message"
         root_topic = group_discussion_assignment
         root_topic.discussion_entries.create!(user: @student, message: entry_text)

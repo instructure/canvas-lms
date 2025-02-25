@@ -3032,7 +3032,11 @@ EG = {
   },
 
   // load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
-  renderSubmissionPreview(domElement = 'iframe', temporaryDiscussionContextView = null) {
+  renderSubmissionPreview(
+    domElement = 'iframe',
+    temporaryDiscussionContextView = null,
+    specificEntryId = null,
+  ) {
     // TODO: this is duplicate code from line 1972 and should be removed
     if (!this.currentStudent.submission) {
       $this_student_does_not_have_a_submission.show()
@@ -3047,7 +3051,13 @@ EG = {
       this.currentStudent.submission,
     )
     const hideStudentNames = utils.shouldHideStudentNames() ? '&hide_student_name=1' : ''
-    const entryId = ENV.ENTRY_ID ? `&entry_id=${ENV.ENTRY_ID}` : ''
+    let entryId = ''
+    if (specificEntryId) {
+      entryId = `&entry_id=${specificEntryId}`
+    } else if (ENV.ENTRY_ID) {
+      entryId = `&entry_id=${ENV.ENTRY_ID}`
+    }
+
     let showFullDiscussionImmediately = ''
     if (temporaryDiscussionContextView) {
       switch (temporaryDiscussionContextView) {

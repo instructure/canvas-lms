@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import { userEvent } from '@testing-library/user-event'
+import {userEvent} from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import UserDifferentiationTagManager from '../UserDifferentiationTagManager'
 import type {UserDifferentiationTagManagerProps} from '../UserDifferentiationTagManager'
@@ -33,11 +33,11 @@ const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategories
 const mockUseAddTagMembership = useAddTagMembership as jest.Mock
 const mutateMock = jest.fn()
 
-// TODO: Fix this test
+// TODO: Fix this test EGG-761
 describe.skip('UserDifferentiationTagManager', () => {
   const defaultProps: UserDifferentiationTagManagerProps = {
     courseId: 1,
-    users:[1, 2]
+    users: [1, 2],
   }
   let user: ReturnType<typeof userEvent.setup>
   const renderComponent = (mockReturn = {}, props = {}, mutationMockReturn = {}) => {
@@ -51,7 +51,7 @@ describe.skip('UserDifferentiationTagManager', () => {
       isLoading: false,
       isSuccess: true,
       isError: false,
-      error: null
+      error: null,
     }
     mockUseDifferentiationTagCategoriesIndex.mockReturnValue({...defaultMock, ...mockReturn})
     mockUseAddTagMembership.mockReturnValue({...defaultMutationMock, ...mutationMockReturn})
@@ -61,9 +61,9 @@ describe.skip('UserDifferentiationTagManager', () => {
   beforeEach(() => {
     fakeENV.setup({
       current_context: {
-          id: 1,
-          type:'Course',
-      }
+        id: 1,
+        type: 'Course',
+      },
     })
     user = userEvent.setup()
     $.flashMessage = jest.fn()
@@ -83,7 +83,6 @@ describe.skip('UserDifferentiationTagManager', () => {
     expect(screen.getByText(/2 Selected/)).toBeInTheDocument()
   })
 
-  // skip due to jenkins failure EGG-761
   it('shows loading in menu when fetching categories', async () => {
     renderComponent({isLoading: true, data: null})
     const TagAsbutton = screen.getByTestId('user-diff-tag-manager-tag-as-button')
@@ -92,7 +91,7 @@ describe.skip('UserDifferentiationTagManager', () => {
     expect(screen.getByText('Fetching Categories...')).toBeInTheDocument()
   })
 
-  it('shows error message when there is an error', async () => {
+  it.skip('shows error message when there is an error', async () => {
     const error = new Error('Failed to fetch')
     renderComponent({error, data: null})
     const TagAsbutton = screen.getByTestId('user-diff-tag-manager-tag-as-button')
@@ -101,7 +100,7 @@ describe.skip('UserDifferentiationTagManager', () => {
     expect(screen.getByText('Error Fetching Categories!')).toBeInTheDocument()
   })
 
-  it('populates Tag as Menu with the mocked categories', async () => {
+  it.skip('populates Tag as Menu with the mocked categories', async () => {
     const mockCategories = [
       {id: 1, name: 'Category 1', groups: []},
       {id: 2, name: 'Category 2', groups: []},
@@ -114,7 +113,7 @@ describe.skip('UserDifferentiationTagManager', () => {
     expect(screen.getByText('Category 2')).toBeInTheDocument()
   })
 
-  it('renders empty message when there are not any diff tag', async () => {
+  it.skip('renders empty message when there are not any diff tag', async () => {
     renderComponent({data: []})
     const TagAsbutton = screen.getByTestId('user-diff-tag-manager-tag-as-button')
     await user.click(TagAsbutton)
@@ -122,7 +121,7 @@ describe.skip('UserDifferentiationTagManager', () => {
     expect(screen.getByText('No Differentiation Tag Categories Yet')).toBeInTheDocument()
   })
 
-  it('calls useAddTagMembership mutation when user selects a tag from the menu and has at least one user selected', async () => {
+  it.skip('calls useAddTagMembership mutation when user selects a tag from the menu and has at least one user selected', async () => {
     const mockCategories = [
       {id: 1, name: 'Category 1', groups: [{id: 1, name: 'Tag 1'}]},
       {id: 2, name: 'Category 2', groups: []},
@@ -137,7 +136,8 @@ describe.skip('UserDifferentiationTagManager', () => {
     expect(mutateMock).toHaveBeenCalled()
   })
 
-  it('does not call useAddTagMembership mutation when user selects a tag from the menu and has no user selected', async () => {
+  // if you are looking at EGG-761, please look at this as well
+  it.skip('does not call useAddTagMembership mutation when user selects a tag from the menu and has no user selected', async () => {
     const mockCategories = [
       {id: 1, name: 'Category 1', groups: [{id: 1, name: 'Tag 1'}]},
       {id: 2, name: 'Category 2', groups: []},
