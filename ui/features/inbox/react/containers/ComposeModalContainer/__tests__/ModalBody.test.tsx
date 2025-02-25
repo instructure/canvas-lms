@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import { fireEvent, render, RenderOptions, waitFor } from '@testing-library/react'
 import ModalBody from '../ModalBody'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import { TranslationContext, TranslationContextValue } from '../../../hooks/useTranslationContext'
 
 injectGlobalAlertContainers()
 
@@ -37,6 +38,14 @@ describe('ModelBody', () => {
     onRemoveMediaComment: jest.fn(),
   }
 
+  const renderWithProvider = (ui: React.ReactElement, options?: Omit<RenderOptions, 'wrapper'>) => {
+    return render(ui, {
+      wrapper: (props) => {
+        return <TranslationContext.Provider value={{} as TranslationContextValue}>{props.children}</TranslationContext.Provider>
+      }, ...options
+    });
+  }
+
   describe('Attachments', () => {
     const mediaUploadFile = {
       mediaObject: {
@@ -50,41 +59,43 @@ describe('ModelBody', () => {
       uploadedFile: new Blob(),
     }
 
-    const attachments = [{id: '1'}, {id: '2'}]
+    const attachments = [{ id: '1' }, { id: '2' }]
 
     it('does not render any attachments when none provided', () => {
-      const {queryByTestId} = render(<ModalBody {...defaultProps} />)
+      const { queryByTestId } = renderWithProvider(
+          <ModalBody {...defaultProps} />
+      )
       expect(queryByTestId('media-attachment')).not.toBeInTheDocument()
       expect(queryByTestId('attachment')).not.toBeInTheDocument()
     })
 
     it('does rended both media and regular attachments when provided', () => {
-      const props = {...defaultProps, mediaUploadFile, attachments}
-      const {queryByTestId, getAllByTestId, queryByText} = render(<ModalBody {...props} />)
+      const props = { ...defaultProps, mediaUploadFile, attachments }
+      const { queryByTestId, getAllByTestId, queryByText } = renderWithProvider(<ModalBody {...props} />)
       expect(queryByTestId('media-attachment')).toBeInTheDocument()
       expect(getAllByTestId('attachment')).toHaveLength(2)
       expect(queryByText('new video')).toBeInTheDocument()
     })
 
     it('does render only media attachments', () => {
-      const props = {...defaultProps, mediaUploadFile}
-      const {queryByTestId, queryByText} = render(<ModalBody {...props} />)
+      const props = { ...defaultProps, mediaUploadFile }
+      const { queryByTestId, queryByText } = renderWithProvider(<ModalBody {...props} />)
       expect(queryByTestId('media-attachment')).toBeInTheDocument()
       expect(queryByText('new video')).toBeInTheDocument()
       expect(queryByTestId('attachment')).not.toBeInTheDocument()
     })
 
     it('does render only regular attachments', () => {
-      const props = {...defaultProps, attachments}
-      const {queryByTestId, getAllByTestId, queryByText} = render(<ModalBody {...props} />)
+      const props = { ...defaultProps, attachments }
+      const { queryByTestId, getAllByTestId, queryByText } = renderWithProvider(<ModalBody {...props} />)
       expect(getAllByTestId('attachment')).toHaveLength(2)
       expect(queryByTestId('media-attachment')).not.toBeInTheDocument()
       expect(queryByText('new video')).not.toBeInTheDocument()
     })
 
     it('displays remove button for media attachment and handles click', async () => {
-      const props = {...defaultProps, mediaUploadFile}
-      const {getByTestId} = render(<ModalBody {...props} />)
+      const props = { ...defaultProps, mediaUploadFile }
+      const { getByTestId } = renderWithProvider(<ModalBody {...props} />)
 
       fireEvent.mouseOver(getByTestId('removable-item'))
       await waitFor(() => getByTestId('remove-button'))
@@ -93,8 +104,8 @@ describe('ModelBody', () => {
     })
 
     it('displays remove button for regular attachment and handles click', async () => {
-      const props = {...defaultProps, attachments}
-      const {getAllByTestId, getByTestId} = render(<ModalBody {...props} />)
+      const props = { ...defaultProps, attachments }
+      const { getAllByTestId, getByTestId } = renderWithProvider(<ModalBody {...props} />)
 
       fireEvent.mouseOver(getAllByTestId('removable-item')[0])
       await waitFor(() => getByTestId('remove-button'))
@@ -103,8 +114,8 @@ describe('ModelBody', () => {
     })
 
     it('renders user entered title when submitted', () => {
-      const props = {...defaultProps, user_entered_title: 'renamed video'}
-      const {queryByText} = render(<ModalBody {...props} />)
+      const props = { ...defaultProps, user_entered_title: 'renamed video' }
+      const { queryByText } = renderWithProvider(<ModalBody {...props} />)
       expect(queryByText('renamed video')).not.toBeInTheDocument()
     })
   })
