@@ -338,7 +338,17 @@ RSpec.describe ApplicationController do
       end
 
       it "gets appropriate settings from the root account" do
-        root_account = double(global_id: 1, id: 1, feature_enabled?: false, open_registration?: true, can_add_pronouns?: true, show_sections_in_course_tray?: true, settings: {}, cache_key: "key", uuid: "bleh", salesforce_id: "blah")
+        root_account = double(global_id: 1,
+                              id: 1,
+                              feature_enabled?: false,
+                              service_enabled?: false,
+                              open_registration?: true,
+                              can_add_pronouns?: true,
+                              show_sections_in_course_tray?: true,
+                              settings: {},
+                              cache_key: "key",
+                              uuid: "bleh",
+                              salesforce_id: "blah")
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
@@ -349,7 +359,17 @@ RSpec.describe ApplicationController do
       end
 
       it "disables fun when set" do
-        root_account = double(global_id: 1, id: 1, feature_enabled?: false, open_registration?: true, can_add_pronouns?: true, show_sections_in_course_tray?: true, settings: {}, cache_key: "key", uuid: "blah", salesforce_id: "bleh")
+        root_account = double(global_id: 1,
+                              id: 1,
+                              feature_enabled?: false,
+                              service_enabled?: false,
+                              open_registration?: true,
+                              can_add_pronouns?: true,
+                              show_sections_in_course_tray?: true,
+                              settings: {},
+                              cache_key: "key",
+                              uuid: "blah",
+                              salesforce_id: "bleh")
         allow(root_account).to receive(:kill_joy?).and_return(true)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
