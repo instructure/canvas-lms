@@ -12,9 +12,9 @@ ags_improved_course_concluded_response_codes:
 ags_score_trigger_needs_grading_after_submitted:
   state: hidden
   shadow: true
-  display_name: Prevents LTI AGS Score publish service incorrectly trigger Needs Grading icon 
+  display_name: Prevents LTI AGS Score publish service incorrectly trigger Needs Grading icon
   description: |-
-    If enabled, the AGS Score publish service endpoint will not trigger showing the Needs Grading icon in the gradebook 
+    If enabled, the AGS Score publish service endpoint will not trigger showing the Needs Grading icon in the gradebook
     when activityProgress is Initialized or Started or InProgress just when it is Submitted or Completed.
     If disabled only Initialized activityProgress will not trigger showing the Needs Grading icon in the gradebook.
   applies_to: RootAccount
@@ -128,6 +128,22 @@ lti_before_assignment_results:
     and can view the assignment. This can be used to make the placement more prominent for tools that require action after an assignment
     has been submitted.
   applies_to: RootAccount
+lti_cache_tool_public_jwks_url:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: "Cache LTI 1.3 tools' JWKs URL"
+  description: |-
+    If enabled, the public_jwk_url for LTI 1.3 tools will be cached
+    for a short amount of time during deep linking flows. If disabled,
+    the JWKs will be fetched on every request to deep_linking_response.
+  environments:
+      development:
+        state: allowed_on
+      test:
+        state: allowed_on
+      ci:
+        state: allowed_on
 lti_context_copy_notice:
   state: hidden
   shadow: true
