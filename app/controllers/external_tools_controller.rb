@@ -449,8 +449,7 @@ class ExternalToolsController < ApplicationController
   #             "url": "...",
   #             "default": "disabled",
   #             "enabled": "true",
-  #             "visibility": "public",
-  #             "windowTarget": "_blank"
+  #             "visibility": "public"
   #        },
   #        "selection_width": 500,
   #        "selection_height": 500,
