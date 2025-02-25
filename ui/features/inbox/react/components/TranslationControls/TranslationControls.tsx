@@ -20,11 +20,12 @@ import {Flex} from '@instructure/ui-flex'
 import {RadioInput} from '@instructure/ui-radio-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 
-import React, {useContext, useState, useRef, useEffect, useMemo} from 'react'
-import {ModalBodyContext, signatureSeparator, translationSeparator} from '../../utils/constants'
+import React, {useState, useRef, useEffect, useMemo} from 'react'
+import {signatureSeparator, translationSeparator} from '../../utils/constants'
 import {stripSignature} from '../../utils/inbox_translator'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasMultiSelect from '@canvas/multi-select/react'
+import { useTranslationContext } from '../../hooks/useTranslationContext'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -49,7 +50,7 @@ const TranslationControls = (props: TranslationControlsProps) => {
     translateBody,
     body,
     setBody,
-  } = useContext(ModalBodyContext)
+  } = useTranslationContext()
   const [input, setInput] = useState('English')
   const [selected, setSelected] = useState<Language['id'] | null>(null)
 
@@ -69,8 +70,7 @@ const TranslationControls = (props: TranslationControlsProps) => {
   /**
    * Handle placing translated message in primary or secondary position
    * */
-  // @ts-expect-error
-  const handleChange = isPrimary => {
+  const handleChange = (isPrimary: boolean) => {
     // If not already translated, translate the body.
     setMessagePosition(isPrimary ? 'primary' : 'secondary')
     if (!translated) {
@@ -78,7 +78,6 @@ const TranslationControls = (props: TranslationControlsProps) => {
       return
     }
 
-    // @ts-expect-error
     setBody(prevBody => {
       let newBody = prevBody
       // Strip the signature
@@ -101,13 +100,11 @@ const TranslationControls = (props: TranslationControlsProps) => {
     })
   }
 
-  // @ts-expect-error
-  const handleIncludeTranslation = shouldInclude => setIncludeTranslation(shouldInclude)
+  const handleIncludeTranslation = (shouldInclude: boolean) => setIncludeTranslation(shouldInclude)
 
   useEffect(() => {
     if (!includeTranslation && translated) {
       setMessagePosition(null)
-      // @ts-expect-error
       setBody(prevBody => {
         if (props.inboxSettingsFeature && props.signature !== '') {
           prevBody = stripSignature(prevBody)
