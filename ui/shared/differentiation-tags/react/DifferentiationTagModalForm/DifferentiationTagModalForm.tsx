@@ -352,9 +352,9 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
         groupCategoryId,
         groupCategoryName,
         operations: {
-          create: createOps.length ? createOps : undefined,
-          update: updateOps.length ? updateOps : undefined,
-          delete: deleteOps.length ? deleteOps : undefined,
+          create: createOps,
+          update: updateOps,
+          delete: deleteOps,
         },
       })
 
