@@ -761,6 +761,125 @@ describe Types::CourseType do
           ).to eq [nil, nil, nil, nil, nil]
         end
       end
+
+      context "search term" do
+        before(:once) do
+          @student_with_name = student_in_course(active_all: true).user
+          @student_with_name.update!(name: "John Doe")
+          @student_with_email = student_in_course(active_all: true).user
+          @student_with_email.update!(name: "Jane Smith")
+          @student_with_email.email = "jsmith@example.com"
+          @student_with_email.save!
+          @student_with_sis = student_in_course(active_all: true).user
+          @student_with_sis.pseudonyms.create!(
+            account: Account.default,
+            sis_user_id: "sis_123",
+            unique_id: "uid_123"
+          )
+          @student_with_login = student_in_course(active_all: true).user
+          @student_with_login.pseudonyms.create!(
+            account: Account.default,
+            unique_id: "uid_456"
+          )
+        end
+
+        it "filters users by search term matching name" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(filter: {searchTerm: "john"}) { edges { node { _id } } }
+            GQL
+          ).to eq [@student_with_name.to_param]
+        end
+
+        it "filters users by search term matching email when user has permissions" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(filter: {searchTerm: "jsmith@example"}) { edges { node { _id } } }
+            GQL
+          ).to eq [@student_with_email.to_param]
+        end
+
+        it "does not match email when user lacks permissions" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @student1)
+              usersConnection(filter: {searchTerm: "jsmith@example"}) { edges { node { _id } } }
+            GQL
+          ).to be_empty
+        end
+
+        it "filters users by search term matching SIS ID when user has permissions" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(filter: {searchTerm: "sis_123"}) { edges { node { _id } } }
+            GQL
+          ).to eq [@student_with_sis.to_param]
+        end
+
+        it "does not match SIS ID when user lacks permissions" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @student1)
+              usersConnection(filter: {searchTerm: "sis_123"}) { edges { node { _id } } }
+            GQL
+          ).to be_empty
+        end
+
+        it "filters users by search term matching login ID when user has permissions" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(filter: {searchTerm: "uid_456"}) { edges { node { _id } } }
+            GQL
+          ).to eq [@student_with_login.to_param]
+        end
+
+        it "does not match login ID when user lacks permissions" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @student1)
+              usersConnection(filter: {searchTerm: "uid_456"}) { edges { node { _id } } }
+            GQL
+          ).to be_empty
+        end
+
+        it "returns empty when search term does not match users" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(filter: {searchTerm: "nonexistent"}) { edges { node { _id } } }
+            GQL
+          ).to be_empty
+        end
+
+        it "throws error if search term is too short" do
+          result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
+            query {
+              course(id: "#{course.id}") {
+                usersConnection(filter: {searchTerm: "a"}) {
+                  edges { node { _id } }
+                }
+              }
+            }
+          GQL
+
+          expect(result["errors"]).to be_present
+          expect(result["errors"][0]["message"]).to match(/at least 2 characters/)
+        end
+
+        it "ignores search term if empty string" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              usersConnection(filter: {searchTerm: ""}) { edges { node { _id } } }
+            GQL
+          ).to match_array([
+            @teacher,
+            @student1,
+            other_teacher,
+            @student2,
+            @inactive_user,
+            @student_with_name,
+            @student_with_email,
+            @student_with_sis,
+            @student_with_login
+          ].map(&:to_param))
+        end
+      end
     end
 
     describe "enrollmentsConnection" do

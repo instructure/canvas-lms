@@ -100,6 +100,23 @@ module Types
                [CourseFilterableEnrollmentType],
                "Only return users with the specified enrollment types",
                required: false
+      argument :search_term,
+               String,
+               <<~MD,
+                 Only return users that match the given search term. The search
+                 term is matched against the user's name and depending on current
+                 user permissions against the user's login id, email and sisid
+               MD
+               required: false,
+               prepare: :prepare_search_term
+
+      def prepare_search_term(term)
+        if term.presence && term.length < 2
+          raise GraphQL::ExecutionError, "search_term must be at least 2 characters"
+        end
+
+        term
+      end
     end
 
     class CourseSectionsFilterInputType < Types::BaseInputObject
@@ -237,11 +254,21 @@ module Types
       )
 
       context.scoped_merge!(course:)
-      scope = UserSearch.scope_for(course,
-                                   current_user,
-                                   include_inactive_enrollments: true,
-                                   enrollment_state: filter[:enrollment_states],
-                                   enrollment_type: filter[:enrollment_types])
+
+      search_params = {
+        enrollment_state: filter[:enrollment_states],
+        enrollment_type: filter[:enrollment_types],
+        include_inactive_enrollments: true,
+        search_term: filter[:search_term]
+      }
+
+      search_term = search_params[:search_term].presence
+
+      scope = if search_term
+                UserSearch.for_user_in_context(search_term, course, current_user, session, search_params)
+              else
+                UserSearch.scope_for(course, current_user, search_params)
+              end
 
       user_ids = filter[:user_ids] || user_ids
       if user_ids.present?
