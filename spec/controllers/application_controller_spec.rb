@@ -2816,7 +2816,7 @@ RSpec.describe ApplicationController do
         account_settings_hash = Digest::SHA256.hexdigest(Account.default[:settings].to_s)
         cache_key = ["js_env_root_account_settings", js_env_settings_hash, account_settings_hash].cache_key
 
-        expect(MultiCache).to receive(:fetch).and_call_original
+        allow(MultiCache).to receive(:fetch).and_call_original
         expect(MultiCache).to receive(:fetch).with(cache_key).and_yield
         expect(subject).to match(hash_including(calendar_contexts_limit: 10, open_registration: true))
       end
