@@ -26,15 +26,17 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
+import {waitFor} from '@testing-library/react'
 
-const group = (opts = {}) =>
+const group = (id, opts = {}) =>
   new AssignmentGroup({
+    id: id,
     name: 'something cool',
     assignments: [new Assignment(), new Assignment()],
     ...opts,
   })
 
-const assignmentGroups = () => new AssignmentGroupCollection([group(), group()])
+const assignmentGroups = () => new AssignmentGroupCollection([group('0'), group('1')])
 
 const createView = function (opts = {}) {
   const groups = opts.assignmentGroups || assignmentGroups()
@@ -67,11 +69,17 @@ describe('CreateGroupView', () => {
     jest.resetAllMocks()
   })
 
-  test('it hides drop options for no assignments and undefined assignmentGroup id', () => {
+  test('it hides drop options for no assignments and undefined assignmentGroup id', async () => {
     view = createView()
+    document.getElementById('fixtures').appendChild(view.el)
     view.render()
-    expect(view.$('[name="rules[drop_lowest]"]').length).toBeGreaterThan(0)
-    expect(view.$('[name="rules[drop_highest]"]').length).toBeGreaterThan(0)
+    view.firstOpen()
+
+    await waitFor(() => {
+      expect(view.$('[name="rules[drop_lowest]"]').length).toBeGreaterThan(0)
+      expect(view.$('[name="rules[drop_highest]"]').length).toBeGreaterThan(0)
+    })
+
     view.assignmentGroup.get('assignments').reset([])
     view.render()
     expect(view.$('[name="rules[drop_lowest]"]')).toHaveLength(0)
@@ -106,13 +114,13 @@ describe('CreateGroupView', () => {
 
     view.render()
     view.firstOpen()
-    
-    view.$('#ag_new_name').val('IchangedIt')
-    
+
+    view.$('#ag_0_name').val('IchangedIt')
+
     const submitPromise = view.submit()
     deferred.resolveWith(view.model, [{}, 'success'])
     await submitPromise
-    
+
     const formData = view.getFormData()
     expect(formData.name).toBe('IchangedIt')
     expect(saveMock).toHaveBeenCalled()
@@ -122,16 +130,16 @@ describe('CreateGroupView', () => {
     view = createView()
     const data = {name: ''}
     const errors = view.validateFormData(data)
-    expect(errors.name[0].type).toBe('no_name_error')
-    expect(errors.name[0].message).toBe(view.messages.no_name_error)
+    expect(errors['name'][0].type).toBe('no_name_error')
+    expect(errors['name'][0].message).toBe(view.messages.no_name_error)
   })
 
   test('it should not allow assignment groups with names longer than 255 characters', () => {
     view = createView()
     const data = {name: 'a'.repeat(256)}
     const errors = view.validateFormData(data)
-    expect(errors.name[0].type).toBe('name_too_long_error')
-    expect(errors.name[0].message).toBe(view.messages.name_too_long_error)
+    expect(errors['name'][0].type).toBe('name_too_long_error')
+    expect(errors['name'][0].message).toBe(view.messages.name_too_long_error)
   })
 
   test('it should not allow NaN values for group weight', () => {
@@ -141,8 +149,8 @@ describe('CreateGroupView', () => {
       group_weight: 'not a number',
     }
     const errors = view.validateFormData(data)
-    expect(errors.group_weight[0].type).toBe('number')
-    expect(errors.group_weight[0].message).toBe(view.messages.non_number)
+    expect(errors['group_weight'][0].type).toBe('number')
+    expect(errors['group_weight'][0].message).toBe(view.messages.non_number)
   })
 
   test('it should round group weight to 2 decimal places', () => {
