@@ -49,6 +49,7 @@ SearchItemSelector.propTypes = {
     }),
   ),
   isRequired: bool,
+  id: string,
 }
 
 SearchItemSelector.defaultProps = {
@@ -67,6 +68,7 @@ SearchItemSelector.defaultProps = {
   inputRef: null,
   messages: [],
   isRequired: false,
+  id: null,
 }
 
 export default function SearchItemSelector({
@@ -85,6 +87,7 @@ export default function SearchItemSelector({
   inputRef,
   messages,
   isRequired,
+  id,
 }) {
   const [items, setItems] = useState(null)
   const [error, setError] = useState(null)
@@ -172,6 +175,7 @@ export default function SearchItemSelector({
     inputRef,
     messages,
     onFocus,
+    id,
   }
   return <CanvasAsyncSelect {...selectProps}>{itemOptions}</CanvasAsyncSelect>
 }
