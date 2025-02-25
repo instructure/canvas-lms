@@ -39,6 +39,7 @@ const Paginator = ({loadPage, page, pageCount, ...paginationProps}: Props): Reac
   return (
     <Pagination
       variant="compact"
+      margin="small"
       labelNext={I18n.t('Next Page')}
       labelPrev={I18n.t('Previous Page')}
       {...paginationProps}
