@@ -33,7 +33,7 @@ module SearchHelper
     include_all_permissions = (permissions == :all)
     permissions = permissions.presence && Array(permissions).map(&:to_sym)
 
-    @contexts = Rails.cache.fetch(["all_conversation_contexts", @current_user, context, permissions].cache_key, expires_in: 10.minutes) do
+    @contexts = Rails.cache.fetch(["all_conversation_contexts_v2", @current_user, context, permissions].cache_key, expires_in: 10.minutes) do
       contexts = { courses: {}, groups: {}, sections: {}, differentiation_tags: {} }
 
       term_for_course = lambda do |course|
