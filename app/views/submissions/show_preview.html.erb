@@ -112,7 +112,7 @@
         <% end %>
       </p>
         <% @entries.each do |entry| %>
-          <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :hide_student_names => params[:hide_student_name], :assignment_visible_to_user => assignment_visible_to_user} %>
+          <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :hide_student_names => params[:hide_student_name], :assignment_visible_to_user => assignment_visible_to_user, :use_discussion_toggle_link => use_discussion_toggle_link} %>
         <% end %>
         <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
           <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1, :embed => true) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>

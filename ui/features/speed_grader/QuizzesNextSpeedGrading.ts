@@ -86,14 +86,24 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
   function onMessage(e) {
     const message = e.data
     const prevButton = document.getElementById('prev-student-button')
+
+    if (
+      message &&
+      message.subject &&
+      message.subject.startsWith('SG.switchToFullContext&entryId=')
+    ) {
+      return EG.renderSubmissionPreview(
+        'iframe',
+        'discussion_view_with_context',
+        message.subject.split('=')[1],
+      )
+    }
     switch (message.subject) {
       case 'quizzesNext.register':
         EG.setGradeReadOnly(true)
         return registerCb(postChangeSubmissionMessage, message.payload || {singleLtiLaunch: true})
-
       case 'quizzesNext.submissionUpdate':
         return refreshGradesCb(quizzesNextChange, retryRefreshGrades, 1000)
-      /* falls through */
       case 'quizzesNext.previousStudent':
         return EG.prev()
       /* falls through */

@@ -32,6 +32,8 @@
   link_to_headless ||= false
   headless_param = {:headless => 1, :embed => true, :hide_student_names => hide_student_names, :student_id => user_id} if link_to_headless
   hide_student_names = hide_student_names
+  use_discussion_toggle_link ||= false
+  discussions_speedgrader_revisit_enabled = entry_context && entry_context.is_a?(Course) ? entry_context.account.feature_enabled?(:discussions_speedgrader_revisit) : entry_context.feature_enabled?(:discussions_speedgrader_revisit)
  %>
 <% cache([
     'entry_message_render_2_',
@@ -52,7 +54,11 @@
         <% if out_of_context %>
           <span style="font-size: 0.8em; padding-<%= direction('left') %>: 20px;">from
             <% if assignment_visible_to_user %>
-              <a href="<%= context_url(entry_context, :context_discussion_topic_url, (entry ? entry.discussion_topic_id : '{{ topic_id }}'), headless_param) %>" style="font-size: 1.2em; font-weight: bold;"><%= entry.discussion_topic.title %></a>
+              <% if discussions_speedgrader_revisit_enabled && use_discussion_toggle_link %>
+                <a id="discussion_speedgrader_revisit_link_entryId=<%= entry_id %>" href="#"><%= entry.discussion_topic.title %></a>
+              <% else %>
+                <a href="<%= context_url(entry_context, :context_discussion_topic_url, (entry ? entry.discussion_topic_id : '{{ topic_id }}'), headless_param) %>" style="font-size: 1.2em; font-weight: bold;"><%= entry.discussion_topic.title %></a>
+              <% end %>
             <% else %>
               <b> <%= entry.discussion_topic.title %> </b>
             <% end %>

@@ -40,6 +40,25 @@ $(document).ready(() => {
     })
   }
 
+  function getEntryId(str) {
+    const match = str.match(/entryId=([^&]+)$/)
+    return match ? match[1] : null
+  }
+
+  if (ENV.FEATURES?.discussions_speedgrader_revisit) {
+    $("a[id^='discussion_speedgrader_revisit_link_entryId']").click(function (event) {
+      const entryId = getEntryId(event.target.id)
+      if (entryId) {
+        window.parent.postMessage(
+          {
+            subject: `SG.switchToFullContext&entryId=${entryId}`,
+          },
+          '*',
+        )
+      }
+    })
+  }
+
   const discussionPreviewIframe = $('#discussion_preview_iframe')
   discussionPreviewIframe.on('load', function () {
     const iframeWindow = discussionPreviewIframe[0].contentWindow
