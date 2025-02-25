@@ -54,6 +54,7 @@ export type CanvasAsyncSelectProps = {
   onFocus?: (event) => void
   children?: ReactElement | ReactElement[]
   options?: any[]
+  inputRef?: (ref: HTMLInputElement | null) => void
   [key: string]: any
 }
 
@@ -72,6 +73,7 @@ export default function CanvasAsyncSelect({
   onFocus = () => {},
   onBlur = () => {},
   children = [],
+  inputRef,
   ...selectProps
 }: CanvasAsyncSelectProps): ReactElement {
   const previousLoadingRef = useRef(isLoading)
@@ -222,6 +224,7 @@ export default function CanvasAsyncSelect({
     onRequestHideOptions: handleHideOptions,
     onRequestHighlightOption: handleHighlightOption,
     onRequestSelectOption: handleSelectOption,
+    inputRef: inputRef,
   }
 
   // remember previous isLoading value so we know whether we need to send announcements

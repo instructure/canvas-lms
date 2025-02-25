@@ -18,9 +18,10 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import {func, string, bool} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
+import './DirectShareCoursePanel.css'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import contentSelectionShape from '../proptypes/contentSelection'
@@ -51,12 +52,21 @@ export default function DirectShareCoursePanel({
   showAssignments = false,
 }) {
   const [selectedCourse, setSelectedCourse] = useState(null)
+  const [selectedCourseError, setSelectedCourseError] = useState(false)
+  const selectedCourseInputRef = useRef(null)
   const [startCopyOperationPromise, setStartCopyOperationPromise] = useState(null)
   const [selectedModule, setSelectedModule] = useState(null)
   const [selectedAssignment, setSelectedAssignment] = useState(null)
   const [selectedPosition, setSelectedPosition] = useState(null)
+  const shouldShowValidationErrors = window.ENV.FEATURES?.validate_call_to_action
 
   function startCopyOperation() {
+    setSelectedCourseError(!selectedCourse)
+    if (!selectedCourse) {
+      selectedCourseInputRef?.current.focus()
+      return
+    }
+
     setStartCopyOperationPromise(
       doFetchApi({
         method: 'POST',
@@ -102,6 +112,9 @@ export default function DirectShareCoursePanel({
         disableModuleInsertion={contentSelection && 'modules' in contentSelection}
         moduleFilteringOpts={{per_page: 50}}
         courseFilteringOpts={{enforce_manage_grant_requirement: true}}
+        selectedCourseError={selectedCourseError}
+        isCourseRequired={shouldShowValidationErrors}
+        courseSelectInputRef={ref => (selectedCourseInputRef.current = ref)}
       />
       <Alert variant="warning" hasShadow={false}>
         {I18n.t(
@@ -111,7 +124,7 @@ export default function DirectShareCoursePanel({
       <ConfirmActionButtonBar
         padding="small 0 0 0"
         primaryLabel={startCopyOperationPromise ? null : I18n.t('Copy')}
-        primaryDisabled={selectedCourse === null}
+        primaryDisabled={!shouldShowValidationErrors && selectedCourse === null}
         secondaryLabel={startCopyOperationPromise ? I18n.t('Close') : I18n.t('Cancel')}
         onPrimaryClick={startCopyOperation}
         onSecondaryClick={onCancel}
