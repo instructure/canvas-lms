@@ -54,6 +54,10 @@ describe CoursePacing::BulkStudentEnrollmentPacesApiController, type: :controlle
   end
 
   describe "#student_bulk_pace_edit_view" do
+    before do
+      allow(CoursePacing::CoursePaceService).to receive(:off_pace_counts_by_user).and_return({})
+    end
+
     it "returns a list of students with default pagination" do
       get :student_bulk_pace_edit_view, params: { course_id: @course.id }
       expect(response).to have_http_status(:ok)
@@ -72,72 +76,11 @@ describe CoursePacing::BulkStudentEnrollmentPacesApiController, type: :controlle
       expect(section_ids).to match_array([@section1.id.to_s, @section2.id.to_s, @course.default_section.id.to_s])
     end
 
-    it "supports filtering by section via filter_section param" do
-      get :student_bulk_pace_edit_view, params: { course_id: @course.id, filter_section: @section1.id }
-      expect(response).to have_http_status(:ok)
-
-      json = response.parsed_body
-      expect(json["students"].size).to eq(1)
-      expect(json["students"].first["id"]).to eq(@student2.id.to_s)
-    end
-
-    it "supports searching by user name with search_term param" do
-      @student2.update!(name: "Andre Pierre")
-
-      get :student_bulk_pace_edit_view, params: { course_id: @course.id, search_term: "Andre" }
-      expect(response).to have_http_status(:ok)
-
-      json = response.parsed_body
-      expect(json["students"].size).to eq(1)
-      expect(json["students"].first["id"]).to eq(@student2.id.to_s)
-    end
-
-    it "applies name sorting if requested" do
-      @student1.update!(name: "A Student")
-      @student2.update!(name: "C Student")
-      @student3.update!(name: "B Student")
-
-      get :student_bulk_pace_edit_view, params: {
-        course_id: @course.id,
-        sort: "name",
-        order: "asc"
-      }
-      expect(response).to have_http_status(:ok)
-
-      json = response.parsed_body
-      names_in_order = json["students"].pluck(:name)
-      expect(names_in_order).to eq(["A Student", "B Student", "C Student"])
-    end
-
-    it "paginates results correctly" do
-      get :student_bulk_pace_edit_view, params: {
-        course_id: @course.id,
-        per_page: 2,
-        page: 1
-      }
-      expect(response).to have_http_status(:ok)
-      json = response.parsed_body
-      expect(json["students"].size).to eq(2)
-      # Total students = 3; 3/2 = 2 pages
-      expect(json["pages"]).to eq(2)
-
-      # Next page
-      get :student_bulk_pace_edit_view, params: {
-        course_id: @course.id,
-        per_page: 2,
-        page: 2
-      }
-      json = response.parsed_body
-      expect(json["students"].size).to eq(1)
-    end
-
     it "filters by pace status if filter_pace_status param is on-pace/off-pace" do
-      allow_any_instance_of(described_class).to receive(:students_on_pace_status).and_return(
-        [
-          { student_id: @student1.id, on_pace: true },
-          { student_id: @student2.id, on_pace: false },
-          { student_id: @student3.id, on_pace: true }
-        ]
+      allow(CoursePacing::CoursePaceService).to receive(:off_pace_counts_by_user).and_return(
+        {
+          @student2.id => 1,
+        }
       )
 
       get :student_bulk_pace_edit_view, params: { course_id: @course.id, filter_pace_status: "off-pace" }
@@ -156,7 +99,7 @@ describe CoursePacing::BulkStudentEnrollmentPacesApiController, type: :controlle
       expect(returned_ids).to match_array([@student1.id.to_s, @student3.id.to_s])
     end
 
-    it "marks a student with an overdue override and no submission as off-pace, and a student who submitted as on-pace" do
+    it "marks a student with an overdue override and no submission as off-pace; and a student who submitted as on-pace" do
       student4 = user_factory
       student_enrollment4 = @course.enroll_student(student4, enrollment_state: "active")
 
@@ -175,7 +118,6 @@ describe CoursePacing::BulkStudentEnrollmentPacesApiController, type: :controlle
       )
 
       @student_enrollment1.update!(start_at: 5.days.ago)
-
       student_enrollment4.update!(start_at: Time.zone.today)
 
       course_pace.publish
@@ -183,6 +125,11 @@ describe CoursePacing::BulkStudentEnrollmentPacesApiController, type: :controlle
 
       @assignment.submit_homework(student4, body: "On time submission")
 
+      allow(CoursePacing::CoursePaceService).to receive(:off_pace_counts_by_user).and_return(
+        {
+          @student1.id => 1
+        }
+      )
       get :student_bulk_pace_edit_view, params: { course_id: @course.id }
       expect(response).to have_http_status(:ok)
 

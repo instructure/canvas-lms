@@ -94,6 +94,13 @@ module ConditionalRelease
           due_dates = CoursePaceDueDatesCalculator.new(course_pace).get_due_dates(course_pace.course_pace_module_items, enrollment, by_assignment: true) if course_pace
         end
 
+        assignments_to_unassign.each do |to_unassign|
+          overrides = existing_overrides_map[to_unassign.id] || []
+          overrides.each do |o|
+            o.assignment_override_students.detect { |aos| aos.user_id == student_id }&.destroy!
+          end
+        end
+
         assignments_to_assign.each do |to_assign|
           due_at = if course_pace
                      due_dates[to_assign.id]
@@ -122,12 +129,8 @@ module ConditionalRelease
             existing_overrides_map_with_dates[[to_assign.id, due_dates[to_assign.id]]] = [new_override]
           end
         end
-
-        assignments_to_unassign.each do |to_unassign|
-          overrides = existing_overrides_map[to_unassign.id] || []
-          overrides.each do |o|
-            o.assignment_override_students.detect { |aos| aos.user_id == student_id }&.destroy!
-          end
+        if course
+          SubmissionLifecycleManager.recompute_users_for_course([student_id], course, assignments_to_assign.concat(assignments_to_unassign))
         end
       end
 

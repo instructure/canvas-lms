@@ -239,6 +239,10 @@ describe('AssignmentRow', () => {
       dueDate: "2025-01-01",
       coursePace: STUDENT_PACE,
       context_type: "Enrollment",
+      coursePaceItem: {
+        ...PACE_ITEM_3,
+        submission_status: "missing"
+      }
     }
       
     // Simulate a due item with no submission
@@ -246,17 +250,16 @@ describe('AssignmentRow', () => {
       renderRow(
         <AssignmentRow
           {...rowProps}
-          coursePaceItem={PACE_ITEM_3}
         />
       )
     )
-    
+
     expect(getByText(NO_SUBMISSION_TEXT)).toBeInTheDocument()
 
     // Simulate an item that was submitted after it's due date
     rerender(
       renderRow(
-        <AssignmentRow {...rowProps} coursePaceItem={{...PACE_ITEM_3, submitted_at: '2025-01-10T00:00:00Z'}} />
+        <AssignmentRow {...rowProps} coursePaceItem={{...PACE_ITEM_3, submission_status: 'late'}} />
       )
     )
     expect(getByText(LATE_SUBMISSION_TEXT)).toBeInTheDocument()
@@ -283,11 +286,10 @@ describe('AssignmentRow', () => {
     expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
     expect(queryByText(LATE_SUBMISSION_TEXT)).toBeNull()
 
-  
     // Simulate an item that is not submittable
     rerender(
       renderRow(
-        <AssignmentRow {...rowProps} coursePaceItem={{...PACE_ITEM_1, submittable: false, submitted_at: null}} />
+        <AssignmentRow {...rowProps} coursePaceItem={PACE_ITEM_1} />
       )
     )
     expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
@@ -298,6 +300,15 @@ describe('AssignmentRow', () => {
     rerender(
       renderRow(
         <AssignmentRow {...rowProps} coursePaceItem={PACE_ITEM_1} />
+      )
+    )
+    expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
+    expect(queryByText(LATE_SUBMISSION_TEXT)).toBeNull()
+
+    // Simulate an item that is unreleased
+    rerender(
+      renderRow(
+        <AssignmentRow {...rowProps} coursePaceItem={{...PACE_ITEM_1, unreleased: true}} />
       )
     )
     expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()

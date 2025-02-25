@@ -356,22 +356,23 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   }
 
   renderSubmissionStatus = () => {
-    const { submittable, submitted_at } = this.props.coursePaceItem
-    const dueDate = moment(this.props.dueDate)
-    const now = moment()
+    const { submission_status } = this.props.coursePaceItem
     const isFeatureEnabled = window.ENV.FEATURES.course_pace_pacing_status_labels
 
     // Not submittable or not due yet, no label needed
-    if (!submittable || dueDate.isAfter(now) || !isFeatureEnabled) {
+    if (!submission_status || !isFeatureEnabled) {
       return null
     }
 
-    const submittedAt = submitted_at ? moment(submitted_at) : null
-    const status = !submittedAt
-      ? I18n.t("No Submission")
-      : submittedAt.isAfter(dueDate)
-      ? I18n.t("Late Submission")
-      : null
+    let status: string = ''
+    switch (submission_status) {
+      case 'late':
+        status = I18n.t("Late Submission")
+        break
+      case 'missing':
+        status = I18n.t("No Submission")
+        break
+    }
 
     return status ? (
       <div style={{whiteSpace: "nowrap", marginTop: 5}}>
@@ -425,7 +426,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     const contextType = this.props.context_type
 
     const coursePaceItem = this.props.coursePaceItem;
-    const masteryPathsData: MasteryPathsData = CyoeHelper.getItemData(coursePaceItem.assignment_id, coursePaceItem.submittable);
+    const masteryPathsData: MasteryPathsData = CyoeHelper.getItemData(coursePaceItem.assignment_id, true);
 
     return (
       <InstUISettingsProvider theme={{componentOverrides}}>

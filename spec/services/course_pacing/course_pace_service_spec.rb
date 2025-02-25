@@ -21,6 +21,60 @@ describe CoursePacing::CoursePaceService do
   let(:course) { course_model }
   let!(:course_pace) { course_pace_model(course:) }
 
+  describe ".off_pace_counts_by_user" do
+    let(:student) { user_factory }
+    let(:student2) { user_factory }
+    let!(:student_enrollment) { StudentEnrollment.create!(user: student, course: course, workflow_state: "active") }
+    let!(:student_enrollment2) { StudentEnrollment.create!(user: student2, course: course) }
+    let(:section) { course.course_sections.create!(name: "Test Section") }
+
+    before do
+      @course.root_account.enable_feature!(:course_paces)
+      @course.enable_course_paces = true
+      @course.save!
+
+      @mod1 = @course.context_modules.create! name: "M1"
+      @a1 = @course.assignments.create! name: "A1", points_possible: 100, workflow_state: "active", submission_types: "text"
+      @ct1 = @mod1.add_item id: @a1.id, type: "assignment"
+
+      @mod2 = @course.context_modules.create! name: "M2"
+      @a2 = @course.assignments.create! name: "A2", points_possible: 50, workflow_state: "unpublished", submission_types: "text"
+      @ct2 = @mod2.add_item id: @a2.id, type: "assignment"
+      @a3 = @course.assignments.create! name: "A3", workflow_state: "active"
+      @ct3 = @mod2.add_item id: @a3.id, type: "assignment", submission_types: "text"
+
+      course_pace.publish
+    end
+
+    context "when contexts array is empty" do
+      it "returns an empty hash" do
+        result = CoursePacing::CoursePaceService.off_pace_counts_by_user([])
+        expect(result).to eq({})
+      end
+    end
+
+    context "when contexts contain a non student_enrollment item" do
+      it "skips them and returns an empty hash" do
+        result = CoursePacing::CoursePaceService.off_pace_counts_by_user([section])
+        expect(result).to eq({})
+      end
+    end
+
+    context "when contexts contain multiple enrollment contexts" do
+      before do
+        student_enrollment.update(start_at: 10.days.ago)
+        student_enrollment2.update(start_at: 10.days.ago)
+        course_pace.publish
+      end
+
+      it "processes the StudentEnrollments and gathers results by user_id" do
+        contexts = [student_enrollment, student_enrollment2]
+        result = CoursePacing::CoursePaceService.off_pace_counts_by_user(contexts)
+        expect(result).to eq({ student.id => 2, student2.id => 2 })
+      end
+    end
+  end
+
   describe ".paces_in_course" do
     it "returns the primary paces for the provided course" do
       expect(

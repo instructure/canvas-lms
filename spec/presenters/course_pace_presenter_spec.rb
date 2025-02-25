@@ -253,6 +253,7 @@ describe CoursePacePresenter do
       it "marks student as off pace" do
         @enrollment.update(start_at: 30.days.ago)
         student_enrollment_pace_model(student_enrollment: @enrollment)
+        @student_enrollment_pace.publish
 
         docx_string = CoursePacePresenter.new(@student_enrollment_pace).as_docx(@enrollment).string
 
@@ -262,6 +263,7 @@ describe CoursePacePresenter do
       it "marks student as on pace" do
         @enrollment.update(start_at: 0.days.ago)
         student_enrollment_pace_model(student_enrollment: @enrollment)
+        @student_enrollment_pace.publish
         docx_string = CoursePacePresenter.new(@student_enrollment_pace).as_docx(@enrollment).string
 
         expect(docx_string).to docx_includes("On Pace")

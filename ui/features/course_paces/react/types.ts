@@ -59,10 +59,9 @@ export interface CoursePaceItem {
   readonly module_item_id: string
   readonly module_item_type: string
   readonly published: boolean
-  readonly submittable: boolean
-  readonly submitted_at?: string | null
   readonly assignment_id?: string | null
   readonly unreleased?: boolean | null
+  readonly submission_status?: string | null
   compressed_due_date?: string
 }
 

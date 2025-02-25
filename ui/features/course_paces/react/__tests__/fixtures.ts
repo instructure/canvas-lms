@@ -126,8 +126,6 @@ export const PACE_ITEM_1: CoursePaceItem = {
   module_item_id: '60',
   module_item_type: 'Assignment',
   published: true,
-  submittable: true,
-  submitted_at: '2025-01-01T00:00:00Z',
 }
 
 export const PACE_ITEM_2: CoursePaceItem = {
@@ -140,8 +138,6 @@ export const PACE_ITEM_2: CoursePaceItem = {
   module_item_id: '61',
   module_item_type: 'Discussion',
   published: false,
-  submittable: true,
-  submitted_at: null,
 }
 
 export const PACE_ITEM_3: CoursePaceItem = {
@@ -154,8 +150,6 @@ export const PACE_ITEM_3: CoursePaceItem = {
   module_item_id: '62',
   module_item_type: 'Quiz',
   published: true,
-  submittable: true,
-  submitted_at: null,
 }
 
 export const PACE_ITEM_4: CoursePaceItem = {
@@ -168,8 +162,6 @@ export const PACE_ITEM_4: CoursePaceItem = {
   module_item_id: '62',
   module_item_type: 'Quiz',
   published: true,
-  submittable: true,
-  submitted_at: null,
   unreleased: true
 }
 
