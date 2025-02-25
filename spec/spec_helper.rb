@@ -1098,3 +1098,21 @@ Mime::SET.select { |t| t.to_s.end_with?("+json") }.map(&:ref).each do |type|
 end
 
 # rubocop:enable Lint/ConstantDefinitionInBlock
+
+module FileUpdateCheckerIgnoreTimecop
+  private
+
+  # Prevent Timecop from interfering with file update checking or we
+  # can see weird Zeitwerk issues due to inappropriate constant reloading.
+  def max_mtime(...)
+    if Timecop.travelled? || Timecop.frozen?
+      Timecop.return do
+        super
+      end
+    else
+      super
+    end
+  end
+end
+
+ActiveSupport::FileUpdateChecker.prepend(FileUpdateCheckerIgnoreTimecop)
