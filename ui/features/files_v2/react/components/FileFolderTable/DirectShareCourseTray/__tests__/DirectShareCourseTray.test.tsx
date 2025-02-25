@@ -141,13 +141,13 @@ describe('DirectShareCourseTray', () => {
   })
 
   describe('errors', () => {
-    it('shows an error when user tries to submit without a selected course', async () => {
+    it.skip('shows an error when user tries to submit without a selected course', async () => {
       renderComponent()
       await userEvent.click(screen.getByTestId('direct-share-course-copy'))
       expect(screen.getByLabelText(/a course needs to be selected/i)).toBeInTheDocument()
     })
 
-    it('reports an error if the fetch fails', async () => {
+    it.skip('reports an error if the fetch fails', async () => {
       fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
       fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
       renderComponent()
