@@ -2074,6 +2074,7 @@ tr:
   add_icon_567dbcaa: "simge ekle"
   add_link_5c01c1e8: "Bağlantı Ekle"
   add_link_fc336ed6: "Bağlantı ekle"
+  add_login_f871148: "Oturum Ekle"
   add_lti_ad9aaef2: "Harici araç ekle"
   add_moderator_review_copy_1st_a484c813: "Moderatör İncelemesi Ekle (1. Kopyala)"
   add_moderator_review_copy_2nd_e80d458f: "Moderatör İncelemesi Ekle (2. Kopyala)"
@@ -15449,6 +15450,7 @@ tr:
   quiz_duplication_not_implemented_c1495585: "Kısa sınavın kopyalanması uygulanmadı"
   quiz_e0dcce8f: "Kısa Sınav"
   quiz_failed_to_update_2b66fa4d: "Kısa Sınav güncellenemedi"
+  quiz_instructions_a36d09c9: "Kısa Sınav Yönergeleri"
   quiz_log_auditing: 
     buttons: 
       reload_events: Yenile
@@ -17262,6 +17264,7 @@ tr:
   save_publish_36440725: "Kaydet & Yayınla"
   save_settings_cafe79a5: "Ayarları Kaydet"
   save_skype_name_4de35a9: "Skype İsmini Kaydet"
+  save_successful_b2f64da4: "Kaydetme başarılı"
   save_theme_36c73e6a: "Temayı Kaydet"
   save_theme_f706116e: "Temayı Kaydet"
   saved_discussion_settings_successfully_ebd46a57: "Tartışma ayarları başarılı bir şekilde kaydedildi"
@@ -17396,6 +17399,7 @@ tr:
     all_courses_inner: 
       join_course: "Bu Derse Katıl"
       next: Sonraki
+      no_courses_found: "Ders bulunamadı"
       previous: Önceki
     course_sections: "Ders Bölümleri"
     enrollments_observers: Gözlemciler
@@ -19674,6 +19678,7 @@ tr:
   update_details_6abfed16: "Ayrıntıları Güncelle"
   update_grade_b47eb3ff: "Notu Düzenle"
   update_link_b7cab181: "Bağlantı güncelle"
+  update_login_472cd6db: "Oturumu Güncelle"
   update_module_b984c2e5: "Modülü Güncelle"
   update_password_4bc5cb1f: "Şifremi Güncelle"
   update_quota_81381226: "Güncelleme Kotası"
