@@ -2295,6 +2295,7 @@ nn:
   add_label_ab288ab0: "Legg til etikett"
   add_link_5c01c1e8: "Legg til ei lenke"
   add_link_fc336ed6: "Legg til ei lenke"
+  add_login_f871148: "Legg til pålogging"
   add_lti_ad9aaef2: "Legg til LTI"
   add_manage_conclude_delete_publish_reset_8a5aa902: "legg til / administrer / avslutt / slett / publiser / tilbakestill"
   add_mastery_level_76469d98: "Legg til meistringsnivå"
@@ -20963,6 +20964,7 @@ nn:
   quiz_e0dcce8f: Quiz
   quiz_extensions_d2550649: "Quiz utvidingar"
   quiz_failed_to_update_2b66fa4d: "Kan ikkje oppdatere quizen"
+  quiz_instructions_a36d09c9: Quizinstruksjonar
   quiz_ip_address_filters_49a75ec8: "IP-adressefilter for quizar"
   quiz_ip_filters_685f7f63: "Quiz IP-filter"
   quiz_itemtitle_28f5bba5: "Quiz, %{itemTitle}"
@@ -23239,6 +23241,7 @@ nn:
     all_courses_inner: 
       join_course: "Ta del i dette emnet"
       next: Neste
+      no_courses_found: "Finn ikkje emne"
       previous: Førre
     course_sections: "Seksjonar på emnet"
     enrollments_observers: Observatørar
@@ -28031,6 +28034,7 @@ nn:
   update_inbox_page_to_use_react_instui_4d343fd: "Oppdater Meldingar til å bruke react/instui"
   update_link_b7cab181: "Oppdater lenke"
   update_live_events_subscriptions_e9c618b0: "Oppdater abonnement for direktehendingar"
+  update_login_472cd6db: "Oppdater pålogging"
   update_module_b984c2e5: "Oppdater modul"
   update_name_6581781d: "Oppdater %{name}"
   update_pages_c91d7ba: "Oppdater sider"
