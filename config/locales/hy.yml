@@ -1657,6 +1657,7 @@ hy:
   add_group_c84f9e9d: "Ավելացնել խումբ"
   add_group_set_f9809e11: "Ավելացնել խմբերի շարք"
   add_icon_567dbcaa: "ավելացնել պատկերանշան"
+  add_login_f871148: "Ավելացնել մուտքանուն"
   add_moderator_review_copy_1st_a484c813: "Ավելացնել մոդերատորի կարգավիճակ ունեցող կարծիք ներկայացող (1-ին պատճե)"
   add_moderator_review_copy_2nd_e80d458f: "Ավելացնել մոդերատորի կարգավիճակ ունեցող կարծիք ներկայացնող (2-րդ պատճե)"
   add_moderator_review_new_3c183cea: "Ավելացնել մոդերատորի կարգավիճակ ունեցող կարծիք ներկայացնող (նոր)"
@@ -13083,6 +13084,7 @@ hy:
       some_scores_reduced: "Միավորներ տալ միայն ճիշտ պատասխանների համար (*որոշ ունկնդիրների միավորներ կարող են նվազեցվել*)"
       update_question_without_regrading: "Թարմացնել հարցը առանց կրկնակի գնահատման"
   quiz_e0dcce8f: Թեստ
+  quiz_instructions_a36d09c9: "Ցուցումներ թեստի վերաբերյալ"
   quiz_log_auditing: 
     buttons: 
       reload_events: "Կրկին բեռնել"
@@ -14840,6 +14842,7 @@ hy:
   save_login_bba1272: "Պահպանել մուտքի տվյալները"
   save_settings_cafe79a5: "Պահպանել կարգաբերումները"
   save_skype_name_4de35a9: "Պահպանել Skype անունը"
+  save_successful_b2f64da4: "Հաջողությամբ պահպանվեց"
   saving_d55dd90e: "Պահպանվում է..."
   saving_recording_e111cb05: "Ձայնագրառումը պահպանվում է..."
   schedule_student_availability_332154a: "Սահմանել ունկնդիրների հասանելիության ժամանակացույց"
@@ -14965,6 +14968,7 @@ hy:
     all_courses_inner: 
       join_course: "Միանալ դասընթացին"
       next: Հաջորդը
+      no_courses_found: "Որեւէ դասընթաց չի գտնվել"
       previous: Նախորդը
     course_sections: "Դասընթացի բաժիններ"
     enrollments_observers: Դիտորդներ
@@ -17096,6 +17100,7 @@ hy:
   update_4d8ee62: Թարմացնել
   update_details_6abfed16: "Թարմացնել Տվյալները"
   update_grade_b47eb3ff: "Թարմացնել գնահատականը"
+  update_login_472cd6db: "Թարմացնել մուտքի տվյալները"
   update_module_b984c2e5: "Թարմացնել մոդուլը"
   update_password_4bc5cb1f: "Թարմացնել գաղտնաբառը"
   update_quota_81381226: "Թարմացնել քվոտան"
