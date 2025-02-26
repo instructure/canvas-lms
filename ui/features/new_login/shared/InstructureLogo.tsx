@@ -39,13 +39,18 @@ const InstructureLogo = () => {
 
   return (
     <Link
+      aria-disabled={isDisabled ? 'true' : 'false'}
       aria-label={I18n.t('By Instructure')}
+      data-testid="instructure-logo-link"
+      forceButtonRole={false}
       href="https://instructure.com"
       onClick={handleClick}
       target="_blank"
     >
       <Img
+        // Img is decorative by default
         constrain="contain"
+        data-testid="instructure-logo-img"
         height="1.125rem"
         src={require('../assets/images/instructure.svg')}
         width="7.9375rem"
