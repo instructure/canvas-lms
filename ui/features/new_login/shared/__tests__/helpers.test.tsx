@@ -27,7 +27,7 @@ describe('Helpers', () => {
   describe('createErrorMessage', () => {
     it('should return a FormMessage array with an error when text is provided', () => {
       const result = createErrorMessage('This is an error')
-      expect(result).toEqual([{type: 'error', text: 'This is an error'}])
+      expect(result).toEqual([{type: 'newError', text: 'This is an error'}])
     })
 
     it('should return an empty array when no text is provided', () => {
