@@ -46,6 +46,7 @@ import {
 import DirectShareUserTray from './DirectShareUserTray'
 import DirectShareCourseTray from './DirectShareCourseTray'
 import MoveModal from './MoveModal'
+import UsageRightsModal from './UsageRightsModal'
 
 const I18n = createI18nScope('files_v2')
 
@@ -65,7 +66,7 @@ const ActionMenuButton = ({
   row,
 }: ActionMenuButtonProps) => {
   const [modalOrTray, setModalOrTray] = useState<
-    'rename' | 'delete' | 'copy-to' | 'send-to' | 'move-to' | null
+    'rename' | 'delete' | 'copy-to' | 'send-to' | 'move-to' | 'manage-usage-rights' | null
   >(null)
   const actionLabel = I18n.t('Actions')
   const {contextType, fileMenuTools} = useFileManagement()
@@ -171,6 +172,7 @@ const ActionMenuButton = ({
               icon: IconCloudLockLine,
               text: I18n.t('Manage Usage Rights'),
               visible: has_usage_rights,
+              onClick: () => setModalOrTray('manage-usage-rights'),
             },
             {
               icon: IconUserLine,
@@ -229,6 +231,7 @@ const ActionMenuButton = ({
               icon: IconCloudLockLine,
               text: I18n.t('Manage Usage Rights'),
               visible: has_usage_rights,
+              onClick: () => setModalOrTray('manage-usage-rights'),
             },
             {
               icon: IconExpandItemsLine,
@@ -249,7 +252,9 @@ const ActionMenuButton = ({
       delete_permissions,
       has_usage_rights,
       rename_move_permissions,
-      row,
+      row.folder_id,
+      row.id,
+      row.url,
       send_copy_permissions,
       userCanEditFilesForContext,
       fileMenuTools,
@@ -296,6 +301,11 @@ const ActionMenuButton = ({
         <MoveModal
           items={[row]}
           open={modalOrTray === 'move-to'}
+          onDismiss={onDismissModalOrTray}
+        />
+        <UsageRightsModal
+          items={[row]}
+          open={modalOrTray === 'manage-usage-rights'}
           onDismiss={onDismissModalOrTray}
         />
       </>
