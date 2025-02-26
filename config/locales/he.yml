@@ -1970,6 +1970,7 @@ he:
   add_icon_567dbcaa: "הוספת צלמית"
   add_link_5c01c1e8: "הוספת קישור"
   add_link_fc336ed6: "הוספת קישור"
+  add_login_f871148: "הוספת לוג-אין "
   add_moderator_review_copy_1st_a484c813: "הוספת ביקורת מנחה (עותק מספר 1)"
   add_moderator_review_copy_2nd_e80d458f: "הוספת ביקורת מנחה (עותק מספר 2)"
   add_moderator_review_new_3c183cea: "הוספת ביקורת מנחה (חדש)"
@@ -15357,6 +15358,7 @@ he:
   quiz_40ee61b1: בוחן
   quiz_e0dcce8f: בוחן
   quiz_failed_to_update_2b66fa4d: "עדכון הבוחן נכשל "
+  quiz_instructions_a36d09c9: "הנחיות הבוחן"
   quiz_log_auditing: 
     buttons: 
       reload_events: "טעינה מחדש"
@@ -17206,6 +17208,7 @@ he:
   save_publish_36440725: "שמירה ופרסום"
   save_settings_cafe79a5: "שמירת הגדרות"
   save_skype_name_4de35a9: "שמירת שם סקייפ"
+  save_successful_b2f64da4: "השמירה בוצעה"
   save_theme_f706116e: "שמירת ערכת נושא"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "שמירת %{type} שלך כדי להתחיל להגדיר את התוכן המותנה."
   saving_associations_989bd4da: "שמירת פריטים נלווים"
@@ -17355,6 +17358,7 @@ he:
     all_courses_inner: 
       join_course: "הצטרפות לקורס זה"
       next: הבא
+      no_courses_found: "לא נמצאו קורסים"
       previous: הקודם
     course_sections: "הקבצות הקורס"
     enrollments_observers: "משקיפים "
@@ -19942,6 +19946,7 @@ he:
   update_details_6abfed16: "עדכון פרטים"
   update_grade_b47eb3ff: "עדכון הערכה"
   update_link_b7cab181: "עדכון קישור"
+  update_login_472cd6db: "עדכון לוג-אין "
   update_module_b984c2e5: "עדכון מודול"
   update_password_4bc5cb1f: "עדכון סיסמה"
   update_quota_81381226: "עדכון מכסות"
