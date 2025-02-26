@@ -167,7 +167,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
 
           <Flex.Item>
             <Flex direction="row" padding="x-small 0">
-              <Flex.Item margin="0 x-small 0 0" >
+              <Flex.Item margin="0 xxx-small 0 0" padding="none none none xx-small">
                 <span data-testid={`duration-${item}`}>
                   <NumberInput
                     renderLabel=""
@@ -190,7 +190,7 @@ const WeightedAssignmentsTray = (props: WeightedAssignmentsTrayProps) => {
             </Flex>
           </Flex.Item>
 
-          <Flex.Item>
+          <Flex.Item padding="xx-small">
             <Link as="button" onClick={onReset} isWithinText={false} interaction={resetInteraction}>
               <Text>Reset</Text>
             </Link>
