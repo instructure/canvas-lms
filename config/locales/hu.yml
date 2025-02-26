@@ -2154,6 +2154,7 @@ hu:
   add_label_ab288ab0: "Címke hozzáadása"
   add_link_5c01c1e8: "Link hozzáadása"
   add_link_fc336ed6: "Link hozzáadása"
+  add_login_f871148: "Belépési azonosító hozzáadása"
   add_lti_ad9aaef2: "LTI Hozzáadása"
   add_manage_conclude_delete_publish_reset_8a5aa902: "hozzáadás / kezelés / lezárás / törlés / közzététel / visszaállítás"
   add_mastery_level_76469d98: "Jártassági szint hozzáadása"
@@ -19551,6 +19552,7 @@ hu:
   quiz_e0dcce8f: Kvíz
   quiz_extensions_d2550649: "Kvíz Kiegészítések"
   quiz_failed_to_update_2b66fa4d: "A kvíz frissítése nem sikerült"
+  quiz_instructions_a36d09c9: Kvízinstrukciók
   quiz_ip_address_filters_49a75ec8: "Kvíz IP cím szűrők"
   quiz_ip_filters_685f7f63: "Kvíz IP szűrők"
   quiz_itemtitle_28f5bba5: "Kvíz, %{itemTitle}"
@@ -21773,6 +21775,7 @@ hu:
     all_courses_inner: 
       join_course: "Csatlakozás a kurzushoz"
       next: Következő
+      no_courses_found: "Nem található kurzus"
       previous: Előző
     course_sections: Kurzusszekciók
     enrollments_observers: Megfigyelők
@@ -26193,6 +26196,7 @@ hu:
   update_inbox_page_to_use_react_instui_4d343fd: "Bejövő üzenetek oldal frissítése a react/instui használatához"
   update_link_b7cab181: "Hivatkozás frissítése"
   update_live_events_subscriptions_e9c618b0: "Élő események előfizetések frissítése"
+  update_login_472cd6db: "Belépési azonosító frissítése"
   update_module_b984c2e5: "Modul frissítése"
   update_pages_c91d7ba: "Oldalak frissítése"
   update_password_4bc5cb1f: "Jelszó frissítése"
