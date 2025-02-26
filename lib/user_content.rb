@@ -165,7 +165,7 @@ module UserContent
     }.freeze
     DefaultAllowedTypes = AssetTypes.keys
 
-    def initialize(context, user, contextless_types: [])
+    def initialize(context, user, contextless_types: %w[media_attachments_iframe])
       raise(ArgumentError, "context required") unless context
 
       @context = context
