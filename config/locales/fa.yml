@@ -2100,6 +2100,7 @@ fa:
   add_items_to_score_range_297d413b: "موارد را به محدوده امتیاز اضافه کنید"
   add_link_5c01c1e8: "افزودن پیوند"
   add_link_fc336ed6: "افزودن پیوند"
+  add_login_f871148: "افزودن ورود"
   add_lti_ad9aaef2: "افزودن LTI"
   add_manage_conclude_delete_publish_reset_8a5aa902: "اضافه کردن / مدیریت / خاتمه دادن / حذف / انتشار / تنظیم مجدد"
   add_mastery_level_76469d98: "سطح تسلط را اضافه کنید"
@@ -18867,6 +18868,7 @@ fa:
   quiz_e0dcce8f: آزمون
   quiz_extensions_d2550649: "پسوندهای آزمون"
   quiz_failed_to_update_2b66fa4d: "بهنگام سازی آزمون انجام نشد"
+  quiz_instructions_a36d09c9: "دستورالعمل های آزمون"
   quiz_ip_address_filters_49a75ec8: "فیلترهای نشانی آی پی آزمون"
   quiz_ip_filters_685f7f63: "فیلترهای آی پی آزمون"
   quiz_log_auditing: 
@@ -21093,6 +21095,7 @@ fa:
     all_courses_inner: 
       join_course: "پیوستن به این درس"
       next: بعدی
+      no_courses_found: "هسچ درسی موجود نیست"
       previous: قبلی
     course_sections: "بخش های درس"
     enrollments_observers: "بیننده ها"
@@ -24810,6 +24813,7 @@ fa:
   update_grade_b47eb3ff: "بهنگام سازی نمره"
   update_important_info_bcc01d6a: "به روز رسانی اطلاعات مهم"
   update_link_b7cab181: "به روزرسانی پیوند"
+  update_login_472cd6db: "بهنگام سازی ورود"
   update_module_b984c2e5: "بهنگام سازی ماژول"
   update_name_6581781d: "به روز رسانی %{name}"
   update_pages_c91d7ba: "به روز رسانی صفحات"
