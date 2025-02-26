@@ -1819,6 +1819,7 @@ uk:
   add_icon_567dbcaa: "додати піктограму"
   add_link_5c01c1e8: "Додати посилання"
   add_link_fc336ed6: "Додати посилання"
+  add_login_f871148: "Додати логін"
   add_moderator_review_copy_1st_a484c813: "Додати відгук модератора (1-й примірник)"
   add_moderator_review_copy_2nd_e80d458f: "Додати відгук модератора (2-й примірник)"
   add_moderator_review_new_3c183cea: "Додати відгук модератора (Новий)"
@@ -13805,6 +13806,7 @@ uk:
   quiz_40ee61b1: "контрольна робота"
   quiz_e0dcce8f: "Контрольна робота"
   quiz_failed_to_update_2b66fa4d: "Не вдалося оновити контрольну роботу"
+  quiz_instructions_a36d09c9: "Інструкція до контрольної роботи"
   quiz_ip_address_filters_49a75ec8: "Контрольна робота з фільтрацією IP-адреси"
   quiz_log_auditing: 
     buttons: 
@@ -15495,6 +15497,7 @@ uk:
   save_publish_36440725: "Зберегти та опублікувати"
   save_settings_cafe79a5: "Зберегти налаштування"
   save_skype_name_4de35a9: "Зберегти ім'я для скайпу"
+  save_successful_b2f64da4: "Успішно збережено"
   save_theme_f706116e: "Зберегти тему"
   save_this_comment_for_reuse_5eda0b70: "Зберегти коментарі для повторного використання"
   saving_associations_989bd4da: "Збереження асоціацій"
@@ -15633,6 +15636,7 @@ uk:
     all_courses_inner: 
       join_course: "Приєднатися до цього курсу"
       next: Наступний
+      no_courses_found: "Жодного курсу не знайдено"
       previous: Попередній
     course_sections: "Розділи курсу"
     enrollments_observers: Спостерігачі
@@ -18107,6 +18111,7 @@ uk:
   update_details_6abfed16: "Оновити детальну інформацію"
   update_grade_b47eb3ff: "Оновити оцінку"
   update_link_b7cab181: "Оновити посилання"
+  update_login_472cd6db: "Оновити логін"
   update_module_b984c2e5: "Оновити модуль"
   update_password_4bc5cb1f: "Оновити пароль"
   update_quota_81381226: "Оновити квоту"
