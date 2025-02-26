@@ -850,8 +850,6 @@ describe "Discussion Topic Show" do
         expect(Discussion.summary_disable_button).to be_present
         expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
 
-        scroll_into_view Discussion.summary_like_button
-
         Discussion.click_summary_like_button
         Discussion.click_summary_dislike_button
         Discussion.click_summary_disable_button
