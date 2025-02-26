@@ -36,6 +36,7 @@ import {type File, type Folder} from '../../../interfaces/File'
 import {getUniqueId} from '../../../utils/fileFolderUtils'
 import {downloadZip} from '../../../utils/downloadUtils'
 import MoveModal from './MoveModal'
+import UsageRightsModal from './UsageRightsModal'
 
 const I18n = createI18nScope('files_v2')
 
@@ -56,7 +57,9 @@ const BulkActionButtons = ({
   userCanDeleteFilesForContext,
   rows,
 }: BulkActionButtonsProps) => {
-  const [modalOrTray, setModalOrTray] = useState<'delete' | 'move-to' | null>(null)
+  const [modalOrTray, setModalOrTray] = useState<
+    'delete' | 'move-to' | 'manage-usage-rights' | null
+  >(null)
   const isEnabled = selectedRows.size >= 1
   const selectedText = !isEnabled
     ? I18n.t('0 selected')
@@ -80,6 +83,11 @@ const BulkActionButtons = ({
         <MoveModal
           items={selectedItems}
           open={modalOrTray === 'move-to'}
+          onDismiss={onDismissModalOrTray}
+        />
+        <UsageRightsModal
+          items={selectedItems}
+          open={modalOrTray === 'manage-usage-rights'}
           onDismiss={onDismissModalOrTray}
         />
       </>
@@ -150,7 +158,10 @@ const BulkActionButtons = ({
                   </Menu.Item>
                 )}
                 {userCanEditFilesForContext && (
-                  <Menu.Item data-testid="bulk-actions-manage-usage-rights-button">
+                  <Menu.Item
+                    data-testid="bulk-actions-manage-usage-rights-button"
+                    onClick={() => setModalOrTray('manage-usage-rights')}
+                  >
                     <Flex alignItems="center" gap="x-small">
                       <Flex.Item>
                         <IconCloudLockLine inline={false} />

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {
@@ -35,6 +35,15 @@ const I18n = createI18nScope('files_v2')
 interface RightsIconButtonProps {
   userCanEditFilesForContext: boolean
   usageRights: UsageRights | null
+  onClick: () => void
+}
+
+type RightsTooltipButtonProps = {
+  icon: React.JSX.Element
+  title: string
+  screenReaderLabel?: string
+  userCanEditFilesForContext: boolean
+  onClick: () => void
 }
 
 const getIconData = (use_justification: string) => {
@@ -52,55 +61,71 @@ const getIconData = (use_justification: string) => {
   }
 }
 
-const RightsIconButton = ({userCanEditFilesForContext, usageRights}: RightsIconButtonProps) => {
-
-  const handleOnClick = () => {}
-
-  const renderTooltipButton = ({icon, title, screenReaderLabel} : {
-    icon: JSX.Element, 
-    title: string, 
-    screenReaderLabel?: string
-  }) => {
-    return (
-      <Tooltip
-        renderTip={title}
-        on={['hover', 'focus']}
-        themeOverride={{
-          fontSize: '0.75rem',
-        }}
+const RightsTooltipButton = ({
+  icon,
+  title,
+  screenReaderLabel,
+  userCanEditFilesForContext,
+  onClick,
+}: RightsTooltipButtonProps) => {
+  return (
+    <Tooltip
+      renderTip={title}
+      on={['hover', 'focus']}
+      themeOverride={{
+        fontSize: '0.75rem',
+      }}
+    >
+      <IconButton
+        withBackground={false}
+        withBorder={false}
+        size="small"
+        shape="circle"
+        screenReaderLabel={screenReaderLabel || title}
+        aria-label={
+          userCanEditFilesForContext ? I18n.t('Set usage rights') : I18n.t('Usage rights')
+        }
+        disabled={!userCanEditFilesForContext}
+        onClick={onClick}
       >
-        <IconButton
-          withBackground={false}
-          withBorder={false}
-          size="small"
-          shape="circle"
-          screenReaderLabel={screenReaderLabel || title}
-          aria-label={userCanEditFilesForContext ? I18n.t('Set usage rights') : I18n.t('Usage rights')}
-          disabled={!userCanEditFilesForContext}
-          onClick={handleOnClick}
-        >
-          {icon}
-        </IconButton>
-      </Tooltip>
-    )
-  }
+        {icon}
+      </IconButton>
+    </Tooltip>
+  )
+}
+
+const RightsIconButton = ({
+  userCanEditFilesForContext,
+  usageRights,
+  onClick,
+}: RightsIconButtonProps) => {
+  const handleOnClick = useCallback(() => onClick?.(), [onClick])
 
   if (!usageRights) {
     if (!userCanEditFilesForContext) return null // not allow to edit
-    return renderTooltipButton({
-      icon: <IconWarningLine color="warning" />,
-      title: I18n.t('Before publishing this file, you must specify usage rights')
-    })
+
+    return (
+      <RightsTooltipButton
+        icon={<IconWarningLine color="warning" />}
+        title={I18n.t('Before publishing this file, you must specify usage rights')}
+        userCanEditFilesForContext={userCanEditFilesForContext}
+        onClick={handleOnClick}
+      />
+    )
   }
 
   const iconData = getIconData(usageRights.use_justification)
   if (!iconData) return null // error
 
-  return renderTooltipButton({
-    icon: iconData.icon,
-    title: usageRights.license_name,
-    screenReaderLabel: iconData.text
-  })
+  return (
+    <RightsTooltipButton
+      icon={iconData.icon}
+      title={usageRights.license_name}
+      screenReaderLabel={iconData.text}
+      userCanEditFilesForContext={userCanEditFilesForContext}
+      onClick={handleOnClick}
+    />
+  )
 }
 
 export default RightsIconButton

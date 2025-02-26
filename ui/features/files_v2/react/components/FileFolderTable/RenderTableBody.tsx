@@ -21,6 +21,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {File, Folder} from 'features/files_v2/interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {getUniqueId} from '../../../utils/fileFolderUtils'
+import {ModalOrTrayOptions} from './FileFolderTable'
 
 // Need to render in this manner to satisfy TypeScript and make sure headers are rendered in stacked view
 const renderTableBody = (
@@ -35,6 +36,7 @@ const renderTableBody = (
   userCanEditFilesForContext: boolean,
   userCanDeleteFilesForContext: boolean,
   usageRightsRequiredForContext: boolean,
+  setModalOrTrayOptions: (modalOrTray: ModalOrTrayOptions | null) => () => void,
 ) => {
   return rows.map(row => {
     const isSelected = selectedRows.has(getUniqueId(row))
@@ -65,6 +67,7 @@ const renderTableBody = (
             size: size,
             isSelected: isSelected,
             toggleSelect: () => toggleRowSelection(getUniqueId(row)),
+            setModalOrTrayOptions,
           })}
         </Table.Cell>
       )),
