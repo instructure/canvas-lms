@@ -26,6 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import SubmissionList from './SubmissionList'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('eportfolio')
 
@@ -74,11 +75,23 @@ export default function SectionContainer(props: Props) {
 
   const renderSubmissionList = () => {
     if (isLoading || data == null) {
-      return <Spinner margin="0 auto" renderTitle={I18n.t('Loading submission list')} />
+      return (
+        <View
+          margin="small"
+          as="div"
+          textAlign="center"
+          borderRadius="medium"
+          borderWidth="small"
+          maxHeight="300px"
+          overflowY="auto"
+        >
+          <Spinner margin="0 auto" renderTitle={I18n.t('Loading section list')} />
+        </View>
+      )
     } else if (isError) {
       return (
         <Alert variant="error" margin="0 auto">
-          {I18n.t('Could not load submission list')}
+          {I18n.t('Could not load section list')}
         </Alert>
       )
     }

@@ -222,7 +222,7 @@ function PageList(props: Props) {
           {props.sectionName}
         </Text>
         <Text>{I18n.t('Pages')}</Text>
-        <View display="block" maxHeight="600px" margin="0" overflowY="auto">
+        <View display="block" maxHeight="400px" margin="0" overflowY="auto">
           <Table caption={I18n.t('List of pages')}>
             <Table.Body>
               {allPages.map((page: ePortfolioPage, index: number) => {

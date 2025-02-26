@@ -29,8 +29,6 @@ import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import SubmissionModal from './SubmissionModal'
 import {Link} from '@instructure/ui-link'
-import {IconWindowsLine} from '@instructure/ui-icons'
-import {SVGIcon} from '@instructure/ui-svg-images'
 
 const I18n = createI18nScope('eportfolio')
 

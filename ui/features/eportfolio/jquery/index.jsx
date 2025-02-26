@@ -52,6 +52,7 @@ import 'jqueryui/progressbar'
 import 'jqueryui/sortable'
 import CreatePortfolioForm from '../react/CreatePortfolioForm'
 import {Portal} from '@instructure/ui-portal'
+import PageNameContainer from '../react/PageNameContainer'
 
 const I18n = createI18nScope('eportfolio')
 
@@ -191,8 +192,8 @@ function renderCreateForm() {
 
 function renderPortal(portfolio_id) {
   const sectionListContainer = document.getElementById('section_list_mount')
-  const pageListContainer = document.getElementById('page_list_mount')
   const submissionContainer = document.getElementById('recent_submission_mount')
+  const pageListContainer = document.getElementById('page_list_mount')
 
   return (
     <QueryProvider>
@@ -209,6 +210,13 @@ function renderPortal(portfolio_id) {
 
 $(document).ready(function () {
   const portfolio_id = ENV.eportfolio_id
+  // formRoot is for the name field in the edit page form and renders dynamically
+  // root is for everything else and should always be rendered
+  let formRoot = null
+  const pageNameMount = document.getElementById('page_name_mount')
+  if (pageNameMount) {
+    formRoot = ReactDOM.createRoot(pageNameMount)
+  }
   const root = ReactDOM.createRoot(document.getElementById('eportfolio_portal_mount'))
   if (portfolio_id) {
     root.render(renderPortal(portfolio_id))
@@ -261,6 +269,25 @@ $(document).ready(function () {
         RichContentEditor.loadNewEditor($richText, {defaultContent: sectionData.section_content})
       }
     })
+    if (formRoot) {
+      const currentPageName = $('#content h2 .name').text()
+      const pageButtonContainer = document.getElementById('page_button_mount')
+      const sideButtonContainer = document.getElementById('side_button_mount')
+
+      formRoot.render(
+        <PageNameContainer
+          pageName={currentPageName}
+          contentBtnNode={pageButtonContainer}
+          sideBtnNode={sideButtonContainer}
+          onPreview={previewPage}
+          onCancel={cancel}
+          onSave={submitPage}
+          onKeepEditing={keepEditing}
+          setHidden={setHidden}
+        />,
+      )
+    }
+
     $('#edit_page_form :text:first').focus().select()
     $('#page_comments_holder').hide()
     $(document).triggerHandler('editing_page')
@@ -271,58 +298,61 @@ $(document).ready(function () {
       $('#edit_page_form .show_comments_box').showIf($(this).prop('checked'))
     })
     .change()
-  $('#edit_page_sidebar .submit_button').click(() => {
+  function submitPage() {
+    formRoot.render(null)
     $('#edit_page_form').submit()
-  })
-  $('#edit_page_form,#edit_page_sidebar')
-    .find('button.preview_button')
-    .click(function () {
-      $('#page_content .section.failed').remove()
-      $('#edit_page_form,#page_content,#page_sidebar').addClass('previewing')
-      $('#page_content .section').each(function () {
-        const $section = $(this)
-        const $preview = $section
-          .find('.section_content')
-          .clone()
-          .removeClass('section_content')
-          .addClass('preview_content')
-          .addClass('preview_section')
-        const section_type = $section.getTemplateData({textValues: ['section_type']}).section_type
-        if (section_type === 'html') {
-          // xsslint safeString.function sanitizeHtml
-          $preview.html(sanitizeHtml($section.find('.edit_section').val()))
-          $section.find('.section_content').after($preview)
-        } else if (section_type === 'rich_text') {
-          const $richText = $section.find('.edit_section')
-          const editorContent = RichContentEditor.callOnRCE($richText, 'get_code')
-          if (editorContent) {
-            $preview.html(sanitizeHtml(editorContent))
-          }
-          $section.find('.section_content').after($preview)
+  }
+  function previewPage() {
+    $('#page_content .section.failed').remove()
+    $('#edit_page_form,#page_content,#page_sidebar').addClass('previewing')
+    $('#page_content .section').each(function () {
+      const $section = $(this)
+      const $preview = $section
+        .find('.section_content')
+        .clone()
+        .removeClass('section_content')
+        .addClass('preview_content')
+        .addClass('preview_section')
+      const section_type = $section.getTemplateData({textValues: ['section_type']}).section_type
+      if (section_type === 'html') {
+        // xsslint safeString.function sanitizeHtml
+        $preview.html(sanitizeHtml($section.find('.edit_section').val()))
+        $section.find('.section_content').after($preview)
+      } else if (section_type === 'rich_text') {
+        const $richText = $section.find('.edit_section')
+        const editorContent = RichContentEditor.callOnRCE($richText, 'get_code')
+        if (editorContent) {
+          $preview.html(sanitizeHtml(editorContent))
         }
-      })
+        $section.find('.section_content').after($preview)
+      }
     })
-    .end()
-    .find('.keep_editing_button')
-    .click(() => {
-      $('#edit_page_form,#page_content,#page_sidebar').removeClass('previewing')
-      $('#page_content .preview_section').remove()
+  }
+
+  function keepEditing() {
+    $('#edit_page_form,#page_content,#page_sidebar').removeClass('previewing')
+    $('#page_content .preview_section').remove()
+  }
+
+  function cancel() {
+    formRoot.render(null)
+    $('#edit_page_form .edit_rich_text_content .edit_section').each(function () {
+      RichContentEditor.destroyRCE($(this))
     })
-    .end()
-    .find('.cancel_button')
-    .click(function () {
-      $('#edit_page_form .edit_rich_text_content .edit_section').each(function () {
-        RichContentEditor.destroyRCE($(this))
-      })
-      $('#edit_page_form,#page_content,#page_sidebar').removeClass('editing')
-      $('#page_content .section.unsaved').remove()
-      $('.edit_content_link_holder').show()
-      $('#edit_page_form .edit_section').each(function () {
-        $(this).remove()
-      })
-      $('#page_content .section .form_content').remove()
-      $('#page_comments_holder').show()
+    $('#edit_page_form,#page_content,#page_sidebar').removeClass('editing')
+    $('#page_content .section.unsaved').remove()
+    $('.edit_content_link_holder').show()
+    $('#edit_page_form .edit_section').each(function () {
+      $(this).remove()
     })
+    $('#page_content .section .form_content').remove()
+    $('#page_comments_holder').show()
+  }
+
+  function setHidden(pageName) {
+    document.getElementById('page_name_field').value = pageName
+  }
+
   $('#edit_page_form').formSubmit({
     processData(_data) {
       $('#page_content .section.unsaved').removeClass('unsaved')

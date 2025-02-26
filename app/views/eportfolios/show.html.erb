@@ -78,16 +78,7 @@
           <li><a class="add_content_link add_submission_link" href="#"><%= t('links.choose_submission', "Course Submission") %></a></li>
           <li><a class="add_content_link add_file_link" href="#"><%= t('links.file_uload', "Image/File Upload") %></a></li>
         </ul>
-        <div class="form_content button-container">
-          <button type="button" class="cancel_button btn button-secondary btn-small"><%= t('#buttons.cancel', "Cancel") %></button>
-          <button type="button" class="preview_button btn btn-small"><%= t('buttons.preview', "Preview") %></button>
-          <button type="button" class="submit_button btn btn-small btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
-        </div>
-        <div class="preview_content button-container">
-          <button type="button" class="cancel_button btn button-secondary btn-small"><%= t('#buttons.cancel', "Cancel") %></button>
-          <button type="button" class="keep_editing_button btn btn-small"><%= t('buttons.keep_editing', "Keep Editing") %></button>
-          <button type="button" class="submit_button btn btn-small btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
-        </div>
+        <div id="side_button_mount"></div>
       </div>
     </div>
     <% end %>
@@ -225,9 +216,9 @@
   <% end %>
   <h2 id="eportfolio_entry_<%= @page.id %>"><span class="name"><%= @page.name %></span></h2>
   <%= form_for @page, :url => eportfolio_entry_url(@portfolio, @page), :html => {:id => "edit_page_form" } do |f| %>
+  <div id="page_name_mount"></div>
   <div class="form_content">
-    <%= f.label :name, before_label(:page_name, "Page Name") %>
-    <%= f.text_field :name %>
+    <%= f.hidden_field :name, id: "page_name_field" %>
   </div>
   <div id="page_content">
     <% @page.content_sections.each_with_index do |c, idx| %>
@@ -242,16 +233,7 @@
       <%= f.label :show_comments, t('labels.show_comments', "Make Comments Public") %>
     </div>
   </div>
-  <div class="form_content button-container">
-    <button type="button" class="cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
-    <button type="button" class="preview_button btn"><%= t('buttons.preview', "Preview") %></button>
-    <button type="submit" class="btn btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
-  </div>
-  <div class="preview_content button-container">
-    <button type="button" class="cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
-    <button type="button" class="keep_editing_button btn"><%= t('buttons.keep_editing', "Keep Editing") %></button>
-    <button type="submit" class="btn btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
-  </div>
+  <div id="page_button_mount"></div>
   <table class="formtable" style="width: 100%; display: none;">
     <tr>
       <td colspan="2">
