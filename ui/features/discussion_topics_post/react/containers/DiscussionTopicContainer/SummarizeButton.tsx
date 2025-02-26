@@ -22,7 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconSyllabusLine, IconXSolid} from '@instructure/ui-icons'
 
 interface SummarizeButtonProps {
-  onClick: () => void
+  onClick: () => Promise<void>
   isEnabled: boolean
   isLoading: boolean
   isMobile: boolean

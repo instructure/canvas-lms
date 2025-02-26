@@ -787,13 +787,15 @@ class DiscussionTopic < ActiveRecord::Base
                                                                     unread_entry_count: unread_count(current_user, lock: true),
                                                                     workflow_state: "unread",
                                                                     subscribed: current_user == user && !subscription_hold(current_user, nil),
-                                                                    sort_order: DiscussionTopic::SortOrder::INHERIT)
+                                                                    sort_order: DiscussionTopic::SortOrder::INHERIT,
+                                                                    summary_enabled:)
           topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
           topic_participant.expanded = opts[:expanded] if opts.key?(:expanded)
           topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
+          topic_participant.summary_enabled = opts[:summary_enabled] if opts.key?(:summary_enabled)
           topic_participant.save
         end
       end

@@ -679,9 +679,9 @@ describe('DiscussionTopicContainer', () => {
   describe('Discussion Summary', () => {
     it('should render the discussion summary button if user can summarize and summary is not enabled', () => {
       ENV.user_can_summarize = true
+      ENV.discussion_summary_enabled = false
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock(),
-        isSummaryEnabled: false,
+        discussionTopic: Discussion.mock()
       })
 
       expect(queryByTestId('summarize-button')).toBeTruthy()
@@ -689,9 +689,9 @@ describe('DiscussionTopicContainer', () => {
 
     it('should render discussion summary button with Turn Off Summary if summary is enabled', () => {
       ENV.user_can_summarize = true
+      ENV.discussion_summary_enabled = true
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock(),
-        isSummaryEnabled: true,
+        discussionTopic: Discussion.mock()
       })
 
       expect(queryByTestId('summarize-button').textContent).toBe('Turn Off Summary')
@@ -699,26 +699,28 @@ describe('DiscussionTopicContainer', () => {
 
     it('should not render the discussion summary button if user can not summarize', () => {
       ENV.user_can_summarize = false
+      ENV.discussion_summary_enabled = false
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock(),
-        isSummaryEnabled: false,
+        discussionTopic: Discussion.mock()
       })
 
       expect(queryByTestId('summarize-button')).toBeNull()
     })
 
     it('renders a summary', () => {
+      ENV.discussion_summary_enabled = true
+      ENV.user_can_summarize = true
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock(),
-        isSummaryEnabled: true,
+        discussionTopic: Discussion.mock()
       })
       expect(queryByTestId('summary-loading')).toBeTruthy()
     })
 
     it('does not render a summary', () => {
+      ENV.discussion_summary_enabled = false
+      ENV.user_can_summarize = true
       const {queryAllByTestId} = setup({
-        discussionTopic: Discussion.mock(),
-        isSummaryEnabled: false,
+        discussionTopic: Discussion.mock()
       })
       expect(queryAllByTestId(/summary-.*/)).toEqual([])
     })

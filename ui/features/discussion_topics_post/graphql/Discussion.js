@@ -98,6 +98,7 @@ export const Discussion = {
         id
         sortOrder
         expanded
+        summaryEnabled
       }
     }
     ${User.fragment}
@@ -162,6 +163,7 @@ export const Discussion = {
       id: string,
       sortOrder: string,
       expanded: bool,
+      summaryEnabled: bool
     }),
   }),
 
@@ -219,6 +221,7 @@ export const Discussion = {
       id: '1',
       sortOrder: 'desc',
       expanded: false,
+      summaryEnaled: false,
       __typename: 'DiscussionParticipant',
     },
     sortOrderLocked = false,

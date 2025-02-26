@@ -30,7 +30,7 @@ import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TranslationControls} from '../../components/TranslationControls/TranslationControls'
 import {useMutation} from '@apollo/client'
-import {UPDATE_DISCUSSION_SORT_ORDER, UPDATE_DISCUSSION_EXPANDED} from '../../../graphql/Mutations'
+import {UPDATE_DISCUSSION_TOPIC_PARTICIPANT} from '../../../graphql/Mutations'
 import DiscussionTopicTitleContainer from '../DiscussionTopicTitleContainer/DiscussionTopicTitleContainer'
 import DiscussionPostButtonsToolbar from '../../components/DiscussionPostToolbar/DiscussionPostButtonsToolbar'
 import {Flex} from '@instructure/ui-flex'
@@ -77,8 +77,7 @@ const DiscussionTopicToolbarContainer = props => {
     setFilter(value.value)
   }
 
-  const [updateDiscussionSortOrder] = useMutation(UPDATE_DISCUSSION_SORT_ORDER)
-  const [updateDiscussionExpanded] = useMutation(UPDATE_DISCUSSION_EXPANDED)
+  const [updateDiscussionTopicParticipant] = useMutation(UPDATE_DISCUSSION_TOPIC_PARTICIPANT)
   const {handleSwitchClick} = useSpeedGrader()
   const onSwitchLinkClick = () => {
     handleSwitchClick()
@@ -91,7 +90,7 @@ const DiscussionTopicToolbarContainer = props => {
     } else {
       newOrder = sort === 'asc' ? 'desc' : 'asc'
     }
-    updateDiscussionSortOrder({
+    updateDiscussionTopicParticipant({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         sortOrder: newOrder,
@@ -101,7 +100,7 @@ const DiscussionTopicToolbarContainer = props => {
     })
   }
   const onExpandCollapseClick = bool => {
-    updateDiscussionExpanded({
+    updateDiscussionTopicParticipant({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         expanded: bool,
