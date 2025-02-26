@@ -37,7 +37,7 @@ export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
  * @returns FormMessage[]
  */
 export const createErrorMessage = (text: string): FormMessage[] =>
-  text ? [{type: 'error', text}] : []
+  text ? [{type: 'newError', text}] : []
 
 /**
  * Handle possible redirects after successful registration
