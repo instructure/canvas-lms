@@ -32,6 +32,10 @@ module UserContent
       def download_frd?
         rest.include?("download_frd=1")
       end
+
+      def media_iframe_url?
+        url.start_with?("/media_attachments_iframe")
+      end
     end
 
     class ProcessedUrl
@@ -62,7 +66,7 @@ module UserContent
       # [ attachment.context_id, attachment.id, url_options ]
       def args
         [attachment.id, options].tap do |a|
-          if Attachment.relative_context?(attachment.context_type)
+          if Attachment.relative_context?(attachment.context_type) && !match.media_iframe_url?
             a.unshift(attachment.context_id)
           end
         end
@@ -84,6 +88,8 @@ module UserContent
             "#{attachment.context_type.downcase}_file_preview_url"
           elsif match.download? || match.download_frd?
             "#{attachment.context_type.downcase}_file_download_url"
+          elsif match.media_iframe_url?
+            "media_attachment_iframe_url"
           else
             "#{attachment.context_type.downcase}_file_url"
           end

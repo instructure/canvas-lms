@@ -2629,7 +2629,7 @@ class ApplicationController < ActionController::Base
     return nil unless str
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
-    rewriter.set_handler("files") do |match|
+    file_handler = proc do |match|
       UserContent::FilesHandler.new(
         match:,
         context:,
@@ -2639,6 +2639,8 @@ class ApplicationController < ActionController::Base
         is_public:
       ).processed_url
     end
+    rewriter.set_handler("files", &file_handler)
+    rewriter.set_handler("media_attachments_iframe", &file_handler)
     UserContent.escape(rewriter.translate_content(str), request.host_with_port, use_new_math_equation_handling?)
   end
   helper_method :public_user_content

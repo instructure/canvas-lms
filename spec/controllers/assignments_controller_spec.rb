@@ -2004,6 +2004,41 @@ describe AssignmentsController do
         expect(assigns[:course_home_sub_navigation_tools].size).to eq 0
       end
     end
+
+    context "with file links in syllabus body" do
+      before :once do
+        @image = attachment_model(context: @course, display_name: "file.jpg")
+        @video = attachment_model(context: @course, display_name: "file.mp4", media_entry_id: "cat_hugs")
+        @doc = attachment_model(context: @course, display_name: "file.docx")
+        @course.public_syllabus = true
+        @course.syllabus_body = <<~HTML
+          <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview" alt="test-1.jpg" /></p>
+          <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
+          <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?wrap=1" target="_blank" rel="noopener" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+        HTML
+        @course.save!
+      end
+
+      it "doesn't make files publicly available when authorized user is logged in" do
+        user_session(@student)
+
+        get "syllabus", params: { course_id: @course.id }
+        expect(assigns[:syllabus_body]).to eql(<<~HTML)
+          <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview" alt="test-1.jpg" loading="lazy"></p>
+          <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
+          <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+        HTML
+      end
+
+      it "does make files publicly available with public syllabus when user does not have access" do
+        get "syllabus", params: { course_id: @course.id }
+        expect(assigns[:syllabus_body]).to eql(<<~HTML)
+          <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview?verifier=#{@image.uuid}" alt="test-1.jpg" loading="lazy"></p>
+          <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}?verifier=#{@video.uuid}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
+          <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?verifier=#{@doc.uuid}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+        HTML
+      end
+    end
   end
 
   describe "PUT 'toggle_mute'" do
