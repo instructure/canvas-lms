@@ -32,9 +32,9 @@ describe CoursePacing::BulkStudentEnrollmentPacesApiController, type: :controlle
     @teacher = user_factory
     @course.enroll_teacher(@teacher, enrollment_state: "active")
 
-    @student1 = user_factory
-    @student2 = user_factory
-    @student3 = user_factory
+    @student1 = user_factory(name: "Alice")
+    @student2 = user_factory(name: "Charlie")
+    @student3 = user_factory(name: "Bob")
 
     @student_enrollment1 = @course.enroll_student(@student1, enrollment_state: "active")
     @student_enrollment2 = @course.enroll_student(@student2, enrollment_state: "active")
@@ -97,6 +97,20 @@ describe CoursePacing::BulkStudentEnrollmentPacesApiController, type: :controlle
       expect(json["students"].size).to eq(2)
       returned_ids = json["students"].pluck(:id)
       expect(returned_ids).to match_array([@student1.id.to_s, @student3.id.to_s])
+    end
+
+    it "correctly sorts by names ascending and descending" do
+      get :student_bulk_pace_edit_view, params: { course_id: @course.id, sort: "name", order: "asc" }
+      json = response.parsed_body
+
+      # Student 1 is Alice
+      expect(json["students"].first["name"]).to eq(@student1.name)
+
+      get :student_bulk_pace_edit_view, params: { course_id: @course.id, sort: "name", order: "desc" }
+      json = response.parsed_body
+
+      # Student 2 is Charlie
+      expect(json["students"].first["name"]).to eq(@student2.name)
     end
 
     it "marks a student with an overdue override and no submission as off-pace; and a student who submitted as on-pace" do

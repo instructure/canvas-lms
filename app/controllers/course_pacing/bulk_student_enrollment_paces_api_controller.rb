@@ -89,21 +89,15 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
   end
 
   def apply_sorting(enrolled_students)
-    if enrolled_students.is_a?(ActiveRecord::Relation)
-      if params[:sort].present?
-        order_direction = (params[:order] == "desc") ? "DESC" : "ASC"
-        enrolled_students.joins(:user).order("users.name #{order_direction}")
+    if params[:sort].present?
+      order_direction = (params[:order] == "desc") ? "DESC" : "ASC"
+      if enrolled_students.is_a?(ActiveRecord::Relation)
+        enrolled_students = enrolled_students.joins(:user).order("users.name #{order_direction}")
       else
-        enrolled_students.order(created_at: :desc)
+        enrolled_students.sort_by! { |e| e.user.name }
+        enrolled_students.reverse! if order_direction == "DESC"
       end
-    elsif params[:sort].present?
-      order_direction = (params[:order] == "desc") ? -1 : 1
-      enrolled_students.sort_by! { |enrollment| enrollment.user.name.downcase }
-      enrolled_students.reverse! if order_direction == -1
-    else
-      enrolled_students.sort_by!(&:created_at).reverse!
     end
-
     enrolled_students
   end
 
