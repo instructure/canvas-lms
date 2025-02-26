@@ -1065,7 +1065,7 @@ describe DiscussionTopicsController do
 
         it "summary is enabled on the topic" do
           discussion.update!(summary_enabled: true)
-
+          discussion.participant(@teacher).destroy
           user_session(@teacher)
           get "show", params: { course_id: @course.id, id: discussion.id }
           expect(assigns.dig(:js_env, :discussion_summary_enabled)).to be true

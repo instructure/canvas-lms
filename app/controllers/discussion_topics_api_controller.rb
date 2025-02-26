@@ -218,7 +218,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   # @API Disable summary
-  #
+  # Deprecated, to remove after VICE-5047 gets merged
   # Disables the summary for a discussion topic.
   #
   # @example_request

@@ -29,6 +29,7 @@ import {
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_READ_STATE,
   UPDATE_DISCUSSION_TOPIC,
+  UPDATE_DISCUSSION_TOPIC_PARTICIPANT
 } from '../../../graphql/Mutations'
 import {DiscussionDetails} from '../../components/DiscussionDetails/DiscussionDetails'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
@@ -80,6 +81,8 @@ export const DiscussionTopicContainer = ({
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(false)
   const [liked, setLiked] = useState(false)
   const [disliked, setDisliked] = useState(false)
+  const [isSummaryEnabled, setIsSummaryEnabled] = useState(ENV.discussion_summary_enabled || false)
+  const [updateDiscussionTopicParticipant] = useMutation(UPDATE_DISCUSSION_TOPIC_PARTICIPANT)
 
   const {searchTerm, filter} = useContext(SearchContext)
   const isSearch = searchTerm || filter === 'unread'
@@ -118,6 +121,17 @@ export const DiscussionTopicContainer = ({
       setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
     },
   })
+
+  const handleSummaryEnabled = async (summaryEnabled) => {
+    return updateDiscussionTopicParticipant({
+      variables: {
+        discussionTopicId:  props.discussionTopic._id,
+        summaryEnabled: summaryEnabled
+      }
+    }).then(() => {
+      setIsSummaryEnabled(summaryEnabled)
+    })
+  }
 
   const client = useApolloClient()
   const resetDiscussionCache = () => {
@@ -281,6 +295,14 @@ export const DiscussionTopicContainer = ({
     },
     [apiUrlPrefix, summary, setOnFailure],
   )
+
+  const handleDisableSummaryClick = async () => {
+    if (summary) {
+      await postDiscussionSummaryFeedback('disable_summary')
+    }
+
+    await handleSummaryEnabled(false)
+  }
 
   const podcast_url =
     document.querySelector(`link[title='${I18n.t('Discussion Podcast Feed')}' ]`) ||
@@ -570,12 +592,12 @@ export const DiscussionTopicContainer = ({
                                       shouldGrow={responsiveProps?.summaryButton?.shouldGrow}
                                       shouldShrink={responsiveProps?.summaryButton?.shouldShrink}
                                     >
-                                      <SummarizeButton
-                                        onClick={handleSummarizeClick}
-                                        isEnabled={props.isSummaryEnabled}
-                                        isLoading={isFeedbackLoading}
-                                        isMobile={matches.includes('mobile')}
-                                      />
+                                        <SummarizeButton
+                                          onClick={() => handleSummaryEnabled(!isSummaryEnabled)}
+                                          isEnabled={isSummaryEnabled}
+                                          isLoading={isFeedbackLoading}
+                                          isMobile={matches.includes('mobile')}
+                                        />
                                     </Flex.Item>
                                   )}
                                   {ENV.user_can_access_insights && (
@@ -636,7 +658,7 @@ export const DiscussionTopicContainer = ({
                     )}
                   </View>
                 </Flex.Item>
-                {props.isSummaryEnabled && (
+                {ENV.user_can_summarize && isSummaryEnabled && (
                   <Flex.Item>
                     <View
                       as="div"
@@ -649,7 +671,7 @@ export const DiscussionTopicContainer = ({
                     >
                       <Flex direction="column" padding={responsiveProps?.container?.padding}>
                         <DiscussionSummary
-                          onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
+                          onDisableSummaryClick={() => handleSummaryEnabled(false)}
                           isMobile={!!matches.includes('mobile')}
                           summary={summary}
                           onSetSummary={setSummary}
@@ -726,14 +748,6 @@ DiscussionTopicContainer.propTypes = {
    * useState object to set the REPLY_TO_ENTRY submission status
    */
   replyToEntrySubmission: PropTypes.object,
-  /**
-   * useState Boolean to toggle the Discussion Summary
-   */
-  isSummaryEnabled: PropTypes.bool,
-  /**
-   * useState function to set the Discussion Summary
-   */
-  setIsSummaryEnabled: PropTypes.func,
   expandedTopicReply: PropTypes.bool,
   setExpandedTopicReply: PropTypes.func,
   isSubmitting: PropTypes.bool,

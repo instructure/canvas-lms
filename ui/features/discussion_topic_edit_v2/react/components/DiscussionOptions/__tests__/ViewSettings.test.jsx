@@ -34,8 +34,6 @@ const defaultProps = {
   sortOrderLocked: DEFAULT_SORT_ORDER_LOCKED,
   setExpanded: () => {},
   setExpandedLocked: () => {},
-  setSortOrder: () => {},
-  setSortOrderLocked: () => {},
 }
 
 const setup = (props = {}, env = {}) => {

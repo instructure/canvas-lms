@@ -914,7 +914,7 @@ class DiscussionTopicsController < ApplicationController
       edit_url += "?embed=true" if params[:embed] == "true"
 
       assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
-
+      participant = @topic.participant(@current_user)
       js_env({
                course_id: params[:course_id] || @context.course&.id,
                context_type: @topic.context_type,
@@ -937,7 +937,8 @@ class DiscussionTopicsController < ApplicationController
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),
                user_can_access_insights: @topic.user_can_access_insights?(@current_user),
-               discussion_summary_enabled: @topic.summary_enabled,
+               user_can_insights: user_can_moderate,
+               discussion_summary_enabled: participant.nil? ? @topic.summary_enabled : participant.summary_enabled,
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # although there is a permissions object in DiscussionEntry type, it's only accessible if a discussion entry
                # is being replied to. We need this env var so that replying to the topic can use this
