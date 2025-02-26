@@ -1390,6 +1390,7 @@ ko:
   add_feed_49ed1cb2: "피드 추가"
   add_group_c84f9e9d: "그룹 추가"
   add_group_set_f9809e11: "그룹 집합 추가"
+  add_login_f871148: "로그인 추가"
   add_message_10cc308c: "메시지 추가"
   add_module_5ad6fee2: "모듈 추가"
   add_page_7ea7ee39: "페이지 추가"
@@ -10929,6 +10930,7 @@ ko:
       some_scores_reduced: "정답에만 점수 주기 (*일부 학생*의 점수가 낮아질 수도 있음)"
       update_question_without_regrading: "다시 평가하지 않고 문제를 업데이트"
   quiz_e0dcce8f: 퀴즈
+  quiz_instructions_a36d09c9: "퀴즈 지침"
   quiz_log_auditing: 
     inverted_table_view: 
       headers: 
@@ -12321,6 +12323,7 @@ ko:
   save_login_bba1272: "로그인 저장"
   save_settings_cafe79a5: "설정 저장"
   save_skype_name_4de35a9: "Skype 이름 저장"
+  save_successful_b2f64da4: "성공적으로 저장함"
   saving_d55dd90e: "저장 중..."
   scheduler_65b5ac91: "일정 관리"
   scheduling_5a3327e7: 일정
@@ -14058,6 +14061,7 @@ ko:
   unsupported_package: "지원하지 않는 내용 묶음"
   until_date_949017c4: "%{date} 까지"
   update_details_6abfed16: "세부 정보 업데이트"
+  update_login_472cd6db: "로그인 업데이트"
   update_module_b984c2e5: "모듈 업데이트"
   update_password_4bc5cb1f: "암호 업데이트"
   update_quota_81381226: "할당량 업데이트"
