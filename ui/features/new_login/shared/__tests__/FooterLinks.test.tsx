@@ -194,4 +194,41 @@ describe('FooterLinks', () => {
     const helpLink = screen.queryByTestId('help-link')
     expect(helpLink).toBeNull()
   })
+
+  it('ensures links are proper anchor elements and do not have role button', () => {
+    mockUseNewLoginData.mockReturnValue({
+      isPreviewMode: false,
+      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+    })
+    mockUseNewLogin.mockReturnValue({isUiActionPending: false})
+    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    render(
+      <MemoryRouter>
+        <NewLoginProvider>
+          <HelpTrayProvider>
+            <FooterLinks />
+          </HelpTrayProvider>
+        </NewLoginProvider>
+      </MemoryRouter>,
+    )
+    const helpLink = screen.getByTestId('help-link')
+    expect(helpLink.tagName).toBe('A')
+    expect(helpLink).toHaveAttribute('href', 'https://community.canvaslms.com/')
+    expect(helpLink).not.toHaveAttribute('role', 'button')
+    const privacyLink = screen.getByTestId('privacy-link')
+    expect(privacyLink.tagName).toBe('A')
+    expect(privacyLink).toHaveAttribute('href', '/privacy_policy')
+    expect(privacyLink).not.toHaveAttribute('role', 'button')
+    const cookieNoticeLink = screen.getByTestId('cookie-notice-link')
+    expect(cookieNoticeLink.tagName).toBe('A')
+    expect(cookieNoticeLink).toHaveAttribute(
+      'href',
+      'https://www.instructure.com/policies/canvas-lms-cookie-notice',
+    )
+    expect(cookieNoticeLink).not.toHaveAttribute('role', 'button')
+    const aupLink = screen.getByTestId('aup-link')
+    expect(aupLink.tagName).toBe('A')
+    expect(aupLink).toHaveAttribute('href', '/acceptable_use_policy')
+    expect(aupLink).not.toHaveAttribute('role', 'button')
+  })
 })
