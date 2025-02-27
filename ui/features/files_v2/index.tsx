@@ -18,8 +18,12 @@
 
 import React from 'react'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import ErrorBoundary from '@canvas/error-boundary'
+import GenericErrorPage from '@canvas/generic-error-page'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import FilesApp from './react/components/FilesApp'
-import {createBrowserRouter, RouterProvider} from 'react-router-dom'
+import {createBrowserRouter, RouterProvider, Outlet, LoaderFunctionArgs} from 'react-router-dom'
 import {QueryProvider} from '@canvas/query'
 import {createRoot} from 'react-dom/client'
 import {generateFolderByPathUrl} from './utils/apiUtils'
@@ -29,100 +33,90 @@ import {createStubRootFolder} from './utils/folderUtils'
 const contextAssetString = window.ENV.context_asset_string
 const showingAllContexts = filesEnv.showingAllContexts
 
-const router = createBrowserRouter(
-  [
-    {
-      path: '/folder/:pluralContext/search',
-      element: <FilesApp contextAssetString={contextAssetString} />,
-      loader: async ({params, request}) => {
-        const searchTerm = new URL(request.url).searchParams.get('search_term')
-        const [pluralContextType, contextId] = params['pluralContext']?.split('_') || []
-        const context = filesEnv.contextsDictionary[`${pluralContextType}_${contextId}`]
-        const rootFolder = createStubRootFolder(
-          context.contextId,
-          context.contextType,
-          context.root_folder_id,
-        )
-        const folders = [rootFolder]
-        return {folders: folders, searchTerm: searchTerm}
-      },
-    },
-    {
-      path: '/search',
-      element: <FilesApp contextAssetString={contextAssetString} />,
-      loader: async ({request}) => {
-        const searchTerm = new URL(request.url).searchParams.get('search_term')
-        const context = filesEnv.contexts[0]
-        const rootFolder = createStubRootFolder(
-          context.contextId,
-          context.contextType,
-          context.root_folder_id,
-        )
-        const folders = [rootFolder]
-        return {folders: folders, searchTerm: searchTerm}
-      },
-    },
-    {
-      path: '/',
-      element: showingAllContexts ? (
-        <AllMyFilesTable />
-      ) : (
-        <FilesApp contextAssetString={contextAssetString} />
-      ),
-      loader: async () => {
-        if (showingAllContexts) return null
+const I18n = createI18nScope('files_v2')
 
-        const context = filesEnv.contexts[0]
-        const rootFolder = createStubRootFolder(
-          context.contextId,
-          context.contextType,
-          context.root_folder_id,
-        )
-        const folders = [rootFolder]
-
-        return {folders: folders, searchTerm: ''}
-      },
-    },
-    {
-      path: '/folder/:pluralContextOrFolder',
-      element: <FilesApp contextAssetString={contextAssetString} />,
-      loader: async ({params}) => {
-        let folders
-        if (filesEnv.showingAllContexts) {
-          // files/folder/users_1
-          const [pluralContextType, contextId] = params['pluralContextOrFolder']?.split('_') || []
-          const context = filesEnv.contextsDictionary[`${pluralContextType}_${contextId}`]
-          const folder = createStubRootFolder(
-            context.contextId,
-            context.contextType,
-            context.root_folder_id,
-          )
-          folders = [folder]
-        } else {
-          // files/folder/some_folder
-          const url = generateFolderByPathUrl(`/${params['pluralContextOrFolder']}`)
-          const resp = await fetch(url)
-          folders = await resp.json()
-        }
-        return {folders: folders, searchTerm: ''}
-      },
-    },
-    {
-      path: '/folder/*',
-      element: <FilesApp contextAssetString={contextAssetString} />,
-      loader: async ({params}) => {
-        const url = generateFolderByPathUrl(`/${params['*']}`)
-        const resp = await fetch(url)
-        const folders = await resp.json()
-
-        return {folders: folders, searchTerm: ''}
-      },
-    },
-  ],
+const routes = [
   {
-    basename: filesEnv.baseUrl,
+    path: '/',
+    errorElement: (
+      <ErrorBoundary
+        errorComponent={
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorSubject={I18n.t('Files Index initial query error')}
+            errorCategory={I18n.t('Files Index Error Page')}
+          />
+        }
+      ></ErrorBoundary>
+    ),
+    element: <Outlet />,
+    children: [
+      {
+        index: true,
+        element: showingAllContexts ? (
+          <AllMyFilesTable />
+        ) : (
+          <FilesApp contextAssetString={contextAssetString} />
+        ),
+        loader: () => {
+          if (showingAllContexts) return null
+          const context = filesEnv.contexts[0]
+          const rootFolder = createStubRootFolder(context)
+          return {folders: [rootFolder], searchTerm: ''}
+        },
+      },
+      {
+        path: 'folder?/:pluralContext?/search',
+        element: <FilesApp contextAssetString={contextAssetString} />,
+        loader: async ({params, request}: LoaderFunctionArgs) => {
+          const searchTerm = new URL(request.url).searchParams.get('search_term')
+          let context
+          if (params.pluralContext) {
+            const [pluralContextType, contextId] = params.pluralContext.split('_')
+            context = filesEnv.contextsDictionary[`${pluralContextType}_${contextId}`]
+          } else {
+            context = filesEnv.contexts[0]
+          }
+          return {folders: [createStubRootFolder(context)], searchTerm}
+        },
+      },
+      {
+        path: 'folder/:folderPathOrPluralContext?/*',
+        element: <FilesApp contextAssetString={contextAssetString} />,
+        loader: async ({params}: LoaderFunctionArgs) => {
+          if (filesEnv.showingAllContexts && !params['*']) {
+            const [pluralContextType, contextId] =
+              params.folderPathOrPluralContext?.split('_') || []
+            const context = filesEnv.contextsDictionary[`${pluralContextType}_${contextId}`]
+            return {folders: [createStubRootFolder(context)], searchTerm: ''}
+          }
+
+          if (!filesEnv.showingAllContexts && !params.folderPathOrPluralContext) {
+            const context = filesEnv.contexts[0]
+            return {folders: [createStubRootFolder(context)], searchTerm: ''}
+          }
+
+          const path = params['*']
+            ? `${params.folderPathOrPluralContext}/${params['*']}`
+            : params.folderPathOrPluralContext
+
+          const url = generateFolderByPathUrl(`/${path ?? ''}`)
+          const resp = await fetch(url)
+          const folders = await resp.json()
+          if (!folders || folders.length === 0) {
+            throw new Error('Error fetching by_path')
+          }
+
+          return {folders, searchTerm: ''}
+        },
+      },
+    ],
   },
-)
+]
+
+const router = createBrowserRouter(routes, {
+  basename: filesEnv.baseUrl,
+})
 
 const root = createRoot(document.getElementById('content')!)
 
