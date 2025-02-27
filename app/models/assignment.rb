@@ -294,7 +294,9 @@ class Assignment < ActiveRecord::Base
   )
 
   def context_tag_id
-    if context_module_tags
+    if context_module_tags.loaded?
+      context_module_tags.first&.id
+    elsif context_module_tags
       context_module_tags.first.id unless context_module_tags.first.nil?
     end
   end

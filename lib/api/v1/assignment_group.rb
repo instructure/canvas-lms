@@ -51,6 +51,9 @@ module Api::V1::AssignmentGroup
       unless includes.include?('module_ids') || group.context.grants_right?(user, session, :read_as_admin)
         Assignment.preload_context_module_tags(assignments) # running this again is fine
       end
+      
+      # Always preload context_module_tags to avoid N+1 queries in context_tag_id
+      ContentTag.preload_for_collection(assignments, :context_module_tags) unless assignments.empty?
 
       unless opts[:exclude_response_fields].include?('in_closed_grading_period')
         closed_grading_period_hash = opts[:closed_grading_period_hash] ||
