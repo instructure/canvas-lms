@@ -28,7 +28,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {bool, func, number, string} from 'prop-types'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {GroupContext, SPLIT, API_STATE, stateToContext} from './context'
-import {Checkbox} from '@instructure/ui-checkbox'
 import {Text} from '@instructure/ui-text'
 
 import {GroupSetName} from './GroupSetName'
@@ -53,7 +52,6 @@ const INITIAL_STATE = Object.freeze({
   autoLeaderType: 'FIRST',
   apiState: API_STATE.inactive,
   errors: {},
-  isDifferentiationTag: false,
 })
 
 function reducer(prevState, action) {
@@ -100,12 +98,6 @@ function reducer(prevState, action) {
         autoLeaderType: enableAutoLeader ? autoLeaderType : 'FIRST',
       }
     }
-    case 'differentiation-tag-change':
-      return {
-        ...prevState,
-        isDifferentiationTag: action.to,
-        selfSignup: action.to ? false : prevState.selfSignup,
-      }
     default:
       throw new RangeError('bad event passed to dispatcher')
   }
@@ -149,7 +141,6 @@ export const CreateOrEditSetModal = ({
       self_signup_end_at: selfSignupEndDate,
       enable_auto_leader: st.enableAutoLeader ? '1' : '0',
       create_group_count: st.createGroupCount,
-      non_collaborative: st.isDifferentiationTag,
     }
     parms[st.selfSignup ? 'restrict_self_signup' : 'group_by_section'] = st.bySection ? '1' : '0'
     if (st.splitGroups !== SPLIT.off) parms.assign_async = true
@@ -326,29 +317,7 @@ export const CreateOrEditSetModal = ({
               }}
               {...props}
             />
-            <Divider />
-            {ENV.FEATURES?.differentiation_tags && (
-              <>
-                <View as="div" margin="medium 0">
-                  <Checkbox
-                    label={I18n.t('Is Differentiation Tag')}
-                    checked={st.isDifferentiationTag}
-                    onChange={event => {
-                      dispatch({ev: 'differentiation-tag-change', to: event.target.checked})
-                    }}
-                  />
-                  <View as="div" margin="small 0 0 x-small">
-                    <Text size="small" color="secondary">
-                      {I18n.t(
-                        'When enabled, this group set will be marked as a differentiation tag, and both self-signup and group structure options will be hidden.',
-                      )}
-                    </Text>
-                  </View>
-                </View>
-                <Divider />
-              </>
-            )}
-            {allowSelfSignup && !st.isDifferentiationTag && (
+            {allowSelfSignup && (
               <>
                 <SelfSignup
                   onChange={to => dispatch({ev: 'selfsignup-change', to})}
