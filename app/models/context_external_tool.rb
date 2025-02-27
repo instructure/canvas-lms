@@ -33,6 +33,7 @@ class ContextExternalTool < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
   belongs_to :root_account, class_name: "Account"
+  belongs_to :lti_registration, class_name: "Lti::Registration"
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:name, :description]

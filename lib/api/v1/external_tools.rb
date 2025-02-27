@@ -47,6 +47,7 @@ module Api::V1::ExternalTools
     json["version"] = tool.use_1_3? ? "1.3" : "1.1"
     json["unified_tool_id"] = tool.unified_tool_id
     json["developer_key_id"] = tool.developer_key_id if tool.developer_key_id
+    json["lti_registration_id"] = tool.lti_registration_id if tool.lti_registration_id
     json["deployment_id"] = tool.deployment_id if tool.deployment_id
     extension_types.each do |type|
       next unless json[type]

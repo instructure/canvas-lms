@@ -26,6 +26,7 @@ describe ContextExternalTool do
 
   describe "associations and validations" do
     let_once(:developer_key) { DeveloperKey.create! }
+    let_once(:lti_registration) { lti_registration_model }
     let_once(:tool) do
       ContextExternalTool.create!(
         context: @course,
@@ -35,7 +36,8 @@ describe ContextExternalTool do
         url: "http://www.tool.com/launch",
         developer_key:,
         lti_version: "1.3",
-        root_account: @root_account
+        root_account: @root_account,
+        lti_registration:
       )
     end
 
@@ -45,6 +47,10 @@ describe ContextExternalTool do
 
     it "allows setting the root account" do
       expect(tool.root_account).to eq @root_account
+    end
+
+    it "belongs to an lti registration" do
+      expect(tool.lti_registration).to eq lti_registration
     end
 
     describe "asset_processor_eula_required" do
