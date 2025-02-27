@@ -565,7 +565,8 @@ class CoursesController < ApplicationController
         if first_enrollment.enrollment_state.pending? || state == :creation_pending ||
            (first_enrollment.admin? && (
                first_enrollment.course.restrict_enrollments_to_course_dates &&
-               first_enrollment.course.start_at&.>(Time.now.utc)
+               first_enrollment.course.start_at&.>(Time.now.utc) &&
+               (first_enrollment.course_section&.start_at&.>(Time.now.utc) || first_enrollment.course_section&.start_at.nil?)
              )
            )
           @future_enrollments << first_enrollment unless first_enrollment.restrict_future_listing?

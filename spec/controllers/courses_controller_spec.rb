@@ -402,6 +402,66 @@ describe CoursesController do
         end
       end
 
+      context "when determining enrollment status based on course and section dates" do
+        let(:course) do
+          course = Account.default.courses.create!(
+            name: "Future Course",
+            start_at: 1.month.from_now,
+            conclude_at: 2.months.from_now,
+            restrict_enrollments_to_course_dates: true
+          )
+          course.update!(workflow_state: "available")
+          course
+        end
+        let(:section) do
+          course.course_sections.create!(
+            name: "Past Section",
+            start_at: 30.days.ago,
+            end_at: 1.day.from_now,
+            restrict_enrollments_to_section_dates: true
+          )
+        end
+        let(:student) { user_with_pseudonym(active_user: true) }
+        let(:teacher) { user_with_pseudonym(active_user: true) }
+
+        before do
+          course.enroll_student(student, section: section).accept!
+          course.enroll_teacher(teacher, section: section).accept!
+        end
+
+        it "shows the course as current for the student when section restrictions are enabled" do
+          section.update!(restrict_enrollments_to_section_dates: true)
+          user_session(student)
+          get_index
+          expect(assigns(:current_enrollments).map(&:course_id)).to include(course.id)
+          expect(assigns(:future_enrollments).map(&:course_id)).not_to include(course.id)
+        end
+
+        it "shows the course as future for the student when section restrictions are disabled" do
+          section.update!(restrict_enrollments_to_section_dates: false)
+          user_session(student)
+          get_index
+
+          expect(assigns(:future_enrollments).map(&:course_id)).to include(course.id)
+          expect(assigns(:current_enrollments).map(&:course_id)).not_to include(course.id)
+        end
+
+        it "always shows the course as current for the teacher regardless of section restrictions" do
+          section.update!(restrict_enrollments_to_section_dates: true)
+          user_session(teacher)
+          get_index
+
+          expect(assigns(:current_enrollments).map(&:course_id)).to include(course.id)
+          expect(assigns(:future_enrollments).map(&:course_id)).not_to include(course.id)
+
+          section.update!(restrict_enrollments_to_section_dates: false)
+          get_index
+
+          expect(assigns(:current_enrollments).map(&:course_id)).to include(course.id)
+          expect(assigns(:future_enrollments).map(&:course_id)).not_to include(course.id)
+        end
+      end
+
       describe "sorting" do
         include_examples "sorting" do
           let(:type) { "current" }
