@@ -16,21 +16,51 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 import axios from '@canvas/axios'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import template from '../../jst/ExternalContentHomeworkFileSubmissionView.handlebars'
 import ExternalContentHomeworkSubmissionView from './ExternalContentHomeworkSubmissionView'
+import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
 
 const I18n = createI18nScope('ExternalContentFileSubmissionView')
 
 class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissionView {
   constructor(...args) {
     super(...args)
+    this.render = this.render.bind(this)
     this.submitHomework = this.submitHomework.bind(this)
     this.reloadSuccessfulAssignment = this.reloadSuccessfulAssignment.bind(this)
     this.sendCallbackUrl = this.sendCallbackUrl.bind(this)
     this.disableLoader = this.disableLoader.bind(this)
     this.submissionFailure = this.submissionFailure.bind(this)
+    this.shouldShowPledgeError = false
+    this.pledgeRoot = null
+  }
+
+  render() {
+    super.render()
+    const mountPoints = document.querySelectorAll('.turnitin_pledge_container_external_homework_file')
+    if (mountPoints.length > 0) {
+      const pledgeMount = mountPoints[mountPoints.length - 1]
+      if (pledgeMount) {
+        const pledgeRoot = this.pledgeRoot ?? createRoot(pledgeMount)
+        const eulaUrl = pledgeMount.dataset.eulaurl
+        const pledgeText = pledgeMount.dataset.pledge
+        const setShouldShowPledgeError = (shouldShow) => this.shouldShowPledgeError = shouldShow
+        const getShouldShowFileRequiredError = () => this.shouldShowPledgeError
+        pledgeRoot.render(
+          <SimilarityPledge
+            inputId='turnitin_pledge_external_content'
+            setShouldShowPledgeError={setShouldShowPledgeError}
+            getShouldShowPledgeError={getShouldShowFileRequiredError}
+            eulaUrl={eulaUrl}
+            pledgeText={pledgeText}
+          />
+        )
+      }
+    }
   }
 
   submitHomework() {

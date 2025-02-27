@@ -45,7 +45,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import PropTypes from 'prop-types'
 import qs from 'qs'
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useState, useEffect, useContext, useRef} from 'react'
 import {
   availableAndUnavailableCounts,
   getPeerReviewButtonText,
@@ -64,7 +64,7 @@ import AttemptTab from './AttemptTab'
 import StudentViewContext from './Context'
 import MarkAsDoneButton from './MarkAsDoneButton'
 import PeerReviewPromptModal from './PeerReviewPromptModal'
-import SimilarityPledge from './SimilarityPledge'
+import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
 import StudentFooter from './StudentFooter'
 import useStore from './stores/index'
 
@@ -194,6 +194,7 @@ const SubmissionManager = ({
   const [peerReviewShowSubHeaderBorder, setPeerReviewShowSubHeaderBorder] = useState(false)
   const [peerReviewHeaderMargin, setPeerReviewHeaderMargin] = useState(null)
   const [isSelfAssessmentOpen, setIsSelfAssessmentOpen] = useState(null)
+  const [shouldShowPledgeError, setShouldShowPledgeError] = useState(false)
 
   const displayedAssessment = useStore(state => state.displayedAssessment)
   const isSavingRubricAssessment = useStore(state => state.isSavingRubricAssessment)
@@ -211,6 +212,8 @@ const SubmissionManager = ({
   } = useContext(StudentViewContext)
 
   const apolloClient = useApolloClient()
+
+  const similarityPledgeCheckboxRef = useRef(null)
 
   const updateSubmissionDraftCache = (cache, result) => {
     if (!result.data.createSubmissionDraft.errors) {
@@ -530,6 +533,17 @@ const SubmissionManager = ({
   }
 
   const handleSubmitButton = async () => {
+    const shouldFocus = true
+    const mustAgreeToPledge = window.ENV.SIMILARITY_PLEDGE && !similarityPledgeChecked
+    if (mustAgreeToPledge) {
+      setShouldShowPledgeError(true)
+      if (shouldFocus) {
+        // focus checkbox
+        similarityPledgeCheckboxRef?.current?.focus()
+      }
+      return
+    }
+
     if (multipleTypesDrafted(submission)) {
       const confirmed = await showConfirmationDialog({
         body: I18n.t(
@@ -761,6 +775,9 @@ const SubmissionManager = ({
           setSimilarityPledgeChecked(!similarityPledgeChecked)
         }}
         pledgeText={pledgeSettings.PLEDGE_TEXT}
+        shouldShowPledgeError={shouldShowPledgeError}
+        setShouldShowPledgeError={setShouldShowPledgeError}
+        checkboxRef={similarityPledgeCheckboxRef}
       />
     )
   }
@@ -860,8 +877,6 @@ const SubmissionManager = ({
   }
 
   const renderSubmitButton = () => {
-    const mustAgreeToPledge = window.ENV.SIMILARITY_PLEDGE != null && !similarityPledgeChecked
-
     let activeTypeMeetsCriteria = false
     switch (activeSubmissionType) {
       case 'media_recording':
@@ -892,7 +907,6 @@ const SubmissionManager = ({
           !submission.submissionDraft ||
           draftStatus === 'saving' ||
           isSubmitting ||
-          mustAgreeToPledge ||
           !activeTypeMeetsCriteria
         }
         color="primary"

@@ -16,14 +16,42 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 import template from '../../jst/ExternalContentHomeworkUrlSubmissionView.handlebars'
 import ExternalContentHomeworkSubmissionView from './ExternalContentHomeworkSubmissionView'
+import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
 
 class ExternalContentUrlSubmissionView extends ExternalContentHomeworkSubmissionView {
   constructor(...args) {
     super(...args)
+    this.render = this.render.bind(this)
     this.submitHomework = this.submitHomework.bind(this)
     this.redirectSuccessfulAssignment = this.redirectSuccessfulAssignment.bind(this)
+    this.shouldShowPledgeError = false
+    this.pledgeRoot = null
+  }
+
+  render() {
+    super.render()
+    const mountPoints = document.querySelectorAll('.turnitin_pledge_container_external_homework_url')
+    if (mountPoints.length > 0) {
+      const pledgeMount = mountPoints[mountPoints.length - 1]
+      if (pledgeMount) {
+        const pledgeRoot = this.pledgeRoot ?? createRoot(pledgeMount)
+        const pledgeText = pledgeMount.dataset.pledge
+        const setShouldShowPledgeError = (shouldShow) => this.shouldShowPledgeError = shouldShow
+        const getShouldShowFileRequiredError = () => this.shouldShowPledgeError
+        pledgeRoot.render(
+          <SimilarityPledge
+            inputId='turnitin_pledge_external_content'
+            setShouldShowPledgeError={setShouldShowPledgeError}
+            getShouldShowPledgeError={getShouldShowFileRequiredError}
+            pledgeText={pledgeText}
+          />
+        )
+      }
+    }
   }
 
   submitHomework() {
