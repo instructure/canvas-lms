@@ -136,5 +136,12 @@ module Types
         Loaders::AssociationLoader.for(ContentTag, :content).load(content_tag)
       end
     end
+
+    field :estimated_duration, GraphQL::Types::ISO8601Duration, null: true
+    def estimated_duration
+      Loaders::AssociationLoader.for(ContentTag, :estimated_duration).load(content_tag).then do |estimated_duration|
+        estimated_duration&.duration&.iso8601
+      end
+    end
   end
 end
