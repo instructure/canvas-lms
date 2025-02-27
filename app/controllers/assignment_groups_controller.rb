@@ -325,6 +325,9 @@ class AssignmentGroupsController < ApplicationController
 
     assignments_by_group = assignments.group_by(&:assignment_group_id)
     preloaded_attachments = user_content_attachments(assignments, context)
+    
+    # Preload context_module_tags for all assignments to avoid N+1 queries in context_tag_id
+    ContentTag.preload_for_collection(assignments, :context_module_tags) unless assignments.empty?
 
     unless assignment_excludes.include?('in_closed_grading_period')
       closed_grading_period_hash =
