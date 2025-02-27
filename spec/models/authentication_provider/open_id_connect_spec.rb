@@ -21,7 +21,7 @@ require_relative "../../spec_helper"
 
 describe AuthenticationProvider::OpenIDConnect do
   subject do
-    described_class.new(account: Account.default)
+    described_class.new(account: Account.default, issuer: "issuer", client_id: "client", client_secret: "secret")
   end
 
   let(:keypair) { OpenSSL::PKey::RSA.new(2048) }
@@ -81,6 +81,7 @@ describe AuthenticationProvider::OpenIDConnect do
 
     it "ignores a (newly) blank issuer" do
       subject.issuer_will_change!
+      subject.issuer = nil
       expect(CanvasHttp).not_to receive(:get)
       subject.valid?
       expect(subject.issuer).to be_nil
@@ -185,19 +186,29 @@ describe AuthenticationProvider::OpenIDConnect do
   end
 
   describe "#unique_id" do
+    let(:nonce) { SecureRandom.hex(12) }
+
+    def id_token(claims)
+      claims = claims.reverse_merge(
+        iss: subject.issuer,
+        aud: subject.client_id,
+        iat: Time.zone.now.to_i,
+        exp: Time.zone.now.to_i + 5,
+        nonce:
+      )
+      jwt = JSON::JWT.new(claims)
+      jwt.sign(subject.client_secret).to_s
+    end
+
     it "decodes jwt and extracts subject attribute" do
-      payload = { sub: "some-login-attribute" }
-      id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      uid = subject.unique_id(double(params: { "id_token" => id_token }, options: {}))
+      uid = subject.unique_id(double(params: { "id_token" => id_token({ sub: "some-login-attribute" }) }, options: { nonce: }))
       expect(uid).to eq("some-login-attribute")
     end
 
     it "requests more attributes if necessary" do
       subject.userinfo_endpoint = "moar"
       subject.login_attribute = "not_in_id_token"
-      payload = { sub: "1" }
-      id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      token = double(options: {}, params: { "id_token" => id_token })
+      token = double(options: { nonce: }, params: { "id_token" => id_token({ sub: "1" }) })
       expect(token).to receive(:get).with("moar").and_return(double(parsed: { "not_in_id_token" => "myid", "sub" => "1" }))
       expect(subject.unique_id(token)).to eq "myid"
     end
@@ -205,9 +216,7 @@ describe AuthenticationProvider::OpenIDConnect do
     it "does not request more attributes if unnecessary, even if userinfo_endpoint is present" do
       subject.userinfo_endpoint = "moar"
       subject.login_attribute = "in_id_token"
-      payload = { sub: "1", in_id_token: "myid" }
-      id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      token = double(options: {}, params: { "id_token" => id_token })
+      token = double(options: { nonce: }, params: { "id_token" => id_token({ sub: "1", in_id_token: "myid" }) })
       expect(token).not_to receive(:get)
       expect(subject.unique_id(token)).to eq "myid"
     end
@@ -215,63 +224,21 @@ describe AuthenticationProvider::OpenIDConnect do
     it "ignores userinfo that doesn't match" do
       subject.userinfo_endpoint = "moar"
       subject.login_attribute = "not_in_id_token"
-      payload = { sub: "1" }
-      id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      token = double(options: {}, params: { "id_token" => id_token })
+      token = double(options: { nonce: }, params: { "id_token" => id_token({ sub: "1" }) })
       expect(token).to receive(:get).with("moar").and_return(double(parsed: { "not_in_id_token" => "myid", "sub" => "2" }))
       expect(subject.unique_id(token)).to be_nil
     end
 
     it "returns nil if the id_token is missing" do
-      uid = subject.unique_id(instance_double(OAuth2::AccessToken, params: { "id_token" => nil }, token: nil, options: {}))
-      expect(uid).to be_nil
+      expect do
+        subject.unique_id(instance_double(OAuth2::AccessToken, params: { "id_token" => nil }, token: nil, options: { nonce: }))
+      end.to raise_error(OAuthValidationError)
     end
 
-    it "validates the audience claim for subclasses" do
-      subject = AuthenticationProvider::Microsoft.new(client_id: "abc",
-                                                      client_secret: "secret",
-                                                      tenant: "microsoft",
-                                                      account: Account.default)
-      nonce = "123"
-      payload = { sub: "some-login-attribute",
-                  aud: "someone_else",
-                  iss: "microsoft",
-                  tid: AuthenticationProvider::Microsoft::MICROSOFT_TENANT,
-                  iat: Time.now.to_i,
-                  exp: Time.now.to_i + 1,
-                  nonce: }
-      id_token = Canvas::Security.create_jwt(payload, nil, subject.client_secret)
-      expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: })) }.to raise_error(OAuthValidationError)
-      subject.client_id = "someone_else"
-      expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: })) }.not_to raise_error
-    end
-
-    it "does not validate the audience claim for self" do
-      subject.client_id = "abc"
-      payload = { sub: "some-login-attribute", aud: "someone_else" }
-      id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      expect { subject.unique_id(double(params: { "id_token" => id_token }, options: {})) }.not_to raise_error
-    end
-
-    it "records the issuer(s)" do
-      subject.client_id = "abc"
-      payload = { sub: "some-login-attribute", aud: "abc", iss: "issuer" }
-      id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      subject.unique_id(double(params: { "id_token" => id_token }, options: {}))
-      expect(subject.settings["known_issuers"]).to eq ["issuer"]
-    end
-
-    context "with oidc_full_token_validation feature flag on" do
-      before do
-        Account.default.enable_feature!(:oidc_full_token_validation)
-        subject.issuer = "issuer"
-        subject.client_id = "abc"
-        subject.client_secret = "def"
-      end
-
+    describe "token validation" do
       base_payload = {
         sub: "some-login-attribute",
-        aud: "abc",
+        aud: "client",
         iat: Time.now.to_i,
         exp: Time.now.to_i + 30,
         iss: "issuer",
@@ -284,7 +251,7 @@ describe AuthenticationProvider::OpenIDConnect do
       end
 
       it "validates a multi-valued audience" do
-        id_token = Canvas::Security.create_jwt(base_payload.merge(aud: ["def", "abc"]), nil, subject.client_secret)
+        id_token = Canvas::Security.create_jwt(base_payload.merge(aud: ["def", "client"]), nil, subject.client_secret)
         expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
       end
 
@@ -425,6 +392,7 @@ describe AuthenticationProvider::OpenIDConnect do
     end
 
     it "updates if nothing changed, but was forced" do
+      subject.issuer = nil
       subject.jwks_uri = "http://jwks"
       subject.jwks = [jwk].to_json
 
