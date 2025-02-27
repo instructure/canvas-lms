@@ -211,7 +211,8 @@ class AbstractAssignment < ActiveRecord::Base
   validates :grader_count, numericality: true
   validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
   validates :sis_source_id, uniqueness: { scope: :root_account_id }, allow_nil: true
-  validates_with HorizonValidators::AssignmentValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
+
+  before_validation :convert_horizon_assignment, if: -> { context.is_a?(Course) && context.horizon_course? }
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true
@@ -256,6 +257,15 @@ class AbstractAssignment < ActiveRecord::Base
   # included to make it easier to work with api, which returns
   # sis_source_id as sis_assignment_id.
   alias_attribute :sis_assignment_id, :sis_source_id
+
+  def convert_horizon_assignment
+    self.peer_reviews = false
+    self.peer_review_count = 0
+    self.automatic_peer_reviews = false
+    self.group_category_id = nil
+    self.rubric_association = nil
+    self.submission_types = "online_text_entry" unless HORIZON_SUBMISSION_TYPES.include?(submission_types)
+  end
 
   def queue_conditional_release_grade_change_handler?
     shard.activate do
