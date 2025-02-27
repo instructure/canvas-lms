@@ -565,7 +565,7 @@ class ContextModuleItemsApiController < ApplicationController
   #
   def select_mastery_path
     return unless authorized_action(@context, @current_user, :read)
-    return unless @student == @current_user || authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
+    return unless @student == @current_user || authorized_action(@context, @current_user, :manage_assignments_edit)
     return render json: { message: "mastery paths not enabled" }, status: :bad_request unless cyoe_enabled?(@context)
     return render json: { message: "assignment_set_id required" }, status: :bad_request unless params[:assignment_set_id]
 
@@ -727,7 +727,7 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(original_tag.context_module, @current_user, :update)
       if original_tag.duplicate_able?
         new_content = original_tag.content.duplicate
-        new_content.save!
+        new_content.save! unless new_content.persisted?
         new_tag = original_tag.context_module.add_item({
                                                          type: original_tag.content_type,
                                                          indent: original_tag.indent,

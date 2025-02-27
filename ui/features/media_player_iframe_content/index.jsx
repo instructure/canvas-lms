@@ -23,7 +23,7 @@ import {createRoot} from 'react-dom/client'
 import {parse} from 'url'
 import ready from '@instructure/ready'
 import CanvasMediaPlayer from '@canvas/canvas-media-player'
-import StudioMediaPlayer from '@canvas/canvas-studio-player'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {captionLanguageForLocale} from '@instructure/canvas-media'
 
 const isStandalone = () => {
@@ -118,7 +118,7 @@ ready(() => {
   const aria_label = !media_object.title ? undefined : media_object.title
   if (window.ENV.FEATURES?.consolidated_media_player_iframe) {
     root.render(
-      <StudioMediaPlayer
+      <CanvasStudioPlayer
         media_id={media_id}
         media_sources={href_source || media_object.media_sources}
         media_tracks={mediaTracks}

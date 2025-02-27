@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
-require "lti_1_3_spec_helper"
 require_relative "lti/concerns/parent_frame_shared_examples"
 require_relative "../support/request_helper"
 
@@ -104,7 +102,7 @@ describe ExternalToolsController do
 
   describe "GET 'show'" do
     context "resource link request" do
-      include_context "lti_1_3_spec_helper"
+      include_context "key_storage_helper"
 
       let(:tool) do
         tool = @course.context_external_tools.new(
@@ -2072,7 +2070,7 @@ describe ExternalToolsController do
         ContextExternalTool.find_by(id: tool_id)
       end
 
-      include_context "lti_1_3_spec_helper"
+      include_context "key_storage_helper"
 
       let(:tool_id) { (response.status == 200) ? response.parsed_body["id"] : -1 }
       let_once(:tool_configuration) { lti_tool_configuration_model(developer_key: developer_key) }
@@ -2995,8 +2993,13 @@ describe ExternalToolsController do
     end
 
     context "with 1.3 tool" do
-      include_context "lti_1_3_spec_helper"
+      include_context "key_storage_helper"
 
+      let(:developer_key) do
+        lti_developer_key_model(account:).tap do |developer_key|
+          lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration)
+        end
+      end
       let(:tool) do
         t = developer_key.lti_registration.new_external_tool(@course)
         t.save!

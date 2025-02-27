@@ -122,8 +122,10 @@ uk:
     length_error: "Має бути 255 символів, чи менше"
     title: "Ім'я цієї групи"
   OutcomeView: 
+    display_name: "Дружнє  ім'я (необов'язково)"
     length_error: "Має бути 255 символів, чи менше"
     mastery_error: "Має бути більше або дорівнювати 0"
+    title: "Назва цього результату"
   OutcomesDirectoryView: 
     flash: 
       error: "Помилка. Будь ласка обновіть сторінку і спробуйте знову."
@@ -1817,6 +1819,7 @@ uk:
   add_icon_567dbcaa: "додати піктограму"
   add_link_5c01c1e8: "Додати посилання"
   add_link_fc336ed6: "Додати посилання"
+  add_login_f871148: "Додати логін"
   add_moderator_review_copy_1st_a484c813: "Додати відгук модератора (1-й примірник)"
   add_moderator_review_copy_2nd_e80d458f: "Додати відгук модератора (2-й примірник)"
   add_moderator_review_new_3c183cea: "Додати відгук модератора (Новий)"
@@ -4706,6 +4709,7 @@ uk:
       buttons: 
         add_prerequisite: "Додати умови"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: Хвилини
       headings: 
         add_prerequisite: "Додати умови до %{name}"
         course_modules: "Розділи курса"
@@ -6048,6 +6052,7 @@ uk:
   custom_6979cd81: Звичай
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Призначені для користувача CSS і Javascript може викликати проблеми доступності або конфлікти з майбутніми оновленнями Canvas!"
   custom_fields_fc3e55af: "Поля користувача"
+  custom_from_name_38a3d784: "Назва поля \"From\" , надана користувачем"
   custom_link_details_35fd38fc: "Подробиці посилання на замовлення "
   customize_74cdc895: Налаштувати
   customize_this_menu_efa72a9: "Налаштувати це меню"
@@ -6284,6 +6289,7 @@ uk:
   deep_purple_bb3e2907: Темно-фіолетовий
   default_9db103d: "За замовчуванням"
   default_account_quotas_e34112fd: "Квоти облікового запису за замовчуванням"
+  default_canvas_setting_fa6e6f81: "Налаштування Canvas по замовчуванню"
   default_conference_title: "%{course_name} конференція"
   default_email_5cb9fa04: "Електронна пошта за замовчуванням"
   default_email_9efb7fbd: "Електронна пошта за замовчуванням"
@@ -6348,6 +6354,7 @@ uk:
   deleted_ce03674d: видалено
   deleted_topic_notice: "Ця тема видалена"
   deleting_6421031e: видалення...
+  deleting_e2bd8cc9: Видалення...
   delicious_7f9ac66f: Смачний
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Демо-сайти вимагають налаштування параметрів Recaptcha. Будь ласка, зверніться до адміністратора сайту стосовно цього випадку Canvas."
   demos: 
@@ -6806,6 +6813,7 @@ uk:
   display_course_catalog: "Показати список курсів з можливістю пошуку в цьому кореневому обліковому записі з включеним прапорцем \"Включити цей курс до індексу публічного курсу\"."
   display_name_6c2cfc58: "Відображуване Ім'я:"
   display_name_b80c243e: "Відображуване Ім'я"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "Показати один раз спливаюче попередження на сторінці Налаштування сповіщень."
   display_totals_for_all_grading_periods_option_4a72586: "Показати результати для опції Всі періоди оціновання"
   district_id_6f408184: "Ідентифікатор району"
   divide_into_equal_slots_of_input_value_minutes_fca83452: "Розділити на рівні проміжки по  %{input_value}  хвилин. "
@@ -6967,6 +6975,7 @@ uk:
       find_existing_rubric: "Знайти існуючу рубрику"
   edit_rubric_7d4d139d: "Редагувати категорію"
   edit_section_name_558cc89: "Редагувати Розділ \"%{name}\""
+  edit_sections_7d0e4e34: "Редагувати розділи"
   edit_survey_b0d6890d: "Редагувати огляд"
   edit_term_name_29a8a322: "Редагувати термін %{name}"
   edit_text_27d8aa3d: "Редагувати %{text}"
@@ -7409,6 +7418,7 @@ uk:
   epub_exporting_f5592ff2: "Експорт Е-публікації"
   error_59293a2c: помилка
   error_98e81528: Помилка
+  error_afac7133: "Помилка:"
   error_deleting_name_reason_11f9d399: "Помилка видалення %{name}: %{reason}"
   error_duplicating_module_4b023042: "Помилка дублювання модуля"
   error_exporting_gradebook_msg_6ea31e2f: "Помилка експорту журналу: %{msg}"
@@ -8514,6 +8524,7 @@ uk:
       removed: "Набір груп успішно видалений."
     group_atom_feed: "Група Atom Feed"
     group_limit_number: "Обмеження групи повинне буди числом"
+    group_set_name_required: "Ім'я обов'язкове"
     groups_count: "Групи (%{count})"
     index: 
       heading_current_groups: "Поточні групи"
@@ -9321,6 +9332,7 @@ uk:
   learning_outcome_name_9cb475e6: "назва результата навчання "
   leave_5e852989: Залишити
   leave_a_comment_7991725b: "Залишити коментар"
+  leave_blank_for_no_limit_e8f80808: "Залишити порожнім для безліміту"
   leave_group_group_name_6847c632: "Залишити групу %{group_name}"
   left_group_group_name_aac4e813: "Залишено групу %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -9455,6 +9467,7 @@ uk:
   link_only_995966e: "Тільки посилання"
   link_selection_1486c5d0: "Вибір посилання"
   link_title_189888b7: "Заголовок посилання"
+  link_to_students_91edf7ea: "Посилання на студентів"
   link_url_a213671c: "URL посилання"
   link_url_cf96376: "Url посилання"
   linked_assignment_message: "Пов'язано з завданням '%{title}'"
@@ -11622,6 +11635,7 @@ uk:
   module_filter_63b17d11: "Фільтр Модуля"
   module_first_to_last_6921f3ec: "Модуль - від першого до останнього"
   module_in_progress_fa600662: "Модуль в процесі"
+  module_item_501fb0c3: "Елемент модуля"
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "Пункт модуля було завершено з найменшою оцінкою %{score}"
   module_item_has_been_viewed_and_is_complete_6d180117: "Пункт модуля переглянуто та завершено"
   module_item_is_locked_19fa60b4: "Елемент модуля заблоковано."
@@ -12246,6 +12260,7 @@ uk:
   notification_preferences_cf47083d: "Налаштування повідомлень"
   notifications_cbfa7704: Повідомлення
   notifications_search_results_80a0b06f: "Повідомлення про результати пошуку"
+  notifications_sent_to_external_services_c4a86b78: "Повідомлення надіслані зовнішнім сервісам"
   notify_users_this_quiz_has_changed_c5b05995: "Повідомляти користувачів, що цей тест був змінений"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Тепер, коли ваш курс налаштований і доступний, вам мабуть більше не знадобиться цей контрольний список. Проте, ми триматимемо його під рукою на випадок, якщо ви пізніше зрозумієте, що хочете спробувати щось нове, або просто потребуватимете трохи додакової допомоги для внесення змін до вмісту курсу. "
   number: 
@@ -13251,6 +13266,7 @@ uk:
   powerschool_a30f0bfc: "Потужна школа"
   practice_quiz_19a8505d: "Практичне завдання"
   pre_processing_92865c1d: "Попередня обробка"
+  preparing_download_percent_complete_34b48e4d: "Підготовка завантаження: %{percent} % завершено"
   prerequisites_49659f16: "Передумови:"
   prerequisites_98b324e0: Передумови
   prerequisites_lookup: 
@@ -13790,6 +13806,7 @@ uk:
   quiz_40ee61b1: "контрольна робота"
   quiz_e0dcce8f: "Контрольна робота"
   quiz_failed_to_update_2b66fa4d: "Не вдалося оновити контрольну роботу"
+  quiz_instructions_a36d09c9: "Інструкція до контрольної роботи"
   quiz_ip_address_filters_49a75ec8: "Контрольна робота з фільтрацією IP-адреси"
   quiz_log_auditing: 
     buttons: 
@@ -15041,6 +15058,7 @@ uk:
   recaptcha_not_configured_3a6ef9ee: "Recaptcha не налаштована"
   recent_activity_51239235: "Недавня активність"
   recent_announcements_8becc59c: "Останні оголошення"
+  recent_canvas_notifications_81395de6: "Останні повідомлення Canvas"
   recent_student: 
     last_logged_in: "Останній вхід %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt}Розкладений середній"
@@ -15154,6 +15172,7 @@ uk:
   remove_f47dc62a: Видалити
   remove_filename_87f3781e: "видалити %{filename}"
   remove_filter_68de01d4: "Видалити фільтр"
+  remove_from_course_6fb47aee: "Видалити з курсу"
   remove_icon_a4646413: "видалити значок"
   remove_image_341340b3: "Видалити зображення"
   remove_label_11d96b8f: "Видалити %{label}"
@@ -15188,6 +15207,7 @@ uk:
   reply_389d6fb9: Відповідь
   reply_all_80298bee: "Відповісти всім"
   reply_from_name: "%{name}через Canvas - повідомлення"
+  reply_to_9fa43ebe: Відповісти-на
   reply_to_comment_72d96728: "Відповісти на коментар"
   reply_to_current_message_55391f5b: "Відповісти на поточне повідомлення"
   reply_to_main_discussion_29823888: "Відповісти на головне обговорення"
@@ -15212,6 +15232,7 @@ uk:
   reregister_9ab95a57: "Зареєструватися заново "
   reregister_toolname_3dde0bfc: "Зареєструватися заново %{toolName}"
   reschedule_9f780bb8: Перепланувати
+  resend_invitation_486bd513: "Переслати запрошення"
   reserved_by_d563e7d2: "Зарезервовано:"
   reserved_by_you_cd03b62d: "Зарезервовано вами"
   reserved_f247b60b: Зарезервовано
@@ -15476,6 +15497,7 @@ uk:
   save_publish_36440725: "Зберегти та опублікувати"
   save_settings_cafe79a5: "Зберегти налаштування"
   save_skype_name_4de35a9: "Зберегти ім'я для скайпу"
+  save_successful_b2f64da4: "Успішно збережено"
   save_theme_f706116e: "Зберегти тему"
   save_this_comment_for_reuse_5eda0b70: "Зберегти коментарі для повторного використання"
   saving_associations_989bd4da: "Збереження асоціацій"
@@ -15614,6 +15636,7 @@ uk:
     all_courses_inner: 
       join_course: "Приєднатися до цього курсу"
       next: Наступний
+      no_courses_found: "Жодного курсу не знайдено"
       previous: Попередній
     course_sections: "Розділи курсу"
     enrollments_observers: Спостерігачі
@@ -15766,6 +15789,7 @@ uk:
   see_turnitin_results_cd9d4a6c: "Побачити Turnitin результати"
   see_vericite_results_b44dd8c8: "Побачити результати VeriCite "
   select_1e849959: "[ Обрати ]"
+  select_a_course_40bc3229: "Виберіть курс"
   select_a_grading_period_5ea50f1: "Обрати період оцінювання..."
   select_a_grading_period_aab25483: "Обрати період оцінювання"
   select_a_log_type_to_search_247fc6b4: "Виберіть тип входу для пошуку."
@@ -16675,6 +16699,7 @@ uk:
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Щось пішло не так. Будь ласка, спробуйте оновити сторінку. Якщо проблема не зникне, можливо забагато записів \"%{assignmentTitle}\" для завантаження SpeedGrader."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Щось пійшло не так при спробі повторно активувати користувача. Будь-ласка спробуйте пізніше."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Щось пійшло не так при спробі оновити роль користувача. Будь-ласка спробуйте пізніше."
+  something_went_wrong_updating_the_user_s_student_l_1047109c: "Щось пішло не так під час спроби оновлення користувацького посилання студента. Будь-ласка спробуйте пізніше."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Щось пійшло не так при спробі синхронізувати оцінки з SIS. Будь-ласка спробуйте пізніше."
   something_went_wrong_while_deactivating_the_user_p_8ff3e261: "Щось пійшло не так при спробі деактивувати користувача. Будь-ласка спробуйте пізніше."
   sort_40afa70: "Сортувати:"
@@ -18086,6 +18111,7 @@ uk:
   update_details_6abfed16: "Оновити детальну інформацію"
   update_grade_b47eb3ff: "Оновити оцінку"
   update_link_b7cab181: "Оновити посилання"
+  update_login_472cd6db: "Оновити логін"
   update_module_b984c2e5: "Оновити модуль"
   update_password_4bc5cb1f: "Оновити пароль"
   update_quota_81381226: "Оновити квоту"
@@ -18585,6 +18611,7 @@ uk:
   validate_links_in_content_b1630fba: "Перевірка посилань у вмісті"
   validation_error_3b943100: "Помилка перевірки"
   value_d842f16d: Значення
+  value_must_be_a_whole_number_23c79120: "Обмеження групи повинне буди числом"
   value_must_be_positive_3e086d5a: "Значення має бути позитивним"
   vanity_url_76f93382: "URL марнославства"
   vendor_code_lti_2_ef36207b: "Код постачальника (LTI 2):"
@@ -18716,6 +18743,7 @@ uk:
   what_should_the_csv_file_look_like_985a59ac: "Як має виглядати файл CSV?"
   what_would_you_like_to_do_next_2835397e: "Що б ви хотіли робити далі?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Під час додавання декількох користувачів використовуйте коми або перехід на наступний рядок для відділення користувачів."
+  when_an_observer_is_linked_to_a_student_they_have__489e2b71: "Коли спостерігач пов'язаний зі студентом, вони мають доступ до оцінок цього студента і курсу взаємодій."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Це сторінка, яку побачать люди, коли відвідуватимуть цей курс. Ви можете налаштувати її для показу потоку активності, списку модулів курсу, навчального плану або власної сторінки, яку ви самі створюєте. За замовчуванням - це потік активності курсу."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       Це перша сторінка, яку побачать люди, коли відвідуватимуть ваш курс.

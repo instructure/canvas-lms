@@ -23,6 +23,6 @@
       "@instructure/*": ["../packages/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "types/**/*"],
   "exclude": ["**/node_modules", "**/.*/", "**/__tests__/*", "**/__mocks__/*"]
 }

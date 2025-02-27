@@ -330,7 +330,12 @@ class AuthenticationProvider
 
     def download_discovery
       discovery_url = self.discovery_url
+
+      # was the Discovery URL changed?
       download = discovery_url.present? && discovery_url_changed?
+
+      # was the authentication provider restored?
+      download ||= self.class.restorable? && active? && workflow_state_changed?
 
       # infer the discovery url from the issuer if possible
       if discovery_url.blank? && issuer_changed? && issuer.present?

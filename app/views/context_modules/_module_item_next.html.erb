@@ -72,7 +72,7 @@
     <%= 'dupeable' if module_item&.duplicate_able? %>
   "
 >
-  <div class="ig-row <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' if @is_student %>">
+  <div class="ig-row <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' if @is_student %> no-estimated-duration">
     <% if @can_edit || module_item.nil? %>
     <div aria-hidden="true" class="ig-handle">
       <span
@@ -142,6 +142,8 @@
           <span class="position" style="display: none;"><%= module_item && module_item.position %></span>
           <span class="url" style="display: none;"><%= module_item.try(:url) if @can_view %></span>
           <span class="new_tab" style="display: none;"><%= module_item.try(:new_tab) ? '1' : '0' if @can_view %></span>
+          <span class="estimated_duration_minutes" style="display: none;"></span>
+          <span class="can_set_estimated_duration" style="display: none;"></span>
         </span>
       </div>
 
@@ -149,6 +151,7 @@
         <!-- dead code? -->
         <span class="criterion <%= 'defined' if criterion %>">
           <span class="min_score" style="display: none;"><%= (criterion && criterion[:min_score]) || nbsp %></span>
+          <span class="min_percentage" style="display: none;"><%= (criterion && criterion[:min_percentage]) || nbsp %></span>
           <span class="criterion_type" style="display: none;"><%= (criterion && criterion[:type]) || nbsp %></span>
         </span>
         <!-- /dead code -->
@@ -164,7 +167,7 @@
         <%end%>
         <div class="due_date_display ig-details__item"></div>
         <% if module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true))%>
-            <div class="points_possible_display ig-details__item"></div>
+          <div class="points_possible_display ig-details__item"></div>
         <%end%>
         <div class="requirement-description ig-details__item">
           <span class="completion_requirement">
@@ -177,6 +180,17 @@
               <span class="fulfilled">
                 <%= t 'min_score.fulfilled', 'Scored at least %{score}', :score => score_display %>
                 <span class="screenreader-only"><%= t 'Module item has been completed by scoring at least %{score}', :score => score_display %></span>
+              </span>
+            </span>
+            <span class="requirement_type min_percentage_requirement">
+              <% percentage_display = content_tag(:span, criterion && criterion[:min_percentage] || nbsp, class: 'min_percentage') %>
+              <span class="unfulfilled">
+                <%= t 'min_percentage.unfulfilled', 'Score at least %{score}%', :score => percentage_display %>
+                <span class="screenreader-only"><%= t 'Must score at least %{score}% to complete this module item', :score => percentage_display %></span>
+              </span>
+              <span class="fulfilled">
+                <%= t 'min_percentage.fulfilled', 'Scored at least %{score}%', :score => percentage_display %>
+                <span class="screenreader-only"><%= t 'Module item has been completed by scoring at least %{score}%', :score => percentage_display %></span>
               </span>
             </span>
             <span class="requirement_type must_view_requirement">
@@ -221,6 +235,7 @@
             </span>
           </span>
         </div> <!-- requirement description end -->
+        <div class="estimated_duration_display ig-details__item"></div>
         <div class="mc_objectives ig-details__item"></div>
       </div>
       <% if module_item && module_item.content_type == 'ContextModuleSubHeader' %>
@@ -357,7 +372,9 @@
                 <% end %>
               <% end %>
               <% if @can_delete || module_item.nil? %>
-                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
+                <% unless @context.horizon_course? && module_item && module_item.published? %>
+                  <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
+                <% end %>
               <% end %>
             </ul>
           <% else %>

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {jest} from '@jest/globals'
 import * as actions from '../files'
 import {spiedStore} from './utils'
 
@@ -190,7 +189,7 @@ describe('Sidebar files actions', () => {
           expect.objectContaining({
             id,
             type: actions.REQUEST_FILES,
-          })
+          }),
         )
       })
 
@@ -223,7 +222,7 @@ describe('Sidebar files actions', () => {
           expect.objectContaining({
             type: actions.RECEIVE_FILES,
             id,
-          })
+          }),
         )
       })
 
@@ -244,7 +243,7 @@ describe('Sidebar files actions', () => {
           expect.objectContaining({
             id,
             type: actions.REQUEST_SUBFOLDERS,
-          })
+          }),
         )
       })
 
@@ -277,7 +276,7 @@ describe('Sidebar files actions', () => {
           expect.objectContaining({
             type: actions.RECEIVE_SUBFOLDERS,
             id,
-          })
+          }),
         )
       })
 
@@ -298,7 +297,7 @@ describe('Sidebar files actions', () => {
           expect.objectContaining({
             id,
             type: actions.TOGGLE,
-          })
+          }),
         )
       })
 
@@ -310,13 +309,13 @@ describe('Sidebar files actions', () => {
           expect.objectContaining({
             id,
             type: actions.REQUEST_FILES,
-          })
+          }),
         )
         expect(store.spy).toHaveBeenCalledWith(
           expect.objectContaining({
             id,
             type: actions.REQUEST_SUBFOLDERS,
-          })
+          }),
         )
       })
 
@@ -328,13 +327,13 @@ describe('Sidebar files actions', () => {
           expect.objectContaining({
             id,
             type: actions.REQUEST_FILES,
-          })
+          }),
         )
         expect(store.spy).not.toHaveBeenCalledWith(
           expect.objectContaining({
             id,
             type: actions.REQUEST_FOLDERS,
-          })
+          }),
         )
       })
     })
@@ -358,7 +357,7 @@ describe('Sidebar files actions', () => {
           expect.objectContaining({
             id,
             type: actions.SET_ROOT,
-          })
+          }),
         )
       })
 
@@ -371,7 +370,7 @@ describe('Sidebar files actions', () => {
           expect.objectContaining({
             id,
             type: actions.ADD_FOLDER,
-          })
+          }),
         )
       })
 
@@ -384,7 +383,7 @@ describe('Sidebar files actions', () => {
           expect.objectContaining({
             id,
             type: actions.TOGGLE,
-          })
+          }),
         )
       })
     })

@@ -376,6 +376,13 @@ input[type="button"] {
   &:focus { @include button-focus-dark; }
 }
 
+// Same as .Button--icon-action, but in danger color
+.Button--icon-action-danger {
+  @extend .Button--icon-action;
+  color: $ic-color-danger;
+  &:hover, &:focus { color: $ic-color-danger; }
+}
+
 
 .ui-button {
   position: relative;

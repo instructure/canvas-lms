@@ -73,6 +73,7 @@ class AssignmentsController < ApplicationController
         assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
         hash = {
           ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+          CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
           WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
           POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
           SIS_INTEGRATION_SETTINGS_ENABLED: sis_integration_settings_enabled,
@@ -276,6 +277,8 @@ class AssignmentsController < ApplicationController
           return
         end
 
+        flash.now[:notice] = t("assignment_submit_success", "Assignment successfully submitted.") if params[:submitted]
+
         # override media comment context: in the show action, these will be submissions
         js_env media_comment_asset_string: @current_user.asset_string if @current_user
 
@@ -350,7 +353,8 @@ class AssignmentsController < ApplicationController
                        VALID_DATE_RANGE: CourseDateRange.new(@context),
                        POST_TO_SIS: Assignment.sis_grade_export_enabled?(@context),
                        DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
-                       ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags
+                       ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+                       CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
                      })
         set_section_list_js_env
         submission = @assignment.submissions.find_by(user: @current_user)
@@ -448,10 +452,7 @@ class AssignmentsController < ApplicationController
                             []
                           end
 
-        context_rights = @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments, :manage_assignments_edit)
-        if @context.root_account.feature_enabled?(:granular_permissions_manage_assignments)
-          context_rights[:manage_assignments] = context_rights[:manage_assignments_edit]
-        end
+        context_rights = @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments_edit)
         permissions = {
           context: context_rights,
           assignment: @assignment.rights_status(@current_user, session, :update, :submit),
@@ -485,7 +486,7 @@ class AssignmentsController < ApplicationController
           assigned_rubric:,
           rubric_association:,
           rubric_self_assessment_ff_enabled: Rubric.rubric_self_assessment_enabled?(@context),
-          rubric_self_assessment_enabled: @assignment.rubric_self_assessment_enabled,
+          rubric_self_assessment_enabled: @assignment.rubric_self_assessment_enabled?,
           can_update_rubric_self_assessment: @assignment.can_update_rubric_self_assessment?,
         }
 
@@ -708,7 +709,7 @@ class AssignmentsController < ApplicationController
       end
     )
     can_see_admin_tools = @context.grants_any_right?(
-      @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+      @current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
     )
     @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
       @context,
@@ -872,6 +873,7 @@ class AssignmentsController < ApplicationController
         ROOT_FOLDER_ID: Folder.root_folders(@context).first&.id,
         ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
         ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+        CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
         ASSIGNMENT_GROUPS: json_for_assignment_groups,
         ASSIGNMENT_INDEX_URL: polymorphic_url([@context, :assignments]),
         ASSIGNMENT_OVERRIDES: assignment_overrides_json(
@@ -1030,7 +1032,7 @@ class AssignmentsController < ApplicationController
 
   # pulish a N.Q assignment from Quizzes Page
   def publish_quizzes
-    if authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
+    if authorized_action(@context, @current_user, :manage_assignments_edit)
       @assignments = @context.assignments.active.where(id: params[:quizzes])
       @assignments.each(&:publish!)
 
@@ -1048,7 +1050,7 @@ class AssignmentsController < ApplicationController
 
   # unpulish a N.Q assignment from Quizzes Page
   def unpublish_quizzes
-    if authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
+    if authorized_action(@context, @current_user, :manage_assignments_edit)
       @assignments = @context.assignments.active.where(id: params[:quizzes], workflow_state: "published")
       @assignments.each(&:unpublish!)
 

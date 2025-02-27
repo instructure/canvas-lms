@@ -19,77 +19,74 @@
 
 describe QuestionBanksController do
   describe "#show" do
-    context "granular permissions" do
-      before do
-        course_with_teacher_logged_in
-        @bank = @course.assessment_question_banks.create!
-        @course.root_account.enable_feature!(:granular_permissions_manage_assignments)
-      end
+    before do
+      course_with_teacher_logged_in
+      @bank = @course.assessment_question_banks.create!
+    end
 
-      it "renders all links" do
-        get "/courses/#{@course.id}/question_banks/#{@bank.id}"
+    it "renders all links" do
+      get "/courses/#{@course.id}/question_banks/#{@bank.id}"
 
-        expect(response.body).to include("Add a Question")
-        expect(response.body).to include("Edit Bank Details")
-        expect(response.body).to include("Delete Bank")
-      end
+      expect(response.body).to include("Add a Question")
+      expect(response.body).to include("Edit Bank Details")
+      expect(response.body).to include("Delete Bank")
+    end
 
-      it "only renders add-appropriate links" do
-        @course.root_account.role_overrides.create!(
-          role: Role.find_by(name: "TeacherEnrollment"),
-          permission: "manage_assignments_edit",
-          enabled: false
-        )
-        @course.root_account.role_overrides.create!(
-          role: Role.find_by(name: "TeacherEnrollment"),
-          permission: "manage_assignments_delete",
-          enabled: false
-        )
+    it "only renders add-appropriate links" do
+      @course.root_account.role_overrides.create!(
+        role: Role.find_by(name: "TeacherEnrollment"),
+        permission: "manage_assignments_edit",
+        enabled: false
+      )
+      @course.root_account.role_overrides.create!(
+        role: Role.find_by(name: "TeacherEnrollment"),
+        permission: "manage_assignments_delete",
+        enabled: false
+      )
 
-        get "/courses/#{@course.id}/question_banks/#{@bank.id}"
+      get "/courses/#{@course.id}/question_banks/#{@bank.id}"
 
-        expect(response.body).to include("Add a Question")
-        expect(response.body).not_to include("Edit Bank Details")
-        expect(response.body).not_to include("Delete Bank")
-      end
+      expect(response.body).to include("Add a Question")
+      expect(response.body).not_to include("Edit Bank Details")
+      expect(response.body).not_to include("Delete Bank")
+    end
 
-      it "only renders edit-appropriate links" do
-        @course.root_account.role_overrides.create!(
-          role: Role.find_by(name: "TeacherEnrollment"),
-          permission: "manage_assignments_add",
-          enabled: false
-        )
-        @course.root_account.role_overrides.create!(
-          role: Role.find_by(name: "TeacherEnrollment"),
-          permission: "manage_assignments_delete",
-          enabled: false
-        )
+    it "only renders edit-appropriate links" do
+      @course.root_account.role_overrides.create!(
+        role: Role.find_by(name: "TeacherEnrollment"),
+        permission: "manage_assignments_add",
+        enabled: false
+      )
+      @course.root_account.role_overrides.create!(
+        role: Role.find_by(name: "TeacherEnrollment"),
+        permission: "manage_assignments_delete",
+        enabled: false
+      )
 
-        get "/courses/#{@course.id}/question_banks/#{@bank.id}"
+      get "/courses/#{@course.id}/question_banks/#{@bank.id}"
 
-        expect(response.body).to include("Add a Question")
-        expect(response.body).to include("Edit Bank Details")
-        expect(response.body).not_to include("Delete Bank")
-      end
+      expect(response.body).to include("Add a Question")
+      expect(response.body).to include("Edit Bank Details")
+      expect(response.body).not_to include("Delete Bank")
+    end
 
-      it "only renders delete-appropriate links" do
-        @course.root_account.role_overrides.create!(
-          role: Role.find_by(name: "TeacherEnrollment"),
-          permission: "manage_assignments_add",
-          enabled: false
-        )
-        @course.root_account.role_overrides.create!(
-          role: Role.find_by(name: "TeacherEnrollment"),
-          permission: "manage_assignments_edit",
-          enabled: false
-        )
+    it "only renders delete-appropriate links" do
+      @course.root_account.role_overrides.create!(
+        role: Role.find_by(name: "TeacherEnrollment"),
+        permission: "manage_assignments_add",
+        enabled: false
+      )
+      @course.root_account.role_overrides.create!(
+        role: Role.find_by(name: "TeacherEnrollment"),
+        permission: "manage_assignments_edit",
+        enabled: false
+      )
 
-        get "/courses/#{@course.id}/question_banks/#{@bank.id}"
+      get "/courses/#{@course.id}/question_banks/#{@bank.id}"
 
-        expect(response.body).not_to include("Add a Question")
-        expect(response.body).not_to include("Edit Bank Details")
-        expect(response.body).to include("Delete Bank")
-      end
+      expect(response.body).not_to include("Add a Question")
+      expect(response.body).not_to include("Edit Bank Details")
+      expect(response.body).to include("Delete Bank")
     end
   end
 end

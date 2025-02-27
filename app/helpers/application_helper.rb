@@ -26,7 +26,7 @@ module ApplicationHelper
   include Canvas::LockExplanation
   include DatadogRumHelper
   include NewQuizzesFeaturesHelper
-  include HeapHelper
+  include UsageMetricsHelper
 
   BYTE_UNITS = %w[B KB MB GB TB PB EB ZB YB].freeze
 

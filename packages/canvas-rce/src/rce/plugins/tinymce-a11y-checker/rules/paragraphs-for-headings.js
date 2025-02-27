@@ -66,7 +66,7 @@ export default {
 
   why: () =>
     formatMessage(
-      'Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should be concise within the proper structure.'
+      'Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should be concise within the proper structure.',
     ),
 
   link: '',

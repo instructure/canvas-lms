@@ -61,7 +61,7 @@ module Api::V1::Quiz
     preloaded_attachments = api_bulk_load_user_content_attachments(quizzes.map(&:description), context)
     DatesOverridable.preload_override_data_for_objects(quizzes)
     options[:description_formatter] = description_formatter(context, user, preloaded_attachments)
-    if context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+    if context.grants_right?(user, session, :manage_assignments_edit)
       options[:master_course_status] = setup_master_course_restrictions(quizzes, context)
     end
 
@@ -118,7 +118,7 @@ module Api::V1::Quiz
   def add_meta_permissions!(meta)
     meta[:permissions] ||= {}
     meta[:permissions][:quizzes] = {
-      create: context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_add)
+      create: context.grants_right?(@current_user, session, :manage_assignments_add)
     }
   end
 

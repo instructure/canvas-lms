@@ -100,13 +100,12 @@ module Login::Shared
       if (oauth = session[:oauth2])
         # redirect to external OAuth provider
         provider = Canvas::OAuth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
-        return redirect_to Canvas::OAuth::Provider.confirmation_redirect(self, provider, user)
+        redirect_target = Canvas::OAuth::Provider.confirmation_redirect(self, provider, user)
 
       elsif session[:course_uuid] && user && (course = Course.where(uuid: session[:course_uuid], workflow_state: "created").first)
         # redirect to course if session includes valid course UUID
         claim_session_course(course, user)
         redirect_target = course_url(course, login_success: "1")
-        format.html { redirect_to redirect_target }
 
       elsif session[:confirm]
         # redirect to registration confirmation
@@ -114,7 +113,6 @@ module Login::Shared
                                                          enrollment: session.delete(:enrollment),
                                                          login_success: 1,
                                                          confirm: ((user.id == session.delete(:expected_user_id)) ? 1 : nil))
-        format.html { redirect_to redirect_target }
 
       else
         # the URL to redirect back to is stored in the session, so it's
@@ -122,9 +120,9 @@ module Login::Shared
         # they must have cookies enabled and we don't need to worry about
         # adding the :login_success param to it.
         redirect_target = delegated_auth_redirect_uri(redirect_back_or_default(dashboard_url(login_success: "1")))
-        format.html { redirect_to redirect_target }
       end
 
+      format.html { redirect_to redirect_target }
       format.json { render json: pseudonym.as_json(methods: :user_code).merge(location: redirect_target), status: :ok }
     end
   end

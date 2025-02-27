@@ -19,89 +19,20 @@
 
 module Lti
   class ToolConfiguration < ActiveRecord::Base
-    CANVAS_EXTENSION_LABEL = "canvas.instructure.com"
-    DEFAULT_PRIVACY_LEVEL = "anonymous"
+    self.ignored_columns += ["settings"]
 
     belongs_to :developer_key
     belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :manual_configuration, optional: true
 
-    before_validation :normalize_configuration
-    before_validation :transform_updated_settings
     before_validation :set_redirect_uris
-    before_save :update_privacy_level_from_extensions
-
+    before_validation :remove_placements_from_launch_settings
     after_update :update_external_tools!, if: :configuration_changed?
-
     after_commit :update_unified_tool_id, if: :update_unified_tool_id?
 
     validates :developer_key_id, uniqueness: true, presence: true
     validate :validate_configuration
     validate :validate_placements
     validate :validate_oidc_initiation_urls
-
-    def settings
-      return self[:settings] unless transformed?
-
-      Schemas::LtiConfiguration.from_internal_lti_configuration(internal_lti_configuration).with_indifferent_access
-    end
-
-    def configuration
-      settings
-    end
-
-    def transform!
-      return if transformed?
-
-      transform_settings
-      self.redirect_uris = developer_key.redirect_uris.presence || [target_link_uri]
-
-      ToolConfiguration.suspend_callbacks(:update_external_tools!, :update_unified_tool_id) do
-        save!(validate: false)
-      end
-    end
-
-    def untransform!
-      return unless transformed?
-
-      self[:settings] = settings
-      internal_lti_configuration.except(:privacy_level).each_key do |key|
-        self[key] = if %i[oidc_initiation_urls custom_fields launch_settings].include?(key)
-                      {}
-                    elsif %i[placements scopes redirect_uris].include?(key)
-                      []
-                    else
-                      nil
-                    end
-      end
-
-      @transformed = false
-      ToolConfiguration.suspend_callbacks(:update_external_tools!, :update_unified_tool_id) do
-        save!(validate: false)
-      end
-    end
-
-    def transformed?
-      @transformed ||= self[:target_link_uri].present?
-    end
-
-    def transform_settings
-      internal_config = Schemas::InternalLtiConfiguration.from_lti_configuration(self[:settings]).except(:vendor_extensions)
-
-      allowed_keys = internal_config.keys & Schemas::InternalLtiConfiguration.allowed_base_properties
-      allowed_keys.each do |key|
-        self[key] = internal_config[key]
-      end
-
-      self[:settings] = {}
-      @transformed = true
-    end
-
-    def transform_updated_settings
-      return unless transformed?
-      return if self[:settings].blank?
-
-      transform_settings
-    end
 
     def self.create_tool_config_and_key!(account, tool_configuration_params, redirect_uris = nil)
       settings = if tool_configuration_params[:settings_url].present? && tool_configuration_params[:settings].blank?
@@ -144,43 +75,9 @@ module Lti
           scopes: internal_config[:scopes],
           redirect_uris:,
           launch_settings: internal_config[:launch_settings] || {},
-          placements: internal_config[:placements] || {},
-          settings: {}
+          placements: internal_config[:placements] || {}
         )
       end
-    end
-
-    def extension_privacy_level
-      canvas_extensions["privacy_level"]
-    end
-
-    # temporary measure since the actual privacy_level column is not fully backfilled
-    # remove with INTEROP-8055
-    def privacy_level
-      self[:privacy_level] || extension_privacy_level
-    end
-
-    def update_privacy_level_from_extensions
-      return if transformed?
-
-      ext_privacy_level = extension_privacy_level
-      if (self[:privacy_level].nil? || settings_changed?) && self[:privacy_level] != ext_privacy_level && ext_privacy_level.present?
-        self[:privacy_level] = ext_privacy_level
-      end
-    end
-
-    def placements
-      return self[:placements] if transformed?
-      return [] if configuration.blank?
-
-      configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.dig("settings", "placements")&.deep_dup || []
-    end
-
-    def domain
-      return self[:domain] if transformed?
-      return "" if configuration.blank?
-
-      configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.dig("domain") || ""
     end
 
     # @return [String | nil] A warning message about any disallowed placements
@@ -220,18 +117,12 @@ module Lti
 
     # @returns InternalLtiConfiguration
     def internal_lti_configuration
-      unless transformed?
-        internal_config = Schemas::InternalLtiConfiguration.from_lti_configuration(configuration)
-
-        return internal_config
-      end
-
       {
         title:,
         description:,
-        domain: self[:domain],
+        domain:,
         tool_id:,
-        privacy_level: self[:privacy_level],
+        privacy_level:,
         target_link_uri:,
         oidc_initiation_url:,
         oidc_initiation_urls:,
@@ -241,7 +132,7 @@ module Lti
         scopes:,
         redirect_uris:,
         launch_settings:,
-        placements: self[:placements],
+        placements:,
       }
     end
 
@@ -271,35 +162,32 @@ module Lti
     end
 
     def set_redirect_uris
-      return unless transformed?
       return if redirect_uris.present?
 
       self.redirect_uris = [target_link_uri]
     end
 
-    def validate_configuration
-      return if configuration.blank?
+    def remove_placements_from_launch_settings
+      launch_settings.delete_if { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
+    end
 
-      if configuration["public_jwk"].blank? && configuration["public_jwk_url"].blank?
+    def validate_configuration
+      if public_jwk.blank? && public_jwk_url.blank?
         errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
       end
-      if configuration["public_jwk"].present?
+      if public_jwk.present?
         if Account.site_admin.feature_enabled?(:lti_report_multiple_schema_validation_errors)
-          jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_errors(configuration["public_jwk"])
+          jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_errors(public_jwk)
           jwk_schema_errors&.each { |err| errors.add(:configuration, err) }
         else
-          jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_first_error(configuration["public_jwk"])
+          jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_first_error(public_jwk)
           errors.add(:configuration, jwk_schema_errors) if jwk_schema_errors.present?
         end
       end
 
-      schema_errors = if transformed?
-                        Schemas::InternalLtiConfiguration.simple_validation_errors(internal_lti_configuration.compact)
-                      else
-                        Schemas::LtiConfiguration.simple_validation_errors(configuration.compact)
-                      end
-
+      schema_errors = Schemas::InternalLtiConfiguration.simple_validation_errors(internal_lti_configuration.compact)
       errors.add(:configuration, schema_errors) if schema_errors.present?
+
       false if errors[:configuration].present?
     end
 
@@ -317,10 +205,9 @@ module Lti
     end
 
     def validate_oidc_initiation_urls
-      urls_hash = configuration&.dig("oidc_initiation_urls")
-      return unless urls_hash.is_a?(Hash)
+      return unless oidc_initiation_urls.is_a?(Hash)
 
-      urls_hash.each_value do |url|
+      oidc_initiation_urls.each_value do |url|
         if url.is_a?(String)
           CanvasHttp.validate_url(url, allowed_schemes: nil)
         else
@@ -331,52 +218,25 @@ module Lti
       errors.add(:configuration, "oidc_initiation_urls must be valid urls")
     end
 
-    def canvas_extensions
-      return {} if configuration.blank?
-
-      extension = configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.deep_dup || { "settings" => {} }
-      # remove any placements at the root level
-      extension["settings"].delete_if { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
-      # ensure we only have enabled placements being added
-      extension["settings"].fetch("placements", []).delete_if { |placement| disabled_placements&.include?(placement["placement"]) }
-      # read valid placements to root settings hash
-      extension["settings"].fetch("placements", []).each do |p|
-        extension["settings"][p["placement"]] = p
-      end
-      extension
-    end
-
-    def normalize_configuration
-      self.settings = JSON.parse(configuration) if configuration.is_a? String
-      self.settings ||= {}
-    rescue JSON::ParserError
-      errors.add(:configuration, "Invalid JSON")
-      self.settings = {}
-      false
-    end
-
     def update_unified_tool_id
-      unified_tool_id = LearnPlatform::GlobalApi.get_unified_tool_id(**params_for_unified_tool_id)
+      params = {
+        lti_name: title,
+        lti_tool_id: tool_id,
+        lti_domain: domain,
+        lti_version: "1.3",
+        lti_url: target_link_uri,
+      }
+      unified_tool_id = LearnPlatform::GlobalApi.get_unified_tool_id(**params)
       update_column(:unified_tool_id, unified_tool_id) if unified_tool_id
     end
     handle_asynchronously :update_unified_tool_id, priority: Delayed::LOW_PRIORITY
 
-    def params_for_unified_tool_id
-      {
-        lti_name: settings["title"],
-        lti_tool_id: canvas_extensions["tool_id"],
-        lti_domain: canvas_extensions["domain"],
-        lti_version: "1.3",
-        lti_url: settings["target_link_uri"],
-      }
-    end
-
     def update_unified_tool_id?
-      saved_changes.keys.intersect?(%w[title tool_id domain target_link_uri]) || saved_change_to_settings?
+      saved_changes.keys.intersect?(%w[title tool_id domain target_link_uri])
     end
 
     def configuration_changed?
-      saved_changes.keys.intersect?(internal_lti_configuration.keys.map(&:to_s)) || saved_change_to_settings?
+      saved_changes.keys.intersect?(internal_lti_configuration.keys.map(&:to_s))
     end
   end
 end

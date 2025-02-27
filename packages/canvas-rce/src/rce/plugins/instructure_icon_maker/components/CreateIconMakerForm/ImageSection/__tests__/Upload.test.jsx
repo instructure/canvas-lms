@@ -59,7 +59,7 @@ describe('Upload()', () => {
 
   it('renders an upload modal', async () => {
     const {getAllByText} = subject(props)
-    await waitFor(() => expect(getAllByText('Upload Image').length).toBe(2))
+    await waitFor(() => expect(getAllByText('Upload Image')).toHaveLength(2))
   })
 
   describe('when the "Close" button is pressed', () => {
@@ -94,7 +94,7 @@ describe('Upload()', () => {
         {},
         {
           theFile,
-        }
+        },
       )
 
     afterEach(() => jest.clearAllMocks())
@@ -172,7 +172,7 @@ describe('Upload()', () => {
         {},
         {
           theFile,
-        }
+        },
       )
 
     const flushPromises = () => new Promise(setTimeout)

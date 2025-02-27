@@ -171,6 +171,29 @@ describe "course sections" do
     end
   end
 
+  context "cross-list sections" do
+    it "shows error if user inputs an invalid course id" do
+      get "/courses/#{@course.id}/sections/#{@section.id}"
+      f(".crosslist_link").click
+      cl_form = f("#crosslist_course_form")
+      replace_content(cl_form.find_element(:id, "course_id"), 99_999)
+      submit_form(cl_form)
+      wait_for_ajaximations
+
+      expect(f("#course_id_errors")).to include_text('Course ID "99999" not authorized for cross-listing')
+    end
+
+    it "shows error if user tries to submit without any values" do
+      get "/courses/#{@course.id}/sections/#{@section.id}"
+      f(".crosslist_link").click
+      cl_form = f("#crosslist_course_form")
+      submit_form(cl_form)
+      wait_for_ajaximations
+
+      expect(f("#course_autocomplete_id_lookup_errors")).to include_text("Not a valid course name")
+    end
+  end
+
   context "student tray" do
     before do
       @account = Account.default

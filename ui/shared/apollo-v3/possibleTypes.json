@@ -34,7 +34,6 @@
     "DiscussionEntry",
     "DiscussionEntryDraft",
     "DiscussionEntryVersion",
-    "Enrollment",
     "ExternalTool",
     "ExternalUrl",
     "File",

@@ -1005,8 +1005,28 @@ class ContentMigration < ActiveRecord::Base
     html_converter.convert(*, **keyword_args)
   end
 
+  def convert_single_link(single_link, link_type: false)
+    return html_converter.convert_single_link(single_link, link_type:) unless single_link.include?("/block_editor/templates/") || single_link.blank?
+
+    single_link
+  end
+
   def convert_text(text)
     format_message(text || "")[0]
+  end
+
+  def convert_block(block, context, migration_id)
+    if block["type"]["resolvedName"] == "MediaBlock" && (url = block["props"]["src"])
+      block["props"]["src"] = convert_single_link(url, link_type: :media_object)
+    elsif block["type"]["resolvedName"] == "ImageBlock" && (url = block["props"]["src"])
+      block["props"]["src"] = convert_single_link(url)
+    elsif block["type"]["resolvedName"] == "RCETextBlock" && (html = block["props"]["text"])
+      block["props"]["text"] = convert_html(html, context, migration_id, :block_editor_text)
+    end
+  end
+
+  def convert_block_editor_blocks(blocks_json, migration_id, context)
+    blocks_json.each_value { |block| convert_block(block, context, migration_id) }
   end
 
   delegate :resolve_content_links!, to: :html_converter

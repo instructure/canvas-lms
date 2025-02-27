@@ -128,6 +128,15 @@ export interface Progress {
   readonly context_id: string
 }
 
+export interface CourseReport {
+  readonly id?: string
+  readonly report_type: string
+  readonly course_id: string
+  readonly file_url?: string
+  readonly parameters?: any
+  readonly status?: string
+}
+
 /* Redux state types */
 
 export type EnrollmentsState = Enrollments

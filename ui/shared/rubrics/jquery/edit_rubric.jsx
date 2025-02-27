@@ -984,10 +984,14 @@ rubricEditing.init = function () {
         .val(),
       description = $rubric_long_description_dialog.find('textarea.description').val(),
       $criterion = $rubric_long_description_dialog.data('current_criterion')
-    const valid = $rubric_long_description_dialog.validateForm({
-      required: ['description'],
-      labels: {description: I18n.t('Description')},
-    })
+    const $form = $rubric_long_description_dialog.find('#edit_criterion_form')
+    const data = $form.getFormData()
+    if (!data['description']) {
+      showDescriptionError($form)
+      return
+    }
+
+    const valid = $rubric_long_description_dialog.validateForm({})
     if (!valid) {
       return
     }
@@ -1020,12 +1024,13 @@ rubricEditing.init = function () {
   $rubric_rating_dialog.find('.save_button').click(event => {
     event.preventDefault()
     event.stopPropagation()
-    const data = $rubric_rating_dialog.find('#edit_rating_form').getFormData()
-    const valid = $rubric_rating_dialog.find('#edit_rating_form').validateForm({
-      data,
-      required: ['description'],
-      labels: {description: I18n.t('Rating Title')},
-    })
+    const $form = $rubric_rating_dialog.find('#edit_rating_form')
+    const data = $form.getFormData()
+    if (!data['description']) {
+      showDescriptionError($form)
+      return
+    }
+    const valid = $rubric_rating_dialog.find('#edit_rating_form').validateForm({data})
     if (!valid) {
       return
     }
@@ -1681,5 +1686,20 @@ const shouldUseMasteryScale = $rubric => {
   }
   return $rubric.find('.criterion').hasClass('learning_outcome_criterion')
 }
+
+const showDescriptionError = $form => {
+  $form.find('.description_error_message').show();
+  $form.find('[name="description"]').css('border', '1px solid red');
+
+  clearTimeout($form.data('ratingTitleErrorDisplayed'));
+
+  const ratingTitleErrorDisplayed = setTimeout(() => removeDescriptionError($form), 5000);
+  $form.data('ratingTitleErrorDisplayed', ratingTitleErrorDisplayed);
+};
+
+const removeDescriptionError = $form => {
+  $form.find('.description_error_message').hide();
+  $form.find('[name="description"]').css('border', '1px solid #ccc');
+};
 
 export default rubricEditing

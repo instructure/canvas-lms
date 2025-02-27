@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {fireEvent, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {TraditionalView} from '../TraditionalView'
 import type {RubricCriterion, RubricAssessmentData} from '../../types/rubric'
@@ -34,16 +34,45 @@ const defaultCriteria: RubricCriterion[] = [
     criterionUseRange: false,
     ratings: [
       {
-        id: 'rating_1',
+        id: 'rating_1_1',
         description: 'Full Marks',
         longDescription: 'Student demonstrates excellent understanding',
         points: 5,
       },
       {
-        id: 'rating_2',
+        id: 'rating_1_2',
         description: 'Partial Marks',
         longDescription: 'Student demonstrates partial understanding',
         points: 3,
+      },
+    ],
+  },
+  {
+    id: 'criterion_2',
+    description: 'Application of Knowledge',
+    longDescription: 'Applies knowledge to practical scenarios',
+    points: 0,
+    criterionUseRange: true,
+    masteryPoints: 0,
+    ignoreForScoring: false,
+    ratings: [
+      {
+        id: 'rating_2_1',
+        description: 'Excellent',
+        longDescription: 'Applies knowledge effectively',
+        points: 0,
+      },
+      {
+        id: 'rating_2_2',
+        description: 'Good',
+        longDescription: 'Applies knowledge with minor errors',
+        points: 0,
+      },
+      {
+        id: 'rating_2_3',
+        description: 'Fair',
+        longDescription: 'Applies knowledge with some errors',
+        points: 0,
       },
     ],
   },
@@ -54,9 +83,18 @@ const defaultAssessmentData: RubricAssessmentData[] = [
     criterionId: 'criterion_1',
     points: 5,
     comments: '',
-    id: 'rating_1',
+    id: 'rating_1_1',
     commentsEnabled: true,
     description: 'Full Marks',
+  },
+  {
+    criterionId: 'criterion_2',
+    points: 0,
+    comments: '',
+    id: 'rating_2_2',
+    commentsEnabled: true,
+    description: 'Excellent',
+    ignoreForScoring: false,
   },
 ]
 
@@ -105,25 +143,44 @@ describe('TraditionalView', () => {
 
   it('handles assessment data updates', async () => {
     const user = userEvent.setup()
-    const onUpdateAssessmentData = jest.fn()
 
-    render(
-      <TraditionalView
-        {...defaultProps}
-        onUpdateAssessmentData={onUpdateAssessmentData}
-        isFreeFormCriterionComments={true}
-      />,
-    )
+    render(<TraditionalView {...defaultProps} isFreeFormCriterionComments={true} />)
 
     const commentInput = screen.getByTestId('free-form-comment-area-criterion_1')
     await user.type(commentInput, 'Test comment')
     await user.tab() // Trigger onBlur to update assessment data
 
-    expect(onUpdateAssessmentData).toHaveBeenCalledWith(
+    expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledWith(
       expect.objectContaining({
         criterionId: 'criterion_1',
         comments: 'Test comment',
       }),
     )
+  })
+
+  it(`comment blur does not clear rating for criterion where ratings' points are different`, async () => {
+    render(<TraditionalView {...defaultProps} />)
+
+    const commentInput = screen.getByTestId('comment-text-area-criterion_1')
+    fireEvent.blur(commentInput)
+
+    expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledWith({
+      ...defaultAssessmentData[0],
+      ratingId: defaultAssessmentData[0].id,
+    })
+    expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledTimes(1)
+  })
+
+  it(`comment blur does not clear rating for criterion where ratings' points are equal`, async () => {
+    render(<TraditionalView {...defaultProps} />)
+
+    const commentInput = screen.getByTestId('comment-text-area-criterion_2')
+    fireEvent.blur(commentInput)
+
+    expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledWith({
+      ...defaultAssessmentData[1],
+      ratingId: defaultAssessmentData[1].id,
+    })
+    expect(defaultProps.onUpdateAssessmentData).toHaveBeenCalledTimes(1)
   })
 })

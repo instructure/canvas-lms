@@ -52,7 +52,7 @@ export default function CanvasContentPanel({
     newFilter: any,
     onChangeContext: (arg0: {contextType: any; contextId: any}) => void,
     onChangeSearchString: (arg0: any) => void,
-    onChangeSortBy: (arg0: {sort: any; dir: any}) => void
+    onChangeSortBy: (arg0: {sort: any; dir: any}) => void,
   ) {
     const newFilterSettings = {...newFilter}
     if (newFilterSettings.sortValue) {
@@ -111,7 +111,7 @@ export default function CanvasContentPanel({
               newFilter,
               storeProps.onChangeContext,
               storeProps.onChangeSearchString,
-              storeProps.onChangeSortBy
+              storeProps.onChangeSortBy,
             )
           }}
         />

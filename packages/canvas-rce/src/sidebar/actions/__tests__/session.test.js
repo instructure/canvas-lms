@@ -39,7 +39,7 @@ describe('Session actions', () => {
           expect.objectContaining({
             type: session.RECEIVE_SESSION,
             data,
-          })
+          }),
         )
       })
     })

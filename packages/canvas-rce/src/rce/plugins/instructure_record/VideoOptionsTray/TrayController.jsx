@@ -28,7 +28,16 @@ import RCEGlobals from '../../../RCEGlobals'
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
 
 export const VIDEO_SIZE_DEFAULT = {height: '225px', width: '400px'} // AKA "LARGE"
+export const STUDIO_PLAYER_VIDEO_SIZE_DEFAULT = {height: '300px', width: '480px'}
 export const AUDIO_PLAYER_SIZE = {width: '320px', height: '14.25rem'}
+
+export const videoDefaultSize = () => {
+  if(RCEGlobals.getFeatures().consolidated_media_player) {
+    return STUDIO_PLAYER_VIDEO_SIZE_DEFAULT
+  }
+
+  return VIDEO_SIZE_DEFAULT
+}
 
 export default class TrayController {
   constructor() {
@@ -84,7 +93,7 @@ export default class TrayController {
           height: `${videoOptions.appliedHeight}px`,
           width: `${Math.max(
             minWidth,
-            isVertical ? videoOptions.appliedHeight : videoOptions.appliedWidth
+            isVertical ? videoOptions.appliedHeight : videoOptions.appliedWidth,
           )}px`,
         }
         this._editor.dom.setStyles($tinymceIframeShim, styl)
@@ -95,7 +104,7 @@ export default class TrayController {
         this._editor.dom.setAttrib(
           $tinymceIframeShim,
           'data-mce-p-data-titleText',
-          videoOptions.titleText
+          videoOptions.titleText,
         )
         this._editor.dom.setAttrib(this.$videoContainer, 'title', title)
         this._editor.dom.setAttrib(this.$videoContainer, 'data-titleText', videoOptions.titleText)
@@ -148,12 +157,12 @@ export default class TrayController {
                   media_object_id: videoOptions.media_object_id,
                   attachment_id: data.attachment_id,
                 },
-                bridge.canvasOrigin
+                bridge.canvasOrigin,
               )
             }
           })
           .catch(ex => {
-            console.error('failed updating video captions', ex) // eslint-disable-line no-console
+            console.error('failed updating video captions', ex)  
           })
       }
     }
@@ -180,12 +189,12 @@ export default class TrayController {
           cb(event?.data?.payload)
         }
       },
-      {signal: this._subtitleListener.signal}
+      {signal: this._subtitleListener.signal},
     )
 
     this.$videoContainer?.contentWindow?.postMessage(
       {subject: 'media_tracks_request'},
-      bridge.canvasOrigin
+      bridge.canvasOrigin,
     )
   }
 

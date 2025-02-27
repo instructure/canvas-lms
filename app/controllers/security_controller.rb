@@ -33,21 +33,22 @@
 class SecurityController < ApplicationController
   skip_before_action :load_user
 
-  def self.messages_supported
+  def self.messages_supported(account)
     Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys
                                                       .map do |message_type|
       {
         type: message_type,
-        placements: placements_supported(message_type)
+        placements: placements_supported(message_type, account)
       }.with_indifferent_access
     end
   end
 
-  def self.placements_supported(message_type)
+  def self.placements_supported(message_type, account)
     (
       Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type]
       .reject { |p| p == :resource_selection }
-      .map { |p| Lti::ResourcePlacement.add_extension_prefix(p) }
+      .reject { |p| p == :ActivityAssetProcessor unless account.root_account.feature_enabled?(:lti_asset_processor) }
+      .map { |p| Lti::ResourcePlacement::STANDARD_PLACEMENTS.include?(p) ? p : Lti::ResourcePlacement.add_extension_prefix(p) }
     ) + [Lti::ResourcePlacement::CONTENT_AREA] + (
       (message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE) ? [Lti::ResourcePlacement::RICH_TEXT_EDITOR] : []
     )
@@ -138,7 +139,7 @@ class SecurityController < ApplicationController
     {
       product_family_code: "canvas",
       version: canvas_ims_product_version,
-      messages_supported: SecurityController.messages_supported,
+      messages_supported: SecurityController.messages_supported(account),
       notice_types_supported:,
       variables: Lti::VariableExpander.expansion_keys,
       "https://canvas.instructure.com/lti/account_name": account.name,

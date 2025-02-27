@@ -25,7 +25,7 @@ export default function useDebouncedValue(currentValue, onChange, processValueCa
   // Only invokes onChange on the trailing edge of the timeout
   const debouncedOnChangeCallback = useCallback(
     debounce(val => onChange(val), 500, {trailing: true}),
-    []
+    [],
   )
 
   useEffect(() => {

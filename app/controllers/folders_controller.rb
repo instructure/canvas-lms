@@ -166,23 +166,39 @@ class FoldersController < ApplicationController
 
     opts = lock_options(@folder.context, @current_user, session)
     opts = opts.merge(include: params[:include]) if params[:include].present?
-    descending = params[:order] == "desc"
+    folder_column_map = {
+      "name" => "name",
+      "updated_at" => "updated_at",
+      "created_at" => "created_at",
+    }
+    file_column_map = {
+      "name" => "display_name",
+      "updated_at" => "updated_at",
+      "created_at" => "created_at",
+      "size" => "size",
+    }
 
+    folder_sort = folder_column_map[params[:sort]] || "name"
+    folder_desc = params[:order] == "desc" && folder_column_map.key?(params[:sort])
+    file_sort = file_column_map[params[:sort]] || "display_name"
+    file_desc = params[:order] == "desc"
     folder_scope = folder_index_scope(opts[:can_view_hidden_files])
     file_scope = file_index_scope(@folder, @current_user, session)
-
-    folder_bookmarker = Plannable::Bookmarker.new(Folder, descending, :name, :id)
+    folder_bookmarker = Plannable::Bookmarker.new(Folder, folder_desc, [folder_sort], :id)
     folders_collection = BookmarkedCollection.wrap(folder_bookmarker, folder_scope)
-
-    file_bookmarker = Plannable::Bookmarker.new(Attachment, descending, :display_name, :id)
+    file_bookmarker = Plannable::Bookmarker.new(Attachment, file_desc, [file_sort], :id)
     files_collection = BookmarkedCollection.wrap(file_bookmarker, file_scope)
-
     collections = [
       ["folders", folders_collection],
       ["files", files_collection]
     ]
     per_page = Api.per_page_for(self, default: 50)
     combined = Api.paginate(BookmarkedCollection.concat(*collections), self, api_v1_list_folders_and_files_url, { per_page: })
+
+    if opts[:can_view_hidden_files] && opts[:context]
+      opts[:master_course_status] = setup_master_course_restrictions(combined, opts[:context])
+    end
+
     render json: folders_or_files_json(combined, @current_user, session, opts)
   end
 

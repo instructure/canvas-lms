@@ -92,7 +92,8 @@ class JwtsController < ApplicationController
       context: @context,
       symmetric:,
       encrypt: encrypt?,
-      audience:
+      audience:,
+      root_account_uuid: @domain_root_account.uuid
     )
     render json: { token: services_jwt }
   end

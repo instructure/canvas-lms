@@ -38,7 +38,7 @@ export const LoginLayout = () => {
             <AppNavBar />
           </Flex.Item>
 
-          <Flex.Item shouldGrow={true}>
+          <Flex.Item shouldGrow={true} overflowX="hidden">
             <ContentLayout>
               <Flex direction="column" gap="large">
                 {loginLogoUrl && (
@@ -52,7 +52,7 @@ export const LoginLayout = () => {
                 </View>
 
                 <View as="footer">
-                  <Flex direction="column" gap="large">
+                  <Flex direction="column" gap="medium">
                     <FooterLinks />
 
                     <Flex.Item align="center" overflowX="visible" overflowY="visible">

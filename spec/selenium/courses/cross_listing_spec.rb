@@ -41,7 +41,7 @@ describe "cross-listing" do
     form = f("#crosslist_course_form")
     submit_btn = form.find_element(:css, ".submit_button")
     expect(form).not_to be_nil
-    expect(form.find_element(:css, ".submit_button")).to be_disabled
+    expect(form.find_element(:css, ".submit_button")).not_to be_disabled
 
     course_id   = form.find_element(:id, "course_id")
     course_name = f("#course_autocomplete_name")
@@ -75,7 +75,7 @@ describe "cross-listing" do
     f(".crosslist_link").click
     form = f("#crosslist_course_form")
     course_id   = form.find_element(:id, "course_id")
-    course_name = f("#course_autocomplete_name")
+    course_name = f("#course_id_errors")
     course_id.click
     course_id.send_keys "-1\n"
     expect(course_name).to include_text 'Course ID "-1" not authorized for cross-listing'
@@ -96,13 +96,13 @@ describe "cross-listing" do
     get "/courses/#{course.id}/sections/#{section.id}"
     f(".crosslist_link").click
     form = f("#crosslist_course_form")
-    expect(form.find_element(:css, ".submit_button")).to be_disabled
+    expect(form.find_element(:css, ".submit_button")).not_to be_disabled
     expect(form).not_to be_nil
 
     # let's try and crosslist an invalid course
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").send_keys("-1\n")
-    expect(f("#course_autocomplete_name")).to include_text("Course ID \"-1\" not authorized for cross-listing")
+    expect(f("#course_id_errors")).to include_text("Course ID \"-1\" not authorized for cross-listing")
 
     # k, let's crosslist to the other course
     form.find_element(:css, "#course_id").click

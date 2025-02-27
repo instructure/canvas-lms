@@ -49,7 +49,7 @@ export const getColor = ({workflowState, hasIssues}: StatusPillProps): Color => 
 export const StatusPill: React.FC<StatusPillProps> = props => {
   const color = getColor(props)
 
-  const {workflowState} = props
+  const {workflowState, hasIssues} = props
 
   let text = ''
   if (workflowState === 'queued') {
@@ -60,7 +60,9 @@ export const StatusPill: React.FC<StatusPillProps> = props => {
     text = I18n.t('Running')
   } else if (workflowState === 'failed') {
     text = I18n.t('Failed')
-  } else if (workflowState === 'completed') {
+  } else if (workflowState === 'completed' && hasIssues) {
+    text = I18n.t('Partially Completed')
+  } else if (workflowState === 'completed' && !hasIssues) {
     text = I18n.t('Completed')
   }
 

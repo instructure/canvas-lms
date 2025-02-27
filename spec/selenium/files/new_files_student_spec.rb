@@ -46,25 +46,25 @@ describe "better_file_browsing" do
         end
       end
 
-      it "searches for a file", priority: "1" do
+      it "searches for a file", priority: "1", upgrade_files_v2: "waiting for deployment" do
         get "/courses/#{@course.id}/files"
         f("input[type='search']").send_keys "b_fi", :return
         expect(all_files_folders).to have_size 1
       end
 
-      it "does not return unpublished files in search results", priority: "1" do
+      it "does not return unpublished files in search results", priority: "1", upgrade_files_v2: "waiting for deployment" do
         @files[0].update_attribute(:locked, true)
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("a_fi")
       end
 
-      it "does not return hidden files in search results", priority: "1" do
+      it "does not return hidden files in search results", priority: "1", upgrade_files_v2: "waiting for deployment" do
         @files[0].update_attribute(:hidden, true)
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("a_fi")
       end
 
-      it "does not see upload file, add folder buttons and cloud icon", priority: "1" do
+      it "does not see upload file, add folder buttons and cloud icon", priority: "1", upgrade_files_v2: "waiting for deployment" do
         get "/courses/#{@course.id}/files"
         content = f("#content")
         expect(content).not_to contain_css(".btn-upload")
@@ -72,7 +72,7 @@ describe "better_file_browsing" do
         expect(content).not_to contain_css(".btn-link.published-status")
       end
 
-      it "only sees Download option on cog icon", priority: "1" do
+      it "only sees Download option on cog icon", priority: "1", upgrade_files_v2: "waiting for deployment" do
         skip_if_safari(:alert)
         get "/courses/#{@course.id}/files"
         content = f("#content")
@@ -83,7 +83,7 @@ describe "better_file_browsing" do
         expect(content).not_to contain_link("Delete")
       end
 
-      it "only sees View and Download options on toolbar menu", priority: "1" do
+      it "only sees View and Download options on toolbar menu", priority: "1", upgrade_files_v2: "waiting for deployment" do
         get "/courses/#{@course.id}/files"
         content = f("#content")
         f(".ef-item-row").click
@@ -94,7 +94,7 @@ describe "better_file_browsing" do
         expect(content).not_to contain_css(".btn-delete")
       end
 
-      it "sees calendar icon on restricted files within a given timeframe", priority: "1" do
+      it "sees calendar icon on restricted files within a given timeframe", priority: "1", upgrade_files_v2: "waiting for deployment" do
         @files[0].update unlock_at: 1.week.ago,
                          lock_at: 1.week.from_now
         get "/courses/#{@course.id}/files"
@@ -114,19 +114,19 @@ describe "better_file_browsing" do
                          @folder)
       end
 
-      it "does not return files from hidden folders in search results", priority: "1" do
+      it "does not return files from hidden folders in search results", priority: "1", upgrade_files_v2: "waiting for deployment" do
         @folder.update_attribute :hidden, true
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("example")
       end
 
-      it "does not return files from unpublished folders in search results", priority: "1" do
+      it "does not return files from unpublished folders in search results", priority: "1", upgrade_files_v2: "waiting for deployment" do
         @folder.update_attribute :locked, true
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("example")
       end
 
-      it "lets student access files in restricted folder hidden by link", priority: "1" do
+      it "lets student access files in restricted folder hidden by link", priority: "1", upgrade_files_v2: "waiting for deployment" do
         skip "LF-999"
         @folder.update_attribute :hidden, true
 

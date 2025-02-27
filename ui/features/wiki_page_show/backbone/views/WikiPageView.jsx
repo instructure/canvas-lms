@@ -117,6 +117,10 @@ export default class WikiPageView extends Backbone.View {
     this.publishButtonView.$el.appendTo(this.$publishButton)
     this.publishButtonView.render()
 
+    if (ENV.horizon_course) {
+      this.publishButtonView.$el.addClass('disabled')
+    }
+
     // Attach the immersive reader button if enabled
     const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
     const immersive_reader_mobile_mount_point = document.getElementById(
@@ -170,8 +174,8 @@ export default class WikiPageView extends Backbone.View {
         assetType: 'Page',
         assetID: this.model.get('url'),
         onFetchSuccess: () => {
-          $('.module-sequence-footer-content').append($('#mark-as-done-container'))
-          $('#mark-as-done-container').css({float: 'right', 'margin-right': '4px'})
+          $('.module-sequence-footer-right').prepend($('#mark-as-done-container'))
+          $('#mark-as-done-container').css({'margin-right': '4px'})
         },
       })
     } else if (this.$sequenceFooter != null) {

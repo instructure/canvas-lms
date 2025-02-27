@@ -22,16 +22,10 @@ import {
   type LtiRegistrationWithConfiguration,
   type LtiRegistration,
 } from '../model/LtiRegistration'
-import {
-  type ApiResult,
-  parseFetchResult,
-  success,
-  apiError,
-  mapApiResult,
-} from '../../common/lib/apiResult/ApiResult'
+import {type ApiResult, parseFetchResult, mapApiResult} from '../../common/lib/apiResult/ApiResult'
 import {ZPaginatedList, type PaginatedList} from './PaginatedList'
-import {type LtiRegistrationId} from '../model/LtiRegistrationId'
-import {ZAccountId, type AccountId} from '../model/AccountId'
+import type {LtiRegistrationId} from '../model/LtiRegistrationId'
+import type {AccountId} from '../model/AccountId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import * as z from 'zod'
 import {
@@ -39,14 +33,15 @@ import {
   type InternalLtiConfiguration,
 } from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
-import type DeveloperKey from 'features/developer_keys_v2/react/DeveloperKey'
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
+import {compact} from '../../common/lib/compact'
 
 export type AppsSortProperty =
   | 'name'
   | 'nickname'
   | 'lti_version'
   | 'installed'
+  | 'updated'
   | 'installed_by'
   | 'updated_by'
   | 'on'
@@ -173,13 +168,16 @@ export const createRegistration: CreateRegistration = (
     }),
   )
 
-export type UpdateRegistration = (
-  accountId: AccountId,
-  registrationId: LtiRegistrationId,
-  internalConfig: InternalLtiConfiguration,
-  overlay?: LtiConfigurationOverlay,
-  adminNickname?: string,
-) => Promise<ApiResult<unknown>>
+type UpdateRegistrationParams = {
+  accountId: AccountId
+  registrationId: LtiRegistrationId
+  internalConfig?: InternalLtiConfiguration
+  overlay?: LtiConfigurationOverlay
+  adminNickname?: string
+  workflowState?: 'on' | 'off' | 'allow'
+}
+
+export type UpdateRegistration = (params: UpdateRegistrationParams) => Promise<ApiResult<unknown>>
 
 /**
  * Updates an LTI registration
@@ -187,16 +185,17 @@ export type UpdateRegistration = (
  * @param registrationId The id of the registration to update
  * @param internalConfig The internal configuration to use
  * @param overlay An overlay to apply to the internal configuration
- * @param unifiedToolId The unified tool id for the registration
+ * @param workflowState The workflow state the registration account binding should be set to
  * @returns An ApiResult with an unknown value. The value should be ignored.
  */
-export const updateRegistration: UpdateRegistration = (
+export const updateRegistration: UpdateRegistration = ({
   accountId,
   registrationId,
   internalConfig,
   overlay,
   adminNickname,
-) =>
+  workflowState,
+}) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
       ...defaultFetchOptions({
@@ -205,11 +204,14 @@ export const updateRegistration: UpdateRegistration = (
         },
       }),
       method: 'PUT',
-      body: JSON.stringify({
-        configuration: internalConfig,
-        overlay,
-        admin_nickname: adminNickname,
-      }),
+      body: JSON.stringify(
+        compact({
+          configuration: internalConfig,
+          overlay,
+          admin_nickname: adminNickname,
+          workflow_state: workflowState,
+        }),
+      ),
     }),
   )
 
@@ -252,6 +254,7 @@ export const unbindGlobalLtiRegistration = (
 export type FetchLtiRegistration = (
   accountId: AccountId,
   registrationId: LtiRegistrationId,
+  includes?: Array<'overlay' | 'overlay_history'>,
 ) => Promise<ApiResult<LtiRegistrationWithConfiguration>>
 
 /**
@@ -261,7 +264,7 @@ export type FetchLtiRegistration = (
 export const fetchLtiRegistration: FetchLtiRegistration = (
   accountId,
   ltiRegistrationId,
-  includes: Array<'overlay' | 'overlay_history'> = ['overlay', 'overlay_history'],
+  includes = ['overlay', 'overlay_history'],
 ) =>
   parseFetchResult(ZLtiRegistrationWithConfiguration)(
     fetch(

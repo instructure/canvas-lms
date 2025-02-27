@@ -260,8 +260,11 @@ describe('DiscussionRow', () => {
   })
 
   it('renders the latest available until date for ungraded overrides', () => {
-    const futureDate = new Date('2027-01-17T00:00:00Z')
-    const furtherFutureDate = new Date('2028-01-17T00:00:00Z')
+    const now = new Date()
+    const futureDate = new Date(now)
+    futureDate.setFullYear(futureDate.getFullYear() + 1)
+    const furtherFutureDate = new Date(now)
+    furtherFutureDate.setFullYear(furtherFutureDate.getFullYear() + 2)
     const discussion = {
       ungraded_discussion_overrides: [
         {assignment_override: {lock_at: futureDate}},

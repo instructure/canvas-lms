@@ -538,7 +538,7 @@ class CoursesController < ApplicationController
   def load_enrollments_for_index
     all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :course, :course_section).to_a
     if @current_user.roles(@domain_root_account).all? { |role| role == "student" || role == "user" }
-      all_enrollments = all_enrollments.reject { |e| e.course.elementary_homeroom_course? }
+      all_enrollments = all_enrollments.reject { |e| e.course.elementary_homeroom_course? || e.course.horizon_course? }
     end
     @past_enrollments = []
     @current_enrollments = []
@@ -1231,6 +1231,7 @@ class CoursesController < ApplicationController
           end
           user_json(u, @current_user, session, includes, @context, enrollments, excludes).tap do |json|
             json[:group_ids] = active_group_memberships(users)[u.id]&.map(&:group_id) || [] if include_group_ids
+            json[:has_non_collaborative_groups] = u.current_differentiation_tags.count > 0 if can_do(@context, @current_user, :manage_tags_manage)
           end
         }
       end
@@ -1308,8 +1309,8 @@ class CoursesController < ApplicationController
                     teacher_scope(email_scope(users_scope), @context.root_account_id),
                     admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.full_account_admin),
                     admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.full_account_admin),
-                    admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission("manage_content")),
-                    admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission("manage_content"))
+                    admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission("manage_course_content_add")),
+                    admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission("manage_course_content_add"))
                   )
                   .order(:name)
                   .distinct
@@ -1619,7 +1620,10 @@ class CoursesController < ApplicationController
                MSFT_SYNC_MAX_ENROLLMENT_OWNERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS,
                COURSE_PACES_ENABLED: @context.enable_course_paces?,
                ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
-               COURSE_PUBLISHED: @context.published?
+               COURSE_PUBLISHED: @context.published?,
+               ALERTS: {
+                 data: @alerts,
+               }
              })
 
       set_tutorial_js_env
@@ -1756,7 +1760,7 @@ class CoursesController < ApplicationController
     return unless api_request?
 
     @course = api_find(Course, params[:course_id])
-    return unless authorized_action(@course, @current_user, %i[manage_content manage_course_content_edit])
+    return unless authorized_action(@course, @current_user, :manage_course_content_edit)
 
     old_settings = @course.settings
 
@@ -2398,7 +2402,7 @@ class CoursesController < ApplicationController
         flash.now[:notice] = t("notices.updated", "Course was successfully updated.") if params[:for_reload]
 
         can_see_admin_tools = @context.grants_any_right?(
-          @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+          @current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
         )
         @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
           @context,
@@ -2421,6 +2425,7 @@ class CoursesController < ApplicationController
           )
 
           js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
+          js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
 
           js_bundle :context_modules
           css_bundle :content_next, :context_modules2
@@ -2440,7 +2445,7 @@ class CoursesController < ApplicationController
             end_date = start_date + 28.days
             scope = Announcement.where(context_type: "Course", context_id: @context.id, workflow_state: "active")
                                 .ordered_between(start_date, end_date)
-            unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) || User.observing_full_course(@context).where(id: @current_user).any?
+            unless @context.grants_any_right?(@current_user, session, :read_as_admin, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) || User.observing_full_course(@context).where(id: @current_user).any?
               scope = scope.visible_to_ungraded_discussion_student_visibilities(@current_user, @context)
             end
             latest_announcement = scope.limit(1).first
@@ -2450,6 +2455,7 @@ class CoursesController < ApplicationController
           grading_standard = @context.grading_standard_or_default
           js_env(
             CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
+            CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url),
             PERMISSIONS: {
               manage: @context.grants_right?(@current_user, session, :manage),
               manage_groups: @context.grants_any_right?(@current_user,
@@ -3101,7 +3107,7 @@ class CoursesController < ApplicationController
       return
     end
 
-    if authorized_action(@course, @current_user, %i[manage_content manage_course_content_edit])
+    if authorized_action(@course, @current_user, :manage_course_content_edit)
       return render_update_success if params[:for_reload]
 
       unless @course.grants_right?(@current_user, :update)
@@ -3905,7 +3911,7 @@ class CoursesController < ApplicationController
 
   def link_validation
     get_context
-    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
     if (progress = CourseLinkValidator.current_progress(@context))
       render json: progress_json(progress, @current_user, session)
@@ -3936,14 +3942,14 @@ class CoursesController < ApplicationController
 
   def start_link_validation
     get_context
-    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
     CourseLinkValidator.queue_course(@context)
     render json: { success: true }
   end
 
   def link_validator
-    authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
     # render view
   end
 

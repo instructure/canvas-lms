@@ -270,6 +270,32 @@ describe Api::V1::AssignmentOverride do
       assignment_overrides_json
     end
 
+    context "group module overrides" do
+      before do
+        @group = @course.groups.create!(name: "Group 1")
+        @context_module = ContextModule.create!(context: @course, name: "Module 1")
+        @group_override = AssignmentOverride.create!(
+          set_type: "Group",
+          set_id: @course.groups.first.id,
+          context_module_id: @context_module.id
+        )
+        @group_override.save!
+      end
+
+      it "correctly returns group overrides" do
+        expected_result = {
+          "id" => @group_override.id,
+          "context_module_id" => @context_module.id,
+          "group_id" => @group.id,
+          "group_category_id" => @group.group_category_id,
+          "non_collaborative" => false,
+          "title" => @group.name,
+          "unassign_item" => false
+        }
+        expect(test_class.new.assignment_overrides_json([@group_override], @teacher).first).to eq expected_result
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 

@@ -91,7 +91,7 @@ tinymce.PluginManager.add('instructure_icon_maker', function (ed) {
           text: item.text,
           value: item.value,
           onAction: () => handleOptionSelected(ed, item.value),
-        }))
+        })),
       ),
     onSetup(api) {
       function handleNodeChange(_e: unknown) {

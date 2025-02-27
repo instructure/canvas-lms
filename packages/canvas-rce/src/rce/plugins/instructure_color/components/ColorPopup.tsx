@@ -43,7 +43,7 @@ const ColorPopup = ({tabs, open, positionTarget, onCancel, onChange}: ColorPopup
     (newcolors: ColorSpec) => {
       onChange(newcolors)
     },
-    [onChange]
+    [onChange],
   )
 
   const handleKey = useCallback(
@@ -52,7 +52,7 @@ const ColorPopup = ({tabs, open, positionTarget, onCancel, onChange}: ColorPopup
         onCancel()
       }
     },
-    [onCancel]
+    [onCancel],
   )
 
   return (

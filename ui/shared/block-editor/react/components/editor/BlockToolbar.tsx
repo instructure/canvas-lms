@@ -359,6 +359,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
               withBackground={false}
               withBorder={false}
               color="danger"
+              data-testid="block-toolbar-icon-button-delete"
             >
               <IconTrashLine />
             </IconButton>

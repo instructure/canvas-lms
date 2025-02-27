@@ -132,6 +132,10 @@ export default class WikiPageIndexItemView extends Backbone.View {
     this.publishIconView.$el.appendTo(this.$publishCell)
     this.publishIconView.render()
 
+    if (ENV.horizon_course) {
+      this.publishIconView.$el.addClass('disabled')
+    }
+
     if (!this.lockIconView) {
       this.lockIconView = new LockIconView({
         model: this.model,

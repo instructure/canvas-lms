@@ -39,16 +39,34 @@ export default class AddUnassignedMenu extends PopoverMenuView {
 
   initialize(options) {
     this.collection.setParam('per_page', 10)
-    if (options.usersView == null)
-      options.usersView = new AddUnassignedUsersView({collection: this.collection})
-    if (options.inputFilterView == null)
+
+    if (options.usersView == null) {
+      options.usersView = new AddUnassignedUsersView({
+        collection: this.collection,
+        parentView: this,
+      })
+    }
+
+    if (options.inputFilterView == null) {
       options.inputFilterView = new InputFilterView({
         collection: this.collection,
         setParamOnInvalid: true,
       })
+    }
+
     this.my = 'right-8 top-47'
     this.at = 'left center'
+
     return super.initialize(...arguments)
+  }
+
+  refocusSearch() {
+    // Prevent hide triggered by focusout for a short period.
+    this.hideDisabled = true
+    this.inputFilterView.el.focus()
+    setTimeout(() => {
+      this.hideDisabled = false
+    }, 200)
   }
 
   setGroup(e) {

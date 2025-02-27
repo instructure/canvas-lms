@@ -21,9 +21,9 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   type CheckboxTreeNode,
-  type ItemType,
+  type ItemType, SwitchState,
   TreeSelector,
-  type TreeSelectorProps,
+  type TreeSelectorProps
 } from '../TreeSelector'
 
 const defaultProps: TreeSelectorProps = {
@@ -297,6 +297,14 @@ describe('TreeSelector', () => {
     expect(component.getAllByText('My sub-child item 3')[1]).toBeInTheDocument()
   })
 
+  describe('expand screen reader', () => {
+    it('find first screen reader texts of first level nodes', () => {
+      const component = renderComponent(defaultProps)
+      expect(component.getByText('My parent item 1, View All')).toBeInTheDocument()
+      expect(component.getByText('My parent item 2, View All')).toBeInTheDocument()
+    })
+  })
+
   describe('checked, unchecked state', () => {
     it('checks/un-checks for single child item', async () => {
       const onChangeMock = jest.fn()
@@ -504,6 +512,163 @@ describe('TreeSelector', () => {
 
       // Everything should be unchecked state wise
       assertFlatItemsCheckBoxStates(defaultProps.onChange, [], [])
+    })
+  })
+
+  describe('switch state handling', () => {
+    const contextModulesProps: TreeSelectorProps = {
+      checkboxTreeNodes: {
+        'parent-item-1': {
+          id: 'parent-item-1',
+          label: 'Context module parent',
+          type: 'context_modules',
+          childrenIds: ['child-item-1'],
+          checkboxState: 'unchecked',
+        },
+        'child-item-1': {
+          id: 'child-item-1',
+          label: 'Context module child',
+          type: 'context_modules',
+          parentId: 'parent-item-1',
+          childrenIds: ['sub-child-item-1'],
+          checkboxState: 'unchecked',
+        },
+        'sub-child-item-1': {
+          id: 'sub-child-item-1',
+          label: 'Context module sub-child',
+          type: 'context_modules',
+          parentId: 'child-item-1',
+          childrenIds: ['grand-sub-child-item-1'],
+          checkboxState: 'unchecked',
+          importAsOneModuleItemState: 'off',
+        },
+        'grand-sub-child-item-1': {
+          id: 'grand-sub-child-item-1',
+          label: 'Context module grand-sub-child',
+          type: 'context_modules',
+          parentId: 'sub-child-item-1',
+          childrenIds: [],
+          checkboxState: 'unchecked',
+          importAsOneModuleItemState: 'disabled',
+        },
+        'parent-item-2': {
+          id: 'parent-item-2',
+          label: 'Context module parent 2',
+          type: 'context_modules',
+          childrenIds: ['child-item-2'],
+          checkboxState: 'unchecked',
+        },
+        'child-item-2': {
+          id: 'child-item-2',
+          label: 'Context module child 2',
+          type: 'context_modules',
+          parentId: 'parent-item-2',
+          childrenIds: ['sub-child-item-2'],
+          checkboxState: 'unchecked',
+        },
+        'sub-child-item-2': {
+          id: 'sub-child-item-2',
+          label: 'Context module sub-child 2',
+          type: 'context_modules',
+          parentId: 'child-item-2',
+          childrenIds: [],
+          checkboxState: 'unchecked',
+          importAsOneModuleItemState: 'off',
+        },
+      },
+      onChange: jest.fn(),
+    }
+
+    const showSwitches = async (component: any) => {
+      // Open necessary toggles
+      await userEvent.click(findToggleButtonById(component, 'toggle-parent-item-1'))
+      await userEvent.click(findToggleButtonById(component, 'toggle-child-item-1'))
+      await userEvent.click(findToggleButtonById(component, 'toggle-sub-child-item-1'))
+      await userEvent.click(findToggleButtonById(component, 'toggle-parent-item-2'))
+      await userEvent.click(findToggleButtonById(component, 'toggle-child-item-2'))
+
+      // Click on the top parent element to check all
+      await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
+      await userEvent.click(component.getByTestId('checkbox-parent-item-2'))
+    }
+
+    it('should show switches for submodules', async () => {
+      const component = renderComponent(contextModulesProps)
+      await showSwitches(component)
+      expect(component.getByTestId('switch-sub-child-item-1')).not.toBeChecked()
+      expect(component.getByTestId('switch-grand-sub-child-item-1')).not.toBeChecked()
+      expect(component.getByTestId('switch-grand-sub-child-item-1')).toBeDisabled()
+    })
+
+    it('should switcher change the state and get rendered', async () => {
+      const component = renderComponent(contextModulesProps)
+      await showSwitches(component)
+      await userEvent.click(component.getByTestId('switch-sub-child-item-1'))
+      expect(component.getByTestId('switch-sub-child-item-1')).toBeChecked()
+      await userEvent.click(component.getByTestId('switch-grand-sub-child-item-1'))
+      expect(component.getByTestId('switch-grand-sub-child-item-1')).toBeChecked()
+
+      // Parent element switch off should off all the children and make them disabled
+      await userEvent.click(component.getByTestId('switch-sub-child-item-1'))
+      expect(component.getByTestId('switch-sub-child-item-1')).not.toBeChecked()
+      expect(component.getByTestId('switch-grand-sub-child-item-1')).not.toBeChecked()
+      expect(component.getByTestId('switch-grand-sub-child-item-1')).toBeDisabled()
+    })
+
+    describe('calling onChange', () => {
+      it('should send importAsOneModuleItemState with ui represented states', async () => {
+        const component = renderComponent(contextModulesProps)
+        await showSwitches(component)
+
+        // Only turn on sub-child-item-2, others remain in the default state
+        await userEvent.click(component.getByTestId('switch-sub-child-item-2'))
+
+        const mock: any = contextModulesProps.onChange
+        const lastState = mock.mock.calls[mock.mock.calls.length - 1][0] as Record<
+          string,
+          CheckboxTreeNode
+        >
+
+        expect(lastState['sub-child-item-1'].importAsOneModuleItemState).toBe('off')
+        expect(lastState['grand-sub-child-item-1'].importAsOneModuleItemState).toBe('disabled')
+        expect(lastState['sub-child-item-2'].importAsOneModuleItemState).toBe('on')
+      })
+    })
+
+    describe('switch text', () => {
+      const getProps = (importAsOneModuleItemState: SwitchState) => {
+        return {
+          checkboxTreeNodes: {
+            'parent-item-1': {
+              ...contextModulesProps.checkboxTreeNodes['parent-item-1'],
+              childrenIds: [],
+              importAsOneModuleItemState
+            },
+          },
+          onChange: jest.fn(),
+        }
+      }
+
+      it('should render disabled text for switch disabled', async () => {
+        const component = renderComponent(getProps('disabled'))
+        await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
+        expect(component.getByText('Import as a standalone module')).toBeInTheDocument()
+        expect(component.getByText('Selection is disabled, as the parent is not selected as a standalone module import item.')).toBeInTheDocument()
+      })
+
+      it('should render normal text for switch on', async () => {
+        const component = renderComponent(getProps('on'))
+        await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
+        expect(component.getByText('Import as a standalone module')).toBeInTheDocument()
+        expect(component.getByText('If not selected, this item will be imported as one module item.')).toBeInTheDocument()
+      })
+
+      it('should render normal text for switch off', async () => {
+        const component = renderComponent(getProps('off'))
+        await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
+        expect(component.getByText('Import as a standalone module')).toBeInTheDocument()
+        expect(component.getByText('If not selected, this item will be imported as one module item.')).toBeInTheDocument()
+      })
     })
   })
 

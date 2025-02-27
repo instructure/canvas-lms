@@ -933,7 +933,7 @@ class SisBatch < ActiveRecord::Base
       restore_progress = Progress.create! context: self, tag: "sis_batch_state_restore", completion: 0.0
       restore_progress.process_job(self,
                                    :restore_states_for_batch,
-                                   { n_strand: ["restore_states_for_batch", account.global_id] },
+                                   { n_strand: ["restore_states_for_batch", account.global_id], max_attempts: 3 },
                                    batch_mode:,
                                    undelete_only:,
                                    unconclude_only:)

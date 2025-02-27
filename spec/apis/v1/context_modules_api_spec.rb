@@ -195,7 +195,6 @@ describe "Modules API", type: :request do
       end
 
       it "shows published attribute to teachers with limited permissions" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
         @course.root_account.role_overrides.create!(permission: "manage_course_content_edit", role: teacher_role, enabled: false)
         @course.root_account.role_overrides.create!(permission: "manage_course_content_add", role: teacher_role, enabled: false)
         @user = @teacher

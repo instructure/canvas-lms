@@ -38,6 +38,8 @@ describe('RequirementForm', () => {
     onAddRequirement: jest.fn(),
     onDropRequirement: () => {},
     onUpdateRequirement: () => {},
+    validatePointsInput: () => {},
+    pointsInputMessages: [],
   }
 
   const renderComponent = (overrides = {}) => render(<RequirementForm {...props} {...overrides} />)

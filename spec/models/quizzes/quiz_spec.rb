@@ -1991,7 +1991,7 @@ describe Quizzes::Quiz do
 
     it "lets admins read quizzes that are unpublished even without management rights" do
       @quiz.unpublish!.reload
-      @course.account.role_overrides.create!(role: teacher_role, permission: "manage_assignments", enabled: false)
+      @course.account.role_overrides.create!(role: teacher_role, permission: "manage_assignments_add", enabled: false)
       @course.account.role_overrides.create!(role: teacher_role, permission: "manage_grades", enabled: false)
       expect(@quiz.grants_right?(@teacher, :read)).to be true
     end
@@ -2674,6 +2674,13 @@ describe Quizzes::Quiz do
       expect(ids.class).to eq Array
       expect(ids.count).to eq 1
       expect(ids.first).to eq @bank.id
+    end
+  end
+
+  describe "Horizon course" do
+    it "does not allow classic quiz creation" do
+      allow(@course).to receive(:horizon_course?).and_return(true)
+      expect { @course.quizzes.create!(title: "test") }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 end

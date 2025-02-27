@@ -80,7 +80,6 @@ module Schemas
         type: "object",
         required: %w[
           title
-          description
           target_link_uri
           oidc_initiation_url
           redirect_uris

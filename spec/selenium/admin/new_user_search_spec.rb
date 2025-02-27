@@ -97,6 +97,47 @@ describe "new account user search" do
     end
   end
 
+  describe "user groups search" do
+    before do
+      @user.update_attribute(:name, "Test User")
+    end
+
+    it "allows searching unassigned users", :ignore_js_errors do
+      student1 = student_in_course(active_all: true, name: "Student 1").user
+      gc = @account.group_categories.create(name: "foo")
+      @collaborative_group = @account.groups.create!(name: "Collaborative group", group_category: gc)
+
+      visit_users(@account)
+      click_people_more_options
+      click_view_user_groups_option
+
+      # Click the + add unassigned users button
+      assign_button = fj("a.add-user.action-darkgray[aria-label='Assign user to group']:visible")
+      assign_button.click
+
+      # Verify that the search input appears
+      search_input = fj("input.search-query[name='search_term'][placeholder='Search people']:visible")
+      expect(search_input).to be_truthy
+
+      # Click the search input and type in the student's name
+      search_input.click
+      search_input.send_keys student1.name
+      wait_for_ajaximations
+
+      # Verify the search input remains on the page after searching
+      expect(f("input.search-query[name='search_term']")).to be_truthy
+
+      # Expect the student to appear in the search
+      student_result = fj("a:contains('#{student1.name}'):visible")
+      expect(student_result).to be_truthy
+      student_result.click
+      wait_for_ajaximations
+
+      # Expect the student to have been added to the group
+      expect(fj("span:contains('1 user')")).to be_truthy
+    end
+  end
+
   describe "with filters" do
     before do
       user_with_pseudonym(account: @account, name: "diffrient user")

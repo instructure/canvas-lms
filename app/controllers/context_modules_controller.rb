@@ -76,10 +76,10 @@ class ContextModulesController < ApplicationController
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 
-      @can_view = @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
-      @can_add = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add)
-      @can_edit = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit)
-      @can_delete = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_delete)
+      @can_view = @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+      @can_add = @context.grants_right?(@current_user, session, :manage_course_content_add)
+      @can_edit = @context.grants_right?(@current_user, session, :manage_course_content_edit)
+      @can_delete = @context.grants_right?(@current_user, session, :manage_course_content_delete)
       @can_view_grades = can_do(@context, @current_user, :view_all_grades)
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
@@ -121,11 +121,11 @@ class ContextModulesController < ApplicationController
         @menu_tools[p] = tools.select { |t| t.has_placement? p }
       end
 
-      if @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+      if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
         module_file_details = load_module_file_details
       end
 
-      @allow_menu_tools = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add) &&
+      @allow_menu_tools = @context.grants_right?(@current_user, session, :manage_course_content_add) &&
                           (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?)
 
       assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
@@ -140,6 +140,7 @@ class ContextModulesController < ApplicationController
           manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
         },
         ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+        CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS) && assign_to_tags,
         MODULE_TOOLS: module_tool_definitions,
         DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
         PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?
@@ -243,6 +244,7 @@ class ContextModulesController < ApplicationController
       add_body_class("padless-content")
       js_bundle :context_modules
       js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
+      js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
       css_bundle :content_next, :context_modules2
       render stream: can_stream_template?
     end
@@ -489,6 +491,19 @@ class ContextModulesController < ApplicationController
     end
   end
 
+  def content_tag_estimated_duration_data
+    if authorized_action(@context, @current_user, :read)
+      info = {}
+      all_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).to_a }
+
+      all_tags.each do |tag|
+        info[tag.context_module_id] ||= {}
+        info[tag.context_module_id][tag.id] = { estimated_duration_minutes: tag.estimated_duration_minutes, can_set_estimated_duration: tag.can_set_estimated_duration }
+      end
+      render json: info
+    end
+  end
+
   def content_tag_master_course_data
     if authorized_action(@context, @current_user, :read_as_admin)
       info = {}
@@ -712,7 +727,7 @@ class ContextModulesController < ApplicationController
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
 
-    if authorized_action(@context, @current_user, %i[manage_content manage_course_content_add manage_course_content_edit])
+    if authorized_action(@context, @current_user, %i[manage_course_content_add manage_course_content_edit])
       params[:item][:link_settings] = launch_dimensions
       @tag = @module.add_item(params[:item])
       unless @tag&.valid?
@@ -749,6 +764,44 @@ class ContextModulesController < ApplicationController
     end
   end
 
+  def create_estimated_duration(reference, duration)
+    unless reference.can_set_estimated_duration
+      return nil
+    end
+
+    reference_mapping = {
+      "Assignment" => :assignment_id,
+      "Quizzes::Quiz" => :quiz_id,
+      "WikiPage" => :wiki_page_id,
+      "DiscussionTopic" => :discussion_topic_id,
+      "Attachment" => :attachment_id
+    }
+
+    reference_type = reference.respond_to?(:content_type) ? reference.content_type : reference.class.name
+    reference_key = reference_mapping[reference_type] ||= :content_tag_id
+
+    content_id = reference.tap do |ref|
+      break ref.id if reference_key == :content_tag_id
+      break ref.content_id if ref.respond_to?(:content_id)
+
+      break ref.id
+    end
+
+    estimated_duration = EstimatedDuration.new(reference_key => content_id, :duration => duration)
+
+    if estimated_duration.save
+      estimated_duration
+    else
+      nil
+    end
+  end
+
+  def get_estimated_duration(minutes)
+    return nil if minutes.zero?
+
+    "PT#{minutes}M"
+  end
+
   def update_item
     @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
@@ -759,6 +812,17 @@ class ContextModulesController < ApplicationController
       end
       @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent] && !@context.horizon_course?
       @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
+
+      duration = get_estimated_duration(params[:content_tag][:estimated_duration_minutes].to_i)
+
+      if duration.nil?
+        @tag.estimated_duration&.destroy!
+        @tag.estimated_duration = nil
+      elsif @tag.estimated_duration
+        @tag.estimated_duration.update(duration: duration)
+      else
+        @tag.estimated_duration = create_estimated_duration(@tag, duration)
+      end
 
       unless @tag.save
         return render json: @tag.errors, status: :bad_request

@@ -36,7 +36,7 @@ export default function processEditorContentItems(
   dialog: {
     // @ts-expect-error
     close()
-  } | null
+  } | null,
 ) {
   try {
     const ltiEndpoint = event.data?.ltiEndpoint
@@ -64,7 +64,7 @@ export default function processEditorContentItems(
         showFlashAlert({
           message: formatMessage(
             'Could not insert content: "{itemType}" items are not currently supported in Canvas.',
-            {itemType: inputItem.type ?? 'unknown'}
+            {itemType: inputItem.type ?? 'unknown'},
           ),
           type: 'warning',
           err: null,

@@ -197,7 +197,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(10)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -210,7 +210,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(10)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -223,7 +223,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(10)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -236,7 +236,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(15)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -249,7 +249,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(15)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -262,7 +262,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(-10)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -275,7 +275,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(-10)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -288,7 +288,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(-10)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -301,7 +301,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(-15)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -314,7 +314,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).toHaveBeenCalledWith(-15)
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -327,7 +327,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).not.toHaveBeenCalled()
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -340,7 +340,7 @@ describe('RotationControls', () => {
           () => {
             expect(callback).not.toHaveBeenCalled()
           },
-          {timeout}
+          {timeout},
         )
       })
 
@@ -354,7 +354,7 @@ describe('RotationControls', () => {
             const messageContainer = container.querySelector('label > span > span:last-child')
             expect(messageContainer.textContent).toEqual('Invalid entry.')
           },
-          {timeout}
+          {timeout},
         )
       })
     })

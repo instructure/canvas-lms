@@ -32,7 +32,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {convertModuleSettingsForApi} from '../utils/miscHelpers'
 import {updateModuleUI} from '../utils/moduleHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import type {Module, ModuleItem, Requirement} from './types'
+import type {Module, ModuleItem, PointsInputMessages, Requirement} from './types'
 import RelockModulesDialog from '@canvas/relock-modules-dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingOverlay from './LoadingOverlay'
@@ -172,7 +172,7 @@ export default function SettingsPanel({
 
   const hasErrors = () => {
     return (
-      state.nameInputMessages.length > 0 ||
+      state.nameInputMessages.length > 0 || state.pointsInputMessages.length > 0 ||
       (state.lockUntilChecked && (state.lockUntilInputMessages.length > 0 || !validDate))
     )
   }
@@ -207,6 +207,64 @@ export default function SettingsPanel({
     })
   }, [state.nameInputMessages])
 
+  const setPointsInputError = (requirement: Requirement) => {
+    if (
+      !['score', 'percentage'].includes(requirement.type) ||
+      ['view', 'mark', 'submit'].includes(requirement.type)
+    ) {
+      return
+    }
+
+    const minimumScore = 'minimumScore' in requirement ? Number(requirement.minimumScore) : 0.0
+
+    if (minimumScore <= 0) {
+      return I18n.t('Required input')
+    }
+
+    const limit = requirement.type === 'score' ? Number(requirement.pointsPossible) : 100
+
+    return minimumScore > limit ? I18n.t('Invalid input') : null
+  }
+
+  const handlePointsInputError = useCallback((pointsMessages: PointsInputMessages) => {
+    dispatch({
+      type: actions.SET_POINTS_INPUT_MESSAGES,
+      payload: pointsMessages,
+    })
+
+  }, [])
+
+  const validatePointsInput = (requirement: Requirement) => {
+    const message = setPointsInputError(requirement)
+    const pointsMessages = state.pointsInputMessages.filter((item) => item.requirementId !== requirement.id)
+
+    if (message){
+      pointsMessages.push({
+        requirementId: requirement.id,
+        message,
+      })
+    }
+
+    handlePointsInputError(pointsMessages)
+  }
+
+  const validatePointsInputList = useCallback(() => {
+    const pointsMessages : PointsInputMessages  = []
+
+    state.requirements?.forEach((requirement) => {
+
+      const message = setPointsInputError(requirement)
+
+      if (message)
+        pointsMessages.push({
+          requirementId: requirement.id,
+          message,
+        })
+    })
+
+    return pointsMessages
+  }, [state.requirements])
+
   const handleSave = useCallback(() => {
     // check for errors
     if (state.moduleName.trim().length === 0) {
@@ -214,6 +272,21 @@ export default function SettingsPanel({
       nameInputRef.current?.focus()
       return
     }
+
+    // Validation only applies if flag is enabled
+    if (window.ENV.FEATURES.modules_requirements_allow_percentage) {
+      const pointsInputsErrors = validatePointsInputList()
+      handlePointsInputError(pointsInputsErrors)
+
+      if (pointsInputsErrors && pointsInputsErrors.length > 0) {
+        return
+      }
+    }
+
+    if (state.pointsInputMessages.length > 0) {
+      return
+    }
+
     if (state.lockUntilChecked && state.unlockAt === undefined) {
       dateInputRef.current?.focus()
       return
@@ -223,10 +296,20 @@ export default function SettingsPanel({
 
     setLoading(true)
 
-    handleRequest({moduleId, moduleElement, addModuleUI, data: state})
+    handleRequest({ moduleId, moduleElement, addModuleUI, data: state })
       .finally(() => setLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
-  }, [state, moduleId, moduleElement, addModuleUI, handleNameError, onDidSubmit, onDismiss])
+  }, [
+    state,
+    moduleId,
+    moduleElement,
+    addModuleUI,
+    handleNameError,
+    handlePointsInputError,
+    onDidSubmit,
+    onDismiss,
+    validatePointsInputList,
+  ])
 
   function customOnDismiss() {
     if (!moduleId) {
@@ -400,6 +483,8 @@ export default function SettingsPanel({
                   ],
                 })
               }}
+              pointsInputMessages={state.pointsInputMessages}
+              validatePointsInput={validatePointsInput}
             />
           </View>
         )}

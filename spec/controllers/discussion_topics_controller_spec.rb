@@ -252,6 +252,12 @@ describe DiscussionTopicsController do
         end
       end
 
+      it "works with short global id format" do
+        @topic = @course.discussion_topics.create!(title: "student topic", message: "Hello", user: @student)
+        get "show", params: { course_id: @course.id, id: "#{@topic.shard.id}~#{@topic.id}" }
+        expect(response).to have_http_status :found
+      end
+
       it "returns the topic across shards" do
         @topic = @course.discussion_topics.create!(title: "student topic", message: "Hello", user: @student)
         user_session(@student)
@@ -636,6 +642,30 @@ describe DiscussionTopicsController do
         override.assignment_override_students.create!(user: student)
       end
     end
+
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+      end
+
+      it "adds differentiation tags information if account setting is on" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "students cannot manage differentiation tags" do
+        user_session(@student)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
+      end
+    end
   end
 
   describe "GET 'show'" do
@@ -854,6 +884,34 @@ describe DiscussionTopicsController do
       expect(assigns[:js_bundles].first).to include(:discussion_topics_post)
       expect(assigns[:_crumbs]).to include(["Discussions", "/courses/#{@course.id}/discussion_topics", {}])
       expect(controller.js_env[:discussion_topic_menu_tools].first).to eq commons_hash
+    end
+
+    context "assign to differentiation tags (for discussion redesign only)" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.enable_feature! :react_discussions_post
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+      end
+
+      it "adds differentiation tags information if account setting is on" do
+        user_session(@teacher)
+        @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello")
+        get "show", params: { course_id: @course.id, id: @discussion.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "CAN_MANAGE_DIFFERENTIAITON_TAGS is false if user cannot manage tags" do
+        user_session(@student)
+        @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello")
+        get "show", params: { course_id: @course.id, id: @discussion.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
+      end
     end
 
     it "does not work for announcements in a public course" do
@@ -1791,6 +1849,20 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
     end
 
+    it "js_env DISCUSSION_DEFAULT_EXPAND_ENABLED is set to true when creating a discussion and discussion default expand ff is on" do
+      Account.site_admin.enable_feature! :discussion_default_expand
+      user_session(@teacher)
+      get :new, params: { course_id: @course.id }
+      expect(assigns[:js_env][:DISCUSSION_DEFAULT_EXPAND_ENABLED]).to be_truthy
+    end
+
+    it "js_env DISCUSSION_DEFAULT_SORT_ENABLED is set to true when creating a discussion and discussion default sort ff is on" do
+      Account.site_admin.enable_feature! :discussion_default_sort
+      user_session(@teacher)
+      get :new, params: { course_id: @course.id }
+      expect(assigns[:js_env][:DISCUSSION_DEFAULT_SORT_ENABLED]).to be_truthy
+    end
+
     it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of :differentiation_tags ff state" do
       Account.site_admin.enable_feature!(:differentiation_tags)
 
@@ -2002,6 +2074,20 @@ describe DiscussionTopicsController do
       @course.root_account.enable_feature!(:discussion_checkpoints)
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
+    end
+
+    it "js_env DISCUSSION_DEFAULT_EXPAND_ENABLED is set to true when editing a discussion and discussion default expand ff is on" do
+      Account.site_admin.enable_feature! :discussion_default_expand
+      user_session(@teacher)
+      get :edit, params: { course_id: @course.id, id: @topic.id }
+      expect(assigns[:js_env][:DISCUSSION_DEFAULT_EXPAND_ENABLED]).to be_truthy
+    end
+
+    it "js_env DISCUSSION_DEFAULT_SORT_ENABLED is set to true when editing a discussion and discussion default sort ff is on" do
+      Account.site_admin.enable_feature! :discussion_default_sort
+      user_session(@teacher)
+      get :edit, params: { course_id: @course.id, id: @topic.id }
+      expect(assigns[:js_env][:DISCUSSION_DEFAULT_SORT_ENABLED]).to be_truthy
     end
 
     it "js_env RESTRICT_QUANTITATIVE_DATA is set to true if enabled in course" do
@@ -2217,6 +2303,34 @@ describe DiscussionTopicsController do
         post("create", params: post_params, format: :json)
         @teacher.reload
         expect(@teacher.create_announcements_unlocked?).to be_falsey
+      end
+    end
+
+    describe "handle locked parameter" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "removes discussion_type and require_initial_post when is_announcement is true and lock_comment is true" do
+        post_params = topic_params(@course, { is_announcement: true, lock_comment: true, discussion_type: "threaded", require_initial_post: true })
+        post "create", params: post_params, format: :json
+        topic = assigns[:topic]
+
+        expect(topic.is_announcement).to be_truthy
+        expect(topic.locked).to be_truthy
+        expect(topic.discussion_type).to eq "not_threaded"
+        expect(topic.require_initial_post).to be_falsey
+      end
+
+      it "does not remove discussion_type and require_initial_post when is_announcement is true and lock_comment is false" do
+        post_params = topic_params(@course, { is_announcement: true, lock_comment: false, discussion_type: "threaded", require_initial_post: true })
+        post "create", params: post_params, format: :json
+        topic = assigns[:topic]
+
+        expect(topic.is_announcement).to be_truthy
+        expect(topic.locked).to be_falsey
+        expect(topic.discussion_type).to eq "threaded"
+        expect(topic.require_initial_post).to be_truthy
       end
     end
 
@@ -2455,13 +2569,13 @@ describe DiscussionTopicsController do
       expect(accessed_asset[:level]).to eq "participate"
     end
 
-    it "creates an announcement that is locked by default" do
+    it "creates an announcement that is not locked by default" do
       user_session(@teacher)
       params = topic_params(@course, { is_announcement: true })
       params.delete(:locked)
       post("create", params:, format: :json)
       expect(response).to be_successful
-      expect(DiscussionTopic.last.locked).to be_truthy
+      expect(DiscussionTopic.last.locked).to be_falsy
     end
 
     it "creates a discussion topic that is not locked by default" do
@@ -2999,6 +3113,25 @@ describe DiscussionTopicsController do
       expect(response).to be_successful
       topics.each(&:reload)
       expect(topics.map(&:position)).to eq [2, 1, 3]
+    end
+  end
+
+  describe "Horizon course" do
+    before do
+      allow(@course).to receive(:horizon_course?).and_return(true)
+    end
+
+    it "does not let create/edit discussions" do
+      user_session @teacher
+      expect do
+        @course.discussion_topics.create!(title: "some topic")
+      end.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "lets create/edit announcements" do
+      user_session @teacher
+      @course.announcements.create!(message: "some topic123")
+      expect(@course.announcements.last.message).to eq "some topic123"
     end
   end
 

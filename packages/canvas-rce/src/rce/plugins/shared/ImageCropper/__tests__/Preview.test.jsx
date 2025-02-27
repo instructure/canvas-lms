@@ -79,7 +79,7 @@ describe('Preview', () => {
       const {container} = subject()
       expect(container.querySelector('img').style).toHaveProperty(
         'transform',
-        'rotate(90deg) scale(1.6)'
+        'rotate(90deg) scale(1.6)',
       )
     })
   })

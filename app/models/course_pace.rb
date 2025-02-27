@@ -587,8 +587,15 @@ class CoursePace < ActiveRecord::Base
       context.course_paces.primary.published.take ||
         context.course_paces.primary.not_deleted.take
     when CourseSection
-      course.course_paces.for_section(context).published.take ||
-        course.course_paces.for_section(context).not_deleted.take
+      if exact
+        course.course_paces.for_section(context).published.take ||
+          course.course_paces.for_section(context).not_deleted.take
+      else
+        course.course_paces.for_section(context).published.take ||
+          course.course_paces.for_section(context).not_deleted.take ||
+          course.course_paces.primary.published.take ||
+          course.course_paces.primary.not_deleted.take
+      end
     when Enrollment
       if exact
         course.course_paces.for_user(context.user).published.take ||

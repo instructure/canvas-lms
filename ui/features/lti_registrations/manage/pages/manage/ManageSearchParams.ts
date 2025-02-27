@@ -23,7 +23,16 @@ import {z} from 'zod'
 export const ZManageSearchParams = {
   q: z.string().optional(),
   sort: z
-    .enum(['name', 'nickname', 'lti_version', 'installed', 'installed_by', 'updated_by', 'on'])
+    .enum([
+      'name',
+      'nickname',
+      'lti_version',
+      'installed',
+      'installed_by',
+      'updated_by',
+      'updated',
+      'on',
+    ])
     .default('installed'),
   dir: z.enum(['asc', 'desc']).default('desc'),
   page: z.string().pipe(z.coerce.number()).default('1'),

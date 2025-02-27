@@ -879,6 +879,19 @@ describe "discussions" do
         file2.close
       end
 
+      context "Horizon course" do
+        before do
+          Account.site_admin.enable_feature!(:horizon_course_setting)
+          @course.horizon_course = true
+          @course.save!
+        end
+
+        it "does not navigate to discussions create page" do
+          Discussion.start_new_discussion @course.id
+          expect(element_exists?(Discussion.save_selector)).to be_falsey
+        end
+      end
+
       context "usage rights" do
         before do
           course.update!(usage_rights_required: true)

@@ -283,6 +283,18 @@ describe('DiscussionTopicForm', () => {
       expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
     })
 
+    it('disable checkpoints if there are student submissions', () => {
+      const {queryByTestId} = setup({
+        currentDiscussionTopic: DiscussionTopic.mock({
+          assignment: Assignment.mock({
+            hasSubmittedSubmissions: true,
+          })
+        })
+      })
+
+      expect(queryByTestId('checkpoints-checkbox')).toBeDisabled()
+    })
+
     it('displays disabled "Allow Participants to Comment" when the setting is turned off', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
       window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true

@@ -24,7 +24,7 @@
  */
 export function simpleCache<K, V>(
   compute: (value: K) => V,
-  cache = new Map<K, V>()
+  cache = new Map<K, V>(),
 ): SimpleCache<K, V> {
   return {
     cache,

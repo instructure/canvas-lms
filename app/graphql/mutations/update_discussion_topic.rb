@@ -63,7 +63,14 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     end
 
     unless input[:published].nil?
-      input[:published] ? discussion_topic.publish! : discussion_topic.unpublish!
+      was_published = discussion_topic.published?
+      if input[:published] && !was_published
+        discussion_topic.publish!
+      elsif input[:published] && was_published
+        discussion_topic.edit!
+      else
+        discussion_topic.unpublish!
+      end
     end
 
     if !input[:remove_attachment].nil? && input[:remove_attachment]
@@ -77,6 +84,11 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
     unless input[:discussion_type].nil?
       discussion_topic.discussion_type = input[:discussion_type]
+    end
+
+    # Validating default expand input data
+    if input.key?(:expanded) && input.key?(:expanded_locked) && (!input[:expanded] && input[:expanded_locked])
+      return validation_error(I18n.t("Cannot set default thread state locked, when threads are collapsed"))
     end
 
     process_common_inputs(input, discussion_topic.is_announcement, discussion_topic)
@@ -146,6 +158,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       # Assignment must be present to set checkpoints
       if discussion_topic.assignment && input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
         return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
+        return validation_error(I18n.t("If there are submissions, checkpoints cannot be enabled.")) if input.dig(:assignment, :for_checkpoints) && discussion_topic.assignment.has_submitted_submissions?
 
         # on the case of changing an ungraded discussion to a graded, checkpointed discussion, at this stage
         # has_sub_assignments? returns true, but sub_assignments is empty. We will want the creator service when this happens

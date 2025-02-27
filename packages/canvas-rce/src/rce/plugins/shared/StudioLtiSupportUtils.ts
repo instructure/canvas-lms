@@ -52,7 +52,7 @@ export function isStudioContentItemCustomJson(input: any): input is StudioConten
 }
 
 export function studioAttributesFrom(
-  customJson: StudioContentItemCustomJson
+  customJson: StudioContentItemCustomJson,
 ): StudioMediaOptionsAttributes {
   return {
     'data-studio-resizable': customJson.resizable ?? false,
@@ -62,7 +62,7 @@ export function studioAttributesFrom(
 }
 
 export function displayStyleFrom(
-  studioAttributes: StudioMediaOptionsAttributes | null
+  studioAttributes: StudioMediaOptionsAttributes | null,
 ): 'inline-block' | '' {
   if (!studioAttributes) return ''
 

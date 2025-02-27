@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -39,7 +37,7 @@ const Template: Story<CustomRecurrenceModalProps> = args => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true)
 
   const handleChange = useCallback((newRRULE: string | null) => {
-    setCurrRRULE(newRRULE)
+    setCurrRRULE(newRRULE ?? '')
     setIsModalOpen(false)
   }, [])
 
@@ -106,7 +104,7 @@ WithCourseEnd.args = {
 
 export const YearlyJuly4 = Template.bind({})
 YearlyJuly4.args = {
-  local: 'en',
+  locale: 'en',
   timezone: mytimezone,
   eventStart: moment.tz('2023-07-04', mytimezone).toISOString(true),
   // RRULE: 'FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=1;UNTIL=20240501T000000Z',

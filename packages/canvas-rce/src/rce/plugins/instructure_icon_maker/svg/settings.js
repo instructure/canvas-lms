@@ -120,10 +120,10 @@ export function useSvgSettings(editor, editing, canvasOrigin) {
         if (imageSettings?.cropperSettings) {
           const generatedSvg = await createCroppedImageSvg(
             imageSettings.cropperSettings,
-            imageSettings.image
+            imageSettings.image,
           )
           metadataJson.embedImage = await convertFileToBase64(
-            new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'})
+            new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}),
           )
         } else {
           metadataJson.embedImage = imageSettings?.image || defaultState.embedImage

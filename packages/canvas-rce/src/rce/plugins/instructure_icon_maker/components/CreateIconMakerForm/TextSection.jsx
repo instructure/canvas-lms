@@ -51,7 +51,7 @@ export const TextSection = ({settings, onChange}) => {
   const [text, setText] = useDebouncedValue(
     settings.text || '',
     value => onChange({text: value}),
-    value => processText(text, value)
+    value => processText(text, value),
   )
 
   return (

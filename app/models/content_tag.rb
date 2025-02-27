@@ -37,6 +37,9 @@ class ContentTag < ActiveRecord::Base
                           "Lti::MessageHandler"].freeze
   TABLELESS_CONTENT_TYPES = ["ContextModuleSubHeader", "ExternalUrl"].freeze
   CONTENT_TYPES = (TABLED_CONTENT_TYPES + TABLELESS_CONTENT_TYPES).freeze
+  HAS_ITS_OWN_ESTIMATED_DURATION = ["Attachment", "Assignment", "WikiPage", "Quizzes::Quiz", "DiscussionTopic"].freeze
+  CONTENT_TAG_ESTIMATED_DURATION = ["ContextExternalTool", "ExternalUrl"].freeze
+  HAS_ESTIMATED_DURATION = (HAS_ITS_OWN_ESTIMATED_DURATION + CONTENT_TAG_ESTIMATED_DURATION).freeze
 
   include Workflow
   include SearchTermHelper
@@ -62,6 +65,7 @@ class ContentTag < ActiveRecord::Base
   belongs_to :learning_outcome_content, class_name: "LearningOutcome", foreign_key: :content_id, inverse_of: false
   has_many :learning_outcome_results
   belongs_to :root_account, class_name: "Account"
+  has_one :estimated_duration, dependent: :destroy, inverse_of: :content_tag
 
   after_create :clear_stream_items_if_module_is_unpublished
 
@@ -93,17 +97,8 @@ class ContentTag < ActiveRecord::Base
   acts_as_list scope: :context_module
 
   set_policy do
-    #################### Begin legacy permission block #########################
     given do |user, session|
-      user && !root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-        context&.grants_right?(user, session, :manage_content)
-    end
-    can :delete
-    ##################### End legacy permission block ##########################
-
-    given do |user, session|
-      user && root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-        context&.grants_right?(user, session, :manage_course_content_delete)
+      user && context&.grants_right?(user, session, :manage_course_content_delete)
     end
     can :delete
   end
@@ -215,6 +210,32 @@ class ContentTag < ActiveRecord::Base
 
   def context_code
     super || (context_type && "#{context_type.to_s.underscore}_#{context_id}")
+  end
+
+  def can_set_estimated_duration
+    HAS_ESTIMATED_DURATION.include?(content_type)
+  end
+
+  def estimated_duration
+    if HAS_ITS_OWN_ESTIMATED_DURATION.include?(content_type)
+      content&.estimated_duration || super
+    else
+      super
+    end
+  end
+
+  def estimated_duration=(estimate)
+    if HAS_ITS_OWN_ESTIMATED_DURATION.include?(content_type)
+      content&.estimated_duration = estimate
+    else
+      super
+    end
+  end
+
+  def estimated_duration_minutes
+    return 0 unless estimated_duration
+
+    estimated_duration.duration.to_i / 60
   end
 
   def context_name

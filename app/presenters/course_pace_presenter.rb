@@ -20,11 +20,14 @@
 class CoursePacePresenter
   include Rails.application.routes.url_helpers
 
-  attr_reader :course_pace
+  attr_reader :course_pace, :enrollment
 
   def initialize(course_pace)
     @course_pace = course_pace
   end
+
+  DATE_FORMAT = "%m/%d/%Y"
+  TEMPLATE_PATH = "app/presenters/course_pacing/templates"
 
   def as_json
     {
@@ -46,7 +49,134 @@ class CoursePacePresenter
     }.merge(course_pace.start_date(with_context: true)).merge(course_pace.effective_end_date(with_context: true))
   end
 
+  def as_docx(pace_context)
+    if pace_context.is_a? Enrollment
+      @enrollment = pace_context
+    end
+    doc = case pace_context
+          when Course
+            Docx::Document.open("#{TEMPLATE_PATH}/DefaultCoursePace.docx")
+          when CourseSection
+            Docx::Document.open("#{TEMPLATE_PATH}/SectionCoursePace.docx")
+          when Enrollment
+            Docx::Document.open("#{TEMPLATE_PATH}/IndividualCoursePace.docx")
+          end
+
+    enrollment_start_date = enrollment&.start_at || [enrollment&.effective_start_at, enrollment&.created_at].compact.max
+    start_date = enrollment_start_date&.to_date || course_pace.start_date.to_date
+    docx_replace(doc, "[Course Name]", course_pace.course.name)
+
+    if pace_context.is_a? Enrollment
+      docx_replace(doc, "[Student Name]", pace_context.user.name)
+      docx_replace(doc, "[On Pace/ Off Pace]", "TODO")
+    elsif pace_context.is_a? CourseSection
+      docx_replace(doc, "[Section Name]", pace_context.name)
+      docx_replace(doc, "[x] students in this section", "#{pace_context.students.count} students in this section")
+    end
+
+    docx_replace(doc, "[MM/DD/YYYY] Start Date", "#{start_date.strftime(DATE_FORMAT)} Start Date")
+    docx_replace(doc, "[MM/DD/YYYY] End Date", "#{planned_end_date.strftime(DATE_FORMAT)} End Date")
+    docx_replace(doc, "[x] Assignments", "#{course_pace.course_pace_module_items.count} Assignments")
+
+    duration = (planned_end_date - start_date).to_i
+    docx_replace(doc, "[x] weeks, [x] days", "#{duration / 7} weeks, #{duration % 7} days")
+
+    add_docx_tables(doc)
+
+    doc.stream
+  end
+
   private
+
+  def add_docx_tables(doc)
+    module_table_template = doc.tables.first
+    course_table_template = doc.tables.last
+
+    module_tables = course_pace_module_items.map do |context_module, items|
+      make_module_table(context_module, items, module_table_template)
+    end
+
+    course_table = make_course_table(course_table_template)
+
+    insert_after_point = course_table_template
+    module_tables.each do |module_table|
+      module_table.insert_after(insert_after_point)
+      p = module_table.rows.last.cells.last.paragraphs.last.copy
+      p.blank!
+      p.insert_after(module_table)
+      insert_after_point = p
+    end
+
+    course_table.insert_after(insert_after_point)
+
+    module_table_template.remove!
+    course_table_template.remove!
+  end
+
+  def make_module_table(context_module, items, module_table_template)
+    table = module_table_template.copy
+
+    module_descriptor_row = table.rows.first
+    docx_replace(module_descriptor_row.cells[0], "[Module Name]", context_module.name)
+
+    assignment_descriptor_template = table.rows.last.copy
+    table.rows.last.remove!
+
+    items.each do |ppmi|
+      module_item = ppmi.module_item
+      item_row = assignment_descriptor_template.copy
+      item_row.cells.each_with_index do |cell, idx|
+        case idx
+        when 0
+          docx_replace(cell, "[Assignment Name]", module_item.title + " ")
+          case module_item.content_type
+          when "Assignment", "Quizzes::Quiz"
+            points = TextHelper.round_if_whole(module_item&.content&.points_possible)
+            docx_replace(cell, "[x] Points", "#{points} #{"Point".pluralize(points)}")
+          when "Page"
+            docx_replace(cell, "[x] Points", "View")
+          end
+        when 1
+          docx_replace(cell, "[X]", ppmi.duration.to_s)
+        when 2
+          docx_replace(cell, "MM/DD/YYYY", due_dates[ppmi.id].strftime(DATE_FORMAT))
+        when 3
+          docx_replace(cell, "[published/ unpublished]", module_item.content.published? ? "Published" : "Unpublished")
+        end
+      end
+      item_row.insert_after(table.rows.last)
+    end
+
+    table
+  end
+
+  def make_course_table(course_table_template)
+    table = course_table_template.copy
+    table.rows.last.remove!
+    blackout_template = table.rows.first
+
+    blackout_dates = due_dates_calculator.blackout_dates
+
+    blackout_dates.each do |blackout_date|
+      row = blackout_template.copy
+
+      docx_replace(row.cells.first, "Black Out Dates", "Black Out Dates: #{blackout_date.title}")
+      docx_replace(row.cells.last, "MM/DD/YYYY", "#{blackout_date.start_at.strftime(DATE_FORMAT)}-#{blackout_date.end_at.strftime(DATE_FORMAT)}")
+
+      row.insert_before(blackout_template)
+    end
+
+    skipped_dates_row = blackout_template.copy
+
+    docx_replace(skipped_dates_row.cells.first, "Black Out Dates", "Skipped Dates")
+    docx_replace(skipped_dates_row.cells.last, "MM/DD/YYYY", course_pace.selected_days_to_skip.map(&:capitalize).join("/"))
+
+    skipped_dates_row.insert_before(blackout_template)
+
+    blackout_template.remove!
+
+    table
+  end
 
   def modules_json
     course_pace_module_items.map do |context_module, items|
@@ -130,7 +260,7 @@ class CoursePacePresenter
               end
 
       module_item_ids = items.filter_map(&:module_item_id).uniq
-      module_items = ContentTag.where(id: module_item_ids).preload(:context_module).index_by(&:id)
+      module_items = ContentTag.where(id: module_item_ids).preload(:context_module, :content).index_by(&:id)
 
       items.each do |ppmi|
         ppmi.module_item = module_items[ppmi.module_item_id]
@@ -138,6 +268,26 @@ class CoursePacePresenter
 
       items.group_by { |ppmi| ppmi.module_item.context_module }
            .sort_by { |context_module, _items| context_module&.position || Float::INFINITY }
+    end
+  end
+
+  def due_dates_calculator
+    @due_dates_calculator ||= CoursePaceDueDatesCalculator.new(course_pace)
+  end
+
+  def due_dates
+    @due_dates ||= due_dates_calculator.get_due_dates(course_pace_module_items.to_h.values.flatten, enrollment)
+  end
+
+  def planned_end_date
+    @planned_end_date ||= due_dates.values.last
+  end
+
+  def docx_replace(doc, matcher, replace_with)
+    doc.paragraphs.each do |p|
+      p.each_text_run do |tr|
+        tr.substitute(matcher, replace_with)
+      end
     end
   end
 end

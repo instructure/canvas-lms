@@ -186,7 +186,7 @@ export function embedUploadResult(results, selectedTabType) {
         contextId: results.contextId,
         uuid: results.uuid,
       },
-      false
+      false,
     )
   }
 }
@@ -301,7 +301,7 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
         },
         (err, uploadData) => {
           dispatch(mediaUploadComplete(err, uploadData))
-        }
+        },
       )
     }
 
@@ -319,7 +319,7 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
       .catch(e => {
         // Get rid of any placeholder that might be there.
         dispatch(removePlaceholdersFor(fileMetaProps.name))
-        // eslint-disable-next-line no-console
+         
         console.error('Fetching the media folder failed.', e)
       })
   }
@@ -454,7 +454,7 @@ export function uploadPreflight(tabContext, fileMetaProps) {
           if (embedResult?.loadingPromise) {
             // Wait until the image loads to remove the placeholder
             await embedResult.loadingPromise.finally(() =>
-              dispatch(removePlaceholdersFor(fileMetaProps.name))
+              dispatch(removePlaceholdersFor(fileMetaProps.name)),
             )
           } else {
             dispatch(removePlaceholdersFor(fileMetaProps.name))

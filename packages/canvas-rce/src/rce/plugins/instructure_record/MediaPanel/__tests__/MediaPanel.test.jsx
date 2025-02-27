@@ -48,7 +48,7 @@ function renderComponent(props) {
       fetchNextMedia={() => {}}
       onMediaEmbed={() => {}}
       {...props}
-    />
+    />,
   )
 }
 
@@ -111,14 +111,14 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
     it('shows a "pending" message for the file', () => {
       const {getByText} = renderComponent(getPanelProps('course', filesObj))
       expect(getByText('pending file').parentElement.parentElement.outerHTML).toContain(
-        'Media file is processing. Please try again later.'
+        'Media file is processing. Please try again later.',
       )
     })
   })
 
   it('renders load more button if there is more', () => {
     const {getByText} = renderComponent(
-      getPanelProps('course', makeFiles({hasMore: true, bookmark: 'next.docs'}))
+      getPanelProps('course', makeFiles({hasMore: true, bookmark: 'next.docs'})),
     )
 
     expect(getByText('Load More')).toBeInTheDocument()
@@ -167,7 +167,7 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
 
   it('shows spinner while loading more', () => {
     const {getByText} = renderComponent(
-      getPanelProps('course', makeFiles({isLoading: true, hasMore: true}))
+      getPanelProps('course', makeFiles({isLoading: true, hasMore: true})),
     )
 
     expect(getByText('Loading')).toBeInTheDocument()

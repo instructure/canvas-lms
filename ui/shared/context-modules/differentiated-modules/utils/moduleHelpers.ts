@@ -38,6 +38,7 @@ const resourceTypeMap: Record<string, Requirement['resource']> = {
 
 const requirementTypeMap: Record<string, Requirement['type']> = {
   min_score_requirement: 'score',
+  min_percentage_requirement: 'percentage',
   must_view_requirement: 'view',
   must_mark_done_requirement: 'mark',
   must_contribute_requirement: 'contribute',
@@ -46,6 +47,7 @@ const requirementTypeMap: Record<string, Requirement['type']> = {
 
 const requirementTypeMapReverse: Record<Requirement['type'], string> = {
   score: 'min_score_requirement',
+  percentage: 'min_percentage_requirement',
   view: 'must_view_requirement',
   mark: 'must_mark_done_requirement',
   contribute: 'must_contribute_requirement',
@@ -54,6 +56,7 @@ const requirementTypeMapReverse: Record<Requirement['type'], string> = {
 
 const requirementFriendlyLabelMap: Record<Requirement['type'], string> = {
   score: I18n.t('Score at least'),
+  percentage: I18n.t('Score at least'),
   view: I18n.t('View'),
   mark: I18n.t('Mark done'),
   contribute: I18n.t('Contribute'),
@@ -74,6 +77,10 @@ function requirementScreenreaderMessage(requirement: Requirement) {
       return I18n.t('Must contribute to this module item to complete it')
     case 'submit':
       return I18n.t('Must submit this module item to complete it')
+    case 'percentage':
+      return I18n.t('Must score at least %{points}% to complete this module item', {
+        points: requirement.minimumScore,
+      })
   }
 }
 
@@ -332,13 +339,15 @@ function updateRequirements(moduleElement: HTMLDivElement, moduleSettings: Setti
       const descriptionElement = moduleItemElement.querySelector('.requirement-description')
       if (descriptionElement) {
         const scoreElement =
-          requirement.type === 'score'
+          (requirement.type === 'score' || requirement.type === 'percentage')
             ? `<span class="min_score"> ${requirement.minimumScore}</span>`
             : ''
+
+        const percentageSymbol = requirement.type === 'percentage' ? '%' : '';
         descriptionElement.innerHTML = `
           <span class="requirement_type ${requirementTypeMapReverse[requirement.type]}">
             <span class="unfulfilled">
-              ${requirementFriendlyLabelMap[requirement.type]}${scoreElement}
+              ${requirementFriendlyLabelMap[requirement.type]}${scoreElement}${percentageSymbol}
               <span class="screenreader-only">${requirementScreenreaderMessage(requirement)}</span>
             </span>
           </span>
@@ -387,7 +396,8 @@ function parseModuleItemData(element: Element, isRequirement: boolean) {
     data.pointsPossible = pointsPossibleString ? pointsPossibleString.split(/\s/)[0] : null
     if (isRequirement) {
       // @ts-expect-error
-      data.minimumScore = activeRequirementNode.querySelector('.min_score')?.textContent || '0'
+      data.minimumScore = activeRequirementNode.querySelector('.min_score, .min_percentage')?.textContent || '0'
+      
     }
   }
   return data

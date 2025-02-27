@@ -280,7 +280,9 @@ module MasterCourses::Restrictor
   # preload restrictions on the child course
   def self.preload_child_restrictions(objects)
     objects = Array(objects)
-    objects_to_load = objects.select { |obj| obj.is_child_content? && !obj.child_content_restrictions_loaded? }.index_by(&:migration_id)
+    objects_to_load = objects.select do |obj|
+      !obj.is_a?(Folder) && obj.is_child_content? && !obj.child_content_restrictions_loaded?
+    end.index_by(&:migration_id)
     migration_ids = objects_to_load.keys
     return unless migration_ids.any?
 

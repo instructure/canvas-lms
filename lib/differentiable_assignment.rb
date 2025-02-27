@@ -24,6 +24,7 @@ module DifferentiableAssignment
 
   def visible_to_user?(user)
     return true unless differentiated_assignments_applies?
+    return false if user.nil?
 
     is_visible = false
     Shard.with_each_shard(user.associated_shards) do
@@ -111,7 +112,7 @@ module DifferentiableAssignment
       Rails.cache.fetch([context, user, "teacher_or_public_user"].cache_key) do
         if context.includes_user?(user)
           permissions_implying_visibility = [:read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS]
-          permissions_implying_visibility << [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS] if context.is_a?(Course)
+          permissions_implying_visibility << RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS if context.is_a?(Course)
           context.grants_any_right?(user, *permissions_implying_visibility)
         else
           true

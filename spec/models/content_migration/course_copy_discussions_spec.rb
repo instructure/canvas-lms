@@ -324,13 +324,13 @@ describe ContentMigration do
       expect(decoy_ag.reload.name).not_to eql group.name
     end
 
-    it "copies references to locked discussions even if manage_content is not true" do
+    it "copies references to locked discussions even if manage_course_content_edit is not true" do
       @role = Account.default.roles.build name: "SuperTeacher"
       @role.base_role_type = "TeacherEnrollment"
       @role.save!
       @copy_to.enroll_user(@user, "TeacherEnrollment", role: @role)
 
-      Account.default.role_overrides.create!(permission: "manage_content", role: teacher_role, enabled: false)
+      Account.default.role_overrides.create!(permission: "manage_course_content_edit", role: teacher_role, enabled: false)
 
       topic = @copy_from.discussion_topics.build(title: "topic")
       topic.locked = true

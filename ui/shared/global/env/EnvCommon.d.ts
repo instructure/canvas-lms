@@ -66,6 +66,35 @@ export type GroupOutcome = {
   description: string
 }
 
+export interface BlueprintCourse {
+  id: number | string
+  name: string
+  enrollment_term_id: number | string
+}
+
+export interface SubAccount {
+  id: number | string
+  name: string
+}
+
+export interface Term {
+  id: number | string
+  name: string
+}
+
+export interface BlueprintCoursesData {
+  isMasterCourse: boolean
+  isChildCourse: boolean
+  accountId: number | string
+  masterCourse: BlueprintCourse
+  course: BlueprintCourse
+  subAccounts?: SubAccount[]
+  terms?: Term[]
+  canManageCourse?: boolean
+  canAutoPublishCourses?: boolean
+  itemNotificationFeatureEnabled?: boolean
+}
+
 export interface EnvCommon {
   ASSET_HOST: string
   active_brand_config_json_url: string
@@ -233,6 +262,8 @@ export interface EnvCommon {
    * and ui/shared/trays/react/ContentTypeExternalToolDrawer.tsx
    */
   top_navigation_tools: Tool[]
+
+  BLUEPRINT_COURSES_DATA: BlueprintCoursesData | undefined
 }
 
 /**
@@ -283,11 +314,17 @@ export type RootAccountFeatureId =
   | 'course_pace_draft_state'
   | 'course_pace_time_selection'
   | 'course_pace_pacing_status_labels'
+  | 'modules_requirements_allow_percentage'
+  | 'lti_asset_processor'
+  | 'discussion_checkpoints'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type BrandAccountFeatureId = 'embedded_release_notes' | 'consolidated_media_player'
+export type BrandAccountFeatureId =
+  | 'embedded_release_notes'
+  | 'consolidated_media_player'
+  | 'discussions_speedgrader_revisit'
 
 /**
  * Feature id exported in ApplicationController that aren't mentioned in

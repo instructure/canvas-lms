@@ -122,7 +122,7 @@ describe('RCE "Links" Plugin > LinkOptionsDialog', () => {
           event => {
             Object.assign(event, {preventDefault})
           },
-          true
+          true,
         )
         dialog.$doneButton.click()
         expect(preventDefault).toHaveBeenCalledTimes(1)

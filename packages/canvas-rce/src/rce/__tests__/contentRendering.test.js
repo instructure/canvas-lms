@@ -19,6 +19,17 @@
 import * as contentRendering from '../contentRendering'
 import {audioFromTray, audioFromUpload, videoFromTray, videoFromUpload} from './contentHelpers'
 import RCEGlobals from '../RCEGlobals'
+import { videoDefaultSize } from '../plugins/instructure_record/VideoOptionsTray/TrayController'
+
+jest.mock('../plugins/instructure_record/VideoOptionsTray/TrayController', () => {
+  const originalModule = jest.requireActual(
+    '../plugins/instructure_record/VideoOptionsTray/TrayController'
+  )
+  return {
+    ...originalModule,
+    videoDefaultSize: jest.fn(),
+  }
+})
 
 describe('contentRendering', () => {
   const canvasOrigin = 'https://mycanvas.com:3000'
@@ -36,7 +47,7 @@ describe('contentRendering', () => {
     it('uses link data to build html', () => {
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>',
       )
     })
 
@@ -45,7 +56,7 @@ describe('contentRendering', () => {
       link.href = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>',
       )
     })
 
@@ -53,7 +64,7 @@ describe('contentRendering', () => {
       link.title = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Click On Me</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Click On Me</a>',
       )
     })
 
@@ -61,7 +72,7 @@ describe('contentRendering', () => {
       link.text = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Here Be Links</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Here Be Links</a>',
       )
     })
 
@@ -70,7 +81,7 @@ describe('contentRendering', () => {
       link.title = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Link</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Link</a>',
       )
     })
 
@@ -87,7 +98,7 @@ describe('contentRendering', () => {
         '<a ' +
           'href="/users/2/files/17/download?verifier=xyzzy" target="_blank" rel="noopener" title="Link" ' +
           'class="instructure_file_link instructure_scribd_file">' +
-          'somefile.pdf</a>'
+          'somefile.pdf</a>',
       )
     })
 
@@ -95,7 +106,7 @@ describe('contentRendering', () => {
       link.href = 'http://example.com/users/2/files/17/download?verifier=xyzzy'
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="http://example.com/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+        '<a href="http://example.com/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>',
       )
     })
 
@@ -103,7 +114,7 @@ describe('contentRendering', () => {
       link.href = '/users/2/files/17/preview?verifier=xyzzy'
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+        '<a href="/users/2/files/17?verifier=xyzzy" title="Here Be Links">Click On Me</a>',
       )
     })
   })
@@ -191,11 +202,17 @@ describe('contentRendering', () => {
   })
 
   describe('renderVideo', () => {
+    const expectedVideoSize = { width: '200px', height: '100px' }
+    const { width, height } = expectedVideoSize
+    beforeEach(() => {
+      videoDefaultSize.mockReturnValue(expectedVideoSize)
+    })
+
     it('builds html from tray video data', () => {
       const video = videoFromTray()
       const html = contentRendering.renderVideo(video, canvasOrigin)
       expect(html).toEqual(
-        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_objects_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>`,
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_objects_iframe/17?type=video" style="width:${width};height:${height};display:inline-block;" title="Video player for filename.mov"></iframe>`,
       )
     })
 
@@ -203,7 +220,7 @@ describe('contentRendering', () => {
       const video = videoFromUpload()
       const html = contentRendering.renderVideo(video, canvasOrigin)
       expect(html).toEqual(
-        `<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" loading="lazy" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>`,
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" loading="lazy" src="/url/to/m-media-id?type=video" style="width:${width};height:${height};display:inline-block;" title="Video player for filename.mov"></iframe>`,
       )
     })
 
@@ -216,7 +233,7 @@ describe('contentRendering', () => {
       }
       const html = contentRendering.renderVideo(file, canvasOrigin)
       expect(html).toEqual(
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_objects_iframe?mediahref=/files/17&type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_objects_iframe?mediahref=/files/17&type=video" style="width:${width};height:${height};display:inline-block;" title="Video player for filename.mov"></iframe>`,
       )
     })
   })
@@ -264,7 +281,7 @@ describe('contentRendering', () => {
             media_entry_id: 'media-entry-id',
             id: 'id',
             file_id: 'file-id',
-          })
+          }),
       )
 
       it('returns media-id', () => {
@@ -279,7 +296,7 @@ describe('contentRendering', () => {
             media_entry_id: 'media-entry-id',
             id: 'id',
             file_id: 'file-id',
-          })
+          }),
       )
 
       it('returns media_entry_id', () => {
@@ -293,7 +310,7 @@ describe('contentRendering', () => {
           (media = {
             id: 'id',
             file_id: 'file-id',
-          })
+          }),
       )
 
       it('returns id', () => {
@@ -306,7 +323,7 @@ describe('contentRendering', () => {
         () =>
           (media = {
             file_id: 'file-id',
-          })
+          }),
       )
 
       it('returns file_id', () => {
@@ -316,8 +333,12 @@ describe('contentRendering', () => {
   })
 
   describe('renderVideo with attachment', () => {
+    const expectedVideoSize = { width: '200px', height: '100px' }
+    const { width, height } = expectedVideoSize
+
     beforeEach(() => {
       RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
+      videoDefaultSize.mockReturnValue(expectedVideoSize)
     })
 
     afterAll(() => {
@@ -328,7 +349,7 @@ describe('contentRendering', () => {
       const video = videoFromTray()
       const html = contentRendering.renderVideo(video, canvasOrigin)
       expect(html).toEqual(
-        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_attachments_iframe/17?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>`,
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_attachments_iframe/17?type=video&embedded=true" style="width:${width};height:${height};display:inline-block;" title="Video player for filename.mov"></iframe>`,
       )
     })
 
@@ -336,7 +357,7 @@ describe('contentRendering', () => {
       const video = videoFromUpload()
       const html = contentRendering.renderVideo(video, canvasOrigin)
       expect(html).toEqual(
-        `<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" loading="lazy" src="/media_attachments_iframe/maybe?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>`,
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" loading="lazy" src="/media_attachments_iframe/maybe?type=video&embedded=true" style="width:${width};height:${height};display:inline-block;" title="Video player for filename.mov"></iframe>`,
       )
     })
   })

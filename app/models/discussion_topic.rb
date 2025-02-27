@@ -49,7 +49,7 @@ class DiscussionTopic < ActiveRecord::Base
   restrict_columns :availability_dates, %i[unlock_at delayed_post_at lock_at]
   restrict_assignment_columns
 
-  attr_writer :can_unpublish, :preloaded_subentry_count, :sections_changed
+  attr_writer :can_unpublish, :preloaded_subentry_count, :sections_changed, :overrides_changed
   attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries, :notify_users
 
   module DiscussionTypes
@@ -104,7 +104,9 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :user
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :discussion_topic
   has_many :summaries, class_name: "DiscussionTopicSummary"
+  has_one :estimated_duration, dependent: :destroy, inverse_of: :discussion_topic
 
+  validates_with HorizonValidators::DiscussionsValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
   validates_associated :discussion_topic_section_visibilities
   validates :context_id, :context_type, presence: true
   validates :discussion_type, inclusion: { in: DiscussionTypes::TYPES }
@@ -119,6 +121,7 @@ class DiscussionTopic < ActiveRecord::Base
   validate :only_course_topics_can_be_section_specific
   validate :assignments_cannot_be_section_specific
   validate :course_group_discussion_cannot_be_section_specific
+  validate :collapsed_not_enforced
 
   sanitize_field :message, CanvasSanitize::SANITIZE
   copy_authorized_links(:message) { [context, nil] }
@@ -467,7 +470,14 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def create_participant
-    discussion_topic_participants.create(user:, workflow_state: "read", unread_entry_count: 0, subscribed: !subscription_hold(user, nil)) if user
+    if user
+      discussion_topic_participants.create(user:,
+                                           workflow_state: "read",
+                                           unread_entry_count: 0,
+                                           subscribed: !subscription_hold(user, nil),
+                                           expanded:,
+                                           sort_order:)
+    end
   end
 
   def update_materialized_view
@@ -564,6 +574,13 @@ class DiscussionTopic < ActiveRecord::Base
     # For some reason, the relation doesn't take care of this for us. Don't understand why.
     # Without this line, *two* discussion topic duplicates appear when a save is performed.
     result.assignment&.discussion_topic = result
+
+    if estimated_duration
+      # we have to save result here because we need the result.id to create the estimated_duration
+      result.save!
+      result.estimated_duration = EstimatedDuration.new({ discussion_topic_id: result.id, duration: estimated_duration.duration.iso8601 })
+    end
+
     result
   end
 
@@ -771,15 +788,16 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
           topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
-          topic_participant.sort_order = if context.feature_enabled?(:discussion_default_sort)
-                                           sort_order_locked ? sort_order : opts[:sort_order]
+
+          topic_participant.sort_order = if opts[:sort_order].nil?
+                                           topic_participant.sort_order.nil? ? sort_order : topic_participant.sort_order
                                          else
-                                           opts[:sort_order] || sort_order || DiscussionTopic::SortOrder::DESC
+                                           opts[:sort_order]
                                          end
-          topic_participant.expanded = if context.feature_enabled?(:discussion_default_expand)
-                                         expanded_locked ? expanded : opts[:expanded]
+          topic_participant.expanded = if opts[:expanded].nil?
+                                         topic_participant.expanded.nil? ? expanded : topic_participant.expanded
                                        else
-                                         opts[:expanded] || expanded || false
+                                         opts[:expanded]
                                        end
           topic_participant.save
         end
@@ -1033,6 +1051,11 @@ class DiscussionTopic < ActiveRecord::Base
     save!
   end
 
+  def edit!
+    self.last_reply_at = Time.zone.now
+    save!
+  end
+
   def unpublish
     self.workflow_state = "unpublished"
   end
@@ -1195,6 +1218,18 @@ class DiscussionTopic < ActiveRecord::Base
     if lock || section
       delay_if_production.partially_clear_stream_items(locked_by_module: lock, section_specific: section)
     end
+    if @overrides_changed
+      delay_if_production.clear_invalid_stream_items
+    end
+  end
+
+  def clear_invalid_stream_items
+    user_ids = []
+
+    stream_item&.stream_item_instances&.where(workflow_state: "unread")&.find_each do |item|
+      destroy_item_and_track(item, user_ids) unless visible_for?(item.user)
+    end
+    clear_stream_item_cache_for(user_ids)
   end
 
   def partially_clear_stream_items(locked_by_module: false, section_specific: false)
@@ -1407,7 +1442,7 @@ class DiscussionTopic < ActiveRecord::Base
       next false unless user && context.is_a?(Course) && context.grants_right?(user, session, :moderate_forum)
 
       if assignment_id
-        context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+        context.grants_right?(user, session, :manage_assignments_edit)
       else
         context.user_is_admin?(user) || context.account_membership_allows(user) || !context.visibility_limited_to_course_sections?(user)
       end
@@ -1418,7 +1453,7 @@ class DiscussionTopic < ActiveRecord::Base
       next false unless user && context.is_a?(Course) && context.grants_right?(user, session, :create_forum)
 
       if assignment_id
-        context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_add)
+        context.grants_right?(user, session, :manage_assignments_add)
       else
         context.user_is_admin?(user) || context.account_membership_allows(user) || !context.visibility_limited_to_course_sections?(user)
       end
@@ -2160,12 +2195,24 @@ class DiscussionTopic < ActiveRecord::Base
     return expanded if Account.site_admin.feature_enabled?(:discussion_default_expand) && expanded_locked
 
     current_user ||= self.current_user
-    participant(current_user)&.expanded || expanded || false
+
+    if participant(current_user).nil?
+      expanded || false
+    else
+      participant(current_user)&.expanded || false
+    end
   end
 
   private
 
   def enough_replies_for_checkpoint?(reply_to_entries)
     reply_to_entries.count >= reply_to_entry_required_count
+  end
+
+  # For the current business logic we don't allow collapsed discussion locking in any scenarios
+  def collapsed_not_enforced
+    if !expanded && expanded_locked
+      errors.add(:expanded_locked, t("Cannot lock a collapsed discussion"))
+    end
   end
 end

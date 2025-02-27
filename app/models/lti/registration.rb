@@ -86,7 +86,7 @@ class Lti::Registration < ActiveRecord::Base
 
   # Searches for the applicable overlay for a context. Currently only supports
   # overlays that are associated with the root account of the context. If no
-  # context is provided, the most recent overlay that is associated with this registration
+  # context is provided, the overlay that is associated with this registration
   # and this registration's account is returned.
   #
   # Overlays are different than account bindings in that we search in a bottom-to-top account
@@ -105,7 +105,6 @@ class Lti::Registration < ActiveRecord::Base
                 context.root_account
               end
 
-    # The most recent overlay takes precedence.
     overlay = Lti::Overlay.find_by(registration: self, account:)
 
     return overlay if overlay.present?
@@ -206,7 +205,7 @@ class Lti::Registration < ActiveRecord::Base
 
   # TODO: this will eventually need to account for 1.1 registrations
   def icon_url
-    ims_registration&.logo_uri || manual_configuration&.settings&.dig("extensions", 0, "settings", "icon_url")
+    ims_registration&.logo_uri || manual_configuration&.launch_settings&.dig("icon_url")
   end
 
   # Returns an LtiConfiguration-conforming Hash with the overlay appropriate

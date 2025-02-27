@@ -482,6 +482,7 @@ CanvasRails::Application.routes.draw do
     post "start_offline_web_export" => "courses#start_offline_web_export"
     get "start_offline_web_export" => "courses#start_offline_web_export"
     get "modules/items/assignment_info" => "context_modules#content_tag_assignment_data", :as => :context_modules_assignment_info
+    get "modules/items/estimated_duration_info" => "context_modules#content_tag_estimated_duration_data", :as => :context_modules_estimated_duration_info
     get "modules/items/master_course_info" => "context_modules#content_tag_master_course_data", :as => :context_modules_master_course_info
     get "modules/items/:id" => "context_modules#item_redirect", :as => :context_modules_item_redirect
     get "modules/items/:id/edit_mastery_paths" => "context_modules#item_redirect_mastery_paths"
@@ -1102,7 +1103,6 @@ CanvasRails::Application.routes.draw do
   scope(controller: :translation) do
     post "courses/:course_id/translate", action: :translate, as: :translate
     post "courses/:course_id/translate/paragraph", action: :translate_paragraph, as: :translate_paragraph
-    post "translate/message", action: :translate_message, as: :translate_message
   end
 
   ### API routes ###
@@ -1773,6 +1773,12 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/reports/:report", action: :create, as: "account_create_report"
       delete "accounts/:account_id/reports/:report/:id", action: :destroy
       put "accounts/:account_id/reports/:report/:id/abort", action: :abort
+    end
+
+    scope(controller: :course_reports) do
+      get "courses/:course_id/reports/:report_type", action: :last
+      get "courses/:course_id/reports/:report_type/:id", action: :show
+      post "courses/:course_id/reports/:report_type", action: :create
     end
 
     scope(controller: :admins) do
@@ -2905,12 +2911,14 @@ CanvasRails::Application.routes.draw do
     # Asset Service & Asset Report Service (LTI Asset Processor Specs)
     scope(controller: "lti/ims/asset_processor") do
       post "asset_processor/:asset_processor_id/report", action: :create_report, as: :lti_asset_processor_create_report
+      get "asset_processor/:asset_processor_id/asset/:asset_id", action: :lti_asset_show, as: :lti_asset_processor_asset_show
     end
 
     # Dynamic Registration Service
     scope(controller: "lti/ims/dynamic_registration") do
       get "accounts/:account_id/registration_token", action: :registration_token
-      get "accounts/:account_id/registrations/uuid/:registration_uuid", action: :registration_by_uuid
+      get "accounts/:account_id/registrations/uuid/:registration_uuid", action: :ims_registration_by_uuid
+      get "accounts/:account_id/lti_registrations/uuid/:registration_uuid", action: :lti_registration_by_uuid
       get "accounts/:account_id/registrations/:registration_id", action: :show
       put "accounts/:account_id/registrations/:registration_id/overlay", action: :update_registration_overlay
       get "accounts/:account_id/dr_iframe", action: :dr_iframe

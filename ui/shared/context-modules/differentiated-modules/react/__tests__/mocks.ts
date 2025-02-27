@@ -29,6 +29,12 @@ export const FILTERED_SECTIONS_DATA = [
   {id: '4', course_id: '1', name: 'Section C', start_at: null, end_at: null},
 ]
 
+export const DIFFERENTIATION_TAGS_DATA = [
+  {id: '1', course_id: '1', name: 'Tag 1', group_category_id: '1', non_collaborative: true, group_category: {id: '1', name: 'Differentiation Tags'}},
+  {id: '2', course_id: '1', name: 'Tag 2', group_category_id: '1', non_collaborative: true, group_category: {id: '1', name: 'Differentiation Tags'}},
+  {id: '3', course_id: '1', name: 'Tag 3', group_category_id: '1', non_collaborative: true, group_category: {id: '1', name: 'Differentiation Tags'}},
+]
+
 export const STUDENTS_DATA = [
   {
     id: 'student-1',
@@ -100,6 +106,15 @@ export const ASSIGNMENT_OVERRIDES_DATA = [
     course_section: {
       id: '2',
       name: 'Section A',
+    },
+  },
+  {
+    id: '3',
+    title: 'Differentiation Tag',
+    context_module_id: '2',
+    group: {
+      id: '1',
+      name: 'Tag 1',
     },
   },
 ]

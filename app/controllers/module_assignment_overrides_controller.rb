@@ -166,7 +166,7 @@ class ModuleAssignmentOverridesController < ApplicationController
   private
 
   def check_authorized_action
-    render_unauthorized_action unless @context.grants_any_right?(@current_user, :manage_content, :manage_course_content_edit)
+    render_unauthorized_action unless @context.grants_right?(@current_user, :manage_course_content_edit)
   end
 
   def require_context_module

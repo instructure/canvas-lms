@@ -1474,7 +1474,11 @@ class AccountsController < ApplicationController
                  BASE_URL: MicrosoftSync::LoginService::BASE_URL
                },
                COURSE_CREATION_SETTINGS: course_creation_settings,
-               EMOJI_DENY_LIST: @account.root_account.settings[:emoji_deny_list]
+               EMOJI_DENY_LIST: @account.root_account.settings[:emoji_deny_list],
+               ALERTS: {
+                 data: @alerts,
+                 account_roles: @account_roles,
+               }
              })
       js_env(edit_help_links_env, true)
     end

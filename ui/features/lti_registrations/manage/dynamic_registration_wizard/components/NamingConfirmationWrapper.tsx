@@ -18,14 +18,13 @@
 
 import React from 'react'
 import {NamingConfirmation} from '../../registration_wizard_forms/NamingConfirmation'
-import type {RegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
+import type {RegistrationOverlayStore} from '../RegistrationOverlayState'
+import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 import {useOverlayStore} from '../hooks/useOverlayStore'
-import {usePlacements} from '../hooks/usePlacements'
 
 export type NamingConfirmationWrapperProps = {
   overlayStore: RegistrationOverlayStore
-  registration: LtiImsRegistration
+  registration: LtiRegistrationWithConfiguration
 }
 
 export const NamingConfirmationWrapper = ({
@@ -33,27 +32,25 @@ export const NamingConfirmationWrapper = ({
   registration,
 }: NamingConfirmationWrapperProps) => {
   const [state, actions] = useOverlayStore(overlayStore)
-  const placements = usePlacements(registration)
-    .filter(p => !state.registration.disabledPlacements?.includes(p))
+  const placements = registration.configuration.placements
+    .filter(p => !state.overlay.disabled_placements?.includes(p.placement))
     .map(p => ({
-      placement: p,
-      label: state.registration.placements?.find(pl => pl.type === p)?.label ?? '',
+      placement: p.placement,
+      label: state.overlay.placements?.[p.placement]?.text ?? '',
     }))
 
   return (
     <NamingConfirmation
-      toolName={registration.client_name}
+      toolName={registration.name}
       adminNickname={state.adminNickname}
       onUpdateAdminNickname={actions.updateAdminNickname}
-      description={
-        state.registration.description ?? registration.default_configuration.description ?? ''
-      }
+      description={state.overlay.description ?? registration.configuration.description ?? ''}
       onUpdateDescription={actions.updateDescription}
       placements={placements}
       onUpdatePlacementLabel={(placement, value) => {
         actions.updatePlacement(placement)(overlay => ({
           ...overlay,
-          label: value,
+          text: value,
         }))
       }}
     />

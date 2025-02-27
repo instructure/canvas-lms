@@ -143,8 +143,8 @@ describe('AddImageModal', () => {
   }
 
   it('renders with 4 tabs', () => {
-    const {getByText} = renderComponent()
-    expect(getByText('Upload Image')).toBeInTheDocument()
+    const {getByRole, getByText} = renderComponent()
+    expect(getByRole('heading', { name: 'Upload Image' })).toBeInTheDocument()
     expect(getByText('Computer')).toBeInTheDocument()
     expect(getByText('URL')).toBeInTheDocument()
     expect(getByText('Course Images')).toBeInTheDocument()

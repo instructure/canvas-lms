@@ -58,7 +58,7 @@ class CourseForMenuPresenter
       isK5Subject: course.elementary_subject_course?,
       isHomeroom: course.homeroom_course,
       useClassicFont: course.account.use_classic_font_in_k5?,
-      canManage: course.grants_any_right?(@user, :manage_content, :manage_course_content_edit),
+      canManage: course.grants_right?(@user, :manage_course_content_edit),
       canReadAnnouncements: course.grants_right?(@user, :read_announcements),
       image: course.image,
       color: course.elementary_enabled? ? course.course_color : nil,

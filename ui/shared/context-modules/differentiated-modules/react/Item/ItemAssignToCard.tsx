@@ -170,6 +170,7 @@ export default forwardRef(function ItemAssignToCard(
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
   const dateInputRefs = useRef<Record<string, HTMLInputElement>>({})
   const timeInputRefs = useRef<Record<string, HTMLInputElement>>({})
+  const prevIsCheckpointedRef = useRef(isCheckpointed)
   const dateValidator = useMemo(
     () =>
       new DateValidator({
@@ -280,6 +281,20 @@ export default forwardRef(function ItemAssignToCard(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAssigneeIds.length])
 
+  useEffect(() => {
+    // Check if we've transitioned from true to false
+    if (prevIsCheckpointedRef.current && !isCheckpointed) {
+      setReplyToTopicDueDate(null)
+      setRequiredRepliesDueDate(null)
+    }
+
+    if (!prevIsCheckpointedRef.current && isCheckpointed) {
+      setDueDate(null)
+    }
+
+    prevIsCheckpointedRef.current = isCheckpointed
+  }, [isCheckpointed])
+
   useImperativeHandle(ref, () => ({
     showValidations() {
       setShowValidations(true)
@@ -352,7 +367,7 @@ export default forwardRef(function ItemAssignToCard(
 
       const dateInputRef = dateInputRefs.current[unparsedFieldKey]
       const timeInputRef = timeInputRefs.current[unparsedFieldKey]
-      const isDateInputEmpty = dateInputRef.value.trim() === ''
+      const isDateInputEmpty = dateInputRef?.value.trim() === ''
       const unparsedFieldExists = unparsedFieldKeys.has(unparsedFieldKey)
       const newUnparsedFieldKeys = new Set(Array.from(unparsedFieldKeys))
 

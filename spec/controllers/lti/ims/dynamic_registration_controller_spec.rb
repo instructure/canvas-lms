@@ -486,6 +486,45 @@ describe Lti::IMS::DynamicRegistrationController do
     end
   end
 
+  describe "#lti_registration_by_uuid" do
+    let(:admin) { account_admin_user(account: Account.default) }
+
+    it "returns a 404 if the registration cannot be found" do
+      user_session(admin)
+      get :lti_registration_by_uuid, params: { account_id: Account.default.id, registration_uuid: "123" }
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns an Lti::Registration with it's configuration and overlay" do
+      user_session(admin)
+      registration = lti_ims_registration_model(account: Account.default)
+      Lti::Overlay.create!(account: Account.default, registration: registration.lti_registration, data: { "description" => "test" })
+      get :lti_registration_by_uuid, params: { account_id: Account.default.id, registration_uuid: registration.guid }
+      expect(response).to be_successful
+      expect(response.parsed_body["configuration"]).to eq(registration.lti_registration.internal_lti_configuration(include_overlay: false))
+      expect(response.parsed_body["overlay"]["data"]).to eq({ "description" => "test" })
+    end
+  end
+
+  describe "#ims_registration_by_uuid" do
+    let(:admin) { account_admin_user(account: Account.default) }
+
+    it "returns a 404 if the registration cannot be found" do
+      user_session(admin)
+      get :ims_registration_by_uuid, params: { account_id: Account.default.id, registration_uuid: "123" }
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns an Lti::IMS::Registration with it's configuration and overlay" do
+      user_session(admin)
+      registration = lti_ims_registration_model(account: Account.default, registration_overlay: { "description" => "test" })
+      get :ims_registration_by_uuid, params: { account_id: Account.default.id, registration_uuid: registration.guid }
+      expect(response).to be_successful
+      expect(response.parsed_body["lti_tool_configuration"].with_indifferent_access).to eq(registration.lti_tool_configuration.with_indifferent_access)
+      expect(response.parsed_body["overlay"].with_indifferent_access).to eq(registration.registration_overlay.with_indifferent_access)
+    end
+  end
+
   describe "#update_registration_overlay" do
     let(:overlay) do
       {

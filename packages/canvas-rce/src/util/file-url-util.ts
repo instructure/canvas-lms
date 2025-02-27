@@ -23,7 +23,7 @@ const fileIdPatterns = [/\/\w+s\/\d+\/files\/(\d+)/]
 
 export function guessCanvasFileIdFromUrl(
   inputUrlStr: string,
-  restrictToOrigin?: string | null
+  restrictToOrigin?: string | null,
 ): string | null {
   const uri = URI.parse(inputUrlStr)
 

@@ -173,8 +173,12 @@ describe "submissions" do
       # fire the callback that the flash object fires
       driver.execute_script("window.mediaCommentCallback([{entryId:1, entryType:1}]);")
 
-      # see if the confirmation element shows up
+      # see if the confirmation element and submit button shows up
       expect(f("#media_media_recording_ready")).to be_displayed
+      expect(f("#media_comment_submit_button")).to be_displayed
+
+      # confirm the record button is now hidden
+      expect(f(".record_media_comment_link")).not_to be_displayed
 
       # submit the assignment so the "are you sure?!" message doesn't freeze up selenium
       submit_form("#submit_media_recording_form")
@@ -187,7 +191,7 @@ describe "submissions" do
 
       create_assignment_and_go_to_page "media_recording"
       f(".submit_assignment_link").click
-      expect(f("#media_comment_submit_button")).to be_disabled
+      expect(f("#media_comment_submit_button")).not_to be_displayed
       # leave so the "are you sure?!" message doesn't freeze up selenium
       f("#section-tabs .home").click
       driver.switch_to.alert.accept
@@ -679,9 +683,11 @@ describe "submissions" do
   end
 
   context "discussion_checkpoints" do
-    it "does not have keyboard-only next and previous buttons" do
+    it "still displays the submission without full discussion context no matter the feature flags set" do
       Account.default.enable_feature! :react_discussions_post
       Account.default.enable_feature! :discussion_checkpoints
+      Account.default.enable_feature! :discussions_speedgrader_revisit
+
       teacher_in_course(active_all: true)
       @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
       Checkpoints::DiscussionCheckpointCreatorService.call(
@@ -705,10 +711,19 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@checkpointed_discussion.assignment.id}/submissions/#{@student.id}"
 
       in_frame("preview_frame") do
-        in_frame("discussion_preview_iframe") do
-          wait_for_ajaximations
-          expect(f("body")).not_to contain_jqcss("[data-testid='jump-to-speedgrader-navigation']")
-        end
+        expect(f("#discussion_view_link")).to be_displayed
+        expect(f("body")).not_to contain_css("#discussion_preview_iframe")
+      end
+
+      Account.default.enable_feature! :react_discussions_post
+      Account.default.disable_feature! :discussion_checkpoints
+      Account.default.disable_feature! :discussions_speedgrader_revisit
+
+      get "/courses/#{@course.id}/assignments/#{@checkpointed_discussion.assignment.id}/submissions/#{@student.id}"
+
+      in_frame("preview_frame") do
+        expect(f("#discussion_view_link")).to be_displayed
+        expect(f("body")).not_to contain_css("#discussion_preview_iframe")
       end
     end
 

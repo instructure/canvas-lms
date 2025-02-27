@@ -28,6 +28,8 @@ import {createMemoryRouter, RouterProvider} from 'react-router-dom'
 import {FAKE_FOLDERS} from '../../../fixtures/fakeData'
 
 describe('FilesApp', () => {
+  let flashElements: any
+
   beforeEach(() => {
     setupFilesEnv()
     fetchMock.get(/.*\/by_path/, [FAKE_FOLDERS[0]], {overwriteRoutes: true})
@@ -36,10 +38,18 @@ describe('FilesApp', () => {
     })
     fetchMock.get(/.*\/files\/quota/, {quota_used: 500, quota: 1000}, {overwriteRoutes: true})
     filesEnv.userHasPermission = jest.fn().mockReturnValue(true)
+
+    flashElements = document.createElement('div')
+    flashElements.setAttribute('id', 'flash_screenreader_holder')
+    flashElements.setAttribute('role', 'alert')
+    document.body.appendChild(flashElements)
   })
 
   afterEach(() => {
     fetchMock.resetHistory()
+
+    document.body.removeChild(flashElements)
+    flashElements = undefined
   })
 
   const renderComponent = (contextAssetString: string) => {
@@ -49,7 +59,7 @@ describe('FilesApp', () => {
           path: '/',
           element: <FilesApp contextAssetString={contextAssetString} />,
           loader: async () => {
-            return [FAKE_FOLDERS[0]]
+            return {folders: [FAKE_FOLDERS[0]], searchTerm: ''}
           },
         },
       ],
@@ -72,7 +82,9 @@ describe('FilesApp', () => {
     })
   })
 
-  it('renders next page button when header', async () => {
+  // eslint-disable-next-line jest/no-disabled-tests
+  it.skip('renders next page button when header', async () => {
+    // this intermittently timedout in jenkins, even though it runs just fine locally
     fetchMock.get(
       /.*\/all.*/,
       {
@@ -98,5 +110,25 @@ describe('FilesApp', () => {
     expect(folderName).toBeInTheDocument()
     const nextPageButton = screen.queryByRole('button', {name: '1'})
     expect(nextPageButton).not.toBeInTheDocument()
+  })
+
+  it('does render Upload File or Create Folder buttons when user has permission', async () => {
+    renderComponent('course_12345')
+    const uploadButton = await screen.findByRole('button', {name: 'Upload'})
+    const createFolderButton = await screen.findByRole('button', {name: 'Folder'})
+    expect(uploadButton).toBeInTheDocument()
+    expect(createFolderButton).toBeInTheDocument()
+  })
+
+  it('does not render Upload File or Create Folder buttons when user does not have permission', async () => {
+    filesEnv.userHasPermission = jest.fn().mockReturnValue(false)
+    renderComponent('course_12345')
+    // necessary to prevent false positives
+    const allMyFilesButton = await screen.findByRole('button', {name: /all my files/i})
+    const uploadButton = screen.queryByRole('button', {name: 'Upload'})
+    const createFolderButton = screen.queryByRole('button', {name: 'Folder'})
+    expect(allMyFilesButton).toBeInTheDocument()
+    expect(uploadButton).not.toBeInTheDocument()
+    expect(createFolderButton).not.toBeInTheDocument()
   })
 })

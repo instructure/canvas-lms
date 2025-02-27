@@ -1028,6 +1028,20 @@ describe WikiPage do
           lock_info = learning_object.locked_for?(@student)
           expect(lock_info).to be_falsey
         end
+
+        it "is unlocked for a teacher with concluded term enrollment" do
+          concluded_teacher_term = Account.default.enrollment_terms.create!(name: "concluded")
+          concluded_teacher_term.set_overrides(Account.default, "TeacherEnrollment" => { start_at: "2014-12-01", end_at: "2014-12-31" })
+          @course.update(enrollment_term: concluded_teacher_term)
+          @course.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
+
+          differentiable.update(lock_at: 1.week.ago)
+          lock_info = learning_object.locked_for?(@student)
+          expect(lock_info).to be_truthy
+
+          lock_info = learning_object.locked_for?(@user, check_policies: true)
+          expect(lock_info).to be_falsey
+        end
       end
 
       context "pages without an assignment" do

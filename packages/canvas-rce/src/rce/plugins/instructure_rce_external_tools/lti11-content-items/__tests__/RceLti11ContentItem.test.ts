@@ -33,7 +33,7 @@ const iframeEnv = createDeepMockProxy<ExternalToolsEnv>(
   {},
   {
     ltiIframeAllowPolicy: 'microphone; camera; midi',
-  }
+  },
 )
 
 describe('RceLti11ContentItem LTI Link', () => {
@@ -41,7 +41,7 @@ describe('RceLti11ContentItem LTI Link', () => {
     const contentItem = RceLti11ContentItem.fromJSON(exampleLti11ContentItems.lti_thumb_embed)
     expect(contentItem.text).toEqual('Arch Linux thumbnail embed')
     expect(contentItem.url).toEqual(
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
     )
     equalHtmlIgnoringAttributeOrder(contentItem.codePayload, 'Arch Linux thumbnail embed')
   })
@@ -50,11 +50,11 @@ describe('RceLti11ContentItem LTI Link', () => {
     const contentItem = RceLti11ContentItem.fromJSON(exampleLti11ContentItems.lti_thumb_frame)
     expect(contentItem.text).toEqual('Arch Linux thumbnail frame')
     expect(contentItem.url).toEqual(
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" style="height: 128px; width: 128px;" alt="Arch Linux thumbnail frame"></a>'
+      '<a href="/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" style="height: 128px; width: 128px;" alt="Arch Linux thumbnail frame"></a>',
     )
   })
 
@@ -62,11 +62,11 @@ describe('RceLti11ContentItem LTI Link', () => {
     const contentItem = RceLti11ContentItem.fromJSON(exampleLti11ContentItems.lti_thumb_iframe)
     expect(contentItem.text).toEqual('Arch Linux thumbnail iframe')
     expect(contentItem.url).toEqual(
-      '/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" target="{&quot;displayHeight&quot;:600,&quot;displayWidth&quot;:800,&quot;presentationDocumentTarget&quot;:&quot;iframe&quot;}" class="lti-thumbnail-launch"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" style="height: 128px; width: 128px;" alt="Arch Linux thumbnail iframe"></a>'
+      '<a href="/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" target="{&quot;displayHeight&quot;:600,&quot;displayWidth&quot;:800,&quot;presentationDocumentTarget&quot;:&quot;iframe&quot;}" class="lti-thumbnail-launch"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" style="height: 128px; width: 128px;" alt="Arch Linux thumbnail iframe"></a>',
     )
   })
 
@@ -74,11 +74,11 @@ describe('RceLti11ContentItem LTI Link', () => {
     const contentItem = RceLti11ContentItem.fromJSON(exampleLti11ContentItems.lti_thumb_window)
     expect(contentItem.text).toEqual('Arch Linux thumbnail window')
     expect(contentItem.url).toEqual(
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" target="_blank"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" style="height: 128px; width: 128px;" alt="Arch Linux thumbnail window"></a>'
+      '<a href="/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" target="_blank"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" style="height: 128px; width: 128px;" alt="Arch Linux thumbnail window"></a>',
     )
   })
 
@@ -86,7 +86,7 @@ describe('RceLti11ContentItem LTI Link', () => {
     const contentItem = RceLti11ContentItem.fromJSON(exampleLti11ContentItems.lti_embed)
     expect(contentItem.text).toEqual('Arch Linux plain embed')
     expect(contentItem.url).toEqual(
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
     )
     equalHtmlIgnoringAttributeOrder(contentItem.codePayload, 'Arch Linux plain embed')
   })
@@ -95,11 +95,11 @@ describe('RceLti11ContentItem LTI Link', () => {
     const contentItem = RceLti11ContentItem.fromJSON(exampleLti11ContentItems.lti_frame)
     expect(contentItem.text).toEqual('Arch Linux plain frame')
     expect(contentItem.url).toEqual(
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer">Arch Linux plain frame</a>'
+      '<a href="/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer">Arch Linux plain frame</a>',
     )
   })
 
@@ -108,11 +108,11 @@ describe('RceLti11ContentItem LTI Link', () => {
 
     expect(contentItem.text).toEqual('Arch Linux plain iframe')
     expect(contentItem.url).toEqual(
-      '/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      `<iframe src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="microphone; camera; midi" style="width: 800px; height: 600px;" width="800" height="600"></iframe>`
+      `<iframe src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="microphone; camera; midi" style="width: 800px; height: 600px;" width="800" height="600"></iframe>`,
     )
   })
 
@@ -130,11 +130,11 @@ describe('RceLti11ContentItem LTI Link', () => {
     const contentItem = RceLti11ContentItem.fromJSON(exampleLti11ContentItems.lti_window)
     expect(contentItem.text).toEqual('Arch Linux plain window')
     expect(contentItem.url).toEqual(
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" target="_blank">Arch Linux plain window</a>'
+      '<a href="/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" target="_blank">Arch Linux plain window</a>',
     )
   })
 })
@@ -154,21 +154,21 @@ describe('RceLti11ContentItem File Item', () => {
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
       normalizeAttributeOrder(
-        '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" alt="Arch Linux file item thumbnail frame" style="height: 128px; width: 128px;"></a>'
-      )
+        '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" alt="Arch Linux file item thumbnail frame" style="height: 128px; width: 128px;"></a>',
+      ),
     )
   })
 
   it("Handles File item with presentation target of 'iframe' and thumbnail is set", () => {
     const contentItem = RceLti11ContentItem.fromJSON(
       exampleLti11ContentItems.text_thumb_iframe,
-      iframeEnv
+      iframeEnv,
     )
     expect(contentItem.text).toEqual('Arch Linux file item thumbnail iframe')
     expect(contentItem.url).toEqual('http://lti-tool-provider-example.dev/test_file.txt')
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      `<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="microphone; camera; midi" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`
+      `<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="microphone; camera; midi" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`,
     )
   })
 
@@ -178,7 +178,7 @@ describe('RceLti11ContentItem File Item', () => {
     expect(contentItem.url).toEqual('http://lti-tool-provider-example.dev/test_file.txt')
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" target="_blank"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" alt="Arch Linux file item thumbnail window" style="height: 128px; width: 128px;"></a>'
+      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" target="_blank"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" alt="Arch Linux file item thumbnail window" style="height: 128px; width: 128px;"></a>',
     )
   })
 
@@ -195,20 +195,20 @@ describe('RceLti11ContentItem File Item', () => {
     expect(contentItem.url).toEqual('http://lti-tool-provider-example.dev/test_file.txt')
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer">Arch Linux file item frame</a>'
+      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer">Arch Linux file item frame</a>',
     )
   })
 
   it("Handles File item with presentation target of 'iframe' and thumbnail is *NOT* set", () => {
     const contentItem = RceLti11ContentItem.fromJSON(
       exampleLti11ContentItems.text_iframe,
-      iframeEnv
+      iframeEnv,
     )
     expect(contentItem.text).toEqual('Arch Linux file item iframe')
     expect(contentItem.url).toEqual('http://lti-tool-provider-example.dev/test_file.txt')
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      `<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="microphone; camera; midi" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`
+      `<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="microphone; camera; midi" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`,
     )
   })
 
@@ -218,7 +218,7 @@ describe('RceLti11ContentItem File Item', () => {
     expect(contentItem.url).toEqual('http://lti-tool-provider-example.dev/test_file.txt')
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" target="_blank">Arch Linux file item window</a>'
+      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" target="_blank">Arch Linux file item window</a>',
     )
   })
 
@@ -229,12 +229,12 @@ describe('RceLti11ContentItem File Item', () => {
         {},
         {
           editorSelection: '<em><strong>formatted selection</strong></em>',
-        }
-      )
+        },
+      ),
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" target="_blank"><em><strong>formatted selection</strong></em></a>'
+      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" target="_blank"><em><strong>formatted selection</strong></em></a>',
     )
   })
 
@@ -245,12 +245,12 @@ describe('RceLti11ContentItem File Item', () => {
         {},
         {
           editorSelection: '',
-        }
-      )
+        },
+      ),
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" target="_blank">Arch Linux file item window</a>'
+      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" target="_blank">Arch Linux file item window</a>',
     )
   })
 
@@ -261,13 +261,13 @@ describe('RceLti11ContentItem File Item', () => {
         {},
         {
           editorSelection: '',
-        }
-      )
+        },
+      ),
     )
 
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" target="_blank">Its like for your computer</a>'
+      '<a href="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" target="_blank">Its like for your computer</a>',
     )
   })
 })
@@ -333,13 +333,13 @@ describe('Studio LTI content items', () => {
         {},
         {
           ltiIframeAllowPolicy: 'undefined',
-        }
-      )
+        },
+      ),
     )
 
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      `<iframe data-studio-convertible-to-link="true" data-studio-resizable="false" data-studio-tray-enabled="false" src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="undefined" style="width: 800px; height: 600px;" width="800" height="600"></iframe>`
+      `<iframe data-studio-convertible-to-link="true" data-studio-resizable="false" data-studio-tray-enabled="false" src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="undefined" style="width: 800px; height: 600px;" width="800" height="600"></iframe>`,
     )
   })
 
@@ -354,13 +354,13 @@ describe('Studio LTI content items', () => {
         {},
         {
           ltiIframeAllowPolicy: 'undefined',
-        }
-      )
+        },
+      ),
     )
 
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      `<iframe data-studio-convertible-to-link="true" data-studio-resizable="true" data-studio-tray-enabled="true" src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="undefined" style="width: 800px; height: 600px; display: inline-block;" width="800" height="600"></iframe>`
+      `<iframe data-studio-convertible-to-link="true" data-studio-resizable="true" data-studio-tray-enabled="true" src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="undefined" style="width: 800px; height: 600px; display: inline-block;" width="800" height="600"></iframe>`,
     )
   })
 })
@@ -394,7 +394,7 @@ describe('Additional RceLti11ContentItem Tests', () => {
     })
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://example.com/">No Media</a>'
+      '<a href="http://example.com/">No Media</a>',
     )
   })
 
@@ -420,7 +420,7 @@ describe('Additional RceLti11ContentItem Tests', () => {
     })
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://example.com/">Unknown Target</a>'
+      '<a href="http://example.com/">Unknown Target</a>',
     )
   })
 
@@ -432,7 +432,7 @@ describe('Additional RceLti11ContentItem Tests', () => {
         text: 'No Policy',
         placementAdvice: {presentationDocumentTarget: 'iframe'},
       },
-      createDeepMockProxy<ExternalToolsEnv>({}, {ltiIframeAllowPolicy: undefined})
+      createDeepMockProxy<ExternalToolsEnv>({}, {ltiIframeAllowPolicy: undefined}),
     )
     expect(contentItem.codePayload).toContain('allowfullscreen="true"')
     expect(contentItem.codePayload).not.toContain('allow="undefined"')
@@ -441,14 +441,14 @@ describe('Additional RceLti11ContentItem Tests', () => {
   it('Sanitizes javascript: URLs', () => {
     const contentItem = RceLti11ContentItem.fromJSON({
       mediaType: 'application/pdf',
-      // eslint-disable-next-line no-script-url
+       
       url: 'javascript:alert(1)',
       text: 'Injected',
       placementAdvice: {presentationDocumentTarget: 'frame'},
     })
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="#javascript:alert(1)">Injected</a>'
+      '<a href="#javascript:alert(1)">Injected</a>',
     )
   })
 
@@ -462,12 +462,12 @@ describe('Additional RceLti11ContentItem Tests', () => {
       },
       createDeepMockProxy<ExternalToolsEnv>(
         {},
-        {editorSelection: '<strong><em>BoldItalic</em></strong>'}
-      )
+        {editorSelection: '<strong><em>BoldItalic</em></strong>'},
+      ),
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://example.com/doc.pdf" title="Complex Selection"><strong><em>BoldItalic</em></strong></a>'
+      '<a href="http://example.com/doc.pdf" title="Complex Selection"><strong><em>BoldItalic</em></strong></a>',
     )
   })
 
@@ -481,7 +481,7 @@ describe('Additional RceLti11ContentItem Tests', () => {
     })
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://example.com/doc.pdf">No Thumbnail ID</a>'
+      '<a href="http://example.com/doc.pdf">No Thumbnail ID</a>',
     )
   })
 
@@ -537,7 +537,7 @@ describe('Additional RceLti11ContentItem Tests', () => {
     expect(contentItem.isLTI).toBe(false)
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="http://example.com">Not LTI</a>'
+      '<a href="http://example.com">Not LTI</a>',
     )
   })
 })

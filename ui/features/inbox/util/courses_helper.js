@@ -27,6 +27,7 @@ export const reduceDuplicateCourses = (enrollments, favoriteCourses) => {
         contextName: c.course.contextName,
         assetString: c.course.assetString,
         concluded: c.concluded,
+        horizonCourse: c.course.horizonCourse,
       }
     })
     .filter(c => {

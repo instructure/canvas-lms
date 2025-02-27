@@ -22,220 +22,152 @@ require_relative "../common"
 describe "Alerts" do
   include_context "in-process server selenium tests"
 
-  before do
-    @context = Account.default
-    @context.settings[:enable_alerts] = true
-    @context.save!
-    @alerts = @context.alerts
-    admin_logged_in
-    stub_rcs_config
+  shared_examples "alert CRUD and validation" do
+    it("should render an existing alert correctly") do
+      alert = @alerts.create!(
+        recipients: [:student, :teachers],
+        criteria: [{ criterion_type: "Interaction", threshold: 1 }, { criterion_type: "UngradedCount", threshold: 2 }, { criterion_type: "UngradedTimespan", threshold: 3 }],
+        repetition: 1
+      )
+      get page_url
+      f("#tab-alerts-link").click
+
+      alerts = f("[data-testid='alerts']")
+      expect(alerts).to include_text("A teacher has not interacted with the student for #{alert.criteria[0].threshold.to_i} days.")
+      expect(alerts).to include_text("More than #{alert.criteria[1].threshold.to_i} submissions have not been graded.")
+      expect(alerts).to include_text("A submission has been left ungraded for #{alert.criteria[2].threshold.to_i} days.")
+      expect(alerts).to include_text("Student")
+      expect(alerts).to include_text("Teacher")
+      expect(alerts).to include_text("Every #{alert.repetition} days until resolved.")
+    end
+
+    it "should be able to create a new alert" do
+      get page_url
+      f("#tab-alerts-link").click
+      f("[aria-label='Create new alert']").click
+
+      tray = f("[aria-label='New Alert']")
+      add_trigger = tray.find_element(:css, "[aria-label='Add trigger']")
+      3.times { add_trigger.click }
+      tray.find_element(:css, "[type='checkbox'][value=':student'] + label").click
+      tray.find_element(:css, "[type='checkbox'][value=':teachers'] + label").click
+      tray.find_element(:css, "[type='checkbox'][name='doNotResend'] + label").click
+      tray.find_element(:css, "[type='submit']").click
+
+      expect(@alerts.last.reload).to have_attributes(
+        recipients: [:student, :teachers],
+        repetition: 1,
+        criteria: contain_exactly(
+          have_attributes(criterion_type: "Interaction", threshold: 7.0),
+          have_attributes(criterion_type: "UngradedCount", threshold: 3.0),
+          have_attributes(criterion_type: "UngradedTimespan", threshold: 7.0)
+        )
+      )
+    end
+
+    it "should be able to delete an existing alert" do
+      @alerts.create!(
+        recipients: [:student, :teachers],
+        criteria: [{ criterion_type: "Interaction", threshold: 1 }, { criterion_type: "UngradedCount", threshold: 2 }, { criterion_type: "UngradedTimespan", threshold: 3 }],
+        repetition: 1
+      )
+      get page_url
+      f("#tab-alerts-link").click
+
+      alerts = f("[data-testid='alerts']")
+      alerts.find_element(:css, "[aria-label='Delete alert button']").click
+
+      expect(@alerts.reload).to be_empty
+    end
+
+    it "should be able to update an existing alert" do
+      alert = @alerts.create!(
+        recipients: [:student, :teachers],
+        criteria: [{ criterion_type: "Interaction", threshold: 1 }, { criterion_type: "UngradedCount", threshold: 2 }, { criterion_type: "UngradedTimespan", threshold: 3 }],
+        repetition: 1
+      )
+      get page_url
+      f("#tab-alerts-link").click
+
+      alerts = f("[data-testid='alerts']")
+      alerts.find_element(:css, "[aria-label='Edit alert button']").click
+      tray = f("[aria-label='Edit Alert']")
+      tray.find_element(:css, "#no_teacher_interaction").send_keys([:control, "a"], "4")
+      tray.find_element(:css, "#ungraded_submissions_count").send_keys([:control, "a"], "5")
+      tray.find_element(:css, "#ungraded_submissions_time").send_keys([:control, "a"], "6")
+      tray.find_element(:css, "[type='checkbox'][value=':teachers'] + label").click
+      tray.find_element(:css, "[type='checkbox'][name='doNotResend'] + label").click
+      tray.find_element(:css, "[type='submit']").click
+
+      expect(alert.reload).to have_attributes(
+        recipients: [:student],
+        repetition: nil,
+        criteria: contain_exactly(
+          have_attributes(criterion_type: "Interaction", threshold: 4.0),
+          have_attributes(criterion_type: "UngradedCount", threshold: 5.0),
+          have_attributes(criterion_type: "UngradedTimespan", threshold: 6.0)
+        )
+      )
+    end
+
+    it "should show validation errors if the form invalid" do
+      get page_url
+      f("#tab-alerts-link").click
+      f("[aria-label='Create new alert']").click
+
+      tray = f("[aria-label='New Alert']")
+      tray.find_element(:css, "[type='submit']").click
+
+      expect(tray).to include_text("Please add at least one trigger.")
+      expect(tray).to include_text("Please select at least one option.")
+    end
   end
 
-  it "is able to create, then update, then delete" do
-    get "/accounts/#{@context.id}/settings"
-    expect(@alerts.length).to eq 0
-
-    find("#tab-alerts-link").click
-    wait_for_ajaximations
-    find(".add_alert_link").click
-    wait_for_ajaximations
-    alert = find(".alert.new")
-    (add_criterion = alert.find(".add_criterion_link")).click
-    wait_for_ajaximations
-    alert.find(".add_recipient_link").click
-    wait_for_ajaximations
-    (submit = alert.find(".submit_button")).click
-    wait_for_ajaximations
-    keep_trying_until do
-      @alerts.reload
-      expect(@alerts.length).to eq 1
+  context "when context is Account" do
+    before do
+      admin_logged_in
+      @context = Account.default
+      @context.settings[:enable_alerts] = true
+      @context.save!
+      @alerts = @context.alerts
+      stub_rcs_config
     end
 
-    expect(@alerts.first.criteria.length).to eq 1
+    let(:page_url) { "/accounts/#{@context.id}/settings" }
 
-    (edit = alert.find(".edit_link")).click
-    add_criterion.click
-    wait_for_ajaximations
-    submit.click
-    wait_for_ajaximations
+    include_examples "alert CRUD and validation"
 
-    keep_trying_until do
-      @alerts.first.criteria.reload
-      expect(@alerts.first.criteria.length).to eq 2
-    end
+    it "should show and be able to edit alert with custom role" do
+      custom_role = custom_account_role("Custom role", account: @context)
+      alert = @alerts.create!(recipients: [{ role_id: custom_role.id }, :student], criteria: [{ criterion_type: "Interaction", threshold: 7 }])
+      get page_url
+      f("#tab-alerts-link").click
 
-    @alerts.reload
-    expect(@alerts.length).to eq 1
+      alerts = f("[data-testid='alerts']")
+      expect(alerts).to include_text(custom_role.name)
 
-    wait_for_ajaximations
-    edit.click
-    alert.find(".criteria .delete_item_link").click
-    expect(ff(".alert .criteria li")).to have_size(1)
-    submit.click
-    wait_for_ajaximations
+      alerts.find_element(:css, "[aria-label='Edit alert button']").click
+      tray = f("[aria-label='Edit Alert']")
+      tray.find_element(:css, "[type='checkbox'][value='#{custom_role.id}'] + label").click
+      tray.find_element(:css, "[type='submit']").click
 
-    keep_trying_until do
-      @alerts.first.criteria.reload
-      expect(@alerts.first.criteria.length).to eq 1
-    end
-
-    @alerts.reload
-    expect(@alerts.length).to eq 1
-
-    wait_for_ajaximations
-    alert.find(".delete_link").click
-
-    wait_for_ajaximations
-    expect(find(".alert")).not_to be_displayed
-
-    keep_trying_until do
-      @alerts.reload
-      expect(@alerts.length).to eq 0
+      expect(alert.reload.recipients).not_to include(custom_role.id)
     end
   end
 
-  it "deletes alerts" do
-    alert = @alerts.create!(recipients: [:student], criteria: [criterion_type: "Interaction", threshold: 7])
-    get "/accounts/#{@context.id}/settings"
-
-    find("#tab-alerts-link").click
-    wait_for_ajaximations
-    find("#edit_alert_#{alert.id} .delete_link").click
-    expect(f("#content")).not_to contain_css("#edit_alert_#{alert.id}")
-
-    @alerts.reload
-    expect(@alerts).to be_empty
-  end
-
-  it "removes non-created alerts by clicking delete link" do
-    get "/accounts/#{@context.id}/settings"
-
-    find("#tab-alerts-link").click
-    wait_for_ajaximations
-    find(".add_alert_link").click
-    wait_for_ajaximations
-    find(".alert.new .delete_link").click
-    wait_for_ajaximations
-    expect(f("#content")).not_to contain_css(".alert.new")
-
-    expect(@alerts).to be_empty
-  end
-
-  it "removes non-created alerts by clicking cancel button" do
-    get "/accounts/#{@context.id}/settings"
-
-    find("#tab-alerts-link").click
-    wait_for_ajaximations
-    find(".add_alert_link").click
-    wait_for_ajaximations
-    find(".alert.new .cancel_button").click
-    expect(f("#content")).not_to contain_css(".alert.new")
-    expect(@alerts).to be_empty
-  end
-
-  it "validates the form" do
-    get "/accounts/#{@context.id}/settings"
-    find("#tab-alerts-link").click
-    wait_for_ajaximations
-    find(".add_alert_link").click
-    wait_for_ajaximations
-    alert = find(".alert.new")
-    alert.find('input[name="repetition"][value="value"]').click
-
-    submit_form("#new_alert")
-    wait_for_ajaximations
-    error_boxes = ff(".error_box")
-    expect(error_boxes).to have_size(4)
-
-    # clicking "do not repeat" should remove the number of days error
-    alert.find('input[name="repetition"][value="none"]').click
-    wait_for_ajaximations
-    expect(error_boxes).to have_size(3)
-
-    # adding recipient and criterion make the errors go away
-    alert.find(".add_recipient_link").click
-    alert.find(".add_criterion_link").click
-    expect(error_boxes).to have_size(1)
-
-    alert.find('.criteria input[type="text"]').send_keys("abc")
-    submit_form("#new_alert")
-    expect(error_boxes).to have_size(2)
-  end
-
-  context "recipients" do
-    it "hides the add link when all recipients are added" do
-      get "/accounts/#{@context.id}/settings"
-
-      find("#tab-alerts-link").click
-      wait_for_ajaximations
-      find(".add_alert_link").click
-      wait_for_ajaximations
-      alert = find(".alert.new")
-      link = alert.find(".add_recipient_link")
-
-      expect(ff(".alert.new .add_recipients_line select option")).to have_size(3)
-      alert.find_all(".add_recipients_line select option").each do
-        link.click
-      end
-      wait_for_ajaximations
-      expect(f(".add_recipients_line")).not_to contain_link("Recipient")
+  context "when context is Course" do
+    before do
+      account = Account.default
+      account.settings[:enable_alerts] = true
+      account.save!
+      course_with_admin_logged_in(account:)
+      @context = @course
+      @alerts = @context.alerts
+      stub_rcs_config
     end
 
-    it "does not show the add link when all recipients are already there" do
-      alert = @alerts.create!(recipients: [:student, :teachers, { role_id: admin_role.id }], criteria: [{ criterion_type: "Interaction", threshold: 7 }])
-      get "/accounts/#{@context.id}/settings"
+    let(:page_url) { "/courses/#{@context.id}/settings" }
 
-      find("#tab-alerts-link").click
-      wait_for_ajaximations
-      alertElement = find("#edit_alert_#{alert.id}")
-      alertElement.find(".edit_link").click
-      wait_for_ajaximations
-      expect(f("#edit_alert_#{alert.id}")).not_to contain_jqcss(".add_recipient_link:visible")
-
-      # Deleting a recipient should add it to the dropdown (which is now visible)
-      alertElement.find(".recipients .delete_item_link").click
-      wait_for_ajaximations
-      expect(fj("#edit_alert_#{alert.id} .add_recipient_link")).to be_displayed
-      expect(alertElement.find_all(".add_recipients_line select option").length).to eq 1
-      expect(ff(".recipients li", alertElement)).to have_size(2)
-
-      # Do it again, with the same results
-      alertElement.find(".recipients .delete_item_link").click
-      expect(fj("#edit_alert_#{alert.id} .add_recipient_link")).to be_displayed
-      expect(alertElement.find_all(".add_recipients_line select option").length).to eq 2
-      expect(ff(".recipients li", alertElement)).to have_size(1)
-
-      # Clicking cancel should restore the LIs
-      alertElement.find(".cancel_button").click
-      expect(alertElement.find_all(".recipients li").length).to eq 3
-    end
-
-    it "works with custom roles" do
-      role1 = custom_account_role("these rolls are delicious", account: @context)
-      role2 = custom_account_role("your just jelly", account: @context)
-
-      alert = @alerts.create!(recipients: [{ role_id: role1.id }], criteria: [{ criterion_type: "Interaction", threshold: 7 }])
-      get "/accounts/#{@context.id}/settings"
-
-      find("#tab-alerts-link").click
-      wait_for_ajaximations
-      alertElement = find("#edit_alert_#{alert.id}")
-      alertElement.find(".edit_link").click
-      wait_for_ajaximations
-
-      recipients = find_all("#edit_alert_#{alert.id} .recipients li")
-      expect(recipients.count).to eq 1
-      expect(recipients.first.text).to match_ignoring_whitespace(role1.name)
-      expect(find("#edit_alert_#{alert.id} .recipients li input")["value"].to_s).to eq role1.id.to_s
-
-      set_value(find("#edit_alert_#{alert.id} .add_recipients_line select"), role2.id.to_s)
-      fj("#edit_alert_#{alert.id} .add_recipient_link").click
-
-      submit_form("#edit_alert_#{alert.id}")
-      wait_for_ajaximations
-
-      alert.reload
-      expect(alert.recipients.pluck(:role_id).sort).to eq [role1.id, role2.id].sort
-    end
+    include_examples "alert CRUD and validation"
   end
 end

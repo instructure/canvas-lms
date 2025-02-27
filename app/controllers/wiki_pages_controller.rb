@@ -169,11 +169,16 @@ class WikiPagesController < ApplicationController
 
   def wiki_pages_js_env(context)
     set_k5_mode # we need this to run now, even though we haven't hit the render hook yet
+
+    assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+
     @wiki_pages_env ||= {
       wiki_page_menu_tools: external_tools_display_hashes(:wiki_page_menu),
       wiki_index_menu_tools: external_tools_display_hashes(:wiki_index_menu),
       DISPLAY_SHOW_ALL_LINK: tab_enabled?(context.class::TAB_PAGES, no_render: true) && !@k5_details_view,
       CAN_SET_TODO_DATE: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
+      ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+      CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
     }
 
     if @context.account.feature_enabled?(:block_editor)

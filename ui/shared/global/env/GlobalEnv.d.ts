@@ -33,6 +33,8 @@ import {EnvContentMigrations} from './ContentMigrations'
 import {EnvDiscussions} from './EnvDiscussions'
 import {EnvProfiles} from './EnvProfiles'
 import {EnvChangePassword} from './EnvChangePassword'
+import {EnvAlerts} from './EnvAlerts'
+import {EnvPortfolio} from './EnvPortfolio'
 
 /**
  * Top level ENV variable.
@@ -64,5 +66,7 @@ export type GlobalEnv =
         EnvContentMigrations &
         EnvDiscussions &
         EnvProfiles &
-        EnvChangePassword
+        EnvChangePassword &
+        EnvAlerts &
+        EnvPortfolio
     >

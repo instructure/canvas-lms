@@ -6,3 +6,4 @@ npm-debug*
 doc/*.js
 github-pages/dist
 testcafe/build
+**/__tests__/__screenshots__/**

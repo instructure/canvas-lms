@@ -56,7 +56,7 @@ export default function buildStyle() {
       themeCanvasPrimaryButtonColor = variables['ic-brand-button--primary-text']
       themeCanvasPrimaryButtonHoverBackground = darken(
         variables['ic-brand-button--primary-bgd'],
-        10
+        10,
       )
       themeActiveMenuItemBackground = variables['ic-brand-button--primary-bgd']
       themeActiveMenuItemLabelColor = variables['ic-brand-button--primary-text']
@@ -148,7 +148,7 @@ export default function buildStyle() {
     canvasEnabledColor: themeCanvasEnabledColor,
     canvasEnabledBoxShadow: `inset 0 0 0.1875rem 0.0625rem ${darken(
       variables.colors.borderLightest,
-      25
+      25,
     )}`,
 
     canvasFontFamily: variables.typography.fontFamily,

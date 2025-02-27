@@ -1118,8 +1118,8 @@ describe Account do
       expect(@account.tabs_available(nil)).to include(mock_tab)
     end
 
-    it "uses :manage_assignments to determine question bank tab visibility" do
-      account_admin_user_with_role_changes(account: @account, role_changes: { manage_assignments: true, manage_grades: false })
+    it "uses :manage_assignments_edit to determine question bank tab visibility" do
+      account_admin_user_with_role_changes(account: @account, role_changes: { manage_assignments_edit: true, manage_grades: false })
       tabs = @account.tabs_available(@admin)
       expect(tabs.pluck(:id)).to include(Account::TAB_QUESTION_BANKS)
     end

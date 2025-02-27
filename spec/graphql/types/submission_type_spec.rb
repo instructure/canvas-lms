@@ -931,6 +931,11 @@ describe Types::SubmissionType do
   describe "previewUrl" do
     let(:preview_url) { submission_type.resolve("previewUrl") }
 
+    let(:quiz) do
+      quiz_with_submission
+      @quiz
+    end
+
     it "returns the preview URL when a student has submitted" do
       @assignment.submit_homework(@student, body: "test")
       expected_url = "http://test.host/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1&version=0"
@@ -1002,6 +1007,17 @@ describe Types::SubmissionType do
       end
     end
 
+    it "includes a 'version' query param that corresponds to the submission version number when it's an old quiz" do
+      @quiz_assignment = quiz.assignment
+      @quiz_submission = @quiz_assignment.submission_for_student(@student)
+      quiz_submission_type_for_teacher = GraphQLTypeTester.new(@quiz_submission, current_user: @teacher, request: ActionDispatch::TestRequest.create)
+      expected_url = "http://test.host/courses/#{@course.id}/assignments/#{@quiz_assignment.id}/submissions/#{@student.id}?preview=1&version=1"
+      aggregate_failures do
+        expect(@quiz_submission.attempt).to eq 1
+        expect(quiz_submission_type_for_teacher.resolve("previewUrl")).to eq expected_url
+      end
+    end
+
     context "when the assignment is a discussion topic" do
       before do
         @assignment.update!(submission_types: "discussion_topic")
@@ -1035,6 +1051,31 @@ describe Types::SubmissionType do
 
     it "does not show the user to a grader when an assignment is actively anonymous" do
       expect(submission_type.resolve("userId")).to be_nil
+    end
+  end
+
+  describe "enrollments" do
+    let(:other_section) { @course.course_sections.create! name: "other section" }
+    let(:other_teacher) do
+      @course.enroll_teacher(user_factory, section: other_section, limit_privileges_to_course_section: true).user
+    end
+
+    it "works" do
+      expect(
+        submission_type.resolve(
+          "enrollmentsConnection { nodes { _id } }",
+          current_user: @teacher
+        )
+      ).to match_array @course.enrollments.where(user_id: @submission.user_id).map(&:to_param)
+    end
+
+    it "doesn't return users not visible to current_user" do
+      expect(
+        submission_type.resolve(
+          "enrollmentsConnection { nodes { _id } }",
+          current_user: other_teacher
+        )
+      ).to be_empty
     end
   end
 end

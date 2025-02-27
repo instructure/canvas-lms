@@ -27,7 +27,7 @@ module Mutations
       rubric_association = assignment.rubric_association
 
       unless Rubric.rubric_self_assessment_enabled?(assignment.course)
-        raise GraphQL::ExecutionError, "enhanced_rubrics, rubric_self_assesment and platform_service_speedgrader must be enabled"
+        raise GraphQL::ExecutionError, "enhanced_rubrics, rubric_self_assesment and assignments_2_student must be enabled"
       end
 
       unless assignment.active_rubric_association?
@@ -36,6 +36,10 @@ module Mutations
 
       unless rubric_association.grants_right?(current_user, session, :update)
         raise GraphQL::ExecutionError, I18n.t("Insufficient permissions")
+      end
+
+      if assignment.has_group_category?
+        raise GraphQL::ExecutionError, I18n.t("Cannot set rubric self assessment for group assignments")
       end
 
       unless assignment.can_update_rubric_self_assessment?

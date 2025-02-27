@@ -46,6 +46,15 @@ describe "Block Editor", :ignore_js_errors do
       create_wiki_page(@course)
     end
 
+    context "Preexisting user text editor preference" do
+      it "respects explicit rce choice for new pages" do
+        @user.set_preference(:text_editor_preference, "block_editor")
+        get "/courses/#{@course.id}/pages"
+        use_the_rce_button.click
+        expect(rce_container).to be_displayed
+      end
+    end
+
     context "Start from Scratch" do
       it "shows the template chooser modal with a default page block" do
         expect(template_chooser).to be_displayed
@@ -102,7 +111,16 @@ describe "Block Editor", :ignore_js_errors do
       open_block_toolbox_to_tab("blocks")
       expect(block_toolbox).to be_displayed
       drop_new_block("button", group_block_dropzone)
-      expect(fj("#{group_block_inner_selector}:contains('Click me')")).to be_displayed
+      expect(block_toolbar_button).to be_displayed
+    end
+
+    it "can click on a block and it gets added to the editor from the toolbox" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      open_block_toolbox_to_tab("blocks")
+      expect(block_toolbox).to be_displayed
+      block_toolbox_button.click
+      expect(block_toolbar_button).to be_displayed
     end
 
     it "cannot resize an image with no src" do
@@ -238,6 +256,89 @@ describe "Block Editor", :ignore_js_errors do
         alt_input.send_keys(:escape)
         expect(f("img", image_block).attribute("alt")).to eq("I am alt text")
       end
+    end
+  end
+
+  describe("block behavior") do
+    describe("hover tag") do
+      it "hovered over Icon block a small tag with the block’s name is displayed" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        page_block.click
+        hover(icon_block)
+        expect(block_tag).to be_displayed
+        expect(block_tag.attribute("textContent")).to eq("Icon")
+      end
+
+      it "hovered over Button block a small tag with the block’s name is displayed" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        open_block_toolbox_to_tab("blocks")
+        drop_new_block("button", group_block_dropzone)
+        page_block.click
+        hover(button_block)
+        expect(block_tag).to be_displayed
+        expect(block_tag.attribute("textContent")).to eq("Button")
+      end
+
+      it "hovered over Image block a small tag with the block’s name is displayed" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        open_block_toolbox_to_tab("blocks")
+        drop_new_block("image", group_block_dropzone)
+        page_block.click
+        hover(image_block)
+        expect(block_tag).to be_displayed
+        expect(block_tag.attribute("textContent")).to eq("Image")
+      end
+
+      it "hovered over Text block a small tag with the block’s name is displayed" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        open_block_toolbox_to_tab("blocks")
+        drop_new_block("text", group_block_dropzone)
+        page_block.click
+        hover(text_block)
+        expect(block_tag).to be_displayed
+        expect(block_tag.attribute("textContent")).to eq("Text")
+      end
+
+      it "tag is not displayed when mouse cursor is no longer over the block" do
+        get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+        wait_for_block_editor
+        page_block.click
+        hover(icon_block)
+        expect(block_tag).to be_displayed
+        expect(block_tag.attribute("textContent")).to eq("Icon")
+        page_block.click
+        expect(element_exists?(block_tag_selector)).to be_falsey
+      end
+    end
+  end
+
+  describe("focus management") do
+    it "focuses the page title when creating a new page" do
+      create_wiki_page(@course)
+      fj("button:contains('New Blank Page')").click
+      wait_for_block_editor
+      expect(f("#wikipage-title-input")).to eq(driver.switch_to.active_element)
+    end
+
+    it "focuses the page title when editing an existing page" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      expect(f("#wikipage-title-input")).to eq(driver.switch_to.active_element)
+    end
+
+    it "switches focus from the editor to the toolbox and back on ctrl-b" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      f(".icon-block").click
+      expect(f(".icon-block")).to eq(driver.switch_to.active_element)
+      f(".icon-block").send_keys(:control, "b")
+      expect(fj("button:contains('Close')")).to eq(driver.switch_to.active_element)
+      fj("button:contains('Close')").send_keys(:control, "b")
+      expect(f(".icon-block")).to eq(driver.switch_to.active_element)
     end
   end
 end

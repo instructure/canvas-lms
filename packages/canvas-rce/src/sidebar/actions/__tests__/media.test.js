@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {jest} from '@jest/globals'
 import * as actions from '../media'
 import {
   fetchMedia,
@@ -229,7 +228,7 @@ describe('Media actions', () => {
       try {
         await actions.updateMediaObject({media_object_id: 'moid', title: 'title'})(
           dispatch,
-          getState
+          getState,
         )
       } catch (e) {
         expect(alertHandler.alertFunc).toHaveBeenCalled()

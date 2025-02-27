@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../../lti_1_3_spec_helper"
 require_relative "../concerns/parent_frame_shared_examples"
 
 describe Lti::IMS::AuthenticationController do
@@ -204,7 +203,7 @@ describe Lti::IMS::AuthenticationController do
         get :authorize, params:
       end
 
-      include_context "lti_1_3_spec_helper"
+      include_context "key_storage_helper"
 
       let(:id_token) do
         token = assigns.dig(:id_token, :id_token)

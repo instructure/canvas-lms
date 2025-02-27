@@ -101,30 +101,33 @@ export const FilterNavPopover = ({
           </Menu.Group>
         ) : menuGroups.length ? (
           menuGroups.map(itemGroup => {
-            const selectedIndices2 = itemGroup.items?.reduce((acc, current, index) => {
-              if (current.isSelected) {
-                return acc.concat(index)
-              }
-              return acc
-            }, [] as number[])
+            const selectedIndices = itemGroup.items?.reduce(
+              (acc, current, index) => (current.isSelected ? acc.concat(index) : acc),
+              [] as number[],
+            )
 
             return (
               <Menu.Group
                 key={itemGroup.id}
                 data-testid={`${itemGroup.name}-sorted-filter-group`}
                 label={itemGroup.name}
-                selected={selectedIndices2}
-                onSelect={(_event, updated) => {
-                  itemGroup.items?.[updated[0] as number]?.onToggle?.()
+                // The _updated parameter seems to store the previous state of selected items
+                // Passing IDs to items below, which we can access through item.props?.id
+                onSelect={(_event, _updated, _selected, item) => {
+                  const id = item.props?.id
+                  const selectedItem = itemGroup.items?.find(item => item.id === id)
+                  selectedItem?.onToggle?.()
                 }}
+                selected={selectedIndices}
               >
-                {itemGroup.items?.map((item: any) => {
+                {itemGroup.items?.map(item => {
                   const unescapedName = unescape(item.name)
                   return (
                     <Menu.Item
                       data-testid={`${item.name}-sorted-filter-group-item`}
                       key={item.id}
                       as="div"
+                      id={item.id}
                     >
                       <Flex as="div" justifyItems="space-between">
                         <TruncateText position="middle">{unescapedName}</TruncateText>

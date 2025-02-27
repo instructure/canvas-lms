@@ -72,7 +72,6 @@ export function ReplyToTopicDueDateTimeInput({
   )
 
   const replyToTopicDueDateProps = {
-    key,
     id: key,
     disabled:
       Boolean(blueprintDateLocks?.includes('availability_dates')) || disabledWithGradingPeriod,

@@ -151,8 +151,22 @@ describe SisBatch do
                         user_1,user_1,active)])
 
     expect(Delayed::Worker).to receive(:current_job).at_least(:once).and_return(double("Delayed::Job", id: 789))
-    expect_any_instance_of(SisBatch).to receive(:roll_back_data) { raise "no roll back data for you" }
+    allow_any_instance_of(SisBatch).to receive(:roll_back_data).and_raise "no roll back data for you"
     batch.restore_states_later
+    run_jobs
+
+    batch.reload
+    expect(batch.workflow_state).to eq "restoring"
+
+    job = Delayed::Job.where(tag: "SisBatch#restore_states_for_batch").last
+    expect(job).to be_present
+    expect(job.attempts).to eq 1
+    job.update run_at: 1.minute.ago
+    run_jobs
+
+    job.reload
+    expect(job.attempts).to eq 2
+    job.update run_at: 1.minute.ago
     run_jobs
 
     batch.reload

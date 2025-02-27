@@ -16,24 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {updateDeveloperKeyWorkflowState} from '../api/developerKey'
+import type {fetchRegistrationToken, getLtiRegistrationByUUID} from '../api/ltiImsRegistration'
 import type {
-  deleteDeveloperKey,
-  updateAdminNickname,
-  updateDeveloperKeyWorkflowState,
-} from '../api/developerKey'
-import type {
-  fetchRegistrationToken,
-  getLtiImsRegistrationById,
-  getRegistrationByUUID,
-  updateRegistrationOverlay,
-} from '../api/ltiImsRegistration'
-
+  deleteRegistration,
+  fetchLtiRegistration,
+  updateRegistration,
+} from '../api/registrations'
 export interface DynamicRegistrationWizardService {
   fetchRegistrationToken: typeof fetchRegistrationToken
-  getRegistrationByUUID: typeof getRegistrationByUUID
-  getLtiImsRegistrationById: typeof getLtiImsRegistrationById
-  updateRegistrationOverlay: typeof updateRegistrationOverlay
+  getRegistrationByUUID: typeof getLtiRegistrationByUUID
+  fetchLtiRegistration: typeof fetchLtiRegistration
+  updateRegistration: typeof updateRegistration
   updateDeveloperKeyWorkflowState: typeof updateDeveloperKeyWorkflowState
-  updateAdminNickname: typeof updateAdminNickname
-  deleteDeveloperKey: typeof deleteDeveloperKey
+  deleteRegistration: typeof deleteRegistration
 }

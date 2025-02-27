@@ -28,6 +28,7 @@ interface Props {
   onChange: (checked: boolean) => void
   checked: boolean
   isDisabled: boolean
+  isRequired?: boolean
   termsOfUseUrl?: string
   privacyPolicyUrl?: string
   messages?: FormMessage[]
@@ -39,6 +40,7 @@ const TermsAndPolicyCheckbox = ({
   onChange,
   checked,
   isDisabled,
+  isRequired,
   termsOfUseUrl,
   privacyPolicyUrl,
   messages,
@@ -52,7 +54,7 @@ const TermsAndPolicyCheckbox = ({
   let translatedText = ''
   let splitText: string[] = []
   if (termsOfUseUrl && privacyPolicyUrl) {
-    translatedText = I18n.t('You agree to the %{termsOfUseLink} and %{privacyPolicyLink}.', {
+    translatedText = I18n.t('You agree to the %{termsOfUseLink} & %{privacyPolicyLink}.', {
       termsOfUseLink: 'ZZZZ_TERMS',
       privacyPolicyLink: 'ZZZZ_PRIVACY',
     })
@@ -91,10 +93,13 @@ const TermsAndPolicyCheckbox = ({
       }
       inline={true}
       disabled={isDisabled}
+      isRequired={isRequired}
+      aria-required={isRequired ? true : undefined}
       onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.checked)}
       onFocus={onFocus}
       checked={checked}
       messages={messages}
+      data-testid="terms-and-policy-checkbox"
     />
   )
 }

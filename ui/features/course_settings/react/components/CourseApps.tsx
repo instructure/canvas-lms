@@ -22,7 +22,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {InstructorApps} from '../../../../shared/lti-apps/components/InstructorApps'
 import ProductDetail from '../../../../shared/lti-apps/components/ProductDetail/ProductDetail'
 import {getBasename} from '@canvas/lti-apps/utils/basename'
-import {instructorAppsRoute} from '@canvas/lti-apps/utils/route'
+import {instructorAppsRoute} from '@canvas/lti-apps/utils/routes'
 
 export const CourseApps = () => {
   const router = createBrowserRouter(

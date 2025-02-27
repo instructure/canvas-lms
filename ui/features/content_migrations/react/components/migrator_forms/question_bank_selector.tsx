@@ -35,7 +35,6 @@ type QuestionBank = {
 
 type QuestionBankSelectorProps = {
   onChange: (settings: QuestionBankSettings | null) => void
-  questionBankError: boolean
   disable?: boolean
   notCompatible?: boolean
   questionBankSettings?: QuestionBankSettings | null
@@ -43,7 +42,6 @@ type QuestionBankSelectorProps = {
 
 const QuestionBankSelector = ({
   onChange,
-  questionBankError,
   disable = false,
   notCompatible = false,
   questionBankSettings,
@@ -114,20 +112,6 @@ const QuestionBankSelector = ({
         <View as="div" maxWidth="22.5rem">
           <TextInput
             disabled={disable}
-            messages={
-              questionBankError
-                ? [
-                    {
-                      text: (
-                        <Text color="danger">
-                          {I18n.t('You must enter a name for the new question bank')}
-                        </Text>
-                      ),
-                      type: 'error',
-                    },
-                  ]
-                : []
-            }
             renderLabel={<></>}
             placeholder={I18n.t('New question bank')}
             onChange={(_, value) => onChange({...questionBankSettings, question_bank_name: value})}

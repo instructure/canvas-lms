@@ -246,6 +246,9 @@ export default function DifferentiatedModulesTray(props: DifferentiatedModulesTr
   const {onDismiss, moduleElement, moduleId} = props
   const headerLabel = moduleId ? I18n.t('Edit Module Settings') : I18n.t('Add Module')
   const trayRef = useRef<HTMLElement | null>(null)
+  const themeOverride = (window.ENV.FEATURES.modules_requirements_allow_percentage)
+    ? { regularWidth: '32.375em' }
+    : undefined
 
   return (
     <Tray
@@ -254,6 +257,7 @@ export default function DifferentiatedModulesTray(props: DifferentiatedModulesTr
       placement="end"
       size="regular"
       contentRef={r => (trayRef.current = r)}
+      themeOverride={themeOverride}
     >
       <Header
         moduleId={moduleId}

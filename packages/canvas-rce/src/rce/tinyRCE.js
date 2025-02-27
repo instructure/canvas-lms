@@ -17,6 +17,7 @@
  */
 
 import * as browser from '../common/browser'
+// eslint-disable-next-line no-redeclare
 import tinymce from 'tinymce'
 
 // load theme

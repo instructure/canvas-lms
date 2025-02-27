@@ -169,7 +169,7 @@ export const FAKE_FILES: File[] = [
   },
   {
     id: '202',
-    uuid: 'MxgT4HZIAWcg6iV1CKYMLRXONfzVg8pm34fEOJ92',
+    uuid: 'MxgT4HZIAWcg6iV1CKYMLRXONfzVg8pm34fEOJ93',
     folder_id: '42',
     display_name: 'digital-library2.png',
     filename: 'digital-library2.png',

@@ -35,6 +35,18 @@ describe HealthChecks do
     expect(readiness_result[:postgresql][:status]).to be false
   end
 
+  it "passes the vault readiness check if the data is cached but vault is not available" do
+    allow(Canvas::Vault).to receive(:read).and_raise(Vault::VaultError)
+
+    allow(Canvas::Vault).to receive(:cached?).and_return(false)
+    readiness_result = described_class.process_readiness_checks(false)
+    expect(readiness_result[:vault][:status]).to be false
+
+    allow(Canvas::Vault).to receive(:cached?).and_return(true)
+    readiness_result = described_class.process_readiness_checks(false)
+    expect(readiness_result[:vault][:status]).to be true
+  end
+
   context "process_deep_checks" do
     it "passes the default_shard check" do
       expect(described_class.process_deep_checks[:critical][:default_shard][:status]).to be true

@@ -54,8 +54,8 @@ export function UploadRecordMediaModal({
         }}
         onDismiss={onDismiss}
         rcsConfig={{
-          contextId: ENV.current_user?.id,
-          contextType: 'user',
+          contextId: ENV.current_context?.id,
+          contextType: ENV.current_context?.type,
         }}
         open={open}
         tabs={{record: true, upload: true}}

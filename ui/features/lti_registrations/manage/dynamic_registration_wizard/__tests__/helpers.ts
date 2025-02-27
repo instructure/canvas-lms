@@ -18,24 +18,26 @@
 
 import type {LtiPlacement} from '../../model/LtiPlacement'
 import {ZLtiRegistrationId} from '../../model/LtiRegistrationId'
-import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {ZDeveloperKeyId} from '../../model/developer_key/DeveloperKeyId'
-import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {ZLtiImsRegistrationId} from '../../model/lti_ims_registration/LtiImsRegistrationId'
-import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
 import type {DynamicRegistrationWizardService} from '../DynamicRegistrationWizardService'
 import type {Lti1p3RegistrationWizardService} from '../../lti_1p3_registration_form/Lti1p3RegistrationWizardService'
+import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
+import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
+import {ZAccountId} from '../../model/AccountId'
+import type {LtiOverlay} from '../../model/LtiOverlay'
+import {ZLtiOverlayId} from '../../model/ZLtiOverlayId'
+import {ZUserId} from '../../model/UserId'
 
 export const mockDynamicRegistrationWizardService = (
   mocked?: Partial<DynamicRegistrationWizardService>,
 ): DynamicRegistrationWizardService => ({
   fetchRegistrationToken: jest.fn(),
-  deleteDeveloperKey: jest.fn(),
+  deleteRegistration: jest.fn(),
   getRegistrationByUUID: jest.fn(),
-  getLtiImsRegistrationById: jest.fn(),
   updateDeveloperKeyWorkflowState: jest.fn(),
-  updateRegistrationOverlay: jest.fn(),
-  updateAdminNickname: jest.fn(),
+  fetchLtiRegistration: jest.fn(),
+  updateRegistration: jest.fn(),
   ...mocked,
 })
 
@@ -48,68 +50,68 @@ export const mockLti1p3RegistrationWizardService = (
   ...mocked,
 })
 
-export const mockToolConfiguration = (config?: Partial<LtiConfiguration>): LtiConfiguration => ({
+export const mockToolConfiguration = (
+  config?: Partial<InternalLtiConfiguration>,
+): InternalLtiConfiguration => ({
   title: '',
   target_link_uri: '',
   oidc_initiation_url: '',
   custom_fields: {},
-  is_lti_key: true,
   scopes: [],
-  extensions: [],
+  placements: [],
+  launch_settings: {},
   ...config,
 })
 
 export const mockRegistration = (
-  reg?: Partial<LtiImsRegistration>,
-  config?: Partial<LtiConfiguration>,
-): LtiImsRegistration => ({
-  id: ZLtiImsRegistrationId.parse('1'),
-  lti_registration_id: ZLtiRegistrationId.parse('1'),
-  lti_tool_configuration: {
-    claims: [],
-    domain: '',
-    messages: [],
-    target_link_uri: '',
-    'https://canvas.instructure.com/lti/privacy_level': 'anonymous',
-  },
+  reg?: Partial<LtiRegistrationWithConfiguration>,
+  config?: Partial<InternalLtiConfiguration>,
+): LtiRegistrationWithConfiguration => ({
+  id: ZLtiRegistrationId.parse('1'),
   developer_key_id: ZDeveloperKeyId.parse('1'),
   overlay: null,
-  grant_types: [],
-  response_types: [],
-  redirect_uris: [],
-  initiate_login_uri: '',
-  client_name: '',
-  jwks_uri: '',
-  token_endpoint_auth_method: '',
-  contacts: [],
-  scopes: [...Object.values(LtiScopes)],
-  created_at: '',
-  updated_at: '',
-  guid: '',
-  /**
-   * Tool configuration with overlay applied
-   */
-  tool_configuration: mockToolConfiguration(config),
-  /**
-   * The configuration without the overlay applied
-   */
-  default_configuration: mockToolConfiguration(config),
+  created_at: new Date(),
+  updated_at: new Date(),
+  configuration: mockToolConfiguration(config),
+  account_id: ZAccountId.parse('1'),
+  icon_url: null,
+  name: 'Test Registration',
+  admin_nickname: 'Test Admin',
+  workflow_state: 'active',
+  vendor: 'canvas',
+  internal_service: false,
+  ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+  manual_configuration_id: null,
   ...reg,
 })
 
-export const mockConfigWithPlacements = (placements: LtiPlacement[]): Partial<LtiConfiguration> => {
+export const mockOverlay = (overlay?: Partial<LtiOverlay>): LtiOverlay => ({
+  id: ZLtiOverlayId.parse('1'),
+  registration_id: ZLtiRegistrationId.parse('1'),
+  root_account_id: ZAccountId.parse('1'),
+  account_id: ZAccountId.parse('1'),
+  created_at: new Date(),
+  updated_at: new Date(),
+  updated_by: {
+    id: ZUserId.parse('1'),
+    name: 'Foo',
+    created_at: new Date(),
+    short_name: 'Foo',
+    sortable_name: 'Foo',
+  },
+  data: {
+    description: 'Foo',
+  },
+  ...overlay,
+})
+
+export const mockConfigWithPlacements = (
+  placements: LtiPlacement[],
+): Partial<InternalLtiConfiguration> => {
   return {
-    extensions: [
-      {
-        platform: 'canvas.instructure.com',
-        settings: {
-          text: '',
-          placements: placements.map(placement => ({
-            placement,
-            message_type: 'LtiResourceLinkRequest',
-          })),
-        },
-      },
-    ],
+    placements: placements.map(placement => ({
+      placement,
+      message_type: 'LtiResourceLinkRequest',
+    })),
   }
 }

@@ -31,6 +31,7 @@ export type UseSimilarProductsProps = {
 
 const useSimilarProducts = ({params, product, queryOptions = {}}: UseSimilarProductsProps) => {
   const {data: otherProductsByCompany} = useQuery({
+    enabled: !!params?.filters?.companies[0].id,
     queryKey: ['lti_similar_products_by_company', product?.company],
     queryFn: () =>
       fetchProducts({

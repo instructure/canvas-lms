@@ -15,7 +15,7 @@ development:
     access_key: aws-key-id-goes-here
     secret_key: secret-goes-here
   # credentials used by translations
-  'sts/testaccount/sts/sagemaker-dev':
+  'sts/testaccount/sts/translation-dev':
     access_key: aws-key-id-goes-here
     secret_key: secret-goes-here
   'sts/testaccount/sts/canvas-release-notes':

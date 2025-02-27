@@ -119,8 +119,10 @@ el:
     length_error: "Πρέπει να έχει μήκος 255 χαρακτήρες ή λιγότερο"
     title: "Όνομα Ομάδας"
   OutcomeView: 
+    display_name: "Φιλικό όνομα (προαιρετικό)"
     length_error: "Πρέπει να έχει μήκος 255 χαρακτήρες ή λιγότερο"
     mastery_error: "Πρέπει να είναι μεγαλύτερο ή ίσο από 0"
+    title: "Όνομα αποτελέσματος"
   OutcomesDirectoryView: 
     flash: 
       error: "Παρουσιάστηκε σφάλμα. Παρακαλώ ανανεώστε τη σελίδα και δοκιμάστε ξανά."
@@ -1633,6 +1635,7 @@ el:
   add_icon_567dbcaa: "προσθήκη εικονιδίου"
   add_link_5c01c1e8: "Προσθήκη Συνδέσμου"
   add_link_fc336ed6: "Προσθήκη συνδέσμου"
+  add_login_f871148: "Προσθήκη Σύνδεσης"
   add_moderator_review_copy_1st_a484c813: "Προσθήκη Αξιολόγησης Συντονιστή (Αντιγραφή 1ης)"
   add_moderator_review_copy_2nd_e80d458f: "Προσθήκη Αξιολόγησης Συντονιστή (Αντιγραφή 2ης)"
   add_moderator_review_new_3c183cea: "Προσθήκη Αξιολόγησης Συντονιστή (Νέα)"
@@ -4069,6 +4072,7 @@ el:
       buttons: 
         add_prerequisite: "Προσθήκη Προαπαιτούμενου"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: Λεπτά
       headings: 
         add_prerequisite: "Προσθήκη Προαπαιτούμενου στο %{name}"
         course_modules: "Αρθρώματα Μαθήματος"
@@ -5203,6 +5207,7 @@ el:
     this_is_permanent: "<mrk mid=\"7410\" mtype=\"seg\">Δεν είναι δυνατή η αναίρεση της αναπροσαρμογής βαθμών.</mrk> <mrk mid=\"7411\" mtype=\"seg\">Το ιστορικό προ-αναπροσαρμοσμένων βαθμών θα είναι διαθέσιμο, αλλά η ενέργεια της αναπροσαρμογής είναι μη αναστρέψιμη.</mrk>"
   curving_assignments_e9479ee3: "Αναπροσαρμογή εργασιών"
   custom_fields_fc3e55af: "Προσαρμοσμένα Πεδία"
+  custom_from_name_38a3d784: "Προσαρμογή Ονόματος «Από»"
   customize_74cdc895: Παραμετροποίηση
   cutoff_score_74254c89: "κατώτατη βαθμολογία"
   cyan_c1d5f68a: Κυανό
@@ -5374,6 +5379,7 @@ el:
   deep_orange_4c7eea99: "Βαθύ πορτοκαλί"
   deep_purple_bb3e2907: "Βαθύ μοβ"
   default_account_quotas_e34112fd: "Ποσοστώσεις Προεπιλεγμένου Λογαριασμού"
+  default_canvas_setting_fa6e6f81: "Προεπιλεγμένη Ρύθμιση Canvas"
   default_conference_title: "Συνεδρία για το μάθημα %{course_name}"
   default_email_9efb7fbd: "Προεπιλεγμένη Ηλεκτρονική Διεύθυνση"
   default_grade_cannot_be_set_to_ex_723caa59: "Ο προεπιλεγμένος βαθμός δεν μπορεί να είναι %{ex}"
@@ -5413,6 +5419,7 @@ el:
   deleted_ce03674d: διεγράφη
   deleted_topic_notice: "Το θέμα έχει διαγραφεί"
   deleting_6421031e: διαγραφή...
+  deleting_e2bd8cc9: Διαγραφή...
   delicious_7f9ac66f: "Η υπηρεσία Delicious"
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "<mrk mid=\"7254\" mtype=\"seg\">Οι demo ιστοσελίδες απαιτούν το σετάρισμα των ρυθμίσεων Recaptcha.</mrk> <mrk mid=\"7255\" mtype=\"seg\">Παρακαλώ επικοινωνήστε με τον διαχειριστή της ιστοσελίδα σας για αυτή τη σύνδεσή σας στο Canvas.</mrk>"
   demos: 
@@ -5832,6 +5839,7 @@ el:
   dismiss_dacdb625: Παράβλεψη
   display_course_catalog: "Εμφάνισης λίστας με δυνατότητα αναζήτησης μαθημάτων σε αυτόν τον λογαριασμό ρίζας με ενεργοποιημένη την ένδειξη «Συμπεριλάβετε αυτό το μάθημα στο ευρετήριο κοινοποιημένων μαθημάτων»."
   display_name_b80c243e: "Όνομα εμφάνισης"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "Προβολή αναδυόμενης προειδοποίησης που εμφανίζεται μία φορά στη σελίδα των Προτιμήσεων Ειδοποιήσεων."
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "<mrk mid=\"4631\" mtype=\"seg\">Καταμερισμός σε ίσες χρονοθυρίδες %{num_minutes} λεπτών.</mrk> <mrk mid=\"4632\" mtype=\"seg\">*Πηγαίνετε στο*</mrk>"
   do_nothing_9672b478: "Καμία δράση"
   does_not_meet_expectations_b0736d20: "Δεν Ικανοποιεί τις Προσδοκίες"
@@ -5927,6 +5935,7 @@ el:
     titles: 
       find_existing_rubric: "Βρείτε Υπάρχουσα Ρουμπρίκα"
   edit_rubric_7d4d139d: "Επεξεργασία Ρουμπρίκας"
+  edit_sections_7d0e4e34: "Επεξεργασία Τομέων"
   edit_survey_b0d6890d: "Τροποποίησης Δημοσκόπισης"
   edit_this_key_1ee53473: "Επεξεργασία αυτού του κλειδιού"
   edit_toolname_app_23cfbb8: "Τροποποίηση %{toolName} Εφαρμογής"
@@ -6311,6 +6320,7 @@ el:
   epub_exporting_f5592ff2: "Εξαγωγή ePub"
   error_59293a2c: σφάλμα
   error_98e81528: Σφάλμα
+  error_afac7133: "Σφάλμα:"
   error_deleting_name_reason_11f9d399: "<mrk mid=\"7261\" mtype=\"seg\">Σφάλμα κατά τη διαγραφή του %{name}:</mrk> <mrk mid=\"7262\" mtype=\"seg\">%{reason}</mrk>"
   error_reports_7d6c8b1e: "Αναφορές Σφαλμάτων"
   error_uploading_file_e2d31b56: "Σφάλμα μεταφόρτωσης αρχείου."
@@ -7170,6 +7180,7 @@ el:
       removed: "Το σετ ομάδων αφαιρέθηκε επιτυχώς."
     group_atom_feed: "Τροφοδοσία Atom Ομάδας"
     group_limit_number: "Το όριο της ομάδας πρέπει να είναι αριθμός"
+    group_set_name_required: "Απαιτείται όνομα"
     groups_count: "(%{Count}) ομάδες"
     index: 
       heading_current_groups: "Τρέχουσες Ομάδες"
@@ -7841,6 +7852,7 @@ el:
   learning_outcome_id_88ff198c: "id αποτελέσματος εκμάθησης"
   learning_outcome_name_9cb475e6: "όνομα αποτελέσματος εκμάθησης"
   leave_5e852989: Αποχώρηση
+  leave_blank_for_no_limit_e8f80808: "Αφήστε το κενό για μη περιορισμό"
   leave_group_group_name_6847c632: "Αποχώρηση από την ομάδα %{group_name}"
   left_group_group_name_aac4e813: "Αποχωρήσατε από την Ομάδα %{group_name}"
   less_than_a_minute_ago_9f45e2a5: "λιγότερο από ένα λεπτό πριν"
@@ -7952,6 +7964,7 @@ el:
   link_number_3_7118ff64: "Σύνδεσμος αρ. 3"
   link_only_995966e: "μόνο Σύνδεσμος"
   link_selection_1486c5d0: "Επιλογή Συνδέσμου"
+  link_to_students_91edf7ea: "Σύνδεσμος με Σπουδαστές"
   link_url_cf96376: "Url συνδέσμου"
   linked_assignment_message: "έγινε σύνδεση με την Εργασία «%{title}»"
   linked_discussion_topic_message: "έγινε σύνδεση με το Θέμα Συζήτησης «%{title}»"
@@ -9933,6 +9946,7 @@ el:
   module_9775f804: "λειτουργική μονάδα"
   module_completed_50c50762: "Η Ενότητα Ολοκληρώθηκε"
   module_in_progress_fa600662: "Η Ενότητα βρίσκεται Σε Εξέλιξη"
+  module_item_501fb0c3: "Χαρακτηριστικό ενότητας"
   module_item_module_item_name_was_successfully_dele_8626d846: "Το στοιχείο %{module_item_name} της ενότητας διαγράφηκε επιτυχώς."
   module_locked_f6a7ea9d: "Η Ενότητα Κλειδώθηκε"
   module_menu_3201af4e: "Μενού Ενότητας"
@@ -10353,6 +10367,7 @@ el:
       scheduling: Προγραμματισμός
   notification_preferences_cf47083d: "Προτιμήσεις Ειδοποιήσεων"
   notifications_cbfa7704: Ειδοποιήσεις
+  notifications_sent_to_external_services_c4a86b78: "Οι ειδοποιήσεις στάλθηκαν σε εξωτερικές υπηρεσίες"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "<mrk mid=\"4332\" mtype=\"seg\">Τώρα που το μάθημά σας δημιουργήθηκε και είναι διαθέσιμο, μάλλον δεν χρειάζεστε πια αυτή τη λίστα ελέγχου.</mrk> <mrk mid=\"4333\" mtype=\"seg\">Θα την έχουμε, πάντως, πρόχειρη σε περίπτωση που θελήσετε αργότερα να δοκιμάσετε κάτι καινούργιο ή χρειαστείτε λίγη επιπλέον βοήθεια κατά την πραγματοποίηση αλλαγών στο περιεχόμενο του μαθήματός σας.</mrk>"
   number: 
     currency: 
@@ -11234,6 +11249,7 @@ el:
       GradingAssignment, GradingAssignmentScore.</mrk>
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Εξάσκηση στο Κουίζ"
+  preparing_download_percent_complete_34b48e4d: "<mrk mid=\"5744\" mtype=\"seg\">Προετοιμασία λήψης:</mrk> <mrk mid=\"5745\" mtype=\"seg\">%{percent}% ολοκληρώθηκε</mrk>"
   prerequisites_49659f16: "Προαπαιτούμενα:"
   prerequisites_98b324e0: Προαπαιτούμενα
   prerequisites_lookup: 
@@ -11737,6 +11753,7 @@ el:
       update_question_without_regrading: "Ενημέρωση ερώτησης χωρίς αναβαθμολόγηση"
   quiz_40ee61b1: κουίζ
   quiz_e0dcce8f: Κουίζ
+  quiz_instructions_a36d09c9: "Οδηγίες Κουίζ"
   quiz_log_auditing: 
     buttons: 
       reload_events: Επαναφόρτωση
@@ -12901,6 +12918,7 @@ el:
     updated_at: "Ημερομηνία Τροποποίησης"
     updated_at_short: Τροποποιήθηκε
   recaptcha_not_configured_3a6ef9ee: "Δεν έχουν ρυθμιστεί τα recaptcha"
+  recent_canvas_notifications_81395de6: "Πρόσφατες Ειδοποιήσεις Canvas"
   recent_student: 
     last_logged_in: "πιο πρόσφατη σύνδεση στις %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} Υπολογισμός Με Μεγαλύτερο Βάρος στις Πιο Πρόσφατες Βαθμολογίες"
@@ -12998,6 +13016,7 @@ el:
   remove_f47dc62a: Αφαίρεση
   remove_filename_87f3781e: "αφαίρεση %{filename}"
   remove_filter_68de01d4: "Αφαίρεση Φίλτου"
+  remove_from_course_6fb47aee: "Αφαίρεση από το Μάθημα"
   remove_icon_a4646413: "αφαίρεση εικονιδίου"
   remove_image_341340b3: "Αφαίρεση Εικόνας"
   remove_media_comment_f4afdb4b: "Αφαίρεση πολυμεσιτικού σχόλιου"
@@ -13024,6 +13043,7 @@ el:
   reply_389d6fb9: Απάντηση
   reply_all_80298bee: "Απάντηση όλων"
   reply_from_name: "%{name} μέσω των Ειδοποιήσεων του Canvas"
+  reply_to_9fa43ebe: Απάντηση-Προς
   reply_to_comment_72d96728: "Απάντηση στο Σχόλιο"
   reply_to_current_message_55391f5b: "Απάντηση στο Τρέχον Μήνυμα"
   reply_to_main_discussion_29823888: "Απάντηση στην Κύρια Συζήτηση"
@@ -13273,6 +13293,7 @@ el:
   save_login_bba1272: "Αποθήκευση Σύνδεσης"
   save_settings_cafe79a5: "Αποθήκευση Ρυθμίσεων"
   save_skype_name_4de35a9: "Αποθήκευση Ονόματος Skype"
+  save_successful_b2f64da4: "Επιτυχής αποθήκευση"
   saving_d55dd90e: Αποθήκευση...
   saving_recording_e111cb05: "Αποθήκευση Ηχογράφησης..."
   schedule_student_availability_332154a: "Προγραμματισμός της διαθεσιμότητας σπουδαστή"
@@ -13385,6 +13406,7 @@ el:
     all_courses_inner: 
       join_course: "Συμμετοχή σε αυτό το Μάθημα"
       next: Επόμενη
+      no_courses_found: "Δεν βρέθηκαν μαθήματα"
       previous: Προηγούμενο
     course_sections: "Τομείς Μαθήματος"
     enrollments_observers: Παρατηρητές
@@ -13502,6 +13524,7 @@ el:
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Δείτε μερικά εργαλεία LTI* που λειτουργούν τέλεια με το Canvas."
   see_this_assignment_in_speedgrader_14b8abaf: "Εμφάνιση της εργασίας στο speedgrader"
   see_vericite_results_b44dd8c8: "Προβολή των αποτελεσμάτων του VeriCite"
+  select_a_course_40bc3229: "Επιλέξτε ένα μάθημα"
   select_a_grading_period_5ea50f1: "Επιλογή Περιόδου Βαθμολόγησης..."
   select_a_grading_period_aab25483: "Επιλογή Περιόδου Βαθμολόγησης"
   select_a_log_type_to_search_247fc6b4: "Επιλέξτε έναν τύπο καταγραφής για αναζήτηση."
@@ -14272,6 +14295,7 @@ el:
   someone_bbbc538b: Κάποιος
   something_went_wrong_re_activating_the_user_please_82c3e7a: "<mrk mid=\"4894\" mtype=\"seg\">Κάτι δεν πήγε σωστά κατά την επανενεργοποίηση του χρήστη.</mrk> <mrk mid=\"4895\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "<mrk mid=\"1498\" mtype=\"seg\">Κάτι δεν πήγε σωστά κατά την ενημέρωση του ρόλου του χρήστη.</mrk> <mrk mid=\"1499\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
+  something_went_wrong_updating_the_user_s_student_l_1047109c: "<mrk mid=\"5554\" mtype=\"seg\">Κάτι δεν πήγε σωστά κατά την ενημέρωση του ρόλου των συνδέσμων σπουδαστή για αυτόν τον χρήστη.</mrk> <mrk mid=\"5555\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
   sortable_name_73f707cf: "Όνομα που μπορεί να ταξινομηθεί"
   source_c377a469: Source
   source_code_2395ca74: "Πηγαίος κώδικας"
@@ -15284,6 +15308,7 @@ el:
   update_4d8ee62: Ενημέρωση
   update_details_6abfed16: "Ενημέρωση Λεπτομερειών"
   update_grade_b47eb3ff: "Ενημέρωση Βαθμού"
+  update_login_472cd6db: "Ενημέρωση Σύνδεσης"
   update_module_b984c2e5: "Ενημέρωση Αρθρώματος"
   update_password_4bc5cb1f: "Ενημέρωση Κωδικού Πρόσβασης"
   update_quota_81381226: "Ενημέρωση Ποσόστωσης"
@@ -15719,6 +15744,7 @@ el:
     is_required: "Αυτό το πεδίο είναι υποχρεωτικό"
   validate_links_in_content_b1630fba: "Επικύρωση Συνδέσμων στο Περιεχόμενο"
   validation_error_3b943100: "Λάθος στην Επικύρωση"
+  value_must_be_a_whole_number_23c79120: "Το όριο της ομάδας πρέπει να είναι αριθμός"
   value_must_be_positive_3e086d5a: "Η τιμή πρέπει να είναι θετική"
   vanity_url_76f93382: "Vanity URL"
   verification_code_5acd64ef: "Κωδικός Επιβεβαίωσης"
@@ -15801,6 +15827,7 @@ el:
   well_below_mastery_37664bdc: "Αρκετά Κάτω από το Επίπεδο Επιδεξιότητας"
   what_should_the_csv_file_look_like_985a59ac: "Πως πρέπει να είναι το CSV αρχείο;"
   what_would_you_like_to_do_next_2835397e: "Τι θα θέλατε να κάνετε έπειτα;"
+  when_an_observer_is_linked_to_a_student_they_have__489e2b71: "Όταν κάποιος παρατηρητής συνδέεται με κάποιον σπουδαστή, έχει πρόσβαση στους βαθμούς και στις αλληλεπιδράσεις μαθημάτων του σπουδαστή αυτού."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "<mrk mid=\"4369\" mtype=\"seg\">Όταν επισκέπτεται κάποιος το μάθημα, αυτή είναι η σελίδα που θα βλέπει.</mrk>  <mrk mid=\"4370\" mtype=\"seg\">Μπορείτε να ρυθμίσετε να εμφανίζεται η ροή δραστηριοτήτων, η λίστα των ενοτήτων του μαθήματος, το αναλυτικό πρόγραμμα ή κάποια προσαρμοσμένη σελίδα που θα δημιουργήσετε εσείς.</mrk>  <mrk mid=\"4371\" mtype=\"seg\">Η προεπιλεγμένη ρύθμιση είναι η ροή δραστηριοτήτων.</mrk>"
   where_would_you_like_to_move_title_fabd6e8f: "Πού θα θέλατε να μετακινήσετε το %{title};"
   which_login_to_change_4707fbc6: "Ποια σύνδεση να αλλάξει"

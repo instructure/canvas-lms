@@ -46,7 +46,7 @@ export const PRETTY_HTML_EDITOR_VIEW = 'PRETTY'
 export const RAW_HTML_EDITOR_VIEW = 'RAW'
 
 // I don't know why eslint is reporting this, the props are all used
-/* eslint-disable react/no-unused-prop-types */
+
 StatusBar.propTypes = {
   id: string.isRequired,
   rceIsFullscreen: bool,
@@ -74,10 +74,8 @@ StatusBar.defaultProps = {
   disabledPlugins: [],
 }
 
-/* eslint-enable react/no-unused-prop-types */
-
 // we use the array index because pathname may not be unique
-/* eslint-disable react/no-array-index-key */
+
 function renderPathString({path}) {
   return path.reduce((result, pathName, index) => {
     return result.concat(
@@ -86,11 +84,10 @@ function renderPathString({path}) {
           {index > 0 ? <IconMiniArrowEndLine /> : null}
           {pathName}
         </Text>
-      </span>
+      </span>,
     )
   }, [])
 }
-/* eslint-enable react/no-array-index-key */
 
 function emptyTagIcon() {
   return (
@@ -232,7 +229,7 @@ export default function StatusBar(props) {
     const message =
       props.editorView === PRETTY_HTML_EDITOR_VIEW
         ? formatMessage(
-            'Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here.'
+            'Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here.',
           )
         : formatMessage('Access the pretty HTML editor')
     const label =
@@ -253,7 +250,7 @@ export default function StatusBar(props) {
             props.onChangeView(
               props.editorView === PRETTY_HTML_EDITOR_VIEW
                 ? RAW_HTML_EDITOR_VIEW
-                : PRETTY_HTML_EDITOR_VIEW
+                : PRETTY_HTML_EDITOR_VIEW,
             )
           }}
           onFocus={() => setFocusedBtnId('rce-editormessage-btn')}
@@ -327,7 +324,7 @@ export default function StatusBar(props) {
         one {1 word}
       other {# words}
     }`,
-      {count: props.wordCount}
+      {count: props.wordCount},
     )
     return (
       <>
@@ -362,7 +359,7 @@ export default function StatusBar(props) {
     return preferredHtmlEditor() === RAW_HTML_EDITOR_VIEW
       ? formatMessage('Shift-O to open the pretty html editor.')
       : formatMessage(
-          'The pretty html editor is not keyboard accessible. Press Shift O to open the raw html editor.'
+          'The pretty html editor is not keyboard accessible. Press Shift O to open the raw html editor.',
         )
   }
 

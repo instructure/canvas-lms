@@ -68,7 +68,7 @@ class Quizzes::QuizzesController < ApplicationController
       return unless authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
 
-      can_manage = @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
+      can_manage = @context.grants_right?(@current_user, session, :manage_assignments_edit)
 
       quiz_index = scoped_quizzes_index
       quiz_index += scoped_new_quizzes_index if quiz_lti_enabled?
@@ -112,6 +112,7 @@ class Quizzes::QuizzesController < ApplicationController
       due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
       sis_integration_settings_enabled = AssignmentUtil.sis_integration_settings_enabled?(@context)
+      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
 
       hash = {
         QUIZZES: {
@@ -147,6 +148,8 @@ class Quizzes::QuizzesController < ApplicationController
         },
         quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
         quiz_index_menu_tools: external_tools_display_hashes(:quiz_index_menu),
+        ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+        CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
         SIS_NAME: sis_name,
         MAX_NAME_LENGTH: max_name_length,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
@@ -253,6 +256,9 @@ class Quizzes::QuizzesController < ApplicationController
 
       setup_attachments
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
+
+      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+
       @stored_params = @submission.temporary_data if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       hash = {
@@ -260,6 +266,8 @@ class Quizzes::QuizzesController < ApplicationController
         CONTEXT_ACTION_SOURCE: :quizzes,
         COURSE_ID: @context.id,
         LOCKDOWN_BROWSER: @quiz.require_lockdown_browser?,
+        ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+        CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
         QUIZ: quiz_json(@quiz, @context, @current_user, session),
         QUIZ_DETAILS_URL: course_quiz_managed_quiz_data_url(@context.id, @quiz.id),
         QUIZZES_URL: course_quizzes_url(@context),
@@ -590,7 +598,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def publish
-    if authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
+    if authorized_action(@context, @current_user, :manage_assignments_edit)
       @quizzes = @context.quizzes.active.where(id: params[:quizzes])
       @quizzes.each(&:publish!)
 
@@ -607,7 +615,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def unpublish
-    if authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
+    if authorized_action(@context, @current_user, :manage_assignments_edit)
       @quizzes = @context.quizzes.active.where(id: params[:quizzes]).select(&:available?)
       @quizzes.each(&:unpublish!)
 

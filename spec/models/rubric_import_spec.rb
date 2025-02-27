@@ -128,6 +128,13 @@ describe RubricImport do
                    ])
     end
 
+    def decimal_points_csv
+      generate_csv([
+                     ["Rubric 1", "Criteria 1", "Criteria 1 Description", "false", "Rating 1", "Rating 1 Description", "1,75", "Rating 2", "Rating 2 Description", "1", "Rating 3", "Rating 3 Description", "0.0"],
+                     ["Rubric 2", "Criteria 1", "Criteria 1 Description", "false", "Rating 1", "Rating 1 Description", "1.5", "Rating 2", "Rating 2 Description", "1.0", "Rating 3", "Rating 3 Description", "0"],
+                   ])
+    end
+
     def missing_rubric_name_csv
       generate_csv([["", "Criteria 1", "Criteria 1 Description", "false", "Rating 1", "Rating 1 Description", "1"]])
     end
@@ -315,6 +322,35 @@ describe RubricImport do
         expect(criterion3[:description]).to eq("Criterion 3")
         expect(criterion3[:ratings].length).to eq(1)
       end
+    end
+
+    it "should run the import with decimal points in ratings" do
+      import = create_import_manually(decimal_points_csv)
+      import.run
+
+      expect(import.workflow_state).to eq("succeeded")
+      expect(import.progress).to eq(100)
+      expect(import.error_count).to eq(0)
+      expect(import.error_data).to eq([])
+
+      rubrics = Rubric.where(rubric_imports_id: import.id)
+      expect(rubrics.length).to eq(2)
+
+      rubric1 = rubrics.find_by(title: "Rubric 1")
+      expect(rubric1.data.length).to eq(1)
+      criterion1 = rubric1.data[0]
+      expect(criterion1[:ratings].length).to eq(3)
+      expect(criterion1[:ratings][0][:points]).to eq(1.75)
+      expect(criterion1[:ratings][1][:points]).to eq(1.0)
+      expect(criterion1[:ratings][2][:points]).to eq(0.0)
+
+      rubric2 = rubrics.find_by(title: "Rubric 2")
+      expect(rubric2.data.length).to eq(1)
+      criterion1 = rubric2.data[0]
+      expect(criterion1[:ratings].length).to eq(3)
+      expect(criterion1[:ratings][0][:points]).to eq(1.5)
+      expect(criterion1[:ratings][1][:points]).to eq(1.0)
+      expect(criterion1[:ratings][2][:points]).to eq(0.0)
     end
 
     describe "succeeded_with_errors" do

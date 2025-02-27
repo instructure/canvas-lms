@@ -22,6 +22,7 @@ import {render, screen} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import userEvent from '@testing-library/user-event'
+import {FileManagementContext} from '../../Contexts'
 
 const defaultProps = {
   isUserContext: false,
@@ -31,7 +32,16 @@ const defaultProps = {
 const renderComponent = (props?: any) => {
   return render(
     <MockedQueryClientProvider client={queryClient}>
-      <FilesHeader {...defaultProps} {...props} />
+      <FileManagementContext.Provider
+        value={{
+          contextType: 'course',
+          contextId: '1',
+          folderId: '1',
+          showingAllContexts: false,
+        }}
+      >
+        <FilesHeader {...defaultProps} {...props} />
+      </FileManagementContext.Provider>
     </MockedQueryClientProvider>,
   )
 }

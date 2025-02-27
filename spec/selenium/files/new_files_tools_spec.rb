@@ -31,7 +31,7 @@ describe "files page with tools" do
       @tool.save!
     end
 
-    it "is able to launch the index menu tool via the tray", custom_timeout: 60 do
+    it "is able to launch the index menu tool via the tray", custom_timeout: 60, upgrade_files_v2: "waiting for deployment" do
       get "/courses/#{@course.id}/files"
 
       gear = f("#file_menu_link")

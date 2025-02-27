@@ -119,6 +119,7 @@ module Types
     global_id_field :id
 
     field :course_code, String, "course short name", null: true
+    field :horizon_course, Boolean, null: true
     field :name, String, null: false
     field :state, CourseWorkflowState, method: :workflow_state, null: false
     field :syllabus_body, String, null: true

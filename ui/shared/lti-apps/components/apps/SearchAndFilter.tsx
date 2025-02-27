@@ -27,7 +27,7 @@ import {IconEndSolid, IconFilterLine, IconSearchLine} from '@instructure/ui-icon
 import useDebouncedSearch from '../../hooks/useDebouncedSearch'
 import useDiscoverQueryParams from '../../hooks/useDiscoverQueryParams'
 import useBreakpoints from '../../hooks/useBreakpoints'
-import {instructorAppsHash, instructorAppsRoute} from '../../utils/route'
+import {instructorAppsHash, instructorAppsRoute} from '../../utils/routes'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -46,7 +46,7 @@ export const SearchAndFilter = (props: {setIsTrayOpen: (isOpen: boolean) => void
 
   return (
     <Flex gap="small" margin="0 0 small 0" direction={isMaxMobile ? 'column-reverse' : 'row'}>
-      <Flex.Item shouldGrow={true} style={{overflowY: 'unset'}}>
+      <Flex.Item shouldGrow={true} overflowY="visible">
         <View as="div">
           <TextInput
             renderLabel={

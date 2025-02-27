@@ -177,6 +177,12 @@ modules_student_module_selection:
     If enabled, teachers will be able to a single module to show on the modules page for students.
   applies_to: Account
 
+modules_requirements_allow_percentage:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Module Requirements Allow Set By Percentage
+  description: Allows for Module Requirements to be set by percentage.
+
 calendar_events_api_pagination_enhancements:
   state: hidden
   display_name: Calendar Events API Pagination Enhancements

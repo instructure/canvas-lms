@@ -672,7 +672,7 @@ describe Mutations::CreateDiscussionTopic do
     end
 
     context "todo_date" do
-      it "returns an error when user has neither manage_content nor manage_course_content_add permissions" do
+      it "returns an error when user has no manage_course_content_add permissions" do
         todo_date = 5.days.from_now.iso8601
         query = <<~GQL
           contextId: "#{@course.id}"
@@ -1651,28 +1651,52 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["sortOrder"]).to eq DiscussionTopic::SortOrder::ASC
   end
 
-  it "sort order is not necessary when discussion_default_sort ff is off" do
-    Account.site_admin.disable_feature!(:discussion_default_sort)
+  context "discussion_default_expand and discussion_default_sort" do
+    it "cannot create discussion with default_expand = false and default_expand_locked = true" do
+      context_type = "Course"
+      title = "Test Title"
+      message = "A message"
+      published = false
+      expanded = false
+      expanded_locked = true
 
-    context_type = "Course"
-    title = "Test Title"
-    message = "A message"
-    published = false
-    require_initial_post = true
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: #{context_type}
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        expanded: #{expanded}
+        expandedLocked: #{expanded_locked}
+      GQL
 
-    query = <<~GQL
-      contextId: "#{@course.id}"
-      contextType: #{context_type}
-      title: "#{title}"
-      message: "#{message}"
-      published: #{published}
-      requireInitialPost: #{require_initial_post}
-    GQL
+      result = execute_with_input(query)
+      result = result.dig("data", "createDiscussionTopic")
+      expect(result["errors"][0]["message"]).to match(/Cannot set default thread state locked, when threads are collapsed/)
+    end
 
-    result = execute_with_input(query)
-    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
-    expect(created_discussion_topic["sortOrder"]).to eq DiscussionTopic::SortOrder::DESC
+    it "sort order is not necessary when discussion_default_sort ff is off" do
+      Account.site_admin.disable_feature!(:discussion_default_sort)
+
+      context_type = "Course"
+      title = "Test Title"
+      message = "A message"
+      published = false
+      require_initial_post = true
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: #{context_type}
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        requireInitialPost: #{require_initial_post}
+      GQL
+
+      result = execute_with_input(query)
+      result = result.dig("data", "createDiscussionTopic")
+      expect(result["errors"]).to be_nil
+      expect(result["discussionTopic"]["sortOrder"]).to eq DiscussionTopic::SortOrder::DESC
+    end
   end
 end

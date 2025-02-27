@@ -45,7 +45,7 @@ import RceApiSource from '../../../../rcs/api'
 import formatMessage from '../../../../format-message'
 import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 import {getTrayHeight} from '../../shared/trayUtils'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import {parsedStudioOptionsPropType} from '../../shared/StudioLtiSupportUtils'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
@@ -61,7 +61,7 @@ export default function VideoOptionsTray({
   onExited = null,
   id = 'video-options-tray',
   studioOptions = null,
-  forBlockEditorUse = false
+  forBlockEditorUse = false,
 }) {
   const {naturalHeight, naturalWidth} = videoOptions
   const currentHeight = videoOptions.appliedHeight || naturalHeight
@@ -85,13 +85,16 @@ export default function VideoOptionsTray({
   const api = new RceApiSource(trayProps)
 
   useEffect(() => {
-    if(videoOptions.attachmentId) {
-      api.getFile(videoOptions.attachmentId, {include: ['blueprint_course_status']})
-        .then((response) => {
-          setEditLocked(response?.restricted_by_master_course && response?.is_master_course_child_content)
+    if (videoOptions.attachmentId) {
+      api
+        .getFile(videoOptions.attachmentId, {include: ['blueprint_course_status']})
+        .then(response => {
+          setEditLocked(
+            response?.restricted_by_master_course && response?.is_master_course_child_content,
+          )
           setLoading(false)
         })
-        .catch((error) => {
+        .catch(error => {
           setLoading(false)
         })
     }
@@ -194,7 +197,7 @@ export default function VideoOptionsTray({
               ? formatMessage('Studio Media Options Tray')
               : formatMessage('Video Options Tray')
           }
-          mountNode={instuiPopupMountNode}
+          mountNode={instuiPopupMountNodeFn}
           onDismiss={onRequestClose}
           onEntered={onEntered}
           onExited={onExited}
@@ -226,7 +229,7 @@ export default function VideoOptionsTray({
             </Flex.Item>
             {loading && videoOptions.attachmentId ? (
               <Flex.Item textAlign="center" margin="xx-large" padding="xx-large">
-                <Spinner renderTitle={formatMessage("Loading")} />
+                <Spinner renderTitle={formatMessage('Loading')} />
               </Flex.Item>
             ) : (
               <Flex.Item as="form" shouldGrow={true} margin="none" shouldShrink={true}>
@@ -277,7 +280,7 @@ export default function VideoOptionsTray({
                           <View as="div" padding="small small xx-small small">
                             <SimpleSelect
                               id={`${id}-size`}
-                              mountNode={instuiPopupMountNode}
+                              mountNode={instuiPopupMountNodeFn}
                               disabled={displayAs !== 'embed'}
                               renderLabel={formatMessage('Size')}
                               messages={messagesForSize}
@@ -323,7 +326,7 @@ export default function VideoOptionsTray({
                               userLocale={Bridge.userLocale}
                               updateSubtitles={handleUpdateSubtitles}
                               liveRegion={getLiveRegion}
-                              mountNode={instuiPopupMountNode}
+                              mountNode={instuiPopupMountNodeFn}
                             />
                           </FormFieldGroup>
                         </Flex.Item>
@@ -365,7 +368,7 @@ VideoOptionsTray.propTypes = {
       shape({
         locale: string.isRequired,
         inherited: bool,
-      })
+      }),
     ),
   }).isRequired,
   onEntered: func,
@@ -379,5 +382,5 @@ VideoOptionsTray.propTypes = {
   }),
   id: string,
   studioOptions: parsedStudioOptionsPropType,
-  requestSubtitlesFromIframe: func
+  requestSubtitlesFromIframe: func,
 }

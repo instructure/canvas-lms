@@ -42,7 +42,7 @@ export default function validateURL(url) {
     // Handle URLs starting with :// (invalid protocol)
     if (href.startsWith('://')) {
       throw new Error(
-        formatMessage('Protocol must be ftp, http, https, mailto, skype, tel or may be omitted')
+        formatMessage('Protocol must be ftp, http, https, mailto, skype, tel or may be omitted'),
       )
     }
 

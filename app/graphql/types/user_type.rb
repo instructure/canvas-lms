@@ -158,6 +158,10 @@ module Types
                Boolean,
                "Whether or not to exclude `completed` enrollments",
                required: false
+      argument :horizon_courses,
+               Boolean,
+               "Whether or not to include or exclude Horizon courses",
+               required: false
       argument :order_by,
                [String],
                "The fields to order the results by",
@@ -182,13 +186,14 @@ module Types
       pseudonym.unique_id
     end
 
-    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false)
+    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil)
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
         course_ids:,
         order_by:,
         current_only:,
-        exclude_concluded:
+        exclude_concluded:,
+        horizon_courses:
       ).load(object.id).then do |enrollments|
         (enrollments || []).select do |enrollment|
           object == context[:current_user] ||
@@ -256,7 +261,14 @@ module Types
         filter_mode = :and
         filter = filter.presence || []
         filters = filter.select(&:presence)
+        is_student = object.roles(context[:domain_root_account]).all? { |role| ["student", "user"].include?(role) }
         conversations_scope = conversations_scope.tagged(*filters, mode: filter_mode) if filters.present?
+        if is_student
+          conversations_scope = conversations_scope.reject do |cs|
+            c = cs.conversation
+            c.context.is_a?(Course) && c.context.horizon_course?
+          end
+        end
         conversations_scope
       end
     end
@@ -576,8 +588,14 @@ end
 
 module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
-    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true)
-      scope = Enrollment.joins(:course)
+    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true, horizon_courses: nil)
+      scope = if horizon_courses
+                Enrollment.horizon
+              elsif horizon_courses == false
+                Enrollment.not_horizon
+              else
+                Enrollment.joins(:course)
+              end
 
       scope = if current_only
                 scope.current.active_by_date

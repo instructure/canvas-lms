@@ -59,8 +59,8 @@ export default function UsersListRow({
           size="x-small"
         />
       </Table.RowHeader>
-      <Table.Cell data-heap-redact-text="">{user.email}</Table.Cell>
-      <Table.Cell data-heap-redact-text="">{user.sis_user_id}</Table.Cell>
+      <Table.Cell>{user.email}</Table.Cell>
+      <Table.Cell>{user.sis_user_id}</Table.Cell>
       <Table.Cell>{user.last_login && <FriendlyDatetime dateTime={user.last_login} />}</Table.Cell>
       <Table.Cell textAlign="end">
         {permissions.can_view_temporary_enrollments &&
@@ -92,7 +92,6 @@ export default function UsersListRow({
             renderTip={I18n.t('Send message to %{name}', {name: user.name})}
           >
             <IconButton
-              data-heap-redact-attributes="href"
               withBorder={false}
               withBackground={false}
               size="small"

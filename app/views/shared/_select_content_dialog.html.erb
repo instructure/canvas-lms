@@ -26,7 +26,7 @@
   new_quizzes_by_default = new_quizzes_enabled && @context.feature_enabled?(:new_quizzes_by_default)
   newquizzes_engine_selected = @context.settings.dig(:engine_selected, :user_id, :newquizzes_engine_selected)
   newquizzes_engine_selected = ['true', 'false'].include?(newquizzes_engine_selected) ? newquizzes_engine_selected : nil
-  add_assignment_permission = @context.root_account.feature_enabled?(:granular_permissions_manage_assignments) ? :manage_assignments_add : :manage_assignments
+  newquizzes_engine_selected = @context.horizon_course? ? 'true' : newquizzes_engine_selected
   module_links_default_new_tab = @current_user&.get_preference(:module_links_default_new_tab)
 %>
 <% js_env :NEW_QUIZZES_BY_DEFAULT => new_quizzes_by_default %>
@@ -234,7 +234,7 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select mathjax_ignore" aria-label="<%= quiz_label %>" multiple>
-          <% if @context.grants_right?(@current_user, session, add_assignment_permission) %>
+          <% if @context.grants_right?(@current_user, session, :manage_assignments_add) %>
             <option value="new"><%= t :create_quiz_option, "[ Create Quiz ]" %></option>
           <% end %>
           <% @combined_active_quizzes.each do |id, title, type| %>
@@ -300,7 +300,7 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select mathjax_ignore" aria-label="<%= assignment_label %>" multiple>
-          <% if @context.grants_right?(@current_user, session, add_assignment_permission) %>
+          <% if @context.grants_right?(@current_user, session, :manage_assignments_add) %>
             <option value="new"><%= t :create_assignment_option, "[ Create Assignment ]" %></option>
           <% end %>
           <% @context.assignment_groups.active.include_active_assignments.reorder(AssignmentGroup.best_unicode_collation_key('name')).each do |group| %>

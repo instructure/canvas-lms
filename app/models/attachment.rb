@@ -87,6 +87,7 @@ class Attachment < ActiveRecord::Base
        :content_export,
        :content_migration,
        :course,
+       :course_report,
        :eportfolio,
        :epub_export,
        :gradebook_upload,
@@ -104,6 +105,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :folder
   belongs_to :user
   has_one :account_report, inverse_of: :attachment
+  has_one :course_report, inverse_of: :attachment
   has_one :group_and_membership_importer, inverse_of: :attachment
   has_one :media_object
   belongs_to :media_object_by_media_id, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :attachments_by_media_id
@@ -127,6 +129,7 @@ class Attachment < ActiveRecord::Base
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
   has_many :discussion_entry_drafts, inverse_of: :attachment
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :attachment
+  has_one :estimated_duration, dependent: :destroy, inverse_of: :attachment
   has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :attachment
 
   before_save :set_root_account_id
@@ -1520,27 +1523,13 @@ class Attachment < ActiveRecord::Base
     end
     can :manage_assign_to
 
-    #################### Begin legacy permission block #########################
     given do |user|
-      !root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-        ((self.user && self.user == user) || context&.grants_right?(user, :manage_content))
-    end
-    can :add_captions and can :delete_captions
-
-    given do |user|
-      !root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-        Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && grants_right?(user, :update)
-    end
-    can :add_captions and can :delete_captions
-    ##################### End legacy permission block ##########################
-
-    given do |user|
-      root_account.feature_enabled?(:granular_permissions_manage_course_content) && grants_right?(user, :update)
+      grants_right?(user, :update)
     end
     can :add_captions
 
     given do |user|
-      root_account.feature_enabled?(:granular_permissions_manage_course_content) && grants_right?(user, :update)
+      grants_right?(user, :update)
     end
     can :delete_captions
   end
@@ -2186,6 +2175,15 @@ class Attachment < ActiveRecord::Base
 
   def full_display_path
     "#{folder_path}/#{display_name}"
+  end
+
+  def sanitized_full_display_path
+    # Produce a path that is cross-platform compatible by removing
+    # chars considered invalid by some OSes, e.g. colon in Windows
+    full_display_path
+      .split("/")
+      .map { |segment| segment.gsub(/[^a-zA-Z0-9\-_.]/, "_") }
+      .join("/")
   end
 
   def matches_full_display_path?(path)

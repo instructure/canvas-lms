@@ -77,13 +77,13 @@ describe('Images reducer', () => {
 
     it('sets preview_url from action preview_url', () => {
       expect(images(state, action).course.files[0].preview_url).toBe(
-        action.payload.newImage.preview_url
+        action.payload.newImage.preview_url,
       )
     })
 
     it('sets thumbnail_url from action thumbnail_url', () => {
       expect(images(state, action).course.files[0].thumbnail_url).toBe(
-        action.payload.newImage.thumbnail_url
+        action.payload.newImage.thumbnail_url,
       )
     })
 
@@ -104,7 +104,7 @@ describe('Images reducer', () => {
       }
 
       state.searchString = 'panda'
-      expect(images(state, action).course.files.length).toBe(2)
+      expect(images(state, action).course.files).toHaveLength(2)
     })
 
     it('does not append new records to the existing array when the payload searchString does not match state', () => {
@@ -118,7 +118,7 @@ describe('Images reducer', () => {
       }
 
       state.searchString = 'cat'
-      expect(images(state, action).course.files.length).toBe(0)
+      expect(images(state, action).course.files).toHaveLength(0)
     })
 
     it("hasMore if there's a bookmark", () => {
@@ -168,7 +168,7 @@ describe('Images reducer', () => {
     it('clears files', () => {
       state.course.files = ['one', 'two']
       const action = {type: actions.REQUEST_INITIAL_IMAGES, payload: {contextType: 'course'}}
-      expect(images(state, action).course.files.length).toBe(0)
+      expect(images(state, action).course.files).toHaveLength(0)
     })
   })
 

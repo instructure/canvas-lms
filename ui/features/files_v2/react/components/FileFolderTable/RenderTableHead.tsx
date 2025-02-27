@@ -15,12 +15,28 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React from 'react'
 import {Table} from '@instructure/ui-table'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 
-// Need to render in this manner to satisfy TypeScript and make sure headers are rendered in stacked view
+// TODO: when we know how to sort by modified_at and published, add them here.
+const SORTABLE_COLUMNS = ['name', 'created_at', 'updated_at', 'size']
+
+const isSortable = (column: string) => SORTABLE_COLUMNS.includes(column)
+
+const mapSortDirection = (sortDirection: 'asc' | 'desc' | 'none') => {
+  switch (sortDirection) {
+    case 'asc':
+      return 'ascending'
+    case 'desc':
+      return 'descending'
+    default:
+      return 'none'
+  }
+}
+
 const renderTableHead = (
   size: 'small' | 'medium' | 'large',
   allRowsSelected: boolean,
@@ -28,9 +44,19 @@ const renderTableHead = (
   toggleSelectAll: () => void,
   isStacked: boolean,
   columnHeaders: ColumnHeader[],
+  sortColumn: string | null,
+  sortDirection: 'asc' | 'desc' | 'none',
+  handleSortChange: (column: string) => void,
 ) => {
   return [
-    <Table.ColHeader key="select" id="select" textAlign="center" width="1em" data-testid="select">
+    <Table.ColHeader
+      scope="col"
+      key="select"
+      id="select"
+      textAlign="center"
+      width="1em"
+      data-testid="select"
+    >
       <Checkbox
         label=""
         size={size}
@@ -42,11 +68,17 @@ const renderTableHead = (
     </Table.ColHeader>,
     ...columnHeaders.map(columnHeader => (
       <Table.ColHeader
+        scope="col"
         key={columnHeader.id}
         id={columnHeader.id}
         textAlign={isStacked ? undefined : columnHeader.textAlign}
         width={columnHeader.width}
         data-testid={columnHeader.id}
+        onRequestSort={
+          isSortable(columnHeader.id) ? () => handleSortChange(columnHeader.id) : undefined
+        }
+        sortDirection={sortColumn === columnHeader.id ? mapSortDirection(sortDirection) : 'none'}
+        stackedSortByLabel={columnHeader.title}
       >
         {columnHeader.title}
       </Table.ColHeader>

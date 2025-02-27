@@ -29,7 +29,6 @@ const featureBundles: {
   account_settings: () => import('./features/account_settings/index'),
   account_statistics: () => import('./features/account_statistics/index'),
   admin_split: () => import('./features/admin_split/index'),
-  alerts: () => import('./features/alerts/index'),
   all_courses: () => import('./features/all_courses/index'),
   analytics_hub: () => import('./features/analytics_hub/index'),
   announcements_on_home_page: () => import('./features/announcements_on_home_page/index'),

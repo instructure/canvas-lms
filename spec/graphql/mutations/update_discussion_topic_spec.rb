@@ -386,6 +386,34 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.published?).to be false
   end
 
+  it "handles the published state change from false to true and sets posted_at and last_reply_at correctly" do
+    @topic.unpublish!
+    expect(@topic.published?).to be false
+
+    result = run_mutation({ id: @topic.id, published: true })
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
+    @topic.reload
+    expect(@topic.published?).to be true
+    expect(@topic.posted_at).to be_within(1.second).of(Time.zone.now)
+    expect(@topic.last_reply_at).to be_within(1.second).of(Time.zone.now)
+  end
+
+  it "does not change posted_at but updates last_reply_at when published is already true" do
+    @topic.publish!
+    expect(@topic.published?).to be true
+    original_posted_at = @topic.posted_at
+
+    sleep 2 # Ensure there is a noticeable time difference
+    result = run_mutation({ id: @topic.id, published: true })
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
+    @topic.reload
+    expect(@topic.published?).to be true
+    expect(@topic.posted_at).to eq original_posted_at
+    expect(@topic.last_reply_at).to be_within(1.second).of(Time.zone.now)
+  end
+
   it "locks the discussion topic" do
     expect(@topic.locked).to be false
 
@@ -1094,6 +1122,22 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
       expect_error(result, "Group discussions cannot have checkpoints.")
     end
+
+    it "returns an error when attempting to add checkpoins to a discussion with student submissions" do
+      discussion_assignment = @course.assignments.create!(
+        title: "Topic 1",
+        submission_types: "discussion_topic"
+      )
+      student = student_in_course.user
+      topic = discussion_assignment.discussion_topic
+      topic.ensure_particular_submission(discussion_assignment, student, Time.zone.now)
+      result = run_mutation(id: topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+
+      expect_error(result, "If there are submissions, checkpoints cannot be enabled.")
+    end
   end
 
   context "with selective release" do
@@ -1146,21 +1190,28 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     end
   end
 
-  it "updates the default sort order" do
-    result = run_mutation({ id: @topic.id, sort_order: :asc })
-    expect(result["errors"]).to be_nil
-    expect(result[:data][:updateDiscussionTopic][:discussionTopic][:sortOrder]).to eq("asc")
-    result = run_mutation({ id: @topic.id, sort_order_locked: true })
-    expect(result["errors"]).to be_nil
-    expect(result[:data][:updateDiscussionTopic][:discussionTopic][:sortOrderLocked]).to be true
-  end
+  context "discussion_default_expand and discussion_default_sort" do
+    it "updates the default sort order" do
+      result = run_mutation({ id: @topic.id, sort_order: :asc })[:data][:updateDiscussionTopic]
+      expect(result["errors"]).to be_nil
+      expect(result[:discussionTopic][:sortOrder]).to eq("asc")
+      result = run_mutation({ id: @topic.id, sort_order_locked: true })[:data][:updateDiscussionTopic]
+      expect(result["errors"]).to be_nil
+      expect(result[:discussionTopic][:sortOrderLocked]).to be true
+    end
 
-  it "updates the default expand fields" do
-    result = run_mutation({ id: @topic.id, expanded: true })
-    expect(result["errors"]).to be_nil
-    expect(@topic.reload.expanded).to be true
-    result = run_mutation({ id: @topic.id, expanded_locked: true })
-    expect(result["errors"]).to be_nil
-    expect(@topic.reload.expanded_locked).to be true
+    it "updates the default expand fields" do
+      result = run_mutation({ id: @topic.id, expanded: true })[:data][:updateDiscussionTopic]
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.expanded).to be true
+      result = run_mutation({ id: @topic.id, expanded_locked: true })[:data][:updateDiscussionTopic]
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.expanded_locked).to be true
+    end
+
+    it "fails to update, if default_expand = false and default_expand_locked = true" do
+      result = run_mutation({ id: @topic.id, expanded: false, expanded_locked: true })[:data][:updateDiscussionTopic]
+      expect(result["errors"][0]["message"]).to match(/Cannot set default thread state locked, when threads are collapsed/)
+    end
   end
 end

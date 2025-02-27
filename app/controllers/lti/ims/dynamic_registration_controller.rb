@@ -34,6 +34,8 @@ module Lti
       # the other Canvas tokens.
       skip_before_action :load_user, only: [:create]
 
+      include Api::V1::Lti::Registration
+
       def require_account
         require_context_with_permission(account_context, :manage_developer_keys)
       end
@@ -77,8 +79,17 @@ module Lti
         }
       end
 
-      def registration_by_uuid
-        render json: Lti::IMS::Registration.find_by(guid: params[:registration_uuid]).as_json(context: account_context)
+      def lti_registration_by_uuid
+        reg = Lti::IMS::Registration.find_by!(guid: params[:registration_uuid])
+        render json: lti_registration_json(reg.lti_registration,
+                                           @current_user,
+                                           session,
+                                           @context,
+                                           includes: %i[configuration overlay])
+      end
+
+      def ims_registration_by_uuid
+        render json: Lti::IMS::Registration.find_by!(guid: params[:registration_uuid]).as_json(context: account_context)
       end
 
       def show

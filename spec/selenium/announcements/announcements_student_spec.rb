@@ -189,5 +189,19 @@ describe "announcements" do
         expect_flash_message :error, "You do not have access to the requested announcement."
       end
     end
+
+    context "Horizon course" do
+      before do
+        Account.site_admin.enable_feature!(:horizon_course_setting)
+        @course.horizon_course = true
+        @course.save!
+      end
+
+      it "does navigate to announcements" do
+        announcement = @course.announcements.create!(title: "Allow Replies", message: "Reply Here")
+        get "/courses/#{@course.id}/announcements/#{announcement.id}"
+        expect(f(".discussion-reply-action")).to be_truthy
+      end
+    end
   end
 end

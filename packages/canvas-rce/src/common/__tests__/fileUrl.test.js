@@ -32,21 +32,21 @@ describe('Common file url utils', () => {
     it('turns an absolute URL into a relative URL', () => {
       const absoluteUrl = 'https://mycanvas.com:3000/some/path/download?download_frd=1#hash_thing'
       expect(absoluteToRelativeUrl(absoluteUrl, canvasOrigin)).toEqual(
-        '/some/path/download?download_frd=1#hash_thing'
+        '/some/path/download?download_frd=1#hash_thing',
       )
     })
 
     it('leaves a relative URL as is', () => {
       const relativeUrl = '/some/path/download?download_frd=1#hash_thing'
       expect(absoluteToRelativeUrl(relativeUrl, canvasOrigin)).toEqual(
-        '/some/path/download?download_frd=1#hash_thing'
+        '/some/path/download?download_frd=1#hash_thing',
       )
     })
 
     it('leaves non-Canvas absolute URLs as absolute', () => {
       const absoluteUrl = 'https://yodawg.com:3001/some/path/download?download_frd=1#hash_thing'
       expect(absoluteToRelativeUrl(absoluteUrl, canvasOrigin)).toEqual(
-        'https://yodawg.com:3001/some/path/download?download_frd=1#hash_thing'
+        'https://yodawg.com:3001/some/path/download?download_frd=1#hash_thing',
       )
     })
 
@@ -59,7 +59,7 @@ describe('Common file url utils', () => {
     it('handles URLs with special characters in query params', () => {
       const absoluteUrl = 'https://mycanvas.com:3000/path?param=hello%20world#hash'
       expect(absoluteToRelativeUrl(absoluteUrl, canvasOrigin)).toEqual(
-        '/path?param=hello%20world#hash'
+        '/path?param=hello%20world#hash',
       )
     })
 
@@ -161,7 +161,7 @@ describe('Common file url utils', () => {
         fileInfo.href = 'http://instructure.com/files/17/download?download_frd=1'
         const result = fixupFileUrl('course', 2, fileInfo, 'http://instructure.com')
         expect(result.href).toEqual(
-          'http://instructure.com/courses/2/files/17?wrap=1&verifier=xyzzy'
+          'http://instructure.com/courses/2/files/17?wrap=1&verifier=xyzzy',
         )
       })
 

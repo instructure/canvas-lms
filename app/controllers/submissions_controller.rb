@@ -334,24 +334,26 @@ class SubmissionsController < SubmissionsBaseController
     respond_to do |format|
       if @submission.persisted?
         log_asset_access(@assignment, "assignments", @assignment_group, "submit")
+        tardiness = if @submission.late?
+                      2 # late
+                    elsif @submission.cached_due_date.nil?
+                      0 # don't know
+                    else
+                      1 # on time
+                    end
+        assignment_url = if @submission.late? || !@domain_root_account&.feature_enabled?(:confetti_for_assignments)
+                           course_assignment_url(@context, @assignment, submitted: tardiness)
+                         else
+                           course_assignment_url(@context, @assignment, submitted: tardiness, confetti: true)
+                         end
         format.html do
-          flash[:notice] = t("assignment_submit_success", "Assignment successfully submitted.")
-          tardiness = if @submission.late?
-                        2 # late
-                      elsif @submission.cached_due_date.nil?
-                        0 # don't know
-                      else
-                        1 # on time
-                      end
-
-          if @submission.late? || !@domain_root_account&.feature_enabled?(:confetti_for_assignments)
-            redirect_to course_assignment_url(@context, @assignment, submitted: tardiness)
-          else
-            redirect_to course_assignment_url(@context, @assignment, submitted: tardiness, confetti: true)
-          end
+          redirect_to assignment_url
         end
         format.json do
-          if api_request?
+          if params[:should_redirect_to_assignment]
+            render json: { redirect_url: assignment_url },
+                   status: :created
+          elsif api_request?
             includes = %(submission_comments attachments)
             json = submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
             render json:,
@@ -564,7 +566,7 @@ class SubmissionsController < SubmissionsBaseController
   private :valid_text_entry?
 
   def always_permitted_create_params
-    always_permitted_params = %i[comment group_comment eula_agreement_timestamp submitted_at resource_link_lookup_uuid].freeze
+    always_permitted_params = %i[comment group_comment eula_agreement_timestamp submitted_at resource_link_lookup_uuid should_redirect_to_assignment].freeze
     params.require(:submission).permit(always_permitted_params)
   end
   private :always_permitted_create_params

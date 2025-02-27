@@ -30,6 +30,8 @@ export const WORK_WEEK_DAYS_MENU_OPTIONS = [
   {value: 'sun', label: 'Sundays'},
 ]
 
+export const WEEK_DAYS_VALUES = WORK_WEEK_DAYS_MENU_OPTIONS.slice(0, 5).map(({value}) => value)
+
 export const START_DATE_CAPTIONS = {
   enrollment: I18n.t('Student enrollment date'),
   enrollment_time_selection: I18n.t('Determined by student enrollment date'),

@@ -28,7 +28,7 @@ module DataFixup
             admin_nickname: developer_key.name,
             account_id: developer_key.account_id.presence || Account.site_admin.global_id,
             internal_service: developer_key.internal_service,
-            name: developer_key.tool_configuration.configuration["title"],
+            name: developer_key.tool_configuration.internal_lti_configuration[:title],
             ims_registration: developer_key.ims_registration, # can be nil
             skip_lti_sync: true,
           }

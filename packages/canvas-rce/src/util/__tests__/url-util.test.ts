@@ -27,13 +27,13 @@ import {
 describe('parseUrlOrNull', () => {
   it('should parse a valid url', () => {
     expect(parseUrlOrNull('https://foobar.local/123')?.toString()).toEqual(
-      'https://foobar.local/123'
+      'https://foobar.local/123',
     )
   })
 
   it('should parse a valid url with an origin', () => {
     expect(parseUrlOrNull('/123', 'https://foobar.local')?.toString()).toEqual(
-      'https://foobar.local/123'
+      'https://foobar.local/123',
     )
   })
 
@@ -61,19 +61,19 @@ describe('relativeHttpUrlForHostname', () => {
     ;['/', 'canvas.com', 'ttp://test.com', '/test.com', 'ftp://test.com', '%@#$^#'].forEach(
       invalidOrigin => {
         expect(relativeHttpUrlForHostname('http://test.com/123', invalidOrigin)).toEqual(
-          'http://test.com/123'
+          'http://test.com/123',
         )
-      }
+      },
     )
   })
 
   it('should not remove query parameters or other parts of the URL', () => {
     expect(
-      relativeHttpUrlForHostname('http://test.com/123?foo=bar&baz=qux#hash', 'http://test.com')
+      relativeHttpUrlForHostname('http://test.com/123?foo=bar&baz=qux#hash', 'http://test.com'),
     ).toEqual('/123?foo=bar&baz=qux#hash')
 
     expect(
-      relativeHttpUrlForHostname('http://test.com:80/123?foo=bar&baz=qux#hash', 'http://test.com')
+      relativeHttpUrlForHostname('http://test.com:80/123?foo=bar&baz=qux#hash', 'http://test.com'),
     ).toEqual('/123?foo=bar&baz=qux#hash')
   })
 
@@ -81,42 +81,42 @@ describe('relativeHttpUrlForHostname', () => {
     expect(
       relativeHttpUrlForHostname(
         'http://user:pass@test.com:80/123?foo=bar&baz=qux#hash',
-        'http://test.com'
-      )
+        'http://test.com',
+      ),
     ).toEqual('/123?foo=bar&baz=qux#hash')
   })
 
   it('should only relativize urls when appropriate (sanity checks)', () => {
     expect(
-      relativeHttpUrlForHostname('https://canvas.com/some/path', 'https://nowhere.com')
+      relativeHttpUrlForHostname('https://canvas.com/some/path', 'https://nowhere.com'),
     ).toEqual('https://canvas.com/some/path')
 
     expect(
-      relativeHttpUrlForHostname('https://canvas.com:443/some/path', 'https://nowhere.com')
+      relativeHttpUrlForHostname('https://canvas.com:443/some/path', 'https://nowhere.com'),
     ).toEqual('https://canvas.com:443/some/path')
 
     expect(
-      relativeHttpUrlForHostname('https://canvas.com:80/some/path', 'https://nowhere.com')
+      relativeHttpUrlForHostname('https://canvas.com:80/some/path', 'https://nowhere.com'),
     ).toEqual('https://canvas.com:80/some/path')
 
     expect(
-      relativeHttpUrlForHostname('https://canvas.com/some/path', 'https://canvas.com')
+      relativeHttpUrlForHostname('https://canvas.com/some/path', 'https://canvas.com'),
     ).toEqual('/some/path')
 
     expect(
-      relativeHttpUrlForHostname('https://canvas.com:443/some/path', 'https://canvas.com:80')
+      relativeHttpUrlForHostname('https://canvas.com:443/some/path', 'https://canvas.com:80'),
     ).toEqual('/some/path')
 
     expect(
-      relativeHttpUrlForHostname('https://canvas.com:80/some/path', 'https://canvas.com')
+      relativeHttpUrlForHostname('https://canvas.com:80/some/path', 'https://canvas.com'),
     ).toEqual('/some/path')
 
     expect(
-      relativeHttpUrlForHostname('https://canvas.com:3000/some/path', 'https://canvas.com')
+      relativeHttpUrlForHostname('https://canvas.com:3000/some/path', 'https://canvas.com'),
     ).toEqual('https://canvas.com:3000/some/path')
 
     expect(
-      relativeHttpUrlForHostname('https://canvas.com/some/path', 'https://canvas.com:3000')
+      relativeHttpUrlForHostname('https://canvas.com/some/path', 'https://canvas.com:3000'),
     ).toEqual('https://canvas.com/some/path')
   })
 
@@ -217,7 +217,7 @@ describe('relativeHttpUrlForHostname', () => {
                 | path: ${path.value} (${pathShouldTransform})
                 | element: ${element.value} (${elementShouldTransform})
                 | portShouldTransform: ${portShouldTransform} (${comparisonPortForUrl(
-                  canvasOrigin.value
+                  canvasOrigin.value,
                 )} === ${comparisonPortForUrl(urlOrigin.value)})
                 | 
                 | shouldTransform: ${shouldTransform}
@@ -225,7 +225,7 @@ describe('relativeHttpUrlForHostname', () => {
                 | absoluteUrl: ${absoluteUrl}
                 | relativeUrl: ${relativeUrl}
                 | transformedUrl: ${transformedUrl}
-                | expectedUrl: ${expectedUrl}`.replace(/^\s*\| /gm, '')
+                | expectedUrl: ${expectedUrl}`.replace(/^\s*\| /gm, ''),
               )
             }
           })
@@ -245,7 +245,7 @@ describe('addQueryParamsToUrl', () => {
     expect(addQueryParamsToUrl('/test', {})).toEqual('/test')
     expect(addQueryParamsToUrl('/test?a=b', {})).toEqual('/test?a=b')
     expect(addQueryParamsToUrl('https://somewhere.com/test', {})).toEqual(
-      'https://somewhere.com/test'
+      'https://somewhere.com/test',
     )
   })
 
@@ -262,7 +262,7 @@ describe('addQueryParamsToUrl', () => {
   it('should handle hash urls', () => {
     expect(addQueryParamsToUrl('#somewhere', {})).toEqual('#somewhere')
     expect(addQueryParamsToUrl('#somewhere', {a: '10', b: 'hello'})).toEqual(
-      '?a=10&b=hello#somewhere'
+      '?a=10&b=hello#somewhere',
     )
   })
 
@@ -276,14 +276,14 @@ describe('addQueryParamsToUrl', () => {
       addQueryParamsToUrl('http://some.url/whatever', {
         a: '10',
         b: '20',
-      })
+      }),
     ).toEqual('http://some.url/whatever?a=10&b=20')
 
     expect(
       addQueryParamsToUrl('http://some.url/whatever?x=foo', {
         a: '10',
         b: '20',
-      })
+      }),
     ).toEqual('http://some.url/whatever?x=foo&a=10&b=20')
   })
 
@@ -292,14 +292,14 @@ describe('addQueryParamsToUrl', () => {
       addQueryParamsToUrl('/whatever', {
         a: '10',
         b: '20',
-      })
+      }),
     ).toEqual('/whatever?a=10&b=20')
 
     expect(
       addQueryParamsToUrl('/whatever?x=foo', {
         a: '10',
         b: '20',
-      })
+      }),
     ).toEqual('/whatever?x=foo&a=10&b=20')
   })
 
@@ -308,14 +308,14 @@ describe('addQueryParamsToUrl', () => {
       addQueryParamsToUrl('whatever', {
         a: '10',
         b: '20',
-      })
+      }),
     ).toEqual('whatever?a=10&b=20')
 
     expect(
       addQueryParamsToUrl('whatever?x=foo', {
         a: '10',
         b: '20',
-      })
+      }),
     ).toEqual('whatever?x=foo&a=10&b=20')
   })
 

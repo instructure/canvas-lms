@@ -65,8 +65,7 @@ module Factories
           text: "LTI 1.3 Test Tool Course Navigation",
           target_link_uri: "http://lti13testtool.docker/launch?placement=account_navigation",
         }
-      ],
-      settings: {}
+      ]
     }.freeze
 
   def lti_tool_configuration_model(**params)

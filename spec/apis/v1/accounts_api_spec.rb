@@ -1249,7 +1249,10 @@ describe "Accounts API", type: :request do
 
   describe "environment" do
     before_once do
-      Account.default.settings[:calendar_contexts_limit] = 10
+      Account.site_admin.enable_feature!(:inbox_settings)
+      Account.default[:settings] = { calendar_contexts_limit: 10,
+                                     enable_inbox_signature_block: true,
+                                     enable_inbox_auto_response: true }
       Account.default.save!
     end
 
@@ -1260,7 +1263,9 @@ describe "Accounts API", type: :request do
                       {},
                       {},
                       { expected_status: 200 })
-      expect(json).to eq({ "calendar_contexts_limit" => 10 })
+      expect(json).to eq(
+        { "calendar_contexts_limit" => 10, "enable_inbox_signature_block" => true, "enable_inbox_auto_response" => true }
+      )
     end
 
     it "requires user session" do

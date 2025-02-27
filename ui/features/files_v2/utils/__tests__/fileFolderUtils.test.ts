@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isFile, getUniqueId} from '../fileFolderUtils'
+import {isFile, getUniqueId, pluralizeContextTypeString} from '../fileFolderUtils'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../fixtures/fakeData'
 
 describe('isFile', () => {
@@ -36,5 +36,15 @@ describe('getUniqueId', () => {
 
   it('returns the correct key for a folder', () => {
     expect(getUniqueId(FAKE_FOLDERS[0])).toBe(FAKE_FOLDERS[0].id)
+  })
+})
+
+describe('pluralizeContextTypeString', () => {
+  it('returns the correct pluralized string for course', () => {
+    expect(pluralizeContextTypeString('course')).toBe('courses')
+  })
+
+  it('returns the correct pluralized string for user', () => {
+    expect(pluralizeContextTypeString('user')).toBe('users')
   })
 })

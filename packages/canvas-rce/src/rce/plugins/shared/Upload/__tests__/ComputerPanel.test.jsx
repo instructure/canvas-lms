@@ -34,7 +34,7 @@ describe('UploadFile: ComputerPanel', () => {
         setError={() => {}}
         accept="image/*"
         label="Upload File"
-      />
+      />,
     )
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
     fireEvent.change(dropZone, {
@@ -56,7 +56,7 @@ describe('UploadFile: ComputerPanel', () => {
         setError={() => {}}
         accept="image/*"
         label="Upload File"
-      />
+      />,
     )
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
     fireEvent.change(dropZone, {
@@ -81,7 +81,7 @@ describe('UploadFile: ComputerPanel', () => {
         setError={() => {}}
         accept="image/*"
         label="Upload File"
-      />
+      />,
     )
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
     fireEvent.change(dropZone, {
@@ -111,7 +111,7 @@ describe('UploadFile: ComputerPanel', () => {
           setError={() => {}}
           accept="image/*"
           label="Upload File"
-        />
+        />,
       )
       expect(getByText('Generating preview...')).toBeInTheDocument()
       const preview = await waitFor(() => getByLabelText('foo.png image preview'))
@@ -129,7 +129,7 @@ describe('UploadFile: ComputerPanel', () => {
           setError={() => {}}
           accept="text/*"
           label="Upload File"
-        />
+        />,
       )
       expect(getByText('Generating preview...')).toBeInTheDocument()
       const preview = await waitFor(() => getByLabelText('foo.txt text preview'))
@@ -147,7 +147,7 @@ describe('UploadFile: ComputerPanel', () => {
           setError={() => {}}
           accept="text/*"
           label="Upload File"
-        />
+        />,
       )
       expect(getByText('Generating preview...')).toBeInTheDocument()
       const preview = await waitFor(() => getByLabelText('foo.pdf file icon'))
@@ -166,7 +166,7 @@ describe('UploadFile: ComputerPanel', () => {
           setError={() => {}}
           accept="text/*"
           label="Upload File"
-        />
+        />,
       )
       const clearButton = await waitFor(() => getByText(`Clear selected file: ${aFile.name}`))
       expect(clearButton).toBeInTheDocument()
@@ -193,7 +193,7 @@ describe('UploadFile: ComputerPanel', () => {
           setError={() => {}}
           accept="mp4"
           label="Upload File"
-        />
+        />,
       )
 
       const player = await waitFor(() => getByLabelText('Video Player'))
@@ -214,7 +214,7 @@ describe('UploadFile: ComputerPanel', () => {
           label="Upload File"
           accept="avi"
           languages={[{id: 'en', label: 'english'}]}
-        />
+        />,
       )
       const warningMsg = await waitFor(() => getByText('No preview is available for this file.'))
       expect(warningMsg).toBeInTheDocument()
@@ -234,7 +234,7 @@ describe('UploadFile: ComputerPanel', () => {
           label="Upload File"
           accept="avi"
           languages={[{id: 'en', label: 'english'}]}
-        />
+        />,
       )
       const warningMsg = await waitFor(() => getByText('No preview is available for this file.'))
       expect(warningMsg).toBeInTheDocument()
@@ -254,7 +254,7 @@ describe('UploadFile: ComputerPanel', () => {
           label="Upload File"
           accept="avi"
           languages={[{id: 'en', label: 'english'}]}
-        />
+        />,
       )
       const warningMsg = await waitFor(() => getByText('No preview is available for this file.'))
       expect(warningMsg).toBeInTheDocument()
@@ -269,7 +269,7 @@ describe('UploadFile: ComputerPanel', () => {
           setError={() => {}}
           accept="text/*"
           label="Upload File"
-        />
+        />,
       )
       const errmsg = await waitFor(() => getByText('You may not upload an empty file.'))
       expect(errmsg).toBeInTheDocument()

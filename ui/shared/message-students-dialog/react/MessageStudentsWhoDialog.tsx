@@ -46,13 +46,8 @@ import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import _ from 'lodash'
-import {
-  OBSERVER_ENROLLMENTS_QUERY,
-  type ObserverEnrollmentQueryResult,
-  type ObserverEnrollmentConnectionUser,
-} from '../graphql/Queries'
+import {type ObserverEnrollmentConnectionUser} from '../graphql/Queries'
 import Pill from './Pill'
-import {useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
   FileAttachmentUpload,
@@ -64,6 +59,7 @@ import {
 } from '@canvas/message-attachments'
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 import {View} from '@instructure/ui-view'
+import {useObserverEnrollments} from './hooks/useObserverEnrollments'
 
 export enum MSWLaunchContext {
   ASSIGNMENT_CONTEXT,
@@ -437,14 +433,10 @@ const MessageStudentsWhoDialog = ({
   const [mediaTitle, setMediaTitle] = useState<string>('')
   const close = () => setOpen(false)
 
-  const {loading, data} = useQuery<ObserverEnrollmentQueryResult>(OBSERVER_ENROLLMENTS_QUERY, {
-    variables: {
-      courseId: assignment?.courseId || courseId,
-      studentIds: students.map(student => student.id),
-    },
-  })
-
-  const observerEnrollments = data?.course?.enrollmentsConnection?.nodes || []
+  const {loading, observerEnrollments} = useObserverEnrollments(
+    assignment?.courseId || courseId,
+    students,
+  )
 
   const observersByStudentID = observerEnrollments.reduce(
     (results, enrollment) => {
@@ -529,12 +521,12 @@ const MessageStudentsWhoDialog = ({
     selectedStudents.length + Object.values(selectedObservers).flat().length > 0
 
   useEffect(() => {
-    if (!loading && data) {
+    if (!loading && observerEnrollments) {
       setObserverRecipientCount(calculateObserverRecipientCount(selectedObservers))
     }
   }, [
     loading,
-    data,
+    observerEnrollments,
     selectedCriterion,
     sortedStudents,
     cutoff,

@@ -68,7 +68,10 @@ describe('DifferentiationTagTray', () => {
 
   it('calls onClose when close button is clicked', async () => {
     renderComponent()
-    const closeButton = screen.getByRole('button', {name: 'Close Differentiation Tag Tray'})
+    const closeButton = screen.getByRole('button', {
+      name: 'Close Differentiation Tag Tray',
+      hidden: true,
+    })
 
     await userEvent.click(closeButton)
     expect(defaultProps.onClose).toHaveBeenCalled()

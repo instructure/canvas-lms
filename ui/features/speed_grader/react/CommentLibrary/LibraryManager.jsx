@@ -73,9 +73,35 @@ const LibraryManager = ({
   // new request to find suggestions isn't made
   const [changeSearchTerm, setChangeSearchTerm] = useState(true)
 
-  const {loading, error, data} = useQuery(COMMENTS_QUERY, {
+  const {loading, error, data, fetchMore} = useQuery(COMMENTS_QUERY, {
     variables: {userId},
+    notifyOnNetworkStatusChange: true,
   })
+
+  useEffect(() => {
+    const pageInfo = data?.legacyNode?.commentBankItemsConnection?.pageInfo
+    if (pageInfo?.hasNextPage && pageInfo?.endCursor && !loading) {
+      fetchMore({
+        variables: {userId, after: pageInfo.endCursor},
+        updateQuery: (prev, {fetchMoreResult}) => {
+          const prevNodes = prev?.legacyNode?.commentBankItemsConnection?.nodes || []
+          const newNodes = fetchMoreResult?.legacyNode?.commentBankItemsConnection?.nodes || []
+          const newPageInfo = fetchMoreResult?.legacyNode?.commentBankItemsConnection?.pageInfo
+
+          return {
+            legacyNode: {
+              ...prev.legacyNode,
+              commentBankItemsConnection: {
+                ...prev.legacyNode.commentBankItemsConnection,
+                nodes: [...prevNodes, ...newNodes],
+                pageInfo: newPageInfo,
+              },
+            },
+          }
+        },
+      })
+    }
+  }, [data, fetchMore, loading, userId])
 
   useEffect(() => {
     if (error) {

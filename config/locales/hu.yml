@@ -138,9 +138,11 @@ hu:
     length_error: "Maximum 255 karakter hosszú lehet"
     title: "A csoport elnevezése"
   OutcomeView: 
+    display_name: "Becenév (opcionális)"
     length_error: "Maximum 255 karakter hosszú lehet"
     mastery_at_nan_error: "Számnak kell lennie"
     mastery_error: "0-nál nagyobb vagy egyenlő lehet"
+    title: "A tanulási eredmény neve"
   OutcomesDirectoryView: 
     flash: 
       error: "Hiba történt! Kérjük, frissítse az oldalt, és próbálja újra!"
@@ -2152,6 +2154,7 @@ hu:
   add_label_ab288ab0: "Címke hozzáadása"
   add_link_5c01c1e8: "Link hozzáadása"
   add_link_fc336ed6: "Link hozzáadása"
+  add_login_f871148: "Belépési azonosító hozzáadása"
   add_lti_ad9aaef2: "LTI Hozzáadása"
   add_manage_conclude_delete_publish_reset_8a5aa902: "hozzáadás / kezelés / lezárás / törlés / közzététel / visszaállítás"
   add_mastery_level_76469d98: "Jártassági szint hozzáadása"
@@ -5287,6 +5290,8 @@ hu:
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "A feladatot nem lehet áthelyezni, mivel az osztályzási időszak lezárult"
   cannot_move_events_with_section_specific_times_bet_3fe871fc: "Nem lehet szekcióspecifikus időpontokkal rendelkező eseményeket áthelyezni a naptárak között"
   cannot_move_scheduler_appointments_between_calenda_253e5ea3: "Nem lehet áthelyezni az Ütemező megbeszéléseit a naptárak között"
+  cannot_observe_user_with_another_user_that_is_bein_f2773e49: "Nem lehet megfigyelni a felhasználót egy másik felhasználóval, akit az aktuális felhasználó megfigyel.\n\
+      \x20       "
   cannot_reference_self_16dfcd49: "nem hivatkozhat saját magára"
   cannot_relink_unsaved_paces_3ed42012: "A nem mentett ütemeket nem lehet újra összekapcsolni"
   cannot_remove_c0fd581d: "Nem távolítható el:"
@@ -6692,6 +6697,7 @@ hu:
       buttons: 
         add_prerequisite: "Előfeltétel hozzáadása"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: perc
       headings: 
         add_prerequisite: "Előfeltétel hozzáadása ehhez: %{name}"
         course_modules: Modulok
@@ -8440,6 +8446,7 @@ hu:
   custom_6ed5c8b7: egyéni
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Az egyéni CSS és Javascript hozzáférhetőségi problémákat okozhat vagy konfliktusba kerülhet a jövőbeli Canvas frissítésekkel!"
   custom_fields_fc3e55af: "Egyéni mezők"
+  custom_from_name_38a3d784: "Egyéni \"Feladó\" név"
   custom_gradebook_columns_81944594: "Egyedi Osztálynapló Oszlopok"
   custom_link_details_35fd38fc: "Egyéni hivatkozás részletei"
   custom_lti_usage_uwf_b63978a5: "Egyéni LTI használat – UWF"
@@ -8704,6 +8711,7 @@ hu:
   default_9db103d: Alapértelmezett
   default_account_quotas_e34112fd: "Alapértelmezett fiókkvóta"
   default_canvas_grading_scheme_ab769633: "Alapértelmezett Canvas osztályozási rendszer"
+  default_canvas_setting_fa6e6f81: "Alapértelmezett Canvas beállítás"
   default_conference_title: "%{course_name} konferencia"
   default_course_pace_ce0ba0f3: "Alapértelmezett Kurzus ütemezés"
   default_date_will_be_today_s_date_4f85dcdc: "Az alapértelmezett dátum a mai dátum lesz"
@@ -8845,6 +8853,7 @@ hu:
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "A felhasználó törlésével az összes ePortfoliója is megsemmisül. Ehelyett az ePorfolió láthatósága beállítható spamként, vagy biztonságosként. "
   deleting_assignment_22d5851d: "feladat törlése"
   deleting_custom_status_statusname_5bd7dfa9: "Egyéni állapot törlése %{statusName}"
+  deleting_e2bd8cc9: Törlés...
   deleting_f2ff0d09: Törlés
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "A demo oldalhoz szükséges, hogy a Recaptcha beállítások konfigurálva legyenek. Kérjük, vegye fel a kapcsolatot a Canvas adminisztrátorával."
@@ -9421,6 +9430,7 @@ hu:
   display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Megjelenítendő név:"
   display_name_b80c243e: "Megjelenítendő név"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "Jelenjen meg egyszeri felugró figyelmeztetés az Értesítési beállítások oldalon."
   display_student_filter_options_ab034cfa: "Hallgatói szűrő opciók megjelenítése"
   display_totals_for_all_grading_periods_option_4a72586: "Összesítések megjelenítése az összes értékelési időszakra vonatkozóan"
   display_updated_at_d5b25d7b: "%{display_updated_at}"
@@ -9740,6 +9750,7 @@ hu:
   edit_rubric_7d4d139d: "Értékelőtábla szerkesztése"
   edit_rubric_title_104d6fd2: "%{title}értékelőtábla szerkesztése"
   edit_section_name_558cc89: "%{name}szekció szerkesztése"
+  edit_sections_7d0e4e34: "Szekciók szerkesztése"
   edit_status_612572db: "Státusz szerkesztése"
   edit_status_dialog_for_editbuttonlabel_7e829fbd: "A %{editButtonLabel} szerkesztési állapot párbeszédpanelje"
   edit_submission_status_from_speedgrader_5e1b1cd4: "A Gyorsértékelőből származó beadási státusz szerkesztése"
@@ -10341,6 +10352,7 @@ hu:
   error_adding_files_97ba198e: "Hiba a fájlok hozzáadásakor"
   error_adding_files_to_conversation_message_58e83876: "Hiba történt a fájlok beszélgetési üzenethez való hozzáadásakor"
   error_adding_files_to_submission_draft_6acac337: "Hiba történt a fájlok hozzáadásakor a beadási vázlathoz"
+  error_afac7133: "Hiba:"
   error_archiving_rubric_f6e6740e: "Hiba az értékelőtábla archiválásakor"
   error_associating_assignment_assignment_name_with__d92e9acf: "Hiba történt a következő feladat LTI-eszközhöz való hozzárendelése során: „%{assignment_name}”."
   error_canceling_draft_ec3dbdc9: "Hiba történt a piszkozat visszavonásakor"
@@ -12048,6 +12060,7 @@ hu:
       removed: "Csoporthalmaz sikeresen eltávolítva."
     group_atom_feed: "Csoport Atom hírfolyam"
     group_limit_number: "A csoportlétszám csak szám lehet"
+    group_set_name_required: "A név megadása kötelező"
     groups_count: "Csoportok (%{count})"
     index: 
       heading_current_groups: "Jelenlegi csoportok"
@@ -13646,6 +13659,7 @@ hu:
   learnplatform_provides_product_information_the_url_f491a905: "A LearnPlatform termékinformációkat biztosít. Az alább megadott URL-nek érvényes LearnPlatform környezetre kell mutatnia (például %{url} -- ügyeljen arra, hogy hagyja ki a perjelet"
   leave_5e852989: Elhagyás
   leave_a_comment_7991725b: "Megjegyzés hozzáadása"
+  leave_blank_for_no_limit_e8f80808: "hagyja üresen, ha nincs korlátozás"
   leave_group_group_name_6847c632: " %{group_name} csoport elhagyása"
   left_group_group_name_aac4e813: "Elhagyta a következő csoportot: %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -13804,6 +13818,7 @@ hu:
   link_selection_1486c5d0: "Link kiválasztása"
   link_title_189888b7: "Link címe"
   link_to_lti_tools_608df3b0: "Link az lti eszközökhöz."
+  link_to_students_91edf7ea: "Hivatkozás hallgatókra"
   link_url_a213671c: "Hivatkozás webcíme"
   link_url_cf96376: "Link URL"
   link_validation_is_running_caf08ced: "A Link ellenőrzés jelenleg fut"
@@ -16376,6 +16391,7 @@ hu:
   module_filter_63b17d11: Modulszűrő
   module_first_to_last_6921f3ec: "Modul - elsőtől az utolsóig"
   module_in_progress_fa600662: "Modul folyamatban"
+  module_item_501fb0c3: Modulelem
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "A modul ezen eleme teljesítve, legalább %{score} pont elérésével."
   module_item_has_been_viewed_and_is_complete_6d180117: "A modul ezen eleme megnézve és teljesítve"
   module_item_is_locked_19fa60b4: "Modulelem zárolva."
@@ -17381,6 +17397,7 @@ hu:
   notifications_cbfa7704: Értesítések
   notifications_off_80da021c: "Értesítések kikapcsolva"
   notifications_search_results_80a0b06f: "Értesítési keresés eredmények"
+  notifications_sent_to_external_services_c4a86b78: "Értesítések elküldve külső szolgáltatásoknak"
   notifications_unsupported_65f6bf65: "Nem támogatott értesítések"
   notifications_view_f9a60770: "Értesítések - áttekintés"
   notifications_will_not_be_sent_retroactively_for_a_e84dc84e: "A kurzus közzététele vagy a kurzus kezdete előtt létrehozott hirdetményekről nem küldünk visszamenőlegesen értesítést. Vegye fontolóra a Késleltetett közzététel opció használatát, amellyel későbbi időpontra ütemezheti a megjelenést."
@@ -18891,6 +18908,7 @@ hu:
   pre_processing_92865c1d: Előfeldolgozás
   precise_link_replacement_on_content_migrations_51976596: "Pontos linkhelyettesítés a tartalom áttelepítésekor"
   prefer_lti_tools_with_a_matching_client_id_when_fi_b6cf4809: "Külső eszköz keresésekor a megfelelő ügyfél-azonosítóval rendelkező LTI-eszközök előnyben részesítése"
+  preparing_download_percent_complete_34b48e4d: "Letöltés előkészítése: %{percent}% kész"
   prerequisite_f361cd61: Előfeltétel
   prerequisites_49659f16: "Előfeltételek:"
   prerequisites_98b324e0: Előfeltételek
@@ -19534,6 +19552,7 @@ hu:
   quiz_e0dcce8f: Kvíz
   quiz_extensions_d2550649: "Kvíz Kiegészítések"
   quiz_failed_to_update_2b66fa4d: "A kvíz frissítése nem sikerült"
+  quiz_instructions_a36d09c9: Kvízinstrukciók
   quiz_ip_address_filters_49a75ec8: "Kvíz IP cím szűrők"
   quiz_ip_filters_685f7f63: "Kvíz IP szűrők"
   quiz_itemtitle_28f5bba5: "Kvíz, %{itemTitle}"
@@ -20812,6 +20831,7 @@ hu:
   received_throttled_response_from_microsoft_api_whi_f0e664bd: "A Microsoft API-tól egy kötegelt kérés végrehajtása közben letiltott választ kapott.                        "
   recent_activity_51239235: "Legutóbbi tevékenységek"
   recent_announcements_8becc59c: "Friss hirdetmények"
+  recent_canvas_notifications_81395de6: "Legutóbbi Canvas-értesítések"
   recent_f19e8c64: Legutóbbi
   recent_history_bcb0f4c0: "A közelmúlt történései"
   recent_history_tray_241a384e: "A közelmúlt történéseinek tálcája"
@@ -20986,6 +21006,7 @@ hu:
   remove_filter_68de01d4: "Szűrő eltávolítása"
   remove_filter_6f7204e2: "szűrő eltávolítása"
   remove_filtername_filter_6b6d7063: "%{filterName} szűrő eltávolítása"
+  remove_from_course_6fb47aee: "Eltávolítás a kurzusból"
   remove_from_to_to_from_substitutes_4a6dc71d: "A '%{from}' és a '%{to}' közötti rész eltávolítása a helyettesítőkből"
   remove_grading_scheme_title_d3942a08: "Osztályzási rendszer eltávolítása: %{title}"
   remove_group_5d2f2f2d: "csoport eltávolítása"
@@ -21077,6 +21098,7 @@ hu:
   reply_for_subject_ae247d1e: "Válasz erre: %{subject}"
   reply_from_author_a2806c77: "Válaszol tőle: %{author}"
   reply_from_name: "%{name} a Canvas-értesítéseken keresztül"
+  reply_to_9fa43ebe: Válaszcím
   reply_to_authorname_f209e84a: "Válasz neki: %{authorName}"
   reply_to_comment_72d96728: "Válasz a megjegyzésre"
   reply_to_conversation_f1aa0d4: "Válasz egy hozzászólásra"
@@ -21157,6 +21179,7 @@ hu:
   reregister_9ab95a57: Újraregisztrálás
   reregister_toolname_3dde0bfc: "%{toolName} újra regisztrálása"
   reschedule_9f780bb8: Átütemezés
+  resend_invitation_486bd513: "Meghívó újraküldése"
   reserved_by_d563e7d2: "Lefoglalva:"
   reserved_by_you_cd03b62d: "Lefoglalva Önnek"
   reserved_f247b60b: Foglalt
@@ -21752,6 +21775,7 @@ hu:
     all_courses_inner: 
       join_course: "Csatlakozás a kurzushoz"
       next: Következő
+      no_courses_found: "Nem található kurzus"
       previous: Előző
     course_sections: Kurzusszekciók
     enrollments_observers: Megfigyelők
@@ -21954,6 +21978,7 @@ hu:
   see_turnitin_results_cd9d4a6c: "Turnitin eredmények megtekintése"
   see_vericite_results_b44dd8c8: "VeriCite-eredmények megtekintése"
   select_1e849959: "[Kiválaszt]"
+  select_a_course_40bc3229: "Kurzus kiválasztása"
   select_a_course_4710371f: "Válasszon egy kurzust"
   select_a_date_optional_d60168d0: "Válasszon ki egy dátumot (opcionális)"
   select_a_grading_period_5ea50f1: "Osztályzási időszak választása..."
@@ -23228,6 +23253,7 @@ hu:
   something_went_wrong_please_try_refreshing_the_pag_689be273: " Valami baj történt. "
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Hiba történt a felhasználó újraaktiválása közben. Kérjük, próbálja újra később."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Hiba történt a felhasználó szerepének frissítése közben. Kérjük, próbálja újra később."
+  something_went_wrong_updating_the_user_s_student_l_1047109c: "Hiba történt a felhasználó hallgató hivatkozásainak frissítése közben. Kérjük, próbálja újra később!"
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: " Valami baj történt, amikor megpróbálta szinkronizálni a jegyeket a hallgatói információs rendszerrel. "
   something_went_wrong_while_deactivating_the_user_p_8ff3e261: "Hiba történt a felhasználó deaktiválása közben. Kérjük, próbálja újra később."
   something_went_wrong_while_fetching_data_76b3ce71: "Valami hiba történt az adatok lekérdezése közben"
@@ -26170,6 +26196,7 @@ hu:
   update_inbox_page_to_use_react_instui_4d343fd: "Bejövő üzenetek oldal frissítése a react/instui használatához"
   update_link_b7cab181: "Hivatkozás frissítése"
   update_live_events_subscriptions_e9c618b0: "Élő események előfizetések frissítése"
+  update_login_472cd6db: "Belépési azonosító frissítése"
   update_module_b984c2e5: "Modul frissítése"
   update_pages_c91d7ba: "Oldalak frissítése"
   update_password_4bc5cb1f: "Jelszó frissítése"
@@ -26539,6 +26566,7 @@ hu:
   user_vaildation_issues_panel_66b66945: "Felhasználói értékelési kérdések panel"
   user_with_genitive_settings_b39e02ba: "%{user_with_genitive} Beállításai"
   usercount_respondents_1521244: "%{userCount} válaszadó"
+  usercount_selected_24930f90: "%{userCount} kijelölve"
   userinfo_d21114ef: "Felhasználó adatai"
   username_47bb5bbe: Felhasználónév
   username_could_not_be_found_6c3e8383: "Felhasználónév nem található"
@@ -26826,6 +26854,7 @@ hu:
   value_is_not_a_valid_standard_grade_status_99de23ac: "%{value} nem egy érvényes szabványos osztályzat státusza"
   value_is_not_a_valid_workflow_state_f75c5e59: "%{value} nem érvényes munkafolyamat_állapot"
   value_is_not_valid_563afee6: "%{value} nem érvényes"
+  value_must_be_a_whole_number_23c79120: "A csoportlétszám csak szám lehet"
   value_must_be_positive_3e086d5a: "Az értéknek pozitívnak kell lennie"
   value_removed_bba9430c: "%{value} Eltávolítva"
   value_too_long_allowed_length_is_length_a81d4cf: "Túl hosszú érték, a megengedett hossz %{length}"
@@ -27096,6 +27125,7 @@ hu:
   what_storage_options_do_i_have_in_zoom_b79c738e: "Milyen tárolási lehetőségeim vannak a Zoomban?"
   what_would_you_like_to_do_next_2835397e: "Mit szeretne csinálni a következő lépésben?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Több felhasználó hozzáadásakor vesszővel vagy sortöréssel válassza szét a felhasználókat."
+  when_an_observer_is_linked_to_a_student_they_have__489e2b71: "Amikor egy megfigyelő van társítva a hallgatóhoz, akkor hozzáfér a hallgató értékeléseihez és a kurzusinterakcióihoz."
   when_creating_a_reply_students_will_have_the_optio_34556e85: " A válasz létrehozásakor a Hallgatóknak lehetőségük van arra, hogy megjelenítsék nevüket és profilképüket, vagy névtelenek maradjanak. "
   when_creating_a_reply_you_will_have_the_option_to__3fb91c13: " A válasz létrehozásakor lehetősége van arra, hogy megmutassa nevét és profilképét a többi kurzus tagnak, vagy névtelen maradjon.  "
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Ha a funkciót letiltották, a hallgatók továbbra is küldhetnek egyéni üzeneteket a kurzus tanárainak, a kurzus segítőinek és azoknak a hallgatóknak, akik ugyanahhoz a fiókszintű  csoporthoz tartoznak."

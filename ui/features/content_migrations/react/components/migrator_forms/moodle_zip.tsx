@@ -41,14 +41,8 @@ const MoodleZipImporter = ({
   fileUploadProgress,
   isSubmitting,
 }: MoodleZipImporterProps) => {
-  const {
-    setFile,
-    fileError,
-    questionBankSettings,
-    setQuestionBankSettings,
-    questionBankError,
-    handleSubmit,
-  } = useSubmitHandlerWithQuestionBank(onSubmit)
+  const {setFile, fileError, questionBankSettings, setQuestionBankSettings, handleSubmit} =
+    useSubmitHandlerWithQuestionBank(onSubmit)
 
   return (
     <>
@@ -61,7 +55,6 @@ const MoodleZipImporter = ({
       />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
-        questionBankError={questionBankError}
         disable={isSubmitting}
         questionBankSettings={questionBankSettings}
       />

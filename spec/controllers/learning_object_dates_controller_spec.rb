@@ -737,7 +737,7 @@ describe LearningObjectDatesController do
                                        "unassign_item" => false,
                                        "group_id" => @group.id,
                                        "non_collaborative" => true,
-                                       "group_category_id" => nil,
+                                       "group_category_id" => @group.group_category.id,
                                      }
                                    ]
                                  })

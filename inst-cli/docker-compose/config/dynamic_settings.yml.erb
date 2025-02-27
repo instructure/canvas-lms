@@ -84,11 +84,10 @@ development:
       bedrock.yml: |-
         vault_credential_path: sts/testaccount/sts/bedrock-dev
         bedrock_region: us-west-2
-      # sagemaker configuration for translations
-      sagemaker.yml: |
-        endpoint_name: translation-endpoint-dev
+      # AWS translation configuration for translations
+      translation.yml: |
         translation_region: us-west-2
-        vault_credential_path: sts/testaccount/sts/sagemaker-dev
+        vault_credential_path: sts/testaccount/sts/translation-dev
       datadog_apm.yml: |
         sample_rate: 0.0
         host_sample_rate: 0.0

@@ -67,7 +67,6 @@ export function DueDateTimeInput({
   )
 
   const dueDateProps = {
-    key,
     id: key,
     disabled: Boolean(blueprintDateLocks?.includes('due_dates')) || disabledWithGradingPeriod,
     description: I18n.t('Choose a due date and time'),

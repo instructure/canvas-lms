@@ -90,7 +90,6 @@ module.exports = {
         jsc: swc[1].use.options.jsc,
       },
     ],
-    '^.+\\.jsx?$': 'babel-jest',
   },
   extensionsToTreatAsEsm: ['.jsx'],
   testEnvironmentOptions: {

@@ -26,7 +26,7 @@ const DEFAULT_FILTER_SETTINGS: FilterSetting = {
 }
 
 export function useFilterSettings(
-  default_settings?: FilterSetting
+  default_settings?: FilterSetting,
 ): [FilterSetting, (nextSettings: FilterSetting) => void] {
   const [filterSettings, setFilterSettings] = useState(default_settings || DEFAULT_FILTER_SETTINGS)
 

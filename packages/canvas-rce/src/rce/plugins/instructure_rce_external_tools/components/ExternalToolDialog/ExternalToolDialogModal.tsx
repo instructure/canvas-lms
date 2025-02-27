@@ -30,7 +30,7 @@ export function ExternalToolDialogModal(
     onCloseButton: () => void
     name: string
     children: ReactNodeLike
-  }
+  },
 ) {
   return (
     <Modal

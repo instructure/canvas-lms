@@ -18,6 +18,7 @@
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -71,7 +72,7 @@ const OtpForm = () => {
 
   const redirectTo = (url: string) => {
     isRedirectingRef.current = true
-    window.location.replace(url)
+    assignLocation(url)
   }
 
   const initiateOtp = useCallback(async () => {
@@ -195,6 +196,8 @@ const OtpForm = () => {
                 otpInputRef.current = inputElement as HTMLInputElement | undefined
               }}
               disabled={isUiActionPending}
+              isRequired={true}
+              data-testid="otp-input"
             />
 
             <Flex.Item overflowY="visible" overflowX="visible">
@@ -208,11 +211,18 @@ const OtpForm = () => {
               onClick={handleCancelOtp}
               display="block"
               disabled={isUiActionPending}
+              data-testid="cancel-button"
             >
               {I18n.t('Cancel')}
             </Button>
 
-            <Button type="submit" color="primary" display="block" disabled={isUiActionPending}>
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={isUiActionPending}
+              data-testid="verify-button"
+            >
               {I18n.t('Verify')}
             </Button>
           </Flex>

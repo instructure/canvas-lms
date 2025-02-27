@@ -26,12 +26,22 @@ import {
 import {Editor} from 'tinymce'
 import {
   AUDIO_PLAYER_SIZE,
-  VIDEO_SIZE_DEFAULT,
+  videoDefaultSize,
 } from '../../rce/plugins/instructure_record/VideoOptionsTray/TrayController'
 import {jsdomInnerText} from './jsdomInnerText'
 
 // =====================================================================================================================
 // placeholderInfoFor
+
+jest.mock('../../rce/plugins/instructure_record/VideoOptionsTray/TrayController', () => {
+  const originalModule = jest.requireActual(
+    '../../rce/plugins/instructure_record/VideoOptionsTray/TrayController'
+  )
+  return {
+    ...originalModule,
+    videoDefaultSize: jest.fn(),
+  }
+})
 
 describe('placeholderInfoFor', () => {
   // -------------------------------------------------------------------------------------------------------------------
@@ -45,7 +55,7 @@ describe('placeholderInfoFor', () => {
           preview: squareImageDataUri,
         },
         contentType: 'image/png',
-      })
+      }),
     ).toEqual({
       type: 'block',
       ariaLabel: 'Loading placeholder for square.png',
@@ -69,7 +79,7 @@ describe('placeholderInfoFor', () => {
         name: 'square.png',
         domObject: blob,
         contentType: 'image/png',
-      })
+      }),
     ).toEqual({
       type: 'block',
       ariaLabel: 'Loading placeholder for square.png',
@@ -93,7 +103,7 @@ describe('placeholderInfoFor', () => {
         name: 'square.png',
         domObject: file,
         contentType: 'image/png',
-      })
+      }),
     ).toEqual({
       type: 'block',
       ariaLabel: 'Loading placeholder for square.png',
@@ -116,7 +126,7 @@ describe('placeholderInfoFor', () => {
         },
         contentType: 'image/png',
         displayAs: 'link',
-      })
+      }),
     ).toEqual({
       type: 'inline',
       ariaLabel: 'Loading placeholder for square.png',
@@ -127,18 +137,22 @@ describe('placeholderInfoFor', () => {
   // -------------------------------------------------------------------------------------------------------------------
 
   it('should handle video files', async () => {
+    const expectedVideoSize = { width: '200px', height: '100px' }
+    const mockVideoDefaultSize = videoDefaultSize as jest.Mock
+    mockVideoDefaultSize.mockReturnValue(expectedVideoSize)
+
     expect(
       await placeholderInfoFor({
         name: 'video.mp4',
         domObject: {},
         contentType: 'video/mp4',
-      })
+      }),
     ).toEqual({
       type: 'block',
       ariaLabel: 'Loading placeholder for video.mp4',
       visibleLabel: 'video.mp4',
-      width: VIDEO_SIZE_DEFAULT.width,
-      height: VIDEO_SIZE_DEFAULT.height,
+      width: expectedVideoSize.width,
+      height: expectedVideoSize.height,
       vAlign: 'bottom',
     })
   })
@@ -151,7 +165,7 @@ describe('placeholderInfoFor', () => {
         name: 'audio.mp3',
         domObject: {},
         contentType: 'audio/mpeg',
-      })
+      }),
     ).toEqual({
       type: 'block',
       visibleLabel: 'audio.mp3',
@@ -170,7 +184,7 @@ describe('placeholderInfoFor', () => {
         name: 'file.txt',
         domObject: {},
         contentType: 'text/plain',
-      })
+      }),
     ).toEqual({
       type: 'inline',
       visibleLabel: 'file.txt',
@@ -187,7 +201,7 @@ describe('placeholderInfoFor', () => {
         domObject: {},
         contentType: 'text/plain',
         title: 'actual-file-name.txt',
-      })
+      }),
     ).toEqual({
       type: 'inline',
       visibleLabel: 'actual-file-name.txt',
@@ -210,11 +224,11 @@ describe('insertPlaceholder', () => {
         type: 'inline',
         visibleLabel: 'test-file.txt',
         ariaLabel: 'Loading placeholder for test-file.txt',
-      })
+      }),
     )
 
     const placeholderElem = editor.dom.doc.querySelector(
-      '*[data-placeholder-for=test-file\\.txt]'
+      '*[data-placeholder-for=test-file\\.txt]',
     ) as HTMLElement
 
     expect(jsdomInnerText(placeholderElem)).toContain('test-file.txt')
@@ -233,11 +247,11 @@ describe('insertPlaceholder', () => {
         width: '123px',
         height: '456px',
         vAlign: 'middle',
-      })
+      }),
     )
 
     const placeholderElem = editor.dom.doc.querySelector(
-      '*[data-placeholder-for=test-file\\.png]'
+      '*[data-placeholder-for=test-file\\.png]',
     ) as HTMLElement
 
     expect(jsdomInnerText(placeholderElem)).toContain('test-file.png')

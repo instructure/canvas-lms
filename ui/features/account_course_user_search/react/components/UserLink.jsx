@@ -32,7 +32,6 @@ export default function UserLink({
   return (
     <Link
       themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: '1rem'}}
-      data-heap-redact-text=""
       {...propsToPassOnToLink}
     >
       <Avatar
@@ -41,7 +40,6 @@ export default function UserLink({
         src={avatar_url}
         margin="0 x-small xxx-small 0"
         data-fs-exclude={true}
-        data-heap-redact-attributes="name"
       />
       {name} {pronouns && <Text fontStyle="italic">({pronouns})</Text>}
     </Link>

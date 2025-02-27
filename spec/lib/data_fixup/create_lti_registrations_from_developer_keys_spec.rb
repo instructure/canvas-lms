@@ -54,7 +54,7 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
       expect(second_account_key.lti_registration.admin_nickname)
         .to eq(second_account_key.name)
       expect(second_account_key.lti_registration.name)
-        .to eq(second_account_key.tool_configuration.configuration["title"])
+        .to eq(second_account_key.tool_configuration.internal_lti_configuration[:title])
       expect(second_account_key.lti_registration.account)
         .to eq(second_account_key.account)
       expect(second_account_key.lti_registration.internal_service)

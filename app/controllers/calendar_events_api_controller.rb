@@ -1747,7 +1747,7 @@ class CalendarEventsApiController < ApplicationController
     scope = assignment_or_sub_assignment(sub_assignment:).for_course(view_unpublished) unless view_unpublished.empty?
 
     unless other.empty?
-      scope2 = assignment_or_sub_assignment(sub_assignment:).for_course(other)
+      scope2 = assignment_or_sub_assignment(sub_assignment:).for_course(other).published
       scope = scope ? scope.or(scope2) : scope2
     end
 

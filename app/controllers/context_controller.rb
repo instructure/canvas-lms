@@ -84,6 +84,7 @@ class ContextController < ApplicationController
       load_all_contexts(context: @context)
       manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)
       can_add_enrollments = @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_COURSE_ENROLLMENT_PERMISSIONS)
+      allow_assign_to_differentiation_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
       js_permissions = {
         read_sis: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
         view_user_logins: @context.grants_right?(@current_user, session, :view_user_logins),
@@ -99,7 +100,8 @@ class ContextController < ApplicationController
         can_read_roster: @context.grants_right?(@current_user, session, :read_roster),
         can_view_all_grades: @context.grants_right?(@current_user, session, :view_all_grades),
         self_registration: @context.root_account.self_registration?,
-        user_is_instructor: @context.user_is_instructor?(@current_user)
+        user_is_instructor: @context.user_is_instructor?(@current_user),
+        allow_assign_to_differentiation_tags:,
       }
 
       js_env({
@@ -349,7 +351,7 @@ class ContextController < ApplicationController
                       rubric_associations_with_deleted].freeze
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
-    if authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
+    if authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       @item_types =
         WORKFLOW_TYPES.each_with_object([]) do |workflow_type, item_types|
           if @context.class.reflections.key?(workflow_type.to_s)
@@ -383,7 +385,7 @@ class ContextController < ApplicationController
   end
 
   def undelete_item
-    if authorized_action(@context, @current_user, [:manage_content, :manage_course_content_add])
+    if authorized_action(@context, @current_user, :manage_course_content_add)
       type = params[:asset_string].split("_")
       id = type.pop
       type = type.join("_")

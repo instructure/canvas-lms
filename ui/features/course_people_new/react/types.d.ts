@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-interface CoursePeoplePermissions {
+import {PENDING_ENROLLMENT, INACTIVE_ENROLLMENT, ACTIVE_ENROLLMENT} from './util/constants'
+interface EnvPermissions {
   can_read_roster: boolean
   can_allow_course_admin_actions: boolean
   can_read_prior_roster: boolean
@@ -26,34 +27,88 @@ interface CoursePeoplePermissions {
   user_is_instructor: boolean
   self_registration: boolean
   can_generate_observer_pairing_code: boolean
+  view_user_logins: boolean
+  read_sis: boolean
+  can_manage_differentiation_tags: boolean
+  allow_assign_to_differentiation_tags: boolean
+  active_granular_enrollment_permissions: string[]
 }
 
-interface CoursePeopleUrls {
+interface EnvCourse {
   groups_url: string
   prior_enrollments_url: string
   interactions_report_url: string
   user_services_url: string
   observer_pairing_codes_url: string
+  hideSectionsOnCourseUsersPage: boolean
+  allowAssignToDifferentiationTags: boolean
+  concluded: boolean
 }
 
 export interface CoursePeopleEnv {
-  permissions: CoursePeoplePermissions
-  course: CoursePeopleUrls
+  COURSE_ROOT_URL: string
+  permissions: EnvPermissions
+  course: EnvCourse
 }
 
 export interface CoursePeopleContextType {
-  canReadRoster: boolean
+  activeGranularEnrollmentPermissions: string[]
+  allowAssignToDifferentiationTags: boolean
   canAllowCourseAdminActions: boolean
-  canReadPriorRoster: boolean
-  canManageStudents: boolean
-  canViewAllGrades: boolean
-  canReadReports: boolean
-  userIsInstructor: boolean
-  selfRegistration: boolean
   canGenerateObserverPairingCode: boolean
+  canManageStudents: boolean
+  canManageDifferentiationTags: boolean
+  canReadPriorRoster: boolean
+  canReadReports: boolean
+  canReadRoster: boolean
+  canViewAllGrades: boolean
+  courseRootUrl: string
+  courseConcluded: boolean
   groupsUrl: string
-  priorEnrollmentsUrl: string
   interactionsReportUrl: string
-  userServicesUrl: string
   observerPairingCodesUrl: string
+  priorEnrollmentsUrl: string
+  selfRegistration: boolean
+  userIsInstructor: boolean
+  userServicesUrl: string
+  canViewLoginIdColumn: boolean
+  canViewSisIdColumn: boolean
+  hideSectionsOnCourseUsersPage: boolean
+}
+
+export type EnrollmentState = typeof PENDING_ENROLLMENT | typeof INACTIVE_ENROLLMENT | typeof ACTIVE_ENROLLMENT | undefined
+
+export type Enrollment = {
+  id: string
+  name: string
+  role: string
+  type: string
+  last_activity: string | null
+  total_activity?: number
+  can_be_removed?: boolean
+  enrollment_state: EnrollmentState
+  temporary_enrollment_source_user_id?: string
+  associatedUser?: {
+    id: string
+    name: string
+  }
+}
+
+export type CustomLink = {
+  id: string
+  text: string
+  url: string
+  icon_class: string
+}
+
+export type User = {
+  id: string
+  short_name: string
+  login_id: string
+  avatar_url: string
+  pronouns?: string
+  sis_user_id: string
+  last_login: string
+  enrollments: Enrollment[]
+  custom_links?: CustomLink[]
 }

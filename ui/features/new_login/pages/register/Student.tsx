@@ -20,8 +20,8 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {FormMessage} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import React, {useRef, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
@@ -83,7 +83,17 @@ const Student = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const recaptchaSectionRef = useRef<ReCaptchaSectionRef>(null)
 
+  const joinCodeHint: FormMessage[] = [
+    {
+      type: 'hint',
+      text: 'Your instructor will provide you with a join code to link you directly to the course. This code will be sent to you separately from the Canvas email that invites you to join the course.',
+    },
+  ]
+
   const validateForm = (): boolean => {
+    let hasValidationError = false
+    let focusTarget: HTMLInputElement | null = null
+
     setNameError('')
     setUsernameError('')
     setPasswordError('')
@@ -94,64 +104,69 @@ const Student = () => {
 
     if (name.trim() === '') {
       setNameError(I18n.t('Name is required.'))
-      nameInputRef.current?.focus()
-      return false
+      focusTarget = nameInputRef.current
+      hasValidationError = true
     }
 
     if (username.trim() === '') {
       setUsernameError(I18n.t('Username is required.'))
-      usernameInputRef.current?.focus()
-      return false
+      if (!focusTarget) focusTarget = usernameInputRef.current
+      hasValidationError = true
     }
 
     if (!password) {
       setPasswordError(ERROR_MESSAGES.passwordRequired)
-      passwordInputRef.current?.focus()
-      return false
+      if (!focusTarget) focusTarget = passwordInputRef.current
+      hasValidationError = true
     } else if (passwordPolicy) {
       const errorKey = validatePassword(password)
       if (errorKey) {
         setPasswordError(
-          // using server error messaging here to avoid duplication
+          // prefer server error messages for consistency; fallback to a generic message if unmapped
           serverErrorsMap[`pseudonym.password.${errorKey}`]?.() ||
             I18n.t('An unknown error occurred.'),
         )
-        passwordInputRef.current?.focus()
-        return false
+        if (!focusTarget) focusTarget = passwordInputRef.current
+        hasValidationError = true
       }
     }
 
-    if (password !== confirmPassword) {
+    if (!confirmPassword || password !== confirmPassword) {
       setConfirmPasswordError(ERROR_MESSAGES.passwordsNotMatch)
-      confirmPasswordInputRef.current?.focus()
-      return false
+      if (!focusTarget) focusTarget = confirmPasswordInputRef.current
+      hasValidationError = true
     }
 
     if (joinCode.trim() === '') {
       setJoinCodeError(ERROR_MESSAGES.joinCodeRequired)
-      joinCodeInputRef.current?.focus()
-      return false
+      if (!focusTarget) focusTarget = joinCodeInputRef.current
+      hasValidationError = true
     }
 
     if (requireEmail && !EMAIL_REGEX.test(email)) {
       setEmailError(ERROR_MESSAGES.invalidEmail)
-      emailInputRef.current?.focus()
-      return false
+      if (!focusTarget) focusTarget = emailInputRef.current
+      hasValidationError = true
     }
 
     if (termsRequired && !termsAccepted) {
       setTermsError(ERROR_MESSAGES.termsRequired)
-      const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
-      checkbox?.focus()
-      return false
+      if (!focusTarget) {
+        focusTarget = document.getElementById('terms-checkbox') as HTMLInputElement
+      }
+      hasValidationError = true
     }
 
     if (recaptchaKey) {
       const recaptchaValid = recaptchaSectionRef.current?.validate() ?? true
-      if (!recaptchaValid) return false
+      if (!recaptchaValid) {
+        hasValidationError = true
+      }
     }
 
-    return true
+    if (focusTarget) focusTarget.focus()
+
+    return !hasValidationError
   }
 
   const handleServerErrors = (errors: any) => {
@@ -327,7 +342,9 @@ const Student = () => {
           {I18n.t('Create a Student Account')}
         </Heading>
 
-        <Text>{I18n.t('All fields are required.')}</Text>
+        <Flex.Item overflowX="visible" overflowY="visible">
+          <ActionPrompt variant="signIn" />
+        </Flex.Item>
       </Flex>
 
       <form onSubmit={handleCreateStudent} noValidate={true}>
@@ -340,6 +357,8 @@ const Student = () => {
               onChange={(_, value) => setName(value)}
               renderLabel={I18n.t('Full Name')}
               value={name}
+              isRequired={true}
+              data-testid="name-input"
             />
 
             <TextInput
@@ -352,6 +371,8 @@ const Student = () => {
               onChange={handleUsernameChange}
               renderLabel={I18n.t('Username')}
               value={username}
+              isRequired={true}
+              data-testid="username-input"
             />
 
             <TextInput
@@ -363,6 +384,8 @@ const Student = () => {
               renderLabel={I18n.t('Password')}
               type="password"
               value={password}
+              isRequired={true}
+              data-testid="password-input"
             />
 
             <TextInput
@@ -374,6 +397,8 @@ const Student = () => {
               renderLabel={I18n.t('Confirm Password')}
               type="password"
               value={confirmPassword}
+              isRequired={true}
+              data-testid="confirm-password-input"
             />
 
             <TextInput
@@ -381,10 +406,12 @@ const Student = () => {
               autoCorrect="none"
               disabled={isUiActionPending}
               inputRef={inputElement => (joinCodeInputRef.current = inputElement)}
-              messages={createErrorMessage(joinCodeError)}
+              messages={joinCodeError ? createErrorMessage(joinCodeError) : joinCodeHint}
               onChange={handleJoinCodeChange}
               renderLabel={I18n.t('Join Code')}
               value={joinCode}
+              isRequired={true}
+              data-testid="join-code-input"
             />
 
             {requireEmail && (
@@ -397,6 +424,8 @@ const Student = () => {
                 onChange={handleEmailChange}
                 renderLabel={I18n.t('Email Address')}
                 value={email}
+                isRequired={true}
+                data-testid="email-input"
               />
             )}
           </Flex>
@@ -411,18 +440,17 @@ const Student = () => {
                 onChange={handleTermsChange}
                 privacyPolicyUrl={privacyPolicyUrl}
                 termsOfUseUrl={termsOfUseUrl}
+                isRequired={true}
               />
             </Flex.Item>
           )}
 
           {recaptchaKey && (
-            <Flex justifyItems="center">
-              <ReCaptchaSection
-                ref={recaptchaSectionRef}
-                recaptchaKey={recaptchaKey}
-                onVerify={handleReCaptchaVerify}
-              />
-            </Flex>
+            <ReCaptchaSection
+              ref={recaptchaSectionRef}
+              recaptchaKey={recaptchaKey}
+              onVerify={handleReCaptchaVerify}
+            />
           )}
 
           <Flex direction="row" gap="small">
@@ -432,19 +460,21 @@ const Student = () => {
               display="block"
               onClick={handleCancel}
             >
-              {I18n.t('Back to Login')}
+              {I18n.t('Back')}
             </Button>
 
-            <Button type="submit" color="primary" display="block" disabled={isUiActionPending}>
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={isUiActionPending}
+              data-testid="submit-button"
+            >
               {I18n.t('Next')}
             </Button>
           </Flex>
         </Flex>
       </form>
-
-      <Flex.Item align="center" overflowX="visible" overflowY="visible">
-        <ActionPrompt variant="signIn" />
-      </Flex.Item>
     </Flex>
   )
 }

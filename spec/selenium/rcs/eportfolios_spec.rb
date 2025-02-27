@@ -30,13 +30,15 @@ describe "eportfolios" do
   end
 
   it "validates creation and visibility of eportfolio" do
-    skip "FOO-3809 (6/20/2024)"
     get "/dashboard/eportfolios"
-    f(".add_eportfolio_link").click
-    wait_for_animations
+    f("#add_eportfolio_button").click
+
+    # fill out form
     replace_content f("#eportfolio_name"), "student content"
-    set_value(f("#eportfolio_public"), 1)
+    f('label[for="eportfolio_public"]').click
     expect_new_page_load { f("#eportfolio_submit").click }
+
+    # validate eportfolio
     eportfolio = Eportfolio.find_by_name("student content")
     expect(eportfolio).to be_valid
     expect(eportfolio.public).to be_truthy
@@ -210,7 +212,7 @@ describe "eportfolios" do
       submit_form("#delete_eportfolio_form")
       f("#wrapper .eportfolios").click
       expect(f("#content")).not_to contain_css("#portfolio_#{@eportfolio.id}")
-      expect(f(".add_eportfolio_link")).to be_displayed
+      expect(f("#add_eportfolio_button")).to be_displayed
       expect(Eportfolio.first.workflow_state).to eq "deleted"
     end
 

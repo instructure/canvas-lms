@@ -41,7 +41,6 @@ export const IconConfirmationWrapper = ({
     <IconConfirmation
       internalConfig={internalConfig}
       name={internalConfig.title}
-      topLevelDefaultIconUrl={internalConfig.launch_settings?.icon_url}
       allPlacements={state.placements.placements ?? []}
       placementIconOverrides={state.icons.placements}
       reviewing={reviewing}

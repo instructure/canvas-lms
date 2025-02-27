@@ -119,8 +119,10 @@ hy:
     length_error: "Պետք է լինի մինչև 255 նիշ"
     title: "Նշել այս խումբը"
   OutcomeView: 
+    display_name: "Ընկերական անուն (ոչ պարտադիր)"
     length_error: "Պետք է լինի մինչև 255 նիշ"
     mastery_error: "Պետք է 0-ին հավասար կամ մեծ լինի"
+    title: "Նշել այս արդյունքը"
   OutcomesDirectoryView: 
     flash: 
       error: "Սխալ է տեղի ունեցել: Խնդրում ենք թարմացնել էջը և փորձել կրկին:"
@@ -1655,6 +1657,7 @@ hy:
   add_group_c84f9e9d: "Ավելացնել խումբ"
   add_group_set_f9809e11: "Ավելացնել խմբերի շարք"
   add_icon_567dbcaa: "ավելացնել պատկերանշան"
+  add_login_f871148: "Ավելացնել մուտքանուն"
   add_moderator_review_copy_1st_a484c813: "Ավելացնել մոդերատորի կարգավիճակ ունեցող կարծիք ներկայացող (1-ին պատճե)"
   add_moderator_review_copy_2nd_e80d458f: "Ավելացնել մոդերատորի կարգավիճակ ունեցող կարծիք ներկայացնող (2-րդ պատճե)"
   add_moderator_review_new_3c183cea: "Ավելացնել մոդերատորի կարգավիճակ ունեցող կարծիք ներկայացնող (նոր)"
@@ -4252,6 +4255,7 @@ hy:
       buttons: 
         add_prerequisite: "Ավելացնել նախնական պայման"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
+      estimated_duration_minutes: Րոպե
       headings: 
         add_prerequisite: "Ավելացնել նախնական պայման %{name}-ին"
         course_modules: "Դասընթացի մոդուլներ"
@@ -5618,6 +5622,7 @@ hy:
     this_is_permanent: "Գնահատականների կորը հնարավոր չէ չեղյալ համարել: Գնահատականների շարքը նախքան կորի սահմանումը հասանելի է, սակայն կորի գծման գործողությունը անշրջելի է: "
   curving_assignments_e9479ee3: "Հանձնարարություննի գնահատման կորը"
   custom_fields_fc3e55af: "Օգտատիրոջ դաշտեր"
+  custom_from_name_38a3d784: "\"Ումից\" օգտատիրոջ անուն"
   customize_74cdc895: Կարգաբերում
   cyan_c1d5f68a: Cyan
   d2l_display: Desire2Learn
@@ -5796,6 +5801,7 @@ hy:
   deep_orange_4c7eea99: "Մուգ նարնջագույն"
   deep_purple_bb3e2907: "Մուգ մանուշակագույն"
   default_account_quotas_e34112fd: "Հաշվի՝ լռությամբ ընդունված քվոտաներ"
+  default_canvas_setting_fa6e6f81: "Canvas-ի լռությամբ ընդունած կարգավորումները "
   default_conference_title: "%{course_name} կոնֆերանս"
   default_grade_cannot_be_set_to_ex_723caa59: "Լռությամբ ընդունվող գնահատականը չի կարող սահմանվել %{ex}"
   default_question_bank_c7bcc5e7: "Լռելյայն ընդունված հարցերի շտեմարան"
@@ -5820,6 +5826,7 @@ hy:
   deleted_ce03674d: "Ջնջված է"
   deleted_topic_notice: "Այս թեման ջնջվել է"
   deleting_6421031e: "ջնջում է..."
+  deleting_e2bd8cc9: "Ջնջվում է..."
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Դեմո կայքերը պահանջում են սահմանել Recaptcha կարգաբերումները: Canvas-ի կարգաբերումների հարցերով դիմեք ձեր կայքի ադմինիստրատորին:  "
   demos: 
@@ -6293,6 +6300,7 @@ hy:
   dismiss_dacdb625: Հեռացնել
   display_course_catalog: "\"Դասընթացը ներառել հանրային դասընթացների ցուցիչում\" ակտիվացված դրոշակով ցույց տալ հասանելիության առավելագույն իրավունքներով այս հաշվում որոնվող դասընթացների ցուցակը:  "
   display_name_b80c243e: "Ցույց տալ անունը"
+  display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "Ծանուցումների կարգաբերման էջի վրա ցույց տալ մեկ անգամ հայտնվող նախազգուշացումը"
   display_totals_for_all_grading_periods_ad1ea050: "Ցույց տալ ընդհանուր գնահատականը \"Գնահատման բոլոր ժամանակահատվածներում\""
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: "Ընթացիկ գնահատականների բաշխումը ըստ դասընթացների՝ դրանցում գրանցված\n\
       \x20բոլոր ունկնդիրների գծով: "
@@ -6400,6 +6408,7 @@ hy:
       criterion_long_description: "Չափանիշի երկար նկարագրություն"
       find_existing_rubric: "Գտնել գոյություն ունեցող ռուբրիկը"
   edit_rubric_7d4d139d: "Խմբագրել ռուբրիկը"
+  edit_sections_7d0e4e34: "Խմբագրել բաժինները"
   edit_survey_b0d6890d: "Խմբագրել հարցումը"
   edit_this_key_1ee53473: "Խմբագրել այս բանալին"
   edit_toolname_app_23cfbb8: "Խմբագրել %{toolName}  հավելվածը"
@@ -6808,6 +6817,7 @@ hy:
   eportfolios_f6dc4579: "Էլ. պորտֆոլիոներ"
   epub_exporting_f5592ff2: "Epub-ի արտահանում"
   error_98e81528: Սխալ
+  error_afac7133: Սխալ՝
   error_deleting_name_reason_11f9d399: "%{name} ջնջման սխալ՝ %{reason}"
   error_message_2b9d12ee: "Սխալ՝ %{message}"
   error_reports_7d6c8b1e: "Հաշվետվություններ սխալների մասին"
@@ -8140,6 +8150,7 @@ hy:
     group_atom_feed: "Խմբի Atom հոսքը"
     group_limit_number: "Խմբի սահմանաչափը պետք է թիվ լինի"
     group_name: "Խմբի անունը"
+    group_set_name_required: "Պահանջվում է նշել անունը"
     groups_count: " (%{count}) խմբեր"
     index: 
       heading_current_groups: "Ընթացիկ խմբեր"
@@ -8833,6 +8844,7 @@ hy:
   learning_outcome_id_88ff198c: "սովորելու արդյունքների նույնականացուցիչ"
   learning_outcome_name_9cb475e6: "ուսուցման արդյունքների անվանումը"
   leave_5e852989: Լքել
+  leave_blank_for_no_limit_e8f80808: "Թողնել դատարկ սահմանաչափի բացակայության դեպքում"
   leave_group_group_name_6847c632: "Լքել %{group_name} խումբը"
   left_group_group_name_aac4e813: "Լքել է %{group_name} խումբը"
   less_than_a_minute_ago_9f45e2a5: "ավելի քիչ, քան մեկ րոպե առաջ"
@@ -8944,6 +8956,7 @@ hy:
   link_selection_1486c5d0: "Հղումների ընտրություն"
   link_title_189888b7: "Հղման անվանում"
   link_title_d959a7b3: "Հղման վերնագիր"
+  link_to_students_91edf7ea: "Կապել ունկնդիրների հետ"
   link_url_cf96376: "Հղման url- հասցե"
   linked_assignment_message: "կապակցված է \"%{title}\" հանձնարարության հետ"
   linked_discussion_topic_message: "կապակցված է \"%{title}\" քննարկման թեմայի հետ"
@@ -11069,6 +11082,7 @@ hy:
   module_9775f804: մոդուլ
   module_completed_50c50762: "Մոդուլն ավարտված է"
   module_in_progress_fa600662: "Մոդուլի աշխատանքը կատարվում է"
+  module_item_501fb0c3: "Մոդուլի տարր"
   module_item_module_item_name_was_successfully_dele_8626d846: "%{module_item_name} մոդուլի տարրը հաջողությամբ ջնջվել է:"
   module_item_types: 
     assignment: Հանձնարարություն
@@ -11601,6 +11615,7 @@ hy:
       scheduling: Պլանավորում
   notification_preferences_cf47083d: "Ծանուցման նախընտրելի տարբերակներ"
   notifications_cbfa7704: Ծանուցումներ
+  notifications_sent_to_external_services_c4a86b78: "Արտաքին ծառայություններին ուղարկված ծանուցումներ"
   now_click_the_agenda_button_607fb40e: "Այժմ սեղմեք *Օրակարգ* կոճակը"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Այժմ, երբ ձեր դասընթացը կարգաբերված և հասանելի է, ձեզ հավանաբար այլևս պետք չեն այս ստուգիչ հարցերը: Բայց մենք դրանք կպահենք այն դեպքերի համար, երբ դուք հետագայում ինչ-որ նոր բան կցանկանաք կամ ձեզ լրացուցիչ օգնություն պետք լինի ձեր դասընթացի բովանդակությունը փոխելիս:   "
   num_messages_c1949bbc: 
@@ -12513,6 +12528,7 @@ hy:
   post_grades_to_sis_97ece878: "Գնահատականները տեղադրել SIS-ում"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Գործնական թեստ"
+  preparing_download_percent_complete_34b48e4d: "Ներբեռնման նախապատրաստում: %{percent}% ավարտված է"
   prerequisites_49659f16: Նախապայմաններ՝
   prerequisites_98b324e0: Նախապայմաններ
   prerequisites_lookup: 
@@ -13068,6 +13084,7 @@ hy:
       some_scores_reduced: "Միավորներ տալ միայն ճիշտ պատասխանների համար (*որոշ ունկնդիրների միավորներ կարող են նվազեցվել*)"
       update_question_without_regrading: "Թարմացնել հարցը առանց կրկնակի գնահատման"
   quiz_e0dcce8f: Թեստ
+  quiz_instructions_a36d09c9: "Ցուցումներ թեստի վերաբերյալ"
   quiz_log_auditing: 
     buttons: 
       reload_events: "Կրկին բեռնել"
@@ -14445,6 +14462,7 @@ hy:
     updated_at_short: "Ձևափոխված է "
     view: Դիտել
   recaptcha_not_configured_3a6ef9ee: "Recaptcha կարգաբերված չէ"
+  recent_canvas_notifications_81395de6: "Canvas-ի վերջին ծանուցումները"
   recent_student: 
     last_logged_in: "համակարգ վերջին մուտքը %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} նվազող միջինը"
@@ -14536,6 +14554,7 @@ hy:
   remove_dates_5a5a8df2: "Հանել ամսաթվերը"
   remove_f47dc62a: Հանել
   remove_filter_68de01d4: "Հեռացնել ֆիլտրները"
+  remove_from_course_6fb47aee: "Հանել դասընթացից"
   remove_icon_a4646413: "հանել պատկերը"
   remove_media_comment_f4afdb4b: "Հանել մուլտիմեդիա մեկնաբանությունը"
   remove_name_as_leader_3e03780a: " %{name} հանել առաջնորդությունից"
@@ -14562,6 +14581,7 @@ hy:
   reply_389d6fb9: Պատասխանել
   reply_all_80298bee: "Պատասխանել բոլորին"
   reply_from_name: "%{name} Canvas ծանուցումների միջոցով "
+  reply_to_9fa43ebe: "Հետադարձ հասցեն"
   reply_to_comment_72d96728: "Պատասխանել մեկնաբանության մեջ"
   reply_to_main_discussion_29823888: "Պատասխանել հիմնական քննարկմանը"
   report_inappropriate_picture_af4eefeb: "Զեկուցել անընդունելի պատկերի մասին"
@@ -14571,6 +14591,7 @@ hy:
   required_5f7ef8c0: "Պահանջվում է"
   reregister_9ab95a57: "Կրկին գրանցել"
   reregister_toolname_3dde0bfc: "Վերագրանցել %{toolName}"
+  resend_invitation_486bd513: "Կրկին ուղարկել հրավերը"
   reset_from_322d819a: "Սկզբնական Վիճակին Բերել Սկսած"
   reset_to_ee9265ef: "Սկզբնական Վիճակին Բերել Դեպի"
   respondus_lockdown_browser_support_413352eb: "Respondus LockDow բրաուզերի աջակցությունը"
@@ -14821,6 +14842,7 @@ hy:
   save_login_bba1272: "Պահպանել մուտքի տվյալները"
   save_settings_cafe79a5: "Պահպանել կարգաբերումները"
   save_skype_name_4de35a9: "Պահպանել Skype անունը"
+  save_successful_b2f64da4: "Հաջողությամբ պահպանվեց"
   saving_d55dd90e: "Պահպանվում է..."
   saving_recording_e111cb05: "Ձայնագրառումը պահպանվում է..."
   schedule_student_availability_332154a: "Սահմանել ունկնդիրների հասանելիության ժամանակացույց"
@@ -14946,6 +14968,7 @@ hy:
     all_courses_inner: 
       join_course: "Միանալ դասընթացին"
       next: Հաջորդը
+      no_courses_found: "Որեւէ դասընթաց չի գտնվել"
       previous: Նախորդը
     course_sections: "Դասընթացի բաժիններ"
     enrollments_observers: Դիտորդներ
@@ -15060,6 +15083,7 @@ hy:
         decrosslist_section: "Այս բաժինը ջնջել խաչաձև ցուցակից"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Որոշ LTI գործիքներ* որոնք գերազանց են աշխատում Canvas -ի հետ:"
   see_this_assignment_in_speedgrader_14b8abaf: "Տես այս հանձնարարությունը «Արագ գնահատման համակարգ»-ում"
+  select_a_course_40bc3229: "Ընտրել դասընթացը"
   select_a_grading_period_5ea50f1: "Ընտրել գնահատման ժամանակահատված..."
   select_a_grading_period_aab25483: "Ընտրել գնահատման ժամանակահատվածը"
   select_a_log_type_to_search_247fc6b4: "Որոնումների համար ընտրեք մատյանի տեսակը"
@@ -16035,6 +16059,7 @@ hy:
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Օգտատիրոջ կարգավիճակի ապաակտիվացման ժամանակ սխալ է տեղի ունեցել: Ավելի ուշ կրկին փորձեք:"
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Օգտատիրոջ կարգավիճակի  կրկին ակտիվացման ժամանակ սխալ է տեղի ունեցել: Ավելի ուշ կրկին փորձեք:"
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Օգտատիրոջ դերի թարմացման ժամանակ սխալ է տեղի ունեցել: Ավելի ուշ կրկին փորձեք:"
+  something_went_wrong_updating_the_user_s_student_l_1047109c: "Սխալ է տեղի ունեցել օգտատիրոջ ուսանողական հղումները թարմացնելիս: Փորձեք ավելի ուշ:"
   sortable_name_73f707cf: "Տեսակավորման ենթակա անուն"
   source_c377a469: Աղբյուր
   source_code_2395ca74: "Աղբյուրի կոդ"
@@ -17075,6 +17100,7 @@ hy:
   update_4d8ee62: Թարմացնել
   update_details_6abfed16: "Թարմացնել Տվյալները"
   update_grade_b47eb3ff: "Թարմացնել գնահատականը"
+  update_login_472cd6db: "Թարմացնել մուտքի տվյալները"
   update_module_b984c2e5: "Թարմացնել մոդուլը"
   update_password_4bc5cb1f: "Թարմացնել գաղտնաբառը"
   update_quota_81381226: "Թարմացնել քվոտան"
@@ -17563,6 +17589,7 @@ hy:
     is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
   validate_links_in_content_b1630fba: "Հաստատել բովանդակության մեջ ներառված  հղումները"
   validation_error_3b943100: "Իսկության հաստատման սխալ"
+  value_must_be_a_whole_number_23c79120: "Խմբի սահմանաչափը պետք է թիվ լինի"
   value_must_be_positive_3e086d5a: "Պետք է դրական մեծություն լինի"
   verification_code_5acd64ef: "Ստուգման կոդ"
   verify_3dd8f159: "Ստուգել "
@@ -17650,6 +17677,7 @@ hy:
   well_below_mastery_37664bdc: "Բավական ցածր է անցողիկ միավորներից "
   what_should_the_csv_file_look_like_985a59ac: "Ի՞նչ տեսք պետք է ունենա CSV ֆայլը:"
   what_would_you_like_to_do_next_2835397e: "Ինչ կցանկանայիք անել հաջորդ քայլում"
+  when_an_observer_is_linked_to_a_student_they_have__489e2b71: "Երբ դիտորդը կապակցված է ունկնդրի հետ, նրան հասանելի են ունկնդրի գնահատականները և դասընթացի շրջանակում փոխգործողությունները:"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Երբ մարդիկ այցելում են դասընթացը, նրանք տեսնում են հենց այս էջը: Դուք կարող եք կարգաբերել այն այնպես, որ ցույց տա գործողությունների հոսքը, մոդուլների, ուսումնական ծրագրերի ցուցակը կամ դնել Ձեր կողմից ստեղծված  օգտատիրոջ էջը: Լռելյայն ընդունված տարբերակը ցուցադրում է դասընթացի գործողությունների հոսքը: "
   where_would_you_like_to_move_title_fabd6e8f: "Ու՞ր կցանկանայիք տեղափոխել %{title}:"
   which_login_to_change_4707fbc6: "Որ մուտքի տվյալները պետք է փոխել"
