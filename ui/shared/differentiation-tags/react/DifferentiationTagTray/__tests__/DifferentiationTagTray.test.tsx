@@ -64,6 +64,19 @@ describe('DifferentiationTagTray', () => {
     expect(screen.queryByTestId('differentiation-tag-header')).toBeInTheDocument()
   })
 
+  it('does not render search bar or + Tag button in empty state and clicking "Get Started" opens modal in create mode', async () => {
+    renderComponent({differentiationTagCategories: []})
+
+    expect(screen.queryByPlaceholderText('Search for Tag')).not.toBeInTheDocument()
+    expect(screen.queryByText('+ Tag')).not.toBeInTheDocument()
+
+    const getStartedButton = screen.getByText('Get Started').closest('button')
+    await userEvent.click(getStartedButton!)
+    const modalManager = screen.getByTestId('dummy-modal-manager')
+    expect(modalManager).toHaveAttribute('data-mode', 'create')
+    expect(modalManager).toHaveAttribute('data-cat-id', '')
+  })
+
   it('shows loading spinner when isLoading is true', () => {
     renderComponent({isLoading: true})
     expect(screen.getByTitle('Loading...')).toBeInTheDocument()

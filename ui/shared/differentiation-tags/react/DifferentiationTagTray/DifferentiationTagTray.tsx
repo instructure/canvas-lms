@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React, {useState, useMemo, useCallback, useEffect} from 'react'
 import pandasBalloonUrl from '../images/pandasBalloon.svg'
 import {Tray} from '@instructure/ui-tray'
@@ -164,20 +163,22 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
         <Flex direction="column" height="100vh" width="100%">
           <Header onClose={onClose} />
 
-          <Flex padding="0 small" direction="column">
-            <Flex.Item shouldGrow shouldShrink overflowX="visible" overflowY="visible">
-              <DifferentiationTagSearch
-                onSearch={setSearchTerm}
-                delay={300}
-                initialValue={searchTerm}
-              />
-            </Flex.Item>
-            <Flex.Item overflowX="visible" overflowY="visible">
-              <Button onClick={handleCreateNewTag} color="primary" margin="x-small none">
-                {I18n.t('+ Tag')}
-              </Button>
-            </Flex.Item>
-          </Flex>
+          {differentiationTagCategories.length > 0 && (
+            <Flex padding="0 small" direction="column">
+              <Flex.Item shouldGrow shouldShrink overflowX="visible" overflowY="visible">
+                <DifferentiationTagSearch
+                  onSearch={setSearchTerm}
+                  delay={300}
+                  initialValue={searchTerm}
+                />
+              </Flex.Item>
+              <Flex.Item overflowX="visible" overflowY="visible">
+                <Button onClick={handleCreateNewTag} color="primary" margin="x-small none">
+                  {I18n.t('+ Tag')}
+                </Button>
+              </Flex.Item>
+            </Flex>
+          )}
 
           {isLoading ? (
             <Flex.Item shouldGrow shouldShrink margin="medium">
