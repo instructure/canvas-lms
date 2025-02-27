@@ -66,6 +66,9 @@ function PageList(props: Props) {
     const {json, link} = await doFetchApi<ePortfolioPage[]>({
       path: `/eportfolios/${props.portfolio.id}/categories/${props.sectionId}/pages`,
       params,
+      fetchOpts: {
+        cache: 'no-store',
+      },
     })
     const nextPage = link?.next ? link.next.page : null
     if (json) {
