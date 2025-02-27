@@ -66,10 +66,6 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
     def jwks_cache
       Rails.cache
     end
-
-    def always_validate?
-      true
-    end
   end
   validates :login_attribute, inclusion: login_attributes
 

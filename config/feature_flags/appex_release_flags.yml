@@ -20,11 +20,6 @@ admin_manage_access_tokens:
   display_name: Admin Manage Access Tokens
   description: Limit the ability to manage access tokens to admins only.
   applies_to: RootAccount
-oidc_full_token_validation:
-  state: allowed
-  applies_to: RootAccount
-  display_name: Perform Full Validation of OpenID Connect ID Tokens
-  description: Performs full validation of OpenID Connect ID Tokens, including requiring issuer, nonce, and expiration claims.
 login_registration_ui_identity:
   state: hidden
   applies_to: RootAccount

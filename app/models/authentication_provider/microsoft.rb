@@ -83,10 +83,6 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     false
   end
 
-  def self.always_validate?
-    true
-  end
-
   def self.validate_issuer?
     false
   end

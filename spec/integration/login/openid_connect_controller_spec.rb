@@ -29,14 +29,15 @@ describe Login::OpenidConnectController do
                                                    authorize_url: "http://somewhere/oidc",
                                                    issuer: "issuer",
                                                    client_id: "audience",
+                                                   client_secret: "secret",
                                                    jwks_uri: "http://somewhere/jwks",
                                                    jwks: [jwk].to_json)
     allow(ap).to receive(:download_jwks)
     ap.save!
     ap
   end
-  let(:sid_id_token) { JSON::JWT.new({ sub: "uid", iss: "issuer", aud: "audience", sid: "session" }).to_s }
-  let(:sub_id_token) { JSON::JWT.new({ sub: "uid", iss: "issuer", aud: "audience" }).to_s }
+  let(:sid_id_token) { JSON::JWT.new({ sub: "uid", iss: "issuer", aud: "audience", sid: "session" }) }
+  let(:sub_id_token) { JSON::JWT.new({ sub: "uid", iss: "issuer", aud: "audience" }) }
 
   before do
     allow_any_instantiation_of(Account.default).to receive(:terms_required?).and_return(false)
@@ -49,6 +50,11 @@ describe Login::OpenidConnectController do
     state_jwt = Rack::Utils.parse_nested_query(uri.query)["state"]
     uri.query = nil
     expect(uri.to_s).to eql oidc_ap.authorize_url
+    state_jwt_decoded = JSON::JWT.decode(state_jwt, :skip_verification)
+    id_token["iat"] = Time.zone.now.to_i
+    id_token["exp"] = Time.zone.now.to_i + 5
+    id_token["nonce"] = state_jwt_decoded["nonce"]
+    id_token = id_token.sign(oidc_ap.client_secret).to_s
 
     token = instance_double(OAuth2::AccessToken, params: { "id_token" => id_token }, token: nil, options: {})
     allow_any_instantiation_of(oidc_ap).to receive(:get_token).and_return(token)
