@@ -57,5 +57,14 @@ module Types
     def module_items
       ModuleItemsVisibleLoader.for(current_user).load(context_module)
     end
+
+    field :estimated_duration, GraphQL::Types::ISO8601Duration, null: true
+    def estimated_duration
+      module_items.then do |content_tags|
+        return nil if content_tags.all?(&:estimated_duration).nil?
+
+        content_tags.sum { |item| item.estimated_duration&.duration || 0 }.iso8601
+      end
+    end
   end
 end
