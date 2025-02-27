@@ -17,7 +17,7 @@
  */
 
 import {useMutation, queryClient} from '@canvas/query'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import type {DifferentiationTagCategory, DifferentiationTagGroup} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -63,38 +63,49 @@ interface BulkManageDiffTagResponse {
  * useDifferentiationTagCategoriesIndex by using the key prefix 'differentiationTagCategories'.
  */
 export const useBulkManageDifferentiationTags = () => {
-  return useMutation<BulkManageDiffTagResponse, Error, UseBulkManageDifferentiationTagsVariables>({
+  return useMutation<
+    BulkManageDiffTagResponse | undefined,
+    Error,
+    UseBulkManageDifferentiationTagsVariables
+  >({
     mutationFn: async ({courseId, groupCategoryId, groupCategoryName, operations}) => {
-      // Prepare the body for the POST request
-      const bodyPayload = {
-        group_category: {
-          ...(groupCategoryId ? {id: groupCategoryId} : {}),
-          ...(groupCategoryName ? {name: groupCategoryName} : {}),
-        },
-        operations,
+      try {
+        // Prepare the body for the POST request
+        const bodyPayload = {
+          group_category: {
+            ...(groupCategoryId ? {id: groupCategoryId} : {}),
+            ...(groupCategoryName ? {name: groupCategoryName} : {}),
+          },
+          operations,
+        }
+
+        const result = await doFetchApi<BulkManageDiffTagResponse>({
+          path: `/api/v1/courses/${courseId}/group_categories/bulk_manage_differentiation_tag`,
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(bodyPayload),
+        })
+        return result.json
+      } catch (unknownError) {
+        let errorMsg = I18n.t('Bulk manage differentiation tags failed')
+
+        // If doFetchApi threw a FetchApiError, try extracting server error details
+        if (unknownError instanceof FetchApiError && unknownError.response) {
+          try {
+            const errorPayload = await unknownError.response.json()
+            if (errorPayload?.errors) {
+              errorMsg = errorPayload.errors
+            }
+          } catch {
+            // Swallow parse errors; fallback to the default message
+          }
+        }
+        throw new Error(errorMsg)
       }
-
-      const result = await doFetchApi<BulkManageDiffTagResponse>({
-        path: `/api/v1/courses/${courseId}/group_categories/bulk_manage_differentiation_tag`,
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bodyPayload),
-      })
-
-      if (!result.response.ok) {
-        throw new Error(I18n.t(`Bulk manage differentiation tags failed`))
-      }
-
-      if (!result.json) {
-        throw new Error(I18n.t('No data returned from the server'))
-      }
-
-      return result.json
     },
-
     onSuccess: async () => {
       // We are invalidating all queries that start with 'differentiationTagCategories'
       // undefined: we aren't using any other query filters to determine what to invalidate

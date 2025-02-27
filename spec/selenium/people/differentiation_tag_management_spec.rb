@@ -476,6 +476,23 @@ describe "Differentiation Tag Management" do
             # verify that the group ids are different
             expect(@multiple_tags.reload.groups.active.pluck(:id)).not_to eq(original_tag_ids)
           end
+
+          it "Displays an error message in the modal", :ignore_js_errors do
+            @collaborative_group_set = @course.group_categories.create!(name: "test", non_collaborative: false)
+            fj("button:contains('+ Tag')").click
+            wait_for_ajaximations
+
+            expect(fj("h2:contains('Create Tag')")).to be_displayed
+
+            tag_input = f("[data-testid='tag-name-input']")
+            tag_input.send_keys(@collaborative_group_set.name)
+
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            expect(fj("h2:contains('Create Tag')")).to be_displayed
+            expect(f(".flashalert-message")).to be_displayed
+          end
         end
       end
     end
