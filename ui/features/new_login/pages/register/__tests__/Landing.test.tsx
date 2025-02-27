@@ -16,14 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider} from '../../../context'
+import {ROUTES} from '../../../routes/routes'
 import Landing from '../Landing'
 
+const mockNavigate = jest.fn()
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
+}))
+
+jest.mock('../../../context', () => {
+  const originalModule = jest.requireActual('../../../context')
+  return {
+    ...originalModule,
+    useNewLogin: jest.fn(() => ({isUiActionPending: false})),
+  }
+})
+const mockUseNewLogin = require('../../../context').useNewLogin
+
 describe('Landing', () => {
-  it('mounts without crashing', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  const renderLanding = () =>
     render(
       <MemoryRouter>
         <NewLoginProvider>
@@ -33,5 +53,47 @@ describe('Landing', () => {
         </NewLoginProvider>
       </MemoryRouter>,
     )
+
+  it('renders heading with the correct text', () => {
+    renderLanding()
+    expect(screen.getByText('Create Your Account')).toBeInTheDocument()
+  })
+
+  it('renders all role selection cards', () => {
+    renderLanding()
+    expect(screen.getByText('Teacher')).toBeInTheDocument()
+    expect(screen.getByText('Student')).toBeInTheDocument()
+    expect(screen.getByText('Parent')).toBeInTheDocument()
+  })
+
+  it('renders links with correct hrefs', () => {
+    renderLanding()
+    expect(screen.getByLabelText('Create Teacher Account')).toHaveAttribute(
+      'href',
+      ROUTES.REGISTER_TEACHER,
+    )
+    expect(screen.getByLabelText('Create Student Account')).toHaveAttribute(
+      'href',
+      ROUTES.REGISTER_STUDENT,
+    )
+    expect(screen.getByLabelText('Create Parent Account')).toHaveAttribute(
+      'href',
+      ROUTES.REGISTER_PARENT,
+    )
+  })
+
+  it('calls navigate function when a card is clicked', () => {
+    renderLanding()
+    const teacherCard = screen.getByLabelText('Create Teacher Account')
+    fireEvent.click(teacherCard)
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.REGISTER_TEACHER)
+  })
+
+  it('prevents navigation when a “ui action” is pending', () => {
+    mockUseNewLogin.mockReturnValueOnce({isUiActionPending: true})
+    renderLanding()
+    const teacherCard = screen.getByLabelText('Create Teacher Account')
+    fireEvent.click(teacherCard)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })
