@@ -220,6 +220,9 @@ function renderContentBaseOnAvailability(
             src={launchURL}
             data-testid="lti-external-tool"
             title={I18n.t('Tool content')}
+            allowFullScreen="true"
+            webkitallowfullscreen="true"
+            mozallowfullscreen="true"
           />
         )}
         {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
