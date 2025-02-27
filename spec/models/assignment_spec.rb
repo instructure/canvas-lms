@@ -12179,26 +12179,31 @@ describe Assignment do
     end
   end
 
-  describe "Horizon course limitations" do
+  describe "Horizon course assignment" do
     before :once do
       @course.account.enable_feature!(:horizon_course_setting)
       @course.horizon_course = true
       @course.save!
     end
 
-    it "does not accept group assignments" do
-      @assignment = assignment_model(submission_types: "online_text_entry", course: @course)
+    it "skips group assignments" do
+      @assignment = assignment_model(course: @course)
       group_category = @course.group_categories.create!(name: "Test Group Set")
       @assignment.group_category = group_category
-      expect { @assignment.save! }.to raise_error(ActiveRecord::RecordInvalid)
+      @assignment.save!
+      expect(@assignment.group_category).to be_nil
     end
 
-    it "does not accept invalid submission types" do
-      expect { assignment_model(submission_types: "online_url", course: @course) }.to raise_error(ActiveRecord::RecordInvalid)
+    it "converts invalid submission types" do
+      @assignment = assignment_model(submission_types: "online_url", course: @course)
+      expect(@assignment.submission_types).to eql("online_text_entry")
     end
 
-    it "does not accept peer reviews" do
-      expect { assignment_model(peer_reviews: true, course: @course) }.to raise_error(ActiveRecord::RecordInvalid)
+    it "skips assignment peer reviews" do
+      @assignment = assignment_model(peer_reviews: true, course: @course)
+      expect(@assignment.peer_reviews).to be false
+      expect(@assignment.peer_review_count).to eq 0
+      expect(@assignment.automatic_peer_reviews).to be false
     end
   end
 
