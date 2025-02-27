@@ -641,6 +641,73 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
           expect(assignment_override.assignment_override_students.pluck(:user_id)).to match_array(student_ids)
         end
       end
+
+      context "differentiation tags" do
+        before do
+          account = @topic.course.account
+          account.enable_feature!(:assign_to_differentiation_tags)
+          account.enable_feature!(:differentiation_tags)
+          account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = true
+            a.save!
+          end
+
+          @differentiation_tag_category = @topic.course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+          @diff_tag1 = @topic.course.groups.create!(name: "Diff Tag 1", group_category: @differentiation_tag_category, non_collaborative: true)
+        end
+
+        it "can create differentiation tag overrides and update them" do
+          due_at = 2.days.from_now
+          unlock_at = 0.days.from_now
+          lock_at = 2.days.from_now
+
+          # Create checkpoint with differentiation tag override for diff tag 1
+
+          checkpoint = creator_service.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "override", set_type: "Group", set_id: @diff_tag1.id, due_at:, unlock_at:, lock_at: }],
+            points_possible: 6
+          )
+
+          expect(checkpoint.assignment_overrides.count).to eq 1
+
+          assignment_override = checkpoint.assignment_overrides.first
+
+          expect(assignment_override.set_type).to eq "Group"
+          expect(assignment_override.set_id).to eq @diff_tag1.id
+          expect(assignment_override.due_at).to be_within(1.second).of(due_at)
+          expect(assignment_override.unlock_at).to be_within(1.second).of(unlock_at)
+          expect(assignment_override.lock_at).to be_within(1.second).of(lock_at)
+
+          parent_override = assignment_override.parent_override
+          expect(parent_override.unlock_at).to be_within(1.second).of(unlock_at)
+          expect(parent_override.lock_at).to be_within(1.second).of(lock_at)
+
+          # Updates checkpoint with differentiation tag override to set a new due date for diff tag 1.
+
+          new_due_at = 5.days.from_now
+          new_unlock_at = 3.days.from_now
+          new_lock_at = 5.days.from_now
+
+          updated_checkpoint = updater_service.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "override", id: assignment_override.id, set_type: "Group", set_id: @diff_tag1.id, due_at: new_due_at, unlock_at: new_unlock_at, lock_at: new_lock_at }],
+            points_possible: 6
+          )
+
+          expect(updated_checkpoint.assignment_overrides.count).to eq 1
+
+          updated_assignment_override = updated_checkpoint.assignment_overrides.first
+
+          expect(updated_assignment_override.set_type).to eq "Group"
+          expect(updated_assignment_override.set_id).to eq @diff_tag1.id
+          expect(updated_assignment_override.due_at).to be_within(1.second).of(new_due_at)
+          expect(updated_assignment_override.unlock_at).to be_within(1.second).of(new_unlock_at)
+          expect(updated_assignment_override.lock_at).to be_within(1.second).of(new_lock_at)
+        end
+      end
     end
   end
 end
