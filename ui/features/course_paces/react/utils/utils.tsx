@@ -120,14 +120,22 @@ export const getItemsDurationFromTimeToComplete = (
     return { duration: 0, remainder: 0 }
   }
 
+  const blackOutDaysObject = blackOutDays.map((blackOutDay) => {
+    return {
+        ...blackOutDay,
+        start_date: moment(blackOutDay.start_date).utc().endOf('day'),
+        end_date: moment(blackOutDay.end_date).utc().endOf('day')}
+      }
+    )
+
   const startDate = DateHelpers.addDays(
     coursePace.start_date,
     1,
     coursePace.exclude_weekends,
     coursePace.selected_days_to_skip,
-    blackOutDays
+    blackOutDaysObject
   )
-  const endDate = moment(coursePace.start_date).add(calendarDays, 'days').endOf('day')
+  const endDate = moment(coursePace.start_date).add(calendarDays, 'days').utc().endOf('day')
 
   if (moment(startDate).isAfter(endDate)) {
     return { duration: 0, remainder: 0 }
@@ -138,7 +146,7 @@ export const getItemsDurationFromTimeToComplete = (
     endDate,
     coursePace.exclude_weekends,
     coursePace.selected_days_to_skip,
-    blackOutDays,
+    blackOutDaysObject,
   )
 
   const itemsDuration = Math.floor(totalDuration / itemsLength)

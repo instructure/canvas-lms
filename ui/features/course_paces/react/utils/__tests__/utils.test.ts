@@ -363,13 +363,13 @@ describe('utils', () => {
         exclude_weekends: false,
         selected_days_to_skip: []
       }
-      // Start date is ignored from calculation,
-      // Calendar days are 11, then 11 / 3 = 3 and 11 % 3 = 2
-      // Then, duration: 3, reminder: 2
+      // Calendar days are 11 and Start date is ignored from calculation,
+      // Then 10 / 3 = 3 and 10 % 3 = 1
+      // Then, duration: 3, reminder: 1
 
       const result = getItemsDurationFromTimeToComplete(newCoursePace, [], 11, 3)
       expect(result.duration).toEqual(3)
-      expect(result.remainder).toEqual(2)
+      expect(result.remainder).toEqual(1)
     })
 
     it('return durations with skipped days', () => {
@@ -421,8 +421,8 @@ describe('utils', () => {
         exclude_weekends: true,
         selected_days_to_skip: []
       }
-      // Start date is ignored from calculation,
-      // Start date is 2021-09-01, Calendar days are 11, so end date is 2021-09-11
+      // Start date is 2021-09-01 and is ignored from calculation,
+      // Calendar days are 11, Then end date is 2021-09-11
       // excluding Sundays and Saturdays
       // Total duration is 7 days, so 7 / 3 = 2 and 7 % 3 = 1
       // duration: 2, reminder: 1
@@ -451,12 +451,12 @@ describe('utils', () => {
       // Start date is ignored from calculation,
       // Start date is 2021-09-01, Calendar days are 11, so end date is 2021-09-11
       // days from 2021-09-06 to 2021-09-08 are blacked out
-      // Total duration is 9 days, so 9 / 3 = 2 and 9 % 3 = 0
+      // Total duration is 8 days, so 8 / 3 = 2 and 8 % 3 = 2
       // duration: 2, reminder: 2
 
       const result = getItemsDurationFromTimeToComplete(newCoursePace, blackoutDates, 11, 3)
-      expect(result.duration).toEqual(3)
-      expect(result.remainder).toEqual(0)
+      expect(result.duration).toEqual(2)
+      expect(result.remainder).toEqual(2)
     })
   })
 })
