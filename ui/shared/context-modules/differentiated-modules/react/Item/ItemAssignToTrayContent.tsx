@@ -316,7 +316,12 @@ const ItemAssignToTrayContent = ({
         let pageCount = 0
         let args: DoFetchApiOpts = {
           path: url,
-          params: {per_page: 100},
+          params: {
+            per_page: 100,
+            ...itemType === 'discussion_topic' && {
+              include: ''
+            }
+          },
         }
         while (url && pageCount < MAX_PAGES) {
           // @ts-expect-error
