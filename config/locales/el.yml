@@ -1635,6 +1635,7 @@ el:
   add_icon_567dbcaa: "προσθήκη εικονιδίου"
   add_link_5c01c1e8: "Προσθήκη Συνδέσμου"
   add_link_fc336ed6: "Προσθήκη συνδέσμου"
+  add_login_f871148: "Προσθήκη Σύνδεσης"
   add_moderator_review_copy_1st_a484c813: "Προσθήκη Αξιολόγησης Συντονιστή (Αντιγραφή 1ης)"
   add_moderator_review_copy_2nd_e80d458f: "Προσθήκη Αξιολόγησης Συντονιστή (Αντιγραφή 2ης)"
   add_moderator_review_new_3c183cea: "Προσθήκη Αξιολόγησης Συντονιστή (Νέα)"
@@ -11752,6 +11753,7 @@ el:
       update_question_without_regrading: "Ενημέρωση ερώτησης χωρίς αναβαθμολόγηση"
   quiz_40ee61b1: κουίζ
   quiz_e0dcce8f: Κουίζ
+  quiz_instructions_a36d09c9: "Οδηγίες Κουίζ"
   quiz_log_auditing: 
     buttons: 
       reload_events: Επαναφόρτωση
@@ -13291,6 +13293,7 @@ el:
   save_login_bba1272: "Αποθήκευση Σύνδεσης"
   save_settings_cafe79a5: "Αποθήκευση Ρυθμίσεων"
   save_skype_name_4de35a9: "Αποθήκευση Ονόματος Skype"
+  save_successful_b2f64da4: "Επιτυχής αποθήκευση"
   saving_d55dd90e: Αποθήκευση...
   saving_recording_e111cb05: "Αποθήκευση Ηχογράφησης..."
   schedule_student_availability_332154a: "Προγραμματισμός της διαθεσιμότητας σπουδαστή"
@@ -13403,6 +13406,7 @@ el:
     all_courses_inner: 
       join_course: "Συμμετοχή σε αυτό το Μάθημα"
       next: Επόμενη
+      no_courses_found: "Δεν βρέθηκαν μαθήματα"
       previous: Προηγούμενο
     course_sections: "Τομείς Μαθήματος"
     enrollments_observers: Παρατηρητές
@@ -15304,6 +15308,7 @@ el:
   update_4d8ee62: Ενημέρωση
   update_details_6abfed16: "Ενημέρωση Λεπτομερειών"
   update_grade_b47eb3ff: "Ενημέρωση Βαθμού"
+  update_login_472cd6db: "Ενημέρωση Σύνδεσης"
   update_module_b984c2e5: "Ενημέρωση Αρθρώματος"
   update_password_4bc5cb1f: "Ενημέρωση Κωδικού Πρόσβασης"
   update_quota_81381226: "Ενημέρωση Ποσόστωσης"
