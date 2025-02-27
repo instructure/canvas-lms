@@ -55,7 +55,7 @@
       <% if @assignment.vericite_enabled? %>
         <%= render :partial => "vericite" %>
       <% end %>
-      <%= render partial: 'assignments/eula_checkbox', locals: { eula_url: eula_url } %>
+      <%= render partial: 'assignments/eula_checkbox', locals: { eula_url: eula_url, type: 'text_entry' } %>
       <tr>
         <td class='button-container'>
           <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
