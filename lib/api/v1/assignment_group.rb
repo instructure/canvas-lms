@@ -53,7 +53,7 @@ module Api::V1::AssignmentGroup
       end
       
       # Always preload context_module_tags to avoid N+1 queries in context_tag_id
-      ContentTag.preload_for_collection(assignments, :context_module_tags) unless assignments.empty?
+      ActiveRecord::Associations::Preloader.new.preload(assignments, :context_module_tags) unless assignments.empty?
 
       unless opts[:exclude_response_fields].include?('in_closed_grading_period')
         closed_grading_period_hash = opts[:closed_grading_period_hash] ||
