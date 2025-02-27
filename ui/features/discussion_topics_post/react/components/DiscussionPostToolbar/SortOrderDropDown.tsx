@@ -78,6 +78,7 @@ const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({ isLocked, select
               id={viewOption}
               key={viewOption}
               value={viewOption}
+              renderBeforeLabel={viewOption === actualSortType ? <IconCheckLine /> : <span />}
             >
               {viewOptionLabel()}
             </SimpleSelect.Option>

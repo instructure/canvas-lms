@@ -47,6 +47,7 @@ import {breakpointsShape} from '@canvas/with-breakpoints'
 import {Drilldown} from '@instructure/ui-drilldown'
 import {getGroupDiscussionUrl} from '../../utils'
 import AiIcon from '@canvas/ai-icon'
+import SortOrderDropDown from './SortOrderDropDown'
 
 const I18n = createI18nScope('discussions_posts')
 
@@ -74,6 +75,48 @@ const DiscussionPostButtonsToolbar = props => {
         <GroupsMenu width="10px" childTopics={props.childTopics} />
       </span>
     )
+
+  const renderSort = () => {
+    if (props.discDefaultSortEnabled) {
+      return (
+        <SortOrderDropDown
+          isLocked={props.isSortOrderLocked}
+          selectedSortType={props.sortDirection}
+          onSortClick={props.onSortClick}
+        />
+      )
+    }
+    return (
+      <Tooltip
+        renderTip={props.sortDirection === 'desc' ? I18n.t('Newest First') : I18n.t('Oldest First')}
+        width="78px"
+        data-testid="sortButtonTooltip"
+      >
+        <span className="discussions-sort-button">
+          <Button
+            style={{width: '100%'}}
+            display="block"
+            onClick={props.onSortClick}
+            renderIcon={
+              props.sortDirection === 'desc' ? (
+                <IconArrowDownLine data-testid="DownArrow" />
+              ) : (
+                <IconArrowUpLine data-testid="UpArrow" />
+              )
+            }
+            data-testid="sortButton"
+          >
+            {I18n.t('Sort')}
+            <ScreenReaderContent>
+              {props.sortDirection === 'asc'
+                ? I18n.t('Sorted by Ascending')
+                : I18n.t('Sorted by Descending')}
+            </ScreenReaderContent>
+          </Button>
+        </span>
+      </Tooltip>
+    )
+  }
 
   const renderSplitScreen = () =>
     !isSpeedGraderInTopUrl && (
@@ -232,15 +275,28 @@ const DiscussionPostButtonsToolbar = props => {
     const drillDownOptions = createDrillDownOptions()
     const buttonsDesktop = [
       renderButtonDrillDown(drillDownOptions),
+      renderSort(),
       renderSplitScreen(),
       renderExpandsThreads(),
       renderAvatar(),
       renderAssignToButton(),
     ]
-
-    const buttonsMobile = ENV.current_user_is_student
-      ? [renderExpandsThreads(), renderGroup()]
-      : [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions)]
+    
+    const buttonsMobile = () => {
+      if (window.ENV?.FEATURES?.discussion_default_sort) {
+        if (ENV.current_user_is_student) {
+          return [renderExpandsThreads(), renderGroup()];
+        } else {
+          return [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions)];
+        }
+      } else {
+        if (ENV.current_user_is_student) {
+          return [renderExpandsThreads(), renderSort(), renderGroup()];
+        } else {
+          return [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions), renderSort()];
+        }
+      }
+    }
 
     const padding = props.breakpoints.mobileOnly ? 'xx-small' : 'xxx-small'
 
