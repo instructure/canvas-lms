@@ -21,7 +21,7 @@ import {
   Constants as CoursePaceItemConstants,
   type CoursePaceItemAction,
 } from '../actions/course_pace_items'
-import { calculatePaceItemDuration, getItemsDurationFromTimeToComplete } from '../utils/utils'
+import { calculatePaceItemDuration } from '../utils/utils'
 
 /* Reducers */
 
