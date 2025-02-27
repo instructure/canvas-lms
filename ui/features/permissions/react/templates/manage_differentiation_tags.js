@@ -30,7 +30,16 @@ export const template = generateActionTemplates(
   ],
   [
     {
-      description: I18n.t('Allows user to manage differentiated tags.'),
+      title: I18n.t('Overview'),
+      description: I18n.t(
+        'These permissions control the ability to create, edit, and delete differentiation tags.',
+      ),
+    },
+    {
+      title: I18n.t('Warning'),
+      description: I18n.t(
+        'If any of these permissions are granted to a user role, that role will be able to view and access data about differentiation tags.',
+      ),
     },
   ],
   [
