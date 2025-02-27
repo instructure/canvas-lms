@@ -78,7 +78,13 @@ const I18n = createI18nScope('quizzes_public')
 const QUESTIONS_NUMBER = 'questions_number'
 const QUESTION_POINTS = 'question_points'
 
-let dueDateList, overrideView, masteryPathToggle, quizModel, sectionList, correctAnswerVisibility, scoreValidation
+let dueDateList,
+  overrideView,
+  masteryPathToggle,
+  quizModel,
+  sectionList,
+  correctAnswerVisibility,
+  scoreValidation
 
 RichContentEditor.preloadRemoteModule()
 
@@ -149,10 +155,14 @@ const renderDueDates = lockedItems => {
 
     overrideView.render()
 
-    if (ENV.IN_PACED_COURSE && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths) {
+    if (
+      ENV.IN_PACED_COURSE &&
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+      ENV.FEATURES.course_pace_pacing_with_mastery_paths
+    ) {
       masteryPathToggle = window.masteryPathToggle = new MasteryPathToggleView({
         el: '.js-assignment-overrides-mastery-paths',
-        model: dueDateList
+        model: dueDateList,
       })
 
       masteryPathToggle.render()
@@ -524,6 +534,13 @@ export const quiz = (window.quiz = {
         },
         () => {
           quiz.rebindMultiChange(questionType, $questionContent[0].id, $select)
+          $('.question-text')
+            .find('iframe')
+            .contents()
+            .find('body')
+            .on('input', () => {
+              restoreOriginalMessage($('.question-text'))
+            })
         },
       )
       $form
@@ -1294,22 +1311,22 @@ scoreValidation = {
           I18n.t(
             'errors.quiz_score_not_a_number',
             'Score must be a number between 0 and 2,000,000,000.',
-          )
+          ),
         )
       })
       .on('invalid:greater_than', function () {
         renderError(
           $inputField,
-          I18n.t('errors.quiz_score_too_short', 'Score must be greater than 0.')
+          I18n.t('errors.quiz_score_too_short', 'Score must be greater than 0.'),
         )
       })
       .on('invalid:less_than', function () {
         renderError(
           $inputField,
-          I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.')
+          I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.'),
         )
       })
-      .on('valid', function() {
+      .on('valid', function () {
         restoreOriginalMessage($inputField)
       })
       .on('change', () => this.validatePoints())
@@ -1437,7 +1454,7 @@ correctAnswerVisibility = {
         I18n.t(
           'errors.invalid_show_correct_answers_range',
           'Hide date cannot be before show date.',
-        )
+        ),
       )
 
       return true
@@ -1986,7 +2003,7 @@ function renderQuestionGroupError(inputName, message, form) {
   inputMessageText
     .attr({
       'aria-live': 'polite',
-      'aria-atomic': 'true'
+      'aria-atomic': 'true',
     })
     .text(message)
   inputMessageText.addClass('error_text')
@@ -2185,7 +2202,7 @@ ready(function () {
         erratic = true
         renderError(
           $('.ip-filter'),
-          I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address')
+          I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address'),
         )
       }
     }
@@ -2195,7 +2212,7 @@ ready(function () {
         erratic = true
         renderError(
           $('.access-code'),
-          I18n.t('errors.missing_access_code', 'You must enter an access code')
+          I18n.t('errors.missing_access_code', 'You must enter an access code'),
         )
       }
     }
@@ -2231,6 +2248,10 @@ ready(function () {
 
   $('#quiz_ip_filter').on('input', function () {
     restoreOriginalMessage($('.ip-filter'))
+  })
+
+  $('#question_points').on('input', function () {
+    restoreOriginalMessage($('.question_points_holder'))
   })
 
   $('#quiz_require_lockdown_browser').change(function () {
@@ -2337,7 +2358,7 @@ ready(function () {
         if (isNaN($attemptsVal)) {
           renderError(
             $inputField,
-            I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers')
+            I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers'),
           )
           $attempts.val('')
         } else if ($attemptsVal.length > 3) {
@@ -2346,7 +2367,7 @@ ready(function () {
             I18n.t(
               'quiz_attempts_length_error',
               'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left',
-            )
+            ),
           )
           $attempts.val('')
         } else {
@@ -2402,7 +2423,7 @@ ready(function () {
       if (validationHelper.nameTooLong()) {
         renderError(
           $('.title'),
-          I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})
+          I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1}),
         )
         return false
       }
@@ -2476,7 +2497,6 @@ ready(function () {
           return false
         }
       }
-
 
       const serializingEvent = $.Event('serializing')
 
@@ -2919,6 +2939,9 @@ ready(function () {
   $('#question_form_template .cancel_link').click(function (event) {
     const $displayQuestion = $(this).parents('form').prev()
     const isNew = $displayQuestion.attr('id') === 'question_new'
+
+    restoreOriginalMessage($('.question_points_holder'))
+    restoreOriginalMessage($('.question-text'))
 
     event.preventDefault()
 
@@ -3895,10 +3918,36 @@ ready(function () {
 
     questionData.question_points = numberHelper.parse(questionData.question_points)
     if (questionData.question_points && questionData.question_points < 0) {
-      $form
-        .find("input[name='question_points']")
-        .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
+      renderError(
+        $('.question_points_holder'),
+        I18n.t('question.positive_points', 'Must be zero or greater'),
+      )
+      
+      // Focus on the question points input
+      $('.question_points_holder').find('input').focus(150)
       return
+    } else {
+      restoreOriginalMessage($('.question_points_holder'))
+    }
+
+    // This is not ideal, but our only way to ensure the validation error gets displayed before
+    // closing the panel. Additionally, this will take HTML tags into account in the length check,
+    // but that's also the case when validated on the backend.
+    const MAX_QUESTION_TEXT_LENGTH = 16_384
+
+    if (questionData.question_text.length > MAX_QUESTION_TEXT_LENGTH) {
+      renderError(
+        $('.question-text'),
+        I18n.t(
+          'question.question_text_too_long',
+          'Question text is too long, max length is 16384 characters',
+        ),
+      )
+
+      $('.question-text').find('iframe').get(0).contentDocument.body.focus()
+      return
+    } else {
+      restoreOriginalMessage($('.question-text'))
     }
 
     questionData.assessment_question_bank_id = $('.question_bank_id').text() || ''
@@ -3906,10 +3955,10 @@ ready(function () {
     let focused_element = null
     if (questionData.question_type === 'calculated_question') {
       if ($form.find('.combinations_holder .combinations tbody tr').length === 0) {
-        focused_element = $form.find('input[name="min"].float_value.min.variable_setting:visible');
+        focused_element = $form.find('input[name="min"].float_value.min.variable_setting:visible')
         // if no element is visible set the focus on the RCE
         if (focused_element.length === 0 && $form.find('iframe').length > 0) {
-          focused_element =  $form.find('iframe').get(0).contentDocument.body
+          focused_element = $form.find('iframe').get(0).contentDocument.body
         }
         error_text = I18n.t(
           'errors.no_possible_solution',
@@ -3943,7 +3992,7 @@ ready(function () {
       }
       if (questionData.question_type === 'fill_in_multiple_blanks_question') {
         const $variables = $form.find('.blank_id_select > option')
-        $variables.each((i) => {
+        $variables.each(i => {
           let blankCount = 0
 
           $answers.filter('.answer_idx_' + i).each((i, element) => {
