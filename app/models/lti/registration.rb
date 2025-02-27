@@ -32,6 +32,7 @@ class Lti::Registration < ActiveRecord::Base
 
   # If this tool has been installed via dynamic registration, it will have an ims_registration.
   has_one :ims_registration, class_name: "Lti::IMS::Registration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
+  has_many :context_external_tool, inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
   has_one :developer_key, inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
