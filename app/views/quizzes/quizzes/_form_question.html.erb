@@ -42,10 +42,17 @@
       <option value="file_upload_question"><%= t('question_type.file_upload', "File Upload Question") %></option>
       <option value="text_only_question"><%= t('question_type.text_only', "Text (no question)") %></option>
     </select>
-    <span class="question_points_holder">
-      <span style="padding-<%= direction('left') %>: 20px;"><%= before_label :points, 'pts' %></span>
-      <input class="float_value" type="text" style="width: 25px; min-width: 0;" name="question_points" aria-label="<%= t "label.question.points", "Question point value" %>" <%= 'readonly' if points_are_locked %>/>
-    </span>
+    <div class="question_points_holder form-control form-control--right-aligned">
+      <div class="form-control__wrapper">
+        <label for="question_points" class="form-control__label" style="padding-<%= direction('left') %>: 20px;"><%= before_label :points, 'pts' %></label>
+        <input aria-describedby="question_points_message" class="float_value form-control__input" id="question_points" type="text" style="width: 25px; min-width: 0;" name="question_points" aria-label="<%= t "label.question.points", "Question point value" %>" <%= 'readonly' if points_are_locked %>/>
+      </div>
+
+      <div class="form-control__message input-message__container hidden" style="padding-<%= direction('left') %>: 20px;">
+        <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+        <span id="question_points_message" class="input-message__text"></span>
+      </div>
+    </div>
   </div>
   <div class="links">
   </div>
@@ -125,8 +132,15 @@
       <%= t('explanations.multi_answer_sets', "In the box below, every place you want to show an answer box, type a reference word (no spaces) surrounded by brackets") %><br/>
       (<%= t(:multi_answer_sets_example, 'i.e. "Roses are [color1], violets are [color2]"') %>)
     </div>
-    <div style="text-align: center;">
-      <textarea style="width: 90%; height: 120px;" class="question_content" name="question_text"></textarea>
+    <div class="form-control question-text" style="text-align: center;">
+      <div id="#question_text_message">
+        <textarea style="width: 90%; height: 120px;" class="question_content form-control__input" name="question_text" aria-describedby="question_text_message"></textarea>
+      </div>
+
+      <div class="form-control__message input-message__container input-message__container--with-bottom-margin hidden">
+        <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+        <span id="question_text_message" class="input-message__text"></span>
+      </div>
     </div>
     <b tabindex="0" role="heading" class="answers_header"><%= before_label(:answers, "Answers") %></b>
     <div id="answers_warning_alert_box" class="alert alert hidden answers_warning" role="alert">

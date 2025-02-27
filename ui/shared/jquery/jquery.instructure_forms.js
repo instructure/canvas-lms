@@ -1125,7 +1125,7 @@ $.fn.formErrors = function (data_errors, options) {
     }
     errorDetails[name] = {object: $obj, message: msg}
     hasErrors = true
-    if (!options ||  !options.disableErrorBox) {
+    if (!options || !options.disableErrorBox) {
       const offset = $obj.errorBox(raw(msg)).offset()
       if (offset.top > highestTop) {
         highestTop = offset.top
