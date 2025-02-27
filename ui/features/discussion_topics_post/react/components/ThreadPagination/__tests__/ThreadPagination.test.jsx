@@ -18,7 +18,10 @@
 
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import {ThreadPagination} from '../ThreadPagination'
+import {ThreadPagination, NAV_BAR_HEIGHT} from '../ThreadPagination'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+
 
 const defaultProps = overrides => ({
   setPage: jest.fn(),
@@ -40,5 +43,80 @@ describe('ThreadPagination', () => {
 
     fireEvent.click(getByText('10'))
     expect(props.setPage).toHaveBeenCalledWith(9)
+  })
+
+  describe('adjust style is nav bar is present', () => {
+    const expectedNavBarHeightPx = `${NAV_BAR_HEIGHT}px`
+    const expectedZeroHeightPx = '0px'
+
+    const setEmbedQueryParam = (paramValue = 'true') => {
+      const url = new URL(window.location.href)
+      url.searchParams.set('embed', paramValue)
+      window.history.pushState({}, '', url)
+    }
+
+    const deleteEmbedParam = () => {
+      const url = new URL(window.location.href)
+      url.searchParams.delete('embed')
+      window.history.pushState({}, '', url)
+    }
+
+    const renderPaginationSection = () => {
+      const {container} = render(<ThreadPagination {...defaultProps()} />)
+      return container.querySelector('.discussion-pagination-section')
+    }
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    describe('when ENV.SEQUENCE is enabled and NOT in embed mode', () => {
+      beforeEach(() => {
+        fakeENV.setup({SEQUENCE: true})
+        deleteEmbedParam()
+      })
+
+      it('should adjust paddingBottom based on the NAV_BAR_HEIGHT', () => {
+        expect(renderPaginationSection().style.paddingBottom).toBe(expectedNavBarHeightPx)
+      })
+
+      it('should adjust paddingBottom if embed flag is not true', () => {
+        setEmbedQueryParam('false')
+        expect(renderPaginationSection().style.paddingBottom).toBe(expectedNavBarHeightPx)
+      })
+    })
+
+    describe('when ENV.SEQUENCE is enabled and in embed mode', () => {
+      beforeEach(() => {
+        fakeENV.setup({SEQUENCE: true})
+        setEmbedQueryParam()
+      })
+
+      it('should not adjust paddingBottom', () => {
+        expect(renderPaginationSection().style.paddingBottom).toBe(expectedZeroHeightPx)
+      })
+    })
+
+    describe('when ENV.SEQUENCE is NOT enabled and NOT in embed mode', () => {
+      beforeEach(() => {
+        fakeENV.setup({SEQUENCE: false})
+        deleteEmbedParam()
+      })
+
+      it('should not adjust paddingBottom', () => {
+        expect(renderPaginationSection().style.paddingBottom).toBe(expectedZeroHeightPx)
+      })
+    })
+
+    describe('when ENV.SEQUENCE is NOT enabled and in embed mode', () => {
+      beforeEach(() => {
+        fakeENV.setup({SEQUENCE: false})
+        setEmbedQueryParam()
+      })
+
+      it('should not adjust paddingBottom', () => {
+        expect(renderPaginationSection().style.paddingBottom).toBe(expectedZeroHeightPx)
+      })
+    })
   })
 })
