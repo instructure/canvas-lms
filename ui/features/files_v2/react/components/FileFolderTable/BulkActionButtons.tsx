@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useState, useMemo} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
@@ -30,6 +30,7 @@ import {
   IconPermissionsLine,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import DeleteModal from './DeleteModal'
 import {type File, type Folder} from '../../../interfaces/File'
@@ -37,6 +38,7 @@ import {getUniqueId} from '../../../utils/fileFolderUtils'
 import {downloadZip} from '../../../utils/downloadUtils'
 import MoveModal from './MoveModal'
 import UsageRightsModal from './UsageRightsModal'
+import DisabledActionsInfoButton from './DisabledActionsInfoButton'
 
 const I18n = createI18nScope('files_v2')
 
@@ -61,6 +63,22 @@ const BulkActionButtons = ({
     'delete' | 'move-to' | 'manage-usage-rights' | null
   >(null)
   const isEnabled = selectedRows.size >= 1
+
+  const containsLockedBPItems = useMemo(
+    () =>
+      rows.some(
+        row =>
+          selectedRows.has(getUniqueId(row)) &&
+          !row.is_master_course_master_content &&
+          row.restricted_by_master_course,
+      ),
+    [rows, selectedRows],
+  )
+  const containsFolders = useMemo(
+    () => Array.from(selectedRows).some(itemId => /^[0-9]+$/.test(itemId)),
+    [selectedRows],
+  )
+
   const selectedText = !isEnabled
     ? I18n.t('0 selected')
     : I18n.t('%{selected} of %{total} selected', {selected: selectedRows.size, total: totalRows})
@@ -95,100 +113,137 @@ const BulkActionButtons = ({
     [modalOrTray, onDismissModalOrTray, selectedItems],
   )
 
+  const getTooltipText = useCallback((): string | undefined => {
+    if (!isEnabled) {
+      return I18n.t('This functionality is disabled until you select an item')
+    } else if (containsLockedBPItems) {
+      return I18n.t('This functionality is disabled because your selection includes locked items')
+    } else {
+      return
+    }
+  }, [isEnabled, containsLockedBPItems])
+
+  const renderTooltip = (child: React.ReactNode, disabled: boolean) => {
+    // only render the tool tip if the action is disabled
+    if (disabled) {
+      return (
+        <Tooltip renderTip={getTooltipText()} on={['hover', 'focus']}>
+          {child}
+        </Tooltip>
+      )
+    } else {
+      return child
+    }
+  }
+
   return (
     <>
       <Flex gap="small" justifyItems={justifyItems}>
         <Flex.Item>
           <Text>{selectedText}</Text>
         </Flex.Item>
+        <DisabledActionsInfoButton />
         <Flex.Item>
           <Flex gap="small">
             <Flex.Item>
-              <IconButton
-                disabled={!isEnabled}
-                renderIcon={<IconDownloadLine />}
-                screenReaderLabel={I18n.t('Download')}
-                onClick={handleDownload}
-              />
+              {renderTooltip(
+                <IconButton
+                  disabled={!isEnabled}
+                  renderIcon={<IconDownloadLine />}
+                  screenReaderLabel={I18n.t('Download')}
+                  onClick={handleDownload}
+                />,
+                !isEnabled,
+              )}
             </Flex.Item>
             {userCanDeleteFilesForContext && (
               <Flex.Item>
-                <IconButton
-                  data-testid="bulk-actions-delete-button"
-                  disabled={!isEnabled}
-                  renderIcon={<IconTrashLine />}
-                  screenReaderLabel={I18n.t('Delete')}
-                  onClick={() => setModalOrTray('delete')}
-                />
+                {renderTooltip(
+                  <IconButton
+                    data-testid="bulk-actions-delete-button"
+                    disabled={!isEnabled || containsLockedBPItems}
+                    renderIcon={<IconTrashLine />}
+                    screenReaderLabel={I18n.t('Delete')}
+                    onClick={() => setModalOrTray('delete')}
+                  />,
+                  !isEnabled || containsLockedBPItems,
+                )}
               </Flex.Item>
             )}
-            <Flex.Item>
-              <Menu
-                placement="bottom"
-                trigger={
-                  <IconButton
-                    renderIcon={<IconMoreLine />}
-                    disabled={!isEnabled}
-                    screenReaderLabel={I18n.t('Actions')}
-                    data-testid="bulk-actions-more-button"
-                  />
-                }
-              >
-                <Menu.Item>
-                  <Flex alignItems="center" gap="x-small">
-                    <Flex.Item>
-                      <IconEyeLine inline={false} />
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Text>{I18n.t('View')}</Text>
-                    </Flex.Item>
-                  </Flex>
-                </Menu.Item>
-
-                {userCanEditFilesForContext && (
-                  <Menu.Item data-testid="bulk-actions-edit-permissions-button">
+            {renderTooltip(
+              <Flex.Item>
+                <Menu
+                  placement="bottom"
+                  trigger={
+                    <IconButton
+                      renderIcon={<IconMoreLine />}
+                      disabled={!isEnabled}
+                      screenReaderLabel={I18n.t('Actions')}
+                      data-testid="bulk-actions-more-button"
+                    />
+                  }
+                >
+                  <Menu.Item disabled={containsFolders} data-testid="bulk-actions-view-button">
                     <Flex alignItems="center" gap="x-small">
                       <Flex.Item>
-                        <IconPermissionsLine inline={false} />
+                        <IconEyeLine inline={false} />
                       </Flex.Item>
                       <Flex.Item>
-                        <Text>{I18n.t('Edit Permissions')}</Text>
+                        <Text>{I18n.t('View')}</Text>
                       </Flex.Item>
                     </Flex>
                   </Menu.Item>
-                )}
-                {userCanEditFilesForContext && (
-                  <Menu.Item
-                    data-testid="bulk-actions-manage-usage-rights-button"
-                    onClick={() => setModalOrTray('manage-usage-rights')}
-                  >
-                    <Flex alignItems="center" gap="x-small">
-                      <Flex.Item>
-                        <IconCloudLockLine inline={false} />
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Text>{I18n.t('Manage Usage Rights')}</Text>
-                      </Flex.Item>
-                    </Flex>
-                  </Menu.Item>
-                )}
-                {userCanEditFilesForContext && (
-                  <Menu.Item
-                    data-testid="bulk-actions-move-button"
-                    onClick={() => setModalOrTray('move-to')}
-                  >
-                    <Flex alignItems="center" gap="x-small">
-                      <Flex.Item>
-                        <IconExpandItemsLine inline={false} />
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Text>{I18n.t('Move To...')}</Text>
-                      </Flex.Item>
-                    </Flex>
-                  </Menu.Item>
-                )}
-              </Menu>
-            </Flex.Item>
+                  {userCanEditFilesForContext && (
+                    <Menu.Item
+                      disabled={containsLockedBPItems}
+                      data-testid="bulk-actions-edit-permissions-button"
+                    >
+                      <Flex alignItems="center" gap="x-small">
+                        <Flex.Item>
+                          <IconPermissionsLine inline={false} />
+                        </Flex.Item>
+                        <Flex.Item>
+                          <Text>{I18n.t('Edit Permissions')}</Text>
+                        </Flex.Item>
+                      </Flex>
+                    </Menu.Item>
+                  )}
+                  {userCanEditFilesForContext && (
+                    <Menu.Item
+                      disabled={containsFolders || containsLockedBPItems}
+                      data-testid="bulk-actions-manage-usage-rights-button"
+                      onClick={() => setModalOrTray('manage-usage-rights')}
+                    >
+                      <Flex alignItems="center" gap="x-small">
+                        <Flex.Item>
+                          <IconCloudLockLine inline={false} />
+                        </Flex.Item>
+                        <Flex.Item>
+                          <Text>{I18n.t('Manage Usage Rights')}</Text>
+                        </Flex.Item>
+                      </Flex>
+                    </Menu.Item>
+                  )}
+                  {userCanEditFilesForContext && (
+                    <Menu.Item
+                      disabled={containsLockedBPItems}
+                      data-testid="bulk-actions-move-button"
+                      onClick={() => setModalOrTray('move-to')}
+                    >
+                      <Flex alignItems="center" gap="x-small">
+                        <Flex.Item>
+                          <IconExpandItemsLine inline={false} />
+                        </Flex.Item>
+                        <Flex.Item>
+                          <Text>{I18n.t('Move To...')}</Text>
+                        </Flex.Item>
+                      </Flex>
+                    </Menu.Item>
+                  )}
+                </Menu>
+              </Flex.Item>,
+              !isEnabled,
+            )}
           </Flex>
         </Flex.Item>
       </Flex>
