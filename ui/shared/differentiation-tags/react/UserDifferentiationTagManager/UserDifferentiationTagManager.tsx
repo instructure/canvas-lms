@@ -132,14 +132,26 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { mutate, isLoading: isAdding, isSuccess, isError, error: errorAdd, } = useAddTagMembership()
   const handleMenuSelection: HandleMenuSelection = (e, selected) => {
-    if(selected && Array.isArray(selected) && selected.length > 0 && selected[0]) {
-      if(users.length > 0)
-        mutate({groupId: selected[0], userIds: users})
-      else
-        $.flashError(I18n.t('Select one or more users first'))
+    if (users.length === 0 && selected !== -1) {
+      $.flashError(I18n.t('Select one or more users first'))
+      return
     }
-    else if(selected === -1)
-      setIsModalOpen(true)
+
+    if (Array.isArray(selected)) {
+      if (selected.length > 0 && selected[0]) {
+        // Directly use the first element as groupId
+        mutate({groupId: selected[0], userIds: users})
+      }
+      return
+    }
+
+    if (typeof selected === 'number') {
+      if (selected === -1) {
+        setIsModalOpen(true)
+      } else if (selected > 0) {
+        mutate({groupId: selected, userIds: users})
+      }
+    }
   }
 
   const onTrayClose = () => {
