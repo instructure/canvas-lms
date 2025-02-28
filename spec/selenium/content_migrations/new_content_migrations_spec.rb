@@ -31,6 +31,9 @@ end
 def select_migration_type(type = nil)
   type ||= @type
   NewContentMigrationPage.migration_type_dropdown.click
+  Selenium::WebDriver::Wait.new(timeout: 5).until do
+    NewContentMigrationPage.migration_type_dropdown.attribute("aria-expanded") == "true"
+  end
   NewContentMigrationPage.migration_type_option_by_id(type).click
 end
 
@@ -43,7 +46,6 @@ def select_migration_file(opts = {})
 end
 
 def fill_migration_form(opts = {})
-  select_migration_type("empty") unless opts[:type] == "empty"
   select_migration_type(opts[:type])
   select_migration_file(opts)
 end
@@ -117,16 +119,16 @@ describe "content migrations", :non_parallel do
     NewContentMigrationPage.select_content_button.click
 
     # Expand learning outcomes
-    SelectContentPage.outcome_parent.click
+    NewSelectContentPage.outcome_parent.click
 
     # Expand first group
-    SelectContentPage.outcome_option_caret_by_name("group1").click
+    NewSelectContentPage.outcome_option_caret_by_name("group1").click
 
     # Select subgroup
-    SelectContentPage.outcome_option_checkbox_by_name("subgroup1").click
+    NewSelectContentPage.outcome_option_checkbox_by_name("subgroup1").click
 
     # Submit selection
-    SelectContentPage.submit_button.click
+    NewSelectContentPage.submit_button.click
     wait_for_ajax_requests
 
     source_course ? run_migration : import
@@ -667,15 +669,15 @@ describe "content migrations", :non_parallel do
 
     NewContentMigrationPage.select_content_button.click
     wait_for_ajaximations
-    SelectContentPage.module_parent.click
+    NewSelectContentPage.module_parent.click
     wait_for_ajaximations
-    SelectContentPage.module_option_caret_by_name("Your Mom, Research, & You").click
+    NewSelectContentPage.module_option_caret_by_name("Your Mom, Research, & You").click
     wait_for_ajaximations
-    SelectContentPage.module_option_checkbox_by_name("Study Guide").click
+    NewSelectContentPage.module_option_checkbox_by_name("Study Guide").click
     wait_for_ajaximations
-    SelectContentPage.import_as_standalone_module_switch_by_name("Study Guide").click
+    NewSelectContentPage.import_as_standalone_module_switch_by_name("Study Guide").click
     wait_for_ajaximations
-    SelectContentPage.submit_button.click
+    NewSelectContentPage.submit_button.click
     wait_for_ajaximations
 
     run_jobs

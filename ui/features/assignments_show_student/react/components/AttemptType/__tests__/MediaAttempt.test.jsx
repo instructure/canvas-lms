@@ -209,6 +209,45 @@ describe('MediaAttempt', () => {
     })
   })
 
+  describe('MediaPlayer', () => {
+    it('renders MediaPlayer', async () => {
+      const props = await makeProps({
+        Submission: {
+          mediaObject: {
+            _id: 'm-123456',
+            id: '1',
+            title: 'dope_vid.mov',
+            mediaTracks: [
+              {
+                _id: 1,
+                locale: 'en',
+                kind: 'captions',
+              },
+              {
+                _id: 2,
+                locale: 'es',
+                kind: 'captions',
+              },
+            ],
+          },
+          state: 'submitted',
+        },
+      })
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+      expect(getByTestId('media-recording')).toBeInTheDocument()
+    })
+
+    it('does not render MediaPlayer when mediaObject is null', async () => {
+      const props = await makeProps({
+        Submission: {
+          mediaObject: null,
+        },
+      })
+      const {queryByTestId} = render(<MediaAttempt {...props} />)
+      expect(queryByTestId('media-recording')).not.toBeInTheDocument()
+    })
+  })
+
   // This will crash given the media modal requires browser specifics
   // fwiw get a real browser or test with selenium
   // it('opens media modal when button is clicked', async () => {

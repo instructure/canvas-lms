@@ -45,7 +45,7 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 describe('ItemAssignToTray', () => {
-  let originalLocation = window.location
+  const originalLocation = window.location
   const props: ItemAssignToTrayProps = {
     open: true,
     onClose: () => {},
@@ -518,7 +518,7 @@ describe('ItemAssignToTray', () => {
       },
     )
     renderComponent({defaultCards: []})
-    expect(fetchMock.calls(OVERRIDES_URL).length).toBe(1)
+    expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(1)
   })
 
   it('calls customAddCard if passed when a card is added', () => {
@@ -968,10 +968,13 @@ describe('ItemAssignToTray', () => {
   describe('in a paced course', () => {
     beforeEach(() => {
       ENV.IN_PACED_COURSE = true
+      ENV.FEATURES ||= {}
+      ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
     })
 
     afterEach(() => {
       ENV.IN_PACED_COURSE = false
+      ENV.FEATURES.course_pace_pacing_with_mastery_paths = false
     })
 
     it('shows the course pacing notice', () => {
@@ -981,12 +984,32 @@ describe('ItemAssignToTray', () => {
 
     it('does not request existing overrides', () => {
       renderComponent()
-      expect(fetchMock.calls(OVERRIDES_URL).length).toBe(0)
+      expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(0)
     })
 
     it('does not fetch assignee options', () => {
       renderComponent()
-      expect(fetchMock.calls(SECTIONS_URL).length).toBe(0)
+      expect(fetchMock.calls(SECTIONS_URL)).toHaveLength(0)
+    })
+
+    describe('with mastery paths', () => {
+      beforeEach(() => {
+        ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+      })
+
+      afterEach(() => {
+        ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+      })
+
+      it('requests the existing overrides', () => {
+        renderComponent()
+        expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(1)
+      })
+
+      it('shows the mastery path toggle', () => {
+        const {getByTestId} = renderComponent()
+        expect(getByTestId('MasteryPathToggle')).toBeInTheDocument()
+      })
     })
   })
 
@@ -1070,14 +1093,14 @@ describe('ItemAssignToTray', () => {
     const {findAllByTestId} = renderComponent()
 
     await waitFor(async () => {
-      expect(fetchMock.calls(OVERRIDES_URL).length).toBe(1)
+      expect(fetchMock.calls(OVERRIDES_URL)).toHaveLength(1)
 
       expect(
-        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`).length,
-      ).toBe(1)
+        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`),
+      ).toHaveLength(1)
       expect(
-        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`).length,
-      ).toBe(1)
+        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`),
+      ).toHaveLength(1)
       const cards = await findAllByTestId('item-assign-to-card')
       expect(cards).toHaveLength(5)
     })

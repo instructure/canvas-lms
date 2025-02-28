@@ -19,6 +19,7 @@
 import {func, string} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import SubmissionCommentForm from './SubmissionCommentForm'
+import {Editor} from 'tinymce'
 
 const I18n = createI18nScope('gradebook')
 
@@ -30,14 +31,18 @@ export default class SubmissionCommentUpdateForm extends SubmissionCommentForm {
     updateSubmissionComment: func.isRequired,
   }
 
-  componentDidMount() {
-    this.focusTextarea()
+  initRCE(tinyeditor: Editor) {
+    this.tinyeditor = tinyeditor
+    this.rceRef.current?.focus()
+  }
+
+  componentDidMount(): void {
+    if (!this.isRceLiteEnabled()) this.focusTextarea()
   }
 
   commentHasChanged() {
     const comment = this.state.comment.trim()
-    // @ts-expect-error
-    return comment !== this.props.comment.trim()
+    return comment !== this.props.comment?.trim()
   }
 
   commentIsValid() {

@@ -16,35 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {type FC} from 'react'
 import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import StatusPill from './StatusPill'
 import {PENDING_ENROLLMENT, INACTIVE_ENROLLMENT} from '../../../util/constants'
-import type {Enrollment, EnrollmentState} from '../../types'
+import type {Enrollment, EnrollmentState} from '../../../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')
 
 export type UserLinkProps = {
-  uid: string,
-  avatarUrl: string,
-  name: string,
-  userUrl: string,
-  pronouns?: string,
-  avatarName: string,
+  uid: string
+  avatarUrl: string
+  name: string
+  htmlUrl: string
+  pronouns: string | null
   enrollments: Enrollment[]
 }
 
-const UserLink: React.FC<UserLinkProps> = ({
+const UserLink: FC<UserLinkProps> = ({
   uid,
   avatarUrl,
   name,
-  userUrl,
+  htmlUrl,
   pronouns,
-  avatarName,
   enrollments
 }) => {
   const renderPronouns = () => {
@@ -58,19 +56,19 @@ const UserLink: React.FC<UserLinkProps> = ({
 
   // Prioritize pending over inactive state
   let enrollmentState: EnrollmentState = undefined
-  if (enrollments.some(e => e.enrollment_state === PENDING_ENROLLMENT)) {
+  if (enrollments.some(e => e.state === PENDING_ENROLLMENT)) {
     enrollmentState = PENDING_ENROLLMENT
-  } else if (enrollments.some(e => e.enrollment_state === INACTIVE_ENROLLMENT)) {
+  } else if (enrollments.some(e => e.state === INACTIVE_ENROLLMENT)) {
     enrollmentState = INACTIVE_ENROLLMENT
   }
 
   return (
     <Flex as="div">
       <Flex.Item>
-        <Link href={userUrl} isWithinText={false}>
+        <Link href={htmlUrl} isWithinText={false}>
           <Avatar
             size="x-small"
-            name={avatarName}
+            name={name}
             src={avatarUrl}
             alt={I18n.t('Avatar for %{name}', {name})}
             margin="0 x-small xxx-small 0"
@@ -79,7 +77,7 @@ const UserLink: React.FC<UserLinkProps> = ({
         </Link>
       </Flex.Item>
       <Flex.Item shouldShrink>
-        <Link href={userUrl} isWithinText={false} data-testid={`link-user-${uid}`}>
+        <Link href={htmlUrl} isWithinText={false} data-testid={`link-user-${uid}`}>
           <Text data-testid={`name-user-${uid}`}>{name}</Text>
           {renderPronouns()}
         </Link>

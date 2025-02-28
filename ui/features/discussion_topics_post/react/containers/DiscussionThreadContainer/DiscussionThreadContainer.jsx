@@ -306,7 +306,7 @@ export const DiscussionThreadContainer = props => {
           authorName={getDisplayName(props.discussionEntry)}
           delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
           onClick={onThreadReply}
-        />
+        />,
       )
     }
     if (

@@ -18,7 +18,13 @@
 
 import type {Lti} from '../models/Product'
 
-export type PreferredLtiIntegration = {id: number; unified_tool_id: string; description: string; lti_placements: string[]; lti_services: string[]} & (
+export type PreferredLtiIntegration = {
+  id: number
+  unified_tool_id: string
+  description: string
+  lti_placements: string[]
+  lti_services: string[]
+} & (
   | {
       integration_type: 'lti_13_dynamic_registration'
       url: string
@@ -43,7 +49,7 @@ type IntegrationType<T extends PreferredLtiIntegration['integration_type']> = Ex
 >
 
 export const isLti13DynamicRegistrationConfig = (
-  lti: Lti
+  lti: Lti,
 ): lti is IntegrationType<'lti_13_dynamic_registration'> => {
   return (
     lti.integration_type === 'lti_13_dynamic_registration' &&
@@ -53,7 +59,7 @@ export const isLti13DynamicRegistrationConfig = (
 }
 
 export const isLti13GlobalInheritedKeyConfig = (
-  lti: Lti
+  lti: Lti,
 ): lti is IntegrationType<'lti_13_global_inherited_key'> => {
   return (
     lti.integration_type === 'lti_13_global_inherited_key' &&
@@ -62,9 +68,7 @@ export const isLti13GlobalInheritedKeyConfig = (
   )
 }
 
-export const isLti13JsonConfig = (
-  lti: Lti
-): lti is IntegrationType<'lti_13_configuration'> => {
+export const isLti13JsonConfig = (lti: Lti): lti is IntegrationType<'lti_13_configuration'> => {
   if (
     lti.integration_type === 'lti_13_configuration' &&
     'configuration' in lti &&
@@ -87,9 +91,7 @@ export const isLti13UrlConfig = (lti: Lti): lti is IntegrationType<'lti_13_url'>
   return lti.integration_type === 'lti_13_url' && 'url' in lti && typeof lti.url === 'string'
 }
 
-export const pickPreferredIntegration = (
-  configs: Lti[]
-): PreferredLtiIntegration | undefined => {
+export const pickPreferredIntegration = (configs: Lti[]): PreferredLtiIntegration | undefined => {
   return (
     configs.find(isLti13DynamicRegistrationConfig) ||
     configs.find(isLti13GlobalInheritedKeyConfig) ||

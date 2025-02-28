@@ -31,7 +31,7 @@ type Props = {
 }
 
 export default function FeaturedHelpLink({featuredLink, handleClick}: Props) {
-  if (featuredLink && window.ENV.FEATURES.featured_help_links) {
+  if (featuredLink) {
     return (
       <View textAlign="center" display="block">
         <Img data-testid="cheerful-panda-svg" src={PandaMapSVGURL} margin="small 0" />

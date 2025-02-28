@@ -23,6 +23,10 @@ class OutcomesController < ApplicationController
   include Api::V1::Role
 
   before_action :require_context, except: [:build_outcomes]
+
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, except: [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_outcomes_path }
   before_action { |c| c.active_tab = "outcomes" }
   before_action :rce_js_env, only: [:show, :index]

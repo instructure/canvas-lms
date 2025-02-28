@@ -40,6 +40,11 @@ module LtiAdvantage::Serializers
       lti11_legacy_user_id
       lti1p1
       notice
+      activity
+      for_user
+      submission
+      asset
+      assetreport_type
     ].freeze
 
     DEEP_LINKING_CLAIMS = %w[

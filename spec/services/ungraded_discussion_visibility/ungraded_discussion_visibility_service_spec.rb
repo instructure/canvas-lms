@@ -36,12 +36,21 @@ describe "UngradedDiscussionVisibility" do
     @discussion2 = DiscussionTopic.create!(context: @course, title: "Page 2")
   end
 
-  context "discussion topic visibility" do
+  context "ungraded discussion topic visibility" do
     let(:learning_object1) { @discussion1 }
     let(:learning_object2) { @discussion2 }
     let(:learning_object_type) { "discussion_topic" }
 
-    it_behaves_like "learning object visiblities with modules"
+    it_behaves_like "learning object visiblities with modules" do
+      before :once do
+        Account.site_admin.disable_feature!(:visibility_performance_improvements)
+      end
+    end
+    it_behaves_like "learning object visiblities with modules" do
+      before :once do
+        Account.site_admin.enable_feature!(:visibility_performance_improvements)
+      end
+    end
     it_behaves_like "learning object visiblities"
 
     it "does not include unpublished discussion topics" do

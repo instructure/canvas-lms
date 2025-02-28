@@ -69,6 +69,7 @@ const CardActions = {
       group_id: assignee.group_id,
       group_category_id: assignee.group_category_id,
       title: assignee.name,
+      non_collaborative: assignee.non_collaborative,
     })
 
     return union(overridesFromRow, [newOverride])

@@ -145,6 +145,19 @@ describe "communication_channels/confirm" do
       expect(merge_button["href"]).to eq registration_confirmation_path(@communication_channel.confirmation_code, enrollment: @enrollment.try(:uuid), confirm: 1)
       expect(page.css("#back.btn").first).not_to be_nil
     end
+
+    it "displays an asterisk and marks the Password field as required" do
+      assign(:merge_opportunities, [])
+      render
+      page = Nokogiri::HTML5("<document>" + response.body + "</document>")
+      label = page.css("label[for='pseudonym_password']").first
+      expect(label).not_to be_nil
+      expect(label.text).to include("Password")
+      expect(label.inner_html).to include('<span aria-hidden="true">*</span>')
+      field = page.css("#pseudonym_password").first
+      expect(field).not_to be_nil
+      expect(field["required"]).to eq "required"
+    end
   end
 
   context "invitations" do

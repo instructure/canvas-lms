@@ -376,8 +376,12 @@ class PseudonymsController < ApplicationController
   #   The new unique ID for the login.
   #
   # @argument login[password] [String]
-  #   The new password for the login. Can only be set by an admin user if admins
-  #   are allowed to change passwords for the account.
+  #   The new password for the login. Admins can only set a password for another
+  #   user if the "Password setting by admins" account setting is enabled.
+  #
+  # @argument login[old_password] [String]
+  #   The prior password for the login. Required if the caller is changing
+  #   their own password.
   #
   # @argument login[sis_user_id] [String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
@@ -443,6 +447,11 @@ class PseudonymsController < ApplicationController
       return unless (@user = @pseudonym.user)
 
       params[:login] ||= {}
+
+      if params[:login][:password] && @user == @current_user
+        return render json: @pseudonym.errors, status: :bad_request unless allow_self_password_change?
+      end
+
       params[:login][:password_confirmation] = params[:login][:password] if params[:login][:password]
       params[:pseudonym] = params[:login]
     else
@@ -636,5 +645,12 @@ class PseudonymsController < ApplicationController
 
   def can_modify_field(override_sis_stickiness, stick_fields_set, key)
     override_sis_stickiness || !stick_fields_set.include?(key)
+  end
+
+  def allow_self_password_change?
+    @pseudonym.errors.add(:old_password, "parameter is required to change your password") unless params[:login][:old_password]
+    @pseudonym.errors.add(:old_password, "parameter is incorrect") if params[:login][:old_password] && !@pseudonym.valid_arbitrary_credentials?(params[:login][:old_password])
+
+    @pseudonym.errors.none?
   end
 end

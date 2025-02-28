@@ -30,9 +30,7 @@ module Importers
       @migration = migration
     end
 
-    def attachment_path_id_lookup
-      @migration.attachment_path_id_lookup
-    end
+    delegate :attachment_path_id_lookup, to: :@migration
 
     # Returns the path for the context, for a course, it should return something like
     # "courses/1"
@@ -83,9 +81,7 @@ module Importers
       Folder.root_folders(@context).first.name
     end
 
-    def process_domain_substitutions(url)
-      @migration.process_domain_substitutions(url)
-    end
+    delegate :process_domain_substitutions, to: :@migration
 
     def context_hosts
       if (account = @migration&.context&.root_account)

@@ -16,10 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createAction, type ActionsUnion} from '../shared/types'
+import {BlackoutDate, createAction, type ActionsUnion} from '../shared/types'
+import {AssignmentWeightening, CoursePace} from '../types'
 
 export enum Constants {
   SET_PACE_ITEM_DURATION = 'COURSE_PACE_ITEMS/SET_PACE_ITEM_DURATION',
+  SET_PACE_ITEM_WEIGHTED_DURATION = 'COURSE_PACE_ITEMS/SET_PACE_ITEM_WEIGHTED_DURATION',
+  SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE = 'COURSE_PACE_ITEMS/SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE'
 }
 
 /* Action creators */
@@ -27,6 +30,10 @@ export enum Constants {
 export const actions = {
   setPaceItemDuration: (paceItemId: string, duration: number) =>
     createAction(Constants.SET_PACE_ITEM_DURATION, {paceItemId, duration}),
+  setPaceItemWeightedDuration: (assignmentWeightedDuration: AssignmentWeightening) =>
+    createAction(Constants.SET_PACE_ITEM_WEIGHTED_DURATION, {assignmentWeightedDuration}),
+  setPaceItemsDurationFromTimeToComplete: (coursePace: CoursePace, blackOutDays: BlackoutDate[], calendarDays: number) =>
+    createAction(Constants.SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE, {coursePace, blackOutDays, calendarDays})
 }
 
 export type CoursePaceItemAction = ActionsUnion<typeof actions>

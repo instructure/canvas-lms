@@ -110,7 +110,7 @@ module CanvasQuizStatistics::Analyzers
     end
 
     def answer_ids
-      @answer_ids ||= question_data[:answers].map { |a| (a[:id]).to_s }
+      @answer_ids ||= question_data[:answers].map { |a| a[:id].to_s }
     end
 
     def answer_key(id)

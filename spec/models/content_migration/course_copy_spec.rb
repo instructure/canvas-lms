@@ -68,6 +68,30 @@ describe ContentMigration do
       expect(@cm.reload.migration_settings[:job_ids]).to eq([123])
     end
 
+    describe "with InstFS enabled" do
+      before do
+        require "webmock/rspec"
+        allow(InstFS).to receive_messages(enabled?: true, app_host: "https://instfs.not_real")
+      end
+
+      it "uses InstFS to store the import files" do
+        export_file = File.open("spec/fixtures/migration/cc_empty_link.zip")
+        exported_data = File.open("spec/fixtures/migration/exported_data_cm.zip")
+        expect(InstFS).to receive(:direct_upload).and_return("export_file", "overview", "exported_data")
+        export_file_url = "https://instfs.not_real/files/export_file/from-course-export.imscc"
+        exported_data_url = "https://instfs.not_real/files/exported_data/exported_data_cm."
+        expect(CanvasHttp).to receive(:validate_url).with(/#{export_file_url}.*/, check_host: true, host: nil, scheme: nil).and_return(["", URI.parse(export_file_url)])
+        expect(CanvasHttp).to receive(:validate_url).with(/#{exported_data_url}.*/, check_host: true, host: nil, scheme: nil).and_return(["", URI.parse(exported_data_url)])
+        stub_request(:get, export_file_url).to_return(body: export_file)
+        stub_request(:get, exported_data_url).to_return(body: exported_data)
+        run_course_copy
+
+        expect(@cm.attachment.instfs_uuid).to eq "export_file"
+        expect(@cm.exported_attachment.instfs_uuid).to eq "exported_data"
+        expect(@cm.overview_attachment.instfs_uuid).to eq "overview"
+      end
+    end
+
     it "migrates course home links in rich content on copy" do
       course_model
 
@@ -796,7 +820,6 @@ describe ContentMigration do
 
     context "media objects" do
       before do
-        Account.site_admin.enable_feature!(:media_links_use_attachment_id)
         kaltura_double = double("kaltura")
         allow(kaltura_double).to receive(:startSession)
         # rubocop:disable RSpec/ReceiveMessages

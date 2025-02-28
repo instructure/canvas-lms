@@ -32,7 +32,7 @@ function createFormField(wrapper: HTMLElement, id: string, value: string): void 
 function renderComponent(wrapper: HTMLElement) {
   createFormField(wrapper, 'course_default_due_time', '05:00:00')
 
-  return render(<CourseDefaultDueTime />, {container: wrapper})
+  return render(<CourseDefaultDueTime canManage={true}/>, {container: wrapper})
 }
 
 describe('CourseDefaultDueTime', () => {

@@ -76,6 +76,7 @@ const I18n = createI18nScope('instructure')
 //    onSubmit: A callback which will receive 1. a deferred object
 //      encompassing the request(s) triggered by the submit action and 2. the
 //      formData being posted
+//    disableErrorBox: If true, error boxes will not be displayed
 $.fn.formSubmit = function (options) {
   $(this).markRequired(options)
   this.submit(function (event) {
@@ -103,6 +104,7 @@ $.fn.formSubmit = function (options) {
         if (INST && INST.environment !== 'production') throw error
       }
       if (newData === false) {
+        options?.onError?.call($form)
         return false
       } else if (newData) {
         formData = newData
@@ -1122,9 +1124,16 @@ $.fn.formErrors = function (data_errors, options) {
     }
     errorDetails[name] = {object: $obj, message: msg}
     hasErrors = true
-    const offset = $obj.errorBox(raw(msg)).offset()
-    if (offset.top > highestTop) {
-      highestTop = offset.top
+    if (!options ||  !options.disableErrorBox) {
+      const offset = $obj.errorBox(raw(msg)).offset()
+      if (offset.top > highestTop) {
+        highestTop = offset.top
+      }
+    } else {
+      const offset = $obj.offset()
+      if (offset.top > highestTop) {
+        highestTop = $obj.offset().top
+      }
     }
     lastField = $obj
   })
@@ -1135,9 +1144,16 @@ $.fn.formErrors = function (data_errors, options) {
     const $obj = elementErrors[idx][0]
     const msg = elementErrors[idx][1]
     hasErrors = true
-    const offset = $obj.errorBox(msg).offset()
-    if (offset.top > highestTop) {
-      highestTop = offset.top
+    if (!options || !options.disableErrorBox) {
+      const offset = $obj.errorBox(msg).offset()
+      if (offset.top > highestTop) {
+        highestTop = offset.top
+      }
+    } else {
+      const offset = $obj.offset()
+      if (offset.top > highestTop) {
+        highestTop = $obj.offset().top
+      }
     }
   }
   if (hasErrors) {
@@ -1156,48 +1172,11 @@ $.fn.errorBox = function (message, scroll, override_position) {
     if ($oldBox) {
       $oldBox.remove()
     }
-    let $template = $('#error_box_template')
-    if (!$template.length) {
-      $template = $(
-        "<div id='error_box_template' class='error_box errorBox' style=''>" +
-          "<div class='error_text' style=''></div>" +
-          "<img src='/images/error_bottom.png' class='error_bottom'/>" +
-          '</div>',
-      ).appendTo('body')
-    }
-    $.screenReaderFlashError(message)
 
-    let $box = $template
-      .clone(true)
-      .attr('id', '')
-      .css('zIndex', $obj.zIndex() + 1)
-
-    if (override_position) {
-      $box = $box.css('position', override_position)
-    }
-    $box.appendTo('body')
-
-    // If our message happens to be a safe string, parse it as such. Otherwise, clean it up. //
-    $box.find('.error_text').html(htmlEscape(message))
-
-    const offset = $obj.offset()
-    const height = $box.outerHeight()
-    let objLeftIndent = Math.round($obj.outerWidth() / 5)
-    if ($obj[0].tagName === 'FORM') {
-      objLeftIndent = Math.min(objLeftIndent, 50)
-    }
-    $box
-      .hide()
-      .css({
-        top: offset.top - height + 2,
-        left: offset.left + objLeftIndent,
-      })
-      .fadeIn('fast')
-
-    const cleanup = function () {
-      const $screenReaderErrors = $('#flash_screenreader_holder').find('span')
-      const srError = find($screenReaderErrors, node => $(node).text() === $box.text())
-      $box.remove()
+    const cleanup = function (item) {
+      const $screenReaderErrors = $('#').find('span')
+      const srError = find($screenReaderErrors, node => $(node).text() === $(item).text())
+      $(item).remove()
       if (srError) {
         $(srError).remove()
       }
@@ -1205,30 +1184,93 @@ $.fn.errorBox = function (message, scroll, override_position) {
       $obj.removeData('associated_error_object')
     }
 
-    const fade = function () {
-      $box.stop(true, true).fadeOut('slow', cleanup)
+    const label_type = $obj.hasClass('labeled-error')
+    if(label_type) {
+      $obj.addClass('input-error')
     }
 
-    $obj
-      .data({
-        associated_error_box: $box,
+    if (label_type) {
+      const $label = $('<label>').addClass('text-error').insertAfter($obj)
+      const icon = document.createElement('i');
+      icon.setAttribute('aria-hidden', 'true')
+      icon.className = 'icon-warning icon-Solid'
+      const textNode = document.createTextNode(htmlEscape(message))
+      $label[0].appendChild(icon)
+      $label[0].appendChild(textNode)
+
+      $obj.attr('aria-describedby', $label.attr('id'))
+      $obj.data({
+        associated_error_box: $label,
         associated_error_object: $obj,
       })
-      .click(fade)
-      .keypress(fade)
+      $obj.one('focus click', function() {
+        $obj.removeClass('input-error')
+        cleanup($label)
+      })
+      return $label
+    } else {
+      let $template = $('#error_box_template')
+      if (!$template.length) {
+        $template = $(
+          "<div id='error_box_template' class='error_box errorBox' style=''>" +
+          "<div class='error_text' style=''></div>" +
+          "<img src='/images/error_bottom.png' class='error_bottom'/>" +
+          '</div>',
+        ).appendTo('body')
+      }
+      $.screenReaderFlashError(message)
 
-    $box.click(function () {
-      $(this).fadeOut('fast', cleanup)
-    })
+      let $box = $template
+        .clone(true)
+        .attr('id', '')
+        .css('zIndex', $obj.zIndex() + 1)
 
-    $.fn.errorBox.errorBoxes.push($obj)
-    if (!$.fn.errorBox.isBeingAdjusted) {
-      $.moveErrorBoxes()
+      if (override_position) {
+        $box = $box.css('position', override_position)
+      }
+
+      $box.appendTo('body')
+      $box.find('.error_text').html(htmlEscape(message))
+
+      const offset = $obj.offset()
+      const height = $box.outerHeight()
+      let objLeftIndent = Math.round($obj.outerWidth() / 5)
+      if ($obj[0].tagName === 'FORM') {
+        objLeftIndent = Math.min(objLeftIndent, 50)
+      }
+      $box
+        .hide()
+        .css({
+          top: offset.top - height + 2,
+          left: offset.left + objLeftIndent,
+        })
+        .fadeIn('fast')
+
+      const fade = function () {
+        $box.stop(true, true).fadeOut('slow', function() {cleanup($box)})
+      }
+
+      $obj
+        .data({
+          associated_error_box: $box,
+          associated_error_object: $obj,
+        })
+        .click(fade)
+        .keypress(fade)
+
+      $box.click(function () {
+        $(this).fadeOut('fast', function() {cleanup($box)})
+      })
+
+      $.fn.errorBox.errorBoxes.push($obj)
+      if (!$.fn.errorBox.isBeingAdjusted) {
+        $.moveErrorBoxes()
+      }
+      if (scroll) {
+        $('html,body').scrollTo($box)
+      }
+      return $box
     }
-    if (scroll) {
-      $('html,body').scrollTo($box)
-    }
-    return $box
   }
 }
 $.fn.errorBox.errorBoxes = []

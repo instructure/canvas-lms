@@ -16,38 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useMemo, type SyntheticEvent} from 'react'
+import React, {useState, type FC, type SyntheticEvent} from 'react'
+import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import RosterTableHeader from './RosterTableHeader'
 import RosterTableRow from './RosterTableRow'
+import LoadingIndicator from '@canvas/loading-indicator'
+import useCoursePeopleQuery from '../../hooks/useCoursePeopleQuery'
+import useCoursePeopleContext from '../../hooks/useCoursePeopleContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {users} from '../../../util/mocks'
+import {ASCENDING, DESCENDING} from '../../../util/constants'
 
 const I18n = createI18nScope('course_people')
 
-const RosterTable = () => {
+const RosterTable: FC = () => {
+  const {courseId} = useCoursePeopleContext()
+  const {data: users, isLoading} = useCoursePeopleQuery({courseId})
   const [sortBy, setSortBy] = useState("name")
   const [ascending, setAscending] = useState(true)
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
-  // Mock sorting for testing purposes; to be removed after integration with backend
-  const sortedUsers = useMemo(() => {
-    if (!sortBy) return users
-
-    const sorted = [...users].sort((a, b) => {
-      // @ts-expect-error
-      return a[sortBy] > b[sortBy]
-        ? 1
-        // @ts-expect-error
-        : a[sortBy] < b[sortBy]
-          ? -1
-          : 0
-    })
-
-    return ascending ? sorted : sorted.reverse()
-  }, [sortBy, ascending])
-
-  const userIds = (users || []).map(user => user.id)
+  const userIds = (users || []).map(user => user._id)
 
   const handleSort = (_event: SyntheticEvent<Element, Event>, {id}: {id: string}) => {
     if (id === sortBy) {
@@ -58,7 +47,8 @@ const RosterTable = () => {
     }
   }
 
-  const handleSelectAll = (allSelected: boolean) => setSelected(allSelected ? new Set() : new Set(userIds))
+  const handleSelectAll = (allSelected: boolean) =>
+    setSelected(allSelected ? new Set() : new Set(userIds))
 
   const handleSelectRow = (rowSelected: boolean, userId: string) => {
     const copy = new Set(selected)
@@ -73,16 +63,24 @@ const RosterTable = () => {
   const allSelected =
     selected.size > 0 && userIds.every(id => selected.has(id))
   const someSelected = selected.size > 0 && !allSelected
-  const direction = ascending ? 'ascending' : 'descending'
+  const direction = ascending ? ASCENDING : DESCENDING
 
-  const renderRows = () => (sortedUsers || []).map(user => (
+  const renderRows = () => (users || []).map(user => (
     <RosterTableRow
-      key={`user-id-${user.id}`}
+      key={`user-id-${user._id}`}
       user={user}
-      isSelected={selected.has(user.id)}
+      isSelected={selected.has(user._id)}
       handleSelectRow={handleSelectRow}
     />
   ))
+
+  if (isLoading) return (
+    <Flex as="div" justifyItems="center">
+      <Flex.Item as="div" padding="xx-large">
+        <LoadingIndicator />
+      </Flex.Item>
+    </Flex>
+  )
 
   return (
     <Table caption={I18n.t('Course Roster')} data-testid="roster-table">

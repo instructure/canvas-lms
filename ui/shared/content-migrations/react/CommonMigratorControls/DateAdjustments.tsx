@@ -20,6 +20,7 @@ import React, {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {datetimeString} from '@canvas/datetime/date-functions'
+import {canvas} from '@instructure/ui-theme-tokens'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -112,9 +113,7 @@ export const DateAdjustments = ({
     <Responsive
       match="media"
       query={{
-        small: {maxWidth: 600},
-        medium: {minWidth: 600},
-        large: {minWidth: 800},
+        small: {maxWidth: canvas.breakpoints.desktop},
       }}
     >
       {(_props, matches) => {
@@ -168,7 +167,7 @@ export const DateAdjustments = ({
                         </ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '18.75rem'}
+                      width={isMobileView ? '100%' : '18.5rem'}
                       messages={timeZonedFormMessages(
                         courseTimeZone,
                         userTimeZone,
@@ -180,10 +179,10 @@ export const DateAdjustments = ({
                       as="div"
                       width={isMobileView ? '100%' : '7.5rem'}
                       textAlign={isMobileView ? 'start' : 'center'}
-                      margin={isMobileView ? 'small 0' : 'x-small 0 0'}
+                      margin={isMobileView ? 'small 0' : 'x-small x-small 0'}
                       tabIndex={-1}
                     >
-                      {I18n.t('change to')}
+                      <span style={{whiteSpace: 'nowrap'}}>{I18n.t('change to')}</span>
                     </View>
                     <CanvasDateInput
                       selectedDate={start_to_date}
@@ -198,7 +197,7 @@ export const DateAdjustments = ({
                         </ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '18.75rem'}
+                      width={isMobileView ? '100%' : '18.5rem'}
                       messages={timeZonedFormMessages(courseTimeZone, userTimeZone, start_to_date)}
                       dataTestid="new_start_date"
                     />
@@ -225,7 +224,7 @@ export const DateAdjustments = ({
                         </ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '18.75rem'}
+                      width={isMobileView ? '100%' : '18.5rem'}
                       messages={timeZonedFormMessages(courseTimeZone, userTimeZone, end_from_date)}
                       dataTestid="old_end_date"
                     />
@@ -233,10 +232,10 @@ export const DateAdjustments = ({
                       as="div"
                       width={isMobileView ? '100%' : '7.5rem'}
                       textAlign={isMobileView ? 'start' : 'center'}
-                      margin={isMobileView ? 'small 0' : 'x-small 0 0'}
+                      margin={isMobileView ? 'small 0' : 'x-small x-small 0'}
                       tabIndex={-1}
                     >
-                      {I18n.t('change to')}
+                      <span style={{whiteSpace: 'nowrap'}}>{I18n.t('change to')}</span>
                     </View>
                     <CanvasDateInput
                       selectedDate={end_to_date}
@@ -249,7 +248,7 @@ export const DateAdjustments = ({
                         <ScreenReaderContent>{I18n.t('Select new end date')}</ScreenReaderContent>
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
-                      width={isMobileView ? '100%' : '18.75rem'}
+                      width={isMobileView ? '100%' : '18.5rem'}
                       messages={timeZonedFormMessages(courseTimeZone, userTimeZone, end_to_date)}
                       dataTestid="new_end_date"
                     />
@@ -265,24 +264,29 @@ export const DateAdjustments = ({
                     onRemoveSubstitution={removeSubstitution}
                   />
                 ))}
-                <Button
-                  margin="medium none none none"
-                  onClick={() => {
-                    const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
-                    tmp.date_shift_options.day_substitutions.push({from: 0, to: 0, id: subs_id++})
-                    setDateAdjustments(tmp)
-                  }}
-                  color="secondary"
-                  width={isMobileView ? '100%' : '8.5rem'}
-                  disabled={disabled}
-                >
-                  <PresentationContent>
-                    <IconAddLine /> {I18n.t('Substitution')}
-                  </PresentationContent>
-                  <ScreenReaderContent>{I18n.t('Add substitution')}</ScreenReaderContent>
-                </Button>
+                <Flex as="div" direction={isMobileView ? 'column' : 'row'}>
+                  <Button
+                    margin="medium none none none"
+                    onClick={() => {
+                      const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
+                      tmp.date_shift_options.day_substitutions.push({from: 0, to: 0, id: subs_id++})
+                      setDateAdjustments(tmp)
+                    }}
+                    color="secondary"
+                    width={isMobileView ? '100%' : '8.5rem'}
+                    disabled={disabled}
+                    textAlign="center"
+                    interaction={disabled ? 'disabled' : 'enabled'}
+                  >
+                    <PresentationContent>
+                      <IconAddLine /> {I18n.t('Substitution')}
+                    </PresentationContent>
+                    <ScreenReaderContent>{I18n.t('Add substitution')}</ScreenReaderContent>
+                  </Button>
+                </Flex>
               </>
             ) : null}
+            { isMobileView && <hr role="presentation" aria-hidden="true" style={{margin: '1.5rem 0 0 0'}} />}
           </View>
         )
       }}

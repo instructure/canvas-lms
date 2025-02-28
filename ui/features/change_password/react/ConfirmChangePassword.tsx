@@ -58,7 +58,7 @@ export type PasswordPolicyAndPseudonym = {
 }
 
 const createValidationSchema = (
-  passwordPoliciesAndPseudonyms: ConfirmChangePasswordProps['passwordPoliciesAndPseudonyms']
+  passwordPoliciesAndPseudonyms: ConfirmChangePasswordProps['passwordPoliciesAndPseudonyms'],
 ) =>
   z
     .object({
@@ -80,7 +80,9 @@ const createValidationSchema = (
       if (isTooShort) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Must be at least ${minCharacterLength} characters.`,
+          message: I18n.t('Must be at least %{minCharacterLength} characters.', {
+            minCharacterLength,
+          }),
           path: ['password'],
           fatal: true,
         })
@@ -91,7 +93,7 @@ const createValidationSchema = (
       if (password !== password_confirmation) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Passwords do not match.',
+          message: I18n.t('Passwords do not match.'),
           path: ['password_confirmation'],
         })
       }
@@ -117,6 +119,7 @@ const ConfirmChangePassword = ({
     formState: {errors, isSubmitting},
     handleSubmit,
     setError,
+    setFocus,
   } = useForm({
     defaultValues: {
       id: pseudonym.id,
@@ -152,16 +155,19 @@ const ConfirmChangePassword = ({
         const policy = passwordPoliciesAndPseudonyms[data.id]
           ? passwordPoliciesAndPseudonyms[data.id].policy
           : defaultPolicy
-        const normalizedError = PseudonymModel.prototype.normalizeErrors(
-          errorResponse.pseudonym,
-          policy
-        )
+        const normalizedError: Record<
+          keyof FormValues,
+          Array<string>
+        > = PseudonymModel.prototype.normalizeErrors(errorResponse.pseudonym, policy)
 
-        for (const fieldName in normalizedError) {
+        for (const key in normalizedError) {
+          const fieldName = key as keyof FormValues
+
           for (const message of normalizedError[fieldName]) {
-            setError(fieldName as keyof FormValues, {
+            setError(fieldName, {
               message,
             })
+            setFocus(fieldName)
           }
         }
       } else {
@@ -206,7 +212,7 @@ const ConfirmChangePassword = ({
                         <SimpleSelect.Option key={pseudonymId} id={pseudonymId} value={pseudonymId}>
                           {`${currentPseudonym.unique_id} - ${currentPseudonym.account_display_name}`}
                         </SimpleSelect.Option>
-                      )
+                      ),
                     )}
                   </SimpleSelect>
                 )}

@@ -502,6 +502,7 @@ CanvasRails::Application.routes.draw do
 
     post "reset" => "courses#reset_content"
     resources :alerts
+    get "student_view(/:redirect_to_referer)" => "courses#student_view"
     post "student_view(/:redirect_to_referer)" => "courses#student_view", :as => :student_view
     delete "student_view" => "courses#leave_student_view"
     delete "test_student" => "courses#reset_test_student"
@@ -517,6 +518,10 @@ CanvasRails::Application.routes.draw do
     put "grading_schemes/:id" => "grading_schemes_json#update"
     get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
     get "grading_schemes/:id" => "grading_schemes_json#show"
+
+    get "canvas_career_validation" => "horizon#validate_course"
+    post "canvas_career_conversion" => "horizon#convert_course"
+    post "canvas_career_reversion" => "horizon#revert_course"
   end
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
 
@@ -607,6 +612,7 @@ CanvasRails::Application.routes.draw do
     end
 
     get :export, as: :export_portfolio
+    get :recent_submissions, as: :recent_submissions
     get ":category_name" => "eportfolio_categories#show", :as => :named_category
     get ":category_name/:entry_name" => "eportfolio_entries#show", :as => :named_category_entry
   end
@@ -2317,7 +2323,7 @@ CanvasRails::Application.routes.draw do
       get "group_categories/:group_category_id/users", action: :users, as: "group_category_users"
       get "group_categories/:group_category_id/export", action: :export, as: "group_category_export", defaults: { format: :csv }
       post "group_categories/:group_category_id/assign_unassigned_members", action: "assign_unassigned_members", as: "group_category_assign_unassigned_members"
-      post "group_categories/:group_category_id/bulk_manage_groups", action: :bulk_manage_groups
+      post "courses/:course_id/group_categories/bulk_manage_differentiation_tag", action: :bulk_manage_differentiation_tag
     end
 
     scope(controller: :progress) do
@@ -2704,6 +2710,10 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/student_enrollments/:student_enrollment_id/paces", action: :create, as: :new_student_enrollment_pace
       patch "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :update, as: :patch_student_enrollment_pace
       delete "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :delete, as: :delete_student_enrollment_pace
+    end
+
+    scope(controller: "course_pacing/bulk_student_enrollment_paces_api") do
+      get "courses/:course_id/bulk_student_enrollments/student_bulk_pace_edit_view", action: :student_bulk_pace_edit_view, as: :student_bulk_pace_edit_view
     end
 
     scope(controller: "course_pacing/pace_contexts_api") do

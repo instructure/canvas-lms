@@ -33,9 +33,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       # @return [Integer|NilClass]
       #   nil if the parameter isn't really an integer.
       def to_integer(number)
-        Integer(number)
-      rescue
-        nil
+        Integer(number, exception: false)
       end
 
       # Cast a localized string number to a BigDecimal

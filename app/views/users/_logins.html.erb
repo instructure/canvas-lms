@@ -22,6 +22,16 @@
   <% css_bundle :user_logins %>
   <% js_bundle :user_logins %>
   <% js_env :PASSWORD_POLICY => (@domain_root_account.try(:password_policy) || {}) %>
+  <%
+    if can_do(Account.site_admin, @current_user, :manage_user_logins)
+      js_env :PASSWORD_POLICIES => Hash[Account.root_accounts.active.non_shadow.map{ |a| [a.id, a.password_policy]}]
+      js_env :ACCOUNT_SELECT_OPTIONS => Account.root_accounts
+                .active
+                .non_shadow
+                .map { |a| {label:(a.name || t("Unnamed Account (%{id})", id: a.id)), value: a.id} }
+                .sort_by(&:first)
+    end
+  %>
   <fieldset
     id="login_information"
     class="responsive"
@@ -77,6 +87,7 @@
             <td class='links <%= 'passwordable' if pseudonym && can_do(pseudonym, @current_user, :change_password) %> <%= 'delegated-auth' if pseudonym && !pseudonym.account.canvas_authentication? %>'>
               <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link" data-account-id="<%= pseudonym.account.id if pseudonym %>"><i class="icon-edit standalone-icon"></i></a>
               <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && !can_do(pseudonym, @current_user, :delete)) %>"><i class="icon-end standalone-icon"></i></a>
+              <div id="edit_pseudonym_mount_point"></div>
             </td>
           <% else %>
             <td>&nbsp;</td>
@@ -91,6 +102,7 @@
           <td colspan="5">
             <% if can_add_pseudonym %>
               <a href="#" rel="<%= user_pseudonyms_url(@user.id) %>" data-can-manage-sis="<%= can_do(new_pseudonym, @current_user, :manage_sis) %>"  class="add_pseudonym_link"><%= t('add_login', 'Add Login') %></a>
+              <div id="add_pseudonym_mount_point"></div>
             <% end %>
             <% if can_add_pseudonym && can_reset_mfa %> | <% end %>
             <% if can_reset_mfa %>
@@ -102,64 +114,4 @@
     </table>
     <div class='inst-extension-login-information' data-extension-details="<%= pseudonyms&.to_json(except: extension_exclusions) %>"></div>
   </fieldset>
-  <%= form_for :pseudonym, :url => user_pseudonyms_url(@user.id),
-               :html => {:id => 'edit_pseudonym_form', :class => 'form-dialog form-horizontal',
-                         :style => 'display: none;'} do |f| %>
-    <table class="formtable" style="margin-top: 20px;">
-      <tr>
-        <td><%= f.blabel :unique_id, :en => "Login" %></td>
-        <td><%= f.text_field :unique_id %></td>
-      </tr>
-      <tr data-react-component="external-ids" />
-      <tr class="sis_user_id" data-external-placeholder="sis-user-id" data-label="<%= before_label('sis_id', 'SIS ID') %>" />
-      <tr class="integration_id" data-external-placeholder="integration-id" data-label="<%= before_label('integration_id', 'Integration ID') %>" />
-      <% if can_do(Account.site_admin, @current_user, :manage_user_logins) %>
-        <% js_env :PASSWORD_POLICIES => Hash[Account.root_accounts.active.non_shadow.map{ |a| [a.id, a.password_policy]}] %>
-        <tr class="account_id">
-          <td><%= f.blabel :account_id, :en => "Account" %></td>
-          <td>
-            <%
-              accounts = Account.root_accounts
-                .active
-                .non_shadow
-                .map { |a| [(a.name || t("Unnamed Account (%{id})", id: a.id)), a.id] }
-                .sort_by(&:first)
-            %>
-            <%= f.select :account_id, accounts, {:selected => @domain_root_account.id}, :class => "account_id_select" %>
-          </td>
-        </tr>
-      <% else %>
-        <tr style="display: none;">
-          <td class="default_account_name"><%= @domain_root_account.name %></td>
-        </tr>
-      <% end %>
-      <tr class="password">
-        <td><%= f.blabel :password, :en => "Password" %></td>
-        <td><%= f.password_field :password %></td>
-      </tr>
-      <tr class="password">
-        <td><%= f.blabel :password_confirmation, :en => "Confirm Password" %></td>
-        <td><%= f.password_field :password_confirmation %></td>
-      </tr>
-      <!-- explicit width is sad, but the dialog auto width will make the
-           dialog crazy wide before wrapping the text otherwise -->
-      <tr class="delegated">
-        <td colspan="2" style="width: 300px;">
-          <div class="hint-text">
-            <%= t do %>
-              Note: This login's account uses delegated authentication, but
-              allows fallback Canvas password authentication. The password
-              fields in this form update the fallback Canvas password,
-              <b>not</b> the delegated authentication.
-            <% end %>
-          </div>
-        </td>
-      </tr>
-    </table>
-
-    <div class='form-controls'>
-      <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
-      <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.update_login', 'Update Login') %></button>
-    </div>
-  <% end %>
 <% end %>

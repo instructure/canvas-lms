@@ -891,10 +891,8 @@ describe "Common Cartridge exporting" do
       run_export
     end
 
-    context "media_links_use_attachment_id feature enabled" do
+    context "media track export" do
       before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_return false
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
         client = double("kaltura_client")
         allow(CanvasKaltura::ClientV3).to receive_messages(new: client)
         allow(client).to receive_messages(media_sources: {})

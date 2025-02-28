@@ -100,6 +100,51 @@ describe WikiPage do
     end
   end
 
+  describe "estimated_duration" do
+    subject { assignment_with_estimated_duration.duplicate }
+
+    let(:estimated_duration) { EstimatedDuration.new({ duration: 30 }) }
+    let(:assignment_with_estimated_duration) do
+      assignment = wiki_page_assignment_model({ title: "Wiki Assignment" })
+      assignment.estimated_duration = estimated_duration
+      assignment.save!
+      assignment
+    end
+
+    context "when course is a horizon_course" do
+      before do
+        assignment_with_estimated_duration.course.account.enable_feature!(:horizon_course_setting)
+        assignment_with_estimated_duration.course.update!(horizon_course: true)
+      end
+
+      it "should set estimated_duration duration on duplication" do
+        expect(subject.estimated_duration.duration.iso8601).to eq("PT30S")
+      end
+
+      it "should not save the estimated_duration to db" do
+        expect(subject.estimated_duration.id).to be_nil
+      end
+
+      context "when estimated_duration not provided" do
+        it "should set estimated_duration on duplication" do
+          assignment_with_estimated_duration.estimated_duration = nil
+          expect(subject.estimated_duration).to be_nil
+        end
+      end
+    end
+
+    context "when course is not a horizon_course" do
+      before do
+        assignment_with_estimated_duration.course.account.disable_feature!(:horizon_course_setting)
+        assignment_with_estimated_duration.course.update!(horizon_course: false)
+      end
+
+      it "should set estimated_duration on duplication" do
+        expect(subject.estimated_duration).to be_nil
+      end
+    end
+  end
+
   it "validates the title" do
     course_with_teacher(active_all: true)
     expect(@course.wiki_pages.new(title: "").valid?).not_to be_truthy
@@ -400,6 +445,17 @@ describe WikiPage do
         run_jobs
         expect(@page.reload).to be_unpublished
       end
+    end
+  end
+
+  describe "#effective_group_category_id" do
+    # if and when a wiki page is allowed to be configured as a group page, this method
+    # will need to be updated to return the group category id associated with the page object
+    # or with an assignment that is created for the page.  However, it will be designed in the future.
+    it "returns nil" do
+      course_with_teacher
+      @page = @course.wiki_pages.create(title: "unpublished page", workflow_state: "unpublished")
+      expect(@page.effective_group_category_id).to be_nil
     end
   end
 

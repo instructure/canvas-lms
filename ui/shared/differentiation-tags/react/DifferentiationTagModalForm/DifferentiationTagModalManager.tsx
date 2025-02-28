@@ -55,6 +55,7 @@ function DifferentiationTagModalContainer(props: DifferentiationTagModalManagerP
       mode={mode}
       differentiationTagSet={tagSet}
       categories={categories}
+      courseId={courseID}
     />
   )
 }

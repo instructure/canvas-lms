@@ -25,6 +25,7 @@ export interface EnvContextModules {
   course_id: string
   CONTEXT_URL_ROOT: string
   ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: boolean
+  CONTENT_MIGRATIONS_EXPIRE_DAYS: number
   CAN_MANAGE_DIFFERENTIATION_TAGS: boolean
   FILES_CONTEXTS: Array<{asset_string: string}>
   MODULE_FILE_DETAILS: Record<

@@ -46,6 +46,8 @@ import {captureException} from '@sentry/react'
 import ready from '@instructure/ready'
 import {Flex} from '@instructure/ui-flex'
 import OnlineUrlSubmission from '../react/OnlineUrlSubmission'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('submit_assignment')
 
@@ -62,6 +64,7 @@ function insertEmoji(emoji) {
 ready(function () {
   let submitting = false
   let shouldShowUrlError = false
+  let errorRoot = null
   const submissionForm = $('.submit_assignment_form')
 
   const homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer()
@@ -88,6 +91,18 @@ ready(function () {
     shouldShowUrlError = true
     const input = document.getElementById('online-url-input')
     input.focus()
+  }
+
+  const findEmptyFileDrop = () => {
+    for (let i = 0; i <= submissionAttachmentIndex; i++) {
+      const inputs = document.querySelectorAll(`#submission_file_drop_${i}`)
+      if (inputs.length > 0) {
+        const fileDrop = inputs[inputs.length - 1]
+        if (!fileDrop?.value) {
+          return fileDrop
+        }
+      }
+    }
   }
 
   // Add InstUI TextInput for online_url_submission
@@ -138,6 +153,16 @@ ready(function () {
     }
   })
 
+  submissionForm.on('change', 'textarea[name="submission[body]"]', function(e) {
+    $('iframe#submission_body_ifr.tox-edit-area__iframe, #submission_body').css({
+      border: '',
+      borderRadius: '',
+    })
+    .removeAttr('aria-label')
+    errorRoot?.unmount()
+    errorRoot = null
+  })
+
   if (submissionForm.attr('id') === 'submit_online_url_form') {
     submissionForm.formSubmit({
       formErrors: false,
@@ -175,43 +200,72 @@ ready(function () {
       const self = this
       const $turnitin = $(this).find('.turnitin_pledge')
       const $vericite = $(this).find('.vericite_pledge')
+      const parser = new DOMParser();
 
       if (!verifyPledgeIsChecked($turnitin)) {
         event.preventDefault()
         event.stopPropagation()
         return false
       }
-  
+
       if (!verifyPledgeIsChecked($vericite)) {
         event.preventDefault()
         event.stopPropagation()
         return false
       }
-  
-      const valid =
-        !$(this).is('#submit_online_text_entry_form') ||
-        $(this).validateForm({
-          object_name: 'submission',
-          required: ['body'],
-          property_validations: {
-            body(value) {
-              const bodyHtml = document.createElement('div')
-              bodyHtml.insertAdjacentHTML('beforeend', value)
-              if (bodyHtml.querySelector(`[data-placeholder-for]`)) {
-                return I18n.t('File has not finished uploading')
-              }
-            },
-          },
-        })
-      if (!valid) return false
-  
+
+      if($(this).is('#submit_online_text_entry_form')){
+        const textEntryFormData = $(this).getFormData()
+        const doc = parser.parseFromString(textEntryFormData['submission[body]'], 'text/html');
+        const otherTags = doc.querySelectorAll('*:not(p):not(html):not(head):not(body)')
+        const pTags = doc.querySelectorAll('p')
+        let error = null
+
+        if(otherTags.length === 0 && ![...pTags].some(p => p.children.length > 0 || p.textContent.trim()))
+          error = I18n.t('Text entry must not be empty')
+        else if(textEntryFormData['submission[body]'].includes('data-placeholder-for'))
+          error = I18n.t('File has not finished uploading')
+        
+        if(error) {
+          $.screenReaderFlashMessage(error)
+          const container = $('iframe#submission_body_ifr.tox-edit-area__iframe, #submission_body')
+          const errorsContainer = document.getElementById('body_errors')
+          if (container) {
+            container.css({
+              border: '1.9px solid red',
+              borderRadius: '3px',
+            })
+            .attr('aria-label', error)
+            .focus()
+          }
+          setTimeout(() => {
+            // changing css property sometimes trigger internal textarea change event
+            // which causes error message to disappear, wrapping in a setTimeout helps
+            // to solve that
+            const root = errorRoot ?? createRoot(errorsContainer)
+            errorRoot = root
+            root.render(
+              <Flex as="div" alignItems="center" margin="0 0 xx-small 0">
+                <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+                  <IconWarningSolid color="error" />
+                </Flex.Item>
+                <Text size="small" color="danger">
+                  {I18n.t('%{errorText}',{errorText: error})}
+                </Text>
+              </Flex>
+            )
+          })
+          return false
+        }
+      }
+
       RichContentEditor.closeRCE($('#submit_online_text_entry_form textarea:first'))
-  
+
       $(this)
         .find("button[type='submit']")
         .text(I18n.t('messages.submitting', 'Submitting...'))
         .prop('disabled', true)
-  
+
       if ($(this).attr('id') === 'submit_online_upload_form') {
         event.preventDefault() && event.stopPropagation()
         const fileElements = $(this)
@@ -219,7 +273,7 @@ ready(function () {
           .filter(function () {
             return $(this).val() !== ''
           })
-  
+
         Object.values(webcamBlobs)
           .filter(blob => blob)
           .forEach(blob => {
@@ -230,13 +284,13 @@ ready(function () {
               files: [blob],
             })
           })
-  
+
         const emptyFiles = $(this)
           .find('input[type=file]:visible')
           .filter(function () {
             return this.files[0] && this.files[0].size === 0
           })
-  
+
         const uploadedAttachmentIds = $(this).find('#submission_attachment_ids').val()
   
         const reenableSubmitButton = function () {
@@ -245,11 +299,11 @@ ready(function () {
             .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
             .prop('disabled', false)
         }
-  
+
         const progressIndicator = function (event) {
           if (event.lengthComputable) {
             const mountPoint = document.getElementById('progress_indicator')
-  
+
             if (mountPoint) {
               ReactDOM.render(
                 <ProgressCircle
@@ -267,27 +321,24 @@ ready(function () {
             }
           }
         }
-  
+
+        const fileDrop = findEmptyFileDrop()
         // warn user if they haven't uploaded any files
         if (fileElements.length === 0 && uploadedAttachmentIds === '') {
-          $.flashError(
-            I18n.t(
-              '#errors.no_attached_file',
-              'You must attach at least one file to this assignment',
-            ),
-          )
+          setShouldShowFileRequiredError(true)
+          fileDrop?.focus()
           reenableSubmitButton()
           return false
         }
-  
+
         // throw error if the user tries to upload an empty file
         // to prevent S3 from erroring
         if (emptyFiles.length) {
-          $.flashError(I18n.t('Attached files must be greater than 0 bytes'))
+          fileDrop?.focus()
           reenableSubmitButton()
           return false
         }
-  
+
         // If there are restrictions on file type, don't accept submission if the file extension is not allowed
         if (ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length > 0) {
           const subButton = $(this).find('button[type=submit]')
@@ -318,7 +369,7 @@ ready(function () {
             return false
           }
         }
-  
+
         $.ajaxJSONPreparedFiles.call(this, {
           handle_files(attachments, data) {
             const ids = (data['submission[attachment_ids]'] || '').split(',').filter(id => id !== '')
@@ -503,29 +554,41 @@ ready(function () {
   })
 
   const webcamBlobs = {}
+  let shouldShowFileRequiredError = false
+  const getShouldShowFileRequiredError = () => shouldShowFileRequiredError
+  const setShouldShowFileRequiredError = value => (shouldShowFileRequiredError = value)
 
   $('.add_another_file_link')
     .click(function (event) {
       event.preventDefault()
-      const clone = $('#submission_attachment_blank').clone(true)
 
-      clone.removeAttr('id').show().insertBefore(this)
+      const emptyFileDrop = findEmptyFileDrop()
+      if (emptyFileDrop) {
+        emptyFileDrop.focus()
+      } else {
+        const clone = $('#submission_attachment_blank').clone(true)
 
-      const wrapperDom = clone.find('.attachment_wrapper')[0]
-      if (wrapperDom) {
-        const index = ++submissionAttachmentIndex
+        clone.removeAttr('id').show().insertBefore(this)
 
-        ReactDOM.render(
-          <Attachment
-            index={index}
-            setBlob={blob => {
-              webcamBlobs[index] = blob
-            }}
-          />,
-          wrapperDom,
-        )
+        const wrapperDom = clone.find('.attachment_wrapper')[0]
+        if (wrapperDom) {
+          const index = ++submissionAttachmentIndex
+
+          ReactDOM.render(
+            <Attachment
+              id={`file_attachment_${index}`}
+              index={index}
+              setBlob={blob => {
+                webcamBlobs[index] = blob
+              }}
+              validFileTypes={ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS}
+              getShouldShowFileRequiredError={getShouldShowFileRequiredError}
+              setShouldShowFileRequiredError={setShouldShowFileRequiredError}
+            />,
+            wrapperDom,
+          )
+        }
       }
-      toggleRemoveAttachmentLinks()
     })
     .click()
 

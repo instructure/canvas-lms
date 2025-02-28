@@ -28,6 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {
   IconAssignmentLine,
   IconDiscussionLine,
+  IconOffLine,
   IconPublishSolid,
   IconQuizLine,
   IconUnpublishedLine,
@@ -37,9 +38,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
 import {coursePaceDateFormatter} from '../../shared/api/backend_serializer'
-import type {CoursePaceItem, CoursePace, StoreState} from '../../types'
+import type {CoursePaceItem, CoursePace, StoreState, MasteryPathsData} from '../../types'
 import type {BlackoutDate} from '../../shared/types'
 import {
   getCoursePace,
@@ -50,6 +50,7 @@ import {
   getSelectedDaysToSkip,
 } from '../../reducers/course_paces'
 import {actions} from '../../actions/course_pace_items'
+import { coursePaceActions } from '../../actions/course_paces'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 import {
   getShowProjections,
@@ -59,6 +60,10 @@ import {
 } from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 import type {Change} from '../../utils/change_tracking'
+import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
+import {Link} from '@instructure/ui-link'
+import {Pill} from '@instructure/ui-pill'
+import { Tooltip } from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('course_paces_assignment_row')
 
@@ -87,6 +92,7 @@ interface StoreProps {
 
 interface DispatchProps {
   readonly setPaceItemDuration: typeof actions.setPaceItemDuration
+  readonly setPaceItemDurationTimeToCompleteCalendarDays: typeof coursePaceActions.setPaceItemDurationTimeToCompleteCalendarDays
 }
 
 interface LocalState {
@@ -223,7 +229,11 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     const duration = parseInt(this.state.duration, 10)
 
     if (!Number.isNaN(duration)) {
-      this.props.setPaceItemDuration(this.props.coursePaceItem.module_item_id, duration)
+      if (window.ENV.FEATURES.course_pace_time_selection) {
+        this.props.setPaceItemDurationTimeToCompleteCalendarDays(this.props.coursePaceItem.module_item_id, duration, this.props.blackoutDates)
+      }else {
+        this.props.setPaceItemDuration(this.props.coursePaceItem.module_item_id, duration)
+      }
     }
   }
 
@@ -262,7 +272,12 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   }
 
   renderDurationInput = () => {
-    if (this.props.isStudentPace && !window.ENV.FEATURES.course_paces_for_students) {
+    const contextType = this.props.context_type;
+    if (
+      this.props.isStudentPace &&
+      !window.ENV.FEATURES.course_paces_for_students
+      && contextType !== 'BulkEnrollment'
+    ) {
       return (
         <Flex height="2.375rem" alignItems="center" justifyItems="center">
           {this.state.duration}
@@ -326,36 +341,78 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
               </Text>
             </div>
           )}
+          {
+            ENV.FEATURES.course_pace_pacing_with_mastery_paths && this.props.coursePaceItem.unreleased && (
+              <div>
+                <Text size="x-small" color="danger">
+                  <IconWarningLine size="x-small" /> {I18n.t("Based on Mastery Path results this assignment may not be assigned to this student.")}
+                </Text>
+              </div>
+            )
+          }
         </div>
       </Flex>
     )
   }
 
   renderSubmissionStatus = () => {
-    const { submittable, submitted_at } = this.props.coursePaceItem
-    const dueDate = moment(this.props.dueDate)
-    const now = moment()
+    const { submission_status } = this.props.coursePaceItem
     const isFeatureEnabled = window.ENV.FEATURES.course_pace_pacing_status_labels
 
     // Not submittable or not due yet, no label needed
-    if (!submittable || dueDate.isAfter(now) || !isFeatureEnabled) {
+    if (!submission_status || !isFeatureEnabled) {
       return null
     }
 
-    const submittedAt = submitted_at ? moment(submitted_at) : null
-    const status = !submittedAt
-      ? I18n.t("No Submission")
-      : submittedAt.isAfter(dueDate)
-      ? I18n.t("Late Submission")
-      : null
+    let status: string = ''
+    switch (submission_status) {
+      case 'late':
+        status = I18n.t("Late Submission")
+        break
+      case 'missing':
+        status = I18n.t("No Submission")
+        break
+    }
 
     return status ? (
-      <span style={{whiteSpace: "nowrap"}}>
+      <div style={{whiteSpace: "nowrap", marginTop: 5}}>
         <Text color="danger">
           <IconWarningLine size="x-small" /> {status}
         </Text>
-      </span>
+      </div>
     ) : null
+  }
+
+  renderMasteryPathsInfo({ isTrigger, releasedLabel }: MasteryPathsData, moduleItemId: string) {
+    if (!isTrigger && !releasedLabel) return null;
+
+    return (
+      <Flex gap="small" data-testid={`mastery-paths-data-${moduleItemId}`}>
+        {
+          ENV.FEATURES.course_pace_pacing_with_mastery_paths && this.props.coursePaceItem.unreleased && (
+            <Flex.Item>
+              <Tooltip renderTip={I18n.t("This student may not have visibility to this assignment based on their Mastery path assessment results.")}>
+                <IconOffLine size="x-small" />
+              </Tooltip>
+            </Flex.Item>
+          )
+        }
+        {isTrigger && moduleItemId && (
+          <Flex.Item>
+            <Link href={`${ENV.CONTEXT_URL_ROOT}/modules/items/${moduleItemId}/edit_mastery_paths`}>
+              {I18n.t('Mastery Paths')}
+            </Link>
+          </Flex.Item>
+        )}
+        {releasedLabel && (
+          <Flex.Item>
+            <Pill data-testid={`${releasedLabel}-${moduleItemId}`}>
+              <i className="icon-mastery-paths" /> {releasedLabel}
+            </Pill>
+          </Flex.Item>
+        )}
+      </Flex>
+    );
   }
 
   render() {
@@ -367,6 +424,10 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       },
     }
     const contextType = this.props.context_type
+
+    const coursePaceItem = this.props.coursePaceItem;
+    const masteryPathsData: MasteryPathsData = CyoeHelper.getItemData(coursePaceItem.assignment_id, true);
+
     return (
       <InstUISettingsProvider theme={{componentOverrides}}>
         {/* @ts-expect-error */}
@@ -377,7 +438,14 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
           {...pick(this.props, ['hover', 'isStacked', 'headers'])}
         >
           <Table.Cell data-testid="pp-title-cell">
-            <View margin={labelMargin}>{this.renderTitle()}</View>
+            <Flex justifyItems="space-between">
+              <Flex.Item>
+                <View margin={labelMargin}>{this.renderTitle()}</View>
+              </Flex.Item>
+              <Flex.Item>
+                {masteryPathsData && ENV.FEATURES.course_pace_pacing_with_mastery_paths && this.renderMasteryPathsInfo(masteryPathsData, coursePaceItem.module_item_id)}
+              </Flex.Item>
+            </Flex>
           </Table.Cell>
           <Table.Cell data-testid="pp-duration-cell" textAlign="center">
             <View data-testid="duration-input" margin={labelMargin}>
@@ -428,6 +496,7 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
 
 const ConnectedAssignmentRow = connect(mapStateToProps, {
   setPaceItemDuration: actions.setPaceItemDuration,
+  setPaceItemDurationTimeToCompleteCalendarDays: coursePaceActions.setPaceItemDurationTimeToCompleteCalendarDays
 })(AssignmentRow)
 
 // This hack allows AssignmentRow to be rendered inside an InstUI Table.Body

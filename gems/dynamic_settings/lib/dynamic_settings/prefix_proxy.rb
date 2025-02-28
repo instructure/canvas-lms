@@ -62,9 +62,7 @@ module DynamicSettings
       @circuit_breaker = circuit_breaker
     end
 
-    def cache
-      DynamicSettings.cache
-    end
+    delegate :cache, to: :DynamicSettings
 
     # Fetch the value at the requested key using the prefix passed to the
     # initializer.

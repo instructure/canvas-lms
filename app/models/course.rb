@@ -1030,10 +1030,10 @@ class Course < ActiveRecord::Base
   scope :archived, -> { deleted.where.not(archived_at: nil) }
 
   scope :master_courses, -> { joins(:master_course_templates).where.not(MasterCourses::MasterTemplate.table_name => { workflow_state: "deleted" }) }
-  scope :not_master_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::MasterTemplate.quoted_table_name} AS mct ON mct.course_id=courses.id AND mct.workflow_state<>'deleted'").where("mct IS NULL") } # rubocop:disable Rails/WhereEquals mct is a table, not a column
+  scope :not_master_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::MasterTemplate.quoted_table_name} AS mct ON mct.course_id=courses.id AND mct.workflow_state<>'deleted'").where("mct IS NULL") } # rubocop:disable Rails/WhereEquals -- mct is a table, not a column
 
   scope :associated_courses, -> { joins(:master_course_subscriptions).where.not(MasterCourses::ChildSubscription.table_name => { workflow_state: "deleted" }) }
-  scope :not_associated_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").where("mcs IS NULL") } # rubocop:disable Rails/WhereEquals mcs is a table, not a column
+  scope :not_associated_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").where("mcs IS NULL") } # rubocop:disable Rails/WhereEquals -- mcs is a table, not a column
 
   scope :public_courses, -> { where(is_public: true) }
   scope :not_public_courses, -> { where(is_public: false) }
@@ -2364,6 +2364,7 @@ class Course < ActiveRecord::Base
     Enrollment.where(id: enrollment_ids).find_each do |enrollment|
       pace_create_params[:user_id] = enrollment.user_id
       pace_create_params[:workflow_state] = "active"
+      pace_create_params[:course_id] = enrollment.course_id
       pace = enrollment.course_paces.new(pace_create_params)
 
       if pace.save
@@ -2828,7 +2829,7 @@ class Course < ActiveRecord::Base
           cm.add_imported_item(new_file.folder, key: new_file.folder.id)
           map_merge(file, new_file)
         rescue => e
-          Canvas::Errors.capture(e)
+          Canvas::Errors.capture(e) unless e.message.include?("Cannot create attachments in deleted folders")
           Rails.logger.error "Couldn't copy file: #{e}"
           cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", name: file.display_name || file.path_name), $!)
         end
@@ -3056,7 +3057,8 @@ class Course < ActiveRecord::Base
                                            visibilities,
                                            visibility,
                                            enrollment_state: opts[:enrollment_state],
-                                           exclude_enrollment_state: opts[:exclude_enrollment_state])
+                                           exclude_enrollment_state: opts[:exclude_enrollment_state],
+                                           section_ids: opts[:section_ids])
   end
 
   def enrollments_visible_to(user, opts = {})
@@ -3067,12 +3069,13 @@ class Course < ActiveRecord::Base
     apply_enrollment_visibilities_internal(enrollment_scope.except(:preload), user, visibilities, visibility)
   end
 
-  def apply_enrollment_visibilities_internal(scope, user, visibilities, visibility, enrollment_state: nil, exclude_enrollment_state: nil)
+  def apply_enrollment_visibilities_internal(scope, user, visibilities, visibility, enrollment_state: nil, exclude_enrollment_state: nil, section_ids: nil)
     if enrollment_state
       scope = scope.where(enrollments: { workflow_state: enrollment_state })
     elsif exclude_enrollment_state
       scope = scope.where.not(enrollments: { workflow_state: exclude_enrollment_state })
     end
+    scope = scope.where(enrollments: { course_section_id: section_ids }) if section_ids.present?
     # See also MessageableUsers (same logic used to get users across multiple courses) (should refactor)
     case visibility
     when :full then scope
@@ -4464,7 +4467,7 @@ class Course < ActiveRecord::Base
   end
 
   def horizon_course?
-    root_account&.feature_enabled?(:horizon_course_setting) && horizon_course
+    horizon_course && account&.feature_enabled?(:horizon_course_setting)
   end
 
   private

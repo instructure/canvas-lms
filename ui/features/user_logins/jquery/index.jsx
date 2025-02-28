@@ -17,82 +17,103 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import SuspendedIcon from '../react/SuspendedIcon'
 import $ from 'jquery'
-import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/util/templateData'
-import '../react/externalIdFields'
+import AddEditPseudonym from '../react/AddEditPseudonym'
 
 const I18n = createI18nScope('user_logins')
 
 const savedSSOIcons = {}
 
+function updateLoginList({isEdit, currentPseudonym, accountSelectOptions}) {
+  let currentLoginElement
+
+  if (isEdit) {
+    currentLoginElement = $(
+      `#login_information .login:has([data-pseudonym-id='${currentPseudonym.id}'])`,
+    )
+  } else {
+    currentLoginElement = $('#login_information .login.blank').clone(true)
+    currentLoginElement.removeClass('blank')
+    currentLoginElement.show()
+    const ssoIconElement = currentLoginElement.find('.sso-icon')
+    ssoIconElement.attr('data-pseudonym-id', currentPseudonym.id)
+    const overviewElement = currentLoginElement.find('.overview')
+    overviewElement.append(
+      $(
+        `<div>${I18n.t('SIS ID')}: <span class="sis_user_id"></span></div>
+         <div style="display:none" class="can_edit_sis_user_id">${$('.add_pseudonym_link').data('can-manage-sis')}</div>`,
+      ),
+    )
+    overviewElement.append(
+      $(`<div>${I18n.t('Integration ID')}: <span class="integration_id"></span></div>`),
+    )
+    $('#login_information .add_holder').before(currentLoginElement)
+    currentPseudonym.account_name = accountSelectOptions.find(
+      ({value}) => `${value}` === currentPseudonym.account_id,
+    )?.label
+  }
+  currentLoginElement.fillTemplateData({
+    data: currentPseudonym,
+    hrefValues: ['id', 'account_id'],
+  })
+
+  const $logins = $('#login_information .login')
+  $('.delete_pseudonym_link', $logins)[$logins.filter(':visible').length < 2 ? 'hide' : 'show']()
+}
+
+const renderAddEditPseudonym = ({
+  nodeIdToMount,
+  pseudonym,
+  canManageSis,
+  canChangePassword,
+  isDelegatedAuth,
+}) => {
+  const mountPoint = document.getElementById(nodeIdToMount)
+
+  if (!mountPoint) {
+    return
+  }
+
+  const accountSelectOptions = ENV.ACCOUNT_SELECT_OPTIONS
+  const accountIdPasswordPolicyMap = ENV.PASSWORD_POLICIES
+  const defaultPolicy = ENV.PASSWORD_POLICY
+  const userId = ENV.USER_ID
+  const isEdit = Boolean(pseudonym)
+  const root = createRoot(mountPoint)
+
+  root.render(
+    <AddEditPseudonym
+      pseudonym={pseudonym}
+      canManageSis={canManageSis}
+      canChangePassword={canChangePassword}
+      isDelegatedAuth={isDelegatedAuth}
+      userId={userId}
+      accountIdPasswordPolicyMap={accountIdPasswordPolicyMap}
+      accountSelectOptions={accountSelectOptions}
+      defaultPolicy={defaultPolicy}
+      isEdit={isEdit}
+      onSubmit={currentPseudonym => {
+        root.unmount()
+
+        updateLoginList({isEdit, currentPseudonym, accountSelectOptions})
+
+        $.flashMessage(I18n.t('save_succeeded', 'Save successful.'))
+      }}
+      onClose={() => {
+        root.unmount()
+      }}
+    />,
+  )
+}
+
 $(function () {
-  const $form = $('#edit_pseudonym_form')
-  $form.formSubmit({
-    disableWhileLoading: true,
-    formErrors: false,
-    processData(data) {
-      if (
-        !$(this).hasClass('passwordable') ||
-        (!data['pseudonym[password]'] && !data['pseudonym[password_confirmation]'])
-      ) {
-        delete data['pseudonym[password]']
-        delete data['pseudonym[password_confirmation]']
-      }
-    },
-    beforeSubmit() {
-      const select = $(this).find('.account_id select')[0]
-      const idx = select && select.selectedIndex
-      $(this).data('account_name', null)
-      $(this).data('account_name', select && select.options[idx] && select.options[idx].innerHTML)
-    },
-    success(data) {
-      let $login
-      $(this).dialog('close')
-      if ($(this).data('unique_id_text')) {
-        $login = $(this).data('unique_id_text').parents('.login')
-      } else {
-        $login = $('#login_information .login.blank').clone(true)
-        $('#login_information .add_holder').before($login)
-        $login.removeClass('blank')
-        $login.show()
-        data.account_name = $(this).data('account_name')
-      }
-      $login.fillTemplateData({
-        data,
-        hrefValues: ['id', 'account_id'],
-      })
-      const $logins = $('#login_information .login')
-      $('.delete_pseudonym_link', $logins)[
-        $logins.filter(':visible').length < 2 ? 'hide' : 'show'
-      ]()
-      $.flashMessage(I18n.t('save_succeeded', 'Save successful'))
-    },
-    error(errors, jqXHR, response) {
-      if (response.status === 401)
-        return $.flashError(
-          I18n.t(
-            'error.unauthorized',
-            'You do not have sufficient privileges to make the change requested',
-          ),
-        )
-      const accountId = $(this).find('.account_id select').val()
-      const policy =
-        (ENV.PASSWORD_POLICIES && ENV.PASSWORD_POLICIES[accountId]) || ENV.PASSWORD_POLICY
-      errors = Pseudonym.prototype.normalizeErrors(errors, policy)
-      $(this).formErrors(errors)
-    },
-  })
-  $('#edit_pseudonym_form .cancel_button').on('click', () => {
-    $form.dialog('close')
-  })
   $('.login_details_link').on('click', function (event) {
     event.preventDefault()
     $(this).parents('td').find('.login_details').show()
@@ -101,60 +122,27 @@ $(function () {
   $('#login_information')
     .on('click', '.edit_pseudonym_link', function (event) {
       event.preventDefault()
-      $form.attr('action', $(this).attr('rel')).attr('method', 'PUT')
-      const data = $(this)
-        .parents('.login')
-        .getTemplateData({
-          textValues: ['unique_id', 'sis_user_id', 'integration_id', 'can_edit_sis_user_id'],
-        })
-      data.password = ''
-      data.password_confirmation = ''
-      $form.fillFormData(
-        {
-          unique_id: data.unique_id,
-        },
-        {object_name: 'pseudonym'},
-      )
-      window.canvas_pseudonyms.jqInterface.onEdit({
-        canEditSisUserId: data.can_edit_sis_user_id === 'true',
-        integrationId: data.integration_id,
-        sisUserId: data.sis_user_id,
+
+      const loginElement = $(this).parents('.login')
+      const {can_edit_sis_user_id, ...restOfTemplateData} = loginElement.getTemplateData({
+        textValues: ['unique_id', 'sis_user_id', 'integration_id', 'can_edit_sis_user_id'],
       })
-      const passwordable = $(this).parents('.links').hasClass('passwordable')
-      const delegated = passwordable && $(this).parents('.links').hasClass('delegated-auth')
-      $form.toggleClass('passwordable', passwordable)
-      $form.find('tr.password').showIf(passwordable)
-      $form.find('tr.delegated').showIf(delegated)
-      $form.find('.account_id').hide()
-      const $account_select = $form.find('.account_id select')
-      const accountId = $(this).data('accountId')
-      if ($account_select && accountId) {
-        $account_select.val(accountId)
+      const pseudonym = {
+        id: loginElement.find('[data-pseudonym-id]').data('pseudonym-id'),
+        ...restOfTemplateData,
       }
-      $form.dialog({
-        width: 'auto',
-        close() {
-          if (
-            $form.data('unique_id_text') &&
-            $form.data('unique_id_text').parents('.login').hasClass('blank')
-          ) {
-            $form.data('unique_id_text').parents('.login').remove()
-          }
-          window.canvas_pseudonyms.jqInterface.onCancel()
-        },
-        modal: true,
-        zIndex: 1000,
+      const canManageSis = can_edit_sis_user_id === 'true'
+      const canChangePassword = $(this).parents('.links').hasClass('passwordable')
+      const isDelegatedAuth =
+        canChangePassword && $(this).parents('.links').hasClass('delegated-auth')
+
+      renderAddEditPseudonym({
+        nodeIdToMount: 'edit_pseudonym_mount_point',
+        pseudonym,
+        canManageSis,
+        canChangePassword,
+        isDelegatedAuth,
       })
-      $form
-        .dialog('option', 'title', I18n.t('titles.update_login', 'Update Login'))
-        .find('.submit_button')
-        .text(I18n.t('buttons.update_login', 'Update Login'))
-      $form.dialog('option', 'beforeClose', () => {
-        $('.error_box:visible').trigger('click')
-      })
-      const $unique_id = $(this).parents('.login').find('.unique_id')
-      $form.data('unique_id_text', $unique_id)
-      $form.find(':input:visible:first').trigger('focus').trigger('select')
     })
     .on('click', '.delete_pseudonym_link', function (event) {
       event.preventDefault()
@@ -187,19 +175,15 @@ $(function () {
     })
     .on('click', '.add_pseudonym_link', function (event) {
       event.preventDefault()
-      $('#login_information .login.blank .edit_pseudonym_link').click()
-      window.canvas_pseudonyms.jqInterface.onAdd({canEditSisUserId: $(this).data('can-manage-sis')})
-      $form.attr('action', $(this).attr('rel')).attr('method', 'POST')
-      $form.fillFormData({'pseudonym[unique_id]': ''})
-      $form
-        .dialog('option', 'title', I18n.t('titles.add_login', 'Add Login'))
-        .find('.submit_button')
-        .text(I18n.t('buttons.add_login', 'Add Login'))
-      $form.addClass('passwordable')
-      $form.find('tr.password').show()
-      $form.find('.account_id').show()
-      $form.find('.account_id_select').change()
-      $form.data('unique_id_text', null)
+
+      const canManageSis = $(this).data('can-manage-sis')
+
+      renderAddEditPseudonym({
+        nodeIdToMount: 'add_pseudonym_mount_point',
+        canManageSis,
+        isDelegatedAuth: false,
+        canChangePassword: true,
+      })
     })
 
   $('.reset_mfa_link').on('click', function (event) {
@@ -231,7 +215,8 @@ $(function () {
     const innerDiv = document.createElement('div')
     icon.replaceChildren(innerDiv)
 
-    ReactDOM.render(<SuspendedIcon login={login} />, innerDiv)
+    const root = createRoot(innerDiv)
+    root.render(<SuspendedIcon login={login} />)
   }
 
   function unsetSuspend(id) {

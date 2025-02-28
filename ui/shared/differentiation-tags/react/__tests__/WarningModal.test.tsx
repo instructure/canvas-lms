@@ -40,8 +40,6 @@ describe('DeleteTagWarningModal', () => {
   it('renders the delete tag warning modal text', () => {
     const {getByText} = setup()
     expect(getByText(/Deleting this tag preserves past assignments/i)).toBeInTheDocument()
-
-    expect(getByText(/For assignments that are currently available/i)).toBeInTheDocument()
   })
 
   it('calls onClose when the Cancel button is clicked', () => {
@@ -81,8 +79,6 @@ describe('RemoveTagWarningModal', () => {
     expect(
       getByText(/Removing the tag from a student preserves past assignments/i),
     ).toBeInTheDocument()
-
-    expect(getByText(/For assignments that are currently available/i)).toBeInTheDocument()
   })
 
   it('calls onClose when the Cancel button is clicked', () => {

@@ -57,22 +57,12 @@ describe('HelpTray', () => {
       id: 'report_a_problem',
     },
   ]
-  let originalWindowEnv: PropertyDescriptor | undefined
 
   beforeEach(() => {
-    originalWindowEnv = Object.getOwnPropertyDescriptor(window, 'ENV')
-    // @ts-expect-error
-    window.ENV = {FEATURES: {featured_help_links: true}}
     ;(doFetchApi as jest.Mock).mockResolvedValueOnce({response: {status: 200, ok: true}})
   })
 
   afterEach(() => {
-    if (originalWindowEnv) {
-      Object.defineProperty(window, 'ENV', originalWindowEnv)
-    } else {
-      // @ts-expect-error
-      delete window.ENV
-    }
     queryClient.removeQueries()
   })
 

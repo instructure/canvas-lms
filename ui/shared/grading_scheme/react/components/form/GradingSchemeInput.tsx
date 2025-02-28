@@ -32,8 +32,25 @@ import {GradingSchemeValidationAlert} from './GradingSchemeValidationAlert'
 import {gradingSchemeIsValid} from './validations/gradingSchemeValidations'
 import {roundToTwoDecimalPlaces, roundToFourDecimalPlaces} from '../../helpers/roundDecimalPlaces'
 import {Flex} from '@instructure/ui-flex'
+import {FormMessage} from '@instructure/ui-form-field'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('GradingSchemeManagement')
+
+const emptyErrorMsg = (): FormMessage => ({
+  text: (
+    <Flex justifyItems="start" alignItems="center" direction="row" gap="x-small">
+      <Flex.Item align="start">
+        <IconWarningSolid color="error" />
+      </Flex.Item>
+      <Flex.Item>
+        <Text color="danger">{I18n.t('Please enter a grading scheme name')}</Text>
+      </Flex.Item>
+    </Flex>
+  ),
+  type: 'error',
+})
 
 export interface ComponentProps {
   initialFormDataByInputType: {
@@ -347,11 +364,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
                   onChange={changeTitle}
                   defaultValue={formState.title}
                   placeholder={I18n.t('New Grading Scheme')}
-                  messages={
-                    !valid && formState.title === ''
-                      ? [{text: I18n.t('Enter a grading scheme name'), type: 'error'}]
-                      : []
-                  }
+                  messages={!valid && formState.title === '' ? [emptyErrorMsg()] : []}
                   data-testid="grading-scheme-name-input"
                 />
               </Flex.Item>

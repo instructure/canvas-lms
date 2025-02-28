@@ -16,18 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState, useRef} from 'react'
 
 import {
   CommonMigratorControls,
   RequiredFormLabel,
   ErrorFormMessage,
   noFileSelectedFormMessage,
+  FormLabel,
 } from '@canvas/content-migrations'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconEndLine, IconFolderLine, IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
@@ -101,7 +102,7 @@ const SelectedFolderName = ({folderName, clearFolderName}: SelectedFolderNamePro
     <Flex alignItems="center" gap="x-small">
       <IconFolderLine />
       <Flex.Item shouldShrink shouldGrow>
-        <Text weight="bold" size="small" >
+        <Text weight="bold" size="small">
           <TruncateText>{folderName}</TruncateText>
         </Text>
       </Flex.Item>
@@ -130,18 +131,25 @@ const ZipFileImporter = ({
   const [searchValue, setSearchValue] = useState('')
   const [fileError, setFileError] = useState<boolean>(false)
   const [folderError, setFolderError] = useState<boolean>(false)
+  const folderInputRef = useRef<HTMLInputElement | null>(null)
+
+  const handleErrorFocus = (folderError: boolean) => {
+    if (folderError) {
+      folderInputRef.current?.focus()
+    }
+  }
+  const [keyword, setKeyword] = useState('')
 
   const handleSubmit: onSubmitMigrationFormCallback = useCallback(
     formData => {
-      if (!file) {
-        setFileError(true)
-      }
+      const fileError = !file
+      const folderError = !folder
 
-      if (!folder) {
-        setFolderError(true)
-      }
+      setFileError(fileError)
+      setFolderError(folderError)
 
-      if (!file || !folder) {
+      if (fileError || folderError) {
+        handleErrorFocus(folderError)
         return
       }
 
@@ -196,8 +204,17 @@ const ZipFileImporter = ({
     fetchFolders()
   }, [])
 
+  const folderToTreeBrowserCollection = (acc: Record<number, Collection>, f: Folder) => {
+    acc[parseInt(f.id, 10)] = {
+      id: parseInt(f.id, 10),
+      name: f.name,
+      collections: searchValue ? [] : f.children || [],
+      items: [],
+    };
+    return acc;
+  }
+
   const folderCollection = () => {
-    const collection: Record<number, Collection> = {}
     let filteredFolders = folders
 
     if (searchValue) {
@@ -205,15 +222,8 @@ const ZipFileImporter = ({
         f.name.toLowerCase().includes(searchValue.toLowerCase()),
       )
     }
-    filteredFolders.forEach((f: Folder) => {
-      collection[parseInt(f.id, 10)] = {
-        id: parseInt(f.id, 10),
-        name: f.name,
-        collections: searchValue ? [] : f.children || [],
-        items: [],
-      }
-    })
-    return collection
+
+    return filteredFolders.reduce(folderToTreeBrowserCollection, {});
   }
 
   const handleCollectionClick: CollectionClickArgs = (_e, collection) => {
@@ -222,22 +232,21 @@ const ZipFileImporter = ({
   }
 
   const renderClearButton = () => {
-    if (!searchValue.length) return
-
-    return (
-      <IconButton
+    return <>
+      {keyword.length ? <IconButton
         type="button"
         size="small"
         withBackground={false}
         withBorder={false}
         screenReaderLabel="Clear search"
         onClick={() => {
+          setKeyword('')
           setSearchValue('')
         }}
       >
         <IconTroubleLine />
-      </IconButton>
-    )
+      </IconButton> : null}
+    </>
   }
 
   const treeBrowserParams = () => {
@@ -256,6 +265,21 @@ const ZipFileImporter = ({
     }
   }
 
+  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    showFlashAlert({
+      message: I18n.t('Folder Tree Results Updated Below for %{keyword}', {keyword}),
+      type: 'info',
+      srOnly: true,
+      politeness: 'polite',
+    })
+    setSearchValue(keyword)
+  }
+
+  const handleFolderSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setKeyword(e.target.value)
+  }
+
   return (
     <>
       <MigrationFileInput
@@ -267,13 +291,10 @@ const ZipFileImporter = ({
         isRequired={true}
       />
       {!isSubmitting && (
-        <View as="div" margin="medium none none none" maxWidth="22.5rem">
+        <View as="div" margin="medium none none none" maxWidth="46.5rem">
           {folders.length > 0 ? (
             <>
-              <RequiredFormLabel
-                showErrorState={folderError}
-                htmlFor="folder-search"
-              >
+              <RequiredFormLabel showErrorState={folderError} htmlFor="folder-search">
                 {I18n.t('Upload to')}
               </RequiredFormLabel>
               <View as="div" margin="x-small 0 medium" data-testid="fileName">
@@ -287,24 +308,42 @@ const ZipFileImporter = ({
                   clearFolderName={() => setFolder(null)}
                 />
               </View>
-              <TextInput
-                id="folder-search"
-                renderLabel=""
-                placeholder={I18n.t('Search folders')}
-                value={searchValue}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setFolder(null)
-                  setSearchValue(e.target.value)
-                }}
-                renderBeforeInput={<IconSearchLine inline={false} />}
-                renderAfterInput={renderClearButton()}
-              />
+              <form onSubmit={handleSearchSubmit}>
+                <View as="div" margin="small 0">
+                  <FormLabel htmlFor="folder-search">{I18n.t('Search folders')}</FormLabel>
+                </View>
+                <Flex alignItems ='start'>
+                  <TextInput
+                    id="folder-search"
+                    renderLabel=""
+                    placeholder={I18n.t('Search for a folder or file name...')}
+                    renderAfterInput={renderClearButton()}
+                    value={keyword}
+                    onChange={handleFolderSearch}
+                    inputRef={ref => (folderInputRef.current = ref)}
+                    messages={
+                      folderError
+                        ? [{text: I18n.t('Please select a folder'), type: 'screenreader-only'}]
+                        : []
+                    }
+                  />
+                  <Button
+                    margin="0 0 0 small"
+                    data-testid="find-assignment-rubric-button"
+                    renderIcon={() => <IconSearchLine />}
+                    type="submit"
+                  >
+                    {I18n.t('Search')}
+                  </Button>
+                </Flex>
+              </form>
               <View
                 as="div"
                 maxHeight="20rem"
                 padding="xx-small"
                 overflowY="auto"
                 overflowX="visible"
+                data-testid="folderTree"
               >
                 <TreeBrowser
                   collections={folderCollection()}

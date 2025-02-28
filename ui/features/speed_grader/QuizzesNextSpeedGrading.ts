@@ -86,6 +86,18 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
   function onMessage(e) {
     const message = e.data
     const prevButton = document.getElementById('prev-student-button')
+
+    if (
+      message &&
+      message.subject &&
+      message.subject.startsWith('SG.switchToFullContext&entryId=')
+    ) {
+      return EG.renderSubmissionPreview(
+        'iframe',
+        'discussion_view_with_context',
+        message.subject.split('=')[1],
+      )
+    }
     switch (message.subject) {
       case 'quizzesNext.register':
         EG.setGradeReadOnly(true)
@@ -94,12 +106,25 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
         return refreshGradesCb(quizzesNextChange, retryRefreshGrades, 1000)
       case 'quizzesNext.previousStudent':
         return EG.prev()
+      /* falls through */
       case 'quizzesNext.nextStudent':
         return EG.next()
+      /* falls through */
       case 'SG.focusPreviousStudentButton':
         if (prevButton) {
-          prevButton.focus()
+          return prevButton.focus()
         }
+      /* falls through */
+      case 'SG.switchToIndividualPosts':
+        EG.renderSubmissionPreview('iframe', 'discussion_view_no_context')
+        EG.clearDiscussionsNavigation()
+        return
+      /* falls through */
+      case 'SG.switchToFullContext':
+        EG.renderSubmissionPreview('iframe', 'discussion_view_with_context')
+        EG.renderDiscussionsNavigation('discussion_view_with_context')
+        return
+      /* falls through */
     }
   }
 

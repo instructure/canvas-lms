@@ -68,7 +68,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   }
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [context, nil] }
-  validates_with HorizonValidators::QuizzesValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
+  validates_with HorizonValidators::QuizzesValidator, if: -> { context.is_a?(Course) && context.horizon_course? }, on: :create
 
   before_save :generate_quiz_data_on_publish, if: :workflow_state_changed?
   before_save :build_assignment
@@ -984,7 +984,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     return if time_limit.blank?
 
     unless time_limit > 0
-      errors.add(:time_limit, t("#quizzes.quiz.errors.invalid_time_limit", "Time Limit is not valid"))
+      errors.add(:invalid_time_limit, t("#quizzes.quiz.errors.invalid_time_limit", "Time Limit is not valid"))
     end
   end
 
@@ -1339,6 +1339,10 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def group_category_id
     assignment.try(:group_category_id)
+  end
+
+  def effective_group_category_id
+    group_category_id
   end
 
   def publish

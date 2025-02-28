@@ -23,6 +23,10 @@ class ContextModulesController < ApplicationController
   include WebZipExportHelper
 
   before_action :require_context
+
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   add_crumb(proc { t("#crumbs.modules", "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_context_modules_url }
   before_action { |c| c.active_tab = "modules" }
 
@@ -569,7 +573,7 @@ class ContextModulesController < ApplicationController
     @progression.current_position ||= 0 if @progression
     res = {}
     if !@progression
-      nil
+      # do nothing
     elsif @progression.locked?
       res[:locked] = true
       res[:modules] = []
@@ -813,15 +817,16 @@ class ContextModulesController < ApplicationController
       @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent] && !@context.horizon_course?
       @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
 
-      duration = get_estimated_duration(params[:content_tag][:estimated_duration_minutes].to_i)
+      if @context.horizon_course?
+        duration = get_estimated_duration(params[:content_tag][:estimated_duration_minutes].to_i)
 
-      if duration.nil?
-        @tag.estimated_duration&.destroy!
-        @tag.estimated_duration = nil
-      elsif @tag.estimated_duration
-        @tag.estimated_duration.update(duration: duration)
-      else
-        @tag.estimated_duration = create_estimated_duration(@tag, duration)
+        if duration.nil?
+          @tag.estimated_duration&.destroy!
+        elsif @tag.estimated_duration
+          @tag.estimated_duration.update(duration: duration)
+        else
+          @tag.estimated_duration = create_estimated_duration(@tag, duration)
+        end
       end
 
       unless @tag.save

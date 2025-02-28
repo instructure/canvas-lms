@@ -223,6 +223,25 @@ describe WikiPagesController do
 
         it_behaves_like "pages enforcing differentiation"
       end
+
+      context "assign to differentiation tags" do
+        before do
+          @course.account.enable_feature! :assign_to_differentiation_tags
+          @course.account.enable_feature! :differentiation_tags
+          @course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = true
+            a.save!
+          end
+        end
+
+        it "differentiation tags information is true if account setting is on and user can manage tags" do
+          course_quiz
+          user_session(@teacher)
+          get "edit", params: { course_id: @course.id, id: @page.url }
+          expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+          expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+        end
+      end
     end
 
     describe "GET 'revisions'" do

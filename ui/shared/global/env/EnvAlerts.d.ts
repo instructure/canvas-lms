@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Alert, AccountRole} from '../../../features/alerts/react/types'
+import {Alert, AccountRole} from '../../../shared/student-alerts/react/types'
 
 export interface EnvAlerts {
   ALERTS: {

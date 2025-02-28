@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_relative "../conditional_release_spec_helper"
+
 RSpec::Matchers.define :docx_includes do |expected|
   match do |actual|
     doc = Docx::Document.open(actual)
@@ -49,14 +51,14 @@ describe CoursePacePresenter do
     course_pace_model(course: @course)
 
     @mod1 = @course.context_modules.create! name: "M1"
-    @a1 = @course.assignments.create! name: "A1", points_possible: 100, workflow_state: "active"
+    @a1 = @course.assignments.create! name: "A1", points_possible: 100, workflow_state: "active", submission_types: "text"
     @ct1 = @mod1.add_item id: @a1.id, type: "assignment"
 
     @mod2 = @course.context_modules.create! name: "M2"
-    @a2 = @course.assignments.create! name: "A2", points_possible: 50, workflow_state: "unpublished"
+    @a2 = @course.assignments.create! name: "A2", points_possible: 50, workflow_state: "unpublished", submission_types: "text"
     @ct2 = @mod2.add_item id: @a2.id, type: "assignment"
     @a3 = @course.assignments.create! name: "A3", workflow_state: "active"
-    @ct3 = @mod2.add_item id: @a3.id, type: "assignment"
+    @ct3 = @mod2.add_item id: @a3.id, type: "assignment", submission_types: "text"
   end
 
   describe "#as_json" do
@@ -167,6 +169,24 @@ describe CoursePacePresenter do
       expect(second_module_item[:module_item_type]).to eq("Assignment")
       expect(second_module_item[:published]).to be(true)
     end
+
+    context "with mastery paths for enrollment paces" do
+      before do
+        @course.root_account.enable_feature!(:course_pace_pacing_with_mastery_paths)
+        @course.update(conditional_release: true)
+        setup_course_with_native_conditional_release(course: @course)
+        course_pace_model(course: @course, user: @student)
+      end
+
+      it "sets 'unreleased' attribute true for conditionally released but not yet released module items" do
+        formatted_plan = CoursePacePresenter.new(@course_pace).as_json
+
+        last_module = formatted_plan[:modules].last
+        first_module_item = last_module[:items].first
+
+        expect(first_module_item[:unreleased]).to be true
+      end
+    end
   end
 
   describe "#as_docx" do
@@ -226,6 +246,27 @@ describe CoursePacePresenter do
 
       it "uses enrollment start_at as start date" do
         expect(docx_string).to docx_includes(I18n.l(@enrollment.start_at, format: CoursePacePresenter::DATE_FORMAT))
+      end
+    end
+
+    describe "on/off pace determination" do
+      it "marks student as off pace" do
+        @enrollment.update(start_at: 30.days.ago)
+        student_enrollment_pace_model(student_enrollment: @enrollment)
+        @student_enrollment_pace.publish
+
+        docx_string = CoursePacePresenter.new(@student_enrollment_pace).as_docx(@enrollment).string
+
+        expect(docx_string).to docx_includes("Off Pace")
+      end
+
+      it "marks student as on pace" do
+        @enrollment.update(start_at: 0.days.ago)
+        student_enrollment_pace_model(student_enrollment: @enrollment)
+        @student_enrollment_pace.publish
+        docx_string = CoursePacePresenter.new(@student_enrollment_pace).as_docx(@enrollment).string
+
+        expect(docx_string).to docx_includes("On Pace")
       end
     end
   end

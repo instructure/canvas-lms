@@ -30,6 +30,12 @@ OutcomeContentBase.prototype.readyForm = () => {}
 const newOutcome = (outcomeOptions, outcomeLinkOptions) =>
   new Outcome(buildOutcome(outcomeOptions, outcomeLinkOptions), {parse: true})
 
+const waitFrames = async frames => {
+  for (let i = 0; i < frames; i++) {
+    await new Promise(resolve => requestAnimationFrame(resolve))
+  }
+}
+
 function buildOutcome(outcomeOptions, outcomeLinkOptions) {
   const base = {
     context_type: 'Course',
@@ -138,29 +144,33 @@ describe('OutcomeView', () => {
   })
 
   describe('Form Validation', () => {
-    it('validates mastery points', () => {
+    it('validates mastery points', async () => {
       const view = createView({
         model: newOutcome(),
         state: 'edit',
       })
+      await waitFrames(10)
       view.$('input[name="mastery_points"]').val('-1')
       expect(view.isValid()).toBeFalsy()
       expect(view.errors.mastery_points).toBeTruthy()
       view.remove()
     })
 
-    it('validates i18n mastery points', () => {
+    it('validates i18n mastery points', async () => {
       const view = createView({
         model: newOutcome(),
         state: 'edit',
       })
+      await waitFrames(10)
       I18nStubber.pushFrame()
       I18nStubber.setLocale('fr_FR')
       I18nStubber.stub('fr_FR', {
         'number.format.delimiter': ' ',
         'number.format.separator': ',',
       })
+      await waitFrames(10)
       view.$('input[name="mastery_points"]').val('1 234,5')
+      await waitFrames(10)
       expect(view.isValid()).toBeTruthy()
       view.remove()
       I18nStubber.clear()
@@ -168,9 +178,11 @@ describe('OutcomeView', () => {
   })
 
   describe('Form Field Modifications', () => {
-    it('returns false for all fields when not modified', () => {
+    it('returns false for all fields when not modified', async () => {
       const view = createView({model: newOutcome(), state: 'edit'})
+      await waitFrames(10)
       view.edit($.Event())
+      await waitFrames(10)
       const modified = view.getModifiedFields(view.getFormData())
       expect(modified.masteryPoints).toBeFalsy()
       expect(modified.calculationInt).toBeFalsy()
@@ -212,33 +224,41 @@ describe('OutcomeView', () => {
   })
 
   describe('Calculation Method Changes', () => {
-    it('sets calculation int intelligently when calc method is changed', () => {
+    it('sets calculation int intelligently when calc method is changed', async () => {
       const view = createView({
         model: newOutcome({calculation_method: 'highest'}),
         state: 'edit',
       })
+      await waitFrames(10)
       view.$('#calculation_method').val('n_mastery').trigger('change')
+      await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('5')
-
+      
       view.$('#calculation_method').val('decaying_average').trigger('change')
+      await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('65')
-
+      
       view.$('#calculation_method').val('n_mastery').trigger('change')
+      await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('5')
-
+      
       view.$('#calculation_int').val('4')
+      await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('4')
-
+      
       view.$('#calculation_method').val('decaying_average').trigger('change')
+      await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('65')
-
+      
       view.$('#calculation_method').val('highest').trigger('change')
+      await waitFrames(10)
       view.$('#calculation_method').val('decaying_average').trigger('change')
+      await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('65')
       view.remove()
     })
 
-    it('does not change calc int to 65 when starting as n mastery and 5', () => {
+    it('does not change calc int to 65 when starting as n mastery and 5', async () => {
       const view = createView({
         model: newOutcome({
           calculation_method: 'n_mastery',
@@ -246,7 +266,9 @@ describe('OutcomeView', () => {
         }),
         state: 'edit',
       })
+      await waitFrames(10)
       view.$('#calculation_method').val('n_mastery').trigger('change')
+      await waitFrames(10)
       expect(view.$('#calculation_int').val()).toBe('5')
       view.remove()
     })
@@ -285,7 +307,7 @@ describe('OutcomeView', () => {
       })
     })
 
-    it('saves without dialog when outcome calculation is changed but no rubrics aligned and not assessed', () => {
+    it('saves without dialog when outcome calculation is changed but no rubrics aligned and not assessed', async () => {
       const view = createView({
         model: newOutcome(
           {assessed: false, native: true, has_updateable_rubrics: false},
@@ -293,14 +315,17 @@ describe('OutcomeView', () => {
         ),
         state: 'edit',
       })
+      await waitFrames(10)
       view.edit($.Event())
+      await waitFrames(10)
       const submitSpy = jest.fn()
       view.on('submit', submitSpy)
       view.$('form').trigger('submit')
-
+      
       return new Promise(resolve => {
-        setTimeout(() => {
+        setTimeout(async () => {
           $('#confirm-outcome-edit-modal').trigger('click')
+          await waitFrames(10)
           expect(submitSpy).toHaveBeenCalled()
           resolve()
         })

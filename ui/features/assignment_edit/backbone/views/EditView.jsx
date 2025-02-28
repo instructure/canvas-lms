@@ -126,6 +126,8 @@ const LTI_EXT_MASTERY_CONNECT = 'https://canvas.instructure.com/lti/mastery_conn
 
 const DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE = 'context_external_tool'
 
+const EXTERNAL_TOOL_URL_INPUT_NAME = 'external_tool_tag_attributes[url]'
+
 /*
 xsslint safeString.identifier srOnly
  */
@@ -292,6 +294,7 @@ EditView.prototype.events = {
     events['change ' + GROUP_CATEGORY_BOX] = 'handleGroupCategoryChange'
     events['change ' + ANONYMOUS_GRADING_BOX] = 'handleAnonymousGradingChange'
     events['change ' + HIDE_ZERO_POINT_QUIZZES_BOX] = 'handleHideZeroPointQuizChange'
+    events['input ' + `[name="${EXTERNAL_TOOL_URL_INPUT_NAME}"]`] = 'clearErrorsOnInput'
     if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
       events.change = 'onChange'
     }
@@ -312,6 +315,7 @@ EditView.prototype.initialize = function (options) {
   this.assignment = this.model
   this.setDefaultsIfNew()
   this.dueDateOverrideView = options.views['js-assignment-overrides']
+  this.masteryPathToggleView = options.views['js-assignment-overrides-mastery-path']
 
   this.on(
     'success',
@@ -1257,6 +1261,10 @@ EditView.prototype.toJSON = function () {
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         : void 0) || false,
+    coursePaceWithMasteryPath:
+      (typeof ENV !== 'undefined' && ENV !== null
+        ? ENV.IN_PACED_COURSE && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths
+        : void 0) || false,
     lockedItems: this.lockedItems,
     cannotEditGrades: this.cannotEditGrades,
     anonymousGradingEnabled:
@@ -1344,8 +1352,15 @@ EditView.prototype.getFormData = function () {
     data.lock_at = null
     data.unlock_at = null
   }
-  data.only_visible_to_overrides = this.dueDateOverrideView.setOnlyVisibleToOverrides()
-  data.assignment_overrides = this.dueDateOverrideView.getOverrides()
+  
+  if (ENV.COURSE_PACE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths) {
+    data.assignment_overrides = this.masteryPathToggleView.getOverrides()
+    data.only_visible_to_overrides = this.masteryPathToggleView.setOnlyVisibleToOverrides()
+  } else {
+    data.assignment_overrides = this.dueDateOverrideView.getOverrides()
+    data.only_visible_to_overrides = this.dueDateOverrideView.setOnlyVisibleToOverrides()
+  }
+
   if (this.shouldPublish) {
     data.published = true
   }
@@ -1501,24 +1516,42 @@ EditView.prototype.fieldSelectors = Object.assign(
 )
 
 EditView.prototype.showErrors = function (errors) {
+  errors = this.sortErrorsByVerticalScreenPosition(errors)
+  let shouldFocus = true
   Object.entries(errors).forEach(([key, value]) => {
     // For this to function properly
     // the error containers must have an ID formatted as ${key}_errors.
-    const errorsContainer = document.getElementById(`${key}_errors`)
-    if(errorsContainer){
+    const errorsContainerID = `${key}_errors`
+    const errorsContainer = document.getElementById(errorsContainerID)
+    if (errorsContainer) {
       const root = this.errorRoots[key] ?? createRoot(errorsContainer)
+      const noMargin = ['allowed_attempts', 'final_grader_id', 'grader_count'].includes(key)
+      const marginTop = [EXTERNAL_TOOL_URL_INPUT_NAME].includes(key)
       root.render(
-        <Flex as="div" alignItems="center" margin="0 0 0 medium">
-          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+        <Flex as="div" alignItems="center" margin={noMargin ? '0' : marginTop ? 'xx-small 0 0 0' : '0 0 0 medium'}>
+          <Flex as="div" margin={value[0].longMessage ? '0 xx-small medium 0' : '0 xx-small xxx-small 0'}>
             <IconWarningSolid color="error" />
-          </Flex.Item>
+          </Flex>
           <Text size="small" color="danger">
             {value[0].message}
           </Text>
         </Flex>
       )
-      this.errorRoots[`${key}_errors`] = root
+      this.errorRoots[errorsContainerID] = root
       delete errors[key]
+      const element = this.getElement(key)
+      if (element) {
+        element.setAttribute("aria-describedby", errorsContainerID)
+
+        if ([EXTERNAL_TOOL_URL_INPUT_NAME].includes(key)) {
+          this.getElement('assignment_external_tool_tag_attributes_url_container')?.classList.add('error-outline')
+        }
+
+        if (shouldFocus) {
+          element.focus()
+          shouldFocus = false
+        }
+      }
     }
   })
 
@@ -1535,10 +1568,51 @@ EditView.prototype.showErrors = function (errors) {
   }
 }
 
+EditView.prototype.sortErrorsByVerticalScreenPosition = function (errors) {
+  return Object.entries(errors)
+    .map(([errorKey, errorMessage]) => {
+      const errorElement = this.getElement(errorKey)
+      if (!errorElement) return null
+
+      const elementRect = errorElement.getBoundingClientRect()
+      const verticalPosition = elementRect.top + window.scrollY
+
+      return { errorKey, errorMessage, verticalPosition }
+    })
+    .filter(errorEntry => errorEntry !== null)
+    .sort((firstError, secondError) => firstError.verticalPosition - secondError.verticalPosition)
+    .reduce((sortedErrors, errorEntry) => {
+      sortedErrors[errorEntry.errorKey] = errorEntry.errorMessage
+      return sortedErrors
+    }, {})
+}
+
+EditView.prototype.getElement = function (key) {
+  const byId = document.getElementById(key)
+  if (byId) return byId
+
+  const byName = document.querySelector(`[name="${key}"]`)
+  if (byName) return byName
+
+  const byCustomSelector =  document.querySelector(EditView.prototype.fieldSelectors[key])
+  if (byCustomSelector) return byCustomSelector
+
+  return null
+}
+
+EditView.prototype.clearErrorsOnInput = function (event) {
+  const key = event.target.name
+  this.hideErrors(`${key}_errors`)
+}
+
 EditView.prototype.hideErrors = function (containerId) {
-  const container = document.getElementById(containerId)
   this.errorRoots[containerId]?.unmount()
   delete this.errorRoots[containerId]
+
+  if (containerId === `${EXTERNAL_TOOL_URL_INPUT_NAME}_errors`) {
+    const element = this.getElement('assignment_external_tool_tag_attributes_url_container')
+    element?.classList.remove('error-outline')
+  }
 }
 
 EditView.prototype.validateBeforeSave = function (data, errors) {
@@ -1578,9 +1652,10 @@ EditView.prototype.validateFinalGrader = function (data) {
   if (data.moderated_grading === 'on' && !data.final_grader_id) {
     errors.final_grader_id = [
       {
-        message: I18n.t('Grader is required'),
+        message: I18n.t('Must select a grader'),
       },
     ]
+    $(document).trigger('validateFinalGraderSelectedValue', {error: true})
   }
   return errors
 }
@@ -1590,26 +1665,18 @@ EditView.prototype.validateGraderCount = function (data) {
   if (data.moderated_grading !== 'on') {
     return errors
   }
+  let message
   if (!data.grader_count) {
-    errors.grader_count = [
-      {
-        message: I18n.t('Grader count is required'),
-      },
-    ]
-  } else if (data.grader_count === '0') {
-    errors.grader_count = [
-      {
-        message: I18n.t('Grader count cannot be 0'),
-      },
-    ]
-  } else if (parseInt(data.grader_count, 10) > ENV.MODERATED_GRADING_GRADER_LIMIT) {
-    errors.grader_count = [
-      {
-        message: I18n.t('Only a maximum of %{max} graders can be assigned', {
+    message = I18n.t('Must have at least one grader')
+  } else if (data.grader_count > ENV.MODERATED_GRADING_GRADER_LIMIT) {
+    message = I18n.t('Only a maximum of %{max} graders can be assigned', {
           max: ENV.MODERATED_GRADING_GRADER_LIMIT,
-        }),
-      },
-    ]
+        })
+  }
+
+  if(message) {
+    errors.grader_count = [{message}]
+    $(document).trigger('validateGraderCountNumber', {error: true})
   }
   return errors
 }
@@ -1765,20 +1832,26 @@ EditView.prototype._validateExternalTool = function (data, errors) {
     return errors
   }
 
-  let ref, ref1
-  if (
-    data.grading_type !== 'not_graded' &&
-    $.trim(
-      (ref = data.external_tool_tag_attributes) != null
-        ? (ref1 = ref.url) != null
-          ? ref1.toString()
-          : void 0
-        : void 0,
-    ).length === 0
-  ) {
-    const message = I18n.t('External Tool URL cannot be left blank')
-    errors['external_tool_tag_attributes[url]'] = [{message}]
-    errors['default-tool-launch-button'] = [{message}]
+  let message
+  let longMessage = false
+  const toolUrl = data.external_tool_tag_attributes?.url?.toString()?.trim() || ''
+  if (data.grading_type !== 'not_graded' && !toolUrl) {
+    message = I18n.t('External Tool URL cannot be left blank')
+  } else {
+    // We are moving the url input validation to this method so we can display our own
+    // errors instead of the native browser tooltip error.
+    try {
+      new URL(toolUrl)
+      // do nothing if it is a valid url
+    } catch {
+      message = I18n.t('Enter a valid URL or use "Find" button to search for an external tool')
+      longMessage = true
+    }
+  }
+
+  if (message) {
+    errors[EXTERNAL_TOOL_URL_INPUT_NAME] = [{message, longMessage}]
+    errors['default-tool-launch-button'] = [{message, longMessage}]
   }
 
   // This can happen when:
@@ -1793,8 +1866,8 @@ EditView.prototype._validateExternalTool = function (data, errors) {
     data.external_tool_tag_attributes.content_type ===
       DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
   ) {
-    const message = I18n.t('Please click below to launch the tool and select a resource.')
-    errors.assignment_submission_container = [{message}]
+    message = I18n.t('Please click below to launch the tool and select a resource.')
+    errors.assignment_submission_container = [{message, longMessage}]
   }
 
   return errors
@@ -1808,13 +1881,19 @@ EditView.prototype._validateAllowedAttempts = function (data, errors) {
     return errors
   }
   const value = parseInt(data.allowed_attempts, 10)
-  if (!(value > 0 || value === -1)) {
-    errors.allowed_attempts = [
-      {
-        message: I18n.t('Number of attempts must be a number greater than 0'),
-      },
-    ]
+
+  let message
+  if (isNaN(value) || !(value > 0 || value === -1)) {
+    message = I18n.t('Number of attempts must be a number greater than 0')
+  } else if (value > 100) {
+    message = I18n.t('Number of attempts must be less than or equal to 100')
   }
+
+  if (message) {
+    errors.allowed_attempts = [{message}]
+    $(document).trigger('validateAllowedAttempts', {error: true})
+  }
+
   return errors
 }
 
@@ -1952,6 +2031,14 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
   if (!ENV.MODERATED_GRADING_ENABLED || this.assignment.isQuizLTIAssignment()) {
     return
   }
+  const clearNumberInputErrors = () => {
+    $(document).trigger('validateGraderCountNumber', {error: false})
+    this.hideErrors('grader_count_errors')
+  }
+  const clearFinalGraderSelectErrors = () => {
+    $(document).trigger('validateFinalGraderSelectedValue', {error: false})
+    this.hideErrors('final_grader_id_errors')
+  }
   const props = {
     availableModerators: ENV.AVAILABLE_MODERATORS,
     currentGraderCount: this.assignment.get('grader_count'),
@@ -1966,6 +2053,8 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
     availableGradersCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT,
     onGraderCommentsVisibleToGradersChange: this.handleGraderCommentsVisibleToGradersChanged,
     onModeratedGradingChange: this.handleModeratedGradingChanged,
+    hideNumberInputErrors: clearNumberInputErrors,
+    hideFinalGraderErrors: clearFinalGraderSelectErrors,
   }
   const formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
   const mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
@@ -1974,6 +2063,10 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
 }
 
 EditView.prototype.renderAllowedAttempts = function () {
+  const clearErrors = () => {
+    $(document).trigger('validateAllowedAttempts', {error: false})
+    this.hideErrors('allowed_attempts_errors')
+  }
   if (!(typeof ENV !== 'undefined' && ENV !== null ? ENV.assignment_attempts_enabled : void 0)) {
     return
   }
@@ -1981,6 +2074,7 @@ EditView.prototype.renderAllowedAttempts = function () {
     limited: this.model.get('allowed_attempts') > 0,
     attempts: this.model.get('allowed_attempts'),
     locked: !!this.lockedItems.settings,
+    onHideErrors: clearErrors,
   }
   const mountPoint = document.querySelector('#allowed-attempts-target')
   // eslint-disable-next-line react/no-render-return-value

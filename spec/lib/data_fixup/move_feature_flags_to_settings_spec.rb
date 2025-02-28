@@ -19,6 +19,10 @@
 #
 
 describe DataFixup::MoveFeatureFlagsToSettings do
+  before do
+    allow(Account.site_admin).to receive(:feature_enabled?).with(:instructure_identity_global_flag)
+  end
+
   before :once do
     Account.add_setting :some_root_only_setting, boolean: true, root_only: true, default: false
     Account.add_setting :some_course_setting, boolean: true, default: false, inheritable: true

@@ -32,6 +32,7 @@
       <tr>
         <td>
           <%= text_area :submission, :body, :style => "width: 100%; height: 250px;" %>
+          <div id="body_errors"></div>
         </td>
       </tr>
       <% unless @context.account.grants_right?(@current_user, :make_submission_comments) %>

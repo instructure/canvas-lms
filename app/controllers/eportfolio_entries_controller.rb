@@ -20,6 +20,7 @@
 
 class EportfolioEntriesController < ApplicationController
   include EportfolioPage
+  include Api::V1::Eportfolio
   before_action :rce_js_env
   before_action :get_eportfolio
 
@@ -36,7 +37,12 @@ class EportfolioEntriesController < ApplicationController
       respond_to do |format|
         if @page.save
           format.html { redirect_to eportfolio_entry_url(@portfolio, @page) }
-          format.json { render json: @page.as_json(methods: :category_slug) }
+          format.json do
+            entry_url = @category.slug.presence && @page.slug.presence && eportfolio_named_category_entry_path(@portfolio, @category.slug, @page.slug)
+            hash = eportfolio_entry_json(@page, @current_user, session)
+            hash["entry_url"] = entry_url
+            render json: hash
+          end
         else
           format.json { render json: @page.errors }
         end

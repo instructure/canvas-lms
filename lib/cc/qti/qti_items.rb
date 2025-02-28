@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# rubocop:disable comments of Style/SymbolProc in this file are because the
+# disablings of Style/SymbolProc in this file are because the
 # builder DSL uses method_missing and blocks to define nested XML elements, and
 # a symbol proc confuses that use of the block
 module CC

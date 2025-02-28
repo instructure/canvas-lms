@@ -591,6 +591,75 @@ describe ActiveRecord::Base do
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
       p3.reload
     end
+
+    context "with single-table-inheritance models" do
+      before do
+        ActiveRecord::Base.connection.execute(<<~SQL.squish)
+          set local search_path to #{Shard.current.name};
+
+          create table tmp_vehicles (id integer primary key, type text, brand text);
+
+          insert into tmp_vehicles values (1, 'TmpCar', 'Mercedes');
+          insert into tmp_vehicles values (2, 'TmpCar', 'BMW');
+          insert into tmp_vehicles values (3, 'TmpPlane', 'Boeing');
+          insert into tmp_vehicles values (4, 'TmpPlane', 'Airbus');
+        SQL
+
+        stub_const("TmpVehicle", Class.new(ActiveRecord::Base))
+        stub_const("TmpCar", Class.new(TmpVehicle))
+        stub_const("TmpPlane", Class.new(TmpVehicle))
+      end
+
+      it "scopes parent class properly" do
+        TmpVehicle.delete_all
+
+        expect(TmpVehicle.all).to be_empty
+        expect(TmpCar.all).to be_empty
+        expect(TmpPlane.all).to be_empty
+      end
+
+      it "scopes child class properly" do
+        TmpPlane.delete_all
+
+        expect(TmpVehicle.pluck(:brand)).to contain_exactly("Mercedes", "BMW")
+        expect(TmpCar.pluck(:brand)).to contain_exactly("Mercedes", "BMW")
+        expect(TmpPlane.pluck(:brand)).to be_empty
+      end
+    end
+
+    context "with model subclasses that use distinct tables" do
+      before do
+        ActiveRecord::Base.connection.execute(<<~SQL.squish)
+          set local search_path to #{Shard.current.name};
+
+          create table tmp_fruit (id integer primary key, color text);
+          create table tmp_apple (id integer primary key, color text, source text);
+
+          insert into tmp_fruit values (1, 'red');
+          insert into tmp_fruit values (2, 'orange');
+
+          insert into tmp_apple values (1, 'red', 'eu');
+          insert into tmp_apple values (2, 'green', 'us');
+        SQL
+      end
+
+      let(:fruit_klass) { Class.new(ActiveRecord::Base) { self.table_name = "tmp_fruit" } }
+      let(:apple_klass) { Class.new(fruit_klass) { self.table_name = "tmp_apple" } }
+
+      it "scopes parent class properly" do
+        fruit_klass.where(color: "red").in_batches.delete_all
+
+        expect(fruit_klass.pluck(:id)).to contain_exactly(2)
+        expect(apple_klass.pluck(:id)).to contain_exactly(1, 2)
+      end
+
+      it "scopes child class properly" do
+        apple_klass.where(color: "red").in_batches.delete_all
+
+        expect(fruit_klass.pluck(:id)).to contain_exactly(1, 2)
+        expect(apple_klass.pluck(:id)).to contain_exactly(2)
+      end
+    end
   end
 
   describe "#in_batches.delete_all" do

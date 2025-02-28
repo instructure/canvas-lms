@@ -39,8 +39,7 @@ export const Discover = () => {
         name: I18n.t('Discover'),
         url: `/accounts/${accountId}/apps`,
       },
-    ],
-    !!window.ENV.FEATURES.lti_registrations_next,
+    ]
   )
 
   const [isTrayOpen, setIsTrayOpen] = useState(false)

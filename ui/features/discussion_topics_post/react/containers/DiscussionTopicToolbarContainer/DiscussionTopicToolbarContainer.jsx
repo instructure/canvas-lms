@@ -24,6 +24,7 @@ import {
   DiscussionManagerUtilityContext,
   SEARCH_TERM_DEBOUNCE_DELAY,
   SearchContext,
+  isSpeedGraderInTopUrl,
 } from '../../utils/constants'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -37,6 +38,7 @@ import {hideStudentNames} from '../../utils'
 import DiscussionPostSearchTool from '../../components/DiscussionPostToolbar/DiscussionPostSearchTool'
 import {breakpointsShape} from '@canvas/with-breakpoints'
 import {DiscussionTranslationModuleContainer} from '../DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer'
+import useSpeedGrader from '../../hooks/useSpeedGrader'
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 const discDefaultSortEnabled = () => window.ENV?.FEATURES?.discussion_default_sort
@@ -62,6 +64,10 @@ const DiscussionTopicToolbarContainer = props => {
 
   const [updateDiscussionSortOrder] = useMutation(UPDATE_DISCUSSION_SORT_ORDER)
   const [updateDiscussionExpanded] = useMutation(UPDATE_DISCUSSION_EXPANDED)
+  const {handleSwitchClick} = useSpeedGrader()
+  const onSwitchLinkClick = () => {
+    handleSwitchClick()
+  }
 
   const onSortClick = () => {
     let newOrder = null
@@ -105,8 +111,12 @@ const DiscussionTopicToolbarContainer = props => {
     }
   }
 
+  const background =
+    ENV?.FEATURES?.discussions_speedgrader_revisit && isSpeedGraderInTopUrl
+      ? 'secondary'
+      : 'primary'
   return (
-    <View as="div" padding="0 0 medium 0" background="primary">
+    <View as="div" padding="small" margin="0 0 x-small 0" background={background}>
       <ScreenReaderContent>
         <h1>{props.discussionTopic.title}</h1>
       </ScreenReaderContent>
@@ -193,6 +203,7 @@ const DiscussionTopicToolbarContainer = props => {
           onViewFilter={onViewFilter}
           onSortClick={onSortClick}
           onCollapseRepliesToggle={onExpandCollapseClick}
+          onSwitchLinkClick={onSwitchLinkClick}
           setUserSplitScreenPreference={props.setUserSplitScreenPreference}
           userSplitScreenPreference={props.userSplitScreenPreference}
           onSummarizeClick={onSummarizeClick}

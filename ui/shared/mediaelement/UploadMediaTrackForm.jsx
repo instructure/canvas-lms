@@ -84,7 +84,7 @@ export default class UploadMediaTrackForm {
         if (!params.content || !params.locale) return submitDfd.reject()
 
         const url =
-          ENV.FEATURES.media_links_use_attachment_id && this.attachmentId
+          this.attachmentId
             ? `/media_attachments/${this.attachmentId}/media_tracks`
             : `/media_objects/${this.mediaCommentId}/media_tracks`
         return $.ajaxJSON(

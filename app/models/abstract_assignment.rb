@@ -439,10 +439,8 @@ class AbstractAssignment < ActiveRecord::Base
 
     result.post_to_sis = false
 
-    if estimated_duration
-      # we have to save result here because we need the result.id to create the estimated_duration
-      result.save!
-      result.estimated_duration = EstimatedDuration.new({ assignment_id: result.id, duration: estimated_duration.duration.iso8601 })
+    if context.is_a?(Course) && context.horizon_course? && estimated_duration
+      result.estimated_duration = EstimatedDuration.new({ duration: estimated_duration.duration.iso8601 })
     end
 
     result
@@ -2627,6 +2625,7 @@ class AbstractAssignment < ActiveRecord::Base
       hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
       homework.add_comment(hash)
     end
+    Lti::AssetProcessorNotifier.notify_asset_processors(primary_homework)
     touch_context
     primary_homework
   end
@@ -3350,6 +3349,28 @@ class AbstractAssignment < ActiveRecord::Base
         "assignments.due_at IS NOT NULL OR (assignment_overrides.due_at IS NOT NULL AND assignment_overrides.due_at_overridden)"
       )
   }
+
+  def unsupported_in_speedgrader_2?
+    unsupported_submissions = Setting.get("submission_types_unsupported_in_sg2", "").strip.split(",")
+    return true if unsupported_submissions.intersect?(submission_types_array)
+
+    unsupported_grading_types = Setting.get("grading_types_unsupported_in_sg2", "").strip.split(",")
+    return true if unsupported_grading_types.include?(grading_type)
+
+    known_features = {
+      moderated: -> { moderated_grading? },
+      peer: -> { peer_reviews? },
+      group: -> { has_group_category? },
+      group_graded_group: -> { grade_as_group? },
+      group_graded_ind: -> { has_group_category? && grade_group_students_individually? },
+      anonymous: -> { anonymous_grading? },
+      anonymized: -> { anonymize_students? },
+      new_quiz: -> { quiz_lti? },
+      rubric: -> { active_rubric_association? },
+    }
+    unsupported_features = Setting.get("assignment_features_unsupported_in_sg2", "moderated").strip.split(",").map(&:to_sym).intersection(known_features.keys)
+    unsupported_features.any? { |feature| known_features.fetch(feature).call }
+  end
 
   def overdue?
     due_at && due_at <= Time.zone.now

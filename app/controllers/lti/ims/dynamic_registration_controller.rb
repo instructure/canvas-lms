@@ -85,7 +85,8 @@ module Lti
                                            @current_user,
                                            session,
                                            @context,
-                                           includes: %i[configuration overlay])
+                                           includes: %i[configuration overlay],
+                                           overlay: reg.lti_registration.overlay_for(@context))
       end
 
       def ims_registration_by_uuid

@@ -193,27 +193,22 @@ module Api::V1::AssignmentOverride
     if !set_type && data.key?(:group_id) && data[:group_id].present?
       group_category_id = learning_object.effective_group_category_id
 
-      if learning_object.context.account.settings[:allow_assign_to_differentiation_tags] && !group_category_id
-        begin
-          group = Group.where(id: data[:group_id], non_collaborative: true, context_id: learning_object.context_id).first
-        rescue ActiveRecord::RecordNotFound
-          errors << "unknown group id #{data[:group_id].inspect} for non_collaborative"
-        end
+      begin
+        group = Group.find_by!(id: data[:group_id], context: learning_object.context)
 
-        set_type = "Group"
-        override_data[:group] = group
-      elsif group_category_id
-        set_type = "Group"
-        # look up the group
-        begin
-          group = find_group(learning_object, data[:group_id], group_category_id)
-        rescue ActiveRecord::RecordNotFound
-          errors << "unknown group id #{data[:group_id].inspect}"
+        # For now, differentiation tags are allowed to be assigned to Group Assignments. If the group is non_collaborative
+        # and the feature flag is enabled, the learning object can be assigned to the group.
+        # For collaborative groups, if the group category id is the same as the learning_object's group category id
+        # the learning object can be assigned to the group.
+        if (group.non_collaborative? && learning_object.context.account.settings[:allow_assign_to_differentiation_tags]) ||
+           (!group.non_collaborative? && group_category_id == group.group_category_id)
+          set_type = "Group"
+          override_data[:group] = group
+        else
+          errors << "group_id is not valid"
         end
-        override_data[:group] = group
-      else
-        # don't recognize group_id for non-group assignments
-        errors << "group_id is not valid for non-group assignments"
+      rescue
+        errors << "unknown group id #{data[:group_id].inspect}"
       end
     end
 

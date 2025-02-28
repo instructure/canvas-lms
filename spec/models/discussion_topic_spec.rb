@@ -346,6 +346,22 @@ describe DiscussionTopic do
       @relevant_permissions = %i[read reply update delete]
     end
 
+    it "does grant create permission with create_forum but no moderate_forum" do
+      @course.account.role_overrides.create!(role: teacher_role, permission: "moderate_forum", enabled: false)
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply create duplicate attach student_reporting create_assign_to]
+    end
+
+    it "does grant create permission with moderate_forum but no create_forum" do
+      @course.account.role_overrides.create!(role: teacher_role, permission: "create_forum", enabled: false)
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply update delete create duplicate attach student_reporting read_as_admin moderate_forum manage_assign_to]
+    end
+
+    it "does not grant create permission without moderate_forum and create_forum" do
+      @course.account.role_overrides.create!(role: teacher_role, permission: "create_forum", enabled: false)
+      @course.account.role_overrides.create!(role: teacher_role, permission: "moderate_forum", enabled: false)
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply attach student_reporting]
+    end
+
     it "does not grant moderate permissions without read permissions" do
       @course.account.role_overrides.create!(role: teacher_role, permission: "read_forum", enabled: false)
       expect(@topic.reload.check_policy(@teacher2)).to eql %i[create duplicate attach student_reporting manage_assign_to create_assign_to]
@@ -974,6 +990,22 @@ describe DiscussionTopic do
       topic.workflow_state = "active"
       topic.save_without_broadcasting!
       expect(topic.stream_item).not_to be_nil
+    end
+
+    describe "#effective_group_category_id" do
+      it "returns the group_category_id if it's set" do
+        group_category = @course.group_categories.create!(name: "category")
+        topic = @course.discussion_topics.build(title: "Group Topic Title")
+        topic.group_category = group_category
+        topic.save!
+
+        expect(topic.effective_group_category_id).to eq group_category.id
+      end
+
+      it "returns nil if the group_category_id is not set" do
+        topic = @course.discussion_topics.build(title: "Topic Title")
+        expect(topic.effective_group_category_id).to be_nil
+      end
     end
 
     describe "#update_based_on_date" do

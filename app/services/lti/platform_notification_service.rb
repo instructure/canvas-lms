@@ -72,7 +72,7 @@ module Lti
       { notice_type:, handler: "" }
     end
 
-    def notify_tools(account, *builders)
+    def notify_tools_in_account(account, *builders)
       notice_type = get_notice_type(builders:)
       Lti::NoticeHandler.active.where(notice_type:, account:).find_each do |notice_handler|
         send_notices(notice_handler:, builders:)
@@ -80,9 +80,20 @@ module Lti
     end
 
     def notify_tools_in_course(course, *builders)
-      notice_type = get_notice_type(builders:)
       tool_ids = Lti::ContextToolFinder.all_tools_for(course).ids
-      Lti::NoticeHandler.active.where(notice_type:, context_external_tool_id: tool_ids).find_each do |notice_handler|
+      notify_tools(cet_id_or_ids: tool_ids, builders: builders)
+    end
+
+    def notify_tools(cet_id_or_ids:, builders:)
+      notice_type = get_notice_type(builders:)
+      Lti::NoticeHandler.active.where(notice_type:, context_external_tool_id: cet_id_or_ids).find_each do |notice_handler|
+        send_notices(notice_handler:, builders:)
+      end
+    end
+
+    def notify_asset_processor(asset_processor, *builders)
+      notice_type = get_notice_type(builders:)
+      Lti::NoticeHandler.active.where(notice_type:, context_external_tool_id: asset_processor.context_external_tool_id).find_each do |notice_handler|
         send_notices(notice_handler:, builders:)
       end
     end

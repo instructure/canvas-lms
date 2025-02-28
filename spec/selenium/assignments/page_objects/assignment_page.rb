@@ -95,6 +95,10 @@ class AssignmentPage
       f(course_pacing_notice_selector)
     end
 
+    def mastery_path_toggle
+      f("[data-testid='MasteryPathToggle'] svg[name='IconCheck'], [data-testid='MasteryPathToggle'] svg[name='IconX']")
+    end
+
     # Methods
     def click_assign_to_button
       assign_to_button.click

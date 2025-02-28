@@ -23,6 +23,10 @@ class WikiPagesController < ApplicationController
   include SubmittableHelper
 
   before_action :require_context
+
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   before_action :get_wiki_page, except: [:front_page]
   before_action :set_front_page, only: [:front_page]
   before_action :set_pandapub_read_token
@@ -88,6 +92,7 @@ class WikiPagesController < ApplicationController
 
   def show
     GuardRail.activate(:secondary) do
+      conditional_release_js_env
       if @page.new_record?
         wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
         if @page.grants_any_right?(@current_user, session, :update, :update_content)

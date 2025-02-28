@@ -34,13 +34,11 @@ class PeopleValidationIssues extends React.Component {
     missing: PropTypes.shape(missingsShape),
     onChangeDuplicate: PropTypes.func.isRequired,
     onChangeMissing: PropTypes.func.isRequired,
+    fieldsRefAndError: PropTypes.object,
   }
 
   static defaultProps = {
     inviteUsersURL: undefined,
-  }
-
-  static defaultProps = {
     duplicates: {},
     missing: {},
   }
@@ -106,6 +104,7 @@ class PeopleValidationIssues extends React.Component {
           const dupeSet = this.props.duplicates[address]
           return (
             <DuplicateSection
+              fieldsRefAndError={this.props.fieldsRefAndError}
               key={`dupe_${address}`}
               inviteUsersURL={this.props.inviteUsersURL}
               duplicates={dupeSet}
@@ -135,6 +134,7 @@ class PeopleValidationIssues extends React.Component {
       <div className="peoplevalidationissues__missing">
         <Alert variant="warning">{alertText}</Alert>
         <MissingPeopleSection
+          fieldsRefAndError={this.props.fieldsRefAndError}
           inviteUsersURL={this.props.inviteUsersURL}
           missing={this.props.missing}
           searchType={this.props.searchType}

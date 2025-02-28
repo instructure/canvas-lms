@@ -48,7 +48,7 @@ describe CoursePacing::PaceContextsPresenter do
 
     context "when the context is a StudentEnrollment and overdue_items is empty" do
       before do
-        @overdue_items_by_user[@student.id] = []
+        @overdue_items_by_user = {}
       end
 
       it "returns on_pace as true" do

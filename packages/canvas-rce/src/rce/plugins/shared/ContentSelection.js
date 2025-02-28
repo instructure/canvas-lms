@@ -148,12 +148,10 @@ export function asAudioElement($element) {
     } catch (e) {}
   }
 
-  if (RCEGlobals.getFeatures().media_links_use_attachment_id) {
-    const source = $audioIframe.getAttribute('src')
-    const matches = source?.match(/\/media_attachments_iframe\/(\d+)/)
-    if (matches) {
-      audioOptions.attachmentId = matches[1]
-    }
+  const source = $audioIframe.getAttribute('src')
+  const matches = source?.match(/\/media_attachments_iframe\/(\d+)/)
+  if (matches) {
+    audioOptions.attachmentId = matches[1]
   }
 
   return audioOptions

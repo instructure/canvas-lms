@@ -23,12 +23,12 @@ import {Flex} from '@instructure/ui-flex'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {IconXSolid} from '@instructure/ui-icons'
 import {NumberInput} from '@instructure/ui-number-input'
 import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
-import {IconXSolid} from '@instructure/ui-icons'
 import type {FormMessage} from '@instructure/ui-form-field'
 import DateValidator from '@canvas/grading/DateValidator'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
@@ -118,22 +118,26 @@ const CreateEditAssignmentModal = ({
   )
   const [name, setName] = useState<string>(isEditMode ? assignment.name : '')
   const [dueAt, setDueAt] = useState<string>(isEditMode && assignment.dueAt ? assignment.dueAt : '')
-  const [points, setPoints] = useState<number>(isEditMode ? assignment.points : 0)
+  const [points, setPoints] = useState<string>(isEditMode ? String(assignment.points) : "0")
   const [syncToSIS, setSyncToSIS] = useState<boolean>(shouldSyncGradesToSIS)
 
   const [saveDisabled, setSaveDisabled] = useState<boolean>(false)
 
+  const MAX_POINTS_ALLOWED_FOR_ASSIGNMENT = 999999999
+
   // Modal input refs (only those that can show errors)
-  const fields = ['name', 'due_at']
+  const fields = ['name', 'due_at', 'points']
   const [fieldWithError, setFieldWithError] = useState<string | null>(null)
   const {inputElRefs, setInputElRef} = useInputFocus(fields)
 
   const setNameRef = (el: HTMLInputElement | null) => setInputElRef(el, 'name')
   const setDueAtRef = (el: HTMLInputElement | null) => setInputElRef(el, 'due_at')
+  const setPointsRef = (el: HTMLInputElement | null) => setInputElRef(el, 'points')
 
   // Error Messages for inputs
   const [nameInputMessage, setNameInputMessage] = useState<FormMessage[]>([])
   const [dueDateInputMessage, setDueDateInputMessage] = useState<FormMessage[]>([])
+  const [pointsInputMessage, setPointsInputMessage] = useState<FormMessage[]>([])
 
   const assignmentTypeLabels: AssignmentTypeIndex = {
     none: I18n.t('Assignment'),
@@ -165,7 +169,6 @@ const CreateEditAssignmentModal = ({
     return time
   }
 
-  // Form validation
   const validateAssignmentType = (type: string) => {
     return assignmentTypeOptions.includes(type)
   }
@@ -176,19 +179,19 @@ const CreateEditAssignmentModal = ({
       return true
     }
     if (value.length === 0) {
-      setNameInputMessage([{text: I18n.t('Please enter a name.'), type: 'error'}])
+      setNameInputMessage([{text: I18n.t('Please enter a name.'), type: 'newError'}])
     } else if (value.length < minNameLength) {
       setNameInputMessage([
         {
           text: I18n.t('Name must be at least %{num} characters.', {num: minNameLength}),
-          type: 'error',
+          type: 'newError',
         },
       ])
     } else if (value.length > maxNameLength) {
       setNameInputMessage([
         {
           text: I18n.t('Name cannot exceed %{num} characters.', {num: maxNameLength}),
-          type: 'error',
+          type: 'newError',
         },
       ])
     }
@@ -222,24 +225,34 @@ const CreateEditAssignmentModal = ({
     // So we will proritize accordingly
     if (errors.unlock_at) {
       setDueDateInputMessage([
-        {text: I18n.t('Due date cannot be before unlock date'), type: 'error'},
+        {text: I18n.t('Due date cannot be before unlock date'), type: 'newError'},
       ])
     }
     if (errors.lock_at) {
-      setDueDateInputMessage([{text: I18n.t('Due date cannot be after lock date'), type: 'error'}])
+      setDueDateInputMessage([{text: I18n.t('Due date cannot be after lock date'), type: 'newError'}])
     }
     if (errors.due_at) {
-      setDueDateInputMessage([{text: errors.due_at, type: 'error'}])
+      setDueDateInputMessage([{text: errors.due_at, type: 'newError'}])
     }
 
     return false
   }
 
-  const validateAssignmentPoints = (value: number) => {
-    if (Number.isNaN(value) || value < 0) {
-      setPoints(0)
+  const validateAssignmentPoints = () => {
+    const pointValue = Number(points)
+    if (pointValue < 0) {
+      setPointsInputMessage([{text: I18n.t('Points must be zero or greater.'), type: 'newError'}])
+      return false
+    } else if (pointValue > MAX_POINTS_ALLOWED_FOR_ASSIGNMENT) {
+      setPointsInputMessage([
+        {
+          text: I18n.t('Points cannot exceed %{num}.', {num: MAX_POINTS_ALLOWED_FOR_ASSIGNMENT}),
+          type: 'newError',
+        },
+      ])
       return false
     }
+
     return true
   }
 
@@ -249,7 +262,7 @@ const CreateEditAssignmentModal = ({
     // The only thing we must check is if a due date is is required
     if (dueDateRequired && !assignment?.multipleDueDates && (dueAt === '' || dueAt === undefined)) {
       setDueDateInputMessage([
-        {text: I18n.t('Due date is required to enable "Sync to SIS"'), type: 'error'},
+        {text: I18n.t('Due date is required to enable "Sync to SIS"'), type: 'newError'},
       ])
       return false
     }
@@ -257,11 +270,12 @@ const CreateEditAssignmentModal = ({
     return true
   }
 
-  const setFocusToErrorField = (validName: boolean, validDueAt: boolean) => {
+  const setFocusToErrorField = (validName: boolean, validDueAt: boolean, validPoints: boolean) => {
     let errorField = null
 
     if (!validName) errorField = 'name'
     else if (!validDueAt) errorField = 'due_at'
+    else if (!validPoints) errorField = 'points'
 
     setFieldWithError(errorField)
   }
@@ -277,13 +291,13 @@ const CreateEditAssignmentModal = ({
     const validType = isEditMode ? true : validateAssignmentType(assignmentType)
     const validName = validateAssignmentName(name)
     const validDueAt = validateAssignmentDueAt(dueAt)
-    const validPoints = validateAssignmentPoints(points)
+    const validPoints = validateAssignmentPoints()
 
     const valid = validType && validName && validDueAt && validPoints && validateForSIS()
 
     // Put focus on inputs with errors if any
     if (!valid) {
-      setFocusToErrorField(validName, validDueAt)
+      setFocusToErrorField(validName, validDueAt, validPoints)
     }
 
     return valid
@@ -297,16 +311,28 @@ const CreateEditAssignmentModal = ({
     return I18n.t('Invalid date: %{rawDateValue}', {rawDateValue})
   }
 
-  const onNameInputChange = (event: React.SyntheticEvent, value: string) => {
+  const onAssignmentTypeInputChange = (
+    _event: React.SyntheticEvent,
+    { id, value }: { id?: string; value?: string | number }
+  ) => {
+    setAssignmentType(String(value))
+    // reset the points input if the assignment changes to not graded
+    if (String(value) === 'not_graded') {
+      setPoints('')
+      setPointsInputMessage([])
+    }
+  }
+
+  const onNameInputChange = (_event: React.SyntheticEvent, value: string) => {
     value.length === 0 ? setName('') : setName(value)
 
     // Don't validate if there is no error message present
     if (nameInputMessage.length > 0) {
-      validateAssignmentName(name)
+      validateAssignmentName(value)
     }
   }
 
-  const onDateInputChange = (event: React.SyntheticEvent, isoValue?: string) => {
+  const onDateInputChange = (_event: React.SyntheticEvent, isoValue?: string) => {
     setDueAt(isoValue || '')
 
     // Don't validate if there is no error message present
@@ -315,14 +341,19 @@ const CreateEditAssignmentModal = ({
     }
   }
 
-  const onNameInputBlur = (event: React.FocusEvent) => {
+  const onPointsInputChange = (_event: React.SyntheticEvent, value: string) => {
+    setPointsInputMessage([])
+    setPoints(value)
+  }
+
+  const onNameInputBlur = (_event: React.FocusEvent) => {
     // Don't validate if there is no error message yet
     if (nameInputMessage.length > 0) {
       validateAssignmentName(name)
     }
   }
 
-  const onDateInputBlur = (event: React.SyntheticEvent) => {
+  const onDateInputBlur = (_event: React.SyntheticEvent) => {
     // Don't validate if there is no error message yet
     if (dueDateInputMessage.length > 0) {
       validateAssignmentDueAt(dueAt)
@@ -332,13 +363,12 @@ const CreateEditAssignmentModal = ({
   // More Options
   const onMoreOptions = () => {
     const isNewAssignment = !isEditMode
-
     onMoreOptionsHandler(
       {
         type: assignmentType,
+        points: Number(points),
         name,
         dueAt,
-        points,
         syncToSIS,
       },
       isNewAssignment,
@@ -355,9 +385,9 @@ const CreateEditAssignmentModal = ({
 
     await onSaveHandler({
       type: assignmentType,
+      points: Number(points),
       name,
       dueAt,
-      points,
       syncToSIS,
       publish: false,
     }, !isEditMode)
@@ -374,9 +404,9 @@ const CreateEditAssignmentModal = ({
 
     await onSaveHandler({
       type: assignmentType,
+      points: Number(points),
       name,
       dueAt,
-      points,
       syncToSIS,
       publish: true,
     }, !isEditMode)
@@ -419,7 +449,7 @@ const CreateEditAssignmentModal = ({
               renderLabel={I18n.t('Type')}
               value={assignmentType}
               defaultValue={I18n.t('Assignment')}
-              onChange={(event, {id, value}) => setAssignmentType(String(value))}
+              onChange={onAssignmentTypeInputChange}
               data-testid="assignment-type-select"
             >
               {assignmentTypeOptions.map((opt, index) => (
@@ -491,17 +521,20 @@ const CreateEditAssignmentModal = ({
           )}
           <br />
         </View>
-        <View as="div">
-          <NumberInput
-            allowStringValue={true}
-            renderLabel={I18n.t('Points')}
-            interaction={enablePointsInput ? 'enabled' : 'disabled'}
-            showArrows={false}
-            value={points}
-            onChange={(event, value) => (value ? setPoints(parseInt(value, 10)) : setPoints(0))}
-            data-testid="points-input"
-          />
+        {(assignmentType !== 'not_graded') && (
+          <View as="div">
+            <NumberInput
+              renderLabel={I18n.t('Points')}
+              inputRef={setPointsRef}
+              showArrows={false}
+              interaction={enablePointsInput ? 'enabled' : 'disabled'}
+              value={points ? points : ''}
+              onChange={onPointsInputChange}
+              messages={pointsInputMessage}
+              data-testid="points-input"
+            />
         </View>
+        )}
         {syncGradesToSISFF && (
           <View>
             <hr />

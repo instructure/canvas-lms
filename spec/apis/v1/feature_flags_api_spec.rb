@@ -506,7 +506,7 @@ describe "Feature Flags API", type: :request do
       enable_cache do
         flag = t_root_account.feature_flags.create! feature: "course_feature", state: "on"
         # try to trick the controller into inserting (and violating a unique constraint) instead of updating
-        MultiCache.fetch(cache_key) { nil } # rubocop:disable Style/RedundantFetchBlock it's a cache, not a Hash
+        MultiCache.fetch(cache_key) { nil } # rubocop:disable Style/RedundantFetchBlock -- it's a cache, not a Hash
         api_call_as_user(t_root_admin,
                          :put,
                          "/api/v1/accounts/#{t_root_account.id}/features/flags/course_feature?state=off",

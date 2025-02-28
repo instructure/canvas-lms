@@ -1,14 +1,16 @@
 require:
   - rubocop-factory_bot
   - rubocop-graphql
-  - rubocop-rails
-  - rubocop-rake
-  - rubocop-rspec
-  #- rubocop-rspec_rails
+  - rubocop-rspec_rails
   # this odd relative path is so that rubocop works when run without "bundle
   # exec", such as from most editors/IDEs.
   - ./gems/rubocop-canvas/lib/rubocop_canvas
   - outrigger/cops/migration/tagged
+
+plugins:
+  - rubocop-rails
+  - rubocop-rake
+  - rubocop-rspec
 
 inherit_gem:
   rubocop-inst:

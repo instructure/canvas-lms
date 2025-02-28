@@ -25,8 +25,8 @@ describe Lti::Messages::PnsNotice do
   let(:context) { course_model }
   let(:expander) { nil }
   let(:user) { student_in_course(course: context).user }
-  let(:opts) { {} }
-  let(:tool) { external_tool_1_3_model(context:) }
+  let(:opts) { { custom_params: { myparam: "$Canvas.account.id" } } }
+  let(:tool) { external_tool_1_3_model(context:, opts: { settings: { custom_fields: { tool_custom: "123" } } }) }
   let(:notice) { { id: "hello", timestamp: "time", type: "LtiHelloWorldNotice" }.with_indifferent_access }
 
   let(:pns_notice) do
@@ -69,7 +69,7 @@ describe Lti::Messages::PnsNotice do
     end
 
     it "includes custom params claim" do
-      expect(subject["#{IMS_CLAIM_PREFIX}/custom"]).to eq({})
+      expect(subject["#{IMS_CLAIM_PREFIX}/custom"]).to eq({ myparam: Account.default.id.to_s, tool_custom: "123" }.with_indifferent_access)
     end
   end
 

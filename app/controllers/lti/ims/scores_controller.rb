@@ -281,6 +281,12 @@ module Lti::IMS
     SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url external_tool online_upload].freeze
     DEFAULT_SUBMISSION_TYPE = "external_tool"
     ACTIVITY_PROGRESSES_NEEDS_GRADING = %w[Submitted Completed].freeze
+    private_constant :REQUIRED_PARAMS,
+                     :OPTIONAL_PARAMS,
+                     :EXTENSION_PARAMS,
+                     :SCORE_SUBMISSION_TYPES,
+                     :DEFAULT_SUBMISSION_TYPE,
+                     :ACTIVITY_PROGRESSES_NEEDS_GRADING
 
     def scopes_matcher
       self.class.all_of(TokenScopes::LTI_AGS_SCORE_SCOPE)

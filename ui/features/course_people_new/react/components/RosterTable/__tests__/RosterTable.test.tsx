@@ -17,15 +17,39 @@
  */
 
 import React from 'react'
-import {render, fireEvent, within} from '@testing-library/react'
-import RosterTable from './../RosterTable'
-import {users} from '../../../../util/mocks'
-import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
+import {render, fireEvent} from '@testing-library/react'
+import RosterTable from '../RosterTable'
+import {
+  INACTIVE_ENROLLMENT,
+  PENDING_ENROLLMENT
+} from '../../../../util/constants'
+import useCoursePeopleQuery from '../../../hooks/useCoursePeopleQuery'
+import {mockUser, mockEnrollment} from '../../../../graphql/Mocks'
 
+jest.mock('../../../hooks/useCoursePeopleQuery')
 jest.mock('../../../hooks/useCoursePeopleContext')
+
+const mockUsers = [
+  mockUser({
+    userId: '1',
+    userName: 'Student One'
+  }),
+  mockUser({
+    userId: '2',
+    userName: 'Student Two',
+    firstEnrollment: mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT})
+  }),
+  mockUser({
+    userId: '3',
+    userName: 'Student Three',
+    firstEnrollment: mockEnrollment({enrollmentState: PENDING_ENROLLMENT})
+  }),
+]
 
 describe('RosterTable', () => {
   const useCoursePeopleContextMocks = {
+    courseId: '1',
+    currentUserId: '1',
     canReadReports: true,
     canViewLoginIdColumn: true,
     canViewSisIdColumn: true,
@@ -36,7 +60,13 @@ describe('RosterTable', () => {
   }
 
   beforeEach(() => {
-    (useCoursePeopleContext as jest.Mock).mockReturnValue(useCoursePeopleContextMocks)
+    (useCoursePeopleQuery as jest.Mock).mockReturnValue({
+      data: mockUsers,
+      isLoading: false,
+      isSuccess: true,
+      error: null
+    })
+    require('../../../hooks/useCoursePeopleContext').default.mockReturnValue(useCoursePeopleContextMocks)
   })
 
   afterEach(() => {
@@ -63,10 +93,10 @@ describe('RosterTable', () => {
 
   it('renders table rows with user data', () => {
     const {getByText, getAllByTestId} = render(<RosterTable />)
-    expect(getByText(users[0].short_name)).toBeInTheDocument()
-    expect(getByText(users[1].short_name)).toBeInTheDocument()
-    expect(getByText(users[2].short_name)).toBeInTheDocument()
-    expect(getAllByTestId(/^table-row-/)).toHaveLength(users.length)
+    expect(getByText(mockUsers[0].name)).toBeInTheDocument()
+    expect(getByText(mockUsers[1].name)).toBeInTheDocument()
+    expect(getByText(mockUsers[2].name)).toBeInTheDocument()
+    expect(getAllByTestId(/^table-row-/)).toHaveLength(mockUsers.length)
   })
 
   it('handles selecting a single row', () => {
@@ -95,25 +125,20 @@ describe('RosterTable', () => {
     })
   })
 
-  it('handles sorting when clicking on sortable headers', () => {
-    const {getAllByTestId, getByTestId} = render(<RosterTable />)
-    const nameHeader = getByTestId('header-name')
-
-    let rows = getAllByTestId(/^table-row-/)
-    expect(rows[0]).toHaveTextContent(users[0].short_name)
-    expect(rows[1]).toHaveTextContent(users[1].short_name)
-    expect(rows[2]).toHaveTextContent(users[2].short_name)
-
-    fireEvent.click(within(nameHeader).getByRole('button', {hidden: true }))
-    rows = getAllByTestId(/^table-row-/)
-    expect(rows[0]).toHaveTextContent(users[2].short_name)
-    expect(rows[1]).toHaveTextContent(users[1].short_name)
-    expect(rows[2]).toHaveTextContent(users[0].short_name)
-  })
-
   it('displays inactive and pending enrollment states', () => {
     const {getByText} = render(<RosterTable />)
     expect(getByText('Inactive')).toBeInTheDocument()
     expect(getByText('Pending')).toBeInTheDocument()
+  })
+
+  it('displays loading state', () => {
+    (useCoursePeopleQuery as jest.Mock).mockReturnValue({
+      data: null,
+      isLoading: true,
+      isSuccess: false,
+      error: null
+    })
+    const {getByText} = render(<RosterTable />)
+    expect(getByText('Loading')).toBeInTheDocument()
   })
 })

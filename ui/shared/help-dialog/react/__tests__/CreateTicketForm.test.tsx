@@ -39,34 +39,34 @@ describe('CreateTicketForm', () => {
 
   beforeEach(() => {
     // default mock for tests
-    mockEnv({current_user_id: '64'})
+    mockEnv({
+      current_user_id: '64', // intentionally a string and not a number
+    })
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
   })
 
-  describe('rendering tests', () => {
-    it('renders all required field labels', () => {
-      const {getByText} = render(<CreateTicketForm {...props} />)
+  describe('rendering', () => {
+    it('focuses on subject field when form renders', () => {
+      const {getByTestId} = render(<CreateTicketForm {...props} />)
+      const subjectInput = getByTestId('subject-input')
+      expect(subjectInput).toHaveFocus()
+    })
+
+    it('displays subject and description input fields with labels', () => {
+      const {getByText, getByTestId} = render(<CreateTicketForm {...props} />)
+      expect(getByTestId('subject-input')).toBeInTheDocument()
       expect(getByText('Subject')).toBeVisible()
+      expect(getByTestId('description-input')).toBeInTheDocument()
       expect(getByText('Description')).toBeVisible()
+    })
+
+    it('shows severity select field with label and available options', async () => {
+      const {getByText, getByTestId} = render(<CreateTicketForm {...props} />)
+      expect(getByTestId('severity-select')).toBeInTheDocument()
       expect(getByText('How is this affecting you?')).toBeVisible()
-    })
-
-    it('does not render the email field when current_user_id is set', () => {
-      const {queryByTestId} = render(<CreateTicketForm {...props} />)
-      expect(queryByTestId('email-input')).toBeNull()
-    })
-
-    it('renders the email field if current_user_id is not set', () => {
-      mockEnv({current_user_id: null})
-      const {getByText} = render(<CreateTicketForm {...props} />)
-      expect(getByText('Your email address')).toBeVisible()
-    })
-
-    it('renders all severity options', async () => {
-      const {getByTestId, getByText} = render(<CreateTicketForm {...props} />)
       await userEvent.click(getByTestId('severity-select'))
       expect(getByText('Just a casual question, comment, idea, or suggestion')).toBeVisible()
       expect(getByText('I need some help, but it is not urgent')).toBeVisible()
@@ -75,15 +75,39 @@ describe('CreateTicketForm', () => {
       expect(getByText('EXTREME CRITICAL EMERGENCY!')).toBeVisible()
     })
 
-    it('renders the form action buttons', () => {
-      const {getByTestId} = render(<CreateTicketForm {...props} />)
+    it('includes cancel and submit buttons with labels', () => {
+      const {getByTestId, getByText} = render(<CreateTicketForm {...props} />)
       expect(getByTestId('cancel-button')).toBeVisible()
+      expect(getByText('Cancel')).toBeVisible()
       expect(getByTestId('submit-button')).toBeVisible()
+      expect(getByText('Submit Ticket')).toBeVisible()
+    })
+
+    it('hides optional email field if user is logged in', () => {
+      const {queryByText, queryByTestId} = render(<CreateTicketForm {...props} />)
+      expect(queryByTestId('email-input')).not.toBeInTheDocument()
+      expect(queryByText('Your email address')).not.toBeInTheDocument()
+    })
+
+    it('displays optional email field if user is logged out', () => {
+      mockEnv({current_user_id: null})
+      const {getByText, getByTestId} = render(<CreateTicketForm {...props} />)
+      expect(getByTestId('email-input')).toBeVisible()
+      expect(getByText('Your email address')).toBeVisible()
     })
   })
 
-  describe('validation tests', () => {
-    it('validates required fields progressively on submission', async () => {
+  describe('validation', () => {
+    it('prevents submission if required fields are empty', async () => {
+      const {getByText, queryByText} = render(<CreateTicketForm {...props} />)
+      fireEvent.click(getByText('Submit Ticket'))
+      await waitFor(() => {
+        expect(queryByText('Ticket successfully submitted.')).not.toBeInTheDocument()
+      })
+      expect(onSubmit).not.toHaveBeenCalled()
+    })
+
+    it('validates fields progressively when submitting the form', async () => {
       const {findByText, getByTestId, getByText, queryByText} = render(
         <CreateTicketForm {...props} />,
       )
@@ -107,24 +131,24 @@ describe('CreateTicketForm', () => {
       expect(queryByText('Please select an option.')).toBeNull()
     })
 
-    it('validates email format when provided', async () => {
+    it('ensures email field is correctly formatted when provided', async () => {
       mockEnv({current_user_id: null})
       const {findByText, getByTestId, getByText} = render(<CreateTicketForm {...props} />)
       // subject field
       fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
       // description field
       fireEvent.change(getByTestId('description-input'), {target: {value: 'Test description'}})
-      // selection field
+      // severity field
       await userEvent.click(getByTestId('severity-select'))
       await userEvent.click(getByText('Just a casual question, comment, idea, or suggestion'))
-      // email field
-      fireEvent.change(getByTestId('email-input'), {target: {value: 'invalid-email-address'}})
+      // optional email field
+      await userEvent.type(getByTestId('email-input'), 'invalid-email-address')
       // submit
       await userEvent.click(getByTestId('submit-button'))
       expect(await findByText('Please provide a valid email address.')).toBeVisible()
     })
 
-    it('updates severity value and clears error on valid selection', async () => {
+    it('clears severity error and updates value when a valid selection is made', async () => {
       const {getByTestId, getByText, queryByText} = render(<CreateTicketForm {...props} />)
       // subject field
       fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
@@ -143,7 +167,83 @@ describe('CreateTicketForm', () => {
     })
   })
 
-  describe('submission tests', () => {
+  describe('form submission requests', () => {
+    it('sends correct payload when user is logged out', async () => {
+      mockEnv({
+        current_user_id: null, // will populate when logged in
+        // @ts-expect-error: context_asset_string can be null in real scenarios, even if TypeScript doesn’t allow it
+        context_asset_string: null, // will populate if in course, for example, null otherwise
+        // @ts-expect-error: current_user_roles can be null in real scenarios even if TypeScript doesn’t allow it
+        current_user_roles: null, // will populate when logged in
+      })
+      ;(doFetchApi as jest.Mock).mockResolvedValue({
+        response: {status: 200},
+        json: {logged: true, id: '10033'},
+      })
+      const {getByTestId, getByText} = render(<CreateTicketForm {...props} />)
+      // fill and submit form
+      fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
+      fireEvent.change(getByTestId('description-input'), {target: {value: 'Test description'}})
+      await userEvent.click(getByTestId('severity-select'))
+      await userEvent.click(getByText('Just a casual question, comment, idea, or suggestion'))
+      await userEvent.type(getByTestId('email-input'), 'test@instructure.com')
+      await userEvent.click(getByTestId('submit-button'))
+      const payload = {
+        error: expect.objectContaining({
+          subject: 'Test subject',
+          comments: 'Test description',
+          user_perceived_severity: 'just_a_comment',
+          email: 'test@instructure.com', // optional
+          url: window.location.toString(), // e.g. http://localhost:3000/login/canvas#help
+          context_asset_string: null,
+          user_roles: undefined,
+        }),
+      }
+      // verify api call
+      expect(doFetchApi).toHaveBeenCalledWith({
+        path: '/error_reports',
+        method: 'POST',
+        body: payload,
+      })
+    })
+
+    it('sends correct payload when user is logged in', async () => {
+      mockEnv({
+        context_asset_string: 'course_7', // this will be populated if in course, for example
+        current_user_roles: ['user', 'student', 'teacher', 'admin', 'root_admin'], // ENV.current_user_roles is an array to begin with
+      })
+      ;(doFetchApi as jest.Mock).mockResolvedValue({
+        response: {status: 200},
+        json: {logged: true, id: '10033'},
+      })
+      const {getByTestId, getByText} = render(<CreateTicketForm {...props} />)
+      // fill and submit form
+      fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
+      fireEvent.change(getByTestId('description-input'), {target: {value: 'Test description'}})
+      await userEvent.click(getByTestId('severity-select'))
+      await userEvent.click(getByText('Just a casual question, comment, idea, or suggestion'))
+      await userEvent.click(getByTestId('submit-button'))
+      const payload = {
+        error: expect.objectContaining({
+          subject: 'Test subject',
+          comments: 'Test description',
+          user_perceived_severity: 'just_a_comment',
+          email: '',
+          url: window.location.toString(),
+          context_asset_string: 'course_7',
+          user_roles: 'user,student,teacher,admin,root_admin', // payload requires comma delimited string of values
+        }),
+      }
+      // verify api call
+      expect(doFetchApi).toHaveBeenCalledWith({
+        path: '/error_reports',
+        method: 'POST',
+        body: payload,
+      })
+    })
+  })
+
+  describe('form behavior on submission', () => {
     beforeEach(() => {
       ;(doFetchApi as jest.Mock).mockReset()
     })
@@ -153,7 +253,10 @@ describe('CreateTicketForm', () => {
         () =>
           new Promise(resolve =>
             setTimeout(() => {
-              resolve({response: {status: 200}, json: {message: 'Success'}})
+              resolve({
+                response: {status: 200},
+                json: {logged: true, id: '10033'},
+              })
             }, 500),
           ),
       )
@@ -177,37 +280,7 @@ describe('CreateTicketForm', () => {
       })
     })
 
-    it('calls the API with the correct payload', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValue({
-        response: {status: 200},
-        json: {message: 'Success'},
-      })
-      const {getByTestId, getByText} = render(<CreateTicketForm {...props} />)
-      // fill and submit form
-      fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
-      fireEvent.change(getByTestId('description-input'), {target: {value: 'Test description'}})
-      await userEvent.click(getByTestId('severity-select'))
-      await userEvent.click(getByText('Just a casual question, comment, idea, or suggestion'))
-      await userEvent.click(getByTestId('submit-button'))
-      // verify api call
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/error_reports',
-        method: 'POST',
-        body: {
-          error: expect.objectContaining({
-            subject: 'Test subject',
-            comments: 'Test description',
-            user_perceived_severity: 'just_a_comment',
-            email: '',
-            url: window.location.toString(),
-            context_asset_string: window.ENV.context_asset_string,
-            user_roles: window.ENV.current_user_roles?.join(','),
-          }),
-        },
-      })
-    })
-
-    it('shows success message on successful submission', async () => {
+    it('shows success message when ticket is submitted successfully', async () => {
       ;(doFetchApi as jest.Mock).mockResolvedValue({
         response: {status: 200},
         json: {message: 'Success'},
@@ -229,7 +302,7 @@ describe('CreateTicketForm', () => {
       )
     })
 
-    it('shows error message on failed submission', async () => {
+    it('displays error message if submission fails', async () => {
       ;(doFetchApi as jest.Mock).mockResolvedValue({
         response: {status: 400},
         json: {message: 'Server error occurred'},
@@ -246,8 +319,8 @@ describe('CreateTicketForm', () => {
     })
   })
 
-  describe('reset and cancel tests', () => {
-    it('resets the form when cancel is clicked', async () => {
+  describe('form reset and cancellation', () => {
+    it('clears form and triggers cancel event when clicking cancel', async () => {
       const {getByTestId} = render(<CreateTicketForm {...props} />)
       fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
       await userEvent.click(getByTestId('cancel-button'))
@@ -255,20 +328,12 @@ describe('CreateTicketForm', () => {
       expect(onCancel).toHaveBeenCalled()
     })
 
-    it('exposes resetForm to the parent via ref', () => {
+    it('allows parent component to reset form via ref', () => {
       const ref = createRef<{resetForm: () => void}>()
       const {getByTestId} = render(<CreateTicketForm ref={ref} {...props} />)
       fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
       ref.current?.resetForm()
       expect(getByTestId('subject-input')).toHaveValue('')
-    })
-  })
-
-  describe('focus management tests', () => {
-    it('focuses on the subject field on initial render', () => {
-      const {getByTestId} = render(<CreateTicketForm {...props} />)
-      const subjectInput = getByTestId('subject-input')
-      expect(subjectInput).toHaveFocus()
     })
   })
 })

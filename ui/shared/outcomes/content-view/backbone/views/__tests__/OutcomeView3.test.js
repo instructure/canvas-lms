@@ -68,6 +68,12 @@ function createView(opts) {
   return view.render()
 }
 
+const waitFrames = async frames => {
+  for (let i = 0; i < frames; i++) {
+    await new Promise(resolve => requestAnimationFrame(resolve))
+  }
+}
+
 describe('OutcomeView', () => {
   let outcome1
 
@@ -267,37 +273,42 @@ describe('OutcomeView', () => {
   })
 
   describe('Form Validation', () => {
-    it('validates title is present', () => {
+    it('validates title is present', async () => {
       const view = createView({
         model: outcome1,
         state: 'edit',
       })
+      await waitFrames(10)
       view.$('#title').val('')
       view.$('#dtitle').trigger('change')
+      await waitFrames(10)
       expect(view.isValid()).toBeFalsy()
       expect(view.errors.title).toBeTruthy()
       view.remove()
     })
 
-    it('validates title length', () => {
+    it('validates title length', async () => {
       const long_name = 'X'.repeat(260)
       const view = createView({
         model: outcome1,
         state: 'edit',
       })
+      await waitFrames(10)
       view.$('#title').val(long_name)
       expect(view.isValid()).toBeFalsy()
       expect(view.errors.title).toBeTruthy()
       view.remove()
     })
 
-    it('validates display_name length', () => {
+    it('validates display_name length', async () => {
       const long_name = 'X'.repeat(260)
       const view = createView({
         model: outcome1,
         state: 'edit',
       })
+      await waitFrames(10)
       view.$('#display_name').val(long_name)
+      await waitFrames(10)
       expect(view.isValid()).toBeFalsy()
       expect(view.errors.display_name).toBeTruthy()
       view.remove()
@@ -313,7 +324,7 @@ describe('OutcomeView', () => {
       console.warn.mockRestore()
     })
 
-    it('shows dialog when outcome is modified', () => {
+    it('shows dialog when outcome is modified', async () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: true},
@@ -321,10 +332,13 @@ describe('OutcomeView', () => {
         ),
         state: 'edit',
       })
+      await waitFrames(10)
       view.edit($.Event())
+      await waitFrames(10)
       view.$('#title').val('this is a brand new title')
       view.$('form').trigger('submit')
-
+      await waitFrames(10)
+      
       return new Promise(resolve => {
         setTimeout(() => {
           expect($('.confirm-outcome-edit-modal-container').length).toBeGreaterThan(0)
@@ -336,7 +350,7 @@ describe('OutcomeView', () => {
       })
     })
 
-    it('saves without dialog when outcome is unchanged', () => {
+    it('saves without dialog when outcome is unchanged', async () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: true},
@@ -344,21 +358,25 @@ describe('OutcomeView', () => {
         ),
         state: 'edit',
       })
+      await waitFrames(10)
       view.edit($.Event())
+      await waitFrames(10)
       const submitSpy = jest.fn()
       view.on('submit', submitSpy)
       view.$('form').trigger('submit')
-
+      await waitFrames(10)
+      
       return new Promise(resolve => {
-        setTimeout(() => {
+        setTimeout(async () => {
           $('#confirm-outcome-edit-modal').trigger('click')
+          await waitFrames(10)
           expect(submitSpy).toHaveBeenCalled()
           resolve()
         })
       })
     })
 
-    it('saves without dialog when outcome title is changed but no rubrics aligned', () => {
+    it('saves without dialog when outcome title is changed but no rubrics aligned', async () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: false},
@@ -366,14 +384,18 @@ describe('OutcomeView', () => {
         ),
         state: 'edit',
       })
+      await waitFrames(10)
       view.edit($.Event())
+      await waitFrames(10)
       const submitSpy = jest.fn()
       view.on('submit', submitSpy)
       view.$('form').trigger('submit')
-
+      await waitFrames(10)
+      
       return new Promise(resolve => {
-        setTimeout(() => {
+        setTimeout(async () => {
           $('#confirm-outcome-edit-modal').trigger('click')
+          await waitFrames(10)
           expect(submitSpy).toHaveBeenCalled()
           resolve()
         })
@@ -408,11 +430,12 @@ describe('OutcomeView', () => {
       expect(outcome.outcomeLink.outcome.id).toBeTruthy()
     })
 
-    it('renders placeholder text properly for new outcomes', () => {
+    it('renders placeholder text properly for new outcomes', async () => {
       const view = createView({
         model: newOutcome(),
         state: 'add',
       })
+      await waitFrames(10)
       expect(view.$('input[name="title"]').attr('placeholder')).toBe('New Outcome')
       view.remove()
     })

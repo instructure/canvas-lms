@@ -19,7 +19,7 @@
 import React from 'react'
 import {Pill} from '@instructure/ui-pill'
 import {PENDING_ENROLLMENT, INACTIVE_ENROLLMENT} from '../../../util/constants'
-import type {EnrollmentState} from '../../types'
+import type {EnrollmentState} from '../../../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')

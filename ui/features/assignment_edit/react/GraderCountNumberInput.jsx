@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {number, string} from 'prop-types'
+import {number, string, func} from 'prop-types'
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {NumberInput} from '@instructure/ui-number-input'
+import {View} from '@instructure/ui-view'
+import $ from 'jquery'
 
 const I18n = createI18nScope('GraderCountNumberInput')
 
@@ -40,6 +42,7 @@ export default class GraderCountNumberInput extends React.Component {
     currentGraderCount: number,
     locale: string.isRequired,
     availableGradersCount: number.isRequired,
+    hideErrors: func,
   }
 
   static defaultProps = {
@@ -51,13 +54,33 @@ export default class GraderCountNumberInput extends React.Component {
       this.props.currentGraderCount ||
       Math.min(this.props.availableGradersCount, DEFAULT_GRADER_COUNT),
     messages: [],
+    validationError: false,
+  }
+
+  componentDidMount() {
+    $(document).on("validateGraderCountNumber", (_e, data) => {
+      this.setValidationError(!!data.error);
+    })
+  }
+
+  componentWillUnmount() {
+    $(document).off("validateGraderCountNumber")
+  }
+
+  setValidationError(validationError) {
+    this.setState({
+      validationError: validationError,
+      messages: validationError
+      ? [{text: '', type: 'error'}]
+      : []
+    })
   }
 
   generateMessages(newValue, eventType) {
     if (newValue === '' && eventType !== 'blur') {
       return []
     } else if (newValue === '0' || newValue === '') {
-      return [{text: I18n.t('Must have at least 1 grader'), type: 'error'}]
+      return []
     }
 
     const current = parseInt(newValue, 10)
@@ -75,6 +98,9 @@ export default class GraderCountNumberInput extends React.Component {
   }
 
   handleNumberInputChange(value) {
+    if(this.props.hideErrors)
+      this.props.hideErrors('grader_count_errors')
+
     if (value === '') {
       this.setState({graderCount: '', messages: this.generateMessages(value, 'change')})
     } else {
@@ -92,24 +118,23 @@ export default class GraderCountNumberInput extends React.Component {
       </strong>
     )
     return (
-      <div className="ModeratedGrading__GraderCountInputContainer">
-        <NumberInput
-          allowStringValue={true}
-          id="grader_count"
-          value={this.state.graderCount.toString()}
-          renderLabel={label}
-          locale={this.props.locale}
-          max={this.props.availableGradersCount.toString()}
-          messages={this.state.messages}
-          min="1"
-          onChange={e => {
-            if (e.type !== 'blur') this.handleNumberInputChange(e.target.value)
-          }}
-          onBlur={e => this.handleNumberInputBlur(e.target.value)}
-          showArrows={false}
-          width="5rem"
-        />
-      </div>
+      <>
+        <div className="ModeratedGrading__GraderCountInputContainer">
+          <NumberInput
+            allowStringValue={true}
+            id="grader_count"
+            value={this.state.graderCount.toString()}
+            renderLabel={label}
+            locale={this.props.locale}
+            messages={this.state.messages}
+            onChange={e => this.handleNumberInputChange(e.target.value)}
+            onBlur={e => this.handleNumberInputBlur(e.target.value)}
+            showArrows={false}
+            width="5rem"
+          />
+          <View as="div" id="grader_count_errors" padding="xxx-small 0 0 0"></View>
+        </div>
+      </>
     )
   }
 }

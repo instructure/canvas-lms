@@ -288,6 +288,7 @@ class ContextModuleItemsApiController < ApplicationController
         opts[:conditional_release_rules] = ConditionalRelease::Service.rules_for(@context, @student, session)
       end
       opts[:can_view_published] = @context.grants_right?((@student || @current_user), session, :read_as_admin)
+      opts[:can_have_estimated_time] = @context.horizon_course?
       render json: items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, includes, opts) }
     end
   end
@@ -315,6 +316,7 @@ class ContextModuleItemsApiController < ApplicationController
       get_module_item
       prog = @student ? @module.evaluate_for(@student) : nil
       opts = { can_view_published: @context.grants_right?((@student || @current_user), session, :read_as_admin) }
+      opts[:can_have_estimated_time] = @context.horizon_course?
       render json: module_item_json(@item, @student || @current_user, session, @module, prog, Array(params[:include]), opts)
     end
   end
@@ -727,7 +729,7 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(original_tag.context_module, @current_user, :update)
       if original_tag.duplicate_able?
         new_content = original_tag.content.duplicate
-        new_content.save! unless new_content.persisted?
+        new_content.save!
         new_tag = original_tag.context_module.add_item({
                                                          type: original_tag.content_type,
                                                          indent: original_tag.indent,

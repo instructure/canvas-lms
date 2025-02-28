@@ -160,6 +160,7 @@ import {createRoot} from 'react-dom/client'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 import {SpeedGraderDiscussionsNavigation} from '../react/SpeedGraderDiscussionsNavigation'
+import {SpeedGraderDiscussionsNavigation2} from '../react/SpeedGraderDiscussionsNavigation2'
 
 declare global {
   interface Window {
@@ -873,7 +874,6 @@ function renderHiddenSubmissionPill(submission: Submission) {
 
 function renderCheckpoints(submission: Submission) {
   const mountPoint = document.getElementById(SPEED_GRADER_CHECKPOINTS_MOUNT_POINT)
-
   if (mountPoint) {
     ReactDOM.render(
       <SpeedGraderCheckpointsWrapper
@@ -919,11 +919,35 @@ function getDefaultDiscussionView() {
   }
 }
 
-function renderDiscussionsNavigation() {
+function renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
   const mountPoint = document.getElementById(SPEED_GRADER_DISCUSSIONS_NAVIGATION_MOUNT_POINT)
 
-  if (getDefaultDiscussionView() === 'discussion_view_with_context' && mountPoint) {
-    ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
+  if (temporaryDiscussionContextView) {
+    if (temporaryDiscussionContextView === 'discussion_view_no_context') {
+      return
+    } else if (temporaryDiscussionContextView === 'discussion_view_with_context' && mountPoint) {
+      if (ENV.FEATURES.discussions_speedgrader_revisit) {
+        const currentUrl = new URL(window.location.href)
+        const params = new URLSearchParams(currentUrl.search)
+        ReactDOM.render(<SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />, mountPoint)
+      }
+      else{
+        ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
+      }
+      return
+    }
+  } else if (getDefaultDiscussionView() === 'discussion_view_with_context' && mountPoint) {
+    if (ENV.FEATURES.discussions_speedgrader_revisit) {
+      const currentUrl = new URL(window.location.href)
+      const params = new URLSearchParams(currentUrl.search)
+      ReactDOM.render(<SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />, mountPoint)
+    }
+    else{
+      ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
+    }
+    return
+  } else {
+    return
   }
 }
 
@@ -3008,7 +3032,11 @@ EG = {
   },
 
   // load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
-  renderSubmissionPreview(domElement = 'iframe') {
+  renderSubmissionPreview(
+    domElement = 'iframe',
+    temporaryDiscussionContextView = null,
+    specificEntryId = null,
+  ) {
     // TODO: this is duplicate code from line 1972 and should be removed
     if (!this.currentStudent.submission) {
       $this_student_does_not_have_a_submission.show()
@@ -3023,12 +3051,38 @@ EG = {
       this.currentStudent.submission,
     )
     const hideStudentNames = utils.shouldHideStudentNames() ? '&hide_student_name=1' : ''
-    const entryId = ENV.ENTRY_ID ? `&entry_id=${ENV.ENTRY_ID}` : ''
-    const showFullDiscussionImmediately =
-      getDefaultDiscussionView() === 'discussion_view_with_context'
-        ? `&show_full_discussion_immediately=1`
-        : ''
-    const queryParams = `${iframePreviewVersion}${hideStudentNames}${entryId}${showFullDiscussionImmediately}`
+    let entryId = ''
+    if (specificEntryId) {
+      entryId = `&entry_id=${specificEntryId}`
+    } else if (ENV.ENTRY_ID) {
+      entryId = `&entry_id=${ENV.ENTRY_ID}`
+    }
+
+    let showFullDiscussionImmediately = ''
+    if (temporaryDiscussionContextView) {
+      switch (temporaryDiscussionContextView) {
+        case 'discussion_view_with_context':
+          showFullDiscussionImmediately = `&show_full_discussion_immediately=1`
+          break
+        case 'discussion_view_no_context':
+          showFullDiscussionImmediately = ''
+          break
+        default:
+          showFullDiscussionImmediately = ''
+          break
+      }
+    } else {
+      showFullDiscussionImmediately =
+        getDefaultDiscussionView() === 'discussion_view_with_context'
+          ? `&show_full_discussion_immediately=1`
+          : ''
+    }
+    // since we are in speedgrader, and not the student submission page, we want to use the toggler version of the link
+    // when the discussions_speedgrader_revisit feature flag is enabled
+    const useDiscussionToggleLink = ENV.FEATURES?.discussions_speedgrader_revisit
+      ? `&use_discussion_toggle_link=1`
+      : ''
+    const queryParams = `${iframePreviewVersion}${hideStudentNames}${entryId}${showFullDiscussionImmediately}${useDiscussionToggleLink}`
     const src = `/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/${anonymizableSubmissionId}?preview=true${queryParams}`
     const iframe = SpeedgraderHelpers.buildIframe(
       htmlEscape(src),
@@ -3037,7 +3091,15 @@ EG = {
     )
     $iframe_holder.html(iframe).show()
 
-    renderDiscussionsNavigation()
+    renderDiscussionsNavigation(temporaryDiscussionContextView)
+  },
+
+  clearDiscussionsNavigation() {
+    clearDiscussionsNavigation()
+  },
+
+  renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
+    renderDiscussionsNavigation(temporaryDiscussionContextView)
   },
 
   renderLtiLaunch($div: JQuery, urlBase: string, submission: HistoricalSubmission) {

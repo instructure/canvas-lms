@@ -23,7 +23,7 @@ import {
   inBlackoutDate,
   daysBetween,
   getEndDateValue,
-  generateDatesCaptions
+  generateDatesCaptions,
 } from '../date_stuff/date_helpers'
 import { END_DATE_CAPTIONS, START_DATE_CAPTIONS } from '../../../constants'
 import {
@@ -133,7 +133,7 @@ describe('date_helpers', () => {
       })
 
       testCases.forEach(
-        ({description, start_date, daysToAdd, excludeWeekends, skipDays, blackouts, expected}) => {
+        ({ description, start_date, daysToAdd, excludeWeekends, skipDays, blackouts, expected }) => {
           it(description, () => {
             const end = addDays(moment(start_date), daysToAdd, excludeWeekends, skipDays, blackouts)
             expect(end).toEqual(expected)

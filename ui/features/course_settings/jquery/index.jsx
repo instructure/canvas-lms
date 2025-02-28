@@ -30,7 +30,6 @@ import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
-import '@canvas/link-enrollment' /* global link_enrollment */
 import 'jquery-tinypubsub' /* /\.publish/ */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/menu'
@@ -489,31 +488,6 @@ $(document).ready(function () {
       $(this).loadingImage('remove')
     },
     disableWhileLoading: 'spin_on_success',
-  })
-  $('.associated_user_link').click(function (event) {
-    event.preventDefault()
-    const $user = $(this).parents('.user')
-    const $enrollment = $(this).parents('.enrollment_link')
-    const user_data = $user.getTemplateData({textValues: ['name']})
-    const enrollment_data = $enrollment.getTemplateData({
-      textValues: ['enrollment_id', 'associated_user_id'],
-    })
-    link_enrollment.choose(
-      user_data.name,
-      enrollment_data.enrollment_id,
-      enrollment_data.associated_user_id,
-      enrollment => {
-        if (enrollment) {
-          const $user = $('.observer_enrollments .user_' + enrollment.user_id)
-          const $enrollment_link = $user.find('.enrollment_link.enrollment_' + enrollment.id)
-          $enrollment_link.find('.associated_user.associated').showIf(enrollment.associated_user_id)
-          $enrollment_link.fillTemplateData({data: enrollment})
-          $enrollment_link
-            .find('.associated_user.unassociated')
-            .showIf(!enrollment.associated_user_id)
-        }
-      },
-    )
   })
   $('.course_info')
     .not('.uneditable')

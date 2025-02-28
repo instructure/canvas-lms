@@ -20,7 +20,7 @@
 
 describe Schemas::Lti::PublicJwk do
   describe "valid?" do
-    subject { Schemas::Lti::PublicJwk.new.valid?(json_hash) }
+    subject { Schemas::Lti::PublicJwk.valid?(json_hash) }
 
     let(:valid_json_hash) do
       {

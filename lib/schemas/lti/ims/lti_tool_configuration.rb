@@ -125,7 +125,7 @@ module Schemas::Lti::IMS
 
     TYPE = "https://purl.imsglobal.org/spec/lti-tool-configuration"
 
-    def schema
+    def self.schema
       SCHEMA
     end
 

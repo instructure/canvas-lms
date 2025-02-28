@@ -63,7 +63,7 @@ module Schemas::Lti
                            .keys
                            .intersection(SCHEMA[:properties].keys)
 
-    def schema
+    def self.schema
       SCHEMA
     end
   end

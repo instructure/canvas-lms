@@ -398,25 +398,27 @@ describe GroupCategoriesController do
     end
   end
 
-  describe "POST bulk_manage_groups" do
+  describe "POST bulk_manage_differentiation_tag" do
     before :once do
-      @collaborative_category = @course.group_categories.create!(name: "Collaborative Category", non_collaborative: false)
+      Account.default.enable_feature!(:differentiation_tags)
       @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+      @collaborative_category = @course.group_categories.create!(name: "Collaborative Category", non_collaborative: false)
     end
 
     context "authorization checks" do
-      it "requires add permission to create groups" do
+      it "requires add permission to create differentiation tag" do
         user_session(@teacher)
-        # Revoke add permission
+        # Revoke add permission for differentiation tags (non_collaborative)
         @course.account.role_overrides.create!(
-          permission: :manage_groups_add,
+          permission: :manage_tags_add,
           role: teacher_role,
           enabled: false
         )
 
-        post "bulk_manage_groups",
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
                  create: [{ name: "New Group" }]
                }
@@ -424,21 +426,21 @@ describe GroupCategoriesController do
         assert_unauthorized
       end
 
-      it "requires manage permission to update groups" do
+      it "requires manage permission to update differentiation tag" do
         user_session(@teacher)
         # Revoke manage permission
         @course.account.role_overrides.create!(
-          permission: :manage_groups_manage,
+          permission: :manage_tags_manage,
           role: teacher_role,
           enabled: false
         )
 
-        # Create a group for testing
-        test_group = @collaborative_category.groups.create!(name: "Old Group", context: @course)
+        test_group = @non_collaborative_category.groups.create!(name: "Old Group", context: @course)
 
-        post "bulk_manage_groups",
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
                  update: [{ id: test_group.id, name: "Updated Group" }]
                }
@@ -446,21 +448,21 @@ describe GroupCategoriesController do
         assert_unauthorized
       end
 
-      it "requires delete permission to delete groups" do
+      it "requires delete permission to delete differentiation tag" do
         user_session(@teacher)
         # Revoke delete permission
         @course.account.role_overrides.create!(
-          permission: :manage_groups_delete,
+          permission: :manage_tags_delete,
           role: teacher_role,
           enabled: false
         )
 
-        # Create a group for testing
-        test_group = @collaborative_category.groups.create!(name: "To Be Deleted", context: @course)
+        test_group = @non_collaborative_category.groups.create!(name: "To Be Deleted", context: @course)
 
-        post "bulk_manage_groups",
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
                  delete: [{ id: test_group.id }]
                }
@@ -472,35 +474,34 @@ describe GroupCategoriesController do
     context "with proper permissions" do
       before do
         user_session(@teacher)
-        # Ensure teacher has all relevant group permissions
-        # (manage_tags_add, manage_tags_manage, manage_tags_delete) = true
+        # Assume teacher has all relevant group permissions (manage_tags_add, manage_tags_manage, manage_tags_delete)
       end
 
       it "creates multiple groups" do
-        post "bulk_manage_groups",
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
                  create: [
                    { name: "Group A" },
                    { name: "Group B" },
-                   { name: "Group C" },
-                   { name: "Group D" },
-                   { name: "Group E" }
+                   { name: "Group C" }
                  ]
                }
              }
         expect(response).to be_successful
         body = response.parsed_body
-        expect(body["created"].size).to eq 5
+        expect(body["created"].size).to eq 3
       end
 
       it "updates groups" do
-        group = @collaborative_category.groups.create!(name: "Original Name", context: @course)
+        group = @non_collaborative_category.groups.create!(name: "Original Name", context: @course)
 
-        post "bulk_manage_groups",
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
                  update: [{ id: group.id, name: "Updated Name" }]
                }
@@ -513,11 +514,12 @@ describe GroupCategoriesController do
       end
 
       it "deletes groups" do
-        group = @collaborative_category.groups.create!(name: "Delete Me", context: @course)
+        group = @non_collaborative_category.groups.create!(name: "Delete Me", context: @course)
 
-        post "bulk_manage_groups",
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
                  delete: [{ id: group.id }]
                }
@@ -526,16 +528,17 @@ describe GroupCategoriesController do
         expect(response).to be_successful
         body = response.parsed_body
         expect(body["deleted"].size).to eq 1
-        expect(@collaborative_category.groups.active.map(&:name)).not_to include("Delete Me")
+        expect(@non_collaborative_category.groups.active.map(&:name)).not_to include("Delete Me")
       end
 
       it "handles create, update, and delete in one request" do
-        group1 = @collaborative_category.groups.create!(name: "Group1", context: @course)
-        group2 = @collaborative_category.groups.create!(name: "Group2", context: @course)
+        group1 = @non_collaborative_category.groups.create!(name: "Group1", context: @course)
+        group2 = @non_collaborative_category.groups.create!(name: "Group2", context: @course)
 
-        post "bulk_manage_groups",
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
                  create: [{ name: "New Group" }],
                  update: [{ id: group1.id, name: "Updated Group1" }],
@@ -548,14 +551,72 @@ describe GroupCategoriesController do
         expect(body["created"].size).to eq 1
         expect(body["updated"].size).to eq 1
         expect(body["deleted"].size).to eq 1
-        expect(@collaborative_category.groups.active.map(&:name)).to include("Updated Group1", "New Group")
-        expect(@collaborative_category.groups.active.map(&:name)).not_to include("Group2")
+        expect(@non_collaborative_category.groups.active.map(&:name)).to include("Updated Group1", "New Group")
+        expect(@non_collaborative_category.groups.active.map(&:name)).not_to include("Group2")
       end
 
-      it "fails if a group to update doesn't exist" do
-        post "bulk_manage_groups",
+      it "updates group category name if both id and new name provided" do
+        new_name = "Updated Non-Collaborative Category"
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id, name: new_name },
+               operations: {
+                 create: [{ name: "New Group" }]
+               }
+             }
+        expect(response).to be_successful
+        body = response.parsed_body
+
+        expect(body["group_category"]["group_category"]["name"]).to eq new_name
+        expect(@non_collaborative_category.reload.name).to eq new_name
+      end
+
+      it "creates a new GroupCategory and new Groups at the same time" do
+        new_category_name = "New Differentiation Category"
+        post "bulk_manage_differentiation_tag",
+             params: {
+               course_id: @course.id,
+               group_category: { name: new_category_name },
+               operations: {
+                 create: [
+                   { name: "Group X" },
+                   { name: "Group Y" }
+                 ]
+               }
+             }
+        expect(response).to be_successful
+
+        new_category = @course.differentiation_tag_categories.find_by(name: new_category_name)
+        expect(new_category).not_to be_nil
+        expect(new_category.groups.active.pluck(:name)).to match_array(["Group X", "Group Y"])
+      end
+    end
+
+    context "with invalid group_category non_collaborative" do
+      it "fails when a non-differentiation (collaborative) category id is provided" do
+        user_session(@teacher)
+        post "bulk_manage_differentiation_tag",
+             params: {
+               course_id: @course.id,
+               group_category: { id: @collaborative_category.id },
+               operations: {
+                 create: [{ name: "New Group" }]
+               }
+             }
+        expect(response).to have_http_status(:bad_request)
+        body = response.parsed_body
+        expect(body["errors"]).to eq I18n.t("This endpoint only works for Differentiation Tags")
+      end
+    end
+
+    context "error conditions" do
+      it "fails if a group to update doesn't exist" do
+        user_session(@teacher)
+        post "bulk_manage_differentiation_tag",
+             params: {
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
                  update: [{ id: 9999, name: "Nonexistent" }]
                }
@@ -564,9 +625,11 @@ describe GroupCategoriesController do
       end
 
       it "fails if a group to delete doesn't exist" do
-        post "bulk_manage_groups",
+        user_session(@teacher)
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
                  delete: [{ id: 9999 }]
                }
@@ -575,71 +638,50 @@ describe GroupCategoriesController do
       end
 
       it "fails if create params are invalid" do
-        post "bulk_manage_groups",
+        user_session(@teacher)
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
-                 create: [{ name: "" }] # invalid name
+                 create: [{ name: "" }]
                }
              }
         expect(response).to have_http_status(:bad_request)
         expect(response.parsed_body["errors"]).to be_present
       end
 
-      it "handles ActiveRecord validation errors gracefully" do
-        group = @collaborative_category.groups.create!(name: "Valid Name", context: @course)
-        post "bulk_manage_groups",
-             params: {
-               group_category_id: @collaborative_category.id,
-               operations: {
-                 update: [{ id: group.id, name: "" }] # invalid
-               }
-             }
-        expect(response).to have_http_status(:bad_request)
-        expect(response.parsed_body["errors"]).to match(/Validation failed/i)
-      end
-
       it "fails when the maximum number of operations is exceeded" do
-        post "bulk_manage_groups",
+        user_session(@teacher)
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: @collaborative_category.id,
+               course_id: @course.id,
+               group_category: { id: @non_collaborative_category.id },
                operations: {
-                 create: [
-                   { name: "Group A" },
-                   { name: "Group B" },
-                   { name: "Group C" },
-                   { name: "Group D" },
-                   { name: "Group E" }
-                 ] * 11
+                 create: [{ name: "Group" }] * (50 + 1)
                }
              }
         expect(response).to have_http_status(:bad_request)
-        expect(response.parsed_body["errors"]).to match(/You can only perform a maximum of 50 operations at a time./i)
+        expect(response.parsed_body["errors"]).to match(/You can only perform a maximum of 50 operations at a time./io)
       end
 
-      it "fails when an invalid group category id is provided" do
-        post "bulk_manage_groups",
+      it "fails if the GroupCategory id is not part of the given course even if the teacher has permissions" do
+        user_session(@teacher)
+        course1 = @course
+        course2 = course_with_teacher(active_all: true, user: @teacher).course
+        other_category = course2.group_categories.create!(name: "Other Category", non_collaborative: true)
+
+        post "bulk_manage_differentiation_tag",
              params: {
-               group_category_id: 999_999,
+               course_id: course1.id,
+               group_category: { id: other_category.id },
                operations: {
-                 create: [{ name: "New Group" }]
+                 create: [{ name: "Invalid Group" }]
                }
              }
-        expect(response).to have_http_status(:not_found)
-      end
-
-      it "fails when trying to edit a group that belongs to a different category" do
-        other_category = @course.group_categories.create!(name: "Other Category")
-        other_group = other_category.groups.create!(name: "Other Group", context: @course)
-
-        post "bulk_manage_groups",
-             params: {
-               group_category_id: @collaborative_category.id,
-               operations: {
-                 update: [{ id: other_group.id, name: "Updated Name" }]
-               }
-             }
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:bad_request)
+        body = response.parsed_body
+        expect(body["errors"]).to match(/not part of the course/i)
       end
     end
   end

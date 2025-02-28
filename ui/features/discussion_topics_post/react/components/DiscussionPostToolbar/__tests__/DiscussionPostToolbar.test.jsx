@@ -38,7 +38,10 @@ jest.mock('../../../utils', () => ({
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
-jest.mock('../../../utils/constants')
+jest.mock('../../../utils/constants', () => ({
+  ...jest.requireActual('../../../utils/constants'),
+  isSpeedGraderInTopUrl: false,
+}))
 
 const onFailureStub = jest.fn()
 const onSuccessStub = jest.fn()
@@ -234,7 +237,10 @@ describe('DiscussionPostToolbar', () => {
     })
 
     it('does not render the Assign To button if in speedGrader', () => {
-      constants.isSpeedGraderInTopUrl = jest.fn().mockReturnValue(true)
+      jest.mock('../../../utils/constants', () => ({
+        ...jest.requireActual('../../../utils/constants'),
+        isSpeedGraderInTopUrl: true,
+      }))
 
       const container = setup({
         manageAssignTo: true,

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {type SyntheticEvent} from 'react'
+import React, {type FC, type SyntheticEvent} from 'react'
 import {Table} from '@instructure/ui-table'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -34,7 +34,7 @@ export type RosterTableHeaderProps = {
   handleSort: (event: SyntheticEvent<Element, Event>, {id}: {id: string}) => void
 }
 
-const RosterTableHeader: React.FC<RosterTableHeaderProps> = ({
+const RosterTableHeader: FC<RosterTableHeaderProps> = ({
   allSelected,
   someSelected,
   sortBy,
@@ -51,7 +51,7 @@ const RosterTableHeader: React.FC<RosterTableHeaderProps> = ({
     allowAssignToDifferentiationTags
   } = useCoursePeopleContext()
 
-  const CustomColHeader: React.FC<{
+  const CustomColHeader: FC<{
     id: string
     name: string
     width?: string

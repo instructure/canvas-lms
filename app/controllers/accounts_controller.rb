@@ -2118,6 +2118,7 @@ class AccountsController < ApplicationController
                                    :enable_as_k5_account,
                                    :use_classic_font_in_k5,
                                    :show_sections_in_course_tray].freeze
+  private_constant :PERMITTED_SETTINGS_FOR_UPDATE
 
   def permitted_account_attributes
     [:name,

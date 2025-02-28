@@ -27,6 +27,7 @@ import {
   IconArrowOpenDownLine,
   IconArrowOpenUpLine,
   IconAttachMediaLine,
+  IconWarningSolid,
 } from '@instructure/ui-icons'
 import UploadMedia from '@instructure/canvas-media'
 import {formatTracksForMediaPlayer} from '@canvas/canvas-media-player'
@@ -409,6 +410,7 @@ const MessageStudentsWhoDialog = ({
   const [open, setOpen] = useState(true)
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState('')
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const initializeSelectedObservers = (studentCollection: Student[]) =>
     studentCollection.reduce(
@@ -516,9 +518,10 @@ const MessageStudentsWhoDialog = ({
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [pendingUploads, setPendingUploads] = useState([])
 
-  const isFormDataValid: boolean =
-    message.trim().length > 0 &&
+  const isMessagePresent: boolean = message.trim().length > 0
+  const areRecipientsPresent: boolean =
     selectedStudents.length + Object.values(selectedObservers).flat().length > 0
+  const isFormDataValid: boolean = isMessagePresent && areRecipientsPresent
 
   useEffect(() => {
     if (!loading && observerEnrollments) {
@@ -569,6 +572,10 @@ const MessageStudentsWhoDialog = ({
   }
 
   const handleSendButton = () => {
+    setIsSubmitted(true)
+    if (!isFormDataValid) {
+      return
+    }
     if (pendingUploads.length) {
       // This notifies the AttachmentUploadSpinner to start spinning
       // which then calls onSend() when pendingUploads are complete.
@@ -583,7 +590,7 @@ const MessageStudentsWhoDialog = ({
       const args: SendMessageArgs = {
         recipientsIds: uniqueRecipientsIds,
         subject,
-        body: message,
+        body: message.trim(),
       }
 
       if (mediaUploadFile) {
@@ -877,6 +884,18 @@ const MessageStudentsWhoDialog = ({
               </Link>
             </Flex.Item>
           </Flex>
+          {!areRecipientsPresent && isSubmitted && (
+            <View as="div" margin="0 xxx-small xx-small 0">
+              <Text size="small" color="danger">
+                <View textAlign="center">
+                  <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+                    <IconWarningSolid />
+                  </View>
+                  {I18n.t('Please select at least one recipient.')}
+                </View>
+              </Text>
+            </View>
+          )}
           {showTable && (
             <Table caption={I18n.t('List of students and observers')}>
               <Table.Head>
@@ -939,6 +958,23 @@ const MessageStudentsWhoDialog = ({
             placeholder={I18n.t('Type your message here…')}
             value={message}
             onChange={e => setMessage(e.target.value)}
+            messages={
+              !isMessagePresent && isSubmitted
+                ? [
+                    {
+                      type: 'error',
+                      text: (
+                        <View textAlign="center">
+                          <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+                            <IconWarningSolid />
+                          </View>
+                          {I18n.t('A message is required to send this message.')}
+                        </View>
+                      ),
+                    },
+                  ]
+                : []
+            }
           />
 
           <Flex alignItems="start">
@@ -996,7 +1032,6 @@ const MessageStudentsWhoDialog = ({
                   <Button
                     id="send-message-button" // EVAL-4242
                     data-testid="send-message-button"
-                    interaction={isFormDataValid ? 'enabled' : 'disabled'}
                     color="primary"
                     onClick={handleSendButton}
                   >

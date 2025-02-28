@@ -16,22 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {type FC} from 'react'
 import {Text} from '@instructure/ui-text'
 import {OBSERVER_ENROLLMENT} from '../../../util/constants'
 import {getRoleName} from '../../../util/utils'
-import type {Enrollment} from '../../types'
+import type {Enrollment} from '../../../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')
 
-const UserRole: React.FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
-  (enrollments || []).map(enrollment => {
-    const {id, type, associatedUser, temporary_enrollment_source_user_id} = enrollment
+const UserRole: FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
+  enrollments.map(enrollment => {
+    const {_id, type, associatedUser, temporaryEnrollmentSourceUserId} = enrollment
 
     let roleName = getRoleName(type)
 
-    if (temporary_enrollment_source_user_id) roleName = I18n.t('Temporary: %{roleName}', {roleName})
+    if (temporaryEnrollmentSourceUserId) roleName = I18n.t('Temporary: %{roleName}', {roleName})
 
     if (type === OBSERVER_ENROLLMENT){
       if (associatedUser) {
@@ -42,7 +42,7 @@ const UserRole: React.FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
     }
 
     return (
-      <Text as="div" key={`enrollment-${id}`}>
+      <Text as="div" key={`enrollment-${_id}`}>
         {roleName}
       </Text>
     )

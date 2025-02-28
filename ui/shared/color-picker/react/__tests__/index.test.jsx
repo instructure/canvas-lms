@@ -55,15 +55,15 @@ describe('ColorPicker', () => {
   })
 
   it('shows current color in textarea', () => {
-    const {getByLabelText} = renderColorPicker({currentColor: '#ff0000'})
-    const textInput = getByLabelText('Enter a hexcode here to use a custom color.')
+    const {getByTestId} = renderColorPicker({currentColor: '#ff0000'})
+    const textInput = getByTestId('color-picker-input')
     expect(textInput).toBeInTheDocument()
     expect(textInput.value).toEqual('#ff0000')
   })
 
   it('shows warning icon if custom color is not a valid hexcode', () => {
-    const {getByLabelText} = renderColorPicker({currentColor: '#ff0000'})
-    const textInput = getByLabelText('Enter a hexcode here to use a custom color.')
+    const {getByTestId} = renderColorPicker({currentColor: '#ff0000'})
+    const textInput = getByTestId('color-picker-input')
     fireEvent.change(textInput, {target: {value: '#00ff0q'}})
     const warningIcon = document.getElementById('ColorPicker__InvalidHex')
     expect(warningIcon).toBeInTheDocument()
@@ -77,18 +77,16 @@ describe('ColorPicker', () => {
   })
 
   it('enables Apply button once valid hex is entered', () => {
-    const {getByText, getByLabelText} = renderColorPicker({currentColor: '#00000'})
+    const {getByText, getByTestId} = renderColorPicker({currentColor: '#00000'})
     const applyButton = getByText('Apply')
-    const textInput = getByLabelText(
-      'Invalid hexcode. Enter a valid hexcode here to use a custom color.',
-    )
+    const textInput = getByTestId('color-picker-input')
     fireEvent.change(textInput, {target: {value: '#00000c'}})
     expect(applyButton).toBeEnabled()
   })
 
   it('plays a screen reader alert when leaving input if hex is invalid', () => {
-    const {getByLabelText, getByText} = renderColorPicker({currentColor: '#ff0000'})
-    const textInput = getByLabelText('Enter a hexcode here to use a custom color.')
+    const {getByTestId, getByText} = renderColorPicker({currentColor: '#ff0000'})
+    const textInput = getByTestId('color-picker-input')
     fireEvent.change(textInput, {target: {value: '#hi'}})
     fireEvent.blur(textInput)
     expect(

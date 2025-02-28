@@ -35,6 +35,8 @@ class MediaObject < ActiveRecord::Base
     complete: -> { I18n.t("Complete") },
   }.freeze
 
+  MAX_CAPTION_ATTEMPTS = 10
+
   belongs_to :user
   belongs_to :context,
              polymorphic:
@@ -238,7 +240,7 @@ class MediaObject < ActiveRecord::Base
         Canvas::Errors.capture(:media_object_failure,
                                {
                                  message: "Kaltura flavor retrieval failed",
-                                 object: inspect.to_s,
+                                 object: inspect,
                                },
                                :warn)
       end
@@ -333,19 +335,19 @@ class MediaObject < ActiveRecord::Base
   def generate_captions
     return unless Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture)
 
-    # On error, the job is scheduled again in 5 seconds + N ** 4, where N is the number of attempts
-    delay(max_attempts: 10, on_permanent_failure: :fail_without_reporting_to_sentry).request_captions
+    delay.request_captions(attempt: 1)
   end
 
-  def fail_without_reporting_to_sentry(error)
-    # only :error level errors are reported to sentry
-    Canvas::Errors.capture(error, { media_object_id: global_id }, :warn)
-  end
-
-  def request_captions
-    raise VideoCaptionServiceError, "No media_sources to generate captions for" unless media_sources.any?
-
-    VideoCaptionService.call(self)
+  def request_captions(attempt:)
+    if media_sources.any?
+      VideoCaptionService.call(self)
+    elsif attempt > MAX_CAPTION_ATTEMPTS
+      error = VideoCaptionServiceError.new("No media sources to generate captions for and max attempts reached")
+      Canvas::Errors.capture(error, { media_object_id: global_id }, :warn)
+    else
+      run_at = (5 + (attempt**4)).seconds.from_now # same backoff that inst-jobs uses
+      delay(run_at:).request_captions(attempt: attempt + 1)
+    end
   end
 
   def data

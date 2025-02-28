@@ -23,6 +23,9 @@ require "pragmatic_segmenter"
 require "nokogiri"
 
 module Translation
+  class SameLanguageTranslationError < StandardError
+  end
+
   class << self
     include Aws::SageMakerRuntime
     # The languages are imported from https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
@@ -216,9 +219,7 @@ module Translation
       ].sort_by { |a| a[:name] }
     end
 
-    def logger
-      Rails.logger
-    end
+    delegate :logger, to: :Rails
 
     def translation_client
       @translation_client ||= create_translation_client
@@ -239,34 +240,34 @@ module Translation
       end
     end
 
-    def translate_text(text:, src_lang:, tgt_lang:)
+    def translate_text(text:, tgt_lang:)
       return unless translation_client.present?
       return if tgt_lang.nil?
 
-      src_lang = parse_src_lang(text) if src_lang.nil?
       result = translation_client.translate_text({
                                                    text: text,
-                                                   source_language_code: src_lang,
+                                                   source_language_code: "auto",
                                                    target_language_code: tgt_lang,
                                                  })
 
+      check_same_language(result)
       result.translated_text
     end
 
-    def translate_html(html_string:, src_lang:, tgt_lang:)
+    def translate_html(html_string:, tgt_lang:)
       return unless translation_client.present?
       return if tgt_lang.nil?
 
-      src_lang = parse_src_lang(html_string) if src_lang.nil?
       result = translation_client.translate_document({
                                                        document: {
                                                          content: html_string,
                                                          content_type: "text/html",
                                                        },
-                                                       source_language_code: src_lang,
+                                                       source_language_code: "auto",
                                                        target_language_code: tgt_lang,
                                                      })
 
+      check_same_language(result)
       result.translated_document.content
     end
 
@@ -345,6 +346,10 @@ module Translation
     end
 
     private
+
+    def check_same_language(translation_result)
+      raise SameLanguageTranslationError if translation_result.source_language_code == translation_result.target_language_code
+    end
 
     def parse_src_lang(text)
       result = trim_locale(CLD.detect_language(text)[:code])

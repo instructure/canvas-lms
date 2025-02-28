@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require_relative "../spec_helper"
+require_relative "../conditional_release_spec_helper"
 
 describe CoursePace do
   before :once do
@@ -464,6 +465,18 @@ describe CoursePace do
       expect(AssignmentOverride.count).to eq(2)
       expect(AssignmentOverride.last.due_at).to eq(fancy_midnight_rounded_to_last_second(@course_pace.end_date.to_s))
       expect(@course_pace.course_pace_module_items.reload.pluck(:duration)).to eq([900, 900])
+    end
+
+    context "with mastery paths" do
+      before :once do
+        setup_course_with_native_conditional_release(course: @course)
+      end
+
+      it "does not create an override for unreleased assignments" do
+        @course_pace.publish
+
+        expect(AssignmentOverride.where.not(set_type: AssignmentOverride::SET_TYPE_NOOP, set_id: AssignmentOverride::NOOP_MASTERY_PATHS).count).to eq(2)
+      end
     end
   end
 
@@ -1075,218 +1088,6 @@ describe CoursePace do
         @course.course_paces.create!(course_section: @section1, workflow_state: "deleted")
         @course.course_paces.create!(user_id: @student1, workflow_state: "deleted")
         expect(@course_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student1.id, @student2.id)
-      end
-    end
-  end
-
-  describe "#overdue_unsubmitted_student_module_items_by_student" do
-    before :once do
-      course_with_student active_all: true
-      @course.root_account.enable_feature!(:course_paces)
-      @course.enable_course_paces = true
-      @course.time_zone = "UTC"
-      @course.save!
-
-      @context_module = @course.context_modules.create!(workflow_state: "active")
-      @assignment = @course.assignments.create!(
-        workflow_state: "published",
-        submission_types: "online_upload"
-      )
-      @tag = @assignment.context_module_tags.create!(
-        context_module: @context_module,
-        context: @course,
-        tag_type: "context_module",
-        workflow_state: "active"
-      )
-
-      @course_pace = @course.course_paces.create!(workflow_state: "active")
-      @course_pace_module_item = @course_pace.course_pace_module_items.create!(
-        module_item: @tag,
-        duration: 1
-      )
-
-      @course_pace.publish
-      @student_enrollment = @course.student_enrollments.find_by!(user_id: @student.id)
-      @student_enrollment.update!(
-        start_at: Time.zone.today,
-        end_at: Time.zone.today + 30.days
-      )
-    end
-
-    context "when there are no enrollments or users provided" do
-      it "returns an empty hash" do
-        result = @course_pace.overdue_unsubmitted_student_module_items_by_student([])
-        expect(result).to eq({})
-      end
-    end
-
-    context "when the assignment is overdue and unsubmitted" do
-      before :once do
-        @student_enrollment.update!(start_at: 7.days.ago)
-        @course_pace.publish
-      end
-
-      it "returns a hash with overdue items for the user" do
-        result = @course_pace.overdue_unsubmitted_student_module_items_by_student([@student.id])
-
-        expect(result).to be_a(Hash)
-        expect(result.keys).to include(@student.id)
-
-        overdue_items = result[@student.id]
-        expect(overdue_items).not_to be_empty
-        expect(overdue_items.first.module_item.content_id).to eq(@assignment.id)
-      end
-    end
-
-    context "when the assignment is published but not overdue" do
-      before :once do
-        @student_enrollment.update!(start_at: Time.zone.today)
-        @course_pace.publish
-      end
-
-      it "does not return the module item because it's not overdue" do
-        result = @course_pace.overdue_unsubmitted_student_module_items_by_student([@student.id])
-        expect(result[@student.id]).to be_empty
-      end
-    end
-
-    context "when the assignment is overdue but the student has already submitted" do
-      before :once do
-        @student_enrollment.update!(start_at: 2.days.ago)
-        @course_pace.publish
-
-        @assignment.submit_homework(@student, body: "My submission")
-      end
-
-      it "does not return the module item because the student already submitted" do
-        result = @course_pace.overdue_unsubmitted_student_module_items_by_student([@student.id])
-        expect(result[@student.id]).to be_empty
-      end
-    end
-
-    context "when the assignment is unpublished" do
-      before :once do
-        @assignment.update!(workflow_state: "unpublished")
-        @course_pace.publish
-      end
-
-      it "does not return the item because it's not submittable" do
-        result = @course_pace.overdue_unsubmitted_student_module_items_by_student([@student.id])
-        expect(result[@student.id]).to be_empty
-      end
-    end
-  end
-
-  describe "#module_item_submission_status_by_student" do
-    before :once do
-      @context_module = @course.context_modules.create!(workflow_state: "active")
-      @assignment = @course.assignments.create!(
-        workflow_state: "published",
-        submission_types: "online_upload"
-      )
-      @tag = @assignment.context_module_tags.create!(
-        context_module: @context_module,
-        context: @course,
-        tag_type: "context_module",
-        workflow_state: "active"
-      )
-
-      @course_pace_module_item = @course_pace.course_pace_module_items.create!(
-        module_item: @tag,
-        duration: 1
-      )
-
-      @course_pace.publish
-
-      @student_enrollment = @course.student_enrollments.find_by!(user_id: @student.id)
-    end
-
-    context "when user_ids or module_item_ids are empty" do
-      it "returns an empty hash if user_ids is empty" do
-        result = @course_pace.module_item_submission_status_by_student([], [@tag.id])
-        expect(result).to eq({})
-      end
-
-      it "returns a hash with empty sub-hashes if module_item_ids is empty" do
-        result = @course_pace.module_item_submission_status_by_student([@student.id], [])
-        expect(result).to eq({ @student.id => {} })
-      end
-    end
-
-    context "when the assignment is published but no submissions exist" do
-      it "marks has_submission as false and submittable as true" do
-        result = @course_pace.module_item_submission_status_by_student([@student.id], [@assignment.context_module_tags.first.id])
-        expect(result[@student.id]).to be_present
-
-        module_item_id = @assignment.context_module_tags.first.id
-        expect(result[@student.id][module_item_id]).to include(
-          has_submission: false,
-          submittable: true
-        )
-      end
-    end
-
-    context "when the assignment is published and a student submission exists" do
-      before :once do
-        @assignment.submit_homework(@student, body: "My submission")
-      end
-
-      it "marks has_submission as true and submittable as true" do
-        result = @course_pace.module_item_submission_status_by_student([@student.id], [@tag.id])
-        module_item_id = @tag.id
-        expect(result[@student.id][module_item_id]).to include(
-          has_submission: true,
-          submittable: true
-        )
-      end
-    end
-
-    context "when the assignment is unpublished" do
-      before :once do
-        @assignment.update!(workflow_state: "unpublished")
-      end
-
-      it "marks the item as not submittable" do
-        result = @course_pace.module_item_submission_status_by_student([@student.id], [@tag.id])
-        module_item_id = @tag.id
-        expect(result[@student.id][module_item_id][:submittable]).to be false
-      end
-    end
-
-    context "when multiple students and multiple module items are provided" do
-      before :once do
-        @student2 = user_model
-        @course.enroll_student(@student2, enrollment_state: "active")
-
-        @assignment2 = @course.assignments.create!(workflow_state: "published")
-        @tag2 = @assignment2.context_module_tags.create!(
-          context_module: @context_module,
-          context: @course,
-          tag_type: "context_module",
-          workflow_state: "active"
-        )
-
-        @course_pace.course_pace_module_items.create!(module_item: @tag2, duration: 1)
-        @course_pace.publish
-
-        # Student1 has a submission on assignment1, Student2 has no submissions
-        @assignment.submit_homework(@student, body: "Student 1 submission")
-      end
-
-      it "returns status for all users and all module items" do
-        user_ids = [@student.id, @student2.id]
-        module_item_ids = [@tag.id, @tag2.id]
-
-        result = @course_pace.module_item_submission_status_by_student(user_ids, module_item_ids)
-        expect(result.keys.sort).to eq([@student.id, @student2.id].sort)
-
-        # For student 1
-        expect(result[@student.id][@tag.id][:has_submission]).to be(true)
-        expect(result[@student.id][@tag2.id][:has_submission]).to be(false)
-
-        # For student 2 (no submissions)
-        expect(result[@student2.id][@tag.id][:has_submission]).to be(false)
-        expect(result[@student2.id][@tag2.id][:has_submission]).to be(false)
       end
     end
   end

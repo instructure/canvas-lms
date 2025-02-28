@@ -172,7 +172,8 @@ module Exporters
 
     def attach_zip(zip_filename)
       attachment = @export.attachments.build
-      attachment.uploaded_data = Canvas::UploadedFile.new(zip_filename, "application/zip")
+      uploaded_data = Canvas::UploadedFile.new(zip_filename, "application/zip")
+      Attachments::Storage.store_for_attachment(attachment, uploaded_data)
       attachment.workflow_state = "zipped"
       attachment.file_state = "available"
       attachment.save!

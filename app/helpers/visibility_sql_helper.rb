@@ -62,6 +62,21 @@ module VisibilitySqlHelper
       SQL
     end
 
+    def assignment_override_non_collaborative_group_join_sql(id_column_name:)
+      <<~SQL.squish
+        INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+          ON (ao.#{id_column_name} = o.id OR m.id = ao.context_module_id)
+          AND ao.set_type = 'Group'
+          AND ao.workflow_state = 'active'
+        INNER JOIN #{Group.quoted_table_name} g
+          ON g.id = ao.set_id
+          AND g.non_collaborative = TRUE
+        INNER JOIN #{GroupMembership.quoted_table_name} gm
+          ON gm.group_id = g.id
+          AND gm.user_id = e.user_id
+      SQL
+    end
+
     def section_override_filter_sql(filter_condition_sql:)
       <<~SQL.squish
         WHERE #{filter_condition_sql}
@@ -99,11 +114,35 @@ module VisibilitySqlHelper
       SQL
     end
 
-    def assignment_override_unassign_section_filter_sql(filter_condition_sql:)
+    def assignment_override_unassign_non_collaborative_group_join_sql(id_column_name:)
+      <<~SQL.squish
+        INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+          ON o.id = ao.#{id_column_name}
+          AND ao.set_type = 'Group'
+          AND ao.workflow_state = 'active'
+        INNER JOIN #{Group.quoted_table_name} g
+          ON g.id = ao.set_id
+          AND g.non_collaborative = TRUE
+        INNER JOIN #{GroupMembership.quoted_table_name} gm
+          ON gm.group_id = g.id
+          AND gm.user_id = e.user_id
+      SQL
+    end
+
+    def assignment_override_non_collaborative_group_filter_sql(filter_condition_sql:)
       <<~SQL.squish
         WHERE #{filter_condition_sql}
         AND o.workflow_state NOT IN ('deleted','unpublished')
-        AND ao.unassign_item = TRUE
+        AND (m.id IS NOT NULL OR o.only_visible_to_overrides = 'true')
+        AND ao.unassign_item = FALSE
+      SQL
+    end
+
+    def assignment_override_unassign_filter_sql(filter_condition_sql:)
+      <<~SQL.squish
+        WHERE #{filter_condition_sql}
+          AND o.workflow_state NOT IN ('deleted','unpublished')
+          AND ao.unassign_item = TRUE
       SQL
     end
 
@@ -169,6 +208,143 @@ module VisibilitySqlHelper
         WHERE #{filter_condition_sql}
           AND o.workflow_state NOT IN ('deleted','unpublished')
           AND ao.workflow_state = 'active'
+      SQL
+    end
+
+    def assign_to_differentiation_tags_enabled?(course_ids)
+      return false if course_ids.blank?
+
+      account_ids = Course.where(id: course_ids).distinct.pluck(:account_id).uniq
+      accounts = Account.where(id: account_ids).to_a
+
+      accounts.any? { |account| account.feature_enabled?(:assign_to_differentiation_tags) }
+    end
+
+    def full_section_with_left_joins_sql(filter_condition_sql:, id_column_name:, content_tag_type:)
+      <<~SQL.squish
+        /* join context modules */
+        #{module_items_join_sql(content_tag_type:)}
+
+        /* join assignment overrides (assignment or related context module) for CourseSection */
+        #{assignment_override_section_join_sql(id_column_name:)}
+
+        /* filtered to course_id, user_id, wiki_page_id, and additional conditions */
+        #{section_override_filter_sql(filter_condition_sql:)}
+      SQL
+    end
+
+    def full_section_without_left_joins_sql(filter_condition_sql:, id_column_name:, table_name:)
+      <<~SQL.squish
+        INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+              ON e.course_section_id = ao.set_id
+              AND ao.set_type = 'CourseSection'
+              AND ao.#{id_column_name} = o.id
+              AND ao.workflow_state = 'active'
+        WHERE #{filter_condition_sql}
+              AND o.workflow_state NOT IN ('deleted','unpublished')
+              AND ao.unassign_item = FALSE
+
+        UNION
+
+        /* Module Section Overrides */
+        #{learning_object_select_sql(table_name:, id_column_name:)}
+
+        /* join active student enrollments */
+        #{enrollment_join_sql}
+
+        #{content_tag_join_sql(table_name:)}
+
+        JOIN #{ContextModule.quoted_table_name} m
+                      ON m.id = t.context_module_id
+                      AND m.workflow_state<>'deleted'
+        JOIN #{AssignmentOverride.quoted_table_name} ao
+              ON e.course_section_id = ao.set_id
+              AND ao.set_type = 'CourseSection'
+              AND m.id = ao.context_module_id
+              AND ao.workflow_state = 'active'
+        WHERE #{filter_condition_sql}
+              AND o.workflow_state NOT IN ('deleted','unpublished')
+      SQL
+    end
+
+    def full_adhoc_with_left_joins_sql(filter_condition_sql:, id_column_name:, content_tag_type:)
+      <<~SQL.squish
+        /* join context modules */
+        #{module_items_join_sql(content_tag_type:)}
+
+        /* join assignment override for 'ADHOC' */
+        #{assignment_override_adhoc_join_sql(id_column_name:)}
+
+        /* join AssignmentOverrideStudent */
+        #{assignment_override_student_join_sql}
+
+        /* filtered to course_id, user_id, wiki_page_id, and additional conditions */
+        #{adhoc_override_filter_sql(filter_condition_sql:)}
+      SQL
+    end
+
+    def full_adhoc_without_left_joins_sql(filter_condition_sql:, id_column_name:, table_name:)
+      <<~SQL.squish
+        INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+              ON ao.#{id_column_name} = o.id
+              AND ao.set_type = 'ADHOC'
+              AND ao.workflow_state = 'active'
+        INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
+              ON ao.id = aos.assignment_override_id
+              AND aos.user_id = e.user_id
+              AND aos.workflow_state <> 'deleted'
+        WHERE #{filter_condition_sql}
+              AND o.workflow_state NOT IN ('deleted','unpublished')
+              AND ao.unassign_item = FALSE
+
+        UNION
+
+        /* Module Adhoc Overrides */
+        #{learning_object_select_sql(table_name:, id_column_name:)}
+        /* join active student enrollments */
+        #{enrollment_join_sql}
+
+        #{content_tag_join_sql(table_name:)}
+
+        JOIN #{ContextModule.quoted_table_name} m
+              ON m.id = t.context_module_id
+              AND m.workflow_state<>'deleted'
+        INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+              ON m.id = ao.context_module_id
+              AND ao.set_type = 'ADHOC'
+              AND ao.workflow_state = 'active'
+        INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
+              ON ao.id = aos.assignment_override_id
+              AND aos.user_id = e.user_id
+              AND aos.workflow_state <> 'deleted'
+        WHERE #{filter_condition_sql}
+              AND o.workflow_state NOT IN ('deleted','unpublished')
+      SQL
+    end
+
+    def content_tag_join_sql(table_name:)
+      if table_name == Assignment
+        <<~SQL.squish
+          JOIN all_tags t
+              ON o.id = t.assignment_id
+        SQL
+      else
+        <<~SQL.squish
+          JOIN #{ContentTag.quoted_table_name} t
+                  ON t.content_id = o.id
+                  AND t.content_type = '#{table_name.name}'
+                  AND t.tag_type='context_module'
+                  AND t.workflow_state<>'deleted'
+        SQL
+      end
+    end
+
+    def learning_object_select_sql(table_name:, id_column_name:)
+      <<~SQL.squish
+        SELECT DISTINCT o.id as #{id_column_name},
+        e.user_id as user_id,
+        e.course_id as course_id
+        FROM #{table_name.quoted_table_name} o
       SQL
     end
   end

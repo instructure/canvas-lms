@@ -34,3 +34,13 @@ export type ePortfolioSection = {
   position: number
   category_url: string
 }
+
+export type NamedSubmission = {
+  id: string
+  name: string
+  attachment_count: number
+  course_name: string
+  assignment_name: string
+  preview_url: string
+  submitted_at: string
+}

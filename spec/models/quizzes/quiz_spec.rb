@@ -1240,6 +1240,31 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe "#effective_group_category_id" do
+    it "returns group category id if it has an assignment" do
+      group_category = @course.group_categories.create!(name: "category")
+      quiz = @course.quizzes.create(title: "test quiz")
+      quiz.publish!
+      expect(quiz.assignment).to be_present
+      quiz.assignment.group_category_id = group_category.id
+      quiz.save!
+      expect(quiz.effective_group_category_id).to eq group_category.id
+      expect(quiz.group_category_id).to eq group_category.id
+    end
+
+    it "returns nil if the assignment does not have a group category id" do
+      quiz = @course.quizzes.create(title: "test quiz")
+      quiz.publish!
+      expect(quiz.assignment).to be_present
+      expect(quiz.effective_group_category_id).to be_nil
+    end
+
+    it "returns nil if it doesn't have an assignment" do
+      quiz = @course.quizzes.create(title: "test quiz")
+      expect(quiz.effective_group_category_id).to be_nil
+    end
+  end
+
   describe "linking overrides with assignments" do
     let_once(:course) { course_model }
     let_once(:quiz) { quiz_model(course:, due_at: 5.days.from_now).reload }
@@ -1394,7 +1419,7 @@ describe Quizzes::Quiz do
         quiz = @course.quizzes.create! title: "test quiz"
         quiz.time_limit = -60
         expect(quiz.save).to be_falsey
-        expect(quiz.errors["time_limit"]).to be_present
+        expect(quiz.errors["invalid_time_limit"]).to be_present
       end
 
       it "does not validate time_limit if not changed" do

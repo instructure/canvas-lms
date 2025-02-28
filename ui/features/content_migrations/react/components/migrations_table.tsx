@@ -26,6 +26,7 @@ import type {ContentMigrationItem, UpdateMigrationItemType} from './types'
 import MigrationRow from './migration_row'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+import InfiniteScroll from '@canvas/infinite-scroll/react/components/InfiniteScroll'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
@@ -57,24 +58,35 @@ const headerData: HeaderData[] = [
 export type ContentMigrationsTableProps = {
   migrations: ContentMigrationItem[]
   isLoading: boolean
+  hasMore?: boolean
+  fetchNext: () => void
   updateMigrationItem: UpdateMigrationItemType
 }
 
 export const ContentMigrationsTable = ({
   migrations,
   isLoading,
+  hasMore = false,
+  fetchNext,
   updateMigrationItem,
 }: ContentMigrationsTableProps) => {
+  const loadMore = () => {
+    if (isLoading || !hasMore) return;
+    fetchNext();
+  }
+
+  const migrationsExpireDays = ENV.CONTENT_MIGRATIONS_EXPIRE_DAYS;
+
   return (
     <View as="div" borderWidth='small 0 0 0' padding='small 0 0 0'>
       <Heading level="h3" as="h3" margin="small 0">
         {I18n.t('Content imports')}
       </Heading>
-      <View as="div" margin="small 0 medium 0">
+      {!!migrationsExpireDays && <View as="div" margin="small 0 medium 0">
         {I18n.t(
-          'Content import files cannot be downloaded after 30 days.',
+          'Content import files cannot be downloaded after %{days} days.', { days: migrationsExpireDays }
         )}
-      </View>
+      </View>}
       <Responsive
         match="media"
         query={{
@@ -83,30 +95,34 @@ export const ContentMigrationsTable = ({
         render={(_, matches) => {
           const layout = matches?.includes('expanded') ? 'auto' : 'stacked'
           return (
-            <Table caption={I18n.t('Content Migrations')} layout={layout}>
-              <Table.Head>
-                <Table.Row>
-                  {headerData.map((header) => (
-                    <Table.ColHeader key={header.id} id={header.id} themeOverride={{padding: '0.6rem 0'}} textAlign={header.textAlign || 'start'}>
-                      {header.label}
-                    </Table.ColHeader>
+            <InfiniteScroll
+              pageStart={1}
+              loadMore={loadMore}
+              hasMore={!isLoading && hasMore}
+            >
+              <Table caption={I18n.t('Content Migrations')} layout={layout}>
+                <Table.Head>
+                  <Table.Row>
+                    {headerData.map((header) => (
+                      <Table.ColHeader key={header.id} id={header.id} themeOverride={{padding: '0.6rem 0'}} textAlign={header.textAlign || 'start'}>
+                        {header.label}
+                      </Table.ColHeader>
+                    ))}
+                  </Table.Row>
+                </Table.Head>
+                <Table.Body>
+                  {migrations.map((cm: ContentMigrationItem) => (
+                    <MigrationRow
+                      key={cm.id}
+                      migration={cm}
+                      layout={layout}
+                      updateMigrationItem={updateMigrationItem}
+                    />
                   ))}
-                </Table.Row>
-              </Table.Head>
-              <Table.Body>
-                {isLoading ? (
-                  <LoadingSpinner />
-                ) : (
-                  migrations.map((cm: ContentMigrationItem) => (
-                  <MigrationRow
-                    key={cm.id}
-                    migration={cm}
-                    layout={layout}
-                    updateMigrationItem={updateMigrationItem}
-                  />
-                )))}
-              </Table.Body>
-            </Table>
+                  {isLoading && <LoadingSpinner />}
+                </Table.Body>
+              </Table>
+            </InfiniteScroll>
           )
         }}
       />

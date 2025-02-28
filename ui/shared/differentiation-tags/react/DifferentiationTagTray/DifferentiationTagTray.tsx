@@ -15,27 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import React, {useState} from 'react'
+import React, {useState, useMemo, useCallback, useEffect} from 'react'
 import pandasBalloonUrl from '../images/pandasBalloon.svg'
-import {CloseButton, Button} from '@instructure/ui-buttons'
+import {Tray} from '@instructure/ui-tray'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Tray} from '@instructure/ui-tray'
-import {View} from '@instructure/ui-view'
-import {List} from '@instructure/ui-list'
-import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager'
+import TagCategoryCard from './TagCategoryCard'
+import {Pagination} from '@instructure/ui-pagination'
+import {DifferentiationTagCategory} from '../types'
+import DifferentiationTagSearch from './DifferentiationTagSearch'
 
 const I18n = createI18nScope('differentiation_tags')
 
 export interface DifferentiationTagTrayProps {
   isOpen: boolean
   onClose: () => void
-  differentiationTagCategories: {id: number; name: string}[] | []
+  differentiationTagCategories: DifferentiationTagCategory[]
   isLoading: boolean
   error: Error | null
 }
@@ -57,19 +59,7 @@ const Header = ({onClose}: {onClose: () => void}) => (
   </Flex>
 )
 
-const DifferentiationTagCategories = ({
-  differentiationTagCategories,
-}: {differentiationTagCategories: Array<{id: number; name: string}>}) => (
-  <List data-testid="differentiation-tag-categories-list">
-    {differentiationTagCategories.map(category => (
-      <List.Item key={category.id}>
-        <Text>{category.name}</Text>
-      </List.Item>
-    ))}
-  </List>
-)
-
-const EmptyState = ({handleCreateNewTag}: {handleCreateNewTag: () => void}) => (
+const EmptyState = ({onCreate}: {onCreate: () => void}) => (
   <Flex
     direction="column"
     alignItems="center"
@@ -97,16 +87,24 @@ const EmptyState = ({handleCreateNewTag}: {handleCreateNewTag: () => void}) => (
         {I18n.t('Learn more about how we used your input to create differentiation tags.')}
       </Link>
     </Text>
-    <Button onClick={handleCreateNewTag} margin="large 0 0 0" color="primary" size="medium">
+    <Button onClick={onCreate} margin="large 0 0 0" color="primary" size="medium">
       {I18n.t('Get Started')}
     </Button>
   </Flex>
 )
+
 export default function DifferentiationTagTray(props: DifferentiationTagTrayProps) {
   const {isOpen, onClose, differentiationTagCategories, isLoading, error} = props
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 4
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
 
   const handleCreateNewTag = () => {
     setModalMode('create')
@@ -114,14 +112,44 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
     setIsModalOpen(true)
   }
 
-  const handleEditFirstTag = () => {
-    if (differentiationTagCategories.length > 0) {
-      setModalMode('edit')
-      // TEMPORARY, WILL BE ADJUSTED TO HANDLE MULTIPLE TAG CATEGORIES
-      setSelectedCategoryId(differentiationTagCategories[0].id)
-      setIsModalOpen(true)
+  // Filter categories based on the search term.
+  const filteredCategories = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return differentiationTagCategories
     }
-  }
+    const lowerSearchTerm = searchTerm.toLowerCase()
+    return differentiationTagCategories.filter(category => {
+      const categoryMatches = category.name.toLowerCase().includes(lowerSearchTerm)
+      const groupMatches =
+        category.groups &&
+        category.groups.some(group => group.name.toLowerCase().includes(lowerSearchTerm))
+      return categoryMatches || groupMatches
+    })
+  }, [differentiationTagCategories, searchTerm])
+
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage)
+
+  // Get the categories for the current page from the filtered list.
+  const paginatedCategories = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return filteredCategories.slice(startIndex, startIndex + itemsPerPage)
+  }, [filteredCategories, currentPage, itemsPerPage])
+
+  const handleEditCategory = useCallback((categoryId: number) => {
+    setModalMode('edit')
+    setSelectedCategoryId(categoryId)
+    setIsModalOpen(true)
+  }, [])
+
+  const categoryCards = useMemo(() => {
+    return paginatedCategories.map(category => (
+      <TagCategoryCard key={category.id} category={category} onEditCategory={handleEditCategory} />
+    ))
+  }, [paginatedCategories, handleEditCategory])
+
+  const handlePageChange = useCallback((newPage: number) => {
+    setCurrentPage(newPage)
+  }, [])
 
   return (
     <View id="manage-differentiation-tag-container" width="100%" display="block">
@@ -134,6 +162,24 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
       >
         <Flex direction="column" height="100vh" width="100%">
           <Header onClose={onClose} />
+
+          {differentiationTagCategories.length > 0 && (
+            <Flex padding="0 small" direction="column">
+              <Flex.Item shouldGrow shouldShrink overflowX="visible" overflowY="visible">
+                <DifferentiationTagSearch
+                  onSearch={setSearchTerm}
+                  delay={300}
+                  initialValue={searchTerm}
+                />
+              </Flex.Item>
+              <Flex.Item overflowX="visible" overflowY="visible">
+                <Button onClick={handleCreateNewTag} color="primary" margin="x-small none">
+                  {I18n.t('+ Tag')}
+                </Button>
+              </Flex.Item>
+            </Flex>
+          )}
+
           {isLoading ? (
             <Flex.Item shouldGrow shouldShrink margin="medium">
               <Spinner renderTitle={I18n.t('Loading...')} size="small" />
@@ -141,29 +187,35 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
           ) : error ? (
             <Flex.Item shouldGrow shouldShrink margin="medium">
               <Text color="danger">
-                {I18n.t('Error loading tag differentiation tag categories:')} {error.message}
+                {I18n.t('Error loading categories:')} {error.message}
               </Text>
             </Flex.Item>
           ) : differentiationTagCategories.length === 0 ? (
-            <EmptyState handleCreateNewTag={handleCreateNewTag} />
+            <EmptyState onCreate={handleCreateNewTag} />
+          ) : filteredCategories.length === 0 && searchTerm.trim() ? (
+            <Flex.Item shouldGrow shouldShrink margin="medium" textAlign="center">
+              <Text>{I18n.t('No matching tags found.')}</Text>
+            </Flex.Item>
           ) : (
-            <Flex.Item shouldGrow shouldShrink margin="medium">
-              <Flex direction="column" height="100%">
-                <Flex.Item shouldGrow>
-                  <DifferentiationTagCategories
-                    differentiationTagCategories={differentiationTagCategories}
-                  />
-                </Flex.Item>
-                <Flex.Item>
-                  <Button onClick={handleCreateNewTag} color="primary" margin="small 0 0 0">
-                    {I18n.t('Create New Tag')}
-                  </Button>
-                  <Button onClick={handleEditFirstTag} color="secondary" margin="small 0 0 0">
-                    {I18n.t('Edit First Tag')}
-                  </Button>
-                </Flex.Item>
+            <Flex.Item shouldGrow shouldShrink margin="none">
+              <Flex direction="column" margin="0 small">
+                {categoryCards}
               </Flex>
             </Flex.Item>
+          )}
+
+          {totalPages > 1 && (
+            <Pagination
+              data-testid="differentiation-tag-pagination"
+              as="nav"
+              margin="small"
+              variant="compact"
+              labelNext={I18n.t('Next Page')}
+              labelPrev={I18n.t('Previous Page')}
+              currentPage={currentPage}
+              totalPageNumber={totalPages}
+              onPageChange={handlePageChange}
+            />
           )}
         </Flex>
       </Tray>

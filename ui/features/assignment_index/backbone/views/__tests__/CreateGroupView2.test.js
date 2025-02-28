@@ -25,19 +25,21 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import Course from '@canvas/courses/backbone/models/Course'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import CreateGroupView from '../CreateGroupView'
+import {waitFor} from '@testing-library/react'
 
 describe('CreateGroupView - Drop Rules', () => {
   let view = null
   let saveMock = null
 
-  const group = (opts = {}) =>
+  const group = (id, opts = {}) =>
     new AssignmentGroup({
+      id: id,
       name: 'something cool',
       assignments: [new Assignment(), new Assignment()],
       ...opts,
     })
 
-  const assignmentGroups = () => new AssignmentGroupCollection([group(), group()])
+  const assignmentGroups = () => new AssignmentGroupCollection([group('0'), group('1')])
 
   const createView = function (opts = {}) {
     const groups = opts.assignmentGroups || assignmentGroups()
@@ -75,9 +77,11 @@ describe('CreateGroupView - Drop Rules', () => {
     view.render()
     view.firstOpen()
 
-    view.$('#ag_new_drop_lowest').val('')
-    view.$('#ag_new_drop_highest').val('0')
-    view.$('#ag_new_name').val('IchangedIt')
+    await waitFor(() => {
+      view.$('#ag_0_drop_lowest').val('')
+      view.$('#ag_0_drop_highest').val('0')
+      view.$('#ag_0_name').val('IchangedIt')
+    })
 
     const submitPromise = view.submit()
     deferred.resolveWith(view.model, [{}, 'success'])
@@ -85,7 +89,32 @@ describe('CreateGroupView - Drop Rules', () => {
 
     const formData = view.getFormData()
     expect(formData.name).toBe('IchangedIt')
-    expect(formData.rules).toEqual({})
+    expect(formData.rules).toEqual(undefined)
+    expect(saveMock).toHaveBeenCalled()
+  })
+
+  test('it should save drop rules when given', async () => {
+    view = createView()
+    const deferred = $.Deferred()
+    saveMock = jest.spyOn(view.model, 'save').mockReturnValue(deferred)
+    document.getElementById('fixtures').appendChild(view.el)
+
+    view.render()
+    view.firstOpen()
+
+    await waitFor(() => {
+      view.$('#ag_0_drop_lowest').val('1')
+      view.$('#ag_0_drop_highest').val('2')
+      view.$('#ag_0_name').val('IchangedIt')
+    })
+
+    const submitPromise = view.submit()
+    deferred.resolveWith(view.model, [{}, 'success'])
+    await submitPromise
+
+    const formData = view.getFormData()
+    expect(formData.name).toBe('IchangedIt')
+    expect(formData.rules).toEqual(undefined)
     expect(saveMock).toHaveBeenCalled()
   })
 })

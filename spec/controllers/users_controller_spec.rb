@@ -2490,6 +2490,14 @@ describe UsersController do
       expect(response.body).not_to include "overwritten@example.com"
       expect(response).to have_http_status :ok
     end
+
+    it "does update timezone for user without admin privileges" do
+      user_with_pseudonym
+      user_session(@user)
+      put "update", params: { id: @user.id, "user[time_zone]": "Arizona" }, format: "json"
+      expect(response.body).to include "Arizona"
+      expect(response).to have_http_status :ok
+    end
   end
 
   describe "POST 'masquerade'" do

@@ -270,7 +270,7 @@ class NotificationMessageCreator
   end
 
   def user_channels(to_list)
-    to_user_channels = Hash.new([])
+    to_user_channels = Hash.new([].freeze)
     # if this method is given users we preload communication channels and they
     # are already loaded so we are using the select :active? to not do another
     # query to load them again.

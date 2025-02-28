@@ -26,7 +26,7 @@ gem "rails", "~> 7.1.3"
   gem "rack", "~> 3.0.11" if $canvas_rails == "7.1"
   # can't upgrade to 2.0 until Rails 7.2
   gem "sqlite3", "~> 1.7"
-gem "switchman", "~> 3.5"
+gem "switchman", "~> 4.0"
 gem "guardrail", "~> 3.0"
 gem "switchman-inst-jobs", "~> 4.0"
 gem "irb", "~> 1.7"
@@ -46,6 +46,7 @@ gem "aws-sdk-sagemakerruntime", "~> 1.61", require: false
 gem "aws-sdk-translate", "~> 1.77", require: false
 gem "rqrcode", "~> 2.2", require: false
 gem "bcrypt", "~> 3.1"
+gem "benchmark", "~> 0.4", require: false
 gem "bigdecimal", "~> 3.1"
 gem "browser", "~> 6.0", require: false
 gem "business_time", "0.13.0"
@@ -79,6 +80,7 @@ gem "inst-jobs-statsd", "~> 4.0"
 gem "json_schemer", "~> 2.0"
 gem "json-jwt", "~> 1.13", require: false
 gem "link_header", "0.0.8"
+gem "logger", "~> 1.5"
 gem "marginalia", "1.11.1", require: false
 gem "method_source", "~> 1.1"
 gem "mime-types", "~> 3.5"

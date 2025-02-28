@@ -121,9 +121,10 @@ export const RCETextBlock = ({text, width, height, sizeVariant = 'auto'}: RCETex
   if (enabled) {
     return (
       <div
-        data-placeholder={I18n.t('Click to edit rich text')}
+        data-placeholder={I18n.t('type <Enter> to edit rich text')}
         role="treeitem"
         aria-label={RCETextBlock.craft.displayName}
+        aria-selected={node.events.selected}
         tabIndex={-1}
         ref={el => {
           el && connect(drag(el))
@@ -131,10 +132,6 @@ export const RCETextBlock = ({text, width, height, sizeVariant = 'auto'}: RCETex
         }}
         className={clazz}
         style={styl}
-        onClick={e => {
-          e.preventDefault()
-          setEditable(true)
-        }}
         onKeyDown={handleKey}
       >
         {renderContent()}

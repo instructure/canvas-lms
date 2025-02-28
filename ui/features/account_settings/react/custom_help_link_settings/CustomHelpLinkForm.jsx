@@ -236,7 +236,6 @@ export default class CustomHelpLinkForm extends React.Component {
               ))}
             </div>
           </fieldset>
-          {ENV?.FEATURES?.featured_help_links && (
             <>
               <fieldset className="ic-Fieldset ic-Fieldset--radio-checkbox">
                 <legend className="ic-Legend">
@@ -297,7 +296,6 @@ export default class CustomHelpLinkForm extends React.Component {
                 />
               </label>
             </>
-          )}
           <div>
             <button type="submit" className="Button Button--primary" onClick={this.handleSave}>
               {state === 'new' ? I18n.t('Add link') : I18n.t('Update link')}

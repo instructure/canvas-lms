@@ -80,7 +80,6 @@ describe('HelpLinks', () => {
   }
 
   beforeEach(() => {
-    window.ENV = {FEATURES: {featured_help_links: true}}
     doFetchApi.mockResolvedValueOnce({response: {status: 200, ok: true}})
     queryClient.setQueryData(['helpLinks'], [featuredLink, newLink, regularLink])
   })
@@ -96,14 +95,6 @@ describe('HelpLinks', () => {
     expect(queryByText('Report a Problem')).toBeInTheDocument()
   })
 
-  it('renders all the links when the FF is disabled', () => {
-    window.ENV = {FEATURES: {featured_help_links: false}}
-    const {queryByText} = render(<HelpLinks {...props} />)
-    expect(queryByText('Google')).toBeInTheDocument()
-    expect(queryByText('Search the Canvas Guides')).toBeInTheDocument()
-    expect(queryByText('Report a Problem')).toBeInTheDocument()
-  })
-
   it('renders the separator when there is a featured link, additional links, and the FF is enabled', () => {
     const {queryByText} = render(<HelpLinks {...props} />)
     expect(queryByText('OTHER RESOURCES')).toBeInTheDocument()
@@ -111,12 +102,6 @@ describe('HelpLinks', () => {
 
   it('does not render the separator if there is no featured link', () => {
     queryClient.setQueryData(['helpLinks'], [newLink, regularLink])
-    const {queryByText} = render(<HelpLinks {...props} />)
-    expect(queryByText('OTHER RESOURCES')).not.toBeInTheDocument()
-  })
-
-  it('does not render the separator if the FF is disabled', () => {
-    window.ENV = {FEATURES: {featured_help_links: false}}
     const {queryByText} = render(<HelpLinks {...props} />)
     expect(queryByText('OTHER RESOURCES')).not.toBeInTheDocument()
   })
@@ -143,12 +128,6 @@ describe('HelpLinks', () => {
 
   it('does not render a "NEW" pill if there is no link tagged with is_new', () => {
     queryClient.setQueryData(['helpLinks'], [featuredLink, regularLink])
-    const {queryByText} = render(<HelpLinks {...props} />)
-    expect(queryByText('NEW')).not.toBeInTheDocument()
-  })
-
-  it('does not render a "NEW" pill if the FF is disabled', () => {
-    window.ENV = {FEATURES: {featured_help_links: false}}
     const {queryByText} = render(<HelpLinks {...props} />)
     expect(queryByText('NEW')).not.toBeInTheDocument()
   })

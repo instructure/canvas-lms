@@ -109,6 +109,7 @@ describe('PlacementsConfirmation', () => {
 
     const checkbox = screen.queryByLabelText(i18nLtiPlacement(LtiPlacements.AnalyticsHub))
     expect(checkbox).toBeTruthy()
+    expect(screen.getByTestId(`placement-img-analytics_hub`)).toBeInTheDocument()
   })
 
   it("let's users toggle placements", async () => {

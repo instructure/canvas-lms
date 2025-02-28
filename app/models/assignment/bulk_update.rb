@@ -25,9 +25,7 @@ class Assignment::BulkUpdate
     @current_user = user
   end
 
-  def grading_periods?
-    @context.grading_periods?
-  end
+  delegate :grading_periods?, to: :@context
 
   def run(progress, assignment_data)
     # assignment_data looks like [:id, :all_dates => [:id, :base, :due_at, :unlock_at, :lock_at]]

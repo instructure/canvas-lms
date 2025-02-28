@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
+
 
 import $ from 'jquery'
 import {without} from 'lodash'
-import htmlEscape, {raw} from '@instructure/html-escape'
+import {htmlEscape, raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '../../jquery/jquery.instructure_forms'
@@ -106,7 +106,6 @@ export default {
       $input = field.element || this.findField(fieldName, useGlobalSelector)
       html =
         field.message ||
-         
         function () {
           let i, len, ref_
           const results1 = []
@@ -137,8 +136,8 @@ export default {
     return $input.attr(
       'aria-describedby',
       errorDescriptionField.description.attr('id') +
-        ' ' +
-        errorDescriptionField.originalDescriptionIds,
+      ' ' +
+      errorDescriptionField.originalDescriptionIds,
     )
   },
   findOrCreateDescriptionField($input) {

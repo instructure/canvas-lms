@@ -1044,6 +1044,21 @@ describe "Groups API", type: :request do
         expected_status: 403
       )
     end
+
+    it "bulks add users to non collaborative groups" do
+      Account.default.enable_feature!(:differentiation_tags)
+      course_with_teacher(active_all: true)
+      category = @course.group_categories.create(name: "category", non_collaborative: true)
+      @group = @course.groups.create!(name: "G1", group_category: category, non_collaborative: true)
+      user = student_in_course(active_all: true).user
+      user2 = student_in_course(active_all: true).user
+      user_session(@teacher)
+      post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, members: [user.id, user2.id] }
+
+      expect(response).to be_successful
+      expect(user.differentiation_tag_memberships.pluck(:group_id)).to include @group.id
+      expect(user2.differentiation_tag_memberships.pluck(:group_id)).to include @group.id
+    end
   end
 
   context "users" do

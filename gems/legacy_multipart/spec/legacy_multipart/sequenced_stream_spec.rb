@@ -36,7 +36,7 @@ describe LegacyMultipart::SequencedStream do
         @reader = reader
       end
 
-      def size
+      def size # rubocop:disable Rails/Delegate
         @source.size
       end
 

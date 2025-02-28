@@ -20,3 +20,10 @@ fill_missing_dates_from_source_course:
   description: |-
     If enabled, the date shifting process will fill in missing dates from the source course.
   applies_to: SiteAdmin
+
+validate_call_to_action:
+  state: hidden
+  display_name: Validate call to action buttons instead of disabling them
+  description: |-
+    If this feature flag is enabled, the call to action button won't be disabled and the validation will be done for the required fields, showing an error if necessary.
+  applies_to: SiteAdmin

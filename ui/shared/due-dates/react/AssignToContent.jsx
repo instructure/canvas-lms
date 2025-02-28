@@ -161,6 +161,9 @@ const AssignToContent = ({
           if (moduleOverride.student_ids) {
             return moduleOverride.student_ids.map(id => `student-${id}`)
           }
+          if(moduleOverride.group_id && moduleOverride.non_collaborative === true) {
+            return `tag-${moduleOverride.group_id}`
+          }
           return []
         })
         .flat()
@@ -249,9 +252,13 @@ const AssignToContent = ({
               value: override?.title,
             })
           }
-          if (override?.group_id) {
+          if (override?.group_id && override?.non_collaborative === false) {
             defaultOptions.push(`group-${override?.group_id}`)
             initialAssigneeOptions.push({id: `group-${override?.group_id}`, value: override?.title})
+          }
+          if (override?.group_id && override?.non_collaborative === true) {
+            defaultOptions.push(`tag-${override?.group_id}`)
+            initialAssigneeOptions.push({id: `tag-${override?.group_id}`, value: override?.title})
           }
           selectedOptionIds.push(...defaultOptions)
         }

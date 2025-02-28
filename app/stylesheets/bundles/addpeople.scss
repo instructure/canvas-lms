@@ -9,7 +9,7 @@
     fieldset.peoplesearch__selections {
       margin-#{direction(right)}: auto;
       margin-#{direction(left)}: auto;
-      margin-top: .5rem;
+      margin-top: 1rem;
       text-align: center;
       &>div {
         display: flex;
@@ -32,11 +32,23 @@
       }
     }
   }
+  .addpeople__peoplevalidationissues {
+    tr {
+      td {
+        align-content: start;
+
+        &:first-of-type {
+          width: 30px;
+        }
+
+        & > :first-child:has(input:checked) {
+          padding-top: .5rem;
+        }
+      }
+    }
+  }
   .namelist {
     margin: 1.5em 0;
-  }
-  .peoplevalidationissues__missing tr td:first-child {
-    width: 30px;
   }
   &:focus {
     outline: none;

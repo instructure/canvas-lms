@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -35,6 +34,7 @@ type BaseModalProps = {
   children: React.ReactNode
   cancelText?: string
   continueText?: string
+  isLoading?: boolean
 }
 
 const BaseWarningModal: React.FC<BaseModalProps> = ({
@@ -45,6 +45,7 @@ const BaseWarningModal: React.FC<BaseModalProps> = ({
   children,
   cancelText = 'Cancel',
   continueText = 'Confirm',
+  isLoading = false,
 }) => {
   return (
     <Modal
@@ -67,24 +68,34 @@ const BaseWarningModal: React.FC<BaseModalProps> = ({
       </Modal.Header>
       <Modal.Body padding="none medium">{children}</Modal.Body>
       <Modal.Footer>
-        <Button onClick={onClose} margin="0 x-small 0 0">
+        <Button onClick={onClose} margin="0 x-small 0 0" disabled={isLoading}>
           {cancelText}
         </Button>
-        <Button onClick={onContinue} color="primary" type="submit">
-          {continueText}
+        <Button onClick={onContinue} color="primary" type="button" disabled={isLoading}>
+          {isLoading ? I18n.t('Deleting...') : continueText}
         </Button>
       </Modal.Footer>
     </Modal>
   )
 }
 
+export default BaseWarningModal
+
 export const DeleteTagWarningModal: React.FC<{
   open: boolean
   onClose: () => void
   onContinue: () => void
-}> = ({open, onClose, onContinue}) => {
+  isLoading?: boolean
+  children?: React.ReactNode
+}> = ({open, onClose, onContinue, isLoading = false, children}) => {
   return (
-    <BaseWarningModal open={open} title="Delete Tag" onClose={onClose} onContinue={onContinue}>
+    <BaseWarningModal
+      open={open}
+      title={I18n.t('Delete Tag')}
+      onClose={onClose}
+      onContinue={onContinue}
+      isLoading={isLoading}
+    >
       <View>
         <Text>
           <p>
@@ -93,14 +104,8 @@ export const DeleteTagWarningModal: React.FC<{
             )}
           </p>
         </Text>
-        <Text>
-          <p>
-            {I18n.t(
-              'For assignments that are currently available and have a deadline that has not yet passed, indicate below which should continue to be assigned to tagged students. Unchecked assignments will no longer be assigned to students with the deleted tag and their submissions will be deleted.',
-            )}
-          </p>
-        </Text>
       </View>
+      {children}
     </BaseWarningModal>
   )
 }
@@ -117,13 +122,6 @@ export const RemoveTagWarningModal: React.FC<{
           <p>
             {I18n.t(
               'Removing the tag from a student preserves past assignments in the gradebook and removes the student from any upcoming assignments where they have been assigned via tag.',
-            )}
-          </p>
-        </Text>
-        <Text>
-          <p>
-            {I18n.t(
-              'For assignments that are currently available and have a deadline that has not yet passed, indicate below which should continue to be assigned to the student, unchecked assignments will no longer be assigned to that student.',
             )}
           </p>
         </Text>

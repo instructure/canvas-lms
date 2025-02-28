@@ -25,6 +25,8 @@ import {Text} from '@instructure/ui-text'
 import {FileManagementContext} from '../Contexts'
 import {type File, type Folder} from '../../../interfaces/File'
 import {RenameModal} from '../RenameModal'
+import DeleteModal from './DeleteModal'
+import { downloadFile, downloadZip } from '../../../utils/downloadUtils'
 
 import {
   IconMoreLine,
@@ -39,6 +41,7 @@ import {
   IconExpandItemsLine,
 } from '@instructure/ui-icons'
 import DirectShareUserTray from './DirectShareUserTray'
+import DirectShareCourseTray from './DirectShareCourseTray'
 
 const I18n = createI18nScope('files_v2')
 
@@ -57,11 +60,22 @@ const ActionMenuButton = ({
   usageRightsRequiredForContext,
   row,
 }: ActionMenuButtonProps) => {
-  const [modal, setModal] = useState<'send-to' | null>(null)
+  const [modal, setModal] = useState<'send-to' | 'copy-to' | null>(null)
   const actionLabel = I18n.t('Actions')
   const currentContext = useContext(FileManagementContext)
   const contextType = currentContext?.contextType
-  const [renamingFile, setRenamingFile] = useState<null | File | Folder>(null)
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [itemsToDelete, setItemsToDelete] = useState<(File | Folder)[]>([])
+
+  const handleDeleteClick = () => {
+    setItemsToDelete([row])
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
 
   const triggerButton = useCallback(() => {
     return size !== 'large' ? (
@@ -133,11 +147,13 @@ const ActionMenuButton = ({
               icon: IconEditLine,
               text: I18n.t('Rename'),
               visible: rename_move_permissions,
-              onClick: () => {
-                setRenamingFile(row)
-              },
+              onClick: () => setIsRenameModalOpen(true),
             },
-            {icon: IconDownloadLine, text: I18n.t('Download')},
+            {
+              icon: IconDownloadLine,
+              text: I18n.t('Download'),
+              onClick: () => downloadFile(row.url),
+            },
             {
               icon: IconPermissionsLine,
               text: I18n.t('Edit Permissions'),
@@ -154,19 +170,33 @@ const ActionMenuButton = ({
               visible: send_copy_permissions,
               onClick: () => setModal('send-to'),
             },
-            {icon: IconDuplicateLine, text: I18n.t('Copy To...'), visible: send_copy_permissions},
+            {
+              icon: IconDuplicateLine,
+              text: I18n.t('Copy To...'),
+              visible: send_copy_permissions,
+              onClick: () => setModal('copy-to'),
+            },
             {
               icon: IconExpandItemsLine,
               text: I18n.t('Move To...'),
               visible: rename_move_permissions,
             },
             {separator: true, visible: delete_permissions},
-            {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions},
+            {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions, onClick: handleDeleteClick},
           ]
         : [
             // folder
-            {icon: IconEditLine, text: I18n.t('Rename'), visible: rename_move_permissions},
-            {icon: IconDownloadLine, text: I18n.t('Download')},
+            {
+              icon: IconEditLine,
+              text: I18n.t('Rename'),
+              visible: rename_move_permissions,
+              onClick: () => setIsRenameModalOpen(true),
+            },
+            {
+              icon: IconDownloadLine,
+              text: I18n.t('Download'),
+              onClick: () => downloadZip(new Set([row.id])),
+            },
             {
               icon: IconPermissionsLine,
               text: I18n.t('Edit Permissions'),
@@ -183,7 +213,7 @@ const ActionMenuButton = ({
               visible: rename_move_permissions,
             },
             {separator: true, visible: delete_permissions},
-            {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions},
+            {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions, onClick: handleDeleteClick},
           ]
       ).filter(({visible}) => visible !== false),
     [
@@ -213,6 +243,14 @@ const ActionMenuButton = ({
             file={file}
           />
         )}
+        {file && ENV.COURSE_ID && (
+          <DirectShareCourseTray
+            open={modal === 'copy-to'}
+            onDismiss={onDismissTray}
+            courseId={ENV.COURSE_ID}
+            file={file}
+          />
+        )}
       </>
     )
   }, [modal, onDismissTray, row])
@@ -222,7 +260,16 @@ const ActionMenuButton = ({
       <Menu placement="bottom" trigger={triggerButton()}>
         {filteredItems.map((item, i) => renderMenuItem(i, item))}
       </Menu>
-      <RenameModal renamingFile={renamingFile} setRenamingFile={setRenamingFile} />
+      <RenameModal
+        renamingItem={row}
+        isOpen={isRenameModalOpen}
+        onClose={() => setIsRenameModalOpen(false)}
+      />
+      <DeleteModal
+        open={isModalOpen}
+        items={itemsToDelete}
+        onClose={handleCloseModal}
+      />
       {buildTrays()}
     </>
   )

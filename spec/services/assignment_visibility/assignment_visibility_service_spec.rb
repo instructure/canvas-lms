@@ -270,21 +270,20 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             before do
               @course.account.enable_feature!(:differentiation_tags)
               @course.account.enable_feature!(:assign_to_differentiation_tags)
+              @course.account.settings = { allow_assign_to_differentiation_tags: true }
+              @course.account.save
 
-              group_category = @group_foo.group_category
-              group_category.update!(role: nil)
-              group_category.update!(non_collaborative: true)
-
-              groups = group_category.groups
-              groups.each do |group|
-                group.update!(non_collaborative: true)
-              end
+              @group_category = @course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)
+              @group_category.create_groups(2)
+              @differentiation_tag_group = @group_category.groups.first
 
               @student = user_model
               @course.enroll_user(@student)
               @course.save!
 
-              enroll_user_in_group(@group_foo, { user: @student })
+              enroll_user_in_group(@differentiation_tag_group, { user: @student })
+              assignment_with_true_only_visible_to_overrides
+              @assignment.assignment_overrides.create!(set: @differentiation_tag_group)
             end
 
             it "sees the assignment" do
@@ -292,8 +291,15 @@ describe AssignmentVisibility::AssignmentVisibilityService do
               expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
             end
 
-            it "does not sees the assignment if the override is deleted" do
+            it "does not see the assignment if the override is deleted" do
               @assignment.assignment_overrides.each(&:destroy)
+
+              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map(&:assignment_id)
+              expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsy
+            end
+
+            it "does not see the assignment if the feature flag is disabled" do
+              @course.account.disable_feature!(:assign_to_differentiation_tags)
 
               visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map(&:assignment_id)
               expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsy
@@ -412,7 +418,7 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           end
         end
 
-        context "module overrides" do
+        shared_examples_for "module overrides" do
           it "includes everyone else if there no modules and no overrides" do
             assignment_with_false_only_visible_to_overrides
             ensure_user_sees_assignment
@@ -532,6 +538,19 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module", workflow_state: "deleted"
 
             ensure_user_does_not_see_assignment
+          end
+        end
+
+        context "assignments with modules" do
+          it_behaves_like "module overrides" do
+            before :once do
+              Account.site_admin.disable_feature!(:visibility_performance_improvements)
+            end
+          end
+          it_behaves_like "module overrides" do
+            before :once do
+              Account.site_admin.enable_feature!(:visibility_performance_improvements)
+            end
           end
         end
 

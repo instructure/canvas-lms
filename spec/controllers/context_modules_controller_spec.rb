@@ -745,12 +745,12 @@ describe ContextModulesController do
 
     describe "with horizon course" do
       before do
-        Account.site_admin.enable_feature!(:horizon_course_setting)
+        @course.account.enable_feature!(:horizon_course_setting)
         @course.update!(horizon_course: true)
       end
 
       after do
-        Account.site_admin.disable_feature!(:horizon_course_setting)
+        @course.account.disable_feature!(:horizon_course_setting)
         @course.update!(horizon_course: false)
       end
 
@@ -829,6 +829,58 @@ describe ContextModulesController do
         @teacher.set_preference(:module_links_default_new_tab, false)
         put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { new_tab: 1 } }
         expect(@teacher.get_preference(:module_links_default_new_tab)).to be_falsey
+      end
+    end
+
+    describe "estimated_duration" do
+      before do
+        @assignment_item.estimated_duration = EstimatedDuration.new
+        @assignment_item.save!
+      end
+
+      describe "without horizon course" do
+        before do
+          @course.account.disable_feature!(:horizon_course_setting)
+          @course.update!(horizon_course: false)
+        end
+
+        it "does not create estimated_duration" do
+          expect_any_instance_of(ContextModulesController).not_to receive(:get_estimated_duration)
+          put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { estimated_duration_minutes: 30 } }
+        end
+      end
+
+      describe "with horizon course" do
+        before do
+          @course.account.enable_feature!(:horizon_course_setting)
+          @course.update!(horizon_course: true)
+        end
+
+        after do
+          @assignment_item.reload.estimated_duration&.destroy!
+        end
+
+        describe "create" do
+          it "does create estimated_duration" do
+            @assignment_item.reload.estimated_duration.destroy!
+            put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { estimated_duration_minutes: 30 } }
+            expect(@assignment_item.reload.estimated_duration).to_not be_nil
+          end
+        end
+
+        describe "update" do
+          it "does update estimated_duration" do
+            put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { estimated_duration_minutes: 40 } }
+            expect(@assignment_item.reload.estimated_duration.duration.iso8601).to eq("PT40M")
+          end
+        end
+
+        describe "delete" do
+          it "does delete estimated_duration" do
+            put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { estimated_duration_minutes: nil } }
+            expect(@assignment_item.reload.estimated_duration).to be_nil
+          end
+        end
       end
     end
   end

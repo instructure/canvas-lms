@@ -566,6 +566,85 @@ describe "assignments" do
       expect(driver.title).to include(assignment_name + " edit")
     end
 
+    context "submission attempts" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "validates number of attempts must be less than or equal to 100" do
+        get "/courses/#{@course.id}/assignments/new"
+
+        f("#assignment_name").send_keys("Test Assignment")
+        click_option("#assignment_submission_type", "Online")
+        f("#assignment_text_entry").click
+        click_option(find_by_test_id("allowed_attempts_type"), "Limited")
+
+        allowed_attempts_input = find_by_test_id("allowed_attempts_input")
+        # 1 attempt is prepopulated so we need to clear it first with backspace
+        allowed_attempts_input.send_keys("\b")
+        allowed_attempts_input.send_keys("101")
+
+        submit_assignment_form
+
+        error_msg = f("#allowed_attempts_errors")
+        expect(error_msg).to include_text("Number of attempts must be less than or equal to 100")
+      end
+
+      it "validates number of attempts must be greater than 0" do
+        get "/courses/#{@course.id}/assignments/new"
+
+        f("#assignment_name").send_keys("Test Assignment")
+        click_option("#assignment_submission_type", "Online")
+        f("#assignment_text_entry").click
+        click_option(find_by_test_id("allowed_attempts_type"), "Limited")
+
+        allowed_attempts_input = find_by_test_id("allowed_attempts_input")
+        allowed_attempts_input.send_keys("\b")
+        allowed_attempts_input.send_keys("0")
+
+        submit_assignment_form
+
+        error_msg = f("#allowed_attempts_errors")
+        expect(error_msg).to include_text("Number of attempts must be a number greater than 0")
+      end
+
+      it "allows valid number of attempts" do
+        get "/courses/#{@course.id}/assignments/new"
+
+        f("#assignment_name").send_keys("Test Assignment")
+        click_option("#assignment_submission_type", "Online")
+        f("#assignment_text_entry").click
+        click_option(find_by_test_id("allowed_attempts_type"), "Limited")
+
+        allowed_attempts_input = find_by_test_id("allowed_attempts_input")
+        allowed_attempts_input.send_keys("\b")
+        allowed_attempts_input.send_keys("5")
+
+        expect_new_page_load { submit_assignment_form }
+
+        # Verify no error message
+        expect(f("body")).not_to contain_css("#allowed_attempts_errors")
+        assignment = @course.assignments.last
+        expect(assignment.allowed_attempts).to eq 5
+      end
+
+      it "allows unlimited attempts" do
+        get "/courses/#{@course.id}/assignments/new"
+
+        f("#assignment_name").send_keys("Test Assignment")
+        click_option("#assignment_submission_type", "Online")
+        f("#assignment_text_entry").click
+        click_option(find_by_test_id("allowed_attempts_type"), "Unlimited")
+
+        expect_new_page_load { submit_assignment_form }
+
+        # Verify no error message
+        expect(f("body")).not_to contain_css("#allowed_attempts_errors")
+        assignment = @course.assignments.last
+        expect(assignment.allowed_attempts).to be_nil
+      end
+    end
+
     # EVAL-3711 Remove this test when instui_nav feature flag is removed
     it "creates an assignment using main add button", :xbrowser, priority: "1" do
       assignment_name = "first assignment"
@@ -1140,6 +1219,32 @@ describe "assignments" do
 
         expect(assignment.reload.primary_resource_link.custom).to eq(custom_params)
       end
+
+      it "shows an error on submit for an empty External Tool URL" do
+        assignment
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        # clear the external tool url input
+        tool.url.each_char { f("#assignment_external_tool_tag_attributes_url").send_keys(:backspace) }
+        submit_assignment_form
+
+        expect(f("#external_tool_tag_attributes\\[url\\]_errors")).to include_text("External Tool URL cannot be left blank")
+      end
+
+      it "shows an error on submit for an invalid External Tool URL" do
+        assignment
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        # clear the external tool url input
+        tool.url.each_char { f("#assignment_external_tool_tag_attributes_url").send_keys(:backspace) }
+        # replace with invalid url
+        f("#assignment_external_tool_tag_attributes_url").send_keys("invalid")
+        submit_assignment_form
+
+        expect(f("#external_tool_tag_attributes\\[url\\]_errors")).to include_text('Enter a valid URL or use "Find" button to search for an external tool')
+      end
     end
 
     context "publishing" do
@@ -1312,6 +1417,7 @@ describe "assignments" do
         final_grader: @teacher
       )
       @assignment.publish
+      @course.root_account.enable_feature!(:moderated_grading)
     end
 
     it "denies access for a regular student to the moderation page", priority: "1" do
@@ -1324,6 +1430,37 @@ describe "assignments" do
       @assignment.update_attribute(:moderated_grading, false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
       expect(f("#content h1").text).to eql "Whoops... Looks like nothing is here!"
+    end
+
+    it "validates grader count must be greater than 0 and final grader must be selected" do
+      get "/courses/#{@course.id}/assignments/new"
+
+      f("#assignment_name").send_keys("Grader count must be greater than 0")
+      f("#assignment_moderated_grading").click
+      f("#grader_count").send_keys("\b")
+      f("#grader_count").send_keys("0")
+
+      submit_assignment_form
+
+      grader_count_error_msg = f("#grader_count_errors")
+      expect(grader_count_error_msg).to include_text("Must have at least one grader")
+
+      final_grader_error_msg = f("#final_grader_id_errors")
+      expect(final_grader_error_msg).to include_text("Must select a grader")
+    end
+
+    it "validates grader count must be less than MODERATED_GRADING_GRADER_LIMIT" do
+      get "/courses/#{@course.id}/assignments/new"
+
+      f("#assignment_name").send_keys("Grader count must be less than a maximum")
+      f("#assignment_moderated_grading").click
+      f("#grader_count").send_keys("\b")
+      f("#grader_count").send_keys("01234567890123456789012")
+
+      submit_assignment_form
+
+      grader_count_error_msg = f("#grader_count_errors")
+      expect(grader_count_error_msg).to include_text("Only a maximum of #{Course::MODERATED_GRADING_GRADER_LIMIT} graders can be assigned")
     end
   end
 

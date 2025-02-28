@@ -22,6 +22,10 @@ class AnnouncementsController < ApplicationController
   include Api::V1::DiscussionTopics
 
   before_action :require_context, except: :public_feed
+
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   before_action { |c| c.active_tab = "announcements" }
 
   include K5Mode

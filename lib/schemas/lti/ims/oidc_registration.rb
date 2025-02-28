@@ -145,9 +145,7 @@ module Schemas::Lti::IMS
       { errors:, registration_attrs: }
     end
 
-    private
-
-    def schema
+    def self.schema
       SCHEMA
     end
   end

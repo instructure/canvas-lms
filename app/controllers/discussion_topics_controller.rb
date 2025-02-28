@@ -270,6 +270,10 @@
 #
 class DiscussionTopicsController < ApplicationController
   before_action :require_context_and_read_access, except: :public_feed
+
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   before_action :rce_js_env
 
   include Api::V1::DiscussionTopics
@@ -563,7 +567,7 @@ class DiscussionTopicsController < ApplicationController
     return render_unauthorized_action unless @topic.visible_for?(@current_user)
 
     @context.try(:require_assignment_group) unless @topic.is_announcement
-    can_set_group_category = ANONYMOUS_STATES.exclude?(@topic.anonymous_state) && @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage) # i.e. not anonymous and not a student
+    can_set_group_category = ANONYMOUS_STATES.exclude?(@topic.anonymous_state) && @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage_groups_add) # i.e. not anonymous and not a student
     hash = {
       URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
       PERMISSIONS: {
@@ -648,6 +652,8 @@ class DiscussionTopicsController < ApplicationController
         @context.course_sections.active.order(:name).select { |s| section_visibilities.include?(s.id) }
       end
 
+    assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+
     js_hash = {
       ASSIGNMENT_ID: @topic.assignment_id,
       CONTEXT_ACTION_SOURCE: :discussion_topic,
@@ -656,6 +662,8 @@ class DiscussionTopicsController < ApplicationController
       GROUP_CATEGORIES: categories
               .reject { |c| c.student_organized? || c.non_collaborative? }
               .map { |category| { id: category.id, name: category.name } },
+      ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
+      CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
       HAS_GRADING_PERIODS: @context.grading_periods?,
       SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
       ANNOUNCEMENTS_LOCKED: announcements_locked?,
@@ -963,6 +971,7 @@ class DiscussionTopicsController < ApplicationController
 
       respond_to do |format|
         format.html do
+          conditional_release_js_env(@topic.assignment)
           render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
         end
       end
@@ -1885,7 +1894,7 @@ class DiscussionTopicsController < ApplicationController
 
   def can_set_group_category?
     error =
-      if !@context.grants_right?(@current_user, session, :manage)
+      if !@context.grants_right?(@current_user, session, :manage_groups_add)
         t("You cannot set a grouped discussion as a student.")
       elsif @topic.is_announcement
         t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")

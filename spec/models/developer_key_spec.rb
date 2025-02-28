@@ -143,33 +143,31 @@ describe DeveloperKey do
     let(:service_user) { user_model }
     let(:root_account) { account_model }
 
-    context "when 'site_admin_service_auth' is enabled" do
-      context "and the service user association is not set" do
-        let(:key_attributes) { { service_user: nil } }
+    context "when the service user association is not set" do
+      let(:key_attributes) { { service_user: nil } }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the service user association is set" do
+      let(:key_attributes) { { service_user: } }
+
+      context "and the key is a site admin key" do
+        let(:key_attributes) { { service_user:, account: nil } }
 
         it { is_expected.to be false }
+
+        context "and the key is an internal service" do
+          let(:key_attributes) { { service_user:, account: nil, internal_service: true } }
+
+          it { is_expected.to be true }
+        end
       end
 
-      context "and the service user association is set" do
-        let(:key_attributes) { { service_user: } }
+      context "and the key is not a site admin key" do
+        let(:key_attributes) { super().merge(account: root_account) }
 
-        context "and the key is a site admin key" do
-          let(:key_attributes) { { service_user:, account: nil } }
-
-          it { is_expected.to be false }
-
-          context "and the key is an internal service" do
-            let(:key_attributes) { { service_user:, account: nil, internal_service: true } }
-
-            it { is_expected.to be true }
-          end
-        end
-
-        context "and the key is not a site admin key" do
-          let(:key_attributes) { super().merge(account: root_account) }
-
-          it { is_expected.to be false }
-        end
+        it { is_expected.to be false }
       end
     end
   end

@@ -199,22 +199,24 @@ export const ContentMigrationsForm = ({
   }, [])
 
   return (
-    <View as="div" margin="small none xx-large none">
+    <View as="div" margin="small none medium none">
       <Heading level="h1" as="h1" margin="0 0 small">
         {I18n.t('Import Content')}
       </Heading>
-      <Text>
-        {I18n.t(
-          'Use the Import Content tool to migrate course materials from other sources into this course.',
-        )}
-      </Text>
-      <Alert variant="warning">
-        {I18n.t(
-          'Importing the same course content more than once will overwrite any existing content in the course.',
-        )}
-      </Alert>
+      <View as="div"  maxWidth="50rem">
+        <Text>
+          {I18n.t(
+            'Use the Import Content tool to migrate course materials from other sources into this course.',
+          )}
+        </Text>
+        <Alert variant="warning">
+          {I18n.t(
+            'Importing the same course content more than once will overwrite any existing content in the course.',
+          )}
+        </Alert>
+      </View>
       <hr role="presentation" aria-hidden="true" />
-      <View as="div" margin="medium 0" maxWidth="22.5rem">
+      <View as="div" margin="medium 0" maxWidth="46.5rem">
         {migrators.length > 0 ? (
           <SimpleSelect
             disabled={isSubmitting}
@@ -251,7 +253,6 @@ export const ContentMigrationsForm = ({
             isSubmitting,
             externalToolTitle,
           })}
-          <hr role="presentation" aria-hidden="true" />
         </>
       )}
     </View>

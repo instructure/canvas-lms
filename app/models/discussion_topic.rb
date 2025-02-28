@@ -293,6 +293,10 @@ class DiscussionTopic < ActiveRecord::Base
     !!group_category_id
   end
 
+  def effective_group_category_id
+    has_group_category? ? group_category_id : nil
+  end
+
   def set_schedule_delayed_transitions
     @delayed_post_at_changed = delayed_post_at_changed? || unlock_at_changed?
     if delayed_post_at? && @delayed_post_at_changed
@@ -574,12 +578,6 @@ class DiscussionTopic < ActiveRecord::Base
     # For some reason, the relation doesn't take care of this for us. Don't understand why.
     # Without this line, *two* discussion topic duplicates appear when a save is performed.
     result.assignment&.discussion_topic = result
-
-    if estimated_duration
-      # we have to save result here because we need the result.id to create the estimated_duration
-      result.save!
-      result.estimated_duration = EstimatedDuration.new({ discussion_topic_id: result.id, duration: estimated_duration.duration.iso8601 })
-    end
 
     result
   end
@@ -1416,7 +1414,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| !root_topic_id && context.grants_all_rights?(user, session, :read_forum, :moderate_forum) && available_for?(user) }
     can :update and can :read_as_admin and can :delete and can :create and can :read and can :attach
 
-    # Moderators can still modify content even in unavailable topics (*especially* unlocking them), but can't create new content
+    # Moderators can still modify content even in unavailable topics (*especially* unlocking them)
     given { |user, session| !root_topic_id && context.grants_all_rights?(user, session, :read_forum, :moderate_forum) }
     can :update and can :read_as_admin and can :delete and can :read and can :attach
 
@@ -1474,7 +1472,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def user_can_create(user, session)
     !is_announcement &&
-      context.grants_right?(user, session, :create_forum) &&
+      context.grants_any_right?(user, session, :create_forum, :moderate_forum) &&
       context_allows_user_to_create?(user)
   end
 
@@ -2136,7 +2134,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     visible_topic_user_id_pairs = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids: opts[:user_id], course_ids: opts[:course_id]).map { |visibility| [visibility.discussion_topic_id, visibility.user_id] }
     eligible_topic_ids = DiscussionTopic.where(id: visible_topic_user_id_pairs.map(&:first)).where(assignment_id: nil).where.not(is_section_specific: true).pluck(:id)
-    eligible_visible_topic_user_id_pairs = visible_topic_user_id_pairs.select { |discussion_topic_id, _user_id| eligible_topic_ids.include?(discussion_topic_id) }
+    eligible_visible_topic_user_id_pairs = visible_topic_user_id_pairs.select { |discussion_topic_id, _user_id| eligible_topic_ids.include?(discussion_topic_id) } # rubocop:disable Style/HashSlice
     ungraded_differentiated_topic_ids_per_user = eligible_visible_topic_user_id_pairs.group_by(&:last).transform_values { |pairs| pairs.map(&:first) }
 
     # build map of user_ids to array of item ids {1 => [2,3,4], 2 => [2,4]}

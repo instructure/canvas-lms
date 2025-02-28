@@ -112,9 +112,7 @@ module Schemas::Lti::IMS
       }.compact.with_indifferent_access
     end
 
-    private
-
-    def schema
+    def self.schema
       SCHEMA
     end
   end
