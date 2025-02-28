@@ -30,16 +30,19 @@ type CoursePeopleQueryResponse = {
   }
 }
 
-const useCoursePeopleQuery = ({courseId}: {courseId: string}) => {
+const useCoursePeopleQuery = ({courseId, searchTerm}: {courseId: string, searchTerm: string}) => {
   const {currentUserId} = useCoursePeopleContext()
+  const shouldFetch = searchTerm === '' || searchTerm.length >= 2
+  const searchTermKey = shouldFetch ? searchTerm : ''
 
   return useQuery({
     // currentUserId added to key so that data is refetched when swithching between Teacher and Student Views
-    queryKey: ['course_people', courseId, currentUserId],
+    queryKey: ['course_people', courseId, currentUserId, searchTermKey],
     queryFn: async () => {
-      const response = await executeQuery<CoursePeopleQueryResponse>(COURSE_PEOPLE_QUERY, {courseId})
+      const response = await executeQuery<CoursePeopleQueryResponse>(COURSE_PEOPLE_QUERY, {courseId, searchTerm})
       return response?.course?.usersConnection?.nodes || []
-    }
+    },
+    enabled: shouldFetch
   })
 }
 

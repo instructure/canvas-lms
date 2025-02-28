@@ -17,25 +17,23 @@
  */
 
 import React, {useState, type FC, type SyntheticEvent} from 'react'
-import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import RosterTableHeader from './RosterTableHeader'
 import RosterTableRow from './RosterTableRow'
-import LoadingIndicator from '@canvas/loading-indicator'
-import useCoursePeopleQuery from '../../hooks/useCoursePeopleQuery'
-import useCoursePeopleContext from '../../hooks/useCoursePeopleContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ASCENDING, DESCENDING} from '../../../util/constants'
+import {User} from '../../../types'
 
 const I18n = createI18nScope('course_people')
 
-const RosterTable: FC = () => {
-  const {courseId} = useCoursePeopleContext()
-  const {data: users, isLoading} = useCoursePeopleQuery({courseId})
-  const [sortBy, setSortBy] = useState("name")
-  const [ascending, setAscending] = useState(true)
-  const [selected, setSelected] = useState<Set<string>>(new Set())
+interface RosterTableProps {
+  users: User[] | undefined
+}
 
+const RosterTable: FC<RosterTableProps> = ({users}) => {
+  const [sortBy, setSortBy] = useState<string>("name")
+  const [ascending, setAscending] = useState<boolean>(true)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
   const userIds = (users || []).map(user => user._id)
 
   const handleSort = (_event: SyntheticEvent<Element, Event>, {id}: {id: string}) => {
@@ -73,14 +71,6 @@ const RosterTable: FC = () => {
       handleSelectRow={handleSelectRow}
     />
   ))
-
-  if (isLoading) return (
-    <Flex as="div" justifyItems="center">
-      <Flex.Item as="div" padding="xx-large">
-        <LoadingIndicator />
-      </Flex.Item>
-    </Flex>
-  )
 
   return (
     <Table caption={I18n.t('Course Roster')} data-testid="roster-table">

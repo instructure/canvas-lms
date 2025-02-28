@@ -19,7 +19,7 @@
 import {gql} from '@apollo/client'
 
 export const COURSE_PEOPLE_QUERY = gql`
-  query getCoursePeopleQuery($courseId: ID!) {
+  query getCoursePeopleQuery($courseId: ID!, $searchTerm: String) {
     course(id: $courseId) {
       usersConnection(
         filter: {
@@ -29,7 +29,8 @@ export const COURSE_PEOPLE_QUERY = gql`
             TaEnrollment
             DesignerEnrollment
             ObserverEnrollment
-          ]
+          ],
+          searchTerm: $searchTerm
         }
       ) {
         nodes {
