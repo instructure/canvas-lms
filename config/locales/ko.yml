@@ -1394,6 +1394,7 @@ ko:
   add_message_10cc308c: "메시지 추가"
   add_module_5ad6fee2: "모듈 추가"
   add_page_7ea7ee39: "페이지 추가"
+  add_page_for_submission_8941db3e: "제출물 페이지 추가"
   add_prerequisite_6409bd9: "필수 조건 추가"
   add_quiz_cebfa28b: "퀴즈 추가"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "이 포트폴리오의 섹션을 추가, 제거, 다시 배열 "
@@ -13998,6 +13999,7 @@ ko:
   to_c4c44f4b: "다음 요일로"
   to_date_7c45ee77: "끝 날짜"
   to_f0e90538: "수신:"
+  to_make_a_new_page_for_this_submission_select_a_se_6cd921aa: "이 제출물에 대한 새 페이지를 만드려면 섹션을 선택하고 새 페이지의 이름을 입력하십시오."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Canvas 사용자에게 전송된 모든 알림을 보려면 검색을 위한 사용자와 날짜 범위를 선택하십시오."
   token_9a020862: 토큰
   tomorrow_9a6c9a00: 내일
