@@ -39,6 +39,7 @@ import {type File} from '../../../interfaces/File'
 import {generatePreviewUrlPath} from '../../../utils/fileUtils'
 import NoFilePreviewAvailable from './NoFilePreviewAvailable'
 import FilePreviewIframe from './FilePreviewIframe'
+import {MediaInfo} from "@canvas/canvas-studio-player/react/types";
 
 const I18n = createI18nScope('files_v2')
 
@@ -52,12 +53,15 @@ interface FilePreviewModalProps {
 const previewableTypes = ['image', 'pdf', 'html', 'doc', 'text']
 const mediaTypes = ['video', 'audio']
 
-const renderFilePreview = (item: File) => {
+const FilePreview = ({item, setMediaInfo}: {
+  item: File,
+  setMediaInfo: React.Dispatch<React.SetStateAction<MediaInfo>>
+}) => {
   if (item.preview_url && previewableTypes.includes(item.mime_class)) {
     return <FilePreviewIframe item={item} />
   } else if (mediaTypes.includes(item.mime_class)) {
     return (
-      <Flex as="div" alignItems="center" height="100%" justifyItems="center" wrap="wrap">
+      <Flex as="div" alignItems="center" height="100%" justifyItems="center" wrap="wrap" style={{color: '#000'}}>
         <StudioMediaPlayer
           media_id={item.media_entry_id || ''}
           type={
@@ -69,6 +73,9 @@ const renderFilePreview = (item: File) => {
           attachment_id={item.id}
           show_loader={true}
           maxHeight={'100%'}
+          mediaFetchCallback={(response) => {
+            setMediaInfo(response)
+          }}
         />
       </Flex>
     )
@@ -178,6 +185,8 @@ const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePreviewModalP
     )
   }
 
+  const [mediaInfo, setMediaInfo] = useState<MediaInfo>({} as MediaInfo);
+
   return (
     <Modal
       open={isOpen}
@@ -250,7 +259,7 @@ const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePreviewModalP
       <Modal.Body padding="none">
         <DrawerLayout onOverlayTrayChange={handleOverlayTrayChange}>
           <DrawerLayout.Content label={I18n.t('File Preview')}>
-            {renderFilePreview(currentItem)}
+            <FilePreview item={currentItem} setMediaInfo={setMediaInfo}/>
           </DrawerLayout.Content>
           <DrawerLayout.Tray
             open={isTrayOpen}
@@ -258,7 +267,7 @@ const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePreviewModalP
             placement="end"
             label={I18n.t('File Information')}
           >
-            <FilePreviewTray onDismiss={() => setIsTrayOpen(false)} item={currentItem} />
+            <FilePreviewTray onDismiss={() => setIsTrayOpen(false)} item={currentItem} mediaInfo={mediaInfo} />
           </DrawerLayout.Tray>
         </DrawerLayout>
       </Modal.Body>
