@@ -19,32 +19,32 @@
 module Courses
   class HorizonService < ApplicationService
     class << self
-      def validate_course_contents(context, link_transformer)
+      def validate_course_contents(course, link_transformer = nil)
         errors = {}
 
         # check assignments
         assignment_validator = HorizonValidators::AssignmentValidator.new
-        validate_entities(context, context.assignments, assignment_validator, errors, link_transformer, :assignments)
+        validate_entities(course, course.assignments, assignment_validator, errors, link_transformer, :assignments)
 
         # check groups
         group_validator = HorizonValidators::GroupValidator.new
-        validate_entities(context, context.groups, group_validator, errors, link_transformer, :groups)
+        validate_entities(course, course.groups, group_validator, errors, link_transformer, :groups)
 
         # check discussions
         discussions_validator = HorizonValidators::DiscussionsValidator.new
-        validate_entities(context, context.discussion_topics, discussions_validator, errors, link_transformer, :discussions)
+        validate_entities(course, course.discussion_topics, discussions_validator, errors, link_transformer, :discussions)
 
         # check quizzes
         quizzes_validator = HorizonValidators::QuizzesValidator.new
-        validate_entities(context, context.quizzes, quizzes_validator, errors, link_transformer, :quizzes)
+        validate_entities(course, course.quizzes, quizzes_validator, errors, link_transformer, :quizzes)
 
         # check collaborations
         collaborations_validator = HorizonValidators::CollaborationsValidator.new
-        validate_entities(context, context.collaborations, collaborations_validator, errors, link_transformer, :collaborations)
+        validate_entities(course, course.collaborations, collaborations_validator, errors, link_transformer, :collaborations)
 
         # check outcomes
         outcomes_validator = HorizonValidators::OutcomesValidator.new
-        validate_entities(context, context.learning_outcomes, outcomes_validator, errors, link_transformer, :outcomes)
+        validate_entities(course, course.learning_outcomes, outcomes_validator, errors, link_transformer, :outcomes)
 
         errors
       end
@@ -87,7 +87,10 @@ module Courses
         end
         progress&.increment_completion!(1)
 
-        if validate_course_contents(context, ->(_x, _y, _z) { "" }).empty?
+        post_errors = validate_course_contents(context)
+        only_optional_errors = post_errors&.keys&.all? { |e| [:collaborations, :outcomes].include?(e) }
+
+        if post_errors.empty? || only_optional_errors
           context.update!(horizon_course: true)
         end
       end
@@ -104,22 +107,15 @@ module Courses
           next if entity.errors.empty?
 
           name = entity.respond_to?(:title) ? entity.title : entity.name
-          link = case error_key
-                 when :assignments
-                   link_transformer.call(context, :context_assignment_url, entity.id)
-                 when :discussions
-                   link_transformer.call(context, :context_discussion_topic_url, entity.id)
-                 when :quizzes
-                   link_transformer.call(context, :context_quiz_url, entity.id)
-                 when :groups
-                   link_transformer.call(context, :context_groups_url)
-                 when :collaborations
-                   link_transformer.call(context, :context_collaboration_url, entity.id)
-                 when :outcomes
-                   link_transformer.call(context, :context_outcome_url, entity.id)
-                 else
-                   nil
-                 end
+          link_mapping = {
+            assignments: :context_assignment_url,
+            discussions: :context_discussion_topic_url,
+            quizzes: :context_quiz_url,
+            groups: :context_groups_url,
+            collaborations: :context_collaboration_url,
+            outcomes: :context_outcome_url
+          }
+          link = link_transformer&.call(context, link_mapping[error_key], entity.id)
           errors[error_key] ||= []
           errors[error_key] << map_to_error_object(entity.id, name, link, entity.errors)
         end
