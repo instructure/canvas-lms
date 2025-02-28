@@ -2132,6 +2132,7 @@ fa:
   add_outcomes_to_groupname_8c33d118: "افزودن نتایج به \"%{groupName}\""
   add_override_da70f198: "اضافه کردن بازبینی"
   add_page_7ea7ee39: "افزودن صفحه"
+  add_page_for_submission_8941db3e: "افزودن صفحه برای مورد ارسالی"
   add_people_7948b7da: "افزودن افراد"
   add_people_7ee4b2ec: "افزودن افراد"
   add_people_and_courses_to_canvas_5c4bfff9: "افراد و درس‌ها را به کانواس اضافه کنید"
@@ -24388,6 +24389,7 @@ fa:
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "برای وارد کردن فایل‌ها با استفاده از ابزار ورود درس ، محتوای درس - افزودن / ویرایش / حذف نیز باید فعال باشد."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "برای وارد کردن داده های سامانه اطلاعات دانشجو، ورود_سامانه اطلاعات دانشجو نیز باید فعال باشد."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "برای پیوند دادن بییننده درس *%{name}* به یک دانشجو، نام دانشجو را در قسمت زیر تایپ کنید تا آنها را بیابید و سپس روی بهنگام سازی کلیک کنید."
+  to_make_a_new_page_for_this_submission_select_a_se_6cd921aa: "برای ایجاد یک صفحه جدید برای این مورد ارسالی، یک بخش را انتخاب کنید و نام صفحه جدید را وارد نمایید."
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "برای مدیریت تنظیمات دوره طرح در تنظیمات درس‌ها، درس‌ها - افزودن / ویرایش / حذف نیز باید فعال باشند."
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
       برای مدیریت گفتگوها، گفتگوها - تعدیل سازی نیز باید فعال شود.
