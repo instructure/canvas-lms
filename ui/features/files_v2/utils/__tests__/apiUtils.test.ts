@@ -21,6 +21,7 @@ import {
   generateFilesQuotaUrl,
   generateFolderPostUrl,
   parseLinkHeader,
+  generateTableUrl,
 } from '../apiUtils'
 import {setupFilesEnv} from '../../fixtures/fakeFilesEnv'
 
@@ -94,5 +95,96 @@ describe('parseLinkHeader', () => {
     const header = '</current>; rel="current", </next>; rel="next", </last>; rel="last"'
     const links = parseLinkHeader(header)
     expect(links).toEqual({current: '/current', next: '/next', last: '/last'})
+  })
+})
+
+describe('generateTableUrl', () => {
+  const QUERY_PARAMS =
+    'include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
+
+  it('returns correct url for search when course', () => {
+    const url = generateTableUrl({
+      searchTerm: 'search',
+      contextType: 'course',
+      contextId: '1',
+      folderId: '2',
+      sortBy: 'name',
+      sortDirection: 'asc',
+      pageQueryParam: 'bookmark:foobarbaz',
+    })
+    expect(url).toBe(
+      `/api/v1/courses/1/files?search_term=search&per_page=50&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
+    )
+  })
+
+  it('returns correct url for search when user', () => {
+    const url = generateTableUrl({
+      searchTerm: 'search',
+      contextType: 'user',
+      contextId: '1',
+      folderId: '2',
+      sortBy: 'name',
+      sortDirection: 'desc',
+      pageQueryParam: 'bookmark:foobarbaz',
+    })
+    expect(url).toBe(
+      `/api/v1/users/1/files?search_term=search&per_page=50&${QUERY_PARAMS}&sort=name&order=desc&page=bookmark:foobarbaz`,
+    )
+  })
+
+  it('returns correct url for search when group', () => {
+    const url = generateTableUrl({
+      searchTerm: 'search',
+      contextType: 'group',
+      contextId: '1',
+      folderId: '2',
+      sortBy: 'name',
+      sortDirection: 'asc',
+      pageQueryParam: 'bookmark:foobarbaz',
+    })
+    expect(url).toBe(
+      `/api/v1/groups/1/files?search_term=search&per_page=50&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
+    )
+  })
+
+  it('returns correct url for search when no page query param', () => {
+    const url = generateTableUrl({
+      searchTerm: 'search',
+      contextType: 'course',
+      contextId: '1',
+      folderId: '2',
+      sortBy: 'name',
+      sortDirection: 'desc',
+    })
+    expect(url).toBe(
+      `/api/v1/courses/1/files?search_term=search&per_page=50&${QUERY_PARAMS}&sort=name&order=desc`,
+    )
+  })
+
+  it('returns correct url for fetch all', () => {
+    const url = generateTableUrl({
+      searchTerm: '',
+      contextType: 'course',
+      contextId: '1',
+      folderId: '2',
+      sortBy: 'name',
+      sortDirection: 'asc',
+      pageQueryParam: 'bookmark:foobarbaz',
+    })
+    expect(url).toBe(
+      `/api/v1/folders/2/all?${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
+    )
+  })
+
+  it('returns correct url for fetch all when no page query param', () => {
+    const url = generateTableUrl({
+      searchTerm: '',
+      contextType: 'course',
+      contextId: '1',
+      folderId: '2',
+      sortBy: 'name',
+      sortDirection: 'desc',
+    })
+    expect(url).toBe(`/api/v1/folders/2/all?${QUERY_PARAMS}&sort=name&order=desc`)
   })
 })
