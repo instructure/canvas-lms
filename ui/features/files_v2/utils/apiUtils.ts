@@ -18,6 +18,19 @@
 
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 
+const SEARCH_AND_ALL_QUERY_PARAMS =
+  'include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
+
+interface TableUrlParams {
+  searchTerm: string
+  contextType: string
+  contextId: string
+  folderId: string
+  sortBy: string
+  sortDirection: string
+  pageQueryParam?: string
+}
+
 export const generateFolderByPathUrl = (path: string) => {
   let contextType = filesEnv.contexts[0].contextType
   let contextId = filesEnv.contexts[0].contextId
@@ -45,6 +58,22 @@ export const generateFolderPostUrl = (parentFolderId: string) => {
   return `/api/v1/folders/${parentFolderId}/folders`
 }
 
+export const generateTableUrl = ({
+  searchTerm,
+  contextType,
+  contextId,
+  folderId,
+  sortBy,
+  sortDirection,
+  pageQueryParam,
+}: TableUrlParams) => {
+  const baseUrl = searchTerm
+    ? generateSearchUrl(contextType, contextId, searchTerm)
+    : generateFetchAllUrl(folderId)
+  const sortedUrl = `${baseUrl}&sort=${sortBy}&order=${sortDirection}`
+  return pageQueryParam ? `${sortedUrl}&page=${pageQueryParam}` : sortedUrl
+}
+
 export const parseLinkHeader = (header: string | null) => {
   if (!header) return {}
   const links: Record<string, string> = {}
@@ -56,4 +85,12 @@ export const parseLinkHeader = (header: string | null) => {
     }
   })
   return links
+}
+
+const generateSearchUrl = (singularContextType: string, contextId: string, searchTerm: string) => {
+  return `/api/v1/${singularContextType}s/${contextId}/files?search_term=${searchTerm}&per_page=50&${SEARCH_AND_ALL_QUERY_PARAMS}`
+}
+
+const generateFetchAllUrl = (folderId: string) => {
+  return `/api/v1/folders/${folderId}/all?${SEARCH_AND_ALL_QUERY_PARAMS}`
 }

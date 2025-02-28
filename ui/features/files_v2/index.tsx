@@ -29,7 +29,7 @@ import {createRoot} from 'react-dom/client'
 import {generateFolderByPathUrl} from './utils/apiUtils'
 import AllMyFilesTable from './react/components/AllMyFilesTable'
 import {createStubRootFolder} from './utils/folderUtils'
-
+import {LoaderData} from './interfaces/LoaderData'
 const contextAssetString = window.ENV.context_asset_string
 const showingAllContexts = filesEnv.showingAllContexts
 
@@ -58,7 +58,7 @@ const routes = [
         ) : (
           <FilesApp contextAssetString={contextAssetString} />
         ),
-        loader: () => {
+        loader: (): LoaderData | null => {
           if (showingAllContexts) return null
           const context = filesEnv.contexts[0]
           const rootFolder = createStubRootFolder(context)
@@ -68,8 +68,8 @@ const routes = [
       {
         path: 'folder?/:pluralContext?/search',
         element: <FilesApp contextAssetString={contextAssetString} />,
-        loader: async ({params, request}: LoaderFunctionArgs) => {
-          const searchTerm = new URL(request.url).searchParams.get('search_term')
+        loader: async ({params, request}: LoaderFunctionArgs): Promise<LoaderData> => {
+          const searchTerm = new URL(request.url).searchParams.get('search_term') || ''
           let context
           if (params.pluralContext) {
             const [pluralContextType, contextId] = params.pluralContext.split('_')
@@ -83,7 +83,7 @@ const routes = [
       {
         path: 'folder/:folderPathOrPluralContext?/*',
         element: <FilesApp contextAssetString={contextAssetString} />,
-        loader: async ({params}: LoaderFunctionArgs) => {
+        loader: async ({params}: LoaderFunctionArgs): Promise<LoaderData> => {
           if (filesEnv.showingAllContexts && !params['*']) {
             const [pluralContextType, contextId] =
               params.folderPathOrPluralContext?.split('_') || []
