@@ -134,6 +134,8 @@ declare global {
       success: (data: any) => void
       beforeSubmit?: (data: any) => void
       error?: (data: JQuery.jqXHR) => void
+      onClientSideValidationError?: () => void
+      disableErrorBox?: boolean
     }) => void
     formErrors: (errors: Record<string, string>) => void
     getTemplateData: (options: {textValues: string[]}) => Record<string, unknown>
