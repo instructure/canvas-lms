@@ -144,6 +144,10 @@ lti_cache_tool_public_jwks_url:
         state: allowed_on
       ci:
         state: allowed_on
+      beta:
+        state: allowed_on
+      production:
+        state: allowed_on
 lti_context_copy_notice:
   state: hidden
   shadow: true

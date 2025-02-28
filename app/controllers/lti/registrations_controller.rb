@@ -177,7 +177,7 @@
 #           "type": "object"
 #         },
 #         "public_jwk_url": {
-#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset.",
+#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset. Canvas may cache JWKs up to 5 minutes.",
 #           "example": "https://mytool.com/1_3/jwks",
 #           "type": "string"
 #         },
@@ -410,7 +410,7 @@
 #           "type": "object"
 #         },
 #         "public_jwk_url": {
-#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset.",
+#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset. Canvas may cache JWKs up to 5 minutes.",
 #           "example": "https://mytool.com/1_3/jwks",
 #           "type": "string"
 #         },
