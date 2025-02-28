@@ -904,7 +904,7 @@ describe "discussions" do
           end
 
           it "does not navigate to existsing discussion edit page" do
-            Account.site_admin.enable_feature!(:horizon_course_setting)
+            course.account.enable_feature!(:horizon_course_setting)
             course.horizon_course = true
             course.save!
             get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"

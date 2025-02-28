@@ -23,33 +23,51 @@ module HorizonValidators
       if record.group_category.present?
         record.errors.add(:group_category, "Group category should not exist")
       end
+
       invalid_types = record.submission_types_array - AbstractAssignment::HORIZON_SUBMISSION_TYPES
       unless invalid_types.empty?
-        record.errors.add(:submission_types, "Invalid submission type for Horizon course: #{invalid_types}")
+        record.errors.add(:submission_types, "Invalid submission types for Horizon course: #{invalid_types}")
       end
-      if record.peer_reviews
-        record.errors.add(:peer_reviews, "Peer reviews are disabled")
+
+      if record.has_peer_reviews? || record.peer_reviews_assigned
+        record.errors.add(:peer_reviews, "Peer reviews are not supported")
+      end
+
+      if record.active_rubric_association?
+        record.errors.add(:rubric, "Rubric is not supported")
       end
     end
   end
 
   class GroupValidator < ActiveModel::Validator
     def validate(record)
-      record.errors.add(:groups, "Can not add groups to Horizon course")
+      record.errors.add(:groups, "Groups are not supported")
     end
   end
 
   class DiscussionsValidator < ActiveModel::Validator
     def validate(record)
       unless record.is_announcement
-        record.errors.add(:discussion_type, "Cannot create discussions in Horizon courses")
+        record.errors.add(:discussion_type, "Discussions are not supported")
       end
     end
   end
 
   class QuizzesValidator < ActiveModel::Validator
     def validate(record)
-      record.errors.add("Classic Quizzes is not supported on Horizon courses")
+      record.errors.add(:quiz_type, "Classic Quizzes are not supported")
+    end
+  end
+
+  class CollaborationsValidator < ActiveModel::Validator
+    def validate(record)
+      record.errors.add(:collaborations, "Collaborations are not supported")
+    end
+  end
+
+  class OutcomesValidator < ActiveModel::Validator
+    def validate(record)
+      record.errors.add(:outcomes, "Outcomes are not supported")
     end
   end
 end

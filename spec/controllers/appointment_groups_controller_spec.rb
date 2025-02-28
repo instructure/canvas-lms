@@ -68,7 +68,7 @@ describe AppointmentGroupsController do
   describe "POST 'create'" do
     it "fails for a horizon course" do
       user_session @teacher
-      @course.root_account.enable_feature!(:horizon_course_setting)
+      @course.account.enable_feature!(:horizon_course_setting)
       @course.update!(horizon_course: true)
       post :create, params: { appointment_group: { title: "Test Group", context_codes: [@course.asset_string] } }
       expect(response).to have_http_status(:bad_request)

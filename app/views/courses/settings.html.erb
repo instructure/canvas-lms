@@ -77,6 +77,9 @@
       <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
         <li id="integrations_tab"><a href="#tab-integrations" id="tab-integrations-link"><%= t('Integrations') %></a></li>
       <% end %>
+      <% if @context.account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
+        <li id="canvas_career_tab"><a href="#tab-canvas-career" id="tab-canvas-career-link"><%= t('Canvas Career Beta') %></a></li>
+      <% end %>
     <% end %>
   </ul>
   <div id="tab-details">
@@ -703,12 +706,6 @@
                   <% end %>
                 </div>
               <% end %>
-              <% if @context.account.feature_enabled?(:horizon_course_setting) %>
-                <div class="checkbox-flex-container">
-                  <%= f.check_box :horizon_course, :disabled => !can_manage_courses %>
-                  <%= f.label :horizon_course, :en => 'Horizon course' %><br />
-                </div>
-              <% end %>
               <%= f.select :default_wiki_editing_roles, [
                 [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
                 [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
@@ -1019,6 +1016,12 @@
 
   <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) && !@context.elementary_homeroom_course? %>
     <div id="tab-integrations"></div>
+  <% end %>
+
+  <% if @context.account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
+      <div id="tab-canvas-career">
+        <% js_bundle :horizon_toggle %>
+      </div>
   <% end %>
 </div><!-- end course details tab -->
 

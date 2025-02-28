@@ -2625,4 +2625,17 @@ class Account < ActiveRecord::Base
       sub_account.recompute_assignments_using_account_default(grading_standard)
     end
   end
+
+  def horizon_domain
+    settings[:horizon_domain]
+  end
+
+  def horizon_redirect_url(canvas_url, reauthenticate: false, preview: false)
+    return nil unless horizon_domain
+
+    protocol = horizon_domain.include?("localhost") ? "http" : "https"
+    uri = Addressable::URI.parse("#{protocol}://#{horizon_domain}/redirect")
+    uri.query_values = { canvas_url: canvas_url, reauthenticate: reauthenticate, preview: preview }
+    uri.to_s
+  end
 end

@@ -23,6 +23,10 @@ class ContextModulesController < ApplicationController
   include WebZipExportHelper
 
   before_action :require_context
+
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   add_crumb(proc { t("#crumbs.modules", "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_context_modules_url }
   before_action { |c| c.active_tab = "modules" }
 

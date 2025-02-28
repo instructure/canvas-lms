@@ -881,7 +881,7 @@ describe "discussions" do
 
       context "Horizon course" do
         before do
-          Account.site_admin.enable_feature!(:horizon_course_setting)
+          @course.account.enable_feature!(:horizon_course_setting)
           @course.horizon_course = true
           @course.save!
         end

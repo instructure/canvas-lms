@@ -270,6 +270,10 @@
 #
 class DiscussionTopicsController < ApplicationController
   before_action :require_context_and_read_access, except: :public_feed
+
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   before_action :rce_js_env
 
   include Api::V1::DiscussionTopics

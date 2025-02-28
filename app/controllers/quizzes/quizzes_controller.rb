@@ -33,6 +33,10 @@ class Quizzes::QuizzesController < ApplicationController
   attr_reader :lock_results_if_needed
 
   before_action :require_context
+
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:index, :show]
+
   before_action :rce_js_env, only: %i[show new edit]
 
   include K5Mode

@@ -366,6 +366,9 @@ class CoursesController < ApplicationController
   before_action :check_limited_access_for_students, only: %i[create_file]
   before_action :check_horizon_redirect, only: [:show]
 
+  include HorizonMode
+  before_action :redirect_student_to_horizon, only: [:show, :settings]
+
   include Api::V1::Course
   include Api::V1::Progress
   include K5Mode
@@ -2229,7 +2232,7 @@ class CoursesController < ApplicationController
         return
       end
 
-      @context = api_find(Course.active, params[:id])
+      @context ||= api_find(Course.active, params[:id])
 
       if @context.horizon_course? && !request.path.include?("/modules")
         redirect_to course_context_modules_path(@context.id)
@@ -3806,7 +3809,7 @@ class CoursesController < ApplicationController
         session[:masquerade_return_to] = params[:leave_student_view]
         leave_student_view
       elsif params[:reset_test_student]
-        @context = api_find(Course.active, params[:id])
+        @context ||= api_find(Course.active, params[:id])
         reset_test_student
       end
     end
@@ -3846,12 +3849,12 @@ class CoursesController < ApplicationController
     @fake_student = @context.student_view_student
     session[:become_user_id] = @fake_student.id
     session.delete(:masquerade_return_to)
-
     return_url = course_path(@context)
-    if @context.horizon_course?
-      horizon_redirect_url = DynamicSettings.find("horizon")["redirect_url"]
+    is_preview = params[:preview] == "true" && @context.account.feature_enabled?(:horizon_course_setting)
+
+    if @context.root_account.horizon_domain.present? && (is_preview || @context.horizon_course?)
       canvas_url = params[:reset_test_student] || request.referer
-      redirect_to "#{horizon_redirect_url}?reauthenticate=true&canvas_url=#{canvas_url}"
+      redirect_to @context.root_account.horizon_redirect_url(canvas_url, reauthenticate: true, preview: is_preview)
     elsif value_to_boolean(params[:redirect_to_referer])
       return_to(request.referer, return_url || dashboard_url)
     else
