@@ -20,6 +20,8 @@
 module Lti::IMS::Concerns
   module DeepLinkingServices
     CLAIM_PREFIX = "https://purl.imsglobal.org/spec/lti-dl/claim/"
+
+    # If changing this value, update documentation (ripgrep: rg '#.*public_jwk_url')
     JWK_SET_CACHE_EXPIRATION = 5.minutes
 
     def return_url_parameters
