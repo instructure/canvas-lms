@@ -76,6 +76,7 @@ const I18n = createI18nScope('instructure')
 //    onSubmit: A callback which will receive 1. a deferred object
 //      encompassing the request(s) triggered by the submit action and 2. the
 //      formData being posted
+//    onClientSideValidationError: A callback which will be called if the form fails client side validation
 //    disableErrorBox: If true, error boxes will not be displayed
 $.fn.formSubmit = function (options) {
   $(this).markRequired(options)
@@ -104,7 +105,7 @@ $.fn.formSubmit = function (options) {
         if (INST && INST.environment !== 'production') throw error
       }
       if (newData === false) {
-        options?.onError?.call($form)
+        options?.onClientSideValidationError?.call($form)
         return false
       } else if (newData) {
         formData = newData

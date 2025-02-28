@@ -1997,6 +1997,33 @@ function renderError(inputContainer, message) {
   inputContainer.find('.asterisk').addClass('error')
 }
 
+function focusOnFirstError() {
+  const errorsOnOptionsTab = $('#options_tab .form-control.invalid input')
+  const errorsOnQuestionsTab = $('#questions_tab .form-control.invalid input')
+
+  if (errorsOnOptionsTab.length > 0) {
+    $('#quiz_tabs').tabs('option', 'active', 0);
+    errorsOnOptionsTab?.first()?.focus();
+  } else if (errorsOnQuestionsTab.length > 0) {
+    $('#quiz_tabs').tabs('option', 'active', 1);
+    errorsOnQuestionsTab?.first()?.focus();
+  }
+}
+
+function restoreSavingButtons() {
+  $('#quiz_edit_wrapper')
+    .find('.btn.save_quiz_button')
+    .prop('disabled', false)
+    .removeClass('saving')
+    .text(I18n.t('buttons.save', 'Save'))
+
+  $('#quiz_edit_wrapper')
+    .find('.btn.save_and_publish')
+    .prop('disabled', false)
+    .removeClass('saving')
+    .text(I18n.t('buttons.save_and_publish', 'Save & Publish'))
+}
+
 function restoreOriginalMessage(inputContainer) {
   const inputMessageContainer = inputContainer.find('.input-message__container')
   const inputField = inputContainer.find('input').last()
@@ -2470,12 +2497,9 @@ ready(function () {
       $quiz_edit_wrapper.find('.btn.save_and_publish').prop('disabled', true)
     },
 
-    onError() {
-        $('#quiz_edit_wrapper')
-          .find('.btn.save_quiz_button')
-          .prop('disabled', false)
-          .removeClass('saving')
-          .text(I18n.t('buttons.save', 'Save'))
+    onClientSideValidationError() {
+      restoreSavingButtons()
+      focusOnFirstError()
     },
 
     onSubmit(promise, data) {
@@ -2534,20 +2558,10 @@ ready(function () {
       }
 
       function error(data) {
-        $('#quiz_edit_wrapper')
-          .find('.btn.save_quiz_button')
-          .prop('disabled', false)
-          .removeClass('saving')
-          .text(I18n.t('buttons.save', 'Save'))
-        $('#quiz_edit_wrapper')
-          .find('.btn.save_and_publish')
-          .prop('disabled', false)
-          .removeClass('saving')
-          .text(I18n.t('buttons.save_and_publish', 'Save & Publish'))
-        $('#quiz_edit_wrapper').find('input[name="publish"]').remove()
-
         $(this).trigger('xhrError', data)
         $(this).formErrors(data)
+        restoreSavingButtons()
+        focusOnFirstError()
       }
     },
   })
