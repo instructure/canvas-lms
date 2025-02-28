@@ -2182,6 +2182,7 @@ hu:
   add_outcomes_to_groupname_8c33d118: "Eredmények hozzáadása ehhez a csoporthoz: \"%{groupName}\" "
   add_override_da70f198: "Felülbírálás hozzáadása"
   add_page_7ea7ee39: "Oldal hozzáadása"
+  add_page_for_submission_8941db3e: "Oldal hozzáadása a leadáshoz "
   add_people_7948b7da: "Résztvevők hozzáadása"
   add_people_7ee4b2ec: "Résztvevők hozzáadása"
   add_people_and_courses_to_canvas_5c4bfff9: "Résztvevők ék kurzusok hozzáadása a Canvashoz"
@@ -25650,6 +25651,7 @@ hu:
   to_link_an_observer_to_a_student_users_manage_logi_cc370c29: "Ahhoz, hogy egy megfigyelőt egy hallgatóhoz kapcsoljon, engedélyezni kell a Felhasználók - bejelentkezési adatok kezelése és a Beszélgetések - küldés az egyes kurzustagoknak funkciót."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Ahhoz, hogy *%{name}* kurzusmegfigyelőt egy hallgatóhoz rendelje, alább kezdje el begépelni a hallgató nevét, majd ha megtalálta, kattintson a Frissítés-re."
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: "Ha útközben is be szeretne jelentkezni Canvas-fiókjába, szkennelje be ezt a QR-kódot bármelyik Canvas mobilalkalmazásból."
+  to_make_a_new_page_for_this_submission_select_a_se_6cd921aa: "Ha a beadáshoz új oldalt kíván létrehozni, válasszon egy szekciót és írja be az új oldal nevét. "
   to_make_outcome_alignment_easier_only_add_outcomes_aecf5e0e: "Az eredmények összehangolásának megkönnyítése érdekében csak olyan eredményeket adjon hozzá, amelyek az adott kurzushoz kapcsolódnak."
   to_manage_associated_courses_courses_view_list_and_26f4c15c: |-
       A kapcsolódó kurzusok kezeléséhez a Kurzusok - lista megtekintése és a Kurzusok -
