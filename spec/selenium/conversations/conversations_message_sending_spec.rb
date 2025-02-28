@@ -368,8 +368,9 @@ describe "conversations new" do
         before do
           Account.default.enable_feature!(:differentiation_tags)
           @non_collaborative_group_category = @course.group_categories.create!(name: "Test differentiation tag", non_collaborative: true)
-          @non_collaborative_group = @course.groups.create!(name: "differentiation tag", group_category: @non_collaborative_group_category)
+          @non_collaborative_group = @course.groups.create!(name: "Test differentiation tag", group_category: @non_collaborative_group_category)
           @non_collaborative_group.add_user(@s1)
+          @non_collaborative_group.add_user(@s2)
         end
 
         describe "as a teacher" do
@@ -396,7 +397,12 @@ describe "conversations new" do
             fj("button:contains('Send')").click
             wait_for_ajaximations
 
+            # Verify that the message was sent to both students in the group, but as separate conversations
             expect(@s1.conversations.last.conversation.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @s1].collect(&:id).sort)
+            expect(@s2.conversations.last.conversation.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @s2].collect(&:id).sort)
+
+            expect(@s1.conversations.last.conversation.conversation_messages.first.body).to eq "hallo!"
+            expect(@s2.conversations.last.conversation.conversation_messages.first.body).to eq "hallo!"
           end
 
           it "does not show all in option for differentiation tags" do
