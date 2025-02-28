@@ -83,7 +83,7 @@ describe.skip('UserDifferentiationTagManager', () => {
     expect(screen.getByText(/2 Selected/)).toBeInTheDocument()
   })
 
-  it('shows loading in menu when fetching categories', async () => {
+  it.skip('shows loading in menu when fetching categories', async () => {
     renderComponent({isLoading: true, data: null})
     const TagAsbutton = screen.getByTestId('user-diff-tag-manager-tag-as-button')
     await user.click(TagAsbutton)
@@ -133,6 +133,21 @@ describe.skip('UserDifferentiationTagManager', () => {
     expect(screen.getByText('Category 1')).toBeInTheDocument()
     expect(screen.getByText('Category 2')).toBeInTheDocument()
     await user.click(screen.getByText('Tag 1'))
+    expect(mutateMock).toHaveBeenCalled()
+  })
+
+  it.skip('calls useAddTagMembership mutation when user selects a single tag from the menu and has at least one user selected', async () => {
+    const mockCategories = [
+      {id: 1, name: 'Category 1', groups: [{id: 1, name: 'Category 1'}]},
+      {id: 2, name: 'Category 2', groups: []},
+    ]
+    renderComponent({data: mockCategories})
+    const TagAsbutton = screen.getByTestId('user-diff-tag-manager-tag-as-button')
+    await user.click(TagAsbutton)
+
+    expect(screen.getByText('Category 1')).toBeInTheDocument()
+    expect(screen.getByText('Category 2')).toBeInTheDocument()
+    await user.click(screen.getByText('Category 1'))
     expect(mutateMock).toHaveBeenCalled()
   })
 

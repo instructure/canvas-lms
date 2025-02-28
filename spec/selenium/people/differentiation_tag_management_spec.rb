@@ -195,6 +195,38 @@ describe "Differentiation Tag Management" do
           expect(fj("span:contains('#{@multiple_tags_1.name}')")).to be_displayed
           expect(fj("span:contains('#{@multiple_tags_2.name}')")).to be_displayed
         end
+
+        it "shows the create tag modal" do
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+          force_click("span:contains('New Tag')")
+
+          expect(fj("h2:contains('Create Tag')")).to be_displayed
+        end
+
+        it "Adds a single tag to the selected user" do
+          f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+
+          force_click("span:contains('#{@single_tag_1.name}')")
+          wait_for_ajaximations
+
+          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include @single_tag_1.id
+        end
+
+        it "Adds a multiple tag variant to the selected user" do
+          f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+
+          force_click("span:contains('#{@multiple_tags_1.name}')")
+          wait_for_ajaximations
+
+          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include @multiple_tags_1.id
+        end
       end
 
       context "create/edit modal" do
