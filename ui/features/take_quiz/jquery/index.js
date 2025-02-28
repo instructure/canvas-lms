@@ -36,6 +36,7 @@ import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/quizzes/jquery/behaviors/quiz_selectmenu'
+import { renderError, restoreOriginalMessage } from '@canvas/quizzes/jquery/quiz_form_utils'
 
 const I18n = createI18nScope('quizzes.take_quiz')
 
@@ -719,11 +720,13 @@ $(function () {
       const $this = $(this)
       if ($this.hasClass('numerical_question_input')) {
         const val = numberHelper.parse($this.val())
-        $this.val(
-          Number.isNaN(Number(val))
-            ? ''
-            : I18n.n(val.toFixed(4), {strip_insignificant_zeros: true}),
-        )
+        if(Number.isNaN(Number(val))){
+          restoreOriginalMessage($('.numerical-question-holder'))
+          $this.val('')
+        }
+        else{
+          $this.val(val)
+        }
       }
       if ($this.hasClass('precision_question_input')) {
         const precisionQuestionInputVal = numberHelper.parse($this.val())
@@ -745,14 +748,14 @@ $(function () {
     .on('keyup', '.numerical_question_input', function (_event) {
       const $this = $(this)
       const val = $this.val() + ''
-      const $errorBox = $this.data('associated_error_box')
-
+      const inputContainer = $this.closest('.numerical-question-holder')
       if (val.match(/^$|^-$/) || numberHelper.validate(val)) {
-        if ($errorBox) {
-          $this.triggerHandler('click')
-        }
-      } else if (!$errorBox) {
-        $this.errorBox(I18n.t('errors.only_numerical_values', 'only numerical values are accepted'))
+        restoreOriginalMessage(inputContainer)
+      } else  {
+        renderError(
+          inputContainer,
+          I18n.t('errors.only_numerical_values', 'only numerical values are accepted'),
+        )
       }
     })
     .on('click', '.flag_question', function (e) {
