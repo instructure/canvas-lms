@@ -45,6 +45,10 @@ describe "Differentiation Tag Management" do
         get "/courses/#{@course.id}/users"
       end
 
+      it "renders the checkbox header" do
+        expect(fj("span:contains('Select User')")).to be_truthy
+      end
+
       context "differentiation tag tray" do
         before do
           fj("button:contains('Manage Tags')").click
