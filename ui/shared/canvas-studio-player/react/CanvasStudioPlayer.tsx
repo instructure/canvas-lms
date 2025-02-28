@@ -17,14 +17,15 @@
  */
 import React, {CSSProperties, useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {LoadingIndicator, sizeMediaPlayer} from '@instructure/canvas-media'
+import {captionLanguageForLocale, LoadingIndicator, sizeMediaPlayer} from '@instructure/canvas-media'
 import {CaptionMetaData, StudioPlayer} from '@instructure/studio-player'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import {type MediaTrack} from 'api'
+import {type MediaTrack as Caption} from 'api'
+import {type MediaInfo, MediaTrack} from './types'
 
 declare const ENV: GlobalEnv & {
   locale?: string
@@ -49,7 +50,7 @@ interface CanvasStudioPlayerProps {
   media_id: string
   // TODO: we've asked studio to export definitions for PlayerSrc and CaptionMetaData
   media_sources?: any[]
-  media_tracks?: MediaTrack[]
+  media_tracks?: Caption[]
   type?: 'audio' | 'video'
   MAX_RETRY_ATTEMPTS?: number
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS?: number
@@ -58,6 +59,7 @@ interface CanvasStudioPlayerProps {
   attachment_id?: string
   show_loader?: boolean
   maxHeight?: null | string
+  mediaFetchCallback?: (mediaInfo: MediaInfo) => void
 }
 
 // The main difference between CanvasMediaPlayer and CanvasStudioPlayer
@@ -74,7 +76,8 @@ export default function CanvasStudioPlayer({
   is_attachment = false,
   attachment_id = '',
   show_loader = false,
-  maxHeight = null
+  maxHeight = null,
+  mediaFetchCallback = () => {}
 }: CanvasStudioPlayerProps) {
   const sorted_sources = Array.isArray(media_sources)
     ? media_sources.sort(byBitrate)
@@ -88,7 +91,7 @@ export default function CanvasStudioPlayer({
       }))
     : undefined
   const [mediaSources, setMediaSources] = useState(sorted_sources)
-  const [mediaCaptions] = useState(captions)
+  const [mediaCaptions, setMediaCaptions] = useState<CaptionMetaData[] | undefined>(captions)
   const [retryAttempt, setRetryAttempt] = useState(0)
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
   const [containerWidth, setContainerWidth] = useState(0)
@@ -168,6 +171,16 @@ export default function CanvasStudioPlayer({
       }
       if (resp?.media_sources?.length) {
         setMediaSources(resp.media_sources.sort(byBitrate))
+        if (!media_captions) {
+          setMediaCaptions(resp.media_tracks.map((caption: MediaTrack) => ({
+            locale: caption.locale,
+            language: captionLanguageForLocale(caption.locale),
+            inherited: caption.inherited,
+            label: captionLanguageForLocale(caption.locale),
+            src: caption.url
+          })))
+        }
+        mediaFetchCallback(resp)
         setIsLoading(false)
       } else {
         setRetryAttempt(retryAttempt + 1)
