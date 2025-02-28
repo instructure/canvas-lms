@@ -443,6 +443,20 @@ const FileFolderTable = ({
           sortDirection: sortDirection === 'asc' ? 'ascending' : 'descending',
         })}
       </Alert>
+      {searchString && rows.length > 0 && (
+        <Alert
+          liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+          liveRegionPoliteness="assertive"
+          screenReaderOnly
+          data-testid="search-announcement"
+        >
+          {I18n.t(
+            'file_search_count',
+            {one: 'One result found', other: '%{count} results found'},
+            {count: rows.length},
+          )}
+        </Alert>
+      )}
     </>
   )
 }

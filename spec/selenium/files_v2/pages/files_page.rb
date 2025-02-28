@@ -85,4 +85,8 @@ module FilesPage
   def search_input
     f("[data-testid='files-search-input']")
   end
+
+  def search_button
+    f("[data-testid='files-search-button']")
+  end
 end
