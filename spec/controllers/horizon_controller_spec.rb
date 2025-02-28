@@ -192,6 +192,8 @@ describe HorizonController do
       @course.groups.create!(name: "Group 1")
       @course.groups.create!(name: "Group 2")
       @course.groups.create!(name: "Group 3")
+      @course.learning_outcomes.create!(title: "Outcome 1")
+      @course.collaborations.create!(title: "Collaboration 1")
 
       account_admin_user
       user_session(@admin)
