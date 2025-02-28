@@ -32,6 +32,9 @@ module Types
 
     field :assignment_id, ID, null: false
 
+    field :custom_grade_status_id, ID, null: true
+    field :seconds_late, Integer, null: true
+
     field :grade_matches_current_submission, Boolean, null: true
 
     field :published_score, Float, null: true
@@ -49,6 +52,15 @@ module Types
       return object.assignment.sub_assignment_tag if object.assignment.is_a?(SubAssignment)
 
       nil
+    end
+
+    field :status_tag, Types::SubmissionStatusTagType, null: false
+    def status_tag
+      load_association(:assignment).then do
+        Loaders::AssociationLoader.for(Assignment, :external_tool_tag).load(object.assignment).then do
+          object.status_tag
+        end
+      end
     end
 
     field :excused,

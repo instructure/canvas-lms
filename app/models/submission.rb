@@ -3083,8 +3083,8 @@ class Submission < ActiveRecord::Base
   end
 
   def status_tag
-    return :custom if custom_grade_status_id
     return :excused if excused?
+    return :custom if custom_grade_status_id
     return :late if late?
     return :extended if extended?
     return :missing if missing?
@@ -3153,6 +3153,18 @@ class Submission < ActiveRecord::Base
     else
       calc_body_word_count
     end
+  end
+
+  def effective_checkpoint_submission(sub_assignment_tag)
+    return self unless sub_assignment_tag.present?
+    return self unless assignment.checkpoints_parent?
+
+    sub_assignment = assignment.find_checkpoint(sub_assignment_tag)
+
+    return self if sub_assignment.nil?
+
+    # TODO: see if we should be throwing an error here instead of defaulting to `submission`
+    sub_assignment.all_submissions.find_by(user: user) || self
   end
 
   def aggregate_checkpoint_submissions
