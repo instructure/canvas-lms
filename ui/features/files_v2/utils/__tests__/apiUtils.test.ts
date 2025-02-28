@@ -22,8 +22,13 @@ import {
   generateFolderPostUrl,
   parseLinkHeader,
   generateTableUrl,
+  generateSearchNavigationUrl,
 } from '../apiUtils'
 import {setupFilesEnv} from '../../fixtures/fakeFilesEnv'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  windowPathname: () => '/files/folder/users_1',
+}))
 
 describe('generateFolderByPathUrl', () => {
   describe('when showing all contexts', () => {
@@ -186,5 +191,19 @@ describe('generateTableUrl', () => {
       sortDirection: 'desc',
     })
     expect(url).toBe(`/api/v1/folders/2/all?${QUERY_PARAMS}&sort=name&order=desc`)
+  })
+})
+
+describe('generateSearchNavigationUrl', () => {
+  it('returns correct url when showing all contexts', () => {
+    setupFilesEnv(true)
+    const url = generateSearchNavigationUrl('foo')
+    expect(url).toBe('/folder/users_1/search?search_term=foo')
+  })
+
+  it('returns correct url when showing only course context', () => {
+    setupFilesEnv(false)
+    const url = generateSearchNavigationUrl('foo')
+    expect(url).toBe('/search?search_term=foo')
   })
 })

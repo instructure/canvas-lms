@@ -195,6 +195,7 @@ describe "files index page" do
         file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf", folder:)
         get "/courses/#{@course.id}/files"
         search_input.send_keys(file_attachment.display_name)
+        search_button.click
         expect(table_item_by_name(file_attachment.display_name)).to be_displayed
       end
     end
@@ -261,6 +262,7 @@ describe "files index page" do
 
         table_item_by_name("My Files").click
         search_input.send_keys(file_attachment.display_name)
+        search_button.click
         expect(table_item_by_name(file_attachment.display_name)).to be_displayed
       end
     end

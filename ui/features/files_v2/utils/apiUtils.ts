@@ -17,6 +17,7 @@
  */
 
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
+import {windowPathname} from '@canvas/util/globalUtils'
 
 const SEARCH_AND_ALL_QUERY_PARAMS =
   'include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
@@ -72,6 +73,14 @@ export const generateTableUrl = ({
     : generateFetchAllUrl(folderId)
   const sortedUrl = `${baseUrl}&sort=${sortBy}&order=${sortDirection}`
   return pageQueryParam ? `${sortedUrl}&page=${pageQueryParam}` : sortedUrl
+}
+
+export const generateSearchNavigationUrl = (searchValue: string) => {
+  const path = windowPathname()
+  const pluralContext = path.split('/')[3]
+  return filesEnv.showingAllContexts
+    ? `/folder/${pluralContext}/search?search_term=${searchValue}`
+    : `/search?search_term=${searchValue}`
 }
 
 export const parseLinkHeader = (header: string | null) => {
