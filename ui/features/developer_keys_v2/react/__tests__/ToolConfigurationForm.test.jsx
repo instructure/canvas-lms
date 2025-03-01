@@ -144,8 +144,8 @@ describe('ToolConfigurationForm', () => {
     it('renders a visible manual configuration', () => {
       renderToolConfigurationForm({configurationMethod: 'manual'})
 
-      const elem1 = screen.queryByText('* Target Link URI')
-      const elem2 = screen.queryByText('* OpenID Connect Initiation Url')
+      const elem1 = screen.queryByText('Target Link URI')
+      const elem2 = screen.queryByText('OpenID Connect Initiation Url')
 
       expect(elem1).toBeVisible()
       expect(elem2).toBeVisible()
