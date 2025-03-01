@@ -671,9 +671,12 @@ const ItemAssignToTrayContent = ({
 
       const studentAssignees = selectedAssigneeIds.filter(assignee => assignee.includes('student'))
       const sectionAssignees = selectedAssigneeIds.filter(assignee => assignee.includes('section'))
+      const differentiationTagAssignees = selectedAssigneeIds.filter(assignee => assignee.includes('tag'))
+
       // this is useful in the page edit page for checking if a module override has been changed
       const hasInitialAssignees =
         sectionAssignees?.includes(initialCard?.defaultOptions?.[0] ?? '') ||
+        differentiationTagAssignees?.includes(initialCard?.defaultOptions?.[0] ?? '') ||
         JSON.stringify(studentAssignees) === JSON.stringify(initialCard?.defaultOptions)
 
       const cards = assignToCardsRef.current.map(card =>

@@ -190,12 +190,26 @@ const createSectionOverride = (
   }
 }
 
+// This method determines whether an override should be created for a group
+// If the group is not a default group override, then an override should be made
+// If the group is a default group override, then an override should be made if the card now contains dates
+//   - This means that the the context module override will be overridden by the assignment override
+//   - Context module overrides cannot contain dates
+const shouldCreateGroupOverride = (card: ItemAssignToCardSpec, group: string): boolean => {
+  const isDefaultGroupOverride = card.defaultOptions?.[0]?.includes(group)
+  const cardHasADate = Boolean(card.due_at || card.unlock_at || card.lock_at || card.reply_to_topic_due_at || card.required_replies_due_at)
+
+  return (!isDefaultGroupOverride || cardHasADate)
+}
+
 const generateGroupOverrides = (card: ItemAssignToCardSpec, isUpdatedModuleOverride: boolean, isDifferentiationTag = false) => {
   const overrides: DateDetailsOverride[] = []
   const groupType = isDifferentiationTag ? 'tag' : 'group'
   const groupAssignees = getAssigneesByType(card.selectedAssigneeIds, groupType)
   groupAssignees.map(group => {
-    overrides.push(createGroupOverride(card, group, isUpdatedModuleOverride))
+    if (shouldCreateGroupOverride(card, group)) {
+      overrides.push(createGroupOverride(card, group, isUpdatedModuleOverride))
+    }
   })
   return overrides
 }
