@@ -250,6 +250,7 @@ export const processModuleOverrides = (overrides, initialModuleOverrides) => {
       const hasChanges = !(
         !hasDates &&
         currentAttributes.course_section_id == previousAttributes.course_section_id &&
+        currentAttributes.group_id == previousAttributes.group_id &&
         JSON.stringify(currentAttributes.student_ids) ==
           JSON.stringify(previousAttributes.student_ids)
       )
