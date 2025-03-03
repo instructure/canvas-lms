@@ -244,6 +244,7 @@ module ActiveRecord
       end
 
       it "writes to the correct partition" do
+        Auditors::ActiveRecord::Partitioner.process
         user = user_with_pseudonym(active_user: true)
         pseud = @pseudonym
         attrs_1 = {
