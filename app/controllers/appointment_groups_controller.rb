@@ -361,7 +361,7 @@ class AppointmentGroupsController < ApplicationController
     end
 
     if contexts.any?(&:horizon_course?)
-      return render json: { error: t("cannot create an appointment group for a horizon course") },
+      return render json: { error: t("cannot create an appointment group for a Canvas Career course") },
                     status: :bad_request
     end
 

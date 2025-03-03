@@ -26,7 +26,7 @@ module HorizonValidators
 
       invalid_types = record.submission_types_array - AbstractAssignment::HORIZON_SUBMISSION_TYPES
       unless invalid_types.empty?
-        record.errors.add(:submission_types, "Invalid submission types for Horizon course: #{invalid_types}")
+        record.errors.add(:submission_types, "Invalid submission types for Canvas Career course: #{invalid_types}")
       end
 
       if record.has_peer_reviews? || record.peer_reviews_assigned
