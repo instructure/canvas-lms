@@ -123,11 +123,14 @@ const AddEditPseudonym = ({
   onClose,
   onSubmit,
 }: AddEditPseudonymProps) => {
+  const accSelOpts = accountSelectOptions ?? [{label: '', value: undefined}]
+  // @ts-expect-error
+  if (accSelOpts.length === 0) accSelOpts[0] = {label: '', value: undefined}
   const defaultValues = {
     unique_id: pseudonym?.unique_id ?? '',
     sis_user_id: pseudonym?.sis_user_id ?? '',
     integration_id: pseudonym?.integration_id ?? '',
-    account_id: pseudonym?.account_id ?? accountSelectOptions[0].value,
+    account_id: pseudonym?.account_id ?? accSelOpts[0].value,
     password: isEdit ? undefined : '',
     password_confirmation: isEdit ? undefined : '',
   }
