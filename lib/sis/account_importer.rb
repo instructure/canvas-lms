@@ -115,7 +115,7 @@ module SIS
 
           @success_count += 1
         else
-          raise ImportError, account.errors.first.last
+          raise ImportError, account.errors.first.message
         end
       end
     end

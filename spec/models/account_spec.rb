@@ -2531,7 +2531,7 @@ describe Account do
       c = a2.courses.create!(template: true)
       a.course_template = c
       expect(a).not_to be_valid
-      expect(a.errors.to_h.keys).to eq [:course_template_id]
+      expect(a.errors.attribute_names).to eq [:course_template_id]
     end
 
     it "requires the course template to actually be a template" do
@@ -2539,7 +2539,7 @@ describe Account do
       c = a.courses.create!
       a.course_template = c
       expect(a).not_to be_valid
-      expect(a.errors.to_h.keys).to eq [:course_template_id]
+      expect(a.errors.attribute_names).to eq [:course_template_id]
     end
 
     it "allows a valid course template" do

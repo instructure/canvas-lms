@@ -38,7 +38,7 @@ RSpec.describe DeveloperKeyAccountBinding do
     it "requires an account" do
       dev_key_binding.account = nil
       dev_key_binding.validate
-      expect(dev_key_binding.errors.keys).to match_array(
+      expect(dev_key_binding.errors.attribute_names).to match_array(
         [:account]
       )
     end
@@ -46,7 +46,7 @@ RSpec.describe DeveloperKeyAccountBinding do
     it "requires a developer key" do
       dev_key_binding.developer_key = nil
       dev_key_binding.validate
-      expect(dev_key_binding.errors.keys).to match_array(
+      expect(dev_key_binding.errors.attribute_names).to match_array(
         [:developer_key]
       )
     end

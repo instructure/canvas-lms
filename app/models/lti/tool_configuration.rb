@@ -181,7 +181,7 @@ module Lti
       end
 
       schema_errors = Schemas::InternalLtiConfiguration.simple_validation_errors(internal_lti_configuration.compact)
-      errors.add(:configuration, schema_errors) if schema_errors.present?
+      schema_errors&.each { |err| errors.add(:configuration, err) }
 
       false if errors[:configuration].present?
     end

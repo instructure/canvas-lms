@@ -72,7 +72,7 @@ describe AuthenticationProvider::SAML do
       ap = Account.default.authentication_providers.new(auth_type: "saml")
       ap.log_out_url = "https:// your.adfserverurl.com /adfs/ls/"
       expect(ap).not_to be_valid
-      expect(ap.errors.keys).to eq [:log_out_url]
+      expect(ap.errors.attribute_names).to eq [:log_out_url]
     end
   end
 
@@ -81,7 +81,8 @@ describe AuthenticationProvider::SAML do
       saml = Account.default.authentication_providers.new(auth_type: "saml",
                                                           metadata_uri: AuthenticationProvider::SAML::InCommon::URN)
       expect(saml).not_to be_valid
-      expect(saml.errors.first.first).to eq :idp_entity_id
+      expect(saml.errors.attribute_names).to eq [:idp_entity_id]
+      expect(saml.errors.full_messages).to eq ["IdP Entity ID can't be blank"]
     end
 
     it "changes InCommon URI to the URN for it" do

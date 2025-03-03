@@ -23,7 +23,7 @@ module Lti
     describe "validations" do
       it "requires a resource_handler" do
         subject.save
-        expect(subject.errors.first).to eq [:message_handler, "can't be blank"]
+        expect(subject.errors[:message_handler].first).to eq "can't be blank"
       end
 
       it "accepts types in PLACEMENT_LOOKUP" do

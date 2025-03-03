@@ -2053,9 +2053,7 @@ class ApplicationController < ActionController::Base
   def api_error_json(exception, status_code)
     case exception
     when ActiveRecord::RecordInvalid
-      errors = exception.record.errors
-      errors.set_reporter(:hash, Api::Errors::Reporter)
-      data = errors.to_hash
+      data = Api::Errors::Reporter.to_hash(exception.record.errors)
     when ActiveRecord::RecordNotFound
       data = { errors: [{ message: "The specified resource does not exist." }] }
     when AuthenticationMethods::RevokedAccessTokenError

@@ -294,7 +294,7 @@ describe DiscussionTopic do
   it "requires a valid discussion_type" do
     @topic = @course.discussion_topics.build(message: "test", discussion_type: "gesundheit")
     expect(@topic.save).to be false
-    expect(@topic.errors.detect { |e| e.first.to_s == "discussion_type" }).to be_present
+    expect(@topic.errors.attribute_names).to eq [:discussion_type]
   end
 
   it "updates the assignment it is associated with" do

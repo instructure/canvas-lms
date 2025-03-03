@@ -41,7 +41,7 @@ class MediaTrack < ActiveRecord::Base
   RE_LOOKS_LIKE_TTML = /<tt\s+xml/i
   validates :content, format: {
     without: RE_LOOKS_LIKE_TTML,
-    message: -> { t("TTML tracks are not allowed because they are susceptible to xss attacks") }
+    message: ->(_object, _data) { t("TTML tracks are not allowed because they are susceptible to xss attacks") }
   }
 
   # MasterCourses::CollectionRestrictor handles soft-deletes, but doesn't handle

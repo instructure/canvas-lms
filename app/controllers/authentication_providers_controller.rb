@@ -888,7 +888,7 @@ class AuthenticationProvidersController < ApplicationController
         account_authorization_config_id: config.id,
         ldap_connection_test: config.test_ldap_connection
       }
-      results << h.merge({ errors: config.errors.map { |attr, err| { attr => err.message } } })
+      results << h.merge({ errors: config.errors.map { |err| { err.attribute => err.message } } })
     end
     render json: results
   end
@@ -900,7 +900,7 @@ class AuthenticationProvidersController < ApplicationController
         account_authorization_config_id: config.id,
         ldap_bind_test: config.test_ldap_bind
       }
-      results << h.merge({ errors: config.errors.map { |attr, err| { attr => err.message } } })
+      results << h.merge({ errors: config.errors.map { |err| { err.attribute => err.message } } })
     end
     render json: results
   end

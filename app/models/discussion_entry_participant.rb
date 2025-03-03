@@ -30,7 +30,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   validate :prevent_creates
 
   validates :report_type, inclusion: { in: %w[inappropriate offensive other],
-                                       message: -> { t("%{value} is not valid") } }
+                                       message: ->(_object, _data) { t("%{value} is not valid") } }
 
   def prevent_creates
     if new_record?
