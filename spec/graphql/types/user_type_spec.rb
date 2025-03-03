@@ -339,7 +339,7 @@ describe Types::UserType do
       expect(user_type.resolve("enrollments { _id }", current_user: @student)).to eq [@student.enrollments.where(course_id: @course2).first.to_param]
     end
 
-    it "return only horizon courses if inlcuded" do
+    it "return only horizon courses if included" do
       course3 = course_factory
       course3.update!(horizon_course: true)
 
@@ -640,6 +640,21 @@ describe Types::UserType do
       )
       expect(result.count).to eq 1
       expect(result[0][0]).to eq "Hey Im using SimpleTags tagged_scope_handler."
+    end
+
+    it "returns the conversations without conversation participants" do
+      conversation(@student, @teacher, { body: "Hello, Mr White" })
+      conversation_participant = conversation(@student, @teacher, { body: "Hello??" })
+
+      # Delete the conversation but leave the conversation_participants orphaned
+      conversation_participant.conversation.conversation_messages.destroy_all
+      conversation_participant.conversation.delete
+
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      result = type.resolve(
+        "conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
+      )
+      expect(result.count).to eq 1
     end
 
     it "scopes the conversations" do
