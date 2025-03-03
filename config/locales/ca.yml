@@ -26767,11 +26767,11 @@ ca:
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
       En aquest informe es mostra tota l’activitat dels usuaris inscrits en una assignatura determinat o
         totes les assignatures d’un període acadèmic determinat. Al fitxer CSV resultant hi haurà una fila per activitat
-        d’estudiant i s’inclouran les capçaleres següents: enrollment_type, id de secció,
-        id del sis de secció, nom de secció, id d'assignatura, id del sis d'assignatura, nom d'assignatura, id d’usuari,
-        id del sis d’usuari, tipus de contingut, contingut, nombre de vegades que s’ha vist, nombre de vegades que s’hi ha participat, última
-        visualització. Les columnes nombre de vegades que s’ha vist i nombre de vegades que s’hi ha participat són comptadors des del
-        començament del període fins al moment en què s’ha generat l’informe.
+        d’estudiant i s’inclouran les capçaleres següents: enrollment_type, id de secció, id del sis de secció,
+        nom de secció, id d'assignatura, id del sis d'assignatura, nom d'assignatura, id d’usuari, id del sis d’usuari,
+        tipus de contingut, contingut, nombre de vegades que s’ha vist, nombre de vegades que s’hi ha participat, última
+        visualització. Les columnes nombre de vegades que s’ha vist i nombre de vegades que s’hi ha participat són comptadors
+        des del començament del període fins al moment en què s’ha generat l’informe.
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       En aquest informe es mostra tota l’activitat dels usuaris inscrits en tots els cursos en un període acadèmic determinat.
         Al fitxer CSV resultant hi haurà una fila per activitat d’estudiant i s’inclouran les capçaleres següents: 
