@@ -25,16 +25,21 @@ import {Spinner} from '@instructure/ui-spinner'
 import {DiscussionSummaryRatings} from './DiscussionSummaryRatings'
 import {DiscussionSummaryGenerateButton} from './DiscussionSummaryGenerateButton'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconEndLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
+
+interface DiscussionSummary {
+  id: number;
+  text: string;
+  userInput?: string;
+}
 
 export interface DiscussionSummaryProps {
   onDisableSummaryClick: () => void
   isMobile: boolean
   summary: {id: number; text: string} | null
-  onSetSummary: Dispatch<SetStateAction<{id: number; text: string} | null>>
+  onSetSummary: Dispatch<SetStateAction<DiscussionSummary | null | undefined>>
   isFeedbackLoading: boolean
   onSetIsFeedbackLoading: (isFeedbackLoading: boolean) => void
   liked: boolean
@@ -44,12 +49,18 @@ export interface DiscussionSummaryProps {
   postDiscussionSummaryFeedback: (action: string) => Promise<void>
 }
 
+interface DiscussionSummaryError {
+  error: string,
+  status: number | undefined,
+}
+
 const I18n = createI18nScope('discussion_posts')
 
 export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   const [previousUserInput, setPreviousUserInput] = useState('')
   const [userInput, setUserInput] = useState('')
-  const [summaryError, setSummaryError] = useState<string | null>(null)
+  const [isInitialGeneration, setIsInitialGeneration] = useState<boolean>(true)
+  const [summaryError, setSummaryError] = useState<DiscussionSummaryError | null>(null)
   const [isSummaryLoading, setIsSummaryLoading] = useState(props.summary === null)
 
   // @ts-expect-error
@@ -69,24 +80,35 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
     props.onSetDisliked(false)
   }
 
-  const generateSummary = async () => {
+  const generateSummary = () => {
+    setIsInitialGeneration(false)
     setIsSummaryLoading(true)
   }
 
-  const getDiscussionSummary = useCallback(async () => {
-    const {json} = await doFetchApi({
-      method: 'GET',
-      path: `${apiUrlPrefix}/summaries`,
-      params: {userInput},
-    })
-    return json
+  const getDiscussionSummary = useCallback(async (initial: boolean): Promise<DiscussionSummary | undefined>  => {
+    const path = `${apiUrlPrefix}/summaries`
+    const params = {
+      method: initial ? "GET" : "POST",
+      path,
+      ...(initial ? {} : { params: { userInput } }),
+    };
+
+    const { json } = await doFetchApi<DiscussionSummary>(params);
+    return json;
   }, [isSummaryLoading]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const fetchSummary = useCallback(async () => {
+  const fetchSummary = useCallback(async (initial: boolean) => {
     try {
-      // @ts-expect-error
-      props.onSetSummary(await getDiscussionSummary())
-      setPreviousUserInput(userInput)
+      const result: DiscussionSummary | undefined = await getDiscussionSummary(initial)
+      props.onSetSummary(result)
+      if(result?.userInput) {
+        setUserInput(result.userInput)
+        setPreviousUserInput(result.userInput)
+      } else {
+        setPreviousUserInput(userInput)
+      }
+
+
     } catch (error: any) {
       let errorMessage = 'An unexpected error occurred while loading the discussion summary.'
 
@@ -95,7 +117,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
         errorMessage = response?.error || errorMessage
       } catch {} // eslint-disable-line no-empty
 
-      setSummaryError(errorMessage)
+      setSummaryError({error: errorMessage, status: error.response?.status})
       setPreviousUserInput('')
     }
 
@@ -108,7 +130,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
     }
 
     resetState()
-    fetchSummary()
+    fetchSummary(isInitialGeneration)
   }, [isSummaryLoading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -122,10 +144,11 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   let content = null
 
   if (summaryError) {
-    content = (
+    content = summaryError.status === 404 ?
+      <></> : (
       <Flex.Item margin={props.isMobile ? '0 0 medium 0' : '0 0 small 0'}>
         <Text color="danger" data-testid="summary-error">
-          {summaryError}
+          {summaryError.error}
         </Text>
       </Flex.Item>
     )
@@ -197,7 +220,8 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
           <TextInput
             renderLabel={I18n.t('Topics to focus on')}
             placeholder={I18n.t('Enter the areas or topics you want the summary to focus on')}
-            onChange={(event, value) => {
+            value={userInput}
+            onChange={(_, value) => {
               setUserInput(value)
             }}
             maxLength={255}
@@ -207,16 +231,18 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
         <Flex.Item width={props.isMobile ? '100%' : 'auto'}>
           <DiscussionSummaryGenerateButton
             onClick={generateSummary}
-            isEnabled={!isSummaryLoading && !props.isFeedbackLoading && userInput !== previousUserInput}
+            isEnabled={!isSummaryLoading && !props.isFeedbackLoading && (userInput !== previousUserInput || isInitialGeneration)}
             isMobile={props.isMobile}
           />
         </Flex.Item>
       </Flex>
-      <Flex.Item margin="0 0 x-small 0">
-        <Text size="small" weight="normal" color="secondary">
-          {I18n.t('Generated Summary')}
-        </Text>
-      </Flex.Item>
+      {!summaryError && (
+        <Flex.Item margin="0 0 x-small 0">
+          <Text size="small" weight="normal" color="secondary">
+            {I18n.t('Generated Summary')}
+          </Text>
+        </Flex.Item>
+      )}
       {content}
     </Flex>
   )
