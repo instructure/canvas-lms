@@ -43,28 +43,32 @@ describe "assignments" do
     end
 
     it "validates points for percentage grading (!= '')", priority: "2" do
-      points_validation(@assignment) do
+      error_message = "Points value must be 0 or greater"
+      points_validation(@assignment, error_message) do
         AssignmentCreateEditPage.select_grading_type "Percentage"
         AssignmentCreateEditPage.enter_points_possible ""
       end
     end
 
     it "validates points for percentage grading (digits only)", priority: "2" do
-      points_validation(@assignment) do
+      error_message = "Points value must be a number"
+      points_validation(@assignment, error_message) do
         AssignmentCreateEditPage.select_grading_type "Percentage"
         AssignmentCreateEditPage.enter_points_possible "taco"
       end
     end
 
     it "validates points for letter grading (!= '')", priority: "2" do
-      points_validation(@assignment) do
+      error_message = "Points value must be 0 or greater"
+      points_validation(@assignment, error_message) do
         AssignmentCreateEditPage.select_grading_type "Letter Grade"
         AssignmentCreateEditPage.enter_points_possible ""
       end
     end
 
     it "validates points for letter grading (digits only)", priority: "2" do
-      points_validation(@assignment) do
+      error_message = "Points value must be a number"
+      points_validation(@assignment, error_message) do
         AssignmentCreateEditPage.select_grading_type "Letter Grade"
         AssignmentCreateEditPage.enter_points_possible "taco"
       end
@@ -103,14 +107,16 @@ describe "assignments" do
     end
 
     it "validates points for GPA scale grading (!= '')", priority: "2" do
-      points_validation(@assignment) do
+      error_message = "Points value must be 0 or greater"
+      points_validation(@assignment, error_message) do
         AssignmentCreateEditPage.select_grading_type "GPA Scale"
         AssignmentCreateEditPage.enter_points_possible ""
       end
     end
 
     it "validates points for GPA scale grading (digits only)", priority: "2" do
-      points_validation(@assignment) do
+      error_message = "Points value must be a number"
+      points_validation(@assignment, error_message) do
         AssignmentCreateEditPage.select_grading_type "GPA Scale"
         AssignmentCreateEditPage.enter_points_possible "taco"
       end
@@ -130,12 +136,11 @@ describe "assignments" do
     end
   end
 
-  def points_validation(assignment)
+  def points_validation(assignment, error_message)
     AssignmentCreateEditPage.visit_assignment_edit_page @course.id, assignment.id
     yield if block_given?
     AssignmentCreateEditPage.assignment_save_button.click
     wait_for_ajaximations
-    expect(f(".errorBox:not(#error_box_template)"))
-      .to include_text("Points possible must be 0 or more for selected grading type")
+    expect(f("#points_possible_errors")).to include_text(error_message)
   end
 end

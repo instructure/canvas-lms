@@ -23,13 +23,13 @@
           placeholder="{{#t "assignment_name"}}Assignment Name{{/t}}"
           value="{{name}}"
           type="text"
-          maxlength="254"
           class="input-block-level"
           {{#if inClosedGradingPeriod}}
             readonly
           {{/if}}
           {{disabledIfIncludes frozenAttributes "title"}}
           autofocus></input>
+          <div id="name_errors" aria-live="assertive"></div>
       </div>
     {{/if}}
   </div>
@@ -65,10 +65,10 @@
       </label>
     </div>
 
-    <div class="form-column-right" style="display: inline-flex">
+    <div class="form-column-right" style="display:inline-flex;flex-direction:column">
       <input id="assignment_points_possible"
         name="points_possible"
-        style="width: 100%;"
+        style="width: 95%;"
         value="{{n pointsPossible}}"
         type="text"
         {{#ifAny inClosedGradingPeriod lockedItems.points cannotEditGrades}}
@@ -76,6 +76,7 @@
         {{/ifAny}}
         {{disabledIfIncludes frozenAttributes "points_possible"}}
       ></input>
+      <div id="points_possible_errors"></div>
       {{#unless lockedItems.points}}
         <div aria-live="polite" role="alert">
           <div id=point_change_warning class="alert">

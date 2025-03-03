@@ -63,6 +63,8 @@ import {createRoot} from 'react-dom/client'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
+import YAML from 'yaml'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 
 const I18n = createI18nScope('assignment_editview')
 
@@ -127,8 +129,11 @@ const LTI_EXT_MASTERY_CONNECT = 'https://canvas.instructure.com/lti/mastery_conn
 
 const DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE = 'context_external_tool'
 
+const ASSIGNMENT_NAME_INPUT_NAME = 'name'
+const POINTS_POSSIBLE_INPUT_NAME = 'points_possible'
 const EXTERNAL_TOOL_URL_INPUT_NAME = 'external_tool_tag_attributes[url]'
 const ACTIVITY_ASSET_PROCESSOR_CONTAINER = '#activity_asset_processor_container'
+const ALLOWED_EXTENSIONS_INPUT_NAME = 'allowed_extensions'
 
 /*
 xsslint safeString.identifier srOnly
@@ -146,7 +151,6 @@ function EditView() {
   this.handleModeratedGradingChanged = this.handleModeratedGradingChanged.bind(this)
   this._validateAllowedAttempts = this._validateAllowedAttempts.bind(this)
   this._validateExternalTool = this._validateExternalTool.bind(this)
-  this._validatePointsRequired = this._validatePointsRequired.bind(this)
   this._validatePointsPossible = this._validatePointsPossible.bind(this)
   this._validateAllowedExtensions = this._validateAllowedExtensions.bind(this)
   this._validateSubmissionTypes = this._validateSubmissionTypes.bind(this)
@@ -298,6 +302,9 @@ EditView.prototype.events = {
     events['change ' + ANONYMOUS_GRADING_BOX] = 'handleAnonymousGradingChange'
     events['change ' + HIDE_ZERO_POINT_QUIZZES_BOX] = 'handleHideZeroPointQuizChange'
     events['input ' + `[name="${EXTERNAL_TOOL_URL_INPUT_NAME}"]`] = 'clearErrorsOnInput'
+    events['input ' + `[name="${ASSIGNMENT_NAME_INPUT_NAME}"]`] = 'validateInput'
+    events['input ' + `[name="${ALLOWED_EXTENSIONS_INPUT_NAME}"]`] = 'validateInput'
+    events['input ' + `[name="${POINTS_POSSIBLE_INPUT_NAME}"]`] = 'validateInput'
     if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
       events.change = 'onChange'
     }
@@ -1372,7 +1379,9 @@ EditView.prototype.getFormData = function () {
   if (this.shouldPublish) {
     data.published = true
   }
-  data.points_possible = round(numberHelper.parse(data.points_possible), 2)
+  if (data.points_possible) {
+    data.points_possible = round(numberHelper.parse(data.points_possible), 2)
+  }
   if (data.peer_review_count) {
     data.peer_review_count = numberHelper.parse(data.peer_review_count)
   }
@@ -1547,18 +1556,15 @@ EditView.prototype.showErrors = function (errors) {
     const errorsContainerID = `${key}_errors`
     const errorsContainer = document.getElementById(errorsContainerID)
     if (errorsContainer) {
-      const root = this.errorRoots[key] ?? createRoot(errorsContainer)
+      const root = this.errorRoots[errorsContainerID] ?? createRoot(errorsContainer)
       const noMargin = ['allowed_attempts', 'final_grader_id', 'grader_count'].includes(key)
-      const marginTop = [EXTERNAL_TOOL_URL_INPUT_NAME].includes(key)
+      const marginTop = [EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME].includes(key)
       root.render(
-        <Flex as="div" alignItems="center" margin={noMargin ? '0' : marginTop ? 'xx-small 0 0 0' : '0 0 0 medium'}>
-          <Flex as="div" margin={value[0].longMessage ? '0 xx-small medium 0' : '0 xx-small xxx-small 0'}>
-            <IconWarningSolid color="error" />
-          </Flex>
-          <Text size="small" color="danger">
-            {value[0].message}
-          </Text>
-        </Flex>
+        <FormattedErrorMessage
+          message={value[0].message}
+          margin={noMargin ? '0' : marginTop ? 'xx-small 0 0 0' : '0 0 0 medium'}
+          iconMargin={value[0].longMessage ? '0 xx-small medium 0' : '0 xx-small xxx-small 0'}
+        />
       )
       this.errorRoots[errorsContainerID] = root
       delete errors[key]
@@ -1566,8 +1572,9 @@ EditView.prototype.showErrors = function (errors) {
       if (element) {
         element.setAttribute("aria-describedby", errorsContainerID)
 
-        if ([EXTERNAL_TOOL_URL_INPUT_NAME].includes(key)) {
-          this.getElement('assignment_external_tool_tag_attributes_url_container')?.classList.add('error-outline')
+        if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME].includes(key)) {
+          const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
+          this.getElement(selector)?.classList.add('error-outline')
         }
 
         if (shouldFocus) {
@@ -1629,12 +1636,16 @@ EditView.prototype.clearErrorsOnInput = function (event) {
 }
 
 EditView.prototype.hideErrors = function (containerId) {
-  this.errorRoots[containerId]?.unmount()
-  delete this.errorRoots[containerId]
+  if (containerId) {
+    this.errorRoots[containerId]?.unmount()
+    delete this.errorRoots[containerId]
 
-  if (containerId === `${EXTERNAL_TOOL_URL_INPUT_NAME}_errors`) {
-    const element = this.getElement('assignment_external_tool_tag_attributes_url_container')
-    element?.classList.remove('error-outline')
+    const key = containerId.replace(/_errors$/, '')
+    if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME].includes(key)) {
+      const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
+      const element = this.getElement(selector)
+      element?.classList.remove('error-outline')
+    }
   }
 }
 
@@ -1653,7 +1664,6 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
     errors = this.groupCategorySelector.validateBeforeSave(data, errors)
   }
   errors = this._validatePointsPossible(data, errors)
-  errors = this._validatePointsRequired(data, errors)
   errors = this._validateExternalTool(data, errors)
   errors = this._validateAllowedAttempts(data, errors)
   const data2 = {
@@ -1704,13 +1714,41 @@ EditView.prototype.validateGraderCount = function (data) {
   return errors
 }
 
+EditView.prototype.validateInput = function (e) {
+  const inputValue = e.target.value
+  if (inputValue) {
+    const data = this.getFormData()
+    let errors = {}
+    switch (e.target.name) {
+      case ASSIGNMENT_NAME_INPUT_NAME:
+        errors = this._validateTitle(data, {})
+        break
+      case ALLOWED_EXTENSIONS_INPUT_NAME:
+        errors = this._validateAllowedExtensions(data, {})
+        break
+      case POINTS_POSSIBLE_INPUT_NAME:
+        errors = this._validatePointsPossible(data, {})
+        break
+      default:
+        break
+    }
+    if (Object.keys(errors).length > 0) {
+      this.showErrors(errors)
+    } else {
+      this.hideErrors(`${e.target.name}_errors`)
+    }
+  } else {
+    this.hideErrors(`${e.target.name}_errors`)
+  }
+}
+
 EditView.prototype._validateTitle = function (data, errors) {
   let max_name_length
   if (includes(this.model.frozenAttributes(), 'title')) {
     return errors
   }
   const post_to_sis = data.post_to_sis === '1'
-  max_name_length = 256
+  max_name_length = 255
   if (
     post_to_sis &&
     ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT &&
@@ -1727,13 +1765,13 @@ EditView.prototype._validateTitle = function (data, errors) {
   if (!data.name || $.trim(data.name.toString()).length === 0) {
     errors.name = [
       {
-        message: I18n.t('name_is_required', 'Name is required!'),
+        message: I18n.t('name_is_required', 'Name is required'),
       },
     ]
-  } else if (validationHelper.nameTooLong()) {
+  } else if ((post_to_sis && validationHelper.nameTooLong()) || (!post_to_sis && data.name.length > max_name_length)) {
     errors.name = [
       {
-        message: I18n.t('Name is too long, must be under %{length} characters', {
+        message: I18n.t('Must be fewer than %{length} characters', {
           length: max_name_length + 1,
         }),
       },
@@ -1798,14 +1836,17 @@ EditView.prototype._validateSubmissionTypes = function (data, errors) {
 }
 
 EditView.prototype._validateAllowedExtensions = function (data, errors) {
-  if (
-    data.allowed_extensions &&
-    includes(data.submission_types, 'online_upload') &&
-    data.allowed_extensions.length === 0
-  ) {
+  const shouldValidate = data.allowed_extensions && includes(data.submission_types, 'online_upload')
+  if (shouldValidate && data.allowed_extensions.length === 0) {
     errors.allowed_extensions = [
       {
         message: I18n.t('at_least_one_file_type', 'Please specify at least one allowed file type'),
+      },
+    ]
+  } else if (shouldValidate && YAML.stringify(data.allowed_extensions)?.length > 255) {
+    errors.allowed_extensions = [
+      {
+        message: I18n.t('allowed_extensions_max', 'Must be fewer than 256 characters'),
       },
     ]
   }
@@ -1813,37 +1854,29 @@ EditView.prototype._validateAllowedExtensions = function (data, errors) {
 }
 
 EditView.prototype._validatePointsPossible = function (data, errors) {
-  if (includes(this.model.frozenAttributes(), 'points_possible')) {
+  if (includes(this.model.frozenAttributes(), 'points_possible') || this.lockedItems.points || data.grading_type === 'not_graded') {
     return errors
   }
   if (this.lockedItems.points) {
     return errors
   }
 
-  if (typeof data.points_possible !== 'number' || isNaN(data.points_possible)) {
+  if ([undefined, '', null].includes(data.points_possible) || data.points_possible < 0) {
     errors.points_possible = [
       {
-        message: I18n.t('points_possible_number', 'Points possible must be a number'),
+        message: I18n.t('points_possible_positive', 'Points value must be 0 or greater')
       },
     ]
-  }
-  return errors
-}
-
-// Require points possible > 0
-// if grading type === percent || letter_grade || gpa_scale
-EditView.prototype._validatePointsRequired = function (data, errors) {
-  if (!['percent', 'letter_grade', 'gpa_scale'].includes(data.grading_type)) {
-    return errors
-  }
-  if (
-    typeof data.points_possible !== 'number' ||
-    data.points_possible < 0 ||
-    isNaN(data.points_possible)
-  ) {
+  } else if (typeof data.points_possible !== 'number' || isNaN(data.points_possible)) {
     errors.points_possible = [
       {
-        message: I18n.t('Points possible must be 0 or more for selected grading type'),
+        message: I18n.t('points_possible_number', 'Points value must be a number'),
+      },
+    ]
+  } else if (data.points_possible > 999999999) {
+    errors.points_possible = [
+      {
+        message: I18n.t('points_possible_max', 'Points value must be 999999999 or less')
       },
     ]
   }

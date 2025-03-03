@@ -820,6 +820,69 @@ describe "assignments" do
       end
     end
 
+    it "validates the assignment name" do
+      get "/courses/#{@course.id}/assignments/new"
+      wait_for_ajaximations
+
+      submit_assignment_form
+      # validate assignment name is not empty
+      expect(f("#name_errors")).to include_text("Name is required")
+
+      f("#assignment_name").send_keys("a" * 256)
+      submit_assignment_form
+      # validate assignment name is not too long
+      expect(f("#name_errors")).to include_text("Must be fewer than 256 characters")
+    end
+
+    it "validates the points possible" do
+      get "/courses/#{@course.id}/assignments/new"
+      wait_for_ajaximations
+      f("#assignment_name").send_keys("test points possible")
+
+      # clear the default value (0)
+      negative_input = "-1"
+      f("#assignment_points_possible").send_keys(:backspace)
+      f("#assignment_points_possible").send_keys(negative_input)
+      submit_assignment_form
+      # validate points possible is not negative
+      expect(f("#points_possible_errors")).to include_text("Points value must be 0 or greater")
+
+      # clear the last value
+      negative_input.each_char { f("#assignment_points_possible").send_keys(:backspace) }
+      f("#assignment_points_possible").send_keys("a")
+      submit_assignment_form
+      # validate points possible is a number
+      expect(f("#points_possible_errors")).to include_text("Points value must be a number")
+
+      # clear the last value
+      f("#assignment_points_possible").send_keys(:backspace)
+      f("#assignment_points_possible").send_keys(1_000_000_000)
+      submit_assignment_form
+      # validate points possible max
+      expect(f("#points_possible_errors")).to include_text("Points value must be 999999999 or less")
+    end
+
+    it "validates allowed extensions" do
+      assignment = @course.assignments.create!(
+        name: "Test allowed extensions",
+        submission_types: "online_upload",
+        assignment_group: @course.assignment_groups.first
+      )
+
+      get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+      wait_for_ajaximations
+
+      f("#assignment_restrict_file_extensions").click
+      submit_assignment_form
+      # validate there is at least one file type
+      expect(f("#allowed_extensions_errors")).to include_text("Please specify at least one allowed file type")
+
+      f("#assignment_allowed_extensions").send_keys("a" * 256)
+      submit_assignment_form
+      # validate allowed extensions max
+      expect(f("#allowed_extensions_errors")).to include_text("Must be fewer than 256 characters")
+    end
+
     it "validates that a group category is selected", priority: "1" do
       assignment_name = "first test assignment"
       @assignment = @course.assignments.create({
