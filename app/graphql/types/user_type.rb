@@ -266,7 +266,7 @@ module Types
         if is_student
           conversations_scope = conversations_scope.reject do |cs|
             c = cs.conversation
-            c.context.is_a?(Course) && c.context.horizon_course?
+            c&.context.is_a?(Course) && c.context.horizon_course?
           end
         end
         conversations_scope
