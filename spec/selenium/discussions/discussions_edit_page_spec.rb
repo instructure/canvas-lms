@@ -314,7 +314,7 @@ describe "discussions" do
             @gc.destroy
             get url
             wait_for_ajaximations
-            expect(f("#assignment_group_category_id")).not_to be_displayed
+            expect(f("#create_group_category_id")).to be_displayed
           end
 
           context "graded" do

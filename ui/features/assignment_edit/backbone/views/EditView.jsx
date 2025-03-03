@@ -36,7 +36,7 @@ import File from '@canvas/files/backbone/models/File'
 import TurnitinSettingsDialog from './TurnitinSettingsDialog'
 import MissingDateDialog from '@canvas/due-dates/backbone/views/MissingDateDialogView'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
-import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector'
+import GroupCategorySelector, {GROUP_CATEGORY_SELECT} from '@canvas/groups/backbone/views/GroupCategorySelector'
 import ConditionalRelease from '@canvas/conditional-release-editor'
 import deparam from 'deparam'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
@@ -60,9 +60,6 @@ import {selectContentDialog} from '@canvas/select-content-dialog'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import {queryClient} from '@canvas/query'
 import {createRoot} from 'react-dom/client'
-import {IconWarningSolid} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-text'
-import {Flex} from '@instructure/ui-flex'
 import YAML from 'yaml'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 
@@ -134,6 +131,7 @@ const POINTS_POSSIBLE_INPUT_NAME = 'points_possible'
 const EXTERNAL_TOOL_URL_INPUT_NAME = 'external_tool_tag_attributes[url]'
 const ACTIVITY_ASSET_PROCESSOR_CONTAINER = '#activity_asset_processor_container'
 const ALLOWED_EXTENSIONS_INPUT_NAME = 'allowed_extensions'
+const ONLINE_SUBMISSION_CHECKBOXES_GROUP = 'online_submission_types[online_text_entry]'
 
 /*
 xsslint safeString.identifier srOnly
@@ -305,6 +303,8 @@ EditView.prototype.events = {
     events['input ' + `[name="${ASSIGNMENT_NAME_INPUT_NAME}"]`] = 'validateInput'
     events['input ' + `[name="${ALLOWED_EXTENSIONS_INPUT_NAME}"]`] = 'validateInput'
     events['input ' + `[name="${POINTS_POSSIBLE_INPUT_NAME}"]`] = 'validateInput'
+    events['change #assignment_online_submission_types input[type="checkbox"]'] = 'handleOnlineSubmissionCheckboxToggle'
+    events['change #' + GROUP_CATEGORY_SELECT] = 'clearGroupSetErrors'
     if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
       events.change = 'onChange'
     }
@@ -393,6 +393,19 @@ EditView.prototype.settingsToCache = function () {
   ]
 }
 
+EditView.prototype.handleOnlineSubmissionCheckboxToggle = function (_e) {
+  const containerId = `${ONLINE_SUBMISSION_CHECKBOXES_GROUP}_errors`
+  this.errorRoots[containerId]?.unmount()
+  delete this.errorRoots[containerId]
+
+  document.getElementById('online_entry_options_asterisk')?.classList.remove('error-text')
+}
+
+EditView.prototype.clearGroupSetErrors = function (_e) {
+  const containerId = `${GROUP_CATEGORY_SELECT}_errors`
+  this.hideErrors(containerId)
+}
+
 EditView.prototype.handlePointsChange = function (ev) {
   let newPoints
   ev.preventDefault()
@@ -471,6 +484,8 @@ EditView.prototype.enableCheckbox = function (box) {
 }
 
 EditView.prototype.handleGroupCategoryChange = function () {
+  // clear any errors
+  this.clearGroupSetErrors()
   const isGrouped = this.$groupCategoryBox.prop('checked')
   const isAnonymous = this.$anonymousGradingBox.prop('checked')
   if (isAnonymous) {
@@ -1557,8 +1572,8 @@ EditView.prototype.showErrors = function (errors) {
     const errorsContainer = document.getElementById(errorsContainerID)
     if (errorsContainer) {
       const root = this.errorRoots[errorsContainerID] ?? createRoot(errorsContainer)
-      const noMargin = ['allowed_attempts', 'final_grader_id', 'grader_count'].includes(key)
-      const marginTop = [EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME].includes(key)
+      const noMargin = ['allowed_attempts', 'final_grader_id', 'grader_count', ONLINE_SUBMISSION_CHECKBOXES_GROUP].includes(key)
+      const marginTop = [EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT].includes(key)
       root.render(
         <FormattedErrorMessage
           message={value[0].message}
@@ -1572,7 +1587,7 @@ EditView.prototype.showErrors = function (errors) {
       if (element) {
         element.setAttribute("aria-describedby", errorsContainerID)
 
-        if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME].includes(key)) {
+        if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT].includes(key)) {
           const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
           this.getElement(selector)?.classList.add('error-outline')
         }
@@ -1581,6 +1596,10 @@ EditView.prototype.showErrors = function (errors) {
           element.focus()
           shouldFocus = false
         }
+      }
+
+      if (key === ONLINE_SUBMISSION_CHECKBOXES_GROUP) {
+        document.getElementById('online_entry_options_asterisk')?.classList.add('error-text')
       }
     }
   })
@@ -1641,7 +1660,7 @@ EditView.prototype.hideErrors = function (containerId) {
     delete this.errorRoots[containerId]
 
     const key = containerId.replace(/_errors$/, '')
-    if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME].includes(key)) {
+    if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT].includes(key)) {
       const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
       const element = this.getElement(selector)
       element?.classList.remove('error-outline')
@@ -1783,7 +1802,7 @@ EditView.prototype._validateTitle = function (data, errors) {
 EditView.prototype._validateSubmissionTypes = function (data, errors) {
   let allow_vericite, annotatedDocumentUsageRights, ref, ref1
   if (data.submission_type === 'online' && data.submission_types.length === 0) {
-    errors['online_submission_types[online_text_entry]'] = [
+    errors[ONLINE_SUBMISSION_CHECKBOXES_GROUP] = [
       {
         message: I18n.t(
           'at_least_one_submission_type',
@@ -1800,7 +1819,7 @@ EditView.prototype._validateSubmissionTypes = function (data, errors) {
           data.submission_types[k] === 'online_text_entry')
     })
     if (!allow_vericite) {
-      errors['online_submission_types[online_text_entry]'] = [
+      errors[ONLINE_SUBMISSION_CHECKBOXES_GROUP] = [
         {
           message: I18n.t(
             'vericite_submission_types_validation',
