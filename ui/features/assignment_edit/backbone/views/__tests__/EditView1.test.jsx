@@ -24,7 +24,7 @@ import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeS
 import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector'
 import DueDateOverrideView from '@canvas/due-dates'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
-import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector'
+import GroupCategorySelector, {GROUP_CATEGORY_SELECT} from '@canvas/groups/backbone/views/GroupCategorySelector'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
 import Section from '@canvas/sections/backbone/models/Section'
 import {isAccessible} from '@canvas/test-utils/assertions'
@@ -86,6 +86,7 @@ const editView = (assignmentOpts = {}) => {
     parentModel: assignment,
     groupCategories: ENV?.GROUP_CATEGORIES || [],
     inClosedGradingPeriod: assignment.inClosedGradingPeriod(),
+    showNewErrors: true
   })
   const peerReviewsSelector = new PeerReviewsSelector({parentModel: assignment})
   const dueDateOverrideView = new DueDateOverrideView({
@@ -207,7 +208,7 @@ describe('EditView', () => {
     const view = editView()
     const data = {group_category_id: 'blank'}
     const errors = view.validateBeforeSave(data, {})
-    expect(errors.newGroupCategory[0].message).toBe('Please create a group set')
+    expect(errors[GROUP_CATEGORY_SELECT][0].message).toBe('Please create a group set')
   })
 
   it('rejects a letter for points_possible', () => {

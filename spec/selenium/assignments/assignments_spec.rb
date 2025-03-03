@@ -834,6 +834,13 @@ describe "assignments" do
       expect(f("#name_errors")).to include_text("Must be fewer than 256 characters")
     end
 
+    it "validates at least one submission type is checked if online submission" do
+      get "/courses/#{@course.id}/assignments/new"
+      wait_for_ajaximations
+      submit_assignment_form
+      expect(f("#online_submission_types\\[online_text_entry\\]_errors")).to include_text("Please choose at least one submission type")
+    end
+
     it "validates the points possible" do
       get "/courses/#{@course.id}/assignments/new"
       wait_for_ajaximations
@@ -883,20 +890,55 @@ describe "assignments" do
       expect(f("#allowed_extensions_errors")).to include_text("Must be fewer than 256 characters")
     end
 
-    it "validates that a group category is selected", priority: "1" do
-      assignment_name = "first test assignment"
-      @assignment = @course.assignments.create({
-                                                 name: assignment_name,
-                                                 assignment_group: @course.assignment_groups.create!(name: "default")
-                                               })
+    context "validates group assignment" do
+      before do
+        @assignment = @course.assignments.create({
+                                                   name: "first test assignment",
+                                                   assignment_group: @course.assignment_groups.create!(name: "default")
+                                                 })
+      end
 
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      f("#has_group_category").click
-      f(%(span[data-testid="group-set-close"])).click
-      f(".btn-primary[type=submit]").click
-      wait_for_ajaximations
-      error_box = f(".errorBox[role=alert]")
-      expect(f(".error_text", error_box).text).to eq "Please create a group set"
+      it "is created before saving", priority: "1" do
+        get "/courses/#{@course.id}/assignments/new"
+        f("#has_group_category").click
+        f(%(span[data-testid="group-set-close"])).click
+        submit_assignment_form
+        wait_for_ajaximations
+        expect(f("#assignment_group_category_id_errors").text).to eq "Please create a group set"
+      end
+
+      context "with group sets" do
+        before do
+          @gc = GroupCategory.create(name: "Group Set}", context: @course)
+        end
+
+        it "clears the errors when the user selects a group", priority: "1" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+          f("#has_group_category").click
+          f("#assignment_group_category_id").click
+          f('#assignment_group_category_id [value="blank"]').click
+          submit_assignment_form
+          wait_for_ajaximations
+          expect(f("#assignment_group_category_id_errors").text).to eq "Please select a group set for this assignment"
+          f('#assignment_group_category_id [value="' + @gc.id.to_s + '"]').click
+          wait_for_ajaximations
+          expect(f("#assignment_group_category_id_errors").text).to eq ""
+        end
+
+        it "clears the errors when the user unchecks and rechecks the group assignment checkbox", priority: "1" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+          f("#has_group_category").click
+          f("#assignment_group_category_id").click
+          f('#assignment_group_category_id [value="blank"]').click
+          submit_assignment_form
+          wait_for_ajaximations
+          expect(f("#assignment_group_category_id_errors").text).to eq "Please select a group set for this assignment"
+          f("#has_group_category").click # uncheck
+          f("#has_group_category").click # check again
+          wait_for_ajaximations
+          expect(f("#assignment_group_category_id_errors").text).to eq ""
+        end
+      end
     end
 
     it "shows assignment details, un-editable, for concluded teachers", priority: "2" do
