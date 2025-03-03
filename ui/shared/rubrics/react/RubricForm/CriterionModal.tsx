@@ -496,7 +496,7 @@ const RatingRow = ({
   const setNumber = (value: number) => {
     if (Number.isNaN(value)) return 0
 
-    return value < 0 ? 0 : value > 100 ? 100 : value
+    return value < 0 ? 0 : value
   }
 
   const errorMessage: FormMessage[] =
@@ -524,7 +524,7 @@ const RatingRow = ({
                   {criterionUseRange && (
                     <Flex.Item width="3.438rem" textAlign="end" margin="0 0 x-small 0">
                       <View as="span" margin="0 small 0 0">
-                      {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
+                        {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
                       </View>
                     </Flex.Item>
                   )}
