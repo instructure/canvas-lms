@@ -166,7 +166,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       next unless metadata_uri == federation::URN
 
       if idp_entity_id.blank?
-        errors.add(:idp_entity_id, :present)
+        errors.add(:idp_entity_id, :blank)
         return
       end
 

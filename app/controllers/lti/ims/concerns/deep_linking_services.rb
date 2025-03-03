@@ -194,8 +194,8 @@ module Lti::IMS::Concerns
           skip_jti_check: true
         )
         validator.validate
-        validator.errors.to_h.each do |k, v|
-          errors.add(k, v.to_s)
+        validator.errors.as_json[:errors].each do |k, v|
+          v.each { |v2| errors.add(k, v2[:type]) }
         end
       end
 

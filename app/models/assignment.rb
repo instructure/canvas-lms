@@ -19,6 +19,10 @@
 #
 
 class Assignment < AbstractAssignment
+  # Later versions of Rails try to read the attribute when setting an error for that attribute. In order to maintain
+  # backwards compatibility with error consumers, create a fake attribute :custom_params so it doesn't error out.
+  attr_reader :custom_params
+
   validates :parent_assignment_id, :sub_assignment_tag, absence: true
   validate :unpublish_ok?, if: -> { will_save_change_to_workflow_state?(to: "unpublished") }
 

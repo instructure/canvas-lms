@@ -394,7 +394,7 @@ describe AssignmentOverride do
       @override.assignment_override_students.create(user: student, workflow_state: "active")
       @override.assignment_override_students.build(user: student, workflow_state: "active")
       expect(@override).not_to be_valid
-      expect(@override.errors[:assignment_override_students].first.type).to eq :taken
+      expect(@override.errors.details[:assignment_override_students].first[:error]).to eq :taken
     end
 
     it "rejects non-nil set_id with an adhoc set" do

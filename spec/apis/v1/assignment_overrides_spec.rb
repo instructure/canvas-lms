@@ -651,7 +651,7 @@ describe AssignmentOverridesController, type: :request do
       @override.save!
 
       raw_api_create_override(@course, @assignment, assignment_override: { course_section_id: @course.default_section.id })
-      expect_errors("set_id" => [{ "message" => "taken", "attribute" => "set_id", "type" => "taken" }])
+      expect_errors("set_id" => [{ "message" => "has already been taken", "attribute" => "set_id", "type" => "taken" }])
     end
 
     it "errors if you try and duplicate a student in an adhoc set" do

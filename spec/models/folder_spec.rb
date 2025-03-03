@@ -108,7 +108,7 @@ describe Folder do
     f3 = f2.sub_folders.create!(name: "f3", context: @course)
     f1.parent_folder = f3
     expect(f1.save).to be false
-    expect(f1.errors.detect { |e| e.first.to_s == "parent_folder_id" }).to be_present
+    expect(f1.errors.attribute_names).to eq [:parent_folder_id]
   end
 
   it "does not allow root folders to have their names changed" do
@@ -116,7 +116,7 @@ describe Folder do
     f1.reload
     f1.update(name: "something")
     expect(f1.save).to be false
-    expect(f1.errors.detect { |e| e.first.to_s == "name" }).to be_present
+    expect(f1.errors.attribute_names).to eq [:name]
   end
 
   describe "set folder root account id" do

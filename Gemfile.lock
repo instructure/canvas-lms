@@ -250,7 +250,7 @@ PATH
       simple_oauth (~> 0.3)
     utf8_cleaner (0.0.1)
     workflow (0.0.1)
-      activesupport (>= 3.2)
+      activesupport (>= 3.2, < 7.2)
 
 GEM
   remote: https://rubygems.org/
@@ -308,8 +308,6 @@ GEM
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    active_model-better_errors (1.6.7)
-      activemodel (>= 3.0)
     active_model_serializers (0.9.9)
       activemodel (>= 3.2)
       concurrent-ruby (~> 1.0)
@@ -1242,7 +1240,6 @@ DEPENDENCIES
   academic_benchmark!
   academic_benchmarks (~> 1.1)
   account_reports!
-  active_model-better_errors (= 1.6.7)
   active_model_serializers (~> 0.9.9)
   active_record_query_trace (~> 1.8)
   activesupport-suspend_callbacks!
