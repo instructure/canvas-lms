@@ -91,9 +91,27 @@ export default function RubricTab(props) {
 
   const rubricData = {
     title: props.rubric?.title,
-    criteria: props.rubric?.criteria,
     ratingOrder: props.rubric?.rating_order,
     freeFormCriterionComments: props.rubric?.free_form_criterion_comments,
+    pointsPossible: props.rubric?.points_possible,
+    criteria: (props.rubric?.criteria || []).map(criterion => {
+      return {
+        ...criterion,
+        longDescription: criterion.long_description,
+        criterionUseRange: criterion.criterion_use_range,
+        learningOutcomeId: criterion.learning_outcome_id,
+        ignoreForScoring: criterion.ignore_for_scoring,
+        masteryPoints: criterion.mastery_points,
+        ratings: criterion.ratings.map(rating => {
+          return {
+            ...rating,
+            longDescription: rating.long_description,
+            points: rating.points,
+            criterionId: criterion.id,
+          }
+        }),
+      }
+    }),
   }
 
   const enhancedRubricsEnabled = ENV.enhanced_rubrics_enabled
