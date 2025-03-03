@@ -1278,8 +1278,7 @@ describe CoursesController do
       expect(flash[:notice]).to match(/Course was successfully updated./)
     end
 
-    it "allows horizon student view student to leave student view" do
-      @course.update_attribute :workflow_state, "claimed"
+    it "allows test student to leave student view from a Canvas Career course" do
       user_session(@teacher)
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
@@ -1287,6 +1286,15 @@ describe CoursesController do
       get "show", params: { id: @course.id, leave_student_view: "/courses/#{@course.id}/modules" }
       expect(response).to redirect_to("#{course_url(@course)}/modules")
       expect(session[:become_user_id]).to be_nil
+    end
+
+    it "allows admin to stop acting as user from a Canvas Career course" do
+      user_session(@teacher)
+      @user = @course.student_view_student
+      session[:become_user_id] = @user.id
+
+      get "show", params: { id: @course.id, stop_acting_as_user: "/courses/#{@course.id}/modules" }
+      expect(response).to redirect_to(user_masquerade_url(@teacher.id, stop_acting_as_user: true))
     end
 
     it "redirects to the modules page for horizon courses" do

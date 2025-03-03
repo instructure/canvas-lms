@@ -3804,6 +3804,12 @@ class CoursesController < ApplicationController
   end
 
   def check_horizon_redirect
+    if params[:stop_acting_as_user] && @user != @real_current_user
+      session[:masquerade_return_to] = params[:stop_acting_as_user]
+      redirect_to user_masquerade_url(@real_current_user.id, stop_acting_as_user: true)
+      return
+    end
+
     if @current_user&.fake_student?
       if params[:leave_student_view]
         session[:masquerade_return_to] = params[:leave_student_view]
