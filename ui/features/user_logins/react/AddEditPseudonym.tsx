@@ -277,7 +277,7 @@ const AddEditPseudonym = ({
               />
             </>
           )}
-          {!isEdit && (
+          {!isEdit && accountSelectOptions && (
             <Controller
               control={control}
               name="account_id"
