@@ -1682,6 +1682,15 @@ Rails.application.config.to_prepare do
         account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:k20_students_in_need_of_attention) }
       },
+      view_students_in_need_in_course: {
+        label: -> { I18n.t("Students in Need of Attention In Courses") },
+        group: "view_advanced_analytics",
+        group_label: -> { I18n.t("Intelligent Insights") },
+        available_to: %w[AccountAdmin AccountMembership TeacherEnrollment],
+        true_for: %w[AccountAdmin],
+        account_only: true,
+        account_allows: ->(a) { a.feature_enabled?(:k20_students_in_need_of_attention) && a.feature_enabled?(:students_in_need_of_attention_course_level_beta) } ## AND they are part of the beta group.
+      },
       view_course_readiness: {
         label: -> { I18n.t("Course Readiness") },
         group: "view_advanced_analytics",
