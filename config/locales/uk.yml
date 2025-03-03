@@ -9511,6 +9511,7 @@ uk:
     other: "Завантаження курсів завершено: %{count} курсів знайдено"
   loading_courses_started_6e6d742c: "Завантаження курсів розпочато"
   loading_data_ecd89ba: "Завантаження даних..."
+  loading_folders_8d4d5d5a: "Завантаження папок ..."
   loading_graders_f6a76142: "Завантаження Оцінювачів"
   loading_grades_c842c887: "Завантаження оцінок"
   loading_more_gradebook_history_results_810f6d2e: "Завантаження додаткових результатів історії gradebook."
