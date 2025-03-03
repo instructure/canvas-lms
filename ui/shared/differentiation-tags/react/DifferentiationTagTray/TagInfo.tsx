@@ -81,6 +81,7 @@ const TagInfo: React.FC<TagInfoProps> = ({tags, onEdit, multiMode = false}) => {
               alignItems="center"
               gap="x-small"
               margin="0 0 x-small 0"
+              data-testid="tag-info"
             >
               <Flex.Item shouldGrow shouldShrink>
                 <Tag text={tagData.name} size="small" />

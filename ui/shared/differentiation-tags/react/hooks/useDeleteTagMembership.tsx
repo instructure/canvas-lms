@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useMutation } from '@canvas/query'
+import {useMutation, queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {UserTags} from '../types'
 
 export const useDeleteTagMembership = () => {
-  return useMutation<{ ok: boolean }, Error, { groupId: number, userId: number, refetch: () => void }>({
+  return useMutation<{ok: boolean}, Error, {groupId: number; userId: number; refetch: () => void}>({
     mutationFn: async ({groupId, userId}) => {
       try {
-        const result = await doFetchApi<{ ok: boolean }>({
+        const result = await doFetchApi<{ok: boolean}>({
           path: `/api/v1/groups/${groupId}/users/${userId}`,
           method: 'DELETE',
           headers: {
@@ -40,16 +40,21 @@ export const useDeleteTagMembership = () => {
         }
 
         return result.json
-      }
-      catch (error) {
+      } catch (error) {
         console.error('Mutation failed:', error)
         throw error
       }
     },
-    onSuccess: (_, props) => {
-        props.refetch()
+    onSuccess: async (_, props) => {
+      // We are invalidating all queries that start with 'differentiationTagCategories'
+      // undefined: we aren't using any other query filters to determine what to invalidate
+      // cancelRefetch: tells the query client to cancel any ongoing refetch for the matching queries
+      await queryClient.invalidateQueries(['differentiationTagCategories'], undefined, {
+        cancelRefetch: true,
+      })
+      props.refetch()
     },
-    onError: (error) => {
+    onError: error => {
       console.error('Error deleting user membership:', error)
     },
   })

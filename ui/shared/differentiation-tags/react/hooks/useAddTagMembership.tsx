@@ -15,33 +15,40 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useMutation } from '@tanstack/react-query'
+import {useMutation, queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export const useAddTagMembership = () => {
-  return useMutation<{ ok: boolean }, Error, { groupId: number | string, userIds: number[], }>({
+  return useMutation<{ok: boolean}, Error, {groupId: number | string; userIds: number[]}>({
     mutationFn: async ({groupId, userIds}) => {
       try {
-        const result = await doFetchApi<{ ok: boolean }>({
-        path: `/api/v1/groups/${groupId}/memberships`,
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: {members: userIds},
+        const result = await doFetchApi<{ok: boolean}>({
+          path: `/api/v1/groups/${groupId}/memberships`,
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: {members: userIds},
         })
         if (!result.response.ok) {
-            throw new Error(`Failed to add users membership: ${result.response.statusText}`)
+          throw new Error(`Failed to add users membership: ${result.response.statusText}`)
         }
         return {ok: true}
-      }
-      catch (error) {
-      console.error('Mutation failed:', error)
-      throw error
+      } catch (error) {
+        console.error('Mutation failed:', error)
+        throw error
       }
     },
-    onError: (error) => {
+    onSuccess: async () => {
+      // We are invalidating all queries that start with 'differentiationTagCategories'
+      // undefined: we aren't using any other query filters to determine what to invalidate
+      // cancelRefetch: tells the query client to cancel any ongoing refetch for the matching queries
+      await queryClient.invalidateQueries(['differentiationTagCategories'], undefined, {
+        cancelRefetch: true,
+      })
+    },
+    onError: error => {
       console.error('Error adding users membership:', error)
     },
   })

@@ -45,6 +45,10 @@ describe "Differentiation Tag Management" do
         get "/courses/#{@course.id}/users"
       end
 
+      it "renders the checkbox header" do
+        expect(fj("span:contains('Select User')")).to be_truthy
+      end
+
       context "differentiation tag tray" do
         before do
           fj("button:contains('Manage Tags')").click
@@ -194,6 +198,71 @@ describe "Differentiation Tag Management" do
           expect(fj("span:contains('#{@single_tag_1.name}')")).to be_displayed
           expect(fj("span:contains('#{@multiple_tags_1.name}')")).to be_displayed
           expect(fj("span:contains('#{@multiple_tags_2.name}')")).to be_displayed
+        end
+
+        it "shows the create tag modal" do
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+          force_click("span:contains('New Tag')")
+
+          expect(fj("h2:contains('Create Tag')")).to be_displayed
+        end
+
+        it "Adds a single tag to the selected user" do
+          f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+
+          force_click("span:contains('#{@single_tag_1.name}')")
+          wait_for_ajaximations
+
+          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include @single_tag_1.id
+        end
+
+        it "Adds a multiple tag variant to the selected user" do
+          f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+
+          force_click("span:contains('#{@multiple_tags_1.name}')")
+          wait_for_ajaximations
+
+          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include @multiple_tags_1.id
+        end
+
+        it "updates user count in tray when removing a member" do
+          fj("button:contains('Manage Tags')").click
+          wait_for_ajaximations
+
+          # Verify counts in tray
+          expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_1.name}')").text).to include("0 students")
+          expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_2.name}')").text).to include("0 students")
+
+          # Add a user to a dif tag
+          f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+          force_click("span:contains('#{@multiple_tags_1.name}')")
+          wait_for_ajaximations
+
+          # verify new count shows in the component
+          expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_1.name}')").text).to include("1 student")
+          expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_2.name}')").text).to include("0 students")
+
+          # remove the user from the tag
+          f("a[aria-label='View user tags']").click
+          wait_for_ajaximations
+          f("button[data-testid='user-tag-#{@multiple_tags_1.id}']").click
+          wait_for_ajaximations
+          expect(fj("h2:contains('Remove Tag')")).to be_displayed
+          fj("button:contains('Confirm')").click
+          wait_for_ajaximations
+
+          # Verify counts in tray
+          expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_1.name}')").text).to include("0 students")
+          expect(fj("[data-testid='tag-info']:contains('#{@multiple_tags_2.name}')").text).to include("0 students")
         end
       end
 
