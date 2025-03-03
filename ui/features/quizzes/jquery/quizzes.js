@@ -74,6 +74,8 @@ import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import MasteryPathToggleView from '@canvas/mastery-path-toggle/backbone/views/MasteryPathToggle'
 
 const I18n = createI18nScope('quizzes_public')
+const QUESTIONS_NUMBER = 'questions_number'
+const QUESTION_POINTS = 'question_points'
 
 let dueDateList, overrideView, masteryPathToggle, quizModel, sectionList, correctAnswerVisibility, scoreValidation
 
@@ -1972,6 +1974,37 @@ function hideAlertBox(inputField) {
   $(`[aria-describedby="answers_warning_alert_box"]`).removeAttr('aria-describedby')
 }
 
+function renderQuestionGroupError(inputName, message, form) {
+  const inputField = form.find(`.${inputName}`)
+  const inputContainer = form.find(`.${inputName}_container`)
+  const inputMessageContainer = form.find(`.${inputName}_message_container`)
+  inputContainer.addClass('invalid')
+  inputMessageContainer.addClass('error').removeClass('hidden')
+  inputField.attr('aria-invalid', 'true')
+  const inputMessageText = inputMessageContainer.find('.input-message__text')
+  inputMessageText
+    .attr({
+      'aria-live': 'polite',
+      'aria-atomic': 'true'
+    })
+    .text(message)
+  inputMessageText.addClass('error_text')
+}
+
+function clearQuestionGroupError(inputName) {
+  const inputField = $(`.${inputName}`)
+  const inputContainer = $(`.${inputName}_container`)
+  const inputMessageContainer = $(`.${inputName}_message_container`)
+  const inputMessageText = inputMessageContainer.find('.input-message__text')
+
+  inputContainer.removeClass('invalid')
+  inputField.removeAttr('aria-invalid')
+  inputMessageContainer.removeClass('error')
+  inputMessageText.removeAttr('aria-live').removeAttr('aria-atomic').removeClass('error_text')
+
+  inputMessageContainer.addClass('hidden')
+}
+
 function renderError(inputContainer, message) {
   const inputMessageContainer = inputContainer.find('.input-message__container')
 
@@ -2247,6 +2280,14 @@ ready(function () {
   $('#quiz_require_lockdown_browser').change(function () {
     $('#lockdown_browser_suboptions').showIf($(this).prop('checked'))
     $('#quiz_require_lockdown_browser_for_results').prop('checked', true).change()
+  })
+
+  $('.questions_number').on('input', function () {
+    clearQuestionGroupError(QUESTIONS_NUMBER)
+  })
+
+  $('.question_points').on('input', function () {
+    clearQuestionGroupError(QUESTION_POINTS)
   })
 
   $('#lockdown_browser_suboptions').showIf($('#quiz_require_lockdown_browser').prop('checked'))
@@ -3209,6 +3250,11 @@ ready(function () {
         $(this).parents('form').trigger('submit')
       },
     )
+
+    if ($('.group_top.editing').find('.invalid').length > 0) {
+      return
+    }
+
     const $group_top = $('#group_top_template').clone(true).attr('id', 'group_top_new')
     const $group_bottom = $('#group_bottom_template').clone(true).attr('id', 'group_bottom_new')
     $('#questions').append($group_top.show()).append($group_bottom.show())
@@ -4274,7 +4320,6 @@ ready(function () {
 
   $('.quiz_group_form').formSubmit({
     object_name: 'quiz_group',
-
     formatApiData(data) {
       const newData = {}
       forEach(data, (val, key) => {
@@ -4284,16 +4329,26 @@ ready(function () {
     },
     // rewrite the data so that it fits the jsonapi format
     processData(data) {
+      const quizGroupQuestionsNumber = numberHelper.parse(data['quiz_group[pick_count]'])
       const quizGroupQuestionPoints = numberHelper.parse(data['quiz_group[question_points]'])
-      if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
-        // TODO: Implement on-field validation errors
-        // $(this)
-        //   .find("input[name='quiz_group[question_points]']")
-        //   .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
+      const validationErrors = validateQuestionGroupData(
+        quizGroupQuestionsNumber,
+        quizGroupQuestionPoints
+      )
+      if (validationErrors.QUESTIONS_NUMBER.length > 0 || validationErrors.QUESTION_POINTS.length > 0) {
+        if (validationErrors.QUESTIONS_NUMBER.length > 0) {
+          renderQuestionGroupError(QUESTIONS_NUMBER, validationErrors.QUESTIONS_NUMBER.join(', '), $(this))
+        }
+        if (validationErrors.QUESTION_POINTS.length > 0) {
+          renderQuestionGroupError(QUESTION_POINTS, validationErrors.QUESTION_POINTS.join(', '), $(this))
+        }
+        $(this).find('.invalid input').first().focus()
         return false
-      } else {
-        data['quiz_group[question_points]'] = quizGroupQuestionPoints
       }
+      clearQuestionGroupError(QUESTION_POINTS)
+      data['quiz_group[question_points]'] = quizGroupQuestionPoints
+      clearQuestionGroupError(QUESTIONS_NUMBER)
+      data['quiz_group[pick_count]'] = quizGroupQuestionsNumber
       return data
     },
     beforeSubmit(formData) {
@@ -4367,6 +4422,30 @@ ready(function () {
       $form.formErrors(data)
     },
   })
+
+  function validateQuestionGroupData(questionsNumber, questionPoints) {
+    const errors = {
+      QUESTIONS_NUMBER: [],
+      QUESTION_POINTS: []
+    }
+    if (Number.isNaN(questionsNumber) || typeof questionsNumber === 'undefined') {
+      errors.QUESTIONS_NUMBER.push(I18n.t('question_group.questions_number.defined', 'Questions number must be a number'))
+    }
+    if (Number.isNaN(questionPoints) || typeof questionPoints === 'undefined') {
+      errors.QUESTION_POINTS.push(I18n.t('question_group.question_points.defined', 'Question points must be a number'))
+    }
+    if (questionsNumber < 0) {
+      errors.QUESTIONS_NUMBER.push(I18n.t(
+        'question_group.questions_number.positive_points', 'The amount of questions must be zero or greater'
+      ))
+    }
+    if (questionPoints < 0) {
+      errors.QUESTION_POINTS.push(I18n.t(
+        'question_group.question_points.positive_points', 'The amount of points must be zero or greater'
+      ))
+    }
+    return errors
+  }
 
   // accessible sortables
   const accessibleSortables = {
@@ -4850,6 +4929,8 @@ ready(function () {
       if ($(this).closest('.group_top').length === 0) {
         return
       }
+      clearQuestionGroupError(QUESTION_POINTS)
+      clearQuestionGroupError(QUESTIONS_NUMBER)
       const $top = $(this).parents('.group_top')
       $top.removeClass('editing')
       if ($top.attr('id') === 'group_top_new') {
