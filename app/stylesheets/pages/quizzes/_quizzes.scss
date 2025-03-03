@@ -215,6 +215,11 @@ input[type]:required:invalid {
   box-shadow: none;
 }
 
+.questions_number_message_container,
+.question_points_message_container {
+  display: block;
+}
+
 .input-message {
   &__container {
     display: flex;
