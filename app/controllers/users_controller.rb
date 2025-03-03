@@ -458,7 +458,7 @@ class UsersController < ApplicationController
     @user = api_find(User, params[:user_id])
     return render_unauthorized_action unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
 
-    if request.post?
+    if request.post? || params[:stop_acting_as_user] == "true"
       if @user == @real_current_user
         session.delete(:become_user_id)
         session.delete(:enrollment_uuid)
