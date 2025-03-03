@@ -876,6 +876,8 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/summaries'
 - verb: POST
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/summaries'
+- verb: POST
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/summaries/:summary_id/feedback'
 - verb: PUT
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/summaries/disable'
@@ -1646,6 +1648,8 @@
 - verb: PUT
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/subscribed'
 - verb: GET
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/summaries'
+- verb: POST
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/summaries'
 - verb: POST
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/summaries/:summary_id/feedback'

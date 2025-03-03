@@ -102,7 +102,6 @@ describe('DiscussionSummary', () => {
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
         path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-        params: {userInput: ''},
       })
       await waitFor(() => {
         expect(getByTestId('summary-error')).toHaveTextContent(
@@ -125,14 +124,34 @@ describe('DiscussionSummary', () => {
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
         path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-        params: {userInput: ''},
       })
       await waitFor(() => {
         expect(getByTestId('summary-error')).toHaveTextContent('Some error message.')
       })
     })
 
-    it('should reset and call setSummary with the loaded discussion summary in course context', async () => {
+    it('should not display the response error message when the error status is 404', async () => {
+      (doFetchApi as jest.Mock).mockRejectedValue({
+        response: {
+          json: async () => {
+            return {error: 'Some error message.'}
+          },
+          status: 404,
+        },
+      })
+
+      const {queryByTestId} = setup()
+
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'GET',
+        path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+      })
+      await waitFor(() => {
+        expect(queryByTestId('summary-error')).not.toBeInTheDocument()
+      })
+    })
+
+    it('should reset and call setSummary with the latest generated discussion summary in course context', async () => {
       (doFetchApi as jest.Mock).mockResolvedValue({
         json: expectedSummary,
       })
@@ -163,7 +182,7 @@ describe('DiscussionSummary', () => {
       expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('seen')
     })
 
-    it('should reset and call setSummary with the loaded discussion summary with group context', async () => {
+    it('should reset and call setSummary with the latest generated discussion summary with group context', async () => {
       window.ENV = {
         ...window.ENV,
         // @ts-expect-error
@@ -182,7 +201,6 @@ describe('DiscussionSummary', () => {
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
         path: `/api/v1/groups/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-        params: {userInput: ''},
       })
     })
    })
@@ -229,7 +247,7 @@ describe('DiscussionSummary', () => {
       })
 
       expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'GET',
+        method: 'POST',
         path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
         params: {userInput: 'focus on student feedback'},
       })
