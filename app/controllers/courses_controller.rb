@@ -3354,7 +3354,7 @@ class CoursesController < ApplicationController
       end
 
       if params[:course][:horizon_course].present? && !@course.account.feature_enabled?(:horizon_course_setting)
-        horizon_message = t("Horizon Course cannot be set without the feature flag enabled")
+        horizon_message = t("Canvas Career cannot be set without the feature flag enabled")
         @course.errors.add(:horizon_course, horizon_message)
       end
 
