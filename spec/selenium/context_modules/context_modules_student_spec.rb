@@ -323,6 +323,36 @@ describe "context modules" do
       end
     end
 
+    context "shows previous and next buttons buttons on the discussion page in student view", priority: "2" do
+      before do
+        user_session(@teacher)
+      end
+
+      before :once do
+        Account.site_admin.enable_feature!(:react_discussions_post)
+        Account.site_admin.enable_feature!(:discussion_create)
+      end
+
+      before :once do
+        @course = course_model.tap(&:offer!)
+        @discussion1 = @course.discussion_topics.create!(title: "Test Discussion 1", message: "Discussion Content 1")
+        @discussion2 = @course.discussion_topics.create!(title: "Test Discussion 2", message: "Discussion Content 2")
+        @discussion3 = @course.discussion_topics.create!(title: "Test Discussion 3", message: "Discussion Content 3")
+        @module = create_context_module("Test Module")
+        @module.add_item(id: @discussion1.id, type: "discussion_topic")
+        @module.add_item(id: @discussion2.id, type: "discussion_topic")
+        @module.add_item(id: @discussion3.id, type: "discussion_topic")
+        @module.save!
+      end
+
+      it "shows previous and next buttons for discussions" do
+        enter_student_view
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion2.id}"
+        expect(f(".module-sequence-footer-left")).to be_displayed
+        expect(f(".module-sequence-footer-right")).to be_displayed
+      end
+    end
+
     describe "sequence footer" do
       it "shows the right nav when an item is in modules multiple times", custom_timeout: 30 do
         @assignment = @course.assignments.create!(title: "some assignment")

@@ -46,28 +46,32 @@ function DiscussionPageLayout() {
 const renderFooter = () => {
   import('@canvas/module-sequence-footer').then(() => {
     $(() => {
-      $(`<div id="module_sequence_footer" style="position: fixed; bottom: 0;  z-index: 100" />`)
+      $(`<div id="module_sequence_footer" style="position: fixed; bottom: 0px; z-index: 100" />`)
         .appendTo('#content')
         .moduleSequenceFooter({
           assetType: 'Discussion',
           assetID: ENV.SEQUENCE.ASSET_ID,
           courseID: ENV.SEQUENCE.COURSE_ID,
         })
-      adjustFooterWidth()
-      new ResizeObserver(adjustFooterWidth).observe(document.getElementById('content'))
+      adjustFooter()
+      new ResizeObserver(adjustFooter).observe(document.getElementById('content'))
     })
   })
 }
 
-export const adjustFooterWidth = () => {
+export const adjustFooter = () => {
+  const masqueradeBar = document.getElementById('masquerade_bar');
   const container = $('#module_sequence_footer_container')
   const footer = $('#module_sequence_footer')
+
   if (container.length > 0) {
     const containerRightPosition = container.css('padding-right')
     const containerWidth = $(container).width() + 'px'
+    const masqueradeBarHeight = $(masqueradeBar).height() + 10 + 'px'
 
     footer.css('width', `calc(${containerWidth} - ${containerRightPosition})`) // width with padding
     footer.css('right', `${containerRightPosition}`)
+    footer.css('bottom',  masqueradeBarHeight)
   }
 }
 
