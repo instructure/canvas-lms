@@ -19,12 +19,13 @@
 import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
 import {DiscussionSummary, DiscussionSummaryProps} from '../DiscussionSummary'
-import {AlertManagerContext, AlertManagerContextType} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {MockedProvider} from '@apollo/client/testing'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {DiscussionSummaryRatings} from '../DiscussionSummaryRatings'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import userEvent from '@testing-library/user-event'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -65,7 +66,11 @@ const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
 }
 
 describe('DiscussionSummary', () => {
-  const expectedSummary = {id: 1, text: 'This is a discussion summary'}
+  const expectedSummary = {
+    id: 1,
+    text: 'This is a discussion summary',
+    obsolete: false
+  }
   let oldEnv: GlobalEnv
 
   beforeEach(() => {
@@ -201,6 +206,89 @@ describe('DiscussionSummary', () => {
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
         path: `/api/v1/groups/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+      })
+    })
+
+    describe('Generate Button', () => {
+      it('generate button is enabled when not loading and user input is changed', async () => {
+        const {getByTestId} = setup({
+          summary: expectedSummary,
+        })
+
+        const generateButton = getByTestId('summary-generate-button')
+        expect(generateButton).toBeDisabled()
+
+        const userInput = getByTestId('summary-user-input')
+        await userEvent.click(userInput)
+        await userEvent.type(userInput, 'text')
+
+        expect(generateButton).toBeEnabled()
+      })
+
+      it('generate button is enabled when not loading and there is no initial summary', async () => {
+        const {getByTestId} = setup({
+          summary: undefined,
+        })
+
+        const generateButton = getByTestId('summary-generate-button')
+        expect(generateButton).toBeEnabled()
+      })
+
+      it('generate button is enabled when not loading and the summary is obsolete', async () => {
+        const {getByTestId} = setup({
+          summary: {...expectedSummary, obsolete: true},
+        })
+
+        const generateButton = getByTestId('summary-generate-button')
+        expect(generateButton).toBeEnabled()
+      })
+
+      it('generate button is disabled when summary is loading', async () => {
+        const {getByTestId} = setup({
+          summary: null,
+        })
+
+        const generateButton = getByTestId('summary-generate-button')
+        expect(generateButton).toBeDisabled()
+      })
+
+      it('generate button is disabled when feedback is loading', async () => {
+        const {getByTestId} = setup({
+          summary: expectedSummary,
+          isFeedbackLoading: true,
+        })
+
+        const generateButton = getByTestId('summary-generate-button')
+        expect(generateButton).toBeDisabled()
+      })
+
+      it('generate button is disabled when not loading and summary is available, not obsolete and user input is not changed', async () => {
+        const {getByTestId} = setup({
+          summary: expectedSummary,
+        })
+
+        const generateButton = getByTestId('summary-generate-button')
+        expect(generateButton).toBeDisabled()
+      })
+    })
+
+    describe('Obsolete alert', () => {
+      it('should display an alert when the summary is obsolete', async () => {
+        const {getByText} = setup({
+          summary: {...expectedSummary, obsolete: true},
+        })
+
+        const alert = getByText(/There have been new replies since this summary/)
+        expect(alert).toBeInTheDocument()
+      })
+
+      it('should not display an alert when the summary is not obsolete', async () => {
+        const {queryByText} = setup({
+          summary: expectedSummary,
+        })
+
+        const alert = queryByText(/There have been new replies since this summary/)
+        expect(alert).not.toBeInTheDocument()
       })
     })
    })

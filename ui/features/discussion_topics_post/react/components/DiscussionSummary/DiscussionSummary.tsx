@@ -28,17 +28,19 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconEndLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
+import {Alert} from '@instructure/ui-alerts'
 
 interface DiscussionSummary {
   id: number;
   text: string;
   userInput?: string;
+  obsolete: boolean;
 }
 
 export interface DiscussionSummaryProps {
   onDisableSummaryClick: () => void
   isMobile: boolean
-  summary: {id: number; text: string} | null
+  summary: DiscussionSummary | null
   onSetSummary: Dispatch<SetStateAction<DiscussionSummary | null | undefined>>
   isFeedbackLoading: boolean
   onSetIsFeedbackLoading: (isFeedbackLoading: boolean) => void
@@ -166,7 +168,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   } else {
     content = (
       <>
-        <Flex.Item margin={props.isMobile ? '0 0 mediumSmall 0' : '0 0 small 0'}>
+        <Flex.Item margin="0 0 medium 0">
           <Text fontStyle="italic" size="medium" weight="normal" data-testid="summary-text">
             {props.summary?.text?.split('\n').map((line, index) => (
               <React.Fragment key={index}>
@@ -176,6 +178,13 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
             ))}
           </Text>
         </Flex.Item>
+        {props.summary?.obsolete && (
+          <Flex.Item margin="0 0 medium 0">
+            <Alert variant="info" margin="0" hasShadow={false} data-testid="summary-obsolete-alert">
+              {I18n.t('There have been new replies since this summary was generated. (TBD)')}
+            </Alert>
+          </Flex.Item>
+        )}
         <Flex.Item margin="0 0 medium 0" align="end">
           <DiscussionSummaryRatings
             liked={props.liked}
@@ -215,7 +224,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
           )}
         </Text>
       </Flex.Item>
-      <Flex gap="small" wrap="wrap" margin="medium 0" alignItems='end'>
+      <Flex gap="small" wrap="wrap" margin="0 0 medium 0" alignItems='end'>
         <Flex.Item width={props.isMobile ? '100%' : 'auto'} shouldGrow={true}>
           <TextInput
             renderLabel={I18n.t('Topics to focus on')}
@@ -231,7 +240,11 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
         <Flex.Item width={props.isMobile ? '100%' : 'auto'}>
           <DiscussionSummaryGenerateButton
             onClick={generateSummary}
-            isEnabled={!isSummaryLoading && !props.isFeedbackLoading && (userInput !== previousUserInput || isInitialGeneration)}
+            isEnabled={
+              !isSummaryLoading &&
+              !props.isFeedbackLoading &&
+              (userInput !== previousUserInput || !props.summary || props.summary?.obsolete)
+            }
             isMobile={props.isMobile}
           />
         </Flex.Item>

@@ -102,12 +102,23 @@ class DiscussionTopicsApiController < ApplicationController
   def find_summary
     return render_unauthorized_action unless @topic.user_can_summarize?(@current_user)
 
-    summary = @topic.summaries.where(user: @current_user).order(created_at: :desc).first
-    if summary
-      render(json: { id: summary.id, text: summary.summary, userInput: summary.user_input })
-    else
-      render(json: { error: t("No summary found.") }, status: :not_found)
+    llm_configs = fetch_llm_configs
+    return if llm_configs.nil?
+
+    llm_config_refined = llm_configs[:refined]
+
+    summary = @topic.summaries.where(user: @current_user, llm_config_version: llm_config_refined.name).order(created_at: :desc).first
+    parent_summary = summary&.parent
+    unless summary && parent_summary
+      render(json: { error: t("No summary found.") }, status: :not_found) and return
     end
+
+    focus = generate_focus(summary.user_input)
+    old_content_hash = parent_summary.dynamic_content_hash
+    new_content_hash = generate_raw_dynamic_content(focus)[:hash]
+    summary_obsolete = old_content_hash != new_content_hash
+
+    render(json: { id: summary.id, text: summary.summary, userInput: summary.user_input, obsolete: summary_obsolete })
   end
 
   # @API Find or Create Summary
@@ -132,22 +143,15 @@ class DiscussionTopicsApiController < ApplicationController
   def find_or_create_summary
     return render_unauthorized_action unless @topic.user_can_summarize?(@current_user)
 
-    llm_config_raw = LLMConfigs.config_for("discussion_topic_summary_raw")
-    llm_config_refined = LLMConfigs.config_for("discussion_topic_summary_refined")
+    llm_configs = fetch_llm_configs
+    return if llm_configs.nil?
 
-    if llm_config_raw.nil? || llm_config_refined.nil?
-      logger.error("No LLM config found for discussion topic summary")
-      return render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
-    end
+    llm_config_raw, llm_config_refined = llm_configs.values_at(:raw, :refined)
 
     user_input = params[:userInput]
-    focus = DiscussionTopic::PromptPresenter.focus_for_summary(user_input:)
-
-    raw_dynamic_content = {
-      CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
-      FOCUS: focus
-    }
-    raw_dynamic_content_hash = Digest::SHA256.hexdigest(raw_dynamic_content.to_json)
+    focus = generate_focus(user_input)
+    raw_dynamic_content, raw_dynamic_content_hash = generate_raw_dynamic_content(focus)
+                                                    .values_at(:content, :hash)
     raw_summary = fetch_or_create_summary(
       llm_config: llm_config_raw,
       dynamic_content: raw_dynamic_content,
@@ -155,14 +159,9 @@ class DiscussionTopicsApiController < ApplicationController
       user_input:
     )
 
-    locale = I18n.locale.to_s || I18n.default_locale.to_s || "en"
-    pretty_locale = available_locales[locale] || "English"
-    refined_dynamic_content = {
-      CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: raw_summary.summary),
-      FOCUS: focus,
-      LOCALE: pretty_locale
-    }
-    refined_dynamic_content_hash = Digest::SHA256.hexdigest(refined_dynamic_content.to_json)
+    refined_dynamic_content, refined_dynamic_content_hash = generate_refined_dynamic_content(focus, raw_summary)
+                                                            .values_at(:content, :hash)
+
     refined_summary = fetch_or_create_summary(
       llm_config: llm_config_refined,
       dynamic_content: refined_dynamic_content,
@@ -1080,6 +1079,43 @@ class DiscussionTopicsApiController < ApplicationController
     end
 
     true
+  end
+
+  def fetch_llm_configs
+    llm_config_raw = LLMConfigs.config_for("discussion_topic_summary_raw")
+    llm_config_refined = LLMConfigs.config_for("discussion_topic_summary_refined")
+
+    if llm_config_raw.nil? || llm_config_refined.nil?
+      logger.error("No LLM config found for discussion topic summary")
+      render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity) and return
+    end
+
+    { raw: llm_config_raw, refined: llm_config_refined }
+  end
+
+  def generate_focus(user_input)
+    DiscussionTopic::PromptPresenter.focus_for_summary(user_input: user_input)
+  end
+
+  def generate_raw_dynamic_content(focus)
+    raw_dynamic_content = {
+      CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+      FOCUS: focus
+    }
+
+    { content: raw_dynamic_content, hash: Digest::SHA256.hexdigest(raw_dynamic_content.to_json) }
+  end
+
+  def generate_refined_dynamic_content(focus, raw_summary)
+    locale = I18n.locale.to_s || I18n.default_locale.to_s || "en"
+    pretty_locale = available_locales[locale] || "English"
+    refined_dynamic_content = {
+      CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: raw_summary.summary),
+      FOCUS: focus,
+      LOCALE: pretty_locale
+    }
+
+    { content: refined_dynamic_content, hash: Digest::SHA256.hexdigest(refined_dynamic_content.to_json) }
   end
 
   def fetch_or_create_summary(llm_config:, dynamic_content:, dynamic_content_hash:, user_input:, parent_summary: nil, locale: nil)
