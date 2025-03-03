@@ -2254,6 +2254,18 @@ ready(function () {
     restoreOriginalMessage($('.question_points_holder'))
   })
 
+  $('#found_question_group_name').on('input', function () {
+    restoreOriginalMessage($('#add_question_group_dialog .name'))
+  })
+
+  $('#found_question_group_pick').on('input', function () {
+    restoreOriginalMessage($('#add_question_group_dialog .pick'))
+  })
+
+  $('#found_question_group_points').on('input', function () {
+    restoreOriginalMessage($('#add_question_group_dialog .points'))
+  })
+
   $('#quiz_require_lockdown_browser').change(function () {
     $('#lockdown_browser_suboptions').showIf($(this).prop('checked'))
     $('#quiz_require_lockdown_browser_for_results').prop('checked', true).change()
@@ -3470,6 +3482,29 @@ ready(function () {
   })
 
   $('#add_question_group_dialog .submit_button').click(event => {
+    const restoreDialogButton = (dialog) => {
+      dialog
+        .find('button')
+        .prop('disabled', false)
+        .filter('.submit_button')
+        .text(I18n.t('buttons.create_group', "Create Group"))
+    }
+
+    const renderNameError = (message) => {
+      renderError($('#add_question_group_dialog .name'), message)
+      restoreDialogButton($dialog)
+    }
+
+    const renderPickError = (message) => {
+      renderError($('#add_question_group_dialog .pick'), message)
+      restoreDialogButton($dialog)
+    }
+
+    const renderPointsError = (message) => {
+      renderError($('#add_question_group_dialog .points'), message)
+      restoreDialogButton($dialog)
+    }
+
     const $dialog = $('#add_question_group_dialog')
     $dialog
       .find('button')
@@ -3478,11 +3513,68 @@ ready(function () {
       .text(I18n.t('buttons.creating_group', 'Creating Group...'))
 
     const params = $dialog.getFormData()
+
+    let hasValidationErrors = false
+
+    const groupName = params['quiz_group[name]']
+    const groupPicks = params['quiz_group[pick_count]']
+    const groupPoints = params['quiz_group[question_points]']
+
+    // Name validation
+    if (!groupName) {
+      renderNameError(I18n.t('errors.field_is_required', 'This field is required'))
+      hasValidationErrors = true
+    }
+
+    // Picks validation
+    const parsedPickCount = Number.parseInt(groupPicks, 10)
+
+    if (Number.isNaN(parsedPickCount)) {
+      renderPickError(I18n.t('errors.must_be_number', 'Must be a number'))
+      hasValidationErrors = true
+    }
+
+    if (groupPicks == null || groupPicks === '') {
+      renderPickError(I18n.t('errors.field_is_required', 'This field is required'))
+      hasValidationErrors = true
+    }
+
+    if (parsedPickCount < 0) {
+      renderPickError(I18n.t('question.positive_points', 'Must be zero or greater'))
+      hasValidationErrors = true
+    }
+
+    // Points validation
+    const parsedPoints = Number.parseInt(groupPoints, 10)
+
+    if (Number.isNaN(parsedPoints)) {
+      renderPointsError(I18n.t('errors.must_be_number', 'Must be a number'))
+      hasValidationErrors = true
+    }
+
+    if (groupPoints == null || groupPoints === '') {
+      renderPointsError(I18n.t('errors.field_is_required', 'This field is required'))
+      hasValidationErrors = true
+    }
+
+    if (parsedPoints < 0) {
+      renderPointsError(I18n.t('question.positive_points', 'Must be zero or greater'))
+      hasValidationErrors = true
+    }
+
+    if (hasValidationErrors) {
+      $('#add_question_group_dialog .form-control.invalid input').first().focus(150)
+      return false
+    }
+
     const quizGroupQuestionPoints = numberHelper.parse(params['quiz_group[question_points]'])
+
     if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
-      $(this)
-        .find("input[name='quiz_group[question_points]']")
-        .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
+      renderError(
+        $('#add_question_group_dialog .points'),
+        I18n.t('question.positive_points', 'Must be zero or greater')
+      )
+      restoreDialogButton($dialog)
       return false
     } else {
       params['quiz_group[question_points]'] = quizGroupQuestionPoints
@@ -3499,11 +3591,7 @@ ready(function () {
       'POST',
       newParams,
       data => {
-        $dialog
-          .find('button')
-          .prop('disabled', false)
-          .filter('.submit_button')
-          .text(I18n.t('buttons.create_group', 'Create Group'))
+        restoreDialogButton($dialog)
 
         const $group_top = $('#group_top_template').clone(true).attr('id', 'group_top_new')
         const $group_bottom = $('#group_bottom_template').clone(true).attr('id', 'group_bottom_new')
@@ -3522,18 +3610,19 @@ ready(function () {
 
         updateFindQuestionDialogQuizGroups(group.id)
         $dialog.dialog('close')
+        $dialog.find('input[type="text"]').val('')
       },
-      data => {
-        $dialog
-          .find('button')
-          .prop('disabled', false)
-          .filter('.submit_button')
-          .text(I18n.t('errors.creating_group_failed', 'Create Group Failed, Please Try Again'))
+      () => {
+        restoreDialogButton($dialog)
       },
     )
   })
 
   $('#add_question_group_dialog .cancel_button').click(event => {
+    restoreOriginalMessage($('#add_question_group_dialog .name'))
+    restoreOriginalMessage($('#add_question_group_dialog .pick'))
+    restoreOriginalMessage($('#add_question_group_dialog .points'))
+    $('#add_question_group_dialog').find('input[type="text"]').val('')
     $('#add_question_group_dialog').dialog('close')
     $('#quiz_group_select').val('none')
   })

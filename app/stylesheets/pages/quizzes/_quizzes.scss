@@ -211,8 +211,13 @@ label {
 
 textarea[type]:required:invalid,
 input[type]:required:invalid {
-  border-color: $ic-color-danger;
+  border-color: #ccc;
   box-shadow: none;
+  color: var(--ic-brand-font-color-dark);
+
+  &:focus {
+    border-color: var(--ic-link-color-lightened-10);
+  }
 }
 
 .questions_number_message_container,
@@ -274,7 +279,10 @@ input[type]:required:invalid {
   }
 
   &.invalid {
-    .form-control__input, input {
+    .form-control__input,
+    input,
+    input[type]:required:invalid,
+    input[type]:focus:required:invalid {
       border-color: $ic-color-danger;
       box-shadow: none;
     }
@@ -288,6 +296,10 @@ input[type]:required:invalid {
     .tox .tox-edit-area.active iframe {
       border-color: $ic-color-danger !important;
     }
+  }
+
+  &--with-bottom-margin {
+    margin-bottom: 0.5rem;
   }
 
   &__label {
@@ -305,6 +317,12 @@ input[type]:required:invalid {
 
   &__message {
     font-weight: normal;
+  }
+
+  &__input {
+    &--without-margin {
+      margin: 0 !important;
+    }
   }
 
   &__inline-wrapper {
@@ -1386,7 +1404,6 @@ ul#quiz_versions {
       padding-top: 0.5rem !important;
     }
   }
-
   #quiz_title {
     margin-top: 5px;
   }
