@@ -5063,7 +5063,7 @@ ga:
   canvas_needs_access_to_your_camera_b5418c0: "Teastaíonn rochtain ar do cheamara ó Canvas."
   canvas_notifications_tutorial_video_79b8e768: "Físeán Teagaisc Fógraí Canvas"
   canvas_now_has_two_quiz_engines_please_choose_whic_4aa9821: |-
-      Tá dhá inneall quizeanna ag Canvas anois. Roghnaigh an
+      Tá dhá inneall quiz ag Canvas anois. Roghnaigh an
               ceann ar mhaith leat a úsáid.
   canvas_pages_accessed_by_the_subject_and_related_m_ed99a0b1: "Leathanaigh Canvas a bhfuil rochtain ag an ábhar orthu agus meiteashonraí gaolmhara."
   canvas_release_notes_f3dc5359: "Nótaí Eisiúna Canvas"
@@ -5085,7 +5085,7 @@ ga:
   captions_off_2ae45751: "Fotheidil Múchta"
   captions_subtitles_af2c47e: Fotheidil/Fotheidil
   captured_image_91838f78: "Íomhá Gafa"
-  card_view_eaf73185: "Amharc Cárta"
+  card_view_eaf73185: "Amharc Liosta"
   carousel_next_badge_button_5e69cc66: "Timpeallán Cnaipe an Chéad Suaitheantais Eile"
   carousel_next_item_button_4955fce0: "Cnaipe Timpealláin “Céad Mhír Eile”"
   carousel_next_product_button_f4828808: "Cnaipe an Timpealláin don Chéad Táirge Eile"
@@ -5228,7 +5228,7 @@ ga:
   choose_a_file_to_upload_from_your_device_d1b50d4c: "Roghnaigh comhad le huaslódáil ó do ghléas"
   choose_a_name_override_for_each_placement_optional_477cfd2b: "Roghnaigh ainm sáraithe do gach socrúchán (roghnach)."
   choose_a_nickname_for_toolname_11447f43: "Roghnaigh leasainm le haghaidh *%{toolName}*."
-  choose_a_quiz_engine_8820d521: "Roghnaigh Innill Quizeanna"
+  choose_a_quiz_engine_8820d521: "Roghnaigh Inneall Quiz"
   choose_a_reply_to_topic_due_date_and_time_b908fd6: "Roghnaigh dáta agus am dlite chun freagra a thabhairt don topaic"
   choose_a_self_sign_up_deadline_date_and_time_19b311e1: "Roghnaigh dáta agus am féinchláraithe"
   choose_a_sticker_aa45291e: "Roghnaigh greamán"
@@ -8021,7 +8021,7 @@ ga:
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Sannta faoi láthair do %{tokenName}, cliceáil chun é a bhaint"
   currently_selected_color_93f44b9f: "Dath Roghnaithe Faoi láthair"
   currently_student_analysis_report_csv_format_is_av_4e24fa59: |-
-      Faoi láthair, tá Tuairisc Anailíse Mac Léinn (formáid CSV)
+      Faoi láthair, tá Tuairisc Anailíse na Mac Léinn (formáid CSV)
               ar fáil trí Quizeanna Clasaiceacha.
   currently_visible_to_e2f85345: "Infheicthe Faoi láthair Go"
   curso_f0ee9b5: Curso
@@ -8118,7 +8118,7 @@ ga:
   dashboard_card_movement_menu_b65b98f5: "Roghchlár Gluaiseachta Cárta Deais"
   dashboard_graphql_integration_bb3f3565: "Comhtháthú GrafQL Deais"
   dashboard_options_b240ed5a: "Roghanna Deais"
-  dashboard_view_d7d85969: "Amharc Deais"
+  dashboard_view_d7d85969: "Amharc Deaise"
   data_exports: "onnmhairí sonraí"
   data_point_over_time_8d0a54cc: "%{data_point} Thar Am"
   data_services_c47a8130: "Seirbhísí Sonraí"
@@ -10738,7 +10738,7 @@ ga:
   formattedgrade_points_576abfea: "%{formattedGrade} *Pointí*"
   formattedpoints_points_c75261e2: 
     one: "Pointe 1"
-    other: "%{formattedPoints} pointí"
+    other: "Líon na bPointí: %{formattedPoints}"
   formattedpoints_points_possible_1d93043f: 
     one: "Pointe *1* Féideartha"
     other: "*%{formattedPoints}* Pointí Féideartha"
@@ -15693,11 +15693,11 @@ ga:
   modelsQuiz: 
     assignment_points_possible: 
       one: "Pointe 1"
-      other: "%{count} pte"
+      other: "Líon na bPointí: %{count}"
     cant_unpublish_when_students_submit: "Ní féidir é a dhífhoilsiú má tá uaslódálacha mac léinn ann"
     question_count: 
       one: "Ceist 1"
-      other: "%{count} (g)c(h)eist"
+      other: "Líon na gCeisteanna: %{count}"
   modelsSection: 
     overrides: 
       everyone: "Gach duine"
@@ -16018,10 +16018,10 @@ ga:
   n_irrelevant_enrollments_irrelevant_enrollments_en_1db72153: "%{n_irrelevant_enrollments} rolluithe nach mbaineann le hábhar (rolluithe nach bhfuil incháilithe le haghaidh sioncronaithe). Úsáideoirí:"
   n_irrelevant_enrollments_irrelevant_enrollments_en_6ff5027c: "%{n_irrelevant_enrollments} rolluithe nach mbaineann le hábhar (rolluithe nach bhfuil incháilithe le haghaidh sioncronaithe). An chéad %{max_shown_users} úsáideoir:"
   n_number_of_times_c2e78b72: "n Líon Uaireanta"
-  n_points_possible_precision_2_st_points_bc3748df: "%{n_points_possible_precision_2_st} Pointí"
-  n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Pointí"
+  n_points_possible_precision_2_st_points_bc3748df: "Líon na bPointí: %{n_points_possible_precision_2_st}"
+  n_points_precision_2_strip_insig_points_60ad6f21: "Líon na bPointí: %{n_points_precision_2_strip_insig}"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} Pointí Féideartha"
-  n_pointspossible_pts_73274d36: "%{n_pointsPossible} pte"
+  n_pointspossible_pts_73274d36: "Líon na bPointí: %{n_pointsPossible}"
   n_users_canvas_users_without_corresponding_microso_262ece1c: "%{n_users} Úsáideoirí Canvas gan úsáideoir comhfhreagrach Microsoft. An chéad %{n_shown}:"
   n_users_canvas_users_without_corresponding_microso_5230e74c: "%{n_users} Úsáideoirí Canvas gan úsáideoir comhfhreagrach Microsoft:"
   n_users_users_without_valid_login_attribute_6dc33cc7: "%{n_users} úsáideoir gan tréith logála isteach bailí:"
@@ -16849,7 +16849,7 @@ ga:
   number_of_times_calc_int_6d1f8687: "Líon Amanna (%{calc_int})"
   numerical_answer_ec7120bf: "Freagra uimhriúil"
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} de %{numGroup} Máistrithe"
-  numpoints_points_b1f0666a: "%{numPoints} pointí"
+  numpoints_points_b1f0666a: "Líon na bPointí: %{numPoints}"
   o_224cf405: o
   oauth2_provider: 
     auth: 
@@ -18222,21 +18222,21 @@ ga:
   points_n_e0b20623: "Pointí %{n}"
   points_out_of_total_24f61148: "*%{points}* as **%{total}**"
   points_points_b6b422e2: "Pointí: %{points}"
-  points_points_d70ced4f: "%{points} pointí"
+  points_points_d70ced4f: "Líon na bPointí: %{points}"
   points_possible_1c0b3445: "Pointí Indéanta"
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
   points_possible_additional_replies_d84680b8: "Pointí Féideartha: Freagraí Breise"
   points_possible_e57d5613: "Pointí indéanta"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Caithfidh na pointí indéanta a bheith 0 nó níos mó don chineál Marcáil roghnaithe"
-  points_possible_points_fda3b111: "%{points_possible} Pointí"
-  points_possible_pts_aedb481e: "%{points_possible} pte"
+  points_possible_points_fda3b111: "Líon na bPointí: %{points_possible}"
+  points_possible_pts_aedb481e: "Líon na bPointí: %{points_possible}"
   points_possible_reply_to_topic_6b19cfe3: "Pointí Féideartha: Tabhair freagra at Topaic"
-  points_pts_e5596bf7: "%{points} pte"
+  points_pts_e5596bf7: "Líon na bPointí: %{points}"
   points_should_be_strictly_decreasing_l_r_18f26f87: "Ba cheart go laghdódh pointí go dian: %{l} <= %{r}"
   points_to_endofrangepoints_pts_aad207f0: "%{points} go >%{endOfRangePoints} pointe"
   points_total_pts_5b4cbd77: "%{points} / %{total} pte"
-  pointspossible_pts_624a6733: "%{pointsPossible} pte"
+  pointspossible_pts_624a6733: "Líon na bPointí: %{pointsPossible}"
   poland_48_e77cc14d: "An Pholainn (+48)"
   polish_4cf2ecaf: Polainnis
   poll_sessions_516c4c26: "Seisiúin Vótála"
@@ -18272,7 +18272,7 @@ ga:
   possible_matches_for_address_select_the_correct_on_e206f972: "Meaitseálacha féideartha le haghaidh \"%{address}\". Roghnaigh an ceann ceart thíos nó cruthaigh úsáideoir nua."
   possible_matches_for_key_select_the_desired_one_be_fd878b4b: "Meaitseálacha féideartha le haghaidh \"%{key}\". Roghnaigh an ceann atá ag teastáil thíos."
   possible_matches_for_searchtype_select_the_desired_14af33f9: "Meaitseálacha féideartha le haghaidh \"%{searchType}\". Roghnaigh an ceann atá ag teastáil thíos."
-  possible_pts_b63dff4c: "%{possible} pte"
+  possible_pts_b63dff4c: "Líon na bPointí: %{possible}"
   possible_score_5e0a328e: "Féideartha: %{score}"
   post_1e445890: Postáil
   post_at_be4b826d: "Postáil Ag"
@@ -18862,7 +18862,7 @@ ga:
       no_questions: "Gan Cheisteanna"
       question_count: 
         one: "Ceist 1"
-        other: "%{count} (g)c(h)eist"
+        other: "Líon na gCeisteanna: %{count}"
     question_teaser: 
       full_details: "Cliceáil chun sonraí iomlána na ceiste a thaispeáint"
       links: 
@@ -19226,7 +19226,7 @@ ga:
           move_copy_question: "aistrigh/cóipeáil ceist chuig banc eile"
         not_yet_graded: "Níl sé marcáilte go fóill"
         original_score: "Scór Úrnuachta"
-        points_possible: "%{points_possible} pte"
+        points_possible: "Líon na bPointí: %{points_possible}"
         question_score: "Scór na gCeisteanna"
         regraded_score: "Scór Athmharcáilte:"
         show_ansers_for_variable: "Taispeáin Freagraí do %{variable}"
@@ -19831,7 +19831,7 @@ ga:
   quizzes_index: 
     headers: 
       assignment_quizzes: "Tasc Quizeanna"
-      practice_quizzes: "Cleachtadh - Practice/ Quizeanna Cleachtadh"
+      practice_quizzes: "Quizeanna mar Chleachtadh"
       surveys: Suirbhéanna
     toggle_message: "scoránaigh infheictheacht quiz"
   quizzes_index_menu_1ce11b54: "Roghchlár Innéacs Quizeanna"
@@ -20494,7 +20494,7 @@ ga:
   reset_lti_provision_6d8e287f: "Athshocraigh Soláthar LTI"
   reset_multi_factor_authentication_2b63a558: "Athshocraigh Fíordheimhniú Ilfhachtóiriúil"
   reset_name_6a0aa0f: "Athshocraigh \"%{name}\""
-  reset_quiz_engine_choice_323a40e6: "Athshocraigh rogha innill quizeanna"
+  reset_quiz_engine_choice_323a40e6: "Athshocraigh rogha an innill quiz"
   reset_the_uuid_of_a_course_when_it_is_reset_this_a_766ac95: "Athshocraigh UUID cúrsa nuair a athshocraítear é.  Ligeann sé seo go n-oibreoidh an cúrsa ar ais níos fearr do Thráth na gCeist Nua."
   reset_this_contact_method_s_bounce_count_3845ecf4: "Athshocraigh áireamh preab ar ais an mhodha teagmhála seo"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Athshocraigh áireamh preab ar ais an tseolta ríomhphoist seo"
@@ -20934,7 +20934,7 @@ ga:
   score_points_3c48e2a8: "%{score} pointí"
   score_pointspossible_bd57ea9e: "%{score}/%{pointsPossible}"
   score_pointspossibletranslated_c1ac019e: "%{score}/%{pointsPossibleTranslated}"
-  score_pts_adcb1af3: "%{score} pte"
+  score_pts_adcb1af3: "Líon na bPointí: %{score}"
   score_score_6f81e8c8: "Scór: %{score}"
   score_similarity_score_2c25b94b: "%{score}% scór cosúlachta"
   score_student_points_possible_points_78360e86: "Scór {{student_points}}/{{possible_points}}"
@@ -21813,7 +21813,7 @@ ga:
         criterion_ratings: "Rátálacha Critéir"
         master_level: "socraigh máistreacht le haghaidh aon scór ag nó os a chionn"
         use_for_scoring: "bain úsáid as an gcritéar seo le haghaidh scórála"
-      points: "%{points} pte"
+      points: "Líon na bPointí: %{points}"
       points_threshold: "tairseach: %{points} pte"
       titles: 
         mastery_level: "faoin gcéad os a chionn chun forlámhas a shocrú"
@@ -22026,7 +22026,7 @@ ga:
       labels: 
         threshold: tairseach
       no_marks: "Níl aon Mharcanna"
-      points: "%{points} pte"
+      points: "Líon na bPointí: %{points}"
     rubric_criterion_dialog: 
       labels: 
         additional_comments: "Ráitis Breise"
@@ -24230,9 +24230,9 @@ ga:
                     gheobhaidh tú an scéim marcála réamhshocraithe óna máthairchuntas ach amháin má sháraítear í.
   this_group_was_successfully_removed_81178d51: "Baineadh an grúpa seo go rathúil."
   this_has_more_question_types_like_hotspot_categori_620e9df6: |-
-      Tá níos mó cineálacha ceisteanna aige seo mar hotspot,
-              catagóiriú, meaitseáil, agus ordú. Tá níos mó
-              gnéithe modhnóireachta agus comhréitigh aige freisin.
+      Gheofar tuilleadh cineálacha ceisteanna anseo mar shampla ‘hotspot’,
+              catagóiriú, meaitseáil, agus cuir in ord. Tá níos mó
+              gnéithe modhnóireachta agus comhréitigh anseo freisin.
   this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "Sioncrónaíonn an seomrabaile seo rolluithe agus dátaí tosaigh/críochnaigh ábhar chuig: "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Taispeántar an íomhá seo mar comhartha uisce cúlra do do leathanach. Formáidí a nglactar leo: Grafaic Ghréasáin Iniompartha, svg, gif, jpeg"
   this_image_has_been_reported_9360e581: "Tuairiscíodh an íomhá seo."
