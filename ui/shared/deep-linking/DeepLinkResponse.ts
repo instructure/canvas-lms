@@ -26,4 +26,6 @@ export type DeepLinkResponse = {
   ltiEndpoint?: string
   reloadpage?: boolean
   replaceEditorContents?: boolean
+  // This is present for some placements, see deep_linking_controller.rb
+  tool_id?: string | number
 }
