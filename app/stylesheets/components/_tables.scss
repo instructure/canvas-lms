@@ -247,3 +247,20 @@ $sp-table: $ic-sp + 2;
     }
   }
 }
+
+.ic-Table-scroll-container {
+  overflow-x: auto;
+  white-space: nowrap;
+  max-width: 100vw;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    height: 0.5rem;
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 0.25rem;
+  }
+}
