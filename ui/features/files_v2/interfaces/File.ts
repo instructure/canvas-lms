@@ -86,3 +86,11 @@ export interface Folder {
   can_upload: boolean
   [key: string]: any
 }
+
+export interface Tool {
+  id: string
+  title: string
+  base_url: string
+  canvas_icon_class?: string
+  icon_url: string
+}

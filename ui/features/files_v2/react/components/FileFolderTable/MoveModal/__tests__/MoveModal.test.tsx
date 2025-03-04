@@ -43,6 +43,7 @@ const renderComponent = (props: any = {}) =>
         rootFolder: FAKE_FOLDERS[0],
         contextType: 'course',
         contextId: '1',
+        fileIndexMenuTools: [],
       }}
     >
       <MoveModal {...defaultProps} {...props} />

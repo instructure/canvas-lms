@@ -18,7 +18,7 @@
 
 import {createContext} from 'react'
 import {BBFolderWrapper} from 'features/files_v2/utils/fileFolderWrappers'
-import {type Folder} from 'features/files_v2/interfaces/File'
+import {type Folder, type Tool} from 'features/files_v2/interfaces/File'
 
 interface FileManagementContextProps {
   folderId: string
@@ -27,6 +27,7 @@ interface FileManagementContextProps {
   showingAllContexts: boolean
   rootFolder?: Folder
   currentFolder?: BBFolderWrapper | null
+  fileIndexMenuTools: Tool[]
 }
 
 export const FileManagementContext = createContext({} as FileManagementContextProps)

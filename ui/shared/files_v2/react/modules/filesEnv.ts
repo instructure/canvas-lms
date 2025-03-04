@@ -24,6 +24,13 @@ interface Permissions {
   manage_files_boolean?: boolean
   [key: string]: boolean | undefined
 }
+interface Tool {
+  id: string
+  title: string
+  base_url: string
+  canvas_icon_class?: string
+  icon_url: string
+}
 interface FileContext {
   asset_string: string
   contextType: string
@@ -32,6 +39,7 @@ interface FileContext {
   permissions: Permissions
   name: string
   usage_rights_required?: boolean
+  file_index_menu_tools?: Tool[]
 }
 
 declare const ENV: {
