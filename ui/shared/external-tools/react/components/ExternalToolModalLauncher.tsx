@@ -64,6 +64,7 @@ export type ExternalToolModalLauncherProps = {
   onExternalContentReady?: (data: any) => void,
   onDeepLinkingResponse?: (data: any) => void,
   resourceSelection?: boolean,
+  secureParams?: string,
 }
 
 export default class ExternalToolModalLauncher extends React.Component<ExternalToolModalLauncherProps> {
@@ -125,6 +126,8 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
         this.props.launchType,
         this.props.contextModuleId && '&context_module_id=',
         this.props.contextModuleId,
+        this.props.secureParams && '&secure_params=',
+        this.props.secureParams,
       ].join('')
     }
   }

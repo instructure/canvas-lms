@@ -24,7 +24,7 @@ import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse';
 import {AssetProcessorContentItem} from '@canvas/deep-linking/models/AssetProcessorContentItem';
 import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog';
 
-export function AssetProcessorModalLauncher() {
+export function AssetProcessorModalLauncher({secureParams}: {secureParams: string}) {
   const [isOpen, setIsOpen] = useState(false);
   const [tools, setTools] = useState<LtiLaunchDefinition[]>([]);
   const [selectedTool, setSelectedTool] = useState<LtiLaunchDefinition|null>(null);
@@ -98,6 +98,7 @@ export function AssetProcessorModalLauncher() {
           title={`Deep Link AP - ${selectedTool.name}`}
           resourceSelection
           onDeepLinkingResponse={handleDeepLinkingResponse}
+          secureParams={secureParams}
         />
       )}
       {Object.keys(formData).map((toolId, toolIndex) => (
@@ -119,7 +120,7 @@ export function AssetProcessorModalLauncher() {
   );
 }
 
-export const attach = function (element: HTMLElement) {
-  const root = createRoot(element)
-  root.render(<AssetProcessorModalLauncher />)
+export const attach = function ({container, secureParams}: {container: HTMLElement, secureParams: string}) {
+  const root = createRoot(container)
+  root.render(<AssetProcessorModalLauncher secureParams={secureParams} />)
 }

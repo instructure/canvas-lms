@@ -46,7 +46,7 @@ describe('AssetProcessorModalLauncher', () => {
       const callback = (args as any)[2];
       return callback(tools)
     })
-    render(<AssetProcessorModalLauncher />)
+    render(<AssetProcessorModalLauncher secureParams="" />)
     await waitFor(() => expect($.get).toHaveBeenCalled())
     expect(screen.getByText('Attach AP - Tool 1')).toBeInTheDocument()
   })
@@ -57,9 +57,23 @@ describe('AssetProcessorModalLauncher', () => {
       const callback = (args as any)[2];
       return callback(tools)
     })
-    render(<AssetProcessorModalLauncher />)
+    render(<AssetProcessorModalLauncher secureParams="" />)
     fireEvent.click(screen.getByText('Attach AP - Tool 1'))
     expect(screen.getByText('Deep Link AP - Tool 1')).toBeInTheDocument()
+  })
+
+  it('passes along secure_params to the launch URL', async () => {
+    const tools = [{ name: 'Tool 1', definition_id: 1 }]
+    jest.spyOn($, 'get').mockImplementation((...args) => {
+      const callback = (args as any)[2];
+      return callback(tools)
+    })
+    render(<AssetProcessorModalLauncher secureParams="abcde" />)
+    fireEvent.click(screen.getByText('Attach AP - Tool 1'))
+    expect(screen.getByTitle('Deep Link AP - Tool 1')).toBeInTheDocument()
+    const iframe = screen.getByTitle('Deep Link AP - Tool 1') as HTMLIFrameElement
+    expect(iframe.tagName.toLowerCase()).toBe('iframe')
+    expect(iframe.src).toContain('&secure_params=abcde')
   })
 
   it('fills in hidden input fields on modal close', async () => {
@@ -84,7 +98,7 @@ describe('AssetProcessorModalLauncher', () => {
       const callback = (args as any)[2];
       return callback(tools)
     })
-    render(<AssetProcessorModalLauncher />)
+    render(<AssetProcessorModalLauncher secureParams="" />)
     await waitFor(() => expect($.get).toHaveBeenCalled())
     fireEvent.click(screen.getByText('Attach AP - Tool 1'))
     sendPostMessage({
