@@ -44,6 +44,7 @@ import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunch
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Flex} from '@instructure/ui-flex'
 import {arrayOf, func, bool} from 'prop-types'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('assignments_2_student_content')
 
@@ -129,6 +130,31 @@ function renderAttemptsAndAvailability(assignment) {
   )
 }
 
+function renderLTIToolIframe(submission) {
+  const launchURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/tool_launch`
+  const submissionDetailsURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/submissions/${ENV.current_user_id}`
+
+  const showSubmissionDetailsLink = submission.state === 'graded'
+
+  return (
+    <>
+      {showSubmissionDetailsLink && (
+        <View margin="0 0 small 0" as="div">
+          <Link data-testid="view-submission-link" href={submissionDetailsURL}>
+            {I18n.t('View Submission')}
+          </Link>
+        </View>
+      )}
+      <ToolLaunchIframe
+        allow={iframeAllowances()}
+        src={launchURL}
+        data-testid="lti-external-tool"
+        title={I18n.t('Tool content')}
+      />
+    </>
+  )
+}
+
 function renderContentBaseOnAvailability(
   {assignment, submission, reviewerSubmission, rubricExpanded, toggleRubricExpanded},
   alertContext,
@@ -161,8 +187,6 @@ function renderContentBaseOnAvailability(
   } else {
     const onMarkAsDoneError = () =>
       alertContext.setOnFailure(I18n.t('Error updating status of module item'))
-
-    const launchURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/tool_launch`
 
     return (
       <>
@@ -214,14 +238,7 @@ function renderContentBaseOnAvailability(
         ) : (
           <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
         )}
-        {ENV.LTI_TOOL === 'true' && (
-          <ToolLaunchIframe
-            allow={iframeAllowances()}
-            src={launchURL}
-            data-testid="lti-external-tool"
-            title={I18n.t('Tool content')}
-          />
-        )}
+        {ENV.LTI_TOOL === 'true' && renderLTIToolIframe(submission)}
         {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
       </>
     )
