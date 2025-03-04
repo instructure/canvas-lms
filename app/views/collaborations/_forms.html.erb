@@ -16,108 +16,96 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= form_for([@context, Collaboration.new], :html => { :target => '_blank',
-                                                      :style => 'display: none; margin-top: 10px;' }) do |f| %>
-<h2 tabindex="-1"><%= t 'titles.new', "Start a New Collaboration" %></h2>
-<table class="formtable">
-  <tr id="collaboration_selection_row">
-    <td id="collaboration_selection_label">
-      <%= f.label :collaboration_type, t('labels.collaboration_type', 'Collaborate using:') %>
-    </td>
-    <td style="width: 90%;">
-      <select id="collaboration_collaboration_type" name="collaboration[collaboration_type]">
-        <% Collaboration.collaboration_types.each do |collab_type| %>
-          <% next if collab_type['type'] == 'etherpad' && @sunsetting_etherpad %>
-          <% if collab_type['type'] == 'google_docs' %>
-            <% if @domain_root_account && feature_and_service_enabled?(:google_drive) %>
-              <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
-            <% end %>
-          <% elsif (Collaboration.collaboration_class(collab_type['type'].titleize.gsub(/\s/, "")).config rescue false) %>
+<%= form_for([@context, Collaboration.new], :html => { target: '_blank',
+                                                      style: 'display: none;' }) do |f| %>
+  <h2 tabindex="-1"><%= t 'titles.new', "Start a New Collaboration" %></h2>
+  <div class="ic-Form-control">
+    <%= f.label :collaboration_type, t('labels.collaboration_type', 'Collaborate using'), class: "ic-Label" %>
+    <select id="collaboration_collaboration_type" name="collaboration[collaboration_type]" class="ic-Input labeled-error">
+      <% Collaboration.collaboration_types.each do |collab_type| %>
+        <% next if collab_type['type'] == 'etherpad' && @sunsetting_etherpad %>
+        <% if collab_type['type'] == 'google_docs' %>
+          <% if @domain_root_account && feature_and_service_enabled?(:google_drive) %>
             <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
           <% end %>
+        <% elsif (Collaboration.collaboration_class(collab_type['type'].titleize.gsub(/\s/, "")).config rescue false) %>
+          <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
         <% end %>
-        <% Lti::ContextToolFinder.all_tools_for(@context, placements: :collaboration).each do |tool| %>
-          <option value="<%= tool.name %>" data-launch-url="<%= polymorphic_url([@context, :external_tool], id: tool.id, display: 'borderless', launch_type: 'collaboration') %>">
-            <%= tool.name %>
-          </option>
-        <% end %>
-      </select>
-    </td>
-  </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @user_has_google_drive %>">
-    <td colspan="2" style="padding: 5px 20px 10px">
+      <% end %>
+      <% Lti::ContextToolFinder.all_tools_for(@context, placements: :collaboration).each do |tool| %>
+        <option value="<%= tool.name %>" data-launch-url="<%= polymorphic_url([@context, :external_tool], id: tool.id, display: 'borderless', launch_type: 'collaboration') %>">
+          <%= tool.name %>
+        </option>
+      <% end %>
+    </select>
+  </div>
+  <div class="collaboration_type_descriptions">
+    <div id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @user_has_google_drive %>">
       <%= mt 'descriptions.google_docs',
-        "**Warning:** you (and all your collaborators) will need accounts from the supported web tool in order to participate in any collaborations.
-         Free online web tools are an excellent place for students to work on group projects or papers, take shared notes, etc.
-         Teachers or students can set up group collaborations."
+             "**Warning:** you (and all your collaborators) will need accounts from the supported web tool in order to participate in any collaborations.
+           Free online web tools are an excellent place for students to work on group projects or papers, take shared notes, etc.
+           Teachers or students can set up group collaborations."
       %>
-    </td>
-  </tr><tr id="etherpad_description" style="display: none;" class="collaboration_type">
-    <td colspan="2" style="padding: 5px 20px 10px">
+    </div>
+    <div id="etherpad_description" style="display: none;" class="collaboration_type">
       <%= mt 'descriptions.etherpad', <<-HEREDOC, :etherpad_deletion_policy_url => "http://titanpad.com/ep/pro-help/#deletionpolicy"
-EtherPad is an open source project that lets you quickly set up shared documents.  It's fast enough that you can see what others are typing as they're typing it. On the other hand, "pads" aren't protected by a password so anyone with a link to them can edit them. EtherPad is better suited than Google Docs if you want to support anonymity and/or allowing people without Google accounts to participate.  \n  \n**Warning**: be sure you are familiar with [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) to ensure your work is preserved.
-HEREDOC
-        %>
-    </td>
-  </tr><tr class="collaborate_data">
-    <td style="white-space: nowrap">
-      <%= f.label :title, t('labels.document_name', 'Document name:') %>
-    </td>
-    <td>
-      <%= f.text_field :title, :style => "width: 300px;" %>
-    </td>
-  </tr><tr class="collaborate_data">
-    <td style="white-space: nowrap; vertical-align: top;">
-      <%= f.label :description, t('labels.description', 'Description:') %>
-    </td>
-    <td>
-      <%= f.text_area :description, :style => "width: 400px; height: 50px;" %>
-    </td>
-  </tr><tr>
-    <td colspan="2">
-      <div class="collaborate_data">
-        <div class="collaborator_list"></div>
-        <div class="collaboration-actions form-actions">
-          <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-          <button type="submit" class="btn btn-primary"><%= t 'buttons.start_collaborating', "Start Collaborating" %></button>
-        </div>
+  EtherPad is an open source project that lets you quickly set up shared documents.  It's fast enough that you can see what others are typing as they're typing it. On the other hand, "pads" aren't protected by a password so anyone with a link to them can edit them. EtherPad is better suited than Google Docs if you want to support anonymity and/or allowing people without Google accounts to participate.  \n  \n**Warning**: be sure you are familiar with [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) to ensure your work is preserved.
+  HEREDOC
+      %>
+    </div>
+  </div>
+  <div class="collaborate_data">
+    <div class="ic-Form-control">
+      <label class="ic-Label" for="collaboration_title">
+        <%= t('labels.document_name', 'Document name') %>
+        <span aria-hidden="true" title="<%= t('is_required', 'This field is required') %>" class="required_symbol"> *</span>
+      </label>
+      <%= f.text_field :title, class: "ic-Input labeled-error" %>
+    </div>
+    <div class="ic-Form-control">
+      <%= f.label :description, t('labels.description', 'Description'), class: "ic-Label" %>
+      <%= f.text_area :description, class: "ic-Input labeled-error" %>
+    </div>
+    <div class="collaborator_list"></div>
+    <div class="collaboration-actions form-actions">
+      <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+      <button type="submit" class="btn btn-primary"><%= t 'buttons.start_collaborating', "Start Collaborating" %></button>
+    </div>
+  </div>
+  <div id="collaborate_authorize_google_docs" class="collaboration_authorization" style="display: none;">
+    <% if !@user_has_google_drive %>
+      <%= t '#instructions.authorize_google_drive', "Before you can collaborate on documents, you need to authorize Canvas
+              to access your Google Drive account:" %>
+      <div class="button-container">
+        <a class="btn button-default-action" href="<%= oauth_url(:service => :google_drive, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_drive', "Authorize Google Drive Access" %></a>
+        <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
       </div>
-      <div id="collaborate_authorize_google_docs" class="collaboration_authorization" style="display: none; margin: 20px;">
-        <% if !@user_has_google_drive %>
-          <%= t '#instructions.authorize_google_drive', "Before you can collaborate on documents, you need to authorize Canvas
-            to access your Google Drive account:" %>
-          <div class="button-container">
-            <a class="btn button-default-action" href="<%= oauth_url(:service => :google_drive, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_drive', "Authorize Google Drive Access" %></a>
-            <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-          </div>
 
-        <% end %>
+    <% end %>
+  </div>
+  <div class="before_external_content_info_alert screenreader-only" tabindex="0">
+    <div class="ic-flash-info">
+      <div class="ic-flash__icon" aria-hidden="true">
+        <i class="icon-info"></i>
       </div>
-    </td>
-  </tr>
-</table>
-<div class="before_external_content_info_alert screenreader-only" tabindex="0">
-  <div class="ic-flash-info">
-    <div class="ic-flash__icon" aria-hidden="true">
-      <i class="icon-info"></i>
+      <%= t('The following content is partner provided') %>
     </div>
-    <%= t('The following content is partner provided') %>
   </div>
-</div>
-<iframe
-  class="tool_launch"
-  id="lti_new_collaboration_iframe"
-  allow="<%= Lti::Launch::FRAME_ALLOWANCES.join('; ') %>"
-  data-lti-launch="true"
->
-</iframe>
-<div class="after_external_content_info_alert screenreader-only" tabindex="0">
-  <div class="ic-flash-info">
-    <div class="ic-flash__icon" aria-hidden="true">
-      <i class="icon-info"></i>
+  <iframe
+    class="tool_launch"
+    id="lti_new_collaboration_iframe"
+    allow="<%= Lti::Launch::FRAME_ALLOWANCES.join('; ') %>"
+    data-lti-launch="true"
+  >
+  </iframe>
+  <div class="after_external_content_info_alert screenreader-only" tabindex="0">
+    <div class="ic-flash-info">
+      <div class="ic-flash__icon" aria-hidden="true">
+        <i class="icon-info"></i>
+      </div>
+      <%= t('The preceding content is partner provided') %>
     </div>
-    <%= t('The preceding content is partner provided') %>
   </div>
-</div>
 <% end %>
 <div id="delete_collaboration_dialog" style="display: none;">
   <%= t 'messages.delete_google_doc_as_well', "This collaboration is being stored as a Google Doc.  Did you want to delete it just
@@ -127,19 +115,3 @@ HEREDOC
   <button type="button" class="btn delete_button delete_document_button"><%= mt 'buttons.delete_from_google_docs', "Also Delete From  \nGoogle Docs" %></button>
   </div>
 </div>
-<%= form_tag(context_url(@context, :context_collaboration_url, "{{ id }}"), {:id => "edit_collaboration_form", :method => :put, :style => "display: none; margin-top: 10px;", :class => 'collaboration communication_message'}) do %>
-  <div class="header">
-    <%= text_field :collaboration, :title, :style => "width: 300px;", :value => t('collaboration_name', "%{course_or_group_name} Collaboration", :course_or_group_name => @context.name) %>
-  </div>
-  <div class="content">
-  <%= before_label :description, "Description:" %><br>
-  <%= text_area :collaboration, :description, :style => "width: 400px; height: 50px;" %>
-  </div>
-  <div class="footer">
-    <div class="collaborator_list"></div>
-  </div>
-  <div class="button-container">
-    <button type="submit" class="btn button-default-action"><%= t 'buttons.update', "Update Collaboration" %></button>
-    <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-  </div>
-<% end %>

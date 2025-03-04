@@ -30,7 +30,7 @@ Teachers or students can set up group collaborations."
 <a href="#" class="external_link" target="_blank" style="display: none;">&nbsp;</a>
 <% if @domain_root_account.feature_enabled?(:instui_nav) %>
   <div class="page_header_container">
-    <h1 class="collab-page_header"><%= t 'titles.collaborations', "Collaborations" %></h1>
+    <h1 class="collab-page_header"><%= t 'titles.collaborations', "Current Collaborations" %></h1>
     <div class="actions_buttons-container">
       <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
         <a role="button" class="Button Button--primary add_collaboration_link" href="#">
