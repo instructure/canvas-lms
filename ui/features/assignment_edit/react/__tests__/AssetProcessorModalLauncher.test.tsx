@@ -42,8 +42,9 @@ describe('AssetProcessorModalLauncher', () => {
 
   it('fetches tools on mount', async () => {
     const tools = [{ name: 'Tool 1', definition_id: 1 }]
-    $.get.mockImplementation((url, params, callback) => {
-      callback(tools)
+    jest.spyOn($, 'get').mockImplementation((...args) => {
+      const callback = (args as any)[2];
+      return callback(tools)
     })
     render(<AssetProcessorModalLauncher />)
     await waitFor(() => expect($.get).toHaveBeenCalled())
@@ -52,8 +53,9 @@ describe('AssetProcessorModalLauncher', () => {
 
   it('opens modal on button click', async () => {
     const tools = [{ name: 'Tool 1', definition_id: 1 }]
-    $.get.mockImplementation((url, params, callback) => {
-      callback(tools)
+    jest.spyOn($, 'get').mockImplementation((...args) => {
+      const callback = (args as any)[2];
+      return callback(tools)
     })
     render(<AssetProcessorModalLauncher />)
     fireEvent.click(screen.getByText('Attach AP - Tool 1'))
@@ -64,7 +66,8 @@ describe('AssetProcessorModalLauncher', () => {
     const sendPostMessage = (data: any) =>
       fireEvent(window, new MessageEvent('message', {data, origin}))
     const mockData = [
-        {
+      {
+        type: 'ltiAssetProcessor',
         url: 'https://example.com/tool1',
         title: 'Tool 1',
         text: 'Description for Tool 1',
@@ -73,23 +76,24 @@ describe('AssetProcessorModalLauncher', () => {
         window: JSON.stringify({ target: '_blank' }),
         iframe: JSON.stringify({ width: 800, height: 600 }),
         report: JSON.stringify({ enabled: true }),
-        context_external_tool_id: 1
-        }
-      ]
+      }
+    ]
 
     const tools = [{ name: 'Tool 1', definition_id: 1 }]
-    $.get.mockImplementation((url, params, callback) => {
-      callback(tools)
+    jest.spyOn($, 'get').mockImplementation((...args) => {
+      const callback = (args as any)[2];
+      return callback(tools)
     })
     render(<AssetProcessorModalLauncher />)
     await waitFor(() => expect($.get).toHaveBeenCalled())
     fireEvent.click(screen.getByText('Attach AP - Tool 1'))
     sendPostMessage({
       subject: 'LtiDeepLinkingResponse',
+      tool_id: '1',
       content_items: mockData,
     })
-    
+
     await waitFor(() => { expect(screen.getByTestId('asset_processors[0][0][url]')).toBeInTheDocument() })
-    expect(screen.getByTestId('asset_processors[0][0][url]').value).toBe(mockData[0].url)
+    expect((screen.getByTestId('asset_processors[0][0][url]') as HTMLInputElement).value).toBe(mockData[0].url)
   })
 })

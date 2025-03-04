@@ -76,7 +76,7 @@ type LtiLaunchPlacement = {
  */
 type SelectContentPlacementType = 'resource_selection' | 'assignment_selection' | 'link_selection'
 
-type LtiLaunchDefinition = {
+export type LtiLaunchDefinition = {
   definition_type: 'ContextExternalTool' | 'Lti::MessageHandler'
   definition_id: string
   name: string
