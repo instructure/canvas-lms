@@ -294,7 +294,7 @@ describe CC::CCHelper do
       html += "</body></html>"
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       exported = @exporter.html_page(html, "Deeply Nested HTML")
-      doc = Nokogiri::HTML5(exported, nil, max_tree_depth: 10_000)
+      doc = Nokogiri::HTML5(exported, nil, **CanvasSanitize::SANITIZE[:parser_options])
       expect(doc.title).to eq "Deeply Nested HTML"
       expect(doc.at_css("p").text).to eq "Deeply nested content"
     end
