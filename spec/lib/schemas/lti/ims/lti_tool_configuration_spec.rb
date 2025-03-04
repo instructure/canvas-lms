@@ -49,7 +49,8 @@ describe Schemas::Lti::IMS::LtiToolConfiguration do
               "https://canvas.instructure.com/lti/account_navigation"
             ],
             roles: [],
-            target_link_uri: "http://yaltt.inseng.test/api/registrations/14/launch?placement=https://canvas.instructure.com/lti/account_navigation"
+            target_link_uri: "http://yaltt.inseng.test/api/registrations/14/launch?placement=https://canvas.instructure.com/lti/account_navigation",
+            "https://canvas.instructure.com/lti/display_type": "new_window",
           }
         ],
         target_link_uri: "http://yaltt.inseng.test/api/registrations/14/launch",
