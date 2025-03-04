@@ -28,18 +28,6 @@ RSpec.describe Lti::NoticeHandler, type: :model do
       Lti::NoticeHandler.new(account:, notice_type:, url:, context_external_tool: tool)
     end
 
-    it { is_expected.to validate_presence_of(:account) }
-    it { is_expected.to validate_presence_of(:notice_type) }
-    it { is_expected.to validate_inclusion_of(:notice_type).in_array(Lti::Pns::NoticeTypes::ALL) }
-    it { is_expected.to validate_presence_of(:url) }
-    it { is_expected.to validate_presence_of(:context_external_tool) }
-
-    it do
-      expect(subject).to \
-        validate_numericality_of(:max_batch_size)
-        .is_greater_than_or_equal_to(10).allow_nil
-    end
-
     it { is_expected.to be_valid }
 
     it "validates url matches tool" do

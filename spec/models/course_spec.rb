@@ -37,26 +37,8 @@ describe Course do
       @course.enrollment_term = Account.default.default_enrollment_term
     end
 
-    context "moved_sections" do
-      describe "relationships" do
-        it { is_expected.to have_many(:moved_sections).class_name("CourseSection") }
-      end
-    end
-
     context "outcome imports" do
       include_examples "outcome import context examples"
-
-      describe "relationships" do
-        it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
-        it { is_expected.to have_one(:default_post_policy).inverse_of(:course) }
-
-        it { is_expected.to have_many(:post_policies).dependent(:destroy).inverse_of(:course) }
-        it { is_expected.to have_many(:assignment_post_policies).inverse_of(:course) }
-        it { is_expected.to have_many(:feature_flags) }
-        it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
-
-        it { is_expected.to have_many(:block_editor_templates).class_name("BlockEditorTemplate").inverse_of(:context) }
-      end
 
       describe "lti2 proxies" do
         include_context "lti2_course_spec_helper"

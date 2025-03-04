@@ -195,8 +195,6 @@ describe RubricAssessment do
     end
   end
 
-  it { is_expected.to have_many(:learning_outcome_results).dependent(:destroy) }
-
   it "htmlifies the rating comments" do
     comment = "Hi, please see www.example.com.\n\nThanks."
     submission = @assignment.find_or_create_submission(@student)

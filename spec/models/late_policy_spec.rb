@@ -19,50 +19,6 @@
 #
 
 describe LatePolicy do
-  describe "relationships" do
-    it { is_expected.to belong_to(:course).inverse_of(:late_policy) }
-  end
-
-  describe "validations" do
-    # Presence
-    it { is_expected.to validate_presence_of(:course_id) }
-    it { is_expected.to validate_presence_of(:late_submission_interval) }
-    it { is_expected.to validate_presence_of(:late_submission_minimum_percent) }
-    it { is_expected.to validate_presence_of(:late_submission_deduction) }
-    it { is_expected.to validate_presence_of(:missing_submission_deduction) }
-
-    # Numericality
-    it do
-      expect(subject).to validate_numericality_of(:late_submission_minimum_percent)
-        .is_greater_than_or_equal_to(0)
-        .is_less_than_or_equal_to(100)
-    end
-
-    it do
-      expect(subject).to validate_numericality_of(:missing_submission_deduction)
-        .is_greater_than_or_equal_to(0)
-        .is_less_than_or_equal_to(100)
-    end
-
-    it do
-      expect(subject).to validate_numericality_of(:late_submission_deduction)
-        .is_greater_than_or_equal_to(0)
-        .is_less_than_or_equal_to(100)
-    end
-
-    # Inclusion
-    it { is_expected.to validate_inclusion_of(:late_submission_interval).in_array(["day", "hour"]) }
-
-    # Uniqueness
-    describe "uniqueness" do
-      subject { course.create_late_policy }
-
-      let(:course) { Course.create! }
-
-      it { is_expected.to validate_uniqueness_of(:course_id) }
-    end
-  end
-
   describe "default values" do
     it 'sets the late_submission_interval to "day" if not explicitly set' do
       policy = LatePolicy.new

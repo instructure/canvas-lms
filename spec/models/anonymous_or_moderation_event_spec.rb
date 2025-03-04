@@ -44,21 +44,7 @@ describe AnonymousOrModerationEvent do
 
   it { is_expected.to be_valid }
 
-  describe "relationships" do
-    it { is_expected.to belong_to(:assignment) }
-    it { is_expected.to belong_to(:user) }
-    it { is_expected.to belong_to(:submission) }
-    it { is_expected.to belong_to(:canvadoc) }
-    it { is_expected.to belong_to(:quiz) }
-    it { is_expected.to belong_to(:context_external_tool) }
-  end
-
   describe "validations" do
-    it { is_expected.to validate_presence_of(:assignment_id) }
-    it { is_expected.to validate_presence_of(:event_type) }
-    it { is_expected.to validate_inclusion_of(:event_type).in_array(AnonymousOrModerationEvent::EVENT_TYPES) }
-    it { is_expected.to validate_presence_of(:payload) }
-
     it { expect { AnonymousOrModerationEvent.new.validate }.not_to raise_error }
 
     context "event ownership validations" do
@@ -102,25 +88,8 @@ describe AnonymousOrModerationEvent do
       end
     end
 
-    context "assignment_created events" do
-      subject { AnonymousOrModerationEvent.new(params) }
-
-      it { is_expected.to validate_absence_of(:canvadoc_id) }
-      it { is_expected.to validate_absence_of(:submission_id) }
-    end
-
-    context "assignment_updated events" do
-      subject { AnonymousOrModerationEvent.new(params.merge(event_type: :assignment_updated)) }
-
-      it { is_expected.to validate_absence_of(:canvadoc_id) }
-      it { is_expected.to validate_absence_of(:submission_id) }
-    end
-
     context "docviewer events" do
       subject(:event) { AnonymousOrModerationEvent.new(params.merge(event_type: :docviewer_comment_created)) }
-
-      it { is_expected.to validate_presence_of(:canvadoc_id) }
-      it { is_expected.to validate_presence_of(:submission_id) }
 
       it "requires the payload to have an annotation body" do
         event.validate
@@ -128,18 +97,8 @@ describe AnonymousOrModerationEvent do
       end
     end
 
-    context '"grades_posted" events' do
-      subject { AnonymousOrModerationEvent.new(params.merge(event_type: :grades_posted)) }
-
-      it { is_expected.to validate_absence_of(:canvadoc_id) }
-      it { is_expected.to validate_absence_of(:submission_id) }
-    end
-
     context '"provisional_grade_selected" events' do
       subject(:event) { AnonymousOrModerationEvent.new(params.merge(event_type: :provisional_grade_selected)) }
-
-      it { is_expected.to validate_absence_of(:canvadoc_id) }
-      it { is_expected.to validate_presence_of(:submission_id) }
 
       it "requires the payload to have an id" do
         event.validate

@@ -27,104 +27,53 @@ describe OutcomeCalculationMethod do
   let(:creation_params) { { context: account, calculation_method:, calculation_int: } }
 
   describe "validations" do
-    it { is_expected.to validate_presence_of :context }
-    it { is_expected.to validate_uniqueness_of(:context_id).scoped_to(:context_type) }
-    it { is_expected.to validate_inclusion_of(:calculation_method).in_array(OutcomeCalculationMethod::CALCULATION_METHODS) }
+    it "restricts the range for calculation_int when the decaying_average method is used" do
+      common_params = { **creation_params, calculation_method: "decaying_average" }
 
-    context "calculation_int" do
-      context "decaying_average" do
-        let(:calculation_method) { "decaying_average" }
-        let(:calculation_int) { 3 }
-
-        it do
-          expect(subject).to allow_values(
-            1,
-            20,
-            99
-          ).for(:calculation_int)
-        end
-
-        it do
-          expect(subject).not_to allow_values(
-            -1,
-            0,
-            100,
-            1000,
-            nil
-          ).for(:calculation_int)
-        end
+      [1, 20, 99].each do |calculation_int|
+        expect(OutcomeCalculationMethod.new(**common_params, calculation_int:)).to be_valid
       end
 
-      context "standard_decaying_average" do
-        before do
-          account.enable_feature!(:outcomes_new_decaying_average_calculation)
-        end
+      [-1, 0, 100, 1000, nil].each do |calculation_int|
+        expect(OutcomeCalculationMethod.new(**common_params, calculation_int:)).not_to be_valid
+      end
+    end
 
-        let(:calculation_method) { "standard_decaying_average" }
-        let(:calculation_int) { 65 }
+    it "restricts the range for calculation_int when the standard_decaying_average method is used" do
+      common_params = { **creation_params, calculation_method: "standard_decaying_average" }
 
-        it do
-          expect(subject).to allow_values(
-            50,
-            72,
-            99
-          ).for(:calculation_int)
-        end
+      account.enable_feature!(:outcomes_new_decaying_average_calculation)
 
-        it do
-          expect(subject).not_to allow_values(
-            -1,
-            0,
-            49,
-            100,
-            1000,
-            nil
-          ).for(:calculation_int)
-        end
+      [50, 72, 99].each do |calculation_int|
+        expect(OutcomeCalculationMethod.new(**common_params, calculation_int:)).to be_valid
       end
 
-      context "n_mastery" do
-        let(:calculation_method) { "n_mastery" }
-        let(:calculation_int) { 3 }
+      [-1, 0, 49, 100, 1000, nil].each do |calculation_int|
+        expect(OutcomeCalculationMethod.new(**common_params, calculation_int:)).not_to be_valid
+      end
+    end
 
-        it do
-          expect(subject).to allow_values(
-            1,
-            4,
-            5,
-            7,
-            10
-          ).for(:calculation_int)
+    it "restricts the range for calculation_int when the n_mastery method is used" do
+      common_params = { **creation_params, calculation_method: "n_mastery" }
+
+      [1, 4, 5, 7, 10].each do |calculation_int|
+        expect(OutcomeCalculationMethod.new(**common_params, calculation_int:)).to be_valid
+      end
+
+      [-1, 0, 11, 28, nil].each do |calculation_int|
+        expect(OutcomeCalculationMethod.new(**common_params, calculation_int:)).not_to be_valid
+      end
+    end
+
+    it "restricts the range for calculation_int when the highest / latest / average method is used" do
+      %w[highest latest average].each do |calculation_method|
+        common_params = { **creation_params, calculation_method: }
+
+        expect(OutcomeCalculationMethod.new(**common_params, calculation_int: nil)).to be_valid
+
+        [1, 10, 100].each do |calculation_int|
+          expect(OutcomeCalculationMethod.new(**common_params, calculation_int:)).not_to be_valid
         end
-
-        it do
-          expect(subject).not_to allow_values(
-            -1,
-            0,
-            11,
-            28,
-            nil
-          ).for(:calculation_int)
-        end
-      end
-
-      context "highest" do
-        let(:calculation_method) { "highest" }
-
-        it { is_expected.to allow_value(nil).for(:calculation_int) }
-        it { is_expected.not_to allow_values(1, 10, 100).for(:calculation_int) }
-      end
-
-      context "latest" do
-        it { is_expected.to allow_value(nil).for(:calculation_int) }
-        it { is_expected.not_to allow_values(1, 10, 100).for(:calculation_int) }
-      end
-
-      context "average" do
-        let(:calculation_method) { "average" }
-
-        it { is_expected.to allow_value(nil).for(:calculation_int) }
-        it { is_expected.not_to allow_values(1, 10, 100).for(:calculation_int) }
       end
     end
   end

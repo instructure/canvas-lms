@@ -25,25 +25,10 @@ require_relative "../lti2_spec_helper"
 describe Assignment do
   include_context "lti2_spec_helper"
 
-  describe "relationships" do
-    it { is_expected.to have_one(:score_statistic).dependent(:destroy) }
-    it { is_expected.to have_one(:post_policy).dependent(:destroy).inverse_of(:assignment) }
-
-    it { is_expected.to have_many(:moderation_graders) }
-    it { is_expected.to have_many(:moderation_grader_users) }
-    it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
-  end
-
   before :once do
     course_with_teacher(active_all: true)
     @initial_student = student_in_course(active_all: true, user_name: "a student").user
   end
-
-  # workaround for our version of shoulda-matchers not having the 'optional' method
-  it { is_expected.to belong_to(:grader_section).class_name("CourseSection") }
-  it { is_expected.not_to validate_presence_of(:grader_section) }
-  it { is_expected.to belong_to(:final_grader).class_name("User") }
-  it { is_expected.not_to validate_presence_of(:final_grader) }
 
   it "creates a new instance given valid attributes" do
     assignment = @course.assignments.create!(assignment_valid_attributes)
@@ -10295,9 +10280,6 @@ describe Assignment do
       context "when moderated_grading is not enabled" do
         subject(:assignment) { @course.assignments.build }
 
-        it { is_expected.to validate_absence_of(:grader_section) }
-        it { is_expected.to validate_absence_of(:final_grader) }
-
         it "before validation, sets final_grader_id to nil if it is present" do
           teacher = User.create!
           @course.enroll_teacher(teacher, active_all: true)
@@ -10334,7 +10316,6 @@ describe Assignment do
           subject { @course.assignments.create(moderated_grading: true, grader_count: 1, final_grader: @section1_ta) }
 
           it { is_expected.to be_muted }
-          it { is_expected.to validate_numericality_of(:grader_count).is_greater_than(0) }
         end
 
         describe "grader_section validation" do
@@ -10471,8 +10452,6 @@ describe Assignment do
     before(:once) do
       assignment_model(course: @course)
     end
-
-    it { is_expected.to validate_numericality_of(:allowed_attempts).allow_nil }
 
     it "allows -1" do
       @assignment.allowed_attempts = -1

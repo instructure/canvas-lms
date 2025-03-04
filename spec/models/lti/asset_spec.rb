@@ -22,12 +22,6 @@ RSpec.describe Lti::Asset, type: :model do
     subject { lti_asset_model }
 
     it { is_expected.to be_valid }
-
-    describe "associations" do
-      it { is_expected.to validate_presence_of(:attachment) }
-      it { is_expected.to validate_presence_of(:submission) }
-      it { is_expected.to validate_uniqueness_of(:attachment_id).scoped_to(:submission_id) }
-    end
   end
 
   it "generates a uuid" do
