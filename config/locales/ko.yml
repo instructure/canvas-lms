@@ -9565,6 +9565,7 @@ ko:
   name: "Academic Benchmark 가져오기 도구"
   name_1aed4a1b: 이름
   name_3806192d: "이름:"
+  name_is_required_ba379522: "이름이 필요합니다!"
   name_only_5f56718e: 이름만
   navigation_ee9af92d: 탐색
   never_1ed1244d: "한 적 없음"
