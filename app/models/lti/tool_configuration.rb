@@ -176,13 +176,8 @@ module Lti
         errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
       end
       if public_jwk.present?
-        if Account.site_admin.feature_enabled?(:lti_report_multiple_schema_validation_errors)
-          jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_errors(public_jwk)
-          jwk_schema_errors&.each { |err| errors.add(:configuration, err) }
-        else
-          jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_first_error(public_jwk)
-          errors.add(:configuration, jwk_schema_errors) if jwk_schema_errors.present?
-        end
+        jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_errors(public_jwk)
+        jwk_schema_errors&.each { |err| errors.add(:configuration, err) }
       end
 
       schema_errors = Schemas::InternalLtiConfiguration.simple_validation_errors(internal_lti_configuration.compact)
