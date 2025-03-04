@@ -19,33 +19,33 @@
   <div class="desc">
     <h3><%= t 'attempt_history', 'Attempt History' %></h3>
   </div>
-  <table class="ic-Table ic-Table--condensed" summary="<%= t('quiz_attempt_history_description', 'A table that shows your quiz attempt history. Each attempt is on the left side. The attempt, time, and score are across the top.')%>">
-    <thead>
-      <tr>
-        <td></td>
-        <th scope="col"><%= t 'attempt', 'Attempt' %></th>
-        <th  scope="col"><%= t 'time', 'Time' %></th>
-        <th scope="col"><%= t 'score', 'Score' %></th>
-        <% if submission_has_regrade?(@submission) %>
-        <th  scope="col" class="regraded"><%= t 'regraded', 'Regraded' %></th>
+  <div class="ic-Table-scroll-container">
+    <table class="ic-Table ic-Table--condensed" summary="<%= t('quiz_attempt_history_description', 'A table that shows your quiz attempt history. Each attempt is on the left side. The attempt, time, and score are across the top.')%>">      <thead>
+        <tr>
+          <td></td>
+          <th scope="col"><%= t 'attempt', 'Attempt' %></th>
+          <th  scope="col"><%= t 'time', 'Time' %></th>
+          <th scope="col"><%= t 'score', 'Score' %></th>
+          <% if submission_has_regrade?(@submission) %>
+          <th  scope="col" class="regraded"><%= t 'regraded', 'Regraded' %></th>
+          <% end %>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% if @versions.size > 1 %>
+          <% version, index = @versions.reverse.each_with_index.detect {|k, v| k.score == @submission.kept_score } %>
+          <% if version %>
+            <%= render :partial => "submission_version", :locals => {:version => version, :index => @versions.length - index, :kept => true} %>
+          <% end %>
         <% end %>
-      </tr>
-    </thead>
 
-    <tbody>
-      <% if @versions.size > 1 %>
-        <% version, index = @versions.reverse.each_with_index.detect {|k, v| k.score == @submission.kept_score } %>
-        <% if version %>
-          <%= render :partial => "submission_version", :locals => {:version => version, :index => @versions.length - index, :kept => true} %>
+        <% (@versions.reverse!).each_with_index do |version, index| %>
+          <%= render :partial => "submission_version", :locals => {:version => version, :index => @versions.length - index, :kept => false} %>
         <% end %>
-      <% end %>
-
-      <% (@versions.reverse!).each_with_index do |version, index| %>
-        <%= render :partial => "submission_version", :locals => {:version => version, :index => @versions.length - index, :kept => false} %>
-      <% end %>
-    </tbody>
-  </table>
-
+      </tbody>
+    </table>
+  </div>
   <% if @versions.detect {|v| v.pending_review? } %>
   <p class="submission-pending-review">
     <em>*</em> <%= t 'questions_not_graded', 'Some questions not yet graded' %>
