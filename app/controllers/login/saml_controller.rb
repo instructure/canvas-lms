@@ -163,37 +163,7 @@ class Login::SamlController < ApplicationController
       session[:session_index] = assertion.authn_statements.first&.session_index
       session[:login_aac] = aac.id
 
-      if relay_state.present?
-        begin
-          uri = URI.parse(relay_state)
-        rescue URI::InvalidURIError
-          # ignore
-        end
-
-        if uri&.path && !uri.path.starts_with?("/login") &&
-           (!uri.scheme || request.scheme == uri.scheme || uri.scheme == "https")
-          if uri.host
-            # allow relay_state's to other (trusted) domains, by tacking on a session token
-            target_account = Account.find_by_domain(uri.host)
-            if uri.host == request.host_with_port
-              # full URLs on the same domain are okay
-              session[:return_to] = relay_state
-            elsif (target_account == @domain_root_account) ||
-                  (target_account && target_account != @domain_root_account &&
-                  pseudonym.works_for_account?(target_account, true))
-              token = SessionToken.new(pseudonym.global_id,
-                                       current_user_id: pseudonym.global_user_id).to_s
-              uri.query&.concat("&")
-              uri.query ||= ""
-              uri.query.concat("session_token=#{token}")
-              session[:return_to] = uri.to_s
-            end
-          elsif uri.path[0] == "/"
-            # otherwise, absolute paths on the same domain are okay
-            session[:return_to] = relay_state
-          end
-        end
-      end
+      Login::Shared.set_return_to_from_provider(request, session, pseudonym, @domain_root_account, relay_state)
       pseudonym.infer_auth_provider(aac)
       successful_login(user, pseudonym)
     else
