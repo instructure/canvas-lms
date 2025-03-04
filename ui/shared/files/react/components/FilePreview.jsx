@@ -231,7 +231,7 @@ export default class FilePreview extends React.PureComponent {
         'ef-file-preview-frame-html': html,
         'attachment-html-iframe': html,
       })
-      const sandbox = html ? 'allow-same-origin' : 'allow-scripts allow-same-origin'
+      const sandbox = classnames('allow-same-origin', 'allow-downloads', { 'allow-scripts': !html })
 
       return (
         <iframe
