@@ -253,21 +253,6 @@ lti_registrations_usage_data:
       state: allowed_on
     ci:
       state: allowed_on
-lti_report_multiple_schema_validation_errors:
-  state: hidden
-  shadow: true
-  applies_to: SiteAdmin
-  display_name: Return multiple json schema validation errors at once (not just the first one).
-  description: INTEROP-8899. This is a low risk change, because tools should not depend on error messages coming from json schema validator.
-  environments:
-    ci:
-      state: allowed_on
-    test:
-      state: allowed_on
-    development:
-      state: allowed_on
-    production:
-      state: allowed_on
 lti_resource_link_id_speedgrader_launches_reference_assignment:
   state: hidden
   applies_to: RootAccount
