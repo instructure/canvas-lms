@@ -1228,9 +1228,10 @@ EditView.prototype.afterRender = function () {
     parseInt(this.assignment.id, 10),
   )
   if (this.assignment.isNew() && window.ENV?.FEATURES?.lti_asset_processor) {
-    this.AssetProcessorModalLauncher = assetProcessorModalAttach(
-      this.$activityAssetProcessorContainer.get(0)
-    )
+    this.AssetProcessorModalLauncher = assetProcessorModalAttach({
+      container: this.$activityAssetProcessorContainer.get(0),
+      secureParams: this.$secureParams.val(),
+    })
   }
   this._attachEditorToDescription()
   this.togglePeerReviewsAndGroupCategoryEnabled()
