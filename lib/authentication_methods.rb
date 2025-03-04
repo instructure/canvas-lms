@@ -193,7 +193,9 @@ module AuthenticationMethods
             else
               Rails.cache.write("unlocked_#{current_integration_id}", true, :expires_in => 5.minutes)
             end
-          rescue
+          rescue => exception
+            Canvas::Errors.capture_exception(:attendance_service_check, exception)
+            Rails.cache.write("unlocked_#{current_integration_id}", true, :expires_in => 5.minutes)
           end
         end
       end
