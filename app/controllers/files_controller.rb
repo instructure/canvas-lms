@@ -567,6 +567,10 @@ class FilesController < ApplicationController
         options[:access_token] = params[:access_token]
         options[:instfs_id] = params[:instfs_id]
       end
+      if params[:view] && @context.respond_to?(:horizon_course?) && @context.horizon_course?
+        @attachment.context_module_action(@current_user, :read) if @current_user
+        options[:view] = true
+      end
 
       if options[:include].include?("blueprint_course_status")
         options[:context] = @context || @folder&.context || @attachment.context
