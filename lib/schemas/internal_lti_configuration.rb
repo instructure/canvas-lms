@@ -22,7 +22,7 @@ module Schemas
   # Represents the "internal" JSON schema used to configure an LTI 1.3 tool,
   # as stored in Lti::ToolConfiguration and used in Lti::Registration.
   class InternalLtiConfiguration < Base
-    VALID_DISPLAY_TYPES = %w[default full_width full_width_in_context in_nav_context borderless].freeze
+    VALID_DISPLAY_TYPES = %w[default full_width full_width_in_context in_nav_context borderless new_window].freeze
 
     # Transforms a hash conforming to the LtiConfiguration schema into
     # a hash conforming to the InternalLtiConfiguration schema.
