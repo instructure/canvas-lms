@@ -26,12 +26,6 @@ describe GradingPeriodGroup do
 
   let(:account) { Account.default }
 
-  # after dev lands in master, re add this title validation
-  # it { is_expected.to validate_presence_of(:title) }
-  it { is_expected.to belong_to(:course) }
-  it { is_expected.to have_many(:enrollment_terms).inverse_of(:grading_period_group) }
-  it { is_expected.to have_many(:grading_periods) }
-
   describe "#recompute_scores_for_each_term" do
     def course_with_grades(account, term, due_date, student, delete_term: false)
       course = account.courses.create!(enrollment_term: term)

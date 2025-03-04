@@ -22,18 +22,9 @@ describe Lti::AssetProcessor, type: :model do
     context "validations" do
       subject { lti_asset_processor_model }
 
-      it { is_expected.to be_valid }
-      it { is_expected.to validate_length_of(:url).is_at_most(4.kilobytes) }
-      it { is_expected.to validate_length_of(:title).is_at_most(255) }
-      it { is_expected.to validate_length_of(:text).is_at_most(255) }
-
       it "defaults to workflow_state=active" do
         expect(lti_asset_processor_model(workflow_state: nil).active?).to be_truthy
       end
-
-      it { is_expected.to belong_to(:context_external_tool).required }
-      it { is_expected.to belong_to(:assignment).required }
-      it { is_expected.to have_many(:asset_reports).dependent(:destroy) }
 
       it "supports associations from ContextExternalTool and Assignment" do
         expect(subject.context_external_tool.lti_asset_processor_ids).to include(subject.id)

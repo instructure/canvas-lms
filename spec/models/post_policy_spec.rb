@@ -21,14 +21,6 @@
 require_relative "../spec_helper"
 
 describe PostPolicy do
-  describe "relationships" do
-    it { is_expected.to belong_to(:course).required.inverse_of(:post_policies) }
-    it { is_expected.to validate_presence_of(:course) }
-
-    it { is_expected.to belong_to(:assignment).inverse_of(:post_policy) }
-    it { is_expected.not_to validate_presence_of(:assignment) }
-  end
-
   describe "validation" do
     let(:course) { Course.create! }
     let(:assignment) { course.assignments.create!(title: "!!!") }

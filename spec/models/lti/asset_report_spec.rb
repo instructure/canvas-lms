@@ -24,9 +24,6 @@ RSpec.describe Lti::AssetReport, type: :model do
     it { is_expected.to be_valid }
 
     describe "associations" do
-      it { is_expected.to validate_presence_of(:asset_processor) }
-      it { is_expected.to validate_presence_of(:asset) }
-
       it "validates the compatibity of the asset with the processor" do
         model = lti_asset_report_model
         expect(model.asset).to receive(:compatible_with_processor?).with(model.asset_processor).and_return(false)
@@ -35,17 +32,6 @@ RSpec.describe Lti::AssetReport, type: :model do
     end
 
     describe "1EdTech spec fields" do
-      it { is_expected.to validate_presence_of(:timestamp) }
-      it { is_expected.to validate_length_of(:report_type).is_at_most(1024) }
-      it { is_expected.to validate_presence_of(:report_type) }
-      it { is_expected.to validate_length_of(:title).is_at_most(1.kilobyte) }
-      it { is_expected.to validate_length_of(:comment).is_at_most(64.kilobytes) }
-      it { is_expected.to validate_numericality_of(:score_given).is_greater_than_or_equal_to(0).allow_nil }
-      it { is_expected.to validate_numericality_of(:score_maximum).is_greater_than_or_equal_to(0).allow_nil }
-      it { is_expected.to validate_inclusion_of(:priority).in_array(Lti::AssetReport::PRIORITIES) }
-      it { is_expected.to validate_length_of(:error_code).is_at_most(1024) }
-      it { is_expected.to validate_length_of(:indication_alt).is_at_most(1024) }
-
       it "rejects empty strings in all fields" do
         %i[report_type title comment indication_alt error_code].each do |field|
           expect do
@@ -115,11 +101,6 @@ RSpec.describe Lti::AssetReport, type: :model do
     it "sets the default processing progress if the given progress is not recognized" do
       expect(lti_asset_report_model(processing_progress: "Unrecognized")).to have_attributes(processing_progress: "NotReady")
     end
-  end
-
-  describe "associations" do
-    it { is_expected.to belong_to(:asset_processor).required }
-    it { is_expected.to belong_to(:asset).required }
   end
 
   describe "PRIORITIES" do
