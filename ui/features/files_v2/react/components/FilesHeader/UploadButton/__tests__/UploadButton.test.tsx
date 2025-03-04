@@ -66,6 +66,7 @@ const renderComponent = (props = {}) =>
         folderId: '1',
         showingAllContexts: false,
         currentFolder: new BBFolderWrapper(FAKE_COURSE_FOLDER),
+        fileIndexMenuTools: [],
       }}
     >
       <UploadButton {...defaultProps} {...props} />

@@ -62,7 +62,13 @@ describe('FilesUsageBar', () => {
     return render(
       <MockedQueryClientProvider client={queryClient}>
         <FileManagementContext.Provider
-          value={{contextType: 'course', contextId: '2', folderId: '1', showingAllContexts: false}}
+          value={{
+            contextType: 'course',
+            contextId: '2',
+            folderId: '1',
+            showingAllContexts: false,
+            fileIndexMenuTools: [],
+          }}
         >
           <FilesUsageBar />
         </FileManagementContext.Provider>

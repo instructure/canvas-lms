@@ -78,7 +78,7 @@ const AllMyFilesTable = ({size}: AllMyFilesTableProps) => {
         </Flex.Item>
       </Flex>
       <Table caption={I18n.t('All My Files')} hover={true}>
-        <Table.Head renderSortLabel="sdfasdf">
+        <Table.Head renderSortLabel={I18n.t('Sort By')}>
           <Table.Row>
             <Table.ColHeader
               key="name"

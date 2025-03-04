@@ -33,7 +33,13 @@ const defaultProps = {
 const renderComponent = (props = {}) => {
   return render(
     <FileManagementContext.Provider
-      value={{folderId: '1', contextType: 'course', contextId: '1', showingAllContexts: false}}
+      value={{
+        folderId: '1',
+        contextType: 'course',
+        contextId: '1',
+        showingAllContexts: false,
+        fileIndexMenuTools: [],
+      }}
     >
       <MockedQueryClientProvider client={queryClient}>
         <CreateFolderModal {...defaultProps} {...props} />

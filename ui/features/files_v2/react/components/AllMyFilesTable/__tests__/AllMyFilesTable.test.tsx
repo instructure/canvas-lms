@@ -36,6 +36,7 @@ const renderComponent = () => {
         contextId: '1',
         showingAllContexts: false,
         currentFolder: null,
+        fileIndexMenuTools: [],
       }}
     >
       <MockedQueryClientProvider client={queryClient}>

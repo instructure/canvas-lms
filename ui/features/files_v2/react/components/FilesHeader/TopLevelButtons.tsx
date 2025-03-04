@@ -21,12 +21,13 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconUploadLine} from '@instructure/ui-icons'
 import CreateFolderButton from './CreateFolderButton'
+import ExternalToolsButton from './ExternalToolsButton'
 import UploadButton from './UploadButton'
 
 const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
   isUserContext: boolean
-  size: string
+  size: 'small' | 'medium' | 'large'
   onCreateFolderButtonClick: () => void
   shouldHideUploadButtons?: boolean
 }
@@ -43,6 +44,12 @@ const TopLevelButtons = ({
     if (shouldHideUploadButtons) return null
 
     return <CreateFolderButton buttonDisplay={buttonDisplay} onClick={onCreateFolderButtonClick} />
+  }
+
+  const externalToolsButton = () => {
+    if (shouldHideUploadButtons) return null
+
+    return <ExternalToolsButton buttonDisplay={buttonDisplay} size={size} />
   }
 
   const uploadButton = () => {
@@ -77,12 +84,14 @@ const TopLevelButtons = ({
         {uploadButton()}
         {createFolderButton()}
         {allMyFilesButton()}
+        {externalToolsButton()}
       </>
     )
   }
 
   return (
     <>
+      {externalToolsButton()}
       {allMyFilesButton()}
       {createFolderButton()}
       {uploadButton()}

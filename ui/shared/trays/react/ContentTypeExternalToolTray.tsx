@@ -47,7 +47,7 @@ export type SelectableItem = {
 }
 
 type Props = {
-  tool: Tool
+  tool: Tool | null
   placement: string
   acceptedResourceTypes: KnownResourceType[]
   targetResourceType: KnownResourceType

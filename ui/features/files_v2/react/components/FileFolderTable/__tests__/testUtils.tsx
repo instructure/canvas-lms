@@ -45,7 +45,13 @@ export const renderComponent = (props = {}) => {
     <BrowserRouter>
       <MockedQueryClientProvider client={queryClient}>
         <FileManagementContext.Provider
-          value={{contextType: 'course', contextId: '1', folderId: '1', showingAllContexts: false}}
+          value={{
+            contextType: 'course',
+            contextId: '1',
+            folderId: '1',
+            showingAllContexts: false,
+            fileIndexMenuTools: [],
+          }}
         >
           <FileFolderTable {...defaultProps} {...props} />
         </FileManagementContext.Provider>

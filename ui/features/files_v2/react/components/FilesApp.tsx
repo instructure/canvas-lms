@@ -128,6 +128,8 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
     userCanAddFilesForContext || userCanEditFilesForContext || userCanDeleteFilesForContext
   const usageRightsRequiredForContext =
     filesEnv.contextFor({contextType, contextId})?.usage_rights_required || false
+  const fileIndexMenuTools =
+    filesEnv.contextFor({contextType, contextId})?.file_index_menu_tools || []
 
   return (
     <FileManagementContext.Provider
@@ -138,6 +140,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
         showingAllContexts,
         currentFolder: currentFolderWrapper.current,
         rootFolder: folders[0],
+        fileIndexMenuTools,
       }}
     >
       <View as="div">

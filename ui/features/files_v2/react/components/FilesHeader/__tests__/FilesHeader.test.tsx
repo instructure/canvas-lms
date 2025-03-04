@@ -38,6 +38,7 @@ const renderComponent = (props?: any) => {
           contextId: '1',
           folderId: '1',
           showingAllContexts: false,
+          fileIndexMenuTools: [],
         }}
       >
         <FilesHeader {...defaultProps} {...props} />

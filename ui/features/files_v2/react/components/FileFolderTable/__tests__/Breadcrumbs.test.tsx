@@ -106,6 +106,7 @@ const renderComponent = (props = {}, context = {}) => {
     contextId: '1',
     folderId: '1',
     showingAllContexts: false,
+    fileIndexMenuTools: [],
   }
   return render(
     <FileManagementContext.Provider value={{...defaultContext, ...context}}>

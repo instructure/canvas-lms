@@ -32,6 +32,7 @@ const defaultContext = {
   contextId: '1',
   folderId: '1',
   showingAllContexts: false,
+  fileIndexMenuTools: [],
 }
 
 const renderComponent = (props?: any, context?: any) => {
