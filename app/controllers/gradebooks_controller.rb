@@ -556,6 +556,7 @@ class GradebooksController < ApplicationController
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       performance_controls: gradebook_performance_controls,
       post_grades_feature: post_grades_feature?,
+      post_grades_enhanced_modal: post_grades_enhanced_modal?,
       post_grades_ltis:,
       post_manually: @context.post_manually?,
       proxy_submissions_allowed: Account.site_admin.feature_enabled?(:proxy_file_uploads) && @context.grants_right?(@current_user, session, :proxy_assignment_submission),
@@ -801,6 +802,10 @@ class GradebooksController < ApplicationController
     @context.feature_enabled?(:post_grades) &&
       @context.allows_grade_publishing_by(@current_user) &&
       can_do(@context, @current_user, :manage_grades)
+  end
+
+  def post_grades_enhanced_modal?
+    @context.feature_enabled?(:post_grades_enhanced_modal)
   end
 
   def history
