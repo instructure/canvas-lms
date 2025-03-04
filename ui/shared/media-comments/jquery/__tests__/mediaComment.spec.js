@@ -122,10 +122,14 @@ describe('getSourcesAndTracks', () => {
       {
         src: 'http://example.com/video_low.mp4',
         label: '320x180 244 kbps',
+        height: 180,
+        width: 320,
       },
       {
         src: 'http://example.com/video.mp4',
         label: '640x360 488 kbps',
+        height: 360,
+        width: 640,
       },
     ])
     expect(result.tracks).toEqual([

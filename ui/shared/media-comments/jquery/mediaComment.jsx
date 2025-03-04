@@ -118,6 +118,8 @@ export function getSourcesAndTracks(id, attachmentId) {
             label: `${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(
               Math.floor(source.bitrate / 1024),
             )} kbps`,
+            height: parseInt(source.height),
+            width: parseInt(source.width),
           }
         }
         // xsslint safeString.function sanitizeUrl
