@@ -649,6 +649,8 @@ $(document).ready(function () {
     }
   })
   $('#select_context_content_dialog .add_item_button').click(function () {
+    // This prevents errors if the user clicks it multiple times in quick succession
+    enable_disable_submit_button(false)
     const submit = function (
       item_data: Record<string, string | number | string[] | undefined | boolean>,
       close_dialog = true,
@@ -663,6 +665,8 @@ $(document).ready(function () {
           $dialog.find('.alert').remove()
         }, 0)
       }
+      // Enable the button again once process is finished
+      enable_disable_submit_button(true)
     }
 
     const item_type = $('#add_module_item_select').val()
@@ -683,8 +687,12 @@ $(document).ready(function () {
 
       if (item_data['item[url]'] === '') {
         $('#content_tag_create_url').errorBox(I18n.t('URL is required'))
+        // Enable the button again once process is finished
+        enable_disable_submit_button(true)
       } else if (item_data['item[title]'] === '') {
         $('#content_tag_create_title').errorBox(I18n.t('Page Name is required'))
+        // Enable the button again once process is finished
+        enable_disable_submit_button(true)
       } else {
         submit(item_data)
       }
@@ -708,8 +716,12 @@ $(document).ready(function () {
           I18n.t('errors.external_tool_url', "An external tool can't be saved without a URL."),
         )
         $dialog.prepend($errorBox)
+        // Enable the button again once process is finished
+        enable_disable_submit_button(true)
       } else if (item_data['item[title]'] === '' && !no_name_input) {
         $('#external_tool_create_title').errorBox(I18n.t('Page Name is required'))
+        // Enable the button again once process is finished
+        enable_disable_submit_button(true)
       } else {
         submit(item_data)
       }
@@ -851,6 +863,8 @@ $(document).ready(function () {
             upload_form?.queueUploads()
             fileSelectBox?.setDirty()
             renderCurrentUploads()
+            // Enable the button again once process is finished
+            enable_disable_submit_button(true)
           } else if (typeof url !== 'undefined') {
             $.ajaxJSON(
               url,
@@ -872,6 +886,8 @@ $(document).ready(function () {
                     I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'),
                   )
                 }
+                // Enable the button again once process is finished
+                enable_disable_submit_button(true)
               },
             )
           }
