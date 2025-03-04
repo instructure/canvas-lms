@@ -2019,6 +2019,11 @@ class User < ActiveRecord::Base
     super
   end
 
+  def usage_metrics_id
+    # Compute a hash of the user's uuid for security and privacy reasons
+    Digest::SHA256.hexdigest(uuid)
+  end
+
   def self.serialization_excludes
     %i[
       uuid
