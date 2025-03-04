@@ -99,7 +99,7 @@ RSpec.describe Mutations::UpdateSubmissionGrade do
   it "set status to nil if none" do
     result = run_mutation({ submission_id: @submission.id, late_policy_status: "none", custom_grade_status_id: nil })
     expect(result[:data][:updateSubmissionGradeStatus][:submission][:_id]).to eq @submission.id.to_s
-    expect(result[:data][:updateSubmissionGradeStatus][:submission][:latePolicyStatus]).to be_nil
+    expect(result[:data][:updateSubmissionGradeStatus][:submission][:latePolicyStatus]).to eq "none"
     expect(result[:data][:updateSubmissionGradeStatus][:submission][:customGradeStatus]).to eq ""
   end
 
@@ -122,7 +122,7 @@ RSpec.describe Mutations::UpdateSubmissionGrade do
     @submission.update!(excused: true)
     result = run_mutation({ submission_id: @submission.id, late_policy_status: "none", custom_grade_status_id: nil })
     expect(result[:data][:updateSubmissionGradeStatus][:submission][:_id]).to eq @submission.id.to_s
-    expect(result[:data][:updateSubmissionGradeStatus][:submission][:latePolicyStatus]).to be_nil
+    expect(result[:data][:updateSubmissionGradeStatus][:submission][:latePolicyStatus]).to eq "none"
     expect(result[:data][:updateSubmissionGradeStatus][:submission][:customGradeStatus]).to eq ""
     expect(result[:data][:updateSubmissionGradeStatus][:submission][:excused]).to be false
   end
