@@ -164,7 +164,7 @@ module CC::Importer::Standard
     def replace_urls(html, resource_dir = nil)
       return "" if html.blank?
 
-      doc = Nokogiri::HTML5(html || "")
+      doc = Nokogiri::HTML5(html || "", **CanvasSanitize::SANITIZE[:parser_options])
       attrs = %w[rel href src data value]
       doc.search("*").each do |node|
         attrs.each do |attr|
