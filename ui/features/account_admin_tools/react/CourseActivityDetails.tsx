@@ -56,7 +56,7 @@ export type CourseActivityDetailsProps = {
   event_source_present: string
   event_type_present: string
   event_source: string
-  user: {
+  user?: {
     name: string
   }
   links?: {
@@ -133,7 +133,7 @@ const CourseActivityDetails = ({
                 <Text weight="bold">{I18n.t('User')}:</Text>
               </Grid.Col>
               <Grid.Col width={10}>
-                <Text>{user.name}</Text>
+                <Text>{user?.name ?? '-'}</Text>
               </Grid.Col>
             </Grid.Row>
             <Grid.Row>
