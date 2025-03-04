@@ -101,7 +101,6 @@ export default function ContentTypeExternalToolTray({
       headerPadding="medium"
     >
       <ToolLaunchIframe
-        // @ts-expect-error
         style={{border: 'none', display: 'block', width: '100%', height: '100%'}}
         data-testid="ltiIframe"
         src={iframeUrl}

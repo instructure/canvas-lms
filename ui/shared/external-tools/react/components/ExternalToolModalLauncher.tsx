@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+// TODO: if editing this file, please consider removing/resolving some of the "any" references
+
 import $ from 'jquery'
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
@@ -27,27 +29,54 @@ import {handleExternalContentMessages} from '../../messages'
 
 const I18n = createI18nScope('external_toolsModalLauncher')
 
-export default class ExternalToolModalLauncher extends React.Component {
-  static propTypes = {
-    appElement: PropTypes.instanceOf(Element),
-    title: PropTypes.string.isRequired,
-    tool: PropTypes.object,
-    isOpen: PropTypes.bool.isRequired,
-    onRequestClose: PropTypes.func.isRequired,
-    contextType: PropTypes.string.isRequired,
-    contextId: PropTypes.number.isRequired,
-    launchType: PropTypes.string.isRequired,
-    contextModuleId: PropTypes.string,
-    onExternalContentReady: PropTypes.func,
-    onDeepLinkingResponse: PropTypes.func,
-    resourceSelection: PropTypes.bool,
-  }
+type Dimensions = {
+  width: number,
+  height: number,
+}
+
+type ExternalToolModalLauncherState = {
+  modalLaunchStyle: {
+    border?: string,
+    width?: number,
+  },
+  beforeExternalContentAlertClass?: string,
+  afterExternalContentAlertClass?: string,
+}
+
+export type ExternalToolModalLauncherProps = {
+  appElement: Element,
+  title: string,
+  tool: {
+    definition_id: string,
+    placements?: Record<string, {
+      selection_width?: number,
+      selection_height?: number,
+      launch_width?: number,
+      launch_height?: number,
+    }>
+  },
+  isOpen: boolean,
+  onRequestClose: () => void,
+  contextType: string,
+  contextId: number | string,
+  launchType: string,
+  contextModuleId?: string,
+  onExternalContentReady?: (data: any) => void,
+  onDeepLinkingResponse?: (data: any) => void,
+  resourceSelection?: boolean,
+}
+
+export default class ExternalToolModalLauncher extends React.Component<ExternalToolModalLauncherProps> {
+  removeExternalContentListener?: () => void
+  iframe?: HTMLIFrameElement | null
+  beforeAlert?: HTMLDivElement | null
+  afterAlert?: HTMLDivElement | null
 
   static defaultProps = {
     appElement: document.getElementById('application'),
   }
 
-  state = {
+  state: ExternalToolModalLauncherState = {
     beforeExternalContentAlertClass: 'screenreader-only',
     afterExternalContentAlertClass: 'screenreader-only',
     modalLaunchStyle: {},
@@ -72,10 +101,10 @@ export default class ExternalToolModalLauncher extends React.Component {
   }
 
   componentWillUnmount() {
-    this.removeExternalContentListener()
+    this.removeExternalContentListener?.()
   }
 
-  onExternalToolCompleted = data => {
+  onExternalToolCompleted = (data: any) => {
     if (this.props.onExternalContentReady) {
       this.props.onExternalContentReady(data)
     }
@@ -114,37 +143,31 @@ export default class ExternalToolModalLauncher extends React.Component {
       this.props.tool.placements[this.props.launchType]
     ) {
       const placement = this.props.tool.placements[this.props.launchType]
-
-      if (placement.launch_width || placement.selection_width) {
-        dimensions.width = placement.launch_width || placement.selection_width
-      }
-
-      if (placement.launch_height || placement.selection_height) {
-        dimensions.height = placement.launch_height || placement.selection_height
-      }
+      dimensions.width = placement.launch_width || placement.selection_width || dimensions.width
+      dimensions.height = placement.launch_height || placement.selection_height || dimensions.height
     }
 
     return dimensions
   }
 
-  getModalLaunchStyle = dimensions => ({
+  getModalLaunchStyle = (dimensions: Dimensions) => ({
     ...dimensions,
     border: 'none',
   })
 
-  getModalBodyStyle = dimensions => ({
+  getModalBodyStyle = (dimensions: Dimensions) => ({
     ...dimensions,
     padding: 0,
     display: 'flex',
     flexDirection: 'column',
   })
 
-  getModalStyle = dimensions => ({
+  getModalStyle = (dimensions: Dimensions) => ({
     width: dimensions.width,
   })
 
-  handleAlertBlur = event => {
-    const newState = {
+  handleAlertBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+    const newState: ExternalToolModalLauncherState = {
       modalLaunchStyle: {
         border: 'none',
       },
@@ -157,10 +180,10 @@ export default class ExternalToolModalLauncher extends React.Component {
     this.setState(newState)
   }
 
-  handleAlertFocus = event => {
-    const newState = {
+  handleAlertFocus = (event: React.FocusEvent<HTMLDivElement>) => {
+    const newState: ExternalToolModalLauncherState = {
       modalLaunchStyle: {
-        width: this.iframe.offsetWidth - 4,
+        width: this.iframe!.offsetWidth - 4,
         border: '2px solid #0374B5',
       },
     }
@@ -194,6 +217,7 @@ export default class ExternalToolModalLauncher extends React.Component {
         title={this.props.title}
         appElement={this.props.appElement}
         shouldCloseOnDocumentClick={false}
+        footer={null}
       >
         <div
           onFocus={this.handleAlertFocus}

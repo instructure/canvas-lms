@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {IframeHTMLAttributes} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('external_toolsModalLauncher')
@@ -30,7 +30,7 @@ const I18n = createI18nScope('external_toolsModalLauncher')
  * - allow: iframeAllowances
  * - "the following content is partner provided" - both visible and SR-only types
  */
-const ToolLaunchIframe = React.forwardRef((props, ref) => {
+const ToolLaunchIframe = React.forwardRef<HTMLIFrameElement, IframeHTMLAttributes<HTMLIFrameElement>>((props, ref) => {
   return (
     <iframe
       title={I18n.t('External tool frame')}
