@@ -27,6 +27,8 @@ class AuthenticationProvider
       client_secret_post
     ].freeze
 
+    POST_LOGIN_REDIRECT_CLAIM = "https://instructure.com/claims/post_login_redirect"
+
     class << self
       attr_reader :jwks_cache
 
@@ -121,7 +123,7 @@ class AuthenticationProvider
       claims(token)[login_attribute]
     end
 
-    def persist_to_session(session, token)
+    def persist_to_session(request, session, pseudonym, domain_root_account, token)
       return unless token.options[:jwt_string]
 
       # the raw JWT for RP Initiated Logout
@@ -133,6 +135,8 @@ class AuthenticationProvider
       session[:oidc_id_token_iss] = id_token["iss"]
       session[:oidc_id_token_sub] = id_token["sub"]
       session[:oidc_id_token_sid] = id_token["sid"] if id_token["sid"]
+
+      Login::Shared.set_return_to_from_provider(request, session, pseudonym, domain_root_account, id_token[POST_LOGIN_REDIRECT_CLAIM])
     end
 
     def slo?
