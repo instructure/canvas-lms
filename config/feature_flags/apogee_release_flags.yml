@@ -448,3 +448,9 @@ submission_comment_media_auto_captioning:
       state: allowed
     development:
       state: allowed
+post_grades_enhanced_modal:
+  state: hidden
+  display_name: Post Grades Enhanced Modal
+  description: Accessible refactor of Sync Grades dialog
+  applies_to: Course
+  root_opt_in: true

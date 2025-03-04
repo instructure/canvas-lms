@@ -3701,6 +3701,22 @@ describe GradebooksController do
     end
   end
 
+  describe "#post_grades_enhanced_modal?" do
+    it "returns false when :post_grades_enhanced modal feature disabled for context" do
+      context = object_double(@course, feature_enabled?: false)
+      @controller.instance_variable_set(:@context, context)
+
+      expect(@controller.post_grades_enhanced_modal?).to be(false)
+    end
+
+    it "returns true when :post_grades_enhanced modal feature enabled for context" do
+      context = object_double(@course, feature_enabled?: true)
+      @controller.instance_variable_set(:@context, context)
+
+      expect(@controller.post_grades_enhanced_modal?).to be(true)
+    end
+  end
+
   describe "#grading_rubrics" do
     context "sharding" do
       specs_require_sharding
