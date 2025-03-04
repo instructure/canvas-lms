@@ -30,8 +30,8 @@ describe Lti::AssetProcessorNotifier do
     let(:student) { course.student_enrollments.first.user }
     let(:assignment) { assignment_model({ course: }) }
     let(:assignment2) { assignment_model({ course: }) }
-    let(:attachment) { attachment_with_context student }
-    let(:attachment2) { attachment_with_context student }
+    let(:attachment) { attachment_with_context student, { uploaded_data: StringIO.new("hello world") } }
+    let(:attachment2) { attachment_with_context student, { uploaded_data: StringIO.new("hello world") } }
 
     it "does not create Lti::Attachment if feature flag is off" do
       course.root_account.disable_feature!(:lti_asset_processor)
@@ -74,6 +74,9 @@ describe Lti::AssetProcessorNotifier do
       expect(notice_params[:cet_id_or_ids]).to eq(tool.id)
       expect(builder_params[:asset_report_service_url]).to eq("http://localhost/api/lti/asset_processors/#{ap.id}/reports")
       expect(builder_params[:submission_lti_id]).to eq(submission.lti_attempt_id)
+      expect(builder_params[:assets][0][:title]).to eq(assignment.title)
+      expect(builder_params[:assets][0][:filename]).to eq(attachment.display_name)
+      expect(builder_params[:assets][0][:sha256_checksum]).to eq "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
     end
 
     it "creates Lti::Asset for each attachment" do

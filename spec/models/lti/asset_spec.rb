@@ -72,4 +72,21 @@ RSpec.describe Lti::Asset, type: :model do
       end
     end
   end
+
+  describe "#calculate_sha256_checksum!" do
+    let(:content) { "hello world" }
+    let(:attachment) { attachment_model(uploaded_data: stub_file_data("test.txt", content, "text/plain")) }
+    let(:asset) { lti_asset_model(attachment:) }
+
+    it "calculates and stores SHA256 checksum" do
+      asset.calculate_sha256_checksum!
+      expect(asset.reload.sha256_checksum).to eq "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
+    end
+
+    it "does nothing if checksum already exists" do
+      asset.update(sha256_checksum: "existing_checksum")
+      asset.calculate_sha256_checksum!
+      expect(asset.reload.sha256_checksum).to eq "existing_checksum"
+    end
+  end
 end
