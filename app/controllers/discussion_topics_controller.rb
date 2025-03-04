@@ -684,6 +684,7 @@ class DiscussionTopicsController < ApplicationController
       ANNOUNCEMENTS_COMMENTS_DISABLED: Announcement.new(context: @context).comments_disabled?,
       DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
       DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
+      DISCUSSION_CONTENT_LOCKED: @topic.editing_restricted?(:content),
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
