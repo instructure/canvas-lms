@@ -1264,8 +1264,6 @@ class ApplicationController < ActionController::Base
 
   MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS = 3
 
-  GET_CONTEXT_GRAPHQL_OPERATION_NAMES = %w[CreateSubmission CreateDiscussionEntry].freeze
-
   # Can be used as a before_action, or just called from controller code.
   # Assigns the variable @context to whatever context the url is scoped
   # to.  So /courses/5/assignments would have a @context=Course.find(5).
@@ -1274,11 +1272,9 @@ class ApplicationController < ActionController::Base
   def get_context(user_scope: nil)
     GuardRail.activate(:secondary) do
       unless @context
-        if params[:course_id] || (request.url.include?("/graphql") && GET_CONTEXT_GRAPHQL_OPERATION_NAMES.include?(params[:operationName]))
+        if params[:course_id]
           course_scope = @token ? Course : Course.active
-          @context = params[:course_id] ? api_find(course_scope, params[:course_id]) : pull_context_course
-          return if @context.nil? # When doing pull_context_course it's possible to get a nil context, if that happen, we don't want to continue.
-
+          @context = api_find(course_scope, params[:course_id])
           @context.root_account = @domain_root_account if @context.root_account_id == @domain_root_account.id # no sense in refetching it
           params[:context_id] = params[:course_id]
           params[:context_type] = "Course"
@@ -3338,18 +3334,6 @@ class ApplicationController < ActionController::Base
     K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).use_classic_font?
   end
   helper_method :use_classic_font?
-
-  def pull_context_course
-    if params[:operationName] == "CreateSubmission"
-      assignment_id = params[:variables][:assignmentLid]
-      return ::Assignment.active.find(assignment_id).course
-    elsif params[:operationName] == "CreateDiscussionEntry"
-      discussion_topic_id = params[:variables][:discussionTopicId]
-      return DiscussionTopic.find(discussion_topic_id).course
-    end
-
-    nil
-  end
 
   def react_discussions_post_enabled_for_preferences_use?
     !!@domain_root_account&.feature_enabled?(:discussions_reporting)
