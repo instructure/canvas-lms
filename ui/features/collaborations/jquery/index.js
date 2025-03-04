@@ -65,10 +65,6 @@ CollaborationsPage.Events = {
     $('#delete_collaboration_dialog .delete_button').on('click', this.onDelete)
     $(document).fragmentChange(this.onFragmentChange)
     $('#collaboration_collaboration_type').on('change', this.onTypeChange).change()
-    $('#collaboration_selection_row').css('display: block;')
-    $('#collaboration_selection_label').css([
-      'white-space: nowrap; text-align: left; display: block;',
-    ])
     addDeepLinkingListener()
     handleExternalContentMessages({ready: onExternalContentReady})
     $('.before_external_content_info_alert, .after_external_content_info_alert')
@@ -87,13 +83,14 @@ CollaborationsPage.Events = {
   },
 
   onDelete(_e) {
+    const $delete_dialog = $('#delete_collaboration_dialog')
     const deleteDocument = $(this).hasClass('delete_document_button'),
       data = {delete_doc: deleteDocument},
-      $collaboration = $('#delete_collaboration_dialog').data('collaboration'),
+      $collaboration = $delete_dialog.data('collaboration'),
       url = $collaboration.find('.delete_collaboration_link').attr('href')
 
     $collaboration.dim()
-    $('#delete_collaboration_dialog').dialog('close')
+    $delete_dialog.dialog('close')
 
     $.ajaxJSON(
       url,
@@ -107,7 +104,7 @@ CollaborationsPage.Events = {
     )
   },
 
-  onFragmentChange(e, hash) {
+  onFragmentChange(_e, hash) {
     if (hash !== '#add_collaboration') return
 
     if ($('#collaborations .collaboration').length === 0) {

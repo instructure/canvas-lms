@@ -47,6 +47,28 @@ $highlight-blue: #00b5fe;
   }
 }
 
+#new_collaboration, .edit_collaboration {
+  .ic-Input {
+    max-width: 28.75rem;
+  }
+
+  textarea.ic-Input {
+    height: 126px;
+  }
+}
+
+#new_collaboration {
+  margin-top: 0.625rem;
+
+  .collaboration_type_descriptions {
+    margin-bottom: 1.125rem;
+  }
+
+  #collaborate_authorize_google_docs {
+    margin-top: 1.25rem;
+  }
+}
+
 .collaboration {
   border: 1px solid $ic-border-color;
   border-radius: $ic-border-radius;
@@ -75,30 +97,6 @@ $highlight-blue: #00b5fe;
 
   .description {
     margin-bottom: 5px;
-  }
-
-  .edit_collaboration {
-    .header, .content, .footer {
-      margin: 0;
-      padding: 0;
-    }
-
-    .header {
-      input[name='collaboration[title]'] {
-        width: 300px;
-      }
-    }
-
-    .content {
-      label {
-        margin-bottom: 0;
-      }
-      textarea {
-        display: block;
-        height: 50px;
-        width: 400px;
-      }
-    }
   }
 }
 
