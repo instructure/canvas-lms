@@ -39,7 +39,7 @@ class Mutations::UpdateSubmissionGradeStatus < Mutations::BaseMutation
         submission.update(late_policy_status: input[:late_policy_status])
       end
     elsif (input[:custom_grade_status_id].nil? && input[:late_policy_status].nil?) || input[:late_policy_status] == "none"
-      submission.update(custom_grade_status_id: nil, late_policy_status: nil, excused: false)
+      submission.update(custom_grade_status_id: nil, late_policy_status: input[:late_policy_status], excused: false)
     end
 
     { submission: }
