@@ -24,7 +24,7 @@ import ExternalToolModalLauncher from '../ExternalToolModalLauncher'
 function generateProps(overrides = {}) {
   return {
     title: 'Modal Title',
-    tool: {placements: {course_assignments_menu: {}}, definition_id: 1},
+    tool: {placements: {course_assignments_menu: {}}, definition_id: '1'},
     isOpen: false,
     onRequestClose: () => {},
     contextType: 'course',
