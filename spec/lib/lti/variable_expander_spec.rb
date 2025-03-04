@@ -2003,6 +2003,14 @@ module Lti
                 assignment.update!(due_at: nil)
                 expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
               end
+
+              context "with an due_date override" do
+                it "is expanded" do
+                  assignment.update!(due_at: right_now - 1.day)
+                  assignment.submissions[0].update!(cached_due_date: right_now)
+                  expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+                end
+              end
             end
 
             context "for teacher" do
@@ -2080,6 +2088,14 @@ module Lti
             it "expands to an empty string if there is no due date for the student" do
               course.enroll_user(user, "StudentEnrollment")
               expect(expand!("$Canvas.assignment.earliestEnrollmentDueAt.iso8601")).to eq ""
+            end
+
+            context "with an due_date override" do
+              it "is expanded" do
+                assignment.update!(due_at: right_now - 1.day)
+                assignment.submissions[0].update!(cached_due_date: right_now)
+                expect(expand!("$Canvas.assignment.earliestEnrollmentDueAt.iso8601")).to eq right_now.utc.iso8601
+              end
             end
           end
 
