@@ -14350,6 +14350,7 @@ tr:
   permissions_manage_9eea4f8f: "Geliştirici Anahtarları - yönet"
   peru_51_d3d38d1f: "Peru (+51)"
   philippines_63_a4f62138: "Philippines (+63)"
+  pick_dd033b86: Seç
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Aşağıdaki canlı ders ayarı için gün ve saati seçin:"
   pin_cdbc9f8f: Sabitle
   pink_68ad45cb: Pembe
@@ -15207,6 +15208,7 @@ tr:
       yo: Yo
     you_have_no_services: "Herhangi bir hizmete kayıtlı değilsiniz, *ayarlar* sayfasından hizmet ekleyebilirsiniz."
   profile_6bd2baed: Profil
+  profile_picture_13e5338c: "Profil Fotoğrafı"
   profiles: 
     avatar_dialog: 
       from_gravatar: "Gravatar'dan al"
