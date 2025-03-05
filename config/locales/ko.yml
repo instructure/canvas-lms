@@ -10187,6 +10187,7 @@ ko:
     view_notifications: "알림 보기"
     view_statistics: "통계 보기"
   permissions_365c49e: 권한
+  pick_dd033b86: 선택
   pinned_discussions_a55c0cea: "고정된 토론"
   play_media_comment_8614d30f: "미디어 설명 재생"
   playback: 
@@ -10740,6 +10741,7 @@ ko:
     ways_to_contact_me: 연락처
     you_have_no_services: "아직 등록한 서비스가 없으며 *설정* 페이지에서 추가할 수 있습니다."
   profile_6bd2baed: 프로필
+  profile_picture_13e5338c: "프로필 사진"
   profile_pictures_15953851: "프로필 사진"
   profiles: 
     gravatar_view: 
