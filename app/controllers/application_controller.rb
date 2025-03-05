@@ -3294,6 +3294,11 @@ class ApplicationController < ActionController::Base
   end
   helper_method :should_show_migration_limitation_message
 
+  def show_migration_text_no_question_warning?
+    !Account.site_admin.feature_enabled?(:hide_quiz_migration_text_no_question_warning)
+  end
+  helper_method :show_migration_text_no_question_warning?
+
   def k5_disabled?
     K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).k5_disabled?
   end
