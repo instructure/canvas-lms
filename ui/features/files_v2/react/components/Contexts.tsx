@@ -28,6 +28,7 @@ export interface FileManagementContextProps {
   rootFolder?: Folder
   currentFolder?: BBFolderWrapper | null
   fileIndexMenuTools: Tool[]
+  fileMenuTools: Tool[]
 }
 
 const FileManagementContext = createContext<FileManagementContextProps | null>(null)

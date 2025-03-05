@@ -130,6 +130,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
     filesEnv.contextFor({contextType, contextId})?.usage_rights_required || false
   const fileIndexMenuTools =
     filesEnv.contextFor({contextType, contextId})?.file_index_menu_tools || []
+  const fileMenuTools = filesEnv.contextFor({contextType, contextId})?.file_menu_tools || []
 
   return (
     <FileManagementProvider
@@ -141,6 +142,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
         currentFolder: currentFolderWrapper.current,
         rootFolder: folders[0],
         fileIndexMenuTools,
+        fileMenuTools,
       }}
     >
       <View as="div">

@@ -18,7 +18,7 @@
 
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 
-const fileIndexMenuTools = [
+const tools = [
   {
     id: 'tool1',
     title: 'Test Tool',
@@ -37,7 +37,8 @@ const setupFilesEnvWithAllContexts = () => {
       asset_string: 'user_1',
       permissions: {},
       name: 'My Files',
-      file_index_menu_tools: fileIndexMenuTools,
+      file_menu_tools: tools,
+      file_index_menu_tools: tools,
     },
     {
       contextType: 'courses',
@@ -46,7 +47,8 @@ const setupFilesEnvWithAllContexts = () => {
       asset_string: 'course_1',
       permissions: {},
       name: 'Course 1',
-      file_index_menu_tools: fileIndexMenuTools,
+      file_menu_tools: tools,
+      file_index_menu_tools: tools,
     },
   ]
   filesEnv.contextsDictionary = {
@@ -65,7 +67,8 @@ const setupFilesEnvWithSingleContext = () => {
       asset_string: 'course_1',
       permissions: {},
       name: 'Course 1',
-      file_index_menu_tools: fileIndexMenuTools,
+      file_menu_tools: tools,
+      file_index_menu_tools: tools,
     },
   ]
   filesEnv.contextsDictionary = {

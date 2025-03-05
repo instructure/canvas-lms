@@ -29,6 +29,7 @@ export function createMockFileManagementContext(
     rootFolder: undefined,
     currentFolder: null,
     fileIndexMenuTools: [],
+    fileMenuTools: [],
     ...overrides,
   }
 }

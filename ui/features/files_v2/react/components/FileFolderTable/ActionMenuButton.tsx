@@ -17,6 +17,7 @@
  */
 
 import React, {useCallback, useMemo, useState} from 'react'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
@@ -27,6 +28,8 @@ import {type File, type Folder} from '../../../interfaces/File'
 import {RenameModal} from '../RenameModal'
 import DeleteModal from './DeleteModal'
 import {downloadFile, downloadZip} from '../../../utils/downloadUtils'
+import {isFile} from '../../../utils/fileFolderUtils'
+import {externalToolEnabled} from '../../../utils/fileUtils'
 
 import {
   IconMoreLine,
@@ -65,7 +68,16 @@ const ActionMenuButton = ({
     'rename' | 'delete' | 'copy-to' | 'send-to' | 'move-to' | null
   >(null)
   const actionLabel = I18n.t('Actions')
-  const {contextType} = useFileManagement()
+  const {contextType, fileMenuTools} = useFileManagement()
+
+  const iconForTrayTool = useCallback((tool: {canvas_icon_class?: string; icon_url?: string}) => {
+    if (tool.canvas_icon_class) {
+      return <i className={tool.canvas_icon_class} />
+    } else if (tool.icon_url) {
+      return <img className="icon lti_tool_icon" alt="" src={tool.icon_url} />
+    }
+    return <></>
+  }, [])
 
   const triggerButton = useCallback(() => {
     return size !== 'large' ? (
@@ -94,12 +106,14 @@ const ActionMenuButton = ({
         text,
         separator,
         onClick,
+        disabled = false,
       }: {
         icon?: any
         text?: string
         separator?: boolean
         visible?: boolean
         onClick?: (e: React.MouseEvent) => void
+        disabled?: boolean
       },
     ) => {
       const key = index + '-' + row.id
@@ -107,9 +121,13 @@ const ActionMenuButton = ({
         return <Menu.Separator key={key} />
       }
       return (
-        <Menu.Item key={key} onClick={onClick}>
+        <Menu.Item key={key} onClick={onClick} disabled={disabled} data-testid={text}>
           <Flex alignItems="center" gap="x-small">
-            <Flex.Item>{React.createElement(icon, {inline: false})}</Flex.Item>
+            {typeof icon === 'object' ? (
+              <Flex.Item>{icon}</Flex.Item>
+            ) : (
+              <Flex.Item>{React.createElement(icon, {inline: false})}</Flex.Item>
+            )}
             <Flex.Item>
               <Text>{text}</Text>
             </Flex.Item>
@@ -130,7 +148,7 @@ const ActionMenuButton = ({
 
   const filteredItems = useMemo(
     () =>
-      (row.folder_id
+      (isFile(row)
         ? [
             // files
             {
@@ -172,6 +190,15 @@ const ActionMenuButton = ({
               visible: rename_move_permissions,
               onClick: () => setModalOrTray('move-to'),
             },
+            ...fileMenuTools.map(tool => {
+              return {
+                icon: iconForTrayTool(tool),
+                text: tool.title,
+                onClick: () => assignLocation(`${tool.base_url}&files[]=${row.id}`),
+                visible: true,
+                disabled: !externalToolEnabled(row, tool),
+              }
+            }),
             {separator: true, visible: delete_permissions},
             {
               icon: IconTrashLine,
@@ -225,32 +252,32 @@ const ActionMenuButton = ({
       row,
       send_copy_permissions,
       userCanEditFilesForContext,
+      fileMenuTools,
+      iconForTrayTool,
     ],
   )
 
   const onDismissModalOrTray = useCallback(() => setModalOrTray(null), [])
 
   const buildTrays = useCallback(() => {
-    let file
-    if (row.filename) {
-      file = row as File
-    }
+    if (!isFile(row)) return null
+
     return (
       <>
-        {file && ENV.COURSE_ID && (
+        {ENV.COURSE_ID && (
           <DirectShareUserTray
             open={modalOrTray === 'send-to'}
             onDismiss={onDismissModalOrTray}
             courseId={ENV.COURSE_ID}
-            file={file}
+            file={row}
           />
         )}
-        {file && ENV.COURSE_ID && (
+        {ENV.COURSE_ID && (
           <DirectShareCourseTray
             open={modalOrTray === 'copy-to'}
             onDismiss={onDismissModalOrTray}
             courseId={ENV.COURSE_ID}
-            file={file}
+            file={row}
           />
         )}
       </>
