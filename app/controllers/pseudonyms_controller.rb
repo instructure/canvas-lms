@@ -230,7 +230,7 @@ class PseudonymsController < ApplicationController
         @pseudonym_session = PseudonymSession.new(@pseudonym, true)
         render json: @pseudonym, status: :ok # -> dashboard
       else
-        render json: { pseudonym: @pseudonym.errors.as_json[:errors] }, status: :bad_request
+        render json: { pseudonym: ::Api::Errors::Reporter.to_json(@pseudonym.errors)[:errors] }, status: :bad_request
       end
     else
       render json: { errors: { nonce: "expired" } }, status: :bad_request # -> login url

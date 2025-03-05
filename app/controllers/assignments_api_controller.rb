@@ -1752,7 +1752,7 @@ class AssignmentsApiController < ApplicationController
         errors = I18n.t("Failed to create or update peer review sub assignment")
       else
         status = (result == :forbidden) ? :forbidden : :bad_request
-        errors = @assignment.errors.as_json[:errors]
+        errors = ::Api::Errors::Reporter.to_json(@assignment.errors)[:errors]
         errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
       end
       render json: { errors: }, status:

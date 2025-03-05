@@ -3466,10 +3466,10 @@ class UsersController < ApplicationController
     else
       errors = {
         errors: {
-          user: @user.errors.as_json[:errors],
-          pseudonym: @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
-          observee: @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {},
-          pairing_code: @invalid_observee_code ? @invalid_observee_code.errors.as_json[:errors] : {},
+          user: ::Api::Errors::Reporter.to_json(@user.errors)[:errors],
+          pseudonym: @pseudonym ? ::Api::Errors::Reporter.to_json(@pseudonym.errors)[:errors] : {},
+          observee: @invalid_observee_creds ? ::Api::Errors::Reporter.to_json(@invalid_observee_creds.errors)[:errors] : {},
+          pairing_code: @invalid_observee_code ? ::Api::Errors::Reporter.to_json(@invalid_observee_code.errors)[:errors] : {},
           recaptcha: @recaptcha_valid ? nil : @recaptcha_errors
         }
       }
