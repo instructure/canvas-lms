@@ -17618,6 +17618,7 @@ fa:
   pick_a_name_to_save_this_theme_as_9773cb1a: "یک نام انتخاب کنید برای ذخیره سازی این زمینه به عنوان"
   pick_an_emoji_942adfc4: "یک ایموجی انتخاب کنید..."
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "یک نقطه پایانی انتخاب کنید، گزارش های خطای شما را به آنجا ارسال خواهیم کرد"
+  pick_dd033b86: انتخاب
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "تاریخ و زمان را برای تنظیمات کنفرانس زیر انتخاب کنید:"
   pin_cdbc9f8f: الصاق
   pin_discussion_title_67c84658: " سنجاق کردن  گفتگوی %{title}"
@@ -18579,6 +18580,7 @@ fa:
     you_have_no_services: "هیچ سرویس ثبت نشده است، می توانید چند مورد را در صفحه *تنظیمات* بیفزایید."
   profile_6bd2baed: "رخ نما"
   profile_photo_save_failed_too_many_times_e1ebda5: "دخیره سازی  عکس پروفایل بارها شکست خورده است. "
+  profile_picture_13e5338c: "عکس رخ نما"
   profile_pictures_15953851: "عکس های رخ نما"
   profile_tray_bcec5044: "سینی رخ‌نما"
   profiles: 
@@ -20163,6 +20165,7 @@ fa:
       loading_questions_failed: "بارگذاری پرسش ها انجام نشد، لطفا دوباره تلاش کنید"
       missing_access_code: "باید یک رمز دسترسی را وارد کنید"
       missing_ip_filter: "باید یک نشانی آی پی معتبر وارد کنید"
+      must_be_number: "حتما باید عدد باشد"
       no_answer: "لطفا حداقل یک پاسخ را اضافه کنید"
       no_correct_answer: "لطفا پاسخ درست را انتخاب کنید"
       no_possible_solution: "لطفا حداقل یک راه حل ممکن را ایجاد کنید"
