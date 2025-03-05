@@ -534,12 +534,13 @@ export const quiz = (window.quiz = {
         },
         () => {
           quiz.rebindMultiChange(questionType, $questionContent[0].id, $select)
-          $('.question-text')
+          $form
+            .find('.question-text')
             .find('iframe')
             .contents()
             .find('body')
             .on('input', () => {
-              restoreOriginalMessage($('.question-text'))
+              restoreOriginalMessage($form.find('.question-text'))
             })
         },
       )
@@ -1074,7 +1075,7 @@ export const quiz = (window.quiz = {
       result.htmlValues = []
     }
     $formQuestion.find('.answer.hidden').remove()
-    hideAlertBox($('.answers_warning'))
+    hideAlertBox($form.find('.answers_warning'))
     $form.find("input[name='answer_selection_type']").val(result.answer_selection_type).change()
     $form.find('.add_answer_link').showIf(options.addable)
     var $answers = $formQuestion.find('.form_answers .answer')
@@ -1596,7 +1597,6 @@ correctAnswerVisibility = {
 }
 
 function makeQuestion(data) {
-  const idx = $('.question_holder:visible').length + 1
   const question = $.extend(
     {},
     quiz.defaultQuestionData,
@@ -1980,7 +1980,7 @@ function renderAlertBox(inputField, message, focusedElement) {
 
   if (focusedElement) {
     $(focusedElement).attr('aria-describedby', 'answers_warning_alert_box')
-    $(focusedElement).focus().select()
+    $(focusedElement).focus(150).trigger('select')
   }
 }
 
@@ -1990,6 +1990,65 @@ function hideAlertBox(inputField) {
 
   $inputField.find('.answers_warning_message').text('')
   $(`[aria-describedby="answers_warning_alert_box"]`).removeAttr('aria-describedby')
+}
+
+function getActiveInnerForms() {
+  return {
+    question: $(".question_form").not("#question_form_template"),
+    group: $(".group_top.editing").find(".quiz_group_form")
+  }
+}
+
+function submitOpenFormsAndCheckValidity() {
+  // Submit open questions and question groups
+  const $forms = $('.question_form:visible,.group_top.editing .quiz_group_form:visible')
+
+  let isValid = true
+
+  $forms.each(function () {
+    const $form = $(this)
+    $form.trigger('submit', { disableInputFocus: !isValid })
+
+    if (!isValid) {
+      return
+    }
+
+    const $invalidInputControls = $form.find('.form-control.invalid')
+
+    if ($invalidInputControls.length) {
+      const $inputs = $invalidInputControls.find('input')
+
+      if ($inputs.length > 0) {
+        isValid = false
+      }
+
+      const $iframes = $invalidInputControls.find('iframe')
+
+      if ($iframes.length > 0) {
+        isValid = false
+        const $firstIframe = $iframes.first()
+        const $drawerLayoutContent = $('#drawer-layout-content')
+        $drawerLayoutContent.scrollTo({
+          top: $drawerLayoutContent.scrollTop() + $firstIframe.get(0).getBoundingClientRect().y - 20,
+          left: 0,
+        })
+      }
+    }
+
+    const $alerts = $form.find('.answers_warning').not('.hidden')
+
+    if ($alerts.length > 0) {
+      isValid = false
+      const $firstAlert = $alerts.first()
+      const $drawerLayoutContent = $('#drawer-layout-content')
+      $drawerLayoutContent.scrollTo({
+        top: $drawerLayoutContent.scrollTop() + $firstAlert.get(0).getBoundingClientRect().y - 20,
+        left: 0,
+      })
+    }
+  })
+
+  return isValid
 }
 
 function renderQuestionGroupError(inputName, message, form) {
@@ -2009,10 +2068,10 @@ function renderQuestionGroupError(inputName, message, form) {
   inputMessageText.addClass('error_text')
 }
 
-function clearQuestionGroupError(inputName) {
-  const inputField = $(`.${inputName}`)
-  const inputContainer = $(`.${inputName}_container`)
-  const inputMessageContainer = $(`.${inputName}_message_container`)
+function clearQuestionGroupError(inputName, form) {
+  const inputField = form.find(`.${inputName}`)
+  const inputContainer = form.find(`.${inputName}_container`)
+  const inputMessageContainer = form.find(`.${inputName}_message_container`)
   const inputMessageText = inputMessageContainer.find('.input-message__text')
 
   inputContainer.removeClass('invalid')
@@ -2028,11 +2087,11 @@ function focusOnFirstError() {
   const errorsOnQuestionsTab = $('#questions_tab .form-control.invalid input')
 
   if (errorsOnOptionsTab.length > 0) {
-    $('#quiz_tabs').tabs('option', 'active', 0);
+    $('#quiz_tabs').tabs('option', 'active', 0)
     errorsOnOptionsTab?.first()?.focus();
   } else if (errorsOnQuestionsTab.length > 0) {
-    $('#quiz_tabs').tabs('option', 'active', 1);
-    errorsOnQuestionsTab?.first()?.focus();
+    $('#quiz_tabs').tabs('option', 'active', 1)
+    errorsOnQuestionsTab?.first()?.focus()
   }
 }
 
@@ -2251,7 +2310,7 @@ ready(function () {
   })
 
   $('#question_points').on('input', function () {
-    restoreOriginalMessage($('.question_points_holder'))
+    restoreOriginalMessage($(this).closest('.form-control').first())
   })
 
   $('#found_question_group_name').on('input', function () {
@@ -2272,11 +2331,11 @@ ready(function () {
   })
 
   $('.questions_number').on('input', function () {
-    clearQuestionGroupError(QUESTIONS_NUMBER)
+    clearQuestionGroupError(QUESTIONS_NUMBER, $(this).closest('.group_edit'))
   })
 
   $('.question_points').on('input', function () {
-    clearQuestionGroupError(QUESTION_POINTS)
+    clearQuestionGroupError(QUESTION_POINTS, $(this).closest('.group_edit'))
   })
 
   $('#lockdown_browser_suboptions').showIf($('#quiz_require_lockdown_browser').prop('checked'))
@@ -2399,6 +2458,29 @@ ready(function () {
     disableErrorBox: true,
 
     processData(data) {
+      const activeInnerForms = getActiveInnerForms()
+
+      if (activeInnerForms.group?.length || activeInnerForms.question?.length) {
+        alert(
+          I18n.t(
+            'errors.save_inner_forms',
+            'Save or cancel the open question/group before saving the quiz.',
+          ),
+        )
+
+        if (activeInnerForms.group.length) {
+          $('#quiz_tabs').tabs('option', 'active', 1)
+          activeInnerForms.group.find('.submit_button').first().focus(150)
+        }
+
+        if (activeInnerForms.question.length) {
+          $('#quiz_tabs').tabs('option', 'active', 1)
+          activeInnerForms.question.find('.submit_button').first().focus(150)
+        }
+
+        return false
+      }
+
       RichContentEditor.closeRCE($('#quiz_description'))
       $(this).attr('method', 'PUT')
       const quiz_title = $("input[name='quiz[title]']").val()
@@ -2531,9 +2613,7 @@ ready(function () {
       focusOnFirstError()
     },
 
-    onSubmit(promise, data) {
-      const form = this
-
+    onSubmit(promise) {
       if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
         promise = promise.pipe(promisedData => {
           if (promisedData && promisedData.quiz) {
@@ -2759,6 +2839,7 @@ ready(function () {
 
   $(document).on('click', '.edit_question_link', function (event) {
     event.preventDefault()
+
     var $question = $(this).parents('.question')
     setQuestionID($question)
     var questionID = $question.data('questionID')
@@ -2949,16 +3030,17 @@ ready(function () {
   })
 
   $('#question_form_template .cancel_link').click(function (event) {
-    const $displayQuestion = $(this).parents('form').prev()
+    const $form = $(this).parents('form')
+    const $displayQuestion = $form.prev()
     const isNew = $displayQuestion.attr('id') === 'question_new'
 
-    restoreOriginalMessage($('.question_points_holder'))
-    restoreOriginalMessage($('.question-text'))
+    restoreOriginalMessage($form.find('.question_points_holder'))
+    restoreOriginalMessage($form.find('.question-text'))
 
     event.preventDefault()
 
     if (!isNew) {
-      $(this).parents('form').remove()
+      $form.remove()
     }
     $displayQuestion.show()
     $('html,body').scrollTo({top: $displayQuestion.offset().top - 10, left: 0})
@@ -3042,6 +3124,7 @@ ready(function () {
     event.preventDefault()
 
     const $question = $(this).parents('.question')
+    hideAlertBox($question.find('.answers_warning'))
     if (!$question.hasClass('selectable')) {
       return
     }
@@ -3228,23 +3311,21 @@ ready(function () {
 
     const $ans = $(this).parents('.answer')
     const $ansHeader = $ans.closest('.question').find('.answers_header')
-    hideAlertBox($('.answers_warning'))
+    hideAlertBox(holder.find('.answers_warning'))
     $ans.remove()
     $ansHeader.focus()
   })
 
   $('.add_question_group_link').click(function (event) {
     event.preventDefault()
-    if (questionLimitReached()) return
-    $('.question_form .submit_button:visible,.quiz_group_form .submit_button:visible').each(
-      function () {
-        $(this).parents('form').trigger('submit')
-      },
-    )
 
-    if ($('.group_top.editing').find('.invalid').length > 0) {
+    const areAllOpenFormsSaved = submitOpenFormsAndCheckValidity()
+
+    if (!areAllOpenFormsSaved) {
       return
     }
+
+    if (questionLimitReached()) return
 
     const $group_top = $('#group_top_template').clone(true).attr('id', 'group_top_new')
     const $group_bottom = $('#group_bottom_template').clone(true).attr('id', 'group_bottom_new')
@@ -3259,8 +3340,15 @@ ready(function () {
 
   $('.add_question_link').click(function (event) {
     event.preventDefault()
+
+    const areAllOpenFormsSaved = submitOpenFormsAndCheckValidity()
+
+    if (!areAllOpenFormsSaved) {
+      return
+    }
+
     if (questionLimitReached()) return
-    $('.question_form:visible,.group_top.editing .quiz_group_form:visible').trigger('submit')
+
     const $question = makeQuestion()
     if ($(this).parents('.group_top').length > 0) {
       const groupID = $(this).parents('.group_top')[0].id.replace('group_top_', '')
@@ -3382,6 +3470,13 @@ ready(function () {
 
   $('.find_question_link').click(event => {
     event.preventDefault()
+
+    const areAllOpenFormsSaved = submitOpenFormsAndCheckValidity()
+
+    if (!areAllOpenFormsSaved) {
+      return
+    }
+
     const $dialog = $findQuestionDialog
     if (!$dialog.hasClass('loaded')) {
       $dialog.data('banks', {})
@@ -3835,8 +3930,8 @@ ready(function () {
 
   $('.add_answer_link').bind('click', function (event, skipFocus) {
     event.preventDefault()
-    hideAlertBox($('.answers_warning'))
     const $question = $(this).parents('.question')
+    hideAlertBox($question.find('.answers_warning'))
     var answers = []
     let answer_type = null,
       question_type = null,
@@ -3990,13 +4085,13 @@ ready(function () {
     $(this).find('.answer_comment').slideToggle()
   })
 
-  $('#question_form_template').submit(function (event) {
+  $('#question_form_template').submit(function (event, data) {
     event.preventDefault()
     event.stopPropagation()
     const $displayQuestion = $(this).prev()
     const $form = $(this)
     $('.errorBox').not('#error_box_template').remove()
-    hideAlertBox($('.answers_warning'))
+    hideAlertBox($form.find('.answers_warning'))
     var $answers = $form.find('.answer')
     const $question = $(this).find('.question')
     const answers = []
@@ -4008,15 +4103,18 @@ ready(function () {
     questionData.question_points = numberHelper.parse(questionData.question_points)
     if (questionData.question_points && questionData.question_points < 0) {
       renderError(
-        $('.question_points_holder'),
+        $form.find('.question_points_holder'),
         I18n.t('question.positive_points', 'Must be zero or greater'),
       )
-      
-      // Focus on the question points input
-      $('.question_points_holder').find('input').focus(150)
+
+      if (!data?.disableInputFocus) {
+        // Focus on the question points input
+        $form.find('.question_points_holder.invalid').find('input').first().focus(150)
+      }
+
       return
     } else {
-      restoreOriginalMessage($('.question_points_holder'))
+      restoreOriginalMessage($form.find('.question_points_holder'))
     }
 
     // This is not ideal, but our only way to ensure the validation error gets displayed before
@@ -4026,17 +4124,19 @@ ready(function () {
 
     if (questionData.question_text.length > MAX_QUESTION_TEXT_LENGTH) {
       renderError(
-        $('.question-text'),
+        $form.find('.question-text'),
         I18n.t(
           'question.question_text_too_long',
           'Question text is too long, max length is 16384 characters',
         ),
       )
 
-      $('.question-text').find('iframe').get(0).contentDocument.body.focus()
+      if (!data?.disableInputFocus) {
+        $form.find('.question-text').find('iframe').get(0).contentDocument.body.focus()
+      }
       return
     } else {
-      restoreOriginalMessage($('.question-text'))
+      restoreOriginalMessage($form.find('.question-text'))
     }
 
     questionData.assessment_question_bank_id = $('.question_bank_id').text() || ''
@@ -4117,7 +4217,11 @@ ready(function () {
         .val()
         .match(/survey/i)
     if (isNotSurvey && error_text) {
-      renderAlertBox($('.answers_warning'), error_text, focused_element)
+      renderAlertBox(
+        $form.find('.answers_warning'),
+        error_text,
+        !data?.disableInputFocus ? focused_element : null
+      )
       return
     }
     const question = $.extend({}, questionData)
@@ -4422,26 +4526,29 @@ ready(function () {
       return newData
     },
     // rewrite the data so that it fits the jsonapi format
-    processData(data) {
+    processData(data, extraData) {
       const quizGroupQuestionsNumber = numberHelper.parse(data['quiz_group[pick_count]'])
       const quizGroupQuestionPoints = numberHelper.parse(data['quiz_group[question_points]'])
       const validationErrors = validateQuestionGroupData(
         quizGroupQuestionsNumber,
         quizGroupQuestionPoints
       )
+      const $form = $(this)
       if (validationErrors.QUESTIONS_NUMBER.length > 0 || validationErrors.QUESTION_POINTS.length > 0) {
         if (validationErrors.QUESTIONS_NUMBER.length > 0) {
-          renderQuestionGroupError(QUESTIONS_NUMBER, validationErrors.QUESTIONS_NUMBER.join(', '), $(this))
+          renderQuestionGroupError(QUESTIONS_NUMBER, validationErrors.QUESTIONS_NUMBER.join(', '), $form)
         }
         if (validationErrors.QUESTION_POINTS.length > 0) {
-          renderQuestionGroupError(QUESTION_POINTS, validationErrors.QUESTION_POINTS.join(', '), $(this))
+          renderQuestionGroupError(QUESTION_POINTS, validationErrors.QUESTION_POINTS.join(', '), $form)
         }
-        $(this).find('.invalid input').first().focus()
+        if (!extraData?.disableInputFocus) {
+          $form.find('.invalid input').first().focus(150)
+        }
         return false
       }
-      clearQuestionGroupError(QUESTION_POINTS)
+      clearQuestionGroupError(QUESTION_POINTS, $form)
       data['quiz_group[question_points]'] = quizGroupQuestionPoints
-      clearQuestionGroupError(QUESTIONS_NUMBER)
+      clearQuestionGroupError(QUESTIONS_NUMBER, $form)
       data['quiz_group[pick_count]'] = quizGroupQuestionsNumber
       return data
     },
@@ -4982,6 +5089,7 @@ ready(function () {
         return
       }
       event.preventDefault()
+
       const $top = $(this).parents('.group_top')
       const data = $top.getTemplateData({textValues: ['name', 'pick_count', 'question_points']})
       $top.fillFormData(data, {object_name: 'quiz_group'})
@@ -5020,11 +5128,14 @@ ready(function () {
       })
     })
     .on('click', '.group_edit.cancel_button', function (event) {
-      if ($(this).closest('.group_top').length === 0) {
+      const $groupContainer = $(this).closest('.group_top')
+
+      if ($groupContainer.length === 0) {
         return
       }
-      clearQuestionGroupError(QUESTION_POINTS)
-      clearQuestionGroupError(QUESTIONS_NUMBER)
+
+      clearQuestionGroupError(QUESTION_POINTS, $groupContainer)
+      clearQuestionGroupError(QUESTIONS_NUMBER, $groupContainer)
       const $top = $(this).parents('.group_top')
       $top.removeClass('editing')
       if ($top.attr('id') === 'group_top_new') {

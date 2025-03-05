@@ -80,7 +80,7 @@ const I18n = createI18nScope('instructure')
 //    disableErrorBox: If true, error boxes will not be displayed
 $.fn.formSubmit = function (options) {
   $(this).markRequired(options)
-  this.submit(function (event) {
+  this.submit(function (event, extraData) {
     const $form = $(this) // this is to handle if bind to a template element, then it gets cloned the original this would not be the same as the this inside of here.
     // disableWhileLoading might need to wrap this, so we don't want to modify the original
     let onSubmit = options.onSubmit
@@ -99,7 +99,7 @@ $.fn.formSubmit = function (options) {
     if (options.processData && $.isFunction(options.processData)) {
       let newData = null
       try {
-        newData = options.processData.call($form, formData)
+        newData = options.processData.call($form, formData, extraData)
       } catch (e) {
         error = e
         if (INST && INST.environment !== 'production') throw error
