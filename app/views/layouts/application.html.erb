@@ -209,11 +209,13 @@ end
               <div class="ic-notification__content">
                 <div class="ic-notification__message notification_message" style="margin-bottom:1rem;">
                   <%= t 'Your Classic Quizzes have been migrated to New Quizzes! ' %><br />
-                  <%= t 'Please note:' %>
-                  <ul>
-                    <li><%= t 'Text No Question has moved to a Stimulus; please add a question so it can display within the quiz.' %></li>
-                  </ul>
-                  <%= t 'We apologize for the inconvenience and thank you for your patience as we continue to improve the migration experience!' %>
+                  <% if show_migration_text_no_question_warning? %>
+                    <%= t 'Please note:' %>
+                    <ul>
+                      <li><%= t 'Text No Question has moved to a Stimulus; please add a question so it can display within the quiz.' %></li>
+                    </ul>
+                    <%= t 'We apologize for the inconvenience and thank you for your patience as we continue to improve the migration experience!' %>
+                  <% end %>
                 </div>
                 <div class="ic-notification__actions">
                   <a href="#"
