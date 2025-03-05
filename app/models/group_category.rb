@@ -51,14 +51,20 @@ class GroupCategory < ActiveRecord::Base
     max_len = maximum_string_length
     max_len -= record.create_group_count.to_s.length + 1 if record.create_group_count
 
-    if value.blank?
-      record.errors.add attr, t(:name_required, "Name is required")
+    if record.non_collaborative?
+      if value.blank?
+        record.errors.add(attr, t(:name_required, "Name is required"))
+      elsif value.length > max_len
+        record.errors.add(attr, t(:name_too_long, "Enter a shorter category name"))
+      end
+    elsif value.blank?
+      record.errors.add(attr, t(:name_required, "Name is required"))
     elsif GroupCategory.protected_name_for_context?(value, record.context)
-      record.errors.add attr, t(:name_reserved, "%{name} is a reserved name.", name: value)
+      record.errors.add(attr, t(:name_reserved, "%{name} is a reserved name.", name: value))
     elsif record.context && record.context.group_categories.other_than(record).where(name: value).exists?
-      record.errors.add attr, t(:name_unavailable, "%{name} is already in use.", name: value)
+      record.errors.add(attr, t(:name_unavailable, "%{name} is already in use.", name: value))
     elsif value.length > max_len
-      record.errors.add attr, t(:name_too_long, "Enter a shorter category name")
+      record.errors.add(attr, t(:name_too_long, "Enter a shorter category name"))
     end
   end
 
