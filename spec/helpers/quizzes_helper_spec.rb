@@ -444,17 +444,26 @@ describe QuizzesHelper do
       expect(message).to match(/last attempt/)
     end
 
-    it 'provides a useful message when "no"' do
-      quiz = double({
-                      show_correct_answers_last_attempt: nil,
-                      show_correct_answers: false,
-                      show_correct_answers_at: nil,
-                      hide_correct_answers_at: nil
-                    })
-      quiz_submission = double(last_attempt_completed?: false)
+    context("when correct answers are hidden") do
+      let(:quiz) do
+        double({
+                 show_correct_answers_last_attempt: nil,
+                 show_correct_answers: false,
+                 show_correct_answers_at: nil,
+                 hide_correct_answers_at: nil
+               })
+      end
+      let(:quiz_submission) { double(last_attempt_completed?: false) }
 
-      message = render_correct_answer_protection(quiz, quiz_submission)
-      expect(message).to match(/are hidden/)
+      it "provides a useful message" do
+        message, _aria_hidden = render_correct_answer_protection(quiz, quiz_submission)
+        expect(message).to match(/are hidden/)
+      end
+
+      it "tells assistive technologies to ignore the message" do
+        _message, aria_hidden = render_correct_answer_protection(quiz, quiz_submission)
+        expect(aria_hidden).to be_truthy
+      end
     end
 
     it 'provides nothing when "yes"' do
