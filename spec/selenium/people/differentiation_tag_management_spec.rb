@@ -36,6 +36,10 @@ describe "Differentiation Tag Management" do
     @multiple_tags = @course.group_categories.create!(name: "Multiple Tags", non_collaborative: true)
     @multiple_tags_1 = @course.groups.create!(name: "tag variant 1", group_category: @multiple_tags)
     @multiple_tags_2 = @course.groups.create!(name: "tag variant 2", group_category: @multiple_tags)
+
+    @single_tag_with_long_name = @course.group_categories.create!(name: "tag with a really long truncated name", non_collaborative: true)
+    @single_tag_with_long_name_1 = @course.groups.create!(name: "tag with a really long truncated name variant", group_category: @single_tag_with_long_name)
+    @single_tag_with_long_name_2 = @course.groups.create!(name: "tag with a really long truncated name variant", group_category: @single_tag_with_long_name)
   end
 
   describe "in the people page" do
@@ -57,6 +61,13 @@ describe "Differentiation Tag Management" do
 
         it "opens the tray when the 'Manage Tags' button is clicked" do
           expect(fj("h2:contains('Manage Tags')")).to be_displayed
+        end
+
+        it "displays a tooltip when name is too large" do
+          expect(ff("[data-testid='full-tag-name']").last.text).to eq ""
+          hover(f("[data-testid='tooltip-container']"))
+          wait_for_ajaximations
+          expect(ff("[data-testid='full-tag-name']").last.text).to eq @single_tag_with_long_name.name
         end
 
         it "closes the tray when the close button is clicked and returns focus to the 'Manage Tags' button" do
@@ -172,9 +183,8 @@ describe "Differentiation Tag Management" do
           wait_for_ajaximations
           fj("button:contains('Confirm')").click
           wait_for_ajaximations
-
           expect(f("body")).not_to contain_jqcss("span:contains('single tag')")
-          expect(@course.differentiation_tag_categories.count).to eq 1
+          expect(@course.differentiation_tag_categories.count).to eq 2
         end
       end
 
@@ -354,7 +364,6 @@ describe "Differentiation Tag Management" do
             # Verify that the modal shows the correct header and fields
             expect(fj("span:contains('Edit Tag')")).to be_displayed
             expect(fj("span:contains('Tag Name')")).to be_displayed
-
             # Ensure that 'Tag Set Name' is not displayed for a single tag
             expect(f("body")).not_to contain_jqcss("span:contains('Tag Set Name')")
 
