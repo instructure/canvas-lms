@@ -64,7 +64,8 @@ export enum Constants {
   SET_TIME_TO_COMPLETE_CALENDAR_DAYS = 'COURSE_PACE/SET_TIME_TO_COMPLETE_CALENDAR_DAYS',
   SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS = 'COURSE_PACE/SET_PACE_ITEM_DURATION_TIME_TO_COMPLETE_CALENDAR_DAYS',
   SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS= 'COURSE_PACE/SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS',
-  SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE= 'COURSE_PACE/SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE'
+  SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE= 'COURSE_PACE/SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE',
+  SET_PACE_ITEM_WEIGHTED_DURATION = 'COURSE_PACE/SET_PACE_ITEM_WEIGHTED_DURATION',
 }
 
 /* Action creators */
@@ -92,7 +93,9 @@ const regularActions = {
   setTimeToCompleteCalendarDaysFromItems: (blackOutDates: BlackoutDate[]) =>
     createAction(Constants.SET_TIME_TO_COMPLETE_CALENDAR_DAYS_FROM_ITEMS, {blackOutDates}),
   setPaceItemsDurationFromTimeToComplete: (blackOutDays: BlackoutDate[], calendarDays: number) =>
-    createAction(Constants.SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE, {blackOutDays, calendarDays})
+    createAction(Constants.SET_PACE_ITEMS_DURATION_FROM_TIME_TO_COMPLETE, {blackOutDays, calendarDays}),
+  setPaceItemWeightedDuration: (assignmentWeightedDuration: AssignmentWeightening, blackOutDays: BlackoutDate[]) =>
+    createAction(Constants.SET_PACE_ITEM_WEIGHTED_DURATION, {assignmentWeightedDuration, blackOutDays}),
 }
 
 // @ts-expect-error

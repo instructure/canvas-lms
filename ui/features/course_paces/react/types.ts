@@ -97,10 +97,10 @@ export interface PaceDuration {
 }
 
 export type AssignmentWeightening = {
-  assignment: number | undefined,
-  quiz: number | undefined,
-  discussion: number | undefined,
-  page: number | undefined,
+  assignment?: number | undefined,
+  quiz?: number | undefined,
+  discussion?: number | undefined,
+  page?: number | undefined,
 }
 
 export interface CoursePace {
