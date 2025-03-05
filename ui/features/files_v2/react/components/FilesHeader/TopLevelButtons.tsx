@@ -28,14 +28,12 @@ const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
   isUserContext: boolean
   size: 'small' | 'medium' | 'large'
-  onCreateFolderButtonClick: () => void
   shouldHideUploadButtons?: boolean
 }
 
 const TopLevelButtons = ({
   isUserContext,
   size,
-  onCreateFolderButtonClick,
   shouldHideUploadButtons = false,
 }: TopLevelButtonsProps) => {
   const buttonDisplay = size === 'small' ? 'block' : 'inline-block'
@@ -43,7 +41,7 @@ const TopLevelButtons = ({
   const createFolderButton = () => {
     if (shouldHideUploadButtons) return null
 
-    return <CreateFolderButton buttonDisplay={buttonDisplay} onClick={onCreateFolderButtonClick} />
+    return <CreateFolderButton buttonDisplay={buttonDisplay} />
   }
 
   const externalToolsButton = () => {

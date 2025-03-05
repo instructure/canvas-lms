@@ -170,7 +170,6 @@ describe "files index page" do
 
       context "Directory Header" do
         it "sorts the files properly", priority: 2 do
-          # this test performs 2 sample sort combinations
           course_with_teacher_logged_in
 
           add_file(fixture_file_upload("example.pdf", "application/pdf"), @course, "a_example.pdf")
@@ -178,15 +177,17 @@ describe "files index page" do
 
           get "/courses/#{@course.id}/files"
 
-          # click name once to make it sort descending
           header_name_files_table.click
           expect(get_item_content_files_table(1, 1)).to eq "PDF File\nexample.pdf"
           expect(get_item_content_files_table(2, 1)).to eq "Text File\nb_file.txt"
 
-          # click size twice to make it sort ascending
           header_name_files_table.click
           expect(get_item_content_files_table(1, 1)).to eq "Text File\nb_file.txt"
           expect(get_item_content_files_table(2, 1)).to eq "PDF File\nexample.pdf"
+
+          header_name_files_table.click
+          expect(get_item_content_files_table(1, 1)).to eq "PDF File\nexample.pdf"
+          expect(get_item_content_files_table(2, 1)).to eq "Text File\nb_file.txt"
         end
       end
 

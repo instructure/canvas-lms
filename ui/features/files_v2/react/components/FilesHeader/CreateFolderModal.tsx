@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useState} from 'react'
+import React, {useState} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
 import {useMutation, queryClient} from '@canvas/query'
-import {FileManagementContext} from '../Contexts'
+import {useFileManagement} from '../Contexts'
 import {generateFolderPostUrl} from '../../../utils/apiUtils'
 import getCookie from '@instructure/get-cookie'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
@@ -40,7 +40,7 @@ interface CreateFolderModalProps {
 const CreateFolderModal = ({isOpen, onRequestClose}: CreateFolderModalProps) => {
   const [folderName, setFolderName] = useState('')
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
-  const {folderId: parentFolderId} = useContext(FileManagementContext)
+  const {folderId: parentFolderId} = useFileManagement()
 
   const createFolderMutation = useMutation({
     mutationFn: async (name: string) => {

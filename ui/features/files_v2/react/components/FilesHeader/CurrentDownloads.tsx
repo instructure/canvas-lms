@@ -16,25 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useEffect, useState, useContext} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {FileManagementContext} from '../Contexts'
+import {useFileManagement} from '../Contexts'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {ProgressBar} from '@instructure/ui-progress'
-import { addDownloadListener, removeDownloadListener, performRequest} from '../../../utils/downloadUtils'
+import {
+  addDownloadListener,
+  removeDownloadListener,
+  performRequest,
+} from '../../../utils/downloadUtils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {type File, type Folder} from '../../../interfaces/File'
 
 const I18n = createI18nScope('files_v2')
 
-const progressMessage = (progress:number) => I18n.t('Preparing download: %{percent}% complete', {
-  percent: progress,
-})
+const progressMessage = (progress: number) =>
+  I18n.t('Preparing download: %{percent}% complete', {
+    percent: progress,
+  })
 
-const DownloadProgress = ({progress}:{progress:number}) => {
+const DownloadProgress = ({progress}: {progress: number}) => {
   return (
     <Flex gap="medium">
       <Flex.Item shouldGrow>
@@ -63,11 +68,11 @@ interface CurrentDownloadsProps {
   rows: (File | Folder)[]
 }
 
-const CurrentDownloads = ({rows}:CurrentDownloadsProps) => {
+const CurrentDownloads = ({rows}: CurrentDownloadsProps) => {
   const [isDownloading, setIsDownloading] = useState(false)
   const [progress, setProgress] = useState(0)
 
-  const {contextId, contextType} = useContext(FileManagementContext)
+  const {contextId, contextType} = useFileManagement()
 
   const handleDownloadAction = useCallback(
     (e: Event) => {
@@ -75,26 +80,28 @@ const CurrentDownloads = ({rows}:CurrentDownloadsProps) => {
         showFlashError(I18n.t('Download already in progress.'))()
         return
       }
-      if (performRequest({
-        contextType: contextType == 'course' ? 'courses' : 'users',
-        contextId: contextId,
-        items: (e as CustomEvent).detail.items,
-        rows: rows,
-        onProgress: (p:number) => setProgress(p),
-        onComplete: () => setIsDownloading(false),
-      })) {
+      if (
+        performRequest({
+          contextType: contextType == 'course' ? 'courses' : 'users',
+          contextId: contextId,
+          items: (e as CustomEvent).detail.items,
+          rows: rows,
+          onProgress: (p: number) => setProgress(p),
+          onComplete: () => setIsDownloading(false),
+        })
+      ) {
         setProgress(0)
         setIsDownloading(true)
       }
     },
-    [isDownloading, contextType, contextId, rows]
+    [isDownloading, contextType, contextId, rows],
   )
 
   useEffect(() => {
     addDownloadListener(handleDownloadAction)
     return () => removeDownloadListener(handleDownloadAction)
   }, [handleDownloadAction])
-    
+
   if (!isDownloading) return null
 
   return (

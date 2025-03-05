@@ -29,7 +29,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 
-import {FileManagementContext} from './Contexts'
+import {FileManagementProvider} from './Contexts'
 import FileFolderTable from './FileFolderTable'
 import FilesHeader from './FilesHeader'
 import FilesUsageBar from './FilesUsageBar'
@@ -132,7 +132,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
     filesEnv.contextFor({contextType, contextId})?.file_index_menu_tools || []
 
   return (
-    <FileManagementContext.Provider
+    <FileManagementProvider
       value={{
         folderId,
         contextType,
@@ -190,7 +190,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
           </Flex.Item>
         </Flex>
       </View>
-    </FileManagementContext.Provider>
+    </FileManagementProvider>
   )
 }
 

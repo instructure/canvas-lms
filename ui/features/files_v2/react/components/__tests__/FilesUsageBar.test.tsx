@@ -24,7 +24,8 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import fetchMock from 'fetch-mock'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import FilesUsageBar from '../FilesUsageBar'
-import {FileManagementContext} from '../Contexts'
+import {FileManagementProvider} from '../Contexts'
+import {createMockFileManagementContext} from '../../__tests__/createMockContext'
 
 const FILES_USAGE_RESULT = {
   quota_used: 500,
@@ -59,19 +60,12 @@ describe('FilesUsageBar', () => {
         },
       },
     })
+
     return render(
       <MockedQueryClientProvider client={queryClient}>
-        <FileManagementContext.Provider
-          value={{
-            contextType: 'course',
-            contextId: '2',
-            folderId: '1',
-            showingAllContexts: false,
-            fileIndexMenuTools: [],
-          }}
-        >
+        <FileManagementProvider value={createMockFileManagementContext()}>
           <FilesUsageBar />
-        </FileManagementContext.Provider>
+        </FileManagementProvider>
       </MockedQueryClientProvider>,
     )
   }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -42,7 +42,7 @@ import BulkActionButtons from './BulkActionButtons'
 import Breadcrumbs from './Breadcrumbs'
 import CurrentUploads from '../FilesHeader/CurrentUploads'
 import {View} from '@instructure/ui-view'
-import {FileManagementContext} from '../Contexts'
+import {useFileManagement} from '../Contexts'
 import {FileFolderWrapper, FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
 import BlueprintIconButton from './BlueprintIconButton'
 import {Alert} from '@instructure/ui-alerts'
@@ -226,7 +226,7 @@ const FileFolderTable = ({
   onSortChange,
   searchString = '',
 }: FileFolderTableProps) => {
-  const {currentFolder} = useContext(FileManagementContext)
+  const {currentFolder} = useFileManagement()
   const isStacked = size !== 'large'
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>('')

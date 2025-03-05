@@ -23,7 +23,8 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
 import MoveModal from '../MoveModal'
-import {FileManagementContext} from '../../../Contexts'
+import {FileManagementProvider} from '../../../Contexts'
+import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 
 jest.mock('@canvas/use-fetch-api-hook')
 jest.mock('@canvas/do-fetch-api-effect')
@@ -36,18 +37,13 @@ const defaultProps = {
 
 const renderComponent = (props: any = {}) =>
   render(
-    <FileManagementContext.Provider
-      value={{
-        folderId: '1',
-        showingAllContexts: false,
+    <FileManagementProvider
+      value={createMockFileManagementContext({
         rootFolder: FAKE_FOLDERS[0],
-        contextType: 'course',
-        contextId: '1',
-        fileIndexMenuTools: [],
-      }}
+      })}
     >
       <MoveModal {...defaultProps} {...props} />
-    </FileManagementContext.Provider>,
+    </FileManagementProvider>,
   )
 
 describe('MoveModal', () => {

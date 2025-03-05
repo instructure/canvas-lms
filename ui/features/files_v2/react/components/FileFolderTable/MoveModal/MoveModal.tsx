@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRef, Ref, useCallback, useContext, useEffect, useState} from 'react'
+import {createRef, Ref, useCallback, useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -29,7 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
-import {FileManagementContext} from '../../Contexts'
+import {useFileManagement} from '../../Contexts'
 import FileFolderInfo from '../../shared/FileFolderInfo'
 import {isFile} from '../../../../utils/fileFolderUtils'
 import {type Folder, type File} from '../../../../interfaces/File'
@@ -49,7 +49,7 @@ export type MoveModalProps = {
 const I18n = createI18nScope('files_v2')
 
 const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
-  const {contextType, contextId, rootFolder} = useContext(FileManagementContext)
+  const {contextType, contextId, rootFolder} = useFileManagement()
   const folderTreeBrowserRef: Ref<FolderTreeBrowserRef> = createRef<FolderTreeBrowserRef>()
   const [selectedFolder, setSelectedFolder] = useState<Collection | null>(null)
   const [postStatus, setPostStatus] = useState<boolean>(false)

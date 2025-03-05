@@ -19,7 +19,8 @@
 import React from 'react'
 import {render, screen, waitFor, act} from '@testing-library/react'
 import CurrentDownloads from '../CurrentDownloads'
-import {FileManagementContext} from '../../Contexts'
+import {FileManagementProvider} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {performRequest} from '../../../../utils/downloadUtils'
 
@@ -36,17 +37,9 @@ jest.mock('../../../../utils/downloadUtils', () => ({
 
 const renderComponent = () => {
   return render(
-    <FileManagementContext.Provider
-      value={{
-        contextId: '1',
-        contextType: 'course',
-        folderId: '0',
-        showingAllContexts: false,
-        fileIndexMenuTools: [],
-      }}
-    >
+    <FileManagementProvider value={createMockFileManagementContext()}>
       <CurrentDownloads rows={[]} />
-    </FileManagementContext.Provider>,
+    </FileManagementProvider>,
   )
 }
 
@@ -112,7 +105,7 @@ describe('CurrentDownloads', () => {
     await waitFor(() => {
       expect(performRequest).toHaveBeenCalledWith({
         contextType: 'courses',
-        contextId: '1',
+        contextId: '2',
         items: new Set(['1']),
         rows: [],
         onProgress: expect.any(Function),

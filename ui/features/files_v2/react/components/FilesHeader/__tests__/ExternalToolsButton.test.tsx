@@ -19,7 +19,8 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import ExternalToolsButton from '../ExternalToolsButton'
-import {FileManagementContext} from '../../Contexts'
+import {FileManagementProvider} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {type ExternalToolsButtonProps} from '../ExternalToolsButton'
 
 describe('ExternalToolsButton', () => {
@@ -30,10 +31,6 @@ describe('ExternalToolsButton', () => {
     }
 
     const contextProps = {
-      contextType: 'course',
-      contextId: '1',
-      folderId: '1',
-      showingAllContexts: false,
       fileIndexMenuTools: [
         {
           id: 'tool1',
@@ -42,13 +39,14 @@ describe('ExternalToolsButton', () => {
           icon_url: 'http://example.com/tool1/icon.png',
         },
       ],
-      ...contextOverrides,
     }
 
     return render(
-      <FileManagementContext.Provider value={contextProps}>
+      <FileManagementProvider
+        value={createMockFileManagementContext({...contextProps, ...contextOverrides})}
+      >
         <ExternalToolsButton {...defaultProps} {...props} />
-      </FileManagementContext.Provider>,
+      </FileManagementProvider>,
     )
   }
 

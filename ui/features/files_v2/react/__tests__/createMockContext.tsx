@@ -16,18 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createContext} from 'react'
-import {BBFolderWrapper} from 'features/files_v2/utils/fileFolderWrappers'
-import {type Folder, type Tool} from 'features/files_v2/interfaces/File'
+import {FileManagementContextProps} from '../components/Contexts'
 
-interface FileManagementContextProps {
-  folderId: string
-  contextType: string
-  contextId: string
-  showingAllContexts: boolean
-  rootFolder?: Folder
-  currentFolder?: BBFolderWrapper | null
-  fileIndexMenuTools: Tool[]
+export function createMockFileManagementContext(
+  overrides: Partial<FileManagementContextProps> = {},
+): FileManagementContextProps {
+  return {
+    folderId: '1',
+    contextType: 'course',
+    contextId: '2',
+    showingAllContexts: false,
+    rootFolder: undefined,
+    currentFolder: null,
+    fileIndexMenuTools: [],
+    ...overrides,
+  }
 }
-
-export const FileManagementContext = createContext({} as FileManagementContextProps)

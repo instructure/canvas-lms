@@ -17,30 +17,7 @@
  */
 
 import splitAssetString from '@canvas/util/splitAssetString'
-
-interface Permissions {
-  manage_files_add?: boolean
-  manage_files_edit?: boolean
-  manage_files_boolean?: boolean
-  [key: string]: boolean | undefined
-}
-interface Tool {
-  id: string
-  title: string
-  base_url: string
-  canvas_icon_class?: string
-  icon_url: string
-}
-interface FileContext {
-  asset_string: string
-  contextType: string
-  contextId: string
-  root_folder_id: string
-  permissions: Permissions
-  name: string
-  usage_rights_required?: boolean
-  file_index_menu_tools?: Tool[]
-}
+import {FileContext} from './filesEnv.types'
 
 declare const ENV: {
   FILES_CONTEXTS?: FileContext[]

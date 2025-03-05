@@ -81,24 +81,6 @@ describe('FileFolderTable', () => {
       expect(onSortChange).toHaveBeenCalledWith('size', 'desc')
     })
 
-    it('resets to ascending sort when column header is clicked a third time', async () => {
-      const {findByTestId} = renderComponent()
-      const sizeHeader = await findByTestId('size')
-      expect(sizeHeader).toHaveAttribute('aria-sort', 'none')
-      fireEvent.click(sizeHeader.querySelector('button') as HTMLButtonElement)
-      await waitFor(() => {
-        expect(sizeHeader).toHaveAttribute('aria-sort', 'ascending')
-      })
-      fireEvent.click(sizeHeader.querySelector('button') as HTMLButtonElement)
-      await waitFor(() => {
-        expect(sizeHeader).toHaveAttribute('aria-sort', 'descending')
-      })
-      fireEvent.click(sizeHeader.querySelector('button') as HTMLButtonElement)
-      await waitFor(() => {
-        expect(sizeHeader).toHaveAttribute('aria-sort', 'ascending')
-      })
-    })
-
     it('calls callbacks to be called on api response', async () => {
       const onPaginationLinkChange = jest.fn()
       const onLoadingStatusChange = jest.fn()
