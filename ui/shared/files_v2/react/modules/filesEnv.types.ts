@@ -29,6 +29,7 @@ export interface Tool {
   base_url: string
   canvas_icon_class?: string
   icon_url: string
+  accept_media_types?: string
 }
 
 export interface FileContext {
@@ -40,4 +41,5 @@ export interface FileContext {
   name: string
   usage_rights_required?: boolean
   file_index_menu_tools?: Tool[]
+  file_menu_tools?: Tool[]
 }

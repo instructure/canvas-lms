@@ -89,4 +89,12 @@ module FilesPage
   def search_button
     f("[data-testid='files-search-button']")
   end
+
+  def action_menu_button
+    f("[data-testid='action-menu-button-large']")
+  end
+
+  def action_menu_item_by_name(name)
+    f("[data-testid='#{name}']")
+  end
 end
