@@ -17,46 +17,45 @@
  */
 
 import React from 'react'
+import {CheckboxGroup, Checkbox} from '@instructure/ui-checkbox'
+import {Text} from '@instructure/ui-text'
 
 class PaginatedUserCheckList extends React.Component {
   static defaultProps = {
     permanentUsers: [],
     checked: [],
     labelId: null,
+    messages: [],
+    label: '',
   }
 
   _isChecked = id => this.props.checked.includes(id)
+  _isPermanentUser = id => this.props.permanentUsers.some(u => u.id === id)
 
   render() {
-    const permanentListItems = this.props.permanentUsers.map(u => (
-      <li key={u.id}>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-        <label className="checkbox">
-          <input checked="true" type="checkbox" disabled="true" readOnly="true" />
-          {u.name || u.display_name}
-        </label>
-      </li>
-    ))
-
-    const listItems = this.props.users.map(u => (
-      <li key={u.id}>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-        <label className="checkbox">
-          <input
-            checked={this._isChecked(u.id)}
-            onChange={e => this.props.onUserCheck(u, e.target.checked)}
-            type="checkbox"
-          />
-          {u.name || u.display_name}
-        </label>
-      </li>
-    ))
-
     return (
-      <ul className="unstyled_list" aria-labelledby={this.props.labelId}>
-        {permanentListItems}
-        {listItems}
-      </ul>
+        <CheckboxGroup
+          name="paginatedUserChecklist"
+          defaultValue={this.props.checked}
+          description={this.props.label}
+          onChange={(event) => {
+            this.props.onUserCheck(event)
+          }}
+          messages={this.props.messages}
+        >
+          { [...this.props.permanentUsers, ...this.props.users].map(u => (
+            <Checkbox
+              data-testid={`user-checkbox-${u.id}`}
+              key={`checkbox-${u.id}`}
+              label={<Text>{u.name || u.display_name}</Text>}
+              value={u.id}
+              name="users"
+              className="checkbox"
+              readOnly={this._isPermanentUser(u.id)}
+              disabled={this._isPermanentUser(u.id)}
+            />
+          ))}
+        </CheckboxGroup>
     )
   }
 }
