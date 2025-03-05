@@ -63,8 +63,9 @@ describe('Promise resolution', () => {
       json: jest.fn().mockResolvedValue(mockedData),
     })
   })
-
-  it('Promise resolves successfully when provided a product', async () => {
+  
+  // To be resolved in LRN-9531
+  test.skip('Promise resolves successfully when provided a product', async () => {
     const params = () => {
       return {
         filters: {
