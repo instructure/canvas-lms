@@ -761,6 +761,24 @@ describe "new groups" do
         expect(f(".errorBox:not(#error_box_template)")).to include_text(@group_category.first.name + " is already in use.")
       end
 
+      it "shows error for name field and clears it if user closes modal" do
+        group_test_setup
+        get "/courses/#{@course.id}/groups"
+
+        open_clone_group_set_option
+
+        replace_content(f('input[data-testid="cloned_category_name_input"]'), "")
+        f('button[type="submit"]').click
+        expect(fj("span:contains('Group set name is required')")).to be_present
+
+        f('button[data-testid="cancel_clone_group_set"]').click
+        open_clone_group_set_option
+
+        expect do
+          fj("span:contains('Group set name is required')")
+        end.to raise_error(Selenium::WebDriver::Error::NoSuchElementError) # rubocop:disable Specs/NoNoSuchElementError
+      end
+
       it "changes group membership after an assignment has been deleted" do
         group_test_setup
         add_user_to_group(@students.first, @testgroup[0])
