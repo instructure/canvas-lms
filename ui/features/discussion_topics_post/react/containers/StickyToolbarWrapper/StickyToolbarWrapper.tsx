@@ -82,7 +82,7 @@ const StickyToolbarWrapper = ({
     const handleScroll = (): void => {
       if (!toolbarRef.current || initialOffsetRef.current === null) return
       const currentScroll = getScrollPosition()
-      setSticky(currentScroll >= initialOffsetRef.current)
+      setSticky(currentScroll >= initialOffsetRef.current + 10)
     }
 
     scrollContainer.addEventListener('scroll', handleScroll)
@@ -109,9 +109,19 @@ const StickyToolbarWrapper = ({
   }
 
   return (
-    <div data-testid="sticky-toolbar" ref={toolbarRef} style={isSticky ? stickyStyle : {}}>
-      {children}
-    </div>
+    <>
+      {/* this is a placeholder div if we know the sticky toolbar is going to be there */}
+      {isSticky && (
+        <div
+          data-testid="placeholder-div"
+          // eslint-disable-next-line react-compiler/react-compiler
+          style={{height: toolbarRef.current?.offsetHeight || 0}}
+        />
+      )}
+      <div data-testid="sticky-toolbar" ref={toolbarRef} style={isSticky ? stickyStyle : {}}>
+        {children}
+      </div>
+    </>
   )
 }
 
