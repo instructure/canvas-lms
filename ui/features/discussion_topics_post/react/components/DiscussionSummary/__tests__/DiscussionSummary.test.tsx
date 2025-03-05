@@ -23,6 +23,8 @@ import {AlertManagerContext, AlertManagerContextType} from '@canvas/alerts/react
 import {MockedProvider} from '@apollo/client/testing'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {DiscussionSummaryRatings} from '../DiscussionSummaryRatings'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -31,6 +33,8 @@ declare const ENV: {
   context_id: string
   context_type: string
 }
+
+const I18n = createI18nScope('discussion_posts')
 
 const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
   const defaultProps: DiscussionSummaryProps = {
@@ -306,4 +310,30 @@ describe('DiscussionSummary', () => {
       expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('reset_like')
     })
   })
+
+  describe('DiscussionSummaryRatings', () => {
+    const defaultProps = {
+      onLikeClick: jest.fn(),
+      onDislikeClick: jest.fn(),
+      liked: false,
+      disliked: false,
+      isEnabled: true,
+    }
+  
+    it('should display "Do you like this summary?" when neither liked nor disliked', () => {
+      const { getByText } = render(<DiscussionSummaryRatings {...defaultProps} />)
+      expect(getByText(I18n.t('Do you like this summary?'))).toBeInTheDocument()
+    })
+  
+    it('should display "Thank you for sharing!" when liked is true', () => {
+      const { getByText } = render(<DiscussionSummaryRatings {...defaultProps} liked={true} />)
+      expect(getByText(I18n.t('Thank you for sharing!'))).toBeInTheDocument()
+    })
+  
+    it('should display "Thank you for sharing!" when disliked is true', () => {
+      const { getByText } = render(<DiscussionSummaryRatings {...defaultProps} disliked={true} />)
+      expect(getByText(I18n.t('Thank you for sharing!'))).toBeInTheDocument()
+    })
+  })
+
 })

@@ -153,7 +153,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
             ))}
           </Text>
         </Flex.Item>
-        <Flex.Item margin="0 0 medium 0">
+        <Flex.Item margin="0 0 medium 0" align="end">
           <DiscussionSummaryRatings
             liked={props.liked}
             disliked={props.disliked}
