@@ -19583,6 +19583,7 @@ nn:
   pick_a_name_to_save_this_theme_as_9773cb1a: "Vel eit namn du kan lagre tema som"
   pick_an_emoji_942adfc4: "Vel ein emoji..."
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "vel eit endepunkt, vi postar feilrapportane der"
+  pick_dd033b86: Vel
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Vel dato og tidspunkt for følgande konferansesetting:"
   pin_cdbc9f8f: Fest
   pin_discussion_title_67c84658: "Fest diskusjon %{title}"
@@ -20639,6 +20640,7 @@ nn:
     you_have_no_services: "Ingen registrerte tenester, du kan leggje til nye i *innstillingar*."
   profile_6bd2baed: Profil
   profile_photo_save_failed_too_many_times_e1ebda5: "Lagring av profilbilde har mislukkast for mange gonger"
+  profile_picture_13e5338c: Profilbilde
   profile_pictures_15953851: Profilbilde
   profile_save_was_unsuccessful_6e27fb5e: "Lagring av profil mislukkast"
   profile_tray_bcec5044: Profilmeny
@@ -22079,6 +22081,7 @@ nn:
       loading_questions_failed: "Spørsmåla lastar ikkje, prøv på nytt seinare"
       missing_access_code: "Du må oppgi ein tilgangskode"
       missing_ip_filter: "Du må oppgi ei gyldig IP-adresse"
+      must_be_number: "Må være eit tal"
       no_answer: "Legg til minst eit svar."
       no_correct_answer: "Vel eit rett svar"
       no_possible_solution: "Generer minst ei mogleg løysing"
