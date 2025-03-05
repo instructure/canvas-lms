@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
@@ -48,7 +48,9 @@ export default function GroupCategoryMessageAllUnassignedModal({
   ...modalProps
 }) {
   const [message, setMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState([])
   const [status, setStatus] = useState(null)
+  const messageTextAreaRef = useRef<HTMLElement | null>(null)
 
   const contextAssetString = ENV.context_asset_string
   const chunkSize = ENV.MAX_GROUP_CONVERSATION_SIZE || 100
@@ -69,6 +71,14 @@ export default function GroupCategoryMessageAllUnassignedModal({
   }
 
   function handleSend() {
+    if(message.trim().length === 0 ) {
+      setErrorMessage([
+        {type: 'newError', text: I18n.t('Message text is required')},
+      ])
+      if(messageTextAreaRef.current)
+        messageTextAreaRef.current.focus()
+      return
+    }
     setStatus('info')
     const chunks = _.chunk(payload.recipients, chunkSize)
     const promiseArray = []
@@ -103,13 +113,12 @@ export default function GroupCategoryMessageAllUnassignedModal({
   }
 
   function Footer() {
-    const sendButtonState = message.length === 0 || status === 'info' ? 'disabled' : 'enabled'
     return (
       <>
         <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
         <Button
+          data-testid="message_submit"
           type="submit"
-          interaction={sendButtonState}
           color="primary"
           margin="0 0 0 x-small"
           onClick={handleSend}
@@ -153,6 +162,8 @@ export default function GroupCategoryMessageAllUnassignedModal({
         </Flex>
         <TextArea
           id="message_all_unassigned"
+          data-testid="message_all_unassigned_textarea"
+          ref={ref => messageTextAreaRef.current = ref}
           label={
             <ScreenReaderContent>
               {I18n.t('Required input. Message all unassigned students.')}
@@ -161,7 +172,11 @@ export default function GroupCategoryMessageAllUnassignedModal({
           placeholder={I18n.t('Type message here...')}
           height="200px"
           value={message}
-          onChange={e => setMessage(e.target.value)}
+          messages={errorMessage}
+          onChange={e =>{
+            setErrorMessage([])
+            setMessage(e.target.value)
+          }}
         />
       </FormFieldGroup>
       {alert}
