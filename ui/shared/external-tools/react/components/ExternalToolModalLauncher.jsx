@@ -193,6 +193,7 @@ export default class ExternalToolModalLauncher extends React.Component {
         onOpen={this.onAfterOpen}
         title={this.props.title}
         appElement={this.props.appElement}
+        shouldCloseOnDocumentClick={false}
       >
         <div
           onFocus={this.handleAlertFocus}

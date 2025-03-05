@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ExternalToolModalLauncher from '../ExternalToolModalLauncher'
 
 function generateProps(overrides = {}) {
@@ -105,6 +106,34 @@ describe('ExternalToolModalLauncher', () => {
       sendPostMessage({subject: 'LtiDeepLinkingResponse'})
 
       expect(onDeepLinkingResponseMock).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('onClose behavior', () => {
+    it('calls onRequestClose when clicking a button element', async () => {
+      const onRequestCloseMock = jest.fn()
+      const {getByText} = render(
+        <ExternalToolModalLauncher {...generateProps({ onRequestClose: onRequestCloseMock, isOpen: true })} />
+      )
+
+      const closeButton = getByText('Close').closest('button')
+      if (!closeButton) throw new Error('No close button found')
+      await userEvent.click(closeButton)
+
+      expect(onRequestCloseMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not call onRequestClose when clicking outside the diaglog', async () => {
+      const onRequestCloseMock = jest.fn()
+      const {getByRole} = render(
+        <ExternalToolModalLauncher {...generateProps({ onRequestClose: onRequestCloseMock, isOpen: true })} />
+      )
+
+      const backdrop = getByRole('dialog').parentElement
+      if (!backdrop) throw new Error('No div element found')
+      await userEvent.click(backdrop)
+
+      expect(onRequestCloseMock).not.toHaveBeenCalled()
     })
   })
 
