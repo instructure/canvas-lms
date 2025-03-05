@@ -19,6 +19,7 @@
  */
 
 import React from 'react'
+import {createRoot} from 'react-dom/client'
 import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
@@ -62,7 +63,8 @@ const StudentView = createReactClass({
   },
 
   openManageGroupDialog(group) {
-    const $dialog = $('<div>').dialog({
+    const mountPoint = document.createElement("div")
+    const $dialog = $(mountPoint).dialog({
       id: 'manage_group_form',
       title: I18n.t('Manage Student Group'),
       height: 500,
@@ -70,7 +72,8 @@ const StudentView = createReactClass({
       'fix-dialog-buttons': false,
 
       close: _e => {
-        ReactDOM.unmountComponentAtNode($dialog[0])
+        this.modalContainer.unmount()
+        this.modalContainer = null
         $(this).remove()
       },
       modal: true,
@@ -81,8 +84,9 @@ const StudentView = createReactClass({
       e.preventDefault()
       $dialog.dialog('close')
     }
-
-    ReactDOM.render(
+    if(!this.modalContainer)
+      this.modalContainer = createRoot(mountPoint)
+    this.modalContainer.render(
       <ManageGroupDialog
         userCollection={this.state.userCollection}
         checked={group.users.map(u => u.id)}
@@ -92,8 +96,7 @@ const StudentView = createReactClass({
         updateGroup={this.updateGroup}
         closeDialog={closeDialog}
         loadMore={() => this._loadMore(this.state.userCollection)}
-      />,
-      $dialog[0],
+      />
     )
   },
 

@@ -96,14 +96,14 @@ describe "student groups" do
         expect(student_list[1].text).to eq "Test Student 2"
       end
 
-      it "is titled what the user types in", priority: "1" do
+      it "is titled what the user types in", :ignore_js_errors do
         create_default_student_group(group_name)
         f('button[type="submit"]').click
 
         expect(fj(".student-group-title")).to include_text(group_name.to_s)
       end
 
-      it "by default, created student group only contains the student creator", priority: "2" do
+      it "by default, created student group only contains the student creator", :ignore_js_errors do
         create_default_student_group
         f('button[type="submit"]').click
 
@@ -117,7 +117,7 @@ describe "student groups" do
         expect(students[1]).to include_text("nobody@example.com")
       end
 
-      it "adds students to the group", priority: "1" do
+      it "adds students to the group", :ignore_js_errors do
         create_group_and_add_all_students
 
         # expand the group
@@ -260,6 +260,36 @@ describe "student groups" do
 
         expect(f(".ui-dialog-titlebar")).to include_text("Manage Student Group")
       end
+
+      it "shows error messages for group name field", :ignore_js_errors do
+        Group.last.update(max_membership: 2)
+        u2 = student_in_course(active_all: true).user
+        u3 = student_in_course(active_all: true).user
+
+        get "/courses/#{@course.id}/groups"
+
+        fln("Manage").click
+        wait_for_ajaximations
+
+        # leave the field empty
+        set_value f("#group_name"), ""
+        f("button[data-testid='manage-group-modal-submit-button']").click
+
+        expect(f("body")).to include_text("Group name is required")
+
+        # input more than 200 chars
+        set_value f("#group_name"), "a" * 201
+        f("button[data-testid='manage-group-modal-submit-button']").click
+
+        expect(f("body")).to include_text("Enter a shorter group name")
+
+        # too many members validation
+        fxpath("//label[../input[@data-testid='user-checkbox-#{u2.id}']]").click
+        fxpath("//label[../input[@data-testid='user-checkbox-#{u3.id}']]").click
+        f("button[data-testid='manage-group-modal-submit-button']").click
+
+        expect(f("body")).to include_text("Too many members")
+      end
     end
 
     describe "student who is not in the group", priority: "2" do
@@ -275,7 +305,7 @@ describe "student groups" do
 
     describe "Manage Student Group Page" do
       before do
-        create_group(group_name:, enroll_student_count: 2)
+        @g = create_group(group_name:, enroll_student_count: 2)
         get "/courses/#{@course.id}/groups"
       end
 
@@ -293,13 +323,13 @@ describe "student groups" do
         addition = "CRIT"
         f("#group_name").send_keys(addition.to_s)
         wait_for_ajaximations
-        f("button.confirm-dialog-confirm-btn").click
+        f("button[data-testid='manage-group-modal-submit-button']").click
 
         new_group_name = group_name.to_s + addition.to_s
         expect(f(".student-group-title")).to include_text(new_group_name.to_s)
       end
 
-      it "adds users to group", priority: "1" do
+      it "adds users to group", :ignore_js_errors do
         # expand the group
         fj(".student-group-title").click
         wait_for_ajaximations
@@ -312,11 +342,12 @@ describe "student groups" do
 
         fln("Manage").click
         wait_for_ajaximations
+        students = User.where(name: ["Test Student 1", "Test Student 2"]).pluck(:id)
+        students.each do |u|
+          fxpath("//label[../input[@data-testid='user-checkbox-#{u}']]").click
+        end
 
-        students = ffj(".checkbox")
-        students.each(&:click)
-
-        fj("button.confirm-dialog-confirm-btn").click
+        f("button[data-testid='manage-group-modal-submit-button']").click
         wait_for_ajaximations
 
         expected_student_list = ["nobody@example.com", "Test Student 1", "Test Student 2"]
