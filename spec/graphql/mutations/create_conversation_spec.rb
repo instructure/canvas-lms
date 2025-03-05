@@ -436,16 +436,50 @@ RSpec.describe Mutations::CreateConversation do
       @ncg.add_user(@student, "accepted")
     end
 
-    it "allows sending to non-collaborative groups as long as groupConversation is set to false" do
-      result = run_mutation({ recipients: ["group_#{@ncg.id}"], body: "test", group_conversation: false, context_code: @course.asset_string }, @teacher)
-      expect(result.dig("data", "createConversation", "errors")).to be_nil
-      expect(result.dig("data", "createConversation", "conversations").count).to eq 1
-    end
+    context "when sending to all in a differentiation tag" do
+      context "allows sending to dif tags with options that will send as individual messages" do
+        it "sends individual conversation for non-collaborative group when group_conversation is false" do
+          result = run_mutation({ recipients: ["group_#{@ncg.id}"], body: "test", group_conversation: false, context_code: @course.asset_string }, @teacher)
+          expect(result.dig("data", "createConversation", "errors")).to be_nil
+          expect(result.dig("data", "createConversation", "conversations").count).to eq 1
+        end
 
-    it "returns a validation error when sending to non-collaborative groups with groupConversation set to true" do
-      result = run_mutation({ recipients: ["group_#{@ncg.id}"], body: "test", group_conversation: true, context_code: @course.asset_string }, @teacher)
-      expect(result.dig("data", "createConversation", "conversations")).to be_nil
-      expect(result.dig("data", "createConversation", "errors", 0, "message")).to eq "Group conversation for differentiation tags not allowed"
+        it "sends individual conversation for differentiation tag when group_conversation is false" do
+          result = run_mutation({ recipients: ["differentiation_tag_#{@ncg.id}"], body: "test", group_conversation: false, context_code: @course.asset_string }, @teacher)
+          expect(result.dig("data", "createConversation", "errors")).to be_nil
+          expect(result.dig("data", "createConversation", "conversations").count).to eq 1
+        end
+
+        it "sends individual conversation for group when group_conversation is true and bulk_message is true" do
+          result = run_mutation({ recipients: ["group_#{@ncg.id}"], body: "test", group_conversation: true, bulk_message: true, context_code: @course.asset_string }, @teacher)
+          expect(result.dig("data", "createConversation", "errors")).to be_nil
+          expect(result.dig("data", "createConversation", "conversations").count).to eq 1
+        end
+
+        it "sends individual conversation for differentiation tag when group_conversation is true and bulk_message is true" do
+          result = run_mutation({ recipients: ["differentiation_tag_#{@ncg.id}"], body: "test", group_conversation: true, bulk_message: true, context_code: @course.asset_string }, @teacher)
+          expect(result.dig("data", "createConversation", "errors")).to be_nil
+          expect(result.dig("data", "createConversation", "conversations").count).to eq 1
+        end
+      end
+
+      context "does not allow sending options that will send as a group message" do
+        it "rejects differentiation tag conversation when group_conversation is true and bulk_message is false" do
+          result = run_mutation({ recipients: ["differentiation_tag_#{@ncg.id}"], body: "test", group_conversation: true, bulk_message: false, context_code: @course.asset_string }, @teacher)
+          expect(result.dig("data", "createConversation", "errors")).not_to be_nil
+        end
+
+        it "rejects group conversation when group_conversation is true and bulk_message is false" do
+          result = run_mutation({ recipients: ["group_#{@ncg.id}"], body: "test", group_conversation: true, bulk_message: false, context_code: @course.asset_string }, @teacher)
+          expect(result.dig("data", "createConversation", "errors")).not_to be_nil
+        end
+
+        it "returns validation error for non-collaborative group when group_conversation is true without bulk_message" do
+          result = run_mutation({ recipients: ["group_#{@ncg.id}"], body: "test", group_conversation: true, context_code: @course.asset_string }, @teacher)
+          expect(result.dig("data", "createConversation", "conversations")).to be_nil
+          expect(result.dig("data", "createConversation", "errors", 0, "message")).to eq "Group conversation for differentiation tags not allowed"
+        end
+      end
     end
 
     it "returns a validation error when sending to a non-collaborative group as someone without GRANULAR_MANAGE_TAGS permission" do
