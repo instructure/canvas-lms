@@ -15,10 +15,11 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, screen} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import stubEnv from '@canvas/stub-env'
 import GroupCategoryMessageAllUnassignedModal from '../GroupCategoryMessageAllUnassignedModal'
+import {userEvent} from '@testing-library/user-event'
 
 describe('GroupCategoryMessageAllUnassignedModal', () => {
   const onDismiss = jest.fn()
@@ -98,7 +99,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         onDismiss={onDismiss}
       />,
     )
-    expect(getByText('Send Message').closest('button').hasAttribute('disabled')).toBeTruthy()
+    expect(getByText('Send Message').closest('button').hasAttribute('disabled')).not.toBeTruthy()
   })
 
   it('enables the Send Message button if text input is provided', () => {
@@ -168,6 +169,56 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
       fireEvent.click(getByText('Send Message'))
       await fetchMock.flush(true)
       expect(getAllByText(/Failed/i)).toBeTruthy()
+    })
+
+    it('shows error if user tries to submit an empty message', async () => {
+      fetchMock.postOnce(`path:/api/v1/conversations`, 500)
+      render(
+        <GroupCategoryMessageAllUnassignedModal
+          groupCategory={groupCategory}
+          recipients={recipients}
+          open={open}
+          onDismiss={onDismiss}
+        />,
+      )
+      const submitBtn = screen.getByTestId('message_submit')
+      await userEvent.click(submitBtn)
+
+      const errorMessages = await screen.findAllByText(/Message text is required/i)
+      expect(errorMessages.length).toBeGreaterThan(0)
+    })
+
+    it('clear error message if user input the textarea', async () => {
+      let errorMessages
+      fetchMock.postOnce(`path:/api/v1/conversations`, 200)
+      render(
+        <GroupCategoryMessageAllUnassignedModal
+          groupCategory={groupCategory}
+          recipients={recipients}
+          open={open}
+          onDismiss={onDismiss}
+        />,
+      )
+
+      const submitBtn = screen.getByTestId('message_submit')
+      await userEvent.click(submitBtn)
+      errorMessages = await screen.queryAllByText(/Message text is required/i)
+      expect(errorMessages.length).toBeGreaterThan(0)
+
+      const textarea = screen.getByTestId('message_all_unassigned_textarea');
+      await userEvent.type(textarea, 'Hello')
+
+      expect(textarea.value).toBe('Hello')
+
+      errorMessages = await screen.queryAllByText('Message text is required')
+      expect(errorMessages).toHaveLength(0)
+
+      await userEvent.click(submitBtn)
+      expect(screen.queryAllByText(/Sending Message/i)).toBeTruthy()
+
+      await fetchMock.flush(true)
+      expect(screen.getAllByText(/Message Sent/i)).toBeTruthy()
+      expect(onDismiss).toHaveBeenCalled()
     })
   })
 })
