@@ -12775,6 +12775,7 @@ uk:
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "оберіть пункт призначення, ми надішлемо Вам помилки"
   pick_a_name_to_save_this_theme_as_9773cb1a: "Оберіть ім'я, щоб зберегти цю тему як"
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "оберіть кінцеву точку, ми розмістимо ваші звіти про помилки там"
+  pick_dd033b86: Підібрати
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Виберіть дату та час для наступної настройки конференції:"
   pin_cdbc9f8f: Закріпити
   pink_68ad45cb: Рожевий
@@ -13566,6 +13567,7 @@ uk:
       yo: Yo
     you_have_no_services: "Немає зареєстрованих сервісів, ви можете додати їх на сторінці *налаштування*"
   profile_6bd2baed: Профіль
+  profile_picture_13e5338c: "Фотографія профілю"
   profile_pictures_15953851: "Фотографії профілю"
   profiles: 
     avatar_dialog: 
