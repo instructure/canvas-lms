@@ -18252,6 +18252,7 @@ hu:
   pick_a_name_to_save_this_theme_as_9773cb1a: "Válasszon egy nevet a téma mentéséhez"
   pick_an_emoji_942adfc4: "Válasszon egy emojit..."
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "válasszon végpontot, ahova a hibariportokat küldjük"
+  pick_dd033b86: Választás
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Dátum és idő választása a következő konferenciabeállításhoz:"
   pin_cdbc9f8f: Rögzítés
   pin_discussion_title_67c84658: "fórum %{title} rögzítése"
@@ -19260,6 +19261,7 @@ hu:
   profile_6bd2baed: Profil
   profile_has_been_saved_successfully_12ffc6ea: "A profil sikeresen mentésre került"
   profile_photo_save_failed_too_many_times_e1ebda5: "A profilkép mentése túl sokszor nem sikerült"
+  profile_picture_13e5338c: Profilkép
   profile_pictures_15953851: Profilképek
   profile_save_was_unsuccessful_6e27fb5e: "A profil mentése sikertelen volt"
   profile_tray_bcec5044: "Profil tálca"
@@ -20652,6 +20654,7 @@ hu:
       loading_questions_failed: "Kérdés betöltése sikertelen, kérjük, próbálja újra"
       missing_access_code: "Hozzáférési kód megadása kötelező"
       missing_ip_filter: "Egy érvényes IP címet kell beírnia"
+      must_be_number: "Számnak kell lennie"
       no_answer: "Kérjük, adjon meg legalább egy választ"
       no_correct_answer: "Kérjük, válasszon ki egy helyes megoldást "
       no_possible_solution: "Kérjük, generáljon le legalább egy lehetséges megoldást"
