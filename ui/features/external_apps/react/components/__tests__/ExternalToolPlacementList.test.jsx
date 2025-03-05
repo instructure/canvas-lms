@@ -27,6 +27,7 @@ describe('ExternalToolPlacementList', () => {
     app_type: 'ContextExternalTool',
     version: '1.3',
     context: 'account',
+    context_id: 1,
     ...overrides,
   })
 
@@ -187,6 +188,28 @@ describe('ExternalToolPlacementList', () => {
       })
       expect(queryByText(/Homework Submission/)).toBeInTheDocument()
       expect(queryByText(/Editor Button/)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('with 1.1 tool in non-editable context', () => {
+    beforeAll(() => {
+      window.ENV.PERMISSIONS = {edit_tool_manually: true}
+      window.ENV.CONTEXT_BASE_URL = '/accounts/2'
+    })
+
+    afterAll(() => {
+      delete window.ENV.PERMISSIONS
+      delete window.ENV.CONTEXT_BASE_URL
+    })
+
+    it('does not show toggle buttons', () => {
+      const {queryByRole} = renderComponent({
+        tool: tool({
+          version: '1.1',
+          not_selectable: false,
+        }),
+      })
+      expect(queryByRole('button', {name: /Placement active/})).not.toBeInTheDocument()
     })
   })
 

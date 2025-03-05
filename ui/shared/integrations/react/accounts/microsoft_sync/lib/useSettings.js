@@ -35,7 +35,7 @@ export default function useSettings() {
         payload: sliceSyncSettings(data),
       })
     }, []),
-    path: `/api/v1/${ENV.CONTEXT_BASE_URL}/settings`,
+    path: `/api/v1${ENV.CONTEXT_BASE_URL}/settings`,
     loading: useCallback(loading => {
       dispatch({type: reducerActions.fetchLoading, payload: {loading}})
     }, []),
