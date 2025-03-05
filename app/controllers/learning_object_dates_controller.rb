@@ -125,7 +125,7 @@ class LearningObjectDatesController < ApplicationController
                                  Api.paginate(section_visibilities, self, route)
                                end
 
-    include_child_override_due_dates = Account.site_admin.feature_enabled?(:discussion_checkpoints)
+    include_child_override_due_dates = @context.account.feature_enabled?(:discussion_checkpoints)
     all_overrides = assignment_overrides_json(overrides, @current_user, include_names: true, include_child_override_due_dates:)
     all_overrides += section_visibility_to_override_json(section_visibilities, overridable) if visibilities_to_override
 

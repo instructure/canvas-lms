@@ -155,6 +155,19 @@ export const buildAssignmentOverrides = discussion => {
           returnHash.dueDateId = returnHash.dueDateId || override._id || null
           returnHash.availableFrom = returnHash.availableFrom || override.unlockAt || null
           returnHash.availableUntil = returnHash.availableUntil || override.lockAt || null
+
+          // Add information based on override type
+          if (override.set.__typename === ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES.ADHOC) {
+            returnHash.students = override.set.students
+            returnHash.student_ids = override.set.students.map(student => student._id)
+          } else if (override.set.__typename === ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES.SECTION) {
+            returnHash.id = override.set._id || null
+            returnHash.title = override.set.name || null
+          } else if (override.set.__typename === ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES.GROUP) {
+            returnHash.id = override.set._id || null
+            returnHash.nonCollaborative = override.set.nonCollaborative || null
+            returnHash.title = override.set.name || null
+          }
         }
       })
       return returnHash
