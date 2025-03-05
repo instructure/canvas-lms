@@ -829,6 +829,16 @@ module Lti::IMS
           )
         end
       end
+
+      context "when logo_uri is nil" do
+        before do
+          registration.logo_uri = nil
+        end
+
+        it "does not include icon_url in launch_settings" do
+          expect(subject[:launch_settings].keys).not_to include("icon_url")
+        end
+      end
     end
 
     describe "as_json" do
