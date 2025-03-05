@@ -93,6 +93,15 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
+  describe "#question_count" do
+    let(:assignment) { Assignment.new }
+
+    it "sets and gets the question_count correctly" do
+      assignment.question_count = 10
+      expect(assignment.question_count).to eq(10)
+    end
+  end
+
   describe "default values" do
     it "sets grader_count to 0" do
       assignment = Assignment.create!(
