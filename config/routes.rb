@@ -1958,6 +1958,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations/:id", action: :show
       get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
       put "accounts/:account_id/lti_registrations/:id", action: :update
+      put "accounts/:account_id/lti_registrations/:id/reset", action: :reset
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
     end
 

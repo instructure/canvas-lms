@@ -221,6 +221,8 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:id'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/bind'
+- verb: PUT
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/reset'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
 - verb: GET

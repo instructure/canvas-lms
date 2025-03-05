@@ -35,9 +35,12 @@ RSpec.describe Lti::RegistrationsController do
   let_once(:account) { account_model }
   let_once(:admin) { account_admin_user(name: "A User", account:) }
 
+  before(:once) do
+    account.enable_feature!(:lti_registrations_page)
+  end
+
   before do
     user_session(admin)
-    account.enable_feature!(:lti_registrations_page)
   end
 
   describe "GET index" do
@@ -1225,15 +1228,20 @@ RSpec.describe Lti::RegistrationsController do
     end
   end
 
-  describe "DELETE destroy", type: :request do
-    subject { delete "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
+  describe "PUT reset", type: :request do
+    subject { put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/reset" }
 
-    let_once(:registration) { lti_registration_model(account:) }
-    let_once(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
+    let_once(:developer_key) { tool_config.developer_key }
+    let_once(:registration) { developer_key.lti_registration }
+    let_once(:tool_config) { lti_tool_configuration_model(account:) }
     let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
-    let_once(:overlay) { lti_overlay_model(account:, registration:) }
+    let_once(:overlay) { lti_overlay_model(account:, registration:, data:) }
+    let_once(:data) { { "title" => "Test Title" } }
 
-    before { ims_registration }
+    before do
+      tool_config
+      account.enable_feature!(:lti_registrations_next)
+    end
 
     context "without user session" do
       before { remove_user_session }
@@ -1264,22 +1272,17 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
-    context "with non-dynamic registration" do
-      before { ims_registration.update!(lti_registration: nil) }
+    context "with lti_registrations_next flag disabled" do
+      before { account.disable_feature!(:lti_registrations_next) }
 
-      it "is successful" do
+      it "returns 404" do
         subject
-        expect(response).to be_successful
-      end
-
-      it "deletes the registration" do
-        subject
-        expect(registration.reload).to be_deleted
+        expect(response).to be_not_found
       end
     end
 
     context "with registration for different account" do
-      subject { delete "/api/v1/accounts/#{account.id}/lti_registrations/#{other_reg.id}" }
+      subject { delete "/api/v1/accounts/#{account.id}/lti_registrations/#{other_reg.id}", params: { accept: "application/json" } }
 
       let_once(:other_reg) { lti_registration_model(account: Account.site_admin) }
       let_once(:other_ims_registration) { lti_ims_registration_model(lti_registration: other_reg) }
@@ -1288,9 +1291,30 @@ RSpec.describe Lti::RegistrationsController do
         subject
         expect(response).to have_http_status(:bad_request)
       end
+    end
 
-      it "does not delete the registration" do
-        expect { subject }.not_to change { registration.reload.workflow_state }
+    context "with a cross-shard admin" do
+      specs_require_sharding
+
+      let_once(:cross_shard_user) { @shard2.activate { user_model } }
+      let_once(:cross_shard_admin) { account_admin_user(account:, user: cross_shard_user) }
+
+      before { user_session(cross_shard_admin) }
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+
+      it "creates a new overlay & version associated with the cross-shard user" do
+        expect { subject }.to change { overlay.reload.lti_overlay_versions.count }.by(1)
+        overlay.reload
+
+        expect(overlay.updated_by).to eql(cross_shard_admin)
+
+        expect(overlay.lti_overlay_versions.last.caused_by_reset).to be_truthy
+        expect(overlay.lti_overlay_versions.last.diff).to eql(Hashdiff.diff(data, {}))
+        expect(overlay.lti_overlay_versions.last.created_by).to eql(cross_shard_admin)
       end
     end
 
@@ -1299,24 +1323,34 @@ RSpec.describe Lti::RegistrationsController do
       expect(response).to be_successful
     end
 
-    it "deletes the registration" do
-      subject
-      expect(registration.reload).to be_deleted
+    it "resets the overlay" do
+      expect { subject }.to change { overlay.reload.data }.from(data).to({})
+      expect(response).to be_successful
     end
 
-    it "includes the account binding" do
-      subject
-      expect(response_json).to have_key(:account_binding)
+    it "updates the overlay and creates a new version with caused_by_reset as true" do
+      expect { subject }.to change { overlay.reload.lti_overlay_versions.count }.by(1)
+      overlay.reload
+
+      expect(overlay.updated_by).to eql(admin)
+
+      expect(overlay.lti_overlay_versions.last.caused_by_reset).to be_truthy
+      expect(overlay.lti_overlay_versions.last.diff).to eql(Hashdiff.diff(data, {}))
+      expect(overlay.lti_overlay_versions.last.created_by).to eql(admin)
     end
 
-    it "includes the configuration" do
+    it "returns the overlay versions, overlay, and overlaid configuration" do
       subject
-      expect(response_json).to have_key(:configuration)
-    end
+      expect(response).to be_successful
+      expect(response_json.keys.map(&:to_sym)).to include(:overlay, :overlaid_configuration)
+      expect(response_json.dig(:overlay, :versions)).to be_present
+      expect(response_json.dig(:overlay, :data)).to eql({})
+      expect(response_json[:overlaid_configuration]).to eql(registration.internal_lti_configuration(context: account))
+      expect(response_json.dig(:overlay, :versions)&.length).to be(1)
 
-    it "includes the overlay" do
-      subject
-      expect(response_json).to have_key(:overlay)
+      overlay_version = response_json.dig(:overlay, :versions).last
+      expect(overlay_version.dig(:created_by, :id)).to eql(admin.id)
+      expect(overlay_version[:caused_by_reset]).to be(true)
     end
   end
 

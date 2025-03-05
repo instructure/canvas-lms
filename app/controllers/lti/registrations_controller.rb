@@ -896,6 +896,7 @@
 class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
+  before_action :require_lti_registrations_next_feature_flag, only: %i[reset]
   before_action :require_manage_lti_registrations
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
@@ -1351,6 +1352,31 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Reset an LTI Registration to Defaults
+  # Reset the specified LTI registration to its default settings in this context. This removes all customizations
+  # that were present in the overlay associated with this context.
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   This would reset the specified LTI registration to its default settings
+  #   curl -X PUT 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/reset' \
+  #        -H "Authorization: Bearer <token>"
+  def reset
+    registration.overlay_for(@context)&.update!(data: {}, updated_by: @current_user)
+
+    render json: lti_registration_json(registration,
+                                       @current_user,
+                                       session,
+                                       @context,
+                                       includes: %i[overlaid_configuration overlay overlay_versions],
+                                       overlay: registration.overlay_for(@context))
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   # @API Delete an LTI Registration
   # Remove the specified LTI registration
   #
@@ -1535,6 +1561,15 @@ class Lti::RegistrationsController < ApplicationController
 
   def require_feature_flag
     unless @context.root_account.feature_enabled?(:lti_registrations_page)
+      respond_to do |format|
+        format.html { render "shared/errors/404_message", status: :not_found }
+        format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
+      end
+    end
+  end
+
+  def require_lti_registrations_next_feature_flag
+    unless @context.root_account.feature_enabled?(:lti_registrations_next)
       respond_to do |format|
         format.html { render "shared/errors/404_message", status: :not_found }
         format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
