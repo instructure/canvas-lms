@@ -22,12 +22,12 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import TagInfo from './TagInfo'
 import {DifferentiationTagCategory} from '../types'
 import {useDeleteDifferentiationTagCategory} from '../hooks/useDeleteDifferentiationTagCategory'
 import {DeleteTagWarningModal} from '../WarningModal'
+import TruncateTextWithTooltip from '../components/TruncateTextWithTooltip'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -93,7 +93,9 @@ function TagCategoryCard({category, onEditCategory, onDeleteFocusFallback}: TagC
           <Flex.Item shouldGrow shouldShrink>
             <Flex direction="column">
               <Flex.Item>
-                <TruncateText>{name}</TruncateText>
+                <TruncateTextWithTooltip>
+                  <div data-testid="full-tag-name">{name}</div>
+                </TruncateTextWithTooltip>
               </Flex.Item>
               <Flex.Item>
                 {mode === 'EMPTY_TAG_MODE' && (
