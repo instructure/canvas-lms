@@ -10823,6 +10823,7 @@ el:
   permissions_365c49e: Δικαιώματα
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "επιλέξτε προορισμό, θα σας στείλουμε τα σφάλματα"
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "επιλέξτε τελικό σημείο, θα σας στείλουμε τις αναφορές σφαλμάτων εκεί"
+  pick_dd033b86: Επιλογή
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Επιλέξτε ημερομηνία και ώρα για την παρακάτω συνεδρία:"
   pink_68ad45cb: Ροζ
   pinned_discussions_a55c0cea: "Καρφιτσωμένες Συζητήσεις"
@@ -11543,6 +11544,7 @@ el:
       yo: "Υπηρεσία Yo"
     you_have_no_services: "Δεν έχετε καταχωρίσει υπηρεσίες, μπορείτε να προσθέσετε μερικές στη σελίδα *ρυθμίσεις*."
   profile_6bd2baed: Προφιλ
+  profile_picture_13e5338c: "Φωτογραφία Προφίλ"
   profile_pictures_15953851: "Φωτογραφίες Προφίλ"
   profiles: 
     avatar_dialog: 
