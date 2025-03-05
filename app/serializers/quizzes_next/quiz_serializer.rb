@@ -54,7 +54,8 @@ module QuizzesNext
                :require_lockdown_browser_monitor,
                :lockdown_browser_monitor_data,
                :access_code,
-               :in_paced_course
+               :in_paced_course,
+               :question_count
 
     def_delegators :@controller
 
@@ -132,6 +133,10 @@ module QuizzesNext
 
     def in_paced_course
       context.try(:enable_course_paces)
+    end
+
+    def question_count
+      object.question_count || 0
     end
   end
 end
