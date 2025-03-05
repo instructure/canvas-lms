@@ -186,17 +186,21 @@ export default class ExternalToolPlacementList extends React.Component {
    *  the `lti_toggle_placements` feature flag is enabled, which allows toggling for 1.3 tools,
    * 2. the user has permission to update the tool (teacher in a course view or admin),
    * 3. the tool is being viewed in the context in which it was installed (no
-   *  toggling an account-level tool from a course).
+   *  toggling a root-account-level tool from a course or subaccount).
    */
   shouldShowToggleButtons = () => {
     const tool = this.state.tool
     const is_1_1_tool = tool.version === '1.1'
     const isFlagEnabled = ENV.FEATURES.lti_toggle_placements
     const canUpdateTool = ENV.PERMISSIONS && ENV.PERMISSIONS.edit_tool_manually
+    const [_, contextType, contextId] = ENV.CONTEXT_BASE_URL?.split('/') || []
     const isEditableContext =
-      ENV.CONTEXT_BASE_URL &&
+      contextType &&
+      contextId &&
       tool.context &&
-      ENV.CONTEXT_BASE_URL.includes(tool.context.toLowerCase())
+      tool.context_id &&
+      contextId === tool.context_id.toString() &&
+      contextType.replace(/s$/, '') === tool.context.toLowerCase()
 
     return (is_1_1_tool || isFlagEnabled) && canUpdateTool && isEditableContext
   }

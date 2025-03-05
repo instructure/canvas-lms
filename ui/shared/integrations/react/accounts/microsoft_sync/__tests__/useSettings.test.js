@@ -23,7 +23,7 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 
 jest.mock('@canvas/use-fetch-api-hook')
 
-const CONTEXT_BASE_URL = 'accounts/5'
+const CONTEXT_BASE_URL = '/accounts/5'
 
 const subject = () => {
   return renderHook(() => useSettings())
@@ -51,7 +51,7 @@ describe('useGetSettings', () => {
     }
     const {result} = subject()
     const call = useFetchApi.mock.calls.pop()[0]
-    expect(call.path).toMatch(`/api/v1/${CONTEXT_BASE_URL}/settings`)
+    expect(call.path).toMatch(`/api/v1${CONTEXT_BASE_URL}/settings`)
     expect(result.current[0]).toStrictEqual(defaultState)
   })
 
