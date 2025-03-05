@@ -279,12 +279,14 @@ describe('FileFolderTable', () => {
       const deleteButton = screen.getByTestId('bulk-actions-delete-button')
       await user.click(deleteButton)
 
-      expect(await screen.findByText('Deleting this item cannot be undone. Do you want to continue?')).toBeInTheDocument()
+      expect(
+        await screen.findByText('Deleting this item cannot be undone. Do you want to continue?'),
+      ).toBeInTheDocument()
     })
 
     it('renders flash success when items are deleted successfully', async () => {
       const user = userEvent.setup()
-      fetchMock.delete(/.*\/folders\/46\?force=true/, 200, { overwriteRoutes: true })
+      fetchMock.delete(/.*\/folders\/46\?force=true/, 200, {overwriteRoutes: true})
       renderComponent()
 
       const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
@@ -301,7 +303,7 @@ describe('FileFolderTable', () => {
 
     it('renders flash error when delete fails', async () => {
       const user = userEvent.setup()
-      fetchMock.delete(/.*\/folders\/46\?force=true/, 500, { overwriteRoutes: true })
+      fetchMock.delete(/.*\/folders\/46\?force=true/, 500, {overwriteRoutes: true})
       renderComponent()
 
       const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')

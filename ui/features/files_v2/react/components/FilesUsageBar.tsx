@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext} from 'react'
+import React from 'react'
 import {useQuery} from '@canvas/query'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ProgressBar} from '@instructure/ui-progress'
@@ -25,7 +25,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import formatMessage from '../../../../../packages/canvas-media/src/format-message'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {generateFilesQuotaUrl} from '../../utils/apiUtils'
-import {FileManagementContext} from './Contexts'
+import {useFileManagement} from './Contexts'
 
 const I18n = createI18nScope('files_v2')
 
@@ -38,7 +38,7 @@ const fetchQuota = async (contextType: string, contextId: string) => {
 }
 
 const FilesUsageBar = () => {
-  const {contextType, contextId} = useContext(FileManagementContext)
+  const {contextType, contextId} = useFileManagement()
   const {data, error, isLoading} = useQuery({
     queryKey: ['quota'],
     queryFn: () => fetchQuota(contextType, contextId),

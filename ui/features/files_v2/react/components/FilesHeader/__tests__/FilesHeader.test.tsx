@@ -21,28 +21,20 @@ import FilesHeader from '../FilesHeader'
 import {render, screen} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
-import userEvent from '@testing-library/user-event'
-import {FileManagementContext} from '../../Contexts'
+import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
 const defaultProps = {
   isUserContext: false,
   size: 'small' as 'small' | 'medium' | 'large',
 }
 
-const renderComponent = (props?: any) => {
+const renderComponent = (props = {}, context: Partial<FileManagementContextProps> = {}) => {
   return render(
     <MockedQueryClientProvider client={queryClient}>
-      <FileManagementContext.Provider
-        value={{
-          contextType: 'course',
-          contextId: '1',
-          folderId: '1',
-          showingAllContexts: false,
-          fileIndexMenuTools: [],
-        }}
-      >
+      <FileManagementProvider value={createMockFileManagementContext(context)}>
         <FilesHeader {...defaultProps} {...props} />
-      </FileManagementContext.Provider>
+      </FileManagementProvider>
     </MockedQueryClientProvider>,
   )
 }
@@ -62,13 +54,20 @@ describe('FilesHeader', () => {
     expect(headingElement).toBeInTheDocument()
   })
 
-  it('opens the create folder modal when the create folder button is clicked', async () => {
-    const user = userEvent.setup()
-    renderComponent()
+  it('renders toplevel buttons', async () => {
+    const fileIndexMenuTools = [
+      {id: '1', title: 'Tool 1', base_url: 'http://tool1.com', icon_url: 'http://someurl.com'},
+    ]
+    renderComponent({}, {fileIndexMenuTools})
 
-    const createFolderButton = await screen.findByRole('button', {name: /Folder/i})
-    await user.click(createFolderButton)
-    const modalElement = await screen.findByRole('heading', {name: /create folder/i})
-    expect(modalElement).toBeInTheDocument()
+    const allMyFilesButton = screen.getByText(/All My Files/i)
+    const uploadButton = screen.getByText(/Upload/i)
+    const createFolderButton = screen.getByText(/Folder/i)
+    const externalToolsButton = screen.getByText(/external tools menu/i)
+
+    expect(allMyFilesButton).toBeInTheDocument()
+    expect(uploadButton).toBeInTheDocument()
+    expect(createFolderButton).toBeInTheDocument()
+    expect(externalToolsButton).toBeInTheDocument()
   })
 })

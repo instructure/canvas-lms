@@ -21,7 +21,8 @@ import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
 import ActionMenuButton from '../ActionMenuButton'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
-import {FileManagementContext} from '../../Contexts'
+import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import fetchMock from 'fetch-mock'
 
@@ -30,14 +31,13 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 let defaultProps: any
-let defaultContext: any
 
-const renderComponent = (props = {}, context = {}) => {
+const renderComponent = (props = {}, context: Partial<FileManagementContextProps> = {}) => {
   return render(
     <Router>
-      <FileManagementContext.Provider value={{...defaultContext, ...context}}>
+      <FileManagementProvider value={createMockFileManagementContext(context)}>
         <ActionMenuButton {...defaultProps} {...props} />
-      </FileManagementContext.Provider>
+      </FileManagementProvider>
     </Router>,
   )
 }
@@ -50,12 +50,6 @@ describe('ActionMenuButton', () => {
       userCanDeleteFilesForContext: true,
       usageRightsRequiredForContext: true,
       row: FAKE_FILES[0],
-    }
-    defaultContext = {
-      contextType: 'course',
-      contextId: '1',
-      folderId: '1',
-      showingAllContexts: false,
     }
   })
 

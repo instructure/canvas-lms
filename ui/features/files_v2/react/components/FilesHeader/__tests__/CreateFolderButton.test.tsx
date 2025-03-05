@@ -17,37 +17,38 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-
-import FileFolderTable, {type FileFolderTableProps} from '..'
-import {BrowserRouter} from 'react-router-dom'
+import CreateFolderButton from '../CreateFolderButton'
+import {render, screen, waitFor} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {QueryClient} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
+import userEvent from '@testing-library/user-event'
 import {FileManagementProvider} from '../../Contexts'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
-export const defaultProps: FileFolderTableProps = {
-  size: 'large',
-  userCanEditFilesForContext: true,
-  userCanDeleteFilesForContext: true,
-  usageRightsRequiredForContext: false,
-  currentUrl:
-    '/api/v1/folders/1/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string',
-  folderBreadcrumbs: [],
-  onPaginationLinkChange: jest.fn(),
-  onLoadingStatusChange: jest.fn(),
-  onSortChange: jest.fn(),
-  searchString: '',
-}
 
-export const renderComponent = (props = {}) => {
-  const queryClient = new QueryClient()
+const renderComponent = () => {
   return render(
-    <BrowserRouter>
+    <FileManagementProvider value={createMockFileManagementContext()}>
       <MockedQueryClientProvider client={queryClient}>
-        <FileManagementProvider value={createMockFileManagementContext()}>
-          <FileFolderTable {...defaultProps} {...props} />
-        </FileManagementProvider>
+        <CreateFolderButton buttonDisplay="block" />
       </MockedQueryClientProvider>
-    </BrowserRouter>,
+    </FileManagementProvider>,
   )
 }
+
+describe('CreateFolderButton', () => {
+  it('can open and close the create folder modal', async () => {
+    const user = userEvent.setup()
+    renderComponent()
+
+    const createFolderButton = await screen.findByRole('button', {name: /Folder/i})
+    await user.click(createFolderButton)
+    const modalElement = await screen.findByRole('heading', {name: /create folder/i})
+    expect(modalElement).toBeInTheDocument()
+
+    const closeButton = screen.getByRole('button', {name: /close/i})
+    await user.click(closeButton)
+    await waitFor(() => {
+      expect(modalElement).not.toBeInTheDocument()
+    })
+  })
+})

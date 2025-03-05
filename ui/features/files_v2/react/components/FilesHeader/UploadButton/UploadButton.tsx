@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import UploadForm from '@canvas/files/react/components/UploadForm'
-import {FileManagementContext} from '../../Contexts'
+import {useFileManagement} from '../../Contexts'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
 import FileRenameForm from './FileRenameForm'
 import ZipFileOptionsForm from './ZipFileOptionsForm'
@@ -29,7 +29,7 @@ import {type FileOptionsResults} from './FileOptions'
 type UploadButtonProps = ButtonProps
 
 const UploadButton = ({disabled, children, ...buttonProps}: UploadButtonProps) => {
-  const {contextId, contextType, currentFolder} = useContext(FileManagementContext)
+  const {contextId, contextType, currentFolder} = useFileManagement()
   const [fileOptions, setFileOptions] = useState<FileOptionsResults | null>(null)
   const formRef = useRef<UploadForm>(null)
 

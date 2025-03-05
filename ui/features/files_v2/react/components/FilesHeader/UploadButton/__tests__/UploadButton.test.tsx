@@ -20,7 +20,8 @@ import React, {forwardRef, useEffect, useImperativeHandle} from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import UploadButton from '../UploadButton'
-import {FileManagementContext} from '../../../Contexts'
+import {FileManagementProvider} from '../../../Contexts'
+import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {BBFolderWrapper} from '../../../../../utils/fileFolderWrappers'
 import {FAKE_COURSE_FOLDER} from '../../../../../fixtures/fakeData'
 
@@ -59,18 +60,13 @@ const defaultProps = {
 
 const renderComponent = (props = {}) =>
   render(
-    <FileManagementContext.Provider
-      value={{
-        contextType: 'course',
-        contextId: '1',
-        folderId: '1',
-        showingAllContexts: false,
+    <FileManagementProvider
+      value={createMockFileManagementContext({
         currentFolder: new BBFolderWrapper(FAKE_COURSE_FOLDER),
-        fileIndexMenuTools: [],
-      }}
+      })}
     >
       <UploadButton {...defaultProps} {...props} />
-    </FileManagementContext.Provider>,
+    </FileManagementProvider>,
   )
 
 describe('UploadButton', () => {

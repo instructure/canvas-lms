@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useContext, useMemo, useState} from 'react'
+import React, {useCallback, useMemo, useState} from 'react'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import {FileManagementContext} from '../Contexts'
+import {useFileManagement} from '../Contexts'
 import {type File, type Folder} from '../../../interfaces/File'
 import {RenameModal} from '../RenameModal'
 import DeleteModal from './DeleteModal'
@@ -65,8 +65,7 @@ const ActionMenuButton = ({
     'rename' | 'delete' | 'copy-to' | 'send-to' | 'move-to' | null
   >(null)
   const actionLabel = I18n.t('Actions')
-  const currentContext = useContext(FileManagementContext)
-  const contextType = currentContext?.contextType
+  const {contextType} = useFileManagement()
 
   const triggerButton = useCallback(() => {
     return size !== 'large' ? (

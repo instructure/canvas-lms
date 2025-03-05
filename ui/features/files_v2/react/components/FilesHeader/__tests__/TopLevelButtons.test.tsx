@@ -19,7 +19,10 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import TopLevelButtons from '../TopLevelButtons'
-import {FileManagementContext} from '../../Contexts'
+import {FileManagementProvider, FileManagementContextProps} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {queryClient} from '@canvas/query'
 
 const defaultProps = {
   isUserContext: false,
@@ -27,19 +30,14 @@ const defaultProps = {
   onCreateFolderButtonClick: jest.fn(),
 }
 
-const defaultContext = {
-  contextType: 'course',
-  contextId: '1',
-  folderId: '1',
-  showingAllContexts: false,
-  fileIndexMenuTools: [],
-}
-
-const renderComponent = (props?: any, context?: any) => {
+const renderComponent = (props?: any, context: Partial<FileManagementContextProps> = {}) => {
+  const contextValue = createMockFileManagementContext(context)
   return render(
-    <FileManagementContext.Provider value={{...defaultContext, ...context}}>
-      <TopLevelButtons {...defaultProps} {...props} />
-    </FileManagementContext.Provider>,
+    <MockedQueryClientProvider client={queryClient}>
+      <FileManagementProvider value={contextValue}>
+        <TopLevelButtons {...defaultProps} {...props} />
+      </FileManagementProvider>
+    </MockedQueryClientProvider>,
   )
 }
 
@@ -76,12 +74,34 @@ describe('TopLevelButtons', () => {
     expect(buttons[2]).toHaveTextContent(/All My Files/i)
   })
 
+  it('renders external tools button when fileIndexMenuTools is provided', () => {
+    const fileIndexMenuTools = [
+      {id: '1', title: 'Tool 1', base_url: 'http://tool1.com', icon_url: 'http://someurl.com'},
+    ]
+    renderComponent({}, {fileIndexMenuTools})
+    const externalToolsButton = screen.getByText(/external tools menu/i)
+    expect(externalToolsButton).toBeInTheDocument()
+  })
+
   it('does not render upload or create folder buttons when shouldHideUploadButtons is true', () => {
-    renderComponent({shouldHideUploadButtons: true})
+    const fileIndexMenuTools = [
+      {id: '1', title: 'Tool 1', base_url: 'http://tool1.com', icon_url: 'http://someurl.com'},
+    ]
+    renderComponent({shouldHideUploadButtons: true}, {fileIndexMenuTools})
 
     const uploadButton = screen.queryByText(/Upload/i)
     const createFolderButton = screen.queryByText(/Folder/i)
+    const externalToolsButton = screen.queryByText(/external tools menu/i)
+
     expect(uploadButton).not.toBeInTheDocument()
     expect(createFolderButton).not.toBeInTheDocument()
+    expect(externalToolsButton).not.toBeInTheDocument()
+  })
+
+  it('does not render external tools button when no tools', () => {
+    renderComponent()
+
+    const externalToolsButton = screen.queryByText(/external tools menu/i)
+    expect(externalToolsButton).not.toBeInTheDocument()
   })
 })

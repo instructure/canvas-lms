@@ -23,7 +23,8 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
-import {FileManagementContext} from '../../Contexts'
+import {FileManagementProvider} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
 const defaultProps = {
   isOpen: true,
@@ -32,19 +33,11 @@ const defaultProps = {
 
 const renderComponent = (props = {}) => {
   return render(
-    <FileManagementContext.Provider
-      value={{
-        folderId: '1',
-        contextType: 'course',
-        contextId: '1',
-        showingAllContexts: false,
-        fileIndexMenuTools: [],
-      }}
-    >
+    <FileManagementProvider value={createMockFileManagementContext()}>
       <MockedQueryClientProvider client={queryClient}>
         <CreateFolderModal {...defaultProps} {...props} />
       </MockedQueryClientProvider>
-    </FileManagementContext.Provider>,
+    </FileManagementProvider>,
   )
 }
 describe('CreateFolderModal', () => {
@@ -86,7 +79,8 @@ describe('CreateFolderModal', () => {
     const user = userEvent.setup()
     renderComponent()
     const input = screen.getByRole('textbox', {name: /Folder Name/i})
-    await user.type(input, '{enter}')
+    await user.click(input)
+    await user.keyboard('{Enter}')
     expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
   })
 

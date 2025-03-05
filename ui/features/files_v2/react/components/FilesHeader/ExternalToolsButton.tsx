@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useState} from 'react'
+import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
@@ -27,8 +27,8 @@ import {IconArrowOpenDownLine, IconMoreLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {FileManagementContext} from '../Contexts'
-import {Tool} from 'features/files_v2/interfaces/File'
+import {useFileManagement} from '../Contexts'
+import {type Tool} from '@canvas/files_v2/react/modules/filesEnv.types'
 
 const I18n = createI18nScope('files_v2')
 
@@ -39,7 +39,7 @@ export interface ExternalToolsButtonProps {
 
 const ExternalToolsButton = ({buttonDisplay, size}: ExternalToolsButtonProps) => {
   const [activeTool, setActiveTool] = useState<Tool | null>(null)
-  const {fileIndexMenuTools} = useContext(FileManagementContext)
+  const {fileIndexMenuTools} = useFileManagement()
   const isMobile = size === 'small'
 
   // Don't render the button if there are no tools
