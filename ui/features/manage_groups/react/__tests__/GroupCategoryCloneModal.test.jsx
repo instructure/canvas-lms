@@ -18,7 +18,7 @@ import {act, render} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import React from 'react'
-import GroupCategoryCloneModal from '../GroupCategoryCloneModal'
+import GroupCategoryCloneModal, {CATEGORY_NAME_MAX_LENGTH} from '../GroupCategoryCloneModal'
 
 // mock reloadWindow
 jest.mock('@canvas/util/globalUtils', () => ({
@@ -61,18 +61,6 @@ describe('GroupCategoryCloneModal', () => {
       )
       expect(getByText(/Submit/i)).toBeVisible()
       expect(getByText(/Cancel/i)).toBeVisible()
-    })
-
-    it('disables the submit button if group name is empty', () => {
-      const {getByText} = render(
-        <GroupCategoryCloneModal
-          groupCategory={groupCategory}
-          label="Clone Group Set"
-          open={open}
-          onDismiss={onDismiss}
-        />,
-      )
-      expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
     })
 
     it('enables the submit button if group name is provided', async () => {
@@ -122,7 +110,7 @@ describe('GroupCategoryCloneModal', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore() // eslint-disable-line no-console
+      console.error.mockRestore()
     })
 
     it('reports an error if the fetch fails', async () => {
@@ -140,6 +128,53 @@ describe('GroupCategoryCloneModal', () => {
         .click(getByText('Submit'))
       await act(() => fetchMock.flush(true))
       expect(getByText(/error/i)).toBeInTheDocument()
+    })
+
+    it('Shows error if name is empty and clears it when user enters a name', async () => {
+      const { getByPlaceholderText, queryByText} = render(
+        <GroupCategoryCloneModal
+          groupCategory={{...groupCategory, name: 'Course Admin View Group Set'}}
+          label="Clone Group Set"
+          open={open}
+          onDismiss={onDismiss}
+        />,
+      )
+
+      const inputName = getByPlaceholderText('Name')
+      await userEvent.clear(inputName)
+
+      expect(inputName).toHaveValue('')
+
+      await userEvent
+        .setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
+        .click(queryByText('Submit'))
+
+      expect(queryByText('Group set name is required')).toBeInTheDocument()
+
+      await userEvent.type(inputName, "something")
+
+      expect(queryByText('Group set name is required')).not.toBeInTheDocument()
+    })
+
+    it(`Shows error if name is greater than ${CATEGORY_NAME_MAX_LENGTH}`, async () => {
+      const { getByPlaceholderText, queryByText} = render(
+        <GroupCategoryCloneModal
+          groupCategory={{...groupCategory, name: 'Course Admin View Group Set'}}
+          label="Clone Group Set"
+          open={open}
+          onDismiss={onDismiss}
+        />,
+      )
+
+      const inputName = getByPlaceholderText('Name')
+
+      await userEvent.type(inputName, 'a'.repeat(CATEGORY_NAME_MAX_LENGTH + 1))
+      await userEvent
+        .setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
+        .click(queryByText('Submit'))
+
+      const errorMessage = `${CATEGORY_NAME_MAX_LENGTH} character limit exceeded`
+      expect(queryByText(errorMessage)).toBeInTheDocument()
     })
   })
 })
