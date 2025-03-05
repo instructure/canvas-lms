@@ -200,7 +200,6 @@ const featureBundles: {
   slickgrid: () => import('./features/slickgrid/index'),
   speed_grader: () => import('./features/speed_grader/index'),
   student_group_dialog: () => import('./features/student_group_dialog/index'),
-  sub_accounts: () => import('./features/sub_accounts/index'),
   submission_download: () => import('./features/submission_download/index'),
   submissions_show_preview_media: () => import('./features/submissions_show_preview_media/index'),
   submissions_show_preview_text: () => import('./features/submissions_show_preview_text/index'),

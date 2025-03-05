@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,4 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './jquery/index'
+import {Account} from 'api'
+
+export type AccountWithCounts = Account & {sub_account_count: number; course_count: number}

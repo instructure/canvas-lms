@@ -16,14 +16,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
   set_active_tab "sub_accounts"
   provide :page_title, t('titles.sub_accounts', 'Sub-Accounts')
-  css_bundle :sub_accounts
-  js_bundle :sub_accounts
 %>
-
-<h1 class="screenreader-only"><%= t :page_header_title, 'Sub Accounts' %></h1>
-<div id="sub_account_urls">
-  <a href="<%= context_url(@context, :context_sub_account_url, "{{ id }}") %>" class="sub_account_url" style="display: none;">&nbsp;</a>
-</div>
-<% account_data = @accounts[@context.id] %>
-<%= render :partial => "sub_accounts", :locals => {:account => @context, :depth => 2, :course_count => account_data[:course_count], :sub_account_count => account_data[:sub_account_count]} %>
-<%= render :partial => "sub_accounts" %>
+<div id="sub_account_mount">
