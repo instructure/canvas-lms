@@ -120,7 +120,7 @@ class Lti::IMS::Registration < ApplicationRecord
       launch_settings: {
         icon_url: registration.logo_uri,
         text: registration.client_name,
-      }
+      }.compact
     }.compact.with_indifferent_access
   end
 
