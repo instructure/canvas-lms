@@ -284,6 +284,9 @@ function CanvasMultiSelect(props: Props) {
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const {value} = e.target
     filterOptions(value)
+    if (value === '') {
+      setFilteredOptionIds(null)
+    }
     setInputValue(value)
     customOnInputChange(value)
   }
@@ -315,6 +318,7 @@ function CanvasMultiSelect(props: Props) {
       if (child) message = primaryLabel(child) + '. ' + message
     }
     setFilteredOptionIds(filtered.map(f => f.id))
+
     if (filtered.length > 0) setHighlightedOptionId(filtered[0].id)
     setIsShowingOptions(true)
     setAnnouncement(message)
