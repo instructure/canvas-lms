@@ -143,8 +143,10 @@
       </div>
     </div>
     <b tabindex="0" role="heading" class="answers_header"><%= before_label(:answers, "Answers") %></b>
-    <div id="answers_warning_alert_box" class="alert alert hidden answers_warning" role="alert">
-      <i class="icon-warning" aria-hidden="true"></i><span class="answers_warning_message"></span>
+    <div id="answers_warning_alert_box" class="alert alert hidden answers_warning">
+      <i class="icon-warning" aria-hidden="true"></i>
+      <span class="screenreader-only"><%= t('errors.invalid_data', "Form data is invalid. Please correct the following errors and resubmit.") %></span>
+      <span class="answers_warning_message"></span>
     </div>
     <div style="display: none;">
     <select class="answer_selection_type" name="answer_selection_type">
