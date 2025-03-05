@@ -511,15 +511,17 @@ describe "Differentiation Tag Management" do
           end
 
           it "Displays an error message in the modal", :ignore_js_errors do
-            @collaborative_group_set = @course.group_categories.create!(name: "test", non_collaborative: false)
+            allow_any_instance_of(GroupCategoriesController)
+              .to receive(:bulk_manage_differentiation_tag)
+              .and_raise(ActiveRecord::RecordInvalid.new)
+
             fj("button:contains('+ Tag')").click
             wait_for_ajaximations
 
             expect(fj("h2:contains('Create Tag')")).to be_displayed
 
             tag_input = f("[data-testid='tag-name-input']")
-            tag_input.send_keys(@collaborative_group_set.name)
-
+            tag_input.send_keys("New Single Tag")
             fj("button:contains('Save')").click
             wait_for_ajaximations
 
