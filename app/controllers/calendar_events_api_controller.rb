@@ -489,7 +489,7 @@ class CalendarEventsApiController < ApplicationController
         end
         render json:
       else
-        render json: { errors: @errors.as_json }, status: :bad_request
+        render json: { errors: @errors }, status: :bad_request
       end
     end
   end

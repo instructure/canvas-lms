@@ -1776,8 +1776,8 @@ class DiscussionTopicsController < ApplicationController
                                                  })
         end
       else
-        errors = @topic.errors.as_json[:errors]
-        errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic
+        errors = ::Api::Errors::Reporter.to_json(@topic.errors)[:errors]
+        errors.merge!(::Api::Errors::Reporter.to_json(@topic.root_topic.errors)[:errors]) if @topic.root_topic
         errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
         render json: { errors: }, status: :bad_request
       end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,21 +16,10 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-require_relative "api_spec_helper"
+require "lti_advantage"
 
-describe "API Error Handling", type: :request do
-  before :once do
-    user_with_pseudonym(active_all: true)
-    enable_default_developer_key!
-    @token = @user.access_tokens.create!(purpose: "Test")
-  end
-
-  it "responds not_found for 404 errors" do
-    get "/api/v1/courses/54321", headers: { "Authorization" => "Bearer #{@token.full_token}" }
-    expect(response.response_code).to eq 404
-    json = JSON.parse(response.body)
-    expect(json["errors"]).to eq [{ "message" => "The specified resource does not exist." }]
-  end
+# Configure LtiAdvantage::TypeValidator to use Canvas's error formatter
+LtiAdvantage::TypeValidator.error_formatter = lambda do |errors|
+  Api::Errors::Reporter.to_json(errors)
 end

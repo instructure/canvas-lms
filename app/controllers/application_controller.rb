@@ -2808,7 +2808,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_cast(obj)
-    obj = obj.as_json if obj.respond_to?(:as_json)
+    obj = recursively_transform_errors(obj)
     stringify_json_ids? ? StringifyIds.recursively_stringify_ids(obj) : obj
   end
 
@@ -3502,4 +3502,19 @@ class ApplicationController < ActionController::Base
   end
 
   helper_method :add_ignite_agent_bundle
+
+  private
+
+  def recursively_transform_errors(obj)
+    case obj.class.name
+    when "ActiveModel::Errors"
+      ::Api::Errors::Reporter.to_json(obj)
+    when "Hash", "ActiveSupport::HashWithIndifferentAccess"
+      obj.transform_values { |value| recursively_transform_errors(value) }
+    when "Array"
+      obj.map { |item| recursively_transform_errors(item) }
+    else
+      obj.respond_to?(:as_json) ? obj.as_json : obj
+    end
+  end
 end
