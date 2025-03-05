@@ -76,11 +76,10 @@ describe('CreateFolderModal', () => {
   })
 
   it('submits on enter', async () => {
-    const user = userEvent.setup()
     renderComponent()
     const input = screen.getByRole('textbox', {name: /Folder Name/i})
-    await user.click(input)
-    await user.keyboard('{Enter}')
+    await userEvent.click(input)
+    await userEvent.type(input, '{Enter}')
     expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
   })
 
