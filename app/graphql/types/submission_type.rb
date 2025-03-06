@@ -72,8 +72,6 @@ module Types
       unless_hiding_user_for_anonymous_grading { object.user_id }
     end
 
-    field :anonymous_id, ID, null: true
-
     field :enrollments_connection, EnrollmentType.connection_type, null: true
     def enrollments_connection
       load_association(:course).then do |course|
