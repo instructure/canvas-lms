@@ -86,7 +86,7 @@ k20_students_in_need_of_attention:
 students_in_need_of_attention_course_level:
   state: hidden
   applies_to: Course
-  display_name: Course Analytics - Students in Need of Attention
+  display_name: Intelligent Insights - Students in Need of Attention - Course Level (flag)
   description:
     students_in_need_of_attention_course_level: Enables the Intelligent Insights - Students in Need of Attention feature and accompanying permission at the Course level.
   root_opt_in: true
@@ -94,9 +94,9 @@ students_in_need_of_attention_course_level:
 students_in_need_of_attention_course_level_beta:
   state: hidden
   applies_to: Account
-  display_name: Course Analytics - Students in Need of Attention
+  display_name: Intelligent Insights - Students in Need of Attention - Course Level (beta)
   description:
-    students_in_need_of_attention_course_level_beta: Enables the Intelligent Insights - Students in Need of Attention feature and accompanying permission at the Course level.
+    students_in_need_of_attention_course_level_beta: Enables the Intelligent Insights - Students in Need of Attention feature in Beta with its accompanying permission at the Course level.
   root_opt_in: true
   beta: true
   shadow: true
