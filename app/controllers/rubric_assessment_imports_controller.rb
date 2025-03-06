@@ -57,7 +57,7 @@ class RubricAssessmentImportsController < ApplicationController
     begin
       grading_role = grading_role(assignment)
 
-      provisional = ["moderator", "provisional_grader"].include?(grading_role)
+      provisional = [:moderator, :provisional_grader].include?(grading_role)
 
       ensure_adjudication_possible(provisional:) do
         import = RubricAssessmentImport.create_with_attachment(
