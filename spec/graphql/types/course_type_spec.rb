@@ -103,189 +103,440 @@ describe Types::CourseType do
     end
   end
 
-  describe "assignmentsConnection" do
-    let_once(:assignment) do
-      course.assignments.create! name: "asdf", workflow_state: "unpublished"
-    end
-
-    context "user_id filter" do
-      let_once(:other_student) do
-        other_user = user_factory(active_all: true, active_state: "active")
-        @course.enroll_student(other_user, enrollment_state: "active").user
+  context "connection types" do
+    describe "assignmentsConnection" do
+      let_once(:assignment) do
+        course.assignments.create! name: "asdf", workflow_state: "unpublished"
       end
 
-      # Create an observer in the course that observes the other_student
-      let_once(:observer) do
-        course_with_observer(course: @course, associated_user_id: other_student.id)
-        @observer
+      context "user_id filter" do
+        let_once(:other_student) do
+          other_user = user_factory(active_all: true, active_state: "active")
+          @course.enroll_student(other_user, enrollment_state: "active").user
+        end
+
+        # Create an observer in the course that observes the other_student
+        let_once(:observer) do
+          course_with_observer(course: @course, associated_user_id: other_student.id)
+          @observer
+        end
+
+        # Create an assignment that is only visible to other_student
+        before(:once) do
+          # Set the assigment to active
+          assignment.workflow_state = "active"
+          assignment.save
+
+          @overridden_assignment = course.assignments.create!(title: "asdf",
+                                                              workflow_state: "published",
+                                                              only_visible_to_overrides: true)
+
+          override = assignment_override_model(assignment: @overridden_assignment)
+          override.assignment_override_students.build(user: other_student)
+          override.save!
+        end
+
+        it "filters assignments by userId correctly for students" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: other_student)
+              assignmentsConnection(filter: {userId: "#{other_student.id}"}) { edges { node { _id } } }
+            GQL
+          ).to eq [assignment.id.to_s, @overridden_assignment.id.to_s]
+
+          # the other_student lacks permission to see @student's assignments
+          expect(
+            course_type.resolve(<<~GQL, current_user: other_student)
+              assignmentsConnection(filter: {userId: "#{@student.id}"}) { edges { node { _id } } }
+            GQL
+          ).to eq []
+        end
+
+        it "filters assignments by userId correctly for observers" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: observer)
+              assignmentsConnection(filter: {userId: "#{other_student.id}"}) { edges { node { _id } } }
+            GQL
+          ).to eq [assignment.id.to_s, @overridden_assignment.id.to_s]
+
+          # the observer doesn't observer @student, so it can not see their assignments
+          expect(
+            course_type.resolve(<<~GQL, current_user: observer)
+              assignmentsConnection(filter: {userId: "#{@student.id}"}) { edges { node { _id } } }
+            GQL
+          ).to eq []
+        end
+
+        it "filters assignments by userId correctly for teachers" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              assignmentsConnection(filter: {userId: "#{other_student.id}"}) { edges { node { _id } } }
+            GQL
+          ).to eq [assignment.id.to_s, @overridden_assignment.id.to_s]
+
+          # A teacher has permission to see all assignments
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              assignmentsConnection(filter: {userId: "#{@student.id}"}) { edges { node { _id } } }
+            GQL
+          ).to eq [assignment.id.to_s]
+        end
+
+        it "returns visible assignments to current user" do
+          expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @teacher).size).to eq 2
+          expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student).size).to eq 1
+          expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: other_student).size).to eq 2
+        end
       end
 
-      # Create an assignment that is only visible to other_student
-      before(:once) do
-        # Set the assigment to active
-        assignment.workflow_state = "active"
-        assignment.save
-
-        @overridden_assignment = course.assignments.create!(title: "asdf",
-                                                            workflow_state: "published",
-                                                            only_visible_to_overrides: true)
-
-        override = assignment_override_model(assignment: @overridden_assignment)
-        override.assignment_override_students.build(user: other_student)
-        override.save!
+      it "only returns visible assignments" do
+        expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @teacher).size).to eq 1
+        expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student).size).to eq 0
       end
 
-      it "filters assignments by userId correctly for students" do
-        expect(
-          course_type.resolve(<<~GQL, current_user: other_student)
-            assignmentsConnection(filter: {userId: "#{other_student.id}"}) { edges { node { _id } } }
-          GQL
-        ).to eq [assignment.id.to_s, @overridden_assignment.id.to_s]
+      context "grading periods" do
+        before(:once) do
+          gpg = GradingPeriodGroup.create! title: "asdf",
+                                           root_account: course.root_account
+          course.enrollment_term.update grading_period_group: gpg
+          @term1 = gpg.grading_periods.create! title: "past grading period",
+                                               start_date: 2.weeks.ago,
+                                               end_date: 1.week.ago
+          @term2 = gpg.grading_periods.create! title: "current grading period",
+                                               start_date: 2.days.ago,
+                                               end_date: 2.days.from_now
+          @term1_assignment1 = course.assignments.create! name: "asdf",
+                                                          due_at: 1.5.weeks.ago
+          @term2_assignment1 = course.assignments.create! name: ";lkj",
+                                                          due_at: Time.zone.today
+        end
 
-        # the other_student lacks permission to see @student's assignments
-        expect(
-          course_type.resolve(<<~GQL, current_user: other_student)
-            assignmentsConnection(filter: {userId: "#{@student.id}"}) { edges { node { _id } } }
-          GQL
-        ).to eq []
-      end
+        it "only returns assignments for the current grading period" do
+          expect(
+            course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student)
+          ).to eq [@term2_assignment1.id.to_s]
+        end
 
-      it "filters assignments by userId correctly for observers" do
-        expect(
-          course_type.resolve(<<~GQL, current_user: observer)
-            assignmentsConnection(filter: {userId: "#{other_student.id}"}) { edges { node { _id } } }
-          GQL
-        ).to eq [assignment.id.to_s, @overridden_assignment.id.to_s]
+        it "returns no assignments when outside of a grading period" do
+          @term2.destroy
+          expect(
+            course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student)
+          ).to eq []
+        end
 
-        # the observer doesn't observer @student, so it can not see their assignments
-        expect(
-          course_type.resolve(<<~GQL, current_user: observer)
-            assignmentsConnection(filter: {userId: "#{@student.id}"}) { edges { node { _id } } }
-          GQL
-        ).to eq []
-      end
+        it "returns assignments for the requested grading period" do
+          expect(
+            course_type.resolve(<<~GQL, current_user: @student)
+              assignmentsConnection(filter: {gradingPeriodId: "#{@term1.id}"}) { edges { node { _id } } }
+            GQL
+          ).to eq [@term1_assignment1.id.to_s]
+        end
 
-      it "filters assignments by userId correctly for teachers" do
-        expect(
-          course_type.resolve(<<~GQL, current_user: @teacher)
-            assignmentsConnection(filter: {userId: "#{other_student.id}"}) { edges { node { _id } } }
-          GQL
-        ).to eq [assignment.id.to_s, @overridden_assignment.id.to_s]
-
-        # A teacher has permission to see all assignments
-        expect(
-          course_type.resolve(<<~GQL, current_user: @teacher)
-            assignmentsConnection(filter: {userId: "#{@student.id}"}) { edges { node { _id } } }
-          GQL
-        ).to eq [assignment.id.to_s]
-      end
-
-      it "returns visible assignments to current user" do
-        expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @teacher).size).to eq 2
-        expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student).size).to eq 1
-        expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: other_student).size).to eq 2
-      end
-    end
-
-    it "only returns visible assignments" do
-      expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @teacher).size).to eq 1
-      expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student).size).to eq 0
-    end
-
-    context "grading periods" do
-      before(:once) do
-        gpg = GradingPeriodGroup.create! title: "asdf",
-                                         root_account: course.root_account
-        course.enrollment_term.update grading_period_group: gpg
-        @term1 = gpg.grading_periods.create! title: "past grading period",
-                                             start_date: 2.weeks.ago,
-                                             end_date: 1.week.ago
-        @term2 = gpg.grading_periods.create! title: "current grading period",
-                                             start_date: 2.days.ago,
-                                             end_date: 2.days.from_now
-        @term1_assignment1 = course.assignments.create! name: "asdf",
-                                                        due_at: 1.5.weeks.ago
-        @term2_assignment1 = course.assignments.create! name: ";lkj",
-                                                        due_at: Time.zone.today
-      end
-
-      it "only returns assignments for the current grading period" do
-        expect(
-          course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student)
-        ).to eq [@term2_assignment1.id.to_s]
-      end
-
-      it "returns no assignments when outside of a grading period" do
-        @term2.destroy
-        expect(
-          course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @student)
-        ).to eq []
-      end
-
-      it "returns assignments for the requested grading period" do
-        expect(
-          course_type.resolve(<<~GQL, current_user: @student)
-            assignmentsConnection(filter: {gradingPeriodId: "#{@term1.id}"}) { edges { node { _id } } }
-          GQL
-        ).to eq [@term1_assignment1.id.to_s]
-      end
-
-      it "can still return assignments for all grading periods" do
-        result = course_type.resolve(<<~GQL, current_user: @student)
-          assignmentsConnection(filter: {gradingPeriodId: null}) { edges { node { _id } } }
-        GQL
-        expect(result.sort).to match course.assignments.published.map(&:to_param).sort
-      end
-
-      it "returns assignments in order by position" do
-        ag = @course.assignment_groups.create! name: "Other Assignments", position: 1
-        other_ag_assignment = @course.assignments.create! assignment_group: ag, name: "other ag"
-
-        @term1_assignment1.assignment_group.update!(position: 2)
-        @term2_assignment1.update!(position: 1)
-        @term1_assignment1.update!(position: 2)
-
-        expect(
-          course_type.resolve(<<~GQL, current_user: @student)
+        it "can still return assignments for all grading periods" do
+          result = course_type.resolve(<<~GQL, current_user: @student)
             assignmentsConnection(filter: {gradingPeriodId: null}) { edges { node { _id } } }
           GQL
-        ).to eq([
-          other_ag_assignment,
-          @term2_assignment1,
-          @term1_assignment1,
-        ].map { |a| a.id.to_s })
+          expect(result.sort).to match course.assignments.published.map(&:to_param).sort
+        end
+
+        it "returns assignments in order by position" do
+          ag = @course.assignment_groups.create! name: "Other Assignments", position: 1
+          other_ag_assignment = @course.assignments.create! assignment_group: ag, name: "other ag"
+
+          @term1_assignment1.assignment_group.update!(position: 2)
+          @term2_assignment1.update!(position: 1)
+          @term1_assignment1.update!(position: 2)
+
+          expect(
+            course_type.resolve(<<~GQL, current_user: @student)
+              assignmentsConnection(filter: {gradingPeriodId: null}) { edges { node { _id } } }
+            GQL
+          ).to eq([
+            other_ag_assignment,
+            @term2_assignment1,
+            @term1_assignment1,
+          ].map { |a| a.id.to_s })
+        end
+      end
+
+      context "grading standards" do
+        it "returns grading standard title" do
+          expect(
+            course_type.resolve("gradingStandard { title }", current_user: @student)
+          ).to eq "Default Grading Scheme"
+        end
+
+        it "returns grading standard id" do
+          expect(
+            course_type.resolve("gradingStandard { _id }", current_user: @student)
+          ).to eq course.grading_standard_or_default.id
+        end
+
+        it "returns grading standard data" do
+          expect(
+            course_type.resolve("gradingStandard { data { letterGrade } }", current_user: @student)
+          ).to eq ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"]
+
+          expect(
+            course_type.resolve("gradingStandard { data { baseValue } }", current_user: @student)
+          ).to eq [0.94, 0.9, 0.87, 0.84, 0.8, 0.77, 0.74, 0.7, 0.67, 0.64, 0.61, 0.0]
+        end
+      end
+
+      context "apply assignment group weights" do
+        it "returns false if not weighted" do
+          expect(
+            course_type.resolve("applyGroupWeights", current_user: @student)
+          ).to be false
+        end
+      end
+
+      context "searchTerm" do
+        before do
+          @discussion_1 = course.discussion_topics.create!(title: "asdf", message: "asdf")
+          @discussion_2 = course.discussion_topics.create!(title: "asdf2", message: "asdf2")
+          @discussion_3 = course.discussion_topics.create!(title: "asdf3", message: "asdf3")
+        end
+
+        it "returns discussions with general search term" do
+          expect(
+            course_type.resolve("discussionsConnection(filter: { searchTerm: \"asdf\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@discussion_1.id.to_s, @discussion_2.id.to_s, @discussion_3.id.to_s]
+        end
+
+        it "returns discussions with specific search term" do
+          expect(
+            course_type.resolve("discussionsConnection(filter: { searchTerm: \"asdf2\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@discussion_2.id.to_s]
+        end
       end
     end
 
-    context "grading standards" do
-      it "returns grading standard title" do
-        expect(
-          course_type.resolve("gradingStandard { title }", current_user: @student)
-        ).to eq "Default Grading Scheme"
+    context "discussionsConnection" do
+      before do
+        @discussion_1 = course.discussion_topics.create!(title: "asdf", message: "asdf")
+        @discussion_2 = course.discussion_topics.create!(title: "asdf2", message: "asdf2")
+        @discussion_3 = course.discussion_topics.create!(title: "asdf3", message: "asdf3")
       end
 
-      it "returns grading standard id" do
+      it "returns discussions" do
         expect(
-          course_type.resolve("gradingStandard { _id }", current_user: @student)
-        ).to eq course.grading_standard_or_default.id
+          course_type.resolve("discussionsConnection { edges { node { _id } } }", current_user: @teacher)
+        ).to eq [@discussion_1.id.to_s, @discussion_2.id.to_s, @discussion_3.id.to_s]
       end
 
-      it "returns grading standard data" do
-        expect(
-          course_type.resolve("gradingStandard { data { letterGrade } }", current_user: @student)
-        ).to eq ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"]
+      context "searchTerm" do
+        it "returns discussions with general search term" do
+          expect(
+            course_type.resolve("discussionsConnection(filter: { searchTerm: \"asdf\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@discussion_1.id.to_s, @discussion_2.id.to_s, @discussion_3.id.to_s]
+        end
 
-        expect(
-          course_type.resolve("gradingStandard { data { baseValue } }", current_user: @student)
-        ).to eq [0.94, 0.9, 0.87, 0.84, 0.8, 0.77, 0.74, 0.7, 0.67, 0.64, 0.61, 0.0]
+        it "returns discussions with specific search term" do
+          expect(
+            course_type.resolve("discussionsConnection(filter: { searchTerm: \"asdf2\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@discussion_2.id.to_s]
+        end
+      end
+
+      context "as a student" do
+        it "returns discussions" do
+          expect(
+            course_type.resolve("discussionsConnection { edges { node { _id } } }", current_user: @student)
+          ).to eq [@discussion_1.id.to_s, @discussion_2.id.to_s, @discussion_3.id.to_s]
+        end
+
+        it "returns only discussions assigned to the student" do
+          new_section = course.course_sections.create!(name: "new section")
+          @discussion_1.assignment_overrides.create!(course_section: new_section)
+          @discussion_1.update!(only_visible_to_overrides: true)
+          expect(
+            course_type.resolve("discussionsConnection { edges { node { _id } } }", current_user: @student)
+          ).to eq [@discussion_2.id.to_s, @discussion_3.id.to_s]
+        end
+      end
+
+      context "userId filter" do
+        it "returns unauthorized code when user is not allowed to act as another user" do
+          new_section = course.course_sections.create!(name: "new section")
+          @discussion_1.assignment_overrides.create!(course_section: new_section)
+          @discussion_1.update!(only_visible_to_overrides: true)
+          expect_error = "You do not have permission to view this course."
+          expect do
+            course_type.resolve("discussionsConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @student)
+          end.to raise_error(GraphQLTypeTester::Error, /#{Regexp.escape(expect_error)}/)
+        end
+
+        it "returns discussions assigned to the user_id when allowed to act as that user" do
+          new_section = course.course_sections.create!(name: "new section")
+          @discussion_1.assignment_overrides.create!(course_section: new_section)
+          @discussion_1.update!(only_visible_to_overrides: true)
+          expect(
+            course_type.resolve("discussionsConnection(filter: { userId: \"#{@student.id}\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@discussion_2.id.to_s, @discussion_3.id.to_s]
+        end
       end
     end
 
-    context "apply assignment group weights" do
-      it "returns false if not weighted" do
+    context "pagesConnection" do
+      before do
+        @page_1 = course.wiki_pages.create!(title: "asdf", body: "asdf")
+        @page_2 = course.wiki_pages.create!(title: "asdf2", body: "asdf2")
+        @page_3 = course.wiki_pages.create!(title: "asdf3", body: "asdf3")
+      end
+
+      it "returns pages" do
         expect(
-          course_type.resolve("applyGroupWeights", current_user: @student)
-        ).to be false
+          course_type.resolve("pagesConnection { edges { node { _id } } }", current_user: @teacher)
+        ).to eq [@page_1.id.to_s, @page_2.id.to_s, @page_3.id.to_s]
+      end
+
+      context "search" do
+        it "returns pages with general search term" do
+          expect(
+            course_type.resolve("pagesConnection(filter: { searchTerm: \"asdf\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@page_1.id.to_s, @page_2.id.to_s, @page_3.id.to_s]
+        end
+
+        it "returns pages with specific search term" do
+          expect(
+            course_type.resolve("pagesConnection(filter: { searchTerm: \"asdf2\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@page_2.id.to_s]
+        end
+      end
+
+      context "as a student" do
+        it "returns pages" do
+          expect(
+            course_type.resolve("pagesConnection { edges { node { _id } } }", current_user: @student)
+          ).to eq [@page_1.id.to_s, @page_2.id.to_s, @page_3.id.to_s]
+        end
+
+        it "returns only wiki pages assigned to the student" do
+          new_section = course.course_sections.create!(name: "new section")
+          @page_1.assignment_overrides.create!(course_section: new_section)
+          @page_1.update!(only_visible_to_overrides: true)
+          expect(
+            course_type.resolve("pagesConnection { edges { node { _id } } }", current_user: @student)
+          ).to eq [@page_2.id.to_s, @page_3.id.to_s]
+        end
+      end
+
+      context "userId filter" do
+        it "returns unauthorized code when user is not allowed to act as another user" do
+          expect_error = "You do not have permission to view this course."
+          expect do
+            course_type.resolve("pagesConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @student)
+          end.to raise_error(GraphQLTypeTester::Error, /#{Regexp.escape(expect_error)}/)
+        end
+
+        it "returns pages for the given user" do
+          expect(
+            course_type.resolve("pagesConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@page_1.id.to_s, @page_2.id.to_s, @page_3.id.to_s]
+        end
+      end
+    end
+
+    context "quizzesConnection" do
+      before do
+        @quiz_1 = course.quizzes.create!(title: "asdf", quiz_type: "assignment")
+        @quiz_2 = course.quizzes.create!(title: "asdf2", quiz_type: "assignment")
+        @quiz_3 = course.quizzes.create!(title: "asdf3", quiz_type: "assignment")
+      end
+
+      it "returns quizzes" do
+        expect(
+          course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @teacher)
+        ).to eq [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
+      end
+
+      context "searchTerm" do
+        it "returns quizzes with general search term" do
+          expect(
+            course_type.resolve("quizzesConnection(filter: { searchTerm: \"asdf\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
+        end
+
+        it "returns quizzes with specific search term" do
+          expect(
+            course_type.resolve("quizzesConnection(filter: { searchTerm: \"asdf2\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@quiz_2.id.to_s]
+        end
+      end
+
+      context "as a student" do
+        it "returns quizzes" do
+          expect(
+            course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @student)
+          ).to eq [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
+        end
+
+        it "returns only quizzes assigned to the student" do
+          new_section = course.course_sections.create!(name: "new section")
+          @quiz_1.assignment_overrides.create!(course_section: new_section)
+          @quiz_1.update!(only_visible_to_overrides: true)
+          expect(
+            course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @student)
+          ).to eq [@quiz_2.id.to_s, @quiz_3.id.to_s]
+        end
+      end
+
+      context "userId filter" do
+        it "returns unauthorized code when user is not allowed to act as another user" do
+          expect_error = "You do not have permission to view this course."
+          expect do
+            course_type.resolve("quizzesConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @student)
+          end.to raise_error(GraphQLTypeTester::Error, /#{Regexp.escape(expect_error)}/)
+        end
+
+        it "returns quizzes for the given user" do
+          expect(
+            course_type.resolve("quizzesConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
+        end
+      end
+    end
+
+    context "filesConnection" do
+      before do
+        @file_1 = course.attachments.create!(filename: "asdf", uploaded_data: default_uploaded_data)
+        @file_2 = course.attachments.create!(filename: "asdf2", uploaded_data: default_uploaded_data)
+        @file_3 = course.attachments.create!(filename: "asdf3", uploaded_data: default_uploaded_data)
+      end
+
+      it "returns files" do
+        expect(
+          course_type.resolve("filesConnection { edges { node { _id } } }", current_user: @teacher)
+        ).to eq [@file_1.id.to_s, @file_2.id.to_s, @file_3.id.to_s]
+      end
+
+      context "search" do
+        it "returns files with general search term" do
+          expect(
+            course_type.resolve("filesConnection(filter: { searchTerm: \"asdf\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@file_1.id.to_s, @file_2.id.to_s, @file_3.id.to_s]
+        end
+
+        it "returns files with specific search term" do
+          expect(
+            course_type.resolve("filesConnection(filter: { searchTerm: \"asdf2\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@file_2.id.to_s]
+        end
+      end
+
+      context "userId filter" do
+        it "returns unauthorized code when user is not allowed to act as another user" do
+          expect_error = "You do not have permission to view this course."
+          expect do
+            course_type.resolve("filesConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @student)
+          end.to raise_error(GraphQLTypeTester::Error, /#{Regexp.escape(expect_error)}/)
+        end
+
+        it "returns files for the given user" do
+          expect(
+            course_type.resolve("filesConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @teacher)
+          ).to eq [@file_1.id.to_s, @file_2.id.to_s, @file_3.id.to_s]
+        end
       end
     end
   end

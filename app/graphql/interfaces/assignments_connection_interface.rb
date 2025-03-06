@@ -14,14 +14,22 @@ module Interfaces::AssignmentsConnectionInterface
       the current grading period. Pass `null` to return all assignments
       (irrespective of the assignment's grading period)
     MD
+    argument :search_term, String, <<~MD, required: false
+      only return assignments whose title matches this search term
+    MD
   end
 
-  def assignments_scope(course, grading_period_id, has_grading_periods = nil, user_id = nil)
+  def assignments_scope(course, grading_period_id, has_grading_periods = nil, user_id = nil, search_term = nil)
     scoped_user = user_id.nil? ? current_user : User.find(user_id)
     assignments = Assignments::ScopedToUser.new(course, scoped_user).scope
     unless can_current_user_read_given_user_submissions(course, scoped_user)
       # current_user lacks permissions to view the submissions of the scoped_user
       return assignments.none
+    end
+
+    # Apply search term filter if provided
+    if search_term.present?
+      assignments = assignments.where(Assignment.wildcard(:title, search_term))
     end
 
     if grading_period_id
@@ -52,16 +60,16 @@ module Interfaces::AssignmentsConnectionInterface
     argument :filter, AssignmentFilterInputType, required: false
   end
 
-  def assignments_connection(filter: {}, course:)
+  def assignments_connection(course:, filter: {})
     if filter.key?(:grading_period_id) || filter.key?(:user_id)
-      apply_order(
-        assignments_scope(course, filter[:grading_period_id], nil, filter[:user_id])
+      apply_assignment_order(
+        assignments_scope(course, filter[:grading_period_id], nil, filter[:user_id], filter[:search_term])
       )
     else
       Loaders::CurrentGradingPeriodLoader.load(course)
                                          .then do |gp, has_grading_periods|
-        apply_order(
-          assignments_scope(course, gp&.id, has_grading_periods, filter[:user_id])
+        apply_assignment_order(
+          assignments_scope(course, gp&.id, has_grading_periods, filter[:user_id], filter[:search_term])
         )
       end
     end
@@ -74,7 +82,7 @@ module Interfaces::AssignmentsConnectionInterface
     is_current_user || course_submission_read_permissions || observer_permissions
   end
 
-  def apply_order(assignments)
+  def apply_assignment_order(assignments)
     # we could force the types that implement assignment_scope to implement
     # this method but i don't think there's going to be any more and this seems
     # a lot more straigthforward
@@ -83,11 +91,11 @@ module Interfaces::AssignmentsConnectionInterface
       assignments.except(:order).ordered
     when Types::CourseType
       assignments
-        .joins(:assignment_group).
+        .joins(:assignment_group)
         # this +select+ is necessary because the assignments scope may be DISTINCT
-        select("assignments.*, assignment_groups.position AS group_position")
+        .select("assignments.*, assignment_groups.position AS group_position")
         .reorder(:group_position, :position, :id)
     end
   end
-  private :apply_order
+  private :apply_assignment_order
 end
