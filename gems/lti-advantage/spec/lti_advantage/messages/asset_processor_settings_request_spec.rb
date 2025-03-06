@@ -57,6 +57,15 @@ module LtiAdvantage::Messages
       end
     end
 
+    it "does not override superclass memoized methods with attr_accessors" do
+      subject.instance_variable_set(:@activity, nil)
+      expect(subject.activity).to be_a(LtiAdvantage::Claims::Activity)
+      subject.instance_variable_set(:@context, nil)
+      expect(subject.context).to be_a(LtiAdvantage::Claims::Context)
+      subject.instance_variable_set(:@roles, nil)
+      expect(subject.roles).to be_a(Array)
+    end
+
     describe "#initialize" do
       it "sets fields correctly" do
         valid_params.each do |key, value|

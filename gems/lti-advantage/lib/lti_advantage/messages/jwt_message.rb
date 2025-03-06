@@ -38,7 +38,8 @@ module LtiAdvantage::Messages
       tool_platform: LtiAdvantage::Claims::Platform,
       roles: Array,
       role_scope_mentor: Array,
-      lti1p1: LtiAdvantage::Claims::Lti1p1
+      lti1p1: LtiAdvantage::Claims::Lti1p1,
+      activity: LtiAdvantage::Claims::Activity
     }.freeze
 
     attr_accessor(*(REQUIRED_CLAIMS + OPTIONAL_CLAIMS))
@@ -117,6 +118,10 @@ module LtiAdvantage::Messages
 
     def lti1p1
       @lti1p1 ||= TYPED_ATTRIBUTES[:lti1p1].new
+    end
+
+    def activity
+      @activity ||= TYPED_ATTRIBUTES[:activity].new
     end
 
     def read_attribute(attribute)
