@@ -84,6 +84,13 @@ describe('QuizIPFilters', () => {
     expect(typeof parentDiv!.__performValidation).toBe('function')
   })
 
+  it('adds screenreader text to the Add Filter button', async () => {
+    const {getByTestId} = renderComponent([])
+    const addFilter = getByTestId('add-ip-filter')
+    await new Promise(resolve => requestAnimationFrame(resolve)) // wait for InstUI to settle down
+    expect(addFilter.attributes.getNamedItem('aria-label')?.value).toBe('Add a quiz IP filter')
+  })
+
   it('lets you create new filters', async () => {
     const {getByTestId} = renderComponent([])
     const addFilter = getByTestId('add-ip-filter')
