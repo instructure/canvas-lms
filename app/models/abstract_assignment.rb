@@ -4163,6 +4163,26 @@ class AbstractAssignment < ActiveRecord::Base
     true
   end
 
+  def stickers_enabled?(current_user)
+    return false unless context.feature_enabled?(:submission_stickers) && a2_enabled?
+
+    [:moderator, :provisional_grader].exclude?(grading_role(current_user))
+  end
+
+  # NOTE: this method assumes the call site has made appropriate authorization checks
+  # beforehand to ensure the current_user has permission to grade the student
+  def grading_role(current_user)
+    if moderated_grading_enabled_and_no_grades_published?
+      permits_moderation?(current_user) ? :moderator : :provisional_grader
+    else
+      :grader
+    end
+  end
+
+  def moderated_grading_enabled_and_no_grades_published?
+    moderated_grading? && !grades_published?
+  end
+
   def self.disable_post_to_sis_if_grading_period_closed
     eligible_root_accounts = Account.root_accounts.active.select do |account|
       account.feature_enabled?(:disable_post_to_sis_when_grading_period_closed) &&

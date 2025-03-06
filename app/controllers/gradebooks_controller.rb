@@ -1055,6 +1055,7 @@ class GradebooksController < ApplicationController
       remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
 
       env = {
+        A2_STUDENT_ENABLED: @context.is_a?(Assignment) ? @context.a2_enabled? : nil,
         COMMENT_LIBRARY_FEATURE_ENABLED:
           @context.root_account.feature_enabled?(:assignment_comment_library),
         EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
@@ -1063,6 +1064,7 @@ class GradebooksController < ApplicationController
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
         RESTRICT_QUANTITATIVE_DATA_ENABLED: @context.restrict_quantitative_data?(@current_user),
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
+        STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),
         course_id: @context.id,
         late_policy: @context.late_policy&.as_json(include_root: false),
       }
@@ -1095,7 +1097,7 @@ class GradebooksController < ApplicationController
 
     respond_to do |format|
       format.html do
-        grading_role_for_user = grading_role(assignment: @assignment)
+        grading_role_for_user = @assignment.grading_role(@current_user)
         rubric = @assignment&.rubric_association&.rubric
         @headers = false
         @outer_frame = true
@@ -1217,7 +1219,7 @@ class GradebooksController < ApplicationController
           @assignment,
           @current_user,
           avatars: service_enabled?(:avatars),
-          grading_role: grading_role(assignment: @assignment)
+          grading_role: @assignment.grading_role(@current_user)
         ).json
       end
     end
@@ -1622,10 +1624,6 @@ class GradebooksController < ApplicationController
     )
   end
 
-  def moderated_grading_enabled_and_no_grades_published?
-    @assignment.moderated_grading? && !@assignment.grades_published?
-  end
-
   def exclude_total?(context)
     return true if context.hide_final_grades
     return false unless grading_periods? && view_all_grading_periods?
@@ -1737,18 +1735,6 @@ class GradebooksController < ApplicationController
         default_to_null_grade: false
       )
       submission.apply_provisional_grade_filter!(provisional_grade) if provisional_grade
-    end
-  end
-
-  def grading_role(assignment:)
-    if moderated_grading_enabled_and_no_grades_published?
-      if assignment.permits_moderation?(@current_user)
-        :moderator
-      else
-        :provisional_grader
-      end
-    else
-      :grader
     end
   end
 

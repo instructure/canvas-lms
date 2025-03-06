@@ -110,6 +110,8 @@ module Interfaces::SubmissionInterface
   end
   private :protect_submission_grades
 
+  field :anonymous_id, ID, null: true
+
   field :assignment, Types::AssignmentType, null: true
   def assignment
     load_association(:assignment)

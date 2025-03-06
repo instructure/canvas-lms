@@ -55,8 +55,7 @@ class RubricAssessmentImportsController < ApplicationController
     end
 
     begin
-      grading_role = grading_role(assignment)
-
+      grading_role = assignment.grading_role(@current_user)
       provisional = [:moderator, :provisional_grader].include?(grading_role)
 
       ensure_adjudication_possible(provisional:) do
@@ -78,22 +77,6 @@ class RubricAssessmentImportsController < ApplicationController
   end
 
   private
-
-  def moderated_grading_enabled_and_no_grades_published?(assignment)
-    assignment.moderated_grading? && !assignment.grades_published?
-  end
-
-  def grading_role(assignment)
-    if moderated_grading_enabled_and_no_grades_published?(assignment)
-      if assignment.permits_moderation?(@current_user)
-        :moderator
-      else
-        :provisional_grader
-      end
-    else
-      :grader
-    end
-  end
 
   def ensure_adjudication_possible(provisional:, &)
     # Non-assignment association objects crash if they're passed into this
