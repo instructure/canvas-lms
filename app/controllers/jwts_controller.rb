@@ -39,29 +39,31 @@ class JwtsController < ApplicationController
   before_action :require_user, :require_non_jwt_auth
   before_action :require_access_token, only: :create, if: :audience_requested?
   before_action :validate_requested_audience, only: :create, if: :audience_requested?
+  before_action :require_authorized_context, only: :create, if: :workflows_require_context?
 
   # @API Create JWT
   #
-  # Create a unique jwt for using with other Canvas services
+  # Create a unique JWT for use with other Canvas services
   #
-  # Generates a different JWT each time it's called, each one expires
+  # Generates a different JWT each time it's called. Each JWT expires
   # after a short window (1 hour)
   #
   # @argument workflows[] [String]
   #   Adds additional data to the JWT to be used by the consuming service workflow
   #
   # @argument context_type [Optional, String, "Course"|"User"|"Account"]
-  #   The type of the context in case a specified workflow uses it to consuming the service. Case insensitive.
+  #   The type of the context to generate the JWT for, in case the workflow requires it. Case insensitive.
   #
   # @argument context_id [Optional, Integer]
-  #   The id of the context in case a specified workflow uses it to consuming the service.
+  #   The id of the context to generate the JWT for, in case the workflow requires it.
   #
   # @argument context_uuid [Optional, String]
-  #   The uuid of the context in case a specified workflow uses it to consuming the service.
+  #   The uuid of the context to generate the JWT for, in case the workflow requires it. Note that context_id
+  #   and context_uuid are mutually exclusive. If both are provided, an error will be returned.
   #
   # @argument canvas_audience [Optional, Boolean]
   #   Defaults to true. If false, the JWT will be signed, but not encrypted, for use in downstream services. The
-  #   default encrypted behaviour can be used to talk to canvas itself.
+  #   default encrypted behaviour can be used to talk to Canvas itself.
   #
   # @example_request
   #   curl 'https://<canvas>/api/v1/jwts' \
@@ -71,16 +73,6 @@ class JwtsController < ApplicationController
   #
   # @returns JWT
   def create
-    workflows = params[:workflows]
-
-    if workflows_require_context?(workflows)
-      init_context
-      return render json: { error: @error }, status: :bad_request if @error
-      return render json: { error: "Context not found." }, status: :not_found unless @context
-      return unless authorized_action(@context, @current_user, :read)
-    end
-    # TODO: remove this once we teach all consumers to consume the asymmetric ones
-    symmetric = workflows_require_symmetric_encryption?(workflows)
     domain = request.host_with_port
     audience = requested_audience if audience_requested?
 
@@ -89,8 +81,8 @@ class JwtsController < ApplicationController
       @current_user,
       real_user: @real_current_user,
       workflows:,
-      context: @context,
-      symmetric:,
+      context:,
+      symmetric: symmetric?,
       encrypt: encrypt?,
       audience:,
       root_account_uuid: @domain_root_account.uuid
@@ -150,38 +142,36 @@ class JwtsController < ApplicationController
 
   private
 
-  def workflows_require_context?(workflows)
-    workflows.is_a?(Array) && workflows.include?("rich_content")
+  def workflows_require_context?
+    workflows.is_a?(Array) && workflows.any? { |workflow| CanvasSecurity::JWTWorkflow.workflow_requires_context?(workflow) }
   end
 
-  def workflows_require_symmetric_encryption?(workflows)
-    # TODO: remove this once we teach the rcs to consume the asymmetric ones
-    workflows.is_a?(Array) && workflows.include?("rich_content")
+  def workflows
+    params[:workflows]
   end
 
-  def init_context
+  def require_authorized_context
     context_type = params[:context_type]
     context_id = params[:context_id]
     context_uuid = params[:context_uuid]
 
-    return @error = "Missing context_type parameter." unless context_type.present?
-    return @error = "Missing context_id or context_uuid parameter." unless context_id.present? || context_uuid.present?
-    return @error = "Should provide context_id or context_uuid parameters, but not both." if context_id.present? && context_uuid.present?
+    return render_error("Missing context_type parameter.") unless context_type.present?
+    return render_error("Missing context_id or context_uuid parameter.") unless context_id.present? || context_uuid.present?
+    return render_error("Should provide context_id or context_uuid parameters, but not both.") if context_id.present? && context_uuid.present?
 
-    context_class = Course if context_type.casecmp("Course").zero?
-    context_class = User if context_type.casecmp("User").zero?
-    context_class = Account if context_type.casecmp("Account").zero?
-    return @error = "Invalid context_type parameter." if context_class.nil?
+    context_class = Course if context_type.casecmp?("Course")
+    context_class = User if context_type.casecmp?("User")
+    context_class = Account if context_type.casecmp?("Account")
 
-    begin
-      @context = if context_id.present?
-                   context_class.find(params[:context_id])
-                 else
-                   context_class.find_by(uuid: params[:context_uuid])
-                 end
-    rescue ActiveRecord::RecordNotFound
-      @context = nil
-    end
+    return render_error("Invalid context_type parameter.") unless context_class.present?
+
+    @context = if context_id.present?
+                 context_class.find(params[:context_id])
+               else
+                 context_class.find_by!(uuid: params[:context_uuid])
+               end
+
+    require_context_with_permission(@context, :read)
   end
 
   def decrypted_jwt
@@ -194,6 +184,10 @@ class JwtsController < ApplicationController
 
   def user_can_refresh?
     @current_user.root_admin_for?(@domain_root_account) && @access_token.developer_key.internal_service?
+  end
+
+  def render_error(error_message, status = :bad_request)
+    render json: { error: error_message }, status: status
   end
 
   def render_unauthorized
@@ -224,6 +218,10 @@ class JwtsController < ApplicationController
     return false if audience_requested?
 
     params[:canvas_audience].nil? ? true : value_to_boolean(params[:canvas_audience])
+  end
+
+  def symmetric?
+    workflows.is_a?(Array) && workflows.any? { |workflow| CanvasSecurity::JWTWorkflow.workflow_requires_symmetric_encryption?(workflow) }
   end
 
   def audience_requested?
