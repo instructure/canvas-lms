@@ -4805,17 +4805,17 @@ ga:
   calendar_frequency_picker: 
     annually: "Gach bliain ar an %{date} %{month}"
     custom: Saincheaptha...
-    daily: Laethúil
-    every_weekday: "Gach lá i rith na seachtaine (Luan go hAoine)"
+    daily: "Go laethúil"
+    every_weekday: "Gach lá den tseachtain (Luan go hAoine)"
     first: céad
     fourth: ceathrú
     frequency: Minicíocht
     last: deireanach
-    monthly_last_day: "Míosa ar an %{weekNumber} %{day}"
-    not_repeat: "Ná athdhéan"
+    monthly_last_day: "Go míosúil ar an %{weekNumber} %{day}"
+    not_repeat: "Uair amháin"
     second: dara
     third: tríú
-    weekly_day: "Seachtainiúil ar an %{day}"
+    weekly_day: "Go seachtainiúil ar an %{day}"
   calendar_removed_1c841af4: "Baineadh an féilire"
   calendar_series_e1b7a4bc: "Sraith Féilire"
   calendars: 
