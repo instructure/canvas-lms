@@ -24,6 +24,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import type {Product} from '../../models/Product'
 
 describe('Promise resolution', () => {
+  const originalFetch = global.fetch
   let mockedData: Product
   beforeEach(() => {
     mockedData = {
@@ -60,12 +61,16 @@ describe('Promise resolution', () => {
     }
 
     global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
       json: jest.fn().mockResolvedValue(mockedData),
     })
   })
-  
-  // To be resolved in LRN-9531
-  test.skip('Promise resolves successfully when provided a product', async () => {
+
+  afterEach(() => {
+    global.fetch = originalFetch
+  })
+
+  it('Promise resolves successfully when provided a product', async () => {
     const params = () => {
       return {
         filters: {
