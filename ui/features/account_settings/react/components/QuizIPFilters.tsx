@@ -304,6 +304,7 @@ export default function QuizIPFilters({
       ))}
       <Button
         renderIcon={<IconAddLine />}
+        elementRef={elt => elt?.setAttribute('aria-label', I18n.t('Add a quiz IP filter'))}
         margin="small 0"
         onClick={newFilter}
         data-testid="add-ip-filter"
