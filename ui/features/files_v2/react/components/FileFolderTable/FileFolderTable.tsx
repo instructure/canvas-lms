@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useMemo, useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -48,8 +48,12 @@ import BlueprintIconButton from './BlueprintIconButton'
 import {Alert} from '@instructure/ui-alerts'
 import CurrentDownloads from '../FilesHeader/CurrentDownloads'
 import UsageRightsModal from './UsageRightsModal'
+import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
+import FileTableUpload from './FileTableUpload'
 
 const I18n = createI18nScope('files_v2')
+
+const MIN_HEIGHT = 400
 
 const fetchFilesAndFolders = async (
   url: string,
@@ -249,6 +253,11 @@ const FileFolderTable = ({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('asc')
   const [modalOrTrayOptions, _setModalOrTrayOptions] = useState<ModalOrTrayOptions | null>(null)
 
+  const [isDragging, setIsDragging] = useState(false)
+  const [directoryMinHeight, setDirectoryMinHeight] = useState('auto')
+
+  const filesDirectoryRef = useRef<HTMLDivElement | null>(null)
+
   const {data, error, isLoading, isFetching} = useQuery({
     queryKey: ['files', currentUrl],
     queryFn: () => {
@@ -415,6 +424,55 @@ const FileFolderTable = ({
     },
   )
 
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    if (e.dataTransfer?.types.includes('Files')) {
+      e.preventDefault()
+      if (!isDragging) {
+        if (filesDirectoryRef.current && filesDirectoryRef.current.offsetHeight < MIN_HEIGHT) {
+          setDirectoryMinHeight(MIN_HEIGHT + 'px')
+        }
+        setIsDragging(true)
+      }
+      return false
+    } else {
+      return true
+    }
+  }
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    if (filesDirectoryRef.current) {
+      const rect = filesDirectoryRef.current.getBoundingClientRect()
+      if (
+        rect &&
+        (e.clientY < rect.top ||
+          e.clientY >= rect.bottom ||
+          e.clientX < rect.left ||
+          e.clientX >= rect.right)
+      ) {
+        setIsDragging(false)
+        setDirectoryMinHeight('auto')
+      }
+    }
+  }
+
+  const handleDropState = () => {
+    setIsDragging(false)
+    setDirectoryMinHeight('auto')
+  }
+
+  const handleDrop = (
+    accepted: ArrayLike<DataTransferItem | globalThis.File>,
+    rejected: ArrayLike<DataTransferItem | globalThis.File>,
+    e: React.DragEvent<Element>,
+  ) => {
+    e.preventDefault()
+    e.stopPropagation()
+    handleDropState()
+    FileOptionsCollection.setFolder(currentFolder)
+    FileOptionsCollection.setOptionsFromFiles(accepted, true)
+  }
+
   return (
     <>
       {renderModals()}
@@ -423,40 +481,67 @@ const FileFolderTable = ({
         <CurrentUploads />
         <CurrentDownloads rows={rows} />
       </View>
-      <Table caption={tableCaption} hover={true} layout={isStacked ? 'stacked' : 'fixed'}>
-        <Table.Head
-          renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+      <div
+        data-testid="files-directory"
+        ref={filesDirectoryRef}
+        style={{minHeight: rows.length === 0 && !isFetching ? MIN_HEIGHT : directoryMinHeight}}
+        className="files_directory"
+        onDragEnter={e => handleDragEnter(e as React.DragEvent<HTMLDivElement>)}
+        onDragLeave={e => handleDragLeave(e as React.DragEvent<HTMLDivElement>)}
+        onDragOver={e => e.preventDefault()}
+        onDrop={e => handleDropState()}
+      >
+        <Table
+          caption={tableCaption}
+          hover={true}
+          layout={isStacked ? 'stacked' : 'fixed'}
+          data-testid="files-table"
         >
-          <Table.Row>
-            {renderTableHead(
-              size,
-              allRowsSelected,
-              someRowsSelected,
-              toggleSelectAll,
-              isStacked,
+          <Table.Head
+            renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+          >
+            <Table.Row>
+              {renderTableHead(
+                size,
+                allRowsSelected,
+                someRowsSelected,
+                toggleSelectAll,
+                isStacked,
+                filteredColumns,
+                sortColumn,
+                sortDirection,
+                handleColumnHeaderClick,
+              )}
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {renderTableBody(
+              rows,
               filteredColumns,
-              sortColumn,
-              sortDirection,
-              handleColumnHeaderClick,
+              selectedRows,
+              size,
+              isStacked,
+              columnRenderers,
+              toggleRowSelection,
+              userCanEditFilesForContext,
+              userCanDeleteFilesForContext,
+              usageRightsRequiredForContext,
+              setModalOrTrayOptions,
             )}
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          {renderTableBody(
-            rows,
-            filteredColumns,
-            selectedRows,
-            size,
-            isStacked,
-            columnRenderers,
-            toggleRowSelection,
-            userCanEditFilesForContext,
-            userCanDeleteFilesForContext,
-            usageRightsRequiredForContext,
-            setModalOrTrayOptions,
-          )}
-        </Table.Body>
-      </Table>
+            {!isFetching && userCanEditFilesForContext && !isStacked && (
+              <Table.Row data-upload>
+                <Table.Cell upload-cell>
+                  <FileTableUpload
+                    currentFolder={currentFolder!}
+                    isDragging={isDragging}
+                    handleDrop={handleDrop}
+                  />
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table>
+      </div>
       <SubTableContent
         isLoading={isLoading || isFetching}
         isEmpty={rows.length === 0 && !isFetching}
