@@ -24,39 +24,21 @@ import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf, disableIf */
 import 'jqueryui/progressbar'
 
-import ReactDOM from 'react-dom'
-import {openModal, renderBatchImportAlert} from '../react/ConfirmationModal'
+import ReactDOM from 'react-dom/client'
+import SisImportForm from '../react/SisImportForm'
+import {QueryProvider} from '@canvas/query'
 
 const I18n = createI18nScope('sis_import')
 
 $(document).ready(function (_event) {
+  const mountNode = document.getElementById('attachment_mount')
+  const root = ReactDOM.createRoot(mountNode)
+  root.render(
+    <QueryProvider>
+      <SisImportForm onSuccess={onSuccess} />
+    </QueryProvider>,
+  )
   let state = 'nothing'
-
-  renderBatchImportAlert('small 0')
-
-  $('#batch_mode')
-    .change(function (__event) {
-      $('#batch_mode_term_id_label').showIf($(this).prop('checked'))
-      $('#batch_mode_term_id').showIf($(this).prop('checked'))
-    })
-    .change()
-
-  const $override_sis_stickiness = $('#override_sis_stickiness')
-  const $add_sis_stickiness = $('#add_sis_stickiness')
-  const $clear_sis_stickiness = $('#clear_sis_stickiness')
-  const $add_sis_stickiness_container = $('#add_sis_stickiness_container')
-  const $clear_sis_stickiness_container = $('#clear_sis_stickiness_container')
-  function updateSisCheckboxes(__event) {
-    $add_sis_stickiness_container.showIf($override_sis_stickiness.prop('checked'))
-    $clear_sis_stickiness_container.showIf($override_sis_stickiness.prop('checked'))
-    $add_sis_stickiness.disableIf($clear_sis_stickiness.prop('checked'))
-    $clear_sis_stickiness.disableIf($add_sis_stickiness.prop('checked'))
-  }
-
-  $override_sis_stickiness.change(updateSisCheckboxes)
-  $add_sis_stickiness.change(updateSisCheckboxes)
-  $clear_sis_stickiness.change(updateSisCheckboxes)
-  updateSisCheckboxes(null)
 
   function createMessageHtml(batch) {
     let output = ''
@@ -323,49 +305,19 @@ $(document).ready(function (_event) {
     setTimeout(tick, 1000)
   }
 
-  const submitModal = () => {
-    $('#safe_to_submit').val('true')
-    $('#sis_importer').submit()
-    ReactDOM.unmountComponentAtNode(document.getElementById('confirmation_modal_root'))
-  }
-  const closeModal = () => {
-    $('#safe_to_submit').val('false')
-    ReactDOM.unmountComponentAtNode(document.getElementById('confirmation_modal_root'))
-  }
-
-  $('#sis_importer').formSubmit({
-    fileUpload: true,
-    beforeSubmit(data) {
-      let shouldSubmit = true
-      if (data.batch_mode && data.safe_to_submit === 'false') {
-        // Prevent normal form submission. Instead, we will render a modal. Rending the modal happens asynchronously. In
-        // other words `openModal` is not blocking. The way we pass data back from the instUI modal is via a hidden
-        // form field.
-        shouldSubmit = false
-        openModal(submitModal, closeModal) // open the modal
-      }
-      return shouldSubmit
-    },
-    success(data) {
-      if (data && data.id) {
+  function onSuccess(data) {
+    root.render(null)
+    if (data && data.id) {
+      startPoll()
+    } else {
+      // show error message
+      $('.sis_messages .sis_error_message').text(data.error_message)
+      $('.sis_messages').show()
+      if (data.batch_in_progress) {
         startPoll()
-      } else {
-        // show error message
-        $('.sis_messages .sis_error_message').text(data.error_message)
-        $('.sis_messages').show()
-        if (data.batch_in_progress) {
-          startPoll()
-        }
       }
-    },
-    error(data) {
-      $(this)
-        .find('.submit_button')
-        .prop('disabled', false)
-        .text(I18n.t('buttons.process_data', 'Process Data'))
-      $(this).formErrors(data)
-    },
-  })
+    }
+  }
 
   function check_if_importing() {
     state = 'checking'
