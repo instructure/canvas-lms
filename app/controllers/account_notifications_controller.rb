@@ -98,6 +98,9 @@ class AccountNotificationsController < ApplicationController
   # @argument include_all  [Boolean]
   #   Include all global announcements, regardless of user's role or availability date. Only available to account admins.
   #
+  # @argument show_is_closed [Boolean]
+  #   Include a flag for each notification indicating whether it has been read by the user.
+  #
   # @example_request
   #   curl -H 'Authorization: Bearer <token>' \
   #   https://<canvas>/api/v1/accounts/2/users/self/account_notifications
@@ -106,6 +109,7 @@ class AccountNotificationsController < ApplicationController
   def user_index
     # include_past is used for obtaining notification from the last 4 months
     include_near_past = value_to_boolean(params[:include_past])
+    show_is_closed = value_to_boolean(params[:show_is_closed])
     include_all = value_to_boolean(params[:include_all])
     admin = false
 
@@ -117,6 +121,19 @@ class AccountNotificationsController < ApplicationController
                     else
                       AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_near_past:)
                     end
+
+    if show_is_closed
+      closed_ids = @current_user.get_preference(:closed_notifications) || []
+
+      notifications_json = notifications.map do |notification|
+        notification_json = account_notification_json(notification, @current_user, session, display_author: admin)
+        notification_json[:closed] = closed_ids.include?(notification.id)
+        notification_json
+      end
+
+      render json: notifications_json and return
+    end
+
     render json: account_notifications_json(notifications, @current_user, session, display_author: admin)
   end
 

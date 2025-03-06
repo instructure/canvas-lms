@@ -107,6 +107,35 @@ describe "Account Notification API", type: :request do
       json = api_call(:get, @path, @api_params)
       expect(json.length).to eq 1
     end
+
+    describe "show_is_closed param" do
+      before do
+        @api_params = { controller: "account_notifications",
+                        action: "user_index",
+                        format: "json",
+                        account_id: @user.account.id.to_s,
+                        include_all: true,
+                        show_is_closed: true }
+        @notification = account_notification(message: "show_is_closed")
+      end
+
+      it "includes closed flag for notifications when show_is_closed is true" do
+        @user.close_announcement(@notification)
+        json = api_call(:get, @path, @api_params)
+        expect(json.length).to eq 2
+        expect(json.first["closed"]).to be true
+        expect(json.second["closed"]).to be false
+      end
+
+      it "does not include closed flag for notifications when show_is_closed is false" do
+        @user.close_announcement(@notification)
+        json = api_call(:get, @path, @api_params.merge(show_is_closed: false))
+        puts json
+        expect(json.length).to eq 2
+        expect(json.first["closed"]).to be_nil
+        expect(json.second["closed"]).to be_nil
+      end
+    end
   end
 
   describe "show" do
