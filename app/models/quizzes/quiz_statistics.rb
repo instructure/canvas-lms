@@ -64,7 +64,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   end
 
   # Generates or returns the previously generated CSV version of this report.
-  def generate_csv
+  def generate_csv(user = nil)
     self.csv_attachment ||= begin
       attachment = build_csv_attachment(
         content_type: "text/csv",
@@ -75,7 +75,8 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
                           report_type: readable_type
                         }) + ".csv"
       )
-      Attachments::Storage.store_for_attachment(attachment, StringIO.new(report.to_csv))
+      csv_options = user ? CSVWithI18n.csv_i18n_settings(user) : {}
+      Attachments::Storage.store_for_attachment(attachment, StringIO.new(report.to_csv(csv_options)))
       attachment.save!
       attachment
     end
@@ -83,7 +84,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
   # Queues a job for generating the CSV version of this report unless a job has
   # already been queued, or the attachment had been generated previously.
-  def generate_csv_in_background
+  def generate_csv_in_background(user = nil)
     return if csv_attachment.present? || progress.present?
 
     build_progress
@@ -95,11 +96,11 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
     progress.process_job(self, :__process_csv_job, {
                            strand: csv_job_strand_id
-                         })
+                         }, user)
   end
 
-  def __process_csv_job(_progress)
-    generate_csv
+  def __process_csv_job(_progress, user = nil)
+    generate_csv(user)
   end
 
   # Whether the CSV attachment is currently being generated, or is about to be.
