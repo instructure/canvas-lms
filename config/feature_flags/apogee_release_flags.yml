@@ -333,6 +333,7 @@ platform_service_speedgrader:
   applies_to: Course
   display_name: Modernized SpeedGrader Platform
   description: This feature provides a new SpeedGrader platform experience with a focus on improved performance for large courses.
+  after_state_change_proc: log_modernized_speedgrader_metrics
   environments:
     ci:
       state: allowed

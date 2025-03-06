@@ -1046,7 +1046,12 @@ class GradebooksController < ApplicationController
                   else
                     @context.assignments.active.find(params[:assignment_id])
                   end
-    platform_service_speedgrader_enabled = platform_service_speedgrader_enabled?(params)
+
+    platform_speedgrader_param_enabled = query_params_allow_platform_service_speedgrader?(params)
+    platform_speedgrader_feature_enabled = platform_service_speedgrader_enabled?
+    track_speedgrader_metrics(platform_speedgrader_param_enabled, platform_speedgrader_feature_enabled)
+    platform_service_speedgrader_enabled = platform_speedgrader_param_enabled && platform_speedgrader_feature_enabled
+
     if platform_service_speedgrader_enabled
       InstStatsd::Statsd.increment("speedgrader.platform_service.load")
       @page_title = t("SpeedGrader")
@@ -1441,7 +1446,7 @@ class GradebooksController < ApplicationController
 
   private
 
-  def platform_service_speedgrader_enabled?(params)
+  def platform_service_speedgrader_enabled?
     return false unless @context.feature_enabled?(:platform_service_speedgrader)
 
     if @assignment.present?
@@ -1450,6 +1455,10 @@ class GradebooksController < ApplicationController
 
     return false if Services::PlatformServiceSpeedgrader.launch_url.blank?
 
+    true
+  end
+
+  def query_params_allow_platform_service_speedgrader?(params)
     params[:platform_sg].nil? || value_to_boolean(params[:platform_sg])
   end
 
@@ -1774,6 +1783,16 @@ class GradebooksController < ApplicationController
   def track_update_metrics(params, submission)
     if params.dig(:submission, :grade) && params["submission"]["grade"].to_s != submission.grade.to_s && params["originator"] == "speed_grader"
       InstStatsd::Statsd.increment("speedgrader.submission.posted_grade")
+    end
+  end
+
+  def track_speedgrader_metrics(param_enabled, feature_enabled)
+    if param_enabled && feature_enabled
+      InstStatsd::Statsd.increment("speedgrader.modernized.load")
+    elsif feature_enabled
+      InstStatsd::Statsd.increment("speedgrader.legacy.load.fallback")
+    else
+      InstStatsd::Statsd.increment("speedgrader.legacy.load")
     end
   end
 end
