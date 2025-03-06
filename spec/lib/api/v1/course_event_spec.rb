@@ -52,6 +52,8 @@ describe Api::V1::CourseEvent do
                           })
     end
 
+    @sis_batch_id = 1
+
     allow(PageView).to receive_messages(
       find_by: @page_view,
       find_all_by_id: [@page_view]
@@ -63,7 +65,7 @@ describe Api::V1::CourseEvent do
       @course.start_at = Time.zone.today + index.days
       @course.conclude_at = @course.start_at + 7.days
 
-      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes, source: :api)
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes, { source: :api, sis_batch_id: @sis_batch_id })
       @events << @event
     end
   end
@@ -79,9 +81,10 @@ describe Api::V1::CourseEvent do
 
     expect(event[:links].keys.sort).to eq %i[course page_view sis_batch user]
 
-    expect(event[:links][:course]).to eq Shard.relative_id_for(@course, Shard.current, Shard.current)
-    expect(event[:links][:page_view]).to eq @page_view.id
-    expect(event[:links][:user]).to eq Shard.relative_id_for(@teacher, Shard.current, Shard.current)
+    expect(event[:links][:course]).to eq Shard.relative_id_for(@course, Shard.current, Shard.current).to_s
+    expect(event[:links][:page_view]).to eq @page_view.id.to_s
+    expect(event[:links][:user]).to eq Shard.relative_id_for(@teacher, Shard.current, Shard.current).to_s
+    expect(event[:links][:sis_batch]).to eq Shard.relative_id_for(@sis_batch_id, Shard.current, Shard.current).to_s
   end
 
   it "is formatted as an array of course content event hashes" do
