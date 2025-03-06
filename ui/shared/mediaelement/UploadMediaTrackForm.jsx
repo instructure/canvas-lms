@@ -29,7 +29,7 @@ const I18n = createI18nScope('UploadMediaTrackForm')
 
 export default class UploadMediaTrackForm {
   // video url needs to be the url to mp4 version of the video.
-  constructor(mediaCommentId, video_url, attachmentId = null, lockedMediaAttachment = false) {
+  constructor(mediaCommentId, video_url, attachmentId = null, lockedMediaAttachment = false, zIndex = 1000) {
     this.mediaCommentId = mediaCommentId
     this.video_url = video_url
     this.attachmentId = attachmentId
@@ -59,7 +59,7 @@ export default class UploadMediaTrackForm {
           },
         ],
         modal: true,
-        zIndex: 1000,
+        zIndex,
       })
 
     ReactDOM.render(
