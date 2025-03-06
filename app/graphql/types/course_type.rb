@@ -170,6 +170,26 @@ module Types
       super(filter:, course:)
     end
 
+    implements Interfaces::QuizzesConnectionInterface
+    def quizzes_connection(filter: {})
+      super(filter:, course:)
+    end
+
+    implements Interfaces::FilesConnectionInterface
+    def files_connection(filter: {})
+      super(filter:, course:)
+    end
+
+    implements Interfaces::PagesConnectionInterface
+    def pages_connection(filter: {})
+      super(filter:, course:)
+    end
+
+    implements Interfaces::DiscussionsConnectionInterface
+    def discussions_connection(filter: {})
+      super(filter:, course:)
+    end
+
     field :account, AccountType, null: true
     def account
       load_association(:account)

@@ -29,4 +29,49 @@ module Interfaces::ModuleItemInterface
       end
     end
   end
+
+  field :title, String, null: true
+  delegate :title, to: :@object
+
+  field :type, String, null: true
+  def type
+    @object.class.name
+  end
+
+  field :points_possible, Float, null: true
+  def points_possible
+    @object.try(:points_possible)
+  end
+
+  field :published, Boolean, null: true do
+    description "Whether the module item is published"
+  end
+  def published
+    # Handle different content types
+    case object
+    when ContentTag
+      object.content.published?
+    when Assignment, DiscussionTopic, WikiPage, Quizzes::Quiz, Attachment
+      object.published?
+    else
+      # Default fallback
+      true
+    end
+  end
+
+  field :can_unpublish, Boolean, null: true do
+    description "Whether the module item can be unpublished"
+  end
+  def can_unpublish
+    # Handle different content types
+    case object
+    when ContentTag
+      object.content.can_unpublish?
+    when Assignment, DiscussionTopic, WikiPage, Quizzes::Quiz, Attachment
+      object.can_unpublish?
+    else
+      # Default fallback
+      true
+    end
+  end
 end
