@@ -703,6 +703,13 @@ describe Types::SubmissionType do
       ).to eq [1, 2, 3]
     end
 
+    it "allows fetching anonymousId on histories" do
+      anon_id = @submission3.anonymous_id
+      expect(
+        submission_history_type.resolve("submissionHistoriesConnection { nodes { anonymousId }}")
+      ).to eq [anon_id, anon_id, anon_id]
+    end
+
     it "properly handles cursors for submission histories" do
       expect(
         submission_history_type.resolve("submissionHistoriesConnection { edges { cursor }}")
