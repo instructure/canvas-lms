@@ -171,6 +171,13 @@ rce_transform_loaded_content:
     ci:
       state: allowed_on
 
+hidden_attachments_replacement_chain:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Hidden Attachments Replacement Chain
+  description: |-
+    Enables that hidden attachments will be included into the replacement chain.
+
 reset_uuid_on_course_reset:
   state: allowed_on
   display_name: Reset UUID on Course Reset
