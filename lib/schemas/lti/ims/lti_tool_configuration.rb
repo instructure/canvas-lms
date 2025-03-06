@@ -57,7 +57,9 @@ module Schemas::Lti::IMS
             "type" => "string",
             "enum" =>
               Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) +
-              Lti::ResourcePlacement::PLACEMENTS.map { |p| Lti::ResourcePlacement.add_extension_prefix(p) } + [
+              Lti::ResourcePlacement::PLACEMENTS.map do |p|
+                Lti::ResourcePlacement.add_extension_prefix_if_necessary(p)
+              end + [
                 Lti::ResourcePlacement::CONTENT_AREA,
                 Lti::ResourcePlacement::RICH_TEXT_EDITOR
               ]

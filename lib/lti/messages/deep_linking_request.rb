@@ -128,13 +128,19 @@ module Lti::Messages
 
     def generate_post_payload_message(validate_launch: true)
       add_deep_linking_request_claims!
+      add_asset_processor_request_claims!
       super
     end
 
     private
 
+    def add_asset_processor_request_claims!
+      return if placement != Lti::ResourcePlacement::ASSET_PROCESSOR
+
+      @message.activity.id = lti_assignment_id if lti_assignment_id
+    end
+
     def add_deep_linking_request_claims!
-      lti_assignment_id = Lti::Security.decoded_lti_assignment_id(@expander.controller&.params&.[]("secure_params"))
       assignment = Assignment.find_by(lti_context_id: lti_assignment_id) if lti_assignment_id
       content_item_id = @expander.collaboration&.id
       @message.deep_linking_settings.deep_link_return_url = return_url(assignment&.id, content_item_id)
@@ -147,6 +153,10 @@ module Lti::Messages
 
     def placement
       @opts[:resource_type]
+    end
+
+    def lti_assignment_id
+      @expander.lti_assignment_id_from_secure_params
     end
 
     def return_url(assignment_id = nil, content_item_id = nil)
