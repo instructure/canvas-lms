@@ -1640,6 +1640,96 @@ describe Course do
     expect { Marshal.dump(c) }.not_to raise_error
   end
 
+  describe "attatchments" do
+    before do
+      @course_with_attachments = course_factory(course_name: "Attachments")
+      @root_folder = Folder.root_folders(@course_with_attachments).first
+      @deleted_attachment = attachment_with_context(
+        @course_with_attachments,
+        folder: @root_folder,
+        filename: "replaceable.txt",
+        file_state: "deleted",
+        workflow_state: "processed"
+      )
+    end
+
+    describe "find" do
+      context "when the replacement attachment file is hidden" do
+        let(:new_attachment) do
+          attachment_with_context(
+            @course_with_attachments,
+            folder: @root_folder,
+            filename: "replaceable.txt",
+            file_state: "hidden",
+            workflow_state: "processed"
+          )
+        end
+
+        before do
+          @deleted_attachment.replacement_attachment = new_attachment
+          @deleted_attachment.save!
+        end
+
+        context "when the hidden_attachments_replacement_chain site admin flag is enabled" do
+          before do
+            Account.site_admin.enable_feature! :hidden_attachments_replacement_chain
+          end
+
+          it "returns the replacement attachment" do
+            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq new_attachment.id
+          end
+        end
+
+        context "when the hidden_attachments_replacement_chain site admin flag is disabled" do
+          before do
+            Account.site_admin.disable_feature! :hidden_attachments_replacement_chain
+          end
+
+          it "returns the original attachment" do
+            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
+          end
+        end
+      end
+
+      context "when the replacement attachment is deleted too" do
+        let(:new_attachment) do
+          attachment_with_context(
+            @course_with_attachments,
+            folder: @root_folder,
+            filename: "replaceable.txt",
+            file_state: "deleted",
+            workflow_state: "processed"
+          )
+        end
+
+        before do
+          @deleted_attachment.replacement_attachment = new_attachment
+          @deleted_attachment.save!
+        end
+
+        context "when the hidden_attachments_replacement_chain site admin flag is enabled" do
+          before do
+            Account.site_admin.enable_feature! :hidden_attachments_replacement_chain
+          end
+
+          it "returns the original attachment" do
+            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
+          end
+        end
+
+        context "when the hidden_attachments_replacement_chain site admin flag is disabled" do
+          before do
+            Account.site_admin.disable_feature! :hidden_attachments_replacement_chain
+          end
+
+          it "returns the original attachment" do
+            expect(@course_with_attachments.attachments.find(@deleted_attachment.id).id).to eq @deleted_attachment.id
+          end
+        end
+      end
+    end
+  end
+
   describe "users_visible_to with section filtering" do
     before :once do
       @course = Account.default.courses.create!
