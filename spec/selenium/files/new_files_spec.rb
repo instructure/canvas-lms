@@ -403,16 +403,14 @@ describe "better_file_browsing" do
         file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @teacher, "292.mp3")
         get "/files?preview=#{file.id}"
         wait_for_ajaximations
-        driver.switch_to.frame(ff(".ef-file-preview-frame")[0])
-        expect(ff("#media_preview")[0]).to include_text("Media has been queued for conversion, please try again in a little bit.")
+        expect(ff(".ef-file-studio-player-container")[0]).to include_text("Your media has been uploaded and will appear here after processing.")
       end
 
       it "works in the course's files page", upgrade_files_v2: "waiting for deployment (RCX-2530)" do
         file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @course, "292.mp3")
         get "/courses/#{@course.id}/files?preview=#{file.id}"
         wait_for_ajaximations
-        driver.switch_to.frame(ff(".ef-file-preview-frame")[0])
-        expect(ff("#media_preview")[0]).to include_text("Media has been queued for conversion, please try again in a little bit.")
+        expect(ff(".ef-file-studio-player-container")[0]).to include_text("Your media has been uploaded and will appear here after processing.")
       end
     end
   end

@@ -59,7 +59,9 @@ interface CanvasStudioPlayerProps {
   attachment_id?: string
   show_loader?: boolean
   maxHeight?: null | string
-  mediaFetchCallback?: (mediaInfo: MediaInfo) => void
+  mediaFetchCallback?: (mediaInfo: MediaInfo) => void,
+  explicitSize?: {width: number, height: number},
+  showUploadSubtitles?: boolean
 }
 
 // The main difference between CanvasMediaPlayer and CanvasStudioPlayer
@@ -77,7 +79,9 @@ export default function CanvasStudioPlayer({
   attachment_id = '',
   show_loader = false,
   maxHeight = null,
-  mediaFetchCallback = () => {}
+  mediaFetchCallback = () => {},
+  explicitSize,
+  showUploadSubtitles = false,
 }: CanvasStudioPlayerProps) {
   const sorted_sources = Array.isArray(media_sources)
     ? media_sources.sort(byBitrate)
@@ -94,8 +98,8 @@ export default function CanvasStudioPlayer({
   const [mediaCaptions, setMediaCaptions] = useState<CaptionMetaData[] | undefined>(captions)
   const [retryAttempt, setRetryAttempt] = useState(0)
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
-  const [containerWidth, setContainerWidth] = useState(0)
-  const [containerHeight, setContainerHeight] = useState(0)
+  const [containerWidth, setContainerWidth] = useState(explicitSize?.width || 0)
+  const [containerHeight, setContainerHeight] = useState(explicitSize?.height || 0)
   const [isLoading, setIsLoading] = useState(true)
   // the ability to set these makes testing easier
   // hint: set these values in a conditional breakpoint in
@@ -132,6 +136,10 @@ export default function CanvasStudioPlayer({
 
   const handlePlayerSize = useCallback(
     (_event: any) => {
+      if (explicitSize) {
+        return
+      }
+
       const updateContainerSize = (width: number, height: number) => {
         setContainerWidth(width)
         setContainerHeight(height)
@@ -177,7 +185,8 @@ export default function CanvasStudioPlayer({
             language: captionLanguageForLocale(caption.locale),
             inherited: caption.inherited,
             label: captionLanguageForLocale(caption.locale),
-            src: caption.url
+            src: caption.url,
+            type: 'srt',
           })))
         }
         mediaFetchCallback(resp)
@@ -329,6 +338,22 @@ export default function CanvasStudioPlayer({
               captions={mediaCaptions}
               hideFullScreen={!includeFullscreen}
               title={getAriaLabel()}
+              kebabMenuElements={
+                !showUploadSubtitles
+                  ? undefined
+                  : [
+                      {
+                        id: 'upload-cc',
+                        text: I18n.t('Upload subtitles'),
+                        icon: 'transcript',
+                        onClick: () => {
+                          import('../../mediaelement/UploadMediaTrackForm').then(({default: UploadMediaTrackForm}) => {
+                            new UploadMediaTrackForm(media_id, mediaSources[0].src, attachment_id as any, false, 99000)
+                          })
+                        },
+                      }
+                    ]
+              }
             />
           ) : (
             renderNoPlayer()
