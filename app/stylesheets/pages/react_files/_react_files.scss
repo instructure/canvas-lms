@@ -386,6 +386,48 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   padding: 10px;
 }
 
+.files_directory
+{
+  padding-bottom: 25px;
+  tbody {
+    position: relative;
+  }
+  [data-upload] {
+    height: 0px;
+    border: none;
+    display: block;
+  }
+  [upload-cell]{
+    padding: 0px;
+  }
+}
+
+.FileDrag {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: none;
+  label{
+    padding: 30px;
+  }
+  z-index: 1000;
+  top: 0;
+}
+
+.FileDrag__dragging {
+  display: block;
+  background: rgba(254, 254, 254, 0.9);
+  label span{
+    background: white;
+  }
+}
+
+.FileDrag__full {
+  position: absolute;
+  display: block;
+  margin-bottom: 25px;
+}
+
 .ef-breadcrumb-popover {
   display: block;
   #{direction(left)}: -9999px;

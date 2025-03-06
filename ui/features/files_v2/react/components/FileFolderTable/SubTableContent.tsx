@@ -87,22 +87,6 @@ const SubTableContent = ({isLoading, isEmpty, searchString}: SubTableContentProp
       </View>
     )
   }
-
-  return (
-    <View as="div" padding="large none none none">
-      {isEmpty && (
-        <FileDrop
-          renderLabel={
-            <View as="div" padding="xx-large large" background="primary">
-              <IconUploadLine size="large" />
-              <Heading margin="medium 0 small 0">{I18n.t('Drag a file here, or')}</Heading>
-              <Text color="brand">{I18n.t('Choose a file to upload')}</Text>
-            </View>
-          }
-        />
-      )}
-    </View>
-  )
 }
 
 export default SubTableContent
