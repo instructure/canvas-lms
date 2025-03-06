@@ -672,6 +672,27 @@ module Lti
           expect(params[:tool_consumer_instance_guid]).to be_nil
           expect(params[:launch_presentation_document_target]).to be_nil
         end
+
+        it "calls LogService" do
+          course_with_teacher_logged_in(active_all: true)
+          message_handler.launch_path = "http://test.turnitin.com/launch"
+          message_handler.save!
+          allow(PandataEvents).to receive(:send_event)
+
+          expect(PandataEvents).to receive(:send_event).with(
+            :lti_launch,
+            hash_including(
+              user_id: @teacher.id.to_s,
+              context_id: @course.id.to_s,
+              message_type: "basic-lti_launch-request",
+              launch_url: message_handler.launch_path,
+              launch_type: "direct_link"
+            ),
+            for_user_id: @teacher.global_id
+          )
+
+          get "basic_lti_launch_request", params: { course_id: @course.id, message_handler_id: message_handler.id }
+        end
       end
 
       describe "resource link" do
