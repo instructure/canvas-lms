@@ -203,15 +203,6 @@ describe "admin settings tab" do
       end
     end
 
-    skip "clicks on the quiz help link (Skipped, FOO-5185)" do
-      get "/accounts/#{Account.default.id}/settings"
-      link = f(%([data-testid="ip-filter-help-toggle"]))
-      scroll_into_view(link)
-      link.click
-      wait_for_animations
-      expect(f(%([data-testid="ip-filter-help"]))).to include_text "Quiz IP filters are a way to limit access"
-    end
-
     it "adds a quiz filter" do
       get "/accounts/#{Account.default.id}/settings"
       add_quiz_filter
