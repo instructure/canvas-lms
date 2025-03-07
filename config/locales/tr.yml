@@ -3532,6 +3532,8 @@ tr:
   attendees_eb402bac: Katılımcılar
   attention_aaca1f1d: Uyarı!
   attribute_d9f3af72: Özellik
+  attributes: 
+    idp_entity_id: "IdP Entity ID"
   attributes_locked_1a1a0f46: "%{attributes} kilitli"
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Cihazınız ya da uygulamanız tarafından sesli içerik destekenmiyor."
   audio_dd489fcc: Ses
@@ -20210,6 +20212,7 @@ tr:
   verify_3dd8f159: Onay
   version_5599c321: Versiyon
   video_b9f27375: Video
+  video_options_24ef6e5d: "Video Seçenekleri"
   video_player_b371005: "Video Oynatıcı"
   vietnam_84_e50a2a44: "Viyetnam (+84)"
   view_analytics_91a3b7a: "Analitikleri Göster"
