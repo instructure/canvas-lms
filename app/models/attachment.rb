@@ -101,6 +101,7 @@ class Attachment < ActiveRecord::Base
          quiz: "Quizzes::Quiz",
          quiz_statistics: "Quizzes::QuizStatistics",
          quiz_submission: "Quizzes::QuizSubmission" }]
+  belongs_to :root_account, class_name: "Account"
   belongs_to :cloned_item
   belongs_to :folder
   belongs_to :user
@@ -619,18 +620,12 @@ class Attachment < ActiveRecord::Base
     # due to account.rb:file_namespace, but it needs to be a global ID or we will reference
     # the incorrect account
     if Attachment.current_root_account && Attachment.current_root_account.shard != Shard.current && Shard.current == Shard.birth
-      Attachment.current_root_account.global_id
+      Attachment.current_root_account.id
     elsif splits[1] == "localstorage"
       splits[3].to_i
     else
       splits[1].to_i
     end
-  end
-
-  def root_account
-    root_account_id && Account.find_cached(root_account_id)
-  rescue ::Canvas::AccountCacheError
-    nil
   end
 
   def namespace

@@ -2002,9 +2002,9 @@ describe Attachment do
           att.infer_namespace
           att.set_root_account_id
           expect(att.namespace).to eq Account.default.global_asset_string
-          expect(att.root_account_id).to eq Account.default.global_id
+          expect(att.root_account.id).to eq Account.default.global_id
         end
-        expect(att.root_account_id).to eq Account.default.local_id
+        expect(att.root_account.id).to eq Account.default.local_id
       end
 
       it "links a cross-shard cloned_item correctly" do
