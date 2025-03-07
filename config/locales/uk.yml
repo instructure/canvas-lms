@@ -3040,6 +3040,8 @@ uk:
   attendees_eb402bac: Учасники
   attention_aaca1f1d: Увага!
   attribute_d9f3af72: Атрибут
+  attributes: 
+    idp_entity_id: "Ідентифікатор об'єкта IdP"
   attributes_locked_1a1a0f46: "%{attributes} заблоковано"
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Аудіо контент не підтримується Вашим пристроєм або застосунком."
   audio_dd489fcc: Звук
