@@ -22,6 +22,7 @@ import {Assignment} from './student/Assignment'
 import {Submission} from './student/Submission'
 
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
+import {createRef} from 'react'
 
 // Dynamically load and cache all of the `DefaultMocks` defined in `./student/*.js`
 let _dynamicDefaultMockImports = null
@@ -100,5 +101,6 @@ export async function mockAssignmentAndSubmission(overrides = []) {
     assignment: result[0],
     submission: result[1],
     onChangeSubmission: () => {},
+    submitButtonRef: createRef()
   }
 }

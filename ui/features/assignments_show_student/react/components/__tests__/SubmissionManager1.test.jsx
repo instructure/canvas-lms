@@ -120,17 +120,6 @@ describe('SubmissionManager', () => {
     expect(getByTestId('attempt-tab')).toBeInTheDocument()
   })
 
-  it('renders a disabled submit button when the draft criteria is not met', async () => {
-    const props = await mockAssignmentAndSubmission()
-    const {getByText} = render(
-      <MockedProvider>
-        <SubmissionManager {...props} />
-      </MockedProvider>,
-    )
-
-    expect(getByText('Submit Assignment').closest('button')).toBeDisabled()
-  })
-
   it('does not render a submit button when peer review mode is OFF', async () => {
     const props = await mockAssignmentAndSubmission()
     const {queryByText} = render(
@@ -153,43 +142,6 @@ describe('SubmissionManager', () => {
     )
 
     expect(getByText('Submit Assignment')).toBeInTheDocument()
-  })
-
-  it('renders a disabled submit button if the draft criteria is not met for the active type', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Submission: {
-        submissionDraft: {
-          activeSubmissionType: 'online_upload',
-          body: 'some text here',
-        },
-      },
-    })
-    const {getByText} = render(
-      <MockedProvider>
-        <SubmissionManager {...props} />
-      </MockedProvider>,
-    )
-
-    expect(getByText('Submit Assignment').closest('button')).toBeDisabled()
-  })
-
-  it('renders a disabled submit button if data placeholders are still present', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Submission: {
-        submissionDraft: {
-          meetsAssignmentCriteria: true,
-          activeSubmissionType: 'online_text_entry',
-          body: '<p><span aria-label="Loading" data-placeholder-for="filename"> </span></p>',
-        },
-      },
-    })
-    const {getByText} = render(
-      <MockedProvider>
-        <SubmissionManager {...props} />
-      </MockedProvider>,
-    )
-
-    expect(getByText('Submit Assignment').closest('button')).toBeDisabled()
   })
 
   it('does not render submit button for observers', async () => {

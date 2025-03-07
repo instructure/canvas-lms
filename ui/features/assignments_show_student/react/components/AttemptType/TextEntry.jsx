@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bool, func} from 'prop-types'
+import {bool, func, object} from 'prop-types'
 import React, {createRef} from 'react'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {RceLti11ContentItem} from '@instructure/canvas-rce/es/rce/plugins/instructure_rce_external_tools/lti11-content-items/RceLti11ContentItem'
@@ -24,10 +24,16 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import theme from '@instructure/canvas-theme'
 import StudentViewContext from '../Context'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
+import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('assignments_2_text_entry')
 
 // This is how long we wait to see that changes have stopped before actually
 // saving the draft
 const saveDraftDelayMS = 1000
+export const ERROR_MESSAGE = I18n.t('Text is required for text submission')
 
 export default class TextEntry extends React.Component {
   static propTypes = {
@@ -36,6 +42,11 @@ export default class TextEntry extends React.Component {
     onContentsChanged: func,
     submission: Submission.shape,
     readOnly: bool,
+    submitButtonRef: object,
+  }
+
+  state = {
+    showErrorMessage: false
   }
 
   _isMounted = false
@@ -47,6 +58,10 @@ export default class TextEntry extends React.Component {
   _lastSavedContent = null
 
   _rceRef = createRef()
+
+  _rceAriaLabel = ''
+
+  getRceIframe = () => document.getElementById('textentry_text_ifr')
 
   handleMessage = e => {
     const editor = this._rceRef.current
@@ -84,6 +99,7 @@ export default class TextEntry extends React.Component {
     this._isMounted = true
 
     window.addEventListener('message', this.handleMessage)
+    this.props.submitButtonRef?.current?.addEventListener('click', this.handleSubmitClick)
   }
 
   componentDidUpdate(prevProps) {
@@ -106,12 +122,30 @@ export default class TextEntry extends React.Component {
         this._rceRef?.current?.focus()
       }
     }
+
+    this.props.submitButtonRef?.current?.addEventListener('click', this.handleSubmitClick)
   }
 
   componentWillUnmount() {
     this._isMounted = false
     clearTimeout(this._saveDraftTimer)
     window.removeEventListener('message', this.handleMessage)
+    this.props.submitButtonRef.current?.removeEventListener('click', this.handleSubmitClick)
+  }
+
+  handleSubmitClick = () => {
+    const {submission} = this.props
+    if (!submission.submissionDraft?.meetsTextEntryCriteria) {
+      this._rceRef.current?.focus()
+      const rceIframe = this.getRceIframe()
+      if (rceIframe) {
+        const iframeBody = rceIframe.contentWindow.document.querySelector('body')
+        iframeBody.style.border = '1.9px solid red'
+        iframeBody.style.borderRadius = '3px'
+        iframeBody.setAttribute('aria-label', ERROR_MESSAGE)
+      }
+      this.setState({showErrorMessage: true})
+    }
   }
 
   checkForChanges = newContent => {
@@ -126,6 +160,8 @@ export default class TextEntry extends React.Component {
     if (!this._isInitted) {
       return
     }
+
+    this.clearErrors()
 
     const {submission} = this.props
 
@@ -149,6 +185,17 @@ export default class TextEntry extends React.Component {
     }
   }
 
+  clearErrors = () => {
+    const rceIframe = this.getRceIframe()
+    if (rceIframe) {
+      const iframeBody = rceIframe.contentWindow.document.querySelector('body')
+      iframeBody.style.border = ''
+      iframeBody.style.borderRadius = ''
+      iframeBody.setAttribute('aria-label', this._rceAriaLabel)
+    }
+    this.setState({showErrorMessage: false})
+  }
+
   // Note: I believe there's a bug in tinymce, that
   // if you set focus:true to give the editor focus on init,
   // then the internal bookkeeping doesn't know it has focus
@@ -157,6 +204,13 @@ export default class TextEntry extends React.Component {
   // in this.handleRCEInit
   handleRCEInit = tinyeditor => {
     this._tinyeditor = tinyeditor
+
+    document.querySelector('.canvas-rce__skins--root.rce-wrapper').style.removeProperty('margin-bottom')
+    const rceIframe = document.getElementById('textentry_text_ifr')
+    if (rceIframe && !this._rceAriaLabel) {
+      const iframeBody = rceIframe.contentWindow.document.querySelector('body')
+      this._rceAriaLabel = iframeBody.getAttribute('aria-label')
+    }
 
     const draftBody = this.getDraftBody()
     tinyeditor.setContent(draftBody)
@@ -224,6 +278,11 @@ export default class TextEntry extends React.Component {
           }}
           resourceType="assignment.submission"
         />
+        {(this.state.showErrorMessage) && (
+          <View as="div" padding="small x-small" background="primary">
+            <FormattedErrorMessage message={ERROR_MESSAGE} />
+          </View>
+        )}
       </div>
     )
   }

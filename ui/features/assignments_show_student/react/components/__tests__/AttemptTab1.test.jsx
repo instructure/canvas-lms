@@ -24,7 +24,7 @@ import TextEntry from '../AttemptType/TextEntry'
 import {render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/client/testing'
-import React from 'react'
+import React, {createRef} from 'react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
@@ -78,11 +78,19 @@ describe('ContentTabs', () => {
     }
   }
 
+  const createSubmitButtonRef = () => {
+    const submitButton = document.createElement('button')
+    const ref = createRef()
+    ref.current = submitButton
+    return ref
+  }
+
   describe('the assignment is locked aka passed the until date', () => {
     it('renders the availability dates if the assignment was not submitted', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {lockInfo: {isLocked: true}},
       })
+      props.submitButtonRef = createSubmitButtonRef()
       const {findByText} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
@@ -100,6 +108,7 @@ describe('ContentTabs', () => {
           attachments: [{displayName: 'test.jpg'}],
         },
       })
+      props.submitButtonRef = createSubmitButtonRef()
       const {findByTestId} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
@@ -121,6 +130,7 @@ describe('ContentTabs', () => {
           submissionType: 'online_upload',
         },
       })
+      props.submitButtonRef = createSubmitButtonRef()
 
       const {findByTestId} = render(
         <MockedProvider>
@@ -139,6 +149,7 @@ describe('ContentTabs', () => {
           attachments: [{displayName: 'test.jpg'}],
         },
       })
+      props.submitButtonRef = createSubmitButtonRef()
       const {findByTestId} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
@@ -153,6 +164,7 @@ describe('ContentTabs', () => {
         Assignment: {lockInfo: {isLocked: true}},
         Submission: {...SubmissionMocks.missing},
       })
+      props.submitButtonRef = createSubmitButtonRef()
       const {findByText} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
@@ -167,6 +179,7 @@ describe('ContentTabs', () => {
         Assignment: {lockInfo: {isLocked: true}},
         Submission: {...SubmissionMocks.excused},
       })
+      props.submitButtonRef = createSubmitButtonRef()
       const {findByText} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
@@ -182,6 +195,7 @@ describe('ContentTabs', () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {submissionTypes: ['online_upload']},
       })
+      props.submitButtonRef = createSubmitButtonRef()
 
       const {getByTestId} = render(
         <MockedProvider mocks={defaultMocks()}>
@@ -199,6 +213,7 @@ describe('ContentTabs', () => {
           attachments: [{}],
         },
       })
+      props.submitButtonRef = createSubmitButtonRef()
 
       const {findByTestId} = render(<AttemptTab {...props} focusAttemptOnInit={false} />)
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
@@ -218,6 +233,7 @@ describe('ContentTabs', () => {
             },
           },
         })
+        props.submitButtonRef = createSubmitButtonRef()
 
         const {getAllByText} = render(
           <MockedProvider mocks={defaultMocks()}>
@@ -238,6 +254,7 @@ describe('ContentTabs', () => {
         ...assignmentAndSubmission,
         createSubmissionDraft: jest.fn().mockResolvedValue({}),
       }
+      props.submitButtonRef = createSubmitButtonRef()
 
       const {getByTestId} = render(
         <MockedProvider>
@@ -250,14 +267,16 @@ describe('ContentTabs', () => {
   })
 
   describe('the submission type is online_text_entry', () => {
+    let submitButtonRef
     beforeAll(async () => {
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
       uploadFileModule.uploadFiles = jest.fn()
+      submitButtonRef = createSubmitButtonRef()
 
       // This gets the lazy loaded components loaded before our specs.
       // otherwise, the first one (at least) will fail.
       const {unmount} = render(
-        <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} />,
+        <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} submitButtonRef={submitButtonRef} />,
       )
       await waitFor(() => {
         expect(tinymce.editors[0]).toBeDefined()
@@ -270,6 +289,7 @@ describe('ContentTabs', () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {submissionTypes: ['online_text_entry']},
         })
+        props.submitButtonRef = submitButtonRef
 
         const {findByTestId} = await renderAttemptTab(props)
         expect(await findByTestId('text-editor')).toBeInTheDocument()
@@ -289,6 +309,7 @@ describe('ContentTabs', () => {
               state: 'submitted',
             },
           })
+          props.submitButtonRef = submitButtonRef
 
           const {findByTestId} = await renderAttemptTab(props)
           expect(await findByTestId('read-only-content')).toBeInTheDocument()
@@ -302,6 +323,7 @@ describe('ContentTabs', () => {
               attempt: 0,
             },
           })
+          props.submitButtonRef = submitButtonRef
 
           const {queryByTestId} = await renderAttemptTab(props)
           expect(queryByTestId('read-only-content')).not.toBeInTheDocument()
@@ -315,6 +337,7 @@ describe('ContentTabs', () => {
               attempt: 1,
             },
           })
+          props.submitButtonRef = submitButtonRef
 
           const {findByTestId} = await renderAttemptTab(props)
           expect(await findByTestId('read-only-content')).toBeInTheDocument()
@@ -327,6 +350,7 @@ describe('ContentTabs', () => {
               state: 'unsubmitted',
             },
           })
+          props.submitButtonRef = submitButtonRef
 
           const {findByTestId} = render(
             <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
@@ -344,6 +368,7 @@ describe('ContentTabs', () => {
               state: 'unsubmitted',
             },
           })
+          props.submitButtonRef = submitButtonRef
 
           const {queryByTestId} = await renderAttemptTab(props)
           expect(queryByTestId('read-only-content')).not.toBeInTheDocument()
