@@ -290,6 +290,7 @@ export type SiteAdminFeatureId =
   | 'dashboard_graphql_integration'
   | 'speedgrader_studio_media_capture'
   | 'validate_call_to_action'
+  | 'new_quizzes_navigation_updates'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES

@@ -2004,7 +2004,11 @@ EditView.prototype.locationAfterSave = function (params) {
 
   const htmlUrl = this.model.get('html_url')
   if (this.assignment.showBuildButton()) {
-    return htmlUrl + '?display=full_width'
+    let displayType = 'full_width'
+    if (ENV.FEATURES.new_quizzes_navigation_updates) {
+      displayType = 'full_width_with_nav'
+    }
+    return htmlUrl + `?display=${displayType}`
   } else {
     return htmlUrl
   }

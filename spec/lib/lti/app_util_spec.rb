@@ -55,7 +55,7 @@ describe Lti::AppUtil do
     end
 
     it "renders the specified display_type if the type is valid" do
-      acceptable_types = %w[borderless full_width in_context default full_width_in_context]
+      acceptable_types = %w[borderless full_width in_context default full_width_in_context full_width_with_nav]
 
       acceptable_types.each do |type|
         expect(Lti::AppUtil.display_template(type)).to eq(Lti::AppUtil::TOOL_DISPLAY_TEMPLATES[type])

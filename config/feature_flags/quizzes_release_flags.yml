@@ -14,7 +14,7 @@ migrate_to_new_quizzes_by_default:
 require_migration_to_new_quizzes:
   state: allowed
   display_name: New Quizzes migration required
-  description:  Disable New Quiz importing and migration checkboxes, defaulting them to enabled
+  description: Disable New Quiz importing and migration checkboxes, defaulting them to enabled
   applies_to: RootAccount
   beta: true
 new_quizzes_assignment_build_button:
@@ -108,3 +108,8 @@ hide_quiz_migration_text_no_question_warning:
   description: If enabled, the "Text No Question has moved to a Stimulus" warning will be hidden after quiz migration
   applies_to: SiteAdmin
   shadow: true
+new_quizzes_navigation_updates:
+  display_name: New Quizzes Navigation Updates
+  description: If enabled, New Quizzes will launch in a display type that includes breadcrumbs and left-side menu
+  state: hidden
+  applies_to: SiteAdmin

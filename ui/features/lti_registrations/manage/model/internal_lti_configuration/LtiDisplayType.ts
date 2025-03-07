@@ -22,6 +22,7 @@ export const ZLtiDisplayType = z.enum([
   'default',
   'full_width',
   'full_width_in_context',
+  'full_width_with_nav',
   'in_nav_context',
   'borderless',
 ])
