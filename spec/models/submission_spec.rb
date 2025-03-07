@@ -7319,6 +7319,16 @@ describe Submission do
       sub = Submission.find(Submission.connection.create(create_sql))
       expect(sub.submission_history).to eq([sub])
     end
+
+    it "optionally returns the version along with the model" do
+      aggregate_failures do
+        history = submission.submission_history(include_version: true)
+        expect(history.size).to be 1
+        entry = history.first
+        expect(entry[:version].id).to eql submission.versions.first.id
+        expect(entry[:model].id).to eql submission.id
+      end
+    end
   end
 
   context "draft comments" do
