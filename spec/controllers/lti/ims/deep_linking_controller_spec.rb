@@ -152,12 +152,13 @@ module Lti
           let(:errorlog) { { html: "some error log" } }
 
           it "turns them into strings before calling js_env to prevent HTML injection" do
+            separator = (RUBY_VERSION >= "3.4.0") ? " => " : "=>"
             expect(controller).to receive(:js_env).with({
                                                           deep_link_response: hash_including(
-                                                            msg: '{"html"=>"some message"}',
-                                                            log: '{"html"=>"some log"}',
-                                                            errormsg: '{"html"=>"some error message"}',
-                                                            errorlog: '{"html"=>"some error log"}'
+                                                            msg: %({"html"#{separator}"some message"}),
+                                                            log: %({"html"#{separator}"some log"}),
+                                                            errormsg: %({"html"#{separator}"some error message"}),
+                                                            errorlog: %({"html"#{separator}"some error log"})
                                                           )
                                                         })
             subject

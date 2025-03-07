@@ -103,7 +103,9 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def self.md5_for(brand_config)
-    Digest::MD5.hexdigest(ATTRS_TO_INCLUDE_IN_MD5.map { |a| brand_config[a] }.join)
+    # Ruby 3.4: Hash.to_s was changed to include a space between the key and value
+    # so we need to remove that space to keep the md5 consistent with previous versions.
+    Digest::MD5.hexdigest(ATTRS_TO_INCLUDE_IN_MD5.map { |a| brand_config[a].to_s.gsub(" => ", "=>") }.join)
   end
 
   def get_value(variable_name)
