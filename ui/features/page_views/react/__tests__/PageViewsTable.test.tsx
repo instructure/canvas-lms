@@ -17,13 +17,20 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import {PageViewsTable, type PageViewsTableProps} from '../PageViewsTable'
 import {type APIPageView} from '../utils'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 const queryClient = new QueryClient()
+
+// As of this writing, JS-DOM does not implement Intl.DurationFormat, so we will
+// expect the component under test to fall back to its manual formatting. Putting
+// this check in so that tests don't later fail if/when JS-DOM implements it.
+const INTERACTION_TIME = 249 // 4 minutes 9 seconds
+// @ts-expect-error
+const FORMATTED_TIME = typeof Intl.DurationFormat === 'function' ? '4m 9s' : '4:09'
 
 function Subject(props: PageViewsTableProps): React.JSX.Element {
   return (
@@ -47,6 +54,20 @@ const sample1: APIPageView[] = [
   },
 ]
 
+const sample2: APIPageView[] = [
+  {
+    id: '1',
+    app_name: null,
+    http_method: 'get',
+    created_at: '2024-01-01T12:00:00Z',
+    participated: false,
+    interaction_seconds: INTERACTION_TIME,
+    user_agent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+    url: 'http://example.com',
+  },
+]
+
 describe('PageViewsTable', () => {
   afterEach(() => {
     fetchMock.resetHistory()
@@ -60,9 +81,6 @@ describe('PageViewsTable', () => {
     expect(spinner).toBeInTheDocument()
   })
 
-  // TODO: This should test an interaction time longer than 5 seconds to
-  // see if something other than "—" is shown, but unfortunately Jest/jsdom
-  // does not implement Intl.DurationFormat.
   it('renders a table from the API data', async () => {
     const id = '123'
     fetchMock.get(`/api/v1/users/${id}/page_views?page=1&per_page=50`, sample1)
@@ -75,8 +93,28 @@ describe('PageViewsTable', () => {
     expect(cells[4]).toHaveTextContent('Chrome 131.0')
   })
 
-  it('passes along the date range to the API when one is provided', async () => {
+  it('properly formats the interaction time', async () => {
     const id = '124'
+    fetchMock.get(`/api/v1/users/${id}/page_views?page=1&per_page=50`, sample2)
+    const {findByTestId, getByTestId} = render(<Subject userId={id} />)
+    expect(await findByTestId('page-views-table-body')).toBeInTheDocument()
+    const time = getByTestId('page-view-row').querySelector('td:nth-child(4)')
+    expect(time).toHaveTextContent(FORMATTED_TIME)
+  })
+
+  it('shows the full user agent string in a tooltip', async () => {
+    const id = '125'
+    fetchMock.get(`/api/v1/users/${id}/page_views?page=1&per_page=50`, sample1)
+    const {findByTestId, getByTestId} = render(<Subject userId={id} />)
+    expect(await findByTestId('page-views-table-body')).toBeInTheDocument()
+    const agentTip = screen.getByText(sample1[0].user_agent)
+    const agent = getByTestId('page-view-row').querySelector('td:nth-child(5)')
+    await waitFor(() => expect(agent).toBeInTheDocument())
+    expect(agentTip).toBeInTheDocument()
+  })
+
+  it('passes along the date range to the API when one is provided', async () => {
+    const id = '126'
     fetchMock.get(`begin:/api/v1/users/${id}`, sample1)
     render(
       <Subject userId={id} startDate={new Date('2024-01-01')} endDate={new Date('2024-01-02')} />,
