@@ -2322,6 +2322,8 @@ ko:
       attendance_help: "출석 도움말"
   attendance_ca433183: 출석
   attendees_eb402bac: 참석자
+  attributes: 
+    idp_entity_id: "IdP 항목 ID"
   auth_logging: 
     login: 로그인
     logout: 로그아웃
