@@ -210,6 +210,7 @@ export interface EnvCommon {
     pronouns: null | string
     fake_student: boolean
     avatar_is_fallback: boolean
+    email?: string
   }
   page_view_update_url: string
   IS_LARGE_ROSTER: boolean
