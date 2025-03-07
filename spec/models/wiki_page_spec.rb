@@ -339,6 +339,14 @@ describe WikiPage do
         end
       end
     end
+
+    it "does not allow account admins to read without read_course_content permission" do
+      account = @course.root_account
+      role = custom_account_role("CustomAccountUser", account:)
+      RoleOverride.manage_role_override(account, role, :read_course_content, enabled: false)
+      admin = account_admin_user(account:, role:, active_all: true)
+      expect(@page.can_read_page?(admin)).to be false
+    end
   end
 
   context "publish_at" do

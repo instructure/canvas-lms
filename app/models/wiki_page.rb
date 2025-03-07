@@ -405,9 +405,11 @@ class WikiPage < ActiveRecord::Base
   end
 
   def can_read_page?(user, session = nil)
-    return true if unpublished? && wiki.grants_right?(user, session, :view_unpublished_items)
+    read_wiki = wiki.grants_right?(user, session, :read)
+    read_course_content = context.is_a?(Course) ? (context.grants_right?(user, session, :read_course_content) || read_wiki) : true
+    return true if unpublished? && wiki.grants_right?(user, session, :view_unpublished_items) && read_course_content
 
-    published? && wiki.grants_right?(user, session, :read)
+    published? && read_wiki
   end
 
   def can_edit_page?(user, session = nil)
