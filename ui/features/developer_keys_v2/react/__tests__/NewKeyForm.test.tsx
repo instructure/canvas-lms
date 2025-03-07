@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import DeveloperKeyFormFields from '../NewKeyForm'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
@@ -69,6 +69,7 @@ function defaultProps(): NewKeyFormProps {
     syncRedirectUris: () => {},
     isRedirectUriRequired: false,
     isLtiKey: false,
+    hasInvalidRedirectUris: false,
     developerKey: {
       access_token_count: 0,
       account_name: '',
@@ -234,12 +235,12 @@ describe('DeveloperKeyFormFields', () => {
         isRedirectUriRequired: false,
       })
       expect(getByText('Redirect URIs:')).toBeInTheDocument()
-      expect(queryByText('* Redirect URIs:')).not.toBeInTheDocument()
+      expect(queryByText('Redirect URIs: *')).not.toBeInTheDocument()
     })
 
     it('renders as required when isRedirectUriRequired is true', () => {
       const {getByText} = renderComponent(developerKey, true, {isRedirectUriRequired: true})
-      expect(getByText('* Redirect URIs:')).toBeInTheDocument()
+      expect(screen.getByLabelText('Redirect URIs: *')).toBeInTheDocument()
     })
   })
 })

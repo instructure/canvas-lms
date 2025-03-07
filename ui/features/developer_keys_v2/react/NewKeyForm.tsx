@@ -29,7 +29,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import type {FormMessageChild, FormMessageType} from '@instructure/ui-form-field/src/FormPropTypes'
 
-import React from 'react'
+import React, {createRef} from 'react'
 
 import Scopes from './Scopes'
 import ToolConfigurationForm from './ToolConfigurationForm'
@@ -57,6 +57,7 @@ export type NewKeyFormProps = {
   configurationMethod: string
   updateConfigurationMethod: Function
   hasRedirectUris: boolean
+  hasInvalidRedirectUris: boolean
   syncRedirectUris: Function
 }
 
@@ -73,8 +74,9 @@ const clientCredentialsAudienceTooltip = I18n.t(
 
 export default class NewKeyForm extends React.Component<NewKeyFormProps> {
   keyFormRef: HTMLFormElement | null = null
-
   toolConfigRef: ToolConfigurationForm | null = null
+
+  redirectUrisRef = createRef<TextArea>()
 
   state = {
     invalidJson: null,
@@ -91,7 +93,13 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
   }
 
   valid = () => {
-    return this.toolConfigRef?.valid()
+    const isValidToolConfig = this.toolConfigRef?.valid()
+    const isValidRedirectUris = this.props.hasRedirectUris && !this.props.hasInvalidRedirectUris
+
+    if (!isValidRedirectUris && this.redirectUrisRef.current) {
+      this.redirectUrisRef.current.focus()
+    }
+    return isValidToolConfig && isValidRedirectUris
   }
 
   get keyForm() {
@@ -114,7 +122,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
     this.props.updateDeveloperKey('test_cluster_only', !this.props.developerKey.test_cluster_only)
   }
 
-  updatePastedJson = (value: string, prettify: boolean = false) => {
+  updatePastedJson = (value: string, prettify = false) => {
     try {
       const settings = JSON.parse(value)
       const jsonString = prettify ? JSON.stringify(settings, null, 2) : value
@@ -188,9 +196,9 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                 />
                 <TextArea
                   data-testid="redirect-uris-input"
-                  label={
-                    isRedirectUriRequired ? I18n.t('* Redirect URIs:') : I18n.t('Redirect URIs:')
-                  }
+                  label={I18n.t('Redirect URIs:')}
+                  required={isRedirectUriRequired}
+                  ref={this.redirectUrisRef}
                   name="developer_key[redirect_uris]"
                   value={developerKey.redirect_uris}
                   onChange={e => updateDeveloperKey('redirect_uris', e.target.value)}

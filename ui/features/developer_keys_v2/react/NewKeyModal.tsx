@@ -62,6 +62,7 @@ type State = {
   toolConfigurationUrl: string | null
   isSaving: boolean
   configurationMethod: ConfigurationMethod
+  isRedirectUrisValid: boolean
 }
 
 export default class DeveloperKeyModal extends React.Component<Props, State> {
@@ -74,6 +75,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     toolConfigurationUrl: '',
     isSaving: false,
     configurationMethod: 'manual',
+    isRedirectUrisValid: true,
   }
 
   developerKeyUrl() {
@@ -251,10 +253,12 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     }
 
     if (!this.hasRedirectUris && !this.isUrlConfig) {
-      $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
+      this.setState({isRedirectUrisValid: false})
+      this.newForm?.valid()
       this.setState({submitted: true})
       return
     } else if (this.hasInvalidRedirectUris) {
+      this.setState({isRedirectUrisValid: false})
       this.alertAboutInvalidRedirectUris()
       return
     }
@@ -436,6 +440,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
                   this.state.submitted && isLtiKey && !this.hasRedirectUris && !this.isUrlConfig
                 }
                 hasRedirectUris={this.hasRedirectUris}
+                hasInvalidRedirectUris={this.hasInvalidRedirectUris}
                 syncRedirectUris={this.syncRedirectUris}
                 updateToolConfiguration={this.updateToolConfiguration}
                 updateDeveloperKey={this.updateDeveloperKey}
