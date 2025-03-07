@@ -165,13 +165,17 @@ const AutoCompleteSelect = <T extends {id: string}>({
         selectProps?.onRequestHighlightOption?.(event, {id})
       }}
       onRequestSelectOption={(event, {id}) => {
-        setSelectState(prevState => ({
-          ...prevState,
-          selectedOptionId: id ?? null,
-          isShowingOption: false,
-          fetchedOptions: prevState.fetchedOptions.filter(option => option.id === id),
-          value: (event.target as HTMLElement).textContent ?? '',
-        }))
+        setSelectState(prevState => {
+          const selectedOption = prevState.fetchedOptions.find(option => option.id === id)
+
+          return {
+            ...prevState,
+            selectedOptionId: id ?? null,
+            isShowingOption: false,
+            fetchedOptions: [selectedOption!],
+            value: renderOptionLabel(selectedOption!),
+          }
+        })
         selectProps?.onRequestSelectOption?.(event, {id})
       }}
       {...overrideSelectProps}

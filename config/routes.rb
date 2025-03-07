@@ -950,6 +950,7 @@ CanvasRails::Application.routes.draw do
     resources :question_banks, only: :index
     get :admin_merge
     get :admin_split
+    get :user_for_merge
     post :merge
     get :grades
     get :manageable_courses

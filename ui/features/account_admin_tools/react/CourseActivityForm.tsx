@@ -29,7 +29,7 @@ import {
 } from '@canvas/forms/react/react-hook-form/utils'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import AutoCompleteSelect from './AutoCompleteSelect'
+import AutoCompleteSelect from '../../../shared/auto-complete-select/react/AutoCompleteSelect'
 
 const I18n = createI18nScope('course_logging_content')
 
