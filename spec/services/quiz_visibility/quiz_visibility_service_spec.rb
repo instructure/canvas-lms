@@ -170,6 +170,13 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
 
+        it "shows the quiz to the user if course_ids is not present" do
+          student_in_course_with_adhoc_override(@quiz)
+
+          visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, quiz_ids: @quiz.id, course_ids: nil).map(&:quiz_id)
+          expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_truthy
+        end
+
         it "does not return a visibility for a student without an ADHOC override" do
           @user = user_model
           ensure_user_does_not_see_quiz
@@ -227,6 +234,11 @@ describe "differentiated_assignments" do
 
         it "shows the quiz to the user" do
           ensure_user_sees_quiz
+        end
+
+        it "shows the quiz to the user if course_ids is not present" do
+          visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, quiz_ids: @quiz.id, course_ids: nil).map(&:quiz_id)
+          expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_truthy
         end
 
         it "updates when enrollments change" do
@@ -310,6 +322,17 @@ describe "differentiated_assignments" do
 
         configure_differentiation_tags(setting_enabled: false, feature_flag_enabled: false)
         ensure_user_does_not_see_quiz
+      end
+
+      it "does not include quiz if course_ids is not present" do
+        create_diff_tags_category_with_groups
+        diff_tag_group_1 = @diff_tag_category.groups[0]
+        user_in_non_collaborative_group(diff_tag_group_1)
+
+        @quiz.assignment_overrides.create!(set: diff_tag_group_1)
+
+        visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, quiz_ids: @quiz.id, course_ids: nil).map(&:quiz_id)
+        expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_falsey
       end
 
       it "does not apply non collaborative group overrides when override is deleted" do
@@ -561,6 +584,11 @@ describe "differentiated_assignments" do
 
       it "shows the quiz to users in the course" do
         ensure_user_sees_quiz
+      end
+
+      it "shows the quiz to the user if course_ids is not present" do
+        visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(user_ids: @user.id, quiz_ids: @quiz.id, course_ids: nil).map(&:quiz_id)
+        expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_truthy
       end
 
       it "does not show unpublished quizzes" do

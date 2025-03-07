@@ -42,14 +42,14 @@ describe WikiPageVisibility::WikiPageVisibilityService do
     let(:learning_object2) { @page2 }
     let(:learning_object_type) { "wiki_page" }
 
-    it_behaves_like "learning object visiblities"
+    it_behaves_like "learning object visibilities"
 
-    it_behaves_like "learning object visiblities with modules" do
+    it_behaves_like "learning object visibilities with modules" do
       before :once do
         Account.site_admin.disable_feature!(:visibility_performance_improvements)
       end
     end
-    it_behaves_like "learning object visiblities with modules" do
+    it_behaves_like "learning object visibilities with modules" do
       before :once do
         Account.site_admin.enable_feature!(:visibility_performance_improvements)
       end
