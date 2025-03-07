@@ -4320,6 +4320,8 @@ hu:
   attention_2baa0104: Figyelem
   attention_aaca1f1d: Figyelem!
   attribute_d9f3af72: Tulajdonság
+  attributes: 
+    idp_entity_id: "IdP Entity ID"
   attributes_locked_1a1a0f46: "%{attributes}zárolva"
   audio_1c89b0c8: hang-
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Az Ön eszköze vagy alkalmazása nem támogatja az audio tartalmakat."
@@ -5699,6 +5701,7 @@ hu:
   close_the_window_and_try_again_7353f8e: "Csukja be az ablakot, és próbálja újra."
   close_total_grade_override_tray_d3b1d190: "Zárja be a teljes érdemjegy felülbírálati tálcát"
   close_warning_d61daf2c: "Figyelmeztetés bezárása"
+  closed_captions_subtitles_e6aaa016: "Zárt feliratok"
   closed_for_comments_e395b42f: "Nem fűzhető hozzá megjegyzés"
   closes_5c6b4367: "Bezár:"
   cluster_cluster_b57fe99a: "Klaszter:%{cluster}"
@@ -26889,6 +26892,7 @@ hu:
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "A videokonferencia-eszközök lehetővé teszik az oktatók és a hallgatók közötti személyes kapcsolatot."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "A videótartalom nem támogatott az Ön eszközén vagy az alkalmazásban."
   video_file_f7188ffe: "Videó fájl"
+  video_options_24ef6e5d: Videóbeállítások
   video_player_b371005: Videólejátszó
   video_player_for_label_6a5fdb03: "Videolejátszó ehhez: %{label}"
   vietnam_84_e50a2a44: "Vietnám (+84)"
