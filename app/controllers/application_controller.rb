@@ -384,6 +384,7 @@ class ApplicationController < ActionController::Base
     new_quizzes_media_type
     differentiation_tags
     validate_call_to_action
+    new_quizzes_navigation_updates
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -2383,12 +2384,16 @@ class ApplicationController < ActionController::Base
   private :external_tool_redirect_display_type
 
   def render_external_tool_prepend_template?
-    !%w[full_width in_nav_context borderless].include?(external_tool_redirect_display_type)
+    display_types = %w[full_width in_nav_context borderless full_width_with_nav]
+
+    !display_types.include?(external_tool_redirect_display_type)
   end
   private :render_external_tool_prepend_template?
 
   def render_external_tool_append_template?
-    !%w[full_width borderless].include?(external_tool_redirect_display_type)
+    display_types = %w[full_width borderless full_width_with_nav]
+
+    !display_types.include?(external_tool_redirect_display_type)
   end
   private :render_external_tool_append_template?
 
@@ -3274,10 +3279,20 @@ class ApplicationController < ActionController::Base
   def show_student_view_button?
     return false unless @context.is_a?(Course) && can_do(@context, @current_user, :use_student_view)
 
+    return false if new_quizzes_navigation_updates? && new_quizzes_lti_tool?
+
     controller_action = "#{params[:controller]}##{params[:action]}"
     STUDENT_VIEW_PAGES.key?(controller_action) && (STUDENT_VIEW_PAGES[controller_action].nil? || !@context.tab_hidden?(STUDENT_VIEW_PAGES[controller_action]))
   end
   helper_method :show_student_view_button?
+
+  def new_quizzes_navigation_updates?
+    Account.site_admin.feature_enabled?(:new_quizzes_navigation_updates)
+  end
+
+  def new_quizzes_lti_tool?
+    @tool&.quiz_lti?
+  end
 
   def show_blueprint_button?
     @context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(@context)

@@ -198,29 +198,39 @@ describe('Quiz#multipleDueDates', () => {
 })
 
 describe('Quiz.Next', () => {
-  let quiz
-  let ajaxStub
+  const testUrl = (isFeatureFlagEnabled, expectedDisplay) => {
+    let quiz
+    let ajaxStub
+    describe(`when new_quizzes_navigation_updates FF is ${isFeatureFlagEnabled ? 'enabled' : 'disabled'}`, () => {
+      beforeEach(() => {
+        fakeENV.setup({
+          FEATURES: {
+            new_quizzes_navigation_updates : isFeatureFlagEnabled,
+          },
+        })
+        quiz = new Quiz({
+          id: 7,
+          html_url: 'http://localhost:3000/courses/1/assignments/7',
+          assignment_id: 7,
+          quiz_type: 'quizzes.next',
+        })
+        $.ajaxJSON = jest.fn().mockImplementation(() => Promise.resolve())
+        ajaxStub = $.ajaxJSON
+      })
 
-  beforeEach(() => {
-    fakeENV.setup()
-    quiz = new Quiz({
-      id: 7,
-      html_url: 'http://localhost:3000/courses/1/assignments/7',
-      assignment_id: 7,
-      quiz_type: 'quizzes.next',
+      afterEach(() => {
+        jest.restoreAllMocks()
+        fakeENV.teardown()
+      })
+
+      it(`should set build url from html url using ${expectedDisplay} display type`, () => {
+        expect(quiz.get('build_url')).toBe(`http://localhost:3000/courses/1/assignments/7?display=${expectedDisplay}`)
+      })
     })
-    $.ajaxJSON = jest.fn().mockImplementation(() => Promise.resolve())
-    ajaxStub = $.ajaxJSON
-  })
+  }
 
-  afterEach(() => {
-    jest.restoreAllMocks()
-    fakeENV.teardown()
-  })
-
-  it('should set url from html url', () => {
-    expect(quiz.get('url')).toBe('http://localhost:3000/courses/1/assignments/7')
-  })
+  testUrl(true, 'full_width_with_nav');
+  testUrl(false, 'full_width');
 })
 
 describe('Quiz.Next with manage enabled', () => {
@@ -257,6 +267,11 @@ describe('Quiz polling', () => {
   let pollerMock
 
   beforeEach(() => {
+    fakeENV.setup({
+      FEATURES: {
+        new_quizzes_navigation_updates: false,
+      }
+    })
     jest.useFakeTimers()
     quiz = new Quiz({
       id: 7,

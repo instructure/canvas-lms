@@ -993,7 +993,15 @@ Assignment.prototype.htmlEditUrl = function () {
 }
 
 Assignment.prototype.htmlBuildUrl = function () {
-  return this.get('html_url')
+  if (this.isQuizLTIAssignment() && canManage()) {
+    let displayType = "full_width"
+    if (ENV.FEATURES.new_quizzes_navigation_updates) {
+      displayType = "full_width_with_nav"
+    }
+    return this.get('html_url') + `?display=${displayType}`
+  } else {
+    return this.get('html_url')
+  }
 }
 
 Assignment.prototype.labelId = function () {

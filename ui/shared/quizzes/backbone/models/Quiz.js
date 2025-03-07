@@ -165,7 +165,18 @@ export default class Quiz extends Backbone.Model {
   }
 
   build_url() {
-    return `${this.get('base_url')}/${this.get('id')}`
+    const url = `${this.get('base_url')}/${this.get('id')}`
+    if (this.isQuizzesNext()) {
+      let displayType = 'full_width'
+
+      if (ENV.FEATURES.new_quizzes_navigation_updates) {
+        displayType = 'full_width_with_nav'
+      }
+
+      return `${url}?display=${displayType}`
+    }
+
+    return url
   }
 
   edit_url() {

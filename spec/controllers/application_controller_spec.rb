@@ -1745,6 +1745,33 @@ RSpec.describe ApplicationController do
           end
         end
       end
+
+      context "external tool template rendering" do
+        shared_examples "display_type_filter" do |display_type, result_prepend, result_append|
+          before do
+            allow(controller).to receive(:external_tool_redirect_display_type).and_return(display_type)
+          end
+
+          context "render_external_tool_prepend_template?" do
+            it "returns #{result_prepend} if display type is #{display_type}" do
+              expect(controller.send(:render_external_tool_prepend_template?)).to eq(result_prepend)
+            end
+          end
+
+          context "render_external_tool_append_template?" do
+            it "returns #{result_append} if display type is #{display_type}" do
+              expect(controller.send(:render_external_tool_append_template?)).to eq(result_append)
+            end
+          end
+        end
+
+        it_behaves_like "display_type_filter", "full_width", false, false
+        it_behaves_like "display_type_filter", "full_width_in_context", true, true
+        it_behaves_like "display_type_filter", "full_width_with_nav", false, false
+        it_behaves_like "display_type_filter", "in_nav_context", false, true
+        it_behaves_like "display_type_filter", "borderless", false, false
+        it_behaves_like "display_type_filter", "other_display_type", true, true
+      end
     end
 
     describe "external_tools_display_hashes" do
@@ -2468,6 +2495,13 @@ RSpec.describe ApplicationController do
         controller.instance_variable_set(:@context, nil)
         controller.params[:controller] = "courses"
         controller.params[:action] = "show"
+        expect(controller.send(:show_student_view_button?)).to be_falsey
+      end
+
+      it "returns false if current LTI tool is New Quizzes and new_quizzes_navigation_updates FF is enabled" do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_navigation_updates).and_return(true)
+        allow(controller).to receive(:new_quizzes_lti_tool?).and_return(true)
+
         expect(controller.send(:show_student_view_button?)).to be_falsey
       end
 
