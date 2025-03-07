@@ -1630,7 +1630,7 @@ class Submission < ActiveRecord::Base
     submission&.submission_type
   end
 
-  def submission_history
+  def submission_history(include_version: false)
     @submission_histories ||= begin
       res = []
       last_submitted_at = nil
@@ -1643,14 +1643,27 @@ class Submission < ActiveRecord::Base
         elsif association(:originality_reports).loaded?
           model.turnitin_data = originality_data
         end
+
         if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
-          res << model
+          res << (include_version ? { model:, version: } : model)
           last_submitted_at = model.submitted_at
         end
       end
-      res = versions.to_a[0, 1].map(&:model) if res.empty?
-      res = [self] if res.empty?
-      res.sort_by { |s| s.submitted_at || CanvasSort::First }
+
+      if res.empty?
+        res = versions.to_a[0, 1].map do |version|
+          include_version ? { version:, model: version.model } : version.model
+        end
+      end
+
+      if res.empty?
+        res = include_version ? [{ model: self, version: nil }] : [self]
+      end
+
+      res.sort_by do |entry|
+        sub = include_version ? entry.fetch(:model) : entry
+        sub.submitted_at || CanvasSort::First
+      end
     end
   end
 
