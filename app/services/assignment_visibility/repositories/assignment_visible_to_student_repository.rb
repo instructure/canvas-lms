@@ -49,6 +49,9 @@ module AssignmentVisibility
             /* join active student enrollments */
             #{VisibilitySqlHelper.enrollment_join_sql}
 
+            /* join context modules */
+            #{assignment_module_items_join_sql}
+
             /* join assignment group overrides */
             #{VisibilitySqlHelper.assign_to_differentiation_tags_enabled?(course_ids) ? assignment_group_override_join_sql : assignment_group_override_join_sql(collaborative_group_filter: "AND g.non_collaborative = FALSE")}
 
@@ -256,7 +259,7 @@ module AssignmentVisibility
         def assignment_group_override_join_sql(collaborative_group_filter: nil)
           <<~SQL.squish
             INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-              ON o.id = ao.assignment_id
+              ON (o.id = ao.assignment_id OR m.id = ao.context_module_id)
               AND ao.set_type = 'Group'
             INNER JOIN #{Group.quoted_table_name} g
               ON g.id = ao.set_id

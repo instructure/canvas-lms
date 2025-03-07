@@ -212,7 +212,9 @@ module VisibilitySqlHelper
     end
 
     def assign_to_differentiation_tags_enabled?(course_ids)
-      return false if course_ids.blank?
+      # alternatively this could throw a error if course_ids is nil. However, this feature flag check will go
+      # away once the feature is fully enabled.
+      return false unless course_ids.present?
 
       account_ids = Course.where(id: course_ids).distinct.pluck(:account_id).uniq
       accounts = Account.where(id: account_ids).to_a
