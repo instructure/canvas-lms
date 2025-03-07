@@ -45,10 +45,22 @@ class ActiveRecord::Base
         defined?(SpecTransactionWrapper) && SpecTransactionWrapper.method(:wrap_block_in_transaction),
         AfterTransactionCommit::Transaction.instance_method(:commit_records)
       ].map do |method|
-        if method
-          regex = /\A#{Regexp.escape(method.source_location.first)}:\d+:in `#{Regexp.escape(method.name)}'\z/
-          stacktrace.index { |s| s =~ regex }
-        end
+        next unless method
+
+        search_name = if RUBY_VERSION >= "3.4.0"
+                        owner_str = method.owner.to_s
+
+                        if owner_str =~ /\A#<Class:(.+)>\z/
+                          "'#{Regexp.last_match(1)}.#{method.name}'"
+                        else
+                          "'#{owner_str}##{method.name}'"
+                        end
+                      else
+                        "`#{method.name}'"
+                      end
+
+        regex = /\A#{Regexp.escape(method.source_location.first)}:\d+:in #{Regexp.escape(search_name)}\z/
+        stacktrace.index { |s| s =~ regex }
       end
 
       if transaction_index
