@@ -160,6 +160,44 @@ describe('Assignment Student Content View', () => {
       expect(queryByTestId('assignment-2-student-content-tabs')).not.toBeInTheDocument()
     })
 
+    it('renders View Submission link when LTI_TOOL is true and the submission is graded', async () => {
+      window.ENV.LTI_TOOL = 'true'
+
+      props.submission.state = 'graded'
+
+      const {getByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>,
+      )
+      const submissionDetailsLink = getByTestId('view-submission-link')
+      expect(submissionDetailsLink).toBeInTheDocument()
+    })
+
+    it('does not render the View Submission link when LTI_TOOL is true and the submission is not graded', async () => {
+      window.ENV.LTI_TOOL = 'true'
+
+      props.submission.state = 'unsubmitted'
+
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>,
+      )
+
+      expect(queryByTestId('view-submission-link')).not.toBeInTheDocument()
+    })
+
+    it('does not render the View Submission link when LTI_TOOL is false', async () => {
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>,
+      )
+
+      expect(queryByTestId('view-submission-link')).not.toBeInTheDocument()
+    })
+
     it('renders LTI Launch Iframe when LTI_TOOL is true', async () => {
       window.ENV.LTI_TOOL = 'true'
 
@@ -172,7 +210,7 @@ describe('Assignment Student Content View', () => {
       expect(lti_external_tool).toBeInTheDocument()
     })
 
-    it('does not renders LTI Launch Iframe when LTI_TOOL is false', async () => {
+    it('does not render LTI Launch Iframe when LTI_TOOL is false', async () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
