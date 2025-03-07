@@ -4781,6 +4781,8 @@ nn:
   attention_2baa0104: Merksemd
   attention_aaca1f1d: Obs!
   attribute_d9f3af72: Attributt
+  attributes: 
+    idp_entity_id: "ID for IdP-eining"
   attributes_locked_1a1a0f46: "%{attributes} låste"
   audio_1c89b0c8: lyd
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Lydinnhaldet er ikkje støtta av eininga eller appen."
@@ -6223,6 +6225,7 @@ nn:
   close_suggestions_6fcb4985: "Lukk forslaga"
   close_the_window_and_try_again_7353f8e: "Lukk vindauget og prøv igjen. "
   close_warning_d61daf2c: "Lukk åtvaring"
+  closed_captions_subtitles_e6aaa016: Undertekstar
   closed_for_comments_e395b42f: "Stengt for kommentarar"
   closes_5c6b4367: "Lukkar: "
   cluster_cluster_b57fe99a: "Klynge: %{cluster}"
@@ -28769,6 +28772,7 @@ nn:
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Videokonferanseverktøya gjer det mogeleg å ha forbindelse ansikt til ansikt mellom lærarar og studentar."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Videoinnhaldet er ikkje støtta av eininga eller appen."
   video_file_f7188ffe: Videofil
+  video_options_24ef6e5d: Videoalternativ
   video_player_b371005: Videoavspelar
   video_player_for_label_6a5fdb03: "Videospelar for %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
