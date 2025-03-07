@@ -130,7 +130,7 @@
     "@types/tinycolor2": "^1.4.6",
     "@tinymce/tinymce-react": "~3.8.4",
     "aphrodite": "^2",
-    "axios": "^0.21.1",
+    "axios": "^1.8.2",
     "bloody-offset": "0.0.0",
     "crypto-es": "^2.0.4",
     "classnames": "^2.2.5",
