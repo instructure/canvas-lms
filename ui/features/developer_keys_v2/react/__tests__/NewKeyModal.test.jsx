@@ -594,25 +594,6 @@ describe('NewKeyModal', () => {
     expect(ltiStub).toHaveBeenCalled()
   })
 
-  it('flashes an error if redirect_uris is empty', () => {
-    const flashStub = jest.spyOn($, 'flashError')
-    const createOrEditSpy = jest.fn()
-    const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
-    const developerKey2 = {...developerKey, require_scopes: true, scopes: [], redirect_uris: ''}
-    const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
-    const {ref} = renderDeveloperKeyModal({
-      createLtiKeyState,
-      createOrEditDeveloperKeyState: editDeveloperKeyState2,
-      listDeveloperKeyScopesState,
-      actions: mergedFakeActions,
-      selectedScopes: [],
-    })
-
-    ref.current.saveLtiToolConfiguration()
-
-    expect(flashStub).toHaveBeenCalledWith('A redirect_uri is required, please supply one.')
-  })
-
   describe('redirect_uris is too long', () => {
     let flashStub
     const createOrEditSpy = jest.fn()
@@ -823,7 +804,7 @@ describe('NewKeyModal', () => {
     })
 
     it('updates `redirect_uris` when updating the tool configuration', async () => {
-      const redirectUris = screen.getByLabelText('* Redirect URIs:')
+      const redirectUris = screen.getByLabelText('Redirect URIs: *')
       await userEvent.clear(redirectUris)
       expect(redirectUris).toHaveValue('')
 
@@ -836,7 +817,7 @@ describe('NewKeyModal', () => {
     })
 
     it('does not update `redirect_uris` if already set when updating the tool configuration', async () => {
-      const redirectUris = screen.getByLabelText('* Redirect URIs:')
+      const redirectUris = screen.getByLabelText('Redirect URIs: *')
       await userEvent.clear(redirectUris)
       await userEvent.click(redirectUris)
       await userEvent.paste('http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com')
@@ -852,7 +833,7 @@ describe('NewKeyModal', () => {
     })
 
     it('does update `redirect_uris` if already set when using the `Sync URIs` button', async () => {
-      const redirectUris = screen.getByLabelText('* Redirect URIs:')
+      const redirectUris = screen.getByLabelText('Redirect URIs: *')
       await userEvent.clear(redirectUris)
 
       const config = screen.getByLabelText('LTI 1.3 Configuration')
@@ -862,7 +843,7 @@ describe('NewKeyModal', () => {
 
       await userEvent.click(screen.getByRole('button', {name: /sync uris/i}))
 
-      expect(screen.getByLabelText(/\* Redirect URIs:/i)).toHaveValue(
+      expect(screen.getByLabelText(/Redirect URIs: */i)).toHaveValue(
         validToolConfig.target_link_uri,
       )
     })
