@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import React, {useLayoutEffect, useRef, useContext} from 'react'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import theme from '@instructure/canvas-theme'
-
+import {scrollToHighlight} from './ScrollToHighlight'
 export function Highlight({...props}) {
   const highlightRef = useRef()
   const urlParams = new URLSearchParams(window.location.search)
@@ -51,7 +51,6 @@ export function Highlight({...props}) {
   useLayoutEffect(() => {
     if (props.isHighlighted && highlightRef.current) {
       setTimeout(() => {
-        highlightRef.current?.scrollIntoView({behavior: 'smooth', block: 'center'})
         if (focusSelector) {
           const speedGraderDiv = highlightRef.current?.querySelector('#speedgrader-navigator')
           triggerFocus(speedGraderDiv)
@@ -60,6 +59,7 @@ export function Highlight({...props}) {
         } else {
           highlightRef.current?.querySelector('button').focus({preventScroll: true})
         }
+        scrollToHighlight(highlightRef.current)
       }, 0)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
