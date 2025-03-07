@@ -24,9 +24,15 @@ import FileUpload from '../FileUpload'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/client/testing'
-import React from 'react'
+import React, {createRef} from 'react'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import StudentViewContext from '../../Context'
+
+jest.mock('@canvas/upload-file', () => ({
+  uploadFile: jest.fn().mockImplementation((file) => {
+    return Promise.resolve({ id: 'mock-id', name: file.name })
+  })
+}))
 
 async function createGraphqlMocks(overrides = {}) {
   const userGroupOverrides = [{Node: () => ({__typename: 'User'})}]
@@ -70,18 +76,14 @@ async function makeProps(overrides) {
     filesToUpload: [],
     uploadingFiles: false,
     focusOnInit: false,
+    submitButtonRef: createRef()
   }
   return props
 }
 
-// EVAL-3907 - remove or rewrite to remove spies on imports
-describe.skip('FileUpload', () => {
+describe('FileUpload', () => {
   beforeAll(() => {
     $('body').append('<div role="alert" id="flash_screenreader_holder" />')
-  })
-
-  beforeEach(() => {
-    uploadFileModule.uploadFile = jest.fn().mockResolvedValue(null)
   })
 
   const uploadFiles = (element, files) => {
@@ -225,8 +227,10 @@ describe.skip('FileUpload', () => {
       </MockedProvider>,
     )
     const fileInput = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
-    const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
+    const file = new Blob(['foo'], { type: 'application/pdf' })
+    file.name = 'file1.pdf'
+    const file2 = new Blob(['foo'], { type: 'application/pdf' })
+    file2.name = 'file2.pdf'
 
     uploadFiles(fileInput, [file, file2])
 
@@ -234,8 +238,8 @@ describe.skip('FileUpload', () => {
       expect(props.onUploadRequested).toHaveBeenCalledWith(
         expect.objectContaining({
           files: [
-            expect.objectContaining({preview: 'http://example.com/whatever'}),
-            expect.objectContaining({preview: 'http://example.com/whatever'}),
+            expect.objectContaining({ preview: expect.stringMatching(/^blob:/) }),
+            expect.objectContaining({ preview: expect.stringMatching(/^blob:/) }),
           ],
         }),
       )
@@ -259,7 +263,8 @@ describe.skip('FileUpload', () => {
       </MockedProvider>,
     )
     const fileInput = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+    const file = new Blob(['foo'], { type: 'application/pdf' })
+    file.name = 'file1.pdf'
 
     uploadFiles(fileInput, [file])
     await waitFor(() => {
@@ -572,7 +577,8 @@ describe.skip('FileUpload', () => {
       </MockedProvider>,
     )
     const fileInput = container.querySelector('input[id="inputFileDrop"]')
-    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+    const file = new Blob(['foo'], { type: 'application/pdf' })
+    file.name = 'file1.pdf'
 
     uploadFiles(fileInput, [file])
 
@@ -593,11 +599,42 @@ describe.skip('FileUpload', () => {
       </MockedProvider>,
     )
     const fileInput = container.querySelector('input[id="inputFileDrop"]')
-    const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
+    const file = new Blob(['foo'], { type: 'application/jpg' })
+    file.name = 'file1.jpg'
 
     uploadFiles(fileInput, [file])
 
     expect(queryByText('Invalid file type')).toBeNull()
+  })
+
+  it('renders an error when attempting to submit the assignment with no files', async () => {
+    const mocks = await createGraphqlMocks()
+    const props = await makeProps({Submission: { submissionDraft: { meetsUploadCriteria: false }}})
+    const submitButton = document.createElement('button')
+    props.submitButtonRef.current = submitButton
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <FileUpload {...props} />
+      </MockedProvider>,
+    )
+    fireEvent.click(props.submitButtonRef.current)
+    expect(getByText('At least one submission type is required')).toBeInTheDocument()
+  })
+
+  it('clears error when clicking the FileDrop component', async () => {
+    const mocks = await createGraphqlMocks()
+    const props = await makeProps({Submission: { submissionDraft: { meetsUploadCriteria: false }}})
+    const submitButton = document.createElement('button')
+    props.submitButtonRef.current = submitButton
+    const {getByText, queryByText} = render(
+      <MockedProvider mocks={mocks}>
+        <FileUpload {...props} />
+      </MockedProvider>,
+    )
+    fireEvent.click(props.submitButtonRef.current)
+    expect(getByText('At least one submission type is required')).toBeInTheDocument()
+    fireEvent.click(document.getElementById('inputFileDrop'))
+    expect(queryByText('At least one submission type is required')).not.toBeInTheDocument()
   })
 
   it('shows a checkmark icon for uploaded files', async () => {

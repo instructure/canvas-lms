@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {getAutoTrack} from '@canvas/canvas-media-player'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import {bool, func, string} from 'prop-types'
+import {bool, func, string, object} from 'prop-types'
 import elideString from '../../helpers/elideString'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -45,8 +45,10 @@ import {Flex} from '@instructure/ui-flex'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 
 const I18n = createI18nScope('assignments_2_media_attempt')
+const MEDIA_ERROR_MESSAGE = I18n.t('At least one submission type is required')
 
 export const VIDEO_SIZE_OPTIONS = {height: '400px', width: '768px'}
 
@@ -61,11 +63,13 @@ class MediaAttempt extends React.Component {
     uploadingFiles: bool.isRequired,
     setIframeURL: func.isRequired,
     iframeURL: string,
+    submitButtonRef: object
   }
 
   state = {
     mediaModalOpen: false,
     mediaModalTabs: {record: false, upload: false},
+    showErrorMessage: false,
   }
 
   componentDidMount() {
@@ -76,6 +80,25 @@ class MediaAttempt extends React.Component {
       !this.props.submission.submissionDraft?.mediaObject?._id
     ) {
       this._mediaUploadRef.focus()
+    }
+    this.props.submitButtonRef?.current?.addEventListener('click', this.handleSubmitClick)
+  }
+
+  componentDidUpdate(_prevProps) {
+    this.props.submitButtonRef?.current?.addEventListener('click', this.handleSubmitClick)
+  }
+
+  componentWillUnmount() {
+    this.props.submitButtonRef.current?.removeEventListener('click', this.handleSubmitClick)
+  }
+
+  handleSubmitClick = () => {
+    if (!this.props.submission.submissionDraft?.meetsMediaRecordingCriteria) {
+      this._mediaUploadRef.focus()
+      const container = document.getElementById('media_upload_container')
+      container?.classList.add('error-outline')
+      this._mediaUploadRef.current?.setAttribute('aria-label', MEDIA_ERROR_MESSAGE)
+      this.setState({showErrorMessage: true})
     }
   }
 
@@ -112,6 +135,20 @@ class MediaAttempt extends React.Component {
       },
     })
     this.props.setIframeURL('')
+  }
+
+  handleMediaClick = (record, upload) => {
+    if (this.state.showErrorMessage) {
+      // clear errors
+      const container = document.getElementById('media_upload_container')
+      container?.classList.remove('error-outline')
+    }
+    this._mediaUploadRef.current?.removeAttribute('aria-label')
+    this.setState({
+      mediaModalTabs: {record: record, upload: upload},
+      mediaModalOpen: true,
+      showErrorMessage: false
+    })
   }
 
   renderMediaPlayer = (mediaObject, renderTrashIcon) => {
@@ -216,7 +253,8 @@ class MediaAttempt extends React.Component {
         />
         <StudentViewContext.Consumer>
           {context => (
-            <Flex alignItems="center" justifyItems="center" direction={desktop ? 'row' : 'column'}>
+            <>
+            <Flex id='media_upload_container' alignItems="center" justifyItems="center" direction={desktop ? 'row' : 'column'}>
               <Flex.Item margin="small">
                 <View
                   as="div"
@@ -248,12 +286,7 @@ class MediaAttempt extends React.Component {
                         elementRef={el => {
                           this._mediaUploadRef = el
                         }}
-                        onClick={() =>
-                          this.setState({
-                            mediaModalTabs: {record: true, upload: false},
-                            mediaModalOpen: true,
-                          })
-                        }
+                        onClick={() => this.handleMediaClick(true, false)}
                       >
                         {I18n.t('Record Media')}
                       </Button>
@@ -318,12 +351,7 @@ class MediaAttempt extends React.Component {
                         disabled={!context.allowChangesToSubmission}
                         renderIcon={IconUploadLine}
                         color="primary"
-                        onClick={() =>
-                          this.setState({
-                            mediaModalTabs: {record: false, upload: true},
-                            mediaModalOpen: true,
-                          })
-                        }
+                        onClick={() => this.handleMediaClick(false, true)}
                       >
                         {I18n.t('Upload Media')}
                       </Button>
@@ -332,6 +360,12 @@ class MediaAttempt extends React.Component {
                 </View>
               </Flex.Item>
             </Flex>
+            {this.state.showErrorMessage && (
+              <View as='div' padding='small 0 0 0' background='primary'>
+                <FormattedErrorMessage message={MEDIA_ERROR_MESSAGE} />
+              </View>
+            )}
+            </>
           )}
         </StudentViewContext.Consumer>
       </>

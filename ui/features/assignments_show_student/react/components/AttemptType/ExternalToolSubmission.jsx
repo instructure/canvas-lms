@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {func, number, string, shape} from 'prop-types'
+import {func, number, string, shape, object} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useEffect, useState} from 'react'
 
@@ -27,9 +27,11 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = createI18nScope('assignments_2_external_tool')
+export const EXTERNAL_TOOL_ERROR_MESSAGE = I18n.t('Please launch the tool and select a resource')
 
 // A generic component that shows an iframe for a given URL, used for both
 // launching the LTI to select content and showing selected content
@@ -59,12 +61,13 @@ function SelectedContentView({url, resourceLinkLookupUuid}) {
   return <ContentLaunchView launchURL={launchURL} />
 }
 
-function ExternalToolDraftView({createSubmissionDraft, onFileUploadRequested, submission, tool}) {
+function ExternalToolDraftView({createSubmissionDraft, onFileUploadRequested, submission, tool, submitButtonRef}) {
   const {submissionDraft} = submission
   const draftExistsForThisTool =
     submissionDraft?.externalTool?._id === tool._id && submissionDraft?.ltiLaunchUrl != null
 
   const [selectingItem, setSelectingItem] = useState(!draftExistsForThisTool)
+  const [showErrorMessage, setShowErrorMessage] = useState(false)
 
   useEffect(() => {
     async function handleDeepLinking(e) {
@@ -80,6 +83,8 @@ function ExternalToolDraftView({createSubmissionDraft, onFileUploadRequested, su
       if (contentItem == null) {
         return
       }
+
+      clearErrors()
 
       if (contentItem['@type'] === 'FileItem' || contentItem.type === 'file') {
         // This is a file, so let's start the upload and redirect the user to
@@ -110,25 +115,57 @@ function ExternalToolDraftView({createSubmissionDraft, onFileUploadRequested, su
     }
   }, [createSubmissionDraft, onFileUploadRequested, submission, tool])
 
+  useEffect(() => {
+    const handleClick = () => {
+      if (!submissionDraft?.meetsBasicLtiLaunchCriteria) {
+        const container = document.getElementById('external_tool_submission_container')
+        container?.classList.add('error-outline')
+        container?.setAttribute('aria-label', EXTERNAL_TOOL_ERROR_MESSAGE)
+        container?.focus()
+        setShowErrorMessage(true)
+      }
+    }
+
+    submitButtonRef.current?.addEventListener('click', handleClick)
+
+    return () => {
+      submitButtonRef.current?.removeEventListener('click', handleClick)
+    }
+  }, [])
+
+  const clearErrors = () => {
+    const container = document.getElementById('external_tool_submission_container')
+    container?.classList.remove('error-outline')
+    container?.removeAttribute('aria-label')
+    setShowErrorMessage(false)
+  }
+
   const contentSelectionUrl = `/courses/${ENV.COURSE_ID}/external_tools/${tool._id}/resource_selection?launch_type=homework_submission&assignment_id=${ENV.ASSIGNMENT_ID}`
 
   return (
-    <View as="div">
-      {draftExistsForThisTool && !selectingItem ? (
-        <View as="div" borderWidth="small" padding="small">
-          <Text>{I18n.t('Website URL: %{url}', {url: submissionDraft.ltiLaunchUrl})}</Text>
-          <br />
-          <Button onClick={() => setSelectingItem(true)}>{I18n.t('Change')}</Button>
+    <>
+      <View id="external_tool_submission_container" as="div">
+        {draftExistsForThisTool && !selectingItem ? (
+          <View as="div" borderWidth="small" padding="small">
+            <Text>{I18n.t('Website URL: %{url}', {url: submissionDraft.ltiLaunchUrl})}</Text>
+            <br />
+            <Button onClick={() => setSelectingItem(true)}>{I18n.t('Change')}</Button>
 
-          <SelectedContentView
-            url={submissionDraft.ltiLaunchUrl}
-            resourceLinkLookupUuid={submissionDraft.resourceLinkLookupUuid}
-          />
+            <SelectedContentView
+              url={submissionDraft.ltiLaunchUrl}
+              resourceLinkLookupUuid={submissionDraft.resourceLinkLookupUuid}
+            />
+          </View>
+        ) : (
+          <ContentLaunchView launchURL={contentSelectionUrl} />
+        )}
+      </View>
+      {showErrorMessage && (
+        <View as='div' background='primary' padding='small 0 0 0'>
+          <FormattedErrorMessage message={EXTERNAL_TOOL_ERROR_MESSAGE} />
         </View>
-      ) : (
-        <ContentLaunchView launchURL={contentSelectionUrl} />
       )}
-    </View>
+    </>
   )
 }
 
@@ -137,6 +174,7 @@ const ExternalToolSubmission = ({
   onFileUploadRequested,
   submission,
   tool,
+  submitButtonRef
 }) =>
   isSubmitted(submission) ? (
     <SelectedContentView
@@ -149,6 +187,7 @@ const ExternalToolSubmission = ({
       onFileUploadRequested={onFileUploadRequested}
       submission={submission}
       tool={tool}
+      submitButtonRef={submitButtonRef}
     />
   )
 
@@ -163,6 +202,7 @@ ExternalToolSubmission.propTypes = {
     url: string,
   }).isRequired,
   tool: ExternalToolModel.shape,
+  submitButtonRef: object
 }
 
 ExternalToolSubmission.defaultProps = {
