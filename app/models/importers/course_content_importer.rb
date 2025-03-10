@@ -567,6 +567,10 @@ module Importers
       if settings.key?(:allow_student_anonymous_discussion_topics)
         course.allow_student_anonymous_discussion_topics = settings[:allow_student_anonymous_discussion_topics]
       end
+
+      if course.course_sections.active.count > 1 && settings.key?(:hide_sections_on_course_users_page)
+        course.hide_sections_on_course_users_page = settings[:hide_sections_on_course_users_page]
+      end
     end
 
     def self.shift_date_options(course, options = {})
