@@ -492,17 +492,19 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             />
           </Flex.Item>
         </Flex>
-        <FrequencyPicker
-          key={date || today}
-          date={date || today}
-          locale={locale}
-          timezone={timezone}
-          width="auto"
-          initialFrequency={frequency}
-          rrule={rrule}
-          onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
+        {event.object.all_context_codes == event.object.context_code && (
+          <FrequencyPicker
+            key={date || today}
+            date={date || today}
+            locale={locale}
+            timezone={timezone}
+            width="auto"
+            initialFrequency={frequency}
+            rrule={rrule}
+            onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
           courseEndAt={context.course_conclude_at || undefined}
-        />
+          />
+        )}
         {shouldShowLocationField() && (
           <TextInput
             data-testid="edit-calendar-event-form-location"
