@@ -571,4 +571,21 @@ describe QuizzesHelper do
       expect(comment).to eq('<img class="equation_image" data-equation-content="\\coprod">')
     end
   end
+
+  describe "#link_to_take_quiz" do
+    before do
+      @quiz = instance_double("Quiz", cant_go_back?: false)
+      allow(self).to receive_messages(preview_quiz_url: "/preview_quiz_url", take_quiz_url: "/take_quiz_url")
+    end
+
+    context 'when opts["class"] includes "btn"' do
+      let(:link_body) { "Take the Quiz Again" }
+      let(:opts) { { "class" => "btn btn-primary", "id" => "take_quiz_link" } }
+
+      it 'adds role="button"' do
+        result = link_to_take_quiz(link_body, opts)
+        expect(result).to include('role="button"')
+      end
+    end
+  end
 end
