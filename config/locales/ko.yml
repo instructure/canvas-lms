@@ -5455,6 +5455,7 @@ ko:
   email_address_a1b97a39: "이메일 주소"
   email_address_optional_72795076: "이메일 주소 (선택)"
   email_e366fa29: 이메일
+  emails_d07c3348: 이메일
   enable_6f5d1328: 사용
   enable_and_lock_e6099cc2: "사용 및 잠금"
   enable_gravatar_8a865b41: "Gravatar 허용하기"
@@ -7716,6 +7717,7 @@ ko:
     customize: "사용자 정의"
     managed_accounts: "관리하는 계정"
     my_courses: "내 과목"
+  merge_user_accounts_a49e8fb1: "사용자 계정 병합"
   message: 
     default_subject: "Canvas 알림"
   message_groups_who_1ba736f: "다음 그룹에게 메시지 보내기"
@@ -9585,6 +9587,7 @@ ko:
   next_module_66f58e91: "다음 모듈"
   next_steps_ce0f0d0c: "다음 단계"
   next_student_79955068: "다음 학생"
+  no_active_user_with_that_id_was_found_b8fb5e14: "해당 ID를 가진 활성 사용자를 찾을 수 없습니다."
   no_assignment_selected_65d9e422: "선택한 과제 없음"
   no_content_5dbc9acf: "내용 없음"
   no_conversations_selected_ebcd9226: "선택한 대화 없음"
@@ -12249,6 +12252,7 @@ ko:
     course_files: "과목 파일"
     group_files: "그룹 파일"
     my_files: "내 파일"
+  root_account_9d4fcb97: "루트 계정"
   roster: 
     delete_confirm: "이 사용자를 제거하시겠습니까?"
     error_sending_invitations: "초대를 보내는 데 오류가 발생했습니다. 다시 시도하시기 바랍니다."
@@ -13984,6 +13988,7 @@ ko:
   title_52b8638d: "직함:"
   title_ee03d132: 직함
   title_is_too_long_b192a46a: "제목이 너무 김"
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "제목은 하나의 글자나 숫자를 포함해야 함"
   title_separator: ": "
   titles: 
     aligned_items: "정렬된 항목"
@@ -14154,6 +14159,7 @@ ko:
     titles: 
       add_login: "로그인 추가"
       update_login: "로그인 업데이트"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "사용자 병합에 실패했습니다. 필요한 권한을 가지고 있는지 확인하고 다시 시도하시기 바랍니다."
   user_name: 
     buttons: 
       update_user: "사용자 업데이트"
@@ -14703,6 +14709,7 @@ ko:
   yesterday_c6bd6abf: 어제
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "이제 이 퀴즈를 이미 치른 학생을 위한 다시 평가하기 옵션을 설정할 수 있습니다."
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "권한이 없거나 한 곳 이상의 장소에서 사용하고 있으므로 이 루브릭을 편집할 수 없습니다. 변경한 내용은 기존 루브릭을 바탕으로 한 새 루브릭이 됩니다. 계속 진행하시겠습니까?"
+  you_can_t_merge_an_account_with_itself_15f58d41: "같은 계정으로 병합할 수 없습니다."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "이 사용자의 정보를 업데이트할 수 있지만 사용자가 원래대로 바꿀 수 있습니다."
   you_created_an_announcement_in_course_c49e3d70: "%{course}에 공지를 생성했습니다"
   you_currently_have_no_pinned_discussions_6f0078b8: "고정한 토론이 없음"
