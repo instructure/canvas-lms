@@ -24,6 +24,9 @@ class GroupCategory < ActiveRecord::Base
   attr_accessor :group_by_section
   attr_writer :assign_unassigned_members
 
+  cattr_accessor :MAX_DIFFERENTIATION_TAG_PER_COURSE
+  self.MAX_DIFFERENTIATION_TAG_PER_COURSE = 40
+
   attr_readonly :non_collaborative
 
   belongs_to :context, polymorphic: [:course, :account]
@@ -585,11 +588,31 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
+  def max_diff_tag_validation_count
+    sql = <<-SQL.squish
+      SELECT
+        SUM(
+          CASE#{" "}
+            WHEN (SELECT COUNT(id) FROM #{Group.quoted_table_name} WHERE group_category_id = parent.id AND workflow_state <> 'deleted') = 0 THEN 1#{" "}
+            ELSE (SELECT COUNT(id) FROM #{Group.quoted_table_name} WHERE group_category_id = parent.id AND workflow_state <> 'deleted')#{" "}
+          END
+        ) AS diff_tag_count
+      FROM #{GroupCategory.quoted_table_name} parent
+      WHERE#{" "}
+        non_collaborative = true
+        AND context_type = 'Course'
+        AND context_id = #{context_id}
+    SQL
+
+    ActiveRecord::Base.connection.execute(sql).first["diff_tag_count"].to_i
+  end
+
   protected
 
   def validate_non_collaborative_constraints
     errors.add(:base, "Non-collaborative group categories can only be created for courses") unless context_type == "Course"
     errors.add(:base, "Non-collaborative group categories cannot be student organized or communities") if ["student_organized", "communities"].include?(role)
+    errors.add(:base, "You have reached the tag limit for this course") if new_record? && max_diff_tag_validation_count >= self.MAX_DIFFERENTIATION_TAG_PER_COURSE
   end
 
   def start_progress
