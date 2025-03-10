@@ -10698,6 +10698,7 @@ nn:
   email_is_invalid_e0d982eb: "E-postadresse er ugyldig."
   email_is_required_736ac26b: "E-post er obligatorisk"
   email_the_user_about_this_account_creation_e63f8759: "Send e-post til brukaren om kontoopprettinga"
+  emails_d07c3348: E-postar
   embed_828fac4a: "Sett inn"
   embed_video_code_703e10f2: "Sett inn videokode"
   embedded_images_598ff8da: embedded_images
@@ -15765,6 +15766,7 @@ nn:
   menu_for_group_title_fbf60567: "Meny for gruppe %{title}"
   menu_for_outcome_title_1d93378d: "Meny for læringsmål %{title}"
   menu_options_9b6b0b5c: Menyval
+  merge_user_accounts_a49e8fb1: "Slå saman brukarkontoar"
   mesa_public_course_syllabus_52282dd3: "Mesa offentleg emneoversikt"
   mesa_public_user_inactivity_report_a6792ccf: "Rapport over offentlege inaktive Mesa brukarar"
   message: 
@@ -18187,6 +18189,7 @@ nn:
   nightingale_student_activity_tracking_f7d7c4cf: "Nightingale sporing av studentaktivitet"
   niles_student_activity_and_performance_eabf444d: "Niles Student Aktivitet og prestasjon"
   no_74e9b590: nei
+  no_active_user_with_that_id_was_found_b8fb5e14: "Finn ikkje aktiv brukar med denne ID-en."
   no_additional_details_were_added_for_this_assignme_547c0de7: "Ingen tilleggsdetaljar vart lagt til for denne oppgåva."
   no_alignments_are_available_for_this_outcome_7f8346f9: "Ingen justeringar er tilgjengeleg for dette læringsmålet."
   no_allowed_domains_b6633d12: "Ingen tillatne domene"
@@ -22887,6 +22890,7 @@ nn:
     my_files: "Mine filer"
   root_523acd46: Rot
   root_account_3fb3aacf: root_account
+  root_account_9d4fcb97: Rotkonto
   root_account_id_e8d75734: Rotkonto-ID
   root_accounts_cc035dcf: Rotkontoar
   root_learning_outcome_groups_4eb5a030: "Rot for læringsmålgrupper"
@@ -27134,6 +27138,7 @@ nn:
   title_is_too_long_must_be_under_length_characters_ab694ae4: "Tittelen er for lang, må vere under %{length} teikn"
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} er ulåst. Klikk for å låse "
   title_must_be_less_than_255_characters_f2f8ef16: "Tittel må ha færre enn 255 tegn."
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "Tittel må innehalde minst ein bokstav eller eit tal"
   title_must_not_be_empty_89f29a21: "Tittel kan ikkje stå tom."
   title_outcomes_7adbd9cc: "%{title} Utfall"
   title_required_3ff5969: "Tittel påkrevd"
@@ -28300,6 +28305,7 @@ nn:
     titles: 
       add_login: "Legg til pålogging"
       update_login: "Oppdater pålogging"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "Samanslåing av brukarar mislukkast. Kontroller om du har korrekt løyve og prøv på nytt."
   user_name: 
     buttons: 
       update_user: "Oppdater brukar"
@@ -29392,6 +29398,7 @@ nn:
   you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "Du kan ikkje endre dette vurderingsskjemaet, enten fordi du ikkje har løyve eller fordi det er i bruk fleire stader. Endringar du gjer vil resultere i eit nytt vurderingsskjema. Tilknytta læringsmål vil bruke emnets ekspertiseskala. Vil du halde fram likevel?"
   you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "Du kan ikkje endre dette vurderingsskjemaet, enten fordi du ikkje har løyve eller fordi det er i bruk fleire stader. Endringar du gjer vil resultere i eit nytt vurderingsskjema. Tilknytta læringsmålkriterier vil bruke kontoens meistringsskala. Vil du halde fram likevel?"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Dette vurderingsskjemaet er i bruk fleire stader. Dersom du redigerer her, vil det bli oppretta ein kopi av vurderingsskjemaet og endringane vil ikkje påverka det opphavlege skjemaet. Vil du halde fram likevel?"
+  you_can_t_merge_an_account_with_itself_15f58d41: "Du kan ikkje slå saman ein konto med seg sjølv."
   you_can_t_submit_an_assignment_when_it_is_unpublis_6c2c0b2f: "Du kan ikkje levera så lenge oppgåva er upublisert."
   you_can_try_to_log_in_again_2b23ef0f: "Du kan prøve å *logge på igjen*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Du kan oppdatere noko av denne brukaren sin informasjon, men dei kan endre det om dei vil."
