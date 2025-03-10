@@ -139,3 +139,19 @@ export function hasTextNode(elem) {
   const nodes = Array.from(elem.childNodes)
   return nodes.some(x => x.nodeType === Node.TEXT_NODE)
 }
+
+/**
+ * Notifies TinyMCE that a change has been made
+ * This ensures that changes persist in the editor's state without requiring additional user actions
+ * @returns {void}
+ */
+export function notifyTinyMCE() {
+  // Get the active TinyMCE editor instance
+  const editor = window.tinymce?.activeEditor
+
+  if (editor) {
+    // Mark the content as dirty to ensure TinyMCE knows it has changed
+    editor.undoManager.add()
+    editor.fire('Change')
+  }
+}
