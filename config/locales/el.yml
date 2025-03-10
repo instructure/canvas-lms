@@ -2659,6 +2659,8 @@ el:
   attendance_ca433183: Παρουσίες
   attendees_eb402bac: Συμμετέχοντες
   attention_aaca1f1d: Προσοχή!
+  attributes: 
+    idp_entity_id: "ID Εξωτερικού Παρόχου Ταυτότητας (ldP)"
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Το περιεχόμενο του αρχείου ήχου δεν υποστηρίζεται από τη συσκευή ή την εφαρμογή σας."
   audio_dd489fcc: "Αρχείο ήχου"
   auth_logging: 
@@ -6007,6 +6009,7 @@ el:
   email_is_invalid_e0d982eb: "H ηλεκτρονική διεύθυνση δεν είναι έγκυρη!"
   email_is_required_736ac26b: "Απαιτείται μια ηλεκτρονική διεύθυνση"
   email_the_user_about_this_account_creation_e63f8759: "Αποστολή email στον χρήστη σχετικά με την δημιουργία λογαριασμού"
+  emails_d07c3348: Email
   enable_6f5d1328: Ενεργοποίηση
   enable_and_lock_e6099cc2: "Ενεργοποίηση και Κλείδωμα"
   enable_feature_title_987d8e9a: "Ενεργοποίηση λειτουργίας: %{title}"
@@ -8272,6 +8275,7 @@ el:
   members_af25c21d: Μέλη
   members_are_free_to_join_defa5929: "Τα μέλη μπορούν ελεύθερα να συμμετάσχουν"
   membership_by_invitation_only_9bc27199: "Συνδρομή μόνο κατόπιν πρόσκλησης"
+  merge_user_accounts_a49e8fb1: "Συγχώνευση Λογαριασμών Χρηστών"
   message: 
     default_subject: "Ειδοποίηση Canvas"
   message_5c38209d: Μήνυμα
@@ -10095,6 +10099,7 @@ el:
   next_steps_ce0f0d0c: "Επόμενα Βήματα"
   next_student_79955068: "Επόμενος Μαθητής"
   no_74e9b590: όχι
+  no_active_user_with_that_id_was_found_b8fb5e14: "Δεν βρέθηκε ενεργός χρήστης με το συγκεκριμένο ID."
   no_assignment_name_adbb215b: "Δεν Υπάρχει Όνομα Εργασίας"
   no_assignment_selected_65d9e422: "Δεν έχει επιλεγεί Εργασία"
   no_content_5dbc9acf: "Κανένα Περιεχόμενο"
@@ -15427,6 +15432,7 @@ el:
     titles: 
       add_login: "Προσθήκη Σύνδεσης"
       update_login: "Ενημέρωση Σύνδεσης"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "<mrk mid=\"3718\" mtype=\"seg\">Η συγχώνευση χρήστη απέτυχε.</mrk> <mrk mid=\"3719\" mtype=\"seg\">Παρακαλώ βεβαιωθείτε ότι έχετε την απαιτούμενη εξουσιοδότηση και δοκιμάστε ξανά.</mrk>"
   user_name: 
     buttons: 
       update_user: "Ενημέρωση Χρήστη"
