@@ -122,7 +122,7 @@ const ActionMenuButton = ({
         return <Menu.Separator key={key} />
       }
       return (
-        <Menu.Item key={key} onClick={onClick} disabled={disabled} data-testid={text}>
+        <Menu.Item key={key} onClick={onClick} disabled={disabled} data-testid={`action-menu-button-${text}`}>
           <Flex alignItems="center" gap="x-small">
             {typeof icon === 'object' ? (
               <Flex.Item>{icon}</Flex.Item>

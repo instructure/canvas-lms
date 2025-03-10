@@ -79,7 +79,7 @@ describe "better_file_browsing" do
         get "/courses/#{@course.id}/files"
       end
 
-      it "edits file name", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "edits file name", priority: "1", upgrade_files_v2: "done" do
         expect(fln("example.pdf")).to be_present
         file_rename_to = "Example_edited.pdf"
         edit_name_from_cog_icon(file_rename_to)
@@ -87,7 +87,7 @@ describe "better_file_browsing" do
         expect(fln(file_rename_to)).to be_present
       end
 
-      it "deletes file", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "deletes file", priority: "1", upgrade_files_v2: "done" do
         skip_if_safari(:alert)
         delete_file(0, :cog_icon)
         expect(f("body")).not_to contain_css(".ef-item-row")
@@ -118,7 +118,7 @@ describe "better_file_browsing" do
     end
 
     context "from toolbar menu" do
-      it "deletes file from toolbar", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "deletes file from toolbar", priority: "1", upgrade_files_v2: "done" do
         skip_if_safari(:alert)
         get "/courses/#{@course.id}/files"
         delete_file(0, :toolbar_menu)
@@ -210,7 +210,7 @@ describe "better_file_browsing" do
       get "/courses/#{@course.id}/files"
     end
 
-    it "searches for a file", priority: "2", upgrade_files_v2: "waiting for deployment" do
+    it "searches for a file", priority: "2", upgrade_files_v2: "done" do
       expect(all_files_folders).to have_size 3
       f("input[type='search']").send_keys "b_fi", :return
       expect(all_files_folders).to have_size 1
@@ -228,7 +228,7 @@ describe "better_file_browsing" do
       user_session(@teacher)
     end
 
-    it "sets focus to the folder tree when opening the dialog", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "sets focus to the folder tree when opening the dialog", priority: "1", upgrade_files_v2: "feature not included" do
       get "/courses/#{@course.id}/files"
       ff(".al-trigger")[0].click
       fln("Move To...").click
@@ -236,7 +236,7 @@ describe "better_file_browsing" do
       check_element_has_focus(ff(".tree")[1])
     end
 
-    it "moves a file using cog icon", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "moves a file using cog icon", priority: "1", upgrade_files_v2: "done" do
       file_name = "a_file.txt"
       folder_model(name: "destination_folder")
       get "/courses/#{@course.id}/files"
@@ -247,7 +247,7 @@ describe "better_file_browsing" do
       expect(fln(file_name)).to be_displayed
     end
 
-    it "moves a file using toolbar menu", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "moves a file using toolbar menu", priority: "1", upgrade_files_v2: "done" do
       file_name = "a_file.txt"
       folder_model(name: "destination_folder")
       get "/courses/#{@course.id}/files"
@@ -258,7 +258,7 @@ describe "better_file_browsing" do
       expect(fln(file_name)).to be_displayed
     end
 
-    it "moves multiple files", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "moves multiple files", priority: "1", upgrade_files_v2: "done" do
       files = ["a_file.txt", "b_file.txt", "c_file.txt"]
       folder_model(name: "destination_folder")
       get "/courses/#{@course.id}/files"
@@ -291,14 +291,14 @@ describe "better_file_browsing" do
 
       let(:folder_name) { "destination_folder" }
 
-      it "moves a file to a destination if contexts are different", upgrade_files_v2: "waiting for deployment" do
+      it "moves a file to a destination if contexts are different", upgrade_files_v2: "done" do
         skip_if_chrome("research")
         folder_model(name: folder_name)
         get "/files"
         search_and_move(file_name: "a_file.txt", destination: "#{@course.name}/#{folder_name}")
       end
 
-      it "moves a file to a destination if the contexts are the same", upgrade_files_v2: "waiting for deployment" do
+      it "moves a file to a destination if the contexts are the same", upgrade_files_v2: "done" do
         skip_if_chrome("research")
         folder_model(name: folder_name, context: @user)
         get "/files"
@@ -599,7 +599,7 @@ describe "better_file_browsing" do
       expect(ff(".ef-name-col__text")[1]).to include_text "example.pdf"
     end
 
-    it "url-encodes sort header links", upgrade_files_v2: "waiting for deployment (RCX-2975)" do
+    it "url-encodes sort header links", upgrade_files_v2: "done" do
       course_with_teacher_logged_in
       Folder.root_folders(@course).first.sub_folders.create!(name: "eh?", context: @course)
       get "/courses/#{@course.id}/files/folder/eh%3F"

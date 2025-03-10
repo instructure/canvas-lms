@@ -131,6 +131,7 @@ export const RenameModal = ({
           placement="end"
           offset="small"
           onClick={onClose}
+          data-testid="rename-modal-button-close"
           screenReaderLabel={I18n.t('Close')}
         />
         <Heading>{I18n.t('Rename')}</Heading>
@@ -153,6 +154,7 @@ export const RenameModal = ({
             <div style={{paddingTop: '1.5rem'}}>
               <TextInput
                 value={newItemName}
+                data-testid="rename-modal-input-folder-name"
                 onChange={(_e: ChangeEvent<HTMLInputElement>, new_value: string) => {
                   setNewItemName(new_value)
                 }}
@@ -177,6 +179,7 @@ export const RenameModal = ({
           color="primary"
           margin="none none none small"
           onClick={handleSave}
+          data-testid="rename-modal-button-save"
           disabled={isRequestInFlight}
         >
           {I18n.t('Save')}
