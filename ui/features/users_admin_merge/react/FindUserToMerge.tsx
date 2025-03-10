@@ -26,7 +26,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import AutoCompleteSelect from '../../../shared/auto-complete-select/react/AutoCompleteSelect'
-import {useState} from 'react'
+import {useRef, useState} from 'react'
 import {
   AccountSelectOption,
   createUserToMergeQueryKey,
@@ -87,6 +87,7 @@ const FindUserToMerge = ({sourceUserId, accountSelectOptions, onFind}: FindUserT
     resolver: zodResolver(validationSchema),
   })
   const [findBy, setFindBy] = useState(FindByOptions.UserId)
+  const isFindBySelectFocused = useRef(false)
   const destinationAccountId = watch('destinationAccountId')
   const buttonText = isSubmitting ? I18n.t('Selecting...') : I18n.t('Select')
 
@@ -147,6 +148,10 @@ const FindUserToMerge = ({sourceUserId, accountSelectOptions, onFind}: FindUserT
         >
           {accountSelectOptions.length && (
             <SimpleSelect
+              ref={ref => {
+                ref?.focus()
+                isFindBySelectFocused.current = true
+              }}
               data-testid="find-by-select"
               renderLabel={I18n.t('Find by')}
               onChange={(_, {value}) => {
@@ -178,6 +183,13 @@ const FindUserToMerge = ({sourceUserId, accountSelectOptions, onFind}: FindUserT
               render={({field}) => (
                 <TextInput
                   {...field}
+                  ref={ref => {
+                    field.ref(ref)
+
+                    if (!isFindBySelectFocused.current) {
+                      ref?.focus()
+                    }
+                  }}
                   isRequired={true}
                   renderLabel={I18n.t('User ID')}
                   placeholder={I18n.t('Enter user ID')}
