@@ -7062,6 +7062,7 @@ uk:
   email_is_invalid_e0d982eb: "Електронна адреса недійсна!"
   email_is_required_736ac26b: "Електронна адреса обов'язкова"
   email_the_user_about_this_account_creation_e63f8759: "Повідомити користувача про створення облікового запису через електронну пошту "
+  emails_d07c3348: "Електронні адреси"
   embedded_images_598ff8da: embedded_images
   empty_stub_for_testing_only_37aad38: "Пустий залишок (лише для тестування)"
   enable_6f5d1328: Доступний
@@ -9860,6 +9861,7 @@ uk:
   members_are_free_to_join_defa5929: "Учасники можуть вільно приєднатися"
   membership_by_invitation_only_9bc27199: "Участь тільки за запрошенням"
   membership_service_configuration_d8ba5a74: "Налаштування Служби Членства"
+  merge_user_accounts_a49e8fb1: "Об`єднати облікові записи користувача"
   message: 
     default_subject: "Canvas попередження"
   message_5c38209d: Повідомлення
@@ -11909,6 +11911,7 @@ uk:
   next_student_b62869f4: "Наступний студент"
   nickname_1e6da3ad: "Ім'я користувача"
   no_74e9b590: ні
+  no_active_user_with_that_id_was_found_b8fb5e14: "Жодного активного користувача з цим ідентифікатором не знайдено."
   no_assignment_name_adbb215b: "Відсутня назва завдання"
   no_assignment_selected_65d9e422: "Не вибрано завдання"
   no_assignments_with_that_name_found_1d7be1: "Не знайдено завдань з такою назвою"
@@ -15412,6 +15415,7 @@ uk:
     group_files: "Файли групи"
     my_files: "Мої файли"
   root_account_3fb3aacf: root_account
+  root_account_9d4fcb97: "Обліковий запис суперкористувача"
   root_accounts_cc035dcf: "Кореневі облікові записи"
   roster: 
     error_sending_invitations: "Помилка при відправці запрошення. Будь ласка спробуйте ще раз."
@@ -17889,6 +17893,7 @@ uk:
   title_is_too_long_b192a46a: "Заголовок занадто довгий"
   title_is_too_long_must_be_under_length_characters_ab694ae4: "Заголовок занадто довгий, має бути до %{length} символів"
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title}розблоковано. Натисніть щоб заблокувати."
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "Заголовок має містити принаймні одну літеру чи цифру"
   title_separator: ":"
   titles: 
     aligned_items: "Впорядковані елементи"
@@ -18273,6 +18278,7 @@ uk:
     titles: 
       add_login: "Додати логін"
       update_login: "Оновити логін"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "Об'єднання користувачів не вдалося. Будь ласка, переконайтеся, що у вас є належний дозвіл і повторіть спробу."
   user_name: 
     buttons: 
       update_user: "Оновити користувача"
@@ -18981,6 +18987,7 @@ uk:
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Ви не можете видалити додатковий обліковий запис, у якому є суб-облікові записи."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "Ви не можете видалити %{account_name}, оскільки в ньому є курси"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Ви не можете редагувати цю рубрику, через те, що у вас немає дозволу або вона використовується більш, ніж в одному місці. Будь-які внесені зміни призведуть до створення нової рубрики на основі старої рубрики. Все одно продовжити?"
+  you_can_t_merge_an_account_with_itself_15f58d41: "Ви не можете об'єднати обліковий запис з ним самим."
   you_can_try_to_log_in_again_2b23ef0f: "Ви можете спробувати * ще раз ввійти в систему *."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Ви можете оновити деяку інформацію про користувача, але вони зможуть повернути зміни назад."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Ви можете використовувати один файл 16x16, 32x32, 48x48 іконок."
