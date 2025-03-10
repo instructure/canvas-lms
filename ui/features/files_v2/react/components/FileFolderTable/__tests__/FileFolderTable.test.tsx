@@ -298,7 +298,7 @@ describe('FileFolderTable', () => {
       const confirmButton = await screen.getByTestId('modal-delete-button')
       await user.click(confirmButton)
 
-      expect(showFlashSuccess).toHaveBeenCalledWith('1 item deleted successfully')
+      expect(showFlashSuccess).toHaveBeenCalledWith('1 item deleted successfully.')
     })
 
     it('renders flash error when delete fails', async () => {

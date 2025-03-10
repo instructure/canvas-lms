@@ -64,7 +64,7 @@ const UploadProgress = ({uploader}: UploadProgressProps) => {
       const fileName = uploader.getFileName()
       const newMessage =
         newProgress < 100
-          ? I18n.t('%{fileName} - %{progress} percent uploaded', {
+          ? I18n.t('%{fileName} - %{progress} percent uploaded.', {
               fileName,
               progress: newProgress,
             })

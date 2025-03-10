@@ -46,7 +46,7 @@ const FilesUsageBar = () => {
   })
 
   if (error) {
-    showFlashError(I18n.t('An error occurred while loading files usage data'))(error as Error)
+    showFlashError(I18n.t('An error occurred while loading files usage data.'))(error as Error)
     return null
   }
 

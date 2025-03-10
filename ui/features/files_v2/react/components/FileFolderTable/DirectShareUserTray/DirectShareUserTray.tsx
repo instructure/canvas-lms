@@ -80,7 +80,7 @@ const DirectShareUserTray = ({open, onDismiss, courseId, file}: DirectShareUserT
   )
 
   const sendSuccessful = useCallback(() => {
-    showFlashSuccess(I18n.t('Send operation started successfully'))()
+    showFlashSuccess(I18n.t('Send operation started successfully.'))()
     onDismiss()
   }, [onDismiss])
 
@@ -92,7 +92,7 @@ const DirectShareUserTray = ({open, onDismiss, courseId, file}: DirectShareUserT
     startSendOperation()
       .then(sendSuccessful)
       .catch(() => {
-        showFlashError(I18n.t('Error starting content share'))()
+        showFlashError(I18n.t('Error starting content share.'))()
       })
   }, [selectorRef, sendSuccessful, startSendOperation])
 
