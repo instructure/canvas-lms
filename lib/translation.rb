@@ -34,8 +34,8 @@ module Translation
     # automatic language detection that AWS translate provides but it needs additional discovery since
     # it incurs cost and not necessarily available in all the regions.
     # List of languages supported by our current detector: https://github.com/google/cld3
-    def languages
-      if Account.site_admin.feature_enabled?(:ai_translation_improvements)
+    def languages(improvements_feature_enabled)
+      if improvements_feature_enabled
         return [
           { id: "af", name: I18n.t("Afrikaans"), translated_to_name: I18n.t("Translated to Afrikaans") },
           { id: "sq", name: I18n.t("Albanian"), translated_to_name: I18n.t("Translated to Albanian") },
@@ -229,11 +229,11 @@ module Translation
       @sagemaker_client ||= create_sagemaker_client
     end
 
-    def available?(context, feature_flag)
+    def available?(context, feature_flag, improvements_feature_enabled)
       Rails.logger.info("Checking if translation is available")
       return false unless context&.feature_enabled?(feature_flag)
 
-      if Account.site_admin.feature_enabled?(:ai_translation_improvements)
+      if improvements_feature_enabled
         translation_client.present?
       else
         sagemaker_client.present?

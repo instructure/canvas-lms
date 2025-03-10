@@ -32,10 +32,11 @@ class TranslationController < ApplicationController
 
   def translate
     start_time = Time.zone.now
+    improvements_enabled = @domain_root_account.feature_enabled?(:ai_translation_improvements)
     # Don't allow users that can't access, or if translation is not available
-    return render_unauthorized_action unless Translation.available?(@context, :translation) && user_can_read?
+    return render_unauthorized_action unless Translation.available?(@context, :translation, improvements_enabled) && user_can_read?
 
-    if Account.site_admin.feature_enabled?(:ai_translation_improvements)
+    if improvements_enabled
       translated_text = Translation.translate_html(html_string: required_params[:text], tgt_lang: required_params[:tgt_lang])
       render json: { translated_text: }
       duration = Time.zone.now - start_time
@@ -49,7 +50,7 @@ class TranslationController < ApplicationController
   def translate_paragraph
     start_time = Time.zone.now
 
-    if Account.site_admin.feature_enabled?(:ai_translation_improvements)
+    if @domain_root_account.feature_enabled?(:ai_translation_improvements)
       translated_text = Translation.translate_text(text: required_params[:text], tgt_lang: required_params[:tgt_lang])
       render json: { translated_text: }
       duration = Time.zone.now - start_time
@@ -69,12 +70,13 @@ class TranslationController < ApplicationController
     tags = []
     case exception
     when Aws::Translate::Errors::UnsupportedLanguagePairException
+      improvements_enabled = @domain_root_account.feature_enabled?(:ai_translation_improvements)
       error_data = JSON.parse(exception.context.http_response.body.read)
       source_lang_code = error_data["SourceLanguageCode"]
       target_lang_code = error_data["TargetLanguageCode"]
       tags = ["error:unsupported_language_pair", "source_language:#{source_lang_code}", "dest_language:#{target_lang_code}"]
-      source_lang = Translation.languages.find { |lang| lang[:id] == source_lang_code }
-      target_lang = Translation.languages.find { |lang| lang[:id] == target_lang_code }
+      source_lang = Translation.languages(improvements_enabled).find { |lang| lang[:id] == source_lang_code }
+      target_lang = Translation.languages(improvements_enabled).find { |lang| lang[:id] == target_lang_code }
       message = I18n.t("Translation from %{source_lang} to %{target_lang} is not supported.", { source_lang: source_lang[:name], target_lang: target_lang[:name] })
       status = :unprocessable_entity
     when Aws::Translate::Errors::DetectedLanguageLowConfidenceException
@@ -125,6 +127,6 @@ class TranslationController < ApplicationController
   end
 
   def require_inbox_translation
-    render_unauthorized_action unless Translation.available?(@domain_root_account, :translate_inbox_messages)
+    render_unauthorized_action unless Translation.available?(@domain_root_account, :translate_inbox_messages, @domain_root_account.feature_enabled?(:ai_translation_improvements))
   end
 end
