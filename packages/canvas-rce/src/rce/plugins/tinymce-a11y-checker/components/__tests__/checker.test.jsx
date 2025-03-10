@@ -317,7 +317,7 @@ describe('checker', () => {
       body.appendChild(updatedNode)
       await promisify(instance.check.bind(instance))()
       rule = instance.state.errors[0].rule
-      rule.update.mockReturnValue(updatedNode)
+      jest.spyOn(rule, 'update').mockImplementation(() => updatedNode)
     })
 
     test('returns rule test of updated node', () => {
@@ -360,9 +360,10 @@ describe('checker', () => {
     })
 
     test('updates the real node', () => {
+      const updateSpy = jest.spyOn(error.rule, 'update')
       instance.fixIssue(ev)
       const formState = instance.state.formState
-      expect(error.rule.update).toHaveBeenCalledWith(error.node, formState)
+      expect(updateSpy).toHaveBeenCalledWith(error.node, formState)
     })
 
     test('checks everything after applying a fix', () => {
