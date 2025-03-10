@@ -44,6 +44,7 @@ import {
   openEditManualRegistrationWizard,
 } from '../../registration_wizard/RegistrationWizardModalState'
 import {alert} from '@canvas/instui-bindings/react/Alert'
+import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDefault'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -112,25 +113,7 @@ const Columns: ReadonlyArray<Column> = [
     render: r => {
       const appName = (
         <Flex>
-          {r.icon_url ? (
-            <img
-              alt={r.name}
-              style={{
-                height: 27,
-                width: 27,
-                marginRight: 12,
-                borderRadius: '4.5px',
-                border: '0.75px solid #C7CDD1',
-              }}
-              src={r.icon_url}
-            />
-          ) : (
-            <img
-              alt={r.name}
-              style={{height: 27, width: 27, marginRight: 12}}
-              src={`/lti/tool_default_icon?id=${r.id}&name=${r.name}`}
-            />
-          )}
+          <ToolIconOrDefault iconUrl={r.icon_url} toolId={r.id} toolName={r.name} size={27} marginRight={12} />
           <div style={ellipsisStyles} title={r.name}>
             {r.name}
           </div>

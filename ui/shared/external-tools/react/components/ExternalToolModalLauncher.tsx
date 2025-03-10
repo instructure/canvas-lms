@@ -19,7 +19,6 @@
 
 // TODO: if editing this file, please consider removing/resolving some of the "any" references
 
-import $ from 'jquery'
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
@@ -64,7 +63,6 @@ export type ExternalToolModalLauncherProps = {
   onExternalContentReady?: (data: any) => void,
   onDeepLinkingResponse?: (data: any) => void,
   resourceSelection?: boolean,
-  secureParams?: string,
 }
 
 export default class ExternalToolModalLauncher extends React.Component<ExternalToolModalLauncherProps> {
@@ -126,8 +124,6 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
         this.props.launchType,
         this.props.contextModuleId && '&context_module_id=',
         this.props.contextModuleId,
-        this.props.secureParams && '&secure_params=',
-        this.props.secureParams,
       ].join('')
     }
   }

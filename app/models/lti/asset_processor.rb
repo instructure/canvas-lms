@@ -46,6 +46,7 @@ class Lti::AssetProcessor < ApplicationRecord
     report.is_a?(Hash) ? report["supportedTypes"] : nil
   end
 
+  # Should match up with UI's AssetProcessorAssingmentJson
   def self.build_for_assignment(content_item)
     context_external_tool = ContextExternalTool.find_by(id: content_item["context_external_tool_id"])
 

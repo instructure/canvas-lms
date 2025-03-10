@@ -74,7 +74,7 @@ type LtiLaunchPlacement = {
 /**
  * A subset of all the placement types, the ones used
  */
-type SelectContentPlacementType = 'resource_selection' | 'assignment_selection' | 'link_selection'
+type SelectContentPlacementType = 'resource_selection' | 'assignment_selection' | 'link_selection' | 'ActivityAssetProcessor'
 
 export type LtiLaunchDefinition = {
   definition_type: 'ContextExternalTool' | 'Lti::MessageHandler'
@@ -84,7 +84,7 @@ export type LtiLaunchDefinition = {
   description: string
   domain: string
   // todo: the key here is actually a subset of string
-  placements: Record<SelectContentPlacementType, LtiLaunchPlacement>
+  placements: Partial<Record<SelectContentPlacementType, LtiLaunchPlacement>>
 }
 
 const I18n = createI18nScope('select_content_dialog')
@@ -325,11 +325,14 @@ export const Events = {
     if ($tool.hasClass('resource_selection')) {
       const tool: LtiLaunchDefinition = $tool.data('tool')
       const frameHeight = Math.max(Math.min(numberOrZero($(window).height()) - 100, 550), 100)
-      const placement_type: SelectContentPlacementType =
+      const placement_type: SelectContentPlacementType | undefined =
         (tool.placements.resource_selection && 'resource_selection') ||
         (tool.placements.assignment_selection && 'assignment_selection') ||
         (tool.placements.link_selection && 'link_selection')
-      const placement = tool.placements[placement_type]
+      if (!placement_type) {
+        return;
+      }
+      const placement = tool.placements[placement_type]!
       const width = placement.selection_width
       const height = placement.selection_height
       let $dialog = $('#resource_selection_dialog')
@@ -959,23 +962,25 @@ $(document).ready(function () {
                 const $tool = $tool_template.clone(true)
                 const placement =
                   tool.placements.assignment_selection || tool.placements.link_selection
-                $tool.toggleClass(
-                  'resource_selection',
-                  SelectContent.isContentMessage(placement, tool.placements),
-                )
-                $tool.fillTemplateData({
-                  data: tool,
-                  dataValues: [
-                    'definition_type',
-                    'definition_id',
-                    'domain',
-                    'name',
-                    'placements',
-                    'description',
-                  ],
-                })
-                $tool.data('tool', tool)
-                $select.find('.tools').append($tool.show())
+                if (placement) {
+                  $tool.toggleClass(
+                    'resource_selection',
+                    SelectContent.isContentMessage(placement, tool.placements),
+                  )
+                  $tool.fillTemplateData({
+                    data: tool,
+                    dataValues: [
+                      'definition_type',
+                      'definition_id',
+                      'domain',
+                      'name',
+                      'placements',
+                      'description',
+                    ],
+                  })
+                  $tool.data('tool', tool)
+                  $select.find('.tools').append($tool.show())
+                }
               }
             },
             () => {

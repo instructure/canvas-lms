@@ -22,8 +22,19 @@ export type AssetProcessorContentItemReport = {
   custom?: Record<string, string>
 }
 
-export type AssetProcessorContentItem = {
+export type AssetProcessorContentItem = { 
   type: 'ltiAssetProcessor'
+  // Not sure where this comes from. Cargo cult from ResourceLinkContentItem, needed by usages of ContentItem.
+  // presumably Canvas is adding it somewhere
+  errors?: Record<string, string>
+} & AssetProcessorCommonFields
+
+// Should match up with ruby app/models/lti/asset_processor.rb#build_for_assignment
+export type AssetProcessorApiJson = {
+  context_external_tool_id: number | string,
+} & AssetProcessorCommonFields
+
+export type AssetProcessorCommonFields = {
   // Fully qualified url of the asset processor settings. If absent, the base LTI URL of the tool must be used for launch.
   url?: string
   // Plain text to use as the display name for the processor.
@@ -55,8 +66,12 @@ export type AssetProcessorContentItem = {
   custom?: Record<string, string>
   // A report object provides configuration around the reports that are passed back.
   report?: AssetProcessorContentItemReport
+}
 
-  // Not sure where this comes from. Cargo cult from ResourceLinkContentItem, needed by usages of ContentItem.
-  // presumably Canvas is adding it somewhere
-  errors?: Record<string, string>
+export function assetProcessorContentItemToApiJson(
+  contentItem: AssetProcessorContentItem, 
+  toolId: number | string,
+): AssetProcessorApiJson {
+  const {type, errors, ...commonFields} = contentItem
+  return {context_external_tool_id: toolId, ...commonFields}
 }
