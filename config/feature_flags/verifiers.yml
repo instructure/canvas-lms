@@ -24,3 +24,13 @@ disable_file_verifiers_in_public_syllabus:
   applies_to: RootAccount
   display_name: Disable verifiers in Public Syllabus
   description: Disable url file verifiers in the public syllabus
+disable_verified_content_export_links:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Disable Verified Content Export Links
+  description: When turning this on, links on the Content Exports page will not use JWT-verified links.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
