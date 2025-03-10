@@ -39,14 +39,17 @@
 
     // Delay initialization to allow the Pendo agent script to load
     setTimeout(() => {
+      const userRoles = ENV.current_user_roles ? ENV.current_user_roles.slice(1) : [];
       pendo.initialize({
         visitor: {
-          id: ENV.current_user_uuid,
-          role: ENV.current_user_roles[ENV.current_user_roles.length - 1],
+          id: ENV.current_user_usage_metrics_id,
+          canvasRoles: userRoles,
         },
         account: {
           id: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
+          surveyOptOut: ENV.FEATURES['account_survey_notifications'],
         },
+        locale: ENV.LOCALE || 'en',
       });
     }, 1000);
   })('<%= usage_metrics_api_key %>');
