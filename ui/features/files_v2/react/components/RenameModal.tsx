@@ -86,7 +86,7 @@ export const RenameModal = ({
     updateItemName(renamingItem, trimmedNewItemName)
       .then(async () => {
         showFlashSuccess(
-          I18n.t('Successfully renamed %{item}', {item: isFile(renamingItem) ? 'file' : 'folder'}),
+          I18n.t('Successfully renamed %{item}.', {item: isFile(renamingItem) ? 'file' : 'folder'}),
         )()
         onClose()
         await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
@@ -94,12 +94,16 @@ export const RenameModal = ({
       .catch(err => {
         if (err?.response?.status == 409) {
           showFlashError(
-            I18n.t('A file named "%{name}" already exists in this folder', {
+            I18n.t('A file named "%{name}" already exists in this folder.', {
               name: trimmedNewItemName,
             }),
           )()
         } else {
-          showFlashError(I18n.t('Renaming failed'))(err)
+          showFlashError(
+            I18n.t('There was an error renaming this %{item}. Please try again.', {
+              item: isFile(renamingItem) ? 'file' : 'folder',
+            }),
+          )()
         }
       })
       .finally(() => {

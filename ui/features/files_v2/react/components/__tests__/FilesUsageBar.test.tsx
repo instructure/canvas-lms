@@ -85,7 +85,7 @@ describe('FilesUsageBar', () => {
     renderComponent()
     await waitFor(() => {
       expect(showFlashError).toHaveBeenCalledWith(
-        'An error occurred while loading files usage data',
+        'An error occurred while loading files usage data.',
       )
     })
   })

@@ -104,7 +104,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
           .then(response => response.json)
           .then((responseItem?: File | Folder) => {
             showFlashSuccess(
-              I18n.t('%{name} successfully moved to %{folderName}', {
+              I18n.t('%{name} successfully moved to %{folderName}.', {
                 name: responseItem?.display_name || responseItem?.filename || responseItem?.name,
                 folderName: selectedFolder?.name,
               }),
@@ -112,7 +112,7 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
           })
           .catch(
             showFlashError(
-              I18n.t('Error moving %{name} to %{folderName}', {
+              I18n.t('Error moving %{name} to %{folderName}.', {
                 name: item.display_name || item.filename || item.name,
                 folderName: selectedFolder?.name,
               }),

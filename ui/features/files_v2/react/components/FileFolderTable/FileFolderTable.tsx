@@ -282,7 +282,7 @@ const FileFolderTable = ({
   }, [currentFolder])
 
   if (error) {
-    showFlashError(I18n.t('Failed to fetch files and folders'))
+    showFlashError(I18n.t('Failed to fetch files and folders.'))()
   }
 
   const rows: (File | Folder)[] = useMemo(
