@@ -1253,7 +1253,7 @@ module Api::V1::Assignment
   def apply_asset_processor_settings(assignment, assignment_params)
     # I'm limiting this for create because updating is a can of worms right now
     if assignment.new_record? && assignment_params["asset_processors"].present? && asset_processor_capable?(assignment_params)
-      assignment_params["asset_processors"].flatten.each do |content_item|
+      assignment_params["asset_processors"].each do |content_item|
         ap = Lti::AssetProcessor.build_for_assignment(content_item)
         assignment.lti_asset_processors << ap
       end
