@@ -53,6 +53,7 @@ export type RubricAssignmentContainerProps = {
   contextAssetString: string
   courseId: string
   rubricSelfAssessmentFFEnabled: boolean
+  aiRubricsEnabled: boolean
 }
 export const RubricAssignmentContainer = ({
   accountMasterScalesEnabled,
@@ -63,6 +64,7 @@ export const RubricAssignmentContainer = ({
   contextAssetString,
   courseId,
   rubricSelfAssessmentFFEnabled,
+  aiRubricsEnabled,
 }: RubricAssignmentContainerProps) => {
   const [rubric, setRubric] = useState(assignmentRubric)
   const [rubricAssociation, setRubricAssociation] = useState(assignmentRubricAssociation)
@@ -73,6 +75,7 @@ export const RubricAssignmentContainer = ({
   const [canUpdateRubric, setCanUpdateRubric] = useState(assignmentRubric?.can_update)
   const [copyEditConfirmModalOpen, setCopyEditConfirmModalOpen] = useState(false)
   const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] = useState(false)
+  const [criteriaViaLlm, setCriteriaViaLlm] = useState(false)
 
   const handleSaveRubric = (savedRubricResponse: SaveRubricResponse) => {
     setRubric(savedRubricResponse.rubric)
@@ -188,15 +191,32 @@ export const RubricAssignmentContainer = ({
         ) : (
           <View>
             {canManageRubrics && (
-              <Button
-                margin="0"
-                // @ts-expect-error
-                renderIcon={IconAddLine}
-                data-testid="create-assignment-rubric-button"
-                onClick={() => setRubricCreateModalOpen(true)}
-              >
-                {I18n.t('Create Rubric')}
-              </Button>
+              <>
+                <Button
+                  margin="0"
+                  // @ts-expect-error
+                  renderIcon={IconAddLine}
+                  data-testid="create-assignment-rubric-button"
+                  onClick={() => {
+                    setCriteriaViaLlm(false)
+                    setRubricCreateModalOpen(true)
+                  }}
+                >
+                  {I18n.t('Create Rubric')}
+                </Button>
+                {aiRubricsEnabled && (
+                  <Button
+                    margin="0 0 0 small"
+                    data-testid="create-assignment-ai-rubric-button"
+                    onClick={() => {
+                      setCriteriaViaLlm(true)
+                      setRubricCreateModalOpen(true)
+                    }}
+                  >
+                    {I18n.t('Create AI Rubric')}
+                  </Button>
+                )}
+              </>
             )}
             <Button
               margin="0 0 0 small"
@@ -216,6 +236,7 @@ export const RubricAssignmentContainer = ({
         isOpen={copyEditConfirmModalOpen}
         onConfirm={() => {
           setCopyEditConfirmModalOpen(false)
+          setCriteriaViaLlm(false)
           setRubricCreateModalOpen(true)
         }}
         onDismiss={() => setCopyEditConfirmModalOpen(false)}
@@ -231,7 +252,11 @@ export const RubricAssignmentContainer = ({
         isOpen={rubricCreateModalOpen}
         rubric={rubric}
         rubricAssociation={rubricAssociation}
-        onDismiss={() => setRubricCreateModalOpen(false)}
+        criteriaViaLlm={criteriaViaLlm}
+        onDismiss={() => {
+          setCriteriaViaLlm(false)
+          setRubricCreateModalOpen(false)
+        }}
         onSaveRubric={handleSaveRubric}
       />
       <RubricAssessmentTray
