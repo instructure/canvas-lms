@@ -161,7 +161,6 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.populate_overrides
     {
       AssetUserAccess => DataFixup::PopulateRootAccountIdOnAssetUserAccesses,
-      Attachment => DataFixup::PopulateRootAccountIdOnAttachments,
       CommunicationChannel => DataFixup::PopulateRootAccountIdsOnCommunicationChannels,
       LearningOutcome => DataFixup::PopulateRootAccountIdsOnLearningOutcomes,
       User => DataFixup::PopulateRootAccountIdsOnUsers,
