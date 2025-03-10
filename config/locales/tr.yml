@@ -8003,6 +8003,7 @@ tr:
   email_is_invalid_or_in_use_4c3de5b9: "Eposta adresi ya geçersiz ya da kullanımda"
   email_is_required_736ac26b: "Eposta gereklidir"
   email_the_user_about_this_account_creation_e63f8759: "Oluşturulan hesap hakkında kullanıcıya eposta gönder"
+  emails_d07c3348: E-Postalar
   embed_828fac4a: Göm
   embed_video_code_703e10f2: "Video Kodunu Göm"
   embedded_images_598ff8da: gömülü_görseller
@@ -11265,6 +11266,7 @@ tr:
     customize: Özelleştir
     managed_accounts: "Yönetilen Hesaplar"
     my_courses: Derslerim
+  merge_user_accounts_a49e8fb1: "Kullanıcı Hesaplarını Birleştir"
   message: 
     default_subject: "Canvas Uyarısı"
   message_5c38209d: Mesaj
@@ -13464,6 +13466,7 @@ tr:
   nickname_1e6da3ad: "Takma İsim"
   nickname_7df95b09: "Takma İsim:"
   no_74e9b590: hayır
+  no_active_user_with_that_id_was_found_b8fb5e14: "Bu numaraya ait aktif kullanıcı bulunamadı."
   no_announcements_280df147: "Duyuru Yok"
   no_assignment_name_adbb215b: "Ödev Adı Yok"
   no_assignment_selected_65d9e422: "Seçili Ödev Yok"
@@ -17173,6 +17176,7 @@ tr:
     group_files: "Grup dosyaları"
     my_files: Dosyalarım
   root_account_3fb3aacf: root_account
+  root_account_9d4fcb97: "Kök Hesabı"
   root_accounts_cc035dcf: "Root Hesapları"
   roster: 
     delete_confirm: "Bu kullanıcıyı silmek istediğinize emin misiniz?"
@@ -19507,6 +19511,7 @@ tr:
   title_f8e03596: "* Başlık"
   title_is_required_6ddcab69: "başlık gereklidir"
   title_is_too_long_b192a46a: "Başlık çok uzun"
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "Başlık, en az bir harf veya sayı içermelidir"
   title_separator: ":"
   titles: 
     aligned_items: "Sıralanmış Öğeler"
@@ -19814,6 +19819,7 @@ tr:
     titles: 
       add_login: "Oturum Ekle"
       update_login: "Oturumu Güncelle"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "Kullanıcı birleştirme başarısız. Lütfen uygun izinlere sahip olduğunuzdan emin olun ve tekrar deneyin."
   user_name: 
     buttons: 
       update_user: "Kullanıcı Güncelle"
@@ -20511,6 +20517,7 @@ tr:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "İçinde dersler bulunan bir alt hesabı silemezsiniz."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Altında hesap bulunan alt hesapları silemezsiniz."
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "İzniniz olmadığı ya da birden fazla yerde kullanıldığı için bu yönergeyi düzenleyemezsiniz. Yapacağınız değişiklikler eski yönergeyi baz alan yeni bir yönerge oluşturacaktır. Devam etmek istiyor musunuz?"
+  you_can_t_merge_an_account_with_itself_15f58d41: "Hesabınızı başka bir hesapla birleştiremezsiniz."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Bu kullanıcının bilgilerinden bazılarını güncelleyebilirsiniz fakat isterlerse kendileri tekrar değiştirebilir."
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Bu alt hesapta temaları düzenleyemezsiniz."
   you_cannot_set_a_grouped_discussion_as_a_student_a20f363: "Öğrenci olarak gruplandırılmış bir tartışma ayarlayamazsınız."
