@@ -36,7 +36,7 @@ describe TranslationController do
   before do
     allow(InstStatsd::Statsd).to receive(:increment)
     allow(Account.site_admin).to receive(:feature_enabled?).and_return(false)
-    allow(Account.site_admin).to receive(:feature_enabled?).with(:ai_translation_improvements).and_return(true)
+    allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(true)
     user_session(@user)
   end
 
