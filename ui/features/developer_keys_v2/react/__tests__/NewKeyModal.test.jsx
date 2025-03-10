@@ -98,7 +98,7 @@ describe('NewKeyModal', () => {
         settings: {
           text: 'test',
           use_1_3: true,
-          icon_url: '/img/default-icon-16x16.png',
+          icon_url: 'http://test.testcloud.org/img/default-icon-16x16.png',
           selection_width: 500,
           selection_height: 500,
           placements: [

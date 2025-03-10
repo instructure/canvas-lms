@@ -103,6 +103,7 @@ export default class ManualConfigurationForm extends React.Component {
             ref={this.setAdditionalRef}
             additionalSettings={this.additionalSettings()}
             custom_fields={this.customFields()}
+            showMessages={this.state.showMessages}
           />
           <Placements
             ref={this.setPlacementsRef}

@@ -18,11 +18,12 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import get from 'lodash/get'
 
 import AdditionalSettings from '../AdditionalSettings'
 
-const props = (overrides = {}, additionalSettingsOverrides = {}, settingsOverrides = {}) => {
+const props = ({overrides = {}, additionalSettingsOverrides = {}, settingsOverrides = {}}) => {
   return {
     additionalSettings: {
       domain: 'www.example.com',
@@ -43,7 +44,7 @@ const props = (overrides = {}, additionalSettingsOverrides = {}, settingsOverrid
 
 it('generates the toolConfiguration', () => {
   const ref = React.createRef()
-  render(<AdditionalSettings {...props()} ref={ref} />)
+  render(<AdditionalSettings {...props({overrides: {ref}})} />)
   const toolConfig = ref.current.generateToolConfigurationPart()
   expect(toolConfig.extensions).toHaveLength(1)
   const ext = toolConfig.extensions[0]
@@ -58,11 +59,35 @@ const checkToolConfigPart = (toolConfig, path, value) => {
 const checkChange = (path, funcName, in_value, out_value) => {
   out_value = out_value || in_value
   const ref = React.createRef()
-  render(<AdditionalSettings {...props()} ref={ref} />)
+  render(<AdditionalSettings {...props({overrides: {ref}})} />)
 
   ref.current[funcName]({target: {value: in_value}})
   checkToolConfigPart(ref.current.generateToolConfigurationPart(), path, out_value)
 }
+
+it('is valid when valid', () => {
+  const ref = React.createRef()
+  render(<AdditionalSettings {...props({overrides: {ref}})} />)
+  expect(ref.current.valid()).toBe(true)
+})
+
+it('is invalid with invalid inputs', async () => {
+  const ref = React.createRef()
+  render(
+    <AdditionalSettings
+      {...props({
+        additionalSettingsOverrides: {settings: {icon_url: 'not_a_url'}},
+        overrides: {ref, showMessages: true},
+      })}
+    />,
+  )
+  userEvent.click(await screen.getByText('Additional Settings').closest('button'))
+  await screen.findByText('Icon Url')
+  expect(ref.current.valid()).toBe(false)
+  expect(
+    screen.getByText('Please enter a valid URL (e.g. https://example.com)'),
+  ).toBeInTheDocument()
+})
 
 it('changes the output when domain changes', () => {
   checkChange(['extensions', '0', 'domain'], 'handleDomainChange', 'new.example.com')
