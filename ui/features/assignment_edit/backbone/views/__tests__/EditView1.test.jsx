@@ -479,8 +479,8 @@ describe('EditView', () => {
         },
       }
       const errors = view._validateExternalTool(data, [])
-      expect(errors.assignment_submission_container[0].message).toBe(
-        'Please click below to launch the tool and select a resource.',
+      expect(errors['assignment_submission_type_selection_launch_button'][0].message).toBe(
+        'Please click above to launch the tool and select a resource.',
       )
     })
 

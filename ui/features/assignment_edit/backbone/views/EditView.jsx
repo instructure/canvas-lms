@@ -132,6 +132,8 @@ const EXTERNAL_TOOL_URL_INPUT_NAME = 'external_tool_tag_attributes[url]'
 const ACTIVITY_ASSET_PROCESSOR_CONTAINER = '#activity_asset_processor_container'
 const ALLOWED_EXTENSIONS_INPUT_NAME = 'allowed_extensions'
 const ONLINE_SUBMISSION_CHECKBOXES_GROUP = 'online_submission_types[online_text_entry]'
+const DEFAULT_TOOL_LAUNCH_BUTTON = 'default-tool-launch-button'
+const SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON = 'assignment_submission_type_selection_launch_button'
 
 /*
 xsslint safeString.identifier srOnly
@@ -977,6 +979,7 @@ EditView.prototype.renderDefaultExternalTool = function () {
     toolButtonText: ENV.DEFAULT_ASSIGNMENT_TOOL_BUTTON_TEXT,
     toolInfoMessage: ENV.DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE,
     previouslySelected: this.assignment.defaultToolSelected(),
+    hideErrors: this.hideErrors
   }
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(
@@ -1112,6 +1115,8 @@ EditView.prototype.renderAssignmentSubmissionTypeContainer = function () {
 }
 
 EditView.prototype.handleSubmissionTypeSelectionLaunch = function () {
+  // clear any errors
+  this.hideErrors(`${SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON}_errors`)
   const removeListener = addDeepLinkingListener(event => {
     if (event.data.content_items?.length >= 1) {
       this.handleContentItem(event.data.content_items[0])
@@ -1573,8 +1578,8 @@ EditView.prototype.showErrors = function (errors) {
     const errorsContainer = document.getElementById(errorsContainerID)
     if (errorsContainer) {
       const root = this.errorRoots[errorsContainerID] ?? createRoot(errorsContainer)
-      const noMargin = ['allowed_attempts', 'final_grader_id', 'grader_count', ONLINE_SUBMISSION_CHECKBOXES_GROUP].includes(key)
-      const marginTop = [EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT].includes(key)
+      const noMargin = ['allowed_attempts', 'final_grader_id', 'grader_count', ONLINE_SUBMISSION_CHECKBOXES_GROUP, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON].includes(key)
+      const marginTop = [EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, DEFAULT_TOOL_LAUNCH_BUTTON].includes(key)
       root.render(
         <FormattedErrorMessage
           message={value[0].message}
@@ -1588,7 +1593,7 @@ EditView.prototype.showErrors = function (errors) {
       if (element) {
         element.setAttribute("aria-describedby", errorsContainerID)
 
-        if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT].includes(key)) {
+        if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, DEFAULT_TOOL_LAUNCH_BUTTON, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON].includes(key)) {
           const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
           this.getElement(selector)?.classList.add('error-outline')
         }
@@ -1661,7 +1666,7 @@ EditView.prototype.hideErrors = function (containerId) {
     delete this.errorRoots[containerId]
 
     const key = containerId.replace(/_errors$/, '')
-    if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT].includes(key)) {
+    if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON].includes(key)) {
       const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
       const element = this.getElement(selector)
       element?.classList.remove('error-outline')
@@ -1927,7 +1932,7 @@ EditView.prototype._validateExternalTool = function (data, errors) {
 
   if (message) {
     errors[EXTERNAL_TOOL_URL_INPUT_NAME] = [{message, longMessage}]
-    errors['default-tool-launch-button'] = [{message, longMessage}]
+    errors[DEFAULT_TOOL_LAUNCH_BUTTON] = [{message, longMessage}]
   }
 
   // This can happen when:
@@ -1942,8 +1947,8 @@ EditView.prototype._validateExternalTool = function (data, errors) {
     data.external_tool_tag_attributes.content_type ===
       DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
   ) {
-    message = I18n.t('Please click below to launch the tool and select a resource.')
-    errors.assignment_submission_container = [{message, longMessage}]
+    message = I18n.t('Please click above to launch the tool and select a resource.')
+    errors[SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON] = [{message, longMessage: true}]
   }
 
   return errors

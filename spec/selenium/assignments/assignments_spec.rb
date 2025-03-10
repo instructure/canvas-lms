@@ -1278,6 +1278,27 @@ describe "assignments" do
       end
     end
 
+    context "with default tool set up" do
+      before do
+        a = @course.account
+        a.settings[:default_assignment_tool_name] = "Test Default Tool"
+        a.settings[:default_assignment_tool_url] = "http://lti13testtool.docker/launch"
+        a.settings[:default_assignment_tool_button_text] = "Default Tool"
+        a.settings[:default_assignment_tool_info_message] = "Click the button above to add content"
+        a.save!
+      end
+
+      it "shows an error if user saves without configuring the tool" do
+        get "/courses/#{@course.id}/assignments/new"
+        f("#assignment_submission_type").click
+        f('[value="default_external_tool"]').click
+
+        f(".btn-primary[type=submit]").click
+        wait_for_ajaximations
+        expect(f("#default-tool-launch-button_errors").text).to eq "External Tool URL cannot be left blank"
+      end
+    end
+
     context "with an LTI 1.3 Tool with custom params" do
       let(:tool) do
         @course.context_external_tools.create!(
