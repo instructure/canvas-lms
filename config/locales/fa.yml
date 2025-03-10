@@ -9633,6 +9633,7 @@ fa:
   email_is_invalid_e0d982eb: "پست اکترونیکی معتبر نیست!"
   email_is_required_736ac26b: "پست الکترونیکی لازم است"
   email_the_user_about_this_account_creation_e63f8759: "ارسال پست الکترونیکی برای آگاهی دادن به کاربر از ایجاد این حساب"
+  emails_d07c3348: "نامه های الکترونیکی"
   embed_828fac4a: قراردادن
   embed_video_code_703e10f2: "قراردادن کد فیلم"
   embedded_images_598ff8da: "تصاویر_درج شده"
@@ -14008,6 +14009,7 @@ fa:
     my_courses: "درس های من"
   menu_39cb0e8e: منو
   menu_options_9b6b0b5c: "گزینه های منو"
+  merge_user_accounts_a49e8fb1: "ادغام حساب های کاربری"
   message: 
     default_subject: "هشدار کانواس"
   message_5c38209d: پیام
@@ -16454,6 +16456,7 @@ fa:
   nickname_1e6da3ad: "نام مستعار"
   nickname_7df95b09: "نام مستعار:"
   no_74e9b590: خیر
+  no_active_user_with_that_id_was_found_b8fb5e14: "کاربر فعال با این شناسه یافت نشد."
   no_alignments_are_available_for_this_outcome_7f8346f9: "هیچ تطبیقی برای این نتیجه موجود نیست."
   no_announcements_280df147: "بدون اطلاعیه"
   no_assignment_group_assigned_8f1cdb9b: "هیچ گروه تکلیفی اختصاص نیافته است"
@@ -20794,6 +20797,7 @@ fa:
     my_files: "فایل های من"
   root_523acd46: ریشه
   root_account_3fb3aacf: حساب_ریشه
+  root_account_9d4fcb97: "حساب ریشه"
   root_account_id_e8d75734: "شناسه حساب اصلی"
   root_accounts_cc035dcf: "حساب های ریشه"
   roster: 
@@ -24263,6 +24267,7 @@ fa:
   title_is_too_long_b192a46a: "عنوان طولانی است"
   title_is_too_long_must_be_under_length_characters_ab694ae4: "طولانی است، باید کمتر از %{length} نویسه باشد"
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} قفل گشایی شده است. برای قفل کردن کلیک کنید."
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "عنوان باید حداقل یک حرف یا عدد داشته باشد"
   title_outcomes_7adbd9cc: "%{title} عواقب"
   title_separator: ": "
   title_tray_ec9f7488: "سینی %{title}"
@@ -25019,6 +25024,7 @@ fa:
     titles: 
       add_login: "افزودن ورود"
       update_login: "بهنگام سازی ورود"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "ادغام کاربر انجام نشد. مطمئن شوید که مجوز لازم را دارید و دوباره تلاش کنید."
   user_name: 
     buttons: 
       update_user: "بهنگام سازی کاربر"
@@ -25968,6 +25974,7 @@ fa:
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "نمی توانید یک زیر حساب که دارای زیر حساب است را حذف کنید."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: " به علت وجود درس در %{account_name} نمی‌توانید آن را حذف کنید"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "نمی توانید این دستورالعمل ارزیابی را ویرایش کنید، یا به این علت که اجازه ندارید و یا اینکه در بیش از یک جا استفاده شده است. هر گونه تغییری که انجام می دهید به یک دستورالعمل ارزیابی جدید بر مبنای دستورالعمل ارزیابی قدیمی منجر می شود. با این وجود ادامه می دهید؟"
+  you_can_t_merge_an_account_with_itself_15f58d41: "نمی توانید یک حساب را با خودش ادغام کنید."
   you_can_t_submit_an_assignment_when_it_is_unpublis_6c2c0b2f: "وقتی تکلیف منتشر نشده است، نمی‌توانید آن را ارسال کنید"
   you_can_try_to_log_in_again_2b23ef0f: "می توانید سعی کنید *دوباره وارد شوید*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "شما می توانید بعضی از اطلاعات این کاربر را بهنگام کنید ولی این کاربر می تواند تغییرات را به حالت اولیه برگرداند."
