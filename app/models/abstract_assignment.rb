@@ -2045,7 +2045,10 @@ class AbstractAssignment < ActiveRecord::Base
     end
     can :attach_submission_comment_files
 
-    given { |user, session| context.grants_right?(user, session, :read_as_admin) }
+    given do |user, session|
+      context.grants_right?(user, session, :read_as_admin) &&
+        context.grants_right?(user, session, :read_course_content)
+    end
     can :read
 
     given { |user, session| context.grants_right?(user, session, :manage_grades) }
