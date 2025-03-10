@@ -325,6 +325,12 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
     )
   }, [handleMoveClick, onDismiss, postStatus])
 
+  // Reset the state when the open prop changes so we don't carry over state
+  // from the previously opened modal
+  useEffect(() => {
+    if (open) resetState()
+  }, [open, resetState])
+
   if (items.length === 0 || !rootFolder) return null
 
   return (
@@ -335,7 +341,6 @@ const MoveModal = ({open, items, onDismiss}: MoveModalProps) => {
         size="small"
         label={I18n.t('Copy')}
         shouldCloseOnDocumentClick={false}
-        onExited={resetState}
       >
         <Modal.Header>{renderHeader()}</Modal.Header>
         <Modal.Body>{renderBody()}</Modal.Body>
