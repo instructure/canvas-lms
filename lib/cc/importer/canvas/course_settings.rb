@@ -119,7 +119,9 @@ module CC::Importer::Canvas
          restrict_enrollments_to_course_dates
          homeroom_course
          allow_final_grade_override
-         enable_course_paces].each do |bool_val|
+         enable_course_paces
+         conditional_release
+         hide_sections_on_course_users_page].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         course[bool_val] = val unless val.nil?
       end

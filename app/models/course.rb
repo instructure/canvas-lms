@@ -2885,7 +2885,8 @@ class Course < ActiveRecord::Base
        course_color
        alt_name
        restrict_quantitative_data
-       horizon_course]
+       horizon_course
+       conditional_release]
   end
 
   def student_reporting?
