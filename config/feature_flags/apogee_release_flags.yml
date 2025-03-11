@@ -415,6 +415,13 @@ rubric_self_assessment:
       state: allowed
     development:
       state: allowed
+ai_rubrics:
+  state: hidden
+  applies_to: Course
+  root_opt_in: true
+  beta: true
+  display_name: AI Genreated Rubrics
+  description: Give rubric creators the options to generate rubric criteria automatically based on an assignment description via a large language model (LLM).
 use_body_word_count:
   state: allowed_on # this is intentional. we want to enable this upon deploy so we start populating word count.
   applies_to: SiteAdmin
