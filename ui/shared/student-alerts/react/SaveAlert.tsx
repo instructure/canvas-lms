@@ -53,7 +53,10 @@ const validationSchema = z
       }),
     ),
     selectedTrigger: z.optional(z.nativeEnum(CriterionType)),
-    sendTo: z.array(z.string()).min(1, I18n.t('Please select at least one option.')),
+    sendTo: z.array(z.string()).refine(
+      val => val.length > 0,
+      () => ({message: I18n.t('Please select at least one option.')}),
+    ),
     doNotResend: z.boolean(),
     resendEvery: z.number(),
   })
