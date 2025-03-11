@@ -50,6 +50,12 @@ import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import DiscussionTopicToolbarContainer from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 import StickyToolbarWrapper from './containers/StickyToolbarWrapper/StickyToolbarWrapper'
 import $ from 'jquery'
+import useHighlightStore from './hooks/useHighlightStore'
+import {
+  KeyboardShortcuts,
+  useEventHandler,
+  useKeyboardShortcuts,
+} from './KeyboardShortcuts/useKeyboardShortcut'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -110,6 +116,11 @@ const DiscussionTopicManager = props => {
     closeView()
     setIsTopicHighlighted(true)
   }
+
+  const setRootEntries = useHighlightStore(state => state.setRootEntries)
+  const highlightNext = useHighlightStore(state => state.highlightNext)
+  const highlightPrev = useHighlightStore(state => state.highlightPrev)
+  const addRootEntryId = useHighlightStore(state => state.addRootEntry)
 
   // Split_screen parent id
   const [threadParentEntryId, setThreadParentEntryId] = useState(
@@ -242,6 +253,22 @@ const DiscussionTopicManager = props => {
     skip: waitForUnreadFilter,
   })
 
+  useEventHandler(KeyboardShortcuts.ON_PREV_REPLY, () => highlightPrev(userSplitScreenPreference, isSplitScreenViewOpen))
+  useEventHandler(KeyboardShortcuts.ON_NEXT_REPLY, () => highlightNext(userSplitScreenPreference, isSplitScreenViewOpen))
+
+  useEffect(() => {
+    if (
+      setRootEntries &&
+      discussionTopicQuery.data?.legacyNode?.discussionEntriesConnection?.nodes?.length > 0
+    ) {
+      setRootEntries(
+        discussionTopicQuery.data?.legacyNode?.discussionEntriesConnection?.nodes
+          .filter(({deleted, subentriesCount}) => !deleted || subentriesCount > 0)
+          .map(({_id}) => _id),
+      )
+    }
+  }, [setRootEntries, discussionTopicQuery.data?.legacyNode?.discussionEntriesConnection?.nodes])
+
   const [firstRequest, setFirstRequest] = useState(true)
   useEffect(() => {
     if (!discussionTopicQuery.data || !firstRequest) return
@@ -354,8 +381,11 @@ const DiscussionTopicManager = props => {
         // add the new entry to the current entries in the cache
         if (currentDiscussion.legacyNode.participant.sortOrder === 'desc') {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
+          addRootEntryId(newDiscussionEntry._id, "first")
+
         } else {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
+          addRootEntryId(newDiscussionEntry._id, "last")
         }
         cache.writeQuery({...options, data: currentDiscussion})
       }
