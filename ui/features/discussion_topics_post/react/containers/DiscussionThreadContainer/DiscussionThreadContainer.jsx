@@ -63,6 +63,7 @@ import {Text} from '@instructure/ui-text'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
 import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
+import useHighlightStore from '../../hooks/useHighlightStore'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -135,6 +136,14 @@ export const DiscussionThreadContainer = props => {
       setEditorExpanded(false)
     }
   }
+
+  const removeRef = useHighlightStore(state => state.removeReplyRef)
+
+  useEffect(() => {
+    return () => {
+      removeRef(props.discussionEntry._id)
+    }
+  }, [removeRef, props.discussionEntry._id])
 
   const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(
     onEntryCreationCompletion,
@@ -781,6 +790,21 @@ const DiscussionSubentries = props => {
     variables,
     skip: props.allRootEntries && Array.isArray(props.allRootEntries),
   })
+
+  const pushSubEntries = useHighlightStore(state => state.pushSubEntries)
+
+  useEffect(() => {
+    if (query.data) {
+      pushSubEntries(
+        query.data.legacyNode.allRootEntries.map(({_id, deleted, parentId}) => ({
+          _id,
+          deleted,
+          parentId,
+        })),
+        props.discussionEntryId,
+      )
+    }
+  }, [query.data, pushSubEntries, props.discussionEntryId])
 
   const allRootEntries = props.allRootEntries || query?.data?.legacyNode?.allRootEntries || []
   const subentries = allRootEntries.filter(entry => entry.parentId === props.discussionEntryId)
