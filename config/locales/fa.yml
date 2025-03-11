@@ -5398,6 +5398,7 @@ fa:
   clear_all_e23811b1: "پاک کردن همه"
   clear_search_field_75f595c7: "قسمت جستجو را پاک کنید"
   clear_selected_file_82388e50: "پاک کردن فایل انتخاب شده"
+  clear_ui_changed_state_d0aca02d: "پاک کردن وضعیت واسط کاربر تغییر یافته"
   clear_user_cache_ef079f7f: "پاک کردن حافظه نهان کاربر"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "اگر نمی‌خواهید کد نمایش داده شود، روی «لغو» کلیک کنید."
   click_for_more_details_on_this_outcome_8c018d2f: "برای اطلاعات بیشتر درباره این نتیجه، کلیک کنید"
@@ -7032,6 +7033,8 @@ fa:
     one: "%{count} شرکت کننده"
     other: "%{count} شرکت کننده"
   count_people_489946e7: "%{count} نفر"
+  count_people_found_1ab374c0: 
+    zero: "فردی یافت نشد"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{count} فرد در *%{course_name}* با موفقیت ثبت نام شدند."
     other: "%{count} فرد در *%{course_name}* با موفقیت ثبت نام شدند."
@@ -16528,6 +16531,7 @@ fa:
   no_outcome_file_or_authority_given_c90f9c5f: "مرجع یا فایل نتیجه ارائه نشده است"
   no_outcome_selected_16d15753: "هیچ نتیجه ای انتخاب نشده است"
   no_password_was_given_472222e5: "هیچ رمز عبوری ارائه نشد"
+  no_people_found_67a8ee2f: "فردی یافت نشد"
   no_placements_enabled_f705f28: "هیچ جای گذاری فعال نشده است"
   no_points_possible_368669d: "امتیازهای ممکن موجود نیست"
   no_points_possible_72db3a55: "امتیاز ممکن موجود نیست"
@@ -17378,6 +17382,7 @@ fa:
   override_score_53994655: "جایگزین کردن نمره"
   override_score_5f3c1189: "جایگزین کردن نمره"
   override_score_gradingperiod_286ac51b: "جایگزین کردن نمره (%{gradingPeriod})"
+  override_ui_changes_5e0c56ab: "جایگزین کردن تغییرات واسط کاربر"
   overrides: 
     blank_override: "باید یک دانشجو یا بخش را انتخاب کنید"
     everyone: همه
@@ -18275,6 +18280,8 @@ fa:
   privacy_policy_c68f482a: "سیاست حریم خصوصی"
   private_3883d133: خصوصی
   proceed_f3d33864: "ادامه دادن"
+  process_as_ui_changes_8e34ed2a: "پردازش به عنوان تغییرات واسط کاربر"
+  process_data_2f5f962f: "پردازش داده ها"
   processing_2fcc9739: "در حال پردازش"
   product_name: کانواس
   proficiency_rating_6346119f: "رتبه‌بندی مهارت"
@@ -23920,6 +23927,7 @@ fa:
   this_is_a_course_template_99bbe698: "این یک قالب دوره است"
   this_is_a_feature_to_allow_product_design_to_remov_e92ea1c3: "این یک ویژگی است که به طراحی محصول اجازه حذف تمامی ابطال فونت‌های مختلف را در تمام نرم‌افزار می‌دهد."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "این ویژگی برای توسعه یک طرح پاسخ ده است. "
+  this_is_a_full_batch_update_99d726e0: "یک بهنگام سازی دسته ای کامل است"
   this_is_a_group_discussion_2f9acdae: "این یک بحث گروهی است"
   this_is_a_media_comment_click_here_to_view_c297bf62: "این نظر یک نظر رسانه ای است، *برای مشاهده، اینجا کلیک کنید*."
   this_is_a_message_for_name_7abf1e39: "این پیام مربوط به *%{name}* است"
@@ -25882,6 +25890,8 @@ fa:
   windows_tile_color_2b786bd9: "رنگ صفحه ویندوز"
   windows_tile_square_b91d2b33: "صفحه ویندوز: مربع"
   windows_tile_wide_4d40910: "صفحه ویندوز: عریض"
+  with_this_option_selected_all_fields_in_all_record_14a361c9: "با انتخاب این گزینه، همه جاهای خالی موجود در همه سوابق که از این ورود اطلاعات سامانه اطلاعات دانشجو متأثر هستند در ورودهای بعدی که جایگزین ورودهای قبلی نمی شوند قابل تغییر خواهند بود."
+  with_this_option_selected_changes_made_through_thi_e751dd22: "با انتخاب این گزینه، تغییرات ایجاد شده از طریق این ورود اطلاعات سامانه اطلاعات دانشجو طوری پردازش خواهند شد که گویی آنها تغییرات واسط کاربر هستند و از تغییر جاهای خالی تغییر داده شده در اینجا از طریق ورودهای بعدی که جایگزین ورودهای قبلی نمی شوند جلوگیری می نماید."
   withdrawn_4c838347: "حذف شده"
   withdrawn_or_enrolled_43a3f0ae: "منصرف شده یا ثبت نام شده "
   wmv_1119d032: WMV
@@ -25968,6 +25978,7 @@ fa:
   you_can_review_the_submission_details_by_clicking__9abc5515: "می توانید با کلیک کردن روی این پیوند: %{link}، اطلاعات مورد ارسالی را بازبینی کنید."
   you_can_review_the_submission_details_using_the_li_c25dd615: "می‌توانید جزئیان مورد ارسالی را با استفاده از پیوند زیر بازبینی کنید"
   you_can_review_the_submission_details_using_this_l_c7f51917: "می توانید با کلیک کردن روی این پیوند: %{link}، اطلاعات مورد ارسالی را بازبینی کنید."
+  you_can_search_by_25d8e2b2: "می توانید جستجو کنید بر اساس:"
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "می توانید با کلیک کردن روی این پیوند %{link}، اطلاعات مربوط به این گروه را مشاهده کنید."
   you_can_t_delete_a_root_account_5673c62d: "نمی‌توانید حساب_ریشه را حذف کنید."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "نمی توانید یک زیر حساب که دارای درس است را حذف کنید"

@@ -5399,6 +5399,7 @@ hu:
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing Email Connector"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
   canvas_user_id_4c18b78a: canvas_user_id
+  canvas_user_id_caf65ef5: "Canvas felhasználói azonosító"
   canvas_will_enroll_recipient_as_a_role_in_the_sele_729d521b: |-
       A Canvas beiratkoztatja %{recipient} mint %{role} a %{source} kiválasztott kurzusaira %{start} - %{end}
                 között, a beiratkozás végállapota %{state}.
@@ -5602,6 +5603,7 @@ hu:
   clear_search_900e9c97: "Keresés törlése"
   clear_search_field_75f595c7: "Törölje a keresőmezőt"
   clear_selected_file_82388e50: "A fájl kiválasztás törlése"
+  clear_ui_changed_state_d0aca02d: "UI-megváltozott állapot törlése"
   clear_until_date_time_a414828a: "Törölve dátumig/időpontig"
   clear_until_date_time_for_pilla_7a93bcf2: "Törlés a %{pillA} dátumig/időpontig"
   clear_until_date_time_for_pilla_and_pillb_81c950f8: "Törlés dátumig/időpontig %{pillA} és %{pillB} esetében"
@@ -7236,6 +7238,8 @@ hu:
     one: "1 részvétel"
     other: "%{count} részvétel"
   count_people_489946e7: "%{count} résztvevő"
+  count_people_found_1ab374c0: 
+    zero: "Nem található ilyen résztvevő"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{user_name} sikeresen beiratkozott a *%{course_name}* kurzusra."
     other: "%{count} ember sikeresen iratkozott be a *%{course_name}* kurzusra."
@@ -16981,6 +16985,7 @@ hu:
   no_outcome_selected_16d15753: "Nincs kiválasztva tanulási eredmény"
   no_password_was_given_472222e5: "Nincs megadva jelszó"
   no_pending_changes_to_apply_b28f98cf: "Nincs folyamatban lévő változás, amelyet alkalmazni kellene"
+  no_people_found_67a8ee2f: "Nem található ilyen résztvevő"
   no_placements_enabled_f705f28: "Nincsenek engedélyezett elhelyezések"
   no_points_possible_368669d: "Nincsenek elérhető pontok"
   no_points_possible_72db3a55: "Nincsenek elérhető pontok"
@@ -17943,6 +17948,7 @@ hu:
   override_score_gradingperiod_286ac51b: "Pontszám Felülbírálása (%{gradingPeriod})"
   override_status_74c3519f: "Státusz Felülbírálásaz"
   override_status_gradingperiod_f41fddd6: "Státusz Felülbírálása (%{gradingPeriod})"
+  override_ui_changes_5e0c56ab: "UI változások felülbírálása"
   overrides: 
     everyone: Mindenki
     everyone_else: "Mindenki más "
@@ -18988,6 +18994,8 @@ hu:
   private_key_is_present_in_certificate_file_1a1b7b42: "A magánkulcs jelen van a tanúsítványfájlban"
   pro_tip_30e41fa3: "PRO TIPP!"
   proceed_f3d33864: Folytatás
+  process_as_ui_changes_8e34ed2a: "Feldolgozás, ahogy az UI változik"
+  process_data_2f5f962f: "Adat feldolgozása"
   processed_4725b02: Feldolgozott
   processing_2fcc9739: Feldolgozás
   product_name: Canvas
@@ -25015,6 +25023,7 @@ hu:
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Ez egy vesszőkkel elválasztott megbízható URL-eket tartalmazó lista. Amennyiben megbízik bármilyen erről a listáról származó URL-ben, a CSRF token átadásra kerül, amikor a Canvasba bejelentkezik."
   this_is_a_course_template_99bbe698: "Ez egy kurzus sablon"
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Ez a funkció lehetővé teszi egy reszponzív elrendezésű felület létrehozását"
+  this_is_a_full_batch_update_99d726e0: "Ez egy teljes kötegfrissítés"
   this_is_a_graded_discussion_28ad2728: "Ez egy osztályozott fórum"
   this_is_a_group_discussion_2f9acdae: "Ez egy csoportfórum"
   this_is_a_media_comment_click_here_to_view_c297bf62: "Ez egy médiamegjegyzés, *kattintson ide a megtekintéshez*."
@@ -27429,6 +27438,8 @@ hu:
   windows_tile_square_b91d2b33: "A Windows csempe: négyzet"
   windows_tile_wide_4d40910: "A Windows csempe: széles"
   with_alignments_3ef4a5e: "Az összehangolásokkal"
+  with_this_option_selected_all_fields_in_all_record_14a361c9: "Ezt kiválasztva, minden mező minden rekordban, amelyet ez a SIS import érint, megváltoztatható lesz a jövőbeli nem felülíró SIS importok alkalmával."
+  with_this_option_selected_changes_made_through_thi_e751dd22: "Ezt kiválasztva a SIS importban eszközölt változtatások UI változtatásokként kerülnek feldolgozásra, ezzel megakadályozva, hogy a későbbi, nem felülíró SIS importok az itt megváltoztatott mezőket felülírják."
   withdrawn_4c838347: Visszavont
   withdrawn_or_enrolled_43a3f0ae: "Visszavonult vagy beiratkozott"
   without_alignments_c5193f9a: "Összehangolások nélkül"
@@ -27538,6 +27549,7 @@ hu:
   you_can_review_the_submission_details_by_clicking__9abc5515: "A leadás részleteit az alábbi linken tekintheti meg: %{link}. "
   you_can_review_the_submission_details_using_the_li_c25dd615: "A leadás részleteit az alábbi hivatkozást használva tekintheti meg."
   you_can_review_the_submission_details_using_this_l_c7f51917: "A leadás részleteit az alábbi linken nézheti át: %{link}. "
+  you_can_search_by_25d8e2b2: "Ezek alapján kereshet:"
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "A csoport részletes adatai az alábbi linken érhetők el: %{link}."
   you_can_t_delete_a_root_account_5673c62d: "Nem törölhet root_account gyökérfiókot."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Nem törölhet olyan alfiókot, ami kurzusokat tartalmaz. "

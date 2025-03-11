@@ -3464,6 +3464,7 @@ hy:
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas-ը կարծում է, որ պատասխանը ընդունելի է"
   canvas_ticketing_email_connector_27e253ae: "Canvas ձևերը գեներացնող էլ.փոստի կոնեկտոր "
   canvas_ticketing_web_post_connector_11158897: "Canvas ձևերը գեներացնող վեբ-հրապարակումների կոնեկտոր"
+  canvas_user_id_caf65ef5: "Canvas օգտատիրոջ ID"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas համակարգը կրկին կգնահատի Ձեր կողմից ուղարկված բոլոր աշխատանքները այն բանից հետո, երբ Դուք կպահպանեք թեստը: Դա կտևի մի քանի րոպե:"
   careful_changes_to_group_membership_will_apply_to__19a9089c: "Ուշադրությո՛ւն։ Խմբի անդամակցության փոփոխությունները կկիրառվեն այն խմբերի նկատմամբ, որոնք արդեն ներկայացրել են իրենց հանձնարարությունները։ Արդյունքում խմբերի ներկայացրած հանձնարարությունները կարող են չհամընկնել։ Արդյո՞ք ցանկանում եք ստեղծել նոր խումբ ապագա հանձնարարությունների համար։"
   cas_url_4ba2843e: "CAS URL"
@@ -3511,6 +3512,7 @@ hy:
   chosencolor_is_not_a_valid_color_5d542cc: "'%{ընտրված գույն}'-ը վավեր գույն չէ"
   clear_2084585f: Մաքրել
   clear_all_e23811b1: "Մաքրել բոլորը"
+  clear_ui_changed_state_d0aca02d: "Մաքրել UI փոփոխված վիճակը"
   click_for_more_details_on_this_outcome_8c018d2f: "Սեղմել այս արդյունքի մանրամասները տեսնելու համար"
   click_here_for_an_account_9536cb36: "Սեղմեք այստեղ հաշվի համար"
   click_here_it_s_free_eeccb9cb: "Սեղմեք այստեղ, այն անվճար է"
@@ -4678,6 +4680,8 @@ hy:
     one: "1 մասնակից"
     other: "%{count} մասնակից"
   count_people_489946e7: "%{count} մարդ"
+  count_people_found_1ab374c0: 
+    zero: "Ոչ մի օգտատեր չի գտնվել"
   count_students_30e46120: 
     one: "1 ուսանող"
     other: "%{count} ունկնդիր"
@@ -11375,6 +11379,7 @@ hy:
   no_migration_file: "Բովանդակության տեղափոխման համար անհրաժեշտ ֆայլ"
   no_outcome_selected_16d15753: "Ոչ մի արդյունք ընտրված չէ"
   no_password_was_given_472222e5: "Գաղտնաբառ տրված չէ "
+  no_people_found_67a8ee2f: "Ոչ մի օգտատեր չի գտնվել"
   no_placements_enabled_f705f28: "Տեղադրումները միացված չեն"
   no_points_possible_368669d: "Հնարավոր միավորներ չկան"
   no_preview_available_e8e71199: "Նախնական դիտումը հասանելի չէ"
@@ -11954,6 +11959,7 @@ hy:
     titles: 
       find_outcomes: "Գտնել արդյունքները"
   outcomes_d1b18d33: Արդյունքներ
+  override_ui_changes_5e0c56ab: "Վերասահմանել UI փոփոխությունները"
   overrides: 
     blank_override: "Անհրաժեշտ է ունենալ ընտրված ունկնդիր կամ բաժին"
     everyone: Յուրաքանչյուրը
@@ -12558,6 +12564,8 @@ hy:
   priority_dd4381ee: Առաջնահերթություն
   privacy_290109ea: Գաղտնիություն
   privacy_policy_c68f482a: "Գաղտնիության պահպանման քաղաքականություն"
+  process_as_ui_changes_8e34ed2a: "Մշակվում են  որպես UI փոփոխություններ "
+  process_data_2f5f962f: "Մշակել տվյալները"
   product_name: Canvas
   profile: 
     access_token: 
@@ -16747,6 +16755,7 @@ hy:
   this_grade_is_currently_dropped_for_this_student_7bc78b78: " Այս գնահատականը այս ունկնդրի համար ներկայումս հանվել է:"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Այս պատկերը հանդիսանում է Ձեր էջ ֆոնային պատկերը: Ընդունելի ձևաչափեր՝ png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Սա URL-հասցեների ստորակետներով բաժանված վստահելի  ցուցակ է: Այս ցուցակում ընդգրկված որևէ URL-ին վստահելը կնշանակի, որ այնտեղից Canvas մուտք գործելիս բաց է թողնվելու CSRF token-ը:"
+  this_is_a_full_batch_update_99d726e0: "Սա փաթեթի ամբողջական թարմացումն է:"
   this_is_a_group_discussion_2f9acdae: "Սա խմբային քննարկում է "
   this_is_a_media_comment_click_here_to_view_c297bf62: "Սա մուլտիմեդիա մեկնաբանություն է, *սեղմեք այստեղ դիտելու համար*:"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Սա այս ունկնդրի համար ընտրված գնահատականն է:"
@@ -17856,6 +17865,8 @@ hy:
   windows_tile_color_2b786bd9: "Windows սալիկի գույն"
   windows_tile_square_b91d2b33: "Windows սալիկ. քառակուսի"
   windows_tile_wide_4d40910: "Windows սալիկ. լայնություն"
+  with_this_option_selected_all_fields_in_all_record_14a361c9: "Այս տարբերակի ընտրության դեպքում սույն SIS ներմուծման մեջ ներառված բոլոր գրանցումների բոլոր դաշտերը հնարավոր է փոփոխել, չվերասահմանելով  SIS հետագա ներմուծումները:"
+  with_this_option_selected_changes_made_through_thi_e751dd22: "Այս օպցիան ընտրելով SIS ներմուծման միջոցով կատարված փոփոխությունները կմշակվեն որպես UI փոփոխություններ, կանխելով այն, որ հետագա SIS չկրկնօրինակող ներմուծումները փոխեն այստեղ փոփոխված դաշտերը: "
   workflow_state_cc8d711a: "Աշխատանքային գործընթացի վիճակը"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Դուք ցանկանում եք այս թարմացումը ընդունել թե՞ մերժել: "
   would_you_like_to_enable_this_app_ccdf735d: "Կցանկանայի՞ք միացնել այս հավելվածը:"
@@ -17889,6 +17900,7 @@ hy:
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "Դուք կարող եք պատասխանել այս հաղորդագրությանը Canvas համակարգում՝ ուղղակիորեն պատասխանելով այս էլեկտրոնային նամակին կամ սեղմելով այս հղումը. %{link}"
   you_can_review_the_submission_details_by_clicking__58a7753: "Դուք կարող եք դիտել մանրամասները, սեղմելով ներքևի հղումը."
   you_can_review_the_submission_details_by_clicking__9abc5515: "Այս հղման միջոցով դուք կարող եք դիտել ուղարկված աշխատանքի մանրամասները. %{link}"
+  you_can_search_by_25d8e2b2: "Դուք կարող եք որոնել ըստ՝"
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "Այս հղման միջոցով Դուք կարող եք տեսնել այս խմբի մանրամասները. %{link}"
   you_can_see_which_groups_you_re_a_part_of_for_this_6efda22c: "Այս հղման միջոցով դուք կարող եք տեսնել, թե այս դասընթացի շրջանակներում ինչ խմբերում եք դուք ընդգրկվել. %{link}"
   you_can_see_which_groups_you_re_a_part_of_for_this_827a3706: "Այս հղման միջոցով Դուք կարող եք տեսնել, թե այս դասընթացի շրջանակներում ինչ խմբերում եք դուք ընդգրկվել. %{link}"

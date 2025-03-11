@@ -5968,6 +5968,7 @@ nn:
   canvas_ticketing_email_connector_27e253ae: "Koplingspunkt for Canvas Ticketing e-post"
   canvas_ticketing_web_post_connector_11158897: "Koplingspunkt for Canvas Ticketing weboppføring"
   canvas_user_id_4c18b78a: canvas_user_id
+  canvas_user_id_caf65ef5: "Brukar-ID i Canvas"
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "Canvas vil fjerne nøklar med null-verdiar frå live event payloads dersom funksjonen er slått på. "
   caption_1cf95987: Biletetekst
   captions_inherited_from_a_parent_course_cannot_be__9248fa3a: "Underoverskrifter som er arva frå eit anna emne kan ikkje fjernast"
@@ -6128,6 +6129,7 @@ nn:
   clear_search_900e9c97: "Tøm søk"
   clear_search_field_75f595c7: "Tøm søkefeltet"
   clear_selected_file_82388e50: "Fjern vald fil"
+  clear_ui_changed_state_d0aca02d: "Fjern status for endra brukargrensesnitt"
   clear_until_date_time_a414828a: "Fjern fram til dato/tid"
   clear_user_cache_ef079f7f: "Tøm brukarcache"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Klikk \"Avbryt\" dersom du ikkje vil at koden skal vise."
@@ -7832,6 +7834,8 @@ nn:
     one: "1 deltaking"
     other: "%{count} deltakingar"
   count_people_489946e7: "%{count} personar"
+  count_people_found_1ab374c0: 
+    zero: "Finn ikkje personar"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{user_name}har meldt seg på *%{course_name}*."
     other: "%{count}personar har meldt seg på *%{course_name}*."
@@ -18284,6 +18288,7 @@ nn:
   no_outcome_selected_16d15753: "Ingen valde resultat"
   no_password_was_given_472222e5: "Passord er ikkje oppgitt"
   no_pending_changes_to_apply_b28f98cf: "Ingen ventande endringar å innføre"
+  no_people_found_67a8ee2f: "Finn ikkje personar"
   no_placements_enabled_f705f28: "Ingen plasseringar er aktivert"
   no_points_possible_368669d: "Ingen moglege poeng"
   no_points_possible_72db3a55: "Ingen moglege poeng"
@@ -19272,6 +19277,7 @@ nn:
   override_score_gradingperiod_286ac51b: "Overstyr poengsum (%{gradingPeriod})"
   override_status_74c3519f: "Overstyr status"
   override_status_gradingperiod_f41fddd6: "Overstyr status (%{gradingPeriod})"
+  override_ui_changes_5e0c56ab: "Overstyr endringar i brukargrensesnitt"
   overrides: 
     blank_override: "Du må velje ein student eller ei klasse"
     everyone: Alle
@@ -20347,6 +20353,8 @@ nn:
   private_3883d133: Privat
   pro_tip_30e41fa3: PROFFTIPS!
   proceed_f3d33864: Fortsett
+  process_as_ui_changes_8e34ed2a: "Behandle som endringar i brukargrensesnittet"
+  process_data_2f5f962f: "Behandle data"
   process_multiple_content_items_from_course_modules_6de90fd8: "Behandle fleire innhaldselement frå emnemodulsida"
   processed_4725b02: Behandla
   processing_2fcc9739: Handsamar
@@ -26720,6 +26728,7 @@ nn:
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Dette er eit avslutta kurs og difor er berre avslutta påmeldingar tilgjengelege."
   this_is_a_course_template_99bbe698: "Dette er ein emnemal"
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Funksjonen tillet utvikling av responsive nettsider "
+  this_is_a_full_batch_update_99d726e0: "Dette er ei fullstendig batchoppdatering"
   this_is_a_graded_discussion_28ad2728: "Dette er ein vurdert diskusjon"
   this_is_a_group_discussion_2f9acdae: "Dette er ein gruppediskusjon"
   this_is_a_media_comment_click_here_to_view_c297bf62: "Dette er ein mediekommentar, *klikk her for å sjå*."
@@ -29281,6 +29290,8 @@ nn:
       ein kan skrive $$ax^2 + by + c = 0$$ i ein kommentar på ei innlevering.
       Denne funksjonen krev at "Updated math equation handling"-
       flagget også er skrudd på.
+  with_this_option_selected_all_fields_in_all_record_14a361c9: "Dersom du vel dette alternativet, kan alle felt og postar som vedkjem SIS-importen endrast i framtidige SIS-importar som ikkje er overstyrande."
+  with_this_option_selected_changes_made_through_thi_e751dd22: "Dersom du vel dette alternativet, vil endringar som er gjort gjennom SIS-importen behandlast som om dei er endringar i brukargrensesnittet og hindre overstyrande SIS-importar i å endre felta som er endra her."
   withdrawn_4c838347: Avmeld
   withdrawn_or_enrolled_43a3f0ae: "Avmeldt eller påmeldt"
   without_alignments_c5193f9a: "Utan justeringar"
@@ -29388,6 +29399,7 @@ nn:
   you_can_review_the_submission_details_by_clicking__9abc5515: "Du kan sjå nærare på innleveringsdetaljane ved å klikke på lenka: %{link}."
   you_can_review_the_submission_details_using_the_li_c25dd615: "Du kan sjå nærare på innleveringsdetaljane ved å bruke lenka nedanfor. "
   you_can_review_the_submission_details_using_this_l_c7f51917: "Du kan sjå nærare på innleveringsdetaljane ved å bruke lenka: %{link}. "
+  you_can_search_by_25d8e2b2: "Du kan søke etter:"
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "Du kan sjå detaljane for denne gruppa ved å klikke på denne lenka: %{link}."
   you_can_t_delete_a_root_account_5673c62d: "Du kan ikkje slette ein rot_konto. "
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Du kan ikkje slette ein underkonto som inneheld emne."
