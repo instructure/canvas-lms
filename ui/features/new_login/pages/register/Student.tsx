@@ -160,6 +160,7 @@ const Student = () => {
     if (recaptchaKey) {
       const recaptchaValid = recaptchaSectionRef.current?.validate() ?? true
       if (!recaptchaValid) {
+        recaptchaSectionRef.current?.focus()
         hasValidationError = true
       }
     }
@@ -241,10 +242,11 @@ const Student = () => {
     }
 
     // reCAPTCHA
-    if (recaptchaKey && errors.recaptcha) {
+    if (recaptchaKey) {
+      recaptchaSectionRef.current?.reset()
       recaptchaSectionRef.current?.validate()
       if (!hasFocusedError) {
-        // TODO: handle reCAPTCHA errors …
+        recaptchaSectionRef.current?.focus()
       }
     }
   }

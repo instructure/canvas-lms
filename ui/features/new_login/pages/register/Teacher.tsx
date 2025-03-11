@@ -21,7 +21,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import React, {useRef, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
@@ -93,6 +92,7 @@ const Teacher = () => {
     if (recaptchaKey) {
       const recaptchaValid = recaptchaSectionRef.current?.validate() ?? true
       if (!recaptchaValid) {
+        recaptchaSectionRef.current?.focus()
         hasValidationError = true
       }
     }
@@ -145,9 +145,10 @@ const Teacher = () => {
 
     // reCAPTCHA
     if (recaptchaKey && errors.recaptcha) {
+      recaptchaSectionRef.current?.reset()
       recaptchaSectionRef.current?.validate()
       if (!hasFocusedError) {
-        // TODO: handle reCAPTCHA errors …
+        recaptchaSectionRef.current?.focus()
       }
     }
   }
