@@ -1644,6 +1644,13 @@ describe FilesController do
       assert_status(400)
     end
 
+    it "rejects an empty file" do
+      empty_file = Rack::Test::UploadedFile.new(file_fixture("empty_file.txt"), "")
+      params = @attachment.ajax_upload_params("", "")
+      post "api_create", params: params[:upload_params].merge(file: empty_file)
+      assert_status(400)
+    end
+
     it "rejects an expired policy" do
       params = @attachment.ajax_upload_params("", "", expiration: -60.seconds)
       post "api_create", params: params[:upload_params].merge({ file: @content })

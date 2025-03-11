@@ -1029,7 +1029,13 @@ class FilesController < ApplicationController
 
     @context = @attachment.context
     @attachment.workflow_state = nil
-    @attachment.uploaded_data = params[:file] || (params[:attachment] && params[:attachment][:uploaded_data])
+    uploaded_data = params[:file] || (params[:attachment] && params[:attachment][:uploaded_data])
+    if uploaded_data.blank?
+      return head :bad_request
+    end
+
+    @attachment.uploaded_data = uploaded_data
+
     if @attachment.save
       # for consistency with the s3 upload client flow, we redirect to the success url here to finish up
       includes = Array(params[:success_include])

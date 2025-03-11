@@ -172,13 +172,17 @@ describe "Files API", type: :request do
   describe "api_create" do
     it "includes success_include as include when redirecting" do
       local_storage!
+      file = Rack::Test::UploadedFile.new(file_fixture("a_file.txt"), "")
       a = attachment_model(workflow_state: :unattached)
       params = a.ajax_upload_params("/url", "/s3")[:upload_params]
-      raw_api_call(:post, "/files_api", params.merge({
-                                                       controller: "files",
-                                                       action: "api_create",
-                                                       success_include: ["avatar"],
-                                                     }))
+      raw_api_call(:post,
+                   "/files_api",
+                   params.merge({
+                                  controller: "files",
+                                  action: "api_create",
+                                  success_include: ["avatar"],
+                                  file:
+                                }))
       expect(redirect_params["include"]).to include("avatar")
     end
   end
