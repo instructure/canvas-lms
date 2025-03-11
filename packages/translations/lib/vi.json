@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "Cân nhắc bổ sung"
     },
+    "address_applied_64269b0b": {
+        "message": "Đã áp dụng địa chỉ"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Đã gỡ địa chỉ"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Liên kết liền kề có cùng URL phải là liên kết đơn."
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "Xanh Dương"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Đã áp dụng in đậm"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Đã gỡ in đậm"
     },
     "border_5b08b06d": {
         "message": "Viền"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Hiển Thị Liên Kết Văn Bản (mở trong tác vụ mới)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Đã áp dụng div"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Đã gỡ div"
     },
     "division_sign_72190870": {
         "message": "Dấu Chia"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "Đầu Đề 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Đã áp dụng tiêu đề { h }"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Đã gỡ tiêu đề { h }"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Không được bỏ qua cấp đầu đề."
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "Tiếng Ý"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Đã áp dụng in nghiêng"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Đã gỡ in nghiêng"
     },
     "japanese_b5721ca7": {
         "message": "Tiếng Nhật"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "Đoạn"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "Đã áp dụng đoạn văn"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Đã gỡ đoạn văn"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Đoạn bắt đầu bằng { start }"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Không thể xác định url lựa chọn tài nguyên"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Đã áp dụng gạch chân"
+    },
+    "underline_removed_3693e17c": {
+        "message": "Đã gỡ gạch chân"
     },
     "union_e6b57a53": {
         "message": "Liên Hợp"
