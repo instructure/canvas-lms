@@ -41,57 +41,87 @@ describe UserContent, type: :request do
       @doc = Nokogiri::HTML5.fragment(json["description"])
     end
 
-    it "translates course file download links to directly-downloadable urls" do
-      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
-      subject
-      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+    context "with verifiers and group context file links" do
+      before do
+        @group = @course.groups.create!(name: "course group")
+        @attachment1 = attachment_model(context: @group)
+        @group.add_user(@teacher)
+      end
+
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "translates group file download links to directly-downloadable urls" do
+          @group.add_user(@teacher)
+          @group_topic = @group.discussion_topics.create!(title: "group topic", user: @teacher, message: "<img src=\"/groups/#{@group.id}/files/#{@attachment1.id}/download\" alt=\"important\">")
+          json = api_call(:get,
+                          "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
+                          { controller: "discussion_topics_api",
+                            action: "show",
+                            format: "json",
+                            group_id: @group.id.to_s,
+                            topic_id: @group_topic.id.to_s })
+
+          @doc = Nokogiri::HTML5.fragment(json["message"])
+          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment1.id}/download#{disable_adding_uuid_verifier_in_api ? "" : "?verifier=#{@attachment1.uuid}"}"
+        end
+      end
     end
 
-    it "translates group file download links to directly-downloadable urls" do
-      @group = @course.groups.create!(name: "course group")
-      attachment_model(context: @group)
-      @group.add_user(@teacher)
-      @group_topic = @group.discussion_topics.create!(title: "group topic", user: @teacher, message: "<img src=\"/groups/#{@group.id}/files/#{@attachment.id}/download\" alt=\"important\">")
-      json = api_call(:get,
-                      "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
-                      { controller: "discussion_topics_api",
-                        action: "show",
-                        format: "json",
-                        group_id: @group.id.to_s,
-                        topic_id: @group_topic.id.to_s })
+    context "with verifiers and replacing files" do
+      before do
+        @attachment.destroy
 
-      @doc = Nokogiri::HTML5.fragment(json["message"])
-      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+        @attachment2 = Attachment.create!(folder: @attachment.folder, context: @attachment.context, filename: @attachment.filename, uploaded_data: StringIO.new("first"))
+      end
+
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "translates file download links to directly-downloadable urls for deleted and replaced files" do
+          expect(@context.attachments.find(@attachment.id).id).to eq @attachment2.id
+
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+          subject
+          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment2.id}/download#{disable_adding_uuid_verifier_in_api ? "" : "?verifier=#{@attachment2.uuid}"}"
+        end
+      end
     end
 
-    it "translates file download links to directly-downloadable urls for deleted and replaced files" do
-      @attachment.destroy
-      attachment2 = Attachment.create!(folder: @attachment.folder, context: @attachment.context, filename: @attachment.filename, uploaded_data: StringIO.new("first"))
-      expect(@context.attachments.find(@attachment.id).id).to eq attachment2.id
+    context "with disable_adding_uuid_verifier_in_api FF" do
+      before do
+        attachment_model(user: @teacher)
+      end
 
-      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
-      subject
-      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "translates course file download links to directly-downloadable urls" do
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+          subject
+          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download#{disable_adding_uuid_verifier_in_api ? "" : "?verifier=#{@attachment.uuid}"}"
+        end
+
+        it "translates file preview links to directly-downloadable preview urls" do
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">")
+          subject
+          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview#{disable_adding_uuid_verifier_in_api ? "" : "?verifier=#{@attachment.uuid}"}"
+        end
+      end
     end
 
-    it "does not corrupt absolute links" do
-      attachment_model(context: @course)
-      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
-      subject
-      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
-    end
+    context "with verifiers and course context file links" do
+      before do
+        attachment_model(context: @course)
+      end
 
-    it "does not remove wrap parameter on file download links" do
-      attachment_model(context: @course)
-      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1\" alt=\"important\">")
-      subject
-      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}&wrap=1"
-    end
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "does not corrupt absolute links" do
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+          subject
+          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
+        end
 
-    it "translates file preview links to directly-downloadable preview urls" do
-      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">")
-      subject
-      expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}"
+        it "does not remove wrap parameter on file download links" do
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1\" alt=\"important\">")
+          subject
+          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?#{"verifier=#{@attachment.uuid}&" unless disable_adding_uuid_verifier_in_api}wrap=1"
+        end
+      end
     end
 
     it "translates media comments to embedded video tags" do
@@ -365,19 +395,21 @@ describe UserContent, type: :request do
         expect(doc.at_css("a")["href"]).to eq url
       end
 
-      it "ignores them when scoped to the file" do
-        url = "/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
-        confirm_url_stability(url)
-      end
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "ignores them when scoped to the file" do
+          url = "/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
+          confirm_url_stability(url)
+        end
 
-      it "ignores them when scoped to the user" do
-        url = "/users/#{@user.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
-        confirm_url_stability(url)
-      end
+        it "ignores them when scoped to the user" do
+          url = "/users/#{@user.id}/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
+          confirm_url_stability(url)
+        end
 
-      it "ignores them when they include the host" do
-        url = "http://somedomain.instructure.com/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
-        confirm_url_stability(url)
+        it "ignores them when they include the host" do
+          url = "http://somedomain.instructure.com/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
+          confirm_url_stability(url)
+        end
       end
     end
   end

@@ -688,110 +688,116 @@ describe DiscussionTopicsController, type: :request do
     end
 
     let(:topic_response_json) do
-      { "read_state" => "read",
-        "unread_count" => 0,
-        "podcast_url" => "/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
-        "user_can_see_posts" => @topic.user_can_see_posts?(@user),
-        "subscribed" => @topic.subscribed?(@user),
-        "require_initial_post" => nil,
-        "title" => "Topic 1",
-        "discussion_subentry_count" => 0,
-        "assignment_id" => nil,
-        "is_section_specific" => @topic.is_section_specific,
-        "summary_enabled" => @topic.summary_enabled,
-        "published" => true,
-        "can_unpublish" => true,
-        "delayed_post_at" => nil,
-        "lock_at" => nil,
-        "created_at" => @topic.created_at.iso8601,
-        "id" => @topic.id,
-        "user_name" => @user.name,
-        "last_reply_at" => @topic.last_reply_at.as_json,
-        "message" => "<p>content here</p>",
-        "posted_at" => @topic.posted_at.as_json,
-        "root_topic_id" => nil,
-        "pinned" => false,
-        "position" => @topic.position,
-        "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-        "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-        "podcast_has_student_posts" => false,
-        "attachments" => [{ "content-type" => "text/plain",
-                            "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
-                            "filename" => "content.txt",
-                            "display_name" => "content.txt",
-                            "id" => @attachment.id,
-                            "uuid" => @attachment.uuid,
-                            "folder_id" => @attachment.folder_id,
-                            "size" => @attachment.size,
-                            "unlock_at" => nil,
-                            "locked" => false,
-                            "hidden" => false,
-                            "lock_at" => nil,
-                            "locked_for_user" => false,
-                            "hidden_for_user" => false,
-                            "created_at" => @attachment.created_at.as_json,
-                            "updated_at" => @attachment.updated_at.as_json,
-                            "upload_status" => "success",
-                            "modified_at" => @attachment.modified_at.as_json,
-                            "thumbnail_url" => nil,
-                            "mime_class" => @attachment.mime_class,
-                            "media_entry_id" => @attachment.media_entry_id,
-                            "category" => "uncategorized",
-                            "visibility_level" => @attachment.visibility_level }],
-        "discussion_type" => "not_threaded",
-        "locked" => false,
-        "can_lock" => true,
-        "comments_disabled" => false,
-        "locked_for_user" => false,
-        "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
-        "permissions" => { "delete" => true, "attach" => true, "update" => true, "reply" => true, "manage_assign_to" => true },
-        "can_group" => true,
-        "allow_rating" => false,
-        "only_graders_can_rate" => false,
-        "sort_by_rating" => false,
-        "todo_date" => nil,
-        "group_category_id" => nil,
-        "topic_children" => [],
-        "group_topic_children" => [],
-        "is_announcement" => false,
-        "ungraded_discussion_overrides" => [],
-        "anonymous_state" => nil }
+      lambda do |disable_adding_uuid_verifier_in_api = false|
+        { "read_state" => "read",
+          "unread_count" => 0,
+          "podcast_url" => "/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
+          "user_can_see_posts" => @topic.user_can_see_posts?(@user),
+          "subscribed" => @topic.subscribed?(@user),
+          "require_initial_post" => nil,
+          "title" => "Topic 1",
+          "discussion_subentry_count" => 0,
+          "assignment_id" => nil,
+          "is_section_specific" => @topic.is_section_specific,
+          "summary_enabled" => @topic.summary_enabled,
+          "published" => true,
+          "can_unpublish" => true,
+          "delayed_post_at" => nil,
+          "lock_at" => nil,
+          "created_at" => @topic.created_at.iso8601,
+          "id" => @topic.id,
+          "user_name" => @user.name,
+          "last_reply_at" => @topic.last_reply_at.as_json,
+          "message" => "<p>content here</p>",
+          "posted_at" => @topic.posted_at.as_json,
+          "root_topic_id" => nil,
+          "pinned" => false,
+          "position" => @topic.position,
+          "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+          "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+          "podcast_has_student_posts" => false,
+          "attachments" => [{ "content-type" => "text/plain",
+                              "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{"&verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}",
+                              "filename" => "content.txt",
+                              "display_name" => "content.txt",
+                              "id" => @attachment.id,
+                              "uuid" => @attachment.uuid,
+                              "folder_id" => @attachment.folder_id,
+                              "size" => @attachment.size,
+                              "unlock_at" => nil,
+                              "locked" => false,
+                              "hidden" => false,
+                              "lock_at" => nil,
+                              "locked_for_user" => false,
+                              "hidden_for_user" => false,
+                              "created_at" => @attachment.created_at.as_json,
+                              "updated_at" => @attachment.updated_at.as_json,
+                              "upload_status" => "success",
+                              "modified_at" => @attachment.modified_at.as_json,
+                              "thumbnail_url" => nil,
+                              "mime_class" => @attachment.mime_class,
+                              "media_entry_id" => @attachment.media_entry_id,
+                              "category" => "uncategorized",
+                              "visibility_level" => @attachment.visibility_level }],
+          "discussion_type" => "not_threaded",
+          "locked" => false,
+          "can_lock" => true,
+          "comments_disabled" => false,
+          "locked_for_user" => false,
+          "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
+          "permissions" => { "delete" => true, "attach" => true, "update" => true, "reply" => true, "manage_assign_to" => true },
+          "can_group" => true,
+          "allow_rating" => false,
+          "only_graders_can_rate" => false,
+          "sort_by_rating" => false,
+          "todo_date" => nil,
+          "group_category_id" => nil,
+          "topic_children" => [],
+          "group_topic_children" => [],
+          "is_announcement" => false,
+          "ungraded_discussion_overrides" => [],
+          "anonymous_state" => nil }
+      end
     end
 
     let(:root_topic_response_json) do
-      topic_response_json.merge(
-        "group_category_id" => @group_category.id,
-        "topic_children" => [@sub.id],
-        "group_topic_children" => [{ "id" => @sub.id, "group_id" => @sub.context_id }],
-        "subscription_hold" => "not_in_group_set"
-      )
+      lambda do |disable_adding_uuid_verifier_in_api = false|
+        topic_response_json.call(disable_adding_uuid_verifier_in_api).merge(
+          "group_category_id" => @group_category.id,
+          "topic_children" => [@sub.id],
+          "group_topic_children" => [{ "id" => @sub.id, "group_id" => @sub.context_id }],
+          "subscription_hold" => "not_in_group_set"
+        )
+      end
     end
 
     describe "GET 'index'" do
-      it "returns discussion topic list" do
-        json = api_call(:get,
-                        "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                        { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s })
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "returns discussion topic list" do
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                          { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s })
 
-        expect(json.size).to eq 1
-        # get rid of random characters in podcast url
-        json.last["podcast_url"].gsub!(/_[^.]*/, "_randomness")
-        expect(json.last).to eq topic_response_json.merge("subscribed" => @topic.subscribed?(@user))
-      end
+          expect(json.size).to eq 1
+          # get rid of random characters in podcast url
+          json.last["podcast_url"].gsub!(/_[^.]*/, "_randomness")
+          expect(json.last).to eq topic_response_json.call(disable_adding_uuid_verifier_in_api).merge("subscribed" => @topic.subscribed?(@user))
+        end
 
-      it "returns discussion topic list for root topics" do
-        @group_category = @course.group_categories.create(name: "watup")
-        @group = @group_category.groups.create!(name: "group1", context: @course)
-        @topic.update_attribute(:group_category, @group_category)
-        @sub = @topic.child_topics.first # create a sub topic the way we actually do - i.e. through groups
-        json = api_call(:get,
-                        "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                        { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s })
+        it "returns discussion topic list for root topics" do
+          @group_category = @course.group_categories.create(name: "watup")
+          @group = @group_category.groups.create!(name: "group1", context: @course)
+          @topic.update_attribute(:group_category, @group_category)
+          @sub = @topic.child_topics.first # create a sub topic the way we actually do - i.e. through groups
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                          { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s })
 
-        expect(json.size).to eq 1
-        # get rid of random characters in podcast url
-        json.last["podcast_url"].gsub!(/_[^.]*/, "_randomness")
-        expect(json.last).to eq root_topic_response_json.merge("subscribed" => @topic.subscribed?(@user))
+          expect(json.size).to eq 1
+          # get rid of random characters in podcast url
+          json.last["podcast_url"].gsub!(/_[^.]*/, "_randomness")
+          expect(json.last).to eq root_topic_response_json.call(disable_adding_uuid_verifier_in_api).merge("subscribed" => @topic.subscribed?(@user))
+        end
       end
 
       it "searches discussion topics by title" do
@@ -1327,28 +1333,30 @@ describe DiscussionTopicsController, type: :request do
     end
 
     describe "GET 'show'" do
-      it "returns an individual topic" do
-        json = api_call(:get,
-                        "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                        { controller: "discussion_topics_api", action: "show", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s })
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "returns an individual topic" do
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                          { controller: "discussion_topics_api", action: "show", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s })
 
-        # get rid of random characters in podcast url
-        json["podcast_url"].gsub!(/_[^.]*/, "_randomness")
-        expect(json.sort.to_h).to eq topic_response_json.merge("subscribed" => @topic.subscribed?(@user)).sort.to_h
-      end
+          # get rid of random characters in podcast url
+          json["podcast_url"].gsub!(/_[^.]*/, "_randomness")
+          expect(json.sort.to_h).to eq topic_response_json.call(disable_adding_uuid_verifier_in_api).merge("subscribed" => @topic.subscribed?(@user)).sort.to_h
+        end
 
-      it "returns an individual root topic" do
-        @group_category = @course.group_categories.create(name: "watup")
-        @group = @group_category.groups.create!(name: "group1", context: @course)
-        @topic.update_attribute(:group_category, @group_category)
-        @sub = @topic.child_topics.first # create a sub topic the way we actually do - i.e. through groups
-        json = api_call(:get,
-                        "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                        { controller: "discussion_topics_api", action: "show", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s })
+        it "returns an individual root topic" do
+          @group_category = @course.group_categories.create(name: "watup")
+          @group = @group_category.groups.create!(name: "group1", context: @course)
+          @topic.update_attribute(:group_category, @group_category)
+          @sub = @topic.child_topics.first # create a sub topic the way we actually do - i.e. through groups
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                          { controller: "discussion_topics_api", action: "show", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s })
 
-        # get rid of random characters in podcast url
-        json["podcast_url"].gsub!(/_[^.]*/, "_randomness")
-        expect(json.sort.to_h).to eq root_topic_response_json.merge("subscribed" => @topic.subscribed?(@user)).sort.to_h
+          # get rid of random characters in podcast url
+          json["podcast_url"].gsub!(/_[^.]*/, "_randomness")
+          expect(json.sort.to_h).to eq root_topic_response_json.call(disable_adding_uuid_verifier_in_api).merge("subscribed" => @topic.subscribed?(@user)).sort.to_h
+        end
       end
 
       it "does not show information for a deleted child topic" do
@@ -2304,87 +2312,95 @@ describe DiscussionTopicsController, type: :request do
     expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
   end
 
-  it "works with groups" do
-    group_category = @course.group_categories.create(name: "watup")
-    group = group_category.groups.create!(name: "group1", context: @course)
-    group.add_user(@user)
-    attachment = create_attachment(group)
-    gtopic = create_topic(group, title: "Group Topic 1", message: "<p>content here</p>", attachment:)
+  context "where double testing verifiers with disable_adding_uuid_verifier_in_api ff" do
+    before do
+      @attachment = create_attachment(@course)
+    end
 
-    json = api_call(:get,
-                    "/api/v1/groups/#{group.id}/discussion_topics.json",
-                    { controller: "discussion_topics", action: "index", format: "json", group_id: group.id.to_s }).first
-    expected = {
-      "read_state" => "read",
-      "unread_count" => 0,
-      "user_can_see_posts" => true,
-      "is_section_specific" => gtopic.is_section_specific,
-      "summary_enabled" => gtopic.summary_enabled,
-      "subscribed" => true,
-      "podcast_url" => nil,
-      "podcast_has_student_posts" => false,
-      "require_initial_post" => nil,
-      "title" => "Group Topic 1",
-      "discussion_subentry_count" => 0,
-      "assignment_id" => nil,
-      "published" => true,
-      "can_unpublish" => true,
-      "delayed_post_at" => nil,
-      "lock_at" => nil,
-      "created_at" => gtopic.created_at.iso8601,
-      "id" => gtopic.id,
-      "is_announcement" => false,
-      "user_name" => @user.name,
-      "last_reply_at" => gtopic.last_reply_at.as_json,
-      "message" => "<p>content here</p>",
-      "pinned" => false,
-      "position" => gtopic.position,
-      "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
-      "html_url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
-      "attachments" =>
-        [{ "content-type" => "text/plain",
-           "url" => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
-           "filename" => "content.txt",
-           "display_name" => "content.txt",
-           "id" => attachment.id,
-           "uuid" => attachment.uuid,
-           "folder_id" => attachment.folder_id,
-           "size" => attachment.size,
-           "unlock_at" => nil,
-           "locked" => false,
-           "hidden" => false,
-           "lock_at" => nil,
-           "locked_for_user" => false,
-           "hidden_for_user" => false,
-           "created_at" => attachment.created_at.as_json,
-           "updated_at" => attachment.updated_at.as_json,
-           "upload_status" => "success",
-           "thumbnail_url" => nil,
-           "modified_at" => attachment.modified_at.as_json,
-           "mime_class" => attachment.mime_class,
-           "media_entry_id" => attachment.media_entry_id,
-           "category" => "uncategorized" }],
-      "posted_at" => gtopic.posted_at.as_json,
-      "root_topic_id" => nil,
-      "topic_children" => [],
-      "group_topic_children" => [],
-      "discussion_type" => "not_threaded",
-      "permissions" => { "delete" => true, "attach" => true, "update" => true, "reply" => true, "manage_assign_to" => false },
-      "locked" => false,
-      "can_lock" => true,
-      "comments_disabled" => false,
-      "locked_for_user" => false,
-      "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
-      "group_category_id" => nil,
-      "can_group" => true,
-      "allow_rating" => false,
-      "only_graders_can_rate" => false,
-      "sort_by_rating" => false,
-      "todo_date" => nil,
-      "anonymous_state" => nil,
-      "ungraded_discussion_overrides" => nil,
-    }
-    expect(json.sort.to_h).to eq expected.sort.to_h
+    double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+      it "works with groups" do
+        group_category = @course.group_categories.create(name: "watup")
+        group = group_category.groups.create!(name: "group1", context: @course)
+        group.add_user(@user)
+        gtopic = create_topic(group, title: "Group Topic 1", message: "<p>content here</p>", attachment: @attachment)
+
+        json = api_call(:get,
+                        "/api/v1/groups/#{group.id}/discussion_topics.json",
+                        { controller: "discussion_topics", action: "index", format: "json", group_id: group.id.to_s }).first
+        expected = {
+          "read_state" => "read",
+          "unread_count" => 0,
+          "user_can_see_posts" => true,
+          "is_section_specific" => gtopic.is_section_specific,
+          "summary_enabled" => gtopic.summary_enabled,
+          "subscribed" => true,
+          "podcast_url" => nil,
+          "podcast_has_student_posts" => false,
+          "require_initial_post" => nil,
+          "title" => "Group Topic 1",
+          "discussion_subentry_count" => 0,
+          "assignment_id" => nil,
+          "published" => true,
+          "can_unpublish" => true,
+          "delayed_post_at" => nil,
+          "lock_at" => nil,
+          "created_at" => gtopic.created_at.iso8601,
+          "id" => gtopic.id,
+          "is_announcement" => false,
+          "user_name" => @user.name,
+          "last_reply_at" => gtopic.last_reply_at.as_json,
+          "message" => "<p>content here</p>",
+          "pinned" => false,
+          "position" => gtopic.position,
+          "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+          "html_url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
+          "attachments" =>
+            [{ "content-type" => "text/plain",
+               "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{"&verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}",
+               "filename" => "content.txt",
+               "display_name" => "content.txt",
+               "id" => @attachment.id,
+               "uuid" => @attachment.uuid,
+               "folder_id" => @attachment.folder_id,
+               "size" => @attachment.size,
+               "unlock_at" => nil,
+               "locked" => false,
+               "hidden" => false,
+               "lock_at" => nil,
+               "locked_for_user" => false,
+               "hidden_for_user" => false,
+               "created_at" => @attachment.created_at.as_json,
+               "updated_at" => @attachment.updated_at.as_json,
+               "upload_status" => "success",
+               "thumbnail_url" => nil,
+               "modified_at" => @attachment.modified_at.as_json,
+               "mime_class" => @attachment.mime_class,
+               "media_entry_id" => @attachment.media_entry_id,
+               "category" => "uncategorized",
+               "visibility_level" => @attachment.visibility_level }],
+          "posted_at" => gtopic.posted_at.as_json,
+          "root_topic_id" => nil,
+          "topic_children" => [],
+          "group_topic_children" => [],
+          "discussion_type" => "not_threaded",
+          "permissions" => { "delete" => true, "attach" => true, "update" => true, "reply" => true, "manage_assign_to" => false },
+          "locked" => false,
+          "can_lock" => true,
+          "comments_disabled" => false,
+          "locked_for_user" => false,
+          "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
+          "group_category_id" => nil,
+          "can_group" => true,
+          "allow_rating" => false,
+          "only_graders_can_rate" => false,
+          "sort_by_rating" => false,
+          "todo_date" => nil,
+          "anonymous_state" => nil,
+          "ungraded_discussion_overrides" => nil,
+        }
+        expect(json.sort.to_h).to eq expected.sort.to_h
+      end
+    end
   end
 
   it "works with account groups" do
@@ -2570,6 +2586,7 @@ describe DiscussionTopicsController, type: :request do
     before :once do
       @topic = create_topic(@course, title: "Topic 1", message: "<p>content here</p>")
       @message = "my message"
+      @attachment = create_attachment(@course)
     end
 
     it "allows creating an entry under a topic and create it correctly" do
@@ -2708,24 +2725,26 @@ describe DiscussionTopicsController, type: :request do
       expect(@entry.attachment.context).to eql @user
     end
 
-    it "handles duplicate files when attaching" do
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
-      attachment_model context: @user, uploaded_data: data, folder: Folder.unfiled_folder(@user)
-      json = api_call(
-        :post,
-        "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { controller: "discussion_topics_api",
-          action: "add_entry",
-          format: "json",
-          course_id: @course.id.to_s,
-          topic_id: @topic.id.to_s },
-        { message: @message, attachment: data }
-      )
-      expect(json["attachment"]).to be_present
-      new_file = Attachment.find(json["attachment"]["id"])
-      expect(new_file.display_name).to match(/txt-[0-9]+\.txt/)
-      expect(json["attachment"]["display_name"]).to eq new_file.display_name
-      expect(json["attachment"]["url"]).to include "verifier="
+    double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+      it "handles duplicate files when attaching" do
+        data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+        attachment_model context: @user, uploaded_data: data, folder: Folder.unfiled_folder(@user)
+        json = api_call(
+          :post,
+          "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
+          { controller: "discussion_topics_api",
+            action: "add_entry",
+            format: "json",
+            course_id: @course.id.to_s,
+            topic_id: @topic.id.to_s },
+          { message: @message, attachment: data }
+        )
+        expect(json["attachment"]).to be_present
+        new_file = Attachment.find(json["attachment"]["id"])
+        expect(new_file.display_name).to match(/txt-[0-9]+\.txt/)
+        expect(json["attachment"]["display_name"]).to eq new_file.display_name
+        expect(json["attachment"]["url"]).to include "verifier=" unless disable_adding_uuid_verifier_in_api
+      end
     end
 
     it "creates a submission from an entry on a graded topic" do
@@ -2801,19 +2820,21 @@ describe DiscussionTopicsController, type: :request do
       expect(entry_json["id"]).to eq @entry.id
     end
 
-    it "returns attachments on top level entries" do
-      json = api_call(
-        :get,
-        "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { controller: "discussion_topics_api",
-          action: "entries",
-          format: "json",
-          course_id: @course.id.to_s,
-          topic_id: @topic.id.to_s }
-      )
-      entry_json = json.first
-      expect(entry_json["attachment"]).not_to be_nil
-      expect(entry_json["attachment"]["url"]).to eq "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
+    double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+      it "returns attachments on top level entries" do
+        json = api_call(
+          :get,
+          "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
+          { controller: "discussion_topics_api",
+            action: "entries",
+            format: "json",
+            course_id: @course.id.to_s,
+            topic_id: @topic.id.to_s }
+        )
+        entry_json = json.first
+        expect(entry_json["attachment"]).not_to be_nil
+        expect(entry_json["attachment"]["url"]).to eq "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{"&verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
+      end
     end
 
     it "includes replies on top level entries" do
@@ -3797,136 +3818,142 @@ describe DiscussionTopicsController, type: :request do
   end
 
   context "materialized view API" do
-    it "responds with the materialized information about the discussion" do
-      topic_with_nested_replies
-      # mark a couple entries as read
-      @user = @student
-      @root2.change_read_state("read", @user)
-      @reply3.change_read_state("read", @user)
-      # have the teacher edit one of the student's replies
-      @reply_reply1.editor = @teacher
-      @reply_reply1.update(message: "<p>censored</p>")
+    before :once do
+      @attachment = attachment_model
+    end
 
-      @all_entries.each(&:reload)
+    double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+      it "responds with the materialized information about the discussion" do
+        topic_with_nested_replies
+        # mark a couple entries as read
+        @user = @student
+        @root2.change_read_state("read", @user)
+        @reply3.change_read_state("read", @user)
+        # have the teacher edit one of the student's replies
+        @reply_reply1.editor = @teacher
+        @reply_reply1.update(message: "<p>censored</p>")
 
-      # materialized view jobs are now delayed
-      Timecop.travel(20.seconds.from_now) do
-        run_jobs
+        @all_entries.each(&:reload)
+
+        # materialized view jobs are now delayed
+        Timecop.travel(20.seconds.from_now) do
+          run_jobs
+        end
+
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+                        { controller: "discussion_topics_api", action: "view", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s })
+
+        expect(json["unread_entries"].size).to eq 2 # two marked read, then ones this user wrote are never unread
+        expect(json["unread_entries"].sort).to eq (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
+
+        expect(json["participants"].sort_by { |h| h["id"] }).to eq([
+          { "id" => @student.id, "anonymous_id" => @student.id.to_s(36), "pronouns" => nil, "display_name" => @student.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
+          { "id" => @teacher.id, "anonymous_id" => @teacher.id.to_s(36), "pronouns" => nil, "display_name" => @teacher.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
+        ].sort_by { |h| h["id"] })
+
+        reply_reply1_attachment_json = {
+          "content-type" => "application/unknown",
+          "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{"&verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}",
+          "filename" => "unknown.example",
+          "display_name" => "unknown.example",
+          "id" => @attachment.id,
+          "uuid" => @attachment.uuid,
+          "folder_id" => @attachment.folder_id,
+          "size" => 100,
+          "unlock_at" => nil,
+          "locked" => false,
+          "hidden" => false,
+          "lock_at" => nil,
+          "locked_for_user" => false,
+          "hidden_for_user" => false,
+          "created_at" => @attachment.created_at.as_json,
+          "updated_at" => @attachment.updated_at.as_json,
+          "upload_status" => "success",
+          "thumbnail_url" => nil,
+          "modified_at" => @attachment.modified_at.as_json,
+          "mime_class" => @attachment.mime_class,
+          "media_entry_id" => @attachment.media_entry_id,
+          "category" => "uncategorized",
+          "visibility_level" => @attachment.visibility_level
+        }
+
+        v0 = json["view"][0]
+        expect(v0["id"]).to eq @root1.id
+        expect(v0["user_id"]).to eq @student.id
+        expect(v0["message"]).to eq "root1"
+        expect(v0["parent_id"]).to be_nil
+        expect(v0["created_at"]).to eq @root1.created_at.as_json
+        expect(v0["updated_at"]).to eq @root1.updated_at.as_json
+
+        v0_r0 = v0["replies"][0]
+        expect(v0_r0["id"]).to eq @reply1.id
+        expect(v0_r0["deleted"]).to be true
+        expect(v0_r0["parent_id"]).to eq @root1.id
+        expect(v0_r0["created_at"]).to eq @reply1.created_at.as_json
+        expect(v0_r0["updated_at"]).to eq @reply1.updated_at.as_json
+
+        v0_r0_r0 = v0_r0["replies"][0]
+        expect(v0_r0_r0["id"]).to eq @reply_reply2.id
+        expect(v0_r0_r0["user_id"]).to eq @student.id
+        expect(v0_r0_r0["message"]).to eq "reply_reply2"
+        expect(v0_r0_r0["parent_id"]).to eq @reply1.id
+        expect(v0_r0_r0["created_at"]).to eq @reply_reply2.created_at.as_json
+        expect(v0_r0_r0["updated_at"]).to eq @reply_reply2.updated_at.as_json
+
+        v0_r1 = v0["replies"][1]
+        expect(v0_r1["id"]).to eq @reply2.id
+        expect(v0_r1["user_id"]).to eq @teacher.id
+
+        message = Nokogiri::HTML5.fragment(v0_r1["message"])
+
+        a_tag = message.css("p a").first
+        expect(a_tag["href"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
+        expect(a_tag["data-api-endpoint"]).to eq "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@reply2_attachment.id}"
+        expect(a_tag["data-api-returntype"]).to eq "File"
+        expect(a_tag.inner_text).to eq "This is a file link"
+
+        video_tag = message.css("p video").first
+        expect(video_tag["poster"]).to eq "http://www.example.com/media_objects/0_abcde/thumbnail?height=448&type=3&width=550"
+        expect(video_tag["data-media_comment_type"]).to eq "video"
+        expect(video_tag["preload"]).to eq "none"
+        expect(video_tag["class"]).to eq "instructure_inline_media_comment"
+        expect(video_tag["data-media_comment_id"]).to eq "0_abcde"
+        expect(video_tag["controls"]).to eq "controls"
+        expect(video_tag["src"]).to eq "http://www.example.com/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
+        expect(video_tag.inner_text).to eq "link"
+
+        expect(v0_r1["parent_id"]).to eq @root1.id
+        expect(v0_r1["created_at"]).to eq @reply2.created_at.as_json
+        expect(v0_r1["updated_at"]).to eq @reply2.updated_at.as_json
+
+        v0_r1_r0 = v0_r1["replies"][0]
+        expect(v0_r1_r0["id"]).to eq @reply_reply1.id
+        expect(v0_r1_r0["user_id"]).to eq @student.id
+        expect(v0_r1_r0["editor_id"]).to eq @teacher.id
+        expect(v0_r1_r0["message"]).to eq "<p>censored</p>"
+        expect(v0_r1_r0["parent_id"]).to eq @reply2.id
+        expect(v0_r1_r0["created_at"]).to eq @reply_reply1.created_at.as_json
+        expect(v0_r1_r0["updated_at"]).to eq @reply_reply1.updated_at.as_json
+        expect(v0_r1_r0["attachment"]).to eq reply_reply1_attachment_json
+        expect(v0_r1_r0["attachments"]).to eq [reply_reply1_attachment_json]
+
+        v1 = json["view"][1]
+        expect(v1["id"]).to eq @root2.id
+        expect(v1["user_id"]).to eq @student.id
+        expect(v1["message"]).to eq "root2"
+        expect(v1["parent_id"]).to be_nil
+        expect(v1["created_at"]).to eq @root2.created_at.as_json
+        expect(v1["updated_at"]).to eq @root2.updated_at.as_json
+
+        v1_r0 = v1["replies"][0]
+        expect(v1_r0["id"]).to eq @reply3.id
+        expect(v1_r0["user_id"]).to eq @student.id
+        expect(v1_r0["message"]).to eq "reply3"
+        expect(v1_r0["parent_id"]).to eq @root2.id
+        expect(v1_r0["created_at"]).to eq @reply3.created_at.as_json
+        expect(v1_r0["updated_at"]).to eq @reply3.updated_at.as_json
       end
-
-      json = api_call(:get,
-                      "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
-                      { controller: "discussion_topics_api", action: "view", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s })
-
-      expect(json["unread_entries"].size).to eq 2 # two marked read, then ones this user wrote are never unread
-      expect(json["unread_entries"].sort).to eq (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
-
-      expect(json["participants"].sort_by { |h| h["id"] }).to eq([
-        { "id" => @student.id, "anonymous_id" => @student.id.to_s(36), "pronouns" => nil, "display_name" => @student.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
-        { "id" => @teacher.id, "anonymous_id" => @teacher.id.to_s(36), "pronouns" => nil, "display_name" => @teacher.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
-      ].sort_by { |h| h["id"] })
-
-      reply_reply1_attachment_json = {
-        "content-type" => "application/unknown",
-        "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
-        "filename" => "unknown.example",
-        "display_name" => "unknown.example",
-        "id" => @attachment.id,
-        "uuid" => @attachment.uuid,
-        "folder_id" => @attachment.folder_id,
-        "size" => 100,
-        "unlock_at" => nil,
-        "locked" => false,
-        "hidden" => false,
-        "lock_at" => nil,
-        "locked_for_user" => false,
-        "hidden_for_user" => false,
-        "created_at" => @attachment.created_at.as_json,
-        "updated_at" => @attachment.updated_at.as_json,
-        "upload_status" => "success",
-        "thumbnail_url" => nil,
-        "modified_at" => @attachment.modified_at.as_json,
-        "mime_class" => @attachment.mime_class,
-        "media_entry_id" => @attachment.media_entry_id,
-        "category" => "uncategorized",
-        "visibility_level" => @attachment.visibility_level
-      }
-
-      v0 = json["view"][0]
-      expect(v0["id"]).to eq @root1.id
-      expect(v0["user_id"]).to eq @student.id
-      expect(v0["message"]).to eq "root1"
-      expect(v0["parent_id"]).to be_nil
-      expect(v0["created_at"]).to eq @root1.created_at.as_json
-      expect(v0["updated_at"]).to eq @root1.updated_at.as_json
-
-      v0_r0 = v0["replies"][0]
-      expect(v0_r0["id"]).to eq @reply1.id
-      expect(v0_r0["deleted"]).to be true
-      expect(v0_r0["parent_id"]).to eq @root1.id
-      expect(v0_r0["created_at"]).to eq @reply1.created_at.as_json
-      expect(v0_r0["updated_at"]).to eq @reply1.updated_at.as_json
-
-      v0_r0_r0 = v0_r0["replies"][0]
-      expect(v0_r0_r0["id"]).to eq @reply_reply2.id
-      expect(v0_r0_r0["user_id"]).to eq @student.id
-      expect(v0_r0_r0["message"]).to eq "reply_reply2"
-      expect(v0_r0_r0["parent_id"]).to eq @reply1.id
-      expect(v0_r0_r0["created_at"]).to eq @reply_reply2.created_at.as_json
-      expect(v0_r0_r0["updated_at"]).to eq @reply_reply2.updated_at.as_json
-
-      v0_r1 = v0["replies"][1]
-      expect(v0_r1["id"]).to eq @reply2.id
-      expect(v0_r1["user_id"]).to eq @teacher.id
-
-      message = Nokogiri::HTML5.fragment(v0_r1["message"])
-
-      a_tag = message.css("p a").first
-      expect(a_tag["href"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
-      expect(a_tag["data-api-endpoint"]).to eq "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@reply2_attachment.id}"
-      expect(a_tag["data-api-returntype"]).to eq "File"
-      expect(a_tag.inner_text).to eq "This is a file link"
-
-      video_tag = message.css("p video").first
-      expect(video_tag["poster"]).to eq "http://www.example.com/media_objects/0_abcde/thumbnail?height=448&type=3&width=550"
-      expect(video_tag["data-media_comment_type"]).to eq "video"
-      expect(video_tag["preload"]).to eq "none"
-      expect(video_tag["class"]).to eq "instructure_inline_media_comment"
-      expect(video_tag["data-media_comment_id"]).to eq "0_abcde"
-      expect(video_tag["controls"]).to eq "controls"
-      expect(video_tag["src"]).to eq "http://www.example.com/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
-      expect(video_tag.inner_text).to eq "link"
-
-      expect(v0_r1["parent_id"]).to eq @root1.id
-      expect(v0_r1["created_at"]).to eq @reply2.created_at.as_json
-      expect(v0_r1["updated_at"]).to eq @reply2.updated_at.as_json
-
-      v0_r1_r0 = v0_r1["replies"][0]
-      expect(v0_r1_r0["id"]).to eq @reply_reply1.id
-      expect(v0_r1_r0["user_id"]).to eq @student.id
-      expect(v0_r1_r0["editor_id"]).to eq @teacher.id
-      expect(v0_r1_r0["message"]).to eq "<p>censored</p>"
-      expect(v0_r1_r0["parent_id"]).to eq @reply2.id
-      expect(v0_r1_r0["created_at"]).to eq @reply_reply1.created_at.as_json
-      expect(v0_r1_r0["updated_at"]).to eq @reply_reply1.updated_at.as_json
-      expect(v0_r1_r0["attachment"]).to eq reply_reply1_attachment_json
-      expect(v0_r1_r0["attachments"]).to eq [reply_reply1_attachment_json]
-
-      v1 = json["view"][1]
-      expect(v1["id"]).to eq @root2.id
-      expect(v1["user_id"]).to eq @student.id
-      expect(v1["message"]).to eq "root2"
-      expect(v1["parent_id"]).to be_nil
-      expect(v1["created_at"]).to eq @root2.created_at.as_json
-      expect(v1["updated_at"]).to eq @root2.updated_at.as_json
-
-      v1_r0 = v1["replies"][0]
-      expect(v1_r0["id"]).to eq @reply3.id
-      expect(v1_r0["user_id"]).to eq @student.id
-      expect(v1_r0["message"]).to eq "reply3"
-      expect(v1_r0["parent_id"]).to eq @root2.id
-      expect(v1_r0["created_at"]).to eq @reply3.created_at.as_json
-      expect(v1_r0["updated_at"]).to eq @reply3.updated_at.as_json
     end
 
     it "can include extra information for context cards" do

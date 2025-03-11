@@ -634,8 +634,7 @@ module Api
       host = HostUrl.context_host(context, @account_domain.try(:host))
       protocol = HostUrl.protocol
     end
-
-    no_verifiers = params[:no_verifiers] if defined?(params)
+    no_verifiers = @domain_root_account&.feature_enabled?(:disable_adding_uuid_verifier_in_api) || (params[:no_verifiers] if defined?(params))
     html = context.shard.activate do
       rewriter = UserContent::HtmlRewriter.new(context, user)
       rewriter.set_handler("files") do |match|

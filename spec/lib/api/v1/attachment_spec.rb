@@ -39,6 +39,12 @@ describe Api::V1::Attachment do
       Canvadoc.create!(document_id: "abc123#{attachment.id}", attachment_id: attachment.id)
     end
 
+    it "hides the verifier parameter from url in the returned hash when 'disable_adding_uuid_verifier_in_api' ff is enabled" do
+      attachment.root_account.enable_feature!(:disable_adding_uuid_verifier_in_api)
+      json = attachment_json(attachment, teacher, {})
+      expect(json.fetch("url")).not_to include("verifier")
+    end
+
     it "includes the submission id in the url_opts when preview_url is included" do
       params = {
         include: ["preview_url"],

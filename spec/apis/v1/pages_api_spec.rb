@@ -389,6 +389,7 @@ describe "Pages API", type: :request do
         @teacher.save!
         @hidden_page.user_id = @teacher.id
         @hidden_page.save!
+        @file = attachment_model(context: @course)
       end
 
       it "retrieves page content and attributes", priority: "1" do
@@ -418,17 +419,18 @@ describe "Pages API", type: :request do
         expect(json).to eq expected
       end
 
-      it "does add verifiers by default" do
-        file = attachment_model(context: @course)
-        page = @course.wiki_pages.create!(title: "hrup", body: "/courses/#{@course.id}/files/#{file.id}")
-        json = api_call(:get,
-                        "/api/v1/courses/#{@course.id}/pages/#{page.url}",
-                        controller: "wiki_pages_api",
-                        action: "show",
-                        format: "json",
-                        course_id: @course.id.to_s,
-                        url_or_id: page.url)
-        expect(json["body"]).to eq "/courses/#{@course.id}/files/#{file.id}?verifier=#{file.uuid}"
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "does add verifiers by default" do
+          page = @course.wiki_pages.create!(title: "hrup", body: "/courses/#{@course.id}/files/#{@file.id}")
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/pages/#{page.url}",
+                          controller: "wiki_pages_api",
+                          action: "show",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          url_or_id: page.url)
+          expect(json["body"]).to eq "/courses/#{@course.id}/files/#{@file.id}#{"?verifier=#{@file.uuid}" unless disable_adding_uuid_verifier_in_api}"
+        end
       end
 
       it "does not add verifiers when no_verifiers set" do
