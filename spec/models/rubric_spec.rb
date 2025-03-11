@@ -591,6 +591,49 @@ describe Rubric do
         end
       end
     end
+
+    describe "criteria_via_llm" do
+      before do
+        @inst_llm = double("InstLLM::Client")
+        allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
+      end
+
+      it "creates criteria via LLM if requested" do
+        assignment.update!(description: "Write a well argued essay about whether milk is better than cheese")
+        llm_rubric = course.rubrics.build
+        llm_rubric.user = teacher
+        rubric_params = { title: "Test LLM Rubric", criteria_via_llm: true }
+        association_params = { association_object: assignment, purpose: "grading", use_for_grading: true }
+
+        llm_response = {
+          id: "xd143",
+          title: "Test LLM Rubric",
+          points_possible: 100,
+          data: [
+            { description: "d1", long_description: "ld1", ratings: [{ description: "rd1.1", points: 3 }, { description: "rd1.2", points: 2 }, { description: "rd1.3", points: 1 }] },
+            { description: "d2", long_description: "ld2", ratings: [{ description: "rd2.1", points: 3 }, { description: "rd2.2", points: 2 }, { description: "rd2.3", points: 1 }] },
+            { description: "d3", long_description: "ld3", ratings: [{ description: "rd3.1", points: 3 }, { description: "rd3.2", points: 2 }, { description: "rd3.3", points: 1 }] },
+          ]
+        }
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: llm_response.to_json },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(Rubric).to receive(:ai_rubrics_enabled?).and_return(true)
+
+        association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
+
+        expect(association).to be_present
+        expect(llm_rubric.data[0][:description]).to eq "d1"
+      end
+    end
   end
 
   it "normalizes criteria for comparison" do
