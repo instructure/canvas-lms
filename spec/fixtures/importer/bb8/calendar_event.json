@@ -10,5 +10,6 @@
     "title":"Event",
     "migration_id":"res00023",
     "start_timestamp":1276806000000,
-    "updated_date":1268857291000
+    "updated_date":1268857291000,
+    "blackout_date": false
 }

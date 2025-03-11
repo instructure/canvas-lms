@@ -254,6 +254,7 @@ module CC::Importer::Canvas
         event["rrule"] = get_node_val(node, "rrule")
         event["series_uuid"] = get_node_val(node, "series_uuid")
         event["series_head"] = get_node_val(node, "series_head", nil)
+        event["blackout_date"] = get_bool_val(node, "blackout_date", false)
         events << event
       end
 
