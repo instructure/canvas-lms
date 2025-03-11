@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import {type MediaTrack as Caption} from 'api'
+import {type MediaTrack as Caption, type MediaSource} from 'api'
 import {type MediaInfo, MediaTrack} from './types'
 
 declare const ENV: GlobalEnv & {
@@ -35,10 +35,30 @@ declare const ENV: GlobalEnv & {
 
 const I18n = createI18nScope('CanvasMediaPlayer')
 
-const byBitrate = (a: {bitrate: string}, b: {bitrate: string}) =>
-  parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
+const byBitrate = (a: {bitrate: number}, b: {bitrate: number}) => a.bitrate - b.bitrate
 
 const liveRegion = () => window?.top?.document.getElementById('flash_screenreader_holder')
+
+type CanvasMediaSource = MediaSource & {
+  bitrate: string
+}
+
+const convertMediaSource = (source: CanvasMediaSource) => {
+  return {
+    src: source.url,
+    type: source.content_type as any,
+    width: parseInt(source.width) ?? undefined,
+    height: parseInt(source.height) ?? undefined,
+    bitrate: parseInt(source.bitrate) ?? undefined,
+  }
+}
+
+const convertAndSortMediaSources = (sources: CanvasMediaSource[] | string) => {
+  if (!Array.isArray(sources)) {
+    return sources
+  }
+  return sources.map(convertMediaSource).sort(byBitrate)
+}
 
 // It can take a while for notorious to process a newly uploaded video
 // Each attempt to get the media_sources is 2**n seconds after the previous attempt
@@ -83,9 +103,6 @@ export default function CanvasStudioPlayer({
   explicitSize,
   showUploadSubtitles = false,
 }: CanvasStudioPlayerProps) {
-  const sorted_sources = Array.isArray(media_sources)
-    ? media_sources.sort(byBitrate)
-    : media_sources
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
     ? media_captions.map(t => ({
         src: t.src || '',
@@ -94,7 +111,7 @@ export default function CanvasStudioPlayer({
         type: t.type === 'vtt' ? 'vtt' : 'srt',
       }))
     : undefined
-  const [mediaSources, setMediaSources] = useState(sorted_sources)
+  const [mediaSources, setMediaSources] = useState(() => convertAndSortMediaSources(media_sources))
   const [mediaCaptions, setMediaCaptions] = useState<CaptionMetaData[] | undefined>(captions)
   const [retryAttempt, setRetryAttempt] = useState(0)
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
@@ -149,7 +166,7 @@ export default function CanvasStudioPlayer({
 
       if (isEmbedded()) {
         updateContainerSize(boundingBoxDimensions.width, boundingBoxDimensions.height)
-      } else if (mediaSources.length) {
+      } else if (Array.isArray(mediaSources)) {
         const player = {
           videoHeight: mediaSources[0].height,
           videoWidth: mediaSources[0].width,
@@ -178,7 +195,7 @@ export default function CanvasStudioPlayer({
         return
       }
       if (resp?.media_sources?.length) {
-        setMediaSources(resp.media_sources.sort(byBitrate))
+        setMediaSources(convertAndSortMediaSources(resp.media_sources))
         if (!media_captions) {
           setMediaCaptions(resp.media_tracks.map((caption: MediaTrack) => ({
             locale: caption.locale,
@@ -347,8 +364,9 @@ export default function CanvasStudioPlayer({
                         text: I18n.t('Upload subtitles'),
                         icon: 'transcript',
                         onClick: () => {
+                          const src = Array.isArray(mediaSources) ? mediaSources[0].src : mediaSources
                           import('../../mediaelement/UploadMediaTrackForm').then(({default: UploadMediaTrackForm}) => {
-                            new UploadMediaTrackForm(media_id, mediaSources[0].src, attachment_id as any, false, 99000)
+                            new UploadMediaTrackForm(media_id, src, attachment_id as any, false, 99000)
                           })
                         },
                       }
