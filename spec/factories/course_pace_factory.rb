@@ -52,7 +52,8 @@ module Factories
       hard_end_dates: true,
       published_at: Time.current,
       course_section: nil,
-      user: nil
+      user: nil,
+      time_to_complete_calendar_days: 20
     }
   end
 
@@ -62,7 +63,8 @@ module Factories
       hard_end_dates: true,
       published_at: Time.current,
       course_section: section,
-      user: nil
+      user: nil,
+      time_to_complete_calendar_days: 7
     }
   end
 
@@ -72,7 +74,8 @@ module Factories
       hard_end_dates: true,
       published_at: Time.current,
       course_section: nil,
-      user: student_enrollment.user
+      user: student_enrollment.user,
+      time_to_complete_calendar_days: 10
     }
   end
 end

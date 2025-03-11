@@ -38,6 +38,7 @@ module CC::Importer::Canvas
         course_pace[:exclude_weekends] = get_bool_val(course_pace_node, "exclude_weekends")
         course_pace[:selected_days_to_skip] = process_selected_days_to_skip(course_pace_node)
         course_pace[:hard_end_dates] = get_bool_val(course_pace_node, "hard_end_dates")
+        course_pace[:time_to_complete_calendar_days] = get_int_val(course_pace_node, "time_to_complete_calendar_days")
 
         course_pace[:module_items] = []
         course_pace_node.css("module_item").each do |item_node|
