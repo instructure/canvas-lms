@@ -33,11 +33,12 @@ export const SpeedGraderDiscussionsNavigation2 = ({studentId}: Props) => {
   let studentEntryIds = window?.jsonData?.student_entries[`${studentId}`]
   if (studentEntryIds) {
     studentEntryIds = [...studentEntryIds]
+    // sortOrder should always be asc, that way first entry is always oldest.
+    studentEntryIds.sort((a: string, b: string) => {
+      return parseInt(a, 10) - parseInt(b, 10);
+    })
   }
-  // sortOrder should always be asc, that way first entry is always oldest.
-  studentEntryIds.sort((a: string, b: string) => {
-    return parseInt(a, 10) - parseInt(b, 10);
-  })
+
   const totalEntries = studentEntryIds?.length
 
   function getStartingEntry() {
