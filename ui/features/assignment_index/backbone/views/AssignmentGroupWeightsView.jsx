@@ -15,23 +15,24 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 import I18n from '@canvas/i18n'
 import round from '@canvas/round'
 import Backbone from '@canvas/backbone'
 import AssignmentGroupWeightsTemplate from '../../jst/AssignmentGroupWeights.handlebars'
 import numberHelper from '@canvas/i18n/numberHelper'
+import GroupWeightInput from '../../react/GroupWeightInput'
 
 class AssignmentGroupWeightsView extends Backbone.View {
-  roundWeight(e) {
-    const value = $(e.target).val()
-    const rounded_value = round(numberHelper.parse(value), 2)
-    if (!Number.isNaN(Number(rounded_value))) {
-      return $(e.target).val(I18n.n(rounded_value))
-    }
+  initialize() {
+    this.weightInputRoot = null
+    super.initialize(...arguments)
   }
 
   findWeight() {
-    return round(numberHelper.parse(this.$el.find('.group_weight_value').val()), 2)
+    const input = document.getElementById(`ag_${this.model.get('id')}_weight_input`)
+    return round(numberHelper.parse(document.getElementById(`ag_${this.model.get('id')}_weight_input`).value), 2)
   }
 
   toJSON() {
@@ -39,12 +40,27 @@ class AssignmentGroupWeightsView extends Backbone.View {
     data.canChangeWeights = this.canChangeWeights
     return data
   }
+
+  afterRender() {
+    setTimeout(() => {
+      const groupId = this.model.get('id')
+      const mount = document.getElementById(`assignment_group_${groupId}_weight_input`)
+      if (!this.weightInputRoot) this.weightInputRoot = createRoot(mount)
+      this.weightInputRoot.render(
+        <GroupWeightInput
+          groupId={groupId}
+          name={this.model.attributes.name}
+          canChangeWeights={this.canChangeWeights}
+          initialValue={this.model.attributes.group_weight}
+        />
+      )
+    }, 0)
+  }
 }
 
 AssignmentGroupWeightsView.prototype.template = AssignmentGroupWeightsTemplate
 AssignmentGroupWeightsView.prototype.tagName = 'tr'
 AssignmentGroupWeightsView.prototype.className = 'ag-weights-tr'
 AssignmentGroupWeightsView.optionProperty('canChangeWeights')
-AssignmentGroupWeightsView.prototype.events = {'blur .group_weight_value': 'roundWeight'}
 
 export default AssignmentGroupWeightsView
