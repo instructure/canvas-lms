@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { defaultFetchOptions } from '@canvas/util/xhr';
+import {defaultFetchOptions} from '@canvas/util/xhr'
 
 export const fetchToken = () =>
-  fetch("/api/v1/jwts?canvas_audience=false", {
-    method: "POST",
+  fetch('/api/v1/jwts?canvas_audience=false&workflows[]=lti_usage', {
+    method: 'POST',
     ...defaultFetchOptions(),
   })
-  .then((resp) => resp.json())
-  .then((data) => ({ token: data.token }))
+    .then(resp => resp.json())
+    .then(data => ({token: data.token}))
