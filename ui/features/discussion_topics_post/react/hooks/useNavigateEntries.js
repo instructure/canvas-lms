@@ -69,13 +69,12 @@ export default function useNavigateEntries({
     let studentEntries = studentTopicQuery?.data?.legacyNode?.discussionEntriesConnection?.nodes
     if (studentEntries) {
       studentEntries = [...studentEntries]
+       // sortOrder should always be asc, that way first entry is always oldest.
+      // Due to VICE-4808 sortOrder param is disabled.
+      studentEntries.sort((a, b) => {
+        return parseInt(a._id, 10) - parseInt(b._id, 10);
+      })
     }
-
-    // sortOrder should always be asc, that way first entry is always oldest.
-    // Due to VICE-4808 sortOrder param is disabled.
-    studentEntries.sort((a, b) => {
-      return parseInt(a._id, 10) - parseInt(b._id, 10);
-    })
 
     return studentEntries
   }, [studentTopicQuery, currentStudentId])
@@ -192,15 +191,21 @@ export default function useNavigateEntries({
 
   // Set highlight default entry; we already set this in iframe for new student. only trigger on new student.
   useEffect(() => {
+    if (!isInSpeedGrader) {
+      return
+    }
+
     if (studentTopicQuery?.loading) {
       return
     }
     const studentEntries = getStudentEntries()
-    const studentEntriesIds = studentEntries.map(entry => entry._id)
-    let currentEntryIndex = studentEntriesIds.indexOf(highlightEntryId)
-    currentEntryIndex = currentEntryIndex >= 0 ? currentEntryIndex : studentEntriesIds.indexOf(`${Math.min(...studentEntriesIds)}`)
-    if(studentEntries[currentEntryIndex]){
-      navigateToEntry(studentEntries[currentEntryIndex])
+    if(studentEntries) {
+      const studentEntriesIds = studentEntries.map(entry => entry._id)
+      let currentEntryIndex = studentEntriesIds.indexOf(highlightEntryId)
+      currentEntryIndex = currentEntryIndex >= 0 ? currentEntryIndex : studentEntriesIds.indexOf(`${Math.min(...studentEntriesIds)}`)
+      if(studentEntries[currentEntryIndex]){
+        navigateToEntry(studentEntries[currentEntryIndex])
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getStudentEntries, sort])
