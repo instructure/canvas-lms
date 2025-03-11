@@ -150,7 +150,6 @@ module Api::V1::Assignment
     end
 
     hash = api_json(assignment, user, session, fields)
-
     description = api_user_content(hash["description"],
                                    @context || assignment.context,
                                    user,

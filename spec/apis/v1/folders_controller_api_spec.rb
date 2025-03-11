@@ -1041,15 +1041,17 @@ describe "Folders API", type: :request do
       expect(@dest_folder.active_file_attachments).not_to be_exists
     end
 
-    it "copies a file" do
-      @dest_context.enroll_teacher @user, enrollment_state: "active"
-      json = api_call(:post,
-                      "/api/v1/folders/#{@dest_folder.id}/copy_file?source_file_id=#{@source_file.id}",
-                      @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param))
-      file = Attachment.find(json["id"])
-      expect(file.folder).to eq(@dest_folder)
-      expect(file.root_attachment).to eq(@source_file)
-      expect(json["url"]).to include "verifier="
+    double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+      it "copies a file" do
+        @dest_context.enroll_teacher @user, enrollment_state: "active"
+        json = api_call(:post,
+                        "/api/v1/folders/#{@dest_folder.id}/copy_file?source_file_id=#{@source_file.id}",
+                        @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param))
+        file = Attachment.find(json["id"])
+        expect(file.folder).to eq(@dest_folder)
+        expect(file.root_attachment).to eq(@source_file)
+        expect(json["url"]).to include "verifier=" unless disable_adding_uuid_verifier_in_api
+      end
     end
 
     it "omits verifier in-app" do

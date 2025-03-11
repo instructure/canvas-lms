@@ -243,29 +243,36 @@ describe CalendarEvent do
         expect(ev.x_alt_desc.first).to eq @event.description
       end
 
-      it "does not add verifiers to files unless course or attachment is public" do
-        attachment_model(context: course_factory)
-        html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
-        calendar_event_model(start_at: "Sep 3 2008 12:00am", description: html)
-        ev = @event.to_ics(in_own_calendar: false)
-        expect(ev.description).to_not include("verifier")
+      context "with double testing with disable adding uuid verifier in api ff" do
+        before do
+          attachment_model(context: course_factory)
+        end
 
-        @attachment.file_state = "public"
-        @attachment.save!
+        double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+          it "does not add verifiers to files unless course or attachment is public" do
+            html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
+            calendar_event_model(start_at: "Sep 3 2008 12:00am", description: html)
+            ev = @event.to_ics(in_own_calendar: false)
+            expect(ev.description).to_not include("verifier")
 
-        AdheresToPolicy::Cache.clear
-        ev = @event.to_ics(in_own_calendar: false)
-        expect(ev.description).to include("verifier")
+            @attachment.file_state = "public"
+            @attachment.save!
 
-        @attachment.file_state = "hidden"
-        @attachment.save!
-        @course.offer
-        @course.is_public = true
-        @course.save!
+            AdheresToPolicy::Cache.clear
+            ev = @event.to_ics(in_own_calendar: false)
+            expect(ev.description).to include("verifier") unless disable_adding_uuid_verifier_in_api
 
-        AdheresToPolicy::Cache.clear
-        ev = @event.to_ics(in_own_calendar: false)
-        expect(ev.description).to include("verifier")
+            @attachment.file_state = "hidden"
+            @attachment.save!
+            @course.offer
+            @course.is_public = true
+            @course.save!
+
+            AdheresToPolicy::Cache.clear
+            ev = @event.to_ics(in_own_calendar: false)
+            expect(ev.description).to include("verifier") unless disable_adding_uuid_verifier_in_api
+          end
+        end
       end
 
       it "works with media comments in course section events" do

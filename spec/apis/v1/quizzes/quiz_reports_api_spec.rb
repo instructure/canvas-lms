@@ -142,6 +142,7 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     it "reuses an existing report" do
+      Attachment.current_root_account = @course.root_account
       @quiz.statistics_csv("item_analysis")
       expect(Quizzes::QuizStatistics.count).to eq 1
       json = api_create({ quiz_report: { report_type: "item_analysis" } })
@@ -333,6 +334,7 @@ describe Quizzes::QuizReportsController, type: :request do
       end
 
       it "embeds its attachment automatically in JSON format" do
+        Attachment.current_root_account = @course.root_account
         @report.generate_csv
         @report.reload
 
@@ -350,6 +352,7 @@ describe Quizzes::QuizReportsController, type: :request do
         end
 
         it "embeds its attachment with ?include=file" do
+          Attachment.current_root_account = @course.root_account
           @report.generate_csv
           @report.reload
 

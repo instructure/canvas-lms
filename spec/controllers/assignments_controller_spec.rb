@@ -2055,6 +2055,7 @@ describe AssignmentsController do
         it_behaves_like "with 'disable_file_verifiers_in_public_syllabus' feature flag enabled"
 
         it "does make files publicly available with public syllabus when user does not have access" do
+          @image.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
           get "syllabus", params: { course_id: @course.id }
           expect(assigns[:syllabus_body]).to eql(<<~HTML)
             <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview?verifier=#{@image.uuid}" alt="test-1.jpg" loading="lazy"></p>

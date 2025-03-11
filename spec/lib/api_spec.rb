@@ -906,24 +906,31 @@ describe Api do
           )
         end
 
-        it "transposes ids in urls, leaving equation images alone" do
-          html = @shard1.activate do
-            a = Account.create!
-            student_in_course(account: a, active_all: true)
-            @file = attachment_model(context: @course, folder: Folder.root_folders(@course).first)
-            <<~HTML
-              <img src="/equation_images/1%2520%252B%25201%2520%252B%2520n%2520%252B%25202%250A2%2520%252B%25201n%2520%252B%25202n%250A3%2520%252B%2520n%250Ax%2520%252B%250A4%2520%252B%250An?scale=1">
-              <img src="/courses/#{@course.id}/files/#{@file.id}/download?wrap=1" data-api-returntype="File" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/files/#{@file.id}">
-              <a href="/courses/#{@course.id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/pages/module-1">link</a>
-            HTML
+        context "with double testing disable_adding_uuid_verifier_in_api FF" do
+          before do
+            @html = @shard1.activate do
+              a = Account.create!
+              student_in_course(account: a, active_all: true)
+              @file = attachment_model(context: @course, folder: Folder.root_folders(@course).first)
+              <<~HTML
+                <img src="/equation_images/1%2520%252B%25201%2520%252B%2520n%2520%252B%25202%250A2%2520%252B%25201n%2520%252B%25202n%250A3%2520%252B%2520n%250Ax%2520%252B%250A4%2520%252B%250An?scale=1">
+                <img src="/courses/#{@course.id}/files/#{@file.id}/download?wrap=1" data-api-returntype="File" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/files/#{@file.id}">
+                <a href="/courses/#{@course.id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/pages/module-1">link</a>
+              HTML
+            end
           end
 
-          res = proxy_instance.api_user_content(html, @course, @student)
-          expect(res).to eq <<~HTML
-            <img src="https://school.instructure.com/equation_images/1%2520%252B%25201%2520%252B%2520n%2520%252B%25202%250A2%2520%252B%25201n%2520%252B%25202n%250A3%2520%252B%2520n%250Ax%2520%252B%250A4%2520%252B%250An?scale=1" loading="lazy">
-            <img src="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}/download?verifier=#{@file.uuid}&amp;wrap=1" data-api-returntype="File" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}" loading="lazy">
-            <a href="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1">link</a>
-          HTML
+          double_testing_with_disable_adding_uuid_verifier_in_api_ff(attachment_variable_name: "file") do
+            it "transposes ids in urls, leaving equation images alone" do
+              Account.default.disable_feature!(:disable_adding_uuid_verifier_in_api) unless disable_adding_uuid_verifier_in_api
+              res = proxy_instance.api_user_content(@html, @course, @student)
+              expect(res).to eq <<~HTML
+                <img src="https://school.instructure.com/equation_images/1%2520%252B%25201%2520%252B%2520n%2520%252B%25202%250A2%2520%252B%25201n%2520%252B%25202n%250A3%2520%252B%2520n%250Ax%2520%252B%250A4%2520%252B%250An?scale=1" loading="lazy">
+                <img src="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}/download#{disable_adding_uuid_verifier_in_api ? "?" : "?verifier=#{@file.uuid}&amp;"}wrap=1" data-api-returntype="File" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}" loading="lazy">
+                <a href="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1">link</a>
+              HTML
+            end
+          end
         end
       end
 

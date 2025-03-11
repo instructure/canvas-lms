@@ -76,7 +76,9 @@ module UserContent
       def options
         { only_path: true }.tap do |h|
           h[:download] = 1 if match.download_frd?
-          h[:verifier] = attachment.uuid unless (in_app && !is_public) || no_verifiers || location
+          unless attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api)
+            h[:verifier] = attachment.uuid unless (in_app && !is_public) || no_verifiers || location
+          end
           h[:location] = location if location
           if !match.preview? && match.rest.include?("wrap=1")
             h[:wrap] = 1

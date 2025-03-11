@@ -46,6 +46,7 @@ describe "syllabus" do
     it "allows viewing available files in a public syllabus" do
       course_factory(active_all: true)
       attachment_model
+      @attachment.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
       @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
       @course.public_syllabus = true
       @course.save!
@@ -80,41 +81,44 @@ describe "syllabus" do
   end
 
   shared_examples_for "public syllabus for authenticated file verifiers" do
-    it "allows viewing available files in a public to authenticated syllabus" do
+    before do
       course_factory(active_all: true)
       attachment_model
-      @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
-      @course.public_syllabus_to_auth = true
-      @course.public_syllabus = false
-      @course.save!
-
-      get "/courses/#{@course.id}/assignments/syllabus"
-
-      expect(response).to be_successful
-      page = Nokogiri::HTML5(response.body)
-      expect(page.css('#identity a[href="/login"]')).not_to be_nil
-      link = page.at_css("#course_syllabus a")
-      expect(link.attributes["href"].value).to include("verifier=#{@attachment.uuid}")
     end
 
-    it "does not allow viewing locked files in a public to authenticated syllabus" do
-      course_factory(active_all: true)
-      attachment_model
-      @attachment.locked = true
-      @attachment.save!
+    double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+      it "allows viewing available files in a public to authenticated syllabus" do
+        @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
+        @course.public_syllabus_to_auth = true
+        @course.public_syllabus = false
+        @course.save!
 
-      @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
-      @course.public_syllabus = false
-      @course.public_syllabus_to_auth = true
-      @course.save!
+        get "/courses/#{@course.id}/assignments/syllabus"
 
-      get "/courses/#{@course.id}/assignments/syllabus"
+        expect(response).to be_successful
+        page = Nokogiri::HTML5(response.body)
+        expect(page.css('#identity a[href="/login"]')).not_to be_nil
+        link = page.at_css("#course_syllabus a")
+        expect(link.attributes["href"].value).to include("verifier=#{@attachment.uuid}") unless disable_adding_uuid_verifier_in_api
+      end
 
-      expect(response).to be_successful
-      page = Nokogiri::HTML5(response.body)
-      expect(page.css('#identity a[href="/login"]')).not_to be_nil
-      link = page.at_css("#course_syllabus a")
-      expect(link.attributes["href"].value).to_not include("verifier=#{@attachment.uuid}")
+      it "does not allow viewing locked files in a public to authenticated syllabus" do
+        @attachment.locked = true
+        @attachment.save!
+
+        @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
+        @course.public_syllabus = false
+        @course.public_syllabus_to_auth = true
+        @course.save!
+
+        get "/courses/#{@course.id}/assignments/syllabus"
+
+        expect(response).to be_successful
+        page = Nokogiri::HTML5(response.body)
+        expect(page.css('#identity a[href="/login"]')).not_to be_nil
+        link = page.at_css("#course_syllabus a")
+        expect(link.attributes["href"].value).to_not include("verifier=#{@attachment.uuid}")
+      end
     end
   end
 
