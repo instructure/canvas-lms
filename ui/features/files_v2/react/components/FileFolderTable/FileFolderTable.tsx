@@ -51,6 +51,7 @@ import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollec
 import FileTableUpload from './FileTableUpload'
 import {UpdatedAtDate} from './UpdatedAtDate'
 import {ModifiedByLink} from './ModifiedByLink'
+import PermissionsModal from './PermissionsModal'
 
 const I18n = createI18nScope('files_v2')
 
@@ -193,8 +194,12 @@ const columnRenderers: {
       />
     ) : null,
   blueprint: ({row}) => <BlueprintIconButton item={row} />,
-  published: ({row, userCanEditFilesForContext}) => (
-    <PublishIconButton item={row} userCanEditFilesForContext={userCanEditFilesForContext} />
+  published: ({row, userCanEditFilesForContext, setModalOrTrayOptions}) => (
+    <PublishIconButton
+      item={row}
+      userCanEditFilesForContext={userCanEditFilesForContext}
+      onClick={setModalOrTrayOptions({id: 'permissions', items: [row]})}
+    />
   ),
   actions: ({
     row,
@@ -214,7 +219,7 @@ const columnRenderers: {
 }
 
 export type ModalOrTrayOptions = {
-  id: 'manage-usage-rights' | null
+  id: 'manage-usage-rights' | 'permissions'
   items: (File | Folder)[]
 }
 
@@ -374,6 +379,11 @@ const FileFolderTable = ({
       <>
         <UsageRightsModal
           open={modalOrTrayOptions?.id === 'manage-usage-rights'}
+          items={modalOrTrayOptions?.items || []}
+          onDismiss={setModalOrTrayOptions(null)}
+        />
+        <PermissionsModal
+          open={modalOrTrayOptions?.id === 'permissions'}
           items={modalOrTrayOptions?.items || []}
           onDismiss={setModalOrTrayOptions(null)}
         />
