@@ -29,5 +29,7 @@ module Types
     implements Interfaces::LegacyIDInterface
 
     global_id_field :id
+
+    field :anonymous_submissions, Boolean, null: false
   end
 end
