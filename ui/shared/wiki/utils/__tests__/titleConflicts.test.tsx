@@ -24,6 +24,7 @@ import {
 } from '../titleConflicts'
 import fetchMock from 'fetch-mock'
 import {render} from '@testing-library/react'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 describe('titleConflicts', () => {
   beforeEach(() => {
@@ -38,7 +39,7 @@ describe('titleConflicts', () => {
       const {getByTestId, getByText} = render(<>{conflictMessage().text}</>)
       expect(getByTestId('warning-icon')).toBeInTheDocument()
       expect(
-        getByText('There is already a page in this course with this title.'),
+        getByText('There is already a page in this course with this title. Hitting save will create a duplicate.'),
       ).toBeInTheDocument()
     })
 
@@ -47,7 +48,7 @@ describe('titleConflicts', () => {
       const {getByTestId, getByText} = render(<>{conflictMessage().text}</>)
       expect(getByTestId('warning-icon')).toBeInTheDocument()
       expect(
-        getByText('There is already a page in this group with this title.'),
+        getByText('There is already a page in this group with this title. Hitting save will create a duplicate.'),
       ).toBeInTheDocument()
     })
   })
@@ -107,7 +108,14 @@ describe('titleConflicts', () => {
       const title = 'anything'
       fetchMock.get(generateUrl(title), JSON.stringify({conflict: true}))
       await checkForTitleConflict(title, mockCallback)
-      expect(mockCallback).toHaveBeenCalledWith([conflictMessage()])
+      expect(mockCallback).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({
+            text: expect.anything(),
+            type: 'hint'
+          })
+        ])
+      )
     })
 
     it('calls the callback with [] if the title is unused', async () => {

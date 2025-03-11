@@ -17,6 +17,7 @@
  */
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Alert} from '@instructure/ui-alerts'
 import {debounce} from '@instructure/debounce'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {IconWarningSolid} from '@instructure/ui-icons'
@@ -31,8 +32,8 @@ type AvailabilityResponse = {
 
 export function conflictMessage(): FormMessage {
   const text = ENV.context_asset_string.startsWith('group')
-    ? I18n.t('There is already a page in this group with this title.')
-    : I18n.t('There is already a page in this course with this title.')
+    ? I18n.t('There is already a page in this group with this title. Hitting save will create a duplicate.')
+    : I18n.t('There is already a page in this course with this title. Hitting save will create a duplicate.')
   return {
     type: 'hint',
     text: (
@@ -41,6 +42,13 @@ export function conflictMessage(): FormMessage {
         <View display="inline-block" margin="0 xx-small">
           {text}
         </View>
+        <Alert
+          variant="warning"
+          liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+          screenReaderOnly={true}
+        >
+          {text}
+        </Alert>
       </>
     ),
   }
