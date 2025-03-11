@@ -110,7 +110,7 @@ const EditableContent = (props: Props) => {
       <input name="title" type="hidden" value={props.defaultValue} />
     </>
   ) : (
-    <View as="div" maxWidth="356px">
+    <View as="div" maxWidth="600px">
       <TextInput
         id="wikipage-title-input"
         data-testid="wikipage-title-input"
