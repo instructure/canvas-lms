@@ -19,3 +19,8 @@ disable_adding_uuid_verifier_in_api:
       state: allowed_on
     ci:
       state: allowed_on
+disable_file_verifiers_in_public_syllabus:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Disable verifiers in Public Syllabus
+  description: Disable url file verifiers in the public syllabus

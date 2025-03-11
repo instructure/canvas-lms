@@ -2019,24 +2019,49 @@ describe AssignmentsController do
         @course.save!
       end
 
-      it "doesn't make files publicly available when authorized user is logged in" do
-        user_session(@student)
+      shared_examples "with 'disable_file_verifiers_in_public_syllabus' feature flag enabled" do
+        before :once do
+          # The course is using the site_admin account by default, and it was having
+          # caching issues if I tried to enable the feature flag on the course's root account.
+          @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+        end
 
-        get "syllabus", params: { course_id: @course.id }
-        expect(assigns[:syllabus_body]).to eql(<<~HTML)
-          <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview" alt="test-1.jpg" loading="lazy"></p>
-          <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
-          <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
-        HTML
+        it "adds location tags to file URLs instead of verifiers" do
+          get "syllabus", params: { course_id: @course.id }
+          expect(assigns[:syllabus_body]).to eql(<<~HTML)
+            <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview?location=course_syllabus_#{@course.id}" alt="test-1.jpg" loading="lazy"></p>
+            <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}?location=course_syllabus_#{@course.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
+            <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?location=course_syllabus_#{@course.id}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+          HTML
+        end
       end
 
-      it "does make files publicly available with public syllabus when user does not have access" do
-        get "syllabus", params: { course_id: @course.id }
-        expect(assigns[:syllabus_body]).to eql(<<~HTML)
-          <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview?verifier=#{@image.uuid}" alt="test-1.jpg" loading="lazy"></p>
-          <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}?verifier=#{@video.uuid}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
-          <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?verifier=#{@doc.uuid}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
-        HTML
+      context "when context grants :read permission to current_user" do
+        it_behaves_like "with 'disable_file_verifiers_in_public_syllabus' feature flag enabled"
+
+        it "doesn't make files publicly available" do
+          user_session(@student)
+
+          get "syllabus", params: { course_id: @course.id }
+          expect(assigns[:syllabus_body]).to eql(<<~HTML)
+            <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview" alt="test-1.jpg" loading="lazy"></p>
+            <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
+            <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+          HTML
+        end
+      end
+
+      context "when context does not grant :read permission to current_user" do
+        it_behaves_like "with 'disable_file_verifiers_in_public_syllabus' feature flag enabled"
+
+        it "does make files publicly available with public syllabus when user does not have access" do
+          get "syllabus", params: { course_id: @course.id }
+          expect(assigns[:syllabus_body]).to eql(<<~HTML)
+            <p><img id="#{@image.id}" src="/courses/#{@course.id}/files/#{@image.id}/preview?verifier=#{@image.uuid}" alt="test-1.jpg" loading="lazy"></p>
+            <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}?verifier=#{@video.uuid}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
+            <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?verifier=#{@doc.uuid}&amp;wrap=1" target="_blank" data-canvas-previewable="true">#{@doc.display_name}</a></p>
+          HTML
+        end
       end
     end
   end

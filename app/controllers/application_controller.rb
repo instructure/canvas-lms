@@ -2625,7 +2625,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :user_content
 
-  def public_user_content(str, context = @context, user = @current_user, is_public = false)
+  def public_user_content(str, context: @context, user: @current_user, is_public: false, location: nil)
     return nil unless str
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
@@ -2636,7 +2636,8 @@ class ApplicationController < ActionController::Base
         user:,
         preloaded_attachments: {},
         in_app: in_app?,
-        is_public:
+        is_public:,
+        location:
       ).processed_url
     end
     rewriter.set_handler("files", &file_handler)

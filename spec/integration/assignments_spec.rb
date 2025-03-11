@@ -455,39 +455,4 @@ describe "assignments_2 feature flag and parameter" do
       end
     end
   end
-
-  describe "description" do
-    before do
-      skip "TODO doesn't work right because public_user_content is wonky"
-    end
-
-    let(:description) { <<~HTML }
-      <a href="#{attachment_model.public_download_url}">link</a>
-    HTML
-
-    it "excludes verifiers if course is not public" do
-      course_with_student(active_all: true)
-      user_session(@student)
-      expect(UserContent::FilesHandler).to receive(:new).with(hash_including(is_public: false))
-      assignment = @course.assignments.create(
-        title: "some assignment",
-        description:
-      )
-      get "/courses/#{@course.id}/assignments/#{assignment.id}"
-    end
-
-    it "includes verifiers if course is public" do
-      expect(UserContent::FilesHandler).to receive(:new).with(hash_including(is_public: true))
-      course = course_factory(
-        active_all: true,
-        is_public: true
-      )
-      assignment = assignment_model(
-        course:,
-        submission_types: "online_url",
-        description:
-      )
-      get "/courses/#{course.id}/assignments/#{assignment.id}"
-    end
-  end
 end
