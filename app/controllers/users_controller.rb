@@ -825,6 +825,7 @@ class UsersController < ApplicationController
       opts[:context] = Context.find_by_asset_string(params[:context_code]) if params[:context_code]
       opts[:submission_user_id] = params[:submission_user_id] if params.key?(:submission_user_id)
       opts[:only_active_courses] = value_to_boolean(params[:only_active_courses]) if params.key?(:only_active_courses)
+      opts[:notification_categories] = params[:notification_categories] if params.key?(:notification_categories)
       api_render_stream(opts)
     else
       render_unauthorized_action
