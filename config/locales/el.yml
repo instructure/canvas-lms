@@ -3387,6 +3387,7 @@ el:
   chosencolor_is_not_a_valid_color_5d542cc: "Το '%{chosenColor}' δεν είναι έγκυρο χρώμα."
   clear_2084585f: Καθαρισμός
   clear_all_e23811b1: "Καθάρισμα Όλων"
+  clear_ui_changed_state_d0aca02d: "Καθαρισμός της κατάστασης του UI που άλλαξε"
   click_for_more_details_on_this_outcome_8c018d2f: "Κάντε κλικ για περισσότερες λεπτομέρειες σχετικά με αυτό το αποτέλεσμα"
   click_here_for_an_account_9536cb36: "Κάντε Κλικ Εδώ για ένα Λογαριασμό"
   click_here_it_s_free_eeccb9cb: "Κάντε Κλικ Εδώ, Είναι Δωρεάν!"
@@ -10672,6 +10673,7 @@ el:
     titles: 
       find_outcomes: "Εύρεση Αποτελεσμάτων"
   outcomes_d1b18d33: Αποτελέσματα
+  override_ui_changes_5e0c56ab: "Υπερίσχυση επί των αλλαγών στο UI"
   overrides: 
     everyone: Όλοι/ες
     everyone_else: "Όλοι οι άλλοι"
@@ -11284,6 +11286,7 @@ el:
   priority_dd4381ee: Προτεραιότητα
   privacy_290109ea: Απόρρητο
   privacy_policy_c68f482a: "Πολιτική Απορρήτου"
+  process_data_2f5f962f: "Επεξεργασία Δεδομένων"
   processing_2fcc9739: "Γίνεται Επεξεργασία"
   product_name: Canvas
   profile: 
@@ -13225,6 +13228,7 @@ el:
     course_files: "Αρχεία μαθήματος"
     group_files: "Αρχεία ομάδας"
     my_files: "Τα αρχεία μου"
+  root_account_9d4fcb97: "Λογαριασμός Ρίζας"
   root_accounts_cc035dcf: "Λογαριασμοί Ρίζας"
   roster: 
     error_sending_invitations: "<mrk mid=\"6720\" mtype=\"seg\">Σφάλμα αποστολής πρόσκλησης.</mrk> <mrk mid=\"6721\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
@@ -15173,6 +15177,7 @@ el:
   title_is_off_6c823e2d: "%{title} είναι απενεργοποιημένο "
   title_is_on_2b72a9b7: "%{title} έχει ενεργοποιηθεί"
   title_is_too_long_b192a46a: "Ο τίτλος είναι πολύ μεγάλος"
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "Ο Τίτλος πρέπει να περιέχει τουλάγιστον ένα γράμμα-χαρακτήρα ή αριθμό"
   title_separator: ":"
   titles: 
     aligned_items: "Ευθυγραμμισμένα Στοιχεία"
@@ -16000,6 +16005,7 @@ el:
   windows_tile_color_2b786bd9: "Χρώμα Πλακιδίου Windows:"
   windows_tile_square_b91d2b33: "<mrk mid=\"4701\" mtype=\"seg\">Πλακίδιο Windows:</mrk> <mrk mid=\"4702\" mtype=\"seg\">Τετράγωνο</mrk>"
   windows_tile_wide_4d40910: "<mrk mid=\"4703\" mtype=\"seg\">Πλακίδιο Windows:</mrk> <mrk mid=\"4704\" mtype=\"seg\">Ευρύ</mrk>"
+  with_this_option_selected_changes_made_through_thi_e751dd22: "Έχοντας ενεργοποιήσει αυτή την επιλογή, η επεξεργασία των αλλαγών που γίνονται μέσω της εισαγωγής προς το SIS θα γίνεται σαν να επρόκειτο για αλλαγές UI, εμποδίζοντας την αλλαγή των πεδίων που άλλαξαν εδώ σε επόμενες μη υπερισχύουσες εισαγωγές προς το SIS."
   workflow_state_cc8d711a: "Κατάσταση Ροής Εργασιών"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Θα θέλατε να αποδεχτείτε ή να παραβλέψετε αυτή την ενημέρωση;"
   would_you_like_to_enable_this_app_ccdf735d: "Θα θέλετε να ενεργοποιήσετε αυτή την εφαρμογή;"
@@ -16028,6 +16034,7 @@ el:
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "<mrk mid=\"4917\" mtype=\"seg\">Μπορείτε να δείτε λεπτομέρειες για αυτή την ομάδα κάνοντας κλικ σε αυτόν τον σύνδεσμο:</mrk> <mrk mid=\"4918\" mtype=\"seg\">%{link}.</mrk>"
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Δεν μπορείτε να διαγράψετε ένα υπολογαριασμό που περιέχει μαθήματα."
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "<mrk mid=\"862\" mtype=\"seg\">Δεν μπορείτε να επεξεργαστείτε αυτή τη ρουμπρίκα είτε επειδή δεν έχετε άδεια ή επειδή χρησιμοποιείται σε περισσότερα από ένα σημεία.</mrk> <mrk mid=\"863\" mtype=\"seg\">Τυχόν αλλαγές που θα πραγματοποιήσετε θα έχουν ως αποτέλεσμα μια νέα ρουμπρίκα βασισμένη στην παλιά ρουμπρίκα.</mrk> <mrk mid=\"864\" mtype=\"seg\">Θέλετε, παρόλα αυτά, να συνεχίσετε;</mrk>"
+  you_can_t_merge_an_account_with_itself_15f58d41: "Δεν μπορείτε να συγχωνεύσετε λογαριασμό με αυτόν τον ίδιο λογαριασμό."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Μπορείτε να ενημερώσετε μερικές από τις πληροφορίες αυτού του χρήστη, αλλά ο ίδιος μπορεί να τις επαναφέρει αν θέλει."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Μπορείτε να χρησιμοποιήσετε ένα μεμονωμένο 16x16, 32x32, 48x48 αρχείο τύπου ico."
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Δεν μπορείτε να τροποποιήσετε θέματα σε αυτό τον υπο-λογαρισμό"
