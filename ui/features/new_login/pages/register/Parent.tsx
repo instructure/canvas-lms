@@ -139,6 +139,7 @@ const Parent = () => {
     if (recaptchaKey) {
       const recaptchaValid = recaptchaSectionRef.current?.validate() ?? true
       if (!recaptchaValid) {
+        recaptchaSectionRef.current?.focus()
         hasValidationError = true
       }
     }
@@ -162,7 +163,6 @@ const Parent = () => {
     if (errors.pseudonym?.unique_id?.length) {
       const errorKey = `pseudonym.unique_id.${errors.pseudonym.unique_id[0]?.type}`
       setEmailError(serverErrorsMap[errorKey]?.() || I18n.t('An unknown error occurred.'))
-
       if (!hasFocusedError) {
         emailInputRef.current?.focus()
         hasFocusedError = true
@@ -173,7 +173,6 @@ const Parent = () => {
     if (errors.pseudonym?.password?.length) {
       const errorKey = `pseudonym.password.${errors.pseudonym.password[0]?.type}`
       setPasswordError(serverErrorsMap[errorKey]?.() || I18n.t('An unknown error occurred.'))
-
       if (!hasFocusedError) {
         passwordInputRef.current?.focus()
         hasFocusedError = true
@@ -184,7 +183,6 @@ const Parent = () => {
     if (errors.pseudonym?.password_confirmation?.length) {
       const errorKey = `pseudonym.password_confirmation.${errors.pseudonym.password_confirmation[0]?.type}`
       setConfirmPasswordError(serverErrorsMap[errorKey]?.() || I18n.t('An unknown error occurred.'))
-
       if (!hasFocusedError) {
         confirmPasswordInputRef.current?.focus()
         hasFocusedError = true
@@ -195,7 +193,6 @@ const Parent = () => {
     if (errors.user?.name?.length) {
       const errorKey = `user.name.${errors.user.name[0]?.type}`
       setNameError(serverErrorsMap[errorKey]?.() || I18n.t('An unknown error occurred.'))
-
       if (!hasFocusedError) {
         nameInputRef.current?.focus()
         hasFocusedError = true
@@ -216,7 +213,6 @@ const Parent = () => {
     if (errors.user?.terms_of_use?.length) {
       const errorKey = `user.terms_of_use.${errors.user.terms_of_use[0]?.type}`
       setTermsError(serverErrorsMap[errorKey]?.() || I18n.t('An unknown error occurred.'))
-
       if (!hasFocusedError) {
         const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
         checkbox?.focus()
@@ -225,10 +221,11 @@ const Parent = () => {
     }
 
     // reCAPTCHA
-    if (recaptchaKey && errors.recaptcha) {
+    if (recaptchaKey) {
+      recaptchaSectionRef.current?.reset()
       recaptchaSectionRef.current?.validate()
       if (!hasFocusedError) {
-        // TODO: handle reCAPTCHA errors …
+        recaptchaSectionRef.current?.focus()
       }
     }
   }
