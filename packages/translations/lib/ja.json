@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "さらなる考慮事項"
     },
+    "address_applied_64269b0b": {
+        "message": "アドレスを適用した"
+    },
+    "address_removed_fcb496e0": {
+        "message": "アドレスを削除した"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "同じURLを持つ隣接リンクは1つのリンクでなければなりません。"
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "ブルー"
+    },
+    "bold_applied_42d547b7": {
+        "message": "太字を適用した"
+    },
+    "bold_removed_da474a5c": {
+        "message": "太字を削除した"
     },
     "border_5b08b06d": {
         "message": "ボーダー"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "テキストリンクを表示する (新しいタブが開きます)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Divを適用した"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Divを削除した"
     },
     "division_sign_72190870": {
         "message": "分割サイン"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "見出し4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "{ h }見出しを適用した"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "{ h }見出しを削除した"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "見出しレベルはスキップしないでください。"
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "イタリア語"
+    },
+    "italic_applied_8f59a684": {
+        "message": "イタリックを適用した"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "イタリックを削除した"
     },
     "japanese_b5721ca7": {
         "message": "日本語"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "段落"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "段落を適用した"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "段落を削除した"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "{ start } で始まる段落"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "リソースURL選択を決定するために利用可能"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "下線を適用した"
+    },
+    "underline_removed_3693e17c": {
+        "message": "下線を削除した"
     },
     "union_e6b57a53": {
         "message": "ユニオン"

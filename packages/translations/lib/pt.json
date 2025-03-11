@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "Considerações adicionais"
     },
+    "address_applied_64269b0b": {
+        "message": "Endereço aplicado"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Endereço removido"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Ligações adjacentes com o mesmo URL devem ser uma única ligação."
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "Azul"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Negrito aplicado"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Negrito removido"
     },
     "border_5b08b06d": {
         "message": "Fronteira"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Exibir ligação de texto (abre em uma nova guia)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Div aplicado"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Div removido"
     },
     "division_sign_72190870": {
         "message": "Sinal de divisão"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "Cabeçalho 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Título { h } aplicado"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Título { h } removido"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Os níveis de título não devem ser ignorados."
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "Italiano"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Itálico aplicado"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Itálico removido"
     },
     "japanese_b5721ca7": {
         "message": "Japonês"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "Parágrafo"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "Parágrafo aplicado"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Parágrafo removido"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Parágrafo começando com { start }"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Não é possível determinar o url de seleção de recursos"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Sublinhado aplicado"
+    },
+    "underline_removed_3693e17c": {
+        "message": "Sublinhado removido"
     },
     "union_e6b57a53": {
         "message": "União"

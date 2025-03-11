@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "Yderligere overvejelser"
     },
+    "address_applied_64269b0b": {
+        "message": "Adresse anvendt"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Adresse fjernet"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Tilstødende links med samme URL skal være et enkelt link."
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "Blå"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Fed skrift anvendt"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Fed skrift fjernet"
     },
     "border_5b08b06d": {
         "message": "Kant"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Vis tekstlink (åbnes i en ny fane)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Div anvendt"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Div fjernet"
     },
     "division_sign_72190870": {
         "message": "Divisionstegn"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "Overskrift 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Overskrift { h } anvendt"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Overskrift { h } fjernet"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Overskriftsniveauer bør ikke springes over."
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "Italiensk"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Kursiv anvendt"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Kursiv fjernet"
     },
     "japanese_b5721ca7": {
         "message": "Japansk"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "Afsnit"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "Afsnit anvendt"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Afsnit fjernet"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Paragraf begynder med { start }"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Kan ikke bestemme webadressen til ressourcevalg"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Understregning anvendt"
+    },
+    "underline_removed_3693e17c": {
+        "message": "Understregning fjernet"
     },
     "union_e6b57a53": {
         "message": "Union"

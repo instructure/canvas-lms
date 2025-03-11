@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "Zusätzliche Überlegungen"
     },
+    "address_applied_64269b0b": {
+        "message": "Adresse angewendet"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Adresse entfernt"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Nebenstehende Links mit dem gleichen URL sollten ein einziger Link sein."
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "Blau"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Fettschrift angewendet"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Fettschrift entfernt"
     },
     "border_5b08b06d": {
         "message": "Rand"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Text-Link anzeigen (wird in einem neuen Tab geöffnet)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Div angewendet"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Div entfernt"
     },
     "division_sign_72190870": {
         "message": "Divisionszeichen"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "Überschrift 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Überschrift { h } angewendet"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Überschrift { h } entfernt"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Die Überschriftsebene darf nicht übersprungen werden."
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "Italienisch"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Kursivschrift angewendet"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Kursivschrift entfernt"
     },
     "japanese_b5721ca7": {
         "message": "Japanisch"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "Absatz"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "Absatz angewendet"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Absatz entfernt"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Absatz, beginnend mit { start }"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "URL für Ressourcenauswahl kann nicht bestimmt werden"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Unterstreichung angewendet"
+    },
+    "underline_removed_3693e17c": {
+        "message": "Unterstreichung entfernt"
     },
     "union_e6b57a53": {
         "message": "Union"
