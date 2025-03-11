@@ -17,9 +17,6 @@
 
 import {getSourcesAndTracks} from '../mediaComment'
 import $ from 'jquery'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 describe('getSourcesAndTracks', () => {
   beforeAll(() => {
@@ -32,6 +29,7 @@ describe('getSourcesAndTracks', () => {
 
   afterAll(() => {
     $.getJSON.mockRestore()
+    jest.resetAllMocks()
   })
 
   it('with no attachment id', () => {
@@ -46,6 +44,7 @@ describe('getSourcesAndTracks', () => {
 
   it('should return sources and tracks in the old format when studio_media_capture_enabled is false', async () => {
     ENV.studio_media_capture_enabled = false
+    ENV.FEATURES.consolidated_media_player = false
     // Mock response
     const mockResponse = {
       media_sources: [
@@ -69,7 +68,7 @@ describe('getSourcesAndTracks', () => {
     }
 
     // Mock $.getJSON to return the mock response
-    jest.spyOn($, 'getJSON').mockImplementation((url, callback) => {
+    jest.spyOn($, 'getJSON').mockImplementation((_, callback) => {
       callback(mockResponse)
       return $.Deferred().resolve(mockResponse).promise()
     })
@@ -88,6 +87,7 @@ describe('getSourcesAndTracks', () => {
 
   it('should return sources and tracks in the new format when studio_media_capture_enabled is true', async () => {
     ENV.studio_media_capture_enabled = true
+    ENV.FEATURES.consolidated_media_player = false
     const mockResponse = {
       media_sources: [
         {
@@ -110,7 +110,65 @@ describe('getSourcesAndTracks', () => {
     }
 
     // Mock $.getJSON to return the mock response
-    jest.spyOn($, 'getJSON').mockImplementation((url, callback) => {
+    jest.spyOn($, 'getJSON').mockImplementation((_, callback) => {
+      callback(mockResponse)
+      return $.Deferred().resolve(mockResponse).promise()
+    })
+
+    const id = '123'
+    const result = await getSourcesAndTracks(id)
+
+    expect(result.sources).toEqual([
+      {
+        src: 'http://example.com/video_low.mp4',
+        label: '320x180 244 kbps',
+        height: 180,
+        width: 320,
+      },
+      {
+        src: 'http://example.com/video.mp4',
+        label: '640x360 488 kbps',
+        height: 360,
+        width: 640,
+      },
+    ])
+    expect(result.tracks).toEqual([
+      {
+        id: '123',
+        type: 'subtitles',
+        label: 'English',
+        src: '/track.vtt',
+        language: 'en',
+      },
+    ])
+  })
+
+  it('should return sources and tracks in the new format when consolidated_media_player is true', async () => {
+    ENV.FEATURES.consolidated_media_player = true
+    ENV.studio_media_capture_enabled = false
+    const mockResponse = {
+      media_sources: [
+        {
+          url: 'http://example.com/video.mp4',
+          content_type: 'video/mp4',
+          width: 640,
+          height: 360,
+          bitrate: 500000,
+        },
+        {
+          url: 'http://example.com/video_low.mp4',
+          content_type: 'video/mp4',
+          width: 320,
+          height: 180,
+          bitrate: 250000,
+        },
+      ],
+      media_tracks: [{url: 'http://example.com/track.vtt', kind: 'subtitles', locale: 'en'}],
+      can_add_captions: true,
+    }
+
+    // Mock $.getJSON to return the mock response
+    jest.spyOn($, 'getJSON').mockImplementation((_, callback) => {
       callback(mockResponse)
       return $.Deferred().resolve(mockResponse).promise()
     })
