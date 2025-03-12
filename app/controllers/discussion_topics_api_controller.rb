@@ -274,6 +274,75 @@ class DiscussionTopicsApiController < ApplicationController
     render(json: { liked: feedback.liked, disliked: feedback.disliked })
   end
 
+  # TODO: this is only mock implementation for now
+  def insight
+    return render_unauthorized_action unless @topic.user_can_access_insights?(@current_user)
+
+    workflow_state = nil
+    valid_states = %w[created in_progress failed completed]
+    if valid_states.include?(params[:mock_workflow_state])
+      workflow_state = params[:mock_workflow_state]
+    end
+
+    if ["failed", "completed"].include?(workflow_state)
+      needs_processing = params[:mock_needs_processing] == "true"
+
+      return render(json: { workflow_state:, needs_processing: })
+    end
+
+    render(json: { workflow_state: })
+  end
+
+  # TODO: this is only mock implementation for now
+  def insight_generation
+    return render_unauthorized_action unless @topic.user_can_access_insights?(@current_user)
+
+    render json: {}
+  end
+
+  # TODO: this is only mock implementation for now
+  def insight_entries
+    return render_unauthorized_action unless @topic.user_can_access_insights?(@current_user)
+
+    entry_count = 20
+    if params[:mock_entry_count]
+      entry_count = params[:mock_entry_count].to_i
+    end
+
+    entries = Array.new(entry_count) do |i|
+      {
+        id: i,
+        entry_content: "Mock discussion entry content #{i + 1}",
+        entry_url: "https://example.com/entries/#{i + 1}",
+        entry_updated_at: Time.now.utc - i.hours,
+        student_id: i,
+        student_name: "Student #{i + 1}",
+        relevance_ai_classification: ["relevant", "irrelevant"].sample,
+        relevance_ai_classification_confidence: rand(1..5),
+        relevance_ai_evaluation_notes: "AI evaluation notes for entry #{i + 1}",
+        relevance_human_reviewer: (i % 3 == 0) ? nil : (entry_count + i),
+        relevance_human_feedback_liked: [false, false, true][i % 3],
+        relevance_human_feedback_disliked: [false, true, false][i % 3],
+        relevance_human_feedback_notes: (i % 3 == 0) ? nil : ["Human feedback notes #{i + 1}", ""].sample,
+      }
+    end
+
+    render json: entries
+  end
+
+  # TODO: this is only mock implementation for now
+  def insight_entry_update
+    return render_unauthorized_action unless @topic.user_can_access_insights?(@current_user)
+
+    params[:entry_id]
+
+    unless %w[like dislike reset_like].include?(params[:relevance_human_feedback_action])
+      return render(json: { error: "Invalid action." }, status: :bad_request)
+    end
+
+    render json: {}
+  end
+
   # @API Get the full topic
   # Return a cached structure of the discussion topic, containing all entries,
   # their authors, and their message bodies.
@@ -1094,7 +1163,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def generate_focus(user_input)
-    DiscussionTopic::PromptPresenter.focus_for_summary(user_input: user_input)
+    DiscussionTopic::PromptPresenter.focus_for_summary(user_input:)
   end
 
   def generate_raw_dynamic_content(focus)

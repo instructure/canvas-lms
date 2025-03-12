@@ -1494,6 +1494,10 @@ CanvasRails::Application.routes.draw do
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/summaries", action: :find_or_create_summary, as: "#{context}_discussion_topic_create_summary"
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/summaries/disable", action: :disable_summary, as: "#{context}_discussion_topic_disable_summary"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/summaries/:summary_id/feedback", action: :summary_feedback, as: "#{context}_discussion_topic_summary_feedback"
+        get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/insights", action: :insight, as: "#{context}_discussion_topic_insight"
+        post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/insights", action: :insight_generation, as: "#{context}_discussion_topic_insight_generation"
+        get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/insights/entries", action: :insight_entries, as: "#{context}_discussion_topic_insight_entries"
+        put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/insights/entries/:entry_id", action: :insight_entry_update, as: "#{context}_discussion_topic_insight_entry_update"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/duplicate", action: :duplicate
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entry_list", action: :entry_list, as: "#{context}_discussion_topic_entry_list"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries", action: :add_entry, as: "#{context}_discussion_add_entry"
