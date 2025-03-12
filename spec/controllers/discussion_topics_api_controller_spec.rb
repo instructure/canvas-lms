@@ -186,7 +186,6 @@ describe DiscussionTopicsApiController do
       context "and config does not exist" do
         before do
           expect(LLMConfigs).to receive(:config_for).and_return(nil)
-          expect(LLMConfigs).to receive(:config_for).and_return(nil)
         end
 
         it "returns an error if there is no llm config" do
@@ -202,7 +201,8 @@ describe DiscussionTopicsApiController do
             LLMConfig.new(
               name: "raw-V1_A",
               model_id: "model",
-              template: "<CONTENT_PLACEHOLDER>"
+              template: "<CONTENT_PLACEHOLDER>",
+              rate_limit: { limit: 25, period: "day" }
             )
           )
           expect(LLMConfigs).to receive(:config_for).and_return(
@@ -239,11 +239,14 @@ describe DiscussionTopicsApiController do
             )
           end
 
-          it "returns the most recent summary for the user" do
+          it "returns the most recent summary and usage information for the user" do
+            allow(Canvas.redis).to receive(:get).and_return("5")
+
             get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
             expect(response).to be_successful
             expect(response.parsed_body["id"]).to eq(@refined_summary.id)
+            expect(response.parsed_body["usage"]).to eq({ "currentCount" => 5, "limit" => 25 })
           end
 
           context "and the generated hash is different than the stored one" do
@@ -277,7 +280,7 @@ describe DiscussionTopicsApiController do
 
           it "returns an error message" do
             get "find_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
-
+            puts("response: #{response.body}")
             expect(response).to be_not_found
           end
         end
@@ -315,7 +318,8 @@ describe DiscussionTopicsApiController do
           LLMConfig.new(
             name: "raw-V1_A",
             model_id: "model",
-            template: "<CONTENT_PLACEHOLDER>"
+            template: "<CONTENT_PLACEHOLDER>",
+            rate_limit: { limit: 11, period: "day" }
           )
         )
         expect(LLMConfigs).to receive(:config_for).and_return(
@@ -386,8 +390,9 @@ describe DiscussionTopicsApiController do
         end
       end
 
-      it "returns a new summary" do
+      it "returns a new summary with usage" do
         expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+        allow(Canvas.redis).to receive(:get).and_return("5")
 
         expect(@inst_llm).to receive(:chat).and_return(
           InstLLM::Response::ChatResponse.new(
@@ -415,6 +420,7 @@ describe DiscussionTopicsApiController do
         post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
         expect(response).to be_successful
+        expect(response.parsed_body["usage"]).to eq({ "currentCount" => 5, "limit" => 11 })
       end
 
       it "enables summary if it was disabled" do
@@ -451,7 +457,7 @@ describe DiscussionTopicsApiController do
       end
     end
 
-    it "returns rate limit exceeded error if the user has reached the max number of summaries for the day" do
+    it "returns an error if the user has reached the maximum number of summaries for the day" do
       cache_key = ["inst_llm_helper", "rate_limit", @teacher.uuid, "raw-V1_A", Time.now.utc.strftime("%Y%m%d")].cache_key
       Canvas.redis.incr(cache_key)
 
@@ -488,7 +494,6 @@ describe DiscussionTopicsApiController do
 
     it "returns an error if there is no llm config" do
       expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
-      expect(LLMConfigs).to receive(:config_for).and_return(nil)
       expect(LLMConfigs).to receive(:config_for).and_return(nil)
 
       post "find_or_create_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
