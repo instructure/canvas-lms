@@ -52,7 +52,7 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    json (2.10.1)
+    json (2.10.2)
     jwt (2.9.3)
       base64
     logger (1.6.6)
