@@ -257,9 +257,12 @@ module UserContent
     end
 
     def replacement(url)
-      asset_types = AssetTypes.slice(*@allowed_types)
+      url = url.sub(%r{/$}, "")
       matched = url.match(@toplevel_regex)
-      context_type, context_id, type, obj_id, rest = [matched[2] || matched[4], matched[3] || matched[5], matched[6], matched[7], matched[8]]
+      asset_types = AssetTypes.slice(*@allowed_types)
+      context_type = matched[2] || matched[4]
+      context_id   = matched[3] || matched[5]
+      type, obj_id, rest = matched.values_at(6, 7, 8)
       prefix = "/#{context_type}/#{context_id}" if context_type && context_id
       return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix
 
@@ -267,7 +270,7 @@ module UserContent
         if obj_id.to_i > 0
           obj_id = obj_id.to_i
         else
-          rest = "/#{obj_id}#{rest}" if obj_id.present? || rest.present?
+          rest = "/#{obj_id}#{rest}" if obj_id && rest
           obj_id = nil
         end
       end
@@ -278,16 +281,15 @@ module UserContent
       end
 
       if asset_types.key?(type)
-        klass = asset_types[type]
-        klass = klass.to_s.constantize if klass
+        klass = asset_types[type]&.to_s&.constantize
         match = UriMatch.new(url, type, klass, obj_id, rest, prefix, context_type, context_id)
         handler = @handlers[type] || @default_handler
-        converted = handler&.call(match)
       else
         match = UriMatch.new(url, type)
-        converted = @unknown_handler&.call(match)
+        handler = @unknown_handler
       end
-      converted ||= url
+
+      converted = handler&.call(match) || url
       converted.gsub("&amp;", "&") # get rid of ampersand conversions, it can trip up logic that runs after this
     end
 
