@@ -140,7 +140,7 @@ const Ratings = ({
         >
           <TextInput
             type="text"
-            messages={masteryPoints.error ? [{text: masteryPoints.error, type: 'error'}] : null}
+            messages={masteryPoints.error ? [{text: masteryPoints.error, type: 'newError'}] : null}
             renderLabel={
               <ScreenReaderContent>{I18n.t('Change mastery points')}</ScreenReaderContent>
             }

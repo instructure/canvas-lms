@@ -385,7 +385,7 @@ class ProficiencyRating extends React.Component {
     )
   }
 
-  errorMessage = error => (error ? [{text: error, type: 'error'}] : null)
+  errorMessage = error => (error ? [{text: error, type: 'newError'}] : null)
 
   render() {
     const {isMobileView, canManage, individualOutcome} = this.props
