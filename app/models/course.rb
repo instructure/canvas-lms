@@ -2890,7 +2890,8 @@ class Course < ActiveRecord::Base
        alt_name
        restrict_quantitative_data
        horizon_course
-       conditional_release]
+       conditional_release
+       default_due_time]
   end
 
   def student_reporting?
