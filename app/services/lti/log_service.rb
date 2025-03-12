@@ -26,7 +26,7 @@ module Lti
       resource_selection
     ].freeze
 
-    def initialize(tool:, context:, user:, session_id:, launch_type:, launch_url: nil, placement: nil)
+    def initialize(tool:, context:, user:, session_id:, launch_type:, launch_url: nil, placement: nil, message_type: nil)
       raise ArgumentError, "context must be a Course, Account, or Group" unless [Course, Account, Group].include? context.class
       raise ArgumentError, "launch_type must be one of #{LAUNCH_TYPES.join(", ")}" unless LAUNCH_TYPES.include?(launch_type.to_sym)
 
@@ -38,6 +38,7 @@ module Lti
       @launch_url = launch_url
       @placement = placement
       @session_id = session_id
+      @message_type = message_type
     end
 
     def log_lti_launches?
@@ -76,6 +77,7 @@ module Lti
     end
 
     def message_type
+      return @message_type if @message_type
       return @tool.extension_setting(@placement, :message_type) if @placement
 
       # no placement means this is a launch from a content item

@@ -74,6 +74,27 @@ module Lti
             expect(id_token_decoded["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq("LtiAssetProcessorSettingsRequest")
             expect(id_token_decoded["https://purl.imsglobal.org/spec/lti/claim/activity"]["id"]).to eq(asset_processor.assignment.lti_context_id)
           end
+
+          context "logging" do
+            before do
+              allow(Lti::LogService).to receive(:new) do
+                double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+              end
+            end
+
+            it "logs launch" do
+              expect(Lti::LogService).to receive(:new).with(
+                tool: asset_processor.context_external_tool,
+                context: @course,
+                user: @teacher,
+                session_id: nil,
+                launch_type: :content_item,
+                launch_url: asset_processor.url,
+                message_type: "LtiAssetProcessorSettingsRequest"
+              )
+              subject
+            end
+          end
         end
 
         context "without proper rights" do
@@ -165,6 +186,27 @@ module Lti
           it "returns 400" do
             subject
             expect(response).to have_http_status :bad_request
+          end
+        end
+
+        context "logging" do
+          before do
+            allow(Lti::LogService).to receive(:new) do
+              double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+            end
+          end
+
+          it "logs launch" do
+            expect(Lti::LogService).to receive(:new).with(
+              tool: asset_processor.context_external_tool,
+              context: @course,
+              user: @teacher,
+              session_id: nil,
+              launch_type: :content_item,
+              launch_url: asset_processor.report["url"],
+              message_type: "LtiReportReviewRequest"
+            )
+            subject
           end
         end
       end

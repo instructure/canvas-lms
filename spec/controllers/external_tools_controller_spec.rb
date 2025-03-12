@@ -268,7 +268,7 @@ describe ExternalToolsController do
             user_session(@teacher)
           end
 
-          it "logs launch with placement and indirect_link launch_type" do
+          it "logs launch with placement and direct_link launch_type" do
             expect(Lti::LogService).to receive(:new).with(
               tool:,
               context: @course,
