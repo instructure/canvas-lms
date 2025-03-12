@@ -158,6 +158,30 @@ it('is valid when valid', () => {
   expect(ref.current.valid()).toEqual(true)
 })
 
+it('is invalid when target link uri ', async () => {
+  const ref = React.createRef()
+  render(<Placement {...props({}, {target_link_uri: 'not_a_url'})} ref={ref} />)
+  userEvent.click(
+    screen.getByRole('button', {
+      name: /account navigation/i,
+    }),
+  )
+  await screen.findByText('Icon Url')
+  expect(ref.current.valid()).toEqual(false)
+})
+
+it('is invalid when icon url is invalid', async () => {
+  const ref = React.createRef()
+  render(<Placement {...props({}, {icon_url: 'not_a_url'})} ref={ref} />)
+  userEvent.click(
+    screen.getByRole('button', {
+      name: /account navigation/i,
+    }),
+  )
+  await screen.findByText('Icon Url')
+  expect(ref.current.valid()).toEqual(false)
+})
+
 const alwaysDeeplinkingPlacements = [
   'editor_button',
   'migration_selection',
