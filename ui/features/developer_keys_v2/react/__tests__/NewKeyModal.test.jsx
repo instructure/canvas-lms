@@ -17,13 +17,15 @@
  */
 
 import React from 'react'
-import {screen, render, cleanup} from '@testing-library/react'
+import {screen, render, cleanup, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DeveloperKeyModal from '../NewKeyModal'
 import devKeyActions from '../actions/developerKeysActions'
 import moxios from 'moxios'
 import {successfulLtiKeySaveResponse} from './fixtures/responses'
 import $ from '@canvas/rails-flash-notifications'
+
+const user = userEvent.setup()
 
 describe('NewKeyModal', () => {
   let oldEnv
@@ -283,6 +285,55 @@ describe('NewKeyModal', () => {
       const sentDevKey = submitForm(editDeveloperKeyState2)
 
       expect(sentDevKey.test_cluster_only).toBeFalsy()
+    })
+
+    describe('and the context is site admin', () => {
+      const createOrEditSpy = jest.fn()
+      const props = {
+        ctx: {
+          params: {
+            contextId: 'site_admin',
+          },
+        },
+        createOrEditDeveloperKeyState: createDeveloperKeyState,
+        actions: {...fakeActions, createOrEditDeveloperKey: createOrEditSpy},
+      }
+
+      let oldEnv
+
+      beforeEach(() => {
+        oldEnv = window.ENV
+        window.ENV = {...oldEnv, RAILS_ENVIRONMENT: 'production'}
+      })
+
+      afterEach(() => {
+        window.ENV = oldEnv
+      })
+
+      it('renders a confirmation modal to prevent accidental updates', async () => {
+        renderDeveloperKeyModal(props)
+
+        await user.click(screen.getByRole('button', {name: /Save/i}))
+
+        expect(await screen.findByText('Environment Confirmation')).toBeInTheDocument()
+
+        const input = screen.getByTestId('confirm-prompt-input')
+
+        await user.click(input)
+        await user.paste('beta')
+        await user.click(screen.getByText(/^Confirm/i).closest('button'))
+
+        expect(await screen.findByText(/The provided value is incorrect/i)).toBeInTheDocument()
+
+        await user.click(input)
+        await user.clear(input)
+        await user.paste('production')
+        await user.click(screen.getByText(/^Confirm/i).closest('button'))
+
+        await waitFor(() => {
+          expect(screen.queryByText(/Environment Confirmation/i)).not.toBeInTheDocument()
+        })
+      })
     })
   })
 
