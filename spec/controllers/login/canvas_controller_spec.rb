@@ -106,18 +106,43 @@ describe Login::CanvasController do
     end
   end
 
-  context "manage_robots_meta" do
-    it "enables robot indexing by default" do
-      get "new"
-      expect(assigns[:allow_robot_indexing]).to be_truthy
+  describe "manage_robots_meta" do
+    let(:domain_root_account) { Account.default }
+
+    context "when disable_login_search_indexing? is true and enable_search_indexing? is true" do
+      before do
+        domain_root_account.settings = { disable_login_search_indexing: true, enable_search_indexing: true }
+        domain_root_account.save!
+        get :new
+      end
+
+      it "sets @allow_robot_indexing to false" do
+        expect(assigns(:allow_robot_indexing)).to be_falsey
+      end
     end
 
-    it "allows robot indexing to be disabled" do
-      Account.default.settings[:disable_login_search_indexing] = true
-      Account.default.save!
+    context "when disable_login_search_indexing? is false" do
+      before do
+        domain_root_account.settings = { disable_login_search_indexing: false, enable_search_indexing: true }
+        domain_root_account.save!
+        get :new
+      end
 
-      get "new"
-      expect(assigns[:allow_robot_indexing]).to be_falsey
+      it "does not set @allow_robot_indexing to false" do
+        expect(assigns(:allow_robot_indexing)).to be_truthy
+      end
+    end
+
+    context "when enable_search_indexing? is false" do
+      before do
+        domain_root_account.settings = { disable_login_search_indexing: true, enable_search_indexing: false }
+        domain_root_account.save!
+        get :new
+      end
+
+      it "does not set @allow_robot_indexing to false" do
+        expect(assigns(:allow_robot_indexing)).to be_nil
+      end
     end
   end
 
