@@ -140,7 +140,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
   if (friendlyDescription.length > 255) {
     friendlyDescriptionMessages.push({
       text: I18n.t('Must be 255 characters or less'),
-      type: 'error',
+      type: 'newError',
     })
   }
 
@@ -230,7 +230,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
       size="medium"
       value={title}
       placeholder={I18n.t('Enter name or code')}
-      messages={invalidTitle && showTitleError ? [{text: invalidTitle, type: 'error'}] : []}
+      messages={invalidTitle && showTitleError ? [{text: invalidTitle, type: 'newError'}] : []}
       renderLabel={I18n.t('Name')}
       onChange={changeTitle}
       inputRef={setTitleRef}
@@ -243,7 +243,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
       size="medium"
       value={displayName}
       placeholder={I18n.t('Create a friendly display name')}
-      messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'error'}] : []}
+      messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'newError'}] : []}
       renderLabel={I18n.t('Friendly Name')}
       onChange={displayNameChangeHandler}
       inputRef={setDisplayNameRef}
