@@ -228,6 +228,7 @@ class ContextModulesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       log_asset_access(["modules", @context], "modules", "other")
+
       load_modules
 
       set_tutorial_js_env
@@ -245,10 +246,19 @@ class ContextModulesController < ApplicationController
         session[:module_progressions_initialized] = true
       end
       add_body_class("padless-content")
-      js_bundle :context_modules
+
       js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
       js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
       css_bundle :content_next, :context_modules2
+
+      if @context.root_account.feature_enabled?(:modules_page_rewrite)
+        # Load new modules page assets
+        js_bundle :context_modules_v2
+        return render html: "", layout: true
+      end
+
+      # Load legacy modules page assets
+      js_bundle :context_modules
       render stream: can_stream_template?
     end
   end

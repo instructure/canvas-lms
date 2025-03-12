@@ -43,6 +43,19 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
+    class ModulePrerequisiteType < ApplicationObjectType
+      field :id, ID, null: false
+      field :name, String, null: false
+      field :type, String, null: false
+    end
+
+    class ModuleCompletionRequirementType < ApplicationObjectType
+      field :id, ID, null: false
+      field :min_percentage, Float, null: true
+      field :min_score, Float, null: true
+      field :type, String, null: false
+    end
+
     alias_method :context_module, :object
 
     global_id_field :id
@@ -52,6 +65,17 @@ module Types
     field :unlock_at, DateTimeType, null: true
 
     field :position, Integer, null: true
+
+    field :prerequisites, [ModulePrerequisiteType], null: true
+    delegate :prerequisites, to: :context_module
+
+    field :completion_requirements, [ModuleCompletionRequirementType], null: true
+    delegate :completion_requirements, to: :context_module
+
+    field :requirement_count, Integer, null: true
+    delegate :requirement_count, to: :context_module
+
+    field :published, Boolean, null: true, method: :published?
 
     field :module_items, [Types::ModuleItemType], null: true
     def module_items
