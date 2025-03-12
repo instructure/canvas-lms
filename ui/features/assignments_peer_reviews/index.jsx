@@ -38,6 +38,7 @@ import {IconWarningSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('assignments.peer_reviews')
+const ERROR_MESSAGE = I18n.t('Please select a student')
 
 $(document).ready(() => {
   const peerReviewCountContainer = document.getElementById('reviews_per_user_container')
@@ -154,6 +155,7 @@ $(document).ready(() => {
           outline: '1px solid red',
           borderRadius: '3px',
         })
+        container.attr('aria-label', ERROR_MESSAGE)
       }
 
       const root = errorRoots[form.attr('action')] ?? createRoot(errorsContainer)
@@ -164,7 +166,7 @@ $(document).ready(() => {
             <IconWarningSolid color="error" />
           </Flex.Item>
           <Text size="small" color="danger">
-            {I18n.t('Please select a student')}
+            {ERROR_MESSAGE}
           </Text>
         </Flex>
       )
@@ -176,6 +178,7 @@ $(document).ready(() => {
           outline: '',
           borderRadius: '',
         })
+        container.removeAttr('aria-label')
       }
       errorRoots[form.attr('action')]?.unmount()
       errorRoots[form.attr('action')] = null
@@ -193,6 +196,7 @@ $(document).ready(() => {
             outline: '1px solid red',
             borderRadius: '3px',
           })
+          container.attr('aria-label', ERROR_MESSAGE)
           container.focus()
         }
         const root = errorRoots[form.attr('action')] ?? createRoot(errorsContainer)
@@ -204,7 +208,7 @@ $(document).ready(() => {
               <IconWarningSolid color="error" />
             </Flex.Item>
             <Text size="small" color="danger">
-              {I18n.t('Please select a student')}
+              {ERROR_MESSAGE}
             </Text>
           </Flex>
         )
