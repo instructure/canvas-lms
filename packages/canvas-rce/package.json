@@ -146,6 +146,7 @@
     "minimatch": "~3.0.4",
     "moment-timezone": "^0.5.45",
     "prop-types": "^15",
+    "psl": "^1.1.0",
     "react": "^18",
     "react-aria-live": "^2",
     "react-color": "^2.13.4",
