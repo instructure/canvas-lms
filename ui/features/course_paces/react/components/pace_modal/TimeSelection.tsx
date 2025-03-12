@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useEffect, useState, SetStateAction, Dispatch } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { connect } from 'react-redux'
 import { Flex } from '@instructure/ui-flex'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import { coursePaceTimezone } from '../../shared/api/backend_serializer'
@@ -26,29 +27,42 @@ import { Text } from '@instructure/ui-text'
 import { NumberInput } from '@instructure/ui-number-input'
 import { View } from '@instructure/ui-view'
 import moment from 'moment-timezone'
-import type { CoursePace, OptionalDate, Pace, PaceDuration } from '../../types'
-import { generateDatesCaptions, getEndDateValue } from '../../utils/date_stuff/date_helpers'
-
-import { calculatePaceDuration } from '../../utils/utils'
+import _ from 'lodash'
+import type { CoursePace, OptionalDate, Pace, ResponsiveSizes, StoreState } from '../../types'
+import { generateDatesCaptions, rawDaysBetweenInclusive } from '../../utils/date_stuff/date_helpers'
+import { coursePaceActions } from '../../actions/course_paces'
+import { calendarDaysToPaceDuration } from '../../utils/utils'
+import { getBlackoutDates } from '../../shared/reducers/blackout_dates'
+import { BlackoutDate } from '../../shared/types'
 
 const I18n = createI18nScope('acceptable_use_policy')
 
-const DATE_COLUMN_WIDTH = '15.313rem'
 const GAP_WIDTH = 'medium'
 
-interface TimeSelectionProps {
+interface PassedProps {
   readonly coursePace: CoursePace
-  readonly plannedEndDate: OptionalDate
   readonly appliedPace: Pace
-  readonly paceDuration: PaceDuration
+  readonly responsiveSize: ResponsiveSizes
+}
+
+interface StoreProps {
+  readonly blackoutDates: BlackoutDate[]
+}
+
+interface DispatchProps {
+  readonly setTimeToCompleteCalendarDays: typeof coursePaceActions.setTimeToCompleteCalendarDays
+  readonly setPaceItemsDurationFromTimeToComplete: typeof coursePaceActions.setPaceItemsDurationFromTimeToComplete
+  readonly setStartDate: typeof coursePaceActions.setStartDate
+  readonly setTimeToCompleteCalendarDaysFromItems: typeof coursePaceActions.setTimeToCompleteCalendarDaysFromItems
 }
 
 interface DateInputWithCaptionProps {
   date: OptionalDate
-  setStateDate: Dispatch<SetStateAction<OptionalDate>>
+  onChangeDate: (date: string) => void
   caption: string
   renderLabel: string
   dataTestId: string
+  dateIsDisabled: (date: moment.Moment) => boolean
 }
 
 interface NumberInputWithLabelProps {
@@ -59,42 +73,102 @@ interface NumberInputWithLabelProps {
   dataTestId: string
 }
 
-const TimeSelection = (props: TimeSelectionProps) => {
-  const { coursePace, plannedEndDate, appliedPace, paceDuration: originalPaceDuration } = props
+type TimeSelectionProps = PassedProps & StoreProps & DispatchProps
 
-  const [startDate, setStartDate] = useState<OptionalDate>(coursePace.start_date)
-  const [endDate, setEndDate] = useState<OptionalDate>(getEndDateValue(coursePace, plannedEndDate))
-  const [weeks, setWeeks] = useState<number>(originalPaceDuration.weeks)
-  const [days, setDays] = useState<number>(originalPaceDuration.days)
+const TimeSelection = (props: TimeSelectionProps) => {
+  const {
+    coursePace,
+    appliedPace,
+    setTimeToCompleteCalendarDays,
+    responsiveSize,
+    setPaceItemsDurationFromTimeToComplete,
+    blackoutDates,
+    setStartDate,
+    setTimeToCompleteCalendarDaysFromItems,
+  } = props
+
+  const originalSelectedDaysToSkip = useRef(coursePace.selected_days_to_skip)
+  const originalBlackoutDates = useRef(blackoutDates)
 
   const enrollmentType = coursePace.context_type === 'Enrollment'
-
-  useEffect(() => {
-
-    setEndDate(getEndDateValue(coursePace, plannedEndDate))
-  }, [coursePace, plannedEndDate])
-
-  useEffect(() => {
-    const startDateValue = moment(startDate).endOf('day')
-    const endDateValue = moment(endDate).endOf('day')
-
-    const paceDuration = calculatePaceDuration(startDateValue, endDateValue)
-    setWeeks(paceDuration.weeks)
-    setDays(paceDuration.days)
-  }, [startDate, endDate])
-
-
+  const dateColumnWidth = responsiveSize === "small" ? "100%" : "15.313rem"
   const formatDate = (date: Date) => {
     return tz.format(date, 'date.formats.long') || ''
   }
 
-  const captions = generateDatesCaptions(coursePace, startDate, endDate, appliedPace)
+  const [endDate, setEndDate] = useState<OptionalDate>(null)
+  const [weeks, setWeeks] = useState<number>(0)
+  const [days, setDays] = useState<number>(0)
 
-  const DateInputWithCaption = ({ date, setStateDate, caption, renderLabel, dataTestId }: DateInputWithCaptionProps) => {
-    const onChangeDate = (date: Date | null) => {
-      const dateValue = date ? date.toISOString() : ''
-      console.log('Changed', dateValue)
-      setStateDate(dateValue)
+  useEffect(() => {
+    if (
+      !_.isEqual(coursePace.selected_days_to_skip, originalSelectedDaysToSkip.current) || 
+      !_.isEqual(blackoutDates, originalBlackoutDates.current)
+    ) {
+      setTimeToCompleteCalendarDaysFromItems(blackoutDates)
+      originalSelectedDaysToSkip.current = coursePace.selected_days_to_skip
+      originalBlackoutDates.current = blackoutDates
+    }
+  }, [coursePace.selected_days_to_skip, blackoutDates, setTimeToCompleteCalendarDaysFromItems])
+
+  useEffect(() => {
+    const startDateMoment = moment(coursePace.start_date).startOf('day')
+    const calendarDays = coursePace.time_to_complete_calendar_days === 0 
+      ? 0 
+      : coursePace.time_to_complete_calendar_days
+    const endDateValue = startDateMoment
+      .add(calendarDays, 'days')
+      .startOf('day')
+      .toISOString()
+    setEndDate(endDateValue)
+
+    const originalPaceDuration = calendarDaysToPaceDuration(coursePace.time_to_complete_calendar_days)
+    setWeeks(originalPaceDuration.weeks)
+    setDays(originalPaceDuration.days)
+  }, [coursePace.time_to_complete_calendar_days, coursePace.start_date])
+
+  const setTimeToComplete = (startDate: OptionalDate, endDate: OptionalDate) => {
+    if (!startDate || !endDate) return
+
+    const startDateValue = moment(startDate).endOf('day')
+    const endDateValue = moment(endDate).endOf('day')
+
+    const calendarDays = rawDaysBetweenInclusive(startDateValue, endDateValue)
+    const calendarDaysValue = calendarDays < 0 ? 0 : calendarDays - 1
+
+    const paceDuration = calendarDaysToPaceDuration(calendarDaysValue)
+    setWeeks(paceDuration.weeks)
+    setDays(paceDuration.days)
+
+    setTimeToCompleteCalendarDays(calendarDaysValue)
+    setPaceItemsDurationFromTimeToComplete(blackoutDates, calendarDaysValue)
+  }
+
+  const onChangeStartDate = (dateValue: string) => {
+    setStartDate(dateValue)
+    setTimeToComplete(dateValue, endDate)
+  }
+
+  const onChangeEndDate = (dateValue: string) => {
+    setEndDate(dateValue)
+    setTimeToComplete(coursePace.start_date, dateValue)
+  }
+
+  const captions = generateDatesCaptions(coursePace, coursePace.start_date, endDate, appliedPace)
+  const DateInputWithCaption = ({
+    date,
+    onChangeDate,
+    caption,
+    renderLabel,
+    dataTestId,
+    dateIsDisabled
+  }: DateInputWithCaptionProps) => {
+
+    const onChange = (selectedDate: Date | null) => {
+      if (selectedDate === null) return
+      const dateValue = selectedDate.toISOString()
+      if (dateValue === date) return
+      onChangeDate(dateValue)
     }
 
     return (
@@ -104,17 +178,25 @@ const TimeSelection = (props: TimeSelectionProps) => {
           timezone={coursePaceTimezone}
           formatDate={formatDate}
           selectedDate={date}
-          onSelectedDateChange={onChangeDate}
-          width="15.313rem"
+          onSelectedDateChange={onChange}
+          width={dateColumnWidth}
+          display="block"
           withRunningValue={true}
           interaction={undefined}
           dataTestid={dataTestId}
-        />
+          dateIsDisabled={dateIsDisabled} />
       </DateInputContainer>
     )
   }
-
-  const ReadOnlyDateWithCaption = ({ dateValue, caption, dataTestId }: { dateValue: OptionalDate, caption: string, dataTestId: string }) => {
+  const ReadOnlyDateWithCaption = ({
+    dateValue,
+    caption,
+    dataTestId
+  }: {
+    dateValue: OptionalDate,
+    caption: string,
+    dataTestId: string
+  }) => {
     return (
       <LabeledComponent label={I18n.t('Start Date')}>
         <DateInputContainer caption={caption}>
@@ -132,7 +214,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
         <Flex.Item>
           <Text weight="bold">{label}</Text>
         </Flex.Item>
-        <Flex gap="small" direction="row" padding="x-small 0 0 0">
+        <Flex gap="small" direction={responsiveSize === "small" ? "column" : "row"} padding="x-small 0 0 0">
           {children}
         </Flex>
       </Flex>
@@ -141,7 +223,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
 
   const DateInputContainer = ({ children, caption }: { children: React.ReactNode, caption: string }) => {
     return (
-      <Flex.Item width={DATE_COLUMN_WIDTH} padding="xxx-small 0 0 0">
+      <Flex.Item width={dateColumnWidth} padding="xxx-small 0 0 0">
         {children}
         <View margin="small 0 0 0" display="inline-block">
           <div style={{ whiteSpace: 'nowrap' }}>
@@ -153,7 +235,6 @@ const TimeSelection = (props: TimeSelectionProps) => {
   }
 
   const NumberInputWithLabel = ({ value, label, renderLabel, unit, dataTestId }: NumberInputWithLabelProps) => {
-
     const updateEndDate = (operation: 'add' | 'subtract') => {
       if (!Number.isInteger(value) || value <= 0 && operation === 'subtract') return
 
@@ -162,11 +243,13 @@ const TimeSelection = (props: TimeSelectionProps) => {
         : moment(endDate).subtract(1, unit)
 
       setEndDate(newEndDate.toISOString(true))
+      setTimeToComplete(coursePace.start_date, newEndDate.toISOString(true))
     }
 
     const onIncrement = () => {
       updateEndDate('add')
     }
+
     const onDecrement = () => {
       updateEndDate('subtract')
     }
@@ -176,7 +259,7 @@ const TimeSelection = (props: TimeSelectionProps) => {
         <NumberInput
           renderLabel={renderLabel}
           display={'inline-block'}
-          width="5.313rem"
+          width={responsiveSize === "small" ? "14.313rem" : "5.313rem"}
           onIncrement={onIncrement}
           onDecrement={onDecrement}
           placeholder={label}
@@ -192,51 +275,75 @@ const TimeSelection = (props: TimeSelectionProps) => {
   }
 
   return (
-    <Flex
-      data-testid="time-selection-section"
-      gap={GAP_WIDTH}
-      direction="row"
-      margin="0 0 medium"
-      padding="x-small 0 0 xx-small"
-      alignItems="start">
+    <View>
+      <Flex
+        data-testid="time-selection-section"
+        gap={GAP_WIDTH}
+        direction={responsiveSize === "small" ? "column" : "row"}
+        margin="0 0 medium"
+        padding="x-small 0 0 xx-small"
+        alignItems="start">
 
-      {enrollmentType
-        ?
-        <ReadOnlyDateWithCaption dateValue={startDate} caption={captions.startDate} dataTestId='start-date-readonly' />
-        :
+        {enrollmentType ? (
+          <ReadOnlyDateWithCaption
+            dateValue={coursePace.start_date}
+            caption={captions.startDate}
+            dataTestId='start-date-readonly'
+          />
+        ) : (
+          <DateInputWithCaption
+            key="start-date"
+            date={coursePace.start_date}
+            onChangeDate={onChangeStartDate}
+            caption={captions.startDate}
+            renderLabel={I18n.t('Start Date')}
+            dataTestId='start-date-input'
+            dateIsDisabled={(date: moment.Moment) =>
+              Boolean(endDate && date.toISOString() > endDate)
+            }
+          />
+        )}
         <DateInputWithCaption
-          key={`start-date`}
-          date={startDate}
-          setStateDate={setStartDate}
-          caption={captions.startDate}
-          renderLabel={I18n.t('Start Date')}
-          dataTestId='start-date-input' />
-      }
-      <DateInputWithCaption
-        key={`end-date`}
-        date={endDate}
-        setStateDate={setEndDate}
-        caption={captions.endDate}
-        renderLabel={I18n.t('End Date')}
-        dataTestId='end-date-input' />
-      <Flex.Item>
-        <LabeledComponent label={I18n.t('Time to Complete Course')}>
-          <NumberInputWithLabel
-            value={weeks}
-            label="Weeks"
-            renderLabel=''
-            unit='weeks'
-            dataTestId='weeks-number-input' />
-          <NumberInputWithLabel
-            value={days}
-            label="Days"
-            renderLabel=''
-            unit='days'
-            dataTestId='days-number-input'  />
-        </LabeledComponent>
-      </Flex.Item>
-    </Flex>
+          key="end-date"
+          date={endDate}
+          onChangeDate={onChangeEndDate}
+          caption={captions.endDate}
+          renderLabel={I18n.t('End Date')}
+          dataTestId="end-date-input"
+          dateIsDisabled={(date: moment.Moment) =>
+            Boolean(coursePace.start_date && date.toISOString() < coursePace.start_date)
+          }
+        />
+        <Flex.Item>
+          <LabeledComponent label={I18n.t('Time to Complete Course')}>
+            <NumberInputWithLabel
+              value={weeks}
+              label="Weeks"
+              renderLabel=''
+              unit='weeks'
+              dataTestId='weeks-number-input' />
+            <NumberInputWithLabel
+              value={days}
+              label="Days"
+              renderLabel=''
+              unit='days'
+              dataTestId='days-number-input' />
+          </LabeledComponent>
+        </Flex.Item>
+      </Flex>
+    </View>
   )
 }
 
-export default TimeSelection
+const mapStateToProps = (state: StoreState): StoreProps => {
+  return {
+    blackoutDates: getBlackoutDates(state),
+  }
+}
+
+export default connect(mapStateToProps, {
+  setTimeToCompleteCalendarDays: coursePaceActions.setTimeToCompleteCalendarDays,
+  setPaceItemsDurationFromTimeToComplete: coursePaceActions.setPaceItemsDurationFromTimeToComplete,
+  setStartDate: coursePaceActions.setStartDate,
+  setTimeToCompleteCalendarDaysFromItems: coursePaceActions.setTimeToCompleteCalendarDaysFromItems,
+})(TimeSelection)

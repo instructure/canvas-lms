@@ -433,6 +433,7 @@ RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.color = true
   config.order = :random
+  config.filter_run_when_matching :focus
 
   # The Pact specs have prerequisite setup steps so we exclude them by default
   config.filter_run_excluding :pact_live_events if ENV.fetch("RUN_LIVE_EVENTS_CONTRACT_TESTS", "0") == "0"
@@ -771,7 +772,7 @@ RSpec.configure do |config|
     BACKENDS = %w[FileSystem S3].map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As # :nodoc:
-      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$)/)) # rubocop:disable Style/AccessModifierDeclarations
+      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$|^object_id$)/)) # rubocop:disable Style/AccessModifierDeclarations
 
       def initialize(subject, ancestor)
         @subject = subject
@@ -877,7 +878,7 @@ RSpec.configure do |config|
     end
   end
 
-  def run_job(job)
+  def run_job(job) # rubocop:disable Rails/Delegate
     Delayed::Testing.run_job(job)
   end
 
@@ -920,9 +921,7 @@ RSpec.configure do |config|
       @code.to_s
     end
 
-    def [](arg)
-      @headers[arg]
-    end
+    delegate :[], to: :@headers
 
     def content_type
       self["content-type"]

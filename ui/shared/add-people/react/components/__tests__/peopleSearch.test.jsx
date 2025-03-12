@@ -65,16 +65,19 @@ describe('PeopleSearch', () => {
     expect(queryByRole('radio', {name: 'SIS ID'})).not.toBeInTheDocument()
   })
 
-  it('shows validation hint for invalid email addresses', () => {
+  it('shows validation error for invalid email addresses', () => {
+    const nameList = 'foobar@'
     const props = defaultProps({
       searchType: 'cc_path',
-      nameList: 'foobar@',
+      nameList,
+      searchInputError: {
+        text: `It looks like you have an invalid email address: "${nameList}"`,
+        type: 'newError',
+      },
     })
     const {getByText} = render(<PeopleSearch {...props} />)
 
-    expect(
-      getByText('It looks like you have an invalid email address: "foobar@"'),
-    ).toBeInTheDocument()
+    expect(getByText(props.searchInputError.text)).toBeInTheDocument()
   })
 
   it('calls onChange when search type changes', () => {

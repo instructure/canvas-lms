@@ -7,11 +7,13 @@ The <a href="http://www.imsglobal.org/spec/security/v1p0/" target="_blank">IMS S
 <a href="http://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow" target="_blank">Open ID Connect (OIDC)</a> third-party flow. You'll want to read these specifications in detail, but the following is a Canvas-specific summary:
 
 ### Step 1: Login Initiation <a name="step-1"></a>
-Canvas <a href="http://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-initiated-login" target="_blank">initiates a login request</a> to the `oidc_initiation_url` that is <a href="file.lti_dev_key_config.html#config-in-canvas">configured on the LTI developer key</a>. This requests contains an issuer identifier (`iss`) to recognize Canvas is launching the tool. As the issuer, Instructure-hosted Canvas instances all use the following, regardless of the specific account domain(s) that the tool was launched from:
+Canvas <a href="http://www.imsglobal.org/spec/security/v1p0/#step-1-third-party-initiated-login" target="_blank">initiates a login request</a> to the `oidc_initiation_url` that is <a href="file.lti_dev_key_config.html#config-in-canvas">configured on the LTI developer key</a>. This request contains an issuer identifier (`iss`) to recognize that Canvas is launching the tool. As the issuer, Instructure-hosted Canvas instances all use the following, regardless of the specific account domain(s) that the tool was launched from:
 
 - <https://canvas.instructure.com> (Production environment launches)
 - <https://canvas.beta.instructure.com> (Beta environment launches)
 - <https://canvas.test.instructure.com> (Test environment launches)
+
+On self-hosted Canvas, the `iss` value must be updated to your Canvas instance's hostname in the `config/security.yml` file, as the default is <https://canvas.instructure.com>.
 
 The request also includes a `login_hint` that is passed in the next step. Last, the request include the `target_link_uri` that has been configured on the Developer key; this is later used by the tool as a recommended final redirect.
 

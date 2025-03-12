@@ -55,6 +55,12 @@ Pseudonym.prototype.errorMap = function (policy) {
       }),
       taken: I18n.t('errors.sis_taken', 'The SIS ID is already in use'),
     },
+    integration_id: {
+      too_long: I18n.t('errors.too_long', "Can't exceed %{max} characters", {
+        max: 255,
+      }),
+      taken: I18n.t('errors.integration_taken', 'The Integration ID is already in use'),
+    },
     password: {
       too_short: I18n.t('errors.too_short', 'Must be at least %{min} characters', {
         min: policy?.minimum_character_length,

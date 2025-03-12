@@ -58,6 +58,7 @@ class MissingPeopleSection extends React.Component {
     searchType: PropTypes.string.isRequired,
     inviteUsersURL: PropTypes.string,
     onChange: PropTypes.func.isRequired,
+    fieldsRefAndError: PropTypes.object,
   }
 
   static defaultProps = {
@@ -178,6 +179,8 @@ class MissingPeopleSection extends React.Component {
           </Table.Row>
         )
       } else if (missing.createNew) {
+        const emailError = this.props.fieldsRefAndError?.[missing.address]?.errorMessage
+
         row = (
           <Table.Row key={`missing_${missing.address}`}>
             <Table.Cell>
@@ -196,7 +199,6 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                isRequired={true}
                 name="name"
                 type="text"
                 placeholder={nameLabel}
@@ -208,6 +210,9 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
+                ref={ref => {
+                  this.props.fieldsRefAndError[missing.address] = {ref}
+                }}
                 isRequired={true}
                 name="email"
                 type="email"
@@ -216,9 +221,12 @@ class MissingPeopleSection extends React.Component {
                 data-address={missing.address}
                 onChange={this.onNewForMissingChange}
                 value={missing.newUserInfo.email || ''}
+                messages={emailError ? [{text: emailError, type: 'newError'}] : []}
               />
             </Table.Cell>
-            <Table.RowHeader>{missing.address}</Table.RowHeader>
+            <Table.Cell>
+              <Text weight="bold">{missing.address}</Text>
+            </Table.Cell>
           </Table.Row>
         )
       } else {
@@ -243,7 +251,9 @@ class MissingPeopleSection extends React.Component {
                 onClick={this.onSelectNewForMissing}
               />
             </Table.Cell>
-            <Table.RowHeader>{missing.address}</Table.RowHeader>
+            <Table.Cell>
+              <Text weight="bold">{missing.address}</Text>
+            </Table.Cell>
           </Table.Row>
         )
       }

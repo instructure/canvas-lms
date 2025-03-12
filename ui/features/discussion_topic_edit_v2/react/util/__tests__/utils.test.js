@@ -247,6 +247,202 @@ describe('buildAssignmentOverrides', () => {
       expect(overrides[0].replyToTopicDueDate).toEqual(replyToTopicDueDate)
       expect(overrides[0].requiredRepliesDueDate).toEqual(requiredRepliesDueDate)
     })
+
+    it('adds student information to the checkpoint overrides', () => {
+      ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
+      const requiredRepliesDueDate = '2036-12-28T22:05:00-07:00'
+      const replyToTopicDueDate = '2036-12-18T22:05:00-07:00'
+      const assignment = Assignment.mock({
+        hasSubAssignments: true,
+        checkpoints: [
+          {
+            tag: REPLY_TO_ENTRY,
+            name: 'Reply to Entry Checkpoint',
+            dueAt: requiredRepliesDueDate,
+            pointsPossible: 10,
+            assignmentOverrides: {
+              nodes: [
+                {
+                  _id: 219,
+                  unassignItem: false,
+                  contextModule: null,
+                  set: {
+                      __typename: "AdhocStudents",
+                      students: [
+                          {
+                              _id: "1",
+                              name: "First Student",
+                          },
+                          {
+                              _id: "2",
+                              name: "Second Student",
+                          }
+                      ]
+                  },
+                  "__typename": "AssignmentOverride"
+                }
+              ],
+            },
+          },
+          {
+            tag: REPLY_TO_TOPIC,
+            name: 'Reply to Topic Checkpoint',
+            dueAt: replyToTopicDueDate,
+            pointsPossible: 10,
+            assignmentOverrides: {
+              nodes: [
+                {
+                  _id: 219,
+                  unassignItem: false,
+                  contextModule: null,
+                  set: {
+                      __typename: "AdhocStudents",
+                      students: [
+                          {
+                              _id: "1",
+                              name: "First Student",
+                          },
+                          {
+                              _id: "2",
+                              name: "Second Student",
+                          }
+                      ]
+                  },
+                  "__typename": "AssignmentOverride"
+                }
+              ],
+            },
+          },
+        ],
+      })
+      const discussion = DiscussionTopic.mock()
+      discussion.assignment = assignment
+
+      const overrides = buildAssignmentOverrides(discussion)
+      expect(overrides[0].students).toEqual([
+        { _id: '1', name: 'First Student' },
+        { _id: '2', name: 'Second Student' },
+      ])
+    })
+
+    it('adds group information to the checkpoint overrides', () => {
+      ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
+      const requiredRepliesDueDate = '2036-12-28T22:05:00-07:00'
+      const replyToTopicDueDate = '2036-12-18T22:05:00-07:00'
+      const assignment = Assignment.mock({
+        hasSubAssignments: true,
+        checkpoints: [
+          {
+            tag: REPLY_TO_ENTRY,
+            name: 'Reply to Entry Checkpoint',
+            dueAt: requiredRepliesDueDate,
+            pointsPossible: 10,
+            assignmentOverrides: {
+              nodes: [
+                {
+                  _id: 219,
+                  unassignItem: false,
+                  contextModule: null,
+                  set: {
+                      __typename: "Group",
+                      id: "1",
+                      name: "Group Name",
+                      nonCollaborative: true,
+                  },
+                  "__typename": "AssignmentOverride"
+                }
+              ],
+            },
+          },
+          {
+            tag: REPLY_TO_TOPIC,
+            name: 'Reply to Topic Checkpoint',
+            dueAt: replyToTopicDueDate,
+            pointsPossible: 10,
+            assignmentOverrides: {
+              nodes: [
+                {
+                  _id: 219,
+                  unassignItem: false,
+                  contextModule: null,
+                  set: {
+                      __typename: "Group",
+                      _id: "1",
+                      name: "Group Name",
+                      nonCollaborative: true,
+                  },
+                  "__typename": "AssignmentOverride"
+                }
+              ],
+            },
+          },
+        ],
+      })
+      const discussion = DiscussionTopic.mock()
+      discussion.assignment = assignment
+
+      const overrides = buildAssignmentOverrides(discussion)
+      expect(overrides[0].title).toEqual('Group Name')
+      expect(overrides[0].nonCollaborative).toEqual(true)
+    })
+
+    it('adds section information to the checkpoint overrides', () => {
+      ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
+      const requiredRepliesDueDate = '2036-12-28T22:05:00-07:00'
+      const replyToTopicDueDate = '2036-12-18T22:05:00-07:00'
+      const assignment = Assignment.mock({
+        hasSubAssignments: true,
+        checkpoints: [
+          {
+            tag: REPLY_TO_ENTRY,
+            name: 'Reply to Entry Checkpoint',
+            dueAt: requiredRepliesDueDate,
+            pointsPossible: 10,
+            assignmentOverrides: {
+              nodes: [
+                {
+                  _id: 219,
+                  unassignItem: false,
+                  contextModule: null,
+                  set: {
+                      __typename: "Section",
+                      id: "1",
+                      name: "Section 1",
+                  },
+                  "__typename": "AssignmentOverride"
+                }
+              ],
+            },
+          },
+          {
+            tag: REPLY_TO_TOPIC,
+            name: 'Reply to Topic Checkpoint',
+            dueAt: replyToTopicDueDate,
+            pointsPossible: 10,
+            assignmentOverrides: {
+              nodes: [
+                {
+                  _id: 219,
+                  unassignItem: false,
+                  contextModule: null,
+                  set: {
+                      __typename: "Section",
+                      _id: "1",
+                      name: "Section 1",
+                  },
+                  "__typename": "AssignmentOverride"
+                }
+              ],
+            },
+          },
+        ],
+      })
+      const discussion = DiscussionTopic.mock()
+      discussion.assignment = assignment
+
+      const overrides = buildAssignmentOverrides(discussion)
+      expect(overrides[0].title).toEqual('Section 1')
+    })
   })
 
   describe('for ungraded assignments', () => {

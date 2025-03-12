@@ -414,10 +414,6 @@ $(document).ready(function () {
     })
   })
 
-  $('#account_settings_external_notification_warning_checkbox').on('change', function (_e) {
-    $('#account_settings_external_notification_warning').val($(this).prop('checked') ? 1 : 0)
-  })
-
   $('.custom_help_link .delete').click(function (event) {
     event.preventDefault()
     $(this).parents('.custom_help_link').find('.custom_help_link_state').val('deleted')
@@ -562,29 +558,6 @@ $(document).ready(function () {
       })
       .appendTo('label[for="account_services_' + serviceName + '"]')
   })
-
-  function displayCustomEmailFromName() {
-    let displayText = $('#account_settings_outgoing_email_default_name').val()
-    if (displayText === '') {
-      displayText = I18n.t('custom_text_blank', '[Custom Text]')
-    }
-    $('#custom_default_name_display').text(displayText)
-  }
-  $('.notification_from_name_option').on('change', () => {
-    const $useCustom = $('#account_settings_outgoing_email_default_name_option_custom')
-    const $customName = $('#account_settings_outgoing_email_default_name')
-    if ($useCustom.prop('checked')) {
-      $customName.removeAttr('disabled')
-    } else {
-      $customName.prop('disabled', true)
-    }
-  })
-  $('#account_settings_outgoing_email_default_name').on('keyup', () => {
-    displayCustomEmailFromName()
-  })
-  // Setup initial display state
-  displayCustomEmailFromName()
-  $('.notification_from_name_option').trigger('change')
 
   $('#account_settings_self_registration')
     .change(function () {

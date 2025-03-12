@@ -177,7 +177,7 @@ describe AssignmentOverride do
         expect(override).to be_valid
       end
 
-      it "rejects non collaborative group set when group assignment" do
+      it "allows non collaborative group set when group assignment" do
         @diff_tag_assignment.update!(group_category: @group_category)
         override = @diff_tag_assignment.assignment_overrides.create(
           due_at: 4.days.from_now(@now),
@@ -185,7 +185,7 @@ describe AssignmentOverride do
           set: @differentiation_tag_group
         )
 
-        expect(override).not_to be_valid
+        expect(override).to be_valid
       end
 
       it "rejects non collaborative group set when account setting is disabled" do

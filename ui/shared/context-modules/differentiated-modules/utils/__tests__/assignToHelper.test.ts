@@ -256,6 +256,26 @@ describe('assitnToHelper', () => {
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })
 
+    it('does not include differentiation tag in payload if it is default option', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: '1',
+          isValid: true,
+          hasAssignees: true,
+          selectedAssigneeIds: ['tag-1'] as string[],
+          defaultOptions: ['tag-1'],
+          due_at: null,
+          lock_at: null,
+          unlock_at: null,
+        } as ItemAssignToCardSpec,
+      ]
+      const expectedPayload = <DateDetailsPayload>{
+        assignment_overrides: [] as unknown as DateDetailsOverride[],
+        only_visible_to_overrides: true,
+      }
+      expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
+    })
+
     it('includes an unassigned override for any deleted module assignees', () => {
       const cards: ItemAssignToCardSpec[] = [
         {

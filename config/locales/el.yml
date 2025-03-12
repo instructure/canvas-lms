@@ -1646,6 +1646,7 @@ el:
   add_new_set_of_due_dates_e8e240f: "Προσθέστε νέο σύνολο απο καταληκτικές ημερομηνίες"
   add_new_term_d2217c0d: "Προσθήκη Νέου Εξαμήνου"
   add_page_7ea7ee39: "Προσθήκη Σελίδας"
+  add_page_for_submission_8941db3e: "Πρόσθεση Σελίδας για Υποβολή"
   add_people_7ee4b2ec: "Προσθήκη Ατόμων"
   add_prerequisite_6409bd9: "Προσθήκη Προαπαιτούμενου"
   add_quiz_cebfa28b: "Προσθήκη Κουίζ"
@@ -2658,6 +2659,8 @@ el:
   attendance_ca433183: Παρουσίες
   attendees_eb402bac: Συμμετέχοντες
   attention_aaca1f1d: Προσοχή!
+  attributes: 
+    idp_entity_id: "ID Εξωτερικού Παρόχου Ταυτότητας (ldP)"
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Το περιεχόμενο του αρχείου ήχου δεν υποστηρίζεται από τη συσκευή ή την εφαρμογή σας."
   audio_dd489fcc: "Αρχείο ήχου"
   auth_logging: 
@@ -3333,6 +3336,7 @@ el:
   canvas_thinks_response_is_valid_8cc4a67d: "το Canvas πιστεύει πως η απάντηση είναι έγκυρη"
   canvas_ticketing_email_connector_27e253ae: "Συνδέτης (Connector) Email του Συστήματος Υποβολής Ticket του Canvas"
   canvas_ticketing_web_post_connector_11158897: "Συνδέτης (Connector) Web Post του Συστήματος Υποβολής Ticket του Canvas"
+  canvas_user_id_caf65ef5: "ID Χρήστη του Canvas"
   careful_changes_to_group_membership_will_apply_to__19a9089c: "<mrk mid=\"7448\" mtype=\"seg\">Προσοχή!</mrk> <mrk mid=\"7449\" mtype=\"seg\">Οι αλλαγές στις συνδρομές των ομάδων θα εφαρμοστούν στις ομάδες που έχουν ήδη υποβολές εργασιών.</mrk> <mrk mid=\"7450\" mtype=\"seg\">Οι υποβολές ομαδικών εργασιών ενδέχεται, συνεπώς, να μην ευθυγραμμιστούν.</mrk> <mrk mid=\"7451\" mtype=\"seg\">Θα θέλατε να δημιουργήσετε μια νέα ομάδα για μελλοντικές εργασίες;</mrk>"
   cas_url_4ba2843e: "CAS URL"
   catalog_already_enabled_56478a3c: "Ο κατάλογος είναι ήδη ενεργοποιημένος"
@@ -3384,6 +3388,7 @@ el:
   chosencolor_is_not_a_valid_color_5d542cc: "Το '%{chosenColor}' δεν είναι έγκυρο χρώμα."
   clear_2084585f: Καθαρισμός
   clear_all_e23811b1: "Καθάρισμα Όλων"
+  clear_ui_changed_state_d0aca02d: "Καθαρισμός της κατάστασης του UI που άλλαξε"
   click_for_more_details_on_this_outcome_8c018d2f: "Κάντε κλικ για περισσότερες λεπτομέρειες σχετικά με αυτό το αποτέλεσμα"
   click_here_for_an_account_9536cb36: "Κάντε Κλικ Εδώ για ένα Λογαριασμό"
   click_here_it_s_free_eeccb9cb: "Κάντε Κλικ Εδώ, Είναι Δωρεάν!"
@@ -4419,6 +4424,8 @@ el:
   count_minutes_ago_c1b7d7ef: "%{count} λεπτά πριν"
   count_more_beba6428: "%{count} περισσότερα"
   count_people_489946e7: "%{count} άτομα"
+  count_people_found_1ab374c0: 
+    zero: "Δεν βρέθηκαν άτομα"
   count_points_4735a2e8: 
     one: "1 μόριο"
     other: "%{count} μόρια"
@@ -6006,6 +6013,7 @@ el:
   email_is_invalid_e0d982eb: "H ηλεκτρονική διεύθυνση δεν είναι έγκυρη!"
   email_is_required_736ac26b: "Απαιτείται μια ηλεκτρονική διεύθυνση"
   email_the_user_about_this_account_creation_e63f8759: "Αποστολή email στον χρήστη σχετικά με την δημιουργία λογαριασμού"
+  emails_d07c3348: Email
   enable_6f5d1328: Ενεργοποίηση
   enable_and_lock_e6099cc2: "Ενεργοποίηση και Κλείδωμα"
   enable_feature_title_987d8e9a: "Ενεργοποίηση λειτουργίας: %{title}"
@@ -8271,6 +8279,7 @@ el:
   members_af25c21d: Μέλη
   members_are_free_to_join_defa5929: "Τα μέλη μπορούν ελεύθερα να συμμετάσχουν"
   membership_by_invitation_only_9bc27199: "Συνδρομή μόνο κατόπιν πρόσκλησης"
+  merge_user_accounts_a49e8fb1: "Συγχώνευση Λογαριασμών Χρηστών"
   message: 
     default_subject: "Ειδοποίηση Canvas"
   message_5c38209d: Μήνυμα
@@ -10094,6 +10103,7 @@ el:
   next_steps_ce0f0d0c: "Επόμενα Βήματα"
   next_student_79955068: "Επόμενος Μαθητής"
   no_74e9b590: όχι
+  no_active_user_with_that_id_was_found_b8fb5e14: "Δεν βρέθηκε ενεργός χρήστης με το συγκεκριμένο ID."
   no_assignment_name_adbb215b: "Δεν Υπάρχει Όνομα Εργασίας"
   no_assignment_selected_65d9e422: "Δεν έχει επιλεγεί Εργασία"
   no_content_5dbc9acf: "Κανένα Περιεχόμενο"
@@ -10118,6 +10128,7 @@ el:
   no_migration_file: "Αρχείο που απαιτείται για τη μεταφορά περιεχομένου."
   no_outcome_selected_16d15753: "Δεν έχει επιλεγεί Αποτέλεσμα"
   no_password_was_given_472222e5: "Δεν δόθηκε κωδικός πρόσβασης"
+  no_people_found_67a8ee2f: "Δεν βρέθηκαν άτομα"
   no_placements_enabled_f705f28: "Δεν έχουν Ενεργοποιηθεί Τοποθετήσεις"
   no_preview_available_e8e71199: "Προβολή μη διαθέσιμη"
   no_results_3cda4e72: "Δεν υπάρχουν Αποτελέσματα"
@@ -10666,6 +10677,7 @@ el:
     titles: 
       find_outcomes: "Εύρεση Αποτελεσμάτων"
   outcomes_d1b18d33: Αποτελέσματα
+  override_ui_changes_5e0c56ab: "Υπερίσχυση επί των αλλαγών στο UI"
   overrides: 
     everyone: Όλοι/ες
     everyone_else: "Όλοι οι άλλοι"
@@ -10822,6 +10834,7 @@ el:
   permissions_365c49e: Δικαιώματα
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "επιλέξτε προορισμό, θα σας στείλουμε τα σφάλματα"
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "επιλέξτε τελικό σημείο, θα σας στείλουμε τις αναφορές σφαλμάτων εκεί"
+  pick_dd033b86: Επιλογή
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Επιλέξτε ημερομηνία και ώρα για την παρακάτω συνεδρία:"
   pink_68ad45cb: Ροζ
   pinned_discussions_a55c0cea: "Καρφιτσωμένες Συζητήσεις"
@@ -11277,6 +11290,8 @@ el:
   priority_dd4381ee: Προτεραιότητα
   privacy_290109ea: Απόρρητο
   privacy_policy_c68f482a: "Πολιτική Απορρήτου"
+  process_as_ui_changes_8e34ed2a: "Επεξεργασία ως αλλαγές UI"
+  process_data_2f5f962f: "Επεξεργασία Δεδομένων"
   processing_2fcc9739: "Γίνεται Επεξεργασία"
   product_name: Canvas
   profile: 
@@ -11542,6 +11557,7 @@ el:
       yo: "Υπηρεσία Yo"
     you_have_no_services: "Δεν έχετε καταχωρίσει υπηρεσίες, μπορείτε να προσθέσετε μερικές στη σελίδα *ρυθμίσεις*."
   profile_6bd2baed: Προφιλ
+  profile_picture_13e5338c: "Φωτογραφία Προφίλ"
   profile_pictures_15953851: "Φωτογραφίες Προφίλ"
   profiles: 
     avatar_dialog: 
@@ -13217,6 +13233,7 @@ el:
     course_files: "Αρχεία μαθήματος"
     group_files: "Αρχεία ομάδας"
     my_files: "Τα αρχεία μου"
+  root_account_9d4fcb97: "Λογαριασμός Ρίζας"
   root_accounts_cc035dcf: "Λογαριασμοί Ρίζας"
   roster: 
     error_sending_invitations: "<mrk mid=\"6720\" mtype=\"seg\">Σφάλμα αποστολής πρόσκλησης.</mrk> <mrk mid=\"6721\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
@@ -14938,6 +14955,7 @@ el:
   this_grade_is_currently_dropped_for_this_student_7bc78b78: "Αυτός ο βαθμός έχει, προς το παρόν, απορριφθεί για αυτόν τον φοιτητή/τρια."
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "<mrk mid=\"1753\" mtype=\"seg\">Αυτή η εικόνα εμφανίζεται ως υδατογράφημα φόντου στη σελίδα σας.</mrk> <mrk mid=\"1754\" mtype=\"seg\">Αποδεκτοί τύποι αρχείων: png, svg, gif, jpeg</mrk>"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "<mrk mid=\"5832\" mtype=\"seg\">Αυτή είναι μια αξιόπιστη λίστα URL οριοθετούμενων από κόμματα.</mrk> <mrk mid=\"5833\" mtype=\"seg\">Αν θεωρηθεί αξιόπιστο κάθε URL που βρίσκεται σε αυτή τη λίστα, αυτό θα οδηγήσει στο να προσπεραστεί κάθε CSRF token κατά τη σύνδεσή σας στο Canvas.</mrk>"
+  this_is_a_full_batch_update_99d726e0: "Πρόκειται για μαζική ενημέρωση των τμημάτων"
   this_is_a_group_discussion_2f9acdae: "Αυτή είναι μια Ομαδική Συζήτηση"
   this_is_a_media_comment_click_here_to_view_c297bf62: "Αυτό είναι ένα πολυμεσικό σχόλιο, *κάντε κλικ εδώ για προβολή*."
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Αυτός είναι ο τρέχων επιλεγμένος βαθμός για αυτόν τον σπουδαστή."
@@ -15165,6 +15183,7 @@ el:
   title_is_off_6c823e2d: "%{title} είναι απενεργοποιημένο "
   title_is_on_2b72a9b7: "%{title} έχει ενεργοποιηθεί"
   title_is_too_long_b192a46a: "Ο τίτλος είναι πολύ μεγάλος"
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "Ο Τίτλος πρέπει να περιέχει τουλάγιστον ένα γράμμα-χαρακτήρα ή αριθμό"
   title_separator: ":"
   titles: 
     aligned_items: "Ευθυγραμμισμένα Στοιχεία"
@@ -15189,6 +15208,7 @@ el:
       <mrk mid="4697" mtype="seg">Αν ο πάροχος μπορεί να δημιουργήσει έγκυρα URL επανάκλησης ή ανακατεύθυνσης, χρησιμοποιήστε το %{callback_url}.</mrk>
   to_date_7c45ee77: "Μέχρι την ημερ/νία"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Για να συνδέσετε τον παρατηρητή του μαθήματος *%{name}* με κάποιον σπουδαστή, ξεκινήστε να πληκτρολογείτε το όνομα του σπουδαστή παρακάτω για να τον βρείτε και μετά πατήστε Ενημέρωση."
+  to_make_a_new_page_for_this_submission_select_a_se_6cd921aa: "Για να δημιουργήσετε μια νέα σελίδα για την υποβολή, επιλέξτε έναν τομέα και εισαγάγετε το όνομα της νέας σελίδας."
   to_minscore_43e5452e: "σε %{minScore}%"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Για να καρφιτσώσετε μια συζήτηση στο επάνω μέρος της σελίδας, σύρετε τη συζήτηση εδώ ή επιλέξτε Καρφίτσωμα από το μενού ρυθμίσεων της συζήτησης."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Για να περιορίσετε χρήστες από το συγκεκριμένο domain Google Apps, εισαγάγετε το domain εδώ."
@@ -15423,6 +15443,7 @@ el:
     titles: 
       add_login: "Προσθήκη Σύνδεσης"
       update_login: "Ενημέρωση Σύνδεσης"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "<mrk mid=\"3718\" mtype=\"seg\">Η συγχώνευση χρήστη απέτυχε.</mrk> <mrk mid=\"3719\" mtype=\"seg\">Παρακαλώ βεβαιωθείτε ότι έχετε την απαιτούμενη εξουσιοδότηση και δοκιμάστε ξανά.</mrk>"
   user_name: 
     buttons: 
       update_user: "Ενημέρωση Χρήστη"
@@ -15990,6 +16011,8 @@ el:
   windows_tile_color_2b786bd9: "Χρώμα Πλακιδίου Windows:"
   windows_tile_square_b91d2b33: "<mrk mid=\"4701\" mtype=\"seg\">Πλακίδιο Windows:</mrk> <mrk mid=\"4702\" mtype=\"seg\">Τετράγωνο</mrk>"
   windows_tile_wide_4d40910: "<mrk mid=\"4703\" mtype=\"seg\">Πλακίδιο Windows:</mrk> <mrk mid=\"4704\" mtype=\"seg\">Ευρύ</mrk>"
+  with_this_option_selected_all_fields_in_all_record_14a361c9: "Αν ενενεργοποιήσετε αυτήν την επιλογή, όλα τα πεδία σε όλες τις καταγραφές που επηρεάζονται από την εισαγωγή προς το SIS θα μπορούν να αλλάξουν σε μελλοντικές μη υπερισχύουσες εισαγωγές προς το SIS."
+  with_this_option_selected_changes_made_through_thi_e751dd22: "Έχοντας ενεργοποιήσει αυτή την επιλογή, η επεξεργασία των αλλαγών που γίνονται μέσω της εισαγωγής προς το SIS θα γίνεται σαν να επρόκειτο για αλλαγές UI, εμποδίζοντας την αλλαγή των πεδίων που άλλαξαν εδώ σε επόμενες μη υπερισχύουσες εισαγωγές προς το SIS."
   workflow_state_cc8d711a: "Κατάσταση Ροής Εργασιών"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Θα θέλατε να αποδεχτείτε ή να παραβλέψετε αυτή την ενημέρωση;"
   would_you_like_to_enable_this_app_ccdf735d: "Θα θέλετε να ενεργοποιήσετε αυτή την εφαρμογή;"
@@ -16015,9 +16038,11 @@ el:
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "Μπορείτε να συνδεθείτε απευθείας με αυτόν τον πάροχο στο %{url}"
   you_can_review_the_submission_details_by_clicking__58a7753: "Μπορείτε να ελέγξετε τις λεπτομέρειες υποβολής κάνοντας κλικ στον παρακάτω σύνδεσμο:"
   you_can_review_the_submission_details_by_clicking__9abc5515: "<mrk mid=\"371\" mtype=\"seg\">Μπορείτε να ελέγξετε τις λεπτομέρειες υποβολής κάνοντας κλικ σε αυτόν τον σύνδεσμο:</mrk> <mrk mid=\"372\" mtype=\"seg\">%{link}.</mrk>"
+  you_can_search_by_25d8e2b2: "Μπορείτε να εκτελέσετε ευρετηρίαση με:"
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "<mrk mid=\"4917\" mtype=\"seg\">Μπορείτε να δείτε λεπτομέρειες για αυτή την ομάδα κάνοντας κλικ σε αυτόν τον σύνδεσμο:</mrk> <mrk mid=\"4918\" mtype=\"seg\">%{link}.</mrk>"
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Δεν μπορείτε να διαγράψετε ένα υπολογαριασμό που περιέχει μαθήματα."
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "<mrk mid=\"862\" mtype=\"seg\">Δεν μπορείτε να επεξεργαστείτε αυτή τη ρουμπρίκα είτε επειδή δεν έχετε άδεια ή επειδή χρησιμοποιείται σε περισσότερα από ένα σημεία.</mrk> <mrk mid=\"863\" mtype=\"seg\">Τυχόν αλλαγές που θα πραγματοποιήσετε θα έχουν ως αποτέλεσμα μια νέα ρουμπρίκα βασισμένη στην παλιά ρουμπρίκα.</mrk> <mrk mid=\"864\" mtype=\"seg\">Θέλετε, παρόλα αυτά, να συνεχίσετε;</mrk>"
+  you_can_t_merge_an_account_with_itself_15f58d41: "Δεν μπορείτε να συγχωνεύσετε λογαριασμό με αυτόν τον ίδιο λογαριασμό."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Μπορείτε να ενημερώσετε μερικές από τις πληροφορίες αυτού του χρήστη, αλλά ο ίδιος μπορεί να τις επαναφέρει αν θέλει."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Μπορείτε να χρησιμοποιήσετε ένα μεμονωμένο 16x16, 32x32, 48x48 αρχείο τύπου ico."
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Δεν μπορείτε να τροποποιήσετε θέματα σε αυτό τον υπο-λογαρισμό"

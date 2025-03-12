@@ -43,6 +43,7 @@ import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 import {toUndefined} from '../../common/lib/toUndefined'
 import {Footer} from '../registration_wizard_forms/Footer'
 import {isLtiPlacementWithIcon} from '../model/LtiPlacement'
+import {Header} from '../registration_wizard_forms/Header'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -98,17 +99,21 @@ export const Lti1p3RegistrationWizard = ({
   switch (store.state._step) {
     case 'LaunchSettings':
       return (
-        <LaunchSettings
-          internalConfig={internalConfiguration}
-          overlayStore={store.state.overlayStore}
-          reviewing={store.state.reviewing}
-          onPreviousClicked={unregister}
-          onNextClicked={handleNextClicked('Permissions')}
-        />
+        <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
+          <LaunchSettings
+            internalConfig={internalConfiguration}
+            overlayStore={store.state.overlayStore}
+            reviewing={store.state.reviewing}
+            onPreviousClicked={unregister}
+            onNextClicked={handleNextClicked('Permissions')}
+          />
+        </>
       )
     case 'Permissions':
       return (
         <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
           <PermissionConfirmationWrapper
             overlayStore={store.state.overlayStore}
             internalConfig={internalConfiguration}
@@ -124,6 +129,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'DataSharing':
       return (
         <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
           <PrivacyConfirmationWrapper
             internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
@@ -139,6 +145,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'Placements':
       return (
         <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
           <PlacementsConfirmationWrapper
             internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
@@ -153,17 +160,21 @@ export const Lti1p3RegistrationWizard = ({
       )
     case 'OverrideURIs':
       return (
-        <OverrideURIsConfirmation
-          overlayStore={store.state.overlayStore}
-          internalConfig={internalConfiguration}
-          reviewing={store.state.reviewing}
-          onPreviousClicked={handlePreviousClicked('Placements')}
-          onNextClicked={handleNextClicked('Naming')}
-        />
+        <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
+          <OverrideURIsConfirmation
+            overlayStore={store.state.overlayStore}
+            internalConfig={internalConfiguration}
+            reviewing={store.state.reviewing}
+            onPreviousClicked={handlePreviousClicked('Placements')}
+            onNextClicked={handleNextClicked('Naming')}
+          />
+        </>
       )
     case 'Naming':
       return (
         <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
           <NamingConfirmationWrapper
             internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
@@ -185,17 +196,21 @@ export const Lti1p3RegistrationWizard = ({
       )
     case 'Icons':
       return (
-        <IconConfirmationWrapper
-          internalConfig={internalConfiguration}
-          reviewing={store.state.reviewing}
-          overlayStore={store.state.overlayStore}
-          onPreviousButtonClicked={handlePreviousClicked('Naming')}
-          onNextButtonClicked={handleNextClicked('Review')}
-        />
+        <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
+          <IconConfirmationWrapper
+            internalConfig={internalConfiguration}
+            reviewing={store.state.reviewing}
+            overlayStore={store.state.overlayStore}
+            onPreviousButtonClicked={handlePreviousClicked('Naming')}
+            onNextButtonClicked={handleNextClicked('Review')}
+          />
+        </>
       )
     case 'Review':
       return (
         <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
           <ReviewScreenWrapper
             overlayStore={store.state.overlayStore}
             internalConfig={internalConfiguration}
@@ -230,36 +245,45 @@ export const Lti1p3RegistrationWizard = ({
       )
     case 'Installing':
       return (
-        <RegistrationModalBody>
-          <Flex justifyItems="center" alignItems="center" height="100%">
-            <Flex.Item>
-              <Spinner renderTitle={I18n.t('Installing App')} />
-            </Flex.Item>
-            <Flex.Item>{I18n.t('Installing App')}</Flex.Item>
-          </Flex>
-        </RegistrationModalBody>
+        <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
+          <RegistrationModalBody>
+            <Flex justifyItems="center" alignItems="center" height="100%">
+              <Flex.Item>
+                <Spinner renderTitle={I18n.t('Installing App')} />
+              </Flex.Item>
+              <Flex.Item>{I18n.t('Installing App')}</Flex.Item>
+            </Flex>
+          </RegistrationModalBody>
+        </>
       )
     case 'Updating':
       return (
-        <RegistrationModalBody>
-          <Flex justifyItems="center" alignItems="center" height="100%">
-            <Flex.Item>
-              <Spinner renderTitle={I18n.t('Updating App')} />
-            </Flex.Item>
-            <Flex.Item>{I18n.t('Updating App')}</Flex.Item>
-          </Flex>
-        </RegistrationModalBody>
+        <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
+          <RegistrationModalBody>
+            <Flex justifyItems="center" alignItems="center" height="100%">
+              <Flex.Item>
+                <Spinner renderTitle={I18n.t('Updating App')} />
+              </Flex.Item>
+              <Flex.Item>{I18n.t('Updating App')}</Flex.Item>
+            </Flex>
+          </RegistrationModalBody>
+        </>
       )
     case 'Error':
       return (
-        <RegistrationModalBody>
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorSubject={I18n.t('Dynamic Registration error')}
-            errorCategory="Dynamic Registration"
-            errorMessage={store.state.errorMessage}
-          />
-        </RegistrationModalBody>
+        <>
+          <Header onClose={unregister} editing={!!existingRegistration} />
+          <RegistrationModalBody>
+            <GenericErrorPage
+              imageUrl={errorShipUrl}
+              errorSubject={I18n.t('Dynamic Registration error')}
+              errorCategory="Dynamic Registration"
+              errorMessage={store.state.errorMessage}
+            />
+          </RegistrationModalBody>
+        </>
       )
   }
 }

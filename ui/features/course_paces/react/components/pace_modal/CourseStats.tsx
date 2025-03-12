@@ -22,17 +22,23 @@ import { StoreState, PaceContext } from '../../types'
 import { Pill } from '@instructure/ui-pill'
 import { Flex } from '@instructure/ui-flex'
 import { getIsDraftPace, getCoursePaceItems } from '../../reducers/course_paces'
+import { isBulkEnrollment } from '../../reducers/pace_contexts'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('course_stats')
 
 interface CourseStatsProps {
   readonly assignmentsCount: number
   readonly isDraftPace: boolean
   readonly paceContext: PaceContext
+  readonly isBulkEnrollment: boolean
 }
 
 export const CourseStats = ({
   assignmentsCount,
   isDraftPace,
-  paceContext
+  paceContext,
+  isBulkEnrollment
 }: CourseStatsProps) => {
   const StatusElement = ({ title, statValue, dataTestId }: { title: string, statValue: string | number, dataTestId: string }) => {
 
@@ -44,14 +50,20 @@ export const CourseStats = ({
       </Flex.Item>
     )
   }
-
   return (
     <Flex gap="small" margin="small none" data-testid="course-stats-info">
       {isDraftPace &&
-        <StatusElement title='Status' statValue='Draft' dataTestId='status-draft' />
+        <StatusElement title={I18n.t('Status')} statValue={I18n.t('Draft')} dataTestId='status-draft' />
       }
-      <StatusElement title='Student Enrolled' statValue={paceContext?.associated_student_count} dataTestId='student-enrollment-count' />
-      <StatusElement title='Assignments Count' statValue={assignmentsCount} dataTestId='assignments-count' />
+      {
+        paceContext.type !== "StudentEnrollment" && !isBulkEnrollment &&
+        <StatusElement title={I18n.t('Students Enrolled')} statValue={paceContext?.associated_student_count} dataTestId='student-enrollment-count' />
+      }
+      {
+        isBulkEnrollment &&
+        <StatusElement title={I18n.t('Students in Bulk Edit')} statValue={paceContext?.associated_student_count} dataTestId='bulk-student-enrollment-count' />
+      }
+      <StatusElement title={I18n.t('Assignment Count')} statValue={assignmentsCount} dataTestId='assignments-count' />
     </Flex>
   )
 }
@@ -59,7 +71,8 @@ export const CourseStats = ({
 const mapStateToProps = (state: StoreState) => {
   return {
     assignmentsCount: getCoursePaceItems(state).length,
-    isDraftPace: getIsDraftPace(state)
+    isDraftPace: getIsDraftPace(state),
+    isBulkEnrollment: isBulkEnrollment(state)
   }
 }
 

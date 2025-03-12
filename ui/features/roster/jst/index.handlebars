@@ -22,14 +22,11 @@
       placeholder='{{#t "search_people"}}Search people{{/t}}'
       aria-label='{{#t "filter_field_description"}}Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.{{/t}}'
       >
-
     <select
       name="enrollment_role_id"
       data-view="roleSelect"
       aria-label='{{#t "role_to_search"}}Limit search to role{{/t}}'
       ></select>
-    <div id="userDiffTagManager"></div>
-    <div id="manageTagsTray"></div>
     {{#if permissions.add_users_to_course}}
     {{#if course.concluded}}
     <a
@@ -53,6 +50,8 @@
       >{{#t "people"}}People{{/t}}</a>
     {{/if}}
     {{/if}}
+    <div id="userDiffTagManager" style="margin-top:1.5em"></div>
+    <div id="manageTagsTray"></div>
 
     <div class="v-gutter">
       <div data-view="resendInvitations"></div>
@@ -63,4 +62,5 @@
   <div id="createUsersModalHolder"></div>
   <div id="differentiationTagTray"></div>
   <div id="userTagsModalContainer"></div>
+  <div id="link_to_students_mount_point"></div>
 </div>

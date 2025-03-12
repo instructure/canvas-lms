@@ -21,11 +21,13 @@ require_relative "../common"
 require_relative "../helpers/wiki_and_tiny_common"
 require_relative "../helpers/public_courses_context"
 require_relative "../helpers/files_common"
+require_relative "../helpers/items_assign_to_tray"
 
 describe "Wiki Pages" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include WikiAndTinyCommon
+  include ItemsAssignToTray
 
   context "Navigation" do
     def edit_page(edit_text)
@@ -254,6 +256,38 @@ describe "Wiki Pages" do
 
       driver.action.move_by(10, 10).perform
       expect(element_exists?(element_selector)).to be_truthy
+    end
+
+    context "Assign To differentiation tags" do
+      before do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+
+        @differentiation_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+        @diff_tag1 = @course.groups.create!(name: "Differentiation Tag 1", group_category: @differentiation_tag_category, non_collaborative: true)
+        @diff_tag2 = @course.groups.create!(name: "Differentiation Tag 2", group_category: @differentiation_tag_category, non_collaborative: true)
+      end
+
+      it "can assign wiki-pages to differentiation tags" do
+        @course.wiki_pages.create!(title: "B-Team")
+        get "/courses/#{@course.id}/pages"
+        f("tbody .al-trigger").click
+        fj("[role=menuitem]:contains('Assign To...')").click
+        f(add_assign_to_card_selector).click
+        assignee_selector = ff("[data-testid='assignee_selector']")[1]
+        assignee_selector.send_keys("Differentiation Tag 1")
+        assignee_selector.send_keys(:enter)
+        save_button.click
+
+        # Reopen tray and verify that it saved
+        f("tbody .al-trigger").click
+        fj("[role=menuitem]:contains('Assign To...')").click
+        expect(assign_to_in_tray("Remove #{@diff_tag1.name}")[0]).to be_displayed
+      end
     end
   end
 

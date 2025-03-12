@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
@@ -31,6 +31,10 @@ import {
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import DeleteModal from './DeleteModal'
+import {type File, type Folder} from '../../../interfaces/File'
+import {getUniqueId} from '../../../utils/fileFolderUtils'
+import { downloadZip } from '../../../utils/downloadUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -40,6 +44,7 @@ interface BulkActionButtonsProps {
   totalRows: number
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
+  rows: (File | Folder)[]
 }
 
 const BulkActionButtons = ({
@@ -48,100 +53,123 @@ const BulkActionButtons = ({
   totalRows,
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
+  rows,
 }: BulkActionButtonsProps) => {
   const isEnabled = selectedRows.size >= 1
   const selectedText = !isEnabled
     ? I18n.t('0 selected')
-    : I18n.t('%{selected} of %{total} selected', {selected: selectedRows.size, total: totalRows})
+    : I18n.t('%{selected} of %{total} selected', { selected: selectedRows.size, total: totalRows })
   const justifyItems = size === 'small' ? 'space-between' : 'end'
 
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [itemsToDelete, setItemsToDelete] = useState<(File | Folder)[]>([])
+
+  const handleDeleteClick = () => {
+    setItemsToDelete(rows.filter(row => selectedRows.has(getUniqueId(row))))
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
+
   return (
-    <Flex gap="small" justifyItems={justifyItems}>
-      <Flex.Item>
-        <Text>{selectedText}</Text>
-      </Flex.Item>
-      <Flex.Item>
-        <Flex gap="small">
-          <Flex.Item>
-            <IconButton
-              disabled={!isEnabled}
-              renderIcon={<IconDownloadLine />}
-              screenReaderLabel={I18n.t('Download')}
-            />
-          </Flex.Item>
-          {userCanDeleteFilesForContext && (
-            <Flex.Item data-testid="bulk-actions-delete-button">
+    <>
+      <Flex gap="small" justifyItems={justifyItems}>
+        <Flex.Item>
+          <Text>{selectedText}</Text>
+        </Flex.Item>
+        <Flex.Item>
+          <Flex gap="small">
+            <Flex.Item>
               <IconButton
                 disabled={!isEnabled}
-                renderIcon={<IconTrashLine />}
-                screenReaderLabel={I18n.t('Delete')}
-              />
+                renderIcon={<IconDownloadLine />}
+                screenReaderLabel={I18n.t('Download')}
+                onClick={() => downloadZip(selectedRows)}
+            />
             </Flex.Item>
-          )}
-          <Flex.Item>
-            <Menu
-              placement="bottom"
-              trigger={
+            {userCanDeleteFilesForContext && (
+              <Flex.Item>
                 <IconButton
-                  renderIcon={<IconMoreLine />}
+                  data-testid="bulk-actions-delete-button"
                   disabled={!isEnabled}
-                  screenReaderLabel={I18n.t('Actions')}
-                  data-testid="bulk-actions-more-button"
+                  renderIcon={<IconTrashLine />}
+                  screenReaderLabel={I18n.t('Delete')}
+                  onClick={handleDeleteClick}
                 />
-              }
-            >
-              <Menu.Item>
-                <Flex alignItems="center" gap="x-small">
-                  <Flex.Item>
-                    <IconEyeLine inline={false} />
-                  </Flex.Item>
-                  <Flex.Item>
-                    <Text>{I18n.t('View')}</Text>
-                  </Flex.Item>
-                </Flex>
-              </Menu.Item>
+              </Flex.Item>
+            )}
+            <Flex.Item>
+              <Menu
+                placement="bottom"
+                trigger={
+                  <IconButton
+                    renderIcon={<IconMoreLine />}
+                    disabled={!isEnabled}
+                    screenReaderLabel={I18n.t('Actions')}
+                    data-testid="bulk-actions-more-button"
+                  />
+                }
+              >
+                <Menu.Item>
+                  <Flex alignItems="center" gap="x-small">
+                    <Flex.Item>
+                      <IconEyeLine inline={false} />
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Text>{I18n.t('View')}</Text>
+                    </Flex.Item>
+                  </Flex>
+                </Menu.Item>
 
-              {userCanEditFilesForContext && (
-                <Menu.Item data-testid="bulk-actions-edit-permissions-button">
-                  <Flex alignItems="center" gap="x-small">
-                    <Flex.Item>
-                      <IconPermissionsLine inline={false} />
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Text>{I18n.t('Edit Permissions')}</Text>
-                    </Flex.Item>
-                  </Flex>
-                </Menu.Item>
-              )}
-              {userCanEditFilesForContext && (
-                <Menu.Item data-testid="bulk-actions-manage-usage-rights-button">
-                  <Flex alignItems="center" gap="x-small">
-                    <Flex.Item>
-                      <IconCloudLockLine inline={false} />
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Text>{I18n.t('Manage Usage Rights')}</Text>
-                    </Flex.Item>
-                  </Flex>
-                </Menu.Item>
-              )}
-              {userCanEditFilesForContext && (
-                <Menu.Item data-testid="bulk-actions-move-button">
-                  <Flex alignItems="center" gap="x-small">
-                    <Flex.Item>
-                      <IconExpandItemsLine inline={false} />
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Text>{I18n.t('Move To...')}</Text>
-                    </Flex.Item>
-                  </Flex>
-                </Menu.Item>
-              )}
-            </Menu>
-          </Flex.Item>
-        </Flex>
-      </Flex.Item>
-    </Flex>
+                {userCanEditFilesForContext && (
+                  <Menu.Item data-testid="bulk-actions-edit-permissions-button">
+                    <Flex alignItems="center" gap="x-small">
+                      <Flex.Item>
+                        <IconPermissionsLine inline={false} />
+                      </Flex.Item>
+                      <Flex.Item>
+                        <Text>{I18n.t('Edit Permissions')}</Text>
+                      </Flex.Item>
+                    </Flex>
+                  </Menu.Item>
+                )}
+                {userCanEditFilesForContext && (
+                  <Menu.Item data-testid="bulk-actions-manage-usage-rights-button">
+                    <Flex alignItems="center" gap="x-small">
+                      <Flex.Item>
+                        <IconCloudLockLine inline={false} />
+                      </Flex.Item>
+                      <Flex.Item>
+                        <Text>{I18n.t('Manage Usage Rights')}</Text>
+                      </Flex.Item>
+                    </Flex>
+                  </Menu.Item>
+                )}
+                {userCanEditFilesForContext && (
+                  <Menu.Item data-testid="bulk-actions-move-button">
+                    <Flex alignItems="center" gap="x-small">
+                      <Flex.Item>
+                        <IconExpandItemsLine inline={false} />
+                      </Flex.Item>
+                      <Flex.Item>
+                        <Text>{I18n.t('Move To...')}</Text>
+                      </Flex.Item>
+                    </Flex>
+                  </Menu.Item>
+                )}
+              </Menu>
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+      </Flex>
+      <DeleteModal
+        open={isModalOpen}
+        items={itemsToDelete}
+        onClose={handleCloseModal}
+      />
+    </>
   )
 }
 

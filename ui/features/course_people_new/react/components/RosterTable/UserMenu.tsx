@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {ReactNode, FC} from 'react'
+import React, {type ReactNode, type FC} from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
@@ -32,7 +32,7 @@ import {
 import useCoursePeopleContext from '../../hooks/useCoursePeopleContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {OBSERVER_ENROLLMENT, INACTIVE_ENROLLMENT} from '../../../util/constants'
-import type {Enrollment, CustomLink} from '../../types'
+import type {Enrollment, CustomLink} from '../../../types'
 
 const I18n = createI18nScope('course_people')
 
@@ -66,11 +66,11 @@ const MenuItem: FC<MenuItemProps> = ({
 export type UserMenuProps = {
   uid: string
   name: string
-  userUrl: string
+  htmlUrl: string
   canManage: boolean
   canRemoveUsers: boolean
   enrollments: Enrollment[]
-  customLinks?: CustomLink[]
+  customLinks: CustomLink[] | null
   onResendInvitation: () => void
   onLinkStudents: () => void
   onEditSections: () => void
@@ -84,7 +84,7 @@ export type UserMenuProps = {
 const UserMenu: FC<UserMenuProps> = ({
   uid,
   name,
-  userUrl,
+  htmlUrl,
   canManage,
   canRemoveUsers,
   enrollments,
@@ -103,7 +103,7 @@ const UserMenu: FC<UserMenuProps> = ({
     courseConcluded,
   } = useCoursePeopleContext()
 
-  const isInactive = enrollments.every(e => e.enrollment_state === INACTIVE_ENROLLMENT)
+  const isInactive = enrollments.every(e => e.state === INACTIVE_ENROLLMENT)
   const canResendInvitation = !isInactive &&
     enrollments.some(e => activeGranularEnrollmentPermissions.includes(e.type))
   const isObserver = enrollments.some(e => e.type === OBSERVER_ENROLLMENT)
@@ -112,10 +112,10 @@ const UserMenu: FC<UserMenuProps> = ({
   const canEditSections = !isInactive && !(sectionEditableEnrollments?.length === 0)
   const canEditRoles = canRemoveUsers &&
     !courseConcluded &&
-    !(enrollments.some(e => e.type === OBSERVER_ENROLLMENT && e.associatedUser?.id))
+    !(enrollments.some(e => e.type === OBSERVER_ENROLLMENT && e.associatedUser?._id))
 
-  const renderCustomLinks = () => (customLinks || []).map(({id, url, icon_class, text}) => (
-    <Menu.Item key={id} href={url} onClick={onCustomLinkSelect} data-testid={`custom-link-${id}-user-${uid}`}>
+  const renderCustomLinks = () => (customLinks || []).map(({_id, url, icon_class, text}) => (
+    <Menu.Item key={_id} href={url} onClick={onCustomLinkSelect} data-testid={`custom-link-${_id}-user-${uid}`}>
       <i className={icon_class} />
       <View margin="0 0 0 x-small">{text}</View>
     </Menu.Item>
@@ -171,7 +171,7 @@ const UserMenu: FC<UserMenuProps> = ({
         </MenuItem>
       )}
       <MenuItem
-        href={userUrl}
+        href={htmlUrl}
         label={I18n.t('User Details')}
         testId={`details-user-${uid}`}
       >

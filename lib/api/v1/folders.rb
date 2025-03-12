@@ -42,8 +42,8 @@ module Api::V1::Folders
       json["all_url"] = api_v1_list_folders_and_files_url(folder) if Account.site_admin.feature_enabled?(:files_a11y_rewrite)
       json["folders_url"] = api_v1_list_folders_url(folder)
       json["files_url"] = api_v1_list_files_url(folder)
-      json["files_count"] = can_view_hidden_files ? folder.attachments.not_deleted.count : folder.attachments.active.count
-      json["folders_count"] = can_view_hidden_files ? folder.sub_folders.active.count : folder.sub_folders.active.not_hidden.count
+      json["files_count"] = can_view_hidden_files ? folder.attachments.not_deleted.count : folder.attachments.active.not_locked.count
+      json["folders_count"] = can_view_hidden_files ? folder.sub_folders.active.count : folder.sub_folders.active.not_hidden.not_locked.count
       json["hidden"] = folder.hidden?
       json["locked_for_user"] = can_view_hidden_files ? false : !!folder.currently_locked
       json["hidden_for_user"] = can_view_hidden_files ? false : !!folder.hidden?

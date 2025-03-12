@@ -35,6 +35,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
+import {IconWarningSolid} from '@instructure/ui-icons'
 import AiIcon from '@canvas/ai-icon'
 
 const I18n = createI18nScope('discussion_posts')
@@ -63,10 +64,10 @@ export function PostMessage({...props}) {
     heading = 'h' + depth.toString()
   }
 
-  const {translationLanguages, translateTargetLanguage} = useContext(DiscussionManagerUtilityContext)
+  const {translationLanguages, translateTargetLanguage, translationLoading, setTranslationLoading} = useContext(DiscussionManagerUtilityContext)
   const [translatedTitle, setTranslatedTitle] = useState(null)
   const [translatedMessage, setTranslatedMessage] = useState(null)
-  const [isTranslating, setIsTranslating] = useState(false)
+  const [translationError, setTranslationError] = useState(null)
 
   // Shouldn't fire if not feature flagged.
   // TODO Create a custom hook for translation logic.
@@ -77,24 +78,35 @@ export function PostMessage({...props}) {
       return
     }
 
+    setTranslationError(null)
+
     const translationAttempts = [
       getTranslation(props.title, translateTargetLanguage),
       getTranslation(props.message, translateTargetLanguage),
     ]
 
     // Begin translating, clear spinner when done.
-    setIsTranslating(true)
     Promise.all(translationAttempts)
       .then(translations => {
         setTranslatedTitle(translations[0])
         setTranslatedMessage(translations[1])
       })
-      .catch(() => {
+      .catch((e) => {
         setTranslatedTitle(null)
         setTranslatedMessage(null)
+
+        if(e.translationError) {
+          setTranslationError(e.translationError)
+        } else {
+          setTranslationError({type: 'error', message: I18n.t('There was an unexpected error during translation.')})
+        }
       })
-      .finally(() => setIsTranslating(false))
+      .finally(() => setTranslationLoading(false))
   }, [translateTargetLanguage, props.title, props.message])
+
+  const isTitleTranslationReady = !props.title || translatedTitle
+  const isMessageTranslationReady = !props.message || translatedMessage
+  const isTranslationReady = !translationLoading && translateTargetLanguage && isTitleTranslationReady && isMessageTranslationReady
 
   return (
     <Responsive
@@ -144,7 +156,7 @@ export function PostMessage({...props}) {
               </Text>
             </View>
           )}
-          {isTranslating && (
+          {translationLoading && (
             <Flex justifyItems="start">
               <Flex.Item>
                 <Spinner renderTitle={I18n.t('Translating')} size="x-small" />
@@ -187,41 +199,58 @@ export function PostMessage({...props}) {
                     props.isTopic ? props.discussionTopic?._id : props.discussionEntry?._id
                   }
                 />
-                {translateTargetLanguage && translatedMessage && (!props.title || translatedTitle) && (
-                  <>
-                    <Flex direction="row" alignItems="center" margin="medium 0 medium 0">
-                      <Flex.Item shouldGrow margin="0 small 0 0">
-                        <hr role="presentation" aria-hidden="true" style={hrStyle} />
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Text color="secondary" fontStyle="italic">
-                          <span style={{marginRight: '0.5rem'}}><AiIcon /></span>
-                          <span>
+                {translateTargetLanguage && (isTranslationReady || translationError) && (
+                  <Flex direction="row" alignItems="center" margin="medium 0 medium 0">
+                    <Flex.Item shouldGrow margin="0 small 0 0">
+                      <hr role="presentation" aria-hidden="true" style={hrStyle} />
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Text color="secondary" size="small" fontStyle="italic">
+                        <span style={{marginRight: '0.5rem'}}><AiIcon /></span>
+                        <span>
                             {translationLanguages.current.find(language => language.id === translateTargetLanguage).translated_to_name}
                           </span>
-                        </Text>
-                      </Flex.Item>
-                      <Flex.Item shouldGrow margin="0 0 0 small">
-                        <hr role="presentation" aria-hidden="true" style={hrStyle} />
-                      </Flex.Item>
-                    </Flex>
-                    <Text size={responsiveProps.titleTextSize} data-testid="message_title_translated" weight="bold">
-                      <AccessibleContent alt={translatedTitle} data-testid="post-title-translated">
-                        <span lang={translateTargetLanguage}>{translatedTitle}</span>
-                      </AccessibleContent>
-                    </Text>
-                    <SearchSpan
-                      lang={translateTargetLanguage}
-                      isSplitView={props.isSplitView}
-                      searchTerm={searchTerm}
-                      text={translatedMessage}
-                      isAnnouncement={props.discussionTopic?.isAnnouncement}
-                      isTopic={props.isTopic}
-                      resourceId={
-                        props.isTopic ? props.discussionTopic?._id : props.discussionEntry?._id
-                      }
-                      testId="post-message-translated"
-                    />
+                      </Text>
+                    </Flex.Item>
+                    <Flex.Item shouldGrow margin="0 0 0 small">
+                      <hr role="presentation" aria-hidden="true" style={hrStyle} />
+                    </Flex.Item>
+                  </Flex>
+                )}
+                {!translationLoading && translateTargetLanguage && translationError?.type === 'error' && (
+                  <Flex direction="row" alignItems="center" margin="0 0 small 0" gap="x-small">
+                      <IconWarningSolid color="error" title="warning" />
+                      <Text color="danger" data-testid="error_type_error">{translationError.message}</Text>
+                  </Flex>
+                )}
+                {!translationLoading && translateTargetLanguage && translationError?.type === 'info' && (
+                  <Flex direction="row" alignItems="center" margin="0 0 small 0" gap="x-small">
+                    <Text color="secondary" fontStyle="italic" data-testid="error_type_info">{translationError.message}</Text>
+                  </Flex>
+                )}
+                {isTranslationReady && (
+                  <>
+                    {translatedTitle && (
+                      <Text size={responsiveProps.titleTextSize} data-testid="message_title_translated" weight="bold">
+                        <AccessibleContent alt={translatedTitle} data-testid="post-title-translated">
+                          <span lang={translateTargetLanguage}>{translatedTitle}</span>
+                        </AccessibleContent>
+                      </Text>
+                    )}
+                    {translatedMessage && (
+                      <SearchSpan
+                        lang={translateTargetLanguage}
+                        isSplitView={props.isSplitView}
+                        searchTerm={searchTerm}
+                        text={translatedMessage}
+                        isAnnouncement={props.discussionTopic?.isAnnouncement}
+                        isTopic={props.isTopic}
+                        resourceId={
+                          props.isTopic ? props.discussionTopic?._id : props.discussionEntry?._id
+                        }
+                        testId="post-message-translated"
+                      />
+                    )}
                   </>
                 )}
               </div>

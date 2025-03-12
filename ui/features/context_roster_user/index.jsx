@@ -26,7 +26,6 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
-import '@canvas/link-enrollment'
 import {datetimeString} from '@canvas/datetime/date-functions'
 
 const I18n = createI18nScope('context.roster_user')

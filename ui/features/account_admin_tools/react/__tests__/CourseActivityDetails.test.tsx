@@ -41,7 +41,7 @@ describe('CourseActivityDetails', () => {
     const eventId = screen.getByText(props.id)
     const date = screen.getByText(dateString(props.created_at, {format: 'medium'}))
     const time = screen.getByText(timeString(props.created_at))
-    const userName = screen.getByText(props.user.name)
+    const userName = screen.getByText(props.user?.name ? props.user.name : 'mock@user.com')
     const source = screen.getByText(props.event_source_present)
     const type = screen.getByText(props.event_type_present)
 
@@ -143,5 +143,22 @@ describe('CourseActivityDetails', () => {
       expect(screen.getByText(from)).toBeInTheDocument()
       expect(screen.getByText(to)).toBeInTheDocument()
     })
+  })
+
+  it('should render the table even if user is missing', () => {
+    render(<CourseActivityDetails {...props} user={undefined} />)
+    const eventId = screen.getByText(props.id)
+    const date = screen.getByText(dateString(props.created_at, {format: 'medium'}))
+    const time = screen.getByText(timeString(props.created_at))
+    const userName = screen.getByText('-')
+    const source = screen.getByText(props.event_source_present)
+    const type = screen.getByText(props.event_type_present)
+
+    expect(eventId).toBeInTheDocument()
+    expect(date).toBeInTheDocument()
+    expect(time).toBeInTheDocument()
+    expect(userName).toBeInTheDocument()
+    expect(source).toBeInTheDocument()
+    expect(type).toBeInTheDocument()
   })
 })

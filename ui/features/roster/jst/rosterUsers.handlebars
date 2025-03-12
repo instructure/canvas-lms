@@ -3,7 +3,10 @@
   <table class="roster ic-Table ic-Table--hover-row ic-Table--condensed ic-Table--striped">
     <thead>
       <tr>
-        <th scope="col"><span class="screenreader-only">Profile Picture</span></th>
+        {{#if ENV.permissions.can_manage_differentiation_tags}}
+          <th scope="col"><span class="screenreader-only">{{#t}}Select User{{/t}}</span></th>
+        {{/if}}
+        <th scope="col"><span class="screenreader-only">{{#t}}Profile Picture{{/t}}</span></th>
         <th scope="col">{{#t "name"}}Name{{/t}}</th>
         {{#if canViewLoginIdColumn}}
         <th scope="col">{{#t "login_name"}}Login ID{{/t}}</th>

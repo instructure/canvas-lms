@@ -1026,7 +1026,19 @@ describe Types::SubmissionType do
 
       it "returns the preview URL for the discussion topic" do
         @discussion_topic.discussion_entries.create!(user: @student, message: "I have a lot to say about this topic")
-        expect(preview_url).to eq "http://test.host/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}?embed=true&persist=1&student_id=#{@student.id}"
+        expect(preview_url).to eq "http://test.host/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1&show_full_discussion_immediately=true&version=0"
+      end
+    end
+
+    context "when the assignment is anonymous" do
+      before do
+        @assignment.update!(anonymous_grading: true)
+      end
+
+      it "returns the preview URL for the submission" do
+        @assignment.submit_homework(@student, body: "test")
+        @submission.update!(posted_at: nil)
+        expect(preview_url).to eq "http://test.host/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{@submission.anonymous_id}?preview=1&version=0"
       end
     end
   end

@@ -1578,6 +1578,51 @@ describe Assignment do
       expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
     end
 
+    describe "estimated_duration" do
+      subject { assignment_with_estimated_duration.duplicate }
+
+      let(:estimated_duration) { EstimatedDuration.new({ duration: 30 }) }
+      let(:assignment_with_estimated_duration) do
+        assignment = @course.assignments.new
+        assignment.estimated_duration = estimated_duration
+        assignment.save!
+        assignment
+      end
+
+      context "when course is a horizon_course" do
+        before do
+          assignment_with_estimated_duration.course.account.enable_feature!(:horizon_course_setting)
+          assignment_with_estimated_duration.course.update!(horizon_course: true)
+        end
+
+        it "should set estimated_duration duration on duplication" do
+          expect(subject.estimated_duration.duration.iso8601).to eq("PT30S")
+        end
+
+        it "should not save the estimated_duration to db" do
+          expect(subject.estimated_duration.id).to be_nil
+        end
+
+        context "when estimated_duration not provided" do
+          it "should set estimated_duration on duplication" do
+            assignment_with_estimated_duration.estimated_duration = nil
+            expect(subject.estimated_duration).to be_nil
+          end
+        end
+      end
+
+      context "when course is not a horizon_course" do
+        before do
+          assignment_with_estimated_duration.course.account.disable_feature!(:horizon_course_setting)
+          assignment_with_estimated_duration.course.update!(horizon_course: false)
+        end
+
+        it "should set estimated_duration on duplication" do
+          expect(subject.estimated_duration).to be_nil
+        end
+      end
+    end
+
     it "does not duplicate the sis_source_id" do
       assignment = @course.assignments.create!(sis_source_id: "abc")
       new_assignment = assignment.duplicate

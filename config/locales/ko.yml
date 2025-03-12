@@ -1394,6 +1394,7 @@ ko:
   add_message_10cc308c: "메시지 추가"
   add_module_5ad6fee2: "모듈 추가"
   add_page_7ea7ee39: "페이지 추가"
+  add_page_for_submission_8941db3e: "제출물 페이지 추가"
   add_prerequisite_6409bd9: "필수 조건 추가"
   add_quiz_cebfa28b: "퀴즈 추가"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "이 포트폴리오의 섹션을 추가, 제거, 다시 배열 "
@@ -2321,6 +2322,8 @@ ko:
       attendance_help: "출석 도움말"
   attendance_ca433183: 출석
   attendees_eb402bac: 참석자
+  attributes: 
+    idp_entity_id: "IdP 항목 ID"
   auth_logging: 
     login: 로그인
     logout: 로그아웃
@@ -2932,6 +2935,7 @@ ko:
   canvas_login_instructure_271b8d00: "Canvas에 로그인"
   canvas_revision_unknown: "알 수 없음"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas가 응답이 유효하다고 간주"
+  canvas_user_id_caf65ef5: "Canvas 사용자 ID"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "퀴즈를 저장한 후에 제출물을 다시 평가게 되며, 이 작업에는 수 분이 걸립니다."
   cc: 
     by: "CC 유형"
@@ -2960,6 +2964,7 @@ ko:
   choose_a_csv_file_to_upload_9644480c: "업로드할 CSV 파일 선택:"
   choose_assignment_group_9e7de13c: "과제 그룹 선택"
   clear_all_e23811b1: "모두 지우기"
+  clear_ui_changed_state_d0aca02d: "UI 변경 상태 지우기"
   click_to_change_profile_picture_for_display_name_6a4b41db: "%{display_name}의 프로필 사진을 변경하려면 클릭"
   click_to_edit_drag_to_reorder_ab725681: "편집하려면 클릭, 순서를 다시 매기려면 끌기"
   click_to_report_profile_picture_370f9625: "프로필 사진을 신고하려면 클릭"
@@ -4027,6 +4032,8 @@ ko:
     zero: "1분 이내"
   count_minutes_ago_c1b7d7ef: "%{count}분 전"
   count_people_489946e7: "%{count}명"
+  count_people_found_1ab374c0: 
+    zero: "사람 없음"
   count_points_4735a2e8: 
     one: "%{count} 점"
     other: "%{count} 점"
@@ -5452,6 +5459,7 @@ ko:
   email_address_a1b97a39: "이메일 주소"
   email_address_optional_72795076: "이메일 주소 (선택)"
   email_e366fa29: 이메일
+  emails_d07c3348: 이메일
   enable_6f5d1328: 사용
   enable_and_lock_e6099cc2: "사용 및 잠금"
   enable_gravatar_8a865b41: "Gravatar 허용하기"
@@ -7713,6 +7721,7 @@ ko:
     customize: "사용자 정의"
     managed_accounts: "관리하는 계정"
     my_courses: "내 과목"
+  merge_user_accounts_a49e8fb1: "사용자 계정 병합"
   message: 
     default_subject: "Canvas 알림"
   message_groups_who_1ba736f: "다음 그룹에게 메시지 보내기"
@@ -9564,6 +9573,7 @@ ko:
   name: "Academic Benchmark 가져오기 도구"
   name_1aed4a1b: 이름
   name_3806192d: "이름:"
+  name_is_required_ba379522: "이름이 필요합니다!"
   name_only_5f56718e: 이름만
   navigation_ee9af92d: 탐색
   never_1ed1244d: "한 적 없음"
@@ -9581,6 +9591,7 @@ ko:
   next_module_66f58e91: "다음 모듈"
   next_steps_ce0f0d0c: "다음 단계"
   next_student_79955068: "다음 학생"
+  no_active_user_with_that_id_was_found_b8fb5e14: "해당 ID를 가진 활성 사용자를 찾을 수 없습니다."
   no_assignment_selected_65d9e422: "선택한 과제 없음"
   no_content_5dbc9acf: "내용 없음"
   no_conversations_selected_ebcd9226: "선택한 대화 없음"
@@ -9597,6 +9608,7 @@ ko:
   no_marks_5e7d2b59: "표시 없음"
   no_migration_file: "내용 마이그레이션을 위해 필요한 파일입니다."
   no_password_was_given_472222e5: "암호가 없음"
+  no_people_found_67a8ee2f: "사람 없음"
   no_points_possible_368669d: "가능한 점수 없음"
   no_preview_available_e8e71199: "미리 보기 없음"
   no_results_3cda4e72: "결과 없음"
@@ -10071,6 +10083,7 @@ ko:
     titles: 
       find_outcomes: "성과 찾기"
   outcomes_d1b18d33: 성과
+  override_ui_changes_5e0c56ab: "UI 변경 재정의"
   overrides: 
     everyone: 모두
     everyone_else: "다른 모든 사람"
@@ -10185,6 +10198,7 @@ ko:
     view_notifications: "알림 보기"
     view_statistics: "통계 보기"
   permissions_365c49e: 권한
+  pick_dd033b86: 선택
   pinned_discussions_a55c0cea: "고정된 토론"
   play_media_comment_8614d30f: "미디어 설명 재생"
   playback: 
@@ -10474,6 +10488,8 @@ ko:
   privacy_level_f0ec09a3: "개인 정보 보호 수준"
   privacy_policy_c68f482a: "개인 정보 보호 정책"
   private_3883d133: 비공개
+  process_as_ui_changes_8e34ed2a: "UI 변경으로 처리"
+  process_data_2f5f962f: "자료 처리"
   product_name: Canvas
   profile: 
     access_token: 
@@ -10738,6 +10754,7 @@ ko:
     ways_to_contact_me: 연락처
     you_have_no_services: "아직 등록한 서비스가 없으며 *설정* 페이지에서 추가할 수 있습니다."
   profile_6bd2baed: 프로필
+  profile_picture_13e5338c: "프로필 사진"
   profile_pictures_15953851: "프로필 사진"
   profiles: 
     gravatar_view: 
@@ -12243,6 +12260,7 @@ ko:
     course_files: "과목 파일"
     group_files: "그룹 파일"
     my_files: "내 파일"
+  root_account_9d4fcb97: "루트 계정"
   roster: 
     delete_confirm: "이 사용자를 제거하시겠습니까?"
     error_sending_invitations: "초대를 보내는 데 오류가 발생했습니다. 다시 시도하시기 바랍니다."
@@ -13769,6 +13787,7 @@ ko:
   this_course_does_not_allow_score_uploads_4b35fe07: "이 과목은 점수 업로드를 허용하지 않습니다."
   this_enables_users_to_generate_and_download_course_4c69c531: "사용자들에게 과목 ePub를 생성하고 내려받을 수 있게 허용합니다."
   this_field_is_required_fa58c4a: "이 필드가 필요함"
+  this_is_a_full_batch_update_99d726e0: "전체 일괄 처리임"
   this_is_a_graded_discussion_28ad2728: "이는 평가된 토론임"
   this_is_a_media_comment_click_here_to_view_c297bf62: "미디어 의견입니다. *보려면 여기를 클릭하십시오*."
   this_message_includes_media_comments_to_listen_or__75ea03a1: "이 메시지는 미디어 설명을 포함하고 있습니다. 청취하거나 재생하려면 아래 링크를 클릭하십시오:"
@@ -13978,6 +13997,7 @@ ko:
   title_52b8638d: "직함:"
   title_ee03d132: 직함
   title_is_too_long_b192a46a: "제목이 너무 김"
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "제목은 하나의 글자나 숫자를 포함해야 함"
   title_separator: ": "
   titles: 
     aligned_items: "정렬된 항목"
@@ -13998,6 +14018,7 @@ ko:
   to_c4c44f4b: "다음 요일로"
   to_date_7c45ee77: "끝 날짜"
   to_f0e90538: "수신:"
+  to_make_a_new_page_for_this_submission_select_a_se_6cd921aa: "이 제출물에 대한 새 페이지를 만드려면 섹션을 선택하고 새 페이지의 이름을 입력하십시오."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Canvas 사용자에게 전송된 모든 알림을 보려면 검색을 위한 사용자와 날짜 범위를 선택하십시오."
   token_9a020862: 토큰
   tomorrow_9a6c9a00: 내일
@@ -14147,6 +14168,7 @@ ko:
     titles: 
       add_login: "로그인 추가"
       update_login: "로그인 업데이트"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "사용자 병합에 실패했습니다. 필요한 권한을 가지고 있는지 확인하고 다시 시도하시기 바랍니다."
   user_name: 
     buttons: 
       update_user: "사용자 업데이트"
@@ -14691,11 +14713,15 @@ ko:
     external_urls: 
       archive: 저장소
       archive_link: "저장소 보기"
+  with_this_option_selected_all_fields_in_all_record_14a361c9: "이 옵션을 선택하면 SIS 가져오기가 변경한 모든 레코드의 모든 필드를 추후의 재정의하지 않는 SIS 가져오기에서 변경할 수 있습니다."
+  with_this_option_selected_changes_made_through_thi_e751dd22: "이 옵션을 선택하면 SIS 가져오기를 통해 변경된 내용이 UI 변경과 마찬가지로 처리되어 여기에서 변경한 필드를 추후의 재정의하지 않는 SIS 가져오기에서 변경할 수 없습니다."
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "달력 월별 보기에서 행사 제목 줄바꿈하기"
   wrong_answer_comments_14963a24: "오답 의견"
   yesterday_c6bd6abf: 어제
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "이제 이 퀴즈를 이미 치른 학생을 위한 다시 평가하기 옵션을 설정할 수 있습니다."
+  you_can_search_by_25d8e2b2: "다음 조건으로 검색 가능:"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "권한이 없거나 한 곳 이상의 장소에서 사용하고 있으므로 이 루브릭을 편집할 수 없습니다. 변경한 내용은 기존 루브릭을 바탕으로 한 새 루브릭이 됩니다. 계속 진행하시겠습니까?"
+  you_can_t_merge_an_account_with_itself_15f58d41: "같은 계정으로 병합할 수 없습니다."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "이 사용자의 정보를 업데이트할 수 있지만 사용자가 원래대로 바꿀 수 있습니다."
   you_created_an_announcement_in_course_c49e3d70: "%{course}에 공지를 생성했습니다"
   you_currently_have_no_pinned_discussions_6f0078b8: "고정한 토론이 없음"

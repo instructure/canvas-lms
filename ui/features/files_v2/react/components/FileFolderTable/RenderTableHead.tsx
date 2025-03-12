@@ -54,7 +54,7 @@ const renderTableHead = (
       key="select"
       id="select"
       textAlign="center"
-      width="1em"
+      width="2.5em"
       data-testid="select"
     >
       <Checkbox

@@ -156,6 +156,13 @@ class WikiPage < ActiveRecord::Base
     current_lookup&.slug || super
   end
 
+  # This group_category_id is used to identify a learning object as a group assignment
+  # since wiki pages cannot be configured as a group assignment,
+  # it will return nil for now.
+  def effective_group_category_id
+    nil
+  end
+
   def should_create_lookup?
     # covers page creation and title changes, and undeletes
     saved_change_to_title? || (saved_change_to_workflow_state? && workflow_state_before_last_save == "deleted")
@@ -617,10 +624,8 @@ class WikiPage < ActiveRecord::Base
                                                })
     end
 
-    if estimated_duration
-      # we have to save result here because we need the result.id to create the estimated_duration
-      result.save!
-      result.estimated_duration = EstimatedDuration.new({ wiki_page_id: result.id, duration: estimated_duration.duration.iso8601 })
+    if context.is_a?(Course) && context.horizon_course? && estimated_duration
+      result.estimated_duration = EstimatedDuration.new({ duration: estimated_duration.duration.iso8601 })
     end
 
     result

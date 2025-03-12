@@ -173,5 +173,16 @@ describe "courses/_recent_feedback" do
       render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
       expect(response).to include "#{@reply_to_entry.title} Required Replies (#{@topic.reply_to_entry_required_count})"
     end
+
+    it "displays proper number of replies if assignment has been unlinked" do
+      @reply_to_topic.submit_homework @student, body: "checkpoint submission for #{@student.name}"
+      submission_model(user: @student, assignment: @reply_to_entry)
+      dt = @reply_to_entry.discussion_topic
+      dt.assignment = nil
+      dt.save!
+
+      render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+      expect(response).to include "#{@reply_to_entry.title} Required Replies (#{@topic.reply_to_entry_required_count})"
+    end
   end
 end

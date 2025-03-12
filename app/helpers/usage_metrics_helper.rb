@@ -19,10 +19,10 @@
 
 module UsageMetricsHelper
   def load_usage_metrics?
-    find_usage_metrics_application_id && @domain_root_account&.feature_enabled?(:send_usage_metrics)
+    usage_metrics_api_key && @domain_root_account&.feature_enabled?(:send_usage_metrics)
   end
 
-  def find_usage_metrics_application_id
+  def usage_metrics_api_key
     DynamicSettings.find(tree: :private)[:pendo_app_id, failsafe: nil]
   end
 end

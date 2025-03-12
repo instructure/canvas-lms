@@ -240,9 +240,7 @@ module AttachmentFu # :nodoc:
     end
 
     # Returns the class used to create new thumbnails for this attachment.
-    def thumbnail_class
-      self.class.thumbnail_class
-    end
+    delegate :thumbnail_class, to: :class
 
     # Gets the thumbnail name for a filename.  'foo.jpg' becomes 'foo_thumbnail.jpg'
     def thumbnail_name_for(thumbnail = nil)

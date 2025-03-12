@@ -1935,7 +1935,7 @@ module Lti
     #   ```
     register_expansion "Canvas.assignment.submission.studentAttempts",
                        [],
-                       -> { @assignment.submissions&.find_by(user: @current_user)&.attempt },
+                       -> { submission&.attempt },
                        STUDENT_ASSIGNMENT_GUARD
 
     # Returns the endpoint url for accessing link-level tool settings
@@ -2219,7 +2219,7 @@ module Lti
       if course_admin?(context)
         @assignment.submissions.minimum(:cached_due_date)
       else
-        @assignment.due_at
+        submission&.cached_due_date || @assignment.due_at
       end
     end
 
@@ -2229,7 +2229,7 @@ module Lti
       if course_admin?(context)
         @assignment.submissions.maximum(:cached_due_date) || @assignment.due_at
       else
-        @assignment.due_at
+        submission&.cached_due_date || @assignment.due_at
       end
     end
 
@@ -2258,6 +2258,10 @@ module Lti
 
     def lti_1_3?
       @tool.respond_to?(:use_1_3?) && @tool.use_1_3?
+    end
+
+    def submission
+      @assignment&.submissions&.find_by(user: @current_user)
     end
   end
 end

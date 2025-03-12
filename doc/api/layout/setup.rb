@@ -36,7 +36,7 @@ def init
       @file = File.basename(@file.path)
     end
     @object = @object.dup if @object.frozen?
-    def @object.source_type; end # rubocop:disable Lint/NestedMethodDefinition rubocop bug?
+    def @object.source_type; end # rubocop:disable Lint/NestedMethodDefinition -- rubocop bug?
     sections :layout, [:diskfile]
   elsif options[:all_resources]
     sections :layout, [T("topic")]
@@ -48,7 +48,7 @@ def init
   end
 end
 
-def contents # rubocop:disable Style/TrivialAccessors not a Class
+def contents # rubocop:disable Style/TrivialAccessors -- not a Class
   @contents
 end
 

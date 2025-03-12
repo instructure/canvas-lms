@@ -16,20 +16,206 @@
  */
 
 import React from 'react'
-import {createEvent, fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {createEvent, fireEvent, render, waitFor} from '@testing-library/react'
 import SubmissionCommentUpdateForm from '../SubmissionCommentUpdateForm'
 
 describe('SubmissionCommentUpdateForm', () => {
   let props: any
-  let wrapper: any
-  let ref: any
+  let wrapper: ReturnType<typeof mountComponent>
+  let ref: React.RefObject<SubmissionCommentUpdateForm>
+  let target: HTMLElement
 
   function mountComponent() {
     ref = React.createRef()
-    return render(<SubmissionCommentUpdateForm {...props} ref={ref} />)
+    return render(<SubmissionCommentUpdateForm {...props} ref={ref} />, {container: target})
+  }
+
+  const getCancelButton = () => wrapper.getByTestId('comment-cancel-button')
+  const getSubmitButton = () => wrapper.getByTestId('comment-submit-button')
+  const getTextarea = async () => {
+    await waitFor(() => expect(wrapper.container.querySelector('textarea')).toBeInTheDocument())
+    return wrapper.container.querySelector('textarea') as HTMLTextAreaElement
+  }
+
+  const commonTestCases = () => {
+    test('initializes with the original comment in the textarea', async () => {
+      wrapper = mountComponent()
+      expect(await getTextarea()).toHaveValue('A comment')
+    })
+
+    test('"Submit" button is present even if there is no text entered in the comment area', async () => {
+      props.comment = ''
+      wrapper = mountComponent()
+      expect(await getTextarea()).toHaveValue('')
+    })
+
+    test('"Cancel" button is present even if there is no text entered in the comment area', () => {
+      props.comment = ''
+      wrapper = mountComponent()
+      expect(getCancelButton()).toBeInTheDocument()
+    })
+
+    test('"Submit" button is present if the content is all spaces', () => {
+      props.comment = '    '
+      wrapper = mountComponent()
+      expect(getSubmitButton()).toBeInTheDocument()
+    })
+
+    test('"Cancel" button is present if the content is all spaces', () => {
+      props.comment = '    '
+      wrapper = mountComponent()
+      expect(getCancelButton()).toBeInTheDocument()
+    })
+
+    test('"Submit" button is present if there is text entered in the comment area', () => {
+      wrapper = mountComponent()
+      expect(getSubmitButton()).toBeInTheDocument()
+    })
+
+    test('"Cancel" button is present if there is text entered in the comment area', () => {
+      wrapper = mountComponent()
+      expect(getCancelButton()).toBeInTheDocument()
+    })
+
+    test('"Submit" button is disabled if the current comment is the same as the comment prop passed in', () => {
+      wrapper = mountComponent()
+      expect(getSubmitButton()).toBeDisabled()
+    })
+
+    test('"Cancel" button is enabled if the current comment is the same as the comment prop passed in', () => {
+      wrapper = mountComponent()
+      expect(getCancelButton()).not.toBeDisabled()
+    })
+
+    test('"Submit" button is disabled if the current comment after trimming is the same as the comment prop passed', async () => {
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: '    A comment    '}})
+      expect(getSubmitButton()).toBeDisabled()
+    })
+
+    test('"Cancel" button is enabled if the current comment after trimming is the same as the comment prop passed', async () => {
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: '    A comment    '}})
+      expect(getCancelButton()).not.toBeDisabled()
+    })
+
+    test('"Submit" button is disabled if the all the content in the comment is removed', async () => {
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: ''}})
+      expect(getSubmitButton()).toBeDisabled()
+    })
+
+    test('"Cancel" button is enabled if the all the content in the comment is removed', async () => {
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: ''}})
+      expect(getCancelButton()).not.toBeDisabled()
+    })
+
+    test('"Submit" button is disabled if the all the content in the comment is removed except for spaces', async () => {
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: '     '}})
+      expect(getSubmitButton()).toBeDisabled()
+    })
+
+    test('"Cancel" button is enabled if the all the content in the comment is removed except for spaces', async () => {
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: '     '}})
+      expect(getCancelButton()).not.toBeDisabled()
+    })
+
+    test('"Submit" button is disabled while processing', async () => {
+      props.processing = true
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: 'A changed comment'}})
+      expect(getSubmitButton()).toBeDisabled()
+    })
+
+    test('"Cancel" button is disabled while processing', async () => {
+      props.processing = true
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: 'A changed comment'}})
+      expect(getCancelButton()).toBeDisabled()
+    })
+
+    test('"Submit" button is enabled if the comment is changed and is not empty', async () => {
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: 'A changed comment'}})
+      expect(getSubmitButton()).not.toBeDisabled()
+    })
+
+    test('"Cancel" button is enabled if the comment is changed and is not empty', async () => {
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: 'A changed comment'}})
+      expect(getCancelButton()).not.toBeDisabled()
+    })
+
+    test('"Submit" button has the text "Submit"', () => {
+      wrapper = mountComponent()
+      expect(getSubmitButton().textContent).toEqual('Submit')
+    })
+
+    test('"Cancel" button has the text "Cancel"', () => {
+      wrapper = mountComponent()
+      expect(getCancelButton().textContent).toEqual('Cancel')
+    })
+
+    test('"Submit" button label reads "Update Comment"', () => {
+      wrapper = mountComponent()
+      expect(getSubmitButton().getAttribute('label')).toEqual('Update Comment')
+    })
+
+    test('"Cancel" button label reads "Cancel Updating Comment"', () => {
+      wrapper = mountComponent()
+      expect(getCancelButton().getAttribute('label')).toEqual('Cancel Updating Comment')
+    })
+
+    test('the default action is prevented when the button is clicked', async () => {
+      props.updateSubmissionComment = jest.fn(() => Promise.resolve())
+      wrapper = mountComponent()
+      const preventDefault = jest.fn()
+      fireEvent.change(await getTextarea(), {
+        target: {value: 'A changed comment'},
+      })
+      const clickEvent = createEvent.click(getSubmitButton(), {
+        preventDefault,
+        button: 1,
+      })
+      fireEvent(getSubmitButton(), clickEvent)
+      expect(clickEvent.defaultPrevented).toBe(true)
+    })
+
+    test('clicking the "Submit" button calls setProcessing (with true) and updateSubmissionComment', async () => {
+      props.updateSubmissionComment = jest.fn(() => Promise.resolve())
+      props.setProcessing = jest.fn()
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: 'A changed comment'}})
+      fireEvent.click(getSubmitButton())
+      expect(props.setProcessing).toHaveBeenCalledTimes(1)
+      expect(props.setProcessing).toHaveBeenCalledWith(true)
+      expect(props.updateSubmissionComment).toHaveBeenCalledTimes(1)
+      expect(props.updateSubmissionComment).toHaveBeenLastCalledWith('A changed comment', '23')
+    })
+
+    test('clicking the "Cancel" button triggers cancelCommenting', async () => {
+      props.cancelCommenting = jest.fn()
+      wrapper = mountComponent()
+      fireEvent.change(await getTextarea(), {target: {value: 'A changed comment'}})
+      fireEvent.click(getCancelButton())
+      expect(props.cancelCommenting).toHaveBeenCalledTimes(1)
+    })
   }
 
   beforeEach(() => {
+    // This is needed to silence the following error:
+    // "[Alert] The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'"
+    // Copied from ui/shared/rce/react/__tests__/CanvasRce.test.jsx
+    const div = document.createElement('div')
+    div.id = 'fixture'
+    div.innerHTML = '<div id="flash_screenreader_holder" role="alert"/><div id="target"/>'
+    document.body.appendChild(div)
+
+    target = document.getElementById('target') as HTMLElement
+
     props = {
       cancelCommenting() {},
       comment: 'A comment',
@@ -40,208 +226,65 @@ describe('SubmissionCommentUpdateForm', () => {
     }
   })
 
-  test('initializes with the original comment in the textarea', () => {
-    wrapper = mountComponent()
-    expect(wrapper.container.querySelector('textarea')).toHaveValue('A comment')
+  afterEach(() => {
+    const fixture = document.getElementById('fixture')
+    if (fixture) document.body.removeChild(fixture)
   })
 
-  test('"Submit" button is present even if there is no text entered in the comment area', () => {
-    props.comment = ''
-    wrapper = mountComponent()
-    expect(wrapper.container.querySelector('textarea')).toHaveValue('')
-  })
-
-  test('"Cancel" button is present even if there is no text entered in the comment area', () => {
-    props.comment = ''
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-cancel-button')).toBeInTheDocument()
-  })
-
-  test('"Submit" button is present if the content is all spaces', () => {
-    props.comment = '    '
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-submit-button')).toBeInTheDocument()
-  })
-
-  test('"Cancel" button is present if the content is all spaces', () => {
-    props.comment = '    '
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-cancel-button')).toBeInTheDocument()
-  })
-
-  test('"Submit" button is present if there is text entered in the comment area', () => {
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-submit-button')).toBeInTheDocument()
-  })
-
-  test('"Cancel" button is present if there is text entered in the comment area', () => {
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-cancel-button')).toBeInTheDocument()
-  })
-
-  test('"Submit" button is disabled if the current comment is the same as the comment prop passed in', () => {
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-submit-button')).toBeDisabled()
-  })
-
-  test('"Cancel" button is enabled if the current comment is the same as the comment prop passed in', () => {
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-cancel-button')).not.toBeDisabled()
-  })
-
-  test('"Submit" button is disabled if the current comment after trimming is the same as the comment prop passed', () => {
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {
-      target: {value: '    A comment    '},
+  describe('with RCE Lite enabled', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.rce_lite_enabled_speedgrader_comments = true
     })
-    expect(screen.getByTestId('comment-submit-button')).toBeDisabled()
-  })
 
-  test('"Cancel" button is enabled if the current comment after trimming is the same as the comment prop passed', () => {
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {
-      target: {value: '    A comment    '},
+    test('renders RCE input', async () => {
+      const {container, queryByTestId} = mountComponent()
+      await waitFor(() => {
+        expect(container.querySelector('textarea[id="comment_rce_textarea"]')).toBeInTheDocument()
+      })
+      expect(queryByTestId('comment-textarea')).not.toBeInTheDocument()
     })
-    expect(screen.getByTestId('comment-cancel-button')).not.toBeDisabled()
-  })
 
-  test('"Submit" button is disabled if the all the content in the comment is removed', () => {
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {target: {value: ''}})
-    expect(screen.getByTestId('comment-submit-button')).toBeDisabled()
-  })
+    test('focuses on the textarea when mounted', async () => {
+      wrapper = mountComponent()
+      await getTextarea()
 
-  test('"Cancel" button is enabled if the all the content in the comment is removed', () => {
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {target: {value: ''}})
-    expect(screen.getByTestId('comment-cancel-button')).not.toBeDisabled()
-  })
-
-  test('"Submit" button is disabled if the all the content in the comment is removed except for spaces', () => {
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {target: {value: '     '}})
-    expect(screen.getByTestId('comment-submit-button')).toBeDisabled()
-  })
-
-  test('"Cancel" button is enabled if the all the content in the comment is removed except for spaces', () => {
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {target: {value: '     '}})
-    expect(screen.getByTestId('comment-cancel-button')).not.toBeDisabled()
-  })
-
-  test('"Submit" button is disabled while processing', () => {
-    props.processing = true
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {
-      target: {value: 'A changed comment'},
+      expect(ref.current).not.toBeNull()
+      expect(ref.current?.rceRef.current).not.toBeNull()
+      expect(ref.current?.rceRef.current?.focused).toBe(true)
     })
-    expect(screen.getByTestId('comment-submit-button')).toBeDisabled()
+
+    commonTestCases()
   })
 
-  test('"Cancel" button is disabled while processing', () => {
-    props.processing = true
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {
-      target: {value: 'A changed comment'},
+  describe('with RCE Lite disabled', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.rce_lite_enabled_speedgrader_comments = false
     })
-    expect(screen.getByTestId('comment-cancel-button')).toBeDisabled()
-  })
 
-  test('"Submit" button is enabled if the comment is changed and is not empty', () => {
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {
-      target: {value: 'A changed comment'},
+    test('renders regular input', () => {
+      const {getByTestId, queryByText} = mountComponent()
+      expect(getByTestId('comment-textarea')).toBeInTheDocument()
+      // RCE displays a loading text initially
+      expect(queryByText(/Loading/)).not.toBeInTheDocument()
     })
-    expect(screen.getByTestId('comment-submit-button')).not.toBeDisabled()
-  })
 
-  test('"Cancel" button is enabled if the comment is changed and is not empty', () => {
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {
-      target: {value: 'A changed comment'},
+    test('TextArea has a placeholder message', () => {
+      wrapper = mountComponent()
+      const textarea = wrapper.getByPlaceholderText('Leave a comment')
+      expect(textarea).toBeInTheDocument()
     })
-    expect(screen.getByTestId('comment-cancel-button')).not.toBeDisabled()
-  })
 
-  test('"Submit" button has the text "Submit"', () => {
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-submit-button').textContent).toEqual('Submit')
-  })
-
-  test('"Cancel" button has the text "Cancel"', () => {
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-cancel-button').textContent).toEqual('Cancel')
-  })
-
-  test('"Submit" button label reads "Update Comment"', () => {
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-submit-button').getAttribute('label')).toEqual(
-      'Update Comment',
-    )
-  })
-
-  test('"Cancel" button label reads "Cancel Updating Comment"', () => {
-    wrapper = mountComponent()
-    expect(screen.getByTestId('comment-cancel-button').getAttribute('label')).toEqual(
-      'Cancel Updating Comment',
-    )
-  })
-
-  test('TextArea has a placeholder message', () => {
-    wrapper = mountComponent()
-    const textarea = wrapper.getByTestId('comment-textarea')
-    expect(textarea).toHaveAttribute('placeholder', 'Leave a comment')
-  })
-
-  test('TextArea has a label', () => {
-    wrapper = mountComponent()
-    const textarea = wrapper.getByRole('textbox', {name: 'Leave a comment'})
-    expect(textarea).toBeInTheDocument()
-  })
-
-  test('focuses on the textarea when mounted', async () => {
-    wrapper = mountComponent()
-    await waitFor(() => {
-      expect(wrapper.getByTestId('comment-textarea')).toHaveFocus()
+    test('TextArea has a label', () => {
+      wrapper = mountComponent()
+      const textarea = wrapper.getByLabelText('Leave a comment')
+      expect(textarea).toBeInTheDocument()
     })
-  })
 
-  test('the default action is prevented when the button is clicked', async () => {
-    props.updateSubmissionComment = jest.fn(() => Promise.resolve())
-    wrapper = mountComponent()
-    const preventDefault = jest.fn()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {
-      target: {value: 'A changed comment'},
+    test('focuses on the textarea when mounted', async () => {
+      wrapper = mountComponent()
+      expect(await getTextarea()).toHaveFocus()
     })
-    const clickEvent = createEvent.click(screen.getByTestId('comment-submit-button'), {
-      preventDefault,
-      button: 1,
-    })
-    fireEvent(screen.getByTestId('comment-submit-button'), clickEvent)
-    expect(clickEvent.defaultPrevented).toBe(true)
-  })
 
-  test('clicking the "Submit" button calls setProcessing', () => {
-    props.updateSubmissionComment = jest.fn(() => Promise.resolve())
-    props.setProcessing = jest.fn()
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {
-      target: {value: 'A changed comment'},
-    })
-    fireEvent.click(screen.getByTestId('comment-submit-button'))
-    expect(props.setProcessing).toHaveBeenCalledTimes(1)
-    expect(props.setProcessing).toHaveBeenCalledWith(true)
-    expect(props.updateSubmissionComment).toHaveBeenCalledTimes(1)
-    expect(props.updateSubmissionComment).toHaveBeenLastCalledWith('A changed comment', '23')
-  })
-
-  test('clicking the "Cancel" button triggers cancelCommenting', () => {
-    props.cancelCommenting = jest.fn()
-    wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {
-      target: {value: 'A changed comment'},
-    })
-    fireEvent.click(screen.getByTestId('comment-cancel-button'))
-    expect(props.cancelCommenting).toHaveBeenCalledTimes(1)
+    commonTestCases()
   })
 })

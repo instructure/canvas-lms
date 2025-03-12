@@ -178,7 +178,15 @@ const RubricContextSelect = ({
       fetchAtLeastOnce: true,
     },
     onSuccess: successResponse => {
-      setSelectedContext(successResponse[0]?.context_code)
+      const matchingCourseContext = successResponse.find(
+        x => x.context_code === `course_${courseId}`,
+      )
+
+      if (matchingCourseContext) {
+        setSelectedContext(matchingCourseContext.context_code)
+      } else {
+        setSelectedContext(successResponse[0]?.context_code)
+      }
     },
   })
 

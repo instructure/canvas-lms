@@ -2132,6 +2132,7 @@ fa:
   add_outcomes_to_groupname_8c33d118: "افزودن نتایج به \"%{groupName}\""
   add_override_da70f198: "اضافه کردن بازبینی"
   add_page_7ea7ee39: "افزودن صفحه"
+  add_page_for_submission_8941db3e: "افزودن صفحه برای مورد ارسالی"
   add_people_7948b7da: "افزودن افراد"
   add_people_7ee4b2ec: "افزودن افراد"
   add_people_and_courses_to_canvas_5c4bfff9: "افراد و درس‌ها را به کانواس اضافه کنید"
@@ -4217,6 +4218,8 @@ fa:
   attendees_eb402bac: حاضرین
   attention_aaca1f1d: توجه!
   attribute_d9f3af72: ویژگی
+  attributes: 
+    idp_entity_id: "شناسه موجودیت IdP"
   attributes_locked_1a1a0f46: "%{attributes} قفل شده"
   audio_1c89b0c8: صدا
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "محتوای صوتی تحت پشتیبانی دستگاه با برنامه شما نیست."
@@ -5395,6 +5398,7 @@ fa:
   clear_all_e23811b1: "پاک کردن همه"
   clear_search_field_75f595c7: "قسمت جستجو را پاک کنید"
   clear_selected_file_82388e50: "پاک کردن فایل انتخاب شده"
+  clear_ui_changed_state_d0aca02d: "پاک کردن وضعیت واسط کاربر تغییر یافته"
   clear_user_cache_ef079f7f: "پاک کردن حافظه نهان کاربر"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "اگر نمی‌خواهید کد نمایش داده شود، روی «لغو» کلیک کنید."
   click_for_more_details_on_this_outcome_8c018d2f: "برای اطلاعات بیشتر درباره این نتیجه، کلیک کنید"
@@ -7029,6 +7033,8 @@ fa:
     one: "%{count} شرکت کننده"
     other: "%{count} شرکت کننده"
   count_people_489946e7: "%{count} نفر"
+  count_people_found_1ab374c0: 
+    zero: "فردی یافت نشد"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{count} فرد در *%{course_name}* با موفقیت ثبت نام شدند."
     other: "%{count} فرد در *%{course_name}* با موفقیت ثبت نام شدند."
@@ -9630,6 +9636,7 @@ fa:
   email_is_invalid_e0d982eb: "پست اکترونیکی معتبر نیست!"
   email_is_required_736ac26b: "پست الکترونیکی لازم است"
   email_the_user_about_this_account_creation_e63f8759: "ارسال پست الکترونیکی برای آگاهی دادن به کاربر از ایجاد این حساب"
+  emails_d07c3348: "نامه های الکترونیکی"
   embed_828fac4a: قراردادن
   embed_video_code_703e10f2: "قراردادن کد فیلم"
   embedded_images_598ff8da: "تصاویر_درج شده"
@@ -14005,6 +14012,7 @@ fa:
     my_courses: "درس های من"
   menu_39cb0e8e: منو
   menu_options_9b6b0b5c: "گزینه های منو"
+  merge_user_accounts_a49e8fb1: "ادغام حساب های کاربری"
   message: 
     default_subject: "هشدار کانواس"
   message_5c38209d: پیام
@@ -16451,6 +16459,7 @@ fa:
   nickname_1e6da3ad: "نام مستعار"
   nickname_7df95b09: "نام مستعار:"
   no_74e9b590: خیر
+  no_active_user_with_that_id_was_found_b8fb5e14: "کاربر فعال با این شناسه یافت نشد."
   no_alignments_are_available_for_this_outcome_7f8346f9: "هیچ تطبیقی برای این نتیجه موجود نیست."
   no_announcements_280df147: "بدون اطلاعیه"
   no_assignment_group_assigned_8f1cdb9b: "هیچ گروه تکلیفی اختصاص نیافته است"
@@ -16522,6 +16531,7 @@ fa:
   no_outcome_file_or_authority_given_c90f9c5f: "مرجع یا فایل نتیجه ارائه نشده است"
   no_outcome_selected_16d15753: "هیچ نتیجه ای انتخاب نشده است"
   no_password_was_given_472222e5: "هیچ رمز عبوری ارائه نشد"
+  no_people_found_67a8ee2f: "فردی یافت نشد"
   no_placements_enabled_f705f28: "هیچ جای گذاری فعال نشده است"
   no_points_possible_368669d: "امتیازهای ممکن موجود نیست"
   no_points_possible_72db3a55: "امتیاز ممکن موجود نیست"
@@ -17372,6 +17382,7 @@ fa:
   override_score_53994655: "جایگزین کردن نمره"
   override_score_5f3c1189: "جایگزین کردن نمره"
   override_score_gradingperiod_286ac51b: "جایگزین کردن نمره (%{gradingPeriod})"
+  override_ui_changes_5e0c56ab: "جایگزین کردن تغییرات واسط کاربر"
   overrides: 
     blank_override: "باید یک دانشجو یا بخش را انتخاب کنید"
     everyone: همه
@@ -17617,6 +17628,7 @@ fa:
   pick_a_name_to_save_this_theme_as_9773cb1a: "یک نام انتخاب کنید برای ذخیره سازی این زمینه به عنوان"
   pick_an_emoji_942adfc4: "یک ایموجی انتخاب کنید..."
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "یک نقطه پایانی انتخاب کنید، گزارش های خطای شما را به آنجا ارسال خواهیم کرد"
+  pick_dd033b86: انتخاب
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "تاریخ و زمان را برای تنظیمات کنفرانس زیر انتخاب کنید:"
   pin_cdbc9f8f: الصاق
   pin_discussion_title_67c84658: " سنجاق کردن  گفتگوی %{title}"
@@ -18268,6 +18280,8 @@ fa:
   privacy_policy_c68f482a: "سیاست حریم خصوصی"
   private_3883d133: خصوصی
   proceed_f3d33864: "ادامه دادن"
+  process_as_ui_changes_8e34ed2a: "پردازش به عنوان تغییرات واسط کاربر"
+  process_data_2f5f962f: "پردازش داده ها"
   processing_2fcc9739: "در حال پردازش"
   product_name: کانواس
   proficiency_rating_6346119f: "رتبه‌بندی مهارت"
@@ -18578,6 +18592,7 @@ fa:
     you_have_no_services: "هیچ سرویس ثبت نشده است، می توانید چند مورد را در صفحه *تنظیمات* بیفزایید."
   profile_6bd2baed: "رخ نما"
   profile_photo_save_failed_too_many_times_e1ebda5: "دخیره سازی  عکس پروفایل بارها شکست خورده است. "
+  profile_picture_13e5338c: "عکس رخ نما"
   profile_pictures_15953851: "عکس های رخ نما"
   profile_tray_bcec5044: "سینی رخ‌نما"
   profiles: 
@@ -20162,6 +20177,7 @@ fa:
       loading_questions_failed: "بارگذاری پرسش ها انجام نشد، لطفا دوباره تلاش کنید"
       missing_access_code: "باید یک رمز دسترسی را وارد کنید"
       missing_ip_filter: "باید یک نشانی آی پی معتبر وارد کنید"
+      must_be_number: "حتما باید عدد باشد"
       no_answer: "لطفا حداقل یک پاسخ را اضافه کنید"
       no_correct_answer: "لطفا پاسخ درست را انتخاب کنید"
       no_possible_solution: "لطفا حداقل یک راه حل ممکن را ایجاد کنید"
@@ -20788,6 +20804,7 @@ fa:
     my_files: "فایل های من"
   root_523acd46: ریشه
   root_account_3fb3aacf: حساب_ریشه
+  root_account_9d4fcb97: "حساب ریشه"
   root_account_id_e8d75734: "شناسه حساب اصلی"
   root_accounts_cc035dcf: "حساب های ریشه"
   roster: 
@@ -23910,6 +23927,7 @@ fa:
   this_is_a_course_template_99bbe698: "این یک قالب دوره است"
   this_is_a_feature_to_allow_product_design_to_remov_e92ea1c3: "این یک ویژگی است که به طراحی محصول اجازه حذف تمامی ابطال فونت‌های مختلف را در تمام نرم‌افزار می‌دهد."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "این ویژگی برای توسعه یک طرح پاسخ ده است. "
+  this_is_a_full_batch_update_99d726e0: "یک بهنگام سازی دسته ای کامل است"
   this_is_a_group_discussion_2f9acdae: "این یک بحث گروهی است"
   this_is_a_media_comment_click_here_to_view_c297bf62: "این نظر یک نظر رسانه ای است، *برای مشاهده، اینجا کلیک کنید*."
   this_is_a_message_for_name_7abf1e39: "این پیام مربوط به *%{name}* است"
@@ -24257,6 +24275,7 @@ fa:
   title_is_too_long_b192a46a: "عنوان طولانی است"
   title_is_too_long_must_be_under_length_characters_ab694ae4: "طولانی است، باید کمتر از %{length} نویسه باشد"
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} قفل گشایی شده است. برای قفل کردن کلیک کنید."
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "عنوان باید حداقل یک حرف یا عدد داشته باشد"
   title_outcomes_7adbd9cc: "%{title} عواقب"
   title_separator: ": "
   title_tray_ec9f7488: "سینی %{title}"
@@ -24388,6 +24407,7 @@ fa:
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "برای وارد کردن فایل‌ها با استفاده از ابزار ورود درس ، محتوای درس - افزودن / ویرایش / حذف نیز باید فعال باشد."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "برای وارد کردن داده های سامانه اطلاعات دانشجو، ورود_سامانه اطلاعات دانشجو نیز باید فعال باشد."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "برای پیوند دادن بییننده درس *%{name}* به یک دانشجو، نام دانشجو را در قسمت زیر تایپ کنید تا آنها را بیابید و سپس روی بهنگام سازی کلیک کنید."
+  to_make_a_new_page_for_this_submission_select_a_se_6cd921aa: "برای ایجاد یک صفحه جدید برای این مورد ارسالی، یک بخش را انتخاب کنید و نام صفحه جدید را وارد نمایید."
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "برای مدیریت تنظیمات دوره طرح در تنظیمات درس‌ها، درس‌ها - افزودن / ویرایش / حذف نیز باید فعال باشند."
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
       برای مدیریت گفتگوها، گفتگوها - تعدیل سازی نیز باید فعال شود.
@@ -25012,6 +25032,7 @@ fa:
     titles: 
       add_login: "افزودن ورود"
       update_login: "بهنگام سازی ورود"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "ادغام کاربر انجام نشد. مطمئن شوید که مجوز لازم را دارید و دوباره تلاش کنید."
   user_name: 
     buttons: 
       update_user: "بهنگام سازی کاربر"
@@ -25869,6 +25890,8 @@ fa:
   windows_tile_color_2b786bd9: "رنگ صفحه ویندوز"
   windows_tile_square_b91d2b33: "صفحه ویندوز: مربع"
   windows_tile_wide_4d40910: "صفحه ویندوز: عریض"
+  with_this_option_selected_all_fields_in_all_record_14a361c9: "با انتخاب این گزینه، همه جاهای خالی موجود در همه سوابق که از این ورود اطلاعات سامانه اطلاعات دانشجو متأثر هستند در ورودهای بعدی که جایگزین ورودهای قبلی نمی شوند قابل تغییر خواهند بود."
+  with_this_option_selected_changes_made_through_thi_e751dd22: "با انتخاب این گزینه، تغییرات ایجاد شده از طریق این ورود اطلاعات سامانه اطلاعات دانشجو طوری پردازش خواهند شد که گویی آنها تغییرات واسط کاربر هستند و از تغییر جاهای خالی تغییر داده شده در اینجا از طریق ورودهای بعدی که جایگزین ورودهای قبلی نمی شوند جلوگیری می نماید."
   withdrawn_4c838347: "حذف شده"
   withdrawn_or_enrolled_43a3f0ae: "منصرف شده یا ثبت نام شده "
   wmv_1119d032: WMV
@@ -25955,12 +25978,14 @@ fa:
   you_can_review_the_submission_details_by_clicking__9abc5515: "می توانید با کلیک کردن روی این پیوند: %{link}، اطلاعات مورد ارسالی را بازبینی کنید."
   you_can_review_the_submission_details_using_the_li_c25dd615: "می‌توانید جزئیان مورد ارسالی را با استفاده از پیوند زیر بازبینی کنید"
   you_can_review_the_submission_details_using_this_l_c7f51917: "می توانید با کلیک کردن روی این پیوند: %{link}، اطلاعات مورد ارسالی را بازبینی کنید."
+  you_can_search_by_25d8e2b2: "می توانید جستجو کنید بر اساس:"
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "می توانید با کلیک کردن روی این پیوند %{link}، اطلاعات مربوط به این گروه را مشاهده کنید."
   you_can_t_delete_a_root_account_5673c62d: "نمی‌توانید حساب_ریشه را حذف کنید."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "نمی توانید یک زیر حساب که دارای درس است را حذف کنید"
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "نمی توانید یک زیر حساب که دارای زیر حساب است را حذف کنید."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: " به علت وجود درس در %{account_name} نمی‌توانید آن را حذف کنید"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "نمی توانید این دستورالعمل ارزیابی را ویرایش کنید، یا به این علت که اجازه ندارید و یا اینکه در بیش از یک جا استفاده شده است. هر گونه تغییری که انجام می دهید به یک دستورالعمل ارزیابی جدید بر مبنای دستورالعمل ارزیابی قدیمی منجر می شود. با این وجود ادامه می دهید؟"
+  you_can_t_merge_an_account_with_itself_15f58d41: "نمی توانید یک حساب را با خودش ادغام کنید."
   you_can_t_submit_an_assignment_when_it_is_unpublis_6c2c0b2f: "وقتی تکلیف منتشر نشده است، نمی‌توانید آن را ارسال کنید"
   you_can_try_to_log_in_again_2b23ef0f: "می توانید سعی کنید *دوباره وارد شوید*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "شما می توانید بعضی از اطلاعات این کاربر را بهنگام کنید ولی این کاربر می تواند تغییرات را به حالت اولیه برگرداند."

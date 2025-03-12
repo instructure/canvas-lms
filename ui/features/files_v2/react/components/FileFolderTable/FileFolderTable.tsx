@@ -30,7 +30,7 @@ import {useQuery, queryClient} from '@canvas/query'
 import {type File, type Folder} from '../../../interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {parseLinkHeader} from '../../../utils/apiUtils'
-import {getUniqueId} from '../../../utils/fileFolderUtils'
+import {isFile, getUniqueId} from '../../../utils/fileFolderUtils'
 import SubTableContent from './SubTableContent'
 import ActionMenuButton from './ActionMenuButton'
 import NameLink from './NameLink'
@@ -40,12 +40,14 @@ import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
 import BulkActionButtons from './BulkActionButtons'
 import Breadcrumbs from './Breadcrumbs'
+import getCookie from '@instructure/get-cookie'
 import CurrentUploads from '../FilesHeader/CurrentUploads'
 import {View} from '@instructure/ui-view'
 import {FileManagementContext} from '../Contexts'
 import {FileFolderWrapper, FilesCollectionEvent} from '../../../utils/fileFolderWrappers'
 import BlueprintIconButton from './BlueprintIconButton'
 import {Alert} from '@instructure/ui-alerts'
+import CurrentDownloads from '../FilesHeader/CurrentDownloads'
 
 const I18n = createI18nScope('files_v2')
 
@@ -63,17 +65,74 @@ const fetchFilesAndFolders = async (
   return {rows, links}
 }
 
+const setColumnWidths = (headers: ColumnHeader[]) => {
+  // Use a temporary div to calculate the width of each column
+  const temp = document.createElement('div')
+  temp.style.position = 'absolute'
+  temp.style.visibility = 'hidden'
+  temp.style.whiteSpace = 'nowrap'
+  temp.style.left = '-9999px'
+  temp.style.fontFamily = getComputedStyle(document.body).fontFamily
+  temp.style.fontSize = getComputedStyle(document.body).fontSize
+  temp.style.fontWeight = 'bold'
+  document.body.appendChild(temp)
+
+  const fontSizeInPx = parseFloat(temp.style.fontSize)
+
+  headers.forEach(header => {
+    if (header.width) return // some headers have fixed widths
+    temp.textContent = header.title
+    const width = temp.getBoundingClientRect().width
+    const widthInEms = width / fontSizeInPx
+    const padding = 1.5
+    header.width = `${Math.round(Math.max(3, widthInEms + padding) * 100) / 100}em`
+  })
+  document.body.removeChild(temp)
+}
+
 const columnHeaders: ColumnHeader[] = [
   {id: 'name', title: I18n.t('Name'), textAlign: 'start', width: '12.5em'},
-  {id: 'created_at', title: I18n.t('Created'), textAlign: 'start', width: '6em'},
-  {id: 'updated_at', title: I18n.t('Last Modified'), textAlign: 'start', width: '6em'},
-  {id: 'modified_by', title: I18n.t('Modified By'), textAlign: 'start', width: '6em'},
-  {id: 'size', title: I18n.t('Size'), textAlign: 'start', width: '4em'},
-  {id: 'rights', title: I18n.t('Rights'), textAlign: 'center', width: '3.5em'},
-  {id: 'blueprint', title: I18n.t('Blueprint'), textAlign: 'center', width: '3.5em'},
-  {id: 'published', title: I18n.t('Published'), textAlign: 'center', width: '4em'},
+  {
+    id: 'created_at',
+    title: I18n.t('Created'),
+    textAlign: 'start',
+    width: undefined,
+  },
+  {
+    id: 'updated_at',
+    title: I18n.t('Last Modified'),
+    textAlign: 'start',
+    width: undefined,
+  },
+  {
+    id: 'modified_by',
+    title: I18n.t('Modified By'),
+    textAlign: 'start',
+    width: undefined,
+  },
+  {id: 'size', title: I18n.t('Size'), textAlign: 'start', width: ''},
+  {
+    id: 'rights',
+    title: I18n.t('Rights'),
+    textAlign: 'center',
+    width: undefined,
+  },
+  {
+    id: 'blueprint',
+    title: I18n.t('Blueprint'),
+    textAlign: 'center',
+    width: undefined,
+  },
+  {
+    id: 'published',
+    title: I18n.t('Published'),
+    textAlign: 'center',
+    width: undefined,
+  },
   {id: 'actions', title: '', textAlign: 'center', width: '3em'},
 ]
+
+setColumnWidths(columnHeaders)
 
 const columnRenderers: {
   [key: string]: ({
@@ -85,7 +144,7 @@ const columnRenderers: {
     size,
     isSelected,
     toggleSelect,
-  }: {
+}: {
     row: File | Folder
     isStacked: boolean
     userCanEditFilesForContext: boolean
@@ -98,11 +157,17 @@ const columnRenderers: {
 } = {
   name: ({row, isStacked}) => <NameLink isStacked={isStacked} item={row} />,
   created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} />,
-  updated_at: ({row}) => <FriendlyDatetime dateTime={row.updated_at} />,
+  updated_at: ({row}) => (
+    <div style={{padding: '0 0.5em'}}>
+      <FriendlyDatetime dateTime={row.updated_at} />
+    </div>
+  ),
   modified_by: ({row}) =>
     'user' in row && row.user?.display_name ? (
       <Link isWithinText={false} href={row.user.html_url}>
-        <Text>{row.user.display_name}</Text>
+        <div style={{textOverflow: 'ellipsis', overflow: 'hidden'}}>
+          <Text>{row.user.display_name}</Text>
+        </div>
       </Link>
     ) : null,
   size: ({row}) =>
@@ -168,7 +233,7 @@ const FileFolderTable = ({
   const [sortColumn, setSortColumn] = useState<string>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('asc')
 
-  const {data, error, isLoading, isFetching} = useQuery({
+  const { data, error, isLoading, isFetching } = useQuery({
     queryKey: ['files', currentUrl],
     queryFn: () => {
       setSelectedRows(new Set())
@@ -178,7 +243,7 @@ const FileFolderTable = ({
       return fetchFilesAndFolders(currentUrl, onLoadingStatusChange)
     },
     staleTime: 0,
-    onSuccess: ({links}) => {
+    onSuccess: ({ links }) => {
       onPaginationLinkChange(links)
     },
     onSettled: result => {
@@ -287,6 +352,7 @@ const FileFolderTable = ({
           <BulkActionButtons
             size={size}
             selectedRows={selectedRows}
+            rows={rows}
             totalRows={rows.length}
             userCanEditFilesForContext={userCanEditFilesForContext}
             userCanDeleteFilesForContext={userCanDeleteFilesForContext}
@@ -294,7 +360,7 @@ const FileFolderTable = ({
         </Flex.Item>
       </Flex>
     )
-  }, [
+}, [
     folderBreadcrumbs,
     rows.length,
     selectedRows,
@@ -317,6 +383,7 @@ const FileFolderTable = ({
       {renderTableActionsHead()}
       <View display="block" margin="0 0 medium">
         <CurrentUploads />
+        <CurrentDownloads rows={rows} />
       </View>
       <Table caption={tableCaption} hover={true} layout={isStacked ? 'stacked' : 'fixed'}>
         <Table.Head

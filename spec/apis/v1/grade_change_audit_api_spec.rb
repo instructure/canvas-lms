@@ -73,7 +73,7 @@ describe "GradeChangeAudit API", type: :request do
 
   def fetch_for_course_and_other_contexts(contexts, options = {})
     expected_contexts = %i[course assignment grader student].freeze
-    sorted_contexts = contexts.select { |key, _| expected_contexts.include?(key) }
+    sorted_contexts = contexts.slice(*expected_contexts)
                               .sort_by { |key, _| expected_contexts.index(key) }
 
     arguments = sorted_contexts.to_h { |key, value| [:"#{key}_id", value.id] }

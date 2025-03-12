@@ -35,6 +35,7 @@ export const inputParamsShape = {
   nameList: PropTypes.string,
   role: PropTypes.string,
   section: PropTypes.string,
+  searchInputError: PropTypes.shape({text: PropTypes.string, type: PropTypes.string}),
 }
 
 export const validateResultShape = {
@@ -49,7 +50,7 @@ export const duplicateUserShape = {
   address: PropTypes.string,
   user_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   user_name: PropTypes.string,
-  account_id: PropTypes.number,
+  account_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   account_name: PropTypes.string,
   email: PropTypes.string,
   login_id: PropTypes.string,
@@ -63,7 +64,7 @@ export const newUserShape = {
 
 export const duplicateSetShape = {
   address: PropTypes.string, // the duplicate field in this list of users
-  selectedUserId: PropTypes.number, // dflt = -1,
+  selectedUserId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // dflt = -1,
   skip: PropTypes.bool, // dflt = false,
   createNew: PropTypes.bool, // true if selected to create a new user  for this address
   newUserInfo: PropTypes.shape(newUserShape), // new user's info, or undefined
@@ -89,7 +90,7 @@ export const validatedUserShape = {
   address: PropTypes.string,
   user_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   user_name: PropTypes.string,
-  account_id: PropTypes.number,
+  account_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   account_name: PropTypes.string,
 }
 
@@ -98,7 +99,7 @@ export const personReadyToEnrollShape = {
   email: PropTypes.string,
   address: PropTypes.string,
   account_name: PropTypes.string,
-  account_id: PropTypes.number,
+  account_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   user_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   login_id: PropTypes.string,
   sis_user_id: PropTypes.string,

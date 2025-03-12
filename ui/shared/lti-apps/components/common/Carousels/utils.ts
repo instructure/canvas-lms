@@ -16,13 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Badges, Product} from '../../../models/Product'
+import type {Product} from '../../../models/Product'
 
 interface Settings {
   [key: string]: number | boolean | Array<number> | object
 }
 
-export const settings = (items: string[] | Badges[] | Product[]): Settings => {
+export const genericCarouselSettings = (): Settings => {
+  return {
+    dots: false,
+    infinite: true,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: false,
+  }
+}
+
+export const responsiveCarouselSettings = (
+  items: string[] | Product[],
+): Settings => {
   return {
     dots: false,
     infinite: false,
@@ -50,7 +62,7 @@ export const settings = (items: string[] | Badges[] | Product[]): Settings => {
 }
 
 export const calculateArrowDisableIndex = (
-  items: string[] | Badges[] | Product[],
+  items: string[] | Product[],
   isDesktop: boolean,
   isTablet: boolean,
   isMobile: boolean,

@@ -50,6 +50,7 @@ const defaultProps: ComponentProps = {
   isSavingDraft: false,
   blueprintLocked: false,
   isDraftPace: false,
+  isBulkEnrollment: false,
 }
 
 describe('Footer', () => {

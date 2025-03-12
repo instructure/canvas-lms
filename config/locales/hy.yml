@@ -1671,6 +1671,7 @@ hy:
   add_new_group_7ac49f31: "Ավելացնել նոր խումբ"
   add_new_set_of_due_dates_e8e240f: "Ավելացնել կատարման ժամկետների նոր խմբեր"
   add_page_7ea7ee39: "Ավելացնել էջ"
+  add_page_for_submission_8941db3e: "Ուղարկման համար ավելացնել էջ"
   add_people_7ee4b2ec: "Ավելացնել մարդկանց"
   add_prerequisite_6409bd9: "Ավելացնել նախնական պայման"
   add_quiz_cebfa28b: "Ավելացնել Թեստ"
@@ -2751,6 +2752,8 @@ hy:
   attendance_ca433183: Հաճախումներ
   attendees_eb402bac: Մասնակիցներ
   attention_aaca1f1d: Ուշադրություն
+  attributes: 
+    idp_entity_id: "IdP միավորի նույնականացուցիչը"
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Ձայնագրառման բովանդակությունը հասանելի չէ Ձեր սարքի կամ հավելվածի միջոցով:"
   audio_dd489fcc: Աուդիո
   auth_logging: 
@@ -3461,6 +3464,7 @@ hy:
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas-ը կարծում է, որ պատասխանը ընդունելի է"
   canvas_ticketing_email_connector_27e253ae: "Canvas ձևերը գեներացնող էլ.փոստի կոնեկտոր "
   canvas_ticketing_web_post_connector_11158897: "Canvas ձևերը գեներացնող վեբ-հրապարակումների կոնեկտոր"
+  canvas_user_id_caf65ef5: "Canvas օգտատիրոջ ID"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas համակարգը կրկին կգնահատի Ձեր կողմից ուղարկված բոլոր աշխատանքները այն բանից հետո, երբ Դուք կպահպանեք թեստը: Դա կտևի մի քանի րոպե:"
   careful_changes_to_group_membership_will_apply_to__19a9089c: "Ուշադրությո՛ւն։ Խմբի անդամակցության փոփոխությունները կկիրառվեն այն խմբերի նկատմամբ, որոնք արդեն ներկայացրել են իրենց հանձնարարությունները։ Արդյունքում խմբերի ներկայացրած հանձնարարությունները կարող են չհամընկնել։ Արդյո՞ք ցանկանում եք ստեղծել նոր խումբ ապագա հանձնարարությունների համար։"
   cas_url_4ba2843e: "CAS URL"
@@ -3508,6 +3512,7 @@ hy:
   chosencolor_is_not_a_valid_color_5d542cc: "'%{ընտրված գույն}'-ը վավեր գույն չէ"
   clear_2084585f: Մաքրել
   clear_all_e23811b1: "Մաքրել բոլորը"
+  clear_ui_changed_state_d0aca02d: "Մաքրել UI փոփոխված վիճակը"
   click_for_more_details_on_this_outcome_8c018d2f: "Սեղմել այս արդյունքի մանրամասները տեսնելու համար"
   click_here_for_an_account_9536cb36: "Սեղմեք այստեղ հաշվի համար"
   click_here_it_s_free_eeccb9cb: "Սեղմեք այստեղ, այն անվճար է"
@@ -4675,6 +4680,8 @@ hy:
     one: "1 մասնակից"
     other: "%{count} մասնակից"
   count_people_489946e7: "%{count} մարդ"
+  count_people_found_1ab374c0: 
+    zero: "Ոչ մի օգտատեր չի գտնվել"
   count_students_30e46120: 
     one: "1 ուսանող"
     other: "%{count} ունկնդիր"
@@ -6486,6 +6493,7 @@ hy:
   email_is_invalid_or_in_use_4c3de5b9: "Էլ. հասցեն անվավեր է կամ օգտագործման ընթացքում է"
   email_is_required_736ac26b: "Անհրաժեշտ է մուտքագրել էլեկտրոնային փոստի հասցե"
   email_the_user_about_this_account_creation_e63f8759: "Տեղեկացնել օգտատիրոջը այս հաշվի ստեղծման մասին էլեկտրոնային փոստի միջոցով:"
+  emails_d07c3348: "Էլեկտրոնային փոստի հասցեներ"
   ember_modules_description: "Մոդուլները արտագրվել են Ember-ում: Օգտագործում է քաշելու և թողնելու սեփական API՝ արտաքին աղբյուրներից տեղափոխություններ կատարելու համար:   "
   enable_6f5d1328: Միացնել
   enable_and_lock_e6099cc2: "Միացնել և արգելափակել"
@@ -9279,6 +9287,7 @@ hy:
     customize: Կարգաբերում
     managed_accounts: "Կառավարվող հաշիվներ"
     my_courses: "Իմ դասընթացները"
+  merge_user_accounts_a49e8fb1: "Միավորել օգտատիրոջ հաշիվները"
   message: 
     default_subject: "Canvas -ի ծանուցում"
   message_896d2ed0: "%{message}"
@@ -11341,6 +11350,7 @@ hy:
   next_steps_ce0f0d0c: "Հերթական քայլերը"
   next_student_79955068: "Հաջորդ ունկնդիրը"
   no_74e9b590: Ոչ
+  no_active_user_with_that_id_was_found_b8fb5e14: "Այդպիսի  ID ունեցող ակտիվ օգտատեր չի գտնվել:"
   no_assignment_name_adbb215b: "Հանձնարարության անվանում չկա"
   no_assignment_selected_65d9e422: "Ոչ մի հանձնարարություն ընտրված չէ"
   no_content_5dbc9acf: "Բովանդակություն չկա"
@@ -11369,6 +11379,7 @@ hy:
   no_migration_file: "Բովանդակության տեղափոխման համար անհրաժեշտ ֆայլ"
   no_outcome_selected_16d15753: "Ոչ մի արդյունք ընտրված չէ"
   no_password_was_given_472222e5: "Գաղտնաբառ տրված չէ "
+  no_people_found_67a8ee2f: "Ոչ մի օգտատեր չի գտնվել"
   no_placements_enabled_f705f28: "Տեղադրումները միացված չեն"
   no_points_possible_368669d: "Հնարավոր միավորներ չկան"
   no_preview_available_e8e71199: "Նախնական դիտումը հասանելի չէ"
@@ -11948,6 +11959,7 @@ hy:
     titles: 
       find_outcomes: "Գտնել արդյունքները"
   outcomes_d1b18d33: Արդյունքներ
+  override_ui_changes_5e0c56ab: "Վերասահմանել UI փոփոխությունները"
   overrides: 
     blank_override: "Անհրաժեշտ է ունենալ ընտրված ունկնդիր կամ բաժին"
     everyone: Յուրաքանչյուրը
@@ -12094,6 +12106,7 @@ hy:
   permissions_365c49e: Թույլտվություններ
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "ընտրեք հասցեն, մենք ձեզ կուղարկենք սխալները "
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "ընտրեք վերջնական կետը, մենք այնտեղ կտեղադրենք սխալների մասին հաշվետվություններ"
+  pick_dd033b86: Ընտրել
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Նշեք ամսաթիվն ու ժամը հետևյալ կոնֆերանսի  համար"
   pink_68ad45cb: Վարդագույն
   pinned_discussions_a55c0cea: "Կապակցված քննարկումներ"
@@ -12551,6 +12564,8 @@ hy:
   priority_dd4381ee: Առաջնահերթություն
   privacy_290109ea: Գաղտնիություն
   privacy_policy_c68f482a: "Գաղտնիության պահպանման քաղաքականություն"
+  process_as_ui_changes_8e34ed2a: "Մշակվում են  որպես UI փոփոխություններ "
+  process_data_2f5f962f: "Մշակել տվյալները"
   product_name: Canvas
   profile: 
     access_token: 
@@ -12847,6 +12862,7 @@ hy:
       yo: Yo
     you_have_no_services: "Դուք որևէ ծառայություն չեք գրանցել, կարող եք ավելացնել մի քանիսը *Կարգաբերումներ* էջում: "
   profile_6bd2baed: Պրոֆիլ
+  profile_picture_13e5338c: "Պրոֆիլի պատկեր"
   profile_pictures_15953851: "Պրոֆիլի նկարներ"
   profiles: 
     avatar_dialog: 
@@ -14758,6 +14774,7 @@ hy:
     course_files: "Դասընթացի ֆայլեր"
     group_files: "Խմբի ֆայլեր"
     my_files: "Իմ ֆայլերը"
+  root_account_9d4fcb97: "Հասանելիության առավելագույն իրավունքներով հաշիվ"
   roster: 
     delete_confirm: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս օգտատիրոջը:"
     error_sending_invitations: "Հրավերն ուղարկելու սխալ: Փորձեք կրկին:"
@@ -16738,6 +16755,7 @@ hy:
   this_grade_is_currently_dropped_for_this_student_7bc78b78: " Այս գնահատականը այս ունկնդրի համար ներկայումս հանվել է:"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Այս պատկերը հանդիսանում է Ձեր էջ ֆոնային պատկերը: Ընդունելի ձևաչափեր՝ png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Սա URL-հասցեների ստորակետներով բաժանված վստահելի  ցուցակ է: Այս ցուցակում ընդգրկված որևէ URL-ին վստահելը կնշանակի, որ այնտեղից Canvas մուտք գործելիս բաց է թողնվելու CSRF token-ը:"
+  this_is_a_full_batch_update_99d726e0: "Սա փաթեթի ամբողջական թարմացումն է:"
   this_is_a_group_discussion_2f9acdae: "Սա խմբային քննարկում է "
   this_is_a_media_comment_click_here_to_view_c297bf62: "Սա մուլտիմեդիա մեկնաբանություն է, *սեղմեք այստեղ դիտելու համար*:"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Սա այս ունկնդրի համար ընտրված գնահատականն է:"
@@ -16956,6 +16974,7 @@ hy:
     new_topic: "Քննարկման նոր թեմա"
   title_52b8638d: Վերնագիր.
   title_is_too_long_b192a46a: "Վերնագիրը չափազանց երկար է"
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "Վերնագիրը պետք է առնվազն պարունակի մեկ տառ կամ թիվ"
   title_separator: ":"
   titles: 
     aligned_items: "Համաձայնեցված տարրեր"
@@ -16981,6 +17000,7 @@ hy:
       
       Եթե պրովայդերը կարող է կարգաբերել ընդունելի callback կամ ուղղորդելURI-ները, օգտագործեք  %{callback_url}:
   to_date_7c45ee77: "մինչև ամսաթիվը"
+  to_make_a_new_page_for_this_submission_select_a_se_6cd921aa: "Այս ուղարկման համար նոր էջ ստեղծելու նպատակով ընտրել բաժինը և մուտքագրել նոր էջի անվանումը:"
   to_minscore_43e5452e: "%{minScore}% համար"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Քննարկումը էջի վերևում տեղադրելու համար քննարկումը քաշեք այստեղ կամ քննարկումների կարգաբերումների մենյուից ընտրեք \"Ամրացնել\" կետը: "
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Օգտատերերի համար կոնկրետ Google Apps դոմեյնը սահմանափակելու համար, մուտքագրեք դոմենը այստեղ"
@@ -17216,6 +17236,7 @@ hy:
     titles: 
       add_login: "Ավելացնել մուտքի տվյալները"
       update_login: "Թարմացնել մուտքի տվյալները"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "Օգտատիրոջ միավորումը չհաջողվեց: Խնդրում ենք համոզվել, որ Դուք ունեք համապատասխան թույլտվություն և փորձեք կրկին:"
   user_name: 
     buttons: 
       update_user: "Թարմացնել օգտատիրոջ տվյալները"
@@ -17844,6 +17865,8 @@ hy:
   windows_tile_color_2b786bd9: "Windows սալիկի գույն"
   windows_tile_square_b91d2b33: "Windows սալիկ. քառակուսի"
   windows_tile_wide_4d40910: "Windows սալիկ. լայնություն"
+  with_this_option_selected_all_fields_in_all_record_14a361c9: "Այս տարբերակի ընտրության դեպքում սույն SIS ներմուծման մեջ ներառված բոլոր գրանցումների բոլոր դաշտերը հնարավոր է փոփոխել, չվերասահմանելով  SIS հետագա ներմուծումները:"
+  with_this_option_selected_changes_made_through_thi_e751dd22: "Այս օպցիան ընտրելով SIS ներմուծման միջոցով կատարված փոփոխությունները կմշակվեն որպես UI փոփոխություններ, կանխելով այն, որ հետագա SIS չկրկնօրինակող ներմուծումները փոխեն այստեղ փոփոխված դաշտերը: "
   workflow_state_cc8d711a: "Աշխատանքային գործընթացի վիճակը"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Դուք ցանկանում եք այս թարմացումը ընդունել թե՞ մերժել: "
   would_you_like_to_enable_this_app_ccdf735d: "Կցանկանայի՞ք միացնել այս հավելվածը:"
@@ -17877,11 +17900,13 @@ hy:
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "Դուք կարող եք պատասխանել այս հաղորդագրությանը Canvas համակարգում՝ ուղղակիորեն պատասխանելով այս էլեկտրոնային նամակին կամ սեղմելով այս հղումը. %{link}"
   you_can_review_the_submission_details_by_clicking__58a7753: "Դուք կարող եք դիտել մանրամասները, սեղմելով ներքևի հղումը."
   you_can_review_the_submission_details_by_clicking__9abc5515: "Այս հղման միջոցով դուք կարող եք դիտել ուղարկված աշխատանքի մանրամասները. %{link}"
+  you_can_search_by_25d8e2b2: "Դուք կարող եք որոնել ըստ՝"
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "Այս հղման միջոցով Դուք կարող եք տեսնել այս խմբի մանրամասները. %{link}"
   you_can_see_which_groups_you_re_a_part_of_for_this_6efda22c: "Այս հղման միջոցով դուք կարող եք տեսնել, թե այս դասընթացի շրջանակներում ինչ խմբերում եք դուք ընդգրկվել. %{link}"
   you_can_see_which_groups_you_re_a_part_of_for_this_827a3706: "Այս հղման միջոցով Դուք կարող եք տեսնել, թե այս դասընթացի շրջանակներում ինչ խմբերում եք դուք ընդգրկվել. %{link}"
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Դուք չեք կարող ջնջել ենթահաշիվ, որը դասընթացներ ունի իր մեջ:"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Դուք չեք կարող խմբագրել այս ռուբրիկը, որովհետև  թույլտվություն չունեք, կամ այն օգտագործվում է մեկից ավելի տեղերում: Ձեր կատարած ցանկացած փոփոխություն կհանգեցնի հին ռուբրիկի վրա հիմնված նոր ռուբրիկի: Ցանկանո՞ւմ եք շարունակել: "
+  you_can_t_merge_an_account_with_itself_15f58d41: "Չի կարելի հաշիվը միավորել ինքն իր հետ:"
   you_can_try_to_log_in_again_2b23ef0f: "Դուք կարող եք փորձել *կրկին մուտք գործել:*"
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Դուք կարող եք թարմացնել օգտատիրոջ վերաբերյալ որոշ տեղեկություններ, բայց նա կարող է դրանք նորից հին տեղեկություններով փոխարինել:"
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Դուք կարող եք օգտագործել 16x16, 32x32, 48x48 ico ֆայլերը"

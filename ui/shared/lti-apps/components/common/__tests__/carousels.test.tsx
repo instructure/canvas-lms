@@ -17,9 +17,8 @@
  */
 
 import {render} from '@testing-library/react'
-import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
-import ImageCarousel from '../Carousels/ImageCarousel'
+import ImageCarouselModal from '../Carousels/ImageCarouselModal'
 import ProductCarousel from '../Carousels/ProductCarousel'
 import {company, product} from './data'
 
@@ -46,7 +45,7 @@ describe('Carousels render as expected', () => {
   })
 
   it('ImageCarousel renders as expected', () => {
-    render(<ImageCarousel screenshots={product[0].screenshots} />)
+    render(<ImageCarouselModal isModalOpen={true} setModalOpen={() => {}} screenshots={product[0].screenshots} productName={product[0].name} />)
 
     const displayedImage = document.querySelector('img') as HTMLImageElement
     expect(displayedImage.src).toContain('greatimage')

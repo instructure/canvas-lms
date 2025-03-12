@@ -524,6 +524,25 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
+    context "assign to differentiation tags" do
+      before do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+      end
+
+      it "differentiation tags information is true if account setting is on and user can manage tags" do
+        course_quiz
+        user_session(@teacher)
+        get "edit", params: { course_id: @course.id, id: @quiz.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+    end
+
     context "conditional release" do
       before do
         allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: "charliemccarthy" })

@@ -114,7 +114,7 @@ export const fetchRubric = async ({
 }
 
 export type SaveRubricResponse = {
-  rubric: Rubric & {canUpdate?: boolean}
+  rubric: Rubric & {canUpdate?: boolean; association_count?: number}
   rubricAssociation: RubricAssociation
 }
 export const saveRubric = async (
@@ -214,6 +214,7 @@ export const saveRubric = async (
     rubric: {
       ...mapRubricUnderscoredKeysToCamelCase(savedRubric),
       canUpdate: savedRubric.permissions?.update,
+      association_count: savedRubric.association_count,
     },
     rubricAssociation: mapRubricAssociationUnderscoredKeysToCamelCase(rubric_association),
   }

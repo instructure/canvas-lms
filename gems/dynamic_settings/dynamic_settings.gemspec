@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activesupport", ">= 5.0"
   spec.add_dependency "config_file"
   spec.add_dependency "diplomat", ">= 2.5.1"
+  spec.add_dependency "logger", "~> 1.5"
   spec.add_dependency "railties"
 
   spec.add_development_dependency "bundler"

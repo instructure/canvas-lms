@@ -163,18 +163,18 @@ describe('Add People Actions', () => {
                 {
                   user_id: 1,
                   name: 'Test User',
-                  email: 'test@example.com'
-                }
-              ]
-            }
+                  email: 'test@example.com',
+                },
+              ],
+            },
           },
           missing: {},
-          validUsers: []
+          validUsers: [],
         },
         courseParams: {
           courseId: '1',
-          inviteUsersURL: '/courses/1/invite_users'
-        }
+          inviteUsersURL: '/courses/1/invite_users',
+        },
       }
       mockStore(testState)
       store.dispatch(actions.resolveValidationIssues())
@@ -240,7 +240,7 @@ describe('Add People Actions', () => {
 
     test('dispatches SUCCESS with data when successful', async () => {
       mockAxiosSuccess({data: 'foo'})
-      store.dispatch(actions.enrollUsers())
+      store.dispatch(actions.enrollUsers(() => Promise.resolve()))
       // Wait for the promise to resolve
       await new Promise(resolve => setTimeout(resolve, 1))
       expect(

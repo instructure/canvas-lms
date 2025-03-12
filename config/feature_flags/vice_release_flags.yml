@@ -37,6 +37,9 @@ react_discussions_post:
       For full details, please see the *Discussions/Announcements Redesign user group*
       in the Canvas Community
   applies_to: Course
+  environments:
+    development:
+      state: allowed_on # default to on for local development
 
 discussions_reporting:
   state: hidden

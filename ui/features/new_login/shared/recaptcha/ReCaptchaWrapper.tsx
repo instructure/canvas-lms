@@ -18,6 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
+import {IconWarningSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import React, {forwardRef, useImperativeHandle, useRef} from 'react'
@@ -46,22 +47,45 @@ const ReCaptchaWrapper = forwardRef<ReCaptchaWrapperRef, Props>(({children, hasE
   return (
     <Flex direction="column" gap="xx-small">
       <View
-        as="div"
-        role="presentation"
         aria-describedby={hasError ? 'recaptcha-error' : undefined}
-        position="relative"
-        tabIndex={-1}
+        as="div"
+        data-testid="recaptcha-container"
         elementRef={el => {
           containerRef.current = el as HTMLDivElement
         }}
+        height="78px"
+        position="relative"
+        role="presentation"
+        tabIndex={-1}
+        width="304px"
       >
         {children}
       </View>
 
       {hasError && (
-        <Text id="recaptcha-error" color="danger" role="alert" size="small" aria-live="assertive">
-          {I18n.t('Please complete the reCAPTCHA verification.')}
-        </Text>
+        <Flex alignItems="start" as="div" direction="row" gap="xx-small">
+          <Flex.Item align="start" padding="xxx-small 0 0 0" shouldShrink={false}>
+            <IconWarningSolid
+              color="error"
+              data-testid="recaptcha-error-icon"
+              height="0.875rem"
+              style={{verticalAlign: 'top'}}
+              width="0.875rem"
+            />
+          </Flex.Item>
+          <Text
+            aria-live="assertive"
+            as="span"
+            color="danger"
+            data-testid="recaptcha-error-text"
+            id="recaptcha-error"
+            lineHeight="default"
+            role="alert"
+            size="small"
+          >
+            {I18n.t('Please complete the verification.')}
+          </Text>
+        </Flex>
       )}
     </Flex>
   )

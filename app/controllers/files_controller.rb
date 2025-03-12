@@ -504,7 +504,7 @@ class FilesController < ApplicationController
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
 
     if (@submission && authorized_action(@submission, @current_user, :read)) ||
-       ((params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) || authorized_action(@attachment, @current_user, :download))
+       ((params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, @domain_root_account, session)) || authorized_action(@attachment, @current_user, :download))
       render json: { public_url: @attachment.public_url(secure: request.ssl?) }
     end
   end
@@ -695,7 +695,7 @@ class FilesController < ApplicationController
 
         if params[:download]
           if jwt_resource_match(@attachment) ||
-             (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
+             (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, @domain_root_account, session)) ||
              @attachment.grants_right?(@current_user, session, :download)
             disable_page_views if params[:preview]
             begin
@@ -768,7 +768,7 @@ class FilesController < ApplicationController
 
         verifier_checker = Attachments::Verification.new(@attachment)
         if jwt_resource_match(attachment) ||
-           (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
+           (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, @domain_root_account, session)) ||
            attachment.grants_right?(@current_user, session, :download)
           # Right now we assume if they ask for json data on the attachment
           # then that means they have viewed or are about to view the file in
@@ -1234,11 +1234,8 @@ class FilesController < ApplicationController
     end
 
     json = attachment_json(@attachment, @current_user, {}, json_params)
-    json.merge!(doc_preview_json(@attachment))
 
-    # render as_text for IE, otherwise it'll prompt
-    # to download the JSON response
-    render json:, as_text: in_app?
+    render json: json.merge!(doc_preview_json(@attachment))
   end
 
   def api_file_status
@@ -1714,7 +1711,7 @@ class FilesController < ApplicationController
 
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
-      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, session)
+      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, @domain_root_account, session)
     end
 
     submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context).filter_map(&:context)

@@ -112,6 +112,65 @@ describe "quiz edit page assign to" do
     expect(selected_assignee_options.count).to be(1)
   end
 
+  context "assign to differentiaiton tags" do
+    before :once do
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.enable_feature! :differentiation_tags
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = true
+        a.save!
+      end
+
+      @differentiation_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+      @diff_tag1 = @course.groups.create!(name: "Differentiation Tag 1", group_category: @differentiation_tag_category, non_collaborative: true)
+      @diff_tag2 = @course.groups.create!(name: "Differentiation Tag 2", group_category: @differentiation_tag_category, non_collaborative: true)
+    end
+
+    it "assigns a differentiation tag and saves quiz" do
+      get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}/edit"
+
+      click_add_assign_to_card
+      select_module_item_assignee(1, @diff_tag1.name)
+      update_due_date(1, "12/31/2022")
+      update_due_time(1, "5:00 PM")
+      update_available_date(1, "12/27/2022")
+      update_available_time(1, "8:00 AM")
+      update_until_date(1, "1/7/2023")
+      update_until_time(1, "9:00 PM")
+
+      submit_page
+
+      override = @classic_quiz.assignment_overrides.last
+      expect(override.set_type).to eq("Group")
+      expect(override.title).to eq(@diff_tag1.name)
+
+      due_at_row = retrieve_quiz_due_date_table_row("1 Group")
+      expect(due_at_row).not_to be_nil
+      expect(due_at_row.text.split("\n").first).to include("Dec 31, 2022")
+      expect(due_at_row.text.split("\n").third).to include("Dec 27, 2022")
+      expect(due_at_row.text.split("\n").last).to include("Jan 7, 2023")
+
+      due_at_row = retrieve_quiz_due_date_table_row("Everyone else")
+      expect(due_at_row).not_to be_nil
+      expect(due_at_row.text.count("-")).to eq(3)
+    end
+
+    context "existing differentiation tag overrides" do
+      before do
+        @classic_quiz.assignment_overrides.create!(set_type: "Group", set_id: @diff_tag1.id, title: @diff_tag1.name)
+        @classic_quiz.assignment_overrides.create!(set_type: "Group", set_id: @diff_tag2.id, title: @diff_tag2.name)
+      end
+
+      it "renders all the override assignees" do
+        get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}/edit"
+
+        # 3 differentiation tags
+        # Since the quiz is not only visible to overrides the "Everyone else" row is shown
+        expect(selected_assignee_options.count).to eq 3
+      end
+    end
+  end
+
   context "sync to sis" do
     include AdminSettingsCommon
     include ItemsAssignToTray

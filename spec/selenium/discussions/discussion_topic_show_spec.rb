@@ -249,6 +249,18 @@ describe "Discussion Topic Show" do
         )
       end
 
+      context "discussions_speedgrader_revisit" do
+        before do
+          @course.account.enable_feature!(:discussions_speedgrader_revisit)
+        end
+
+        it "does not show the switch to individual posts button" do
+          user_session(@teacher)
+          get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+          expect(f("body")).not_to contain_css("button#switch-to-individual-posts-link")
+        end
+      end
+
       it "lets students see the checkpoints tray" do
         user_session(@student)
         get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
@@ -849,6 +861,8 @@ describe "Discussion Topic Show" do
         expect(Discussion.summary_generate_button).to be_present
         expect(Discussion.summary_disable_button).to be_present
         expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
+
+        scroll_into_view Discussion.summary_like_button
 
         Discussion.click_summary_like_button
         Discussion.click_summary_dislike_button

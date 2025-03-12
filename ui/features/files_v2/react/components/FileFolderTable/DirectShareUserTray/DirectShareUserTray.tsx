@@ -120,7 +120,7 @@ const DirectShareUserTray = ({open, onDismiss, courseId, file}: DirectShareUserT
     >
       <Flex direction="column">
         <Flex.Item padding="small">
-          <FileFolderInfo item={file} />
+          <FileFolderInfo items={[file]} />
         </Flex.Item>
         <Flex.Item padding="small">
           <DirectShareUserPanel

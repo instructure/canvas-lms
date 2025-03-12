@@ -91,7 +91,7 @@ export const fetchRubric = async (id?: string): Promise<RubricQueryResponse | nu
 }
 
 export type SaveRubricResponse = {
-  rubric: Rubric
+  rubric: Rubric & {association_count?: number}
   rubricAssociation: RubricAssociation
 }
 export const saveRubric = async (
@@ -171,7 +171,7 @@ export const saveRubric = async (
   }
 
   return {
-    rubric: mapRubricUnderscoredKeysToCamelCase(savedRubric),
+    rubric: {...mapRubricUnderscoredKeysToCamelCase(savedRubric), association_count: 1},
     rubricAssociation: rubric_association,
   }
 }

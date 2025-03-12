@@ -25,6 +25,7 @@ export interface DifferentiationTagCategory {
 export interface DifferentiationTagGroup {
   id: number
   name: string
+  members_count: number
 }
 
 export type ModalMode = 'create' | 'edit'

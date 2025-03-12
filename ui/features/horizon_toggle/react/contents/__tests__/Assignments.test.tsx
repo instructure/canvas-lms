@@ -69,6 +69,10 @@ describe('Assignments', () => {
       </HorizonToggleContext.Provider>,
     )
     expect(screen.getByText('Assignments with Revisions (2 items)')).toBeInTheDocument()
+    const toggle = screen.getByText('Assignments with Revisions')
+    toggle.click()
+    expect(screen.getByText('Assignment 1')).toBeInTheDocument()
+    expect(screen.getByText('Assignment 2')).toBeInTheDocument()
   })
 
   it('displays correct translation for single item', () => {
@@ -97,5 +101,8 @@ describe('Assignments', () => {
       </HorizonToggleContext.Provider>,
     )
     expect(screen.getByText('Assignments with Revisions (1 item)')).toBeInTheDocument()
+    const toggle = screen.getByText('Assignments with Revisions')
+    toggle.click()
+    expect(screen.getByText('Assignment 1')).toBeInTheDocument()
   })
 })

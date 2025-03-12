@@ -69,6 +69,10 @@ describe('Collaborations', () => {
       </HorizonToggleContext.Provider>,
     )
     expect(screen.getByText('Collaborations (2 items)')).toBeInTheDocument()
+    const toggle = screen.getByText('Collaborations')
+    toggle.click()
+    expect(screen.getByText('Collab 1')).toBeInTheDocument()
+    expect(screen.getByText('Collab 2')).toBeInTheDocument()
   })
 
   it('renders the correct translation for single item', () => {
@@ -97,5 +101,8 @@ describe('Collaborations', () => {
       </HorizonToggleContext.Provider>,
     )
     expect(screen.getByText('Collaborations (1 item)')).toBeInTheDocument()
+    const toggle = screen.getByText('Collaborations')
+    toggle.click()
+    expect(screen.getByText('Collab 1')).toBeInTheDocument()
   })
 })

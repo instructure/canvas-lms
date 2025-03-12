@@ -536,7 +536,7 @@ describe "Modules API", type: :request do
         end
       end
 
-      context "index including estimated duration" do
+      context "show including estimated duration" do
         before do
           Account.default.enable_feature!(:horizon_course_setting)
           @course.update!(horizon_course: true)

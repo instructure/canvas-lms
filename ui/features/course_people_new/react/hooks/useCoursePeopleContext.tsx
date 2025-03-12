@@ -18,7 +18,7 @@
 
 import {useContext} from 'react'
 import CoursePeopleContext from '../contexts/CoursePeopleContext'
-import type {CoursePeopleContextType} from '../types.d'
+import type {CoursePeopleContextType} from '../../types'
 
 const useCoursePeopleContext = (): CoursePeopleContextType => useContext(CoursePeopleContext)
 

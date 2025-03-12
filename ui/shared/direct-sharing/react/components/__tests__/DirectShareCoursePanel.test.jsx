@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act} from '@testing-library/react'
+import {render, fireEvent, act, screen} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useManagedCourseSearchApi from '../../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi, {
@@ -58,32 +58,6 @@ describe('DirectShareCoursePanel', () => {
   it('shows the overwrite warning', () => {
     const {getByText} = render(<DirectShareCoursePanel />)
     expect(getByText(/^Importing the same course content more than once/)).toBeInTheDocument()
-  })
-
-  it('disables the copy button initially', () => {
-    const {getByText} = render(<DirectShareCoursePanel />)
-    expect(getByText(/copy/i).closest('button').getAttribute('disabled')).toBe('')
-  })
-
-  it('enables the copy button when a course is selected', async () => {
-    fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
-    const {getByText} = render(<DirectShareCoursePanel />)
-    fireEvent.click(getByText(/select a course/i))
-    fireEvent.click(getByText('abc'))
-    await act(() => fetchMock.flush(true))
-    const copyButton = getByText(/copy/i).closest('button')
-    expect(copyButton.getAttribute('disabled')).toBe(null)
-  })
-
-  it('disables the copy button again when a course search is initiated', async () => {
-    fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
-    const {getByText, getByLabelText} = render(<DirectShareCoursePanel />)
-    const input = getByLabelText(/select a course/i)
-    fireEvent.click(input)
-    fireEvent.click(getByText('abc'))
-    await act(() => fetchMock.flush(true))
-    fireEvent.change(input, {target: {value: 'foo'}})
-    expect(getByText(/copy/i).closest('button').getAttribute('disabled')).toBe('')
   })
 
   it('calls the onCancel property', () => {
@@ -155,13 +129,80 @@ describe('DirectShareCoursePanel', () => {
     expect(useCourseModuleItemApi).not.toHaveBeenCalled()
   })
 
+  describe('Form validation', () => {
+    describe('when validate_call_to_action is off', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES.validate_call_to_action = false
+      })
+
+      it('hides asterisk for course input', () => {
+        render(<DirectShareCoursePanel />)
+        expect(screen.getByLabelText(/select a course/i).getAttribute('required')).toBe(null)
+      })
+
+      it('disables the copy button initially', () => {
+        const {getByText} = render(<DirectShareCoursePanel />)
+        expect(getByText(/copy/i).closest('button').getAttribute('disabled')).toBe('')
+      })
+
+      it('enables the copy button when a course is selected', async () => {
+        fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+        const {getByText} = render(<DirectShareCoursePanel />)
+        fireEvent.click(getByText(/select a course/i))
+        fireEvent.click(getByText('abc'))
+        await act(() => fetchMock.flush(true))
+        const copyButton = getByText(/copy/i).closest('button')
+        expect(copyButton.getAttribute('disabled')).toBe(null)
+      })
+
+      it('disables the copy button again when a course search is initiated', async () => {
+        fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+        const {getByText, getByLabelText} = render(<DirectShareCoursePanel />)
+        const input = getByLabelText(/select a course/i)
+        fireEvent.click(input)
+        fireEvent.click(getByText('abc'))
+        await act(() => fetchMock.flush(true))
+        fireEvent.change(input, {target: {value: 'foo'}})
+        expect(getByText(/copy/i).closest('button').getAttribute('disabled')).toBe('')
+      })
+    })
+
+    describe('validate_call_to_action is on', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES.validate_call_to_action = true
+      })
+
+      it('shows asterisk for course input', () => {
+        render(<DirectShareCoursePanel />)
+        expect(screen.getByLabelText(/select a course/i).getAttribute('required')).toBe('')
+      })
+
+      it('enables the copy button initially', () => {
+        render(<DirectShareCoursePanel />)
+        expect(screen.getByText(/copy/i).closest('button').getAttribute('disabled')).toBe(null)
+      })
+
+      it('shows error message after course selection validation error', () => {
+        render(<DirectShareCoursePanel />)
+        fireEvent.click(screen.getByText(/copy/i))
+        expect(screen.getByText(/please select a course/i)).toBeInTheDocument()
+      })
+
+      it('focuses on course input after course selection validation error', () => {
+        render(<DirectShareCoursePanel />)
+        fireEvent.click(screen.getByText(/copy/i))
+        expect(screen.getByLabelText(/select a course/i)).toHaveFocus()
+      })
+    })
+  })
+
   describe('errors', () => {
     beforeEach(() => {
       jest.spyOn(console, 'error').mockImplementation()
     })
 
     afterEach(() => {
-      console.error.mockRestore()  
+      console.error.mockRestore()
     })
 
     it('reports an error if the fetch fails', async () => {

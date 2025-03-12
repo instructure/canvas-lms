@@ -40,6 +40,8 @@ describe "differentiated_assignments" do
                                   })
     @quiz.publish
     @quiz.save!
+    @quiz.assignment.context = @course
+    @quiz.save!
     @assignment = @quiz.assignment
   end
 
@@ -73,6 +75,24 @@ describe "differentiated_assignments" do
     StudentEnrollment.create!(user: @user, course: @course, course_section: section)
   end
 
+  def create_diff_tags_category_with_groups(number_of_groups: 1)
+    @diff_tag_category = @course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)
+    @diff_tag_category.create_groups(number_of_groups)
+  end
+
+  def user_in_non_collaborative_group(non_collaborative_group, opts = {})
+    @user = opts[:user] || user_model
+    StudentEnrollment.create!(user: @user, course: @course)
+    non_collaborative_group.add_user(@user)
+  end
+
+  def configure_differentiation_tags(setting_enabled: true, feature_flag_enabled: true)
+    @course.account.enable_feature!(:differentiation_tags)
+    feature_flag_enabled ? @course.account.enable_feature!(:assign_to_differentiation_tags) : @course.account.disable_feature!(:assign_to_differentiation_tags)
+    @course.account.settings[:allow_assign_to_differentiation_tags] = setting_enabled
+    @course.account.save!
+  end
+
   def enroller_user_in_both_sections
     @user = user_model
     StudentEnrollment.create!(user: @user, course: @course, course_section: @section_foo)
@@ -93,6 +113,14 @@ describe "differentiated_assignments" do
     yield(ao)
     ao.save!
     quiz.reload
+  end
+
+  def give_non_collaborative_group_foo_due_date(quiz, non_collaborative_group, opts = {})
+    create_override_for_quiz(quiz) do |ao|
+      ao.set = non_collaborative_group
+      ao.due_at = 3.weeks.from_now
+      ao.unassign_item = opts[:unassign_item] || "false"
+    end
   end
 
   def give_section_foo_due_date(quiz, opts = {})
@@ -235,7 +263,66 @@ describe "differentiated_assignments" do
       end
     end
 
-    context "module overrides" do
+    context "quiz assignment non collaborative group overrides" do
+      before do
+        quiz_with_true_only_visible_to_overrides
+        configure_differentiation_tags
+      end
+
+      it "applies non collaborative group overrides" do
+        create_diff_tags_category_with_groups
+        diff_tag_group_1 = @diff_tag_category.groups[0]
+        user_in_non_collaborative_group(diff_tag_group_1)
+
+        @quiz.assignment_overrides.create!(set: diff_tag_group_1)
+        ensure_user_sees_quiz
+      end
+
+      it "does not apply non collaborative group overrides" do
+        create_diff_tags_category_with_groups(number_of_groups: 2)
+        diff_tag_group_1 = @diff_tag_category.groups[0]
+        user_in_non_collaborative_group(diff_tag_group_1)
+        diff_tag_group_no_users = @diff_tag_category.groups[1]
+
+        @quiz.assignment_overrides.create!(set: diff_tag_group_no_users)
+        ensure_user_does_not_see_quiz
+      end
+
+      it "applies existing non collaborative group overrides when account setting is disabled" do
+        create_diff_tags_category_with_groups
+        diff_tag_group_1 = @diff_tag_category.groups[0]
+        user_in_non_collaborative_group(diff_tag_group_1)
+
+        @quiz.assignment_overrides.create!(set: diff_tag_group_1)
+        ensure_user_sees_quiz
+
+        configure_differentiation_tags(setting_enabled: false, feature_flag_enabled: true)
+        ensure_user_sees_quiz
+      end
+
+      it "does not apply non collaborative group overrides when feature flag is disabled" do
+        create_diff_tags_category_with_groups
+        diff_tag_group_1 = @diff_tag_category.groups[0]
+        user_in_non_collaborative_group(diff_tag_group_1)
+
+        @quiz.assignment_overrides.create!(set: diff_tag_group_1)
+        ensure_user_sees_quiz
+
+        configure_differentiation_tags(setting_enabled: false, feature_flag_enabled: false)
+        ensure_user_does_not_see_quiz
+      end
+
+      it "does not apply non collaborative group overrides when override is deleted" do
+        create_diff_tags_category_with_groups
+        diff_tag_group_1 = @diff_tag_category.groups[0]
+        user_in_non_collaborative_group(diff_tag_group_1)
+
+        @quiz.assignment_overrides.create!(set: diff_tag_group_1, workflow_state: "deleted")
+        ensure_user_does_not_see_quiz
+      end
+    end
+
+    shared_examples_for "module overrides" do
       it "includes everyone else if there no modules and no overrides" do
         quiz_with_false_only_visible_to_overrides
         ensure_user_sees_quiz
@@ -293,6 +380,93 @@ describe "differentiated_assignments" do
 
         ensure_user_does_not_see_quiz
       end
+
+      context "non collaborative group overrides" do
+        before do
+          quiz_with_true_only_visible_to_overrides
+          configure_differentiation_tags
+        end
+
+        it "applies context module non collaborative group overrides" do
+          create_diff_tags_category_with_groups
+          diff_tag_group_1 = @diff_tag_category.groups[0]
+          user_in_non_collaborative_group(diff_tag_group_1)
+
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag_group_1.id)
+          ensure_user_sees_quiz
+        end
+
+        it "does not apply context module non collaborative group overrides" do
+          create_diff_tags_category_with_groups(number_of_groups: 2)
+          diff_tag_group_1 = @diff_tag_category.groups[0]
+          user_in_non_collaborative_group(diff_tag_group_1)
+          diff_tag_group_no_users = @diff_tag_category.groups[1]
+
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag_group_no_users.id)
+          ensure_user_does_not_see_quiz
+        end
+
+        it "applies existing context module non collaborative group overrides when account setting is disabled" do
+          create_diff_tags_category_with_groups
+          diff_tag_group_1 = @diff_tag_category.groups[0]
+          user_in_non_collaborative_group(diff_tag_group_1)
+
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag_group_1.id)
+          ensure_user_sees_quiz
+
+          configure_differentiation_tags(setting_enabled: false, feature_flag_enabled: true)
+          ensure_user_sees_quiz
+        end
+
+        it "does not apply context module non collaborative group overrides when feature flag is disabled" do
+          create_diff_tags_category_with_groups
+          diff_tag_group_1 = @diff_tag_category.groups[0]
+          user_in_non_collaborative_group(diff_tag_group_1)
+
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag_group_1.id)
+          ensure_user_sees_quiz
+
+          configure_differentiation_tags(setting_enabled: false, feature_flag_enabled: false)
+          ensure_user_does_not_see_quiz
+        end
+
+        it "does not apply context module non collaborative group overrides when override is deleted" do
+          create_diff_tags_category_with_groups
+          diff_tag_group_1 = @diff_tag_category.groups[0]
+          user_in_non_collaborative_group(diff_tag_group_1)
+
+          module1 = @course.context_modules.create!(name: "Module 1")
+          @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+          module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag_group_1.id, workflow_state: "deleted")
+          ensure_user_does_not_see_quiz
+        end
+      end
+    end
+
+    context "quizzes with modules" do
+      it_behaves_like "module overrides" do
+        before :once do
+          Account.site_admin.disable_feature!(:visibility_performance_improvements)
+        end
+      end
+      it_behaves_like "module overrides" do
+        before :once do
+          Account.site_admin.enable_feature!(:visibility_performance_improvements)
+        end
+      end
     end
 
     context "unassign item overrides" do
@@ -308,6 +482,16 @@ describe "differentiated_assignments" do
       it "is not visible with an unassigned section override" do
         enroller_user_in_section(@section_foo)
         give_section_foo_due_date(@quiz, { unassign_item: "true" })
+        ensure_user_does_not_see_quiz
+      end
+
+      it "is not visible with an unassigned non collaborative group override" do
+        configure_differentiation_tags
+        create_diff_tags_category_with_groups
+        diff_tag_group_1 = @diff_tag_category.groups[0]
+        user_in_non_collaborative_group(diff_tag_group_1)
+
+        give_non_collaborative_group_foo_due_date(@quiz, diff_tag_group_1, { unassign_item: "true" })
         ensure_user_does_not_see_quiz
       end
 
@@ -337,6 +521,22 @@ describe "differentiated_assignments" do
         module_override.save!
 
         give_section_foo_due_date(@quiz, { unassign_item: "true" })
+
+        ensure_user_does_not_see_quiz
+      end
+
+      it "does not apply context module section override with an unassigned non collaborative group override" do
+        configure_differentiation_tags
+        create_diff_tags_category_with_groups
+        diff_tag_group_1 = @diff_tag_category.groups[0]
+        user_in_non_collaborative_group(diff_tag_group_1)
+
+        module1 = @course.context_modules.create!(name: "Module 1")
+        @quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+        module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag_group_1.id)
+
+        give_non_collaborative_group_foo_due_date(@quiz, diff_tag_group_1, { unassign_item: "true" })
 
         ensure_user_does_not_see_quiz
       end

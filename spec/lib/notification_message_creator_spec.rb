@@ -778,7 +778,7 @@ describe NotificationMessageCreator do
         expect(scope).to receive(:update_all).ordered
 
         user = User.create!
-        to_user_channels = Hash.new([])
+        to_user_channels = Hash.new([].freeze)
         to_user_channels[user] = user.communication_channels
         subject.instance_variable_set(:@to_user_channels, to_user_channels)
       end

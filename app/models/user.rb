@@ -1368,6 +1368,7 @@ class User < ActiveRecord::Base
       manage_calendar
       send_messages
       update_avatar
+      update_profile
       view_feature_flags
       manage_feature_flags
       api_show_user
@@ -1425,7 +1426,7 @@ class User < ActiveRecord::Base
       check_accounts_right?(user, :manage_user_logins) && adminable_accounts.select(&:root_account?).all? { |a| has_subset_of_account_permissions?(user, a) }
     end
     can :manage_user_details and can :rename and can :update_avatar and can :remove_avatar and
-      can :manage_feature_flags and can :view_feature_flags
+      can :manage_feature_flags and can :view_feature_flags and can :update_profile
 
     given { |user| pseudonyms.shard(self).any? { |p| p.grants_right?(user, :update) } }
     can :merge
@@ -1571,9 +1572,7 @@ class User < ActiveRecord::Base
     Setting.get("max_messages_per_day_per_user", 500).to_i
   end
 
-  def max_messages_per_day
-    User.max_messages_per_day
-  end
+  delegate :max_messages_per_day, to: :User
 
   def gravatar_url(size = 50, fallback = nil, request = nil)
     fallback = self.class.avatar_fallback_url(fallback, request)
@@ -2020,18 +2019,9 @@ class User < ActiveRecord::Base
     super
   end
 
-  def heap_id(root_account: nil)
-    # this is called in read-only contexts where we can't create a missing uuid
-    # (uuid-less users should be rare in real life but they exist in specs and maybe unauthenticated requests)
-    return nil unless self["uuid"]
-
-    # for an explanation of these, see
-    # https://instructure.atlassian.net/wiki/spaces/HEAP/pages/85854749165/RFC+Advanced+HEAP+installation
-    if root_account
-      "uu-2-#{Digest::SHA256.hexdigest(uuid)}-#{root_account.uuid}"
-    else
-      "uu-1-#{Digest::SHA256.hexdigest(uuid)}"
-    end
+  def usage_metrics_id
+    # Compute a hash of the user's uuid for security and privacy reasons
+    Digest::SHA256.hexdigest(uuid)
   end
 
   def self.serialization_excludes
@@ -2063,6 +2053,8 @@ class User < ActiveRecord::Base
     true
   end
 
+  # Legacy method - don't use this since users may belong to multiple accounts and this method is
+  # not aware of context
   def account
     pseudonym&.account || Account.default
   end

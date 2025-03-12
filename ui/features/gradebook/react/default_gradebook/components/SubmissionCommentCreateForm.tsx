@@ -19,6 +19,8 @@
 import {func} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import SubmissionCommentForm from './SubmissionCommentForm'
+import {Editor} from 'tinymce'
+import {ViewProps} from '@instructure/ui-view'
 
 const I18n = createI18nScope('gradebook')
 
@@ -29,15 +31,20 @@ export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
     createSubmissionComment: func.isRequired,
   }
 
-  // @ts-expect-error
-  handleCancel(event) {
-    super.handleCancel(event, this.focusTextarea)
+  initRCE(tinyeditor: Editor) {
+    this.tinyeditor = tinyeditor
+    if (this.state.rceKey > 0) {
+      this.rceRef.current?.focus()
+    }
   }
 
-  // @ts-expect-error
-  handlePublishComment(event) {
-    super.handlePublishComment(event)
-    this.setState({comment: ''}, this.focusTextarea)
+  handleCancel(e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) {
+    super.handleCancel(e, this.focusTextarea)
+  }
+
+  handlePublishComment(e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) {
+    super.handlePublishComment(e)
+    this.handleCommentChange('', {rerenderRCE: true, callback: this.focusTextarea})
   }
 
   buttonLabels() {

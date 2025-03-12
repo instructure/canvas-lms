@@ -150,9 +150,7 @@ export const resetStagedCards = (cards, newCardsState, defaultState) => {
 
 export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId, defaultSectionId) => {
   let index = 0
-  const validOverrides = stagedOverrides.filter(override =>
-    [undefined, groupCategoryId].includes(override.group_category_id),
-  )
+  const validOverrides = getValidOverrides(stagedOverrides, groupCategoryId)
   const overridesByKey = validOverrides.reduce((acc, override) => {
     const rowKey = override?.rowKey ?? combinedDates(override)
     override.rowKey = rowKey
@@ -177,6 +175,15 @@ export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId, defa
   return parsedOverrides
 }
 
+// This function filters out any Group overrides
+// Differentiation tag overrides are valid but they use 'group_category_id'
+// Differentiation tag overrides will pass the filter because of the non_collaborative check
+const getValidOverrides = (stagedOverrides, groupCategoryId) => {
+  return stagedOverrides.filter(override =>
+    [undefined, groupCategoryId].includes(override.group_category_id) || override.non_collaborative === true,
+  )
+}
+
 export const removeOverriddenAssignees = (overrides, parsedOverrides) => {
   const parsed = overrides.map(o => o)
   const overriddenTargets = getOverriddenAssignees(parsed)
@@ -186,8 +193,7 @@ export const removeOverriddenAssignees = (overrides, parsedOverrides) => {
       if (override.unassign_item) {
         delete parsedOverrides[key]
       }
-      const {context_module_id, student_ids, course_section_id} = override
-
+      const {context_module_id, student_ids, course_section_id, group_id} = override
       if (context_module_id && student_ids) {
         let filteredStudents = student_ids
         filteredStudents = filteredStudents?.filter(
@@ -203,6 +209,14 @@ export const removeOverriddenAssignees = (overrides, parsedOverrides) => {
         context_module_id &&
         course_section_id &&
         overriddenTargets?.sections?.includes(course_section_id)
+      ) {
+        delete parsedOverrides[key]
+      }
+
+      if (
+        context_module_id &&
+        group_id &&
+        overriddenTargets?.differentiationTags?.includes(group_id)
       ) {
         delete parsedOverrides[key]
       }
@@ -236,6 +250,7 @@ export const processModuleOverrides = (overrides, initialModuleOverrides) => {
       const hasChanges = !(
         !hasDates &&
         currentAttributes.course_section_id == previousAttributes.course_section_id &&
+        currentAttributes.group_id == previousAttributes.group_id &&
         JSON.stringify(currentAttributes.student_ids) ==
           JSON.stringify(previousAttributes.student_ids)
       )

@@ -216,7 +216,18 @@ lti_registrations_page:
   beta: true
   applies_to: RootAccount
   display_name: LTI Apps Page
-  description: When enabled, the LTI Apps page will be available in the Account navigation sidebar..
+  description: When enabled, the LTI Apps page will be available in the Account navigation sidebar.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+lti_registrations_usage_data:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Apps - Usage Data
+  description: When enabled, the Usage Data tab will appear in Canvas Apps.
   environments:
     development:
       state: allowed_on

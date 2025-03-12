@@ -95,6 +95,12 @@ RSpec.describe Lti::RegistrationsController do
       expect(assigns.dig(:js_env, :dynamicRegistrationUrl)).to be_nil
     end
 
+    it "sets canvas_apps_lti_usage_url in ENV to null if it's not present in DynamicSettings" do
+      DynamicSettings.fallback_data = { config: { canvas: { lti: {} } } }.deep_stringify_keys
+      get :index, params: { account_id: account.id }
+      expect(assigns.dig(:js_env, :canvasAppsLtiUsageUrl)).to be_nil
+    end
+
     context "with temp_dr_url" do
       let(:temp_dr_url) { "http://example.com" }
 
@@ -106,6 +112,19 @@ RSpec.describe Lti::RegistrationsController do
       it "sets temp_dr_url in ENV" do
         get :index, params: { account_id: account.id }
         expect(assigns.dig(:js_env, :dynamicRegistrationUrl)).to eq(temp_dr_url)
+      end
+    end
+
+    context "with canvas_apps_lti_usage_url" do
+      let(:canvas_apps_lti_usage_url) { "http://example.com" }
+
+      before do
+        DynamicSettings.fallback_data = { config: { canvas: { lti: { canvas_apps_lti_usage_url: canvas_apps_lti_usage_url } } } }.deep_stringify_keys
+      end
+
+      it "sets canvas_apps_lti_usage_url in ENV" do
+        get :index, params: { account_id: account.id }
+        expect(assigns.dig(:js_env, :canvasAppsLtiUsageUrl)).to eq(canvas_apps_lti_usage_url)
       end
     end
   end
@@ -149,6 +168,20 @@ RSpec.describe Lti::RegistrationsController do
 
         # an lti registration with no account binding
         lti_registration_model(account: Account.site_admin, name: "Site admin registration with no binding")
+      end
+
+      context "when using 'self' for the account_id parameter" do
+        let(:url) { "/api/v1/accounts/self/lti_registrations" }
+
+        it "is successful" do
+          expect_any_instance_of(Lti::RegistrationsController)
+            .to receive(:api_find)
+            .with(Account.active, "self")
+            .once
+            .and_return(account)
+          subject
+          expect(response_json[:total]).to eq(4)
+        end
       end
 
       it "is successful" do

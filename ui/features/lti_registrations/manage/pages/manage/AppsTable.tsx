@@ -86,7 +86,7 @@ const renderEditButton = (r: LtiRegistration) => {
         {I18n.t('Edit App')}
       </Menu.Item>
     )
-  } else if (manualConfigurationId && !r.inherited && window.ENV.FEATURES.lti_registrations_next) {
+  } else if (manualConfigurationId && !r.inherited) {
     return (
       <Menu.Item
         onClick={() => {

@@ -71,7 +71,7 @@ const QuestionBankSelector = ({
 
   return (
     <>
-      <View as="div" margin="medium 0" maxWidth="22.5rem">
+      <View as="div" margin="medium 0" maxWidth="46.5rem">
         <SimpleSelect
           data-testid="questionBankSelect"
           renderLabel={I18n.t('Default Question bank')}
@@ -109,7 +109,7 @@ const QuestionBankSelector = ({
         )}
       </View>
       {showQuestionInput && (
-        <View as="div" maxWidth="22.5rem">
+        <View as="div" maxWidth="46.5rem">
           <TextInput
             disabled={disable}
             renderLabel={<></>}

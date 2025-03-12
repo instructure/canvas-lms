@@ -206,6 +206,9 @@ specify the paths to the test files as one or more arguments, e.g.:
 
 ```
 docker-compose run --rm webpack yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
+
+
+docker-compose run --rm webpack yarn test:jest:watch ui/features/course_paces/react/components/course_pace_table/__tests__/assignment_row.test.tsx
 ```
 
 ## Selenium
@@ -282,6 +285,18 @@ Set `rich-content-service` `app-host` to `"http://rce.canvas.docker:3000"` in `c
 rich-content-service:
   app-host: "http://rce.canvas.docker:3000"
 ```
+
+### StatsD
+The optional StatsD service simply intercepts UDP traffic to port 8125 and echoes it.
+
+This is useful if you want to understand what metrics are being sent to DataDog when
+the application is running in production.
+
+To enable this service, add `docker-compose/statsd.override.yml` to your .env file
+
+Next, stop and start any running containers (a restart is not sufficient since environment variables change).
+
+Finally, tail the statsd service logs to see what metrics Canvas is recording: `docker compose logs -ft statsd`.
 
 ## Tips
 

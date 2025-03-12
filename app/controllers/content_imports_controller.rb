@@ -184,6 +184,8 @@ class ContentImportsController < ApplicationController
     "modules" => "context_modules",
     "outcomes" => "learning_outcomes"
   }.freeze
+  private_constant :SELECTION_CONVERSIONS
+
   # convert types selected in API to expected format
   def convert_to_table_name(selections)
     selections.map { |s| SELECTION_CONVERSIONS[s] || s }

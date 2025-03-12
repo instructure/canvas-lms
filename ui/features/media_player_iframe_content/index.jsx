@@ -39,11 +39,7 @@ ready(() => {
   //  `http://canvas.example.com/media_objects_iframe/?type=video&mediahref=url/to/file.mov`
   // or
   //  `http://canvas.example.com/media_attachments_iframe/12345678
-  let media_id = window.location.pathname.split('media_objects_iframe/').pop()
-  // This covers a timing issue between canvas/RCE when the media_links_use_attachment flag is flipped off
-  if (media_id?.includes('media_attachments_iframe') && ENV?.media_object?.media_id) {
-    media_id = ENV.media_object.media_id
-  }
+  const media_id = ENV?.media_object?.media_id || window.location.pathname.split('media_objects_iframe/').pop()
   const attachment_id = ENV.attachment_id
   const media_href_match = window.location.search.match(/mediahref=([^&]+)/)
   const media_object = ENV.media_object || {}

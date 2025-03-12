@@ -20,7 +20,7 @@
 
 require "spec_helper"
 
-# rubocop:disable Style/RedundantFetchBlock it's a cache, not a Hash
+# rubocop:disable Style/RedundantFetchBlock -- it's a cache, not a Hash
 describe AdheresToPolicy::Cache do
   def cached
     AdheresToPolicy::Cache.instance_variable_get(:@cache)

@@ -61,15 +61,13 @@ describe('DifferentiationTagTrayManager', () => {
   it('shows error message when there is an error', () => {
     const error = new Error('Failed to fetch')
     renderComponent({error})
-    expect(screen.getByText(/Error loading tag differentiation tag categories/)).toBeInTheDocument()
+    expect(screen.getByText(/Error loading categories:/)).toBeInTheDocument()
     expect(screen.getByText(/Failed to fetch/)).toBeInTheDocument()
   })
   it('shows error message when course id is not provided', () => {
     const error = new Error('A valid course ID is required')
     renderComponent({error}, {courseID: undefined})
-    expect(
-      screen.getByText(/Error loading tag differentiation tag categories:/),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Error loading categories:/)).toBeInTheDocument()
     expect(screen.getByText(/A valid course ID is required./)).toBeInTheDocument()
   })
 

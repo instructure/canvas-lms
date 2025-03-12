@@ -46,6 +46,12 @@ export enum Constants {
   SYNCING_COMPLETED = 'UI/SYNCING_COMPLETED',
   SET_SELECTED_PACE_CONTEXT_TYPE = 'UI/SET_SELECTED_PACE_CONTEXT_TYPE',
   SET_BLUEPRINT_LOCK = 'COURSE_PACE/SET_BLUEPRINT_LOCK',
+  SHOW_WEIGHTING_ASSIGNMENTS_MODAL = 'UI/SHOW_WEIGHTING_ASSIGNMENTS_MODAL',
+  HIDE_WEIGHTING_ASSIGNMENTS_MODAL = 'UI/HIDE_WEIGHTING_ASSIGNMENTS_MODAL',
+  OPEN_BULK_EDIT_MODAL = 'UI/OPEN_BULK_EDIT_MODAL',
+  CLOSE_BULK_EDIT_MODAL = 'UI/CLOSE_BULK_EDIT_MODAL',
+  SET_SELECTED_BULK_STUDENTS = 'UI/SET_SELECTED_STUDENTS',
+  GET_SELECTED_BULK_STUDENTS = 'UI/GET_SELECTED_STUDENTS'
 }
 
 /* Action creators */
@@ -75,6 +81,11 @@ export const regularActions = {
   setSelectedContextType: (selectedContextType: PaceContextTypes) =>
     createAction(Constants.SET_SELECTED_PACE_CONTEXT_TYPE, selectedContextType),
   setBlueprintLocked: (locked?: boolean) => createAction(Constants.SET_BLUEPRINT_LOCK, locked),
+  showWeightedAssignmentsTray: () => createAction(Constants.SHOW_WEIGHTING_ASSIGNMENTS_MODAL),
+  hideWeightedAssignmentsTray: () => createAction(Constants.HIDE_WEIGHTING_ASSIGNMENTS_MODAL),
+  openBulkEditModal: (students: string[]) => createAction(Constants.OPEN_BULK_EDIT_MODAL, students),
+  closeBulkEditModal: () => createAction(Constants.CLOSE_BULK_EDIT_MODAL),
+  setSelectedBulkStudents: (students: string[]) => createAction(Constants.SET_SELECTED_BULK_STUDENTS, students),
 }
 
 export const thunkActions = {
@@ -90,9 +101,16 @@ export const thunkActions = {
           payload: {contextType, contextId, newSelectedPace},
         }
       }
-      dispatch(
-        coursePaceActions.loadLatestPaceByContext(contextType, contextId, afterLoadActionCreator),
-      )
+
+      if (contextType == 'BulkEnrollment') {
+        dispatch(
+          coursePaceActions.loadLatestPaceByContext('Enrollment', contextId.split(',')[0], afterLoadActionCreator, true, true),
+        )
+      } else {
+        dispatch(
+          coursePaceActions.loadLatestPaceByContext(contextType, contextId, afterLoadActionCreator),
+        )
+      }
     }
   },
 }

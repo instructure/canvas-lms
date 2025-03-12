@@ -88,7 +88,6 @@ const router = createBrowserRouter(
       element: <FilesApp contextAssetString={contextAssetString} />,
       loader: async ({params}) => {
         let folders
-
         if (filesEnv.showingAllContexts) {
           // files/folder/users_1
           const [pluralContextType, contextId] = params['pluralContextOrFolder']?.split('_') || []

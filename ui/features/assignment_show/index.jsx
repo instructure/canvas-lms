@@ -47,7 +47,7 @@ import {
 } from '@canvas/rubrics/react/utils'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
-import { RubricSelfAssessmentSettingsWrapper } from './react/RubricSelfAssessmentSettingsWrapper'
+import {RubricSelfAssessmentSettingsWrapper} from './react/RubricSelfAssessmentSettingsWrapper'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -343,6 +343,7 @@ $(() => {
       ? {
           ...mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric),
           can_update: ENV.assigned_rubric?.can_update,
+          association_count: ENV.assigned_rubric?.association_count,
         }
       : undefined
     const assignmentRubricAssociation = envRubricAssociation
@@ -366,9 +367,7 @@ $(() => {
 
   createOrUpdateRoot(
     'enhanced-rubric-self-assessment-edit',
-    <RubricSelfAssessmentSettingsWrapper
-      assignmentId={ENV.ASSIGNMENT_ID}
-    />,
+    <RubricSelfAssessmentSettingsWrapper assignmentId={ENV.ASSIGNMENT_ID} />,
   )
 })
 

@@ -79,14 +79,14 @@ class FilePreviewsController < ApplicationController
   def read_allowed(attachment, user, session, params)
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
-      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)
+      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, @domain_root_account, session)
     end
     jwt_resource_match(attachment) || authorized_action(attachment, user, :read)
   end
 
   def download_allowed(attachment, user, session, params)
     verifier_checker = Attachments::Verification.new(attachment)
-    (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
+    (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, @domain_root_account, session)) ||
       jwt_resource_match(attachment) ||
       attachment.grants_right?(user, session, :download)
   end

@@ -35,7 +35,7 @@ import {
 } from '../../../util/constants'
 import useCoursePeopleContext from '../../hooks/useCoursePeopleContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {User} from '../../types.d'
+import type {User} from '../../../types'
 
 const I18n = createI18nScope('course_people')
 
@@ -51,17 +51,16 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
   handleSelectRow
 }) => {
   const {
-    id: uid,
-    short_name: name,
-    login_id: loginId,
-    sis_user_id: sisUserId,
-    avatar_url: avatarUrl,
-    custom_links: customLinks,
+    _id: uid,
+    name,
+    loginId,
+    sisId,
+    avatarUrl,
+    customLinks,
     pronouns
   } = user
 
   const {
-    courseRootUrl,
     canViewLoginIdColumn,
     canViewSisIdColumn,
     canReadReports,
@@ -73,8 +72,8 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
   } = useCoursePeopleContext()
 
   const enrollments = user?.enrollments || []
-  const userLink = `${courseRootUrl}/users/${uid}`
-  const canRemoveUsers = enrollments.every(e => e.can_be_removed)
+  const htmlUrl = enrollments[0]?.htmlUrl
+  const canRemoveUsers = enrollments.every(e => e.canBeRemoved)
   const canManage = enrollments.some(e =>
     [TEACHER_ENROLLMENT, TA_ENROLLMENT, DESIGNER_ENROLLMENT].includes(e.type),
   )
@@ -94,8 +93,8 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
 
   const renderSections = () =>
     enrollments.map(e => (
-      <View as="div" key={`enrollment-${e.id}`}>
-        {e.name}
+      <View as="div" key={`enrollment-${e._id}`}>
+        {e.section.name}
       </View>
     ))
 
@@ -121,11 +120,10 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
       <Table.Cell>
         <UserLink
           uid={uid}
-          userUrl={userLink}
+          htmlUrl={htmlUrl}
           name={name}
           pronouns={pronouns}
           avatarUrl={avatarUrl}
-          avatarName={name}
           enrollments={enrollments}
         />
       </Table.Cell>
@@ -140,7 +138,7 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
       {canViewSisIdColumn
         ? (
             <Table.Cell data-testid={`sis-id-user-${uid}`}>
-              <Text>{sisUserId}</Text>
+              <Text>{sisId}</Text>
             </Table.Cell>
           )
         : <></>
@@ -180,7 +178,7 @@ const RosterTableRow: React.FC<RosterTableRowProps> = ({
               <UserMenu
                 uid={uid}
                 name={name}
-                userUrl={userLink}
+                htmlUrl={htmlUrl}
                 enrollments={enrollments}
                 customLinks={customLinks}
                 canManage={canManage}

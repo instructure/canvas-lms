@@ -19,22 +19,26 @@
 import React from 'react'
 import {render, within} from '@testing-library/react'
 import UserLink from '../UserLink'
-import {enrollments} from '../../../../util/mocks'
+import {mockEnrollment} from '../../../../graphql/Mocks'
+import {
+  PENDING_ENROLLMENT,
+  INACTIVE_ENROLLMENT
+} from '../../../../util/constants'
 
 describe('UserLink', () => {
   const defaultProps = {
     uid: '1',
     name: 'John Doe',
-    userUrl: 'https://example.com/user',
+    pronouns: null,
+    htmlUrl: 'https://example.com/user',
     avatarUrl: 'https://example.com/avatar.jpg',
-    avatarName: 'John Doe',
-    enrollments: [enrollments[0]]
+    enrollments: [mockEnrollment()],
   }
 
   describe('user details', () => {
     it('renders the link with the correct href', () => {
       const {getByTestId} = render(<UserLink {...defaultProps} />)
-      expect(getByTestId(`link-user-${defaultProps.uid}`)).toHaveAttribute('href', defaultProps.userUrl)
+      expect(getByTestId(`link-user-${defaultProps.uid}`)).toHaveAttribute('href', defaultProps.htmlUrl)
     })
 
     it('renders the avatar with the correct src and name initials', () => {
@@ -64,19 +68,22 @@ describe('UserLink', () => {
 
   describe('status indicators', () => {
     it('renders pending status', () => {
-      const pendingEnrollment = [enrollments[1]]
+      const pendingEnrollment = [mockEnrollment({enrollmentState: PENDING_ENROLLMENT})]
       const {getByText} = render(<UserLink {...defaultProps} enrollments={pendingEnrollment} />)
       expect(getByText('Pending')).toBeInTheDocument()
     })
 
     it('renders inactive status', () => {
-      const inactiveEnrollment = [enrollments[2]]
+      const inactiveEnrollment = [mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT})]
       const {getByText} = render(<UserLink {...defaultProps} enrollments={inactiveEnrollment} />)
       expect(getByText('Inactive')).toBeInTheDocument()
     })
 
     it('prioritizes pending over inactive state', () => {
-      const pendingAndInactiveEnrollment = [enrollments[1], enrollments[2]]
+      const pendingAndInactiveEnrollment = [
+        mockEnrollment({enrollmentState: PENDING_ENROLLMENT}),
+        mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT})
+      ]
       const {getByText, queryByText} = render(<UserLink {...defaultProps} enrollments={pendingAndInactiveEnrollment} />)
       expect(getByText('Pending')).toBeInTheDocument()
       expect(queryByText('Inactive')).not.toBeInTheDocument()

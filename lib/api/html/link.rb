@@ -40,6 +40,7 @@ module Api
       SKIP_CONTEXT_TYPES = ["User"].freeze
       FILE_LINK_REGEX = %r{/files/(\d+)/(?:download|preview)}
       VERIFIER_REGEX = /(\?)verifier=[^&]*&?|&verifier=[^&]*/
+      private_constant :APPLICABLE_CONTEXT_TYPES, :SKIP_CONTEXT_TYPES, :FILE_LINK_REGEX, :VERIFIER_REGEX
 
       def strip_host(link)
         return link if @host.nil?

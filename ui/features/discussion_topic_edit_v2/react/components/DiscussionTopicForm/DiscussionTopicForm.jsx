@@ -145,6 +145,7 @@ function DiscussionTopicForm({
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
   const published = currentDiscussionTopic?.published ?? false
   const shouldMasteryPathsBeVisible = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement
+  const masteryPathsWithCoursePaces = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.IN_PACED_COURSE && ENV.FEATURES.course_pace_pacing_with_mastery_paths
 
   const announcementAlertProps = () => {
     if (isUnpublishedAnnouncement) {
@@ -672,7 +673,7 @@ function DiscussionTopicForm({
       const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
       const postToSisEnabled = isGraded && postToSis && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
 
-      const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
+      const isPacedDiscussion = ENV.IN_PACED_COURSE
       if (!isPacedDiscussion) {
         sectionViewRef = document.getElementById(
           'manage-assign-to-container',
@@ -718,7 +719,7 @@ function DiscussionTopicForm({
           assignedTo == `course_${ENV.context_id}`,
       )
 
-      if (!isEveryoneOrEveryoneElseSelected) {
+      if (!isEveryoneOrEveryoneElseSelected && !masteryPathsWithCoursePaces) {
         const selectedSectionIds = selectedAssignedTo
           .filter(assignedTo => String(assignedTo).startsWith('course_section_'))
           .map(assignedTo => assignedTo.split('_')[2])

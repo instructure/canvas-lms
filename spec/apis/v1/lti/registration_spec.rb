@@ -37,13 +37,15 @@ describe Api::V1::Lti::Registration do
   end
 
   describe "#lti_registration_json" do
-    subject { tester.lti_registration_json(registration, user, session, context, includes:) }
+    subject { tester.lti_registration_json(registration, user, session, context, includes:, account_binding:, overlay:) }
 
     let(:registration) { lti_registration_model(admin_nickname: "Test", vendor: "Test Company", account: context) }
     let(:user) { user_model }
     let(:session) { {} }
     let(:context) { account_model }
     let(:includes) { [] }
+    let(:account_binding) { nil }
+    let(:overlay) { nil }
 
     it "includes all expected base attributes" do
       expect(subject).to include({

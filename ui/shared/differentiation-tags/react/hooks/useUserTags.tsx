@@ -18,7 +18,6 @@
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useQuery} from '@tanstack/react-query'
-import {QUERY_STALE_TIME} from '../util/constants'
 import {UserTags} from '../types'
 
 export const useUserTags = (
@@ -55,6 +54,7 @@ export const useUserTags = (
     queryKey: ['userDifferentiationTags', courseId, userId],
     queryFn: fetchUserTags,
     enabled: !!courseId && !!userId,
-    staleTime: QUERY_STALE_TIME,
+    refetchOnMount: 'always',
+
   })
 }

@@ -32,12 +32,19 @@ describe('generateFolderByPathUrl', () => {
 
     it('returns correct url for user subfolder', () => {
       const url = generateFolderByPathUrl('/users_1/profile pictures')
-      expect(url).toBe('/api/v1/users/1/folders/by_path/profile pictures')
+      expect(url).toBe('/api/v1/users/1/folders/by_path/profile%20pictures')
     })
 
     it('returns correct url for course subfolder', () => {
       const url = generateFolderByPathUrl('/courses_1/afolder/asubfolder')
       expect(url).toBe('/api/v1/courses/1/folders/by_path/afolder/asubfolder')
+    })
+
+    it('returns the correct url when folder has uri characters', () => {
+      const url = generateFolderByPathUrl('/courses_1/some folder/this#could+be bad?maybe')
+      expect(url).toBe(
+        '/api/v1/courses/1/folders/by_path/some%20folder/this%23could%2Bbe%20bad%3Fmaybe',
+      )
     })
   })
 
@@ -49,6 +56,11 @@ describe('generateFolderByPathUrl', () => {
     it('returns correct url for course subfolder', () => {
       const url = generateFolderByPathUrl('/afolder/asubfolder')
       expect(url).toBe('/api/v1/courses/1/folders/by_path/afolder/asubfolder')
+    })
+
+    it('returns the correct url when folder has uri characters', () => {
+      const url = generateFolderByPathUrl('/this#could+be bad?maybe')
+      expect(url).toBe('/api/v1/courses/1/folders/by_path/this%23could%2Bbe%20bad%3Fmaybe')
     })
   })
 })

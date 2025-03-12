@@ -325,15 +325,14 @@ describe('IconConfirmation', () => {
 
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
-    const mockTransition = jest.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         registration={reg}
         reviewing={true}
-        transitionToConfirmationState={jest.fn()}
-        transitionToReviewingState={mockTransition}
+        transitionToConfirmationState={mockTransitionToConfirmationState}
+        transitionToReviewingState={mockTransitionToReviewingState}
       />,
     )
 

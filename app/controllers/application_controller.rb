@@ -230,7 +230,7 @@ class ApplicationController < ActionController::Base
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
           current_user_id: @current_user&.id,
           current_user_global_id: @current_user&.global_id,
-          current_user_heap_id: @current_user&.heap_id(root_account: @domain_root_account),
+          current_user_usage_metrics_id: @current_user&.usage_metrics_id,
           current_user_roles: @current_user&.roles(@domain_root_account),
           current_user_is_student: @context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user),
           current_user_types: @current_user.try { |u| u.account_users.active.map { |au| au.role.name } },
@@ -357,14 +357,12 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links
     account_level_blackout_dates
     render_both_to_do_lists
     commons_new_quizzes
     course_paces_redesign
     course_paces_for_students
     explicit_latex_typesetting
-    media_links_use_attachment_id
     permanent_page_links
     enhanced_course_creation_account_fetching
     instui_for_import_page
@@ -382,6 +380,7 @@ class ApplicationController < ActionController::Base
     horizon_course_setting
     new_quizzes_media_type
     differentiation_tags
+    validate_call_to_action
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -389,6 +388,7 @@ class ApplicationController < ActionController::Base
     file_verifiers_for_quiz_links
     lti_deep_linking_module_index_menu_modal
     lti_registrations_next
+    lti_registrations_page
     lti_asset_processor
     buttons_and_icons_root_account
     extended_submission_state
@@ -412,15 +412,27 @@ class ApplicationController < ActionController::Base
     course_pace_draft_state
     course_pace_time_selection
     course_pace_pacing_status_labels
+    course_pace_pacing_with_mastery_paths
+    course_pace_weighted_assignments
     modules_requirements_allow_percentage
     discussion_checkpoints
+    course_pace_allow_bulk_pace_assign
   ].freeze
+  JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
     embedded_release_notes
     consolidated_media_player
     discussions_speedgrader_revisit
   ].freeze
-  JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_BRAND_ACCOUNT_FEATURES].sort.join(",")).freeze
+  JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest(
+    [
+      JS_ENV_SITE_ADMIN_FEATURES +
+      JS_ENV_ROOT_ACCOUNT_FEATURES +
+      JS_ENV_ROOT_ACCOUNT_SERVICES +
+      JS_ENV_BRAND_ACCOUNT_FEATURES
+    ].sort.join(",")
+  ).freeze
+
   def cached_js_env_account_features
     # can be invalidated by a flag change on site admin, the domain root account, or the brand config account
     MultiCache.fetch(["js_env_account_features",
@@ -434,6 +446,9 @@ class ApplicationController < ActionController::Base
       end
       JS_ENV_ROOT_ACCOUNT_FEATURES.each do |f|
         results[f] = !!@domain_root_account&.feature_enabled?(f)
+      end
+      JS_ENV_ROOT_ACCOUNT_SERVICES.each do |s|
+        results[s] = !!@domain_root_account&.service_enabled?(s)
       end
       JS_ENV_BRAND_ACCOUNT_FEATURES.each do |f|
         results[f] = !!brand_config_account&.feature_enabled?(f)
@@ -1096,7 +1111,7 @@ class ApplicationController < ActionController::Base
         # Even if there are multiple justifications, we can only reasonably handle one at a time,
         # so just arbitrarily choose the first one
         chosen = can_do.justifications.first
-        send("render_auth_failure_#{chosen.justification}".to_s, chosen.context)
+        send(:"render_auth_failure_#{chosen.justification}", chosen.context)
       else
         render_unauthorized_action
       end
@@ -2653,11 +2668,6 @@ class ApplicationController < ActionController::Base
     !!(@current_user ? @pseudonym_session : session[:session_id])
   end
 
-  def json_as_text?
-    request.headers["CONTENT_TYPE"].to_s.include?("multipart/form-data") &&
-      (params[:format].to_s != "json" || in_app?)
-  end
-
   def params_are_integers?(*check_params)
     begin
       check_params.each { |p| Integer(params[p]) }
@@ -2702,13 +2712,7 @@ class ApplicationController < ActionController::Base
         json = ActiveSupport::JSON.encode(json_cast(json))
       end
 
-      # fix for some browsers not properly handling json responses to multipart
-      # file upload forms and s3 upload success redirects -- we'll respond with text instead.
-      if options[:as_text] || json_as_text?
-        options[:html] = json.html_safe
-      else
-        options[:json] = json
-      end
+      options[:json] = json
     end
 
     # _don't_ call before_render hooks if we're not returning HTML

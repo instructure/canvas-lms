@@ -47,20 +47,10 @@ describe "course people" do
   end
 
   describe "course users" do
-    def select_from_auto_complete(text, input_id)
-      fj(".token_input input:visible").send_keys(text)
-      wait_for_ajaximations
-
-      keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.list.query.search") == text }
-      wait_for_ajaximations
-      elements = ffj(".autocomplete_menu:visible .list:last ul:last li").map do |e|
-        [e, e.find_element(:tag_name, :b)&.text || e.text]
-      end
-      wait_for_ajaximations
-      element = elements.detect { |e| e.last == text }
-      expect(element).not_to be_nil
-      element.first.click
-      wait_for_ajaximations
+    def select_from_auto_complete(text)
+      select = f("[aria-label='Observee select']")
+      select.send_keys(text)
+      click_option(select, text)
     end
 
     def go_to_people_page
@@ -220,7 +210,7 @@ describe "course people" do
       f('a[data-event="linkToStudents"]', cog).click
       wait_for_ajaximations
       yield
-      f(".ui-dialog-buttonpane .btn-primary").click
+      f("[aria-label='Update']").click
       wait_for_ajaximations
     end
 
@@ -253,13 +243,13 @@ describe "course people" do
       expect(observer_row).to include students[1].name
       # remove an observer
       use_link_dialog(obs) do
-        fj("#link_students input:visible").send_keys(:backspace)
+        f("[aria-label='Observee select']").send_keys(:backspace)
       end
       # expect
       expect(obs.reload.not_ended_enrollments.count).to eq 1
       # add an observer
       use_link_dialog(obs) do
-        select_from_auto_complete(students[2].name, "student_input")
+        select_from_auto_complete(students[2].name)
       end
       # expect
       expect(obs.reload.not_ended_enrollments.count).to eq 2
@@ -294,9 +284,8 @@ describe "course people" do
 
       # dialog loads too
       use_link_dialog(obs) do
-        input = f("#link_students")
-        expect(input.text).to include "Student 1"
-        expect(input.text).not_to include "Student 2"
+        expect(f("[type=button][title$='Student 1']")).to be_truthy
+        expect { f("[type=button][title$='Student 2']") }.to raise_error(Selenium::WebDriver::Error::NoSuchElementError)
       end
     end
 
@@ -331,7 +320,7 @@ describe "course people" do
 
         go_to_people_page
         use_link_dialog(@observer, "ObserverEnrollment") do
-          select_from_auto_complete(@student.name, "student_input")
+          select_from_auto_complete(@student.name)
         end
 
         expect(@observer.enrollments.where(associated_user_id: @student)).to be_exists
@@ -348,7 +337,7 @@ describe "course people" do
         go_to_people_page
 
         use_link_dialog(@observer) do
-          select_from_auto_complete(@student.name, "student_input")
+          select_from_auto_complete(@student.name)
         end
 
         @observer.reload

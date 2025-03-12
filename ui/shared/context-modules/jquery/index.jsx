@@ -1218,10 +1218,12 @@ modules.initModuleManagement = async function (duplicate) {
       !get(ENV, 'MASTER_COURSE_SETTINGS.IS_MASTER_COURSE') && !!get(restrictions, 'content')
     $titleInput.prop('disabled', isDisabled)
 
-    if(data.can_set_estimated_duration === 'false') {
-      $('#estimated_duration_edit').css({display: 'none'})
-    } else {
-      $('#estimated_duration_edit').css({display: 'table-row'})
+    if (ENV.horizon_course) {
+      if(data.can_set_estimated_duration === 'false') {
+        $('#estimated_duration_edit').css({display: 'none'})
+      } else {
+        $('#estimated_duration_edit').css({display: 'table-row'})
+      }
     }
 
     $('#edit_item_form')
@@ -1500,12 +1502,13 @@ modules.initModuleManagement = async function (duplicate) {
     event.preventDefault()
     const moduleId = event.originalEvent.moduleId
     const attachment = event.originalEvent.attachment
+    const returnToFileDrop = event.originalEvent.returnToFileDrop
     const item_data = {
       'item[id]': attachment.id,
       'item[type]': 'attachment',
       'item[title]': attachment.display_name,
     }
-    generate_submit(moduleId, false)(item_data)
+    generate_submit(moduleId, false, returnToFileDrop)(item_data)
   })
 
   $('.add_module_item_link').on('click', function (event) {
@@ -1539,7 +1542,7 @@ modules.initModuleManagement = async function (duplicate) {
     selectContentDialog(options)
   })
 
-  function generate_submit(id, focusLink = true) {
+  function generate_submit(id, focusLink = true, returnToFileDrop = false) {
     return item_data => {
       // a content item with an assignment_id means that an assignment was already created
       // on the backend, so no module item should be created now. Reload the page to show
@@ -1578,6 +1581,10 @@ modules.initModuleManagement = async function (duplicate) {
           onComplete() {
             if (focusLink) {
               $module.find('.add_module_item_link').focus()
+            } else if(returnToFileDrop) {
+              const itemList =$module.find('ul.context_module_items');
+              const focusItem =  itemList.find("a[role='button']")
+              focusItem ?.focus()
             }
           },
         },
@@ -1921,7 +1928,7 @@ modules.updateAssignmentData(() => {
     }
   })
 })
-modules.updateEstimatedDurations()
+
 
 $(document).ready(function () {
   $('.context_module').each(function () {
@@ -1930,6 +1937,10 @@ $(document).ready(function () {
   if (ENV.IS_STUDENT) {
     $('.context_module').addClass('student-view')
     $('.context_module_item .ig-row').addClass('student-view')
+  }
+
+  if (ENV.horizon_course){
+    modules.updateEstimatedDurations()
   }
 
   $('.external_url_link').click(function (event) {

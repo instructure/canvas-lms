@@ -703,7 +703,7 @@
                               <div class="media_comment_content"></div>
                             </div>
                           <% else %>
-                            <span style="white-space: pre-wrap;"><%= comment.comment %></span>
+                            <span style="white-space: pre-wrap;"><%= Sanitize.clean(comment.comment, CanvasSanitize::SANITIZE).html_safe %></span>
                           <% end %>
                           <div style="text-align: <%= direction('right') %>; font-size: 0.8em; margin-<%= direction('right') %>: 10px; clear: both;">
                             <% comment.attachments.each do |attachment| %>

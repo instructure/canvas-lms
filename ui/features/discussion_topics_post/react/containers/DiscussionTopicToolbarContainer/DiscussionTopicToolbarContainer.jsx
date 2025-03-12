@@ -24,6 +24,7 @@ import {
   DiscussionManagerUtilityContext,
   SEARCH_TERM_DEBOUNCE_DELAY,
   SearchContext,
+  isSpeedGraderInTopUrl,
 } from '../../utils/constants'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -37,6 +38,22 @@ import {hideStudentNames} from '../../utils'
 import DiscussionPostSearchTool from '../../components/DiscussionPostToolbar/DiscussionPostSearchTool'
 import {breakpointsShape} from '@canvas/with-breakpoints'
 import {DiscussionTranslationModuleContainer} from '../DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer'
+import useSpeedGrader from '../../hooks/useSpeedGrader'
+import SortOrderDropDown from '../../components/DiscussionPostToolbar/SortOrderDropDown'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Button} from '@instructure/ui-buttons'
+import {
+  IconArrowDownLine,
+  IconArrowOpenDownLine,
+  IconArrowOpenUpLine,
+  IconArrowUpLine,
+  IconGroupLine,
+  IconMoreSolid,
+  IconPermissionsLine,
+} from '@instructure/ui-icons'
+
+const I18n = createI18nScope('discussion_topic')
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 const discDefaultSortEnabled = () => window.ENV?.FEATURES?.discussion_default_sort
@@ -62,6 +79,10 @@ const DiscussionTopicToolbarContainer = props => {
 
   const [updateDiscussionSortOrder] = useMutation(UPDATE_DISCUSSION_SORT_ORDER)
   const [updateDiscussionExpanded] = useMutation(UPDATE_DISCUSSION_EXPANDED)
+  const {handleSwitchClick} = useSpeedGrader()
+  const onSwitchLinkClick = () => {
+    handleSwitchClick()
+  }
 
   const onSortClick = () => {
     let newOrder = null
@@ -92,6 +113,48 @@ const DiscussionTopicToolbarContainer = props => {
     props.setIsSummaryEnabled(true)
   }
 
+  const renderSort = () => {
+    if (discDefaultSortEnabled) {
+      return (
+        <SortOrderDropDown
+          isLocked={props.discussionTopic.sortOrderLocked}
+          selectedSortType={props.sortDirection}
+          onSortClick={props.onSortClick}
+        />
+      )
+    }
+    return (
+      <Tooltip
+        renderTip={props.sortDirection === 'desc' ? I18n.t('Newest First') : I18n.t('Oldest First')}
+        width="78px"
+        data-testid="sortButtonTooltip"
+      >
+        <span className="discussions-sort-button">
+          <Button
+            style={{width: '100%'}}
+            display="block"
+            onClick={props.onSortClick}
+            renderIcon={
+              props.sortDirection === 'desc' ? (
+                <IconArrowDownLine data-testid="DownArrow" />
+              ) : (
+                <IconArrowUpLine data-testid="UpArrow" />
+              )
+            }
+            data-testid="sortButton"
+          >
+            {I18n.t('Sort')}
+            <ScreenReaderContent>
+              {props.sortDirection === 'asc'
+                ? I18n.t('Sorted by Ascending')
+                : I18n.t('Sorted by Descending')}
+            </ScreenReaderContent>
+          </Button>
+        </span>
+      </Tooltip>
+    )
+  }
+
   const getGroupsMenuTopics = () => {
     if (!props.discussionTopic.groupSet) {
       return null
@@ -105,8 +168,12 @@ const DiscussionTopicToolbarContainer = props => {
     }
   }
 
+  const background =
+    ENV?.FEATURES?.discussions_speedgrader_revisit && isSpeedGraderInTopUrl
+      ? 'secondary'
+      : 'primary'
   return (
-    <View as="div" padding="0 0 medium 0" background="primary">
+    <View as="div" padding="small" margin="0 0 x-small 0" background={background}>
       <ScreenReaderContent>
         <h1>{props.discussionTopic.title}</h1>
       </ScreenReaderContent>
@@ -169,13 +236,46 @@ const DiscussionTopicToolbarContainer = props => {
               />
             </Flex.Item>
           </Flex>
-          {!hideStudentNames && (
-            <DiscussionPostSearchTool
-              discussionAnonymousState={props.discussionTopic.anonymousState}
-              onSearchChange={value => setCurrentSearchValue(value)}
-              searchTerm={currentSearchValue}
-              breakpoints={props.breakpoints}
-            />
+          {!window.ENV?.FEATURES?.discussion_default_sort ? (
+            !hideStudentNames && (
+              <DiscussionPostSearchTool
+                discussionAnonymousState={props.discussionTopic.anonymousState}
+                onSearchChange={value => setCurrentSearchValue(value)}
+                searchTerm={currentSearchValue}
+                breakpoints={props.breakpoints}
+              />
+            )
+          ) : (
+            <Flex 
+              direction={props.breakpoints.mobileOnly ? 'column' : 'row'}
+              wrap="wrap"
+              gap={props.breakpoints.mobileOnly ? '0' : 'small'}
+              width="100%"
+              height="100%"
+              padding="xxx-small 0"
+            >
+              <Flex.Item
+                shouldGrow={true}
+                shouldShrink={true}
+              >
+                {!hideStudentNames && (
+                  <DiscussionPostSearchTool
+                    discussionAnonymousState={props.discussionTopic.anonymousState}
+                    onSearchChange={value => setCurrentSearchValue(value)}
+                    searchTerm={currentSearchValue}
+                    breakpoints={props.breakpoints}
+                  />
+                )}
+              </Flex.Item>
+              <Flex.Item
+                  shouldGrow={false}
+                  shouldShrink={true}
+                  width={props.breakpoints.mobileOnly ? "100%" : "fit-content"}
+                  padding={props.breakpoints.mobileOnly ? 'xx-small' : 'xxx-small'}
+                >
+                {renderSort()}
+              </Flex.Item>
+            </Flex>
           )}
         </>
       ) : (
@@ -193,6 +293,7 @@ const DiscussionTopicToolbarContainer = props => {
           onViewFilter={onViewFilter}
           onSortClick={onSortClick}
           onCollapseRepliesToggle={onExpandCollapseClick}
+          onSwitchLinkClick={onSwitchLinkClick}
           setUserSplitScreenPreference={props.setUserSplitScreenPreference}
           userSplitScreenPreference={props.userSplitScreenPreference}
           onSummarizeClick={onSummarizeClick}

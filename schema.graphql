@@ -256,6 +256,15 @@ type AdhocStudents {
   students: [User!]
 }
 
+"""
+An anonymous student identity
+"""
+type AnonymousStudentIdentity {
+  anonymousId: ID!
+  name: String!
+  position: Int!
+}
+
 type AnonymousUser {
   avatarUrl: String
   id: ID!
@@ -311,6 +320,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   anonymizeStudents: Boolean
   anonymousGrading: Boolean
   anonymousInstructorAnnotations: Boolean
+  anonymousStudentIdentities: [AnonymousStudentIdentity!]
   assessmentRequestsForCurrentUser: [AssessmentRequest!]
   assignmentGroup: AssignmentGroup
   assignmentGroupId: ID
@@ -1754,6 +1764,7 @@ type Course implements AssetString & AssignmentsConnectionInterface & LegacyIDIn
     """
     last: Int
   ): GroupConnection
+  horizonCourse: Boolean
   id: ID!
 
   """
@@ -3838,6 +3849,7 @@ type Group implements AssetString & LegacyIDInterface & Node & Timestamped {
   ): GroupMembershipConnection
   membersCount: Int
   name: String
+  nonCollaborative: Boolean
   sisId: String
   updatedAt: DateTime
 }
@@ -7329,6 +7341,12 @@ input SubmissionRubricAssessmentFilterInput {
 
 input SubmissionSearchFilterInput {
   """
+  Return only submissions related to the given anonymous_id
+  There is no character restriction on this field
+  """
+  anonymousId: ID
+
+  """
   Filters submissions for deactivated and concluded users based on the calling user's
   'Show -> Inactive Enrollments' and 'Show -> Concluded Enrollments' settings in the Gradebook.
   When true, this filter takes precedence over the include_concluded and include_deactivated filters.
@@ -8209,6 +8227,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
     Whether or not to exclude `completed` enrollments
     """
     excludeConcluded: Boolean
+
+    """
+    Whether or not to include or exclude Horizon courses
+    """
+    horizonCourses: Boolean
 
     """
     The fields to order the results by

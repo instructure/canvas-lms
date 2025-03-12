@@ -281,10 +281,22 @@ const DiscussionPostButtonsToolbar = props => {
       renderAvatar(),
       renderAssignToButton(),
     ]
-
-    const buttonsMobile = ENV.current_user_is_student
-      ? [renderExpandsThreads(), renderSort(), renderGroup()]
-      : [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions), renderSort()]
+    
+    const buttonsMobile = () => {
+      if (window.ENV?.FEATURES?.discussion_default_sort) {
+        if (ENV.current_user_is_student) {
+          return [renderExpandsThreads(), renderGroup()];
+        } else {
+          return [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions)];
+        }
+      } else {
+        if (ENV.current_user_is_student) {
+          return [renderExpandsThreads(), renderSort(), renderGroup()];
+        } else {
+          return [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions), renderSort()];
+        }
+      }
+    }
 
     const padding = props.breakpoints.mobileOnly ? 'xx-small' : 'xxx-small'
 

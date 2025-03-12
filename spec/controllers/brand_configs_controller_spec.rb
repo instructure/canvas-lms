@@ -165,8 +165,12 @@ describe BrandConfigsController do
       tf = Tempfile.new("test.js")
       tf.write("test")
       uf = ActionDispatch::Http::UploadedFile.new(tempfile: tf, filename: "test.js")
+      request.headers["CONTENT_TYPE"] = "multipart/form-data"
+      expect_any_instance_of(Attachment).to receive(:save_to_storage).and_return(true)
+
       post "create", params: { account_id: @account.id, brand_config: bcin, js_overrides: uf }
       assert_status(200)
+
       json = response.parsed_body
       expect(json["brand_config"]["js_overrides"]).to be_present
     end

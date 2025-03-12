@@ -2096,7 +2096,7 @@ class Account < ActiveRecord::Base
     raise "Invalid Service" unless AccountServices.allowable_services[service]
 
     allowed_service_names = (allowed_services || "").split(",").compact
-    # rubocop:disable Style/IdenticalConditionalBranches common line needs to happen after the conditional
+    # rubocop:disable Style/IdenticalConditionalBranches -- common line needs to happen after the conditional
     if allowed_service_names.count > 0 && !["+", "-"].include?(allowed_service_names[0][0, 1])
       allowed_service_names.reject! { |flag| flag.match("^[+-]?#{service}$") }
       # This account has a hard-coded list of services, so handle accordingly

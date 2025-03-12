@@ -38,6 +38,35 @@ RSpec.describe Lti::Asset, type: :model do
     expect(asset1.uuid).not_to eq(asset2.uuid)
   end
 
+  it "submission_id is nullified when submission is deleted" do
+    asset1 = lti_asset_model
+
+    asset1.submission.destroy
+
+    expect(asset1.reload.submission_id).to be_nil
+  end
+
+  it "allows multiple rows with the same attachment_id and empty submission id" do
+    attachment = attachment_model
+    asset1 = lti_asset_model(attachment:)
+    asset2 = lti_asset_model(attachment:)
+    expect(asset2.attachment_id).to eq(asset1.attachment_id)
+
+    asset1.submission.destroy
+    asset2.submission.destroy
+
+    expect(asset1.reload.submission_id).to be_nil
+    expect(asset2.reload.submission_id).to be_nil
+  end
+
+  it "soft deleted when attachment is deleted" do
+    asset1 = lti_asset_model
+
+    asset1.attachment.destroy
+
+    expect(asset1.reload.workflow_state).to eq("deleted")
+  end
+
   describe "#compatible_with_processor?" do
     describe "for submission-attachment assets" do
       it "is true iff the submission matches the given processor's assignment" do

@@ -34,7 +34,13 @@ module LoggingFilter
     FILTERED_PARAMETERS
   end
 
-  EXTENDED_FILTERED_PARAMETERS = ["pseudonym[password]", "login[password]", "pseudonym_session[password]"].freeze
+  EXTENDED_FILTERED_PARAMETERS = %w[
+    pseudonym[password]
+    pseudonym_session[password]
+    login[password]
+    login[old_password]
+  ].freeze
+
   def self.all_filtered_parameters
     FILTERED_PARAMETERS.map(&:to_s) + EXTENDED_FILTERED_PARAMETERS
   end

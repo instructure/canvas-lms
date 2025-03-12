@@ -23,7 +23,7 @@ require_relative "../../../spec_helper"
 RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model do
   let(:developer_key) do
     dk = DeveloperKey.new(
-      scopes: ["https://purl.imsglobal.org/spec/lti/scope/noticehandlers"],
+      scopes: ["https://purl.imsglobal.org/spec/lti/scope/noticehandlers", TokenScopes::LTI_AGS_LINE_ITEM_SCOPE],
       account: Account.default
     )
     dk.save!
@@ -43,11 +43,16 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model 
   end
   let(:iso_timestamp) { Time.now.utc.iso8601 }
   let(:activity_id) { "activity_id" }
+  let(:submission_lti_id) { "submission_id:1" }
   let(:for_user_id) { "for_user_id" }
   let(:notice_event_timestamp) { iso_timestamp }
+  let(:custom) { { myparam: "$Canvas.account.id" } }
+  let(:assignment) { assignment_model }
+  let(:asset_report_url) { "https://example.com/asset_processor_service" }
   let(:param_hash) do
     {
-      activity_id:,
+      submission_lti_id:,
+      assignment:,
       for_user_id:,
       notice_event_timestamp:,
       assets: [{
@@ -58,13 +63,31 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model 
         sha256_checksum: 555,
         timestamp: 23,
         content_type: "text"
-      }]
+      }],
+      custom:,
+      asset_report_service_url: asset_report_url
     }
   end
 
   describe "#initialize" do
-    context "when activity_id is missing" do
-      let(:activity_id) { nil }
+    context "when submission is missing" do
+      let(:submission_lti_id) { nil }
+
+      it "raises an error" do
+        expect { described_class.new(param_hash) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context "when assignment is missing" do
+      let(:assignment) { nil }
+
+      it "raises an error" do
+        expect { described_class.new(param_hash) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context "when asset_report_service_url is missing" do
+      let(:asset_report_url) { nil }
 
       it "raises an error" do
         expect { described_class.new(param_hash) }.to raise_error(ArgumentError)
@@ -105,7 +128,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model 
           "aud" => developer_key.global_id.to_s,
           "azp" => developer_key.global_id.to_s,
           "exp" => now.to_i + 3600,
-          "https://purl.imsglobal.org/spec/lti/claim/activity" => { id: "activity_id" },
+          "https://purl.imsglobal.org/spec/lti/claim/activity" => { id: "random_uuid" },
           "https://purl.imsglobal.org/spec/lti/claim/assetservice" =>
           {
             assets: [{
@@ -117,16 +140,18 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model 
               title: "title",
               url: "url"
             }],
-            scope: ["https://purl.imsglobal.org/spec/lti-ap/scope/asset.readonly"]
+            scope: ["https://purl.imsglobal.org/spec/lti/scope/asset.readonly"]
           },
-          "https://purl.imsglobal.org/spec/lti/claim/custom" => {},
+          "https://purl.imsglobal.org/spec/lti/claim/custom" => { myparam: Account.default.id }.with_indifferent_access,
           "https://purl.imsglobal.org/spec/lti/claim/context" => {
-            "id" => Account.default.lti_context_id,
-            "title" => Account.default.name,
-            "type" => ["Account"]
+            "id" => assignment.context.lti_context_id,
+            "title" => "value for name",
+            "label" => "value",
+            "type" => ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
           },
           "https://purl.imsglobal.org/spec/lti/claim/deployment_id" => tool.deployment_id.to_s,
           "https://purl.imsglobal.org/spec/lti/claim/for_user" => { user_id: "for_user_id" },
+          "https://purl.imsglobal.org/spec/lti/claim/submission" => { id: "submission_id:1" },
           "https://purl.imsglobal.org/spec/lti/claim/notice" => {
             "id" => "random_uuid",
             "timestamp" => iso_timestamp,
@@ -137,7 +162,14 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model 
           "iss" => "https://canvas.instructure.com",
           "nonce" => "random_uuid",
           "https://purl.imsglobal.org/spec/lti/claim/roles" => ["http://purl.imsglobal.org/vocab/lis/v2/system/person#None"],
-          "https://purl.imsglobal.org/spec/lti/claim/target_link_uri" => "https://www.test.tool.com",
+          "https://purl.imsglobal.org/spec/lti/claim/assetreport" => {
+            scope: ["https://purl.imsglobal.org/spec/lti/scope/report"],
+            report_url: "https://example.com/asset_processor_service",
+          },
+          "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint" => {
+            "lineitems" => "http://localhost/api/lti/courses/#{assignment.course.id}/line_items",
+            "scope" => ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"]
+          },
         },
         anything
       )

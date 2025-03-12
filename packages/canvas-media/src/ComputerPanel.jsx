@@ -73,7 +73,9 @@ export default function ComputerPanel({
   const [messages, setMessages] = useState([])
   const [mediaTracksCheckbox, setMediaTracksCheckbox] = useState(false)
   const [previewURL, setPreviewURL] = useState(null)
-  const height = 0.8 * (bounds?.height - 38 - px('1.5rem')) // the trashcan is 38px tall and the 1.5rem margin-bottom
+  const height = useStudioPlayer
+    ? 400
+    : 0.8 * (bounds?.height - 38 - px('1.5rem')) // the trashcan is 38px tall and the 1.5rem margin-bottom
   const width = 0.8 * bounds?.width
 
   const previewPanelRef = useRef(null)
@@ -93,7 +95,7 @@ export default function ComputerPanel({
 
   const handlePlayerSize = useCallback(
     _event => {
-      if (previewPanelRef.current === null) return
+      if (previewPanelRef.current === null || useStudioPlayer) return
 
       const player = previewPanelRef.current.querySelector('video')
       let boundingBox = {width, height}

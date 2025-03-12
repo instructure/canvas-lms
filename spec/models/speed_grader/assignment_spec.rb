@@ -247,6 +247,56 @@ describe SpeedGrader::Assignment do
     end
   end
 
+  context "discussions assignment" do
+    before do
+      Account.site_admin.enable_feature! :discussion_checkpoints
+      Account.site_admin.enable_feature!(:react_discussions_post)
+
+      @teacher = teacher_in_course(active_all: true, name: "teacher").user
+      @student1 = student_in_course(course: @course, name: "student", active_all: true).user
+      @student2 = student_in_course(course: @course, name: "student2", active_all: true).user
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+
+      @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+      @assignment = @checkpointed_assignment = @checkpointed_discussion.assignment
+
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 2.days.from_now }],
+        points_possible: 5
+      )
+
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 5.days.from_now }],
+        points_possible: 15,
+        replies_required: 3
+      )
+
+      3.times do |i|
+        entry = @checkpointed_discussion.discussion_entries.create!(user: @student1, message: " reply to topic i#{i} ")
+        @checkpointed_discussion.discussion_entries.create!(user: @student2, message: " reply to entry i#{i} ", root_entry_id: entry.id, parent_id: entry.id)
+      end
+
+      3.times do |j|
+        entry = @checkpointed_discussion.discussion_entries.create!(user: @student2, message: " reply to topic j#{j} ")
+        @checkpointed_discussion.discussion_entries.create!(user: @student1, message: " reply to entry j#{j} ", root_entry_id: entry.id, parent_id: entry.id)
+      end
+    end
+
+    let(:json) { SpeedGrader::Assignment.new(@checkpointed_assignment, @teacher).json }
+
+    it "returns the students entries ids in asc order" do
+      expect(json["student_entries"][@student1.id].last).to eq(DiscussionEntry.where(message: " reply to entry j2 ").first.id)
+      expect(json["student_entries"][@student1.id].first).to eq(DiscussionEntry.where(message: " reply to topic i0 ").first.id)
+
+      expect(json["student_entries"][@student2.id].last).to eq(DiscussionEntry.where(message: " reply to topic j2 ").first.id)
+      expect(json["student_entries"][@student2.id].first).to eq(DiscussionEntry.where(message: " reply to entry i0 ").first.id)
+    end
+  end
+
   context "students and active course sections" do
     before(:once) do
       @course = course_factory(active_course: true)

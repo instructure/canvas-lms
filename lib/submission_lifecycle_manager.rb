@@ -332,6 +332,7 @@ class SubmissionLifecycleManager
   private
 
   EnrollmentCounts = Struct.new(:accepted_student_ids, :prior_student_ids, :deleted_student_ids)
+  private_constant :EnrollmentCounts
   def enrollment_counts
     @enrollment_counts ||= begin
       counts = EnrollmentCounts.new([], [], [])

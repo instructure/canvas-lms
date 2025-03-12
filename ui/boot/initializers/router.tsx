@@ -48,12 +48,16 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/page_views/react/PageViewsRoute')}
       />
       <Route
-        path="/accounts/:accountId/users/:userId"
-        lazy={() => import('../../features/page_views/react/PageViewsRoute')}
+        path="/accounts/site_admin/release_notes"
+        lazy={() => import('../../features/release_notes_edit/react/ReleaseNotesEditRoute')}
       />
       <Route
-        path="/accounts/:accountId/settings/*"
-        lazy={() => import('../../features/alerts/react/AlertListRoute')}
+        path="/accounts/:accountId/settings"
+        lazy={() => import('../../features/account_settings/react/AccountSettingsRoute')}
+      />
+      <Route
+        path="/accounts/:accountId/users/:userId"
+        lazy={() => import('../../features/page_views/react/PageViewsRoute')}
       />
       <Route
         path="/accounts"
@@ -61,7 +65,7 @@ const portalRouter = createBrowserRouter(
       />
       <Route
         path="/courses/:courseId/settings/*"
-        lazy={() => import('../../features/alerts/react/AlertListRoute')}
+        lazy={() => import('../../features/course_settings/react/CourseSettingsRoute')}
       />
 
       {accountGradingSettingsRoutes}

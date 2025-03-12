@@ -748,6 +748,14 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be false
       end
 
+      it "CAN_SET_GROUP is true for an account admin lacking manage_courses_admin" do
+        regular_topic = @course.discussion_topics.create!(user: @teacher, title: "Greetings", message: "Hello, and good morning!")
+        account_admin_user_with_role_changes(account: @account, role_changes: { manage_courses_admin: false, manage_groups_add: true })
+        user_session(@admin)
+        get("edit", params: { course_id: @course.id, id: regular_topic.id })
+        expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be true
+      end
+
       it "CAN_SET_GROUP is false when existing discussion_topic is fully anonymous" do
         anon_topic = @course.discussion_topics.create!(title: "some topic", anonymous_state: "full_anonymity")
         user_session(@teacher)
@@ -2104,6 +2112,24 @@ describe DiscussionTopicsController do
       @course.save!
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:RESTRICT_QUANTITATIVE_DATA]).to be_falsy
+    end
+
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.enable_feature! :differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+      end
+
+      it "adds differentiation tags information if account setting is on" do
+        user_session(@teacher)
+        get "edit", params: { course_id: @course.id, id: @topic.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
     end
 
     context "conditional-release" do

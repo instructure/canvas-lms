@@ -142,6 +142,8 @@ export default function SpeedGraderStatusMenu({
               />
             ) : null}
           </div>
+          {/* fill up the space of the absolute positioned element */}
+          <div className="time-late-input-spacer" />
         </>
       )}
     </>

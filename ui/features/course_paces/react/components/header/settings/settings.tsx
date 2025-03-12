@@ -71,6 +71,7 @@ interface LocalState {
   readonly showBlackoutDatesModal: boolean
   readonly showSettingsPopover: boolean
   readonly blackoutDatesModalKey: string
+  readonly showWeightedAssignments: boolean
 }
 
 export class Settings extends React.Component<ComponentProps, LocalState> {
@@ -80,6 +81,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
       showBlackoutDatesModal: false,
       showSettingsPopover: false,
       blackoutDatesModalKey: uid('bod_', 2),
+      showWeightedAssignments: false,
     }
   }
 
@@ -95,6 +97,12 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
   closeBlackoutDatesModal = (): void => {
     this.setState({
       showBlackoutDatesModal: false,
+    })
+  }
+
+  closeWeightedAssignmentsTray = () => {
+    this.setState({
+      showWeightedAssignments: false,
     })
   }
 

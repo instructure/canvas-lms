@@ -298,8 +298,9 @@ describe "CanvasHttp" do
   end
 
   describe ".tempfile_for_url" do
+    let(:tempfile) { double("tempfile") }
+
     before do
-      tempfile = double("tempfile")
       allow(tempfile).to receive(:binmode)
       allow(Tempfile).to receive(:new).and_return(tempfile)
     end
@@ -307,6 +308,11 @@ describe "CanvasHttp" do
     it "truncates uris to 100 characters" do
       expect(Tempfile).to receive(:new).with("1234567890" * 10)
       CanvasHttp.tempfile_for_uri(URI.parse("1234567890" * 12))
+    end
+
+    it "doesn't crash when given a URI with no path" do
+      res = CanvasHttp.tempfile_for_uri(URI.parse("http://example.com"))
+      expect(res).to eq(tempfile)
     end
   end
 

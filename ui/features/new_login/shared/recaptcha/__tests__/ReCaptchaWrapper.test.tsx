@@ -16,16 +16,54 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
-import React from 'react'
-import {ReCaptchaWrapper} from '..'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import React, {useRef} from 'react'
+import ReCaptchaWrapper, {ReCaptchaWrapperRef} from '../ReCaptchaWrapper'
 
 describe('ReCaptchaWrapper', () => {
-  it('mounts without crashing', () => {
+  test('renders children inside the wrapper', () => {
     render(
       <ReCaptchaWrapper>
-        <div>ReCaptcha Content</div>
+        <div data-testid="recaptcha-content">ReCaptcha Widget</div>
       </ReCaptchaWrapper>,
     )
+    expect(screen.getByTestId('recaptcha-content')).toBeInTheDocument()
+  })
+
+  test('renders error message and icon when hasError is true', () => {
+    render(<ReCaptchaWrapper hasError={true}>ReCaptcha Widget</ReCaptchaWrapper>)
+    expect(screen.getByText('Please complete the verification.')).toBeInTheDocument()
+    expect(screen.getByTestId('recaptcha-error-text')).toBeInTheDocument()
+    const icon = screen.getByTestId('recaptcha-error-icon')
+    expect(icon).toBeInTheDocument()
+    expect(icon).toHaveAttribute('width', '0.875rem')
+    expect(icon).toHaveAttribute('height', '0.875rem')
+    expect(icon).toHaveStyle({verticalAlign: 'top'})
+  })
+
+  test('does not render error message or icon when hasError is false', () => {
+    render(<ReCaptchaWrapper hasError={false}>ReCaptcha Widget</ReCaptchaWrapper>)
+    expect(screen.queryByText('Please complete the verification.')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('recaptcha-error-icon')).not.toBeInTheDocument()
+  })
+
+  test('focus() method moves focus to the container', async () => {
+    const user = userEvent.setup()
+    const TestComponent = () => {
+      const recaptchaRef = useRef<ReCaptchaWrapperRef>(null)
+      return (
+        <div>
+          <button onClick={() => recaptchaRef.current?.focus()}>Focus Recaptcha</button>
+          <ReCaptchaWrapper ref={recaptchaRef}>ReCaptcha Widget</ReCaptchaWrapper>
+        </div>
+      )
+    }
+    render(<TestComponent />)
+    const focusButton = screen.getByText('Focus Recaptcha')
+    const recaptchaContainer = screen.getByTestId('recaptcha-container')
+    expect(recaptchaContainer).not.toHaveFocus()
+    await user.click(focusButton)
+    expect(recaptchaContainer).toHaveFocus()
   })
 })

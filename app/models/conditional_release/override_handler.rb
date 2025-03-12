@@ -81,10 +81,34 @@ module ConditionalRelease
         ActiveRecord::Associations.preload(existing_overrides,
                                            :assignment_override_students,
                                            AssignmentOverrideStudent.where(user_id: student_id)) # only care about records for this student
+        existing_overrides_map_with_dates = existing_overrides.group_by { |override| [override.assignment_id, override.due_at] }
         existing_overrides_map = existing_overrides.group_by(&:assignment_id)
+        due_dates = {}
+        course_pace = nil
+
+        course = [assignments_to_assign.first, assignments_to_unassign.first].compact.first&.course
+
+        if course
+          enrollment = StudentEnrollment.current.find_by(user_id: student_id, course:)
+          course_pace = CoursePace.pace_for_context(course, enrollment)
+          due_dates = CoursePaceDueDatesCalculator.new(course_pace).get_due_dates(course_pace.course_pace_module_items, enrollment, by_assignment: true) if course_pace
+        end
+
+        assignments_to_unassign.each do |to_unassign|
+          overrides = existing_overrides_map[to_unassign.id] || []
+          overrides.each do |o|
+            o.assignment_override_students.detect { |aos| aos.user_id == student_id }&.destroy!
+          end
+        end
 
         assignments_to_assign.each do |to_assign|
-          overrides = existing_overrides_map[to_assign.id]
+          due_at = if course_pace
+                     due_dates[to_assign.id]
+                   else
+                     nil
+                   end
+
+          overrides = existing_overrides_map_with_dates[[to_assign.id, due_dates[to_assign.id]]]
           if overrides
             unless overrides.any? { |o| o.assignment_override_students.map(&:user_id).include?(student_id) }
               override = overrides.min_by(&:id) # kind of arbitrary but may as well be consistent and always pick the earliest
@@ -97,17 +121,16 @@ module ConditionalRelease
               set_type: "ADHOC",
               assignment_override_students: [
                 AssignmentOverrideStudent.new(assignment: to_assign, user_id: student_id, no_enrollment: false)
-              ]
+              ],
+              due_at_overridden: due_at&.present?,
+              due_at:
             )
-            existing_overrides_map[to_assign.id] = [new_override]
+
+            existing_overrides_map_with_dates[[to_assign.id, due_dates[to_assign.id]]] = [new_override]
           end
         end
-
-        assignments_to_unassign.each do |to_unassign|
-          overrides = existing_overrides_map[to_unassign.id] || []
-          overrides.each do |o|
-            o.assignment_override_students.detect { |aos| aos.user_id == student_id }&.destroy!
-          end
+        if course
+          SubmissionLifecycleManager.recompute_users_for_course([student_id], course, assignments_to_assign.concat(assignments_to_unassign))
         end
       end
 

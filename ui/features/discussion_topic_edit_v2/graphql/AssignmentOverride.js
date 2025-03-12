@@ -60,6 +60,7 @@ export const AssignmentOverride = {
         ... on Group {
           id
           name
+          nonCollaborative
           _id
         }
       }

@@ -336,9 +336,7 @@ ActiveRecord::Base.class_eval do
   include I18nUtilities
   extend I18nUtilities
 
-  def i18nliner_scope
-    self.class.i18nliner_scope
-  end
+  delegate :i18nliner_scope, to: :class
 
   def self.i18nliner_scope
     @i18nliner_scope ||= I18nliner::Scope.new(name.underscore)

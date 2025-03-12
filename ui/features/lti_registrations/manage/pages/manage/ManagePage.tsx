@@ -51,8 +51,7 @@ export const ManagePage = () => {
     {
       name: I18n.t('Manage'),
       url: `/accounts/${accountId}/apps/manage`,
-    },
-    !!window.ENV.FEATURES.lti_registrations_next,
+    }
   )
   const [searchParams] = useManageSearchParams()
 

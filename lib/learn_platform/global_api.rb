@@ -19,6 +19,9 @@
 
 module LearnPlatform
   module GlobalApi
+    GET_UNIFIED_TOOL_ID_ENDPOINT = "/api/v2/lti/global_products/unified_tool_id"
+    POST_UNIFIED_TOOL_ID_BULK_LOAD_CALLBACK_ENDPOINT = "/api/v2/lti/unified_tool_id_bulk_load"
+
     def self.credentials
       @credentials ||= Rails.application.credentials.learn_platform_creds&.with_indifferent_access || {}
     end
@@ -28,17 +31,20 @@ module LearnPlatform
     end
 
     def self.endpoint
-      @endpoint ||= config[:url]
+      @endpoint ||= config[:url]&.chomp("/")
     end
 
     def self.enabled?
       !!config[:enabled_for_canvas]
     end
 
+    def self.auth_headers
+      { Authorization: "Basic #{credentials[:learn_platform_basic_token]}" }
+    end
+
     def self.get_unified_tool_id(lti_name:, lti_tool_id:, lti_domain:, lti_version:, lti_url:, integration_type: nil, lti_redirect_url: nil)
       return unless enabled?
 
-      headers = { Authorization: "Basic #{credentials[:learn_platform_basic_token]}" }
       params = {
         lti_name:,
         lti_tool_id:,
@@ -49,10 +55,9 @@ module LearnPlatform
         lti_redirect_url:
       }
 
-      suffix = "api/v2/lti/global_products/unified_tool_id"
       encoded_params = URI.encode_www_form(params)
-      url = "#{endpoint}/#{suffix}?#{encoded_params}"
-      response = CanvasHttp.get(url, headers)
+      url = "#{endpoint}#{GET_UNIFIED_TOOL_ID_ENDPOINT}?#{encoded_params}"
+      response = CanvasHttp.get(url, auth_headers)
 
       if response.is_a?(Net::HTTPSuccess)
         InstStatsd::Statsd.increment("learn_platform_api.success", tags: { event_type: "get_unified_tool_id" })
@@ -64,6 +69,16 @@ module LearnPlatform
     rescue CanvasHttp::Error
       InstStatsd::Statsd.increment("learn_platform_api.error", tags: { event_type: "get_unified_tool_id" })
       false
+    end
+
+    def self.post_unified_tool_id_bulk_load_callback(id:, region:, shard_issues:, row_stats:, error:)
+      url = "#{endpoint}#{POST_UNIFIED_TOOL_ID_BULK_LOAD_CALLBACK_ENDPOINT}"
+      payload = { id:, region:, row_stats:, shard_issues:, error: }.compact
+      CanvasHttp.post(url, auth_headers, content_type: "application/json", body: payload.to_json) do |resp|
+        unless resp.is_a?(Net::HTTPSuccess)
+          raise CanvasHttp::InvalidResponseCodeError, resp.code
+        end
+      end
     end
   end
 end

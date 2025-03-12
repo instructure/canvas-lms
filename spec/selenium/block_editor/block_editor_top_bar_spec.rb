@@ -79,7 +79,6 @@ describe "Block Editor", :ignore_js_errors do
       f(block_toolbar_selector("delete")).click
       expect(body).not_to contain_css('[data-testid="icon-block"]')
 
-      editor_area.click
       top_bar_action("undo").click
       expect(icon_block).to be_displayed
     end
@@ -94,11 +93,9 @@ describe "Block Editor", :ignore_js_errors do
       f(block_toolbar_selector("delete")).click
       expect(body).not_to contain_css('[data-testid="icon-block"]')
 
-      editor_area.click
       top_bar_action("undo").click
       expect(icon_block).to be_displayed
 
-      editor_area.click
       top_bar_action("redo").click
       expect(body).not_to contain_css('[data-testid="icon-block"]')
     end

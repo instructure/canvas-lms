@@ -69,9 +69,6 @@ export default class CustomHelpLink extends React.Component {
   }
 
   renderPill() {
-    if (!ENV?.FEATURES?.featured_help_links) {
-      return null
-    }
     const {is_featured, is_new} = this.props.link
     if (is_featured || is_new) {
       const text = is_featured ? I18n.t('Featured') : I18n.t('New')

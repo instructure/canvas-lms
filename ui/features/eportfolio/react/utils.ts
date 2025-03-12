@@ -45,6 +45,7 @@ export const createEntry = async (
   })
   return json
 }
+
 export const deleteEntry = async (type: string, portfolioId: number, id: number) => {
   const {json} = await doFetchApi({
     path: `/eportfolios/${portfolioId}/${type}/${id}`,
@@ -52,6 +53,7 @@ export const deleteEntry = async (type: string, portfolioId: number, id: number)
   })
   return json
 }
+
 export const moveEntry = async (
   type: string,
   portfolioId: number,
@@ -72,6 +74,7 @@ export const moveEntry = async (
   })
   return json
 }
+
 export const updateEntry = async (
   type: string,
   portfolioId: number,
@@ -100,4 +103,8 @@ export const updateEntry = async (
     params,
   })
   return json
+}
+
+export const generatePageListKey = (sectionId: number, portfolioId: number) => {
+  return ['portfolioPageList', portfolioId, sectionId]
 }

@@ -48,14 +48,11 @@ module UngradedDiscussionVisibility
             /* join active student enrollments */
             #{VisibilitySqlHelper.enrollment_join_sql}
 
-            /* join context modules */
-            #{VisibilitySqlHelper.module_items_join_sql(content_tag_type: "DiscussionTopic")}
-
-            /* join assignment overrides (assignment or related context module) for CourseSection */
-            #{VisibilitySqlHelper.assignment_override_section_join_sql(id_column_name: "discussion_topic_id")}
-
-            /* filtered to course_id, user_id, discussion_topic_id, and additional conditions */
-            #{VisibilitySqlHelper.section_override_filter_sql(filter_condition_sql:)}
+            #{if Account.site_admin.feature_enabled?(:visibility_performance_improvements)
+                VisibilitySqlHelper.full_section_without_left_joins_sql(filter_condition_sql:, id_column_name: "discussion_topic_id", table_name: DiscussionTopic)
+              else
+                VisibilitySqlHelper.full_section_with_left_joins_sql(filter_condition_sql:, id_column_name: "discussion_topic_id", content_tag_type: "DiscussionTopic")
+              end}
 
             EXCEPT
 
@@ -69,7 +66,11 @@ module UngradedDiscussionVisibility
             #{VisibilitySqlHelper.assignment_override_unassign_section_join_sql(id_column_name: "discussion_topic_id")}
 
             /* filtered to course_id, user_id, discussion_topic_id, and additional conditions */
-            #{VisibilitySqlHelper.assignment_override_unassign_section_filter_sql(filter_condition_sql:)}
+            #{VisibilitySqlHelper.assignment_override_unassign_filter_sql(filter_condition_sql:)}
+
+            /* non collaborative groups */
+            /* incorporate non_collaborative groups if account feature flag is enabled */
+            #{non_collaborative_group_union_sql(filter_condition_sql) if VisibilitySqlHelper.assign_to_differentiation_tags_enabled?(course_ids)}
 
             UNION
 
@@ -79,17 +80,11 @@ module UngradedDiscussionVisibility
             /* join active student enrollments */
             #{VisibilitySqlHelper.enrollment_join_sql}
 
-            /* join context modules */
-            #{VisibilitySqlHelper.module_items_join_sql(content_tag_type: "DiscussionTopic")}
-
-            /* join assignment override for 'ADHOC' */
-            #{VisibilitySqlHelper.assignment_override_adhoc_join_sql(id_column_name: "discussion_topic_id")}
-
-            /* join AssignmentOverrideStudent */
-            #{VisibilitySqlHelper.assignment_override_student_join_sql}
-
-            /* filtered to course_id, user_id, discussion_topic_id, and additional conditions */
-            #{VisibilitySqlHelper.adhoc_override_filter_sql(filter_condition_sql:)}
+            #{if Account.site_admin.feature_enabled?(:visibility_performance_improvements)
+                VisibilitySqlHelper.full_adhoc_without_left_joins_sql(filter_condition_sql:, id_column_name: "discussion_topic_id", table_name: DiscussionTopic)
+              else
+                VisibilitySqlHelper.full_adhoc_with_left_joins_sql(filter_condition_sql:, id_column_name: "discussion_topic_id", content_tag_type: "DiscussionTopic")
+              end}
 
             EXCEPT
 
@@ -103,7 +98,7 @@ module UngradedDiscussionVisibility
             #{VisibilitySqlHelper.assignment_override_unassign_adhoc_join_sql(id_column_name: "discussion_topic_id")}
 
             /* filtered to course_id, user_id, discussion_topic_id, and additional conditions */
-            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_filter_sql(filter_condition_sql:)}
+            #{VisibilitySqlHelper.assignment_override_unassign_filter_sql(filter_condition_sql:)}
 
             UNION
 
@@ -118,7 +113,6 @@ module UngradedDiscussionVisibility
 
             /* filtered to course_id, user_id, discussion_topic_id, and additional conditions */
             #{VisibilitySqlHelper.course_override_filter_sql(filter_condition_sql:)}
-
           SQL
 
           query_params = query_params(course_ids:, user_ids:, discussion_topic_ids:)
@@ -130,10 +124,8 @@ module UngradedDiscussionVisibility
         def exec_find_discussion_topic_visibility_query(query_sql:, query_params:)
           # safely replace parameters in the filter clause
           sanitized_sql = ActiveRecord::Base.sanitize_sql_array([query_sql, query_params])
-
           # Execute the query
           query_results = ActiveRecord::Base.connection.exec_query(sanitized_sql)
-
           # map the results to an array of AssignmentVisibleToStudent (DTO / PORO) and return it
           query_results.map do |row|
             UngradedDiscussionVisibility::Entities::UngradedDiscussionVisibleToStudent.new(course_id: row["course_id"], discussion_topic_id: row["discussion_topic_id"], user_id: row["user_id"])
@@ -164,6 +156,43 @@ module UngradedDiscussionVisibility
             e.user_id as user_id,
             e.course_id as course_id
             FROM #{DiscussionTopic.quoted_table_name} o
+          SQL
+        end
+
+        def non_collaborative_group_union_sql(filter_condition_sql)
+          <<~SQL.squish
+            UNION
+
+            /* discussion topics visible to non collaborative groups */
+            /* selecting discussion topics */
+            #{discussion_topic_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join context modules */
+            #{VisibilitySqlHelper.module_items_join_sql(content_tag_type: "DiscussionTopic")}
+
+            /* join assignment overrides for non collaborative 'Group' */
+            #{VisibilitySqlHelper.assignment_override_non_collaborative_group_join_sql(id_column_name: "discussion_topic_id")}
+
+            /* filtered to course_id, user_id, discussion_topic_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_non_collaborative_group_filter_sql(filter_condition_sql:)}
+
+            EXCEPT
+
+            /* remove students with unassigned non collaborative groups overrides */
+            /* selecting discussion topics */
+            #{discussion_topic_select_sql}
+
+            /* join active student enrollments */
+            #{VisibilitySqlHelper.enrollment_join_sql}
+
+            /* join assignment override for non collaborative 'Group' (no module check) */
+            #{VisibilitySqlHelper.assignment_override_unassign_non_collaborative_group_join_sql(id_column_name: "discussion_topic_id")}
+
+            /* filtered to course_id, user_id, discussion_topic_id, and additional conditions */
+            #{VisibilitySqlHelper.assignment_override_unassign_filter_sql(filter_condition_sql:)}
           SQL
         end
       end

@@ -22,6 +22,7 @@ import ready from '@instructure/ready'
 import DiscussionTopic from '@canvas/discussions/backbone/models/DiscussionTopic'
 import Announcement from '@canvas/discussions/backbone/models/Announcement'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
+import MasteryPathToggle from '@canvas/mastery-path-toggle'
 import EditView from './backbone/views/EditView'
 import OverrideView from '@canvas/due-dates'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
@@ -119,6 +120,9 @@ ready(() => {
         inPacedCourse: model.get('in_paced_course'),
         isModuleItem: ENV.IS_MODULE_ITEM,
         courseId: assignment.courseID(),
+      }),
+      'js-assignment-overrides-mastery-path': new MasteryPathToggle({
+        model: dueDateList
       }),
     },
     lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion

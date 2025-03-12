@@ -103,7 +103,7 @@ module Lti
     #   }
     #
     # (Extra copy at the end is to undo the default value ([]))
-    INVERTED_LIS_V2_LTI_ADVANTAGE_ROLE_MAP = LIS_V2_LTI_ADVANTAGE_ROLE_MAP.each_with_object(Hash.new([])) do |(key, values), memo|
+    INVERTED_LIS_V2_LTI_ADVANTAGE_ROLE_MAP = LIS_V2_LTI_ADVANTAGE_ROLE_MAP.each_with_object(Hash.new([].freeze)) do |(key, values), memo|
       values.each { |value| memo[value] += [key] }
     end.reverse_merge({}).freeze
 

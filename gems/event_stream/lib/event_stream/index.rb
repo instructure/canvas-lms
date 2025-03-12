@@ -35,11 +35,7 @@ class EventStream::Index
     attr_config_validate
   end
 
-  def find_with(args, options)
-    @strategy.find_with(args, options)
-  end
+  delegate :find_with, to: :@strategy
 
-  def find_ids_with(args, options)
-    @strategy.find_ids_with(args, options)
-  end
+  delegate :find_ids_with, to: :@strategy
 end

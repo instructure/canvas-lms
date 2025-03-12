@@ -50,7 +50,7 @@ module ConditionalRelease
   module SpecHelper
     def setup_course_with_native_conditional_release(course: nil)
       # set up a trigger assignment with rules and whatnot
-      course ||= course_with_student(active_all: true) && @course
+      course ||= course_with_student(active_all: true, course: @course) && @course
       @trigger_assmt = course.assignments.create!(points_possible: 10, submission_types: "online_text_entry")
       @sub = @trigger_assmt.submit_homework(@student, body: "hi") if @student
 

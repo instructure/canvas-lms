@@ -39,6 +39,9 @@ export const initialState: UIState = {
   responsiveSize: 'large',
   showProjections: true,
   blueprintLocked: window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course,
+  showWeightedAssignmentsTray: false,
+  bulkEditModalOpen: false,
+  selectedBulkStudents: [],
 }
 
 /* Selectors */
@@ -73,6 +76,10 @@ export const getShowPaceModal = (state: StoreState) => state.ui.showPaceModal
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
 export const getIsSyncing = (state: StoreState) => state.ui.syncing
 export const getBlueprintLocked = (state: StoreState) => state.ui.blueprintLocked
+export const getShowWeightedAssignmentsTray = (state: StoreState) => state.ui.showWeightedAssignmentsTray
+export const getBulkEditModalOpen = (state: StoreState) => state.ui.bulkEditModalOpen
+export const getSelectedBulkStudents = (state: StoreState) => state.ui.selectedBulkStudents
+
 
 export const getShowProjections = createSelector(
   state => state.ui.showProjections,
@@ -129,6 +136,16 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, blueprintLocked: action.payload}
     case UIConstants.SAVING_DRAFT:
       return {...state, savingDraft: !state.savingDraft}
+    case UIConstants.SHOW_WEIGHTING_ASSIGNMENTS_MODAL:
+      return {...state, showWeightedAssignmentsTray: true}
+    case UIConstants.HIDE_WEIGHTING_ASSIGNMENTS_MODAL:
+      return {...state, showWeightedAssignmentsTray: false}
+    case UIConstants.OPEN_BULK_EDIT_MODAL:
+      return {...state, bulkEditModalOpen: true, selectedBulkStudents: action.payload}
+    case UIConstants.CLOSE_BULK_EDIT_MODAL:
+      return {...state, bulkEditModalOpen: false, selectedBulkStudents: [] }
+    case UIConstants.SET_SELECTED_BULK_STUDENTS:
+      return {...state, selectedBulkStudents: action.payload}
     default:
       return state
   }

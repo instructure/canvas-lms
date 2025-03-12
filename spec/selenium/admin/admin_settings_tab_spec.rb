@@ -426,7 +426,7 @@ describe "admin settings tab" do
       get "/accounts/#{Account.default.id}/settings"
 
       f("#tab-notifications-link").click
-      f("#account_settings_notifications button[type=submit]").click
+      f(%(#tab-notifications button[data-testid="update-button")).click
       wait_for_ajax_requests
 
       expect(Account.default.settings[:custom_help_links]).to eq [
@@ -462,7 +462,6 @@ describe "admin settings tab" do
     end
 
     it "adds a custom link" do
-      Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
       wait_for_ajaximations
 
@@ -498,7 +497,6 @@ describe "admin settings tab" do
     end
 
     it "adds a custom link with New designation" do
-      Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
       help_options = f(".HelpMenuOptions__Container button")
       scroll_into_view(help_options)

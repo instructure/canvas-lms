@@ -18,7 +18,7 @@
 
 import {createContext} from 'react'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import type {CoursePeopleEnv, CoursePeopleContextType} from '../types.d'
+import type {CoursePeopleEnv, CoursePeopleContextType} from '../../types'
 
 declare const ENV: GlobalEnv & CoursePeopleEnv
 
@@ -40,6 +40,7 @@ const defaultEnvPermissions = {
 }
 
 const defaultEnvCourse = {
+  id: '',
   groups_url: '',
   prior_enrollments_url: '',
   interactions_report_url: '',
@@ -58,7 +59,7 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     ? defaultEnvCourse
     : {...defaultEnvCourse, ...ENV.course}
 
-  const courseRootUrl = ENV.COURSE_ROOT_URL
+  const currentUserId = ENV.current_user_id
 
   const {
     can_read_roster: canReadRoster,
@@ -78,6 +79,7 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
   } = permissions
 
   const {
+    id: courseId,
     groups_url: groupsUrl,
     prior_enrollments_url: priorEnrollmentsUrl,
     interactions_report_url: interactionsReportUrl,
@@ -101,10 +103,11 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     canViewLoginIdColumn,
     canViewSisIdColumn,
     courseConcluded,
+    courseId,
+    currentUserId,
     hideSectionsOnCourseUsersPage,
     userIsInstructor,
     selfRegistration,
-    courseRootUrl,
     observerPairingCodesUrl,
     groupsUrl,
     interactionsReportUrl,

@@ -20,19 +20,26 @@ import React from 'react'
 import {act, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderRow} from '@canvas/util/react/testing/TableHelper'
-
+import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import {
   BLACKOUT_DATES,
   PACE_ITEM_1,
   PACE_ITEM_3,
+  PACE_ITEM_4,
   PRIMARY_PACE,
   STUDENT_PACE,
+  STUDENT_PACE_UNRELEASED_ITEMS
 } from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
 
 import {AssignmentRow, type ComponentProps} from '../assignment_row'
 
 const setPaceItemDuration = jest.fn()
+const setPaceItemDurationTimeToCompleteCalendarDays = jest.fn()
+
+jest.mock('@canvas/conditional-release-cyoe-helper', () => ({
+  getItemData: jest.fn()
+}))
 
 const defaultProps: ComponentProps = {
   coursePace: PRIMARY_PACE,
@@ -52,10 +59,12 @@ const defaultProps: ComponentProps = {
   blueprintLocked: false,
   selectedDaysToSkip: [],
   context_type: 'Course',
+  setPaceItemDurationTimeToCompleteCalendarDays,
 }
 
 const NO_SUBMISSION_TEXT = 'No Submission'
 const LATE_SUBMISSION_TEXT = 'Late Submission'
+const UNRELEASED_ASSIGNMENT_TEXT = 'Based on Mastery Path results this assignment may not be assigned to this student.'
 
 beforeAll(() => {
   ENV.CONTEXT_TIMEZONE = 'America/New_York' // to match defaultProps.dueDate
@@ -230,6 +239,10 @@ describe('AssignmentRow', () => {
       dueDate: "2025-01-01",
       coursePace: STUDENT_PACE,
       context_type: "Enrollment",
+      coursePaceItem: {
+        ...PACE_ITEM_3,
+        submission_status: "missing"
+      }
     }
       
     // Simulate a due item with no submission
@@ -237,17 +250,16 @@ describe('AssignmentRow', () => {
       renderRow(
         <AssignmentRow
           {...rowProps}
-          coursePaceItem={PACE_ITEM_3}
         />
       )
     )
-    
+
     expect(getByText(NO_SUBMISSION_TEXT)).toBeInTheDocument()
 
     // Simulate an item that was submitted after it's due date
     rerender(
       renderRow(
-        <AssignmentRow {...rowProps} coursePaceItem={{...PACE_ITEM_3, submitted_at: '2025-01-10T00:00:00Z'}} />
+        <AssignmentRow {...rowProps} coursePaceItem={{...PACE_ITEM_3, submission_status: 'late'}} />
       )
     )
     expect(getByText(LATE_SUBMISSION_TEXT)).toBeInTheDocument()
@@ -274,11 +286,10 @@ describe('AssignmentRow', () => {
     expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
     expect(queryByText(LATE_SUBMISSION_TEXT)).toBeNull()
 
-  
     // Simulate an item that is not submittable
     rerender(
       renderRow(
-        <AssignmentRow {...rowProps} coursePaceItem={{...PACE_ITEM_1, submittable: false, submitted_at: null}} />
+        <AssignmentRow {...rowProps} coursePaceItem={PACE_ITEM_1} />
       )
     )
     expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
@@ -293,6 +304,66 @@ describe('AssignmentRow', () => {
     )
     expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
     expect(queryByText(LATE_SUBMISSION_TEXT)).toBeNull()
+
+    // Simulate an item that is unreleased
+    rerender(
+      renderRow(
+        <AssignmentRow {...rowProps} coursePaceItem={{...PACE_ITEM_1, unreleased: true}} />
+      )
+    )
+    expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
+    expect(queryByText(LATE_SUBMISSION_TEXT)).toBeNull()
+  })
+
+  it('renders unreleasd indicator when the item is unreleased', () => {
+    window.ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
+
+    const rowProps = {
+      ...defaultProps,
+      dueDate: "2025-01-01",
+      coursePace: STUDENT_PACE_UNRELEASED_ITEMS,
+      context_type: "Enrollment",
+    }
+
+    const {getByText} = renderConnected(
+      renderRow(
+        <AssignmentRow
+          {...rowProps}
+          coursePaceItem={PACE_ITEM_4}
+        />
+      )
+    )
+
+    expect(getByText(UNRELEASED_ASSIGNMENT_TEXT)).toBeInTheDocument()
+  })
+
+  it('returns null when isTrigger and releasedLabel are both false', () => {
+    (CyoeHelper.getItemData as jest.Mock).mockReturnValue({ isTrigger: false, releasedLabel: '' })
+
+    const { queryByTestId } = renderConnected(renderRow(<AssignmentRow {...{...defaultProps, context_type: 'Section'}} />))
+
+    expect(queryByTestId(`mastery-paths-data-${defaultProps.coursePaceItem.module_item_id}`)).toBeNull()
+  })
+
+  it('renders Mastery Paths link when isTrigger is true and moduleItemId is provided', () => {
+    (CyoeHelper.getItemData as jest.Mock).mockReturnValue({ isTrigger: true, releasedLabel: '' })
+    window.ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
+    const { getByText } = renderConnected(renderRow(<AssignmentRow {...{...defaultProps, context_type: 'Section'}} />))
+    const link = getByText('Mastery Paths')
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute(
+      'href',
+      `${ENV.CONTEXT_URL_ROOT}/modules/items/${defaultProps.coursePaceItem.module_item_id}/edit_mastery_paths`
+    )
+  })
+
+  it('renders both Mastery Paths link and Pill when isTrigger is true and releasedLabel is provided', () => {
+    (CyoeHelper.getItemData as jest.Mock).mockReturnValue({ isTrigger: true, releasedLabel: '100 pts - 70 pts' })
+    window.ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
+    const { getByText } = renderConnected(renderRow(<AssignmentRow {...{...defaultProps, context_type: 'Section'}} />))
+
+    expect(getByText('Mastery Paths')).toBeInTheDocument()
+    expect(getByText('100 pts - 70 pts')).toBeInTheDocument()
   })
 
   describe('localized', () => {
@@ -306,6 +377,28 @@ describe('AssignmentRow', () => {
     it('localizes the projected dates', () => {
       const {getByText} = renderConnected(renderRow(<AssignmentRow {...defaultProps} />))
       expect(getByText('Wed, 1 Jan 2020')).toBeInTheDocument()
+    })
+  })
+
+  describe('with course_pace_time_selection enabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_pace_time_selection = true
+    })
+
+    it('renders an input that updates the duration for that module item', async () => {
+      const {getByRole} = renderConnected(renderRow(<AssignmentRow {...defaultProps} />))
+      const daysInput = getByRole('textbox', {
+        name: 'Duration for assignment Basic encryption/decryption',
+      }) as HTMLInputElement
+      expect(daysInput).toBeInTheDocument()
+      expect(daysInput.value).toBe('2')
+
+      await userEvent.type(daysInput, '{selectall}{backspace}4')
+      await userEvent.tab()
+
+      expect(setPaceItemDurationTimeToCompleteCalendarDays).toHaveBeenCalled()
+      expect(setPaceItemDurationTimeToCompleteCalendarDays).toHaveBeenCalledWith('60', 4, BLACKOUT_DATES)
     })
   })
 })

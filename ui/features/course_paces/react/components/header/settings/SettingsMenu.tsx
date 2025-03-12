@@ -27,7 +27,6 @@ import type {CoursePace, ResponsiveSizes, StoreState} from 'features/course_pace
 import type {ButtonProps} from '@instructure/ui-buttons'
 import SkipSelectedDaysMenu from './SkipSelectedDaysMenu'
 import MainMenu from './MainMenu'
-import {renderManageBlackoutDates} from './helpers'
 
 const I18n = createI18nScope('course_paces_settings')
 
@@ -53,10 +52,33 @@ export type MenuPlacement = 'bottom start' | 'bottom end' | 'top start' | 'top e
 export type ComponentProps = StoreProps & PassedProps
 
 export const SettingsMenu = (props: ComponentProps) => {
+
   return window.ENV.FEATURES.course_paces_skip_selected_days ? (
-    <SkipSelectedDaysMenu {...props} />
+    <SkipSelectedDaysMenu
+      margin={props.margin}
+      isSyncing={props.isSyncing}
+      responsiveSize={props.responsiveSize}
+      showSettingsPopover={props.showSettingsPopover}
+      isBlueprintLocked={props.isBlueprintLocked}
+      menuPlacement={props.menuPlacement}
+      showBlackoutDatesModal={props.showBlackoutDatesModal}
+      coursePace={props.coursePace}
+      toggleSelectedDaysToSkip={props.toggleSelectedDaysToSkip}
+      toggleShowSettingsPopover={props.toggleShowSettingsPopover}
+    />
   ) : (
-    <MainMenu {...props}>
+    <MainMenu
+      margin={props.margin}
+      responsiveSize={props.responsiveSize}
+      showSettingsPopover={props.showSettingsPopover}
+      isBlueprintLocked={props.isBlueprintLocked}
+      isPrincipal={true}
+      isSyncing={props.isSyncing}
+      showBlackoutDatesModal={props.showBlackoutDatesModal}
+      toggleShowSettingsPopover={props.toggleShowSettingsPopover}
+      contextType={props.coursePace.context_type}
+      menuPlacement={props.menuPlacement}
+    >
       <Menu.Item
         type="checkbox"
         selected={props.excludeWeekends}
@@ -66,12 +88,6 @@ export const SettingsMenu = (props: ComponentProps) => {
       >
         {I18n.t('Skip Weekends')}
       </Menu.Item>
-      {renderManageBlackoutDates(
-        props.isSyncing,
-        props.showBlackoutDatesModal,
-        props.toggleShowSettingsPopover,
-        props.coursePace.context_type,
-      )}
     </MainMenu>
   )
 }

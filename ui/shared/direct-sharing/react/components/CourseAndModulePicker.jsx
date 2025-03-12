@@ -38,6 +38,9 @@ const I18n = createI18nScope('course_and_module_picker')
 CourseAndModulePicker.propTypes = {
   selectedCourseId: string,
   setSelectedCourse: func,
+  selectedCourseError: bool,
+  courseSelectInputRef: func,
+  isCourseRequired: bool,
   selectedModuleId: string,
   setSelectedModule: func,
   setSelectedAssignment: func,
@@ -60,6 +63,9 @@ CourseAndModulePicker.defaultProps = {
 export default function CourseAndModulePicker({
   selectedCourseId,
   setSelectedCourse,
+  selectedCourseError,
+  courseSelectInputRef,
+  isCourseRequired,
   selectedModuleId,
   setSelectedModule,
   setSelectedAssignment,
@@ -74,6 +80,10 @@ export default function CourseAndModulePicker({
   moduleFilteringOpts.include = moduleFilteringOpts.include ? 'concluded' : ''
   moduleFilteringOpts.enforce_manage_grant_requirement = moduleFilteringOpts.include ? true : ''
 
+  const messages = selectedCourseError
+    ? [{text: I18n.t('Please select a course'), type: 'newError'}]
+    : []
+
   return (
     <div ref={trayRef}>
       <View as="div" padding="0 0 small 0">
@@ -84,6 +94,10 @@ export default function CourseAndModulePicker({
           additionalParams={courseFilteringOpts}
           mountNodeRef={trayRef}
           minimumSearchLength={MINIMUM_SEARCH_LENGTH}
+          id={'direct-share-course-select'}
+          isRequired={isCourseRequired}
+          messages={messages}
+          inputRef={courseSelectInputRef}
           isSearchableTerm={isSearchableTerm}
           renderOption={item => {
             return (

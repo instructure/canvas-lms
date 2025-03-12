@@ -28,8 +28,8 @@ describe "usage_metrics_helper" do
   end
 
   context "with feature enabled" do
-    it "returns false if there is no pendo_app_id" do
-      allow_any_instance_of(UsageMetricsHelper).to receive(:find_usage_metrics_application_id).and_return(nil)
+    it "returns false if there is no usage_metrics_api_key" do
+      allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return(nil)
 
       expect(load_usage_metrics?).to be_falsey
     end
@@ -41,7 +41,7 @@ describe "usage_metrics_helper" do
     end
 
     it "is disabled if the dynamic settings are missing" do
-      allow_any_instance_of(UsageMetricsHelper).to receive(:find_usage_metrics_application_id).and_return(nil)
+      allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return(nil)
 
       override_dynamic_settings(config: { canvas: nil }) do
         expect(load_usage_metrics?).to be_falsey
@@ -55,18 +55,18 @@ describe "usage_metrics_helper" do
     end
 
     it "returns false if the feature is disabled" do
-      allow_any_instance_of(UsageMetricsHelper).to receive(:find_usage_metrics_application_id).and_return("some_app_id")
+      allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return("some_api_key")
 
       expect(load_usage_metrics?).to be_falsey
     end
   end
 
-  context "with pendo_app_id present" do
+  context "with usage_metrics_api_key present" do
     before do
-      allow_any_instance_of(UsageMetricsHelper).to receive(:find_usage_metrics_application_id).and_return("some_app_id")
+      allow_any_instance_of(UsageMetricsHelper).to receive(:usage_metrics_api_key).and_return("some_api_key")
     end
 
-    it "returns true if the feature is enabled and pendo_app_id is present" do
+    it "returns true if the feature is enabled and usage_metrics_api_key is present" do
       expect(load_usage_metrics?).to be_truthy
     end
   end

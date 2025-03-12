@@ -39,6 +39,7 @@ import {hideStudentNames, responsiveQuerySizes} from '../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {SplitScreenButton} from './SplitScreenButton'
+import SwitchToIndividualPostsLink from '../SwitchToIndividualPostsLink/SwitchToIndividualPostsLink'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
@@ -48,7 +49,7 @@ import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/
 import {SummarizeButton} from './SummarizeButton'
 import MoreMenuButton from './MoreMenuButton'
 import AiIcon from '@canvas/ai-icon'
-import {TranslationTriggerModal} from "../TranslationTriggerModal/TranslationTriggerModal";
+import {TranslationTriggerModal} from '../TranslationTriggerModal/TranslationTriggerModal'
 import SortOrderDropDown from './SortOrderDropDown'
 
 const I18n = createI18nScope('discussions_posts')
@@ -86,10 +87,13 @@ const getClearButton = buttonProperties => {
 export const DiscussionPostToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
   const [isModalOpen, setModalOpen] = useState(false)
-  const {translationLanguages, setShowTranslationControl, translateTargetLanguage,
-    setTranslateTargetLanguage, showTranslationControl} = useContext(
-    DiscussionManagerUtilityContext,
-  )
+  const {
+    translationLanguages,
+    setShowTranslationControl,
+    translateTargetLanguage,
+    setTranslateTargetLanguage,
+    showTranslationControl,
+  } = useContext(DiscussionManagerUtilityContext)
 
   const [showTranslate, setShowTranslate] = useState(false)
 
@@ -109,16 +113,13 @@ export const DiscussionPostToolbar = props => {
   const handleClose = () => setShowAssignToTray(false)
 
   const toggleTranslateText = () => {
-
     if (ENV.ai_translation_improvements) {
-
       // If translations module is visible and discussion is translated open the modal
-      if(showTranslationControl) {
-        translateTargetLanguage ? setModalOpen(true): setShowTranslationControl(false)
+      if (showTranslationControl) {
+        translateTargetLanguage ? setModalOpen(true) : setShowTranslationControl(false)
       } else {
         setShowTranslationControl(true)
       }
-
     } else {
       // Update local state
       setShowTranslate(!showTranslate)
@@ -147,24 +148,25 @@ export const DiscussionPostToolbar = props => {
     return menuOptions.length > 0 && <MoreMenuButton menuOptions={menuOptions} />
   }
 
-  const closeModalAndKeepTranslations = () =>{
+  const closeModalAndKeepTranslations = () => {
     setModalOpen(false)
     setShowTranslationControl(false)
   }
 
-  const closeModalAndRemoveTranslations = () =>{
+  const closeModalAndRemoveTranslations = () => {
     setModalOpen(false)
     setShowTranslationControl(false)
     setTranslateTargetLanguage(null)
   }
 
-  const renderSort = () => {
+  const renderSort = width => {
     if (props.discDefaultSortEnabled) {
       return (
         <SortOrderDropDown
           isLocked={props.isSortOrderLocked}
           selectedSortType={props.sortDirection}
           onSortClick={props.onSortClick}
+          width={width}
         />
       )
     }
@@ -198,13 +200,25 @@ export const DiscussionPostToolbar = props => {
     )
   }
 
+  const renderSwitchLink = () => {
+    return (
+      <SwitchToIndividualPostsLink
+        onSwitchLinkClick={props.onSwitchLinkClick}
+        data-testid="context-toggle-link"
+      />
+    )
+  }
+
   return (
     <>
       <TranslationTriggerModal
         isModalOpen={isModalOpen}
-        closeModal={() => {setModalOpen(false)}}
+        closeModal={() => {
+          setModalOpen(false)
+        }}
         closeModalAndKeepTranslations={closeModalAndKeepTranslations}
-        closeModalAndRemoveTranslations={closeModalAndRemoveTranslations}/>
+        closeModalAndRemoveTranslations={closeModalAndRemoveTranslations}
+      />
       <Responsive
         match="media"
         query={responsiveQuerySizes({mobile: true, desktop: true})}
@@ -223,12 +237,17 @@ export const DiscussionPostToolbar = props => {
             filter: {
               shouldGrow: true,
               shouldShrink: true,
-              width: null,
-              margin: '0 xx-small 0 0',
+              width: window.ENV?.FEATURES?.discussion_default_sort ? '100%' : null,
+              margin: window.ENV?.FEATURES?.discussion_default_sort ? null : '0 xx-small 0 0',
             },
             viewSplitScreen: {
               shouldGrow: true,
               margin: '0 xx-small 0 0',
+            },
+            sortOrder: {
+              shouldGrow: true,
+              shouldShrink: true,
+              width: '100%',
             },
             padding: 'xx-small',
           },
@@ -241,7 +260,7 @@ export const DiscussionPostToolbar = props => {
             search: {
               shouldGrow: true,
               shouldShrink: true,
-              width: null,
+              width: window.ENV?.FEATURES?.discussion_default_sort ? '100%' : null,
             },
             filter: {
               shouldGrow: false,
@@ -253,92 +272,102 @@ export const DiscussionPostToolbar = props => {
               shouldGrow: false,
               margin: '0 small 0 0',
             },
+            sortOrder: {
+              shouldGrow: false,
+              shouldShrink: false,
+              margin: '0 0 0 small',
+            },
             padding: 'xxx-small',
           },
         }}
         render={(responsiveProps, matches) => (
           <View maxWidth="56.875em">
             <Flex width="100%" direction={responsiveProps.direction} wrap="wrap">
-              <Flex.Item
-                margin={responsiveProps?.dividingMargin}
-                shouldShrink={responsiveProps.shouldShrink}
-              >
-                <Flex>
-                  {/* Groups */}
-                  {props.childTopics?.length && props.isAdmin && (
-                    <Flex.Item
-                      data-testid="groups-menu-button"
-                      margin={responsiveProps?.groupSelect?.margin}
-                      padding={responsiveProps?.padding}
-                    >
-                    <span className="discussions-post-toolbar-groupsMenu">
-                      <GroupsMenu width="10px" childTopics={props.childTopics} />
-                    </span>
-                    </Flex.Item>
-                  )}
-                  {/* Search */}
-                  {!hideStudentNames && (
-                    <Flex.Item
-                      shouldGrow={responsiveProps?.search?.shouldGrow}
-                      shouldShrink={responsiveProps?.search?.shouldShrink}
-                      padding={responsiveProps.padding}
-                    >
-                    <span className="discussions-search-filter">
-                      <TextInput
-                        data-testid="search-filter"
-                        onChange={event => {
-                          props.onSearchChange(event.target.value)
-                        }}
-                        renderLabel={<ScreenReaderContent>{searchElementText}</ScreenReaderContent>}
-                        value={props.searchTerm}
-                        renderBeforeInput={<IconSearchLine display="block" />}
-                        renderAfterInput={clearButton}
-                        placeholder={searchElementText}
-                        shouldNotWrap={true}
-                        width={responsiveProps?.search?.width}
-                      />
-                    </span>
-                    </Flex.Item>
-                  )}
-                </Flex>
-              </Flex.Item>
-
+              {!window.ENV?.FEATURES?.discussion_default_sort && (
+                <Flex.Item
+                  margin={responsiveProps?.dividingMargin}
+                  shouldShrink={responsiveProps.shouldShrink}
+                >
+                  <Flex>
+                    {/* Groups */}
+                    {props.childTopics?.length && props.isAdmin && (
+                      <Flex.Item
+                        data-testid="groups-menu-button"
+                        margin={responsiveProps?.groupSelect?.margin}
+                        padding={responsiveProps?.padding}
+                      >
+                        <span className="discussions-post-toolbar-groupsMenu">
+                          <GroupsMenu width="10px" childTopics={props.childTopics} />
+                        </span>
+                      </Flex.Item>
+                    )}
+                    {/* Search */}
+                    {!hideStudentNames && (
+                      <Flex.Item
+                        shouldGrow={responsiveProps?.search?.shouldGrow}
+                        shouldShrink={responsiveProps?.search?.shouldShrink}
+                        padding={responsiveProps.padding}
+                      >
+                        <span className="discussions-search-filter">
+                          <TextInput
+                            data-testid="search-filter"
+                            onChange={event => {
+                              props.onSearchChange(event.target.value)
+                            }}
+                            renderLabel={<ScreenReaderContent>{searchElementText}</ScreenReaderContent>}
+                            value={props.searchTerm}
+                            renderBeforeInput={<IconSearchLine display="block" />}
+                            renderAfterInput={clearButton}
+                            placeholder={searchElementText}
+                            shouldNotWrap={true}
+                            width={responsiveProps?.search?.width}
+                          />
+                        </span>
+                      </Flex.Item>
+                    )}
+                  </Flex>
+                </Flex.Item>
+              )}
               <Flex.Item shouldGrow={true}>
                 <Flex wrap="wrap">
-                  {/* Filter */}
-                  <Flex.Item
-                    margin={responsiveProps?.filter?.margin}
-                    padding={responsiveProps.padding}
-                    shouldGrow={responsiveProps?.filter?.shouldGrow}
-                    shouldShrink={false}
-                  >
-                  <span data-testid="toggle-filter-menu">
-                    <SimpleSelect
-                      renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
-                      defaultValue={props.selectedView}
-                      onChange={props.onViewFilter}
-                      width={responsiveProps?.filter?.width}
-                    >
-                      <SimpleSelect.Group renderLabel={I18n.t('View')}>
-                        {Object.entries(getMenuConfig(props)).map(
-                          ([viewOption, viewOptionLabel]) => (
-                            <SimpleSelect.Option
-                              id={viewOption}
-                              key={viewOption}
-                              value={viewOption}
-                            >
-                              {viewOptionLabel.call()}
-                            </SimpleSelect.Option>
-                          ),
-                        )}
-                      </SimpleSelect.Group>
-                    </SimpleSelect>
-                  </span>
-                </Flex.Item>
-                {/* Sort */}
-                <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                  {renderSort()}
-                </Flex.Item>
+                  {!window.ENV?.FEATURES?.discussion_default_sort && (
+                    <>
+                      {/* Filter */}
+                      <Flex.Item
+                        margin={responsiveProps?.filter?.margin}
+                        padding={responsiveProps.padding}
+                        shouldGrow={responsiveProps?.filter?.shouldGrow}
+                        shouldShrink={false}
+                      >
+                        <span data-testid="toggle-filter-menu">
+                          <SimpleSelect
+                            renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
+                            defaultValue={props.selectedView}
+                            onChange={props.onViewFilter}
+                            width={responsiveProps?.filter?.width}
+                          >
+                            <SimpleSelect.Group renderLabel={I18n.t('View')}>
+                              {Object.entries(getMenuConfig(props)).map(
+                                ([viewOption, viewOptionLabel]) => (
+                                  <SimpleSelect.Option
+                                    id={viewOption}
+                                    key={viewOption}
+                                    value={viewOption}
+                                  >
+                                    {viewOptionLabel.call()}
+                                  </SimpleSelect.Option>
+                                ),
+                              )}
+                            </SimpleSelect.Group>
+                          </SimpleSelect>
+                        </span>
+                      </Flex.Item>
+                      {/* Sort */}
+                      <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                        {renderSort()}
+                      </Flex.Item>
+                    </>
+                  )}
                   {!isSpeedGraderInTopUrl && (
                     <Flex.Item
                       margin={responsiveProps?.viewSplitScreen?.margin}
@@ -357,14 +386,20 @@ export const DiscussionPostToolbar = props => {
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                       <ExpandCollapseThreadsButton
                         showText={!matches.includes('mobile')}
-                        isExpanded={props.isExpanded || (props.discDefaultExpandEnabled && props.isExpandedLocked)}
+                        isExpanded={
+                          props.isExpanded ||
+                          (props.discDefaultExpandEnabled && props.isExpandedLocked)
+                        }
                         onCollapseRepliesToggle={props.onCollapseRepliesToggle}
-                        disabled={props.userSplitScreenPreference || (props.discDefaultExpandEnabled && props.isExpandedLocked)}
+                        disabled={
+                          props.userSplitScreenPreference ||
+                          (props.discDefaultExpandEnabled && props.isExpandedLocked)
+                        }
                         expandedLocked={props.isExpandedLocked}
                       />
                     </Flex.Item>
                   )}
-                  {ENV.user_can_summarize && !props.isSummaryEnabled && (
+                  {ENV.user_can_summarize && !props.isSummaryEnabled && !isSpeedGraderInTopUrl && (
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                       <SummarizeButton
                         onClick={props.onSummarizeClick}
@@ -372,39 +407,148 @@ export const DiscussionPostToolbar = props => {
                       />
                     </Flex.Item>
                   )}
-                  {translationLanguages.current.length > 0 && (
+                  {translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                       {renderMore()}
                     </Flex.Item>
                   )}
-                  {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
-                    <Flex.Item shouldGrow={true}>
-                      <Flex justifyItems="end">
-                        <Flex.Item>
-                          <Tooltip renderTip={I18n.t('This is your anonymous avatar')}>
-                            <div>
-                              <AnonymousAvatar addFocus="0" seedString={CURRENT_USER} />
-                            </div>
-                          </Tooltip>
-                        </Flex.Item>
-                      </Flex>
-                    </Flex.Item>
-                  )}
-                  {!isSpeedGraderInTopUrl &&
-                    props.manageAssignTo &&
-                    props.showAssignTo && (
-                      <Flex.Item shouldGrow={true} textAlign="end">
-                        <Button
-                          data-testid="manage-assign-to"
-                          renderIcon={IconPermissionsLine}
-                          onClick={() => setShowAssignToTray(!showAssignToTray)}
-                        >
-                          {I18n.t('Assign To')}
-                        </Button>
+                  {isSpeedGraderInTopUrl &&
+                    window?.ENV?.FEATURES?.discussions_speedgrader_revisit && (
+                      <Flex.Item
+                        margin="0 small 0 0"
+                        padding={responsiveProps.padding}
+                        textAlign="end"
+                        shouldGrow={true}
+                      >
+                        {renderSwitchLink()}
                       </Flex.Item>
                     )}
-                </Flex>
-              </Flex.Item>
+                  {props.discussionAnonymousState &&
+                    ENV.current_user_roles?.includes('student') && (
+                      <Flex.Item shouldGrow={true}>
+                        <Flex justifyItems="end">
+                          <Flex.Item>
+                            <Tooltip renderTip={I18n.t('This is your anonymous avatar')}>
+                              <div>
+                                <AnonymousAvatar addFocus="0" seedString={CURRENT_USER} />
+                              </div>
+                            </Tooltip>
+                          </Flex.Item>
+                        </Flex>
+                      </Flex.Item>
+                    )}
+                  {!isSpeedGraderInTopUrl && props.manageAssignTo && props.showAssignTo && (
+                    <Flex.Item shouldGrow={true} textAlign="end">
+                      <Button
+                        data-testid="manage-assign-to"
+                        renderIcon={IconPermissionsLine}
+                        onClick={() => setShowAssignToTray(!showAssignToTray)}
+                      >
+                        {I18n.t('Assign To')}
+                      </Button>
+                    </Flex.Item>
+                  )}
+                  {window.ENV?.FEATURES?.discussion_default_sort && (
+                    <>
+                      {/* Groups */}
+                      {props.childTopics?.length && props.isAdmin && (
+                        <Flex.Item
+                          data-testid="groups-menu-button"
+                          margin={responsiveProps?.groupSelect?.margin}
+                          padding={responsiveProps?.padding}
+                        >
+                          <span className="discussions-post-toolbar-groupsMenu">
+                            <GroupsMenu width="10px" childTopics={props.childTopics} />
+                          </span>
+                        </Flex.Item>
+                      )}
+                    </>
+                  )}
+                  </Flex>
+                </Flex.Item>
+                {window.ENV?.FEATURES?.discussion_default_sort && (
+                  <Flex.Item
+                    margin={responsiveProps?.dividingMargin}
+                    shouldShrink={responsiveProps.shouldShrink}
+                    width="100%"
+                  >
+                    <Flex
+                      wrap="wrap"
+                      width="100%"
+                      direction={responsiveProps?.direction}
+                      height="100%"
+                      padding="xx-small 0 0 0"
+                    >
+                      {/* Filter */}
+                      <Flex.Item
+                        margin={responsiveProps?.filter?.margin}
+                        padding={responsiveProps.padding}
+                        shouldGrow={responsiveProps?.filter?.shouldGrow}
+                        shouldShrink={false}
+                      >
+                        <span data-testid="toggle-filter-menu">
+                          <SimpleSelect
+                            renderLabel={
+                              <ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>
+                            }
+                            defaultValue={props.selectedView}
+                            onChange={props.onViewFilter}
+                            width={responsiveProps?.filter?.width}
+                          >
+                            <SimpleSelect.Group renderLabel={I18n.t('View')}>
+                              {Object.entries(getMenuConfig(props)).map(
+                                ([viewOption, viewOptionLabel]) => (
+                                  <SimpleSelect.Option
+                                    id={viewOption}
+                                    key={viewOption}
+                                    value={viewOption}
+                                  >
+                                    {viewOptionLabel.call()}
+                                  </SimpleSelect.Option>
+                                ),
+                              )}
+                            </SimpleSelect.Group>
+                          </SimpleSelect>
+                        </span>
+                      </Flex.Item>
+                      {/* Search */}
+                      {!hideStudentNames && (
+                        <Flex.Item
+                          shouldGrow={responsiveProps?.search?.shouldGrow}
+                          shouldShrink={responsiveProps?.search?.shouldShrink}
+                          padding={responsiveProps.padding}
+                        >
+                          <span className="discussions-search-filter">
+                            <TextInput
+                              data-testid="search-filter"
+                              onChange={event => {
+                                props.onSearchChange(event.target.value)
+                              }}
+                              renderLabel={
+                                <ScreenReaderContent>{searchElementText}</ScreenReaderContent>
+                              }
+                              value={props.searchTerm}
+                              renderBeforeInput={<IconSearchLine display="block" />}
+                              renderAfterInput={clearButton}
+                              placeholder={searchElementText}
+                              shouldNotWrap={true}
+                              width="100%"
+                            />
+                          </span>
+                        </Flex.Item>
+                      )}
+                      {/* Sort */}
+                      <Flex.Item
+                        margin={responsiveProps?.sortOrder?.margin}
+                        padding={responsiveProps.padding}
+                        shouldGrow={responsiveProps?.sortOrder?.shouldGrow}
+                        shouldShrink={responsiveProps?.sortOrder?.shouldShrink}
+                      >
+                        {renderSort(responsiveProps?.sortOrder?.width)}
+                      </Flex.Item>
+                  </Flex>
+                </Flex.Item>
+              )}
             </Flex>
             {showAssignToTray && (
               <ItemAssignToManager
@@ -443,6 +587,7 @@ DiscussionPostToolbar.propTypes = {
   onViewFilter: PropTypes.func,
   onSortClick: PropTypes.func,
   onCollapseRepliesToggle: PropTypes.func,
+  onSwitchLinkClick: PropTypes.func,
   searchTerm: PropTypes.string,
   discussionTitle: PropTypes.string,
   discussionId: PropTypes.string,

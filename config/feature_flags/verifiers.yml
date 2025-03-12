@@ -1,0 +1,11 @@
+---
+file_association_access:
+  state: hidden
+  applies_to: RootAccount
+  display_name: File Association Access
+  description: Allow users to access files associated with a course
+disable_file_verifier_access:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Disable File Verifier Access
+  description: Disable access to the file verifier through UUID

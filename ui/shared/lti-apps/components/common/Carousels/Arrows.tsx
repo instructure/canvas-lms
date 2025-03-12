@@ -31,18 +31,41 @@ const enabled = I18n.t('enabled')
 type NextArrowProps = {
   currentSlideNumber: number
   slider: React.RefObject<Slider>
-  updatedArrowDisableIndex: number
+  updatedArrowDisableIndex?: number
   screenReaderLabel?: string
+  isImageCarousel?: boolean
+  itemCount?: number
 }
 
 type PreviousArrowProps = {
   currentSlideNumber: number
   slider: React.RefObject<Slider>
   screenReaderLabel?: string
+  isImageCarousel?: boolean
+  itemCount?: number
 }
 
 export const NextArrow = (props: NextArrowProps) => {
-  const {currentSlideNumber, slider, updatedArrowDisableIndex, screenReaderLabel} = props
+  const {
+    currentSlideNumber,
+    slider,
+    updatedArrowDisableIndex,
+    screenReaderLabel,
+    isImageCarousel,
+    itemCount = 0,
+  } = props
+
+  const arrowDisabledAtLastIndex =
+    currentSlideNumber === updatedArrowDisableIndex ? disabled : enabled
+
+  const isNextArrowEnabled = () => {
+    if (isImageCarousel && itemCount > 1) {
+      return enabled
+    } else if (isImageCarousel && itemCount === 1) {
+      return disabled
+    }
+    return arrowDisabledAtLastIndex
+  }
 
   return (
     <Flex.Item>
@@ -51,9 +74,9 @@ export const NextArrow = (props: NextArrowProps) => {
           screenReaderLabel={screenReaderLabel || I18n.t('Carousel Next Item Button')}
           withBackground={false}
           withBorder={false}
-          color="secondary"
+          color={props.isImageCarousel ? 'primary-inverse' : 'secondary'}
           onClick={() => slider?.current?.slickNext()}
-          interaction={currentSlideNumber === updatedArrowDisableIndex ? disabled : enabled}
+          interaction={isNextArrowEnabled()}
         >
           <IconArrowOpenEndLine />
         </IconButton>
@@ -64,21 +87,20 @@ export const NextArrow = (props: NextArrowProps) => {
 
 export const PreviousArrow = (props: PreviousArrowProps) => {
   const {currentSlideNumber, slider, screenReaderLabel} = props
+  const arrowDisabledAtFirstIndex = currentSlideNumber === 0 ? disabled : enabled
 
   return (
     <Flex.Item>
-      <div style={{marginRight: '0.8rem'}}>
-        <IconButton
-          screenReaderLabel={screenReaderLabel || I18n.t('Carousel Previous Item Button')}
-          withBackground={false}
-          withBorder={false}
-          color="secondary"
-          onClick={() => slider?.current?.slickPrev()}
-          interaction={currentSlideNumber === 0 ? disabled : enabled}
-        >
-          <IconArrowOpenStartLine />
-        </IconButton>
-      </div>
+      <IconButton
+        screenReaderLabel={screenReaderLabel || I18n.t('Carousel Previous Item Button')}
+        withBackground={false}
+        withBorder={false}
+        color={props.isImageCarousel ? 'primary-inverse' : 'secondary'}
+        onClick={() => slider?.current?.slickPrev()}
+        interaction={arrowDisabledAtFirstIndex}
+      >
+        <IconArrowOpenStartLine />
+      </IconButton>
     </Flex.Item>
   )
 }

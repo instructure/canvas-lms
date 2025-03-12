@@ -43,7 +43,17 @@ describe WikiPageVisibility::WikiPageVisibilityService do
     let(:learning_object_type) { "wiki_page" }
 
     it_behaves_like "learning object visiblities"
-    it_behaves_like "learning object visiblities with modules"
+
+    it_behaves_like "learning object visiblities with modules" do
+      before :once do
+        Account.site_admin.disable_feature!(:visibility_performance_improvements)
+      end
+    end
+    it_behaves_like "learning object visiblities with modules" do
+      before :once do
+        Account.site_admin.enable_feature!(:visibility_performance_improvements)
+      end
+    end
 
     it "does not include unpublished wiki pages" do
       @page1.workflow_state = "unpublished"

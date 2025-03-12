@@ -42,9 +42,7 @@ module ErrorContext
       ErrorSummary.finish
     end
 
-    def errors_path
-      @summary.errors_path
-    end
+    delegate :errors_path, to: :@summary
 
     def self.inherited(klass)
       super

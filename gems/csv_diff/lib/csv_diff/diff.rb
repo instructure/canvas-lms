@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# rubocop:disable Rails/SquishedSQLHeredocs Rails isn't in this gem
+# rubocop:disable Rails/SquishedSQLHeredocs -- Rails isn't in this gem
 module CsvDiff
   # We need to know which key(s) comprise the id, to properly detect deletes
   # vs updates. Other than that, we don't need to care what the data is, just

@@ -719,12 +719,20 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(@topic.reload.lock_at).to be_nil
     end
 
-    it "sets discussion topic lock_at to root lock_at even if assignment lock_at is nil" do
+    it "overrides discussion_topic's lock at" do
       @topic.update!(lock_at: 5.days.from_now)
       new_lock_at = 10.days.from_now.iso8601
       result = run_mutation(id: @topic.id, lock_at: new_lock_at, assignment: { lockAt: nil })
       expect(result["errors"]).to be_nil
-      expect(@topic.reload.lock_at).to eq(new_lock_at)
+      expect(@topic.reload.lock_at).to be_nil
+    end
+
+    it "switch back to discussion's lock_at if assignment in unset" do
+      new_lock_at = 5.days.from_now.iso8601
+      @topic.update!(lock_at: 2.days.from_now)
+      result = run_mutation(id: @topic.id, lock_at: new_lock_at, assignment: { lockAt: @topic.assignment.lock_at, setAssignment: false })
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.lock_at).to eq new_lock_at
     end
   end
 
@@ -1137,6 +1145,54 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
                             ])
 
       expect_error(result, "If there are submissions, checkpoints cannot be enabled.")
+    end
+
+    context "with differentiation tag overrides" do
+      before do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.enable_feature!(:differentiation_tags)
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.save!
+        end
+
+        @differentiation_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+        @diff_tag1 = @course.groups.create!(name: "Diff Tag 1", group_category: @differentiation_tag_category, non_collaborative: true)
+      end
+
+      it "allows differentiation tag overrides on checkpointed discussions" do
+        result = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                                { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC,
+                                  dates: [
+                                    { type: "everyone", dueAt: @due_at1.iso8601 },
+                                    { type: "override", setType: "Group", setId: @diff_tag1.id, dueAt: @due_at1.iso8601 }
+                                  ],
+                                  pointsPossible: 6 },
+                                { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY,
+                                  dates: [
+                                    { type: "everyone", dueAt: @due_at2.iso8601 },
+                                    { type: "override", setType: "Group", setId: @diff_tag1.id, dueAt: @due_at2.iso8601 }
+                                  ],
+                                  pointsPossible: 8,
+                                  repliesRequired: 5 }
+                              ])
+
+        expect(result["errors"]).to be_nil
+
+        @checkpoint1.reload
+        @checkpoint2.reload
+
+        c1_assignment_overrides = @checkpoint1.assignment_overrides.active
+        c2_assignment_overrides = @checkpoint2.assignment_overrides.active
+
+        expect(c1_assignment_overrides.count).to eq(1)
+        expect(c2_assignment_overrides.count).to eq(1)
+
+        c1_diff_tag_override = c1_assignment_overrides.find_by(set_type: "Group", set_id: @diff_tag1.id)
+
+        expect(c1_diff_tag_override).to be_present
+        expect(c1_diff_tag_override.due_at).to be_within(1.second).of(@due_at1)
+      end
     end
   end
 

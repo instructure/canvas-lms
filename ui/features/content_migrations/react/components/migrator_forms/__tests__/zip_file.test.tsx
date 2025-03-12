@@ -21,10 +21,9 @@ import {render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ZipFileImporter from '../zip_file'
 import fetchMock from 'fetch-mock'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn().mockReturnValue(jest.fn()),
-}))
+jest.mock('@canvas/alerts/react/FlashAlert')
 
 const onSubmit = jest.fn()
 const onCancel = jest.fn()
@@ -198,7 +197,47 @@ describe('ZipFileImporter', () => {
 
       await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
-      expect(screen.getByText('Please select a folder')).toBeInTheDocument()
+      expect(screen.getAllByText('Please select a folder')[0]).toBeInTheDocument()
+    })
+
+    describe('filter folder structure', () => {
+      const searchAFolder = async (searchTerm: string) => {
+        await waitFor(() => {
+          expect(screen.getByText('Upload to')).toBeInTheDocument()
+        })
+        await userEvent.click(screen.getByText('course files'))
+        await userEvent.type(screen.getByPlaceholderText('Search for a folder or file name...'), searchTerm)
+        await userEvent.click(screen.getByRole('button', {name: 'Search', hidden: true}))
+      }
+      let container: HTMLElement
+      const getExpectedAlertParams = (keyword: string) => ({
+        politeness: 'polite',
+        message: `Folder Tree Results Updated Below for ${keyword}`,
+        srOnly: true,
+        type: "info",
+      })
+      beforeEach(async () => {
+        const wrapper = renderComponent()
+        container = wrapper.container
+      })
+
+      it('does not have result', async () => {
+        const keyword = 'wrong keyword'
+        await searchAFolder(keyword)
+        const listItems = container.querySelectorAll('[data-testid="folderTree"] ul li')
+
+        expect(listItems).toHaveLength(0)
+        expect(showFlashAlert).toHaveBeenLastCalledWith(getExpectedAlertParams(keyword))
+      })
+
+      it('has result', async () => {
+        const keyword = 'course'
+        await searchAFolder(keyword)
+        const listItems = container.querySelectorAll('[data-testid="folderTree"] ul li')
+
+        expect(listItems).toHaveLength(1)
+        expect(showFlashAlert).toHaveBeenLastCalledWith(getExpectedAlertParams(keyword))
+      })
     })
   })
 
@@ -213,7 +252,7 @@ describe('ZipFileImporter', () => {
       expect(screen.getByTestId('migrationFileUpload')).toBeDisabled()
       expect(screen.getByRole('button', {name: 'Clear'})).toBeDisabled()
       expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
-      expect(screen.queryByText('Search folders')).not.toBeInTheDocument()
+      expect(screen.queryByText('Search for a folder or file name...')).not.toBeInTheDocument()
       expect(screen.queryByText('course files')).not.toBeInTheDocument()
     })
   })
@@ -227,6 +266,17 @@ describe('ZipFileImporter', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
         expect(screen.getByText(expectedFileMissingError)).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('focus after error', () => {
+    it('focuses on input after folder error', async () => {
+      renderComponent()
+      const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
+      const input = screen.getByTestId('migrationFileUpload')
+      await userEvent.upload(input, file)
+      await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+      expect(screen.getByPlaceholderText('Search for a folder or file name...')).toHaveFocus()
     })
   })
 })

@@ -279,6 +279,10 @@ EditView.prototype.toJSON = function () {
   const data = EditView.__super__.toJSON.apply(this, arguments)
   const json = lodashExtend(data, this.options, {
     showAssignment: !!this.assignmentGroupCollection,
+    coursePaceWithMasteryPath:
+    (typeof ENV !== 'undefined' && ENV !== null
+      ? ENV.IN_PACED_COURSE && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths
+      : void 0) || false,
     useForGrading: this.model.get('assignment') != null,
     isTopic: this.isTopic(),
     isAnnouncement: this.isAnnouncement(),

@@ -47,6 +47,14 @@ export default class DueDateList {
 
   containsSectionsWithoutOverrides = () => {
     if (this.overrides.containsDefaultDueDate()) return false
+    if (
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+      ENV.IN_PACED_COURSE &&
+      ENV.FEATURES.course_pace_pacing_with_mastery_paths &&
+      this.overrides.models.some(({attributes}) => attributes.noop_id === "1")
+    ) {
+      return false
+    }
     return this.sectionsWithOverrides().length < this.courseSectionsLength
   }
 

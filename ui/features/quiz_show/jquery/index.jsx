@@ -41,6 +41,28 @@ import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/
 
 const I18n = createI18nScope('quizzes.show')
 
+const roots = new Map()
+
+function createOrUpdateRoot(elementId, component) {
+  const container = document.getElementById(elementId)
+  if (!container) return
+
+  let root = roots.get(elementId)
+  if (!root) {
+    root = createRoot(container)
+    roots.set(elementId, root)
+  }
+  root.render(component)
+}
+
+function unmountRoot(elementId) {
+  const root = roots.get(elementId)
+  if (root) {
+    root.unmount()
+    roots.delete(elementId)
+  }
+}
+
 $(document).ready(function () {
   if (ENV.QUIZ_SUBMISSION_EVENTS_URL) {
     QuizLogAuditingEventDumper(true)
@@ -276,13 +298,11 @@ $(document).ready(function () {
   })
 
   function renderItemAssignToTray(open, returnFocusTo, itemProps) {
-    const container = document.getElementById('assign-to-mount-point')
-    const root = createRoot(container)
-    root.render(
+    createOrUpdateRoot('assign-to-mount-point',
       <ItemAssignToManager
         open={open}
         onClose={() => {
-          root.unmount()
+          unmountRoot('assign-to-mount-point')
         }}
         onDismiss={() => {
           renderItemAssignToTray(false, returnFocusTo, itemProps)

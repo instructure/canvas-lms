@@ -50,7 +50,7 @@ module AssignmentVisibility
             #{VisibilitySqlHelper.enrollment_join_sql}
 
             /* join assignment group overrides */
-            #{assignment_group_override_join_sql}
+            #{VisibilitySqlHelper.assign_to_differentiation_tags_enabled?(course_ids) ? assignment_group_override_join_sql : assignment_group_override_join_sql(collaborative_group_filter: "AND g.non_collaborative = FALSE")}
 
             /* filtered to course_id, user_id, assignment_id, and additional conditions */
             #{assignment_group_override_filter_sql(filter_condition_sql:)}
@@ -63,14 +63,11 @@ module AssignmentVisibility
             /* join active student enrollments */
             #{VisibilitySqlHelper.enrollment_join_sql}
 
-            /* (logical) join context modules */
-            #{assignment_module_items_join_sql}
-
-            /* join assignment overrides (assignment or related context module) for CourseSection */
-            #{VisibilitySqlHelper.assignment_override_section_join_sql(id_column_name: "assignment_id")}
-
-            /* filtered to course_id, user_id, assignment_id, and additional conditions */
-            #{VisibilitySqlHelper.section_override_filter_sql(filter_condition_sql:)}
+            #{if Account.site_admin.feature_enabled?(:visibility_performance_improvements)
+                VisibilitySqlHelper.full_section_without_left_joins_sql(filter_condition_sql:, id_column_name: "assignment_id", table_name: Assignment)
+              else
+                section_overrides_with_left_joins_sql(filter_condition_sql:)
+              end}
 
             EXCEPT
 
@@ -84,7 +81,7 @@ module AssignmentVisibility
             #{VisibilitySqlHelper.assignment_override_unassign_section_join_sql(id_column_name: "assignment_id")}
 
             /* filtered to course_id, user_id, assignment_id, and additional conditions */
-            #{VisibilitySqlHelper.assignment_override_unassign_section_filter_sql(filter_condition_sql:)}
+            #{VisibilitySqlHelper.assignment_override_unassign_filter_sql(filter_condition_sql:)}
 
             UNION
 
@@ -94,17 +91,12 @@ module AssignmentVisibility
             /* join active student enrollments */
             #{VisibilitySqlHelper.enrollment_join_sql}
 
-            /* (logical) join context modules */
-            #{assignment_module_items_join_sql}
-
-            /* join assignment override for 'ADHOC' */
-            #{VisibilitySqlHelper.assignment_override_adhoc_join_sql(id_column_name: "assignment_id")}
-
-            /* join AssignmentOverrideStudent */
-            #{VisibilitySqlHelper.assignment_override_student_join_sql}
-
-            /* filtered to course_id, user_id, assignment_id, and additional conditions */
-            #{VisibilitySqlHelper.adhoc_override_filter_sql(filter_condition_sql:)}
+            /* assignments visible to adhoc overrides */
+            #{if Account.site_admin.feature_enabled?(:visibility_performance_improvements)
+                VisibilitySqlHelper.full_adhoc_without_left_joins_sql(filter_condition_sql:, id_column_name: "assignment_id", table_name: Assignment)
+              else
+                adhoc_overrides_with_left_joins_sql(filter_condition_sql:)
+              end}
 
             EXCEPT
 
@@ -118,7 +110,7 @@ module AssignmentVisibility
             #{VisibilitySqlHelper.assignment_override_unassign_adhoc_join_sql(id_column_name: "assignment_id")}
 
             /* filtered to course_id, user_id, assignment_id, and additional conditions */
-            #{VisibilitySqlHelper.assignment_override_unassign_adhoc_filter_sql(filter_condition_sql:)}
+            #{VisibilitySqlHelper.assignment_override_unassign_filter_sql(filter_condition_sql:)}
 
             UNION
 
@@ -261,13 +253,14 @@ module AssignmentVisibility
           SQL
         end
 
-        def assignment_group_override_join_sql
+        def assignment_group_override_join_sql(collaborative_group_filter: nil)
           <<~SQL.squish
             INNER JOIN #{AssignmentOverride.quoted_table_name} ao
               ON o.id = ao.assignment_id
               AND ao.set_type = 'Group'
             INNER JOIN #{Group.quoted_table_name} g
               ON g.id = ao.set_id
+              #{collaborative_group_filter unless collaborative_group_filter.nil?}
             INNER JOIN #{GroupMembership.quoted_table_name} gm
               ON gm.group_id = g.id
               AND gm.user_id = e.user_id
@@ -282,6 +275,35 @@ module AssignmentVisibility
             AND ao.workflow_state = 'active'
             AND o.workflow_state NOT IN ('deleted','unpublished')
             AND o.only_visible_to_overrides = 'true'
+          SQL
+        end
+
+        def section_overrides_with_left_joins_sql(filter_condition_sql:)
+          <<~SQL.squish
+            /* (logical) join context modules */
+            #{assignment_module_items_join_sql}
+
+            /* join assignment overrides (assignment or related context module) for CourseSection */
+            #{VisibilitySqlHelper.assignment_override_section_join_sql(id_column_name: "assignment_id")}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.section_override_filter_sql(filter_condition_sql:)}
+          SQL
+        end
+
+        def adhoc_overrides_with_left_joins_sql(filter_condition_sql:)
+          <<~SQL.squish
+            /* (logical) join context modules */
+            #{assignment_module_items_join_sql}
+
+            /* join assignment override for 'ADHOC' */
+            #{VisibilitySqlHelper.assignment_override_adhoc_join_sql(id_column_name: "assignment_id")}
+
+            /* join AssignmentOverrideStudent */
+            #{VisibilitySqlHelper.assignment_override_student_join_sql}
+
+            /* filtered to course_id, user_id, assignment_id, and additional conditions */
+            #{VisibilitySqlHelper.adhoc_override_filter_sql(filter_condition_sql:)}
           SQL
         end
 

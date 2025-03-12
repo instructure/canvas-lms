@@ -44,6 +44,20 @@ describe('CreateEditAssignmentModal', () => {
     frozenFields: [],
   }
 
+  const notGradedAssignmentData: ModalAssignment = {
+    type: 'not_graded',
+    name: 'Test Not Graded Assignment',
+    dueAt: '2024-01-14T00:00:00Z',
+    unlockAt: '2024-01-12T00:00:00Z',
+    lockAt: '2024-01-20T00:00:00Z',
+    allDates: [],
+    points: 0,
+    isPublished: false,
+    multipleDueDates: false,
+    differentiatedAssignment: false,
+    frozenFields: [],
+  }
+
   const defaultProps = (overrides: object = {}): CreateEditAssignmentModalProps => ({
     assignment: undefined,
     userIsAdmin: true,
@@ -78,7 +92,7 @@ describe('CreateEditAssignmentModal', () => {
 
   it('calls onMoreOptionsHandler with form data when more options button is clicked', () => {
     const {getByTestId, getByPlaceholderText, getByText} = render(
-      <CreateEditAssignmentModal {...defaultProps({assgnment: assignmentData})} />,
+      <CreateEditAssignmentModal {...defaultProps({assignment: assignmentData})} />,
     )
 
     fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
@@ -93,11 +107,11 @@ describe('CreateEditAssignmentModal', () => {
       {
         type: 'none',
         name: 'Test Assignment',
-        dueAt: '2024-01-15T23:59:00.000Z',
+        dueAt: '2024-01-15T00:00:00.000Z',
         points: 100,
         syncToSIS: false,
       },
-      true,
+      false,
     )
   })
 
@@ -127,6 +141,20 @@ describe('CreateEditAssignmentModal', () => {
     fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Hi'}})
     fireEvent.click(getByTestId('save-button'))
     expect(getByText('Name must be at least 3 characters.')).toBeInTheDocument()
+  })
+
+  it('renders proper error messages in "Points" field', () => {
+    const {getByTestId, getByText} = render(<CreateEditAssignmentModal {...defaultProps()} />)
+
+    fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
+    fireEvent.change(getByTestId('points-input'), {target: {value: '-1'}})
+    fireEvent.click(getByTestId('save-button'))
+    expect(getByText('Points must be zero or greater.')).toBeInTheDocument()
+    expect(getByTestId('points-input')).toHaveFocus()
+
+    fireEvent.change(getByTestId('points-input'), {target: {value: '1000000000'}})
+    fireEvent.click(getByTestId('save-button'))
+    expect(getByText('Points cannot exceed 999,999,999.')).toBeInTheDocument()
   })
 
   describe('create mode', () => {
@@ -172,11 +200,36 @@ describe('CreateEditAssignmentModal', () => {
       expect(getByTestId('assignment-type-select')).toHaveValue('Quiz')
     })
 
+    it('hides points input when selecting not_graded assignment type and saves with 0 points', () => {
+      const {queryByTestId, getByTestId, getAllByTestId} = render(
+        <CreateEditAssignmentModal {...defaultProps()} />,
+      )
+
+      fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
+      fireEvent.change(getByTestId('points-input'), {target: {value: '100'}})
+      fireEvent.click(getByTestId('assignment-type-select'))
+      fireEvent.click(getAllByTestId('assignment-type-option')[4])
+
+      expect(getByTestId('assignment-type-select')).toHaveValue('Not Graded')
+
+      expect(queryByTestId('points-input')).not.toBeInTheDocument()
+      fireEvent.click(getByTestId('save-button'))
+
+      expect(onSaveHandlerMock).toHaveBeenCalledWith({
+        type: 'not_graded',
+        name: 'Test Assignment',
+        dueAt: '',
+        points: 0,
+        publish: false,
+        syncToSIS: false,
+      }, true)
+    })
+
     it('does not populate fields with assignment data in create mode', () => {
       const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps()} />)
 
       expect(getByTestId('assignment-name-input')).toHaveValue('')
-      expect(getByTestId('points-input')).toHaveValue('0')
+      expect(getByTestId('points-input')).toHaveValue(0)
     })
 
     it('prevents saving when required fields are empty', () => {
@@ -272,6 +325,45 @@ describe('CreateEditAssignmentModal', () => {
         syncToSIS: false,
       }, true)
     })
+
+    it('allows saving when point input contains decimal values', () => {
+      const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps()} />)
+
+      fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
+      fireEvent.change(getByTestId('points-input'), {target: {value: '35.35'}})
+      fireEvent.click(getByTestId('save-button'))
+
+      expect(onSaveHandlerMock).toHaveBeenCalledWith({
+        type: 'none',
+        name: 'Test Assignment',
+        dueAt: '',
+        points: 35.35,
+        publish: false,
+        syncToSIS: false,
+      }, true)
+    })
+
+    it('allows users to enter "0" for points input', () => {
+      const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps()} />)
+
+      fireEvent.change(getByTestId('assignment-name-input'), {target: {value: 'Test Assignment'}})
+      fireEvent.change(getByTestId('points-input'), {target: {value: '0'}})
+      fireEvent.click(getByTestId('save-button'))
+
+      expect(onSaveHandlerMock).toHaveBeenCalledWith({
+        type: 'none',
+        name: 'Test Assignment',
+        dueAt: '',
+        points: 0,
+        publish: false,
+        syncToSIS: false,
+      }, true)
+    })
+
+    it('does not display points input field when type is not_graded', () => {
+      const {queryByTestId} = render(<CreateEditAssignmentModal {...defaultProps({assignment: notGradedAssignmentData})} />)
+      expect(queryByTestId('points-input')).not.toBeInTheDocument()
+    })
   })
 
   describe('edit mode', () => {
@@ -290,7 +382,7 @@ describe('CreateEditAssignmentModal', () => {
 
       expect(getByTestId('assignment-name-input')).toHaveValue('Test Assignment')
       expect(getAllByText('Sunday, January 14, 2024 12:00 AM')[0]).toBeInTheDocument()
-      expect(getByTestId('points-input')).toHaveValue('100')
+      expect(getByTestId('points-input')).toHaveValue(100)
     })
 
     it('save buttons are enabled when required fields are populated', () => {

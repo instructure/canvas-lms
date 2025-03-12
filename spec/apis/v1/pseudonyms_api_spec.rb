@@ -400,6 +400,49 @@ describe PseudonymsController, type: :request do
                      })
         expect(response).to have_http_status :not_found
       end
+
+      context "updating own password" do
+        before(:once) do
+          @student.pseudonym.password = "password"
+          @student.pseudonym.password_confirmation = "password"
+          @student.pseudonym.save!
+          @user = @student
+        end
+
+        it "fails without old_password" do
+          raw_api_call(:put, @path, @path_options, {
+                         login: {
+                           password: "new_password",
+                         }
+                       })
+          assert_status(400)
+          expect(response.body).to match(/parameter is required to change your password/)
+          expect(@student.pseudonym.reload).not_to be_valid_password("new_password")
+        end
+
+        it "fails with an incorrect old_password" do
+          raw_api_call(:put, @path, @path_options, {
+                         login: {
+                           password: "new_password",
+                           old_password: "bad_old_password"
+                         }
+                       })
+          assert_status(400)
+          expect(response.body).to match(/parameter is incorrect/)
+          expect(@student.pseudonym.reload).not_to be_valid_password("new_password")
+        end
+
+        it "succeeds with all required params" do
+          raw_api_call(:put, @path, @path_options, {
+                         login: {
+                           password: "new_password",
+                           old_password: "password"
+                         }
+                       })
+          expect(response).to be_successful
+          expect(@student.pseudonym.reload).to be_valid_password("new_password")
+        end
+      end
     end
 
     context "an unauthorized user" do

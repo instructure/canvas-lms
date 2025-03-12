@@ -21,7 +21,7 @@ module DynamicSettings
   RSpec.describe MemoryCache do
     it "caches things in the standard rails cache interface" do
       cache_instance = MemoryCache.new
-      output = cache_instance.fetch("test-foo") { "test-bar" } # rubocop:disable Style/RedundantFetchBlock it's a MemoryCache, not a Hash
+      output = cache_instance.fetch("test-foo") { "test-bar" } # rubocop:disable Style/RedundantFetchBlock -- it's a MemoryCache, not a Hash
       expect(output).to eq("test-bar")
     end
   end

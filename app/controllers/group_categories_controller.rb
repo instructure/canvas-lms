@@ -94,7 +94,7 @@
 #
 class GroupCategoriesController < ApplicationController
   before_action :require_context, only: [:create, :index]
-  before_action :get_category_context, only: %i[show update destroy groups users assign_unassigned_members import export bulk_manage_groups]
+  before_action :get_category_context, only: %i[show update destroy groups users assign_unassigned_members import export]
 
   include Api::V1::Attachment
   include Api::V1::GroupCategory
@@ -288,9 +288,12 @@ class GroupCategoriesController < ApplicationController
     end
   end
 
-  # @API Bulk manage groups in category
+  # @API Bulk manage differentiation tags
   #
-  # Perform bulk operations on groups within a category
+  # This API is only meant for Groups and GroupCategories where non_collaborative is true.
+  #
+  # Perform bulk operations on groups within a group category, or create a new group category
+  # along with the groups in one transaction. If creation of the GroupCategory or any Group fails, the entire operation will be rolled back.
   #
   # @argument operations [Required, Hash]
   #   A hash containing arrays of create/update/delete operations:
@@ -309,8 +312,13 @@ class GroupCategoriesController < ApplicationController
   #     ]
   #   }
   #
+  # @argument group_category [Required, Hash]
+  #   Attributes for the GroupCategory. May include:
+  #     - id [Optional, Integer]: The ID of an existing GroupCategory.
+  #     - name [Optional, String]: A new name for the GroupCategory. If provided with an ID, the category name will be updated.
+  #
   # @example_request
-  #     curl https://<canvas>/api/v1/group_categories/<group_category_id>/bulk_manage_groups \
+  #     curl https://<canvas>/api/v1/courses/:course_id/group_categories/bulk_manage_differentiation_tag \
   #          -X POST \
   #          -H 'Authorization: Bearer <token>' \
   #          -H 'Content-Type: application/json' \
@@ -319,11 +327,12 @@ class GroupCategoriesController < ApplicationController
   #                  "create": [{"name": "New Group"}],
   #                  "update": [{"id": 123, "name": "Updated Group"}],
   #                  "delete": [{"id": 456}]
-  #                }
+  #                },
+  #                "group_category": {"id": 1, "name": "New Category Name"}
   #              }'
   #
-  # @returns GroupCategory
-  def bulk_manage_groups
+  # @returns GroupCategory and groups operation results
+  def bulk_manage_differentiation_tag
     operations = params.require(:operations)
     create_ops = operations[:create] || []
     update_ops = operations[:update] || []
@@ -333,12 +342,28 @@ class GroupCategoriesController < ApplicationController
       return render json: { errors: "You can only perform a maximum of #{MAX_BULK_ACTIONS} operations at a time." }, status: :bad_request
     end
 
+    # Consolidate group_category parameters: may include an id and/or a name.
+    gc_params = params.require(:group_category).permit(:id, :name)
+    if gc_params[:id].present?
+      load_category_context_from_params
+      unless @group_category.non_collaborative?
+        return render json: { errors: t("This endpoint only works for Differentiation Tags") }, status: :bad_request
+      end
+
+      if @group_category.context.id != params[:course_id].to_i
+        return render json: { errors: t("GroupCategory not part of the course") }, status: :bad_request
+      end
+    else
+      # Set the context from the provided course_id
+      @context = Course.find(params[:course_id])
+    end
+
     if create_ops.any?
       return unless check_group_authorization(
         context: @context,
         current_user: @current_user,
         action_category: :add,
-        non_collaborative: @group_category.non_collaborative?
+        non_collaborative: true
       )
     end
     if update_ops.any?
@@ -346,7 +371,7 @@ class GroupCategoriesController < ApplicationController
         context: @context,
         current_user: @current_user,
         action_category: :manage,
-        non_collaborative: @group_category.non_collaborative?
+        non_collaborative: true
       )
     end
     if delete_ops.any?
@@ -354,25 +379,33 @@ class GroupCategoriesController < ApplicationController
         context: @context,
         current_user: @current_user,
         action_category: :delete,
-        non_collaborative: @group_category.non_collaborative?
+        non_collaborative: true
       )
     end
+
     results = { created: [], updated: [], deleted: [] }
 
     ActiveRecord::Base.transaction do
+      if @group_category.nil?
+        @group_category = GroupCategory.create!(gc_params.merge(non_collaborative: true, context: @context))
+      elsif gc_params[:name].present? && gc_params[:name] != @group_category.name
+        # If a new name is provided along with the id, update the group_category name.
+        @group_category.update!(name: gc_params[:name])
+      end
+
       create_ops.each do |group_params|
         permitted_attrs = group_params.permit(:name)
         group = @group_category.groups.create!(permitted_attrs.merge(context: @group_category.context))
         results[:created] << group
       end
-      update_ops.each do |group_params|
-        permitted_attrs = group_params.permit(:name, :id)
 
+      update_ops.each do |group_params|
+        permitted_attrs = group_params.permit(:id, :name)
         group = @group_category.groups.find(permitted_attrs[:id])
-        group.name = group_params[:name]
-        group.save!
+        group.update!(name: permitted_attrs[:name])
         results[:updated] << group
       end
+
       delete_ops.each do |group_params|
         permitted_attrs = group_params.permit(:id)
         group = @group_category.groups.find(permitted_attrs[:id])
@@ -381,7 +414,7 @@ class GroupCategoriesController < ApplicationController
       end
     end
 
-    render json: results
+    render json: results.merge(group_category: @group_category)
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.message }, status: :bad_request
   rescue ActiveRecord::RecordNotFound => e
@@ -912,12 +945,23 @@ class GroupCategoriesController < ApplicationController
     @context = @group_category.context
   end
 
+  def load_category_context_from_params
+    group_category_params = params[:group_category]
+    id = (group_category_params && group_category_params[:id]) || (api_request? ? params[:group_category_id] : params[:id])
+    begin
+      @group_category = api_find(GroupCategory.active, id)
+    rescue ActiveRecord::RecordNotFound
+      render(json: { "status" => "not found" }, status: :not_found) and return
+    end
+    @context = @group_category.context
+  end
+
   private
 
   def body_file
     file_obj = request.body
 
-    # rubocop:disable Style/TrivialAccessors not a Class
+    # rubocop:disable Style/TrivialAccessors -- not a Class
     file_obj.instance_exec do
       def set_file_attributes(filename, content_type)
         @original_filename = filename

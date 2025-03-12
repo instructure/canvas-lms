@@ -59,8 +59,9 @@ export interface CoursePaceItem {
   readonly module_item_id: string
   readonly module_item_type: string
   readonly published: boolean
-  readonly submittable: boolean
-  readonly submitted_at?: string | null
+  readonly assignment_id?: string | null
+  readonly unreleased?: boolean | null
+  readonly submission_status?: string | null
   compressed_due_date?: string
 }
 
@@ -84,8 +85,8 @@ export interface ModuleWithDueDates extends Module {
   itemsWithDates: CoursePaceItemWithDate[]
 }
 
-export type PaceContextTypes = 'Course' | 'Section' | 'Enrollment'
-export type APIPaceContextTypes = 'course' | 'section' | 'student_enrollment'
+export type PaceContextTypes = 'Course' | 'Section' | 'Enrollment' | 'BulkEnrollment'
+export type APIPaceContextTypes = 'course' | 'section' | 'student_enrollment' | 'bulk_enrollment'
 export type WorkflowStates = 'unpublished' | 'active' | 'deleted'
 export type ProgressStates = 'queued' | 'running' | 'completed' | 'failed'
 export type ContextTypes = 'user' | 'course' | 'term' | 'hypothetical'
@@ -93,6 +94,13 @@ export type OptionalDate = string | null | undefined
 export interface PaceDuration {
   weeks: number
   days: number
+}
+
+export type AssignmentWeightening = {
+  assignment: number | undefined,
+  quiz: number | undefined,
+  discussion: number | undefined,
+  page: number | undefined,
 }
 
 export interface CoursePace {
@@ -115,6 +123,8 @@ export interface CoursePace {
   readonly compressed_due_dates: CoursePaceItemDueDates | undefined
   readonly updated_at: string
   readonly name?: string
+  readonly assignments_weighting: AssignmentWeightening
+  readonly time_to_complete_calendar_days: number
 }
 
 export interface Progress {
@@ -151,6 +161,13 @@ export type OriginalState = {
   blackoutDates: BlackoutDate[]
 }
 
+export type MasteryPathsData = {
+  isCyoeAble?: boolean
+  isTrigger?: boolean,
+  isReleased?: boolean,
+  releasedLabel?: string
+}
+
 export interface UIState {
   readonly autoSaving: boolean
   readonly syncing: number
@@ -167,6 +184,9 @@ export interface UIState {
   readonly showProjections: boolean
   readonly editingBlackoutDates: boolean
   readonly blueprintLocked?: boolean
+  readonly showWeightedAssignmentsTray: boolean
+  readonly bulkEditModalOpen: boolean
+  readonly selectedBulkStudents: string[]
 }
 
 export type SortableColumn = 'name' | null
@@ -188,6 +208,20 @@ export interface PaceContextsState {
   readonly contextsPublishing: PaceContextProgress[]
 }
 
+export interface BulkEditStudentsState {
+  readonly searchTerm: string
+  readonly filterSection: string
+  readonly filterPaceStatus: string
+  readonly sortBy: SortableColumn
+  readonly orderType: OrderType
+  readonly page: number
+  readonly pageCount: number
+  readonly isLoading: boolean
+  readonly error?: string
+  readonly students: Student[]
+  readonly sections: Section[]
+}
+
 export interface StoreState {
   readonly original: OriginalState
   readonly coursePace: CoursePacesState
@@ -197,6 +231,7 @@ export interface StoreState {
   readonly course: Course
   readonly blackoutDates: BlackoutDateState
   readonly paceContexts: PaceContextsState
+  readonly bulkEditStudents: BulkEditStudentsState
 }
 
 export interface Pace {
@@ -225,6 +260,21 @@ export interface PaceContextProgress {
 export interface PaceContextsApiResponse {
   pace_contexts: PaceContext[]
   total_entries: number
+}
+
+export type BulkStudentsApiResponse = {
+  students: Student[],
+  sections: Section[],
+  pages: number
+}
+
+export type Student = {
+  id: string
+  name: string
+  sections: Section[]
+  paceStatus: string
+  enrollmentDate: string
+  enrollmentId: string
 }
 
 export interface PaceContextsAsyncActionPayload {

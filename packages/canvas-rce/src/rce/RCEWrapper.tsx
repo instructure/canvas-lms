@@ -99,6 +99,7 @@ import {
 } from './RCEWrapper.utils'
 import {AlertMessage, EditorOptions, RCETrayProps} from './types'
 import {externalToolsForToolbar} from './plugins/instructure_rce_external_tools/util/externalToolsForToolbar'
+import {initScreenreaderOnFormat} from './screenreaderOnFormat'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -415,7 +416,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       new_math_equation_handling = false,
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
-      media_links_use_attachment_id = false,
       rce_find_replace = false,
       file_verifiers_for_quiz_links = false,
       consolidated_media_player = false,
@@ -425,7 +425,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       new_math_equation_handling,
       explicit_latex_typesetting,
       rce_transform_loaded_content,
-      media_links_use_attachment_id,
       file_verifiers_for_quiz_links,
       rce_find_replace,
       consolidated_media_player,
@@ -1176,6 +1175,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     // focus-trapping components, so they properly ignore trapping focus on click.
     editor.on('click', () => window.document.body.click(), true)
     editor.on('Cut Change input Undo Redo', debounce(this.handleInputChange, 1000))
+    initScreenreaderOnFormat(editor)
     this.announceContextToolbars(editor)
 
     if (this.isAutoSaving) {

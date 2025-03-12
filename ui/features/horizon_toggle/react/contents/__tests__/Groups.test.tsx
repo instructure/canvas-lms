@@ -60,6 +60,10 @@ describe('Groups', () => {
       </HorizonToggleContext.Provider>,
     )
     expect(screen.getByText('Groups (2 items)')).toBeInTheDocument()
+    const toggle = screen.getByText('Groups')
+    toggle.click()
+    expect(screen.getByText('Group 1')).toBeInTheDocument()
+    expect(screen.getByText('Group 2')).toBeInTheDocument()
   })
 
   it('displays correct translation for single item', () => {
@@ -88,5 +92,8 @@ describe('Groups', () => {
       </HorizonToggleContext.Provider>,
     )
     expect(screen.getByText('Groups (1 item)')).toBeInTheDocument()
+    const toggle = screen.getByText('Groups')
+    toggle.click()
+    expect(screen.getByText('Group 1')).toBeInTheDocument()
   })
 })

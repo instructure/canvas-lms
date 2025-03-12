@@ -3040,6 +3040,8 @@ uk:
   attendees_eb402bac: Учасники
   attention_aaca1f1d: Увага!
   attribute_d9f3af72: Атрибут
+  attributes: 
+    idp_entity_id: "Ідентифікатор об'єкта IdP"
   attributes_locked_1a1a0f46: "%{attributes} заблоковано"
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Аудіо контент не підтримується Вашим пристроєм або застосунком."
   audio_dd489fcc: Звук
@@ -3824,6 +3826,7 @@ uk:
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing Email Connector"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
   canvas_user_id_4c18b78a: canvas_user_id
+  canvas_user_id_caf65ef5: "Ідентифікатор користувача Canvas "
   card_view_eaf73185: "Вигляд карти"
   careful_changes_to_group_membership_will_apply_to__19a9089c: "Обережно! Зміни у членстві в групах будуть застосовані до груп, які вже мають підтвердження для завдань. Підтвердження для групових завдань можуть не збігатися з результатом. Хочете створити новий набір груп для майбутніх завдань?"
   cas_url_4ba2843e: "CAS URL"
@@ -3902,6 +3905,7 @@ uk:
   clear_2084585f: Очистити
   clear_all_e23811b1: "Очистити все"
   clear_selected_file_82388e50: "Очистити вибраний файл"
+  clear_ui_changed_state_d0aca02d: "Очищення стану зміненого UI"
   click_for_more_details_on_this_outcome_8c018d2f: "натисніть для отримання більш докладної інформації з цього результату"
   click_here_for_an_account_9536cb36: "Натисніть тут для входу в свій обліковий запис"
   click_here_it_s_free_eeccb9cb: "Натисніть тут, це безкоштовно!"
@@ -5134,6 +5138,8 @@ uk:
     one: "1 участь"
     other: "%{count}участей"
   count_people_489946e7: "%{count}людей"
+  count_people_found_1ab374c0: 
+    zero: "Людей не знайдено"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     few: "%{count} людей зараховано на *%{course_name}*."
     many: "%{count} людей зараховано на *%{course_name}*."
@@ -7060,6 +7066,7 @@ uk:
   email_is_invalid_e0d982eb: "Електронна адреса недійсна!"
   email_is_required_736ac26b: "Електронна адреса обов'язкова"
   email_the_user_about_this_account_creation_e63f8759: "Повідомити користувача про створення облікового запису через електронну пошту "
+  emails_d07c3348: "Електронні адреси"
   embedded_images_598ff8da: embedded_images
   empty_stub_for_testing_only_37aad38: "Пустий залишок (лише для тестування)"
   enable_6f5d1328: Доступний
@@ -9511,6 +9518,7 @@ uk:
     other: "Завантаження курсів завершено: %{count} курсів знайдено"
   loading_courses_started_6e6d742c: "Завантаження курсів розпочато"
   loading_data_ecd89ba: "Завантаження даних..."
+  loading_folders_8d4d5d5a: "Завантаження папок ..."
   loading_graders_f6a76142: "Завантаження Оцінювачів"
   loading_grades_c842c887: "Завантаження оцінок"
   loading_more_gradebook_history_results_810f6d2e: "Завантаження додаткових результатів історії gradebook."
@@ -9857,6 +9865,7 @@ uk:
   members_are_free_to_join_defa5929: "Учасники можуть вільно приєднатися"
   membership_by_invitation_only_9bc27199: "Участь тільки за запрошенням"
   membership_service_configuration_d8ba5a74: "Налаштування Служби Членства"
+  merge_user_accounts_a49e8fb1: "Об`єднати облікові записи користувача"
   message: 
     default_subject: "Canvas попередження"
   message_5c38209d: Повідомлення
@@ -11906,6 +11915,7 @@ uk:
   next_student_b62869f4: "Наступний студент"
   nickname_1e6da3ad: "Ім'я користувача"
   no_74e9b590: ні
+  no_active_user_with_that_id_was_found_b8fb5e14: "Жодного активного користувача з цим ідентифікатором не знайдено."
   no_assignment_name_adbb215b: "Відсутня назва завдання"
   no_assignment_selected_65d9e422: "Не вибрано завдання"
   no_assignments_with_that_name_found_1d7be1: "Не знайдено завдань з такою назвою"
@@ -11945,6 +11955,7 @@ uk:
   no_outcome_file_or_authority_given_c90f9c5f: "Немає файлу результатів або відсутні повноваження"
   no_outcome_selected_16d15753: "Результат не обрано"
   no_password_was_given_472222e5: "Не було надано жодного паролю"
+  no_people_found_67a8ee2f: "Людей не знайдено"
   no_placements_enabled_f705f28: "Не доступне розміщення"
   no_points_possible_368669d: "Можливі бали відсутні"
   no_points_possible_72db3a55: "Можливі бали відсутні"
@@ -12597,6 +12608,7 @@ uk:
   outcomes_d1b18d33: Результати
   outcomes_report_8887bd49: "Звіт результатів"
   over_time_bee1a733: понаднормово
+  override_ui_changes_5e0c56ab: "Скасування змін графічного інтерфейсу користувача"
   overrides: 
     everyone: Кожен
     everyone_else: "Всі інші"
@@ -12774,6 +12786,7 @@ uk:
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "оберіть пункт призначення, ми надішлемо Вам помилки"
   pick_a_name_to_save_this_theme_as_9773cb1a: "Оберіть ім'я, щоб зберегти цю тему як"
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "оберіть кінцеву точку, ми розмістимо ваші звіти про помилки там"
+  pick_dd033b86: Підібрати
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Виберіть дату та час для наступної настройки конференції:"
   pin_cdbc9f8f: Закріпити
   pink_68ad45cb: Рожевий
@@ -13308,6 +13321,8 @@ uk:
   privacy_290109ea: Приватність
   privacy_policy_c68f482a: "Політика конфіденційності"
   proceed_f3d33864: Продовжувати
+  process_as_ui_changes_8e34ed2a: "Обробка змін графічного інтерфейсу користувача"
+  process_data_2f5f962f: "Обробка даних"
   processing_2fcc9739: Обробка
   product_name: Canvas
   profile: 
@@ -13565,6 +13580,7 @@ uk:
       yo: Yo
     you_have_no_services: "Немає зареєстрованих сервісів, ви можете додати їх на сторінці *налаштування*"
   profile_6bd2baed: Профіль
+  profile_picture_13e5338c: "Фотографія профілю"
   profile_pictures_15953851: "Фотографії профілю"
   profiles: 
     avatar_dialog: 
@@ -15407,6 +15423,7 @@ uk:
     group_files: "Файли групи"
     my_files: "Мої файли"
   root_account_3fb3aacf: root_account
+  root_account_9d4fcb97: "Обліковий запис суперкористувача"
   root_accounts_cc035dcf: "Кореневі облікові записи"
   roster: 
     error_sending_invitations: "Помилка при відправці запрошення. Будь ласка спробуйте ще раз."
@@ -17588,6 +17605,7 @@ uk:
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Це зображення виглядає як водяний знак для вашої сторінки. Сприйнятні формати: png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Це список URL, яким можна довіряти, відокремлених комами. Кожна URL в цьому списку буде обходити CSRF токен при вході до Canvas."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Це функція, яка дозволяє розробляти адаптивний макет"
+  this_is_a_full_batch_update_99d726e0: "Це повне пакетне оновлення"
   this_is_a_group_discussion_2f9acdae: "Це групове обговорення"
   this_is_a_media_comment_click_here_to_view_c297bf62: "Це медіа коментар, *натисніть тут, щоб переглянути*."
   this_is_a_message_for_name_7abf1e39: "Це повідомлення для *%{name}*"
@@ -17884,6 +17902,7 @@ uk:
   title_is_too_long_b192a46a: "Заголовок занадто довгий"
   title_is_too_long_must_be_under_length_characters_ab694ae4: "Заголовок занадто довгий, має бути до %{length} символів"
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title}розблоковано. Натисніть щоб заблокувати."
+  title_must_contain_at_least_one_letter_or_number_6a6e4b54: "Заголовок має містити принаймні одну літеру чи цифру"
   title_separator: ":"
   titles: 
     aligned_items: "Впорядковані елементи"
@@ -17919,6 +17938,7 @@ uk:
   to_do_items_loading_d1cdfcd5: "Завантажувати елементи плану робіт"
   to_do_list_dashboard_d741f64e: "Панель інструментів для плану робіт"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Щоб пов'язати спостерігача курсу *%{name}* зі студентом, розпочніть введення імені студента нижче, для його пошуку, та натисніть кнопку Оновити."
+  to_make_a_new_page_for_this_submission_select_a_se_6cd921aa: "Щоб зробити нову сторінку для цього матеріалу, виберіть розділ і введіть ім'я для нової сторінки."
   to_minscore_43e5452e: "до %{minScore}%"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Щоб закріпити обговорення у верхній частині сторінки, перетягніть його сюди або виберіть Закріпити з меню налаштувань для обговорення."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "Щоб переглянути Брендінг редактора тем, вам необхідно *Вимкнути висококонтрастний режим інтерфейсу користувача*."
@@ -18267,6 +18287,7 @@ uk:
     titles: 
       add_login: "Додати логін"
       update_login: "Оновити логін"
+  user_merge_failed_please_make_sure_you_have_proper_c0e02cf2: "Об'єднання користувачів не вдалося. Будь ласка, переконайтеся, що у вас є належний дозвіл і повторіть спробу."
   user_name: 
     buttons: 
       update_user: "Оновити користувача"
@@ -18912,6 +18933,8 @@ uk:
   windows_tile_color_2b786bd9: "Кольор Windows плитки"
   windows_tile_square_b91d2b33: "Windows плитка: Квадрат"
   windows_tile_wide_4d40910: "Windows плитка: Широка"
+  with_this_option_selected_all_fields_in_all_record_14a361c9: "Коли ця опція вибрана, всі поля у всіх записах, зачеплених цим SIS імпортом можуть бути змінені у майбутньому неголовними SIS імпортами."
+  with_this_option_selected_changes_made_through_thi_e751dd22: "З обранням цієї опції, зміни виконані через цей SIS імпорт, будуть оброблені як зміни інтерфейсу користувача, запобігаючи, щоб  подальший SIS імпорт не змінив поля, які вже були змінені тут."
   withdrawn_4c838347: Вилучено
   work_and_create_together_c65f358b: "Працюйте та створюйте разом"
   workflow_state_cc8d711a: "Стан робочого процесу"
@@ -18969,12 +18992,14 @@ uk:
   you_can_review_the_submission_details_by_clicking__9abc5515: "Ви можете переглянути деталі відправлення, натиснувши це посилання:%{link}."
   you_can_review_the_submission_details_using_the_li_c25dd615: "Ви можете переглянути деталі відправлення, використовуючи посилання нижче."
   you_can_review_the_submission_details_using_this_l_c7f51917: "Ви можете переглянути деталі відправлення за допомогою ціього посилання:%{link}."
+  you_can_search_by_25d8e2b2: "Ви можете виконувати пошук за:"
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "Ви можете переглянути деталі цієї групи, натиснувши це посилання:%{link}."
   you_can_t_delete_a_root_account_5673c62d: "Ви не можете видалити root_account."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Ви не можете видалити додатковий обліковий запис, у якому є курси."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Ви не можете видалити додатковий обліковий запис, у якому є суб-облікові записи."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "Ви не можете видалити %{account_name}, оскільки в ньому є курси"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Ви не можете редагувати цю рубрику, через те, що у вас немає дозволу або вона використовується більш, ніж в одному місці. Будь-які внесені зміни призведуть до створення нової рубрики на основі старої рубрики. Все одно продовжити?"
+  you_can_t_merge_an_account_with_itself_15f58d41: "Ви не можете об'єднати обліковий запис з ним самим."
   you_can_try_to_log_in_again_2b23ef0f: "Ви можете спробувати * ще раз ввійти в систему *."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Ви можете оновити деяку інформацію про користувача, але вони зможуть повернути зміни назад."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Ви можете використовувати один файл 16x16, 32x32, 48x48 іконок."

@@ -412,7 +412,7 @@ describe "AuthenticationProviders API", type: :request do
       @saml_hash["mfa_required"] = false
       @saml_hash["skip_internal_mfa"] = false
       @saml_hash["otp_via_sms"] = true
-      expect(json).to eq @saml_hash
+      expect(json.slice(*@saml_hash.keys)).to eql @saml_hash
     end
 
     it "returns ldap aac" do
@@ -431,7 +431,7 @@ describe "AuthenticationProviders API", type: :request do
       @ldap_hash["internal_ca"] = nil
       @ldap_hash["verify_tls_cert_opt_in"] = false
       @ldap_hash["otp_via_sms"] = true
-      expect(json).to eq @ldap_hash
+      expect(json).to eql @ldap_hash
     end
 
     it "returns cas aac" do
@@ -446,7 +446,7 @@ describe "AuthenticationProviders API", type: :request do
       @cas_hash["mfa_required"] = false
       @cas_hash["skip_internal_mfa"] = false
       @cas_hash["otp_via_sms"] = true
-      expect(json).to eq @cas_hash
+      expect(json.slice(*@cas_hash.keys)).to eql @cas_hash
     end
 
     it "404s" do

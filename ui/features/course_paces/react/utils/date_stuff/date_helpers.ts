@@ -50,8 +50,16 @@ export const daysBetween = (
   blackoutDates: BlackoutDate[] = [],
   inclusiveEnd = true,
 ): number => {
-  const startDate = moment(start).endOf('day')
-  const endDate = moment(end).endOf('day')
+  let startDate
+  let endDate
+
+  if (window.ENV.FEATURES.course_pace_time_selection) {
+    startDate = moment(start).utc().endOf('day')
+    endDate = moment(end).utc().endOf('day')
+  } else {
+    startDate = moment(start).endOf('day')
+    endDate = moment(end).endOf('day')
+  }
 
   if (inclusiveEnd) {
     endDate.endOf('day').add(1, 'day')
@@ -227,7 +235,7 @@ export const generateDatesCaptions = (
   captions.startDate = getStartDateCaption(startDateValue, coursePace, contextType)
 
   if (contextType === 'enrollment') {
-    const appliedPaceContextType = appliedPace.type.toLocaleLowerCase()
+    const appliedPaceContextType = appliedPace?.type.toLocaleLowerCase()
     const paceType = ['course', 'section'].includes(appliedPaceContextType)
       ? appliedPaceContextType
       : 'default'

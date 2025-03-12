@@ -12,8 +12,10 @@ export COMPOSE_FILE=docker-compose.new-jenkins-package-translations.yml
 docker compose build
 docker compose up -d
 
+docker compose exec -T translations yarn run build:packages
+
 # Run the English extraction for each package, skipping packages without one.
-docker compose exec -T translations yarn wsrun --exclude-missing i18n:extract
+docker compose exec -T translations yarn wsrun --serial --exclude-missing i18n:extract
 
 # Merge translations from all packages together
 docker compose exec -T translations ./package-translations/merge-strings.sh

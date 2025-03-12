@@ -49,6 +49,7 @@ import {
 import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 import UnpublishedChangesIndicator from './unpublished_changes_indicator'
 import {RemovePaceWarningModal} from './remove_pace_warning_modal'
+import { isBulkEnrollment } from '../reducers/pace_contexts'
 
 const I18n = createI18nScope('course_paces_footer')
 
@@ -69,6 +70,7 @@ interface StoreProps {
   readonly isDraftPace: boolean
   readonly paceName: string
   readonly blueprintLocked: boolean | undefined
+  readonly isBulkEnrollment: boolean
 }
 
 interface DispatchProps {
@@ -109,6 +111,7 @@ export const Footer = ({
   isDraftPace,
   paceName,
   blueprintLocked,
+  isBulkEnrollment
 }: ComponentProps) => {
   const [isRemovePaceModalOpen, setRemovePaceModalOpen] = useState(false)
   const isCoursePace = !sectionPace && !studentPace
@@ -178,11 +181,11 @@ export const Footer = ({
   }
 
   const getSaveDraftButton = () => {
-    if (allowDraftPaces) {
+    if (allowDraftPaces && !isBulkEnrollment) {
       let saveDraftLabel = I18n.t('Save as Draft')
       let draftTip = I18n.t('Save this pace as a draft without publishing.')
       if (!saveDraftEnabled && !isDraftPace) {
-        draftTip = I18n.t('Published paces cannot be saved as a draft.')
+        return null
       } else if (!saveDraftEnabled && !unpublishedChanges) {
         draftTip = I18n.t('Make changes to the pace to save as a draft.')
       }
@@ -260,8 +263,7 @@ export const Footer = ({
       return <UnpublishedChangesIndicator newPace={newPace} onClick={handleDrawerToggle} />
     }
   }
-
-  if (studentPace && !allowStudentPaces) return null
+  if (studentPace && !isBulkEnrollment && !allowStudentPaces) return null
   return (
     <View as="div" width="100%" margin={useRedesign && userIsMasquerading ? '0 0 x-large' : '0'}>
       {showCondensedView && (
@@ -354,6 +356,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     isDraftPace: getIsDraftPace(state),
     paceName: getPaceName(state),
     blueprintLocked: getBlueprintLocked(state),
+    isBulkEnrollment: isBulkEnrollment(state),
   }
 }
 

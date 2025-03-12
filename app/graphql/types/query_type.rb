@@ -29,7 +29,7 @@ module Types
       argument :_id, ID, required: true
       argument :type, LegacyNodeType, required: true
     end
-    def legacy_node(type:, _id:) # rubocop:disable Lint/UnderscorePrefixedVariableName named for DSL reasons
+    def legacy_node(type:, _id:) # rubocop:disable Lint/UnderscorePrefixedVariableName -- named for DSL reasons
       GraphQLNodeLoader.load(type, _id, context)
     end
 

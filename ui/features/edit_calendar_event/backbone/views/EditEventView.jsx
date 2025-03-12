@@ -339,7 +339,7 @@ export default class EditCalendarEventView extends Backbone.View {
         .done(() => this.renderRecurringEventFrequencyPicker())
         .fail(err =>
           showFlashAlert({
-            message: 'Failed to fetch course data.',
+            message: I18n.t('Failed to fetch course data.'),
             err,
             type: 'error',
           }),
