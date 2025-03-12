@@ -607,9 +607,10 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
-    graphql (2.4.8)
+    graphql (2.4.13)
       base64
       fiber-storage
+      logger
     graphql-batch (0.6.0)
       graphql (>= 1.12.18, < 3)
       promise.rb (~> 0.7.2)
