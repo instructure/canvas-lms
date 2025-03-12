@@ -81,6 +81,12 @@ describe "context modules" do
       expect(context_modules[2].find_element(:css, ".prerequisites_message")).to include_text(@module_2.name)
     end
 
+    it "does not render modules page rewrite" do
+      user_session(@student)
+      get "/courses/#{@course.id}/modules"
+      expect(driver.execute_script("return document.querySelector('[data-testid=\"modules-rewrite-student-container\"]')")).to be_nil # rubocop:disable Specs/NoExecuteScript
+    end
+
     it "does not lock modules for observers" do
       @course.enroll_user(user_factory, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id)
       user_session(@user)
@@ -894,6 +900,21 @@ describe "context modules" do
       checkpoints = ff("div[data-testid='checkpoint']")
       expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(reply_to_topic_new_due_date)}")
       expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(reply_to_entry_new_due_date)}")
+    end
+  end
+
+  context "with modules page rewrite feature flag enabled" do
+    before do
+      @course.root_account.enable_feature!(:modules_page_rewrite)
+      module_1 = @course.context_modules.create!(name: "Module 1")
+      assignment_1 = @course.assignments.create!(name: "Assignment 1")
+      module_1.add_item({ id: assignment_1.id, type: "assignment" })
+    end
+
+    it "page renders" do
+      user_session(@student)
+      get "/courses/#{@course.id}/modules"
+      expect(f("[data-testid='modules-rewrite-student-container']")).to be_present
     end
   end
 end

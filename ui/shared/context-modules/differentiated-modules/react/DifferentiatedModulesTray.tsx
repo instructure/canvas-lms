@@ -45,6 +45,7 @@ export type DifferentiatedModulesTrayProps = {
   onDismiss: () => void
   moduleElement: HTMLDivElement
   moduleId?: string
+  onComplete: () => void
   initialTab?: DifferentiatedModulesTrayTabId
   moduleName?: string
   unlockAt?: string
@@ -110,6 +111,7 @@ function Body({
   onDismiss,
   moduleElement,
   moduleId,
+  onComplete,
   initialTab = ASSIGN_TO_ID,
   courseId,
   trayRef,
@@ -177,6 +179,7 @@ function Body({
           mountNodeRef={trayRef}
           updateParentData={newSettingsData => (settingsData.current = newSettingsData)}
           onDidSubmit={onDismiss}
+          onComplete={onComplete}
           {...settingsProps}
           {...(settingsData.current ?? {})}
         />
@@ -202,6 +205,7 @@ function Body({
                 if (changed) changes.current.add(SETTINGS_ID)
               }}
               onDidSubmit={handleSubmitMissingTabs}
+              onComplete={onComplete}
               {...settingsProps}
               {...(settingsData.current ?? {})}
             />

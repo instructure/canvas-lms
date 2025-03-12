@@ -66,6 +66,7 @@ const featureBundles: {
   context_modules_publish_icon: () => import('./features/context_modules_publish_icon/index'),
   context_modules_publish_menu: () => import('./features/context_modules_publish_menu/index'),
   context_modules: () => import('./features/context_modules/index'),
+  context_modules_v2: () => import('./features/context_modules_v2/index'),
   context_roster_usage: () => import('./features/context_roster_usage/index'),
   context_roster_user_services: () => import('./features/context_roster_user_services/index'),
   context_roster_user: () => import('./features/context_roster_user/index'),

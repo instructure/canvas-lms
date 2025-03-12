@@ -26,6 +26,7 @@ import fetchMock from 'fetch-mock'
 describe('DifferentiatedModulesTray', () => {
   const props: DifferentiatedModulesTrayProps = {
     onDismiss: () => {},
+    onComplete: () => {},
     moduleElement: document.createElement('div'),
     moduleId: '1',
     initialTab: 'assign-to',
