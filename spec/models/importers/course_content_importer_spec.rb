@@ -534,6 +534,16 @@ describe Course do
       end
     end
 
+    describe "default_due_time" do
+      let(:migration) { build_migration(@course, {}, all_course_settings: true) }
+
+      it "is correctly imported" do
+        import_data = { course: { default_due_time: "02:10:00" } }.with_indifferent_access
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+        expect(@course.default_due_time).to eq "02:10:00"
+      end
+    end
+
     describe "hide_sections_on_course_users_page" do
       let(:migration) { build_migration(@course, {}, all_course_settings: true) }
 

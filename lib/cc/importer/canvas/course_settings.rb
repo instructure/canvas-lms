@@ -81,7 +81,8 @@ module CC::Importer::Canvas
          banner_image_identifier_ref
          course_color
          alt_name
-         time_zone].each do |string_type|
+         time_zone
+         default_due_time].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end
