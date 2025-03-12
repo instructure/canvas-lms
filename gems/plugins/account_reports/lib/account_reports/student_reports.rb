@@ -240,7 +240,7 @@ module AccountReports
     def last_user_access
       report_extra_text
 
-      students = root_account.pseudonyms.joins(:user)
+      students = root_account.pseudonyms.not_instructure_identity.joins(:user)
       students = add_user_sub_account_scope(students)
 
       courses = term.courses if term
