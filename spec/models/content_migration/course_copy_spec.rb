@@ -1441,5 +1441,46 @@ describe ContentMigration do
         expect(@copy_to.reload.late_policy.late_submission_deduction).to eq 10.0
       end
     end
+
+    describe "Course Page Copy with Home Link" do
+      include_context "course copy"
+      let(:course1) { Course.create!(name: "Course 1") }
+      let(:course2) { Course.create!(name: "Course 2") }
+      let(:course3) { Course.create!(name: "Course 3") }
+      let(:home_page) do
+        course1.wiki_pages.create(
+          title: "Javascript",
+          body: "<a title='Home' href=\"/courses/#{course1.id}\" data-course-type='navigation'>Home</a>"
+        )
+      end
+
+      before do
+        home_page
+      end
+
+      def run_course_copy(copy_from, copy_to)
+        @cm = ContentMigration.new(
+          context: copy_to,
+          source_course: copy_from,
+          migration_type: "course_copy_importer",
+          copy_options: { everything: "1" }
+        )
+        @cm.migration_settings[:import_immediately] = true
+        @cm.set_default_settings
+        @cm.save!
+        worker = Canvas::Migration::Worker::CourseCopyWorker.new
+        worker.perform(@cm)
+      end
+      it "updates home link when copying the page between courses" do
+        run_course_copy(course1, course2)
+        copied_page1 = course2.wiki_pages.find_by(title: "Javascript")
+        expect(copied_page1).not_to be_nil
+        expect(copied_page1.body).to include("/courses/#{course2.id}/")
+        run_course_copy(course2, course3)
+        copied_page2 = course3.wiki_pages.find_by(title: "Javascript")
+        expect(copied_page2).not_to be_nil
+        expect(copied_page2.body).to include("/courses/#{course3.id}/")
+      end
+    end
   end
 end
