@@ -6140,7 +6140,7 @@ es-ES:
   completed_items_out_of_total_items_item_batches_mi_66ea175b: "Se ha realizado la migración de %{completed_items} de un total de %{total_items} lotes de ítems"
   completed_peer_reviews_c134676: "Revisiones entre compañeros terminadas"
   completed_submittedat_66f56614: "Completado %{submittedAt}"
-  compose_44c904f4: Componer
+  compose_44c904f4: Redactar
   compose_a_new_message_db3a68ed: "Redactar un nuevo mensaje"
   compose_message_8abd180a: "Escribir un mensaje"
   compressing_f4a35c08: Comprimiendo...
@@ -11832,7 +11832,7 @@ es-ES:
       crocodoc_pending: "Crocodoc todavía está procesando este documento."
       headers: 
         anonymous_submission: "Las respuestas de los estudiantes están ocultas porque esta actividad es anónima."
-        assessment: Actividad
+        assessment: Evaluación
         no_group_submission: "Este grupo no ha realizado ninguna entrega para esta actividad"
         no_submission: "Este estudiante no tiene ninguna entrega para esta actividad"
         submission: "Este estudiante ha entregado la actividad"
@@ -23367,7 +23367,7 @@ es-ES:
       defaults: 
         title: Título
       headers: 
-        assessment: Actividad
+        assessment: Evaluación
         criteria: Criterios
       labels: 
         total_points: "Puntos totales"
