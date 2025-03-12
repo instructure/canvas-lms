@@ -69,7 +69,8 @@ describe('DiscussionSummary', () => {
   const expectedSummary = {
     id: 1,
     text: 'This is a discussion summary',
-    obsolete: false
+    obsolete: false,
+    usage: {currentCount: 3, limit: 5}
   }
   let oldEnv: GlobalEnv
 
@@ -91,6 +92,47 @@ describe('DiscussionSummary', () => {
   afterAll(() => {
     window.ENV = oldEnv
   })
+    describe('DiscussionSummaryUsagePill', () => {
+        it('should display a pill with summary usage information and an enabled Generate button if some usage left', async () => {
+            (doFetchApi as jest.Mock).mockResolvedValueOnce({
+                json: expectedSummary,
+            })
+
+            const {getByTestId} = setup({
+                summary: null
+            })
+
+            await waitFor(() => {
+                const pill = getByTestId('summary-usage-pill')
+                expect(pill).toHaveTextContent('3 / 5')
+            })
+
+            await waitFor(() => {
+                const generateButton = getByTestId('summary-generate-button')
+                expect(generateButton).not.toBeDisabled()
+            })
+        })
+
+        it('should display a pill with summary usage information and a disabled Generate button if no usage left', async () => {
+            (doFetchApi as jest.Mock).mockResolvedValueOnce({
+                json: {id: 1, text: 'This is a discussion summary', usage: {currentCount: 5, limit: 5}},
+            })
+
+            const {getByTestId} = setup({
+                summary: null
+            })
+
+            await waitFor(() => {
+                const pill = getByTestId('summary-usage-pill')
+                expect(pill).toHaveTextContent('5 / 5')
+            })
+
+            await waitFor(() => {
+                const generateButton = getByTestId('summary-generate-button')
+                expect(generateButton).toBeDisabled()
+            })
+        })
+    })
 
   describe('Rendering', () => {
     it('should display loading state initially', () => {

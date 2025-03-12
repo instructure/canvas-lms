@@ -29,12 +29,19 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconEndLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
+import {DiscussionSummaryUsagePill} from "./DiscussionSummaryUsagePill";
 
 interface DiscussionSummary {
   id: number;
   text: string;
   userInput?: string;
   obsolete: boolean;
+  usage: DiscussionSummaryUsage;
+}
+
+export interface DiscussionSummaryUsage {
+    currentCount: number;
+    limit: number;
 }
 
 export interface DiscussionSummaryProps {
@@ -64,6 +71,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   const [isInitialGeneration, setIsInitialGeneration] = useState<boolean>(true)
   const [summaryError, setSummaryError] = useState<DiscussionSummaryError | null>(null)
   const [isSummaryLoading, setIsSummaryLoading] = useState(props.summary === null)
+  const [usage, setUsage] = useState<DiscussionSummaryUsage | null>(null)
 
   // @ts-expect-error
   const contextType = ENV.context_type.toLowerCase()
@@ -102,6 +110,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   const fetchSummary = useCallback(async (initial: boolean) => {
     try {
       const result: DiscussionSummary | undefined = await getDiscussionSummary(initial)
+      if (result) { setUsage(result.usage) }
       props.onSetSummary(result)
       if(result?.userInput) {
         setUserInput(result.userInput)
@@ -109,8 +118,6 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
       } else {
         setPreviousUserInput(userInput)
       }
-
-
     } catch (error: any) {
       let errorMessage = 'An unexpected error occurred while loading the discussion summary.'
 
@@ -168,7 +175,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   } else {
     content = (
       <>
-        <Flex.Item margin="0 0 medium 0">
+        <Flex.Item margin={props.isMobile ? '0 0 mediumSmall 0' : '0 0 small 0'}>
           <Text fontStyle="italic" size="medium" weight="normal" data-testid="summary-text">
             {props.summary?.text?.split('\n').map((line, index) => (
               <React.Fragment key={index}>
@@ -197,6 +204,13 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
       </>
     )
   }
+    function usageLimitReached() {
+        if (!usage) {
+            return false
+        }
+
+        return usage.currentCount >= usage.limit;
+    }
 
   return (
     <Flex direction="column">
@@ -243,18 +257,24 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
             isEnabled={
               !isSummaryLoading &&
               !props.isFeedbackLoading &&
+              !usageLimitReached() &&
               (userInput !== previousUserInput || !props.summary || props.summary?.obsolete)
             }
             isMobile={props.isMobile}
+            usage={usage}
           />
         </Flex.Item>
       </Flex>
       {!summaryError && (
-        <Flex.Item margin="0 0 x-small 0">
-          <Text size="small" weight="normal" color="secondary">
-            {I18n.t('Generated Summary')}
-          </Text>
-        </Flex.Item>
+            <Flex.Item margin="0 0 x-small 0">
+              <Text size="small" weight="normal" color="secondary">
+                {I18n.t('Generated Summary')}
+              </Text>
+                {!!usage && (<DiscussionSummaryUsagePill
+                    currentCount={usage.currentCount}
+                    limit={usage.limit}
+                />)}
+            </Flex.Item>
       )}
       {content}
     </Flex>
