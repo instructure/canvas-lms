@@ -102,7 +102,7 @@ GEM
     timecop (0.9.10)
     trailblazer-option (0.1.2)
     uber (0.1.0)
-    uri (1.0.2)
+    uri (1.0.3)
     webmock (3.25.0)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
