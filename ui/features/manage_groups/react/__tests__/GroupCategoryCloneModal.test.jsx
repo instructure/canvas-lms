@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {act, render} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import React from 'react'
@@ -72,8 +72,11 @@ describe('GroupCategoryCloneModal', () => {
           onDismiss={onDismiss}
         />,
       )
-      await userEvent.setup({delay: null}).type(getByPlaceholderText('Name'), 'enabled')
-      expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
+      fireEvent.input(getByPlaceholderText('Name'), {target: {value: 'enabled'}})
+
+      await waitFor(() => {
+        expect(getByText('Submit').closest('button')).toBeEnabled()
+      })
     })
 
     it('creates a clone from current group set and reports status', async () => {
@@ -131,7 +134,7 @@ describe('GroupCategoryCloneModal', () => {
     })
 
     it('Shows error if name is empty and clears it when user enters a name', async () => {
-      const { getByPlaceholderText, queryByText} = render(
+      const {getByPlaceholderText, queryByText} = render(
         <GroupCategoryCloneModal
           groupCategory={{...groupCategory, name: 'Course Admin View Group Set'}}
           label="Clone Group Set"
@@ -151,13 +154,15 @@ describe('GroupCategoryCloneModal', () => {
 
       expect(queryByText('Group set name is required')).toBeInTheDocument()
 
-      await userEvent.type(inputName, "something")
+      fireEvent.input(inputName, {target: {value: 'something'}})
 
-      expect(queryByText('Group set name is required')).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(queryByText('Group set name is required')).not.toBeInTheDocument()
+      })
     })
 
     it(`Shows error if name is greater than ${CATEGORY_NAME_MAX_LENGTH}`, async () => {
-      const { getByPlaceholderText, queryByText} = render(
+      const {getByPlaceholderText, queryByText} = render(
         <GroupCategoryCloneModal
           groupCategory={{...groupCategory, name: 'Course Admin View Group Set'}}
           label="Clone Group Set"
@@ -168,7 +173,7 @@ describe('GroupCategoryCloneModal', () => {
 
       const inputName = getByPlaceholderText('Name')
 
-      await userEvent.type(inputName, 'a'.repeat(CATEGORY_NAME_MAX_LENGTH + 1))
+      fireEvent.input(inputName, {target: {value: 'a'.repeat(CATEGORY_NAME_MAX_LENGTH + 1)}})
       await userEvent
         .setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
         .click(queryByText('Submit'))
