@@ -3622,6 +3622,60 @@ describe DiscussionTopic do
     end
   end
 
+  describe "user_can_access_insights" do
+    before do
+      @course = course_factory(active_all: true)
+      @admin = account_admin_user(account: @course.root_account)
+      @teacher = user_model
+      @course.enroll_teacher(@teacher, enrollment_state: "active")
+      @student = user_model
+      @course.enroll_student(@student, enrollment_state: "active")
+      @observer = user_model
+      @course.enroll_user(@observer, "ObserverEnrollment").update_attribute(:associated_user_id, @student.id)
+      @ta = user_model
+      @course.enroll_ta(@ta, enrollment_state: "active")
+      @designer = user_model
+      @course.enroll_designer(@designer, enrollment_state: "active")
+
+      @topic = @course.discussion_topics.create!(title: "topic")
+    end
+
+    it "does not allow to access insights if the feature is disabled" do
+      expect(@topic.user_can_access_insights?(@teacher)).to be false
+      expect(@topic.user_can_access_insights?(@ta)).to be false
+      expect(@topic.user_can_access_insights?(@admin)).to be false
+      expect(@topic.user_can_access_insights?(@designer)).to be false
+      expect(@topic.user_can_access_insights?(@observer)).to be false
+      expect(@topic.user_can_access_insights?(@student)).to be false
+    end
+
+    it "allows instructors and read admins to access insights if the feature is enabled" do
+      @course.enable_feature!(:discussion_insights)
+
+      expect(@topic.user_can_access_insights?(@teacher)).to be true
+      expect(@topic.user_can_access_insights?(@ta)).to be true
+      expect(@topic.user_can_access_insights?(@admin)).to be true
+      expect(@topic.user_can_access_insights?(@designer)).to be true
+
+      expect(@topic.user_can_access_insights?(@observer)).to be false
+      expect(@topic.user_can_access_insights?(@student)).to be false
+    end
+
+    it "does not crash if the topic is in the context of a group with account context" do
+      account = @course.root_account
+      account.enable_feature!(:discussion_insights)
+      group = account.groups.create!
+      topic = group.discussion_topics.create!(title: "topic")
+
+      expect(topic.user_can_access_insights?(@teacher)).to be false
+      expect(topic.user_can_access_insights?(@ta)).to be false
+      expect(topic.user_can_access_insights?(@admin)).to be false
+      expect(topic.user_can_access_insights?(@designer)).to be false
+      expect(topic.user_can_access_insights?(@observer)).to be false
+      expect(topic.user_can_access_insights?(@student)).to be false
+    end
+  end
+
   describe "low_level_locked_for?" do
     before :once do
       @topic = @course.discussion_topics.create!(title: "topic")

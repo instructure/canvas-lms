@@ -183,7 +183,7 @@ discussion_permalink:
 
 discussion_insights:
   state: hidden
-  applies_to: RootAccount
+  applies_to: Course
   display_name: Discussion Insights
   description: |-
     Allow access to discussion insights
