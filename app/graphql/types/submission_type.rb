@@ -72,8 +72,6 @@ module Types
       unless_hiding_user_for_anonymous_grading { object.user_id }
     end
 
-    field :anonymous_id, ID, null: true
-
     field :enrollments_connection, EnrollmentType.connection_type, null: true
     def enrollments_connection
       load_association(:course).then do |course|
@@ -92,17 +90,35 @@ module Types
 
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
+      argument :order_by, SubmissionHistoryOrderInputType, required: false
     end
-    def submission_histories_connection(filter:)
+    def submission_histories_connection(filter:, order_by: nil)
       filter = filter.to_h
       states, include_current_submission = filter.values_at(:states, :include_current_submission)
       Promise.all([
                     load_association(:versions),
                     load_association(:assignment)
                   ]).then do
-        histories = object.submission_history
+        histories = object.submission_history(include_version: true)
         histories.pop unless include_current_submission
-        histories.select { |h| states.include?(h.workflow_state) }
+        histories = histories.select { |h| states.include?(h.fetch(:model).workflow_state) }
+
+        if order_by
+          order_by.to_h => { direction:, field: }
+          histories = histories.sort do |h1, h2|
+            left, right = ((direction == "ascending") ? [h1, h2] : [h2, h1])
+            comparison = left.fetch(:model).public_send(field) <=> right.fetch(:model).public_send(field)
+            if comparison.zero?
+              # Fall back to comparing by version id (model ID is the same for all histories)
+              # in order to guarantee a stable sort.
+              left.fetch(:version).id <=> right.fetch(:version).id
+            else
+              comparison
+            end
+          end
+        end
+
+        histories.map { |h| h.fetch(:model) }
       end
     end
 

@@ -25,6 +25,7 @@ export const UPDATE_SUBMISSION_GRADE_STATUS = gql`
     $submissionId: ID!
     $latePolicyStatus: String
     $customGradeStatusId: ID
+    $checkpointTag: String
   ) {
     __typename
     updateSubmissionGradeStatus(
@@ -32,6 +33,7 @@ export const UPDATE_SUBMISSION_GRADE_STATUS = gql`
         submissionId: $submissionId
         latePolicyStatus: $latePolicyStatus
         customGradeStatusId: $customGradeStatusId
+        checkpointTag: $checkpointTag
       }
     ) {
       submission {
@@ -46,6 +48,7 @@ export const ZUpdateSubmissionGradeStatusParams = z.object({
   latePolicyStatus: z.string().nullable(),
   customGradeStatusId: z.string().nullable(),
   courseId: z.string().nullable(),
+  checkpointTag: z.string().nullable(),
 })
 
 const ZSubmissionWithGradingStatus = z.object({
@@ -67,6 +70,7 @@ export async function updateSubmissionGradeStatus({
   latePolicyStatus,
   customGradeStatusId,
   courseId,
+  checkpointTag,
 }: UpdateSubmissionGradeStatusParams): Promise<SubmissionWithGradingStatus> {
   const result: UpdateSubmissionGradeStatusResult = await executeQuery(
     UPDATE_SUBMISSION_GRADE_STATUS,
@@ -75,6 +79,7 @@ export async function updateSubmissionGradeStatus({
       latePolicyStatus,
       customGradeStatusId,
       courseId,
+      checkpointTag,
     },
   )
 

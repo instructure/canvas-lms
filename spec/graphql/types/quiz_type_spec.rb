@@ -35,4 +35,12 @@ describe Types::QuizType do
     quiz.context_module_tags.create!(context_module: module2, context: quiz.context, tag_type: "context_module")
     expect(quiz_type.resolve("modules { _id }")).to match_array([module1.id.to_s, module2.id.to_s])
   end
+
+  it "has anonymous_submissions" do
+    expect(quiz_type.resolve("anonymousSubmissions")).to be_falsey
+
+    quiz.anonymous_submissions = true
+    quiz.save!
+    expect(quiz_type.resolve("anonymousSubmissions")).to be_truthy
+  end
 end

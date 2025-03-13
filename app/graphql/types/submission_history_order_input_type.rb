@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2025 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,17 +19,17 @@
 #
 
 module Types
-  # TODO: inherit from app-specific object
-  class QuizType < ApplicationObjectType
-    graphql_name "Quiz"
+  class SubmissionHistoryOrderFieldInputType < Types::BaseEnum
+    graphql_name "SubmissionHistoryOrderField"
+    description "The submission history field to sort by"
 
-    implements GraphQL::Types::Relay::Node
-    implements Interfaces::TimestampInterface
-    implements Interfaces::ModuleItemInterface
-    implements Interfaces::LegacyIDInterface
+    value :attempt
+  end
 
-    global_id_field :id
-
-    field :anonymous_submissions, Boolean, null: false
+  class SubmissionHistoryOrderInputType < Types::BaseInputObject
+    graphql_name "SubmissionHistoryOrder"
+    description "Specify a sort for the results"
+    argument :direction, OrderDirectionType, required: true
+    argument :field, SubmissionHistoryOrderFieldInputType, required: true
   end
 end

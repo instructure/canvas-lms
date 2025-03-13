@@ -248,7 +248,7 @@
                     </div>
                   </div>
 
-                  <% if @assignment.a2_enabled? && @context.feature_enabled?(:submission_stickers) %>
+                  <% if @assignment.stickers_enabled?(@current_user) %>
                   <div id="submission_sticker_mount_point"></div>
                   <% end %>
                 </div>
