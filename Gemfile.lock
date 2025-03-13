@@ -517,8 +517,8 @@ GEM
       pygments.rb
       redcarpet
     dumb_delegator (1.1.0)
-    encrypted_cookie_store-instructure (1.2.13)
-      actionpack (>= 4.2, < 7.2)
+    encrypted_cookie_store-instructure (1.2.14)
+      actionpack (>= 4.2, < 8.0)
     erubi (1.13.1)
     escape_code (0.2)
     et-orbi (1.2.11)
