@@ -96,10 +96,13 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
     const isValidToolConfig = this.toolConfigRef?.valid()
     const isValidRedirectUris = this.props.hasRedirectUris && !this.props.hasInvalidRedirectUris
 
-    if (!isValidRedirectUris && this.redirectUrisRef.current) {
+    if (!isValidRedirectUris && this.redirectUrisRef.current && this.props.isRedirectUriRequired) {
       this.redirectUrisRef.current.focus()
     }
-    return isValidToolConfig && isValidRedirectUris
+
+    return this.props.isRedirectUriRequired
+      ? isValidToolConfig && isValidRedirectUris
+      : isValidToolConfig
   }
 
   get keyForm() {

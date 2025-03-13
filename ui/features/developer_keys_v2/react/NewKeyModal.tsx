@@ -29,7 +29,7 @@ import React from 'react'
 import NewKeyForm from './NewKeyForm'
 import type {AvailableScope} from './reducers/listScopesReducer'
 import type {DeveloperKeyCreateOrEditState} from './reducers/createOrEditReducer'
-import actions from './actions/developerKeysActions'
+import type actions from './actions/developerKeysActions'
 import type {AnyAction, Dispatch} from 'redux'
 import type {DeveloperKey} from '../model/api/DeveloperKey'
 import {confirmWithPrompt} from '@canvas/instui-bindings/react/ConfirmWithPrompt'
@@ -266,12 +266,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       scopes?: unknown
     } = {}
 
-    if (this.isJsonConfig) {
-      if (!this.state.toolConfiguration || _.isEmpty(this.state.toolConfiguration)) {
-        this.setState({submitted: true})
-        $.flashError(I18n.t('Configuration JSON cannot be empty.'))
-        return
-      }
+    if (this.isJsonConfig || this.isUrlConfig) {
       if (!this.toolConfigForm.valid()) {
         this.setState({submitted: true})
         return
@@ -300,12 +295,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
         developer_key,
       }
       if (this.isUrlConfig) {
-        if (!this.state.toolConfigurationUrl) {
-          $.flashError(I18n.t('A json url is required, please supply one.'))
-          this.setState({submitted: true})
-          return
-        }
-        toSave.settings_url = this.state.toolConfigurationUrl
+        toSave.settings_url = this.state.toolConfigurationUrl || undefined
       } else {
         toSave.settings = settings
       }
