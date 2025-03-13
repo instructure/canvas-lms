@@ -88,7 +88,10 @@ module Types
                "only include users with the given ids",
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
                required: false
-
+      argument :enrollment_role_ids,
+               [ID],
+               "Only return users with the specified enrollment role ids",
+               required: false
       argument :enrollment_states,
                [CourseFilterableEnrollmentWorkflowState],
                <<~MD,
@@ -99,6 +102,10 @@ module Types
       argument :enrollment_types,
                [CourseFilterableEnrollmentType],
                "Only return users with the specified enrollment types",
+               required: false
+      argument :exclude_test_students,
+               Boolean,
+               "Exclude test students from results",
                required: false
       argument :search_term,
                String,
@@ -278,6 +285,7 @@ module Types
       search_params = {
         enrollment_state: filter[:enrollment_states],
         enrollment_type: filter[:enrollment_types],
+        enrollment_role_id: filter[:enrollment_role_ids],
         include_inactive_enrollments: true,
         search_term: filter[:search_term]
       }
@@ -294,6 +302,8 @@ module Types
       if user_ids.present?
         scope = scope.where(users: { id: user_ids })
       end
+
+      scope = scope.not_fake_student if filter[:exclude_test_students]
 
       scope
     end

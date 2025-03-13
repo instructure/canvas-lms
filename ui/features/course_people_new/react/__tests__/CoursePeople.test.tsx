@@ -39,6 +39,21 @@ jest.mock('../components/RosterTable/RosterTable', () => ({users}: {users: User[
 jest.mock('../components/SearchPeople/PeopleSearchBar', () => ({searchTerm}: {searchTerm: string}) => (
   <div data-testid="search-bar">SearchBar: {searchTerm}</div>
 ))
+jest.mock('../components/FilterPeople/PeopleFilter', () => ({onOptionSelect}: {onOptionSelect: (id: string) => void}) => (
+  <div
+    data-testid="people-filter"
+    role="button"
+    tabIndex={0}
+    onClick={() => onOptionSelect('test-id')}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        onOptionSelect('test-id')
+      }
+    }}
+  >
+    PeopleFilter
+  </div>
+))
 jest.mock('../components/SearchPeople/NoPeopleFound', () => () => <div data-testid="no-people-found" />)
 
 const mockUsers = [
@@ -82,6 +97,7 @@ describe('CoursePeople', () => {
     const {getByTestId} = render(<CoursePeople />)
     expect(getByTestId('page-header')).toBeInTheDocument()
     expect(getByTestId('search-bar')).toBeInTheDocument()
+    expect(getByTestId('people-filter')).toBeInTheDocument()
     expect(getByTestId('roster-table')).toBeInTheDocument()
   })
 
@@ -104,6 +120,18 @@ describe('CoursePeople', () => {
   it('passes search term to PeopleSearchBar', () => {
     const {getByTestId} = render(<CoursePeople />)
     expect(getByTestId('search-bar')).toHaveTextContent(`SearchBar: test user`)
+  })
+
+  it('passes handler for selected option to PeopleFilter', () => {
+    const {getByTestId} = render(<CoursePeople />)
+    const filter = getByTestId('people-filter')
+    expect(filter).toBeInTheDocument()
+    filter.click()
+    expect(useCoursePeopleQuery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        optionId: 'test-id'
+      })
+    )
   })
 
   it('passes search term to query hook', () => {

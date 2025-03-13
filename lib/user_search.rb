@@ -142,7 +142,7 @@ module UserSearch
       if enrollment_role_ids || enrollment_roles
         role_ids =
           if enrollment_role_ids
-            enrollment_role_ids.filter_map { |id| Role.get_role_by_id(id).id }
+            enrollment_role_ids.filter_map { |id| Role.get_role_by_id(id)&.id }
           else
             enrollment_roles.filter_map do |name|
               if context.is_a?(Account)

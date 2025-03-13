@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, type FC} from 'react'
+import React, {useEffect, useState, type FC} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import CoursePeopleHeader from './components/PageHeader/CoursePeopleHeader'
+import PeopleFilter from './components/FilterPeople/PeopleFilter'
 import PeopleSearchBar from './components/SearchPeople/PeopleSearchBar'
 import RosterTable from './components/RosterTable/RosterTable'
 import NoPeopleFound from './components/SearchPeople/NoPeopleFound'
@@ -28,6 +29,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import useSearch from './hooks/useSearch'
 import useCoursePeopleContext from './hooks/useCoursePeopleContext'
 import useCoursePeopleQuery from './hooks/useCoursePeopleQuery'
+import {DEFAULT_OPTION} from '../util/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')
@@ -39,8 +41,10 @@ const CoursePeople: FC = () => {
     onChangeHandler,
     onClearHandler
   } = useSearch()
+
+  const [optionId, setOptionId] = useState<string>(DEFAULT_OPTION.id)
   const {courseId} = useCoursePeopleContext()
-  const {data: users, isLoading, error} = useCoursePeopleQuery({courseId, searchTerm})
+  const {data: users, isLoading, error} = useCoursePeopleQuery({courseId, searchTerm, optionId})
   const numberOfResults = users ? users.length : 0
 
   useEffect(() => {
@@ -53,17 +57,22 @@ const CoursePeople: FC = () => {
   }, [error])
 
   return (
-    <View>
+    <View as="div" margin="medium 0">
       <CoursePeopleHeader />
-      <View as="div" margin="medium 0">
-        <PeopleSearchBar
-          searchTerm={rawSearchTerm}
-          numberOfResults={numberOfResults}
-          isLoading={isLoading}
-          onChangeHandler={onChangeHandler}
-          onClearHandler={onClearHandler}
-        />
-      </View>
+      <Flex as="div" margin="medium 0">
+        <Flex.Item as="div" margin="0 small 0 0" width={"30%"}>
+          <PeopleSearchBar
+            searchTerm={rawSearchTerm}
+            numberOfResults={numberOfResults}
+            isLoading={isLoading}
+            onChangeHandler={onChangeHandler}
+            onClearHandler={onClearHandler}
+          />
+        </Flex.Item>
+        <Flex.Item as="div" margin="0 small 0 0" width={"30%"}>
+          <PeopleFilter onOptionSelect={setOptionId} />
+        </Flex.Item>
+      </Flex>
       {isLoading && (
         <Flex as="div" justifyItems="center">
           <Flex.Item as="div" padding="xx-large">

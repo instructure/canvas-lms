@@ -60,6 +60,7 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
     : {...defaultEnvCourse, ...ENV.course}
 
   const currentUserId = ENV.current_user_id
+  const allRoles = ENV.ALL_ROLES
 
   const {
     can_read_roster: canReadRoster,
@@ -91,6 +92,7 @@ export const getCoursePeopleContext = ({defaultContext = false} = {}): CoursePeo
 
   return {
     activeGranularEnrollmentPermissions,
+    allRoles,
     allowAssignToDifferentiationTags,
     canReadRoster,
     canAllowCourseAdminActions,

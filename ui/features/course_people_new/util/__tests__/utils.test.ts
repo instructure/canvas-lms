@@ -16,7 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {secondsToTime} from '../utils'
+import {secondsToTime, sortRoles, getRoleName} from '../utils'
+import type {EnvRole} from '../../types'
+import {
+  NO_PERMISSIONS,
+  ACCOUNT_MEMBERSHIP,
+  TEACHER_ENROLLMENT,
+  STUDENT_ENROLLMENT,
+  TA_ENROLLMENT,
+  OBSERVER_ENROLLMENT,
+  DESIGNER_ENROLLMENT,
+  ACCOUNT_ADMIN,
+  TEACHER_ROLE,
+  STUDENT_ROLE,
+  TA_ROLE,
+  OBSERVER_ROLE,
+  DESIGNER_ROLE,
+} from '../constants'
 
 describe('utils', () => {
   describe('secondsToTime', () => {
@@ -46,6 +62,68 @@ describe('utils', () => {
       expect(secondsToTime(360000)).toBe('100:00:00')
       expect(secondsToTime(478861)).toBe('133:01:01')
       expect(secondsToTime(8000542)).toBe('2222:22:22')
+    })
+  })
+
+  describe('sortRoles', () => {
+    it('sorts roles according to predefined order', () => {
+      const roles: Partial<EnvRole>[] = [
+        {base_role_name: OBSERVER_ENROLLMENT, name: 'Observer'},
+        {base_role_name: DESIGNER_ENROLLMENT, name: 'Designer'},
+        {base_role_name: NO_PERMISSIONS, name: 'No Permissions'},
+        {base_role_name: ACCOUNT_MEMBERSHIP, name: 'Account Member'},
+        {base_role_name: TEACHER_ENROLLMENT, name: 'Teacher'},
+        {base_role_name: STUDENT_ENROLLMENT, name: 'Student'},
+        {base_role_name: TA_ENROLLMENT, name: 'TA'},
+      ]
+
+      const sorted = sortRoles(roles as EnvRole[])
+      expect(sorted.map(r => r.name)).toEqual([
+        'No Permissions',
+        'Account Member',
+        'Student',
+        'TA',
+        'Teacher',
+        'Designer',
+        'Observer'
+      ])
+    })
+
+    it('puts account admin role first', () => {
+      const roles: Partial<EnvRole>[] = [
+        {base_role_name: TEACHER_ENROLLMENT, name: 'Teacher'},
+        {base_role_name: ACCOUNT_MEMBERSHIP, name: ACCOUNT_ADMIN},
+        {base_role_name: STUDENT_ENROLLMENT, name: 'Student'},
+      ]
+
+      const sorted = sortRoles(roles as EnvRole[])
+      expect(sorted.map(r => r.name)).toEqual([ACCOUNT_ADMIN, 'Student', 'Teacher'])
+    })
+
+    it('sorts alphabetically within same base role type', () => {
+      const roles: Partial<EnvRole>[] = [
+        {base_role_name: TEACHER_ENROLLMENT, name: 'Senior Teacher'},
+        {base_role_name: TEACHER_ENROLLMENT, name: 'Assistant Teacher'},
+        {base_role_name: STUDENT_ENROLLMENT, name: 'Student'},
+      ]
+
+      const sorted = sortRoles(roles as EnvRole[])
+      expect(sorted.map(r => r.name)).toEqual(['Student', 'Assistant Teacher', 'Senior Teacher'])
+    })
+  })
+
+  describe('getRoleName', () => {
+    it('returns translated name for standard SIS roles', () => {
+      expect(getRoleName(TEACHER_ROLE)).toBe('Teacher')
+      expect(getRoleName(STUDENT_ROLE)).toBe('Student')
+      expect(getRoleName(TA_ROLE)).toBe('TA')
+      expect(getRoleName(OBSERVER_ROLE)).toBe('Observer')
+      expect(getRoleName(DESIGNER_ROLE)).toBe('Designer')
+    })
+
+    it('returns original name for custom roles', () => {
+      const customRole = 'Custom Teaching Assistant'
+      expect(getRoleName(customRole)).toBe(customRole)
     })
   })
 })

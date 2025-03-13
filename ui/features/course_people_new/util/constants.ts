@@ -16,6 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {EnvRole} from '../types'
+
+const I18n = createI18nScope('course_people')
+
+export const NO_PERMISSIONS = 'NoPermissions'
+export const ACCOUNT_MEMBERSHIP = 'AccountMembership'
 export const TEACHER_ENROLLMENT = 'TeacherEnrollment'
 export const STUDENT_ENROLLMENT = 'StudentEnrollment'
 export const TA_ENROLLMENT = 'TaEnrollment'
@@ -32,5 +39,18 @@ export const STUDENT_ROLE = 'student'
 export const OBSERVER_ROLE = 'observer'
 export const DESIGNER_ROLE = 'designer'
 
+export const ACCOUNT_ADMIN = 'AccountAdmin'
+
 export const ASCENDING = 'ascending'
 export const DESCENDING = 'descending'
+
+export const DEFAULT_OPTION: EnvRole = {
+  addable_by_user: false,
+  base_role_name: undefined,
+  count: 0,
+  deleteable_by_user: false,
+  id: 'all_roles',
+  label: I18n.t('All Roles'),
+  name: I18n.t('All Roles'),
+  plural_label: I18n.t('All Roles')
+}
