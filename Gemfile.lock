@@ -654,10 +654,10 @@ GEM
       json-jwt (~> 1.16.6)
       rexml
       simple_oauth (~> 0.3.1)
-    inst-jobs (3.1.17)
-      activerecord (>= 6.0)
+    inst-jobs (3.1.18)
+      activerecord (>= 7.0)
       activerecord-pg-extensions (~> 0.4)
-      activesupport (>= 6.0)
+      activesupport (>= 7.0)
       after_transaction_commit (>= 1.0, < 3)
       debug_inspector (~> 1.0)
       fugit (~> 1.3)
