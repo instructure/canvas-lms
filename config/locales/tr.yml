@@ -5815,9 +5815,7 @@ tr:
   count_hours_ago_322dcc79: 
     one: "1 saat önce"
     other: "%{count} saat önce"
-  count_items_deleted_successfully_a287aa53: 
-    one: "%{name} başarıyla silindi."
-    other: "%{count} öğe başarıyla silindi."
+  count_items_deleted_successfully_a287aa53: "%{count} öğe başarıyla silindi."
   count_items_deleted_successfully_b5d06e4b: "%{count} öğe başarıyla silindi"
   count_items_found_224f86d3: 
     zero: "Hiçbir öğe bulunamadı"
@@ -16843,6 +16841,9 @@ tr:
     file_list: "Dosya Listesi"
     files: Dosyalar
     files_heading: Dosyalar
+    files_legacy_delete: 
+      one: "%{name} başarıyla silindi."
+      other: "%{count} öğe başarıyla silindi."
     files_toolbar: "Dosyalar Araç Çubuğu"
     folder: Dizin
     folder_browsing_tree: "Dizin Görüntüleme Ağacı"
