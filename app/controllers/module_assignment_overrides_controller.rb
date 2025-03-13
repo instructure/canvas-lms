@@ -136,7 +136,7 @@ class ModuleAssignmentOverridesController < ApplicationController
     return render json: { error: "List of overrides required" }, status: :bad_request unless override_list.is_a?(Array)
 
     override_list.each do |override|
-      if @context.account.settings[:allow_assign_to_differentiation_tags] && override["group_id"].present?
+      if @context.account.allow_assign_to_differentiation_tags? && override["group_id"].present?
         if override["student_ids"].present? && override["course_section_id"].present?
           return render json: { error: "cannot provide group_id, course_section_id, and student_ids on the same override" }, status: :bad_request
         elsif override["course_section_id"].present?
@@ -149,7 +149,7 @@ class ModuleAssignmentOverridesController < ApplicationController
       end
 
       required_params = %w[id student_ids course_section_id]
-      required_params << "group_id" if @context.account.settings[:allow_assign_to_differentiation_tags]
+      required_params << "group_id" if @context.account.allow_assign_to_differentiation_tags?
       unless required_params.any? { |param| override[param].present? }
         return render json: { error: "#{[required_params[0...-1].join(", "), required_params.last].join(", or ")} required with each override" }, status: :bad_request
       end
@@ -199,7 +199,7 @@ class ModuleAssignmentOverridesController < ApplicationController
       if override["course_section_id"].present?
         current_override.assignment_override_students.delete_all if current_override.set_type == "ADHOC"
         current_override.course_section = @context.course_sections.find(override["course_section_id"])
-      elsif override["group_id"].present? && @context.account.settings[:allow_assign_to_differentiation_tags]
+      elsif override["group_id"].present? && @context.account.allow_assign_to_differentiation_tags?
         group = find_group(override["group_id"])
         current_override.group = group if group.non_collaborative?
       elsif override["student_ids"].present?
@@ -225,7 +225,7 @@ class ModuleAssignmentOverridesController < ApplicationController
       new_override.title = override["title"] if override["title"].present?
       if override["course_section_id"].present?
         new_override.course_section = @context.course_sections.find(override["course_section_id"])
-      elsif override["group_id"].present? && @context.account.settings[:allow_assign_to_differentiation_tags]
+      elsif override["group_id"].present? && @context.account.allow_assign_to_differentiation_tags?
         group = find_group(override["group_id"])
         new_override.group = group if group.non_collaborative?
       elsif override["student_ids"].present?

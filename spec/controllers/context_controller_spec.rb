@@ -156,7 +156,7 @@ describe ContextController do
       @course.root_account.enable_feature!(:people_page_modernization)
       user_session(@teacher)
       get :roster, params: { course_id: @course.id }
-      expect(response.status).to eq(200)
+      expect(response).to have_http_status(:ok)
       expect(response).to render_template "layouts/application"
       expect(response.body).to eq("")
       expect(assigns).to have_key(:js_bundles)
@@ -166,7 +166,7 @@ describe ContextController do
     context "allow_manage_differentiation_tags in js_env" do
       before :once do
         @course.account.enable_feature! :assign_to_differentiation_tags
-        @course.account.settings = { allow_assign_to_differentiation_tags: true }
+        @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
         @course.account.save!
       end
 
@@ -177,7 +177,7 @@ describe ContextController do
       end
 
       it "set to false when differentiation tags are disabled in account settings" do
-        @course.account.settings = { allow_assign_to_differentiation_tags: false }
+        @course.account.settings = { allow_assign_to_differentiation_tags: { value: false } }
         @course.account.save!
         user_session(@teacher)
         get :roster, params: { course_id: @course.id }

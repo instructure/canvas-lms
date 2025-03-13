@@ -317,7 +317,7 @@ describe "selective_release module item assign to tray" do
         @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.enable_feature!(:differentiation_tags)
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
 

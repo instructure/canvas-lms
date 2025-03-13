@@ -89,7 +89,7 @@ describe "differentiated_assignments" do
   def configure_differentiation_tags(setting_enabled: true, feature_flag_enabled: true)
     @course.account.enable_feature!(:differentiation_tags)
     feature_flag_enabled ? @course.account.enable_feature!(:assign_to_differentiation_tags) : @course.account.disable_feature!(:assign_to_differentiation_tags)
-    @course.account.settings[:allow_assign_to_differentiation_tags] = setting_enabled
+    @course.account.settings[:allow_assign_to_differentiation_tags] = { value: setting_enabled }
     @course.account.save!
   end
 

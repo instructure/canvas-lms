@@ -407,13 +407,14 @@ describe AccountsController do
             id: @account.id,
             account: {
               settings: {
-                allow_assign_to_differentiation_tags: false
+                allow_assign_to_differentiation_tags: { value: false, locked: false }
               }
             }
           }
         )
         @account.reload
-        expect(@account.settings[:allow_assign_to_differentiation_tags]).to be false
+        expect(@account.settings[:allow_assign_to_differentiation_tags][:value]).to be_falsey
+        expect(@account.settings[:allow_assign_to_differentiation_tags][:locked]).to be_falsey
 
         post(
           :update,
@@ -421,45 +422,45 @@ describe AccountsController do
             id: @account.id,
             account: {
               settings: {
-                allow_assign_to_differentiation_tags: true
+                allow_assign_to_differentiation_tags: { value: true, locked: true }
               }
             }
           }
         )
         @account.reload
-        expect(@account.settings[:allow_assign_to_differentiation_tags]).to be true
+        expect(@account.settings[:allow_assign_to_differentiation_tags][:value]).to be_truthy
+        expect(@account.settings[:allow_assign_to_differentiation_tags][:locked]).to be_truthy
       end
 
-      it "allows for setting to be updated on a sub-account" do
+      it "allows updating setting in child account after updating from inheritable value" do
         account_with_admin_logged_in
-        sub_account = @account.sub_accounts.create!
-        post(
-          :update,
-          params: {
-            id: sub_account.id,
-            account: {
-              settings: {
-                allow_assign_to_differentiation_tags: false
-              }
-            }
-          }
-        )
-        sub_account.reload
-        expect(sub_account.settings[:allow_assign_to_differentiation_tags]).to be false
+        root_account = @account.sub_accounts.create!
+        subaccount = root_account.sub_accounts.create!
 
-        post(
-          :update,
-          params: {
-            id: sub_account.id,
-            account: {
-              settings: {
-                allow_assign_to_differentiation_tags: true
-              }
-            }
-          }
-        )
-        sub_account.reload
-        expect(sub_account.settings[:allow_assign_to_differentiation_tags]).to be true
+        post "update", params: { id: subaccount.id, account: { allow_assign_to_differentiation_tags: {} } }
+        expect(subaccount.reload.settings[:allow_assign_to_differentiation_tags]).to be_nil
+        expect(subaccount.allow_assign_to_differentiation_tags[:value]).to be false
+
+        post "update", params: { id: root_account.id,
+                                 account: { settings: {
+                                   allow_assign_to_differentiation_tags: { value: true }
+                                 } } }
+        expect(subaccount.reload.settings[:allow_assign_to_differentiation_tags]).to be_nil
+        expect(subaccount.allow_assign_to_differentiation_tags[:value]).to be true
+
+        post "update", params: { id: subaccount.id,
+                                 account: { settings: {
+                                   allow_assign_to_differentiation_tags: { value: false }
+                                 } } }
+        expect(subaccount.reload.settings[:allow_assign_to_differentiation_tags][:value]).to be false
+        expect(subaccount.allow_assign_to_differentiation_tags[:value]).to be false
+
+        post "update", params: { id: subaccount.id,
+                                 account: { settings: {
+                                   allow_assign_to_differentiation_tags: { value: true }
+                                 } } }
+        expect(subaccount.reload.settings[:allow_assign_to_differentiation_tags]).to be_nil
+        expect(subaccount.allow_assign_to_differentiation_tags[:value]).to be true
       end
     end
 
