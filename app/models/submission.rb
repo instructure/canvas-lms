@@ -1631,7 +1631,9 @@ class Submission < ActiveRecord::Base
   end
 
   def submission_history(include_version: false)
-    @submission_histories ||= begin
+    @submission_histories ||= {}
+    key = include_version ? :with_version : :without_version
+    @submission_histories[key] ||= begin
       res = []
       last_submitted_at = nil
       versions.sort_by(&:created_at).reverse_each do |version|

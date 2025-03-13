@@ -7337,6 +7337,14 @@ describe Submission do
         expect(entry[:model].id).to eql submission.id
       end
     end
+
+    it "considers the include_version arg in memoization" do
+      aggregate_failures do
+        submission.submission_history(include_version: true)
+        history = submission.submission_history(include_version: false)
+        expect(history.first).to be_a Submission
+      end
+    end
   end
 
   context "draft comments" do
