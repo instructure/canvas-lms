@@ -463,8 +463,12 @@ class SubmissionsApiController < ApplicationController
     end
 
     assignments = GuardRail.activate(:secondary) do
-      if params[:grading_period_id].present?
-        GradingPeriod.active.find(params[:grading_period_id]).assignments(@context, assignment_scope)
+      if params[:grading_period_id].present? && (grading_period_id = params[:grading_period_id])
+        unless grading_period_id.is_a?(String) || grading_period_id.is_a?(Integer)
+          return render json: { error: "grading_period_id is invalid, verify the parameter and type are correct" },
+                        status: :bad_request
+        end
+        GradingPeriod.active.find(grading_period_id).assignments(@context, assignment_scope)
       else
         assignment_scope.to_a
       end
