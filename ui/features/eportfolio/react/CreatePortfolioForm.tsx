@@ -44,18 +44,19 @@ interface Props {
 
 const NAME_MAX_LENGTH = 255
 
-const validationSchema = z.object({
-  name: z
-    .string()
-    .min(1, I18n.t('Name is required.'))
-    .max(
-      NAME_MAX_LENGTH,
-      I18n.t('Exceeded the maximum length (%{nameMaxLength} characters).', {
-        nameMaxLength: NAME_MAX_LENGTH,
-      }),
-    ),
-  isPublic: z.boolean(),
-})
+const createValidationSchema = () =>
+  z.object({
+    name: z
+      .string()
+      .min(1, I18n.t('Name is required.'))
+      .max(
+        NAME_MAX_LENGTH,
+        I18n.t('Exceeded the maximum length (%{nameMaxLength} characters).', {
+          nameMaxLength: NAME_MAX_LENGTH,
+        }),
+      ),
+    isPublic: z.boolean(),
+  })
 
 export default function CreatePortfolioForm(props: Props) {
   const [isOpen, setIsOpen] = useState(false)
@@ -65,7 +66,7 @@ export default function CreatePortfolioForm(props: Props) {
     formState: {errors},
     control,
     handleSubmit,
-  } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
+  } = useForm({defaultValues, resolver: zodResolver(createValidationSchema())})
 
   const onCancel = () => {
     setIsOpen(false)

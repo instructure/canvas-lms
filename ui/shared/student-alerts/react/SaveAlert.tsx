@@ -43,35 +43,33 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('alerts')
 
-const validationSchema = z
-  .object({
-    availableTriggers: z.array(z.nativeEnum(CriterionType)),
-    chosenTriggers: z.array(
-      z.object({
-        criterion_type: z.nativeEnum(CriterionType),
-        threshold: z.number().positive(),
-      }),
-    ),
-    selectedTrigger: z.optional(z.nativeEnum(CriterionType)),
-    sendTo: z.array(z.string()).refine(
-      val => val.length > 0,
-      () => ({message: I18n.t('Please select at least one option.')}),
-    ),
-    doNotResend: z.boolean(),
-    resendEvery: z.number(),
-  })
-  .superRefine(({chosenTriggers}, ctx) => {
-    if (!chosenTriggers.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: I18n.t('Please add at least one trigger.'),
-        path: ['selectedTrigger'],
-        fatal: true,
-      })
-    }
-  })
+const createValidationSchema = () =>
+  z
+    .object({
+      availableTriggers: z.array(z.nativeEnum(CriterionType)),
+      chosenTriggers: z.array(
+        z.object({
+          criterion_type: z.nativeEnum(CriterionType),
+          threshold: z.number().positive(),
+        }),
+      ),
+      selectedTrigger: z.optional(z.nativeEnum(CriterionType)),
+      sendTo: z.array(z.string()).min(1, I18n.t('Please select at least one option.')),
+      doNotResend: z.boolean(),
+      resendEvery: z.number(),
+    })
+    .superRefine(({chosenTriggers}, ctx) => {
+      if (!chosenTriggers.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: I18n.t('Please add at least one trigger.'),
+          path: ['selectedTrigger'],
+          fatal: true,
+        })
+      }
+    })
 
-type FormValues = z.infer<typeof validationSchema>
+type FormValues = z.infer<ReturnType<typeof createValidationSchema>>
 
 export interface SaveAlertProps {
   initialAlert?: AlertData
@@ -124,7 +122,7 @@ const SaveAlert = ({
     handleSubmit,
     setValue,
     setError,
-  } = useForm({values: initialValues, resolver: zodResolver(validationSchema)})
+  } = useForm({values: initialValues, resolver: zodResolver(createValidationSchema())})
   const {
     append,
     remove,

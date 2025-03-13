@@ -40,7 +40,7 @@ describe('CreatePortfolioForm', () => {
     expect(getByText('Mark as Public')).toBeVisible()
   })
 
-  it('sets focus if name is blank', () => {
+  it('sets focus and shows error if name is blank', () => {
     const mountNode = document.createElement('div')
     const {getByTestId, getByText} = render(
       <React.Fragment>
@@ -53,7 +53,10 @@ describe('CreatePortfolioForm', () => {
     const textInput = getByTestId('portfolio-name-field')
     const saveButton = getByText('Submit')
     saveButton.click()
-    waitFor(() => expect(textInput).toHaveFocus())
+    waitFor(() => {
+      expect(textInput).toHaveFocus()
+      expect(getByText('Name is required.')).toBeInTheDocument()
+    })
   })
 
   it('makes POST request when submitting', async () => {

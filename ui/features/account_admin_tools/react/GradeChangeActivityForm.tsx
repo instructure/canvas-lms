@@ -58,10 +58,10 @@ const validationSchema = z
   .refine(
     ({grader_id, student_id, course_id, assignment_id}) =>
       grader_id || student_id || course_id || assignment_id,
-    {
+    () => ({
       message: I18n.t('Please enter at least one field.'),
       path: ['grader_id'],
-    },
+    }),
   )
   .refine(
     ({start_time, end_time}) => {
@@ -71,10 +71,10 @@ const validationSchema = z
 
       return isToDateAfterFromDate
     },
-    {
+    () => ({
       message: I18n.t('To Date cannot come before From Date.'),
       path: ['end_time'],
-    },
+    }),
   )
 
 type FormValues = z.infer<typeof validationSchema>

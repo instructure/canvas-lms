@@ -28,16 +28,23 @@ describe('AuditLogForm', () => {
     expect(getByText(/Find/)).toBeInTheDocument()
   })
 
+  it('shows error when asset string is blank', async () => {
+    const cb = jest.fn()
+    const {getByText} = render(<AuditLogForm onSubmit={cb} />)
+
+    fireEvent.click(getByText(/Find/))
+    await waitFor(() => {
+      expect(getByText('Asset String is required.')).toBeInTheDocument()
+      expect(cb.mock.calls).toHaveLength(0)
+    })
+  })
+
   it('calls onSubmit when clicked', async () => {
     const cb = jest.fn()
     const {getByLabelText, getByText} = render(<AuditLogForm onSubmit={cb} />)
 
     const assetStringInput = getByLabelText(/Asset/)
     const submitButton = getByText(/Find/)
-
-    // doesn't fire when assetString is blank
-    fireEvent.click(submitButton)
-    expect(cb.mock.calls).toHaveLength(0)
 
     fireEvent.change(assetStringInput, {target: {value: 'user_123'}})
     fireEvent.click(submitButton)
