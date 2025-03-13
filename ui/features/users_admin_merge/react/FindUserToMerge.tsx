@@ -49,12 +49,13 @@ enum FindByOptions {
   Name,
 }
 
-const validationSchema = z.object({
-  destinationAccountId: z.string().optional(),
-  destinationUserId: z.string().min(1, I18n.t('Required')),
-})
+const createValidationSchema = () =>
+  z.object({
+    destinationAccountId: z.string().optional(),
+    destinationUserId: z.string().min(1, I18n.t('Required')),
+  })
 
-type FormValues = z.infer<typeof validationSchema>
+type FormValues = z.infer<ReturnType<typeof createValidationSchema>>
 
 const defaultValues: FormValues = {
   destinationAccountId: undefined,
@@ -84,7 +85,7 @@ const FindUserToMerge = ({sourceUserId, accountSelectOptions, onFind}: FindUserT
     handleSubmit,
   } = useForm({
     defaultValues,
-    resolver: zodResolver(validationSchema),
+    resolver: zodResolver(createValidationSchema()),
   })
   const [findBy, setFindBy] = useState(FindByOptions.UserId)
   const isFindBySelectFocused = useRef(false)

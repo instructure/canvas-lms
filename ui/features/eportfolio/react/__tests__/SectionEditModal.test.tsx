@@ -46,7 +46,10 @@ describe('SectionEditModal', () => {
     const textInput = getByTestId('add-field')
     const saveButton = getByText('Save')
     saveButton.click()
-    waitFor(() => expect(textInput).toHaveFocus())
+    waitFor(() => {
+      expect(getByText('Name is required.')).toBeInTheDocument()
+      expect(textInput).toHaveFocus()
+    })
   })
 
   // fickle; these pass individually

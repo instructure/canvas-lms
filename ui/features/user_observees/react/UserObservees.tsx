@@ -44,16 +44,17 @@ const defaultValues = {
   pairing_code: '',
 }
 
-const validationSchema = z.object({
-  pairing_code: z.string().min(1, I18n.t('Invalid pairing code.')),
-})
+const createValidationSchema = () =>
+  z.object({
+    pairing_code: z.string().min(1, I18n.t('Invalid pairing code.')),
+  })
 
 export type Observee = {
   id: string
   name: string
 }
 
-type FormValues = z.infer<typeof validationSchema>
+type FormValues = z.infer<ReturnType<typeof createValidationSchema>>
 
 interface UserObserveesProps {
   userId: string
@@ -66,7 +67,7 @@ function UserObservees({userId}: UserObserveesProps) {
     handleSubmit,
     setValue,
     setFocus,
-  } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
+  } = useForm({defaultValues, resolver: zodResolver(createValidationSchema())})
   const {
     data: observees,
     isLoading,
