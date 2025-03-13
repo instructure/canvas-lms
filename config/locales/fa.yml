@@ -6997,9 +6997,7 @@ fa:
     one: "%{count} ساعت قبل"
     other: "%{count} ساعت قبل"
   count_images_found_for_term_a93635ed: "%{count} تصویر برای %{term} پیدا شد."
-  count_items_deleted_successfully_a287aa53: 
-    one: "%{count} مورد با موفقیت حذف شد."
-    other: "%{count} مورد با موفقیت حذف شد."
+  count_items_deleted_successfully_a287aa53: "%{count} مورد با موفقیت حذف شد."
   count_items_found_224f86d3: 
     one: " یک مورد پیدا شد"
     other: " %{count} موارد یافت شده"
@@ -20296,6 +20294,9 @@ fa:
     file_list: "فهرست فایل"
     files: "فایل ها"
     files_heading: "فایل ها"
+    files_legacy_delete: 
+      one: "%{count} مورد با موفقیت حذف شد."
+      other: "%{count} مورد با موفقیت حذف شد."
     files_toolbar: "نوار ابزار فایل ها"
     folder: پوشه
     folder_browsing_tree: "درخت مرور پوشه"
