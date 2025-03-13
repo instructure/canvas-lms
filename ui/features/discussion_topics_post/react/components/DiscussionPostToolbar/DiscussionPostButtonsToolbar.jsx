@@ -151,7 +151,10 @@ const DiscussionPostButtonsToolbar = props => {
       onCollapseRepliesToggle={props.onCollapseRepliesToggle}
       showText={true}
       tooltipEnabled={props.breakpoints.ICEDesktop}
-      disabled={props.userSplitScreenPreference || (props.discDefaultExpandEnabled && props.isExpandedLocked)}
+      disabled={
+        props.userSplitScreenPreference ||
+        (props.discDefaultExpandEnabled && props.isExpandedLocked)
+      }
       expandedLocked={props.isExpandedLocked}
     />
   )
@@ -281,19 +284,28 @@ const DiscussionPostButtonsToolbar = props => {
       renderAvatar(),
       renderAssignToButton(),
     ]
-    
+
     const buttonsMobile = () => {
       if (window.ENV?.FEATURES?.discussion_default_sort) {
         if (ENV.current_user_is_student) {
-          return [renderExpandsThreads(), renderGroup()];
+          return [renderExpandsThreads(), renderGroup()]
         } else {
-          return [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions)];
+          return [
+            renderAssignToButton(),
+            renderExpandsThreads(),
+            renderButtonDrillDown(drillDownOptions),
+          ]
         }
       } else {
         if (ENV.current_user_is_student) {
-          return [renderExpandsThreads(), renderSort(), renderGroup()];
+          return [renderExpandsThreads(), renderSort(), renderGroup()]
         } else {
-          return [renderAssignToButton(), renderExpandsThreads(), renderButtonDrillDown(drillDownOptions), renderSort()];
+          return [
+            renderAssignToButton(),
+            renderExpandsThreads(),
+            renderButtonDrillDown(drillDownOptions),
+            renderSort(),
+          ]
         }
       }
     }
@@ -310,7 +322,7 @@ const DiscussionPostButtonsToolbar = props => {
         height="100%"
         padding="xxx-small 0"
       >
-        {(props.breakpoints.mobileOnly ? buttonsMobile : buttonsDesktop).map((button, idx) => {
+        {(props.breakpoints.mobileOnly ? buttonsMobile() : buttonsDesktop).map((button, idx) => {
           return button ? (
             <Flex.Item
               shouldGrow={false}
