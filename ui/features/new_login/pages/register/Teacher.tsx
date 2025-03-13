@@ -214,7 +214,11 @@ const Teacher = () => {
   }
 
   const handleCancel = () => {
-    navigate(ROUTES.SIGN_IN)
+    if (window.history.length > 1) {
+      navigate(-1)
+    } else {
+      navigate(ROUTES.SIGN_IN)
+    }
   }
 
   const handleReCaptchaVerify = (token: string | null) => {
@@ -292,6 +296,7 @@ const Teacher = () => {
               disabled={isUiActionPending}
               display="block"
               onClick={handleCancel}
+              data-testid="back-button"
             >
               {I18n.t('Back')}
             </Button>
