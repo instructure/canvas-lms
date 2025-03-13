@@ -22,42 +22,7 @@ import {useServerErrorsMap} from '..'
 describe('useServerErrorsMap', () => {
   it('returns default error messages without a password policy', () => {
     const {result} = renderHook(() => useServerErrorsMap())
-
     expect(result.current['user.name.blank']?.()).toBe('Please enter your name.')
-    expect(result.current['pseudonym.password.too_short']?.()).toBe(
-      'Password does not meet the length requirement.',
-    )
-    expect(result.current['pseudonym.password.too_long']?.()).toBe(
-      'Password exceeds the allowed length.',
-    )
-  })
-
-  it('returns error messages with specific password policy values', () => {
-    const passwordPolicy = {
-      minimumCharacterLength: 8,
-      maximumCharacterLength: 50,
-      maxRepeats: 3,
-      maxSequence: 4,
-    }
-    const {result} = renderHook(() => useServerErrorsMap(passwordPolicy))
-
-    expect(result.current['pseudonym.password.too_short']?.()).toBe(
-      'Password must be at least 8 characters.',
-    )
-    expect(result.current['pseudonym.password.too_long']?.()).toBe(
-      'Password cannot exceed 50 characters.',
-    )
-    expect(result.current['pseudonym.password.repeated']?.()).toBe(
-      'Password cannot have the same character more than 3 times in a row.',
-    )
-    expect(result.current['pseudonym.password.sequence']?.()).toBe(
-      'Password cannot include a sequence of 4 or more characters (e.g., “abcdef”).',
-    )
-  })
-
-  it('handles missing or undefined password policy gracefully', () => {
-    const {result} = renderHook(() => useServerErrorsMap(undefined))
-
     expect(result.current['pseudonym.password.too_short']?.()).toBe(
       'Password does not meet the length requirement.',
     )
@@ -68,7 +33,6 @@ describe('useServerErrorsMap', () => {
 
   it('returns all error keys with expected messages', () => {
     const {result} = renderHook(() => useServerErrorsMap())
-
     expect(result.current['user.name.blank']?.()).toBe('Please enter your name.')
     expect(result.current['user.self_enrollment_code.blank']?.()).toBe(
       'Please enter an enrollment code.',

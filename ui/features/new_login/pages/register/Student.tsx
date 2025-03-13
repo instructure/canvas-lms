@@ -54,7 +54,7 @@ const Student = () => {
     termsRequired,
   } = useNewLoginData()
   const validatePassword = usePasswordValidator(passwordPolicy)
-  const serverErrorsMap = useServerErrorsMap(passwordPolicy)
+  const serverErrorsMap = useServerErrorsMap()
   const navigate = useNavigate()
 
   const [confirmPassword, setConfirmPassword] = useState('')

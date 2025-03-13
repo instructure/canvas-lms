@@ -23,7 +23,7 @@
   enable_course_catalog = @domain_root_account.enable_course_catalog?
 
   # json-encoded array of authentication providers with each object containing id and auth_type
-  auth_providers_json = @auth_providers.to_json
+  auth_providers_json = ERB::Util.json_escape(@auth_providers.to_json)
 
   # sso settings custom “login label”
   login_handle_name = @domain_root_account.login_handle_name_with_inference
@@ -58,7 +58,8 @@
   require_email = @domain_root_account.require_email_for_registration?
 
   # json-encoded object of password policy rules
-  password_policy_data = @domain_root_account&.password_policy.to_json
+  password_policy_data = @domain_root_account.password_policy&.slice(:minimum_character_length, :require_number_characters, :require_symbol_characters)&.compact
+  password_policy_json = password_policy_data.present? ? ERB::Util.json_escape(password_policy_data.to_json) : nil
 
   # custom forgot password URL
   forgot_password_url = (params[:canvas_login] != '1' && @domain_root_account.try(:forgot_password_external_url)) || nil
@@ -75,7 +76,7 @@
 
 <div id="new_login_data"
      <%= "data-enable-course-catalog='true'".html_safe if enable_course_catalog.present? %>
-     <%= "data-auth-providers=#{raw auth_providers_json}" if auth_providers_json.present? %>
+     <%= "data-auth-providers='#{auth_providers_json}'".html_safe if auth_providers_json.present? %>
      <%= "data-login-handle-name='#{login_handle_name}'".html_safe if login_handle_name.present? %>
      <%= "data-login-logo-url='#{login_logo_url}'".html_safe if login_logo_url.present? %>
      <%= "data-login-logo-text='#{login_logo_text}'".html_safe if login_logo_text.present? %>
@@ -88,7 +89,7 @@
      <%= "data-terms-of-use-url='#{tou_url}'".html_safe if tou_url.present? %>
      <%= "data-privacy-policy-url='#{pp_url}'".html_safe if pp_url.present? %>
      <%= "data-require-email='true'".html_safe if require_email %>
-     <%= "data-password-policy=#{raw password_policy_data}" if password_policy_data.present? %>
+     <%= "data-password-policy='#{password_policy_json}'".html_safe if password_policy_json.present? %>
      <%= "data-forgot-password-url='#{forgot_password_url}'".html_safe if forgot_password_url.present? %>
      <%= "data-invalid-login-faq-url='#{h(invalid_login_faq_url)}'".html_safe if invalid_login_faq_url.present? %>
      <%= "data-help-link='#{help_link_json}'".html_safe if help_link_json.present? %>

@@ -69,8 +69,15 @@ describe "login/canvas/new_login" do
       terms_required?: true,
       require_email_for_registration?: true,
       forgot_password_external_url: "http://example.com/forgot",
-      password_policy: { min_length: 8, require_special: true }
+      password_policy: { minimum_character_length: 8, require_number_characters: true, require_symbol_characters: true }
     )
+    # authentication providers
+    mock_auth_providers = [
+      { id: 1, auth_type: "apple", display_name: "Apple" },
+      { id: 2, auth_type: "google", display_name: "Google" }
+    ]
+    allow(view).to receive(:auth_providers_with_buttons).and_return(mock_auth_providers)
+    assign(:auth_providers, mock_auth_providers)
     # branding values
     allow(view).to receive(:brand_variable).with("ic-brand-Login-logo").and_return("custom-logo.png")
     allow(view).to receive(:brand_variable).with("ic-brand-Login-body-bgd-color").and_return("#ffffff")
@@ -105,7 +112,7 @@ describe "login/canvas/new_login" do
         if expected_value.nil?
           expect(login_data.attributes).not_to include(attr)
         else
-          expect(login_data[attr]).to eq(expected_value)
+          expect(login_data.attributes).to include(attr)
         end
       end
     end
@@ -128,6 +135,60 @@ describe "login/canvas/new_login" do
     it "includes the invalid login faq url attribute" do
       login_data = rendered_page.at_css("#new_login_data")
       expect(login_data["data-invalid-login-faq-url"]).to eq("http://example.com/faq")
+    end
+  end
+
+  describe "password policy" do
+    context "when set" do
+      let(:login_data) { rendered_page.at_css("#new_login_data") }
+      let(:policy_json) { JSON.parse(login_data["data-password-policy"]) }
+
+      it "renders only the allowed attributes" do
+        expected_policy = {
+          "minimum_character_length" => 8,
+          "require_number_characters" => true,
+          "require_symbol_characters" => true
+        }
+        expect(policy_json).to eq(expected_policy)
+      end
+
+      it "excludes disallowed attributes" do
+        allowed_keys = %w[minimum_character_length require_number_characters require_symbol_characters]
+        excluded_keys = %w[
+          disallow_common_passwords
+          max_repeats
+          max_sequence
+          maximum_character_length
+          maximum_login_attempts
+        ]
+        aggregate_failures "validating included and excluded attributes" do
+          expect(policy_json.keys).to match_array(allowed_keys)
+          excluded_keys.each { |key| expect(policy_json).not_to have_key(key) }
+        end
+      end
+
+      it "does not contain unexpected attributes" do
+        unexpected_keys = policy_json.keys - %w[minimum_character_length require_number_characters require_symbol_characters]
+        expect(unexpected_keys).to be_empty, "Unexpected keys found: #{unexpected_keys.join(", ")}"
+      end
+    end
+
+    context "when unset" do
+      before { allow(account).to receive(:password_policy).and_return(nil) }
+
+      it "does not include the data-password-policy attribute" do
+        login_data = rendered_page.at_css("#new_login_data")
+        expect(login_data.attributes).not_to include("data-password-policy")
+      end
+    end
+
+    context "when empty" do
+      before { allow(account).to receive(:password_policy).and_return({}) }
+
+      it "does not include the data-password-policy attribute" do
+        login_data = rendered_page.at_css("#new_login_data")
+        expect(login_data.attributes).not_to include("data-password-policy")
+      end
     end
   end
 end

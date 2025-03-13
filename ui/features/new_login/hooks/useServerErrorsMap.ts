@@ -17,13 +17,10 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {PasswordPolicy} from '../types'
 
 const I18n = createI18nScope('new_login')
 
-export const useServerErrorsMap = (
-  passwordPolicy?: PasswordPolicy,
-): {[key: string]: () => string} => {
+export const useServerErrorsMap = (): {[key: string]: () => string} => {
   return {
     // taken from ui/shared/users/backbone/models/User.js
     'user.name.blank': () => I18n.t('Please enter your name.'),
@@ -50,31 +47,11 @@ export const useServerErrorsMap = (
     'pseudonym.sis_user_id.taken': () => I18n.t('This SIS ID is already in use.'),
 
     // taken from ui/shared/pseudonyms/backbone/models/Pseudonym.js
-    'pseudonym.password.too_short': () =>
-      passwordPolicy?.minimumCharacterLength
-        ? I18n.t('Password must be at least %{min} characters.', {
-            min: passwordPolicy.minimumCharacterLength,
-          })
-        : I18n.t('Password does not meet the length requirement.'),
-    'pseudonym.password.too_long': () =>
-      passwordPolicy?.maximumCharacterLength
-        ? I18n.t('Password cannot exceed %{max} characters.', {
-            max: passwordPolicy.maximumCharacterLength,
-          })
-        : I18n.t('Password exceeds the allowed length.'),
-    'pseudonym.password.repeated': () =>
-      passwordPolicy?.maxRepeats
-        ? I18n.t('Password cannot have the same character more than %{max} times in a row.', {
-            max: passwordPolicy.maxRepeats,
-          })
-        : I18n.t('Password contains too many repeated characters.'),
+    'pseudonym.password.too_short': () => I18n.t('Password does not meet the length requirement.'),
+    'pseudonym.password.too_long': () => I18n.t('Password exceeds the allowed length.'),
+    'pseudonym.password.repeated': () => I18n.t('Password contains too many repeated characters.'),
     'pseudonym.password.sequence': () =>
-      passwordPolicy?.maxSequence
-        ? I18n.t(
-            'Password cannot include a sequence of %{max} or more characters (e.g., “abcdef”).',
-            {max: passwordPolicy.maxSequence},
-          )
-        : I18n.t('Password contains a prohibited sequence of characters.'),
+      I18n.t('Password contains a prohibited sequence of characters.'),
     'pseudonym.password.common': () => I18n.t('Avoid using common passwords like “password123.”'),
     'pseudonym.password.no_digits': () => I18n.t('Password must include at least one number.'),
     'pseudonym.password.no_symbols': () =>
