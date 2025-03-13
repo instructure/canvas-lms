@@ -18,6 +18,7 @@
 
 export const ROUTES = {
   FORGOT_PASSWORD: '/login/canvas/forgot-password',
+  LDAP: '/login/ldap',
   REGISTER: '/login/canvas/register',
   REGISTER_PARENT: '/login/canvas/register/parent',
   REGISTER_STUDENT: '/login/canvas/register/student',

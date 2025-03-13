@@ -18,13 +18,14 @@
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {assignLocation} from '@canvas/util/globalUtils'
+import {assignLocation, windowPathname} from '@canvas/util/globalUtils'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
 import React, {useEffect, useRef, useState} from 'react'
 import {useNewLogin, useNewLoginData} from '../context'
+import {ROUTES} from '../routes/routes'
 import {performSignIn} from '../services'
 import {ActionPrompt, RememberMeCheckbox, SSOButtons, SignInLinks} from '../shared'
 import LoginAlert from '../shared/LoginAlert'
@@ -101,7 +102,10 @@ const SignIn = () => {
     setIsUiActionPending(true)
 
     try {
-      const response = await performSignIn(username, password, rememberMe)
+      const loginApiEndpoint = windowPathname().startsWith(ROUTES.LDAP)
+        ? ROUTES.LDAP
+        : ROUTES.SIGN_IN
+      const response = await performSignIn(username, password, rememberMe, loginApiEndpoint)
 
       if (response.status === 200) {
         if (response.data?.otp_required) {
