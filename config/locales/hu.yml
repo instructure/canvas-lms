@@ -7171,9 +7171,7 @@ hu:
     other: "%{count} órával ezelőtt"
   count_images_found_for_term_a93635ed: "%{count} kép található a következőhöz: %{term}"
   count_issues_baf25342: "%{count} kérdés"
-  count_items_deleted_successfully_a287aa53: 
-    one: "%{name} sikeresen törölve."
-    other: "%{count} elem sikeresen törölve."
+  count_items_deleted_successfully_a287aa53: "%{count} elem sikeresen törölve."
   count_items_found_224f86d3: 
     one: "Egy elem található"
     other: "%{count} elem található"
@@ -20799,6 +20797,9 @@ hu:
         three_chars: "Legalább 3 karaktert be kell írni a keresőmezőbe!"
         your_search: "A keresésre - \"%{search_term}\" - nincs találat a fájlok között."
     files: Fájlok
+    files_legacy_delete: 
+      one: "%{name} sikeresen törölve."
+      other: "%{count} elem sikeresen törölve."
     folder_browsing_tree: "Mappaböngészés fanézetben"
     folder_name: "Mappa neve"
     modified_by: Módosította

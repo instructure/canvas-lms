@@ -5096,11 +5096,7 @@ uk:
     many: "%{count} годин тому"
     one: "1 година тому"
     other: "%{count} годин тому"
-  count_items_deleted_successfully_a287aa53: 
-    few: "%{count} елементів видалено успішно."
-    many: "%{count} елементів видалено успішно."
-    one: "%{name} видалено успішно."
-    other: "%{count} елементів видалено успішно."
+  count_items_deleted_successfully_a287aa53: "%{count} елементів видалено успішно."
   count_items_found_224f86d3: 
     zero: "Елементи не знайдено"
   count_items_selected_91814713: 
@@ -15045,6 +15041,11 @@ uk:
         three_chars: "Введіть принаймні 3 літери у вікні пошуку."
         your_search: "За Вашим запитом %{search_term} файлів не знайдено."
     files: Файли
+    files_legacy_delete: 
+      few: "%{count} елементів видалено успішно."
+      many: "%{count} елементів видалено успішно."
+      one: "%{name} видалено успішно."
+      other: "%{count} елементів видалено успішно."
     folder_browsing_tree: "Дерево перегляду папок"
     folder_name: "Ім'я папки"
     modified_by: Модифікував
