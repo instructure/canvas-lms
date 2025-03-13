@@ -19,18 +19,13 @@
 import {gql} from '@apollo/client'
 
 export const COURSE_PEOPLE_QUERY = gql`
-  query getCoursePeopleQuery($courseId: ID!, $searchTerm: String) {
+  query getCoursePeopleQuery($courseId: ID!, $searchTerm: String, $enrollmentRoleIds: [ID!]) {
     course(id: $courseId) {
       usersConnection(
         filter: {
-          enrollmentTypes: [
-            StudentEnrollment
-            TeacherEnrollment
-            TaEnrollment
-            DesignerEnrollment
-            ObserverEnrollment
-          ],
           searchTerm: $searchTerm
+          enrollmentRoleIds: $enrollmentRoleIds
+          excludeTestStudents: true
         }
       ) {
         nodes {
@@ -40,7 +35,10 @@ export const COURSE_PEOPLE_QUERY = gql`
           avatarUrl
           pronouns
           loginId
-          enrollments(courseId: $courseId, excludeConcluded: true) {
+          enrollments(
+            courseId: $courseId,
+            excludeConcluded: true
+          ) {
             _id
             type
             state

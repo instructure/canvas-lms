@@ -81,7 +81,7 @@ const PeopleSearchBar: FC<PeopleSearchBarType> = ({
     {!isLoading && (
       <Alert
         liveRegion={getLiveRegion}
-        liveRegionPoliteness="assertive"
+        liveRegionPoliteness="polite"
         screenReaderOnly
       >
         {I18n.t(

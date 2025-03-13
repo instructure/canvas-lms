@@ -19,7 +19,17 @@
 import {
   ACTIVE_ENROLLMENT,
   INACTIVE_ENROLLMENT,
-  PENDING_ENROLLMENT
+  PENDING_ENROLLMENT,
+  TEACHER_ENROLLMENT,
+  STUDENT_ENROLLMENT,
+  TA_ENROLLMENT,
+  OBSERVER_ENROLLMENT,
+  DESIGNER_ENROLLMENT,
+  TEACHER_ROLE,
+  STUDENT_ROLE,
+  TA_ROLE,
+  OBSERVER_ROLE,
+  DESIGNER_ROLE
 } from './react/util/constants'
 
 interface EnvPermissions {
@@ -51,13 +61,28 @@ interface EnvCourse {
   concluded: boolean
 }
 
+export type EnrollmentType = typeof TEACHER_ENROLLMENT | typeof STUDENT_ENROLLMENT | typeof TA_ENROLLMENT | typeof OBSERVER_ENROLLMENT | typeof DESIGNER_ENROLLMENT
+
+export interface EnvRole {
+  addable_by_user: boolean
+  base_role_name: EnrollmentType
+  count: number
+  deleteable_by_user: boolean
+  id: string
+  label: string
+  name: EnrollmentType | string
+  plural_label: string
+}
+
 export interface CoursePeopleEnv {
   current_user_id: string
+  ALL_ROLES: EnvRole[]
   permissions: EnvPermissions
   course: EnvCourse
 }
 
 export interface CoursePeopleContextType {
+  allRoles: EnvRole[]
   activeGranularEnrollmentPermissions: string[]
   allowAssignToDifferentiationTags: boolean
   canAllowCourseAdminActions: boolean
@@ -122,3 +147,5 @@ export type User = {
   enrollments: Enrollment[]
   customLinks: CustomLink[] | null
 }
+
+export type SisRole = typeof TEACHER_ROLE | typeof STUDENT_ROLE | typeof TA_ROLE | typeof OBSERVER_ROLE | typeof DESIGNER_ROLE
