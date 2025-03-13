@@ -7767,9 +7767,7 @@ nn:
     other: "%{count} timar sidan"
   count_images_found_for_term_a93635ed: "%{count} bilder funnet for %{term}"
   count_issues_baf25342: "%{count} feil"
-  count_items_deleted_successfully_a287aa53: 
-    one: "%{name} er sletta."
-    other: "%{count} element er sletta."
+  count_items_deleted_successfully_a287aa53: "%{count} element er sletta."
   count_items_found_224f86d3: 
     one: "Eit element funne"
     other: "%{count} element funne"
@@ -22225,6 +22223,9 @@ nn:
         three_chars: "Oppgi minst 3 bokstavar i søkeboksen."
         your_search: "Søket ditt – \"%{search_term}\" – matcha ingen filer."
     files: Filer
+    files_legacy_delete: 
+      one: "%{name} er sletta."
+      other: "%{count} element er sletta."
     folder_browsing_tree: "Bla gjennom mappetre"
     folder_name: Mappenamn
     modified_by: "Endra av"
