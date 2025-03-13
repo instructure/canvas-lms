@@ -180,5 +180,6 @@ module Login::Shared
     tags[:auth_provider_id] = authentication_provider.global_id if authentication_provider
     tags[:reason] = reason if reason
     InstStatsd::Statsd.distributed_increment("auth.#{action}.#{counter}", tags:)
+    InstStatsd::Statsd.distributed_increment("auth.#{action}.#{counter}.v2", tags:)
   end
 end
