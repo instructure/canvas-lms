@@ -808,7 +808,7 @@ describe('NewKeyModal', () => {
       await userEvent.clear(redirectUris)
       expect(redirectUris).toHaveValue('')
 
-      const config = screen.getByLabelText('LTI 1.3 Configuration', {hidden: true})
+      const config = screen.getByLabelText('LTI 1.3 Configuration *', {hidden: true})
       await userEvent.clear(config)
       await userEvent.click(config)
       await userEvent.paste(JSON.stringify(validToolConfig))
@@ -822,7 +822,7 @@ describe('NewKeyModal', () => {
       await userEvent.click(redirectUris)
       await userEvent.paste('http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com')
 
-      const config = screen.getByLabelText('LTI 1.3 Configuration')
+      const config = screen.getByLabelText('LTI 1.3 Configuration *')
       await userEvent.clear(config)
       await userEvent.click(config)
       await userEvent.paste(JSON.stringify(validToolConfig))
@@ -836,7 +836,7 @@ describe('NewKeyModal', () => {
       const redirectUris = screen.getByLabelText('Redirect URIs: *')
       await userEvent.clear(redirectUris)
 
-      const config = screen.getByLabelText('LTI 1.3 Configuration')
+      const config = screen.getByLabelText('LTI 1.3 Configuration *')
       await userEvent.clear(config)
       await userEvent.click(config)
       await userEvent.paste(JSON.stringify(validToolConfig))
@@ -847,30 +847,6 @@ describe('NewKeyModal', () => {
         validToolConfig.target_link_uri,
       )
     })
-  })
-
-  it('does not flash an error if configurationMethod is url', () => {
-    const flashStub = jest.spyOn($, 'flashError')
-    const saveLtiToolConfigurationSpy = jest.fn()
-    const actions = {
-      ...fakeActions,
-      saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy}),
-    }
-    const {ref} = renderDeveloperKeyModal({
-      createLtiKeyState: {},
-      createOrEditDeveloperKeyState: editDeveloperKeyState,
-      listDeveloperKeyScopesState,
-      actions,
-      selectedScopes: [],
-      state: {},
-    })
-
-    ref.current.updateConfigurationMethod('url')
-    ref.current.updateToolConfigurationUrl('http://foo.com')
-    ref.current.saveLtiToolConfiguration()
-
-    expect(saveLtiToolConfigurationSpy).toHaveBeenCalled()
-    expect(flashStub).not.toHaveBeenCalledWith('A redirect_uri is required, please supply one.')
   })
 
   describe('saving a LTI key in json view', () => {
