@@ -105,7 +105,7 @@ const Attachment = ({
     setFile(null)
   }
 
-  const handleAcceptFile = (file) => {
+  const handleAcceptFile = ([file], e) => {
     if (file.size === 0) {
       const errorText = formatErrorMessage(I18n.t('Attached files must be greater than 0 bytes.'))
       setErrorMessages([{ text: errorText, type: 'error' }])
@@ -114,6 +114,11 @@ const Attachment = ({
     } else {
       // We want the input element from the FileDrop component to persist
       const fileDropInput = getFileDropInput()
+      // With drag and drop, the value of the input is not updated. We need to
+      // use the datatransfer from the event to set the value of the input to the dropped file
+      if (!fileDropInput.value) {
+        fileDropInput.files = e.dataTransfer?.files
+      }
       if (fileDropInput && fileInputPlaceholderRef.current) {
         fileInputPlaceholderRef.current.appendChild(fileDropInput)
       }
@@ -150,7 +155,7 @@ const Attachment = ({
                 accept={validFileTypes.length > 0 ? validFileTypes : undefined}
                 onClick={clearErrors}
                 onDrop={clearErrors}
-                onDropAccepted={([file]) => handleAcceptFile(file)}
+                onDropAccepted={handleAcceptFile}
                 onDropRejected={([file]) => handleRejectedFile(file)}
                 messages={errorMessages}
                 renderLabel={
