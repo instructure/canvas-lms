@@ -4407,9 +4407,7 @@ el:
   count_hours_ago_322dcc79: 
     one: "1 ώρα πριν"
     other: "%{count} ώρες πριν"
-  count_items_deleted_successfully_a287aa53: 
-    one: "%{name} διαγράφηκε επιτυχώς."
-    other: "%{count} στοιχεία διαγράφηκαν επιτυχώς."
+  count_items_deleted_successfully_a287aa53: "%{count} στοιχεία διαγράφηκαν επιτυχώς."
   count_items_found_224f86d3: 
     zero: "Δεν βρέθηκαν στοιχεία"
   count_items_selected_91814713: 
