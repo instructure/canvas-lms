@@ -261,15 +261,11 @@ module Types
         filter_mode = :and
         filter = filter.presence || []
         filters = filter.select(&:presence)
-        is_student = object.roles(context[:domain_root_account]).all? { |role| ["student", "user"].include?(role) }
         conversations_scope = conversations_scope.tagged(*filters, mode: filter_mode) if filters.present?
-        if is_student
-          conversations_scope = conversations_scope.reject do |cs|
-            c = cs.conversation
-            c&.context.is_a?(Course) && c.context.horizon_course?
-          end
+        conversations_scope.preload(conversation: :context).reject do |cs|
+          c = cs.conversation
+          c&.context.is_a?(Course) && c.context.horizon_course? && !c.context.grants_right?(context[:current_user], :read_as_admin)
         end
-        conversations_scope
       end
     end
 

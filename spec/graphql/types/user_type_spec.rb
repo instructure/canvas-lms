@@ -339,22 +339,21 @@ describe Types::UserType do
       expect(user_type.resolve("enrollments { _id }", current_user: @student)).to eq [@student.enrollments.where(course_id: @course2).first.to_param]
     end
 
-    it "return only horizon courses if included" do
-      course3 = course_factory
-      course3.update!(horizon_course: true)
+    context "Horizon courses" do
+      before :once do
+        @course3 = course_factory
+        @course3.update!(horizon_course: true)
+      end
 
-      course3.enroll_student(@student, enrollment_state: "active")
+      it "return only horizon courses if included" do
+        @course3.enroll_student(@student, enrollment_state: "active")
+        expect(user_type.resolve("enrollments(horizonCourses: true) { _id }", current_user: @student).length).to eq 1
+      end
 
-      expect(user_type.resolve("enrollments(horizonCourses: true) { _id }", current_user: @student).length).to eq 1
-    end
-
-    it "returns only non-horizon courses if false" do
-      course3 = course_factory
-      course3.update!(horizon_course: true)
-
-      course3.enroll_student(@student, enrollment_state: "active")
-
-      expect(user_type.resolve("enrollments(horizonCourses: false) { _id }", current_user: @student).length).to eq @student.enrollments.length - 1
+      it "returns only non-horizon courses if false" do
+        @course3.enroll_student(@student, enrollment_state: "active")
+        expect(user_type.resolve("enrollments(horizonCourses: false) { _id }", current_user: @student).length).to eq @student.enrollments.length - 1
+      end
     end
   end
 
