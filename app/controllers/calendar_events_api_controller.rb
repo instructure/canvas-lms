@@ -425,11 +425,6 @@ class CalendarEventsApiController < ApplicationController
     assignment = @type == :assignment
     sub_assignment = @type == :sub_assignment
 
-    if sub_assignment && !discussion_checkpoints_enabled?
-      render json: []
-      return
-    end
-
     GuardRail.activate(:secondary) do
       if @domain_root_account.feature_enabled?(:calendar_events_api_pagination_enhancements)
         submissions = nil
@@ -1215,7 +1210,7 @@ class CalendarEventsApiController < ApplicationController
         @events.concat assignment_scope(@current_user).paginate(per_page: 1000, max: 1000)
         @events = apply_assignment_overrides(@events, @current_user)
 
-        if discussion_checkpoints_enabled?
+        if courses_with_checkpoints_enabled(@selected_contexts).present?
           sub_assignments = assignment_scope(@current_user, sub_assignment: true).paginate(per_page: 1000, max: 1000)
 
           if sub_assignments.present?
@@ -1270,7 +1265,7 @@ class CalendarEventsApiController < ApplicationController
         @contexts.each do |context|
           @assignments = context.assignments.active.to_a if context.respond_to?(:assignments)
 
-          if discussion_checkpoints_enabled? && @assignments.present?
+          if context.is_a?(Course) && context.discussion_checkpoints_enabled? && @assignments.present?
             # replace parent assignments with their sub_assignments
             parent_assignment_ids = @assignments.extract!(&:has_sub_assignments?).map(&:id)
 
@@ -1686,8 +1681,8 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
-  def discussion_checkpoints_enabled?
-    @domain_root_account.feature_enabled?(:discussion_checkpoints)
+  def courses_with_checkpoints_enabled(contexts)
+    contexts.select { |context| context.is_a?(Course) && context.discussion_checkpoints_enabled? }
   end
 
   def assignment_or_sub_assignment(sub_assignment: false)
@@ -1710,9 +1705,12 @@ class CalendarEventsApiController < ApplicationController
 
       next unless scope
 
-      # exclude parent assignment when the discussion checkpoints FF is enabled
+      # exclude parent assignments for courses where the discussion checkpoints FF is enabled
       # because due dates and other relevant info is stored in the sub_assignments/checkpoints
-      scope = scope.where(has_sub_assignments: false) if discussion_checkpoints_enabled?
+      courses_with_active_checkpoints = courses_with_checkpoints_enabled(@selected_contexts)
+      if courses_with_active_checkpoints.present?
+        scope = scope.where(context: courses_with_active_checkpoints, has_sub_assignments: false).union(scope.where.not(context: courses_with_active_checkpoints))
+      end
 
       scope = scope.order(:due_at, :id)
       scope = scope.active
@@ -1728,7 +1726,7 @@ class CalendarEventsApiController < ApplicationController
       collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, scope)]
     end
 
-    return SubAssignment.none if sub_assignment && discussion_checkpoints_enabled? && collections.empty?
+    return SubAssignment.none if sub_assignment && collections.empty?
     return Assignment.none if collections.empty?
     return last_scope if collections.length == 1
 
@@ -1736,10 +1734,14 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def assignment_context_scope(user, sub_assignment: false)
-    return nil if sub_assignment && !discussion_checkpoints_enabled?
-
     contexts = @selected_contexts.select { |c| c.is_a?(Course) && c.shard == Shard.current }
     return nil if contexts.empty?
+
+    if sub_assignment
+      # limit contexts to only courses where the discussion checkpoints FF is enabled
+      contexts = courses_with_checkpoints_enabled(contexts)
+      return nil if contexts.empty?
+    end
 
     # contexts have to be partitioned into two groups so they can be queried effectively
     view_unpublished, other = contexts.partition { |c| c.grants_right?(user, session, :view_unpublished_items) }
@@ -2141,7 +2143,7 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
-  def assignment_or_subassignment_events_and_submissions_for_user(user, route_url, sub_assignment: nil)
+  def assignment_or_subassignment_events_and_submissions_for_user(user, route_url, sub_assignment: false)
     # Same max limit as public feed
     scope = assignment_scope(
       user,

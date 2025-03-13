@@ -29,7 +29,7 @@
     :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size,
     :VISIBLE_CONTEXTS_LIMIT => @domain_root_account.settings[:calendar_contexts_limit] || 10,
     :ACCOUNT_CALENDAR_EVENTS_SEEN => @account_calendar_events_seen,
-    :SHOW_CHECKPOINTS => @domain_root_account.feature_enabled?(:discussion_checkpoints)
+    :SHOW_CHECKPOINTS => @domain_root_account.discussion_checkpoints_enabled? || @domain_root_account.sub_accounts.any?(&:discussion_checkpoints_enabled?)
   }
   js_env({
     :STUDENT_PLANNER_ENABLED => @current_user.has_student_enrollment?,
