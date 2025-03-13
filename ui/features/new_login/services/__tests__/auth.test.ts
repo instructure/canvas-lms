@@ -38,7 +38,7 @@ describe('Auth Service', () => {
         response: {status: 200},
       }
       ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
-      const result = await performSignIn('testUser', 'testPassword', true)
+      const result = await performSignIn('testUser', 'testPassword', true, '/login/canvas')
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/login/canvas',
         method: 'POST',
@@ -63,7 +63,7 @@ describe('Auth Service', () => {
     it('should return empty data when response has no json', async () => {
       const mockResponse = {json: null, response: {status: 200}}
       ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
-      const result = await performSignIn('testUser', 'testPassword', true)
+      const result = await performSignIn('testUser', 'testPassword', true, '/login/canvas')
       expect(result).toEqual({status: 200, data: {}})
     })
   })
