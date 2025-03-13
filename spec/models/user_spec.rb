@@ -2162,6 +2162,27 @@ describe User do
       expect(@user1.menu_courses).to eq [@course]
     end
 
+    context "with Horizon courses" do
+      before :once do
+        @course = course_factory(active_all: true)
+        @course.account.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: true)
+      end
+
+      it "shows Horizon courses for non-students" do
+        teacher = user_factory(active_all: true)
+        account_admin_user(account: @course.root_account, user: teacher)
+        @course.enroll_teacher(teacher)
+        expect(teacher.menu_courses).to eq [@course]
+      end
+
+      it "hides Horizon courses for students" do
+        student = user_factory(active_all: true)
+        @course.enroll_student(student)
+        expect(student.menu_courses).to eq []
+      end
+    end
+
     context "with favoriting" do
       before :once do
         k5_account = Account.create!(name: "Elementary")

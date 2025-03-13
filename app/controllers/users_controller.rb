@@ -605,13 +605,10 @@ class UsersController < ApplicationController
       return render_unauthorized_action unless course_ids.any?
     end
     courses = course_ids.present? ? api_find_all(Course, course_ids) : nil
-
     @stream_items = @user.cached_recent_stream_items(contexts: courses)
-    is_student = @user.roles(@domain_root_account).all? { |role| ["student", "user"].include?(role) }
+
     if stale?(etag: @stream_items)
-      if is_student
-        @stream_items = @stream_items.reject { |i| i&.course&.horizon_course? }
-      end
+      @stream_items = @stream_items.reject { |i| i&.course&.horizon_course? && !i.course.grants_right?(@user, :read_as_admin) }
       render partial: "shared/recent_activity", layout: false
     end
   end
