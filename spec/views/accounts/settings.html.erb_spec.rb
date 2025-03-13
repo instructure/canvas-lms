@@ -254,28 +254,28 @@ describe "accounts/settings" do
         account.enable_feature!(:differentiation_tags)
         account.enable_feature!(:assign_to_differentiation_tags)
         render
-        expect(response).to have_tag "#differentiation_tags"
+        expect(response.body).to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
       end
 
       it "hides differentiation tags section when differentiation tags and assign to different tags FF are disabled" do
         account.disable_feature!(:differentiation_tags)
         account.disable_feature!(:assign_to_differentiation_tags)
         render
-        expect(response).not_to have_tag "#differentiation_tags"
+        expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
       end
 
       it "hides differentiation tags section when differentiation tags FF is disabled" do
         account.disable_feature!(:differentiation_tags)
         account.enable_feature!(:assign_to_differentiation_tags)
         render
-        expect(response).not_to have_tag "#differentiation_tags"
+        expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
       end
 
       it "hides differentiation tags section when assign to differentiation tags FF is disabled" do
         account.enable_feature!(:differentiation_tags)
         account.disable_feature!(:assign_to_differentiation_tags)
         render
-        expect(response).not_to have_tag "#differentiation_tags"
+        expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
       end
     end
 
@@ -296,28 +296,41 @@ describe "accounts/settings" do
         sub_account.enable_feature!(:differentiation_tags)
         sub_account.enable_feature!(:assign_to_differentiation_tags)
         render
-        expect(response).to have_tag "#differentiation_tags"
+        expect(response.body).to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
+        expect(response.body).to include("Lock this setting for sub-accounts and courses")
+      end
+
+      it "shows differentiation tags as locked when inherited in a lock" do
+        sub_account.enable_feature!(:differentiation_tags)
+        sub_account.enable_feature!(:assign_to_differentiation_tags)
+        allow(sub_account).to receive(:allow_assign_to_differentiation_tags).and_return({
+                                                                                          value: true,
+                                                                                          locked: true,
+                                                                                          inherited: true
+                                                                                        })
+        render
+        expect(response.body).to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]'][disabled]")
       end
 
       it "hides differentiation tags section when differentiation tags and assign to different tags FF are disabled" do
         sub_account.disable_feature!(:differentiation_tags)
         sub_account.disable_feature!(:assign_to_differentiation_tags)
         render
-        expect(response).not_to have_tag "#differentiation_tags"
+        expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
       end
 
       it "hides differentiation tags section when differentiation tags FF is disabled" do
         sub_account.disable_feature!(:differentiation_tags)
         sub_account.enable_feature!(:assign_to_differentiation_tags)
         render
-        expect(response).not_to have_tag "#differentiation_tags"
+        expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
       end
 
       it "hides differentiation tags section when assign to differentiation tags FF is disabled" do
         sub_account.enable_feature!(:differentiation_tags)
         sub_account.disable_feature!(:assign_to_differentiation_tags)
         render
-        expect(response).not_to have_tag "#differentiation_tags"
+        expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
       end
     end
 
@@ -336,14 +349,16 @@ describe "accounts/settings" do
 
       it "hides differentiation tags section by default" do
         render
-        expect(response).not_to have_tag "#differentiation_tags"
+        expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
+        expect(response.body).not_to include("Lock this setting for sub-accounts and courses")
       end
 
       it "hides differentiation tags section when differentiation tags and assign to different tags are enabled" do
         site_admin_account.enable_feature!(:differentiation_tags)
         site_admin_account.enable_feature!(:assign_to_differentiation_tags)
         render
-        expect(response).not_to have_tag "#differentiation_tags"
+        expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
+        expect(response.body).not_to include("Lock this setting for sub-accounts and courses")
       end
     end
   end

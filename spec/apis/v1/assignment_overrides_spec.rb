@@ -540,7 +540,7 @@ describe AssignmentOverridesController, type: :request do
         before do
           @course.account.enable_feature!(:differentiation_tags)
           @course.account.enable_feature!(:assign_to_differentiation_tags)
-          @course.account.settings[:allow_assign_to_differentiation_tags] = true
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           @course.account.save!
           @course.account.reload
 
@@ -569,7 +569,7 @@ describe AssignmentOverridesController, type: :request do
         end
 
         it "errors if differentiation tags are not enabled" do
-          @course.account.settings[:allow_assign_to_differentiation_tags] = false
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
           @course.account.save!
 
           raw_api_create_override(@course, @assignment, assignment_override: { group_id: @differentiation_tag_group_1.id })

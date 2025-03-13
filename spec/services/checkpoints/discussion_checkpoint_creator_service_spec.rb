@@ -280,7 +280,7 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
           account.enable_feature!(:assign_to_differentiation_tags)
           account.enable_feature!(:differentiation_tags)
           account.tap do |a|
-            a.settings[:allow_assign_to_differentiation_tags] = true
+            a.settings[:allow_assign_to_differentiation_tags] = { value: true }
             a.save!
           end
 

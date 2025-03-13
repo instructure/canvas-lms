@@ -200,7 +200,7 @@ module Api::V1::AssignmentOverride
         # and the feature flag is enabled, the learning object can be assigned to the group.
         # For collaborative groups, if the group category id is the same as the learning_object's group category id
         # the learning object can be assigned to the group.
-        if (group.non_collaborative? && learning_object.context.account.settings[:allow_assign_to_differentiation_tags]) ||
+        if (group.non_collaborative? && learning_object.context.account.allow_assign_to_differentiation_tags?) ||
            (!group.non_collaborative? && group_category_id == group.group_category_id)
           set_type = "Group"
           override_data[:group] = group

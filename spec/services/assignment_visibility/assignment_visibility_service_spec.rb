@@ -270,7 +270,7 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             before do
               @course.account.enable_feature!(:differentiation_tags)
               @course.account.enable_feature!(:assign_to_differentiation_tags)
-              @course.account.settings = { allow_assign_to_differentiation_tags: true }
+              @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
               @course.account.save
 
               @group_category = @course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)

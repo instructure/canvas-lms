@@ -61,7 +61,7 @@ describe WikiPagesController do
         @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.enable_feature! :differentiation_tags
         @course.account.tap do |a|
-          a.settings[:allow_assign_to_differentiation_tags] = true
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
       end
@@ -229,7 +229,7 @@ describe WikiPagesController do
           @course.account.enable_feature! :assign_to_differentiation_tags
           @course.account.enable_feature! :differentiation_tags
           @course.account.tap do |a|
-            a.settings[:allow_assign_to_differentiation_tags] = true
+            a.settings[:allow_assign_to_differentiation_tags] = { value: true }
             a.save!
           end
         end
