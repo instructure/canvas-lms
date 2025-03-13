@@ -437,6 +437,16 @@ class Enrollment < ActiveRecord::Base
       membership = group.group_memberships.where(user_id:).first
       membership&.destroy
     end
+
+    user.differentiation_tags.preload(:group_category).where(
+      context_type: "Course", context_id: section.course_id
+    ).find_each do |tag|
+      # Only remove differentiation tag memberships if the enrollment is being deleted/rejected
+      next unless is_deleted
+
+      membership = tag.group_memberships.where(user_id:).first
+      membership&.destroy
+    end
   end
   protected :audit_groups_for_deleted_enrollments
 

@@ -33,6 +33,7 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import RosterDialogMixin from './RosterDialogMixin'
 import UserTaggedModal from '@canvas/differentiation-tags/react/UserTaggedModal/UserTaggedModal'
 import MessageBus from '@canvas/util/MessageBus'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('RosterUserView')
 
@@ -308,6 +309,16 @@ export default class RosterUserView extends View {
       // TODO: change the count on the search roles drop down
       $.flashMessage(I18n.t('User successfully removed.'))
       const $previousRow = this.$el.prev(':visible')
+
+      try {
+        queryClient.invalidateQueries({
+          queryKey: ['differentiationTagCategories'],
+          exact: false,
+        })
+      } catch (error) {
+        console.error('Error invalidating query, error:', error)
+      }
+
       const $focusElement = $previousRow.length
         ? $previousRow.find('.al-trigger')
         : // For some reason, VO + Safari sends the virtual cursor to the window
