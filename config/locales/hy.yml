@@ -4657,9 +4657,7 @@ hy:
   count_hours_ago_322dcc79: 
     one: "1 ժամ առաջ"
     other: "%{count} ժամ առաջ"
-  count_items_deleted_successfully_a287aa53: 
-    one: "%{name} հաջողությամբ ջնջվել է:"
-    other: "%{count} տարր հաջողությամբ ջնջվել է:"
+  count_items_deleted_successfully_a287aa53: "%{count} տարր հաջողությամբ ջնջվել է:"
   count_items_found_224f86d3: 
     zero: "Ոչինչ չի գտնվել"
   count_items_selected_91814713: 
@@ -14452,6 +14450,9 @@ hy:
     file_list: "Ֆայլերի ցանկ"
     files: Ֆայլեր
     files_heading: Ֆայլեր
+    files_legacy_delete: 
+      one: "%{name} հաջողությամբ ջնջվել է:"
+      other: "%{count} տարր հաջողությամբ ջնջվել է:"
     files_toolbar: "Ֆայլերի գործիքների վահանակ"
     folder: Թղթապանակ
     folder_browsing_tree: "Թղթապանակի դիտման ծառ"
