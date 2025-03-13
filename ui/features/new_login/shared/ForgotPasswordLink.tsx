@@ -20,21 +20,18 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Link} from '@instructure/ui-link'
 import type {ViewOwnProps} from '@instructure/ui-view'
 import React from 'react'
-import {useMatch, useNavigate} from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 import {useNewLogin, useNewLoginData} from '../context'
 import {ROUTES} from '../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
-const SignInLinks = () => {
+const ForgotPasswordLink = () => {
   const navigate = useNavigate()
   const {isUiActionPending} = useNewLogin()
   const {isPreviewMode, forgotPasswordUrl} = useNewLoginData()
-  const isSignIn = useMatch(ROUTES.SIGN_IN)
-  const isForgotPassword = useMatch(ROUTES.FORGOT_PASSWORD)
 
   const isDisabled = isPreviewMode || isUiActionPending
 
@@ -58,33 +55,25 @@ const SignInLinks = () => {
 
   return (
     <Flex direction="column" gap="small">
-      {isSignIn && (
-        <Flex.Item overflowX="visible" overflowY="visible">
-          {forgotPasswordUrl ? (
-            <CondensedButton
-              href={forgotPasswordUrl}
-              onClick={handleForgotPasswordUrl(forgotPasswordUrl)}
-            >
-              {I18n.t('Forgot password?')}
-            </CondensedButton>
-          ) : (
-            <CondensedButton
-              href={ROUTES.FORGOT_PASSWORD}
-              onClick={handleNavigate(ROUTES.FORGOT_PASSWORD)}
-            >
-              {I18n.t('Forgot password?')}
-            </CondensedButton>
-          )}
-        </Flex.Item>
-      )}
-
-      {isForgotPassword && (
-        <Flex.Item overflowX="visible" overflowY="visible">
-          <Link onClick={handleNavigate(ROUTES.SIGN_IN)}>{I18n.t('Log in')}</Link>
-        </Flex.Item>
-      )}
+      <Flex.Item overflowX="visible" overflowY="visible">
+        {forgotPasswordUrl ? (
+          <CondensedButton
+            href={forgotPasswordUrl}
+            onClick={handleForgotPasswordUrl(forgotPasswordUrl)}
+          >
+            {I18n.t('Forgot password?')}
+          </CondensedButton>
+        ) : (
+          <CondensedButton
+            href={ROUTES.FORGOT_PASSWORD}
+            onClick={handleNavigate(ROUTES.FORGOT_PASSWORD)}
+          >
+            {I18n.t('Forgot password?')}
+          </CondensedButton>
+        )}
+      </Flex.Item>
     </Flex>
   )
 }
 
-export default SignInLinks
+export default ForgotPasswordLink
