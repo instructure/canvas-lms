@@ -2996,6 +2996,20 @@ describe "Submissions API", type: :request do
                { student_ids: [@student1.to_param, @student2.to_param], grouped: "1" })
       expect(response).to be_ok
     end
+
+    it "returns an error when an invalid grading_period_id is provided" do
+      api_call(:get,
+               "/api/v1/courses/#{@course.id}/students/submissions.json",
+               { controller: "submissions_api",
+                 action: "for_students",
+                 format: "json",
+                 course_id: @course.to_param },
+               { student_ids: [@student1.to_param, @student2.to_param],
+                 grouped: "1",
+                 grading_period_id: [@gp2.to_param] })
+      expect(response).to have_http_status :bad_request
+      expect(json_parse.fetch("error")).to eq "grading_period_id is invalid, verify the parameter and type are correct"
+    end
   end
 
   context "with late policies" do
