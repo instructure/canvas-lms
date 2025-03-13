@@ -465,4 +465,70 @@ describe "course pace page" do
       end
     end
   end
+
+  context "course with multiple modules" do
+    before :once do
+      # module 1
+      create_published_course_pace("Pace Module 1", "Assignment 1")
+      @assignment_1 = @course_pace_assignment
+      @assignment_2 = create_assignment(@course, "Assignment 2", "Assignment 2", 10, "published")
+      @course_pace_module.add_item(id: @assignment_2.id, type: "assignment")
+      # module 2
+      @course_module_2 = create_course_pace_module_with_assignment("Pace Module 2", "Assignment 3")
+      @assignment_3 = @course_pace_assignment
+      @assignment_4 = create_assignment(@course, "Assignment 4", "Assignment 4", 10, "published")
+      @course_module_2.add_item(id: @assignment_4.id, type: "assignment")
+      @course.course_sections.create!(name: "New Section")
+      @course_pace.course_pace_module_items.each { |item| item.update! duration: 2 }
+      @course_pace.update!(exclude_weekends: false, selected_days_to_skip: [])
+
+      run_jobs # Run the autopublish job
+    end
+
+    it "shows the right order and due date when assignment are re organized in context module" do
+      visit_course_paces_page
+      click_create_default_pace_button
+
+      # Original order 1,2,3,4
+      expect(module_item_title_text(0)).to start_with("Assignment 1")
+      expect(assignment_due_dates[0].text).to eq(format_course_pacing_date(@course_pace.start_date + 2.days))
+
+      expect(module_item_title_text(1)).to start_with("Assignment 2")
+      expect(assignment_due_dates[1].text).to eq(format_course_pacing_date(@course_pace.start_date + 4.days))
+
+      expect(module_item_title_text(2)).to start_with("Assignment 3")
+      expect(assignment_due_dates[2].text).to eq(format_course_pacing_date(@course_pace.start_date + 6.days))
+
+      expect(module_item_title_text(3)).to start_with("Assignment 4")
+      expect(assignment_due_dates[3].text).to eq(format_course_pacing_date(@course_pace.start_date + 8.days))
+
+      click_apply_or_create_pace_button
+
+      get "/courses/#{@course.id}/modules"
+      wait_for_ajaximations
+      selector_1 = ".Assignment_#{@assignment_1.id} .move_item_link"
+      selector_2 = ".Assignment_#{@assignment_2.id} .move_item_link"
+      selector_3 = ".Assignment_#{@assignment_3.id} .move_item_link"
+      selector_4 = ".Assignment_#{@assignment_4.id} .move_item_link"
+      js_drag_and_drop(selector_1, selector_2)
+      js_drag_and_drop(selector_3, selector_4)
+      visit_course_paces_page
+      click_context_link("New Section")
+
+      # New order 2,1,4,3
+      # The due dates are orderered: Firs item in the list has the smallest due date
+      # and last item in the list has the largest due date
+      expect(module_item_title_text(0)).to start_with("Assignment 2")
+      expect(assignment_due_dates[0].text).to eq(format_course_pacing_date(@course_pace.start_date + 2.days))
+
+      expect(module_item_title_text(1)).to start_with("Assignment 1")
+      expect(assignment_due_dates[1].text).to eq(format_course_pacing_date(@course_pace.start_date + 4.days))
+
+      expect(module_item_title_text(2)).to start_with("Assignment 4")
+      expect(assignment_due_dates[2].text).to eq(format_course_pacing_date(@course_pace.start_date + 6.days))
+
+      expect(module_item_title_text(3)).to start_with("Assignment 3")
+      expect(assignment_due_dates[3].text).to eq(format_course_pacing_date(@course_pace.start_date + 8.days))
+    end
+  end
 end

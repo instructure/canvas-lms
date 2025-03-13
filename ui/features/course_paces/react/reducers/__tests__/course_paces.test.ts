@@ -17,15 +17,26 @@
  */
 
 import moment from 'moment-timezone'
-import type {CoursePace} from '../../types'
+import type {CoursePace, Module} from '../../types'
 import type {BlackoutDate} from '../../shared/types'
 import {
   getBlackoutDateChanges,
+  getModuleItems,
   getPaceName,
   isNewPace,
   mergeAssignmentsAndBlackoutDates,
 } from '../course_paces'
-import {DEFAULT_STORE_STATE, SECTION_PACE, STUDENT_PACE} from '../../__tests__/fixtures'
+import {
+  DEFAULT_STORE_STATE,
+  PACE_ITEM_1,
+  PACE_ITEM_2,
+  PACE_ITEM_3,
+  PACE_ITEM_4,
+  PACE_MODULE_1,
+  PACE_MODULE_2,
+  SECTION_PACE,
+  STUDENT_PACE
+} from '../../__tests__/fixtures'
 
 const newbod1: BlackoutDate = {
   temp_id: 'tmp1',
@@ -333,6 +344,52 @@ describe('course_paces reducer', () => {
       expect(getPaceName({...DEFAULT_STORE_STATE, coursePace: STUDENT_PACE})).toBe(
         'Henry Dorsett Case',
       )
+    })
+  })
+
+  describe('getModuleItems', () => {
+
+    const modules: Module[] = [
+      {
+        ...PACE_MODULE_1,
+        items : [
+          {
+            ...PACE_ITEM_1,
+            id: '3',
+            position: 3,
+          },
+          {
+            ...PACE_ITEM_2,
+            id: '1',
+            position: 1,
+          },
+          {
+            ...PACE_ITEM_3,
+            id: '2',
+            position: 2,
+          }
+        ]
+      },
+      {
+        ...PACE_MODULE_2,
+        items : [
+          {
+            ...PACE_ITEM_4,
+            id: '5',
+            position: 2,
+          },
+          {
+            ...PACE_ITEM_1,
+            id: '4',
+            position: 1,
+          }
+        ]
+      },
+    ]
+
+    it('return module items ordered by position',() => {
+      const result = getModuleItems(modules)
+      expect(result.map(item => item.id)).toEqual(['1', '2', '3', '4', '5'])
     })
   })
 })
