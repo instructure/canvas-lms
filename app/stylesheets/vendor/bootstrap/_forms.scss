@@ -18,7 +18,7 @@ fieldset {
 }
 
 // Groups of fields with labels on top (legends)
-legend {
+legend:not(.control-legend) {
   display: block;
   width: 100%;
   padding: 0;
@@ -41,7 +41,8 @@ label,
 input,
 button,
 select,
-textarea {
+textarea,
+.control-legend {
   @include font-shorthand($baseFontSize, normal, $baseLineHeight); // Set size, weight, line-height here
 }
 input,
