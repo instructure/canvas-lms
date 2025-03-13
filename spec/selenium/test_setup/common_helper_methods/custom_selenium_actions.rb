@@ -701,6 +701,11 @@ module CustomSeleniumActions
     driver.action.move_to(el).click.perform
   end
 
+  def scroll_to_click_element(element)
+    scroll_into_view(element)
+    element.click
+  end
+
   def move_to_click_element(element)
     driver.action.move_to(element).click.perform
   end

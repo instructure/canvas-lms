@@ -175,17 +175,13 @@ describe "help dialog" do
 
     it "has the default link at the top of the tray" do
       get "/accounts/#{Account.default.id}/settings"
-      button = f(".HelpMenuOptions__Container button")
-      scroll_into_view(button)
-      button.click
+      scroll_to_click_element(f(".HelpMenuOptions__Container button"))
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
       replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "FEATURED LINK"
       replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "FEATURED subtext"
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://featuredurl.example.com"
-      fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
-      button = f('#custom_help_link_settings button[type="submit"]')
-      scroll_into_view(button)
-      button.click
+      scroll_to_click_element(fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible'))
+      scroll_to_click_element(f('#custom_help_link_settings button[type="submit"]'))
       form = f("#account_settings")
       expect_new_page_load { form.submit }
       f("#global_nav_help_link").click
@@ -195,17 +191,13 @@ describe "help dialog" do
 
     it "has a New Link in the tray" do
       get "/accounts/#{Account.default.id}/settings"
-      button = f(".HelpMenuOptions__Container button")
-      scroll_into_view(button)
-      button.click
-      fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
+      scroll_to_click_element(f(".HelpMenuOptions__Container button"))
+      scroll_to_click_element(fj('[role="menuitemradio"] span:contains("Add Custom Link")'))
       replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "NEW LINK"
       replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "NEW subtext"
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://newurl.example.com"
-      fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
-      button = f('#custom_help_link_settings button[type="submit"]')
-      scroll_into_view(button)
-      button.click
+      scroll_to_click_element(fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible'))
+      scroll_to_click_element(f('#custom_help_link_settings button[type="submit"]'))
       form = f("#account_settings")
       expect_new_page_load { form.submit }
       f("#global_nav_help_link").click
