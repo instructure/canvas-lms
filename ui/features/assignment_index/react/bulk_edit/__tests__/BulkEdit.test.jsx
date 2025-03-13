@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act} from '@testing-library/react'
+import {render, fireEvent, act, screen} from '@testing-library/react'
 import tz from 'timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import tokyo from 'timezone/Asia/Tokyo'
@@ -25,6 +25,7 @@ import anchorage from 'timezone/America/Anchorage'
 import moment from 'moment-timezone'
 import BulkEdit from '../BulkEdit'
 import {enableFetchMocks} from 'jest-fetch-mock'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 
 enableFetchMocks()
 
@@ -134,6 +135,7 @@ beforeEach(() => {
 })
 
 describe('Assignment Bulk Edit Dates', () => {
+  const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null })
   let oldEnv
   beforeEach(() => {
     oldEnv = window.ENV
@@ -223,11 +225,6 @@ describe('Assignment Bulk Edit Dates', () => {
     expect(queryByText(/Please enter a due date on or after/)).not.toBeInTheDocument()
     changeAndBlurInput(theInput, '2020-01-03')
     expect(queryByText(/Please enter a due date on or after/)).toBeInTheDocument()
-  })
-
-  it('disables save when nothing has been edited', async () => {
-    const {getByText} = await renderBulkEditAndWait()
-    expect(getByText('Save').closest('button').disabled).toBe(true)
   })
 
   it('shows the specified dates', async () => {
@@ -748,6 +745,14 @@ describe('Assignment Bulk Edit Dates', () => {
       await flushPromises()
       expect(getByText(/something bad happened/)).toBeInTheDocument()
     })
+
+    it('displays an error alert if no dates are edited', async () => {
+      await renderBulkEditAndWait()
+      const saveButton = await screen.findByText('Save')
+      await user.click(saveButton)
+      const errorMessage = await screen.findByText('Update at least one date to save changes.')
+      expect(errorMessage).toBeInTheDocument()
+    })
   })
 
   describe('save progress', () => {
@@ -789,7 +794,6 @@ describe('Assignment Bulk Edit Dates', () => {
       act(jest.runOnlyPendingTimers)
       await flushPromises()
       expect(getByText(/saved successfully/)).toBeInTheDocument()
-      expect(getByText('Save').closest('button').disabled).toBe(true)
       expect(getByText('Close')).toBeInTheDocument()
       // complete, expect no more polling
       fetch.resetMocks()
@@ -840,7 +844,6 @@ describe('Assignment Bulk Edit Dates', () => {
       act(jest.runAllTimers)
       await flushPromises()
       expect(getByText(/saved successfully/)).toBeInTheDocument()
-      expect(getByText('Save').closest('button').disabled).toBe(true)
 
       changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-02')
       expect(queryByText(/saved successfully/)).toBe(null)
@@ -1094,10 +1097,12 @@ describe('Assignment Bulk Edit Dates', () => {
       return result
     }
 
-    it('has a disabled "Batch Edit" button when no assignments are selected', async () => {
-      const {getByText, queryByText} = await renderBulkEditAndWait()
-      expect(getByText('Batch Edit').closest('button').disabled).toBe(true)
-      expect(queryByText('Batch Edit Dates')).toBeNull()
+    it('displays an error alert if no assignments are selected', async () => {
+      await renderBulkEditAndWait()
+      const batchEditButton = await screen.findByText('Batch Edit')
+      await user.click(batchEditButton)
+      const errorMessage = await screen.findByText('Use checkboxes to select one or more assignments to batch edit.')
+      expect(errorMessage).toBeInTheDocument()
     })
 
     it('can be canceled with no effects', async () => {
@@ -1106,16 +1111,14 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(getByTestId('cancel-batch-edit'))
       jest.runAllTimers() // required for modal to actually close
       expect(queryByText('Batch Edit Dates')).toBeNull()
-      // check no dates edited by disabled save button
-      expect(getByText('Save').closest('button').disabled).toBe(true)
     })
 
     it('shifts dates for all selected assignments forward N days, including overrides', async () => {
       const {getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
       fireEvent.change(getByLabelText('Days'), {target: {value: '2'}})
-      fireEvent.click(getByText('Ok'))
+      fireEvent.click(getByText('Confirm'))
       jest.runAllTimers() // required for modal to actually close
-      fireEvent.click(getByText('Save'))
+      await user.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
       expect(body).toHaveLength(1) // second assignment was not selected
@@ -1143,22 +1146,32 @@ describe('Assignment Bulk Edit Dates', () => {
     it('ignores blank date fields', async () => {
       const {getByText, getByLabelText} = await renderOpenBatchEditDialog([1])
       fireEvent.change(getByLabelText('Days'), {target: {value: '2'}})
-      fireEvent.click(getByText('Ok'))
+      fireEvent.click(getByText('Confirm'))
       jest.runAllTimers() // required for modal to actually close
       // all dates in the assignment are null, so nothing should change
-      expect(getByText('Save').closest('button').disabled).toBe(true)
+      await user.click(getByText('Save'))
+      expect(getByText('Update at least one date to save changes.')).toBeInTheDocument()
     })
 
-    it('disables "Ok" when N days input is blank', async () => {
-      const {getByText, getByLabelText} = await renderOpenBatchEditDialog([1])
+    it('clears days error when closing and reopening the dialog', async () => {
+      const {queryByText, getByLabelText, getByTestId} = await renderOpenBatchEditDialog([1])
       fireEvent.change(getByLabelText('Days'), {target: {value: ''}})
-      expect(getByText('Ok').closest('button').disabled).toBe(true)
+      await user.click(queryByText('Confirm'))
+      expect(queryByText('Number of days is required')).toBeInTheDocument()
+
+      fireEvent.click(getByTestId('cancel-batch-edit'))
+      jest.runAllTimers() // required for modal to actually close
+
+      //reopening the dialog
+      fireEvent.click(queryByText('Batch Edit'))
+      expect(queryByText('Batch Edit Dates')).toBeInTheDocument()
+      expect(queryByText('Number of days is required')).not.toBeInTheDocument()
     })
 
     it('removes due dates from assignments', async () => {
       const {assignments, getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
       fireEvent.click(getByLabelText('Remove Dates'))
-      fireEvent.click(getByText('Ok'))
+      await user.click(getByText('Confirm'))
       jest.runAllTimers() // required for modal to actually close
       fireEvent.click(getByText('Save'))
       await flushPromises()
@@ -1188,9 +1201,8 @@ describe('Assignment Bulk Edit Dates', () => {
     it('removes availability dates from assignments', async () => {
       const {assignments, getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
       fireEvent.click(getByLabelText('Remove Dates'))
-      fireEvent.click(getByLabelText('Due Dates'))
-      fireEvent.click(getByLabelText('Availability Dates'))
-      fireEvent.click(getByText('Ok'))
+      fireEvent.click(getByLabelText('Remove Availability Dates'))
+      await user.click(getByText('Confirm'))
       jest.runAllTimers() // required for modal to actually close
       fireEvent.click(getByText('Save'))
       await flushPromises()
@@ -1220,8 +1232,8 @@ describe('Assignment Bulk Edit Dates', () => {
     it('removes all dates from assignments', async () => {
       const {getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
       fireEvent.click(getByLabelText('Remove Dates'))
-      fireEvent.click(getByLabelText('Availability Dates'))
-      fireEvent.click(getByText('Ok'))
+      fireEvent.click(getByLabelText('Remove Both'))
+      await user.click(getByText('Confirm'))
       jest.runAllTimers() // required for modal to actually close
       fireEvent.click(getByText('Save'))
       await flushPromises()
@@ -1246,13 +1258,6 @@ describe('Assignment Bulk Edit Dates', () => {
           ],
         },
       ])
-    })
-
-    it('disables "Ok" when neither checkbox is selected', async () => {
-      const {getByText, getByLabelText} = await renderOpenBatchEditDialog([0])
-      fireEvent.click(getByLabelText('Remove Dates'))
-      fireEvent.click(getByLabelText('Due Dates'))
-      expect(getByText('Ok').closest('button').disabled).toBe(true)
     })
   })
 })
