@@ -22,7 +22,6 @@ import {HelpTrayProvider, NewLoginDataProvider, NewLoginProvider} from '../conte
 import {LoginLayout} from '../layouts/LoginLayout'
 import {HelpTray} from '../shared'
 import RegistrationRoutesMiddleware from './RegistrationRoutesMiddleware'
-import {ROUTES} from './routes'
 
 const SignIn = lazy(() => import('../pages/SignIn'))
 const ForgotPassword = lazy(() => import('../pages/ForgotPassword'))
@@ -33,7 +32,7 @@ const RegisterTeacher = lazy(() => import('../pages/register/Teacher'))
 
 export const NewLoginRoutes = (
   <Route
-    path={ROUTES.SIGN_IN}
+    path="login"
     element={
       <NewLoginProvider>
         <NewLoginDataProvider>
@@ -45,14 +44,19 @@ export const NewLoginRoutes = (
       </NewLoginProvider>
     }
   >
-    <Route index={true} element={<SignIn />} />
-    <Route path="forgot-password" element={<ForgotPassword />} />
-    <Route path="register" element={<RegistrationRoutesMiddleware />}>
-      <Route index={true} element={<RegisterLanding />} />
-      <Route path="student" element={<RegisterStudent />} />
-      <Route path="parent" element={<RegisterParent />} />
-      <Route path="teacher" element={<RegisterTeacher />} />
+    {/* standalone LDAP login route */}
+    <Route path="ldap" element={<SignIn />} />
+    {/* everything else under /login/canvas/… */}
+    <Route path="canvas">
+      <Route index={true} element={<SignIn />} />
+      <Route path="forgot-password" element={<ForgotPassword />} />
+      <Route path="register" element={<RegistrationRoutesMiddleware />}>
+        <Route index={true} element={<RegisterLanding />} />
+        <Route path="student" element={<RegisterStudent />} />
+        <Route path="parent" element={<RegisterParent />} />
+        <Route path="teacher" element={<RegisterTeacher />} />
+      </Route>
+      <Route path="*" element={<SignIn />} />
     </Route>
-    <Route path="*" element={<SignIn />} />
   </Route>
 )

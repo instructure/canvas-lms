@@ -66,6 +66,17 @@ describe('NewLoginRoutes', () => {
     await waitFor(() => expect(screen.getByText('Sign In Page')).toBeInTheDocument())
   })
 
+  it('renders SignIn component at /login/ldap', async () => {
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={['/login/ldap']}>
+          <Routes>{NewLoginRoutes}</Routes>
+        </MemoryRouter>,
+      )
+    })
+    await waitFor(() => expect(screen.getByText('Sign In Page')).toBeInTheDocument())
+  })
+
   it('renders ForgotPassword component at /login/canvas/forgot-password', async () => {
     await act(async () => {
       render(

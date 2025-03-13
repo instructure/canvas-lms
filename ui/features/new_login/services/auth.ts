@@ -24,11 +24,12 @@ export const performSignIn = async (
   username: string,
   password: string,
   rememberMe: boolean,
+  route: string,
   csrfToken?: string,
 ): Promise<ApiResponse<LoginResponse>> => {
   const token = csrfToken || authenticityToken()
   const {json, response} = await doFetchApi<LoginResponse>({
-    path: '/login/canvas',
+    path: route,
     method: 'POST',
     body: {
       authenticity_token: token,
