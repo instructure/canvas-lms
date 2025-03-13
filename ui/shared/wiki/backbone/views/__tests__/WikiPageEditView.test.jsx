@@ -26,7 +26,7 @@ const createView = opts => {
   const view = new WikiPageEditView({
     model: new WikiPage({editor: 'block_editor'}),
     wiki_pages_path: '/courses/1/pages',
-    ...opts
+    ...opts,
   })
   view.$el.appendTo(document.getElementById('fixtures'))
   return view.render()
@@ -55,20 +55,29 @@ describe('WikiPageEditView', () => {
   test('should show errors', () => {
     const view = createView()
     const errors = {
-      body: [{ type: 'too_long', message: 'Error...' }],
+      body: [{type: 'too_long', message: 'Error...'}],
     }
     view.showErrors(errors)
     expect(view.$('.body_has_errors')).toBeDefined()
   })
 
-  describe('validate form data', () => {
+  test('saveAndPublish should trigger native submit', async () => {
+    window.block_editor = false
+    const view = createView()
+    const triggerSpy = jest.spyOn(view.$el, 'trigger')
+    view.saveAndPublish()
+    expect(triggerSpy).toHaveBeenCalledWith('submit')
+  })
 
+  describe('validate form data', () => {
     test('should validate form data with body too long', () => {
       const view = createView()
-      const data = { body: 'a'.repeat(BODY_MAX_LENGTH + 1) }
+      const data = {body: 'a'.repeat(BODY_MAX_LENGTH + 1)}
       const errors = view.validateFormData(data)
       expect(errors.body[0].type).toBe('too_long')
-      expect(errors.body[0].message).toBe('Input exceeds 500 KB limit. Please reduce the text size.')
+      expect(errors.body[0].message).toBe(
+        'Input exceeds 500 KB limit. Please reduce the text size.',
+      )
     })
   })
 })

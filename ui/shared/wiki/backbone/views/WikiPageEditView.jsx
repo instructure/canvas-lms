@@ -36,7 +36,6 @@ import {BODY_MAX_LENGTH} from '../../utils/constants'
 import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
 
-
 const I18n = createI18nScope('pages')
 
 RichContentEditor.preloadRemoteModule()
@@ -79,9 +78,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
     this.queryParams = new URLSearchParams(window.location.search)
-    this.enableAssignTo =
-      ENV.COURSE_ID != null &&
-      ENV.WIKI_RIGHTS.manage_assign_to
+    this.enableAssignTo = ENV.COURSE_ID != null && ENV.WIKI_RIGHTS.manage_assign_to
     this.coursePaceWithMasteryPaths =
       this.enableAssignTo &&
       ENV.IN_PACED_COURSE &&
@@ -111,12 +108,16 @@ export default class WikiPageEditView extends ValidatedFormView {
 
     const data = this.overrides
 
-    if (ENV.FEATURES.course_pace_pacing_with_mastery_paths && ENV.IN_PACED_COURSE && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
+    if (
+      ENV.FEATURES.course_pace_pacing_with_mastery_paths &&
+      ENV.IN_PACED_COURSE &&
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+    ) {
       data.only_visible_to_overrides = this.overrides.only_visible_to_overrides
     } else {
       data.only_visible_to_overrides = ENV.IN_PACED_COURSE
-      ? false
-      : this.overrides.only_visible_to_overrides
+        ? false
+        : this.overrides.only_visible_to_overrides
     }
 
     $.ajaxJSON(url, 'PUT', JSON.stringify(data), redirect, errorCallBack, {
@@ -170,9 +171,10 @@ export default class WikiPageEditView extends ValidatedFormView {
     json.edit_with_block_editor = this.model.get('editor') === 'block_editor'
 
     if (
-      (this.queryParams.get('editor') === 'block_editor' || window.ENV.text_editor_preference === "block_editor")
-      && this.model.get('body') == null
-      && this.model.get('editor') !== 'rce'
+      (this.queryParams.get('editor') === 'block_editor' ||
+        window.ENV.text_editor_preference === 'block_editor') &&
+      this.model.get('body') == null &&
+      this.model.get('editor') !== 'rce'
     ) {
       json.edit_with_block_editor = true
     }
@@ -209,7 +211,6 @@ export default class WikiPageEditView extends ValidatedFormView {
   renderStudentTodoAtDate() {
     const elt = this.$studentTodoAtContainer[0]
     if (elt) {
-
       return createRoot(elt).render(
         <DueDateCalendarPicker
           dateType="todo_date"
@@ -261,7 +262,10 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (this.coursePaceWithMasteryPaths) {
       const mountElement = document.getElementById('mastery-paths-toggle-edit-page')
       const onSync = payload => {
-        this.overrides = { assignment_overrides: payload, only_visible_to_overrides: payload.some((override) => override.noop_id == 1) }
+        this.overrides = {
+          assignment_overrides: payload,
+          only_visible_to_overrides: payload.some(override => override.noop_id == 1),
+        }
       }
 
       ReactDOM.render(
@@ -270,20 +274,27 @@ export default class WikiPageEditView extends ValidatedFormView {
           fetchOwnOverrides: true,
           courseId: ENV.COURSE_ID,
           itemType: 'wiki_page',
-          itemContentId: this.model.id
+          itemContentId: this.model.id,
         }),
         mountElement,
       )
     }
 
-    let chose_block_editor = window.location.href.split("?").filter((piece) => { return piece.indexOf('editor=block_editor') !== -1 }).length === 1
-    if(!chose_block_editor){
-      chose_block_editor = window.ENV.text_editor_preference === "block_editor"
-        && this.model.get('body') == null
-        && this.model.get('editor') !== 'rce'
+    let chose_block_editor =
+      window.location.href.split('?').filter(piece => {
+        return piece.indexOf('editor=block_editor') !== -1
+      }).length === 1
+    if (!chose_block_editor) {
+      chose_block_editor =
+        window.ENV.text_editor_preference === 'block_editor' &&
+        this.model.get('body') == null &&
+        this.model.get('editor') !== 'rce'
     }
 
-    if ( (this.model.get('editor') === 'block_editor' && this.model.get('block_editor_attributes')) || chose_block_editor ) {
+    if (
+      (this.model.get('editor') === 'block_editor' && this.model.get('block_editor_attributes')) ||
+      chose_block_editor
+    ) {
       const BlockEditor = lazy(() => import('@canvas/block-editor'))
       const blockEditorData = this.model.get('block_editor_attributes')
 
@@ -383,15 +394,15 @@ export default class WikiPageEditView extends ValidatedFormView {
       } else {
         $('<span>', {
           id: 'wiki_page_body_error',
-          class: 'ic-Form-message ic-Form-message--error', 
+          class: 'ic-Form-message ic-Form-message--error',
           role: 'alert',
-          'aria-live': 'assertive'
+          'aria-live': 'assertive',
         })
-        .append($('<i>', {class: 'icon-warning icon-Solid'}))
-        .append(' ' + error.message)
-        .hide()
-        .insertBefore('#wiki_page_body_statusbar')
-        .show()
+          .append($('<i>', {class: 'icon-warning icon-Solid'}))
+          .append(' ' + error.message)
+          .hide()
+          .insertBefore('#wiki_page_body_statusbar')
+          .show()
       }
     } else {
       $('.edit-content').removeClass('has_body_errors')
@@ -408,13 +419,13 @@ export default class WikiPageEditView extends ValidatedFormView {
 
       // tinymce workaround for focus issue
       if (!tinymce.activeEditor.hidden) {
-        tinymce.activeEditor.fire("focus")
-        tinymce.activeEditor.container.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        tinymce.activeEditor.fire('focus')
+        tinymce.activeEditor.container.scrollIntoView({behavior: 'smooth', block: 'center'})
       } else {
         const rceHtmlEditor = $('.RceHtmlEditor')
-        if (rceHtmlEditor.length) { 
+        if (rceHtmlEditor.length) {
           // div[role=textbox] can't be focused
-          rceHtmlEditor[0].scrollIntoView({ behavior: 'smooth', block: 'center' })
+          rceHtmlEditor[0].scrollIntoView({behavior: 'smooth', block: 'center'})
         } else {
           $('textarea#wiki_page_body')[0].focus()
         }
@@ -422,7 +433,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     } else {
       if (body) otherErrors.body = body
     }
-    
+
     super.showErrors(otherErrors)
   }
 
@@ -449,11 +460,11 @@ export default class WikiPageEditView extends ValidatedFormView {
       ]
     }
 
-    if (data.body && (new Blob([data.body])).size > BODY_MAX_LENGTH) {
+    if (data.body && new Blob([data.body]).size > BODY_MAX_LENGTH) {
       errors.body = [
         {
           type: 'too_long',
-          message: I18n.t("Input exceeds 500 KB limit. Please reduce the text size."),
+          message: I18n.t('Input exceeds 500 KB limit. Please reduce the text size.'),
         },
       ]
     }
@@ -524,9 +535,9 @@ export default class WikiPageEditView extends ValidatedFormView {
     return super.submit(...arguments)
   }
 
-  saveAndPublish(event) {
+  saveAndPublish(_event) {
     this.shouldPublish = true
-    return this.submit(event)
+    this.$el.trigger('submit')
   }
 
   onSaveFail(xhr) {
