@@ -15,16 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {CSSProperties, useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {LoadingIndicator, sizeMediaPlayer} from '@instructure/canvas-media'
+import {captionLanguageForLocale, LoadingIndicator, sizeMediaPlayer} from '@instructure/canvas-media'
 import {CaptionMetaData, StudioPlayer} from '@instructure/studio-player'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import {type MediaTrack} from 'api'
+import {type MediaTrack as Caption, type MediaSource} from 'api'
+import {type MediaInfo, MediaTrack} from './types'
 
 declare const ENV: GlobalEnv & {
   locale?: string
@@ -34,10 +35,30 @@ declare const ENV: GlobalEnv & {
 
 const I18n = createI18nScope('CanvasMediaPlayer')
 
-const byBitrate = (a: {bitrate: string}, b: {bitrate: string}) =>
-  parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
+const byBitrate = (a: {bitrate: number}, b: {bitrate: number}) => a.bitrate - b.bitrate
 
 const liveRegion = () => window?.top?.document.getElementById('flash_screenreader_holder')
+
+type CanvasMediaSource = MediaSource & {
+  bitrate: string
+}
+
+const convertMediaSource = (source: CanvasMediaSource) => {
+  return {
+    src: source.url,
+    type: source.content_type as any,
+    width: parseInt(source.width) ?? undefined,
+    height: parseInt(source.height) ?? undefined,
+    bitrate: parseInt(source.bitrate) ?? undefined,
+  }
+}
+
+const convertAndSortMediaSources = (sources: CanvasMediaSource[] | string) => {
+  if (!Array.isArray(sources)) {
+    return sources
+  }
+  return sources.map(convertMediaSource).sort(byBitrate)
+}
 
 // It can take a while for notorious to process a newly uploaded video
 // Each attempt to get the media_sources is 2**n seconds after the previous attempt
@@ -49,13 +70,18 @@ interface CanvasStudioPlayerProps {
   media_id: string
   // TODO: we've asked studio to export definitions for PlayerSrc and CaptionMetaData
   media_sources?: any[]
-  media_tracks?: MediaTrack[]
+  media_tracks?: Caption[]
   type?: 'audio' | 'video'
   MAX_RETRY_ATTEMPTS?: number
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS?: number
   aria_label?: string
   is_attachment?: boolean
   attachment_id?: string
+  show_loader?: boolean
+  maxHeight?: null | string
+  mediaFetchCallback?: (mediaInfo: MediaInfo) => void,
+  explicitSize?: {width: number, height: number},
+  showUploadSubtitles?: boolean
 }
 
 // The main difference between CanvasMediaPlayer and CanvasStudioPlayer
@@ -71,10 +97,12 @@ export default function CanvasStudioPlayer({
   aria_label = '',
   is_attachment = false,
   attachment_id = '',
+  show_loader = false,
+  maxHeight = null,
+  mediaFetchCallback = () => {},
+  explicitSize,
+  showUploadSubtitles = false,
 }: CanvasStudioPlayerProps) {
-  const sorted_sources = Array.isArray(media_sources)
-    ? media_sources.sort(byBitrate)
-    : media_sources
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
     ? media_captions.map(t => ({
         src: t.src || '',
@@ -83,12 +111,13 @@ export default function CanvasStudioPlayer({
         type: t.type === 'vtt' ? 'vtt' : 'srt',
       }))
     : undefined
-  const [mediaSources, setMediaSources] = useState(sorted_sources)
-  const [mediaCaptions] = useState(captions)
+  const [mediaSources, setMediaSources] = useState(() => convertAndSortMediaSources(media_sources))
+  const [mediaCaptions, setMediaCaptions] = useState<CaptionMetaData[] | undefined>(captions)
   const [retryAttempt, setRetryAttempt] = useState(0)
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
-  const [containerWidth, setContainerWidth] = useState(0)
-  const [containerHeight, setContainerHeight] = useState(0)
+  const [containerWidth, setContainerWidth] = useState(explicitSize?.width || 0)
+  const [containerHeight, setContainerHeight] = useState(explicitSize?.height || 0)
+  const [isLoading, setIsLoading] = useState(true)
   // the ability to set these makes testing easier
   // hint: set these values in a conditional breakpoint in
   // media_player_iframe_content.js where the CanvasStudioPlayer is rendered
@@ -124,6 +153,10 @@ export default function CanvasStudioPlayer({
 
   const handlePlayerSize = useCallback(
     (_event: any) => {
+      if (explicitSize) {
+        return
+      }
+
       const updateContainerSize = (width: number, height: number) => {
         setContainerWidth(width)
         setContainerHeight(height)
@@ -133,7 +166,7 @@ export default function CanvasStudioPlayer({
 
       if (isEmbedded()) {
         updateContainerSize(boundingBoxDimensions.width, boundingBoxDimensions.height)
-      } else if (mediaSources.length) {
+      } else if (Array.isArray(mediaSources)) {
         const player = {
           videoHeight: mediaSources[0].height,
           videoWidth: mediaSources[0].width,
@@ -152,15 +185,29 @@ export default function CanvasStudioPlayer({
         : `/media_objects/${media_id}/info`
       let resp
       try {
+        setIsLoading(true)
         setMediaObjNetworkErr(null)
         resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e: any) {
         console.warn(`Error getting ${url}`, e.message)
         setMediaObjNetworkErr(e)
+        setIsLoading(false)
         return
       }
       if (resp?.media_sources?.length) {
-        setMediaSources(resp.media_sources.sort(byBitrate))
+        setMediaSources(convertAndSortMediaSources(resp.media_sources))
+        if (!media_captions) {
+          setMediaCaptions(resp.media_tracks.map((caption: MediaTrack) => ({
+            locale: caption.locale,
+            language: captionLanguageForLocale(caption.locale),
+            inherited: caption.inherited,
+            label: captionLanguageForLocale(caption.locale),
+            src: caption.url,
+            type: 'srt',
+          })))
+        }
+        mediaFetchCallback(resp)
+        setIsLoading(false)
       } else {
         setRetryAttempt(retryAttempt + 1)
       }
@@ -275,23 +322,63 @@ export default function CanvasStudioPlayer({
     handlePlayerSize({})
   }, [mediaSources, type, boundingBox])
 
+  function renderLoader(){
+    if (retryAttempt >= showBePatientMsgAfterAttempts){
+      setIsLoading(false)
+      return
+    }
+    return <Spinner renderTitle={I18n.t('Loading media')} size="small" margin="small"/>
+  }
+
+  const containerStyle: Partial<CSSProperties> = {
+    height: containerHeight,
+    width: containerWidth
+  }
+
+  if (maxHeight) {
+    containerStyle.maxHeight = maxHeight
+  }
+
   return (
-    <div
-      style={{height: containerHeight, width: containerWidth}}
-      ref={containerRef}
-      data-captions={JSON.stringify(mediaCaptions)}
-    >
-      {mediaSources.length ? (
-        <StudioPlayer
-          src={mediaSources}
-          captions={mediaCaptions}
-          hideFullScreen={!includeFullscreen}
-          title={getAriaLabel()}
-        />
+    <>
+      {isLoading && show_loader ? (
+        renderLoader()
       ) : (
-        renderNoPlayer()
+        <div
+          style={containerStyle}
+          ref={containerRef}
+          data-captions={JSON.stringify(mediaCaptions)}
+        >
+          {mediaSources.length ? (
+            <StudioPlayer
+              src={mediaSources}
+              captions={mediaCaptions}
+              hideFullScreen={!includeFullscreen}
+              title={getAriaLabel()}
+              kebabMenuElements={
+                !showUploadSubtitles
+                  ? undefined
+                  : [
+                      {
+                        id: 'upload-cc',
+                        text: I18n.t('Upload subtitles'),
+                        icon: 'transcript',
+                        onClick: () => {
+                          const src = Array.isArray(mediaSources) ? mediaSources[0].src : mediaSources
+                          import('../../mediaelement/UploadMediaTrackForm').then(({default: UploadMediaTrackForm}) => {
+                            new UploadMediaTrackForm(media_id, src, attachment_id as any, false, 99000)
+                          })
+                        },
+                      }
+                    ]
+              }
+            />
+          ) : (
+            renderNoPlayer()
+          )}
+        </div>
       )}
-    </div>
+    </>
   )
 }
 

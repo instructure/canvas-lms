@@ -23,6 +23,7 @@ import {
   isHidden,
   getRestrictedText,
   generatePreviewUrlPath,
+  externalToolEnabled,
 } from '../fileUtils'
 import {type File} from '../../interfaces/File'
 
@@ -112,6 +113,38 @@ describe('fileUtils', () => {
     it('should throw an error if context_asset_string format is invalid', () => {
       const item: File = {context_asset_string: 'invalid', id: '123'} as File
       expect(() => generatePreviewUrlPath(item)).toThrow('Invalid context_asset_string format')
+    })
+  })
+
+  describe('externalToolEnabled', () => {
+    it('should return true if the tool accepts media type', () => {
+      const file = {'content-type': 'image/png'} as File
+      const tool = {accept_media_types: 'image/*'} as any
+      expect(externalToolEnabled(file, tool)).toBe(true)
+    })
+
+    it('should return false if the tool does not accept media type', () => {
+      const file = {'content-type': 'image/png'} as File
+      const tool = {accept_media_types: 'video/*'} as any
+      expect(externalToolEnabled(file, tool)).toBe(false)
+    })
+
+    it('should return true if the tool does not accept any media type', () => {
+      const file = {'content-type': 'image/png'} as File
+      const tool = {accept_media_types: ''} as any
+      expect(externalToolEnabled(file, tool)).toBe(true)
+    })
+
+    it('should return false if file has empty content-type', () => {
+      const file = {'content-type': ''} as File
+      const tool = {accept_media_types: 'image/*'} as any
+      expect(externalToolEnabled(file, tool)).toBe(false)
+    })
+
+    it('should return false if file has no content-type', () => {
+      const file = {} as File
+      const tool = {accept_media_types: 'image/*'} as any
+      expect(externalToolEnabled(file, tool)).toBe(false)
     })
   })
 })

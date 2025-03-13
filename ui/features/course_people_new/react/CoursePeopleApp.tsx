@@ -18,13 +18,12 @@
 
 import React, {FC} from 'react'
 import {QueryProvider} from '@canvas/query'
-import CoursePeopleHeader from './components/PageHeader/CoursePeopleHeader'
+import CoursePeople from './CoursePeople'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import CoursePeopleContext, {getCoursePeopleContext} from './contexts/CoursePeopleContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import RosterTable from './components/RosterTable/RosterTable'
 
 const I18n = createI18nScope('course_people')
 
@@ -39,8 +38,7 @@ const CoursePeopleApp: FC = () => (
           />
         }
       >
-        <CoursePeopleHeader />
-        <RosterTable />
+        <CoursePeople />
       </ErrorBoundary>
     </CoursePeopleContext.Provider>
   </QueryProvider>

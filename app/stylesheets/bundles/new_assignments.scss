@@ -43,8 +43,19 @@
   margin-top: 15px;
 }
 
-.group_select {
+.group_select_container {
   margin-#{direction(left)}: 20px;
+  display: inline-block;
+  border: 2px solid transparent;
+  border-radius: 4px;
+}
+
+.group_select_container.error {
+  border-color: red;
+}
+
+.group_select_container .group_select {
+  width: 100%;
 }
 
 #ag_weights_wrapper {

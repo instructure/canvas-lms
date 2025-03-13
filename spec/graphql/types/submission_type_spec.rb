@@ -639,12 +639,75 @@ describe Types::SubmissionType do
       @submission3 = assignment.submit_homework(@student, body: "Attempt 3")
     end
 
-    let(:submission_history_type) { GraphQLTypeTester.new(@submission3, current_user: @teacher) }
+    let(:submission_history_type) { GraphQLTypeTester.new(@submission3, current_user: @teacher, request: ActionDispatch::TestRequest.create) }
+
+    describe "orderBy" do
+      it "allows ordering the histories by attempt, ascending" do
+        expect(
+          submission_history_type.resolve("submissionHistoriesConnection(orderBy: { field: attempt, direction: ascending }) { nodes { attempt }}")
+        ).to eq [1, 2, 3]
+      end
+
+      it "allows ordering the histories by attempt, descending" do
+        expect(
+          submission_history_type.resolve("submissionHistoriesConnection(orderBy: { field: attempt, direction: descending }) { nodes { attempt }}")
+        ).to eq [3, 2, 1]
+      end
+
+      it "falls back to comparing by version id if two histories have the same attempt" do
+        v3 = @submission3.versions.find_by(number: 3)
+        model = v3.model
+        model.attempt = 1
+        model.updated_at = @submission3.versions.find_by(number: 1).model.updated_at
+        v3.update!(yaml: model.attributes.to_yaml)
+
+        aggregate_failures do
+          expect(
+            submission_history_type.resolve("submissionHistoriesConnection(orderBy: { field: attempt, direction: ascending }) { nodes { body }}")
+          ).to eq ["Attempt 1", "Attempt 3", "Attempt 2"]
+
+          expect(
+            submission_history_type.resolve("submissionHistoriesConnection(orderBy: { field: attempt, direction: descending }) { nodes { body }}")
+          ).to eq ["Attempt 2", "Attempt 3", "Attempt 1"]
+        end
+      end
+
+      it "does not allow ordering by unupported fields" do
+        expect do
+          submission_history_type.resolve("submissionHistoriesConnection(orderBy: { field: body, direction: ascending }) { nodes { attempt }}")
+        end.to raise_error(GraphQLTypeTester::Error)
+      end
+
+      it "does not allow ordering by unsupported directions" do
+        expect do
+          submission_history_type.resolve("submissionHistoriesConnection(orderBy: { field: attempt, direction: asc }) { nodes { attempt }}")
+        end.to raise_error(GraphQLTypeTester::Error)
+      end
+
+      it "requires field to be specified" do
+        expect do
+          submission_history_type.resolve("submissionHistoriesConnection(orderBy: { direction: ascending }) { nodes { attempt }}")
+        end.to raise_error(GraphQLTypeTester::Error)
+      end
+
+      it "requires direction to be specified" do
+        expect do
+          submission_history_type.resolve("submissionHistoriesConnection(orderBy: { field: attempt }) { nodes { attempt }}")
+        end.to raise_error(GraphQLTypeTester::Error)
+      end
+    end
 
     it "returns the submission histories" do
       expect(
         submission_history_type.resolve("submissionHistoriesConnection { nodes { attempt }}")
       ).to eq [1, 2, 3]
+    end
+
+    it "allows fetching anonymousId on histories" do
+      anon_id = @submission3.anonymous_id
+      expect(
+        submission_history_type.resolve("submissionHistoriesConnection { nodes { anonymousId }}")
+      ).to eq [anon_id, anon_id, anon_id]
     end
 
     it "properly handles cursors for submission histories" do

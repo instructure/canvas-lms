@@ -50,11 +50,32 @@ class Lti::Asset < ApplicationRecord
 
   before_validation :generate_uuid, on: :create
 
-  def generate_uuid
-    self.uuid ||= SecureRandom.uuid
-  end
-
   def compatible_with_processor?(processor)
     !!submission&.assignment && submission.assignment == processor&.assignment
+  end
+
+  # The AP specification requires the SHA256 checksum of the asset in the LtiAssetProcessorSubmissionNotice.
+  # Since the underlying storage might not provide this, we must download and calculate it.
+  # Run this function in a background job to avoid blocking the request.
+  def calculate_sha256_checksum!
+    return if sha256_checksum
+
+    timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    digester = Digest::SHA256.new
+    attachment.open do |chunk|
+      digester << chunk
+    end
+    digest = digester.hexdigest
+    timing_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    InstStatsd::Statsd.timing("lti.asset_processor_asset_sha256_calculation", timing_end - timing_start)
+    InstStatsd::Statsd.gauge("lti.asset_processor_asset_size", attachment.size)
+
+    update(sha256_checksum: digest)
+  end
+
+  private
+
+  def generate_uuid
+    self.uuid ||= SecureRandom.uuid
   end
 end

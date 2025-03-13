@@ -16,17 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useContext, useMemo, useState} from 'react'
+import React, {useCallback, useMemo, useState} from 'react'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import {FileManagementContext} from '../Contexts'
+import {useFileManagement} from '../Contexts'
 import {type File, type Folder} from '../../../interfaces/File'
 import {RenameModal} from '../RenameModal'
 import DeleteModal from './DeleteModal'
-import { downloadFile, downloadZip } from '../../../utils/downloadUtils'
+import {downloadFile, downloadZip} from '../../../utils/downloadUtils'
+import {isFile} from '../../../utils/fileFolderUtils'
+import {externalToolEnabled} from '../../../utils/fileUtils'
 
 import {
   IconMoreLine,
@@ -42,6 +45,8 @@ import {
 } from '@instructure/ui-icons'
 import DirectShareUserTray from './DirectShareUserTray'
 import DirectShareCourseTray from './DirectShareCourseTray'
+import MoveModal from './MoveModal'
+import UsageRightsModal from './UsageRightsModal'
 
 const I18n = createI18nScope('files_v2')
 
@@ -60,22 +65,20 @@ const ActionMenuButton = ({
   usageRightsRequiredForContext,
   row,
 }: ActionMenuButtonProps) => {
-  const [modal, setModal] = useState<'send-to' | 'copy-to' | null>(null)
+  const [modalOrTray, setModalOrTray] = useState<
+    'rename' | 'delete' | 'copy-to' | 'send-to' | 'move-to' | 'manage-usage-rights' | null
+  >(null)
   const actionLabel = I18n.t('Actions')
-  const currentContext = useContext(FileManagementContext)
-  const contextType = currentContext?.contextType
-  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [itemsToDelete, setItemsToDelete] = useState<(File | Folder)[]>([])
+  const {contextType, fileMenuTools} = useFileManagement()
 
-  const handleDeleteClick = () => {
-    setItemsToDelete([row])
-    setIsModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-  }
+  const iconForTrayTool = useCallback((tool: {canvas_icon_class?: string; icon_url?: string}) => {
+    if (tool.canvas_icon_class) {
+      return <i className={tool.canvas_icon_class} />
+    } else if (tool.icon_url) {
+      return <img className="icon lti_tool_icon" alt="" src={tool.icon_url} />
+    }
+    return <></>
+  }, [])
 
   const triggerButton = useCallback(() => {
     return size !== 'large' ? (
@@ -104,12 +107,14 @@ const ActionMenuButton = ({
         text,
         separator,
         onClick,
+        disabled = false,
       }: {
         icon?: any
         text?: string
         separator?: boolean
         visible?: boolean
         onClick?: (e: React.MouseEvent) => void
+        disabled?: boolean
       },
     ) => {
       const key = index + '-' + row.id
@@ -117,9 +122,13 @@ const ActionMenuButton = ({
         return <Menu.Separator key={key} />
       }
       return (
-        <Menu.Item key={key} onClick={onClick}>
+        <Menu.Item key={key} onClick={onClick} disabled={disabled} data-testid={`action-menu-button-${text}`}>
           <Flex alignItems="center" gap="x-small">
-            <Flex.Item>{React.createElement(icon, {inline: false})}</Flex.Item>
+            {typeof icon === 'object' ? (
+              <Flex.Item>{icon}</Flex.Item>
+            ) : (
+              <Flex.Item>{React.createElement(icon, {inline: false})}</Flex.Item>
+            )}
             <Flex.Item>
               <Text>{text}</Text>
             </Flex.Item>
@@ -140,14 +149,14 @@ const ActionMenuButton = ({
 
   const filteredItems = useMemo(
     () =>
-      (row.folder_id
+      (isFile(row)
         ? [
             // files
             {
               icon: IconEditLine,
               text: I18n.t('Rename'),
               visible: rename_move_permissions,
-              onClick: () => setIsRenameModalOpen(true),
+              onClick: () => setModalOrTray('rename'),
             },
             {
               icon: IconDownloadLine,
@@ -163,26 +172,42 @@ const ActionMenuButton = ({
               icon: IconCloudLockLine,
               text: I18n.t('Manage Usage Rights'),
               visible: has_usage_rights,
+              onClick: () => setModalOrTray('manage-usage-rights'),
             },
             {
               icon: IconUserLine,
               text: I18n.t('Send To...'),
               visible: send_copy_permissions,
-              onClick: () => setModal('send-to'),
+              onClick: () => setModalOrTray('send-to'),
             },
             {
               icon: IconDuplicateLine,
               text: I18n.t('Copy To...'),
               visible: send_copy_permissions,
-              onClick: () => setModal('copy-to'),
+              onClick: () => setModalOrTray('copy-to'),
             },
             {
               icon: IconExpandItemsLine,
               text: I18n.t('Move To...'),
               visible: rename_move_permissions,
+              onClick: () => setModalOrTray('move-to'),
             },
+            ...fileMenuTools.map(tool => {
+              return {
+                icon: iconForTrayTool(tool),
+                text: tool.title,
+                onClick: () => assignLocation(`${tool.base_url}&files[]=${row.id}`),
+                visible: true,
+                disabled: !externalToolEnabled(row, tool),
+              }
+            }),
             {separator: true, visible: delete_permissions},
-            {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions, onClick: handleDeleteClick},
+            {
+              icon: IconTrashLine,
+              text: I18n.t('Delete'),
+              visible: delete_permissions,
+              onClick: () => setModalOrTray('delete'),
+            },
           ]
         : [
             // folder
@@ -190,7 +215,7 @@ const ActionMenuButton = ({
               icon: IconEditLine,
               text: I18n.t('Rename'),
               visible: rename_move_permissions,
-              onClick: () => setIsRenameModalOpen(true),
+              onClick: () => setModalOrTray('rename'),
             },
             {
               icon: IconDownloadLine,
@@ -206,71 +231,94 @@ const ActionMenuButton = ({
               icon: IconCloudLockLine,
               text: I18n.t('Manage Usage Rights'),
               visible: has_usage_rights,
+              onClick: () => setModalOrTray('manage-usage-rights'),
             },
             {
               icon: IconExpandItemsLine,
               text: I18n.t('Move To...'),
               visible: rename_move_permissions,
+              onClick: () => setModalOrTray('move-to'),
             },
             {separator: true, visible: delete_permissions},
-            {icon: IconTrashLine, text: I18n.t('Delete'), visible: delete_permissions, onClick: handleDeleteClick},
+            {
+              icon: IconTrashLine,
+              text: I18n.t('Delete'),
+              visible: delete_permissions,
+              onClick: () => setModalOrTray('delete'),
+            },
           ]
       ).filter(({visible}) => visible !== false),
     [
       delete_permissions,
       has_usage_rights,
       rename_move_permissions,
-      row,
+      row.folder_id,
+      row.id,
+      row.url,
       send_copy_permissions,
       userCanEditFilesForContext,
+      fileMenuTools,
+      iconForTrayTool,
     ],
   )
 
-  const onDismissTray = useCallback(() => setModal(null), [])
+  const onDismissModalOrTray = useCallback(() => setModalOrTray(null), [])
 
   const buildTrays = useCallback(() => {
-    let file
-    if (row.filename) {
-      file = row as File
-    }
+    if (!isFile(row)) return null
+
     return (
       <>
-        {file && ENV.COURSE_ID && (
+        {ENV.COURSE_ID && (
           <DirectShareUserTray
-            open={modal === 'send-to'}
-            onDismiss={onDismissTray}
+            open={modalOrTray === 'send-to'}
+            onDismiss={onDismissModalOrTray}
             courseId={ENV.COURSE_ID}
-            file={file}
+            file={row}
           />
         )}
-        {file && ENV.COURSE_ID && (
+        {ENV.COURSE_ID && (
           <DirectShareCourseTray
-            open={modal === 'copy-to'}
-            onDismiss={onDismissTray}
+            open={modalOrTray === 'copy-to'}
+            onDismiss={onDismissModalOrTray}
             courseId={ENV.COURSE_ID}
-            file={file}
+            file={row}
           />
         )}
       </>
     )
-  }, [modal, onDismissTray, row])
+  }, [modalOrTray, onDismissModalOrTray, row])
+
+  const buildModals = useCallback(() => {
+    return (
+      <>
+        <RenameModal
+          renamingItem={row}
+          isOpen={modalOrTray === 'rename'}
+          onClose={onDismissModalOrTray}
+        />
+        <DeleteModal open={modalOrTray === 'delete'} items={[row]} onClose={onDismissModalOrTray} />
+        <MoveModal
+          items={[row]}
+          open={modalOrTray === 'move-to'}
+          onDismiss={onDismissModalOrTray}
+        />
+        <UsageRightsModal
+          items={[row]}
+          open={modalOrTray === 'manage-usage-rights'}
+          onDismiss={onDismissModalOrTray}
+        />
+      </>
+    )
+  }, [modalOrTray, onDismissModalOrTray, row])
 
   return (
     <>
       <Menu placement="bottom" trigger={triggerButton()}>
         {filteredItems.map((item, i) => renderMenuItem(i, item))}
       </Menu>
-      <RenameModal
-        renamingItem={row}
-        isOpen={isRenameModalOpen}
-        onClose={() => setIsRenameModalOpen(false)}
-      />
-      <DeleteModal
-        open={isModalOpen}
-        items={itemsToDelete}
-        onClose={handleCloseModal}
-      />
       {buildTrays()}
+      {buildModals()}
     </>
   )
 }

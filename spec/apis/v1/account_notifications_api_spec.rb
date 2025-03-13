@@ -107,6 +107,35 @@ describe "Account Notification API", type: :request do
       json = api_call(:get, @path, @api_params)
       expect(json.length).to eq 1
     end
+
+    describe "show_is_closed param" do
+      before do
+        @api_params = { controller: "account_notifications",
+                        action: "user_index",
+                        format: "json",
+                        account_id: @user.account.id.to_s,
+                        include_all: true,
+                        show_is_closed: true }
+        @notification = account_notification(message: "show_is_closed")
+      end
+
+      it "includes closed flag for notifications when show_is_closed is true" do
+        @user.close_announcement(@notification)
+        json = api_call(:get, @path, @api_params)
+        expect(json.length).to eq 2
+        expect(json.first["closed"]).to be true
+        expect(json.second["closed"]).to be false
+      end
+
+      it "does not include closed flag for notifications when show_is_closed is false" do
+        @user.close_announcement(@notification)
+        json = api_call(:get, @path, @api_params.merge(show_is_closed: false))
+        puts json
+        expect(json.length).to eq 2
+        expect(json.first["closed"]).to be_nil
+        expect(json.second["closed"]).to be_nil
+      end
+    end
   end
 
   describe "show" do
@@ -144,7 +173,8 @@ describe "Account Notification API", type: :request do
   describe "user_close_notification" do
     before do
       @a = account_notification(message: "default")
-      @path = "/api/v1/accounts/#{@admin.account.id}/account_notifications/#{@a.id}"
+      @account = @admin.account
+      @path = "/api/v1/accounts/#{@account.id}/account_notifications/#{@a.id}"
       @api_params = { controller: "account_notifications",
                       action: "user_close_notification",
                       format: "json",
@@ -152,13 +182,58 @@ describe "Account Notification API", type: :request do
                       account_id: @admin.account.id.to_s }
     end
 
-    it "closes notifications" do
-      api_call(:delete, @path, @api_params)
-      @admin.reload
-      expect(@admin.get_preference(:closed_notifications)).to eq [@a.id]
+    context "as an admin" do
+      it "closes notification" do
+        api_call(:delete, @path, @api_params)
+        expect(response).to have_http_status :ok
 
-      json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/account_notifications", @api_params.merge(action: "user_index"))
-      expect(json.length).to eq 0
+        @admin.reload
+        expect(@admin.get_preference(:closed_notifications)).to eq [@a.id]
+
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/account_notifications", @api_params.merge(action: "user_index"))
+        expect(json.length).to eq 0
+      end
+
+      it "does not delete the notification unless the remove parameter has the value true" do
+        expect(AccountNotification.find_by(id: @a.id)).not_to be_nil
+
+        api_call(:delete, @path, @api_params.merge(remove: ""))
+        expect(response).to have_http_status :ok
+        expect(AccountNotification.find_by(id: @a.id)).not_to be_nil
+      end
+
+      it "deletes the notification if a remove=true parameter is passed" do
+        expect(AccountNotification.find_by(id: @a.id)).not_to be_nil
+
+        api_call(:delete, @path, @api_params.merge(remove: "true"))
+        expect(response).to have_http_status :ok
+        expect(AccountNotification.find_by(id: @a.id)).to be_nil
+      end
+    end
+
+    context "as a non-admin" do
+      before do
+        @non_admin = user_with_managed_pseudonym(account: @account)
+      end
+
+      it "closes notification" do
+        expect(@non_admin.get_preference(:closed_notifications)).to be_nil
+
+        api_call_as_user(@non_admin, :delete, @path, @api_params)
+        expect(response).to have_http_status :ok
+
+        @non_admin.reload
+        expect(@non_admin.get_preference(:closed_notifications)).to eq [@a.id]
+
+        json = api_call(:get, "/api/v1/accounts/#{@account.id}/account_notifications", @api_params.merge(action: "user_index"))
+        expect(json.length).to eq 0
+      end
+
+      it "does not delete notification" do
+        api_call_as_user(@non_admin, :delete, @path, @api_params.merge(remove: "true"))
+
+        expect(response).to have_http_status :forbidden
+      end
     end
   end
 

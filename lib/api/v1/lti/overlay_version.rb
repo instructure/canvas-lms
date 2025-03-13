@@ -23,7 +23,7 @@ module Api::V1::Lti::OverlayVersion
   include Api::V1::User
 
   JSON_ATTRS = %w[
-    id account_id root_account_id lti_overlay_id workflow_state created_at updated_at diff
+    id account_id root_account_id lti_overlay_id workflow_state created_at updated_at diff caused_by_reset
   ].freeze
 
   def lti_overlay_version_json(overlay_version, user, session, context)

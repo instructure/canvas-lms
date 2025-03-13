@@ -72,7 +72,8 @@ class GradebooksController < ApplicationController
              restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user),
              student_grade_summary_upgrade: Account.site_admin.feature_enabled?(:student_grade_summary_upgrade),
              can_clear_badge_counts: Account.site_admin.grants_right?(@current_user, :manage_students),
-             custom_grade_statuses: @context.custom_grade_statuses.as_json(include_root: false)
+             custom_grade_statuses: @context.custom_grade_statuses.as_json(include_root: false),
+             consolidated_media_player: @context.account.feature_enabled?(:consolidated_media_player),
            })
     return render :grade_summary_list unless @presenter.student
 
@@ -896,7 +897,7 @@ class GradebooksController < ApplicationController
 
             submission[:dont_overwrite_grade] = dont_overwrite_grade
             submission.delete(:final) if submission[:final] && !@assignment.permits_moderation?(@current_user)
-            if params.key?(:sub_assignment_tag) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
+            if params.key?(:sub_assignment_tag) && @context.discussion_checkpoints_enabled?
               submission[:sub_assignment_tag] = params[:sub_assignment_tag]
             end
             subs = @assignment.grade_student(@user, submission.merge(skip_grader_check: is_default_grade_for_missing))
@@ -978,7 +979,7 @@ class GradebooksController < ApplicationController
           course: @context
         ).map { |c| { submission_comment: c } }
 
-        if assignment.root_account.feature_enabled?(:discussion_checkpoints)
+        if assignment.context.discussion_checkpoints_enabled?
           submission_json[:has_sub_assignment_submissions] = assignment.has_sub_assignments
           submission_json[:sub_assignment_submissions] = (assignment.has_sub_assignments &&
             assignment.sub_assignments&.map do |sub_assignment|
@@ -1046,7 +1047,12 @@ class GradebooksController < ApplicationController
                   else
                     @context.assignments.active.find(params[:assignment_id])
                   end
-    platform_service_speedgrader_enabled = platform_service_speedgrader_enabled?(params)
+
+    platform_speedgrader_param_enabled = query_params_allow_platform_service_speedgrader?(params)
+    platform_speedgrader_feature_enabled = platform_service_speedgrader_enabled?
+    track_speedgrader_metrics(platform_speedgrader_param_enabled, platform_speedgrader_feature_enabled)
+    platform_service_speedgrader_enabled = platform_speedgrader_param_enabled && platform_speedgrader_feature_enabled
+
     if platform_service_speedgrader_enabled
       InstStatsd::Statsd.increment("speedgrader.platform_service.load")
       @page_title = t("SpeedGrader")
@@ -1055,6 +1061,7 @@ class GradebooksController < ApplicationController
       remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
 
       env = {
+        A2_STUDENT_ENABLED: @context.is_a?(Assignment) ? @context.a2_enabled? : nil,
         COMMENT_LIBRARY_FEATURE_ENABLED:
           @context.root_account.feature_enabled?(:assignment_comment_library),
         EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
@@ -1063,6 +1070,7 @@ class GradebooksController < ApplicationController
         PLATFORM_SERVICE_SPEEDGRADER_ENABLED: platform_service_speedgrader_enabled,
         RESTRICT_QUANTITATIVE_DATA_ENABLED: @context.restrict_quantitative_data?(@current_user),
         GRADE_BY_STUDENT_ENABLED: @context.root_account.feature_enabled?(:speedgrader_grade_by_student),
+        STICKERS_ENABLED_FOR_ASSIGNMENT: @assignment.present? && @assignment.stickers_enabled?(@current_user),
         course_id: @context.id,
         late_policy: @context.late_policy&.as_json(include_root: false),
       }
@@ -1095,7 +1103,7 @@ class GradebooksController < ApplicationController
 
     respond_to do |format|
       format.html do
-        grading_role_for_user = grading_role(assignment: @assignment)
+        grading_role_for_user = @assignment.grading_role(@current_user)
         rubric = @assignment&.rubric_association&.rubric
         @headers = false
         @outer_frame = true
@@ -1217,7 +1225,7 @@ class GradebooksController < ApplicationController
           @assignment,
           @current_user,
           avatars: service_enabled?(:avatars),
-          grading_role: grading_role(assignment: @assignment)
+          grading_role: @assignment.grading_role(@current_user)
         ).json
       end
     end
@@ -1441,7 +1449,7 @@ class GradebooksController < ApplicationController
 
   private
 
-  def platform_service_speedgrader_enabled?(params)
+  def platform_service_speedgrader_enabled?
     return false unless @context.feature_enabled?(:platform_service_speedgrader)
 
     if @assignment.present?
@@ -1450,6 +1458,10 @@ class GradebooksController < ApplicationController
 
     return false if Services::PlatformServiceSpeedgrader.launch_url.blank?
 
+    true
+  end
+
+  def query_params_allow_platform_service_speedgrader?(params)
     params[:platform_sg].nil? || value_to_boolean(params[:platform_sg])
   end
 
@@ -1622,10 +1634,6 @@ class GradebooksController < ApplicationController
     )
   end
 
-  def moderated_grading_enabled_and_no_grades_published?
-    @assignment.moderated_grading? && !@assignment.grades_published?
-  end
-
   def exclude_total?(context)
     return true if context.hide_final_grades
     return false unless grading_periods? && view_all_grading_periods?
@@ -1740,18 +1748,6 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def grading_role(assignment:)
-    if moderated_grading_enabled_and_no_grades_published?
-      if assignment.permits_moderation?(@current_user)
-        :moderator
-      else
-        :provisional_grader
-      end
-    else
-      :grader
-    end
-  end
-
   def gradebook_column_size_preferences
     @current_user.save if @current_user.changed?
     shared_settings = @current_user.get_preference(:gradebook_column_size, "shared") || {}
@@ -1774,6 +1770,16 @@ class GradebooksController < ApplicationController
   def track_update_metrics(params, submission)
     if params.dig(:submission, :grade) && params["submission"]["grade"].to_s != submission.grade.to_s && params["originator"] == "speed_grader"
       InstStatsd::Statsd.increment("speedgrader.submission.posted_grade")
+    end
+  end
+
+  def track_speedgrader_metrics(param_enabled, feature_enabled)
+    if param_enabled && feature_enabled
+      InstStatsd::Statsd.increment("speedgrader.modernized.load")
+    elsif feature_enabled
+      InstStatsd::Statsd.increment("speedgrader.legacy.load.fallback")
+    else
+      InstStatsd::Statsd.increment("speedgrader.legacy.load")
     end
   end
 end

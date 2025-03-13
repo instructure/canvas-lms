@@ -448,7 +448,7 @@ class Course < ActiveRecord::Base
 
   def assignments_scope
     scope = assignments.active
-    if root_account.feature_enabled?(:discussion_checkpoints)
+    if discussion_checkpoints_enabled?
       # We need to update the scope to use AbstractAssignment instead of its subclass Assignment so that we can merge the
       # scope query with the checkpoints_scope query
       scope_assignment_ids = scope.pluck(:id)
@@ -1550,6 +1550,10 @@ class Course < ActiveRecord::Base
 
   # Allows the account to be set directly
   belongs_to :account
+
+  def discussion_checkpoints_enabled?
+    account&.discussion_checkpoints_enabled?
+  end
 
   def wiki
     return super if wiki_id
@@ -2885,7 +2889,8 @@ class Course < ActiveRecord::Base
        course_color
        alt_name
        restrict_quantitative_data
-       horizon_course]
+       horizon_course
+       conditional_release]
   end
 
   def student_reporting?

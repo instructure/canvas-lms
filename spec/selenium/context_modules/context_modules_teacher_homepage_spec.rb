@@ -101,6 +101,17 @@ describe "context modules" do
         expect(fln("New Assignment Title")).to be_displayed
       end
 
+      it "validate only one assignment is created when multiple clicks are done", priority: "2" do
+        first_module = @course.context_modules.reload.first
+        add_module_item_button(first_module).click
+        f("#add_module_item_select").click
+        select_module_item("#assignments_select" + " .module_item_select", "[ Create Assignment ]")
+        replace_content(f("#assignments_select input.item_title"), "New Assignment Title")
+        driver.action.double_click(f(".add_item_button.ui-button")).perform
+        wait_for_ajax_requests
+        expect(@course.assignments.where(title: "New Assignment Title").count).to eq 1
+      end
+
       it "adds a assignment item to a module, publish new assignment refresh page and verify", priority: "2" do
         # this test basically verifies that the published icon is accurate after a page refresh
         mod = @course.context_modules.first

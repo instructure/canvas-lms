@@ -18,6 +18,42 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Login::Shared
+  class << self
+    def set_return_to_from_provider(request, session, pseudonym, domain_root_account, url)
+      return if url.blank?
+
+      begin
+        uri = URI.parse(url)
+      rescue URI::InvalidURIError
+        return
+      end
+
+      if uri&.path && !uri.path.starts_with?("/login") &&
+         (!uri.scheme || request.scheme == uri.scheme || uri.scheme == "https")
+        if uri.host
+          # allow redirects to other (trusted) domains, by tacking on a session token
+          target_account = Account.find_by_domain(uri.host)
+          if uri.host == request.host_with_port
+            # full URLs on the same domain are okay
+            session[:return_to] = url
+          elsif (target_account == domain_root_account) ||
+                (target_account && target_account != domain_root_account &&
+                pseudonym.works_for_account?(target_account, true))
+            token = SessionToken.new(pseudonym.global_id,
+                                     current_user_id: pseudonym.global_user_id).to_s
+            uri.query&.concat("&")
+            uri.query ||= ""
+            uri.query.concat("session_token=#{token}")
+            session[:return_to] = uri.to_s
+          end
+        elsif uri.path[0] == "/"
+          # otherwise, absolute paths on the same domain are okay
+          session[:return_to] = url
+        end
+      end
+    end
+  end
+
   def reset_session_for_login
     reset_session_saving_keys(:return_to,
                               :oauth,
@@ -169,7 +205,7 @@ module Login::Shared
     false
   end
 
-  protected
+  private
 
   def increment_statsd(counter, tags: {}, action: nil, reason: nil, authentication_provider: nil)
     action ||= params[:action]
@@ -180,5 +216,6 @@ module Login::Shared
     tags[:auth_provider_id] = authentication_provider.global_id if authentication_provider
     tags[:reason] = reason if reason
     InstStatsd::Statsd.distributed_increment("auth.#{action}.#{counter}", tags:)
+    InstStatsd::Statsd.distributed_increment("auth.#{action}.#{counter}.v2", tags:)
   end
 end

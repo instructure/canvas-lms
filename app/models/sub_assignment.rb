@@ -19,8 +19,8 @@
 #
 
 class SubAssignment < AbstractAssignment
-  validates :parent_assignment_id, presence: true, comparison: { other_than: :id, message: -> { I18n.t("cannot reference self") }, allow_blank: true }
-  validates :has_sub_assignments, inclusion: { in: [false], message: -> { I18n.t("cannot be true for sub assignments") } }
+  validates :parent_assignment_id, presence: true, comparison: { other_than: :id, message: ->(_object, _data) { I18n.t("cannot reference self") }, allow_blank: true }
+  validates :has_sub_assignments, inclusion: { in: [false], message: ->(_object, _data) { I18n.t("cannot be true for sub assignments") } }
   validates :sub_assignment_tag, inclusion: { in: [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY] }
 
   has_one :discussion_topic, through: :parent_assignment
@@ -139,7 +139,7 @@ class SubAssignment < AbstractAssignment
   end
 
   def checkpoint_changes?
-    !!root_account&.feature_enabled?(:discussion_checkpoints) && checkpoint_attributes_changed?
+    !!context.discussion_checkpoints_enabled? && checkpoint_attributes_changed?
   end
 
   def checkpoint_attributes_changed?

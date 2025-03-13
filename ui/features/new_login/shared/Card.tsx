@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
@@ -24,24 +23,24 @@ import {Text} from '@instructure/ui-text'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
 import React from 'react'
 
-const I18n = createI18nScope('new_login')
-
 type Props = {
   compact?: boolean
   icon: string
   href: string
   onClick: (event: React.MouseEvent<ViewOwnProps>) => void
   text: string
+  label: string
 }
 
-const Card = ({icon, text, href, onClick, compact = false}: Props) => {
+const Card = ({compact = false, href, icon, onClick, text, label}: Props) => {
   return (
     <Link
-      href={href}
-      onClick={onClick}
-      isWithinText={false}
+      aria-label={label}
+      data-testid="card-link"
       display="block"
-      aria-label={I18n.t('Navigate to %{text}', {text})}
+      href={href}
+      isWithinText={false}
+      onClick={onClick}
     >
       <View
         as="div"
@@ -52,9 +51,15 @@ const Card = ({icon, text, href, onClick, compact = false}: Props) => {
         shadow="resting"
         width="100%"
       >
-        <Flex direction={compact ? 'row' : 'column'} wrap="wrap" gap="mediumSmall">
+        <Flex direction={compact ? 'row' : 'column'} gap="mediumSmall" wrap="wrap">
           <Flex.Item shouldShrink={false} align="center">
-            <Img src={icon} width="3.125rem" height="3.125rem" display="block" />
+            <Img
+              data-testid="card-icon"
+              display="block"
+              height="3.125rem"
+              src={icon}
+              width="3.125rem"
+            />
           </Flex.Item>
 
           <Flex.Item shouldGrow={true} textAlign="center">

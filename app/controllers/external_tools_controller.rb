@@ -449,8 +449,7 @@ class ExternalToolsController < ApplicationController
   #             "url": "...",
   #             "default": "disabled",
   #             "enabled": "true",
-  #             "visibility": "public",
-  #             "windowTarget": "_blank"
+  #             "visibility": "public"
   #        },
   #        "selection_width": 500,
   #        "selection_height": 500,
@@ -1191,7 +1190,7 @@ class ExternalToolsController < ApplicationController
       if api_request?
         render json: external_tool_json(@tool, @context, @current_user, session)
       else
-        render json: @tool.as_json(methods: %i[readable_state custom_fields_string vendor_help_link], include_root: false)
+        render json: @tool.as_json(methods: %i[readable_state custom_fields_string], include_root: false)
       end
     else
       render json: @tool.errors, status: :bad_request

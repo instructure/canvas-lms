@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback} from 'react'
 import {type File, type Folder} from '../../../interfaces/File'
 import {getIcon} from '../../../utils/fileFolderUtils'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -35,53 +35,54 @@ interface FileFolderInfoProps {
 }
 
 const FileFolderInfo = ({items}: FileFolderInfoProps) => {
+  const multiple = items.length > 1
+
+  const renderIcon = useCallback(() => {
+    const item = items[0]
+    if (multiple) {
+      return (
+        <IconCollectionLine
+          data-testid="multiple-items-icon"
+          color="primary"
+          title={I18n.t('Multiple Items')}
+          size="medium"
+        />
+      )
+    } else if (item.thumbnail_url) {
+      return <Img height="3em" width="3em" alt="" src={item.thumbnail_url} />
+    } else {
+      return getIcon(item, !!item.folder_id, item.thumbnail_url, {size: 'medium'})
+    }
+  }, [items, multiple])
+
+  const renderTitle = useCallback(() => {
+    const item = items[0]
+    const text = multiple
+      ? I18n.t('Selected Items (%{count})', {count: items.length})
+      : item.display_name || item.filename || item.name
+    return (
+      <Text weight="bold">
+        <TruncateText position="middle">{text}</TruncateText>
+      </Text>
+    )
+  }, [items, multiple])
+
+  const renderSubtitle = useCallback(() => {
+    if (multiple) return null
+
+    const item = items[0]
+    return <Text size="small">{item.size ? formatFileSize(item.size) : I18n.t('Folder')}</Text>
+  }, [items, multiple])
+
   if (items.length === 0) return null
 
-  if (items.length > 1) {
-    return (
-      <View as="div" borderWidth="small" borderRadius="medium" padding="xxx-small" key="multiple-items">
-        <Flex padding="x-small" gap="small">
-          <Flex.Item>
-            <IconCollectionLine
-                data-testid="multiple-items-icon"
-                color="primary"
-                title={I18n.t('Multiple Items')}
-                size="medium"
-            />
-          </Flex.Item>
-
-          <Flex.Item shouldGrow={true} shouldShrink={true}>
-            <Text weight="bold">
-              <TruncateText position="middle">
-                {I18n.t('Selected Items (%{count})', {count: items.length})}
-              </TruncateText>
-            </Text>
-          </Flex.Item>
-        </Flex>
-      </View>
-    )
-  }
-
-  const item = items[0]
-
   return (
-    <View as="div" borderWidth="small" borderRadius="medium" padding="xxx-small" key={item.id}>
+    <View as="div" borderWidth="small" borderRadius="medium" padding="xxx-small">
       <Flex padding="x-small" gap="small">
-        <Flex.Item>
-          {item.thumbnail_url ? (
-            <Img height="3em" width="3em" alt="" src={item.thumbnail_url} />
-          ) : (
-            getIcon(item, !!item.folder_id, item.thumbnail_url, {size: 'medium'})
-          )}
-        </Flex.Item>
-
+        <Flex.Item>{renderIcon()}</Flex.Item>
         <Flex.Item shouldGrow={true} shouldShrink={true}>
-          <Text weight="bold">
-            <TruncateText position="middle">
-              {item.display_name || item.filename || item.name}
-            </TruncateText>
-          </Text>
-          <Text size="small">{item.size ? formatFileSize(item.size) : I18n.t('Folder')}</Text>
+          {renderTitle()}
+          {renderSubtitle()}
         </Flex.Item>
       </Flex>
     </View>

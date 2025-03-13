@@ -112,7 +112,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
   validates :auth_type,
             inclusion: { in: ->(_) { valid_auth_types },
-                         message: -> { "invalid auth_type, must be one of #{valid_auth_types.join(",")}" } }
+                         message: ->(_object, _data) { "invalid auth_type, must be one of #{valid_auth_types.join(",")}" } }
   validates :account_id, presence: true
   validate :validate_federated_attributes
 

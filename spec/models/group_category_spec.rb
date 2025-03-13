@@ -759,6 +759,18 @@ describe GroupCategory do
   end
 
   context "non_collaborative group_category" do
+    it "can have the same names as a collaborative group_category" do
+      category = GroupCategory.create(name: "Test Category", context: @course)
+      expect(category).to be_valid
+      non_collaborative = GroupCategory.create(name: "Test Category", context: @course, non_collaborative: true)
+      expect(non_collaborative).to be_valid
+    end
+
+    it "can have the same names as a collaborative group_category restricted name" do
+      non_collaborative = GroupCategory.create(name: "Imported Groups", context: @course, non_collaborative: true)
+      expect(non_collaborative).to be_valid
+    end
+
     it "attribute can be set on creation but cannot be changed afterwards" do
       # Set non_collaborative on creation
       category = GroupCategory.create(name: "Test Category", context: @course, non_collaborative: true)

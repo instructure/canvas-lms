@@ -47,6 +47,7 @@ export type PageView = {
   createdAt: Date
   participated: JSX.Element | null
   interactionSeconds: string
+  rawUserAgentString: string
   userAgent: string
 }
 
@@ -116,16 +117,18 @@ export function formatParticipated({participated}: APIPageView): JSX.Element | n
 // TS doesn't know about Intl.DurationFormat yet hence the expect-error notations below
 export function formatInteractionTime({interaction_seconds: time}: APIPageView): string {
   if (time <= 5) return '—'
-  const timeArray = hourParts(time)
+  const timeArr = hourParts(time)
   // Not all our supported browsers implement Intl.DurationFormat yet
   // @ts-expect-error
   if (typeof Intl.DurationFormat === 'undefined') {
-    if (timeArray.hours > 0) return `${timeArray.hours}:${timeArray.minutes}:${timeArray.seconds}`
-    if (timeArray.minutes > 0) return `${timeArray.minutes}:${timeArray.seconds}`
-    return `${timeArray.seconds}`
+    const pad = (n: number) => String(n).padStart(2, '0')
+
+    if (timeArr.hours > 0) return `${timeArr.hours}:${pad(timeArr.minutes)}:${pad(timeArr.seconds)}`
+    if (timeArr.minutes > 0) return `${timeArr.minutes}:${pad(timeArr.seconds)}`
+    return String(timeArr.seconds)
   }
   const locales = ENV.LOCALES || navigator.languages || ['en-US']
   // @ts-expect-error
   const duration = new Intl.DurationFormat(locales, {style: 'narrow'})
-  return duration.format(timeArray)
+  return duration.format(timeArr)
 }

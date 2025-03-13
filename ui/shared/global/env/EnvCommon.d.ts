@@ -210,6 +210,7 @@ export interface EnvCommon {
     pronouns: null | string
     fake_student: boolean
     avatar_is_fallback: boolean
+    email?: string
   }
   page_view_update_url: string
   IS_LARGE_ROSTER: boolean
@@ -300,6 +301,7 @@ export type RootAccountFeatureId =
   | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_registrations_next'
   | 'lti_registrations_page'
+  | 'lti_registrations_usage_data'
   | 'mobile_offline_mode'
   | 'product_tours'
   | 'rce_transform_loaded_content'
@@ -318,7 +320,6 @@ export type RootAccountFeatureId =
   | 'course_pace_pacing_with_mastery_paths'
   | 'modules_requirements_allow_percentage'
   | 'lti_asset_processor'
-  | 'discussion_checkpoints'
   | 'course_pace_weighted_assignments'
   | 'course_pace_allow_bulk_pace_assign'
 
@@ -329,6 +330,7 @@ export type BrandAccountFeatureId =
   | 'embedded_release_notes'
   | 'consolidated_media_player'
   | 'discussions_speedgrader_revisit'
+  | 'discussion_checkpoints'
 
 /**
  * Feature id exported in ApplicationController that aren't mentioned in

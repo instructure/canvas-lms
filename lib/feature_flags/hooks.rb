@@ -141,5 +141,15 @@ module FeatureFlags
       new_state["on"]["locked"] = true
       new_state["on"]["warning"] = I18n.t("'Assignment Enhancements - Student' must first be enabled in order to enable 'Submission Stickers'")
     end
+
+    def self.log_modernized_speedgrader_metrics(_user, context, _old_state, new_state)
+      state = if ["allowed_on", "on"].include? new_state
+                "enabled"
+              else
+                "disabled"
+              end
+      cxt = context.is_a?(Course) ? "course" : "account"
+      InstStatsd::Statsd.increment("speedgrader.modernized.flag.#{state}.#{cxt}")
+    end
   end
 end

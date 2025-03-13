@@ -439,4 +439,47 @@ describe "assignment groups" do
     wait_for_ajaximations
     expect(f("#ag-list")).not_to include_text(assignment.name)
   end
+
+  context "move assignments to validations" do
+    before do
+      @group0 = @course.assignment_groups.create!(name: "Test Group")
+      @assignment0 = @course.assignments.create!(title: "Test Assignment", assignment_group: @group0)
+      get "/courses/#{@course.id}/assignments"
+
+      open_delete_dialog
+      wait_for_ajaximations
+
+      fj(".assignment_group_move:visible").click
+      fj(".delete_group:visible").click
+    end
+
+    def open_delete_dialog
+      f("#ag_#{@group0.id}_manage_link").click
+      f("#assignment_group_#{@group0.id} .delete_group").click
+    end
+
+    it "shows an error if move_assignments_to group is not selected" do
+      expect(fj("#ag_#{@group0.id}_move_assignments_to_errors:visible")).to include_text("Assignment group is required to move assignment")
+    end
+
+    it "hides error if delete its assignments is checked" do
+      expect(f("#ag_#{@group0.id}_move_assignments_to_errors")).to include_text("Assignment group is required to move assignment")
+      fj(".assignment_group_delete:visible").click
+      expect(fj("#ag_#{@group0.id}_move_assignments_to_errors:visible")).to include_text("")
+    end
+
+    it "hides error if move_assignments_to group is selected" do
+      expect(f("#ag_#{@group0.id}_move_assignments_to_errors")).to include_text("Assignment group is required to move assignment")
+      click_option(".group_select:visible", @assignment_group.id.to_s, :value)
+      expect(fj("#ag_#{@group0.id}_move_assignments_to_errors:visible")).to include_text("")
+    end
+
+    it "hides error if dialog is closed" do
+      expect(fj("#ag_#{@group0.id}_move_assignments_to_errors:visible")).to include_text("Assignment group is required to move assignment")
+      fj(".cancel_button:visible").click
+
+      open_delete_dialog
+      expect(fj("#ag_#{@group0.id}_move_assignments_to_errors:visible")).to include_text("")
+    end
+  end
 end

@@ -27,6 +27,7 @@ import {View} from '@instructure/ui-view'
 
 import type {ResponsiveSizes} from '../../types'
 import {actions} from '../../actions/ui'
+import {paceContextsActions} from '../../actions/pace_contexts'
 import PandaShowingPaces from '../../../images/PandaShowingPaces.svg'
 import PandaUsingPaces from '../../../images/PandaUsingPaces.svg'
 
@@ -34,6 +35,7 @@ const I18n = createI18nScope('course_paces_empty_state')
 
 interface DispatchProps {
   readonly setSelectedPaceContext: typeof actions.setSelectedPaceContext
+  readonly setDefaultPaceContextAsSelected: typeof paceContextsActions.setDefaultPaceContextAsSelected
 }
 
 interface PassedProps {
@@ -42,6 +44,7 @@ interface PassedProps {
 
 export const CoursePaceEmpty = ({
   setSelectedPaceContext,
+  setDefaultPaceContextAsSelected,
   responsiveSize,
 }: DispatchProps & PassedProps) => {
   return (
@@ -120,6 +123,7 @@ export const CoursePaceEmpty = ({
         onClick={() => {
           // @ts-expect-error
           setSelectedPaceContext('Course', window.ENV.COURSE_ID)
+          setDefaultPaceContextAsSelected()
         }}
       >
         {I18n.t('Get Started')}
@@ -145,7 +149,10 @@ export const CoursePaceEmpty = ({
   )
 }
 
-export default connect(null, {setSelectedPaceContext: actions.setSelectedPaceContext})(
+export default connect(null, {
+  setSelectedPaceContext: actions.setSelectedPaceContext,
+  setDefaultPaceContextAsSelected: paceContextsActions.setDefaultPaceContextAsSelected
+})(
   // @ts-expect-error
   CoursePaceEmpty,
 )

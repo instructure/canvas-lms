@@ -207,6 +207,11 @@ module Lti
                             end
     end
 
+    def lti_assignment_id_from_secure_params
+      @lti_assignment_id_from_secure_params ||=
+        Lti::Security.decoded_lti_assignment_id(@secure_params)
+    end
+
     # LTI - Custom parameter substitution: ResourceLink.id
     # Returns the LTI value for the resource_link.id property
     # Returns "$ResourceLink.id" otherwise
@@ -451,7 +456,7 @@ module Lti
                          elsif @originality_report
                            @originality_report.submission.assignment.lti_context_id
                          elsif @secure_params.present?
-                           Lti::Security.decoded_lti_assignment_id(@secure_params)
+                           lti_assignment_id_from_secure_params
                          end
                        },
                        LTI_ASSIGN_ID,

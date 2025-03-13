@@ -30,13 +30,12 @@ module LtiAdvantage::Messages
     ]).freeze
 
     TYPED_ATTRIBUTES = superclass::TYPED_ATTRIBUTES.merge(
-      activity: LtiAdvantage::Claims::Activity,
       submission: LtiAdvantage::Claims::Submission,
       for_user: LtiAdvantage::Claims::ForUser,
       asset: LtiAdvantage::Claims::Asset
     ).freeze
 
-    attr_accessor(*REQUIRED_CLAIMS)
+    attr_accessor(*(REQUIRED_CLAIMS - [:activity]))
 
     validates_presence_of(*REQUIRED_CLAIMS)
     validates_with LtiAdvantage::TypeValidator
@@ -49,10 +48,6 @@ module LtiAdvantage::Messages
       self.message_type = MESSAGE_TYPE
       self.version = "1.3.0"
       super
-    end
-
-    def activity
-      @activity ||= TYPED_ATTRIBUTES[:activity].new
     end
 
     def submission

@@ -24,7 +24,7 @@ describe "Smart Search API", type: :request do
   end
 
   def stub_smart_search
-    allow(SmartSearch).to receive(:api_key).and_return("dummy")
+    allow(SmartSearch).to receive(:bedrock_client).and_return(double)
     allow(SmartSearch).to receive(:generate_embedding) { |chunk| chunk.split(": ").last[0...3].chars.map(&:ord) }
   end
 
@@ -43,7 +43,7 @@ describe "Smart Search API", type: :request do
 
   describe "with feature disabled" do
     it "returns unauthorized" do
-      api_call(:get, @path, @params, {}, {}, { expected_status: 401 })
+      api_call(:get, @path, @params, {}, {}, { expected_status: 403 })
     end
   end
 
@@ -54,7 +54,7 @@ describe "Smart Search API", type: :request do
 
     it "checks permissions on course" do
       user_factory
-      api_call(:get, @path, @params, {}, {}, { expected_status: 401 })
+      api_call(:get, @path, @params, {}, {}, { expected_status: 403 })
     end
 
     it "returns results in order of relevance" do

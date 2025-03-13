@@ -870,7 +870,7 @@ describe SubmissionsController do
     end
 
     it "mark sub assignment submissions as read if reading parent assignment one's own submission" do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       user_session(@student)
       request.accept = Mime[:json].to_s
 
@@ -917,7 +917,7 @@ describe SubmissionsController do
     end
 
     it "contains assignment checkpoint sub-assignment information" do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       user_session(@student)
       request.accept = Mime[:json].to_s
 

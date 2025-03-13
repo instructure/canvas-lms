@@ -116,7 +116,7 @@ describe PlannerOverridesController do
       end
 
       it "saves sub_assignment overrides with plannable type sub_assignment" do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
         post :create, params: { plannable_type: "sub_assignment", plannable_id: @reply_to_topic.id, user_id: @student.id, marked_complete: true }
         json = json_parse(response.body)

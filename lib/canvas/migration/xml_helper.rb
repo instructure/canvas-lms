@@ -103,7 +103,7 @@ module Canvas::Migration
     end
 
     def open_file_html5(path)
-      File.exist?(path) ? ::Nokogiri::HTML5(File.open(path)) : nil
+      File.exist?(path) ? ::Nokogiri::HTML5(File.open(path), **CanvasSanitize::SANITIZE[:parser_options]) : nil
     end
 
     def open_file_xml(path)

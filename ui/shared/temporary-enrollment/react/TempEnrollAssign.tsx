@@ -315,17 +315,24 @@ export function TempEnrollAssign(props: Props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const {json} = await doFetchApi<Course[]>({
-          path: `/api/v1/users/${userProps.id}/courses`,
-          params: {
-            enrollment_state: 'active',
-            include: ['sections', 'term'],
-            per_page: MAX_ALLOWED_COURSES_PER_PAGE,
-            ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {account_id: ENV.ACCOUNT_ID}),
-          },
-        })
-        // @ts-expect-error
-        setEnrollmentsByCourse(json)
+        let data: Course[] = []
+        let next_page: string | undefined
+        let num_pages = 0
+        do {
+          const {json, link} = await doFetchApi<Course[]>({
+            path: `/api/v1/users/${userProps.id}/courses`,
+            params: {
+              enrollment_state: 'active',
+              include: ['sections', 'term'],
+              per_page: MAX_ALLOWED_COURSES_PER_PAGE,
+              ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {account_id: ENV.ACCOUNT_ID}),
+              ...(next_page && {page: next_page}),
+            },
+          })
+          data = data.concat(json!)
+          next_page = link?.next?.page
+        } while (++num_pages < 10 && next_page)
+        setEnrollmentsByCourse(data)
       } catch (error: any) {
         showFlashError(
           I18n.t('There was an error while requesting user enrollments, please try again'),

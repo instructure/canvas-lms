@@ -22,8 +22,8 @@ import {TextInput} from '@instructure/ui-text-input'
 import type {TextInputProps} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {IconWarningSolid} from '@instructure/ui-icons'
 import {Heading} from '@instructure/ui-heading'
+import type {FormMessage} from '@instructure/ui-form-field'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type JQuery from 'jquery'
 import type WikiPageEditView from '../backbone/views/WikiPageEditView'
@@ -38,11 +38,6 @@ interface ComponentProps {
   validationCallback: (data: Record<string, unknown>) => ValidationResult
 }
 
-export interface Message {
-  text: React.ReactNode
-  type: 'error' | 'hint' | 'success' | 'screenreader-only'
-}
-
 interface FormDataError {
   message: string
   type: string
@@ -55,26 +50,34 @@ interface ValidationResult {
 export type Props = TextInputProps & ComponentProps
 
 const EditableContent = (props: Props) => {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<FormMessage[]>([])
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
-    const handleSubmit = (evt?: JQuery.Event) => {
+    const handleSubmit = (evt?: JQuery.SubmitEvent) => {
       evt?.stopPropagation()
+
       const data = props.viewElement.getFormData<Record<string, unknown>>()
       const dataErrors = props.validationCallback(data)
       const titleErrors = dataErrors?.title || []
       if (titleErrors.length > 0) {
-        const parsedErrors: Message[] = titleErrors.map((error: FormDataError) => ({
-          text: (
-            <>
-              <IconWarningSolid /> {error.message}
-            </>
-          ),
-          type: 'error',
+        const parsedErrors: FormMessage[] = titleErrors.map((error: FormDataError) => ({
+          text: error.message,
+          type: 'newError',
         }))
         setMessages(parsedErrors)
         return false
+      }
+      else {
+        // we show errors from the server if any
+        evt?.result.catch((error: any) => {
+          const titleError = error.responseJSON.errors.title[0]
+          if (titleError) {
+            setMessages([{text: titleError.message, type: 'newError'}])
+            setTimeout(() => inputRef.current?.focus(), 200)
+            return false
+          }
+        })
       }
     }
 
@@ -88,7 +91,7 @@ const EditableContent = (props: Props) => {
     return () => {
       props.viewElement.off('submit', handleSubmit)
     }
-  }, [props])
+  }, [props, inputRef])
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {value} = e.target
@@ -107,7 +110,7 @@ const EditableContent = (props: Props) => {
       <input name="title" type="hidden" value={props.defaultValue} />
     </>
   ) : (
-    <View as="div" maxWidth="356px">
+    <View as="div" maxWidth="600px">
       <TextInput
         id="wikipage-title-input"
         data-testid="wikipage-title-input"

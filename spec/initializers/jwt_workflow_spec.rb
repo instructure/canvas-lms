@@ -104,6 +104,10 @@ describe CanvasSecurity::JWTWorkflow do
         state = described_class.state_for(%i[rich_content], @c, @u)
         expect(state[:can_create_pages]).to be true
       end
+
+      it "requires a context" do
+        expect(CanvasSecurity::JWTWorkflow.workflow_requires_context?(:rich_content)).to be true
+      end
     end
 
     describe ":ui" do

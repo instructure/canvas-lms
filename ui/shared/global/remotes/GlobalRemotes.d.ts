@@ -17,5 +17,6 @@
  */
 
 export type GlobalRemotes = Partial<{
-  speedgrader: string
+  speedgrader: string,
+  ltiUsage: string
 }>

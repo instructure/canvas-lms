@@ -21,7 +21,7 @@ describe Checkpoints::AssignmentAggregatorService do
   describe ".call" do
     before(:once) do
       @course = course_model
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @student = student_in_course(course: @course, active_all: true).user
       Assignment.suspend_callbacks(:aggregate_checkpoint_assignments) do
         @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
@@ -50,7 +50,7 @@ describe Checkpoints::AssignmentAggregatorService do
       end
 
       it "returns false when checkpoint discussions are disabled" do
-        @course.root_account.disable_feature!(:discussion_checkpoints)
+        @course.account.disable_feature!(:discussion_checkpoints)
         expect(service_call).to be false
       end
     end

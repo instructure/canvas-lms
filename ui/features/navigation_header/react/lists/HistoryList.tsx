@@ -39,7 +39,7 @@ export default function HistoryList() {
     return {json, nextPage}
   }, [])
 
-  const {data, fetchNextPage, isFetching, hasNextPage, error} = useInfiniteQuery({
+  const {data, fetchNextPage, isLoading, hasNextPage, error} = useInfiniteQuery({
     queryKey: ['history'],
     queryFn: fetchHistory,
     meta: {
@@ -94,7 +94,7 @@ export default function HistoryList() {
 
   if (error) {
     return <Alert variant="error">{I18n.t('Failed to retrieve history')}</Alert>
-  } else if (isFetching || data == null) {
+  } else if (isLoading || data == null) {
     return <Spinner size="small" renderTitle={I18n.t('Loading')} />
   } else {
     const historyEntries = combineHistoryEntries(data.pages)

@@ -20,7 +20,7 @@ import {type Folder} from '../interfaces/File'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 
 export const generateUrlPath = (folder: Folder) => {
-  const EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^\/]+\/?/
+  const EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^/]+\/?/
 
   const getRelativePath = (fullName: string) => {
     return fullName
@@ -42,17 +42,18 @@ export const generateUrlPath = (folder: Folder) => {
 }
 
 // The root folder only needs to have context info for use in breadcrumbs
-export const createStubRootFolder = (
-  context_id: string,
-  plural_context_type: string,
-  root_folder_id: string,
-): Folder => {
+export const createStubRootFolder = (context: {
+  contextId: string
+  // the plural form
+  contextType: string
+  root_folder_id: string
+}): Folder => {
   return {
-    id: root_folder_id,
+    id: context.root_folder_id,
     name: '',
     parent_folder_id: null,
-    context_id: context_id,
-    context_type: plural_context_type.toLowerCase().slice(0, -1),
+    context_id: context.contextId,
+    context_type: context.contextType.toLowerCase().slice(0, -1),
     hidden: false,
     full_name: '',
     created_at: '',

@@ -90,6 +90,7 @@
         <xs:element name="public_syllabus" type="xs:boolean" minOccurs="0"/>
         <xs:element name="files_visibility" type="xs:string" minOccurs="0"/>
         <xs:element name="hide_distribution_graphs" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="hide_sections_on_course_users_page" type="xs:boolean" minOccurs="0"/>
         <xs:element name="usage_rights_required" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_topics" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_editing" type="xs:boolean" minOccurs="0"/>
@@ -149,6 +150,7 @@
         <xs:element name="default_post_policy" type="postPolicyType" minOccurs="0"/>
         <xs:element name="late_policy" type="latePolicyType" minOccurs="0"/>
         <xs:element name="enable_course_paces" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="conditional_release" type="xs:boolean" minOccurs="0"/>
       </xs:all>
       <xs:attribute name="identifier" type="xs:ID" use="required"/>
     </xs:complexType>

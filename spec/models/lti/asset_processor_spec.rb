@@ -22,18 +22,9 @@ describe Lti::AssetProcessor, type: :model do
     context "validations" do
       subject { lti_asset_processor_model }
 
-      it { is_expected.to be_valid }
-      it { is_expected.to validate_length_of(:url).is_at_most(4.kilobytes) }
-      it { is_expected.to validate_length_of(:title).is_at_most(255) }
-      it { is_expected.to validate_length_of(:text).is_at_most(255) }
-
       it "defaults to workflow_state=active" do
         expect(lti_asset_processor_model(workflow_state: nil).active?).to be_truthy
       end
-
-      it { is_expected.to belong_to(:context_external_tool).required }
-      it { is_expected.to belong_to(:assignment).required }
-      it { is_expected.to have_many(:asset_reports).dependent(:destroy) }
 
       it "supports associations from ContextExternalTool and Assignment" do
         expect(subject.context_external_tool.lti_asset_processor_ids).to include(subject.id)
@@ -75,6 +66,50 @@ describe Lti::AssetProcessor, type: :model do
     it "returns nil when 'report' is not a present" do
       model = lti_asset_processor_model(report: nil)
       expect(model.supported_types).to be_nil
+    end
+  end
+
+  describe ".build_for_assignment" do
+    let(:context_external_tool) { external_tool_1_3_model }
+
+    let(:content_item) do
+      {
+        "context_external_tool_id" => context_external_tool.id,
+        "url" => "http://example.com",
+        "title" => "Example Title",
+        "text" => "Example Text",
+        "custom" => { "key" => "value" },
+        "icon" => { "icon_key" => "icon_value" },
+        "window" => { "window_key" => "window_value" },
+        "iframe" => { "iframe_key" => "iframe_value" },
+        "report" => { "report_key" => "report_value" }
+      }
+    end
+
+    context "when context_external_tool is found" do
+      it "returns a new Lti::AssetProcessor instance with the correct attributes" do
+        asset_processor = Lti::AssetProcessor.build_for_assignment(content_item)
+
+        expect(asset_processor).to be_a(Lti::AssetProcessor)
+        expect(asset_processor.context_external_tool).to eq(context_external_tool)
+        expect(asset_processor.url).to eq("http://example.com")
+        expect(asset_processor.title).to eq("Example Title")
+        expect(asset_processor.text).to eq("Example Text")
+        expect(asset_processor.custom).to eq({ "key" => "value" })
+        expect(asset_processor.icon).to eq({ "icon_key" => "icon_value" })
+        expect(asset_processor.window).to eq({ "window_key" => "window_value" })
+        expect(asset_processor.iframe).to eq({ "iframe_key" => "iframe_value" })
+        expect(asset_processor.report).to eq({ "report_key" => "report_value" })
+      end
+    end
+
+    context "when context_external_tool is not found" do
+      it "returns nil" do
+        content_item["context_external_tool_id"] = nil
+        asset_processor = Lti::AssetProcessor.build_for_assignment(content_item)
+
+        expect(asset_processor).to be_nil
+      end
     end
   end
 end

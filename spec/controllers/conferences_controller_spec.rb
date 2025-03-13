@@ -210,7 +210,7 @@ describe ConferencesController do
       post "create", params: { course_id: @course.id, web_conference: { title: long_str, conference_type: "Wimba" } }, format: "json"
       expect(response).to have_http_status :bad_request
       res_body = response.parsed_body
-      expect(res_body["errors"]["title"][0]["message"]).to eq "too_long"
+      expect(res_body["errors"]["title"][0]["type"]).to eq "too_long"
     end
 
     it "creates a conference with observers removed" do

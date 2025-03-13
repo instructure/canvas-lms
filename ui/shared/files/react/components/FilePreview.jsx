@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, { Suspense } from 'react'
 import page from 'page'
 import $ from 'jquery'
 import {each, find} from 'lodash'
@@ -25,6 +25,7 @@ import {Mask, Overlay} from '@instructure/ui-overlays'
 import FilePreviewInfoPanel from './FilePreviewInfoPanel'
 import CollectionHandler from '../../util/collectionHandler'
 import preventDefault from '@canvas/util/preventDefault'
+import StudioMediaPlayer from '@canvas/canvas-studio-player'
 
 import PropTypes from 'prop-types'
 import customPropTypes from '../modules/customPropTypes'
@@ -223,25 +224,58 @@ export default class FilePreview extends React.PureComponent {
     )
   }
 
-  renderPreview = () => {
-    if (this.state.displayedItem && this.state.displayedItem.get('preview_url')) {
-      const html = this.state.displayedItem.get('content-type') === 'text/html'
-      const iFrameClasses = classnames({
-        'ef-file-preview-frame': true,
-        'ef-file-preview-frame-html': html,
-        'attachment-html-iframe': html,
-      })
-      const sandbox = html ? 'allow-same-origin' : 'allow-scripts allow-same-origin'
+  renderStudioPlayer = (item) => {
+    const containerClasses = classnames({
+      'ef-file-studio-player-container': true,
+    });
+    return (
+      <div className={containerClasses}>
+        <Suspense>
+          <StudioMediaPlayer
+            key={item.get('media_entry_id') || ''}
+            media_id={item.get('media_entry_id') || ''}
+            type={item.get('mime_class')}
+            is_attachment={true}
+            attachment_id={item.get('id')}
+            show_loader={true}
+            maxHeight={'100%'}
+            explicitSize={{
+              width: '100%',
+              height: '100%',
+            }}
+            showUploadSubtitles
+          />
+        </Suspense>
+      </div>
+    )
+  }
 
-      return (
-        <iframe
-          allowFullScreen={true}
-          title={I18n.t('File Preview')}
-          src={this.state.displayedItem.get('preview_url')}
-          className={iFrameClasses}
-          sandbox={sandbox}
-        />
-      )
+  renderCanvasPlayer = (item) => {
+    const html = item.get('content-type') === 'text/html'
+    const iFrameClasses = classnames({
+      'ef-file-preview-frame': true,
+      'ef-file-preview-frame-html': html,
+      'attachment-html-iframe': html,
+    })
+    const sandbox = classnames('allow-same-origin', 'allow-downloads', { 'allow-scripts': !html })
+    return (
+      <iframe
+        allowFullScreen={true}
+        title={I18n.t('File Preview')}
+        src={item.get('preview_url')}
+        className={iFrameClasses}
+        sandbox={sandbox}
+      />
+    )
+  }
+
+  renderPreview = () => {
+    const item = this.state.displayedItem;
+    if (item && item.get('preview_url')) {
+      const isNewStudioPlayer = ENV.FEATURES?.consolidated_media_player;
+      return isNewStudioPlayer && ['video', 'audio'].includes(item.get('mime_class'))
+        ? this.renderStudioPlayer(item)
+        : this.renderCanvasPlayer(item);
     } else {
       return (
         <div className="ef-file-not-found ef-file-preview-frame">

@@ -89,7 +89,7 @@ describe "courses/_to_do_list" do
       context "discussion checkpoints" do
         before do
           course_with_student(active_all: true)
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
           @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
         end
 
@@ -169,7 +169,7 @@ describe "courses/_to_do_list" do
         before do
           course_with_teacher(active_all: true)
           course_with_student(active_all: true, user: @teacher)
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
           @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, title: "Discussion with Checkpoints")
         end
 

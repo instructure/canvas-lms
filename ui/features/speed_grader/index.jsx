@@ -161,6 +161,7 @@ ready(() => {
           ltiIframeAllowances: iframeAllowances(),
         },
         features: {
+          a2StudentEnabled: window.ENV.A2_STUDENT_ENABLED ?? false,
           extendedSubmissionState: window.ENV.FEATURES.extended_submission_state ?? false,
           emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
           enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED ?? false,
@@ -168,6 +169,7 @@ ready(() => {
           restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED ?? false,
           gradeByStudentEnabled: window.ENV.GRADE_BY_STUDENT_ENABLED ?? false,
           discussionCheckpointsEnabled: window.ENV.FEATURES.discussion_checkpoints ?? false,
+          stickersEnabled: window.ENV.STICKERS_ENABLED_FOR_ASSIGNMENT ?? false,
         },
       })
     })

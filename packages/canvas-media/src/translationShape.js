@@ -29,7 +29,10 @@ const translationShape = shape({
   RECORD_PANEL_TITLE: string,
   SUBMIT_TEXT: string,
   UPLOADING_ERROR: string,
-  UPLOAD_MEDIA_LABEL: string
+  UPLOAD_MEDIA_LABEL: string,
+  SELECT_SUPPORTED_FILE_TYPE: string,
+  CHOOSE_FILE_TO_UPLOAD: string,
+  ENTER_FILE_NAME: string
 })
 
 export default translationShape

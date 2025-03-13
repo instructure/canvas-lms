@@ -39,6 +39,7 @@ import {
   CREATE_NEW_SET_OPTION,
 } from '../util/constants'
 import {useBulkManageDifferentiationTags} from '../hooks/useBulkManageDifferentiationTags'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -134,10 +135,9 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
     setIsSubmitting(submitting)
   }
 
-  const handleSetErrors = (errs: Record<string, string>) => {
+  const handleSetErrors = (errs: React.SetStateAction<Record<string, string>>) => {
     setErrors(errs)
   }
-
   const handleSetCategoryId = (id: string) => {
     setSelectedCategoryId(id)
     if (id === SINGLE_TAG) {
@@ -230,6 +230,8 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
     tags.forEach(tag => {
       if (!tag.name.trim()) {
         newErrors[String(tag.id)] = I18n.t('Tag Name is required')
+      } else if (tag.name.length > 255) {
+        newErrors[String(tag.id)] = I18n.t('Enter a shorter name')
       }
     })
 
@@ -241,6 +243,8 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
       (mode === EDIT_MODE && tagMode === MULTIPLE_TAGS && !tagSetName.trim())
     ) {
       newErrors.tagSetName = I18n.t('Tag Set Name is required')
+    } else if (tagSetName && tagSetName.length > 255) {
+      newErrors.tagSetName = I18n.t('Enter a shorter name')
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -253,10 +257,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
             tagSetNameRef.current?.focus()
           } else {
             const tagId = parseInt(firstErrorKey, 10)
-            const inputRef = inputRefs.current[tagId]
-            if (inputRef) {
-              inputRef.focus()
-            }
+            inputRefs.current[tagId]?.focus()
           }
         }
       }, 0)
@@ -360,6 +361,12 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
 
       // If mutation succeeds, close the modal
       handleClose()
+    } catch (error) {
+      // -- API Error Handling --
+      if (error instanceof Error) {
+        const errorMessage = error.message
+        showFlashError(errorMessage)(new Error())
+      }
     } finally {
       handleSetSubmitting(false)
     }

@@ -39,12 +39,7 @@ import {
 import {ConversationContext} from '../../../util/constants'
 import {useLazyQuery, useQuery} from '@apollo/client'
 import {RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
-import {ModalBodyContext, translationSeparator} from '../../utils/constants'
-import {
-  translateMessage,
-  handleTranslatedModalBody,
-  stripSignature,
-} from '../../utils/inbox_translator'
+import { TranslationContext, useTranslationContextState } from '../../hooks/useTranslationContext'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -54,7 +49,6 @@ const ComposeModalContainer = props => {
   const [attachments, setAttachments] = useState([])
   const [attachmentsToUpload, setAttachmentsToUpload] = useState([])
   const [subject, setSubject] = useState('')
-  const [body, setBody] = useState('')
   const [addressBookInputValue, setAddressBookInputValue] = useState('')
   const [bodyMessages, setBodyMessages] = useState([])
   const [addressBookMessages, setAddressBookMessages] = useState([])
@@ -68,6 +62,16 @@ const ComposeModalContainer = props => {
   const [loadingObservers, setLoadingObservers] = useState(false)
   const [includeObserversMessages, setIncludeObserversMessages] = useState(null)
   const [activeSignature, setActiveSignature] = useState()
+
+  const [body, setBody] = useState('')
+
+  const contextValues = useTranslationContextState({
+    subject,
+    activeSignature,
+    setModalError: props.setModalError,
+    body,
+    setBody
+  })
 
   const {loading: inboxSettingsLoading} = useQuery(INBOX_SETTINGS_QUERY, {
     onCompleted: data => {
@@ -83,10 +87,6 @@ const ComposeModalContainer = props => {
     },
     skip: !props.inboxSignatureBlock || !props.open,
   })
-  // Translation features
-  const [translating, setTranslating] = useState(false)
-  const [messagePosition, setMessagePosition] = useState(null)
-  const [translationTargetLanguage, setTranslationTargetLanguage] = useState('en')
 
   const [
     getRecipientsObserversQuery,
@@ -277,32 +277,6 @@ const ComposeModalContainer = props => {
     }
   }, [props.maxGroupRecipientsMet])
 
-  /** TRANSLATION CODE */
-  const translateBody = isPrimary => {
-    translateBodyWith(isPrimary, body)
-  }
-
-  const translateBodyWith = async (isPrimary, bodyText, {tgtLang} = {}) => {
-    setTranslating(true)
-    try {
-      const translatedText = await translateMessage({
-        subject: subject,
-        body: bodyText,
-        signature: activeSignature,
-        tgtLang: typeof tgtLang !== 'undefined' ? tgtLang : translationTargetLanguage,
-      })
-      handleTranslatedModalBody(translatedText, isPrimary, activeSignature, setBody, bodyText)
-    } catch (err) {
-      props.setModalError(I18n.t('Error while trying to translate message'))
-      setTimeout(() => {
-        props.setModalError(null)
-      }, 2500)
-    } finally {
-      setTranslating(false)
-    }
-  }
-  /**  END TRANSLATION CODE */
-
   const onContextSelect = context => {
     if (context && context?.contextID) {
       setCourseMessages([])
@@ -316,7 +290,7 @@ const ComposeModalContainer = props => {
     const errors = [] // Initialize an array to collect errors
 
     if (!body) {
-      const errorMessage = I18n.t('Please insert a message body.')
+      const errorMessage = I18n.t('Please insert a message')
       setBodyMessages([{text: errorMessage, type: 'error'}])
       errors.push(errorMessage) // Add error message to the array
       isValid = false
@@ -329,7 +303,7 @@ const ComposeModalContainer = props => {
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       } else if (props.selectedIds.length === 0) {
-        const errorMessage = I18n.t('Please select a recipient.')
+        const errorMessage = I18n.t('Please select a recipient')
         setAddressBookMessages([{text: errorMessage, type: 'error'}])
         errors.push(errorMessage) // Add error message to the array
         isValid = false
@@ -444,19 +418,6 @@ const ComposeModalContainer = props => {
 
   if (inboxSettingsLoading) return loadInboxSettingsSpinner()
 
-  const modalBodyContext = {
-    body,
-    setBody,
-    translating,
-    setTranslating,
-    translationTargetLanguage,
-    setTranslationTargetLanguage,
-    messagePosition,
-    setMessagePosition,
-    translateBody,
-    translateBodyWith,
-  }
-
   const shouldShowModalSpinner =
     props.sendingMessage && !attachmentsToUpload.length && !uploadingMediaFile
 
@@ -476,7 +437,7 @@ const ComposeModalContainer = props => {
           },
         }}
         render={responsiveProps => (
-          <ModalBodyContext.Provider value={modalBodyContext}>
+          <TranslationContext.Provider value={contextValues}>
             <Modal
               open={props.open}
               onDismiss={props.onDismiss}
@@ -551,7 +512,7 @@ const ComposeModalContainer = props => {
                 />
               </Modal.Footer>
             </Modal>
-          </ModalBodyContext.Provider>
+          </TranslationContext.Provider>
         )}
       />
       <UploadMedia

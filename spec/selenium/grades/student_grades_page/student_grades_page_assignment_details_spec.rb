@@ -178,7 +178,7 @@ describe "Student Gradebook - Assignment Details" do
     context "discussion Checkpoints" do
       before do
         @course.enroll_student(@students[0], enrollment_state: "active")
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
       end
 

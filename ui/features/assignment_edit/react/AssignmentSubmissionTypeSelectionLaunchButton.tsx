@@ -18,8 +18,6 @@
 
 import React from 'react'
 
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-
 import {BaseButton} from '@instructure/ui-buttons'
 import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
@@ -50,27 +48,30 @@ export function AssignmentSubmissionTypeSelectionLaunchButton(props: ButtonProps
   }
 
   return (
-    <BaseButton
-      id="assignment_submission_type_selection_launch_button"
-      data-testid="assignment_submission_type_selection_launch_button"
-      display="block"
-      color="secondary"
-      margin="small 0"
-      withBackground={true}
-      withBorder={true}
-      onClick={onClick}
-      renderIcon={RenderIcon}
-    >
-      <View>
-        <Text as="div" id="title_text">
-          {title}
-        </Text>
-        {description && (
-          <Text id="desc_text" weight="light" size="small">
-            <TruncateText maxLines={1}>{description}</TruncateText>
+    <>
+      <BaseButton
+        id="assignment_submission_type_selection_launch_button"
+        data-testid="assignment_submission_type_selection_launch_button"
+        display="block"
+        color="secondary"
+        margin="small 0"
+        withBackground={true}
+        withBorder={true}
+        onClick={onClick}
+        renderIcon={RenderIcon}
+      >
+        <View>
+          <Text as="div" id="title_text">
+            {title}
           </Text>
-        )}
-      </View>
-    </BaseButton>
+          {description && (
+            <Text id="desc_text" weight="light" size="small">
+              <TruncateText maxLines={1}>{description}</TruncateText>
+            </Text>
+          )}
+        </View>
+      </BaseButton>
+      <div id="assignment_submission_type_selection_launch_button_errors"></div>
+    </>
   )
 }

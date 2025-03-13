@@ -518,7 +518,7 @@ describe PseudonymsController, type: :request do
         expect(JSON.parse(response.body)).to eq({
                                                   "errors" => {
                                                     "base" => [
-                                                      { "type" => "Users must have at least one login", "attribute" => "base", "message" => "Users must have at least one login" }
+                                                      { "type" => "Users must have at least one login", "attribute" => nil, "message" => "Users must have at least one login" }
                                                     ]
                                                   }
                                                 })

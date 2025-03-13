@@ -20,7 +20,7 @@ require_relative "../../common"
 
 describe "Screenreader Gradebook grading" do
   include_context "in-process server selenium tests"
-  context "checkpoints" do
+  context "checkpoints", :ignore_js_errors do
     before do
       Account.site_admin.enable_feature! :discussion_checkpoints
       Account.site_admin.enable_feature!(:react_discussions_post)
@@ -28,7 +28,7 @@ describe "Screenreader Gradebook grading" do
       @teacher = course_with_teacher_logged_in(active_course: true, active_all: true, name: "teacher").user
       @student1 = student_in_course(course: @course, name: "student", active_all: true).user
       @student2 = student_in_course(course: @course, name: "student2", active_all: true).user
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
 
       @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
       @checkpointed_assignment = @checkpointed_discussion.assignment
@@ -137,6 +137,7 @@ describe "Screenreader Gradebook grading" do
 
       in_frame("speedgrader_iframe") do
         in_frame("discussion_preview_iframe") do
+          wait_for(method: nil, timeout: 2) { f("div[data-testid='isHighlighted']").displayed? }
           expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
           expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic j2")
           # page 2 is selected
@@ -145,11 +146,11 @@ describe "Screenreader Gradebook grading" do
         end
       end
       f("button[data-testid='discussions-previous-reply-button']").click
-      wait_for_ajaximations
 
       2.times do |i|
         in_frame("speedgrader_iframe") do
           in_frame("discussion_preview_iframe") do
+            wait_for_ajaximations
             expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
             expect(f("div[data-testid='isHighlighted']").text).to include("reply to topic j#{1 - i}")
             # page 1 is selected
@@ -165,6 +166,7 @@ describe "Screenreader Gradebook grading" do
       3.times do |i|
         in_frame("speedgrader_iframe") do
           in_frame("discussion_preview_iframe") do
+            wait_for_ajaximations
             expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
             expect(f("div[data-testid='isHighlighted']").text).to include("reply to entry i#{2 - i}")
             # page 1 is selected
@@ -257,6 +259,7 @@ describe "Screenreader Gradebook grading" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@entry.id}"
       in_frame("speedgrader_iframe") do
         in_frame("discussion_preview_iframe") do
+          wait_for_ajaximations
           expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
           # page 1 is selected
           expect(f("body").text).to include("reply to topic j2")

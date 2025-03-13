@@ -40,7 +40,7 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
     beforeAll(() => {
       oldEnv = ENV
       ENV = {
-        CONTEXT_BASE_URL: 'accounts/4',
+        CONTEXT_BASE_URL: '/accounts/4',
       }
       fetchMock.mock('*', 200)
     })
@@ -59,7 +59,7 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
       await doUpdateSettings(expectedBody)
 
       expect(fetchMock.called()).toBeTruthy()
-      expect(fetchMock.lastCall()[0]).toBe(`/api/v1/${ENV.CONTEXT_BASE_URL}`)
+      expect(fetchMock.lastCall()[0]).toBe(`/api/v1${ENV.CONTEXT_BASE_URL}`)
     })
 
     it('calls with the correct body format', async () => {

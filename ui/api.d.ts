@@ -725,3 +725,32 @@ export type CheckpointOverride = {
   unlock_at: string | null
   lock_at: string | null
 }
+
+export type SisImport = {
+  id: string
+  created_at: string
+  started_at: string | null
+  ended_at: string | null
+  updated_at: string
+  progress: number
+  workflow_state: string
+  data: {
+    import_type: string
+  }
+  batch_mode: boolean
+  batch_mode_term_id: string
+  multi_term_batch_mode: boolean
+  override_sis_stickiness: boolean
+  add_sis_stickiness: boolean
+  update_sis_id_if_login_claimed: boolean
+  clear_sis_stickiness: boolean
+  diffing_data_set_identifier: string
+  diffing_remaster: boolean
+  diffed_against_import_id: string
+  diffing_drop_status: string
+  diffing_user_remove_status: string
+  skip_deletes: boolean
+  change_threshold: number
+  diff_row_count_threshold: number
+  user: User
+}

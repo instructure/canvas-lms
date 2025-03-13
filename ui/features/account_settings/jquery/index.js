@@ -19,6 +19,7 @@
 import 'jqueryui/dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
+// eslint-disable-next-line import/no-named-as-default
 import htmlEscape from '@instructure/html-escape'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import axios from '@canvas/axios'
@@ -88,31 +89,8 @@ $(document).ready(function () {
   checkFutureListingSetting()
   $('#account_settings_restrict_student_future_view_value').change(checkFutureListingSetting)
 
-  $('#account_settings').submit(function () {
+  $('#account_settings').on('submit', function (event) {
     const $this = $(this)
-    let remove_ip_filters = true
-    $('.ip_filter .value')
-      .each(function () {
-        $(this).removeAttr('name')
-      })
-      .filter(':not(.blank)')
-      .each(function () {
-        const name = $.trim(
-          $(this).parents('.ip_filter').find('.name').val().replace(/\[|\]/g, '_'),
-        )
-        if (name) {
-          remove_ip_filters = false
-          $(this).attr('name', 'account[ip_filters][' + name + ']')
-        }
-      })
-
-    if (remove_ip_filters) {
-      $this.append(
-        "<input class='remove_ip_filters' type='hidden' name='account[remove_ip_filters]' value='1'/>",
-      )
-    } else {
-      $this.find('.remove_ip_filters').remove() // just in case it's left over after a failed validation
-    }
 
     const account_validations = {
       object_name: 'account',
@@ -144,9 +122,11 @@ $(document).ready(function () {
       result = result && $this.validateForm(help_menu_validations)
     }
 
-    if (!result) {
-      return false
-    }
+    // Check for quiz filter errors too
+    const quizIPFilters = document.getElementById('account_settings_quiz_ip_filters')
+    if (quizIPFilters) result = result && quizIPFilters.__performValidation()
+
+    if (!result) event.preventDefault()
   })
 
   $('#account_settings_suppress_notifications').click(event => {
@@ -169,7 +149,7 @@ $(document).ready(function () {
 
   globalAnnouncements.bindDomEvents()
 
-  $('#account_settings_tabs').on('tabsactivate', (event, ui) => {
+  $('#account_settings_tabs').on('tabsactivate', (_e, ui) => {
     try {
       const $tabLink = ui.newTab.children('a:first-child')
       const hash = new URL($tabLink.prop('href')).hash
@@ -334,6 +314,7 @@ $(document).ready(function () {
               /* webpackChunkName: "[request]" */
               '../react/index'
             )
+              /* eslint-disable promise/no-nesting */
               .then(({start}) => {
                 start(document.getElementById('tab-security'), {
                   context: splitContext[0],
@@ -351,6 +332,7 @@ $(document).ready(function () {
                 // We really should never get here... but if we do... do something.
                 $('#tab-security').text(I18n.t('Security Tab failed to load'))
               })
+            /* eslint-enable promise/no-nesting */
           })
           .catch(() => {
             // We really should never get here... but if we do... do something.
@@ -370,27 +352,7 @@ $(document).ready(function () {
       lockbox.prop('disabled', true)
     }
   })
-  $('.add_ip_filter_link').click(event => {
-    event.preventDefault()
-    const $filter = $('.ip_filter.blank:first').clone(true).removeClass('blank')
-    $('#ip_filters').append($filter.show())
-  })
-  $('.delete_filter_link').click(function (event) {
-    event.preventDefault()
-    $(this).parents('.ip_filter').remove()
-  })
-  if ($('.ip_filter:not(.blank)').length === 0) {
-    $('.add_ip_filter_link').click()
-  }
-  $('.ip_help_link').click(event => {
-    event.preventDefault()
-    $('#ip_filters_dialog').dialog({
-      title: I18n.t('titles.what_are_quiz_ip_filters', 'What are Quiz IP Filters?'),
-      width: 400,
-      modal: true,
-      zIndex: 1000,
-    })
-  })
+
   $('.rqd_help_btn').click(event => {
     event.preventDefault()
     $('#rqd_dialog').dialog({
@@ -428,7 +390,7 @@ $(document).ready(function () {
       newId = uniqueCounter++
     // need to replace the unique id in the inputs so they get sent back to rails right,
     // chage the 'for' on the lables to match.
-    $.each(['id', 'name', 'for'], (i, prop) => {
+    $.each(['id', 'name', 'for'], (_i, prop) => {
       $newContainer
         .find('[' + prop + ']')
         .attr(prop, (_i, previous) => previous.replace(/\d+/, newId))

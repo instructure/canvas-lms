@@ -31,60 +31,70 @@ class TranslationController < ApplicationController
   rescue_from Aws::Translate::Errors::ServiceError, with: :handle_generic_error
 
   def translate
+    start_time = Time.zone.now
     # Don't allow users that can't access, or if translation is not available
     return render_unauthorized_action unless Translation.available?(@context, :translation) && user_can_read?
 
-    InstStatsd::Statsd.increment("translation.discussions")
     if Account.site_admin.feature_enabled?(:ai_translation_improvements)
-      render json: { translated_text: Translation.translate_html(html_string: required_params[:text],
-                                                                 tgt_lang: required_params[:tgt_lang]) }
+      translated_text = Translation.translate_html(html_string: required_params[:text], tgt_lang: required_params[:tgt_lang])
+      render json: { translated_text: translated_text }
+      duration = Time.zone.now - start_time
+      InstStatsd::Statsd.timing("translation.discussions.duration", duration)
     else
-      render json: { translated_text: Translation.translate_html_sagemaker(html_string: required_params[:text],
-                                                                           src_lang: required_params[:src_lang],
-                                                                           tgt_lang: required_params[:tgt_lang]) }
+      translated_text = Translation.translate_html_sagemaker(html_string: required_params[:text], src_lang: required_params[:src_lang], tgt_lang: required_params[:tgt_lang])
+      render json: { translated_text: translated_text }
     end
   end
 
   def translate_paragraph
-    InstStatsd::Statsd.increment("translation.inbox_compose")
+    start_time = Time.zone.now
+
     if Account.site_admin.feature_enabled?(:ai_translation_improvements)
-      render json: { translated_text: Translation.translate_text(text: required_params[:text],
-                                                                 tgt_lang: required_params[:tgt_lang]) }
+      translated_text = Translation.translate_text(text: required_params[:text], tgt_lang: required_params[:tgt_lang])
+      render json: { translated_text: translated_text }
+      duration = Time.zone.now - start_time
+      InstStatsd::Statsd.timing("translation.inbox_compose.duration", duration)
     else
-      render json: translate_large_passage(original_text: required_params[:text],
-                                           src_lang: required_params[:src_lang],
-                                           tgt_lang: required_params[:tgt_lang])
+      translated_text = translate_large_passage(original_text: required_params[:text], src_lang: required_params[:src_lang], tgt_lang: required_params[:tgt_lang])
+      render json: { translated_text: translated_text }
     end
   end
 
   def handle_same_language_error
+    InstStatsd::Statsd.increment("translation.errors", tags: ["error:same_language"])
     render json: { translationError: { type: "info", message: I18n.t("Translation is identical to source language.") } }, status: :unprocessable_entity
   end
 
   def handle_generic_error(exception)
+    tags = []
     case exception
     when Aws::Translate::Errors::UnsupportedLanguagePairException
       error_data = JSON.parse(exception.context.http_response.body.read)
-
       source_lang_code = error_data["SourceLanguageCode"]
-      source_lang = Translation.languages.find { |lang| lang[:id] == source_lang_code }
       target_lang_code = error_data["TargetLanguageCode"]
+      tags = ["error:unsupported_language_pair", "source_language:#{source_lang_code}", "dest_language:#{target_lang_code}"]
+      source_lang = Translation.languages.find { |lang| lang[:id] == source_lang_code }
       target_lang = Translation.languages.find { |lang| lang[:id] == target_lang_code }
-
-      render json: { translationError: { type: "error",
-                                         message: I18n.t("Translation from %{source_lang} to %{target_lang} is not supported.", {
-                                                           source_lang: source_lang[:name],
-                                                           target_lang: target_lang[:name]
-                                                         }) } },
-             status: :unprocessable_entity
+      message = I18n.t("Translation from %{source_lang} to %{target_lang} is not supported.", { source_lang: source_lang[:name], target_lang: target_lang[:name] })
+      status = :unprocessable_entity
     when Aws::Translate::Errors::DetectedLanguageLowConfidenceException
-      render json: { translationError: { type: "error", message: I18n.t("Couldn’t identify source language.") } }, status: :unprocessable_entity
+      tags = ["error:low_confidence"]
+      message = I18n.t("Couldn’t identify source language.")
+      status = :unprocessable_entity
     when Aws::Translate::Errors::TextSizeLimitExceededException
-      render json: { translationError: { type: "error", message: I18n.t("Couldn’t translate because the text is too long.") } }, status: :unprocessable_entity
+      character_count = required_params[:text].length
+      tags = ["error:text_size_limit", "character_count:#{character_count}"]
+      message = I18n.t("Couldn’t translate because the text is too long.")
+      status = :unprocessable_entity
     else
       # Generic response for all other ServiceErrors
-      render json: { translationError: { type: "error", message: I18n.t("There was an unexpected error during translation.") } }, status: :internal_server_error
+      tags = ["error:generic"]
+      message = I18n.t("There was an unexpected error during translation.")
+      status = :internal_server_error
     end
+
+    InstStatsd::Statsd.increment("translation.errors", tags: tags)
+    render json: { translationError: { type: "error", message: message } }, status: status
   end
 
   private

@@ -17,7 +17,6 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import {verifyPledgeIsChecked} from '../../jquery/helper'
 
 class ExternalContentHomeworkSubmissionView extends Backbone.View {
   constructor(...args) {
@@ -25,6 +24,7 @@ class ExternalContentHomeworkSubmissionView extends Backbone.View {
     this._relaunchTool = this._relaunchTool.bind(this)
     this._triggerCancel = this._triggerCancel.bind(this)
     this._triggerSubmit = this._triggerSubmit.bind(this)
+    this._showPledgeError = this._showPledgeError.bind(this)
   }
 
   _relaunchTool(event) {
@@ -43,9 +43,17 @@ class ExternalContentHomeworkSubmissionView extends Backbone.View {
     event.preventDefault()
     event.stopPropagation()
     this.model.set('comment', this.$el.find('.submission_comment').val())
-    if (verifyPledgeIsChecked($('input.turnitin_pledge.external-tool'))) {
+    const checkbox = document.getElementById('turnitin_pledge_external_content')
+    if (checkbox && !checkbox.checked) {
+      this.shouldShowPledgeError = true
+      this._showPledgeError(checkbox)
+    } else {
       return this.submitHomework()
     }
+  }
+
+  _showPledgeError(checkbox) {
+    checkbox?.focus()
   }
 }
 

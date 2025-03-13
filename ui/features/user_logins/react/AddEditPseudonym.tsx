@@ -38,6 +38,7 @@ const I18n = createI18nScope('add_edit_pseudonym')
 const createValidationSchema = (
   isEdit: boolean,
   accountIdPasswordPolicyMap: AddEditPseudonymProps['accountIdPasswordPolicyMap'],
+  defaultPolicy: PasswordPolicy,
 ) =>
   z
     .object({
@@ -49,8 +50,11 @@ const createValidationSchema = (
       password_confirmation: z.string().optional(),
     })
     .superRefine(({account_id, password, password_confirmation}, ctx) => {
-      if (!isEdit && account_id && password != null && password_confirmation != null) {
-        const policy = accountIdPasswordPolicyMap[account_id]
+      if (!isEdit && password != null && password_confirmation != null) {
+        const policy =
+          accountIdPasswordPolicyMap && account_id
+            ? (accountIdPasswordPolicyMap[account_id] ?? defaultPolicy)
+            : defaultPolicy
         const {minimum_character_length} = policy
         const minCharacterLength = Number(minimum_character_length)
         const isTooShort = password.length < minCharacterLength
@@ -103,7 +107,7 @@ export interface AddEditPseudonymProps {
   canChangePassword: boolean
   isDelegatedAuth: boolean
   accountSelectOptions: Array<{label: string; value: number}>
-  accountIdPasswordPolicyMap: Record<string, PasswordPolicy>
+  accountIdPasswordPolicyMap?: Record<string, PasswordPolicy>
   defaultPolicy: PasswordPolicy
   isEdit: boolean
   onClose: () => void
@@ -123,14 +127,11 @@ const AddEditPseudonym = ({
   onClose,
   onSubmit,
 }: AddEditPseudonymProps) => {
-  const accSelOpts = accountSelectOptions ?? [{label: '', value: undefined}]
-  // @ts-expect-error
-  if (accSelOpts.length === 0) accSelOpts[0] = {label: '', value: undefined}
   const defaultValues = {
     unique_id: pseudonym?.unique_id ?? '',
     sis_user_id: pseudonym?.sis_user_id ?? '',
     integration_id: pseudonym?.integration_id ?? '',
-    account_id: pseudonym?.account_id ?? accSelOpts[0].value,
+    account_id: pseudonym?.account_id ?? accountSelectOptions?.[0]?.value,
     password: isEdit ? undefined : '',
     password_confirmation: isEdit ? undefined : '',
   }
@@ -142,7 +143,9 @@ const AddEditPseudonym = ({
     setFocus,
   } = useForm({
     defaultValues,
-    resolver: zodResolver(createValidationSchema(isEdit, accountIdPasswordPolicyMap)),
+    resolver: zodResolver(
+      createValidationSchema(isEdit, accountIdPasswordPolicyMap, defaultPolicy),
+    ),
   })
   const title = isEdit ? I18n.t('Update Login') : I18n.t('Add Login')
   const buttonText = isSubmitting ? (isEdit ? I18n.t('Updating...') : I18n.t('Adding...')) : title
@@ -188,9 +191,11 @@ const AddEditPseudonym = ({
           I18n.t('You do not have sufficient privileges to make the change requested.'),
         )()
       } else if (error?.response?.status === 400 && errorResponse) {
-        const policy = accountIdPasswordPolicyMap[data.account_id!]
-          ? accountIdPasswordPolicyMap[data.account_id!]
-          : defaultPolicy
+        const {account_id} = data
+        const policy =
+          accountIdPasswordPolicyMap && account_id
+            ? (accountIdPasswordPolicyMap[account_id] ?? defaultPolicy)
+            : defaultPolicy
         const normalizedError: Record<
           keyof FormValues,
           Array<string>
@@ -277,7 +282,7 @@ const AddEditPseudonym = ({
               />
             </>
           )}
-          {!isEdit && accountSelectOptions && (
+          {!isEdit && accountSelectOptions.length && (
             <Controller
               control={control}
               name="account_id"

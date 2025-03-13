@@ -82,6 +82,7 @@ ready(() => {
       groupCategories:
         (typeof ENV !== 'undefined' && ENV !== null ? ENV.GROUP_CATEGORIES : undefined) || [],
       inClosedGradingPeriod: assignment.inClosedGradingPeriod(),
+      showNewErrors: true
     })
     const peerReviewsSelector = new PeerReviewsSelector({
       parentModel: assignment,

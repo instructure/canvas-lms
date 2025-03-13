@@ -211,7 +211,8 @@ class AbstractAssignment < ActiveRecord::Base
   validates :grader_count, numericality: true
   validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
   validates :sis_source_id, uniqueness: { scope: :root_account_id }, allow_nil: true
-  validates_with HorizonValidators::AssignmentValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
+
+  before_validation :convert_horizon_assignment, if: -> { context.is_a?(Course) && context.horizon_course? }
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true
@@ -256,6 +257,15 @@ class AbstractAssignment < ActiveRecord::Base
   # included to make it easier to work with api, which returns
   # sis_source_id as sis_assignment_id.
   alias_attribute :sis_assignment_id, :sis_source_id
+
+  def convert_horizon_assignment
+    self.peer_reviews = false
+    self.peer_review_count = 0
+    self.automatic_peer_reviews = false
+    self.group_category_id = nil
+    self.rubric_association = nil
+    self.submission_types = "online_text_entry" unless HORIZON_SUBMISSION_TYPES.include?(submission_types)
+  end
 
   def queue_conditional_release_grade_change_handler?
     shard.activate do
@@ -2208,7 +2218,7 @@ class AbstractAssignment < ActiveRecord::Base
     submissions = []
     grade_group_students = !(grade_group_students_individually || opts[:excused])
 
-    if has_sub_assignments? && root_account&.feature_enabled?(:discussion_checkpoints)
+    if has_sub_assignments? && context.discussion_checkpoints_enabled?
       sub_assignment_tag = opts[:sub_assignment_tag]
       checkpoint_assignment = find_checkpoint(sub_assignment_tag)
       if sub_assignment_tag.blank? || checkpoint_assignment.nil?
@@ -2625,7 +2635,7 @@ class AbstractAssignment < ActiveRecord::Base
       hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
       homework.add_comment(hash)
     end
-    Lti::AssetProcessorNotifier.notify_asset_processors(primary_homework)
+    Lti::AssetProcessorNotifier.delay_if_production.notify_asset_processors(primary_homework)
     touch_context
     primary_homework
   end
@@ -4161,6 +4171,26 @@ class AbstractAssignment < ActiveRecord::Base
     return false if external_tool? && !Account.site_admin.feature_enabled?(:external_tools_for_a2)
 
     true
+  end
+
+  def stickers_enabled?(current_user)
+    return false unless context.feature_enabled?(:submission_stickers) && a2_enabled?
+
+    [:moderator, :provisional_grader].exclude?(grading_role(current_user))
+  end
+
+  # NOTE: this method assumes the call site has made appropriate authorization checks
+  # beforehand to ensure the current_user has permission to grade the student
+  def grading_role(current_user)
+    if moderated_grading_enabled_and_no_grades_published?
+      permits_moderation?(current_user) ? :moderator : :provisional_grader
+    else
+      :grader
+    end
+  end
+
+  def moderated_grading_enabled_and_no_grades_published?
+    moderated_grading? && !grades_published?
   end
 
   def self.disable_post_to_sis_if_grading_period_closed

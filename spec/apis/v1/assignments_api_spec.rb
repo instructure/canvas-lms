@@ -184,7 +184,7 @@ describe AssignmentsApiController, type: :request do
 
     describe "checkpoints in-place" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
 
         assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
         @c1 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
@@ -1740,7 +1740,7 @@ describe AssignmentsApiController, type: :request do
     describe "checkpoints in-place" do
       before do
         course_with_teacher(active_all: true)
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
 
         assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
         @c1 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
@@ -5994,7 +5994,7 @@ describe AssignmentsApiController, type: :request do
 
     describe "checkpoints in-place" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
 
         @assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
         @c1 = @assignment.sub_assignments.create!(context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)

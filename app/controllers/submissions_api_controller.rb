@@ -282,7 +282,7 @@ class SubmissionsApiController < ApplicationController
                submissions = Api.paginate(submissions,
                                           self,
                                           polymorphic_url([:api_v1, @section || @context, @assignment, :submissions]))
-               bulk_load_attachments_and_previews(submissions)
+               Submission.bulk_load_attachments_and_previews(submissions)
 
                submissions.map do |s|
                  s.visible_to_user = true
@@ -452,7 +452,7 @@ class SubmissionsApiController < ApplicationController
     includes = Array(params[:include])
 
     assignment_scope = @context.assignments.published.preload(:quiz, :discussion_topic, :post_policy)
-    if includes.include?("sub_assignment_submissions") && @context.root_account.feature_enabled?(:discussion_checkpoints)
+    if includes.include?("sub_assignment_submissions") && @context.discussion_checkpoints_enabled?
       assignment_scope = assignment_scope.preload(:sub_assignments)
     end
 
@@ -523,7 +523,7 @@ class SubmissionsApiController < ApplicationController
       submission_preloads << :attachment unless params[:exclude_response_fields]&.include?("attachments")
       submissions = submissions_scope.preload(submission_preloads).to_a
 
-      bulk_load_attachments_and_previews(submissions)
+      Submission.bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 
       result = []
@@ -621,7 +621,7 @@ class SubmissionsApiController < ApplicationController
   # @argument include[] [String, "submission_history"|"submission_comments"|"submission_html_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"|"read_status"|"student_entered_score"]
   #   Associations to include with the group.
   def show
-    bulk_load_attachments_and_previews([@submission])
+    Submission.bulk_load_attachments_and_previews([@submission])
 
     if authorized_action(@submission, @current_user, :read)
       if @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades) ||
@@ -878,7 +878,7 @@ class SubmissionsApiController < ApplicationController
           submission[:sticker] = params[:submission].delete(:sticker)
         end
 
-        if params.key?(:sub_assignment_tag) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
+        if params.key?(:sub_assignment_tag) && @assignment.context.discussion_checkpoints_enabled?
           submission[:sub_assignment_tag] = params.delete(:sub_assignment_tag)
         end
 
@@ -923,7 +923,7 @@ class SubmissionsApiController < ApplicationController
         end
 
         @submissions.each do |original_sub|
-          sub = effective_submission(original_sub, submission[:sub_assignment_tag])
+          sub = original_sub.effective_checkpoint_submission(submission[:sub_assignment_tag])
 
           if custom_status
             sub.custom_grade_status = custom_status
@@ -994,7 +994,7 @@ class SubmissionsApiController < ApplicationController
       # submission without going through the model instance -- it'd be nice to
       # fix this at some point.
       @submission.reload
-      bulk_load_attachments_and_previews([@submission])
+      Submission.bulk_load_attachments_and_previews([@submission])
 
       includes = %w[submission_comments]
       includes.concat(Array.wrap(params[:include]) & %w[visibility sub_assignment_submissions])
@@ -1034,19 +1034,6 @@ class SubmissionsApiController < ApplicationController
       end
       render json:
     end
-  end
-
-  def effective_submission(sub, sub_assignment_tag)
-    assignment = sub.assignment
-
-    return sub unless sub_assignment_tag.present?
-    return sub unless assignment.checkpoints_parent?
-
-    sub_assignment = assignment.find_checkpoint(sub_assignment_tag)
-
-    return sub if sub_assignment.nil?
-
-    sub_assignment.all_submissions.find_by(user: sub.user) || sub
   end
 
   # @API Grade or comment on a submission by anonymous id
@@ -1644,19 +1631,11 @@ class SubmissionsApiController < ApplicationController
     @section ? [@section.id] : nil
   end
 
-  def bulk_load_attachments_and_previews(submissions)
-    Submission.bulk_load_versioned_attachments(submissions)
-    attachments = submissions.flat_map(&:versioned_attachments)
-    ActiveRecord::Associations.preload(attachments,
-                                       [:canvadoc, :crocodoc_document])
-    Version.preload_version_number(submissions)
-  end
-
   def bulk_process_submissions_for_visibility(submissions_scope, includes)
     result = []
 
     submissions_scope.find_in_batches(batch_size: 100) do |submission_batch|
-      bulk_load_attachments_and_previews(submission_batch)
+      Submission.bulk_load_attachments_and_previews(submission_batch)
       user_ids = submission_batch.map(&:user_id)
       users_with_visibility = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(
         course_ids: @context.id,

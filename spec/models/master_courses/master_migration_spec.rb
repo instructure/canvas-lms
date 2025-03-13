@@ -2927,7 +2927,7 @@ describe MasterCourses::MasterMigration do
       expect(qg_to.question_points).to eq 2.0
       qg_to.question_points = 3.0
       expect(qg_to.save).to be false
-      expect(qg_to.errors.first.second).to eq "cannot change column(s): question_points - locked by Master Course"
+      expect(qg_to.errors.full_messages).to include "cannot change column(s): question_points - locked by Master Course"
     end
 
     it "copies tab configurations for account-level external tools" do

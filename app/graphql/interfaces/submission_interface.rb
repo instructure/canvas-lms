@@ -110,6 +110,8 @@ module Interfaces::SubmissionInterface
   end
   private :protect_submission_grades
 
+  field :anonymous_id, ID, null: true
+
   field :assignment, Types::AssignmentType, null: true
   def assignment
     load_association(:assignment)
@@ -166,7 +168,7 @@ module Interfaces::SubmissionInterface
   end
   def comments_connection(filter:, sort_order:, include_draft_comments:)
     filter = filter.to_h
-    all_comments, for_attempt, peer_review = filter.values_at(:all_comments, :for_attempt, :peer_review)
+    filter => all_comments:, for_attempt:, peer_review:
 
     load_association(:assignment).then do
       load_association(:submission_comments).then do

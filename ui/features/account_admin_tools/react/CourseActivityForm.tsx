@@ -29,33 +29,34 @@ import {
 } from '@canvas/forms/react/react-hook-form/utils'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import AutoCompleteSelect from './AutoCompleteSelect'
+import AutoCompleteSelect from '../../../shared/auto-complete-select/react/AutoCompleteSelect'
 
 const I18n = createI18nScope('course_logging_content')
 
 const defaultValues = {course_id: '', start_time: undefined, end_time: undefined}
 
-const validationSchema = z
-  .object({
-    course_id: z.string().min(1, I18n.t('Course ID is required.')),
-    start_time: z.string().optional(),
-    end_time: z.string().optional(),
-  })
-  .refine(
-    ({start_time, end_time}) => {
-      if (!start_time || !end_time) return true
+const createValidationSchema = () =>
+  z
+    .object({
+      course_id: z.string().min(1, {message: I18n.t('Course ID is required.')}),
+      start_time: z.string().optional(),
+      end_time: z.string().optional(),
+    })
+    .refine(
+      ({start_time, end_time}) => {
+        if (!start_time || !end_time) return true
 
-      const isToDateAfterFromDate = new Date(end_time).getTime() >= new Date(start_time).getTime()
+        const isToDateAfterFromDate = new Date(end_time).getTime() >= new Date(start_time).getTime()
 
-      return isToDateAfterFromDate
-    },
-    {
-      message: I18n.t('To Date cannot come before From Date.'),
-      path: ['end_time'],
-    },
-  )
+        return isToDateAfterFromDate
+      },
+      () => ({
+        message: I18n.t('To Date cannot come before From Date.'),
+        path: ['end_time'],
+      }),
+    )
 
-type FormValues = z.infer<typeof validationSchema>
+type FormValues = z.infer<ReturnType<typeof createValidationSchema>>
 
 type Course = {
   id: string
@@ -74,7 +75,7 @@ const CourseActivityForm = ({accountId, onSubmit}: CourseActivityFormProps) => {
     formState: {errors},
     handleSubmit,
     setFocus,
-  } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
+  } = useForm({defaultValues, resolver: zodResolver(createValidationSchema())})
   const startDateInputRef = useRef<DateTimeInput>(null)
   const endDateInputRef = useRef<DateTimeInput>(null)
   const buttonText = I18n.t('Find')

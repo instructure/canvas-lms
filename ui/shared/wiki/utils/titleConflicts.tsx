@@ -17,10 +17,13 @@
  */
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Alert} from '@instructure/ui-alerts'
 import {debounce} from '@instructure/debounce'
-import type {Message} from '../react/renderWikiPageTitle'
+import type {FormMessage} from '@instructure/ui-form-field'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text';
+import {Flex} from '@instructure/ui-flex';
 
 const I18n = createI18nScope('wiki_pages')
 
@@ -29,35 +32,45 @@ type AvailabilityResponse = {
   errors?: Array<{message: string}>
 }
 
-export function conflictMessage(): Message {
+export function conflictMessage(): FormMessage {
   const text = ENV.context_asset_string.startsWith('group')
-    ? I18n.t('There is already a page in this group with this title.')
-    : I18n.t('There is already a page in this course with this title.')
+    ? I18n.t('There is already a page in this group with this title. Hitting save will create a duplicate.')
+    : I18n.t('There is already a page in this course with this title. Hitting save will create a duplicate.')
   return {
     type: 'hint',
     text: (
-      <>
-        <IconWarningSolid data-testid="warning-icon" color="warning" />
-        <View display="inline-block" margin="0 xx-small">
+      <Flex as="div" alignItems="center" gap="x-small">
+        <IconWarningSolid data-testid="warning-icon" color="warning"/>
+        <Text size="small">
           {text}
-        </View>
-      </>
+        </Text>
+        <Alert
+          variant="warning"
+          liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+          screenReaderOnly={true}
+        >
+          {text}
+        </Alert>
+      </Flex>
     ),
   }
 }
 
-export function generateUrl(title: string): string {
+export function generateUrl(title: string, currentPageId?: string): string {
   const origin = ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
   if (!ENV.TITLE_AVAILABILITY_PATH) {
     throw new Error('Title availability path required')
   }
   const url = new URL(ENV.TITLE_AVAILABILITY_PATH, origin)
   url.searchParams.set('title', title)
+  if (currentPageId) {
+    url.searchParams.set('current_page_id', currentPageId)
+  }
   return url.toString()
 }
 
-export async function fetchTitleAvailability(title: string): Promise<boolean> {
-  const response = await fetch(generateUrl(title))
+export async function fetchTitleAvailability(title: string, currentPageId?: string): Promise<boolean> {
+  const response = await fetch(generateUrl(title, currentPageId))
   const {conflict, errors}: AvailabilityResponse = await response.json()
   if (response.ok) {
     return !!conflict
@@ -68,10 +81,11 @@ export async function fetchTitleAvailability(title: string): Promise<boolean> {
 
 export async function checkForTitleConflict(
   title: string,
-  callback: (messages: Message[]) => void,
+  callback: (messages: FormMessage[]) => void,
+  currentPageId?: string
 ) {
   try {
-    const conflict = await fetchTitleAvailability(title)
+    const conflict = await fetchTitleAvailability(title, currentPageId)
     conflict ? callback([conflictMessage()]) : callback([])
   } catch (error) {
     console.log(error)

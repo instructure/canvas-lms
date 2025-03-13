@@ -26,9 +26,9 @@ import {TextInput} from '@instructure/ui-text-input'
 import type {File, Folder} from '../../interfaces/File'
 import {queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {isFile} from '../../utils/fileFolderUtils'
+import {isFile, getName} from '../../utils/fileFolderUtils'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 
@@ -51,18 +51,9 @@ export const RenameModal = ({
   isOpen: boolean
   onClose: () => void
 }) => {
-  const [newItemName, setNewItemName] = useState<string>(
-    isFile(renamingItem) ? renamingItem.display_name : renamingItem.name,
-  )
+  const [newItemName, setNewItemName] = useState<string>(getName(renamingItem))
   const [errorMessages, setErrorMessages] = useState<FormMessage[]>()
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
-
-  const handleClose = () => {
-    setNewItemName('')
-    setErrorMessages([])
-    setIsRequestInFlight(false)
-    onClose()
-  }
 
   const handleSave = () => {
     const trimmedNewItemName = newItemName.trim()
@@ -70,7 +61,7 @@ export const RenameModal = ({
       trimmedNewItemName === renamingItem.name ||
       trimmedNewItemName === renamingItem.display_name
     ) {
-      handleClose()
+      onClose()
       return
     }
 
@@ -94,29 +85,44 @@ export const RenameModal = ({
     setIsRequestInFlight(true)
     updateItemName(renamingItem, trimmedNewItemName)
       .then(async () => {
+        showFlashSuccess(
+          I18n.t('Successfully renamed %{item}.', {item: isFile(renamingItem) ? 'file' : 'folder'}),
+        )()
+        onClose()
         await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
       })
       .catch(err => {
         if (err?.response?.status == 409) {
           showFlashError(
-            I18n.t('A file named "%{name}" already exists in this folder', {
+            I18n.t('A file named "%{name}" already exists in this folder.', {
               name: trimmedNewItemName,
             }),
           )()
         } else {
-          showFlashError(I18n.t('Renaming failed'))(err)
+          showFlashError(
+            I18n.t('There was an error renaming this %{item}. Please try again.', {
+              item: isFile(renamingItem) ? 'file' : 'folder',
+            }),
+          )()
         }
       })
       .finally(() => {
-        handleClose()
+        setIsRequestInFlight(false)
       })
+  }
+
+  const handleExited = () => {
+    setNewItemName(getName(renamingItem))
+    setErrorMessages([])
+    setIsRequestInFlight(false)
   }
 
   return (
     <Modal
       as="div"
       open={isOpen}
-      onDismiss={handleClose}
+      onDismiss={onClose}
+      onExited={handleExited}
       size="small"
       label={I18n.t('Rename file/folder modal')}
     >
@@ -124,7 +130,8 @@ export const RenameModal = ({
         <CloseButton
           placement="end"
           offset="small"
-          onClick={handleClose}
+          onClick={onClose}
+          data-testid="rename-modal-button-close"
           screenReaderLabel={I18n.t('Close')}
         />
         <Heading>{I18n.t('Rename')}</Heading>
@@ -138,6 +145,7 @@ export const RenameModal = ({
               }
               margin="0 0 0 medium"
               aria-live="polite"
+              data-testid="rename-spinner"
             />
           </View>
         ) : (
@@ -145,9 +153,15 @@ export const RenameModal = ({
             <FileFolderInfo items={[renamingItem]} />
             <div style={{paddingTop: '1.5rem'}}>
               <TextInput
-                defaultValue={isFile(renamingItem) ? renamingItem.display_name : renamingItem.name}
+                value={newItemName}
+                data-testid="rename-modal-input-folder-name"
                 onChange={(_e: ChangeEvent<HTMLInputElement>, new_value: string) => {
                   setNewItemName(new_value)
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    handleSave()
+                  }
                 }}
                 messages={errorMessages}
                 renderLabel={isFile(renamingItem) ? I18n.t('File Name') : I18n.t('Folder Name')}
@@ -158,13 +172,14 @@ export const RenameModal = ({
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={handleClose} disabled={isRequestInFlight}>
+        <Button onClick={onClose} disabled={isRequestInFlight}>
           {I18n.t('Cancel')}
         </Button>
         <Button
           color="primary"
           margin="none none none small"
           onClick={handleSave}
+          data-testid="rename-modal-button-save"
           disabled={isRequestInFlight}
         >
           {I18n.t('Save')}

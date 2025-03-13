@@ -219,7 +219,7 @@ describe "Api::V1::Assignment" do
 
       context "discussion_checkpoints enabled without checkpoints" do
         before do
-          assignment.root_account.enable_feature!(:discussion_checkpoints)
+          assignment.course.account.enable_feature!(:discussion_checkpoints)
         end
 
         it "returns false for the has_sub_assignments attribute and [] for the checkpoints attribute" do
@@ -231,7 +231,7 @@ describe "Api::V1::Assignment" do
 
       context "discussion_checkpoints enabled with checkpoints" do
         before do
-          assignment.root_account.enable_feature!(:discussion_checkpoints)
+          assignment.course.account.enable_feature!(:discussion_checkpoints)
 
           assignment.update_attribute(:has_sub_assignments, true)
 
@@ -352,7 +352,7 @@ describe "Api::V1::Assignment" do
       describe "checkpointed assignments" do
         before do
           @student1 = student_in_course(course: @course, active_all: true).user
-          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @course.account.enable_feature!(:discussion_checkpoints)
 
           @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
           Checkpoints::DiscussionCheckpointCreatorService.call(
@@ -1092,6 +1092,71 @@ describe "Api::V1::Assignment" do
       it "doesn't create the assignment if the custom params are invalid" do
         assignment_create_params[:external_tool_tag_attributes][:custom_params] = "invalid"
         expect { subject }.not_to change { Assignment.count }
+      end
+    end
+
+    context "when asset processor content items are passed in for asset processor" do
+      let_once(:tool) { external_tool_1_3_model(context: account, developer_key:) }
+      let(:content_items) do
+        [
+          {
+            "url" => "",
+            "title" => "Lti 1.3 Tool Title",
+            "text" => "Lti 1.3 Tool Text",
+            "custom" => "",
+            "icon" => "{\"url\":\"https://img.icons8.com/metro/1600/unicorn.png\",\"width\":64,\"height\":64}",
+            "window" => "",
+            "iframe" => "",
+            "report" => "{\"supportedTypes\":[\"originality\",\"ai_detection\"],\"released\":true,\"indicator\":false,\"custom\":{\"some_setting\":\"az-123\"}}",
+            "assignment_id" => "",
+            "context_external_tool_id" => tool.id,
+          }
+        ]
+      end
+
+      let_once(:assignment_create_params) do
+        ActionController::Parameters.new(
+          name: "New Assignment",
+          asset_processors: content_items,
+          submission_type: "online",
+          submission_types: ["online_upload"],
+          similarityDetectionTool: ""
+        )
+      end
+
+      before do
+        Account.default.enable_feature! :lti_asset_processor
+      end
+
+      context "when the content_items are valid" do
+        it "creates asset processors for the assignment" do
+          expect { subject }.to change { Assignment.count }.by(1)
+          expect(subject.lti_asset_processors.count).to eq 1
+        end
+      end
+
+      context "when the content_items is nil" do
+        it "does not create asset processors for the assignment" do
+          assignment_create_params[:asset_processors] = nil
+          expect { subject }.to change { Assignment.count }.by(1)
+          expect(subject.lti_asset_processors.count).to eq 0
+        end
+      end
+
+      context "when the assignment is not asset processor capable" do
+        it "does not create asset processors for the assignment" do
+          assignment_create_params[:submission_type] = nil
+          expect { subject }.to change { Assignment.count }.by(1)
+          expect(subject.lti_asset_processors.count).to eq 0
+        end
+      end
+
+      context "when the lti_asset_processor FF is off" do
+        it "does not create asset processors for the assignment" do
+          Account.default.disable_feature! :lti_asset_processor
+          expect { subject }.to change { Assignment.count }.by(1)
+          expect(subject.lti_asset_processors.count).to eq 0
+        end
       end
     end
   end

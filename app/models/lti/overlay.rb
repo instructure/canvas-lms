@@ -172,7 +172,8 @@ class Lti::Overlay < ActiveRecord::Base
     lti_overlay_versions.create!(
       diff:,
       account:,
-      created_by: updated_by
+      created_by: updated_by,
+      caused_by_reset: data == {}
     )
   end
 end

@@ -21,6 +21,9 @@ module Lti::IMS::Concerns
   module DeepLinkingServices
     CLAIM_PREFIX = "https://purl.imsglobal.org/spec/lti-dl/claim/"
 
+    # If changing this value, update documentation (ripgrep: rg '#.*public_jwk_url')
+    JWK_SET_CACHE_EXPIRATION = 5.minutes
+
     def return_url_parameters
       @return_url_parameters ||= return_url_data.data
     end
@@ -93,10 +96,15 @@ module Lti::IMS::Concerns
 
       private
 
+      def cache_public_jwk_url?
+        @cache_public_jwk_url ||=
+          developer_key.root_account.feature_enabled?(:lti_cache_tool_public_jwks_url)
+      end
+
       def verified_jwt
         @verified_jwt ||= begin
           jwt_hash = if developer_key&.public_jwk_url.present?
-                       get_jwk_from_url
+                       verified_jwt_using_jwks_url
                      else
                        JSON::JWT.decode(@raw_jwt_str, public_key)
                      end
@@ -118,12 +126,56 @@ module Lti::IMS::Concerns
         end
       end
 
-      def get_jwk_from_url
-        pub_jwk_from_url = HTTParty.get(developer_key&.public_jwk_url)
-        JSON::JWT.decode(@raw_jwt_str, JSON::JWK::Set.new(pub_jwk_from_url.parsed_response))
+      def verified_jwt_using_jwks_url
+        verified_jwt_using_cached_jwks_url || verified_jwt_using_fetched_jwks_url
+      end
+
+      def verified_jwt_using_cached_jwks_url
+        return nil unless cache_public_jwk_url?
+
+        jwk_set = Rails.cache.read(public_jwk_url_cache_key)
+        return nil unless jwk_set.present?
+
+        JSON::JWT.decode(@raw_jwt_str, JSON::JWK::Set.new(jwk_set))
       rescue JSON::JWT::Exception => e
-        errors.add(:jwt, e.message)
-        raise JSON::JWS::VerificationFailed
+        Rails.logger.error("Error decoding JWT using cached JWKs (will try re-fetching): #{e}")
+        nil
+      end
+
+      def verified_jwt_using_fetched_jwks_url
+        jwk_set =
+          begin
+            JSON.parse(CanvasHttp.get(public_jwk_url).body)
+          rescue JSON::ParserError, *CanvasHttp::ALL_HTTP_ERRORS => e
+            errors.add(:jwt, "Fetching JWK from public_jwk_url failed")
+            Rails.logger.warn("Fetching JWK from public_jwk_url failed: #{e.inspect}")
+            raise JSON::JWS::VerificationFailed
+          end
+
+        jwt =
+          begin
+            JSON::JWT.decode(@raw_jwt_str, JSON::JWK::Set.new(jwk_set))
+          rescue JSON::JWT::Exception => e
+            errors.add(:jwt, e.message)
+            raise JSON::JWS::VerificationFailed
+          end
+
+        if cache_public_jwk_url?
+          # Cache only if the JWT was successfully decoded
+          Rails.cache.write(public_jwk_url_cache_key, jwk_set, expires_in: JWK_SET_CACHE_EXPIRATION)
+        end
+
+        jwt
+      end
+
+      def public_jwk_url
+        @public_jwk_url ||= developer_key&.public_jwk_url
+      end
+
+      def public_jwk_url_cache_key
+        # public_jwk_url is user input; hash to ensure a safe cache key (no delimiters, etc)
+        url_hash = Digest::SHA256.hexdigest(public_jwk_url)
+        ["dev_key_public_jwk_url", url_hash].cache_key
       end
 
       def standard_claim_errors(jwt_hash)
@@ -142,8 +194,8 @@ module Lti::IMS::Concerns
           skip_jti_check: true
         )
         validator.validate
-        validator.errors.to_h.each do |k, v|
-          errors.add(k, v.to_s)
+        validator.errors.as_json[:errors].each do |k, v|
+          v.each { |v2| errors.add(k, v2[:type]) }
         end
       end
 

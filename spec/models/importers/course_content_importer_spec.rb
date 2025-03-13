@@ -516,6 +516,44 @@ describe Course do
         Importers::CourseContentImporter.import_content(@course, {}, nil, migration)
       end
     end
+
+    describe "conditional_release" do
+      let(:migration) { build_migration(@course, {}, all_course_settings: true) }
+
+      it "is set to true when originally true" do
+        import_data = { course: { conditional_release: "true" } }.with_indifferent_access
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+        expect(@course.conditional_release).to be true
+      end
+
+      it "is set to false when originally false" do
+        import_data = { course: { conditional_release: "false" } }.with_indifferent_access
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+
+        expect(@course.conditional_release).to be false
+      end
+    end
+
+    describe "hide_sections_on_course_users_page" do
+      let(:migration) { build_migration(@course, {}, all_course_settings: true) }
+
+      before do
+        @course.course_sections.create!
+        @course.course_sections.create!
+      end
+
+      it "is set to true when originally true" do
+        import_data = { course: { hide_sections_on_course_users_page: "true" } }.with_indifferent_access
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+        expect(@course.hide_sections_on_course_users_page).to be true
+      end
+
+      it "is set to false when originally false" do
+        import_data = { course: { hide_sections_on_course_users_page: "false" } }.with_indifferent_access
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+        expect(@course.hide_sections_on_course_users_page).to be false
+      end
+    end
   end
 
   describe "shift_date_options" do

@@ -97,7 +97,7 @@ function intoRels(acc: Links, x: LinkInfo): Links {
   return acc
 }
 
-const PARSE_LINK_HEADER_MAXLEN = 2000
+const PARSE_LINK_HEADER_MAXLEN = 4000
 const PARSE_LINK_HEADER_THROW_ON_MAXLEN_EXCEEDED =
   process.env.PARSE_LINK_HEADER_THROW_ON_MAXLEN_EXCEEDED != null
 

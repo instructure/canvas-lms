@@ -20,14 +20,17 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MemoryRouter, Route, Routes, useNavigate} from 'react-router-dom'
+import {setupFilesEnv} from '../../../fixtures/fakeFilesEnv'
 import SearchBar from '../SearchBar'
-
-jest.useFakeTimers()
 
 const navigateMock = jest.fn()
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
+}))
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  windowPathname: () => '/files/folder/users_1',
 }))
 
 const defaultProps = {
@@ -59,34 +62,78 @@ describe('SearchBar', () => {
     expect(input).toHaveValue('test')
   })
 
-  it('updates the search value and triggers the search', async () => {
-    const user = userEvent.setup({delay: null})
-    renderComponent()
-    const input = screen.getByPlaceholderText('Search files...')
-    await user.type(input, 'searchTerm')
-    jest.runAllTimers()
-    expect(input).toHaveValue('searchTerm')
-    expect(navigateMock).toHaveBeenCalledWith('/search?search_term=searchTerm')
-  })
-
   it('clears the search value', async () => {
-    const user = userEvent.setup({delay: null})
+    const user = userEvent.setup()
     renderComponent({initialValue: 'test'})
     const input = screen.getByPlaceholderText('Search files...')
     const clearButton = screen.getByRole('button', {name: 'Clear search'})
     await user.click(clearButton)
-    jest.runAllTimers()
     expect(input).toHaveValue('')
-    expect(navigateMock).toHaveBeenCalledWith('/')
   })
 
-  it('navigates to root when search value is completely cleared', async () => {
-    const user = userEvent.setup({delay: null})
-    renderComponent({initialValue: 'test'})
-    const input = screen.getByPlaceholderText('Search files...')
-    await user.clear(input)
-    jest.runAllTimers()
-    expect(input).toHaveValue('')
-    expect(navigateMock).toHaveBeenCalledWith('/')
+  it('does not search on click when empty input', async () => {
+    const user = userEvent.setup()
+    renderComponent()
+    const searchButton = screen.getByRole('button', {name: 'Search'})
+    await user.click(searchButton)
+    expect(navigateMock).not.toHaveBeenCalled()
+  })
+
+  it('does not search on enter press when empty input', async () => {
+    const user = userEvent.setup()
+    renderComponent()
+    const searchButton = screen.getByRole('button', {name: 'Search'})
+    await user.type(searchButton, '{enter}')
+    expect(navigateMock).not.toHaveBeenCalled()
+  })
+
+  describe('when showing all contexts', () => {
+    beforeAll(() => {
+      setupFilesEnv(true)
+    })
+
+    it('searches on click', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const input = screen.getByPlaceholderText('Search files...')
+      await user.type(input, 'searchTerm')
+      const searchButton = screen.getByRole('button', {name: 'Search'})
+      await user.click(searchButton)
+      expect(navigateMock).toHaveBeenCalledWith('/folder/users_1/search?search_term=searchTerm')
+    })
+
+    it('searches on enter press', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const input = screen.getByPlaceholderText('Search files...')
+      await user.type(input, 'searchTerm')
+      await user.keyboard('{enter}')
+      expect(navigateMock).toHaveBeenCalledWith('/folder/users_1/search?search_term=searchTerm')
+    })
+  })
+
+  describe('when not showing all contexts', () => {
+    beforeAll(() => {
+      setupFilesEnv(false)
+    })
+
+    it('searches on click', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const input = screen.getByPlaceholderText('Search files...')
+      await user.type(input, 'searchTerm')
+      const searchButton = screen.getByRole('button', {name: 'Search'})
+      await user.click(searchButton)
+      expect(navigateMock).toHaveBeenCalledWith('/search?search_term=searchTerm')
+    })
+
+    it('searches on enter press', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+      const input = screen.getByPlaceholderText('Search files...')
+      await user.type(input, 'searchTerm')
+      await user.keyboard('{enter}')
+      expect(navigateMock).toHaveBeenCalledWith('/search?search_term=searchTerm')
+    })
   })
 })

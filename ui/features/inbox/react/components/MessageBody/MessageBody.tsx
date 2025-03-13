@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useEffect} from 'react'
+import React, {useEffect} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ModalBodyContext, signatureSeparator} from '../../utils/constants'
+import {signatureSeparator} from '../../utils/constants'
+import { useTranslationContext } from '../../hooks/useTranslationContext'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -41,7 +42,7 @@ export const MessageBody = (props: Props) => {
     (props.inboxSignatureBlock && props.signature && `${signatureSeparator}${props.signature}`) ||
     ''
 
-  const {body, setBody, translating} = useContext(ModalBodyContext)
+  const { body, setBody, translating } =  useTranslationContext() 
 
   useEffect(() => {
     if (signature) setBody((body: string) => body + signature)

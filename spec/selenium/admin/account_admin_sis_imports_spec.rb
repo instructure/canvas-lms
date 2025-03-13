@@ -28,116 +28,26 @@ describe "sis imports ui" do
     user_session(@admin)
   end
 
-  it "properly shows sis stickiness options" do
+  it "creates SisBatch with no options" do
     account_with_admin_logged_in
     @account.update_attribute(:allow_sis_import, true)
     get "/accounts/#{@account.id}/sis_import"
-    expect(f("#add_sis_stickiness")).not_to be_displayed
-    expect(f("#clear_sis_stickiness")).not_to be_displayed
-    expect(f("#override_sis_stickiness")).to be_displayed
-    expect(f("#add_sis_stickiness")).to be_enabled
-    expect(f("#clear_sis_stickiness")).to be_enabled
-    expect(f("#override_sis_stickiness")).to be_enabled
-    expect(is_checked("#add_sis_stickiness")).to be_falsey
-    expect(is_checked("#clear_sis_stickiness")).to be_falsey
-    # #override_sis_stickiness is an <input> element, so .prop('checked') is appropriate
-    expect(driver.execute_script("return $('#override_sis_stickiness').prop('checked')")).to be false
-    expect(is_checked("#override_sis_stickiness")).to be_falsey
-    f("#override_sis_stickiness").click
-    expect(f("#add_sis_stickiness")).to be_displayed
-    expect(f("#clear_sis_stickiness")).to be_displayed
-    expect(f("#override_sis_stickiness")).to be_displayed
-    expect(f("#add_sis_stickiness")).to be_enabled
-    expect(f("#clear_sis_stickiness")).to be_enabled
-    expect(f("#override_sis_stickiness")).to be_enabled
-    expect(is_checked("#add_sis_stickiness")).to be_falsey
-    expect(is_checked("#clear_sis_stickiness")).to be_falsey
-    expect(is_checked("#override_sis_stickiness")).to be_truthy
-    f("#override_sis_stickiness").click
-
-    expect(f("#add_sis_stickiness")).not_to be_displayed
-    expect(f("#clear_sis_stickiness")).not_to be_displayed
-    expect(f("#override_sis_stickiness")).to be_displayed
-    expect(f("#add_sis_stickiness")).to be_enabled
-    expect(f("#clear_sis_stickiness")).to be_enabled
-    expect(f("#override_sis_stickiness")).to be_enabled
-    expect(is_checked("#add_sis_stickiness")).to be_falsey
-    expect(is_checked("#clear_sis_stickiness")).to be_falsey
-    expect(is_checked("#override_sis_stickiness")).to be_falsey
-    f("#override_sis_stickiness").click
-    f("#add_sis_stickiness").click
-
-    expect(f("#add_sis_stickiness")).to be_displayed
-    expect(f("#clear_sis_stickiness")).to be_displayed
-    expect(f("#override_sis_stickiness")).to be_displayed
-    expect(f("#add_sis_stickiness")).to be_enabled
-    expect(f("#clear_sis_stickiness")).not_to be_enabled
-    expect(f("#override_sis_stickiness")).to be_enabled
-    expect(is_checked("#add_sis_stickiness")).to be_truthy
-    expect(is_checked("#clear_sis_stickiness")).to be_falsey
-    expect(is_checked("#override_sis_stickiness")).to be_truthy
-    f("#add_sis_stickiness").click
-
-    expect(f("#add_sis_stickiness")).to be_displayed
-    expect(f("#clear_sis_stickiness")).to be_displayed
-    expect(f("#override_sis_stickiness")).to be_displayed
-    expect(f("#add_sis_stickiness")).to be_enabled
-    expect(f("#clear_sis_stickiness")).to be_enabled
-    expect(f("#override_sis_stickiness")).to be_enabled
-    expect(is_checked("#add_sis_stickiness")).to be_falsey
-    expect(is_checked("#clear_sis_stickiness")).to be_falsey
-    expect(is_checked("#override_sis_stickiness")).to be_truthy
-    f("#clear_sis_stickiness").click
-
-    expect(f("#add_sis_stickiness")).to be_displayed
-    expect(f("#clear_sis_stickiness")).to be_displayed
-    expect(f("#override_sis_stickiness")).to be_displayed
-    expect(f("#add_sis_stickiness")).not_to be_enabled
-    expect(f("#clear_sis_stickiness")).to be_enabled
-    expect(f("#override_sis_stickiness")).to be_enabled
-
-    expect(is_checked("#add_sis_stickiness")).to be_falsey
-    expect(is_checked("#clear_sis_stickiness")).to be_truthy
-    expect(is_checked("#override_sis_stickiness")).to be_truthy
-    f("#clear_sis_stickiness").click
-
-    expect(f("#add_sis_stickiness")).to be_displayed
-    expect(f("#clear_sis_stickiness")).to be_displayed
-    expect(f("#override_sis_stickiness")).to be_displayed
-    expect(f("#add_sis_stickiness")).to be_enabled
-    expect(f("#clear_sis_stickiness")).to be_enabled
-    expect(f("#override_sis_stickiness")).to be_enabled
-
-    expect(is_checked("#add_sis_stickiness")).to be_falsey
-    expect(is_checked("#clear_sis_stickiness")).to be_falsey
-    expect(is_checked("#override_sis_stickiness")).to be_truthy
-    f("#clear_sis_stickiness").click
-    f("#override_sis_stickiness").click
-
-    expect(f("#add_sis_stickiness")).not_to be_displayed
-    expect(f("#clear_sis_stickiness")).not_to be_displayed
-    expect(f("#override_sis_stickiness")).to be_displayed
-    expect(is_checked("#override_sis_stickiness")).to be_falsey
-    f("#override_sis_stickiness").click
-    f("#clear_sis_stickiness").click
-    f("#add_sis_stickiness").click
-    f("#override_sis_stickiness").click
-
-    expect(f("#add_sis_stickiness")).not_to be_displayed
-    expect(f("#clear_sis_stickiness")).not_to be_displayed
-    expect(f("#override_sis_stickiness")).to be_displayed
-    expect(is_checked("#override_sis_stickiness")).to be_falsey
+    f("input[type=file]").send_keys Rails.root.join("spec/fixtures/sis/utf8.csv")
+    f("button[type='submit']").click
+    expect(f(".progress_bar_holder .progress_message")).to be_displayed
+    expect(SisBatch.last.batch_mode).to be_nil
+    expect(SisBatch.last.options).to eq({ skip_deletes: false, update_sis_id_if_login_claimed: false })
   end
 
-  it "passes options along to the batch" do
+  it "creates SisBatch with options" do
     account_with_admin_logged_in
     @account.update_attribute(:allow_sis_import, true)
     get "/accounts/#{@account.id}/sis_import"
-    f("#override_sis_stickiness").click
-    f("#add_sis_stickiness").click
-    f("#batch_mode").click
+    f("label[for='override_sis_stickiness']").click
+    f("label[for='add_sis_stickiness']").click
+    f("label[for='batch_mode']").click
     f("input[type=file]").send_keys Rails.root.join("spec/fixtures/sis/utf8.csv")
-    submit_form("#sis_importer")
+    f("button[type='submit']").click
     f("#confirmation_modal_confirm").click
     expect(f(".progress_bar_holder .progress_message")).to be_displayed
     expect(SisBatch.last.batch_mode).to be true

@@ -103,7 +103,6 @@ module Outcomes
           [[line, e.message]]
         rescue ActiveRecord::RecordInvalid => e
           errors = e.record.errors
-          errors.set_reporter(:array, :human)
           errors.to_a.map { |err| [line, err] }
         end
 

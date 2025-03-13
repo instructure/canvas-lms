@@ -32,6 +32,12 @@
     "additional_considerations_f3801683": {
         "message": "Extra overwegingen"
     },
+    "address_applied_64269b0b": {
+        "message": "Adres toegepast"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Adres verwijderd"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Aangrenzende koppelingen met dezelfde URL moeten één koppeling zijn."
     },
@@ -202,6 +208,12 @@
     },
     "blue_daf8fea9": {
         "message": "Blauw"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Vet toegepast"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Vet verwijderd"
     },
     "border_5b08b06d": {
         "message": "Rand"
@@ -595,6 +607,12 @@
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Tekstkoppeling weergeven (Opent in een nieuw tabblad)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Div toegepast"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Div verwijderd"
     },
     "division_sign_72190870": {
         "message": "Deelteken"
@@ -992,6 +1010,12 @@
     "heading_4_b2e74be7": {
         "message": "Koptekst 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Koptekst { h } toegepast"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Koptekst { h } verwijderd"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Koptekstniveaus mogen niet worden overgeslagen."
     },
@@ -1198,6 +1222,12 @@
     },
     "italian_bd3c792d": {
         "message": "Italiaans"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Cursief toegepast"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Cursief verwijderd"
     },
     "japanese_b5721ca7": {
         "message": "Japans"
@@ -1690,6 +1720,12 @@
     },
     "paragraph_5e5ad8eb": {
         "message": "Alinea"
+    },
+    "paragraph_applied_959b3fe5": {
+        "message": "Paragraaf toegepast"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Paragraaf verwijderd"
     },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Alinea die begint met { start }"
@@ -2470,6 +2506,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Kan geen bronselectie-URL vaststellen"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Onderstreept toegepast "
+    },
+    "underline_removed_3693e17c": {
+        "message": "Onderstreept verwijderd"
     },
     "union_e6b57a53": {
         "message": "Vereniging"

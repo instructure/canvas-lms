@@ -1472,6 +1472,21 @@ describe "Files API", type: :request do
                                             "license_name" => "CC Attribution Share Alike"
                                           })
     end
+
+    it "views file in Horizon course with query params set" do
+      @course.account.enable_feature!(:horizon_course_setting)
+      @course.update!(horizon_course: true)
+
+      api_options = { controller: "files", action: "api_show", format: "json", course_id: @course.id, id: @att.id.to_param }
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/files/#{@att.id}" + "?view=true", api_options.merge(view: true))
+      expect(json["view"]).to be_truthy
+    end
+
+    it "does not view file if not a Horizon course" do
+      api_options = { controller: "files", action: "api_show", format: "json", course_id: @course.id, id: @att.id.to_param }
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/files/#{@att.id}" + "?view=true", api_options.merge(view: true))
+      expect(json["view"]).to be_nil
+    end
   end
 
   describe "#file_ref" do

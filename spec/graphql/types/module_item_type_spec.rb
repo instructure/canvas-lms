@@ -34,6 +34,11 @@ describe Types::ModuleItemType do
     expect(resolver.resolve("_id")).to eq module_item1.id.to_s
   end
 
+  it "gets the indent" do
+    resolver = GraphQLTypeTester.new(module_item1, current_user: @teacher)
+    expect(resolver.resolve("indent")).to eq 0
+  end
+
   context "permissions" do
     let_once(:student) { student_in_course(course:).user }
 
@@ -197,6 +202,73 @@ describe Types::ModuleItemType do
         GraphQLTypeTester.new(module_item, current_user: @teacher)
            .resolve("content { ... on SubHeader { title } }")
       ).to eq module_item.title
+    end
+
+    it "shows estimated_duration" do
+      assignment = assignment_model({ context: course })
+      EstimatedDuration.create!(assignment: assignment, duration: 1.hour + 30.minutes)
+      module_item = module1.add_item({ type: "Assignment", id: assignment.id }, nil, position: 1)
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("estimatedDuration")).to eq (1.hour + 30.minutes).iso8601
+    end
+
+    it "does not show estimated_duration when missing" do
+      assignment = assignment_model({ context: course })
+      module_item = module1.add_item({ type: "Assignment", id: assignment.id }, nil, position: 1)
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("estimatedDuration")).to be_nil
+    end
+  end
+
+  context "assignments" do
+    let_once(:assignment) { assignment_model({ context: course }) }
+    let_once(:module_item) { module1.add_item({ type: "Assignment", id: assignment.id }, nil, position: 1) }
+
+    it "works" do
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("content { title }")).to eq module_item.title
+      expect(resolver.resolve("content { type }")).to eq "Assignment"
+      expect(resolver.resolve("content { pointsPossible }")).to eq module_item.content.points_possible
+      expect(resolver.resolve("content { published }")).to eq module_item.content.published?
+      expect(resolver.resolve("content { canUnpublish }")).to eq module_item.content.can_unpublish?
+    end
+  end
+
+  context "discussions" do
+    let_once(:discussion_topic) { discussion_topic_model({ context: course }) }
+    let_once(:module_item) { module1.add_item({ type: "DiscussionTopic", id: discussion_topic.id }, nil, position: 1) }
+
+    it "works" do
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("content { title }")).to eq module_item.title
+      expect(resolver.resolve("content { type }")).to eq "DiscussionTopic"
+      expect(resolver.resolve("content { published }")).to eq module_item.content.published?
+      expect(resolver.resolve("content { canUnpublish }")).to eq module_item.content.can_unpublish?
+    end
+
+    context "graded discussions" do
+      it "works" do
+        assignment = assignment_model({ context: course })
+        discussion_topic.assignment = assignment
+        discussion_topic.save!
+        module_item.reload
+        resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+        expect(resolver.resolve("content { title }")).to eq module_item.title
+        expect(resolver.resolve("content { type }")).to eq "DiscussionTopic"
+        expect(resolver.resolve("content { pointsPossible }")).to eq module_item.content.assignment.points_possible
+      end
+    end
+  end
+
+  context "quizzes" do
+    let_once(:quiz) { quiz_model({ course: }) }
+    let_once(:module_item) { module1.add_item({ type: "Quiz", id: quiz.id }, nil, position: 1) }
+
+    it "works" do
+      resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("content { title }")).to eq module_item.title
+      expect(resolver.resolve("content { type }").to_s).to eq "Quizzes::Quiz"
+      expect(resolver.resolve("content { pointsPossible }")).to eq module_item.content.points_possible
     end
   end
 end

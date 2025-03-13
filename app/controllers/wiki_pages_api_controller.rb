@@ -607,7 +607,12 @@ class WikiPagesApiController < ApplicationController
     return render_json_unauthorized unless @context.wiki.grants_right?(@current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
 
     title = params.require(:title)
-    render json: { conflict: @context.wiki.wiki_pages.not_deleted.where(title:).count > 0 }
+    query = @context.wiki.wiki_pages.not_deleted.where(title:)
+
+    current_id = params[:current_page_id].presence
+    query = query.where.not(id: current_id) if current_id
+
+    render json: { conflict: query.exists? }
   end
 
   protected

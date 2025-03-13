@@ -33,8 +33,15 @@ import {MediaPlayer} from '@instructure/ui-media-player'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
+import {StudioPlayer, type StudioPlayerProps} from '@instructure/studio-player'
+import {GlobalEnv} from '../../../shared/global/env/GlobalEnv'
+import {Spacing} from '@instructure/emotion'
 
 const I18n = createI18nScope('grade_summary')
+
+declare const ENV: GlobalEnv & {
+  consolidated_media_player?: boolean
+}
 
 type AttachmentProps = Pick<Attachment, 'id' | 'mime_class' | 'display_name' | 'url'>
 type SubmissionCommentProps = Pick<
@@ -88,6 +95,11 @@ export default function SubmissionAttempts({attempts}: SubmissionAttemptsProps) 
 type SubmissionAttemptProps = {
   comments?: SubmissionCommentProps[]
 }
+type StudioPlayerSrc = NonNullable<StudioPlayerProps['src']>
+type StudioPlayerCaptions = NonNullable<StudioPlayerProps['captions']>
+type CommentMediaSource = MediaSource[] | StudioPlayerSrc
+type CommentMediaCaptions = MediaTrack[] | StudioPlayerCaptions
+
 function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
   if (!comments) return null
 
@@ -96,24 +108,27 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
   return (
     <>
       {comments.map((comment, i) => {
-        // @ts-expect-error
-        let mediaTracks: MediaTrack[] = null
-        // @ts-expect-error
-        let mediaSources: MediaSource[] = null
+        let mediaSources: CommentMediaSource = []
+        let mediaTracks: CommentMediaCaptions = []
+
         const mediaObject = comment.media_object
         if (mediaObject) {
           mediaSources = mediaObject.media_sources.map(mediaSource => {
-            mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
-            mediaSource.src = mediaSource.url
-            return mediaSource
+            return {
+              ...mediaSource,
+              label: `${mediaSource.width}x${mediaSource.height}`,
+              src: mediaSource.url,
+              type: mediaSource.content_type,
+            }
           })
-          // @ts-expect-error
           mediaTracks = mediaObject.media_tracks.map(track => {
             return {
               id: track.id,
               src: `/media_objects/${mediaObject.id}/media_tracks/${track.id}`,
               label: track.locale,
-              type: track.kind,
+              // type is an optional string in MediaTrack,
+              // but required in CaptionMetaData as 'vtt' | 'srt'
+              type: track.kind as any,
               language: track.locale,
             }
           })
@@ -171,11 +186,7 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
                 </Link>
               </View>
             ))}
-            {mediaObject && (
-              <View data-testid="submission-comment-media" as="span">
-                <MediaPlayer tracks={mediaTracks} sources={mediaSources} />
-              </View>
-            )}
+            {mediaObject && <CommentMediaPlayer source={mediaSources} tracks={mediaTracks} />}
             <View as="div" textAlign="end" margin="0 medium 0 0">
               <Text weight="bold" size="small" data-testid="submission-comment-author">
                 - {I18n.t('%{display_name}', {display_name: comment.author_name})}
@@ -185,5 +196,29 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
         )
       })}
     </>
+  )
+}
+
+type CommentMediaPlayerProps = {
+  source: CommentMediaSource
+  tracks: CommentMediaCaptions
+}
+function CommentMediaPlayer({source, tracks}: CommentMediaPlayerProps) {
+  const isNewMediaPlayer = ENV.consolidated_media_player ?? false
+  const mediaPlayer = isNewMediaPlayer ? (
+    <StudioPlayer
+      src={source as StudioPlayerSrc}
+      captions={tracks as StudioPlayerCaptions}
+      title={I18n.t('Play Media Comment')}
+    />
+  ) : (
+    <MediaPlayer sources={source} tracks={tracks} />
+  )
+  const styles = isNewMediaPlayer ? {height: '280px', padding: '0 small' as Spacing} : {}
+
+  return (
+    <View data-testid="submission-comment-media" as="span" {...styles}>
+      {mediaPlayer}
+    </View>
   )
 }

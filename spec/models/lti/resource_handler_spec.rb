@@ -33,13 +33,13 @@ module Lti
       it "requires the name" do
         resource_handler.name = nil
         resource_handler.save
-        expect(resource_handler.errors.first).to eq [:name, "can't be blank"]
+        expect(resource_handler.errors[:name].first).to eq "can't be blank"
       end
 
       it "requires a tool proxy" do
         resource_handler.tool_proxy = nil
         resource_handler.save
-        expect(resource_handler.errors.first).to eq [:tool_proxy, "can't be blank"]
+        expect(resource_handler.errors[:tool_proxy].first).to eq "can't be blank"
       end
     end
 

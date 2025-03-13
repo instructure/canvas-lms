@@ -854,6 +854,10 @@ class Account < ActiveRecord::Base
       .first
   end
 
+  def discussion_checkpoints_enabled?
+    feature_enabled?(:discussion_checkpoints)
+  end
+
   def file_namespace
     if Shard.current == Shard.birth
       "account_#{root_account.local_id}"
@@ -2401,7 +2405,7 @@ class Account < ActiveRecord::Base
       next unless key.grants_right?(current_user, :write)
 
       if params_keys[key_type].blank?
-        key.delete
+        key.destroy!
       else
         key.key_value = params_keys[key_type]
         key.save!

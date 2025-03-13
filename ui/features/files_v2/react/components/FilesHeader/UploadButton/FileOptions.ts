@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type Folder} from '../../../../interfaces/File'
+
 export type FileOptions = {
   name: string
   file: File
@@ -26,4 +28,12 @@ export type FileOptions = {
 export type FileOptionsResults = {
   zipOptions: FileOptions[]
   nameCollisions: FileOptions[]
+  resolvedNames: ResolvedName[]
+}
+
+export type ResolvedName = {
+  file: File | Folder
+  dup: string
+  name: string
+  expandZip: boolean
 }

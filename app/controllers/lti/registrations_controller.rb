@@ -177,7 +177,7 @@
 #           "type": "object"
 #         },
 #         "public_jwk_url": {
-#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset.",
+#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset. Canvas may cache JWKs up to 5 minutes.",
 #           "example": "https://mytool.com/1_3/jwks",
 #           "type": "string"
 #         },
@@ -410,7 +410,7 @@
 #           "type": "object"
 #         },
 #         "public_jwk_url": {
-#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset.",
+#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset. Canvas may cache JWKs up to 5 minutes.",
 #           "example": "https://mytool.com/1_3/jwks",
 #           "type": "string"
 #         },
@@ -896,6 +896,7 @@
 class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
+  before_action :require_lti_registrations_next_feature_flag, only: %i[reset]
   before_action :require_manage_lti_registrations
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
@@ -914,6 +915,8 @@ class Lti::RegistrationsController < ApplicationController
                       end
     add_crumb(t("#crumbs.apps", "Apps"), breadcrumb_path)
 
+    inject_lti_usage_env
+
     # allows override of DR url hard-coded into Discover page
     # todo: remove once Discover page retrieves and uses correct DR url
     temp_dr_url = Setting.get("lti_discover_page_dyn_reg_url", "")
@@ -922,10 +925,6 @@ class Lti::RegistrationsController < ApplicationController
                dynamicRegistrationUrl: temp_dr_url
              })
     end
-
-    js_env({
-             canvasAppsLtiUsageUrl: DynamicSettings.find("lti")["canvas_apps_lti_usage_url"] || nil
-           })
 
     render :index
   end
@@ -1191,24 +1190,11 @@ class Lti::RegistrationsController < ApplicationController
         **configuration_params
       )
 
-      if params[:workflow_state].present? && params[:workflow_state] != "off"
-        # This is automatically created when we create the developer key, but we need to update it
-        # with the correct workflow state.
-        account_binding = Lti::RegistrationAccountBinding.find_by(account: @context, registration:)
-
-        # We have to suspend_callbacks/avoid validations because we're still inside a transaction and the
-        # developer_key_account_binding will fail validations, as it will look to the secondary
-        # when trying to validate the presence of its developer key. The
-        # developer key doesn't exist in the secondary (yet), so it fails.
-        # See DeveloperKey::CacheOnAssociation for the offending code.
-        account_binding.suspend_callbacks(:update_developer_key_account_binding) do
-          account_binding.update!(workflow_state: params[:workflow_state],
-                                  created_by: @current_user,
-                                  updated_by: @current_user)
-        end
-        # Avoid validating developer key is present, we already know it is.
-        account_binding.developer_key_account_binding.update_column(:workflow_state, params[:workflow_state])
-      end
+      Lti::AccountBindingService.call(account: @context,
+                                      registration:,
+                                      user: @current_user,
+                                      overwrite_created_by: true,
+                                      workflow_state: workflow_state || :off)
       registration
     end
 
@@ -1339,7 +1325,15 @@ class Lti::RegistrationsController < ApplicationController
 
       registration.developer_key.update!(developer_key_update_params) if developer_key_update_params.present?
 
-      bind_registration_to_account(registration, params[:workflow_state]) if params[:workflow_state].present?
+      if workflow_state.present?
+        Lti::AccountBindingService
+          .call(
+            account: @context,
+            registration:,
+            workflow_state: workflow_state,
+            user: @current_user
+          )
+      end
     end
     render json: lti_registration_json(registration,
                                        @current_user,
@@ -1350,6 +1344,31 @@ class Lti::RegistrationsController < ApplicationController
                                                     overlay
                                                     overlay_versions],
                                        account_binding: registration.account_binding_for(@context),
+                                       overlay: registration.overlay_for(@context))
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
+  # @API Reset an LTI Registration to Defaults
+  # Reset the specified LTI registration to its default settings in this context. This removes all customizations
+  # that were present in the overlay associated with this context.
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   This would reset the specified LTI registration to its default settings
+  #   curl -X PUT 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/reset' \
+  #        -H "Authorization: Bearer <token>"
+  def reset
+    registration.overlay_for(@context)&.update!(data: {}, updated_by: @current_user)
+
+    render json: lti_registration_json(registration,
+                                       @current_user,
+                                       session,
+                                       @context,
+                                       includes: %i[overlaid_configuration overlay overlay_versions],
                                        overlay: registration.overlay_for(@context))
   rescue => e
     report_error(e)
@@ -1412,29 +1431,20 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Content-Type: application/json" \
   #        -d '{"workflow_state": "on"}'
   def bind
-    account_binding = bind_registration_to_account(registration, params.require(:workflow_state))
-    render json: lti_registration_account_binding_json(account_binding, @current_user, session, @context)
+    Lti::AccountBindingService.call(
+      account: @context,
+      registration:,
+      workflow_state: params.require(:workflow_state),
+      user: @current_user
+    ) => {lti_registration_account_binding:}
+
+    render json: lti_registration_account_binding_json(lti_registration_account_binding, @current_user, session, @context)
   end
 
   private
 
   def render_configuration_errors(errors)
     render json: { errors: }, status: :unprocessable_entity
-  end
-
-  def bind_registration_to_account(registration, workflow_state)
-    account_binding = Lti::RegistrationAccountBinding
-                      .find_or_initialize_by(account: @context, registration:)
-
-    if account_binding.new_record?
-      account_binding.created_by = @current_user
-    end
-
-    account_binding.updated_by = @current_user
-    account_binding.workflow_state = workflow_state
-
-    account_binding.save!
-    account_binding
   end
 
   def configuration_params
@@ -1487,9 +1497,15 @@ class Lti::RegistrationsController < ApplicationController
   # At the model level, setting an invalid workflow_state will silently change it to the
   # initial state ("off") without complaining, so enforce this here as part of the API contract.
   def validate_workflow_state
-    return if params[:workflow_state].nil? || %w[on off allow].include?(params[:workflow_state])
+    return if workflow_state.nil? || %w[on off].include?(workflow_state)
 
-    render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', or 'allow'")
+    return if workflow_state == "allow" && context.site_admin?
+
+    if workflow_state == "allow" && !context.site_admin?
+      render_error(:invalid_workflow_state, "only site admin registrations can have a state of 'allow'")
+    else
+      render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', or 'allow'")
+    end
   end
 
   def validate_list_params
@@ -1499,6 +1515,10 @@ class Lti::RegistrationsController < ApplicationController
 
     valid_sort_fields = %w[name nickname lti_version installed installed_by updated_by updated on]
     render_error("invalid_sort", "#{params[:sort]} is not a valid field for sorting") unless [*valid_sort_fields, nil].include?(params[:sort])
+  end
+
+  def workflow_state
+    params[:workflow_state]
   end
 
   def require_registration_params
@@ -1546,6 +1566,15 @@ class Lti::RegistrationsController < ApplicationController
     end
   end
 
+  def require_lti_registrations_next_feature_flag
+    unless @context.root_account.feature_enabled?(:lti_registrations_next)
+      respond_to do |format|
+        format.html { render "shared/errors/404_message", status: :not_found }
+        format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
+      end
+    end
+  end
+
   def require_manage_lti_registrations
     require_context_with_permission(@context, :manage_lti_registrations)
   end
@@ -1553,5 +1582,41 @@ class Lti::RegistrationsController < ApplicationController
   def report_error(exception, code = nil)
     code ||= response_code_for_rescue(exception) if exception
     InstStatsd::Statsd.increment("canvas.lti_registrations_controller.request_error", tags: { action: action_name, code: })
+  end
+
+  def filter_registrations_by_search_query(registrations, search_terms)
+    # all search terms must appear, but each can be in either the name,
+    # admin_nickname, or vendor name. Remove the search terms from the list
+    # as they are found -- keep the registration as a matching result if the
+    # list is empty at the end.
+    registrations.select do |registration|
+      terms_to_find = search_terms.dup
+      terms_to_find.delete_if do |term|
+        attributes = %i[name admin_nickname vendor]
+        attributes.any? do |attribute|
+          registration[attribute]&.downcase&.include?(term)
+        end
+      end
+
+      terms_to_find.empty?
+    end
+  end
+
+  def inject_lti_usage_env
+    js_env({
+             LTI_USAGE: {
+               env: Canvas.environment,
+               region: Canvas.region,
+               canvasBaseUrl: request.base_url,
+               firstName: @current_user.short_name,
+               locale: @current_user.browser_locale,
+               rootAccountId: @domain_root_account.id,
+               rootAccountUuid: @domain_root_account.uuid,
+             },
+           })
+
+    remote_env({
+                 ltiUsage: DynamicSettings.find("lti")["canvas_apps_lti_usage_url"] || nil
+               })
   end
 end

@@ -26,8 +26,9 @@ import type React from 'react'
 interface TranslateArgs {
   subject?: string
   body?: string
-  srcLang: string
+  srcLang?: string
   tgtLang: string
+  signature?: string
 }
 
 /**
@@ -87,14 +88,13 @@ export function stripSignature(body: string): string {
 /**
  * Set the modal body properly, with signature and body text.
  * */
-export function handleTranslatedModalBody(
+export function updateTranslatedModalBody(
   translatedText: string,
   isPrimary: boolean,
-  activeSignature: string,
-  bodySetter: React.SetStateAction<string>,
+  bodySetter: React.Dispatch<React.SetStateAction<string>>,
+  activeSignature?: string,
   newBody?: string,
 ) {
-  // @ts-expect-error
   bodySetter(prevBody => {
     let message
     if (typeof newBody !== 'undefined') {

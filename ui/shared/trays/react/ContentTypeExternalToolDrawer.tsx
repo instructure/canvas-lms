@@ -61,7 +61,7 @@ export default function ContentTypeExternalToolDrawer({
   const toolTitle = tool ? tool.title : 'External Tool'
   const toolIconUrl = tool?.icon_url
   const toolIconAlt = toolTitle ? `${toolTitle} Icon` : 'Tool Icon'
-  const iframeRef = useRef()
+  const iframeRef = useRef<HTMLIFrameElement>(null)
   const pageContentRef = useRef()
   // @ts-expect-error
   const initDrawerLayoutMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
@@ -148,7 +148,6 @@ export default function ContentTypeExternalToolDrawer({
                 <ToolLaunchIframe
                   data-testid="ltiIframe"
                   ref={iframeRef}
-                  // @ts-expect-error
                   src={iframeUrl}
                   title={toolTitle}
                 />

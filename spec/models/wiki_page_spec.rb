@@ -151,6 +151,9 @@ describe WikiPage do
     expect(@course.wiki_pages.new(title: "!!!").valid?).not_to be_truthy
     expect(@course.wiki_pages.new(title: "a" * 256).valid?).not_to be_truthy
     expect(@course.wiki_pages.new(title: "asdf").valid?).to be_truthy
+    expect(@course.wiki_pages.new(title: "   ").valid?).not_to be_truthy
+    expect(@course.wiki_pages.new(title: " a ").valid?).to be_truthy
+    expect(@course.wiki_pages.new(title: "は").valid?).to be_truthy # foreign character
   end
 
   it "sets as front page" do
@@ -335,6 +338,14 @@ describe WikiPage do
           expect(@page.can_read_page?(admin)).to be true
         end
       end
+    end
+
+    it "does not allow account admins to read without read_course_content permission" do
+      account = @course.root_account
+      role = custom_account_role("CustomAccountUser", account:)
+      RoleOverride.manage_role_override(account, role, :read_course_content, enabled: false)
+      admin = account_admin_user(account:, role:, active_all: true)
+      expect(@page.can_read_page?(admin)).to be false
     end
   end
 

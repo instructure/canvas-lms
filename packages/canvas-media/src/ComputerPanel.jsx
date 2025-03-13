@@ -16,7 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
+import React, {
+  forwardRef,
+  Suspense,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState
+} from 'react'
 import {
   arrayOf,
   bool,
@@ -35,7 +43,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import {IconTrashLine, IconVideoLine} from '@instructure/ui-icons'
+import {IconTrashLine, IconVideoLine, IconWarningSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {px} from '@instructure/ui-utils'
@@ -45,7 +53,6 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Spinner} from '@instructure/ui-spinner'
 import formatMessage from './format-message'
 
-import LoadingIndicator from './shared/LoadingIndicator'
 import RocketSVG from './RocketSVG'
 import translationShape from './translationShape'
 import useComputerPanelFocus from './useComputerPanelFocus'
@@ -53,7 +60,7 @@ import {isAudio, isVideo, isPreviewable, sizeMediaPlayer} from './shared/utils'
 
 const ClosedCaptionPanel = React.lazy(() => import('./ClosedCaptionCreator'))
 
-export default function ComputerPanel({
+const ComputerPanel = forwardRef(({
   accept,
   hasUploadedFile,
   label,
@@ -67,10 +74,17 @@ export default function ComputerPanel({
   bounds,
   mountNode,
   useStudioPlayer,
-}) {
-  const {ADD_CLOSED_CAPTIONS_OR_SUBTITLES, LOADING_MEDIA} =
-    uploadMediaTranslations.UploadMediaStrings
-  const [messages, setMessages] = useState([])
+}, ref) => {
+  const {
+    ADD_CLOSED_CAPTIONS_OR_SUBTITLES,
+    CHOOSE_FILE_TO_UPLOAD,
+    CLEAR_FILE_TEXT,
+    DRAG_DROP_CLICK_TO_BROWSE,
+    ENTER_FILE_NAME,
+    SELECT_SUPPORTED_FILE_TYPE
+  } = uploadMediaTranslations.UploadMediaStrings
+  const [fileDropMessages, setFileDropMessages] = useState([])
+  const [fileNameMessages, setFileNameMessages] = useState([])
   const [mediaTracksCheckbox, setMediaTracksCheckbox] = useState(false)
   const [previewURL, setPreviewURL] = useState(null)
   const height = useStudioPlayer
@@ -130,6 +144,51 @@ export default function ComputerPanel({
     }
   }, [handlePlayerSize])
 
+  useImperativeHandle(ref, () => ({
+    updateValidationMessages,
+  }));
+
+  const buildErrorMessage = errorMessage => (
+    {
+      type: 'error',
+      text: (
+        <>
+          <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+            <IconWarningSolid />
+          </View>
+          &nbsp;
+          {errorMessage}
+        </>
+      )
+    }
+  )
+
+  const updateValidationMessages = (file) => {
+    setFileDropMessages(
+      file ? [] : [buildErrorMessage(CHOOSE_FILE_TO_UPLOAD)]
+    )
+    setFileNameMessages(
+      file?.title?.trim() ? [] : [buildErrorMessage(ENTER_FILE_NAME)]
+    )
+  }
+
+  const handleFileChange = file => {
+    setFile(file)
+    setHasUploadedFile(!!file)
+    setPreviewURL(file ? URL.createObjectURL(file) : null)
+    if (file) {
+      updateValidationMessages(file)
+    }
+  }
+
+  const handleFileNameChange = fileName => {
+    theFile.title = fileName
+    setFile(theFile)
+    if (fileName?.trim()) {
+      updateValidationMessages(theFile)
+    }
+  }
+
   if (hasUploadedFile) {
     return (
       <div style={{position: 'relative'}} ref={previewPanelRef}>
@@ -140,15 +199,11 @@ export default function ComputerPanel({
                 clearButtonRef.current = el
               }}
               onClick={() => {
-                setFile(null)
-                setHasUploadedFile(false)
-                setPreviewURL(null)
+                handleFileChange(null)
               }}
               renderIcon={IconTrashLine}
             >
-              <ScreenReaderContent>
-                {uploadMediaTranslations.UploadMediaStrings.CLEAR_FILE_TEXT}
-              </ScreenReaderContent>
+              <ScreenReaderContent>{CLEAR_FILE_TEXT}</ScreenReaderContent>
             </Button>
           </Flex.Item>
         </Flex>
@@ -185,10 +240,10 @@ export default function ComputerPanel({
             renderLabel={formatMessage('File name')}
             placeholder={formatMessage('File name')}
             value={theFile.title}
-            onChange={(e, val) => {
-              theFile.title = val
-              setFile(theFile)
+            onChange={(_e, fileName) => {
+              handleFileNameChange(fileName)
             }}
+            messages={fileNameMessages}
           />
         </View>
         {(isVideo(theFile.type) || isAudio(theFile.type)) && (
@@ -204,7 +259,13 @@ export default function ComputerPanel({
               </div>
             </View>
             {mediaTracksCheckbox && (
-              <Suspense fallback={<View as="div" margin="small 0 0"><Spinner data-testid="loading-spinner" renderTitle="" /></View>}>
+              <Suspense
+                fallback={
+                  <View as="div" margin="small 0 0">
+                    <Spinner data-testid="loading-spinner" renderTitle="" />
+                  </View>
+                }
+              >
                 <ClosedCaptionPanel
                   data-testid="ClosedCaptionPanel"
                   userLocale={userLocale}
@@ -222,38 +283,30 @@ export default function ComputerPanel({
   }
 
   return (
-    <div ref={panelRef}>
+    <div ref={panelRef} style={{marginBottom: '1.875rem'}}>
       <FileDrop
         accept={accept}
         onDropAccepted={([file]) => {
-          if (messages.length) {
-            setMessages([])
-          }
           file.title = file.name
-          setFile(file)
-          setHasUploadedFile(true)
-          setPreviewURL(URL.createObjectURL(file))
+          handleFileChange(file)
         }}
         onDropRejected={() => {
-          setMessages(msgs =>
-            msgs.concat({
-              text: uploadMediaTranslations.UploadMediaStrings.INVALID_FILE_TEXT,
-              type: 'error',
-            }),
+          setFileDropMessages(
+            [buildErrorMessage(SELECT_SUPPORTED_FILE_TYPE)]
           )
         }}
-        messages={messages}
+        messages={fileDropMessages}
         renderLabel={
           <Billboard
             heading={label}
             hero={<RocketSVG width="3em" height="3em" />}
-            message={uploadMediaTranslations.UploadMediaStrings.DRAG_DROP_CLICK_TO_BROWSE}
+            message={DRAG_DROP_CLICK_TO_BROWSE}
           />
         }
       />
     </div>
   )
-}
+})
 
 ComputerPanel.propTypes = {
   accept: oneOfType([string, arrayOf(string)]),
@@ -273,3 +326,6 @@ ComputerPanel.propTypes = {
   mountNode: oneOfType([element, func]),
   useStudioPlayer: bool,
 }
+
+export default ComputerPanel;
+

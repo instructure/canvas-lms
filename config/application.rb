@@ -137,7 +137,8 @@ module CanvasRails
     config.active_record.automatic_scope_inversing = true
 
     # Activate observers that should always be running
-    config.active_record.observers = %i[cacher stream_item_cache live_events_observer]
+    config.active_record.observers ||= []
+    config.active_record.observers << %i[cacher stream_item_cache live_events_observer]
 
     config.active_support.encode_big_decimal_as_string = false
     config.active_support.remove_deprecated_time_with_zone_name = true

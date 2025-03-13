@@ -98,6 +98,9 @@ class AccountNotificationsController < ApplicationController
   # @argument include_all  [Boolean]
   #   Include all global announcements, regardless of user's role or availability date. Only available to account admins.
   #
+  # @argument show_is_closed [Boolean]
+  #   Include a flag for each notification indicating whether it has been read by the user.
+  #
   # @example_request
   #   curl -H 'Authorization: Bearer <token>' \
   #   https://<canvas>/api/v1/accounts/2/users/self/account_notifications
@@ -106,6 +109,7 @@ class AccountNotificationsController < ApplicationController
   def user_index
     # include_past is used for obtaining notification from the last 4 months
     include_near_past = value_to_boolean(params[:include_past])
+    show_is_closed = value_to_boolean(params[:show_is_closed])
     include_all = value_to_boolean(params[:include_all])
     admin = false
 
@@ -117,6 +121,19 @@ class AccountNotificationsController < ApplicationController
                     else
                       AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_near_past:)
                     end
+
+    if show_is_closed
+      closed_ids = @current_user.get_preference(:closed_notifications) || []
+
+      notifications_json = notifications.map do |notification|
+        notification_json = account_notification_json(notification, @current_user, session, display_author: admin)
+        notification_json[:closed] = closed_ids.include?(notification.id)
+        notification_json
+      end
+
+      render json: notifications_json and return
+    end
+
     render json: account_notifications_json(notifications, @current_user, session, display_author: admin)
   end
 
@@ -173,24 +190,6 @@ class AccountNotificationsController < ApplicationController
 
   def show_deprecated
     show
-  end
-
-  # @API Close notification for user
-  # If the current user no long wants to see this notification it can be excused with this call
-  #
-  # @example_request
-  #   curl -X DELETE -H 'Authorization: Bearer <token>' \
-  #   https://<canvas>/api/v1/accounts/2/users/self/account_notifications/4
-  #
-  # @returns AccountNotification
-  def user_close_notification
-    notification = AccountNotification.find(params[:id])
-    @current_user.close_announcement(notification)
-    render json: account_notification_json(notification, @current_user, session)
-  end
-
-  def user_close_notification_deprecated
-    user_close_notification
   end
 
   # @API Create a global notification
@@ -355,9 +354,39 @@ class AccountNotificationsController < ApplicationController
     end
   end
 
+  # @API Close notification for user. Destroy notification for admin
+  # If the current user no longer wants to see this account notification, it can be closed with this call.
+  # This affects the current user only.
+  #
+  # If the current user is an admin and they pass a remove parameter with a value of "true", the account notification
+  # will be destroyed. This affects all users.
+  #
+  # @argument remove [Boolean]
+  #   Destroy the account notification.
+  #
+  # @example_request
+  #   curl -X DELETE -H 'Authorization: Bearer <token>' \
+  #   https://<canvas>/api/v1/accounts/2/account_notifications/4
+  #
+  # @returns AccountNotification
+  def user_close_notification
+    @notification = AccountNotification.find(params[:id])
+
+    if value_to_boolean(params[:remove])
+      render json: { status: :forbidden } and return unless require_account_admin
+
+      destroy_notification
+    else
+      close_notification
+    end
+
+    render json: account_notification_json(@notification, @current_user, session)
+  end
+
   def destroy
-    @notification = @account.announcements.find(params[:id])
-    @notification.destroy
+    @notification = AccountNotification.find(params[:id])
+    destroy_notification
+
     respond_to do |format|
       format.html do
         flash[:message] = t(:announcement_deleted_notice, "Announcement successfully deleted")
@@ -367,7 +396,19 @@ class AccountNotificationsController < ApplicationController
     end
   end
 
+  def user_close_notification_deprecated
+    user_close_notification
+  end
+
   protected
+
+  def destroy_notification
+    @notification.destroy
+  end
+
+  def close_notification
+    @current_user.close_announcement(@notification)
+  end
 
   def check_user_param
     raise ActiveRecord::RecordNotFound unless api_find(User, params[:user_id]) == @current_user
@@ -375,7 +416,7 @@ class AccountNotificationsController < ApplicationController
 
   def require_account_admin
     require_account_context
-    false unless authorized_action(@account, @current_user, :manage_alerts)
+    !!authorized_action(@account, @current_user, :manage_alerts)
   end
 
   def roles_to_add(role_params)

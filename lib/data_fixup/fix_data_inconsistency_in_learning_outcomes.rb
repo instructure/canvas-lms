@@ -20,7 +20,7 @@
 module DataFixup
   module FixDataInconsistencyInLearningOutcomes
     def self.run
-      Shard.find("alamo").activate do
+      Shard.find(4).activate do
         GuardRail.activate(:secondary) do
           ids = learning_outcomes_to_update
           GuardRail.activate(:primary) do

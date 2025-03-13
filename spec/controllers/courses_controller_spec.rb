@@ -402,6 +402,66 @@ describe CoursesController do
         end
       end
 
+      context "when determining enrollment status based on course and section dates" do
+        let(:course) do
+          course = Account.default.courses.create!(
+            name: "Future Course",
+            start_at: 1.month.from_now,
+            conclude_at: 2.months.from_now,
+            restrict_enrollments_to_course_dates: true
+          )
+          course.update!(workflow_state: "available")
+          course
+        end
+        let(:section) do
+          course.course_sections.create!(
+            name: "Past Section",
+            start_at: 30.days.ago,
+            end_at: 1.day.from_now,
+            restrict_enrollments_to_section_dates: true
+          )
+        end
+        let(:student) { user_with_pseudonym(active_user: true) }
+        let(:teacher) { user_with_pseudonym(active_user: true) }
+
+        before do
+          course.enroll_student(student, section: section).accept!
+          course.enroll_teacher(teacher, section: section).accept!
+        end
+
+        it "shows the course as current for the student when section restrictions are enabled" do
+          section.update!(restrict_enrollments_to_section_dates: true)
+          user_session(student)
+          get_index
+          expect(assigns(:current_enrollments).map(&:course_id)).to include(course.id)
+          expect(assigns(:future_enrollments).map(&:course_id)).not_to include(course.id)
+        end
+
+        it "shows the course as future for the student when section restrictions are disabled" do
+          section.update!(restrict_enrollments_to_section_dates: false)
+          user_session(student)
+          get_index
+
+          expect(assigns(:future_enrollments).map(&:course_id)).to include(course.id)
+          expect(assigns(:current_enrollments).map(&:course_id)).not_to include(course.id)
+        end
+
+        it "always shows the course as current for the teacher regardless of section restrictions" do
+          section.update!(restrict_enrollments_to_section_dates: true)
+          user_session(teacher)
+          get_index
+
+          expect(assigns(:current_enrollments).map(&:course_id)).to include(course.id)
+          expect(assigns(:future_enrollments).map(&:course_id)).not_to include(course.id)
+
+          section.update!(restrict_enrollments_to_section_dates: false)
+          get_index
+
+          expect(assigns(:current_enrollments).map(&:course_id)).to include(course.id)
+          expect(assigns(:future_enrollments).map(&:course_id)).not_to include(course.id)
+        end
+      end
+
       describe "sorting" do
         include_examples "sorting" do
           let(:type) { "current" }
@@ -1278,8 +1338,7 @@ describe CoursesController do
       expect(flash[:notice]).to match(/Course was successfully updated./)
     end
 
-    it "allows horizon student view student to leave student view" do
-      @course.update_attribute :workflow_state, "claimed"
+    it "allows test student to leave student view from a Canvas Career course" do
       user_session(@teacher)
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
@@ -1287,6 +1346,15 @@ describe CoursesController do
       get "show", params: { id: @course.id, leave_student_view: "/courses/#{@course.id}/modules" }
       expect(response).to redirect_to("#{course_url(@course)}/modules")
       expect(session[:become_user_id]).to be_nil
+    end
+
+    it "allows admin to stop acting as user from a Canvas Career course" do
+      user_session(@teacher)
+      @user = @course.student_view_student
+      session[:become_user_id] = @user.id
+
+      get "show", params: { id: @course.id, stop_acting_as_user: "/courses/#{@course.id}/modules" }
+      expect(response).to redirect_to(user_masquerade_url(@teacher.id, stop_acting_as_user: true))
     end
 
     it "redirects to the modules page for horizon courses" do
@@ -1474,7 +1542,7 @@ describe CoursesController do
         end
 
         it "includes discussion checkpoints if discussion checkpoints enabled" do
-          @course1.root_account.enable_feature!(:discussion_checkpoints)
+          @course1.account.enable_feature!(:discussion_checkpoints)
           @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course1)
           get "show", params: { id: @course1.id }
           expect(assigns(:upcoming_assignments)).to include @reply_to_topic

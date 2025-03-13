@@ -950,6 +950,7 @@ CanvasRails::Application.routes.draw do
     resources :question_banks, only: :index
     get :admin_merge
     get :admin_split
+    get :user_for_merge
     post :merge
     get :grades
     get :manageable_courses
@@ -1109,6 +1110,11 @@ CanvasRails::Application.routes.draw do
   scope(controller: :translation) do
     post "courses/:course_id/translate", action: :translate, as: :translate
     post "courses/:course_id/translate/paragraph", action: :translate_paragraph, as: :translate_paragraph
+  end
+
+  scope(controller: "lti/asset_processor_launch") do
+    get "asset_processors/:asset_processor_id/launch", action: :launch_settings, as: :asset_processor_settings_launch
+    get "asset_processors/:asset_processor_id/reports/:report_id/launch", action: :launch_report, as: :asset_report_launch
   end
 
   ### API routes ###
@@ -1480,7 +1486,8 @@ CanvasRails::Application.routes.draw do
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", controller: :discussion_topics, action: :destroy
 
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/view", action: :view, as: "#{context}_discussion_topic_view"
-        get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/summaries", action: :summary, as: "#{context}_discussion_topic_summary"
+        get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/summaries", action: :find_summary, as: "#{context}_discussion_topic_summary"
+        post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/summaries", action: :find_or_create_summary, as: "#{context}_discussion_topic_create_summary"
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/summaries/disable", action: :disable_summary, as: "#{context}_discussion_topic_disable_summary"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/summaries/:summary_id/feedback", action: :summary_feedback, as: "#{context}_discussion_topic_summary_feedback"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/duplicate", action: :duplicate
@@ -1952,6 +1959,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/lti_registrations/:id", action: :show
       get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
       put "accounts/:account_id/lti_registrations/:id", action: :update
+      put "accounts/:account_id/lti_registrations/:id/reset", action: :reset
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
     end
 
@@ -2920,8 +2928,8 @@ CanvasRails::Application.routes.draw do
 
     # Asset Service & Asset Report Service (LTI Asset Processor Specs)
     scope(controller: "lti/ims/asset_processor") do
-      post "asset_processor/:asset_processor_id/report", action: :create_report, as: :lti_asset_processor_create_report
-      get "asset_processor/:asset_processor_id/asset/:asset_id", action: :lti_asset_show, as: :lti_asset_processor_asset_show
+      post "asset_processors/:asset_processor_id/reports", action: :create_report, as: :lti_asset_processor_create_report
+      get "asset_processors/:asset_processor_id/assets/:asset_id", action: :lti_asset_show, as: :lti_asset_processor_asset_show
     end
 
     # Dynamic Registration Service

@@ -229,7 +229,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def threaded?
     discussion_type == DiscussionTypes::THREADED ||
-      (root_account&.feature_enabled?(:discussion_checkpoints) && checkpoints?) ||
+      (context.discussion_checkpoints_enabled? && checkpoints?) ||
       (DiscussionTypes::SIDE_COMMENT && has_threaded_replies?)
   end
   alias_method :threaded, :threaded?
@@ -1548,7 +1548,7 @@ class DiscussionTopic < ActiveRecord::Base
     submissions = []
     all_entries_for_user = topic.discussion_entries.all_for_user(user)
 
-    if topic.root_account&.feature_enabled?(:discussion_checkpoints) && checkpoints?
+    if topic.context.discussion_checkpoints_enabled? && checkpoints?
       reply_to_topic_submitted_at = topic.discussion_entries.top_level_for_user(user).minimum(:created_at)
 
       if reply_to_topic_submitted_at.present?

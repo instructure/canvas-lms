@@ -21,15 +21,6 @@
 describe LearningOutcome do
   let(:calc_method_no_int) { %w[highest latest average] }
 
-  describe "associations" do
-    it { is_expected.to belong_to(:copied_from).inverse_of(:cloned_outcomes) }
-
-    it do
-      expect(subject).to have_many(:cloned_outcomes).with_foreign_key("copied_from_outcome_id")
-                                                    .inverse_of(:copied_from)
-    end
-  end
-
   def outcome_errors(prop)
     @outcome.errors[prop].map(&:to_s)
   end
@@ -76,29 +67,6 @@ describe LearningOutcome do
     end
 
     outcome.rubric_criterion = criterion
-  end
-
-  context "validations" do
-    describe "lengths" do
-      it { is_expected.to validate_length_of(:description).is_at_most(described_class.maximum_text_length) }
-      it { is_expected.to validate_length_of(:short_description).is_at_most(described_class.maximum_string_length) }
-      it { is_expected.to validate_length_of(:vendor_guid).is_at_most(described_class.maximum_string_length) }
-      it { is_expected.to validate_length_of(:display_name).is_at_most(described_class.maximum_string_length) }
-    end
-
-    describe "nullable" do
-      it { is_expected.to allow_value(nil).for(:description) }
-      it { is_expected.not_to allow_value(nil).for(:short_description) }
-      it { is_expected.to allow_value(nil).for(:vendor_guid) }
-      it { is_expected.to allow_value(nil).for(:display_name) }
-    end
-
-    describe "blankable" do
-      it { is_expected.to allow_value("").for(:description) }
-      it { is_expected.not_to allow_value("").for(:short_description) }
-      it { is_expected.to allow_value("").for(:vendor_guid) }
-      it { is_expected.to allow_value("").for(:display_name) }
-    end
   end
 
   context "outcomes" do

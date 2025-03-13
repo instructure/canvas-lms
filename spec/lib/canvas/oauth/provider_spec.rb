@@ -185,7 +185,7 @@ module Canvas::OAuth
       before { stub_dev_key(double(id: 123)) }
 
       it "uses the key id for a client id" do
-        expect(provider.session_hash[:client_id]).to eq 123
+        expect(provider.session_hash[:client_id]).to eq "123"
       end
 
       it "passes the redirect_uri through" do

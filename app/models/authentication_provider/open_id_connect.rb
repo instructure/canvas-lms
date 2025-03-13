@@ -27,6 +27,8 @@ class AuthenticationProvider
       client_secret_post
     ].freeze
 
+    POST_LOGIN_REDIRECT_CLAIM = "https://instructure.com/claims/post_login_redirect"
+
     class << self
       attr_reader :jwks_cache
 
@@ -88,10 +90,6 @@ class AuthenticationProvider
         }]
       end
 
-      def always_validate?
-        false
-      end
-
       def validate_issuer?
         true
       end
@@ -125,7 +123,7 @@ class AuthenticationProvider
       claims(token)[login_attribute]
     end
 
-    def persist_to_session(session, token)
+    def persist_to_session(request, session, pseudonym, domain_root_account, token)
       return unless token.options[:jwt_string]
 
       # the raw JWT for RP Initiated Logout
@@ -137,6 +135,8 @@ class AuthenticationProvider
       session[:oidc_id_token_iss] = id_token["iss"]
       session[:oidc_id_token_sub] = id_token["sub"]
       session[:oidc_id_token_sid] = id_token["sid"] if id_token["sid"]
+
+      Login::Shared.set_return_to_from_provider(request, session, pseudonym, domain_root_account, id_token[POST_LOGIN_REDIRECT_CLAIM])
     end
 
     def slo?
@@ -269,6 +269,51 @@ class AuthenticationProvider
       e.message
     end
 
+    def claims(token)
+      token.options[:claims] ||= begin
+        id_token = unverified_id_token(token)
+
+        unless (missing_claims = %w[aud iss iat exp nonce] - id_token.keys).empty?
+          raise OAuthValidationError, t({ one: "Missing claim %{claims}", other: "Missing claims %{claims}" },
+                                        count: missing_claims.length,
+                                        claims: missing_claims.join(", "))
+        end
+
+        unless Array(id_token["aud"]).include?(client_id)
+          raise OAuthValidationError, t("Invalid JWT audience: %{audience}", audience: id_token["aud"].inspect)
+        end
+
+        if self.class.validate_issuer?
+          if issuer.blank?
+            raise OAuthValidationError, t("No issuer configured for OpenID Connect provider")
+          end
+          unless issuer === id_token["iss"] # rubocop:disable Style/CaseEquality -- may be a string or a RegEx
+            raise OAuthValidationError, t("Invalid JWT issuer: %{issuer}", issuer: id_token["iss"])
+          end
+        end
+        unless id_token["nonce"] == token.options[:nonce]
+          raise OAuthValidationError, t("Invalid nonce claim in ID Token")
+        end
+
+        if (signature_error = validate_signature(id_token))
+          raise OAuthValidationError, t("Invalid signature: %{signature_error}", signature_error:)
+        end
+
+        # we have a userinfo endpoint, and we don't have everything we want,
+        # then request more
+        if userinfo_endpoint.present? && !(requested_claims - id_token.keys).empty?
+          userinfo = token.get(userinfo_endpoint).parsed
+          debug_set(:userinfo, userinfo.to_json) if instance_debugging
+          # but only use it if it's for the user we logged in as
+          # see http://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse
+          if userinfo["sub"] == id_token["sub"]
+            id_token.merge!(userinfo)
+          end
+        end
+        id_token
+      end
+    end
+
     protected
 
     def authorize_options
@@ -372,85 +417,6 @@ class AuthenticationProvider
           response.value
           populate_from_discovery_json(response.body)
         end
-      end
-    end
-
-    def claims(token)
-      token.options[:claims] ||= begin
-        id_token = unverified_id_token(token)
-
-        if self.class.always_validate? || account.feature_enabled?(:oidc_full_token_validation)
-          unless (missing_claims = %w[aud iss iat exp nonce] - id_token.keys).empty?
-            raise OAuthValidationError, t({ one: "Missing claim %{claims}", other: "Missing claims %{claims}" },
-                                          count: missing_claims.length,
-                                          claims: missing_claims.join(", "))
-          end
-
-          unless Array(id_token["aud"]).include?(client_id)
-            raise OAuthValidationError, t("Invalid JWT audience: %{audience}", audience: id_token["aud"].inspect)
-          end
-
-          if self.class.validate_issuer?
-            if issuer.blank?
-              raise OAuthValidationError, t("No issuer configured for OpenID Connect provider")
-            end
-            unless issuer === id_token["iss"] # rubocop:disable Style/CaseEquality -- may be a string or a RegEx
-              raise OAuthValidationError, t("Invalid JWT issuer: %{issuer}", issuer: id_token["iss"])
-            end
-          end
-          unless id_token["nonce"] == token.options[:nonce]
-            raise OAuthValidationError, t("Invalid nonce claim in ID Token")
-          end
-
-          if (signature_error = validate_signature(id_token))
-            raise OAuthValidationError, t("Invalid signature: %{signature_error}", signature_error:)
-          end
-        elsif id_token != {}
-          missing_claims_persisted = settings["missing_claims"] ||= []
-          missing_claims = %w[aud iss iat exp nonce] - id_token.keys
-          missing_claims_persisted.replace(missing_claims_persisted | missing_claims)
-
-          audiences = settings["known_audiences"] ||= []
-          if audiences.length < 20 && !audiences.include?(id_token["aud"])
-            audiences << id_token["aud"]
-          end
-
-          issuers = settings["known_issuers"] ||= []
-          if issuers.length < 20 && !issuers.include?(id_token["iss"])
-            issuers << id_token["iss"]
-          end
-          alg = id_token.alg&.to_s
-          algs = settings["known_signature_algorithms"] ||= []
-          algs << alg if algs.length < 20 && !algs.include?(alg)
-
-          nonce_valid_list = settings["nonce_valid"] ||= []
-          nonce_valid = id_token["nonce"] == token.options[:nonce]
-          nonce_valid_list << nonce_valid unless nonce_valid_list.include?(nonce_valid)
-
-          # validate the signature if we have enough information
-          sigs_valid_list = settings["sigs_valid"] ||= []
-          if id_token.send(:hmac?)
-            sig_valid = !!validate_signature(id_token) if client_secret
-          elsif id_token.alg&.to_sym != :none && jwks_uri
-            sig_valid = !!validate_signature(id_token)
-          end
-          sigs_valid_list << sig_valid unless sigs_valid_list.include?(sig_valid)
-
-          save! if changed?
-        end
-
-        # we have a userinfo endpoint, and we don't have everything we want,
-        # then request more
-        if userinfo_endpoint.present? && !(requested_claims - id_token.keys).empty?
-          userinfo = token.get(userinfo_endpoint).parsed
-          debug_set(:userinfo, userinfo.to_json) if instance_debugging
-          # but only use it if it's for the user we logged in as
-          # see http://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse
-          if userinfo["sub"] == id_token["sub"]
-            id_token.merge!(userinfo)
-          end
-        end
-        id_token
       end
     end
 

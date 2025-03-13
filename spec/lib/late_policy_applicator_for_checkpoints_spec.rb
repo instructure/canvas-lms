@@ -22,7 +22,7 @@ describe LatePolicyApplicator do
     before :once do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @course.account.enable_feature!(:discussion_checkpoints)
       @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
       @course.late_policy = @late_policy
       @course.save!

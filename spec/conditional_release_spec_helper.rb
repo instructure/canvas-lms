@@ -20,8 +20,6 @@
 require_relative "factory_bot_spec_helper"
 
 RSpec.shared_examples "a soft-deletable model" do
-  it { is_expected.to have_db_column(:deleted_at) }
-
   it "adds a deleted_at where clause when requested" do
     expect(described_class.active.all.where_clause.ast.to_sql).to include('"deleted_at" IS NULL')
   end

@@ -53,7 +53,7 @@ describe "add content box" do
     skip("eportfolio still using old RCE, LS-1805")
     f(".add_rich_content_link").click
     type_in_tiny "textarea", "hello student"
-    submit_form(".form_content")
+    f("[data-testid='save-page']").click
     wait_for_ajax_requests
     entry_verifier({ section_type: "rich_text", content: "hello student" })
     expect(f("#page_content .section_content")).to include_text("hello student")
@@ -75,7 +75,7 @@ describe "add content box" do
     download = fj(".eportfolio_download:visible")
     expect(download).to be_present
     expect(download).to include_text @attachment.filename
-    submit_form(".form_content")
+    f("[data-testid='save-page']").click
     wait_for_ajaximations
     expect(f(".section.read_only")).to include_text @attachment.filename
     refresh_page
@@ -91,7 +91,7 @@ describe "add content box" do
     end
 
     def add_html
-      submit_form(".form_content")
+      f("[data-testid='save-page']").click
     end
 
     def put_comment_in_html
@@ -101,7 +101,7 @@ describe "add content box" do
       comment_public = "#eportfolio_entry_show_comments"
       f(comment_public).click
       expect(is_checked(comment_public)).to be_truthy
-      submit_form(".form_content")
+      f("[data-testid='save-page']").click
       wait_for_ajaximations
       expect(f(".section_content strong").text).to eq "student"
       entry_verifier({ section_type: "html", content: @html_content })
@@ -130,7 +130,7 @@ describe "add content box" do
       hover_and_click("#page_section_0 .delete_page_section_link")
       accept_alert
       wait_for_ajaximations
-      submit_form(".form_content")
+      f("[data-testid='save-page']").click
       wait_for_ajaximations
       expect(@eportfolio.eportfolio_entries.first.content[0]).to eq "No Content Added Yet"
       expect(f("#content")).not_to contain_css("#edit_page_section_0")

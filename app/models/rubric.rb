@@ -612,4 +612,10 @@ class Rubric < ActiveRecord::Base
 
     context_to_check.feature_enabled?(:enhanced_rubrics) && context_to_check.root_account.feature_enabled?(:rubric_self_assessment)
   end
+
+  def self.ai_rubrics_enabled?(context_to_check)
+    return false unless context_to_check.is_a?(Course)
+
+    context_to_check.feature_enabled?(:enhanced_rubrics) && context_to_check.feature_enabled?(:ai_rubrics)
+  end
 end

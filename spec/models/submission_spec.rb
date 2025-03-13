@@ -41,14 +41,6 @@ describe Submission do
     }
   end
 
-  it { is_expected.to validate_numericality_of(:points_deducted).is_greater_than_or_equal_to(0).allow_nil }
-  it { is_expected.to validate_numericality_of(:seconds_late_override).is_greater_than_or_equal_to(0).allow_nil }
-  it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(%w[none missing late extended]).allow_nil }
-  it { is_expected.to validate_inclusion_of(:cached_tardiness).in_array(["missing", "late"]).allow_nil }
-
-  it { is_expected.to delegate_method(:auditable?).to(:assignment).with_prefix(true) }
-  it { is_expected.to delegate_method(:can_be_moderated_grader?).to(:assignment).with_prefix(true) }
-
   describe "inferred values" do
     subject do
       submission.infer_values
@@ -7327,6 +7319,16 @@ describe Submission do
       sub = Submission.find(Submission.connection.create(create_sql))
       expect(sub.submission_history).to eq([sub])
     end
+
+    it "optionally returns the version along with the model" do
+      aggregate_failures do
+        history = submission.submission_history(include_version: true)
+        expect(history.size).to be 1
+        entry = history.first
+        expect(entry[:version].id).to eql submission.versions.first.id
+        expect(entry[:model].id).to eql submission.id
+      end
+    end
   end
 
   context "draft comments" do
@@ -8909,8 +8911,6 @@ describe Submission do
   end
 
   describe "extra_attempts validations" do
-    it { is_expected.to validate_numericality_of(:extra_attempts).is_greater_than_or_equal_to(0).allow_nil }
-
     describe "#extra_attempts_can_only_be_set_on_online_uploads" do
       it "does not allow extra_attempts to be set for non online upload submission types" do
         submission = @assignment.submissions.first

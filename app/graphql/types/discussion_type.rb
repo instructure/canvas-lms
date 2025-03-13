@@ -132,6 +132,11 @@ module Types
       object.published?
     end
 
+    field :points_possible, Float, null: true
+    def points_possible
+      object.try(:assignment).try(:points_possible)
+    end
+
     field :reply_to_entry_required_count, Integer, null: false
     delegate :reply_to_entry_required_count, to: :object
 

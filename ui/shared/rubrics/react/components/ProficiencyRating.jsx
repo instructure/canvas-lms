@@ -25,14 +25,15 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
-import {Table} from '@instructure/ui-table'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconTrashLine} from '@instructure/ui-icons'
+import {IconTrashLine, IconWarningSolid} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
 import {RadioInput} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ColorPicker, {PREDEFINED_COLORS} from '@canvas/color-picker'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('ProficiencyRating')
 
@@ -58,6 +59,7 @@ export default class ProficiencyRating extends React.Component {
     onPointsChange: PropTypes.func.isRequired,
     points: PropTypes.string.isRequired,
     pointsError: PropTypes.string,
+    onBlurChange: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -142,15 +144,34 @@ export default class ProficiencyRating extends React.Component {
     this.props.onDelete()
   }
 
-  errorMessage = error => (error ? [{text: error, type: 'error'}] : null)
+  retrieveErrorMessage = error => (
+    <>
+      <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+        <IconWarningSolid />
+      </View>
+      &nbsp;
+      {error}
+    </>
+  )
+
+  handleBlurChange = (e) => {
+    const field = e.target.name
+    if (field === 'description') {
+      this.props.onBlurChange(this.descriptionInput.value, field)
+    } else if (field === 'points') {
+      this.props.onBlurChange(this.pointsInput.value, field)
+    }
+  }
+
+  errorMessage = error => (error ? [{text: this.retrieveErrorMessage(error), type: 'error'}] : null)
 
   render() {
     const {color, description, descriptionError, disableDelete, mastery, points, pointsError} =
       this.props
     return (
-      <Table.Row>
-        <Table.Cell textAlign="center">
-          <div style={{display: 'inline-block'}}>
+      <Flex alignItems="start" gap="medium">
+        <Flex.Item size="80px" textAlign="center">
+          <div style={{display: 'inline-block', marginTop: '10px'}}>
             <RadioInput
               ref={input => {
                 this.radioInput = input
@@ -160,29 +181,33 @@ export default class ProficiencyRating extends React.Component {
               onChange={this.handleMasteryChange}
             />
           </div>
-        </Table.Cell>
-        <Table.Cell>
+        </Flex.Item>
+        <Flex.Item shouldGrow={true} shouldShrink={true} size="auto" >
           <TextInput
+            name="description"
             ref={this.setDescriptionRef}
             renderLabel={<ScreenReaderContent>{I18n.t('Change description')}</ScreenReaderContent>}
             messages={this.errorMessage(descriptionError)}
             onChange={this.handleDescriptionChange}
             defaultValue={description}
+            onBlur={this.handleBlurChange}
           />
-        </Table.Cell>
-        <Table.Cell>
+        </Flex.Item>
+        <Flex.Item size="80px">
           <TextInput
+            name="points"
             autoComplete="off"
             ref={this.setPointsRef}
             renderLabel={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
             messages={this.errorMessage(pointsError)}
             onChange={this.handlePointChange}
             defaultValue={I18n.n(points)}
+            onBlur={this.handleBlurChange}
             width="4rem"
           />
-        </Table.Cell>
-        <Table.Cell>
-          <span style={{whiteSpace: 'nowrap'}}>
+        </Flex.Item>
+        <Flex.Item size="170px">
+          <Flex style={{whiteSpace: 'nowrap'}} gap="small">
             <Popover
               on="click"
               isShowingContent={this.state.showColorPopover}
@@ -225,9 +250,9 @@ export default class ProficiencyRating extends React.Component {
                 screenReaderLabel={I18n.t('Delete proficiency rating')}
               />
             </div>
-          </span>
-        </Table.Cell>
-      </Table.Row>
+          </Flex>
+        </Flex.Item>
+      </Flex>
     )
   }
 }

@@ -408,6 +408,34 @@ describe WikiPagesApiController, type: :request do
         expect(json["conflict"]).to be true
       end
 
+      it "is not a conflict when is the same id" do
+        json = api_call_as_user(@teacher,
+                                :get,
+                                "/api/v1/courses/#{@course.id}/page_title_availability",
+                                { controller: "wiki_pages_api",
+                                  action: "check_title_availability",
+                                  format: "json",
+                                  course_id: @course.id.to_s },
+                                { title: @page.title, current_page_id: @page.id },
+                                {},
+                                { expected_status: 200 })
+        expect(json["conflict"]).to be false
+      end
+
+      it "is a conflict when is another id" do
+        json = api_call_as_user(@teacher,
+                                :get,
+                                "/api/v1/courses/#{@course.id}/page_title_availability",
+                                { controller: "wiki_pages_api",
+                                  action: "check_title_availability",
+                                  format: "json",
+                                  course_id: @course.id.to_s },
+                                { title: @page.title, current_page_id: @page.id + 10 },
+                                {},
+                                { expected_status: 200 })
+        expect(json["conflict"]).to be true
+      end
+
       it "correctly indicates lack of conflicts" do
         json = api_call_as_user(@teacher,
                                 :get,

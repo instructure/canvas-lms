@@ -39,20 +39,21 @@ export const USERNAME_MAX_LENGTH = 255
 
 const defaultValues = {username: '', password: ''}
 
-const validationSchema = z.object({
-  username: z
-    .string()
-    .min(1, I18n.t('This field is required.'))
-    .max(
-      USERNAME_MAX_LENGTH,
-      I18n.t('Exceeded the maximum length (%{usernameMaxLength} characters).', {
-        usernameMaxLength: USERNAME_MAX_LENGTH,
-      }),
-    ),
-  password: z.string().optional(),
-})
+const createValidationSchema = () =>
+  z.object({
+    username: z
+      .string()
+      .min(1, I18n.t('This field is required.'))
+      .max(
+        USERNAME_MAX_LENGTH,
+        I18n.t('Exceeded the maximum length (%{usernameMaxLength} characters).', {
+          usernameMaxLength: USERNAME_MAX_LENGTH,
+        }),
+      ),
+    password: z.string().optional(),
+  })
 
-type FormValues = z.infer<typeof validationSchema>
+type FormValues = z.infer<ReturnType<typeof createValidationSchema>>
 
 export const serviceConfigByName: Record<
   ServiceName,
@@ -170,7 +171,7 @@ const RegisterService = ({serviceName, onSubmit, onClose}: RegisterServiceProps)
     control,
     formState: {isSubmitting},
     handleSubmit,
-  } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
+  } = useForm({defaultValues, resolver: zodResolver(createValidationSchema())})
   const {title, image, description, fields, button} = serviceConfigByName[serviceName]
 
   const handleFormSubmit: SubmitHandler<FormValues> = async ({username, password}) => {

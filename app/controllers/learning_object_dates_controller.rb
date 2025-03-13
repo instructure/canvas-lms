@@ -124,8 +124,8 @@ class LearningObjectDatesController < ApplicationController
                                  section_visibilities = overridable.discussion_topic_section_visibilities.active.where.not(course_section_id: section_overrides)
                                  Api.paginate(section_visibilities, self, route)
                                end
-
-    include_child_override_due_dates = @context.account.feature_enabled?(:discussion_checkpoints)
+    # @context here is always a course, which was requested by the API client
+    include_child_override_due_dates = @context.discussion_checkpoints_enabled?
     all_overrides = assignment_overrides_json(overrides, @current_user, include_names: true, include_child_override_due_dates:)
     all_overrides += section_visibility_to_override_json(section_visibilities, overridable) if visibilities_to_override
 

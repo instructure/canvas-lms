@@ -89,7 +89,7 @@ module CanvasOutcomesHelper
     total_pages = 1
     all_results = []
     loop do
-      results, total_pages = get_request_page(context, domain, endpoint, jwt, params, page_num, per_page).values_at(:results, :total_pages)
+      get_request_page(context, domain, endpoint, jwt, params, page_num, per_page) => results:, total_pages:
       all_results.concat(results)
       break if page_num >= total_pages
 

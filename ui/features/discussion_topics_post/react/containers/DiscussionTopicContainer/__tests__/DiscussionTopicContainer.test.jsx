@@ -677,6 +677,36 @@ describe('DiscussionTopicContainer', () => {
   })
 
   describe('Discussion Summary', () => {
+    it('should render the discussion summary button if user can summarize and summary is not enabled', () => {
+      ENV.user_can_summarize = true
+      const {queryByTestId} = setup({
+        discussionTopic: Discussion.mock(),
+        isSummaryEnabled: false,
+      })
+
+      expect(queryByTestId('summarize-button')).toBeTruthy()
+    })
+
+    it('should not render the discussion summary button if summary is enabled', () => {
+      ENV.user_can_summarize = true
+      const {queryByTestId} = setup({
+        discussionTopic: Discussion.mock(),
+        isSummaryEnabled: true,
+      })
+
+      expect(queryByTestId('summarize-button')).toBeNull()
+    })
+
+    it('should not render the discussion summary button if user can not summarize', () => {
+      ENV.user_can_summarize = false
+      const {queryByTestId} = setup({
+        discussionTopic: Discussion.mock(),
+        isSummaryEnabled: false,
+      })
+
+      expect(queryByTestId('summarize-button')).toBeNull()
+    })
+
     it('renders a summary', () => {
       const {queryByTestId} = setup({
         discussionTopic: Discussion.mock(),

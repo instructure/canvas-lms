@@ -53,3 +53,7 @@ export function windowAlert(message: string): void {
 export function windowConfirm(message: string): boolean {
   return window.confirm(message)
 }
+
+export function windowPathname(): string {
+  return window.location.pathname
+}

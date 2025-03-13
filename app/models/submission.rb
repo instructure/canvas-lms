@@ -1630,7 +1630,7 @@ class Submission < ActiveRecord::Base
     submission&.submission_type
   end
 
-  def submission_history
+  def submission_history(include_version: false)
     @submission_histories ||= begin
       res = []
       last_submitted_at = nil
@@ -1643,14 +1643,27 @@ class Submission < ActiveRecord::Base
         elsif association(:originality_reports).loaded?
           model.turnitin_data = originality_data
         end
+
         if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
-          res << model
+          res << (include_version ? { model:, version: } : model)
           last_submitted_at = model.submitted_at
         end
       end
-      res = versions.to_a[0, 1].map(&:model) if res.empty?
-      res = [self] if res.empty?
-      res.sort_by { |s| s.submitted_at || CanvasSort::First }
+
+      if res.empty?
+        res = versions.to_a[0, 1].map do |version|
+          include_version ? { version:, model: version.model } : version.model
+        end
+      end
+
+      if res.empty?
+        res = include_version ? [{ model: self, version: nil }] : [self]
+      end
+
+      res.sort_by do |entry|
+        sub = include_version ? entry.fetch(:model) : entry
+        sub.submitted_at || CanvasSort::First
+      end
     end
   end
 
@@ -1925,6 +1938,14 @@ class Submission < ActiveRecord::Base
       s.versioned_attachments =
         attachments_by_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten
     end
+  end
+
+  def self.bulk_load_attachments_and_previews(submissions)
+    bulk_load_versioned_attachments(submissions)
+    attachments = submissions.flat_map(&:versioned_attachments)
+    ActiveRecord::Associations.preload(attachments,
+                                       [:canvadoc, :crocodoc_document])
+    Version.preload_version_number(submissions)
   end
 
   # use this method to pre-load the versioned_originality_reports for a bunch of
@@ -3075,8 +3096,8 @@ class Submission < ActiveRecord::Base
   end
 
   def status_tag
-    return :custom if custom_grade_status_id
     return :excused if excused?
+    return :custom if custom_grade_status_id
     return :late if late?
     return :extended if extended?
     return :missing if missing?
@@ -3147,6 +3168,18 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def effective_checkpoint_submission(sub_assignment_tag)
+    return self unless sub_assignment_tag.present?
+    return self unless assignment.checkpoints_parent?
+
+    sub_assignment = assignment.find_checkpoint(sub_assignment_tag)
+
+    return self if sub_assignment.nil?
+
+    # TODO: see if we should be throwing an error here instead of defaulting to `submission`
+    sub_assignment.all_submissions.find_by(user: user) || self
+  end
+
   def aggregate_checkpoint_submissions
     Checkpoints::SubmissionAggregatorService.call(
       assignment: assignment.parent_assignment,
@@ -3187,7 +3220,7 @@ class Submission < ActiveRecord::Base
   end
 
   def checkpoint_submission?
-    assignment.present? && assignment.checkpoint? && !!root_account&.feature_enabled?(:discussion_checkpoints)
+    assignment.present? && assignment.checkpoint? && !!assignment.context.discussion_checkpoints_enabled?
   end
 
   def checkpoint_attributes_changed?

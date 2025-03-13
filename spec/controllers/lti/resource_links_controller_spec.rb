@@ -112,6 +112,17 @@ describe Lti::ResourceLinksController, type: :request do
       expect(launch_urls[rich_content_rl.id]).to eq("http://www.example.com/courses/#{course.id}/external_tools/retrieve?resource_link_lookup_uuid=#{rich_content_rl.lookup_uuid}")
     end
 
+    it "includes corresponding module_item_id for resource link" do
+      subject
+      content_types = response_json.to_h { |rl| [rl["id"], rl["associated_content_type"]] }
+      content_ids = response_json.to_h { |rl| [rl["id"], rl["associated_content_id"]] }
+
+      expect(content_types[module_item_rl.id]).to eq("ModuleItem")
+      expect(content_ids[module_item_rl.id]).to eq(module_item.id)
+      expect(content_types[assignment_rl.id]).to be_nil
+      expect(content_ids[assignment_rl.id]).to be_nil
+    end
+
     context "with deleted link and content" do
       before do
         collaboration_rl.destroy
@@ -239,7 +250,7 @@ describe Lti::ResourceLinksController, type: :request do
   describe "PUT #update" do
     subject { put "/api/v1/courses/#{course.id}/lti_resource_links/#{id}", params: }
 
-    let(:resource_link) { resource_link_model(context: course) }
+    let(:resource_link) { resource_link_model(context: course, course: course) }
     let(:id) { resource_link.id }
     let(:params) { {} }
 
@@ -272,16 +283,26 @@ describe Lti::ResourceLinksController, type: :request do
     end
 
     context "with url param" do
-      let(:url) { "https://example.com/lti/launch" }
+      let(:url) { resource_link.original_context_external_tool.url + "/deeplink" }
       let(:params) { { url: } }
 
       it "updates the resource link" do
         subject
+        expect(response).to be_successful
         expect(resource_link.reload.url).to eq(url)
       end
 
       context "invalid" do
         let(:url) { "hello world!" }
+
+        it "returns 422" do
+          subject
+          expect(response).to be_unprocessable
+        end
+      end
+
+      context "does not match tool url" do
+        let(:url) { "https://othertool.com/lti/launch" }
 
         it "returns 422" do
           subject
@@ -323,6 +344,36 @@ describe Lti::ResourceLinksController, type: :request do
         it "returns resource link" do
           subject
           expect(response_json).to include({ id: resource_link.id })
+        end
+      end
+    end
+
+    context "with tool id" do
+      let(:tool2) { external_tool_1_3_model(context: account, developer_key:) }
+      let(:params) { { context_external_tool_id: tool2.id } }
+
+      it "updates the resource link" do
+        subject
+        expect(response).to be_successful
+        expect(resource_link.reload.context_external_tool_id).to eq(tool2.id)
+      end
+
+      context "invalid" do
+        let(:params) { { context_external_tool_id: 0 } }
+
+        it "returns 422" do
+          subject
+          expect(response).to be_unprocessable
+        end
+      end
+
+      context "that does not match original url" do
+        let(:tool2) { external_tool_1_3_model(context: account, developer_key:, opts: { url: "https://otherurl.com", domain: "otherurl.com" }) }
+        let(:params) { { context_external_tool_id: tool2.id } }
+
+        it "returns 422" do
+          subject
+          expect(response).to be_unprocessable
         end
       end
     end

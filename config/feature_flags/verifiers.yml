@@ -9,3 +9,13 @@ disable_file_verifier_access:
   applies_to: RootAccount
   display_name: Disable File Verifier Access
   description: Disable access to the file verifier through UUID
+disable_adding_uuid_verifier_in_api:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Disable adding verifiers to file URLs in the API
+  description: This will disable self-authorized file URLs in the API.  When this is enabled, file URLs will need to be accessed with authentication.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

@@ -29,11 +29,11 @@ import {
 } from '@canvas/forms/react/react-hook-form/utils'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import AutoCompleteSelect from './AutoCompleteSelect'
 import {TextInput} from '@instructure/ui-text-input'
 import FieldGroup from '@canvas/forms/react/field-group/FieldGroup'
 import {Grid} from '@instructure/ui-grid'
 import {IconCoursesSolid, IconUserSolid} from '@instructure/ui-icons'
+import AutoCompleteSelect from '../../../shared/auto-complete-select/react/AutoCompleteSelect'
 
 const I18n = createI18nScope('grade_change_logging_content')
 
@@ -58,10 +58,10 @@ const validationSchema = z
   .refine(
     ({grader_id, student_id, course_id, assignment_id}) =>
       grader_id || student_id || course_id || assignment_id,
-    {
+    () => ({
       message: I18n.t('Please enter at least one field.'),
       path: ['grader_id'],
-    },
+    }),
   )
   .refine(
     ({start_time, end_time}) => {
@@ -71,10 +71,10 @@ const validationSchema = z
 
       return isToDateAfterFromDate
     },
-    {
+    () => ({
       message: I18n.t('To Date cannot come before From Date.'),
       path: ['end_time'],
-    },
+    }),
   )
 
 type FormValues = z.infer<typeof validationSchema>

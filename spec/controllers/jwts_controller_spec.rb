@@ -218,37 +218,31 @@ describe JwtsController do
         it "context_type param is missing" do
           post "create", params: params.except(:context_type), format: "json"
           expect(response).to have_http_status(:bad_request)
-          expect(response.body).to match(/Missing context_type parameter./)
         end
 
         it "context_id or context_uuid param is missing" do
           post "create", params: params.except(:context_id), format: "json"
           expect(response).to have_http_status(:bad_request)
-          expect(response.body).to match(/Missing context_id or context_uuid parameter./)
         end
 
         it "context_type and context_uuid are passed" do
           post "create", params: params.merge({ context_uuid: @context_uuid }), format: "json"
           expect(response).to have_http_status(:bad_request)
-          expect(response.body).to match(/Should provide context_id or context_uuid parameters, but not both./)
         end
 
         it "context_type is invalid" do
           post "create", params: params.merge({ context_type: "unknown" }), format: "json"
           expect(response).to have_http_status(:bad_request)
-          expect(response.body).to match(/Invalid context_type parameter./)
         end
 
         it "context not found with id" do
           post "create", params: params.merge({ context_id: "unknown" }), format: "json"
           expect(response).to have_http_status(:not_found)
-          expect(response.body).to match(/Context not found./)
         end
 
         it "context not found with uuid" do
           post "create", params: params.except(:context_id).merge({ context_uuid: "unknown" }), format: "json"
           expect(response).to have_http_status(:not_found)
-          expect(response.body).to match(/Context not found./)
         end
 
         it "context is unauthorized" do

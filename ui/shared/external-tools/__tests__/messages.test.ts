@@ -55,12 +55,22 @@ describe('1.1 content item messages', () => {
       ...props,
     })
 
+    const LtiDeepLinkingResponse = (props = {}) => ({
+      subject: 'LtiDeepLinkingResponse',
+      contentItems: [{url: 'test'}],
+      service: 'equella',
+      service_id: '1',
+      ...props,
+    })
+
     let ready: () => void
+    let onDeepLinkingResponse: () => void
     let cancel: () => void
     let remove: () => void | undefined
     beforeEach(() => {
       ready = jest.fn()
       cancel = jest.fn()
+      onDeepLinkingResponse = jest.fn()
     })
 
     afterEach(() => {
@@ -75,6 +85,16 @@ describe('1.1 content item messages', () => {
 
       sendPostMessage(externalContentCancel())
       expect(cancel).toHaveBeenCalled()
+    })
+
+    it('calls onDeepLinkingResponse handler on LtiDeepLinkingResponse event', () => {
+      remove = handleExternalContentMessages({
+        onDeepLinkingResponse,
+        env,
+      })
+
+      sendPostMessage(LtiDeepLinkingResponse())
+      expect(onDeepLinkingResponse).toHaveBeenCalled()
     })
 
     it('calls ready handler on externalContentReady event', () => {

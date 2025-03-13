@@ -17,7 +17,6 @@
  */
 
 import ProfileShow from '../ProfileShow'
-import {waitFor} from '@testing-library/dom'
 import $ from 'jquery'
 import 'jquery-migrate'
 
@@ -95,10 +94,30 @@ describe('ProfileShow', () => {
     beforeEach(() => {
       container.innerHTML = `
         <form id="profile_form">
-          <input id="profile_title" name="user_profile[title]" data-testid="profile-title" />
-          <textarea id="profile_bio" name="user_profile[bio]" data-testid="profile-bio"></textarea>
+          <input id="user_short_name" name="user[short_name]" value="John Doe" />
+          <input id="profile_title" name="user_profile[title]" />
+          <textarea id="profile_bio" name="user_profile[bio]"></textarea>
+          <table id="profile_link_fields">
+            <input id="profile_link" type="text" name="link_urls[]" />
+          </table>
         </form>
       `
+    })
+
+    it('validates name input length', () => {
+      // Arrange
+      const form = document.querySelector('#profile_form')
+      const nameInput = document.querySelector('#user_short_name')
+      const preventDefault = jest.fn()
+
+      // Act & Assert - Valid input
+      view.validateForm({preventDefault, target: form})
+      expect(preventDefault).not.toHaveBeenCalled()
+
+      // Act & Assert - Invalid input
+      nameInput.value = ''
+      view.validateForm({preventDefault, target: form})
+      expect(preventDefault).toHaveBeenCalled()
     })
 
     it('validates title input length', () => {
@@ -118,15 +137,25 @@ describe('ProfileShow', () => {
       expect(preventDefault).toHaveBeenCalled()
     })
 
+    it('validates bio input length', () => {
+      // Arrange
+      const form = document.querySelector('#profile_form')
+      const bioInput = document.querySelector('#profile_bio')
+      const preventDefault = jest.fn()
+
+      // Act & Assert - Valid input
+      bioInput.value = 'a'.repeat(65536)
+      view.validateForm({preventDefault, target: form})
+      expect(preventDefault).not.toHaveBeenCalled()
+
+      // Act & Assert - Invalid input
+      bioInput.value = 'a'.repeat(65537)
+      view.validateForm({preventDefault, target: form})
+      expect(preventDefault).toHaveBeenCalled()
+    })
+
     it('validates URL has no spaces', () => {
       // Arrange
-      container.innerHTML = `
-        <form id="profile_form">
-          <table id="profile_link_fields">
-            <input id="profile_link" type="text" name="link_urls[]" data-testid="profile-link" />
-          </table>
-        </form>
-      `
       const form = document.querySelector('#profile_form')
       const linkInput = document.querySelector('#profile_link')
       const preventDefault = jest.fn()

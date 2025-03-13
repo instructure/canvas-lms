@@ -121,112 +121,83 @@ describe "users" do
   end
 
   context "admin merge" do
-    def setup_user_merge(from_user, into_user)
-      get "/users/#{from_user.id}/admin_merge"
-      f("#manual_user_id").send_keys(into_user.id)
-      expect_new_page_load { f('button[type="submit"]').click }
+    def select_user_for_merge_by_user_id(user)
+      user_id_input = f("input[name=destinationUserId]")
+      select_button = f("button[type=submit]")
+      user_id_input.send_keys(user.id)
+      select_button.click
     end
 
-    def reload_users(users)
-      users.each(&:reload)
-    end
-
-    def submit_merge
-      expect_new_page_load { f("#prepare_to_merge").click }
-      expect_new_page_load { f('button[type="submit"]').click }
-    end
-
-    def validate_login_info(user_id)
-      expect(f("#login_information")).to include_text(user_id)
+    def select_user_for_merge_by_user_name(user)
+      select_button = f("button[type=submit]")
+      click_option("input[data-testid=find-by-select]", "Name")
+      destination_user_input = f("input[name=destinationUserId]")
+      destination_user_input.send_keys(user.name)
+      option = fj("[role=option]:contains(#{user.name})")
+      option.click
+      select_button.click
     end
 
     before do
-      @student_1_id = "student1@example.com"
-      @student_2_id = "student2@example.com"
-
       course_with_admin_logged_in
       @student_1 = User.create!(name: "Student One")
       @student_1.register!
-      @student_1.pseudonyms.create!(unique_id: @student_1_id, password: "asdfasdf", password_confirmation: "asdfasdf")
-      @course.enroll_user(@student_1).accept!
+      @student_1.pseudonyms.create!(unique_id: "studentr1_pseudonym1@example.com", password: "asdfasdf", password_confirmation: "asdfasdf")
+      @student_1.communication_channels.create(path: "student1_cc@instructure.com").confirm!
+      @common_course = @course
+      @common_course.enroll_user(@student_1).accept!
+      course_with_student({ user: @student_1, active_course: true, active_enrollment: true })
 
       @student_2 = User.create!(name: "Student Two")
       @student_2.register!
-      @student_2.pseudonyms.create!(unique_id: @student_2_id, password: "asdfasdf", password_confirmation: "asdfasdf")
-      @course.enroll_user(@student_2).accept!
-      @users = [@student_1, @student_2]
+      @student_2.pseudonyms.create!(unique_id: "student2_pseudonym@example.com", password: "asdfasdf", password_confirmation: "asdfasdf")
+      @student_2.communication_channels.create(path: "student2_cc@instructure.com").confirm!
+      @common_course.enroll_user(@student_2).accept!
+      course_with_student({ user: @student_2, active_course: true, active_enrollment: true })
     end
 
-    it "merges user a with user b" do
-      setup_user_merge(@student_2, @student_1)
-      submit_merge
-      reload_users(@users)
+    it "merges user A with user B by user id" do
+      get "/users/#{@student_1.id}/admin_merge"
+      expected_enrollment_ids = [*@student_1.enrollments.filter { |e| e.course_id != @common_course.id }, *@student_2.enrollments].map(&:id)
+      expected_pseudonym_ids = [*@student_1.pseudonyms, *@student_2.pseudonyms].map(&:id)
+      expected_login_ids = [*@student_1.communication_channels, *@student_2.communication_channels].map(&:id)
+
+      select_user_for_merge_by_user_id(@student_2)
+      merge_account_button = f("[aria-label='Merge Accounts']")
+      merge_account_button.click
+      confirm_merge_account_button = f("[aria-label='Merge User Accounts']")
+      confirm_merge_account_button.click
+
+      @student_1.reload
+      @student_2.reload
+      expect(@student_2.workflow_state).to eq "registered"
+      expect(@student_1.workflow_state).to eq "deleted"
+      expect(@student_1.merged_into_user_id).to be(@student_2.id)
+      expect(@student_2.enrollments.map(&:id)).to match_array(expected_enrollment_ids)
+      expect(@student_2.pseudonyms.map(&:id)).to match_array(expected_pseudonym_ids)
+      expect(@student_2.communication_channels.map(&:id)).to match_array(expected_login_ids)
+    end
+
+    it "merges user B with user A by user name" do
+      get "/users/#{@student_2.id}/admin_merge"
+      expected_enrollment_ids = [*@student_2.enrollments.filter { |e| e.course_id != @common_course.id }, *@student_1.enrollments].map(&:id)
+      expected_pseudonym_ids = [*@student_2.pseudonyms, *@student_1.pseudonyms].map(&:id)
+      expected_login_ids = [*@student_2.communication_channels, *@student_1.communication_channels].map(&:id)
+
+      select_user_for_merge_by_user_name(@student_1)
+      merge_account_button = f("[aria-label='Merge Accounts']")
+      merge_account_button.click
+      confirm_merge_account_button = f("[aria-label='Merge User Accounts']")
+      confirm_merge_account_button.click
+
+      @student_1.reload
+      @student_2.reload
       expect(@student_1.workflow_state).to eq "registered"
       expect(@student_2.workflow_state).to eq "deleted"
-      validate_login_info(@student_1_id)
-    end
-
-    it "merges user b with user a" do
-      setup_user_merge(@student_1, @student_2)
-      submit_merge
-      reload_users(@users)
-      expect(@student_1.workflow_state).to eq "deleted"
-      expect(@student_2.workflow_state).to eq "registered"
-      validate_login_info(@student_2_id)
-    end
-
-    it "validates switching the users to merge" do
-      setup_user_merge(@student_2, @student_1)
-      user_names = ff(".result td")
-      expect(user_names[0]).to include_text(@student_2.name)
-      expect(user_names[1]).to include_text(@student_1.name)
-      f("#switch_user_positions").click
-      wait_for_ajaximations
-      user_names = ff(".result td")
-      expect(user_names[0]).to include_text(@student_1.name)
-      expect(user_names[1]).to include_text(@student_2.name)
-      submit_merge
-      reload_users(@users)
-      expect(@student_1.workflow_state).to eq "deleted"
-      expect(@student_2.workflow_state).to eq "registered"
-      validate_login_info(@student_1_id)
-    end
-
-    it "cancels a merge and validate both users still exist" do
-      setup_user_merge(@student_2, @student_1)
-      expect_new_page_load { f("#prepare_to_merge").click }
-      wait_for_ajaximations
-      expect_new_page_load { f(".button-secondary").click }
-      wait_for_ajaximations
-      expect(f("#global_nav_courses_link")).to be_displayed
-      expect(@student_1.workflow_state).to eq "registered"
-      expect(@student_2.workflow_state).to eq "registered"
-    end
-
-    it "shows an error if the user id entered is the current users" do
-      get "/users/#{@student_1.id}/admin_merge"
-      expect_no_flash_message :error
-      f("#manual_user_id").send_keys(@student_1.id)
-      expect_new_page_load { f('button[type="submit"]').click }
-      wait_for_ajaximations
-      expect_flash_message :error, "You can't merge an account with itself."
-    end
-
-    it "shows an error if invalid text is entered in the id box" do
-      get "/users/#{@student_1.id}/admin_merge"
-      expect_no_flash_message :error
-      f("#manual_user_id").send_keys("azxcvbytre34567uijmm23456yhj")
-      expect_new_page_load { f('button[type="submit"]').click }
-      wait_for_ajaximations
-      expect_flash_message :error, "No active user with that ID was found."
-    end
-
-    it "shows an error if the user id doesnt exist" do
-      get "/users/#{@student_1.id}/admin_merge"
-      expect_no_flash_message :error
-      f("#manual_user_id").send_keys(1_234_567_809)
-      expect_new_page_load { f('button[type="submit"]').click }
-      expect_flash_message :error, "No active user with that ID was found."
+      expect(@student_2.merged_into_user_id).to be(@student_1.id)
+      expect(@student_1.enrollments.map(&:id)).to match_array(expected_enrollment_ids)
+      expect(@student_1.pseudonyms.map(&:id)).to match_array(expected_pseudonym_ids)
+      expect(@student_1.communication_channels.map(&:id)).to match_array(expected_login_ids)
     end
   end
 

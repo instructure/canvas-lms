@@ -43,7 +43,7 @@ describe "better_file_browsing, folders" do
       expect(fj("a:contains('new test folder')")).to be_present
     end
 
-    it "displays all cog icon options", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "displays all cog icon options", priority: "1", upgrade_files_v2: "done" do
       expect(fj("a:contains('new test folder')")).to be_present
       ff(".ef-item-row").first.click # ensure folder item has focus
       f("button.al-trigger.btn-link").click # toggle cog menu button
@@ -54,7 +54,7 @@ describe "better_file_browsing, folders" do
       expect(fln("Delete")).to be_displayed
     end
 
-    it "edits folder name", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "edits folder name", priority: "1", upgrade_files_v2: "done" do
       folder_rename_to = "test folder"
       edit_name_from_cog_icon(folder_rename_to)
       wait_for_ajaximations
@@ -67,7 +67,7 @@ describe "better_file_browsing, folders" do
       expect(ff(".ef-name-col__text")[0].text).to eq '<script>alert("Hi");<_script>'
     end
 
-    it "moves a folder", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "moves a folder", priority: "1", upgrade_files_v2: "done" do
       ff(".ef-name-col__text")[0].click
       wait_for_ajaximations
       add_folder("test folder")
@@ -78,7 +78,7 @@ describe "better_file_browsing, folders" do
       expect(ff(".treeLabel span")[2].text).to eq "test folder"
     end
 
-    it "deletes a folder from cog icon", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "deletes a folder from cog icon", priority: "1", upgrade_files_v2: "done" do
       skip_if_safari(:alert)
       delete_file(0, :cog_icon)
       expect(f("#content")).not_to contain_link("new test folder")
@@ -101,7 +101,7 @@ describe "better_file_browsing, folders" do
       expect(f(".btn-link.published-status.restricted")).to be_displayed
     end
 
-    it "deletes folder from toolbar", priority: "1", upgrade_files_v2: "waiting for deployment" do
+    it "deletes folder from toolbar", priority: "1", upgrade_files_v2: "done" do
       skip_if_safari(:alert)
       delete_file(0, :toolbar_menu)
       expect(f("body")).not_to contain_css(".ef-item-row")

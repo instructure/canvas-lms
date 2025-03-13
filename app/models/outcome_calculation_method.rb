@@ -61,7 +61,7 @@ class OutcomeCalculationMethod < ApplicationRecord
     if: lambda do |model|
       CALCULATION_METHODS.include?(model.calculation_method)
     end,
-    message: -> { t("invalid calculation_int for this calculation_method") }
+    message: ->(_object, _data) { t("invalid calculation_int for this calculation_method") }
   }
 
   before_validation :adjust_calculation_method

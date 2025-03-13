@@ -24,26 +24,19 @@ import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
-import {FileManagementContext} from '../../Contexts'
+import {FileManagementProvider} from '../../Contexts'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import userEvent from '@testing-library/user-event'
 
 const renderComponent = () => {
   return render(
-    <FileManagementContext.Provider
-      value={{
-        folderId: '1',
-        contextType: 'course',
-        contextId: '1',
-        showingAllContexts: false,
-        currentFolder: null,
-      }}
-    >
+    <FileManagementProvider value={createMockFileManagementContext()}>
       <MockedQueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AllMyFilesTable />
         </BrowserRouter>
       </MockedQueryClientProvider>
-    </FileManagementContext.Provider>,
+    </FileManagementProvider>,
   )
 }
 

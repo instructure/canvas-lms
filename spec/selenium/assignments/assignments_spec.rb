@@ -369,7 +369,9 @@ describe "assignments" do
       end
 
       it "preserves all assignment attributes for checkpointed discussion when opening and submitting without changes using more options", :ignore_js_errors do
-        Account.site_admin.enable_feature!(:discussion_checkpoints)
+        sub_account = Account.create!(name: "sub1", parent_account: Account.default)
+        @course.update!(account: sub_account)
+        sub_account.enable_feature!(:discussion_checkpoints)
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
@@ -491,7 +493,9 @@ describe "assignments" do
       end
 
       it "preserves all assignment attributes for checkpointed discussion when opening and submitting without changes" do
-        Account.site_admin.enable_feature!(:discussion_checkpoints)
+        sub_account = Account.create!(name: "sub1", parent_account: Account.default)
+        sub_account.enable_feature!(:discussion_checkpoints)
+        @course.update!(account: sub_account)
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
@@ -820,20 +824,125 @@ describe "assignments" do
       end
     end
 
-    it "validates that a group category is selected", priority: "1" do
-      assignment_name = "first test assignment"
-      @assignment = @course.assignments.create({
-                                                 name: assignment_name,
-                                                 assignment_group: @course.assignment_groups.create!(name: "default")
-                                               })
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      f("#has_group_category").click
-      f(%(span[data-testid="group-set-close"])).click
-      f(".btn-primary[type=submit]").click
+    it "validates the assignment name" do
+      get "/courses/#{@course.id}/assignments/new"
       wait_for_ajaximations
-      error_box = f(".errorBox[role=alert]")
-      expect(f(".error_text", error_box).text).to eq "Please create a group set"
+
+      submit_assignment_form
+      # validate assignment name is not empty
+      expect(f("#name_errors")).to include_text("Name is required")
+
+      f("#assignment_name").send_keys("a" * 256)
+      submit_assignment_form
+      # validate assignment name is not too long
+      expect(f("#name_errors")).to include_text("Must be fewer than 256 characters")
+    end
+
+    it "validates at least one submission type is checked if online submission" do
+      get "/courses/#{@course.id}/assignments/new"
+      wait_for_ajaximations
+      submit_assignment_form
+      expect(f("#online_submission_types\\[online_text_entry\\]_errors")).to include_text("Please choose at least one submission type")
+    end
+
+    it "validates the points possible" do
+      get "/courses/#{@course.id}/assignments/new"
+      wait_for_ajaximations
+      f("#assignment_name").send_keys("test points possible")
+
+      # clear the default value (0)
+      negative_input = "-1"
+      f("#assignment_points_possible").send_keys(:backspace)
+      f("#assignment_points_possible").send_keys(negative_input)
+      submit_assignment_form
+      # validate points possible is not negative
+      expect(f("#points_possible_errors")).to include_text("Points value must be 0 or greater")
+
+      # clear the last value
+      negative_input.each_char { f("#assignment_points_possible").send_keys(:backspace) }
+      f("#assignment_points_possible").send_keys("a")
+      submit_assignment_form
+      # validate points possible is a number
+      expect(f("#points_possible_errors")).to include_text("Points value must be a number")
+
+      # clear the last value
+      f("#assignment_points_possible").send_keys(:backspace)
+      f("#assignment_points_possible").send_keys(1_000_000_000)
+      submit_assignment_form
+      # validate points possible max
+      expect(f("#points_possible_errors")).to include_text("Points value must be 999999999 or less")
+    end
+
+    it "validates allowed extensions" do
+      assignment = @course.assignments.create!(
+        name: "Test allowed extensions",
+        submission_types: "online_upload",
+        assignment_group: @course.assignment_groups.first
+      )
+
+      get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+      wait_for_ajaximations
+
+      f("#assignment_restrict_file_extensions").click
+      submit_assignment_form
+      # validate there is at least one file type
+      expect(f("#allowed_extensions_errors")).to include_text("Please specify at least one allowed file type")
+
+      f("#assignment_allowed_extensions").send_keys("a" * 256)
+      submit_assignment_form
+      # validate allowed extensions max
+      expect(f("#allowed_extensions_errors")).to include_text("Must be fewer than 256 characters")
+    end
+
+    context "validates group assignment" do
+      before do
+        @assignment = @course.assignments.create({
+                                                   name: "first test assignment",
+                                                   assignment_group: @course.assignment_groups.create!(name: "default")
+                                                 })
+      end
+
+      it "is created before saving", priority: "1" do
+        get "/courses/#{@course.id}/assignments/new"
+        f("#has_group_category").click
+        f(%(span[data-testid="group-set-close"])).click
+        submit_assignment_form
+        wait_for_ajaximations
+        expect(f("#assignment_group_category_id_errors").text).to eq "Please create a group set"
+      end
+
+      context "with group sets" do
+        before do
+          @gc = GroupCategory.create(name: "Group Set}", context: @course)
+        end
+
+        it "clears the errors when the user selects a group", priority: "1" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+          f("#has_group_category").click
+          f("#assignment_group_category_id").click
+          f('#assignment_group_category_id [value="blank"]').click
+          submit_assignment_form
+          wait_for_ajaximations
+          expect(f("#assignment_group_category_id_errors").text).to eq "Please select a group set for this assignment"
+          f('#assignment_group_category_id [value="' + @gc.id.to_s + '"]').click
+          wait_for_ajaximations
+          expect(f("#assignment_group_category_id_errors").text).to eq ""
+        end
+
+        it "clears the errors when the user unchecks and rechecks the group assignment checkbox", priority: "1" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+          f("#has_group_category").click
+          f("#assignment_group_category_id").click
+          f('#assignment_group_category_id [value="blank"]').click
+          submit_assignment_form
+          wait_for_ajaximations
+          expect(f("#assignment_group_category_id_errors").text).to eq "Please select a group set for this assignment"
+          f("#has_group_category").click # uncheck
+          f("#has_group_category").click # check again
+          wait_for_ajaximations
+          expect(f("#assignment_group_category_id_errors").text).to eq ""
+        end
+      end
     end
 
     it "shows assignment details, un-editable, for concluded teachers", priority: "2" do
@@ -1170,6 +1279,27 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments/#{@a2.id}"
         wait_for_ajaximations
         expect(f("#sequence_footer .module-sequence-footer")).to be_present
+      end
+    end
+
+    context "with default tool set up" do
+      before do
+        a = @course.account
+        a.settings[:default_assignment_tool_name] = "Test Default Tool"
+        a.settings[:default_assignment_tool_url] = "http://lti13testtool.docker/launch"
+        a.settings[:default_assignment_tool_button_text] = "Default Tool"
+        a.settings[:default_assignment_tool_info_message] = "Click the button above to add content"
+        a.save!
+      end
+
+      it "shows an error if user saves without configuring the tool" do
+        get "/courses/#{@course.id}/assignments/new"
+        f("#assignment_submission_type").click
+        f('[value="default_external_tool"]').click
+
+        f(".btn-primary[type=submit]").click
+        wait_for_ajaximations
+        expect(f("#default-tool-launch-button_errors").text).to eq "External Tool URL cannot be left blank"
       end
     end
 
@@ -1905,9 +2035,10 @@ describe "assignments" do
 
   context "with discussion_checkpoints" do
     before :once do
-      course_with_teacher({ user: @teacher, active_course: true, active_enrollment: true })
+      sub_account = Account.create!(name: "sub account", parent_account: Account.default)
+      course_with_teacher({ user: @teacher, active_course: true, active_enrollment: true, account: sub_account })
+      sub_account.enable_feature! :discussion_checkpoints
 
-      Account.site_admin.enable_feature! :discussion_checkpoints
       @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
       Checkpoints::DiscussionCheckpointCreatorService.call(
         discussion_topic: @checkpointed_discussion,

@@ -26,7 +26,7 @@ import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from '@canvas/rails-flash-notifications'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-
+import {loadErrorMessages, loadDevMessages} from '@apollo/client/dev'
 const I18n = createI18nScope('discussion_topics_post')
 
 export const getSpeedGraderUrl = (authorId = null, entryId = null) => {
@@ -184,11 +184,11 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
 }
 
 export const addReplyToAllRootEntries = (cache, newDiscussionEntry) => {
-  try {
+  if (newDiscussionEntry.id === 'DISCUSSION_ENTRY_PLACEHOLDER') return
     const options = {
       query: DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
       variables: {
-        discussionEntryID: newDiscussionEntry.rootEntryId,
+        discussionEntryID: newDiscussionEntry.rootEntryId
       },
     }
     const rootEntry = JSON.parse(JSON.stringify(cache.readQuery(options)))
@@ -201,13 +201,52 @@ export const addReplyToAllRootEntries = (cache, newDiscussionEntry) => {
       } else {
         rootEntry.legacyNode.allRootEntries = [newDiscussionEntry]
       }
+      rootEntry.legacyNode.subentriesCount = (rootEntry.legacyNode.subentriesCount || 0) + 1
+      rootEntry.legacyNode.rootEntryParticipantCounts = {
+        ...rootEntry.legacyNode.rootEntryParticipantCounts,
+        repliesCount: (rootEntry.legacyNode.rootEntryParticipantCounts?.repliesCount || 0) + 1
+      }
+      cache.writeQuery({...options, data: rootEntry})
+    } else {
+      addFirstReplyToAllRootEntries(cache, newDiscussionEntry)
+    }
+}
+
+const addFirstReplyToAllRootEntries = (cache, newDiscussionEntry) => {
+  //either we're adding what would be the first reply to a thread either the thread is not expanded, first reply means un-expanded anyway
+  const discussionEntryOptions = {
+    id: btoa('DiscussionEntry-' + newDiscussionEntry.parentId),
+    fragment: DiscussionEntry.fragment,
+    fragmentName: 'DiscussionEntry'
+  }
+  const rootEntry = JSON.parse(JSON.stringify(cache.readFragment(discussionEntryOptions)))
+  if (rootEntry) {
+    if (
+      rootEntry.allRootEntries &&
+      Array.isArray(rootEntry.allRootEntries)
+    ) {
+      rootEntry.allRootEntries.push(newDiscussionEntry)
+    } else {
+      rootEntry.allRootEntries = [newDiscussionEntry]
+    }
+    rootEntry.subentriesCount = (rootEntry.subentriesCount || 0) + 1
+    rootEntry.rootEntryParticipantCounts = {
+      __typename: 'DiscussionEntryCounts',
+      unreadCount: (rootEntry.rootEntryParticipantCounts?.unreadCount || 0),
+      repliesCount: (rootEntry.repliesCount || 0) + 1
+    }
+    rootEntry.lastReply = {
+      createdAt: newDiscussionEntry.createdAt,
+      __typename: 'DiscussionEntry'
     }
 
-    cache.writeQuery({...options, data: rootEntry})
-  } catch (e) {
-    // do nothing for errors updating the cache on all root entries. This will happen when the thread hasn't been expanded.
+    cache.writeFragment({
+      ...discussionEntryOptions,
+      data: rootEntry
+    })
   }
 }
+
 
 export const addSubentriesCountToParentEntry = (cache, newDiscussionEntry) => {
   // If the new discussion entry is a reply to a reply, update the subentries count on the parent entry.
@@ -223,7 +262,12 @@ export const addSubentriesCountToParentEntry = (cache, newDiscussionEntry) => {
       if (data.rootEntryParticipantCounts) {
         data.lastReply = {
           createdAt: newDiscussionEntry.createdAt,
-          __typename: 'DiscussionEntry',
+          __typename: 'DiscussionEntry'
+        }
+        data.rootEntryParticipantCounts = {
+          ...data.rootEntryParticipantCounts,
+          unreadCount: (data.rootEntryParticipantCounts?.unreadCount || 0),
+          repliesCount: (data.rootEntryParticipantCounts?.repliesCount || 0) + 1
         }
       }
 
@@ -235,8 +279,8 @@ export const addSubentriesCountToParentEntry = (cache, newDiscussionEntry) => {
 
       cache.writeFragment({
         ...discussionEntryOptions,
-        data,
-      })
+        data
+      });
     }
   }
 }

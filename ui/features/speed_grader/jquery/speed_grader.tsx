@@ -929,9 +929,11 @@ function renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
       if (ENV.FEATURES.discussions_speedgrader_revisit) {
         const currentUrl = new URL(window.location.href)
         const params = new URLSearchParams(currentUrl.search)
-        ReactDOM.render(<SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />, mountPoint)
-      }
-      else{
+        ReactDOM.render(
+          <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
+          mountPoint,
+        )
+      } else {
         ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
       }
       return
@@ -940,9 +942,11 @@ function renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
     if (ENV.FEATURES.discussions_speedgrader_revisit) {
       const currentUrl = new URL(window.location.href)
       const params = new URLSearchParams(currentUrl.search)
-      ReactDOM.render(<SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />, mountPoint)
-    }
-    else{
+      ReactDOM.render(
+        <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
+        mountPoint,
+      )
+    } else {
       ReactDOM.render(<SpeedGraderDiscussionsNavigation />, mountPoint)
     }
     return
@@ -2981,8 +2985,10 @@ EG = {
     $submissions_container.children().hide()
     $('.speedgrader_alert').hide()
 
-    // @ts-expect-error
-    if (this.currentStudent?.submission?.['partially_submitted?'] && ENV.discussion_checkpoints) {
+    if (
+      this.currentStudent?.submission?.['partially_submitted?'] &&
+      ENV.FEATURES.discussion_checkpoints
+    ) {
       this.renderSubmissionPreview()
       return
     }
@@ -4477,11 +4483,8 @@ EG = {
 
   renderSticker() {
     const mountPoint = document.getElementById('submission_sticker_mount_point')
-    if (!mountPoint) {
-      return
-    }
 
-    if (ENV.grading_role === 'moderator' || ENV.grading_role === 'provisional_grader') {
+    if (!mountPoint) {
       return
     }
 

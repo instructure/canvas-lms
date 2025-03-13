@@ -1067,10 +1067,10 @@ Rails.application.config.to_prepare do
         acts_as_access_token_scope: true
       },
       manage_tags_add: {
-        label: -> { I18n.t("Add Differentiated Tags") },
-        label_v2: -> { I18n.t("Differentiated Tags - add") },
-        group: "manage_differentiated_tags",
-        group_label: -> { I18n.t("Manage Differentiated Tags") },
+        label: -> { I18n.t("Add Differentiation Tags") },
+        label_v2: -> { I18n.t("Differentiation Tags - add") },
+        group: "manage_differentiation_tags",
+        group_label: -> { I18n.t("Manage Differentiation Tags") },
         available_to: %w[
           TaEnrollment
           DesignerEnrollment
@@ -1083,10 +1083,10 @@ Rails.application.config.to_prepare do
         account_allows: ->(a) { a.feature_allowed?(:differentiation_tags) }
       },
       manage_tags_manage: {
-        label: -> { I18n.t("Manage Differentiated Tags") },
-        label_v2: -> { I18n.t("Differentiated Tags - manage") },
-        group: "manage_differentiated_tags",
-        group_label: -> { I18n.t("Manage Differentiated Tags") },
+        label: -> { I18n.t("Manage Differentiation Tags") },
+        label_v2: -> { I18n.t("Differentiation Tags - manage") },
+        group: "manage_differentiation_tags",
+        group_label: -> { I18n.t("Manage Differentiation Tags") },
         available_to: %w[
           TaEnrollment
           DesignerEnrollment
@@ -1099,10 +1099,10 @@ Rails.application.config.to_prepare do
         account_allows: ->(a) { a.feature_allowed?(:differentiation_tags) }
       },
       manage_tags_delete: {
-        label: -> { I18n.t("Delete Differentiated Tags") },
-        label_v2: -> { I18n.t("Differentiated Tags - delete") },
-        group: "manage_differentiated_tags",
-        group_label: -> { I18n.t("Manage Differentiated Tags") },
+        label: -> { I18n.t("Delete Differentiation Tags") },
+        label_v2: -> { I18n.t("Differentiation Tags - delete") },
+        group: "manage_differentiation_tags",
+        group_label: -> { I18n.t("Manage Differentiation Tags") },
         available_to: %w[
           TaEnrollment
           DesignerEnrollment
@@ -1681,6 +1681,12 @@ Rails.application.config.to_prepare do
         true_for: %w[AccountAdmin],
         account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:k20_students_in_need_of_attention) }
+      },
+      view_students_in_need_in_course: {
+        label: -> { I18n.t("Intelligent Insights - Students in Need of Attention - Course Level") },
+        available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
+        true_for: %w[AccountAdmin],
+        account_allows: ->(a) { a.feature_enabled?(:k20_students_in_need_of_attention) && a.feature_enabled?(:students_in_need_of_attention_course_level_beta) } ## AND they are part of the beta group.
       },
       view_course_readiness: {
         label: -> { I18n.t("Course Readiness") },
