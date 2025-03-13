@@ -244,10 +244,6 @@ describe Login::CasController do
     expect(Time.now.utc - start).to be < 1
     expect(session[:sentinel]).to be true
     expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
-      "auth.create.failure", tags: { auth_type: ap.auth_type.to_s, auth_provider_id: ap.global_id, domain: request.host, reason: :timeout }
-    )
-
-    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
       "auth.create.failure.v2", tags: { auth_type: ap.auth_type.to_s, auth_provider_id: ap.global_id, domain: request.host, reason: :timeout }
     )
   end
