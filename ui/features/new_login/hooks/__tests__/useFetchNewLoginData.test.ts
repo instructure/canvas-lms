@@ -200,14 +200,8 @@ describe('useFetchNewLoginData', () => {
       'true',
       JSON.stringify({
         minimum_character_length: 8,
-        maximum_character_length: 50,
-        max_repeats: 3,
-        max_sequence: 4,
-        maximum_login_attempts: 10,
-        allow_login_suspension: 'false',
         require_number_characters: 'false',
         require_symbol_characters: 'false',
-        disallow_common_passwords: 'true',
       }),
       'https://example.com/password-reset',
       'https://example.com/faq',
@@ -235,13 +229,8 @@ describe('useFetchNewLoginData', () => {
       requireEmail: true,
       passwordPolicy: {
         minimumCharacterLength: 8,
-        maximumCharacterLength: 50,
-        maxRepeats: 3,
-        maxSequence: 4,
-        maximumLoginAttempts: 10,
         requireNumberCharacters: false,
         requireSymbolCharacters: false,
-        disallowCommonPasswords: true,
       },
       forgotPasswordUrl: 'https://example.com/password-reset',
       invalidLoginFaqUrl: 'https://example.com/faq',
@@ -333,5 +322,61 @@ describe('useFetchNewLoginData', () => {
       invalidLoginFaqUrl: undefined,
       helpLink: undefined,
     })
+  })
+
+  it('returns empty structures for present but empty object-like attributes', () => {
+    createMockContainer(
+      null,
+      JSON.stringify({}), // authProviders
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      JSON.stringify({}), // passwordPolicy
+      null,
+      null,
+      null,
+      JSON.stringify({}), // helpLink
+    )
+    const {result} = renderHook(() => useFetchNewLoginData())
+    const data = result.current.data
+    expect(data.passwordPolicy).toBeUndefined()
+    expect(data.authProviders).toEqual({})
+    expect(data.helpLink).toEqual({text: '', trackCategory: '', trackLabel: ''})
+  })
+
+  it('returns undefined for object-like attributes that are missing from the DOM', () => {
+    createMockContainer(
+      null,
+      null, // authProviders
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null, // passwordPolicy
+      null,
+      null,
+      null,
+      null, // helpLink
+    )
+    const {result} = renderHook(() => useFetchNewLoginData())
+    const data = result.current.data
+    expect(data.passwordPolicy).toBeUndefined()
+    expect(data.authProviders).toBeUndefined()
+    expect(data.helpLink).toBeUndefined()
   })
 })

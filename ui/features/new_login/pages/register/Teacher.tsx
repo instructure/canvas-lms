@@ -42,9 +42,8 @@ const ERROR_MESSAGES = {
 
 const Teacher = () => {
   const {isUiActionPending, setIsUiActionPending} = useNewLogin()
-  const {passwordPolicy, privacyPolicyUrl, recaptchaKey, termsOfUseUrl, termsRequired} =
-    useNewLoginData()
-  const serverErrorsMap = useServerErrorsMap(passwordPolicy)
+  const {privacyPolicyUrl, recaptchaKey, termsOfUseUrl, termsRequired} = useNewLoginData()
+  const serverErrorsMap = useServerErrorsMap()
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
