@@ -98,7 +98,11 @@ const ForgotPassword = () => {
   }
 
   const handleCancel = () => {
-    navigate(ROUTES.SIGN_IN)
+    if (window.history.length > 1) {
+      navigate(-1)
+    } else {
+      navigate(ROUTES.SIGN_IN)
+    }
   }
 
   const passwordRecoveryForm = (
