@@ -5556,11 +5556,7 @@ he:
     one: "לפני שעה"
     other: "לפני %{count} שעות"
     two: "לפני %{count} שעות"
-  count_items_deleted_successfully_a287aa53: 
-    many: "%{count} פריטים בוטלו בהצלחה"
-    one: "%{name}  בוטל בהצלחה"
-    other: "%{count} פריטים בוטלו בהצלחה"
-    two: "%{count} פריטים בוטלו בהצלחה"
+  count_items_deleted_successfully_a287aa53: "%{count} פריטים בוטלו בהצלחה"
   count_items_found_224f86d3: 
     zero: "לא נמצאו פריטים"
   count_items_on_page_page_961fc0c7: "%{count} פריטים בדף %{page}"
@@ -16755,6 +16751,10 @@ he:
         three_chars: "יש להקליד לפחות 3 תווים בתיבת החיפוש"
         your_search: "החיפוש שלך - \"%{search_term}\" - לא העלה אף קובץ."
     files: קבצים
+    files_legacy_delete: 
+      one: "%{name}  בוטל בהצלחה"
+      other: "%{count} פריטים בוטלו בהצלחה"
+      two: "%{count} פריטים בוטלו בהצלחה"
     folder_browsing_tree: "עץ דפדוף בתיקיות"
     folder_name: "שם תיקיה"
     modified_by: "עודכן ע\"י"
