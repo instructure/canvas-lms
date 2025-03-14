@@ -27,6 +27,8 @@ import {Responsive, type ResponsivePropsObject} from '@instructure/ui-responsive
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {Link} from '@instructure/ui-link'
+import {Link as RouterLink} from 'react-router-dom'
 import React from 'react'
 import type {PaginatedList} from '../../api/PaginatedList'
 import type {AppsSortDirection, AppsSortProperty} from '../../api/registrations'
@@ -107,32 +109,46 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('App Name'),
     width: '150px',
     sortable: true,
-    render: r => (
-      <Flex>
-        {r.icon_url ? (
-          <img
-            alt={r.name}
-            style={{
-              height: 27,
-              width: 27,
-              marginRight: 12,
-              borderRadius: '4.5px',
-              border: '0.75px solid #C7CDD1',
-            }}
-            src={r.icon_url}
-          />
-        ) : (
-          <img
-            alt={r.name}
-            style={{height: 27, width: 27, marginRight: 12}}
-            src={`/lti/tool_default_icon?id=${r.id}&name=${r.name}`}
-          />
-        )}
-        <div style={ellipsisStyles} title={r.name}>
-          {r.name}
-        </div>
-      </Flex>
-    ),
+    render: r => {
+      const appName = (
+        <Flex>
+          {r.icon_url ? (
+            <img
+              alt={r.name}
+              style={{
+                height: 27,
+                width: 27,
+                marginRight: 12,
+                borderRadius: '4.5px',
+                border: '0.75px solid #C7CDD1',
+              }}
+              src={r.icon_url}
+            />
+          ) : (
+            <img
+              alt={r.name}
+              style={{height: 27, width: 27, marginRight: 12}}
+              src={`/lti/tool_default_icon?id=${r.id}&name=${r.name}`}
+            />
+          )}
+          <div style={ellipsisStyles} title={r.name}>
+            {r.name}
+          </div>
+        </Flex>
+      )
+      return window.ENV.FEATURES.lti_registrations_next ? (
+        <Link
+          as={RouterLink}
+          to={`/manage/${r.id}/configuration`}
+          isWithinText={false}
+          data-testid={`reg-link-${r.id}`}
+        >
+          {appName}
+        </Link>
+      ) : (
+        appName
+      )
+    },
   },
   {
     id: 'nickname',
@@ -247,7 +263,7 @@ const Columns: ReadonlyArray<Column> = [
                     type: 'info',
                     message: I18n.t('Client ID copied (%{id})', {id: developerKeyId}),
                   })
-                } catch (error) {
+                } catch {
                   showFlashAlert({
                     type: 'error',
                     message: I18n.t('There was an issue copying the client ID (%{id})', {
@@ -260,34 +276,36 @@ const Columns: ReadonlyArray<Column> = [
               {I18n.t('Copy Client ID')}
             </Menu.Item>
           ) : null}
-          {renderEditButton(r)}
-          {isForcedOn(r) ? (
-            <Menu.Item
-              themeOverride={{
-                labelColor: colors.textDanger,
-                activeBackground: colors.backgroundDanger,
-              }}
-              onClick={() => {
-                alert({
-                  message: I18n.t('This App is locked on, and cannot be deleted.'),
-                  title: I18n.t('Delete App'),
-                  okButtonLabel: I18n.t('Ok'),
-                })
-              }}
-            >
-              {I18n.t('Delete App')}
-            </Menu.Item>
-          ) : (
-            <Menu.Item
-              themeOverride={{
-                labelColor: colors.textDanger,
-                activeBackground: colors.backgroundDanger,
-              }}
-              onClick={() => deleteApp(r)}
-            >
-              {I18n.t('Delete App')}
-            </Menu.Item>
-          )}
+          {!window.ENV.FEATURES.lti_registrations_next ? renderEditButton(r) : null}
+          {!window.ENV.FEATURES.lti_registrations_next ? (
+            isForcedOn(r) ? (
+              <Menu.Item
+                themeOverride={{
+                  labelColor: colors.textDanger,
+                  activeBackground: colors.backgroundDanger,
+                }}
+                onClick={() => {
+                  alert({
+                    message: I18n.t('This App is locked on, and cannot be deleted.'),
+                    title: I18n.t('Delete App'),
+                    okButtonLabel: I18n.t('Ok'),
+                  })
+                }}
+              >
+                {I18n.t('Delete App')}
+              </Menu.Item>
+            ) : (
+              <Menu.Item
+                themeOverride={{
+                  labelColor: colors.textDanger,
+                  activeBackground: colors.backgroundDanger,
+                }}
+                onClick={() => deleteApp(r)}
+              >
+                {I18n.t('Delete App')}
+              </Menu.Item>
+            )
+          ) : null}
 
           {/* <Menu.Item
             onClick={() => {
