@@ -24,7 +24,13 @@ import {IconDiscussionLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import canvas from '@instructure/ui-themes'
-import type {Attachment, SubmissionComment, MediaSource, MediaTrack} from '../../../api.d'
+import type {
+  Attachment,
+  SubmissionComment,
+  MediaSource,
+  MediaTrack,
+  MediaObject,
+} from '../../../api.d'
 import useStore from './stores'
 import {Badge} from '@instructure/ui-badge'
 import {Link} from '@instructure/ui-link'
@@ -95,47 +101,21 @@ export default function SubmissionAttempts({attempts}: SubmissionAttemptsProps) 
 type SubmissionAttemptProps = {
   comments?: SubmissionCommentProps[]
 }
-type StudioPlayerSrc = NonNullable<StudioPlayerProps['src']>
-type StudioPlayerCaptions = NonNullable<StudioPlayerProps['captions']>
-type CommentMediaSource = MediaSource[] | StudioPlayerSrc
-type CommentMediaCaptions = MediaTrack[] | StudioPlayerCaptions
 
 function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
   if (!comments) return null
 
   const {borders, colors, spacing} = canvas
+  const isNewMediaPlayer = ENV.consolidated_media_player ?? false
 
   return (
     <>
       {comments.map((comment, i) => {
-        let mediaSources: CommentMediaSource = []
-        let mediaTracks: CommentMediaCaptions = []
-
         const mediaObject = comment.media_object
-        if (mediaObject) {
-          mediaSources = mediaObject.media_sources.map(mediaSource => {
-            return {
-              ...mediaSource,
-              label: `${mediaSource.width}x${mediaSource.height}`,
-              src: mediaSource.url,
-              type: mediaSource.content_type,
-            }
-          })
-          mediaTracks = mediaObject.media_tracks.map(track => {
-            return {
-              id: track.id,
-              src: `/media_objects/${mediaObject.id}/media_tracks/${track.id}`,
-              label: track.locale,
-              // type is an optional string in MediaTrack,
-              // but required in CaptionMetaData as 'vtt' | 'srt'
-              type: track.kind as any,
-              language: track.locale,
-            }
-          })
-        }
         const formattedComment = containsHtmlTags(comment.comment)
           ? sanitizeHtml(comment.comment)
           : formatMessage(comment.comment)
+
         return (
           <Flex as="div" direction="column" key={comment.id} data-testid="submission-comment">
             <div
@@ -186,7 +166,12 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
                 </Link>
               </View>
             ))}
-            {mediaObject && <CommentMediaPlayer source={mediaSources} tracks={mediaTracks} />}
+            {mediaObject &&
+              (isNewMediaPlayer ? (
+                <CommentStudioPlayer mediaObject={mediaObject} />
+              ) : (
+                <CommentMediaPlayer mediaObject={mediaObject} />
+              ))}
             <View as="div" textAlign="end" margin="0 medium 0 0">
               <Text weight="bold" size="small" data-testid="submission-comment-author">
                 - {I18n.t('%{display_name}', {display_name: comment.author_name})}
@@ -200,25 +185,71 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
 }
 
 type CommentMediaPlayerProps = {
-  source: CommentMediaSource
-  tracks: CommentMediaCaptions
+  mediaObject: MediaObject
 }
-function CommentMediaPlayer({source, tracks}: CommentMediaPlayerProps) {
-  const isNewMediaPlayer = ENV.consolidated_media_player ?? false
-  const mediaPlayer = isNewMediaPlayer ? (
-    <StudioPlayer
-      src={source as StudioPlayerSrc}
-      captions={tracks as StudioPlayerCaptions}
-      title={I18n.t('Play Media Comment')}
-    />
-  ) : (
-    <MediaPlayer sources={source} tracks={tracks} />
+function CommentMediaPlayer({mediaObject}: CommentMediaPlayerProps) {
+  const mediaSources: MediaSource[] = []
+  const mediaTracks: MediaTrack[] = []
+
+  for (const it of mediaObject.media_sources) {
+    mediaSources.push({
+      ...it,
+      src: it.url,
+      label: `${it.width}x${it.height}`,
+    })
+  }
+
+  for (const it of mediaObject.media_tracks) {
+    mediaTracks.push({
+      ...it,
+      src: `/media_objects/${mediaObject.id}/media_tracks/${it.id}`,
+      label: it.locale,
+      type: it.kind,
+      language: it.locale,
+    })
+  }
+
+  const styles = {
+    padding: '0 small' as Spacing,
+  }
+  return (
+    <View data-testid="submission-comment-media" as="span" {...styles}>
+      <MediaPlayer sources={mediaSources} tracks={mediaTracks} />
+    </View>
   )
-  const styles = isNewMediaPlayer ? {height: '280px', padding: '0 small' as Spacing} : {}
+}
+
+function CommentStudioPlayer({mediaObject}: CommentMediaPlayerProps) {
+  const mediaSources: StudioPlayerProps['src'] = []
+  const mediaCaptions: StudioPlayerProps['captions'] = []
+
+  for (const it of mediaObject.media_sources) {
+    mediaSources.push({
+      src: it.url,
+      type: it.content_type as any,
+      width: Number(it.width),
+      height: Number(it.height),
+    })
+  }
+
+  for (const it of mediaObject.media_tracks) {
+    mediaCaptions.push({
+      src: `/media_objects/${mediaObject.id}/media_tracks/${it.id}`,
+      label: it.locale,
+      type: it.kind as any,
+      language: it.locale,
+    })
+  }
+
+  const styles = {height: '300px', padding: '0 small' as Spacing}
 
   return (
     <View data-testid="submission-comment-media" as="span" {...styles}>
-      {mediaPlayer}
+      <StudioPlayer
+        src={mediaSources}
+        captions={mediaCaptions}
+        title={I18n.t('Play Media Comment')}
+      />
     </View>
   )
 }
