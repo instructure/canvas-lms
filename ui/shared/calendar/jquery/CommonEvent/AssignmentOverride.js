@@ -48,7 +48,12 @@ Object.assign(AssignmentOverride.prototype, {
       this.copyDataFromOverride(data)
     }
 
-    this.title = `${this.assignment.name} (${this.override.title})`
+    if (this.override.title) {
+      this.title = `${this.assignment.name} (${this.override.title})`
+    } else {
+      this.title = this.assignment.name
+    }
+
     this.object = this.override
     this.addClass(`group_${this.contextCode()}`)
     return AssignmentOverride.__super__.copyDataFromObject.apply(this, arguments)

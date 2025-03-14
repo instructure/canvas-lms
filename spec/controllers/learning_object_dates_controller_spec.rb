@@ -709,49 +709,55 @@ describe LearningObjectDatesController do
         @group.add_user(@student, "accepted")
       end
 
-      def returns_non_collaborative_field_for_group_overrides
+      def returns_non_collaborative_field_for_group_overrides(hide_group_name: false)
         due_at = 7.days.from_now
         # to properly override a due date, due_at_overridden needs to be true
         override2 = @assignment.assignment_overrides.create!(set: @group, due_at_overridden: true, due_at:)
 
         get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
         expect(response).to be_successful
-        expect(json_parse).to eq({
-                                   "id" => @assignment.id,
-                                   "due_at" => "2022-01-02T00:00:00Z",
-                                   "unlock_at" => "2022-01-01T00:00:00Z",
-                                   "lock_at" => "2022-01-03T01:00:00Z",
-                                   "only_visible_to_overrides" => true,
-                                   "group_category_id" => nil,
-                                   "graded" => true,
-                                   "visible_to_everyone" => false,
-                                   "overrides" => [
-                                     {
-                                       "id" => @override.id,
-                                       "assignment_id" => @assignment.id,
-                                       "title" => "Unnamed Course",
-                                       "course_section_id" => @course.default_section.id,
-                                       "due_at" => "2022-02-01T01:00:00Z",
-                                       "all_day" => false,
-                                       "all_day_date" => "2022-02-01",
-                                       "unassign_item" => false,
-                                       "sub_assignment_due_dates" => []
-                                     },
-                                     {
-                                       "id" => override2.id,
-                                       "assignment_id" => @assignment.id,
-                                       "title" => "Non-Collaborative Group 1",
-                                       "due_at" => due_at.iso8601,
-                                       "all_day" => false,
-                                       "all_day_date" => due_at.to_date.to_s,
-                                       "unassign_item" => false,
-                                       "group_id" => @group.id,
-                                       "non_collaborative" => true,
-                                       "group_category_id" => @group.group_category.id,
-                                       "sub_assignment_due_dates" => []
-                                     }
-                                   ]
-                                 })
+        expected_response = {
+          "id" => @assignment.id,
+          "due_at" => "2022-01-02T00:00:00Z",
+          "unlock_at" => "2022-01-01T00:00:00Z",
+          "lock_at" => "2022-01-03T01:00:00Z",
+          "only_visible_to_overrides" => true,
+          "group_category_id" => nil,
+          "graded" => true,
+          "visible_to_everyone" => false,
+          "overrides" => [
+            {
+              "id" => @override.id,
+              "assignment_id" => @assignment.id,
+              "title" => "Unnamed Course",
+              "course_section_id" => @course.default_section.id,
+              "due_at" => "2022-02-01T01:00:00Z",
+              "all_day" => false,
+              "all_day_date" => "2022-02-01",
+              "unassign_item" => false,
+              "sub_assignment_due_dates" => []
+            },
+            {
+              "id" => override2.id,
+              "assignment_id" => @assignment.id,
+              "title" => "Non-Collaborative Group 1",
+              "due_at" => due_at.iso8601,
+              "all_day" => false,
+              "all_day_date" => due_at.to_date.to_s,
+              "unassign_item" => false,
+              "group_id" => @group.id,
+              "non_collaborative" => true,
+              "group_category_id" => @group.group_category.id,
+              "sub_assignment_due_dates" => []
+            }
+          ]
+        }
+
+        if hide_group_name
+          expected_response["overrides"][1].delete("title")
+        end
+
+        expect(json_parse).to eq(expected_response)
       end
 
       it "returns the non_collaborative field for group overrides" do
@@ -767,7 +773,8 @@ describe LearningObjectDatesController do
         end
 
         it "returns the non_collaborative field for group overrides" do
-          returns_non_collaborative_field_for_group_overrides
+          # TA should not see the group name for non-collaborative groups
+          returns_non_collaborative_field_for_group_overrides(hide_group_name: true)
         end
       end
     end
