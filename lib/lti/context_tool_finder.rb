@@ -38,6 +38,18 @@ module Lti
       @options = options
     end
 
+    # Most places that ask for a context's external tools are actually asking
+    # for "all tools installed somewhere in this context's account chain", which
+    # is what all_tools_for and all_tools_sorted_array do. This method is for
+    # the rare cases where you want only tools associated directly with this context,
+    # and functions as a confirmation for callers and future code spelunkers that
+    # this is an exception to the rule.
+    def self.only_for(context)
+      return ContextExternalTool.none unless context.respond_to? :context_external_tools
+
+      context.context_external_tools
+    end
+
     def self.all_tools_scope_union(*)
       new(*).send(:all_tools_scope_union)
     end

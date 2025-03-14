@@ -291,7 +291,7 @@ module Importers
           if custom_fields.present?
             external_tool_url = add_custom_fields_to_url(hash[:url], custom_fields) || hash[:url]
           end
-        elsif hash[:linked_resource_id] && (et = context_module.context.context_external_tools.active.where(migration_id: hash[:linked_resource_id]).first)
+        elsif hash[:linked_resource_id] && (et = Lti::ContextToolFinder.only_for(context_module.context).active.where(migration_id: hash[:linked_resource_id]).first)
           external_tool_id = et.id
         end
 

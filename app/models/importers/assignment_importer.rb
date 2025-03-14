@@ -507,7 +507,7 @@ module Importers
 
             tag.content_id = tool&.id
           elsif hash[:external_tool_migration_id]
-            tool = context.context_external_tools.where(migration_id: hash[:external_tool_migration_id]).first
+            tool = Lti::ContextToolFinder.only_for(context).where(migration_id: hash[:external_tool_migration_id]).first
             tag.content_id = tool.id if tool
           end
           if hash[:external_tool_data_json]

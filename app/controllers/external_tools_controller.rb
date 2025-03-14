@@ -134,7 +134,7 @@ class ExternalToolsController < ApplicationController
       @tools = if params[:include_parents]
                  Lti::ContextToolFinder.all_tools_for(@context, user: (params[:include_personal] ? @current_user : nil))
                else
-                 @context.context_external_tools.active
+                 Lti::ContextToolFinder.only_for(@context).active
                end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
 
@@ -459,7 +459,7 @@ class ExternalToolsController < ApplicationController
   def show
     Utils::InstStatsdUtils::Timing.track "lti.show.request_time" do |timing_meta|
       if api_request?
-        tool = @context.context_external_tools.active.find(params[:external_tool_id])
+        tool = Lti::ContextToolFinder.only_for(@context).active.find(params[:external_tool_id])
         render json: external_tool_json(tool, @context, @current_user, session)
         timing_meta.tags = { lti_version: tool.lti_version }
       else
@@ -1255,7 +1255,7 @@ class ExternalToolsController < ApplicationController
   #        -F 'name=Public Example' \
   #        -F 'privacy_level=public'
   def update
-    @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
+    @tool = Lti::ContextToolFinder.only_for(@context).active.find(params[:id] || params[:external_tool_id])
     if authorized_action(@tool, @current_user, :update_manually)
       external_tool_params = (params[:external_tool] || params).to_unsafe_h
       if request.media_type == "application/x-www-form-urlencoded"
@@ -1287,7 +1287,7 @@ class ExternalToolsController < ApplicationController
   #   curl -X DELETE 'https://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \
   #        -H "Authorization: Bearer <token>"
   def destroy
-    @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
+    @tool = Lti::ContextToolFinder.only_for(@context).active.find(params[:id] || params[:external_tool_id])
     delete_tool(@tool)
   end
 

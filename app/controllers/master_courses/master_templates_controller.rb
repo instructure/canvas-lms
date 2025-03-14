@@ -443,7 +443,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     scope =
       case content_type
       when "external_tool"
-        @course.context_external_tools.active
+        Lti::ContextToolFinder.only_for(@course).active
       when "attachment"
         @course.attachments.not_deleted
       when "lti-quiz"
