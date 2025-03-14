@@ -21,7 +21,6 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {AppsTableInner} from '../AppsTable'
 import {mockPageOfRegistrations, mockRegistration} from './helpers'
 import {BrowserRouter} from 'react-router-dom'
-import * as tz from '@instructure/moment-utils'
 
 // Need to use AppsTableInner because AppsTable uses Responsive
 // which doesn't seem to work in these tests -- both media queries are
@@ -173,5 +172,38 @@ describe('AppsTableInner', () => {
     )
 
     expect(wrapper.getAllByText('Instructure')).toHaveLength(2)
+  })
+
+  it("renders a link to the tool's detail page", async () => {
+    window.ENV.FEATURES.lti_registrations_next = true
+    const wrapper = render(
+      <BrowserRouter>
+        <AppsTableInner
+          tableProps={{
+            apps: {
+              data: [
+                mockRegistration(
+                  'ExampleApp',
+                  1,
+                  {},
+                  {created_by: 'Instructure', updated_by: 'Instructure'},
+                ),
+              ],
+              total: 1,
+            },
+            dir: 'asc',
+            sort: 'name',
+            updateSearchParams: () => {},
+            deleteApp: () => {},
+            page: 1,
+          }}
+          responsiveProps={undefined}
+        />
+      </BrowserRouter>,
+    )
+
+    const link = wrapper.getByTestId('reg-link-1')
+    expect(link).toHaveAttribute('href', '/manage/1/configuration')
+    window.ENV.FEATURES.lti_registrations_next = false
   })
 })

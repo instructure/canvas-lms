@@ -51,8 +51,8 @@ export type ApiResult<A> =
       error: Error
     }
 
-type UnsuccessfulApiResult = Exclude<ApiResult<unknown>, {_type: 'Success'}>
-type SuccessfulApiResult<A> = Extract<ApiResult<A>, {_type: 'Success'}>
+export type UnsuccessfulApiResult = Exclude<ApiResult<unknown>, {_type: 'Success'}>
+export type SuccessfulApiResult<A> = Extract<ApiResult<A>, {_type: 'Success'}>
 
 export const success = <A>(data: A): ApiResult<A> => ({
   _type: 'Success',
