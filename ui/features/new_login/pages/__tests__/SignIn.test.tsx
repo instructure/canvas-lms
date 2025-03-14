@@ -18,7 +18,7 @@
 
 import React from 'react'
 import '@testing-library/jest-dom'
-import {assignLocation} from '@canvas/util/globalUtils'
+import {assignLocation, windowPathname} from '@canvas/util/globalUtils'
 import {within} from '@testing-library/dom'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -50,6 +50,7 @@ jest.mock('../../services/auth', () => ({
 jest.mock('@canvas/util/globalUtils', () => ({
   ...jest.requireActual('@canvas/util/globalUtils'),
   assignLocation: jest.fn(),
+  windowPathname: jest.fn(),
 }))
 
 describe('SignIn', () => {
@@ -77,7 +78,6 @@ describe('SignIn', () => {
     ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
       loginHandleName: 'Email',
     }))
-    setup()
   })
 
   afterEach(() => {
@@ -85,22 +85,47 @@ describe('SignIn', () => {
   })
 
   describe('login behavior', () => {
-    it('calls performSignIn with the correct parameters when valid credentials are submitted', async () => {
+    it('calls performSignIn with /login/canvas when on the Canvas login route', async () => {
+      ;(windowPathname as jest.Mock).mockReturnValue('/login/canvas')
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
       await userEvent.type(usernameInput, 'user@example.com')
-      await userEvent.click(loginButton)
       await userEvent.type(passwordInput, 'password123')
       await userEvent.click(loginButton)
       await waitFor(() => {
-        expect(performSignIn).toHaveBeenCalledWith('user@example.com', 'password123', false)
-        expect(performSignIn).toHaveBeenCalledTimes(1)
+        expect(performSignIn).toHaveBeenCalledWith(
+          'user@example.com',
+          'password123',
+          false,
+          '/login/canvas',
+        )
+      })
+    })
+
+    it('calls performSignIn with /login/ldap when on the LDAP login route', async () => {
+      ;(windowPathname as jest.Mock).mockReturnValue('/login/ldap')
+      setup()
+      const usernameInput = screen.getByTestId('username-input')
+      const passwordInput = screen.getByTestId('password-input')
+      const loginButton = screen.getByTestId('login-button')
+      await userEvent.type(usernameInput, 'user@example.com')
+      await userEvent.type(passwordInput, 'password123')
+      await userEvent.click(loginButton)
+      await waitFor(() => {
+        expect(performSignIn).toHaveBeenCalledWith(
+          'user@example.com',
+          'password123',
+          false,
+          '/login/ldap',
+        )
       })
     })
 
     it('displays a login error alert when invalid credentials are submitted', async () => {
       ;(performSignIn as jest.Mock).mockRejectedValueOnce({response: {status: 400}})
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -115,6 +140,7 @@ describe('SignIn', () => {
     })
 
     it('does not call performSignIn when the username is missing', async () => {
+      setup()
       const loginButton = screen.getByTestId('login-button')
       await userEvent.click(loginButton)
       await waitFor(() => {
@@ -123,6 +149,7 @@ describe('SignIn', () => {
     })
 
     it('does not call performSignIn when the password is missing', async () => {
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const loginButton = screen.getByTestId('login-button')
       await userEvent.type(usernameInput, 'user@example.com')
@@ -140,6 +167,7 @@ describe('SignIn', () => {
         status: 200,
         data: {pseudonym: true},
       })
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -154,6 +182,7 @@ describe('SignIn', () => {
         status: 200,
         data: {pseudonym: true},
       })
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -165,6 +194,7 @@ describe('SignIn', () => {
     })
 
     it('removes the error alert when the user starts typing in the username field', async () => {
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const loginButton = screen.getByTestId('login-button')
       await userEvent.click(loginButton)
@@ -176,6 +206,7 @@ describe('SignIn', () => {
     })
 
     it('removes the error alert when the user starts typing in the password field', async () => {
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -192,6 +223,7 @@ describe('SignIn', () => {
   describe('error handling', () => {
     it('displays a flash error with an error message when a network or unexpected API error occurs', async () => {
       ;(performSignIn as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -209,6 +241,7 @@ describe('SignIn', () => {
 
     it('renders the LoginAlert component when login fails due to invalid credentials', async () => {
       ;(performSignIn as jest.Mock).mockRejectedValueOnce({response: {status: 400}})
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -224,12 +257,15 @@ describe('SignIn', () => {
 
   describe('remember me functionality', () => {
     it('renders the "Remember Me" checkbox correctly', () => {
+      setup()
       const rememberMeCheckbox = screen.getByTestId('remember-me-checkbox')
       expect(rememberMeCheckbox).toBeInTheDocument()
       expect(rememberMeCheckbox).not.toBeChecked()
     })
 
-    it('passes the correct "Remember Me" value to performSignIn when checked', async () => {
+    it('passes the correct "Remember Me" value when checked', async () => {
+      ;(windowPathname as jest.Mock).mockReturnValue('/login/canvas')
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const rememberMeCheckbox = screen.getByTestId('remember-me-checkbox')
@@ -237,14 +273,20 @@ describe('SignIn', () => {
       await userEvent.type(usernameInput, 'user@example.com')
       await userEvent.type(passwordInput, 'password123')
       await userEvent.click(rememberMeCheckbox)
-      expect(rememberMeCheckbox).toBeChecked()
       await userEvent.click(loginButton)
       await waitFor(() => {
-        expect(performSignIn).toHaveBeenCalledWith('user@example.com', 'password123', true)
+        expect(performSignIn).toHaveBeenCalledWith(
+          'user@example.com',
+          'password123',
+          true,
+          '/login/canvas',
+        )
       })
     })
 
-    it('passes the correct "Remember Me" value to performSignIn when unchecked', async () => {
+    it('passes the correct "Remember Me" value when unchecked', async () => {
+      ;(windowPathname as jest.Mock).mockReturnValue('/login/canvas')
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -252,7 +294,12 @@ describe('SignIn', () => {
       await userEvent.type(passwordInput, 'password123')
       await userEvent.click(loginButton)
       await waitFor(() => {
-        expect(performSignIn).toHaveBeenCalledWith('user@example.com', 'password123', false)
+        expect(performSignIn).toHaveBeenCalledWith(
+          'user@example.com',
+          'password123',
+          false,
+          '/login/canvas',
+        )
       })
     })
   })
@@ -263,6 +310,7 @@ describe('SignIn', () => {
         status: 200,
         data: {pseudonym: true, location: '/dashboard'},
       })
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -280,6 +328,7 @@ describe('SignIn', () => {
         status: 200,
         data: {pseudonym: true},
       })
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -295,6 +344,7 @@ describe('SignIn', () => {
 
   describe('user input', () => {
     it('trims whitespace from the username field when typing', async () => {
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const loginButton = screen.getByTestId('login-button')
       await userEvent.type(usernameInput, '   user@example.com   ')
@@ -304,6 +354,7 @@ describe('SignIn', () => {
     })
 
     it('trims whitespace from the password field when typing', async () => {
+      setup()
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
       await userEvent.type(passwordInput, '   password123   ')
@@ -315,6 +366,7 @@ describe('SignIn', () => {
 
   describe('form validation', () => {
     it('shows validation error when the username contains only whitespace', async () => {
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const loginButton = screen.getByTestId('login-button')
       await userEvent.type(usernameInput, '   ')
@@ -332,6 +384,7 @@ describe('SignIn', () => {
     })
 
     it('shows validation error when the password contains only whitespace after fixing the username', async () => {
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -350,6 +403,7 @@ describe('SignIn', () => {
     })
 
     it('toggles the aria-invalid attribute correctly for both fields during sequential validation', async () => {
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -365,6 +419,7 @@ describe('SignIn', () => {
     })
 
     it('marks both username and password fields as valid after sequential validation with correct input', async () => {
+      setup()
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
@@ -379,6 +434,7 @@ describe('SignIn', () => {
     })
 
     it('does not submit if required fields are empty', async () => {
+      setup()
       const loginButton = screen.getByTestId('login-button')
       await userEvent.click(loginButton)
       const usernameInput = await screen.findByTestId('username-input')
@@ -390,6 +446,7 @@ describe('SignIn', () => {
     })
 
     it('shows validation messages when fields are left blank', async () => {
+      setup()
       const loginButton = screen.getByTestId('login-button')
       await userEvent.click(loginButton)
       const emailError = await screen.findByText('Please enter your email')
@@ -402,6 +459,7 @@ describe('SignIn', () => {
     })
 
     it('validates all fields at once on form submission', async () => {
+      setup()
       const loginButton = screen.getByTestId('login-button')
       await userEvent.click(loginButton)
       expect(await screen.findByText('Please enter your email')).toBeInTheDocument()
@@ -433,6 +491,7 @@ describe('SignIn', () => {
       })
 
       it('redirects to the OtpForm component and removes the username and password inputs when OTP is required', async () => {
+        setup()
         const usernameInput = screen.getByTestId('username-input')
         const passwordInput = screen.getByTestId('password-input')
         const loginButton = screen.getByTestId('login-button')
