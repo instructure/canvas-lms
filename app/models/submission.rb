@@ -3157,6 +3157,14 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def postable_comments?
+    # This logic is also implemented in SQL in
+    # app/graphql/loaders/has_postable_comments_loader.rb
+    # to determine if a submission has any postable comments.
+    # Any changes made here should also be reflected in the loader.
+    submission_comments.any?(&:allows_posting_submission?)
+  end
+
   def word_count
     if get_word_count_from_body?
       read_or_calc_body_word_count
