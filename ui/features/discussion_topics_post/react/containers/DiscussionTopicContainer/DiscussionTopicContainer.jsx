@@ -39,7 +39,7 @@ import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {PodcastFeed} from '../../components/PodcastFeed/PodcastFeed'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import {getReviewLinkUrl, getSpeedGraderUrl, responsiveQuerySizes} from '../../utils'
-import {SearchContext,isSpeedGraderInTopUrl} from '../../utils/constants'
+import {SearchContext, isSpeedGraderInTopUrl} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -59,7 +59,8 @@ import {assignLocation, openWindow} from '@canvas/util/globalUtils'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
 import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
 import {SummarizeButton} from './SummarizeButton'
-import { DiscussionSummaryDisableButton } from '../../components/DiscussionSummary/DiscussionSummaryDisableButton'
+import {DiscussionInsightsButton} from './DiscussionInsightsButton'
+import {DiscussionSummaryDisableButton} from '../../components/DiscussionSummary/DiscussionSummaryDisableButton'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('discussion_posts')
@@ -239,7 +240,7 @@ export const DiscussionTopicContainer = ({
   }
 
   const postDiscussionSummaryFeedback = useCallback(
-    async (action) => {
+    async action => {
       setIsFeedbackLoading(true)
 
       try {
@@ -543,7 +544,11 @@ export const DiscussionTopicContainer = ({
                             )}
                             {props.discussionTopic.permissions?.reply && !expandedTopicReply && (
                               <>
-                                <Flex width="100%" direction={responsiveProps.direction} wrap="wrap">
+                                <Flex
+                                  width="100%"
+                                  direction={responsiveProps.direction}
+                                  wrap="wrap"
+                                >
                                   <Flex.Item padding={responsiveProps?.replyButton?.padding}>
                                     <span className="discussion-topic-reply-button">
                                       <Button
@@ -559,12 +564,16 @@ export const DiscussionTopicContainer = ({
                                     </span>
                                   </Flex.Item>
                                   {ENV.user_can_summarize && !isSpeedGraderInTopUrl && (
-                                    <Flex.Item padding={responsiveProps?.summaryButton?.padding} shouldGrow={responsiveProps?.summaryButton?.shouldGrow} shouldShrink={responsiveProps?.summaryButton?.shouldShrink}>
+                                    <Flex.Item
+                                      padding={responsiveProps?.summaryButton?.padding}
+                                      shouldGrow={responsiveProps?.summaryButton?.shouldGrow}
+                                      shouldShrink={responsiveProps?.summaryButton?.shouldShrink}
+                                    >
                                       {!props.isSummaryEnabled ? (
                                         <SummarizeButton
-                                        onClick={onSummarizeClick}
-                                        isMobile={matches.includes('mobile')}
-                                      />
+                                          onClick={onSummarizeClick}
+                                          isMobile={matches.includes('mobile')}
+                                        />
                                       ) : (
                                         <DiscussionSummaryDisableButton
                                           isMobile={matches.includes('mobile')}
@@ -572,6 +581,15 @@ export const DiscussionTopicContainer = ({
                                           isEnabled={!isFeedbackLoading}
                                         />
                                       )}
+                                    </Flex.Item>
+                                  )}
+                                  {ENV.DISCUSSION_INSIGHTS_ENABLED && ENV.user_can_insights && (
+                                    <Flex.Item>
+                                      <DiscussionInsightsButton
+                                        onClick={() => {
+                                          assignLocation(ENV.INSIGHTS_URL)
+                                        }}
+                                      />
                                     </Flex.Item>
                                   )}
                                 </Flex>

@@ -919,6 +919,7 @@ class DiscussionTopicsController < ApplicationController
                context_type: @topic.context_type,
                context_id: @context.id,
                EDIT_URL: edit_url,
+               INSIGHTS_URL: context_url(@topic.context, :insights_context_discussion_topic_url, @topic),
                PEER_REVIEWS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_peer_reviews_url, @topic.assignment.id) : nil,
                ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
                CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
@@ -934,6 +935,7 @@ class DiscussionTopicsController < ApplicationController
                discussion_translation_languages: Translation.available?(@context, :translation, @domain_root_account.feature_enabled?(:ai_translation_improvements)) ? Translation.languages(@domain_root_account.feature_enabled?(:ai_translation_improvements)) : [],
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),
+               user_can_insights: user_can_moderate,
                discussion_summary_enabled: @topic.summary_enabled,
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # although there is a permissions object in DiscussionEntry type, it's only accessible if a discussion entry
@@ -958,6 +960,7 @@ class DiscussionTopicsController < ApplicationController
                DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
                DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
                DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
+               DISCUSSION_INSIGHTS_ENABLED: @context.root_account.feature_enabled?(:discussion_insights),
              })
       unless @locked
         InstStatsd::Statsd.increment("discussion_topic.visit.redesign")
@@ -1127,6 +1130,27 @@ class DiscussionTopicsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
         end
       end
+    end
+  end
+
+  def insights
+    if @context.root_account.feature_enabled?(:discussion_insights)
+      return render_unauthorized_action unless user_can_moderate
+
+      @topic = DiscussionTopic.find(params[:id])
+      add_discussion_or_announcement_crumb
+      add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+      add_crumb t(:insights_crumb, "Discussion Insights")
+      @page_title = join_title("Discussion Insights", @topic.title)
+      js_bundle :discussion_topic_insights
+      js_env({
+               course_id: params[:course_id] || @context.course&.id,
+               context_type: @topic.context_type,
+               context_id: @context.id,
+               INSIGHTS_URL: context_url(@topic.context, :insights_context_discussion_topic_url, @topic),
+               DISCUSSION_INSIGHTS_ENABLED: @context.root_account.feature_enabled?(:discussion_insights),
+             })
+      render html: "<div id='discussion-insights-container'/>".html_safe, layout: true
     end
   end
 

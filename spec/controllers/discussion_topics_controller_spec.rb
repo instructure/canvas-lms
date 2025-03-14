@@ -2213,6 +2213,25 @@ describe DiscussionTopicsController do
     end
   end
 
+  describe "GET 'insights'" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @topic = @course.discussion_topics.create!(title: "Test Topic")
+    end
+
+    context "when the feature flag is enabled" do
+      before do
+        @course.root_account.enable_feature!(:discussion_insights)
+      end
+
+      it "renders the insights page" do
+        user_session(@teacher)
+        get :insights, params: { course_id: @course.id, id: @topic.id }
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
+
   context "student planner" do
     before do
       course_topic

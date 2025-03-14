@@ -180,3 +180,10 @@ discussion_permalink:
   display_name: Discussion permalink
   description: |-
     This feature flag enables the Copy Link option in the discussions redesign
+
+discussion_insights:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Discussion Insights
+  description: |-
+    Allow access to discussion insights
