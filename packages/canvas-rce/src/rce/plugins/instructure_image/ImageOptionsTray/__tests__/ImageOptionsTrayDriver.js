@@ -68,6 +68,10 @@ export default class ImageOptionsTrayDriver {
     return getByLabelText(this.$element, 'Decorative Image', {exact: false})
   }
 
+  get $firstNumericField() {
+    return this.$element.querySelector('input[inputmode="numeric"]')
+  }
+
   get $displayAsField() {
     return getAllByText(this.$element, 'Display Options')[0].closest('fieldset')
   }
@@ -120,6 +124,10 @@ export default class ImageOptionsTrayDriver {
 
   setAltText(altText) {
     fireEvent.change(this.$altTextField, {target: {value: altText}})
+  }
+
+  setFirstNumericField(value) {
+    fireEvent.change(this.$firstNumericField, {target: {value: value}})
   }
 
   setIsDecorativeImage(isDecorativeImage) {

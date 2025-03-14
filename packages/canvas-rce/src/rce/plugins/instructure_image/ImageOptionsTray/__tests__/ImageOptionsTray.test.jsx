@@ -133,6 +133,13 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
     })
   })
 
+  it('focuses the Dimensions field when those are not valid', () => {
+    renderComponent()
+    tray.setFirstNumericField('')
+    tray.$doneButton.click()
+    expect(tray.$firstNumericField).toHaveFocus()
+  })
+
   describe('"Alt Text" field', () => {
     it('uses the value of .altText in the given image options', () => {
       props.imageOptions.altText = 'A turtle in a party suit.'
@@ -150,6 +157,13 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
       props.imageOptions.isDecorativeImage = false
       renderComponent()
       expect(tray.altTextDisabled).toEqual(false)
+    })
+
+    it('focuses the Alt Text field when the Alt Text is invalid', () => {
+      renderComponent()
+      tray.setAltText('')
+      tray.$doneButton.click()
+      expect(tray.$altTextField).toHaveFocus()
     })
   })
 

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {bool, func, number, shape, string} from 'prop-types'
+import {bool, func, number, shape, string, object} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {IconLockLine, IconWarningSolid} from '@instructure/ui-icons'
@@ -69,7 +69,7 @@ const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
 }
 
 export default function DimensionsInput(props) {
-  const {dimensionsState, minHeight, minWidth, minPercentage, hidePercentage} = props
+  const {dimensionsState, minHeight, minWidth, minPercentage, hidePercentage, dimensionsRef} = props
 
   const handleDimensionTypeChange = e => {
     dimensionsState.setUsePercentageUnits(e.target.value === 'percentage')
@@ -124,6 +124,7 @@ export default function DimensionsInput(props) {
                     dimensionState={dimensionsState.percentageState}
                     label={formatMessage('Percentage')}
                     messages={[secondaryMessage]}
+                    dimensionsRef={dimensionsRef}
                   />
                 </Flex.Item>
 
@@ -137,6 +138,7 @@ export default function DimensionsInput(props) {
                     label={formatMessage('Width')}
                     minValue={minWidth}
                     messages={[secondaryMessage]}
+                    dimensionsRef={dimensionsRef}
                   />
                 </Flex.Item>
 
@@ -187,6 +189,7 @@ DimensionsInput.propTypes = {
   minWidth: number.isRequired,
   minPercentage: number.isRequired,
   hidePercentage: bool,
+  dimensionsRef: object
 }
 
 DimensionsInput.defaultProps = {
