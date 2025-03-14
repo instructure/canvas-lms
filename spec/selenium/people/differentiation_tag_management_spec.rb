@@ -53,6 +53,15 @@ describe "Differentiation Tag Management" do
         expect(fj("span:contains('Select User')")).to be_truthy
       end
 
+      context "checkbox visibility" do
+        it "renders differentiation checkbox only for student rows" do
+          # Ensure the checkbox is displayed for the student
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']")).to be_displayed
+          # Ensure the checkbox is not displayed for non-student rows (e.g. teacher)
+          expect(f("body")).not_to contain_jqcss("input[type='checkbox'][aria-label='Select #{@teacher.name}']")
+        end
+      end
+
       context "differentiation tag tray" do
         before do
           fj("button:contains('Manage Tags')").click

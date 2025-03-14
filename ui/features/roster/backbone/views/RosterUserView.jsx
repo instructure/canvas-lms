@@ -91,6 +91,7 @@ export default class RosterUserView extends View {
   permissionsJSON(json) {
     json.url = `${ENV.COURSE_ROOT_URL}/users/${this.model.get('id')}`
     json.isObserver = this.model.hasEnrollmentType('ObserverEnrollment')
+    json.isStudent = this.model.hasEnrollmentType('StudentEnrollment')
     json.isPending = this.model.pending(this.model.currentRole)
     json.isInactive = this.model.inactive()
     if (!json.isInactive) {
