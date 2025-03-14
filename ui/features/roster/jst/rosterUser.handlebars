@@ -1,9 +1,10 @@
 {{#if canManageDifferentiationTags}}
-<td class="center">
-  <input type="checkbox" class="select-user-checkbox" id="select-user-{{id}}"
-    aria-label="{{#t}}Select {{name}}{{/t}}" />
-  </input>
-</td>
+  <td class="center">
+    {{#if isStudent}}
+      <input type="checkbox" class="select-user-checkbox" id="select-user-{{id}}"
+        aria-label="{{#t}}Select {{name}}{{/t}}" />
+    {{/if}}
+  </td>
 {{/if}}
 <td class="center">
   <div id={{avatarId}}></div>
