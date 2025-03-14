@@ -38,6 +38,11 @@ import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
 
 const I18n = createI18nScope('pages')
 
+const INPUT_LENGTH_ERROR = {
+  type: 'too_long',
+  message: I18n.t('Input exceeds 500 KB limit. Please reduce the text size.'),
+}
+
 RichContentEditor.preloadRemoteModule()
 
 export default class WikiPageEditView extends ValidatedFormView {
@@ -315,12 +320,23 @@ export default class WikiPageEditView extends ValidatedFormView {
         </Suspense>,
       )
     } else {
-      RichContentEditor.loadNewEditor(this.$wikiPageBody, {
-        focus: true,
-        manageParent: true,
-        resourceType: 'wiki_page.body',
-        resourceId: this.model.id,
-      })
+      RichContentEditor.loadNewEditor(
+        this.$wikiPageBody,
+        {
+          focus: true,
+          manageParent: true,
+          resourceType: 'wiki_page.body',
+          resourceId: this.model.id,
+        },
+        rce => {
+          rce.handleBlurEditor = () => {
+            this.handleBlurContent()
+          }
+          rce.handleBlurRCE = () => {
+            this.handleBlurContent()
+          }
+        },
+      )
     }
 
     this.checkUnsavedOnLeave = true
@@ -412,6 +428,15 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
   }
 
+  handleBlurContent() {
+    const body = this.getFormData().body
+    if (body && new Blob([body]).size > BODY_MAX_LENGTH) {
+      this.toggleBodyError(INPUT_LENGTH_ERROR)
+    } else {
+      this.toggleBodyError(null)
+    }
+  }
+
   showErrors(errors) {
     const {title, body, ...otherErrors} = errors
     // IntsUI TextInput component show the title errors from server response
@@ -463,12 +488,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
 
     if (data.body && new Blob([data.body]).size > BODY_MAX_LENGTH) {
-      errors.body = [
-        {
-          type: 'too_long',
-          message: I18n.t('Input exceeds 500 KB limit. Please reduce the text size.'),
-        },
-      ]
+      errors.body = [INPUT_LENGTH_ERROR]
     }
 
     const studentTodoAtValid = data.student_todo_at != null && data.student_todo_at !== ''
