@@ -1416,7 +1416,7 @@ acknowledge that you have read and agreed to the
   <% end %>
   <% if can_do(@context, @current_user, :read_as_admin) %>
       <div id="tab-tools">
-        <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>
+        <%= render :partial => 'external_tools/external_tools' %>
       </div>
   <% end %>
   <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>

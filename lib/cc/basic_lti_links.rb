@@ -20,9 +20,9 @@
 module CC
   module BasicLTILinks
     def create_basic_lti_links
-      return nil unless @course.context_external_tools.active.count > 0
+      return nil unless Lti::ContextToolFinder.only_for(@course).active.count > 0
 
-      @course.context_external_tools.active.each do |tool|
+      Lti::ContextToolFinder.only_for(@course).active.each do |tool|
         next unless export_object?(tool)
 
         add_exported_asset(tool)

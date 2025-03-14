@@ -448,7 +448,7 @@ module Importers
           if tab["id"].is_a?(String) && tab["id"].start_with?("context_external_tool_")
             tool_mig_id = tab["id"].sub("context_external_tool_", "")
             all_tools ||= if migration.cross_institution?
-                            course.context_external_tools.having_setting("course_navigation")
+                            Lti::ContextToolFinder.only_for(course).placements(:course_navigation)
                           else
                             ContextExternalTool.find_all_for(course, :course_navigation)
                           end
