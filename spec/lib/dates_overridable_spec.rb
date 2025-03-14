@@ -62,6 +62,32 @@ shared_examples_for "learning object with due dates" do
         expect(dates_hash.size).to eq 3
         expect(dates_hash.pluck(:title)).to eq [nil, "Summer session", "2 students"]
       end
+
+      context "differentiation tags" do
+        before do
+          course.account.enable_feature!(:assign_to_differentiation_tags)
+          course.account.enable_feature!(:differentiation_tags)
+          course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+            a.save!
+          end
+        end
+
+        it "returns active differentiaiton tag overrides (includes override title)" do
+          diff_tag_category = course.group_categories.create!(name: "Differentiation Tags", non_collaborative: true)
+          diff_tag = course.groups.create!(name: "Tag 1", group_category: diff_tag_category, non_collaborative: true)
+
+          override.set = diff_tag
+          override.title = diff_tag.name
+          override.save!
+
+          response = overridable.all_dates_visible_to(@teacher)
+          expect(response.size).to eq 3
+
+          diff_tag_override = response.find { |r| r[:set_type] == "Group" }
+          expect(diff_tag_override[:title]).to eq diff_tag.name
+        end
+      end
     end
 
     context "as a student" do
@@ -69,6 +95,37 @@ shared_examples_for "learning object with due dates" do
         course_with_student({ course:, active_all: true })
         override.delete
         expect(overridable.all_dates_visible_to(@student).size).to eq 1
+      end
+
+      context "differentiation tags" do
+        before do
+          course.account.enable_feature!(:assign_to_differentiation_tags)
+          course.account.enable_feature!(:differentiation_tags)
+          course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+            a.save!
+          end
+        end
+
+        it "returns active differentiaiton tag overrides (excludes override title)" do
+          student = course_with_student({ course:, active_all: true }).user
+          diff_tag_category = course.group_categories.create!(name: "Differentiation Tags", non_collaborative: true)
+          diff_tag = course.groups.create!(name: "Tag 1", group_category: diff_tag_category, non_collaborative: true)
+          diff_tag.add_user(student, "accepted")
+
+          diff_tag_override = assignment_override_model(overridable_type => overridable)
+          diff_tag_override.set = diff_tag
+          diff_tag_override.set_type = "Group"
+          diff_tag_override.title = diff_tag.name
+          diff_tag_override.override_due_at(18.days.from_now)
+          diff_tag_override.save!
+
+          response = overridable.all_dates_visible_to(student)
+          expect(response.size).to eq 1
+
+          override = response.first
+          expect(override[:title]).to be_nil
+        end
       end
     end
 

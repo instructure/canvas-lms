@@ -491,6 +491,59 @@ describe AssignmentOverrideApplicator do
 
       it "should order section overrides by position" # see TODO in implementation
 
+      context "differentiation tag overrides" do
+        before do
+          account = @course.account
+          account.enable_feature!(:assign_to_differentiation_tags)
+          account.enable_feature!(:differentiation_tags)
+          account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+            a.save!
+          end
+
+          @diff_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+          @diff_tag = @course.groups.create!(name: "Diff Tag 1", group_category: @diff_tag_category, non_collaborative: true)
+          @diff_tag.add_user(@student)
+        end
+
+        it "includes differentiation tag overrides if available" do
+          @section_override = assignment_override_model(assignment: @assignment)
+          @section_override.set = @course.default_section
+          @section_override.save!
+
+          @diff_tag_override = assignment_override_model(assignment: @assignment)
+          @diff_tag_override.set_type = "Group"
+          @diff_tag_override.set_id = @diff_tag.id
+          @diff_tag_override.save!
+
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          expect(overrides.size).to eq 2
+          expect(overrides.first).to eq @diff_tag_override
+          expect(overrides.last).to eq @section_override
+        end
+
+        it "does not include differentiation tag overrides if account setting is disabled" do
+          @section_override = assignment_override_model(assignment: @assignment)
+          @section_override.set = @course.default_section
+          @section_override.save!
+
+          @diff_tag_override = assignment_override_model(assignment: @assignment)
+          @diff_tag_override.set_type = "Group"
+          @diff_tag_override.set_id = @diff_tag.id
+          @diff_tag_override.save!
+
+          # disable account setting for differentiation tags
+          @course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = false
+            a.save!
+          end
+
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          expect(overrides.size).to eq 1
+          expect(overrides.first).to eq @section_override
+        end
+      end
+
       context "sharding" do
         specs_require_sharding
 
