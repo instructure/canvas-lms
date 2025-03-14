@@ -17,16 +17,16 @@
  */
 
 import React from 'react'
-import {IconButton} from '@instructure/ui-buttons'
+import { IconButton } from '@instructure/ui-buttons'
 
-import {SimpleSelect} from '@instructure/ui-simple-select'
-import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
-import {TextArea} from '@instructure/ui-text-area'
-import {Checkbox} from '@instructure/ui-checkbox'
-import {IconQuestionLine} from '@instructure/ui-icons'
-import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
-import {Tooltip} from '@instructure/ui-tooltip'
+import { SimpleSelect } from '@instructure/ui-simple-select'
+import { RadioInput, RadioInputGroup } from '@instructure/ui-radio-input'
+import { TextArea } from '@instructure/ui-text-area'
+import { Checkbox } from '@instructure/ui-checkbox'
+import { IconQuestionLine } from '@instructure/ui-icons'
+import { Flex } from '@instructure/ui-flex'
+import { View } from '@instructure/ui-view'
+import { Tooltip } from '@instructure/ui-tooltip'
 
 import {
   CUSTOM,
@@ -55,6 +55,9 @@ const ImageOptionsForm = ({
   id = 'image-options-form',
   isIconMaker = false,
   forBlockEditorUse = false,
+  altHasError = false,
+  altRef = null,
+  dimensionsRef = null
 }) => {
   const TYPE = isIconMaker ? formatMessage('icon') : formatMessage('image')
   const tooltipText = formatMessage('Used by screen readers to describe the content of an {TYPE}', {
@@ -63,7 +66,6 @@ const ImageOptionsForm = ({
   const textAreaLabel = (
     <Flex alignItems="center">
       <Flex.Item>{formatMessage('Alt Text')}</Flex.Item>
-
       <Flex.Item margin="0 0 0 xx-small">
         <Tooltip
           on={['hover', 'focus']}
@@ -92,6 +94,7 @@ const ImageOptionsForm = ({
     <Flex id={id} direction="column">
       <Flex.Item padding="small">
         <TextArea
+          data-testid="alt-text-field"
           disabled={isDecorativeImage}
           aria-describedby="alt-text-label-tooltip"
           height="4rem"
@@ -100,6 +103,8 @@ const ImageOptionsForm = ({
           placeholder={formatMessage('(Describe the {TYPE})', {TYPE})}
           resize="vertical"
           value={altText}
+          messages={altHasError ? [{ text: formatMessage('Invalid description'), type: 'error' }] : []}
+          ref={altRef}
         />
       </Flex.Item>
 
@@ -162,6 +167,7 @@ const ImageOptionsForm = ({
                     minHeight={MIN_HEIGHT}
                     minWidth={MIN_WIDTH}
                     minPercentage={MIN_PERCENTAGE}
+                    dimensionsRef={dimensionsRef}
                   />
                 </View>
               )}
