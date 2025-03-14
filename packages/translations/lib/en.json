@@ -1809,8 +1809,17 @@
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "Please allow Canvas to access your microphone and webcam."
   },
+  "please_choose_a_file_c2449cc": {
+    "message": "Please choose a file"
+  },
   "please_decribe_what_you_would_like_to_compose_27a51be5": {
     "message": "Please decribe what you would like to compose."
+  },
+  "please_enter_a_file_name_f159edc1": {
+    "message": "Please enter a file name"
+  },
+  "please_select_a_file_of_a_supported_type_1fc578f2": {
+    "message": "Please select a file of a supported type"
   },
   "plus_d43cd4ec": {
     "message": "Plus"
