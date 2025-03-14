@@ -709,5 +709,18 @@ $revision-button-color: $ic-color-dark;
     border: none !important;
   }
 }
-
-
+.controls-section .format_example,
+.controls-section .datetime_suggest {
+  font-size: 14px;
+  padding-left: 0;
+  color: inherit;
+  .error-message {
+    display: initial;
+    justify-content: initial;
+    align-items: initial;
+    color: $ic-color-danger;
+    i.icon-warning.icon-Solid {
+      margin-right: 4px;
+    }
+  }
+}

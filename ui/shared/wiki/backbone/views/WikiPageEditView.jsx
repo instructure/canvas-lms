@@ -334,7 +334,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       if (this.model.get('published')) {
         publishAtInput.prop('disabled', true)
       } else {
-        renderDatetimeField(publishAtInput)
+        renderDatetimeField(publishAtInput, {showFormatExample: true})
           .change(e => {
             $('.save_and_publish').prop('disabled', e.target.value.length > 0)
           })
