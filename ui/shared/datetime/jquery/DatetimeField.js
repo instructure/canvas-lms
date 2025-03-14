@@ -232,6 +232,9 @@ export default class DatetimeField {
   addSuggests($sibling, options = {}) {
     if (this.isReadonly()) return
     this.contextTimezone = options.contextTimezone || ENV.CONTEXT_TIMEZONE
+    if (this.$options.showFormatExample) {
+      this.$formatExample = $('<span class="format_example" />').insertAfter($sibling)
+    }
     this.$suggest = $('<div class="datetime_suggest" />').insertAfter($sibling)
     if (this.contextTimezone != null && this.contextTimezone !== ENV.TIMEZONE) {
       this.$contextSuggest = $('<div class="datetime_suggest" />').insertAfter(this.$suggest)
@@ -402,6 +405,7 @@ export default class DatetimeField {
   updateSuggest(show) {
     if (this.isReadonly()) return
 
+    this.$formatExample?.text('')
     let localText = this.formatSuggest()
     this.screenreaderAlert = localText
     if (this.$contextSuggest && !this.invalid()) {
@@ -420,6 +424,7 @@ export default class DatetimeField {
   defaultSuggestion(show, localText) {
     this.$suggest.toggleClass('invalid_datetime', this.invalid()).text(localText)
     if (show || this.$contextSuggest || this.invalid()) {
+      this.$formatExample?.text(!localText ? this.getFormatExample() : '')
       this.$suggest.show()
       return
     }
@@ -472,6 +477,7 @@ export default class DatetimeField {
     this.$suggest.hide()
     if (this.$contextSuggest) this.$contextSuggest.hide()
     this.screenreaderAlert = ''
+    this.$formatExample?.text(this.getFormatExample())
   }
 
   alertScreenreader() {
@@ -525,5 +531,11 @@ export default class DatetimeField {
       if (this.$options.timeOnly) return I18n.t('Not a valid time format')
     }
     return I18n.t('errors.not_a_date', 'Please enter a valid format for a date')
+  }
+
+  getFormatExample() {
+    const locale = moment.localeData(ENV.MOMENT_LOCALE)
+    const formatExample = locale.longDateFormat('L')
+    return this.$options.timeOnly ? '' : formatExample
   }
 }
