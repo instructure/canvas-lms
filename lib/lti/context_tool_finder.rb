@@ -88,6 +88,37 @@ module Lti
       Lti::ScopeUnion.new(scopes)
     end
 
+    def self.contexts_to_search(context, include_federated_parent: false)
+      case context
+      when Course
+        [:self, :account_chain]
+      when Group
+        if context.context
+          [:self, :recursive]
+        else
+          [:self, :account_chain]
+        end
+      when Account
+        [:account_chain]
+      when Assignment
+        [:recursive]
+      else
+        []
+      end.flat_map do |component|
+        case component
+        when :self
+          context
+        when :recursive
+          contexts_to_search(context.context, include_federated_parent:)
+        when :account_chain
+          inc_fp = include_federated_parent &&
+                   Account.site_admin.feature_enabled?(:lti_tools_from_federated_parents) &&
+                   !context.root_account.primary_settings_root_account?
+          context.account_chain(include_federated_parent: inc_fp)
+        end
+      end
+    end
+
     private
 
     # Returns an array of scopes (which have no SQL order) for all tools.
@@ -100,7 +131,7 @@ module Lti
     # is on
     def scopes(include_federated_parent: true)
       placements = * options[:placements] || options[:type]
-      contexts = ContextExternalTool.contexts_to_search(context, include_federated_parent:)
+      contexts = Lti::ContextToolFinder.contexts_to_search(context, include_federated_parent:)
 
       return [] if contexts.empty?
 

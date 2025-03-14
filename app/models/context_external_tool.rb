@@ -1048,51 +1048,20 @@ class ContextExternalTool < ActiveRecord::Base
     developer_key_id == ContextExternalTool.from_content_tag(content_tag, context)&.developer_key_id
   end
 
-  def self.contexts_to_search(context, include_federated_parent: false)
-    case context
-    when Course
-      [:self, :account_chain]
-    when Group
-      if context.context
-        [:self, :recursive]
-      else
-        [:self, :account_chain]
-      end
-    when Account
-      [:account_chain]
-    when Assignment
-      [:recursive]
-    else
-      []
-    end.flat_map do |component|
-      case component
-      when :self
-        context
-      when :recursive
-        contexts_to_search(context.context, include_federated_parent:)
-      when :account_chain
-        inc_fp = include_federated_parent &&
-                 Account.site_admin.feature_enabled?(:lti_tools_from_federated_parents) &&
-                 !context.root_account.primary_settings_root_account?
-        context.account_chain(include_federated_parent: inc_fp)
-      end
-    end
-  end
-
   def self.find_active_external_tool_by_consumer_key(consumer_key, context)
-    active.where(consumer_key:, context: contexts_to_search(context)).first
+    active.where(consumer_key:, context: Lti::ContextToolFinder.contexts_to_search(context)).first
   end
 
   def self.find_active_external_tool_by_client_id(client_id, context)
-    active.where(developer_key_id: client_id, context: contexts_to_search(context)).first
+    active.where(developer_key_id: client_id, context: Lti::ContextToolFinder.contexts_to_search(context)).first
   end
 
   def self.find_external_tool_by_id(id, context)
-    where(id:, context: contexts_to_search(context)).first
+    where(id:, context: Lti::ContextToolFinder.contexts_to_search(context)).first
   end
 
   def self.find_external_tool_client_id(id, context)
-    where(id:, context: contexts_to_search(context)).pluck(:developer_key_id).map { Shard.global_id_for _1 }
+    where(id:, context: Lti::ContextToolFinder.contexts_to_search(context)).pluck(:developer_key_id).map { Shard.global_id_for _1 }
   end
 
   # Order of precedence: Basic LTI defines precedence as first
@@ -1119,7 +1088,7 @@ class ContextExternalTool < ActiveRecord::Base
     GuardRail.activate(:secondary) do
       preferred_tool = ContextExternalTool.where(id: preferred_tool_id).first if preferred_tool_id # don't raise an exception if it's not found
       original_client_id = preferred_tool&.developer_key_id
-      can_use_preferred_tool = preferred_tool&.active? && contexts_to_search(context).member?(preferred_tool.context)
+      can_use_preferred_tool = preferred_tool&.active? && Lti::ContextToolFinder.contexts_to_search(context).member?(preferred_tool.context)
 
       # always use the preferred_tool_id if url isn't provided
       return preferred_tool if url.blank? && can_use_preferred_tool
@@ -1176,7 +1145,7 @@ class ContextExternalTool < ActiveRecord::Base
   )
     context.shard.activate do
       preferred_tool_id = Shard.integral_id_for(preferred_tool_id)
-      contexts = contexts_to_search(context)
+      contexts = Lti::ContextToolFinder.contexts_to_search(context)
       context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
 
       preferred_version = prefer_1_1 ? "1.1" : "1.3" # Hack required for one Turnitin case :( see git blame
@@ -1384,14 +1353,6 @@ class ContextExternalTool < ActiveRecord::Base
   scope :not_duplicate, lambda {
     where.not(identity_hash: "duplicate")
   }
-
-  def self.find_all_for(context, type)
-    tools = []
-    if !context.is_a?(Account) && context.respond_to?(:context_external_tools)
-      tools += context.context_external_tools.having_setting(type.to_s)
-    end
-    tools + ContextExternalTool.having_setting(type.to_s).where(context_type: "Account", context_id: context.account_chain_ids)
-  end
 
   def self.serialization_excludes
     [:shared_secret, :settings]
@@ -1623,7 +1584,7 @@ class ContextExternalTool < ActiveRecord::Base
       # https://guides.rubyonrails.org/caching_with_rails.html#avoid-caching-instances-of-active-record-objects
       GuardRail.activate(:secondary) do
         sorted_external_tools = context.shard.activate do
-          contexts = contexts_to_search(context)
+          contexts = Lti::ContextToolFinder.contexts_to_search(context)
           context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
 
           order_clauses = [

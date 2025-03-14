@@ -179,12 +179,7 @@ module Importers
       url, domain, settings = extract_for_translation(hash)
       return unless domain
 
-      tool_contexts = ContextExternalTool.contexts_to_search(migration.context)
-      return unless tool_contexts.present?
-
-      tools = ContextExternalTool.active.where(context: tool_contexts)
-
-      tools.each do |tool|
+      Lti::ContextToolFinder.all_tools_for(migration.context).each do |tool|
         # check if tool is compatible
         next unless matching_settings?(migration, hash, tool, settings, true)
 

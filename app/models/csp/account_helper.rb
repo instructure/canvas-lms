@@ -151,7 +151,7 @@ module Csp::AccountHelper
   end
 
   def csp_tools_grouped_by_domain(internal_service_only: false)
-    csp_tool_scope = ContextExternalTool.where(context_type: "Account", context_id: account_chain_ids).active
+    csp_tool_scope = Lti::ContextToolFinder.all_tools_for(self).except(:order) # unordered to not mess with the .distinct
 
     if internal_service_only
       csp_tool_scope = csp_tool_scope.where.not(developer_key_id: nil)

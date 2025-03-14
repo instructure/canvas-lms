@@ -450,7 +450,7 @@ module Importers
             all_tools ||= if migration.cross_institution?
                             Lti::ContextToolFinder.only_for(course).placements(:course_navigation)
                           else
-                            ContextExternalTool.find_all_for(course, :course_navigation)
+                            Lti::ContextToolFinder.all_tools_for(course, placements: :course_navigation)
                           end
             if (tool = all_tools.detect { |t| t.migration_id == tool_mig_id } ||
                 all_tools.detect do |t|

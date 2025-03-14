@@ -525,7 +525,7 @@ module ApplicationHelper
     # called outside of Lti::ContextToolFinder to make sure that
     # @context is non-nil and also a type of Context that would have
     # tools in it (ie Course/Account/Group/User)
-    contexts = ContextExternalTool.contexts_to_search(@context)
+    contexts = Lti::ContextToolFinder.contexts_to_search(@context)
     return [] if contexts.empty?
 
     cached_tools =
