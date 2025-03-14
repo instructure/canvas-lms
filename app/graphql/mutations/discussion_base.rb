@@ -135,7 +135,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
     end
     if input.key?(:sort_order)
       sort_order = input[:sort_order].to_s
-      sort_order = DiscussionTopic::SortOrder::DESC unless DiscussionTopic::SortOrder::TYPES.include?(sort_order)
+      sort_order = DiscussionTopic::SortOrder::DEFAULT unless DiscussionTopic::SortOrder::TYPES.include?(sort_order)
       discussion_topic.sort_order = sort_order
     end
   end
