@@ -370,16 +370,41 @@ describe UserLearningObjectScopes do
     end
 
     context "sub_assignments" do
+      let(:root_account) { Account.default }
+
       before :once do
-        @course.account.enable_feature!(:discussion_checkpoints)
-        course_with_student(active_all: true)
-        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+        @sub_account1 = root_account.sub_accounts.create!(name: "sub-account1")
+        @sub_account2 = root_account.sub_accounts.create!(name: "sub-account2")
+        root_account.allow_feature!(:discussion_checkpoints)
       end
 
-      it "returns sub_assignments when discussion checkpoints FF enabled" do
+      it "returns sub_assignments from root account with discussion checkpoints FF enabled" do
+        root_account.enable_feature!(:discussion_checkpoints)
+        course_with_student(active_all: true, account: root_account)
+        reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
         list = @student.assignments_for_student("submitting", is_sub_assignment: true, contexts: [@course])
+
         expect(list.size).to be 2
-        expect(list.pluck(:id)).to match_array([@reply_to_topic.id, @reply_to_entry.id])
+        expect(list.pluck(:id)).to match_array([reply_to_topic.id, reply_to_entry.id])
+      end
+
+      it "returns sub_assignments only from sub-accounts with discussion checkpoints FF enabled" do
+        # sub_account1 has FF enabled
+        @sub_account1.enable_feature!(:discussion_checkpoints)
+        course_with_student(active_all: true, account: @sub_account1)
+        @course1 = @course
+        reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course1)
+
+        # temporary enable FF for sub_account2 to create discussion with checkpoints
+        course_with_student(active_all: true, account: @sub_account2, user: @student)
+        @sub_account2.enable_feature!(:discussion_checkpoints)
+        graded_discussion_topic_with_checkpoints(context: @course)
+        # sub_account2 has FF disabled
+        @sub_account2.disable_feature!(:discussion_checkpoints)
+
+        list = @student.assignments_for_student("submitting", is_sub_assignment: true, contexts: [@course1, @course])
+        expect(list.size).to be 2
+        expect(list.pluck(:id)).to match_array([reply_to_topic.id, reply_to_entry.id])
       end
     end
   end

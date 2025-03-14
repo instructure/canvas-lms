@@ -1379,8 +1379,11 @@ describe PlannerController do
       end
 
       context "discussion checkpoints FF" do
+        let(:root_account) { Account.default }
+
         before :once do
-          @course.account.enable_feature!(:discussion_checkpoints)
+          root_account.enable_feature!(:discussion_checkpoints)
+          course_with_student(active_all: true, account: root_account)
           @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
         end
 
@@ -1388,7 +1391,7 @@ describe PlannerController do
           user_session(@student)
         end
 
-        it "includes discussion checkpoints when FF enabled" do
+        it "includes discussion checkpoints from accounts with FF enabled" do
           get :index
           response_json = json_parse(response.body)
           items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
@@ -1396,8 +1399,8 @@ describe PlannerController do
           expect(items).to include ["sub_assignment", @reply_to_entry.id]
         end
 
-        it "does not include discussion checkpoints when FF disabled" do
-          @course.account.disable_feature!(:discussion_checkpoints)
+        it "does not include discussion checkpoints from accounts with FF disabled" do
+          root_account.disable_feature!(:discussion_checkpoints)
           get :index
           response_json = json_parse(response.body)
           items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
@@ -1415,6 +1418,44 @@ describe PlannerController do
           expect(res["plannable"]["read_state"]).to eq "unread"
           expect(res["plannable_type"]).to eq "sub_assignment"
           expect(res["new_activity"]).to be true
+        end
+
+        context "sub-accounts" do
+          before :once do
+            @sub_account1 = root_account.sub_accounts.create!(name: "sub-account")
+            @sub_account2 = root_account.sub_accounts.create!(name: "sub-account")
+            root_account.allow_feature!(:discussion_checkpoints)
+            @sub_account1.enable_feature!(:discussion_checkpoints)
+            course_with_student(active_all: true, account: @sub_account1, user: @student)
+            @reply_to_topic1, @reply_to_entry1 = graded_discussion_topic_with_checkpoints(context: @course)
+
+            @sub_account2.enable_feature!(:discussion_checkpoints)
+            course_with_student(active_all: true, account: @sub_account2, user: @student)
+            @reply_to_topic2, @reply_to_entry2 = graded_discussion_topic_with_checkpoints(context: @course)
+          end
+
+          it "includes sub_assignments only from sub-accounts with FF enabled" do
+            # sub_account1 has FF disabled, sub_account2 has FF enabled
+            @sub_account1.disable_feature!(:discussion_checkpoints)
+            get :index
+            response_json = json_parse(response.body)
+            items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
+            expect(items).not_to include ["sub_assignment", @reply_to_topic1.id]
+            expect(items).not_to include ["sub_assignment", @reply_to_entry1.id]
+            expect(items).to include ["sub_assignment", @reply_to_topic2.id]
+            expect(items).to include ["sub_assignment", @reply_to_entry2.id]
+
+            # sub_account1 has FF enabled, sub_account2 has FF enabled
+            @sub_account1.enable_feature!(:discussion_checkpoints)
+            @sub_account2.disable_feature!(:discussion_checkpoints)
+            get :index
+            response_json = json_parse(response.body)
+            items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
+            expect(items).to include ["sub_assignment", @reply_to_topic1.id]
+            expect(items).to include ["sub_assignment", @reply_to_entry1.id]
+            expect(items).not_to include ["sub_assignment", @reply_to_topic2.id]
+            expect(items).not_to include ["sub_assignment", @reply_to_entry2.id]
+          end
         end
       end
     end
