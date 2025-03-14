@@ -337,6 +337,8 @@ export default class WikiPageEditView extends ValidatedFormView {
         renderDatetimeField(publishAtInput, {showFormatExample: true})
           .change(e => {
             $('.save_and_publish').prop('disabled', e.target.value.length > 0)
+            const isInvalid = e.target.getAttribute('aria-invalid') === 'true'
+            $('.submit').prop('disabled', isInvalid)
           })
           .trigger('change')
       }

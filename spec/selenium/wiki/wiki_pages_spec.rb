@@ -107,6 +107,21 @@ describe "Wiki Pages" do
       expect(f('[id*="TextInput-messages"]')).to include_text "Title must contain at least one letter or number"
     end
 
+    it "changes Save button state based on publish_at state" do
+      Account.site_admin.enable_feature!(:scheduled_page_publication)
+      @course.wiki_pages.create!(title: "Page1", workflow_state: "unpublished")
+      get "/courses/#{@course.id}/pages/Page1/edit"
+      publish_at_input.send_keys("invalid date")
+      # blurs the input
+      wiki_page_title_input.click
+      expect(submit_button).to be_disabled
+
+      publish_at_input.clear
+      publish_at_input.send_keys(Time.zone.now)
+      wiki_page_title_input.click
+      expect(submit_button).not_to be_disabled
+    end
+
     it "updates with changes made in other window", custom_timeout: 40.seconds, priority: "1" do
       @course.wiki_pages.create!(title: "Page1")
       edit_page("this is")
