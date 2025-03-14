@@ -17,7 +17,7 @@
  */
 
 import {SyntheticEvent, useCallback, useEffect, useState} from 'react'
-import {useCourseModuleItemApi} from '@canvas/direct-sharing/react/effects/useModuleCourseSearchApi'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
@@ -79,10 +79,10 @@ const ModulePositionPicker = ({
 }: ModulePositionPickerProps) => {
   const [moduleItems, setModuleItems] = useState<ModuleItem[]>([])
   const [position, setPosition] = useState<PositionType>('first')
-  const [offset, setOffset] = useState(0)
-  const [siblingPosition, setSiblingPosition] = useState(1)
-  const [error, setError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [offset, setOffset] = useState<number>(0)
+  const [siblingPosition, setSiblingPosition] = useState<number>(1)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
     setSiblingPosition(1)
@@ -91,15 +91,24 @@ const ModulePositionPicker = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, moduleId])
 
-  const setFetchError = useCallback(() => setError(I18n.t('Error retrieving module items')), [])
-
-  useCourseModuleItemApi({
-    success: setModuleItems,
-    error: setFetchError,
-    loading: setIsLoading,
-    fetchAllPages: true,
-    params: {contextId: courseId, moduleId},
-  })
+  useEffect(() => {
+    setIsLoading(true)
+    doFetchApi<ModuleItem[]>({
+      path: `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
+    })
+      .then(response => response.json)
+      .then((items?: ModuleItem[]) => {
+        if (!items) throw new Error('Invalid response')
+        setModuleItems(items)
+        setError(null)
+      })
+      .catch(() => {
+        setError(I18n.t('Error retrieving module items'))
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [courseId, moduleId])
 
   const handleSetPosition = useCallback(
     (_e: SyntheticEvent, {value}: {value?: string | number | undefined}) => {
@@ -185,7 +194,7 @@ const ModulePositionPicker = ({
         {renderSelectPlace()}
       </View>
 
-      {positions[position]?.type === 'relative' && (
+      {positions[position]?.type === 'relative' && !error && (
         <View as="div" margin="0 0 small 0" textAlign="center">
           {renderSelectSibling()}
         </View>
@@ -193,4 +202,5 @@ const ModulePositionPicker = ({
     </>
   )
 }
+
 export default ModulePositionPicker
