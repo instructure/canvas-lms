@@ -88,6 +88,10 @@
 #         "progress": {
 #           "description": "If the group category has not yet finished a randomly student assignment request, a progress object will be attached, which will contain information related to the progress of the assignment request. Refer to the Progress API for more information",
 #           "$ref": "Progress"
+#         },
+#         "non_collaborative": {
+#           "description": "Indicates whether this group category is non-collaborative. A value of true means these group categories rely on the manage_tags permissions and do not have collaborative features",
+#           "type": "boolean"
 #         }
 #       }
 #     }
