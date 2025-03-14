@@ -26,7 +26,7 @@ import PropTypes from 'prop-types'
 const I18n = createI18nScope('discussion_posts')
 
 export const TranslationControls = forwardRef((props, ref) => {
-  const {translationLanguages} = useContext(
+  const {translationLanguages, setTranslateTargetLanguage, setTranslationLoading} = useContext(
     DiscussionManagerUtilityContext,
   )
   const [input, setInput] = useState('')
@@ -36,10 +36,15 @@ export const TranslationControls = forwardRef((props, ref) => {
     const result = translationLanguages.current.find(({id: _id}) => id === _id)
 
     //TODO: Somehow trigger this function if not valid item is selected
+    if(ENV.ai_translation_improvements) {
+      props.onSetIsLanguageNotSelectedError(false)
+      props.onSetIsLanguageAlreadyActiveError(false)
+      props.onSetSelectedLanguage(result.id)
+    } else {
+      setTranslationLoading(true)
+      setTranslateTargetLanguage(result.id)
+    }
 
-    props.onSetIsLanguageNotSelectedError(false)
-    props.onSetIsLanguageAlreadyActiveError(false)
-    props.onSetSelectedLanguage(result.id)
     setInput(result.name)
   }
 
