@@ -17,7 +17,7 @@
  */
 
 import {PostMessage} from '../PostMessage'
-import React from 'react'
+import React, {useState} from 'react'
 import {render, screen, act, waitFor, cleanup} from '@testing-library/react'
 import {DiscussionManagerUtilityContext, SearchContext} from '../../../utils/constants'
 import {User} from '../../../../graphql/User'
@@ -67,12 +67,14 @@ const setup = (props, {searchTerm = ''} = {}) => {
 
 const setupWithTranslationLanguageSelected = (props, {
   searchTerm = '',
-  initLoading = true,
   loading = false,
   translateTargetLanguage = 'en',
 } = {}) => {
+  const entryId = 'asdasd'
   const Wrapper = ({ children }) => {
-    const [translationLoading, setTranslationLoading] = React.useState(initLoading);
+    const initSet = new Set()
+    initSet.add(entryId)
+    const [entryTranslatingSet, setEntryTranslatingSet] = useState(initSet);
 
     return (
       <DiscussionManagerUtilityContext.Provider
@@ -81,8 +83,17 @@ const setupWithTranslationLanguageSelected = (props, {
             current: [{ id: 'en', name: 'English', translated_to_name: 'Translated to English' }],
           },
           translateTargetLanguage,
-          translationLoading,
-          setTranslationLoading: () => setTranslationLoading(loading),
+          entryTranslatingSet,
+          setEntryTranslating: () => {
+            const newSet = new Set(entryTranslatingSet);
+            if (loading) {
+              newSet.add(entryId);
+            } else {
+              newSet.delete(entryId);
+            }
+
+            setEntryTranslatingSet(newSet);
+          },
         }}
       >
         <SearchContext.Provider value={{ searchTerm }}>{children}</SearchContext.Provider>
@@ -93,6 +104,7 @@ const setupWithTranslationLanguageSelected = (props, {
   return render(
     <Wrapper>
       <PostMessage
+        discussionEntry={{ id: entryId }}
         author={User.mock()}
         timingDisplay="Jan 1 2000"
         message="Posts are fun"

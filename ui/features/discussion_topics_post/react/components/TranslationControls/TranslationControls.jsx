@@ -26,7 +26,7 @@ import PropTypes from 'prop-types'
 const I18n = createI18nScope('discussion_posts')
 
 export const TranslationControls = forwardRef((props, ref) => {
-  const {translationLanguages, setTranslateTargetLanguage, setTranslationLoading} = useContext(
+  const {translationLanguages, setTranslateTargetLanguage} = useContext(
     DiscussionManagerUtilityContext,
   )
   const [input, setInput] = useState('')
@@ -41,7 +41,6 @@ export const TranslationControls = forwardRef((props, ref) => {
       props.onSetIsLanguageAlreadyActiveError(false)
       props.onSetSelectedLanguage(result.id)
     } else {
-      setTranslationLoading(true)
       setTranslateTargetLanguage(result.id)
     }
 
