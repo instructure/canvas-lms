@@ -3567,6 +3567,7 @@ EG = {
     commentElement.find('span.comment').html(formattedComment)
 
     deleteCommentLinkText = I18n.t('Delete comment: %{commentText}', {commentText: spokenComment})
+    commentElement.find('.delete_comment_link').attr('role', 'button')
     commentElement.find('.delete_comment_link .screenreader-only').text(deleteCommentLinkText)
 
     if (comment.avatar_path && !hideStudentName) {
