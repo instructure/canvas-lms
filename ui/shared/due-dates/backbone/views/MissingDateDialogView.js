@@ -35,11 +35,6 @@ function MissingDateDialogView() {
   return MissingDateDialogView.__super__.constructor.apply(this, arguments)
 }
 
-MissingDateDialogView.prototype.dialogTitle =
-  '<span>\n  <i class="icon-warning"></i>\n  ' +
-  htmlEscape(I18n.t('titles.warning', 'Warning')) +
-  '\n</span>'
-
 MissingDateDialogView.prototype.initialize = function (options) {
   MissingDateDialogView.__super__.initialize.apply(this, arguments)
   this.validationFn = options.validationFn || function () {}
@@ -64,11 +59,10 @@ MissingDateDialogView.prototype.render = function () {
 MissingDateDialogView.prototype.showDialog = function () {
   this.$dialog = $(template())
     .dialog({
-      dialogClass: 'dialog-warning',
       draggable: false,
       modal: true,
       resizable: false,
-      title: $(this.dialogTitle),
+      title: I18n.t('titles.warning', 'Warning'),
       zIndex: 1000,
     })
     .fixDialogButtons()
