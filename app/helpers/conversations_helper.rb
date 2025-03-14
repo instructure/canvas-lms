@@ -364,7 +364,6 @@ module ConversationsHelper
     # Get inbox settings for participants that are Out of Office
     ooo_inbox_settings = Inbox::InboxService.users_out_of_office(user_ids: participant_ids, root_account_id:, date:)
 
-    Rails.logger.info("inbox settings: #{ooo_inbox_settings.empty?}")
     # If no one is out of office, then do not send anything
     return if ooo_inbox_settings.empty?
 
@@ -373,7 +372,6 @@ module ConversationsHelper
       ooo_message_recipient = author
 
       # user should not send themselves an OOO message
-      Rails.logger.info("sending themselves: #{ooo_message_author.id != ooo_message_recipient.id}")
       next unless ooo_message_author.id != ooo_message_recipient.id
 
       # Find the most recent ooo message to the recipient since ooo start date
@@ -386,7 +384,6 @@ module ConversationsHelper
                                       start: settings.out_of_office_first_date).order("created_at DESC").first
 
       should_send = should_send_auto_response?(ooo_message_author, last_sent_ooo_response)
-      Rails.logger.info("should send: #{should_send}")
       next unless should_send
 
       conversation = ooo_message_author.initiate_conversation(
@@ -419,7 +416,6 @@ module ConversationsHelper
         automated: true
       )
     end
-    Rails.logger.info("Out of office messages sent")
   end
 
   def inbox_settings_student?(user: @current_user, account: @domain_root_account)
