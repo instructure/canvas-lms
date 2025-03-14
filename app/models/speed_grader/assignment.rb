@@ -323,7 +323,7 @@ module SpeedGrader
               submission_comments:,
               submissions:
             )
-          json[:has_postable_comments] = submission_comments.any?(&:allows_posting_submission?)
+          json[:has_postable_comments] = sub.postable_comments?
           json[:proxy_submitter] = sub.proxy_submitter&.short_name
           json[:proxy_submitter_id] = sub.proxy_submitter_id
 

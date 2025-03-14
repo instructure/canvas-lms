@@ -106,8 +106,7 @@ module Api::V1::Submission
     end
 
     if includes.include?("has_postable_comments")
-      hash["has_postable_comments"] =
-        submission.submission_comments.any?(&:allows_posting_submission?)
+      hash["has_postable_comments"] = submission.postable_comments?
     end
 
     if includes.include?("submission_comments")

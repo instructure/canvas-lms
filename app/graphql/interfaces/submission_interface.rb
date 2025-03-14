@@ -242,6 +242,11 @@ module Interfaces::SubmissionInterface
   field :state, Types::SubmissionStateType, method: :workflow_state, null: false
   field :redo_request, Boolean, null: true
 
+  field :has_postable_comments, Boolean, null: false
+  def has_postable_comments # rubocop:disable Naming/PredicateName
+    Loaders::HasPostableCommentsLoader.load(submission.id)
+  end
+
   field :grade_hidden, Boolean, null: false
   def grade_hidden
     !submission.user_can_read_grade?(current_user, session)
