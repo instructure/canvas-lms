@@ -1061,7 +1061,7 @@ class GradebooksController < ApplicationController
       remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
 
       env = {
-        A2_STUDENT_ENABLED: @context.is_a?(Assignment) ? @context.a2_enabled? : nil,
+        A2_STUDENT_ENABLED: @assignment&.a2_enabled? || false,
         COMMENT_LIBRARY_FEATURE_ENABLED:
           @context.root_account.feature_enabled?(:assignment_comment_library),
         EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
