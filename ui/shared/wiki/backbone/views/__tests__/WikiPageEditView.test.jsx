@@ -17,6 +17,7 @@
  */
 
 import 'jquery-migrate'
+import $ from 'jquery'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import WikiPageEditView from '../WikiPageEditView'
 import WikiPage from '../../models/WikiPage'
@@ -78,6 +79,29 @@ describe('WikiPageEditView', () => {
       expect(errors.body[0].message).toBe(
         'Input exceeds 500 KB limit. Please reduce the text size.',
       )
+    })
+
+    test('toggleBodyError hides error when called with null', () => {
+      document.body.innerHTML = `
+        <div class="edit-content has_body_errors"></div>
+        <span id="wiki_page_body_error">Input exceeds limit</span>
+      `
+      const view = createView()
+      view.toggleBodyError(null)
+      expect($('.edit-content').hasClass('has_body_errors')).toBe(false)
+      expect($('#wiki_page_body_error').is(':visible')).toBe(false)
+    })
+
+    test('toggleBodyError shows error when called with error message', () => {
+      document.body.innerHTML = `
+        <div class="edit-content"></div>
+        <div id="wiki_page_body_statusbar"></div>
+      `
+      const view = createView()
+      const error = {message: 'Input exceeds limit'}
+      view.toggleBodyError(error)
+      expect($('.edit-content').hasClass('has_body_errors')).toBe(true)
+      expect($('#wiki_page_body_error').text()).toContain('Input exceeds limit')
     })
   })
 })
