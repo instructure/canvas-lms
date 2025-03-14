@@ -64,11 +64,13 @@ export function PostMessage({...props}) {
     heading = 'h' + depth.toString()
   }
 
-  const {translationLanguages, translateTargetLanguage, translationLoading, setTranslationLoading} = useContext(DiscussionManagerUtilityContext)
+  const {translationLanguages, translateTargetLanguage, entryTranslatingSet, setEntryTranslating} = useContext(DiscussionManagerUtilityContext)
   const [translatedTitle, setTranslatedTitle] = useState(null)
   const [translatedMessage, setTranslatedMessage] = useState(null)
   const [translationError, setTranslationError] = useState(null)
 
+  const id = props.discussionEntry?.id || 'topic'
+  const isTranslating = entryTranslatingSet?.has(id)
   // Shouldn't fire if not feature flagged.
   // TODO Create a custom hook for translation logic.
   useEffect(() => {
@@ -86,6 +88,7 @@ export function PostMessage({...props}) {
     ]
 
     // Begin translating, clear spinner when done.
+    setEntryTranslating(id, true)
     Promise.all(translationAttempts)
       .then(translations => {
         setTranslatedTitle(translations[0])
@@ -101,12 +104,12 @@ export function PostMessage({...props}) {
           setTranslationError({type: 'error', message: I18n.t('There was an unexpected error during translation.')})
         }
       })
-      .finally(() => setTranslationLoading(false))
+      .finally(() => setEntryTranslating(id, false))
   }, [translateTargetLanguage, props.title, props.message])
 
   const isTitleTranslationReady = !props.title || translatedTitle
   const isMessageTranslationReady = !props.message || translatedMessage
-  const isTranslationReady = !translationLoading && translateTargetLanguage && isTitleTranslationReady && isMessageTranslationReady
+  const isTranslationReady = !isTranslating && translateTargetLanguage && isTitleTranslationReady && isMessageTranslationReady
 
   return (
     <Responsive
@@ -156,7 +159,7 @@ export function PostMessage({...props}) {
               </Text>
             </View>
           )}
-          {translationLoading && (
+          {isTranslating && (
             <Flex justifyItems="start">
               <Flex.Item>
                 <Spinner renderTitle={I18n.t('Translating')} size="x-small" />
@@ -217,13 +220,13 @@ export function PostMessage({...props}) {
                     </Flex.Item>
                   </Flex>
                 )}
-                {!translationLoading && translateTargetLanguage && translationError?.type === 'error' && (
+                {!isTranslating && translateTargetLanguage && translationError?.type === 'error' && (
                   <Flex direction="row" alignItems="center" margin="0 0 small 0" gap="x-small">
                       <IconWarningSolid color="error" title="warning" />
                       <Text color="danger" data-testid="error_type_error">{translationError.message}</Text>
                   </Flex>
                 )}
-                {!translationLoading && translateTargetLanguage && translationError?.type === 'info' && (
+                {!isTranslating && translateTargetLanguage && translationError?.type === 'info' && (
                   <Flex direction="row" alignItems="center" margin="0 0 small 0" gap="x-small">
                     <Text color="secondary" fontStyle="italic" data-testid="error_type_info">{translationError.message}</Text>
                   </Flex>

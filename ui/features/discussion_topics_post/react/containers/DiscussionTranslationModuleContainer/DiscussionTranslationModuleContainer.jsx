@@ -41,8 +41,7 @@ export const DiscussionTranslationModuleContainer = () => {
     translateTargetLanguage,
     setTranslateTargetLanguage,
     setShowTranslationControl,
-    translationLoading,
-    setTranslationLoading,
+    entryTranslatingSet,
   } = useContext(
     DiscussionManagerUtilityContext,
   )
@@ -85,7 +84,6 @@ export const DiscussionTranslationModuleContainer = () => {
       return
     }
 
-    setTranslationLoading(true)
     setTranslateTargetLanguage(selectedLanguage)
   }
 
@@ -146,7 +144,7 @@ export const DiscussionTranslationModuleContainer = () => {
         <Flex.Item>
           <Button
             onClick={translateDiscussion}
-            disabled={translationLoading}
+            disabled={entryTranslatingSet.size > 0}
             margin="0 small 0 0"
             renderIcon={<AiIcon />}
             color="primary"
@@ -156,7 +154,7 @@ export const DiscussionTranslationModuleContainer = () => {
           <Button
             onClick={resetTranslationsModule}
             renderIcon={<IconRefreshLine />}
-            disabled={translationLoading}
+            disabled={entryTranslatingSet.size > 0}
           >
             {I18n.t('Reset')}
           </Button>

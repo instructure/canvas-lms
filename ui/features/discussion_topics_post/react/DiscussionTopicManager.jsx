@@ -34,7 +34,7 @@ import {
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useQuery} from '@apollo/client'
 import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
@@ -69,8 +69,20 @@ const DiscussionTopicManager = props => {
   const [showTranslationControl, setShowTranslationControl] = useState(false)
   // Start as null, populate when ready.
   const [translateTargetLanguage, setTranslateTargetLanguage] = useState(null)
-  const [translationLoading, setTranslationLoading] = useState(false)
+  const [entryTranslatingSet, setEntryTranslatingSet] = useState(new Set());
   const [focusSelector, setFocusSelector] = useState('')
+
+  const setEntryTranslating = useCallback((id, isTranslating) => {
+    setEntryTranslatingSet((prevSet) => {
+      const newSet = new Set(prevSet);
+      if (isTranslating) {
+        newSet.add(id);
+      } else {
+        newSet.delete(id);
+      }
+      return newSet;
+    });
+  }, []);
 
   const searchContext = {
     searchTerm,
@@ -156,8 +168,8 @@ const DiscussionTopicManager = props => {
     setShowTranslationControl,
     translateTargetLanguage,
     setTranslateTargetLanguage,
-    translationLoading,
-    setTranslationLoading,
+    entryTranslatingSet,
+    setEntryTranslating,
     isSummaryEnabled,
     setIsSummaryEnabled,
   }
