@@ -22,6 +22,8 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import FileFolderTray from '../../shared/TrayWrapper'
@@ -38,6 +40,25 @@ export type DirectShareCourseTrayProps = {
   file: File
 }
 
+type DirectShareCourseTrayFooterProps = {
+  requestInFlight: boolean
+  onDismiss: () => void
+  onCopy: () => void
+}
+
+type DirectShareCourseTrayBodyProps = {
+  requestInFlight: boolean
+  file: File
+  warningVisible: boolean
+  onDismissWarning: () => void
+  selectedCourse: Course | null
+  onSelectCourse: (course: Course | null) => void
+  selectedModule: Module | null
+  onSelectModule: (module: Module | null) => void
+  onSelectPosition: (position: number | null) => void
+  coursePanelRef: Ref<DirectShareCoursePanelPropsRef>
+}
+
 export type Course = {
   id: string
   name: string
@@ -47,7 +68,91 @@ export type Course = {
 
 export type Module = {
   id: string
+  name: string
 }
+
+const DirectShareCourseTrayHeader = () => <Heading level="h3">{I18n.t('Copy To...')}</Heading>
+
+const DirectShareCourseTrayBody = ({
+  requestInFlight,
+  file,
+  warningVisible,
+  onDismissWarning,
+  selectedCourse,
+  onSelectCourse,
+  selectedModule,
+  onSelectModule,
+  onSelectPosition,
+  coursePanelRef,
+}: DirectShareCourseTrayBodyProps) => {
+  if (requestInFlight) {
+    return (
+      <View as="div" textAlign="center">
+        <Spinner
+          data-testid="copy-to-spinner"
+          renderTitle={I18n.t('Copying %{file}', {
+            file: file.display_name || file.filename,
+          })}
+          margin="0 0 0 medium"
+          aria-live="polite"
+        />
+      </View>
+    )
+  }
+
+  return (
+    <Flex direction="column">
+      <Flex.Item padding="small">
+        <FileFolderInfo items={[file]} />
+      </Flex.Item>
+      {warningVisible && (
+        <Flex.Item padding="small">
+          <Alert
+            variant="warning"
+            renderCloseButtonLabel={I18n.t('Close warning message')}
+            onDismiss={onDismissWarning}
+            hasShadow={false}
+          >
+            {I18n.t(
+              'Importing the same course content more than once will overwrite any existing content in the course.',
+            )}
+          </Alert>
+        </Flex.Item>
+      )}
+      <Flex.Item padding="small">
+        <DirectShareCoursePanel
+          ref={coursePanelRef}
+          selectedCourseId={selectedCourse?.id}
+          onSelectCourse={onSelectCourse}
+          selectedModuleId={selectedModule?.id}
+          onSelectModule={onSelectModule}
+          onSelectPosition={onSelectPosition}
+        />
+      </Flex.Item>
+    </Flex>
+  )
+}
+
+const DirectShareCourseTrayFooter = ({
+  requestInFlight,
+  onDismiss,
+  onCopy,
+}: DirectShareCourseTrayFooterProps) => (
+  <>
+    <Button data-testid="direct-share-course-cancel" disabled={requestInFlight} onClick={onDismiss}>
+      {I18n.t('Cancel')}
+    </Button>
+    <Button
+      data-testid="direct-share-course-copy"
+      disabled={requestInFlight}
+      color="primary"
+      margin="0 0 0 x-small"
+      onClick={onCopy}
+    >
+      {I18n.t('Copy')}
+    </Button>
+  </>
+)
 
 const DirectShareCourseTray = ({open, onDismiss, courseId, file}: DirectShareCourseTrayProps) => {
   const coursePanelRef: Ref<DirectShareCoursePanelPropsRef> =
@@ -55,14 +160,14 @@ const DirectShareCourseTray = ({open, onDismiss, courseId, file}: DirectShareCou
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
   const [selectedModule, setSelectedModule] = useState<Module | null>(null)
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null)
-  const [postStatus, setPostStatus] = useState<boolean>(false)
+  const [requestInFlight, setRequestInFlight] = useState<boolean>(false)
   const [warningVisible, setWarningVisible] = useState<boolean>(true)
 
   const resetState = useCallback(() => {
     setSelectedCourse(null)
     setSelectedModule(null)
     setSelectedPosition(null)
-    setPostStatus(false)
+    setRequestInFlight(false)
     setWarningVisible(true)
   }, [])
 
@@ -96,16 +201,19 @@ const DirectShareCourseTray = ({open, onDismiss, courseId, file}: DirectShareCou
     if (!coursePanelRef.current?.validate()) return
 
     showFlashAlert({message: I18n.t('Starting copy operation...')})
-    setPostStatus(true)
+    setRequestInFlight(true)
     startCopyOperation()
       .then(sendSuccessful)
       .catch(showFlashError(I18n.t('Copy operation failed.')))
+      .finally(() => setRequestInFlight(false))
   }, [coursePanelRef, sendSuccessful, startCopyOperation])
 
-  const handleSelectCourse = useCallback((course: Course) => {
+  const handleSelectCourse = useCallback((course: Course | null) => {
     setSelectedCourse(course)
     setSelectedModule(null)
   }, [])
+
+  const handleDismissWarning = useCallback(() => () => setWarningVisible(false), [])
 
   // Reset the state when the open prop changes so we don't carry over state
   // from the previously opened tray
@@ -119,53 +227,27 @@ const DirectShareCourseTray = ({open, onDismiss, courseId, file}: DirectShareCou
       label={I18n.t('Copy To...')}
       onDismiss={onDismiss}
       open={open}
-      header={<Heading level="h3">{I18n.t('Copy To...')}</Heading>}
+      header={<DirectShareCourseTrayHeader />}
       footer={
-        <>
-          <Button data-testid="direct-share-course-cancel" onClick={onDismiss}>
-            {I18n.t('Cancel')}
-          </Button>
-          <Button
-            data-testid="direct-share-course-copy"
-            disabled={postStatus}
-            color="primary"
-            margin="0 0 0 x-small"
-            onClick={handleCopy}
-          >
-            {I18n.t('Copy')}
-          </Button>
-        </>
+        <DirectShareCourseTrayFooter
+          requestInFlight={requestInFlight}
+          onDismiss={onDismiss}
+          onCopy={handleCopy}
+        />
       }
     >
-      <Flex direction="column">
-        <Flex.Item padding="small">
-          <FileFolderInfo items={[file]} />
-        </Flex.Item>
-        {warningVisible && (
-          <Flex.Item padding="small">
-            <Alert
-              variant="warning"
-              renderCloseButtonLabel={I18n.t('Close warning message')}
-              onDismiss={() => setWarningVisible(false)}
-              hasShadow={false}
-            >
-              {I18n.t(
-                'Importing the same course content more than once will overwrite any existing content in the course.',
-              )}
-            </Alert>
-          </Flex.Item>
-        )}
-        <Flex.Item padding="small">
-          <DirectShareCoursePanel
-            ref={coursePanelRef}
-            selectedCourseId={selectedCourse?.id}
-            onSelectCourse={handleSelectCourse}
-            selectedModuleId={selectedModule?.id}
-            onSelectModule={setSelectedModule}
-            onSelectPosition={setSelectedPosition}
-          />
-        </Flex.Item>
-      </Flex>
+      <DirectShareCourseTrayBody
+        requestInFlight={requestInFlight}
+        file={file}
+        warningVisible={warningVisible}
+        onDismissWarning={handleDismissWarning}
+        selectedCourse={selectedCourse}
+        onSelectCourse={handleSelectCourse}
+        selectedModule={selectedModule}
+        onSelectModule={setSelectedModule}
+        onSelectPosition={setSelectedPosition}
+        coursePanelRef={coursePanelRef}
+      />
     </FileFolderTray>
   )
 }

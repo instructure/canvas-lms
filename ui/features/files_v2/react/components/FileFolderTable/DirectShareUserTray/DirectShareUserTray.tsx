@@ -28,6 +28,8 @@ import FileFolderInfo from '../../shared/FileFolderInfo'
 import {type File} from '../../../../interfaces/File'
 import DirectShareUserPanel from './DirectShareUserPanel'
 import FileFolderTray from '../../shared/TrayWrapper'
+import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('files_v2')
 
@@ -38,15 +40,90 @@ export type DirectShareUserTrayProps = {
   file: File
 }
 
+type DirectShareUserTrayBodyProps = {
+  requestInFlight: boolean
+  file: File
+  courseId: string
+  selectedUsers: BasicUser[]
+  onUserSelected: (newUser?: BasicUser) => void
+  onUserRemoved: (doomedUser: BasicUser) => void
+  selectorRef: Ref<ContentShareUserSearchSelectorRef>
+}
+
+type DirectShareUserTrayFooterProps = {
+  requestInFlight: boolean
+  onDismiss: () => void
+  onSend: () => void
+}
+
+const DirectShareUserTrayHeader = () => <Heading level="h3">{I18n.t('Send To...')}</Heading>
+
+const DirectShareUserTrayBody = ({
+  requestInFlight,
+  file,
+  courseId,
+  selectedUsers,
+  onUserSelected,
+  onUserRemoved,
+  selectorRef,
+}: DirectShareUserTrayBodyProps) => {
+  if (requestInFlight) {
+    return (
+      <View as="div" textAlign="center">
+        <Spinner
+          data-testid="send-to-spinner"
+          renderTitle={I18n.t('Sending %{file}', {
+            file: file.display_name || file.filename,
+          })}
+          margin="0 0 0 medium"
+          aria-live="polite"
+        />
+      </View>
+    )
+  }
+
+  return (
+    <Flex direction="column">
+      <Flex.Item padding="small">
+        <FileFolderInfo items={[file]} />
+      </Flex.Item>
+      <Flex.Item padding="small">
+        <DirectShareUserPanel
+          selectorRef={selectorRef}
+          courseId={courseId}
+          selectedUsers={selectedUsers}
+          onUserSelected={onUserSelected}
+          onUserRemoved={onUserRemoved}
+        />
+      </Flex.Item>
+    </Flex>
+  )
+}
+
+const DirectShareUserTrayFooter = ({
+  requestInFlight,
+  onDismiss,
+  onSend,
+}: DirectShareUserTrayFooterProps) => (
+  <>
+    <Button disabled={requestInFlight} onClick={onDismiss}>
+      {I18n.t('Cancel')}
+    </Button>
+    <Button disabled={requestInFlight} color="primary" margin="0 0 0 x-small" onClick={onSend}>
+      {I18n.t('Send')}
+    </Button>
+  </>
+)
+
 const DirectShareUserTray = ({open, onDismiss, courseId, file}: DirectShareUserTrayProps) => {
   const selectorRef: Ref<ContentShareUserSearchSelectorRef> =
     createRef<ContentShareUserSearchSelectorRef>()
   const [selectedUsers, setSelectedUsers] = useState<BasicUser[]>([])
-  const [postStatus, setPostStatus] = useState<boolean>(false)
+  const [requestInFlight, setRequestInFlight] = useState<boolean>(false)
 
   const resetState = useCallback(() => {
     setSelectedUsers([])
-    setPostStatus(false)
+    setRequestInFlight(false)
   }, [])
 
   const handleUserSelected = useCallback(
@@ -88,12 +165,11 @@ const DirectShareUserTray = ({open, onDismiss, courseId, file}: DirectShareUserT
     if (!selectorRef.current?.validate()) return
 
     showFlashAlert({message: I18n.t('Starting send operation...')})
-    setPostStatus(true)
+    setRequestInFlight(true)
     startSendOperation()
       .then(sendSuccessful)
-      .catch(() => {
-        showFlashError(I18n.t('Error starting content share.'))()
-      })
+      .catch(showFlashError(I18n.t('Error starting content share.')))
+      .finally(() => setRequestInFlight(false))
   }, [selectorRef, sendSuccessful, startSendOperation])
 
   // Reset the state when the open prop changes so we don't carry over state
@@ -108,30 +184,24 @@ const DirectShareUserTray = ({open, onDismiss, courseId, file}: DirectShareUserT
       label={I18n.t('Send To...')}
       onDismiss={onDismiss}
       open={open}
-      header={<Heading level="h3">{I18n.t('Send To...')}</Heading>}
+      header={<DirectShareUserTrayHeader />}
       footer={
-        <>
-          <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
-          <Button disabled={postStatus} color="primary" margin="0 0 0 x-small" onClick={handleSend}>
-            {I18n.t('Send')}
-          </Button>
-        </>
+        <DirectShareUserTrayFooter
+          requestInFlight={requestInFlight}
+          onDismiss={onDismiss}
+          onSend={handleSend}
+        />
       }
     >
-      <Flex direction="column">
-        <Flex.Item padding="small">
-          <FileFolderInfo items={[file]} />
-        </Flex.Item>
-        <Flex.Item padding="small">
-          <DirectShareUserPanel
-            selectorRef={selectorRef}
-            courseId={courseId}
-            selectedUsers={selectedUsers}
-            onUserSelected={handleUserSelected}
-            onUserRemoved={handleUserRemoved}
-          />
-        </Flex.Item>
-      </Flex>
+      <DirectShareUserTrayBody
+        requestInFlight={requestInFlight}
+        file={file}
+        courseId={courseId}
+        selectedUsers={selectedUsers}
+        onUserSelected={handleUserSelected}
+        onUserRemoved={handleUserRemoved}
+        selectorRef={selectorRef}
+      />
     </FileFolderTray>
   )
 }
