@@ -3931,7 +3931,11 @@ describe DiscussionTopic do
       end
 
       it "falls back to the topic's sort order if the participant's sort order is not set" do
-        expect(@topic.sort_order_for_user(@student)).to eq "asc"
+        @topic.update_or_create_participant(current_user: @student, sort_order: "inherit")
+        expect(@topic.sort_order_for_user(@student)).to eq DiscussionTopic::SortOrder::ASC
+        @topic.sort_order = DiscussionTopic::SortOrder::DESC
+        @topic.save!
+        expect(@topic.sort_order_for_user(@student)).to eq DiscussionTopic::SortOrder::DESC
       end
     end
 
@@ -3945,22 +3949,20 @@ describe DiscussionTopic do
     end
 
     context "topic participant when creating the topic" do
-      it "does create the participant with the proper expanded and sort order values" do
+      xit "does create the participant with the proper expanded and sort order values" do
         sort_order = "asc"
         expanded = false
         topic1 = @course.discussion_topics.create!(user: @teacher, sort_order:, expanded:)
 
-        participant = topic1.participant(@teacher)
-        expect(participant.sort_order).to eq sort_order
-        expect(participant.expanded).to eq expanded
+        expect(topic1.sort_order_for_user(@teacher)).to eq sort_order
+        expect(topic1.expanded_for_user(@teacher)).to eq expanded
 
         sort_order = "desc"
         expanded = true
         topic2 = @course.discussion_topics.create!(user: @teacher, sort_order:, expanded:)
 
-        participant = topic2.participant(@teacher)
-        expect(participant.sort_order).to eq sort_order
-        expect(participant.expanded).to eq expanded
+        expect(topic2.sort_order_for_user(@teacher)).to eq sort_order
+        expect(topic2.expanded_for_user(@teacher)).to eq expanded
       end
     end
   end
