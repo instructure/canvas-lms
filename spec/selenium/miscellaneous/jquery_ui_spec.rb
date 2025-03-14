@@ -128,9 +128,9 @@ describe "jquery ui" do
     # wrap it in a jquery object.
     #
     # see http://bugs.jqueryui.com/ticket/6016
-    it "html-escapes ignored in dialog titles" do
+    it "html-escapes inferred dialog titles" do
       title = "<b>this</b> is the title"
-      expect(driver.execute_script(<<~JS)).to eq "this is the title"
+      expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test" title="#{title}">hello</div>')
           .dialog({
             modal: true,
@@ -168,9 +168,9 @@ describe "jquery ui" do
       JS
     end
 
-    it "html-escapes are now ignored in dialog titles" do
+    it "html-escapes explicit string dialog titles" do
       title = "<b>this</b> is the title"
-      expect(driver.execute_script(<<~JS)).to eq "this is the title"
+      expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test">hello again</div>')
           .dialog({
             title: #{title.inspect},
@@ -183,7 +183,7 @@ describe "jquery ui" do
       JS
 
       new_title = "and now <i>this</i> is the title"
-      expect(driver.execute_script(<<~JS)).to eq "and now this is the title"
+      expect(driver.execute_script(<<~JS)).to eq new_title
         return $('#jqueryui_test')
           .dialog()
           .dialog('option', 'title', #{new_title.inspect})
