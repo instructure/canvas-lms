@@ -190,6 +190,7 @@ const ComputerPanel = forwardRef(({
   }
 
   if (hasUploadedFile) {
+    const fileBaseType = theFile.type.split('/')[0] ?? 'video'
     return (
       <div style={{position: 'relative'}} ref={previewPanelRef}>
         <Flex direction="row-reverse" margin="none none medium">
@@ -224,8 +225,9 @@ const ComputerPanel = forwardRef(({
             </>
           ) : useStudioPlayer ? (
             <StudioPlayer
-              src={[{src: previewURL, type: theFile.type}]}
+              src={{src: theFile, type: `${fileBaseType}/object`}}
               hideFullScreen={!(document.fullscreenEnabled || document.webkitFullscreenEnabled)}
+              disableStorage
             />
           ) : (
             <MediaPlayer
