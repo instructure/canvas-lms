@@ -151,7 +151,11 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :discussions do
-    resources :discussion_topics, only: %i[index new show edit destroy]
+    resources :discussion_topics, only: %i[index new show edit destroy] do
+      member do
+        get "insights" => "discussion_topics#insights", :as => :insights
+      end
+    end
     get "discussion_topics/:id/*extras" => "discussion_topics#show", :as => :map, :extras => /.+/
     resources :discussion_entries
   end
