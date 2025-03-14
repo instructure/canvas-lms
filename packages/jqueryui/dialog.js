@@ -1,5 +1,3 @@
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
 /*!
  * jQuery UI Dialog 1.9.2
  * http://jqueryui.com
@@ -19,6 +17,10 @@
  *	jquery.ui.position.js
  *	jquery.ui.resizable.js
  */
+
+// INSTRUCTURE: _setTitle has been created to make this behave like jQueryUI 1.10.0 after
+// https://bugs.jqueryui.com/ticket/6016/ was fixed. If we upgrade to 1.10.0 or later, we
+// don't need to worry about this local modification.
 
 import $ from 'jquery'
 import './core'
@@ -99,7 +101,7 @@ import './resizable'
       var that = this,
         options = this.options,
 
-        title = options.title || "&#160;",
+        title = options.title,
         uiDialog,
         uiDialogTitlebar,
         uiDialogTitlebarClose,
@@ -159,8 +161,8 @@ import './resizable'
       uiDialogTitle = $( "<span>" )
         .uniqueId()
         .addClass( "ui-dialog-title" )
-        .html( title )
         .prependTo( uiDialogTitlebar );
+      this._setTitle( uiDialogTitle, title );
 
       uiDialogButtonPane = ( this.uiDialogButtonPane = $( "<div>" ) )
         .addClass( "ui-dialog-buttonpane ui-widget-content ui-helper-clearfix" );
@@ -210,6 +212,14 @@ import './resizable'
             return false;
           }
         }});
+    },
+
+    _setTitle: function( el, value ) {
+      if ( !value ) {
+        el.html("&#160;");
+      } else {
+        el.text(value);
+      }
     },
 
     _init: function() {
@@ -625,9 +635,7 @@ import './resizable'
           }
           break;
         case "title":
-          // convert whatever was passed in o a string, for html() to not throw up
-          $( ".ui-dialog-title", this.uiDialogTitlebar )
-            .html( "" + ( value || "&#160;" ) );
+          this._setTitle( this.uiDialogTitlebar.find( ".ui-dialog-title" ), value );
           break;
       }
 
