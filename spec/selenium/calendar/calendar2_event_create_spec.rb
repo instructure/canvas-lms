@@ -158,10 +158,11 @@ describe "calendar2" do
       end
 
       it "shows the correct suggestions when user and context timezones differ", :ignore_js_errors do
-        skip("RCX-3131: Timezone issues")
-        @user.time_zone = "America/Denver"
+        # This spec failed due DST boundary, timecop does not work this time since this is also
+        # managed in UI by moment.js
+        @user.time_zone = "America/Lima"
         @user.save!
-        @course.time_zone = "America/New_York"
+        @course.time_zone = "America/Caracas"
         @course.save!
 
         get "/courses/#{@course.id}/calendar_events/new"
@@ -176,11 +177,11 @@ describe "calendar2" do
 
         expect(
           f("#editCalendarEventFull #start_and_end_times > div:nth-child(1) > div:nth-child(3)").text
-        ).to eq "Local: 1:00 AM"
+        ).to eq "Local: 12:00 AM"
 
         expect(
           f("#editCalendarEventFull #start_and_end_times > div:nth-child(1) > div:nth-child(4)").text
-        ).to eq "Course: 3:00 AM"
+        ).to eq "Course: 1:00 AM"
       end
 
       context "duplicate" do
