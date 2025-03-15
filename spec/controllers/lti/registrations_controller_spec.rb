@@ -122,7 +122,7 @@ RSpec.describe Lti::RegistrationsController do
       let(:canvas_apps_lti_usage_url) { "http://example.com" }
 
       before do
-        DynamicSettings.fallback_data = { config: { canvas: { lti: { canvas_apps_lti_usage_url: canvas_apps_lti_usage_url } } } }.deep_stringify_keys
+        DynamicSettings.fallback_data = { config: { canvas: { lti: { canvas_apps_lti_usage_url: } } } }.deep_stringify_keys
       end
 
       it "sets ltiUsage remote url via canvas_apps_lti_usage_url in env" do

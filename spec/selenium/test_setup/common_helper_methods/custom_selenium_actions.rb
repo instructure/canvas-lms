@@ -522,7 +522,7 @@ module CustomSeleniumActions
   # (tested with the CanvasSelect wrapper and instui SimpleSelect,
   # untested with a raw instui Select)
   def click_INSTUI_Select_option(select, option_text, select_by = :text)
-    instui_select_option(select, option_text, select_by: select_by).click
+    instui_select_option(select, option_text, select_by:).click
   end
 
   def INSTUI_Select_options(select)

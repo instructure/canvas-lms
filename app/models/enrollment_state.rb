@@ -157,7 +157,7 @@ class EnrollmentState < ActiveRecord::Base
     now = Time.zone.now
 
     # start_at <= now <= end_at, allowing for open ranges on either end
-    if (range = ranges.detect { |start_at, end_at| (start_at || now) <= now && now <= (end_at || now) })
+    if (range = ranges.detect { |start_at, end_at| now.between?((start_at || now), (end_at || now)) })
       # we're in the middle of the start-end so the state is just the same as the workflow state
       self.state = wf_state
       start_at, end_at = range

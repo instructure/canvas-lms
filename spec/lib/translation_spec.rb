@@ -57,16 +57,16 @@ describe Translation do
 
     it "returns nil if translation client is not present" do
       allow(described_class).to receive(:translation_client).and_return(nil)
-      expect(described_class.translate_text(text: text, tgt_lang: "es")).to be_nil
+      expect(described_class.translate_text(text:, tgt_lang: "es")).to be_nil
     end
 
     it "returns nil if tgt_lang is nil" do
-      expect(described_class.translate_text(text: text, tgt_lang: nil)).to be_nil
+      expect(described_class.translate_text(text:, tgt_lang: nil)).to be_nil
     end
 
     it "translates text when src_lang and tgt_lang are provided" do
       allow(translation_client).to receive(:translate_text).and_return(result)
-      expect(described_class.translate_text(text: text, tgt_lang: "es")).to eq("Hola, mundo!")
+      expect(described_class.translate_text(text:, tgt_lang: "es")).to eq("Hola, mundo!")
     end
 
     context "when target language is identical to detected source language" do
@@ -74,7 +74,7 @@ describe Translation do
 
       it "raises SameLanguageTranslationError" do
         allow(translation_client).to receive(:translate_text).and_return(result)
-        expect { described_class.translate_text(text: text, tgt_lang: "es") }.to raise_error(Translation::SameLanguageTranslationError)
+        expect { described_class.translate_text(text:, tgt_lang: "es") }.to raise_error(Translation::SameLanguageTranslationError)
       end
     end
   end

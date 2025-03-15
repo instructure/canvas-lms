@@ -2639,7 +2639,7 @@ class Account < ActiveRecord::Base
 
     protocol = horizon_domain.include?("localhost") ? "http" : "https"
     uri = Addressable::URI.parse("#{protocol}://#{horizon_domain}/redirect")
-    uri.query_values = { canvas_url: canvas_url, reauthenticate: reauthenticate, preview: preview }
+    uri.query_values = { canvas_url:, reauthenticate:, preview: }
     uri.to_s
   end
 end

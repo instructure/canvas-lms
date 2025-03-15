@@ -136,7 +136,7 @@ describe Mutations::SetRubricSelfAssessment do
       group_category = course.group_categories.create!(name: "Group Category")
       @group = group_category.groups.create!(name: "Group", context: course)
       group_membership_model(group: @group, user: student)
-      @assignment.update!(group_category: group_category)
+      @assignment.update!(group_category:)
     end
 
     it "returns error when group assignment" do

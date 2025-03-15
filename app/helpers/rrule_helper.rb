@@ -129,7 +129,7 @@ module RruleHelper
 
   def parse_bymonth(bymonth)
     month = bymonth.to_i
-    raise RruleValidationError, I18n.t("Invalid BYMONTH '%{bymonth}'", bymonth:) unless month >= 1 && month <= 12
+    raise RruleValidationError, I18n.t("Invalid BYMONTH '%{bymonth}'", bymonth:) unless month.between?(1, 12)
 
     month
   end
@@ -140,7 +140,7 @@ module RruleHelper
     monthday = bymonthday.to_i
 
     # not validating if we're in a leap year
-    raise RruleValidationError, I18n.t("Invalid BYMONTHDAY '%{bymonthday}'", bymonthday:) unless monthday >= 1 && monthday <= DAYS_IN_MONTH[month]
+    raise RruleValidationError, I18n.t("Invalid BYMONTHDAY '%{bymonthday}'", bymonthday:) unless monthday.between?(1, DAYS_IN_MONTH[month])
 
     monthday
   end

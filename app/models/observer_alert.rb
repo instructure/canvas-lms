@@ -55,7 +55,7 @@ class ObserverAlert < ActiveRecord::Base
                     end
         if enrolled_courses.include?(course_id)
           enrolled_alert_ids.concat(where(context_type:, context_id:).pluck(:id))
-        elsif Enrollment.active_or_pending_by_date.where(user_id: student.id, course_id: course_id).shard(observer).exists?
+        elsif Enrollment.active_or_pending_by_date.where(user_id: student.id, course_id:).shard(observer).exists?
           enrolled_courses << course_id
           enrolled_alert_ids.concat(where(context_type:, context_id:).pluck(:id))
         end

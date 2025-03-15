@@ -32,7 +32,7 @@ describe EstimatedDuration do
 
       it "is invalid and adds an error" do
         assignment = Assignment.create!(
-          course: course,
+          course:,
           name: "Some assignment"
         )
         quiz = Quizzes::Quiz.create!(title: "quiz1", context: course)
@@ -48,7 +48,7 @@ describe EstimatedDuration do
 
       it "is valid when assignment is present" do
         assignment = Assignment.create!(
-          course: course,
+          course:,
           name: "Some assignment"
         )
         estimated_duration = EstimatedDuration.create!(assignment_id: assignment.id, duration: 1.hour + 30.minutes)
@@ -86,7 +86,7 @@ describe EstimatedDuration do
       end
 
       it "is valid with attachment present" do
-        attachment = Attachment.create!(user: user,
+        attachment = Attachment.create!(user:,
                                         context: user,
                                         filename: "test.txt",
                                         uploaded_data: StringIO.new("first"))

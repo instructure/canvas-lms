@@ -81,7 +81,7 @@ class CoursePaceDocxGenerator
     attachment = Attachment.new(context: course_report, display_name: filename, user: course_report.user)
     Attachments::Storage.store_for_attachment(attachment, data)
     attachment.save!
-    course_report.update(attachment: attachment)
+    course_report.update(attachment:)
   end
 
   private

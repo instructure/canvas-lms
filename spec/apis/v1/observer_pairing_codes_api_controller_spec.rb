@@ -45,7 +45,7 @@ describe ObserverPairingCodesApiController, type: :request do
     it "students can create pairing codes for themselves" do
       json = api_call_as_user(@student, :post, @path, @params)
       expect(json["user_id"]).to eq @student.id
-      expect(json["expires_at"] >= 6.days.from_now && json["expires_at"] <= 7.days.from_now).to be true
+      expect(json["expires_at"].between?(6.days.from_now, 7.days.from_now)).to be true
       expect(json["workflow_state"]).to eq "active"
       expect(json["code"].length).to eq 6
     end

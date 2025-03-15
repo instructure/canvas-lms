@@ -30,10 +30,10 @@ module Lti
       init_launch
       launch_url = tool.url_with_environment_overrides(settings_url)
       @lti_launch.params = lti_adapter(
-        launch_url: launch_url
+        launch_url:
       ).generate_post_payload_for_asset_processor_settings
       @lti_launch.resource_url = lti_adapter.launch_url
-      log_launch(launch_url: launch_url, message_type: LtiAdvantage::Messages::AssetProcessorSettingsRequest::MESSAGE_TYPE)
+      log_launch(launch_url:, message_type: LtiAdvantage::Messages::AssetProcessorSettingsRequest::MESSAGE_TYPE)
       render Lti::AppUtil.display_template("borderless")
     end
 
@@ -41,12 +41,12 @@ module Lti
       init_launch
       launch_url = tool.url_with_environment_overrides(report_url)
       @lti_launch.params = lti_adapter(
-        asset_report: asset_report,
-        launch_url: launch_url,
+        asset_report:,
+        launch_url:,
         submission_attempt: params[:submission_attempt]
       ).generate_post_payload_for_report_review
       @lti_launch.resource_url = lti_adapter.launch_url
-      log_launch(launch_url: launch_url, message_type: LtiAdvantage::Messages::ReportReviewRequest::MESSAGE_TYPE)
+      log_launch(launch_url:, message_type: LtiAdvantage::Messages::ReportReviewRequest::MESSAGE_TYPE)
       render Lti::AppUtil.display_template("borderless")
     end
 
@@ -79,10 +79,10 @@ module Lti
 
     def variable_expander
       Lti::VariableExpander.new(@domain_root_account, @context, self, {
-                                  assignment: assignment,
+                                  assignment:,
                                   current_user: @current_user,
                                   current_pseudonym: @current_pseudonym,
-                                  tool: tool,
+                                  tool:,
                                   launch: @lti_launch,
                                 })
     end
@@ -162,8 +162,8 @@ module Lti
         user: @current_user,
         session_id: session[:session_id],
         launch_type: :content_item,
-        launch_url: launch_url,
-        message_type: message_type
+        launch_url:,
+        message_type:
       ).call
     end
   end

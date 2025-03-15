@@ -1398,7 +1398,7 @@ class GradebooksController < ApplicationController
 
       percent_value = params[:percent].to_f
 
-      unless percent_value >= 0 && percent_value <= 100
+      unless percent_value.between?(0, 100)
         return render json: { error: :invalid_percent_value }, status: :bad_request
       end
     end

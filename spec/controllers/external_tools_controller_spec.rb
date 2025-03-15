@@ -2073,7 +2073,7 @@ describe ExternalToolsController do
       include_context "key_storage_helper"
 
       let(:tool_id) { (response.status == 200) ? response.parsed_body["id"] : -1 }
-      let_once(:tool_configuration) { lti_tool_configuration_model(developer_key: developer_key) }
+      let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:) }
       let_once(:developer_key) { lti_developer_key_model(account:) }
       let_once(:user) { account_admin_user(account:) }
       let_once(:account) { account_model }
