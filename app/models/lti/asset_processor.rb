@@ -52,7 +52,7 @@ class Lti::AssetProcessor < ApplicationRecord
     return nil unless context_external_tool
 
     new(
-      context_external_tool: context_external_tool,
+      context_external_tool:,
       url: content_item["url"],
       title: content_item["title"],
       text: content_item["text"],

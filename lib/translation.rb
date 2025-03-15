@@ -245,14 +245,14 @@ module Translation
       return if tgt_lang.nil?
 
       result = translation_client.translate_text({
-                                                   text: text,
+                                                   text:,
                                                    source_language_code: "auto",
                                                    target_language_code: tgt_lang,
                                                  })
 
       check_same_language(result)
       tags = ["source_language:#{result.source_language_code}", "dest_language:#{result.target_language_code}"]
-      InstStatsd::Statsd.increment("translation.inbox_compose.invocations", tags: tags)
+      InstStatsd::Statsd.increment("translation.inbox_compose.invocations", tags:)
       result.translated_text
     end
 
@@ -271,7 +271,7 @@ module Translation
 
       check_same_language(result)
       tags = ["source_language:#{result.source_language_code}", "dest_language:#{result.target_language_code}"]
-      InstStatsd::Statsd.increment("translation.discussions.invocations", tags: tags)
+      InstStatsd::Statsd.increment("translation.discussions.invocations", tags:)
       result.translated_document.content
     end
 

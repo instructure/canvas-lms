@@ -1330,7 +1330,7 @@ class Lti::RegistrationsController < ApplicationController
           .call(
             account: @context,
             registration:,
-            workflow_state: workflow_state,
+            workflow_state:,
             user: @current_user
           )
       end

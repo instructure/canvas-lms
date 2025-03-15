@@ -782,8 +782,8 @@ class DiscussionTopic < ActiveRecord::Base
                                                                     unread_entry_count: unread_count(current_user, lock: true),
                                                                     workflow_state: "unread",
                                                                     subscribed: current_user == user && !subscription_hold(current_user, nil),
-                                                                    expanded: expanded,
-                                                                    sort_order: sort_order)
+                                                                    expanded:,
+                                                                    sort_order:)
           topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]

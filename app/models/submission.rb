@@ -1956,7 +1956,10 @@ class Submission < ActiveRecord::Base
   def self.bulk_load_versioned_originality_reports(submissions)
     reports = originality_reports_by_submission_id_submission_time_attachment_id(submissions)
     submissions.each do |s|
-      s.versioned_originality_reports = [] && next unless s.submitted_at
+      unless s.submitted_at
+        s.versioned_originality_reports = []
+        next
+      end
       reports_for_sub = reports.dig(s.id, :by_time, s.submitted_at.iso8601(6)) || []
 
       # nil for originality reports with no submission time
@@ -3179,7 +3182,7 @@ class Submission < ActiveRecord::Base
     return self if sub_assignment.nil?
 
     # TODO: see if we should be throwing an error here instead of defaulting to `submission`
-    sub_assignment.all_submissions.find_by(user: user) || self
+    sub_assignment.all_submissions.find_by(user:) || self
   end
 
   def aggregate_checkpoint_submissions

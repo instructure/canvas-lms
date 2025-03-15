@@ -148,7 +148,7 @@ RSpec.describe Lti::Registration do
     end
 
     context "when tool_configuration is present" do
-      let(:developer_key) { lti_developer_key_model(account: account) }
+      let(:developer_key) { lti_developer_key_model(account:) }
       let(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: registration) }
 
       before { tool_configuration }

@@ -37,12 +37,12 @@ class TranslationController < ApplicationController
 
     if Account.site_admin.feature_enabled?(:ai_translation_improvements)
       translated_text = Translation.translate_html(html_string: required_params[:text], tgt_lang: required_params[:tgt_lang])
-      render json: { translated_text: translated_text }
+      render json: { translated_text: }
       duration = Time.zone.now - start_time
       InstStatsd::Statsd.timing("translation.discussions.duration", duration)
     else
       translated_text = Translation.translate_html_sagemaker(html_string: required_params[:text], src_lang: required_params[:src_lang], tgt_lang: required_params[:tgt_lang])
-      render json: { translated_text: translated_text }
+      render json: { translated_text: }
     end
   end
 
@@ -51,12 +51,12 @@ class TranslationController < ApplicationController
 
     if Account.site_admin.feature_enabled?(:ai_translation_improvements)
       translated_text = Translation.translate_text(text: required_params[:text], tgt_lang: required_params[:tgt_lang])
-      render json: { translated_text: translated_text }
+      render json: { translated_text: }
       duration = Time.zone.now - start_time
       InstStatsd::Statsd.timing("translation.inbox_compose.duration", duration)
     else
       translated_text = translate_large_passage(original_text: required_params[:text], src_lang: required_params[:src_lang], tgt_lang: required_params[:tgt_lang])
-      render json: { translated_text: translated_text }
+      render json: { translated_text: }
     end
   end
 
@@ -93,8 +93,8 @@ class TranslationController < ApplicationController
       status = :internal_server_error
     end
 
-    InstStatsd::Statsd.increment("translation.errors", tags: tags)
-    render json: { translationError: { type: "error", message: message } }, status: status
+    InstStatsd::Statsd.increment("translation.errors", tags:)
+    render json: { translationError: { type: "error", message: } }, status:
   end
 
   private

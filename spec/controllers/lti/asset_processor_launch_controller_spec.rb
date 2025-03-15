@@ -151,7 +151,7 @@ module Lti
         context "with specific submission_attempt" do
           let(:submission_attempt) { 5 }
 
-          subject { get :launch_report, params: { asset_processor_id: asset_processor.id, report_id: asset_report, submission_attempt: submission_attempt } }
+          subject { get :launch_report, params: { asset_processor_id: asset_processor.id, report_id: asset_report, submission_attempt: } }
 
           it "contains valid submission lti_attempt_id" do
             subject

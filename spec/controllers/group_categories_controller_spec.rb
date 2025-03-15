@@ -1122,7 +1122,7 @@ describe GroupCategoriesController do
           # Revoke all tag management permissions
           RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
             @course.account.role_overrides.create!(
-              permission: permission,
+              permission:,
               role: teacher_role,
               enabled: false
             )
@@ -1161,7 +1161,7 @@ describe GroupCategoriesController do
           # Revoke all group management permissions
           RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS.each do |permission|
             @course.account.role_overrides.create!(
-              permission: permission,
+              permission:,
               role: teacher_role,
               enabled: false
             )

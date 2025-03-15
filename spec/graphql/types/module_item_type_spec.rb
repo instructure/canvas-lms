@@ -206,7 +206,7 @@ describe Types::ModuleItemType do
 
     it "shows estimated_duration" do
       assignment = assignment_model({ context: course })
-      EstimatedDuration.create!(assignment: assignment, duration: 1.hour + 30.minutes)
+      EstimatedDuration.create!(assignment:, duration: 1.hour + 30.minutes)
       module_item = module1.add_item({ type: "Assignment", id: assignment.id }, nil, position: 1)
       resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
       expect(resolver.resolve("estimatedDuration")).to eq (1.hour + 30.minutes).iso8601

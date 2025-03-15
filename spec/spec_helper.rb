@@ -167,7 +167,7 @@ module TimeComparisonWithRounding
     if nsec % 1_000 == 0
       super
     else
-      change(usec: usec) <=> other
+      change(usec:) <=> other
     end
   end
 end

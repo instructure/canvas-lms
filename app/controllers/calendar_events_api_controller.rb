@@ -2063,11 +2063,7 @@ class CalendarEventsApiController < ApplicationController
       # possibly an observer without a full link
       shards = @current_user.in_region_associated_shards & @observee.in_region_associated_shards
       @observed_course_ids = @current_user.observer_enrollments.shard(shards).active_or_pending.where(associated_user_id: @observee).pluck(:course_id)
-      if @observed_course_ids.any?
-        true
-      else
-        render_unauthorized_action
-      end
+      @observed_course_ids.any? || render_unauthorized_action
     end
   end
 

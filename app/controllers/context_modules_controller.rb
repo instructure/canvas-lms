@@ -823,7 +823,7 @@ class ContextModulesController < ApplicationController
         if duration.nil?
           @tag.estimated_duration&.destroy!
         elsif @tag.estimated_duration
-          @tag.estimated_duration.update(duration: duration)
+          @tag.estimated_duration.update(duration:)
         else
           @tag.estimated_duration = create_estimated_duration(@tag, duration)
         end

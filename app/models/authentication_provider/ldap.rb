@@ -325,7 +325,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
       time = Time.zone.now
 
       errors << "certificate is not a CA" unless cert.extensions.map(&:to_h)&.any? { |e| e["critical"] && e["oid"] == "basicConstraints" && e["value"].include?("CA:TRUE") }
-      errors << "certificate is expired or not yet valid" unless cert.not_before <= time && cert.not_after >= time
+      errors << "certificate is expired or not yet valid" unless time.between?(cert.not_before, cert.not_after)
     rescue => e
       errors << "unable to parse certificate: #{e.message}"
     end

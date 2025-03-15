@@ -31,7 +31,7 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
     per_page, offset = pagination_params
 
     enrolled_students = fetch_filtered_enrolled_students(course_id)
-    active_sections = CourseSection.where(course_id: course_id, workflow_state: "active")
+    active_sections = CourseSection.where(course_id:, workflow_state: "active")
 
     overdue_items_by_user = CoursePacing::CoursePaceService.off_pace_counts_by_user(enrolled_students)
 
@@ -67,7 +67,7 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
 
   def fetch_filtered_enrolled_students(course_id)
     students = StudentEnrollment.active
-                                .where(course_id: course_id)
+                                .where(course_id:)
                                 .preload(:user, :course_section)
 
     if params[:filter_section].present?
@@ -79,7 +79,7 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
     end
 
     individual_paced_user_ids = CoursePace
-                                .where(course_id: course_id, workflow_state: "active")
+                                .where(course_id:, workflow_state: "active")
                                 .where.not(user_id: nil)
                                 .pluck(:user_id)
 

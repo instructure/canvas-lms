@@ -12223,7 +12223,7 @@ describe Assignment do
 
     it "returns rubric_self_assessment_enabled as false when true and group assignment" do
       assignment_model(course: @course)
-      @assignment.update!(rubric_self_assessment_enabled: true, group_category: group_category)
+      @assignment.update!(rubric_self_assessment_enabled: true, group_category:)
 
       expect(@assignment.rubric_self_assessment_enabled?).to be_falsey
     end

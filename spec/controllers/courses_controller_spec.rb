@@ -425,8 +425,8 @@ describe CoursesController do
         let(:teacher) { user_with_pseudonym(active_user: true) }
 
         before do
-          course.enroll_student(student, section: section).accept!
-          course.enroll_teacher(teacher, section: section).accept!
+          course.enroll_student(student, section:).accept!
+          course.enroll_teacher(teacher, section:).accept!
         end
 
         it "shows the course as current for the student when section restrictions are enabled" do

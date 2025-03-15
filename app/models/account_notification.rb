@@ -268,7 +268,7 @@ class AccountNotification < ActiveRecord::Base
 
       # need to post-process since the cache covers the entire day
       unless include_near_past || include_all
-        result.select! { |n| n.start_at <= now && n.end_at >= now }
+        result.select! { |n| now.between?(n.start_at, n.end_at) }
       end
       result
     end

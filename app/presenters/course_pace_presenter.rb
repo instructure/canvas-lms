@@ -46,7 +46,7 @@ class CoursePacePresenter
       root_account_id: course_pace.root_account_id,
       modules: modules_json,
       context_id:,
-      assignments_weighting: assignments_weighting,
+      assignments_weighting:,
       time_to_complete_calendar_days: course_pace.time_to_complete_calendar_days || 0,
       context_type:
     }.merge(course_pace.start_date(with_context: true)).merge(course_pace.effective_end_date(with_context: true))
@@ -321,13 +321,13 @@ class CoursePacePresenter
         root_account_id: ppmi.root_account_id,
         module_item_id: module_item.id,
         assignment_title: module_item.title,
-        assignment_id: assignment_id,
+        assignment_id:,
         points_possible: TextHelper.round_if_whole(content&.try_rescue(:points_possible)),
         assignment_link: "#{course_url(course_pace.course, only_path: true)}/modules/items/#{module_item.id}",
         position: module_item.position,
         module_item_type: module_item.content_type,
         published: module_item.published?,
-        submission_status: submission_status,
+        submission_status:,
         unreleased: unreleased_statuses[module_item.id]
       }
     end
