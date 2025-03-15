@@ -106,10 +106,16 @@ const DirectShareUserTrayFooter = ({
   onSend,
 }: DirectShareUserTrayFooterProps) => (
   <>
-    <Button disabled={requestInFlight} onClick={onDismiss}>
+    <Button data-testid="direct-share-user-cancel" disabled={requestInFlight} onClick={onDismiss}>
       {I18n.t('Cancel')}
     </Button>
-    <Button disabled={requestInFlight} color="primary" margin="0 0 0 x-small" onClick={onSend}>
+    <Button
+      data-testid="direct-share-user-send"
+      disabled={requestInFlight}
+      color="primary"
+      margin="0 0 0 x-small"
+      onClick={onSend}
+    >
       {I18n.t('Send')}
     </Button>
   </>
