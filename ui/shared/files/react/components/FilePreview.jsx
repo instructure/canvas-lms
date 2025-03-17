@@ -243,7 +243,7 @@ export default class FilePreview extends React.PureComponent {
               width: '100%',
               height: '100%',
             }}
-            showUploadSubtitles
+            hideUploadCaptions={item.get('restricted_by_master_course') ?? false}
           />
         </Suspense>
       </div>
