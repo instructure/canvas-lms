@@ -181,7 +181,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
         {props.summary?.obsolete && (
           <Flex.Item margin="0 0 medium 0">
             <Alert variant="info" margin="0" hasShadow={false} data-testid="summary-obsolete-alert">
-              {I18n.t('There have been new replies since this summary was generated. (TBD)')}
+              {I18n.t('The discussion board has some new activity since this summary was generated.')}
             </Alert>
           </Flex.Item>
         )}
