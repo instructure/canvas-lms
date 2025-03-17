@@ -467,7 +467,7 @@ class Rubric < ActiveRecord::Base
     valid_bools = [true, "true", "1"]
     title = params[:title] || t("context_name_rubric", "%{course_name} Rubric", course_name: context.name)
     criteria = []
-    if params[:criteria_via_llm] && Rubric.ai_rubrics_enabled?(context)
+    if Canvas::Plugin.value_to_boolean(params[:criteria_via_llm]) && Rubric.ai_rubrics_enabled?(context)
       criteria = generate_criteria_via_llm(association_object)
     else
       (params[:criteria] || {}).each do |idx, criterion_data|

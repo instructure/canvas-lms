@@ -602,8 +602,8 @@ describe Rubric do
         assignment.update!(description: "Write a well argued essay about whether milk is better than cheese")
         llm_rubric = course.rubrics.build
         llm_rubric.user = teacher
-        rubric_params = { title: "Test LLM Rubric", criteria_via_llm: true }
-        association_params = { association_object: assignment, purpose: "grading", use_for_grading: true }
+        rubric_params = { title: "Test LLM Rubric", criteria_via_llm: "true" }
+        association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
 
         llm_response = {
           id: "xd143",
@@ -632,6 +632,41 @@ describe Rubric do
 
         expect(association).to be_present
         expect(llm_rubric.data[0][:description]).to eq "d1"
+      end
+
+      it "still creates the normal way if requested" do
+        assignment.update!(description: "Write a well argued essay about whether milk is better than cheese")
+        llm_rubric = course.rubrics.build
+        llm_rubric.user = teacher
+        rubric_params = {
+          title: "Test LLM Rubric",
+          criteria_via_llm: "false",
+          criteria: {
+            "0" => {
+              "id" => "1742228963899",
+              "description" => "Test 1",
+              "long_description" => "Test first criteria",
+              "points" => "4",
+              "ignore_for_scoring" => "false",
+              "criterion_use_range" => "false",
+              "ratings" => {
+                "0" => { "description" => "Exceeds", "long_description" => "", "points" => "4", "id" => "1" },
+                "1" => { "description" => "Mastery", "long_description" => "", "points" => "3", "id" => "2" },
+                "2" => { "description" => "Near", "long_description" => "", "points" => "2", "id" => "3" },
+                "3" => { "description" => "Below", "long_description" => "", "points" => "1", "id" => "4" },
+                "4" => { "description" => "No Evidence", "long_description" => "", "points" => "0", "id" => "5" }
+              }
+            }
+          }.with_indifferent_access
+        }
+        association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
+
+        expect(Rubric).not_to receive(:ai_rubrics_enabled?)
+
+        association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
+
+        expect(association).to be_present
+        expect(llm_rubric.data[0][:description]).to eq "Test 1"
       end
     end
   end
