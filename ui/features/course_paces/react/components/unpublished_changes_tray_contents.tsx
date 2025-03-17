@@ -122,9 +122,9 @@ export const UnpublishedChangesTrayContents = ({
       </View>
       <ol className="course_pace_changes">
         {unpublishedChanges.map(
-          c =>
+          (c, idx) =>
             c.summary && (
-              <li key={c.id} style={{overflowWrap: 'break-word'}}>
+              <li key={`${c.id}-${idx}`} style={{overflowWrap: 'break-word'}}>
                 {c.summary}
               </li>
             ),
