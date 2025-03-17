@@ -62,7 +62,6 @@ module Importers
       item.rrule = hash[:rrule]
       item.series_uuid = hash[:series_uuid]
       item.series_head = hash[:series_head]
-      item.blackout_date = hash[:blackout_date]
       item.imported = true
 
       if migration.send_item_notifications?
