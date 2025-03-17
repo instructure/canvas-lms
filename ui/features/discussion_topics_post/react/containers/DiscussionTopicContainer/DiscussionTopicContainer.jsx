@@ -583,7 +583,7 @@ export const DiscussionTopicContainer = ({
                                       )}
                                     </Flex.Item>
                                   )}
-                                  {ENV.DISCUSSION_INSIGHTS_ENABLED && ENV.user_can_insights && (
+                                  {ENV.user_can_access_insights && (
                                     <Flex.Item>
                                       <DiscussionInsightsButton
                                         onClick={() => {
