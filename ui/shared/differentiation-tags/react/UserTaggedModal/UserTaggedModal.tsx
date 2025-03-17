@@ -134,7 +134,7 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
                       data-testid={`user-tag-${tag.id}`}
                       text={
                         <AccessibleContent alt="Remove dismissible tag">
-                          {`${tag.groupCategoryName} | ${tag.name}`}
+                          {tag.isSingleTag ? tag.groupCategoryName : `${tag.groupCategoryName} | ${tag.name}`}
                         </AccessibleContent>
                       }
                       dismissible={true}

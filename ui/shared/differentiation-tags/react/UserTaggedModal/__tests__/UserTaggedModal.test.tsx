@@ -44,7 +44,7 @@ describe('UserTaggedModal', () => {
   const mutateMock = jest.fn()
   const renderComponent = (mockReturn = {}, props = {}, mutationMockReturn = {}) => {
     const defaultMock = {
-      data: [{id: 1, name: 'test group', groupCategoryName: 'test category'}],
+      data: [{id: 1, name: 'test group', groupCategoryName: 'test category', isSingleTag: false}],
       isLoading: false,
       error: null,
     }
@@ -87,12 +87,15 @@ describe('UserTaggedModal', () => {
 
   it('displays differentiation tag categories when data is available', () => {
     const mockData = [
-      {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups'},
-      {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups'},
+      {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
+      {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
+      {id: 3, name: 'Single Tag', groupCategoryName: 'Single Tag', isSingleTag: true},
     ]
     renderComponent({data: mockData})
+
     expect(screen.getByText('Reading Groups | Macroeconomics')).toBeInTheDocument()
     expect(screen.getByText('Reading Groups | Microeconomics')).toBeInTheDocument()
+    expect(screen.getByText('Single Tag')).toBeInTheDocument()
   })
 
   it('calls onClose when close button is clicked', async () => {
@@ -108,8 +111,8 @@ describe('UserTaggedModal', () => {
 
   it('shows the delete warning modal when click the tag', async () => {
     const mockData = [
-      {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups'},
-      {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups'},
+      {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
+      {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
     ]
     renderComponent({data: mockData})
     expect(screen.getByText('Reading Groups | Macroeconomics')).toBeInTheDocument()
@@ -123,8 +126,8 @@ describe('UserTaggedModal', () => {
 
   it('calls mutate when removing a tag from the user', async () =>{
     const mockData = [
-      {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups'},
-      {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups'},
+      {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
+      {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
     ]
     renderComponent({data:mockData})
     expect(screen.getByText('Reading Groups | Macroeconomics')).toBeInTheDocument()
@@ -143,8 +146,8 @@ describe('UserTaggedModal', () => {
 
   it('shows an Alert with error description when mutation fails', async () =>{
     const mockData = [
-      {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups'},
-      {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups'},
+      {id: 1, name: 'Macroeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
+      {id: 2, name: 'Microeconomics', groupCategoryName: 'Reading Groups', isSingleTag: false},
     ]
     const error = new Error('Forbidden, user does not have permission')
 

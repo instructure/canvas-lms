@@ -439,6 +439,7 @@ class GroupsController < ApplicationController
                      include: Array(params[:include]),
                      include_inactive_users:).tap do |json|
             json[:group_category_name] = g.group_category.name if collaboration_state == "non_collaborative" && params[:user_id]
+            json[:is_single_tag] = g.group_category.single_tag? if collaboration_state == "non_collaborative" && params[:user_id]
           end
         }
       end
