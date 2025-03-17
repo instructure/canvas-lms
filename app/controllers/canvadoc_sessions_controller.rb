@@ -23,7 +23,7 @@ class CanvadocSessionsController < ApplicationController
   include CoursesHelper
   include HmacHelper
 
-  def services_jwt_auth_allowed
+  def token_auth_allowed?
     params[:action] == "show" && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
   end
 
