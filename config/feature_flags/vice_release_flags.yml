@@ -145,7 +145,7 @@ discussion_checkpoints:
     create separate due dates for the initial response and replies. The initial
     response and replies are then graded separately, and those grades are
     combined to form a final discussion grade.
-  applies_to: Account
+  applies_to: RootAccount
 
 inbox_settings:
   state: hidden
