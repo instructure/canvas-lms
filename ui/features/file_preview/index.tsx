@@ -56,6 +56,7 @@ function renderStudioMediaPlayer(domId: string, data: MediaPlayerAttributes) {
       type={data.type === 'audio' ? 'audio' : 'video'}
       attachment_id={data.attachment_id}
       explicitSize={{width: 550, height: 400}}
+      hideUploadCaptions={data.bp_locked_attachment}
     />
   )
 }
