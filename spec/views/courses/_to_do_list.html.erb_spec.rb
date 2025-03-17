@@ -175,13 +175,13 @@ describe "courses/_to_do_list" do
 
         it "displays proper title for reply to topic checkpoint" do
           view_context
-          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
+          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true }
           expect(response).to include "Turn in #{@reply_to_topic.title} Reply to Topic"
         end
 
         it "displays proper title for reply to entry checkpoint" do
           view_context
-          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true, root_account: @course.root_account }
+          render partial: "courses/to_do_list", locals: { contexts: nil, show_legacy_todo_list: true }
           expect(response).to include "Turn in #{@reply_to_entry.title} Required Replies (#{@topic.reply_to_entry_required_count})"
         end
       end
