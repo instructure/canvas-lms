@@ -13913,7 +13913,7 @@ ca:
   import_outcomes_to_groupname_d0a3264d: "Importa les competències a “%{groupName}”\""
   import_override_scores_in_gradebook_80d51a72: "Importa les puntuacions de substitució al llibre de notes"
   import_queue_1fe82fe4: "Importa la cua"
-  import_rubric_aa83d957: "Rúbrica de la importació"
+  import_rubric_aa83d957: "Importar rúbrica"
   import_rubric_assessments_to_cf75d794: "Importa les avaluacions de rúbriques a "
   import_rubrics_135270f0: "Rúbriques de la importació"
   import_rubrics_tray_c4cbaa72: "Safata de rúbriques de la importació"
