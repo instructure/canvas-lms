@@ -80,8 +80,8 @@ interface CanvasStudioPlayerProps {
   show_loader?: boolean
   maxHeight?: null | string
   mediaFetchCallback?: (mediaInfo: MediaInfo) => void,
-  explicitSize?: {width: number, height: number},
-  showUploadSubtitles?: boolean
+  explicitSize?: {width: number, height: number}
+  hideUploadCaptions?: boolean
 }
 
 // The main difference between CanvasMediaPlayer and CanvasStudioPlayer
@@ -101,7 +101,7 @@ export default function CanvasStudioPlayer({
   maxHeight = null,
   mediaFetchCallback = () => {},
   explicitSize,
-  showUploadSubtitles = false,
+  hideUploadCaptions = false,
 }: CanvasStudioPlayerProps) {
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
     ? media_captions.map(t => ({
@@ -118,6 +118,7 @@ export default function CanvasStudioPlayer({
   const [containerWidth, setContainerWidth] = useState(explicitSize?.width || 0)
   const [containerHeight, setContainerHeight] = useState(explicitSize?.height || 0)
   const [isLoading, setIsLoading] = useState(true)
+  const [canAddCaptions, setCanAddCaptions] = useState(false)
   // the ability to set these makes testing easier
   // hint: set these values in a conditional breakpoint in
   // media_player_iframe_content.js where the CanvasStudioPlayer is rendered
@@ -193,6 +194,9 @@ export default function CanvasStudioPlayer({
         setMediaObjNetworkErr(e)
         setIsLoading(false)
         return
+      }
+      if (typeof resp?.can_add_captions === 'boolean') {
+        setCanAddCaptions(resp.can_add_captions)
       }
       if (resp?.media_sources?.length) {
         setMediaSources(convertAndSortMediaSources(resp.media_sources))
@@ -356,12 +360,12 @@ export default function CanvasStudioPlayer({
               hideFullScreen={!includeFullscreen}
               title={getAriaLabel()}
               kebabMenuElements={
-                !showUploadSubtitles
+                hideUploadCaptions || !canAddCaptions
                   ? undefined
                   : [
                       {
                         id: 'upload-cc',
-                        text: I18n.t('Upload subtitles'),
+                        text: I18n.t('Upload Captions'),
                         icon: 'transcript',
                         onClick: () => {
                           const src = Array.isArray(mediaSources) ? mediaSources[0].src : mediaSources
