@@ -46,6 +46,17 @@ describe ContextExternalTool do
     it "allows setting the root account" do
       expect(tool.root_account).to eq @root_account
     end
+
+    describe "asset_processor_eula_required" do
+      it "defaults null for new tools" do
+        expect(tool.asset_processor_eula_required).to be_nil
+      end
+
+      it "can be updated" do
+        tool.update!(asset_processor_eula_required: false)
+        expect(tool.reload.asset_processor_eula_required).to be false
+      end
+    end
   end
 
   describe "#permission_given?" do
