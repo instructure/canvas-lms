@@ -855,7 +855,7 @@ class Account < ActiveRecord::Base
   end
 
   def discussion_checkpoints_enabled?
-    feature_enabled?(:discussion_checkpoints)
+    root_account.feature_enabled?(:discussion_checkpoints)
   end
 
   def file_namespace
