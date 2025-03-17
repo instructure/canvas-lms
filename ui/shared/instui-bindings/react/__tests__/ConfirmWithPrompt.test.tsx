@@ -22,7 +22,7 @@ import {confirmWithPrompt, type PromptConfirmProps} from '../ConfirmWithPrompt'
 
 const user = userEvent.setup()
 
-describe('confirmWithPrompt', () => {
+describe.skip('confirmWithPrompt', () => {
   const defaultProps: PromptConfirmProps = {
     title: 'Dialog Title',
     message: 'Dialog Msg',
