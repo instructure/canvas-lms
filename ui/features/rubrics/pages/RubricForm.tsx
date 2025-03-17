@@ -72,6 +72,7 @@ export const Component = () => {
           rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}
           // @ts-expect-error
           showAdditionalOptions={ENV.enhanced_rubric_assignments_enabled}
+          criteriaViaLlm={false}
           onLoadRubric={title => setRubricTitle(title)}
           onCancel={() => navigate(navigateUrl)}
           onSaveRubric={() => navigate(navigateUrl)}

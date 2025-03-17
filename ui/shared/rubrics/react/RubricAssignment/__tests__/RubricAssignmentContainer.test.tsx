@@ -77,6 +77,7 @@ describe('RubricAssignmentContainer Tests', () => {
         contextAssetString="course_1"
         canManageRubrics={true}
         rubricSelfAssessmentFFEnabled={true}
+        aiRubricsEnabled={true}
         {...props}
       />,
     )
@@ -86,21 +87,33 @@ describe('RubricAssignmentContainer Tests', () => {
     it('should render the create and search buttons', () => {
       const {getByTestId} = renderComponent()
       expect(getByTestId('create-assignment-rubric-button')).toHaveTextContent('Create Rubric')
+      expect(getByTestId('create-assignment-ai-rubric-button')).toHaveTextContent(
+        'Create AI Rubric',
+      )
       expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
     })
 
     it('should not render the create when manage_rubrics permissions is false', () => {
       const {getByTestId, queryByTestId} = renderComponent({canManageRubrics: false})
       expect(queryByTestId('create-assignment-rubric-button')).toBeNull()
+      expect(queryByTestId('create-assignment-ai-rubric-button')).toBeNull()
       expect(queryByTestId('rubric-self-assessment-checkbox')).toBeNull()
       expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
     })
 
-    it('should render the create modal when the create button is clicked', () => {
+    it('should render the create modal with criteria builder when the create button is clicked', () => {
       const {getByTestId} = renderComponent()
       getByTestId('create-assignment-rubric-button').click()
       expect(getByTestId('rubric-assignment-create-modal')).toHaveTextContent('Create Rubric')
+      expect(getByTestId('rubric-criteria-builder-header')).toHaveTextContent('Criteria Builder')
       expect(getByTestId('save-rubric-button')).toBeDisabled()
+    })
+
+    it('should render the create modal with no criteria builder when the create button is clicked', () => {
+      const {getByTestId, queryByTestId} = renderComponent()
+      getByTestId('create-assignment-ai-rubric-button').click()
+      expect(getByTestId('rubric-assignment-create-modal')).toHaveTextContent('Create Rubric')
+      expect(queryByTestId('rubric-criteria-builder-header')).not.toBeInTheDocument()
     })
 
     it('should save a new rubric and display the Rubric title, edit, preview, and remove buttons', async () => {

@@ -60,6 +60,7 @@ export const defaultRubricForm: RubricFormProps = {
   hasRubricAssociations: false,
   hidePoints: false,
   criteria: [],
+  criteriaViaLlm: false,
   pointsPossible: 0,
   buttonDisplay: 'numeric',
   ratingOrder: 'descending',
@@ -86,6 +87,7 @@ export type RubricFormComponentProp = {
   rootOutcomeGroup: GroupOutcome
   criterionUseRangeEnabled: boolean
   hideHeader?: boolean
+  criteriaViaLlm: boolean
   rubric?: Rubric
   rubricAssociation?: RubricAssociation
   showAdditionalOptions?: boolean
@@ -103,6 +105,7 @@ export const RubricForm = ({
   criterionUseRangeEnabled,
   rootOutcomeGroup,
   hideHeader = false,
+  criteriaViaLlm,
   rubric,
   rubricAssociation,
   showAdditionalOptions = false,
@@ -112,6 +115,7 @@ export const RubricForm = ({
 }: RubricFormComponentProp) => {
   const [rubricForm, setRubricForm] = useState<RubricFormProps>({
     ...defaultRubricForm,
+    criteriaViaLlm,
     accountId,
     courseId,
   })
@@ -179,7 +183,10 @@ export const RubricForm = ({
   )
 
   const formValid = () => {
-    return !validationErrors.title?.message && rubricForm.criteria.length > 0
+    return (
+      !validationErrors.title?.message &&
+      (rubricForm.criteria.length > 0 || rubricForm.criteriaViaLlm)
+    )
   }
 
   const openCriterionModal = (criterion?: RubricCriterion) => {
@@ -489,70 +496,75 @@ export const RubricForm = ({
             </Flex>
           )}
 
-          <View as="div" margin="large 0 large 0">
-            <Flex>
-              <Flex.Item shouldGrow={true}>
-                <Heading
-                  level="h2"
-                  as="h2"
-                  themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
-                >
-                  {I18n.t('Criteria Builder')}
-                </Heading>
-              </Flex.Item>
-              {!rubricForm.hidePoints && !rubricForm.hideScoreTotal && (
-                <Flex.Item>
+          {!criteriaViaLlm && (
+            <View as="div" margin="large 0 large 0">
+              <Flex>
+                <Flex.Item shouldGrow={true}>
                   <Heading
                     level="h2"
                     as="h2"
-                    data-testid={`rubric-points-possible-${rubricForm.id}`}
+                    data-testid="rubric-criteria-builder-header"
                     themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
                   >
-                    {rubricForm.pointsPossible} {I18n.t('Points Possible')}
+                    {I18n.t('Criteria Builder')}
                   </Heading>
                 </Flex.Item>
-              )}
-            </Flex>
-          </View>
+                {!rubricForm.hidePoints && !rubricForm.hideScoreTotal && (
+                  <Flex.Item>
+                    <Heading
+                      level="h2"
+                      as="h2"
+                      data-testid={`rubric-points-possible-${rubricForm.id}`}
+                      themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
+                    >
+                      {rubricForm.pointsPossible} {I18n.t('Points Possible')}
+                    </Heading>
+                  </Flex.Item>
+                )}
+              </Flex>
+            </View>
+          )}
         </Flex.Item>
 
-        <Flex.Item shouldGrow={true} shouldShrink={true} as="main" padding="xx-small">
-          <View as="div" margin="0 0 small 0">
-            <DragAndDrop onDragEnd={handleDragEnd}>
-              <Droppable droppableId="droppable-id">
-                {provided => {
-                  return (
-                    <div ref={provided.innerRef} {...provided.droppableProps}>
-                      {rubricForm.criteria.map((criterion, index) => {
-                        return (
-                          <RubricCriteriaRow
-                            key={criterion.id}
-                            criterion={criterion}
-                            freeFormCriterionComments={rubricForm.freeFormCriterionComments}
-                            hidePoints={rubricForm.hidePoints}
-                            rowIndex={index + 1}
-                            unassessed={rubricForm.unassessed}
-                            onDeleteCriterion={() => deleteCriterion(criterion)}
-                            onDuplicateCriterion={() => duplicateCriterion(criterion)}
-                            onEditCriterion={() => openCriterionModal(criterion)}
-                          />
-                        )
-                      })}
-                      {provided.placeholder}
-                    </div>
-                  )
-                }}
-              </Droppable>
-            </DragAndDrop>
-            {rubricForm.unassessed && (
-              <NewCriteriaRow
-                rowIndex={rubricForm.criteria.length + 1}
-                onEditCriterion={() => openCriterionModal()}
-                onAddOutcome={handleAddOutcome}
-              />
-            )}
-          </View>
-        </Flex.Item>
+        {!criteriaViaLlm && (
+          <Flex.Item shouldGrow={true} shouldShrink={true} as="main" padding="xx-small">
+            <View as="div" margin="0 0 small 0">
+              <DragAndDrop onDragEnd={handleDragEnd}>
+                <Droppable droppableId="droppable-id">
+                  {provided => {
+                    return (
+                      <div ref={provided.innerRef} {...provided.droppableProps}>
+                        {rubricForm.criteria.map((criterion, index) => {
+                          return (
+                            <RubricCriteriaRow
+                              key={criterion.id}
+                              criterion={criterion}
+                              freeFormCriterionComments={rubricForm.freeFormCriterionComments}
+                              hidePoints={rubricForm.hidePoints}
+                              rowIndex={index + 1}
+                              unassessed={rubricForm.unassessed}
+                              onDeleteCriterion={() => deleteCriterion(criterion)}
+                              onDuplicateCriterion={() => duplicateCriterion(criterion)}
+                              onEditCriterion={() => openCriterionModal(criterion)}
+                            />
+                          )
+                        })}
+                        {provided.placeholder}
+                      </div>
+                    )
+                  }}
+                </Droppable>
+              </DragAndDrop>
+              {rubricForm.unassessed && (
+                <NewCriteriaRow
+                  rowIndex={rubricForm.criteria.length + 1}
+                  onEditCriterion={() => openCriterionModal()}
+                  onAddOutcome={handleAddOutcome}
+                />
+              )}
+            </View>
+          </Flex.Item>
+        )}
       </Flex>
 
       <div id="enhanced-rubric-builder-footer" style={{backgroundColor: colors.white}}>
@@ -585,27 +597,33 @@ export const RubricForm = ({
                 disabled={saveLoading || !formValid()}
                 data-testid="save-rubric-button"
               >
-                {I18n.t('Save Rubric')}
+                {criteriaViaLlm
+                  ? I18n.t('Create with AI')
+                  : rubric?.id
+                    ? I18n.t('Save Rubric')
+                    : I18n.t('Create Rubric')}
               </Button>
             </Flex.Item>
-            <Flex.Item>
-              <View
-                as="div"
-                padding="0 0 0 medium"
-                borderWidth="none none none medium"
-                height="2.375rem"
-              >
-                <Link
-                  as="button"
-                  data-testid="preview-rubric-button"
-                  isWithinText={false}
-                  margin="x-small 0 0 0"
-                  onClick={() => setIsPreviewTrayOpen(true)}
+            {!criteriaViaLlm && (
+              <Flex.Item>
+                <View
+                  as="div"
+                  padding="0 0 0 medium"
+                  borderWidth="none none none medium"
+                  height="2.375rem"
                 >
-                  <IconEyeLine /> {I18n.t('Preview Rubric')}
-                </Link>
-              </View>
-            </Flex.Item>
+                  <Link
+                    as="button"
+                    data-testid="preview-rubric-button"
+                    isWithinText={false}
+                    margin="x-small 0 0 0"
+                    onClick={() => setIsPreviewTrayOpen(true)}
+                  >
+                    <IconEyeLine /> {I18n.t('Preview Rubric')}
+                  </Link>
+                </View>
+              </Flex.Item>
+            )}
           </Flex>
         </View>
       </div>

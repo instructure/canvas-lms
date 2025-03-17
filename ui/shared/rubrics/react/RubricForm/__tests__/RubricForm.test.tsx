@@ -70,6 +70,7 @@ describe('RubricForm Tests', () => {
           onSaveRubric={() => {}}
           accountId="1"
           showAdditionalOptions={true}
+          criteriaViaLlm={false}
           {...props}
         />
       </MockedQueryProvider>,
@@ -418,7 +419,11 @@ describe('RubricForm Tests', () => {
 
         const {queryAllByTestId, queryAllByText} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('criterion-row-rating-accordion')).toHaveLength(0)
-        expect(queryAllByText('This area will be used by the assessor to leave comments related to this criterion.')).toHaveLength(2)
+        expect(
+          queryAllByText(
+            'This area will be used by the assessor to leave comments related to this criterion.',
+          ),
+        ).toHaveLength(2)
       })
     })
 
