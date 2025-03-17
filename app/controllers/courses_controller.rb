@@ -1647,7 +1647,6 @@ class CoursesController < ApplicationController
       @course_settings_sub_navigation_tools = Lti::ContextToolFinder.new(
         @context,
         type: :course_settings_sub_navigation,
-        root_account: @domain_root_account,
         current_user: @current_user
       ).all_tools_sorted_array(
         exclude_admin_visibility: !@context.grants_right?(@current_user, session, :read_as_admin)
@@ -2411,7 +2410,6 @@ class CoursesController < ApplicationController
         @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
           @context,
           type: :course_home_sub_navigation,
-          root_account: @domain_root_account,
           current_user: @current_user
         ).all_tools_sorted_array(exclude_admin_visibility: !can_see_admin_tools)
 

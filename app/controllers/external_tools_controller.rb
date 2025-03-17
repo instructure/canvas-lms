@@ -132,7 +132,7 @@ class ExternalToolsController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       @tools = if params[:include_parents]
-                 Lti::ContextToolFinder.all_tools_for(@context, user: (params[:include_personal] ? @current_user : nil))
+                 Lti::ContextToolFinder.all_tools_for(@context, current_user: (params[:include_personal] ? @current_user : nil))
                else
                  Lti::ContextToolFinder.only_for(@context).active
                end
