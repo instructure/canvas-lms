@@ -29,18 +29,18 @@ module Lti
       include Rails.application.routes.url_helpers
 
       def external_tools_for(context, placements, options = {})
-        tools_options = {}
+        tools_options = {
+          placements:
+        }
         if options[:current_user]
           tools_options[:current_user] = options[:current_user]
-          tools_options[:user] = options[:current_user]
         end
         if options[:only_visible]
           tools_options[:only_visible] = options[:only_visible]
           tools_options[:session] = options[:session] if options[:session]
-          tools_options[:visibility_placements] = placements
         end
 
-        Lti::ContextToolFinder.all_tools_for(context, tools_options).placements(*placements)
+        Lti::ContextToolFinder.all_tools_for(context, **tools_options)
       end
 
       def message_handlers_for(context, placements)

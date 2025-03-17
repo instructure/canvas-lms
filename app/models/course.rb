@@ -4256,9 +4256,7 @@ class Course < ActiveRecord::Base
   end
 
   def quiz_lti_tool
-    context_external_tools.active.quiz_lti.first ||
-      account.context_external_tools.active.quiz_lti.first ||
-      root_account.context_external_tools.active.quiz_lti.first
+    Lti::ContextToolFinder.ordered_by_context_for(self).quiz_lti.first
   end
 
   def has_new_quizzes?
