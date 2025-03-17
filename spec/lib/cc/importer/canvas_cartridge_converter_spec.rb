@@ -1448,8 +1448,7 @@ describe "Canvas Cartridge importing" do
           "start_at" => 1_371_189_600_000,
           "end_at" => 1_371_189_600_000,
           "all_day" => false,
-          "description" => "<a href='discussion_topic_migration_id=stillnotreal'>hooray for bad links</a>",
-          "blackout_date" => false
+          "description" => "<a href='discussion_topic_migration_id=stillnotreal'>hooray for bad links</a>"
         },
                               {
                                 "migration_id" => "blahblahblah",
@@ -1457,8 +1456,7 @@ describe "Canvas Cartridge importing" do
                                 "start_at" => 1_371_189_600_000,
                                 "end_at" => 1_371_189_600_000,
                                 "all_day" => false,
-                                "description" => "<a href='http://thislinkshouldbeokaythough.com'>hooray for good links</a>",
-                                "blackout_date" => false
+                                "description" => "<a href='http://thislinkshouldbeokaythough.com'>hooray for good links</a>"
                               }]
       }.with_indifferent_access
 

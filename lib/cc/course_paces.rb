@@ -50,7 +50,6 @@ module CC
                 selected_days_to_skip_node.day_of_week day_of_week
               end
             end
-            course_pace_node.time_to_complete_calendar_days course_pace.time_to_complete_calendar_days if course_pace.time_to_complete_calendar_days
             course_pace_node.hard_end_dates course_pace.hard_end_dates
             add_exported_asset(course_pace)
             course_pace_node.module_items do |module_items_node|

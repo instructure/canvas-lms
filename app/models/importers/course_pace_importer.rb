@@ -43,7 +43,6 @@ module Importers
       course_pace.exclude_weekends = hash[:exclude_weekends]
       course_pace.selected_days_to_skip = hash[:selected_days_to_skip]
       course_pace.hard_end_dates = hash[:hard_end_dates]
-      course_pace.time_to_complete_calendar_days = hash[:time_to_complete_calendar_days]
       course_pace.save!
 
       # preload mapping from content tag migration id to id

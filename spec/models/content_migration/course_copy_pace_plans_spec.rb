@@ -35,7 +35,6 @@ describe ContentMigration do
       course_pace.published_at = Time.now.utc
       course_pace.selected_days_to_skip = NOT_EXCLUDE_WEEKENDS_WORK_WEEK_DAYS
       course_pace.hard_end_dates = true
-      course_pace.time_to_complete_calendar_days = 10
       course_pace.save!
 
       run_course_copy
@@ -49,7 +48,6 @@ describe ContentMigration do
       expect(course_pace_to.published_at.to_i).to eq course_pace.published_at.to_i
       expect(course_pace_to.selected_days_to_skip).to eq NOT_EXCLUDE_WEEKENDS_WORK_WEEK_DAYS
       expect(course_pace_to.hard_end_dates).to be true
-      expect(course_pace_to.time_to_complete_calendar_days).to eq 10
     end
 
     context "module items" do
