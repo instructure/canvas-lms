@@ -222,6 +222,7 @@ module CanvasSanitize # :nodoc:
                "aria-relevant",
                "aria-autocomplete",
                "aria-checked",
+               "aria-description",
                "aria-disabled",
                "aria-expanded",
                "aria-haspopup",
