@@ -1072,6 +1072,30 @@ describe DiscussionTopicsController do
         end
       end
 
+      context "insight" do
+        it "teacher cannot access insights when the feature is disabled" do
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: discussion.id }
+          expect(assigns.dig(:js_env, :user_can_access_insights)).to be false
+        end
+
+        it "teacher can access insights when the feature is enabled" do
+          Account.site_admin.enable_feature! :discussion_insights
+
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: discussion.id }
+          expect(assigns.dig(:js_env, :user_can_access_insights)).to be true
+        end
+
+        it "student cannot access insights when the feature is enabled" do
+          Account.site_admin.enable_feature! :discussion_insights
+
+          user_session(@student)
+          get "show", params: { course_id: @course.id, id: discussion.id }
+          expect(assigns.dig(:js_env, :user_can_access_insights)).to be false
+        end
+      end
+
       context "podcast_enabled" do
         it "adds Discussion Podcast Feed to header" do
           discussion.podcast_enabled = true
