@@ -278,7 +278,7 @@ describe('DiscussionSummary', () => {
           summary: {...expectedSummary, obsolete: true},
         })
 
-        const alert = getByText(/There have been new replies since this summary/)
+        const alert = getByText(/The discussion board has some new activity since this summary was generated/)
         expect(alert).toBeInTheDocument()
       })
 
@@ -287,7 +287,7 @@ describe('DiscussionSummary', () => {
           summary: expectedSummary,
         })
 
-        const alert = queryByText(/There have been new replies since this summary/)
+        const alert = queryByText(/The discussion board has some new activity since this summary was generated/)
         expect(alert).not.toBeInTheDocument()
       })
     })
