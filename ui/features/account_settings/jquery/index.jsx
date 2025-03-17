@@ -34,6 +34,9 @@ import '@instructure/date-js' // Date.parse
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import ReportDescription from '../react/account_reports/ReportDescription'
 
 const I18n = createI18nScope('account_settings')
 
@@ -42,17 +45,21 @@ let reportsTabHasLoaded = false
 const _settings_smallTablet = window.matchMedia('(min-width: 550px)').matches
 const _settings_desktop = window.matchMedia('(min-width: 992px)').matches
 
+let descMount
+let descRoot
+
 export function openReportDescriptionLink(event) {
   event.preventDefault()
+
+  const closeModal = () => {
+    descRoot.render(null)
+  }
   const title = $(this).parents('.title').find('span.title').text()
-  const $desc = $(this).parent('.reports').find('.report_description')
-  const responsiveWidth = _settings_desktop ? 800 : _settings_smallTablet ? 550 : 320
-  $desc.clone().dialog({
-    title,
-    width: responsiveWidth,
-    modal: true,
-    zIndex: 1000,
-  })
+  const desc = $(this).parent('.reports').find('.report_description').html()
+
+  if (descMount && descRoot) {
+    descRoot.render(<ReportDescription title={title} descHTML={desc} closeModal={closeModal} />)
+  }
 }
 
 export function addUsersLink(event) {
@@ -181,6 +188,8 @@ $(document).ready(function () {
           .then(html => {
             $('#tab-reports').html(html)
             renderDatetimeField($('#tab-reports .datetime_field'))
+            descMount = document.getElementById('report_desc_mount')
+            descRoot = ReactDOM.createRoot(descMount)
 
             $('.open_report_description_link').click(openReportDescriptionLink)
 
