@@ -2532,13 +2532,14 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@instructure/studio-player@0.3.9":
-  version "0.3.9"
-  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-0.3.9.tgz#204ebffec46f0dfd2b12037994b286114f3b76ee"
-  integrity sha512-WNqI++7iaRsuq49NanyHRLfanMwRmcMW3xPk/KF5mdtlBXg0QmlHp3Tw2o/pjM8lQ+DiGmviPtbTzFhtEiXd/A==
+"@instructure/studio-player@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@instructure/studio-player/-/studio-player-0.4.0.tgz#dd7314064bc8b19e5d43c1a8f9f5a7b4e2218d2d"
+  integrity sha512-h6kcl9zJmBna+XmOSbwAFf8neQwA6cIVRsm8xb5tZjBWrqeIuo7l09JFtwwagKipI2GKyvwAYXMUzX6GHMa7Sg==
   dependencies:
     "@floating-ui/react" "^0.27.3"
     "@vidstack/react" "^1.12.11"
+    clsx "^2.1.1"
     i18next "^24.2.1"
     i18next-resources-to-backend "^1.2.1"
     react "^18.3.1"
@@ -11379,6 +11380,11 @@ cloneable-readable@^1.0.0:
     inherits "^2.0.1"
     process-nextick-args "^2.0.0"
     readable-stream "^2.3.5"
+
+clsx@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/clsx/-/clsx-2.1.1.tgz#eed397c9fd8bd882bfb18deab7102049a2f32999"
+  integrity sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==
 
 co@^4.6.0:
   version "4.6.0"
