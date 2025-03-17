@@ -44,12 +44,12 @@
         visitor: {
           id: ENV.current_user_usage_metrics_id,
           canvasRoles: userRoles,
+          locale: ENV.LOCALE || 'en',
         },
         account: {
           id: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
           surveyOptOut: ENV.FEATURES['account_survey_notifications'],
         },
-        locale: ENV.LOCALE || 'en',
       });
     }, 1000);
   })('<%= usage_metrics_api_key %>');
