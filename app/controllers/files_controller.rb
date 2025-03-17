@@ -190,8 +190,8 @@ class FilesController < ApplicationController
 
   before_action { |c| c.active_tab = "files" }
 
-  def services_jwt_auth_allowed
-    %w[show api_show].include?(params[:action]) && Account.site_admin.feature_enabled?(:rce_linked_file_urls)
+  def token_auth_allowed?
+    %w[show api_show].include?(params[:action])
   end
 
   def verify_api_id

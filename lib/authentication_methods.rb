@@ -67,12 +67,12 @@ module AuthenticationMethods
     @authenticated_with_jwt = true
   end
 
-  def services_jwt_auth_allowed
+  def token_auth_allowed?
     false
   end
 
   def load_pseudonym_from_jwt
-    return unless api_request? || services_jwt_auth_allowed
+    return unless api_request? || token_auth_allowed?
 
     token_string = AuthenticationMethods.access_token(request)
     return unless token_string.present?
@@ -141,7 +141,7 @@ module AuthenticationMethods
   end
 
   def load_pseudonym_from_access_token
-    return unless api_request? ||
+    return unless api_request? || token_auth_allowed? ||
                   (params[:controller] == "oauth2_provider" && params[:action] == "destroy") ||
                   (params[:controller] == "login" && params[:action] == "session_token")
 

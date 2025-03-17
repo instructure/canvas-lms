@@ -134,6 +134,31 @@ describe AuthenticationMethods do
   end
 
   describe "#load_user" do
+    describe("load_pseudonym_from_access_token without /api/v1") do
+      before do
+        @controller = mock_controller_class.new(request: nil)
+        allow(@controller).to receive(:api_request?).and_return(false)
+      end
+
+      context "if the controller allows tokens" do
+        it "will check for OAUTH tokens" do
+          allow(@controller).to receive(:token_auth_allowed?).and_return(true)
+          allow(AuthenticationMethods).to receive(:access_token).and_return(nil)
+          expect(AuthenticationMethods).to receive(:access_token)
+          @controller.send(:load_pseudonym_from_access_token)
+        end
+      end
+
+      context "if the controller does not allow tokens" do
+        it "will not check for OAUTH tokens" do
+          allow(@controller).to receive(:token_auth_allowed?).and_return(false)
+          allow(AuthenticationMethods).to receive(:access_token).and_return(nil)
+          expect(AuthenticationMethods).not_to receive(:access_token)
+          @controller.send(:load_pseudonym_from_access_token)
+        end
+      end
+    end
+
     context "with active session" do
       before do
         @request = double(env: { "encrypted_cookie_store.session_refreshed_at" => 5.minutes.ago },
