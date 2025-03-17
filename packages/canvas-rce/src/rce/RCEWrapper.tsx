@@ -1135,6 +1135,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     // @ts-expect-error
     textarea.value = this.getCode()
     textarea.style.height = this.state.height
+    textarea.removeAttribute('aria-hidden')
 
     if (document.body.classList.contains('Underline-All-Links__enabled')) {
       if (this.iframe?.contentDocument) {
