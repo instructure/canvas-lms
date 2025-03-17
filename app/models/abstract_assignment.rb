@@ -282,6 +282,8 @@ class AbstractAssignment < ActiveRecord::Base
     false
   end
 
+  delegate :discussion_checkpoints_enabled?, to: :context
+
   def context_code
     "#{context_type.downcase}_#{context_id}"
   end
