@@ -1,4 +1,11 @@
 GIT
+  remote: https://github.com/Ameelio/canvas_inline_pdf.git
+  revision: f3ad78a9dddd6f136cf940d2cd82281f7dce97b6
+  ref: f3ad78a9dddd6f136cf940d2cd82281f7dce97b6
+  specs:
+    canvas_inline_pdf (0.1.0.alpha)
+
+GIT
   remote: https://github.com/instructure/rspecq.git
   revision: 34c2f3c2d7cbc6d546c347e6bffb82ef91e7429d
   specs:
@@ -1275,6 +1282,7 @@ DEPENDENCIES
   canvas_errors!
   canvas_ext!
   canvas_http!
+  canvas_inline_pdf!
   canvas_kaltura!
   canvas_link_migrator (~> 1.0.16)
   canvas_mimetype_fu!
