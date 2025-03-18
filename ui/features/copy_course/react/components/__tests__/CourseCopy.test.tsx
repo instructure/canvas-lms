@@ -22,6 +22,7 @@ import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {useTermsQuery} from '../../queries/termsQuery'
 import CourseCopy from '../CourseCopy'
+import {courseCopyRootKey, createCourseAndMigrationKey} from '../../types'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -33,7 +34,8 @@ jest.mock('../../queries/termsQuery')
 describe('CourseCopy', () => {
   const defaultProps = {
     courseId: '1',
-    accountId: '1',
+    accountId: '2',
+    rootAccountId: '3',
     canImportAsNewQuizzes: true,
   }
 
@@ -46,6 +48,30 @@ describe('CourseCopy', () => {
 
   afterEach(() => {
     mockUseMutation.mockReset()
+  })
+
+  it('should call terms query with rootAccountId', () => {
+    mockUseQuery.mockReturnValue({isLoading: true})
+    mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, hasNextPage: false})
+
+    render(<CourseCopy {...defaultProps} />)
+
+    expect(mockUseTermsQuery).toHaveBeenCalledWith(defaultProps.rootAccountId)
+  })
+
+  it('should set up useMutation with accountId in mutationKey', () => {
+    mockUseQuery.mockReturnValue({isLoading: true})
+    mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, hasNextPage: false})
+    mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false})
+
+    render(<CourseCopy {...defaultProps} />)
+
+    expect(mockUseMutation).toHaveBeenCalledWith(expect.objectContaining({
+      mutationKey: [courseCopyRootKey, createCourseAndMigrationKey, defaultProps.accountId],
+      mutationFn: expect.any(Function),
+      onSuccess: expect.any(Function),
+      onError: expect.any(Function),
+    }))
   })
 
   it('renders loading state on course loading', () => {
