@@ -23,9 +23,9 @@ set up at the account level.
 
 ## Types of Tool Integrations
 
-Canvas currently supports the following types of tool placements:
+Canvas currently supports the following types of tool placements.
 
-External tool <a href="file.assignment_tools.html" target="_blank">assignments integrations</a>:
+#### External tool <a href="file.assignment_tools.html" target="_blank" style="text-decoration: revert; color: revert;">assignments integrations</a>:
 
 This type of integration is part of the
 <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html" target="_blank">LTI 1.1
@@ -39,8 +39,7 @@ synchronize grades, and other assignment details.
 - Evaluating a student's ability to correctly draw notes at different musical intervals
 - Giving students credit for participating in an interactive lesson on the Civil War
 
-Adding a link/tab to the <a href="file.navigation_tools.html#course_navigation"
-target="_blank">course navigation</a>:
+#### Adding a link/tab to the <a href="file.navigation_tools.html#course_navigation" target="_blank" style="text-decoration: revert; color: revert;">course navigation</a>:
 
 Example use cases might include:
 
@@ -50,8 +49,7 @@ Example use cases might include:
 - Linking to campus communication hub
 - Displaying a course-level dashboard (ex: analytics, student engagement, risk assessment, etc.)
 
-Adding a link/tab to the <a href="file.navigation_tools.html#account_navigation"
-target="_blank">account navigation</a>:
+#### Adding a link/tab to the <a href="file.navigation_tools.html#account_navigation" target="_blank" style="text-decoration: revert; color: revert;">account navigation</a>:
 
 Example use cases might include:
 
@@ -59,17 +57,14 @@ Example use cases might include:
 - Building helper libraries for campus-specific customizations
 - Leveraging single sign-on for access to other systems, like SIS
 
-Adding a link/tab to the <a href="file.navigation_tools.html#user_navigation"
-target="_blank">
-user profile navigation</a>:
+#### Adding a link/tab to the <a href="file.navigation_tools.html#user_navigation" target="_blank" style="text-decoration: revert; color: revert;">user profile navigation</a>:
 
 Example use cases might include:
 
 - Leveraging single sign-on to student portal from within Canvas
 - Linking to an external user profile
 
-Selecting content to add to a variety of locations as <a
-href="file.content_item.html" target="_blank">LTI deep links</a>:
+#### Selecting content to add to a variety of locations as <a href="file.content_item.html" target="_blank" style="text-decoration: revert; color: revert;">LTI deep links</a>:
 
 Example use cases might include:
 
@@ -103,6 +98,9 @@ Example use cases might include:
   - A student chooses an item from a portfolio tool and submits the item to Canvas
 
 
+#### Subscribing to notifications with <a href="file.pns.html" target="_blank" style="text-decoration: revert; color: revert;">Platform Notification Service</a>:
+
+Platform Notification Service (PNS) enables server-to-server communication by allowing the Platform to send messages, known as Notices, to Tools outside the scope of an active user session. Tools can register a "webhook" or handler endpoint using PNS to receive specific types of Notices, facilitating seamless integration and automation.
 
 ## How to Configure/Import Integrated Tools
 
@@ -117,7 +115,7 @@ target="_blank">configure the tool by a tool-provided URL</a>
 (recommended), or <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-external-app-for-an-account-using-XML/ta-p/221"
 target="_blank">paste in the XML</a> that the tool provides.
 
-For information on how to programmatically configured external tools, so users
+For information on how to programmatically configure external tools, so users
 don't have to copy and paste URLs or XML, please see the Canvas
 <a href="external_tools.html">external tools API</a>.
 
@@ -126,7 +124,7 @@ Similar to LTI 1.1, tools built on the <a href="https://www.imsglobal.org/spec/l
 target="_blank">LTI 1.3 specification</a> can be configured by either supplying clients with a
 JSON block or URL that hosts the JSON. This JSON is used to determine the behavior of the tool
 within Canvas by <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140"
-target="_blank">configuring and LTI Developer Key</a>. Once the developer key is created and
+target="_blank">configuring an LTI Developer Key</a>. Once the developer key is created and
 turned on, users with sufficient permissions can
 <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-external-app-for-an-account-using-a-client/ta-p/202" target="_blank">install the
 tool using the developer key's client ID</a>.
@@ -144,7 +142,7 @@ access via that developer key. Below is the list of permissions available:
 | **Can create and update submission results for assignments associated with the tool**         | Allows use of the <a href="score.html" target="_blank">LTI Advantage Score API</a>                                                                        | https://purl.imsglobal.org/spec/lti-ags/scope/score                       |
 | **Can view Progress records associated with the context the tool is installed in**            | Allows use of the <a href="progress.html" target="_blank">Canvas LTI Progress API</a>, which is used during Score creation with an associated file        | https://canvas.instructure.com/lti-ags/progress/scope/show                |
 | **Can retrieve user data associated with the context the tool is installed in**               | Allows use of the <a href="names_and_role.html" target="_blank">LTI Advantage Names and Roles Provisioning Service</a>                                    | https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly |
-| **Can register event notice handlers using the Platform Notification Service (experimental)** | Allows use of the 1EdTech Platform Notification Service. *Under development and not available yet for general use.*                                       | https://purl.imsglobal.org/spec/lti/scope/noticehandlers                  |
+| **Can register event notice handlers using the Platform Notification Service** | Allows use of the 1EdTech Platform Notification Service.                                      | https://purl.imsglobal.org/spec/lti/scope/noticehandlers                  |
 | **Can fetch assets from the platform using the Asset Service (experimental)**                 | Allows use of the Asset Service (part of the 1EdTech Asset Processor specification). *Under development and not available yet for general use.*           | https://purl.imsglobal.org/spec/lti/scope/asset.readonly                  |
 | **Can create reports using the Asset Report Service (experimental)**                          | Allows use of the Asset Report Service (part of the 1EdTech Asset Processor specification). *Under development and not available yet for general use.*    | https://purl.imsglobal.org/spec/lti/scope/report                          |
 | **Can update or remove the tool's EULA accepted flag (experimental)**                         | Allows use of the EULA Service (part of the 1EdTech Asset Processor specification). *Under development and not available yet for general use.*            | https://purl.imsglobal.org/spec/lti/scope/eula                            |
