@@ -770,7 +770,9 @@ describe "context modules" do
 
   context "discussion_checkpoints" do
     before :once do
-      @course.root_account.enable_feature!(:discussion_checkpoints)
+      sub_account = Account.create!(name: "sub account", parent_account: Account.default)
+      @course.update!(account: sub_account)
+      @course.account.enable_feature!(:discussion_checkpoints)
       modules = create_modules(1, true)
 
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")

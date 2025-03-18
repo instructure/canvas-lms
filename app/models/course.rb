@@ -1551,7 +1551,9 @@ class Course < ActiveRecord::Base
   # Allows the account to be set directly
   belongs_to :account
 
-  delegate :discussion_checkpoints_enabled?, to: :root_account
+  def discussion_checkpoints_enabled?
+    account&.discussion_checkpoints_enabled?
+  end
 
   def wiki
     return super if wiki_id
