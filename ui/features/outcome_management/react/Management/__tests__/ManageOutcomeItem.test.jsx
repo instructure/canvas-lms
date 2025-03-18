@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render as rtlRender, fireEvent} from '@testing-library/react'
+import {render as rtlRender, fireEvent, screen} from '@testing-library/react'
 import ManageOutcomeItem from '../ManageOutcomeItem'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {MockedProvider} from '@apollo/client/testing'
@@ -86,8 +86,8 @@ describe('ManageOutcomeItem', () => {
   })
 
   it('renders title if title prop passed', () => {
-    const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    expect(getByText('Outcome Title')).toBeInTheDocument()
+    render(<ManageOutcomeItem {...defaultProps()} />)
+    expect(screen.getAllByText('Outcome Title')).toHaveLength(2)
   })
 
   it('does not render component if title prop not passed', () => {
