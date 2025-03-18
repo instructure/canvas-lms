@@ -3069,8 +3069,10 @@ ko:
       buttons: 
         cancel: 취소
         update: "협업 업데이트"
+      is_required: "이 필드가 필요함"
       labels: 
         description: "설명:"
+        document_name: "문서 이름"
         title: "협업 제목"
     errors: 
       cannot_load_collaboration: "협업을 로드할 수 없음"
@@ -3099,6 +3101,7 @@ ko:
             Google Docs는 그룹 프로젝트에서 협업하기에 좋은 곳입니다. Microsoft Word와 같으면서도 이메일을 주고 받지 않고 다른 사람들과 동시에 작업을 할 수 있게 해줍니다.
             
             **주의**: Google Docs 협업에 참여하려면 여러분과 협업자 모두 Google 계정이 필요합니다.
+      is_required: "이 필드가 필요함"
       labels: 
         collaboration_type: "협업에 사용:"
         description: "설명:"
