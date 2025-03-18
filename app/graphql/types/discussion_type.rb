@@ -96,7 +96,14 @@ module Types
         return lock_explanation(locked_info, "topic", object.context, { only_path: true, include_js: false })
       end
 
-      object.message
+      Loaders::ApiContentAttachmentLoader.for(object.context).load(object.message).then do |preloaded_attachments|
+        GraphQLHelpers::UserContent.process(object.message,
+                                            request: context[:request],
+                                            context: object.context,
+                                            user: current_user,
+                                            in_app: context[:in_app],
+                                            preloaded_attachments:)
+      end
     end
 
     field :lock_information, String, null: true

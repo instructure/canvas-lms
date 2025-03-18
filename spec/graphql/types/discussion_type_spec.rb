@@ -685,7 +685,7 @@ describe Types::DiscussionType do
         .with(@student, check_policies: true)
         .and_return({ can_view: true })
 
-      expect(GraphQLTypeTester.new(discussion, current_user: @student).resolve("message")).to eq discussion.message
+      expect(GraphQLTypeTester.new(discussion, current_user: @student, request: ActionDispatch::TestRequest.create).resolve("message")).to eq discussion.message
     end
 
     describe "delayed post" do
@@ -709,10 +709,10 @@ describe Types::DiscussionType do
 
         course_with_student(course: @course)
 
-        @delayed_type_with_student = GraphQLTypeTester.new(@delayed_discussion, current_user: @student)
-        @delayed_type_with_teacher = GraphQLTypeTester.new(@delayed_discussion, current_user: @teacher)
-        @nil_delayed_at_type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
-        @past_delayed_type_with_student = GraphQLTypeTester.new(@past_delayed_discussion, current_user: @student)
+        @delayed_type_with_student = GraphQLTypeTester.new(@delayed_discussion, current_user: @student, request: ActionDispatch::TestRequest.create)
+        @delayed_type_with_teacher = GraphQLTypeTester.new(@delayed_discussion, current_user: @teacher, request: ActionDispatch::TestRequest.create)
+        @nil_delayed_at_type_with_student = GraphQLTypeTester.new(discussion, current_user: @student, request: ActionDispatch::TestRequest.create)
+        @past_delayed_type_with_student = GraphQLTypeTester.new(@past_delayed_discussion, current_user: @student, request: ActionDispatch::TestRequest.create)
       end
 
       it "exposes title field" do
@@ -816,7 +816,7 @@ describe Types::DiscussionType do
     end
 
     it "returns module lock information" do
-      type_with_student = GraphQLTypeTester.new(@topic, current_user: @student)
+      type_with_student = GraphQLTypeTester.new(@topic, current_user: @student, request: ActionDispatch::TestRequest.create)
       resolved_message = type_with_student.resolve("message")
 
       canvaslms_url = resolved_message.match(/x-canvaslms-trusted-url='([^']+)'/)
@@ -825,7 +825,7 @@ describe Types::DiscussionType do
     end
 
     it "does not return locked module information when you are the teacher" do
-      teacher_type = GraphQLTypeTester.new(@topic, current_user: @teacher)
+      teacher_type = GraphQLTypeTester.new(@topic, current_user: @teacher, request: ActionDispatch::TestRequest.create)
       expect(teacher_type.resolve("message")).to eq @topic.message
     end
   end
