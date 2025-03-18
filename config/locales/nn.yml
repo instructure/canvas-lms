@@ -6273,8 +6273,10 @@ nn:
       buttons: 
         cancel: Avbryt
         update: "Oppdater samarbeid"
+      is_required: "Dette feltet er obligatorisk"
       labels: 
         description: "Skildring:"
+        document_name: "Dokumentnamn:"
         title: Samarbeidstittel
     edit_button: 
       links: 
@@ -6306,6 +6308,7 @@ nn:
             Google Docs er ei fantastisk plattform for samarbeid i gruppeprosjekt.  Det liknar på Microsoft Word, men du kan arbeide saman med andre på same fila til same tid utan å måtte sende ho rundt med e-post.
             
             **Åtvaring**: du (og alle samarbeidspartnarane) treng ein Google-konto for å kunne ta del i alt samarbeid gjennom Google Docs.
+      is_required: "Dette feltet er obligatorisk"
       labels: 
         collaboration_type: "Samarbeid ved å bruke:"
         description: "Skildring:"
