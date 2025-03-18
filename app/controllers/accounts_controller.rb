@@ -382,7 +382,8 @@ class AccountsController < ApplicationController
   def course_creation_accounts
     return render json: [] unless @current_user
 
-    accounts = @current_user.adminable_accounts || []
+    adminable_accounts = @current_user.adminable_accounts
+    accounts = adminable_accounts || []
     accounts = accounts.select { |a| a.grants_any_right?(@current_user, session, :manage_courses_admin, :manage_courses_add) }
     sub_accounts = []
     # Load and handle ids from now on to avoid excessive memory usage
@@ -423,7 +424,9 @@ class AccountsController < ApplicationController
     account_active_records = Account.where(id: accounts)
     accounts_json = accounts.map do |a|
       a = account_active_records.find { |ar| ar.id == a }
-      account_json(a, @current_user, session, [], false)
+      hash = account_json(a, @current_user, session, [], false)
+      hash[:adminable] = adminable_accounts.include?(a) if Account.site_admin.feature_enabled?(:enhanced_course_creation_account_fetching)
+      hash
     end
     render json: accounts_json
   end

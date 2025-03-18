@@ -2228,6 +2228,37 @@ describe AccountsController do
         expect(response).to be_successful
         expect(json_parse(response.body).pluck("name")).to match_array(["Default Account", "Manually-Created Courses"])
       end
+
+      context "enhanced_course_creation_account_fetching enabled" do
+        before :once do
+          @user = user_factory(active_all: true)
+          Account.site_admin.enable_feature!(:enhanced_course_creation_account_fetching)
+        end
+
+        it "adminable flag is returned for accounts where the user has manage_courses_admin permission" do
+          # sub account admin with creation rights
+          Account.create!(name: "Sub Account", parent_account: Account.default).account_users.create!(user: @user)
+
+          Account.create!(name: "Teacher Creator #2").update(settings: { teachers_can_create_courses: true, students_can_create_courses: true })
+          course_with_teacher(user: @user, active_all: true, account: Account.last)
+
+          Account.create!(name: "Teacher Creator #3").update(settings: { teachers_can_create_courses: true, students_can_create_courses: true })
+          course_with_teacher(user: @user, active_all: true, account: Account.last)
+
+          user_session @user
+          get "course_creation_accounts"
+          expect(response).to be_successful
+          accounts = json_parse(response.body)
+
+          adminable_account = accounts.find { |a| a["name"] == "Sub Account" }
+          expect(adminable_account["adminable"]).to be true
+
+          not_adminable_account = accounts.filter { |a| a["name"] != "Sub Account" }
+          not_adminable_account.each do |account|
+            expect(account["adminable"]).to be false
+          end
+        end
+      end
     end
   end
 
