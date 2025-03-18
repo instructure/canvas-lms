@@ -142,16 +142,31 @@ describe ObserverAlertsApiController, type: :request do
       end
     end
 
-    it "filters out expired AccountNotifications" do
+    it "filters out expired or deleted AccountNotifications" do
       account = @course.root_account
       account_admin_user(account:)
       ObserverAlertThreshold.create!(observer: @observer, student: @student, alert_type: "institution_announcement")
       @observer.user_account_associations.create!(account:, depth: 0) # ordinarily this would happen in an after transaction commit callback
-      account.announcements.create!(user: @admin, subject: "expired", message: "...", start_at: 1.day.ago, end_at: 1.hour.ago)
-      active = account.announcements.create!(user: @admin, subject: "active", message: "...", start_at: 1.day.ago, end_at: 1.day.from_now)
+      account.announcements.create!(
+        user: @admin,
+        subject: "expired",
+        message: "...",
+        start_at: 1.day.ago,
+        end_at: 1.hour.ago
+      )
+      account.announcements.create!(
+        user: @admin,
+        subject: "this one is deleted",
+        message: "...",
+        start_at: 1.day.ago,
+        end_at: 1.day.from_now,
+        workflow_state: "deleted"
+      )
+      expected = account.announcements.create!(user: @admin, subject: "not expired nor deleted", message: "...", start_at: 1.day.ago, end_at: 1.day.from_now)
       json = api_call_as_user(@observer, :get, @path, @params)
       account_notification_alerts = json.select { |row| row["context_type"] == "AccountNotification" }
-      expect(account_notification_alerts.pluck("context_id")).to eq [active.id]
+
+      expect(account_notification_alerts.pluck("context_id")).to eq [expected.id]
     end
   end
 

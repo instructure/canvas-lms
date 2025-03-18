@@ -122,6 +122,7 @@ describe "Account Notification API", type: :request do
       it "includes closed flag for notifications when show_is_closed is true" do
         @user.close_announcement(@notification)
         json = api_call(:get, @path, @api_params)
+
         expect(json.length).to eq 2
         expect(json.first["closed"]).to be true
         expect(json.second["closed"]).to be false
@@ -130,7 +131,7 @@ describe "Account Notification API", type: :request do
       it "does not include closed flag for notifications when show_is_closed is false" do
         @user.close_announcement(@notification)
         json = api_call(:get, @path, @api_params.merge(show_is_closed: false))
-        puts json
+
         expect(json.length).to eq 2
         expect(json.first["closed"]).to be_nil
         expect(json.second["closed"]).to be_nil
@@ -194,20 +195,20 @@ describe "Account Notification API", type: :request do
         expect(json.length).to eq 0
       end
 
-      it "does not delete the notification unless the remove parameter has the value true" do
+      it "does not soft-delete the notification unless the remove parameter has the value true" do
         expect(AccountNotification.find_by(id: @a.id)).not_to be_nil
 
         api_call(:delete, @path, @api_params.merge(remove: ""))
         expect(response).to have_http_status :ok
-        expect(AccountNotification.find_by(id: @a.id)).not_to be_nil
+        expect(AccountNotification.find_by(id: @a.id).active?).to be true
       end
 
-      it "deletes the notification if a remove=true parameter is passed" do
+      it "soft-deletes the notification if a remove=true parameter is passed" do
         expect(AccountNotification.find_by(id: @a.id)).not_to be_nil
 
         api_call(:delete, @path, @api_params.merge(remove: "true"))
         expect(response).to have_http_status :ok
-        expect(AccountNotification.find_by(id: @a.id)).to be_nil
+        expect(AccountNotification.find_by(id: @a.id).deleted?).to be true
       end
     end
 

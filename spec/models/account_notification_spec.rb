@@ -547,7 +547,7 @@ describe AccountNotification do
       end
     end
 
-    context "queue_message_broadcast" do
+    context "queue_message_broadcast hook" do
       it "does not let site admin account notifications even try" do
         an = account_notification(account: Account.site_admin)
         an.send_message = true
@@ -570,6 +570,13 @@ describe AccountNotification do
         an.messages_sent_at = 1.day.ago
         an.send_message = true
         expect { an.save! }.not_to change(Delayed::Job, :count)
+      end
+
+      it "does not call queue_message_broadcast when soft deleting an account notification" do
+        an = account_notification(account: Account.default, send_message: true)
+        allow(an).to receive(:queue_message_broadcast).and_call_original
+        an.destroy
+        expect(an).not_to have_received(:queue_message_broadcast)
       end
     end
 
@@ -626,6 +633,36 @@ describe AccountNotification do
         expect(BroadcastPolicy.notifier).to receive(:send_notification).ordered.with(*send_notification_args(user_ids)).and_call_original
         an.broadcast_messages
         expect(Message.count).to eq initial_message_count
+      end
+    end
+
+    describe "create_alert hook" do
+      context "when saving a new account notification" do
+        let(:account) { Account.create! }
+        let(:unsaved_notification) do
+          account.announcements.build(
+            subject: "my subject",
+            message: "my message",
+            start_at: 5.minutes.ago.utc,
+            end_at: 1.day.from_now.utc,
+            user: User.create!
+          )
+        end
+
+        it "calls create_alert" do
+          expect(unsaved_notification).to receive(:create_alert)
+          unsaved_notification.save!
+        end
+      end
+
+      context "when soft deleting an account notification" do
+        let!(:notification) { account_notification(account: Account.default, send_message: true) }
+
+        it "does not call create_alert" do
+          allow(notification).to receive(:create_alert).and_call_original
+          notification.destroy
+          expect(notification).not_to have_received(:create_alert)
+        end
       end
     end
   end
