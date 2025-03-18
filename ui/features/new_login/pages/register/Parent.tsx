@@ -283,9 +283,6 @@ const Parent = () => {
 
   const handleNameChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setName(value)
-    if (value.trim() !== '' && nameError) {
-      setNameError('')
-    }
   }
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
