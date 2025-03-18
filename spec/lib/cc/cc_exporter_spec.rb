@@ -1522,6 +1522,43 @@ describe "Common Cartridge exporting" do
     end
   end
 
+  context "when adding files to zip" do
+    let(:content_export) { ContentExport.new(context: course_model) }
+    let(:cc_exporter) { CC::CCExporter.new(content_export) }
+
+    before do
+      @export_dir = Dir.mktmpdir
+      @zip_path = File.join(@export_dir, "test-export.zip")
+      @zip_file = Zip::File.new(@zip_path, Zip::File::CREATE)
+    end
+
+    after do
+      @zip_file.close
+      FileUtils.remove_entry @export_dir
+    end
+
+    it "skips file if it already exists in zip" do
+      file_path = "test_file.txt"
+      file_full_path = File.join(@export_dir, file_path)
+      File.write(file_full_path, "test content")
+
+      # First add the file to zip manually
+      @zip_file.add(file_path, file_full_path)
+      @zip_file.commit
+
+      cc_exporter.instance_variable_set(:@zip_file, @zip_file)
+      cc_exporter.instance_variable_set(:@export_dirs, [@export_dir])
+      cc_exporter.instance_variable_set(:@export_dir, @export_dir)
+
+      # Should not raise an error when trying to add the same file again
+      expect { cc_exporter.send(:copy_all_to_zip) }.not_to raise_error
+
+      entry = @zip_file.find_entry(file_path)
+      expect(entry).not_to be_nil
+      expect(entry.get_input_stream.read).to eq "test content"
+    end
+  end
+
   describe "#disable_content_rewriting" do
     subject { cc_exporter.disable_content_rewriting }
 
