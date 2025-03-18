@@ -72,7 +72,7 @@ const SearchBar = ({initialValue = ''}: SearchBarProps) => {
     <View as="div">
       <form name="files-search" autoComplete="off" onSubmit={handleSearch}>
         <Flex>
-          <Flex.Item shouldGrow>
+          <Flex.Item shouldGrow shouldShrink>
             <TextInput
               renderLabel={<ScreenReaderContent>{I18n.t('Search files...')}</ScreenReaderContent>}
               placeholder={I18n.t('Search files...')}

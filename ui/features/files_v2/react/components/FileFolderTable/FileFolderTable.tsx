@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useContext, useEffect, useMemo, useState, useRef} from 'react'
+import React, {useCallback, useEffect, useMemo, useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -50,6 +49,8 @@ import CurrentDownloads from '../FilesHeader/CurrentDownloads'
 import UsageRightsModal from './UsageRightsModal'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import FileTableUpload from './FileTableUpload'
+import {UpdatedAtDate} from './UpdatedAtDate'
+import {ModifiedByLink} from './ModifiedByLink'
 
 const I18n = createI18nScope('files_v2')
 
@@ -165,18 +166,16 @@ const columnRenderers: {
 } = {
   name: ({row, rows, isStacked}) => <NameLink isStacked={isStacked} item={row} collection={rows} />,
   created_at: ({row}) => <FriendlyDatetime dateTime={row.created_at} />,
-  updated_at: ({row}) => (
-    <div style={{padding: '0 0.5em'}}>
-      <FriendlyDatetime dateTime={row.updated_at} />
-    </div>
+  updated_at: ({row, isStacked}) => (
+    <UpdatedAtDate updatedAt={row.updated_at} isStacked={isStacked} />
   ),
-  modified_by: ({row}) =>
+  modified_by: ({row, isStacked}) =>
     'user' in row && row.user?.display_name ? (
-      <Link isWithinText={false} href={row.user.html_url}>
-        <div style={{textOverflow: 'ellipsis', overflow: 'hidden'}}>
-          <Text>{row.user.display_name}</Text>
-        </div>
-      </Link>
+      <ModifiedByLink
+        htmlUrl={row.user.html_url}
+        displayName={row.user.display_name}
+        isStacked={isStacked}
+      />
     ) : null,
   size: ({row}) =>
     'size' in row ? <Text>{friendlyBytes(row.size)}</Text> : <Text>{I18n.t('--')}</Text>,
@@ -405,12 +404,9 @@ const FileFolderTable = ({
     )
   }, [
     folderBreadcrumbs,
-    rows.length,
     selectedRows,
     size,
-    folderBreadcrumbs,
     searchString,
-    selectedRows,
     rows,
     userCanEditFilesForContext,
     userCanDeleteFilesForContext,
@@ -463,7 +459,7 @@ const FileFolderTable = ({
 
   const handleDrop = (
     accepted: ArrayLike<DataTransferItem | globalThis.File>,
-    rejected: ArrayLike<DataTransferItem | globalThis.File>,
+    _rejected: ArrayLike<DataTransferItem | globalThis.File>,
     e: React.DragEvent<Element>,
   ) => {
     e.preventDefault()
@@ -489,7 +485,7 @@ const FileFolderTable = ({
         onDragEnter={e => handleDragEnter(e as React.DragEvent<HTMLDivElement>)}
         onDragLeave={e => handleDragLeave(e as React.DragEvent<HTMLDivElement>)}
         onDragOver={e => e.preventDefault()}
-        onDrop={e => handleDropState()}
+        onDrop={_e => handleDropState()}
       >
         <Table
           caption={tableCaption}

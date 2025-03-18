@@ -75,16 +75,7 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
 
   const renderIconComponent = () => {
     if (iconUrl) {
-      return (
-        <Img
-          src={iconUrl}
-          width={pxSize}
-          height={pxSize}
-          margin="0 x-small 0 0"
-          alt=""
-          data-testid="name-icon"
-        />
-      )
+      return <Img src={iconUrl} width={pxSize} height={pxSize} alt="" data-testid="name-icon" />
     }
     return isStacked ? (
       <>{icon}</>
@@ -96,7 +87,7 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
   const renderTextComponent = () => {
     return isStacked ? (
       <View margin="0 0 0 xx-small">
-        <Text>{name}</Text>
+        <span style={{wordBreak: 'break-all'}}>{name}</span>
       </View>
     ) : (
       <div style={{whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden'}}>
