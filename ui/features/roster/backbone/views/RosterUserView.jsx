@@ -78,6 +78,8 @@ export default class RosterUserView extends View {
     this.permissionsJSON(json)
     this.observerJSON(json)
     this.contextCardJSON(json)
+    // Set flag based on whether the user is selected in the collection
+    json.isSelected = this.model.collection?.selectedUserIds?.includes(this.model.id) ?? false
     return json
   }
 
@@ -336,23 +338,23 @@ export default class RosterUserView extends View {
     return this[method].call(this, e)
   }
 
-  // you can access the selected users through RosterUserView.selectedUsers
-  static selectedUsers = []
-
   handleCheckboxChange(e) {
     const isChecked = $(e.currentTarget).is(':checked')
     const userId = this.model.id
+    const selectedUserIds = this.model.collection.selectedUserIds
 
     if (isChecked) {
-      RosterUserView.selectedUsers.push(userId)
+      if (!selectedUserIds.includes(userId)) {
+        selectedUserIds.push(userId)
+      }
     } else {
-      RosterUserView.selectedUsers = RosterUserView.selectedUsers.filter(id => id !== userId)
+      this.model.collection.selectedUserIds = selectedUserIds.filter(id => id !== userId)
     }
 
     MessageBus.trigger('userSelectionChanged', {
       model: this.model,
       selected: isChecked,
-      selectedUsers: RosterUserView.selectedUsers,
+      selectedUsers: this.model.collection.selectedUserIds,
     })
   }
 

@@ -25,6 +25,7 @@ describe "Differentiation Tag Management" do
 
   before :once do
     course_with_teacher active_user: true, active_course: true, active_enrollment: true, name: "Teacher Example"
+    @other_student ||= student_in_course(active_all: true, name: "other_student@test.com").user
     student_in_course(active_all: true, name: "student@test.com")
     ta_in_course(active_all: true)
 
@@ -546,6 +547,77 @@ describe "Differentiation Tag Management" do
             expect(fj("h2:contains('Create Tag')")).to be_displayed
             expect(f(".flashalert-message")).to be_displayed
           end
+        end
+      end
+
+      context "user selection persistence" do
+        it "retains checked users across a search and applies a single tag to both" do
+          # Check first student on the initial people page
+          f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
+
+          # Perform a search that brings in the second student (@other_student)
+          search_box = f("input[placeholder='Search people']")
+          search_box.send_keys("other")
+          wait_for_ajaximations
+
+          # Check the second student from the search results
+          f("input[type='checkbox'][aria-label='Select #{@other_student.name}']").click
+          expect(f("input[type='checkbox'][aria-label='Select #{@other_student.name}']").attribute("checked")).to be_truthy
+
+          # Clear the search to display the full people list
+          search_box.clear
+          search_box.send_keys(" ")
+          search_box.send_keys(:backspace)
+
+          wait_for_ajaximations
+
+          # Verify that both students remain checked
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
+          expect(f("input[type='checkbox'][aria-label='Select #{@other_student.name}']").attribute("checked")).to be_truthy
+
+          # Open the 'Tag As' menu and tag both with a single tag variant
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+          force_click("span:contains('#{@single_tag_1.name}')")
+          wait_for_ajaximations
+
+          # Verify that both users have been tagged with the single tag
+          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include(@single_tag_1.id)
+          expect(@other_student.current_differentiation_tag_memberships.pluck(:group_id)).to include(@single_tag_1.id)
+        end
+
+        it "retains checked users across a role filter search and applies a multiple tag variant to both" do
+          # Check first student on the initial people page
+          f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
+
+          # Use the role filter dropdown (assumed to have id 'role-filter') to filter by "Student"
+          student_role_id = Role.where(name: "StudentEnrollment", root_account_id: @course.account.id).first.id
+          click_option("select[name=enrollment_role_id]", student_role_id.to_s, :value)
+          wait_for_ajaximations
+
+          # Check the second student from the filtered results
+          f("input[type='checkbox'][aria-label='Select #{@other_student.name}']").click
+          expect(f("input[type='checkbox'][aria-label='Select #{@other_student.name}']").attribute("checked")).to be_truthy
+
+          # Clear the role filter by selecting "All"
+          click_option("select[name=enrollment_role_id]", "All Roles")
+          wait_for_ajaximations
+
+          # Verify that both checkboxes remain checked
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
+          expect(f("input[type='checkbox'][aria-label='Select #{@other_student.name}']").attribute("checked")).to be_truthy
+
+          # Open the 'Tag As' menu and tag both with a multiple tag variant
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+          force_click("span:contains('#{@multiple_tags_1.name}')")
+          wait_for_ajaximations
+
+          # Verify that both users have been tagged with the multiple tag variant
+          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include(@multiple_tags_1.id)
+          expect(@other_student.current_differentiation_tag_memberships.pluck(:group_id)).to include(@multiple_tags_1.id)
         end
       end
     end
