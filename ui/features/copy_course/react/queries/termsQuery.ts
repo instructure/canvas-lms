@@ -50,9 +50,9 @@ export const termsQuery = async ({
   return doFetchApi<EnrollmentTerms>({path, fetchOpts})
 }
 
-export const useTermsQuery = (accountId: string) => {
+export const useTermsQuery = (rootAccountId: string) => {
   const {isLoading, isError, data, hasNextPage} = useAllPages({
-    queryKey: [courseCopyRootKey, enrollmentTermsFetchKey, accountId],
+    queryKey: [courseCopyRootKey, enrollmentTermsFetchKey, rootAccountId],
     queryFn: termsQuery,
     getNextPageParam: getTermsNextPage,
     meta: {fetchAtLeastOnce: true},

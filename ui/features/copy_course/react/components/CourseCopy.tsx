@@ -51,12 +51,14 @@ export const onErrorCallback = () => {
 export const CourseCopy = ({
   courseId,
   accountId,
+  rootAccountId,
   userTimeZone,
   courseTimeZone,
   canImportAsNewQuizzes,
 }: {
   courseId: string
   accountId: string
+  rootAccountId: string
   userTimeZone?: string
   courseTimeZone?: string
   canImportAsNewQuizzes: boolean
@@ -67,7 +69,7 @@ export const CourseCopy = ({
     meta: {fetchAtLeastOnce: true},
   })
 
-  const termsQueryResult = useTermsQuery(accountId)
+  const termsQueryResult = useTermsQuery(rootAccountId)
 
   const mutation = useMutation({
     mutationKey: [courseCopyRootKey, createCourseAndMigrationKey, accountId],
