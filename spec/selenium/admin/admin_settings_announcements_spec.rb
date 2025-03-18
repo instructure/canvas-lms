@@ -82,7 +82,7 @@ describe "settings tabs" do
       f(".delete_notification_link").click
       accept_alert
       wait_for_ajaximations
-      expect(AccountNotification.count).to eq 0
+      expect(AccountNotification.active.count).to eq 0
     end
 
     it "checks title length" do
@@ -156,7 +156,7 @@ describe "settings tabs" do
       wait_for_ajax_requests
 
       # Checking if copied content has been saved as new item
-      expect(AccountNotification.count).to eq 2
+      expect(AccountNotification.active.count).to eq 2
     end
 
     it "resets form properly on new announcement" do
