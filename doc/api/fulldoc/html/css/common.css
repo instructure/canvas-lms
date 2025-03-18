@@ -534,6 +534,7 @@ table.response-fields td.param-desc ul {
   width: 10em;
 }
 
+.lti-pns-image,
 .lti-placement-image {
   width: 100%;
 }
