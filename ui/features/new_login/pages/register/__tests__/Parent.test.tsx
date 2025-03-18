@@ -180,6 +180,16 @@ describe('Parent', () => {
         screen.queryByText('You must accept the terms to create an account.'),
       ).not.toBeInTheDocument()
     })
+
+    it('does not clear the name error until submit is clicked again', async () => {
+      setup()
+      await userEvent.click(screen.getByTestId('submit-button'))
+      expect(await screen.findByText('Name is required.')).toBeInTheDocument()
+      await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
+      expect(screen.queryByText('Name is required.')).toBeInTheDocument()
+      await userEvent.click(screen.getByTestId('submit-button'))
+      expect(screen.queryByText('Name is required.')).not.toBeInTheDocument()
+    })
   })
 
   describe('form submission', () => {

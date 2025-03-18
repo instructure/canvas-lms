@@ -112,10 +112,10 @@ describe('Student', () => {
         termsOfUseUrl: 'http://www.example.com/terms',
         termsRequired: true,
       }))
-      setup()
     })
 
     it('shows an error for a missing name and focuses the name input', async () => {
+      setup()
       await userEvent.click(screen.getByTestId('submit-button'))
       expect(await screen.findByText('Name is required.')).toBeInTheDocument()
       expect(document.activeElement).toBe(screen.getByTestId('name-input'))
@@ -125,6 +125,7 @@ describe('Student', () => {
     })
 
     it('shows an error for a missing username and focuses the username input', async () => {
+      setup()
       await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
       await userEvent.click(screen.getByTestId('submit-button'))
       expect(await screen.findByText('Username is required.')).toBeInTheDocument()
@@ -135,6 +136,7 @@ describe('Student', () => {
     })
 
     it('shows an error when the password is missing and focuses the password input', async () => {
+      setup()
       await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
       await userEvent.type(screen.getByTestId('username-input'), 'validusername')
       await userEvent.click(screen.getByTestId('submit-button'))
@@ -146,6 +148,7 @@ describe('Student', () => {
     })
 
     it('validates that passwords match and focuses the confirm password input', async () => {
+      setup()
       await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
       await userEvent.type(screen.getByTestId('username-input'), 'validusername')
       await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
@@ -160,6 +163,7 @@ describe('Student', () => {
     })
 
     it('validates the join code field and focuses the join code input', async () => {
+      setup()
       await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
       await userEvent.type(screen.getByTestId('username-input'), 'validusername')
       await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
@@ -173,6 +177,7 @@ describe('Student', () => {
     })
 
     it('validates the email field when required and focuses the email input', async () => {
+      setup()
       await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
       await userEvent.type(screen.getByTestId('username-input'), 'validusername')
       await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
@@ -187,6 +192,7 @@ describe('Student', () => {
     })
 
     it('validates the terms checkbox when required', async () => {
+      setup()
       await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
       await userEvent.type(screen.getByTestId('username-input'), 'validusername')
       await userEvent.type(screen.getByTestId('password-input'), 'ValidPassword123!')
@@ -202,6 +208,16 @@ describe('Student', () => {
       expect(
         screen.queryByText('You must accept the terms to create an account.'),
       ).not.toBeInTheDocument()
+    })
+
+    it('does not clear the name error until submit is clicked again', async () => {
+      setup()
+      await userEvent.click(screen.getByTestId('submit-button'))
+      expect(await screen.findByText('Name is required.')).toBeInTheDocument()
+      await userEvent.type(screen.getByTestId('name-input'), 'John Doe')
+      expect(screen.queryByText('Name is required.')).toBeInTheDocument()
+      await userEvent.click(screen.getByTestId('submit-button'))
+      expect(screen.queryByText('Name is required.')).not.toBeInTheDocument()
     })
   })
 
