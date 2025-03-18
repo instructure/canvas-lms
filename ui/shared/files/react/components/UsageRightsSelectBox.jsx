@@ -21,6 +21,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import filesEnv from '../modules/filesEnv'
+import { Text } from '@instructure/ui-text'
 
 const I18n = createI18nScope('usageRightsSelectBox')
 
@@ -80,10 +81,18 @@ export default class UsageRightsSelectBox extends React.Component {
     usageRightSelectionValue: this.props.use_justification
       ? this.props.use_justification
       : undefined,
+    validationError: false,
   }
 
   componentDidMount() {
     this.getUsageRightsOptions()
+    $(document).on("validateUsageRightsSelectedValue", (_e, data) => {
+      this.setValidationError(!!data.error)
+    })
+  }
+
+  setValidationError(validationError) {
+    this.setState({validationError})
   }
 
   apiUrl() {
@@ -122,7 +131,7 @@ export default class UsageRightsSelectBox extends React.Component {
       showMessage: this.props.showMessage && event.target.value === 'choose',
     })
     if(this.props.hideErrors)
-      this.props.hideErrors('usage_rights_use_justification_errors')
+      this.props.hideErrors()
   }
 
   // This method only really applies to firefox which doesn't handle onChange
@@ -197,7 +206,7 @@ export default class UsageRightsSelectBox extends React.Component {
       <div className="UsageRightsSelectBox__container">
         <div className="control-group">
           <label className="control-label" htmlFor="usageRightSelector">
-            {I18n.t('Usage Rights')}<span style={{ fontSize: "1.5em", position: "relative", top: "0.2em" }}>*</span>:
+            {I18n.t('Usage Rights')}<Text color={this.state.validationError ? 'danger' : 'primary'}>*</Text>:
           </label>
           <div className="controls">
             <select

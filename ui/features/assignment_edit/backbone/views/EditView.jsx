@@ -134,6 +134,7 @@ const ALLOWED_EXTENSIONS_INPUT_NAME = 'allowed_extensions'
 const ONLINE_SUBMISSION_CHECKBOXES_GROUP = 'online_submission_types[online_text_entry]'
 const DEFAULT_TOOL_LAUNCH_BUTTON = 'default-tool-launch-button'
 const SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON = 'assignment_submission_type_selection_launch_button'
+const USAGE_RIGHTS_SELECT = 'usage_rights_use_justification'
 
 /*
 xsslint safeString.identifier srOnly
@@ -919,12 +920,15 @@ EditView.prototype.renderAnnotatedDocumentUsageRightsSelectBox = function () {
   if (annotatedDocument) {
     contextType = annotatedDocument.contextType
     contextId = annotatedDocument.contextId
-    const hideErrors = this.hideErrors
+    const clearUsageRightsErrors = () => {
+      $(document).trigger('validateUsageRightsSelectedValue', {error: false})
+      this.hideErrors('usage_rights_use_justification_errors')
+    }
     ReactDOM.render(
       React.createElement(UsageRightsSelectBox, {
         contextType,
         contextId,
-        hideErrors
+        hideErrors: clearUsageRightsErrors,
       }),
       document.querySelector(USAGE_RIGHTS_CONTAINER),
     )
@@ -1587,7 +1591,7 @@ EditView.prototype.showErrors = function (errors) {
       if (element) {
         element.setAttribute("aria-describedby", errorsContainerID)
 
-        if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, DEFAULT_TOOL_LAUNCH_BUTTON, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON].includes(key)) {
+        if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, DEFAULT_TOOL_LAUNCH_BUTTON, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON, USAGE_RIGHTS_SELECT].includes(key)) {
           const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
           this.getElement(selector)?.classList.add('error-outline')
         }
@@ -1625,7 +1629,6 @@ EditView.prototype.sortErrorsByVerticalScreenPosition = function (errors) {
 
       const elementRect = errorElement.getBoundingClientRect()
       const verticalPosition = elementRect.top + window.scrollY
-
       return { errorKey, errorMessage, verticalPosition }
     })
     .filter(errorEntry => errorEntry !== null)
@@ -1640,7 +1643,11 @@ EditView.prototype.getElement = function (key) {
   const byId = document.getElementById(key)
   if (byId) return byId
 
-  const byName = document.querySelector(`[name="${key}"]`)
+  // This check is necessary because some elements may share the same name attribute 
+  // but have the `hidden` attribute set. 
+  // These hidden elements should be excluded from the selection to ensure 
+  // we only target visible elements in the DOM.
+  const byName = document.querySelector(`[name="${key}"]:not([type="hidden"])`)
   if (byName) return byName
 
   const byCustomSelector =  document.querySelector(EditView.prototype.fieldSelectors[key])
@@ -1660,7 +1667,7 @@ EditView.prototype.hideErrors = function (containerId) {
     delete this.errorRoots[containerId]
 
     const key = containerId.replace(/_errors$/, '')
-    if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON].includes(key)) {
+    if ([EXTERNAL_TOOL_URL_INPUT_NAME, ASSIGNMENT_NAME_INPUT_NAME, POINTS_POSSIBLE_INPUT_NAME, ALLOWED_EXTENSIONS_INPUT_NAME, GROUP_CATEGORY_SELECT, SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON, USAGE_RIGHTS_SELECT].includes(key)) {
       const selector = key === EXTERNAL_TOOL_URL_INPUT_NAME ? 'assignment_external_tool_tag_attributes_url_container' : key
       const element = this.getElement(selector)
       element?.classList.remove('error-outline')
@@ -1844,11 +1851,12 @@ EditView.prototype._validateSubmissionTypes = function (data, errors) {
   ) {
     annotatedDocumentUsageRights = this.getAnnotatedDocumentUsageRights()
     if (annotatedDocumentUsageRights.use_justification === 'choose') {
-      errors.usage_rights_use_justification = [
+      errors[USAGE_RIGHTS_SELECT] = [
         {
           message: I18n.t('Identifying the usage rights is required'),
         },
       ]
+      $(document).trigger('validateUsageRightsSelectedValue', {error: true})
     }
   }
   return errors
