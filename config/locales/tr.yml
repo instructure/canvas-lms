@@ -4593,8 +4593,10 @@ tr:
       buttons: 
         cancel: İptal
         update: "Çalışma ekibini güncelle"
+      is_required: "Bu alan zorunludur"
       labels: 
         description: "Açıklama:"
+        document_name: "Belge Adı:"
         title: "Çalışma ekibi başlığı"
     edit_button: 
       links: 
@@ -4627,6 +4629,7 @@ tr:
             
             
             **Uyarı**: Google Docs da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı.
+      is_required: "Bu alan zorunludur"
       labels: 
         collaboration_type: "Şunu kullanarak işbirliği yap:"
         description: "Açıklama:"
