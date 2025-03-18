@@ -120,7 +120,7 @@ const ManageOutcomeItem = ({
                 <IconButton
                   elementRef={b => (iconButtonRef.current = b)}
                   size="small"
-                  screenReaderLabel=""
+                  screenReaderLabel={title}
                   withBackground={false}
                   withBorder={false}
                   interaction={
