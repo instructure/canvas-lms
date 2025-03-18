@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="full-page">
 <head>
-    <title>We're sorry, but something went wrong (500)</title>
+    <title>The page you were looking for doesn't exist (404)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.strongmind.com/backpack-ui/latest/assets/css/BackpackUI.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,10 +37,18 @@
         .rive-position {
             display: flex;
             justify-content: center;
+            align-items: center;
+            width: 100%;
+            overflow: hidden;
         }
         .rive-size {
-            width: 65%;
-            height: 65%;
+            max-width: 100%;
+            height: auto;
+        }
+        .animation-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
         }
         .text-style {
             font-family: "Open Sans", sans-serif;
@@ -69,21 +77,22 @@
         }
     </style>
 </head>
+
 <body class="strongmind-ui full-page">
 <main class="flex flex-col items-center min-h-screen pt-2">
     <div class="w-full max-w-6xl px-4 mx-auto">
         <div class="flex flex-col items-center gap-4">
             <!-- Rive Animation -->
-            <div class="w-full max-w-xl">
-                <div class="rive-position" data-controller="rive" data-rive-animation="500_page_error">
-                    <canvas id="500" width="500" height="500" class="rive-size" data-rive-target="pageError"></canvas>
+            <div class="animation-container">
+                <div class="rive-position" data-controller="rive" data-rive-animation="404_page_error">
+                    <canvas id="404" width="1960" height="829" class="rive-size" data-rive-target="pageError"></canvas>
                 </div>
             </div>
 
             <!-- Error Text -->
             <div class="text-center md:text-left">
-                <p class="mb-1 text-style text-size">Oh snap! Something broke!</p>
-                <p class="text-style">Looks like a server issue (it's not you, it's us).</p>
+                <p class="mb-1 text-style text-size">Whoops! Page Not Found</p>
+                <p class="text-style">We can't find what you're looking for. The page may have been moved or deleted.</p>
             </div>
 
             <!-- Action Section -->
