@@ -138,6 +138,10 @@ export const CreateCourseModal = ({
         setAllAccounts(
           accounts.sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'})),
         )
+        if (accounts.length === 1) {
+          setSelectedAccount(accounts[0])
+          setAccountSearchTerm(accounts[0].name)
+        }
       }, []),
       params: {
         per_page: 100,
@@ -178,14 +182,13 @@ export const CreateCourseModal = ({
       ))
   }
 
-  const teacherHomeroomFetchOpts = {
-    path: '/api/v1/users/self/courses',
-  }
-
-  const adminHomeroomFetchOpts = {
-    path: selectedAccount
-      ? `api/v1/accounts/${selectedAccount.id}/courses`
-      : '/api/v1/users/self/courses',
+  let homeOptionPath = '/api/v1/users/self/courses'
+  if(window.ENV.FEATURES?.enhanced_course_creation_account_fetching) {
+    if(selectedAccount && selectedAccount.adminable){
+      homeOptionPath = `/api/v1/accounts/${selectedAccount.id}/courses`
+    }
+  } else if (permissions === 'admin' && selectedAccount) {
+    homeOptionPath = `/api/v1/accounts/${selectedAccount.id}/courses`
   }
 
   useFetchApi({
@@ -207,8 +210,7 @@ export const CreateCourseModal = ({
     fetchAllPages: true,
     // don't let students/users with no enrollments sync homeroom data
     forceResult: ['no_enrollments', 'student'].includes(permissions) ? [] : undefined,
-    ...(permissions === 'teacher' && teacherHomeroomFetchOpts),
-    ...(permissions === 'admin' && adminHomeroomFetchOpts),
+    path: homeOptionPath,
   })
 
   const handleHomeroomSelected = id => {
