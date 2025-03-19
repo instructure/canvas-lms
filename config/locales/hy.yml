@@ -4648,6 +4648,9 @@ hy:
     zero: "Սխալներ պարունակող հանձնարարություններ առկա չեն: Սեղմել «Շարունակել» կոճակը"
   count_attempts_d23c69a0: 
     zero: "Անսահմանափակ փորձեր"
+  count_courses_609dc3b8: 
+    one: "1 դասընթաց"
+    other: "%{count} դասընթաց"
   count_days_de0c6a32: 
     one: "1 օր"
     other: "%{count} օր"
@@ -4692,6 +4695,9 @@ hy:
   count_students_will_get_num_points_c970fc01: 
     one: "1 ուսանող կստանա %{num} միավոր"
     other: "%{count} ունկնդիր կստանան %{num} միավոր"
+  count_sub_accounts_345f48ea: 
+    one: "1 ենթահաշիվ"
+    other: "%{count} ենթահաշիվ"
   country_is_required_b0afbf52: "Պետությունը նշելը պարտադիր է"
   course: 
     access_denied: "Հասանելիությունը մերժվել է"
@@ -16291,6 +16297,7 @@ hy:
       other: "%{count} ենթահաշիվ"
     titles: 
       sub_accounts: Ենթահաշիվներ
+  sub_accounts_e1b196a9: Ենթահաշիվներ
   sub_assignment: 
     atom_no_author: "Հեղինակ չկա"
     labels: 
