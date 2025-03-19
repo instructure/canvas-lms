@@ -18,6 +18,7 @@
 
 import formatMessage from '../../../format-message'
 import {scaleForHeight, scaleForWidth} from '../shared/DimensionUtils'
+import RCEGlobals from '../../RCEGlobals'
 
 export const MIN_HEIGHT = 10
 export const MIN_WIDTH = 10
@@ -141,10 +142,12 @@ export function fromVideoEmbed($element) {
 
   videoOptions.videoSize = imageSizeFromKnownOptions(videoOptions)
 
-  const source = $videoIframe.getAttribute('src')
-  const matches = source?.match(/\/media_attachments_iframe\/(\d+)/)
-  if (matches) {
-    videoOptions.attachmentId = matches[1]
+  if (RCEGlobals.getFeatures().media_links_use_attachment_id) {
+    const source = $videoIframe.getAttribute('src')
+    const matches = source?.match(/\/media_attachments_iframe\/(\d+)/)
+    if (matches) {
+      videoOptions.attachmentId = matches[1]
+    }
   }
 
   return videoOptions

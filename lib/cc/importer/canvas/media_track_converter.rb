@@ -33,7 +33,7 @@ module CC::Importer::Canvas
             track = { "migration_id" => track_node["identifierref"],
                       "kind" => track_node["kind"],
                       "locale" => track_node["locale"] }
-            track["content"] = track_node.text
+            track["content"] = track_node.text if Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
             tracks << track
           end
           track_map[file_migration_id] = tracks

@@ -120,7 +120,11 @@ export function mediaPlayerURLFromFile(file: FileType, canvasOrigin?: string) {
   const type = content_type.replace(/\/.*$/, '')
   const baseOrigin = canvasOrigin ?? window.location.origin
 
-  if (isAudioOrVideo(content_type) && file.id) {
+  if (
+    RCEGlobals.getFeatures()?.media_links_use_attachment_id &&
+    isAudioOrVideo(content_type) &&
+    file.id
+  ) {
     const url = new URL(`/media_attachments_iframe/${file.id}`, baseOrigin)
     url.searchParams.set('type', type)
     url.searchParams.set('embedded', 'true')

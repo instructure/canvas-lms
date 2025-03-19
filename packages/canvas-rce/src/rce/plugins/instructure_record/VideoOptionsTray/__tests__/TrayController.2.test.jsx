@@ -117,6 +117,14 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   }
 
   describe('#_applyVideoOptions', () => {
+    beforeEach(() => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: false})
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
+    })
+
     it('updates the video', async () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
@@ -139,6 +147,25 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     })
 
     it('calls updateMediaObject with correct params', () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '321',
+        titleText: 'new title',
+        media_object_id: 'm_somevideo',
+        updateMediaObject,
+      })
+      expect(updateMediaObject).toHaveBeenCalledWith({
+        media_object_id: 'm_somevideo',
+        subtitles: undefined,
+        title: 'new title',
+      })
+    })
+
+    it('calls updateMediaObject with correct params with media_links_use_attachment_id', () => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
       trayController._applyVideoOptions({
@@ -180,6 +207,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     })
 
     it('does update video w/o media_object_id if attachment_id present', async () => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
       trayController._applyVideoOptions({
