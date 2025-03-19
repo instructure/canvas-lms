@@ -39,7 +39,7 @@ export default class FindDialog extends DialogBaseView {
       width: 1000,
       resizable: true,
       close: () => {
-        $('.find_outcome').focus()
+        $('#create-from-outcome').focus()
         this?.content?.innerView?.render()
       },
       buttons: [
@@ -184,6 +184,11 @@ export default class FindDialog extends DialogBaseView {
       canShow = false
     }
     $('.ui-dialog-buttonpane .btn-primary').toggle(canShow)
+  }
+
+  show() {
+    this.dialog.dialog('open')
+    this.$el.closest('.ui-dialog').find('.ui-dialog-titlebar-close').focus()
   }
 
   cleanup() {
