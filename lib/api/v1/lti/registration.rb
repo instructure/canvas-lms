@@ -82,6 +82,10 @@ module Api::V1::Lti::Registration
         json["overlaid_configuration"] = registration.internal_lti_configuration(context:)
       end
 
+      if includes.include?(:overlaid_legacy_configuration)
+        json["overlaid_legacy_configuration"] = registration.canvas_configuration
+      end
+
       if includes.include?(:account_binding) && account_binding.present?
         json["account_binding"] = lti_registration_account_binding_json(account_binding, user, session, context)
       end
