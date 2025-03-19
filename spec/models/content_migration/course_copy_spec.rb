@@ -820,6 +820,7 @@ describe ContentMigration do
 
     context "media objects" do
       before do
+        Account.site_admin.enable_feature!(:media_links_use_attachment_id)
         kaltura_double = double("kaltura")
         allow(kaltura_double).to receive(:startSession)
         # rubocop:disable RSpec/ReceiveMessages

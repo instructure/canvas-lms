@@ -279,6 +279,7 @@ export type SiteAdminFeatureId =
   | 'explicit_latex_typesetting'
   | 'instui_for_import_page'
   | 'instui_nav'
+  | 'media_links_use_attachment_id'
   | 'multiselect_gradebook_filters'
   | 'permanent_page_links'
   | 'render_both_to_do_lists'

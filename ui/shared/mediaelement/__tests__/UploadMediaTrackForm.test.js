@@ -38,10 +38,23 @@ describe('UploadMediaTrackForm', () => {
     form.getFileContent = jest.fn(() => new $.Deferred().resolve({}))
   })
 
-  it('uses the media attachment route', () => {
+  it('uses the media attachment route if FF ON', () => {
+    window.ENV.FEATURES.media_links_use_attachment_id = true
     form.onSubmit()
     expect($.ajaxJSON).toHaveBeenCalledWith(
       '/media_attachments/attachment_id/media_tracks',
+      'POST',
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    )
+  })
+
+  it('uses the media objects route if FF OFF', () => {
+    window.ENV.FEATURES.media_links_use_attachment_id = false
+    form.onSubmit()
+    expect($.ajaxJSON).toHaveBeenCalledWith(
+      '/media_objects/media_object_id/media_tracks',
       'POST',
       expect.anything(),
       expect.anything(),
