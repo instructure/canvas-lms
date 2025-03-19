@@ -19,9 +19,10 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {LaunchSettings} from '../components/LaunchSettings'
+import {LaunchSettingsConfirmationWrapper} from '../components/LaunchSettingsConfirmationWrapper'
 import {mockInternalConfiguration} from './helpers'
 import {createLti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
+import {getInputIdForField} from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
 
 describe('LaunchSettings', () => {
   beforeEach(() => {
@@ -36,7 +37,7 @@ describe('LaunchSettings', () => {
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
     render(
-      <LaunchSettings
+      <LaunchSettingsConfirmationWrapper
         internalConfig={config}
         overlayStore={overlayStore}
         onPreviousClicked={jest.fn()}
@@ -79,7 +80,7 @@ describe('LaunchSettings', () => {
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
     render(
-      <LaunchSettings
+      <LaunchSettingsConfirmationWrapper
         internalConfig={config}
         overlayStore={overlayStore}
         onPreviousClicked={jest.fn()}
@@ -87,7 +88,7 @@ describe('LaunchSettings', () => {
         reviewing={false}
       />,
     )
-    const redirectURIs = screen.getByLabelText('Redirect URIs')
+    const redirectURIs = screen.getByLabelText(/Redirect URIs/i)
     const expectedRedirectUris = [
       'https://example.com',
       'https://example.com/launch',
@@ -98,12 +99,12 @@ describe('LaunchSettings', () => {
 
     expect(redirectURIs).toHaveValue(expectedRedirectUris.join('\n'))
 
-    const targetLinkUri = screen.getByLabelText('Default Target Link URI')
+    const targetLinkUri = screen.getByLabelText(/Default Target Link URI/i)
     await userEvent.clear(targetLinkUri)
     await userEvent.paste('https://otherexample.com')
     expect(targetLinkUri).toHaveValue('https://otherexample.com')
 
-    const oidcInitiationUrl = screen.getByLabelText('OpenID Connect Initiation URL')
+    const oidcInitiationUrl = screen.getByLabelText(/OpenID Connect Initiation URL/i)
     await userEvent.clear(oidcInitiationUrl)
     await userEvent.paste('https://example.com/init')
 
@@ -125,44 +126,47 @@ describe('LaunchSettings', () => {
 
     expect(customFields).toHaveValue('name=value\n')
   })
+})
 
-  it('disables the next button if any fields are invalid', async () => {
-    const config = mockInternalConfiguration({
-      redirect_uris: ['https://example.com/launch'],
-      domain: 'example.com',
-      public_jwk_url: 'https://example.com/jwks',
-    })
-    const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
-    render(
-      <LaunchSettings
-        internalConfig={config}
-        overlayStore={overlayStore}
-        onPreviousClicked={jest.fn()}
-        onNextClicked={jest.fn()}
-        reviewing={false}
-      />,
-    )
-
-    const nextButton = screen.getByRole('button', {name: /Next/i})
-
-    const redirectURIs = screen.getByLabelText('Redirect URIs')
-    await userEvent.clear(redirectURIs)
-    await userEvent.paste('http:<<<>>')
-
-    expect(nextButton).toBeDisabled()
-
-    await userEvent.clear(redirectURIs)
-    await userEvent.paste('https://example.com/launch')
-    expect(nextButton).toBeEnabled()
-
-    const domain = screen.getByLabelText('Domain')
-    await userEvent.clear(domain)
-    await userEvent.paste('domain00---.com.')
-
-    expect(nextButton).toBeDisabled()
-
-    await userEvent.clear(domain)
-    await userEvent.paste('example.com')
-    expect(nextButton).toBeEnabled()
+it('focuses invalid inputs if any fields are invalid', async () => {
+  const config = mockInternalConfiguration({
+    redirect_uris: ['https://example.com/launch'],
+    domain: 'example.com',
+    public_jwk_url: 'https://example.com/jwks',
   })
+  const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
+  const onNextClicked = jest.fn()
+  render(
+    <LaunchSettingsConfirmationWrapper
+      internalConfig={config}
+      overlayStore={overlayStore}
+      onPreviousClicked={jest.fn()}
+      onNextClicked={onNextClicked}
+      reviewing={false}
+    />,
+  )
+  const nextButton = screen.getByRole('button', {name: /Next/i})
+  const redirectURIs = screen.getByLabelText(/Redirect URIs/i)
+  await userEvent.clear(redirectURIs)
+  await userEvent.paste('http:<<<>>')
+  await userEvent.tab()
+  await userEvent.click(nextButton)
+  expect(onNextClicked).not.toHaveBeenCalled()
+  expect(redirectURIs).toHaveFocus()
+
+  await userEvent.clear(redirectURIs)
+  await userEvent.paste('https://example.com/launch')
+
+  const domain = screen.getByLabelText('Domain')
+  await userEvent.clear(domain)
+  await userEvent.paste('domain00---.com.')
+  await userEvent.tab()
+  await userEvent.click(nextButton)
+  expect(onNextClicked).not.toHaveBeenCalled()
+  expect(domain).toHaveFocus()
+
+  await userEvent.clear(domain)
+  await userEvent.paste('example.com')
+  await userEvent.click(nextButton)
+  expect(onNextClicked).toHaveBeenCalled()
 })

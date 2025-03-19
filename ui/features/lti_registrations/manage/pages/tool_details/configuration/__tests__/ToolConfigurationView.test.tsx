@@ -17,39 +17,14 @@
  */
 import {AllLtiScopes} from '@canvas/lti/model/LtiScope'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
-import {render} from '@testing-library/react'
-import {MemoryRouter, Outlet, Route, Routes} from 'react-router-dom'
 import {AllLtiPlacements} from '../../../../model/LtiPlacement'
 import {AllLtiPrivacyLevels} from '../../../../model/LtiPrivacyLevel'
 import {i18nLtiPlacement} from '../../../../model/i18nLtiPlacement'
 import {i18nLtiPrivacyLevel} from '../../../../model/i18nLtiPrivacyLevel'
 import {ZLtiImsRegistrationId} from '../../../../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZLtiToolConfigurationId} from '../../../../model/lti_tool_configuration/LtiToolConfigurationId'
-import {mockRegistrationWithAllInformation} from '../../../manage/__tests__/helpers'
-import {ToolConfiguration} from '../ToolConfigurationView'
-import {mockConfiguration} from './helpers'
-
-const renderApp = (...p: Parameters<typeof mockRegistrationWithAllInformation>) => {
-  const registration = mockRegistrationWithAllInformation(...p)
-  return render(
-    <MemoryRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Outlet
-              context={{
-                registration,
-              }}
-            />
-          }
-        >
-          <Route index element={<ToolConfiguration />} />
-        </Route>
-      </Routes>
-    </MemoryRouter>,
-  )
-}
+import {ToolConfigurationView} from '../ToolConfigurationView'
+import {mockConfiguration, renderApp} from './helpers'
 
 describe('Tool Configuration View Launch Settings', () => {
   it('should render the Launch Settings for manual registrations', () => {
@@ -69,7 +44,7 @@ describe('Tool Configuration View Launch Settings', () => {
         }),
         manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
       },
-    })
+    })(<ToolConfigurationView />)
 
     expect(getByText('Launch Settings')).toBeInTheDocument()
     expect(getByText('https://example.com/target_link_uri')).toBeInTheDocument()
@@ -95,7 +70,7 @@ describe('Tool Configuration View Launch Settings', () => {
         }),
         manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
       },
-    })
+    })(<ToolConfigurationView />)
 
     expect(getByText('Launch Settings')).toBeInTheDocument()
     expect(getByText('No domain configured.')).toBeInTheDocument()
@@ -110,7 +85,7 @@ describe('Tool Configuration View Launch Settings', () => {
         ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         overlaid_configuration: mockConfiguration({}),
       },
-    })
+    })(<ToolConfigurationView />)
 
     expect(getByText('Test App')).toBeInTheDocument()
     expect(queryAllByText('Launch Settings')).toHaveLength(0)
@@ -125,7 +100,7 @@ describe('Tool Configuration View Permissions', () => {
       configuration: {
         scopes: [],
       },
-    })
+    })(<ToolConfigurationView />)
     expect(getByTestId('permissions')).toHaveTextContent('This app has no permissions configured.')
   })
 
@@ -139,7 +114,7 @@ describe('Tool Configuration View Permissions', () => {
           scopes: Array.from(AllLtiScopes),
         }),
       },
-    })
+    })(<ToolConfigurationView />)
 
     AllLtiScopes.forEach(scope => {
       expect(getByText(i18nLtiScope(scope))).toBeInTheDocument()
@@ -160,7 +135,7 @@ describe('Tool Configuration View Data Sharing', () => {
             privacy_level: privacyLevel,
           }),
         },
-      })
+      })(<ToolConfigurationView />)
 
       expect(getByText(i18nLtiPrivacyLevel(privacyLevel))).toBeInTheDocument()
     },
@@ -184,10 +159,11 @@ describe('Tool Configuration View Placements', () => {
           ],
         }),
       },
-    })
+    })(<ToolConfigurationView />)
 
     expect(getByText(i18nLtiPlacement(placement))).toBeInTheDocument()
   })
+
   it.each(AllLtiPlacements)('should not render a disabled %p placement', placement => {
     const {queryAllByText} = renderApp({
       n: 'Test App',
@@ -204,7 +180,7 @@ describe('Tool Configuration View Placements', () => {
           ],
         }),
       },
-    })
+    })(<ToolConfigurationView />)
 
     expect(queryAllByText(i18nLtiPlacement(placement))).toHaveLength(0)
   })
@@ -222,7 +198,7 @@ describe('Tool Configuration View Nickname and Description', () => {
           description: 'Test Description',
         }),
       },
-    })
+    })(<ToolConfigurationView />)
 
     expect(getByText('Test Nickname')).toBeInTheDocument()
     expect(getByText('Test Description')).toBeInTheDocument()
@@ -244,7 +220,7 @@ describe('Tool Configuration View Nickname and Description', () => {
           ],
         }),
       },
-    })
+    })(<ToolConfigurationView />)
 
     expect(getByText(`Test Placement (${placement})`)).toBeInTheDocument()
   })
@@ -264,7 +240,7 @@ describe('Tool Configuration View Nickname and Description', () => {
           ],
         }),
       },
-    })
+    })(<ToolConfigurationView />)
 
     expect(queryByText(`No text`)).toBeInTheDocument()
   })
@@ -309,7 +285,7 @@ describe('Tool Configuration View Icon Placements', () => {
           ],
         }),
       },
-    })
+    })(<ToolConfigurationView />)
 
   it('should not render icon URLs for non-icon placements', () => {
     const {queryByTestId} = renderIconPlacements()

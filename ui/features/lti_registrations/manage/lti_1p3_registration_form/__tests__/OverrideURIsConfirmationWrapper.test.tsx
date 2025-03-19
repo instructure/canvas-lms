@@ -18,7 +18,7 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {OverrideURIsConfirmation} from '../components/OverrideURIsConfirmation'
+import {OverrideURIsConfirmationWrapper} from '../components/OverrideURIsConfirmationWrapper'
 import {createLti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {mockInternalConfiguration} from './helpers'
 import {LtiPlacements} from '../../model/LtiPlacement'
@@ -35,7 +35,7 @@ describe('OverrideURIsConfirmation', () => {
     const onPreviousClicked = jest.fn()
 
     render(
-      <OverrideURIsConfirmation
+      <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         onNextClicked={onNextClicked}
@@ -59,7 +59,7 @@ describe('OverrideURIsConfirmation', () => {
     const onPreviousClicked = jest.fn()
 
     render(
-      <OverrideURIsConfirmation
+      <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         onNextClicked={onNextClicked}
@@ -82,7 +82,7 @@ describe('OverrideURIsConfirmation', () => {
     const onPreviousClicked = jest.fn()
 
     render(
-      <OverrideURIsConfirmation
+      <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         onNextClicked={onNextClicked}
@@ -114,7 +114,7 @@ describe('OverrideURIsConfirmation', () => {
     const onPreviousClicked = jest.fn()
 
     render(
-      <OverrideURIsConfirmation
+      <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         onNextClicked={onNextClicked}
@@ -127,6 +127,7 @@ describe('OverrideURIsConfirmation', () => {
     await userEvent.click(input)
     await userEvent.clear(input)
     await userEvent.paste('invalid-uri')
+    await userEvent.tab()
 
     expect(screen.getByText('Invalid URL')).toBeInTheDocument()
   })
@@ -138,9 +139,8 @@ describe('OverrideURIsConfirmation', () => {
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
     const onNextClicked = jest.fn()
     const onPreviousClicked = jest.fn()
-
     render(
-      <OverrideURIsConfirmation
+      <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         onNextClicked={onNextClicked}
@@ -148,39 +148,16 @@ describe('OverrideURIsConfirmation', () => {
         reviewing={false}
       />,
     )
-
     const input = screen.getByPlaceholderText('https://example.com')
     await userEvent.click(input)
     await userEvent.clear(input)
     await userEvent.paste('invalid-uri^&*&)')
+    await userEvent.tab()
 
-    expect(screen.getByText('Next').closest('button')).toBeDisabled()
-  })
+    await userEvent.click(screen.getByText('Next').closest('button')!)
 
-  it('enables the next button if all URIs are valid', async () => {
-    const internalConfig = mockInternalConfiguration({
-      placements: [{placement: LtiPlacements.CourseNavigation}],
-    })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
-
-    render(
-      <OverrideURIsConfirmation
-        overlayStore={overlayStore}
-        internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
-        reviewing={false}
-      />,
-    )
-
-    const input = screen.getByPlaceholderText('https://example.com')
-    await userEvent.click(input)
-    await userEvent.clear(input)
-    await userEvent.paste('https://a.cool.url.com')
-
-    expect(screen.getByText('Next').closest('button')).not.toBeDisabled()
+    expect(input).toHaveFocus()
+    expect(onNextClicked).not.toHaveBeenCalled()
   })
 
   it('allows users to change the message type on placements that support it', async () => {
@@ -192,7 +169,7 @@ describe('OverrideURIsConfirmation', () => {
     const onPreviousClicked = jest.fn()
 
     render(
-      <OverrideURIsConfirmation
+      <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         onNextClicked={onNextClicked}
@@ -216,7 +193,7 @@ describe('OverrideURIsConfirmation', () => {
     const onPreviousClicked = jest.fn()
 
     render(
-      <OverrideURIsConfirmation
+      <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         onNextClicked={onNextClicked}
@@ -241,7 +218,7 @@ describe('OverrideURIsConfirmation', () => {
     const onPreviousClicked = jest.fn()
 
     render(
-      <OverrideURIsConfirmation
+      <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         onNextClicked={onNextClicked}
@@ -276,7 +253,7 @@ describe('OverrideURIsConfirmation', () => {
     const onPreviousClicked = jest.fn()
 
     render(
-      <OverrideURIsConfirmation
+      <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         onNextClicked={onNextClicked}

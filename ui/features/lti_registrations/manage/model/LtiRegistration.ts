@@ -22,7 +22,7 @@ import {ZDeveloperKeyId} from './developer_key/DeveloperKeyId'
 import {ZInternalLtiConfiguration} from './internal_lti_configuration/InternalLtiConfiguration'
 import {ZLtiImsRegistrationId} from './lti_ims_registration/LtiImsRegistrationId'
 import {ZLtiToolConfigurationId} from './lti_tool_configuration/LtiToolConfigurationId'
-import {ZLtiOverlay} from './LtiOverlay'
+import {ZLtiOverlay, ZLtiOverlayWithVersions} from './LtiOverlay'
 import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZUser} from './User'
@@ -59,11 +59,7 @@ export type LtiRegistrationWithConfiguration = z.infer<typeof ZLtiRegistrationWi
 
 export const ZLtiRegistrationWithAllInformation = ZLtiRegistrationWithConfiguration.extend({
   overlaid_configuration: ZInternalLtiConfiguration,
-  overlay: ZLtiOverlay.extend({
-    versions: z.array(ZLtiOverlayVersion),
-  })
-    .nullable()
-    .optional(),
+  overlay: ZLtiOverlayWithVersions.nullable().optional(),
 })
 
 export type LtiRegistrationWithAllInformation = z.infer<typeof ZLtiRegistrationWithAllInformation>

@@ -104,6 +104,11 @@ const renderEditButton = (r: LtiRegistration) => {
   }
 }
 
+const DangerMenuItemThemeOverrides = {
+  labelColor: colors.contrasts.red4570,
+  activeBackground: colors.contrasts.red4570,
+}
+
 const Columns: ReadonlyArray<Column> = [
   {
     id: 'name',
@@ -113,7 +118,13 @@ const Columns: ReadonlyArray<Column> = [
     render: r => {
       const appName = (
         <Flex>
-          <ToolIconOrDefault iconUrl={r.icon_url} toolId={r.id} toolName={r.name} size={27} marginRight={12} />
+          <ToolIconOrDefault
+            iconUrl={r.icon_url}
+            toolId={r.id}
+            toolName={r.name}
+            size={27}
+            marginRight={12}
+          />
           <div style={ellipsisStyles} title={r.name}>
             {r.name}
           </div>
@@ -263,10 +274,7 @@ const Columns: ReadonlyArray<Column> = [
           {!window.ENV.FEATURES.lti_registrations_next ? (
             isForcedOn(r) ? (
               <Menu.Item
-                themeOverride={{
-                  labelColor: colors.contrasts.red4570,
-                  activeBackground: colors.contrasts.red4570,
-                }}
+                themeOverride={DangerMenuItemThemeOverrides}
                 onClick={() => {
                   alert({
                     message: I18n.t('This App is locked on, and cannot be deleted.'),
@@ -278,13 +286,7 @@ const Columns: ReadonlyArray<Column> = [
                 {I18n.t('Delete App')}
               </Menu.Item>
             ) : (
-              <Menu.Item
-                themeOverride={{
-                  labelColor: colors.contrasts.red4570,
-                  activeBackground: colors.contrasts.red4570,
-                }}
-                onClick={() => deleteApp(r)}
-              >
+              <Menu.Item themeOverride={DangerMenuItemThemeOverrides} onClick={() => deleteApp(r)}>
                 {I18n.t('Delete App')}
               </Menu.Item>
             )

@@ -20,6 +20,12 @@ import React from 'react'
 import {IconConfirmation} from '../../registration_wizard_forms/IconConfirmation'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
+import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
+import {Footer} from '../../registration_wizard_forms/Footer'
+import {
+  getInputIdForField,
+  validateIconUris,
+} from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
 
 export type IconConfirmationWrapperProps = {
   onNextButtonClicked: () => void
@@ -37,16 +43,37 @@ export const IconConfirmationWrapper = ({
 }: IconConfirmationWrapperProps) => {
   const {state, ...actions} = overlayStore()
 
+  const [hasSubmitted, setHasSubmitted] = React.useState(false)
+
+  const onNextClicked = React.useCallback(() => {
+    // if there are any errors, don't proceed
+    const errors = validateIconUris(overlayStore.getState().state.icons)
+    if (errors.length > 0) {
+      document.getElementById(getInputIdForField(errors[0].field))?.focus()
+    } else {
+      onNextButtonClicked()
+    }
+    setHasSubmitted(true)
+  }, [onNextButtonClicked, overlayStore])
+
   return (
-    <IconConfirmation
-      internalConfig={internalConfig}
-      name={internalConfig.title}
-      allPlacements={state.placements.placements ?? []}
-      placementIconOverrides={state.icons.placements}
-      reviewing={reviewing}
-      setPlacementIconUrl={actions.setPlacementIconUrl}
-      onPreviousButtonClicked={onPreviousButtonClicked}
-      onNextButtonClicked={onNextButtonClicked}
-    />
+    <>
+      <RegistrationModalBody>
+        <IconConfirmation
+          internalConfig={internalConfig}
+          name={internalConfig.title}
+          allPlacements={state.placements.placements ?? []}
+          placementIconOverrides={state.icons.placements}
+          setPlacementIconUrl={actions.setPlacementIconUrl}
+          hasSubmitted={hasSubmitted}
+        />
+      </RegistrationModalBody>
+      <Footer
+        reviewing={reviewing}
+        currentScreen="intermediate"
+        onPreviousClicked={onPreviousButtonClicked}
+        onNextClicked={onNextClicked}
+      />
+    </>
   )
 }

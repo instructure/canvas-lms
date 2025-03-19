@@ -18,7 +18,6 @@
 
 import React from 'react'
 import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
-import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {PermissionConfirmation} from '../../registration_wizard_forms/PermissionConfirmation'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
@@ -35,6 +34,8 @@ export const PermissionConfirmationWrapper = ({
   const [state, actions] = useOverlayStore(overlayStore)
   return (
     <PermissionConfirmation
+      showAllSettings={false}
+      mode="new"
       appName={registration.name}
       scopesSelected={registration.configuration.scopes.filter(
         s => !state.overlay.disabled_scopes?.includes(s),

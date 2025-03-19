@@ -42,6 +42,8 @@ describe('Lti1p3RegistrationOverlayState', () => {
       naming: {
         placements: {},
       },
+      dirty: false,
+      hasSubmitted: false,
     }
     let state: Lti1p3RegistrationOverlayStore
 

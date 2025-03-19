@@ -70,11 +70,16 @@ export const ToolDetailsRequest = ({
     [accountId, ltiRegistrationId],
   )
 
-  const {state} = useApiResult(fetchReg)
+  const {state, refresh} = useApiResult(fetchReg)
 
   return matchApiResultState(state)({
     data: (value, stale) => (
-      <ToolDetailsInner registration={value} stale={stale} accountId={accountId} />
+      <ToolDetailsInner
+        registration={value}
+        stale={stale}
+        accountId={accountId}
+        refreshRegistration={refresh}
+      />
     ),
     error: message => (
       <GenericErrorPage
@@ -103,12 +108,21 @@ const useToolDetailsRoute = () => {
 
 export type ToolDetailsOutletContext = {
   registration: LtiRegistrationWithAllInformation
+  refreshRegistration: () => void
 }
+
+const OverflowThemeOverride = {defaultOverflowY: 'unset'}
 
 const ToolDetailsInner = ({
   registration,
   accountId,
-}: {registration: LtiRegistrationWithAllInformation; stale: boolean; accountId: AccountId}) => {
+  refreshRegistration,
+}: {
+  registration: LtiRegistrationWithAllInformation
+  stale: boolean
+  accountId: AccountId
+  refreshRegistration: () => void
+}) => {
   const navigate = useNavigate()
 
   const route = useToolDetailsRoute()
@@ -126,11 +140,13 @@ const ToolDetailsInner = ({
     [navigate, registration.id],
   )
 
+  const outletContext: ToolDetailsOutletContext = {registration, refreshRegistration}
+
   return (
     <Flex direction="column">
       <View
         borderRadius="large"
-        borderColor="primary"
+        borderColor="secondary"
         borderWidth="small"
         margin="0 0 small"
         as="div"
@@ -205,9 +221,9 @@ const ToolDetailsInner = ({
           renderTitle={
             <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Access')}</Text>
           }
-          themeOverride={{defaultOverflowY: 'unset'}}
+          themeOverride={OverflowThemeOverride}
         >
-          <Outlet context={{registration}} />
+          <Outlet context={outletContext} />
         </Tabs.Panel>
         <Tabs.Panel
           isSelected={route === 'configuration'}
@@ -219,8 +235,9 @@ const ToolDetailsInner = ({
           }
           id="configuration"
           padding="medium 0"
+          themeOverride={OverflowThemeOverride}
         >
-          <Outlet context={{registration}} />
+          <Outlet context={outletContext} />
         </Tabs.Panel>
         {window.ENV.FEATURES.lti_registrations_usage_data ? (
           <Tabs.Panel
@@ -232,7 +249,7 @@ const ToolDetailsInner = ({
             id="usage"
             padding="medium 0"
           >
-            <Outlet context={{registration}} />
+            <Outlet context={outletContext} />
           </Tabs.Panel>
         ) : null}
         <Tabs.Panel
@@ -244,7 +261,7 @@ const ToolDetailsInner = ({
           id="history"
           padding="medium 0"
         >
-          <Outlet context={{registration}} />
+          <Outlet context={outletContext} />
         </Tabs.Panel>
       </Tabs>
     </Flex>

@@ -16,17 +16,3 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {InternalLtiConfiguration} from '../../../../model/internal_lti_configuration/InternalLtiConfiguration'
-
-export const mockConfiguration = (
-  config: Partial<InternalLtiConfiguration>,
-): InternalLtiConfiguration => {
-  return {
-    title: 'Test App',
-    oidc_initiation_url: 'http://example.com',
-    placements: [],
-    scopes: [],
-    target_link_uri: 'http://example.com',
-    ...config,
-  }
-}
