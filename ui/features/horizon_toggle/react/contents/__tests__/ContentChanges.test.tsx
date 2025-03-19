@@ -37,6 +37,42 @@ describe('ContentChanges', () => {
             },
           },
         },
+        {
+          id: 2,
+          name: 'Assignment 2',
+          link: '/assignment2',
+          errors: {
+            submission_types: {
+              attribute: 'submission_type',
+              type: 'unsupported',
+              message: 'Submission type not supported',
+            },
+          },
+        },
+        {
+          id: 3,
+          name: 'Assignment 3',
+          link: '/assignment3',
+          errors: {
+            workflow_state: {
+              attribute: 'workflow_state',
+              type: 'unsupported',
+              message: 'Can not be published',
+            },
+          },
+        },
+        {
+          id: 4,
+          name: 'Assignment 4',
+          link: '/assignment4',
+          errors: {
+            workflow_state: {
+              attribute: 'workflow_state',
+              type: 'unsupported',
+              message: 'Can not be published',
+            },
+          },
+        },
       ],
       quizzes: [
         {
@@ -62,5 +98,14 @@ describe('ContentChanges', () => {
       </HorizonToggleContext.Provider>,
     )
     expect(screen.getByText('Assignments')).toBeInTheDocument()
+  })
+
+  it('includes Published Contents section', () => {
+    render(
+      <HorizonToggleContext.Provider value={mockData}>
+        <ContentChanges />
+      </HorizonToggleContext.Provider>,
+    )
+    expect(screen.getByText('Published Content')).toBeInTheDocument()
   })
 })

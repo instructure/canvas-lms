@@ -265,6 +265,7 @@ class AbstractAssignment < ActiveRecord::Base
     self.group_category_id = nil
     self.rubric_association = nil
     self.submission_types = "online_text_entry" unless HORIZON_SUBMISSION_TYPES.include?(submission_types)
+    self.workflow_state = "unpublished" if context_module_tags.none? { |t| t.tag_type == "context_module" && t.context_module&.published? }
   end
 
   def queue_conditional_release_grade_change_handler?

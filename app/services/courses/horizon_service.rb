@@ -71,6 +71,7 @@ module Courses
         errors[:assignments]&.each do |error|
           has_rubrics = error[:errors][:rubric].present?
           has_incompatible_submission_types = error[:errors][:submission_types].present?
+          is_published = error[:errors][:workflow_state].present?
           assignment = context.assignments.find(error[:id])
           assignment&.update!(
             peer_reviews: false,
@@ -83,6 +84,9 @@ module Courses
           end
           if has_incompatible_submission_types
             assignment&.update!(submission_types: "online_text_entry")
+          end
+          if is_published
+            assignment&.unpublish
           end
           assignment&.save!
         end
