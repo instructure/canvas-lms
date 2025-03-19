@@ -73,7 +73,7 @@ class GradebooksController < ApplicationController
              student_grade_summary_upgrade: Account.site_admin.feature_enabled?(:student_grade_summary_upgrade),
              can_clear_badge_counts: Account.site_admin.grants_right?(@current_user, :manage_students),
              custom_grade_statuses: @context.custom_grade_statuses.as_json(include_root: false),
-             consolidated_media_player: @context.account.feature_enabled?(:consolidated_media_player),
+             consolidated_media_player: Account.site_admin.feature_enabled?(:consolidated_media_player),
            })
     return render :grade_summary_list unless @presenter.student
 
