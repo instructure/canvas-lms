@@ -117,8 +117,12 @@ module Importers
             end
           end
 
-          migration.update_import_progress(30)
-          Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
+          if (!migration.for_course_copy? || Account.site_admin.feature_enabled?(:media_links_use_attachment_id)) &&
+             (migration.canvas_import? || migration.for_master_course_import?)
+            migration.update_import_progress(30)
+            Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
+          end
+
           migration.update_import_progress(35)
           unless migration.quizzes_next_banks_migration?
             question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration)
