@@ -23,7 +23,7 @@ import {MockedQueryClientProvider} from "@canvas/test-utils/query"
 import {renderHook} from "@testing-library/react-hooks"
 import {mockDeepLinkResponse, mockDoFetchApi, mockTools} from './assetProcessorsTestHelpers'
 import {AssetProcessorsAddModalOnProcessorResponseFn, AssetProcessorsAddModalProps} from '../AssetProcessorsAddModal'
-import {useAssetProcessorsState} from '../hooks/AssetProcessorsState'
+import {ExistingAttachedAssetProcessor, useAssetProcessorsState} from '../hooks/AssetProcessorsState'
 import {AssetProcessors} from '../AssetProcessors'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
 
@@ -42,6 +42,17 @@ jest.mock('../AssetProcessorsAddModal', () => ({
 describe('AssetProcessors', () => {
   const queryClient = new QueryClient()
   let state: ReturnType<typeof useAssetProcessorsState.getState>
+  const initialAttachedProcessors: ExistingAttachedAssetProcessor[] = [
+    {
+      id: 1,
+      context_external_tool_id: 2,
+      context_external_tool_name: "tool name",
+      title: "ap title",
+      text: "ap text",
+      icon: {url: "http://instructure.com/icon.png"}
+    }
+  ]
+
 
   beforeEach(() => {
     state = useAssetProcessorsState.getState()
@@ -57,7 +68,7 @@ describe('AssetProcessors', () => {
   function renderAssetProcessors() {
     return render(
       <MockedQueryClientProvider client={queryClient}>
-        <AssetProcessors courseId={123} secureParams="my-secure-params" />
+        <AssetProcessors initialAttachedProcessors={initialAttachedProcessors} courseId={123} secureParams="my-secure-params" />
       </MockedQueryClientProvider>
     )
   }
@@ -70,6 +81,11 @@ describe('AssetProcessors', () => {
     addButton.click()
     tag = renderHook(() => useAssetProcessorsAddModalState(s => s.state.tag)).result.current
     expect(tag).toBe("toolList")
+  })
+
+  it('shows the initial attached processors', () => {
+    const {getByText} = renderAssetProcessors()
+    expect(getByText("tool name · ap title")).toBeInTheDocument()
   })
 
   it('adds attached processors sent by the modal', async () => {
@@ -88,6 +104,18 @@ describe('AssetProcessors', () => {
     getByText("Delete").click()
     if (queryByText("t2 · Lti 1.3 Tool Title")) {
       await waitForElementToBeRemoved(() => queryByText("t2 · Lti 1.3 Tool Title"))
+    }
+  })
+
+  it('allows removing existing attached processors', async () => {
+    const {queryByText, getByText} = renderAssetProcessors()
+    expect(getByText("tool name · ap title")).toBeInTheDocument()
+    getByText("Actions for document processing app: tool name · ap title").click()
+    getByText("Delete").click()
+    expect(getByText("Confirm Delete")).toBeInTheDocument()
+    getByText("Delete").click()
+    if (queryByText("tool name · ap title")) {
+      await waitForElementToBeRemoved(() => queryByText("tool name · ap title"))
     }
   })
 })

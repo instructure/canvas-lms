@@ -21,14 +21,14 @@ import {Button} from "@instructure/ui-buttons"
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {assetProcessorContentItemToApiJson} from "@canvas/deep-linking/models/AssetProcessorContentItem"
 
 import {AssetProcessorsAddModal} from "./AssetProcessorsAddModal"
 import {AssetProcessorsAttachedProcessorCard} from "./AssetProcessorsCards"
 import {Flex} from "@instructure/ui-flex"
 import {useAssetProcessorsAddModalState} from "./hooks/AssetProcessorsAddModalState"
 import {useAssetProcessorsToolsList} from "./hooks/useAssetProcessorsToolsList"
-import {useAssetProcessorsState} from "./hooks/AssetProcessorsState"
+import {ExistingAttachedAssetProcessor, useAssetProcessorsState} from "./hooks/AssetProcessorsState"
+import {useEffect} from "react"
 
 const I18n = createI18nScope('asset_processors_selection')
 
@@ -37,6 +37,7 @@ const queryClient = new QueryClient()
 export type AssetProcessorsProps = {
   courseId: number,
   secureParams: string,
+  initialAttachedProcessors: ExistingAttachedAssetProcessor[],
 }
 
 /**
@@ -64,10 +65,15 @@ export function AssetProcessors(
   const openAddDialog = useAssetProcessorsAddModalState(s => s.actions.showToolList)
   const toolsAvailable = !! useAssetProcessorsToolsList(props.courseId).data?.length;
   const {
-    attachedProcessors, addAttachedProcessors, deleteAttachedProcessor
+    attachedProcessors, addAttachedProcessors, deleteAttachedProcessor, setFromExistingAttachedProcessors,
   } = useAssetProcessorsState(s => s)
 
-  if (!toolsAvailable) {
+  useEffect(() => {
+    // Neither of the deps will change, so this should only run once
+    setFromExistingAttachedProcessors(props.initialAttachedProcessors)
+  }, [props.initialAttachedProcessors, setFromExistingAttachedProcessors])
+
+  if (!toolsAvailable && !attachedProcessors.length) {
     // No tools available, or we are still loading, or there was an error fetching
     return null
   }
@@ -84,13 +90,12 @@ export function AssetProcessors(
               <AssetProcessorsAttachedProcessorCard
                 key={index}
                 icon={{
-                  toolId: processor.tool.definition_id,
-                  toolName: processor.tool.name,
-                  url: processor.contentItem.icon?.url ||
-                    processor.tool.placements?.ActivityAssetProcessor?.icon_url
+                  toolId: processor.toolId,
+                  toolName: processor.toolName || '',
+                  url: processor.iconUrl
                 }}
-                title={processor.contentItem.title}
-                description={processor.contentItem.text}
+                title={processor.title}
+                description={processor.text}
                 onModify={() => {}}
                 onDelete={() => deleteAttachedProcessor(index)}
               >
@@ -98,17 +103,16 @@ export function AssetProcessors(
                   data-testid={`asset_processors[${index}]`}
                   type="hidden"
                   name={`asset_processors[${index}]`}
-                  value={JSON.stringify(
-                    assetProcessorContentItemToApiJson(
-                      processor.contentItem, processor.tool.definition_id
-                    )
-                  )}
+                  value={processor.dtoJson}
                 />
               </AssetProcessorsAttachedProcessorCard>
             ))}
             <span><Button color="secondary" onClick={openAddDialog}>{I18n.t("Add Document Processing App")}</Button></span>
           </Flex>
-          <AssetProcessorsAddModal onProcessorResponse={addAttachedProcessors} {...props} />
+          {
+            toolsAvailable && 
+            <AssetProcessorsAddModal onProcessorResponse={addAttachedProcessors} {...props} />
+          }
         </div>
       </div>
     </div>

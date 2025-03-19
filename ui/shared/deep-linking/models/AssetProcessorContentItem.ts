@@ -29,8 +29,9 @@ export type AssetProcessorContentItem = {
   errors?: Record<string, string>
 } & AssetProcessorCommonFields
 
+// Part of the the JSON sent to the API when saving (creating/editing) assignments
 // Should match up with ruby app/models/lti/asset_processor.rb#build_for_assignment
-export type AssetProcessorApiJson = {
+export type AssetProcessorContentItemDto = {
   context_external_tool_id: number | string,
 } & AssetProcessorCommonFields
 
@@ -68,10 +69,10 @@ export type AssetProcessorCommonFields = {
   report?: AssetProcessorContentItemReport
 }
 
-export function assetProcessorContentItemToApiJson(
+export function assetProcessorContentItemToDto(
   contentItem: AssetProcessorContentItem, 
   toolId: number | string,
-): AssetProcessorApiJson {
+): AssetProcessorContentItemDto {
   const {type, errors, ...commonFields} = contentItem
   return {context_external_tool_id: toolId, ...commonFields}
 }

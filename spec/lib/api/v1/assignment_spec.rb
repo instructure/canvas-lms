@@ -1095,29 +1095,15 @@ describe "Api::V1::Assignment" do
       end
     end
 
-    context "when asset processor content items are passed in for asset processor" do
+    context "when asset processor content items are passed in" do
       let_once(:tool) { external_tool_1_3_model(context: account, developer_key:) }
-      let(:content_items) do
-        [
-          {
-            "url" => "",
-            "title" => "Lti 1.3 Tool Title",
-            "text" => "Lti 1.3 Tool Text",
-            "custom" => "",
-            "icon" => "{\"url\":\"https://img.icons8.com/metro/1600/unicorn.png\",\"width\":64,\"height\":64}",
-            "window" => "",
-            "iframe" => "",
-            "report" => "{\"supportedTypes\":[\"originality\",\"ai_detection\"],\"released\":true,\"indicator\":false,\"custom\":{\"some_setting\":\"az-123\"}}",
-            "assignment_id" => "",
-            "context_external_tool_id" => tool.id,
-          }
-        ]
-      end
-
       let_once(:assignment_create_params) do
         ActionController::Parameters.new(
           name: "New Assignment",
-          asset_processors: content_items,
+          asset_processors: [
+            { "new_content_item" => make_ap_content_item("Processor 1!") },
+            { "new_content_item" => make_ap_content_item("Processor 2!") },
+          ],
           submission_type: "online",
           submission_types: ["online_upload"],
           similarityDetectionTool: ""
@@ -1128,10 +1114,24 @@ describe "Api::V1::Assignment" do
         Account.default.enable_feature! :lti_asset_processor
       end
 
+      def make_ap_content_item(title)
+        {
+          "url" => "",
+          "title" => title,
+          "text" => "Lti 1.3 Tool Text",
+          "custom" => "",
+          "icon" => "{\"url\":\"https://img.icons8.com/metro/1600/unicorn.png\",\"width\":64,\"height\":64}",
+          "window" => "",
+          "iframe" => "",
+          "report" => "{\"supportedTypes\":[\"originality\",\"ai_detection\"],\"released\":true,\"indicator\":false,\"custom\":{\"some_setting\":\"az-123\"}}",
+          "context_external_tool_id" => tool.id,
+        }
+      end
+
       context "when the content_items are valid" do
         it "creates asset processors for the assignment" do
           expect { subject }.to change { Assignment.count }.by(1)
-          expect(subject.lti_asset_processors.count).to eq 1
+          expect(subject.lti_asset_processors.pluck(:title)).to match_array ["Processor 1!", "Processor 2!"]
         end
       end
 
@@ -1145,7 +1145,7 @@ describe "Api::V1::Assignment" do
 
       context "when the assignment is not asset processor capable" do
         it "does not create asset processors for the assignment" do
-          assignment_create_params[:submission_type] = nil
+          assignment_create_params[:submission_types] = ["online_url"]
           expect { subject }.to change { Assignment.count }.by(1)
           expect(subject.lti_asset_processors.count).to eq 0
         end
@@ -1260,6 +1260,68 @@ describe "Api::V1::Assignment" do
           json = api.assignment_json(assignment, user, session, opts)
           expect(json).to be_a(Hash)
           expect(json).to_not have_key "migrated_urls_content_migration_id"
+        end
+      end
+    end
+
+    context "when asset processor content items are passed in" do
+      def make_ap(title, context_external_tool)
+        assignment.lti_asset_processors.create!(title:, context_external_tool:)
+      end
+
+      let(:account) { assignment.root_account }
+      let(:developer_key) { lti_developer_key_model(account:) }
+      let(:tool) { external_tool_1_3_model(context: account, developer_key:) }
+      let(:tool2) { external_tool_1_3_model(context: account, developer_key:) }
+
+      let(:existing_ap1) { make_ap("Existing1", tool) }
+      let(:existing_ap2) { make_ap("Existing2", tool2) }
+
+      let(:content_items) do
+        [
+          { "existing_id" => existing_ap1.id },
+          {
+            "new_content_item" => {
+              "title" => "AP Title",
+              "text" => "AP Text",
+              "report" => "{}",
+              "context_external_tool_id" => tool.id,
+            }
+          }
+        ]
+      end
+
+      # don't use let_once (it could cause two different assignments to be created)
+      let(:assignment_update_params) do
+        ActionController::Parameters.new(
+          name: assignment.name,
+          submission_type: "online",
+          submission_types: ["online_upload"],
+          asset_processors: content_items,
+          similarityDetectionTool: ""
+        )
+      end
+
+      before do
+        Account.default.enable_feature! :lti_asset_processor
+        assignment.update!(submission_types: "online_upload")
+        existing_ap1
+        existing_ap2
+      end
+
+      context "when the content_items are valid" do
+        it "creates, deletes, and retains asset processors as appropriate" do
+          expect { subject }.to \
+            change { assignment.lti_asset_processors.active.pluck(:title).sort }
+            .from(["Existing1", "Existing2"])
+            .to(["AP Title", "Existing1"])
+        end
+      end
+
+      context "when the assignment is no longer asset processor capable" do
+        it "deletes any previous asset processors" do
+          assignment_update_params[:submission_types] = ["online_url"]
+          expect { subject }.to change { assignment.lti_asset_processors.active.count }.from(2).to(0)
         end
       end
     end

@@ -53,9 +53,12 @@ jest.mock('jquery-ui', () => {
 })
 
 jest.mock('../../../react/AssetProcessors', () => ({
-  attach: ({container, courseId, secureParams}) => {
-    const el = <div>AssetProcessors courseId={courseId} secureParams={secureParams}</div>
-      createRoot(container).render(el)
+  attach: ({container, initialAttachedProcessors, courseId, secureParams}) => {
+    const initialJson = JSON.stringify(initialAttachedProcessors)
+    const el = <div>
+      AssetProcessors initialAttachedProcessors={initialJson} courseId={courseId} secureParams={secureParams}
+    </div>
+    createRoot(container).render(el)
   }
 }))
 
@@ -329,7 +332,20 @@ describe('EditView', () => {
         expect(view.$assetProcessorsContainer.children()).toHaveLength(1)
       })
       await waitFor(() => {
-        expect(view.$assetProcessorsContainer.text()).toBe('AssetProcessors courseId=1 secureParams=some super secure params')
+        expect(view.$assetProcessorsContainer.text()).toBe(
+        'AssetProcessors initialAttachedProcessors=[] courseId=1 secureParams=some super secure params'
+      )
+      })
+    })
+
+    it('contains the correct initialAttachedProcessors', async () => {
+      window.ENV.FEATURES = {lti_asset_processor: true}
+      window.ENV.ASSET_PROCESSORS = [{id: 1}] // rest of the fields omitted here for brevity
+      const view = createEditViewOnlineSubmission({onlineUpload: true})
+      await waitFor(() => {
+        expect(view.$assetProcessorsContainer.text()).toBe(
+        'AssetProcessors initialAttachedProcessors=[{"id":1}] courseId=1 secureParams=some super secure params'
+      )
       })
     })
 

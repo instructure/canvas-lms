@@ -2931,6 +2931,33 @@ describe AssignmentsController do
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be false
       end
     end
+
+    describe "ASSET_PROCESSORS" do
+      before { user_session(@teacher) }
+
+      it "includes the existing asset processors" do
+        tool = external_tool_1_3_model(context: @course)
+        ap1 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 1")
+        ap2 = lti_asset_processor_model(tool:, assignment: @assignment, title: "ap 2")
+        get :edit, params: { course_id: @course.id, id: @assignment.id }
+
+        aps = assigns[:js_env][:ASSET_PROCESSORS].map do |ap|
+          ap.slice(:id, :title, :context_external_tool_id)
+        end
+
+        expected = [
+          { id: ap1.id, title: "ap 1", context_external_tool_id: tool.id },
+          { id: ap2.id, title: "ap 2", context_external_tool_id: tool.id }
+        ]
+
+        expect(aps).to match_array(expected)
+      end
+
+      it "is an empty array when there are no asset processors" do
+        get :edit, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ASSET_PROCESSORS]).to eq []
+      end
+    end
   end
 
   describe "DELETE 'destroy'" do

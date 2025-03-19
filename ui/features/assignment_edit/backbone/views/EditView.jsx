@@ -1198,7 +1198,6 @@ EditView.prototype.handleExternalContentReady = function (data) {
 EditView.prototype.handleOnlineSubmissionTypeChange = function (_env) {
   const showAssetProcessors =
     window.ENV?.FEATURES?.lti_asset_processor &&
-    this.assignment.isNew() &&
     this.$submissionType.val() === 'online' &&
     this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked')
   this.$assetProcessorsContainer.toggleAccessibly(showAssetProcessors)
@@ -1242,6 +1241,7 @@ EditView.prototype.afterRender = function () {
       container: this.$assetProcessorsContainer.get(0),
       courseId: ENV.COURSE_ID,
       secureParams: this.$secureParams.val(),
+      initialAttachedProcessors: ENV.ASSET_PROCESSORS || [],
     })
   }
 
