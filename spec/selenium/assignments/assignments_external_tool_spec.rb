@@ -242,9 +242,10 @@ describe "external tool assignments" do
       get "/courses/#{@course.id}/assignments/new"
       click_option("#assignment_submission_type", @t1.name) # should use the tool name for drop-down
       f("#assignment_submission_type_selection_launch_button").click
-      expect(fxpath("//span[@aria-label = 'Launch External Tool']//h2").text).to include("link to #{@t1.name} or whatever")
+      tool_title = @t1.submission_type_selection["text"]
+      expect(fxpath("//span[@aria-label = '#{tool_title}']//h2").text).to include("link to #{@t1.name} or whatever")
 
-      close_button_selector = "//span[@aria-label = 'Launch External Tool']//button[//*[text() = 'Close']]"
+      close_button_selector = "//span[@aria-label = '#{tool_title}']//button[//*[text() = 'Close']]"
       close_button = fxpath(close_button_selector)
       close_button.click
       expect(element_exists?(close_button_selector, true)).to be(false)
