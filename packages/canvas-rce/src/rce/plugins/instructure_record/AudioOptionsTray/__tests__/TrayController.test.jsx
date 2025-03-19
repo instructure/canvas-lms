@@ -50,6 +50,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
   let trayController
 
   beforeEach(() => {
+    RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
     createLiveRegion()
 
     const trayProps = {

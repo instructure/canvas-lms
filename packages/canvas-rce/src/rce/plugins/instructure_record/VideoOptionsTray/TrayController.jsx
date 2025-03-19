@@ -133,7 +133,10 @@ export default class TrayController {
         media_object_id: videoOptions.media_object_id,
         title: videoOptions.titleText,
         subtitles: videoOptions.subtitles,
-        attachment_id: videoOptions.attachment_id,
+      }
+
+      if (RCEGlobals.getFeatures().media_links_use_attachment_id) {
+        data.attachment_id = videoOptions.attachment_id
       }
 
       // If the video just edited came from a file uploaded to canvas

@@ -97,6 +97,7 @@ export class UploadMediaModal extends React.Component {
       upload: bool,
     }),
     uploadMediaTranslations: translationShape,
+    media_links_use_attachment_id: bool,
     // for testing
     computerFile: instanceOf(File),
     userLocale: string,
@@ -104,6 +105,7 @@ export class UploadMediaModal extends React.Component {
   }
 
   static defaultProps = {
+    media_links_use_attachment_id: false,
     disableSubmitWhileUploading: false,
     userLocale: 'en',
   }
@@ -210,7 +212,7 @@ export class UploadMediaModal extends React.Component {
   }
 
   saveMediaCallback = async (err, data) => {
-    const {onUploadComplete, onDismiss, rcsConfig} = this.props
+    const {onUploadComplete, onDismiss, rcsConfig, media_links_use_attachment_id} = this.props
     const {selectedPanel, subtitles} = this.state
     if (err) {
       onUploadComplete?.(err, data)
@@ -219,12 +221,19 @@ export class UploadMediaModal extends React.Component {
         const {media_object} = data.mediaObject
         let captions
         if (selectedPanel === PANELS.COMPUTER && subtitles.length > 0) {
-          captions = await saveClosedCaptionsForAttachment(
-                       media_object.attachment_id,
-                       subtitles,
-                       rcsConfig,
-                       CC_FILE_MAX_BYTES,
-                     )
+          captions = media_links_use_attachment_id
+            ? await saveClosedCaptionsForAttachment(
+                media_object.attachment_id,
+                subtitles,
+                rcsConfig,
+                CC_FILE_MAX_BYTES,
+              )
+            : await saveClosedCaptions(
+                media_object.media_id,
+                subtitles,
+                rcsConfig,
+                CC_FILE_MAX_BYTES,
+              )
         }
         onUploadComplete?.(null, data, captions?.data)
       } catch (ex) {
