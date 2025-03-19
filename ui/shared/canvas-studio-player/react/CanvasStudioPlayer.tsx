@@ -17,7 +17,11 @@
  */
 import React, {CSSProperties, useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {captionLanguageForLocale, LoadingIndicator, sizeMediaPlayer} from '@instructure/canvas-media'
+import {
+  captionLanguageForLocale,
+  LoadingIndicator,
+  sizeMediaPlayer,
+} from '@instructure/canvas-media'
 import {CaptionMetaData, StudioPlayer} from '@instructure/studio-player'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
@@ -25,8 +29,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import getCookie from '@instructure/get-cookie'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import {type MediaTrack as Caption, type MediaSource} from 'api'
-import {type MediaInfo, MediaTrack} from './types'
+import {type MediaSource} from 'api'
+import {type MediaTrack} from './types'
 
 declare const ENV: GlobalEnv & {
   locale?: string
@@ -61,6 +65,19 @@ const convertAndSortMediaSources = (sources: CanvasMediaSource[] | string) => {
   return sources.map(convertMediaSource).sort(byBitrate)
 }
 
+const convertMediaTracks = (
+  tracks: {locale: string; inherited: boolean; url: string}[],
+): CaptionMetaData[] => {
+  return tracks.map(track => ({
+    locale: track.locale,
+    language: captionLanguageForLocale(track.locale),
+    inherited: track.inherited,
+    label: captionLanguageForLocale(track.locale),
+    src: track.url,
+    type: 'srt',
+  }))
+}
+
 // It can take a while for notorious to process a newly uploaded video
 // Each attempt to get the media_sources is 2**n seconds after the previous attempt
 // so we'll keep at it for about an hour (2**(MAX_RETRY_ATTEMPTS+1)/60 minutes) as long as there's no network error.
@@ -71,7 +88,7 @@ interface CanvasStudioPlayerProps {
   media_id: string
   // TODO: we've asked studio to export definitions for PlayerSrc and CaptionMetaData
   media_sources?: any[]
-  media_tracks?: Caption[]
+  media_tracks?: MediaTrack[]
   type?: 'audio' | 'video'
   MAX_RETRY_ATTEMPTS?: number
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS?: number
@@ -79,9 +96,7 @@ interface CanvasStudioPlayerProps {
   is_attachment?: boolean
   attachment_id?: string
   show_loader?: boolean
-  maxHeight?: null | string
-  mediaFetchCallback?: (mediaInfo: MediaInfo) => void,
-  explicitSize?: {width: number, height: number}
+  explicitSize?: {width: number | string; height: number | string}
   hideUploadCaptions?: boolean
 }
 
@@ -99,18 +114,11 @@ export default function CanvasStudioPlayer({
   is_attachment = false,
   attachment_id = '',
   show_loader = false,
-  maxHeight = null,
-  mediaFetchCallback = () => {},
   explicitSize,
   hideUploadCaptions = false,
 }: CanvasStudioPlayerProps) {
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
-    ? media_captions.map(t => ({
-        src: t.src || '',
-        label: t.label || '',
-        language: t.language || '',
-        type: t.type === 'vtt' ? 'vtt' : 'srt',
-      }))
+    ? convertMediaTracks(media_captions)
     : undefined
   const [mediaSources, setMediaSources] = useState(() => convertAndSortMediaSources(media_sources))
   const [mediaCaptions, setMediaCaptions] = useState<CaptionMetaData[] | undefined>(captions)
@@ -128,13 +136,14 @@ export default function CanvasStudioPlayer({
   const retryAttempts = ENV.MAX_MEDIA_SOURCE_RETRY_ATTEMPTS || MAX_RETRY_ATTEMPTS
   const showBePatientMsgAfterAttempts =
     ENV.SHOW_MEDIA_SOURCE_BE_PATIENT_MSG_AFTER_ATTEMPTS || SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS
-
   const containerRef = useRef<any>(null)
 
   function isEmbedded(): boolean {
-    return window.frameElement?.tagName === 'IFRAME' ||
-           window.location !== window?.top?.location ||
-           !containerRef.current
+    return (
+      window.frameElement?.tagName === 'IFRAME' ||
+      window.location !== window?.top?.location ||
+      !containerRef.current
+    )
   }
 
   const boundingBox = useCallback(() => {
@@ -145,7 +154,6 @@ export default function CanvasStudioPlayer({
         height: window.innerHeight,
       }
     }
-
     // media_player_iframe_content.js includes a 16px top/bottom margin
     return {
       width: containerRef?.current?.clientWidth,
@@ -170,14 +178,15 @@ export default function CanvasStudioPlayer({
         updateContainerSize(boundingBoxDimensions.width, boundingBoxDimensions.height)
       } else if (Array.isArray(mediaSources)) {
         const player = {
-          videoHeight: mediaSources[0].height,
-          videoWidth: mediaSources[0].width,
+          videoHeight: mediaSources[0]?.height || 0,
+          videoWidth: mediaSources[0]?.width || 0,
         }
-        const { width, height } = sizeMediaPlayer(player, type, boundingBoxDimensions)
+
+        const {width, height} = sizeMediaPlayer(player, type, boundingBoxDimensions)
         updateContainerSize(width, height)
       }
     },
-    [type, boundingBox, mediaSources],
+    [type, boundingBox, mediaSources, explicitSize],
   )
 
   const fetchSources = useCallback(
@@ -202,22 +211,14 @@ export default function CanvasStudioPlayer({
       if (resp?.media_sources?.length) {
         setMediaSources(convertAndSortMediaSources(resp.media_sources))
         if (!media_captions) {
-          setMediaCaptions(resp.media_tracks.map((caption: MediaTrack) => ({
-            locale: caption.locale,
-            language: captionLanguageForLocale(caption.locale),
-            inherited: caption.inherited,
-            label: captionLanguageForLocale(caption.locale),
-            src: caption.url,
-            type: 'srt',
-          })))
+          setMediaCaptions(convertMediaTracks(resp.media_tracks))
         }
-        mediaFetchCallback(resp)
         setIsLoading(false)
       } else {
         setRetryAttempt(retryAttempt + 1)
       }
     },
-    [attachment_id, media_id, retryAttempt],
+    [attachment_id, media_id, retryAttempt, media_captions],
   )
 
   const deleteCaption = useCallback(async (caption: CaptionMetaData) => {
@@ -340,23 +341,20 @@ export default function CanvasStudioPlayer({
 
   useEffect(() => {
     handlePlayerSize({})
-  }, [mediaSources, type, boundingBox])
+  }, [mediaSources, type, boundingBox, handlePlayerSize])
 
-  function renderLoader(){
-    if (retryAttempt >= showBePatientMsgAfterAttempts){
+  function renderLoader() {
+    if (retryAttempt >= showBePatientMsgAfterAttempts) {
       setIsLoading(false)
       return
     }
-    return <Spinner renderTitle={I18n.t('Loading media')} size="small" margin="small"/>
+    return <Spinner renderTitle={I18n.t('Loading media')} size="large" margin="0 0 0 medium" />
   }
 
   const containerStyle: Partial<CSSProperties> = {
     height: containerHeight,
-    width: containerWidth
-  }
-
-  if (maxHeight) {
-    containerStyle.maxHeight = maxHeight
+    width: containerWidth,
+    color: '#2d3b45',
   }
 
   const hideCaptionButtons = hideUploadCaptions || !canAddCaptions
@@ -391,12 +389,22 @@ export default function CanvasStudioPlayer({
                         text: I18n.t('Upload Captions'),
                         icon: 'transcript',
                         onClick: () => {
-                          const src = Array.isArray(mediaSources) ? mediaSources[0].src : mediaSources
-                          import('../../mediaelement/UploadMediaTrackForm').then(({default: UploadMediaTrackForm}) => {
-                            new UploadMediaTrackForm(media_id, src, attachment_id as any, false, 99000)
-                          })
+                          const src = Array.isArray(mediaSources)
+                            ? mediaSources[0].src
+                            : mediaSources
+                          import('../../mediaelement/UploadMediaTrackForm').then(
+                            ({default: UploadMediaTrackForm}) => {
+                              new UploadMediaTrackForm(
+                                media_id,
+                                src,
+                                attachment_id as any,
+                                false,
+                                99000,
+                              )
+                            },
+                          )
                         },
-                      }
+                      },
                     ]
               }
             />
@@ -407,14 +415,4 @@ export default function CanvasStudioPlayer({
       )}
     </>
   )
-}
-
-export function formatTracksForMediaPlayer(tracks: any[]) {
-  return tracks.map((track: {id: any; media_object_id: any; locale: any; kind: any}) => ({
-    id: track.id,
-    src: `/media_objects/${track.media_object_id}/media_tracks/${track.id}`,
-    label: track.locale,
-    type: track.kind,
-    language: track.locale,
-  }))
 }

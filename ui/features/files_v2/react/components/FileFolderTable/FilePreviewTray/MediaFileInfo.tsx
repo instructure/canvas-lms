@@ -16,40 +16,84 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MediaInfo, MediaTrack} from "@canvas/canvas-studio-player/react/types";
-import {captionLanguageForLocale} from "@instructure/canvas-media";
-import {Flex} from "@instructure/ui-flex";
-import {Heading} from "@instructure/ui-heading";
-import {Text} from "@instructure/ui-text";
+import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React from "react";
+import {CondensedButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+import {IconPlusLine} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
+import type {File} from '../../../../interfaces/File'
+import {MediaTrack} from '@canvas/canvas-studio-player/react/types'
+import {UploadMediaTrackForm} from './UploadMediaTrackForm'
+import LoadingIndicator from '../../../../../../shared/loading-indicator/react'
+import {MediaTrackList} from './MediaTrackList'
 
 const I18n = createI18nScope('files_v2')
 
-const renderMediaTracks = (media_tracks: MediaTrack[]) => {
-  return media_tracks.map((caption: MediaTrack) => (
-    <p key={caption.id}>{captionLanguageForLocale(caption.locale)}</p>
-  ))
+export interface MediaFileInfoProps {
+  attachment: File
+  mediaTracks: MediaTrack[]
+  isLoading: boolean
+  canAddTracks: boolean
 }
-const MediaFileInfo = ({mediaInfo}: {mediaInfo: MediaInfo}) => {
-  if (!mediaInfo || !mediaInfo.can_add_captions) { return null }
+
+export const MediaFileInfo = ({
+  attachment,
+  mediaTracks,
+  isLoading,
+  canAddTracks,
+}: MediaFileInfoProps) => {
+  const [showUploadForm, setShowUploadForm] = useState(false)
+  const showMediaFileInfo = canAddTracks && !attachment.restricted_by_master_course
+  const existingLocales = mediaTracks.map((track: any) => track.locale)
+
+  if (isLoading) {
+    return (
+      <Flex direction="column" gap="x-small">
+        <Heading margin="large 0">{I18n.t('Media Options')}</Heading>
+        <LoadingIndicator />
+      </Flex>
+    )
+  }
+
+  // canAddTracks is unknown until the response is complete
+  if (!showMediaFileInfo) {
+    return null
+  }
 
   return (
-    <Flex direction="column" gap="small">
-      <Heading margin="large 0">{I18n.t('Video Options')}</Heading>
-      <Flex.Item>
-        {
-          mediaInfo.media_tracks && (<>
-            <Text weight="bold">{I18n.t('Closed Captions/Subtitles')}</Text>
-            <br/>
-            {
-              mediaInfo.media_tracks.length > 0 ? renderMediaTracks(mediaInfo.media_tracks) : I18n.t('None')
-            }
-          </>)
-        }
-      </Flex.Item>
+    <Flex direction="column" gap="x-small">
+      <Heading margin="large 0">{I18n.t('Media Options')}</Heading>
+
+      <Text weight="bold">{I18n.t('Closed Captions/Subtitles')}</Text>
+
+      {mediaTracks.length === 0 && (
+        <Flex as="div" margin="0 0 x-small">
+          {I18n.t('None')}
+        </Flex>
+      )}
+      {showUploadForm ? (
+        <UploadMediaTrackForm
+          closeForm={() => setShowUploadForm(false)}
+          attachmentId={attachment.id}
+          existingLocales={existingLocales}
+        />
+      ) : (
+        <CondensedButton
+          renderIcon={<IconPlusLine size="x-small" />}
+          color="primary-inverse"
+          onClick={() => setShowUploadForm(true)}
+        >
+          {I18n.t('Add Captions/Subtitles')}
+        </CondensedButton>
+      )}
+      {mediaTracks.length > 0 && (
+        <>
+          <hr />
+          <MediaTrackList mediaTracks={mediaTracks} attachmentId={attachment.id} />
+        </>
+      )}
     </Flex>
   )
 }
-
-export default MediaFileInfo
