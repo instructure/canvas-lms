@@ -2577,7 +2577,12 @@ class Attachment < ActiveRecord::Base
                               if (existing_attachment = new_attachment.find_existing_attachment_for_md5)
                                 new_attachment.root_attachment = existing_attachment
                               else
-                                attachment.copy_attachment_content(new_attachment)
+                                begin
+                                  attachment.copy_attachment_content(new_attachment)
+                                rescue Aws::S3::Errors::NoSuchKey => e
+                                  Canvas::Errors.capture_exception(:attachment, e, :warn)
+                                  next
+                                end
                               end
                               new_attachment
                             end
