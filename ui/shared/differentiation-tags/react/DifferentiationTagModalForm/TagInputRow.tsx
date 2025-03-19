@@ -81,7 +81,7 @@ const TagInputRow: React.FC<TagInputRowProps> = ({
               ? [
                   {
                     text: error,
-                    type: 'error',
+                    type: 'newError',
                   },
                 ]
               : undefined
