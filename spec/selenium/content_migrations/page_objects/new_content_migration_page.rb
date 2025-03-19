@@ -143,8 +143,8 @@ class NewContentMigrationPage
       f(".tool_launch")
     end
 
-    def lti_title
-      fxpath('//*[@aria-label="Launch External Tool"]//h2')
+    def lti_title(lti_title = "Launch External Tool")
+      fxpath("//*[@aria-label='#{lti_title}']//h2")
     end
 
     def basic_lti_link

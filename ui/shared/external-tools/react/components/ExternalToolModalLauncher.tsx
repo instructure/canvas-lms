@@ -209,7 +209,7 @@ export default class ExternalToolModalLauncher extends React.Component<ExternalT
 
     return (
       <CanvasModal
-        label={I18n.t('Launch External Tool')}
+        label={I18n.t('%{externalToolText}', {externalToolText: this.props.title || 'Launch External Tool'})}
         open={this.props.isOpen}
         onDismiss={this.props.onRequestClose}
         onOpen={this.onAfterOpen}
