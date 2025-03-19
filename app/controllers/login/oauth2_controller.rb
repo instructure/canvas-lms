@@ -26,7 +26,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
 
   def new
     nonce = push_nonce
-    jwt = Canvas::Security.create_jwt({ aac_id: aac.global_id, nonce:, host: request.host_with_port }, 10.minutes.from_now)
+    jwt = Canvas::Security.create_jwt({ aac_id: aac.global_id, nonce:, host: request.host_with_port }.merge(additional_state_claims), 10.minutes.from_now)
     authorize_url = aac.generate_authorize_url(oauth2_login_callback_url, jwt, nonce:, **additional_authorize_params)
 
     if aac.debugging? && aac.debug_set(:nonce, nonce, overwrite: false)
@@ -85,6 +85,10 @@ class Login::OAuth2Controller < Login::OAuthBaseController
   end
 
   def additional_authorize_params
+    {}
+  end
+
+  def additional_state_claims
     {}
   end
 

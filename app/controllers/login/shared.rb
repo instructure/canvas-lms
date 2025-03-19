@@ -233,11 +233,16 @@ module Login::Shared
   def increment_statsd(counter, tags: {}, action: nil, reason: nil, authentication_provider: nil)
     action ||= params[:action]
     authentication_provider ||= @aac
+    target_provider = try(:target_auth_provider)
     auth_type = authentication_provider&.auth_type || self.auth_type
+
     tags ||= {}
     tags = tags.reverse_merge({ auth_type:, domain: request.host })
+
+    tags[:target_auth_type] = target_provider.auth_type if target_provider
     tags[:auth_provider_id] = authentication_provider.global_id if authentication_provider
     tags[:reason] = reason if reason
+
     InstStatsd::Statsd.distributed_increment("auth.#{action}.#{counter}.v2", tags:)
   end
 end
