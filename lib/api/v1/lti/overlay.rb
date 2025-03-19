@@ -28,9 +28,11 @@ module Api::V1::Lti::Overlay
 
   def lti_overlay_json(overlay, user, session, context)
     api_json(overlay, user, session, only: JSON_ATTRS).tap do |json|
-      if overlay.updated_by.present?
-        json["updated_by"] = user_json(overlay.updated_by, user, session, [], context, nil, ["pseudonym"])
-      end
+      json["updated_by"] = if overlay.updated_by.present?
+                             user_json(overlay.updated_by, user, session, [], context, nil, ["pseudonym"])
+                           else
+                             nil
+                           end
     end
   end
 end

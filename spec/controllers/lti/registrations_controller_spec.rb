@@ -799,6 +799,28 @@ RSpec.describe Lti::RegistrationsController do
         expect(response_json[:overlay]).to have_key(:versions)
         expect(response_json[:overlay][:versions].length).to eq(5)
       end
+
+      context "and one of the user's that modified the overlay is a site admin" do
+        specs_require_cache(:redis_cache_store)
+
+        let(:site_admin) { site_admin_user(name: "Don't Show Me!") }
+        let(:site_admin_overlay_version) do
+          lti_overlay_version_model(created_by: site_admin,
+                                    lti_overlay: overlay,
+                                    diff: [["+", "disabled_scopes[0]", "https://canvas.instructure.com/lti-ags/progress/scope/show"]])
+        end
+
+        before do
+          site_admin_overlay_version
+        end
+
+        it "omits the site admin user's name" do
+          subject
+          expect(response_json[:overlay]).to have_key(:versions)
+          expect(response_json[:overlay][:versions].length).to eq(5)
+          expect(response_json[:overlay][:versions].first[:created_by]).to eq("Instructure")
+        end
+      end
     end
 
     context "with a site admin registration" do

@@ -95,7 +95,7 @@ export type FetchRegistrationWithAllInfoForId = (options: {
 export const fetchRegistrationWithAllInfoForId: FetchRegistrationWithAllInfoForId = options =>
   parseFetchResult(ZLtiRegistrationWithAllInformation)(
     fetch(
-      `/api/v1/accounts/${options.accountId}/lti_registrations/${options.ltiRegistrationId}?include[]=overlaid_configuration`,
+      `/api/v1/accounts/${options.accountId}/lti_registrations/${options.ltiRegistrationId}?include[]=overlaid_configuration&include[]=overlay&include[]=overlay_versions`,
       defaultFetchOptions(),
     ),
   )

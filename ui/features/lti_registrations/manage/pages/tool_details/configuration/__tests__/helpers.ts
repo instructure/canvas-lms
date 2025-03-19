@@ -17,24 +17,6 @@
  */
 
 import {InternalLtiConfiguration} from '../../../../model/internal_lti_configuration/InternalLtiConfiguration'
-import {LtiRegistrationWithAllInformation} from '../../../../model/LtiRegistration'
-import {mockRegistration} from '../../../manage/__tests__/helpers'
-
-export const mockRegistrationWithAllInformation = (
-  n: string,
-  i: number,
-  configuration: Partial<InternalLtiConfiguration> = {},
-  registration: Partial<LtiRegistrationWithAllInformation> = {},
-) => {
-  const mockedReg = mockRegistration(n, i, configuration, registration)
-  return {
-    ...mockedReg,
-    overlaid_configuration: {
-      ...mockedReg.configuration,
-      ...registration.overlaid_configuration,
-    },
-  }
-}
 
 export const mockConfiguration = (
   config: Partial<InternalLtiConfiguration>,
