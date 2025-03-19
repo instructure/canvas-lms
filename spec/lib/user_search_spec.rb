@@ -615,5 +615,130 @@ describe UserSearch do
         it { is_expected.not_to include("not enrolled 02") }
       end
     end
+
+    describe "sorting" do
+      before do
+        @test_teacher = User.create!(name: "Woody Walton")
+        TeacherEnrollment.create!(user: @test_teacher, course:, workflow_state: "active")
+        @sorted_by_name = ["Ĭńşŧřůćƭǜȑȩ Person", "Jon Stewart", "Martha Jones", "Martha Stewart", "Rose Tyler", "Rosemary Giver", "Stewart Little", "Tyler Pickett", "Woody Walton"]
+      end
+
+      context "name" do
+        it "sorts by name ascending" do
+          users = UserSearch.scope_for(course, @test_teacher, sort: "name", order: "asc").to_a
+          expect(users.map(&:name)).to eq @sorted_by_name
+        end
+
+        it "sorts by name descending" do
+          users = UserSearch.scope_for(course, @test_teacher, sort: "name", order: "desc").to_a
+          expect(users.map(&:name)).to eq @sorted_by_name.reverse
+        end
+      end
+
+      context "login_id" do
+        before do
+          User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "tyler@example.com", account_id: course.root_account_id)
+          User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "pickett@example.com", account_id: course.root_account_id)
+        end
+
+        it "sorts by login_id ascending" do
+          users = UserSearch.scope_for(course, @test_teacher, sort: "login_id", order: "asc").to_a
+          login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+          expect(login_ids).to include("pickett@example.com")
+          expect(login_ids).to include("tyler@example.com")
+          expect(login_ids[0..1]).to eq ["pickett@example.com", "tyler@example.com"]
+        end
+
+        it "sorts by login_id descending" do
+          users = UserSearch.scope_for(course, @test_teacher, sort: "login_id", order: "desc").to_a
+          login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+          expect(login_ids).to include("tyler@example.com")
+          expect(login_ids).to include("pickett@example.com")
+          expect(login_ids[0..1]).to eq ["tyler@example.com", "pickett@example.com"]
+        end
+
+        context "with include_deleted_users" do
+          before do
+            @deleted_user = User.create!(name: "Deleted User")
+            User.find_by(name: "Deleted User").pseudonyms.create!(unique_id: "deleted@example.com", account_id: course.root_account_id)
+            @deleted_user.remove_from_root_account(course.root_account)
+          end
+
+          describe "when include_deleted_users is true" do
+            it "includes deleted users when sorting by login_id ascending" do
+              users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "asc", include_deleted_users: true).to_a
+              login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+              expect(login_ids).to include("deleted@example.com")
+              expect(login_ids).to include("pickett@example.com")
+              expect(login_ids).to include("tyler@example.com")
+              expect(login_ids[0..2]).to eq ["deleted@example.com", "pickett@example.com", "tyler@example.com"]
+            end
+
+            it "includes deleted users when sorting by login_id descending" do
+              users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "desc", include_deleted_users: true).to_a
+              login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+              expect(login_ids).to include("tyler@example.com")
+              expect(login_ids).to include("pickett@example.com")
+              expect(login_ids).to include("deleted@example.com")
+              expect(login_ids[0..2]).to eq ["tyler@example.com", "pickett@example.com", "deleted@example.com"]
+            end
+          end
+
+          describe "when include_deleted_users is false (default)" do
+            it "excludes deleted users when sorting by login_id ascending" do
+              users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "asc").to_a
+              login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+              expect(login_ids).not_to include("deleted@example.com")
+              expect(login_ids).to include("pickett@example.com")
+              expect(login_ids).to include("tyler@example.com")
+              expect(login_ids[0..1]).to eq ["pickett@example.com", "tyler@example.com"]
+            end
+
+            it "excludes deleted users when sorting by login_id descending" do
+              users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "desc").to_a
+              login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+              expect(login_ids).not_to include("deleted@example.com")
+              expect(login_ids).to include("pickett@example.com")
+              expect(login_ids).to include("tyler@example.com")
+              expect(login_ids[0..1]).to eq ["tyler@example.com", "pickett@example.com"]
+            end
+          end
+        end
+      end
+
+      context "total_activity_time" do
+        before do
+          User.find_by(name: "Rose Tyler").enrollments&.first&.update!(total_activity_time: 100)
+          User.find_by(name: "Tyler Pickett").enrollments&.first&.update!(total_activity_time: 200)
+        end
+
+        it "sorts users by total activity time ascending" do
+          users = UserSearch.scope_for(course, @test_teacher, sort: "total_activity_time", order: "asc").to_a
+          total_activity_times = users.map { |u| u.enrollments&.first&.total_activity_time }
+
+          expect(total_activity_times[0..1]).to eq [100, 200]
+        end
+
+        it "sorts users by total activity time descending" do
+          users = UserSearch.scope_for(course, @test_teacher, sort: "total_activity_time", order: "desc").to_a
+          total_activity_times = users.map { |u| u.enrollments&.first&.total_activity_time }
+
+          expect(total_activity_times[0..1]).to eq [200, 100]
+        end
+
+        it "raises an error when context is an account" do
+          account = Account.create!
+          expect do
+            UserSearch.scope_for(account, @test_teacher, sort: "total_activity_time", order: "asc")
+          end.to raise_error(RequestError, "Sorting by total activity time is only available within a course context")
+        end
+      end
+    end
   end
 end

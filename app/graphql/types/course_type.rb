@@ -118,8 +118,8 @@ module Types
                prepare: :prepare_search_term
 
       def prepare_search_term(term)
-        if term.presence && term.length < 2
-          raise GraphQL::ExecutionError, "search_term must be at least 2 characters"
+        if term.presence && term.length < SearchTermHelper::MIN_SEARCH_TERM_LENGTH
+          raise GraphQL::ExecutionError, "search term must be at least #{SearchTermHelper::MIN_SEARCH_TERM_LENGTH} characters"
         end
 
         term
@@ -275,8 +275,9 @@ module Types
                required: false
 
       argument :filter, CourseUsersFilterInputType, required: false
+      argument :sort, CourseUsersSortInputType, required: false
     end
-    def users_connection(user_ids: nil, filter: {})
+    def users_connection(user_ids: nil, filter: {}, sort: {})
       return nil unless course.grants_any_right?(
         current_user,
         session,
@@ -287,20 +288,21 @@ module Types
 
       context.scoped_merge!(course:)
 
-      search_params = {
+      options = {
         enrollment_state: filter[:enrollment_states],
         enrollment_type: filter[:enrollment_types],
         enrollment_role_id: filter[:enrollment_role_ids],
         include_inactive_enrollments: true,
-        search_term: filter[:search_term]
+        sort: sort[:field],
+        order: sort[:direction]
       }
 
-      search_term = search_params[:search_term].presence
+      search_term = filter[:search_term].presence
 
       scope = if search_term
-                UserSearch.for_user_in_context(search_term, course, current_user, session, search_params)
+                UserSearch.for_user_in_context(search_term, course, current_user, session, options)
               else
-                UserSearch.scope_for(course, current_user, search_params)
+                UserSearch.scope_for(course, current_user, options)
               end
 
       user_ids = filter[:user_ids] || user_ids
