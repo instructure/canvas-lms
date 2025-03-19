@@ -19,6 +19,7 @@
 import fetchMock from 'fetch-mock'
 import RceApiSource from '../api'
 import {saveClosedCaptions, saveClosedCaptionsForAttachment} from '@instructure/canvas-media'
+import RCEGlobals from '../../rce/RCEGlobals'
 
 jest.mock('@instructure/canvas-media')
 
@@ -127,7 +128,8 @@ describe('fetchMedia', () => {
       contextId: 1,
     }
 
-    apiSource.apiFetch = jest.fn().mockResolvedValue({files: []})
+    apiSource.apiFetch = jest.fn()
+    fetchMock.mock('/api/documents', '{"files": []}')
   })
 
   it('fetches media documents', async () => {
@@ -234,9 +236,9 @@ describe('updateMediaData()', () => {
   const media_object_id = 'm-id',
     attachment_id = '123'
 
-  it('Uses the media object route with no attachment_id', async () => {
+  it('Uses the media object route with no attachment_id FF ON', async () => {
     apiSource.apiPost = jest.fn()
-    await apiSource.updateMediaObject(apiProps, {media_object_id, title: '', attachment_id: null})
+    await apiSource.updateMediaObject(apiProps, {media_object_id, title: '', attachment_id})
     expect(apiSource.apiPost).toHaveBeenCalledWith(
       'http://test.com/api/media_objects/m-id?user_entered_title=',
       expect.anything(),
@@ -245,8 +247,9 @@ describe('updateMediaData()', () => {
     )
   })
 
-  it('Uses the media attachment route with the attachment_id', async () => {
+  it('Uses the media attachment route with the attachment_id FF ON', async () => {
     apiSource.apiPost = jest.fn()
+    RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
     await apiSource.updateMediaObject(apiProps, {media_object_id, title: '', attachment_id})
     expect(apiSource.apiPost).toHaveBeenCalledWith(
       'http://test.com/api/media_attachments/123?user_entered_title=',
