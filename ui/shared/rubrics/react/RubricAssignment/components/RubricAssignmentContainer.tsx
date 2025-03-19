@@ -170,10 +170,10 @@ export const RubricAssignmentContainer = ({
               </IconButton>
             </Tooltip>
 
-            <Tooltip renderTip={I18n.t('Change Rubric')}>
+            <Tooltip renderTip={I18n.t('Replace Rubric')}>
               <IconButton
                 margin="0 0 0 small"
-                screenReaderLabel={I18n.t('Find New Rubric')}
+                screenReaderLabel={I18n.t('Replace Rubric')}
                 data-testid="find-assignment-rubric-icon-button"
                 onClick={() => setIsSearchTrayOpen(true)}
               >
