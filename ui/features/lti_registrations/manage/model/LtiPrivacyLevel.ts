@@ -37,6 +37,11 @@ export const AllLtiPrivacyLevels = [
 export const ZLtiPrivacyLevel = z.enum(AllLtiPrivacyLevels)
 
 /**
+ * The default privacy level for an LTI tool, if one isn't provided.
+ */
+export const DefaultLtiPrivacyLevel = LtiPrivacyLevels.Anonymous
+
+/**
  * Returns true if the given value is a valid LTI privacy level.
  * @param setting
  * @returns

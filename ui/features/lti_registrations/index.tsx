@@ -43,7 +43,7 @@ import type {Lti1p3RegistrationWizardService} from './manage/lti_1p3_registratio
 import {ZAccountId} from './manage/model/AccountId'
 import {ToolDetails} from './manage/pages/tool_details/ToolDetails'
 import {ToolAccess} from './manage/pages/tool_details/access/ToolAccess'
-import {ToolConfiguration} from './manage/pages/tool_details/configuration/ToolConfiguration'
+import {ToolConfiguration} from './manage/pages/tool_details/configuration/ToolConfigurationView'
 import {ToolHistory} from './manage/pages/tool_details/history/ToolHistory'
 import {ToolUsage} from './manage/pages/tool_details/usage/ToolUsage'
 import type {JsonUrlWizardService} from './manage/registration_wizard/JsonUrlWizardService'
