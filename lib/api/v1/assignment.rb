@@ -1251,12 +1251,24 @@ module Api::V1::Assignment
   end
 
   def apply_asset_processor_settings(assignment, assignment_params)
-    # I'm limiting this for create because updating is a can of worms right now
-    if assignment.new_record? && assignment_params["asset_processors"].present? && asset_processor_capable?(assignment_params)
-      assignment_params["asset_processors"].each do |content_item|
-        ap = Lti::AssetProcessor.build_for_assignment(content_item)
-        assignment.lti_asset_processors << ap
+    # Remove APs if the assignment is no longer capable.
+    # We only need to do this (and incur the DB hit) if the assignment _was_
+    # capable.
+    unless asset_processor_capable?(submission_types: assignment_params["submission_types"])
+      if asset_processor_capable?(submission_types: assignment.submission_types_array)
+        assignment.lti_asset_processors.active.destroy_all
       end
+
+      return
+    end
+
+    asset_processors = assignment_params["asset_processors"] || []
+    existing_ids_to_keep = asset_processors.filter_map { |ap| ap["existing_id"] }
+    content_items_to_create = asset_processors.filter_map { |ap| ap["new_content_item"] }
+
+    assignment.lti_asset_processors.active.where.not(id: existing_ids_to_keep).destroy_all
+    assignment.lti_asset_processors += content_items_to_create.filter_map do |content_item|
+      Lti::AssetProcessor.build_for_assignment(content_item:, context: assignment.context)
     end
   end
 
@@ -1290,10 +1302,8 @@ module Api::V1::Assignment
       assignment_params["submission_types"].include?("online_text_entry"))
   end
 
-  def asset_processor_capable?(assignment_params)
-    assignment_params["submission_type"] == "online" &&
-      assignment_params["submission_types"].present? &&
-      assignment_params["submission_types"].include?("online_upload")
+  def asset_processor_capable?(submission_types:)
+    submission_types.presence&.include?("online_upload")
   end
 
   def submissions_download_url(context, assignment)

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssetProcessorContentItem, assetProcessorContentItemToApiJson} from "../AssetProcessorContentItem"
+import {AssetProcessorContentItem, assetProcessorContentItemToDto} from "../AssetProcessorContentItem"
 
-describe('assetProcessorContentItemToApiJson', () => {
+describe('assetProcessorContentItemToDto', () => {
   it('converts an AssetProcessorContentItem to the format used by the assignment api', () => {
     const contentItem: AssetProcessorContentItem = {
       type: 'ltiAssetProcessor',
@@ -28,7 +28,7 @@ describe('assetProcessorContentItemToApiJson', () => {
       icon: {url: 'http://example.com/icon' },
       thumbnail: {url: 'http://example.com/thumbnail' },
     }
-    expect(assetProcessorContentItemToApiJson(contentItem, 1)).toEqual({
+    expect(assetProcessorContentItemToDto(contentItem, 1)).toEqual({
       context_external_tool_id: 1,
       url: 'http://example.com',
       title: 'example',
