@@ -5071,6 +5071,11 @@ uk:
     many: "%{count} коментарів"
     one: "1 коментар"
     other: "%{count} коментарів"
+  count_courses_609dc3b8: 
+    few: "%{count} Курси"
+    many: "%{count} Курсів"
+    one: "1 Курс"
+    other: "%{count} Курсів"
   count_criteria_22927713: 
     few: "%{count} критеріїв"
     many: "%{count} критеріїв"
@@ -5182,6 +5187,11 @@ uk:
     many: "%{count} студентів у відсотках %{percentile}. "
     one: "1 студент у відсотках %{percentile}. "
     other: "%{count} студентів у відсотках %{percentile}. "
+  count_sub_accounts_345f48ea: 
+    few: "%{count} додаткових облікових записи"
+    many: "%{count} додаткових облікових записів"
+    one: "1 додатковий обліковий запис"
+    other: "%{count} додаткових облікових записів"
   count_sub_modules_3373a1c4: 
     few: "%{count} підмодулів"
     many: "%{count} підмодулів"
@@ -17000,6 +17010,7 @@ uk:
       other: "%{count} додаткових облікових записів"
     titles: 
       sub_accounts: "Додаткові облікові записи"
+  sub_accounts_e1b196a9: "Додаткові облікові записи"
   sub_assignment: 
     atom_no_author: "Немає автора"
     labels: 
