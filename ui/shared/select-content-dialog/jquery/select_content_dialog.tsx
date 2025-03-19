@@ -69,6 +69,7 @@ type LtiLaunchPlacement = {
   title: string
   selection_width: number
   selection_height: number
+  icon_url?: string
 }
 
 /**
