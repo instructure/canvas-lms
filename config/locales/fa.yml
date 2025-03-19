@@ -5541,8 +5541,10 @@ fa:
       buttons: 
         cancel: لغو
         update: "بهنگام سازی همکاری"
+      is_required: "پر کردن این جای خالی لازم است"
       labels: 
         description: "شرح:"
+        document_name: "نام سند:"
         title: "عنوان همکاری"
     edit_button: 
       links: 
@@ -5574,6 +5576,7 @@ fa:
             Google Docs جای خوبی برای همکاری در یک پروژه گروهی است. شبیه به برنامه Word‌ مایکروسافت است، اما به شما امکان می دهد بتوانید همزمان با دیگران روی یک فایل کار کنید، بدون اینکه مجبور باشید آن را از طریق پست الکترونیکی ارسال کنید.
             
             **هشدار**: شما (و همه همکاران شما) برای شرکت در برنامه های مشارکتی Google Docs به یک حساب گوگل نیاز خواهید داشت.
+      is_required: "پر کردن این جای خالی لازم است"
       labels: 
         collaboration_type: "همکاری با استفاده از:"
         description: "شرح:"
@@ -6970,6 +6973,9 @@ fa:
   count_comments_cb137ab8: 
     one: "%{count} نظر"
     other: "%{count} نظر"
+  count_courses_609dc3b8: 
+    one: "%{count} درس"
+    other: "%{count} درس"
   count_criteria_22927713: 
     one: "%{count} معیار"
     other: "%{count} معیار"
@@ -7084,6 +7090,9 @@ fa:
   count_students_will_get_num_points_c970fc01: 
     one: "%{count} دانشجو، %{num} امتیاز کسب خواهند کرد"
     other: "%{count} دانشجو، %{num} امتیاز کسب خواهند کرد"
+  count_sub_accounts_345f48ea: 
+    one: "%{count} زیر حساب"
+    other: "%{count} زیر حساب"
   count_sub_modules_3373a1c4: 
     one: "%{count} منوی فرعی"
     other: "%{count} منوی فرعی"
@@ -23006,6 +23015,7 @@ fa:
       other: "%{count} زیر حساب"
     titles: 
       sub_accounts: "زیر حساب ها"
+  sub_accounts_e1b196a9: "زیر حساب ها"
   sub_assignment: 
     atom_no_author: "نویسنده موجود نیست"
     labels: 
