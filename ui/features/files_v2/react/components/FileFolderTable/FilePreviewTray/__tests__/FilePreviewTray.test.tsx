@@ -16,40 +16,88 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { render, screen } from '@testing-library/react';
+import React from 'react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import FilePreviewTray from '../FilePreviewTray';
-import { MediaInfo } from '@canvas/canvas-studio-player/react/types';
-import type {File} from "../../../../../interfaces/File.ts"
+import {FilePreviewTray, FilePreviewTrayProps} from '../FilePreviewTray'
+import type {File} from '../../../../../interfaces/File.ts'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {queryClient} from '@canvas/query'
+import {FAKE_MEDIA_TRACKS} from './fixtures'
 
-jest.mock('../CommonFileInfo', () => jest.fn(() => <div data-testid="common-file-info" />));
-jest.mock('../MediaFileInfo', () => jest.fn(() => <div data-testid="media-file-info" />));
-
-describe('FilePreviewTray', () => {
-  const mockOnDismiss = jest.fn();
-  const mockItem = {
+const defaultProps: FilePreviewTrayProps = {
+  item: {
     id: '1',
     name: 'Sample File',
     type: 'document',
-  } as unknown as File;
+    restricted_by_master_course: false,
+  } as unknown as File,
+  onDismiss: jest.fn(),
+  mediaTracks: [],
+  isFetchingTracks: false,
+  canAddTracks: false,
+}
 
-  const mockMediaInfo = {
-    duration: 120,
-    format: 'mp4',
-  } as unknown as MediaInfo;
+const renderComponent = (props?: Partial<FilePreviewTrayProps>) => {
+  return render(
+    <MockedQueryClientProvider client={queryClient}>
+      <FilePreviewTray {...defaultProps} {...props} />
+    </MockedQueryClientProvider>,
+  )
+}
 
-  it('renders with the appropriate children components', () => {
-    render(<FilePreviewTray onDismiss={mockOnDismiss} item={mockItem} mediaInfo={mockMediaInfo} />);
-    expect(screen.getByTestId('tray-close-button')).toBeInTheDocument();
-    expect(screen.getByTestId('common-file-info')).toBeInTheDocument();
-    expect(screen.getByTestId('media-file-info')).toBeInTheDocument();
-  });
+describe('FilePreviewTray', () => {
+  it('closes on click', async () => {
+    renderComponent()
+    const button = screen
+      .getByTestId('tray-close-button')
+      .querySelector('button') as HTMLButtonElement
+    await userEvent.click(button)
+    expect(defaultProps.onDismiss).toHaveBeenCalledTimes(1)
+  })
 
-  it('calls onDismiss when close button is clicked', async () => {
-    const user = userEvent.setup()
-    render(<FilePreviewTray onDismiss={mockOnDismiss} item={mockItem} mediaInfo={mockMediaInfo}/>);
-    await user.click(screen.getByTestId('tray-close-button').querySelector('button') as HTMLButtonElement);
-    expect(mockOnDismiss).toHaveBeenCalledTimes(1);
-  });
-});
+  it('renders CommonFileInfo', () => {
+    renderComponent()
+    expect(screen.getByText('File Info')).toBeInTheDocument()
+  })
+
+  it('renders MediaFileInfo when there are tracks', () => {
+    renderComponent({
+      canAddTracks: true,
+      mediaTracks: FAKE_MEDIA_TRACKS,
+    })
+    expect(screen.getByText('Media Options')).toBeInTheDocument()
+  })
+
+  it('renders loading icon when fetching tracks', () => {
+    renderComponent({
+      isFetchingTracks: true,
+    })
+    expect(screen.getByText('Loading')).toBeInTheDocument()
+  })
+
+  it('does not render MediaFileInfo when there are no tracks', () => {
+    renderComponent()
+    expect(screen.queryByText('Media Options')).not.toBeInTheDocument()
+  })
+
+  it('does not render MediaFileInfo when file is a locked blueprint item', () => {
+    renderComponent({
+      canAddTracks: true,
+      item: {
+        ...defaultProps.item,
+        restricted_by_master_course: true,
+      },
+      mediaTracks: FAKE_MEDIA_TRACKS,
+    })
+    expect(screen.queryByText('Media Options')).not.toBeInTheDocument()
+  })
+
+  it('does not render MediaFileInfo when user cannot add tracks', () => {
+    renderComponent({
+      canAddTracks: false,
+      mediaTracks: FAKE_MEDIA_TRACKS,
+    })
+    expect(screen.queryByText('Media Options')).not.toBeInTheDocument()
+  })
+})

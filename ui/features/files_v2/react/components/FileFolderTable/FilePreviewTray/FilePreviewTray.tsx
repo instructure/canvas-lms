@@ -18,22 +18,37 @@
 
 import React from 'react'
 import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
 import {CloseButton} from '@instructure/ui-buttons'
-import { MediaInfo } from '@canvas/canvas-studio-player/react/types'
-import CommonFileInfo from "./CommonFileInfo";
-import MediaFileInfo from "./MediaFileInfo";
-import type {File} from "../../../../interfaces/File.ts"
+import CommonFileInfo from './CommonFileInfo'
+import {MediaFileInfo} from './MediaFileInfo'
+import type {File} from '../../../../interfaces/File'
+import {MediaTrack} from '@canvas/canvas-studio-player/react/types'
 
-interface FilePreviewTrayProps {
+export interface FilePreviewTrayProps {
   onDismiss: () => void
   item: File
-  mediaInfo: MediaInfo
+  mediaTracks: MediaTrack[]
+  isFetchingTracks: boolean
+  canAddTracks: boolean
 }
 
-const FilePreviewTray = ({onDismiss, item, mediaInfo}: FilePreviewTrayProps) => {
+export const FilePreviewTray = ({
+  onDismiss,
+  item,
+  mediaTracks,
+  isFetchingTracks,
+  canAddTracks,
+}: FilePreviewTrayProps) => {
   return (
-    <View as="div" padding="medium" background="primary-inverse" style={{minHeight: "100%"}}>
+    <View
+      as="div"
+      background="primary-inverse"
+      padding="medium"
+      style={{minHeight: '100%'}}
+      themeOverride={{
+        backgroundPrimaryInverse: '#0F1316',
+      }}
+    >
       <CloseButton
         placement="end"
         offset="small"
@@ -43,9 +58,13 @@ const FilePreviewTray = ({onDismiss, item, mediaInfo}: FilePreviewTrayProps) => 
         data-testid="tray-close-button"
       />
       <CommonFileInfo item={item} />
-      <MediaFileInfo mediaInfo={mediaInfo}/>
+      <MediaFileInfo
+        attachment={item}
+        mediaTracks={mediaTracks}
+        key={item.id}
+        isLoading={isFetchingTracks}
+        canAddTracks={canAddTracks}
+      />
     </View>
   )
 }
-
-export default FilePreviewTray

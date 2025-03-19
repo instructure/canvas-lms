@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,24 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type MediaInfo = {
-  auto_caption_status: any
-  can_add_captions: boolean
-  created_at: string
-  embedded_iframe_url: string
-  media_id: string
-  media_sources: any[]
-  media_tracks: MediaTrack[]
-  media_type: string
-  title: string
-}
-
-export type MediaTrack = {
-  created_at: string
-  id: string
-  inherited: boolean
-  kind: string
-  locale: string
-  updated_at: string
-  url: string
-}
+export const FAKE_MEDIA_TRACKS = [
+  {
+    id: '1',
+    kind: 'srt',
+    locale: 'en',
+    created_at: '123',
+    updated_at: '456',
+    inherited: false,
+    url: 'someurl.edu',
+  },
+  {
+    id: '2',
+    kind: 'srt',
+    locale: 'ar',
+    created_at: '234',
+    updated_at: '567',
+    inherited: false,
+    url: 'someotherurl.edu',
+  },
+]
