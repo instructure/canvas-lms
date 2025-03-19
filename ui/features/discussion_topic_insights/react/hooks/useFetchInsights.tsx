@@ -15,15 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {useQuery} from '@tanstack/react-query'
 
-import React from 'react'
-import {createRoot} from 'react-dom/client'
-import ready from '@instructure/ready'
-import DiscussionInsightsApp from './react/index'
+const fetchInsights = async (context: string, contextId: string, discussionId: string) => {
+  const response = await fetch(
+    `/api/v1/${context}/${contextId}/discussion_topics/${discussionId}/insights/entries`,
+  )
+  if (!response.ok) {
+    throw new Error('Network response was not ok')
+  }
+  const data = await response.json()
+  return data
+}
 
-ready(() => {
-  document.querySelector('body')?.classList.add('full-width')
-  const contentElement = document.getElementById('discussion-insights-container')
-  const root = createRoot(contentElement)
-  root.render(<DiscussionInsightsApp />)
-})
+export const useGetInsights = (context: string, contextId: string, discussionId: string) => {
+  return useQuery(['insights', context, contextId, discussionId], () =>
+    fetchInsights(context, contextId, discussionId),
+  )
+}

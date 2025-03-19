@@ -18,22 +18,25 @@
 import React, {ReactNode} from 'react'
 import {Table} from '@instructure/ui-table'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {IconInfoLine} from '@instructure/ui-icons'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('discussion_insights')
 
 export type Row = {
-  status: ReactNode
+  relevance: ReactNode
   name: string
   notes: string
-  review: string
+  review: ReactNode
   date: string
-  actions: string
+  actions: ReactNode
 }
 
 export type Header = {
   id: keyof Row
-  text: ReactNode
+  text: string
   width: string
+  alignment: 'start' | 'center' | 'end'
   sortAble: boolean
 }
 
@@ -68,14 +71,19 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
     <Table caption={translatedCaption}>
       <Table.Head renderSortLabel={'Discussion Insights Table'}>
         <Table.Row>
-          {headers.map(({id, text, width, sortAble}) => (
+          {headers.map(({id, text, width, alignment, sortAble}) => (
             <Table.ColHeader
               key={id}
               id={id}
               width={width}
+              textAlign={alignment}
               onRequestSort={sortAble ? (_, {id}) => onSort(id as any) : undefined}
+              sortDirection={id === sortBy ? direction : 'none'}
             >
-              {text}
+              <Flex gap="xx-small" alignItems="center">
+                <span>{text}</span>
+                {id === 'review' && <IconInfoLine />}
+              </Flex>
             </Table.ColHeader>
           ))}
         </Table.Row>
@@ -83,8 +91,10 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
       <Table.Body>
         {rows.map((row, index) => (
           <Table.Row key={index}>
-            {headers.map(({id}) => (
-              <Table.Cell key={id}>{row[id]}</Table.Cell>
+            {headers.map(({id, alignment, width}) => (
+              <Table.Cell key={id} textAlign={alignment} style={{width}}>
+                {row[id]}
+              </Table.Cell>
             ))}
           </Table.Row>
         ))}
