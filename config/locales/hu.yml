@@ -5747,8 +5747,10 @@ hu:
       buttons: 
         cancel: Mégse
         update: "Együttműködés frissítése"
+      is_required: "A mező kitöltése kötelező"
       labels: 
         description: "Leírás:"
+        document_name: "Dokumentum neve:"
         title: "Együttműködés címe"
     edit_button: 
       links: 
@@ -5781,6 +5783,7 @@ hu:
             A Google Dokumentumok egy nagyszerű szolgáltatás a projektmunkák támogatására. Olyan, mint egy hagyományos szövegszerkesztő, de lehetővé teszi számunkra, hogy ugyanabban az időben másokkal együtt dolgozhassunk ugyanazon a dokumentumon, anélkül, hogy körbe kellene küldeni a dokumentum újabb és újabb változatait.
             
             **Figyelem**: Önnek (és minden együttműködőnek) szüksége lesz egy Google fiókra ahhoz, hogy részt vehessen a Google Dokumentumok szerkesztésében.
+      is_required: "A mező kitöltése kötelező"
       labels: 
         collaboration_type: "Együttműködés ezt használva:"
         description: "Leírás:"
@@ -7130,6 +7133,9 @@ hu:
     one: "1 befejezett elem"
     other: "%{count} befejezett elem"
   count_conversation_messages_loaded_1a4811ff: "%{count} Üzenetváltás betöltve"
+  count_courses_609dc3b8: 
+    one: "1 kurzus"
+    other: "%{count} kurzus"
   count_criteria_22927713: 
     one: "1 kritérium"
     other: "%{count} kritérium"
@@ -7310,6 +7316,9 @@ hu:
   count_students_marked_as_missing_b26bdb6e: 
     one: "1 hallgató hiányzónak van jelölve"
     other: "%{count} hallgató hiányzónak van jelölve"
+  count_sub_accounts_345f48ea: 
+    one: "1 Alfiók"
+    other: "%{count} alfiók"
   count_sub_modules_3373a1c4: 
     one: "%{count} almodul"
     other: "%{count} almodul"
@@ -23756,6 +23765,7 @@ hu:
       other: "%{count} alfiók"
     titles: 
       sub_accounts: Alfiókok
+  sub_accounts_e1b196a9: Alfiókok
   sub_assignment: 
     atom_no_author: "Nincs szerző"
     labels: 
