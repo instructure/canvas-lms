@@ -680,7 +680,10 @@ RSpec.describe Lti::RegistrationsController do
     let_once(:registration) { lti_registration_model(account:) }
     let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
 
-    before { account_binding }
+    before do
+      account_binding
+      registration.manual_configuration = lti_tool_configuration_model
+    end
 
     context "without user session" do
       before { remove_user_session }
@@ -746,6 +749,15 @@ RSpec.describe Lti::RegistrationsController do
       it "includes the overlaid configuration" do
         subject
         expect(response_json).to have_key(:overlaid_configuration)
+      end
+    end
+
+    context "with 'overlaid_legacy_configuration' in include[] parameter" do
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}?include[]=overlaid_legacy_configuration" }
+
+      it "includes the overlaid legacy configuration" do
+        subject
+        expect(response_json).to have_key(:overlaid_legacy_configuration)
       end
     end
 
