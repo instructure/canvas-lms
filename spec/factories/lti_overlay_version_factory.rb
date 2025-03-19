@@ -25,7 +25,16 @@ module Factories
     params[:lti_overlay] ||= params[:lti_overlay] || lti_overlay_model(account: params[:account])
 
     @lti_overlay_versions = Array.new(count) do
-      Lti::OverlayVersion.create!(params)
+      lti_overlay_version_model(params)
     end
+  end
+
+  def lti_overlay_version_model(params)
+    params ||= {}
+    params[:created_by] ||= user_model
+    params[:account] ||= params[:overlay]&.account || account_model
+    params[:lti_overlay] ||= params[:lti_overlay] || lti_overlay_model(account: params[:account])
+
+    @lti_overlay_version = Lti::OverlayVersion.create!(params)
   end
 end

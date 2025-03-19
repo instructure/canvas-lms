@@ -31,3 +31,5 @@ export const ZUser = z.object({
   sis_user_id: z.string().optional().nullable(),
   sortable_name: z.string(),
 })
+
+export type User = z.infer<typeof ZUser>

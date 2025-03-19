@@ -15,19 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {getByTestId, queryAllByText, render} from '@testing-library/react'
-import React from 'react'
+import {AllLtiScopes} from '@canvas/lti/model/LtiScope'
+import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
+import {render} from '@testing-library/react'
 import {MemoryRouter, Outlet, Route, Routes} from 'react-router-dom'
+import {AllLtiPlacements} from '../../../../model/LtiPlacement'
+import {AllLtiPrivacyLevels} from '../../../../model/LtiPrivacyLevel'
+import {i18nLtiPlacement} from '../../../../model/i18nLtiPlacement'
+import {i18nLtiPrivacyLevel} from '../../../../model/i18nLtiPrivacyLevel'
 import {ZLtiImsRegistrationId} from '../../../../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZLtiToolConfigurationId} from '../../../../model/lti_tool_configuration/LtiToolConfigurationId'
+import {mockRegistrationWithAllInformation} from '../../../manage/__tests__/helpers'
 import {ToolConfiguration} from '../ToolConfigurationView'
-import {mockConfiguration, mockRegistrationWithAllInformation} from './helpers'
-import {i18nLtiPlacement} from '../../../../model/i18nLtiPlacement'
-import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
-import {i18nLtiPrivacyLevel} from '../../../../model/i18nLtiPrivacyLevel'
-import {AllLtiScopes, LtiScopes} from '@canvas/lti/model/LtiScope'
-import {AllLtiPrivacyLevels, LtiPrivacyLevels} from '../../../../model/LtiPrivacyLevel'
-import {AllLtiPlacements, LtiPlacements} from '../../../../model/LtiPlacement'
+import {mockConfiguration} from './helpers'
 
 const renderApp = (...p: Parameters<typeof mockRegistrationWithAllInformation>) => {
   const registration = mockRegistrationWithAllInformation(...p)
@@ -53,11 +53,10 @@ const renderApp = (...p: Parameters<typeof mockRegistrationWithAllInformation>) 
 
 describe('Tool Configuration View Launch Settings', () => {
   it('should render the Launch Settings for manual registrations', () => {
-    const {getByText, queryByText} = renderApp(
-      'Test App',
-      1,
-      {},
-      {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
         overlaid_configuration: mockConfiguration({
           redirect_uris: ['http://example.com/redirect_uri_1', 'http://example.com/redirect_uri_2'],
           target_link_uri: 'https://example.com/target_link_uri',
@@ -70,7 +69,7 @@ describe('Tool Configuration View Launch Settings', () => {
         }),
         manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
       },
-    )
+    })
 
     expect(getByText('Launch Settings')).toBeInTheDocument()
     expect(getByText('https://example.com/target_link_uri')).toBeInTheDocument()
@@ -84,11 +83,10 @@ describe('Tool Configuration View Launch Settings', () => {
   })
 
   it('should render empty values for manual registrations', () => {
-    const {getByText} = renderApp(
-      'Test App',
-      1,
-      {},
-      {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
         overlaid_configuration: mockConfiguration({
           redirect_uris: ['http://example.com/redirect_uri_1', 'http://example.com/redirect_uri_2'],
           target_link_uri: 'https://example.com/target_link_uri',
@@ -97,7 +95,7 @@ describe('Tool Configuration View Launch Settings', () => {
         }),
         manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
       },
-    )
+    })
 
     expect(getByText('Launch Settings')).toBeInTheDocument()
     expect(getByText('No domain configured.')).toBeInTheDocument()
@@ -105,15 +103,14 @@ describe('Tool Configuration View Launch Settings', () => {
   })
 
   it('should not render the Launch Settings for non-manual registrations', () => {
-    const {getByText, queryAllByText} = renderApp(
-      'Test App',
-      1,
-      {},
-      {
+    const {getByText, queryAllByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
         ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         overlaid_configuration: mockConfiguration({}),
       },
-    )
+    })
 
     expect(getByText('Test App')).toBeInTheDocument()
     expect(queryAllByText('Launch Settings')).toHaveLength(0)
@@ -122,29 +119,27 @@ describe('Tool Configuration View Launch Settings', () => {
 
 describe('Tool Configuration View Permissions', () => {
   it('should render an empty permissions list', () => {
-    const {getByText, queryAllByText, getByTestId} = renderApp(
-      'Test App',
-      1,
-      {
+    const {getByText, queryAllByText, getByTestId} = renderApp({
+      n: 'Test App',
+      i: 1,
+      configuration: {
         scopes: [],
       },
-      {},
-    )
+    })
     expect(getByTestId('permissions')).toHaveTextContent('This app has no permissions configured.')
   })
 
   it('should render the permissions list', () => {
-    const {getByText} = renderApp(
-      'Test App',
-      1,
-      {},
-      {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
         ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         overlaid_configuration: mockConfiguration({
           scopes: Array.from(AllLtiScopes),
         }),
       },
-    )
+    })
 
     AllLtiScopes.forEach(scope => {
       expect(getByText(i18nLtiScope(scope))).toBeInTheDocument()
@@ -156,17 +151,16 @@ describe('Tool Configuration View Data Sharing', () => {
   it.each(AllLtiPrivacyLevels)(
     "should render %p the registration's privacy level",
     privacyLevel => {
-      const {getByText} = renderApp(
-        'Test App',
-        1,
-        {},
-        {
+      const {getByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
           ims_registration_id: ZLtiImsRegistrationId.parse('1'),
           overlaid_configuration: mockConfiguration({
             privacy_level: privacyLevel,
           }),
         },
-      )
+      })
 
       expect(getByText(i18nLtiPrivacyLevel(privacyLevel))).toBeInTheDocument()
     },
@@ -175,11 +169,10 @@ describe('Tool Configuration View Data Sharing', () => {
 
 describe('Tool Configuration View Placements', () => {
   it.each(AllLtiPlacements)('should render the %p placement', placement => {
-    const {getByText} = renderApp(
-      'Test App',
-      1,
-      {},
-      {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
         ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         overlaid_configuration: mockConfiguration({
           placements: [
@@ -191,16 +184,15 @@ describe('Tool Configuration View Placements', () => {
           ],
         }),
       },
-    )
+    })
 
     expect(getByText(i18nLtiPlacement(placement))).toBeInTheDocument()
   })
   it.each(AllLtiPlacements)('should not render a disabled %p placement', placement => {
-    const {queryAllByText} = renderApp(
-      'Test App',
-      1,
-      {},
-      {
+    const {queryAllByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
         ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         overlaid_configuration: mockConfiguration({
           placements: [
@@ -212,7 +204,7 @@ describe('Tool Configuration View Placements', () => {
           ],
         }),
       },
-    )
+    })
 
     expect(queryAllByText(i18nLtiPlacement(placement))).toHaveLength(0)
   })
@@ -220,29 +212,27 @@ describe('Tool Configuration View Placements', () => {
 
 describe('Tool Configuration View Nickname and Description', () => {
   it('should render the nickname and description', () => {
-    const {getByText} = renderApp(
-      'Test App',
-      1,
-      {},
-      {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
         ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         admin_nickname: 'Test Nickname',
         overlaid_configuration: mockConfiguration({
           description: 'Test Description',
         }),
       },
-    )
+    })
 
     expect(getByText('Test Nickname')).toBeInTheDocument()
     expect(getByText('Test Description')).toBeInTheDocument()
   })
 
   it.each(AllLtiPlacements)('should render the %p placement name', placement => {
-    const {getByText} = renderApp(
-      'Test App',
-      1,
-      {},
-      {
+    const {getByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
         ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         overlaid_configuration: mockConfiguration({
           placements: [
@@ -254,17 +244,16 @@ describe('Tool Configuration View Nickname and Description', () => {
           ],
         }),
       },
-    )
+    })
 
     expect(getByText(`Test Placement (${placement})`)).toBeInTheDocument()
   })
 
   it.each(AllLtiPlacements)('should render no text for a missing %p placement name', placement => {
-    const {queryByText} = renderApp(
-      'Test App',
-      1,
-      {},
-      {
+    const {queryByText} = renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
         ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         overlaid_configuration: mockConfiguration({
           placements: [
@@ -275,7 +264,7 @@ describe('Tool Configuration View Nickname and Description', () => {
           ],
         }),
       },
-    )
+    })
 
     expect(queryByText(`No text`)).toBeInTheDocument()
   })
@@ -283,11 +272,10 @@ describe('Tool Configuration View Nickname and Description', () => {
 
 describe('Tool Configuration View Icon Placements', () => {
   const renderIconPlacements = () =>
-    renderApp(
-      'Test App',
-      1,
-      {},
-      {
+    renderApp({
+      n: 'Test App',
+      i: 1,
+      registration: {
         ims_registration_id: ZLtiImsRegistrationId.parse('1'),
         overlaid_configuration: mockConfiguration({
           placements: [
@@ -321,7 +309,7 @@ describe('Tool Configuration View Icon Placements', () => {
           ],
         }),
       },
-    )
+    })
 
   it('should not render icon URLs for non-icon placements', () => {
     const {queryByTestId} = renderIconPlacements()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,20 +18,26 @@
 
 import {z} from 'zod'
 import {ZAccountId} from './AccountId'
-import {ZLtiConfigurationOverlay} from './internal_lti_configuration/LtiConfigurationOverlay'
-import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZUser} from './User'
 import {ZLtiOverlayId} from './ZLtiOverlayId'
 
-export const ZLtiOverlay = z.object({
-  id: ZLtiOverlayId,
+export const ZLtiOverlayVersionId = z.string().brand('ZLtiOverlayVersionId')
+
+/**
+ * @see The Lti::OverlayVersion Rails model and its associated serializer.
+ */
+export const ZLtiOverlayVersion = z.object({
+  id: ZLtiOverlayVersionId,
   account_id: ZAccountId,
-  registration_id: ZLtiRegistrationId,
   root_account_id: ZAccountId,
-  data: ZLtiConfigurationOverlay,
+  lti_overlay_id: ZLtiOverlayId,
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  updated_by: ZUser.nullable(),
+  // TODO: Refine this type to be a bit more specific. If we switch to storing
+  // a copy instead of a diff, it can just be the regular overlay data type.
+  diff: z.unknown(),
+  caused_by_reset: z.boolean(),
+  created_by: z.union([ZUser, z.literal('Instructure')]),
 })
 
-export type LtiOverlay = z.infer<typeof ZLtiOverlay>
+export type LtiOverlayVersion = z.infer<typeof ZLtiOverlayVersion>
