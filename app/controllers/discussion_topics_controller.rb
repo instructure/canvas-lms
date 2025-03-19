@@ -1147,6 +1147,7 @@ class DiscussionTopicsController < ApplicationController
                course_id: params[:course_id] || @context.course&.id,
                context_type: @topic.context_type,
                context_id: @context.id,
+               discussion_topic_id: @topic.id,
                INSIGHTS_URL: context_url(@topic.context, :insights_context_discussion_topic_url, @topic),
                DISCUSSION_INSIGHTS_ENABLED: @context.root_account.feature_enabled?(:discussion_insights),
              })

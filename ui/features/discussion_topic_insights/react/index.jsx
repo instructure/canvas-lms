@@ -15,105 +15,22 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import React, {useState, useEffect} from 'react'
-import {ApolloProvider, createClient} from '@canvas/apollo-v3'
-import AlertManager from '@canvas/alerts/react/AlertManager'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import React from 'react'
+import DiscussionInsightsPage from './DiscussionInsightsPage'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ErrorBoundary from '@canvas/error-boundary'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import AlertManager from '@canvas/alerts/react/AlertManager'
 import GenericErrorPage from '@canvas/generic-error-page'
-import DiscussionInsights from './components/DiscussionInsights/DiscussionInsights'
-import {IconInfoLine} from '@instructure/ui-icons'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = createI18nScope('discussion_topics_insights')
+const I18n = createI18nScope('discussion_insights')
 
-const DiscussionInsightsPage = _props => {
-  const [client, setClient] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  const headers = [
-    {
-      id: 'status',
-      text: <IconInfoLine />,
-      width: 'fit-content',
-      sortAble: false,
-    },
-    {
-      id: 'name',
-      text: 'Student Name',
-      width: 'fit-content',
-      sortAble: true,
-    },
-    {
-      id: 'notes',
-      text: 'Evaluation Notes',
-      width: 'fit-content',
-      sortAble: true,
-    },
-    {
-      id: 'review',
-      text: (
-        <>
-          Review <IconInfoLine />
-        </>
-      ),
-      width: 'fit-content',
-      sortAble: false,
-    },
-    {
-      id: 'date',
-      text: 'Time Posted',
-      width: 'fit-content',
-      sortAble: true,
-    },
-    {
-      id: 'actions',
-      text: 'Actions',
-      width: 'fit-content',
-      sortAble: false,
-    },
-  ]
-
-  const rows = [
-    {
-      status: <IconInfoLine />,
-      name: 'Test Student1',
-      notes: 'Some AI generated text',
-      review: 'Like buttons',
-      date: 'Date',
-      actions: 'See Reply',
-    },
-    {
-      status: <IconInfoLine />,
-      name: 'Test Student2',
-      notes: 'Some AI generated text',
-      review: 'Like buttons',
-      date: 'Date',
-      actions: 'See Reply',
-    },
-    {
-      status: <IconInfoLine />,
-      name: 'Test Student3',
-      notes: 'Some AI generated text',
-      review: 'Like buttons',
-      date: 'Date',
-      actions: 'See Reply',
-    },
-  ]
-
-  useEffect(() => {
-    setClient(createClient())
-    setLoading(false)
-  }, [])
-
-  if (loading) {
-    return <LoadingIndicator />
-  }
-
+const DiscussionInsightsApp = () => {
+  const queryClient = new QueryClient()
+  const context = ENV.context_type === 'Course' ? 'courses' : 'groups'
   return (
-    <ApolloProvider client={client}>
+    <QueryClientProvider client={queryClient}>
       <ErrorBoundary
         errorComponent={
           <GenericErrorPage
@@ -123,11 +40,15 @@ const DiscussionInsightsPage = _props => {
         }
       >
         <AlertManager>
-          <DiscussionInsights headers={headers} rows={rows} />
+          <DiscussionInsightsPage
+            context={context}
+            contextId={ENV.context_id}
+            discussionId={ENV.discussion_topic_id}
+          />
         </AlertManager>
       </ErrorBoundary>
-    </ApolloProvider>
+    </QueryClientProvider>
   )
 }
 
-export default DiscussionInsightsPage
+export default DiscussionInsightsApp

@@ -26,6 +26,10 @@ const SortableTable: React.FC<InsightsTableProps> = ({caption, headers, rows, pe
 
   const sortedRows = useMemo(() => {
     if (!sortBy) return rows
+    if (sortBy === 'review' || sortBy === 'relevance') {
+      //TODO: Implement sorting by review and relevance
+      return rows
+    }
     const sorted = [...rows].sort((a, b) => {
       return (a[sortBy] as string).localeCompare(b[sortBy] as string)
     })
