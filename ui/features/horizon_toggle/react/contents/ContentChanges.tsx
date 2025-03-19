@@ -23,6 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {Assignments} from './Assignments'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ContentPublished} from './ContentPublished'
 
 const I18n = createI18nScope('horizon_toggle_page')
 
@@ -39,6 +40,7 @@ export const ContentChanges = () => {
         )}
       </Text>
       <Flex gap="small" direction="column">
+        <ContentPublished />
         <Assignments />
       </Flex>
     </View>

@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import {Assignments} from '../Assignments'
+import {ContentPublished} from '../ContentPublished'
 import {HorizonToggleContext} from '../../HorizonToggleContext'
 
-describe('Assignments', () => {
+describe('Content Published', () => {
   const mockData = {
     errors: {
       assignments: [
@@ -30,10 +30,10 @@ describe('Assignments', () => {
           name: 'Assignment 1',
           link: '/assignment/1',
           errors: {
-            submission_types: {
-              attribute: 'submission_type',
+            workflow_state: {
+              attribute: 'workflow_state',
               type: 'unsupported',
-              message: 'Submission type not supported',
+              message: 'Can not be published',
             },
           },
         },
@@ -42,10 +42,10 @@ describe('Assignments', () => {
           name: 'Assignment 2',
           link: '/assignment/2',
           errors: {
-            submission_types: {
-              attribute: 'submission_type',
+            workflow_state: {
+              attribute: 'workflow_state',
               type: 'unsupported',
-              message: 'Submission type not supported',
+              message: 'Can not be published',
             },
           },
         },
@@ -56,20 +56,20 @@ describe('Assignments', () => {
   it('renders nothing when no assignment errors exist', () => {
     render(
       <HorizonToggleContext.Provider value={{errors: {}}}>
-        <Assignments />
+        <ContentPublished />
       </HorizonToggleContext.Provider>,
     )
-    expect(screen.queryByText('Assignments')).toBeNull()
+    expect(screen.queryByText('Content to be Unpublished')).toBeNull()
   })
 
   it('renders assignment items when errors exist', async () => {
     render(
       <HorizonToggleContext.Provider value={mockData}>
-        <Assignments />
+        <ContentPublished />
       </HorizonToggleContext.Provider>,
     )
-    expect(screen.getByText('Assignments with Revisions (2 items)')).toBeInTheDocument()
-    const toggle = screen.getByText('Assignments with Revisions')
+    expect(screen.getByText('Content to be Unpublished (2 items)')).toBeInTheDocument()
+    const toggle = screen.getByText('Content to be Unpublished')
     toggle.click()
     expect(screen.getByText('Assignment 1')).toBeInTheDocument()
     expect(screen.getByText('Assignment 2')).toBeInTheDocument()
@@ -86,10 +86,10 @@ describe('Assignments', () => {
                 name: 'Assignment 1',
                 link: '/assignment1',
                 errors: {
-                  submission_types: {
-                    attribute: 'submission_type',
+                  workflow_state: {
+                    attribute: 'workflow_state',
                     type: 'unsupported',
-                    message: 'Submission type not supported',
+                    message: 'Can not be published',
                   },
                 },
               },
@@ -97,11 +97,11 @@ describe('Assignments', () => {
           },
         }}
       >
-        <Assignments />
+        <ContentPublished />
       </HorizonToggleContext.Provider>,
     )
-    expect(screen.getByText('Assignments with Revisions (1 item)')).toBeInTheDocument()
-    const toggle = screen.getByText('Assignments with Revisions')
+    expect(screen.getByText('Content to be Unpublished (1 item)')).toBeInTheDocument()
+    const toggle = screen.getByText('Content to be Unpublished')
     toggle.click()
     expect(screen.getByText('Assignment 1')).toBeInTheDocument()
   })

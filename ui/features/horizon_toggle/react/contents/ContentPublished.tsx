@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useContext} from 'react'
+import {useContext, useMemo} from 'react'
 import {HorizonToggleContext} from '../HorizonToggleContext'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
@@ -26,33 +26,30 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('horizon_toggle_page')
 
-export const Assignments = () => {
+export const ContentPublished = () => {
   const data = useContext(HorizonToggleContext)
-  const assignments = data?.errors?.assignments?.filter(item => !item.errors.workflow_state)
-  if (!assignments || assignments.length === 0) {
+  const publishedContent = data?.errors?.assignments?.filter(item => item.errors.workflow_state)
+  if (!publishedContent || publishedContent.length === 0) {
     return null
   }
   return (
     <View as="div">
-      <Heading level="h3">{I18n.t('Assignments')}</Heading>
+      <Heading level="h3">{I18n.t('Published Content')}</Heading>
       <Text as="p">
         {I18n.t(
-          'Unsupported submission types will be updated to online text entry. You may choose to change this to another supported submission type after converting your course.',
+          `Published content that isn't part of a module will be automatically unpublished. You'll have the option to publish this content once it's added to a module.`,
         )}
-      </Text>
-      <Text as="p">
-        {I18n.t('Group assignments are not supported and the group setting will be removed.')}
       </Text>
       <ContentItems
         label={I18n.t(
           {
-            one: 'Assignments with Revisions (%{count} item)',
-            other: 'Assignments with Revisions (%{count} items)',
+            one: 'Content to be Unpublished (%{count} item)',
+            other: 'Content to be Unpublished (%{count} items)',
           },
-          {count: assignments.length},
+          {count: publishedContent.length},
         )}
-        screenReaderLabel={I18n.t('Assignments with Revisions')}
-        contents={assignments}
+        screenReaderLabel={I18n.t('Content to be Unpublished')}
+        contents={publishedContent}
       />
     </View>
   )
