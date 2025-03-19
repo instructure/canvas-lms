@@ -5800,6 +5800,9 @@ tr:
   count_comments_cb137ab8: 
     one: "1 yorum"
     other: "%{count} yorum"
+  count_courses_609dc3b8: 
+    one: "1 Ders"
+    other: "%{count} Ders"
   count_criteria_22927713: 
     one: "1 kriter"
     other: "%{count} kriter"
@@ -5882,6 +5885,9 @@ tr:
   count_students_will_get_num_points_c970fc01: 
     one: "1 öğrenci %{num} puan alacak"
     other: "%{count} öğrenci %{num} puan alacak"
+  count_sub_accounts_345f48ea: 
+    one: "1 Alt Hesap"
+    other: "%{count} Alt Hesap"
   count_sub_modules_3373a1c4: 
     one: "%{count} alt modül"
     other: "%{count} alt modül"
@@ -18802,6 +18808,7 @@ tr:
       other: "%{count} Alt Hesap"
     titles: 
       sub_accounts: "Alt Hesaplar"
+  sub_accounts_e1b196a9: "Alt Hesaplar"
   sub_assignment: 
     atom_no_author: "Yazar Yok"
     labels: 
