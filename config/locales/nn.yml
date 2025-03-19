@@ -7729,6 +7729,9 @@ nn:
     one: "1 fullført element"
     other: "%{count} fullførte element"
   count_conversation_messages_loaded_1a4811ff: "%{count} samtalemeldingar lasta"
+  count_courses_609dc3b8: 
+    one: "1 emne"
+    other: "%{count} emne"
   count_criteria_22927713: 
     one: "1 kriterium"
     other: "%{count} kriterium"
@@ -7912,6 +7915,9 @@ nn:
   count_students_will_get_num_points_c970fc01: 
     one: "1 student får %{num} poeng"
     other: "%{count} studentar får %{num} poeng"
+  count_sub_accounts_345f48ea: 
+    one: "1 underkonto"
+    other: "%{count} underkontoar"
   count_sub_modules_3373a1c4: 
     one: "%{count} submodul"
     other: "%{count} submodular"
@@ -25426,6 +25432,7 @@ nn:
       other: "%{count} underkontoar"
     titles: 
       sub_accounts: Underkontoar
+  sub_accounts_e1b196a9: Underkontoar
   sub_assignment: 
     atom_no_author: "Utan forfattar"
     labels: 
