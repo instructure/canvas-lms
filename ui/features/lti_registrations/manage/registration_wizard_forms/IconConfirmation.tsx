@@ -29,6 +29,7 @@ import type {FormMessage} from '@instructure/ui-form-field'
 import {useDebouncedCallback} from 'use-debounce'
 import {Img} from '@instructure/ui-img'
 import {
+  isLtiPlacementWithDefaultIcon,
   LtiPlacements,
   LtiPlacementsWithIcons,
   type LtiPlacement,
@@ -39,6 +40,7 @@ import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import {Footer} from './Footer'
+import {ltiToolDefaultIconUrl} from '../model/ltiToolIcons'
 
 const I18n = createI18nScope('lti_registration.wizard')
 export type IconConfirmationProps = {
@@ -160,17 +162,12 @@ const IconOverrideInput = React.memo(
     let messages: FormMessage[] = []
     if (inputUrl && !isValidHttpUrl(inputUrl)) {
       messages = [{type: 'error', text: I18n.t('Invalid URL')}]
-    } else if (
-      (
-        [LtiPlacements.EditorButton, LtiPlacements.TopNavigation] as Array<LtiPlacementWithIcon>
-      ).includes(placement) &&
-      !inputUrl &&
-      !defaultIconUrl
-    ) {
-      imageUrl = `${window.location.origin}/lti/tool_default_icon?name=${toolName}`
-      if (developerKeyId) {
-        imageUrl += `&id=${developerKeyId}`
-      }
+    } else if (isLtiPlacementWithDefaultIcon(placement) && !inputUrl && !defaultIconUrl) {
+      imageUrl = ltiToolDefaultIconUrl({
+        base: window.location.origin,
+        toolName,
+        developerKeyId,
+      })
       messages = [
         {
           type: 'hint',

@@ -24,7 +24,7 @@ import type {
   LtiRegistrationWithConfiguration,
 } from '../../../model/LtiRegistration'
 import type {LtiRegistrationAccountBindingId} from '../../../model/LtiRegistrationAccountBinding'
-import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
+import {ZLtiRegistrationId, type LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {ZUserId} from '../../../model/UserId'
 import type {DeveloperKeyId} from '../../../model/developer_key/DeveloperKeyId'
 import type {InternalLtiConfiguration} from '../../../model/internal_lti_configuration/InternalLtiConfiguration'

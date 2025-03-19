@@ -16,16 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from 'react'
-import {useOutletContext} from 'react-router-dom'
-import {ToolDetailsOutletContext} from '../ToolDetails'
+import {DeveloperKeyId} from './developer_key/DeveloperKeyId'
 
-export const ToolConfiguration = () => {
-  const {registration} = useOutletContext<ToolDetailsOutletContext>()
+export const ltiToolDefaultIconUrl = ({
+  toolName,
+  base,
+  developerKeyId,
+}: {
+  toolName: string
+  base: string
+  developerKeyId?: DeveloperKeyId
+}) => {
   return (
-    <div>
-      Configuration page
-      <pre>{JSON.stringify(registration, null, 2)}</pre>
-    </div>
+    `${base}/lti/tool_default_icon?name=${toolName}` +
+    (developerKeyId ? `&developer_key_id=${developerKeyId}` : '')
   )
 }
