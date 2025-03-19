@@ -4370,8 +4370,10 @@ he:
       buttons: 
         cancel: ביטול
         update: "עדכון שיתוף הפעולה"
+      is_required: "חובה למלא שדה זה"
       labels: 
         description: "תיאור:"
+        document_name: "שם מסמך:"
         title: "כותרת שיתוף הפעולה"
     edit_button: 
       links: 
@@ -4403,6 +4405,7 @@ he:
             גוגל דוקס הנו מקום טוב לשיתוף פעולה במשימות פרויקט. הוא דומה לתפקוד של MS Word של מיקרוספוט, אך מאפשר עבודה משותפת עם אחרים באותו המסמך בו זמנית ללא צורך בשיגור הודעות דוא"ל.
             
             **אזהרה**. כל המשתתפים בפרויקט צריכים חשבון גוגל כדי להשתתף בתהליך של גוגל דוקס כלשהו.
+      is_required: "חובה למלא שדה זה"
       labels: 
         collaboration_type: "שתף/י פעולה תוך שימוש ב:"
         description: "תיאור:"
@@ -5528,6 +5531,10 @@ he:
     one: "הערה אחת"
     other: "%{count} הערות"
     two: "%{count} הערות"
+  count_courses_609dc3b8: 
+    one: "קורס אחד"
+    other: "%{count} קורסים"
+    two: "%{count} קורסים"
   count_criteria_22927713: 
     many: "%{count} קריטריונים"
     one: "קריטריון אחד"
@@ -5642,6 +5649,10 @@ he:
   count_students_will_get_num_points_c970fc01: 
     one: "תלמיד/ה אחד/ת י/תקבל נקודה %{num} "
     other: "%{count} תלמידים יקבלו %{num} נקודות"
+  count_sub_accounts_345f48ea: 
+    one: "חשבון משנה אחד"
+    other: "%{count} חשבונות משנה"
+    two: "%{count} חשבונות משנה"
   count_sub_modules_3373a1c4: 
     many: "%{count} מודולי משנה"
     one: "מודול משנה %{count} "
@@ -18882,6 +18893,7 @@ he:
       two: "%{count} חשבונות משנה"
     titles: 
       sub_accounts: "חשבונות משנה"
+  sub_accounts_e1b196a9: "חשבונות משנה"
   sub_assignment: 
     atom_no_author: "אין עורכ/ת"
     labels: 
