@@ -27,7 +27,7 @@ import sanitizeUrl from '@canvas/util/sanitizeUrl'
 import {contentMapping} from '@instructure/canvas-rce/src/common/mimeClass'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import {StudioPlayer} from '@instructure/studio-player'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {MediaPlayer} from '@instructure/ui-media-player'
 
 const I18n = createI18nScope('jquery_media_comments')
@@ -99,8 +99,13 @@ mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'sourcechoose
 // enable the playback speed selector
 mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'speed')
 
+export function isNewPlayerEnabled() {
+  const mediaPlayerEnabled = ENV.studio_media_capture_enabled
+  const studioPlayerEnabled = ENV.FEATURES?.consolidated_media_player
+  return studioPlayerEnabled || mediaPlayerEnabled
+}
+
 export function getSourcesAndTracks(id, attachmentId) {
-  const studioMediaEnabled = ENV.studio_media_capture_enabled
   const dfd = new $.Deferred()
   const api = attachmentId ? 'media_attachments' : 'media_objects'
   $.getJSON(`/${api}/${attachmentId || id}/info`, data => {
@@ -112,7 +117,7 @@ export function getSourcesAndTracks(id, attachmentId) {
       // resolution. sort so we play the lowest res. by default
       .sort((a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10))
       .map(source => {
-        if (studioMediaEnabled) {
+        if (isNewPlayerEnabled()) {
           return {
             src: source.url,
             label: `${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(
@@ -132,7 +137,7 @@ export function getSourcesAndTracks(id, attachmentId) {
 
     const tracks = map(data.media_tracks, track => {
       const languageName = mejs.language.codes[track.locale] || track.locale
-      if (studioMediaEnabled) {
+      if (isNewPlayerEnabled()) {
         return {
           id: attachmentId || id,
           type: track.kind,
@@ -240,7 +245,7 @@ const mediaCommentActions = {
             keyActions: [
               {
                 keys: values(MediaElementKeyActionHandler.keyCodes),
-                action(player, media, keyCode, event) {
+                action(player, media, _, event) {
                   if (player.isVideo) {
                     player.showControls()
                     player.startControlsTimer()
@@ -304,8 +309,6 @@ const mediaCommentActions = {
 
     const $this = $(this)
 
-    const studioMediaEnabled = ENV.studio_media_capture_enabled
-
     const dialog = $this.data('media_comment_dialog')
     if (dialog) {
       dialog.dialog('open')
@@ -337,7 +340,7 @@ const mediaCommentActions = {
           if (openingElement) {
             openingElement.focus()
           }
-          if (studioMediaEnabled) {
+          if (isNewPlayerEnabled()) {
             const root = $dialog.data('reactRoot')
             if (root) {
               root.unmount()
@@ -368,20 +371,6 @@ const mediaCommentActions = {
               mediaCommentId: id,
             }
 
-            const mediaPlayer = ENV.FEATURES?.consolidated_media_player ? (
-              <StudioPlayer
-                src={sourcesAndTracks.sources}
-                captions={sourcesAndTracks.tracks}
-                title={I18n.t('Play Media Comment')}
-              />
-            ) : (
-              <MediaPlayer
-                tracks={sourcesAndTracks.tracks}
-                sources={sourcesAndTracks.sources}
-                captionPosition="bottom"
-              />
-            )
-
             const $mediaTag = createMediaTag({
               sourcesAndTracks,
               mediaPlayerOptions,
@@ -390,7 +379,22 @@ const mediaCommentActions = {
               width,
             })
 
-            if (studioMediaEnabled) {
+            if (isNewPlayerEnabled()) {
+              const mediaPlayer = ENV.FEATURES?.consolidated_media_player ? (
+                <CanvasStudioPlayer
+                  media_id={id}
+                  explicitSize={{width: width, height: height}}
+                  hideUploadCaptions={!sourcesAndTracks.can_add_captions}
+                  type={mediaType === 'audio' ? 'audio' : 'video'}
+                />
+              ) : (
+                <MediaPlayer
+                  tracks={sourcesAndTracks.tracks}
+                  sources={sourcesAndTracks.sources}
+                  captionPosition="bottom"
+                />
+              )
+
               const root = createRoot($dialog[0])
               root.render(mediaPlayer)
               $dialog.data('reactRoot', root)
