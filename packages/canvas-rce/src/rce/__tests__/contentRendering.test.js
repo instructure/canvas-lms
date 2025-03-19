@@ -18,6 +18,7 @@
 
 import * as contentRendering from '../contentRendering'
 import {audioFromTray, audioFromUpload, videoFromTray, videoFromUpload} from './contentHelpers'
+import RCEGlobals from '../RCEGlobals'
 import { videoDefaultSize } from '../plugins/instructure_record/VideoOptionsTray/TrayController'
 
 jest.mock('../plugins/instructure_record/VideoOptionsTray/TrayController', () => {
@@ -200,6 +201,74 @@ describe('contentRendering', () => {
     })
   })
 
+  describe('renderVideo', () => {
+    const expectedVideoSize = { width: '200px', height: '100px' }
+    const { width, height } = expectedVideoSize
+    beforeEach(() => {
+      videoDefaultSize.mockReturnValue(expectedVideoSize)
+    })
+
+    it('builds html from tray video data', () => {
+      const video = videoFromTray()
+      const html = contentRendering.renderVideo(video, canvasOrigin)
+      expect(html).toEqual(
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_objects_iframe/17?type=video" style="width:${width};height:${height};display:inline-block;" title="Video player for filename.mov"></iframe>`,
+      )
+    })
+
+    it('builds html from uploaded video data', () => {
+      const video = videoFromUpload()
+      const html = contentRendering.renderVideo(video, canvasOrigin)
+      expect(html).toEqual(
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" loading="lazy" src="/url/to/m-media-id?type=video" style="width:${width};height:${height};display:inline-block;" title="Video player for filename.mov"></iframe>`,
+      )
+    })
+
+    it('builds html from canvas file data', () => {
+      const file = {
+        id: '17',
+        url: 'https://mycanvas.com:3000/files/17',
+        title: 'filename.mov',
+        type: 'video',
+      }
+      const html = contentRendering.renderVideo(file, canvasOrigin)
+      expect(html).toEqual(
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" loading="lazy" src="/media_objects_iframe?mediahref=/files/17&type=video" style="width:${width};height:${height};display:inline-block;" title="Video player for filename.mov"></iframe>`,
+      )
+    })
+  })
+
+  describe('renderAudio', () => {
+    it('builds the html from tray audio data', () => {
+      const audio = audioFromTray()
+      const rendered = contentRendering.renderAudio(audio, canvasOrigin)
+      expect(rendered).toEqual(
+        '<iframe data-media-id="29" data-media-type="audio" loading="lazy" src="/media_objects_iframe?mediahref=/url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+      )
+    })
+
+    it('builds the html from uploaded audio data', () => {
+      const audio = audioFromUpload()
+      const rendered = contentRendering.renderAudio(audio, canvasOrigin)
+      expect(rendered).toEqual(
+        '<iframe data-media-id="m-media-id" data-media-type="audio" loading="lazy" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+      )
+    })
+
+    it('builds html from canvas file data', () => {
+      const file = {
+        id: '17',
+        url: 'https://mycanvas.com:3000/files/17',
+        title: 'filename.mp3',
+        type: 'audio',
+      }
+      const html = contentRendering.renderAudio(file, canvasOrigin)
+      expect(html).toEqual(
+        '<iframe data-media-id="17" data-media-type="audio" loading="lazy" src="/media_objects_iframe?mediahref=/files/17&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+      )
+    })
+  })
+
   describe('getMediaId()', () => {
     let media
     const subject = () => contentRendering.getMediaId(media)
@@ -263,12 +332,17 @@ describe('contentRendering', () => {
     })
   })
 
-  describe('renderVideo', () => {
+  describe('renderVideo with attachment', () => {
     const expectedVideoSize = { width: '200px', height: '100px' }
     const { width, height } = expectedVideoSize
 
     beforeEach(() => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
       videoDefaultSize.mockReturnValue(expectedVideoSize)
+    })
+
+    afterAll(() => {
+      RCEGlobals.getFeatures.mockRestore()
     })
 
     it('builds html from tray video data with attachmentId', () => {
@@ -288,7 +362,15 @@ describe('contentRendering', () => {
     })
   })
 
-  describe('renderAudio', () => {
+  describe('renderAudio with attachment', () => {
+    beforeEach(() => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
+    })
+
+    afterAll(() => {
+      RCEGlobals.getFeatures.mockRestore()
+    })
+
     it('builds the html from tray audio data with attachmentId', () => {
       const audio = audioFromTray()
       const rendered = contentRendering.renderAudio(audio, canvasOrigin)

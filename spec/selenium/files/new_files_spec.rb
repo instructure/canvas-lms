@@ -338,6 +338,7 @@ describe "better_file_browsing" do
       course_with_teacher_logged_in
       allow_any_instance_of(MediaObject).to receive(:grants_right?).with(anything, anything, :add_captions).and_return(true)
 
+      Account.site_admin.enable_feature!(:media_links_use_attachment_id)
       @att = Attachment.create! filename: "file.mp4", context: @course, media_entry_id: "mediaentryid", uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4")
       @mo = MediaObject.create! media_id: "mediaentryid", attachment: @att
 

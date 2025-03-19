@@ -101,6 +101,7 @@ export default function (ed, document) {
             onDismiss={handleDismiss}
             tabs={{record: true, upload: true}}
             uploadMediaTranslations={Bridge.uploadMediaTranslations}
+            media_links_use_attachment_id={RCEGlobals.getFeatures().media_links_use_attachment_id}
             useStudioPlayer={RCEGlobals.getFeatures()?.consolidated_media_player}
           />
         )}
