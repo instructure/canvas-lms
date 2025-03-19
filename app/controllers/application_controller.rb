@@ -360,6 +360,7 @@ class ApplicationController < ActionController::Base
     account_level_blackout_dates
     render_both_to_do_lists
     commons_new_quizzes
+    consolidated_media_player
     course_paces_redesign
     course_paces_for_students
     explicit_latex_typesetting
@@ -423,7 +424,6 @@ class ApplicationController < ActionController::Base
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
     embedded_release_notes
-    consolidated_media_player
     discussions_speedgrader_revisit
     discussion_checkpoints
   ].freeze
