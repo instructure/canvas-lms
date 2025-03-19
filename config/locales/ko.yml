@@ -4018,6 +4018,9 @@ ko:
   correct_answers_will_be_available_on_date_48137: "정답은 %{date}에 사용할 수 있습니다."
   count_attempts_d23c69a0: 
     zero: "무제한 시도"
+  count_courses_609dc3b8: 
+    one: "과목 %{count}개"
+    other: "과목 %{count}개"
   count_days_de0c6a32: 
     one: "%{count}일"
     other: "%{count}일"
@@ -4043,6 +4046,9 @@ ko:
   count_students_c9920376: 
     one: "학생(%{count})"
     other: "학생(%{count})"
+  count_sub_accounts_345f48ea: 
+    one: "하위 계정 %{count}개"
+    other: "하위 계정 %{count}개"
   course: 
     access_denied: "액세스가 거부됨"
     batch_update_message: 
@@ -12150,6 +12156,7 @@ ko:
       unpublish: 
         description: "게시 취소"
   result_8f971a09: 결과
+  results_7526f4f6: 결과
   resume_quiz_afeceb87: "퀴즈 다시 시작"
   resume_survey_58dce775: "설문 다시 시작"
   retrieve_timeout: "구성을 찾아올 수 없음 - 서버 응답 시간 만료"
@@ -13448,6 +13455,7 @@ ko:
       other: "하위 계정 %{count}개"
     titles: 
       sub_accounts: "하위 계정"
+  sub_accounts_e1b196a9: "하위 계정"
   sub_assignment: 
     atom_no_author: "작성자 없음"
     labels: 
