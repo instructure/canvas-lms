@@ -384,9 +384,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
             currentScreen="last"
             reviewing={state.reviewing}
             onPreviousClicked={() => {
-              const placements = Object.keys(
-                state.registration.configuration.placements,
-              ) as LtiPlacement[]
+              const placements = state.registration.configuration.placements.map(p => p.placement)
               const disabledPlacements =
                 state.overlayStore.getState().state.overlay.disabled_placements ?? []
               const enabledPlacements = placements.filter(p => !disabledPlacements.includes(p))

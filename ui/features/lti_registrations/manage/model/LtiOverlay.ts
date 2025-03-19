@@ -22,6 +22,7 @@ import {ZLtiConfigurationOverlay} from './internal_lti_configuration/LtiConfigur
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZUser} from './User'
 import {ZLtiOverlayId} from './ZLtiOverlayId'
+import {ZLtiOverlayVersion} from './LtiOverlayVersion'
 
 export const ZLtiOverlay = z.object({
   id: ZLtiOverlayId,
@@ -35,3 +36,9 @@ export const ZLtiOverlay = z.object({
 })
 
 export type LtiOverlay = z.infer<typeof ZLtiOverlay>
+
+export const ZLtiOverlayWithVersions = ZLtiOverlay.extend({
+  versions: z.array(ZLtiOverlayVersion),
+})
+
+export type LtiOverlayWithVersions = z.infer<typeof ZLtiOverlayWithVersions>

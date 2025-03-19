@@ -17,7 +17,7 @@
  */
 
 import * as React from 'react'
-import {useOutletContext} from 'react-router-dom'
+import {useOutletContext, Link as RouterLink} from 'react-router-dom'
 import {ToolDetailsOutletContext} from '../ToolDetails'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -31,13 +31,15 @@ import {i18nLtiPlacement} from '../../../model/i18nLtiPlacement'
 import {DefaultLtiPrivacyLevel} from '../../../model/LtiPrivacyLevel'
 import {isLtiPlacementWithDefaultIcon, isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
 import {ltiToolDefaultIconUrl} from '../../../model/ltiToolIcons'
+import {Button} from '@instructure/ui-buttons'
+import {ToolConfigurationFooter} from './ToolConfigurationFooter'
 
 const I18n = createI18nScope('lti_registrations')
 
 const Section = ({
   title,
   children,
-  margin = '0 0 medium 0',
+  margin = '0 small medium small',
 }: {
   title: string
   children: React.ReactNode
@@ -46,7 +48,7 @@ const Section = ({
   return (
     <View
       borderRadius="large"
-      borderColor="primary"
+      borderColor="secondary"
       borderWidth="small"
       margin={margin}
       as="div"
@@ -79,7 +81,7 @@ const SubSection = ({
   )
 }
 
-export const ToolConfiguration = () => {
+export const ToolConfigurationView = () => {
   const {registration} = useOutletContext<ToolDetailsOutletContext>()
 
   const customFields = Object.entries(registration.overlaid_configuration.custom_fields || {})
@@ -292,6 +294,21 @@ export const ToolConfiguration = () => {
           <Text fontStyle="italic">{I18n.t('No placements with icons are enabled.')}</Text>
         )}
       </Section>
+
+      <ToolConfigurationFooter>
+        <Flex direction="row" justifyItems="space-between" padding="0 small">
+          <Flex.Item>{/*Todo: add actions here */}</Flex.Item>
+          <Flex.Item>
+            <Button
+              color="primary"
+              as={RouterLink}
+              to={`/manage/${registration.id}/configuration/edit`}
+            >
+              {I18n.t('Edit')}
+            </Button>
+          </Flex.Item>
+        </Flex>
+      </ToolConfigurationFooter>
     </div>
   )
 }

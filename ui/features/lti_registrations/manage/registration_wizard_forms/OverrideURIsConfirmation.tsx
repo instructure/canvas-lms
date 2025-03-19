@@ -17,62 +17,55 @@
  */
 
 import React from 'react'
-import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
-import type {Lti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
-import {
-  type LtiPlacement,
-  supportsDeepLinkingRequest,
-  supportsResourceLinkRequest,
-} from '../../model/LtiPlacement'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
+import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
-import {
-  isLtiMessageType,
-  LtiResourceLinkRequest,
-  type LtiMessageType,
-  LtiDeepLinkingRequest,
-} from '../../model/LtiMessageType'
-import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
-import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
-import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import {View} from '@instructure/ui-view'
-import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
-import {Footer} from '../../registration_wizard_forms/Footer'
+import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
+import {
+  LtiResourceLinkRequest,
+  LtiMessageType,
+  isLtiMessageType,
+  LtiDeepLinkingRequest,
+} from '../model/LtiMessageType'
+import {
+  LtiPlacement,
+  supportsDeepLinkingRequest,
+  supportsResourceLinkRequest,
+} from '../model/LtiPlacement'
+import {isValidHttpUrl} from '../../common/lib/validators/isValidHttpUrl'
+import {getInputIdForField} from '../registration_overlay/validateLti1p3RegistrationOverlayState'
+import {Lti1p3RegistrationOverlayState} from '../registration_overlay/Lti1p3RegistrationOverlayState'
+import {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
+import {Lti1p3RegistrationOverlayStore} from '../registration_overlay/Lti1p3RegistrationOverlayStore'
 
 const I18n = createI18nScope('lti_registration.wizard')
 
-export type OverrideURIsConfirmationProps = {
-  overlayStore: Lti1p3RegistrationOverlayStore
-  internalConfig: InternalLtiConfiguration
-  reviewing: boolean
-  onNextClicked: () => void
-  onPreviousClicked: () => void
-}
+export const OverrideURIsConfirmation = React.memo(
+  ({internalConfig, overlayStore}: OverrideURIsConfirmationProps) => {
+    const {statePlacements, overrides, setOverrideURI, setMessageType} = overlayStore(s => ({
+      statePlacements: s.state.placements.placements,
+      overrides: s.state.override_uris.placements,
+      setOverrideURI: s.setOverrideURI,
+      setMessageType: s.setMessageType,
+    }))
 
-export const OverrideURIsConfirmation = ({
-  overlayStore,
-  internalConfig,
-  reviewing,
-  onNextClicked,
-  onPreviousClicked,
-}: OverrideURIsConfirmationProps) => {
-  const {state, setOverrideURI, setMessageType} = overlayStore()
+    const placements = (statePlacements || internalConfig.placements.map(p => p.placement)).sort()
 
-  const allURIsValid = React.useMemo(
-    () => Object.values(state.override_uris.placements).every(p => !p.uri || isValidHttpUrl(p.uri)),
-    [state.override_uris.placements],
-  )
+    const [blurStatus, setBlurStatus] = React.useState<Partial<Record<LtiPlacement, boolean>>>({})
 
-  const placements = React.useMemo(
-    () => (state.placements.placements || internalConfig.placements.map(p => p.placement)).sort(),
-    [state.placements.placements, internalConfig.placements],
-  )
-  const overrides = state.override_uris.placements
-  return (
-    <>
-      <RegistrationModalBody>
+    const handleBlur = React.useCallback(
+      (placement: LtiPlacement) =>
+        (event: React.FocusEvent<HTMLInputElement>): void => {
+          setBlurStatus(prev => ({...prev, [placement]: event.target.value.trim() !== ''}))
+        },
+      [setBlurStatus],
+    )
+
+    return (
+      <>
         <Heading level="h3" margin="0 0 x-small 0">
           {I18n.t('Override URIs')}
         </Heading>
@@ -85,6 +78,8 @@ export const OverrideURIsConfirmation = ({
           const overrideURI = overrides[p]?.uri || ''
           return (
             <PlacementOverrideURIFormField
+              handleBlur={handleBlur}
+              wasBlurred={blurStatus[p] ?? false}
               key={p}
               placement={p}
               defaultTargetLinkURI={
@@ -98,19 +93,19 @@ export const OverrideURIsConfirmation = ({
             />
           )
         })}
-      </RegistrationModalBody>
-      <Footer
-        currentScreen="intermediate"
-        reviewing={reviewing}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
-        disableNextButton={!allURIsValid}
-      />
-    </>
-  )
+      </>
+    )
+  },
+)
+
+export type OverrideURIsConfirmationProps = {
+  internalConfig: InternalLtiConfiguration
+  overlayStore: Lti1p3RegistrationOverlayStore
 }
 
 type PlacementOverrideURIFormFieldProps = {
+  handleBlur: (placement: LtiPlacement) => (event: React.FocusEvent<HTMLInputElement>) => void
+  wasBlurred: boolean
   placement: LtiPlacement
   overrideURI: string
   defaultMessageType: LtiMessageType
@@ -161,12 +156,16 @@ const PlacementOverrideURIFormField = React.memo((props: PlacementOverrideURIFor
         {messageTypeElement(props)}
         <View margin="small 0 0 0" as="div">
           <TextInput
+            id={getInputIdForField(`override_uri_${props.placement}`)}
             renderLabel={I18n.t('Override URI')}
             value={props.overrideURI}
             placeholder={props.defaultTargetLinkURI}
             onChange={e => props.onChangeOverrideURI(props.placement, e.target.value)}
+            onBlur={props.handleBlur(props.placement)}
             messages={
-              props.overrideURI.trim() === '' || isValidHttpUrl(props.overrideURI)
+              props.overrideURI.trim() === '' ||
+              isValidHttpUrl(props.overrideURI) ||
+              !props.wasBlurred
                 ? []
                 : [
                     {

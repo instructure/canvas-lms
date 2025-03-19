@@ -44,6 +44,8 @@ export const initialOverlayStateFromInternalConfig = (
       'disabled'
 
   return {
+    dirty: false,
+    hasSubmitted: false,
     launchSettings: {
       redirectURIs: internalConfig.redirect_uris?.join('\n'),
       targetLinkURI: existingOverlay?.target_link_uri || internalConfig.target_link_uri,
@@ -168,6 +170,8 @@ export const convertToLtiConfigurationOverlay = (
         .filter(p => !state.placements.placements?.includes(p))
     : undefined
 
+  const disabled_scopes = internalConfig.scopes.filter(s => !state.permissions.scopes?.includes(s))
+
   const newInternalConfig = {
     ...internalConfig,
     scopes: state.permissions.scopes || [],
@@ -194,7 +198,7 @@ export const convertToLtiConfigurationOverlay = (
         state.launchSettings.targetLinkURI === internalConfig.target_link_uri
           ? undefined
           : state.launchSettings.targetLinkURI,
-      disabled_scopes: [],
+      disabled_scopes,
       privacy_level:
         state.data_sharing.privacy_level === internalConfig.privacy_level
           ? undefined

@@ -21,7 +21,7 @@ import * as React from 'react'
 import type {AccountId} from '../model/AccountId'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
-import {LaunchSettings} from './components/LaunchSettings'
+import {LaunchSettingsConfirmationWrapper} from './components/LaunchSettingsConfirmationWrapper'
 import {
   createLti1p3RegistrationWizardState,
   type Lti1p3RegistrationWizardStep,
@@ -30,7 +30,7 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
 import {PlacementsConfirmationWrapper} from './components/PlacementsConfirmationWrapper'
 import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'
-import {OverrideURIsConfirmation} from './components/OverrideURIsConfirmation'
+import {OverrideURIsConfirmationWrapper} from './components/OverrideURIsConfirmationWrapper'
 import {NamingConfirmationWrapper} from './components/NamingConfirmationWrapper'
 import {IconConfirmationWrapper} from './components/IconConfirmationWrapper'
 import {ReviewScreenWrapper} from './components/ReviewScreenWrapper'
@@ -101,7 +101,7 @@ export const Lti1p3RegistrationWizard = ({
       return (
         <>
           <Header onClose={unregister} editing={!!existingRegistration} />
-          <LaunchSettings
+          <LaunchSettingsConfirmationWrapper
             internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
             reviewing={store.state.reviewing}
@@ -115,6 +115,7 @@ export const Lti1p3RegistrationWizard = ({
         <>
           <Header onClose={unregister} editing={!!existingRegistration} />
           <PermissionConfirmationWrapper
+            showAllSettings={true}
             overlayStore={store.state.overlayStore}
             internalConfig={internalConfiguration}
           />
@@ -162,7 +163,7 @@ export const Lti1p3RegistrationWizard = ({
       return (
         <>
           <Header onClose={unregister} editing={!!existingRegistration} />
-          <OverrideURIsConfirmation
+          <OverrideURIsConfirmationWrapper
             overlayStore={store.state.overlayStore}
             internalConfig={internalConfiguration}
             reviewing={store.state.reviewing}

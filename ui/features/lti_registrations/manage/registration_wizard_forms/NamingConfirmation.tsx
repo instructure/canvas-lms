@@ -40,84 +40,86 @@ export type NamingConfirmationProps = {
   onUpdatePlacementLabel: (placement: LtiPlacement, value: string) => void
 }
 
-export const NamingConfirmation = ({
-  toolName,
-  adminNickname,
-  onUpdateAdminNickname,
-  description,
-  descriptionPlaceholder,
-  onUpdateDescription,
-  placements,
-  onUpdatePlacementLabel,
-}: NamingConfirmationProps) => {
-  return (
-    <Flex direction="column">
-      <>
-        <Heading level="h3" margin="0 0 x-small 0">
-          {I18n.t('Nickname')}
-        </Heading>
-        <Text
-          dangerouslySetInnerHTML={{
-            __html: I18n.t('Choose a nickname for *%{toolName}*.', {
-              toolName: toolName,
-              wrapper: ['<strong>$1</strong>'],
-            }),
-          }}
-        />
-        <View margin="medium 0 0 0" as="div">
-          <TextInput
-            renderLabel={I18n.t('Administration Nickname')}
-            value={adminNickname}
-            onChange={(_, value) => onUpdateAdminNickname(value)}
-          />
-          <Text size="small">
-            {I18n.t("The nickname will always appear next to the App's name")}
-          </Text>
-        </View>
-      </>
-      <View margin="medium 0 medium 0" as="div">
-        <Heading level="h3" margin="0 0 x-small 0">
-          {I18n.t('Description')}
-        </Heading>
-        <TextArea
-          label={
-            <Text weight="normal">
-              {I18n.t(
-                'Choose a description for this tool to display in the Link Selection and Assignment Selection placements for all accounts.',
-              )}
-            </Text>
-          }
-          value={description}
-          placeholder={descriptionPlaceholder}
-          onChange={e => {
-            onUpdateDescription(e.target.value)
-          }}
-        />
-      </View>
-      {placements.length > 0 && (
+export const NamingConfirmation = React.memo(
+  ({
+    toolName,
+    adminNickname,
+    onUpdateAdminNickname,
+    description,
+    descriptionPlaceholder,
+    onUpdateDescription,
+    placements,
+    onUpdatePlacementLabel,
+  }: NamingConfirmationProps) => {
+    return (
+      <Flex direction="column">
         <>
           <Heading level="h3" margin="0 0 x-small 0">
-            {I18n.t('Placement Names')}
+            {I18n.t('Nickname')}
           </Heading>
-          <Text>{I18n.t('Choose a name override for each placement (optional).')}</Text>
-          <Flex direction="column" gap="medium" margin="medium 0 medium 0">
-            {placements.map(placement => {
-              return (
-                <MemoPlacementLabelInput
-                  key={placement.placement}
-                  placement={placement.placement}
-                  label={placement.label}
-                  defaultValue={placement.defaultValue}
-                  onChange={onUpdatePlacementLabel}
-                />
-              )
-            })}
-          </Flex>
+          <Text
+            dangerouslySetInnerHTML={{
+              __html: I18n.t('Choose a nickname for *%{toolName}*.', {
+                toolName: toolName,
+                wrapper: ['<strong>$1</strong>'],
+              }),
+            }}
+          />
+          <View margin="medium 0 0 0" as="div">
+            <TextInput
+              renderLabel={I18n.t('Administration Nickname')}
+              value={adminNickname}
+              onChange={(_, value) => onUpdateAdminNickname(value)}
+            />
+            <Text size="small">
+              {I18n.t("The nickname will always appear next to the App's name")}
+            </Text>
+          </View>
         </>
-      )}
-    </Flex>
-  )
-}
+        <View margin="medium 0 medium 0" as="div">
+          <Heading level="h3" margin="0 0 x-small 0">
+            {I18n.t('Description')}
+          </Heading>
+          <TextArea
+            label={
+              <Text weight="normal">
+                {I18n.t(
+                  'Choose a description for this tool to display in the Link Selection and Assignment Selection placements for all accounts.',
+                )}
+              </Text>
+            }
+            value={description}
+            placeholder={descriptionPlaceholder}
+            onChange={e => {
+              onUpdateDescription(e.target.value)
+            }}
+          />
+        </View>
+        {placements.length > 0 && (
+          <>
+            <Heading level="h3" margin="0 0 x-small 0">
+              {I18n.t('Placement Names')}
+            </Heading>
+            <Text>{I18n.t('Choose a name override for each placement (optional).')}</Text>
+            <Flex direction="column" gap="medium" margin="medium 0 medium 0">
+              {placements.map(placement => {
+                return (
+                  <MemoPlacementLabelInput
+                    key={placement.placement}
+                    placement={placement.placement}
+                    label={placement.label}
+                    defaultValue={placement.defaultValue}
+                    onChange={onUpdatePlacementLabel}
+                  />
+                )
+              })}
+            </Flex>
+          </>
+        )}
+      </Flex>
+    )
+  },
+)
 
 const MemoPlacementLabelInput = React.memo(
   ({
