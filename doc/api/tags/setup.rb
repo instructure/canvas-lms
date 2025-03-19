@@ -60,15 +60,13 @@ end
 def returns
   return unless object.has_tag?(:returns)
 
-  response_object_name = object.tag(:returns).text
-  response_object_name = response_object_name.sub("Schemas::Docs::", "")
-
-  case response_object_name
+  response_info = object.tag(:returns)
+  case response_info.text
   when /\[(.*)\]/
     @object_name = $1.strip
     @is_list = true
   else
-    @object_name = response_object_name.strip
+    @object_name = response_info.text.strip
     @is_list = false
   end
   @resource_name = options[:json_objects_map][@object_name]

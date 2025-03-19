@@ -8,4 +8,4 @@ test:
 
 ## amazon storage example. requires valid amazon_s3.yml
 production:
-  storage: local
+  storage: s3
