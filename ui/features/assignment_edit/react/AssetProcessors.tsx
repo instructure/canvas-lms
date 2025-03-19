@@ -86,7 +86,8 @@ export function AssetProcessors(
                 icon={{
                   toolId: processor.tool.definition_id,
                   toolName: processor.tool.name,
-                  url: processor.contentItem.icon?.url || "/TODO-processor-tool-icon_url"
+                  url: processor.contentItem.icon?.url ||
+                    processor.tool.placements?.ActivityAssetProcessor?.icon_url
                 }}
                 title={processor.contentItem.title}
                 description={processor.contentItem.text}

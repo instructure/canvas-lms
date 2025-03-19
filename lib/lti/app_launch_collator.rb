@@ -108,7 +108,8 @@ module Lti
             url: tool.extension_setting(p, :url) || tool.extension_default_value(p, :url) || tool.extension_default_value(p, :target_link_uri),
             title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
           }
-          definition[:placements][:global_navigation].merge!(global_nav_info(tool)) if p == "global_navigation"
+          definition[:placements][p.to_sym].merge!(global_nav_info(tool)) if p == "global_navigation"
+          definition[:placements][p.to_sym].merge!(asset_processor_info(tool)) if p == Lti::ResourcePlacement::ASSET_PROCESSOR
 
           message_type = definition.dig(:placements, p.to_sym, :message_type)
 
@@ -157,6 +158,12 @@ module Lti
           url: message_handler.launch_path,
           title: message_handler.resource_handler.name
         }
+      end
+
+      def asset_processor_info(tool)
+        %i[icon_url icon_svg_path_64].index_with do |key|
+          tool.extension_setting(Lti::ResourcePlacement::ASSET_PROCESSOR, key)
+        end.compact
       end
 
       def global_nav_info(tool)
