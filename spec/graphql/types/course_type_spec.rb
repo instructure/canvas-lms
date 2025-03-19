@@ -1065,122 +1065,193 @@ describe Types::CourseType do
         end
       end
 
-      context "search term" do
+      context "search and sort" do
         before(:once) do
+          @domain_root_account = Account.default
           @student_with_name = student_in_course(active_all: true).user
-          @student_with_name.update!(name: "John Doe")
+          @student_with_name.update!(name: "John Doe", sortable_name: "Doe, John")
           @student_with_email = student_in_course(active_all: true).user
-          @student_with_email.update!(name: "Jane Smith")
-          @student_with_email.email = "jsmith@example.com"
+          @student_with_email.update!(name: "Mary Smith", sortable_name: "Smith, Mary")
+          @student_with_email.email = "a123@example.com"
           @student_with_email.save!
           @student_with_sis = student_in_course(active_all: true).user
+          @student_with_sis.update(email: "b456@email.com", name: "Claire Anne", sortable_name: "Anne, Claire")
           @student_with_sis.pseudonyms.create!(
             account: Account.default,
             sis_user_id: "sis_123",
             unique_id: "uid_123"
           )
           @student_with_login = student_in_course(active_all: true).user
+          @student_with_login.update(email: "c789@example.com", name: "Newman Bradley", sortable_name: "Bradley, Newman")
           @student_with_login.pseudonyms.create!(
             account: Account.default,
+            sis_user_id: "sis_456",
             unique_id: "uid_456"
           )
+          @student_with_email.pseudonyms.create!(
+            account: Account.default,
+            sis_user_id: "sis_789",
+            unique_id: "uid_789"
+          )
+          @student_with_email.enrollments.first.update!(total_activity_time: 100)
+          @student_with_sis.enrollments.first.update!(total_activity_time: 200)
+          @student_with_login.enrollments.first.update!(total_activity_time: 300)
         end
 
-        it "filters users by search term matching name" do
-          expect(
-            course_type.resolve(<<~GQL, current_user: @teacher)
-              usersConnection(filter: {searchTerm: "john"}) { edges { node { _id } } }
-            GQL
-          ).to eq [@student_with_name.to_param]
-        end
+        context "search" do
+          it "filters users by search term matching name" do
+            expect(
+              course_type.resolve(<<~GQL, current_user: @teacher)
+                usersConnection(filter: {searchTerm: "john"}) { edges { node { _id } } }
+              GQL
+            ).to eq [@student_with_name.to_param]
+          end
 
-        it "filters users by search term matching email when user has permissions" do
-          expect(
-            course_type.resolve(<<~GQL, current_user: @teacher)
-              usersConnection(filter: {searchTerm: "jsmith@example"}) { edges { node { _id } } }
-            GQL
-          ).to eq [@student_with_email.to_param]
-        end
+          it "filters users by search term matching email when user has permissions" do
+            expect(
+              course_type.resolve(<<~GQL, current_user: @teacher)
+                usersConnection(filter: {searchTerm: "a123@example.com"}) { edges { node { _id } } }
+              GQL
+            ).to eq [@student_with_email.to_param]
+          end
 
-        it "does not match email when user lacks permissions" do
-          expect(
-            course_type.resolve(<<~GQL, current_user: @student1)
-              usersConnection(filter: {searchTerm: "jsmith@example"}) { edges { node { _id } } }
-            GQL
-          ).to be_empty
-        end
+          it "does not match email when user lacks permissions" do
+            expect(
+              course_type.resolve(<<~GQL, current_user: @student1)
+                usersConnection(filter: {searchTerm: "a123@example.com"}) { edges { node { _id } } }
+              GQL
+            ).to be_empty
+          end
 
-        it "filters users by search term matching SIS ID when user has permissions" do
-          expect(
-            course_type.resolve(<<~GQL, current_user: @teacher)
-              usersConnection(filter: {searchTerm: "sis_123"}) { edges { node { _id } } }
-            GQL
-          ).to eq [@student_with_sis.to_param]
-        end
+          it "filters users by search term matching SIS ID when user has permissions" do
+            expect(
+              course_type.resolve(<<~GQL, current_user: @teacher)
+                usersConnection(filter: {searchTerm: "sis_123"}) { edges { node { _id } } }
+              GQL
+            ).to eq [@student_with_sis.to_param]
+          end
 
-        it "does not match SIS ID when user lacks permissions" do
-          expect(
-            course_type.resolve(<<~GQL, current_user: @student1)
-              usersConnection(filter: {searchTerm: "sis_123"}) { edges { node { _id } } }
-            GQL
-          ).to be_empty
-        end
+          it "does not match SIS ID when user lacks permissions" do
+            expect(
+              course_type.resolve(<<~GQL, current_user: @student1)
+                usersConnection(filter: {searchTerm: "sis_123"}) { edges { node { _id } } }
+              GQL
+            ).to be_empty
+          end
 
-        it "filters users by search term matching login ID when user has permissions" do
-          expect(
-            course_type.resolve(<<~GQL, current_user: @teacher)
-              usersConnection(filter: {searchTerm: "uid_456"}) { edges { node { _id } } }
-            GQL
-          ).to eq [@student_with_login.to_param]
-        end
+          it "filters users by search term matching login ID when user has permissions" do
+            expect(
+              course_type.resolve(<<~GQL, current_user: @teacher)
+                usersConnection(filter: {searchTerm: "uid_456"}) { edges { node { _id } } }
+              GQL
+            ).to eq [@student_with_login.to_param]
+          end
 
-        it "does not match login ID when user lacks permissions" do
-          expect(
-            course_type.resolve(<<~GQL, current_user: @student1)
-              usersConnection(filter: {searchTerm: "uid_456"}) { edges { node { _id } } }
-            GQL
-          ).to be_empty
-        end
+          it "does not match login ID when user lacks permissions" do
+            expect(
+              course_type.resolve(<<~GQL, current_user: @student1)
+                usersConnection(filter: {searchTerm: "uid_456"}) { edges { node { _id } } }
+              GQL
+            ).to be_empty
+          end
 
-        it "returns empty when search term does not match users" do
-          expect(
-            course_type.resolve(<<~GQL, current_user: @teacher)
-              usersConnection(filter: {searchTerm: "nonexistent"}) { edges { node { _id } } }
-            GQL
-          ).to be_empty
-        end
+          it "returns empty when search term does not match users" do
+            expect(
+              course_type.resolve(<<~GQL, current_user: @teacher)
+                usersConnection(filter: {searchTerm: "nonexistent"}) { edges { node { _id } } }
+              GQL
+            ).to be_empty
+          end
 
-        it "throws error if search term is too short" do
-          result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
-            query {
-              course(id: "#{course.id}") {
-                usersConnection(filter: {searchTerm: "a"}) {
-                  edges { node { _id } }
+          it "throws error if search term is too short" do
+            result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
+              query {
+                course(id: "#{course.id}") {
+                  usersConnection(filter: {searchTerm: "a"}) {
+                    edges { node { _id } }
+                  }
                 }
               }
-            }
-          GQL
+            GQL
 
-          expect(result["errors"]).to be_present
-          expect(result["errors"][0]["message"]).to match(/at least 2 characters/)
+            expect(result["errors"]).to be_present
+            expect(result["errors"][0]["message"]).to match(/at least 2 characters/)
+          end
+
+          it "ignores search term if empty string" do
+            expect(
+              course_type.resolve(<<~GQL, current_user: @teacher)
+                usersConnection(filter: {searchTerm: ""}) { edges { node { _id } } }
+              GQL
+            ).to match_array([
+              @teacher,
+              @student1,
+              other_teacher,
+              @student2,
+              @inactive_user,
+              @student_with_name,
+              @student_with_email,
+              @student_with_sis,
+              @student_with_login
+            ].map(&:to_param))
+          end
         end
 
-        it "ignores search term if empty string" do
-          expect(
-            course_type.resolve(<<~GQL, current_user: @teacher)
-              usersConnection(filter: {searchTerm: ""}) { edges { node { _id } } }
-            GQL
-          ).to match_array([
-            @teacher,
-            @student1,
-            other_teacher,
-            @student2,
-            @inactive_user,
-            @student_with_name,
-            @student_with_email,
-            @student_with_sis,
-            @student_with_login
-          ].map(&:to_param))
+        context "sort" do
+          before :once do
+            @sorted_by_name_asc = [@student_with_sis, @student_with_name, @student_with_email].map(&:name)
+            @sorted_by_sis_id_asc = [@student_with_sis, @student_with_login, @student_with_email].map { |u| u.pseudonyms.first.sis_user_id }
+            @sorted_by_login_id_asc = [@student_with_sis, @student_with_login, @student_with_email].map { |u| u.pseudonyms.first.unique_id }
+            @sorted_by_total_activity_time_asc = [@student_with_email, @student_with_sis, @student_with_login].map { |u| u.enrollments.first.total_activity_time }
+          end
+
+          def get_sorted_results(field, direction, result = "_id")
+            course_type.resolve(
+              "usersConnection(sort: {field: #{field}, direction: #{direction}}) { edges { node { #{result} } } }",
+              current_user: @teacher,
+              domain_root_account: @domain_root_account
+            )
+          end
+
+          context "name" do
+            it "sorts by name ascending" do
+              expect(get_sorted_results(:name, :asc, "name")[0..2]).to eq @sorted_by_name_asc
+            end
+
+            it "sorts by name descending" do
+              expect(get_sorted_results(:name, :desc, "name")[-3..]).to eq @sorted_by_name_asc.reverse
+            end
+          end
+
+          context "sis_id" do
+            it "sorts by SIS ID ascending" do
+              expect(get_sorted_results(:sis_id, :asc, "sisId")[0..2]).to eq @sorted_by_sis_id_asc
+            end
+
+            it "sorts by SIS ID descending" do
+              expect(get_sorted_results(:sis_id, :desc, "sisId")[0..2]).to eq @sorted_by_sis_id_asc.reverse
+            end
+          end
+
+          context "login_id" do
+            it "sorts by login_id ascending" do
+              expect(get_sorted_results(:login_id, :asc, "loginId")[0..2]).to eq @sorted_by_login_id_asc
+            end
+
+            it "sorts by login_id descending" do
+              expect(get_sorted_results(:login_id, :desc, "loginId")[0..2]).to eq @sorted_by_login_id_asc.reverse
+            end
+          end
+
+          context "total_activity_time" do
+            it "sorts by total_activity_time ascending" do
+              expect(get_sorted_results(:total_activity_time, :asc, "enrollments { totalActivityTime }")[0..2].flatten).to eq @sorted_by_total_activity_time_asc
+            end
+
+            it "sorts by total_activity_time descending" do
+              expect(get_sorted_results(:total_activity_time, :desc, "enrollments { totalActivityTime }")[0..2].flatten).to eq @sorted_by_total_activity_time_asc.reverse
+            end
+          end
         end
       end
     end

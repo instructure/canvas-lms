@@ -128,6 +128,42 @@ module UserSearch
                                                      context.try(:resolved_root_account_id) || context.root_account_id
                                                    ]))
         users_scope.order(Arel.sql("#{column} #{order}"))
+      when "name"
+        users_scope.select("users.*").order_by_name(direction: (options[:order] == "desc") ? :descending : :ascending)
+      when "login_id"
+        # sort pseudonyms based on SisPseudonym#pick_user_pseudonym
+        # grab only the first pseudonym of each user after sorting based on collation_key
+        users_scope = users_scope.select(User.send(:sanitize_sql, [
+                                                     "users.*,
+                                                    (SELECT unique_id
+                                                      FROM #{Pseudonym.quoted_table_name}
+                                                      WHERE pseudonyms.user_id = users.id
+                                                        #{"AND pseudonyms.workflow_state <> 'deleted'" unless @include_deleted_users}
+                                                        AND pseudonyms.account_id = ?
+                                                      ORDER BY workflow_state,
+                                                              CASE WHEN pseudonyms.sis_user_id IS NOT NULL THEN 0 ELSE 1 END,
+                                                              #{Pseudonym.best_unicode_collation_key("unique_id")},
+                                                              position
+                                                      LIMIT 1) AS login_id",
+                                                     context.try(:resolved_root_account_id) || context.root_account_id
+                                                   ]))
+        users_scope.order(Arel.sql("login_id#{order}"))
+      when "total_activity_time"
+        # sort by total_activity_time works only within course context
+        raise RequestError.new("Sorting by total activity time is only available within a course context", 400) unless context.is_a?(Course)
+
+        # grab the max total_activity_time from all non-deleted user enrollments in the course
+        users_scope = users_scope.select(User.send(:sanitize_sql, [
+                                                     "users.*,
+                                                    (SELECT MAX(enrollments.total_activity_time)
+                                                      FROM #{Enrollment.quoted_table_name}
+                                                      WHERE enrollments.user_id = users.id
+                                                        AND enrollments.workflow_state <> 'deleted'
+                                                        AND enrollments.course_id = ?
+                                                    ) AS total_activity_time",
+                                                     context.id
+                                                   ]))
+        users_scope.order(Arel.sql("total_activity_time#{order}"))
       else
         users_scope.select("users.*").order_by_sortable_name
       end
