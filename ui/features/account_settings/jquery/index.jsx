@@ -37,6 +37,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import ReportDescription from '../react/account_reports/ReportDescription'
+import RunReportForm from '../react/account_reports/RunReportForm'
 
 const I18n = createI18nScope('account_settings')
 
@@ -47,6 +48,8 @@ const _settings_desktop = window.matchMedia('(min-width: 992px)').matches
 
 let descMount
 let descRoot
+let reportMount
+let reportRoot
 
 export function openReportDescriptionLink(event) {
   event.preventDefault()
@@ -187,9 +190,11 @@ $(document).ready(function () {
           .then(req => req.text())
           .then(html => {
             $('#tab-reports').html(html)
-            renderDatetimeField($('#tab-reports .datetime_field'))
             descMount = document.getElementById('report_desc_mount')
             descRoot = ReactDOM.createRoot(descMount)
+
+            reportMount = document.getElementById('run_report_mount')
+            reportRoot = ReactDOM.createRoot(reportMount)
 
             $('.open_report_description_link').click(openReportDescriptionLink)
 
@@ -225,86 +230,108 @@ $(document).ready(function () {
             })
 
             $('.configure_report_link').click(function (_event) {
-              const provisioning_container = document.getElementById('provisioning_csv_form')
-              const sis_export_container = document.getElementById('sis_export_csv_form')
-              const provisioning_checkboxes = provisioning_container.querySelectorAll(
-                'input[type="checkbox"]:not(#parameters_created_by_sis):not(#parameters_include_deleted)',
-              )
-              const sis_export_checkboxes = sis_export_container.querySelectorAll(
-                'input[type="checkbox"]:not(#parameters_created_by_sis):not(#parameters_include_deleted)',
-              )
-
-              provisioning_container.onclick = function () {
-                let reportIsChecked = false
-
-                provisioning_checkboxes.forEach(checkbox => {
-                  if (checkbox.checked) {
-                    reportIsChecked = true
-                  }
-                })
-
-                const createdBySisChecbox = provisioning_container.querySelector(
-                  '#parameters_created_by_sis',
-                )
-                const includeDeletedCheckbox = provisioning_container.querySelector(
-                  '#parameters_include_deleted',
-                )
-
-                if (reportIsChecked) {
-                  createdBySisChecbox.disabled = false
-                  includeDeletedCheckbox.disabled = false
-                } else {
-                  createdBySisChecbox.checked = false
-                  createdBySisChecbox.disabled = true
-                  includeDeletedCheckbox.checked = false
-                  includeDeletedCheckbox.disabled = true
-                }
+              const closeModal = () => {
+                reportRoot.render(null)
               }
 
-              sis_export_container.onclick = function () {
-                let reportIsChecked = false
+              const onSuccess = reportName => {
+                reportRoot.render(null)
+                $('#' + reportName)
+                  .find('.run_report_link')
+                  .hide()
+                  .end()
+                  .find('.configure_report_link')
+                  .hide()
+                  .end()
+                  .find('.running_report_message')
+                  .show()
+              }
 
-                sis_export_checkboxes.forEach(checkbox => {
-                  if (checkbox.checked) {
-                    reportIsChecked = true
+              const setupJQuery = () => {
+                const modalBody = document.getElementById('configure_modal_body')
+                const provisioning_container = modalBody.querySelector('form#provisioning_csv_form')
+                const sis_export_container = modalBody.querySelector('form#sis_export_csv_form')
+                if (provisioning_container) {
+                  const provisioning_checkboxes = provisioning_container.querySelectorAll(
+                    'input[type="checkbox"]:not(#parameters_created_by_sis):not(#parameters_include_deleted)',
+                  )
+
+                  provisioning_container.onclick = function () {
+                    let reportIsChecked = false
+
+                    provisioning_checkboxes.forEach(checkbox => {
+                      if (checkbox.checked) {
+                        reportIsChecked = true
+                      }
+                    })
+
+                    const createdBySisChecbox = provisioning_container.querySelector(
+                      '#parameters_created_by_sis',
+                    )
+                    const includeDeletedCheckbox = provisioning_container.querySelector(
+                      '#parameters_include_deleted',
+                    )
+
+                    if (reportIsChecked) {
+                      createdBySisChecbox.disabled = false
+                      includeDeletedCheckbox.disabled = false
+                    } else {
+                      createdBySisChecbox.checked = false
+                      createdBySisChecbox.disabled = true
+                      includeDeletedCheckbox.checked = false
+                      includeDeletedCheckbox.disabled = true
+                    }
                   }
-                })
+                } else if (sis_export_container) {
+                  const sis_export_checkboxes = sis_export_container.querySelectorAll(
+                    'input[type="checkbox"]:not(#parameters_created_by_sis):not(#parameters_include_deleted)',
+                  )
 
-                const createdBySisChecbox = sis_export_container.querySelector(
-                  '#parameters_created_by_sis',
-                )
-                const includeDeletedCheckbox = sis_export_container.querySelector(
-                  '#parameters_include_deleted',
-                )
+                  sis_export_container.onclick = function () {
+                    let reportIsChecked = false
 
-                if (reportIsChecked) {
-                  createdBySisChecbox.disabled = false
-                  includeDeletedCheckbox.disabled = false
-                } else {
-                  createdBySisChecbox.checked = false
-                  createdBySisChecbox.disabled = true
-                  includeDeletedCheckbox.checked = false
-                  includeDeletedCheckbox.disabled = true
+                    sis_export_checkboxes.forEach(checkbox => {
+                      if (checkbox.checked) {
+                        reportIsChecked = true
+                      }
+                    })
+
+                    const createdBySisChecbox = sis_export_container.querySelector(
+                      '#parameters_created_by_sis',
+                    )
+                    const includeDeletedCheckbox = sis_export_container.querySelector(
+                      '#parameters_include_deleted',
+                    )
+
+                    if (reportIsChecked) {
+                      createdBySisChecbox.disabled = false
+                      includeDeletedCheckbox.disabled = false
+                    } else {
+                      createdBySisChecbox.checked = false
+                      createdBySisChecbox.disabled = true
+                      includeDeletedCheckbox.checked = false
+                      includeDeletedCheckbox.disabled = true
+                    }
+                  }
                 }
               }
 
               event.preventDefault()
-              const data = $(this).data()
-              let $dialog = data.$report_dialog
-              const responsiveWidth = _settings_smallTablet ? 400 : 320
-              if (!$dialog) {
-                $dialog = data.$report_dialog = $(this)
-                  .parent('td')
-                  .find('.report_dialog')
-                  .dialog({
-                    autoOpen: false,
-                    width: responsiveWidth,
-                    title: I18n.t('titles.configure_report', 'Configure Report'),
-                    modal: true,
-                    zIndex: 1000,
-                  })
-              }
-              $dialog.dialog('open')
+              const reportCell = $(this).closest('td')
+              const reportRow = reportCell.closest('tr')
+              const reportName = reportRow[0].id
+              const path = reportCell.find('.report_dialog form').attr('action')
+              const html = reportCell.find('.report_dialog').html()
+              reportRoot.render(
+                <RunReportForm
+                  formHTML={html}
+                  onRender={setupJQuery}
+                  closeModal={closeModal}
+                  onSuccess={onSuccess}
+                  path={path}
+                  reportName={reportName}
+                />,
+              )
             })
           })
           .catch(() => {
