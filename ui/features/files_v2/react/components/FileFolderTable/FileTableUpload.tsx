@@ -29,6 +29,7 @@ import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('upload_drop_zone')
 
+const FILE_DROP_HEIGHT = 350
 interface FileTableUploadProps {
   currentFolder: BBFolderWrapper
   isDragging: boolean
@@ -51,7 +52,7 @@ const FileTableUpload = ({currentFolder, isDragging, handleDrop}: FileTableUploa
   return (
     <div data-testid="file-upload" className={classes}>
       <FileDrop
-        height="max(100%, 300px)"
+        height={FILE_DROP_HEIGHT}
         shouldAllowMultiple={true}
         // Called when dropping files or when clicking,
         // after the file dialog window exits successfully
