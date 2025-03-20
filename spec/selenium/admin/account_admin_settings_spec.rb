@@ -76,8 +76,8 @@ describe "root account basic settings" do
       button = fj("button:contains('About restrict quantitative data')")
       button.location_once_scrolled_into_view
       button.click
-      expect(fj("div.ui-dialog-titlebar:contains('Restrict Quantitative Data')")).to be_present
-      force_click(".ui-dialog-titlebar-close")
+      expect("[data-testid='rqd-modal-test']").to be_present
+      f("[data-testid='close-button']").click
 
       f("#account_settings_restrict_quantitative_data_value").click
       submit_form("#account_settings")

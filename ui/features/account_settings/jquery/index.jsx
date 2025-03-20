@@ -38,6 +38,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import ReportDescription from '../react/account_reports/ReportDescription'
 import RunReportForm from '../react/account_reports/RunReportForm'
+import RQDModal from '../react/components/RQDModal'
 
 const I18n = createI18nScope('account_settings')
 
@@ -50,6 +51,8 @@ let descMount
 let descRoot
 let reportMount
 let reportRoot
+let rqdMount
+let rqdRoot
 
 export function openReportDescriptionLink(event) {
   event.preventDefault()
@@ -75,6 +78,9 @@ export function addUsersLink(event) {
 }
 
 $(document).ready(function () {
+  rqdMount = document.getElementById('rqd_mount')
+  rqdRoot = ReactDOM.createRoot(rqdMount)
+
   const settingsTabs = document
     .getElementById('account_settings_tabs')
     ?.querySelectorAll('ul>li>a[id^="tab"]')
@@ -391,12 +397,12 @@ $(document).ready(function () {
 
   $('.rqd_help_btn').click(event => {
     event.preventDefault()
-    $('#rqd_dialog').dialog({
-      title: I18n.t('titles.rqd_help', 'Restrict Quantitative Data'),
-      width: 400,
-      modal: true,
-      zIndex: 1000,
-    })
+
+    const closeModal = () => {
+      rqdRoot.render(null)
+    }
+
+    rqdRoot.render(<RQDModal closeModal={closeModal} />)
   })
 
   $('.open_registration_delegated_warning_link').click(event => {
