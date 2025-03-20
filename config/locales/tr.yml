@@ -8122,6 +8122,7 @@ tr:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "İsteğe bağlı bir renk kullanmak için bir hexcode girin."
   enter_a_score_to_test_c6f89f4a: "Teste bir puan gir"
   enter_a_section_name_adbe3099: "Bir bölüm adı giriniz"
+  enter_a_shorter_group_name_8f7fc42c: "Kısa bir grup adı giriniz"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Kullanıcının kök hesabı alan adını değiştireceğiniz \"{{ACCOUNT_DOMAIN}}\" i girin."
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Kullanıcının özel Canvas Kimliğini değiştireceğiniz \"{{CANVAS_USER_ID}}\" i girin."
   enter_grades_as_e113e606: "Notları şu şekilde gir"
@@ -10947,6 +10948,7 @@ tr:
   lock_questions_after_answering_5aecef9d: "Cevaplandırma sonrası soruları kilitle"
   lock_selected_announcements_33740f80: "Seçili Duyuruları Kilitle"
   lock_this_setting_for_sub_accounts_2ae5af17: "Alt hesaplar için bu ayarı kilitle"
+  lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "Alt hesaplar ve dersler için bu ayarı kilitle"
   lock_until_549bb904: "Bu tarihe kadar kilitle"
   locked_762f138b: Kilitli
   locked_at_cda02889: Kilitli
