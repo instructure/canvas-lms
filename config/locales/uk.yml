@@ -7169,6 +7169,7 @@ uk:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Введіть шістнадцятковий код тут, щоб використовувати власний колір."
   enter_a_score_to_test_c6f89f4a: "Введіть оцінку для тестування"
   enter_a_section_name_adbe3099: "Введіть назву розділу"
+  enter_a_shorter_group_name_8f7fc42c: "Введіть коротшу назву групи"
   enter_a_what_if_score_668c91a3: "Введіть оцінку Що-якщо "
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Введіть \"{{ACCOUNT_DOMAIN}}\" для заміни домену кореневого облікового запису користувача"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Введіть \"{{CANVAS_USER_ID}}\" для заміни унікального Canvas ID користувача"
@@ -9553,6 +9554,7 @@ uk:
   lock_date_cannot_be_before_due_date_ac30f54: "Дата блокування не може бути до очікуваної дати виконання"
   lock_questions_after_answering_5aecef9d: "Блокування питань після відповідей"
   lock_this_setting_for_sub_accounts_2ae5af17: "Блокувати ці налаштування для підпорядкованих облікових записів"
+  lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "Блокувати цей параметр для субрахунків і курсів"
   locked_762f138b: Заблоковано
   locked_796957c7: "Заблоковано:"
   locked_at_cda02889: "Заблоковано в"
