@@ -2598,11 +2598,20 @@ describe User do
         expect(events.first).to eq assignment2
       end
 
-      it "includes sub assignments when include_sub_assignments is true" do
+      it "includes sub assignments if checkpoints are enabled in the accounts they are in" do
+        # root account has checkpoints OFF and unlocked, while sub-account has checkpoints ON
+        @course.root_account.set_feature_flag!(:discussion_checkpoints, Feature::STATE_DEFAULT_OFF)
+        sub_account = @course.root_account.sub_accounts.create!(name: "Sub Account")
+        @course.update!(account: sub_account)
         @course.account.enable_feature!(:discussion_checkpoints)
+
+        # sanity check
+        expect(@course.account.discussion_checkpoints_enabled?).to be_truthy
+        expect(@course.root_account.discussion_checkpoints_enabled?).to be_falsey
+
         reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
         context_codes = [@user.asset_string] + @user.cached_context_codes
-        events = @user.upcoming_events(context_codes:, include_sub_assignments: true)
+        events = @user.upcoming_events(context_codes:)
         expect(events).to match_array([reply_to_topic, reply_to_entry])
       end
 

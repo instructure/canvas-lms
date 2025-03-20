@@ -2578,9 +2578,9 @@ class User < ActiveRecord::Base
       )
     end
 
-    if opts[:include_sub_assignments]
+    if course_ids_with_checkpoints_enabled.any?
       sub_assignments = SubAssignment.published
-                                     .for_context_codes(context_codes)
+                                     .for_course(course_ids_with_checkpoints_enabled)
                                      .due_between_with_overrides(now, opts[:end_at])
                                      .include_submitted_count.to_a
 
@@ -2606,6 +2606,10 @@ class User < ActiveRecord::Base
     end
 
     sorted_events.uniq.first(opts[:limit])
+  end
+
+  def course_ids_with_checkpoints_enabled
+    courses.select(&:discussion_checkpoints_enabled?).map(&:id)
   end
 
   def select_available_assignments(assignments, include_concluded: false)
