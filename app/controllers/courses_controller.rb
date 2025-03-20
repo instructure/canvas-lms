@@ -2399,7 +2399,7 @@ class CoursesController < ApplicationController
         end
 
         if @current_user && (@show_recent_feedback = @context.user_is_student?(@current_user))
-          @recent_feedback = @current_user.recent_feedback(contexts: @contexts, exclude_parent_assignment_submissions: @context.discussion_checkpoints_enabled?) || []
+          @recent_feedback = @current_user.recent_feedback(contexts: @contexts) || []
         end
 
         flash.now[:notice] = t("notices.updated", "Course was successfully updated.") if params[:for_reload]

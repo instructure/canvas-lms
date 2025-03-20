@@ -2384,7 +2384,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def submissions_for_course_ids(course_ids, start_at: nil, limit: 20, exclude_parent_assignment_submissions: false)
+  def submissions_for_course_ids(course_ids, start_at: nil, limit: 20)
     return [] unless course_ids.present?
 
     shard.activate do
@@ -2414,10 +2414,12 @@ class User < ActiveRecord::Base
 
           ActiveRecord::Associations.preload(submissions, [{ assignment: :context }, :user, :submission_comments])
 
-          if exclude_parent_assignment_submissions
-            submissions.delete_if { |s| s.assignment.has_sub_assignments? }
-          else
-            submissions
+          # when discussion_checkpoints FF is enabled, we filter out parent assignment submissions
+          # when that FF is disabled, we filter out sub_assignment submissions
+          course_ids_with_active_checkpoints = Course.where(id: course_ids).select(&:discussion_checkpoints_enabled?).map(&:id)
+          submissions.delete_if do |sub|
+            (sub.assignment.has_sub_assignments? && course_ids_with_active_checkpoints.include?(sub.course_id)) ||
+              (sub.assignment.is_a?(SubAssignment) && !course_ids_with_active_checkpoints.include?(sub.course_id))
           end
         end
       end

@@ -681,7 +681,7 @@ class UsersController < ApplicationController
       end
 
       if (@show_recent_feedback = @user.student_enrollments.active.exists?)
-        @recent_feedback = @user.recent_feedback(course_ids:, exclude_parent_assignment_submissions: @domain_root_account.feature_enabled?(:discussion_checkpoints)) || []
+        @recent_feedback = @user.recent_feedback(course_ids:) || []
       end
     end
 
