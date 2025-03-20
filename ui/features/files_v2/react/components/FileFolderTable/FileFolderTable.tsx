@@ -55,7 +55,7 @@ import PermissionsModal from './PermissionsModal'
 
 const I18n = createI18nScope('files_v2')
 
-const MIN_HEIGHT = 400
+const MIN_HEIGHT = 450
 
 const fetchFilesAndFolders = async (
   url: string,
@@ -490,7 +490,7 @@ const FileFolderTable = ({
       <div
         data-testid="files-directory"
         ref={filesDirectoryRef}
-        style={{minHeight: rows.length === 0 && !isFetching ? MIN_HEIGHT : directoryMinHeight}}
+        style={{minHeight: rows.length === 0 && !isFetching && !isStacked ? MIN_HEIGHT : directoryMinHeight}}
         className="files_directory"
         onDragEnter={e => handleDragEnter(e as React.DragEvent<HTMLDivElement>)}
         onDragLeave={e => handleDragLeave(e as React.DragEvent<HTMLDivElement>)}
