@@ -396,9 +396,9 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
     height: 0px;
     border: none;
     display: block;
-  }
-  [upload-cell]{
-    padding: 0px;
+    td {
+      padding: 0px;
+    }
   }
 }
 

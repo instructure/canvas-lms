@@ -20,8 +20,7 @@ import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {windowPathname} from '@canvas/util/globalUtils'
 
 const SEARCH_AND_ALL_QUERY_PARAMS =
-  'include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
-
+  'per_page=25&include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
 interface TableUrlParams {
   searchTerm: string
   contextType: string
@@ -97,7 +96,7 @@ export const parseLinkHeader = (header: string | null) => {
 }
 
 const generateSearchUrl = (singularContextType: string, contextId: string, searchTerm: string) => {
-  return `/api/v1/${singularContextType}s/${contextId}/files?search_term=${searchTerm}&per_page=50&${SEARCH_AND_ALL_QUERY_PARAMS}`
+  return `/api/v1/${singularContextType}s/${contextId}/files?search_term=${searchTerm}&${SEARCH_AND_ALL_QUERY_PARAMS}`
 }
 
 const generateFetchAllUrl = (folderId: string) => {

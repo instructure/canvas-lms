@@ -207,7 +207,7 @@ class FoldersController < ApplicationController
       ["files", files_collection]
     ]
 
-    per_page = Api.per_page_for(self, default: 50)
+    per_page = Api.per_page_for(self, default: 25)
 
     combined = Api.paginate(
       BookmarkedCollection.concat(*collections),
