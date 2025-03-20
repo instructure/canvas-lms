@@ -163,6 +163,29 @@ module Login::Shared
     end
   end
 
+  # This method may be overridden, and any caller needs to check `performed?`
+  # and immediately return if so.
+  # @return [String, nil] the URL to redirect to after logging out the current user
+  def logout_current_user_for_idp
+    if @domain_root_account == Account.site_admin && cookies["canvas_sa_delegated"]
+      cookies.delete("canvas_sa_delegated",
+                     domain: remember_me_cookie_domain,
+                     httponly: true,
+                     secure: CanvasRails::Application.config.session_options[:secure])
+    end
+
+    if session[:login_aac]
+      # The AAC could have been deleted since the user logged in
+      @aac = AuthenticationProvider.where(id: session[:login_aac]).first
+      redirect = @aac.try(:user_logout_redirect, self, @current_user)
+      increment_statsd(:attempts, action: :slo) if @aac.try(:slo?)
+    end
+
+    flash[:logged_out] = true if redirect.nil?
+    logout_current_user
+    redirect
+  end
+
   def logout_current_user
     reset_authenticity_token!
     Auditors::Authentication.record(@current_pseudonym, "logout")
