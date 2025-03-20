@@ -1617,7 +1617,7 @@ class Lti::RegistrationsController < ApplicationController
            })
 
     remote_env({
-                 ltiUsage: DynamicSettings.find("lti")["canvas_apps_lti_usage_url"] || nil
+                 ltiUsage: DynamicSettings.find("lti")["canvas_apps_lti_usage_url", failsafe: nil]
                })
   end
 end
