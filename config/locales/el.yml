@@ -4398,6 +4398,9 @@ el:
     zero: "Δεν υπάρχουν Εργασίες με Σφάλματα, Κάνετε Κλικ για Συνέχεια"
   count_attempts_d23c69a0: 
     zero: "Απεριόριστες Προσπάθειες"
+  count_courses_609dc3b8: 
+    one: "1 Μάθημα"
+    other: "%{count} Μαθήματα"
   count_days_de0c6a32: 
     one: "1 ημέρα"
     other: "%{count} ημέρες"
@@ -4436,6 +4439,9 @@ el:
   count_students_c9920376: 
     one: "%{count} Φοιτητές/ιες"
     other: "%{count} Φοιτητές/ιες"
+  count_sub_accounts_345f48ea: 
+    one: "1 Υπο-λογαριασμός"
+    other: "%{count} Υπο-λογαριασμοί"
   count_submissions_need_grading_d34bae25: 
     one: "1 υποβολή χρειάζεται βαθμολόγηση"
     other: "%{count} υποβολές χρειάζονται βαθμολόγηση"
@@ -6080,6 +6086,7 @@ el:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Εισάγετε έναν εξαψήφιο κωδικό/hex εδώ για να χρησιμοποιήσετε ένα προσαρμοσμένο χρώμα."
   enter_a_score_to_test_c6f89f4a: "Εισαγωγή βαθμολογίας για έλεγχο"
   enter_a_section_name_adbe3099: "Εισάγετε ένα όνομα τμήματος"
+  enter_a_shorter_group_name_8f7fc42c: "Πληκτρολογήστε ένα συντομότερο όνομα ομάδας"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Εισαγάγετε «{{ACCOUNT_DOMAIN}}» για να υποκαταστήσετε τον τομέα λογαριασμού ρίζας του χρήστη"
   enter_or_find_an_external_tool_url_6aebbd0d: "Εισαγωγή ή εύρεση URL Εξωτερικού Εργαλείου"
   enter_the_date_you_would_like_to_navigate_to_a712de47: "Εισαγάγετε την ημερομηνία στην οποία θα θέλατε να πλοηγηθείτε."
@@ -8006,6 +8013,7 @@ el:
   lock_date_cannot_be_after_section_end_d37da70c: "Η ημερομηνία κλειδώματος δεν μπορεί να είναι μετά το τέλος του τομέα"
   lock_date_cannot_be_after_term_end_cf1a188f: "Η ημερομηνία κλειδώματος δεν μπορεί να είναι μετά το τέλος του εξαμήνου"
   lock_date_cannot_be_before_due_date_ac30f54: "Η ημερομηνία κλειδώματος δεν μπορεί να είναι πριν την καταληκτική ημερομηνία"
+  lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "Κλείδωμα αυτής της ρύθμισης για δευτερεύοντες λογαριασμούς και μαθήματα"
   lock_until_549bb904: "Κλείδωμα Μέχρι"
   locked_762f138b: Κλειδωμένο
   locked_at_cda02889: "Κλειδώθηκε Στις"
@@ -14517,6 +14525,7 @@ el:
       other: "%{count} Υπο-λογαριασμοί"
     titles: 
       sub_accounts: Υπο-λογαρισμοί
+  sub_accounts_e1b196a9: Υπο-λογαρισμοί
   sub_assignment: 
     atom_no_author: "Δεν υπάρχει Συγγραφέας"
     labels: 
