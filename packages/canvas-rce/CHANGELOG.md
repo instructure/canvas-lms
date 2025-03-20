@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 6.0.0 - 2025-03-20
+
+### Changed
+
+- Upgraded to Node 20 LTS
+
+### Fixed
+
+- Redirect focus on invalid save in Image Options tray
+- Whitelist the aria-description attribute
+- Flag external links when they have multi-part TLDs
+- Save changes to alt text when it is the only thing that changes
+- Screenreader reads out content inside raw HTML editor
+- Validations in Upload Media modal
+- Increased Link header size
+
 ## 5.15.8 - 2025-02-20
 
 ### Fixed
