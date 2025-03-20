@@ -82,25 +82,10 @@ class LoginController < ApplicationController
 
   # DELETE /logout
   def destroy
-    if @domain_root_account == Account.site_admin && cookies["canvas_sa_delegated"]
-      cookies.delete("canvas_sa_delegated",
-                     domain: remember_me_cookie_domain,
-                     httponly: true,
-                     secure: CanvasRails::Application.config.session_options[:secure])
-    end
+    redirect = logout_current_user_for_idp
+    return if performed?
 
-    if session[:login_aac]
-      # The AAC could have been deleted since the user logged in
-      @aac = AuthenticationProvider.where(id: session[:login_aac]).first
-      redirect = @aac.try(:user_logout_redirect, self, @current_user)
-      increment_statsd(:attempts, action: :slo) if @aac.try(:slo?)
-    end
-
-    flash[:logged_out] = true if redirect.nil?
-    redirect ||= login_url
-    logout_current_user
-
-    redirect_to redirect
+    redirect_to redirect || login_url
   end
 
   # GET /logout

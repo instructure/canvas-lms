@@ -430,8 +430,9 @@ module AuthenticationMethods
     # can't use slice, because session has a different ctor than a normal hash
     saved = {}
     keys.each { |k| saved[k] = session[k] if session[k] }
-    reset_session
+    r = block_given? ? yield : reset_session
     saved.each_pair { |k, v| session[k] = v }
+    r
   end
 
   def invalidate_session
