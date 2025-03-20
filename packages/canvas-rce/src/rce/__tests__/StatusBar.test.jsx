@@ -404,4 +404,13 @@ describe('RCE StatusBar', () => {
       expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).not.toBeInTheDocument()
     })
   })
+
+  describe('movile view', () => {
+    it('does not show the keyboard shortcut button', () => {
+      const aiTextTools = false
+      const isDesktop = false
+      const {container} = renderStatusBar({features: getStatusBarFeaturesForVariant('full', aiTextTools, isDesktop)})
+      expect(container.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).not.toBeInTheDocument()
+    })
+  })
 })

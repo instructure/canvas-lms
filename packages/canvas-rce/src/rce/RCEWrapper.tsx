@@ -1090,13 +1090,11 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     if (event.code === 'F9' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
-      this.setFocusAbilityForHeader(true)
       // @ts-expect-error
       focusFirstMenuButton(this._elementRef.current)
     } else if (event.code === 'F10' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
-      this.setFocusAbilityForHeader(true)
       // @ts-expect-error
       focusToolbar(this._elementRef.current)
     } else if (event.code === 'F8' && event.altKey) {
@@ -1154,20 +1152,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       tinyapp.setAttribute('role', 'document')
       tinyapp.setAttribute('tabIndex', '-1')
     }
-
-    // Adds a focusout event listener for handling screen reader navigation focus
-    const header = this._elementRef.current?.querySelector('.tox-editor-header')
-    if (header) {
-      // @ts-expect-error
-      header.addEventListener('focusout', (e: FocusEvent) => {
-        // @ts-expect-error
-        const leavingHeader = !header.contains(e.relatedTarget)
-        if (leavingHeader) {
-          this.setFocusAbilityForHeader(false)
-        }
-      })
-    }
-    this.setFocusAbilityForHeader(false)
 
     // Probably should do this in tinymce.scss, but we only want it in new rce
     textarea.style.resize = 'none'
@@ -1687,14 +1671,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         }
   }
 
-  setFocusAbilityForHeader = (focusable: boolean) => {
-    // Sets aria-hidden to prevent screen readers focus in RCE menus and toolbar
-    const header = this._elementRef.current?.querySelector('.tox-editor-header')
-    if (header) {
-      header.setAttribute('aria-hidden', focusable ? 'false' : 'true')
-    }
-  }
-
   componentWillUnmount() {
     if (this.state.shouldShowEditor) {
       window.clearTimeout(this.blurTimer)
@@ -2061,7 +2037,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         />
       )
     }
-    const statusBarFeatures = getStatusBarFeaturesForVariant(this.variant, this.props.ai_text_tools)
+    const statusBarFeatures = getStatusBarFeaturesForVariant(this.variant, this.props.ai_text_tools, tinymce.Env.desktop)
     return (
       <>
         <style>{this.style.css}</style>
@@ -2086,7 +2062,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                 onFocus={this.handleFocusRCE}
                 onBlur={this.handleBlurRCE}
               >
-                {this.state.shouldShowOnFocusButton && (
+                {this.state.shouldShowOnFocusButton && tinymce.Env.desktop && (
                   <ShowOnFocusButton
                     id={`show-on-focus-btn-${this.id}`}
                     onClick={this.openKBShortcutModal}
