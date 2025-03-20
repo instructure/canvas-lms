@@ -10896,6 +10896,7 @@ nn:
   enter_a_letter_grade_536a8cef: "Skriv inn bokstavkarakter"
   enter_a_score_to_test_c6f89f4a: "Oppgi eit resultat du vil teste"
   enter_a_section_name_adbe3099: "Oppgi eit seksjonsnamn"
+  enter_a_shorter_group_name_8f7fc42c: "Oppgi eit kortare gruppenamn"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "Skriv inn ein paringskode under for å leggje til ein student å observere"
   enter_a_valid_date_46d77547: "Legg inn ein gyldig dato"
   enter_a_what_if_score_668c91a3: "Oppgi eit kva-skjer-dersom-resultat."
@@ -15259,6 +15260,7 @@ nn:
   lock_questions_after_answering_5aecef9d: "Lås spørsmåla etter at svara er gitte"
   lock_selected_announcements_33740f80: "Lås utvalde kunngjeringar"
   lock_this_setting_for_sub_accounts_2ae5af17: "Lås innstillinga for underkontoar"
+  lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "Lås innstillinga for underkontoar og emne"
   lock_until_549bb904: "Lås fram til"
   locked_1d1eaa8c: Låst
   locked_762f138b: Låst
