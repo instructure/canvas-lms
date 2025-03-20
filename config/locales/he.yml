@@ -7841,6 +7841,7 @@ he:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "יש להזין כאן hexcode כדי לקבל צבע בעצוב ייחודי."
   enter_a_score_to_test_c6f89f4a: "הזנת ציון לניסוי"
   enter_a_section_name_adbe3099: "הזנת שם הקבצה"
+  enter_a_shorter_group_name_8f7fc42c: "יש להזין שם קבוצה קצר יותר"
   enter_a_what_if_score_668c91a3: "הקלדת ציון ל\"מה יקרה אם\""
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "הקלד/י \"{{ACCOUNT_DOMAIN}}\" כדי להחליף את חשבון הבסיס של דומיין המשתמש"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "הקלד/י \"{{ACCOUNT_DOMAIN}}\" כדי להחליף את המזהה היחודי של קנבס למשתמש"
@@ -10908,6 +10909,7 @@ he:
   lock_date_cannot_be_before_due_date_ac30f54: "תאריך נעילה אינו יכול להיות לפני תאריך יעד"
   lock_questions_after_answering_5aecef9d: "נעילת שאלות אחרי שנתקבלו תשובות"
   lock_this_setting_for_sub_accounts_2ae5af17: "נעילת הגדרות אלו לחשבונות משנה"
+  lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "נעילת ההגדרה עבור חשבונות-משנה וקורסים"
   locked_762f138b: נעול
   locked_796957c7: "נעול:"
   locked_at_cda02889: "ננעל ב-"
