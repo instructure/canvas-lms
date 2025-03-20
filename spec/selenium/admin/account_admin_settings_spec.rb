@@ -244,57 +244,67 @@ describe "root account basic settings" do
     end
   end
 
-  it "downloads reports" do
-    course_with_admin_logged_in
-    account.account_reports.create!(
-      user: @user,
-      report_type: "course_storage_csv"
-    ).run_report(synchronous: true)
-    get reports_url
+  context "reports" do
+    before do
+      course_with_admin_logged_in
+    end
 
-    expect(f("#course_storage_csv .last-run a").attribute("href")).to match(/download_frd=1/)
-  end
+    def modal_body
+      f("#configure_modal_body")
+    end
 
-  it "has date pickers for reports tab" do
-    course_with_admin_logged_in
-    get account_settings_url
-    f("#tab-reports-link").click
-    wait_for_ajax_requests
-    f("#configure_zero_activity_csv").click
-    expect(f("#zero_activity_csv_form")).to contain_css(".ui-datepicker-trigger")
-  end
+    it "downloads reports" do
+      course_with_admin_logged_in
+      account.account_reports.create!(
+        user: @user,
+        report_type: "course_storage_csv"
+      ).run_report(synchronous: true)
+      get reports_url
 
-  it "handles linking directly to reports tab" do
-    course_with_admin_logged_in
-    get account_settings_url + "#tab-reports"
-    f("#configure_zero_activity_csv").click
-    expect(f("#zero_activity_csv_form")).to contain_css(".ui-datepicker-trigger")
-  end
+      expect(f("#course_storage_csv .last-run a").attribute("href")).to match(/download_frd=1/)
+    end
 
-  it "disables report options for provisioning report form when a report hasn't been selected" do
-    course_with_admin_logged_in
-    get account_settings_url + "#tab-reports"
+    it "has date pickers for reports tab" do
+      course_with_admin_logged_in
+      get account_settings_url
+      f("#tab-reports-link").click
+      wait_for_ajax_requests
+      f("#configure_zero_activity_csv").click
+      expect(modal_body.find('[data-testid="parameters[start_at]"]')).to be_present
+    end
 
-    f("#configure_provisioning_csv").click
-    expect(f("#provisioning_csv_form").find("#parameters_created_by_sis")).to be_disabled
-    expect(f("#provisioning_csv_form").find("#parameters_include_deleted")).to be_disabled
+    it "handles linking directly to reports tab" do
+      course_with_admin_logged_in
+      get account_settings_url + "#tab-reports"
+      f("#configure_zero_activity_csv").click
+      expect(modal_body.find('[data-testid="parameters[start_at]"]')).to be_present
+    end
 
-    f("#provisioning_csv_form").find("#parameters_courses").click
-    expect(f("#provisioning_csv_form").find("#parameters_created_by_sis")).to_not be_disabled
-    expect(f("#provisioning_csv_form").find("#parameters_include_deleted")).to_not be_disabled
-  end
+    it "disables report options for provisioning report form when a report hasn't been selected" do
+      course_with_admin_logged_in
+      get account_settings_url + "#tab-reports"
 
-  it "disables report options for SIS export report form when a report hasn't been selected" do
-    course_with_admin_logged_in
-    get account_settings_url + "#tab-reports"
+      f("#configure_provisioning_csv").click
+      expect(modal_body.find("#parameters_created_by_sis")).to be_disabled
+      expect(modal_body.find("#parameters_include_deleted")).to be_disabled
 
-    f("#configure_sis_export_csv").click
-    expect(f("#sis_export_csv_form").find("#parameters_created_by_sis")).to be_disabled
-    expect(f("#sis_export_csv_form").find("#parameters_include_deleted")).to be_disabled
+      modal_body.find("#parameters_courses").click
+      expect(modal_body.find("#parameters_created_by_sis")).to_not be_disabled
+      expect(modal_body.find("#parameters_include_deleted")).to_not be_disabled
+    end
 
-    f("#sis_export_csv_form").find("#parameters_users").click
-    expect(f("#sis_export_csv_form").find("#parameters_created_by_sis")).to_not be_disabled
-    expect(f("#sis_export_csv_form").find("#parameters_include_deleted")).to_not be_disabled
+    it "disables report options for SIS export report form when a report hasn't been selected" do
+      course_with_admin_logged_in
+      get account_settings_url + "#tab-reports"
+
+      f("#configure_sis_export_csv").click
+      expect(modal_body.find("#parameters_created_by_sis")).to be_disabled
+      expect(modal_body.find("#parameters_include_deleted")).to be_disabled
+
+      modal_body.find("#parameters_users").click
+      expect(modal_body.find("#parameters_created_by_sis")).to_not be_disabled
+      expect(modal_body.find("#parameters_include_deleted")).to_not be_disabled
+    end
   end
 
   it "changes the default user quota", priority: "1" do
