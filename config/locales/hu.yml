@@ -10069,6 +10069,7 @@ hu:
   enter_a_letter_grade_536a8cef: "Adjon meg egy betűjeles osztályzatot"
   enter_a_score_to_test_c6f89f4a: "Írjon be egy pontszámot a teszteléshez"
   enter_a_section_name_adbe3099: "Adjon meg egy szekció nevet"
+  enter_a_shorter_group_name_8f7fc42c: "Írjon be egy rövidebb csoportnevet"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "Adjon meg egy hallgatópárosítási kódot alább, ha egy hallgatót szeretne megfigyelni."
   enter_a_what_if_score_668c91a3: "Adja meg a Mi lenne, ha pontszámát."
   enter_a_workflow_state_to_narrow_results_162903af: "Adjon meg egy munkafolyamat-állapotot az eredmények szűkítéséhez"
@@ -14011,6 +14012,7 @@ hu:
   lock_questions_after_answering_5aecef9d: "Kérdések zárolása a válaszadás után"
   lock_selected_announcements_33740f80: "Kiválasztott hirdetmények zárolása"
   lock_this_setting_for_sub_accounts_2ae5af17: "Ezen beállítás zárolása az alfiókok esetén"
+  lock_this_setting_for_sub_accounts_and_courses_4cb8cbd6: "Ezen beállítás zárolása az alfiókok és kurzusok esetén"
   lock_until_549bb904: "Zárolás eddig"
   locked_1d1eaa8c: "Zárolva:"
   locked_762f138b: Zárolt
