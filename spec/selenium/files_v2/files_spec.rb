@@ -77,7 +77,7 @@ describe "files index page" do
 
       context("with a large number of files") do
         before do
-          51.times do |i|
+          26.times do |i|
             attachment_model(content_type: "application/pdf", context: @course, size: 100 - i, display_name: "file#{i.to_s.rjust(2, "0")}.pdf")
           end
         end
@@ -86,7 +86,7 @@ describe "files index page" do
           get "/courses/#{@course.id}/files"
           pagination_button_by_index(1).click
           # that's just how sorting works
-          expect(content).to include_text("file50.pdf")
+          expect(content).to include_text("file25.pdf")
         end
 
         describe "sorting" do
@@ -103,7 +103,7 @@ describe "files index page" do
             pagination_button_by_index(1).click
             expect(content).to include_text("file00.pdf")
             pagination_button_by_index(0).click
-            expect(content).to include_text("file50.pdf")
+            expect(content).to include_text("file25.pdf")
             expect(content).to include_text("file01.pdf")
           end
 

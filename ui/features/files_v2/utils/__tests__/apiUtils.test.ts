@@ -105,7 +105,7 @@ describe('parseLinkHeader', () => {
 
 describe('generateTableUrl', () => {
   const QUERY_PARAMS =
-    'include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
+    'per_page=25&include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
 
   it('returns correct url for search when course', () => {
     const url = generateTableUrl({
@@ -118,7 +118,7 @@ describe('generateTableUrl', () => {
       pageQueryParam: 'bookmark:foobarbaz',
     })
     expect(url).toBe(
-      `/api/v1/courses/1/files?search_term=search&per_page=50&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
+      `/api/v1/courses/1/files?search_term=search&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
     )
   })
 
@@ -133,7 +133,7 @@ describe('generateTableUrl', () => {
       pageQueryParam: 'bookmark:foobarbaz',
     })
     expect(url).toBe(
-      `/api/v1/users/1/files?search_term=search&per_page=50&${QUERY_PARAMS}&sort=name&order=desc&page=bookmark:foobarbaz`,
+      `/api/v1/users/1/files?search_term=search&${QUERY_PARAMS}&sort=name&order=desc&page=bookmark:foobarbaz`,
     )
   })
 
@@ -148,7 +148,7 @@ describe('generateTableUrl', () => {
       pageQueryParam: 'bookmark:foobarbaz',
     })
     expect(url).toBe(
-      `/api/v1/groups/1/files?search_term=search&per_page=50&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
+      `/api/v1/groups/1/files?search_term=search&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
     )
   })
 
@@ -162,7 +162,7 @@ describe('generateTableUrl', () => {
       sortDirection: 'desc',
     })
     expect(url).toBe(
-      `/api/v1/courses/1/files?search_term=search&per_page=50&${QUERY_PARAMS}&sort=name&order=desc`,
+      `/api/v1/courses/1/files?search_term=search&${QUERY_PARAMS}&sort=name&order=desc`,
     )
   })
 

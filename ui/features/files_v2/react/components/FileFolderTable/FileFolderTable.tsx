@@ -530,7 +530,7 @@ const FileFolderTable = ({
             )}
             {!isFetching && userCanEditFilesForContext && !isStacked && (
               <Table.Row data-upload>
-                <Table.Cell upload-cell>
+                <Table.Cell>
                   <FileTableUpload
                     currentFolder={currentFolder!}
                     isDragging={isDragging}
