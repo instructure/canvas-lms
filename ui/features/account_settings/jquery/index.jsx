@@ -39,6 +39,7 @@ import ReactDOM from 'react-dom/client'
 import ReportDescription from '../react/account_reports/ReportDescription'
 import RunReportForm from '../react/account_reports/RunReportForm'
 import RQDModal from '../react/components/RQDModal'
+import OpenRegistrationWarning from '../react/components/OpenRegistrationWarning'
 
 const I18n = createI18nScope('account_settings')
 
@@ -47,12 +48,9 @@ let reportsTabHasLoaded = false
 const _settings_smallTablet = window.matchMedia('(min-width: 550px)').matches
 const _settings_desktop = window.matchMedia('(min-width: 992px)').matches
 
+// for report description modals
 let descMount
 let descRoot
-let reportMount
-let reportRoot
-let rqdMount
-let rqdRoot
 
 export function openReportDescriptionLink(event) {
   event.preventDefault()
@@ -78,8 +76,21 @@ export function addUsersLink(event) {
 }
 
 $(document).ready(function () {
-  rqdMount = document.getElementById('rqd_mount')
-  rqdRoot = ReactDOM.createRoot(rqdMount)
+  // for report configure modals
+  let reportMount
+  let reportRoot
+  // for RQD popup (behind FF)
+  const rqdMount = document.getElementById('rqd_mount')
+  let rqdRoot
+  if (rqdMount) {
+    rqdRoot = ReactDOM.createRoot(rqdMount)
+  }
+  // for open registration warning (renders based on auth providers)
+  const openRegMount = document.getElementById('open_registration_mount')
+  let openRegRoot
+  if (openRegMount) {
+    openRegRoot = ReactDOM.createRoot(openRegMount)
+  }
 
   const settingsTabs = document
     .getElementById('account_settings_tabs')
@@ -227,11 +238,9 @@ $(document).ready(function () {
                   .end()
                   .find('.running_report_message')
                   .show()
-                $(this).parent('.report_dialog').dialog('close')
               },
               error(_data) {
                 $(this).loadingImage('remove')
-                $(this).parent('.report_dialog').dialog('close')
               },
             })
 
@@ -409,17 +418,15 @@ $(document).ready(function () {
     rqdRoot.render(<RQDModal closeModal={closeModal} />)
   })
 
-  $('.open_registration_delegated_warning_link').click(event => {
+  $('.open_registration_delegated_warning_btn').click(event => {
     event.preventDefault()
-    $('#open_registration_delegated_warning_dialog').dialog({
-      title: I18n.t(
-        'titles.open_registration_delegated_warning_dialog',
-        'An External Identity Provider is Enabled',
-      ),
-      width: 400,
-      modal: true,
-      zIndex: 1000,
-    })
+
+    const closeModal = () => {
+      openRegRoot.render(null)
+    }
+
+    const loginUrl = $('.open_registration_delegated_warning_btn').data('url')
+    openRegRoot.render(<OpenRegistrationWarning loginUrl={loginUrl} closeModal={closeModal} />)
   })
 
   $('.custom_help_link .delete').click(function (event) {

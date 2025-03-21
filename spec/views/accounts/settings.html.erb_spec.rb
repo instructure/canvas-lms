@@ -73,7 +73,7 @@ describe "accounts/settings" do
     it "shows by default" do
       render
       expect(response).to have_tag("input#account_settings_open_registration")
-      expect(response).not_to have_tag("div#open_registration_delegated_warning_dialog")
+      expect(response).not_to have_tag("button.open_registration_delegated_warning_btn")
     end
 
     it "shows warning dialog when a delegated auth config is around" do
@@ -81,7 +81,7 @@ describe "accounts/settings" do
       @account.authentication_providers.first.move_to_bottom
       render
       expect(response).to have_tag("input#account_settings_open_registration")
-      expect(response).to have_tag("div#open_registration_delegated_warning_dialog")
+      expect(response).to have_tag("button.open_registration_delegated_warning_btn")
     end
   end
 
