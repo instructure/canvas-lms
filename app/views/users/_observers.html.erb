@@ -1,0 +1,50 @@
+<%
+# Copyright (C) 2025 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% if can_do(@user, @current_user, :manage, :manage_user_details) %>
+  <% linked_observers_scope = @user&.linked_observers&.active&.where(workflow_state: 'registered')&.linked_through_root_account(@domain_root_account) %>
+  <% if linked_observers_scope&.exists? %>
+    <% observers = linked_observers_scope.preload(:pseudonyms) %>
+    <fieldset>
+      <legend><%= t('Observers') %></legend>
+      <table class="ic-Table">
+        <caption class="screenreader-only"><%= t('List of observers for %{student_name}', student_name: @user.name) %></caption>
+        <thead>
+          <tr>
+            <th scope="col"><%= t("Name") %></th>
+            <th scope="col"><%= t("Email") %></th>
+            <th scope="col"><%= t("Last Request") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% observers.each do |observer| %>
+            <tr>
+              <td>
+                <a href="<%= account_user_url(observer.account, observer) %>">
+                  <%= observer.name %>
+                </a>
+              </td>
+              <td><%= observer.email %></td>
+              <td><%= datetime_string(observer.pseudonyms.maximum(:last_request_at)) || t("never") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </fieldset>
+  <% end %>
+<% end %>
