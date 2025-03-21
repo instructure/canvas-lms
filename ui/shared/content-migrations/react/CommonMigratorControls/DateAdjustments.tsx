@@ -140,6 +140,7 @@ export const DateAdjustments = ({
               <RadioInput
                 name="date_operation"
                 value="remove_dates"
+                data-testid="remove-dates"
                 label={I18n.t('Remove dates')}
                 checked={dateOperation === 'remove_dates'}
               />
@@ -266,6 +267,7 @@ export const DateAdjustments = ({
                 ))}
                 <Flex as="div" direction={isMobileView ? 'column' : 'row'}>
                   <Button
+                    data-testid = "substitution-button"
                     margin="medium none none none"
                     onClick={() => {
                       const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))

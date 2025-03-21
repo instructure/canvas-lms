@@ -23,94 +23,90 @@ require_relative "page_objects/new_content_migration_progress_item"
 require_relative "page_objects/new_select_content_page"
 require_relative "page_objects/new_course_copy_page"
 
-def visit_page
-  @course.reload
-  get "/courses/#{@course.id}/content_migrations"
-end
-
-def select_migration_type(type = nil)
-  type ||= @type
-  NewContentMigrationPage.migration_type_dropdown.click
-  Selenium::WebDriver::Wait.new(timeout: 5).until do
-    NewContentMigrationPage.migration_type_dropdown.attribute("aria-expanded") == "true"
-  end
-  NewContentMigrationPage.migration_type_option_by_id(type).click
-end
-
-def select_migration_file(opts = {})
-  filename = opts[:filename] || @filename
-
-  new_filename, fullpath, _data = get_file(filename, opts[:data])
-  NewContentMigrationPage.migration_file_upload_input.send_keys(fullpath)
-  new_filename
-end
-
-def fill_migration_form(opts = {})
-  select_migration_type(opts[:type])
-  select_migration_file(opts)
-end
-
-def submit
-  @course.reload
-  # depending on the type of migration, we need to wait for it to have one of these states
-  scope = { workflow_state: %w[queued exporting exported] }
-  count = @course.content_migrations.where(scope).count
-  NewContentMigrationPage.add_import_queue_button.click
-  keep_trying_until do
-    expect(@course.content_migrations.where(scope).count).to eq count + 1
-  end
-end
-
-def run_migration(cm = nil)
-  cm ||= @course.content_migrations.last
-  cm.reload
-  cm.skip_job_progress = false
-  cm.reset_job_progress
-  worker_class = Canvas::Migration::Worker.const_get(Canvas::Plugin.find(cm.migration_type).settings["worker"])
-  worker_class.new(cm.id).perform
-end
-
-def test_search_course_field(course)
-  input_canvas_select(NewContentMigrationPage.course_search_input, course.name)
-  option_text = instui_select_option(NewContentMigrationPage.course_search_input, course.id, select_by: :value).text
-  expect(option_text).to eq "#{course.name}\nTerm: #{course.term_name}"
-end
-
-def import(cm = nil)
-  cm ||= @course.content_migrations.last
-  cm.reload
-  cm.set_default_settings
-  cm.import_content
-end
-
-def test_selective_content(source_course = nil)
-  visit_page
-
-  # Open selective dialog
-  expect(NewContentMigrationPage.progress_status_label).to include_text("Waiting for selection")
-  NewContentMigrationPage.select_content_button.click
-  wait_for_ajaximations
-
-  NewContentMigrationPage.all_assignments_checkbox.click
-
-  # Submit selection
-  NewContentMigrationPage.select_content_submit_button.click
-  wait_for_ajaximations
-
-  source_course ? run_migration : import
-
-  visit_page
-
-  expect(NewContentMigrationPage.progress_status_label).to include_text("Completed")
-  expect(@course.assignments.count).to eq(source_course ? source_course.assignments.count : 1)
-end
-
 describe "content migrations", :non_parallel do
-  before(:once) do
-    Account.site_admin.enable_feature! :instui_for_import_page
+  include_context "in-process server selenium tests"
+
+  def visit_page
+    @course.reload
+    get "/courses/#{@course.id}/content_migrations"
   end
 
-  include_context "in-process server selenium tests"
+  def select_migration_type(type = nil)
+    type ||= @type
+    NewContentMigrationPage.migration_type_dropdown.click
+    Selenium::WebDriver::Wait.new(timeout: 5).until do
+      NewContentMigrationPage.migration_type_dropdown.attribute("aria-expanded") == "true"
+    end
+    NewContentMigrationPage.migration_type_option_by_id(type).click
+  end
+
+  def select_migration_file(opts = {})
+    filename = opts[:filename] || @filename
+
+    new_filename, fullpath, _data = get_file(filename, opts[:data])
+    NewContentMigrationPage.migration_file_upload_input.send_keys(fullpath)
+    new_filename
+  end
+
+  def fill_migration_form(opts = {})
+    select_migration_type(opts[:type])
+    select_migration_file(opts)
+  end
+
+  def submit
+    @course.reload
+    # depending on the type of migration, we need to wait for it to have one of these states
+    scope = { workflow_state: %w[queued exporting exported] }
+    count = @course.content_migrations.where(scope).count
+    NewContentMigrationPage.add_import_queue_button.click
+    keep_trying_until do
+      expect(@course.content_migrations.where(scope).count).to eq count + 1
+    end
+  end
+
+  def run_migration(content_migration = nil)
+    content_migration ||= @course.content_migrations.last
+    content_migration.reload
+    content_migration.skip_job_progress = false
+    content_migration.reset_job_progress
+    worker_class = Canvas::Migration::Worker.const_get(Canvas::Plugin.find(content_migration.migration_type).settings["worker"])
+    worker_class.new(content_migration.id).perform
+  end
+
+  def test_search_course_field(course)
+    input_canvas_select(NewContentMigrationPage.course_search_input, course.name)
+    option_text = instui_select_option(NewContentMigrationPage.course_search_input, course.id, select_by: :value).text
+    expect(option_text).to eq "#{course.name}\nTerm: #{course.term_name}"
+  end
+
+  def import(content_migration = nil)
+    content_migration ||= @course.content_migrations.last
+    content_migration.reload
+    content_migration.set_default_settings
+    content_migration.import_content
+  end
+
+  def test_selective_content(source_course = nil)
+    visit_page
+
+    # Open selective dialog
+    expect(NewContentMigrationPage.progress_status_label).to include_text("Waiting for selection")
+    NewContentMigrationPage.select_content_button.click
+    wait_for_ajaximations
+
+    NewContentMigrationPage.all_assignments_checkbox.click
+
+    # Submit selection
+    NewContentMigrationPage.select_content_submit_button.click
+    wait_for_ajaximations
+
+    source_course ? run_migration : import
+
+    visit_page
+
+    expect(NewContentMigrationPage.progress_status_label).to include_text("Completed")
+    expect(@course.assignments.count).to eq(source_course ? source_course.assignments.count : 1)
+  end
 
   def test_selective_outcome(source_course = nil)
     visit_page
@@ -180,7 +176,7 @@ describe "content migrations", :non_parallel do
       visit_page
 
       NewContentMigrationPage.migration_type_dropdown.click
-      migration_types = CourseCopyPage.migration_type_options_values.pluck("value") - ["empty"]
+      migration_types = NewCourseCopyPage.migration_type_options_values.pluck("value") - ["empty"]
       NewContentMigrationPage.migration_type_dropdown.click
       migration_types.each do |type|
         select_migration_type(type)

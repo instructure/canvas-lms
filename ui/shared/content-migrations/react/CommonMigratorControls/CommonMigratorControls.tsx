@@ -251,6 +251,7 @@ export const CommonMigratorControls = ({
             value={adjustDatesCheckboxId}
             disabled={isSubmitting}
             label={I18n.t('Adjust events and due dates')}
+            data-testid="date-adjust-checkbox"
             onChange={({target}) => {
               setShowAdjustDates(target.checked)
               const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
