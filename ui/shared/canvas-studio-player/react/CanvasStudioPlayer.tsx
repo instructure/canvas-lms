@@ -30,7 +30,7 @@ import getCookie from '@instructure/get-cookie'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {type MediaSource} from 'api'
-import {type MediaTrack} from './types'
+import {type MediaInfo, MediaTrack} from './types'
 
 declare const ENV: GlobalEnv & {
   locale?: string
@@ -96,6 +96,8 @@ interface CanvasStudioPlayerProps {
   is_attachment?: boolean
   attachment_id?: string
   show_loader?: boolean
+  maxHeight?: null | string
+  mediaFetchCallback?: (mediaInfo: MediaInfo) => void
   explicitSize?: {width: number | string; height: number | string}
   hideUploadCaptions?: boolean
 }
@@ -181,7 +183,6 @@ export default function CanvasStudioPlayer({
           videoHeight: mediaSources[0]?.height || 0,
           videoWidth: mediaSources[0]?.width || 0,
         }
-
         const {width, height} = sizeMediaPlayer(player, type, boundingBoxDimensions)
         updateContainerSize(width, height)
       }
@@ -211,7 +212,16 @@ export default function CanvasStudioPlayer({
       if (resp?.media_sources?.length) {
         setMediaSources(convertAndSortMediaSources(resp.media_sources))
         if (!media_captions) {
-          setMediaCaptions(convertMediaTracks(resp.media_tracks))
+          setMediaCaptions(
+            resp.media_tracks.map((caption: MediaTrack) => ({
+              locale: caption.locale,
+              language: captionLanguageForLocale(caption.locale),
+              inherited: caption.inherited,
+              label: captionLanguageForLocale(caption.locale),
+              src: caption.url,
+              type: 'srt',
+            })),
+          )
         }
         setIsLoading(false)
       } else {
@@ -348,13 +358,12 @@ export default function CanvasStudioPlayer({
       setIsLoading(false)
       return
     }
-    return <Spinner renderTitle={I18n.t('Loading media')} size="large" margin="0 0 0 medium" />
+    return <Spinner renderTitle={I18n.t('Loading media')} size="small" margin="small" />
   }
 
   const containerStyle: Partial<CSSProperties> = {
     height: containerHeight,
     width: containerWidth,
-    color: '#2d3b45',
   }
 
   const hideCaptionButtons = hideUploadCaptions || !canAddCaptions
@@ -365,6 +374,7 @@ export default function CanvasStudioPlayer({
         renderLoader()
       ) : (
         <div
+          data-testid={'canvas-studio-player'}
           style={containerStyle}
           ref={containerRef}
           data-captions={JSON.stringify(mediaCaptions)}
@@ -375,11 +385,7 @@ export default function CanvasStudioPlayer({
               captions={mediaCaptions}
               hideFullScreen={!includeFullscreen}
               title={getAriaLabel()}
-              onCaptionsDelete={
-                hideCaptionButtons
-                  ? undefined
-                  : deleteCaption
-              }
+              onCaptionsDelete={hideCaptionButtons ? undefined : deleteCaption}
               kebabMenuElements={
                 hideCaptionButtons
                   ? undefined

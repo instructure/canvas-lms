@@ -374,6 +374,7 @@ export default class CommentTextArea extends Component {
                     uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
                     userLocale={ENV.LOCALE}
                     disableSubmitWhileUploading={true}
+                    useStudioPlayer={ENV.FEATURES?.consolidated_media_player}
                   />
                   <Button
                     onClick={() => {
