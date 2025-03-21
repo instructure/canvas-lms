@@ -388,11 +388,16 @@ const mediaCommentActions = {
                   type={mediaType === 'audio' ? 'audio' : 'video'}
                 />
               ) : (
-                <MediaPlayer
-                  tracks={sourcesAndTracks.tracks}
-                  sources={sourcesAndTracks.sources}
-                  captionPosition="bottom"
-                />
+                <div style={{
+                  maxHeight: height,
+                  maxWidth: width,
+                }}>
+                  <MediaPlayer
+                    tracks={sourcesAndTracks.tracks}
+                    sources={sourcesAndTracks.sources}
+                    captionPosition="bottom"
+                  />
+                </div>
               )
 
               const root = createRoot($dialog[0])
