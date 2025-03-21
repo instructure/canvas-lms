@@ -68,7 +68,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
           <Flex>
             <Flex.Item>
             {/* Item Type Icon */}
-            <Flex.Item margin={`0 small 0 ${INDENT_LOOKUP[indent] ?? '0'}`}>
+            <Flex.Item margin={`0 small 0 ${INDENT_LOOKUP[indent] ?? 'x-small'}`}>
               {getItemIcon(content)}
             </Flex.Item>
             </Flex.Item>

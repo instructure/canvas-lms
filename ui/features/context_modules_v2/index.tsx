@@ -50,7 +50,11 @@ ready(() => {
           errorCategory={I18n.t('Context Modules Error Page')}
         />}>
         <QueryProvider>
-          <ContextModuleProvider courseId={ENV.course_id}>
+          <ContextModuleProvider
+            courseId={ENV.course_id}
+            isMasterCourse={ENV.MASTER_COURSE_SETTINGS?.IS_MASTER_COURSE ?? false}
+            isChildCourse={ENV.MASTER_COURSE_SETTINGS?.IS_CHILD_COURSE ?? false}
+          >
             {ENV.current_user_is_student
               ? <ModulesStudentContainer />
               : <ModulesContainer />}

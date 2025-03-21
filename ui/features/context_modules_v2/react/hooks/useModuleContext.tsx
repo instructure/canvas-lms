@@ -20,25 +20,33 @@ import { createContext, useContext, useState } from "react";
 
 const ContextModule = createContext<{
   courseId: string
-  state: string
-  setState: (state: string) => void
+  isMasterCourse: boolean
+  isChildCourse: boolean
+  state: Record<string, any>
+  setState: (state: Record<string, any>) => void
 }>({} as {
   courseId: string
-  state: string
-  setState: (state: string) => void
+  isMasterCourse: boolean
+  isChildCourse: boolean
+  state: Record<string, any>
+  setState: (state: Record<string, any>) => void
 })
 
 export const ContextModuleProvider = ({
   children,
-  courseId
+  courseId,
+  isMasterCourse,
+  isChildCourse
 }: {
-  children: React.ReactNode,
+  children: React.ReactNode
   courseId: string
+  isMasterCourse: boolean
+  isChildCourse: boolean
 }) => {
-  const [state, setState] = useState("Hello, Context!");
+  const [state, setState] = useState({})
 
   return (
-    <ContextModule.Provider value={{ courseId, state, setState }}>
+    <ContextModule.Provider value={{ courseId, isMasterCourse, isChildCourse, state, setState }}>
       {children}
     </ContextModule.Provider>
   );
