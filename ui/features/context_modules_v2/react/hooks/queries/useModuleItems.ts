@@ -46,6 +46,7 @@ const MODULE_ITEMS_QUERY = gql`
               unlockAt
               published
               canUnpublish
+              isLockedByMasterCourse
             }
             ... on Discussion {
               _id
@@ -57,6 +58,7 @@ const MODULE_ITEMS_QUERY = gql`
               discussionType
               published
               canUnpublish
+              isLockedByMasterCourse
             }
             ... on File {
               _id
@@ -69,6 +71,7 @@ const MODULE_ITEMS_QUERY = gql`
               url
               published
               canUnpublish
+              isLockedByMasterCourse
             }
             ... on Page {
               _id
@@ -77,6 +80,7 @@ const MODULE_ITEMS_QUERY = gql`
               published
               canUnpublish
               type: __typename
+              isLockedByMasterCourse
             }
             ... on Quiz {
               _id
@@ -86,6 +90,7 @@ const MODULE_ITEMS_QUERY = gql`
               pointsPossible
               published
               canUnpublish
+              isLockedByMasterCourse
             }
             ... on ExternalUrl {
               title

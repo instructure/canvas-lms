@@ -49,6 +49,7 @@ import {MasteryPathsData} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import {mapContentSelection} from '../utils/utils'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import BlueprintLockIcon from './BlueprintLockIcon'
 
 const ENV = window.ENV as GlobalEnv
 
@@ -66,6 +67,7 @@ interface ModuleItemActionPanelProps {
     type?: string
     published?: boolean
     canUnpublish?: boolean
+    isLockedByMasterCourse?: boolean
   } | null
   published: boolean
   canBeUnpublished: boolean
@@ -86,7 +88,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   const [isDirectShareOpen, setIsDirectShareOpen] = useState(false)
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
 
-  const {courseId} = useContextModule()
+  const {courseId, isMasterCourse, isChildCourse} = useContextModule()
 
   const renderMasteryPathsInfo = () => {
     if (!masteryPathsData || (!masteryPathsData.isTrigger && !masteryPathsData.releasedLabel)) {
@@ -168,6 +170,13 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
     <Flex alignItems="center" gap="small" wrap="no-wrap" justifyItems="end">
       {/* Mastery Path Info */}
       {renderMasteryPathsInfo()}
+      {/* BlueprintLockIcon */}
+      {(isMasterCourse || isChildCourse) && <BlueprintLockIcon
+        isChildCourse={isChildCourse}
+        initialLockState={content?.isLockedByMasterCourse || false}
+        contentId={content?._id}
+        contentType={content?.type?.toLowerCase() || ''}
+      />}
       {/* Publish Icon */}
       <Flex.Item>
         <IconButton

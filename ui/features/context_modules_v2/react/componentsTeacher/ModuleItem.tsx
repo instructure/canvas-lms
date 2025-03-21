@@ -114,7 +114,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
         <Flex.Item>
           <Flex>
             {/* Item Type Icon */}
-            <Flex.Item margin={`0 small 0 ${INDENT_LOOKUP[indent] ?? '0'}`}>
+            <Flex.Item margin={`0 small 0 ${INDENT_LOOKUP[indent] ?? 'x-small'}`}>
               {getItemIcon(content)}
             </Flex.Item>
             <Flex.Item>
