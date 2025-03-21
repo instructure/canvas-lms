@@ -1390,6 +1390,8 @@ ko:
   add_feed_49ed1cb2: "피드 추가"
   add_group_c84f9e9d: "그룹 추가"
   add_group_set_f9809e11: "그룹 집합 추가"
+  add_item_75b67d07: "항목 추가"
+  add_item_to_module_3d7a05b2: "모듈에 항목 추가"
   add_login_f871148: "로그인 추가"
   add_message_10cc308c: "메시지 추가"
   add_module_5ad6fee2: "모듈 추가"
@@ -1624,6 +1626,7 @@ ko:
   are_you_sure_you_want_to_delete_this_rubric_f1c9eaa2: "이 루브릭을 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "이 메시지의 사본을 삭제하시겠습니까? 이 작업은 실행을 취소할 수 없습니다."
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "이 토큰을 다시 생성하시겠습니까? 이 토큰을 사용하는 것도 업데이트해야 합니다."
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "이 항목을 모듈에서 제거하시겠습니까?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "이 도구를 제거하시겠습니까?"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "이 사용자의 프로필 사진을 제거하시겠습니까?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "이 프로필 사진을 신고하시겠습니까?"
@@ -5369,6 +5372,7 @@ ko:
   display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "알림 기본 설정 페이지에 팝업 경고를 한 번 표시합니다."
   does_not_meet_expectations_b0736d20: "기대치에 미치지 못함"
   domain_3b54c511: 도메인
+  don_t_indent_b35ae9fb: "들여쓰지 않음"
   done_editing_9f7379d9: "편집 마침"
   done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "마쳤습니다. 업로드한 파일을 받아 간단한 의견과 함께 각 사용자의 이 과제에 대한 제출물 페이지에 첨부했습니다. 학생은 새 의견이 추가되었다는 알림을 받게 됩니다."
   download_submissions_7454665f: "제출물 다운로드"
@@ -5989,6 +5993,7 @@ ko:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "도구 없음"
   external_tools_6e77821: 외부도구
+  external_url_4752767f: "외부 URL"
   external_urls_62082a38: "외부 URL"
   failed_at_f471dfd3: "실패 시각"
   failed_please_report_the_following_error_code_to_y_42248d60: "실패했습니다. 다음 오류 코드를 시스템 관라지에게 알려주시기 바랍니다: ErrorReport:%{error};"
@@ -7161,6 +7166,8 @@ ko:
     get_started: 시작하기
     welcome_to_canvas: "Canvas에 오신 것을 환영합니다!"
   incorrect_username_and_or_password_2de73abb: "유효하지 않은 사용자 이름이나 암호"
+  indent_1_level_e7b18c1e: "한 수준 들여쓰기"
+  indentation_3c6081d5: 들여쓰기
   individual_2033c005: 개별
   info: 
     old_styleguide: 
@@ -9440,6 +9447,7 @@ ko:
     page: 페이지
     quiz: 퀴즈
     sub_header: "하위 머리글"
+  module_options_24663bfb: "모듈 옵션"
   modules: 
     add: 
       header: 
@@ -13786,6 +13794,7 @@ ko:
       timespan: "%{start_at}*부터* %{end_at}까지"
   testing_state_effd4a82: "테스트 상태"
   text_entry_e1808b2f: "텍스트 항목"
+  text_header_48fa9c37: "텍스트 머리글"
   text_sms_4e2d82a7: "텍스트 (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "해당 사용자 계정은 삭제되었습니다.  계정을 다시 활성화하려면 시스템 관리자에게 문의하시기 바랍니다."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "이 계정에 구성되어 있지 않은 기관에서 로그인했습니다."
@@ -14540,6 +14549,7 @@ ko:
   view_grades_8d3bae6c: "평점 보기"
   view_grades_for_name_45aeb2f2: "%{name} 평점 보기"
   view_notifications_6aea09a2: "알림 보기"
+  view_progress_2d61dd4: "진행 상황 보기"
   view_registered_services_6c8cd301: "등록된 서비스 보기"
   view_rubric_d71cce10: "루브릭 보기"
   viewsContextModules: 
