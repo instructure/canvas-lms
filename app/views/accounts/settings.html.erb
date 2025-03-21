@@ -703,19 +703,12 @@
                   <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
                   <%= settings.label :open_registration, :en => "Open Registration" %>
                   <% if @account.delegated_authentication? %>
-                    <legend>
-                      <%= link_to(image_tag('warning.png', :alt => ''), '#',
-                                  :class => 'open_registration_delegated_warning_link no-hover',
-                                  :title => t(:open_registration_delegated_warning_tooltip,
-                                  "An External Identity Provider is Enabled"))
-                                %>
-                    </legend>
+                    <button data-url="<%= canvas_login_url %>" type="button" class='Button Button--icon-action open_registration_delegated_warning_btn'>
+                      <%= image_tag "warning.png", :alt => '' %>
+                      <span class='screenreader-only'><%= t(:open_registration_screenreader, "Warning about Open Registration") %></span>
+                    </button>
 
-                    <div id="open_registration_delegated_warning_dialog" style="display: none;">
-                        <%= t(:open_registration_delegated_warning_message,
-                        "An external identity provider is enabled, and users created via open registration may not be able to log in unless
-                        the external identity provider's login form has a link back to %{url}.", :url => canvas_login_url) %>
-                    </div>
+                    <div id="open_registration_mount"></div>
                   <% end %>
                 </div>
               <% end %>
@@ -1427,7 +1420,7 @@ acknowledge that you have read and agreed to the
   <% end %>
   <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
       <div id="tab-alerts">
-        <div id="alerts_mount_point"></div> 
+        <div id="alerts_mount_point"></div>
       </div>
   <% end %>
   <% if can_do(@context, @current_user, :view_feature_flags) %>
