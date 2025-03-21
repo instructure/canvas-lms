@@ -1968,6 +1968,7 @@ el:
   are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "Είστε σίγουρος/η ότι επιθυμείτε να διαγράψετε το αντίγραφο αυτού του μηνύματος; Αυτή η πράξη δεν μπορεί να αναιρεθεί."
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Είστε σίγουρος/η ότι θέλετε να το κάνετε; Δεν μπορεί να αναιρεθεί και θα παρακάμψει τους υπάρχοντες βαθμούς στο βιβλίο βαθμών."
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "<mrk mid=\"2424\" mtype=\"seg\">Είστε σίγουρος/η ότι θέλετε να δημιουργήσετε εκ νέου αυτό το token;</mrk>  <mrk mid=\"2425\" mtype=\"seg\">Οτιδήποτε χρησιμοποιεί αυτό το token θα πρέπει να ενημερωθεί.</mrk>"
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "Είστε σίγουρος/η ότι επιθυμείτε να αφαιρέσετε αυτό το στοιχείο από την ενότητα;"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Είστε βέβαιος ότι επιθυμείτε να αφαιρέσετε αυτό το εργαλείο;"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Είστε βέβαιος ότι επιθυμείτε να αφαιρέσετε την εικόνα από το προφιλ αυτού του χρήστη;"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Είστε σίγουρος/η ότι θέλετε να αναφέρετε αυτή την εικόνα προφίλ;"
@@ -4217,6 +4218,7 @@ el:
   continue_ac067716: Συνέχεια
   continue_typing_to_find_additional_sections_or_stu_49786085: "Συνεχίστε να πληκτρολογείτε για να βρείτε περισσότερους τομείς ή σπουδαστές."
   contribute_4730e633: Συνεισφορά
+  contributed_fadcc2b9: Συνεισέφερε
   conversation_dialog: 
     message_sent: "Μήνυμα εστάλη!"
     no_course: "Κανένα μάθημα"
