@@ -2148,6 +2148,8 @@ hu:
   add_help_menu_links_de9fc34f: "Súgó menü link hozzáadása"
   add_hostname_as_an_allowed_domain_1f58c38d: "%{hostname}hozzáadása engedélyezett domainként"
   add_icon_567dbcaa: "ikon hozzáadása"
+  add_item_75b67d07: "Elem hozzáadása"
+  add_item_to_module_3d7a05b2: "Elem hozzáadása a modulhoz"
   add_items_44913315: "Elem hozzáadása"
   add_items_into_scoring_range_title_be08104e: "Elem hozzáadása ehhez %{scoring_range_title}"
   add_items_to_score_range_297d413b: "Elemek hozzáadása a pontszámtartományhoz"
@@ -3400,6 +3402,7 @@ hu:
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Biztosan folytatja? A végrehajtott módosítások nem kerülnek mentésre."
   are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Biztos benne, hogy újragenerálja ezt a tokent? Mindent frissíteni kell, ami használja ezt a tokent. "
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Biztosan eltávolítja ezt az elemet?"
+  are_you_sure_you_want_to_remove_this_item_from_the_3e39f6a9: "Biztos benne, hogy törli ezt az elemet a modulból?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Biztos benne, hogy el szeretné távolítani ezt az eszközt?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Biztos benne, hogy szeretné törölni ezt a felhasználót?"
   are_you_sure_you_want_to_remove_this_user_from_all_85fb8eb4: "Biztos, hogy ezt a felhasználót MINDEN fiókból el szeretné távolítani? A felhasználó nem csak törlésre kerül, hanem végleges törlésre lesz jelölve."
@@ -6856,6 +6859,7 @@ hu:
   continue_typing_to_find_additional_sections_or_stu_49786085: "Folytassa a gépelést ahhoz, hogy további szekciókat vagy hallgatókat találjon"
   contribute_4730e633: Közreműködés
   contribute_to_the_page_2116bf3b: "Hozzájárulás az oldalhoz"
+  contributed_fadcc2b9: Közreműködött
   contributed_to_this_module_item_and_is_complete_2799d5c: "Közreműködött a modulelemnél és teljesítette"
   conversation_dialog: 
     message_sent: "Üzenet elküldve!"
@@ -9505,6 +9509,7 @@ hu:
   domains_count_max_a52b7947: "Tartományok (%{count}/%{max})"
   dominican_republic_1_3cef4021: "Dominikai Köztársaság (+1)"
   don_t_add_this_user_for_now_32912974: "Egyelőre ne adja hozzá ezt a felhasználót."
+  don_t_indent_b35ae9fb: "Nincs behúzás"
   don_t_miss_notifications_from_your_students_900e9e30: "Ne maradjon le a hallgatók értesítéseiről."
   don_t_move_lti_query_params_to_post_body_5c80e037: "Ne mozgassa az LTI lekérdezési paramétereket a POST törzsébe"
   don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Ne vigye át a Tanulási eredmények pontszámait a Jártassági szint naplóba."
@@ -10751,6 +10756,7 @@ hu:
     no_tools_found: "Nem találhatóak eszközök"
   external_tools_6e77821: "Külső eszközök"
   external_tools_in_assignment_enhancements_18841855: "Külső eszközök a Feladatjavításokban"
+  external_url_4752767f: "Külső URL"
   external_url_e9b87215: "Külső webcím"
   external_urls_62082a38: "Külső webcímek"
   extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "Extra jóváírás nem engedélyezett az eredményeknél, a pontszám a maximális lehetséges értékre igazítva: %{outcome}"
@@ -12960,6 +12966,8 @@ hu:
   increase_indent_6af90f7c: "Behúzás növelése"
   increase_indent_6d550a4a: "Behúzás növelése"
   incremental_update_successfully_generated_against__db3f3f06: "A növekményes frissítés sikeresen le lett generálva az előző SIS import helyett."
+  indent_1_level_e7b18c1e: "Behúzás 1 szinttel"
+  indentation_3c6081d5: Behúzás
   indexing_in_progress_6ce56f27: "Indexelés folyamatban"
   india_91_6c290107: "India (+91)"
   indigo_2035fc55: Indigókék
@@ -21661,6 +21669,7 @@ hu:
   scope_to_a_specifc_user_9828eb72: "Hatály egy adott felhasználóra"
   scope_to_a_specific_course_deb646df: "Hatály egy adott kurzusra"
   score_at_least_1141bb81: "A pontszám legalább"
+  score_at_least_score_8668a54a: "Pontszám legalább %{score}"
   score_change_notifications_6b94f27f: "Értesítések eredményváltozásról"
   score_details_2995369: "Az eredmény részletei"
   score_distribution_graph_title_45e8fe7e: "Ponteloszlási grafikon - %{title}"
@@ -21692,6 +21701,7 @@ hu:
   score_to_ungraded_process_failed_reason_788f9030: "Pontozás a nem osztályozottnál folyamat sikertelen: %{reason}"
   score_to_ungraded_process_finished_successfully_6689b418: "Pontozás a nem osztályzotthoz folyamat sikeres"
   scored_187e6983: Pontozva
+  scored_at_least_score_e2272f6d: "Elért legalább %{score} pontszámot"
   scored_less_than_2427896c: "Kevesebbet ért el, mint"
   scored_less_than_cutoff_on_assignment_5f5c4303: "Kevesebb pontot ért el, mint %{cutoff} ezen a feladaton: %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "Kevesebb pontot ért el, mint %{score} ezen a feladaton: %{assignmentTitle}"
@@ -24395,6 +24405,7 @@ hu:
   text_entry_submission_7b0ae0c5: Szövegesbejegyzés-beadás
   text_entry_submission_cannot_be_empty_3d187cae: "Szöveges beadás nem lehet üres"
   text_file_73d8d08c: "Szöveges fájl"
+  text_header_48fa9c37: "Szöveges fejléc"
   text_input_d3480b8c: "Szöveges bemenet"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "A szöveg No Question átkerült egy Stimulusba; kérjük, adjon hozzá egy kérdést, hogy megjelenhessen a kvízben."
   text_sms_4e2d82a7: "Szöveg (SMS)"
@@ -26983,6 +26994,7 @@ hu:
   view_previous_student_90000459: "előző hallgató megtekintése"
   view_previous_week_6f83849f: "Az előző hét megtekintése"
   view_prior_enrollments_9b519b25: "Előzetes jelentkezések megtekintése"
+  view_progress_2d61dd4: "Előrehaladás megtekintése"
   view_question_banks_188a9e0f: "Kérdésbankok megtekintése"
   view_range_student_details_8116d68a: "A Hallgatói adatok megtekintése"
   view_registered_services_6c8cd301: "Regisztrált szolgáltatások megtekintése"
