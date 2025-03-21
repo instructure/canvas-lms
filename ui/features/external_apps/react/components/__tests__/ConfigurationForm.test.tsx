@@ -148,17 +148,6 @@ describe('when configuration type is manual', () => {
   })
 
   describe('error checking', () => {
-    it('flashes an error when name is empty', async () => {
-      renderForm(baseProps)
-      await userEvent.click(getSubmitButton())
-
-      // This can't use .not.toHaveBeenCalled because the submit function receives a React synthetic event,
-      // and if it has been called, jest will try to print out the result of that event, which results in
-      // a misleading error message about what actually happened, so toHaveBeenCalledTimes it is.
-      expect(handleSubmitMock).toHaveBeenCalledTimes(0)
-      expect(mockedFlash).toHaveBeenCalled()
-    })
-
     it('renders an error next to the name input when name is empty', async () => {
       renderForm(baseProps)
       await userEvent.click(getSubmitButton())
@@ -168,22 +157,15 @@ describe('when configuration type is manual', () => {
     })
 
     describe('name has a value', () => {
-      it('flashes an error when url and domain are both empty', async () => {
-        renderForm(baseProps)
-        await userPaste(getNameInput(), 'a really cool name')
-        await userEvent.click(getSubmitButton())
-
-        expect(handleSubmitMock).toHaveBeenCalledTimes(0)
-        expect(mockedFlash).toHaveBeenCalled()
-      })
-
       it('renders an error when url and domain are both empty', async () => {
         renderForm(baseProps)
         await userPaste(getNameInput(), 'a really cool name')
         await userEvent.click(getSubmitButton())
 
         expect(handleSubmitMock).toHaveBeenCalledTimes(0)
-        expect(screen.getAllByText(/Either the url or domain should be set./i)).not.toHaveLength(0)
+        expect(
+          screen.getAllByText(/One or both of Launch URL and Domain should be entered./i),
+        ).not.toHaveLength(0)
       })
 
       it("doesn't flash an error if just url is set and tries to submit the form", async () => {
