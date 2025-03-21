@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback, useContext} from 'react'
 import type {Dispatch, SetStateAction} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -30,6 +30,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconEndLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {DiscussionSummaryUsagePill} from "./DiscussionSummaryUsagePill";
 
 interface DiscussionSummary {
@@ -72,6 +73,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   const [isInitialGeneration, setIsInitialGeneration] = useState<boolean>(true)
   const [summaryError, setSummaryError] = useState<DiscussionSummaryError | null>(null)
   const [isSummaryLoading, setIsSummaryLoading] = useState(props.summary === null)
+  const {setOnSuccess} = useContext(AlertManagerContext)
   const [usage, setUsage] = useState<DiscussionSummaryUsage | null>(null)
 
   // @ts-expect-error
@@ -92,6 +94,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   }
 
   const generateSummary = () => {
+    setOnSuccess(I18n.t('Generating discussion summary.'))
     setIsInitialGeneration(false)
     setIsSummaryLoading(true)
   }
@@ -111,7 +114,10 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   const fetchSummary = useCallback(async (initial: boolean) => {
     try {
       const result: DiscussionSummary | undefined = await getDiscussionSummary(initial)
-      if (result) { setUsage(result.usage) }
+      if (result) {
+          setUsage(result.usage)
+          setOnSuccess(I18n.t('Summary generated.'))
+      }
       props.onSetSummary(result)
       if(result?.userInput) {
         setUserInput(result.userInput)
